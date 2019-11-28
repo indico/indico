@@ -11,6 +11,7 @@ from indico.core.db import db
 from indico.core.db.sqlalchemy import UTCDateTime
 from indico.core.db.sqlalchemy.descriptions import RenderMode, RenderModeMixin
 from indico.util.date_time import now_utc
+from indico.util.locators import locator_property
 from indico.util.string import format_repr, return_ascii, text_to_repr
 from indico.util.struct.enum import IndicoEnum
 
@@ -100,3 +101,22 @@ class EditingRevisionComment(RenderModeMixin, db.Model):
     @return_ascii
     def __repr__(self):
         return format_repr(self, 'id', 'revision_id', 'user_id', internal=False, _text=text_to_repr(self.text))
+
+    @locator_property
+    def locator(self):
+        return dict(self.revision.locator, comment_id=self.id)
+
+    def can_modify(self, user):
+        editable = self.revision.editable
+        contribution = self.revision.editable.contribution
+        authorized_submitter = contribution.is_user_associated(user, check_abstract=True)
+        authorized_editor = user in editable.editors
+
+        if self.user != user:
+            return False
+        elif self.system:
+            return False
+        elif self.internal and not authorized_editor:
+            return False
+
+        return authorized_editor or authorized_submitter

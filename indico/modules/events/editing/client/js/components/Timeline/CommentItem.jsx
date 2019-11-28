@@ -6,23 +6,49 @@
 // LICENSE file for more details.
 
 import moment from 'moment';
-import React from 'react';
+import React, {useState} from 'react';
+import {useDispatch, useSelector} from 'react-redux';
 import PropTypes from 'prop-types';
+import {Button, Confirm} from 'semantic-ui-react';
 
 import UserAvatar from 'indico/modules/events/reviewing/components/UserAvatar';
 import {Param, Translate} from 'indico/react/i18n';
 import {serializeDate} from 'indico/utils/date';
 
-export default function Comment({user, createdDt, modifiedDt, html, internal}) {
+import {deleteRevisionComment} from '../../actions';
+import {getStaticData} from '../../selectors';
+
+const INDICO_BOT_USER = {
+  fullName: 'Indico Bot',
+  avatarBgColor: '#8f8f8f',
+};
+
+export default function Comment({
+  user,
+  createdDt,
+  modifiedDt,
+  html,
+  internal,
+  system,
+  canModify,
+  modifyCommentURL,
+}) {
+  const [isDeletingComment, setIsDeletingComment] = useState(false);
+  const [confirmOpen, setConfirmOpen] = useState(false);
+  const staticData = useSelector(getStaticData);
+  const dispatch = useDispatch();
+  const commentUser = system ? INDICO_BOT_USER : user;
+
   return (
     <div className="i-timeline-item">
-      <UserAvatar user={user} />
+      <UserAvatar user={commentUser} />
       <div className="flexrow i-timeline-item-content">
         <div className="i-timeline-item-box header-indicator-left">
           <div className="i-box-header flexrow">
             <div className="f-self-stretch">
               <Translate>
-                <Param name="userName" value={user.fullName} wrapper={<strong />} /> left a comment
+                <Param name="userName" value={commentUser.fullName} wrapper={<strong />} /> left a
+                comment
               </Translate>{' '}
               {internal && (
                 <i
@@ -45,6 +71,46 @@ export default function Comment({user, createdDt, modifiedDt, html, internal}) {
                 </span>
               )}
             </div>
+            {canModify && (
+              <>
+                <a
+                  onClick={() => setConfirmOpen(true)}
+                  className="i-link icon-cross js-delete-comment"
+                  title={Translate.string('Remove comment')}
+                />
+                <Confirm
+                  size="tiny"
+                  header={Translate.string('Remove comment')}
+                  open={confirmOpen}
+                  content={Translate.string('Are you sure you want to remove this comment?')}
+                  closeOnDimmerClick={!isDeletingComment}
+                  closeOnEscape={!isDeletingComment}
+                  onCancel={() => setConfirmOpen(false)}
+                  onConfirm={async () => {
+                    setIsDeletingComment(true);
+
+                    const rv = await dispatch(deleteRevisionComment(modifyCommentURL, staticData));
+                    if (!rv.error) {
+                      setConfirmOpen(false);
+                    }
+
+                    setIsDeletingComment(false);
+                  }}
+                  cancelButton={
+                    <Button content={Translate.string('Cancel')} disabled={isDeletingComment} />
+                  }
+                  confirmButton={
+                    <Button
+                      content={Translate.string('Remove comment')}
+                      loading={isDeletingComment}
+                      disabled={isDeletingComment}
+                      negative
+                    />
+                  }
+                  closeIcon={!isDeletingComment}
+                />
+              </>
+            )}
           </div>
           <div className="i-box-content js-form-container">
             <div className="markdown-text" dangerouslySetInnerHTML={{__html: html}} />
@@ -58,15 +124,20 @@ export default function Comment({user, createdDt, modifiedDt, html, internal}) {
 Comment.propTypes = {
   createdDt: PropTypes.string.isRequired,
   html: PropTypes.string.isRequired,
+  canModify: PropTypes.bool.isRequired,
+  modifyCommentURL: PropTypes.string.isRequired,
   user: PropTypes.shape({
     fullName: PropTypes.string.isRequired,
     avatarBgColor: PropTypes.string.isRequired,
-  }).isRequired,
+  }),
   modifiedDt: PropTypes.string,
   internal: PropTypes.bool,
+  system: PropTypes.bool,
 };
 
 Comment.defaultProps = {
+  user: null,
   modifiedDt: null,
   internal: false,
+  system: false,
 };

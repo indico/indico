@@ -89,6 +89,6 @@ class Editable(db.Model):
     @property
     def editors(self):
         editors = [self.editor] if self.editor else []
-        editors.extend([revision.editor for revision in self.revisions
-                        if revision.editor and revision.editor != self.editor])
+        editors.extend(revision.editor for revision in self.revisions
+                       if revision.editor and revision.editor != self.editor)
         return editors

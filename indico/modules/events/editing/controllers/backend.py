@@ -95,7 +95,8 @@ class RHEditable(RHContributionEditableBase):
             raise Forbidden
 
     def _process(self):
-        return EditableSchema(context={'user': session.user, 'editors': self.editable.editors}).jsonify(self.editable)
+        context = {'user': session.user, 'editors': self.editable.editors}
+        return EditableSchema(context=context).jsonify(self.editable)
 
 
 class RHCreateEditable(RHContributionEditableBase):
@@ -217,7 +218,7 @@ class RHEditRevisionComment(RHContributionEditableRevisionBase):
 
     normalize_url_spec = {
         'locators': {
-            lambda self: self.contrib
+            lambda self: self.comment
         }
     }
 
@@ -229,13 +230,7 @@ class RHEditRevisionComment(RHContributionEditableRevisionBase):
                         .first_or_404())
 
     def _check_revision_access(self):
-        if self.comment.system:
-            return False
-        elif self.comment.internal and not self._user_is_authorized_editor():
-            return False
-        elif not self._user_is_authorized_submitter() and not self._user_is_authorized_editor():
-            return False
-        return self.comment.user == session.user
+        return self.comment.can_modify(session.user)
 
     @use_kwargs({
         'text': fields.String(missing=None, validate=not_empty),
