@@ -12,6 +12,7 @@ export const UNDELETE = 'UNDELETE';
 export const REVERT = 'REVERT';
 export const PROGRESS = 'PROGRESS';
 export const START_UPLOADS = 'START_UPLOADS';
+export const CLEAR_DIRTY = 'CLEAR_DIRTY';
 
 export const startUploads = (fileTypeId, files, tmpFileIds) => ({
   type: START_UPLOADS,
@@ -59,4 +60,8 @@ export const markUploaded = (fileTypeId, fileId, tmpFileId, file) => ({
   fileId,
   tmpFileId,
   file,
+});
+
+export const clearDirty = () => ({
+  type: CLEAR_DIRTY,
 });

@@ -40,7 +40,12 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   const files = camelizeKeys(response.data.revisions[0].files);
   ReactDOM.render(
-    <FileManager fileTypes={fileTypes} files={files} uploadURL={fileManager.dataset.uploadUrl} />,
+    <FileManager
+      fileTypes={fileTypes}
+      files={files}
+      uploadURL={fileManager.dataset.uploadUrl}
+      onChange={v => console.log(v)}
+    />,
     fileManager
   );
   ReactDOM.render(

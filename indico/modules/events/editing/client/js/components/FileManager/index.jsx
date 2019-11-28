@@ -6,7 +6,7 @@
 // LICENSE file for more details.
 
 import _ from 'lodash';
-import React, {useCallback, useReducer, useContext, useRef, useMemo} from 'react';
+import React, {useCallback, useReducer, useContext, useRef, useMemo, useEffect} from 'react';
 import PropTypes from 'prop-types';
 import {useDropzone} from 'react-dropzone';
 import {Icon} from 'semantic-ui-react';
@@ -22,6 +22,7 @@ import FileList from './FileList';
 import Uploads from './Uploads';
 import reducer from './reducer';
 import * as actions from './actions';
+import {getFiles} from './selectors';
 
 import './FileManager.module.scss';
 
@@ -100,12 +101,20 @@ FileType.defaultProps = {
   uploads: {},
 };
 
-export default function FileManager({uploadURL, fileTypes, files}) {
+export default function FileManager({onChange, uploadURL, fileTypes, files}) {
   const _fileTypes = useMemo(() => mapFileTypes(fileTypes, files), [fileTypes, files]);
   const [state, dispatch] = useReducer(reducer, {
     fileTypes: _fileTypes,
     uploads: {},
+    isDirty: false,
   });
+
+  useEffect(() => {
+    if (state.isDirty) {
+      onChange(getFiles(state));
+      dispatch(actions.clearDirty());
+    }
+  }, [onChange, state]);
 
   return (
     <div styleName="file-manager-wrapper">
@@ -128,5 +137,10 @@ export default function FileManager({uploadURL, fileTypes, files}) {
 FileManager.propTypes = {
   uploadURL: PropTypes.string.isRequired,
   fileTypes: PropTypes.arrayOf(PropTypes.shape(fileTypePropTypes)).isRequired,
-  files: PropTypes.arrayOf(PropTypes.shape(filePropTypes)).isRequired,
+  files: PropTypes.arrayOf(PropTypes.shape(filePropTypes)),
+  onChange: PropTypes.func.isRequired,
+};
+
+FileManager.defaultProps = {
+  files: [],
 };

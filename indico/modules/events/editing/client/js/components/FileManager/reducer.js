@@ -111,4 +111,20 @@ export default combineReducers({
         return state;
     }
   },
+  isDirty: (state = false, action) => {
+    switch (action.type) {
+      case actions.MARK_UPLOADED:
+      case actions.MARK_MODIFIED:
+      case actions.MARK_DELETED:
+      case actions.UNDELETE:
+      case actions.REVERT:
+        return true;
+
+      case actions.CLEAR_DIRTY:
+        return false;
+
+      default:
+        return state;
+    }
+  },
 });
