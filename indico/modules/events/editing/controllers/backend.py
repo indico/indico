@@ -95,8 +95,7 @@ class RHEditable(RHContributionEditableBase):
             raise Forbidden
 
     def _process(self):
-        context = {'user': session.user, 'editors': self.editable.editors}
-        return EditableSchema(context=context).jsonify(self.editable)
+        return EditableSchema(context={'user': session.user}).jsonify(self.editable)
 
 
 class RHCreateEditable(RHContributionEditableBase):
@@ -200,7 +199,7 @@ class RHCreateRevisionComment(RHContributionEditableRevisionBase):
     """Create new revision comment"""
 
     def _check_revision_access(self):
-        return self._user_is_authorized_submitter() or self._user_is_authorized_editor()
+        return self.editable.can_comment(session.user)
 
     @use_kwargs({
         'text': fields.String(required=True, validate=not_empty),

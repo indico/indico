@@ -9,8 +9,9 @@ from __future__ import unicode_literals
 
 from indico.core import signals
 from indico.core.logger import Logger
+from indico.core.permissions import ManagementPermission
 from indico.modules.events.features.base import EventFeature
-from indico.modules.events.models.events import EventType
+from indico.modules.events.models.events import Event, EventType
 from indico.util.i18n import _
 
 
@@ -31,3 +32,15 @@ class EditingFeature(EventFeature):
 @signals.event.get_feature_definitions.connect
 def _get_feature_definitions(sender, **kwargs):
     return EditingFeature
+
+
+@signals.acl.get_management_permissions.connect_via(Event)
+def _get_management_permissions(sender, **kwargs):
+    yield EditableEditorPermission
+
+
+class EditableEditorPermission(ManagementPermission):
+    name = 'paper_editing'
+    friendly_name = _('Paper editor')
+    description = _('Grants editor rights for paper editing on an event.')
+    user_selectable = True
