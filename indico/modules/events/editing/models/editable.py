@@ -83,12 +83,10 @@ class Editable(db.Model):
     def locator(self):
         return dict(self.contribution.locator, type=self.type.name)
 
-    def can_comment(self, user):
-        return self.editor == user or self.contribution.is_user_associated(user, check_abstract=True)
-
     @property
-    def editors(self):
-        editors = [self.editor] if self.editor else []
-        editors.extend(revision.editor for revision in self.revisions
-                       if revision.editor and revision.editor != self.editor)
-        return editors
+    def event(self):
+        return self.contribution.event
+
+    def can_comment(self, user):
+        return (self.event.can_manage(user, permission='paper_editing')
+                or self.contribution.is_user_associated(user, check_abstract=True))
