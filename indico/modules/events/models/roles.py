@@ -94,6 +94,10 @@ class EventRole(db.Model):
     def css(self):
         return 'color: #{0} !important; border-color: #{0} !important'.format(self.color)
 
+    @property
+    def style(self):
+        return {'color': '#' + self.color, 'borderColor': '#' + self.color}
+
 
 role_members_table = db.Table(
     'role_members',

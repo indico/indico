@@ -43,6 +43,7 @@ export const PrincipalListItem = ({
   invalid,
   name,
   detail,
+  meta,
   canDelete,
   onDelete,
   onAddFavorite,
@@ -55,22 +56,28 @@ export const PrincipalListItem = ({
 }) => (
   <List.Item>
     <div styleName="item">
-      <div styleName="icon">
-        {invalid ? (
-          <Popup
-            trigger={
-              <Icon.Group size="large">
-                <Icon name={PrincipalType.getIcon(type)} />
-                <Icon name="exclamation triangle" color="orange" corner />
-              </Icon.Group>
-            }
-          >
-            {PrincipalType.getDeletedText(type)}
-          </Popup>
-        ) : (
-          <Icon name={PrincipalType.getIcon(type)} size="large" />
-        )}
-      </div>
+      {type === PrincipalType.eventRole ? (
+        <div styleName="event-role">
+          <span style={meta.style}>{meta.code}</span>
+        </div>
+      ) : (
+        <div styleName="icon">
+          {invalid ? (
+            <Popup
+              trigger={
+                <Icon.Group size="large">
+                  <Icon name={PrincipalType.getIcon(type)} />
+                  <Icon name="exclamation triangle" color="orange" corner />
+                </Icon.Group>
+              }
+            >
+              {PrincipalType.getDeletedText(type)}
+            </Popup>
+          ) : (
+            <Icon name={PrincipalType.getIcon(type)} size="large" />
+          )}
+        </div>
+      )}
       <div styleName="content">
         <List.Content>{name}</List.Content>
         {detail && (
@@ -123,6 +130,7 @@ PrincipalListItem.propTypes = {
   invalid: PropTypes.bool,
   name: PropTypes.string.isRequired,
   detail: PropTypes.string,
+  meta: PropTypes.object,
   actions: PropTypes.node,
   onDelete: PropTypes.func.isRequired,
   onAddFavorite: PropTypes.func.isRequired,
@@ -143,6 +151,7 @@ PrincipalListItem.defaultProps = {
   isPendingUser: false,
   invalid: false,
   detail: null,
+  meta: {},
   search: null,
 };
 

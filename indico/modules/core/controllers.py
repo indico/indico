@@ -244,7 +244,8 @@ class PrincipalsMixin(object):
             return {'identifier': identifier,
                     'type': 'event_role',
                     'invalid': False,
-                    'name': principal.name}
+                    'name': principal.name,
+                    'meta': {'style': principal.style, 'code': principal.code}}
 
     def _process(self):
         return jsonify({identifier: self._serialize_principal(identifier, principal)

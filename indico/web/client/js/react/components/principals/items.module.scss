@@ -6,14 +6,38 @@
 // LICENSE file for more details.
 
 @import 'base/palette';
+@import 'base/defaults';
+@import 'base/borders';
 
 .item {
     display: flex;
     align-items: center;
 }
 
+.event-role {
+    width: 3.5em;
+    text-align: center;
+
+    & > span {
+        /* from the role-code mixin */
+        @extend %default-border-radius;
+        @include border-all();
+        padding: 0.3em 0.1em;
+        font-size: 0.9em;
+        font-weight: bold;
+
+        /* from the SUI icon */
+        display: inline-block;
+        margin: 0 0.25rem 0 0;
+
+        width: 3.25em;
+        text-align: center;
+    }
+}
+
 .icon {
-    padding-right: 5px;
+    width: 3.5em;
+    text-align: center;
     color: $light-black;
 }
 

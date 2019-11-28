@@ -135,7 +135,7 @@ export class PrincipalType {
       [PrincipalType.user]: 'user',
       [PrincipalType.localGroup]: 'users',
       [PrincipalType.multipassGroup]: 'users',
-      [PrincipalType.eventRole]: 'users',
+      // event roles have no icon but their code
     }[type];
   }
 

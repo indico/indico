@@ -119,6 +119,7 @@ const ACLField = props => {
               key={data.identifier}
               name={data.name}
               detail={data.detail}
+              meta={data.meta}
               type={data.type}
               invalid={data.invalid}
               favorite={data.type === PrincipalType.user && data.userId in favoriteUsers}
