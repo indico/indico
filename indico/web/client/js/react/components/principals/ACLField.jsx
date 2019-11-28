@@ -158,6 +158,7 @@ const ACLField = props => {
               text={Translate.string('Role')}
               button
               upward
+              floating
               disabled={roleOptions.length === 0}
               options={roleOptions}
               value={null}

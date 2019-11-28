@@ -269,7 +269,13 @@ const searchFactory = config => {
     const trigger = triggerFactory ? (
       triggerFactory({disabled, onClick: handleOpenClick})
     ) : (
-      <Button type="button" content={buttonTitle} disabled={disabled} onClick={handleOpenClick} />
+      <Button
+        as="div"
+        type="button"
+        content={buttonTitle}
+        disabled={disabled}
+        onClick={handleOpenClick}
+      />
     );
 
     const stopPropagation = evt => {
