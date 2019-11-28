@@ -18,3 +18,10 @@ export const InitialRevisionState = {
   ready_for_review: 'ready_for_review',
   needs_submitter_confirmation: 'needs_submitter_confirmation',
 };
+
+export const EditingReviewAction = {
+  accept: 'accept',
+  reject: 'reject',
+  update: 'update',
+  requestUpdate: 'request_update',
+};

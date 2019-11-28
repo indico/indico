@@ -12,6 +12,7 @@ import {Button, Dropdown} from 'semantic-ui-react';
 import {Translate} from 'indico/react/i18n';
 
 import {blockPropTypes} from '../util';
+import {EditingReviewAction} from '../../../models';
 import AcceptRejectForm from './AcceptRejectForm';
 
 import './JudgmentBox.module.scss';
@@ -54,7 +55,7 @@ export default function JudgmentBox({block, onClose, judgmentType: _judgmentType
           <Button icon="delete" disabled={loading} onClick={onClose} />
         </div>
       </div>
-      {(judgmentType === 'accept' || judgmentType === 'reject') && (
+      {[EditingReviewAction.accept, EditingReviewAction.reject].includes(judgmentType) && (
         <AcceptRejectForm block={block} action={judgmentType} setLoading={setLoading} />
       )}
     </>

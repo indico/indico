@@ -16,27 +16,28 @@ import {Translate} from 'indico/react/i18n';
 
 import JudgmentBox from './judgment/JudgmentBox';
 import {blockPropTypes} from './util';
+import {EditingReviewAction} from '../../models';
 
 import './ReviewForm.module.scss';
 
 const judgmentOptions = [
   {
-    value: 'accept',
+    value: EditingReviewAction.accept,
     text: Translate.string('Accept'),
     class: 'accepted',
   },
   {
-    value: 'reject',
+    value: EditingReviewAction.reject,
     text: Translate.string('Reject'),
     class: 'rejected',
   },
   {
-    value: 'update',
+    value: EditingReviewAction.update,
     text: Translate.string('Make changes'),
     class: 'needs-submitter-confirmation',
   },
   {
-    value: 'request_update',
+    value: EditingReviewAction.requestUpdate,
     text: Translate.string('Request changes'),
     class: 'needs-submitter-changes',
   },
