@@ -60,7 +60,7 @@ function FileEntry({
   return (
     <>
       <span styleName="file-state" className={state || ''}>
-        <a href={downloadURL}>{filename}</a>
+        {downloadURL ? <a href={downloadURL}>{filename}</a> : filename}
       </span>
       <span>
         {!state && allowMultipleFiles && (
