@@ -26,6 +26,7 @@ export default function AcceptRejectForm({block, action, setLoading}) {
 
   return (
     <FinalForm
+      initialValues={{comment: ''}}
       onSubmit={async formData => {
         setLoading(true);
         const ret = await dispatch(
@@ -45,11 +46,19 @@ export default function AcceptRejectForm({block, action, setLoading}) {
               name="comment"
               placeholder={Translate.string('Leave a comment...')}
               hideValidationError
+              autoFocus
+              required={action === 'reject'}
+              /* otherwise changing required doesn't work properly if the field has been touched */
+              key={action}
             />
             <div>TODO: Tags field</div>
           </Form>
           <div styleName="judgment-submit-button">
-            <FinalSubmitButton form="judgment-form" label={Translate.string('Confirm')} />
+            <FinalSubmitButton
+              form="judgment-form"
+              label={Translate.string('Confirm')}
+              disabledUntilChange={action === 'reject'}
+            />
           </div>
         </>
       )}
