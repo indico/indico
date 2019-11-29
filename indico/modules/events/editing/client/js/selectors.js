@@ -52,6 +52,7 @@ export function processRevisions(revisions) {
       });
 
       if (index === revisions.length - 1) {
+        items = [];
         currentRevision = {...revision};
       } else {
         items = [...revision.comments];

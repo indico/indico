@@ -64,8 +64,9 @@ class EditingRevisionCommentSchema(mm.ModelSchema):
     class Meta:
         model = EditingRevisionComment
         fields = ('id', 'user', 'created_dt', 'modified_dt', 'internal', 'system', 'text', 'html', 'can_modify',
-                  'modify_comment_url')
+                  'modify_comment_url', 'revision_id')
 
+    revision_id = fields.Int(attribute='revision.id')
     user = fields.Nested(UserSchema, only=('id', 'avatar_bg_color', 'full_name'))
     html = fields.Function(lambda comment: escape(comment.text))
     can_modify = fields.Function(lambda comment, ctx: comment.can_modify(ctx.get('user')))
