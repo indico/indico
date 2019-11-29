@@ -18,7 +18,9 @@ function FileListDisplay({files}) {
       {files.map(({filename, uuid, downloadURL}) => (
         <li key={uuid}>
           <span styleName="file-name">
-            <a href={downloadURL}>{filename}</a>
+            <a href={downloadURL} target="_blank" rel="noopener noreferrer">
+              {filename}
+            </a>
           </span>
         </li>
       ))}

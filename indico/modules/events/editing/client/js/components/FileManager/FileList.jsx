@@ -60,7 +60,13 @@ function FileEntry({
   return (
     <>
       <span styleName="file-state" className={state || ''}>
-        {downloadURL ? <a href={downloadURL}>{filename}</a> : filename}
+        {downloadURL ? (
+          <a href={downloadURL} target="_blank" rel="noopener noreferrer">
+            {filename}
+          </a>
+        ) : (
+          filename
+        )}
       </span>
       <span>
         {!state && allowMultipleFiles && (
