@@ -13,7 +13,10 @@ import {InitialRevisionState, FinalRevisionState} from './models';
 
 function shouldCreateNewRevision({initialState, finalState}) {
   return (
-    initialState.name === InitialRevisionState.ready_for_review &&
+    [
+      InitialRevisionState.ready_for_review,
+      InitialRevisionState.needs_submitter_confirmation,
+    ].includes(initialState.name) &&
     ![
       FinalRevisionState.replaced,
       FinalRevisionState.accepted,
@@ -88,8 +91,9 @@ export function processRevisions(revisions) {
       items.push(
         createNewCustomItemFromRevision(revision, {
           user: revisions[0].submitter,
-          header: Translate.string('Submitter rejected proposed changes'),
+          header: Translate.string('Editor rejected current revision'),
           state: 'rejected',
+          html: revision.commentHtml,
         })
       );
     } else if (revision.finalState.name === FinalRevisionState.accepted) {
