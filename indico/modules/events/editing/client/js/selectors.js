@@ -18,9 +18,9 @@ function shouldCreateNewRevision({initialState, finalState}) {
       InitialRevisionState.needs_submitter_confirmation,
     ].includes(initialState.name) &&
     ![
-      FinalRevisionState.replaced,
       FinalRevisionState.accepted,
       FinalRevisionState.rejected,
+      FinalRevisionState.replaced,
     ].includes(finalState.name)
   );
 }
@@ -42,35 +42,11 @@ export function processRevisions(revisions) {
   let items = [...currentRevision.comments];
 
   for (const [index, revision] of revisions.entries()) {
-    const {initialState, finalState} = revision;
+    const {finalState} = revision;
 
-    if (revisions.length > 1 && shouldCreateNewRevision(revision)) {
-      newRevisions.push({
-        ..._.omit(currentRevision, 'comments'),
-        number:
-          finalState.name === FinalRevisionState.needs_submitter_confirmation
-            ? numberOfRevisions
-            : numberOfRevisions++,
-        items,
-      });
-
-      if (index === revisions.length - 1) {
-        items = [];
-        currentRevision = {...revision};
-      } else {
-        items = [...revision.comments];
-        currentRevision = {...revisions[index + 1]};
-      }
-
-      items = [...items, ...currentRevision.comments];
-    }
-
-    if (initialState.name === InitialRevisionState.needs_submitter_confirmation) {
-      const previousRevision = revisions[index - 1];
-
-      currentRevision.header = Translate.string('Editor requested some changes');
-      currentRevision.comment = previousRevision.comment;
-      currentRevision.commentHtml = previousRevision.commentHtml;
+    if (!currentRevision) {
+      currentRevision = {...revision};
+      items = [...currentRevision.comments];
     }
 
     if (finalState.name === FinalRevisionState.replaced) {
@@ -80,20 +56,6 @@ export function processRevisions(revisions) {
         createNewCustomItemFromRevision(updatedRevision, {
           header: Translate.string('Revision has been replaced'),
           state: FinalRevisionState.replaced,
-        })
-      );
-
-      // Don't create a new top-level entry for the new (replaced) revision if it is the last one
-      if (updatedRevision.finalState.name === FinalRevisionState.none) {
-        break;
-      }
-    } else if (revision.finalState.name === FinalRevisionState.needs_submitter_changes) {
-      items.push(
-        createNewCustomItemFromRevision(revision, {
-          user: revisions[0].submitter,
-          header: Translate.string('Editor rejected current revision'),
-          state: 'rejected',
-          html: revision.commentHtml,
         })
       );
     } else if (revision.finalState.name === FinalRevisionState.accepted) {
@@ -112,6 +74,28 @@ export function processRevisions(revisions) {
           html: revision.commentHtml,
         })
       );
+    } else if (revision.finalState.name === FinalRevisionState.needs_submitter_changes) {
+      items.push(
+        createNewCustomItemFromRevision(revision, {
+          user: revisions[0].submitter,
+          header: Translate.string('Editor requested an update'),
+          state: 'rejected',
+          html: revision.commentHtml,
+        })
+      );
+    } else if (revision.finalState.name === FinalRevisionState.needs_submitter_confirmation) {
+      // TODO: Check if we need to handle that state in some way
+    }
+
+    if (shouldCreateNewRevision(revision)) {
+      newRevisions.push({
+        ..._.omit(currentRevision, 'comments'),
+        number: numberOfRevisions++,
+        items,
+      });
+
+      currentRevision = null;
+      items = [];
     }
   }
 
