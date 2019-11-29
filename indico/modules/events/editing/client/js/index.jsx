@@ -62,6 +62,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     eventId: parseInt(timelineRootElem.dataset.eventId, 10),
     contributionId: parseInt(timelineRootElem.dataset.contributionId, 10),
     editableType: timelineRootElem.dataset.editableType,
+    fileTypes,
   });
 
   ReactDOM.render(

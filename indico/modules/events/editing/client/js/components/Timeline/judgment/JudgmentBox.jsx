@@ -14,6 +14,7 @@ import {Translate} from 'indico/react/i18n';
 import {blockPropTypes} from '../util';
 import {EditingReviewAction} from '../../../models';
 import AcceptRejectForm from './AcceptRejectForm';
+import UpdateFilesForm from './UpdateFilesForm';
 
 import './JudgmentBox.module.scss';
 
@@ -57,6 +58,9 @@ export default function JudgmentBox({block, onClose, judgmentType: _judgmentType
       </div>
       {[EditingReviewAction.accept, EditingReviewAction.reject].includes(judgmentType) && (
         <AcceptRejectForm block={block} action={judgmentType} setLoading={setLoading} />
+      )}
+      {judgmentType === EditingReviewAction.update && (
+        <UpdateFilesForm block={block} setLoading={setLoading} />
       )}
     </>
   );
