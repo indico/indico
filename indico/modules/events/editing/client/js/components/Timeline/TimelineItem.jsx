@@ -30,7 +30,7 @@ export default function TimelineItem({block}) {
   const {fileTypes, eventId, contributionId, editableType} = useSelector(getStaticData);
   const isLastBlock = lastBlock.id === block.id;
   const [visible, setVisible] = useState(isLastBlock);
-  const headerOnly = !visible || (isLastBlock && block.items.length === 0 && !block.comment);
+  const headerOnly = !visible || (!isLastBlock && block.items.length === 0 && !block.comment);
 
   return (
     <>
