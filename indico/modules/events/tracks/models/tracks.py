@@ -97,6 +97,7 @@ class Track(DescriptionMixin, ProtectionManagersMixin, db.Model):
         lazy=True,
         backref=db.backref(
             'tracks',
+            order_by=position,
             lazy=True,
             passive_deletes=True
         )

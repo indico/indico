@@ -91,7 +91,7 @@
             </div>
         {% endif %}
             <div  class="embedded-track-list">
-                <ul class="i-box-group vert track-list" data-url="{{ url_for('.sort_tracks', event) }}">
+                <ul class="i-box-group vert track-list"">
                     <div class="no-tracks-message">
                         <em>{% trans %}No tracks have been added yet.{% endtrans %}</em>
                         <br>
@@ -113,7 +113,7 @@
             {% endcall %}
         </div>
     {% else %}
-        <ul class="i-box-group vert track-list" data-url="{{ url_for('.sort_tracks', event) }}">
+        <ul class="i-box-group vert track-list">
             {% for item in items %}
                 {% if item.is_track_group %}
                     {{ render_group(item, event)}}

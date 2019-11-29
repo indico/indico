@@ -57,7 +57,7 @@
         </a>
     </div>
 
-    <div id="track-list-container">
+    <div id="track-list-container" data-url="{{ url_for('.sort_tracks', event) }}">
         {{ render_list(event, list_items) }}
     </div>
     <script>
