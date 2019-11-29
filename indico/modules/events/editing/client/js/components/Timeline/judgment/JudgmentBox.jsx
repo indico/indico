@@ -14,6 +14,7 @@ import {Translate} from 'indico/react/i18n';
 import {blockPropTypes} from '../util';
 import {EditingReviewAction} from '../../../models';
 import AcceptRejectForm from './AcceptRejectForm';
+import RequestChangesForm from './RequestChangesForm';
 import UpdateFilesForm from './UpdateFilesForm';
 
 import './JudgmentBox.module.scss';
@@ -61,6 +62,9 @@ export default function JudgmentBox({block, onClose, judgmentType: _judgmentType
       )}
       {judgmentType === EditingReviewAction.update && (
         <UpdateFilesForm block={block} setLoading={setLoading} />
+      )}
+      {judgmentType === EditingReviewAction.requestUpdate && (
+        <RequestChangesForm setLoading={setLoading} onSuccess={onClose} />
       )}
     </>
   );
