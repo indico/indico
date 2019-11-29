@@ -106,6 +106,7 @@ describe('File manager', () => {
         downloadURL="goes://nowhere"
         fileTypes={fileTypes}
         files={fileList}
+        onChange={() => null}
       />
     );
     expect(wrapper.find('FileType')).toHaveLength(3);
@@ -119,12 +120,14 @@ describe('File manager', () => {
   });
 
   it('modifies an existing file', async () => {
+    const onChange = jest.fn();
     const wrapper = mount(
       <FileManager
         uploadURL="http://upload/endpoint"
         downloadURL="http://download/endpoint"
         fileTypes={fileTypes}
         files={fileList}
+        onChange={onChange}
       />
     );
     const dropzone = wrapper
@@ -154,6 +157,8 @@ describe('File manager', () => {
       expect.objectContaining({type: actions.START_UPLOADS})
     );
 
+    expect(onChange).not.toHaveBeenCalled();
+
     await act(async () => {
       mockAxios.mockResponse({
         data: {
@@ -169,6 +174,8 @@ describe('File manager', () => {
     expect(mockDispatch).toHaveBeenCalledWith(
       expect.objectContaining({type: actions.MARK_MODIFIED})
     );
+
+    expect(onChange).toHaveBeenCalledWith({'1': ['file1'], '2': ['newfile2'], '3': ['file3']});
 
     wrapper.update();
 
