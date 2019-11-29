@@ -15,14 +15,18 @@ import TimelineContent from 'indico/modules/events/reviewing/components/Timeline
 import * as actions from '../../actions';
 import * as selectors from '../../selectors';
 import TimelineItem from './TimelineItem';
+import FileDisplay from '../FileDisplay';
 
 export default function Timeline() {
   const dispatch = useDispatch();
   const details = useSelector(selectors.getDetails);
   const isInitialEditableDetailsLoading = useSelector(selectors.isInitialEditableDetailsLoading);
   const lastState = useSelector(selectors.getLastState);
+  const lastRevision = useSelector(selectors.getLastRevision);
   const timelineBlocks = useSelector(selectors.getTimelineBlocks);
-  const {eventId, contributionId, editableType} = useSelector(selectors.getStaticData);
+  const {eventId, contributionId, downloadURL, editableType, fileTypes} = useSelector(
+    selectors.getStaticData
+  );
 
   useEffect(() => {
     dispatch(actions.loadTimeline(eventId, contributionId, editableType));
@@ -42,7 +46,7 @@ export default function Timeline() {
         submitter={timelineBlocks[0].submitter}
         eventId={eventId}
       >
-        STUFF
+        <FileDisplay fileTypes={fileTypes} files={lastRevision.files} downloadURL={downloadURL} />
       </TimelineHeader>
       <TimelineContent blocks={timelineBlocks} itemComponent={TimelineItem} />
     </>

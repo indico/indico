@@ -5,6 +5,8 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
+import getDownloadURL from 'indico-url:event_editing.revision_files_export';
+
 import React, {useState} from 'react';
 import {useSelector} from 'react-redux';
 import moment from 'moment';
@@ -17,13 +19,15 @@ import {serializeDate} from 'indico/utils/date';
 import RevisionLog from './RevisionLog';
 import ReviewForm from './ReviewForm';
 import {blockPropTypes} from './util';
-import {getDetails, getLastTimelineBlock, getLastState} from '../../selectors';
+import {getDetails, getLastTimelineBlock, getLastState, getStaticData} from '../../selectors';
+import FileDisplay from '../FileDisplay';
 
 export default function TimelineItem({block}) {
   const {submitter, createdDt} = block;
   const lastBlock = useSelector(getLastTimelineBlock);
   const lastState = useSelector(getLastState);
   const {canComment} = useSelector(getDetails);
+  const {fileTypes, eventId, contributionId, editableType} = useSelector(getStaticData);
   const isLastBlock = lastBlock.id === block.id;
   const [visible, setVisible] = useState(isLastBlock);
   const headerOnly = !visible || (isLastBlock && block.items.length === 0 && !block.comment);
@@ -65,6 +69,16 @@ export default function TimelineItem({block}) {
             </div>
             {visible && (
               <div className="i-box-content">
+                <FileDisplay
+                  fileTypes={fileTypes}
+                  files={block.files}
+                  downloadURL={getDownloadURL({
+                    revision_id: block.id,
+                    confId: eventId,
+                    contrib_id: contributionId,
+                    type: editableType,
+                  })}
+                />
                 {block.comment && (
                   <>
                     <div className="titled-rule">

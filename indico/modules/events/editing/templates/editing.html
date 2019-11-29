@@ -5,18 +5,11 @@
 {% endblock %}
 
 {% block content %}
-    <div id="file-manager"
-         data-event-id="{{ event.id }}"
-         data-download-url="{{ url_for('event_editing.revision_files_export', event, contrib_id=contribution.id,
-                                       revision_id=editable.revisions[0].id, type='paper') }}"
-         data-upload-url="{{ url_for('event_editing.api_upload', event, contrib_id=contribution.id, type='paper') }}"
-         data-api-editable-url="{{ url_for('event_editing.api_editable', event, contrib_id=contribution.id, type='paper') }}">
-    </div>
-    <hr>
-    <div id="file-display"></div>
-    <hr>
     <div data-event-id="{{ event.id }}"
          data-contribution-id="{{ editable.contribution.id }}"
          data-editable-type="{{ editable.type.name }}"
-         id="editing-timeline"></div>
+         id="editing-timeline"
+         data-download-url="{{ url_for('event_editing.revision_files_export', event, contrib_id=contribution.id,
+                                       revision_id=editable.revisions[0].id, type='paper') }}">
+    </div>
 {% endblock %}
