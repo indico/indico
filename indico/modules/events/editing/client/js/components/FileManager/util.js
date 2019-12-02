@@ -80,8 +80,7 @@ export function uploadFiles(action, fileTypeId, acceptedFiles, uploadURL, dispat
 
 export async function deleteFile(uuid) {
   try {
-    const {data} = await indicoAxios.delete(deleteFileURL({uuid}));
-    return data;
+    await indicoAxios.delete(deleteFileURL({uuid}));
   } catch (e) {
     handleAxiosError(e, false, true);
   }

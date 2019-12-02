@@ -23,6 +23,7 @@ function replaceFile(files, uuid, func) {
  * Reducer for arrays of files within a fileType (`fileType.files`).
  * @param {Array} state - the array of file objects which will be reduced
  * @param {Object} action - the action which will be processed
+ * @param {boolean} allowMultipleFiles - whether the file type allows multiple files
  */
 function fileListReducer(state, action, allowMultipleFiles) {
   switch (action.type) {
@@ -38,7 +39,7 @@ function fileListReducer(state, action, allowMultipleFiles) {
 
     case actions.MARK_MODIFIED:
       return replaceFile(state, action.fileId, file =>
-        file.claimed
+        file.claimed || file.state === 'modified'
           ? {
               ...action.file,
               state: 'modified',

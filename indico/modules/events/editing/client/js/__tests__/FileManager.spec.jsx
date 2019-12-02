@@ -98,6 +98,27 @@ function createDtWithFiles(files = []) {
   };
 }
 
+async function simulateFileUpload(dropzone, name, type) {
+  const uuid = `new${name}`;
+
+  await act(async () => {
+    dropzone.simulate('drop', createDtWithFiles([{type, name}]));
+  });
+
+  await act(async () => {
+    mockAxios.mockResponse({
+      data: {
+        uuid,
+        filename: name,
+        claimed: false,
+        downloadURL: 'goes://nowhere',
+      },
+    });
+  });
+
+  return uuid;
+}
+
 describe('File manager', () => {
   it('renders OK', () => {
     const wrapper = shallow(
@@ -117,6 +138,108 @@ describe('File manager', () => {
       });
       expect(node.prop('uploads')).toEqual({});
     });
+  });
+
+  it('lets you upload a new file', async () => {
+    const onChange = jest.fn();
+    const wrapper = mount(
+      <FileManager
+        uploadURL="goes://nowhere"
+        downloadURL="goes://nowhere"
+        fileTypes={[fileTypes[1]]}
+        onChange={onChange}
+      />
+    );
+
+    const dropzone = wrapper
+      .find('FileType')
+      .find(Dropzone)
+      .filterWhere(d => d.prop('fileType').id === 2)
+      .find('Dropzone');
+
+    const uuid1 = await simulateFileUpload(dropzone, 'test1.pdf', 'pdf');
+    expect(onChange).toHaveBeenCalledWith({'2': [uuid1]});
+    expect(mockAxios.delete).not.toHaveBeenCalled();
+    onChange.mockClear();
+
+    // upload another file which should replace the previous one
+    const uuid2 = await simulateFileUpload(dropzone, 'test2.pdf', 'pdf');
+    expect(onChange).toHaveBeenCalledWith({'2': [uuid2]});
+    expect(mockAxios.delete).toHaveBeenCalledWith('/files/newtest1.pdf');
+    await act(async () => {
+      mockAxios.mockResponse(); // respond to the DELETE request
+    });
+    onChange.mockClear();
+    mockAxios.delete.mockClear();
+
+    wrapper.update();
+    const fileEntry = wrapper.find('FileEntry').find({fileTypeId: 2});
+    const fileAction = fileEntry.find('FileAction');
+    expect(fileEntry.find('span:first-child').text()).toEqual('test2.pdf');
+    expect(fileAction.prop('icon')).toEqual('trash');
+
+    await act(async () => {
+      fileAction.simulate('click');
+      mockAxios.mockResponse(); // respond to the DELETE request
+    });
+
+    expect(mockAxios.delete).toHaveBeenCalledWith('/files/newtest2.pdf');
+    expect(onChange).toHaveBeenCalledWith({});
+  });
+
+  it('lets you upload a file, replacing an existing one', async () => {
+    const onChange = jest.fn();
+    const wrapper = mount(
+      <FileManager
+        uploadURL="goes://nowhere"
+        downloadURL="goes://nowhere"
+        fileTypes={fileTypes}
+        onChange={onChange}
+        files={[
+          {
+            filename: 'file1.pdf',
+            downloadURL: 'url://file1.pdf',
+            uuid: 'file1',
+            claimed: true,
+            fileType: 2,
+          },
+        ]}
+      />
+    );
+
+    const dropzone = wrapper
+      .find('FileType')
+      .find(Dropzone)
+      .filterWhere(d => d.prop('fileType').id === 2)
+      .find('Dropzone');
+
+    const uuid1 = await simulateFileUpload(dropzone, 'test1.pdf', 'pdf');
+    expect(onChange).toHaveBeenCalledWith({'2': [uuid1]});
+    onChange.mockClear();
+
+    // upload another file which should replace the previous one
+    const uuid2 = await simulateFileUpload(dropzone, 'test2.pdf', 'pdf');
+    expect(onChange).toHaveBeenCalledWith({'2': [uuid2]});
+    expect(mockAxios.delete).toHaveBeenCalledWith('/files/newtest1.pdf');
+    await act(async () => {
+      mockAxios.mockResponse(); // respond to the DELETE request
+    });
+    onChange.mockClear();
+    mockAxios.delete.mockClear();
+
+    wrapper.update();
+    const fileEntry = wrapper.find('FileEntry').find({fileTypeId: 2});
+    const fileAction = fileEntry.find('FileAction');
+    expect(fileEntry.find('span:first-child').text()).toEqual('test2.pdf');
+    expect(fileAction.prop('icon')).toEqual('undo');
+
+    await act(async () => {
+      fileAction.simulate('click');
+      mockAxios.mockResponse(); // respond to the DELETE request
+    });
+
+    expect(mockAxios.delete).toHaveBeenCalledWith('/files/newtest2.pdf');
+    expect(onChange).toHaveBeenCalledWith({'2': ['file1']});
   });
 
   it('modifies an existing file', async () => {

@@ -28,7 +28,20 @@ import './FileManager.module.scss';
 
 export function Dropzone({uploadURL, fileType: {id, allowMultipleFiles, files}}) {
   const dispatch = useContext(FileManagerContext);
-  const acceptsNewFiles = allowMultipleFiles || !files.length;
+  // we only want to modify the existing file if we do not allow multiple files and
+  // there is exactly one file that is not in the 'added' state (which would imply
+  // a freshly uploaded file which can be simply replaced)
+  const fileToReplace =
+    !allowMultipleFiles && files.length && files[0].state !== 'added' ? files[0] : null;
+  // if we don't allow multiple files and have a file in the added or modified state,
+  // that file can always be deleted from the server after the upload
+  const fileToDelete =
+    !allowMultipleFiles && files.length && ['added', 'modified'].includes(files[0].state)
+      ? files[0]
+      : null;
+  // as far as the user is concerned, they upload a "new" file when there are no files or
+  // multiple files are supported for the file type
+  const showNewFileIcon = files.length === 0 || allowMultipleFiles;
 
   const onDrop = useCallback(
     async acceptedFiles => {
@@ -36,20 +49,19 @@ export function Dropzone({uploadURL, fileType: {id, allowMultipleFiles, files}})
         acceptedFiles = acceptedFiles.splice(0, 1);
       }
       await uploadFiles(
-        acceptsNewFiles ? actions.markUploaded : actions.markModified,
+        fileToReplace ? actions.markModified : actions.markUploaded,
         id,
         acceptedFiles,
         uploadURL,
         dispatch,
-        acceptsNewFiles ? null : files[0].uuid
+        fileToReplace ? fileToReplace.uuid : null
       );
-      if (files.length && files[0].state === 'modified') {
-        // we're modifying a "modified" file, so we can get rid of
-        // the current one
-        dispatch(deleteFile(files[0].uuid));
+      if (fileToDelete) {
+        // we're modifying a freshly uploaded file, so we can get rid of the current one
+        deleteFile(fileToDelete.uuid);
       }
     },
-    [acceptsNewFiles, allowMultipleFiles, files, id, uploadURL, dispatch]
+    [fileToReplace, fileToDelete, allowMultipleFiles, id, uploadURL, dispatch]
   );
 
   const {getRootProps, getInputProps, isDragActive} = useDropzone({onDrop});
@@ -58,7 +70,7 @@ export function Dropzone({uploadURL, fileType: {id, allowMultipleFiles, files}})
     <div {...getRootProps()}>
       <input {...getInputProps()} />
       <div styleName="dropzone" className={isDragActive ? 'active' : ''}>
-        <Icon color="grey" size="big" name={acceptsNewFiles ? 'plus circle' : 'exchange'} />
+        <Icon color="grey" size="big" name={showNewFileIcon ? 'plus circle' : 'exchange'} />
       </div>
     </div>
   );
