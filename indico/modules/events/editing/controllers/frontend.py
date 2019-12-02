@@ -7,11 +7,18 @@
 
 from __future__ import unicode_literals
 
+from werkzeug.exceptions import NotFound
+
 from indico.modules.events.editing.controllers.base import RHContributionEditableBase
 from indico.modules.events.editing.views import WPEditing
 
 
 class RHEditableTimeline(RHContributionEditableBase):
+    def _process_args(self):
+        RHContributionEditableBase._process_args(self)
+        if not self.editable:
+            raise NotFound
+
     def _process(self):
         return WPEditing.render_template(
             'editing.html',
