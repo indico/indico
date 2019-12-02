@@ -5,9 +5,9 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
+/* eslint-disable import/unambiguous */
+/* global handleAjaxError:false */
 (function(global) {
-  'use strict';
-
   function updateSorting() {
     const container = $('#track-list-container');
     const sortedList = container
@@ -37,7 +37,7 @@
   }
 
   global.setupTrackManagement = function setupTrackManagement() {
-    var heightLimit = 50;
+    const heightLimit = 50;
     $('#track-list-container')
       .on('indico:htmlUpdated', function() {
         const $this = $(this);
@@ -59,13 +59,13 @@
           forcePlaceholderSize: true,
           placeholder: 'track-placeholder',
           connectWith: '.track-list',
-          update: function(_event, ui) {
+          update(_, ui) {
             // call update only once and only for the receiver
             if (this === ui.item.parent()[0]) {
               updateSorting();
             }
           },
-          receive: function(_, ui) {
+          receive(_, ui) {
             const parentDiv = $(this).closest('.track-group-box');
             if (parentDiv.length && ui.item.hasClass('track-group-box')) {
               $(ui.sender).sortable('cancel');
