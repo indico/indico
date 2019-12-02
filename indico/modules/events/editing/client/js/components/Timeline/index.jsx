@@ -5,8 +5,6 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-import getDownloadURL from 'indico-url:event_editing.revision_files_export';
-
 import React, {useEffect} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
 import {Loader} from 'semantic-ui-react';
@@ -49,12 +47,7 @@ export default function Timeline() {
         <FileDisplay
           fileTypes={fileTypes}
           files={lastRevision.files}
-          downloadURL={getDownloadURL({
-            revision_id: lastRevision.id,
-            confId: eventId,
-            contrib_id: contributionId,
-            type: editableType,
-          })}
+          downloadURL={lastRevision.downloadFilesURL}
         />
       </TimelineHeader>
       <TimelineContent blocks={timelineBlocks} itemComponent={TimelineItem} />

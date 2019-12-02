@@ -5,8 +5,6 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-import getDownloadURL from 'indico-url:event_editing.revision_files_export';
-
 import React, {useState} from 'react';
 import {useSelector} from 'react-redux';
 import moment from 'moment';
@@ -27,7 +25,7 @@ export default function TimelineItem({block}) {
   const lastBlock = useSelector(getLastTimelineBlock);
   const lastState = useSelector(getLastState);
   const {canComment} = useSelector(getDetails);
-  const {fileTypes, eventId, contributionId, editableType} = useSelector(getStaticData);
+  const {fileTypes} = useSelector(getStaticData);
   const isLastBlock = lastBlock.id === block.id;
   const [visible, setVisible] = useState(isLastBlock);
   const headerOnly = !visible || (!isLastBlock && block.items.length === 0 && !block.comment);
@@ -72,12 +70,7 @@ export default function TimelineItem({block}) {
                 <FileDisplay
                   fileTypes={fileTypes}
                   files={block.files}
-                  downloadURL={getDownloadURL({
-                    revision_id: block.id,
-                    confId: eventId,
-                    contrib_id: contributionId,
-                    type: editableType,
-                  })}
+                  downloadURL={block.downloadFilesURL}
                 />
                 {block.comment && (
                   <>
