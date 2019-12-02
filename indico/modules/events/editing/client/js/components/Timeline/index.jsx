@@ -5,6 +5,8 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
+import getDownloadURL from 'indico-url:event_editing.revision_files_export';
+
 import React, {useEffect} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
 import {Loader} from 'semantic-ui-react';
@@ -24,9 +26,7 @@ export default function Timeline() {
   const lastState = useSelector(selectors.getLastState);
   const lastRevision = useSelector(selectors.getLastRevision);
   const timelineBlocks = useSelector(selectors.getTimelineBlocks);
-  const {eventId, contributionId, downloadURL, editableType, fileTypes} = useSelector(
-    selectors.getStaticData
-  );
+  const {eventId, contributionId, editableType, fileTypes} = useSelector(selectors.getStaticData);
 
   useEffect(() => {
     dispatch(actions.loadTimeline(eventId, contributionId, editableType));
@@ -46,7 +46,16 @@ export default function Timeline() {
         submitter={timelineBlocks[0].submitter}
         eventId={eventId}
       >
-        <FileDisplay fileTypes={fileTypes} files={lastRevision.files} downloadURL={downloadURL} />
+        <FileDisplay
+          fileTypes={fileTypes}
+          files={lastRevision.files}
+          downloadURL={getDownloadURL({
+            revision_id: lastRevision.id,
+            confId: eventId,
+            contrib_id: contributionId,
+            type: editableType,
+          })}
+        />
       </TimelineHeader>
       <TimelineContent blocks={timelineBlocks} itemComponent={TimelineItem} />
     </>

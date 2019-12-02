@@ -20,7 +20,6 @@ import Timeline from './components/Timeline';
 document.addEventListener('DOMContentLoaded', async () => {
   const timelineElement = document.querySelector('#editing-timeline');
   const eventId = timelineElement.dataset.eventId;
-  const downloadURL = timelineElement.dataset.downloadUrl;
 
   let response;
   try {
@@ -34,7 +33,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     eventId: parseInt(timelineElement.dataset.eventId, 10),
     contributionId: parseInt(timelineElement.dataset.contributionId, 10),
     editableType: timelineElement.dataset.editableType,
-    downloadURL,
     fileTypes,
   });
 

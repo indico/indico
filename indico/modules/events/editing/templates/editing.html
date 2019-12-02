@@ -5,11 +5,9 @@
 {% endblock %}
 
 {% block content %}
-    <div data-event-id="{{ event.id }}"
+    <div id="editing-timeline"
+         data-event-id="{{ event.id }}"
          data-contribution-id="{{ editable.contribution.id }}"
-         data-editable-type="{{ editable.type.name }}"
-         id="editing-timeline"
-         data-download-url="{{ url_for('event_editing.revision_files_export', event, contrib_id=contribution.id,
-                                       revision_id=editable.revisions[0].id, type='paper') }}">
+         data-editable-type="{{ editable.type.name }}">
     </div>
 {% endblock %}
