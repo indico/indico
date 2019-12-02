@@ -17,8 +17,14 @@
     flex-wrap: wrap;
 
     .file-type-display {
+        overflow: hidden;
+        margin-bottom: 1em;
         padding: 1em;
         flex: 0 0 32%;
+
+        &:not(:nth-child(3n)) {
+            margin-right: 0.9em;
+        }
     }
 }
 
@@ -26,8 +32,15 @@
     list-style-type: none;
     padding: 0;
 
-    .file-name {
-        font-weight: bold;
+    .file-row {
+        display: flex;
+
+        .file-name {
+            font-weight: bold;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
     }
 }
 

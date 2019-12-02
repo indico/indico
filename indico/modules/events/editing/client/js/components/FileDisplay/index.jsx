@@ -8,6 +8,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import {Button, Icon} from 'semantic-ui-react';
+import {TooltipIfTruncated} from 'indico/react/components';
 import {Translate} from 'indico/react/i18n';
 import {fileTypePropTypes, filePropTypes, mapFileTypes} from '../FileManager/util';
 import './FileDisplay.module.scss';
@@ -16,12 +17,14 @@ function FileListDisplay({files}) {
   return (
     <ul styleName="file-list-display">
       {files.map(({filename, uuid, downloadURL}) => (
-        <li key={uuid}>
-          <span styleName="file-name">
-            <a href={downloadURL} target="_blank" rel="noopener noreferrer">
-              {filename}
-            </a>
-          </span>
+        <li key={uuid} styleName="file-row">
+          <TooltipIfTruncated>
+            <span styleName="file-name">
+              <a href={downloadURL} target="_blank" rel="noopener noreferrer">
+                {filename}
+              </a>
+            </span>
+          </TooltipIfTruncated>
         </li>
       ))}
       {!files.length && (
