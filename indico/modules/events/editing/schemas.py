@@ -89,7 +89,6 @@ class EditingRevisionSchema(mm.ModelSchema):
     create_comment_url = fields.Function(lambda revision: url_for('event_editing.api_create_comment', revision))
 
     def _get_comments(self, revision):
-        comments = []
         current_user = self.context.get('user')
         event = revision.editable.event
         comments = [comment for comment in revision.comments
