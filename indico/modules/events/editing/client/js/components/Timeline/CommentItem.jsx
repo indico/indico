@@ -16,7 +16,7 @@ import {Param, Translate} from 'indico/react/i18n';
 import {serializeDate} from 'indico/utils/date';
 
 import {deleteRevisionComment} from '../../actions';
-import {getLastTimelineBlock, getStaticData} from '../../selectors';
+import {getLastRevision, getStaticData} from '../../selectors';
 
 const INDICO_BOT_USER = {
   fullName: 'Indico Bot',
@@ -37,7 +37,7 @@ export default function Comment({
   const [isDeletingComment, setIsDeletingComment] = useState(false);
   const [confirmOpen, setConfirmOpen] = useState(false);
   const staticData = useSelector(getStaticData);
-  const lastBlock = useSelector(getLastTimelineBlock);
+  const lastRevision = useSelector(getLastRevision);
   const dispatch = useDispatch();
   const commentUser = system ? INDICO_BOT_USER : user;
 
@@ -73,7 +73,7 @@ export default function Comment({
                 </span>
               )}
             </div>
-            {canModify && lastBlock.id === revisionId && (
+            {canModify && lastRevision.id === revisionId && (
               <>
                 <a
                   onClick={() => setConfirmOpen(true)}
