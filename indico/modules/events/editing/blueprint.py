@@ -16,16 +16,16 @@ _bp = IndicoBlueprint('event_editing', __name__, url_prefix='/event/<confId>', t
 
 # Frontend
 _bp.add_url_rule('/contributions/<int:contrib_id>/editing/<any(paper):type>', 'editable', frontend.RHEditableTimeline)
+_bp.add_url_rule('/contributions/<int:contrib_id>/editing/<any(paper):type>/<int:revision_id>/files.zip',
+                 'revision_files_export', backend.RHExportRevisionFiles)
+_bp.add_url_rule('/contributions/<int:contrib_id>/editing/<any(paper):type>/<int:revision_id>/<int:file_id>/<filename>',
+                 'download_file', backend.RHDownloadRevisionFile)
 
 # Event-level APIs
 _bp.add_url_rule('/editing/api/file-types', 'api_file_types', backend.RHEditingFileTypes)
 _bp.add_url_rule('/editing/api/tags', 'api_tags', backend.RHEditingTags)
 
 # Contribution/revision-level APIs
-_bp.add_url_rule('/contributions/<int:contrib_id>/editing/<any(paper):type>/<int:revision_id>/files.zip',
-                 'revision_files_export', backend.RHExportRevisionFiles)
-_bp.add_url_rule('/contributions/<int:contrib_id>/editing/<any(paper):type>/<int:revision_id>/<int:file_id>/<filename>',
-                 'download_file', backend.RHDownloadRevisionFile)
 _bp.add_url_rule('/api/contributions/<int:contrib_id>/editing/<any(paper):type>/upload', 'api_upload',
                  backend.RHEditingUploadFile, methods=('POST',))
 _bp.add_url_rule('/api/contributions/<int:contrib_id>/editing/<any(paper):type>',
