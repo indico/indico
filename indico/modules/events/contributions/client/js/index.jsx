@@ -6,15 +6,19 @@
 // LICENSE file for more details.
 
 /* global showUndoWarning:false, setupListGenerator:false, setupSearchBox:false */
-/* global reloadManagementAttachmentInfoColumn:false */
+/* global reloadManagementAttachmentInfoColumn:false, ajaxDialog:true, handleAjaxError:true */
+/* global enableIfChecked:true */
 
 import fileTypesURL from 'indico-url:event_editing.api_file_types';
 
+import _ from 'lodash';
+import moment from 'moment';
 import React from 'react';
 import ReactDOM from 'react-dom';
 
 import 'indico/modules/events/util/types_dialog';
 import EditableSubmissionButton from 'indico/modules/events/editing/components/EditableSubmissionButton';
+import {$T} from 'indico/utils/i18n';
 import {PublicationSwitch} from 'indico/react/components';
 import {camelizeKeys} from 'indico/utils/case';
 import {indicoAxios, handleAxiosError} from 'indico/utils/axios';
@@ -75,8 +79,8 @@ import {indicoAxios, handleAxiosError} from 'indico/utils/axios';
 
   function patchObject(url, method, data) {
     return $.ajax({
-      url: url,
-      method: method,
+      url,
+      method,
       data: JSON.stringify(data),
       dataType: 'json',
       contentType: 'application/json',
@@ -86,7 +90,7 @@ import {indicoAxios, handleAxiosError} from 'indico/utils/axios';
   }
 
   function setupSessionPicker(createURL, timetableRESTURL) {
-    var $contributionList = $('#contribution-list');
+    const $contributionList = $('#contribution-list');
     $contributionList.on('click', '.session-item-picker', function() {
       $(this).itempicker({
         filterPlaceholder: $T.gettext('Filter sessions'),
@@ -95,14 +99,14 @@ import {indicoAxios, handleAxiosError} from 'indico/utils/axios';
         footerElements: [
           {
             title: $T.gettext('Assign new session'),
-            onClick: function(itemPicker) {
+            onClick(itemPicker) {
               ajaxDialog({
                 title: $T.gettext('Add new session'),
                 url: createURL,
-                onClose: function(data) {
+                onClose(data) {
                   if (data) {
                     $('.session-item-picker').each(function() {
-                      var $this = $(this);
+                      const $this = $(this);
                       if ($this.data('indicoItempicker')) {
                         $this.itempicker('updateItemList', data.sessions);
                       } else {
@@ -116,33 +120,33 @@ import {indicoAxios, handleAxiosError} from 'indico/utils/axios';
             },
           },
         ],
-        onSelect: function(newSession, oldSession) {
-          var $this = $(this);
-          var styleObject = $this[0].style;
-          var postData = {session_id: newSession ? newSession.id : null};
+        onSelect(newSession, oldSession) {
+          const $this = $(this);
+          const styleObject = $this[0].style;
+          const postData = {session_id: newSession ? newSession.id : null};
 
           return patchObject($this.data('href'), $this.data('method'), postData).then(function(
             data
           ) {
-            var label = newSession ? newSession.title : $T.gettext('No session');
+            const label = newSession ? newSession.title : $T.gettext('No session');
             $this.find('.label').text(label);
 
             if (!newSession) {
               styleObject.removeProperty('color');
               styleObject.removeProperty('background');
             } else {
-              styleObject.setProperty('color', '#' + newSession.colors.text, 'important');
+              styleObject.setProperty('color', `#${newSession.colors.text}`, 'important');
               styleObject.setProperty(
                 'background',
-                '#' + newSession.colors.background,
+                `#${newSession.colors.background}`,
                 'important'
               );
             }
 
             if (data.unscheduled) {
-              var row = $this.closest('tr');
-              var startDateCol = row.find('td.start-date > .vertical-aligner');
-              var oldLabelHtml = startDateCol.children().detach();
+              const row = $this.closest('tr');
+              const startDateCol = row.find('td.start-date > .vertical-aligner');
+              const oldLabelHtml = startDateCol.children().detach();
 
               startDateCol.html($('<em>', {text: $T.gettext('Not scheduled')}));
               /* eslint-disable max-len */
@@ -157,6 +161,7 @@ import {indicoAxios, handleAxiosError} from 'indico/utils/axios';
                   ) {
                     oldLabelHtml
                       .filter('.label')
+                      // eslint-disable-next-line prefer-template
                       .text(' ' + moment.utc(data.start_dt).format('DD/MM/YYYY HH:mm'));
                     startDateCol.html(oldLabelHtml);
                     $this.itempicker('selectItem', oldSession ? oldSession.id : null);
@@ -171,7 +176,7 @@ import {indicoAxios, handleAxiosError} from 'indico/utils/axios';
   }
 
   function setupTrackPicker(createURL) {
-    var $contributionList = $('#contribution-list');
+    const $contributionList = $('#contribution-list');
     $contributionList.on('click', '.track-item-picker', function() {
       $(this).itempicker({
         filterPlaceholder: $T.gettext('Filter tracks'),
@@ -181,14 +186,14 @@ import {indicoAxios, handleAxiosError} from 'indico/utils/axios';
         footerElements: [
           {
             title: $T.gettext('Add new track'),
-            onClick: function(trackItemPicker) {
+            onClick(trackItemPicker) {
               ajaxDialog({
                 title: $T.gettext('Add new track'),
                 url: createURL,
-                onClose: function(data) {
+                onClose(data) {
                   if (data) {
                     $('.track-item-picker').each(function() {
-                      var $this = $(this);
+                      const $this = $(this);
                       if ($this.data('indicoItempicker')) {
                         $this.itempicker('updateItemList', data.tracks);
                       } else {
@@ -202,12 +207,12 @@ import {indicoAxios, handleAxiosError} from 'indico/utils/axios';
             },
           },
         ],
-        onSelect: function(newTrack) {
-          var $this = $(this);
-          var postData = {track_id: newTrack ? newTrack.id : null};
+        onSelect(newTrack) {
+          const $this = $(this);
+          const postData = {track_id: newTrack ? newTrack.id : null};
 
           return patchObject($this.data('href'), $this.data('method'), postData).then(function() {
-            var label = newTrack ? newTrack.title : $T.gettext('No track');
+            const label = newTrack ? newTrack.title : $T.gettext('No track');
             $this.find('.label').text(label);
           });
         },
@@ -217,7 +222,7 @@ import {indicoAxios, handleAxiosError} from 'indico/utils/axios';
 
   function setupStartDateQBubbles() {
     $('.js-contrib-start-date').each(function() {
-      var $this = $(this);
+      const $this = $(this);
 
       $this.ajaxqbubble({
         url: $this.data('href'),
@@ -232,7 +237,7 @@ import {indicoAxios, handleAxiosError} from 'indico/utils/axios';
 
   function setupDurationQBubbles() {
     $('.js-contrib-duration').each(function() {
-      var $this = $(this);
+      const $this = $(this);
 
       $this.ajaxqbubble({
         url: $this.data('href'),
@@ -255,7 +260,7 @@ import {indicoAxios, handleAxiosError} from 'indico/utils/axios';
       options
     );
 
-    var filterConfig = {
+    const filterConfig = {
       itemHandle: 'tr',
       listItems: '#contribution-list tbody tr',
       term: '#search-input',
@@ -273,7 +278,7 @@ import {indicoAxios, handleAxiosError} from 'indico/utils/axios';
     setupDurationQBubbles();
     enableIfChecked('#contribution-list', 'input[name=contribution_id]', '.js-enable-if-checked');
 
-    var applySearchFilters = setupListGenerator(filterConfig);
+    const applySearchFilters = setupListGenerator(filterConfig);
 
     $('#contribution-list')
       .on('indico:htmlUpdated', function() {
@@ -283,12 +288,12 @@ import {indicoAxios, handleAxiosError} from 'indico/utils/axios';
         _.defer(applySearchFilters);
       })
       .on('attachments:updated', function(evt) {
-        var target = $(evt.target);
+        const target = $(evt.target);
         reloadManagementAttachmentInfoColumn(target.data('locator'), target.closest('td'));
       });
     $('.js-submit-form').on('click', function(e) {
       e.preventDefault();
-      var $this = $(this);
+      const $this = $(this);
       if (!$this.hasClass('disabled')) {
         $('#contribution-list form')
           .attr('action', $this.data('href'))
@@ -309,13 +314,13 @@ import {indicoAxios, handleAxiosError} from 'indico/utils/axios';
     );
 
     $('#subcontribution-list td.subcontribution-title').on('mouseenter', function() {
-      var $this = $(this);
+      const $this = $(this);
       if (this.offsetWidth < this.scrollWidth && !$this.attr('title')) {
         $this.attr('title', $this.text());
       }
     });
     $('#subcontribution-list').on('attachments:updated', function(evt) {
-      var target = $(evt.target);
+      const target = $(evt.target);
       reloadManagementAttachmentInfoColumn(target.data('locator'), target.closest('td'));
     });
 
@@ -327,11 +332,11 @@ import {indicoAxios, handleAxiosError} from 'indico/utils/axios';
       distance: 10,
       axis: 'y',
       containment: '#subcontribution-list table',
-      start: function(e, ui) {
+      start(e, ui) {
         ui.placeholder.height(ui.helper.outerHeight());
       },
-      update: function(e, ui) {
-        var self = $(this);
+      update(e, ui) {
+        const self = $(this);
 
         $.ajax({
           url: ui.item.data('sort-url'),
@@ -344,7 +349,7 @@ import {indicoAxios, handleAxiosError} from 'indico/utils/axios';
   };
 
   global.setupEventDisplayContributionList = function setupEventDisplayContributionList() {
-    var filterConfig = {
+    const filterConfig = {
       itemHandle: 'div.contribution-row',
       listItems: '#display-contribution-list div.contribution-row',
       term: '#search-input',
@@ -352,12 +357,12 @@ import {indicoAxios, handleAxiosError} from 'indico/utils/axios';
       placeholder: '#filter-placeholder',
     };
 
-    var applySearchFilters = setupListGenerator(filterConfig);
+    const applySearchFilters = setupListGenerator(filterConfig);
     applySearchFilters();
   };
 
   global.setupEventDisplayAuthorList = function setupEventDisplayAuthorList() {
-    var filterConfig = {
+    const filterConfig = {
       itemHandle: '.author-list > li',
       listItems: '.author-list > li',
       term: '#search-input',
@@ -365,7 +370,7 @@ import {indicoAxios, handleAxiosError} from 'indico/utils/axios';
       placeholder: '#filter-placeholder',
     };
 
-    var applySearchFilters = setupSearchBox(filterConfig);
+    const applySearchFilters = setupSearchBox(filterConfig);
     applySearchFilters();
   };
 })(window);
