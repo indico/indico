@@ -17,7 +17,7 @@ from indico.modules.events.editing.models.comments import EditingRevisionComment
 from indico.modules.events.editing.models.editable import Editable
 from indico.modules.events.editing.models.file_types import EditingFileType
 from indico.modules.events.editing.models.revision_files import EditingRevisionFile
-from indico.modules.events.editing.models.revisions import EditingRevision
+from indico.modules.events.editing.models.revisions import EditingRevision, InitialRevisionState
 from indico.modules.events.editing.models.tags import EditingTag
 from indico.modules.users.schemas import UserSchema
 from indico.util.struct.enum import IndicoEnum
@@ -77,7 +77,8 @@ class EditingRevisionSchema(mm.ModelSchema):
     class Meta:
         model = EditingRevision
         fields = ('id', 'created_dt', 'submitter', 'editor', 'files', 'comment', 'comment_html', 'comments',
-                  'initial_state', 'final_state', 'tags', 'create_comment_url', 'download_files_url', 'review_url')
+                  'initial_state', 'final_state', 'tags', 'create_comment_url', 'download_files_url', 'review_url',
+                  'confirm_url')
 
     comment_html = fields.Function(lambda rev: escape(rev.comment))
     submitter = fields.Nested(UserSchema, only=('id', 'avatar_bg_color', 'full_name'))
@@ -89,6 +90,11 @@ class EditingRevisionSchema(mm.ModelSchema):
     create_comment_url = fields.Function(lambda revision: url_for('event_editing.api_create_comment', revision))
     download_files_url = fields.Function(lambda revision: url_for('event_editing.revision_files_export', revision))
     review_url = fields.Function(lambda revision: url_for('event_editing.api_review_editable', revision))
+    confirm_url = fields.Method('_get_confirm_url')
+
+    def _get_confirm_url(self, revision):
+        if revision.initial_state == InitialRevisionState.needs_submitter_confirmation and not revision.final_state:
+            return url_for('event_editing.api_confirm_changes', revision)
 
     def _get_comments(self, revision):
         current_user = self.context.get('user')

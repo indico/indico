@@ -26,6 +26,12 @@ export function reviewEditable(revision, formData) {
   );
 }
 
+export function confirmEditableChanges(revision, formData) {
+  return submitFormAction(() => indicoAxios.post(revision.confirmURL, formData), null, () =>
+    loadTimeline()
+  );
+}
+
 export function createRevisionComment(url, formData) {
   return submitFormAction(() => indicoAxios.post(url, formData), null, () => loadTimeline());
 }
