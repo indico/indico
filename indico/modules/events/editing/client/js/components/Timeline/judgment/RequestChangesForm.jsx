@@ -16,23 +16,18 @@ import {Translate} from 'indico/react/i18n';
 
 import {EditingReviewAction} from '../../../models';
 import {reviewEditable} from '../../../actions';
-import {getLastRevision, getStaticData} from '../../../selectors';
+import {getLastRevision} from '../../../selectors';
 
 export default function RequestChangesForm({setLoading, onSuccess}) {
   const dispatch = useDispatch();
   const lastRevision = useSelector(getLastRevision);
-  const staticData = useSelector(getStaticData);
   const requestChanges = async formData => {
     setLoading(true);
     const rv = await dispatch(
-      reviewEditable(
-        lastRevision,
-        {
-          ...formData,
-          action: EditingReviewAction.requestUpdate,
-        },
-        staticData
-      )
+      reviewEditable(lastRevision, {
+        ...formData,
+        action: EditingReviewAction.requestUpdate,
+      })
     );
 
     setLoading(false);

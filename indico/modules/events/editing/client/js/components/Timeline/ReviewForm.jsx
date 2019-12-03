@@ -19,7 +19,7 @@ import JudgmentBox from './judgment/JudgmentBox';
 import {blockPropTypes} from './util';
 import {createRevisionComment} from '../../actions';
 import {EditingReviewAction} from '../../models';
-import {getDetails, getStaticData, getLastRevision} from '../../selectors';
+import {getDetails, getLastRevision} from '../../selectors';
 
 import './ReviewForm.module.scss';
 
@@ -48,7 +48,6 @@ const judgmentOptions = [
 
 export default function ReviewForm({block}) {
   const dispatch = useDispatch();
-  const staticData = useSelector(getStaticData);
   const lastRevision = useSelector(getLastRevision);
   const {canCreateInternalComments} = useSelector(getDetails);
   const currentUser = {
@@ -67,9 +66,7 @@ export default function ReviewForm({block}) {
   const InputComponent = commentFormVisible ? FinalTextArea : FinalInput;
   const inputProps = commentFormVisible ? {autoFocus: true} : {};
   const addComment = async (formData, form) => {
-    const rv = await dispatch(
-      createRevisionComment(lastRevision.createCommentURL, formData, staticData)
-    );
+    const rv = await dispatch(createRevisionComment(lastRevision.createCommentURL, formData));
 
     if (rv.error) {
       return rv.error;

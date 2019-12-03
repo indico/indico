@@ -6,6 +6,7 @@
 // LICENSE file for more details.
 
 import fileTypesURL from 'indico-url:event_editing.api_file_types';
+import editableDetailsURL from 'indico-url:event_editing.api_editable';
 
 import React from 'react';
 import ReactDOM from 'react-dom';
@@ -19,7 +20,7 @@ import Timeline from './components/Timeline';
 
 document.addEventListener('DOMContentLoaded', async () => {
   const timelineElement = document.querySelector('#editing-timeline');
-  const eventId = timelineElement.dataset.eventId;
+  const eventId = parseInt(timelineElement.dataset.eventId, 10);
 
   let response;
   try {
@@ -27,13 +28,20 @@ document.addEventListener('DOMContentLoaded', async () => {
   } catch (e) {
     handleAxiosError(e);
   }
-  const fileTypes = camelizeKeys(response.data);
 
+  const fileTypes = camelizeKeys(response.data);
+  const contributionId = parseInt(timelineElement.dataset.contributionId, 10);
+  const editableType = timelineElement.dataset.editableType;
   const store = storeFactory({
-    eventId: parseInt(timelineElement.dataset.eventId, 10),
-    contributionId: parseInt(timelineElement.dataset.contributionId, 10),
-    editableType: timelineElement.dataset.editableType,
+    eventId,
+    contributionId,
+    editableType,
     fileTypes,
+    editableDetailsURL: editableDetailsURL({
+      confId: eventId,
+      contrib_id: contributionId,
+      type: editableType,
+    }),
   });
 
   ReactDOM.render(
