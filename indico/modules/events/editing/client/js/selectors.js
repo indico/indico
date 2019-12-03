@@ -13,15 +13,13 @@ import {InitialRevisionState, FinalRevisionState} from './models';
 
 function shouldCreateNewRevision({initialState, finalState}) {
   return (
-    [
-      InitialRevisionState.ready_for_review,
-      InitialRevisionState.needs_submitter_confirmation,
-    ].includes(initialState.name) &&
-    ![
-      FinalRevisionState.accepted,
-      FinalRevisionState.rejected,
-      FinalRevisionState.replaced,
-    ].includes(finalState.name)
+    initialState.name === InitialRevisionState.needs_submitter_confirmation ||
+    (initialState.name === InitialRevisionState.ready_for_review &&
+      ![
+        FinalRevisionState.accepted,
+        FinalRevisionState.rejected,
+        FinalRevisionState.replaced,
+      ].includes(finalState.name))
   );
 }
 
@@ -42,11 +40,15 @@ export function processRevisions(revisions) {
   let items = [...currentRevision.comments];
 
   for (const [index, revision] of revisions.entries()) {
-    const {finalState} = revision;
+    const {initialState, finalState} = revision;
 
     if (!currentRevision) {
       currentRevision = {...revision};
       items = [...currentRevision.comments];
+    }
+
+    if (initialState.name === InitialRevisionState.needs_submitter_confirmation) {
+      currentRevision.header = Translate.string('Editor has made some changes to the paper');
     }
 
     if (finalState.name === FinalRevisionState.replaced) {
@@ -58,15 +60,24 @@ export function processRevisions(revisions) {
           state: FinalRevisionState.replaced,
         })
       );
-    } else if (revision.finalState.name === FinalRevisionState.accepted) {
+
+      items = [...items, ...updatedRevision.comments];
+    } else if (finalState.name === FinalRevisionState.accepted) {
+      let header;
+      if (initialState.name === InitialRevisionState.needs_submitter_confirmation) {
+        header = Translate.string('Submitter has accepted proposed changes');
+      } else {
+        header = Translate.string('Revision has been accepted');
+      }
+
       items.push(
         createNewCustomItemFromRevision(revision, {
-          header: Translate.string('Revision has been accepted'),
           state: 'accepted',
           html: revision.commentHtml,
+          header,
         })
       );
-    } else if (revision.finalState.name === FinalRevisionState.rejected) {
+    } else if (finalState.name === FinalRevisionState.rejected) {
       items.push(
         createNewCustomItemFromRevision(revision, {
           header: Translate.string('Revision has been rejected'),
@@ -74,17 +85,31 @@ export function processRevisions(revisions) {
           html: revision.commentHtml,
         })
       );
-    } else if (revision.finalState.name === FinalRevisionState.needs_submitter_changes) {
+    } else if (finalState.name === FinalRevisionState.needs_submitter_changes) {
+      let header;
+      if (initialState.name === InitialRevisionState.needs_submitter_confirmation) {
+        header = Translate.string('Submitter rejected proposed changes');
+      } else {
+        header = Translate.string('Submitter has been asked to make some changes');
+      }
+
       items.push(
         createNewCustomItemFromRevision(revision, {
           user: revisions[0].submitter,
-          header: Translate.string('Editor requested an update'),
           state: 'rejected',
+          html: revision.commentHtml,
+          header,
+        })
+      );
+    } else if (finalState.name === FinalRevisionState.needs_submitter_confirmation) {
+      items.push(
+        createNewCustomItemFromRevision(revision, {
+          user: revisions[0].submitter,
+          header: Translate.string('Editor made some changes and awaits submitter confirmation'),
+          state: 'needs_submitter_confirmation',
           html: revision.commentHtml,
         })
       );
-    } else if (revision.finalState.name === FinalRevisionState.needs_submitter_confirmation) {
-      // TODO: Check if we need to handle that state in some way
     }
 
     if (shouldCreateNewRevision(revision)) {
