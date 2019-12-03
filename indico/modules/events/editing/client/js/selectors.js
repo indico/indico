@@ -155,4 +155,10 @@ export const getLastState = createSelector(
       ? lastRevision.initialState
       : lastRevision.finalState)
 );
+export const needsSubmitterConfirmation = createSelector(
+  getLastRevision,
+  lastRevision =>
+    lastRevision.initialState.name === InitialRevisionState.needs_submitter_confirmation &&
+    lastRevision.finalState.name === FinalRevisionState.none
+);
 export const getStaticData = state => state.staticData;

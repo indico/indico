@@ -18,16 +18,16 @@ import ChangesConfirmation from './ChangesConfirmation';
 import RevisionLog from './RevisionLog';
 import ReviewForm from './ReviewForm';
 import {blockPropTypes} from './util';
-import {getDetails, getLastTimelineBlock, getLastState, getStaticData} from '../../selectors';
+import * as selectors from '../../selectors';
 import FileDisplay from '../FileDisplay';
-import {FinalRevisionState, InitialRevisionState} from '../../models';
 
 export default function TimelineItem({block}) {
   const {submitter, createdDt} = block;
-  const lastBlock = useSelector(getLastTimelineBlock);
-  const lastState = useSelector(getLastState);
-  const {canComment} = useSelector(getDetails);
-  const {fileTypes} = useSelector(getStaticData);
+  const lastBlock = useSelector(selectors.getLastTimelineBlock);
+  const needsSubmitterConfirmation = useSelector(selectors.needsSubmitterConfirmation);
+  const lastState = useSelector(selectors.getLastState);
+  const {canComment} = useSelector(selectors.getDetails);
+  const {fileTypes} = useSelector(selectors.getStaticData);
   const isLastBlock = lastBlock.id === block.id;
   const [visible, setVisible] = useState(isLastBlock);
   const headerOnly = !visible || (!isLastBlock && block.items.length === 0 && !block.comment);
@@ -83,9 +83,7 @@ export default function TimelineItem({block}) {
                   </>
                 )}
                 {/* TODO: Check whether the current user is submitter */}
-                {isLastBlock &&
-                  block.initialState.name === InitialRevisionState.needs_submitter_confirmation &&
-                  block.finalState.name === FinalRevisionState.none && <ChangesConfirmation />}
+                {needsSubmitterConfirmation && <ChangesConfirmation />}
               </div>
             )}
           </div>
