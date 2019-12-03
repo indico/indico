@@ -6,7 +6,7 @@
 // LICENSE file for more details.
 
 import React from 'react';
-import {Form as FinalForm} from 'react-final-form';
+import {Field, Form as FinalForm} from 'react-final-form';
 import {Divider, Form, Message} from 'semantic-ui-react';
 import {FinalSubmitButton, FinalTextArea} from 'indico/react/forms';
 import {Translate} from 'indico/react/i18n';
@@ -21,7 +21,7 @@ export default function ChangesConfirmation() {
   return (
     <div>
       <Divider />
-      <FinalForm onSubmit={confirmChanges}>
+      <FinalForm onSubmit={confirmChanges} initialValues={{comment: ''}} subscription={{}}>
         {fprops => (
           <Form onSubmit={fprops.handleSubmit}>
             <Message
@@ -44,24 +44,32 @@ export default function ChangesConfirmation() {
               placeholder={Translate.string('You can leave a comment if you wish')}
             />
             <Form.Group inline styleName="submit-buttons">
-              <FinalSubmitButton
-                label={Translate.string('Accept')}
-                color="green"
-                icon="check"
-                onClick={() => {
-                  fprops.form.change('action', 'accept');
-                }}
-                disabledUntilChange={false}
-              />
-              <FinalSubmitButton
-                label={Translate.string('Reject')}
-                color="red"
-                icon="times"
-                onClick={() => {
-                  fprops.form.change('action', 'reject');
-                }}
-                disabledUntilChange={false}
-              />
+              <Field name="action" subscription={{value: true}}>
+                {({input: {value: currentAction}}) => (
+                  <>
+                    <FinalSubmitButton
+                      label={Translate.string('Accept')}
+                      color="green"
+                      icon="check"
+                      onClick={() => {
+                        fprops.form.change('action', 'accept');
+                      }}
+                      disabledUntilChange={false}
+                      activeSubmitButton={currentAction === 'accept'}
+                    />
+                    <FinalSubmitButton
+                      label={Translate.string('Reject')}
+                      color="red"
+                      icon="times"
+                      onClick={() => {
+                        fprops.form.change('action', 'reject');
+                      }}
+                      disabledUntilChange={false}
+                      activeSubmitButton={currentAction === 'reject'}
+                    />
+                  </>
+                )}
+              </Field>
             </Form.Group>
           </Form>
         )}
