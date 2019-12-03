@@ -167,6 +167,8 @@
     "moduleNameMapper": {
       "^indico-url:.*$": "<rootDir>/__mocks__/indico-url",
       "^.+\\.(s?css)$": "identity-obj-proxy",
+      "^indico/modules/events/(reviewing|util)/(.*)$": "<rootDir>/indico/modules/events/client/js/$1/$2",
+      "^indico/modules/events/([\\w]+)/(.*)$": "<rootDir>/indico/modules/events/$1/client/js/$2",
       "^indico/modules/([\\w]+)/(.*)$": "<rootDir>/indico/modules/$1/client/js/$2",
       "^indico/(.*)$": "<rootDir>/indico/web/client/js/$1"
     },
