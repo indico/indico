@@ -28,10 +28,10 @@ export default function AcceptRejectForm({action, setLoading}) {
       initialValues={{comment: ''}}
       onSubmit={async formData => {
         setLoading(true);
-        const ret = await dispatch(reviewEditable(lastRevision, {...formData, action}));
-        if (ret.error) {
+        const rv = await dispatch(reviewEditable(lastRevision, {...formData, action}));
+        if (rv.error) {
           setLoading(false);
-          return ret.error;
+          return rv.error;
         }
       }}
       subscription={{}}

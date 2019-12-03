@@ -27,7 +27,7 @@ export default function SubmitRevision() {
 
   const submitRevision = async () => {
     setSubmitting(true);
-    const ret = await dispatch(
+    const rv = await dispatch(
       createRevision(
         createSubmitterRevisionURL({
           confId: eventId,
@@ -39,8 +39,8 @@ export default function SubmitRevision() {
       )
     );
     setSubmitting(false);
-    if (ret.error) {
-      return ret.error;
+    if (rv.error) {
+      return rv.error;
     }
   };
 

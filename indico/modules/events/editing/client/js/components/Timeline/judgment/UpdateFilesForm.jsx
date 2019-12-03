@@ -44,16 +44,16 @@ export default function UpdateFilesForm({setLoading}) {
       subscription={{}}
       onSubmit={async formData => {
         setLoading(true);
-        const ret = await dispatch(
+        const rv = await dispatch(
           reviewEditable(lastRevision, {
             ...formData,
             files: formFiles,
             action: EditingReviewAction.update,
           })
         );
-        if (ret.error) {
+        if (rv.error) {
           setLoading(false);
-          return ret.error;
+          return rv.error;
         }
       }}
     >
