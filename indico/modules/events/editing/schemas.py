@@ -77,7 +77,7 @@ class EditingRevisionSchema(mm.ModelSchema):
     class Meta:
         model = EditingRevision
         fields = ('id', 'created_dt', 'submitter', 'editor', 'files', 'comment', 'comment_html', 'comments',
-                  'initial_state', 'final_state', 'tags', 'create_comment_url', 'download_files_url')
+                  'initial_state', 'final_state', 'tags', 'create_comment_url', 'download_files_url', 'review_url')
 
     comment_html = fields.Function(lambda rev: escape(rev.comment))
     submitter = fields.Nested(UserSchema, only=('id', 'avatar_bg_color', 'full_name'))
@@ -88,6 +88,7 @@ class EditingRevisionSchema(mm.ModelSchema):
     final_state = fields.Nested(RevisionState)
     create_comment_url = fields.Function(lambda revision: url_for('event_editing.api_create_comment', revision))
     download_files_url = fields.Function(lambda revision: url_for('event_editing.revision_files_export', revision))
+    review_url = fields.Function(lambda revision: url_for('event_editing.api_review_editable', revision))
 
     def _get_comments(self, revision):
         current_user = self.context.get('user')

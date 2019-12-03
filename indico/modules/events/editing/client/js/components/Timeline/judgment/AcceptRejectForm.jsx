@@ -15,13 +15,13 @@ import {FinalSubmitButton, FinalTextArea} from 'indico/react/forms';
 import {Translate} from 'indico/react/i18n';
 
 import {reviewEditable} from '../../../actions';
-import * as selectors from '../../../selectors';
+import {getLastRevision, getStaticData} from '../../../selectors';
 
 import './JudgmentBox.module.scss';
 
 export default function AcceptRejectForm({action, setLoading}) {
-  const {eventId, contributionId, editableType} = useSelector(selectors.getStaticData);
-  const lastRevision = useSelector(selectors.getLastRevision);
+  const lastRevision = useSelector(getLastRevision);
+  const staticData = useSelector(getStaticData);
   const dispatch = useDispatch();
 
   return (
@@ -29,9 +29,7 @@ export default function AcceptRejectForm({action, setLoading}) {
       initialValues={{comment: ''}}
       onSubmit={async formData => {
         setLoading(true);
-        const ret = await dispatch(
-          reviewEditable(eventId, contributionId, editableType, lastRevision, {...formData, action})
-        );
+        const ret = await dispatch(reviewEditable(lastRevision, {...formData, action}, staticData));
         if (ret.error) {
           setLoading(false);
           return ret.error;

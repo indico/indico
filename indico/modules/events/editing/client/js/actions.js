@@ -6,7 +6,6 @@
 // LICENSE file for more details.
 
 import editableDetailsURL from 'indico-url:event_editing.api_editable';
-import getReviewURL from 'indico-url:event_editing.api_review_editable';
 
 import {indicoAxios} from 'indico/utils/axios';
 import {ajaxAction, submitFormAction} from 'indico/utils/redux';
@@ -19,16 +18,9 @@ export function loadTimeline(eventId, contributionId, type) {
   return ajaxAction(() => indicoAxios.get(url), SET_LOADING, SET_DETAILS);
 }
 
-export function reviewEditable(eventId, contributionId, type, revision, formData) {
-  const url = getReviewURL({
-    confId: eventId,
-    contrib_id: contributionId,
-    type,
-    revision_id: revision.id,
-  });
-
-  return submitFormAction(() => indicoAxios.post(url, formData), null, () =>
-    loadTimeline(eventId, contributionId, type)
+export function reviewEditable(revision, formData, {eventId, contributionId, editableType}) {
+  return submitFormAction(() => indicoAxios.post(revision.reviewURL, formData), null, () =>
+    loadTimeline(eventId, contributionId, editableType)
   );
 }
 

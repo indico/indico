@@ -26,8 +26,10 @@ import {mapFileTypes} from '../../FileManager/util';
 import './JudgmentBox.module.scss';
 
 export default function UpdateFilesForm({setLoading}) {
-  const {eventId, contributionId, editableType, fileTypes} = useSelector(selectors.getStaticData);
+  const {fileTypes} = useSelector(selectors.getStaticData);
   const lastRevision = useSelector(selectors.getLastRevision);
+  const staticData = useSelector(selectors.getStaticData);
+  const {eventId, contributionId, editableType} = staticData;
   const dispatch = useDispatch();
 
   const mappedFileTypes = useMemo(() => mapFileTypes(fileTypes, lastRevision.files), [
@@ -43,11 +45,15 @@ export default function UpdateFilesForm({setLoading}) {
       onSubmit={async formData => {
         setLoading(true);
         const ret = await dispatch(
-          reviewEditable(eventId, contributionId, editableType, lastRevision, {
-            ...formData,
-            files: formFiles,
-            action: EditingReviewAction.update,
-          })
+          reviewEditable(
+            lastRevision,
+            {
+              ...formData,
+              files: formFiles,
+              action: EditingReviewAction.update,
+            },
+            staticData
+          )
         );
         if (ret.error) {
           setLoading(false);
