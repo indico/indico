@@ -52,7 +52,7 @@ export default function ChangesConfirmation() {
               name="comment"
               placeholder={Translate.string('You can leave a comment if you wish')}
             />
-            <Form.Group inline styleName="submit-buttons">
+            <Form.Group styleName="submit-buttons">
               <Field name="action" subscription={{value: true}}>
                 {({input: {value: currentAction}}) => (
                   <>
