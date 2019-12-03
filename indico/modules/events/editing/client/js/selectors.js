@@ -155,6 +155,11 @@ export const getLastState = createSelector(
       ? lastRevision.initialState
       : lastRevision.finalState)
 );
+export const needsSubmitterChanges = createSelector(
+  getLastRevision,
+  lastRevision =>
+    lastRevision && lastRevision.finalState.name === FinalRevisionState.needs_submitter_changes
+);
 export const needsSubmitterConfirmation = createSelector(
   getLastRevision,
   lastRevision =>

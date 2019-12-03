@@ -15,7 +15,6 @@ import SubmitRevision from './SubmitRevision';
 
 import * as actions from '../../actions';
 import * as selectors from '../../selectors';
-import {FinalRevisionState} from '../../models';
 import TimelineItem from './TimelineItem';
 import FileDisplay from '../FileDisplay';
 
@@ -24,6 +23,7 @@ export default function Timeline() {
   const details = useSelector(selectors.getDetails);
   const isInitialEditableDetailsLoading = useSelector(selectors.isInitialEditableDetailsLoading);
   const lastState = useSelector(selectors.getLastState);
+  const needsSubmitterChanges = useSelector(selectors.needsSubmitterChanges);
   const lastRevision = useSelector(selectors.getLastRevision);
   const timelineBlocks = useSelector(selectors.getTimelineBlocks);
   const {eventId, contributionId, editableType, fileTypes} = useSelector(selectors.getStaticData);
@@ -53,7 +53,7 @@ export default function Timeline() {
         />
       </TimelineHeader>
       <TimelineContent blocks={timelineBlocks} itemComponent={TimelineItem} />
-      {lastState.name === FinalRevisionState.needs_submitter_changes && <SubmitRevision />}
+      {needsSubmitterChanges && <SubmitRevision />}
     </>
   );
 }
