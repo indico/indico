@@ -11,9 +11,11 @@ import {Loader} from 'semantic-ui-react';
 
 import TimelineHeader from 'indico/modules/events/reviewing/components/TimelineHeader';
 import TimelineContent from 'indico/modules/events/reviewing/components/TimelineContent';
+import SubmitRevision from './SubmitRevision';
 
 import * as actions from '../../actions';
 import * as selectors from '../../selectors';
+import {FinalRevisionState} from '../../models';
 import TimelineItem from './TimelineItem';
 import FileDisplay from '../FileDisplay';
 
@@ -51,6 +53,7 @@ export default function Timeline() {
         />
       </TimelineHeader>
       <TimelineContent blocks={timelineBlocks} itemComponent={TimelineItem} />
+      {lastState.name === FinalRevisionState.needs_submitter_changes && <SubmitRevision />}
     </>
   );
 }
