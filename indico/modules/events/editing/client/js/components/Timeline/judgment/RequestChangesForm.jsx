@@ -19,16 +19,20 @@ import {reviewEditable} from '../../../actions';
 import {getLastRevision, getStaticData} from '../../../selectors';
 
 export default function RequestChangesForm({setLoading, onSuccess}) {
-  const {eventId, contributionId, editableType} = useSelector(getStaticData);
   const dispatch = useDispatch();
   const lastRevision = useSelector(getLastRevision);
+  const staticData = useSelector(getStaticData);
   const requestChanges = async formData => {
     setLoading(true);
     const rv = await dispatch(
-      reviewEditable(eventId, contributionId, editableType, lastRevision, {
-        ...formData,
-        action: EditingReviewAction.requestUpdate,
-      })
+      reviewEditable(
+        lastRevision,
+        {
+          ...formData,
+          action: EditingReviewAction.requestUpdate,
+        },
+        staticData
+      )
     );
 
     setLoading(false);
