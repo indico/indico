@@ -45,15 +45,11 @@ export default function UpdateFilesForm({setLoading}) {
       onSubmit={async formData => {
         setLoading(true);
         const ret = await dispatch(
-          reviewEditable(
-            lastRevision,
-            {
-              ...formData,
-              files: formFiles,
-              action: EditingReviewAction.update,
-            },
-            staticData
-          )
+          reviewEditable(lastRevision, {
+            ...formData,
+            files: formFiles,
+            action: EditingReviewAction.update,
+          })
         );
         if (ret.error) {
           setLoading(false);
