@@ -91,7 +91,7 @@ class RHEditable(RHContributionEditableBase):
         RHContributionEditableBase._check_access(self)
         if self.event.can_manage(session.user) or self.event.can_manage(session.user, permission='paper_editing'):
             return
-        if not self._user_is_authorized_editor() and not self._user_is_authorized_editor():
+        if not self._user_is_authorized_submitter() and not self._user_is_authorized_editor():
             raise Forbidden
 
     def _process(self):
