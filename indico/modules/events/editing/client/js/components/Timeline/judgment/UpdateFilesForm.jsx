@@ -19,20 +19,20 @@ import {Translate} from 'indico/react/i18n';
 import {reviewEditable} from '../../../actions';
 import * as selectors from '../../../selectors';
 import {EditingReviewAction} from '../../../models';
-import {blockPropTypes} from '../util';
 import FileManager from '../../FileManager';
 import {getFiles} from '../../FileManager/selectors';
 import {mapFileTypes} from '../../FileManager/util';
 
 import './JudgmentBox.module.scss';
 
-export default function UpdateFilesForm({block, setLoading}) {
+export default function UpdateFilesForm({setLoading}) {
   const {eventId, contributionId, editableType, fileTypes} = useSelector(selectors.getStaticData);
+  const lastRevision = useSelector(selectors.getLastRevision);
   const dispatch = useDispatch();
 
-  const mappedFileTypes = useMemo(() => mapFileTypes(fileTypes, block.files), [
+  const mappedFileTypes = useMemo(() => mapFileTypes(fileTypes, lastRevision.files), [
     fileTypes,
-    block.files,
+    lastRevision.files,
   ]);
   const [formFiles, setFormFiles] = useState(getFiles({fileTypes: mappedFileTypes}));
 
@@ -43,7 +43,7 @@ export default function UpdateFilesForm({block, setLoading}) {
       onSubmit={async formData => {
         setLoading(true);
         const ret = await dispatch(
-          reviewEditable(eventId, contributionId, editableType, block, {
+          reviewEditable(eventId, contributionId, editableType, lastRevision, {
             ...formData,
             files: formFiles,
             action: EditingReviewAction.update,
@@ -60,7 +60,7 @@ export default function UpdateFilesForm({block, setLoading}) {
           <Form id="judgment-form" onSubmit={handleSubmit}>
             <FileManager
               fileTypes={fileTypes}
-              files={block.files}
+              files={lastRevision.files}
               uploadURL={uploadURL({
                 confId: eventId,
                 contrib_id: contributionId,
@@ -86,6 +86,5 @@ export default function UpdateFilesForm({block, setLoading}) {
 }
 
 UpdateFilesForm.propTypes = {
-  block: PropTypes.shape(blockPropTypes).isRequired,
   setLoading: PropTypes.func.isRequired,
 };

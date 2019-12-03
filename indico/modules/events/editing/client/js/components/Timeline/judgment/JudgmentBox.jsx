@@ -60,9 +60,7 @@ export default function JudgmentBox({block, onClose, judgmentType: _judgmentType
       {[EditingReviewAction.accept, EditingReviewAction.reject].includes(judgmentType) && (
         <AcceptRejectForm block={block} action={judgmentType} setLoading={setLoading} />
       )}
-      {judgmentType === EditingReviewAction.update && (
-        <UpdateFilesForm block={block} setLoading={setLoading} />
-      )}
+      {judgmentType === EditingReviewAction.update && <UpdateFilesForm setLoading={setLoading} />}
       {judgmentType === EditingReviewAction.requestUpdate && (
         <RequestChangesForm setLoading={setLoading} onSuccess={onClose} />
       )}

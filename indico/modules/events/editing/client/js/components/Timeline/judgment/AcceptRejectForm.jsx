@@ -16,12 +16,12 @@ import {Translate} from 'indico/react/i18n';
 
 import {reviewEditable} from '../../../actions';
 import * as selectors from '../../../selectors';
-import {blockPropTypes} from '../util';
 
 import './JudgmentBox.module.scss';
 
-export default function AcceptRejectForm({block, action, setLoading}) {
+export default function AcceptRejectForm({action, setLoading}) {
   const {eventId, contributionId, editableType} = useSelector(selectors.getStaticData);
+  const lastRevision = useSelector(selectors.getLastRevision);
   const dispatch = useDispatch();
 
   return (
@@ -30,7 +30,7 @@ export default function AcceptRejectForm({block, action, setLoading}) {
       onSubmit={async formData => {
         setLoading(true);
         const ret = await dispatch(
-          reviewEditable(eventId, contributionId, editableType, block, {...formData, action})
+          reviewEditable(eventId, contributionId, editableType, lastRevision, {...formData, action})
         );
         if (ret.error) {
           setLoading(false);
@@ -67,7 +67,6 @@ export default function AcceptRejectForm({block, action, setLoading}) {
 }
 
 AcceptRejectForm.propTypes = {
-  block: PropTypes.shape(blockPropTypes).isRequired,
   action: PropTypes.oneOf(['accept', 'reject']).isRequired,
   setLoading: PropTypes.func.isRequired,
 };
