@@ -9,7 +9,13 @@ import React, {useContext, useCallback, useState} from 'react';
 import PropTypes from 'prop-types';
 import {useDropzone} from 'react-dropzone';
 import {Icon} from 'semantic-ui-react';
-import {FileManagerContext, filePropTypes, uploadFiles, deleteFile} from './util';
+import {
+  FileManagerContext,
+  filePropTypes,
+  uploadFiles,
+  deleteFile,
+  fileTypePropTypes,
+} from './util';
 import * as actions from './actions';
 
 import './FileManager.module.scss';
@@ -36,26 +42,32 @@ FileAction.propTypes = {
   className: PropTypes.string.isRequired,
 };
 
-function FileEntry({
-  uploadURL,
-  fileTypeId,
-  allowMultipleFiles,
-  file: {uuid, filename, state, claimed, downloadURL},
-}) {
+function FileEntry({uploadURL, fileType, file: {uuid, filename, state, claimed, downloadURL}}) {
   const dispatch = useContext(FileManagerContext);
   const [activeButton, setActiveButton] = useState(null);
 
-  const onDrop = useCallback(
+  const onDropAccepted = useCallback(
     async acceptedFiles => {
       setActiveButton('replace');
-      await uploadFiles(actions.markModified, fileTypeId, acceptedFiles, uploadURL, dispatch, uuid);
+      await uploadFiles(
+        actions.markModified,
+        fileType.id,
+        acceptedFiles,
+        uploadURL,
+        dispatch,
+        uuid
+      );
       // when we're done, the component will have been unmounted,
       // so there's no need to unset the active button
     },
-    [dispatch, uploadURL, uuid, fileTypeId]
+    [dispatch, uploadURL, uuid, fileType.id]
   );
 
-  const {getRootProps, getInputProps, open} = useDropzone({onDrop});
+  const {getRootProps, getInputProps, open} = useDropzone({
+    onDropAccepted,
+    multiple: fileType.allowMultipleFiles,
+    accept: fileType.extensions.map(ext => `.${ext}`).join(','),
+  });
 
   return (
     <>
@@ -69,7 +81,7 @@ function FileEntry({
         )}
       </span>
       <span>
-        {!state && allowMultipleFiles && (
+        {!state && fileType.allowMultipleFiles && (
           <>
             <FileAction
               icon="exchange"
@@ -95,7 +107,7 @@ function FileEntry({
                 await deleteFile(uuid);
                 setActiveButton(null);
               }
-              dispatch(actions.markDeleted(fileTypeId, uuid));
+              dispatch(actions.markDeleted(fileType.id, uuid));
             }}
           />
         ) : (
@@ -109,7 +121,9 @@ function FileEntry({
                 await deleteFile(uuid);
                 setActiveButton(null);
               }
-              dispatch((state === 'deleted' ? actions.undelete : actions.revert)(fileTypeId, uuid));
+              dispatch(
+                (state === 'deleted' ? actions.undelete : actions.revert)(fileType.id, uuid)
+              );
             }}
           />
         )}
@@ -120,22 +134,16 @@ function FileEntry({
 
 FileEntry.propTypes = {
   uploadURL: PropTypes.string.isRequired,
-  fileTypeId: PropTypes.number.isRequired,
-  allowMultipleFiles: PropTypes.bool.isRequired,
+  fileType: PropTypes.shape(fileTypePropTypes).isRequired,
   file: PropTypes.shape(filePropTypes).isRequired,
 };
 
-export default function FileList({files, fileTypeId, allowMultipleFiles, uploadURL}) {
+export default function FileList({files, fileType, uploadURL}) {
   return (
     <ul styleName="file-list">
       {files.map(file => (
         <li key={file.uuid} styleName="file-row">
-          <FileEntry
-            fileTypeId={fileTypeId}
-            uploadURL={uploadURL}
-            allowMultipleFiles={allowMultipleFiles}
-            file={file}
-          />
+          <FileEntry fileType={fileType} uploadURL={uploadURL} file={file} />
         </li>
       ))}
     </ul>
@@ -144,7 +152,6 @@ export default function FileList({files, fileTypeId, allowMultipleFiles, uploadU
 
 FileList.propTypes = {
   files: PropTypes.arrayOf(PropTypes.shape(filePropTypes)).isRequired,
-  fileTypeId: PropTypes.number.isRequired,
-  allowMultipleFiles: PropTypes.bool.isRequired,
+  fileType: PropTypes.shape(fileTypePropTypes).isRequired,
   uploadURL: PropTypes.string.isRequired,
 };

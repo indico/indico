@@ -26,7 +26,7 @@ import {getFiles} from './selectors';
 
 import './FileManager.module.scss';
 
-export function Dropzone({uploadURL, fileType: {id, allowMultipleFiles, files}}) {
+export function Dropzone({uploadURL, fileType: {id, allowMultipleFiles, files, extensions}}) {
   const dispatch = useContext(FileManagerContext);
   // we only want to modify the existing file if we do not allow multiple files and
   // there is exactly one file that is not in the 'added' state (which would imply
@@ -43,7 +43,7 @@ export function Dropzone({uploadURL, fileType: {id, allowMultipleFiles, files}})
   // multiple files are supported for the file type
   const showNewFileIcon = files.length === 0 || allowMultipleFiles;
 
-  const onDrop = useCallback(
+  const onDropAccepted = useCallback(
     async acceptedFiles => {
       if (!allowMultipleFiles) {
         acceptedFiles = acceptedFiles.splice(0, 1);
@@ -64,7 +64,11 @@ export function Dropzone({uploadURL, fileType: {id, allowMultipleFiles, files}})
     [fileToReplace, fileToDelete, allowMultipleFiles, id, uploadURL, dispatch]
   );
 
-  const {getRootProps, getInputProps, isDragActive} = useDropzone({onDrop});
+  const {getRootProps, getInputProps, isDragActive} = useDropzone({
+    onDropAccepted,
+    multiple: allowMultipleFiles,
+    accept: extensions.map(ext => `.${ext}`).join(','),
+  });
 
   return (
     <div {...getRootProps()}>
@@ -86,12 +90,7 @@ function FileType({uploadURL, fileType, uploads}) {
   return (
     <div styleName="file-type">
       <h3>{fileType.name}</h3>
-      <FileList
-        files={fileType.files}
-        fileTypeId={fileType.id}
-        allowMultipleFiles={fileType.allowMultipleFiles}
-        uploadURL={uploadURL}
-      />
+      <FileList files={fileType.files} fileType={fileType} uploadURL={uploadURL} />
       {!_.isEmpty(uploads) && <Uploads uploads={uploads} />}
       <Dropzone dropzoneRef={ref} fileType={fileType} uploadURL={uploadURL} />
     </div>

@@ -28,19 +28,19 @@ const fileTypes = [
   {
     id: 1,
     name: 'Source file',
-    extensions: ['.txt', '.md', '.tex'],
+    extensions: ['txt', 'md', 'tex'],
     allowMultipleFiles: false,
   },
   {
     id: 2,
     name: 'PDF file',
-    extensions: ['.pdf'],
+    extensions: ['pdf'],
     allowMultipleFiles: false,
   },
   {
     id: 3,
     name: 'Image files',
-    extensions: ['.png'],
+    extensions: ['png'],
     allowMultipleFiles: true,
   },
 ];
@@ -143,7 +143,7 @@ async function uploadFile(dropzone, onChange, name, type, deletedFile = null) {
 }
 
 function getFileEntryForFileType(wrapper, fileTypeId) {
-  return wrapper.find('FileEntry').find({fileTypeId});
+  return wrapper.find('FileEntry').filterWhere(x => x.prop('fileType').id === fileTypeId);
 }
 
 function checkFileEntry(fileEntry, name, icon) {
