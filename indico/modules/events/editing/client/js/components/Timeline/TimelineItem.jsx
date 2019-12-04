@@ -83,7 +83,7 @@ export default function TimelineItem({block}) {
                   </>
                 )}
                 {/* TODO: Check whether the current user is submitter */}
-                {needsSubmitterConfirmation && <ChangesConfirmation />}
+                {isLastBlock && needsSubmitterConfirmation && <ChangesConfirmation />}
               </div>
             )}
           </div>
