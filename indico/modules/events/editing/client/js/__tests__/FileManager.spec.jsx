@@ -119,6 +119,38 @@ async function simulateFileUpload(dropzone, name, type) {
   return uuid;
 }
 
+function getDropzoneForFileType(wrapper, id) {
+  return wrapper
+    .find('FileType')
+    .find(Dropzone)
+    .filterWhere(d => d.prop('fileType').id === id)
+    .find('Dropzone');
+}
+
+async function uploadFile(dropzone, onChange, name, type, deletedFile = null) {
+  const uuid = await simulateFileUpload(dropzone, name, type);
+  expect(onChange).toHaveBeenCalledWith({'2': [uuid]});
+  if (deletedFile) {
+    expect(mockAxios.delete).toHaveBeenCalledWith(`/files/${deletedFile}`);
+    await act(async () => {
+      mockAxios.mockResponse(); // respond to the DELETE request
+    });
+  } else {
+    expect(mockAxios.delete).not.toHaveBeenCalled();
+  }
+  onChange.mockClear();
+  mockAxios.delete.mockClear();
+}
+
+function getFileEntryForFileType(wrapper, fileTypeId) {
+  return wrapper.find('FileEntry').find({fileTypeId});
+}
+
+function checkFileEntry(fileEntry, name, icon) {
+  expect(fileEntry.find('span:first-child').text()).toEqual(name);
+  expect(fileEntry.find('FileAction').prop('icon')).toEqual(icon);
+}
+
 describe('File manager', () => {
   it('renders OK', () => {
     const wrapper = shallow(
@@ -151,38 +183,24 @@ describe('File manager', () => {
       />
     );
 
-    const dropzone = wrapper
-      .find('FileType')
-      .find(Dropzone)
-      .filterWhere(d => d.prop('fileType').id === 2)
-      .find('Dropzone');
+    const dropzone = getDropzoneForFileType(wrapper, 2);
 
-    const uuid1 = await simulateFileUpload(dropzone, 'test1.pdf', 'pdf');
-    expect(onChange).toHaveBeenCalledWith({'2': [uuid1]});
-    expect(mockAxios.delete).not.toHaveBeenCalled();
-    onChange.mockClear();
-
-    // upload another file which should replace the previous one
-    const uuid2 = await simulateFileUpload(dropzone, 'test2.pdf', 'pdf');
-    expect(onChange).toHaveBeenCalledWith({'2': [uuid2]});
-    expect(mockAxios.delete).toHaveBeenCalledWith('/files/newtest1.pdf');
-    await act(async () => {
-      mockAxios.mockResponse(); // respond to the DELETE request
-    });
-    onChange.mockClear();
-    mockAxios.delete.mockClear();
-
+    // upload a new file
+    await uploadFile(dropzone, onChange, 'test1.pdf', 'pdf');
     wrapper.update();
-    const fileEntry = wrapper.find('FileEntry').find({fileTypeId: 2});
-    const fileAction = fileEntry.find('FileAction');
-    expect(fileEntry.find('span:first-child').text()).toEqual('test2.pdf');
-    expect(fileAction.prop('icon')).toEqual('trash');
+    checkFileEntry(getFileEntryForFileType(wrapper, 2), 'test1.pdf', 'trash');
 
+    // replace the newly uploaded file
+    await uploadFile(dropzone, onChange, 'test2.pdf', 'pdf', 'newtest1.pdf');
+    wrapper.update();
+    const fileEntry = getFileEntryForFileType(wrapper, 2);
+    checkFileEntry(fileEntry, 'test2.pdf', 'trash');
+
+    // perform an undo - this needs to go back to an empty file list
     await act(async () => {
-      fileAction.simulate('click');
+      fileEntry.find('FileAction').simulate('click');
       mockAxios.mockResponse(); // respond to the DELETE request
     });
-
     expect(mockAxios.delete).toHaveBeenCalledWith('/files/newtest2.pdf');
     expect(onChange).toHaveBeenCalledWith({});
   });
@@ -207,37 +225,24 @@ describe('File manager', () => {
       />
     );
 
-    const dropzone = wrapper
-      .find('FileType')
-      .find(Dropzone)
-      .filterWhere(d => d.prop('fileType').id === 2)
-      .find('Dropzone');
+    const dropzone = getDropzoneForFileType(wrapper, 2);
 
-    const uuid1 = await simulateFileUpload(dropzone, 'test1.pdf', 'pdf');
-    expect(onChange).toHaveBeenCalledWith({'2': [uuid1]});
-    onChange.mockClear();
-
-    // upload another file which should replace the previous one
-    const uuid2 = await simulateFileUpload(dropzone, 'test2.pdf', 'pdf');
-    expect(onChange).toHaveBeenCalledWith({'2': [uuid2]});
-    expect(mockAxios.delete).toHaveBeenCalledWith('/files/newtest1.pdf');
-    await act(async () => {
-      mockAxios.mockResponse(); // respond to the DELETE request
-    });
-    onChange.mockClear();
-    mockAxios.delete.mockClear();
-
+    // upload a file which replaces the initial one
+    await uploadFile(dropzone, onChange, 'test1.pdf', 'pdf');
     wrapper.update();
-    const fileEntry = wrapper.find('FileEntry').find({fileTypeId: 2});
-    const fileAction = fileEntry.find('FileAction');
-    expect(fileEntry.find('span:first-child').text()).toEqual('test2.pdf');
-    expect(fileAction.prop('icon')).toEqual('undo');
+    checkFileEntry(getFileEntryForFileType(wrapper, 2), 'test1.pdf', 'undo');
 
+    // replace the newly uploaded file
+    await uploadFile(dropzone, onChange, 'test2.pdf', 'pdf', 'newtest1.pdf');
+    wrapper.update();
+    const fileEntry = getFileEntryForFileType(wrapper, 2);
+    checkFileEntry(fileEntry, 'test2.pdf', 'undo');
+
+    // perform an undo - this needs to revert to the initial file!
     await act(async () => {
-      fileAction.simulate('click');
+      fileEntry.find('FileAction').simulate('click');
       mockAxios.mockResponse(); // respond to the DELETE request
     });
-
     expect(mockAxios.delete).toHaveBeenCalledWith('/files/newtest2.pdf');
     expect(onChange).toHaveBeenCalledWith({'2': ['file1']});
   });
@@ -253,11 +258,7 @@ describe('File manager', () => {
         onChange={onChange}
       />
     );
-    const dropzone = wrapper
-      .find('FileType')
-      .find(Dropzone)
-      .filterWhere(d => d.prop('fileType').id === 2)
-      .find('Dropzone');
+    const dropzone = getDropzoneForFileType(wrapper, 2);
 
     const file1 = {type: 'pdf', name: 'test.pdf'};
 
@@ -303,7 +304,7 @@ describe('File manager', () => {
     wrapper.update();
 
     // modified file renders properly
-    const fileEntry = wrapper.find('FileEntry').find({fileTypeId: 2});
+    const fileEntry = getFileEntryForFileType(wrapper, 2);
     expect(fileEntry.find('span:first-child').text()).toEqual('test.pdf');
     expect(fileEntry.find('FileAction').prop('icon')).toEqual('undo');
   });
