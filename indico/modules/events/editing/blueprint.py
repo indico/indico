@@ -15,6 +15,7 @@ _bp = IndicoBlueprint('event_editing', __name__, url_prefix='/event/<confId>', t
                       virtual_template_folder='events/editing')
 
 # Frontend
+_bp.add_url_rule('/manage/editing/', 'management', frontend.RHEditingDashboard)
 _bp.add_url_rule('/contributions/<int:contrib_id>/editing/<any(paper):type>', 'editable', frontend.RHEditableTimeline)
 _bp.add_url_rule('/contributions/<int:contrib_id>/editing/<any(paper):type>/<int:revision_id>/files.zip',
                  'revision_files_export', backend.RHExportRevisionFiles)

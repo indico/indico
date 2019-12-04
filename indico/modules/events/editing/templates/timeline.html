@@ -1,0 +1,13 @@
+{% extends 'events/management/base.html' %}
+
+{% block title %}
+    Paper editing
+{% endblock %}
+
+{% block content %}
+    <div id="editing-timeline"
+         data-event-id="{{ event.id }}"
+         data-contribution-id="{{ editable.contribution.id }}"
+         data-editable-type="{{ editable.type.name }}">
+    </div>
+{% endblock %}

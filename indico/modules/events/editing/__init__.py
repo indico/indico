@@ -7,12 +7,16 @@
 
 from __future__ import unicode_literals
 
+from flask import session
+
 from indico.core import signals
 from indico.core.logger import Logger
 from indico.core.permissions import ManagementPermission
 from indico.modules.events.features.base import EventFeature
 from indico.modules.events.models.events import Event, EventType
 from indico.util.i18n import _
+from indico.web.flask.util import url_for
+from indico.web.menu import SideMenuItem
 
 
 logger = Logger.get('events.editing')
@@ -37,6 +41,14 @@ def _get_feature_definitions(sender, **kwargs):
 @signals.acl.get_management_permissions.connect_via(Event)
 def _get_management_permissions(sender, **kwargs):
     yield EditableEditorPermission
+
+
+@signals.menu.items.connect_via('event-management-sidemenu')
+def _extend_event_management_menu(sender, event, **kwargs):
+    if not event.can_manage(session.user) or not EditingFeature.is_allowed_for_event(event):
+        return
+    return SideMenuItem('editing', _('Paper Editing'), url_for('event_editing.management', event),
+                        section='organization')
 
 
 class EditableEditorPermission(ManagementPermission):

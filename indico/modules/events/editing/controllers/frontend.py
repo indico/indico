@@ -9,8 +9,13 @@ from __future__ import unicode_literals
 
 from werkzeug.exceptions import NotFound
 
-from indico.modules.events.editing.controllers.base import RHContributionEditableBase
+from indico.modules.events.editing.controllers.base import RHContributionEditableBase, RHEditingBase
 from indico.modules.events.editing.views import WPEditing
+
+
+class RHEditingDashboard(RHEditingBase):
+    def _process(self):
+        return WPEditing.render_template('editing.html', self.event)
 
 
 class RHEditableTimeline(RHContributionEditableBase):
@@ -21,7 +26,7 @@ class RHEditableTimeline(RHContributionEditableBase):
 
     def _process(self):
         return WPEditing.render_template(
-            'editing.html',
+            'timeline.html',
             self.event,
             editable=self.editable,
             contribution=self.contrib
