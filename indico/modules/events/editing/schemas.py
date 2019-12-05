@@ -39,7 +39,7 @@ class EditingFileTypeSchema(mm.ModelSchema):
 class EditingTagSchema(mm.ModelSchema):
     class Meta:
         model = EditingTag
-        fields = ('id', 'name', 'color', 'system')
+        fields = ('id', 'code', 'title', 'color', 'system')
 
     @post_dump(pass_many=True)
     def convert_to_dict(self, data, many, **kwargs):

@@ -18,7 +18,7 @@ class EditingTag(db.Model):
 
     @declared_attr
     def __table_args__(cls):
-        return (db.Index('ix_uq_tags_event_id_name_lower', cls.event_id, db.func.lower(cls.name), unique=True),
+        return (db.Index('ix_uq_tags_event_id_code_lower', cls.event_id, db.func.lower(cls.code), unique=True),
                 {'schema': 'event_editing'})
 
     id = db.Column(
@@ -31,7 +31,11 @@ class EditingTag(db.Model):
         index=True,
         nullable=False
     )
-    name = db.Column(
+    title = db.Column(
+        db.String,
+        nullable=False
+    )
+    code = db.Column(
         db.String,
         nullable=False
     )
@@ -61,7 +65,7 @@ class EditingTag(db.Model):
 
     @return_ascii
     def __repr__(self):
-        return format_repr(self, 'id', 'event_id', system=False, _text=self.name)
+        return format_repr(self, 'id', 'event_id', system=False, _text=self.title)
 
 
 db.Table(
