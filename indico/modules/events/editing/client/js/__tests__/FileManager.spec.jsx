@@ -134,7 +134,7 @@ async function uploadFile(dropzone, onChange, name, type, deletedFile = null) {
   const uuid = await simulateFileUpload(dropzone, name, type);
   expect(onChange).toHaveBeenCalledWith({'2': [uuid]});
   if (deletedFile) {
-    const deleteUrl = `/files/${deletedFile}`;
+    const deleteUrl = `flask://files.delete_file/uuid=${deletedFile}`;
     expect(mockAxios.delete).toHaveBeenCalledWith(deleteUrl);
     await act(async () => {
       mockAxios.mockResponse(undefined, mockAxios.mustGetReqByUrl(deleteUrl));
@@ -204,9 +204,12 @@ describe('File manager', () => {
     // perform an undo - this needs to go back to an empty file list
     await act(async () => {
       fileEntry.find('FileAction').simulate('click');
-      mockAxios.mockResponse(undefined, mockAxios.mustGetReqByUrl(`/files/${uuid}`));
+      mockAxios.mockResponse(
+        undefined,
+        mockAxios.mustGetReqByUrl(`flask://files.delete_file/uuid=${uuid}`)
+      );
     });
-    expect(mockAxios.delete).toHaveBeenCalledWith('/files/newtest2.pdf');
+    expect(mockAxios.delete).toHaveBeenCalledWith(`flask://files.delete_file/uuid=${uuid}`);
     expect(onChange).toHaveBeenCalledWith({});
   });
 
@@ -246,9 +249,12 @@ describe('File manager', () => {
     // perform an undo - this needs to revert to the initial file!
     await act(async () => {
       fileEntry.find('FileAction').simulate('click');
-      mockAxios.mockResponse(undefined, mockAxios.mustGetReqByUrl(`/files/${uuid}`));
+      mockAxios.mockResponse(
+        undefined,
+        mockAxios.mustGetReqByUrl(`flask://files.delete_file/uuid=${uuid}`)
+      );
     });
-    expect(mockAxios.delete).toHaveBeenCalledWith('/files/newtest2.pdf');
+    expect(mockAxios.delete).toHaveBeenCalledWith(`flask://files.delete_file/uuid=${uuid}`);
     expect(onChange).toHaveBeenCalledWith({'2': ['file1']});
   });
 

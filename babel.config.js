@@ -9,6 +9,7 @@
 /* eslint-disable import/unambiguous, import/no-commonjs */
 
 const path = require('path');
+const process = require('process');
 
 const plugins = [
   '@babel/plugin-transform-runtime',
@@ -30,24 +31,28 @@ const plugins = [
   'macros',
 ];
 
-// if there is a valid build config, we can use it to generate proper URLs
-try {
-  const config = require(process.env.INDICO_PLUGIN_ROOT
-    ? path.join(process.env.INDICO_PLUGIN_ROOT, 'webpack-build-config')
-    : './webpack-build-config');
-  const globalBuildConfig = config.indico ? config.indico.build : config.build;
+if (process.env.NODE_ENV === 'test') {
+  plugins.push(['flask-urls', {importPrefix: 'indico-url', mock: true}]);
+} else {
+  // if there is a valid build config, we can use it to generate proper URLs
+  try {
+    const config = require(process.env.INDICO_PLUGIN_ROOT
+      ? path.join(process.env.INDICO_PLUGIN_ROOT, 'webpack-build-config')
+      : './webpack-build-config');
+    const globalBuildConfig = config.indico ? config.indico.build : config.build;
 
-  plugins.push([
-    'flask-urls',
-    {
-      importPrefix: 'indico-url',
-      urlMap: require(config.build.urlMapPath).rules,
-      basePath: globalBuildConfig.baseURLPath,
-    },
-  ]);
-} catch (e) {
-  if (e.code !== 'MODULE_NOT_FOUND') {
-    throw e;
+    plugins.push([
+      'flask-urls',
+      {
+        importPrefix: 'indico-url',
+        urlMap: require(config.build.urlMapPath).rules,
+        basePath: globalBuildConfig.baseURLPath,
+      },
+    ]);
+  } catch (e) {
+    if (e.code !== 'MODULE_NOT_FOUND') {
+      throw e;
+    }
   }
 }
 
