@@ -20,6 +20,7 @@ from indico.modules.events.editing.models.revision_files import EditingRevisionF
 from indico.modules.events.editing.models.revisions import EditingRevision, InitialRevisionState
 from indico.modules.events.editing.models.tags import EditingTag
 from indico.modules.users.schemas import UserSchema
+from indico.util.string import natural_sort_key
 from indico.util.struct.enum import IndicoEnum
 from indico.web.flask.util import url_for
 
@@ -39,12 +40,12 @@ class EditingFileTypeSchema(mm.ModelSchema):
 class EditingTagSchema(mm.ModelSchema):
     class Meta:
         model = EditingTag
-        fields = ('id', 'code', 'title', 'color', 'system')
+        fields = ('id', 'code', 'title', 'color', 'system', 'verbose_title')
 
     @post_dump(pass_many=True)
-    def convert_to_dict(self, data, many, **kwargs):
+    def sort_list(self, data, many, **kwargs):
         if many:
-            data = {x['id']: x for x in data}
+            data = sorted(data, key=lambda e: natural_sort_key(e['verbose_title']))
         return data
 
 
