@@ -106,14 +106,17 @@ async function simulateFileUpload(dropzone, name, type) {
   });
 
   await act(async () => {
-    mockAxios.mockResponse({
-      data: {
-        uuid,
-        filename: name,
-        claimed: false,
-        downloadURL: 'goes://nowhere',
+    mockAxios.mockResponse(
+      {
+        data: {
+          uuid,
+          filename: name,
+          claimed: false,
+          downloadURL: 'goes://nowhere',
+        },
       },
-    });
+      mockAxios.mustGetReqByUrl('goes://nowhere')
+    );
   });
 
   return uuid;
@@ -131,15 +134,17 @@ async function uploadFile(dropzone, onChange, name, type, deletedFile = null) {
   const uuid = await simulateFileUpload(dropzone, name, type);
   expect(onChange).toHaveBeenCalledWith({'2': [uuid]});
   if (deletedFile) {
-    expect(mockAxios.delete).toHaveBeenCalledWith(`/files/${deletedFile}`);
+    const deleteUrl = `/files/${deletedFile}`;
+    expect(mockAxios.delete).toHaveBeenCalledWith(deleteUrl);
     await act(async () => {
-      mockAxios.mockResponse(); // respond to the DELETE request
+      mockAxios.mockResponse(undefined, mockAxios.mustGetReqByUrl(deleteUrl));
     });
   } else {
     expect(mockAxios.delete).not.toHaveBeenCalled();
   }
   onChange.mockClear();
   mockAxios.delete.mockClear();
+  return uuid;
 }
 
 function getFileEntryForFileType(wrapper, fileTypeId) {
@@ -191,7 +196,7 @@ describe('File manager', () => {
     checkFileEntry(getFileEntryForFileType(wrapper, 2), 'test1.pdf', 'trash');
 
     // replace the newly uploaded file
-    await uploadFile(dropzone, onChange, 'test2.pdf', 'pdf', 'newtest1.pdf');
+    const uuid = await uploadFile(dropzone, onChange, 'test2.pdf', 'pdf', 'newtest1.pdf');
     wrapper.update();
     const fileEntry = getFileEntryForFileType(wrapper, 2);
     checkFileEntry(fileEntry, 'test2.pdf', 'trash');
@@ -199,7 +204,7 @@ describe('File manager', () => {
     // perform an undo - this needs to go back to an empty file list
     await act(async () => {
       fileEntry.find('FileAction').simulate('click');
-      mockAxios.mockResponse(); // respond to the DELETE request
+      mockAxios.mockResponse(undefined, mockAxios.mustGetReqByUrl(`/files/${uuid}`));
     });
     expect(mockAxios.delete).toHaveBeenCalledWith('/files/newtest2.pdf');
     expect(onChange).toHaveBeenCalledWith({});
@@ -233,7 +238,7 @@ describe('File manager', () => {
     checkFileEntry(getFileEntryForFileType(wrapper, 2), 'test1.pdf', 'undo');
 
     // replace the newly uploaded file
-    await uploadFile(dropzone, onChange, 'test2.pdf', 'pdf', 'newtest1.pdf');
+    const uuid = await uploadFile(dropzone, onChange, 'test2.pdf', 'pdf', 'newtest1.pdf');
     wrapper.update();
     const fileEntry = getFileEntryForFileType(wrapper, 2);
     checkFileEntry(fileEntry, 'test2.pdf', 'undo');
@@ -241,7 +246,7 @@ describe('File manager', () => {
     // perform an undo - this needs to revert to the initial file!
     await act(async () => {
       fileEntry.find('FileAction').simulate('click');
-      mockAxios.mockResponse(); // respond to the DELETE request
+      mockAxios.mockResponse(undefined, mockAxios.mustGetReqByUrl(`/files/${uuid}`));
     });
     expect(mockAxios.delete).toHaveBeenCalledWith('/files/newtest2.pdf');
     expect(onChange).toHaveBeenCalledWith({'2': ['file1']});
@@ -284,14 +289,17 @@ describe('File manager', () => {
     expect(onChange).not.toHaveBeenCalled();
 
     await act(async () => {
-      mockAxios.mockResponse({
-        data: {
-          uuid: 'newfile2',
-          filename: file1.name,
-          claimed: false,
-          downloadURL: 'goes://nowhere',
+      mockAxios.mockResponse(
+        {
+          data: {
+            uuid: 'newfile2',
+            filename: file1.name,
+            claimed: false,
+            downloadURL: 'goes://nowhere',
+          },
         },
-      });
+        mockAxios.mustGetReqByUrl('http://upload/endpoint')
+      );
     });
 
     // once the upload finished, the state is updated
