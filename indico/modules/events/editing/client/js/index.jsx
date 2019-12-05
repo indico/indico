@@ -7,6 +7,7 @@
 
 import fileTypesURL from 'indico-url:event_editing.api_file_types';
 import editableDetailsURL from 'indico-url:event_editing.api_editable';
+import tagsURL from 'indico-url:event_editing.api_tags';
 
 import React from 'react';
 import ReactDOM from 'react-dom';
@@ -22,14 +23,19 @@ document.addEventListener('DOMContentLoaded', async () => {
   const timelineElement = document.querySelector('#editing-timeline');
   const eventId = parseInt(timelineElement.dataset.eventId, 10);
 
-  let response;
+  let fileTypes, tags;
+
   try {
-    response = await indicoAxios.get(fileTypesURL({confId: eventId}));
+    const [fileTypeResponse, tagResponse] = await Promise.all([
+      indicoAxios.get(fileTypesURL({confId: eventId})),
+      indicoAxios.get(tagsURL({confId: eventId})),
+    ]);
+    fileTypes = camelizeKeys(fileTypeResponse.data);
+    tags = camelizeKeys(tagResponse.data);
   } catch (e) {
     handleAxiosError(e);
   }
 
-  const fileTypes = camelizeKeys(response.data);
   const contributionId = parseInt(timelineElement.dataset.contributionId, 10);
   const editableType = timelineElement.dataset.editableType;
   const store = storeFactory({
@@ -37,6 +43,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     contributionId,
     editableType,
     fileTypes,
+    tags,
     editableDetailsURL: editableDetailsURL({
       confId: eventId,
       contrib_id: contributionId,

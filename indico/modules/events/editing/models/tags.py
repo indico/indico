@@ -63,6 +63,11 @@ class EditingTag(db.Model):
     # relationship backrefs:
     # - revisions (EditingRevision.tags)
 
+    @property
+    def verbose_title(self):
+        """Properly formatted title, including tag code."""
+        return '{}: {}'.format(self.code, self.title)
+
     @return_ascii
     def __repr__(self):
         return format_repr(self, 'id', 'event_id', system=False, _text=self.title)
