@@ -12,3 +12,4 @@ pygments
 sqlparse
 isort
 flask_url_map_serializer
+migra
