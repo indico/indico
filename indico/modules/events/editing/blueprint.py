@@ -16,7 +16,8 @@ _bp = IndicoBlueprint('event_editing', __name__, url_prefix='/event/<confId>', t
 
 # Frontend
 _bp.add_url_rule('/manage/editing/', 'dashboard', frontend.RHEditingDashboard)
-_bp.add_url_rule('/manage/editing/tags', 'manage_tags', frontend.RHEditingTags)
+_bp.add_url_rule('/manage/editing/tags', 'manage_tags', frontend.RHManageEditingTags)
+_bp.add_url_rule('/manage/editing/types', 'manage_file_types', frontend.RHManageEditingFileTypes)
 _bp.add_url_rule('/contributions/<int:contrib_id>/editing/<any(paper):type>', 'editable', frontend.RHEditableTimeline)
 _bp.add_url_rule('/contributions/<int:contrib_id>/editing/<any(paper):type>/<int:revision_id>/files.zip',
                  'revision_files_export', backend.RHExportRevisionFiles)
