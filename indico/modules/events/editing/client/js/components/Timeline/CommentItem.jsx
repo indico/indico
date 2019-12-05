@@ -15,7 +15,8 @@ import UserAvatar from 'indico/modules/events/reviewing/components/UserAvatar';
 import {Param, Translate} from 'indico/react/i18n';
 import {serializeDate} from 'indico/utils/date';
 
-import {deleteRevisionComment} from '../../actions';
+import CommentForm from './CommentForm';
+import {deleteRevisionComment, modifyRevisionComment} from '../../actions';
 import {getLastRevision} from '../../selectors';
 
 const INDICO_BOT_USER = {
@@ -29,6 +30,7 @@ export default function Comment({
   createdDt,
   modifiedDt,
   html,
+  text,
   internal,
   system,
   canModify,
@@ -36,9 +38,17 @@ export default function Comment({
 }) {
   const [isDeletingComment, setIsDeletingComment] = useState(false);
   const [confirmOpen, setConfirmOpen] = useState(false);
+  const [editCommentFormOpen, setEditCommentFormOpen] = useState(false);
   const lastRevision = useSelector(getLastRevision);
   const dispatch = useDispatch();
   const commentUser = system ? INDICO_BOT_USER : user;
+
+  const modifyComment = async formData => {
+    const rv = await dispatch(modifyRevisionComment(modifyCommentURL, formData));
+    if (rv.error) {
+      return rv.error;
+    }
+  };
 
   return (
     <div className="i-timeline-item">
@@ -73,10 +83,15 @@ export default function Comment({
               )}
             </div>
             {canModify && lastRevision.id === revisionId && (
-              <>
+              <div className="review-comment-action">
+                <a
+                  onClick={() => setEditCommentFormOpen(!editCommentFormOpen)}
+                  className="i-link icon-edit"
+                  title={Translate.string('Edit comment')}
+                />{' '}
                 <a
                   onClick={() => setConfirmOpen(true)}
-                  className="i-link icon-cross js-delete-comment"
+                  className="i-link icon-cross"
                   title={Translate.string('Remove comment')}
                 />
                 <Confirm
@@ -110,11 +125,20 @@ export default function Comment({
                   }
                   closeIcon={!isDeletingComment}
                 />
-              </>
+              </div>
             )}
           </div>
           <div className="i-box-content js-form-container">
-            <div className="markdown-text" dangerouslySetInnerHTML={{__html: html}} />
+            {editCommentFormOpen ? (
+              <CommentForm
+                onSubmit={modifyComment}
+                onToggleExpand={setEditCommentFormOpen}
+                initialValues={{text, internal}}
+                expanded
+              />
+            ) : (
+              <div className="markdown-text" dangerouslySetInnerHTML={{__html: html}} />
+            )}
           </div>
         </div>
       </div>
@@ -126,6 +150,7 @@ Comment.propTypes = {
   revisionId: PropTypes.number.isRequired,
   createdDt: PropTypes.string.isRequired,
   html: PropTypes.string.isRequired,
+  text: PropTypes.string.isRequired,
   canModify: PropTypes.bool.isRequired,
   modifyCommentURL: PropTypes.string.isRequired,
   user: PropTypes.shape({

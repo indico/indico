@@ -61,14 +61,10 @@ export default function RevisionComment({comment, revision}) {
             </div>
             {comment.canEdit && (
               <div className="review-comment-action hide-if-locked">
-                <a
-                  href="#"
-                  className="i-link icon-edit js-edit-comment"
-                  title={Translate.string('Edit comment')}
-                />{' '}
+                <a href="#" className="i-link icon-edit" title={Translate.string('Edit comment')} />{' '}
                 <a
                   onClick={() => setConfirmOpen(true)}
-                  className="i-link icon-cross js-delete-comment"
+                  className="i-link icon-cross"
                   title={Translate.string('Remove comment')}
                 />
                 <Confirm
