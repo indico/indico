@@ -72,14 +72,15 @@ def upgrade():
         'tags',
         sa.Column('id', sa.Integer(), nullable=False),
         sa.Column('event_id', sa.Integer(), nullable=False, index=True),
-        sa.Column('name', sa.String(), nullable=False),
+        sa.Column('title', sa.String(), nullable=False),
+        sa.Column('code', sa.String(), nullable=False),
         sa.Column('color', sa.String(), nullable=False),
         sa.Column('system', sa.Boolean(), nullable=False),
         sa.ForeignKeyConstraint(['event_id'], ['events.events.id']),
         sa.PrimaryKeyConstraint('id'),
         schema='event_editing'
     )
-    op.create_index('ix_uq_tags_event_id_name_lower', 'tags', ['event_id', sa.text('lower(name)')],
+    op.create_index('ix_uq_tags_event_id_code_lower', 'tags', ['event_id', sa.text('lower(code)')],
                     unique=True, schema='event_editing')
 
     op.create_table(
