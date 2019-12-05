@@ -7,3 +7,4 @@
 
 import './timeline';
 import './tags';
+import './fileTypes';

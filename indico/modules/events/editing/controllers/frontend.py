@@ -9,7 +9,8 @@ from __future__ import unicode_literals
 
 from werkzeug.exceptions import NotFound
 
-from indico.modules.events.editing.controllers.base import RHContributionEditableBase, RHEditingBase
+from indico.modules.events.editing.controllers.base import (RHContributionEditableBase, RHEditingBase,
+                                                            RHEditingManagementBase)
 from indico.modules.events.editing.views import WPEditing
 
 
@@ -33,6 +34,11 @@ class RHEditableTimeline(RHContributionEditableBase):
         )
 
 
-class RHEditingTags(RHEditingBase):
+class RHManageEditingTags(RHEditingManagementBase):
     def _process(self):
         return WPEditing.render_template('management/tags.html', self.event)
+
+
+class RHManageEditingFileTypes(RHEditingManagementBase):
+    def _process(self):
+        return WPEditing.render_template('management/filetypes.html', self.event)

@@ -17,6 +17,20 @@
                     </a>
                 </div>
             </div>
+            <div class="section">
+                <span class="icon icon-file" style="align-self: center;"></span>
+                <div class="text">
+                    <div class="label">
+                        {% trans %}File Types{% endtrans %}
+                    </div>
+                    {% trans %}Configure file types{% endtrans %}
+                </div>
+                <div class="toolbar">
+                    <a href="{{ url_for('.manage_file_types', event) }}" class="i-button icon-settings">
+                        {% trans %}Configure{% endtrans %}
+                    </a>
+                </div>
+            </div>
         </div>
     </div>
 {% endblock %}
