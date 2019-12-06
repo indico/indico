@@ -13,10 +13,6 @@
 .tab { border: gray solid;
         background-color: gray }
 
-label.disabled{
-    color: gray;
-}
-
 .subtitle {
    font-weight: normal;
    font-size: 16px;
@@ -768,19 +764,6 @@ div.PeopleListDiv {
     width: 300px;
     border: 1px solid #CCCCCC;
     overflow: auto;
-}
-
-div.disabled {
-    background: #DDDDDD;
-}
-
-div.disabled input {
-    color: #AAAAAA;
-    background: #DDDDDD;
-}
-
-div.disabled input[disabled] {
-    background: #DDDDDD;
 }
 
 div.posterEntry {
