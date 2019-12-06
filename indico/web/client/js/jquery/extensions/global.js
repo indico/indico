@@ -48,7 +48,8 @@ $(document).ready(function() {
       var qtipHTML =
         qtipHTMLContainer && qtipHTMLContainer.length ? $(this).next(qtipHTMLContainer) : null;
 
-      if ((!qtipHTML && !title) || this.disabled || $target.data('no-auto-tooltip')) {
+      // qtip not applied if it's empty, the element is disabled or it's inside a SemanticUI widget
+      if ((!qtipHTML && !title) || this.disabled || $target.data('no-qtip') || $target.closest('.ui').length) {
         return;
       }
 

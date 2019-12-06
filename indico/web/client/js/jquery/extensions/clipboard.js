@@ -26,11 +26,11 @@ $(document).ready(function() {
       events: {
         hide: function() {
           $(this).qtip('destroy');
-          $element.removeData('no-auto-tooltip');
+          $element.removeData('no-qtip');
         },
       },
     });
-    $element.data('no-auto-tooltip', true).trigger('indico:closeAutoTooltip');
+    $element.data('no-qtip', true).trigger('indico:closeAutoTooltip');
     container.qtip('show');
 
     if (hideAfterDelay) {
