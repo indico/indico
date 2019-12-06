@@ -15,7 +15,7 @@ from sqlalchemy.orm.attributes import flag_modified
 from indico.core.celery import celery
 from indico.core.config import config
 from indico.core.db import db
-from indico.core.storage import StorageReadOnlyError
+from indico.core.storage import StorageError, StorageReadOnlyError
 from indico.modules.files import logger
 from indico.modules.files.models.files import File
 from indico.util.date_time import now_utc
@@ -36,12 +36,13 @@ def delete_unclaimed_files():
             logger.info('Would have removed unclaimed file %s (skipped due to debug mode)', file_repr)
             continue
         try:
-            file.delete()
-            db.session.delete(file)
+            file.delete(delete_from_db=True)
         except StorageReadOnlyError:
             file.meta['deletion_failed'] = True
             flag_modified(file, 'meta')
             logger.warn('Could not delete unclaimed file %s (read-only storage)', file_repr)
+        except StorageError as exc:
+            logger.error('Could not delete unclaimed file %s: %s', file_repr, exc)
         else:
             logger.info('Removed unclaimed file %s', file_repr)
         db.session.commit()
