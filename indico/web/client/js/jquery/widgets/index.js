@@ -16,7 +16,6 @@ import './dropdown';
 import './dttbutton';
 import './itempicker';
 import './misc';
-import './multiselect';
 import './multitextfield';
 import './nullableselector';
 import './palettepicker';
@@ -27,7 +26,6 @@ import './realtimefilter';
 import './rulelistwidget';
 import './scrollblocker';
 import './sticky_tooltip';
-import './timerange';
 import './track_role_widget';
 
 // JS code for Jinja Widgets

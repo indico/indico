@@ -23,13 +23,6 @@
     }
 }
 
-.timerange {
-    input {
-        width: 5em;
-        text-align: center;
-    }
-}
-
 i.info-helper {
     @include icon-before('icon-question');
     @extend .text-superfluous;

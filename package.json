@@ -35,7 +35,6 @@
     "jquery-migrate": "^3.1.0",
     "jquery-typeahead": "^2.11.0",
     "jquery-ui": "^1.12.1",
-    "jquery-ui-multiselect-widget": "^2.0.2",
     "jquery.typewatch": "github:dennyferra/typewatch#3.0.0",
     "leaflet": "^1.6.0",
     "leaflet-draw": "^1.0.4",
