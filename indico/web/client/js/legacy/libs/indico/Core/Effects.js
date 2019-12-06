@@ -6,28 +6,6 @@
 // LICENSE file for more details.
 
 IndicoUI.Effect = {
-  /**
-   * Simple CSS manipulation that sets the element's 'display' property to a new style
-   * @param {XElement} element the target element
-   * @param {string} newStyle the new display style, e.g.: "inline", "block", "table-row".
-   *                 If not existant, will be set to '', which usually restores the default style of the element.
-   */
-  appear: function(element, newStyle) {
-    if (!exists(newStyle)) {
-      newStyle = '';
-    }
-    element.dom.style.display = newStyle;
-  },
-
-  /**
-   * Simple CSS manipualtion that sets the element's
-   * 'display' property to 'none'
-   * @param {XElement} element the target element
-   */
-  disappear: function(element) {
-    element.dom.style.display = 'none';
-  },
-
   followScroll: function() {
     $.each($('.follow-scroll'), function() {
       if (!$(this).data('original-offset')) {

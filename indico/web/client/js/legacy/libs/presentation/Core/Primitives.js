@@ -288,17 +288,8 @@ function objectize(key, value) {
  * Browser detection from Prototype JavaScript Framework.
  */
 var Browser = {
-  IE: window.attachEvent && !window.opera ? extract(navigator.appVersion, 'MSIE ', ';') : false,
   WebKit:
     navigator.appVersion.indexOf('AppleWebKit/') > -1
       ? extract(navigator.appVersion, 'AppleWebKit/', ' ')
-      : false,
-  Gecko:
-    navigator.userAgent.indexOf('Gecko') > -1 && navigator.userAgent.indexOf('KHTML') == -1
-      ? extract(navigator.userAgent, 'rv:', ')')
-      : false,
-  KHTML:
-    navigator.appVersion.indexOf('KHTML') > -1 && navigator.appVersion.indexOf('AppleWebKit') == -1
-      ? extract(navigator.appVersion, 'KHTML/', ' ')
       : false,
 };

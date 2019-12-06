@@ -341,20 +341,9 @@ delayedBind(Html.prototype.styleGetters, 'opacity', function(dom) {
       };
 });
 delayedBind(Html.prototype.styleSetters, 'opacity', function() {
-  return Browser.IE
-    ? function(value) {
-        return objectize(
-          'filter',
-          value == 1 || value === ''
-            ? ''
-            : 'progid:DXImageTransform.Microsoft.Alpha(opacity=' +
-                Math.round((value < 0.00001 ? 0 : value) * 100) +
-                ')'
-        );
-      }
-    : function(value) {
-        return objectize('opacity', value == 1 || value === '' ? '' : value < 0.00001 ? 0 : value);
-      };
+  return function(value) {
+    return objectize('opacity', value == 1 || value === '' ? '' : value < 0.00001 ? 0 : value);
+  };
 });
 
 delayedBind(Html.prototype.styleGetters, 'cssFloat', function(dom) {
@@ -367,13 +356,9 @@ delayedBind(Html.prototype.styleGetters, 'cssFloat', function(dom) {
       };
 });
 delayedBind(Html.prototype.styleSetters, 'cssFloat', function() {
-  return Browser.IE
-    ? function(value) {
-        return objectize('styleFloat', Html.toDimensions(value));
-      }
-    : function(value) {
-        return objectize('cssFloat', Html.toDimensions(value));
-      };
+  return function(value) {
+    return objectize('cssFloat', Html.toDimensions(value));
+  };
 });
 
 iterate(

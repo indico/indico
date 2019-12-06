@@ -226,19 +226,6 @@ bind.sequence = function(target, source, template) {
 };
 
 /**
- *
- * @param {List} target
- * @param {WatchList, Enumerable, Array} source
- * @param {Function, String} [template]
- * @param {Number} [offset]
- * @param {Number} [multiplier]
- * @return {List}
- */
-bind.listEx = function(target, source, template, offset, multiplier) {
-  return bind.attach(target, bind.internal.listEx(target, source, template, offset, multiplier));
-};
-
-/**
  * Binds the target using the setter to the source getter.
  * @param {Object} target
  * @param {Getter, Object} source
@@ -413,40 +400,3 @@ bind.internal.sequence = function(target, list, template) {
   return null;
 };
 
-bind.internal.listEx = function(target, list, template, offset, multiplier) {
-  template = obtainTemplate(template);
-  if (!exists(offset)) {
-    offset = 0;
-  }
-  if (!exists(multiplier)) {
-    multiplier = 1;
-  }
-  function inserter(item, index) {
-    var items = template(item, target);
-    var start = offset + multiplier * index;
-    for (var i = 0; i < multiplier; i++) {
-      target.insert(items[i], start + i);
-    }
-  }
-  each(list, inserter);
-  if (list.WatchList) {
-    return list.observe({
-      itemAdded: inserter,
-      itemRemoved: function(item, index) {
-        index = offset + multiplier * index;
-        times(multiplier, function() {
-          target.removeAt(index);
-        });
-      },
-      itemMoved: function(item, source, destination) {
-        // CHECK THAT
-        source = offset + multiplier * source;
-        destination = offset + multiplier * destination;
-        times(multiplier, function() {
-          target.move(source, destination);
-        });
-      },
-    });
-  }
-  return null;
-};

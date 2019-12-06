@@ -168,34 +168,3 @@ function processListable(source, processor) {
     return source.observe(processor);
   }
 }
-
-function processListableAccessor(source, key, append, remove) {
-  processListable(source, {
-    itemAdded: function(item) {
-      var accessor = item[key];
-      if (exists(accessor)) {
-        bind.setter(accessor, accessor, function(value, old) {
-          if (exists(old)) {
-            remove(old);
-          }
-          if (exists(value)) {
-            append(value);
-          }
-        });
-      }
-    },
-    itemRemoved: function(item) {
-      var accessor = item[key];
-      if (exists(accessor)) {
-        bind.stop(accessor);
-        var old = accessor.get();
-        if (exists(old)) {
-          remove(old);
-        }
-      }
-    },
-  });
-}
-
-newWatchList = construct(WatchList);
-getWatchList = provide(WatchList);

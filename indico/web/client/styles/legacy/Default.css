@@ -690,31 +690,6 @@ body.cke_show_borders {
     color: #045FB4;
 }
 
-.dragndrop-placeholder {
-    background: none repeat scroll 0 0 #FFCC66;
-    height: 1.5em;
-    margin-top: 3px;
-    margin-bottom: 3px;
-}
-
-.drop-target {
-    background: none repeat scroll 0 0 #FFF7CF;
-    border: 1px dashed #FFAA00 !important;
-    width: 85%;
-}
-
-.sortblock {
-    width: 85%;
-}
-
-.sortblock ul {
-    margin-top: 2px;
-    margin-bottom: 10px;
-    padding: 4px;
-    list-style-type: none;
-    width: 100%;
-}
-
 .social_share_tooltip {
     max-width: 420px;
     color: #fff;

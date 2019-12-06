@@ -9,7 +9,6 @@ import './libs/indico/Core/Presentation.js';
 import './libs/indico/Core/Data.js';
 import './libs/indico/Core/Components.js';
 import './libs/indico/Core/Auxiliar.js';
-import './libs/indico/Core/Buttons.js';
 import './libs/indico/Core/Effects.js';
 import './libs/indico/Core/Interaction/Base.js';
 import './libs/indico/Core/Widgets/Base.js';
@@ -22,7 +21,6 @@ import './libs/indico/Core/Dialogs/Util.js';
 import './libs/indico/Core/Dialogs/Users.js';
 import './libs/indico/Core/Browser.js';
 import './libs/indico/Core/Util.js';
-import './libs/indico/Core/Dragndrop.js';
 import './libs/indico/Core/keymap.js';
 
 import './libs/indico/Legacy/Widgets.js';

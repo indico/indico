@@ -919,7 +919,7 @@ type(
     checkTabOverflow: function(tab) {
       // some magic numbers used... it would be great if a better solution
       // was possible
-      return this.tabList.dom.offsetHeight > (Browser.IE ? 33 : 30);
+      return this.tabList.dom.offsetHeight > 30;
     },
 
     scrollRight: function() {
@@ -1214,21 +1214,7 @@ type(
       var self = this;
 
       IndicoUI.unAssignLayerLevel(this.canvas);
-
-      /*
-       * IE problem. If the close is triggered by en event and this.canvas
-       * is remvoved from the dom tree then the event wont propagate.
-       * This is fixed by hiding the element and removing it with a timeout so that
-       * there is time enough for the event to be handled.
-       */
-      if (Browser.IE) {
-        this.canvas.dom.style.display = 'none';
-        setTimeout(function() {
-          $E(document.body).remove(self.canvas);
-        }, 500);
-      } else {
-        $E(document.body).remove(self.canvas);
-      }
+      $E(document.body).remove(self.canvas);
 
       this.isopen = false;
     },

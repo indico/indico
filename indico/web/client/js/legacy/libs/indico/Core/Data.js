@@ -181,13 +181,6 @@ var Util = {
 
     return date;
   },
-
-  HTMLEscape: function(text) {
-    // escape special HTML chars - kind of hacky but works
-    return $('<p/>')
-      .text(text || '')
-      .html();
-  },
 };
 
 Util.Validation = {

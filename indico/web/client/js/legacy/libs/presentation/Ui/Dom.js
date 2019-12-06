@@ -26,28 +26,6 @@ function getDom(object) {
 var Dom = {
   Event: {
     /**
-     * Observe event
-     * @param {Dom} dom
-     * @param {String} eventName
-     * @param {Function} observer
-     * @return {Function} function to remove observer
-     */
-    observe: function(dom, eventName, observer) {
-      if (dom.addEventListener) {
-        dom.addEventListener(eventName, observer, false);
-        return function() {
-          dom.removeEventListener(eventName, observer, false);
-        };
-      } else {
-        eventName = 'on' + eventName;
-        dom.attachEvent(eventName, observer);
-        return function() {
-          dom.detachEvent(eventName, observer);
-        };
-      }
-    },
-
-    /**
      * Fires event
      * @param {Dom} dom
      * @param {String} eventName
