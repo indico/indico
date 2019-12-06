@@ -7,19 +7,24 @@
  */
 
 /* For the multi-tab control */
-.tabSelected {border-top: gray solid;
-                border-left: gray solid;
-                border-right: gray solid}
-.tab { border: gray solid;
-        background-color: gray }
+.tabSelected {
+    border-top: gray solid;
+    border-left: gray solid;
+    border-right: gray solid
+}
+
+.tab {
+    border: gray solid;
+    background-color: gray
+}
 
 .subtitle {
-   font-weight: normal;
-   font-size: 16px;
-   color: #777777;
-   padding: 3px;
-   margin-top: 2px;
-   margin-bottom: 2px;
+    font-weight: normal;
+    font-size: 16px;
+    color: #777777;
+    padding: 3px;
+    margin-top: 2px;
+    margin-bottom: 2px;
 }
 
 /* ListWidget, list of users styles */
@@ -74,6 +79,7 @@ td.suggestedUsersPanel {
     border-left: 1px dotted #CCCCCC;
 }
 
+/* TODO: remove when replacing the old search plugin */
 .arrowExpandIcon
 {
     background: transparent url('static:images/menu_arrow_black.png') scroll no-repeat center center;
@@ -85,25 +91,6 @@ td.suggestedUsersPanel {
     float: right;
     cursor: pointer;
 }
-
-/* Breadcrumb styles */
-
-.path img {
-    padding-right: 5px;
-    padding-left: 7px;
-}
-
-/* Root Page */
-
-.container
-{
-    background: #FFFFFF;
-    margin-bottom: 10px;
-    margin: 15px 80px 30px 60px;
-    /*overflow: visible;*/
-    overflow: hidden;
-}
-
 
 a.active {
     font-weight: bold;
@@ -180,8 +167,6 @@ div.tabScrollArrow {
 
 div.tabGradient {
     background: white url(static:images/tab_bg.png) repeat-x scroll 0 -60px;
-    /*border-left: 1px solid #777777;
-    border-right: 1px solid #777777;*/
     height: 20px;
 }
 
@@ -249,11 +234,6 @@ div.tabBorderGradient {
     background: #555;
 }
 
-ul.tabList li.hiddenTab
-{
-    display: none;
-}
-
 .popUpLabel {
    text-align: right;
    font-size: 13px;
@@ -315,13 +295,6 @@ span.errorTitle {
     font-weight: bold;
 }
 
-div.warningExplanation {
-    margin-top: 10px;
-    color: #555;
-    text-align: left;
-}
-
-
 ul.warningLevel0 {
     margin: 0;
     padding: 0;
@@ -360,28 +333,6 @@ div.exclusivePopup .printLink {
     -webkit-border-top-left-radius: 3px;
     -moz-border-radius-topleft: 3px;
     -moz-border-radius-topright: 3px;
-}
-
-div.balloonPopupCloseButton {
-    position: absolute;
-    cursor: pointer;
-    top: 10px;
-    right: 10px;
-    background-image: url('static:images/popup_close_button.png');
-    width: 15px;
-    height: 15px;
-}
-
-.loadingPopup {
-    background: transparent url('static:images/load_lightblue.gif') scroll no-repeat center center;
-    min-width: 130px;
-    height: 70px;
-}
-.loadingPopup .text {
-    color: #DDD;
-    text-align: center;
-    font-family: Verdana;
-    padding-top: 80px;
 }
 
 div.ui-draggable.timetableBlock {
@@ -429,12 +380,6 @@ div.timetableBlockMaterial {
     background: transparent url(static:images/material_folder.png) scroll no-repeat 3px 3px;
 }
 
-div.timetableBlockMaterial:hover, div.timetableBlockMaterialActive {
-    border: 1px solid #777;
-    margin: 1px;
-    background-color: white;
-}
-
 div.timetableBlockTime {
     position: absolute;
     bottom: 4px;
@@ -468,51 +413,6 @@ div.timetableBlockConvener {
     font-size: 11px;
 }
 
-div.timetableBlockContribs {
-    margin: 4px;
-    border: 1px solid #CCC;
-}
-
-span.sessionRenameEntry, span.sessionRenameValue {
-    color: #888888;
-    font-weight: bold;
-}
-
-div.exclusivePopup {
-    background-color: white;
-    display: block;
-    min-width: 250px;
-    padding: 15px;
-    overflow: hidden;
-}
-
-div.ui-dialog-titlebar {
-    padding: 0.4em 15px !important;
-    border-bottom-left-radius: 0;
-    border-bottom-right-radius: 0;
-}
-
-div.exclusivePopupTopBg {
-    background-color: #F8F8F8;
-    -moz-border-radius: 10px;
-    -webkit-border-radius: 10px;
-}
-
-div.exclusivePopup .printLink {
-    font-size: 13px;
-    position: absolute;
-    bottom: 0px;
-    right: 45px;
-    border: 1px solid #aaa;
-    border-bottom-color: white;
-    background: white;
-
-    -webkit-border-top-right-radius: 3px;
-    -webkit-border-top-left-radius: 3px;
-    -moz-border-radius-topleft: 3px;
-    -moz-border-radius-topright: 3px;
-}
-
 div.balloonPopupCloseButton {
     position: absolute;
     cursor: pointer;
@@ -528,6 +428,7 @@ div.balloonPopupCloseButton {
     min-width: 130px;
     height: 70px;
 }
+
 .loadingPopup .text {
     color: #DDD;
     text-align: center;
@@ -734,38 +635,6 @@ div.cssPreview {
     float: right;
 }
 
-ul.nobulletsListInline
-{
-    margin:0px;
-    margin-top: 10px;
-    padding-left: 0px;
-}
-
-ul.nobulletsListInline li
-{
-    margin-left: 10px;
-    height: 25px;
-    overflow: visible;
-    list-style-type: none;
-    display: inline;
-}
-
-div.AspectsListDiv {
-    margin-bottom: 10px;
-    height: 100px;
-    width: 350px;
-    border: 1px solid #CCCCCC;
-    overflow: auto;
-}
-
-div.PeopleListDiv {
-    margin-bottom: 10px;
-    height: 100px;
-    width: 300px;
-    border: 1px solid #CCCCCC;
-    overflow: auto;
-}
-
 div.posterEntry {
     border: 1px solid #aaaaaa;
     -moz-border-radius: 3px;
@@ -778,30 +647,6 @@ div.posterEntry {
 
 div.posterEntry:hover {
     background-color: #ECECEC;
-}
-
-.startEndDate, .support {
-    margin-top: 5px;
-}
-
-.startEndDate td, .support td {
-    color: #000;
-}
-td.startEndDateEntry, td.supportEntry, span.innerWidgetLabel {
-    color: #666;
-    padding-right: 6px;
-}
-
-.support td input {
-    width: 300px;
-}
-
-tr.selectedItem td {
-    color: #000;
-}
-
-.filterTable {
-    border-collapse: collapse;
 }
 
 div.invalid {
@@ -839,47 +684,9 @@ body.cke_show_borders {
     height: auto;
 }
 
-.infoTD {
-    padding: 4px 4px 4px 10px;
-}
-
-.infoTR:hover {
-    background-color: #ECECEC;
-}
-
-.infoTable {
-    -moz-border-radius: 5px 5px 5px 5px;
-    border:1px solid #999999;
-}
-
-table.infoTable td.tableHeader {
-    font-size: 13px;
-    font-family: Verdana, Arial;
-    color: #523D04;
-    padding: 7px;
-    border-bottom: 1px groove #A4A4A4;
-    font-weight: bold;
-}
-
-table.infoTable td.content {
-    padding: 7px;
-}
-
 .link {
     cursor: pointer;
     color: #045FB4;
-}
-
-.abstract.selected, .participant.selected {
-    background: #CDEB8B;
-}
-
-.abstract:hover, .participant:hover {
-    background: #FFF6DF;
-}
-
-.abstract.selected:hover, .participant.selected:hover {
-    background: #CDEB8B;
 }
 
 .dragndrop-placeholder {
@@ -1308,14 +1115,6 @@ ul.material_list ul li {
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
-}
-
-.visibility_hidden {
-    visibility: hidden;
-    padding: 0;
-    height: 0;
-    margin: 0;
-    border: 0;
 }
 
 .user_list_icon_shield {
