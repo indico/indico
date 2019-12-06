@@ -35,11 +35,11 @@ function TagInput({onChange, value, placeholder, options}) {
       search
       selection
       value={value}
-      options={options.map(({id, verboseTitle, ...rest}) => ({
+      options={options.map(({id, verboseTitle, color}) => ({
         value: id,
         text: verboseTitle,
         key: id,
-        ...rest,
+        color,
       }))}
       onChange={(_, {value: v}) => onChange(v)}
       closeOnChange
