@@ -44,10 +44,20 @@ Bugfixes
 
 ----
 
-Version 2.2.5
+Version 2.2.6
 -------------
 
 *Unreleased*
+
+Bugfixes
+^^^^^^^^
+
+- None so far :)
+
+Version 2.2.5
+-------------
+
+*Released on December 06, 2019*
 
 Improvements
 ^^^^^^^^^^^^
