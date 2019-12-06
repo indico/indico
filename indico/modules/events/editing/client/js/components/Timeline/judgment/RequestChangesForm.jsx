@@ -16,11 +16,14 @@ import {Translate} from 'indico/react/i18n';
 
 import {EditingReviewAction} from '../../../models';
 import {reviewEditable} from '../../../actions';
-import {getLastRevision} from '../../../selectors';
+import {getLastRevision, getStaticData} from '../../../selectors';
+import FinalTagInput from './TagInput';
 
 export default function RequestChangesForm({setLoading, onSuccess}) {
   const dispatch = useDispatch();
   const lastRevision = useSelector(getLastRevision);
+  const {tags: tagOptions} = useSelector(getStaticData);
+
   const requestChanges = async formData => {
     setLoading(true);
     const rv = await dispatch(
@@ -39,7 +42,11 @@ export default function RequestChangesForm({setLoading, onSuccess}) {
   };
 
   return (
-    <FinalForm onSubmit={requestChanges} subscription={{}} initialValues={{comment: ''}}>
+    <FinalForm
+      onSubmit={requestChanges}
+      subscription={{}}
+      initialValues={{comment: '', tags: lastRevision.tags}}
+    >
       {fprops => (
         <Form onSubmit={fprops.handleSubmit}>
           <FinalTextArea
@@ -48,6 +55,7 @@ export default function RequestChangesForm({setLoading, onSuccess}) {
             hideValidationError
             autoFocus
           />
+          <FinalTagInput name="tags" options={tagOptions} />
           <div style={{display: 'flex', justifyContent: 'flex-end'}}>
             <FinalSubmitButton label={Translate.string('Submit')} />
           </div>

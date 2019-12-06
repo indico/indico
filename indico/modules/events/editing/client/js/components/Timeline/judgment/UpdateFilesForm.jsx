@@ -22,6 +22,7 @@ import {EditingReviewAction} from '../../../models';
 import FileManager from '../../FileManager';
 import {getFiles} from '../../FileManager/selectors';
 import {mapFileTypes} from '../../FileManager/util';
+import FinalTagInput from './TagInput';
 
 import './JudgmentBox.module.scss';
 
@@ -40,7 +41,7 @@ export default function UpdateFilesForm({setLoading}) {
 
   return (
     <FinalForm
-      initialValues={{comment: ''}}
+      initialValues={{comment: '', tags: lastRevision.tags}}
       subscription={{}}
       onSubmit={async formData => {
         setLoading(true);
@@ -76,7 +77,7 @@ export default function UpdateFilesForm({setLoading}) {
               hideValidationError
               autoFocus
             />
-            <div>TODO: Tags field</div>
+            <FinalTagInput name="tags" options={staticData.tags} />
           </Form>
           <div styleName="judgment-submit-button">
             <FinalSubmitButton form="judgment-form" label={Translate.string('Confirm')} />
