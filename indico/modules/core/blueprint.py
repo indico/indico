@@ -7,7 +7,7 @@
 
 from __future__ import unicode_literals
 
-from indico.modules.core.controllers import (RHChangeLanguage, RHChangeTimezone, RHContact, RHPrincipals, RHReportError,
+from indico.modules.core.controllers import (RHChangeLanguage, RHChangeTimezone, RHContact, RHPrincipals,
                                              RHReportErrorAPI, RHResetSignatureTokens, RHSettings, RHSignURL,
                                              RHVersionCheck)
 from indico.web.flask.util import redirect_view
@@ -31,7 +31,6 @@ _bp.add_url_rule('/api/reset-signature-tokens', 'reset_signature_tokens', RHRese
 
 # Misc pages
 _bp.add_url_rule('/contact', 'contact', RHContact)
-_bp.add_url_rule('/report-error/<error_id>', 'report_error', RHReportError, methods=('GET', 'POST'))
 _bp.add_url_rule('/report-error/api/<error_id>', 'report_error_api', RHReportErrorAPI, methods=('POST',))
 
 # Allow loadbalancers etc to easily check whether the service is alive

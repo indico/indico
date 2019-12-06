@@ -10,12 +10,12 @@ import ReactDOM from 'react-dom';
 import {Provider} from 'react-redux';
 
 import createReduxStore from 'indico/utils/redux';
-import {addError} from './actions';
+import {addError, showReportForm} from './actions';
 import reducer from './reducers';
 import ErrorDialog from './container';
 
 let store;
-export default function showReactErrorDialog(error) {
+export default function showReactErrorDialog(error, instantReport = false) {
   if (!store) {
     store = createReduxStore('errors', {
       errors: reducer,
@@ -30,4 +30,7 @@ export default function showReactErrorDialog(error) {
     ReactDOM.render(jsx, container);
   }
   store.dispatch(addError(error));
+  if (instantReport) {
+    store.dispatch(showReportForm());
+  }
 }

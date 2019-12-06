@@ -42,7 +42,7 @@ async function uploadFile(file, url, onUploadProgress) {
     });
     return data;
   } catch (e) {
-    handleAxiosError(e, false, true);
+    handleAxiosError(e);
   }
 }
 
@@ -82,7 +82,7 @@ export async function deleteFile(uuid) {
   try {
     await indicoAxios.delete(deleteFileURL({uuid}));
   } catch (e) {
-    handleAxiosError(e, false, true);
+    handleAxiosError(e);
   }
 }
 

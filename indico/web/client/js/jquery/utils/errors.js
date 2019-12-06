@@ -5,7 +5,7 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-/* global showErrorDialog:false */
+import showReactErrorDialog from 'indico/react/errors';
 
 (function(global) {
   global.handleAjaxError = function handleAjaxError(data) {
@@ -27,18 +27,17 @@
       try {
         data = JSON.parse(data.responseText);
       } catch (e) {
-        showErrorDialog({
+        showReactErrorDialog({
           title: $T.gettext('Something went wrong'),
           message: '{0} ({1})'.format(data.statusText.toLowerCase(), data.status),
-          report_url: null,
         });
         return true;
       }
     }
     // data.data.error is only needed for angular error handlers
-    var error = data.error || (data.data && data.data.error);
+    const error = data.error || (data.data && data.data.error);
     if (error) {
-      showErrorDialog(error);
+      showReactErrorDialog(error);
       return true;
     }
   };
@@ -49,9 +48,9 @@
     context
       .find('.i-form .has-error > .form-field, .i-form .has-error > .form-subfield')
       .each(function() {
-        var $this = $(this);
+        const $this = $(this);
         // Try a custom tooltip anchor
-        var input = $this.find('[data-tooltip-anchor]');
+        let input = $this.find('[data-tooltip-anchor]');
 
         if (!input.length) {
           // Try the first non-hidden input field
@@ -62,9 +61,7 @@
           // Try the first element that's not a hidden input
           input = $this.children(':not(:input:hidden)').eq(0);
         }
-        input.stickyTooltip('danger', function() {
-          return $this.data('error');
-        });
+        input.stickyTooltip('danger', () => $this.data('error'));
       });
   };
 })(window);

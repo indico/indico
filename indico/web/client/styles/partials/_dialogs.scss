@@ -136,23 +136,3 @@
 form.confirmation-dialog {
     max-width: 800px;
 }
-
-.error-dialog {
-    width: 450px;
-
-    .message-text {
-        overflow: hidden;
-        word-wrap: break-word;
-    }
-
-    p {
-        margin-top: 0;
-        font-size: 1.2em;
-    }
-
-    .actions {
-        display: flex;
-        flex-flow: row nowrap;
-        justify-content: flex-end;
-    }
-}

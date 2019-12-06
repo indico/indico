@@ -5,8 +5,6 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-/* global showErrorDialog:false */
-
 import axios from 'axios';
 import isURLSameOrigin from 'axios/lib/helpers/isURLSameOrigin';
 import qs from 'qs';
@@ -33,7 +31,7 @@ indicoAxios.interceptors.request.use(config => {
   return config;
 });
 
-export function handleAxiosError(error, strict = false, useReactDialog = false) {
+export function handleAxiosError(error, strict = false) {
   if (axios.isCancel(error)) {
     return;
   }
@@ -46,14 +44,9 @@ export function handleAxiosError(error, strict = false, useReactDialog = false) 
     error = {
       title: $T.gettext('Something went wrong'),
       message: error.message,
-      report_url: null,
     };
   }
-  if (window.showErrorDialog && !useReactDialog) {
-    showErrorDialog(error);
-  } else {
-    showReactErrorDialog(error);
-  }
+  showReactErrorDialog(error);
   return error.message;
 }
 

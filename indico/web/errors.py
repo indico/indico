@@ -17,7 +17,6 @@ from werkzeug.exceptions import Forbidden, HTTPException
 
 from indico.core.errors import NoReportError
 from indico.legacy.common.cache import GenericCache
-from indico.web.flask.util import url_for
 from indico.web.util import get_request_info
 from indico.web.views import WPError
 
@@ -91,15 +90,10 @@ def _is_error_reportable(exc):
 
 
 def _jsonify_error(exc, title, message, code):
-    report_url = error_uuid = None
-    if _is_error_reportable(exc) and 'saved_error_uuid' in g:
-        report_url = url_for('core.report_error', error_id=g.saved_error_uuid)
-        error_uuid = g.saved_error_uuid
     error_data = {
         'title': title,
         'message': message,
-        'report_url': report_url,
-        'error_uuid': error_uuid,
+        'error_uuid': g.get('saved_error_uuid') if _is_error_reportable(exc) else None,
     }
     response = jsonify(error=error_data)
     response.status_code = code

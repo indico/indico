@@ -27,7 +27,7 @@ from indico.core.notifications import make_email, send_email
 from indico.core.settings import PrefixSettingsProxy
 from indico.modules.admin import RHAdminBase
 from indico.modules.cephalopod import cephalopod_settings
-from indico.modules.core.forms import ReportErrorForm, SettingsForm
+from indico.modules.core.forms import SettingsForm
 from indico.modules.core.settings import core_settings, social_settings
 from indico.modules.core.views import WPContact, WPSettings
 from indico.modules.users.controllers import RHUserBase
@@ -39,7 +39,7 @@ from indico.web.flask.templating import get_template_module
 from indico.web.flask.util import url_for
 from indico.web.forms.base import FormDefaults
 from indico.web.rh import RH, RHProtected
-from indico.web.util import jsonify_data, jsonify_form, signed_url_for
+from indico.web.util import signed_url_for
 
 
 class RHContact(RH):
@@ -49,7 +49,7 @@ class RHContact(RH):
         return WPContact.render_template('contact.html')
 
 
-class RHReportErrorBase(RH):
+class RHReportErrorAPI(RH):
     def _process_args(self):
         self.error_data = load_error_data(request.view_args['error_id'])
         if self.error_data is None:
@@ -93,17 +93,6 @@ class RHReportErrorBase(RH):
             # don't bother users if this fails!
             Logger.get('sentry').exception('Could not submit user feedback')
 
-
-class RHReportError(RHReportErrorBase):
-    def _process(self):
-        form = ReportErrorForm(email=(session.user.email if session.user else ''))
-        if form.validate_on_submit():
-            self._save_report(form.email.data, form.comment.data)
-            return jsonify_data(flash=False)
-        return jsonify_form(form)
-
-
-class RHReportErrorAPI(RHReportErrorBase):
     @use_kwargs({
         'email': fields.Email(missing=None),
         'comment': fields.String(required=True),

@@ -2,21 +2,17 @@
     <h1>{{ error_message }}</h1>
     <p>{{ error_description }}</p>
     {% if g.saved_error_uuid and not standalone %}
-        <button id="report-error" class="i-button big"
-                data-href="{{ url_for('core.report_error', error_id=g.saved_error_uuid) }}"
-                data-title="{% trans %}Report Error{% endtrans %}"
-                data-ajax-dialog>
+        <button id="report-error" class="i-button big">
             {%- trans %}Report Error{% endtrans -%}
         </button>
         <script>
-            (function() {
-                'use strict';
-                $('#report-error').on('ajaxDialog:closed', function(evt, data) {
-                    if (data) {
-                        $(this).replaceWith($T.gettext('Thanks for your error report!'));
-                    }
-                });
-            })();
+            document.querySelector('#report-error').addEventListener('click', () => {
+                showErrorDialog({
+                    title: {{ error_message | tojson }},
+                    message: {{ error_description | tojson }},
+                    error_uuid: {{ g.saved_error_uuid | tojson }},
+                }, true);
+            });
         </script>
     {% endif %}
     <div class="error-box-small">

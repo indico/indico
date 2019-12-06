@@ -32,7 +32,7 @@ export default function EditableSubmissionButton({
         files: submissionFiles,
       });
     } catch (e) {
-      handleAxiosError(e, false, true);
+      handleAxiosError(e);
       setSubmitting(false);
       return;
     }

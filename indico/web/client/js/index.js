@@ -13,3 +13,13 @@ import './legacy/timetable.js';
 
 import '../styles/screen.scss';
 import 'indico-sui-theme/semantic.css';
+
+import showReactErrorDialog from 'indico/react/errors';
+
+// XXX: some plugins (and legacy code) use it
+window.showErrorDialog = (error, instantReport = false) => {
+  if (process.env.NODE_ENV === 'development') {
+    console.warn('Legacy showErrorDialog called');
+  }
+  return showReactErrorDialog(error, instantReport);
+};

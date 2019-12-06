@@ -52,7 +52,7 @@ export default function SubmitRevision() {
         {headers}
       );
     } catch (e) {
-      handleAxiosError(e, false, true);
+      handleAxiosError(e);
       return;
     } finally {
       setSubmitting(false);
