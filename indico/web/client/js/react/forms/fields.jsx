@@ -120,7 +120,7 @@ FormFieldAdapter.defaultProps = {
   hideValidationError: false,
   hideErrorWhileActive: false,
   undefinedValue: '',
-  placeholder: null,
+  placeholder: undefined,
   label: null,
   componentLabel: null,
   children: null,
