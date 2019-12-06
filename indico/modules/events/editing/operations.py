@@ -100,7 +100,8 @@ def review_editable_revision(revision, editor, action, comment, tags, files=None
     elif action == EditingReviewAction.update:
         new_revision = EditingRevision(submitter=editor,
                                        initial_state=InitialRevisionState.needs_submitter_confirmation,
-                                       files=_make_editable_files(revision.editable, files))
+                                       files=_make_editable_files(revision.editable, files),
+                                       tags=revision.tags)
         revision.editable.revisions.append(new_revision)
     db.session.flush()
     logger.info('Revision %r reviewed by %s [%s]', revision, editor, action.name)
@@ -145,7 +146,8 @@ def create_submitter_revision(prev_revision, user, files):
     _ensure_state(prev_revision, final=FinalRevisionState.needs_submitter_changes)
     new_revision = EditingRevision(submitter=user,
                                    initial_state=InitialRevisionState.ready_for_review,
-                                   files=_make_editable_files(prev_revision.editable, files))
+                                   files=_make_editable_files(prev_revision.editable, files),
+                                   tags=prev_revision.tags)
     prev_revision.editable.revisions.append(new_revision)
     db.session.flush()
     logger.info('Revision %r created by submitter %s', new_revision, user)
