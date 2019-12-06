@@ -70,7 +70,7 @@ td.searchUsersGroupsPanel {
     width: 450px;
     padding-left: 10px;
     padding-top: 10px;
-    padding-right:10px;
+    padding-right: 10px;
 }
 
 td.suggestedUsersPanel {
@@ -80,12 +80,11 @@ td.suggestedUsersPanel {
 }
 
 /* TODO: remove when replacing the old search plugin */
-.arrowExpandIcon
-{
+.arrowExpandIcon {
     background: transparent url('static:images/menu_arrow_black.png') scroll no-repeat center center;
     font-weight: normal;
     vertical-align: middle;
-    display:block;
+    display: block;
     width: 20px;
     height: 17px;
     float: right;
@@ -121,7 +120,7 @@ ul.tabList {
     border-bottom: 1px solid #777777;
 }
 
-ul.tabList li{
+ul.tabList li {
     display: inline;
     position: relative;
     padding-bottom: 1px;
@@ -130,7 +129,7 @@ ul.tabList li{
     font-weight: bold;
 }
 
-.tabSelected  {
+.tabSelected {
     color: #E25300;
     background: #F2F2F2;
     border: 1px solid #777777;
@@ -140,7 +139,7 @@ ul.tabList li{
     margin-right: 1px;
 }
 
-.tabSelected  a, .tabSelected  span {
+.tabSelected a, .tabSelected span {
     padding-top: 3px;
     color: #555555;
     font-size: 12px;
@@ -188,7 +187,7 @@ div.tabBorderGradient {
     cursor: pointer;
 }
 
-.tabUnselected a, .tabUnselected  span {
+.tabUnselected a, .tabUnselected span {
     color: #4c6a83;
     font-weight: normal;
     font-size: 12px;
@@ -203,8 +202,8 @@ div.tabBorderGradient {
     -moz-border-radius: 3px;
     border-radius: 3px;
     margin: 10px 10px 0 0;
-    box-shadow:1px 1px 1px #000;
-    -moz-box-shadow:1px 1px 1px #000;
+    box-shadow: 1px 1px 1px #000;
+    -moz-box-shadow: 1px 1px 1px #000;
     z-index: 1;
 }
 
@@ -235,26 +234,26 @@ div.tabBorderGradient {
 }
 
 .popUpLabel {
-   text-align: right;
-   font-size: 13px;
-   font-family: Verdana, Arial;
-   color: #523D04;
-   font-weight: normal;
-   padding-right: 5px;
-   padding-bottom: 3px;
+    text-align: right;
+    font-size: 13px;
+    font-family: Verdana, Arial;
+    color: #523D04;
+    font-weight: normal;
+    padding-right: 5px;
+    padding-bottom: 3px;
 }
 
 .popUpTdContent {
-   font-weight: normal;
-   padding-bottom: 3px;
-   color: black;
+    font-weight: normal;
+    padding-bottom: 3px;
+    color: black;
 }
 
 .tooltip {
-   background-color: #FFFFFF;
-   border: 1px solid #000000;
-   color: #000000;
- }
+    background-color: #FFFFFF;
+    border: 1px solid #000000;
+    color: #000000;
+}
 
 .invalid {
     -moz-appearance: none;
@@ -270,14 +269,14 @@ div.tabBorderGradient {
 }
 
 .tooltipError {
-   max-width: 300px;
-   padding: 5px;
-   border: 1px solid #777;
-   color: #ad1f1f;
-   background: white;
-   -moz-box-shadow: 2px 2px 2px #444;
-   -webkit-box-shadow: 2px 2px 2px #444;
-   box-shadow: 2px 2px 2px #444;
+    max-width: 300px;
+    padding: 5px;
+    border: 1px solid #777;
+    color: #ad1f1f;
+    background: white;
+    -moz-box-shadow: 2px 2px 2px #444;
+    -webkit-box-shadow: 2px 2px 2px #444;
+    box-shadow: 2px 2px 2px #444;
 }
 
 ul.errorList {
@@ -336,7 +335,7 @@ div.exclusivePopup .printLink {
 }
 
 div.ui-draggable.timetableBlock {
-   /* border: 3px solid #9F883B;*/
+    /* border: 3px solid #9F883B;*/
 }
 
 div.ui-draggable.timetableBlock:hover {
@@ -388,7 +387,7 @@ div.timetableBlockTime {
     font-size: 11px;
 }
 
-div.timetableBlockTimeDiscreet{
+div.timetableBlockTimeDiscreet {
     float: left;
     margin: 4px;
     margin-right: 6px;
@@ -439,6 +438,7 @@ div.balloonPopupCloseButton {
 div.timetablePreLoading {
     background: transparent url('static:images/load_big.gif') scroll no-repeat center center;
 }
+
 div.timetablePreLoading .text {
     color: #777;
     text-align: center;
@@ -532,7 +532,7 @@ ul.popupList li a {
     vertical-align: bottom;
     padding: 4px;
     display: block;
-    list-style-type:none;
+    list-style-type: none;
 }
 
 ul.popupList li a.selected {
@@ -547,7 +547,7 @@ ul.popupList li span {
 ul.popupList li a:hover {
     padding: 4px;
     display: block;
-    list-style-type:none;
+    list-style-type: none;
     color: white;
     background: #5FA5D4;
 }
@@ -587,7 +587,8 @@ ul.sectionPopupList li.section .line {
 
 ul.sectionPopupList li.section .name {
     position: absolute;
-    top: 0; right: 0;
+    top: 0;
+    right: 0;
     font-family: Verdana;
     font-size: 12px;
     color: #666;
@@ -638,7 +639,7 @@ div.cssPreview {
 div.posterEntry {
     border: 1px solid #aaaaaa;
     -moz-border-radius: 3px;
-    -webkit-border-radius:3px;
+    -webkit-border-radius: 3px;
     padding: 5px;
     margin-bottom: 5px;
     overflow: auto;
@@ -703,7 +704,7 @@ body.cke_show_borders {
 }
 
 .sortblock {
-    width:85%;
+    width: 85%;
 }
 
 .sortblock ul {
@@ -753,12 +754,12 @@ body.cke_show_borders {
     color: #999;
 }
 
-.social_share_tooltip.qtip-dark .qtip-content{
-    background: rgba(40,40,40,0.96);
+.social_share_tooltip.qtip-dark .qtip-content {
+    background: rgba(40, 40, 40, 0.96);
     border-color: #303030;
 }
 
-.social_share_tooltip.qtip-blue .qtip-content{
+.social_share_tooltip.qtip-blue .qtip-content {
     background: #E5F6FE;
     border-color: #ADD9ED;
     color: #5E99BD;
@@ -785,11 +786,11 @@ body.cke_show_borders {
 }
 
 .social_share_tooltip.qtip-dark .social_site {
-    background: rgba(0,0,0,0.15);
+    background: rgba(0, 0, 0, 0.15);
 }
 
 .social_share_tooltip.qtip-blue .social_site {
-    background: rgba(255,255,255,0.6);
+    background: rgba(255, 255, 255, 0.6);
 }
 
 .social_share_tooltip .social_site * {
@@ -797,8 +798,8 @@ body.cke_show_borders {
 }
 
 .placesLeft {
-    color:green;
-    font-style:italic;
+    color: green;
+    font-style: italic;
     padding-left: 5px;
 }
 
@@ -807,7 +808,7 @@ body.cke_show_borders {
 }
 
 .scrolling {
-    background-color:#FFFFFF;
+    background-color: #FFFFFF;
     box-shadow: 0 12px 6px -6px rgba(0, 0, 0, 0.2);
     position: fixed;
     top: 0;
@@ -874,8 +875,8 @@ body.cke_show_borders {
 
 .ui-list-menu-level-0 > li {
     background: #ECECEC;
-    background: -webkit-gradient(linear,0% 40%,0% 70%,from(#F5F5F5),to(#F1F1F1));
-    background: -moz-linear-gradient(linear,0% 40%,0% 70%,from(#F5F5F5),to(#F1F1F1));
+    background: -webkit-gradient(linear, 0% 40%, 0% 70%, from(#F5F5F5), to(#F1F1F1));
+    background: -moz-linear-gradient(linear, 0% 40%, 0% 70%, from(#F5F5F5), to(#F1F1F1));
     border: solid 1px #dcdcdc;
     border-radius: 5px;
     -webkit-border-radius: 5px;
@@ -914,7 +915,7 @@ body.cke_show_borders {
     border-width: 0 0 1px 0 !important;
 }
 
-.ui-list-menu-level-2{
+.ui-list-menu-level-2 {
     width: 100px;
 }
 
@@ -967,7 +968,7 @@ body.cke_show_borders {
     font-size: 10px;
     padding: 4px;
     opacity: 0.7;
-    box-shadow: 0px 0px 4px rgba(0,0,0,0.3);
+    box-shadow: 0px 0px 4px rgba(0, 0, 0, 0.3);
 }
 
 #dragTip .pointer {
@@ -991,7 +992,7 @@ body.cke_show_borders {
 
 .icalExportPopup .exportIcalHeader {
     font-weight: bold;
-    font-size :12px;
+    font-size: 12px;
     margin-bottom: 5px;
 }
 
@@ -1023,7 +1024,7 @@ body.cke_show_borders {
     margin-top: 5px;
     vertical-align: middle;
     text-align: justify;
-    background: rgba(0,0,0,0.15);
+    background: rgba(0, 0, 0, 0.15);
 
 }
 
@@ -1045,7 +1046,7 @@ body.cke_show_borders {
 
 .settingsWidget .settingsWidgetSection, .protectionWidget .protectionWidgetSection {
     padding: 10px 0px 0px;
-    text-align:justify;
+    text-align: justify;
 }
 
 .settingsWidget .settingsWidgetHeader {
@@ -1055,7 +1056,7 @@ body.cke_show_borders {
 
 .settingsWidget .settingsSeparator {
     border-bottom: 1px solid #DDDDDD;
-    margin-bottom:5px;
+    margin-bottom: 5px;
 }
 
 .protectionWidget {
