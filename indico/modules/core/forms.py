@@ -9,7 +9,7 @@ from __future__ import unicode_literals
 
 from wtforms.fields import BooleanField, StringField, TextAreaField
 from wtforms.fields.html5 import EmailField
-from wtforms.validators import DataRequired, Email
+from wtforms.validators import DataRequired, Email, Optional
 
 from indico.util.i18n import _
 from indico.web.forms.base import IndicoForm
@@ -20,7 +20,7 @@ from indico.web.forms.widgets import SwitchWidget
 class ReportErrorForm(IndicoForm):
     comment = TextAreaField(_('Details'), [DataRequired()], render_kw={'rows': 5},
                             description=_('Please let us know what you were doing when the error showed up.'))
-    email = EmailField(_('Email address'), [Email()],
+    email = EmailField(_('Email address'), [Optional(), Email()],
                        description=_('If you enter your email address we can contact you to follow-up '
                                      'on your error report.'))
 

@@ -10,7 +10,8 @@ Version 2.2.6
 Bugfixes
 ^^^^^^^^
 
-- None so far :)
+- Fix some email fields (error report contact, agreement cc address) being
+  required even though they should be optional
 
 Version 2.2.5
 -------------
