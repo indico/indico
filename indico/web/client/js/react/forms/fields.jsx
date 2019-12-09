@@ -18,7 +18,7 @@ import validators from './validators';
 import './fields.module.scss';
 
 const identity = v => v;
-const unsortedArraysEqual = (a, b) => _.isEqual((a || []).sort(), (b || []).sort());
+export const unsortedArraysEqual = (a, b) => _.isEqual((a || []).sort(), (b || []).sort());
 
 export function FormFieldAdapter({
   input: {value, ...input},

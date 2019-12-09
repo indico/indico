@@ -8,7 +8,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import {Dropdown} from 'semantic-ui-react';
-import {FinalField} from 'indico/react/forms/fields';
+import {FinalField, unsortedArraysEqual} from 'indico/react/forms/fields';
 import {Translate} from 'indico/react/i18n';
 
 import './TagInput.module.scss';
@@ -68,7 +68,17 @@ TagInput.defaultProps = {
 
 /** final-form-compatible <TagInput /> */
 export default function FinalTagInput({name, ...rest}) {
-  return <FinalField name={name} component={TagInput} {...rest} />;
+  return (
+    <FinalField
+      name={name}
+      component={TagInput}
+      format={v => v}
+      parse={v => v}
+      undefinedValue={[]}
+      isEqual={unsortedArraysEqual}
+      {...rest}
+    />
+  );
 }
 
 FinalTagInput.propTypes = {
