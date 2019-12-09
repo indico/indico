@@ -8,7 +8,7 @@
 import uploadURL from 'indico-url:event_editing.api_upload';
 import createSubmitterRevisionURL from 'indico-url:event_editing.api_create_submitter_revision';
 
-import React, {useState} from 'react';
+import React, {useMemo, useState} from 'react';
 import {useSelector, useDispatch} from 'react-redux';
 import {Button} from 'semantic-ui-react';
 import {Translate} from 'indico/react/i18n';
@@ -16,14 +16,20 @@ import UserAvatar from 'indico/modules/events/reviewing/components/UserAvatar';
 import FileManager from '../FileManager';
 import * as selectors from '../../selectors';
 import {createRevision} from '../../actions';
+import {mapFileTypes} from '../FileManager/util';
+import {getFiles} from '../FileManager/selectors';
 
 export default function SubmitRevision() {
   const {eventId, contributionId, fileTypes, editableType} = useSelector(selectors.getStaticData);
   const lastRevision = useSelector(selectors.getLastRevision);
-  const [submissionFiles, setSubmissionFiles] = useState({});
   const [submitting, setSubmitting] = useState(false);
   const dispatch = useDispatch();
   const currentUser = {fullName: Indico.User.full_name, avatarBgColor: Indico.User.avatar_bg_color};
+  const mappedFileTypes = useMemo(() => mapFileTypes(fileTypes, lastRevision.files), [
+    fileTypes,
+    lastRevision.files,
+  ]);
+  const [submissionFiles, setSubmissionFiles] = useState(getFiles({fileTypes: mappedFileTypes}));
 
   const submitRevision = async () => {
     setSubmitting(true);
