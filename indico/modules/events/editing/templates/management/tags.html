@@ -1,0 +1,9 @@
+{% extends 'events/management/base.html' %}
+
+{% block title %}
+    {% trans %}Tag management{% endtrans %}
+{% endblock %}
+
+{% block content %}
+    <div id="editing-tags" data-event-id="{{ event.id }}"></div>
+{% endblock %}

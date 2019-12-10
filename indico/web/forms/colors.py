@@ -33,3 +33,21 @@ def get_colors():
         ColorTuple('#000000', '#D0C296'),
         ColorTuple('#202020', '#EFEBC2')
     ]
+
+
+def get_sui_colors():
+    return [
+        'red',
+        'orange',
+        'yellow',
+        'olive',
+        'green',
+        'teal',
+        'blue',
+        'violet',
+        'purple',
+        'pink',
+        'brown',
+        'grey',
+        'black'
+    ]

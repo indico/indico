@@ -13,11 +13,6 @@ from indico.core.db import db
 from indico.util.string import format_repr, return_ascii
 
 
-tag_colors = [
-    'red', 'orange', 'yellow', 'olive', 'green', 'teal', 'blue', 'violet', 'purple', 'pink', 'brown', 'grey', 'black'
-]
-
-
 class EditingTag(db.Model):
     __tablename__ = 'tags'
 

@@ -47,7 +47,7 @@ def _get_management_permissions(sender, **kwargs):
 def _extend_event_management_menu(sender, event, **kwargs):
     if not event.can_manage(session.user) or not EditingFeature.is_allowed_for_event(event):
         return
-    return SideMenuItem('editing', _('Paper Editing'), url_for('event_editing.management', event),
+    return SideMenuItem('editing', _('Paper Editing'), url_for('event_editing.dashboard', event),
                         section='organization')
 
 

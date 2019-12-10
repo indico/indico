@@ -15,7 +15,8 @@ _bp = IndicoBlueprint('event_editing', __name__, url_prefix='/event/<confId>', t
                       virtual_template_folder='events/editing')
 
 # Frontend
-_bp.add_url_rule('/manage/editing/', 'management', frontend.RHEditingDashboard)
+_bp.add_url_rule('/manage/editing/', 'dashboard', frontend.RHEditingDashboard)
+_bp.add_url_rule('/manage/editing/tags', 'manage_tags', frontend.RHEditingTags)
 _bp.add_url_rule('/contributions/<int:contrib_id>/editing/<any(paper):type>', 'editable', frontend.RHEditableTimeline)
 _bp.add_url_rule('/contributions/<int:contrib_id>/editing/<any(paper):type>/<int:revision_id>/files.zip',
                  'revision_files_export', backend.RHExportRevisionFiles)
@@ -25,6 +26,8 @@ _bp.add_url_rule('/contributions/<int:contrib_id>/editing/<any(paper):type>/<int
 # Event-level APIs
 _bp.add_url_rule('/editing/api/file-types', 'api_file_types', backend.RHEditingFileTypes)
 _bp.add_url_rule('/editing/api/tags', 'api_tags', backend.RHEditingTags)
+_bp.add_url_rule('/editing/api/tags', 'api_create_tag', backend.RHCreateTag, methods=('POST',))
+_bp.add_url_rule('/editing/api/tag/<int:tag_id>', 'api_edit_tag', backend.RHEditTag, methods=('PATCH', 'DELETE'))
 
 # Contribution/revision-level APIs
 _bp.add_url_rule('/api/contributions/<int:contrib_id>/editing/<any(paper):type>/upload', 'api_upload',

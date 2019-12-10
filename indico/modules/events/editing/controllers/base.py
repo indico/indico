@@ -13,6 +13,7 @@ from werkzeug.exceptions import Forbidden
 from indico.modules.events.contributions.controllers.display import RHContributionDisplayBase
 from indico.modules.events.controllers.base import RHEventBase
 from indico.modules.events.editing.models.editable import Editable, EditableType
+from indico.modules.events.management.controllers.base import RHManageEventBase
 
 
 class RHEditingBase(RHEventBase):
@@ -24,6 +25,10 @@ class RHEditingBase(RHEventBase):
         RHEventBase._check_access(self)
         if not session.user:
             raise Forbidden
+
+
+class RHEditingManagementBase(RHManageEventBase):
+    EVENT_FEATURE = 'editing'
 
 
 class RHContributionEditableBase(RHContributionDisplayBase):

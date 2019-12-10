@@ -15,7 +15,7 @@ from indico.modules.events.editing.views import WPEditing
 
 class RHEditingDashboard(RHEditingBase):
     def _process(self):
-        return WPEditing.render_template('editing.html', self.event)
+        return WPEditing.render_template('management/editing.html', self.event)
 
 
 class RHEditableTimeline(RHContributionEditableBase):
@@ -31,3 +31,8 @@ class RHEditableTimeline(RHContributionEditableBase):
             editable=self.editable,
             contribution=self.contrib
         )
+
+
+class RHEditingTags(RHEditingBase):
+    def _process(self):
+        return WPEditing.render_template('management/tags.html', self.event)
