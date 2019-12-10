@@ -20,6 +20,11 @@ class RHEditingBase(RHEventBase):
 
     EVENT_FEATURE = 'editing'
 
+    def _check_access(self):
+        RHEventBase._check_access(self)
+        if not session.user:
+            raise Forbidden
+
 
 class RHContributionEditableBase(RHContributionDisplayBase):
     """Base class for operations on an editable."""
@@ -40,11 +45,6 @@ class RHContributionEditableBase(RHContributionDisplayBase):
                          .with_parent(self.contrib)
                          .filter_by(type=self.editable_type)
                          .first())
-
-    def _check_access(self):
-        RHContributionDisplayBase._check_access(self)
-        if not session.user:
-            raise Forbidden
 
     def _user_is_authorized_submitter(self):
         if session.user.is_admin:
