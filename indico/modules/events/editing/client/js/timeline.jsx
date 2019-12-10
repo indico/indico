@@ -21,8 +21,12 @@ import Timeline from './components/Timeline';
 
 document.addEventListener('DOMContentLoaded', async () => {
   const timelineElement = document.querySelector('#editing-timeline');
-  const eventId = parseInt(timelineElement.dataset.eventId, 10);
 
+  if (!timelineElement) {
+    return;
+  }
+
+  const eventId = parseInt(timelineElement.dataset.eventId, 10);
   let fileTypes, tags;
 
   try {
