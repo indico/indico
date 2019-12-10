@@ -7,6 +7,7 @@
 
 from __future__ import unicode_literals
 
+from flask import session
 from werkzeug.exceptions import BadRequest
 
 from indico.core.db import db
@@ -16,6 +17,7 @@ from indico.modules.events.editing.models.comments import EditingRevisionComment
 from indico.modules.events.editing.models.editable import Editable
 from indico.modules.events.editing.models.revision_files import EditingRevisionFile
 from indico.modules.events.editing.models.revisions import EditingRevision, FinalRevisionState, InitialRevisionState
+from indico.modules.events.editing.models.tags import EditingTag
 from indico.modules.events.editing.schemas import EditingConfirmationAction, EditingReviewAction
 from indico.util.date_time import now_utc
 from indico.util.i18n import _
@@ -204,3 +206,26 @@ def delete_revision_comment(comment):
     comment.is_deleted = True
     db.session.flush()
     logger.info('Comment on revision %r deleted: %r', comment.revision, comment)
+
+
+def create_new_tag(event, code, title, color, is_system=False):
+    tag = EditingTag(code=code, title=title, color=color, system=is_system, event=event)
+    db.session.flush()
+    logger.info('Tag %r created by %r', tag, session.user)
+    return tag
+
+
+def update_tag(tag, code=None, title=None, color=None):
+    if code:
+        tag.code = code
+    if title:
+        tag.title = title
+    if color:
+        tag.color = color
+    db.session.flush()
+    logger.info('Tag %r updated by %r', tag, session.user)
+
+
+def delete_tag(tag):
+    logger.info('Tag %r deleted by %r', tag, session.user)
+    db.session.delete(tag)
