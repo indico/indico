@@ -7,13 +7,11 @@
 
 @import 'base/palette';
 
-:global(.ui.form) {
-    :global(.disabled.field) {
-        background: none;
-    }
-
-    :global(.field) {
-        display: flex;
-        align-items: center;
+.judgment-form {
+    :global(.ui.form) {
+        :global(.field) {
+            display: flex;
+            align-items: center;
+        }
     }
 }

@@ -66,7 +66,7 @@ export default function ReviewForm({block}) {
   };
 
   const judgmentForm = (
-    <div className="flexrow">
+    <div className="flexrow" styleName="judgment-form">
       <CommentForm onSubmit={addComment} onToggleExpand={setCommentFormVisible} />
       {!commentFormVisible && (
         <div className="review-trigger flexrow">
