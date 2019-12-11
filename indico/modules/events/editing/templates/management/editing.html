@@ -5,5 +5,22 @@
 {% endblock %}
 
 {% block content %}
-    <div class="page-content"></div>
+    <div class="page-content">
+        <div class="action-box">
+            <div class="section">
+                <span class="icon icon-tag" style="align-self: center;"></span>
+                <div class="text">
+                    <div class="label">
+                        {% trans %}Tags{% endtrans %}
+                    </div>
+                    {% trans %}Configure tags{% endtrans %}
+                </div>
+                <div class="toolbar">
+                    <a href="{{ url_for('.manage_tags', event) }}" class="i-button icon-settings">
+                        {% trans %}Configure{% endtrans %}
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
 {% endblock %}

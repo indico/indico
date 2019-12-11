@@ -1,0 +1,28 @@
+// This file is part of Indico.
+// Copyright (C) 2002 - 2019 CERN
+//
+// Indico is free software; you can redistribute it and/or
+// modify it under the terms of the MIT License; see the
+// LICENSE file for more details.
+
+.tags-container {
+    max-width: 600px !important;
+
+    .tag-segment {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+
+        .tag-actions {
+            width: 45px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+
+            i:global(.icon) {
+                margin-right: 0;
+                cursor: pointer;
+            }
+        }
+    }
+}

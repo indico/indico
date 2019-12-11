@@ -6,3 +6,4 @@
 // LICENSE file for more details.
 
 import './timeline';
+import './tags';
