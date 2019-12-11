@@ -9,7 +9,7 @@ import favoriteUsersURL from 'indico-url:users.favorites_api';
 import principalsURL from 'indico-url:core.principals';
 
 import _ from 'lodash';
-import {useEffect, useState} from 'react';
+import {useEffect, useRef, useState} from 'react';
 import PropTypes from 'prop-types';
 import useAxios from '@use-hooks/axios';
 import {handleAxiosError, indicoAxios} from '../utils/axios';
@@ -104,6 +104,7 @@ FavoritesProvider.propTypes = {
 };
 
 export function useIndicoAxios({camelize, ...args}) {
+  const lastData = useRef(null);
   const {response, error, loading, reFetch} = useAxios({
     customHandler: err => err && handleAxiosError(err),
     ...args,
@@ -116,6 +117,7 @@ export function useIndicoAxios({camelize, ...args}) {
     if (camelize) {
       data = camelizeKeys(data);
     }
+    lastData.current = data;
   }
-  return {response, error, loading, reFetch, data};
+  return {response, error, loading, reFetch, data, lastData: lastData.current};
 }
