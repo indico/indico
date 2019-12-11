@@ -34,10 +34,10 @@ export default function RequestConfirm({
       cancelButton={<Button disabled={requestInProgress}>{cancelText}</Button>}
       onConfirm={async () => {
         setRequestInProgress(true);
-        const close = await requestFunc();
+        const keepOpen = await requestFunc();
         setRequestInProgress(false);
 
-        if (onClose && close) {
+        if (onClose && !keepOpen) {
           onClose();
         }
       }}

@@ -161,9 +161,7 @@ export default function TagManager({eventId}) {
               </Translate>
             </div>
           }
-          requestFunc={async () => {
-            return !(await deleteTag(currentTag.id));
-          }}
+          requestFunc={() => deleteTag(currentTag.id)}
           open
         />
       )}
