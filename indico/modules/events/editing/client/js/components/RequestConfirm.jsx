@@ -53,10 +53,12 @@ RequestConfirm.propTypes = {
   confirmText: PropTypes.string,
   cancelText: PropTypes.string,
   onClose: PropTypes.func,
+  size: PropTypes.oneOf(['mini', 'tiny', 'small', 'large', 'fullscreen']),
 };
 
 RequestConfirm.defaultProps = {
   confirmText: Translate.string('Confirm'),
   cancelText: Translate.string('Cancel'),
   onClose: null,
+  size: 'tiny',
 };
