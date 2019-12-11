@@ -1,0 +1,11 @@
+{% extends 'events/management/base.html' %}
+
+{% block title %}
+    {% trans %}Paper editing{% endtrans %}
+{% endblock %}
+
+{% block back_button_url -%}
+    {%- if self.subtitle() -%}
+        {{ url_for('.dashboard', event) }}
+    {%- endif -%}
+{%- endblock %}

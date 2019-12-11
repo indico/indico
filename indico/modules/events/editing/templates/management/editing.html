@@ -1,8 +1,4 @@
-{% extends 'events/management/base.html' %}
-
-{% block title %}
-    Paper editing
-{% endblock %}
+{% extends 'events/editing/management/base.html' %}
 
 {% block content %}
     <div class="page-content">
@@ -13,7 +9,7 @@
                     <div class="label">
                         {% trans %}Tags{% endtrans %}
                     </div>
-                    {% trans %}Configure tags{% endtrans %}
+                    {% trans %}Configure the tags that can be assigned to revisions{% endtrans %}
                 </div>
                 <div class="toolbar">
                     <a href="{{ url_for('.manage_tags', event) }}" class="i-button icon-settings">
