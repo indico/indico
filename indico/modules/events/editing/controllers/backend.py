@@ -12,12 +12,10 @@ from io import BytesIO
 from zipfile import ZipFile
 
 from flask import request, session
-from marshmallow import fields, validate
+from marshmallow import fields
 from marshmallow_enum import EnumField
-from webargs.flaskparser import abort
 from werkzeug.exceptions import Forbidden, NotFound
 
-from indico.core.db import db
 from indico.core.errors import UserValueError
 from indico.modules.events.editing.controllers.base import (RHContributionEditableBase, RHEditingBase,
                                                             RHEditingManagementBase)
@@ -31,15 +29,15 @@ from indico.modules.events.editing.operations import (confirm_editable_changes, 
                                                       delete_revision_comment, delete_tag, replace_revision,
                                                       review_editable_revision, undo_review, update_revision_comment,
                                                       update_tag)
-from indico.modules.events.editing.schemas import (EditableSchema, EditingConfirmationAction, EditingFileTypeSchema,
-                                                   EditingReviewAction, EditingTagSchema, ReviewEditableArgs)
+from indico.modules.events.editing.schemas import (EditableSchema, EditableTagArgs, EditingConfirmationAction,
+                                                   EditingFileTypeSchema, EditingReviewAction, EditingTagSchema,
+                                                   ReviewEditableArgs)
 from indico.modules.files.controllers import UploadFileMixin
 from indico.util.fs import secure_filename
 from indico.util.i18n import _
 from indico.util.marshmallow import not_empty
-from indico.web.args import parser, use_kwargs
+from indico.web.args import parser, use_kwargs, use_rh_args
 from indico.web.flask.util import send_file
-from indico.web.forms.colors import get_sui_colors
 
 
 class RHEditingFileTypes(RHEditingBase):
@@ -56,25 +54,12 @@ class RHEditingTags(RHEditingBase):
         return EditingTagSchema(many=True).jsonify(self.event.editing_tags)
 
 
-def _check_for_unique_tag_code(code, tag=None):
-    query = EditingTag.query.filter(db.func.lower(EditingTag.code) == code.lower())
-    if tag:
-        query = query.filter(EditingTag.id != tag.id)
-    if query.has_rows():
-        abort(422, messages={'code': [_('Tag code must be unique')]})
-
-
 class RHCreateTag(RHEditingManagementBase):
     """Create a new tag."""
 
-    @use_kwargs({
-        'code': fields.String(required=True, validate=not_empty),
-        'title': fields.String(required=True, validate=not_empty),
-        'color': fields.String(required=True, validate=validate.OneOf(get_sui_colors())),
-    })
-    def _process(self, code, title, color):
-        _check_for_unique_tag_code(code)
-        tag = create_new_tag(self.event, code, title, color)
+    @use_rh_args(EditableTagArgs)
+    def _process(self, data):
+        tag = create_new_tag(self.event, **data)
         return EditingTagSchema().jsonify(tag)
 
 
@@ -88,16 +73,9 @@ class RHEditTag(RHEditingBase):
                     .filter_by(id=request.view_args['tag_id'])
                     .first_or_404())
 
-    @use_kwargs({
-        'code': fields.String(validate=not_empty),
-        'title': fields.String(validate=not_empty),
-        'color': fields.String(validate=validate.OneOf(get_sui_colors())),
-    })
-    def _process_PATCH(self, **kwargs):
-        code = kwargs.get('code')
-        if code:
-            _check_for_unique_tag_code(code, self.tag)
-        update_tag(self.tag, **kwargs)
+    @use_rh_args(EditableTagArgs, partial=True)
+    def _process_PATCH(self, data):
+        update_tag(self.tag, **data)
         return EditingTagSchema().jsonify(self.tag)
 
     def _process_DELETE(self):

@@ -8,8 +8,9 @@
 from __future__ import unicode_literals
 
 from markupsafe import escape
-from marshmallow import ValidationError, fields, post_dump, validates_schema
+from marshmallow import ValidationError, fields, post_dump, validate, validates, validates_schema
 from marshmallow_enum import EnumField
+from sqlalchemy import func
 
 from indico.core.marshmallow import mm
 from indico.modules.events.contributions.schemas import ContributionSchema
@@ -20,9 +21,12 @@ from indico.modules.events.editing.models.revision_files import EditingRevisionF
 from indico.modules.events.editing.models.revisions import EditingRevision, InitialRevisionState
 from indico.modules.events.editing.models.tags import EditingTag
 from indico.modules.users.schemas import UserSchema
+from indico.util.i18n import _
+from indico.util.marshmallow import not_empty
 from indico.util.string import natural_sort_key
 from indico.util.struct.enum import IndicoEnum
 from indico.web.flask.util import url_for
+from indico.web.forms.colors import get_sui_colors
 
 
 class RevisionState(mm.Schema):
@@ -139,3 +143,22 @@ class ReviewEditableArgs(mm.Schema):
 class EditingConfirmationAction(IndicoEnum):
     accept = 'accept'
     reject = 'reject'
+
+
+class EditableTagArgs(mm.Schema):
+    class Meta:
+        rh_context = ('event', 'tag')
+
+    code = fields.String(required=True, validate=not_empty)
+    title = fields.String(required=True, validate=not_empty)
+    color = fields.String(required=True, validate=validate.OneOf(get_sui_colors()))
+
+    @validates('code')
+    def _check_for_unique_tag_code(self, code):
+        event = self.context['event']
+        tag = self.context['tag']
+        query = EditingTag.query.with_parent(event).filter(func.lower(EditingTag.code) == code.lower())
+        if tag:
+            query = query.filter(EditingTag.id != tag.id)
+        if query.has_rows():
+            raise ValidationError(_('Tag code must be unique'))
