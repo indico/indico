@@ -159,7 +159,7 @@ class RHReviewEditable(RHContributionEditableRevisionBase):
     def _check_revision_access(self):
         return self._user_is_authorized_editor()
 
-    @use_kwargs(ReviewEditableArgs())
+    @use_kwargs(ReviewEditableArgs)
     def _process(self, action, comment):
         argmap = {'tags': EditingTagsField(self.event, missing=set())}
         if action == EditingReviewAction.update:

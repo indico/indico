@@ -32,7 +32,7 @@ from indico.modules.rb.operations.bookings import (get_active_bookings, get_book
                                                    get_matching_events, get_room_calendar, get_rooms_availability,
                                                    has_same_dates, should_split_booking, split_booking)
 from indico.modules.rb.operations.suggestions import get_suggestions
-from indico.modules.rb.schemas import (create_booking_args, reservation_details_schema,
+from indico.modules.rb.schemas import (CreateBookingSchema, reservation_details_schema,
                                        reservation_linked_object_data_schema, reservation_occurrences_schema,
                                        reservation_user_event_schema)
 from indico.modules.rb.util import (generate_spreadsheet_from_occurrences, get_linked_object, group_by_occurrence_date,
@@ -128,7 +128,7 @@ class RHActiveBookings(RHRoomBookingBase):
 
 
 class RHCreateBooking(RHRoomBookingBase):
-    @use_args(create_booking_args)
+    @use_args(CreateBookingSchema)
     def _process_args(self, args):
         self.args = args
         self.prebook = args.pop('is_prebooking')
@@ -277,7 +277,7 @@ class RHUpdateBooking(RHBookingBase):
         if not self.booking.can_edit(session.user):
             raise Forbidden
 
-    @use_args(create_booking_args)
+    @use_args(CreateBookingSchema)
     def _process(self, args):
         new_booking_data = {
             'booking_reason': args['booking_reason'],

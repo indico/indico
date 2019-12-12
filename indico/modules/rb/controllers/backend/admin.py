@@ -32,10 +32,10 @@ from indico.modules.rb.models.rooms import Room
 from indico.modules.rb.operations.admin import (create_area, delete_areas, update_area, update_room,
                                                 update_room_attributes, update_room_availability, update_room_equipment)
 from indico.modules.rb.operations.rooms import has_managed_rooms
-from indico.modules.rb.schemas import (AdminRoomSchema, RoomAttributeValuesSchema, admin_equipment_type_schema,
-                                       admin_locations_schema, bookable_hours_schema, map_areas_schema,
-                                       nonbookable_periods_schema, room_attribute_schema, room_equipment_schema,
-                                       room_feature_schema, room_update_args_schema, room_update_schema)
+from indico.modules.rb.schemas import (AdminRoomSchema, RoomAttributeValuesSchema, RoomUpdateArgsSchema,
+                                       admin_equipment_type_schema, admin_locations_schema, bookable_hours_schema,
+                                       map_areas_schema, nonbookable_periods_schema, room_attribute_schema,
+                                       room_equipment_schema, room_feature_schema, room_update_schema)
 from indico.modules.rb.util import (build_rooms_spritesheet, get_resized_room_photo, rb_is_admin,
                                     remove_room_spritesheet_photo)
 from indico.util.i18n import _
@@ -440,7 +440,7 @@ class RHRoom(RHRoomAdminBase):
     def _process_GET(self):
         return jsonify(room_update_schema.dump(self.room))
 
-    @use_args(room_update_args_schema)
+    @use_args(RoomUpdateArgsSchema)
     def _process_PATCH(self, args):
         update_room(self.room, args)
         RHRoomsPermissions._jsonify_user_permissions.clear_cached(session.user)
@@ -478,7 +478,7 @@ class RHRooms(RHRoomBookingAdminBase):
         return AdminRoomSchema().jsonify(rooms, many=True)
 
     @use_kwargs({'location_id': fields.Int(required=True)})
-    @use_args(room_update_args_schema)
+    @use_args(RoomUpdateArgsSchema)
     def _process_POST(self, args, location_id):
         room = Room()
         args['location_id'] = location_id
