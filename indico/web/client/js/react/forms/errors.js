@@ -17,6 +17,14 @@ function flatten(value) {
   return _.uniq(_.flattenDeep(value.map(x => (_.isPlainObject(x) ? Object.values(x) : x))));
 }
 
+/**
+ * Handle an error during a form submission.
+ *
+ * This is an internal util; if you are looking for a function to handle any error
+ * that could happen from a form submission request (including unexpected errors),
+ * use the `handleSubmitError` function instead (which will call this function if
+ * appropriate but also take care of showing an error report dialog otherwise).
+ */
 export function handleSubmissionError(error, defaultMessage = null, fieldErrorMap = {}) {
   const webargsErrors = _.get(error, 'response.data.webargs_errors');
   if (webargsErrors && error.response.status === 422) {

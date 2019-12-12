@@ -14,7 +14,7 @@ import PropTypes from 'prop-types';
 import {Button, Icon, Label, Loader, Message, Segment} from 'semantic-ui-react';
 
 import {Param, Translate} from 'indico/react/i18n';
-import {getChangedValues, handleSubmissionError} from 'indico/react/forms';
+import {getChangedValues, handleSubmitError} from 'indico/react/forms';
 import {useIndicoAxios} from 'indico/react/hooks';
 import {handleAxiosError, indicoAxios} from 'indico/utils/axios';
 import RequestConfirm from './RequestConfirm';
@@ -55,7 +55,7 @@ export default function TagManager({eventId}) {
       await indicoAxios.post(createTagURL({confId: eventId}), formData);
       reFetch();
     } catch (e) {
-      return handleSubmissionError(e);
+      return handleSubmitError(e);
     }
   };
 
@@ -66,7 +66,7 @@ export default function TagManager({eventId}) {
       await indicoAxios.patch(url, tagData);
       reFetch();
     } catch (e) {
-      return handleSubmissionError(e);
+      return handleSubmitError(e);
     }
   };
 
