@@ -8,6 +8,8 @@
 from __future__ import absolute_import, unicode_literals
 
 from flask import g
+from webargs import dict2schema
+from webargs.compat import Mapping
 from webargs.flaskparser import FlaskParser
 
 from indico.util.string import strip_whitespace
@@ -38,23 +40,31 @@ def use_rh_args(schema_cls, **kwargs):
     The Schema needs a Meta class with an ``rh_context`` attribute specifying
     which attributes should be taken from the current RH.
 
-    :param schema_cls: A marshmallow Schema. This must be the schema class itself,
-                       an argmap or schema instance is not accepted.
+    :param schema_cls: A marshmallow Schema or an argmap dict.
+    :param rh_context: When using an argmap, this argument is required and behaves
+                       exactly like the ``rh_context`` Meta attribute mentioned above.
     :param kwargs: Any keyword arguments that are supported by ``use_args`` or the
                    Schema constructor.
     """
 
     default_context = kwargs.pop('context', {})
-
     webargs_kwargs = {
         a: kwargs.pop(a)
         for a in ('locations', 'as_kwargs', 'validate', 'error_status_code', 'error_headers')
         if a in kwargs
     }
 
+    if isinstance(schema_cls, Mapping):
+        schema_cls = dict2schema(schema_cls, parser.schema_class)
+        rh_context_attrs = kwargs.pop('rh_context')
+    else:
+        if 'rh_context' in kwargs:
+            raise TypeError('The `rh_context` kwarg is only supported when passing an argmap')
+        rh_context_attrs = schema_cls.Meta.rh_context
+
     def factory(req):
         context = dict(default_context)
-        context.update((arg, getattr(g.rh, arg, None)) for arg in schema_cls.Meta.rh_context)
+        context.update((arg, getattr(g.rh, arg, None)) for arg in rh_context_attrs)
         return schema_cls(context=context, **kwargs)
 
     return use_args(factory, **webargs_kwargs)
