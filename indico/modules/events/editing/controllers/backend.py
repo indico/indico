@@ -63,11 +63,11 @@ class RHCreateTag(RHEditingManagementBase):
         return EditingTagSchema().jsonify(tag)
 
 
-class RHEditTag(RHEditingBase):
+class RHEditTag(RHEditingManagementBase):
     """Delete/update a tag."""
 
     def _process_args(self):
-        RHEditingBase._process_args(self)
+        RHEditingManagementBase._process_args(self)
         self.tag = (EditingTag.query
                     .with_parent(self.event)
                     .filter_by(id=request.view_args['tag_id'])
