@@ -10,15 +10,13 @@ from __future__ import unicode_literals
 from io import BytesIO
 
 from flask import jsonify, request, session
-from marshmallow import missing, validate
+from marshmallow import missing
 from sqlalchemy.orm import joinedload
 from webargs import fields
 from webargs.flaskparser import abort
 from werkzeug.exceptions import Forbidden, NotFound
 
 from indico.core.db import db
-from indico.core.marshmallow import mm
-from indico.modules.categories.models.categories import Category
 from indico.modules.rb import logger, rb_settings
 from indico.modules.rb.controllers import RHRoomBookingBase
 from indico.modules.rb.controllers.backend.rooms import RHRoomsPermissions
@@ -32,15 +30,15 @@ from indico.modules.rb.models.rooms import Room
 from indico.modules.rb.operations.admin import (create_area, delete_areas, update_area, update_room,
                                                 update_room_attributes, update_room_availability, update_room_equipment)
 from indico.modules.rb.operations.rooms import has_managed_rooms
-from indico.modules.rb.schemas import (AdminRoomSchema, RoomAttributeValuesSchema, RoomUpdateArgsSchema,
+from indico.modules.rb.schemas import (AdminRoomSchema, EquipmentTypeArgs, FeatureArgs, LocationArgs, RoomAttributeArgs,
+                                       RoomAttributeValuesSchema, RoomUpdateArgsSchema, SettingsSchema,
                                        admin_equipment_type_schema, admin_locations_schema, bookable_hours_schema,
                                        map_areas_schema, nonbookable_periods_schema, room_attribute_schema,
                                        room_equipment_schema, room_feature_schema, room_update_schema)
 from indico.modules.rb.util import (build_rooms_spritesheet, get_resized_room_photo, rb_is_admin,
                                     remove_room_spritesheet_photo)
 from indico.util.i18n import _
-from indico.util.marshmallow import ModelList, PrincipalList
-from indico.web.args import use_args, use_kwargs
+from indico.web.args import use_args, use_kwargs, use_rh_kwargs
 from indico.web.flask.util import send_file
 from indico.web.util import ExpectedError
 
@@ -55,27 +53,6 @@ class RHRoomBookingAdminBase(RHRoomBookingBase):
             raise Forbidden
 
 
-class SettingsSchema(mm.Schema):
-    admin_principals = PrincipalList(allow_groups=True)
-    authorized_principals = PrincipalList(allow_groups=True)
-    managers_edit_rooms = fields.Bool()
-    tileserver_url = fields.String(validate=[
-        validate.URL(schemes={'http', 'https'}),
-        lambda value: all(x in value for x in ('{x}', '{y}', '{z}'))
-    ], allow_none=True)
-    booking_limit = fields.Int(validate=[validate.Range(min=1)])
-    notifications_enabled = fields.Bool()
-    notification_before_days = fields.Int(validate=[validate.Range(min=1, max=30)])
-    notification_before_days_weekly = fields.Int(validate=[validate.Range(min=1, max=30)])
-    notification_before_days_monthly = fields.Int(validate=[validate.Range(min=1, max=30)])
-    end_notifications_enabled = fields.Bool()
-    end_notification_daily = fields.Int(validate=[validate.Range(min=1, max=30)])
-    end_notification_weekly = fields.Int(validate=[validate.Range(min=1, max=30)])
-    end_notification_monthly = fields.Int(validate=[validate.Range(min=1, max=30)])
-    excluded_categories = ModelList(Category)
-    grace_period = fields.Int(validate=[validate.Range(min=0, max=24)], allow_none=True)
-
-
 class RHSettings(RHRoomBookingAdminBase):
     def _jsonify_settings(self):
         return SettingsSchema().jsonify(rb_settings.get_all())
@@ -83,7 +60,7 @@ class RHSettings(RHRoomBookingAdminBase):
     def _process_GET(self):
         return self._jsonify_settings()
 
-    @use_args(SettingsSchema)
+    @use_args(SettingsSchema, partial=True)
     def _process_PATCH(self, args):
         rb_settings.set_multi(args)
         return self._jsonify_settings()
@@ -123,30 +100,16 @@ class RHLocations(RHRoomBookingAdminBase):
         db.session.flush()
         return '', 204
 
-    @use_kwargs({
-        'name': fields.String(required=True),
-        'room_name_format': fields.String(validate=[
-            lambda value: all(x in value for x in ('{building}', '{floor}', '{number}'))
-        ], required=True),
-        'map_url_template': fields.URL(schemes={'http', 'https'}, allow_none=True, missing=''),
-    })
+    @use_rh_kwargs(LocationArgs)
     def _process_POST(self, name, room_name_format, map_url_template):
-        self._check_conflict(name)
         loc = Location(name=name, room_name_format=room_name_format, map_url_template=(map_url_template or ''))
         db.session.add(loc)
         db.session.flush()
         return self._jsonify_one(loc), 201
 
-    @use_kwargs({
-        'name': fields.String(),
-        'room_name_format': fields.String(validate=[
-            lambda value: all(x in value for x in ('{building}', '{floor}', '{number}'))
-        ]),
-        'map_url_template': fields.URL(schemes={'http', 'https'}, allow_none=True),
-    })
+    @use_rh_kwargs(LocationArgs, partial=True)
     def _process_PATCH(self, name=None, room_name_format=None, map_url_template=missing):
         if name is not None:
-            self._check_conflict(name)
             self.location.name = name
         if room_name_format is not None:
             self.location.room_name_format = room_name_format
@@ -154,13 +117,6 @@ class RHLocations(RHRoomBookingAdminBase):
             self.location.map_url_template = map_url_template or ''
         db.session.flush()
         return self._jsonify_one(self.location)
-
-    def _check_conflict(self, name):
-        query = Location.query.filter(~Location.is_deleted, db.func.lower(Location.name) == name.lower())
-        if self.location:
-            query = query.filter(Location.id != self.location.id)
-        if query.has_rows():
-            abort(422, messages={'name': [_('Name must be unique')]})
 
 
 class RHFeatures(RHRoomBookingAdminBase):
@@ -189,26 +145,16 @@ class RHFeatures(RHRoomBookingAdminBase):
         db.session.flush()
         return '', 204
 
-    @use_kwargs({
-        'name': fields.String(validate=validate.Length(min=2), required=True),
-        'title': fields.String(validate=validate.Length(min=2), required=True),
-        'icon': fields.String(missing=''),
-    })
+    @use_rh_kwargs(FeatureArgs)
     def _process_POST(self, name, title, icon):
-        self._check_conflict(name)
         feature = RoomFeature(name=name, title=title, icon=icon)
         db.session.add(feature)
         db.session.flush()
         return self._jsonify_one(feature), 201
 
-    @use_kwargs({
-        'name': fields.String(validate=validate.Length(min=2)),
-        'title': fields.String(validate=validate.Length(min=2)),
-        'icon': fields.String(),
-    })
+    @use_rh_kwargs(FeatureArgs, partial=True)
     def _process_PATCH(self, name=None, title=None, icon=None):
         if name is not None:
-            self._check_conflict(name)
             self.feature.name = name
         if title is not None:
             self.feature.title = title
@@ -216,13 +162,6 @@ class RHFeatures(RHRoomBookingAdminBase):
             self.feature.icon = icon
         db.session.flush()
         return self._jsonify_one(self.feature)
-
-    def _check_conflict(self, name):
-        query = RoomFeature.query.filter(db.func.lower(RoomFeature.name) == name.lower())
-        if self.feature:
-            query = query.filter(RoomFeature.id != self.feature.id)
-        if query.has_rows():
-            abort(422, messages={'name': [_('Name must be unique')]})
 
 
 class RHEquipmentTypes(RHRoomBookingAdminBase):
@@ -263,36 +202,21 @@ class RHEquipmentTypes(RHRoomBookingAdminBase):
         db.session.flush()
         return '', 204
 
-    @use_kwargs({
-        'name': fields.String(validate=validate.Length(min=2), required=True),
-        'features': ModelList(RoomFeature, missing=[])
-    })
+    @use_rh_kwargs(EquipmentTypeArgs)
     def _process_POST(self, name, features):
-        self._check_conflict(name)
         equipment_type = EquipmentType(name=name, features=features)
         db.session.add(equipment_type)
         db.session.flush()
         return self._jsonify_one(equipment_type), 201
 
-    @use_kwargs({
-        'name': fields.String(validate=validate.Length(min=2)),
-        'features': ModelList(RoomFeature)
-    })
+    @use_rh_kwargs(EquipmentTypeArgs, partial=True)
     def _process_PATCH(self, name=None, features=None):
         if name is not None:
-            self._check_conflict(name)
             self.equipment_type.name = name
         if features is not None:
             self.equipment_type.features = features
         db.session.flush()
         return self._jsonify_one(self.equipment_type)
-
-    def _check_conflict(self, name):
-        query = EquipmentType.query.filter(db.func.lower(EquipmentType.name) == name.lower())
-        if self.equipment_type:
-            query = query.filter(EquipmentType.id != self.equipment_type.id)
-        if query.has_rows():
-            abort(422, messages={'name': [_('Name must be unique')]})
 
 
 class RHAttributes(RHRoomBookingAdminBase):
@@ -338,26 +262,16 @@ class RHAttributes(RHRoomBookingAdminBase):
         db.session.flush()
         return '', 204
 
-    @use_kwargs({
-        'name': fields.String(validate=validate.Length(min=2), required=True),
-        'title': fields.String(validate=validate.Length(min=2), required=True),
-        'hidden': fields.Bool(missing=False),
-    })
+    @use_rh_kwargs(RoomAttributeArgs)
     def _process_POST(self, name, title, hidden):
-        self._check_conflict(name)
         attribute = RoomAttribute(name=name, title=title, is_hidden=hidden)
         db.session.add(attribute)
         db.session.flush()
         return self._jsonify_one(attribute), 201
 
-    @use_kwargs({
-        'name': fields.String(validate=validate.Length(min=2)),
-        'title': fields.String(validate=validate.Length(min=2)),
-        'hidden': fields.Bool(),
-    })
+    @use_rh_kwargs(RoomAttributeArgs, partial=True)
     def _process_PATCH(self, name=None, title=None, hidden=None):
         if name is not None:
-            self._check_conflict(name)
             self.attribute.name = name
         if title is not None:
             self.attribute.title = title
@@ -365,13 +279,6 @@ class RHAttributes(RHRoomBookingAdminBase):
             self.attribute.is_hidden = hidden
         db.session.flush()
         return self._jsonify_one(self.attribute)
-
-    def _check_conflict(self, name):
-        query = RoomAttribute.query.filter(db.func.lower(RoomAttribute.name) == name.lower())
-        if self.attribute:
-            query = query.filter(RoomAttribute.id != self.attribute.id)
-        if query.has_rows():
-            abort(422, messages={'name': [_('Name must be unique')]})
 
 
 class RHRoomAdminBase(RHRoomBookingAdminBase):

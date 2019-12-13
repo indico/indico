@@ -10,13 +10,15 @@ from __future__ import unicode_literals
 from operator import itemgetter
 
 from flask import session
-from marshmallow import ValidationError, fields, post_dump, validate, validates_schema
+from marshmallow import ValidationError, fields, post_dump, validate, validates, validates_schema
 from marshmallow.fields import Boolean, DateTime, Function, Method, Nested, Number, Pluck, String
 from marshmallow_enum import EnumField
+from sqlalchemy import func
 
 from indico.core.db.sqlalchemy.links import LinkType
 from indico.core.db.sqlalchemy.protection import ProtectionMode
 from indico.core.marshmallow import mm
+from indico.modules.categories.models.categories import Category
 from indico.modules.events.sessions.models.blocks import SessionBlock
 from indico.modules.rb.models.blocked_rooms import BlockedRoom, BlockedRoomState
 from indico.modules.rb.models.blockings import Blocking
@@ -35,7 +37,8 @@ from indico.modules.rb.models.rooms import Room
 from indico.modules.rb.util import rb_is_admin
 from indico.modules.users.schemas import UserSchema
 from indico.util.i18n import _
-from indico.util.marshmallow import NaiveDateTime, Principal, PrincipalList, PrincipalPermissionList
+from indico.util.marshmallow import (ModelList, NaiveDateTime, Principal, PrincipalList, PrincipalPermissionList,
+                                     not_empty)
 from indico.util.string import natural_sort_key
 
 
@@ -372,6 +375,111 @@ class RoomAttributeSchema(mm.ModelSchema):
     class Meta:
         model = RoomAttribute
         fields = ('id', 'name', 'title', 'hidden')
+
+
+class LocationArgs(mm.Schema):
+    class Meta:
+        rh_context = ('location',)
+
+    name = fields.String(required=True)
+    room_name_format = fields.String(required=True)
+    map_url_template = fields.URL(schemes={'http', 'https'}, allow_none=True, missing='')
+
+    @validates('name')
+    def _check_name_unique(self, name):
+        location = self.context['location']
+        query = Location.query.filter(~Location.is_deleted, func.lower(Location.name) == name.lower())
+        if location:
+            query = query.filter(Location.id != location.id)
+        if query.has_rows():
+            raise ValidationError(_('Name must be unique'))
+
+    @validates('room_name_format')
+    def _check_room_name_format_placeholders(self, room_name_format):
+        missing = {x for x in ('{building}', '{floor}', '{number}') if x not in room_name_format}
+        if missing:
+            # validated client-side, no i18n needed
+            raise ValidationError('Missing placeholders: {}'.format(', '.join(missing)))
+
+
+class FeatureArgs(mm.Schema):
+    class Meta:
+        rh_context = ('feature',)
+
+    name = fields.String(validate=validate.Length(min=2), required=True)
+    title = fields.String(validate=validate.Length(min=2), required=True)
+    icon = fields.String(missing='')
+
+    @validates('name')
+    def _check_name_unique(self, name):
+        feature = self.context['feature']
+        query = RoomFeature.query.filter(func.lower(RoomFeature.name) == name.lower())
+        if feature:
+            query = query.filter(RoomFeature.id != feature.id)
+        if query.has_rows():
+            raise ValidationError(_('Name must be unique'))
+
+
+class EquipmentTypeArgs(mm.Schema):
+    class Meta:
+        rh_context = ('equipment_type',)
+
+    name = fields.String(validate=validate.Length(min=2), required=True)
+    features = ModelList(RoomFeature, missing=[])
+
+    @validates('name')
+    def _check_name_unique(self, name):
+        equipment_type = self.context['equipment_type']
+        query = EquipmentType.query.filter(func.lower(EquipmentType.name) == name.lower())
+        if equipment_type:
+            query = query.filter(EquipmentType.id != equipment_type.id)
+        if query.has_rows():
+            raise ValidationError(_('Name must be unique'))
+
+
+class RoomAttributeArgs(mm.Schema):
+    class Meta:
+        rh_context = ('attribute',)
+
+    name = fields.String(validate=validate.Length(min=2), required=True)
+    title = fields.String(validate=validate.Length(min=2), required=True)
+    hidden = fields.Bool(missing=False)
+
+    @validates('name')
+    def _check_name_unique(self, name):
+        attribute = self.context['attribute']
+        query = RoomAttribute.query.filter(func.lower(RoomAttribute.name) == name.lower())
+        if attribute:
+            query = query.filter(RoomAttribute.id != attribute.id)
+        if query.has_rows():
+            raise ValidationError(_('Name must be unique'))
+
+
+class SettingsSchema(mm.Schema):
+    admin_principals = PrincipalList(allow_groups=True)
+    authorized_principals = PrincipalList(allow_groups=True)
+    managers_edit_rooms = fields.Bool()
+    tileserver_url = fields.String(validate=validate.URL(schemes={'http', 'https'}), allow_none=True)
+    booking_limit = fields.Int(validate=not_empty)
+    notifications_enabled = fields.Bool()
+    notification_before_days = fields.Int(validate=validate.Range(min=1, max=30))
+    notification_before_days_weekly = fields.Int(validate=validate.Range(min=1, max=30))
+    notification_before_days_monthly = fields.Int(validate=validate.Range(min=1, max=30))
+    end_notifications_enabled = fields.Bool()
+    end_notification_daily = fields.Int(validate=validate.Range(min=1, max=30))
+    end_notification_weekly = fields.Int(validate=validate.Range(min=1, max=30))
+    end_notification_monthly = fields.Int(validate=validate.Range(min=1, max=30))
+    excluded_categories = ModelList(Category)
+    grace_period = fields.Int(validate=validate.Range(min=0, max=24), allow_none=True)
+
+    @validates('tileserver_url')
+    def _check_tileserver_url_placeholders(self, tileserver_url):
+        if tileserver_url is None:
+            return
+        missing = {x for x in ('{x}', '{y}', '{z}') if x not in tileserver_url}
+        if missing:
+            # validated client-side, no i18n needed
+            raise ValidationError('Missing placeholders: {}'.format(', '.join(missing)))
 
 
 attributes_schema = AttributesSchema(many=True)
