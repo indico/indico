@@ -11,8 +11,12 @@
     max-width: 300px !important;
 
     .filetype-segment {
-        .actions i {
-            cursor: pointer;
+        .actions {
+            display: flex;
+
+            i {
+                cursor: pointer;
+            }
         }
 
         .filetype {

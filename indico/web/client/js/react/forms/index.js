@@ -14,6 +14,7 @@ export {
   FinalRadio,
   FinalSubmitButton,
   FinalTextArea,
+  unsortedArraysEqual,
 } from './fields';
 export {default as validators} from './validators';
 export {default as parsers} from './parsers';
