@@ -8,7 +8,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import {Dropdown} from 'semantic-ui-react';
-import {FinalField, unsortedArraysEqual} from 'indico/react/forms/fields';
+import {FinalField, unsortedArraysEqual} from 'indico/react/forms';
 import {Translate} from 'indico/react/i18n';
 
 import './TagInput.module.scss';
