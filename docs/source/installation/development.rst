@@ -78,14 +78,14 @@ Cloning Indico
 First, let's clone Indico's code base. If you're going to contribute back to the project, it's probably best if you
 clone your own `GitHub fork of the project <https://help.github.com/articles/fork-a-repo/>`_ and set it as the origin::
 
-    git clone --recursive git@github.com:<your-github-username>/indico.git src
+    git clone git@github.com:<your-github-username>/indico.git src
     cd src
     git remote add upstream https://github.com/indico/indico.git
     cd ..
 
 Otherwise, cloning the upstream repository as the origin should be enough::
 
-    git clone --recursive https://github.com/indico/indico.git src
+    git clone https://github.com/indico/indico.git src
 
 If you're going to be changing the standard Indico plugins and/or the documentation, you can also clone those::
 
