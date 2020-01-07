@@ -30,10 +30,7 @@ export default function FileTypeManager({eventId}) {
   }
 
   return (
-    <div>
-      <h3>
-        <Translate>List of file types</Translate>
-      </h3>
+    <div styleName="file-types-container">
       {fileTypes.length === 0 && (
         <Message info>
           <Translate>There are no file types defined for this event</Translate>
@@ -57,7 +54,7 @@ export default function FileTypeManager({eventId}) {
           </div>
         </Segment>
       ))}
-      <Button primary floated="left">
+      <Button icon primary floated="right">
         <Icon name="plus" />
         <Translate>Add a new file type</Translate>
       </Button>
