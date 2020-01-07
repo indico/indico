@@ -31,15 +31,15 @@ Improvements
 - Show more verbose error when email validation fails during event
   registration (:issue:`4177`)
 
-Internal Changes
-^^^^^^^^^^^^^^^^
-
-- Make React and SemanticUI usable everywhere (:issue:`3955`)
-
 Bugfixes
 ^^^^^^^^
 
 - Hide Book of Abstracts menu item if LaTeX is disabled
+
+Internal Changes
+^^^^^^^^^^^^^^^^
+
+- Make React and SemanticUI usable everywhere (:issue:`3955`)
 
 
 ----
