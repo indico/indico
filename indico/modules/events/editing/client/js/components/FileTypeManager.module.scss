@@ -7,37 +7,38 @@
 
 @import 'base/palette';
 
-.filetype-segment {
-    width: 290px;
+.file-types-container {
+    max-width: 300px !important;
 
-    .actions i {
-        cursor: pointer;
-    }
+    .filetype-segment {
+        .actions i {
+            cursor: pointer;
+        }
 
-    .filetype {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-    }
+        .filetype {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
 
-    .filetype h3 {
-        margin-bottom: 0;
-    }
+        .filetype h3 {
+            margin-bottom: 0;
+        }
 
-    .file-extensions {
-        font-style: italic;
-        color: $gray;
-        list-style-type: none;
-        margin: 0.2em 0;
-        padding: 0;
-    }
+        .file-extensions {
+            font-style: italic;
+            color: $gray;
+            list-style-type: none;
+            margin: 0.2em 0;
+            padding: 0;
 
-    .file-extensions li {
-        display: inline;
-    }
+            li {
+                display: inline;
+            }
 
-    .file-extensions li:not(:last-child)::after {
-        content: ', ';
+            li:not(:last-child)::after {
+                content: ', ';
+            }
+        }
     }
 }
-
