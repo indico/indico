@@ -23,6 +23,7 @@ class RHEditingBase(RHEventBase):
 
     def _check_access(self):
         RHEventBase._check_access(self)
+        # TODO: check for proper event/editing access (RHEventBase does NOT check event access)
         if not session.user:
             raise Forbidden
 
