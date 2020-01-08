@@ -6,19 +6,12 @@ Installation guide (development)
 Installing System Packages
 --------------------------
 
-We'll assume you've installed PostgreSQL (and its ``contrib`` package, if on a Linux system) and managed to setup/start
-the server. PostgreSQL 9.6 at least is required.
-
-You can find instructions on how to install it on Fedora/CentOS
-`here <https://wiki.postgresql.org/wiki/YUM_Installation>`_. You can find the same for Debian/Ubuntu
-`here <https://wiki.postgresql.org/wiki/Apt>`_. If you're a macOS user, you will probably want to use Homebrew::
-
-    brew install postgresql
-    brew services start postgresql
-
 Web assets such as JavaScript and SCSS files are compiled using `Webpack <https://webpack.js.org>`_, which
 requires NodeJS to be present. You can find information on how to install NodeJS
 `here <https://nodejs.org/en/download/package-manager/>`_.
+
+Do not use the default NodeJS packages from your Linux distribution as they are usually outdated or come wit
+an outdated npm version.
 
 CentOS/Fedora
 +++++++++++++
@@ -26,8 +19,9 @@ CentOS/Fedora
 .. code-block:: shell
 
     yum install -y gcc redis python-devel python-virtualenv libjpeg-turbo-devel libxslt-devel libxml2-devel \
-        libffi-devel pcre-devel libyaml-devel redhat-rpm-config
-    systemctl start redis.service
+        libffi-devel pcre-devel libyaml-devel redhat-rpm-config \
+        postgresql postgresql-server postgresql-contrib libpq-devel
+    systemctl start redis.service postgresql.service
 
 
 Debian/Ubuntu
@@ -36,7 +30,7 @@ Debian/Ubuntu
 .. code-block:: shell
 
     apt install -y --install-recommends python-dev python-virtualenv libxslt1-dev libxml2-dev libffi-dev libpcre3-dev \
-        libyaml-dev build-essential redis-server
+        libyaml-dev build-essential redis-server postgresql libpq-dev
 
 Then on Debian::
 
@@ -52,7 +46,8 @@ macOS
 
 We recommend that you use `Homebrew <https://brew.sh/>`_::
 
-    brew install python2 redis libjpeg libffi pcre libyaml
+    brew install python2 redis libjpeg libffi pcre libyaml postgresql
+    brew services start postgresql
     pip install virtualenv
 
 
