@@ -8,7 +8,9 @@
 import _ from 'lodash';
 import React from 'react';
 import PropTypes from 'prop-types';
-import {Icon, Progress, Segment} from 'semantic-ui-react';
+import {Icon, Popup, Progress, Segment} from 'semantic-ui-react';
+
+import {Translate} from 'indico/react/i18n';
 
 import './FileManager.module.scss';
 
@@ -16,14 +18,23 @@ export default function Uploads({uploads}) {
   const uploadList = _.sortBy(Object.entries(uploads), x => x[0]);
   return (
     <div styleName="uploading-file-list">
-      {uploadList.map(([key, {file: {name}, percent}]) => (
-        <Segment key={key} styleName="uploading-file-row">
-          <Icon loading name="spinner" />
-          <span styleName="file-state" className="uploading">
-            {name}
-          </span>
-          <Progress percent={percent} attached="bottom" color="blue" />
-        </Segment>
+      {uploadList.map(([key, {file: {name}, percent, failed}]) => (
+        <Popup
+          key={key}
+          on="hover"
+          disabled={!failed}
+          position="right center"
+          content={Translate.string('An error occurred while uploading this file')}
+          trigger={
+            <Segment styleName="uploading-file-row">
+              <Icon loading={!failed} name={failed ? 'exclamation' : 'spinner'} />
+              <span styleName="file-state" className={failed ? 'error' : 'uploading'}>
+                {name}
+              </span>
+              {!failed && <Progress percent={percent} attached="bottom" color="blue" />}
+            </Segment>
+          }
+        />
       ))}
     </div>
   );

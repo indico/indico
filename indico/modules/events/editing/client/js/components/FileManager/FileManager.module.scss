@@ -108,6 +108,10 @@
     &:global(.uploading) {
         color: $gray;
     }
+
+    &:global(.error) {
+        color: $dark-red;
+    }
 }
 
 .uploading-file-list {

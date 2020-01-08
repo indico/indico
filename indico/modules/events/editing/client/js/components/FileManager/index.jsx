@@ -48,7 +48,7 @@ export function Dropzone({uploadURL, fileType: {id, allowMultipleFiles, files, e
       if (!allowMultipleFiles) {
         acceptedFiles = acceptedFiles.splice(0, 1);
       }
-      await uploadFiles(
+      const rv = await uploadFiles(
         fileToReplace ? actions.markModified : actions.markUploaded,
         id,
         acceptedFiles,
@@ -56,7 +56,8 @@ export function Dropzone({uploadURL, fileType: {id, allowMultipleFiles, files, e
         dispatch,
         fileToReplace ? fileToReplace.uuid : null
       );
-      if (fileToDelete) {
+      // only delete if there is a file to delete and the upload of a new file didn't fail
+      if (fileToDelete && rv[0] !== null) {
         // we're modifying a freshly uploaded file, so we can get rid of the current one
         deleteFile(fileToDelete.uuid);
       }

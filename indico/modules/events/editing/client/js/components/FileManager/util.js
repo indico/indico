@@ -43,6 +43,7 @@ async function uploadFile(file, url, onUploadProgress) {
     return data;
   } catch (e) {
     handleAxiosError(e);
+    return null;
   }
 }
 
@@ -55,8 +56,17 @@ async function uploadFile(file, url, onUploadProgress) {
  * @param {String} uploadURL - the URL to POST the files to
  * @param {Function} dispatch - the dispatch function for reducer actions
  * @param {String?} fileId - the ID of the file to modify, if any
+ * @param {Function} onError - the function to be called on file upload error
  */
-export function uploadFiles(action, fileTypeId, acceptedFiles, uploadURL, dispatch, fileId = null) {
+export function uploadFiles(
+  action,
+  fileTypeId,
+  acceptedFiles,
+  uploadURL,
+  dispatch,
+  fileId = null,
+  onError = null
+) {
   const tmpFileIds = acceptedFiles.map(() => _.uniqueId(_.now()));
 
   dispatch(actions.startUploads(fileTypeId, acceptedFiles, tmpFileIds));
@@ -66,14 +76,25 @@ export function uploadFiles(action, fileTypeId, acceptedFiles, uploadURL, dispat
       const uploadedFile = await uploadFile(acceptedFile, uploadURL, e =>
         dispatch(actions.progress(fileTypeId, tmpFileId, Math.floor((e.loaded / e.total) * 100)))
       );
-      dispatch(
-        action(fileTypeId, fileId, tmpFileId, {
-          filename: uploadedFile.filename,
-          uuid: uploadedFile.uuid,
-          claimed: false,
-          fileType: fileTypeId,
-        })
-      );
+
+      if (uploadedFile === null) {
+        // error happened while uploading a file
+        dispatch(actions.error(fileTypeId, tmpFileId));
+        if (onError) {
+          onError();
+        }
+        return null;
+      } else {
+        dispatch(
+          action(fileTypeId, fileId, tmpFileId, {
+            filename: uploadedFile.filename,
+            uuid: uploadedFile.uuid,
+            claimed: false,
+            fileType: fileTypeId,
+          })
+        );
+        return uploadedFile;
+      }
     })
   );
 }
