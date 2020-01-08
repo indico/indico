@@ -108,6 +108,18 @@ export default combineReducers({
         };
       }
 
+      case actions.UPLOAD_ERROR: {
+        const fileType = state[action.fileTypeId];
+        const tmpFile = fileType[action.tmpFileId];
+        return {
+          ...state,
+          [action.fileTypeId]: {
+            ...fileType,
+            [action.tmpFileId]: {...tmpFile, failed: true},
+          },
+        };
+      }
+
       default:
         return state;
     }

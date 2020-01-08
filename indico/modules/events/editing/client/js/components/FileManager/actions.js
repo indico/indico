@@ -13,6 +13,7 @@ export const REVERT = 'REVERT';
 export const PROGRESS = 'PROGRESS';
 export const START_UPLOADS = 'START_UPLOADS';
 export const CLEAR_DIRTY = 'CLEAR_DIRTY';
+export const UPLOAD_ERROR = 'UPLOAD_ERROR';
 
 export const startUploads = (fileTypeId, files, tmpFileIds) => ({
   type: START_UPLOADS,
@@ -64,4 +65,10 @@ export const markUploaded = (fileTypeId, fileId, tmpFileId, file) => ({
 
 export const clearDirty = () => ({
   type: CLEAR_DIRTY,
+});
+
+export const error = (fileTypeId, tmpFileId) => ({
+  type: UPLOAD_ERROR,
+  fileTypeId,
+  tmpFileId,
 });

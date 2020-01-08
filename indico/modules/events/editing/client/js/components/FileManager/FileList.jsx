@@ -55,7 +55,8 @@ function FileEntry({uploadURL, fileType, file: {uuid, filename, state, claimed, 
         acceptedFiles,
         uploadURL,
         dispatch,
-        uuid
+        uuid,
+        () => setActiveButton(null)
       );
       // when we're done, the component will have been unmounted,
       // so there's no need to unset the active button

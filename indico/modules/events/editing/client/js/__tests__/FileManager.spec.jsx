@@ -11,6 +11,8 @@ import {act} from 'react-dom/test-utils';
 import mockAxios from 'jest-mock-axios';
 import React from 'react';
 
+import * as axiosUtils from 'indico/utils/axios';
+
 import FileManager, {Dropzone} from '../components/FileManager';
 import * as actions from '../components/FileManager/actions';
 
@@ -321,5 +323,55 @@ describe('File manager', () => {
     const fileEntry = getFileEntryForFileType(wrapper, 2);
     expect(fileEntry.find('span:first-child').text()).toEqual('test.pdf');
     expect(fileEntry.find('FileAction').prop('icon')).toEqual('undo');
+  });
+
+  it('handles upload errors properly', async () => {
+    // eslint-disable-next-line import/namespace
+    axiosUtils.handleAxiosError = jest
+      .spyOn(axiosUtils, 'handleAxiosError')
+      .mockImplementation(() => {});
+
+    const onChange = jest.fn();
+    const wrapper = mount(
+      <FileManager
+        uploadURL="goes://nowhere"
+        downloadURL="goes://nowhere"
+        fileTypes={[fileTypes[1]]}
+        onChange={onChange}
+      />
+    );
+
+    const dropzone = getDropzoneForFileType(wrapper, 2);
+    const file1 = {type: 'pdf', name: 'test.pdf'};
+
+    // simulate actual "drop" event
+    await act(async () => {
+      dropzone.simulate('drop', createDtWithFiles([file1]));
+    });
+
+    await act(async () => {
+      mockAxios.mockError();
+    });
+
+    const mockDispatch = React.mockDispatches[0];
+
+    expect(mockDispatch).toHaveBeenCalledWith(
+      expect.objectContaining({type: actions.UPLOAD_ERROR})
+    );
+    expect(onChange).not.toHaveBeenCalled();
+
+    wrapper.update();
+
+    const fileEntry = getFileEntryForFileType(wrapper, 2);
+    expect(fileEntry.exists()).toEqual(false);
+    expect(
+      wrapper
+        .find('FileType')
+        .find('Uploads')
+        .find('.error')
+        .exists()
+    ).toEqual(true);
+
+    axiosUtils.handleAxiosError.mockRestore();
   });
 });
