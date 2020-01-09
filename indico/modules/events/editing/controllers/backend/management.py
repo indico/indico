@@ -12,8 +12,8 @@ from flask import request
 from indico.modules.events.editing.controllers.base import RHEditingManagementBase
 from indico.modules.events.editing.models.file_types import EditingFileType
 from indico.modules.events.editing.models.tags import EditingTag
-from indico.modules.events.editing.operations import (create_new_tag, delete_file_type, delete_tag, update_file_type,
-                                                      update_tag)
+from indico.modules.events.editing.operations import (create_new_file_type, create_new_tag, delete_file_type,
+                                                      delete_tag, update_file_type, update_tag)
 from indico.modules.events.editing.schemas import (EditableFileTypeArgs, EditableTagArgs, EditingFileTypeSchema,
                                                    EditingTagSchema)
 from indico.web.args import use_rh_args
@@ -46,6 +46,15 @@ class RHEditTag(RHEditingManagementBase):
     def _process_DELETE(self):
         delete_tag(self.tag)
         return '', 204
+
+
+class RHCreateFileType(RHEditingManagementBase):
+    """Create a new file type."""
+
+    @use_rh_args(EditableFileTypeArgs)
+    def _process(self, data):
+        file_type = create_new_file_type(self.event, **data)
+        return EditingFileTypeSchema().jsonify(file_type)
 
 
 class RHEditFileType(RHEditingManagementBase):
