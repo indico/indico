@@ -21,17 +21,18 @@ from indico.modules.events.editing.controllers.base import (RHContributionEditab
                                                             RHEditingManagementBase)
 from indico.modules.events.editing.fields import EditingFilesField, EditingTagsField
 from indico.modules.events.editing.models.comments import EditingRevisionComment
+from indico.modules.events.editing.models.file_types import EditingFileType
 from indico.modules.events.editing.models.revision_files import EditingRevisionFile
 from indico.modules.events.editing.models.revisions import EditingRevision
 from indico.modules.events.editing.models.tags import EditingTag
 from indico.modules.events.editing.operations import (confirm_editable_changes, create_new_editable, create_new_tag,
                                                       create_revision_comment, create_submitter_revision,
-                                                      delete_revision_comment, delete_tag, replace_revision,
-                                                      review_editable_revision, undo_review, update_revision_comment,
-                                                      update_tag)
-from indico.modules.events.editing.schemas import (EditableSchema, EditableTagArgs, EditingConfirmationAction,
-                                                   EditingFileTypeSchema, EditingReviewAction, EditingTagSchema,
-                                                   ReviewEditableArgs)
+                                                      delete_file_type, delete_revision_comment, delete_tag,
+                                                      replace_revision, review_editable_revision, undo_review,
+                                                      update_file_type, update_revision_comment, update_tag)
+from indico.modules.events.editing.schemas import (EditableFileTypeArgs, EditableSchema, EditableTagArgs,
+                                                   EditingConfirmationAction, EditingFileTypeSchema,
+                                                   EditingReviewAction, EditingTagSchema, ReviewEditableArgs)
 from indico.modules.files.controllers import UploadFileMixin
 from indico.util.fs import secure_filename
 from indico.util.i18n import _
@@ -80,6 +81,26 @@ class RHEditTag(RHEditingManagementBase):
 
     def _process_DELETE(self):
         delete_tag(self.tag)
+        return '', 204
+
+
+class RHEditFileType(RHEditingManagementBase):
+    """Delete/update a file type."""
+
+    def _process_args(self):
+        RHEditingManagementBase._process_args(self)
+        self.file_type = (EditingFileType.query
+                          .with_parent(self.event)
+                          .filter_by(id=request.view_args['file_type_id'])
+                          .first_or_404())
+
+    @use_rh_args(EditableFileTypeArgs, partial=True)
+    def _process_PATCH(self, data):
+        update_file_type(self.file_type, **data)
+        return EditingFileTypeSchema().jsonify(self.file_type)
+
+    def _process_DELETE(self):
+        delete_file_type(self.file_type)
         return '', 204
 
 

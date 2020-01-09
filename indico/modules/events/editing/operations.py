@@ -229,3 +229,14 @@ def update_tag(tag, code=None, title=None, color=None):
 def delete_tag(tag):
     logger.info('Tag %r deleted by %r', tag, session.user)
     db.session.delete(tag)
+
+
+def update_file_type(file_type, **data):
+    file_type.populate_from_dict(data, keys=('name', 'extensions', 'allow_multiple_files', 'required', 'publishable'))
+    db.session.flush()
+    logger.info('File type %r updated by %r', file_type, session.user)
+
+
+def delete_file_type(file_type):
+    logger.info('File type %r deleted by %r', file_type, session.user)
+    db.session.delete(file_type)
