@@ -15,6 +15,7 @@ from indico.core.db.sqlalchemy.util.session import no_autoflush
 from indico.modules.events.editing import logger
 from indico.modules.events.editing.models.comments import EditingRevisionComment
 from indico.modules.events.editing.models.editable import Editable
+from indico.modules.events.editing.models.file_types import EditingFileType
 from indico.modules.events.editing.models.revision_files import EditingRevisionFile
 from indico.modules.events.editing.models.revisions import EditingRevision, FinalRevisionState, InitialRevisionState
 from indico.modules.events.editing.models.tags import EditingTag
@@ -229,6 +230,14 @@ def update_tag(tag, code=None, title=None, color=None):
 def delete_tag(tag):
     logger.info('Tag %r deleted by %r', tag, session.user)
     db.session.delete(tag)
+
+
+def create_new_file_type(event, **data):
+    file_type = EditingFileType(event=event)
+    file_type.populate_from_dict(data, keys=('name', 'extensions', 'allow_multiple_files', 'required', 'publishable'))
+    db.session.flush()
+    logger.info('File type %r created by %r', file_type, session.user)
+    return file_type
 
 
 def update_file_type(file_type, **data):
