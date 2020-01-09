@@ -26,6 +26,8 @@ _bp.add_url_rule('/contributions/<int:contrib_id>/editing/<any(paper):type>/<int
 
 # Event-level APIs
 _bp.add_url_rule('/editing/api/file-types', 'api_file_types', backend.RHEditingFileTypes)
+_bp.add_url_rule('/editing/api/file-types/<int:file_type_id>', 'api_edit_file_type', backend.RHEditFileType,
+                 methods=('PATCH', 'DELETE'))
 _bp.add_url_rule('/editing/api/tags', 'api_tags', backend.RHEditingTags)
 _bp.add_url_rule('/editing/api/tags', 'api_create_tag', backend.RHCreateTag, methods=('POST',))
 _bp.add_url_rule('/editing/api/tag/<int:tag_id>', 'api_edit_tag', backend.RHEditTag, methods=('PATCH', 'DELETE'))

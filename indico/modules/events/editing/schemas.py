@@ -162,3 +162,24 @@ class EditableTagArgs(mm.Schema):
             query = query.filter(EditingTag.id != tag.id)
         if query.has_rows():
             raise ValidationError(_('Tag code must be unique'))
+
+
+class EditableFileTypeArgs(mm.Schema):
+    class Meta:
+        rh_context = ('event', 'file_type')
+
+    name = fields.String(required=True, validate=not_empty)
+    extensions = fields.List(fields.String(validate=not_empty))
+    allow_multiple_files = fields.Boolean()
+    required = fields.Boolean()
+    publishable = fields.Boolean()
+
+    @validates('name')
+    def _check_for_unique_file_type_name(self, name):
+        event = self.context['event']
+        file_type = self.context['file_type']
+        query = EditingFileType.query.with_parent(event).filter(func.lower(EditingFileType.name) == name.lower())
+        if file_type:
+            query = query.filter(EditingFileType.id != file_type.id)
+        if query.has_rows():
+            raise ValidationError(_('Name must be unique'))
