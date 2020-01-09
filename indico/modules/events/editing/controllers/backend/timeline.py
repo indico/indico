@@ -17,91 +17,23 @@ from marshmallow_enum import EnumField
 from werkzeug.exceptions import Forbidden, NotFound
 
 from indico.core.errors import UserValueError
-from indico.modules.events.editing.controllers.base import (RHContributionEditableBase, RHEditingBase,
-                                                            RHEditingManagementBase)
+from indico.modules.events.editing.controllers.base import RHContributionEditableBase
 from indico.modules.events.editing.fields import EditingFilesField, EditingTagsField
 from indico.modules.events.editing.models.comments import EditingRevisionComment
-from indico.modules.events.editing.models.file_types import EditingFileType
 from indico.modules.events.editing.models.revision_files import EditingRevisionFile
 from indico.modules.events.editing.models.revisions import EditingRevision
-from indico.modules.events.editing.models.tags import EditingTag
-from indico.modules.events.editing.operations import (confirm_editable_changes, create_new_editable, create_new_tag,
+from indico.modules.events.editing.operations import (confirm_editable_changes, create_new_editable,
                                                       create_revision_comment, create_submitter_revision,
-                                                      delete_file_type, delete_revision_comment, delete_tag,
-                                                      replace_revision, review_editable_revision, undo_review,
-                                                      update_file_type, update_revision_comment, update_tag)
-from indico.modules.events.editing.schemas import (EditableFileTypeArgs, EditableSchema, EditableTagArgs,
-                                                   EditingConfirmationAction, EditingFileTypeSchema,
-                                                   EditingReviewAction, EditingTagSchema, ReviewEditableArgs)
+                                                      delete_revision_comment, replace_revision,
+                                                      review_editable_revision, undo_review, update_revision_comment)
+from indico.modules.events.editing.schemas import (EditableSchema, EditingConfirmationAction, EditingReviewAction,
+                                                   ReviewEditableArgs)
 from indico.modules.files.controllers import UploadFileMixin
 from indico.util.fs import secure_filename
 from indico.util.i18n import _
 from indico.util.marshmallow import not_empty
-from indico.web.args import parser, use_kwargs, use_rh_args
+from indico.web.args import parser, use_kwargs
 from indico.web.flask.util import send_file
-
-
-class RHEditingFileTypes(RHEditingBase):
-    """Return all editing file types defined in the event."""
-
-    def _process(self):
-        return EditingFileTypeSchema(many=True).jsonify(self.event.editing_file_types)
-
-
-class RHEditingTags(RHEditingBase):
-    """Return all editing tags defined in the event."""
-
-    def _process(self):
-        return EditingTagSchema(many=True).jsonify(self.event.editing_tags)
-
-
-class RHCreateTag(RHEditingManagementBase):
-    """Create a new tag."""
-
-    @use_rh_args(EditableTagArgs)
-    def _process(self, data):
-        tag = create_new_tag(self.event, **data)
-        return EditingTagSchema().jsonify(tag)
-
-
-class RHEditTag(RHEditingManagementBase):
-    """Delete/update a tag."""
-
-    def _process_args(self):
-        RHEditingManagementBase._process_args(self)
-        self.tag = (EditingTag.query
-                    .with_parent(self.event)
-                    .filter_by(id=request.view_args['tag_id'])
-                    .first_or_404())
-
-    @use_rh_args(EditableTagArgs, partial=True)
-    def _process_PATCH(self, data):
-        update_tag(self.tag, **data)
-        return EditingTagSchema().jsonify(self.tag)
-
-    def _process_DELETE(self):
-        delete_tag(self.tag)
-        return '', 204
-
-
-class RHEditFileType(RHEditingManagementBase):
-    """Delete/update a file type."""
-
-    def _process_args(self):
-        RHEditingManagementBase._process_args(self)
-        self.file_type = (EditingFileType.query
-                          .with_parent(self.event)
-                          .filter_by(id=request.view_args['file_type_id'])
-                          .first_or_404())
-
-    @use_rh_args(EditableFileTypeArgs, partial=True)
-    def _process_PATCH(self, data):
-        update_file_type(self.file_type, **data)
-        return EditingFileTypeSchema().jsonify(self.file_type)
-
-    def _process_DELETE(self):
-        delete_file_type(self.file_type)
-        return '', 204
 
 
 class RHEditingUploadFile(UploadFileMixin, RHContributionEditableBase):
