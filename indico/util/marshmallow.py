@@ -157,7 +157,7 @@ class ModelList(Field):
 
     def _deserialize(self, value, attr, data):
         if not value:
-            return []
+            return self.collection_class()
         try:
             value = map(self.column_type, value)
         except (TypeError, ValueError):
