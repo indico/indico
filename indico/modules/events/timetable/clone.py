@@ -14,7 +14,7 @@ from indico.core.db.sqlalchemy.util.models import get_simple_column_attrs
 from indico.modules.events.cloning import EventCloner
 from indico.modules.events.models.events import EventType
 from indico.modules.events.timetable.models.breaks import Break
-from indico.modules.events.timetable.models.entries import TimetableEntry
+from indico.modules.events.timetable.models.entries import TimetableEntry, TimetableEntryType
 from indico.util.i18n import _
 
 
@@ -49,10 +49,15 @@ class TimetableCloner(EventCloner):
         break_strategy = defaultload('break_')
         break_strategy.joinedload('own_venue')
         break_strategy.joinedload('own_room').lazyload('*')
+        entry_key_order = db.case({
+            TimetableEntryType.SESSION_BLOCK: db.func.concat('s', TimetableEntry.id),
+            TimetableEntryType.CONTRIBUTION: db.func.concat('c', TimetableEntry.id),
+            TimetableEntryType.BREAK: db.func.concat('b', TimetableEntry.id),
+        }, value=TimetableEntry.type)
         query = (self.old_event.timetable_entries
                  .options(joinedload('parent').lazyload('*'),
                           break_strategy)
-                 .order_by(TimetableEntry.parent_id.is_(None).desc()))
+                 .order_by(TimetableEntry.parent_id.is_(None).desc(), entry_key_order))
         # iterate over all timetable entries; start with top-level
         # ones so we can build a mapping that can be used once we
         # reach nested entries

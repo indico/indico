@@ -35,6 +35,7 @@ Bugfixes
 ^^^^^^^^
 
 - Hide Book of Abstracts menu item if LaTeX is disabled
+- Use a more consistent order when cloning the timetable (:issue:`4227`)
 
 Internal Changes
 ^^^^^^^^^^^^^^^^
