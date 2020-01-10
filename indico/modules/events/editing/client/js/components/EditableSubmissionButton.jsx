@@ -6,12 +6,14 @@
 // LICENSE file for more details.
 
 import editableURL from 'indico-url:event_editing.editable';
-import React, {useCallback, useState} from 'react';
+import React, {useState} from 'react';
 import PropTypes from 'prop-types';
-import {Button, Modal} from 'semantic-ui-react';
-import {indicoAxios, handleAxiosError} from 'indico/utils/axios';
+import {Button, Form, Modal} from 'semantic-ui-react';
+import {Form as FinalForm} from 'react-final-form';
+import {indicoAxios} from 'indico/utils/axios';
+import {FinalSubmitButton, handleSubmitError} from 'indico/react/forms';
 import {Translate} from 'indico/react/i18n';
-import FileManager from './FileManager';
+import {FinalFileManager} from './FileManager';
 import {fileTypePropTypes} from './FileManager/util';
 
 export default function EditableSubmissionButton({
@@ -23,53 +25,45 @@ export default function EditableSubmissionButton({
   submitRevisionURL,
 }) {
   const [open, setOpen] = useState(false);
-  const [submissionFiles, setSubmissionFiles] = useState({});
-  const [submitting, setSubmitting] = useState(false);
-  const submitRevision = async () => {
-    setSubmitting(true);
+
+  const submitRevision = async formData => {
     try {
-      await indicoAxios.put(submitRevisionURL, {
-        files: submissionFiles,
-      });
+      await indicoAxios.put(submitRevisionURL, formData);
     } catch (e) {
-      handleAxiosError(e);
-      setSubmitting(false);
-      return;
+      return handleSubmitError(e);
     }
-    setSubmitting(false);
     location.href = editableURL({confId: eventId, contrib_id: contributionId, type});
   };
 
-  const handleChange = useCallback(files => setSubmissionFiles(files), []);
   return (
     <>
-      <Modal
-        open={open}
-        onClose={() => setOpen(false)}
-        closeIcon
-        closeOnDimmerClick={false}
-        closeOnEscape={false}
-      >
-        <Modal.Header>
-          {type === 'paper' && <Translate>Submit your paper</Translate>}
-          {type === 'slides' && <Translate>Submit your slides</Translate>}
-        </Modal.Header>
-        <Modal.Content>
-          <FileManager onChange={handleChange} fileTypes={fileTypes} uploadURL={uploadURL} />
-        </Modal.Content>
-        <Modal.Actions>
-          <Button onClick={() => setOpen(false)}>
-            <Translate>Cancel</Translate>
-          </Button>
-          <Button
-            primary
-            disabled={submitting || !Object.keys(submissionFiles).length}
-            onClick={submitRevision}
+      <FinalForm onSubmit={submitRevision} subscription={{}} initialValues={{files: {}}}>
+        {({handleSubmit}) => (
+          <Modal
+            open={open}
+            onClose={() => setOpen(false)}
+            closeIcon
+            closeOnDimmerClick={false}
+            closeOnEscape={false}
           >
-            <Translate>Save</Translate>
-          </Button>
-        </Modal.Actions>
-      </Modal>
+            <Modal.Header>
+              {type === 'paper' && <Translate>Submit your paper</Translate>}
+              {type === 'slides' && <Translate>Submit your slides</Translate>}
+            </Modal.Header>
+            <Modal.Content>
+              <Form id="submit-editable-form" onSubmit={handleSubmit}>
+                <FinalFileManager name="files" fileTypes={fileTypes} uploadURL={uploadURL} />
+              </Form>
+            </Modal.Content>
+            <Modal.Actions style={{display: 'flex', justifyContent: 'flex-end'}}>
+              <FinalSubmitButton form="submit-editable-form" label={Translate.string('Submit')} />
+              <Button onClick={() => setOpen(false)}>
+                <Translate>Cancel</Translate>
+              </Button>
+            </Modal.Actions>
+          </Modal>
+        )}
+      </FinalForm>
       <button type="submit" className="i-button highlight" onClick={() => setOpen(true)}>
         <Translate>Submit Files</Translate>
       </button>
