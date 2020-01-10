@@ -17,3 +17,7 @@ export const getFiles = state => {
       .filter(([, files]) => files.length !== 0)
   );
 };
+
+export const isUploading = state => {
+  return Object.values(state.uploads).some(uploads => Object.values(uploads).some(x => !x.failed));
+};
