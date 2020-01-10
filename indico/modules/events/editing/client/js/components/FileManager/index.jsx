@@ -9,6 +9,7 @@ import _ from 'lodash';
 import React, {useCallback, useReducer, useContext, useRef, useMemo, useEffect} from 'react';
 import PropTypes from 'prop-types';
 import {useDropzone} from 'react-dropzone';
+import {Field} from 'react-final-form';
 import {Icon} from 'semantic-ui-react';
 import {TooltipIfTruncated} from 'indico/react/components';
 import {Translate} from 'indico/react/i18n';
@@ -24,7 +25,7 @@ import FileList from './FileList';
 import Uploads from './Uploads';
 import reducer from './reducer';
 import * as actions from './actions';
-import {getFiles} from './selectors';
+import {getFiles, isUploading} from './selectors';
 
 import './FileManager.module.scss';
 
@@ -122,7 +123,7 @@ FileType.defaultProps = {
   uploads: {},
 };
 
-export default function FileManager({onChange, uploadURL, fileTypes, files}) {
+export default function FileManager({onChange, uploadURL, fileTypes, files, finalFieldName}) {
   const _fileTypes = useMemo(() => mapFileTypes(fileTypes, files), [fileTypes, files]);
   const [state, dispatch] = useReducer(reducer, {
     fileTypes: _fileTypes,
@@ -137,6 +138,8 @@ export default function FileManager({onChange, uploadURL, fileTypes, files}) {
     }
   }, [onChange, state]);
 
+  const uploading = isUploading(state);
+
   return (
     <div styleName="file-manager-wrapper">
       <div styleName="file-manager">
@@ -150,6 +153,13 @@ export default function FileManager({onChange, uploadURL, fileTypes, files}) {
             />
           ))}
         </FileManagerContext.Provider>
+        {!!finalFieldName && uploading && (
+          <Field
+            name={`_${finalFieldName}_uploading`}
+            validate={() => Translate.string('Upload in progress')}
+            render={() => null}
+          />
+        )}
       </div>
     </div>
   );
@@ -160,8 +170,37 @@ FileManager.propTypes = {
   fileTypes: PropTypes.arrayOf(PropTypes.shape(fileTypePropTypes)).isRequired,
   files: PropTypes.arrayOf(PropTypes.shape(filePropTypes)),
   onChange: PropTypes.func.isRequired,
+  finalFieldName: PropTypes.string,
 };
 
 FileManager.defaultProps = {
   files: [],
+  finalFieldName: null,
+};
+
+export function FinalFileManager({name, uploadURL, fileTypes, ...rest}) {
+  // We do not use FinalField here since the file manager is more "standalone"
+  // and thus not wrapped in the usual SUI field markup.
+
+  // TODO:
+  // - validation based on fileTypes requirements
+  // - accept incoming `value` and fetch file metadata
+  return (
+    <Field name={name} isEqual={_.isEqual} format={v => v} parse={v => v} {...rest}>
+      {({input}) => (
+        <FileManager
+          onChange={input.onChange}
+          uploadURL={uploadURL}
+          fileTypes={fileTypes}
+          finalFieldName={input.name}
+        />
+      )}
+    </Field>
+  );
+}
+
+FinalFileManager.propTypes = {
+  name: PropTypes.string.isRequired,
+  uploadURL: PropTypes.string.isRequired,
+  fileTypes: PropTypes.arrayOf(PropTypes.shape(fileTypePropTypes)).isRequired,
 };
