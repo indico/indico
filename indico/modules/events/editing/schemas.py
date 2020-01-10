@@ -40,6 +40,12 @@ class EditingFileTypeSchema(mm.ModelSchema):
         model = EditingFileType
         fields = ('id', 'name', 'extensions', 'allow_multiple_files', 'required', 'publishable')
 
+    @post_dump(pass_many=True)
+    def sort_list(self, data, many, **kwargs):
+        if many:
+            data = sorted(data, key=lambda ft: natural_sort_key(ft['name']))
+        return data
+
 
 class EditingTagSchema(mm.ModelSchema):
     class Meta:
