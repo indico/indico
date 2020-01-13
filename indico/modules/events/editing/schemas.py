@@ -38,7 +38,9 @@ class RevisionState(mm.Schema):
 class EditingFileTypeSchema(mm.ModelSchema):
     class Meta:
         model = EditingFileType
-        fields = ('id', 'name', 'extensions', 'allow_multiple_files', 'required', 'publishable')
+        fields = ('id', 'name', 'extensions', 'allow_multiple_files', 'required', 'publishable', 'is_used')
+
+    is_used = fields.Function(lambda file_type: EditingRevisionFile.query.with_parent(file_type).has_rows())
 
     @post_dump(pass_many=True)
     def sort_list(self, data, many, **kwargs):

@@ -11,12 +11,15 @@ from flask import request
 
 from indico.modules.events.editing.controllers.base import RHEditingManagementBase
 from indico.modules.events.editing.models.file_types import EditingFileType
+from indico.modules.events.editing.models.revision_files import EditingRevisionFile
 from indico.modules.events.editing.models.tags import EditingTag
 from indico.modules.events.editing.operations import (create_new_file_type, create_new_tag, delete_file_type,
                                                       delete_tag, update_file_type, update_tag)
 from indico.modules.events.editing.schemas import (EditableFileTypeArgs, EditableTagArgs, EditingFileTypeSchema,
                                                    EditingTagSchema)
+from indico.util.i18n import _
 from indico.web.args import use_rh_args
+from indico.web.util import ExpectedError
 
 
 class RHCreateTag(RHEditingManagementBase):
@@ -73,5 +76,7 @@ class RHEditFileType(RHEditingManagementBase):
         return EditingFileTypeSchema().jsonify(self.file_type)
 
     def _process_DELETE(self):
+        if EditingRevisionFile.query.with_parent(self.file_type).has_rows():
+            raise ExpectedError(_('Cannot delete file type which already has files'))
         delete_file_type(self.file_type)
         return '', 204
