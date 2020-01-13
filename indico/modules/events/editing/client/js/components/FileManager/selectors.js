@@ -6,6 +6,8 @@
 // LICENSE file for more details.
 
 import _ from 'lodash';
+import {createSelector} from 'reselect';
+import {PluralTranslate} from 'indico/react/i18n';
 
 export const getFiles = state => {
   return _.fromPairs(
@@ -21,3 +23,22 @@ export const getFiles = state => {
 export const isUploading = state => {
   return Object.values(state.uploads).some(uploads => Object.values(uploads).some(x => !x.failed));
 };
+
+export const getValidationError = createSelector(
+  state => state.fileTypes,
+  fileTypes => {
+    const missing = fileTypes
+      .filter(ft => ft.required)
+      .filter(ft => !ft.files.some(f => f.state !== 'deleted'))
+      .map(ft => ft.name);
+    if (!missing.length) {
+      return null;
+    }
+    return PluralTranslate.string(
+      'Required file type missing: {types}',
+      'Required file types missing: {types}',
+      missing.length,
+      {types: missing.sort().join(', ')}
+    );
+  }
+);

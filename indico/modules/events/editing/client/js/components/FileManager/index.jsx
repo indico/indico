@@ -25,7 +25,7 @@ import FileList from './FileList';
 import Uploads from './Uploads';
 import reducer from './reducer';
 import * as actions from './actions';
-import {getFiles, isUploading} from './selectors';
+import {getFiles, getValidationError, isUploading} from './selectors';
 
 import './FileManager.module.scss';
 
@@ -139,6 +139,7 @@ export default function FileManager({onChange, uploadURL, fileTypes, files, fina
   }, [onChange, state]);
 
   const uploading = isUploading(state);
+  const validationError = getValidationError(state);
 
   return (
     <div styleName="file-manager-wrapper">
@@ -157,6 +158,13 @@ export default function FileManager({onChange, uploadURL, fileTypes, files, fina
           <Field
             name={`_${finalFieldName}_uploading`}
             validate={() => Translate.string('Upload in progress')}
+            render={() => null}
+          />
+        )}
+        {!!finalFieldName && validationError && (
+          <Field
+            name={`_${finalFieldName}_invalid`}
+            validate={() => validationError}
             render={() => null}
           />
         )}
@@ -183,7 +191,6 @@ export function FinalFileManager({name, uploadURL, fileTypes, ...rest}) {
   // and thus not wrapped in the usual SUI field markup.
 
   // TODO:
-  // - validation based on fileTypes requirements
   // - accept incoming `value` and fetch file metadata
   return (
     <Field name={name} isEqual={_.isEqual} format={v => v} parse={v => v} {...rest}>
