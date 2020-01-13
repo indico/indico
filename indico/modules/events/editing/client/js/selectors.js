@@ -96,7 +96,7 @@ export function processRevisions(revisions) {
       items.push(
         createNewCustomItemFromRevision(revision, {
           user: revisions[0].submitter,
-          state: 'rejected',
+          state: 'needs_submitter_changes',
           html: revision.commentHtml,
           header,
         })
