@@ -12,6 +12,8 @@ Bugfixes
 
 - Fix some email fields (error report contact, agreement cc address) being
   required even though they should be optional
+- Avoid browsers prefilling stored passwords in togglable password fields
+  such as the event access key
 
 Version 2.2.5
 -------------
