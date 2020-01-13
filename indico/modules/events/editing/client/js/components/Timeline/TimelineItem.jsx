@@ -20,6 +20,9 @@ import ReviewForm from './ReviewForm';
 import {blockPropTypes} from './util';
 import * as selectors from '../../selectors';
 import FileDisplay from '../FileDisplay';
+import StateIndicator from './StateIndicator';
+
+import './TimelineItem.module.scss';
 
 export default function TimelineItem({block}) {
   const {submitter, createdDt} = block;
@@ -58,13 +61,20 @@ export default function TimelineItem({block}) {
                 </time>
               </div>
               {!isLastBlock && (
-                <a className="block-info-link i-link" onClick={() => setVisible(!visible)}>
-                  {visible ? (
-                    <Translate>Hide old revision</Translate>
-                  ) : (
-                    <Translate>Show old revision</Translate>
+                <>
+                  <a className="block-info-link i-link" onClick={() => setVisible(!visible)}>
+                    {visible ? (
+                      <Translate>Hide old revision</Translate>
+                    ) : (
+                      <Translate>Show old revision</Translate>
+                    )}
+                  </a>
+                  {!visible && block.finalState && (
+                    <div styleName="state-indicator">
+                      <StateIndicator state={block.finalState.name} circular />
+                    </div>
                   )}
-                </a>
+                </>
               )}
             </div>
             {visible && (

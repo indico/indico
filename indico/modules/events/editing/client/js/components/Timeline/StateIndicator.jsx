@@ -15,11 +15,12 @@ const colors = {
   rejected: 'red',
   accepted: 'green',
   assigned: 'purple',
+  needs_submitter_changes: 'orange',
 };
 
 export default function StateIndicator({text, circular, tooltip, state}) {
   const trigger = (
-    <Label size="small" color={colors[state]} circular={circular}>
+    <Label size="tiny" color={colors[state]} circular={circular}>
       {text}
     </Label>
   );
