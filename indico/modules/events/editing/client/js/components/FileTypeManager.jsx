@@ -102,7 +102,33 @@ export default function FileTypeManager({eventId}) {
         <Segment key={fileType.id} styleName="filetype-segment">
           <div styleName="filetype">
             <div>
-              <h3>{fileType.name}</h3>
+              <h3>
+                <span styleName="name">{fileType.name}</span>
+                {fileType.required && (
+                  <Icon
+                    size="small"
+                    color="grey"
+                    name="asterisk"
+                    title={Translate.string('File required')}
+                  />
+                )}
+                {fileType.allowMultipleFiles && (
+                  <Icon
+                    size="small"
+                    color="grey"
+                    name="copy outline"
+                    title={Translate.string('Multiple files allowed')}
+                  />
+                )}
+                {fileType.publishable && (
+                  <Icon
+                    size="small"
+                    color="grey"
+                    name="eye"
+                    title={Translate.string('File publishable')}
+                  />
+                )}
+              </h3>
               <ul styleName="file-extensions">
                 {fileType.extensions.length !== 0
                   ? fileType.extensions.map(ext => <li key={ext}>{ext}</li>)
