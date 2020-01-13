@@ -11,7 +11,7 @@ import editFileTypeURL from 'indico-url:event_editing.api_edit_file_type';
 
 import React, {useReducer} from 'react';
 import PropTypes from 'prop-types';
-import {Button, Icon, Loader, Message, Segment} from 'semantic-ui-react';
+import {Button, Icon, Loader, Message, Segment, Popup} from 'semantic-ui-react';
 import {Param, Translate} from 'indico/react/i18n';
 import {getChangedValues, handleSubmitError} from 'indico/react/forms';
 import {useIndicoAxios} from 'indico/react/hooks';
@@ -115,10 +115,22 @@ export default function FileTypeManager({eventId}) {
                 name="pencil"
                 onClick={() => dispatch({type: 'EDIT_FILE_TYPE', fileType})}
               />
-              <Icon
-                color="red"
-                name="trash"
-                onClick={() => dispatch({type: 'DELETE_FILE_TYPE', fileType})}
+              <Popup
+                on="hover"
+                disabled={!fileType.isUsed}
+                position="right center"
+                content={Translate.string('This type has files attached')}
+                trigger={
+                  <Icon
+                    styleName={fileType.isUsed ? 'disabled' : ''}
+                    color="red"
+                    name="trash"
+                    disabled={fileType.isUsed}
+                    onClick={() =>
+                      !fileType.isUsed && dispatch({type: 'DELETE_FILE_TYPE', fileType})
+                    }
+                  />
+                }
               />
             </div>
           </div>
