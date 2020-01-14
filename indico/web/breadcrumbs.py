@@ -32,7 +32,8 @@ def render_breadcrumbs(*titles, **kwargs):
     management = kwargs.get('management', False)
     assert bool(titles) + bool(event) + bool(category) == 1
     if not category and not event:
-        items = [(_('Home'), url_for_index())] + [(x, None) for x in titles]
+        items = [(_('Home'), url_for_index())]
+        items += [(x, None) if isinstance(x, basestring) else x for x in titles]
     else:
         items = []
         if event:
