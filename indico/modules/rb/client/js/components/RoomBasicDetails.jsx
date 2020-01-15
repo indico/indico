@@ -123,6 +123,7 @@ export default class RoomBasicDetails extends React.PureComponent {
       latitude,
       longitude,
       division,
+      mapURL,
       locationName: location,
       surfaceArea: surface,
       capacity,
@@ -189,7 +190,9 @@ export default class RoomBasicDetails extends React.PureComponent {
                     name="location arrow"
                     text={Translate.string('Geographical Coordinates')}
                   />
-                  {formatLatLon(latitude, longitude)}
+                  <a target="_blank" rel="noopener noreferrer" href={mapURL}>
+                    {formatLatLon(latitude, longitude)}
+                  </a>
                 </>
               )}
             </li>
