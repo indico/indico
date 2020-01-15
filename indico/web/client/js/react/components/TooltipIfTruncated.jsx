@@ -11,15 +11,21 @@ import PropTypes from 'prop-types';
 export default class TooltipIfTruncated extends React.Component {
   static propTypes = {
     children: PropTypes.any.isRequired,
+    tooltip: PropTypes.string,
+  };
+
+  static defaultProps = {
+    tooltip: null,
   };
 
   mouseEnter(event) {
+    const {tooltip} = this.props;
     const element = event.target;
     const overflows =
       element.offsetWidth < element.scrollWidth || element.offsetHeight < element.scrollHeight;
 
     if (overflows && !element.getAttribute('title')) {
-      element.setAttribute('title', element.innerText);
+      element.setAttribute('title', tooltip || element.innerText);
     }
   }
 

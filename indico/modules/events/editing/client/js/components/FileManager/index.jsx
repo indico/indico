@@ -10,6 +10,7 @@ import React, {useCallback, useReducer, useContext, useRef, useMemo, useEffect} 
 import PropTypes from 'prop-types';
 import {useDropzone} from 'react-dropzone';
 import {Icon} from 'semantic-ui-react';
+import {TooltipIfTruncated} from 'indico/react/components';
 import {Translate} from 'indico/react/i18n';
 import {
   FileManagerContext,
@@ -92,11 +93,13 @@ function FileType({uploadURL, fileType, uploads}) {
   return (
     <div styleName="file-type">
       <h3>{fileType.name}</h3>
-      <ul styleName="file-extensions">
-        {fileType.extensions.length !== 0
-          ? fileType.extensions.map(ext => <li key={ext}>{ext}</li>)
-          : Translate.string('(no extension restrictions)')}
-      </ul>
+      <TooltipIfTruncated tooltip={fileType.extensions.join(', ')}>
+        <ul styleName="file-extensions">
+          {fileType.extensions.length !== 0
+            ? fileType.extensions.map(ext => <li key={ext}>{ext}</li>)
+            : Translate.string('(no extension restrictions)')}
+        </ul>
+      </TooltipIfTruncated>
       <FileList files={fileType.files} fileType={fileType} uploadURL={uploadURL} />
       {!_.isEmpty(uploads) && <Uploads uploads={uploads} />}
       <Dropzone dropzoneRef={ref} fileType={fileType} uploadURL={uploadURL} />
