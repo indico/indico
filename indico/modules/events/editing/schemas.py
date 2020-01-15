@@ -7,6 +7,8 @@
 
 from __future__ import unicode_literals
 
+import re
+
 from markupsafe import escape
 from marshmallow import ValidationError, fields, post_dump, validate, validates, validates_schema
 from marshmallow_enum import EnumField
@@ -191,3 +193,9 @@ class EditableFileTypeArgs(mm.Schema):
             query = query.filter(EditingFileType.id != file_type.id)
         if query.has_rows():
             raise ValidationError(_('Name must be unique'))
+
+    @validates('extensions')
+    def _check_for_correct_extensions_format(self, extensions):
+        for extension in extensions:
+            if re.match(r'^[*.]+', extension):
+                raise ValidationError(_('Extensions cannot have leading dots'))
