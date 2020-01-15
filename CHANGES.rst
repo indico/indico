@@ -14,6 +14,8 @@ Bugfixes
   required even though they should be optional
 - Avoid browsers prefilling stored passwords in togglable password fields
   such as the event access key
+- Make sure that tickets are not attached to emails sent to registrants for whom
+  tickets are blocked (:issue:`4242`)
 
 Version 2.2.5
 -------------
