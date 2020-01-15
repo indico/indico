@@ -5,6 +5,7 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
+import _ from 'lodash';
 import React from 'react';
 import PropTypes from 'prop-types';
 import {Dropdown} from 'semantic-ui-react';
@@ -12,7 +13,7 @@ import {Translate} from 'indico/react/i18n';
 
 export default function ExtensionList({value, disabled, onChange, onFocus, onBlur}) {
   const handleChange = (e, {value: newValue}) => {
-    onChange(newValue);
+    onChange(_.uniq(newValue.map(x => x.trim().replace(/^[*.]+/, ''))));
     onFocus();
     onBlur();
   };
