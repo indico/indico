@@ -35,16 +35,38 @@
 
     .file-type {
         overflow: hidden;
-
-        &:not(:nth-child(3n)) {
-            margin-right: 0.9em;
-        }
-
         margin-bottom: 1em;
         border: 1px solid $gray;
         border-radius: 3px;
         padding: 1em;
         flex: 0 0 32%;
+
+        &:not(:nth-child(3n)) {
+            margin-right: 0.9em;
+        }
+
+        .file-extensions {
+            font-style: italic;
+            color: $gray;
+            list-style-type: none;
+            margin: 0.2em 0;
+            padding: 0;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+
+            li {
+                display: inline;
+
+                &:not(:last-child)::after {
+                    content: ', ';
+                }
+            }
+        }
+    }
+
+    .file-type h3 {
+        margin-bottom: 0;
     }
 }
 
