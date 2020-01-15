@@ -200,6 +200,7 @@ export function FinalFileManager({name, uploadURL, fileTypes, ...rest}) {
           uploadURL={uploadURL}
           fileTypes={fileTypes}
           finalFieldName={input.name}
+          files={rest.files}
         />
       )}
     </Field>
