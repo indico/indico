@@ -1,10 +1,38 @@
 {% from 'forms/_form.html' import form_header, form_rows, form_footer  %}
+{% from 'message_box.html' import message_box %}
 
 {{ form_header(form) }}
 {{ form_rows(form) }}
+
+{% if registrations_without_ticket_count %}
+    <div class="attach-ticket-warning" style="display: none;">
+        {% call message_box('warning') -%}
+            {% trans count=registrations_without_ticket_count, total=all_registrations_count -%}
+                Tickets are currently not available for the selected registration.
+            {%- pluralize total -%}
+                Tickets are currently not available for {{ count }} out of the {{ total }} selected registrations.
+            {%- endtrans %}
+        {%- endcall %}
+    </div>
+{% endif %}
+
 {% call form_footer(form) %}
     <input type="submit" class="i-button highlight big" value="{% trans %}Send{% endtrans %}">
     <input id="preview-email" class="i-button big" type="button" value="{%- trans %}Preview email{% endtrans -%}"
            data-href="{{ url_for('.email_registrants_preview', regform) }}">
     <a class="i-button big" data-button-back>{% trans %}Cancel{% endtrans %}</a>
 {% endcall %}
+
+{% if form.attach_ticket is not none and registrations_without_ticket_count %}
+    <script>
+        (function() {
+            'use strict';
+
+            const warningMessage = $('.attach-ticket-warning');
+
+            $('#{{ form.attach_ticket.id }}').on('change', (e) => {
+                warningMessage.toggle(e.target.checked);
+            });
+        })();
+    </script>
+{% endif %}
