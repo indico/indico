@@ -8,7 +8,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import {Form as FinalForm} from 'react-final-form';
-import {Button, Form, Header, Modal} from 'semantic-ui-react';
+import {Button, Form, Header, Icon, Modal, Message} from 'semantic-ui-react';
 import {
   FinalCheckbox,
   FinalField,
@@ -44,6 +44,16 @@ export default function FileTypeModal({onClose, onSubmit, initialValues, header}
         >
           <Modal.Header content={header} />
           <Modal.Content>
+            {initialValues.isUsed && (
+              <Message warning>
+                <Message.Content>
+                  <Icon name="warning" size="large" />
+                  <Translate>
+                    Take into account that this file type has files attached to it.
+                  </Translate>
+                </Message.Content>
+              </Message>
+            )}
             <Form id="file-type-form" onSubmit={fprops.handleSubmit}>
               <FinalInput name="name" label={Translate.string('Name')} required />
               <FinalField
@@ -103,6 +113,7 @@ FileTypeModal.defaultProps = {
     required: false,
     allowMultipleFiles: false,
     publishable: false,
+    isUsed: false,
   },
   onClose: null,
 };
