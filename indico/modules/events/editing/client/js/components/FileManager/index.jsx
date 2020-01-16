@@ -25,7 +25,7 @@ import FileList from './FileList';
 import Uploads from './Uploads';
 import reducer from './reducer';
 import * as actions from './actions';
-import {getFiles, getValidationError, isUploading} from './selectors';
+import {getFiles, getUploadedFileUUIDs, getValidationError, isUploading} from './selectors';
 
 import './FileManager.module.scss';
 
@@ -123,13 +123,37 @@ FileType.defaultProps = {
   uploads: {},
 };
 
-export default function FileManager({onChange, uploadURL, fileTypes, files, finalFieldName}) {
+export default function FileManager({
+  onChange,
+  uploadURL,
+  fileTypes,
+  files,
+  finalFieldName,
+  pristine,
+}) {
+  const lastPristineRef = useRef(pristine);
   const _fileTypes = useMemo(() => mapFileTypes(fileTypes, files), [fileTypes, files]);
   const [state, dispatch] = useReducer(reducer, {
     fileTypes: _fileTypes,
     uploads: {},
     isDirty: false,
   });
+
+  useEffect(() => {
+    // when the pristine flag changes from false to true, it indicates that the form has
+    // been reset (or that the user undid their change, but this is not a problem here).
+    // in this case we delete all uploaded files and revert to the initial state, which is
+    // based on the value coming from the outside.
+    //
+    // while this is quite ugly, making the FileManager a fully controlled component is even
+    // messier, since we'd need to fetch extra file metadata from the server and keep the
+    // external state (value) in sync with the local state, which is not trivial at all.
+    if (pristine && !lastPristineRef.current) {
+      getUploadedFileUUIDs(state).forEach(uuid => deleteFile(uuid));
+      dispatch(actions.reset(_fileTypes));
+    }
+    lastPristineRef.current = pristine;
+  }, [pristine, _fileTypes, state]);
 
   useEffect(() => {
     if (state.isDirty) {
@@ -179,28 +203,28 @@ FileManager.propTypes = {
   files: PropTypes.arrayOf(PropTypes.shape(filePropTypes)),
   onChange: PropTypes.func.isRequired,
   finalFieldName: PropTypes.string,
+  pristine: PropTypes.bool,
 };
 
 FileManager.defaultProps = {
   files: [],
   finalFieldName: null,
+  pristine: null,
 };
 
 export function FinalFileManager({name, uploadURL, fileTypes, ...rest}) {
   // We do not use FinalField here since the file manager is more "standalone"
   // and thus not wrapped in the usual SUI field markup.
-
-  // TODO:
-  // - accept incoming `value` and fetch file metadata
   return (
     <Field name={name} isEqual={_.isEqual} format={v => v} parse={v => v} {...rest}>
-      {({input}) => (
+      {({input, meta: {pristine}}) => (
         <FileManager
           onChange={input.onChange}
           uploadURL={uploadURL}
           fileTypes={fileTypes}
           finalFieldName={input.name}
           files={rest.files}
+          pristine={pristine}
         />
       )}
     </Field>

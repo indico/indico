@@ -12,6 +12,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import {indicoAxios, handleAxiosError} from 'indico/utils/axios';
 import * as actions from './actions';
+import {getFiles} from './selectors';
 
 export const FileManagerContext = React.createContext(null);
 
@@ -112,4 +113,8 @@ export function mapFileTypes(fileTypes, files) {
     ...fileType,
     files: files.filter(file => file.fileType === fileType.id).map(f => ({...f, claimed: true})),
   }));
+}
+
+export function getFilesFromRevision(fileTypes, revision) {
+  return getFiles({fileTypes: mapFileTypes(fileTypes, revision.files)});
 }

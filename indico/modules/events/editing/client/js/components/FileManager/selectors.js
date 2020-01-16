@@ -24,6 +24,14 @@ export const isUploading = state => {
   return Object.values(state.uploads).some(uploads => Object.values(uploads).some(x => !x.failed));
 };
 
+export const getUploadedFileUUIDs = state => {
+  return state.fileTypes.reduce(
+    (acc, {files}) =>
+      acc.concat(files.filter(f => ['added', 'modified'].includes(f.state)).map(f => f.uuid)),
+    []
+  );
+};
+
 export const getValidationError = createSelector(
   state => state.fileTypes,
   fileTypes => {

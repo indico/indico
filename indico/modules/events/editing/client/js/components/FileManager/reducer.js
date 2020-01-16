@@ -66,6 +66,9 @@ function fileListReducer(state, action, allowMultipleFiles) {
 
 export default combineReducers({
   fileTypes: (state = [], action) => {
+    if (action.type === actions.RESET) {
+      return action.fileTypes;
+    }
     return state.map(fileType => {
       if (fileType.id === action.fileTypeId) {
         return {
@@ -79,6 +82,9 @@ export default combineReducers({
   },
   uploads: (state = {}, action) => {
     switch (action.type) {
+      case actions.RESET:
+        return {};
+
       case actions.PROGRESS: {
         const fileType = state[action.fileTypeId];
         const tmpFile = fileType[action.tmpFileId];
@@ -131,6 +137,7 @@ export default combineReducers({
       case actions.MARK_DELETED:
       case actions.UNDELETE:
       case actions.REVERT:
+      case actions.RESET:
         return true;
 
       case actions.CLEAR_DIRTY:

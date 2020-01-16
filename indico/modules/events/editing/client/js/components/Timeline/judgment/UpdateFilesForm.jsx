@@ -20,8 +20,7 @@ import {reviewEditable} from '../../../actions';
 import * as selectors from '../../../selectors';
 import {EditingReviewAction} from '../../../models';
 import {FinalFileManager} from '../../FileManager';
-import {getFiles} from '../../FileManager/selectors';
-import {mapFileTypes} from '../../FileManager/util';
+import {getFilesFromRevision} from '../../FileManager/util';
 import FinalTagInput from './TagInput';
 
 import './JudgmentBox.module.scss';
@@ -32,8 +31,7 @@ export default function UpdateFilesForm({setLoading}) {
   const staticData = useSelector(selectors.getStaticData);
   const {eventId, contributionId, editableType} = staticData;
   const dispatch = useDispatch();
-
-  const files = getFiles({fileTypes: mapFileTypes(fileTypes, lastRevision.files)});
+  const files = getFilesFromRevision(fileTypes, lastRevision);
 
   const submitReview = async formData => {
     setLoading(true);
@@ -51,7 +49,7 @@ export default function UpdateFilesForm({setLoading}) {
 
   return (
     <FinalForm
-      initialValues={{comment: '', files, tags: lastRevision.tags}}
+      initialValues={{comment: '', tags: lastRevision.tags, files}}
       subscription={{}}
       onSubmit={submitReview}
     >
