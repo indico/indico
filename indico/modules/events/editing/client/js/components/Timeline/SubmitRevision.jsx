@@ -18,15 +18,14 @@ import UserAvatar from 'indico/modules/events/reviewing/components/UserAvatar';
 import {FinalFileManager} from '../FileManager';
 import * as selectors from '../../selectors';
 import {createRevision} from '../../actions';
-import {mapFileTypes} from '../FileManager/util';
-import {getFiles} from '../FileManager/selectors';
+import {getFilesFromRevision} from '../FileManager/util';
 
 export default function SubmitRevision() {
   const {eventId, contributionId, fileTypes, editableType} = useSelector(selectors.getStaticData);
   const lastRevision = useSelector(selectors.getLastRevision);
   const dispatch = useDispatch();
   const currentUser = {fullName: Indico.User.full_name, avatarBgColor: Indico.User.avatar_bg_color};
-  const files = getFiles({fileTypes: mapFileTypes(fileTypes, lastRevision.files)});
+  const files = getFilesFromRevision(fileTypes, lastRevision);
 
   const submitRevision = async formData => {
     const rv = await dispatch(

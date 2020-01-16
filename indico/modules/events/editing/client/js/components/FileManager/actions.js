@@ -14,6 +14,7 @@ export const PROGRESS = 'PROGRESS';
 export const START_UPLOADS = 'START_UPLOADS';
 export const CLEAR_DIRTY = 'CLEAR_DIRTY';
 export const UPLOAD_ERROR = 'UPLOAD_ERROR';
+export const RESET = 'RESET';
 
 export const startUploads = (fileTypeId, files, tmpFileIds) => ({
   type: START_UPLOADS,
@@ -71,4 +72,9 @@ export const error = (fileTypeId, tmpFileId) => ({
   type: UPLOAD_ERROR,
   fileTypeId,
   tmpFileId,
+});
+
+export const reset = fileTypes => ({
+  type: RESET,
+  fileTypes,
 });
