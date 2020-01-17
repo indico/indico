@@ -29,6 +29,7 @@ function createNewCustomItemFromRevision(revision, updates) {
     createdDt: revision.createdDt,
     user: revision.submitter,
     custom: true,
+    revisionId: revision.id,
     ...updates,
   };
 }
@@ -155,6 +156,10 @@ export const getLastState = createSelector(
       ? lastRevision.initialState
       : lastRevision.finalState)
 );
+export const hasLastState = createSelector(
+  getLastRevision,
+  lastRevision => lastRevision && lastRevision.finalState.name !== FinalRevisionState.none
+);
 export const needsSubmitterChanges = createSelector(
   getLastRevision,
   lastRevision =>
@@ -167,3 +172,30 @@ export const needsSubmitterConfirmation = createSelector(
     lastRevision.finalState.name === FinalRevisionState.none
 );
 export const getStaticData = state => state.staticData;
+
+export const getLastRevertableRevisionId = createSelector(
+  getDetails,
+  details => {
+    if (!details || !details.revisions.length) {
+      return null;
+    }
+    const latestRevision = details.revisions[details.revisions.length - 1];
+    const lastFinalRev = details.revisions
+      .reverse()
+      .find(r => r.finalState.name !== FinalRevisionState.none);
+
+    if (!lastFinalRev) {
+      return null;
+    }
+    if (lastFinalRev.id !== latestRevision.id) {
+      if (
+        lastFinalRev.finalState.name !== FinalRevisionState.needs_submitter_confirmation ||
+        latestRevision.finalState.name !== FinalRevisionState.none ||
+        latestRevision.initialState.name !== InitialRevisionState.needs_submitter_confirmation
+      ) {
+        return null;
+      }
+    }
+    return lastFinalRev.id;
+  }
+);

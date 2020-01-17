@@ -47,3 +47,7 @@ export function deleteRevisionComment(url) {
 export function createRevision(url, files) {
   return ajaxAction(() => indicoAxios.post(url, files), null, () => loadTimeline());
 }
+
+export function resetReviews(url) {
+  return ajaxAction(() => indicoAxios.delete(url), null, () => loadTimeline());
+}
