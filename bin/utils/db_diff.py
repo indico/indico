@@ -143,8 +143,13 @@ def main(dbname, verbose, reverse):
         base_conn = base_eng.connect()
         target_conn = target_eng.connect()
 
+        version = base_conn.execute("SELECT current_setting('server_version_num')::int").scalar()
+        if version < 100000:
+            click.echo(click.style('!! This utility requires at least Postgres 10', fg='red', bold=True), err=True)
+            sys.exit(1)
+
         if verbose:
-            click.echo(click.style('** Calculating differences', fg='magenta', bold=True), err=True)
+            click.echo(click.style('** Calculating differences', fg='cyan'), err=True)
         # use migra to figure out the SQL diff
         m = Migration(base_conn, target_conn) if reverse else Migration(target_conn, base_conn)
         m.set_safety(False)
