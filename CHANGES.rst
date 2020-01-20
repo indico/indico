@@ -33,6 +33,7 @@ Improvements
 - Add link to external map in room details view (:issue:`4146`)
 - Allow up to 9 digits (instead of 6) before the decimal point in
   registration fees
+- Add button to booking details modal to copy direct link (:issue:`4230`)
 
 Bugfixes
 ^^^^^^^^

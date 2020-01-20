@@ -32,6 +32,7 @@ import {toMoment, serializeDate} from 'indico/utils/date';
 import {Param, Translate} from 'indico/react/i18n';
 import {FinalTextArea} from 'indico/react/forms';
 import {Responsive} from 'indico/react/util';
+import {ClipboardButton} from 'indico/react/components';
 import {DailyTimelineContent, TimelineLegend} from '../timeline';
 import {
   getRecurrenceInfo,
@@ -505,6 +506,7 @@ class BookingDetails extends React.Component {
         newBookingId,
         isLinkedToObject,
         link,
+        externalDetailsURL,
       },
     } = this.props;
     const dates = {startDate: startDt, endDate: endDt};
@@ -526,6 +528,10 @@ class BookingDetails extends React.Component {
               <Translate>Booking Details</Translate>
             </span>
             <span styleName="booking-status">{this.renderBookingStatus()}</span>
+            <ClipboardButton
+              text={externalDetailsURL}
+              successText={Translate.string('Booking link copied')}
+            />
             <span>
               <Responsive.Tablet andLarger>
                 {canEdit && editButton({disabled: bookingStateChangeInProgress})}
