@@ -36,6 +36,8 @@ Improvements
 - Add button to booking details modal to copy direct link (:issue:`4230`)
 - Do not require new room manager approval when simply shortening a booking
   (:issue:`4214`)
+- Make root category description/title customizable using the normal
+  category settings form (:issue:`4231`)
 
 Bugfixes
 ^^^^^^^^

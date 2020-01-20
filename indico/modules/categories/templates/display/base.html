@@ -7,10 +7,12 @@
         {% endif %}
         <h1 class="category-title {{ category_title_classes }}">
             {% block title %}
-                {% if category.is_root and category.children %}
-                    {% trans %}Main categories{% endtrans %}
-                {% elif category.is_root %}
-                    {% trans %}All events{% endtrans %}
+                {% if category.title == 'Home' and category.is_root %}
+                    {% if category.children %}
+                        {% trans %}Main categories{% endtrans %}
+                    {% else %}
+                        {% trans %}All events{% endtrans %}
+                    {% endif %}
                 {% else %}
                     {{ category.title }}
                 {% endif %}
