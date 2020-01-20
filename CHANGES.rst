@@ -31,6 +31,8 @@ Improvements
 - Show more verbose error when email validation fails during event
   registration (:issue:`4177`)
 - Add link to external map in room details view (:issue:`4146`)
+- Allow up to 9 digits (instead of 6) before the decimal point in
+  registration fees
 
 Bugfixes
 ^^^^^^^^

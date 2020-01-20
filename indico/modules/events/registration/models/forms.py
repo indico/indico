@@ -151,7 +151,7 @@ class RegistrationForm(db.Model):
     )
     #: The base fee users have to pay when registering
     base_price = db.Column(
-        db.Numeric(8, 2),  # max. 999999.99
+        db.Numeric(11, 2),  # max. 999999999.99
         nullable=False,
         default=0
     )
