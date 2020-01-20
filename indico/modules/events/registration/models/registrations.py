@@ -123,13 +123,13 @@ class Registration(db.Model):
     )
     #: The base registration fee (that is not specific to form items)
     base_price = db.Column(
-        db.Numeric(8, 2),  # max. 999999.99
+        db.Numeric(11, 2),  # max. 999999999.99
         nullable=False,
         default=0
     )
     #: The price modifier applied to the final calculated price
     price_adjustment = db.Column(
-        db.Numeric(8, 2),  # max. 999999.99
+        db.Numeric(11, 2),  # max. 999999999.99
         nullable=False,
         default=0
     )

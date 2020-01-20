@@ -155,7 +155,7 @@ class PaymentTransaction(db.Model):
     )
     #: the base amount the user needs to pay (without payment-specific fees)
     amount = db.Column(
-        db.Numeric(8, 2),  # max. 999999.99
+        db.Numeric(11, 2),  # max. 999999999.99
         nullable=False
     )
     #: the currency of the payment (ISO string, e.g. EUR or USD)
