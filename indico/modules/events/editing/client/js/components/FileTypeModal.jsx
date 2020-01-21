@@ -68,7 +68,7 @@ export default function FileTypeModal({onClose, onSubmit, fileType, header}) {
                 name="filename_template"
                 label={Translate.string('Filename template')}
                 description={Translate.string(
-                  'Filename template that all files of this type have to conform to (e.g. *_paper). No dots allowed.'
+                  'Glob-style filename template that all files of this type have to conform to (e.g. *_paper). No dots allowed.'
                 )}
                 pattern="^[^.]*$"
                 nullIfEmpty

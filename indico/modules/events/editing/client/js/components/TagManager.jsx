@@ -143,7 +143,7 @@ export default function TagManager({eventId}) {
               return await createTag(formData);
             }
           }}
-          initialValues={currentTag}
+          tag={currentTag}
           onClose={() => dispatch({type: 'CLEAR'})}
         />
       )}
