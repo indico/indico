@@ -16,7 +16,6 @@ import {Param, Translate} from 'indico/react/i18n';
 import {getChangedValues, handleSubmitError} from 'indico/react/forms';
 import {useIndicoAxios} from 'indico/react/hooks';
 import {handleAxiosError, indicoAxios} from 'indico/utils/axios';
-import {snakifyKeys} from 'indico/utils/case';
 import FileTypeModal from './FileTypeModal';
 import RequestConfirm from './RequestConfirm';
 
@@ -53,7 +52,7 @@ export default function FileTypeManager({eventId}) {
 
   const createFileType = async formData => {
     try {
-      await indicoAxios.post(createFileTypeURL({confId: eventId}), snakifyKeys(formData));
+      await indicoAxios.post(createFileTypeURL({confId: eventId}), formData);
       reFetch();
     } catch (e) {
       return handleSubmitError(e);
@@ -64,7 +63,7 @@ export default function FileTypeManager({eventId}) {
     const url = editFileTypeURL({confId: eventId, file_type_id: fileTypeId});
 
     try {
-      await indicoAxios.patch(url, snakifyKeys(fileTypeData));
+      await indicoAxios.patch(url, fileTypeData);
       reFetch();
     } catch (e) {
       return handleSubmitError(e);
@@ -180,7 +179,7 @@ export default function FileTypeManager({eventId}) {
               return await createFileType(formData);
             }
           }}
-          initialValues={currentFileType ? currentFileType : undefined}
+          fileType={currentFileType ? currentFileType : undefined}
           onClose={() => dispatch({type: 'CLEAR'})}
         />
       )}

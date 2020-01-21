@@ -15,6 +15,7 @@ export const START_UPLOADS = 'START_UPLOADS';
 export const CLEAR_DIRTY = 'CLEAR_DIRTY';
 export const UPLOAD_ERROR = 'UPLOAD_ERROR';
 export const RESET = 'RESET';
+export const INVALID_TEMPLATE = 'INVALID_TEMPLATE';
 
 export const startUploads = (fileTypeId, files, tmpFileIds) => ({
   type: START_UPLOADS,
@@ -77,4 +78,10 @@ export const error = (fileTypeId, tmpFileId) => ({
 export const reset = fileTypes => ({
   type: RESET,
   fileTypes,
+});
+
+export const invalidTemplate = (fileTypeId, filename) => ({
+  type: INVALID_TEMPLATE,
+  fileTypeId,
+  filename,
 });

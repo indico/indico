@@ -64,6 +64,15 @@ function fileListReducer(state, action, allowMultipleFiles) {
   }
 }
 
+function invalidFilesReducer(state, action) {
+  switch (action.type) {
+    case actions.INVALID_TEMPLATE:
+      return [...state, action.filename];
+    default:
+      return state;
+  }
+}
+
 export default combineReducers({
   fileTypes: (state = [], action) => {
     if (action.type === actions.RESET) {
@@ -74,6 +83,7 @@ export default combineReducers({
         return {
           ...fileType,
           files: fileListReducer(fileType.files, action, fileType.allowMultipleFiles),
+          invalidFiles: invalidFilesReducer(fileType.invalidFiles, action),
         };
       } else {
         return fileType;

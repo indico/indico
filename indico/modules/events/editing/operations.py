@@ -24,6 +24,9 @@ from indico.util.date_time import now_utc
 from indico.util.i18n import _
 
 
+FILE_TYPE_ATTRS = ('name', 'extensions', 'allow_multiple_files', 'required', 'publishable', 'filename_template')
+
+
 class InvalidEditableState(BadRequest):
     """
     An error indicating that an operation on an Editable failed because its
@@ -234,14 +237,14 @@ def delete_tag(tag):
 
 def create_new_file_type(event, **data):
     file_type = EditingFileType(event=event)
-    file_type.populate_from_dict(data, keys=('name', 'extensions', 'allow_multiple_files', 'required', 'publishable'))
+    file_type.populate_from_dict(data, keys=FILE_TYPE_ATTRS)
     db.session.flush()
     logger.info('File type %r created by %r', file_type, session.user)
     return file_type
 
 
 def update_file_type(file_type, **data):
-    file_type.populate_from_dict(data, keys=('name', 'extensions', 'allow_multiple_files', 'required', 'publishable'))
+    file_type.populate_from_dict(data, keys=FILE_TYPE_ATTRS)
     db.session.flush()
     logger.info('File type %r updated by %r', file_type, session.user)
 

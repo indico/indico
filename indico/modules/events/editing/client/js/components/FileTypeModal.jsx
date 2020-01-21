@@ -19,7 +19,7 @@ import {
 import {Translate} from 'indico/react/i18n';
 import ExtensionList from './ExtensionList';
 
-export default function FileTypeModal({onClose, onSubmit, initialValues, header}) {
+export default function FileTypeModal({onClose, onSubmit, fileType, header}) {
   const handleSubmit = async (formData, form) => {
     const error = await onSubmit(formData, form);
     if (error) {
@@ -28,11 +28,19 @@ export default function FileTypeModal({onClose, onSubmit, initialValues, header}
     onClose();
   };
 
+  const {name, filenameTemplate, extensions, required, allowMultipleFiles, publishable} = fileType;
   return (
     <FinalForm
       onSubmit={handleSubmit}
       subscription={{submitting: true}}
-      initialValues={initialValues}
+      initialValues={{
+        name,
+        extensions,
+        required,
+        publishable,
+        filename_template: filenameTemplate,
+        allow_multiple_files: allowMultipleFiles,
+      }}
     >
       {fprops => (
         <Modal
@@ -44,7 +52,7 @@ export default function FileTypeModal({onClose, onSubmit, initialValues, header}
         >
           <Modal.Header content={header} />
           <Modal.Content>
-            {initialValues.isUsed && (
+            {fileType.isUsed && (
               <Message warning>
                 <Message.Content>
                   <Icon name="warning" size="large" />
@@ -56,6 +64,15 @@ export default function FileTypeModal({onClose, onSubmit, initialValues, header}
             )}
             <Form id="file-type-form" onSubmit={fprops.handleSubmit}>
               <FinalInput name="name" label={Translate.string('Name')} required />
+              <FinalInput
+                name="filename_template"
+                label={Translate.string('Filename template')}
+                description={Translate.string(
+                  'Filename template that all files of this type have to conform to (e.g. *_paper). No dots allowed.'
+                )}
+                pattern="^[^.]*$"
+                nullIfEmpty
+              />
               <FinalField
                 name="extensions"
                 component={ExtensionList}
@@ -74,7 +91,7 @@ export default function FileTypeModal({onClose, onSubmit, initialValues, header}
                 description={<Translate>Whether the file type is mandatory</Translate>}
               />
               <FinalCheckbox
-                name="allowMultipleFiles"
+                name="allow_multiple_files"
                 label={Translate.string('Multiple files')}
                 description={
                   <Translate>Whether the file type allows uploading multiple files</Translate>
@@ -103,17 +120,18 @@ FileTypeModal.propTypes = {
   onClose: PropTypes.func,
   onSubmit: PropTypes.func.isRequired,
   header: PropTypes.string.isRequired,
-  initialValues: PropTypes.object,
+  fileType: PropTypes.object,
 };
 
 FileTypeModal.defaultProps = {
-  initialValues: {
+  fileType: {
     name: null,
     extensions: [],
     required: false,
     allowMultipleFiles: false,
     publishable: false,
     isUsed: false,
+    filenameTemplate: null,
   },
   onClose: null,
 };

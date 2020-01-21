@@ -40,7 +40,8 @@ class RevisionState(mm.Schema):
 class EditingFileTypeSchema(mm.ModelSchema):
     class Meta:
         model = EditingFileType
-        fields = ('id', 'name', 'extensions', 'allow_multiple_files', 'required', 'publishable', 'is_used')
+        fields = ('id', 'name', 'extensions', 'allow_multiple_files', 'required', 'publishable', 'is_used',
+                  'filename_template')
 
     is_used = fields.Function(lambda file_type: EditingRevisionFile.query.with_parent(file_type).has_rows())
 
@@ -179,6 +180,7 @@ class EditableFileTypeArgs(mm.Schema):
         rh_context = ('event', 'file_type')
 
     name = fields.String(required=True, validate=not_empty)
+    filename_template = fields.String(validate=not_empty, allow_none=True)
     extensions = fields.List(fields.String(validate=not_empty))
     allow_multiple_files = fields.Boolean()
     required = fields.Boolean()
@@ -193,6 +195,11 @@ class EditableFileTypeArgs(mm.Schema):
             query = query.filter(EditingFileType.id != file_type.id)
         if query.has_rows():
             raise ValidationError(_('Name must be unique'))
+
+    @validates('filename_template')
+    def _check_for_correct_filename_template(self, template):
+        if template is not None and '.' in template:
+            raise ValidationError(_('Filename template cannot include dots'))
 
     @validates('extensions')
     def _check_for_correct_extensions_format(self, extensions):

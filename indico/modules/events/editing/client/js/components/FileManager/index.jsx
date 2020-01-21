@@ -7,12 +7,14 @@
 
 import _ from 'lodash';
 import React, {useCallback, useReducer, useContext, useRef, useMemo, useEffect} from 'react';
+import globToRegExp from 'glob-to-regexp';
 import PropTypes from 'prop-types';
+import {fromEvent} from 'file-selector';
 import {useDropzone} from 'react-dropzone';
 import {Field} from 'react-final-form';
-import {Icon} from 'semantic-ui-react';
+import {Icon, Popup, Segment} from 'semantic-ui-react';
 import {TooltipIfTruncated} from 'indico/react/components';
-import {Translate} from 'indico/react/i18n';
+import {Param, Translate} from 'indico/react/i18n';
 import {
   FileManagerContext,
   filePropTypes,
@@ -29,7 +31,10 @@ import {getFiles, getUploadedFileUUIDs, getValidationError, isUploading} from '.
 
 import './FileManager.module.scss';
 
-export function Dropzone({uploadURL, fileType: {id, allowMultipleFiles, files, extensions}}) {
+export function Dropzone({
+  uploadURL,
+  fileType: {id, allowMultipleFiles, files, extensions, filenameTemplate},
+}) {
   const dispatch = useContext(FileManagerContext);
   // we only want to modify the existing file if we do not allow multiple files and
   // there is exactly one file that is not in the 'added' state (which would imply
@@ -72,6 +77,22 @@ export function Dropzone({uploadURL, fileType: {id, allowMultipleFiles, files, e
     onDropAccepted,
     multiple: allowMultipleFiles,
     accept: extensions.map(ext => `.${ext}`).join(','),
+    getFilesFromEvent: async event => {
+      const eventFiles = await fromEvent(event);
+      if (!filenameTemplate) {
+        return eventFiles;
+      }
+
+      const templateRe = globToRegExp(filenameTemplate);
+      return eventFiles.filter(file => {
+        const filename = file.name.slice(0, file.name.indexOf('.'));
+        if (!templateRe.test(filename)) {
+          dispatch(actions.invalidTemplate(id, file.name));
+          return false;
+        }
+        return true;
+      });
+    },
   });
 
   return (
@@ -103,6 +124,28 @@ function FileType({uploadURL, fileType, uploads}) {
       </TooltipIfTruncated>
       <FileList files={fileType.files} fileType={fileType} uploadURL={uploadURL} />
       {!_.isEmpty(uploads) && <Uploads uploads={uploads} />}
+      {!_.isEmpty(fileType.invalidFiles) && (
+        <div style={{paddingBottom: '1em'}}>
+          {fileType.invalidFiles.map(invalidFile => (
+            <Popup
+              position="right center"
+              key={`${invalidFile}-${Date.now()}`}
+              content={
+                <Translate>
+                  This file does not conform to the filename template{' '}
+                  <Param name="template" value={fileType.filenameTemplate} wrapper={<code />} />
+                </Translate>
+              }
+              trigger={
+                <Segment>
+                  <Icon name="ban" color="orange" />
+                  {invalidFile}
+                </Segment>
+              }
+            />
+          ))}
+        </div>
+      )}
       <Dropzone dropzoneRef={ref} fileType={fileType} uploadURL={uploadURL} />
     </div>
   );
@@ -164,7 +207,6 @@ export default function FileManager({
 
   const uploading = isUploading(state);
   const validationError = getValidationError(state);
-
   return (
     <div styleName="file-manager-wrapper">
       <div styleName="file-manager">

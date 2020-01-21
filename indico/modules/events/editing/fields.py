@@ -7,6 +7,7 @@
 
 from __future__ import unicode_literals
 
+import fnmatch
 import os
 
 from marshmallow import ValidationError
@@ -48,6 +49,13 @@ class EditingFilesField(Dict):
                 if invalid_extensions:
                     raise ValidationError('File type "{}" does not allow these extensions: {}'
                                           .format(file_type.name, ', '.join(invalid_extensions)))
+
+            # ensure all filenames conform to the template
+            if file_type.filename_template:
+                filenames = {os.path.splitext(f.filename)[0] for f in files}
+                if not all(fnmatch.fnmatch(filename, file_type.filename_template) for filename in filenames):
+                    raise ValidationError("Some files don't conform to the filename template '{}'"
+                                          .format(file_type.filename_template))
 
             # ensure each file is only used in one type
             duplicates = set(files) & seen

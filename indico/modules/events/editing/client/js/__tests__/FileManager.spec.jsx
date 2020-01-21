@@ -174,6 +174,7 @@ describe('File manager', () => {
       expect(node.prop('fileType')).toEqual({
         ...fileTypes[i],
         files: fileList.filter(f => f.fileType === i + 1),
+        invalidFiles: [],
       });
       expect(node.prop('uploads')).toEqual({});
     });
