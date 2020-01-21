@@ -7,7 +7,7 @@
 
 import React, {useState} from 'react';
 import PropTypes from 'prop-types';
-import {Popup, Icon} from 'semantic-ui-react';
+import {Popup, Button} from 'semantic-ui-react';
 import {Translate} from 'indico/react/i18n';
 import {useTimeout} from 'indico/react/hooks';
 
@@ -29,11 +29,14 @@ export default function ClipboardButton({text, successText}) {
       on="click"
       position="bottom center"
       trigger={
-        <Icon
+        <Button
+          basic
+          type="button"
+          icon="linkify"
+          onClick={handleOpen}
           style={copied ? {} : {cursor: 'pointer'}}
           disabled={copied}
-          name="linkify"
-          onClick={copied ? null : handleOpen}
+          circular
         />
       }
       open={copied}
