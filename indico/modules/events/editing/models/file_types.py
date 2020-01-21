@@ -55,6 +55,10 @@ class EditingFileType(db.Model):
         nullable=False,
         default=False
     )
+    filename_template = db.Column(
+        db.String,
+        nullable=True
+    )
 
     event = db.relationship(
         'Event',
@@ -72,4 +76,4 @@ class EditingFileType(db.Model):
     @return_ascii
     def __repr__(self):
         return format_repr(self, 'id', 'event_id', 'extensions', allow_multiple_files=False, required=False,
-                           publishable=False, _text=self.name)
+                           publishable=False, filename_template=None, _text=self.name)
