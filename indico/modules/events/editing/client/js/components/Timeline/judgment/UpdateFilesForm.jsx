@@ -7,6 +7,7 @@
 
 import uploadURL from 'indico-url:event_editing.api_upload';
 
+import _ from 'lodash';
 import React from 'react';
 import {useDispatch, useSelector} from 'react-redux';
 import PropTypes from 'prop-types';
@@ -50,6 +51,7 @@ export default function UpdateFilesForm({setLoading}) {
   return (
     <FinalForm
       initialValues={{comment: '', tags: lastRevision.tags, files}}
+      initialValuesEqual={_.isEqual}
       subscription={{}}
       onSubmit={submitReview}
     >

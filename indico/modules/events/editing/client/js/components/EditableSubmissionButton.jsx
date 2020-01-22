@@ -6,6 +6,8 @@
 // LICENSE file for more details.
 
 import editableURL from 'indico-url:event_editing.editable';
+
+import _ from 'lodash';
 import React, {useState} from 'react';
 import PropTypes from 'prop-types';
 import {Button, Form, Modal} from 'semantic-ui-react';
@@ -37,7 +39,12 @@ export default function EditableSubmissionButton({
 
   return (
     <>
-      <FinalForm onSubmit={submitRevision} subscription={{}} initialValues={{files: {}}}>
+      <FinalForm
+        onSubmit={submitRevision}
+        subscription={{}}
+        initialValuesEqual={_.isEqual}
+        initialValues={{files: {}}}
+      >
         {({handleSubmit}) => (
           <Modal
             open={open}

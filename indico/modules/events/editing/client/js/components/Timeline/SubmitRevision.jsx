@@ -8,6 +8,7 @@
 import uploadURL from 'indico-url:event_editing.api_upload';
 import createSubmitterRevisionURL from 'indico-url:event_editing.api_create_submitter_revision';
 
+import _ from 'lodash';
 import React from 'react';
 import {useSelector, useDispatch} from 'react-redux';
 import {Form as FinalForm} from 'react-final-form';
@@ -45,7 +46,12 @@ export default function SubmitRevision() {
   };
 
   return (
-    <FinalForm initialValues={{files}} subscription={{}} onSubmit={submitRevision}>
+    <FinalForm
+      initialValues={{files}}
+      initialValuesEqual={_.isEqual}
+      subscription={{}}
+      onSubmit={submitRevision}
+    >
       {({handleSubmit}) => (
         <Form onSubmit={handleSubmit}>
           <div className="i-timeline">
