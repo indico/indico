@@ -52,6 +52,7 @@ export default function RequestChangesForm({setLoading, onSuccess}) {
           <FinalTextArea
             name="comment"
             placeholder={Translate.string('Leave a comment...')}
+            required
             hideValidationError
             autoFocus
           />

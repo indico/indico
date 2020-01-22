@@ -69,6 +69,7 @@ export default function UpdateFilesForm({setLoading}) {
             <FinalTextArea
               name="comment"
               placeholder={Translate.string('Leave a comment...')}
+              required
               hideValidationError
               autoFocus
             />
