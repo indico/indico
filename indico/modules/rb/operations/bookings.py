@@ -363,6 +363,15 @@ def has_same_dates(old_booking, new_booking):
             old_booking.repeat_frequency == new_booking['repeat_frequency'])
 
 
+def has_same_slots(old_booking, new_booking):
+    if (
+        old_booking.repeat_interval != new_booking['repeat_interval']
+        or old_booking.repeat_frequency != new_booking['repeat_frequency']
+    ):
+        return False
+    return old_booking.start_dt <= new_booking['start_dt'] and old_booking.end_dt >= new_booking['end_dt']
+
+
 def should_split_booking(booking, new_data):
     today = date.today()
     is_ongoing_booking = booking.start_dt.date() < today < booking.end_dt.date()

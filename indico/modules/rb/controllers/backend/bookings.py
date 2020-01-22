@@ -30,7 +30,7 @@ from indico.modules.rb.models.reservations import RepeatFrequency, Reservation
 from indico.modules.rb.models.rooms import Room
 from indico.modules.rb.operations.bookings import (get_active_bookings, get_booking_edit_calendar_data,
                                                    get_matching_events, get_room_calendar, get_rooms_availability,
-                                                   has_same_dates, should_split_booking, split_booking)
+                                                   has_same_slots, should_split_booking, split_booking)
 from indico.modules.rb.operations.suggestions import get_suggestions
 from indico.modules.rb.schemas import (CreateBookingSchema, reservation_details_schema,
                                        reservation_linked_object_data_schema, reservation_occurrences_schema,
@@ -290,10 +290,10 @@ class RHUpdateBooking(RHBookingBase):
 
         additional_booking_attrs = {}
         if not should_split_booking(self.booking, new_booking_data):
-            has_date_changed = not has_same_dates(self.booking, new_booking_data)
+            has_slot_changed = not has_same_slots(self.booking, new_booking_data)
             room = self.booking.room
             self.booking.modify(new_booking_data, session.user)
-            if (has_date_changed and not room.can_book(session.user, allow_admin=False) and
+            if (has_slot_changed and not room.can_book(session.user, allow_admin=False) and
                     room.can_prebook(session.user, allow_admin=False) and self.booking.is_accepted):
                 self.booking.reset_approval(session.user)
         else:

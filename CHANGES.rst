@@ -34,6 +34,8 @@ Improvements
 - Allow up to 9 digits (instead of 6) before the decimal point in
   registration fees
 - Add button to booking details modal to copy direct link (:issue:`4230`)
+- Do not require new room manager approval when simply shortening a booking
+  (:issue:`4214`)
 
 Bugfixes
 ^^^^^^^^
@@ -143,6 +145,7 @@ Improvements
   requires it (such as contribution PDF export or the Book of Abstracts).
   **LaTeX is now disabled by default, unless the** :data:`XELATEX_PATH`
   **is explicitly set in** ``indico.conf``.
+
 
 Bugfixes
 ^^^^^^^^

@@ -47,6 +47,18 @@ class BookingEditForm extends React.Component {
     hideOptions: {},
   };
 
+  showApprovalWarning = (dirtyFields, initialValues, values) => {
+    const initialStartTime = moment(initialValues.timeSlot.startTime, 'HH:mm');
+    const initialEndTime = moment(initialValues.timeSlot.endTime, 'HH:mm');
+    const newStartTime = moment(values.timeSlot.startTime, 'HH:mm');
+    const newEndTime = moment(values.timeSlot.endTime, 'HH:mm');
+    return (
+      Object.keys(dirtyFields).some(key => key === 'dates' || key.startsWith('recurrence.')) ||
+      newStartTime.isBefore(initialStartTime) ||
+      newEndTime.isAfter(initialEndTime)
+    );
+  };
+
   recurrenceTypeChanged = newType => {
     const {
       booking: {startDt},
@@ -226,11 +238,9 @@ class BookingEditForm extends React.Component {
             />
           )}
           {!room.canUserBook && room.canUserPrebook && isAccepted && (
-            <FormSpy subscription={{dirtyFields: true}}>
-              {({dirtyFields}) =>
-                Object.keys(dirtyFields).some(
-                  key => key === 'dates' || key === 'timeSlot' || key.startsWith('recurrence.')
-                ) && (
+            <FormSpy subscription={{dirtyFields: true, initialValues: true, values: true}}>
+              {({dirtyFields, initialValues, values}) =>
+                this.showApprovalWarning(dirtyFields, initialValues, values) && (
                   <Message warning visible>
                     <Message.Header>
                       <Translate>This booking will require approval!</Translate>
