@@ -114,7 +114,21 @@ function FileType({uploadURL, fileType, uploads}) {
   const ref = useRef(null);
   return (
     <div styleName="file-type">
-      <h3>{fileType.name}</h3>
+      <h3>
+        {fileType.name}
+        {fileType.filenameTemplate !== null && (
+          <Popup
+            position="bottom center"
+            content={
+              <Translate>
+                Filenames must have the format{' '}
+                <Param name="template" value={fileType.filenameTemplate} wrapper={<code />} />
+              </Translate>
+            }
+            trigger={<Icon corner="top right" name="info" />}
+          />
+        )}
+      </h3>
       <TooltipIfTruncated tooltip={fileType.extensions.join(', ')}>
         <ul styleName="file-extensions">
           {fileType.extensions.length !== 0
