@@ -66,6 +66,8 @@ Bugfixes
   such as the event access key
 - Make sure that tickets are not attached to emails sent to registrants for whom
   tickets are blocked (:issue:`4242`)
+- Fix event access key prompt not showing when accessing an attachment link
+  (:issue:`4255`)
 
 Version 2.2.5
 -------------
