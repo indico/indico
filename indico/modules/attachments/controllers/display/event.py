@@ -15,14 +15,18 @@ from indico.modules.attachments.controllers.event_package import AttachmentPacka
 from indico.modules.attachments.controllers.util import SpecificFolderMixin
 from indico.modules.attachments.views import (WPEventFolderDisplay, WPPackageEventAttachmentsDisplay,
                                               WPPackageEventAttachmentsDisplayConference)
-from indico.modules.events.controllers.base import RHDisplayEventBase, RHEventBase
+from indico.modules.events.controllers.base import RHDisplayEventBase
 from indico.modules.events.models.events import EventType
 
 
-class RHDownloadEventAttachment(DownloadAttachmentMixin, RHEventBase):
+class RHDownloadEventAttachment(DownloadAttachmentMixin, RHDisplayEventBase):
     def _process_args(self):
-        RHEventBase._process_args(self)
+        RHDisplayEventBase._process_args(self)
         DownloadAttachmentMixin._process_args(self)
+
+    def _check_access(self):
+        RHDisplayEventBase._check_access(self)
+        DownloadAttachmentMixin._check_access(self)
 
 
 class RHListEventAttachmentFolder(SpecificFolderMixin, RHDisplayEventBase):
