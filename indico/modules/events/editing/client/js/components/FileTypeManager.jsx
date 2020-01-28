@@ -102,6 +102,13 @@ export default function FileTypeManager({eventId}) {
     return null;
   }
 
+  const isLastPublishable = fileTypeId => {
+    const publishable = fileTypes.filter(ft => ft.publishable);
+    return publishable.length === 1 && publishable[0].id === fileTypeId;
+  };
+
+  const canDelete = fileType => !fileType.isUsed && !isLastPublishable(fileType.id);
+
   const {operation, fileType: currentFileType} = state;
   return (
     <div styleName="file-types-container">
@@ -131,17 +138,23 @@ export default function FileTypeManager({eventId}) {
           </Label>
           <Popup
             on="hover"
-            disabled={!fileType.isUsed}
+            disabled={canDelete(fileType)}
             position="right center"
-            content={Translate.string('This type has files attached')}
+            content={
+              fileType.isUsed
+                ? Translate.string('This type has files attached')
+                : Translate.string('Cannot delete the only publishable type')
+            }
             trigger={
               <Icon
-                style={!fileType.isUsed ? {cursor: 'pointer'} : {}}
+                style={canDelete(fileType) ? {cursor: 'pointer'} : {}}
                 color="red"
                 name="trash"
                 corner="top right"
-                disabled={fileType.isUsed}
-                onClick={() => !fileType.isUsed && dispatch({type: 'DELETE_FILE_TYPE', fileType})}
+                disabled={!canDelete(fileType)}
+                onClick={() =>
+                  canDelete(fileType) && dispatch({type: 'DELETE_FILE_TYPE', fileType})
+                }
               />
             }
           />
