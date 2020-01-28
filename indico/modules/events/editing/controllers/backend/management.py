@@ -78,5 +78,12 @@ class RHEditFileType(RHEditingManagementBase):
     def _process_DELETE(self):
         if EditingRevisionFile.query.with_parent(self.file_type).has_rows():
             raise ExpectedError(_('Cannot delete file type which already has files'))
+        if self.file_type.publishable:
+            is_last = not (EditingFileType.query
+                           .with_parent(self.event)
+                           .filter(EditingFileType.publishable, EditingFileType.id != self.file_type.id)
+                           .has_rows())
+            if is_last:
+                raise ExpectedError(_('Cannot delete the only publishable file type'))
         delete_file_type(self.file_type)
         return '', 204
