@@ -206,3 +206,15 @@ class EditableFileTypeArgs(mm.Schema):
         for extension in extensions:
             if re.match(r'^[*.]+', extension):
                 raise ValidationError(_('Extensions cannot have leading dots'))
+
+    @validates('publishable')
+    def _check_if_can_unset_or_delete(self, publishable):
+        event = self.context['event']
+        file_type = self.context['file_type']
+        if file_type and not publishable:
+            is_last = not (EditingFileType.query
+                           .with_parent(event)
+                           .filter(EditingFileType.publishable, EditingFileType.id != file_type.id)
+                           .has_rows())
+            if is_last:
+                raise ValidationError(_('Cannot unset the only publishable file type'))
