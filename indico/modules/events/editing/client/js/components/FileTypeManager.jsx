@@ -11,7 +11,8 @@ import editFileTypeURL from 'indico-url:event_editing.api_edit_file_type';
 
 import React, {useReducer} from 'react';
 import PropTypes from 'prop-types';
-import {Button, Icon, Loader, Message, Segment, Popup} from 'semantic-ui-react';
+import {Button, Icon, Loader, Message, Segment, Popup, Label} from 'semantic-ui-react';
+import {TooltipIfTruncated} from 'indico/react/components';
 import {Param, Translate} from 'indico/react/i18n';
 import {getChangedValues, handleSubmitError} from 'indico/react/forms';
 import {useIndicoAxios} from 'indico/react/hooks';
@@ -40,6 +41,18 @@ function fileTypesReducer(state, action) {
       return state;
   }
 }
+
+function StatusIcon({active, icon, text}) {
+  return (
+    <Icon size="small" color={active ? 'blue' : 'grey'} name={icon} title={active ? text : ''} />
+  );
+}
+
+StatusIcon.propTypes = {
+  active: PropTypes.bool.isRequired,
+  icon: PropTypes.string.isRequired,
+  text: PropTypes.string.isRequired,
+};
 
 export default function FileTypeManager({eventId}) {
   const [state, dispatch] = useReducer(fileTypesReducer, initialState);
@@ -99,65 +112,57 @@ export default function FileTypeManager({eventId}) {
       )}
       {fileTypes.map(fileType => (
         <Segment key={fileType.id} styleName="filetype-segment">
-          <div styleName="filetype">
-            <div>
-              <h3>
-                <span styleName="name">{fileType.name}</span>
-                {fileType.required && (
-                  <Icon
-                    size="small"
-                    color="grey"
-                    name="asterisk"
-                    title={Translate.string('File required')}
-                  />
-                )}
-                {fileType.allowMultipleFiles && (
-                  <Icon
-                    size="small"
-                    color="grey"
-                    name="copy outline"
-                    title={Translate.string('Multiple files allowed')}
-                  />
-                )}
-                {fileType.publishable && (
-                  <Icon
-                    size="small"
-                    color="grey"
-                    name="eye"
-                    title={Translate.string('File publishable')}
-                  />
-                )}
-              </h3>
-              <ul styleName="file-extensions">
-                {fileType.extensions.length !== 0
-                  ? fileType.extensions.map(ext => <li key={ext}>{ext}</li>)
-                  : Translate.string('(no extension restrictions)')}
-              </ul>
-            </div>
-            <div styleName="actions">
+          <Label ribbon>
+            <StatusIcon
+              active={fileType.required}
+              icon="asterisk"
+              text={Translate.string('File required')}
+            />
+            <StatusIcon
+              active={fileType.allowMultipleFiles}
+              icon="copy outline"
+              text={Translate.string('Multiple files allowed')}
+            />
+            <StatusIcon
+              active={fileType.publishable}
+              icon="eye"
+              text={Translate.string('File publishable')}
+            />
+          </Label>
+          <Popup
+            on="hover"
+            disabled={!fileType.isUsed}
+            position="right center"
+            content={Translate.string('This type has files attached')}
+            trigger={
               <Icon
-                color="blue"
-                name="pencil"
-                onClick={() => dispatch({type: 'EDIT_FILE_TYPE', fileType})}
+                style={!fileType.isUsed ? {cursor: 'pointer'} : {}}
+                color="red"
+                name="trash"
+                corner="top right"
+                disabled={fileType.isUsed}
+                onClick={() => !fileType.isUsed && dispatch({type: 'DELETE_FILE_TYPE', fileType})}
               />
-              <Popup
-                on="hover"
-                disabled={!fileType.isUsed}
-                position="right center"
-                content={Translate.string('This type has files attached')}
-                trigger={
-                  <Icon
-                    styleName={fileType.isUsed ? 'disabled' : ''}
-                    color="red"
-                    name="trash"
-                    disabled={fileType.isUsed}
-                    onClick={() =>
-                      !fileType.isUsed && dispatch({type: 'DELETE_FILE_TYPE', fileType})
-                    }
-                  />
-                }
-              />
-            </div>
+            }
+          />
+          <Icon
+            style={{cursor: 'pointer'}}
+            color="blue"
+            name="pencil"
+            corner="top right"
+            onClick={() => dispatch({type: 'EDIT_FILE_TYPE', fileType})}
+          />
+          <div styleName="filetype-header">
+            <h3>
+              <TooltipIfTruncated>
+                <span styleName="name">{fileType.name}</span>
+              </TooltipIfTruncated>
+            </h3>
+            <ul styleName="file-extensions">
+              {fileType.extensions.length !== 0
+                ? fileType.extensions.map(ext => <li key={ext}>{ext}</li>)
+                : Translate.string('(no extension restrictions)')}
+            </ul>
           </div>
         </Segment>
       ))}
