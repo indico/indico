@@ -22,6 +22,7 @@ from indico.core.config import config
 from indico.modules.categories import Category
 from indico.modules.events import Event
 from indico.util.date_time import now_utc
+from indico.util.string import sanitize_html
 
 
 def serialize_categories_ical(category_ids, user, event_filter=True, event_filter_fn=None, update_query=None):
@@ -130,7 +131,7 @@ def serialize_category_atom(category, url, user, event_filter):
         entry = feed.add_entry(order='append')
         entry.id(event.external_url)
         entry.title(event.title)
-        entry.summary(unicode(event.description))
+        entry.summary(sanitize_html(unicode(event.description)) or None, type='html')
         entry.link(href=event.external_url)
         entry.updated(event.start_dt)
     return BytesIO(feed.atom_str(pretty=True))

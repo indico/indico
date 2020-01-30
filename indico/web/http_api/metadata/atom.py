@@ -11,7 +11,7 @@ import dateutil.parser
 from feedgen.feed import FeedGenerator
 from pytz import timezone, utc
 
-from indico.util.string import to_unicode
+from indico.util.string import sanitize_html, to_unicode
 from indico.web.http_api.metadata.serializer import Serializer
 
 
@@ -42,7 +42,7 @@ class AtomSerializer(Serializer):
             entry = feed.add_entry(order='append')
             entry.id(fossil['url'])
             entry.title(to_unicode(fossil['title']) or None)
-            entry.summary(to_unicode(fossil['description']) or None)
+            entry.summary(sanitize_html(to_unicode(fossil['description'])) or None, type='html')
             entry.link(href=fossil['url'])
             entry.updated(_deserialize_date(fossil['startDate']))
         return feed.atom_str(pretty=True)
