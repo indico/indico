@@ -21,7 +21,8 @@ from indico.modules.events.contributions.models.contributions import Contributio
 from indico.modules.events.contributions.models.persons import AuthorType, ContributionPersonLink
 from indico.modules.events.contributions.models.subcontributions import SubContribution
 from indico.modules.events.contributions.util import (get_contribution_ical_file,
-                                                      get_contributions_with_user_as_submitter)
+                                                      get_contributions_with_user_as_submitter,
+                                                      has_contributions_with_user_as_submitter)
 from indico.modules.events.contributions.views import WPAuthorList, WPContributions, WPMyContributions, WPSpeakerList
 from indico.modules.events.controllers.base import RHDisplayEventBase
 from indico.modules.events.layout.util import is_menu_entry_enabled
@@ -58,7 +59,8 @@ class RHContributionDisplayBase(RHDisplayEventBase):
         if not self.contrib.can_access(session.user):
             raise Forbidden
         published = contribution_settings.get(self.event, 'published')
-        if not published and not self.event.can_manage(session.user):
+        if (not published and not self.event.can_manage(session.user)
+                and not self.contrib.is_user_associated(session.user)):
             raise NotFound(_("The contributions of this event have not been published yet."))
 
     def _process_args(self):
@@ -70,7 +72,7 @@ class RHDisplayProtectionBase(RHDisplayEventBase):
     def _check_access(self):
         RHDisplayEventBase._check_access(self)
         published = contribution_settings.get(self.event, 'published')
-        if not published:
+        if not published and not has_contributions_with_user_as_submitter(self.event, session.user):
             raise NotFound(_("The contributions of this event have not been published yet."))
 
         if not is_menu_entry_enabled(self.MENU_ENTRY_NAME, self.event):
@@ -248,7 +250,8 @@ class RHSubcontributionDisplay(RHDisplayEventBase):
         if not self.subcontrib.can_access(session.user):
             raise Forbidden
         published = contribution_settings.get(self.event, 'published')
-        if not published and not self.event.can_manage(session.user):
+        if (not published and not self.event.can_manage(session.user)
+                and not self.contrib.is_user_associated(session.user)):
             raise NotFound(_("The contributions of this event have not been published yet."))
 
     def _process_args(self):
