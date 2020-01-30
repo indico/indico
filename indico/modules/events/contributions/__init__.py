@@ -105,8 +105,9 @@ def _extend_event_menu(sender, **kwargs):
     from indico.modules.events.layout.util import MenuEntryData
 
     def _visible_my_contributions(event):
-        published = contribution_settings.get(event, 'published')
-        return session.user and published and has_contributions_with_user_as_submitter(event, session.user)
+        if not session.user:
+            return False
+        return has_contributions_with_user_as_submitter(event, session.user)
 
     def _visible_list_of_contributions(event):
         published = contribution_settings.get(event, 'published')
