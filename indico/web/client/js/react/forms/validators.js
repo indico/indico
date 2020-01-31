@@ -55,7 +55,11 @@ function url(value) {
 }
 
 function required(value) {
-  return value || value === 0 ? undefined : Translate.string('This field is required.');
+  const errorMsg = Translate.string('This field is required.');
+  if (Array.isArray(value)) {
+    return value.length !== 0 ? undefined : errorMsg;
+  }
+  return value || value === 0 ? undefined : errorMsg;
 }
 
 function optional(arg = null) {

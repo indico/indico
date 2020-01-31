@@ -38,6 +38,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     tags = camelizeKeys(tagResponse.data);
   } catch (e) {
     handleAxiosError(e);
+    return;
   }
 
   const contributionId = parseInt(timelineElement.dataset.contributionId, 10);

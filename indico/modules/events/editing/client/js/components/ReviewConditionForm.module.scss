@@ -1,0 +1,35 @@
+// This file is part of Indico.
+// Copyright (C) 2002 - 2020 CERN
+//
+// Indico is free software; you can redistribute it and/or
+// modify it under the terms of the MIT License; see the
+// LICENSE file for more details.
+
+.condition-form {
+    flex: 1;
+
+    :global(.ui.form) {
+        display: flex;
+        flex: 1;
+        align-items: center;
+
+        :global(.ui.search) {
+            font-size: 0.85em;
+        }
+
+        .file-types-dropdown {
+            margin-bottom: 0;
+            flex: 1;
+        }
+
+        .action-buttons {
+            display: flex;
+            flex: 0.3;
+            justify-content: flex-end;
+
+            :global(.field) {
+                margin-bottom: 0;
+            }
+        }
+    }
+}

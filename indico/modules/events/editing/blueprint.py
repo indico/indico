@@ -19,6 +19,8 @@ _bp = IndicoBlueprint('event_editing', __name__, url_prefix='/event/<confId>', t
 _bp.add_url_rule('/manage/editing/', 'dashboard', frontend.RHEditingDashboard)
 _bp.add_url_rule('/manage/editing/tags', 'manage_tags', frontend.RHManageEditingTags)
 _bp.add_url_rule('/manage/editing/types', 'manage_file_types', frontend.RHManageEditingFileTypes)
+_bp.add_url_rule('/manage/editing/review-conditions', 'manage_review_conditions',
+                 frontend.RHManageEditingReviewConditions)
 _bp.add_url_rule('/contributions/<int:contrib_id>/editing/<any(paper):type>', 'editable', frontend.RHEditableTimeline)
 _bp.add_url_rule('/contributions/<int:contrib_id>/editing/<any(paper):type>/<int:revision_id>/files.zip',
                  'revision_files_export', timeline.RHExportRevisionFiles)
@@ -26,6 +28,10 @@ _bp.add_url_rule('/contributions/<int:contrib_id>/editing/<any(paper):type>/<int
                  'download_file', timeline.RHDownloadRevisionFile)
 
 # Event-level APIs
+_bp.add_url_rule('/editing/api/review-conditions', 'api_review_conditions', management.RHEditingReviewConditions,
+                 methods=('GET', 'POST'))
+_bp.add_url_rule('/editing/api/review-conditions/<uuid:uuid>', 'api_edit_review_condition',
+                 management.RHEditingEditReviewCondition, methods=('DELETE', 'PATCH'))
 _bp.add_url_rule('/editing/api/file-types', 'api_file_types', common.RHEditingFileTypes)
 _bp.add_url_rule('/editing/api/file-types', 'api_add_file_type', management.RHCreateFileType, methods=('POST',))
 _bp.add_url_rule('/editing/api/file-types/<int:file_type_id>', 'api_edit_file_type', management.RHEditFileType,

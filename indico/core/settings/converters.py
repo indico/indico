@@ -7,6 +7,7 @@
 
 from __future__ import unicode_literals
 
+from collections import OrderedDict
 from datetime import timedelta
 
 import dateutil.parser
@@ -144,3 +145,13 @@ class ModelListConverter(SettingConverter):
         if not value:
             return []
         return self.collection_class(self.model.query.filter(self.column.in_(value)))
+
+
+class OrderedDictConverter(SettingConverter):
+    @staticmethod
+    def from_python(value):
+        return value.items()
+
+    @staticmethod
+    def to_python(value):
+        return OrderedDict(value)
