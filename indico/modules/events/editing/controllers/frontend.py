@@ -42,3 +42,8 @@ class RHManageEditingTags(RHEditingManagementBase):
 class RHManageEditingFileTypes(RHEditingManagementBase):
     def _process(self):
         return WPEditing.render_template('management/filetypes.html', self.event)
+
+
+class RHManageEditingReviewConditions(RHEditingManagementBase):
+    def _process(self):
+        return WPEditing.render_template('management/review_conditions.html', self.event)

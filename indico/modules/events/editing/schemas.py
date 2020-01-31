@@ -22,6 +22,7 @@ from indico.modules.events.editing.models.file_types import EditingFileType
 from indico.modules.events.editing.models.revision_files import EditingRevisionFile
 from indico.modules.events.editing.models.revisions import EditingRevision, InitialRevisionState
 from indico.modules.events.editing.models.tags import EditingTag
+from indico.modules.events.editing.settings import editing_settings
 from indico.modules.users.schemas import UserSchema
 from indico.util.i18n import _
 from indico.util.marshmallow import not_empty
@@ -41,15 +42,20 @@ class EditingFileTypeSchema(mm.ModelSchema):
     class Meta:
         model = EditingFileType
         fields = ('id', 'name', 'extensions', 'allow_multiple_files', 'required', 'publishable', 'is_used',
-                  'filename_template')
+                  'filename_template', 'is_used_in_condition')
 
     is_used = fields.Function(lambda file_type: EditingRevisionFile.query.with_parent(file_type).has_rows())
+    is_used_in_condition = fields.Method('_is_used_in_condition')
 
     @post_dump(pass_many=True)
     def sort_list(self, data, many, **kwargs):
         if many:
             data = sorted(data, key=lambda ft: natural_sort_key(ft['name']))
         return data
+
+    def _is_used_in_condition(self, file_type):
+        conditions = editing_settings.get(file_type.event, 'review_conditions')
+        return any(file_type.id in cond for cond in conditions.values())
 
 
 class EditingTagSchema(mm.ModelSchema):
@@ -218,3 +224,23 @@ class EditableFileTypeArgs(mm.Schema):
                            .has_rows())
             if is_last:
                 raise ValidationError(_('Cannot unset the only publishable file type'))
+
+
+class EditingReviewConditionArgs(mm.Schema):
+    class Meta:
+        rh_context = ('event',)
+
+    file_types = fields.List(fields.Int(), required=True, validate=not_empty)
+
+    @validates('file_types')
+    def _validate_file_types(self, file_types):
+        event = self.context['event']
+        event_file_types = {ft.id for ft in event.editing_file_types}
+        condition_types = set(file_types)
+
+        if condition_types - event_file_types:
+            raise ValidationError(_('Invalid file type used'))
+
+        event_conditions = editing_settings.get(event, 'review_conditions')
+        if any(condition_types == set(event_condition) for event_condition in event_conditions.values()):
+            raise ValidationError(_('Conditions have to be unique'))
