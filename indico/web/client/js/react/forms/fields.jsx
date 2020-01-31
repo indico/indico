@@ -418,6 +418,9 @@ export function FinalSubmitButton({
   activeSubmitButton,
   color,
   onClick,
+  circular,
+  size,
+  icon,
 }) {
   return (
     <FormSpy subscription={{hasValidationErrors: true, pristine: true, submitting: true}}>
@@ -431,6 +434,9 @@ export function FinalSubmitButton({
           content={label}
           color={color}
           onClick={onClick}
+          circular={circular}
+          size={size}
+          icon={icon}
         />
       )}
     </FormSpy>
@@ -438,18 +444,25 @@ export function FinalSubmitButton({
 }
 
 FinalSubmitButton.propTypes = {
-  label: PropTypes.string.isRequired,
+  label: PropTypes.string,
   form: PropTypes.string,
   disabledUntilChange: PropTypes.bool,
   activeSubmitButton: PropTypes.bool,
   color: PropTypes.string,
   onClick: PropTypes.func,
+  circular: PropTypes.bool,
+  icon: PropTypes.string,
+  size: PropTypes.string,
 };
 
 FinalSubmitButton.defaultProps = {
+  label: null,
   form: null,
   disabledUntilChange: true,
   activeSubmitButton: true,
   color: null,
   onClick: null,
+  circular: false,
+  icon: null,
+  size: null,
 };
