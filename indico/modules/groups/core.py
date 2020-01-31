@@ -13,6 +13,7 @@ from flask_multipass import MultipassException
 from werkzeug.utils import cached_property
 
 from indico.core.auth import multipass
+from indico.core.config import config
 from indico.core.db import db
 from indico.core.db.sqlalchemy.principals import PrincipalType
 from indico.legacy.common.cache import GenericCache
@@ -138,7 +139,7 @@ class GroupProxy(object):
         else:
             criterion = db.func.lower(LocalGroup.name).contains(name.lower())
         result = set()
-        if providers is None or 'indico' in providers:
+        if (providers is None or 'indico' in providers) and config.LOCAL_GROUPS:
             result |= {g.proxy for g in LocalGroup.find(criterion)}
         result |= {GroupProxy(g.name, g.provider.name, _group=g)
                    for g in multipass.search_groups(name, providers=providers, exact=exact)}
@@ -162,6 +163,10 @@ class _LocalGroupProxy(GroupProxy):
     @cached_property
     def group(self):
         """The underlying :class:`.LocalGroup`"""
+        if not config.LOCAL_GROUPS:
+            # pretend local groups do not exist if they are disabled
+            # this way they'll be rejected in acl fields
+            return None
         return LocalGroup.get(self.id)
 
     @cached_property
@@ -174,6 +179,8 @@ class _LocalGroupProxy(GroupProxy):
         return LocalGroupWrapper(self.id)
 
     def has_member(self, user):
+        if not config.LOCAL_GROUPS:
+            return False
         return user and self.group in user.local_groups
 
     def get_members(self):

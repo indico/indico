@@ -38,6 +38,8 @@ Improvements
   (:issue:`4214`)
 - Make root category description/title customizable using the normal
   category settings form (:issue:`4231`)
+- Added new :data:`LOCAL_GROUPS` setting that can be used to fully disable
+  local groups (:issue:`4260`)
 
 Bugfixes
 ^^^^^^^^

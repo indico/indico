@@ -55,6 +55,7 @@ DEFAULTS = {
     'LOCAL_IDENTITIES': True,
     'LOCAL_MODERATION': False,
     'LOCAL_REGISTRATION': True,
+    'LOCAL_GROUPS': True,
     'LOGGING_CONFIG_FILE': 'logging.yaml',
     'LOGO_URL': None,
     'LOG_DIR': '/opt/indico/log',
