@@ -14,10 +14,10 @@ import PropTypes from 'prop-types';
 import {Button, Icon, Label, Loader, Message, Segment} from 'semantic-ui-react';
 
 import {Param, Translate} from 'indico/react/i18n';
+import {RequestConfirm} from 'indico/react/components';
 import {getChangedValues, handleSubmitError} from 'indico/react/forms';
 import {useIndicoAxios} from 'indico/react/hooks';
 import {handleAxiosError, indicoAxios} from 'indico/utils/axios';
-import RequestConfirm from './RequestConfirm';
 import TagModal from './TagModal';
 
 import './TagManager.module.scss';
@@ -147,24 +147,24 @@ export default function TagManager({eventId}) {
           onClose={() => dispatch({type: 'CLEAR'})}
         />
       )}
-      {operation === 'delete' && (
-        <RequestConfirm
-          header={Translate.string('Delete tag')}
-          confirmText={Translate.string('Yes')}
-          cancelText={Translate.string('No')}
-          onClose={() => dispatch({type: 'CLEAR'})}
-          content={
+      <RequestConfirm
+        header={Translate.string('Delete tag')}
+        confirmText={Translate.string('Yes')}
+        cancelText={Translate.string('No')}
+        onClose={() => dispatch({type: 'CLEAR'})}
+        content={
+          currentTag ? (
             <div className="content">
               <Translate>
                 Are you sure you want to delete the tag{' '}
                 <Param name="tag" value={currentTag.verboseTitle} wrapper={<strong />} />?
               </Translate>
             </div>
-          }
-          requestFunc={() => deleteTag(currentTag.id)}
-          open
-        />
-      )}
+          ) : null
+        }
+        requestFunc={() => deleteTag(currentTag.id)}
+        open={operation === 'delete'}
+      />
     </div>
   );
 }

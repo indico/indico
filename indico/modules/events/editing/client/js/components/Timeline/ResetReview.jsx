@@ -11,11 +11,11 @@ import React, {useState} from 'react';
 import {useSelector, useDispatch} from 'react-redux';
 import PropTypes from 'prop-types';
 import {Icon, Popup} from 'semantic-ui-react';
+import {RequestConfirm} from 'indico/react/components';
 import {Translate} from 'indico/react/i18n';
 
 import * as selectors from '../../selectors';
 import {resetReviews} from '../../actions';
-import RequestConfirm from '../RequestConfirm';
 
 import './ResetReviews.module.scss';
 
@@ -54,21 +54,19 @@ export default function ResetReview({revisionId}) {
           />
         }
       />
-      {isOpen && (
-        <RequestConfirm
-          header={Translate.string('Reset review')}
-          confirmText={Translate.string('Yes')}
-          cancelText={Translate.string('No')}
-          onClose={() => setIsOpen(false)}
-          content={
-            <div className="content">
-              <Translate>Are you sure you want to reset the review?</Translate>
-            </div>
-          }
-          requestFunc={() => resetRevisions()}
-          open
-        />
-      )}
+      <RequestConfirm
+        header={Translate.string('Reset review')}
+        confirmText={Translate.string('Yes')}
+        cancelText={Translate.string('No')}
+        onClose={() => setIsOpen(false)}
+        content={
+          <div className="content">
+            <Translate>Are you sure you want to reset the review?</Translate>
+          </div>
+        }
+        requestFunc={resetRevisions}
+        open={isOpen}
+      />
     </>
   );
 }
