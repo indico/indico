@@ -34,6 +34,16 @@ Authentication
 
     Default: ``True``
 
+.. data:: LOCAL_GROUPS
+
+    This setting controls whether local Indico groups are available.
+    If no centralized authentication infrastructure that supports groups
+    (e.g. LDAP) is used, local groups are the only way to define groups in 
+    Indico, but if you do have central groups it may be useful to disable 
+    local ones to have all groups in one central place.
+
+    Default: ``True``
+
 .. data:: LOCAL_REGISTRATION
 
     This setting controls whether people accessing Indico can create a

@@ -1,5 +1,7 @@
 {% extends 'layout/admin_page.html' %}
 {% from 'forms/_form.html' import form_header, form_rows, form_footer %}
+{% from 'message_box.html' import message_box %}
+
 
 {% macro group_table(groups, show_members=false, show_provider=false) %}
     <table class="i-table-widget">
@@ -31,64 +33,76 @@
 {% endmacro %}
 
 {%- block content %}
-    <div class="i-box-group vert">
-        <div class="i-box">
-            <div class="i-box-header">
-                <div class="i-box-title">
-                    {%- trans %}Local groups{% endtrans -%}
-                </div>
-                <div class="i-box-buttons toolbar">
-                    <div class="group">
-                        <a class="i-button icon-plus" href="{{ url_for('.group_add') }}">
-                            {%- trans %}Create new group{% endtrans -%}
-                        </a>
+    {% if not groups_enabled %}
+        {% call message_box('info', fixed_width=true) %}
+            {% trans %}
+                Group functionality is not available as local groups are disabled and there are no
+                providers for remote groups configured.
+            {% endtrans %}
+        {% endcall %}
+    {% else %}
+        <div class="i-box-group vert">
+            {% if indico_config.LOCAL_GROUPS %}
+                <div class="i-box">
+                    <div class="i-box-header">
+                        <div class="i-box-title">
+                            {%- trans %}Local groups{% endtrans -%}
+                        </div>
+                        <div class="i-box-buttons toolbar">
+                            <div class="group">
+                                <a class="i-button icon-plus" href="{{ url_for('.group_add') }}">
+                                    {%- trans %}Create new group{% endtrans -%}
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="i-box-table-widget">
+                        {{ group_table(groups, show_members=true) }}
                     </div>
                 </div>
-            </div>
-            <div class="i-box-table-widget">
-                {{ group_table(groups, show_members=true) }}
-            </div>
-        </div>
-        <div class="i-box">
-            <div class="i-box-header">
-                <div class="i-box-title">
-                    {%- trans %}Search groups{% endtrans -%}
+            {% endif %}
+
+            <div class="i-box">
+                <div class="i-box-header">
+                    <div class="i-box-title">
+                        {%- trans %}Search groups{% endtrans -%}
+                    </div>
+                </div>
+                <div class="i-box-content">
+                    {% if providers and indico_config.LOCAL_GROUPS %}
+                        <p>
+                            {% trans providers=providers|map(attribute='title')|join(', ') -%}
+                                This Indico instance also supports external groups from identity providers ({{ providers }}).
+                            {%- endtrans %}
+                            <br>
+                            {% trans -%}
+                                The search form below will search both local groups and external groups, unless specified otherwise.
+                            {%- endtrans %}
+                        </p>
+                    {% endif %}
+
+                    {{ form_header(form) }}
+                    {{ form_rows(form) }}
+                    {% call form_footer(form) %}
+                        <input class="i-button big highlight" type="submit" value="{% trans %}Search{% endtrans %}">
+                    {% endcall %}
+
+                    {% if search_results is not none %}
+                        {% if not search_results %}
+                            <h3>{% trans %}No groups could be found.{% endtrans %}</h3>
+                        {% else %}
+                            <h3>
+                                {% trans count=search_results|count -%}
+                                    There is one group matching your search criteria.
+                                {%- pluralize -%}
+                                    There are {{ count }} groups matching your search criteria.
+                                {%- endtrans %}
+                            </h3>
+                            {{ group_table(search_results, show_provider=true) }}
+                        {% endif %}
+                    {% endif %}
                 </div>
             </div>
-            <div class="i-box-content">
-                {% if providers %}
-                    <p>
-                        {% trans providers=providers|map(attribute='title')|join(', ') -%}
-                            This Indico instance also supports external groups from identity providers ({{ providers }}).
-                        {%- endtrans %}
-                        <br>
-                        {% trans -%}
-                            The search form below will search both local groups and external groups, unless specified otherwise.
-                        {%- endtrans %}
-                    </p>
-                {% endif %}
-
-                {{ form_header(form) }}
-                {{ form_rows(form) }}
-                {% call form_footer(form) %}
-                    <input class="i-button big highlight" type="submit" value="{% trans %}Search{% endtrans %}">
-                {% endcall %}
-
-                {% if search_results is not none %}
-                    {% if not search_results %}
-                        <h3>{% trans %}No groups could be found.{% endtrans %}</h3>
-                    {% else %}
-                        <h3>
-                            {% trans count=search_results|count -%}
-                                There is one group matching your search criteria.
-                            {%- pluralize -%}
-                                There are {{ count }} groups matching your search criteria.
-                            {%- endtrans %}
-                        </h3>
-                        {{ group_table(search_results, show_provider=true) }}
-                    {% endif %}
-                {% endif %}
-            </div>
         </div>
-    </div>
+    {% endif %}
 {%- endblock %}

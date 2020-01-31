@@ -12,9 +12,10 @@ from operator import attrgetter
 from flask import flash, jsonify, redirect, request
 from sqlalchemy.orm import joinedload
 from webargs import fields
-from werkzeug.exceptions import NotFound
+from werkzeug.exceptions import Forbidden, NotFound
 
 from indico.core.auth import multipass
+from indico.core.config import config
 from indico.core.db import db
 from indico.modules.admin import RHAdminBase
 from indico.modules.groups import GroupProxy
@@ -39,20 +40,27 @@ class RHGroups(RHAdminBase):
         groups = [g.proxy for g in query]
         providers = [p for p in multipass.identity_providers.itervalues() if p.supports_groups]
         form = SearchForm(obj=FormDefaults(exact=True))
-        if not providers:
+        groups_enabled = True
+        if not providers and not config.LOCAL_GROUPS:
+            groups_enabled = False
+        elif not providers:
             del form.provider
         else:
-            form.provider.choices = ([('', _('All')), ('indico', _('Local Groups'))] +
-                                     [(p.name, p.title) for p in sorted(providers, key=attrgetter('title'))])
+            choices = [('', _('All'))]
+            if config.LOCAL_GROUPS:
+                choices.append(('indico', _('Local Groups')))
+            choices += [(p.name, p.title) for p in sorted(providers, key=attrgetter('title'))]
+            form.provider.choices = choices
         search_results = None
-        if form.validate_on_submit():
+        if groups_enabled and form.validate_on_submit():
             search_providers = None if not providers or not form.provider.data else {form.provider.data}
             search_results = GroupProxy.search(form.name.data, exact=form.exact.data, providers=search_providers)
             search_results.sort(key=attrgetter('provider', 'name'))
         provider_titles = {p.name: p.title for p in multipass.identity_providers.itervalues()}
         provider_titles[None] = _('Local')
         return WPGroupsAdmin.render_template('groups.html', groups=groups, providers=providers, form=form,
-                                             search_results=search_results, provider_titles=provider_titles)
+                                             search_results=search_results, provider_titles=provider_titles,
+                                             groups_enabled=groups_enabled)
 
 
 class RHGroupBase(RHAdminBase):
@@ -63,6 +71,8 @@ class RHGroupBase(RHAdminBase):
             group = None
         if group is None or group.group is None:
             raise NotFound
+        if not config.LOCAL_GROUPS and group.is_local:
+            raise Forbidden('Local groups are disabled.')
         self.group = group
 
 
@@ -88,6 +98,8 @@ class RHGroupEdit(RHAdminBase):
     """Admin group modification/creation"""
 
     def _process_args(self):
+        if not config.LOCAL_GROUPS:
+            raise Forbidden('Local groups are disabled.')
         if 'group_id' in request.view_args:
             self.new_group = False
             self.group = LocalGroup.get(request.view_args['group_id'])
@@ -115,6 +127,8 @@ class RHGroupEdit(RHAdminBase):
 
 class RHLocalGroupBase(RHAdminBase):
     def _process_args(self):
+        if not config.LOCAL_GROUPS:
+            raise Forbidden('Local groups are disabled.')
         self.group = LocalGroup.get(request.view_args['group_id'])
         if self.group is None:
             raise NotFound
