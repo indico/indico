@@ -12,13 +12,12 @@ import editFileTypeURL from 'indico-url:event_editing.api_edit_file_type';
 import React, {useReducer} from 'react';
 import PropTypes from 'prop-types';
 import {Button, Icon, Loader, Message, Segment, Popup, Label} from 'semantic-ui-react';
-import {TooltipIfTruncated} from 'indico/react/components';
+import {RequestConfirm, TooltipIfTruncated} from 'indico/react/components';
 import {Param, Translate} from 'indico/react/i18n';
 import {getChangedValues, handleSubmitError} from 'indico/react/forms';
 import {useIndicoAxios} from 'indico/react/hooks';
 import {handleAxiosError, indicoAxios} from 'indico/utils/axios';
 import FileTypeModal from './FileTypeModal';
-import RequestConfirm from './RequestConfirm';
 
 import './FileTypeManager.module.scss';
 
@@ -201,24 +200,24 @@ export default function FileTypeManager({eventId}) {
           onClose={() => dispatch({type: 'CLEAR'})}
         />
       )}
-      {operation === 'delete' && (
-        <RequestConfirm
-          header={Translate.string('Delete file type')}
-          confirmText={Translate.string('Yes')}
-          cancelText={Translate.string('No')}
-          onClose={() => dispatch({type: 'CLEAR'})}
-          content={
+      <RequestConfirm
+        header={Translate.string('Delete file type')}
+        confirmText={Translate.string('Yes')}
+        cancelText={Translate.string('No')}
+        onClose={() => dispatch({type: 'CLEAR'})}
+        content={
+          currentFileType ? (
             <div className="content">
               <Translate>
                 Are you sure you want to delete the file type{' '}
                 <Param name="fileType" value={currentFileType.name} wrapper={<strong />} />?
               </Translate>
             </div>
-          }
-          requestFunc={() => deleteFileType(currentFileType.id)}
-          open
-        />
-      )}
+          ) : null
+        }
+        requestFunc={() => deleteFileType(currentFileType.id)}
+        open={operation === 'delete'}
+      />
     </div>
   );
 }
