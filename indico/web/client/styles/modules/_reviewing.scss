@@ -69,6 +69,16 @@
         color: $gray;
     }
 
+    .submission-code {
+        font-size: 0.8em;
+        border: 1px solid $dark-gray;
+        border-radius: 3px;
+        padding: 0 0.2em;
+        background-color: $dark-gray;
+        color: $light-gray;
+        margin-left: 5px;
+    }
+
     .toolbar {
         padding: 0;
         margin: 0;
