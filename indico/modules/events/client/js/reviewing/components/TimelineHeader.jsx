@@ -20,6 +20,7 @@ export default function TimelineHeader({children, contribution, state, submitter
         <MathJax>
           <h3 className="f-self-strech">
             {contribution.title} <span className="submission-id">#{contribution.friendlyId}</span>
+            {contribution.code && <span className="submission-code">{contribution.code}</span>}
           </h3>
         </MathJax>
       </div>
@@ -57,6 +58,7 @@ TimelineHeader.propTypes = {
     id: PropTypes.number.isRequired,
     friendlyId: PropTypes.number.isRequired,
     title: PropTypes.string.isRequired,
+    code: PropTypes.string.isRequired,
   }).isRequired,
   state: PropTypes.shape({
     cssClass: PropTypes.string.isRequired,

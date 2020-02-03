@@ -19,7 +19,7 @@ from indico.modules.events.contributions.models.types import ContributionType
 class ContributionSchema(mm.ModelSchema):
     class Meta:
         model = Contribution
-        fields = ('id', 'title', 'friendly_id')
+        fields = ('id', 'title', 'friendly_id', 'code')
 
 
 class ContributionTypeSchema(mm.ModelSchema):
