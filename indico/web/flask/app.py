@@ -108,17 +108,17 @@ def configure_multipass(app, config):
 
 
 def configure_multipass_local(app):
-    app.config['MULTIPASS_AUTH_PROVIDERS']['indico'] = {
+    app.config['MULTIPASS_AUTH_PROVIDERS'] = dict(app.config['MULTIPASS_AUTH_PROVIDERS'], indico={
         'type': IndicoAuthProvider,
         'title': 'Indico',
         'default': not any(p.get('default') for p in app.config['MULTIPASS_AUTH_PROVIDERS'].itervalues())
-    }
-    app.config['MULTIPASS_IDENTITY_PROVIDERS']['indico'] = {
+    })
+    app.config['MULTIPASS_IDENTITY_PROVIDERS'] = dict(app.config['MULTIPASS_IDENTITY_PROVIDERS'], indico={
         'type': IndicoIdentityProvider,
         # We don't want any user info from this provider
         'identity_info_keys': {}
-    }
-    app.config['MULTIPASS_PROVIDER_MAP']['indico'] = 'indico'
+    })
+    app.config['MULTIPASS_PROVIDER_MAP'] = dict(app.config['MULTIPASS_PROVIDER_MAP'], indico='indico')
 
 
 def configure_webpack(app):
