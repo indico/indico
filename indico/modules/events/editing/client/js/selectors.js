@@ -199,3 +199,8 @@ export const getLastRevertableRevisionId = createSelector(
     return lastFinalRev.id;
   }
 );
+
+export const canJudgeLastRevision = createSelector(
+  getLastRevision,
+  lastRevision => lastRevision.finalState.name === FinalRevisionState.none
+);

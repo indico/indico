@@ -18,7 +18,7 @@ import CommentForm from './CommentForm';
 import {blockPropTypes} from './util';
 import {createRevisionComment} from '../../actions';
 import {EditingReviewAction} from '../../models';
-import {getLastRevision} from '../../selectors';
+import {getLastRevision, canJudgeLastRevision} from '../../selectors';
 
 import './ReviewForm.module.scss';
 
@@ -48,6 +48,7 @@ const judgmentOptions = [
 export default function ReviewForm({block}) {
   const dispatch = useDispatch();
   const lastRevision = useSelector(getLastRevision);
+  const canJudge = useSelector(canJudgeLastRevision);
   const currentUser = {
     fullName: Indico.User.full_name,
     avatarBgColor: Indico.User.avatar_bg_color,
@@ -68,7 +69,7 @@ export default function ReviewForm({block}) {
   const judgmentForm = (
     <div className="flexrow" styleName="judgment-form">
       <CommentForm onSubmit={addComment} onToggleExpand={setCommentFormVisible} />
-      {!commentFormVisible && (
+      {!commentFormVisible && canJudge && (
         <div className="review-trigger flexrow">
           <span className="comment-or-review">
             <Translate>or</Translate>
