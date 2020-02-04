@@ -13,27 +13,27 @@ from indico.util.locators import locator_property
 from indico.util.string import format_repr, return_ascii
 
 
-class EventRole(db.Model):
+class CategoryRole(db.Model):
     __tablename__ = 'roles'
     __table_args__ = (db.CheckConstraint('code = upper(code)', 'uppercase_code'),
-                      db.Index(None, 'event_id', 'code', unique=True),
-                      {'schema': 'events'})
+                      db.Index(None, 'category_id', 'code', unique=True),
+                      {'schema': 'categories'})
 
     is_group = False
-    is_event_role = True
-    is_category_role = False
+    is_event_role = False
+    is_category_role = True
     is_single_person = True
     is_network = False
     principal_order = 2
-    principal_type = PrincipalType.event_role
+    principal_type = PrincipalType.category_role
 
     id = db.Column(
         db.Integer,
         primary_key=True
     )
-    event_id = db.Column(
+    category_id = db.Column(
         db.Integer,
-        db.ForeignKey('events.events.id'),
+        db.ForeignKey('categories.categories.id'),
         nullable=False,
         index=True
     )
@@ -50,8 +50,8 @@ class EventRole(db.Model):
         nullable=False
     )
 
-    event = db.relationship(
-        'Event',
+    category = db.relationship(
+        'Category',
         lazy=True,
         backref=db.backref(
             'roles',
@@ -61,23 +61,23 @@ class EventRole(db.Model):
     )
     members = db.relationship(
         'User',
-        secondary='events.role_members',
+        secondary='categories.role_members',
         lazy=True,
         collection_class=set,
-        backref=db.backref('event_roles', lazy=True, collection_class=set),
+        backref=db.backref('category_roles', lazy=True, collection_class=set),
     )
 
     # relationship backrefs:
-    # - in_attachment_acls (AttachmentPrincipal.event_role)
-    # - in_attachment_folder_acls (AttachmentFolderPrincipal.event_role)
-    # - in_contribution_acls (ContributionPrincipal.event_role)
-    # - in_event_acls (EventPrincipal.event_role)
-    # - in_event_settings_acls (EventSettingPrincipal.event_role)
-    # - in_session_acls (SessionPrincipal.event_role)
-    # - in_track_acls (TrackPrincipal.event_role)
+    # - in_attachment_acls (AttachmentPrincipal.category_role)
+    # - in_attachment_folder_acls (AttachmentFolderPrincipal.category_role)
+    # - in_contribution_acls (ContributionPrincipal.category_role)
+    # - in_event_acls (EventPrincipal.category_role)
+    # - in_event_settings_acls (EventSettingPrincipal.category_role)
+    # - in_session_acls (SessionPrincipal.category_role)
+    # - in_track_acls (TrackPrincipal.category_role)
 
     def __contains__(self, user):
-        return user is not None and self in user.event_roles
+        return user is not None and self in user.category_roles
 
     @return_ascii
     def __repr__(self):
@@ -85,11 +85,11 @@ class EventRole(db.Model):
 
     @locator_property
     def locator(self):
-        return dict(self.event.locator, role_id=self.id)
+        return dict(self.category.locator, role_id=self.id)
 
     @property
     def identifier(self):
-        return 'EventRole:{}'.format(self.id)
+        return 'CategoryRole:{}'.format(self.id)
 
     @property
     def css(self):
@@ -106,7 +106,7 @@ role_members_table = db.Table(
     db.Column(
         'role_id',
         db.Integer,
-        db.ForeignKey('events.roles.id'),
+        db.ForeignKey('categories.roles.id'),
         primary_key=True,
         nullable=False,
         index=True
@@ -119,5 +119,5 @@ role_members_table = db.Table(
         nullable=False,
         index=True
     ),
-    schema='events'
+    schema='categories'
 )

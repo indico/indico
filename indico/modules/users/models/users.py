@@ -158,6 +158,7 @@ class User(PersonMixin, db.Model):
     is_group = False
     is_single_person = True
     is_event_role = False
+    is_category_role = False
     is_network = False
     principal_order = 0
     principal_type = PrincipalType.user
@@ -362,6 +363,7 @@ class User(PersonMixin, db.Model):
     # - attachment_files (AttachmentFile.user)
     # - attachments (Attachment.user)
     # - blockings (Blocking.created_by_user)
+    # - category_roles (CategoryRole.members)
     # - content_reviewer_for_contributions (Contribution.paper_content_reviewers)
     # - created_events (Event.creator)
     # - editing_comments (EditingRevisionComment.user)
