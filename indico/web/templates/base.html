@@ -15,11 +15,15 @@
         window.CKEDITOR_BASEPATH = {{ url_for('assets.dist', filename='js/ckeditor/')|tojson() }};
     </script>
 
+    {{ webpack['common.css'] }}
     {{ webpack['common.js'] }}
-    {{ webpack['jquery.js'] }}
+    {{ webpack['react.js'] }}
+    {{ webpack['semantic-ui.js'] }}
+    {{ webpack['semantic-ui.css'] }}
     {{ webpack['jquery.css'] }}
-    {{ webpack['main.js'] }}
+    {{ webpack['jquery.js'] }}
     {{ webpack['main.css'] }}
+    {{ webpack['main.js'] }}
     {{ webpack['outdatedbrowser.js'] }}
     {{ webpack['outdatedbrowser.css'] }}
     {{ webpack['__custom.js'] }}
