@@ -178,6 +178,7 @@ def generate_global_file():
             },
 
             'Categories': {
+                'display': url_rule_to_js('categories.display'),
                 'info': url_rule_to_js('categories.info'),
                 'infoFrom': url_rule_to_js('categories.info_from'),
                 'search': url_rule_to_js('categories.search')

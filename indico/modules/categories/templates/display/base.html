@@ -23,6 +23,12 @@
                 {{ create_event_button(category, classes="highlight", text=_("Create event"), with_tooltip=false) }}
             </div>
             <div class="group">
+                <button id="navigate-button" class="i-button icon-compass2"
+                        title="{% trans %}Navigate categories{% endtrans %}">
+                    {% trans %}Navigate{% endtrans %}
+                </button>
+            </div>
+            <div class="group">
                 {% if not category.is_root %}
                     <a class="i-button icon-arrow-up" href="{{ category.parent.url }}">
                         {% trans %}Parent category{% endtrans %}
@@ -86,6 +92,17 @@
     </div>
 </div>
 <script>
+    $('#navigate-button').on('click', function(evt) {
+        $('<div>').categorynavigator({
+            openInDialog: true,
+            category: {{ category.id }},
+            actionButtonText: $T.gettext('Navigate to'),
+            dialogTitle: $T.gettext('Navigate to a category'),
+            onAction: function(category) {
+                window.location.href = build_url(Indico.Urls.Categories.display, {category_id: category.id});
+            }
+        });
+    });
     $('.js-export-ical').on('click', function(evt) {
         evt.preventDefault();
         $(this).trigger('menu_select');

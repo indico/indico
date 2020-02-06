@@ -58,6 +58,8 @@ Improvements
 - Add event logging to opening/closing registration forms, approval/rejection of
   registrations, and updates to event layout (:issue:`4360`,
   thanks :user:`giusedb` & :user:`omegak`)
+- Add category navigation dialog on category display page (:issue:`4282`,
+  thanks :user:`omegak`)
 
 Bugfixes
 ^^^^^^^^
