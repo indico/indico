@@ -40,6 +40,7 @@ Improvements
   category settings form (:issue:`4231`)
 - Added new :data:`LOCAL_GROUPS` setting that can be used to fully disable
   local groups (:issue:`4260`)
+- Log bulk event category changes in the event log (:issue:`4241`)
 
 Bugfixes
 ^^^^^^^^
