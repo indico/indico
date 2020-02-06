@@ -1,7 +1,7 @@
-{% macro render_roles(roles) -%}
+{% macro render_roles(roles, email_button=true) -%}
     {% for role in roles|sort(attribute='code') %}
         <tbody id="event-role-{{ role.id }}">
-            {{ render_role(role) }}
+            {{ render_role(role, email_button=email_button) }}
         </tbody>
     {% else %}
         <tr>
@@ -13,7 +13,7 @@
 {%- endmacro %}
 
 
-{% macro render_role(role, collapsed=true) -%}
+{% macro render_role(role, collapsed=true, email_button=true) -%}
     <tr>
         <td class="badge-column toggle-members">
             <span class="i-tag outline role-badge" style="{{ role.css }};">
@@ -39,12 +39,14 @@
         <td class="action-column">
             <div class="thin toolbar right entry-action-buttons">
                 <div class="group">
-                    <button class="icon-mail i-button text-color borderless"
-                            data-href="{{ url_for('persons.email_event_persons', role.event) }}"
-                            data-title="{% trans %}Send email{% endtrans %}"
-                            data-method="POST"
-                            data-params="{{ dict(role_id=role.id) | tojson | forceescape }}"
-                            data-ajax-dialog></button>
+                    {% if email_button %}
+                        <button class="icon-mail i-button text-color borderless"
+                                data-href="{{ url_for('persons.email_event_persons', role.event) }}"
+                                data-title="{% trans %}Send email{% endtrans %}"
+                                data-method="POST"
+                                data-params="{{ dict(role_id=role.id) | tojson | forceescape }}"
+                                data-ajax-dialog></button>
+                    {% endif %}
                     <button class="icon-edit i-button text-color borderless"
                             data-href="{{ url_for('.edit_role', role) }}"
                             data-title="{% trans %}Edit role{% endtrans %}"

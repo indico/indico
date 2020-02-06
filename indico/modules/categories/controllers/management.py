@@ -8,6 +8,7 @@
 from __future__ import unicode_literals
 
 import os
+import random
 from io import BytesIO
 
 from flask import flash, redirect, request, session
@@ -19,17 +20,22 @@ from indico.core.db import db
 from indico.modules.categories import logger
 from indico.modules.categories.controllers.base import RHManageCategoryBase
 from indico.modules.categories.forms import (CategoryIconForm, CategoryLogoForm, CategoryProtectionForm,
-                                             CategorySettingsForm, CreateCategoryForm, SplitCategoryForm)
+                                             CategorySettingsForm, CreateCategoryForm, RoleForm, SplitCategoryForm)
 from indico.modules.categories.models.categories import Category
+from indico.modules.categories.models.roles import CategoryRole
 from indico.modules.categories.operations import create_category, delete_category, move_category, update_category
 from indico.modules.categories.util import get_image_data
 from indico.modules.categories.views import WPCategoryManagement
 from indico.modules.events import Event
+from indico.modules.events.roles.util import get_role_colors, serialize_role
 from indico.modules.events.util import update_object_principals
 from indico.modules.rb.models.reservations import Reservation, ReservationLink
+from indico.modules.users import User
 from indico.util.fs import secure_filename
 from indico.util.i18n import _, ngettext
 from indico.util.string import crc32
+from indico.util.user import principal_from_fossil
+from indico.web.flask.templating import get_template_module
 from indico.web.flask.util import url_for
 from indico.web.forms.base import FormDefaults
 from indico.web.util import jsonify_data, jsonify_form, jsonify_template, url_for_index
@@ -37,6 +43,22 @@ from indico.web.util import jsonify_data, jsonify_form, jsonify_template, url_fo
 
 CATEGORY_ICON_DIMENSIONS = (16, 16)
 MAX_CATEGORY_LOGO_DIMENSIONS = (200, 200)
+
+
+def _get_roles(category):
+    return (CategoryRole.query.with_parent(category)
+            .options(joinedload('members'))
+            .all())
+
+
+def _render_roles(category):
+    tpl = get_template_module('events/roles/_roles.html')
+    return tpl.render_roles(_get_roles(category), email_button=False)
+
+
+def _render_role(role, collapsed=True):
+    tpl = get_template_module('events/roles/_roles.html')
+    return tpl.render_role(role, collapsed=collapsed, email_button=False)
 
 
 class RHManageCategoryContent(RHManageCategoryBase):
@@ -402,3 +424,94 @@ class RHMoveEvents(RHManageCategorySelectedEventsBase):
                        'You have moved {count} events to the category "{cat}"', len(self.events))
               .format(count=len(self.events), cat=self.target_category.title), 'success')
         return jsonify_data(flash=False)
+
+
+class RHCategoryRoles(RHManageCategoryBase):
+    """Category role management"""
+
+    def _process(self):
+        return WPCategoryManagement.render_template('management/roles.html', self.category, 'roles',
+                                                    roles=_get_roles(self.category))
+
+
+class RHAddCategoryRole(RHManageCategoryBase):
+    """Add a new category role"""
+
+    def _process(self):
+        form = RoleForm(category=self.category, color=self._get_color())
+        if form.validate_on_submit():
+            role = CategoryRole(category=self.category)
+            form.populate_obj(role)
+            db.session.flush()
+            logger.info('Category role %r created by %r', role, session.user)
+            return jsonify_data(html=_render_roles(self.category), role=serialize_role(role))
+        return jsonify_form(form)
+
+    def _get_color(self):
+        used_colors = {role.color for role in self.category.roles}
+        unused_colors = set(get_role_colors()) - used_colors
+        return random.choice(tuple(unused_colors) or get_role_colors())
+
+
+class RHManageCategoryRole(RHManageCategoryBase):
+    """Base class to manage a specific category role"""
+
+    normalize_url_spec = {
+        'locators': {
+            lambda self: self.role
+        }
+    }
+
+    def _process_args(self):
+        RHManageCategoryBase._process_args(self)
+        self.role = CategoryRole.get_one(request.view_args['role_id'])
+
+
+class RHEditCategoryRole(RHManageCategoryRole):
+    """Edit an category role"""
+
+    def _process(self):
+        form = RoleForm(obj=self.role, category=self.category)
+        if form.validate_on_submit():
+            form.populate_obj(self.role)
+            db.session.flush()
+            logger.info('Category role %r updated by %r', self.role, session.user)
+            return jsonify_data(html=_render_role(self.role))
+        return jsonify_form(form)
+
+
+class RHDeleteCategoryRole(RHManageCategoryRole):
+    """Delete an category role"""
+
+    def _process(self):
+        db.session.delete(self.role)
+        logger.info('Category role %r deleted by %r', self.role, session.user)
+        return jsonify_data(html=_render_roles(self.category))
+
+
+class RHRemoveCategoryRoleMember(RHManageCategoryRole):
+    """Remove a user from an category role"""
+
+    normalize_url_spec = dict(RHManageCategoryRole.normalize_url_spec, preserved_args={'user_id'})
+
+    def _process_args(self):
+        RHManageCategoryRole._process_args(self)
+        self.user = User.get_one(request.view_args['user_id'])
+
+    def _process(self):
+        if self.user in self.role.members:
+            self.role.members.remove(self.user)
+            logger.info('User %r removed from role %r by %r', self.user, self.role, session.user)
+        return jsonify_data(html=_render_role(self.role, collapsed=False))
+
+
+class RHAddCategoryRoleMembers(RHManageCategoryRole):
+    """Add users to an category role"""
+
+    def _process(self):
+        for data in request.json['users']:
+            user = principal_from_fossil(data, allow_pending=True, allow_groups=False)
+            if user not in self.role.members:
+                self.role.members.add(user)
+                logger.info('User %r added to role %r by %r', user, self.role, session.user)
+        return jsonify_data(html=_render_role(self.role, collapsed=False))

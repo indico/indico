@@ -1,0 +1,23 @@
+{% extends 'categories/management/base.html' %}
+{% from 'events/roles/_roles.html' import render_roles %}
+
+{% block title %}{% trans %}Roles Setup{% endtrans %}{% endblock %}
+
+{% block content %}
+    <table class="i-table-widget multi-tbody" id="event-roles">
+        {{ render_roles(roles, email_button=false) }}
+    </table>
+    <div class="toolbar f-j-end space-before">
+        <button class="i-button highlight icon-plus hide-if-locked"
+                data-href="{{ url_for('.add_role', category) }}"
+                data-title="{% trans %}Add a new role{% endtrans %}"
+                data-update="#event-roles"
+                data-ajax-dialog>
+            {% trans %}Add Role{% endtrans %}
+        </button>
+    </div>
+
+    <script>
+        setupCategoryRolesList();
+    </script>
+{% endblock %}

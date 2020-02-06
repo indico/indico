@@ -18,11 +18,14 @@ from indico.modules.categories.controllers.display import (RHCategoryCalendarVie
                                                            RHExportCategoryICAL, RHReachableCategoriesInfo,
                                                            RHShowFutureEventsInCategory, RHShowPastEventsInCategory,
                                                            RHSubcatInfo, RHXMLExportCategoryInfo)
-from indico.modules.categories.controllers.management import (RHCreateCategory, RHDeleteCategory, RHDeleteEvents,
-                                                              RHDeleteSubcategories, RHManageCategoryContent,
-                                                              RHManageCategoryIcon, RHManageCategoryLogo,
-                                                              RHManageCategoryProtection, RHManageCategorySettings,
-                                                              RHMoveCategory, RHMoveEvents, RHMoveSubcategories,
+from indico.modules.categories.controllers.management import (RHAddCategoryRole, RHAddCategoryRoleMembers,
+                                                              RHCategoryRoles, RHCreateCategory, RHDeleteCategory,
+                                                              RHDeleteCategoryRole, RHDeleteEvents,
+                                                              RHDeleteSubcategories, RHEditCategoryRole,
+                                                              RHManageCategoryContent, RHManageCategoryIcon,
+                                                              RHManageCategoryLogo, RHManageCategoryProtection,
+                                                              RHManageCategorySettings, RHMoveCategory, RHMoveEvents,
+                                                              RHMoveSubcategories, RHRemoveCategoryRoleMember,
                                                               RHSortSubcategories, RHSplitCategory)
 from indico.modules.users import User
 from indico.web.flask.util import make_compat_redirect_func, redirect_view, url_for
@@ -45,6 +48,15 @@ _bp.add_url_rule('/manage/logo', 'manage_logo', RHManageCategoryLogo, methods=('
 _bp.add_url_rule('/manage/move', 'move', RHMoveCategory, methods=('POST',))
 _bp.add_url_rule('/manage/protection', 'manage_protection', RHManageCategoryProtection, methods=('GET', 'POST'))
 _bp.add_url_rule('/manage/settings', 'manage_settings', RHManageCategorySettings, methods=('POST', 'GET'))
+
+# Role management
+_bp.add_url_rule('/manage/roles', 'manage_roles', RHCategoryRoles, methods=('POST', 'GET'))
+_bp.add_url_rule('/manage/roles/create', 'add_role', RHAddCategoryRole, methods=('GET', 'POST'))
+_bp.add_url_rule('/manage/roles/<int:role_id>/edit', 'edit_role', RHEditCategoryRole, methods=('GET', 'POST'))
+_bp.add_url_rule('/manage/roles/<int:role_id>', 'delete_role', RHDeleteCategoryRole, methods=('DELETE',))
+_bp.add_url_rule('/manage/roles/<int:role_id>/members', 'add_members', RHAddCategoryRoleMembers, methods=('POST',))
+_bp.add_url_rule('/manage/roles/<int:role_id>/members/<int:user_id>', 'remove_member', RHRemoveCategoryRoleMember,
+                 methods=('DELETE',))
 
 # Event management
 _bp.add_url_rule('/manage/events/delete', 'delete_events', RHDeleteEvents, methods=('GET', 'POST'))

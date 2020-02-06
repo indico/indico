@@ -11,18 +11,21 @@ from functools import partial
 
 from flask import request
 from wtforms.fields import BooleanField, HiddenField, IntegerField, SelectField, StringField
-from wtforms.validators import DataRequired, InputRequired, NumberRange, Optional, ValidationError
+from wtforms.validators import DataRequired, InputRequired, Length, NumberRange, Optional, ValidationError
 
 from indico.modules.categories.models.categories import Category, EventMessageMode
+from indico.modules.categories.models.roles import CategoryRole
 from indico.modules.categories.util import get_image_data, get_visibility_options
 from indico.modules.events import Event
 from indico.modules.events.fields import IndicoThemeSelectField
 from indico.modules.events.models.events import EventType
+from indico.modules.events.roles.util import get_role_colors
 from indico.util.i18n import _
 from indico.web.forms.base import IndicoForm
 from indico.web.forms.fields import (AccessControlListField, EditableFileField, EmailListField, HiddenFieldList,
                                      IndicoEnumSelectField, IndicoMarkdownField, IndicoProtectionField,
-                                     IndicoTimezoneSelectField, MultipleItemsField, PrincipalListField)
+                                     IndicoSinglePalettePickerField, IndicoTimezoneSelectField, MultipleItemsField,
+                                     PrincipalListField)
 from indico.web.forms.widgets import HiddenCheckbox, SwitchWidget
 
 
@@ -171,3 +174,25 @@ class UpcomingEventsForm(IndicoForm):
                 raise ValidationError(_('Invalid category: {}').format(entry['id']))
             if entry['type'] == 'event' and not Event.get(entry['id'], is_deleted=False):
                 raise ValidationError(_('Invalid event: {}').format(entry['id']))
+
+
+class RoleForm(IndicoForm):
+    name = StringField(_('Name'), [DataRequired()],
+                       description=_('The full name of the role'))
+    code = StringField(_('Abbreviation'), [DataRequired(), Length(max=3)], filters=[lambda x: x.upper() if x else ''],
+                       render_kw={'style': 'width:60px; text-align:center; text-transform:uppercase;'},
+                       description=_('A shortcut (max. 3 characters) for the role'))
+    color = IndicoSinglePalettePickerField(_('Colour'), color_list=get_role_colors(), text_color='ffffff',
+                                           description=_('The colour used when displaying the role'))
+
+    def __init__(self, *args, **kwargs):
+        self.role = kwargs.get('obj')
+        self.category = kwargs.pop('category')
+        super(RoleForm, self).__init__(*args, **kwargs)
+
+    def validate_code(self, field):
+        query = CategoryRole.query.with_parent(self.category).filter_by(code=field.data)
+        if self.role is not None:
+            query = query.filter(CategoryRole.id != self.role.id)
+        if query.has_rows():
+            raise ValueError(_('A role with this abbreviation already exists.'))
