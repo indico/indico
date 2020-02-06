@@ -818,10 +818,16 @@ class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionMan
         db.m.Session.preload_acl_entries(self)
 
     def move(self, category):
+        from indico.modules.events import EventLogRealm, EventLogKind
         old_category = self.category
         self.category = category
+        sep = ' \N{RIGHT-POINTING DOUBLE ANGLE QUOTATION MARK} '
+        old_path = sep.join(old_category.chain_titles)
+        new_path = sep.join(self.category.chain_titles)
         db.session.flush()
         signals.event.moved.send(self, old_parent=old_category)
+        self.log(EventLogRealm.management, EventLogKind.change, 'Category', 'Event moved', session.user,
+                 data={'From': old_path, 'To': new_path})
 
     def delete(self, reason, user=None):
         from indico.modules.events import logger, EventLogRealm, EventLogKind
