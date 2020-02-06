@@ -71,6 +71,23 @@ class Placeholder(object):
         return cls.get_regex(**kwargs).search(text) is not None
 
     @classmethod
+    def is_empty(cls, text, **kwargs):
+        """Checks whether the placeholder renders an empty string
+
+        :param text: The text to replace placeholders in
+        :param kwargs: arguments specific to the placeholder's context
+        """
+        empty = [False]
+
+        def _replace(m):
+            if not cls.render(**kwargs):
+                empty[0] = True
+            return ''
+
+        cls.get_regex(**kwargs).sub(_replace, text)
+        return empty[0]
+
+    @classmethod
     def render(cls, **kwargs):
         """Converts the placeholder to a string
 
@@ -139,6 +156,23 @@ class ParametrizedPlaceholder(Placeholder):
         return cls.get_regex(**kwargs).sub(_replace, text)
 
     @classmethod
+    def is_empty(cls, text, **kwargs):
+        """Checks whether the placeholder renders an empty string
+
+        :param text: The text to replace placeholders in
+        :param kwargs: arguments specific to the placeholder's context
+        """
+        empty = [False]
+
+        def _replace(m):
+            if not cls.render(m.group(1), **kwargs):
+                empty[0] = True
+            return ''
+
+        cls.get_regex(**kwargs).sub(_replace, text)
+        return empty[0]
+
+    @classmethod
     def render(cls, param, **kwargs):
         raise NotImplementedError
 
@@ -170,7 +204,7 @@ def get_empty_placeholders(context, text, **kwargs):
     return set(
         placeholder.friendly_name
         for placeholder in get_placeholders(context, **kwargs).viewvalues()
-        if placeholder.is_in(text, **kwargs) and not placeholder.replace(text, **kwargs)
+        if placeholder.is_in(text, **kwargs) and placeholder.is_empty(text, **kwargs)
     )
 
 
