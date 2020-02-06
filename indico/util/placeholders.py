@@ -170,7 +170,7 @@ def get_empty_placeholders(context, text, **kwargs):
     return set(
         placeholder.friendly_name
         for placeholder in get_placeholders(context, **kwargs).viewvalues()
-        if placeholder.is_in(text, **kwargs) and not placeholder.render(**kwargs)
+        if placeholder.is_in(text, **kwargs) and not placeholder.replace(text, **kwargs)
     )
 
 

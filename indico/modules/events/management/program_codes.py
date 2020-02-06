@@ -12,7 +12,7 @@ from collections import OrderedDict
 from indico.modules.events.management.settings import program_codes_settings
 from indico.util.date_time import format_datetime
 from indico.util.i18n import _
-from indico.util.placeholders import Placeholder, get_empty_placeholders, replace_placeholders
+from indico.util.placeholders import ParametrizedPlaceholder, Placeholder, get_empty_placeholders, replace_placeholders
 
 
 def generate_program_codes(event, object_type, objects):
@@ -49,13 +49,22 @@ def _make_date_placeholder(class_name, name, render_kwarg, date_format, descript
     return type(str(class_name), (DatePlaceholder,), dct)
 
 
-class ContributionIDPlaceholder(Placeholder):
+class ContributionIDPlaceholder(ParametrizedPlaceholder):
     name = 'id'
-    description = _('The ID of the contribution')
+    description = _('The ID of the contribution (optionally padded with zeros, e.g. {id:2} for "01" or {id} for "1")')
+    param_friendly_name = 'length'
+    param_required = False
 
     @classmethod
-    def render(cls, contribution):
-        return unicode(contribution.friendly_id)
+    def render(cls, param, contribution):
+        if param is None:
+            return unicode(contribution.friendly_id)
+        try:
+            padding = max(1, min(int(param), 10))
+        except ValueError:
+            return unicode(contribution.friendly_id)
+        else:
+            return unicode(contribution.friendly_id).zfill(padding)
 
 
 class ContributionSessionCodePlaceholder(Placeholder):
