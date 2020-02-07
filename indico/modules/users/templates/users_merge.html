@@ -56,7 +56,7 @@
 
                 function showProblem(problem, isError) {
                     $('#flashed-messages').append(
-                        $('<div>', {'class': (isError ? 'error' : 'warning') + '-message-box'}).append(
+                        $('<div>', {'class': (isError ? 'error' : 'warning') + '-message-box fixed-width'}).append(
                             $('<div>', {'class': 'message-text', text: problem})
                         )
                     );
