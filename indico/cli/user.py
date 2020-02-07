@@ -30,6 +30,15 @@ def cli():
 
 
 def _print_user_info(user):
+    flags = []
+    if user.is_admin:
+        flags.append('%{yellow}admin%{reset}')
+    if user.is_blocked:
+        flags.append('%{red}blocked%{reset}')
+    if user.is_deleted:
+        flags.append('%{red!}deleted%{reset}')
+    if user.is_pending:
+        flags.append('%{cyan}pending%{reset}')
     print()
     print('User info:')
     print("  ID: {}".format(user.id))
@@ -37,6 +46,8 @@ def _print_user_info(user):
     print("  Family name: {}".format(user.last_name))
     print("  Email: {}".format(user.email))
     print("  Affiliation: {}".format(user.affiliation))
+    if flags:
+        print(cformat("  Flags: {}".format(', '.join(flags))))
     print()
 
 
