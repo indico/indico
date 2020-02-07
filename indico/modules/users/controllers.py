@@ -472,6 +472,10 @@ def _get_merge_problems(source, target):
         warnings.append(_("Source user has never logged in to Indico!"))
     if target.is_pending:
         warnings.append(_("Target user has never logged in to Indico!"))
+    if source.is_blocked:
+        warnings.append(_("Source user is blocked!"))
+    if target.is_blocked:
+        warnings.append(_("Target user is blocked!"))
     if source.is_deleted:
         errors.append(_("Source user has been deleted!"))
     if target.is_deleted:

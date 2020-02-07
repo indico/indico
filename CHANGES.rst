@@ -42,6 +42,7 @@ Improvements
   local groups (:issue:`4260`)
 - Log bulk event category changes in the event log (:issue:`4241`)
 - Add CLI commands to block and unblock users (:issue:`3845`)
+- Show warning when trying to merge a blocked user (:issue:`3845`)
 
 Bugfixes
 ^^^^^^^^
