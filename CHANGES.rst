@@ -41,6 +41,7 @@ Improvements
 - Added new :data:`LOCAL_GROUPS` setting that can be used to fully disable
   local groups (:issue:`4260`)
 - Log bulk event category changes in the event log (:issue:`4241`)
+- Add CLI commands to block and unblock users (:issue:`3845`)
 
 Bugfixes
 ^^^^^^^^

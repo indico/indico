@@ -166,3 +166,39 @@ def revoke_admin(user_id):
         user.is_admin = False
         db.session.commit()
         print(cformat("%{green}Administration rights revoked successfully"))
+
+
+@cli.command()
+@click.argument('user_id', type=int)
+def block(user_id):
+    """Blocks a given user"""
+    user = User.get(user_id)
+    if user is None:
+        print(cformat("%{red}This user does not exist"))
+        return
+    _print_user_info(user)
+    if user.is_blocked:
+        print(cformat("%{yellow}This user is already blocked"))
+        return
+    if click.confirm(cformat("%{yellow}Block this user?")):
+        user.is_blocked = True
+        db.session.commit()
+        print(cformat("%{green}Successfully blocked user"))
+
+
+@cli.command()
+@click.argument('user_id', type=int)
+def unblock(user_id):
+    """Unblocks a given user"""
+    user = User.get(user_id)
+    if user is None:
+        print(cformat("%{red}This user does not exist"))
+        return
+    _print_user_info(user)
+    if not user.is_blocked:
+        print(cformat("%{yellow}This user is not blocked"))
+        return
+    if click.confirm(cformat("%{yellow}Unblock this user?")):
+        user.is_blocked = False
+        db.session.commit()
+        print(cformat("%{green}Successfully unblocked user"))
