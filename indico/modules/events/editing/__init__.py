@@ -53,6 +53,6 @@ def _extend_event_management_menu(sender, event, **kwargs):
 
 class EditableEditorPermission(ManagementPermission):
     name = 'paper_editing'
-    friendly_name = _('Paper editor')
+    friendly_name = _('Paper Editor')
     description = _('Grants editor rights for paper editing on an event.')
     user_selectable = True

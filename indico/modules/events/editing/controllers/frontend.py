@@ -7,14 +7,14 @@
 
 from __future__ import unicode_literals
 
-from werkzeug.exceptions import NotFound
+from flask import session
+from werkzeug.exceptions import Forbidden, NotFound
 
-from indico.modules.events.editing.controllers.base import (RHContributionEditableBase, RHEditingBase,
-                                                            RHEditingManagementBase)
+from indico.modules.events.editing.controllers.base import RHContributionEditableBase, RHEditingManagementBase
 from indico.modules.events.editing.views import WPEditing
 
 
-class RHEditingDashboard(RHEditingBase):
+class RHEditingDashboard(RHEditingManagementBase):
     def _process(self):
         return WPEditing.render_template('management/editing.html', self.event)
 
@@ -24,6 +24,14 @@ class RHEditableTimeline(RHContributionEditableBase):
         RHContributionEditableBase._process_args(self)
         if not self.editable:
             raise NotFound
+
+    def _check_access(self):
+        RHContributionEditableBase._check_access(self)
+
+        if self.event.can_manage(session.user, permission='paper_editing'):
+            return
+        if not self._user_is_authorized_submitter() and not self._user_is_authorized_editor():
+            raise Forbidden
 
     def _process(self):
         return WPEditing.render_template(

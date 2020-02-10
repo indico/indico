@@ -8,31 +8,31 @@
 from __future__ import unicode_literals
 
 from flask import request, session
-from werkzeug.exceptions import Forbidden
 
 from indico.modules.events.contributions.controllers.display import RHContributionDisplayBase
-from indico.modules.events.controllers.base import RHEventBase
+from indico.modules.events.controllers.base import RHDisplayEventBase
 from indico.modules.events.editing.models.editable import Editable, EditableType
 from indico.modules.events.management.controllers.base import RHManageEventBase
+from indico.web.rh import RequireUserMixin
 
 
-class RHEditingBase(RHEventBase):
+class RHEditingBase(RequireUserMixin, RHDisplayEventBase):
     """Base class for editing RHs that don't reference an editable."""
 
     EVENT_FEATURE = 'editing'
 
     def _check_access(self):
-        RHEventBase._check_access(self)
-        # TODO: check for proper event/editing access (RHEventBase does NOT check event access)
-        if not session.user:
-            raise Forbidden
+        RHDisplayEventBase._check_access(self)
+        RequireUserMixin._check_access(self)
 
 
 class RHEditingManagementBase(RHManageEventBase):
+    """Base class for editing RHs that don't reference an editable."""
+
     EVENT_FEATURE = 'editing'
 
 
-class RHContributionEditableBase(RHContributionDisplayBase):
+class RHContributionEditableBase(RequireUserMixin, RHContributionDisplayBase):
     """Base class for operations on an editable."""
 
     EVENT_FEATURE = 'editing'
@@ -43,6 +43,10 @@ class RHContributionEditableBase(RHContributionDisplayBase):
         },
         'preserved_args': {'type'}
     }
+
+    def _check_access(self):
+        RequireUserMixin._check_access(self)
+        RHContributionDisplayBase._check_access(self)
 
     def _process_args(self):
         RHContributionDisplayBase._process_args(self)
