@@ -18,6 +18,7 @@ Bugfixes
   tickets are blocked (:issue:`4242`)
 - Fix event access key prompt not showing when accessing an attachment link
   (:issue:`4255`)
+- Include event title in OpenGraph metadata (:issue:`4288`)
 
 Version 2.2.5
 -------------
