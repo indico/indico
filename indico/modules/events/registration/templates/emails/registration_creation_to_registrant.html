@@ -40,13 +40,13 @@
 {% macro render_registration_info() %}
     for the event <strong>{{ event.title }}</strong>
     {% if event.start_dt_local.date() == event.end_dt_local.date() %}
-        ({{ event.start_dt|format_datetime(timezone=event.tzinfo) }}
+        ({{ event.start_dt|format_datetime(timezone=event.tzinfo, locale='en_GB') }}
         -
-        {{ event.end_dt|format_time(timezone=event.tzinfo) }})
+        {{ event.end_dt|format_time(timezone=event.tzinfo, locale='en_GB') }})
     {% else %}
-        ({{ event.start_dt|format_datetime(timezone=event.tzinfo) }}
+        ({{ event.start_dt|format_datetime(timezone=event.tzinfo, locale='en_GB') }}
         -
-        {{ event.end_dt|format_datetime(timezone=event.tzinfo) }})
+        {{ event.end_dt|format_datetime(timezone=event.tzinfo, locale='en_GB') }})
     {% endif %}
 {% endmacro %}
 
