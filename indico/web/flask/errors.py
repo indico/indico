@@ -7,6 +7,9 @@
 
 from __future__ import unicode_literals
 
+import os
+import traceback
+
 from flask import current_app, jsonify, request, session
 from itsdangerous import BadData
 from sqlalchemy.exc import DatabaseError
@@ -98,6 +101,10 @@ def handle_exception(exc, message=None):
         sentry_log_exception()
         if message is None:
             message = '{}: {}'.format(type(exc).__name__, to_unicode(exc.message))
+        if os.environ.get('INDICO_DEV_SERVER') == '1':
+            # If we are in the dev server, we always want to see a traceback on the
+            # console, even if this was an API request.
+            traceback.print_exc()
         return render_error(exc, _('Something went wrong'), message, 500)
     # Let the exception propagate to middleware /the webserver.
     # This triggers the Flask debugger in development and sentry

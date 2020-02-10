@@ -44,6 +44,7 @@ def run_cmd(info, host, port, url, ssl, ssl_key, ssl_cert, quiet, proxy, enable_
         else:
             url = '{}://{}:{}'.format(proto, url_host, port)
 
+    os.environ['INDICO_DEV_SERVER'] = '1'
     os.environ.pop('FLASK_DEBUG', None)
     os.environ['INDICO_CONF_OVERRIDE'] = repr({
         'BASE_URL': url,
