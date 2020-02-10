@@ -75,8 +75,8 @@ def test_import_error(dummy_regform):
 
     with pytest.raises(UserValueError) as e:
         import_registrations_from_csv(dummy_regform, BytesIO(csv))
-    assert 'malformed' in e.value.message
-    assert 'Row 2' in e.value.message
+    assert 'malformed' in str(e.value)
+    assert 'Row 2' in str(e.value)
 
     # missing e-mail
     csv = b'\n'.join([b'Bill,Doe,ACME Inc.,Regional Manager,+1-202-555-0140,bdoe@example.com',
@@ -84,8 +84,8 @@ def test_import_error(dummy_regform):
 
     with pytest.raises(UserValueError) as e:
         import_registrations_from_csv(dummy_regform, BytesIO(csv))
-    assert 'missing e-mail' in e.value.message
-    assert 'Row 2' in e.value.message
+    assert 'missing e-mail' in str(e.value)
+    assert 'Row 2' in str(e.value)
 
     # bad e-mail
     csv = b'\n'.join([b'Bill,Doe,ACME Inc.,Regional Manager,+1-202-555-0140,bdoe@example.com',
@@ -93,8 +93,8 @@ def test_import_error(dummy_regform):
 
     with pytest.raises(UserValueError) as e:
         import_registrations_from_csv(dummy_regform, BytesIO(csv))
-    assert 'invalid e-mail' in e.value.message
-    assert 'Row 2' in e.value.message
+    assert 'invalid e-mail' in str(e.value)
+    assert 'Row 2' in str(e.value)
 
     # duplicate e-mail (csv)
     csv = b'\n'.join([b'Bill,Doe,ACME Inc.,Regional Manager,+1-202-555-0140,bdoe@example.com',
@@ -102,16 +102,16 @@ def test_import_error(dummy_regform):
 
     with pytest.raises(UserValueError) as e:
         import_registrations_from_csv(dummy_regform, BytesIO(csv))
-    assert 'email address is not unique' in e.value.message
-    assert 'Row 2' in e.value.message
+    assert 'email address is not unique' in str(e.value)
+    assert 'Row 2' in str(e.value)
 
     # duplicate e-mail (registration)
     csv = b'\n'.join([b'Big,Boss,ACME Inc.,Supreme Leader,+1-202-555-1337,boss@example.com'])
 
     with pytest.raises(UserValueError) as e:
         import_registrations_from_csv(dummy_regform, BytesIO(csv))
-    assert 'a registration with this email already exists' in e.value.message
-    assert 'Row 1' in e.value.message
+    assert 'a registration with this email already exists' in str(e.value)
+    assert 'Row 1' in str(e.value)
 
     # missing first name
     csv = b'\n'.join([b'Ray,Doe,ACME Inc.,Regional Manager,+1-202-555-0140,rdoe@example.com',
@@ -119,5 +119,5 @@ def test_import_error(dummy_regform):
 
     with pytest.raises(UserValueError) as e:
         import_registrations_from_csv(dummy_regform, BytesIO(csv))
-    assert 'missing first' in e.value.message
-    assert 'Row 2' in e.value.message
+    assert 'missing first' in str(e.value)
+    assert 'Row 2' in str(e.value)

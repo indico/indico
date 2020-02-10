@@ -23,7 +23,7 @@ pytest_plugins = 'indico.modules.rb.testing.fixtures'
     bool_matrix('..1', expect='any_dynamic')
 )
 @pytest.mark.usefixtures('smtp')
-def test_proxy_to_reservation_if_last_valid_occurrence(db, mock, create_reservation, dummy_user,
+def test_proxy_to_reservation_if_last_valid_occurrence(db, mocker, create_reservation, dummy_user,
                                                        not_repeating, only_one_valid, propagate, proxied, freeze_time):
     resv = create_reservation(start_dt=datetime.combine(date.today(), time(8)),
                               end_dt=datetime.combine(date.today() + timedelta(days=1), time(17)),
@@ -35,6 +35,6 @@ def test_proxy_to_reservation_if_last_valid_occurrence(db, mock, create_reservat
         db.session.flush()
 
     occ = resv.occurrences.first()
-    mock.patch.object(resv, 'cancel')
+    mocker.patch.object(resv, 'cancel')
     occ.cancel(user=dummy_user, propagate=propagate)
     assert resv.cancel.called == proxied
