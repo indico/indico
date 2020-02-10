@@ -335,6 +335,12 @@ class RHProtected(RH):
         self._require_user()
 
 
+class RequireUserMixin(object):
+    def _check_access(self):
+        if session.user is None:
+            raise Forbidden
+
+
 class RHTokenProtected(RH):
     """A request handler which is protected through a signature token parameter."""
 
