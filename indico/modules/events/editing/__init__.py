@@ -7,7 +7,7 @@
 
 from __future__ import unicode_literals
 
-from flask import session
+from flask import flash, session
 
 from indico.core import signals
 from indico.core.logger import Logger
@@ -31,6 +31,15 @@ class EditingFeature(EventFeature):
     @classmethod
     def is_allowed_for_event(cls, event):
         return event.type_ == EventType.conference
+
+    @classmethod
+    def enabled(cls, event):
+        from indico.modules.events.editing.models.file_types import EditingFileType
+        if not EditingFileType.query.with_parent(event).filter_by(publishable=True).has_rows():
+            ft = EditingFileType(name='PDF', extensions=['pdf'], publishable=True, required=True)
+            event.editing_file_types.append(ft)
+            flash(_("A default publishable PDF file type has been created; if you want to use other file types in "
+                    "your event's editing workflow, please configure them accordingly."))
 
 
 @signals.event.get_feature_definitions.connect
