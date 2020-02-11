@@ -97,6 +97,7 @@ class WPEventBase(WPDecorated):
         metadata = super(WPEventBase, self).page_metadata
         return {
             'og': dict(metadata['og'], **{
+                'title': self.event.title,
                 'type': 'event',
                 'image': (self.event.logo_url if self.event.has_logo else
                           url_for('assets.image', filename='indico_square.png', _external=True)),
