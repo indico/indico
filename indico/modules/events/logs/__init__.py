@@ -13,6 +13,7 @@ from indico.core import signals
 from indico.modules.events.logs.models.entries import EventLogEntry, EventLogKind, EventLogRealm
 from indico.modules.events.logs.renderers import EmailRenderer, SimpleRenderer
 from indico.modules.events.logs.util import get_log_renderers
+from indico.util.i18n import _
 from indico.web.flask.util import url_for
 from indico.web.menu import SideMenuItem
 
@@ -24,7 +25,7 @@ __all__ = ('EventLogEntry', 'EventLogKind', 'EventLogRealm')
 def _extend_event_management_menu(sender, event, **kwargs):
     if not event.can_manage(session.user):
         return
-    return SideMenuItem('logs', 'Logs', url_for('event_logs.index', event), section='reports')
+    return SideMenuItem('logs', _('Logs'), url_for('event_logs.index', event), section='reports')
 
 
 @signals.users.merged.connect
