@@ -107,7 +107,12 @@ class RegistrationCloner(EventCloner):
         db.session.flush()
 
     def _clone_registrations(self, old_form, new_form, field_data_map):
-        registration_attrs = get_simple_column_attrs(Registration) - {'uuid', 'ticket_uuid'}
+        registration_attrs = get_simple_column_attrs(Registration) - {
+            'uuid',
+            'ticket_uuid',
+            'checked_in',
+            'checked_in_dt',
+        }
         for old_registration in old_form.registrations:
             if old_registration.is_deleted:
                 continue
