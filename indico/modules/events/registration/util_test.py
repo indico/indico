@@ -12,22 +12,10 @@ from io import BytesIO
 import pytest
 
 from indico.core.errors import UserValueError
-from indico.modules.events.registration.models.forms import RegistrationForm
-from indico.modules.events.registration.util import (create_personal_data_fields, create_registration,
-                                                     import_registrations_from_csv)
+from indico.modules.events.registration.util import create_registration, import_registrations_from_csv
 
 
-@pytest.fixture
-def dummy_regform(db, dummy_event):
-    regform = RegistrationForm(event=dummy_event, title='Registration Form', currency='USD')
-    create_personal_data_fields(regform)
-
-    # enable all fields
-    for field in regform.sections[0].fields:
-        field.is_enabled = True
-    db.session.add(regform)
-    db.session.flush()
-    return regform
+pytest_plugins = 'indico.modules.events.registration.testing.fixtures'
 
 
 def test_import_registrations(dummy_regform, dummy_user):
