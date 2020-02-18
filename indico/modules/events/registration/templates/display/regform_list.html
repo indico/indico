@@ -54,7 +54,7 @@
                         {% endif %}
                     {% endif %}
                     <td class="regform-actions">
-                        {% if session.user and regform.id in user_registrations %}
+                        {% if user_registrations[regform] %}
                             <a href="{{ url_for('.display_regform', regform) }}"
                                class="i-button highlight"
                                title="{% trans %}You have already registered{% endtrans %}">

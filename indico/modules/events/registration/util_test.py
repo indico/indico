@@ -7,12 +7,14 @@
 
 from __future__ import unicode_literals
 
+from datetime import datetime
 from io import BytesIO
 
 import pytest
 
 from indico.core.errors import UserValueError
-from indico.modules.events.registration.util import create_registration, import_registrations_from_csv
+from indico.modules.events.registration.util import (create_registration, get_event_regforms_registrations,
+                                                     import_registrations_from_csv)
 
 
 pytest_plugins = 'indico.modules.events.registration.testing.fixtures'
@@ -109,3 +111,51 @@ def test_import_error(dummy_regform):
         import_registrations_from_csv(dummy_regform, BytesIO(csv))
     assert 'missing first' in str(e.value)
     assert 'Row 2' in str(e.value)
+
+
+@pytest.mark.parametrize(('start_dt', 'end_dt', 'include_scheduled', 'expected_regform_flag'), (
+    (datetime(2007, 1, 1, 1, 0, 0), datetime(2007, 2, 1, 1, 0, 0), False, False),
+    (datetime(2019, 1, 1, 1, 0, 0), datetime(2020, 2, 1, 1, 0, 0), False, True),
+    (datetime(2007, 1, 1, 1, 0, 0), datetime(2007, 2, 1, 1, 0, 0), True, True),
+    (datetime(2019, 1, 1, 1, 0, 0), datetime(2020, 2, 1, 1, 0, 0), True, True),
+    (None, datetime(2020, 2, 1, 1, 0, 0), False, False),
+    (None, datetime(2020, 2, 1, 1, 0, 0), True, False),
+    (datetime(2019, 1, 1, 1, 0, 0), None, False, True),
+    (None, None, False, False),
+    (None, None, True, False)
+))
+def test_get_event_regforms_no_registration(dummy_event, dummy_user, dummy_regform, freeze_time, start_dt, end_dt,
+                                            include_scheduled, expected_regform_flag):
+    freeze_time(datetime(2019, 12, 13, 8, 0, 0))
+    if start_dt:
+        dummy_regform.start_dt = dummy_event.tzinfo.localize(start_dt)
+    if end_dt:
+        dummy_regform.end_dt = dummy_event.tzinfo.localize(end_dt)
+
+    regforms, registrations = get_event_regforms_registrations(dummy_event, dummy_user, include_scheduled)
+
+    assert (dummy_regform in regforms) == expected_regform_flag
+    assert registrations.values() == [None]
+
+
+@pytest.mark.parametrize(('start_dt', 'end_dt', 'include_scheduled'), (
+    (datetime(2019, 1, 1, 1, 0, 0), datetime(2019, 2, 1, 1, 0, 0), True),
+    (datetime(2018, 1, 1, 1, 0, 0), datetime(2018, 12, 1, 1, 0, 0), False),
+    (datetime(2019, 1, 1, 1, 0, 0), datetime(2020, 2, 1, 1, 0, 0), False),
+    (None, None, False),
+    (datetime(2008, 1, 1, 1, 0, 0), None, False),
+    (None, datetime(2020, 12, 1, 1, 0, 0), True),
+))
+@pytest.mark.usefixtures('dummy_reg')
+def test_get_event_regforms_registration(dummy_event, dummy_user, dummy_regform, start_dt, end_dt, include_scheduled,
+                                         freeze_time):
+    freeze_time(datetime(2019, 12, 13, 8, 0, 0))
+    if start_dt:
+        dummy_regform.start_dt = dummy_event.tzinfo.localize(start_dt)
+    if end_dt:
+        dummy_regform.end_dt = dummy_event.tzinfo.localize(end_dt)
+
+    regforms, registrations = get_event_regforms_registrations(dummy_event, dummy_user, include_scheduled=False)
+
+    assert registrations.values()[0].user == dummy_user
+    assert dummy_regform in regforms

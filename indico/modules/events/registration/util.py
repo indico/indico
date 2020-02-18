@@ -488,6 +488,27 @@ def get_event_regforms(event, user, with_registrations=False):
     return query.all()
 
 
+def get_event_regforms_registrations(event, user, include_scheduled=True):
+    """Get regforms and the associated registrations for an event+user.
+
+    :param event: the `Event` to get registration forms for
+    :param user: A `User`
+    :param include_scheduled: Whether to include scheduled
+                              but not open registration forms
+    :return: A tuple, which includes:
+            - All registration forms which are scheduled, open or registered.
+            - A dict mapping all registration forms to the user's registration if they have one.
+    """
+    all_regforms = get_event_regforms(event, user, with_registrations=True)
+    if include_scheduled:
+        displayed_regforms = [regform for regform, registration in all_regforms
+                              if regform.is_scheduled or registration]
+    else:
+        displayed_regforms = [regform for regform, registration in all_regforms
+                              if regform.is_open or registration]
+    return displayed_regforms, dict(all_regforms)
+
+
 def generate_ticket(registration):
     from indico.modules.designer.util import get_default_template_on_category
     from indico.modules.events.registration.controllers.management.tickets import DEFAULT_TICKET_PRINTING_SETTINGS

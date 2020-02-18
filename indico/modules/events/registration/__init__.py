@@ -67,16 +67,14 @@ def _inject_regform_announcement(event, **kwargs):
 
 @template_hook('event-header')
 def _inject_event_header(event, **kwargs):
-    from indico.modules.events.registration.util import get_event_regforms
+    from indico.modules.events.registration.util import get_event_regforms_registrations
     if event.has_feature('registration'):
-        all_regforms = get_event_regforms(event, session.user, with_registrations=True)
-        open_and_registered_regforms = [regform for regform, registration in all_regforms
-                                        if regform.is_open or registration]
-        user_registrations = {regform: registration for regform, registration in all_regforms}
+        displayed_regforms, user_registrations = get_event_regforms_registrations(event, session.user,
+                                                                                  include_scheduled=False)
         # A participant could appear more than once in the list in case he register to multiple registration form.
         # This is deemed very unlikely in the case of meetings and lectures and thus not worth the extra complexity.
         return render_template('events/registration/display/event_header.html', event=event,
-                               regforms=open_and_registered_regforms, user_registrations=user_registrations)
+                               regforms=displayed_regforms, user_registrations=user_registrations)
 
 
 @signals.event.sidemenu.connect
