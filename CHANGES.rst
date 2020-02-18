@@ -55,6 +55,8 @@ Internal Changes
 
 - Make React and SemanticUI usable everywhere (:issue:`3955`)
 - Add ``before-regform`` template hook (:issue:`4171`, thanks :user:`giusedb`)
+- Add ``registrations`` kwarg to the ``event.designer.print_badge_template``
+  signal (:issue:`4297`, thanks :user:`giusedb`)
 
 
 ----

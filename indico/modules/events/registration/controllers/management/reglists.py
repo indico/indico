@@ -414,7 +414,9 @@ class RHRegistrationsPrintBadges(RHRegistrationsActionBase):
         else:
             pdf_class = RegistrantsListToBadgesPDF
         registration_ids = config_params.pop('registration_ids')
-        signals.event.designer.print_badge_template.send(self.template, regform=self.regform)
+        registrations = Registration.query.filter(Registration.id.in_(registration_ids)).all()
+        signals.event.designer.print_badge_template.send(self.template, regform=self.regform,
+                                                         registrations=registrations)
         pdf = pdf_class(self.template, config_params, self.event, registration_ids)
         return send_file('Badges-{}.pdf'.format(self.event.id), pdf.get_pdf(), 'application/pdf')
 
