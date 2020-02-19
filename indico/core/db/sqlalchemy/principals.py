@@ -179,7 +179,7 @@ class PrincipalMixin(object):
                                       cls.allow_event_roles, cls.allow_category_roles, 'event_role_id'))
         if cls.allow_category_roles:
             checks.append(_make_check(PrincipalType.category_role, cls.allow_emails, cls.allow_networks,
-                                      cls.allow_category_roles, cls.allow_event_roles, 'category_role_id'))
+                                      cls.allow_event_roles, cls.allow_category_roles, 'category_role_id'))
         return tuple(uniques + indexes + checks)
 
     @declared_attr

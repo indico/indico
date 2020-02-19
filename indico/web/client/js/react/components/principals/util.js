@@ -97,6 +97,7 @@ export class PrincipalType {
   static localGroup = 'local_group';
   static multipassGroup = 'multipass_group';
   static eventRole = 'event_role';
+  static categoryRole = 'category_role';
   /* eslint-enable lines-between-class-members */
 
   static propType = PropTypes.oneOf([
@@ -104,6 +105,7 @@ export class PrincipalType {
     PrincipalType.localGroup,
     PrincipalType.multipassGroup,
     PrincipalType.eventRole,
+    PrincipalType.categoryRole,
   ]);
 
   static getPendingText(type) {
@@ -112,6 +114,7 @@ export class PrincipalType {
       [PrincipalType.localGroup]: Translate.string('Unknown group'),
       [PrincipalType.multipassGroup]: Translate.string('Unknown group'),
       [PrincipalType.eventRole]: Translate.string('Unknown event role'),
+      [PrincipalType.categoryRole]: Translate.string('Unknown category role'),
     }[type];
   }
 
@@ -126,7 +129,7 @@ export class PrincipalType {
       [PrincipalType.multipassGroup]: Translate.string(
         'This group does not exist anymore. Please choose a different one.'
       ),
-      // event roles are hard-deleted
+      // event/category roles are hard-deleted
     }[type];
   }
 
@@ -135,7 +138,7 @@ export class PrincipalType {
       [PrincipalType.user]: 'user',
       [PrincipalType.localGroup]: 'users',
       [PrincipalType.multipassGroup]: 'users',
-      // event roles have no icon but their code
+      // event/category roles have no icon but their code
     }[type];
   }
 
@@ -144,7 +147,8 @@ export class PrincipalType {
       [PrincipalType.localGroup]: 0,
       [PrincipalType.multipassGroup]: 0,
       [PrincipalType.eventRole]: 1,
-      [PrincipalType.user]: 2,
+      [PrincipalType.categoryRole]: 2,
+      [PrincipalType.user]: 3,
     }[type];
   }
 }
@@ -158,6 +162,8 @@ export function getTypeFromIdentifier(identifier) {
     return PrincipalType.multipassGroup;
   } else if (identifier.startsWith('EventRole:')) {
     return PrincipalType.eventRole;
+  } else if (identifier.startsWith('CategoryRole:')) {
+    return PrincipalType.categoryRole;
   } else {
     throw new Error(`Identifier ${identifier} has unknown type`);
   }

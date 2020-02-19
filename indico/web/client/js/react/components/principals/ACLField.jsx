@@ -42,6 +42,7 @@ const ACLField = props => {
     withGroups,
     eventId,
     eventRoles,
+    categoryRoles,
     favoriteUsersController,
     readAccessAllowed,
     fullAccessAllowed,
@@ -83,7 +84,14 @@ const ACLField = props => {
   // Handling of list of principals (shared with PrincipalListField)
   const [entries, pendingEntries] = getPrincipalList(valueIds, informationMap);
 
-  const roleOptions = eventRoles
+  const eventRoleOptions = eventRoles
+    .filter(r => !usedIdentifiers.has(r.identifier))
+    .map(r => ({
+      value: r.identifier,
+      text: r.name,
+    }));
+
+  const categoryRoleOptions = categoryRoles
     .filter(r => !usedIdentifiers.has(r.identifier))
     .map(r => ({
       value: r.identifier,
@@ -155,12 +163,27 @@ const ACLField = props => {
           )}
           {eventRoles.length !== 0 && (
             <Dropdown
-              text={Translate.string('Role')}
+              text={Translate.string('Event Role')}
               button
               upward
               floating
-              disabled={roleOptions.length === 0}
-              options={roleOptions}
+              disabled={eventRoleOptions.length === 0}
+              options={eventRoleOptions}
+              value={null}
+              openOnFocus={false}
+              selectOnBlur={false}
+              selectOnNavigation={false}
+              onChange={(e, data) => handleAddItems([{identifier: data.value}])}
+            />
+          )}
+          {categoryRoles.length !== 0 && (
+            <Dropdown
+              text={Translate.string('Category Role')}
+              button
+              upward
+              floating
+              disabled={categoryRoleOptions.length === 0}
+              options={categoryRoleOptions}
               value={null}
               openOnFocus={false}
               selectOnBlur={false}
@@ -199,6 +222,8 @@ ACLField.propTypes = {
   eventId: PropTypes.number,
   /** The event roles that are available for the specified eventId */
   eventRoles: PropTypes.array,
+  /** The category roles that are available for the specified eventId */
+  categoryRoles: PropTypes.array,
   /** Object containing metadata about available permissions */
   permissionInfo: PropTypes.shape({
     permissions: PropTypes.object,
@@ -217,6 +242,7 @@ ACLField.defaultProps = {
   fullAccessAllowed: true,
   eventId: null,
   eventRoles: [],
+  categoryRoles: [],
 };
 
 export default React.memo(ACLField);

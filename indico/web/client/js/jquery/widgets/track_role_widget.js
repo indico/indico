@@ -16,6 +16,7 @@ import {TrackACLField} from 'indico/react/components';
       permissionsInfo: null,
       eventId: null,
       eventRoles: null,
+      categoryRoles: null,
     },
 
     _updateValue(newValue, trackId) {
@@ -32,6 +33,7 @@ import {TrackACLField} from 'indico/react/components';
         permissionInfo: this.options.permissionsInfo,
         eventId: this.options.eventId,
         eventRoles: this.options.eventRoles,
+        categoryRoles: this.options.categoryRoles,
         onChange,
       });
       ReactDOM.render(component, element);

@@ -23,6 +23,7 @@ class TrackPrincipal(PrincipalPermissionsMixin, db.Model):
     unique_columns = ('track_id',)
     allow_emails = True
     allow_event_roles = True
+    allow_category_roles = True
 
     @declared_attr
     def __table_args__(cls):

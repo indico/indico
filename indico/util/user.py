@@ -29,11 +29,15 @@ def iter_acl(acl):
 
 
 def principal_from_fossil(fossil, allow_pending=False, allow_groups=True, allow_missing_groups=False,
-                          allow_emails=False, allow_networks=False, existing_data=None, event=None):
+                          allow_emails=False, allow_networks=False, existing_data=None, event=None, category=None):
     from indico.modules.networks.models.networks import IPNetworkGroup
     from indico.modules.events.models.roles import EventRole
+    from indico.modules.categories.models.roles import CategoryRole
     from indico.modules.groups import GroupProxy
     from indico.modules.users import User
+
+    if event and category is None:
+        category = event.category
 
     if existing_data is None:
         existing_data = set()
@@ -88,24 +92,32 @@ def principal_from_fossil(fossil, allow_pending=False, allow_groups=True, allow_
         if group.group is None and not allow_missing_groups:
             raise ValueError('Multipass group does not exist: {}:{}'.format(provider, id_))
         return group
+    elif category:
+        role = CategoryRole.get_category_role_by_id(category, id_)
+        role_name = fossil.get('name')
+        if role is None:
+            raise ValueError('Category role "{}" is not available in "{}"'.format(role_name, category.title))
+        return role
     elif event and type_ == 'EventRole':
         role = EventRole.get(id_)
         role_name = fossil.get('name')
         if role is None:
-            raise ValueError('Role does not exist: {}:{}'.format(role_name, id_))
+            raise ValueError('Event role "{}" does not exist'.format(role_name))
         if role.event != event:
-            raise ValueError('Role does not belong to provided event: {}:{} - {}'.format(role_name, id_, event))
+            raise ValueError('Event role "{}" does not belong to "{}"'.format(role_name, event.title))
         return role
     else:
         raise ValueError('Unexpected fossil type: {}'.format(type_))
 
 
 def principal_from_identifier(identifier, allow_groups=False, allow_external_users=False, allow_event_roles=False,
-                              event_id=None, soft_fail=False):
+                              allow_category_roles=True, event_id=None, soft_fail=False):
     # XXX: this is currently only used in PrincipalList
-    # if we ever need to support more than just users, groups and event roles,
+    # if we ever need to support more than just users, groups, event roles and category roles
     # make sure to add it in here as well
+    from indico.modules.events.models.events import Event
     from indico.modules.events.models.roles import EventRole
+    from indico.modules.categories.models.roles import CategoryRole
     from indico.modules.groups import GroupProxy
     from indico.modules.users import User
 
@@ -170,5 +182,23 @@ def principal_from_identifier(identifier, allow_groups=False, allow_external_use
         if event_role is None or event_role.event_id != event_id:
             raise ValueError('Invalid event role: {}'.format(event_role_id))
         return event_role
+    elif type_ == 'CategoryRole':
+        if not allow_category_roles:
+            raise ValueError('Category roles are not allowed')
+
+        event = Event.get(event_id)
+        if event is None:
+            raise ValueError('Invalid event id: {}'.format(event_id))
+        try:
+            category_role_id = int(data)
+        except ValueError:
+            raise ValueError('Invalid data')
+        if soft_fail:
+            category_role = CategoryRole.get(category_role_id)
+        else:
+            category_role = CategoryRole.get_category_role_by_id(event.category, category_role_id)
+        if category_role is None:
+            raise ValueError('Invalid category role: {}'.format(category_role_id))
+        return category_role
     else:
         raise ValueError('Invalid data')

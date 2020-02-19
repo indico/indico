@@ -195,3 +195,23 @@ def get_image_data(image_type, category):
         'size': metadata['size'],
         'content_type': metadata['content_type']
     }
+
+
+def serialize_category_role(role, legacy=True):
+    """Serialize role to JSON-like object"""
+    if legacy:
+        return {
+            'id': role.id,
+            'name': role.name,
+            'code': role.code,
+            'color': role.color,
+            'category': role.category.title,
+            'identifier': 'CategoryRole:{}'.format(role.id),
+            '_type': 'CategoryRole'
+        }
+    else:
+        return {
+            'id': role.id,
+            'name': role.name,
+            'identifier': 'CategoryRole:{}'.format(role.id),
+        }

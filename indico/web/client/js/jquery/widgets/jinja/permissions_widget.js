@@ -48,13 +48,15 @@ import Palette from 'indico/utils/palette';
       const $labelBox = $('<div>', {class: 'label-box flexrow f-a-center'});
       const type = principal._type;
       if (type === 'EventRole') {
-        $labelBox.append(this._renderRoleLabel(principal));
+        $labelBox.append(this._renderEventRoleLabel(principal));
+      } else if (type === 'CategoryRole') {
+        $labelBox.append(this._renderCategoryRoleLabel(principal));
       } else {
         $labelBox.append(this._renderOtherLabel(principal, type));
       }
       return $labelBox;
     },
-    _renderRoleLabel(principal) {
+    _renderEventRoleLabel(principal) {
       const $text = $('<span>', {
         'class': 'text-normal entry-label',
         'text': principal.name,
@@ -62,6 +64,17 @@ import Palette from 'indico/utils/palette';
       });
       const $code = this._renderRoleCode(principal.code, principal.color);
       return [$code, $text];
+    },
+    _renderCategoryRoleLabel(principal) {
+      const text = principal.name;
+      const extraText = principal.category;
+      const $code = this._renderRoleCode(principal.code, principal.color);
+      const tooltip = `${text} (${extraText})`;
+      const textDiv = $('<div>', {'class': 'text-normal entry-label', 'data-tooltip': tooltip});
+      textDiv.append($('<span>', {text: text}));
+      textDiv.append('<br>');
+      textDiv.append($('<span>', {class: 'text-not-important entry-label-extra', text: extraText}));
+      return [$code, textDiv];
     },
     _renderOtherLabel(principal, type) {
       let iconClass, extraText;
@@ -214,7 +227,7 @@ import Palette from 'indico/utils/palette';
         'data-principal': JSON.stringify(principal),
       });
       const $itemContent = $('<a>');
-      if (principal._type === 'EventRole') {
+      if (principal._type === 'EventRole' || principal._type === 'CategoryRole') {
         $itemContent.append(
           this._renderRoleCode(principal.code, principal.color).addClass('dropdown-icon')
         );
@@ -271,18 +284,27 @@ import Palette from 'indico/utils/palette';
       ];
       this.$permissionsWidgetList.append(this._renderItem(anonymous));
 
-      const managersTitle =
-        this.options.objectType === 'event'
-          ? $T.gettext('Category Managers')
-          : $T.gettext('Event Managers');
-      const categoryManagers = [
+      let managersTitle;
+      if (this.options.objectType === 'event') {
+        managersTitle = $T.gettext('Category Managers');
+      } else if (this.options.objectType === 'category') {
+        managersTitle = $T.gettext('Parent Category Managers');
+      } else {
+        managersTitle = $T.gettext('Event Managers');
+      }
+      const managers = [
         {_type: 'DefaultEntry', name: managersTitle},
         [FULL_ACCESS_PERMISSIONS],
       ];
-      this.$permissionsWidgetList.prepend(this._renderItem(categoryManagers));
+      this.$permissionsWidgetList.prepend(this._renderItem(managers));
       this.$permissionsWidgetList.find('.anonymous').toggle(!this.isEventProtected);
 
-      this._renderDropdown(this.$roleDropdown);
+      if (this.$eventRoleDropdown.length) {
+        this._renderDropdown(this.$eventRoleDropdown);
+      }
+      if (this.$categoryRoleDropdown.length) {
+        this._renderDropdown(this.$categoryRoleDropdown);
+      }
       if (this.$ipNetworkDropdown.length) {
         this._renderDropdown(this.$ipNetworkDropdown);
       }
@@ -350,7 +372,8 @@ import Palette from 'indico/utils/palette';
     _create() {
       this.$permissionsWidgetList = this.element.find('.permissions-widget-list');
       this.$dataField = this.element.find('input[type=hidden]');
-      this.$roleDropdown = this.element.find('.entry-role-dropdown');
+      this.$eventRoleDropdown = this.element.find('.entry-role-dropdown');
+      this.$categoryRoleDropdown = this.element.find('.entry-category-role-dropdown');
       this.$ipNetworkDropdown = this.element.find('.entry-ip-network-dropdown');
       this.data = JSON.parse(this.$dataField.val());
       this._update();
@@ -375,7 +398,7 @@ import Palette from 'indico/utils/palette';
       // Manage the creation of new roles
       $('.js-new-role').on('ajaxDialog:closed', (evt, data) => {
         if (data && data.role) {
-          this.$roleDropdown.data('items').push(data.role);
+          this.$eventRoleDropdown.data('items').push(data.role);
           this._addItems([data.role], [READ_ACCESS_PERMISSIONS]);
         }
       });

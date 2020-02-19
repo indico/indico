@@ -21,6 +21,7 @@ class CategoryPrincipal(PrincipalPermissionsMixin, db.Model):
     principal_for = 'Category'
     unique_columns = ('category_id',)
     allow_networks = True
+    allow_category_roles = True
 
     @declared_attr
     def __table_args__(cls):

@@ -17,12 +17,13 @@ from indico.modules.events import EventLogKind, EventLogRealm
 from indico.modules.events.management.controllers import RHManageEventBase
 from indico.modules.events.models.roles import EventRole
 from indico.modules.events.roles import logger
-from indico.modules.events.roles.forms import RoleForm
-from indico.modules.events.roles.util import get_role_colors, serialize_role
+from indico.modules.events.roles.forms import EventRoleForm
+from indico.modules.events.roles.util import serialize_event_role
 from indico.modules.events.roles.views import WPEventRoles
 from indico.modules.users import User
 from indico.util.user import principal_from_fossil
 from indico.web.flask.templating import get_template_module
+from indico.web.forms.colors import get_role_colors
 from indico.web.util import jsonify_data, jsonify_form
 
 
@@ -53,7 +54,7 @@ class RHAddEventRole(RHManageEventBase):
     """Add a new event role"""
 
     def _process(self):
-        form = RoleForm(event=self.event, color=self._get_color())
+        form = EventRoleForm(event=self.event, color=self._get_color())
         if form.validate_on_submit():
             role = EventRole(event=self.event)
             form.populate_obj(role)
@@ -61,7 +62,7 @@ class RHAddEventRole(RHManageEventBase):
             logger.info('Event role %r created by %r', role, session.user)
             self.event.log(EventLogRealm.management, EventLogKind.positive, 'Roles',
                            'Added role: "{}"'.format(role.name), session.user)
-            return jsonify_data(html=_render_roles(self.event), role=serialize_role(role))
+            return jsonify_data(html=_render_roles(self.event), role=serialize_event_role(role))
         return jsonify_form(form)
 
     def _get_color(self):
@@ -88,7 +89,7 @@ class RHEditEventRole(RHManageEventRole):
     """Edit an event role"""
 
     def _process(self):
-        form = RoleForm(obj=self.role, event=self.event)
+        form = EventRoleForm(obj=self.role, event=self.event)
         if form.validate_on_submit():
             form.populate_obj(self.role)
             db.session.flush()

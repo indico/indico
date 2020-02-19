@@ -56,7 +56,7 @@ export const PrincipalListItem = ({
 }) => (
   <List.Item>
     <div styleName="item">
-      {type === PrincipalType.eventRole ? (
+      {type === PrincipalType.eventRole || type === PrincipalType.categoryRole ? (
         <div styleName="event-role">
           <span style={meta.style}>{meta.code}</span>
         </div>

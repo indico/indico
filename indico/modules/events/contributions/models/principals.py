@@ -23,6 +23,7 @@ class ContributionPrincipal(PrincipalPermissionsMixin, db.Model):
     disallowed_protection_modes = frozenset()
     allow_emails = True
     allow_event_roles = True
+    allow_category_roles = True
 
     @declared_attr
     def __table_args__(cls):

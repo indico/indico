@@ -17,18 +17,18 @@ from sqlalchemy.orm import joinedload, load_only, undefer_group
 from werkzeug.exceptions import BadRequest, Forbidden
 
 from indico.core.db import db
+from indico.core.permissions import get_principal_permissions, update_permissions
 from indico.modules.categories import logger
 from indico.modules.categories.controllers.base import RHManageCategoryBase
 from indico.modules.categories.forms import (CategoryIconForm, CategoryLogoForm, CategoryProtectionForm,
-                                             CategorySettingsForm, CreateCategoryForm, RoleForm, SplitCategoryForm)
+                                             CategoryRoleForm, CategorySettingsForm, CreateCategoryForm,
+                                             SplitCategoryForm)
 from indico.modules.categories.models.categories import Category
 from indico.modules.categories.models.roles import CategoryRole
 from indico.modules.categories.operations import create_category, delete_category, move_category, update_category
-from indico.modules.categories.util import get_image_data
+from indico.modules.categories.util import get_image_data, serialize_category_role
 from indico.modules.categories.views import WPCategoryManagement
 from indico.modules.events import Event
-from indico.modules.events.roles.util import get_role_colors, serialize_role
-from indico.modules.events.util import update_object_principals
 from indico.modules.rb.models.reservations import Reservation, ReservationLink
 from indico.modules.users import User
 from indico.util.fs import secure_filename
@@ -38,6 +38,8 @@ from indico.util.user import principal_from_fossil
 from indico.web.flask.templating import get_template_module
 from indico.web.flask.util import url_for
 from indico.web.forms.base import FormDefaults
+from indico.web.forms.colors import get_role_colors
+from indico.web.forms.fields.principals import serialize_principal
 from indico.web.util import jsonify_data, jsonify_form, jsonify_template, url_for_index
 
 
@@ -46,9 +48,7 @@ MAX_CATEGORY_LOGO_DIMENSIONS = (200, 200)
 
 
 def _get_roles(category):
-    return (CategoryRole.query.with_parent(category)
-            .options(joinedload('members'))
-            .all())
+    return (CategoryRole.query.with_parent(category).options(joinedload('members')).all())
 
 
 def _render_roles(category):
@@ -209,25 +209,22 @@ class RHManageCategoryProtection(RHManageCategoryBase):
     def _process(self):
         form = CategoryProtectionForm(obj=self._get_defaults(), category=self.category)
         if form.validate_on_submit():
+            update_permissions(self.category, form)
             update_category(self.category,
                             {'protection_mode': form.protection_mode.data,
                              'own_no_access_contact': form.own_no_access_contact.data,
                              'event_creation_restricted': form.event_creation_restricted.data,
                              'visibility': form.visibility.data})
-            update_object_principals(self.category, form.acl.data, read_access=True)
-            update_object_principals(self.category, form.managers.data, full_access=True)
-            update_object_principals(self.category, form.event_creators.data, permission='create')
             flash(_('Protection settings of the category have been updated'), 'success')
             return redirect(url_for('.manage_protection', self.category))
         return WPCategoryManagement.render_template('management/category_protection.html', self.category, 'protection',
                                                     form=form)
 
     def _get_defaults(self):
-        acl = {x.principal for x in self.category.acl_entries if x.read_access}
-        managers = {x.principal for x in self.category.acl_entries if x.full_access}
-        event_creators = {x.principal for x in self.category.acl_entries
-                          if x.has_management_permission('create', explicit=True)}
-        return FormDefaults(self.category, acl=acl, managers=managers, event_creators=event_creators)
+        permissions = [[serialize_principal(p.principal), list(get_principal_permissions(p, Category))]
+                       for p in self.category.acl_entries]
+        permissions = [item for item in permissions if item[1]]
+        return FormDefaults(self.category, permissions=permissions)
 
 
 class RHCreateCategory(RHManageCategoryBase):
@@ -438,13 +435,13 @@ class RHAddCategoryRole(RHManageCategoryBase):
     """Add a new category role"""
 
     def _process(self):
-        form = RoleForm(category=self.category, color=self._get_color())
+        form = CategoryRoleForm(category=self.category, color=self._get_color())
         if form.validate_on_submit():
             role = CategoryRole(category=self.category)
             form.populate_obj(role)
             db.session.flush()
             logger.info('Category role %r created by %r', role, session.user)
-            return jsonify_data(html=_render_roles(self.category), role=serialize_role(role))
+            return jsonify_data(html=_render_roles(self.category), role=serialize_category_role(role))
         return jsonify_form(form)
 
     def _get_color(self):
@@ -468,10 +465,10 @@ class RHManageCategoryRole(RHManageCategoryBase):
 
 
 class RHEditCategoryRole(RHManageCategoryRole):
-    """Edit an category role"""
+    """Edit a category role"""
 
     def _process(self):
-        form = RoleForm(obj=self.role, category=self.category)
+        form = CategoryRoleForm(obj=self.role, category=self.category)
         if form.validate_on_submit():
             form.populate_obj(self.role)
             db.session.flush()
@@ -481,7 +478,7 @@ class RHEditCategoryRole(RHManageCategoryRole):
 
 
 class RHDeleteCategoryRole(RHManageCategoryRole):
-    """Delete an category role"""
+    """Delete a category role"""
 
     def _process(self):
         db.session.delete(self.role)
@@ -490,7 +487,7 @@ class RHDeleteCategoryRole(RHManageCategoryRole):
 
 
 class RHRemoveCategoryRoleMember(RHManageCategoryRole):
-    """Remove a user from an category role"""
+    """Remove a user from a category role"""
 
     normalize_url_spec = dict(RHManageCategoryRole.normalize_url_spec, preserved_args={'user_id'})
 
@@ -506,7 +503,7 @@ class RHRemoveCategoryRoleMember(RHManageCategoryRole):
 
 
 class RHAddCategoryRoleMembers(RHManageCategoryRole):
-    """Add users to an category role"""
+    """Add users to a category role"""
 
     def _process(self):
         for data in request.json['users']:

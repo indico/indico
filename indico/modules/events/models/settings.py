@@ -69,6 +69,7 @@ class EventSettingPrincipal(PrincipalSettingsBase, EventSettingsMixin, db.Model)
     settings_backref_name = 'settings_principals'
     extra_key_cols = ('event_id',)
     allow_event_roles = True
+    allow_category_roles = True
 
     @declared_attr
     def __table_args__(cls):

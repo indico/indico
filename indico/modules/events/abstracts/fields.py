@@ -16,12 +16,13 @@ from wtforms.ext.sqlalchemy.fields import QuerySelectField
 from indico.core.db import db
 from indico.core.db.sqlalchemy.util.session import no_autoflush
 from indico.core.permissions import get_permissions_info
+from indico.modules.categories.util import serialize_category_role
 from indico.modules.events.abstracts.models.abstracts import Abstract
 from indico.modules.events.abstracts.models.persons import AbstractPersonLink
 from indico.modules.events.abstracts.notifications import ContributionTypeCondition, StateCondition, TrackCondition
 from indico.modules.events.contributions.models.persons import AuthorType
 from indico.modules.events.fields import PersonLinkListFieldBase
-from indico.modules.events.roles.util import serialize_role
+from indico.modules.events.roles.util import serialize_event_role
 from indico.modules.events.tracks.models.tracks import Track
 from indico.modules.events.util import serialize_person_link
 from indico.modules.users.models.users import User
@@ -209,7 +210,13 @@ class TrackRoleField(JSONField):
 
     @property
     def event_roles(self):
-        return [serialize_role(role, legacy=False) for role in sorted(self.event.roles, key=attrgetter('code'))]
+        return [serialize_event_role(role, legacy=False) for role in sorted(self.event.roles, key=attrgetter('code'))]
+
+    @property
+    def category_roles(self):
+        from indico.modules.categories.models.roles import CategoryRole
+        category_roles = CategoryRole.get_category_roles(self.event.category)
+        return [serialize_category_role(role) for role in category_roles]
 
     def _value(self):
         return super(TrackRoleField, self)._value() if self.data else '[]'

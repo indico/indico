@@ -67,6 +67,7 @@ def get_permissions_info(_type):
     :return: A tuple containing a dict with the available permissions and a dict with the permissions tree
     """
     from indico.modules.events import Event
+    from indico.modules.categories import Category
     from indico.modules.events.contributions import Contribution
     from indico.modules.events.sessions import Session
     from indico.modules.rb.models.rooms import Room
@@ -78,6 +79,7 @@ def get_permissions_info(_type):
             Session: _('Unrestricted management access for the selected session'),
             Contribution: _('Unrestricted management access for the selected contribution'),
             Room: _('Full management access over the room'),
+            Category: _('Unrestricted management access for this category and all its subcategories/events'),
             Track: None
         },
         READ_ACCESS_PERMISSION: {
@@ -85,6 +87,7 @@ def get_permissions_info(_type):
             Session: _('Access the public areas of the selected session'),
             Contribution: _('Access the public areas of the selected contribution'),
             Room: None,
+            Category: _('View the category and its events'),
             Track: None
         }
     }
@@ -170,14 +173,30 @@ def get_split_permissions(permissions):
 def update_permissions(obj, form):
     """Update the permissions of an object, based on the corresponding WTForm."""
     from indico.util.user import principal_from_fossil
+    from indico.modules.categories import Category
+    from indico.modules.events import Event
 
-    event = obj.event
+    event = category = None
+    if isinstance(obj, Category):
+        category = obj
+    elif isinstance(obj, Event):
+        event = obj
+    else:
+        event = obj.event
+        category = event.category
+
     current_principal_permissions = {p.principal: get_principal_permissions(p, type(obj))
                                      for p in obj.acl_entries}
     current_principal_permissions = {k: v for k, v in current_principal_permissions.iteritems() if v}
     new_principal_permissions = {
-        principal_from_fossil(fossil, allow_emails=True, allow_networks=True, allow_pending=True, event=event):
-            set(permissions)
+        principal_from_fossil(
+            fossil,
+            allow_emails=True,
+            allow_networks=True,
+            allow_pending=True,
+            event=event,
+            category=category,
+        ): set(permissions)
         for fossil, permissions in form.permissions.data
     }
     update_principals_permissions(obj, current_principal_permissions, new_principal_permissions)

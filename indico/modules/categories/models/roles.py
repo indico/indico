@@ -70,6 +70,7 @@ class CategoryRole(db.Model):
     # relationship backrefs:
     # - in_attachment_acls (AttachmentPrincipal.category_role)
     # - in_attachment_folder_acls (AttachmentFolderPrincipal.category_role)
+    # - in_category_acls (CategoryPrincipal.category_role)
     # - in_contribution_acls (ContributionPrincipal.category_role)
     # - in_event_acls (EventPrincipal.category_role)
     # - in_event_settings_acls (EventSettingPrincipal.category_role)
@@ -98,6 +99,20 @@ class CategoryRole(db.Model):
     @property
     def style(self):
         return {'color': '#' + self.color, 'borderColor': '#' + self.color}
+
+    @staticmethod
+    def get_category_roles(cat):
+        """Get the category roles available for the specified category."""
+        return CategoryRole.query.join(cat.chain_query.subquery()).order_by(CategoryRole.code).all()
+
+    @staticmethod
+    def get_category_role_by_id(cat, id):
+        """
+        Get a category role in the context of the specified category.
+        If the role is not defined in the category or one of its parents,
+        it is considered non-existing.
+        """
+        return CategoryRole.query.filter_by(id=id).join(cat.chain_query.subquery()).first()
 
 
 role_members_table = db.Table(

@@ -235,6 +235,13 @@ class PrincipalsMixin(object):
                     'invalid': False,
                     'name': principal.name,
                     'meta': {'style': principal.style, 'code': principal.code}}
+        elif principal.principal_type == PrincipalType.category_role:
+            return {'identifier': identifier,
+                    'type': 'category_role',
+                    'invalid': False,
+                    'name': principal.name,
+                    'meta': {'style': principal.style, 'code': principal.code},
+                    'detail': principal.category.title}
 
     def _process(self):
         return jsonify({identifier: self._serialize_principal(identifier, principal)

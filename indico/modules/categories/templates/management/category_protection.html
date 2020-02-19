@@ -20,19 +20,4 @@
                data-disabled-until-change
                data-save-reminder>
     {% endcall %}
-
-    <script>
-        (function() {
-            'use strict';
-
-            var eventCreationRestrictedField = $('#{{ form.event_creation_restricted.id }}');
-            eventCreationRestrictedField.on('change', function() {
-                toggleAclField($('#{{ form.event_creators.id }}'), !this.checked);
-            });
-
-            _.defer(function() {
-                eventCreationRestrictedField.trigger('change');
-            });
-        })();
-    </script>
 {% endblock %}

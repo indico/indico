@@ -71,3 +71,4 @@ class CreatorPermission(ManagementPermission):
     name = 'create'
     friendly_name = _('Event creation')
     description = _('Allows creating events in the category')
+    user_selectable = True

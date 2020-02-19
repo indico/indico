@@ -458,8 +458,8 @@
 
   function setupRolesButtons() {
     $('#event-roles').on('click', '.js-add-members', function(evt) {
-      var $this = $(this);
       evt.stopPropagation();
+      var $this = $(this);
       $('<div>')
         .principalfield({
           multiChoice: true,

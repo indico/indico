@@ -51,3 +51,15 @@ def get_sui_colors():
         'grey',
         'black'
     ]
+
+
+def get_role_colors():
+    """Get the list of colors available for event/category roles"""
+    return ['005272', '007cac', '5d95ea',
+            'af0000', 'a76766',
+            '999999', '555555', '777777',
+            '67a766', '6cc644',
+            '9c793b', 'e99e18',
+            'b14300', 'e25300',
+            '6e5494', 'cb6ea4',
+            '0b63a5', '00a4e4']

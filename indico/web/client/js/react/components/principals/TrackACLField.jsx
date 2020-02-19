@@ -12,7 +12,14 @@ import {ACLField} from 'indico/react/components';
 import {useFavoriteUsers} from 'indico/react/hooks';
 import {PermissionManager} from 'indico/react/components/principals/util';
 
-export default function TrackACLField({value, permissionInfo, eventId, eventRoles, onChange}) {
+export default function TrackACLField({
+  value,
+  permissionInfo,
+  eventId,
+  eventRoles,
+  categoryRoles,
+  onChange,
+}) {
   const [currentValue, setCurrentValue] = useState(value);
   const permissionManager = new PermissionManager(permissionInfo.tree, permissionInfo.default);
   const favoriteUsersController = useFavoriteUsers();
@@ -34,6 +41,7 @@ export default function TrackACLField({value, permissionInfo, eventId, eventRole
       permissionManager={permissionManager}
       eventId={eventId}
       eventRoles={eventRoles}
+      categoryRoles={categoryRoles}
     />
   );
 }
@@ -49,5 +57,6 @@ TrackACLField.propTypes = {
   }).isRequired,
   eventId: PropTypes.number.isRequired,
   eventRoles: PropTypes.array.isRequired,
+  categoryRoles: PropTypes.array.isRequired,
   onChange: PropTypes.func.isRequired,
 };

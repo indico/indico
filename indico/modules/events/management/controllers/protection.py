@@ -66,18 +66,17 @@ class RHEventProtection(RHManageEventBase):
     """Show event protection"""
 
     def _process(self):
-        event = self.event
-        form = EventProtectionForm(obj=FormDefaults(**self._get_defaults()), event=event)
+        form = EventProtectionForm(obj=FormDefaults(**self._get_defaults()), event=self.event)
         if form.validate_on_submit():
-            update_permissions(event, form)
-            update_event_protection(event, {'protection_mode': form.protection_mode.data,
-                                            'own_no_access_contact': form.own_no_access_contact.data,
-                                            'access_key': form.access_key.data,
-                                            'visibility': form.visibility.data})
+            update_permissions(self.event, form)
+            update_event_protection(self.event, {'protection_mode': form.protection_mode.data,
+                                                 'own_no_access_contact': form.own_no_access_contact.data,
+                                                 'access_key': form.access_key.data,
+                                                 'visibility': form.visibility.data})
             self._update_session_coordinator_privs(form)
             flash(_('Protection settings have been updated'), 'success')
-            return redirect(url_for('.protection', event))
-        return WPEventProtection.render_template('event_protection.html', event, 'protection', form=form)
+            return redirect(url_for('.protection', self.event))
+        return WPEventProtection.render_template('event_protection.html', self.event, 'protection', form=form)
 
     def _get_defaults(self):
         registration_managers = {p.principal for p in self.event.acl_entries

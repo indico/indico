@@ -20,6 +20,7 @@ class AttachmentFolderPrincipal(PrincipalMixin, db.Model):
     principal_backref_name = 'in_attachment_folder_acls'
     unique_columns = ('folder_id',)
     allow_event_roles = True
+    allow_category_roles = True
 
     @declared_attr
     def __table_args__(cls):
@@ -50,6 +51,7 @@ class AttachmentPrincipal(PrincipalMixin, db.Model):
     principal_backref_name = 'in_attachment_acls'
     unique_columns = ('attachment_id',)
     allow_event_roles = True
+    allow_category_roles = True
 
     @declared_attr
     def __table_args__(cls):
