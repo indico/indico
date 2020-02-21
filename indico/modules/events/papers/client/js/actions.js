@@ -8,7 +8,7 @@
 import paperInfoURL from 'indico-url:papers.api_paper_details';
 import resetPaperStateURL from 'indico-url:papers.api_reset_paper_state';
 import addCommentURL from 'indico-url:papers.api_submit_comment';
-import deleteCommentURL from 'indico-url:papers.api_delete_comment';
+import apiCommentActions from 'indico-url:papers.api_comment_actions';
 import judgePaperURL from 'indico-url:papers.api_judge_paper';
 
 import {indicoAxios} from 'indico/utils/axios';
@@ -58,6 +58,22 @@ export function addComment(eventId, contributionId, commentData) {
   );
 }
 
+export function editComment(eventId, contributionId, revisionId, commentId, commentData) {
+  const params = {
+    confId: eventId,
+    contrib_id: contributionId,
+    revision_id: revisionId,
+    comment_id: commentId,
+  };
+
+  return submitFormAction(
+    () => indicoAxios.patch(apiCommentActions(params), commentData),
+    null,
+    () => fetchPaperDetails(eventId, contributionId),
+    null
+  );
+}
+
 export function deleteComment(eventId, contributionId, revisionId, commentId) {
   const params = {
     confId: eventId,
@@ -66,7 +82,7 @@ export function deleteComment(eventId, contributionId, revisionId, commentId) {
     comment_id: commentId,
   };
   return ajaxAction(
-    () => indicoAxios.delete(deleteCommentURL(params)),
+    () => indicoAxios.delete(apiCommentActions(params)),
     DELETE_COMMENT_REQUEST,
     [DELETE_COMMENT_SUCCESS, () => fetchPaperDetails(eventId, contributionId)],
     DELETE_COMMENT_ERROR,

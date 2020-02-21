@@ -17,7 +17,7 @@ from indico.modules.events.papers.models.comments import PaperReviewComment
 from indico.modules.events.papers.models.reviews import PaperAction, PaperCommentVisibility
 from indico.modules.events.papers.models.revisions import PaperRevisionState
 from indico.modules.events.papers.operations import (create_comment, create_paper_revision, delete_comment, judge_paper,
-                                                     reset_paper_state)
+                                                     reset_paper_state, update_comment)
 from indico.modules.events.papers.schemas import PaperSchema
 from indico.web.args import use_kwargs
 
@@ -53,7 +53,7 @@ class RHSubmitPaperComment(RHPaperBase):
         return '', 204
 
 
-class RHDeleteComment(RHPaperBase):
+class RHCommentActions(RHPaperBase):
     normalize_url_spec = {
         'locators': {
             lambda self: self.comment
@@ -71,6 +71,14 @@ class RHDeleteComment(RHPaperBase):
 
     def _process_DELETE(self):
         delete_comment(self.comment)
+        return '', 204
+
+    @use_kwargs({
+        'comment': fields.String(),
+        'visibility': EnumField(PaperCommentVisibility)
+    }, partial=True)
+    def _process_PATCH(self, comment=None, visibility=None):
+        update_comment(self.comment, comment, visibility)
         return '', 204
 
 
