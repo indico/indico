@@ -10,7 +10,9 @@ Version 2.3
 Major Features
 ^^^^^^^^^^^^^^
 
-- TODO
+- Add category roles, which are similar to local groups but within the
+  scope of a category and its subcategories. They can be used for assigning
+  permissions in any of these categories and events within such categories.
 
 Improvements
 ^^^^^^^^^^^^
@@ -43,6 +45,7 @@ Improvements
 - Log bulk event category changes in the event log (:issue:`4241`)
 - Add CLI commands to block and unblock users (:issue:`3845`)
 - Show warning when trying to merge a blocked user (:issue:`3845`)
+- Allow importing event role members from a CSV file (:issue:`4301`)
 
 Bugfixes
 ^^^^^^^^
