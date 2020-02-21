@@ -13,8 +13,9 @@ import click
 
 from indico.cli.core import cli_group
 from indico.core.db import db
-from indico.modules.events import Event
+from indico.modules.events import Event, EventLogKind, EventLogRealm
 from indico.modules.events.export import export_event, import_event
+from indico.modules.users.models.users import User
 
 
 click.disable_unicode_literals_warning = True
@@ -27,9 +28,13 @@ def cli():
 
 @cli.command()
 @click.argument('event_id', type=int)
-def restore(event_id):
+@click.option('-u', '--user', 'user_id', type=int, default=None, metavar="USER_ID",
+              help="The user which will be shown on the log as having restored the event (default: no user).")
+@click.option('-m', '--message', 'message', metavar="MESSAGE", help="An additional message for the log")
+def restore(event_id, user_id, message):
     """Restores a deleted event."""
     event = Event.get(event_id)
+    user = User.get(user_id) if user_id else None
     if event is None:
         click.secho('This event does not exist', fg='red')
         sys.exit(1)
@@ -37,6 +42,8 @@ def restore(event_id):
         click.secho('This event is not deleted', fg='yellow')
         sys.exit(1)
     event.is_deleted = False
+    text = 'Event restored: {}'.format(message) if message else 'Event restored'
+    event.log(EventLogRealm.event, EventLogKind.positive, 'Event', text, user=user)
     db.session.commit()
     click.secho('Event undeleted: "{}"'.format(event.title), fg='green')
 
