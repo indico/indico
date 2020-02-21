@@ -47,6 +47,7 @@ Improvements
 - Show warning when trying to merge a blocked user (:issue:`3845`)
 - Allow importing event role members from a CSV file (:issue:`4301`)
 - Allow optional comment when accepting a pre-booking (:issue:`4086`)
+- Log event restores in event log (:issue:`4309`)
 
 Bugfixes
 ^^^^^^^^
