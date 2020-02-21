@@ -194,6 +194,25 @@ def test_reject(smtp, create_reservation, dummy_user, silent):
         assert smtp.outbox
 
 
+@pytest.mark.parametrize('reason', ('My reason.', None))
+def test_accept(smtp, create_reservation, dummy_user, reason):
+    reservation = create_reservation(start_dt=date.today() + relativedelta(hour=8),
+                                     end_dt=date.today() + relativedelta(days=10, hour=17),
+                                     repeat_frequency=RepeatFrequency.DAY)
+    assert not reservation.is_rejected
+    assert not any(occ.is_rejected for occ in reservation.occurrences)
+    reservation.accept(user=dummy_user, reason=reason)
+    assert reservation.is_accepted
+    assert len(smtp.outbox) == 2
+
+    if reason:
+        assert ['My reason' in mail.as_string() for mail in smtp.outbox]
+        assert reservation.edit_logs.one().info == ['Reservation accepted: My reason.']
+    else:
+        assert ['My reason' not in mail.as_string() for mail in smtp.outbox]
+        assert reservation.edit_logs.one().info == ['Reservation accepted']
+
+
 def test_add_edit_log(dummy_reservation):
     dummy_reservation.add_edit_log(ReservationEditLog(user_name='user', info='Some change'))
     assert dummy_reservation.edit_logs.count() == 1

@@ -222,9 +222,15 @@ class RHBookingStateActions(RHBookingBase):
     def reject(self, reason):
         self.booking.reject(session.user, reason)
 
+    @use_kwargs({
+        'reason': fields.String(required=False)
+    })
+    def accept(self, reason=None):
+        self.booking.accept(session.user, reason)
+
     def _process(self):
         if self.action == 'approve':
-            self.booking.accept(session.user)
+            self.accept()
         elif self.action == 'reject':
             self.reject()
         elif self.action == 'cancel':

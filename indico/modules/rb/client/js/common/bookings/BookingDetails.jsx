@@ -70,6 +70,15 @@ class BookingDetails extends React.Component {
   state = {
     occurrencesVisible: false,
     activeConfirmation: null,
+    acceptanceFormVisible: false,
+  };
+
+  showAcceptanceForm = () => {
+    this.setState({acceptanceFormVisible: true});
+  };
+
+  hideAcceptanceForm = () => {
+    this.setState({acceptanceFormVisible: false});
   };
 
   showOccurrences = () => {
@@ -384,7 +393,7 @@ class BookingDetails extends React.Component {
 
   renderActionButtons = (canCancel, canReject, showAccept) => {
     const {bookingStateChangeInProgress} = this.props;
-    const {actionInProgress, activeConfirmation} = this.state;
+    const {actionInProgress, activeConfirmation, acceptanceFormVisible} = this.state;
     const rejectButton = (
       <Button
         type="button"
@@ -397,7 +406,16 @@ class BookingDetails extends React.Component {
       />
     );
 
-    const renderForm = ({
+    const acceptWithMessage = (
+      <Button
+        type="button"
+        icon="edit outline"
+        styleName="accept-with-message"
+        disabled={bookingStateChangeInProgress || acceptanceFormVisible}
+      />
+    );
+
+    const renderRejectionForm = ({
       handleSubmit,
       hasValidationErrors,
       submitSucceeded,
@@ -421,6 +439,36 @@ class BookingDetails extends React.Component {
             primary
           >
             <Translate>Reject</Translate>
+          </Button>
+        </Form>
+      );
+    };
+
+    const renderAcceptanceForm = ({
+      handleSubmit,
+      hasValidationErrors,
+      submitSucceeded,
+      submitting,
+    }) => {
+      return (
+        <Form styleName="rejection-form" onSubmit={handleSubmit}>
+          <FinalTextArea
+            name="reason"
+            placeholder={Translate.string(
+              'You can provide an optional message when accepting this booking'
+            )}
+            disabled={submitSucceeded}
+            rows={2}
+            autoFocus
+          />
+          <Button
+            type="submit"
+            disabled={submitting || hasValidationErrors || submitSucceeded}
+            loading={submitting}
+            floated="right"
+            primary
+          >
+            <Translate>Accept</Translate>
           </Button>
         </Form>
       );
@@ -458,20 +506,47 @@ class BookingDetails extends React.Component {
         )}
         {canReject && (
           <Popup trigger={rejectButton} position="bottom center" on="click">
-            <FinalForm onSubmit={data => this.changeState('reject', data)} render={renderForm} />
+            <FinalForm
+              onSubmit={data => this.changeState('reject', data)}
+              render={renderRejectionForm}
+              subscription={{
+                hasValidationErrors: true,
+                submitSucceeded: true,
+                submitting: true,
+                pristine: true,
+              }}
+            />
           </Popup>
         )}
         {showAccept && (
-          <Button
-            type="button"
-            icon="check circle"
-            color="green"
-            size="small"
-            onClick={() => this.changeState('approve')}
-            loading={actionInProgress === 'approve' && bookingStateChangeInProgress}
-            disabled={bookingStateChangeInProgress}
-            content={Translate.string('Accept booking')}
-          />
+          <Button.Group size="small" color="green">
+            <Button
+              type="button"
+              icon="check circle"
+              onClick={() => this.changeState('approve')}
+              loading={actionInProgress === 'approve' && bookingStateChangeInProgress}
+              disabled={bookingStateChangeInProgress || acceptanceFormVisible}
+              content={Translate.string('Accept booking')}
+            />
+            <Popup
+              trigger={acceptWithMessage}
+              position="bottom right"
+              on="click"
+              onOpen={this.showAcceptanceForm}
+              onClose={this.hideAcceptanceForm}
+            >
+              <FinalForm
+                onSubmit={data => this.changeState('approve', data)}
+                render={renderAcceptanceForm}
+                subscription={{
+                  hasValidationErrors: true,
+                  submitSucceeded: true,
+                  submitting: true,
+                  pristine: true,
+                }}
+              />
+            </Popup>
+          </Button.Group>
         )}
       </Modal.Actions>
     );
