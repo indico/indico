@@ -22,8 +22,9 @@ _bp.add_url_rule('/create', 'add_role', RHAddEventRole, methods=('GET', 'POST'))
 _bp.add_url_rule('/<int:role_id>/edit', 'edit_role', RHEditEventRole, methods=('GET', 'POST'))
 _bp.add_url_rule('/<int:role_id>', 'delete_role', RHDeleteEventRole, methods=('DELETE',))
 
-_bp.add_url_rule('/<int:role_id>/members', 'add_members', RHAddEventRoleMembers, methods=('POST',))
-_bp.add_url_rule('/<int:role_id>/members/<int:user_id>', 'remove_member', RHRemoveEventRoleMember, methods=('DELETE',))
+_bp.add_url_rule('/<int:role_id>/members', 'add_role_members', RHAddEventRoleMembers, methods=('POST',))
+_bp.add_url_rule('/<int:role_id>/members/<int:user_id>', 'remove_role_member', RHRemoveEventRoleMember,
+                 methods=('DELETE',))
 
 _bp.add_url_rule('/<int:role_id>/members/import', 'add_members_import_csv', RHEventRoleMembersImportCSV,
                  methods=('GET', 'POST'))

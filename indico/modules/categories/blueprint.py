@@ -54,8 +54,8 @@ _bp.add_url_rule('/manage/roles', 'manage_roles', RHCategoryRoles, methods=('POS
 _bp.add_url_rule('/manage/roles/create', 'add_role', RHAddCategoryRole, methods=('GET', 'POST'))
 _bp.add_url_rule('/manage/roles/<int:role_id>/edit', 'edit_role', RHEditCategoryRole, methods=('GET', 'POST'))
 _bp.add_url_rule('/manage/roles/<int:role_id>', 'delete_role', RHDeleteCategoryRole, methods=('DELETE',))
-_bp.add_url_rule('/manage/roles/<int:role_id>/members', 'add_members', RHAddCategoryRoleMembers, methods=('POST',))
-_bp.add_url_rule('/manage/roles/<int:role_id>/members/<int:user_id>', 'remove_member', RHRemoveCategoryRoleMember,
+_bp.add_url_rule('/manage/roles/<int:role_id>/members', 'add_role_members', RHAddCategoryRoleMembers, methods=('POST',))
+_bp.add_url_rule('/manage/roles/<int:role_id>/members/<int:user_id>', 'remove_role_member', RHRemoveCategoryRoleMember,
                  methods=('DELETE',))
 _bp.add_url_rule('/manage/roles/<int:role_id>/members/import', 'add_members_import_csv',
                  RHCategoryRoleMembersImportCSV, methods=('GET', 'POST'))

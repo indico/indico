@@ -72,7 +72,7 @@
                             <li class="i-tag outline highlight icon-user">
                                 {{ user.display_full_name }}
                                 <button class="icon-cross i-button borderless text-color danger"
-                                        data-href="{{ url_for('.remove_member', role, user) }}"
+                                        data-href="{{ url_for('.remove_role_member', role, user) }}"
                                         data-method="DELETE"
                                         data-update="#event-role-{{ role.id }}"
                                         data-ajax></button>
@@ -90,7 +90,7 @@
                         {% trans %}Import users from CSV file{% endtrans %}
                     </button>
                     <button class="i-button highlight text-color icon-plus js-add-members"
-                            data-href="{{ url_for('.add_members', role) }}"
+                            data-href="{{ url_for('.add_role_members', role) }}"
                             data-method="POST"
                             data-update="#event-role-{{ role.id }}">
                         {% trans %}Add user{% endtrans %}
