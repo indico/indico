@@ -4,6 +4,12 @@
 {% block state -%}
 Your booking has been ACCEPTED.
 This is the final confirmation.
+
+{%- if reason %}
+
+The following message was provided by the room manager:
+{{ reason }}
+{%- endif -%}
 {%- endblock %}
 
 {% include 'rb/emails/reservations/reservation_info.txt' %}

@@ -112,18 +112,20 @@ def notify_cancellation(reservation):
 
 
 @email_sender
-def notify_confirmation(reservation):
+def notify_confirmation(reservation, reason=None):
     if not reservation.is_accepted:
         raise ValueError('Reservation is not confirmed')
     notification = ReservationNotification(reservation)
     return filter(None, [
         notification.compose_email_to_user(
             subject='Booking confirmed on',
-            template_name='confirmation_email_to_user'
+            template_name='confirmation_email_to_user',
+            reason=reason
         ),
         notification.compose_email_to_manager(
             subject='Booking confirmed on',
-            template_name='confirmation_email_to_manager'
+            template_name='confirmation_email_to_manager',
+            reason=reason
         ),
     ])
 

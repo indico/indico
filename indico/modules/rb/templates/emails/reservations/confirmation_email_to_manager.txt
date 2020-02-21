@@ -2,4 +2,10 @@
 
 {% block body -%}
 A booking in your room '{{ reservation.room.full_name }}' has been CONFIRMED by a room manager.
+
+{%- if reason %}
+
+The following message was provided by the room manager:
+{{ reason }}
+{%- endif -%}
 {%- endblock %}

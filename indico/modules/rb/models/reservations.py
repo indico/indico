@@ -5,6 +5,8 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
+from __future__ import unicode_literals
+
 from collections import OrderedDict, defaultdict
 from datetime import datetime
 
@@ -64,13 +66,13 @@ class RepeatMapping(object):
         # XXX: move this somewhere else
         # not translated since it's only used in log messages + emails now
         if repeat_frequency == RepeatFrequency.NEVER:
-            return u'single booking'
+            return 'single booking'
         elif repeat_frequency == RepeatFrequency.DAY:
-            return u'daily booking'
+            return 'daily booking'
         elif repeat_frequency == RepeatFrequency.WEEK:
-            return u'weekly' if repeat_interval == 1 else u'every {} weeks'.format(repeat_interval)
+            return 'weekly' if repeat_interval == 1 else 'every {} weeks'.format(repeat_interval)
         elif repeat_frequency == RepeatFrequency.MONTH:
-            return u'monthly' if repeat_interval == 1 else u'every {} months'.format(repeat_interval)
+            return 'monthly' if repeat_interval == 1 else 'every {} months'.format(repeat_interval)
 
     @classmethod
     def get_short_name(cls, repeat_frequency, repeat_interval):
@@ -333,7 +335,7 @@ class Reservation(Serializer, db.Model):
         if prebook is None:
             prebook = not room.can_book(user, allow_admin=(not ignore_admin))
             if prebook and not room.can_prebook(user, allow_admin=(not ignore_admin)):
-                raise NoReportError(u'You cannot book this room')
+                raise NoReportError('You cannot book this room')
 
         room.check_advance_days(data['end_dt'].date(), user)
         room.check_bookable_hours(data['start_dt'].time(), data['end_dt'].time(), user)
@@ -349,7 +351,7 @@ class Reservation(Serializer, db.Model):
         reservation.created_by_user = user
         reservation.create_occurrences(True)
         if not any(occ.is_valid for occ in reservation.occurrences):
-            raise NoReportError(_(u'Reservation has no valid occurrences'))
+            raise NoReportError(_('Reservation has no valid occurrences'))
         db.session.flush()
         signals.rb.booking_created.send(reservation)
         notify_creation(reservation)
@@ -406,17 +408,21 @@ class Reservation(Serializer, db.Model):
                                 ReservationOccurrence.filter_overlap(occurrences),
                                 _join=ReservationOccurrence)
 
-    def accept(self, user):
+    def accept(self, user, reason=None):
         self.state = ReservationState.accepted
-        self.add_edit_log(ReservationEditLog(user_name=user.full_name, info=['Reservation accepted']))
-        notify_confirmation(self)
+        if reason:
+            log_msg = 'Reservation accepted: {}'.format(reason)
+        else:
+            log_msg = 'Reservation accepted'
+        self.add_edit_log(ReservationEditLog(user_name=user.full_name, info=[log_msg]))
+        notify_confirmation(self, reason)
         signals.rb.booking_state_changed.send(self)
         valid_occurrences = self.occurrences.filter(ReservationOccurrence.is_valid).all()
         pre_occurrences = ReservationOccurrence.find_overlapping_with(self.room, valid_occurrences, self.id).all()
         for occurrence in pre_occurrences:
             if not occurrence.is_valid:
                 continue
-            occurrence.reject(user, u'Rejected due to collision with a confirmed reservation')
+            occurrence.reject(user, 'Rejected due to collision with a confirmed reservation')
 
     def reset_approval(self, user):
         self.state = ReservationState.pending
@@ -434,7 +440,7 @@ class Reservation(Serializer, db.Model):
         signals.rb.booking_state_changed.send(self)
         if not silent:
             notify_cancellation(self)
-            log_msg = u'Reservation cancelled: {}'.format(reason) if reason else 'Reservation cancelled'
+            log_msg = 'Reservation cancelled: {}'.format(reason) if reason else 'Reservation cancelled'
             self.add_edit_log(ReservationEditLog(user_name=user.full_name, info=[log_msg]))
 
     def reject(self, user, reason, silent=False):
@@ -447,7 +453,7 @@ class Reservation(Serializer, db.Model):
         signals.rb.booking_state_changed.send(self)
         if not silent:
             notify_rejection(self)
-            log_msg = u'Reservation rejected: {}'.format(reason)
+            log_msg = 'Reservation rejected: {}'.format(reason)
             self.add_edit_log(ReservationEditLog(user_name=user.full_name, info=[log_msg]))
 
     def add_edit_log(self, edit_log):
@@ -506,7 +512,7 @@ class Reservation(Serializer, db.Model):
                     if nbd.overlaps(occurrence.start_dt, occurrence.end_dt):
                         if not skip_conflicts:
                             raise ConflictingOccurrences()
-                        occurrence.cancel(user, u'Skipped due to nonbookable date', silent=True, propagate=False)
+                        occurrence.cancel(user, 'Skipped due to nonbookable date', silent=True, propagate=False)
                         break
 
         # Check for conflicts with blockings
@@ -518,7 +524,7 @@ class Reservation(Serializer, db.Model):
             for occurrence in self.occurrences:
                 if occurrence.is_valid and blocking.is_active_at(occurrence.start_dt.date()):
                     # Cancel OUR occurrence
-                    msg = u'Skipped due to collision with a blocking ({})'
+                    msg = 'Skipped due to collision with a blocking ({})'
                     occurrence.cancel(user, msg.format(blocking.reason), silent=True, propagate=False)
 
         # Check for conflicts with other occurrences
@@ -530,12 +536,12 @@ class Reservation(Serializer, db.Model):
                 if not skip_conflicts:
                     raise ConflictingOccurrences()
                 # Cancel OUR occurrence
-                msg = u'Skipped due to collision with {} reservation(s)'
+                msg = 'Skipped due to collision with {} reservation(s)'
                 occurrence.cancel(user, msg.format(len(conflicts['confirmed'])), silent=True, propagate=False)
             elif conflicts['pending'] and self.is_accepted:
                 # Reject OTHER occurrences
                 for conflict in conflicts['pending']:
-                    conflict.reject(user, u'Rejected due to collision with a confirmed reservation')
+                    conflict.reject(user, 'Rejected due to collision with a confirmed reservation')
 
     def find_excluded_days(self):
         return self.occurrences.filter(~ReservationOccurrence.is_valid)
@@ -631,7 +637,7 @@ class Reservation(Serializer, db.Model):
             return False
 
         # Create a verbose log entry for the modification
-        log = [u'Booking modified']
+        log = ['Booking modified']
         for field, change in changes.iteritems():
             field_title = field_names.get(field, field)
             converter = change['converter']
@@ -671,7 +677,7 @@ class Reservation(Serializer, db.Model):
 
         # Sanity check so we don't end up with an "empty" booking
         if not any(occ.is_valid for occ in self.occurrences):
-            raise NoReportError(_(u'Reservation has no valid occurrences'))
+            raise NoReportError(_('Reservation has no valid occurrences'))
 
         notify_modification(self, changes)
         return True
