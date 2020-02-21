@@ -41,7 +41,7 @@ def freeze_time(monkeypatch):
     which simply returns the current time from `datetime.now()` instead of
     retrieving it using the actual `now()` function of PostgreSQL.
     """
-    freezer = [None]
+    freezers = []
     orig_call = _FunctionGenerator.__call__
 
     def FunctionGenerator_call(self, *args, **kwargs):
@@ -52,9 +52,10 @@ def freeze_time(monkeypatch):
     monkeypatch.setattr(_FunctionGenerator, '__call__', FunctionGenerator_call)
 
     def _freeze_time(time_to_freeze):
-        freezer[0] = freezegun.freeze_time(time_to_freeze)
-        freezer[0].start()
+        freezer = freezegun.freeze_time(time_to_freeze)
+        freezer.start()
+        freezers.append(freezer)
 
     yield _freeze_time
-    if freezer[0]:
-        freezer[0].stop()
+    for freezer in reversed(freezers):
+        freezer.stop()
