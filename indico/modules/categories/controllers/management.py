@@ -33,6 +33,7 @@ from indico.modules.rb.models.reservations import Reservation, ReservationLink
 from indico.modules.users import User
 from indico.util.fs import secure_filename
 from indico.util.i18n import _, ngettext
+from indico.util.roles import ImportRoleMembersMixin
 from indico.util.string import crc32
 from indico.util.user import principal_from_fossil
 from indico.web.flask.templating import get_template_module
@@ -512,3 +513,9 @@ class RHAddCategoryRoleMembers(RHManageCategoryRole):
                 self.role.members.add(user)
                 logger.info('User %r added to role %r by %r', user, self.role, session.user)
         return jsonify_data(html=_render_role(self.role, collapsed=False))
+
+
+class RHCategoryRoleMembersImportCSV(ImportRoleMembersMixin, RHManageCategoryRole):
+    """Add users to a category role from CSV"""
+
+    logger = logger

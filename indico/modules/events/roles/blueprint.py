@@ -8,7 +8,8 @@
 from __future__ import unicode_literals
 
 from indico.modules.events.roles.controllers import (RHAddEventRole, RHAddEventRoleMembers, RHDeleteEventRole,
-                                                     RHEditEventRole, RHEventRoles, RHRemoveEventRoleMember)
+                                                     RHEditEventRole, RHEventRoleMembersImportCSV, RHEventRoles,
+                                                     RHRemoveEventRoleMember)
 from indico.web.flask.wrappers import IndicoBlueprint
 
 
@@ -23,3 +24,6 @@ _bp.add_url_rule('/<int:role_id>', 'delete_role', RHDeleteEventRole, methods=('D
 
 _bp.add_url_rule('/<int:role_id>/members', 'add_members', RHAddEventRoleMembers, methods=('POST',))
 _bp.add_url_rule('/<int:role_id>/members/<int:user_id>', 'remove_member', RHRemoveEventRoleMember, methods=('DELETE',))
+
+_bp.add_url_rule('/<int:role_id>/members/import', 'add_members_import_csv', RHEventRoleMembersImportCSV,
+                 methods=('GET', 'POST'))

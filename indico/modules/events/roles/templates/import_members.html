@@ -1,0 +1,15 @@
+{% from 'forms/_form.html' import simple_form  %}
+{% from 'message_box.html' import message_box %}
+
+{% call message_box('highlight', large_icon=true) %}
+    {% trans -%}
+        You should upload a CSV or TXT file with with one email address per line.
+    {%- endtrans %}
+    <br>
+    {% trans -%}
+        Users will be matched with existing Indico identities through their e-mail.
+    {%- endtrans %}
+{% endcall %}
+
+{{ simple_form(form, submit=_('Upload'), back=_('Cancel'), footer_align_right=true,
+               form_header_kwargs={'multipart': true, 'action': url_for('.add_members_import_csv', role)}) }}

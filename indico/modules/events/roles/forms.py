@@ -7,14 +7,15 @@
 
 from __future__ import unicode_literals
 
-from wtforms.fields.core import StringField
-from wtforms.validators import DataRequired, Length
+from wtforms.fields.core import BooleanField, StringField
+from wtforms.validators import DataRequired, InputRequired, Length
 
 from indico.modules.events.models.roles import EventRole
 from indico.util.i18n import _
 from indico.web.forms.base import IndicoForm
 from indico.web.forms.colors import get_role_colors
-from indico.web.forms.fields import IndicoSinglePalettePickerField
+from indico.web.forms.fields import FileField, IndicoSinglePalettePickerField
+from indico.web.forms.widgets import SwitchWidget
 
 
 class EventRoleForm(IndicoForm):
@@ -37,3 +38,8 @@ class EventRoleForm(IndicoForm):
             query = query.filter(EventRole.id != self.role.id)
         if query.has_rows():
             raise ValueError(_('A role with this code already exists.'))
+
+
+class ImportMembersCSVForm(IndicoForm):
+    source_file = FileField(_('Source File'), [InputRequired(), DataRequired()], accepted_file_types='.csv,.txt')
+    remove_existing = BooleanField(_('Remove existing members'), widget=SwitchWidget())

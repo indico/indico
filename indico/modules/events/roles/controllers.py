@@ -21,6 +21,7 @@ from indico.modules.events.roles.forms import EventRoleForm
 from indico.modules.events.roles.util import serialize_event_role
 from indico.modules.events.roles.views import WPEventRoles
 from indico.modules.users import User
+from indico.util.roles import ImportRoleMembersMixin
 from indico.util.user import principal_from_fossil
 from indico.web.flask.templating import get_template_module
 from indico.web.forms.colors import get_role_colors
@@ -145,3 +146,9 @@ class RHAddEventRoleMembers(RHManageEventRole):
                                data={'Name': user.full_name,
                                      'Email': user.email})
         return jsonify_data(html=_render_role(self.role, collapsed=False))
+
+
+class RHEventRoleMembersImportCSV(ImportRoleMembersMixin, RHManageEventRole):
+    """Add users to an event role from CSV"""
+
+    logger = logger

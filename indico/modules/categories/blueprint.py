@@ -19,9 +19,9 @@ from indico.modules.categories.controllers.display import (RHCategoryCalendarVie
                                                            RHShowFutureEventsInCategory, RHShowPastEventsInCategory,
                                                            RHSubcatInfo, RHXMLExportCategoryInfo)
 from indico.modules.categories.controllers.management import (RHAddCategoryRole, RHAddCategoryRoleMembers,
-                                                              RHCategoryRoles, RHCreateCategory, RHDeleteCategory,
-                                                              RHDeleteCategoryRole, RHDeleteEvents,
-                                                              RHDeleteSubcategories, RHEditCategoryRole,
+                                                              RHCategoryRoleMembersImportCSV, RHCategoryRoles,
+                                                              RHCreateCategory, RHDeleteCategory, RHDeleteCategoryRole,
+                                                              RHDeleteEvents, RHDeleteSubcategories, RHEditCategoryRole,
                                                               RHManageCategoryContent, RHManageCategoryIcon,
                                                               RHManageCategoryLogo, RHManageCategoryProtection,
                                                               RHManageCategorySettings, RHMoveCategory, RHMoveEvents,
@@ -57,6 +57,8 @@ _bp.add_url_rule('/manage/roles/<int:role_id>', 'delete_role', RHDeleteCategoryR
 _bp.add_url_rule('/manage/roles/<int:role_id>/members', 'add_members', RHAddCategoryRoleMembers, methods=('POST',))
 _bp.add_url_rule('/manage/roles/<int:role_id>/members/<int:user_id>', 'remove_member', RHRemoveCategoryRoleMember,
                  methods=('DELETE',))
+_bp.add_url_rule('/manage/roles/<int:role_id>/members/import', 'add_members_import_csv',
+                 RHCategoryRoleMembersImportCSV, methods=('GET', 'POST'))
 
 # Event management
 _bp.add_url_rule('/manage/events/delete', 'delete_events', RHDeleteEvents, methods=('GET', 'POST'))
