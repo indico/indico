@@ -25,7 +25,7 @@ _bp.add_url_rule('/papers/api/<int:contrib_id>', 'api_reset_paper_state', api.RH
 _bp.add_url_rule('/papers/api/<int:contrib_id>/comment', 'api_submit_comment', api.RHSubmitPaperComment,
                  methods=('POST',))
 _bp.add_url_rule('/papers/api/<int:contrib_id>/revision/<int:revision_id>/comment/<int:comment_id>',
-                 'api_delete_comment', api.RHDeleteComment, methods=('DELETE',))
+                 'api_comment_actions', api.RHCommentActions, methods=('DELETE', 'PATCH'))
 _bp.add_url_rule('/papers/api/<int:contrib_id>/judge', 'api_judge_paper', api.RHJudgePaper, methods=('POST',))
 _bp.add_url_rule('/papers/api/contributions/<int:contrib_id>/paper/submit', 'api_submit_revision',
                  api.RHSubmitNewRevision, methods=('POST',))

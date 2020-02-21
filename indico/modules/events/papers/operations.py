@@ -329,8 +329,13 @@ def create_comment(paper, text, visibility, user):
                     session.user)
 
 
-def update_comment(comment, text, visibility):
-    changes = comment.populate_from_dict({'text': text, 'visibility': visibility})
+def update_comment(comment, text=None, visibility=None):
+    new_values = {}
+    if text:
+        new_values['text'] = text
+    if visibility:
+        new_values['visibility'] = visibility
+    changes = comment.populate_from_dict(new_values)
     comment.modified_by = session.user
     comment.modified_dt = now_utc()
     db.session.flush()

@@ -12,26 +12,44 @@ import {useDispatch, useSelector} from 'react-redux';
 import {Button, Confirm} from 'semantic-ui-react';
 
 import UserAvatar from 'indico/modules/events/reviewing/components/UserAvatar';
-import {serializeDate} from 'indico/utils/date';
+import {getChangedValues} from 'indico/react/forms';
 import {Param, Translate} from 'indico/react/i18n';
+import {serializeDate} from 'indico/utils/date';
 
-import {deleteComment} from '../actions';
+import CommentForm from './CommentForm';
+import {deleteComment, editComment} from '../actions';
 import {CommentVisibility} from '../models';
 import {getPaperContribution, getPaperEvent, isDeletingComment} from '../selectors';
 
 export default function RevisionComment({comment, revision}) {
   const dispatch = useDispatch();
   const [confirmOpen, setConfirmOpen] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
   const {id: eventId} = useSelector(getPaperEvent);
   const {id: contributionId} = useSelector(getPaperContribution);
   const isDeletingCommentInProgress = useSelector(isDeletingComment);
+
+  const updateComment = async (formData, form) => {
+    const rv = await dispatch(
+      editComment(
+        eventId,
+        contributionId,
+        revision.id,
+        comment.id,
+        getChangedValues(formData, form)
+      )
+    );
+    if (rv.error) {
+      return rv.error;
+    }
+  };
 
   return (
     <div className="i-timeline-item">
       <UserAvatar user={comment.user} />
       <div className="flexrow i-timeline-item-content">
         <div className="i-timeline-item-box header-indicator-left">
-          <div className="i-box-header flexrow">
+          <div className="i-box-header flexrow" style={{display: isEditing ? 'none' : 'flex'}}>
             <div className="f-self-stretch">
               <Translate>
                 <Param name="userName" value={comment.user.fullName} wrapper={<strong />} /> left a
@@ -61,7 +79,11 @@ export default function RevisionComment({comment, revision}) {
             </div>
             {comment.canEdit && (
               <div className="review-comment-action hide-if-locked">
-                <a href="#" className="i-link icon-edit" title={Translate.string('Edit comment')} />{' '}
+                <a
+                  className="i-link icon-edit"
+                  title={Translate.string('Edit comment')}
+                  onClick={() => setIsEditing(!isEditing)}
+                />{' '}
                 <a
                   onClick={() => setConfirmOpen(true)}
                   className="i-link icon-cross"
@@ -103,7 +125,16 @@ export default function RevisionComment({comment, revision}) {
             )}
           </div>
           <div className="i-box-content js-form-container">
-            <div className="markdown-text" dangerouslySetInnerHTML={{__html: comment.html}} />
+            {isEditing ? (
+              <CommentForm
+                onSubmit={updateComment}
+                onFormHide={() => setIsEditing(false)}
+                comment={comment}
+                expanded
+              />
+            ) : (
+              <div className="markdown-text" dangerouslySetInnerHTML={{__html: comment.html}} />
+            )}
           </div>
         </div>
       </div>
