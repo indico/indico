@@ -114,7 +114,9 @@
                                                 <span class="question-index">{{ loop.index }}</span>
                                             </div>
                                             <div class="question-text f-self-stretch">{{ question.title }}</div>
-                                            {{ render_score(score, abstract.event.cfa.rating_range) }}
+                                            {% if score is not none %}
+                                                {{ render_score(score, abstract.event.cfa.rating_range) }}
+                                            {% endif %}
                                         </div>
                                     {% endfor %}
                                 </div>
