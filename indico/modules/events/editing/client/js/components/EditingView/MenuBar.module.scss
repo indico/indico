@@ -1,0 +1,45 @@
+// This file is part of Indico.
+// Copyright (C) 2002 - 2020 CERN
+//
+// Indico is free software; you can redistribute it and/or
+// modify it under the terms of the MIT License; see the
+// LICENSE file for more details.
+
+@import 'base/palette';
+
+$header-height: calc(100vh - 167px);
+
+.menu-bar {
+    color: $white;
+    background-color: $light-purple;
+    padding: 20px 30px;
+    margin-right: 25px;
+    max-width: 200px;
+    min-height: $header-height;
+
+    .header {
+        color: $white;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+    }
+
+    .list {
+        margin-top: 15px;
+        list-style-type: none;
+        padding-inline-start: 0;
+
+        li .inner-list {
+            list-style-type: none;
+            padding-inline-start: 20px;
+        }
+
+        li .inner-list a .inner-list-item {
+            padding-top: 5px;
+            color: $light-gray;
+
+            &:hover {
+                color: $black;
+            }
+        }
+    }
+}
