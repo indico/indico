@@ -14,7 +14,7 @@ import dateutil
 from flask import jsonify, request, session
 from marshmallow import fields, validate
 from marshmallow_enum import EnumField
-from werkzeug.exceptions import Forbidden
+from werkzeug.exceptions import Forbidden, NotFound
 
 from indico.core import signals
 from indico.core.db import db
@@ -195,6 +195,8 @@ class RHRoomSuggestions(RHRoomBookingBase):
 class RHBookingBase(RHRoomBookingBase):
     def _process_args(self):
         self.booking = Reservation.get_one(request.view_args['booking_id'])
+        if self.booking.room.is_deleted:
+            raise NotFound(_('The room has been deleted'))
 
 
 class RHBookingDetails(RHBookingBase):
