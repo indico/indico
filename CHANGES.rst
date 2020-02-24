@@ -19,6 +19,7 @@ Bugfixes
 - Fix event access key prompt not showing when accessing an attachment link
   (:issue:`4255`)
 - Include event title in OpenGraph metadata (:issue:`4288`)
+- Fix error when viewing abstract with reviews that have no scores
 
 Version 2.2.5
 -------------
