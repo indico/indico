@@ -11,12 +11,14 @@ from io import BytesIO
 
 from flask import jsonify, request, session
 from marshmallow import missing
+from PIL import Image
 from sqlalchemy.orm import joinedload
 from webargs import fields
 from webargs.flaskparser import abort
 from werkzeug.exceptions import Forbidden, NotFound
 
 from indico.core.db import db
+from indico.core.errors import UserValueError
 from indico.modules.rb import logger, rb_settings
 from indico.modules.rb.controllers import RHRoomBookingBase
 from indico.modules.rb.controllers.backend.rooms import RHRoomsPermissions
@@ -373,8 +375,19 @@ class RHRoomPhoto(RHRoomAdminBase):
         return '', 204
 
     def _process_POST(self):
-        photo = request.files['photo'].read()
-        self.room.photo = Photo(data=photo)
+        f = request.files['photo']
+        try:
+            photo = Image.open(f)
+        except IOError:
+            raise UserValueError(_('You cannot upload this file as a room picture.'))
+        if photo.format.lower() not in {'jpeg', 'png', 'gif'}:
+            raise UserValueError(_('The file has an invalid format ({format}).').format(format=photo.format))
+        if photo.mode != 'RGB':
+            photo = photo.convert('RGB')
+        image_bytes = BytesIO()
+        photo.save(image_bytes, 'JPEG')
+        image_bytes.seek(0)
+        self.room.photo = Photo(data=image_bytes.read())
         token = build_rooms_spritesheet()
         return jsonify(rooms_sprite_token=unicode(token))
 
