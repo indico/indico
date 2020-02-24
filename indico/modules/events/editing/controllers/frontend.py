@@ -35,7 +35,7 @@ class RHEditableTimeline(RHContributionEditableBase):
 
     def _process(self):
         return WPEditing.render_template(
-            'timeline.html',
+            'editing.html',
             self.event,
             editable=self.editable,
             contribution=self.contrib

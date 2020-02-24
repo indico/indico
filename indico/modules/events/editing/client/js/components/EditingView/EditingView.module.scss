@@ -5,7 +5,18 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-import './tags';
-import './fileTypes';
-import './reviewConditions';
-import './editing';
+@import 'base/palette';
+
+.editing-view {
+    display: flex;
+
+    .contents {
+        max-width: 800px;
+        margin-top: 25px;
+
+        .header {
+            color: #737373;
+        }
+    }
+}
+

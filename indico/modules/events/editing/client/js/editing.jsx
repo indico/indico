@@ -17,16 +17,18 @@ import {camelizeKeys} from 'indico/utils/case';
 import {indicoAxios, handleAxiosError} from 'indico/utils/axios';
 
 import storeFactory from './store';
-import Timeline from './components/Timeline';
+import EditingView from './components/EditingView';
 
 document.addEventListener('DOMContentLoaded', async () => {
-  const timelineElement = document.querySelector('#editing-timeline');
+  const editingElement = document.querySelector('#editing-view');
 
-  if (!timelineElement) {
+  if (!editingElement) {
     return;
   }
 
-  const eventId = parseInt(timelineElement.dataset.eventId, 10);
+  const eventId = parseInt(editingElement.dataset.eventId, 10);
+  const eventTitle = editingElement.dataset.eventTitle;
+
   let fileTypes, tags;
 
   try {
@@ -41,9 +43,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     return;
   }
 
-  const contributionId = parseInt(timelineElement.dataset.contributionId, 10);
-  const contributionCode = timelineElement.dataset.contributionCode;
-  const editableType = timelineElement.dataset.editableType;
+  const contributionId = parseInt(editingElement.dataset.contributionId, 10);
+  const contributionCode = editingElement.dataset.contributionCode;
+  const editableType = editingElement.dataset.editableType;
   const store = storeFactory({
     eventId,
     contributionId,
@@ -60,8 +62,8 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   ReactDOM.render(
     <Provider store={store}>
-      <Timeline />
+      <EditingView eventTitle={eventTitle} />
     </Provider>,
-    timelineElement
+    editingElement
   );
 });

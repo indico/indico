@@ -14,3 +14,6 @@ class WPEditing(WPEventManagement):
     template_prefix = 'events/editing/'
     # TODO: remove mathjax later on from here (it is just here to make the timeline work)
     bundles = ('module_events.editing.js', 'module_events.editing.css', 'mathjax.js')
+
+    def _get_footer(self):
+        return u""
