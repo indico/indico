@@ -80,6 +80,47 @@ import setupReactPaperTimeline from './setup';
       applySearchFilters();
     }
   };
+
+  global.setupConflictsList = function setupConflictsList() {
+    const $conflictListTooltip = $('.js-assign-dialog .name-column .affiliation > span');
+    $conflictListTooltip.qbubble({
+      show: {
+        event: 'mouseover',
+      },
+      hide: {
+        fixed: true,
+        delay: 100,
+        event: 'mouseleave',
+      },
+      position: {
+        my: 'left center',
+        at: 'right center',
+      },
+      content: {
+        text() {
+          const $this = $(this);
+          const html = $('<div>');
+          const title = $('<strong>', {text: $(this).data('title')});
+          html.append(title);
+          if ($this.is('.js-count-label')) {
+            const list = $('<ul>', {class: 'qbubble-item-list'});
+            const items = _.values($this.data('items'));
+            $.each(items, function(i, val) {
+              const item = $('<li>');
+              item.append(
+                $('<a>', {text: val[0], href: val[1]})
+                  .attr('target', '_blank')
+                  .attr('rel', 'noopener noreferrer')
+              );
+              list.append(item);
+            });
+            html.append(list);
+          }
+          return html;
+        },
+      },
+    });
+  };
 })(window);
 
 document.addEventListener('DOMContentLoaded', () => {

@@ -46,6 +46,14 @@
     label {
         font-weight: normal;
     }
+
+    .affiliation {
+        font-size: 0.8em;
+
+        .warning-text {
+            color: $yellow;
+        }
+    }
 }
 
 #assignment-list {
