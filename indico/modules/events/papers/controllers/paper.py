@@ -8,6 +8,7 @@
 from __future__ import unicode_literals
 
 import os
+from collections import defaultdict
 from itertools import chain
 from operator import attrgetter
 
@@ -26,6 +27,7 @@ from indico.modules.events.papers.views import WPDisplayJudgingArea, WPManagePap
 from indico.modules.events.util import ZipGeneratorMixin
 from indico.util.fs import secure_filename
 from indico.util.i18n import _, ngettext
+from indico.web.flask.util import url_for
 from indico.web.util import jsonify_data, jsonify_form, jsonify_template
 
 
@@ -167,13 +169,30 @@ class RHAssignPapersBase(RHPapersActionBase):
             flash(_("Paper reviewing roles have been unassigned."), 'success')
         return jsonify_data(**self.list_generator.render_list())
 
+    def _get_conflicts(self, users):
+        conflicts = defaultdict(list)
+        for user in users:
+            if not user.affiliation:
+                continue
+            for contribution in self.contributions:
+                conflicts[user].extend(
+                    (
+                        contribution.title,
+                        url_for('contributions.display_contribution', contribution),
+                    )
+                    for person in contribution.person_links
+                    if user.affiliation in person.affiliation
+                )
+        return conflicts
+
     def _render_form(self, users, action):
+        conflicts = self._get_conflicts(users)
         user_competences = self.event.cfp.user_competences
         competences = {'competences_{}'.format(user_id): competences.competences
                        for user_id, competences in user_competences.iteritems()}
         return jsonify_template('events/papers/assign_role.html', event=self.event, role=self.role.name,
                                 action=action, users=users, competences=competences,
-                                contribs=self.contributions)
+                                contribs=self.contributions, conflicts=conflicts)
 
 
 class RHAssignPapers(RHAssignPapersBase):

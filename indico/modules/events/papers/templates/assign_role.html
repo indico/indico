@@ -25,6 +25,20 @@
                                     <td class="i-table name-column">
                                         <label for="assign-user-{{ user.id }}">
                                             {{ user.full_name }}
+                                            {% if user.affiliation %}
+                                                <br>
+                                                <span class="affiliation">
+                                                    {{ user.affiliation }}
+                                                    {% set user_conflicts = conflicts.get(user) %}
+                                                    {% if user_conflicts %}
+                                                        <span class="js-count-label"
+                                                              data-title="{% trans %}Overlapping affiliation{% endtrans %}"
+                                                              data-items="{{ user_conflicts | tojson | forceescape }}">
+                                                            <i class="icon-warning warning-text"></i>
+                                                        </span>
+                                                    {% endif %}
+                                                </span>
+                                            {% endif %}
                                         </label>
                                     </td>
                                     <td>
@@ -68,5 +82,6 @@
     </form>
     <script>
         enableIfChecked('.js-assign-dialog', '.select-row:visible', '.js-assign-dialog .js-requires-selected-row');
+        setupConflictsList();
     </script>
 {% endblock %}

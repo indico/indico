@@ -189,7 +189,7 @@ import './badges';
         text: function() {
           var $this = $(this);
           var html = $('<div>');
-          var role = $('<strong>', {text: '{0}'.format($(this).data('role-name'))});
+          var role = $('<strong>', {text: $(this).data('role-name')});
           html.append(role);
           if ($this.is('.js-count-label')) {
             var list = $('<ul>', {class: 'qbubble-item-list'});
