@@ -29,7 +29,7 @@ import {
 } from 'semantic-ui-react';
 
 import {toMoment, serializeDate} from 'indico/utils/date';
-import {Param, Translate} from 'indico/react/i18n';
+import {Param, Plural, PluralTranslate, Singular, Translate} from 'indico/react/i18n';
 import {FinalTextArea} from 'indico/react/forms';
 import {Responsive} from 'indico/react/util';
 import {ClipboardButton} from 'indico/react/components';
@@ -391,7 +391,7 @@ class BookingDetails extends React.Component {
     return transformToLegendLabels(occurrenceTypes, inactiveTypes);
   };
 
-  renderActionButtons = (canCancel, canReject, showAccept) => {
+  renderActionButtons = (canCancel, canReject, showAccept, occurrenceCount) => {
     const {bookingStateChangeInProgress} = this.props;
     const {actionInProgress, activeConfirmation, acceptanceFormVisible} = this.state;
     const rejectButton = (
@@ -487,21 +487,58 @@ class BookingDetails extends React.Component {
               disabled={bookingStateChangeInProgress}
               content={Translate.string('Cancel booking')}
             />
-            <Confirm
-              header={Translate.string('Confirm cancellation')}
-              content={Translate.string(
-                'Are you sure you want to cancel this booking? ' +
-                  'This will cancel future occurrences of this booking.'
-              )}
-              confirmButton={<Button content={Translate.string('Cancel booking')} negative />}
-              cancelButton={Translate.string('Close')}
+            <Modal
               open={activeConfirmation === 'cancel'}
-              onCancel={this.hideConfirm}
-              onConfirm={() => {
-                this.changeState('cancel');
-                this.hideConfirm();
-              }}
-            />
+              size="small"
+              onClose={() => this.hideConfirm()}
+            >
+              <Modal.Header>
+                <Translate>Confirm cancellation</Translate>
+              </Modal.Header>
+              <Modal.Content>
+                <p>
+                  <PluralTranslate count={occurrenceCount}>
+                    <Singular>Are you sure you want to cancel this booking?</Singular>
+                    <Plural>
+                      Are you sure you want to cancel this booking? This will cancel all{' '}
+                      <Param name="count" value={occurrenceCount} wrapper={<strong />} />{' '}
+                      occurrences.
+                    </Plural>
+                  </PluralTranslate>
+                </p>
+                <p>
+                  {occurrenceCount > 1 && (
+                    <Translate>
+                      Single occurrences can be cancelled via the timeline view.
+                    </Translate>
+                  )}
+                </p>
+              </Modal.Content>
+              <Modal.Actions>
+                <Button onClick={this.hideConfirm} content={Translate.string('Close')} />
+                {occurrenceCount > 1 && (
+                  <Button
+                    icon="calendar outline"
+                    onClick={() => {
+                      this.hideConfirm();
+                      this.showOccurrences();
+                    }}
+                    content={Translate.string('View Timeline')}
+                  />
+                )}
+                <Button
+                  onClick={() => {
+                    this.hideConfirm();
+                  }}
+                  content={PluralTranslate.string(
+                    'Cancel booking',
+                    'Cancel all occurrences',
+                    occurrenceCount
+                  )}
+                  negative
+                />
+              </Modal.Actions>
+            </Modal>
           </>
         )}
         {canReject && (
@@ -640,7 +677,8 @@ class BookingDetails extends React.Component {
               </Grid.Column>
             </Grid>
           </Modal.Content>
-          {showActionButtons && this.renderActionButtons(canCancel, canReject, showAccept)}
+          {showActionButtons &&
+            this.renderActionButtons(canCancel, canReject, showAccept, occurrenceCount)}
         </Modal>
         <Modal open={occurrencesVisible} onClose={this.hideOccurrences} size="large" closeIcon>
           <Modal.Header className="legend-header">

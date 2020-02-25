@@ -48,6 +48,8 @@ Improvements
 - Allow importing event role members from a CSV file (:issue:`4301`)
 - Allow optional comment when accepting a pre-booking (:issue:`4086`)
 - Log event restores in event log (:issue:`4309`)
+- Warn about cancelling/rejecting whole recurring bookings instead of just
+  specific occurrences (:issue:`4092`)
 
 Bugfixes
 ^^^^^^^^
