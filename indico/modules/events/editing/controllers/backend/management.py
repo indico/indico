@@ -20,7 +20,7 @@ from indico.modules.events.editing.models.tags import EditingTag
 from indico.modules.events.editing.operations import (create_new_file_type, create_new_tag, delete_file_type,
                                                       delete_tag, update_file_type, update_tag)
 from indico.modules.events.editing.schemas import (EditableFileTypeArgs, EditableTagArgs, EditingFileTypeSchema,
-                                                   EditingReviewConditionArgs, EditingTagSchema)
+                                                   EditingReviewConditionArgs, EditingTagSchema, side_menu_items_schema)
 from indico.modules.events.editing.settings import editing_settings
 from indico.util.i18n import _
 from indico.web.args import use_rh_args, use_rh_kwargs
@@ -130,3 +130,11 @@ class RHEditingEditReviewCondition(RHEditingManagementBase):
         new_conditions[self.uuid] = file_types
         editing_settings.set(self.event, 'review_conditions', new_conditions)
         return '', 204
+
+
+class RHMenuEntries(RHEditingManagementBase):
+    def _process(self):
+        from indico.core import signals
+        from indico.util.signals import named_objects_from_signal
+        menu_entries = named_objects_from_signal(signals.menu.items.send('event-editing-sidemenu', event=self.event))
+        return side_menu_items_schema.jsonify(menu_entries.values())

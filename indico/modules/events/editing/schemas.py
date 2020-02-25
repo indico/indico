@@ -244,3 +244,17 @@ class EditingReviewConditionArgs(mm.Schema):
         event_conditions = editing_settings.get(event, 'review_conditions')
         if any(condition_types == set(event_condition) for event_condition in event_conditions.values()):
             raise ValidationError(_('Conditions have to be unique'))
+
+
+class SideMenuItemSchema(mm.Schema):
+    name = fields.String(required=True)
+    title = fields.String(required=True)
+    url = fields.String(required=True)
+    weight = fields.Int()
+    active = fields.Boolean()
+    disabled = fields.Boolean()
+    section = fields.String()
+    icon = fields.String()
+
+
+side_menu_items_schema = SideMenuItemSchema(many=True)
