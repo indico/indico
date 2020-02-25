@@ -73,6 +73,7 @@ function TimeInformation({
               </strong>
             </div>
             <Button size="small" basic color="teal" onClick={onClickOccurrences}>
+              <Icon name="calendar outline" />
               <Translate>See on timeline</Translate>
             </Button>
           </div>
