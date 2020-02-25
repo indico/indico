@@ -160,6 +160,8 @@ class ReservationOccurrence(db.Model, Serializer):
 
     @staticmethod
     def filter_overlap(occurrences):
+        if not occurrences:
+            raise RuntimeError('Cannot check for overlap with empty occurrence list')
         return or_(db_dates_overlap(ReservationOccurrence, 'start_dt', occ.start_dt, 'end_dt', occ.end_dt)
                    for occ in occurrences)
 
