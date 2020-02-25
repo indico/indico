@@ -24,16 +24,11 @@ export default function MenuBar({eventId, eventTitle, menuItems}) {
         <li>
           <Translate>OTHER MODULES</Translate>
           <ul styleName="inner-list">
-            <a href="#">
-              <li styleName="inner-list-item">
-                <Translate>Call for Papers</Translate>
-              </li>
-            </a>
-            <a href="#">
-              <li styleName="inner-list-item">
-                <Translate>Call for Abstracts</Translate>
-              </li>
-            </a>
+            {menuItems.map(item => (
+              <a key={item.name} href={item.url}>
+                <li styleName="inner-list-item">{item.title}</li>
+              </a>
+            ))}
           </ul>
         </li>
       </ul>
@@ -60,8 +55,18 @@ export default function MenuBar({eventId, eventTitle, menuItems}) {
   );
 }
 
+const menuEntryPropTypes = {
+  name: PropTypes.string.isRequired,
+  title: PropTypes.string.isRequired,
+  url: PropTypes.string.isRequired,
+  weight: PropTypes.number.isRequired,
+  active: PropTypes.bool.isRequired,
+  disabled: PropTypes.bool.isRequired,
+  section: PropTypes.string.isRequired,
+  icon: PropTypes.string,
+};
 MenuBar.propTypes = {
   eventId: PropTypes.number.isRequired,
   eventTitle: PropTypes.string.isRequired,
-  menuItems: PropTypes.array.isRequired,
+  menuItems: PropTypes.arrayOf(PropTypes.shape(menuEntryPropTypes)).isRequired,
 };

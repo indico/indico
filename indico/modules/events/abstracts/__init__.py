@@ -46,6 +46,7 @@ def _clear_boa_cache(sender, obj=None, **kwargs):
     clear_boa_cache(event)
 
 
+@signals.menu.items.connect_via('event-editing-sidemenu')
 @signals.menu.items.connect_via('event-management-sidemenu')
 def _extend_event_management_menu(sender, event, **kwargs):
     if not event.can_manage(session.user) or not AbstractsFeature.is_allowed_for_event(event):
