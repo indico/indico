@@ -30,9 +30,11 @@ from indico.modules.cephalopod import cephalopod_settings
 from indico.modules.core.forms import SettingsForm
 from indico.modules.core.settings import core_settings, social_settings
 from indico.modules.core.views import WPContact, WPSettings
+from indico.modules.legal import legal_settings
 from indico.modules.users.controllers import RHUserBase
 from indico.util.i18n import _, get_all_locales
 from indico.util.marshmallow import PrincipalDict
+from indico.util.string import sanitize_html
 from indico.web.args import use_kwargs
 from indico.web.errors import load_error_data
 from indico.web.flask.templating import get_template_module
@@ -283,3 +285,22 @@ class RHResetSignatureTokens(RHUserBase):
         self.user.reset_signing_secret()
         flash(_('All your token-based links have been invalidated'), 'success')
         return redirect(url_for('api.user_profile'))
+
+
+class RHConfig(RH):
+    def _process(self):
+        tos_url = legal_settings.get('tos_url')
+        tos_html = sanitize_html(legal_settings.get('tos')) or None
+        privacy_policy_url = legal_settings.get('privacy_policy_url')
+        privacy_policy_html = sanitize_html(legal_settings.get('privacy_policy')) or None
+        if tos_url:
+            tos_html = None
+        if privacy_policy_url:
+            privacy_policy_html = None
+
+        return jsonify(help_url=config.HELP_URL,
+                       contact_email=config.PUBLIC_SUPPORT_EMAIL,
+                       has_tos=bool(tos_url or tos_html),
+                       tos_html=tos_html,
+                       has_privacy_policy=bool(privacy_policy_url or privacy_policy_html),
+                       privacy_policy_html=privacy_policy_html)

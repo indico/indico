@@ -14,11 +14,11 @@ import {Translate} from 'indico/react/i18n';
 
 import './MenuBar.module.scss';
 
-export default function MenuBar({eventId, eventTitle, menuItems}) {
+export default function MenuBar({eventId, menuItems}) {
   return (
     <div styleName="menu-bar">
       <Header as="h2" styleName="header">
-        Paper Editing
+        <Translate>Paper Editing</Translate>
       </Header>
       <ul styleName="list">
         <li>
@@ -67,6 +67,5 @@ const menuEntryPropTypes = {
 };
 MenuBar.propTypes = {
   eventId: PropTypes.number.isRequired,
-  eventTitle: PropTypes.string.isRequired,
   menuItems: PropTypes.arrayOf(PropTypes.shape(menuEntryPropTypes)).isRequired,
 };

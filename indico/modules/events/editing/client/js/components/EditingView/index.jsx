@@ -16,6 +16,7 @@ import {getStaticData} from '../../selectors';
 
 import Timeline from '../Timeline';
 import MenuBar from './MenuBar';
+import Footer from './Footer';
 
 import './EditingView.module.scss';
 
@@ -23,12 +24,12 @@ export default function EditingView({eventTitle}) {
   const staticData = useSelector(getStaticData);
   const {eventId} = staticData;
 
-  const menuItems = useIndicoAxios({
+  const {data, lastData} = useIndicoAxios({
     url: menuEntriesURL({confId: eventId}),
-    camelize: false,
     trigger: eventId,
   });
 
+  const menuItems = data || lastData;
   if (!menuItems) {
     return null;
   }
@@ -37,10 +38,13 @@ export default function EditingView({eventTitle}) {
     <div styleName="editing-view">
       <MenuBar eventId={eventId} eventTitle={eventTitle} menuItems={menuItems} />
       <div styleName="contents">
-        <Header as="h2" styleName="header">
-          {eventTitle}
-        </Header>
-        <Timeline />
+        <div styleName="timeline">
+          <Header as="h2" styleName="header">
+            {eventTitle}
+          </Header>
+          <Timeline />
+        </div>
+        <Footer />
       </div>
     </div>
   );

@@ -11,11 +11,17 @@
     display: flex;
 
     .contents {
-        max-width: 800px;
-        margin-top: 25px;
+        display: flex;
+        flex-direction: column;
+        width: 100%;
 
-        .header {
-            color: #737373;
+        .timeline {
+            max-width: 800px;
+            margin-top: 25px;
+        }
+
+        .timeline.header {
+            color: $black;
         }
     }
 }

@@ -16,4 +16,4 @@ class WPEditing(WPEventManagement):
     bundles = ('module_events.editing.js', 'module_events.editing.css', 'mathjax.js')
 
     def _get_footer(self):
-        return u""
+        return ''
