@@ -30,7 +30,7 @@ import {
 
 import {toMoment, serializeDate} from 'indico/utils/date';
 import {Param, Plural, PluralTranslate, Singular, Translate} from 'indico/react/i18n';
-import {FinalTextArea} from 'indico/react/forms';
+import {FinalCheckbox, FinalTextArea} from 'indico/react/forms';
 import {Responsive} from 'indico/react/util';
 import {ClipboardButton} from 'indico/react/components';
 import {DailyTimelineContent, TimelineLegend} from '../timeline';
@@ -391,7 +391,7 @@ class BookingDetails extends React.Component {
     return transformToLegendLabels(occurrenceTypes, inactiveTypes);
   };
 
-  renderActionButtons = (canCancel, canReject, showAccept, occurrenceCount) => {
+  renderActionButtons = (canCancel, canReject, showAccept, occurrenceCount, isAccepted) => {
     const {bookingStateChangeInProgress} = this.props;
     const {actionInProgress, activeConfirmation, acceptanceFormVisible} = this.state;
     const rejectButton = (
@@ -431,6 +431,17 @@ class BookingDetails extends React.Component {
             rows={2}
             required
           />
+          {isAccepted && occurrenceCount > 1 && (
+            <FinalCheckbox
+              name="_confirm"
+              label={Translate.string(
+                'I understand that this will reject all occurrences of the booking.'
+              )}
+              validate={val =>
+                val ? undefined : Translate.string('Please confirm rejecting the booking.')
+              }
+            />
+          )}
           <Button
             type="submit"
             disabled={submitting || pristine || hasValidationErrors || submitSucceeded}
@@ -544,7 +555,7 @@ class BookingDetails extends React.Component {
         {canReject && (
           <Popup trigger={rejectButton} position="bottom center" on="click">
             <FinalForm
-              onSubmit={data => this.changeState('reject', data)}
+              onSubmit={data => this.changeState('reject', {reason: data.reason})}
               render={renderRejectionForm}
               subscription={{
                 hasValidationErrors: true,
@@ -678,7 +689,7 @@ class BookingDetails extends React.Component {
             </Grid>
           </Modal.Content>
           {showActionButtons &&
-            this.renderActionButtons(canCancel, canReject, showAccept, occurrenceCount)}
+            this.renderActionButtons(canCancel, canReject, showAccept, occurrenceCount, isAccepted)}
         </Modal>
         <Modal open={occurrencesVisible} onClose={this.hideOccurrences} size="large" closeIcon>
           <Modal.Header className="legend-header">
