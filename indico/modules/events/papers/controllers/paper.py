@@ -13,6 +13,7 @@ from itertools import chain
 from operator import attrgetter
 
 from flask import flash, request, session
+from sqlalchemy.orm import selectinload
 from werkzeug.exceptions import Forbidden
 from werkzeug.utils import cached_property
 
@@ -91,11 +92,15 @@ class RHCustomizePapersList(RHPapersListBase):
 class RHPapersActionBase(RHPapersListBase):
     """Base class for actions on selected papers"""
 
+    def _get_contrib_query_options(self):
+        return ()
+
     def _process_args(self):
         RHPapersListBase._process_args(self)
         ids = map(int, request.form.getlist('contribution_id'))
         self.contributions = (self.list_generator._build_query()
                               .filter(Contribution.id.in_(ids))
+                              .options(*self._get_contrib_query_options())
                               .all())
 
 
@@ -149,6 +154,9 @@ class RHJudgePapers(RHPapersActionBase):
 
 class RHAssignPapersBase(RHPapersActionBase):
     """Base class for assigning/unassigning paper reviewing roles"""
+
+    def _get_contrib_query_options(self):
+        return [selectinload('person_links')]
 
     def _process_args(self):
         RHPapersActionBase._process_args(self)
