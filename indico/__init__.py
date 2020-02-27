@@ -8,6 +8,6 @@
 from indico.util.mimetypes import register_custom_mimetypes
 
 
-__version__ = '2.2.6'
+__version__ = '2.2.7-dev'
 
 register_custom_mimetypes()
