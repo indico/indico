@@ -5,7 +5,7 @@ Changelog
 Version 2.2.6
 -------------
 
-*Unreleased*
+*Released on February 27, 2020*
 
 Bugfixes
 ^^^^^^^^
