@@ -19,7 +19,8 @@ simplejson==3.16.0
 termcolor==1.1.0
 wsgiref==0.1.2
 zope.interface==3.8.0
-requests==2.22.0
+requests==2.23.0
+idna==2.9
 Werkzeug==0.15.5
 Flask==1.1.1
 bcrypt==3.1.7

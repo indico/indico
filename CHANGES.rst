@@ -20,6 +20,8 @@ Bugfixes
   (:issue:`4255`)
 - Include event title in OpenGraph metadata (:issue:`4288`)
 - Fix error when viewing abstract with reviews that have no scores
+- Update requests and pin idna to avoid installing incompatible dependency versions
+  (:issue:`4327`)
 
 Version 2.2.5
 -------------
