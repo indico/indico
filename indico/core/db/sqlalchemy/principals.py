@@ -55,7 +55,7 @@ def serialize_email_principal(email):
         '_type': 'Email',
         'email': email.email,
         'id': email.name,
-        'identifier': 'Email:{}'.format(email.email)
+        'identifier': email.identifier
     }
 
 
@@ -103,6 +103,10 @@ class EmailPrincipal(Fossilizable):
     def user(self):
         from indico.modules.users import User
         return User.query.filter(~User.is_deleted, User.all_emails == self.email).first()
+
+    @property
+    def identifier(self):
+        return 'Email:{}'.format(self.email)
 
     def __eq__(self, other):
         return isinstance(other, EmailPrincipal) and self.email == other.email
