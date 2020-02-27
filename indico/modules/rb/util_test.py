@@ -67,7 +67,7 @@ def test_get_booking_params_for_event_same_times(create_event, dummy_room, start
         'params': dict({
             'link_id': event.id,
             'link_type': 'event',
-            'text': dummy_room.name,
+            'text': '#{}'.format(dummy_room.id),
         }, **expected_params)
     }
 
@@ -95,7 +95,7 @@ def test_get_booking_params_for_event_multiple_times(create_event, create_contri
         'params': {
             'link_type': 'event',
             'link_id': event.id,
-            'text': dummy_room.name,
+            'text': '#{}'.format(dummy_room.id),
         },
         'time_info': [
             (date(2019, 8, 16), dict({'sd': '2019-08-16'}, **expected_params)),
