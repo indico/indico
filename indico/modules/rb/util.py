@@ -272,7 +272,7 @@ def get_booking_params_for_event(event):
     params = {
         'link_type': 'event',
         'link_id': event.id,
-        'text': event.room.name if event.room else None,
+        'text': '#{}'.format(event.room.id) if event.room else None,
     }
     all_times = {day: (_find_first_entry_start_dt(event, day), _find_latest_entry_end_dt(event, day))
                  for day in event.iter_days(tzinfo=event.tzinfo)}

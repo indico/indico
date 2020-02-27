@@ -56,6 +56,8 @@ Bugfixes
 
 - Hide Book of Abstracts menu item if LaTeX is disabled
 - Use a more consistent order when cloning the timetable (:issue:`4227`)
+- Do not show unrelated rooms with similar names when booking room from an
+  event (:issue:`4089`)
 
 Internal Changes
 ^^^^^^^^^^^^^^^^
