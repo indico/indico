@@ -11,11 +11,12 @@ import BookingDetailsModal from './BookingDetailsModal';
 
 export default {
   /* eslint-disable react/display-name */
-  'booking-details': (onClose, bookingId) => (
+  'booking-details': (onClose, bookingId, payload) => (
     <BookingDetailsPreloader
       bookingId={bookingId}
       component={BookingDetailsModal}
       onClose={onClose}
+      cancelDate={payload ? payload.cancel : null}
     />
   ),
 };

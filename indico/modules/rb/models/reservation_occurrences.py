@@ -27,6 +27,7 @@ from indico.util.date_time import format_date
 from indico.util.serializer import Serializer
 from indico.util.string import format_repr, return_ascii
 from indico.util.struct.enum import IndicoEnum
+from indico.web.flask.util import url_for
 
 
 class ReservationOccurrenceState(int, IndicoEnum):
@@ -107,6 +108,15 @@ class ReservationOccurrence(db.Model, Serializer):
     @hybrid_property
     def is_within_cancel_grace_period(self):
         return self.start_dt >= datetime.now() - timedelta(minutes=10)
+
+    @property
+    def external_cancellation_url(self):
+        return url_for(
+            'rb.booking_cancellation_link',
+            booking_id=self.reservation_id,
+            date=self.start_dt.date(),
+            _external=True,
+        )
 
     @return_ascii
     def __repr__(self):

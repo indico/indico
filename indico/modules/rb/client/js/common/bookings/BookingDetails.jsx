@@ -58,13 +58,17 @@ class BookingDetails extends React.Component {
     bookingStateChangeInProgress: PropTypes.bool.isRequired,
     actions: PropTypes.exact({
       deleteBooking: PropTypes.func.isRequired,
+      changeBookingOccurrenceState: PropTypes.func,
       changeBookingState: PropTypes.func.isRequired,
       openBookingDetails: PropTypes.func.isRequired,
+      fetchBookingDetails: PropTypes.func.isRequired,
     }).isRequired,
+    cancelDate: PropTypes.string,
   };
 
   static defaultProps = {
     onClose: () => {},
+    cancelDate: null,
   };
 
   state = {
@@ -112,6 +116,76 @@ class BookingDetails extends React.Component {
         )}
       </>
     );
+  };
+
+  renderCancelOccurrence = (bookings, id) => {
+    const {
+      actions: {openBookingDetails},
+    } = this.props;
+    const {cancelDate} = this.props;
+    const serializedDate = serializeDate(cancelDate, 'L');
+    if (cancelDate === null) {
+      return null;
+    } else if (bookings[cancelDate] === undefined || bookings[cancelDate].length === 0) {
+      return (
+        <Modal open size="tiny" onClose={() => openBookingDetails(id)}>
+          <Modal.Header>Cancellation not possible</Modal.Header>
+          <Modal.Content>
+            <Translate>
+              There is no occurrence on this date (
+              <Param name="date" value={serializedDate} />
+              ).
+            </Translate>
+          </Modal.Content>
+          <Modal.Actions>
+            <Button content={Translate.string('Close')} onClick={() => openBookingDetails(id)} />
+          </Modal.Actions>
+        </Modal>
+      );
+    } else if (!bookings[cancelDate][0].canCancel) {
+      return (
+        <Modal open size="tiny" onClose={() => openBookingDetails(id)}>
+          <Modal.Header>
+            <Translate>Cancellation not possible</Translate>
+          </Modal.Header>
+          <Modal.Content>
+            <Translate>
+              The occurrence you chose (
+              <Param name="date" value={serializedDate} />) cannot be cancelled.
+            </Translate>
+          </Modal.Content>
+          <Modal.Actions>
+            <Button content={Translate.string('Close')} onClick={() => openBookingDetails(id)} />
+          </Modal.Actions>
+        </Modal>
+      );
+    } else {
+      return (
+        <Modal open size="tiny" onClose={() => openBookingDetails(id)}>
+          <Modal.Header>
+            <Translate>Confirm cancellation</Translate>
+          </Modal.Header>
+          <Modal.Content>
+            <Translate>
+              Are you sure you want to cancel this occurrence (
+              <Param name="date" value={serializedDate} />
+              )?
+            </Translate>
+          </Modal.Content>
+          <Modal.Actions>
+            <Button content={Translate.string('Close')} onClick={() => openBookingDetails(id)} />
+            <Button
+              content={Translate.string('Cancel this occurrence')}
+              onClick={async () => {
+                await this.cancelOccurrence();
+                openBookingDetails(id);
+              }}
+              negative
+            />
+          </Modal.Actions>
+        </Modal>
+      );
+    }
   };
 
   renderReason = reason => (
@@ -380,6 +454,19 @@ class BookingDetails extends React.Component {
     });
   };
 
+  cancelOccurrence = async () => {
+    const {
+      cancelDate,
+      booking: {id},
+      actions: {changeBookingOccurrenceState, fetchBookingDetails},
+    } = this.props;
+    const serializedDate = serializeDate(cancelDate);
+    this.setState({actionInProgress: true});
+    await changeBookingOccurrenceState(id, serializedDate, 'cancel');
+    await fetchBookingDetails(id);
+    this.setState({actionInProgress: false});
+  };
+
   getLegendLabels = availability => {
     const inactiveTypes = [
       'blockings',
@@ -607,6 +694,7 @@ class BookingDetails extends React.Component {
       editButton,
       bookingStateChangeInProgress,
       booking: {
+        id,
         startDt,
         endDt,
         occurrences,
@@ -701,6 +789,7 @@ class BookingDetails extends React.Component {
           </Modal.Header>
           <Modal.Content>{this.renderTimeline(occurrences, dateRange)}</Modal.Content>
         </Modal>
+        {this.renderCancelOccurrence(occurrences.bookings, id)}
       </>
     );
   }
@@ -714,9 +803,11 @@ export default connect(
     actions: bindActionCreators(
       {
         changeBookingState: bookingsActions.changeBookingState,
+        changeBookingOccurrenceState: bookingsActions.changeBookingOccurrenceState,
         deleteBooking: bookingsActions.deleteBooking,
         openBookingDetails: bookingId =>
           modalActions.openModal('booking-details', bookingId, null, true),
+        fetchBookingDetails: bookingsActions.fetchBookingDetails,
       },
       dispatch
     ),

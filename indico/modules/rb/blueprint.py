@@ -7,6 +7,8 @@
 
 from __future__ import unicode_literals
 
+import json
+
 from flask import jsonify, redirect
 
 from indico.modules.rb.controllers.backend import admin, blockings, bookings, locations, misc, rooms
@@ -135,6 +137,12 @@ def room_link(room_id):
 @_bp.route('/booking/<int:booking_id>')
 def booking_link(booking_id):
     return redirect(url_for('rb.roombooking', modal='booking-details:{}'.format(booking_id)))
+
+
+@_bp.route('/booking/<int:booking_id>/cancel/<date>')
+def booking_cancellation_link(booking_id, date):
+    modal = 'booking-details:{}:{}'.format(booking_id, json.dumps({'cancel': date}))
+    return redirect(url_for('rb.roombooking', modal=modal))
 
 
 @_bp.route('/my-bookings')

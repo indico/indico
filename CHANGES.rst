@@ -50,6 +50,7 @@ Improvements
 - Log event restores in event log (:issue:`4309`)
 - Warn about cancelling/rejecting whole recurring bookings instead of just
   specific occurrences (:issue:`4092`)
+- Add "quick cancel" link to room booking reminder emails (:issue:`4324`)
 
 Bugfixes
 ^^^^^^^^

@@ -17,10 +17,12 @@ class BookingDetailsModal extends React.Component {
   static propTypes = {
     booking: PropTypes.object.isRequired,
     onClose: PropTypes.func,
+    cancelDate: PropTypes.string,
   };
 
   static defaultProps = {
     onClose: () => {},
+    cancelDate: null,
   };
 
   state = {
@@ -28,7 +30,7 @@ class BookingDetailsModal extends React.Component {
   };
 
   render() {
-    const {booking, onClose} = this.props;
+    const {booking, onClose, cancelDate} = this.props;
     const {mode} = this.state;
     const isBeingEdited = mode === 'edit';
     const editButton = (props = {}) => (
@@ -49,7 +51,12 @@ class BookingDetailsModal extends React.Component {
         actionButtons={editButton}
       />
     ) : (
-      <BookingDetails booking={booking} onClose={onClose} editButton={editButton} />
+      <BookingDetails
+        booking={booking}
+        onClose={onClose}
+        editButton={editButton}
+        cancelDate={cancelDate}
+      />
     );
   }
 }

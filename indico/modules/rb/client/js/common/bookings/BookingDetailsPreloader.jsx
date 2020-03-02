@@ -15,7 +15,13 @@ import {Preloader} from 'indico/react/util';
 import * as bookingsActions from './actions';
 import * as bookingsSelectors from './selectors';
 
-const BookingDetailsPreloader = ({bookingId, component: Component, fetchDetails, onClose}) => (
+const BookingDetailsPreloader = ({
+  bookingId,
+  component: Component,
+  fetchDetails,
+  onClose,
+  cancelDate,
+}) => (
   <Preloader
     key={bookingId}
     checkCached={state => bookingsSelectors.hasDetails(state, {bookingId})}
@@ -27,7 +33,7 @@ const BookingDetailsPreloader = ({bookingId, component: Component, fetchDetails,
     }
     alwaysLoad
   >
-    {() => <Component bookingId={bookingId} onClose={onClose} />}
+    {() => <Component bookingId={bookingId} onClose={onClose} cancelDate={cancelDate} />}
   </Preloader>
 );
 
@@ -36,6 +42,11 @@ BookingDetailsPreloader.propTypes = {
   fetchDetails: PropTypes.func.isRequired,
   component: PropTypes.elementType.isRequired,
   onClose: PropTypes.func.isRequired,
+  cancelDate: PropTypes.string,
+};
+
+BookingDetailsPreloader.defaultProps = {
+  cancelDate: null,
 };
 
 export default connect(
