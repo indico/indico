@@ -1,7 +1,7 @@
 """Add track principal
 
 Revision ID: 2496c4adc7e9
-Revises: eefba82b42c5
+Revises: 4e459d27adab
 Create Date: 2019-10-02 18:20:33.866458
 """
 
