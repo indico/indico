@@ -26,6 +26,11 @@ document.addEventListener('DOMContentLoaded', async () => {
     return;
   }
 
+  const headerHeight =
+    document.querySelector('div.header').getBoundingClientRect().height +
+    document.querySelector('div.main-breadcrumb').getBoundingClientRect().height;
+  document.body.style.setProperty('--header-height', headerHeight);
+
   const eventId = parseInt(editingElement.dataset.eventId, 10);
   const eventTitle = editingElement.dataset.eventTitle;
 
