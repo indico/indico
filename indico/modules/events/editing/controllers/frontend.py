@@ -15,8 +15,13 @@ from indico.modules.events.editing.views import WPEditing
 
 
 class RHEditingDashboard(RHEditingManagementBase):
+    EVENT_FEATURE = None
+
     def _process(self):
-        return WPEditing.render_template('management/editing.html', self.event)
+        if not self.event.has_feature('editing'):
+            return WPEditing.render_template('management/disabled.html', self.event)
+        else:
+            return WPEditing.render_template('management/editing.html', self.event)
 
 
 class RHEditableTimeline(RHContributionEditableBase):

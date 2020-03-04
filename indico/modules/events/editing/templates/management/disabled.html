@@ -1,0 +1,25 @@
+{% extends 'events/editing/management/base.html' %}
+
+{% block content %}
+    <div class="action-box highlight">
+        <div class="section">
+            <div class="icon icon-file-check"></div>
+            <div class="text">
+                <div class="label">
+                    {% trans %}Editing disabled{% endtrans %}
+                </div>
+                {% trans -%}
+                    "Editing" provides an integrated editing workflow for papers, slides and/or posters.
+                {%- endtrans %}
+            </div>
+            <div class="toolbar">
+                <a href="#" id="enable-editing" class="i-button highlight {{ 'disabled' if event.is_locked }}"
+                   data-href="{{ url_for('event_features.switch', event, feature='editing') }}"
+                   data-method="PUT"
+                   data-reload-after>
+                    {% trans %}Enable module{% endtrans %}
+                </a>
+            </div>
+        </div>
+    </div>
+{% endblock %}
