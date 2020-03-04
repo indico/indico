@@ -79,7 +79,7 @@ Version 2.2.7
 Bugfixes
 ^^^^^^^^
 
-- None so far :)
+- Allow slashes in roomName export API
 
 Version 2.2.6
 -------------

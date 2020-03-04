@@ -86,7 +86,7 @@ class RoomNameHook(RoomBookingHookBase):
     # e.g. /export/roomName/CERN/pump.json
     GUEST_ALLOWED = True
     TYPES = ('roomName', )
-    RE = r'(?P<location>[\w\s]+)/(?P<room_name>[\w\s\-]+)'
+    RE = r'(?P<location>[\w\s]+)/(?P<room_name>[\w\s/\-]+)'
     DEFAULT_DETAIL = 'rooms'
     MAX_RECORDS = {
         'rooms': 500
