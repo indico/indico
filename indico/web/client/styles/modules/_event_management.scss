@@ -439,6 +439,16 @@ th.i-table {
         }
     }
 
+    .registration-column {
+        .icon-ticket {
+            color: $pastel-gray;
+
+            &.exists {
+                color: $light-black;
+            }
+        }
+    }
+
     .form-group-mail {
         display: block;
     }

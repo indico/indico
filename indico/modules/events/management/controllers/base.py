@@ -16,6 +16,7 @@ from indico.modules.events.contributions.models.persons import (AuthorType, Cont
                                                                 SubContributionPersonLink)
 from indico.modules.events.contributions.models.subcontributions import SubContribution
 from indico.modules.events.controllers.base import RHEventBase
+from indico.modules.events.registration.util import get_registered_event_persons
 from indico.modules.events.util import check_event_locked
 from indico.util.i18n import _
 from indico.web.util import jsonify_template
@@ -61,11 +62,15 @@ class RHContributionPersonListMixin:
                                           .has(SubContribution.contribution.has(self._membership_filter)))
                                     .all())
 
+        registered_persons = get_registered_event_persons(self.event)
+
         contribution_persons_dict = defaultdict(lambda: {'speaker': False, 'primary_author': False,
-                                                         'secondary_author': False})
+                                                         'secondary_author': False, 'not_registered': True})
         for contrib_person in contribution_persons:
             person_roles = contribution_persons_dict[contrib_person.person]
             person_roles['speaker'] |= contrib_person.is_speaker
             person_roles['primary_author'] |= contrib_person.author_type == AuthorType.primary
             person_roles['secondary_author'] |= contrib_person.author_type == AuthorType.secondary
+            person_roles['not_registered'] = contrib_person.person not in registered_persons
+
         return jsonify_template(self.template, event_persons=contribution_persons_dict, event=self.event)

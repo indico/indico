@@ -16,6 +16,10 @@ from sqlalchemy.orm import joinedload, subqueryload
 
 from indico.core.db import db
 from indico.modules.events.contributions.models.contributions import Contribution
+from indico.modules.events.contributions.models.persons import ContributionPersonLink
+from indico.modules.events.models.persons import EventPerson
+from indico.modules.events.registration.models.registrations import Registration
+from indico.modules.events.registration.util import get_registered_event_persons
 from indico.modules.events.util import ListGeneratorBase
 from indico.util.i18n import _
 from indico.web.flask.templating import get_template_module
@@ -49,7 +53,9 @@ class ContributionListGenerator(ListGeneratorBase):
             ('type', {'title': _('Type'),
                       'filter_choices': OrderedDict(type_empty.items() + type_choices.items())}),
             ('status', {'title': _('Status'), 'filter_choices': {'scheduled': _('Scheduled'),
-                                                                 'unscheduled': _('Not scheduled')}})
+                                                                 'unscheduled': _('Not scheduled')}}),
+            ('speakers', {'title': _('Speakers'), 'filter_choices': {'registered': _('Registered'),
+                                                                     'not_registered': _('Not registered')}})
         ])
 
         self.list_config = self._get_config()
@@ -80,6 +86,28 @@ class ContributionListGenerator(ListGeneratorBase):
             if status_criteria:
                 criteria.append(db.or_(*status_criteria))
 
+        if 'speakers' in filters['items']:
+            registration_join_criteria = db.and_(
+                Registration.event_id == Contribution.event_id,
+                Registration.is_active,
+                (Registration.user_id == EventPerson.user_id) | (Registration.email == EventPerson.email)
+            )
+            contrib_query = (db.session.query(Contribution.id)
+                             .filter(Contribution.event_id == self.event.id)
+                             .join(ContributionPersonLink)
+                             .join(EventPerson)
+                             .join(Registration, registration_join_criteria))
+            registered_contribs = {id_ for id_, in contrib_query}
+
+            filtered_speakers = filters['items']['speakers']
+            speakers_criteria = []
+            if 'registered' in filtered_speakers:
+                speakers_criteria.append(Contribution.id.in_(registered_contribs))
+            if 'not_registered' in filtered_speakers:
+                speakers_criteria.append(~Contribution.id.in_(registered_contribs))
+            if speakers_criteria:
+                criteria.append(db.or_(*speakers_criteria))
+
         filter_cols = {'session': Contribution.session_id,
                        'track': Contribution.track_id,
                        'type': Contribution.type_id}
@@ -109,8 +137,10 @@ class ContributionListGenerator(ListGeneratorBase):
                           sum((c.duration for c in contributions if c.timetable_entry), timedelta()))
         selected_entry = request.args.get('selected')
         selected_entry = int(selected_entry) if selected_entry else None
+        registered_persons = get_registered_event_persons(self.event)
         return {'contribs': contributions, 'sessions': sessions, 'tracks': tracks, 'total_entries': total_entries,
-                'total_duration': total_duration, 'selected_entry': selected_entry}
+                'total_duration': total_duration, 'selected_entry': selected_entry,
+                'registered_persons': registered_persons}
 
     def render_list(self, contrib=None):
         """Render the contribution list template components.

@@ -59,6 +59,14 @@
         }
     }
 
+    .icon-user {
+        color: $pastel-gray;
+
+        &.exists {
+            color: $light-black;
+        }
+    }
+
     .tablesorter {
         .material-column {
             width: 5em;

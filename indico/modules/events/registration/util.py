@@ -14,6 +14,7 @@ from operator import attrgetter
 
 from flask import current_app, json, session
 from qrcode import QRCode, constants
+from sqlalchemy import and_, or_
 from sqlalchemy.orm import joinedload, load_only, undefer
 from werkzeug.urls import url_parse
 from wtforms import BooleanField, ValidationError
@@ -25,6 +26,7 @@ from indico.core.db.sqlalchemy.util.session import no_autoflush
 from indico.core.errors import UserValueError
 from indico.modules.events import EventLogKind, EventLogRealm
 from indico.modules.events.models.events import Event
+from indico.modules.events.models.persons import EventPerson
 from indico.modules.events.payment.models.transactions import TransactionStatus
 from indico.modules.events.registration import logger
 from indico.modules.events.registration.badges import RegistrantsListToBadgesPDF, RegistrantsListToBadgesPDFFoldable
@@ -577,3 +579,12 @@ def import_registrations_from_csv(regform, fileobj, skip_moderation=True, notify
         })
     return [create_registration(regform, data, notify_user=notify_users, skip_moderation=skip_moderation)
             for data in todo]
+
+
+def get_registered_event_persons(event):
+    """Get all registered EventPersons of an event."""
+    query = event.persons.join(Registration, and_(Registration.event_id == EventPerson.event_id,
+                                                  Registration.is_active,
+                                                  or_(Registration.user_id == EventPerson.user_id,
+                                                      Registration.email == EventPerson.email)))
+    return set(query)
