@@ -51,6 +51,8 @@ Improvements
 - Warn about cancelling/rejecting whole recurring bookings instead of just
   specific occurrences (:issue:`4092`)
 - Add "quick cancel" link to room booking reminder emails (:issue:`4324`)
+- Add visual information and filtering options for participants'
+  registration status to the contribution list (:issue:`4318`)
 
 Bugfixes
 ^^^^^^^^

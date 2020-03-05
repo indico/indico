@@ -12,9 +12,11 @@ from io import BytesIO
 
 import pytest
 
+from indico.core.db import db
 from indico.core.errors import UserValueError
+from indico.modules.events.models.persons import EventPerson
 from indico.modules.events.registration.util import (create_registration, get_event_regforms_registrations,
-                                                     import_registrations_from_csv)
+                                                     get_registered_event_persons, import_registrations_from_csv)
 
 
 pytest_plugins = 'indico.modules.events.registration.testing.fixtures'
@@ -159,3 +161,38 @@ def test_get_event_regforms_registration(dummy_event, dummy_user, dummy_regform,
 
     assert registrations.values()[0].user == dummy_user
     assert dummy_regform in regforms
+
+
+@pytest.mark.usefixtures('dummy_reg')
+def test_get_registered_event_persons(dummy_event, dummy_user, dummy_regform):
+    create_registration(dummy_regform, {
+        'email': 'john@example.com',
+        'first_name': 'John',
+        'last_name': 'Doe',
+    }, notify_user=False)
+
+    user_person = EventPerson.create_from_user(dummy_user, dummy_event)
+    no_user_person = EventPerson(
+        email='john@example.com',
+        first_name='John',
+        last_name='Doe'
+    )
+
+    create_registration(dummy_regform, {
+        'email': 'jane@example.com',
+        'first_name': 'Jane',
+        'last_name': 'Doe',
+    }, notify_user=False)
+
+    no_user_no_reg = EventPerson(
+        email='noshow@example.com',
+        first_name='No',
+        last_name='Show'
+    )
+    dummy_event.persons.append(user_person)
+    dummy_event.persons.append(no_user_person)
+    dummy_event.persons.append(no_user_no_reg)
+    db.session.flush()
+
+    registered_persons = get_registered_event_persons(dummy_event)
+    assert registered_persons == {user_person, no_user_person}

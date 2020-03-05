@@ -73,6 +73,11 @@ $(document).ready(function() {
           my: 'bottom center',
           at: 'top center',
         };
+      } else if (position === 'bottom') {
+        positionOptions = {
+          my: 'top center',
+          at: 'bottom center'
+        }
       }
 
       /* Attach the qTip to a new element to avoid side-effects on all elements with "title" attributes. */
