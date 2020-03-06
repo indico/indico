@@ -6,6 +6,10 @@ git:
   depth: 500
 addons:
   postgresql: 9.6
+env:
+  - NODE_VERSION="12.16.1"
+before_install:
+  - nvm install $NODE_VERSION
 install:
   - pip install -U pip setuptools
   - pip install -r requirements.dev.txt
