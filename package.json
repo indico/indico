@@ -120,6 +120,7 @@
     "eslint-plugin-react-hooks": "^2.3.0",
     "exports-loader": "^0.7.0",
     "file-loader": "^4.2.0",
+    "husky": "^4.2.3",
     "identity-obj-proxy": "^3.0.0",
     "jest": "^24.9.0",
     "jest-mock-axios": "^3.1.2",
@@ -192,6 +193,11 @@
           }
         }
       }
+    }
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "bash pre-commit.githook"
     }
   }
 }
