@@ -5,6 +5,7 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
+import _ from 'lodash';
 import React from 'react';
 import PropTypes from 'prop-types';
 import {Icon, Sidebar, Menu} from 'semantic-ui-react';
@@ -52,6 +53,7 @@ function SidebarMenu({
   visible,
   onClickOption,
   hideOptions,
+  extraOptions,
 }) {
   const options = [
     {
@@ -97,7 +99,13 @@ function SidebarMenu({
       onClick: toggleAdminOverride,
       onlyIf: isAdmin,
     },
-  ].filter(({onlyIf}) => onlyIf === undefined || onlyIf);
+  ]
+    .concat(extraOptions)
+    .filter(
+      ({onlyIf}) =>
+        onlyIf === undefined ||
+        (_.isFunction(onlyIf) ? onlyIf({isAdmin, isAdminOverrideEnabled, hasOwnedRooms}) : onlyIf)
+    );
 
   return (
     <Sidebar
@@ -138,6 +146,12 @@ function SidebarMenu({
 }
 
 SidebarMenu.propTypes = {
+  extraOptions: PropTypes.arrayOf(
+    PropTypes.shape({
+      key: PropTypes.string.isRequired,
+      icon: PropTypes.string.isRequired,
+    })
+  ),
   isAdmin: PropTypes.bool.isRequired,
   isAdminOverrideEnabled: PropTypes.bool.isRequired,
   hasOwnedRooms: PropTypes.bool.isRequired,
@@ -153,6 +167,7 @@ SidebarMenu.propTypes = {
 };
 
 SidebarMenu.defaultProps = {
+  extraOptions: [],
   visible: false,
   onClickOption: null,
   hideOptions: {},
@@ -165,6 +180,9 @@ export default connect(
     hasOwnedRooms: userSelectors.hasOwnedRooms(state),
   }),
   dispatch => ({
+    // ATTENTION: this is **intentionally** passed as a prop, despite not being used,
+    // so that plugins can dispatch actions.
+    dispatch,
     gotoMyBookings() {
       dispatch(globalActions.resetPageState('calendar'));
       dispatch(

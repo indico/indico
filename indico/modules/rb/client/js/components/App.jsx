@@ -43,11 +43,13 @@ class App extends React.Component {
     isInitializing: PropTypes.bool.isRequired,
     fetchInitialData: PropTypes.func.isRequired,
     resetPageState: PropTypes.func.isRequired,
+    renderExtraRoutes: PropTypes.func,
   };
 
   static defaultProps = {
     title: Translate.string('Room Booking'),
     iconName: 'home',
+    renderExtraRoutes: () => null,
   };
 
   state = {
@@ -65,7 +67,7 @@ class App extends React.Component {
   };
 
   renderContent() {
-    const {filtersSet, isInitializing} = this.props;
+    const {filtersSet, isInitializing, renderExtraRoutes} = this.props;
     const {userActionsVisible} = this.state;
     return (
       <Sidebar.Pushable styleName="rb-pushable">
@@ -101,6 +103,7 @@ class App extends React.Component {
               />
               <ConditionalRoute path="/calendar" component={Calendar} active={!isInitializing} />
               <ConditionalRoute path="/admin" component={AdminArea} active={!isInitializing} />
+              {renderExtraRoutes(isInitializing)}
               <Route
                 render={() => (
                   <Segment placeholder>
