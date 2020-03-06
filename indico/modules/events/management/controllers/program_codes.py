@@ -97,7 +97,8 @@ class RHAssignProgramCodesBase(RHManageEventBase):
             return jsonify_data()
         codes = generate_program_codes(self.event, self.object_type, self.objects)
         return jsonify_template('events/management/assign_program_codes.html', event=self.event, codes=codes,
-                                show_dates=self.show_dates, hidden_post_field=self.hidden_post_field)
+                                show_dates=self.show_dates, hidden_post_field=self.hidden_post_field,
+                                object_type=self.object_type)
 
 
 class RHAssignProgramCodesSessions(RHAssignProgramCodesBase):

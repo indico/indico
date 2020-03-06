@@ -2,7 +2,7 @@
 
 {% set has_codes = codes|selectattr('code')|any %}
 
-{% macro render_row(object, code, unused) %}
+{% macro render_row(object, code, unused, object_type) %}
     <tr class="i-table">
         <td class="i-table title-column">
             {% if unused %}
@@ -27,6 +27,13 @@
                 </div>
             {% endif %}
             {{ object.full_title or object.title }}
+            {%- if object_type in ('contributions', 'subcontributions') and object.speakers -%}
+                <ul class="speaker-list">
+                    {%- for speaker in object.speakers -%}
+                        <li>{{ speaker.full_name }}</li>
+                    {%- endfor -%}
+                </ul>
+            {%- endif -%}
         </td>
         {% if show_dates %}
             <td class="i-table date-column">{{ object.start_dt|format_datetime('short', timezone=event.timezone) }}</td>
@@ -79,7 +86,7 @@
                 </thead>
                 <tbody>
                     {% for object, (code, unused) in codes.viewitems() %}
-                        {{ render_row(object, code, unused) }}
+                        {{ render_row(object, code, unused, object_type) }}
                     {% endfor %}
                 </tbody>
             </table>
