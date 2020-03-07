@@ -14,6 +14,7 @@ from io import BytesIO
 from operator import attrgetter
 
 import dateutil.parser
+import six
 from flask import session
 from sqlalchemy.orm import contains_eager, joinedload, load_only, noload
 
@@ -122,7 +123,7 @@ def sort_contribs(contribs, sort_by):
         key_func = attrgetter('friendly_id')
     elif sort_by == BOASortField.title:
         key_func = attrgetter('title')
-    elif isinstance(sort_by, (str, unicode)) and sort_by:
+    elif isinstance(sort_by, six.string_types) and sort_by:
         key_func = attrgetter(mapping.get(sort_by) or sort_by)
     else:
         key_func = attrgetter('title')

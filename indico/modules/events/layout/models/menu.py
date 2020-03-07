@@ -7,6 +7,7 @@
 
 from __future__ import unicode_literals
 
+import six
 from flask import g
 from sqlalchemy.orm import joinedload
 from werkzeug.utils import cached_property
@@ -66,7 +67,7 @@ class MenuEntryMixin(object):
             return None
         elif self.is_internal_link:
             data = self.default_data
-            if data.static_site and isinstance(data.static_site, basestring) and g.get('static_site'):
+            if data.static_site and isinstance(data.static_site, six.string_types) and g.get('static_site'):
                 return data.static_site
             kwargs = {}
             if self.name == 'timetable':

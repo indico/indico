@@ -9,6 +9,7 @@ import re
 from datetime import datetime
 
 import dateutil.parser
+import six
 from lxml import etree
 from pytz import timezone, utc
 
@@ -38,11 +39,11 @@ class XMLSerializer(Serializer):
     def _convert(self, value, _control_char_re=re.compile(r'[\x00-\x08\x0b\x0c\x0e-\x1f]')):
         if isinstance(value, datetime):
             return value.isoformat()
-        elif isinstance(value, (int, long, float, bool)):
+        elif isinstance(value, six.integer_types + (float, bool)):
             return str(value)
         else:
-            value = to_unicode(value) if isinstance(value, str) else value
-            if isinstance(value, basestring):
+            value = to_unicode(value) if isinstance(value, six.binary_type) else value
+            if isinstance(value, six.string_types):
                 # Get rid of control chars breaking XML conversion
                 value = _control_char_re.sub(u'', value)
             return value
@@ -67,7 +68,7 @@ class XMLSerializer(Serializer):
         for k, v in fossil.iteritems():
             if k in ['_fossil', '_type', 'id']:
                 continue
-            if isinstance(k, (int, float)) or (isinstance(k, basestring) and k.isdigit()):
+            if isinstance(k, (int, float)) or (isinstance(k, six.string_types) and k.isdigit()):
                 elem = etree.SubElement(felement, 'entry', {'key': unicode(k)})
             else:
                 elem = etree.SubElement(felement, k)

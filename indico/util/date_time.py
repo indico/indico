@@ -11,6 +11,7 @@ from datetime import time as dt_time
 from datetime import timedelta
 
 import pytz
+import six
 from babel.dates import format_date as _format_date
 from babel.dates import format_datetime as _format_datetime
 from babel.dates import format_time as _format_time
@@ -122,7 +123,7 @@ def format_date(d, format='medium', locale=None, timezone=None, as_unicode=False
     if not locale:
         locale = get_current_locale()
     if timezone and isinstance(d, datetime) and d.tzinfo:
-        d = d.astimezone(pytz.timezone(timezone) if isinstance(timezone, basestring) else timezone)
+        d = d.astimezone(pytz.timezone(timezone) if isinstance(timezone, six.string_types) else timezone)
 
     rv = _format_date(d, format=format, locale=locale)
     if as_unicode:
@@ -144,7 +145,7 @@ def format_time(t, format='short', locale=None, timezone=None, server_tz=False, 
         timezone = session.tzinfo
     elif server_tz:
         timezone = config.DEFAULT_TIMEZONE
-    if isinstance(timezone, basestring):
+    if isinstance(timezone, six.string_types):
         timezone = get_timezone(timezone)
     rv = _format_time(t, format=format, locale=locale, tzinfo=timezone)
     if as_unicode:

@@ -11,6 +11,7 @@ import os
 from copy import copy
 from importlib import import_module
 
+import six
 from flask import g
 from flask_sqlalchemy import BaseQuery, Model, Pagination
 from sqlalchemy import Column, inspect, orm
@@ -342,7 +343,7 @@ def auto_table_args(cls, **extra_kwargs):
 
 
 def _get_backref_name(relationship):
-    return relationship.backref if isinstance(relationship.backref, basestring) else relationship.backref[0]
+    return relationship.backref if isinstance(relationship.backref, six.string_types) else relationship.backref[0]
 
 
 def populate_one_to_one_backrefs(model, *relationships):

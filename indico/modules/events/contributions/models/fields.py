@@ -7,6 +7,7 @@
 
 from __future__ import unicode_literals
 
+import six
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.ext.declarative import declared_attr
 
@@ -198,5 +199,5 @@ class ContributionFieldValue(ContributionFieldValueBase):
 
     @return_ascii
     def __repr__(self):
-        text = text_to_repr(self.data) if isinstance(self.data, unicode) else self.data
+        text = text_to_repr(self.data) if isinstance(self.data, six.text_type) else self.data
         return format_repr(self, 'contribution_id', 'contribution_field_id', _text=text)

@@ -9,6 +9,7 @@ from __future__ import unicode_literals
 
 from collections import OrderedDict
 
+import six
 from flask import request
 from sqlalchemy.orm import joinedload
 
@@ -91,7 +92,7 @@ class RegistrationListGenerator(ListGeneratorBase):
         result = []
         personal_data_field_ids = {x.personal_data_type: x.id for x in self.regform.form_items if x.is_field}
         for item_id in ids:
-            if isinstance(item_id, basestring):
+            if isinstance(item_id, six.string_types):
                 personal_data_type = PersonalDataType.get(item_id)
                 if personal_data_type:
                     item_id = personal_data_field_ids[personal_data_type]

@@ -12,6 +12,7 @@ import traceback
 import warnings
 from contextlib import contextmanager
 
+import six
 from babel import negotiate_locale
 from babel.core import LOCALE_ALIASES, Locale
 from babel.messages.pofile import read_po
@@ -57,8 +58,8 @@ def gettext_unicode(*args, **kwargs):
     plugin_name = kwargs.pop('plugin_name', None)
     force_unicode = kwargs.pop('force_unicode', False)
 
-    if not isinstance(args[0], unicode):
-        args = [(text.decode('utf-8') if isinstance(text, str) else text) for text in args]
+    if not isinstance(args[0], six.text_type):
+        args = [(text.decode('utf-8') if isinstance(text, six.binary_type) else text) for text in args]
         using_unicode = force_unicode
     else:
         using_unicode = True

@@ -12,6 +12,7 @@ import time
 from functools import wraps
 from types import GeneratorType
 
+import six
 from flask import g
 
 from indico.core.config import config
@@ -160,10 +161,10 @@ def make_email(to_list=None, cc_list=None, bcc_list=None, from_address=None, rep
         cc_list = set()
     if bcc_list is None:
         bcc_list = set()
-    to_list = {to_list} if isinstance(to_list, basestring) else to_list
-    cc_list = {cc_list} if isinstance(cc_list, basestring) else cc_list
-    bcc_list = {bcc_list} if isinstance(bcc_list, basestring) else bcc_list
-    reply_address = {reply_address} if isinstance(reply_address, basestring) else (reply_address or set())
+    to_list = {to_list} if isinstance(to_list, six.string_types) else to_list
+    cc_list = {cc_list} if isinstance(cc_list, six.string_types) else cc_list
+    bcc_list = {bcc_list} if isinstance(bcc_list, six.string_types) else bcc_list
+    reply_address = {reply_address} if isinstance(reply_address, six.string_types) else (reply_address or set())
     return {
         'to': set(map(to_unicode, to_list)),
         'cc': set(map(to_unicode, cc_list)),

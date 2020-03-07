@@ -7,6 +7,7 @@
 
 from __future__ import absolute_import, unicode_literals
 
+import six
 from flask import g
 from marshmallow import Schema
 from webargs import dict2schema
@@ -23,7 +24,7 @@ class IndicoFlaskParser(FlaskParser):
 
     def parse_arg(self, name, field, req, locations=None):
         rv = super(IndicoFlaskParser, self).parse_arg(name, field, req, locations=locations)
-        if isinstance(rv, basestring):
+        if isinstance(rv, six.string_types):
             return rv.strip()
         elif isinstance(rv, (list, set)):
             return type(rv)(map(strip_whitespace, rv))

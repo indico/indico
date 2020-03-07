@@ -13,6 +13,7 @@ import re
 from tempfile import NamedTemporaryFile
 from zipfile import ZipFile
 
+import six
 from flask import g, request, session
 from flask.helpers import get_root_path
 from werkzeug.utils import secure_filename
@@ -312,7 +313,7 @@ class StaticConferenceCreator(StaticEventCreator):
         self._add_page(html, 'event_pages.page_display', page)
 
     def _get_url(self, uh_or_endpoint, target, **params):
-        if isinstance(uh_or_endpoint, basestring):
+        if isinstance(uh_or_endpoint, six.string_types):
             return url_for(uh_or_endpoint, target, **params)
         else:
             return str(uh_or_endpoint.getStaticURL(target, **params))
@@ -383,7 +384,7 @@ class StaticConferenceCreator(StaticEventCreator):
                 self._add_file(f, uh_or_endpoint, target)
 
     def _add_file(self, file_like_or_str, uh_or_endpoint, target):
-        if isinstance(file_like_or_str, str):
+        if isinstance(file_like_or_str, six.string_types):
             content = file_like_or_str
         else:
             content = file_like_or_str.read()

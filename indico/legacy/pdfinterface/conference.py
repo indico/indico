@@ -12,6 +12,7 @@ from copy import deepcopy
 from datetime import timedelta
 from operator import attrgetter
 
+import six
 from reportlab.lib import colors
 from reportlab.lib.enums import TA_CENTER, TA_JUSTIFY, TA_LEFT, TA_RIGHT
 from reportlab.lib.pagesizes import A4, landscape
@@ -953,10 +954,10 @@ class RegistrantToPDF(PDFBase):
             story.append(Spacer(inch, space*cm, registration.full_name))
 
         def _print_row(caption, value):
-            if isinstance(caption, unicode) or is_lazy_string(caption):
-                caption = unicode(caption).encode('utf-8')
-            if isinstance(value, unicode) or is_lazy_string(value):
-                value = unicode(value).encode('utf-8')
+            if isinstance(caption, six.text_type) or is_lazy_string(caption):
+                caption = six.text_type(caption).encode('utf-8')
+            if isinstance(value, six.text_type) or is_lazy_string(value):
+                value = six.text_type(value).encode('utf-8')
             text = '<b>{field_name}</b>: {field_value}'.format(field_name=caption, field_value=value)
             _append_text_to_story(text)
 
@@ -1192,7 +1193,7 @@ class RegistrantsListToPDF(PDFBase):
                     else:
                         lp.append(Paragraph('', text_format))
                 else:
-                    if isinstance(friendly_data, unicode):
+                    if isinstance(friendly_data, six.text_type):
                         friendly_data = friendly_data.encode('utf-8')
                     lp.append(Paragraph(str(friendly_data), text_format))
             if 'reg_date' in self.static_items:

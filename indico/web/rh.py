@@ -15,6 +15,7 @@ import time
 from functools import partial, wraps
 
 import jsonschema
+import six
 from flask import current_app, g, redirect, request, session
 from sqlalchemy.exc import DatabaseError
 from sqlalchemy.orm.exc import NoResultFound
@@ -155,7 +156,7 @@ class RH(object):
         def _convert(v):
             # some legacy code has numeric ids in the locator data, but still takes
             # string ids in the url rule (usually for confId)
-            return unicode(v) if isinstance(v, (int, long)) else v
+            return six.text_type(v) if isinstance(v, six.integer_types) else v
 
         provided = {k: _convert(v) for k, v in request.view_args.iteritems() if k not in defaults}
         new_view_args = {k: _convert(v) for k, v in new_view_args.iteritems() if v is not None}

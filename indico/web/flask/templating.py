@@ -13,6 +13,7 @@ import posixpath
 import re
 from operator import itemgetter
 
+import six
 from flask import current_app
 from flask_pluginengine.util import get_state
 from jinja2 import environmentfilter
@@ -57,7 +58,7 @@ def natsort(environment, value, reverse=False, case_sensitive=False, attribute=N
     """
     if not case_sensitive:
         def sort_func(item):
-            if isinstance(item, basestring):
+            if isinstance(item, six.string_types):
                 item = item.lower()
             return natural_sort_key(item)
     else:
@@ -259,7 +260,7 @@ class EnsureUnicodeExtension(Extension):
     @staticmethod
     def ensure_unicode(s):
         """Converts a bytestring to unicode. Must be registered as a filter!"""
-        if isinstance(s, str):
+        if isinstance(s, six.binary_type):
             return s.decode('utf-8')
         return s
 

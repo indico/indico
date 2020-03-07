@@ -19,6 +19,7 @@ from uuid import uuid4
 
 import click
 import dateutil.parser
+import six
 import yaml
 from flask import current_app
 from sqlalchemy import inspect
@@ -105,7 +106,7 @@ def _resolve_col(col):
     :param col: A string containing a Python expression, a model
                 attribute or a Column instance.
     """
-    attr = eval(col, _make_globals()) if isinstance(col, basestring) else col
+    attr = eval(col, _make_globals()) if isinstance(col, six.string_types) else col
     if isinstance(attr, db.Column):
         return attr
     assert len(attr.prop.columns) == 1
@@ -151,7 +152,7 @@ class EventExporter(object):
         self.users = {}
 
     def _add_file(self, name, size, data):
-        if isinstance(data, basestring):
+        if isinstance(data, six.string_types):
             data = BytesIO(data)
         info = tarfile.TarInfo(name)
         info.size = size

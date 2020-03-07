@@ -12,6 +12,7 @@ from datetime import datetime
 from difflib import SequenceMatcher
 from enum import Enum
 
+import six
 from markupsafe import Markup
 
 from indico.core import signals
@@ -40,7 +41,7 @@ def make_diff_log(changes, fields):
             change = changes[key]
         except KeyError:
             continue
-        if isinstance(field_data, basestring):
+        if isinstance(field_data, six.string_types):
             field_data = {'title': field_data}
         title = field_data['title']
         convert = field_data.get('convert')
@@ -54,7 +55,7 @@ def make_diff_log(changes, fields):
         elif all(isinstance(x, Enum) for x in change):
             type_ = 'enum'
             change = [orig_string(getattr(x, 'title', x.name)) for x in change]
-        elif all(isinstance(x, (int, long, float)) for x in change):
+        elif all(isinstance(x, six.integer_types + (float,)) for x in change):
             type_ = 'number'
         elif all(isinstance(x, (list, tuple)) for x in change):
             type_ = 'list'

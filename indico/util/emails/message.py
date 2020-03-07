@@ -23,6 +23,7 @@ from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from email.utils import formataddr, formatdate, getaddresses, parseaddr
 
+import six
 from speaklater import is_lazy_string
 from werkzeug.urls import url_parse
 
@@ -240,25 +241,25 @@ class EmailMessage(object):
         necessary encoding conversions.
         """
         if to:
-            if isinstance(to, basestring):
+            if isinstance(to, six.string_types):
                 raise TypeError('"to" argument must be a list or tuple')
             self.to = list(to)
         else:
             self.to = []
         if cc:
-            if isinstance(cc, basestring):
+            if isinstance(cc, six.string_types):
                 raise TypeError('"cc" argument must be a list or tuple')
             self.cc = list(cc)
         else:
             self.cc = []
         if bcc:
-            if isinstance(bcc, basestring):
+            if isinstance(bcc, six.string_types):
                 raise TypeError('"bcc" argument must be a list or tuple')
             self.bcc = list(bcc)
         else:
             self.bcc = []
         if reply_to:
-            if isinstance(reply_to, basestring):
+            if isinstance(reply_to, six.string_types):
                 raise TypeError('"reply_to" argument must be a list or tuple')
             self.reply_to = list(reply_to)
         else:
@@ -352,7 +353,7 @@ class EmailMessage(object):
             basetype, subtype = mimetype.split('/', 1)
 
             if basetype == 'text':
-                if isinstance(content, str):
+                if isinstance(content, six.binary_type):
                     try:
                         content = content.decode('utf-8')
                     except UnicodeDecodeError:

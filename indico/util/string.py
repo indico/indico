@@ -25,6 +25,7 @@ from uuid import uuid4
 import bleach
 import email_validator
 import markdown
+import six
 import translitcodec  # noqa: F401 (this is NOT unused. it needs to be imported to register the codec)
 from html2text import HTML2Text
 from jinja2.filters import do_striptags
@@ -75,20 +76,20 @@ LATEX_MATH_PLACEHOLDER = u"\uE000"
 
 
 def encode_if_unicode(s):
-    if isinstance(s, _LazyString) and isinstance(s.value, unicode):
+    if isinstance(s, _LazyString) and isinstance(s.value, six.text_type):
         s = unicode(s)
-    return s.encode('utf-8') if isinstance(s, unicode) else s
+    return s.encode('utf-8') if isinstance(s, six.text_type) else s
 
 
 def safe_upper(text):
-    if isinstance(text, unicode):
+    if isinstance(text, six.text_type):
         return text.upper()
     else:
         return text.decode('utf-8').upper().encode('utf-8')
 
 
 def remove_accents(text, reencode=True):
-    if not isinstance(text, unicode):
+    if not isinstance(text, six.text_type):
         text = text.decode('utf-8')
     result = u''.join((c for c in unicodedata.normalize('NFD', text) if unicodedata.category(c) != 'Mn'))
     if reencode:
@@ -110,7 +111,7 @@ def fix_broken_string(text, as_unicode=False):
 
 def to_unicode(text):
     """Converts a string to unicode if it isn't already unicode."""
-    return fix_broken_string(text, as_unicode=True) if isinstance(text, str) else unicode(text)
+    return fix_broken_string(text, as_unicode=True) if isinstance(text, six.binary_type) else six.text_type(text)
 
 
 def remove_non_alpha(text):
@@ -118,7 +119,7 @@ def remove_non_alpha(text):
 
 
 def unicode_to_ascii(text):
-    if not isinstance(text, unicode):
+    if not isinstance(text, six.text_type):
         text = to_unicode(text)
     text = text.encode('translit/long')
     return text.encode('ascii', 'ignore')
@@ -182,7 +183,7 @@ def truncate(text, max_size, ellipsis='...', encoding='utf-8'):
     """
     encode = False
 
-    if isinstance(text, str):
+    if isinstance(text, six.binary_type):
         encode = True
         text = text.decode(encoding)
 
@@ -198,7 +199,7 @@ def truncate(text, max_size, ellipsis='...', encoding='utf-8'):
 def strip_tags(text):
     """Strip HTML tags and replace adjacent whitespace by one space."""
     encode = False
-    if isinstance(text, str):
+    if isinstance(text, six.binary_type):
         encode = True
         text = text.decode('utf-8')
     text = do_striptags(text)
@@ -343,7 +344,7 @@ def strip_whitespace(s):
     This utility is useful in cases where you might get None or
     non-string values such as WTForms filters.
     """
-    if isinstance(s, basestring):
+    if isinstance(s, six.string_types):
         s = s.strip()
     return s
 
@@ -368,7 +369,7 @@ def encode_utf8(f):
             return ''
         if is_lazy_string(rv):
             rv = rv.value
-        return rv.encode('utf-8') if isinstance(rv, unicode) else str(rv)
+        return rv.encode('utf-8') if isinstance(rv, six.text_type) else str(rv)
 
     return _wrapper
 
@@ -380,7 +381,7 @@ def is_legacy_id(id_):
     numeric or have a leading zero, resulting in different objects
     with the same numeric id.
     """
-    return not isinstance(id_, (int, long)) and (not id_.isdigit() or str(int(id_)) != id_)
+    return not isinstance(id_, six.integer_types) and (not id_.isdigit() or str(int(id_)) != id_)
 
 
 def text_to_repr(text, html=False, max_length=50):
@@ -504,7 +505,7 @@ def crc32(data):
 
     When a unicode object is passed, it is encoded as UTF-8.
     """
-    if isinstance(data, unicode):
+    if isinstance(data, six.text_type):
         data = data.encode('utf-8')
     return binascii.crc32(data) & 0xffffffff
 

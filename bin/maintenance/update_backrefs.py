@@ -12,6 +12,7 @@ from collections import defaultdict
 from operator import itemgetter
 
 import click
+import six
 from sqlalchemy import inspect
 
 from indico.core.db import db
@@ -31,7 +32,7 @@ def _find_backrefs():
         for rel in mapper.relationships:
             if rel.backref is None:
                 continue
-            backref_name = rel.backref if isinstance(rel.backref, basestring) else rel.backref[0]
+            backref_name = rel.backref if isinstance(rel.backref, six.string_types) else rel.backref[0]
             if cls != rel.class_attribute.class_:
                 # skip relationships defined on a parent class
                 continue

@@ -10,6 +10,8 @@ from __future__ import unicode_literals
 from itertools import chain
 from operator import attrgetter
 
+import six
+
 from indico.core.db import db
 from indico.core.db.sqlalchemy import PyIntEnum, UTCDateTime
 from indico.core.db.sqlalchemy.descriptions import RenderMode, RenderModeMixin
@@ -195,7 +197,7 @@ class PaperRevision(ProposalRevisionMixin, RenderModeMixin, db.Model):
     def has_user_reviewed(self, user, review_type=None):
         from indico.modules.events.papers.models.reviews import PaperReviewType
         if review_type:
-            if isinstance(review_type, basestring):
+            if isinstance(review_type, six.string_types):
                 review_type = PaperReviewType[review_type]
             return any(review.user == user and review.type == review_type for review in self.reviews)
         else:

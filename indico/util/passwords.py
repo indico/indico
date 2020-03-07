@@ -8,6 +8,7 @@
 from __future__ import unicode_literals
 
 import bcrypt
+import six
 
 
 class BCryptPassword(object):
@@ -18,7 +19,7 @@ class BCryptPassword(object):
         if not self.hash or not value:
             # For security reasons we never consider an empty password/hash valid
             return False
-        if isinstance(value, unicode):
+        if isinstance(value, six.text_type):
             value = value.encode('utf-8')
         return bcrypt.checkpw(value, self.hash)
 
@@ -33,7 +34,7 @@ class BCryptPassword(object):
 
     @staticmethod
     def hash(value):
-        if isinstance(value, unicode):
+        if isinstance(value, six.text_type):
             value = value.encode('utf-8')
         return bcrypt.hashpw(value, bcrypt.gensalt())
 

@@ -11,6 +11,7 @@ import sys
 from contextlib import contextmanager
 from functools import partial
 
+import six
 from flask import g
 from flask_sqlalchemy import SQLAlchemy
 from flask_sqlalchemy.model import BindMetaMixin
@@ -156,7 +157,7 @@ def _mapper_configured(mapper, class_):
 
 
 def _column_names(constraint, table):
-    return '_'.join((c if isinstance(c, basestring) else c.name) for c in constraint.columns)
+    return '_'.join((c if isinstance(c, six.string_types) else c.name) for c in constraint.columns)
 
 
 def _unique_index(constraint, table):

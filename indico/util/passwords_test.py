@@ -8,12 +8,13 @@
 from hashlib import md5 as _md5
 
 import pytest
+import six
 
 from indico.util.passwords import BCryptPassword, PasswordProperty
 
 
 def md5(s):
-    if isinstance(s, unicode):
+    if isinstance(s, six.text_type):
         s = s.encode('utf-8')
     return _md5(s).hexdigest()
 
@@ -29,8 +30,8 @@ class Foo(object):
 @pytest.fixture
 def mock_bcrypt(mocker):
     def _hashpw(value, salt):
-        assert isinstance(value, str), 'hashpw expects bytes'
-        assert isinstance(salt, str), 'hashpw expects bytes'
+        assert isinstance(value, six.binary_type), 'hashpw expects bytes'
+        assert isinstance(salt, six.binary_type), 'hashpw expects bytes'
         return md5(value)
 
     bcrypt = mocker.patch('indico.util.passwords.bcrypt')
@@ -88,10 +89,10 @@ def test_passwordproperty_get():
 def test_bcryptpassword_check(password_hash_unicode, password):
     password_hash = bytes(md5(password))
     if password_hash_unicode:
-        password_hash = unicode(password_hash)
+        password_hash = six.text_type(password_hash)
     pw = BCryptPassword(password_hash)
-    assert pw == unicode(password)
-    assert pw == unicode(password).encode('utf-8')
+    assert pw == six.text_type(password)
+    assert pw == six.text_type(password).encode('utf-8')
     assert pw != u'notthepassword'
     assert pw != 'notthepassword'
 

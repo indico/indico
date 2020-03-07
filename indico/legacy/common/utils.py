@@ -7,6 +7,8 @@
 
 import os
 
+import six
+
 
 # fcntl is only available for POSIX systems
 if os.name == 'posix':
@@ -19,7 +21,7 @@ def utf8rep(text):
 
 
 def isStringHTML(s):
-    if not isinstance(s, basestring):
+    if not isinstance(s, six.string_types):
         return False
     s = s.lower()
     return any(tag in s for tag in ('<p>', '<p ', '<br', '<li>'))

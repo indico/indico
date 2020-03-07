@@ -10,6 +10,7 @@ from __future__ import absolute_import, unicode_literals
 import os
 import uuid
 
+import six
 from babel.numbers import format_currency, get_currency_name
 from flask import _app_ctx_stack, request
 from flask.helpers import get_root_path
@@ -132,7 +133,7 @@ def configure_webpack(app):
 def configure_xsendfile(app, method):
     if not method:
         return
-    elif isinstance(method, basestring):
+    elif isinstance(method, six.string_types):
         args = None
     else:
         method, args = method

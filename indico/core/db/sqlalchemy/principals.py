@@ -7,6 +7,7 @@
 
 from __future__ import unicode_literals
 
+import six
 from sqlalchemy.dialects.postgresql import ARRAY
 from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.ext.hybrid import Comparator, hybrid_method, hybrid_property
@@ -523,7 +524,7 @@ class PrincipalPermissionsMixin(PrincipalMixin):
     @classproperty
     @classmethod
     def principal_for_obj(cls):
-        if isinstance(cls.principal_for, basestring):
+        if isinstance(cls.principal_for, six.string_types):
             return db.Model._decl_class_registry[cls.principal_for]
         else:
             return cls.principal_for

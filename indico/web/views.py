@@ -11,6 +11,7 @@ import itertools
 import posixpath
 from urlparse import urlparse
 
+import six
 from flask import current_app, g, render_template, request, session
 from markupsafe import Markup
 from pytz import common_timezones, common_timezones_set
@@ -140,7 +141,7 @@ class WPJinjaMixin(object):
     def _prefix_template(cls, template):
         if cls.template_prefix and cls.template_prefix[-1] != '/':
             raise ValueError('template_prefix needs to end with a slash')
-        if isinstance(template, basestring):
+        if isinstance(template, six.string_types):
             return cls.template_prefix + template
         else:
             templates = []

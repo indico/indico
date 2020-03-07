@@ -11,6 +11,7 @@ import logging
 import os
 from operator import itemgetter
 
+import six
 from celery import Celery
 from celery.app.log import Logging
 from celery.beat import PersistentScheduler
@@ -124,7 +125,7 @@ class IndicoCelery(Celery):
                 args = _CelerySAWrapper.unwrap_args(args)
                 kwargs = _CelerySAWrapper.unwrap_kwargs(kwargs)
                 plugin = getattr(s, 'plugin', s.request.get('indico_plugin'))
-                if isinstance(plugin, basestring):
+                if isinstance(plugin, six.string_types):
                     plugin_name = plugin
                     plugin = plugin_engine.get_plugin(plugin)
                     if plugin is None:

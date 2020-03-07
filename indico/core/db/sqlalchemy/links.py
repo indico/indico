@@ -10,6 +10,7 @@ from __future__ import unicode_literals
 from functools import partial
 from itertools import chain
 
+import six
 from sqlalchemy.event import listen
 from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.ext.hybrid import Comparator, hybrid_property
@@ -89,7 +90,7 @@ class LinkMixin(object):
     def __auto_table_args(cls):
         args = tuple(_make_checks(cls.allowed_link_types))
         if cls.unique_links:
-            extra_criteria = [cls.unique_links] if isinstance(cls.unique_links, basestring) else None
+            extra_criteria = [cls.unique_links] if isinstance(cls.unique_links, six.string_types) else None
             args = args + tuple(_make_uniques(cls.allowed_link_types, extra_criteria))
         return args
 

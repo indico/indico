@@ -13,6 +13,7 @@ import time
 from itertools import izip
 
 import redis
+import six
 from flask import g
 
 from indico.core.config import config
@@ -288,7 +289,7 @@ class GenericCache(object):
         return hashlib.sha256(key).hexdigest()
 
     def _makeKey(self, key):
-        if not isinstance(key, basestring):
+        if not isinstance(key, six.string_types):
             # In case we get something not a string (number, list, whatever)
             key = repr(key)
         # Hashlib doesn't allow unicode so let's ensure it's not!

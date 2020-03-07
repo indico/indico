@@ -18,6 +18,7 @@ from mimetypes import guess_extension
 from tempfile import NamedTemporaryFile
 from zipfile import ZipFile
 
+import six
 from flask import current_app, flash, g, redirect, request, session
 from sqlalchemy import inspect
 from sqlalchemy.orm import load_only, noload
@@ -310,7 +311,7 @@ class ListGeneratorBase(object):
                  partitioning.
         """
         if separator_type == 'dynamic':
-            dynamic_item_ids = [item_id for item_id in item_ids if not isinstance(item_id, basestring)]
+            dynamic_item_ids = [item_id for item_id in item_ids if not isinstance(item_id, six.string_types)]
             return dynamic_item_ids, [item_id for item_id in item_ids if item_id not in dynamic_item_ids]
         elif separator_type == 'static':
             static_item_ids = [item_id for item_id in item_ids if item_id in self.static_items]

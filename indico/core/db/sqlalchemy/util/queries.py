@@ -9,6 +9,7 @@ from __future__ import unicode_literals
 
 import re
 
+import six
 from sqlalchemy import func, inspect, over
 from sqlalchemy.sql import update
 
@@ -117,9 +118,9 @@ def get_related_object(obj, relationship, criteria):
              such object could be found.
     """
     def _compare(a, b):
-        if isinstance(a, basestring) and a.isdigit():
+        if isinstance(a, six.string_types) and a.isdigit():
             a = int(a)
-        if isinstance(b, basestring) and b.isdigit():
+        if isinstance(b, six.string_types) and b.isdigit():
             b = int(b)
         return a == b
 

@@ -11,6 +11,7 @@ import os
 from contextlib import contextmanager
 from uuid import uuid4
 
+import six
 from flask import Blueprint, Flask, g, request
 from flask.blueprints import BlueprintSetupState
 from flask.helpers import locked_cached_property
@@ -53,7 +54,7 @@ class IndicoRequest(Request):
 
     def __repr__(self):
         rv = super(IndicoRequest, self).__repr__()
-        if isinstance(rv, unicode):
+        if isinstance(rv, six.text_type):
             rv = rv.encode('utf-8')
         return rv
 

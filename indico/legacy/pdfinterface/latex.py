@@ -17,6 +17,7 @@ from zipfile import ZipFile
 
 import markdown
 import pkg_resources
+import six
 from flask import session
 from flask.helpers import get_root_path
 from jinja2 import Environment, FileSystemLoader, StrictUndefined
@@ -126,9 +127,9 @@ class RawLatex(unicode):
 
 
 def _latex_escape(s, ignore_braces=False):
-    if not isinstance(s, basestring) or isinstance(s, RawLatex):
+    if not isinstance(s, six.string_types) or isinstance(s, RawLatex):
         return s
-    if isinstance(s, str):
+    if isinstance(s, six.binary_type):
         s = s.decode('utf-8')
     return RawLatex(mdx_latex.latex_escape(s, ignore_braces=ignore_braces))
 

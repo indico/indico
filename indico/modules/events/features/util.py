@@ -9,6 +9,7 @@ from __future__ import unicode_literals
 
 from itertools import chain
 
+import six
 from werkzeug.exceptions import NotFound
 
 from indico.core import signals
@@ -96,7 +97,7 @@ def is_feature_enabled(event, name):
     if enabled_features is not None:
         return feature.name in enabled_features
     else:
-        if isinstance(event, (basestring, int, long)):
+        if isinstance(event, six.string_types + six.integer_types):
             event = Event.get(event)
         return event and feature.is_default_for_event(event)
 
