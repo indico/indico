@@ -286,8 +286,11 @@ $dropdown-transition: $dropdown-transition-step ease-out;
     }
 
     .clear-pickers {
+        @include icon-before('icon-cross');
         font-size: 1.3em;
-        vertical-align: sub;
+        position: relative;
+        left: 20px;
+        top: 4px;
 
         &:hover {
             color: $red;
