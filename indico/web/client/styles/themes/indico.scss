@@ -566,7 +566,7 @@ div.event-details {
 
     .event-details-row {
         display: flex;
-        align-items: baseline;
+        align-items: flex-start;
         margin-bottom: 0.5em;
     }
 
@@ -588,4 +588,8 @@ div.event-details {
 
 .attachments-display-container {
     flex-wrap: wrap;
+
+    // needed to nullify the margin of the items in this flexbox
+    // for the very first items of each row
+    margin-left: -0.2em;
 }
