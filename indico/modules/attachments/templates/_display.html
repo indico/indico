@@ -37,12 +37,12 @@
     {% set folders = item.attached_items.folders if item else folders %}
 
     <div class="attachments-display-container toolbar">
-        <div class="folder folder-root {{ 'folder-root-empty' if not files }}">
-            {% for attachment in files %}
+        {% for attachment in files %}
+            <div class="folder">
                 {{ render_attachment(attachment, classes='i-button') }}
                 {{ template_hook('event-display-after-attachment', attachment=attachment, top_level=true, has_label=false) }}
-            {% endfor %}
-        </div>
+            </div>
+        {% endfor %}
 
         {%- for folder in folders -%}
             {{ render_folder(folder) }}
