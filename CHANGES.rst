@@ -61,6 +61,7 @@ Bugfixes
 - Use a more consistent order when cloning the timetable (:issue:`4227`)
 - Do not show unrelated rooms with similar names when booking room from an
   event (:issue:`4089`)
+- Stop icons from overlapping in the datetime widget (:issue:`4342`)
 
 Internal Changes
 ^^^^^^^^^^^^^^^^
