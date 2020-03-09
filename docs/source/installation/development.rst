@@ -50,6 +50,11 @@ We recommend that you use `Homebrew <https://brew.sh/>`_::
     brew services start postgresql
     pip install virtualenv
 
+Note: Homebrew dropped support for the python2 formula at the end of 2019.
+As an alternative you can install it directly using the latest commit::
+
+    brew install https://raw.githubusercontent.com/Homebrew/homebrew-core/86a44a0a552c673a05f11018459c9f5faae3becc/Formula/python@2.rb
+
 
 Creating the directory structure
 --------------------------------
