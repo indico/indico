@@ -53,6 +53,8 @@ Improvements
 - Add "quick cancel" link to room booking reminder emails (:issue:`4324`)
 - Add visual information and filtering options for participants'
   registration status to the contribution list (:issue:`4318`)
+- Add warning when accepting a pre-booking in case there are
+  concurrent bookings (:issue:`4129`)
 
 Bugfixes
 ^^^^^^^^

@@ -321,3 +321,9 @@ def get_booking_params_for_event(event):
             'params': params,
             'time_info': time_info
         }
+
+
+def get_prebooking_collisions(reservation):
+    from indico.modules.rb.models.reservation_occurrences import ReservationOccurrence
+    valid_occurrences = reservation.occurrences.filter(ReservationOccurrence.is_valid).all()
+    return ReservationOccurrence.find_overlapping_with(reservation.room, valid_occurrences, reservation.id).all()

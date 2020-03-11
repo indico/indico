@@ -31,7 +31,7 @@ from indico.modules.rb.models.reservation_occurrences import ReservationOccurren
 from indico.modules.rb.models.room_nonbookable_periods import NonBookablePeriod
 from indico.modules.rb.notifications.reservations import (notify_cancellation, notify_confirmation, notify_creation,
                                                           notify_modification, notify_rejection, notify_reset_approval)
-from indico.modules.rb.util import rb_is_admin
+from indico.modules.rb.util import get_prebooking_collisions, rb_is_admin
 from indico.util.date_time import format_date, format_time, now_utc
 from indico.util.i18n import _
 from indico.util.serializer import Serializer
@@ -417,11 +417,8 @@ class Reservation(Serializer, db.Model):
         self.add_edit_log(ReservationEditLog(user_name=user.full_name, info=[log_msg]))
         notify_confirmation(self, reason)
         signals.rb.booking_state_changed.send(self)
-        valid_occurrences = self.occurrences.filter(ReservationOccurrence.is_valid).all()
-        pre_occurrences = ReservationOccurrence.find_overlapping_with(self.room, valid_occurrences, self.id).all()
+        pre_occurrences = get_prebooking_collisions(self)
         for occurrence in pre_occurrences:
-            if not occurrence.is_valid:
-                continue
             occurrence.reject(user, 'Rejected due to collision with a confirmed reservation')
 
     def reset_approval(self, user):

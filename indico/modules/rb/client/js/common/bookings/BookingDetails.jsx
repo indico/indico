@@ -75,6 +75,11 @@ class BookingDetails extends React.Component {
     occurrencesVisible: false,
     activeConfirmation: null,
     acceptanceFormVisible: false,
+    preBookingConflicts: {
+      warningVisible: false,
+      concurrentBookings: [],
+      acceptanceData: null,
+    },
   };
 
   showAcceptanceForm = () => {
@@ -91,6 +96,16 @@ class BookingDetails extends React.Component {
 
   hideOccurrences = () => {
     this.setState({occurrencesVisible: false});
+  };
+
+  hidePreBookingWarning = () => {
+    this.setState({
+      preBookingConflicts: {
+        warningVisible: false,
+        concurrentBookings: [],
+        acceptanceData: null,
+      },
+    });
   };
 
   renderBookedFor = bookedForUser => {
@@ -115,6 +130,69 @@ class BookingDetails extends React.Component {
           </div>
         )}
       </>
+    );
+  };
+
+  renderPreBookingWarning = () => {
+    const {bookingStateChangeInProgress} = this.props;
+    const {
+      actionInProgress,
+      preBookingConflicts: {warningVisible, concurrentBookings, acceptanceData},
+    } = this.state;
+    const items = concurrentBookings.map(booking => {
+      const reservation = booking.reservation;
+      const startDate = serializeDate(toMoment(booking.start_dt), 'L LT');
+      const endDate = serializeDate(toMoment(booking.end_dt), 'LT');
+      return (
+        <List.Item key={reservation.id}>
+          <a
+            href={bookingLinkURL({booking_id: reservation.id})}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            {startDate} - {endDate}
+          </a>{' '}
+          <Translate>
+            by <Param name="user" value={reservation.booked_for_name} />
+          </Translate>{' '}
+          ({reservation.booking_reason})
+        </List.Item>
+      );
+    });
+    return (
+      <Modal open={warningVisible} size="small" onClose={this.hidePreBookingWarning}>
+        <Modal.Header>
+          <Translate>Warning</Translate>
+        </Modal.Header>
+        <Modal.Content>
+          <Translate>
+            There is more than one booking request during this time. Accepting this booking will
+            automatically reject the following:
+          </Translate>
+          <div styleName="concurrent-reservations">
+            <List divided styleName="concurrent-reservations-list">
+              {items}
+            </List>
+          </div>
+        </Modal.Content>
+        <Modal.Actions>
+          <Button
+            content={Translate.string('Close without accepting')}
+            onClick={this.hidePreBookingWarning}
+          />
+          <Button
+            icon="check circle"
+            onClick={() => {
+              this.changeState('approve', {...acceptanceData, force: true});
+              this.hidePreBookingWarning();
+            }}
+            loading={actionInProgress === 'approve' && bookingStateChangeInProgress}
+            disabled={bookingStateChangeInProgress}
+            content={Translate.string('Accept anyway')}
+            positive
+          />
+        </Modal.Actions>
+      </Modal>
     );
   };
 
@@ -448,8 +526,21 @@ class BookingDetails extends React.Component {
       booking: {id},
       actions: {changeBookingState},
     } = this.props;
+    const {acceptanceFormVisible} = this.state;
     this.setState({actionInProgress: action});
-    return changeBookingState(id, action, data).then(() => {
+    return changeBookingState(id, action, data).then(({error}) => {
+      if (error && error.message === 'prebooking_collision' && action === 'approve') {
+        if (acceptanceFormVisible) {
+          this.hideAcceptanceForm();
+        }
+        this.setState({
+          preBookingConflicts: {
+            concurrentBookings: error.data,
+            acceptanceData: data,
+            warningVisible: true,
+          },
+        });
+      }
       this.setState({actionInProgress: null});
     });
   };
@@ -667,6 +758,7 @@ class BookingDetails extends React.Component {
               trigger={acceptWithMessage}
               position="bottom right"
               on="click"
+              open={acceptanceFormVisible}
               onOpen={this.showAcceptanceForm}
               onClose={this.hideAcceptanceForm}
             >
@@ -790,6 +882,7 @@ class BookingDetails extends React.Component {
           <Modal.Content>{this.renderTimeline(occurrences, dateRange)}</Modal.Content>
         </Modal>
         {this.renderCancelOccurrence(occurrences.bookings, id)}
+        {this.renderPreBookingWarning()}
       </>
     );
   }

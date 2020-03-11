@@ -35,9 +35,9 @@ from indico.modules.rb.operations.suggestions import get_suggestions
 from indico.modules.rb.schemas import (CreateBookingSchema, reservation_details_schema,
                                        reservation_linked_object_data_schema, reservation_occurrences_schema,
                                        reservation_user_event_schema)
-from indico.modules.rb.util import (generate_spreadsheet_from_occurrences, get_linked_object, group_by_occurrence_date,
-                                    is_booking_start_within_grace_period, serialize_availability,
-                                    serialize_booking_details, serialize_occurrences)
+from indico.modules.rb.util import (generate_spreadsheet_from_occurrences, get_linked_object, get_prebooking_collisions,
+                                    group_by_occurrence_date, is_booking_start_within_grace_period,
+                                    serialize_availability, serialize_booking_details, serialize_occurrences)
 from indico.util.date_time import now_utc, utc_to_server
 from indico.util.i18n import _
 from indico.util.spreadsheets import send_csv, send_xlsx
@@ -225,9 +225,15 @@ class RHBookingStateActions(RHBookingBase):
         self.booking.reject(session.user, reason)
 
     @use_kwargs({
-        'reason': fields.String(required=False)
+        'reason': fields.String(required=False),
+        'force': fields.Bool(required=False)
     })
-    def accept(self, reason=None):
+    def accept(self, reason=None, force=False):
+        if not force:
+            collisions = get_prebooking_collisions(self.booking)
+            if collisions:
+                collision_data = reservation_occurrences_schema.dump(collisions)
+                raise ExpectedError('prebooking_collision', data=collision_data)
         self.booking.accept(session.user, reason)
 
     def _process(self):
