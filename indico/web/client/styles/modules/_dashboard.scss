@@ -202,10 +202,18 @@
     flex-wrap: wrap;
     margin-bottom: 15px;
 
-    .avatar-image .ui.label {
-        font-size: 70px;
-        color: $light-gray;
-        margin-right: 34px;
+    .avatar-image {
+        display: none;
+
+        @media (min-width: $tablet-width) {
+            display: block;
+        }
+
+        .ui.label {
+            font-size: 70px;
+            color: $light-gray;
+            margin-right: 34px;
+        }
     }
 
     .your-details-wrapper {
