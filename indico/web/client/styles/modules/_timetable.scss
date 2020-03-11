@@ -283,7 +283,7 @@
 
 %timetable-entry-button {
     background: white;
-    height: 14px;
+    height: 19px;
     padding: 2px;
 }
 
@@ -322,4 +322,5 @@
     @include icon-before(icon-attachment);
     position: absolute;
     right: 0;
+    top: 0;
 }

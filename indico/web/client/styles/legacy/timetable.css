@@ -115,10 +115,33 @@ div.ui-draggable-dragging.timetableBlock {
     opacity: 0.5;
 }
 
+div.entry-content {
+    display: flex;
+    flex-direction: column;
+    flex-wrap: wrap;
+    overflow: hidden;
+    line-height: normal;
+    padding: 4px;
+}
+
+div.timetableBlockWrapper {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    margin-right: 4px;
+    width: 100%;
+}
+
+div.timetableBlockWrapper > * {
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
 div.timetableBlockTitle {
     font-weight: bold;
     font-size: 11px;
-    padding: 4px;
+    order: 1;
 }
 
 a.entry-attachments + div.timetableBlockPresenters {
@@ -127,48 +150,39 @@ a.entry-attachments + div.timetableBlockPresenters {
 
 div.timetableBlockPresenters {
     float: right;
-    margin: 4px;
-    margin-right: 6px;
-    margin-left: 6px;
+    margin-right: 7px;
     font-size: 11px;
     font-style: italic;
     max-width: 50%;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    overflow: hidden;
+    order: 2;
 }
 
 div.timetableBlockTime {
-    position: absolute;
-    bottom: 4px;
-    right: 6px;
+    margin-right: 7px;
     padding-top: 4px;
     font-size: 11px;
+    order: 3;
 }
 
-div.timetableBlockTimeDiscreet{
+div.timetableBlockTimeDiscreet {
     float: left;
-    margin: 4px;
-    margin-right: 6px;
-    margin-left: 6px;
+    margin: 4px 7px;
     font-size: 11px;
 }
 
 div.timetableBlockLocation {
-    position: absolute;
     bottom: 4px;
     left: 4px;
     font-style: italic;
     padding-top: 4px;
     font-size: 11px;
+    order: 2;
 }
 
 div.timetableBlockConvener {
-    position: absolute;
-    left: 4px;
     font-style: italic;
-    padding-top: 4px;
     font-size: 11px;
+    order: 2;
 }
 
 div.timetablePreLoading {

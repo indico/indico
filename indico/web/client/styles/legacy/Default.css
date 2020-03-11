@@ -334,40 +334,8 @@ div.exclusivePopup .printLink {
     -moz-border-radius-topright: 3px;
 }
 
-div.ui-draggable.timetableBlock {
-    /* border: 3px solid #9F883B;*/
-}
-
-div.ui-draggable.timetableBlock:hover {
-    cursor: move;
-}
-
-div.ui-draggable-dragging.timetableBlock {
-    z-index: 9000;
-    opacity: 0.5;
-}
-
 /* Timetable drag n drop,
    droppable styles ends here. */
-
-div.timetableBlockTitle {
-    font-weight: bold;
-    font-size: 11px;
-    padding: 4px;
-}
-
-a.entry-attachments + div.timetableBlockPresenters {
-    margin-right: 24px;
-}
-
-div.timetableBlockPresenters {
-    float: right;
-    margin: 4px;
-    margin-right: 6px;
-    margin-left: 6px;
-    font-size: 11px;
-    font-style: italic;
-}
 
 div.timetableBlockMaterial {
     cursor: pointer;
@@ -377,39 +345,6 @@ div.timetableBlockMaterial {
     width: 12px;
     height: 12px;
     background: transparent url(static:images/material_folder.png) scroll no-repeat 3px 3px;
-}
-
-div.timetableBlockTime {
-    position: absolute;
-    bottom: 4px;
-    right: 6px;
-    padding-top: 4px;
-    font-size: 11px;
-}
-
-div.timetableBlockTimeDiscreet {
-    float: left;
-    margin: 4px;
-    margin-right: 6px;
-    margin-left: 6px;
-    font-size: 11px;
-}
-
-div.timetableBlockLocation {
-    position: absolute;
-    bottom: 4px;
-    left: 4px;
-    font-style: italic;
-    padding-top: 4px;
-    font-size: 11px;
-}
-
-div.timetableBlockConvener {
-    position: absolute;
-    left: 4px;
-    font-style: italic;
-    padding-top: 4px;
-    font-size: 11px;
 }
 
 div.balloonPopupCloseButton {
@@ -433,69 +368,6 @@ div.balloonPopupCloseButton {
     text-align: center;
     font-family: Verdana;
     padding-top: 80px;
-}
-
-div.timetablePreLoading {
-    background: transparent url('static:images/load_big.gif') scroll no-repeat center center;
-}
-
-div.timetablePreLoading .text {
-    color: #777;
-    text-align: center;
-    font-family: Verdana;
-    letter-spacing: 2px;
-}
-
-div.timetableLoading {
-    position: absolute;
-    top: 40px;
-    left: 0px;
-    padding: 10px 0 6px 35px;
-    background: transparent url('static:images/loading.gif') scroll no-repeat 10px center;
-    color: #444;
-}
-
-.timetableFilter {
-    width: 100%;
-    position: fixed;
-    bottom: 0;
-    left: 0;
-}
-
-.timetableFilter .content {
-    width: 900px;
-    margin: 0 auto;
-    background: #ECECEC;
-    border: 1px solid #777;
-    border-bottom: none;
-    position: relative;
-}
-
-.timetableFilter .content table {
-    background: white;
-    width: 100%;
-}
-
-.timetableFilter .content td {
-    padding: 13px 30px;
-    white-space: nowrap;
-    background-color: #ECECEC;
-    vertical-align: middle;
-    width: 1px;
-}
-
-.timetableFilter .closeButton {
-    position: absolute;
-    top: 15px;
-    right: 15px;
-    width: 16px;
-    height: 16px;
-    cursor: pointer;
-    background: transparent url('static:images/close_button.png') scroll no-repeat 0 0;
-}
-
-.timetableFilter .closeButton:hover {
-    background-position: 0 -16px;
 }
 
 ul.popupList {
