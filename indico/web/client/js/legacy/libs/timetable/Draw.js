@@ -9,30 +9,6 @@ type(
   'TimetableBlockBase',
   [],
   {
-    truncateTitle: function(numChars, title) {
-      if (numChars >= title.length) {
-        return title;
-      }
-
-      if (numChars < 0) {
-        // Never truncate more than the length of  the string
-        if (-numChars >= title.length) {
-          return title;
-        }
-
-        // Since we add 3 periods in the end truncating 3 or less chars
-        // doen't result in shortening the string. Force it to be <= -4
-        if (numChars >= -3) {
-          numChars = -4;
-        }
-
-        numChars = title.length + numChars;
-      }
-
-      title = title.substring(0, numChars) + '...';
-      return title;
-    },
-
     openPopup: function(event) {
       var self = this;
       self.popupActive = true;
@@ -180,11 +156,12 @@ type(
         this._getTitle()
       );
 
-      this.titleWrapper = Html.div({}, this.titleDiv);
+      this.headerBlock = Html.div({className: 'timetableBlockWrapper'}, this.titleDiv);
+      this.footerBlock = Html.div({className: 'timetableBlockWrapper', style: {marginTop: 'auto'}});
 
       this.div = Html.div(
         {className: 'entry-content', style: {width: '100%', height: '100%'}},
-        this.titleWrapper
+        this.headerBlock
       );
 
       if (this.compactMode) {
@@ -235,7 +212,7 @@ type(
           if (self.eventData.presenters.length > 1) {
             this.presentersDiv.append(' ' + $T('et al.'));
           }
-          this.titleWrapper.insert(this.presentersDiv);
+          this.headerBlock.insert(this.presentersDiv);
         }
 
         // Add material menu
@@ -244,7 +221,7 @@ type(
           self.eventData.attachments &&
           self.eventData.attachments.files
         ) {
-          this.titleWrapper.insert(this.createMaterialButton(this.eventData.attachments));
+          this.headerBlock.insert(this.createMaterialButton(this.eventData.attachments));
         }
 
         //this.titleWrapper.insert(this.createManageButton());
@@ -255,9 +232,12 @@ type(
           self._formatConveners(this.eventData.conveners)
         );
 
-        this.div.append(this.convenerDiv);
-        this.div.append(this.timeDiv);
-        this.div.append(this.locationDiv);
+        if (this.eventData.conveners) {
+          this.headerBlock.append(this.convenerDiv);
+        }
+        this.footerBlock.append(this.locationDiv);
+        this.footerBlock.append(this.timeDiv);
+        this.div.append(this.footerBlock);
       }
 
       return this.div;
@@ -273,7 +253,8 @@ type(
 
       this.leftPos = leftPos;
       this.width = width;
-      this.height = this.blockData.end - this.blockData.start - 3;
+      // the block height minus an extra padding to prevent nodes from being too close
+      this.height = this.blockData.end - this.blockData.start - 2;
       this.topPos = this.blockData.start;
 
       //To disable dragging while outside management mode
@@ -353,121 +334,28 @@ type(
     _postDraw: function() {},
 
     postDraw: function(hook) {
-      var self = this;
-      var title = this._getTitle();
-
-      // Returns the total height of the divs in the block
-      var contentHeight = function() {
-        var h = 0;
-        if (!self.compactMode) {
-          var locationHeight =
-            self.locationDiv.dom.style.display != 'none' ? self.locationDiv.dom.offsetHeight : 0;
-          var timeHeight =
-            self.timeDiv.dom.style.display != 'none' ? self.timeDiv.dom.offsetHeight : 0;
-
-          h = Math.max(locationHeight, timeHeight);
-        }
-
-        return self.titleDiv.dom.offsetHeight + h;
-      };
-      var contentWidth = function() {
-        return self.timeDiv.dom.offsetWidth + self.locationDiv.dom.offsetWidth + 2 * self.margin;
-      };
-
-      var parentDivHeight = this.div.dom.parentNode.offsetHeight;
-      var parentDivWidth = this.div.dom.parentNode.offsetWidth;
+      const parentDivHeight = this.div.dom.parentNode.offsetHeight;
+      const contentHeight = () => Array.from(this.div.dom.childNodes).reduce((acc, x) => acc + x.offsetHeight, 0);
 
       // If nothing has been drawn do nothing
       if (!parentDivHeight) {
         return;
       }
 
-      // If no space for location and time info then hide the divs
-      if (this.compactMode && parentDivWidth < 200) {
-        this.timeDiv.dom.style.display = 'none';
-      }
-      if (!this.compactMode) {
-        var locationMaxWidth = parentDivWidth - 20;
-
-        // Hide the time if there is not enough space
-        if (this.timeDiv.dom.offsetWidth + 8 >= parentDivWidth) {
-          this.timeDiv.dom.style.display = 'none';
-        }
-        // If at this point the width of the content fits but the height of the content
-        // is bigger than the height of the parent div, it is probably because the
-        // location takes more than one line in the block. For this edge case we force
-        // the hiding of the time div so that the location div takes only one line.
-        else if (contentWidth() >= parentDivWidth || contentHeight() >= parentDivHeight) {
-          this.timeDiv.dom.style.display = 'none';
-        } else {
-          locationMaxWidth -= this.timeDiv.dom.offsetWidth;
-        }
-
-        this.locationDiv.dom.style.maxWidth =
-          locationMaxWidth > 0 ? pixels(locationMaxWidth) : '0px';
-
-        // After modifying the location width, the content of the location might be expaneded
-        // on two lines. Therefore, we should re-check if there is enought space for the time.
-        if (contentWidth() >= parentDivWidth || contentHeight() >= parentDivHeight) {
-          this.timeDiv.dom.style.display = 'none';
-          this.locationDiv.dom.style.maxWidth = pixels(parentDivWidth - 20);
-        }
-
-        // Convener information should not take more than half of the space of the block
-        // if not truncate the string.
-        if (this.convenerDiv && this.convenerDiv.dom.offsetWidth > parentDivWidth / 2) {
-          var newLength =
-            (parentDivWidth / 2 / this.convenerDiv.dom.offsetWidth) * this.convenerDiv.get().length;
-          this.convenerDiv.set(this.truncateTitle(newLength - 1, this.convenerDiv.get()));
-        }
-
-        // If checks if height of the cell is enough to paint convener's name.
-        if (
-          this.convenerDiv &&
-          this.convenerDiv.dom.offsetHeight + contentHeight() > parentDivHeight
-        ) {
-          this.convenerDiv.dom.style.display = 'none';
-        }
+      // If the content (header + footer) is bigger than the block, we'll start by reducing the footer
+      if (contentHeight() > parentDivHeight - 8) {
+        this.footerBlock.dom.style.whiteSpace = 'nowrap';
       }
 
-      // If content height <= div height then nothing needs to be done
-      if (contentHeight() > parentDivHeight) {
-        // Try to remove the location info, and set title font weight to non bold,
-        // if this works, then we're done. Otherwise, start to truncate the title as well.
-        if (this.timeDiv.dom.style.display == 'none') {
-          this.locationDiv.dom.style.display = 'none';
-        }
+      // If the content is bigger than the block, we'll remove line wrappings first
+      // 8 is equivalent to 2x the block padding
+      if (this.headerBlock.dom.offsetHeight > parentDivHeight - 8) {
+        this.headerBlock.dom.style.whiteSpace = 'nowrap';
+      }
 
-        if (contentHeight() > parentDivHeight) {
-          // Calculates the the width of title, presenters and possible arrows
-          var topContentWidth = function() {
-            var width = 2 * self.margin;
-            if (self.titleDiv) width += self.titleDiv.dom.offsetWidth;
-            if (self.presentersDiv) width += self.presentersDiv.dom.offsetWidth;
-
-            self._postDraw();
-            return width;
-          };
-
-          // Truncate title based on a ratio: div height / content height
-          title = this.truncateTitle(
-            Math.ceil(title.length * (parentDivHeight / contentHeight())),
-            title
-          );
-          this.titleDiv.set(title);
-          //String will be shorten by the value of 'step'
-          var step = 2;
-          //Truncating the title since it can be displayed in a single line
-          // title !== "..." avoids the endless loop
-          while (
-            title !== '...' &&
-            contentHeight() > parentDivHeight &&
-            topContentWidth() > parentDivWidth * 0.8
-          ) {
-            title = this.truncateTitle(-step, title);
-            this.titleDiv.set(title);
-          }
-        }
+      // If the content still doesn't fit, we'll fit everything in one line
+      if (this.headerBlock.dom.offsetHeight > parentDivHeight - 8) {
+        this.headerBlock.dom.style.flexWrap = 'nowrap';
       }
 
       this._postDraw();
@@ -486,7 +374,7 @@ type(
       );
 
       this.div.insert(pileEffect);
-      this.titleWrapper.dom.style.paddingTop = '15px';
+      this.headerBlock.dom.style.paddingTop = '15px';
       if (this.compactMode) {
         this.timeDiv.dom.style.paddingTop = '15px';
       }
@@ -529,9 +417,9 @@ type(
         {className: 'timetableBlockTitle', style: {fontWeight: this.eventData.fontWeight}},
         this.eventData.title
       );
-      this.titleWrapper = Html.div({}, this._getRightSideDecorators(), this.titleDiv);
+      this.headerBlock = Html.div({}, this._getRightSideDecorators(), this.titleDiv);
 
-      this.div = Html.div({style: {width: '100%', height: '100%'}}, this.titleWrapper);
+      this.div = Html.div({style: {width: '100%', height: '100%'}}, this.headerBlock);
 
       this.timeDiv = Html.div(
         'timetableBlockTimeDiscreet',
@@ -543,7 +431,7 @@ type(
 
       // Add material menu
       if (self.eventData.attachments && self.eventData.attachments.files) {
-        this.titleWrapper.insert(this.createMaterialButton(this.eventData.attachments));
+        this.headerBlock.insert(this.createMaterialButton(this.eventData.attachments));
       }
 
       return this.div;

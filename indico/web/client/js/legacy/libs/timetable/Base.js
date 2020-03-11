@@ -1341,37 +1341,6 @@ type(
     },
 
     _legendPostDraw: function() {
-      var self = this;
-      // loop for truncation of too long session titles,
-      // the text next a coloured box in the "session legend".
-      var initialTruncing = null;
-      var i = 0;
-
-      // Loop through each legend item
-      $('.legendItem').each(function() {
-        var titleIsTruncated = false;
-        var fullTitle = $(this).text();
-        initialTruncing = fullTitle.length;
-        // Keep truncating the title until its short enough to be written in
-        // one line and still less wide than the
-        // "maximum legend item width".
-
-        var span = $(this).children('span');
-
-        while (span.get(0).offsetHeight > 25 || span.get(0).offsetWidth > 130) {
-          titleIsTruncated = true;
-          var truncSessionTitle = TimetableBlockBase.prototype.truncateTitle(
-            --initialTruncing,
-            fullTitle
-          );
-          span.html(truncSessionTitle);
-        }
-
-        if (titleIsTruncated) {
-          $(this).qtip({content: fullTitle, position: {my: 'top middle', at: 'bottom middle'}});
-        }
-      });
-
       if ($('#detailsButton').length) {
         $('#legendMainToggle').position({
           my: 'left top',
