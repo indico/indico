@@ -717,6 +717,7 @@ class BookingDetails extends React.Component {
                 )}
                 <Button
                   onClick={() => {
+                    this.changeState('cancel');
                     this.hideConfirm();
                   }}
                   content={PluralTranslate.string(
