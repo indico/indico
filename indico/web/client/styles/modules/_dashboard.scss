@@ -17,6 +17,10 @@
     @media (max-width: $wide-screen-width) {
         max-width: 100%;
     }
+
+    & > .page-content {
+        width: 100%;
+    }
 }
 
 .banner.user-dashboard {
@@ -194,6 +198,8 @@
 }
 
 .your-details {
+    display: flex;
+    flex-wrap: wrap;
     margin-bottom: 15px;
 
     .avatar-image .ui.label {
@@ -216,5 +222,9 @@
             color: $dark-gray;
             margin-right: 10px;
         }
+    }
+
+    .actions {
+        margin-left: auto;
     }
 }

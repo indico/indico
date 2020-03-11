@@ -34,13 +34,13 @@
     <div class="dashboard-tab">
         <div class="quick-access-pane">
             <div class="dashboard-col">
-                <div class="your-details clearfix">
-                    <div class="avatar-image left">
+                <div class="your-details">
+                    <div class="avatar-image">
                         <span class="ui large circular label" style="{{ user.avatar_css }}">
                             {{ user.first_name[0] }}
                         </span>
                     </div>
-                    <div class="your-details-wrapper left">
+                    <div class="your-details-wrapper">
                         <h3>{{ user.full_name }}</h3>
                         {% if config.DEBUG %}
                             <div>
@@ -61,7 +61,7 @@
                             </div>
                         {% endif %}
                     </div>
-                    <div class="toolbar right">
+                    <div class="actions">
                         <a class="ui icon button" href="{{ url_for('users.user_profile') }}">
                             <i aria-hidden="true" class="cog icon"></i>
                             {% trans %}Settings{% endtrans %}
