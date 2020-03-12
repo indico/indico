@@ -13,7 +13,9 @@ import pytest
 import pytz
 
 from indico.modules.rb import rb_settings
-from indico.modules.rb.util import get_booking_params_for_event, rb_check_user_access, rb_is_admin
+from indico.modules.rb.models.reservations import ReservationState
+from indico.modules.rb.util import (get_booking_params_for_event, get_prebooking_collisions, rb_check_user_access,
+                                    rb_is_admin)
 from indico.testing.util import bool_matrix
 
 
@@ -128,3 +130,19 @@ def test_get_booking_params_timezone(create_event):
             'text': None
         }
     }
+
+
+def test_get_prebooking_collisions(create_reservation, dummy_user):
+    start_dt = datetime(2020, 4, 1, 9, 0)
+    end_dt = datetime(2020, 4, 1, 12, 0)
+
+    res1 = create_reservation(start_dt=start_dt, end_dt=end_dt, state=ReservationState.pending)
+    res2 = create_reservation(start_dt=start_dt, end_dt=end_dt, state=ReservationState.pending)
+    create_reservation(start_dt=end_dt, end_dt=datetime(2020, 4, 1, 15, 0), state=ReservationState.pending)
+    res_cancelled = create_reservation(start_dt=start_dt, end_dt=end_dt, state=ReservationState.pending)
+    res_cancelled.cancel(dummy_user, silent=True)
+    res_rejected = create_reservation(start_dt=start_dt, end_dt=end_dt, state=ReservationState.pending)
+    res_rejected.reject(dummy_user, 'Testing', silent=True)
+
+    collisions = get_prebooking_collisions(res1)
+    assert collisions == [res2.occurrences.one()]
