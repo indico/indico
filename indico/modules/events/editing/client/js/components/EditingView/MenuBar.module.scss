@@ -41,5 +41,11 @@ $header-height: calc(100vh - var(--header-height) * 1px);
                 color: $black;
             }
         }
+
+
     }
+}
+
+.capitalized {
+    text-transform: uppercase;
 }

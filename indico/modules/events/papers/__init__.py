@@ -28,13 +28,23 @@ from indico.web.menu import SideMenuItem
 logger = Logger.get('events.papers')
 
 
-@signals.menu.items.connect_via('event-editing-sidemenu')
 @signals.menu.items.connect_via('event-management-sidemenu')
 def _extend_event_management_menu(sender, event, **kwargs):
     if not event.cfp.is_manager(session.user) or not PapersFeature.is_allowed_for_event(event):
         return
     return SideMenuItem('papers', _('Call for Papers'), url_for('papers.management', event),
                         section='organization')
+
+
+@signals.menu.items.connect_via('event-editing-sidemenu')
+def _extend_editing_menu(sender, event, **kwargs):
+    from indico.modules.events.papers.util import has_contributions_with_user_paper_submission_rights
+    if not session.user or not event.has_feature('papers'):
+        return None
+    if (has_contributions_with_user_paper_submission_rights(event, session.user) or
+            event.cfp.is_staff(session.user)):
+        return SideMenuItem('papers', _('Call for Papers'), url_for('papers.call_for_papers', event),
+                            section='organization')
 
 
 @signals.event_management.management_url.connect

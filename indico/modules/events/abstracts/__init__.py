@@ -46,7 +46,6 @@ def _clear_boa_cache(sender, obj=None, **kwargs):
     clear_boa_cache(event)
 
 
-@signals.menu.items.connect_via('event-editing-sidemenu')
 @signals.menu.items.connect_via('event-management-sidemenu')
 def _extend_event_management_menu(sender, event, **kwargs):
     if not event.can_manage(session.user) or not AbstractsFeature.is_allowed_for_event(event):
@@ -137,6 +136,13 @@ def _get_notification_placeholders(sender, **kwargs):
         obj = getattr(placeholders, name)
         if issubclass(obj, Placeholder):
             yield obj
+
+
+@signals.menu.items.connect_via('event-editing-sidemenu')
+def _extend_editing_menu(sender, event, **kwargs):
+    if event.has_feature('abstracts'):
+        yield SideMenuItem('abstracts', _('Call for Abstracts'), url_for('abstracts.call_for_abstracts', event),
+                           section='organization')
 
 
 @signals.event.sidemenu.connect

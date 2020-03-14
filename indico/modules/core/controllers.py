@@ -302,5 +302,7 @@ class RHConfig(RH):
                        contact_email=config.PUBLIC_SUPPORT_EMAIL,
                        has_tos=bool(tos_url or tos_html),
                        tos_html=tos_html,
+                       tos_url=tos_url,
                        has_privacy_policy=bool(privacy_policy_url or privacy_policy_html),
-                       privacy_policy_html=privacy_policy_html)
+                       privacy_policy_html=privacy_policy_html,
+                       privacy_policy_url=privacy_policy_url)
