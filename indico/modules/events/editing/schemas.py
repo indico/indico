@@ -246,15 +246,8 @@ class EditingReviewConditionArgs(mm.Schema):
             raise ValidationError(_('Conditions have to be unique'))
 
 
-class SideMenuItemSchema(mm.Schema):
+class EditingMenuItemSchema(mm.Schema):
     name = fields.String(required=True)
     title = fields.String(required=True)
     url = fields.String(required=True)
-    weight = fields.Int()
-    active = fields.Boolean()
-    disabled = fields.Boolean()
-    section = fields.String()
     icon = fields.String()
-
-
-side_menu_items_schema = SideMenuItemSchema(many=True)

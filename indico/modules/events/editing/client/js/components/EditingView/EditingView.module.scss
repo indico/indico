@@ -13,7 +13,7 @@
     .contents {
         display: flex;
         flex-direction: column;
-        width: 100%;
+        flex: 1;
 
         .timeline {
             max-width: 800px;

@@ -22,11 +22,16 @@ export default function MenuBar({eventId, menuItems}) {
       </Header>
       <ul styleName="list">
         <li>
-          <Translate>OTHER MODULES</Translate>
+          <span styleName="capitalized">
+            <Translate>other modules</Translate>
+          </span>
           <ul styleName="inner-list">
             {menuItems.map(item => (
               <a key={item.name} href={item.url}>
-                <li styleName="inner-list-item">{item.title}</li>
+                <li styleName="inner-list-item">
+                  {item.icon && <Icon name={item.icon.replace('icon-', '')} />}
+                  {item.title}
+                </li>
               </a>
             ))}
           </ul>
@@ -34,7 +39,9 @@ export default function MenuBar({eventId, menuItems}) {
       </ul>
       <ul styleName="list">
         <li>
-          <Translate>OTHER VIEWS</Translate>
+          <span styleName="capitalized">
+            <Translate>other views</Translate>
+          </span>
           <ul styleName="inner-list">
             <a href={displayURL({confId: eventId})}>
               <li styleName="inner-list-item">
@@ -59,10 +66,6 @@ const menuEntryPropTypes = {
   name: PropTypes.string.isRequired,
   title: PropTypes.string.isRequired,
   url: PropTypes.string.isRequired,
-  weight: PropTypes.number.isRequired,
-  active: PropTypes.bool.isRequired,
-  disabled: PropTypes.bool.isRequired,
-  section: PropTypes.string.isRequired,
   icon: PropTypes.string,
 };
 MenuBar.propTypes = {

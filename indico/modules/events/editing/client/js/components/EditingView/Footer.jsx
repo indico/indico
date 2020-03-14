@@ -10,68 +10,100 @@ import configURL from 'indico-url:core.config';
 import React, {useState} from 'react';
 import {Image, Modal} from 'semantic-ui-react';
 import {useIndicoAxios} from 'indico/react/hooks';
-import {Translate} from 'indico/react/i18n';
+import {Translate, Param} from 'indico/react/i18n';
 
 import './Footer.module.scss';
 
-export default function Footer() {
-  const [tosModal, setTosModal] = useState(false);
+const buildFooterItems = config => {
+  const {
+    helpURL,
+    hasTos,
+    contactEmail,
+    tosHtml,
+    tosURL,
+    hasPrivacyPolicy,
+    privacyPolicyHtml,
+    privacyPolicyURL,
+  } = config;
 
-  const {data} = useIndicoAxios({
+  const footerItems = [];
+  if (helpURL) {
+    footerItems.push({
+      id: 'help',
+      caption: Translate.string('Help'),
+      href: helpURL,
+    });
+  }
+  footerItems.push({
+    id: 'contact',
+    caption: Translate.string('Contact'),
+    href: `mailto:${contactEmail}`,
+  });
+  if (hasTos) {
+    footerItems.push({
+      id: 'tos',
+      caption: Translate.string('Terms and Conditions'),
+      href: tosURL,
+      modal: tosHtml,
+    });
+  }
+  if (hasPrivacyPolicy) {
+    footerItems.push({
+      id: 'privacy',
+      caption: Translate.string('Privacy'),
+      href: privacyPolicyURL,
+      modal: privacyPolicyHtml,
+    });
+  }
+
+  return footerItems;
+};
+
+export default function Footer() {
+  const [currentModal, setCurrentModal] = useState(false);
+
+  const {data: config} = useIndicoAxios({
     url: configURL(),
     camelize: true,
     trigger: 'once',
   });
 
-  const config = data;
   if (!config) {
     return null;
   }
 
-  const {helpURL, hasTos, contactEmail, tosHtml} = config;
+  const triggerModal = (e, id) => {
+    setCurrentModal(id);
+    e.preventDefault();
+  };
+
+  const footerItems = buildFooterItems(config);
   return (
     <div styleName="editing-footer">
       <div styleName="logo">
         <Image src={logoURL({filename: 'indico_small.png'})} styleName="image" />
         <span styleName="text">
-          <Translate>Powered by </Translate>
-          <a href="http://getindico.io">Indico</a>
+          <Translate>
+            Powered by <Param name="indico" value={<a href="https://getindico.io">Indico</a>} />
+          </Translate>
         </span>
       </div>
       <div styleName="information">
-        {helpURL && (
-          <span>
-            <a href={helpURL}>
-              <Translate>Help</Translate>
+        {footerItems.map(({id, caption, href, modal, ...props}) => (
+          <span key={id}>
+            <a href={href} onClick={modal && (e => triggerModal(e, id))} {...props}>
+              {caption}
             </a>
+            {modal && (
+              <Modal open={currentModal === id} closeIcon onClose={() => setCurrentModal(false)}>
+                <Modal.Header>{caption}</Modal.Header>
+                <Modal.Content>
+                  <div dangerouslySetInnerHTML={{__html: modal}} />
+                </Modal.Content>
+              </Modal>
+            )}
           </span>
-        )}
-        <span>
-          <a href={`mailto: ${contactEmail}`}>
-            <Translate>Contact</Translate>
-          </a>
-        </span>
-        {hasTos && tosHtml && (
-          <Modal
-            open={tosModal}
-            closeIcon
-            onClose={() => setTosModal(false)}
-            trigger={
-              <span>
-                <a onClick={() => setTosModal(true)}>
-                  <Translate>Terms and Conditions</Translate>
-                </a>
-              </span>
-            }
-          >
-            <Modal.Header>
-              <Translate>Terms and Conditions</Translate>
-            </Modal.Header>
-            <Modal.Content>
-              <div dangerouslySetInnerHTML={{__html: tosHtml}} />
-            </Modal.Content>
-          </Modal>
-        )}
+        ))}
       </div>
     </div>
   );

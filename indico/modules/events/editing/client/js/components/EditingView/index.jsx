@@ -21,8 +21,7 @@ import Footer from './Footer';
 import './EditingView.module.scss';
 
 export default function EditingView({eventTitle}) {
-  const staticData = useSelector(getStaticData);
-  const {eventId} = staticData;
+  const {eventId} = useSelector(getStaticData);
 
   const {data, lastData} = useIndicoAxios({
     url: menuEntriesURL({confId: eventId}),
