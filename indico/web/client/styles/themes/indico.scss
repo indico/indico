@@ -207,6 +207,11 @@ div.event-header {
 
 .event-header {
     @extend %font-family-title-light;
+
+    .event-label {
+        margin-left: 1em !important;
+        text-transform: uppercase;
+    }
 }
 
 .meeting-timetable, .meeting-sub-timetable {

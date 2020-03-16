@@ -1,0 +1,40 @@
+{% macro render_event_label_list(labels) %}
+    {% if labels %}
+        <table class="i-table-widget">
+            <thead>
+                <tr>
+                    <th>{% trans %}Label{% endtrans %}</th>
+                    <th class="action-column">{% trans %}Actions{% endtrans %}</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for label in labels %}
+                    <tr>
+                        <td>
+                            {% with label=label, message='', size='' %}
+                                {% include 'events/label.html' %}
+                            {% endwith %}
+                        </td>
+                        <td>
+                            <a href="#" class="icon-edit action-icon" title="{% trans %}Edit{% endtrans %}"
+                               data-href="{{ url_for('.update_event_label', label) }}"
+                               data-title="{% trans name=label.title %}Edit event label '{{ name }}'{% endtrans %}"
+                               data-update="#event-labels"
+                               data-ajax-dialog>
+                            </a>
+                            <a href="#" class="icon-remove action-icon" title="{% trans %}Delete{% endtrans %}"
+                               data-href="{{ url_for('.delete_event_label', label) }}"
+                               data-title="{% trans name=label.title %}Delete event label '{{ name }}'?{% endtrans %}"
+                               data-confirm="{% trans name=label.title %}Are you sure you want to permanently delete the event label '{{ name }}'? This action will remove it from all events that use it.{% endtrans %}"
+                               data-update="#event-labels"
+                               data-method="DELETE">
+                            </a>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <span class="empty">{% trans %}There are no event labels yet.{% endtrans %}</span>
+    {% endif %}
+{% endmacro %}

@@ -7,8 +7,9 @@
 
 from __future__ import unicode_literals
 
-from indico.modules.events.controllers.admin import (RHCreateReferenceType, RHDeleteReferenceType, RHEditReferenceType,
-                                                     RHReferenceTypes)
+from indico.modules.events.controllers.admin import (RHCreateEventLabel, RHCreateReferenceType, RHDeleteEventLabel,
+                                                     RHDeleteReferenceType, RHEditEventLabel, RHEditReferenceType,
+                                                     RHEventLabels, RHReferenceTypes)
 from indico.modules.events.controllers.creation import RHCreateEvent
 from indico.modules.events.controllers.display import RHEventAccessKey, RHEventMarcXML, RHExportEventICAL
 from indico.modules.events.controllers.entry import event_or_shorturl
@@ -22,12 +23,19 @@ _bp = IndicoBlueprint('events', __name__, template_folder='templates', virtual_t
 _bp.add_url_rule('/admin/external-id-types/', 'reference_types', RHReferenceTypes, methods=('GET', 'POST'))
 _bp.add_url_rule('/admin/external-id-types/create', 'create_reference_type', RHCreateReferenceType,
                  methods=('GET', 'POST'))
+_bp.add_url_rule('/admin/event-labels/', 'event_labels', RHEventLabels, methods=('GET', 'POST'))
+_bp.add_url_rule('/admin/event-labels/create', 'create_event_label', RHCreateEventLabel, methods=('GET', 'POST'))
 
 # Single reference type
 _bp.add_url_rule('/admin/external-id-types/<int:reference_type_id>/edit', 'update_reference_type', RHEditReferenceType,
                  methods=('GET', 'POST'))
 _bp.add_url_rule('/admin/external-id-types/<int:reference_type_id>', 'delete_reference_type', RHDeleteReferenceType,
                  methods=('DELETE',))
+
+# Single event label
+_bp.add_url_rule('/admin/event-labels/<event_label_id>/edit', 'update_event_label', RHEditEventLabel,
+                 methods=('GET', 'POST'))
+_bp.add_url_rule('/admin/event-labels/<event_label_id>', 'delete_event_label', RHDeleteEventLabel, methods=('DELETE',))
 
 _bp.add_url_rule('/event/<confId>/event.ics', 'export_event_ical', RHExportEventICAL)
 

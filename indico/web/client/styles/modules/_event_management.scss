@@ -580,6 +580,10 @@ th.i-table {
                 color: $gray;
                 font-style: italic;
             }
+
+            .event-label {
+                text-transform: uppercase;
+            }
         }
     }
 }

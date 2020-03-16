@@ -11,6 +11,7 @@ from datetime import time, timedelta
 
 from flask import session
 from wtforms.fields import StringField, TextAreaField
+from wtforms.fields.core import SelectField
 from wtforms.fields.html5 import URLField
 from wtforms.validators import DataRequired, InputRequired, ValidationError
 
@@ -20,8 +21,10 @@ from indico.modules.categories.fields import CategoryField
 from indico.modules.events.fields import EventPersonLinkListField, IndicoThemeSelectField
 from indico.modules.events.models.events import EventType
 from indico.modules.events.models.references import ReferenceType
+from indico.modules.events.settings import event_labels_store
 from indico.util.i18n import _
 from indico.web.forms.base import IndicoForm
+from indico.web.forms.colors import get_sui_colors
 from indico.web.forms.fields import (IndicoDateTimeField, IndicoEnumRadioField, IndicoLocationField,
                                      IndicoTimezoneSelectField, JSONField, OccurrencesField)
 from indico.web.forms.validators import LinkedDateTime
@@ -49,6 +52,21 @@ class ReferenceTypeForm(IndicoForm):
     def validate_url_template(self, field):
         if field.data and '{value}' not in field.data:
             raise ValidationError(_("The URL template must contain the placeholder '{value}'."))
+
+
+class EventLabelForm(IndicoForm):
+    title = StringField(_('Title'), [DataRequired()])
+    color = SelectField(_('Color'), [DataRequired()], choices=zip(get_sui_colors(), get_sui_colors()))
+
+    def __init__(self, *args, **kwargs):
+        self.event_label = kwargs.pop('event_label', None)
+        super(EventLabelForm, self).__init__(*args, **kwargs)
+
+    def validate_title(self, field):
+        conflict = next((x for x in event_labels_store.get_all().values() if x.title.lower() == field.data.lower()),
+                        None)
+        if conflict and (not self.event_label or conflict.id != self.event_label.id):
+            raise ValidationError(_('This title is already in use.'))
 
 
 class EventCreationFormBase(IndicoForm):

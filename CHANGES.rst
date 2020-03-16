@@ -7,6 +7,12 @@ Version 2.2.7
 
 *Unreleased*
 
+Improvements
+^^^^^^^^^^^^
+
+- Add support for event labels to indicate e.g. postponed or cancelled
+  events (:issue:`3199`)
+
 Bugfixes
 ^^^^^^^^
 

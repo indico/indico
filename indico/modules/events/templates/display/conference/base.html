@@ -42,7 +42,10 @@
                     <div class="confSubTitle f-self-stretch" style="{{ conf_layout_params.text_color_css }}">
                         {{ template_hook('conference-header', event=event) }}
                         <div class="datePlace">
-                            <div class="date">{{ _format_event_date(event) }}</div>
+                            <div class="date">
+                                {{- _format_event_date(event) -}}
+                                {{- event.get_label_markup() -}}
+                            </div>
                             <div class="place">{{ event.venue_name }}</div>
                             <div class="timezone">
                                 {%- trans tz=event.display_tzinfo.zone %}{{ tz }} timezone{% endtrans -%}

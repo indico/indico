@@ -9,16 +9,16 @@ from __future__ import unicode_literals
 
 import os
 import re
-from datetime import timedelta
 from functools import wraps
 
 import yaml
 from flask.helpers import get_root_path
 
 from indico.core import signals
-from indico.core.settings import ACLProxyBase, SettingProperty, SettingsProxyBase
-from indico.core.settings.converters import DatetimeConverter, TimedeltaConverter
+from indico.core.settings import ACLProxyBase, SettingProperty, SettingsProxy, SettingsProxyBase
+from indico.core.settings.converters import DatetimeConverter, SettingConverter
 from indico.core.settings.util import get_all_settings, get_setting, get_setting_acl
+from indico.modules.events.models.labels import EventLabel
 from indico.modules.events.models.settings import EventSetting, EventSettingPrincipal
 from indico.util.caching import memoize
 from indico.util.signals import values_from_signal
@@ -253,3 +253,44 @@ event_contact_settings = EventSettingsProxy('contact', {
     'emails': [],
     'phones': []
 })
+
+
+# TODO: remove all this when switching to a real model in 2.3
+class _EventLabelConverter(SettingConverter):
+    def from_python(self, value):
+        if value is None:
+            return None
+        return value.id
+
+    def to_python(self, value):
+        if value is None:
+            return None
+        return event_labels_store.get(value)
+
+
+class _LabelDataConverter(SettingConverter):
+    def from_python(self, value):
+        if value is None:
+            return None
+        assert isinstance(value, EventLabel)
+        return {'id': value.id, 'title': value.title, 'color': value.color}
+
+    def to_python(self, value):
+        if value is None:
+            return None
+        return EventLabel(id=value['id'], title=value['title'], color=value['color'])
+
+
+class _LabelDataConverterProvider(object):
+    def get(self, key):
+        return _LabelDataConverter()
+
+
+event_label_settings = EventSettingsProxy('label', {
+    'label': None,
+    'message': '',
+}, converters={
+    'label': _EventLabelConverter(),
+})
+
+event_labels_store = SettingsProxy('event_labels', strict=False, converters=_LabelDataConverterProvider())

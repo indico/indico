@@ -21,7 +21,10 @@ from indico.modules.events.features import features_event_settings
 from indico.modules.events.layout import layout_settings
 from indico.modules.events.logs.util import make_diff_log
 from indico.modules.events.models.events import EventType
+from indico.modules.events.models.labels import EventLabel
 from indico.modules.events.models.references import ReferenceType
+from indico.modules.events.models.settings import EventSetting
+from indico.modules.events.settings import event_labels_store
 
 
 def create_reference_type(data):
@@ -50,6 +53,35 @@ def create_event_references(event, data):
     db.session.flush()
     for reference in event.references:
         logger.info('Reference "%s" created by %s', reference, session.user)
+
+
+def create_event_label(data):
+    event_label = EventLabel(**data)
+    event_labels_store.set(event_label.id, event_label)
+    db.session.flush()
+    logger.info('Event label "%s" created by %s', event_label, session.user)
+    return event_label
+
+
+def update_event_label(event_label, data):
+    for k, v in data.items():
+        setattr(event_label, k, v)
+    event_labels_store.set(event_label.id, event_label)
+    db.session.flush()
+    logger.info('Event label "%s" updated by %s', event_label, session.user)
+
+
+def delete_event_label(event_label):
+    events = (Event.query
+              .filter(Event.settings.any(db.and_(EventSetting.module == 'label',
+                                                 EventSetting.name == 'label',
+                                                 EventSetting.value[()].astext == event_label.id)))
+              .all())
+    for event in events:
+        event.label = None
+    event_labels_store.delete(event_label.id)
+    db.session.flush()
+    logger.info('Event label "%s" deleted by %s', event_label, session.user)
 
 
 @no_autoflush
@@ -106,7 +138,7 @@ def update_event(event, update_timetable=False, **data):
     assert set(data.viewkeys()) <= {'title', 'description', 'url_shortcut', 'location_data', 'keywords',
                                     'person_link_data', 'start_dt', 'end_dt', 'timezone', 'keywords', 'references',
                                     'organizer_info', 'additional_info', 'contact_title', 'contact_emails',
-                                    'contact_phones', 'start_dt_override', 'end_dt_override'}
+                                    'contact_phones', 'start_dt_override', 'end_dt_override', 'label', 'label_message'}
     old_person_links = event.person_links[:]
     changes = {}
     if (update_timetable or event.type == EventType.lecture) and 'start_dt' in data:
@@ -188,6 +220,8 @@ def _log_event_update(event, changes, visible_person_link_changes=False):
         'contact_title': {'title': 'Contact/Support title', 'type': 'string'},
         'contact_emails': 'Contact emails',
         'contact_phones': 'Contact phone numbers',
+        'label': {'title': 'Label', 'type': 'string', 'attr': 'title'},
+        'label_message': 'Label message'
     }
     _split_location_changes(changes)
     if not visible_person_link_changes:

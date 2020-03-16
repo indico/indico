@@ -190,6 +190,8 @@ def _sidemenu_items(sender, **kwargs):
     if session.user.is_admin:
         yield SideMenuItem('reference_types', _('External ID Types'), url_for('events.reference_types'),
                            section='customization')
+        yield SideMenuItem('event_labels', _('Event Labels'), url_for('events.event_labels'),
+                           section='customization')
 
 
 @signals.menu.sections.connect_via('top-menu')

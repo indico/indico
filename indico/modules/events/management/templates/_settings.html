@@ -174,7 +174,7 @@
 
 
 {% macro render_section_classification(event, with_container=true) %}
-    {% set edit_cls_title = _('Edit keywords / references') if event.type == 'meeting' else _('Edit keywords') %}
+    {% set edit_cls_title = _('Edit keywords / references / label') if event.type == 'meeting' else _('Edit keywords / label') %}
     {% call render_section(event, 'classification', 'icon-tag', '.edit_classification', edit_cls_title,
                            with_container=with_container) %}
         <dl class="i-data-list">
@@ -200,6 +200,12 @@
                     {% endcall %}
                 </dd>
             {% endif %}
+            <dt>{% trans %}Label{% endtrans %}</dt>
+            <dd>
+                {% call with_default() %}
+                    {{ event.get_label_markup('mini') }}
+                {% endcall %}
+            </dd>
         </dl>
     {% endcall %}
 {% endmacro %}

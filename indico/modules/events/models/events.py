@@ -12,7 +12,8 @@ from contextlib import contextmanager
 from datetime import timedelta
 
 import pytz
-from flask import has_request_context, session
+from flask import has_request_context, render_template, session
+from markupsafe import Markup
 from sqlalchemy import DDL, orm
 from sqlalchemy.dialects.postgresql import ARRAY, JSONB
 from sqlalchemy.event import listens_for
@@ -37,7 +38,8 @@ from indico.modules.categories import Category
 from indico.modules.events.logs import EventLogEntry
 from indico.modules.events.management.util import get_non_inheriting_objects
 from indico.modules.events.models.persons import PersonLinkDataMixin
-from indico.modules.events.settings import EventSettingProperty, event_contact_settings, event_core_settings
+from indico.modules.events.settings import (EventSettingProperty, event_contact_settings, event_core_settings,
+                                            event_label_settings)
 from indico.modules.events.timetable.models.entries import TimetableEntry
 from indico.util.caching import memoize_request
 from indico.util.date_time import get_display_tz, now_utc, overlaps
@@ -690,6 +692,32 @@ class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionMan
         if show_series_pos and self.series and self.series.show_sequence_in_title:
             title = '{} ({}/{})'.format(title, self.series_pos, self.series_count)
         return title
+
+    @property
+    def label(self):
+        return event_label_settings.get(self, 'label')
+
+    @label.setter
+    def label(self, label):
+        event_label_settings.set(self, 'label', label)
+        if label is None:
+            self.label_message = ''
+
+    @property
+    def label_message(self):
+        if not self.label:
+            return ''
+        return event_label_settings.get(self, 'message')
+
+    @label_message.setter
+    def label_message(self, message):
+        event_label_settings.set(self, 'message', message)
+
+    def get_label_markup(self, size=''):
+        label = self.label
+        if not label:
+            return ''
+        return Markup(render_template('events/label.html', label=label, message=self.label_message, size=size))
 
     def get_non_inheriting_objects(self):
         """Get a set of child objects that do not inherit protection"""

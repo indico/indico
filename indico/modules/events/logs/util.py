@@ -44,7 +44,10 @@ def make_diff_log(changes, fields):
             field_data = {'title': field_data}
         title = field_data['title']
         convert = field_data.get('convert')
+        attr = field_data.get('attr')
         type_ = field_data.get('type')
+        if attr:
+            change = [getattr(x, attr) if x is not None else '' for x in change]
         if convert:
             change = convert(change)
         if type_ is not None:
