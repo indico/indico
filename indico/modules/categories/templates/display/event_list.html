@@ -103,7 +103,10 @@
                                 {% endif %}
 
                                 {% if is_recent(event.created_dt) %}
-                                    <i class="icon-new new-label" title="{% trans %}This event is new.{% endtrans %}"></i>
+                                    <span class="ui label mini blue"
+                                          title="{% trans %}This event is new.{% endtrans %}">
+                                        {%- trans %}new{% endtrans -%}
+                                    </span>
                                 {% endif %}
                             </span>
                         </div>

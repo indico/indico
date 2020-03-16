@@ -416,6 +416,10 @@ ul.category-resource-qtip {
             font-size: smaller;
             color: $dark-gray;
         }
+
+        .ui.label {
+            text-transform: uppercase;
+        }
     }
 }
 
