@@ -8,7 +8,8 @@
 from __future__ import unicode_literals
 
 from markupsafe import escape
-from marshmallow.fields import Boolean, Field, Float, Function, Integer, List, Nested, String
+from marshmallow import post_dump
+from marshmallow.fields import Boolean, Field, Float, Function, Integer, List, Method, Nested, String
 from marshmallow_enum import EnumField
 
 from indico.core.marshmallow import mm
@@ -16,17 +17,28 @@ from indico.modules.events.contributions.schemas import ContributionSchema
 from indico.modules.events.models.events import Event
 from indico.modules.events.papers.models.comments import PaperReviewComment
 from indico.modules.events.papers.models.files import PaperFile
+from indico.modules.events.papers.models.review_questions import PaperReviewQuestion
+from indico.modules.events.papers.models.review_ratings import PaperReviewRating
 from indico.modules.events.papers.models.reviews import PaperReview
 from indico.modules.events.papers.models.revisions import PaperRevision, PaperRevisionState
 from indico.modules.users.schemas import UserSchema
+from indico.util.i18n import orig_string
 from indico.util.mimetypes import icon_from_mimetype
 from indico.web.flask.util import url_for
 
 
+class CallForPapersSchema(mm.Schema):
+    layout_review_questions = Nested('PaperReviewQuestionSchema', many=True)
+    content_review_questions = Nested('PaperReviewQuestionSchema', many=True)
+    rating_range = List(Integer())
+
+
 class PaperEventSchema(mm.ModelSchema):
+    cfp = Nested(CallForPapersSchema)
+
     class Meta:
         model = Event
-        fields = ('id', 'title', 'is_locked')
+        fields = ('id', 'title', 'is_locked', 'cfp')
 
 
 class PaperFileSchema(mm.ModelSchema):
@@ -60,9 +72,13 @@ class PaperRevisionTimelineField(Field):
             return []
 
         serialized = []
+        user = self.context.get('user')
         review_comment_schema = PaperReviewCommentSchema(context=self.context)
         review_schema = PaperReviewSchema(context=self.context)
         for timeline_item in value:
+            if timeline_item.timeline_item_type in {'comment', 'review'} and not timeline_item.can_view(user):
+                continue
+
             serialized_item = {'timeline_item_type': timeline_item.timeline_item_type}
             if timeline_item.timeline_item_type == 'comment':
                 serialized_item.update(review_comment_schema.dump(timeline_item))
@@ -70,6 +86,12 @@ class PaperRevisionTimelineField(Field):
                 serialized_item.update(review_schema.dump(timeline_item))
             serialized.append(serialized_item)
         return serialized
+
+
+class PaperReviewTypeSchema(mm.Schema):
+    name = String()
+    title = String()
+    value = Integer()
 
 
 class PaperRevisionSchema(mm.ModelSchema):
@@ -80,11 +102,48 @@ class PaperRevisionSchema(mm.ModelSchema):
     state = EnumField(PaperRevisionState)
     timeline = PaperRevisionTimelineField()
     judgment_comment_html = Function(lambda revision: escape(revision.judgment_comment))
+    reviewer_data = Method('_get_reviewer_data')
 
     class Meta:
         model = PaperRevision
         fields = ('id', 'submitted_dt', 'judgment_dt', 'submitter', 'judge', 'spotlight_file', 'files',
-                  'is_last_revision', 'number', 'state', 'timeline', 'judgment_comment', 'judgment_comment_html')
+                  'is_last_revision', 'number', 'state', 'timeline', 'judgment_comment', 'judgment_comment_html',
+                  'reviewer_data')
+
+    def _get_reviewer_data(self, revision):
+        if not revision.is_last_revision:
+            return None
+
+        data = dict(revision.get_reviewer_render_data(self.context.get('user')))
+        review_type_schema = PaperReviewTypeSchema()
+        for name in {'groups', 'missing_groups', 'reviewed_groups'}:
+            data[name] = [review_type_schema.dump(item.instance) for item in data[name]]
+
+        reviews = {}
+        for key, value in data['reviews'].iteritems():
+            reviews[orig_string(key.instance.title)] = paper_review_schema.dump(value)
+        data['reviews'] = reviews
+        return data
+
+
+class PaperReviewQuestionSchema(mm.ModelSchema):
+    class Meta:
+        model = PaperReviewQuestion
+        fields = ('id', 'type', 'field_type', 'title', 'position', 'description', 'is_required', 'field_data')
+
+
+class PaperRatingSchema(mm.ModelSchema):
+    question = Nested(PaperReviewQuestionSchema)
+
+    class Meta:
+        model = PaperReviewRating
+        fields = ('id', 'value', 'question')
+
+    @post_dump(pass_many=True)
+    def sort_ratings(self, data, many, **kwargs):
+        if many:
+            data = sorted(data, key=lambda rating: rating['question']['position'])
+        return data
 
 
 class PaperReviewSchema(mm.ModelSchema):
@@ -92,16 +151,15 @@ class PaperReviewSchema(mm.ModelSchema):
     user = Nested(UserSchema)
     visibility = Nested(PaperCommentVisibilitySchema)
     proposed_action = Nested(PaperAction)
-    group = Function(lambda review: {'title': unicode(review.group.title)})
-    ratings = Function(lambda review: [{'value': rating.value} for rating in review.ratings])
+    ratings = Nested(PaperRatingSchema, many=True)
+    group = Nested(PaperReviewTypeSchema, attribute='group.instance')
     comment_html = Function(lambda review: escape(review.comment))
-    can_edit = Function(lambda review, ctx: review.can_edit(ctx.get('user')))
-    can_view = Function(lambda review, ctx: review.can_view(ctx.get('user')))
+    can_edit = Function(lambda review, ctx: review.can_edit(ctx.get('user'), check_state=True))
 
     class Meta:
         model = PaperReview
         fields = ('id', 'score', 'created_dt', 'user', 'comment', 'comment_html', 'modified_dt', 'visibility',
-                  'proposed_action', 'group', 'ratings', 'can_edit', 'can_view')
+                  'proposed_action', 'group', 'ratings', 'can_edit')
 
 
 class PaperReviewCommentSchema(mm.ModelSchema):
@@ -125,9 +183,8 @@ class PaperSchema(mm.Schema):
     revisions = List(Nested(PaperRevisionSchema))
     last_revision = Nested(PaperRevisionSchema)
     state = Nested(PaperRevisionStateSchema)
-    rating_range = List(Integer(), attribute='cfp.rating_range')
     can_judge = Function(lambda paper, ctx: paper.can_judge(ctx.get('user')))
-    can_comment = Function(lambda paper, ctx: paper.can_comment(ctx.get('user')))
+    can_comment = Function(lambda paper, ctx: paper.can_comment(ctx.get('user'), check_state=True))
     can_review = Function(lambda paper, ctx: paper.can_review(ctx.get('user')))
 
 
