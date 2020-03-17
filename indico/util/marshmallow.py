@@ -50,6 +50,14 @@ def not_empty(value):
         raise ValidationError(_('This field cannot be empty.'))
 
 
+def max_words(max):
+    def validate(text):
+        count = len(re.split(r'\s+', text, flags=re.UNICODE)) if text else 0
+        if count > max:
+            raise ValidationError(_('This field has more than {} words').format(max))
+    return validate
+
+
 def _naive_isoformat(dt, **unused):
     assert dt.tzinfo is None, 'expected naive datetime'
     return dt.isoformat()
