@@ -34,3 +34,4 @@ export {default as MathJax} from './MathJax';
 export {default as FileSubmission} from './FileSubmission';
 export {default as ClipboardButton} from './ClipboardButton';
 export {default as RequestConfirm} from './RequestConfirm';
+export {default as ReviewRating} from './ReviewRating';
