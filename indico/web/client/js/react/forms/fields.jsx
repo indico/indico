@@ -11,6 +11,8 @@ import PropTypes from 'prop-types';
 import {Button, Checkbox, Dropdown, Form, Input, Popup, Radio, TextArea} from 'semantic-ui-react';
 import {Field, useFormState} from 'react-final-form';
 import {OnChange} from 'react-final-form-listeners';
+
+import ReviewRating from '../components/ReviewRating';
 import formatters from './formatters';
 import parsers from './parsers';
 import validators from './validators';
@@ -203,6 +205,17 @@ DropdownAdapter.defaultProps = {
   isMultiple: false,
   width: null,
 };
+
+function RatingAdapter(props) {
+  return (
+    <FormFieldAdapter
+      {...props}
+      as={ReviewRating}
+      getValue={(__, {rating}) => rating}
+      undefinedValue={null}
+    />
+  );
+}
 
 /**
  * A wrapper for final-form's Field component that handles the markup
@@ -406,6 +419,21 @@ FinalDropdown.propTypes = {
 FinalDropdown.defaultProps = {
   label: null,
   multiple: false,
+};
+
+export function FinalRating({name, label, ...rest}) {
+  return (
+    <FinalField {...rest} name={name} label={label} adapter={RatingAdapter} format={identity} />
+  );
+}
+
+FinalRating.propTypes = {
+  name: PropTypes.string.isRequired,
+  label: PropTypes.string,
+};
+
+FinalRating.defaultProps = {
+  label: null,
 };
 
 /**
