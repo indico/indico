@@ -84,7 +84,7 @@ def render_event_footer(event, dark=False):
                            google_calendar_params=google_calendar_params)
 
 
-class WPReferenceTypes(WPAdmin):
+class WPEventAdmin(WPAdmin):
     template_prefix = 'events/'
 
 

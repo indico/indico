@@ -43,7 +43,7 @@
 
 {% macro event_list(events_by_month, format_event_date, is_recent, happening_now, category, future_event_count,
                     past_event_count, future_threshold, past_threshold, future_events_by_month=[],
-                    past_events_by_month=[], show_future_events=false, show_past_events=false) %}
+                    past_events_by_month=[], show_future_events=false, show_past_events=false, labels={}) %}
     <div class="event-list"
          data-show-future-events-url="{{ url_for('.show_future_events', category) }}"
          data-show-past-events-url="{{ url_for('.show_past_events', category) }}">
@@ -58,7 +58,7 @@
             {% endcall %}
         {% endif %}
         <div>
-            {{ event_list_block(events_by_month, format_event_date, is_recent, happening_now) }}
+            {{ event_list_block(events_by_month, format_event_date, is_recent, happening_now, labels=labels) }}
         </div>
         {% if past_event_count %}
             {% call _hidden_events_block('past-events', category, past_events_by_month, format_event_date, is_recent,
@@ -77,7 +77,7 @@
     </script>
 {% endmacro %}
 
-{% macro event_list_block(events_by_month, format_event_date, is_recent, happening_now) %}
+{% macro event_list_block(events_by_month, format_event_date, is_recent, happening_now, labels={}) %}
     {% for month in events_by_month %}
         <h4 class="{% if month.is_current %}current-month{% endif %}">
             <span>{{ month.name }}</span>
@@ -103,9 +103,19 @@
                                 {% endif %}
 
                                 {% if is_recent(event.created_dt) %}
-                                    <i class="icon-new new-label" title="{% trans %}This event is new.{% endtrans %}"></i>
+                                    <span class="ui label mini blue"
+                                          title="{% trans %}This event is new.{% endtrans %}">
+                                        {%- trans %}new{% endtrans -%}
+                                    </span>
                                 {% endif %}
                             </span>
+                            {% set label_data = labels.get(event.id) %}
+                            {% if label_data and label_data.label %}
+                                <span class="ui label basic mini {{ label_data.label.color }}"
+                                      title="{{ label_data.message }}">
+                                    {{- label_data.label.title -}}
+                                </span>
+                            {% endif %}
                         </div>
                     </span>
                 </li>

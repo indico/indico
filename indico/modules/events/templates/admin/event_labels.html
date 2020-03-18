@@ -1,0 +1,22 @@
+{% extends 'layout/admin_page.html' %}
+{% from 'events/admin/_event_label_list.html' import render_event_label_list %}
+
+{%- block content %}
+    <div class="i-box">
+        <div class="i-box-header">
+            <div class="i-box-title">{%- trans %}Existing event labels{% endtrans -%}</div>
+            <div class="i-box-buttons toolbar right">
+                <a href="#" class="i-button icon-plus"
+                   data-ajax-dialog
+                   data-href="{{ url_for('.create_event_label') }}"
+                   data-title="{% trans %}Create new event label{% endtrans %}"
+                   data-update="#event-labels">
+                    {%- trans %}Create new event label{% endtrans -%}
+                </a>
+            </div>
+        </div>
+        <div id="event-labels" class="i-box-table-widget">
+            {{ render_event_label_list(labels) }}
+        </div>
+    </div>
+{%- endblock %}

@@ -25,7 +25,10 @@
                 {{ render_manage_button(event, 'EVENT', show_button=show_button, toggle_notes=false) }}
             </div>
 
-            <h1>{{ event.get_verbose_title(show_series_pos=true) }}</h1>
+            <h1>
+                {{- event.get_verbose_title(show_series_pos=true) -}}
+                {{- event.get_label_markup() -}}
+            </h1>
             {% set chairpersons = event.person_links %}
             {% if chairpersons %}
                 <h2>

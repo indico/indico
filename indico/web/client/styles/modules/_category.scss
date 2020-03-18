@@ -320,13 +320,6 @@ ul.category-resource-qtip {
     line-height: 15px;
 }
 
-.new-label {
-    font-size: 2em;
-    vertical-align: middle;
-    color: $yellow;
-    margin-left: 0.2em;
-}
-
 
 #eventCreationForm {
     .form-group {
@@ -416,6 +409,10 @@ ul.category-resource-qtip {
             font-weight: normal;
             font-size: smaller;
             color: $dark-gray;
+        }
+
+        .ui.label {
+            text-transform: uppercase;
         }
     }
 }

@@ -15,6 +15,12 @@ from flask_multipass import InvalidCredentials, Multipass, NoSuchUser
 from indico.core.logger import Logger
 
 
+try:
+    from flask_multipass.providers.oauth import OAuthInvalidSessionState
+except ImportError:
+    OAuthInvalidSessionState = None
+
+
 logger = Logger.get('auth')
 
 
@@ -95,8 +101,10 @@ class IndicoMultipass(Multipass):
             logger.warning('Invalid credentials (ip=%s, provider=%s): %s',
                            request.remote_addr, exc.provider.name if exc.provider else None, exc)
         else:
-            logger.error('Authentication via %s failed: %s (%r)', exc.provider.name if exc.provider else None, exc,
-                         exc.details)
+            fn = logger.error
+            if OAuthInvalidSessionState is not None and isinstance(exc, OAuthInvalidSessionState):
+                fn = logger.debug
+            fn('Authentication via %s failed: %s (%r)', exc.provider.name if exc.provider else None, exc, exc.details)
         return super(IndicoMultipass, self).handle_auth_error(exc, redirect_to_login=redirect_to_login)
 
 
