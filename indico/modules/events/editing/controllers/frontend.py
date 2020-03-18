@@ -18,10 +18,8 @@ class RHEditingDashboard(RHEditingManagementBase):
     EVENT_FEATURE = None
 
     def _process(self):
-        if not self.event.has_feature('editing'):
-            return WPEditing.render_template('management/disabled.html', self.event)
-        else:
-            return WPEditing.render_template('management/editing.html', self.event)
+        template = 'editing.html' if self.event.has_feature('editing') else 'disabled.html'
+        return WPEditing.render_template('management/{}'.format(template), self.event)
 
 
 class RHEditableTimeline(RHContributionEditableBase):

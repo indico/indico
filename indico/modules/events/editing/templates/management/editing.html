@@ -17,34 +17,7 @@
                     </a>
                 </div>
             </div>
-            <div class="section">
-                <span class="icon icon-file" style="align-self: center;"></span>
-                <div class="text">
-                    <div class="label">
-                        {% trans %}File Types{% endtrans %}
-                    </div>
-                    {% trans %}Configure file types{% endtrans %}
-                </div>
-                <div class="toolbar">
-                    <a href="{{ url_for('.manage_file_types', event) }}" class="i-button icon-settings">
-                        {% trans %}Configure{% endtrans %}
-                    </a>
-                </div>
-            </div>
-            <div class="section">
-                <span class="icon icon-rulers" style="align-self: center;"></span>
-                <div class="text">
-                    <div class="label">
-                        {% trans %}Ready for review conditions{% endtrans %}
-                    </div>
-                    {% trans %}Configure conditions for reviewing{% endtrans %}
-                </div>
-                <div class="toolbar">
-                    <a href="{{ url_for('.manage_review_conditions', event) }}" class="i-button icon-settings">
-                        {% trans %}Configure{% endtrans %}
-                    </a>
-                </div>
-            </div>
         </div>
+        <div id="editable-type-list" data-event-id="{{ event.id }}"></div>
     </div>
 {% endblock %}
