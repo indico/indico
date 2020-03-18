@@ -98,11 +98,12 @@ class EditingRevisionCommentSchema(mm.ModelSchema):
 class EditingRevisionSchema(mm.ModelSchema):
     class Meta:
         model = EditingRevision
-        fields = ('id', 'created_dt', 'submitter', 'editor', 'files', 'comment', 'comment_html', 'comments',
-                  'initial_state', 'final_state', 'tags', 'create_comment_url', 'download_files_url', 'review_url',
-                  'confirm_url')
+        fields = ('id', 'created_dt', 'submitter', 'editor', 'files', 'initial_comment', 'initial_comment_html',
+                  'final_comment', 'final_comment_html', 'comments', 'initial_state', 'final_state', 'tags',
+                  'create_comment_url', 'download_files_url', 'review_url', 'confirm_url')
 
-    comment_html = fields.Function(lambda rev: escape(rev.comment))
+    initial_comment_html = fields.Function(lambda rev: escape(rev.initial_comment))
+    final_comment_html = fields.Function(lambda rev: escape(rev.final_comment))
     submitter = fields.Nested(UserSchema, only=('id', 'avatar_bg_color', 'full_name'))
     editor = fields.Nested(UserSchema, only=('id', 'avatar_bg_color', 'full_name'))
     files = fields.List(fields.Nested(EditingRevisionFileSchema))

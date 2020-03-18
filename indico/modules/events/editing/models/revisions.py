@@ -103,8 +103,14 @@ class EditingRevision(RenderModeMixin, db.Model):
         nullable=False,
         default=FinalRevisionState.none
     )
-    _comment = db.Column(
-        'comment',
+    _initial_comment = db.Column(
+        'initial_comment',
+        db.Text,
+        nullable=False,
+        default=''
+    )
+    _final_comment = db.Column(
+        'final_comment',
         db.Text,
         nullable=False,
         default=''
@@ -152,7 +158,8 @@ class EditingRevision(RenderModeMixin, db.Model):
     )
 
     #: A comment provided by whoever assigned the final state of the revision.
-    comment = RenderModeMixin.create_hybrid_property('_comment')
+    initial_comment = RenderModeMixin.create_hybrid_property('_initial_comment')
+    final_comment = RenderModeMixin.create_hybrid_property('_final_comment')
 
     # relationship backrefs:
     # - comments (EditingRevisionComment.revision)

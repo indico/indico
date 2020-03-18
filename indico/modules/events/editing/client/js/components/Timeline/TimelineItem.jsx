@@ -33,7 +33,8 @@ export default function TimelineItem({block}) {
   const {fileTypes} = useSelector(selectors.getStaticData);
   const isLastBlock = lastBlock.id === block.id;
   const [visible, setVisible] = useState(isLastBlock);
-  const headerOnly = !visible || (!isLastBlock && block.items.length === 0 && !block.comment);
+  const headerOnly =
+    !visible || (!isLastBlock && block.items.length === 0 && !block.initialComment);
 
   return (
     <>
@@ -84,12 +85,12 @@ export default function TimelineItem({block}) {
                   files={block.files}
                   downloadURL={block.downloadFilesURL}
                 />
-                {block.comment && (
+                {block.initialComment && (
                   <>
                     <div className="titled-rule">
                       <Translate>Comment</Translate>
                     </div>
-                    <div dangerouslySetInnerHTML={{__html: block.commentHtml}} />
+                    <div dangerouslySetInnerHTML={{__html: block.initialCommentHtml}} />
                   </>
                 )}
                 {/* TODO: Check whether the current user is submitter */}

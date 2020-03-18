@@ -41,6 +41,8 @@ export const blockPropTypes = {
   items: PropTypes.arrayOf(PropTypes.shape(blockItemPropTypes)).isRequired,
   initialState: PropTypes.shape(statePropTypes).isRequired,
   finalState: PropTypes.shape(statePropTypes).isRequired,
-  comment: PropTypes.string.isRequired,
-  commentHtml: PropTypes.string.isRequired,
+  initialComment: PropTypes.string.isRequired,
+  initialCommentHtml: PropTypes.string.isRequired,
+  finalComment: PropTypes.string,
+  finalCommentHtml: PropTypes.string,
 };

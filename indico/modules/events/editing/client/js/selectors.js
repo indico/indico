@@ -70,11 +70,10 @@ export function processRevisions(revisions) {
       } else {
         header = Translate.string('Revision has been accepted');
       }
-
       items.push(
         createNewCustomItemFromRevision(revision, {
           state: 'accepted',
-          html: revision.commentHtml,
+          html: revision.finalCommentHtml,
           header,
         })
       );
@@ -83,7 +82,7 @@ export function processRevisions(revisions) {
         createNewCustomItemFromRevision(revision, {
           header: Translate.string('Revision has been rejected'),
           state: 'rejected',
-          html: revision.commentHtml,
+          html: revision.initialCommentHtml,
         })
       );
     } else if (finalState.name === FinalRevisionState.needs_submitter_changes) {
@@ -98,7 +97,7 @@ export function processRevisions(revisions) {
         createNewCustomItemFromRevision(revision, {
           user: revisions[0].submitter,
           state: 'needs_submitter_changes',
-          html: revision.commentHtml,
+          html: revision.finalCommentHtml,
           header,
         })
       );
@@ -108,7 +107,7 @@ export function processRevisions(revisions) {
           user: revisions[0].submitter,
           header: Translate.string('Editor made some changes and awaits submitter confirmation'),
           state: 'needs_submitter_confirmation',
-          html: revision.commentHtml,
+          html: revision.initialCommentHtml,
         })
       );
     }
