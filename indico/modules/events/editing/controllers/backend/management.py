@@ -20,12 +20,13 @@ from indico.modules.events.editing.models.revision_files import EditingRevisionF
 from indico.modules.events.editing.models.tags import EditingTag
 from indico.modules.events.editing.operations import (create_new_file_type, create_new_tag, delete_file_type,
                                                       delete_tag, update_file_type, update_tag)
-from indico.modules.events.editing.schemas import (EditableFileTypeArgs, EditableTagArgs, EditingFileTypeSchema,
-                                                   EditingMenuItemSchema, EditingReviewConditionArgs, EditingTagSchema)
+from indico.modules.events.editing.schemas import (EditableFileTypeArgs, EditableTagArgs, EditableTypeArgs,
+                                                   EditingFileTypeSchema, EditingMenuItemSchema,
+                                                   EditingReviewConditionArgs, EditingTagSchema)
 from indico.modules.events.editing.settings import editing_settings
 from indico.util.i18n import _
 from indico.util.signals import named_objects_from_signal
-from indico.web.args import use_rh_args, use_rh_kwargs
+from indico.web.args import use_kwargs, use_rh_args, use_rh_kwargs
 
 
 class RHCreateTag(RHEditingManagementBase):
@@ -138,3 +139,14 @@ class RHMenuEntries(RHEditingManagementBase):
     def _process(self):
         menu_entries = named_objects_from_signal(signals.menu.items.send('event-editing-sidemenu', event=self.event))
         return EditingMenuItemSchema(many=True).jsonify(menu_entries.values())
+
+
+class RHEnabledEditableTypes(RHEditingManagementBase):
+    def _process_GET(self):
+        return jsonify(editing_settings.get(self.event, 'editable_types'))
+
+    @use_kwargs(EditableTypeArgs)
+    def _process_POST(self, editable_types):
+        editable_types_names = [t.name for t in editable_types]
+        editing_settings.set(self.event, 'editable_types', editable_types_names)
+        return '', 204

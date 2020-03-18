@@ -40,6 +40,8 @@ _bp.add_url_rule('/editing/api/tags', 'api_tags', common.RHEditingTags)
 _bp.add_url_rule('/editing/api/tags', 'api_create_tag', management.RHCreateTag, methods=('POST',))
 _bp.add_url_rule('/editing/api/tag/<int:tag_id>', 'api_edit_tag', management.RHEditTag, methods=('PATCH', 'DELETE'))
 _bp.add_url_rule('/editing/api/menu-entries', 'api_menu_entries', management.RHMenuEntries)
+_bp.add_url_rule('/editing/api/enabled-editable-types', 'api_enabled_editable_types', management.RHEnabledEditableTypes,
+                 methods=('GET', 'POST'))
 
 # Contribution/revision-level APIs
 _bp.add_url_rule('/api/contributions/<int:contrib_id>/editing/<any(paper):type>/upload', 'api_upload',

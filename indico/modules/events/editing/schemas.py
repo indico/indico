@@ -17,7 +17,7 @@ from sqlalchemy import func
 from indico.core.marshmallow import mm
 from indico.modules.events.contributions.schemas import ContributionSchema
 from indico.modules.events.editing.models.comments import EditingRevisionComment
-from indico.modules.events.editing.models.editable import Editable
+from indico.modules.events.editing.models.editable import Editable, EditableType
 from indico.modules.events.editing.models.file_types import EditingFileType
 from indico.modules.events.editing.models.revision_files import EditingRevisionFile
 from indico.modules.events.editing.models.revisions import EditingRevision, InitialRevisionState
@@ -252,3 +252,7 @@ class EditingMenuItemSchema(mm.Schema):
     title = fields.String(required=True)
     url = fields.String(required=True)
     icon = fields.String()
+
+
+class EditableTypeArgs(mm.Schema):
+    editable_types = fields.List(EnumField(EditableType), required=True)

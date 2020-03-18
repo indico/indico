@@ -17,6 +17,7 @@ from indico.util.struct.enum import IndicoEnum
 class EditableType(int, IndicoEnum):
     paper = 1
     slides = 2
+    poster = 3
 
 
 class Editable(db.Model):

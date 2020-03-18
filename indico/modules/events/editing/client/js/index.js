@@ -9,3 +9,4 @@ import './tags';
 import './fileTypes';
 import './reviewConditions';
 import './editing';
+import './editableTypesList';

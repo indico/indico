@@ -5,6 +5,8 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
+import {Translate} from 'indico/react/i18n';
+
 export const FinalRevisionState = {
   none: 'none',
   replaced: 'replaced',
@@ -26,3 +28,11 @@ export const EditingReviewAction = {
   update_accept: 'update_accept',
   requestUpdate: 'request_update',
 };
+
+export const EditableTypeTitles = {
+  paper: Translate.string('Paper'),
+  slides: Translate.string('Slides'),
+  poster: Translate.string('Poster'),
+};
+
+export const editableTypeOrder = ['paper', 'slides', 'poster'];
