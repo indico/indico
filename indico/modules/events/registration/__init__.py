@@ -17,6 +17,7 @@ from indico.modules.events import Event
 from indico.modules.events.features.base import EventFeature
 from indico.modules.events.layout.util import MenuEntryData
 from indico.modules.events.models.events import EventType
+from indico.modules.events.registration.logging import connect_log_signals
 from indico.modules.events.registration.settings import RegistrationSettingsProxy
 from indico.util.i18n import _, ngettext
 from indico.web.flask.templating import template_hook
@@ -25,6 +26,7 @@ from indico.web.menu import SideMenuItem
 
 
 logger = Logger.get('events.registration')
+connect_log_signals()
 
 registration_settings = RegistrationSettingsProxy('registrations', {
     # Whether to merge display forms on the participant list

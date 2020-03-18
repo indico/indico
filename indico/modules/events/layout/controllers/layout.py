@@ -17,12 +17,14 @@ from wtforms import fields as wtforms_fields
 from wtforms.validators import DataRequired
 
 from indico.core.db import db
+from indico.modules.events import EventLogKind, EventLogRealm
 from indico.modules.events.controllers.base import RHDisplayEventBase
 from indico.modules.events.layout import layout_settings, logger, theme_settings
 from indico.modules.events.layout.forms import (ConferenceLayoutForm, CSSForm, CSSSelectionForm,
                                                 LectureMeetingLayoutForm, LogoForm)
 from indico.modules.events.layout.util import get_css_file_data, get_css_url, get_logo_data
 from indico.modules.events.layout.views import WPLayoutEdit
+from indico.modules.events.logs.util import make_diff_log
 from indico.modules.events.management.controllers import RHManageEventBase
 from indico.modules.events.models.events import EventType
 from indico.modules.events.views import WPConferenceDisplay
@@ -74,11 +76,28 @@ class RHLayoutTimetableThemeForm(RHLayoutBase):
 
 
 class RHLayoutEdit(RHLayoutBase):
-    def _process(self):
+    def _process_request(self):
         if self.event.type_ == EventType.conference:
             return self._process_conference()
         else:
             return self._process_lecture_meeting()
+
+    def _process_GET(self):
+        return self._process_request()
+
+    def _process_POST(self):
+        old_values = layout_settings.get_all(self.event)
+        ret = self._process_request()
+        new_values = layout_settings.get_all(self.event)
+        # Skip `timetable_theme_settings` as they are dynamically generated from themes.yaml
+        changes = {k: (old_values[k], v) for k, v in new_values.iteritems()
+                   if old_values[k] != v and k != 'timetable_theme_settings'}
+        if changes:
+            form_cls = ConferenceLayoutForm if self.event.type_ == EventType.conference else LectureMeetingLayoutForm
+            form = form_cls(event=self.event)
+            self.event.log(EventLogRealm.participants, EventLogKind.change, 'Layout', summary='Layout was updated',
+                           user=session.user, data={'Changes': make_diff_log(changes, form.log_fields_metadata)})
+        return ret
 
     def _get_form_defaults(self):
         defaults = FormDefaults(**layout_settings.get_all(self.event))

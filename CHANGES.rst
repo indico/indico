@@ -55,6 +55,9 @@ Improvements
   registration status to the contribution list (:issue:`4318`)
 - Add warning when accepting a pre-booking in case there are
   concurrent bookings (:issue:`4129`)
+- Add event logging to opening/closing registration forms, approval/rejection of
+  registrations, and updates to event layout (:issue:`4360`,
+  thanks :user:`giusedb` & :user:`omegak`)
 
 Bugfixes
 ^^^^^^^^

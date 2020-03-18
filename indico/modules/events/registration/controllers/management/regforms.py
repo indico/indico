@@ -214,12 +214,20 @@ class RHRegistrationFormOpen(RHManageRegFormBase):
     """Opens registration for a registration form"""
 
     def _process(self):
+        old_dts = (self.regform.start_dt, self.regform.end_dt)
         if self.regform.has_ended:
             self.regform.end_dt = None
         else:
             self.regform.start_dt = now_utc()
         logger.info("Registrations for %s opened by %s", self.regform, session.user)
         flash(_("Registrations for {} are now open").format(self.regform.title), 'success')
+        new_dts = (self.regform.start_dt, self.regform.end_dt)
+        if new_dts != old_dts:
+            if not old_dts[1]:
+                log_text = 'Registration form "{}" was opened'.format(self.regform.title)
+            else:
+                log_text = 'Registration form "{}" was reopened'.format(self.regform.title)
+            self.event.log(EventLogRealm.event, EventLogKind.change, 'Registration', log_text, session.user)
         return redirect(url_for('.manage_regform', self.regform))
 
 
@@ -232,6 +240,8 @@ class RHRegistrationFormClose(RHManageRegFormBase):
             self.regform.start_dt = self.regform.end_dt
         flash(_("Registrations for {} are now closed").format(self.regform.title), 'success')
         logger.info("Registrations for %s closed by %s", self.regform, session.user)
+        log_text = 'Registration form "{}" was closed'.format(self.regform.title)
+        self.event.log(EventLogRealm.event, EventLogKind.change, 'Registration', log_text, session.user)
         return redirect(url_for('.manage_regform', self.regform))
 
 
