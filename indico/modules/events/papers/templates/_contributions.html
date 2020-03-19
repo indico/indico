@@ -75,6 +75,7 @@
                             <div id="editable-submission-button"
                                  data-event-id="{{ contribution.event_id }}"
                                  data-contribution-id="{{ contribution.id }}"
+                                 data-contribution-code="{{ contribution.code }}"
                                  data-type="paper"
                                  data-upload-url="{{ url_for('event_editing.api_upload', contribution, type='paper') }}"
                                  data-api-editable-submit-url="{{ url_for('event_editing.api_create_editable', contribution, type='paper') }}">

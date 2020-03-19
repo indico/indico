@@ -32,6 +32,7 @@ import {indicoAxios, handleAxiosError} from 'indico/utils/axios';
     const {
       eventId,
       contributionId,
+      contributionCode,
       apiEditableSubmitUrl,
       type,
       uploadUrl,
@@ -52,6 +53,7 @@ import {indicoAxios, handleAxiosError} from 'indico/utils/axios';
         submitRevisionURL={apiEditableSubmitUrl}
         eventId={eventId}
         contributionId={contributionId}
+        contributionCode={contributionCode}
       />,
       editableSubmissionButton
     );

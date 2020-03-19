@@ -16,7 +16,7 @@ import {
   FinalSubmitButton,
   unsortedArraysEqual,
 } from 'indico/react/forms';
-import {Translate} from 'indico/react/i18n';
+import {Param, Translate} from 'indico/react/i18n';
 import ExtensionList from './ExtensionList';
 
 export default function FileTypeModal({onClose, onSubmit, fileType, header}) {
@@ -67,9 +67,15 @@ export default function FileTypeModal({onClose, onSubmit, fileType, header}) {
               <FinalInput
                 name="filename_template"
                 label={Translate.string('Filename template')}
-                description={Translate.string(
-                  'Glob-style filename template that all files of this type have to conform to (e.g. *_paper). No dots allowed.'
-                )}
+                description={
+                  <Translate>
+                    Glob-style filename template that all files of this type have to conform to
+                    (e.g. <Param name="example" value="*_paper" wrapper={<code />} />
+                    ). No dots allowed. It is possible to use{' '}
+                    <Param name="placeholder" value="{code}" wrapper={<code />} /> as a placeholder
+                    for the contribution programme code.
+                  </Translate>
+                }
                 pattern="^[^.]*$"
                 nullIfEmpty
               />

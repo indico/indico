@@ -19,8 +19,9 @@ from indico.util.marshmallow import FilesField, ModelField, ModelList
 
 
 class EditingFilesField(Dict):
-    def __init__(self, event, allow_claimed_files=False, **kwargs):
+    def __init__(self, event, contrib, allow_claimed_files=False, **kwargs):
         self.event = event
+        self.contrib = contrib
         keys_field = ModelField(EditingFileType, get_query=lambda m: m.query.with_parent(event))
         values_field = FilesField(required=True, allow_claimed=allow_claimed_files)
         validators = kwargs.pop('validate', []) + [self.validate_files]
@@ -53,7 +54,8 @@ class EditingFilesField(Dict):
             # ensure all filenames conform to the template
             if file_type.filename_template:
                 filenames = {os.path.splitext(f.filename)[0] for f in files}
-                if not all(fnmatch.fnmatch(filename, file_type.filename_template) for filename in filenames):
+                filename_template = file_type.filename_template.replace('{code}', self.contrib.code)
+                if not all(fnmatch.fnmatch(filename, filename_template) for filename in filenames):
                     raise ValidationError("Some files don't conform to the filename template '{}'"
                                           .format(file_type.filename_template))
 

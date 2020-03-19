@@ -18,14 +18,18 @@ import {Translate} from 'indico/react/i18n';
 import {FinalFileManager} from './FileManager';
 import {fileTypePropTypes} from './FileManager/util';
 
+import {getFileTypes} from '../selectors';
+
 export default function EditableSubmissionButton({
   eventId,
   contributionId,
+  contributionCode,
   uploadURL,
   fileTypes,
   type,
   submitRevisionURL,
 }) {
+  fileTypes = getFileTypes({staticData: {fileTypes, contributionCode}});
   const [open, setOpen] = useState(false);
 
   const submitRevision = async formData => {
@@ -85,4 +89,5 @@ EditableSubmissionButton.propTypes = {
   fileTypes: PropTypes.arrayOf(PropTypes.shape(fileTypePropTypes)).isRequired,
   eventId: PropTypes.string.isRequired,
   contributionId: PropTypes.string.isRequired,
+  contributionCode: PropTypes.string.isRequired,
 };

@@ -22,7 +22,8 @@ import {createRevision} from '../../actions';
 import {getFilesFromRevision} from '../FileManager/util';
 
 export default function SubmitRevision() {
-  const {eventId, contributionId, fileTypes, editableType} = useSelector(selectors.getStaticData);
+  const {eventId, contributionId, editableType} = useSelector(selectors.getStaticData);
+  const fileTypes = useSelector(selectors.getFileTypes);
   const lastRevision = useSelector(selectors.getLastRevision);
   const dispatch = useDispatch();
   const currentUser = {fullName: Indico.User.full_name, avatarBgColor: Indico.User.avatar_bg_color};
