@@ -1,5 +1,6 @@
 {% extends 'layout/admin_page.html' %}
 {% from 'forms/_form.html' import form_header, form_rows, form_footer, simple_form %}
+{% from 'users/_labels.html' import labels %}
 
 {% block title %}{% trans %}Users{% endtrans %}{% endblock %}
 
@@ -27,7 +28,10 @@
                 </div>
                 <div class="i-box-buttons toolbar right">
                     <div class="group">
-                        <a class="i-button icon-users" href="{{ url_for('.users_merge') }}">{% trans %}Merge users{% endtrans %}</a>
+                        <a class="i-button icon-users"
+                           href="{{ url_for('.users_merge') }}">
+                            {% trans %}Merge users{% endtrans %}
+                        </a>
                     </div>
                     <div class="group">
                         <a href="#"
@@ -50,7 +54,11 @@
             </div>
             <div class="i-box-content">
                 <div class="info-message-box">
-                    <div class="message-text">{% trans num_of_users=num_of_users %}There are {{ num_of_users }} users, {{ num_deleted_users }} of which are deleted{% endtrans %}</div>
+                    <div class="message-text">
+                        {%- trans num_of_users=num_of_users -%}
+                            There are {{ num_of_users }} users, {{ num_deleted_users }} of which are deleted
+                        {%- endtrans -%}
+                    </div>
                 </div>
                 <h2>{% trans %}Search users{% endtrans %}</h2>
                 {{ form_header(form) }}
@@ -79,11 +87,14 @@
                                             {{ user_entry.full_name }}
                                         {%- endif -%}
                                     </span>
+                                    {% if user_entry.user %}
+                                        {{ labels(user_entry.user) }}
+                                    {% endif %}
                                     <span class="right">
                                         {% if user_entry.user and user_entry.user.is_system %}
-                                            <em title="{% trans %}This is the system user.{% endtrans %}">
+                                            <span class="ui tiny label">
                                                 {%- trans %}System{% endtrans -%}
-                                            </em>
+                                            </span>
                                         {% else %}
                                             {{ user_entry.email }}
                                         {% endif %}

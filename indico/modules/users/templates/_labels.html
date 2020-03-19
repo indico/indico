@@ -1,0 +1,17 @@
+{% macro labels(user) %}
+    {% if user.is_admin %}
+        <span class="ui blue label">
+            {%- trans %}Admin{% endtrans -%}
+        </span>
+    {% endif %}
+    {% if user.is_blocked %}
+        <span class="ui orange label">
+            {%- trans %}Blocked{% endtrans -%}
+        </span>
+    {% endif %}
+    {% if user.is_deleted %}
+        <span class="ui red label">
+            {%- trans %}Deleted{% endtrans -%}
+        </span>
+    {% endif %}
+{% endmacro %}

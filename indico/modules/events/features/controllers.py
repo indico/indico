@@ -37,8 +37,7 @@ class RHFeatures(RHFeaturesBase):
         for name, feature in sorted(get_feature_definitions().iteritems(), key=lambda x: x[1].friendly_name):
             if name in disallowed:
                 continue
-            field = BooleanField(feature.friendly_name, widget=SwitchWidget(),
-                                 description=feature.description)
+            field = BooleanField(feature.friendly_name, widget=SwitchWidget(), description=feature.description)
             setattr(form_class, name, field)
         defaults = {name: True for name in get_enabled_features(self.event)}
         return form_class(csrf_enabled=False, obj=FormDefaults(defaults))

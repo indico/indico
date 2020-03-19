@@ -639,3 +639,17 @@ class RHUserSearchInfo(RHProtected):
     def _process(self):
         external_users_available = any(auth.supports_search for auth in multipass.identity_providers.itervalues())
         return jsonify(external_users_available=external_users_available)
+
+
+class RHUserBlock(RHUserBase):
+    def _process_PUT(self):
+        self.user.is_blocked = True
+        logger.info("User %s blocked %s", session.user, self.user)
+        flash(_('{name} has been blocked.').format(name=self.user.name), 'success')
+        return jsonify(flash=False)
+
+    def _process_DELETE(self):
+        self.user.is_blocked = False
+        logger.info("User %s unblocked %s", session.user, self.user)
+        flash(_('{name} has been unblocked.').format(name=self.user.name), 'success')
+        return jsonify(flash=False)

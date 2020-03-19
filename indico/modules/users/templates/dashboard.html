@@ -1,5 +1,6 @@
 {% extends 'layout/management_page.html' %}
 {% from 'users/_category.html' import suggested_category, user_category %}
+{% from 'users/_labels.html' import labels %}
 
 {% macro _format_event_times(event) %}
     {% if event.start_dt.astimezone(session.tzinfo).date() != event.end_dt.astimezone(session.tzinfo).date() %}
@@ -42,11 +43,15 @@
                     </div>
                     <div class="your-details-wrapper">
                         <h3>{{ user.full_name }}</h3>
-                        {% if config.DEBUG %}
-                            <div>
-                                <i class="icon-info" title="{% trans %}User ID{% endtrans %}"></i><span>{{ user.id }}</span>
-                            </div>
-                        {% endif %}
+                        <div class="your-labels">
+                            {% if config.DEBUG %}
+                                <div class="ui label">
+                                  ID
+                                  <div class="detail">{{ user.id }}</div>
+                                </div>
+                            {% endif %}
+                            {{ labels(user) }}
+                        </div>
                         {% if user.affiliation %}
                             <div>
                                 <i class="icon-users"></i><span>{{ user.affiliation }}</span>

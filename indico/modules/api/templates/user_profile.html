@@ -12,14 +12,21 @@
                 {% if key and can_modify %}
                     <div class="i-box-buttons toolbar">
                         <div class="group">
-                            <button type="button" class="ui orange button" data-href="{{ url_for('.key_create') }}" data-method="post"
+                            <button type="button"
+                                    class="ui orange button"
+                                    data-href="{{ url_for('.key_create') }}"
+                                    data-method="post"
                                     data-params='{"force": "1"}'
                                     data-title="{% trans %}Create new API key{% endtrans %}"
-                                    data-confirm="{% trans %}Do you really want to create a new API key? Your old key will stop working immediately!{% endtrans %}">
+                                    data-confirm="{% trans %}Do you really want to create a new API key?
+                                    Your old key will stop working immediately!{% endtrans %}">
                                 <i aria-hidden="true" class="icon plus"></i>
                                 {%- trans %}Create new API key{% endtrans -%}
                             </button>
-                            <button type="button" class="ui negative button" data-href="{{ url_for('.key_delete') }}" data-method="post"
+                            <button type="button"
+                                    class="ui negative button"
+                                    data-href="{{ url_for('.key_delete') }}"
+                                    data-method="post"
                                     data-title="{% trans %}Delete API key{% endtrans %}"
                                     data-confirm="{% trans %}Do you really want to delete your API key?{% endtrans %}">
                                 <i aria-hidden="true" class="icon trash alternate"></i>
@@ -38,7 +45,10 @@
                         {%- endtrans -%}
                     </p>
 
-                    <button type="button" class="ui primary button" data-href="{{ url_for('.key_create') }}" data-method="post">
+                    <button type="button"
+                            class="ui primary button"
+                            data-href="{{ url_for('.key_create') }}"
+                            data-method="post">
                         {%- trans %}Create API key{% endtrans -%}
                     </button>
                 {% else %}
@@ -47,7 +57,10 @@
                         <dd>
                             {{ key.token }}
                             {% if key.is_blocked %}
-                                <i class="icon-warning warningText" title="{% trans %}Your API key has been blocked. Please contact an administrator for further details.{% endtrans %}"></i>
+                                <i class="icon-warning warningText"
+                                   title="{% trans %}Your API key has been blocked.
+                                   Please contact an administrator for further details.{% endtrans %}">
+                                </i>
                             {% endif %}
                         </dd>
                         {% if use_signatures %}
@@ -71,9 +84,13 @@
                             <dd>
                                 {{ key.last_used_uri }}
                                 {% if key.last_used_auth %}
-                                    <i class="icon-shield" title="{% trans %}Last request could access private data.{% endtrans %}"></i>
+                                    <i class="icon-shield"
+                                       title="{% trans %}Last request could access private data.{% endtrans %}">
+                                    </i>
                                 {% else %}
-                                    <i class="icon-earth" title="{% trans %}Last request could only access public data.{% endtrans %}"></i>
+                                    <i class="icon-earth"
+                                       title="{% trans %}Last request could only access public data.{% endtrans %}">
+                                    </i>
                                 {% endif %}
                             </dd>
                         {% endif %}
@@ -104,7 +121,8 @@
                                 class="ui warning button"
                                 data-href="{{ url_for('core.reset_signature_tokens') }}"
                                 data-method="POST"
-                                data-confirm="{% trans %}Are you sure you'd like to invalidate all your token-based links?{% endtrans %}">
+                                data-confirm="{% trans %}Are you sure you'd like to invalidate all your
+                                token-based links?{% endtrans %}">
                             <i aria-hidden="true" class="icon trash alternate"></i>
                             {%- trans %}Invalidate all links{% endtrans -%}
                         </button>
@@ -131,12 +149,16 @@
                         <div class="i-box-buttons toolbar">
                             <div class="group">
                                 {% if key.is_blocked %}
-                                    <button type="button" class="ui positive button" data-href="{{ url_for('.key_block') }}"
+                                    <button type="button"
+                                            class="ui positive button"
+                                            data-href="{{ url_for('.key_block') }}"
                                             data-method="post">
                                         {%- trans %}Unblock API key{% endtrans -%}
                                     </button>
                                 {% else %}
-                                    <button type="button" class="ui negative button" data-href="{{ url_for('.key_block') }}"
+                                    <button type="button"
+                                            class="ui negative button"
+                                            data-href="{{ url_for('.key_block') }}"
                                             data-method="post">
                                         <i aria-hidden="true" class="icon ban"></i>
                                         {%- trans %}Block API key{% endtrans -%}

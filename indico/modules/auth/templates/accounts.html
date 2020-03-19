@@ -70,7 +70,7 @@
                                                 </span>
                                             </span>
                                         </span>
-                                        <button class="ui negative button"
+                                        <button class="ui negative small button"
                                             data-href="{{ url_for('.remove_account', identity) }}"
                                             data-method="post"
                                             data-title="{% trans %}Remove account{% endtrans %}"
@@ -122,12 +122,12 @@
                                         </span>
                                     </span>
                                     {% if identity.id == session.login_identity %}
-                                        <button class="ui primary button" disabled
+                                        <button class="ui primary small button" disabled
                                             title="{% trans %}The account used to log in cannot be unlinked{% endtrans %}">
                                             {% trans %}Unlink{% endtrans %}
                                         </button>
                                     {% else %}
-                                        <button class="ui primary button right"
+                                        <button class="ui primary small button right"
                                             data-href="{{ url_for('.remove_account', identity) }}"
                                             data-method="post"
                                             data-title="{% trans %}Unlink account{% endtrans %}"

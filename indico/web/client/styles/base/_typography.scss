@@ -13,6 +13,10 @@
     font-family: "Roboto", sans-serif;
 }
 
+%font-family-sui {
+    font-family: "Muli", "Helvetica Neue", Arial, Helvetica, sans-serif;
+}
+
 %font-family-title {
     font-family: "Roboto", sans-serif;
 }
@@ -62,35 +66,36 @@ body {
     background: #fff;
     padding: 0px;
     margin: 0px;
-}
-
-body > :not(.rb-app-container) {
     @extend %font-family-body;
     @extend %font-size-body;
+}
+
+.ui {
+    @extend %font-family-sui;
 }
 
 h1, h2, h3, h4, h5, h6, td, dl, ol, blockquote {
     color: $black;
 }
 
-body > :not(.rb-app-container) h1 {
+body > h1 {
     @extend %font-family-title;
     font-size: 1.7em;
 }
 
-body > :not(.rb-app-container) h1.category-title {
+body > h1.category-title {
     font-size: 2em;
 }
 
-body > :not(.rb-app-container) h2, h3, h4 {
+body > h2, h3, h4 {
     @extend %font-family-title-light;
 }
 
-body > :not(.rb-app-container) h2 {
+body > h2 {
     font-size: 1.6em;
 }
 
-body > :not(.rb-app-container) h3 {
+body > h3 {
     font-size: 1.2em;
 }
 
