@@ -8,8 +8,8 @@
 import _ from 'lodash';
 import React from 'react';
 import PropTypes from 'prop-types';
-import {Checkbox, Dropdown, Form, Input, Popup, Radio, TextArea} from 'semantic-ui-react';
-import {Field, FormSpy} from 'react-final-form';
+import {Button, Checkbox, Dropdown, Form, Input, Popup, Radio, TextArea} from 'semantic-ui-react';
+import {Field, useFormState} from 'react-final-form';
 import {OnChange} from 'react-final-form-listeners';
 import formatters from './formatters';
 import parsers from './parsers';
@@ -421,25 +421,29 @@ export function FinalSubmitButton({
   circular,
   size,
   icon,
+  children,
 }) {
+  const {hasValidationErrors, pristine, submitting} = useFormState({
+    subscription: {hasValidationErrors: true, pristine: true, submitting: true},
+  });
+  const disabled = hasValidationErrors || (disabledUntilChange && pristine) || submitting;
   return (
-    <FormSpy subscription={{hasValidationErrors: true, pristine: true, submitting: true}}>
-      {({hasValidationErrors, pristine, submitting}) => (
-        <Form.Button
-          type="submit"
-          form={form}
-          disabled={hasValidationErrors || (disabledUntilChange && pristine) || submitting}
-          loading={submitting && activeSubmitButton}
-          primary={color === null}
-          content={label}
-          color={color}
-          onClick={onClick}
-          circular={circular}
-          size={size}
-          icon={icon}
-        />
-      )}
-    </FormSpy>
+    <Form.Field disabled={disabled}>
+      <Button
+        type="submit"
+        form={form}
+        disabled={disabled}
+        loading={submitting && activeSubmitButton}
+        primary={color === null}
+        content={label}
+        color={color}
+        onClick={onClick}
+        circular={circular}
+        size={size}
+        icon={icon}
+      />
+      {children && children(disabled)}
+    </Form.Field>
   );
 }
 
@@ -453,6 +457,7 @@ FinalSubmitButton.propTypes = {
   circular: PropTypes.bool,
   icon: PropTypes.string,
   size: PropTypes.string,
+  children: PropTypes.func,
 };
 
 FinalSubmitButton.defaultProps = {
@@ -465,4 +470,5 @@ FinalSubmitButton.defaultProps = {
   circular: false,
   icon: null,
   size: null,
+  children: null,
 };
