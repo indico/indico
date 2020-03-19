@@ -34,7 +34,7 @@ class EditingRevisionComment(RenderModeMixin, db.Model):
         primary_key=True
     )
     revision_id = db.Column(
-        db.ForeignKey('event_editing.revisions.id'),
+        db.ForeignKey('event_editing.revisions.id', ondelete='CASCADE'),
         index=True,
         nullable=False
     )
@@ -94,6 +94,7 @@ class EditingRevisionComment(RenderModeMixin, db.Model):
                          '~EditingRevisionComment.is_deleted'),
             order_by=created_dt,
             cascade='all, delete-orphan',
+            passive_deletes=True,
             lazy=True,
         )
     )
