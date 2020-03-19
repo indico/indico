@@ -42,10 +42,12 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 
   const contributionId = parseInt(timelineElement.dataset.contributionId, 10);
+  const contributionCode = timelineElement.dataset.contributionCode;
   const editableType = timelineElement.dataset.editableType;
   const store = storeFactory({
     eventId,
     contributionId,
+    contributionCode,
     editableType,
     fileTypes,
     tags,

@@ -99,7 +99,7 @@ class RHCreateEditable(RHContributionEditableBase):
             raise UserValueError(_('Editable already exists'))
 
         args = parser.parse({
-            'files': EditingFilesField(self.event, required=True)
+            'files': EditingFilesField(self.event, self.contrib, required=True)
         })
 
         create_new_editable(self.contrib, self.editable_type, session.user, args['files'])
@@ -116,7 +116,7 @@ class RHReviewEditable(RHContributionEditableRevisionBase):
     def _process(self, action, comment):
         argmap = {'tags': EditingTagsField(self.event, missing=set())}
         if action == EditingReviewAction.update:
-            argmap['files'] = EditingFilesField(self.event, allow_claimed_files=True, required=True)
+            argmap['files'] = EditingFilesField(self.event, self.contrib, allow_claimed_files=True, required=True)
         args = parser.parse(argmap)
         review_editable_revision(self.revision, session.user, action, comment, args['tags'], args.get('files'))
         return '', 204
@@ -148,7 +148,7 @@ class RHReplaceRevision(RHContributionEditableRevisionBase):
     })
     def _process(self, comment):
         args = parser.parse({
-            'files': EditingFilesField(self.event, allow_claimed_files=True, required=True)
+            'files': EditingFilesField(self.event, self.contrib, allow_claimed_files=True, required=True)
         })
 
         replace_revision(self.revision, session.user, comment, args['files'])
@@ -163,7 +163,7 @@ class RHCreateSubmitterRevision(RHContributionEditableRevisionBase):
 
     def _process(self):
         args = parser.parse({
-            'files': EditingFilesField(self.event, allow_claimed_files=True, required=True)
+            'files': EditingFilesField(self.event, self.contrib, allow_claimed_files=True, required=True)
         })
 
         create_submitter_revision(self.revision, session.user, args['files'])

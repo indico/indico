@@ -27,10 +27,10 @@ import FinalTagInput from './TagInput';
 import './JudgmentBox.module.scss';
 
 export default function UpdateFilesForm({setLoading}) {
-  const {fileTypes} = useSelector(selectors.getStaticData);
   const lastRevision = useSelector(selectors.getLastRevision);
   const staticData = useSelector(selectors.getStaticData);
   const {eventId, contributionId, editableType} = staticData;
+  const fileTypes = useSelector(selectors.getFileTypes);
   const dispatch = useDispatch();
   const files = getFilesFromRevision(fileTypes, lastRevision);
 

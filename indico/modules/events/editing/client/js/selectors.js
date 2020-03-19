@@ -173,6 +173,21 @@ export const needsSubmitterConfirmation = createSelector(
 );
 export const getStaticData = state => state.staticData;
 
+export const getFileTypes = createSelector(
+  getStaticData,
+  staticData => {
+    return staticData.fileTypes.map(fileType => {
+      if (!fileType.filenameTemplate) {
+        return fileType;
+      }
+      return {
+        ...fileType,
+        filenameTemplate: fileType.filenameTemplate.replace('{code}', staticData.contributionCode),
+      };
+    });
+  }
+);
+
 export const getLastRevertableRevisionId = createSelector(
   getDetails,
   details => {
