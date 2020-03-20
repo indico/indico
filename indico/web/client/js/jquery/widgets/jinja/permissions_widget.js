@@ -219,7 +219,7 @@ import Palette from 'indico/utils/palette';
         const isEmpty = !$dropdown.children().not('.default').length;
         $('.entry-role-dropdown .separator').toggleClass('hidden', isEmpty);
       } else if (!$dropdown.children().length) {
-        $dropdownLink.addClass('disabled').attr('title', $T.gettext('All IP Networks were added'));
+        $dropdownLink.addClass('disabled').attr('title', $T.gettext('All options have been added'));
       } else {
         $dropdownLink.removeClass('disabled');
       }
