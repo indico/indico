@@ -111,7 +111,7 @@ def principal_from_fossil(fossil, allow_pending=False, allow_groups=True, allow_
 
 
 def principal_from_identifier(identifier, allow_groups=False, allow_external_users=False, allow_event_roles=False,
-                              allow_category_roles=True, event_id=None, soft_fail=False):
+                              allow_category_roles=False, event_id=None, soft_fail=False):
     # XXX: this is currently only used in PrincipalList
     # if we ever need to support more than just users, groups, event roles and category roles
     # make sure to add it in here as well

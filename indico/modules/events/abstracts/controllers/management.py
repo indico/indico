@@ -164,7 +164,7 @@ class RHManageReviewingRoles(RHManageAbstractsBase):
             global_roles = role_data.pop('global')
             for identifier, permissions in global_roles:
                 principal = principal_from_identifier(identifier, allow_groups=True, allow_event_roles=True,
-                                                      event_id=self.event.id)
+                                                      allow_category_roles=True, event_id=self.event.id)
                 if 'convene' in permissions:
                     global_conveners.append(principal)
                 if 'review' in permissions:
@@ -179,7 +179,7 @@ class RHManageReviewingRoles(RHManageAbstractsBase):
                 acl_entries = {}
                 for identifier, permissions in track_roles:
                     principal = principal_from_identifier(identifier, allow_groups=True, allow_event_roles=True,
-                                                          event_id=self.event.id)
+                                                          allow_category_roles=True, event_id=self.event.id)
                     acl_entries[principal] = set(permissions)
                     if 'convene' in permissions:
                         track_conveners.append(principal)

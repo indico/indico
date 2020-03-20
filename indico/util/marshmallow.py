@@ -197,11 +197,12 @@ class Principal(Field):
 class PrincipalList(Field):
     """Marshmallow field for a list of principals."""
 
-    def __init__(self, allow_groups=False, allow_external_users=False, allow_event_roles=False, event_id=None,
-                 **kwargs):
+    def __init__(self, allow_groups=False, allow_external_users=False, allow_event_roles=False,
+                 allow_category_roles=False, event_id=None, **kwargs):
         self.allow_groups = allow_groups
         self.allow_external_users = allow_external_users
         self.allow_event_roles = allow_event_roles
+        self.allow_category_roles = allow_category_roles
         self.event_id = event_id
         if allow_event_roles and event_id is None:
             raise ValueError('event_id is required to use event roles')
@@ -216,6 +217,7 @@ class PrincipalList(Field):
                                                  allow_groups=self.allow_groups,
                                                  allow_external_users=self.allow_external_users,
                                                  allow_event_roles=self.allow_event_roles,
+                                                 allow_category_roles=self.allow_category_roles,
                                                  event_id=self.event_id)
                        for identifier in value)
         except ValueError as exc:
@@ -231,6 +233,7 @@ class PrincipalDict(PrincipalList):
                                                           allow_groups=self.allow_groups,
                                                           allow_external_users=self.allow_external_users,
                                                           allow_event_roles=self.allow_event_roles,
+                                                          allow_category_roles=self.allow_category_roles,
                                                           event_id=self.event_id,
                                                           soft_fail=True)
                     for identifier in value}

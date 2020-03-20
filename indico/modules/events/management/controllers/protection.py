@@ -113,6 +113,6 @@ class RHEventPrincipals(PrincipalsMixin, RHManageEventBase):
         RHManageEventBase._process_args(self)
         args = parser.parse({
             'values': PrincipalDict(allow_groups=True, allow_external_users=True, allow_event_roles=True,
-                                    event_id=self.event.id, missing={})
+                                    allow_category_roles=True, event_id=self.event.id, missing={})
         })
         self.values = args['values']
