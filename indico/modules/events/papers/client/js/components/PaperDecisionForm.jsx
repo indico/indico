@@ -15,47 +15,53 @@ import {FinalDropdown, FinalSubmitButton, FinalTextArea} from 'indico/react/form
 import {Translate} from 'indico/react/i18n';
 
 import {judgePaper} from '../actions';
+import {PaperState} from '../models';
 import {canJudgePaper, getCurrentUser, getPaperDetails, isEventLocked} from '../selectors';
 
 import './PaperDecisionForm.module.scss';
-
-const actionOptions = [
-  {
-    value: 'accept',
-    text: Translate.string('Accept'),
-  },
-  {
-    value: 'reject',
-    text: Translate.string('Reject'),
-  },
-  {
-    value: 'to_be_corrected',
-    text: Translate.string('To be corrected'),
-  },
-];
 
 export default function PaperDecisionForm() {
   const dispatch = useDispatch();
   const {
     event: {id: eventId},
     contribution: {id: contributionId},
+    state,
   } = useSelector(getPaperDetails);
   const isLocked = useSelector(isEventLocked);
   const currentUser = useSelector(getCurrentUser);
   const canJudge = useSelector(canJudgePaper);
 
   const submitPaperJudgment = useCallback(
-    async formData => {
+    async (formData, form) => {
       const rv = await dispatch(judgePaper(eventId, contributionId, formData));
       if (rv.error) {
         return rv.error;
       }
+      setTimeout(() => form.reset(), 0);
     },
     [dispatch, eventId, contributionId]
   );
 
   if (isLocked || !canJudge) {
     return null;
+  }
+
+  const actionOptions = {
+    [PaperState.accepted]: {
+      value: 'accept',
+      text: Translate.string('Accept'),
+    },
+    [PaperState.rejected]: {
+      value: 'reject',
+      text: Translate.string('Reject'),
+    },
+  };
+
+  if (state.name === PaperState.submitted) {
+    actionOptions[PaperState.to_be_corrected] = {
+      value: 'to_be_corrected',
+      text: Translate.string('To be corrected'),
+    };
   }
 
   return (
@@ -74,7 +80,12 @@ export default function PaperDecisionForm() {
           >
             {fprops => (
               <Form onSubmit={fprops.handleSubmit}>
-                <FinalDropdown name="action" options={actionOptions} selection required />
+                <FinalDropdown
+                  name="action"
+                  options={Object.values(actionOptions)}
+                  selection
+                  required
+                />
                 <FinalTextArea
                   name="comment"
                   placeholder={Translate.string('Leave a comment for the submitter...')}

@@ -59,16 +59,12 @@ export default function TimelineItem({block}) {
                 </a>
               )}
             </div>
-            <Transition animation="slide down" duration={500} visible={visible || isLastRevision}>
+            <Transition animation="slide down" duration={50} visible={visible || isLastRevision}>
               <div className="i-box-content submission-info">
                 <ul className="file-list">
                   {_.sortBy(files, 'filename').map(file => (
                     <li className="truncate-text" key={file.id}>
-                      <a
-                        href={file.downloadURL}
-                        className={`attachment ${file.icon}`}
-                        title={file.filename}
-                      >
+                      <a href={file.downloadURL} className={`attachment ${file.icon}`}>
                         {' '}
                         <span className="title">{file.filename}</span>
                       </a>
@@ -80,9 +76,9 @@ export default function TimelineItem({block}) {
           </div>
         </div>
       </div>
-      <Transition animation="slide down" duration={500} visible={visible || isLastRevision}>
-        <div className="i-timeline">
-          {(timeline.length > 0 || canReview || canComment) && (
+      <Transition animation="slide down" duration={50} visible={visible || isLastRevision}>
+        <div className="i-timeline" style={{zIndex: isLastRevision ? 1 : 0}}>
+          {(timeline.length > 0 || (!paper.isInFinalState && canReview) || canComment) && (
             <div className="i-timeline with-line">
               <div className="i-timeline-connect-up" />
               <RevisionTimeline revision={block} />

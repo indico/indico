@@ -5,23 +5,58 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-import React from 'react';
+import React, {useState} from 'react';
 import PropTypes from 'prop-types';
 import moment from 'moment';
-import {useSelector} from 'react-redux';
+import {useDispatch, useSelector} from 'react-redux';
+import {Popup, Transition} from 'semantic-ui-react';
 
 import UserAvatar from 'indico/modules/events/reviewing/components/UserAvatar';
+import {ReviewRating} from 'indico/react/components';
 import {Param, Translate} from 'indico/react/i18n';
 import {serializeDate} from 'indico/utils/date';
+
+import GroupReviewForm from './GroupReviewForm';
+import {updateReview as updateReviewAction} from '../actions';
 import {getPaperDetails} from '../selectors';
 
-export default function RevisionReview({review}) {
+export default function RevisionReview({review, revision}) {
+  const [isEditing, setIsEditing] = useState(false);
+  const [showRatings, setShowRatings] = useState(false);
+  const dispatch = useDispatch();
   const {
-    ratingRange: [, maxScore],
+    contribution: {id: contributionId},
+    event: {
+      id: eventId,
+      cfp: {
+        ratingRange: [minScore, maxScore],
+      },
+    },
   } = useSelector(getPaperDetails);
   const wrapper = (
     <span className={`bold underline semantic-text ${review.proposedAction.cssClass}`} />
   );
+  const renderQuestionAnswer = rating => {
+    if (rating.question.fieldType === 'bool') {
+      if (rating.value !== null) {
+        return rating.value ? Translate.string('Yes') : Translate.string('No');
+      }
+      return null;
+    } else if (rating.question.fieldType === 'rating') {
+      return <ReviewRating min={minScore} max={maxScore} value={rating.value} disabled />;
+    } else {
+      return rating.value;
+    }
+  };
+  const updateReview = async formData => {
+    const rv = await dispatch(
+      updateReviewAction(eventId, contributionId, revision.id, review.id, formData)
+    );
+    if (rv.error) {
+      return rv.error;
+    }
+    setIsEditing(false);
+  };
 
   return (
     <div id={`proposal-review-${review.id}`} className="i-timeline-item">
@@ -33,9 +68,12 @@ export default function RevisionReview({review}) {
               <Param name="reviewerName" value={review.user.fullName} wrapper={<strong />} /> left a
               review
             </Translate>{' '}
-            <i
-              className={`review-comment-visibility ${review.visibility.name} icon-shield`}
-              title={review.visibility.title}
+            <Popup
+              trigger={
+                <i className={`review-comment-visibility ${review.visibility.name} icon-shield`} />
+              }
+              content={review.visibility.title}
+              position="bottom center"
             />{' '}
             <time dateTime={serializeDate(review.createdDt, moment.HTML5_FMT.DATETIME_LOCAL)}>
               {serializeDate(review.createdDt, 'LL')}
@@ -44,81 +82,143 @@ export default function RevisionReview({review}) {
               <>
                 {' '}
                 ·{' '}
-                <span
-                  className="review-comment-edited"
-                  title={serializeDate(review.modifiedDt, 'LL')}
-                >
-                  <Translate>edited</Translate>
-                </span>
+                <Popup
+                  trigger={
+                    <span className="review-comment-edited">
+                      <Translate>edited</Translate>
+                    </span>
+                  }
+                  content={serializeDate(review.modifiedDt, 'LL')}
+                  position="bottom center"
+                />
               </>
             )}
           </div>
           <div className="review-group truncate-text">
-            <span title={review.group.title}>{review.group.title}</span>
+            <span>{review.group.title}</span>
           </div>
         </div>
         <div
           data-no-comment={!review.comment}
           className={`i-timeline-item-box header-indicator-top ${
-            !review.comment ? 'header-only' : ''
+            !review.comment && !showRatings && !isEditing ? 'header-only' : ''
           }`}
         >
-          <div className="i-box-header flexrow">
-            <div className="review-badges">
-              {review.proposedAction.name === 'accept' && (
-                <Translate>
-                  Proposed to <Param name="actionName" value="accept" wrapper={wrapper} />
-                </Translate>
-              )}
-              {review.proposedAction.name === 'reject' && (
-                <Translate>
-                  Proposed to <Param name="actionName" value="reject" wrapper={wrapper} />
-                </Translate>
-              )}
-              {review.proposedAction.name === 'to_be_corrected' && (
-                <Translate>
-                  Proposed to <Param name="actionName" value="correct" wrapper={wrapper} />
-                </Translate>
-              )}{' '}
-              {review.ratings.length > 0 &&
-                (review.score !== null && (
+          {!isEditing && (
+            <div className="i-box-header flexrow">
+              <div className="review-badges">
+                {review.proposedAction.name === 'accept' && (
+                  <Translate>
+                    Proposed to{' '}
+                    <Param name="actionName" wrapper={wrapper}>
+                      accept
+                    </Param>
+                  </Translate>
+                )}
+                {review.proposedAction.name === 'reject' && (
+                  <Translate>
+                    Proposed to{' '}
+                    <Param name="actionName" wrapper={wrapper}>
+                      reject
+                    </Param>
+                  </Translate>
+                )}
+                {review.proposedAction.name === 'to_be_corrected' && (
+                  <Translate>
+                    Proposed to{' '}
+                    <Param name="actionName" wrapper={wrapper}>
+                      correct
+                    </Param>
+                  </Translate>
+                )}{' '}
+                {review.ratings.length > 0 && (
                   <>
-                    <Translate>
-                      · score{' '}
-                      <Param
-                        name="prettyScore"
-                        value={review.score}
-                        wrapper={
-                          <span
-                            className="highlight bold semantic-text"
-                            title={Translate.string('Score: {score} / {maxScore}', {
-                              score: review.score,
-                              maxScore,
-                            })}
-                          />
-                        }
-                      />
-                    </Translate>
+                    {review.score !== null && (
+                      <Translate>
+                        · score{' '}
+                        <Param
+                          name="prettyScore"
+                          value={review.score}
+                          wrapper={
+                            <span
+                              className="highlight bold semantic-text"
+                              title={Translate.string('Score: {score} / {maxScore}', {
+                                score: review.score,
+                                maxScore,
+                              })}
+                            />
+                          }
+                        />
+                      </Translate>
+                    )}
                     {' ('}
-                    <a className="toggle-link">
+                    <a className="toggle-link" onClick={() => setShowRatings(!showRatings)}>
                       <span>
-                        <Translate>show ratings</Translate>
-                      </span>
-                      <span className="weak-hidden">
-                        <Translate>hide ratings</Translate>
+                        {showRatings ? (
+                          <Translate>hide ratings</Translate>
+                        ) : (
+                          <Translate>show ratings</Translate>
+                        )}
                       </span>
                     </a>
                     )
                   </>
-                ))}
+                )}
+              </div>
+              {review.canEdit && (
+                <div className="review-comment-actions">
+                  <Popup
+                    position="right center"
+                    content={Translate.string('Edit review')}
+                    trigger={<a className="i-link icon-edit" onClick={() => setIsEditing(true)} />}
+                  />
+                </div>
+              )}
             </div>
-          </div>
+          )}
           <div className="i-box-content">
-            {review.comment && (
-              <div
-                className="markdown-text"
-                dangerouslySetInnerHTML={{__html: review.commentHtml}}
+            {isEditing ? (
+              <GroupReviewForm
+                group={review.group}
+                review={review}
+                onSubmit={updateReview}
+                onCancel={() => setIsEditing(false)}
               />
+            ) : (
+              <>
+                <Transition
+                  visible={review.ratings.length !== 0 && showRatings}
+                  animation="slide down"
+                  duration={50}
+                >
+                  <div className="ratings-details">
+                    <ul className="review-questions">
+                      {review.ratings.map((rating, index) => (
+                        <li key={`rating-${rating.question.id}-${rating.id}`} className="flexrow">
+                          <div>
+                            <span className="question-index">{index + 1}</span>
+                          </div>
+                          <div className="question-text f-self-stretch">
+                            {rating.question.title}
+                          </div>
+                          <div>{renderQuestionAnswer(rating)}</div>
+                        </li>
+                      ))}
+                    </ul>
+                    {review.comment && (
+                      <div className="titled-rule">
+                        <Translate>Comment</Translate>
+                      </div>
+                    )}
+                  </div>
+                </Transition>
+                {review.comment && (
+                  <div
+                    className="markdown-text"
+                    dangerouslySetInnerHTML={{__html: review.commentHtml}}
+                  />
+                )}
+              </>
             )}
           </div>
         </div>
@@ -129,4 +229,5 @@ export default function RevisionReview({review}) {
 
 RevisionReview.propTypes = {
   review: PropTypes.object.isRequired,
+  revision: PropTypes.object.isRequired,
 };

@@ -57,7 +57,7 @@ export default function ReviewForm({block}) {
   const [commentFormVisible, setCommentFormVisible] = useState(false);
   const [judgmentType, setJudgmentType] = useState(null);
 
-  const addComment = async (formData, form) => {
+  const createComment = async (formData, form) => {
     const rv = await dispatch(createRevisionComment(lastRevision.createCommentURL, formData));
     if (rv.error) {
       return rv.error;
@@ -68,7 +68,7 @@ export default function ReviewForm({block}) {
 
   const judgmentForm = (
     <div className="flexrow" styleName="judgment-form">
-      <CommentForm onSubmit={addComment} onToggleExpand={setCommentFormVisible} />
+      <CommentForm onSubmit={createComment} onToggleExpand={setCommentFormVisible} />
       {!commentFormVisible && canJudge && (
         <div className="review-trigger flexrow">
           <span className="comment-or-review">

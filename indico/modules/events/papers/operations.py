@@ -333,7 +333,7 @@ def update_comment(comment, text=None, visibility=None):
     new_values = {}
     if text:
         new_values['text'] = text
-    if visibility:
+    if visibility is not None:
         new_values['visibility'] = visibility
     changes = comment.populate_from_dict(new_values)
     comment.modified_by = session.user

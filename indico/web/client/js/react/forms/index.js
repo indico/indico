@@ -14,7 +14,7 @@ export {
   FinalRadio,
   FinalSubmitButton,
   FinalTextArea,
-  FinalRating,
+  FormFieldAdapter,
   unsortedArraysEqual,
 } from './fields';
 export {default as validators} from './validators';

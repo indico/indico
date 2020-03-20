@@ -29,7 +29,6 @@ export default function PaperContent() {
           className={`flexrow f-a-center spotlight-file i-button text-color borderless paper-file ${
             onlySpotlightFile ? 'full-width' : ''
           }`}
-          title={spotlightFile.filename}
         >
           <a
             href={spotlightFile.downloadURL}

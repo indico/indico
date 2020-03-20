@@ -5,12 +5,21 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-.review-timeline-input {
+.review-input {
     form [name='visibility'] {
         width: 60% !important;
     }
 
     form :global(.disabled) {
         background: none;
+    }
+
+    :global(.menu) :global(.item) {
+        display: flex !important;
+        justify-content: space-between;
+
+        :global(.icon) {
+            margin-right: 0 !important;
+        }
     }
 }

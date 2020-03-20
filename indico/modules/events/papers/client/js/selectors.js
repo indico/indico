@@ -22,6 +22,13 @@ export const getPaperDetails = state => state.paper.details;
 export const getPaperEvent = state => state.paper.details.event;
 export const getPaperContribution = state => state.paper.details.contribution;
 
+export const getReviewingQuestions = createSelector(
+  getPaperEvent,
+  ({cfp}) => ({
+    layout: cfp.layoutReviewQuestions,
+    content: cfp.contentReviewQuestions,
+  })
+);
 export const canJudgePaper = createSelector(
   getPaperDetails,
   getPaperEvent,

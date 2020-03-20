@@ -9,7 +9,7 @@ from __future__ import unicode_literals
 
 from markupsafe import escape
 from marshmallow import post_dump
-from marshmallow.fields import Boolean, Field, Float, Function, Integer, List, Method, Nested, String
+from marshmallow.fields import Boolean, Decimal, Field, Function, Integer, List, Method, Nested, String
 from marshmallow_enum import EnumField
 
 from indico.core.marshmallow import mm
@@ -76,7 +76,7 @@ class PaperRevisionTimelineField(Field):
         review_comment_schema = PaperReviewCommentSchema(context=self.context)
         review_schema = PaperReviewSchema(context=self.context)
         for timeline_item in value:
-            if timeline_item.timeline_item_type in {'comment', 'review'} and not timeline_item.can_view(user):
+            if timeline_item.timeline_item_type in ('comment', 'review') and not timeline_item.can_view(user):
                 continue
 
             serialized_item = {'timeline_item_type': timeline_item.timeline_item_type}
@@ -116,11 +116,11 @@ class PaperRevisionSchema(mm.ModelSchema):
 
         data = dict(revision.get_reviewer_render_data(self.context.get('user')))
         review_type_schema = PaperReviewTypeSchema()
-        for name in {'groups', 'missing_groups', 'reviewed_groups'}:
+        for name in ('groups', 'missing_groups', 'reviewed_groups'):
             data[name] = [review_type_schema.dump(item.instance) for item in data[name]]
 
         reviews = {}
-        for key, value in data['reviews'].iteritems():
+        for key, value in data['reviews'].viewitems():
             reviews[orig_string(key.instance.title)] = paper_review_schema.dump(value)
         data['reviews'] = reviews
         return data
@@ -147,7 +147,7 @@ class PaperRatingSchema(mm.ModelSchema):
 
 
 class PaperReviewSchema(mm.ModelSchema):
-    score = Float(as_string=True)
+    score = Decimal(places=2, as_string=True)
     user = Nested(UserSchema)
     visibility = Nested(PaperCommentVisibilitySchema)
     proposed_action = Nested(PaperAction)

@@ -18,7 +18,7 @@ function renderTimelineItem(item, revision) {
   } else if (item.timelineItemType === 'comment') {
     return <RevisionComment key={item.id} revision={revision} comment={item} />;
   } else if (item.timelineItemType === 'review') {
-    return <RevisionReview key={item.id} review={item} />;
+    return <RevisionReview key={item.id} review={item} revision={revision} />;
   }
 }
 

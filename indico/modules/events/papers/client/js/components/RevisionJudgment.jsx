@@ -9,7 +9,7 @@ import React, {useState} from 'react';
 import PropTypes from 'prop-types';
 import moment from 'moment';
 import {useDispatch, useSelector} from 'react-redux';
-import {Button, Confirm} from 'semantic-ui-react';
+import {Button, Confirm, Popup} from 'semantic-ui-react';
 
 import UserAvatar from 'indico/modules/events/reviewing/components/UserAvatar';
 import {Param, Translate} from 'indico/react/i18n';
@@ -61,10 +61,12 @@ export default function RevisionJudgment({revision}) {
           {canJudge && isLastRevision && (
             <>
               <div>
-                <a
-                  className="i-link icon-remove"
-                  title={Translate.string('Reset judgment')}
-                  onClick={() => setConfirmOpen(true)}
+                <Popup
+                  position="bottom center"
+                  content={Translate.string('Reset judgment')}
+                  trigger={
+                    <a className="i-link icon-remove" onClick={() => setConfirmOpen(true)} />
+                  }
                 />
               </div>
               <Confirm
