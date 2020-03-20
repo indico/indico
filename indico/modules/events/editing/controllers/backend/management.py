@@ -12,6 +12,7 @@ from uuid import uuid4
 from flask import jsonify, request
 from werkzeug.exceptions import NotFound
 
+from indico.core.errors import UserValueError
 from indico.modules.events.editing.controllers.base import RHEditingManagementBase
 from indico.modules.events.editing.models.file_types import EditingFileType
 from indico.modules.events.editing.models.revision_files import EditingRevisionFile
@@ -23,7 +24,6 @@ from indico.modules.events.editing.schemas import (EditableFileTypeArgs, Editabl
 from indico.modules.events.editing.settings import editing_settings
 from indico.util.i18n import _
 from indico.web.args import use_rh_args, use_rh_kwargs
-from indico.web.util import ExpectedError
 
 
 class RHCreateTag(RHEditingManagementBase):
@@ -81,18 +81,18 @@ class RHEditFileType(RHEditingManagementBase):
 
     def _process_DELETE(self):
         if EditingRevisionFile.query.with_parent(self.file_type).has_rows():
-            raise ExpectedError(_('Cannot delete file type which already has files'))
+            raise UserValueError(_('Cannot delete file type which already has files'))
 
         review_conditions = editing_settings.get(self.event, 'review_conditions')
         if any(self.file_type.id in cond for cond in review_conditions.values()):
-            raise ExpectedError(_('Cannot delete file type which is used in a review condition'))
+            raise UserValueError(_('Cannot delete file type which is used in a review condition'))
         if self.file_type.publishable:
             is_last = not (EditingFileType.query
                            .with_parent(self.event)
                            .filter(EditingFileType.publishable, EditingFileType.id != self.file_type.id)
                            .has_rows())
             if is_last:
-                raise ExpectedError(_('Cannot delete the only publishable file type'))
+                raise UserValueError(_('Cannot delete the only publishable file type'))
         delete_file_type(self.file_type)
         return '', 204
 
