@@ -92,7 +92,7 @@ def principal_from_fossil(fossil, allow_pending=False, allow_groups=True, allow_
         if group.group is None and not allow_missing_groups:
             raise ValueError('Multipass group does not exist: {}:{}'.format(provider, id_))
         return group
-    elif category:
+    elif category and type_ == 'CategoryRole':
         role = CategoryRole.get_category_role_by_id(category, id_)
         role_name = fossil.get('name')
         if role is None:
