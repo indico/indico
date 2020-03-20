@@ -16,7 +16,6 @@ export default function PaperFiles({fullWidth, files}) {
           <a
             href={file.downloadURL}
             className={`attachment paper-file i-button text-color borderless ${file.icon}`}
-            title={file.filename}
           >
             <span className="title truncate-text">{file.filename}</span>
           </a>

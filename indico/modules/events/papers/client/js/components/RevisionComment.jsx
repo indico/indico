@@ -9,7 +9,7 @@ import React, {useState} from 'react';
 import PropTypes from 'prop-types';
 import moment from 'moment';
 import {useDispatch, useSelector} from 'react-redux';
-import {Button, Confirm} from 'semantic-ui-react';
+import {Button, Confirm, Popup} from 'semantic-ui-react';
 
 import UserAvatar from 'indico/modules/events/reviewing/components/UserAvatar';
 import {getChangedValues} from 'indico/react/forms';
@@ -17,7 +17,7 @@ import {Param, Translate} from 'indico/react/i18n';
 import {serializeDate} from 'indico/utils/date';
 
 import CommentForm from './CommentForm';
-import {deleteComment, editComment} from '../actions';
+import {deleteComment, updateComment as updateCommentAction} from '../actions';
 import {CommentVisibility} from '../models';
 import {getPaperContribution, getPaperEvent, isDeletingComment} from '../selectors';
 
@@ -31,7 +31,7 @@ export default function RevisionComment({comment, revision}) {
 
   const updateComment = async (formData, form) => {
     const rv = await dispatch(
-      editComment(
+      updateCommentAction(
         eventId,
         contributionId,
         revision.id,
@@ -55,39 +55,49 @@ export default function RevisionComment({comment, revision}) {
                 <Param name="userName" value={comment.user.fullName} wrapper={<strong />} /> left a
                 comment
               </Translate>{' '}
-              {comment.visibility !== CommentVisibility.contributors && (
-                <i
-                  className={`review-comment-visibility ${comment.visibility.name} icon-shield`}
-                  title={comment.visibility.title}
+              {comment.visibility.name !== CommentVisibility.contributors && (
+                <Popup
+                  trigger={
+                    <i
+                      className={`review-comment-visibility ${comment.visibility.name} icon-shield`}
+                    />
+                  }
+                  content={comment.visibility.title}
+                  position="bottom center"
                 />
               )}{' '}
               <time dateTime={serializeDate(comment.createdDt, moment.HTML5_FMT.DATETIME_LOCAL)}>
                 {serializeDate(comment.createdDt, 'LL')}
               </time>
               {comment.modifiedDt && (
-                <span
-                  className="review-comment-edited"
-                  title={Translate.string('On {modificationDate} by {modifiedBy}', {
+                <Popup
+                  trigger={
+                    <span className="review-comment-edited">
+                      {' '}
+                      · <Translate>edited</Translate>
+                    </span>
+                  }
+                  content={Translate.string('On {modificationDate} by {modifiedBy}', {
                     modificationDate: serializeDate(comment.modifiedDt, 'LL'),
                     modifiedBy: comment.modifiedBy.fullName,
                   })}
-                >
-                  {' '}
-                  · <Translate>edited</Translate>
-                </span>
+                  position="bottom center"
+                />
               )}
             </div>
             {comment.canEdit && (
               <div className="review-comment-action hide-if-locked">
-                <a
-                  className="i-link icon-edit"
-                  title={Translate.string('Edit comment')}
-                  onClick={() => setIsEditing(!isEditing)}
+                <Popup
+                  position="bottom center"
+                  content={Translate.string('Edit comment')}
+                  trigger={
+                    <a className="i-link icon-edit" onClick={() => setIsEditing(!isEditing)} />
+                  }
                 />{' '}
-                <a
-                  onClick={() => setConfirmOpen(true)}
-                  className="i-link icon-cross"
-                  title={Translate.string('Remove comment')}
+                <Popup
+                  position="bottom center"
+                  content={Translate.string('Remove comment')}
+                  trigger={<a onClick={() => setConfirmOpen(true)} className="i-link icon-cross" />}
                 />
                 <Confirm
                   size="tiny"
@@ -128,7 +138,11 @@ export default function RevisionComment({comment, revision}) {
             {isEditing ? (
               <CommentForm
                 onSubmit={updateComment}
-                onFormHide={() => setIsEditing(false)}
+                onToggleExpand={visible => {
+                  if (!visible) {
+                    setIsEditing(false);
+                  }
+                }}
                 comment={comment}
                 expanded
               />

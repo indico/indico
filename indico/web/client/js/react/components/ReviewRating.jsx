@@ -10,6 +10,8 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import {Rating} from 'semantic-ui-react';
 
+import {FinalField} from 'indico/react/forms';
+
 import './ReviewRating.module.scss';
 
 export default function ReviewRating({min, max, value, disabled, onChange}) {
@@ -24,10 +26,10 @@ export default function ReviewRating({min, max, value, disabled, onChange}) {
         maxRating={maxRating}
         rating={value === null ? null : rating}
         disabled={disabled}
-        onRate={(evt, {rating: newRating, ...rest}) => {
+        onRate={(evt, {rating: newRating}) => {
           // map the value from SUIR Rating to the corresponding value between min and max
           const val = ratingRange[suiRatingRange.findIndex(item => item === newRating)];
-          onChange(evt, {rating: val, ...rest});
+          onChange(val);
         }}
         clearable
       />
@@ -49,4 +51,26 @@ ReviewRating.defaultProps = {
   value: null,
   disabled: false,
   onChange: null,
+};
+
+export function FinalRating({name, label, ...rest}) {
+  return (
+    <FinalField
+      {...rest}
+      name={name}
+      label={label}
+      component={ReviewRating}
+      undefinedValue={null}
+      format={v => v}
+    />
+  );
+}
+
+FinalRating.propTypes = {
+  name: PropTypes.string.isRequired,
+  label: PropTypes.string,
+};
+
+FinalRating.defaultProps = {
+  label: null,
 };

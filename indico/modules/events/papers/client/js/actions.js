@@ -7,9 +7,11 @@
 
 import paperInfoURL from 'indico-url:papers.api_paper_details';
 import resetPaperStateURL from 'indico-url:papers.api_reset_paper_state';
-import addCommentURL from 'indico-url:papers.api_submit_comment';
-import apiCommentActions from 'indico-url:papers.api_comment_actions';
+import createCommentURL from 'indico-url:papers.api_create_comment';
+import commentActionsURL from 'indico-url:papers.api_comment_actions';
 import judgePaperURL from 'indico-url:papers.api_judge_paper';
+import createReviewURL from 'indico-url:papers.api_create_review';
+import updateReviewURL from 'indico-url:papers.api_update_review';
 
 import {indicoAxios} from 'indico/utils/axios';
 import {ajaxAction, submitFormAction} from 'indico/utils/redux';
@@ -44,21 +46,21 @@ export function resetPaperJudgment(eventId, contributionId) {
   );
 }
 
-export function addComment(eventId, contributionId, commentData) {
+export function createComment(eventId, contributionId, commentData) {
   const params = {
     confId: eventId,
     contrib_id: contributionId,
   };
 
   return submitFormAction(
-    () => indicoAxios.post(addCommentURL(params), commentData),
+    () => indicoAxios.post(createCommentURL(params), commentData),
     null,
     () => fetchPaperDetails(eventId, contributionId),
     null
   );
 }
 
-export function editComment(eventId, contributionId, revisionId, commentId, commentData) {
+export function updateComment(eventId, contributionId, revisionId, commentId, commentData) {
   const params = {
     confId: eventId,
     contrib_id: contributionId,
@@ -67,7 +69,7 @@ export function editComment(eventId, contributionId, revisionId, commentId, comm
   };
 
   return submitFormAction(
-    () => indicoAxios.patch(apiCommentActions(params), commentData),
+    () => indicoAxios.patch(commentActionsURL(params), commentData),
     null,
     () => fetchPaperDetails(eventId, contributionId),
     null
@@ -82,7 +84,7 @@ export function deleteComment(eventId, contributionId, revisionId, commentId) {
     comment_id: commentId,
   };
   return ajaxAction(
-    () => indicoAxios.delete(apiCommentActions(params)),
+    () => indicoAxios.delete(commentActionsURL(params)),
     DELETE_COMMENT_REQUEST,
     [DELETE_COMMENT_SUCCESS, () => fetchPaperDetails(eventId, contributionId)],
     DELETE_COMMENT_ERROR,
@@ -94,6 +96,37 @@ export function judgePaper(eventId, contributionId, judgmentData) {
   return submitFormAction(
     () =>
       indicoAxios.post(judgePaperURL({confId: eventId, contrib_id: contributionId}), judgmentData),
+    null,
+    () => fetchPaperDetails(eventId, contributionId),
+    null
+  );
+}
+
+export function createReview(eventId, contributionId, group, reviewData) {
+  return submitFormAction(
+    () =>
+      indicoAxios.post(
+        createReviewURL({confId: eventId, contrib_id: contributionId, review_type: group}),
+        reviewData
+      ),
+    null,
+    () => fetchPaperDetails(eventId, contributionId),
+    null
+  );
+}
+
+export function updateReview(eventId, contributionId, revisionId, reviewId, reviewData) {
+  return submitFormAction(
+    () =>
+      indicoAxios.post(
+        updateReviewURL({
+          confId: eventId,
+          contrib_id: contributionId,
+          revision_id: revisionId,
+          review_id: reviewId,
+        }),
+        reviewData
+      ),
     null,
     () => fetchPaperDetails(eventId, contributionId),
     null

@@ -63,7 +63,11 @@ export default function SubmitRevision() {
   };
 
   return (
-    <div className="i-timeline-item" id="proposal-revision-submission-box">
+    <div
+      className="i-timeline-item"
+      id="proposal-revision-submission-box"
+      style={{position: 'relative', zIndex: -1}}
+    >
       <UserAvatar user={currentUser} />
       <div className="i-timeline-item-box header-indicator-left">
         <div className="i-box-header flexrow">

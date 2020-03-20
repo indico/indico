@@ -199,6 +199,7 @@
 
     .review-trigger {
         white-space: nowrap;
+        align-items: center;
 
         .judgment-btn, .judgment-btn.active {
             align-self: center;
@@ -209,6 +210,7 @@
 
         .i-button {
             height: 2.1rem;
+            display: flex;
 
             &::after {
                 vertical-align: bottom;
