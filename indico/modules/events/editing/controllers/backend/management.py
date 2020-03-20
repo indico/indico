@@ -84,7 +84,7 @@ class RHEditFileType(RHEditingManagementBase):
             raise ExpectedError(_('Cannot delete file type which already has files'))
 
         review_conditions = editing_settings.get(self.event, 'review_conditions')
-        if any(self.file_type.id in cond for cond in review_conditions):
+        if any(self.file_type.id in cond for cond in review_conditions.values()):
             raise ExpectedError(_('Cannot delete file type which is used in a review condition'))
         if self.file_type.publishable:
             is_last = not (EditingFileType.query
