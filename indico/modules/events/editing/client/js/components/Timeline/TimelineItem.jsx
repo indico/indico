@@ -84,14 +84,6 @@ export default function TimelineItem({block}) {
                   files={block.files}
                   downloadURL={block.downloadFilesURL}
                 />
-                {block.comment && (
-                  <>
-                    <div className="titled-rule">
-                      <Translate>Comment</Translate>
-                    </div>
-                    <div dangerouslySetInnerHTML={{__html: block.commentHtml}} />
-                  </>
-                )}
                 {/* TODO: Check whether the current user is submitter */}
                 {isLastBlock && needsSubmitterConfirmation && <ChangesConfirmation />}
               </div>

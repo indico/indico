@@ -122,7 +122,7 @@ def confirm_editable_changes(revision, submitter, action, comment):
         EditingConfirmationAction.reject: FinalRevisionState.needs_submitter_changes,
     }[action]
     if comment:
-        create_revision_comment(revision, submitter, comment)
+        revision.comment = comment
     db.session.flush()
     if action == EditingConfirmationAction.accept:
         publish_editable_revision(revision)
