@@ -52,6 +52,7 @@ def serialize_email_principal(email):
         '_type': 'Email',
         'email': email.email,
         'id': email.name,
+        'name': email.name,
         'identifier': 'Email:{}'.format(email.email)
     }
 
@@ -68,6 +69,10 @@ class IEmailPrincipalFossil(IFossil):
     def getEmail(self):
         pass
     getEmail.produce = lambda x: x.email
+
+    def getName(self):
+        pass
+    getName.produce = lambda x: x.name
 
 
 class EmailPrincipal(Fossilizable):
