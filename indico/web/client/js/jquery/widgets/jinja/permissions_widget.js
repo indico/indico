@@ -87,14 +87,18 @@ import Palette from 'indico/utils/palette';
         iconClass = 'icon-question';
       } else if (type === 'IPNetworkGroup') {
         iconClass = 'icon-lan';
+      } else if (type === 'LocalGroup') {
+        iconClass = 'icon-users';
+      } else if (type === 'MultipassGroup') {
+        iconClass = 'icon-users';
+        extraText = principal.provider_title;
       } else {
         iconClass = 'icon-users';
       }
-      const labelIsName = _.contains(['Avatar', 'DefaultEntry', 'IPNetworkGroup'], type);
-      const text = labelIsName ? principal.name : principal.id;
+      const text = principal.name;
       const tooltip = extraText ? `${text} (${extraText})` : text;
       const textDiv = $('<div>', {'class': 'text-normal entry-label', 'data-tooltip': tooltip});
-      textDiv.append($('<span>', {text: text}));
+      textDiv.append($('<span>', {text}));
       if (extraText) {
         textDiv.append('<br>');
         textDiv.append(

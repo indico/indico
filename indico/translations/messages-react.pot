@@ -1,6 +1,6 @@
 msgid ""
 msgstr ""
-"POT-Creation-Date: 2019-10-19 14:41+0100\n"
+"POT-Creation-Date: 2020-03-20 12:25+0100\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "MIME-Version: 1.0\n"
@@ -598,11 +598,11 @@ msgid "Number"
 msgstr ""
 
 #: indico/modules/rb/client/js/common/rooms/RoomEditModal.jsx:288
-msgid "Longitude"
+msgid "Latitude"
 msgstr ""
 
 #: indico/modules/rb/client/js/common/rooms/RoomEditModal.jsx:299
-msgid "Latitude"
+msgid "Longitude"
 msgstr ""
 
 #: indico/modules/rb/client/js/common/rooms/RoomEditModal.jsx:312

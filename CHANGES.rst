@@ -92,6 +92,7 @@ Bugfixes
 ^^^^^^^^
 
 - Allow slashes in roomName export API
+- Show names instead of IDs of local groups in ACLs (:issue:`3700`)
 
 Version 2.2.6
 -------------
