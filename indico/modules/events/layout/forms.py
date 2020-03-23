@@ -68,7 +68,7 @@ class ConferenceLayoutForm(LoggedLayoutForm):
                                  description=_("Enable search within the event"))
     show_nav_bar = BooleanField(_("Show navigation bar"), widget=SwitchWidget(),
                                 description=_("Show the navigation bar at the top"))
-    show_banner = BooleanField(_("\"Now happening\""), widget=SwitchWidget(on_label=_("ON"), off_label=_("OFF")),
+    show_banner = BooleanField(_("\"Now happening\""), widget=SwitchWidget(),
                                description=_("Show a banner with the current entries from the timetable"))
     show_social_badges = BooleanField(_("Show social badges"), widget=SwitchWidget())
     name_format = IndicoEnumSelectField(_('Name format'), enum=NameFormat, none=_('Inherit from user preferences'),

@@ -30,7 +30,7 @@
                                     {% endif %}
                                 </span>
                             </span>
-                            <button class="i-button"
+                            <button class="ui negative button"
                                     data-href="{{ url_for('.user_token_revoke', token) }}"
                                     data-method="POST"
                                     data-confirm="{% trans app_name=token.application.name %}{{ app_name }} will no longer have access to your Indico data.<br>

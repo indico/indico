@@ -1,12 +1,8 @@
-{% macro switch(value='1', id=none, name=none, on_label=none, off_label=none) -%}
-    {%- set on_label = _('Yes') if on_label is none else on_label -%}
-    {%- set off_label = _('No') if off_label is none else off_label -%}
-
-    <label class="switch">
-        <input type="checkbox" class="switch-input" value="{{ value }}" {{ kwargs | html_params }}
+{% macro switch(value='1', id=none, name=none) -%}
+    <div class="ui toggle checkbox">
+        <input type="checkbox" value="{{ value }}" {{ kwargs | html_params }}
                {%- if id %} id="{{ id }}"{% endif -%}
                {%- if name %} name="{{ name }}"{% endif -%}>
-        <span class="switch-label" data-on="{{ on_label }}" data-off="{{ off_label }}"></span>
-        <span class="switch-handle"></span>
-    </label>
+        <label></label> {# ui toggle always requires a label #}
+    </div>
 {%- endmacro %}

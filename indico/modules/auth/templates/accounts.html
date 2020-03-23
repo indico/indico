@@ -20,9 +20,9 @@
                             {{ form_header(form, orientation='vertical', classes='no-block-padding') }}
                             {{ form_rows(form) }}
                             {% call form_footer(form) %}
-                                <input class="i-button big highlight" type="submit"
+                                <input class="ui primary button" type="submit"
                                        value="{% trans %}Create account{% endtrans %}" data-disabled-until-change>
-                                <a href="#" class="i-button big js-hide-form">
+                                <a href="#" class="ui negative button js-hide-form">
                                     {% trans %}Cancel{% endtrans %}
                                 </a>
                             {% endcall %}
@@ -31,7 +31,7 @@
                         {{ form_header(form, orientation='vertical', classes='no-block-padding') }}
                         {{ form_rows(form) }}
                         {% call form_footer(form) %}
-                            <input class="i-button big highlight" type="submit" value="{% trans %}Modify credentials{% endtrans %}" data-disabled-until-change>
+                            <input class="ui primary button" type="submit" value="{% trans %}Modify credentials{% endtrans %}" data-disabled-until-change>
                         {% endcall %}
                     {% endif %}
                     {% if user.secondary_local_identities %}
@@ -70,7 +70,7 @@
                                                 </span>
                                             </span>
                                         </span>
-                                        <button class="i-button"
+                                        <button class="ui negative button"
                                             data-href="{{ url_for('.remove_account', identity) }}"
                                             data-method="post"
                                             data-title="{% trans %}Remove account{% endtrans %}"
@@ -122,12 +122,12 @@
                                         </span>
                                     </span>
                                     {% if identity.id == session.login_identity %}
-                                        <button class="i-button" disabled
+                                        <button class="ui primary button" disabled
                                             title="{% trans %}The account used to log in cannot be unlinked{% endtrans %}">
                                             {% trans %}Unlink{% endtrans %}
                                         </button>
                                     {% else %}
-                                        <button class="i-button right"
+                                        <button class="ui primary button right"
                                             data-href="{{ url_for('.remove_account', identity) }}"
                                             data-method="post"
                                             data-title="{% trans %}Unlink account{% endtrans %}"

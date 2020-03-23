@@ -122,20 +122,21 @@ $i-box-padding: 10px;
     margin-top: -18px; // Pure magic number to align the rule with the i-box border
 }
 
-@mixin single-box-shadow($hoff: $default-box-shadow-h-offset, $voff: $default-box-shadow-v-offset, $blur: $default-box-shadow-blur,
-                         $spread: $default-box-shadow-spread, $color: $default-box-shadow-color, $inset: $default-box-shadow-inset) {
-    box-shadow: $inset $hoff $voff $blur $spread $color ;
+@mixin single-box-shadow($hoff: $default-box-shadow-h-offset, $voff: $default-box-shadow-v-offset,
+    $blur: $default-box-shadow-blur, $spread: $default-box-shadow-spread,
+    $color: $default-box-shadow-color, $inset: $default-box-shadow-inset) {
+    box-shadow: $inset $hoff $voff $blur $spread $color;
 }
 
 .i-box {
     @extend %i-box-padding;
-    @include border-all();
     @extend %default-border-radius;
-    box-sizing: border-box;
+    @include border-all();
     @include single-box-shadow();
     @include transition();
     @include transition(padding-bottom);
 
+    box-sizing: border-box;
     background: white;
     color: $black;
 
@@ -171,8 +172,8 @@ $i-box-padding: 10px;
         }
 
         &::before {
-            transform: rotate(90deg);
             @include transition(top);
+            transform: rotate(90deg);
             display: inline-block;
             position: relative;
             top: -3px;
@@ -208,6 +209,10 @@ $i-box-padding: 10px;
         @extend %i-box-padding;
         @include border-bottom();
         @include transition(margin-bottom);
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
         background-color: $light-gray;
         overflow: hidden;
         margin-bottom: $i-box-padding;
@@ -226,7 +231,6 @@ $i-box-padding: 10px;
         }
 
         .i-box-buttons {
-            float: right;
             margin: 0;
             padding: 0;
         }

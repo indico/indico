@@ -17,7 +17,7 @@ from indico.modules.events.features.util import (format_feature_names, get_disal
 from indico.modules.events.features.views import WPFeatures
 from indico.modules.events.logs import EventLogKind, EventLogRealm
 from indico.modules.events.management.controllers import RHManageEventBase
-from indico.util.i18n import _, ngettext
+from indico.util.i18n import ngettext
 from indico.web.forms.base import FormDefaults, IndicoForm
 from indico.web.forms.widgets import SwitchWidget
 from indico.web.menu import render_sidemenu
@@ -37,7 +37,7 @@ class RHFeatures(RHFeaturesBase):
         for name, feature in sorted(get_feature_definitions().iteritems(), key=lambda x: x[1].friendly_name):
             if name in disallowed:
                 continue
-            field = BooleanField(feature.friendly_name, widget=SwitchWidget(on_label=_('On'), off_label=_('Off')),
+            field = BooleanField(feature.friendly_name, widget=SwitchWidget(),
                                  description=feature.description)
             setattr(form_class, name, field)
         defaults = {name: True for name in get_enabled_features(self.event)}

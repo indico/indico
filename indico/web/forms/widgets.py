@@ -126,24 +126,18 @@ class CKEditorWidget(JinjaWidget):
 class SwitchWidget(JinjaWidget):
     """Renders a switch widget
 
-    :param on_label: Text to override default ON label
-    :param off_label: Text to override default OFF label
     :param confirm_enable: Text to prompt when enabling the switch
     :param confirm_disable: Text to prompt when disabling the switch
     """
 
-    def __init__(self, on_label=None, off_label=None, confirm_enable=None, confirm_disable=None):
+    def __init__(self, confirm_enable=None, confirm_disable=None):
         super(SwitchWidget, self).__init__('forms/switch_widget.html')
-        self.on_label = on_label
-        self.off_label = off_label
         self.confirm_enable = confirm_enable
         self.confirm_disable = confirm_disable
 
     def __call__(self, field, **kwargs):
         kwargs.update({
-            'checked': getattr(field, 'checked', field.data),
-            'on_label': self.on_label,
-            'off_label': self.off_label
+            'checked': getattr(field, 'checked', field.data)
         })
         return super(SwitchWidget, self).__call__(field, kwargs=kwargs, confirm_enable=self.confirm_enable,
                                                   confirm_disable=self.confirm_disable)
