@@ -72,6 +72,7 @@ export default function SubmitRevision() {
                       contrib_id: contributionId,
                       type: editableType,
                     })}
+                    mustChange
                   />
                   <FinalSubmitButton label={Translate.string('Submit new revision')} />
                 </div>

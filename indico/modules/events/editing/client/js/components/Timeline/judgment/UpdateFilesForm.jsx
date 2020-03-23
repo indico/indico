@@ -67,6 +67,7 @@ export default function UpdateFilesForm({setLoading}) {
                 contrib_id: contributionId,
                 type: editableType,
               })}
+              mustChange
             />
             <FinalTextArea
               name="comment"

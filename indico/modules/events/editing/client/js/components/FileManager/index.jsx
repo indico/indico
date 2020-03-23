@@ -12,7 +12,7 @@ import PropTypes from 'prop-types';
 import {fromEvent} from 'file-selector';
 import {useDropzone} from 'react-dropzone';
 import {Field} from 'react-final-form';
-import {Icon, Popup, Segment} from 'semantic-ui-react';
+import {Icon, Message, Popup} from 'semantic-ui-react';
 import {TooltipIfTruncated} from 'indico/react/components';
 import {Param, Translate} from 'indico/react/i18n';
 import {
@@ -110,7 +110,7 @@ Dropzone.propTypes = {
   fileType: PropTypes.shape(fileTypePropTypes).isRequired,
 };
 
-function FileType({uploadURL, fileType, uploads}) {
+function FileType({uploadURL, fileType, uploads, dispatch}) {
   const ref = useRef(null);
   return (
     <div styleName="file-type">
@@ -151,10 +151,14 @@ function FileType({uploadURL, fileType, uploads}) {
                 </Translate>
               }
               trigger={
-                <Segment>
+                <Message
+                  onDismiss={() => {
+                    dispatch(actions.removeInvalidFilename(fileType.id, invalidFile));
+                  }}
+                >
                   <Icon name="ban" color="orange" />
                   {invalidFile}
-                </Segment>
+                </Message>
               }
             />
           ))}
@@ -174,6 +178,7 @@ FileType.propTypes = {
       progress: PropTypes.number,
     })
   ),
+  dispatch: PropTypes.func.isRequired,
 };
 
 FileType.defaultProps = {
@@ -187,6 +192,7 @@ export default function FileManager({
   files,
   finalFieldName,
   pristine,
+  mustChange,
 }) {
   const lastPristineRef = useRef(pristine);
   const _fileTypes = useMemo(() => mapFileTypes(fileTypes, files), [fileTypes, files]);
@@ -231,6 +237,7 @@ export default function FileManager({
               uploadURL={uploadURL}
               fileType={fileType}
               uploads={state.uploads[fileType.id]}
+              dispatch={dispatch}
             />
           ))}
         </FileManagerContext.Provider>
@@ -248,6 +255,13 @@ export default function FileManager({
             render={() => null}
           />
         )}
+        {!!finalFieldName && pristine && mustChange && (
+          <Field
+            name={`_${finalFieldName}_pristine`}
+            validate={() => Translate.string('No changes yet')}
+            render={() => null}
+          />
+        )}
       </div>
     </div>
   );
@@ -260,15 +274,17 @@ FileManager.propTypes = {
   onChange: PropTypes.func.isRequired,
   finalFieldName: PropTypes.string,
   pristine: PropTypes.bool,
+  mustChange: PropTypes.bool,
 };
 
 FileManager.defaultProps = {
   files: [],
   finalFieldName: null,
   pristine: null,
+  mustChange: false,
 };
 
-export function FinalFileManager({name, uploadURL, fileTypes, ...rest}) {
+export function FinalFileManager({name, uploadURL, fileTypes, mustChange, ...rest}) {
   // We do not use FinalField here since the file manager is more "standalone"
   // and thus not wrapped in the usual SUI field markup.
   return (
@@ -281,6 +297,7 @@ export function FinalFileManager({name, uploadURL, fileTypes, ...rest}) {
           finalFieldName={input.name}
           files={rest.files}
           pristine={pristine}
+          mustChange={mustChange}
         />
       )}
     </Field>
@@ -291,4 +308,9 @@ FinalFileManager.propTypes = {
   name: PropTypes.string.isRequired,
   uploadURL: PropTypes.string.isRequired,
   fileTypes: PropTypes.arrayOf(PropTypes.shape(fileTypePropTypes)).isRequired,
+  mustChange: PropTypes.bool,
+};
+
+FinalFileManager.defaultProps = {
+  mustChange: false,
 };

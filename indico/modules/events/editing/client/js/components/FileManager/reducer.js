@@ -78,6 +78,18 @@ export default combineReducers({
     if (action.type === actions.RESET) {
       return action.fileTypes;
     }
+    if (action.type === actions.REMOVE_INVALID_FILENAME) {
+      return state.map(fileType => {
+        if (fileType.id === action.fileTypeId) {
+          return {
+            ...fileType,
+            invalidFiles: fileType.invalidFiles.filter(name => name !== action.filename),
+          };
+        } else {
+          return fileType;
+        }
+      });
+    }
     return state.map(fileType => {
       if (fileType.id === action.fileTypeId) {
         return {

@@ -63,7 +63,12 @@ export default function EditableSubmissionButton({
             </Modal.Header>
             <Modal.Content>
               <Form id="submit-editable-form" onSubmit={handleSubmit}>
-                <FinalFileManager name="files" fileTypes={fileTypes} uploadURL={uploadURL} />
+                <FinalFileManager
+                  name="files"
+                  fileTypes={fileTypes}
+                  uploadURL={uploadURL}
+                  mustChange
+                />
               </Form>
             </Modal.Content>
             <Modal.Actions style={{display: 'flex', justifyContent: 'flex-end'}}>

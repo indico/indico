@@ -35,6 +35,18 @@ export const getUploadedFileUUIDs = state => {
 export const getValidationError = createSelector(
   state => state.fileTypes,
   fileTypes => {
+    const invalid = fileTypes
+      .filter(ft => ft.invalidFiles.some(f => f.length > 0))
+      .map(ft => ft.invalidFiles)
+      .flat();
+    if (invalid.length > 0) {
+      return PluralTranslate.string(
+        'Invalid file name: {files}',
+        'Invalid file names: {files}',
+        invalid.length,
+        {files: invalid.sort().join(', ')}
+      );
+    }
     const missing = fileTypes
       .filter(ft => ft.required)
       .filter(ft => !ft.files.some(f => f.state !== 'deleted'))
