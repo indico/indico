@@ -5,7 +5,7 @@ Changelog
 Version 2.2.7
 -------------
 
-*Unreleased*
+*Released on March 23, 2020*
 
 Improvements
 ^^^^^^^^^^^^
