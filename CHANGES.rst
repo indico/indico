@@ -77,10 +77,20 @@ Internal Changes
 
 ----
 
-Version 2.2.7
+Version 2.2.8
 -------------
 
 *Unreleased*
+
+Bugfixes
+^^^^^^^^
+
+- None so far :)
+
+Version 2.2.7
+-------------
+
+*Released on March 23, 2020*
 
 Improvements
 ^^^^^^^^^^^^

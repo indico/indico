@@ -1,5 +1,5 @@
 # Translations template for indico.
-# Copyright (C) 2019 ORGANIZATION
+# Copyright (C) 2020 ORGANIZATION
 # This file is distributed under the same license as the indico project.
 # 
 # Translators:
@@ -14,7 +14,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Indico\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2019-10-28 14:40+0100\n"
+"POT-Creation-Date: 2020-03-20 12:25+0100\n"
 "PO-Revision-Date: 2019-06-11 20:36+0000\n"
 "Last-Translator: Thomas Baron <thomas.baron@cern.ch>\n"
 "Language-Team: French (France) (http://www.transifex.com/indico/indico/language/fr_FR/)\n"
@@ -1009,44 +1009,44 @@ msgstr "Doit être inférieur à {0}"
 msgid "Please fill in the required fields."
 msgstr "Veuillez renseigner les champs obligatoires."
 
-#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:141
+#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:145
 msgid "IP networks cannot have management permissions"
 msgstr "Les réseaux IP n'ont pas de droit d'administration"
 
-#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:148
+#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:152
 msgid "Assign Permissions"
 msgstr "Assigner les permissions"
 
-#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:165
+#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:169
 msgid "Delete entry '{0}'"
 msgstr "Effacer l'entrée '{0}'"
 
-#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:166
+#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:170
 #: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:1344
 msgid "Are you sure you want to remove yourself from the list?"
 msgstr "Êtes-vous sûr de vouloir vous retirer de la liste ?"
 
-#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:205
+#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:209
 msgid "All IP Networks were added"
 msgstr "Tous les réseaux IP ont été ajoutés"
 
-#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:236
+#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:240
 msgid "This entry was already added"
 msgstr "Cette entrée existait déjà"
 
-#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:269
+#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:273
 msgid "Anonymous"
 msgstr "Anonyme"
 
-#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:276
+#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:280
 msgid "Category Managers"
 msgstr "Administrateurs de catégorie"
 
-#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:277
+#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:281
 msgid "Event Managers"
 msgstr "Administrateurs de l'événement"
 
-#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:334
+#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:338
 msgid "Select a user or group to add"
 msgstr "Veuillez choisir un utilisateur ou un groupe à ajouter"
 

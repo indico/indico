@@ -6,7 +6,7 @@
 # 
 msgid ""
 msgstr ""
-"POT-Creation-Date: 2019-10-19 14:41+0100\n"
+"POT-Creation-Date: 2020-03-20 12:25+0100\n"
 "Last-Translator: Thomas Baron <thomas.baron@cern.ch>, 2019\n"
 "Language-Team: French (France) (https://www.transifex.com/indico/teams/6478/fr_FR/)\n"
 "MIME-Version: 1.0\n"
@@ -619,12 +619,12 @@ msgid "Number"
 msgstr "Numéro"
 
 #: indico/modules/rb/client/js/common/rooms/RoomEditModal.jsx:288
-msgid "Longitude"
-msgstr "Longitude"
-
-#: indico/modules/rb/client/js/common/rooms/RoomEditModal.jsx:299
 msgid "Latitude"
 msgstr "Latitude"
+
+#: indico/modules/rb/client/js/common/rooms/RoomEditModal.jsx:299
+msgid "Longitude"
+msgstr "Longitude"
 
 #: indico/modules/rb/client/js/common/rooms/RoomEditModal.jsx:312
 msgid "Surface Area (m²)"
