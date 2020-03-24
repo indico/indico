@@ -49,7 +49,12 @@ $(document).ready(function() {
         qtipHTMLContainer && qtipHTMLContainer.length ? $(this).next(qtipHTMLContainer) : null;
 
       // qtip not applied if it's empty, the element is disabled or it's inside a SemanticUI widget
-      if ((!qtipHTML && !title) || this.disabled || $target.data('no-qtip') || $target.closest('.ui').length) {
+      if (
+        (!qtipHTML && !title) ||
+        this.disabled ||
+        $target.data('no-qtip') ||
+        $target.closest('.ui:not(.ui-qtip)').length
+      ) {
         return;
       }
 
