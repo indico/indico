@@ -31,9 +31,9 @@ from indico.modules.events import Event, LegacyEventMapping
 from indico.modules.events.cloning import EventCloner
 from indico.modules.events.fields import EventPersonLinkListField, ReferencesField
 from indico.modules.events.models.events import EventType
+from indico.modules.events.models.labels import EventLabel
 from indico.modules.events.models.references import EventReference, ReferenceType
 from indico.modules.events.sessions import COORDINATOR_PRIV_DESCS, COORDINATOR_PRIV_TITLES
-from indico.modules.events.settings import event_labels_store
 from indico.modules.events.timetable.util import get_top_level_entries
 from indico.modules.events.util import check_permissions
 from indico.util.date_time import format_datetime, format_human_timedelta, now_utc, relativedelta
@@ -209,10 +209,7 @@ class EventContactInfoForm(IndicoForm):
 class EventClassificationForm(IndicoForm):
     keywords = IndicoTagListField(_('Keywords'))
     references = ReferencesField(_('External IDs'), reference_class=EventReference)
-    # XXX: this is incredibly ugly but the normal SelectField doesn't have a good way to
-    # coerce into objects unless the objects can be put in `<option value=...>`
-    # we also switch to proper models in 2.3 so this is fine for now!
-    label = QuerySelectField(_('Label'), allow_blank=True, get_pk=attrgetter('id'), get_label=attrgetter('title'))
+    label = QuerySelectField(_('Label'), allow_blank=True, get_label='title')
     label_message = TextAreaField(_('Label message'),
                                   description=_('You can optionally provide a message that is shown when hovering '
                                                 'the selected label.'))
@@ -222,10 +219,8 @@ class EventClassificationForm(IndicoForm):
         super(EventClassificationForm, self).__init__(*args, **kwargs)
         if event.type_ != EventType.meeting or not ReferenceType.query.has_rows():
             del self.references
-        labels = event_labels_store.get_all().values()
-        if labels:
-            self.label.query = labels
-        else:
+        self.label.query = EventLabel.query.order_by(db.func.lower(EventLabel.title))
+        if not self.label.query.has_rows():
             del self.label
             del self.label_message
 

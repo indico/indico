@@ -8,15 +8,14 @@
 from __future__ import unicode_literals
 
 from flask import flash, request
-from werkzeug.exceptions import NotFound
 
 from indico.core.db import db
 from indico.modules.admin import RHAdminBase
 from indico.modules.events.forms import EventLabelForm, ReferenceTypeForm
+from indico.modules.events.models.labels import EventLabel
 from indico.modules.events.models.references import ReferenceType
 from indico.modules.events.operations import (create_event_label, create_reference_type, delete_event_label,
                                               delete_reference_type, update_event_label, update_reference_type)
-from indico.modules.events.settings import event_labels_store
 from indico.modules.events.views import WPEventAdmin
 from indico.util.i18n import _
 from indico.web.flask.templating import get_template_module
@@ -83,7 +82,7 @@ class RHDeleteReferenceType(RHManageReferenceTypeBase):
 
 
 def _get_all_event_labels():
-    return sorted(event_labels_store.get_all().values(), key=lambda x: x.title.lower())
+    return EventLabel.query.order_by(db.func.lower(EventLabel.title)).all()
 
 
 def _render_event_label_list():
@@ -96,9 +95,7 @@ class RHManageEventLabelBase(RHAdminBase):
 
     def _process_args(self):
         RHAdminBase._process_args(self)
-        self.event_label = event_labels_store.get(request.view_args['event_label_id'])
-        if self.event_label is None:
-            raise NotFound
+        self.event_label = EventLabel.get_one(request.view_args['event_label_id'])
 
 
 class RHEventLabels(RHAdminBase):

@@ -173,7 +173,7 @@
 {% endmacro %}
 
 
-{% macro render_section_classification(event, has_reference_types, with_container=true) %}
+{% macro render_section_classification(event, has_reference_types, has_event_labels, with_container=true) %}
     {% set edit_cls_title = _('Edit keywords / references / label') if event.type == 'meeting' else _('Edit keywords / label') %}
     {% call render_section(event, 'classification', 'icon-tag', '.edit_classification', edit_cls_title,
                            with_container=with_container) %}
@@ -200,18 +200,20 @@
                     {% endcall %}
                 </dd>
             {% endif %}
-            <dt>{% trans %}Label{% endtrans %}</dt>
-            <dd>
-                {% call with_default() %}
-                    {{ event.get_label_markup('mini') }}
-                {% endcall %}
-            </dd>
+            {% if has_event_labels %}
+                <dt>{% trans %}Label{% endtrans %}</dt>
+                <dd>
+                    {% call with_default() %}
+                        {{ event.get_label_markup('mini') }}
+                    {% endcall %}
+                </dd>
+            {% endif %}
         </dl>
     {% endcall %}
 {% endmacro %}
 
 
-{% macro render_event_settings(event, has_reference_types, section=none, with_container=true) %}
+{% macro render_event_settings(event, has_reference_types, has_event_labels, section=none, with_container=true) %}
     {% if section is none or section == 'data' %}
         {{ render_section_data(event, with_container=with_container) }}
     {% endif %}
@@ -228,6 +230,6 @@
         {{ render_section_contact_info(event, with_container=with_container) }}
     {% endif %}
     {% if section is none or section == 'classification' %}
-        {{ render_section_classification(event, has_reference_types, with_container=with_container) }}
+        {{ render_section_classification(event, has_reference_types, has_event_labels, with_container=with_container) }}
     {% endif %}
 {% endmacro %}

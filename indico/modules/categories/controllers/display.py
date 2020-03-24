@@ -33,8 +33,6 @@ from indico.modules.categories.serialize import (serialize_categories_ical, seri
 from indico.modules.categories.util import get_category_stats, get_upcoming_events
 from indico.modules.categories.views import WPCategory, WPCategoryCalendar, WPCategoryStatistics
 from indico.modules.events.models.events import Event
-from indico.modules.events.models.settings import EventSetting
-from indico.modules.events.settings import event_label_settings, event_labels_store
 from indico.modules.events.timetable.util import get_category_timetable
 from indico.modules.events.util import get_base_ical_parameters, serialize_event_for_json_ld
 from indico.modules.news.util import get_recent_news
@@ -237,9 +235,10 @@ class RHDisplayCategoryEventsBase(RHDisplayCategoryBase):
     _category_query_options = (joinedload('children').load_only('id', 'title', 'protection_mode'),
                                undefer('attachment_count'), undefer('has_events'))
     _event_query_options = (joinedload('person_links'), joinedload('series'), undefer_group('series'),
+                            joinedload('label'),
                             load_only('id', 'category_id', 'created_dt', 'start_dt', 'end_dt', 'timezone',
                                       'protection_mode', 'title', 'type_', 'series_pos', 'series_count',
-                                      'own_address', 'own_venue_id', 'own_venue_name'))
+                                      'own_address', 'own_venue_id', 'own_venue_name', 'label_id', 'label_message'))
 
     def _process_args(self):
         RHDisplayCategoryBase._process_args(self)
@@ -278,16 +277,6 @@ class RHDisplayCategoryEventsBase(RHDisplayCategoryBase):
 
     def is_recent(self, dt):
         return dt > self.now - relativedelta(weeks=1)
-
-
-def _get_event_labels(events):
-    labels = {}
-    for setting in event_label_settings.query.filter(EventSetting.event_id.in_(e.id for e in events)):
-        value = setting.value
-        if setting.name == 'label':
-            value = event_labels_store.get(value)
-        labels.setdefault(setting.event_id, {})[setting.name] = value
-    return labels
 
 
 class RHDisplayCategory(RHDisplayCategoryEventsBase):
@@ -333,12 +322,9 @@ class RHDisplayCategory(RHDisplayCategoryEventsBase):
 
         managers = sorted(self.category.get_manager_list(), key=attrgetter('principal_type.name', 'name'))
 
-        labels = _get_event_labels(events)
-
         threshold_format = '%Y-%m'
         params = {'event_count': len(events),
                   'events_by_month': events_by_month,
-                  'labels': labels,
                   'format_event_date': self.format_event_date,
                   'future_event_count': future_event_count,
                   'show_future_events': show_future_events,
@@ -390,11 +376,10 @@ class RHEventList(RHDisplayCategoryEventsBase):
         self.events = event_query.all()
 
     def _process(self):
-        labels = _get_event_labels(self.events)
         events_by_month = self.group_by_month(self.events)
         tpl = get_template_module('categories/display/event_list.html')
         html = tpl.event_list_block(events_by_month=events_by_month, format_event_date=self.format_event_date,
-                                    is_recent=self.is_recent, happening_now=self.happening_now, labels=labels)
+                                    is_recent=self.is_recent, happening_now=self.happening_now)
         return jsonify_data(flash=False, html=html)
 
 

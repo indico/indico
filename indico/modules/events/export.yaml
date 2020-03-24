@@ -44,6 +44,8 @@ export:
       cloned_from_id: ~
       category_id: ~
       url_shortcut: ~
+      label_id: ~
+      label_message: ~
     fks:
       - EventPerson.event_id
       - EventPersonLink.event_id

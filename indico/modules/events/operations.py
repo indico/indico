@@ -23,8 +23,6 @@ from indico.modules.events.logs.util import make_diff_log
 from indico.modules.events.models.events import EventType
 from indico.modules.events.models.labels import EventLabel
 from indico.modules.events.models.references import ReferenceType
-from indico.modules.events.models.settings import EventSetting
-from indico.modules.events.settings import event_labels_store
 
 
 def create_reference_type(data):
@@ -56,30 +54,22 @@ def create_event_references(event, data):
 
 
 def create_event_label(data):
-    event_label = EventLabel(**data)
-    event_labels_store.set(event_label.id, event_label)
+    event_label = EventLabel()
+    event_label.populate_from_dict(data)
+    db.session.add(event_label)
     db.session.flush()
     logger.info('Event label "%s" created by %s', event_label, session.user)
     return event_label
 
 
 def update_event_label(event_label, data):
-    for k, v in data.items():
-        setattr(event_label, k, v)
-    event_labels_store.set(event_label.id, event_label)
+    event_label.populate_from_dict(data)
     db.session.flush()
     logger.info('Event label "%s" updated by %s', event_label, session.user)
 
 
 def delete_event_label(event_label):
-    events = (Event.query
-              .filter(Event.settings.any(db.and_(EventSetting.module == 'label',
-                                                 EventSetting.name == 'label',
-                                                 EventSetting.value[()].astext == event_label.id)))
-              .all())
-    for event in events:
-        event.label = None
-    event_labels_store.delete(event_label.id)
+    db.session.delete(event_label)
     db.session.flush()
     logger.info('Event label "%s" deleted by %s', event_label, session.user)
 

@@ -7,26 +7,36 @@
 
 from __future__ import unicode_literals
 
-import uuid
+from sqlalchemy.ext.declarative import declared_attr
 
+from indico.core.db import db
 from indico.util.locators import locator_property
 from indico.util.string import format_repr, return_ascii
 
 
-class EventLabel(object):
-    # TODO: convert this to a proper model in 2.3
-    id = None
-    title = None
-    color = None
+class EventLabel(db.Model):
+    __tablename__ = 'labels'
 
-    def __init__(self, **kwargs):
-        if 'id' not in kwargs:
-            self.id = str(uuid.uuid4())
-        for name, value in kwargs.iteritems():
-            setattr(self, name, value)
+    @declared_attr
+    def __table_args__(cls):
+        return (db.Index('ix_uq_labels_title_lower', db.func.lower(cls.title), unique=True),
+                {'schema': 'events'})
 
-    def __eq__(self, other):
-        return isinstance(other, EventLabel) and other.id == self.id
+    id = db.Column(
+        db.Integer,
+        primary_key=True
+    )
+    title = db.Column(
+        db.String,
+        nullable=False
+    )
+    color = db.Column(
+        db.String,
+        nullable=False
+    )
+
+    # relationship backrefs:
+    # - events (Event.label)
 
     @locator_property
     def locator(self):

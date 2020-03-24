@@ -33,9 +33,10 @@ _bp.add_url_rule('/admin/external-id-types/<int:reference_type_id>', 'delete_ref
                  methods=('DELETE',))
 
 # Single event label
-_bp.add_url_rule('/admin/event-labels/<event_label_id>/edit', 'update_event_label', RHEditEventLabel,
+_bp.add_url_rule('/admin/event-labels/<int:event_label_id>/edit', 'update_event_label', RHEditEventLabel,
                  methods=('GET', 'POST'))
-_bp.add_url_rule('/admin/event-labels/<event_label_id>', 'delete_event_label', RHDeleteEventLabel, methods=('DELETE',))
+_bp.add_url_rule('/admin/event-labels/<int:event_label_id>', 'delete_event_label', RHDeleteEventLabel,
+                 methods=('DELETE',))
 
 _bp.add_url_rule('/event/<confId>/event.ics', 'export_event_ical', RHExportEventICAL)
 

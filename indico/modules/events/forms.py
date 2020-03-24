@@ -20,8 +20,8 @@ from indico.core.db.sqlalchemy.protection import ProtectionMode
 from indico.modules.categories.fields import CategoryField
 from indico.modules.events.fields import EventPersonLinkListField, IndicoThemeSelectField
 from indico.modules.events.models.events import EventType
+from indico.modules.events.models.labels import EventLabel
 from indico.modules.events.models.references import ReferenceType
-from indico.modules.events.settings import event_labels_store
 from indico.util.i18n import _
 from indico.web.forms.base import IndicoForm
 from indico.web.forms.colors import get_sui_colors
@@ -63,9 +63,10 @@ class EventLabelForm(IndicoForm):
         super(EventLabelForm, self).__init__(*args, **kwargs)
 
     def validate_title(self, field):
-        conflict = next((x for x in event_labels_store.get_all().values() if x.title.lower() == field.data.lower()),
-                        None)
-        if conflict and (not self.event_label or conflict.id != self.event_label.id):
+        query = EventLabel.query.filter(db.func.lower(EventLabel.title) == field.data.lower())
+        if self.event_label:
+            query = query.filter(EventLabel.id != self.event_label.id)
+        if query.has_rows():
             raise ValidationError(_('This title is already in use.'))
 
 

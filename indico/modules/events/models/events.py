@@ -39,8 +39,7 @@ from indico.modules.categories import Category
 from indico.modules.events.logs import EventLogEntry
 from indico.modules.events.management.util import get_non_inheriting_objects
 from indico.modules.events.models.persons import PersonLinkDataMixin
-from indico.modules.events.settings import (EventSettingProperty, event_contact_settings, event_core_settings,
-                                            event_label_settings)
+from indico.modules.events.settings import EventSettingProperty, event_contact_settings, event_core_settings
 from indico.modules.events.timetable.models.entries import TimetableEntry
 from indico.util.caching import memoize_request
 from indico.util.date_time import get_display_tz, now_utc, overlaps
@@ -157,6 +156,17 @@ class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionMan
         db.ForeignKey('events.events.id'),
         nullable=True,
         index=True,
+    )
+    #: The ID of the label assigned to the event
+    label_id = db.Column(
+        db.ForeignKey('events.labels.id'),
+        index=True,
+        nullable=True
+    )
+    label_message = db.Column(
+        db.Text,
+        nullable=False,
+        default='',
     )
     #: The creation date of the event
     created_dt = db.Column(
@@ -333,6 +343,15 @@ class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionMan
             lazy=True,
             order_by=(start_dt, id),
             primaryjoin='(Event.series_id == EventSeries.id) & ~Event.is_deleted',
+        )
+    )
+    #: The label assigned to the event
+    label = db.relationship(
+        'EventLabel',
+        lazy=True,
+        backref=db.backref(
+            'events',
+            lazy=True
         )
     )
 
@@ -671,26 +690,6 @@ class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionMan
             title = '{} ({}/{})'.format(title, self.series_pos, self.series_count)
         return title
 
-    @property
-    def label(self):
-        return event_label_settings.get(self, 'label')
-
-    @label.setter
-    def label(self, label):
-        event_label_settings.set(self, 'label', label)
-        if label is None:
-            self.label_message = ''
-
-    @property
-    def label_message(self):
-        if not self.label:
-            return ''
-        return event_label_settings.get(self, 'message')
-
-    @label_message.setter
-    def label_message(self, message):
-        event_label_settings.set(self, 'message', message)
-
     def get_label_markup(self, size=''):
         label = self.label
         if not label:
@@ -937,6 +936,12 @@ def _set_start_end_dt(target, value, oldvalue, *unused):
         return
     if value != oldvalue:
         register_event_time_change(target)
+
+
+@listens_for(Event.label, 'set')
+def _set_label(target, value, oldvalue, *unused):
+    if oldvalue and not value:
+        target.label_message = ''
 
 
 @listens_for(Event.__table__, 'after_create')
