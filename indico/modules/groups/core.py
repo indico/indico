@@ -213,7 +213,10 @@ class _MultipassGroupProxy(GroupProxy):
 
     @property
     def supports_member_list(self):
-        return multipass.identity_providers[self.provider].group_class.supports_member_list
+        try:
+            return multipass.identity_providers[self.provider].group_class.supports_member_list
+        except KeyError:
+            return False
 
     @cached_property
     def group(self):
@@ -235,7 +238,10 @@ class _MultipassGroupProxy(GroupProxy):
 
     @property
     def provider_title(self):
-        return multipass.identity_providers[self.provider].title
+        try:
+            return multipass.identity_providers[self.provider].title
+        except KeyError:
+            return self.provider.title()
 
     def has_member(self, user):
         if not user:
