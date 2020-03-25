@@ -142,7 +142,7 @@ class RHDisplayTracks(RHDisplayEventBase):
                   .filter(~Track.track_group.has())
                   .all())
         track_groups = self.event.track_groups
-        items = sorted(tracks + track_groups,  key=attrgetter('position'))
+        items = sorted(tracks + track_groups, key=attrgetter('position'))
         return WPDisplayTracks.render_template('display.html', self.event, program=program, items=items)
 
 

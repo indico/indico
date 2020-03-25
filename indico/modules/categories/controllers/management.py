@@ -77,7 +77,7 @@ class RHManageCategoryContent(RHManageCategoryBase):
         order_column = order_columns[request.args.get('order', 'start_dt')]
         query = (Event.query.with_parent(self.category)
                  .options(joinedload('series'), undefer_group('series'),
-                          load_only('id', 'category_id', 'created_dt',  'end_dt', 'protection_mode', 'start_dt',
+                          load_only('id', 'category_id', 'created_dt', 'end_dt', 'protection_mode', 'start_dt',
                                     'title', 'type_', 'series_pos', 'series_count'))
                  .order_by(getattr(order_column, direction)())
                  .order_by(Event.id))

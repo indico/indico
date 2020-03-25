@@ -50,11 +50,11 @@ def calculate_rooms_booked_time(rooms, start_date=None, end_date=None):
 
     # this basically handles all possible ways an occurrence overlaps with each one of the working time slots
     overlaps = sum(db.case([
-                ((rsv_start < start) & (rsv_end > end), db.extract('epoch', end - start)),
-                ((rsv_start < start) & (rsv_end > start) & (rsv_end <= end), db.extract('epoch', rsv_end - start)),
-                ((rsv_start >= start) & (rsv_start < end) & (rsv_end > end), db.extract('epoch', end - rsv_start)),
-                ((rsv_start >= start) & (rsv_end <= end), db.extract('epoch', rsv_end - rsv_start))
-            ], else_=0) for start, end in slots)
+        ((rsv_start < start) & (rsv_end > end), db.extract('epoch', end - start)),
+        ((rsv_start < start) & (rsv_end > start) & (rsv_end <= end), db.extract('epoch', rsv_end - start)),
+        ((rsv_start >= start) & (rsv_start < end) & (rsv_end > end), db.extract('epoch', end - rsv_start)),
+        ((rsv_start >= start) & (rsv_end <= end), db.extract('epoch', rsv_end - rsv_start))
+    ], else_=0) for start, end in slots)
 
     return reservations.with_entities(db.func.sum(overlaps)).scalar() or 0
 

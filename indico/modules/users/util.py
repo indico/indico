@@ -245,11 +245,8 @@ def search_users(exact=False, include_deleted=False, include_pending=False, exte
     if not criteria:
         return set()
 
-    query = (build_user_search_query(
-                dict(criteria),
-                exact=exact,
-                include_deleted=include_deleted,
-                include_pending=include_pending)
+    query = (build_user_search_query(dict(criteria), exact=exact, include_deleted=include_deleted,
+                                     include_pending=include_pending)
              .options(db.joinedload(User.identities),
                       db.joinedload(User.merged_into_user)))
 

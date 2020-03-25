@@ -24,4 +24,4 @@ class BootstrapForm(LocalRegistrationForm):
     affiliation = StringField('Affiliation', [DataRequired()])
     enable_tracking = BooleanField('Join the community', widget=SwitchWidget())
     contact_name = StringField('Contact Name', [UsedIfChecked('enable_tracking'), DataRequired()])
-    contact_email = EmailField('Contact Email Address',  [UsedIfChecked('enable_tracking'), DataRequired(), Email()])
+    contact_email = EmailField('Contact Email Address', [UsedIfChecked('enable_tracking'), DataRequired(), Email()])

@@ -17,7 +17,12 @@ exclude =
     .git
     __pycache__
 
-extend-ignore =
+ignore =
+    # allow omitting whitespace around arithmetic operators
+    E226
+    # don't require specific wrapping before/after binary operators
+    W503
+    W504
     # allow assigning lambdas (it's useful for single-line functions defined inside other functions)
     E731
 
