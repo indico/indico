@@ -38,11 +38,11 @@ def _check_feature_definitions(app, **kwargs):
 
 
 @signals.event.created.connect
-def _event_created(event, **kwargs):
+def _event_created(event, cloning, **kwargs):
     from indico.modules.events.features.util import get_feature_definitions, get_enabled_features
     feature_definitions = get_feature_definitions()
     for feature in get_enabled_features(event):
-        feature_definitions[feature].enabled(event)
+        feature_definitions[feature].enabled(event, cloning)
 
 
 @signals.event.type_changed.connect

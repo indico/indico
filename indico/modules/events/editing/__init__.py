@@ -12,6 +12,7 @@ from flask import flash, session
 from indico.core import signals
 from indico.core.logger import Logger
 from indico.core.permissions import ManagementPermission
+from indico.modules.events.editing.clone import EditingSettingsCloner
 from indico.modules.events.features.base import EventFeature
 from indico.modules.events.models.events import Event, EventType
 from indico.util.i18n import _
@@ -33,13 +34,14 @@ class EditingFeature(EventFeature):
         return event.type_ == EventType.conference
 
     @classmethod
-    def enabled(cls, event):
+    def enabled(cls, event, cloning):
         from indico.modules.events.editing.models.file_types import EditingFileType
         if not EditingFileType.query.with_parent(event).filter_by(publishable=True).has_rows():
             ft = EditingFileType(name='PDF', extensions=['pdf'], publishable=True, required=True)
             event.editing_file_types.append(ft)
-            flash(_("A default publishable PDF file type has been created; if you want to use other file types in "
-                    "your event's editing workflow, please configure them accordingly."))
+            if not cloning:
+                flash(_("A default publishable PDF file type has been created; if you want to use other file types in "
+                        "your event's editing workflow, please configure them accordingly."))
 
 
 @signals.event.get_feature_definitions.connect
@@ -58,6 +60,11 @@ def _extend_event_management_menu(sender, event, **kwargs):
         return
     return SideMenuItem('editing', _('Paper Editing'), url_for('event_editing.dashboard', event),
                         section='organization')
+
+
+@signals.event_management.get_cloners.connect
+def _get_cloners(sender, **kwargs):
+    yield EditingSettingsCloner
 
 
 class EditableEditorPermission(ManagementPermission):

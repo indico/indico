@@ -43,7 +43,8 @@ the old category is in the `old_parent` kwarg.
 """)
 
 created = _signals.signal('created', """
-Called when a new event is created. The `sender` is the new Event.
+Called when a new event is created. The `sender` is the new Event. The `cloning`
+kwarg indictates whether the event is a clone.
 """)
 
 session_updated = _signals.signal('session-updated', """

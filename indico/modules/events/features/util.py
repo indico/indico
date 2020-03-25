@@ -62,14 +62,16 @@ def set_feature_enabled(event, name, state):
     if state:
         funcs = {feature_definitions[x].enabled for x in names - enabled}
         enabled |= names
+        extra_args = {'cloning': False}
     else:
         old = set(enabled)
         enabled -= feature.required_by_deep | {name}
         funcs = {feature_definitions[x].disabled for x in old - enabled}
+        extra_args = {}
     features_event_settings.set(event, 'enabled', sorted(enabled))
     db.session.flush()
     for func in funcs:
-        func(event)
+        func(event, **extra_args)
     return True
 
 
