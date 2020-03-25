@@ -62,7 +62,7 @@ class EventFeature(object):
         return True
 
     @classmethod
-    def enabled(cls, event):  # pragma: no cover
+    def enabled(cls, event, cloning):  # pragma: no cover
         """Called when the feature is enabled for an event"""
         pass
 

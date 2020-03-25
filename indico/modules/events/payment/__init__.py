@@ -65,7 +65,7 @@ class PaymentFeature(EventFeature):
     description = _('Gives event managers the opportunity to process payments for registrations.')
 
     @classmethod
-    def enabled(cls, event):
+    def enabled(cls, event, cloning):
         for setting in ('conditions',):
             if payment_event_settings.get(event, setting) is None:
                 value = payment_settings.get(setting)

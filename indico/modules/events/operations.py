@@ -75,8 +75,7 @@ def delete_event_label(event_label):
 
 
 @no_autoflush
-def create_event(category, event_type, data, add_creator_as_manager=True, features=None):
-    from indico.modules.rb.operations.bookings import create_booking_for_event
+def create_event(category, event_type, data, add_creator_as_manager=True, features=None, cloning=False):
     """Create a new event.
 
     :param category: The category in which to create the event
@@ -88,7 +87,9 @@ def create_event(category, event_type, data, add_creator_as_manager=True, featur
                      event. If set, only those features will be used
                      and the default feature set for the event type
                      will be ignored.
+    :param cloning: Whether the event is created via cloning or not
     """
+    from indico.modules.rb.operations.bookings import create_booking_for_event
     event = Event(category=category, type_=event_type)
     data.setdefault('creator', session.user)
     theme = data.pop('theme', None)
@@ -105,7 +106,7 @@ def create_event(category, event_type, data, add_creator_as_manager=True, featur
     if features is not None:
         features_event_settings.set(event, 'enabled', features)
     db.session.flush()
-    signals.event.created.send(event)
+    signals.event.created.send(event, cloning=cloning)
     logger.info('Event %r created in %r by %r ', event, category, session.user)
     event.log(EventLogRealm.event, EventLogKind.positive, 'Event', 'Event created', session.user)
     db.session.flush()
@@ -170,7 +171,7 @@ def clone_event(event, start_dt, cloners, category=None):
     }
     new_event = create_event(category or event.category, event.type_, data,
                              features=features_event_settings.get(event, 'enabled'),
-                             add_creator_as_manager=False)
+                             add_creator_as_manager=False, cloning=True)
 
     # Run the modular cloning system
     EventCloner.run_cloners(event, new_event, cloners)
