@@ -629,7 +629,7 @@ def clone_principals(cls, principals, event_role_map=None):
     """
     rv = set()
     assert all(isinstance(x, cls) for x in principals)
-    attrs = get_simple_column_attrs(cls) | {'user', 'local_group', 'ip_network_group'}
+    attrs = get_simple_column_attrs(cls) | {'user', 'local_group', 'ip_network_group', 'category_role'}
     for old_principal in principals:
         event_role = None
         if old_principal.type == PrincipalType.event_role:
