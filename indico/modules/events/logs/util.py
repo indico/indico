@@ -46,6 +46,7 @@ def make_diff_log(changes, fields):
         convert = field_data.get('convert')
         attr = field_data.get('attr')
         type_ = field_data.get('type')
+        not_none_change = [x for x in change if x is not None]
         if attr:
             change = [getattr(x, attr) if x is not None else '' for x in change]
         if convert:
@@ -54,7 +55,7 @@ def make_diff_log(changes, fields):
             # when we have an explicit type specified don't do any
             # guessing/conversions
             pass
-        elif all(isinstance(x, Enum) for x in change):
+        elif not_none_change and all(isinstance(x, Enum) for x in not_none_change):
             type_ = 'enum'
             change = [orig_string(getattr(x, 'title', x.name)) for x in change]
         elif all(isinstance(x, (int, long, float)) for x in change):
