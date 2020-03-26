@@ -1,19 +1,78 @@
 name: CI
 
-on: [push]
+on:
+  push:
+    branches: [master, actions]
+  pull_request:
+    branches: [master, actions]
 
 jobs:
-  build:
+  setup:
     runs-on: ubuntu-latest
-
-    services:
-      postgres:
-        image: postgres:9.6
-        ports:
-          - 5432/tcp
-        options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
-
     steps:
+      - uses: actions/checkout@v2
+
+      - uses: actions/cache@v1
+        id: cache-pip
+        with:
+          path: .venv
+          key: ${{ runner.os }}-pip-${{ hashFiles('requirements*.txt') }}
+
+      - uses: actions/cache@v1
+        id: cache-npm
+        with:
+          path: node_modules
+          key: ${{ runner.os }}-npm-${{ hashFiles('package*.json') }}
+
+      - name: Setup Python
+        uses: actions/setup-python@v1
+        if: steps.cache-pip.outputs.cache-hit != 'true'
+        with:
+          python-version: 2.7
+
+      - name: Setup Node
+        uses: actions/setup-node@v1
+        if: steps.cache-npm.outputs.cache-hit != 'true'
+        with:
+          node-version: 12.x
+
+      - name: Install system dependencies
+        if: steps.cache-pip.outputs.cache-hit != 'true'
+        run: sudo apt-get install libpq-dev python-virtualenv
+
+      - name: Install python dependencies
+        if: steps.cache-pip.outputs.cache-hit != 'true'
+        run: |
+          virtualenv -p /usr/bin/python2.7 .venv
+          source .venv/bin/activate
+          pip install -U pip setuptools
+          pip install -r requirements.dev.txt
+          pip install -r requirements.txt
+
+      - name: Install node dependencies
+        if: steps.cache-npm.outputs.cache-hit != 'true'
+        run: npm ci
+
+
+  lint:
+    needs: setup
+    runs-on: ubuntu-latest
+    steps:
+      # BEGIN common steps - edit all occurrences if needed!
+      - uses: actions/checkout@v2
+
+      - uses: actions/cache@v1
+        id: cache-pip
+        with:
+          path: .venv
+          key: ${{ runner.os }}-pip-${{ hashFiles('requirements*.txt') }}
+
+      - uses: actions/cache@v1
+        id: cache-npm
+        with:
+          path: node_modules
+          key: ${{ runner.os }}-npm-${{ hashFiles('package*.json') }}
+
       - name: Setup Python
         uses: actions/setup-python@v1
         with:
@@ -22,11 +81,93 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v1
         with:
-          node-version: 10.x
+          node-version: 12.x
+
+      - name: Activate virtualenv for later steps
+        run: |
+          echo "::set-env name=VIRTUAL_ENV::$(pwd)/.venv"
+          echo "::add-path::$(pwd)/.venv/bin"
+
+      - name: Install Indico
+        run: pip install -e .
+      # END common steps
+
+      - name: Check import sorting
+        run: isort -rc --diff --check-only indico/
+
+      - name: Check backref comments
+        if: success() || failure()
+        run: python bin/maintenance/update_backrefs.py --ci
+
+      - name: Run flake8
+        if: success() || failure()
+        run: flake8
+
+      - name: Try extracting i18n strings
+        if: success() || failure()
+        run: FORCE_COLOR=1 npx react-jsx-i18n extract --ext jsx indico/web/client/ indico/modules/ > /dev/null
+
+      - name: Run eslint
+        if: success() || failure()
+        run: npx eslint --ext .js --ext .jsx
+             indico/modules/rb/
+             indico/modules/events/logs/
+             indico/modules/events/editing/
+             indico/web/client/js/react/
+             indico/modules/users/
+
+
+  test-python:
+    needs: setup
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:11
+        env:
+          POSTGRES_HOST_AUTH_METHOD: trust
+        ports:
+          - 5432
+        options: --health-cmd pg_isready --health-interval 5s --health-timeout 5s --health-retries 10
+
+    steps:
+      # BEGIN common steps - edit all occurrences if needed!
+      - uses: actions/checkout@v2
+
+      - uses: actions/cache@v1
+        id: cache-pip
+        with:
+          path: .venv
+          key: ${{ runner.os }}-pip-${{ hashFiles('requirements*.txt') }}
+
+      - uses: actions/cache@v1
+        id: cache-npm
+        with:
+          path: node_modules
+          key: ${{ runner.os }}-npm-${{ hashFiles('package*.json') }}
+
+      - name: Setup Python
+        uses: actions/setup-python@v1
+        with:
+          python-version: 2.7
+
+      - name: Setup Node
+        uses: actions/setup-node@v1
+        with:
+          node-version: 12.x
+
+      - name: Activate virtualenv for later steps
+        run: |
+          echo "::set-env name=VIRTUAL_ENV::$(pwd)/.venv"
+          echo "::add-path::$(pwd)/.venv/bin"
+
+      - name: Install Indico
+        run: pip install -e .
+      # END common steps
 
       - name: Setup database
         run: |
-          sudo apt-get install postgresql-client
+          sudo apt-get install postgresql-client libpq-dev
           export PGHOST=localhost
           export PGPORT=${{ job.services.postgres.ports[5432] }}
           export PGUSER=postgres
@@ -35,33 +176,52 @@ jobs:
           psql indicotest -c 'CREATE EXTENSION unaccent;'
           psql indicotest -c 'CREATE EXTENSION pg_trgm;'
 
-      - uses: actions/checkout@v1
-
-      - name: Install dependencies
-        run: |
-          sudo apt-get install libpq-dev
-          pip install -U pip setuptools
-          pip install -r requirements.dev.txt
-          pip install -e .
-
-      - name: Check import sorting
-        run: isort -rc --diff --check-only indico/
-
-      - name: Check backref comments
-        run: python bin/maintenance/update_backrefs.py --ci
-
-      - name: Run tests
+      - name: Run pytest tests
         run: |
           export INDICO_TEST_DATABASE_URI="postgresql://indicotest@localhost:${{ job.services.postgres.ports[5432] }}/indicotest"
-          pytest
+          pytest --color=yes
 
-      - name: Install node dependencies
-        run: npm ci
 
-      - name: Try extracting i18n strings
+  test-js:
+    needs: setup
+    runs-on: ubuntu-latest
+    steps:
+      # BEGIN common steps - edit all occurrences if needed!
+      - uses: actions/checkout@v2
+
+      - uses: actions/cache@v1
+        id: cache-pip
+        with:
+          path: .venv
+          key: ${{ runner.os }}-pip-${{ hashFiles('requirements*.txt') }}
+
+      - uses: actions/cache@v1
+        id: cache-npm
+        with:
+          path: node_modules
+          key: ${{ runner.os }}-npm-${{ hashFiles('package*.json') }}
+
+      - name: Setup Python
+        uses: actions/setup-python@v1
+        with:
+          python-version: 2.7
+
+      - name: Setup Node
+        uses: actions/setup-node@v1
+        with:
+          node-version: 12.x
+
+      - name: Activate virtualenv for later steps
         run: |
-          export FORCE_COLOR=1
-          npx react-jsx-i18n extract --ext jsx indico/web/client/ indico/modules/ >/dev/null
+          echo "::set-env name=VIRTUAL_ENV::$(pwd)/.venv"
+          echo "::add-path::$(pwd)/.venv/bin"
+
+      - name: Install Indico
+        run: pip install -e .
+      # END common steps
+
+      - name: Run jest tests
+        run: npm test
 
       - name: Try building assets
         run: python bin/maintenance/build-assets.py indico --dev
