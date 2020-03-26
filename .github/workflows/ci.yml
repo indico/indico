@@ -101,7 +101,10 @@ jobs:
 
       - name: Run flake8
         if: success() || failure()
-        run: flake8
+        run: |
+          echo "::add-matcher::.github/matchers/flake8-problem-matcher.json"
+          flake8 --format '%(path)s:%(row)d:%(col)d: %(code)s %(text)s'
+          echo "::remove-matcher owner=flake8::"
 
       - name: Try extracting i18n strings
         if: success() || failure()
