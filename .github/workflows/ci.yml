@@ -108,7 +108,10 @@ jobs:
 
       - name: Try extracting i18n strings
         if: success() || failure()
-        run: FORCE_COLOR=1 npx react-jsx-i18n extract --ext jsx indico/web/client/ indico/modules/ > /dev/null
+        run: |
+          echo "::add-matcher::.github/matchers/react-jsx-i18n-problem-matcher.json"
+          FORCE_COLOR=1 npx react-jsx-i18n extract --ext jsx indico/web/client/ indico/modules/ > /dev/null
+          echo "::remove-matcher owner=react-jsx-i18n::"
 
       - name: Run eslint
         if: success() || failure()
