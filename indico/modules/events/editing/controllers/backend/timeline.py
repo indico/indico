@@ -115,7 +115,7 @@ class RHReviewEditable(RHContributionEditableRevisionBase):
     @use_kwargs(ReviewEditableArgs)
     def _process(self, action, comment):
         argmap = {'tags': EditingTagsField(self.event, missing=set())}
-        if action == EditingReviewAction.update:
+        if action in (EditingReviewAction.update, EditingReviewAction.update_accept):
             argmap['files'] = EditingFilesField(self.event, self.contrib, allow_claimed_files=True, required=True)
         args = parser.parse(argmap)
         review_editable_revision(self.revision, session.user, action, comment, args['tags'], args.get('files'))

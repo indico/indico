@@ -144,6 +144,7 @@ class EditingReviewAction(IndicoEnum):
     accept = 'accept'
     reject = 'reject'
     update = 'update'
+    update_accept = 'update_accept'
     request_update = 'request_update'
 
 

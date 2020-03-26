@@ -65,7 +65,12 @@ export function processRevisions(revisions) {
       items = [...items, ...updatedRevision.comments];
     } else if (finalState.name === FinalRevisionState.accepted) {
       let header;
-      if (initialState.name === InitialRevisionState.needs_submitter_confirmation) {
+      if (
+        revision.editor !== null &&
+        initialState.name === InitialRevisionState.needs_submitter_confirmation
+      ) {
+        header = Translate.string('Editor has accepted after making some changes');
+      } else if (initialState.name === InitialRevisionState.needs_submitter_confirmation) {
         header = Translate.string('Submitter has accepted proposed changes');
       } else {
         header = Translate.string('Revision has been accepted');
@@ -106,7 +111,7 @@ export function processRevisions(revisions) {
       items.push(
         createNewCustomItemFromRevision(revision, {
           user: revisions[0].submitter,
-          header: Translate.string('Editor made some changes and awaits submitter confirmation'),
+          header: Translate.string('Editor made some changes'),
           state: 'needs_submitter_confirmation',
           html: revision.commentHtml,
         })
@@ -169,7 +174,8 @@ export const needsSubmitterConfirmation = createSelector(
   getLastRevision,
   lastRevision =>
     lastRevision.initialState.name === InitialRevisionState.needs_submitter_confirmation &&
-    lastRevision.finalState.name === FinalRevisionState.none
+    lastRevision.finalState.name === FinalRevisionState.none &&
+    lastRevision.editor === null
 );
 export const getStaticData = state => state.staticData;
 

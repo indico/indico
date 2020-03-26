@@ -97,15 +97,23 @@ def review_editable_revision(revision, editor, action, comment, tags, files=None
         EditingReviewAction.accept: FinalRevisionState.accepted,
         EditingReviewAction.reject: FinalRevisionState.rejected,
         EditingReviewAction.update: FinalRevisionState.needs_submitter_confirmation,
+        EditingReviewAction.update_accept: FinalRevisionState.needs_submitter_confirmation,
         EditingReviewAction.request_update: FinalRevisionState.needs_submitter_changes,
     }[action]
 
     db.session.flush()
     if action == EditingReviewAction.accept:
         publish_editable_revision(revision)
-    elif action == EditingReviewAction.update:
+    elif action in (EditingReviewAction.update, EditingReviewAction.update_accept):
+        final_state = FinalRevisionState.none
+        editable_editor = None
+        if action == EditingReviewAction.update_accept:
+            final_state = FinalRevisionState.accepted
+            editable_editor = editor
         new_revision = EditingRevision(submitter=editor,
+                                       editor=editable_editor,
                                        initial_state=InitialRevisionState.needs_submitter_confirmation,
+                                       final_state=final_state,
                                        files=_make_editable_files(revision.editable, files),
                                        tags=revision.tags)
         revision.editable.revisions.append(new_revision)
@@ -177,7 +185,11 @@ def undo_review(revision):
                       initial=InitialRevisionState.needs_submitter_confirmation,
                       final=FinalRevisionState.none)
         db.session.delete(latest_revision)
-    if revision.final_state == FinalRevisionState.accepted:
+    if (revision.initial_state == InitialRevisionState.needs_submitter_confirmation and
+            revision.final_state == FinalRevisionState.accepted and revision.editor is not None):
+        revision = revision.editable.revisions[-2]
+        db.session.delete(latest_revision)
+    elif revision.final_state == FinalRevisionState.accepted:
         revision.editable.published_revision = None
     db.session.flush()
     revision.final_state = FinalRevisionState.none
