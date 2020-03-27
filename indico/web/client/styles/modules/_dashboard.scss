@@ -89,7 +89,6 @@
 }
 
 .dashboard-box ol li {
-    display: block;
     border-bottom: 1px solid #e5e5e5;
     padding: 10px 10px 5px 10px;
 }
@@ -106,7 +105,7 @@
 }
 
 .dashboard-box.suggestions ol li > a {
-    margin-right: 35px;
+    margin-right: 15px;
 }
 
 .dashboard-box ol li .actions {
@@ -151,7 +150,6 @@
 .dashboard-box ol .event-category {
     display: block;
     font-size: 0.8em;
-    margin-left: 89px;
 }
 
 .dashboard-box ol .item-legend {
@@ -173,19 +171,6 @@
     display: inline-block;
 }
 
-.truncate .truncate-target {
-    @include ellipsis();
-    display: inline-block;
-}
-
-.dashboard-box .event-title.truncate-target {
-    max-width: 90%;
-}
-
-#happeningCategories .event-title.truncate-target { // sass-lint:disable-line no-ids id-name-format
-    max-width: 90%;
-}
-
 .item-legend [class*='icon-'] {
     color: #ddd;
     font-size: 18px;
@@ -197,7 +182,7 @@
 
 .your-details {
     display: flex;
-    flex-wrap: wrap;
+    flex-flow: row nowrap;
     margin-bottom: 15px;
 
     .avatar-image {
@@ -219,10 +204,11 @@
         font-size: 1.2em;
         line-height: 1.5;
         max-width: 300px;
+        margin-right: 5px;
 
         h3 {
             margin-top: 0;
-            margin-bottom: 5px;
+            margin-bottom: 10px;
         }
 
         i {
@@ -231,11 +217,18 @@
         }
 
         .your-labels {
+            display: flex;
+            flex-flow: row wrap;
             margin-bottom: 1rem;
+
+            .label {
+                margin: 0 7px 7px 0;
+            }
         }
     }
 
     .actions {
+        flex-shrink: 0;
         margin-left: auto;
     }
 }

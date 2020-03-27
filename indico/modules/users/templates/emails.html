@@ -18,15 +18,24 @@
                 <ul class="group-list with-buttons content-after">
                     <li>
                         <span><strong>{{ user.email }}</strong></span>
-                        <span class="i-label">{% trans %}Primary{% endtrans %}</span>
+                        <span class="ui label">{% trans %}Primary{% endtrans %}</span>
                     </li>
                     {% for email in user.secondary_emails|sort %}
-                        <li class="js-email-row">
+                        <li class="flexrow f-a-center js-email-row">
                             <span>{{ email }}</span>
-                            <a class="toggle icon-remove right js-delete-email" href="#" data-href="{{ url_for('.user_emails_delete', email=email) }}" style="margin-left: 10px;"></a>
-                            <button type="button" class="ui primary button right" data-href="{{ url_for('.user_emails_set_primary') }}" data-method='POST' data-params="{{ {'email': email} | tojson | forceescape }}">
-                                {%- trans %}Set as primary{% endtrans -%}
-                            </button>
+                            <span class="right">
+                                <button type="button"
+                                        class="ui primary small button"
+                                        data-href="{{ url_for('.user_emails_set_primary') }}"
+                                        data-method="POST"
+                                        data-params="{{ {'email': email} | tojson | forceescape }}">
+                                    {%- trans %}Set as primary{% endtrans -%}
+                                </button>
+                                <button class="ui icon small button js-delete-email"
+                                        data-href="{{ url_for('.user_emails_delete', email=email) }}">
+                                    <i class="trash alternate icon"></i>
+                                </button>
+                            </span>
                         </li>
                     {% endfor %}
                 </ul>

@@ -13,7 +13,7 @@
                     <div class="i-box-buttons toolbar">
                         <div class="group">
                             <button type="button"
-                                    class="ui orange button"
+                                    class="ui orange small button"
                                     data-href="{{ url_for('.key_create') }}"
                                     data-method="post"
                                     data-params='{"force": "1"}'
@@ -24,7 +24,7 @@
                                 {%- trans %}Create new API key{% endtrans -%}
                             </button>
                             <button type="button"
-                                    class="ui negative button"
+                                    class="ui negative small button"
                                     data-href="{{ url_for('.key_delete') }}"
                                     data-method="post"
                                     data-title="{% trans %}Delete API key{% endtrans %}"
@@ -118,7 +118,7 @@
                 <div class="i-box-buttons toolbar">
                     <div class="group">
                         <button type="button"
-                                class="ui warning button"
+                                class="ui negative small button"
                                 data-href="{{ url_for('core.reset_signature_tokens') }}"
                                 data-method="POST"
                                 data-confirm="{% trans %}Are you sure you'd like to invalidate all your
@@ -150,14 +150,14 @@
                             <div class="group">
                                 {% if key.is_blocked %}
                                     <button type="button"
-                                            class="ui positive button"
+                                            class="ui positive small button"
                                             data-href="{{ url_for('.key_block') }}"
                                             data-method="post">
                                         {%- trans %}Unblock API key{% endtrans -%}
                                     </button>
                                 {% else %}
                                     <button type="button"
-                                            class="ui negative button"
+                                            class="ui negative small button"
                                             data-href="{{ url_for('.key_block') }}"
                                             data-method="post">
                                         <i aria-hidden="true" class="icon ban"></i>

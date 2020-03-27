@@ -402,10 +402,30 @@ $i-box-padding: 10px;
     > li {
         @include border-top();
         padding: 10px;
-        display: flex;
-        flex-direction: row;
-        align-items: center;
-        overflow: hidden;
+
+        > span:not(:last-child) {
+            margin-right: 10px;
+        }
+
+        .list-item-title {
+            font-weight: bold;
+        }
+
+        .list-item-info {
+            margin: 0 1em;
+
+            > span:not(:last-child) {
+                margin-right: 0.7em;
+            }
+
+            .label {
+                font-weight: bold;
+            }
+
+            .content {
+                font-style: italic;
+            }
+        }
 
         // Sortable row with handle on the left
         &.ui-sortable {
@@ -465,27 +485,6 @@ $i-box-padding: 10px;
 
         .i-button {
             margin-top: 0;
-        }
-    }
-
-    .list-item-title {
-        font-weight: bold;
-        margin-right: 5px;
-    }
-
-    .list-item-info {
-        margin: 0 1em;
-
-        > span:not(:last-child) {
-            margin-right: 0.7em;
-        }
-
-        .label {
-            font-weight: bold;
-        }
-
-        .content {
-            font-style: italic;
         }
     }
 }

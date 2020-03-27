@@ -45,9 +45,9 @@
                         <h3>{{ user.full_name }}</h3>
                         <div class="your-labels">
                             {% if config.DEBUG %}
-                                <div class="ui label">
-                                  ID
-                                  <div class="detail">{{ user.id }}</div>
+                                <div class="ui small label">
+                                    ID
+                                    <div class="detail">{{ user.id }}</div>
                                 </div>
                             {% endif %}
                             {{ labels(user) }}
@@ -79,12 +79,12 @@
                     </h3>
                     <ol>
                         {% for event, roles in linked_events %}
-                            <li id="event-{{ event.id }}" class="truncate">
+                            <li id="event-{{ event.id }}" class="flexrow">
                                 <span class="event-date" title="{{ _format_event_times(event) }}">
                                     {{ _format_event_time(event) }}
                                 </span>
-                                <span class="event-title truncate-target">
-                                    <a href="{{ event.url }}" class="truncate">
+                                <span class="event-title ellipsis f-self-stretch">
+                                    <a href="{{ event.url }}">
                                         {{ event.get_verbose_title(show_series_pos=true) }}
                                     </a>
                                 </span>
@@ -106,7 +106,7 @@
                         {% endfor %}
                     </ol>
                 </div>
-                {% if suggested_categories %}
+                {% if suggested_categories and user == session.user %}
                     <div id="suggestedCategories" class="dashboard-box suggestions">
                         <h3>{% trans %}You might be interested in the following categories...{% endtrans %}</h3>
                         <ol>
@@ -123,7 +123,9 @@
                     <ol>
                         {% if not categories %}
                             <li class="no-event">
-                                <span class="event-title italic text-superfluous">{% trans %}You have no categories.{% endtrans %}</span>
+                                <span class="event-title italic text-superfluous">
+                                    {% trans %}You have no categories.{% endtrans %}
+                                </span>
                             </li>
                         {% else %}
                             {% for category in categories.itervalues() %}
@@ -149,18 +151,21 @@
                             </li>
                         {% else %}
                             {% for event in categories_events %}
-                                <li class="truncate">
-                                    <a href="{{ event.url }}" class="truncate">
-                                        <span class="event-date" title="{{ _format_event_times(event) }}">
-                                            {{ _format_event_time(event) }}
-                                        </span>
-                                        <span class="event-title truncate-target">
-                                            {{ event.get_verbose_title(show_series_pos=true) }}
+                                <li class="flexrow">
+                                    <span class="event-date f-self-no-shrink"
+                                          title="{{ _format_event_times(event) }}">
+                                        {{ _format_event_time(event) }}
+                                    </span>
+                                    <div class="flexcol ellipsis">
+                                        <span class="event-title ellipsis">
+                                            <a href="{{ event.url }}">
+                                                {{ event.get_verbose_title(show_series_pos=true) }}
+                                            </a>
                                         </span>
                                         <span class="event-category">
                                             {{ event.category.title }}
                                         </span>
-                                    </a>
+                                    </div>
                                 </li>
                             {% endfor %}
                         {% endif %}

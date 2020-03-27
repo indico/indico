@@ -644,12 +644,12 @@ class RHUserSearchInfo(RHProtected):
 class RHUserBlock(RHUserBase):
     def _process_PUT(self):
         self.user.is_blocked = True
-        logger.info("User %s blocked %s", session.user, self.user)
+        logger.info('User %s blocked %s', session.user, self.user)
         flash(_('{name} has been blocked.').format(name=self.user.name), 'success')
-        return jsonify(flash=False)
+        return jsonify(success=True)
 
     def _process_DELETE(self):
         self.user.is_blocked = False
-        logger.info("User %s unblocked %s", session.user, self.user)
+        logger.info('User %s unblocked %s', session.user, self.user)
         flash(_('{name} has been unblocked.').format(name=self.user.name), 'success')
-        return jsonify(flash=False)
+        return jsonify(success=True)

@@ -99,35 +99,35 @@
                 <ul class="group-list with-buttons">
                     {% if user.external_identities %}
                         {% for identity in user.external_identities | sort(attribute='safe_last_login_dt', reverse=True) %}
-                            <li>
+                            <li class="flexrow f-a-center">
                                 <span class="list-item-title">
                                     {{ provider_titles[identity.provider] }}
                                 </span>
-                                <small>
-                                    ({{ identity.identifier }})
-                                </small>
+                                <span>
+                                    <small>
+                                        ({{ identity.identifier }})
+                                    </small>
+                                </span>
                                 <span class="right">
                                     <span class="list-item-info">
-                                        <span>
-                                            <span class="label">
-                                                {% trans %}Last login:{% endtrans %}
-                                            </span>
-                                            <span class="content">
-                                                {% if identity.last_login_dt %}
-                                                    {{ identity.last_login_dt | format_datetime('short') }}
-                                                {% else %}
-                                                    {% trans %}Never{% endtrans %}
-                                                {% endif %}
-                                            </span>
+                                        <span class="label">
+                                            {% trans %}Last login:{% endtrans %}
+                                        </span>
+                                        <span class="content">
+                                            {% if identity.last_login_dt %}
+                                                {{ identity.last_login_dt | format_datetime('short') }}
+                                            {% else %}
+                                                {% trans %}Never{% endtrans %}
+                                            {% endif %}
                                         </span>
                                     </span>
                                     {% if identity.id == session.login_identity %}
-                                        <button class="ui primary small button" disabled
+                                        <button class="ui primary tiny button" disabled
                                             title="{% trans %}The account used to log in cannot be unlinked{% endtrans %}">
                                             {% trans %}Unlink{% endtrans %}
                                         </button>
                                     {% else %}
-                                        <button class="ui primary small button right"
+                                        <button class="ui primary tiny button right"
                                             data-href="{{ url_for('.remove_account', identity) }}"
                                             data-method="post"
                                             data-title="{% trans %}Unlink account{% endtrans %}"

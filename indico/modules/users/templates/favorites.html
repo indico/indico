@@ -18,11 +18,15 @@
                                 {{ favorite_users_list(user) }}
                             </ul>
                         {% else %}
-                            <span class="empty">{% trans %}You have not marked any user as favourite.{% endtrans %}</span>
+                            <span class="empty">
+                                {% trans %}You have not marked any user as favourite.{% endtrans %}
+                            </span>
                         {% endif %}
                     </div>
                 </div>
-                <button class="ui primary button js-add-user" style="margin-top: 15px;">{% trans %}Add Indico user{% endtrans %}</button>
+                <button class="ui primary button js-add-user" style="margin-top: 15px;">
+                    {% trans %}Add Indico user{% endtrans %}
+                </button>
             </div>
             <div class="column col-50">
                 <div class="i-box just-group-list">
@@ -39,7 +43,9 @@
                                 {% endfor %}
                             </ul>
                         {% else %}
-                            <span class="empty">{% trans %}You have not marked any category as favourite.{% endtrans %}</span>
+                            <span class="empty">
+                                {% trans %}You have not marked any category as favourite.{% endtrans %}
+                            </span>
                         {% endif %}
                     </div>
                 </div>

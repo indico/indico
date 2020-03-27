@@ -52,7 +52,7 @@
                     {% endif %}
                 </div>
             </div>
-            <div class="i-box-content">
+            <span class="i-box-content">
                 <div class="info-message-box">
                     <div class="message-text">
                         {%- trans num_of_users=num_of_users -%}
@@ -79,7 +79,7 @@
                         </h3>
                         <ul class="group-list">
                             {% for user_entry in search_results -%}
-                                <li>
+                                <li class="flexrow f-a-center">
                                     <span>
                                         {%- if user_entry.profile_url -%}
                                             <a href="{{ user_entry.profile_url }}">{{ user_entry.full_name }}</a>
@@ -88,9 +88,11 @@
                                         {%- endif -%}
                                     </span>
                                     {% if user_entry.user %}
-                                        {{ labels(user_entry.user) }}
+                                        <span>
+                                            {{ labels(user_entry.user) }}
+                                        </span>
                                     {% endif %}
-                                    <span class="right">
+                                    <span class="right text-right">
                                         {% if user_entry.user and user_entry.user.is_system %}
                                             <span class="ui tiny label">
                                                 {%- trans %}System{% endtrans -%}

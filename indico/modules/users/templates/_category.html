@@ -17,15 +17,13 @@
 {% endmacro %}
 
 {% macro _category_item(category, truncated_path, extra_info='') %}
-    <li class="category-box">
-        <div>
-            <span class="category-box-info">
-                <a href="{{ category.url }}">{{ category.title }}</a>
-                {{ _category_path(category, truncated_path) }}
-                {{ caller() }}
-            {# The caller must provide the closing span tag (</span>). #}
-            {# TODO This should be changed once Jinja is updated to 2.8 with support for set block. #}
-        </div>
+    <li class="category-box flexrow f-a-center">
+        <span class="category-box-info">
+            <a href="{{ category.url }}">{{ category.title }}</a>
+            {{ _category_path(category, truncated_path) }}
+            {{ caller() }}
+        {# The caller must provide the closing span tag (</span>). #}
+        {# TODO This should be changed once Jinja is updated to 2.8 with support for set block. #}
     </li>
 {% endmacro %}
 
@@ -33,9 +31,13 @@
     {% call _category_item(category, truncated_path) %}
         </span>
         {% if is_manager %}
-            <span title="{% trans %}You have management rights{% endtrans %}" class="category-action icon-medal active"></span>
+            <span title="{% trans %}You have management rights{% endtrans %}"
+                  class="category-action right icon-medal active">
+            </span>
         {% else %}
-            <span title="{% trans %}You have favourited this category{% endtrans %}" class="category-action icon-star active"></span>
+            <span title="{% trans %}You have favourited this category{% endtrans %}"
+                  class="category-action right icon-star active">
+            </span>
         {% endif %}
     {% endcall %}
 {% endmacro %}
@@ -53,7 +55,8 @@
         <a href="#"
            data-href="{{ url_for('.user_suggestions_remove', category_id=category.id) }}"
            title="{% trans %}Click here to remove this suggestion. It will not be suggested again.{% endtrans %}"
-           class="category-action icon-close active suggestion-remove">
+           class="category-action right active suggestion-remove">
+            <i class="close icon"></i>
         </a>
     {% endcall %}
 {% endmacro %}
@@ -64,7 +67,8 @@
         <a href="#"
            data-href="{{ url_for('.user_favorites_category_api', category_id=category.id) }}"
            title="{% trans %}Remove from favourites{% endtrans %}"
-           class="category-action icon-close js-delete-category">
+           class="right js-delete-category">
+            <i class="close icon"></i>
         </a>
     {% endcall %}
 {% endmacro %}

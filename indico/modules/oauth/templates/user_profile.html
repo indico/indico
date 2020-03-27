@@ -9,7 +9,7 @@
             </div>
         </div>
         <div class="i-box-content">
-            <p>{% trans %}This is the list of applications your authorized to access your Indico data.{% endtrans %}</p>
+            <p>{% trans %}This is the list of applications you authorized to access your Indico data.{% endtrans %}</p>
             <ul class="group-list with-buttons">
                 {% if not tokens %}
                     <li class="italic">
@@ -17,7 +17,7 @@
                     </li>
                 {% endif %}
                 {% for token in tokens|sort(attribute='application.name') %}
-                    <li>
+                    <li class="flexrow f-a-center">
                         <span class="list-item-title">{{ token.application.name }}</span>
                         <span class="right">
                             <span class="list-item-info">
@@ -30,7 +30,7 @@
                                     {% endif %}
                                 </span>
                             </span>
-                            <button class="ui negative button"
+                            <button class="ui negative small button"
                                     data-href="{{ url_for('.user_token_revoke', token) }}"
                                     data-method="POST"
                                     data-confirm="{% trans app_name=token.application.name %}{{ app_name }} will no longer have access to your Indico data.<br>

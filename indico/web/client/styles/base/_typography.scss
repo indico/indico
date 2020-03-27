@@ -78,24 +78,24 @@ h1, h2, h3, h4, h5, h6, td, dl, ol, blockquote {
     color: $black;
 }
 
-body > h1 {
+h1 {
     @extend %font-family-title;
     font-size: 1.7em;
 }
 
-body > h1.category-title {
+h1.category-title {
     font-size: 2em;
 }
 
-body > h2, h3, h4 {
+h2, h3, h4 {
     @extend %font-family-title-light;
 }
 
-body > h2 {
+h2 {
     font-size: 1.6em;
 }
 
-body > h3 {
+h3 {
     font-size: 1.2em;
 }
 
@@ -266,4 +266,8 @@ textarea.log {
 
 .underline {
     text-decoration: underline;
+}
+
+.ellipsis {
+    @include ellipsis;
 }

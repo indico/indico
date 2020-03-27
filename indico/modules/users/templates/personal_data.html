@@ -11,7 +11,7 @@
                 </div>
                 <div class="i-box-buttons">
                     {% if not user.is_blocked %}
-                        <button class="ui negative button"
+                        <button class="ui negative small button"
                                 data-href="{{ url_for('.user_block') }}"
                                 data-method="PUT"
                                 data-confirm="{% trans %}This user will no longer have access to Indico.<br>
@@ -20,7 +20,7 @@
                             {% trans %}Block User{% endtrans %}
                         </button>
                     {% else %}
-                        <button class="ui button"
+                        <button class="ui small button"
                                 data-href="{{ url_for('.user_block') }}"
                                 data-method="DELETE"
                                 data-confirm="{% trans %}This user will regain access to Indico.<br>
