@@ -11,6 +11,8 @@ from sqlalchemy.dialects.postgresql import ARRAY
 from sqlalchemy.ext.declarative import declared_attr
 
 from indico.core.db import db
+from indico.core.db.sqlalchemy import PyIntEnum
+from indico.modules.events.editing.models.editable import EditableType
 from indico.util.string import format_repr, return_ascii
 
 
@@ -19,8 +21,16 @@ class EditingFileType(db.Model):
 
     @declared_attr
     def __table_args__(cls):
-        return (db.Index('ix_uq_file_types_event_id_name_lower', cls.event_id, db.func.lower(cls.name), unique=True),
-                {'schema': 'event_editing'})
+        return (
+            db.Index(
+                'ix_uq_file_types_event_id_type_name_lower',
+                cls.event_id,
+                cls.type,
+                db.func.lower(cls.name),
+                unique=True,
+            ),
+            {'schema': 'event_editing'},
+        )
 
     id = db.Column(
         db.Integer,
@@ -29,6 +39,10 @@ class EditingFileType(db.Model):
     event_id = db.Column(
         db.ForeignKey('events.events.id'),
         index=True,
+        nullable=False
+    )
+    type = db.Column(
+        PyIntEnum(EditableType),
         nullable=False
     )
     name = db.Column(

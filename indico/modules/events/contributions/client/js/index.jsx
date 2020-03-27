@@ -40,7 +40,7 @@ import {indicoAxios, handleAxiosError} from 'indico/utils/axios';
 
     let response;
     try {
-      response = await indicoAxios.get(fileTypesURL({confId: eventId}));
+      response = await indicoAxios.get(fileTypesURL({confId: eventId, type}));
     } catch (e) {
       handleAxiosError(e);
     }

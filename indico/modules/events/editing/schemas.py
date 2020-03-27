@@ -184,7 +184,7 @@ class EditableTagArgs(mm.Schema):
 
 class EditableFileTypeArgs(mm.Schema):
     class Meta:
-        rh_context = ('event', 'file_type')
+        rh_context = ('event', 'file_type', 'editable_type')
 
     name = fields.String(required=True, validate=not_empty)
     filename_template = fields.String(validate=not_empty, allow_none=True)
@@ -197,7 +197,10 @@ class EditableFileTypeArgs(mm.Schema):
     def _check_for_unique_file_type_name(self, name):
         event = self.context['event']
         file_type = self.context['file_type']
-        query = EditingFileType.query.with_parent(event).filter(func.lower(EditingFileType.name) == name.lower())
+        editable_type = self.context['editable_type']
+        query = EditingFileType.query.with_parent(event).filter(
+            func.lower(EditingFileType.name) == name.lower(), EditingFileType.type == editable_type
+        )
         if file_type:
             query = query.filter(EditingFileType.id != file_type.id)
         if query.has_rows():
@@ -218,10 +221,13 @@ class EditableFileTypeArgs(mm.Schema):
     def _check_if_can_unset_or_delete(self, publishable):
         event = self.context['event']
         file_type = self.context['file_type']
+        editable_type = self.context['editable_type']
         if file_type and not publishable:
             is_last = not (EditingFileType.query
                            .with_parent(event)
-                           .filter(EditingFileType.publishable, EditingFileType.id != file_type.id)
+                           .filter(EditingFileType.publishable,
+                                   EditingFileType.id != file_type.id,
+                                   EditingFileType.type == editable_type)
                            .has_rows())
             if is_last:
                 raise ValidationError(_('Cannot unset the only publishable file type'))

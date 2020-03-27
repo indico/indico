@@ -247,11 +247,11 @@ def delete_tag(tag):
     db.session.delete(tag)
 
 
-def create_new_file_type(event, **data):
-    file_type = EditingFileType(event=event)
+def create_new_file_type(event, editable_type, **data):
+    file_type = EditingFileType(event=event, type=editable_type)
     file_type.populate_from_dict(data, keys=FILE_TYPE_ATTRS)
     db.session.flush()
-    logger.info('File type %r created by %r', file_type, session.user)
+    logger.info('File type %r for %s created by %r', file_type, editable_type.name, session.user)
     return file_type
 
 

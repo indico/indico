@@ -33,12 +33,15 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   const eventId = parseInt(editingElement.dataset.eventId, 10);
   const eventTitle = editingElement.dataset.eventTitle;
+  const contributionId = parseInt(editingElement.dataset.contributionId, 10);
+  const contributionCode = editingElement.dataset.contributionCode;
+  const editableType = editingElement.dataset.editableType;
 
   let fileTypes, tags;
 
   try {
     const [fileTypeResponse, tagResponse] = await Promise.all([
-      indicoAxios.get(fileTypesURL({confId: eventId})),
+      indicoAxios.get(fileTypesURL({confId: eventId, type: editableType})),
       indicoAxios.get(tagsURL({confId: eventId})),
     ]);
     fileTypes = camelizeKeys(fileTypeResponse.data);
@@ -48,9 +51,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     return;
   }
 
-  const contributionId = parseInt(editingElement.dataset.contributionId, 10);
-  const contributionCode = editingElement.dataset.contributionCode;
-  const editableType = editingElement.dataset.editableType;
   const store = storeFactory({
     eventId,
     contributionId,

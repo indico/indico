@@ -24,10 +24,11 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 
   const eventId = parseInt(reviewConditionsManager.dataset.eventId, 10);
+  const editableType = reviewConditionsManager.dataset.editableType;
   let fileTypes;
 
   try {
-    const {data} = await indicoAxios.get(fileTypesURL({confId: eventId}));
+    const {data} = await indicoAxios.get(fileTypesURL({confId: eventId, type: editableType}));
     fileTypes = camelizeKeys(data);
   } catch (e) {
     handleAxiosError(e);

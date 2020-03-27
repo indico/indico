@@ -16,5 +16,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     return null;
   }
   const eventId = parseInt(fileTypeManager.dataset.eventId, 10);
-  ReactDOM.render(<FileTypeManager eventId={eventId} />, fileTypeManager);
+  const editableType = fileTypeManager.dataset.editableType;
+  ReactDOM.render(
+    <FileTypeManager eventId={eventId} editableType={editableType} />,
+    fileTypeManager
+  );
 });

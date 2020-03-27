@@ -14,6 +14,7 @@ from werkzeug.exceptions import NotFound
 
 from indico.core.errors import UserValueError
 from indico.modules.events.editing.controllers.base import RHEditingManagementBase
+from indico.modules.events.editing.models.editable import EditableType
 from indico.modules.events.editing.models.file_types import EditingFileType
 from indico.modules.events.editing.models.revision_files import EditingRevisionFile
 from indico.modules.events.editing.models.tags import EditingTag
@@ -57,10 +58,13 @@ class RHEditTag(RHEditingManagementBase):
 
 class RHCreateFileType(RHEditingManagementBase):
     """Create a new file type."""
+    def _process_args(self):
+        RHEditingManagementBase._process_args(self)
+        self.editable_type = EditableType[request.view_args['type']]
 
     @use_rh_args(EditableFileTypeArgs)
     def _process(self, data):
-        file_type = create_new_file_type(self.event, **data)
+        file_type = create_new_file_type(self.event, self.editable_type, **data)
         return EditingFileTypeSchema().jsonify(file_type)
 
 
@@ -69,9 +73,10 @@ class RHEditFileType(RHEditingManagementBase):
 
     def _process_args(self):
         RHEditingManagementBase._process_args(self)
+        self.editable_type = EditableType[request.view_args['type']]
         self.file_type = (EditingFileType.query
                           .with_parent(self.event)
-                          .filter_by(id=request.view_args['file_type_id'])
+                          .filter_by(id=request.view_args['file_type_id'], type=self.editable_type)
                           .first_or_404())
 
     @use_rh_args(EditableFileTypeArgs, partial=True)

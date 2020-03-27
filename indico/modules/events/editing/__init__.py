@@ -10,6 +10,7 @@ from __future__ import unicode_literals
 from flask import flash, session
 
 from indico.core import signals
+from indico.core.db import db
 from indico.core.logger import Logger
 from indico.core.permissions import ManagementPermission
 from indico.modules.events.editing.clone import EditingSettingsCloner
@@ -36,12 +37,16 @@ class EditingFeature(EventFeature):
     @classmethod
     def enabled(cls, event, cloning):
         from indico.modules.events.editing.models.file_types import EditingFileType
-        if not EditingFileType.query.with_parent(event).filter_by(publishable=True).has_rows():
-            ft = EditingFileType(name='PDF', extensions=['pdf'], publishable=True, required=True)
+        from indico.modules.events.editing.models.editable import EditableType
+        types_with_filetypes = {type_ for type_, in db.session.query(EditingFileType.type).with_parent(event)}
+        types_without_filetypes = set(EditableType) - types_with_filetypes
+        for type_ in types_without_filetypes:
+            ft = EditingFileType(name='PDF', extensions=['pdf'], publishable=True, required=True, type=type_)
             event.editing_file_types.append(ft)
-            if not cloning:
-                flash(_("A default publishable PDF file type has been created; if you want to use other file types in "
-                        "your event's editing workflow, please configure them accordingly."))
+
+        if types_without_filetypes:
+            flash(_("A default publishable PDF file type has been created; if you want to use other file types in "
+                    "your event's editing workflow, please configure them accordingly."))
 
 
 @signals.event.get_feature_definitions.connect

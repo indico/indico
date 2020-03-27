@@ -18,6 +18,7 @@ import {getChangedValues, handleSubmitError} from 'indico/react/forms';
 import {useIndicoAxios} from 'indico/react/hooks';
 import {handleAxiosError, indicoAxios} from 'indico/utils/axios';
 import FileTypeModal from './FileTypeModal';
+import {EditableTypeTitles} from '../models';
 
 import './FileTypeManager.module.scss';
 
@@ -53,18 +54,17 @@ StatusIcon.propTypes = {
   text: PropTypes.string.isRequired,
 };
 
-export default function FileTypeManager({eventId}) {
+export default function FileTypeManager({eventId, editableType}) {
   const [state, dispatch] = useReducer(fileTypesReducer, initialState);
-
   const {data, loading: isLoadingFileTypes, reFetch, lastData} = useIndicoAxios({
-    url: fileTypesURL({confId: eventId}),
+    url: fileTypesURL({confId: eventId, type: editableType}),
     camelize: true,
     trigger: eventId,
   });
 
   const createFileType = async formData => {
     try {
-      await indicoAxios.post(createFileTypeURL({confId: eventId}), formData);
+      await indicoAxios.post(createFileTypeURL({confId: eventId, type: editableType}), formData);
       reFetch();
     } catch (e) {
       return handleSubmitError(e);
@@ -72,7 +72,7 @@ export default function FileTypeManager({eventId}) {
   };
 
   const editFileType = async (fileTypeId, fileTypeData) => {
-    const url = editFileTypeURL({confId: eventId, file_type_id: fileTypeId});
+    const url = editFileTypeURL({confId: eventId, file_type_id: fileTypeId, type: editableType});
 
     try {
       await indicoAxios.patch(url, fileTypeData);
@@ -83,7 +83,7 @@ export default function FileTypeManager({eventId}) {
   };
 
   const deleteFileType = async fileTypeId => {
-    const url = editFileTypeURL({confId: eventId, file_type_id: fileTypeId});
+    const url = editFileTypeURL({confId: eventId, file_type_id: fileTypeId, type: editableType});
 
     try {
       await indicoAxios.delete(url);
@@ -233,4 +233,5 @@ export default function FileTypeManager({eventId}) {
 
 FileTypeManager.propTypes = {
   eventId: PropTypes.number.isRequired,
+  editableType: PropTypes.oneOf(Object.keys(EditableTypeTitles)).isRequired,
 };
