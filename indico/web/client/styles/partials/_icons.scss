@@ -77,8 +77,8 @@ i[class^="icon-"]:before {
  * 13. Click on the "Generate font" tab at the bottom of the screen
  * 14. Click on "Download" at the bottom right of the screen
  * 15. Copy files:
- *      - icomoon.zip/fonts/icommon.{svg,ttf,woff} to indico/htdocs/static/fonts/icomoon/
- *      - icomoon.zip/selection.json to indico/htdocs/static/fonts/icomoon/
+ *      - icomoon.zip/fonts/icommon.{svg,ttf,woff} to indico/web/static/fonts/icomoon/
+ *      - icomoon.zip/selection.json to indico/web/static/fonts/icomoon/
  *      - Replace the icon definitions between the comments below with the ones found in icomoon.zip/style.css
           (pay attention to the indentation!)
  */
@@ -530,6 +530,15 @@ i[class^="icon-"]:before {
 }
 .icon-compass2:before {
     content: "\e94a";
+}
+.icon-bell:before {
+    content: "\e908";
+}
+.icon-copy1:before {
+    content: "\e909";
+}
+.icon-equalizer:before {
+    content: "\e90a";
 }
 /* End of icomoon's icon definitions */
 
