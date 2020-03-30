@@ -10,12 +10,14 @@ from __future__ import unicode_literals
 from indico.core.db import db
 from indico.core.db.sqlalchemy import PyIntEnum
 from indico.modules.events.editing.settings import editing_settings
+from indico.util.i18n import _
 from indico.util.locators import locator_property
 from indico.util.string import format_repr, return_ascii
-from indico.util.struct.enum import IndicoEnum
+from indico.util.struct.enum import RichIntEnum
 
 
-class EditableType(int, IndicoEnum):
+class EditableType(RichIntEnum):
+    __titles__ = [None, _("Paper"), _("Slides"), _("Poster")]
     paper = 1
     slides = 2
     poster = 3

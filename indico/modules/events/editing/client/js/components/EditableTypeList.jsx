@@ -6,6 +6,7 @@
 // LICENSE file for more details.
 
 import enabledEditableTypesURL from 'indico-url:event_editing.api_enabled_editable_types';
+import manageEditableTypeURL from 'indico-url:event_editing.manage_editable_type';
 
 import React, {useState} from 'react';
 import PropTypes from 'prop-types';
@@ -55,21 +56,21 @@ export default function EditableTypeList({eventId}) {
         onSubmit={handleSubmit}
         subscription={{submitting: true}}
         initialValues={Object.assign(
-          ...editableTypeOrder.map(id => ({[id]: enabledEditableTypes.includes(id)}))
+          ...editableTypeOrder.map(type => ({[type]: enabledEditableTypes.includes(type)}))
         )}
       >
         {fprops => (
           <>
             <Form id="editable-type-form" onSubmit={fprops.handleSubmit}>
               <div className="action-box">
-                {editableTypeOrder.map(id => (
-                  <div key={id} className="section">
+                {editableTypeOrder.map(type => (
+                  <div key={type} className="section">
                     <span className="icon icon-file" />
                     <div className="text">
-                      <div className="label">{EditableTypeTitles[id]}</div>
+                      <div className="label">{EditableTypeTitles[type]}</div>
                     </div>
                     <div className="toolbar" styleName="switch-toolbar">
-                      <FinalCheckbox name={id} toggle label="" styleName="type-switch" />
+                      <FinalCheckbox name={type} toggle label="" styleName="type-switch" />
                     </div>
                   </div>
                 ))}
@@ -96,17 +97,20 @@ export default function EditableTypeList({eventId}) {
       </span>
     ) : (
       <div className="action-box">
-        {enabledEditableTypes.map(id => (
-          <div key={id} className="section">
+        {enabledEditableTypes.map(type => (
+          <div key={type} className="section">
             <span className="icon icon-file" />
             <div className="text">
-              <div className="label">{EditableTypeTitles[id]}</div>
+              <div className="label">{EditableTypeTitles[type]}</div>
             </div>
             <div className="toolbar">
               <a className="i-button icon-list">
                 <Translate>List</Translate>
               </a>
-              <a className="i-button icon-settings">
+              <a
+                className="i-button icon-settings"
+                href={manageEditableTypeURL({confId: eventId, type})}
+              >
                 <Translate>Manage</Translate>
               </a>
             </div>

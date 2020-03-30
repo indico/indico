@@ -5,9 +5,11 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-import './tags';
-import './fileTypes';
-import './reviewConditions';
-import './editing';
-import './editableTypesList';
-import './editableType';
+.toolbar-checkbox {
+    align-self: center;
+}
+
+.toolbar-label {
+    align-self: center;
+    padding: 0 1rem 0 0.5rem;
+}

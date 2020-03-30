@@ -1,9 +1,10 @@
-{% extends 'events/editing/management/base.html' %}
+{% extends 'events/editing/management/editable_type_base.html' %}
 
 {% block subtitle %}
     {% trans %}File Types{% endtrans %}
 {% endblock %}
 
 {% block content %}
-    <div id="editing-filetypes" data-event-id="{{ event.id }}" data-editable-type="{{ editable_type }}"></div>
+    <div id="editing-filetypes" data-event-id="{{ event.id }}" data-editable-type="{{ editable_type.name }}"></div>
 {% endblock %}
+

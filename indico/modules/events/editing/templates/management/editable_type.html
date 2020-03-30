@@ -1,0 +1,9 @@
+{% extends 'events/editing/management/base.html' %}
+
+{% block subtitle %}
+    {{ type.title }}
+{% endblock %}
+
+{% block content %}
+    <div id="editable-type" data-event-id="{{ event.id }}" data-editable-type="{{ type.name }}"></div>
+{% endblock %}

@@ -32,6 +32,14 @@ class RHEditingManagementBase(RHManageEventBase):
     EVENT_FEATURE = 'editing'
 
 
+class RHEditableTypeManagementBase(RHEditingManagementBase):
+    """Base class for editable type RHs."""
+
+    def _process_args(self):
+        RHManageEventBase._process_args(self)
+        self.editable_type = EditableType[request.view_args['type']]
+
+
 class RHContributionEditableBase(RequireUserMixin, RHContributionDisplayBase):
     """Base class for operations on an editable."""
 
