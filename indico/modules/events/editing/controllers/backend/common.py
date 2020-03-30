@@ -7,8 +7,10 @@
 
 from __future__ import unicode_literals
 
+from indico.core import signals
 from indico.modules.events.editing.controllers.base import RHEditingBase
-from indico.modules.events.editing.schemas import EditingFileTypeSchema, EditingTagSchema
+from indico.modules.events.editing.schemas import EditingFileTypeSchema, EditingMenuItemSchema, EditingTagSchema
+from indico.util.signals import named_objects_from_signal
 
 
 class RHEditingFileTypes(RHEditingBase):
@@ -23,3 +25,11 @@ class RHEditingTags(RHEditingBase):
 
     def _process(self):
         return EditingTagSchema(many=True).jsonify(self.event.editing_tags)
+
+
+class RHMenuEntries(RHEditingBase):
+    """Return the menu entries for the editing view."""
+
+    def _process(self):
+        menu_entries = named_objects_from_signal(signals.menu.items.send('event-editing-sidemenu', event=self.event))
+        return EditingMenuItemSchema(many=True).jsonify(menu_entries.values())
