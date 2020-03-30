@@ -13,11 +13,15 @@
 }
 
 .submit-message {
-    margin-bottom: 10px;
+    margin: 0 0 1em !important;
 }
 
 .room-form {
     :global(.fields) > :global(.field) {
         flex-grow: 1 !important;
     }
+}
+
+.DateRangePicker_picker { // sass-lint:disable-line class-name-format
+    z-index: 10;
 }

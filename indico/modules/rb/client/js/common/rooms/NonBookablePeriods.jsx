@@ -34,28 +34,25 @@ export default class NonBookablePeriods extends React.Component {
       {
         startDt: serializeDate(moment()),
         endDt: serializeDate(moment()),
-        key: shortid.generate(),
       },
     ]);
     this.setTouched();
   };
 
-  handleRemoveDates = key => {
+  handleRemoveDates = index => {
     const {value, onChange} = this.props;
-    onChange([...value.filter(dA => dA.key !== key)]);
+    onChange(value.filter((_, i) => i !== index));
     this.setTouched();
   };
 
-  handleDatesChange = ({startDate, endDate}, key) => {
+  handleDatesChange = ({startDate, endDate}, index) => {
     const {value, onChange} = this.props;
     onChange(
-      value.map(v => {
-        if (v.key === key) {
-          return {...v, startDt: serializeDate(startDate), endDt: serializeDate(endDate)};
-        } else {
-          return v;
-        }
-      })
+      value.map((v, vIndex) =>
+        vIndex === index
+          ? {...v, startDt: serializeDate(startDate), endDt: serializeDate(endDate)}
+          : v
+      )
     );
     this.setTouched();
   };
@@ -68,8 +65,9 @@ export default class NonBookablePeriods extends React.Component {
     onBlur();
   };
 
-  renderEntry = dateRangeItem => {
-    const {startDt, endDt, key} = dateRangeItem;
+  renderEntry = (dateRangeItem, index) => {
+    const {startDt, endDt} = dateRangeItem;
+    const key = shortid.generate();
     return (
       <div key={key} className="flex-container">
         <DateRangePicker
@@ -78,13 +76,13 @@ export default class NonBookablePeriods extends React.Component {
           anchorDirection={ANCHOR_RIGHT}
           startDate={startDt === null ? null : moment(startDt)}
           endDate={endDt === null ? null : moment(endDt)}
-          onDatesChange={dates => this.handleDatesChange(dates, key)}
+          onDatesChange={dates => this.handleDatesChange(dates, index)}
         />
         <Icon
           floated="right"
           name="remove"
           className="delete-button"
-          onClick={() => this.handleRemoveDates(key)}
+          onClick={() => this.handleRemoveDates(index)}
         />
       </div>
     );
@@ -104,7 +102,7 @@ export default class NonBookablePeriods extends React.Component {
           <Icon name="plus" />
           <Translate>Add new Nonbookable Periods</Translate>
         </Button>
-        {value && value.map(dateRangeItem => this.renderEntry(dateRangeItem))}
+        {value && value.map(this.renderEntry)}
         {value.length === 0 && (
           <div>
             <Translate>No non-bookable periods found</Translate>

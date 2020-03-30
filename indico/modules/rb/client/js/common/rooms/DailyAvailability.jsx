@@ -26,38 +26,37 @@ export default class DailyAvailability extends React.Component {
     value: [],
   };
 
-  handleTimesChange = ({startTime, endTime}, key) => {
+  handleTimesChange = ({startTime, endTime}, index) => {
     const {value, onChange} = this.props;
     onChange(
-      value.map(v => {
-        if (v.key === key) {
-          return {...v, startTime: serializeTime(startTime), endTime: serializeTime(endTime)};
-        } else {
-          return v;
-        }
-      })
+      value.map((v, vIndex) =>
+        vIndex === index
+          ? {...v, startTime: serializeTime(startTime), endTime: serializeTime(endTime)}
+          : v
+      )
     );
   };
 
-  handleRemoveTimes = key => {
+  handleRemoveTimes = index => {
     const {onChange, value} = this.props;
-    onChange([...value.filter(bH => bH.key !== key)]);
+    onChange(value.filter((_, i) => i !== index));
   };
 
-  renderEntry = bookableHour => {
-    const {startTime: startT, endTime: endT, key} = bookableHour;
+  renderEntry = (bookableHour, index) => {
+    const {startTime: startT, endTime: endT} = bookableHour;
+    const key = shortid.generate();
     return (
       <div key={key} className="flex-container">
         <TimeRangePicker
           startTime={moment(startT, 'HH:mm')}
           endTime={moment(endT, 'HH:mm')}
-          onChange={(startTime, endTime) => this.handleTimesChange({startTime, endTime}, key)}
+          onChange={(startTime, endTime) => this.handleTimesChange({startTime, endTime}, index)}
         />
         <Icon
           floated="right"
           name="remove"
           className="delete-button"
-          onClick={() => this.handleRemoveTimes(key)}
+          onClick={() => this.handleRemoveTimes(index)}
         />
       </div>
     );
@@ -72,14 +71,12 @@ export default class DailyAvailability extends React.Component {
           className="room-edit-modal-add-btn"
           icon
           labelPosition="left"
-          onClick={() =>
-            onChange([...value, {startTime: '08:00', endTime: '17:00', key: shortid.generate()}])
-          }
+          onClick={() => onChange([...value, {startTime: '08:00', endTime: '17:00'}])}
         >
           <Icon name="plus" />
           <Translate>Add new Daily Availability</Translate>
         </Button>
-        {value && value.map(bookableHour => this.renderEntry(bookableHour))}
+        {value && value.map(this.renderEntry)}
         {value.length === 0 && (
           <div>
             <Translate>No daily availability found</Translate>
