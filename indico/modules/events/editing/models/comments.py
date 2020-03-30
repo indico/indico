@@ -13,12 +13,6 @@ from indico.core.db.sqlalchemy.descriptions import RenderMode, RenderModeMixin
 from indico.util.date_time import now_utc
 from indico.util.locators import locator_property
 from indico.util.string import format_repr, return_ascii, text_to_repr
-from indico.util.struct.enum import IndicoEnum
-
-
-class EditableType(int, IndicoEnum):
-    paper = 1
-    slides = 2
 
 
 class EditingRevisionComment(RenderModeMixin, db.Model):
