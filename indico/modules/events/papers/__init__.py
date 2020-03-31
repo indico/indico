@@ -33,7 +33,7 @@ def _extend_event_management_menu(sender, event, **kwargs):
     if not event.cfp.is_manager(session.user) or not PapersFeature.is_allowed_for_event(event):
         return
     return SideMenuItem('papers', _('Call for Papers'), url_for('papers.management', event),
-                        section='organization')
+                        section='workflows')
 
 
 @signals.menu.items.connect_via('event-editing-sidemenu')
@@ -43,8 +43,7 @@ def _extend_editing_menu(sender, event, **kwargs):
         return None
     if (has_contributions_with_user_paper_submission_rights(event, session.user) or
             event.cfp.is_staff(session.user)):
-        return SideMenuItem('papers', _('Call for Papers'), url_for('papers.call_for_papers', event),
-                            section='organization')
+        return SideMenuItem('papers', _('Call for Papers'), url_for('papers.call_for_papers', event))
 
 
 @signals.event_management.management_url.connect

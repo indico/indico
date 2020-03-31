@@ -51,7 +51,7 @@ def _extend_event_management_menu(sender, event, **kwargs):
     if not event.can_manage(session.user) or not AbstractsFeature.is_allowed_for_event(event):
         return
     return SideMenuItem('abstracts', _('Call for Abstracts'), url_for('abstracts.management', event),
-                        section='organization')
+                        section='workflows')
 
 
 @signals.event.get_feature_definitions.connect
@@ -141,8 +141,7 @@ def _get_notification_placeholders(sender, **kwargs):
 @signals.menu.items.connect_via('event-editing-sidemenu')
 def _extend_editing_menu(sender, event, **kwargs):
     if event.has_feature('abstracts'):
-        yield SideMenuItem('abstracts', _('Call for Abstracts'), url_for('abstracts.call_for_abstracts', event),
-                           section='organization')
+        yield SideMenuItem('abstracts', _('Call for Abstracts'), url_for('abstracts.call_for_abstracts', event))
 
 
 @signals.event.sidemenu.connect

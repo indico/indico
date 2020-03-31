@@ -64,7 +64,7 @@ def _extend_event_management_menu(sender, event, **kwargs):
     if not event.can_manage(session.user) or not EditingFeature.is_allowed_for_event(event):
         return
     return SideMenuItem('editing', _('Editing'), url_for('event_editing.dashboard', event),
-                        section='organization')
+                        section='workflows')
 
 
 @signals.event_management.get_cloners.connect

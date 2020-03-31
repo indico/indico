@@ -17,7 +17,8 @@ from indico.web.menu import SideMenuItem, SideMenuSection
 
 @signals.menu.sections.connect_via('event-management-sidemenu')
 def _sidemenu_sections(sender, **kwargs):
-    yield SideMenuSection('organization', _("Organization"), 50, icon='list', active=True)
+    yield SideMenuSection('organization', _("Organization"), 60, icon='list', active=True)
+    yield SideMenuSection('workflows', _("Workflows"), 55, icon="hammer")
     yield SideMenuSection('services', _("Services"), 40, icon='broadcast')
     yield SideMenuSection('reports', _("Reports"), 30, icon='stack')
     yield SideMenuSection('customization', _("Customization"), 20, icon='image')
@@ -30,7 +31,7 @@ def _sidemenu_items(sender, event, **kwargs):
     if event.can_manage(session.user):
         yield SideMenuItem('settings', _('Settings'), url_for('event_management.settings', event), 100, icon='settings')
         yield SideMenuItem('protection', _('Protection'), url_for('event_management.protection', event),
-                           60, icon='shield')
+                           70, icon='shield')
         if event.type_ == EventType.conference:
             yield SideMenuItem('program_codes', _('Programme Codes'), url_for('event_management.program_codes', event),
                                section='advanced')
