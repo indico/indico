@@ -402,7 +402,7 @@ class RHUsersAdmin(RHAdminBase):
             external = form_data.pop('external')
             form_data = {k: v for (k, v) in form_data.iteritems() if v and v.strip()}
             matches = search_users(exact=exact, include_deleted=include_deleted, include_pending=include_pending,
-                                   external=external, allow_system_user=True, **form_data)
+                                   include_blocked=True, external=external, allow_system_user=True, **form_data)
             for entry in matches:
                 if isinstance(entry, User):
                     search_results.append(UserEntry(

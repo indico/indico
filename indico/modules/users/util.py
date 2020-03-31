@@ -174,7 +174,7 @@ def _build_name_search(name_list):
 
 
 def build_user_search_query(criteria, exact=False, include_deleted=False, include_pending=False,
-                            favorites_first=False):
+                            include_blocked=False, favorites_first=False):
     unspecified = object()
     query = User.query.distinct(User.id).options(db.joinedload(User._all_emails))
 
@@ -182,6 +182,8 @@ def build_user_search_query(criteria, exact=False, include_deleted=False, includ
         query = query.filter(~User.is_pending)
     if not include_deleted:
         query = query.filter(~User.is_deleted)
+    if not include_blocked:
+        query = query.filter(~User.is_blocked)
 
     affiliation = criteria.pop('affiliation', unspecified)
     if affiliation is not unspecified:
@@ -216,8 +218,8 @@ def build_user_search_query(criteria, exact=False, include_deleted=False, includ
     return query
 
 
-def search_users(exact=False, include_deleted=False, include_pending=False, external=False, allow_system_user=False,
-                 **criteria):
+def search_users(exact=False, include_deleted=False, include_pending=False, include_blocked=False,
+                 external=False, allow_system_user=False, **criteria):
     """Searches for users.
 
     :param exact: Indicates if only exact matches should be returned.
@@ -227,6 +229,8 @@ def search_users(exact=False, include_deleted=False, include_pending=False, exte
                             should be returned.
     :param include_pending: Indicates if also users who are still
                             pending should be returned.
+    :param include_blocked: Indicates if also users marked as blocked
+                            should be returned.
     :param external: Indicates if identity providers should be searched
                      for matching users.
     :param allow_system_user: Whether the system user may be returned
@@ -246,7 +250,7 @@ def search_users(exact=False, include_deleted=False, include_pending=False, exte
         return set()
 
     query = (build_user_search_query(dict(criteria), exact=exact, include_deleted=include_deleted,
-                                     include_pending=include_pending)
+                                     include_pending=include_pending, include_blocked=include_blocked)
              .options(db.joinedload(User.identities),
                       db.joinedload(User.merged_into_user)))
 
@@ -293,7 +297,7 @@ def get_user_by_email(email, create_pending=False):
     if not create_pending:
         res = User.query.filter(~User.is_deleted, User.all_emails == email).all()
     else:
-        res = search_users(exact=True, include_pending=True, external=True, email=email)
+        res = search_users(exact=True, include_pending=True, include_blocked=True, external=True, email=email)
     if len(res) != 1:
         return None
     user_or_identity = next(iter(res))

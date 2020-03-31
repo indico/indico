@@ -16,20 +16,19 @@
     </span>
 {% endmacro %}
 
-{% macro _category_item(category, truncated_path, extra_info='') %}
+{% macro _category_item(category, truncated_path, extra_info) %}
     <li class="category-box flexrow f-a-center">
-        <span class="category-box-info">
+        <div class="category-box-info">
             <a href="{{ category.url }}">{{ category.title }}</a>
             {{ _category_path(category, truncated_path) }}
-            {{ caller() }}
-        {# The caller must provide the closing span tag (</span>). #}
-        {# TODO This should be changed once Jinja is updated to 2.8 with support for set block. #}
+            {{ extra_info }}
+        </div>
+        {{ caller() }}
     </li>
 {% endmacro %}
 
 {% macro user_category(category, truncated_path, is_manager) %}
     {% call _category_item(category, truncated_path) %}
-        </span>
         {% if is_manager %}
             <span title="{% trans %}You have management rights{% endtrans %}"
                   class="category-action right icon-medal active">
@@ -43,7 +42,7 @@
 {% endmacro %}
 
 {% macro suggested_category(category, truncated_path) %}
-    {% call _category_item(category, truncated_path) %}
+    {% set category_action_extra %}
         <div class="category-action-extra">
             <a href="#"
                data-href="{{ url_for('.user_favorites_category_api', category_id=category.id) }}"
@@ -51,7 +50,9 @@
                class="icon-star active suggestion-favorite">
                 <span>{% trans %}Add to favourites{% endtrans %}</span>
             </a>
-        </div></span>
+        </div>
+    {% endset %}
+    {% call _category_item(category, truncated_path, category_action_extra) %}
         <a href="#"
            data-href="{{ url_for('.user_suggestions_remove', category_id=category.id) }}"
            title="{% trans %}Click here to remove this suggestion. It will not be suggested again.{% endtrans %}"
@@ -63,7 +64,6 @@
 
 {% macro favorite_category(category, truncated_path) %}
     {% call _category_item(category, truncated_path) %}
-        </span>
         <a href="#"
            data-href="{{ url_for('.user_favorites_category_api', category_id=category.id) }}"
            title="{% trans %}Remove from favourites{% endtrans %}"

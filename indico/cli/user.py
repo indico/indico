@@ -62,6 +62,8 @@ def _safe_lower(s):
               help='Include deleted users in the results')
 @click.option('--include-pending', '-P', is_flag=True,
               help='Include pending users in the results')
+@click.option('--include-blocked', '-B', is_flag=True,
+              help='Include blocked users in the results')
 @click.option('--include-external', '-X', is_flag=True,
               help='Also include external users (e.g. from LDAP). This is potentially very slow in substring mode')
 @click.option('--include-system', '-S', is_flag=True,
@@ -70,12 +72,13 @@ def _safe_lower(s):
 @click.option('--last-name', '-s', help='Last name of the user')
 @click.option('--email', '-e', help='Email address of the user')
 @click.option('--affiliation', '-a', help='Affiliation of the user')
-def search(substring, include_deleted, include_pending, include_external, include_system, **criteria):
+def search(substring, include_deleted, include_pending, include_blocked, include_external, include_system, **criteria):
     """Searches users matching some criteria"""
     assert set(criteria.viewkeys()) == {'first_name', 'last_name', 'email', 'affiliation'}
     criteria = {k: v for k, v in criteria.viewitems() if v is not None}
     res = search_users(exact=(not substring), include_deleted=include_deleted, include_pending=include_pending,
-                       external=include_external, allow_system_user=include_system, **criteria)
+                       include_blocked=include_blocked, external=include_external,
+                       allow_system_user=include_system, **criteria)
     if not res:
         print(cformat('%{yellow}No results found'))
         return

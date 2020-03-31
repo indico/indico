@@ -106,7 +106,7 @@
                         {% endfor %}
                     </ol>
                 </div>
-                {% if suggested_categories and user == session.user %}
+                {% if suggested_categories %}
                     <div id="suggestedCategories" class="dashboard-box suggestions">
                         <h3>{% trans %}You might be interested in the following categories...{% endtrans %}</h3>
                         <ol>
