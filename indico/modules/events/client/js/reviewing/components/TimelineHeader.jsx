@@ -10,10 +10,18 @@ import contributionDisplayURL from 'indico-url:contributions.display_contributio
 import React from 'react';
 import PropTypes from 'prop-types';
 
+import {Message, Icon} from 'semantic-ui-react';
 import {Param, Translate} from 'indico/react/i18n';
 import {MathJax} from 'indico/react/components';
 
-export default function TimelineHeader({children, contribution, state, submitter, eventId}) {
+export default function TimelineHeader({
+  children,
+  contribution,
+  state,
+  submitter,
+  eventId,
+  reviewConditionsValid,
+}) {
   return (
     <>
       <div className="submission-title flexrow">
@@ -27,7 +35,13 @@ export default function TimelineHeader({children, contribution, state, submitter
       <div className="paper-public">
         <div className="review-summary flexrow f-a-baseline">
           <div className="review-summary-badge">
-            <div className={`i-tag ${state.cssClass}`}>{state.title}</div>
+            {reviewConditionsValid ? (
+              <div className={`i-tag ${state.cssClass}`}>{state.title}</div>
+            ) : (
+              <div className="i-tag">
+                <Translate>Not Ready</Translate>
+              </div>
+            )}
           </div>
           <div className="review-summary-content f-self-stretch">
             <div>
@@ -47,6 +61,12 @@ export default function TimelineHeader({children, contribution, state, submitter
             </div>
           </div>
         </div>
+        {!reviewConditionsValid && (
+          <Message warning>
+            <Icon name="warning sign" />
+            <Translate>This editable is not fulfilling reviewing conditions.</Translate>
+          </Message>
+        )}
         <div className="review-item-content">{children}</div>
       </div>
     </>
@@ -69,4 +89,9 @@ TimelineHeader.propTypes = {
   }).isRequired,
   eventId: PropTypes.number.isRequired,
   children: PropTypes.node.isRequired,
+  reviewConditionsValid: PropTypes.bool,
+};
+
+TimelineHeader.defaultProps = {
+  reviewConditionsValid: true,
 };

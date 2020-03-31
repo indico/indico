@@ -45,6 +45,7 @@ export default function Timeline() {
         state={lastState}
         submitter={timelineBlocks[0].submitter}
         eventId={eventId}
+        reviewConditionsValid={details.reviewConditionsValid}
       >
         <FileDisplay
           fileTypes={fileTypes}
