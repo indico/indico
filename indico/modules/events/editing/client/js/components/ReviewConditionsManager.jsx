@@ -18,13 +18,14 @@ import {indicoAxios} from 'indico/utils/axios';
 
 import ConditionInfo from './ConditionInfo';
 import ReviewConditionForm from './ReviewConditionForm';
+import {EditableTypeTitles} from '../models';
 
 import './ReviewConditionsManager.module.scss';
 
-export default function ReviewConditionsManager({eventId, fileTypes}) {
+export default function ReviewConditionsManager({eventId, fileTypes, editableType}) {
   const [isAdding, setIsAdding] = useState(false);
   const {loading, reFetch, data: eventConditionsSetting, lastData} = useIndicoAxios({
-    url: reviewConditionsURL({confId: eventId}),
+    url: reviewConditionsURL({confId: eventId, type: editableType}),
     trigger: eventId,
   });
 
@@ -42,7 +43,7 @@ export default function ReviewConditionsManager({eventId, fileTypes}) {
   ]);
   const createNewCondition = async formData => {
     try {
-      await indicoAxios.post(reviewConditionsURL({confId: eventId}), formData);
+      await indicoAxios.post(reviewConditionsURL({confId: eventId, type: editableType}), formData);
       setIsAdding(false);
       reFetch();
     } catch (e) {
@@ -71,6 +72,7 @@ export default function ReviewConditionsManager({eventId, fileTypes}) {
               <ConditionInfo
                 condition={reviewCondition}
                 uuid={uuid}
+                editableType={editableType}
                 onUpdate={() => reFetch()}
                 disableActions={loading}
               />
@@ -112,4 +114,5 @@ export default function ReviewConditionsManager({eventId, fileTypes}) {
 ReviewConditionsManager.propTypes = {
   eventId: PropTypes.number.isRequired,
   fileTypes: PropTypes.array.isRequired,
+  editableType: PropTypes.oneOf(Object.keys(EditableTypeTitles)).isRequired,
 };

@@ -18,14 +18,15 @@ import {handleSubmitError} from 'indico/react/forms';
 import {handleAxiosError, indicoAxios} from 'indico/utils/axios';
 
 import ReviewConditionForm from './ReviewConditionForm';
+import {EditableTypeTitles} from '../models';
 
 import './ConditionInfo.module.scss';
 
-export default function ConditionInfo({condition, uuid, onUpdate, disableActions}) {
+export default function ConditionInfo({condition, uuid, editableType, onUpdate, disableActions}) {
   const [isEditing, setIsEditing] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const {eventId} = useSelector(state => state.staticData);
-  const url = editReviewConditionURL({confId: eventId, uuid});
+  const url = editReviewConditionURL({confId: eventId, uuid, type: editableType});
 
   const deleteCondition = async () => {
     try {
@@ -107,6 +108,7 @@ export default function ConditionInfo({condition, uuid, onUpdate, disableActions
 ConditionInfo.propTypes = {
   condition: PropTypes.array.isRequired,
   uuid: PropTypes.string.isRequired,
+  editableType: PropTypes.oneOf(Object.keys(EditableTypeTitles)).isRequired,
   onUpdate: PropTypes.func,
   disableActions: PropTypes.bool,
 };

@@ -21,7 +21,7 @@ _bp.add_url_rule('/manage/editing/', 'dashboard', frontend.RHEditingDashboard)
 _bp.add_url_rule('/manage/editing/tags', 'manage_tags', frontend.RHManageEditingTags)
 _bp.add_url_rule('/manage/editing/<any(paper,slides,poster):type>/types', 'manage_file_types',
                  frontend.RHManageEditingFileTypes)
-_bp.add_url_rule('/manage/editing/review-conditions/<any(paper,slides,poster):type>', 'manage_review_conditions',
+_bp.add_url_rule('/manage/editing/<any(paper,slides,poster):type>/review-conditions', 'manage_review_conditions',
                  frontend.RHManageEditingReviewConditions)
 _bp.add_url_rule(contrib_prefix, 'editable', frontend.RHEditableTimeline)
 _bp.add_url_rule(contrib_prefix + '/<int:revision_id>/files.zip', 'revision_files_export',
@@ -30,9 +30,10 @@ _bp.add_url_rule(contrib_prefix + '/<int:revision_id>/<int:file_id>/<filename>',
                  timeline.RHDownloadRevisionFile)
 
 # Event-level APIs
-_bp.add_url_rule('/editing/api/review-conditions', 'api_review_conditions',
+review_cond_prefix = '/editing/api/<any(paper,slides,poster):type>/review-conditions'
+_bp.add_url_rule(review_cond_prefix, 'api_review_conditions',
                  management.RHEditingReviewConditions, methods=('GET', 'POST'))
-_bp.add_url_rule('/editing/api/review-conditions/<uuid:uuid>', 'api_edit_review_condition',
+_bp.add_url_rule(review_cond_prefix + '/<uuid:uuid>', 'api_edit_review_condition',
                  management.RHEditingEditReviewCondition, methods=('DELETE', 'PATCH'))
 _bp.add_url_rule('/editing/api/<any(paper,slides,poster):type>/file-types', 'api_file_types',
                  common.RHEditingFileTypes)

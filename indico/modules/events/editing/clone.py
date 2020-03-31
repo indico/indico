@@ -14,6 +14,7 @@ from indico.core.db import db
 from indico.core.db.sqlalchemy.util.models import get_simple_column_attrs
 from indico.core.db.sqlalchemy.util.session import no_autoflush
 from indico.modules.events.cloning import EventCloner
+from indico.modules.events.editing.models.editable import EditableType
 from indico.modules.events.editing.models.file_types import EditingFileType
 from indico.modules.events.editing.models.tags import EditingTag
 from indico.modules.events.editing.settings import editing_settings
@@ -56,12 +57,13 @@ class EditingSettingsCloner(EventCloner):
             self._filetype_map[old_filetype.id] = filetype.id
 
     def _clone_review_conditions(self, new_event):
-        review_conditions = editing_settings.get(self.old_event, 'review_conditions')
-        new_conditions = OrderedDict(
-            self._build_review_conditions(new_event, cond)
-            for cond in review_conditions.viewvalues()
-        )
-        editing_settings.set(new_event, 'review_conditions', new_conditions)
+        for type_ in EditableType:
+            review_conditions = editing_settings.get(self.old_event, type_.name + '_review_conditions')
+            new_conditions = OrderedDict(
+                self._build_review_conditions(new_event, cond)
+                for cond in review_conditions.viewvalues()
+            )
+            editing_settings.set(new_event, type_.name + '_review_conditions', new_conditions)
 
     def _build_review_conditions(self, new_event, value):
         return unicode(uuid4()), [self._filetype_map[filetype_id] for filetype_id in value]

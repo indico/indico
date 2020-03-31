@@ -88,7 +88,7 @@ class RHEditFileType(RHEditingManagementBase):
         if EditingRevisionFile.query.with_parent(self.file_type).has_rows():
             raise UserValueError(_('Cannot delete file type which already has files'))
 
-        review_conditions = editing_settings.get(self.event, 'review_conditions')
+        review_conditions = editing_settings.get(self.event, self.editable_type.name + '_review_conditions')
         if any(self.file_type.id in cond for cond in review_conditions.values()):
             raise UserValueError(_('Cannot delete file type which is used in a review condition'))
         if self.file_type.publishable:
@@ -103,37 +103,42 @@ class RHEditFileType(RHEditingManagementBase):
 
 
 class RHEditingReviewConditions(RHEditingManagementBase):
+    def _process_args(self):
+        RHEditingManagementBase._process_args(self)
+        self.editable_type = EditableType[request.view_args['type']]
+
     def _process_GET(self):
-        return jsonify(editing_settings.get(self.event, 'review_conditions').items())
+        return jsonify(editing_settings.get(self.event, self.editable_type.name + '_review_conditions').items())
 
     @use_rh_kwargs(EditingReviewConditionArgs)
     def _process_POST(self, file_types):
-        new_conditions = editing_settings.get(self.event, 'review_conditions')
+        new_conditions = editing_settings.get(self.event, self.editable_type.name + '_review_conditions')
         new_conditions[unicode(uuid4())] = file_types
-        editing_settings.set(self.event, 'review_conditions', new_conditions)
+        editing_settings.set(self.event, self.editable_type.name + '_review_conditions', new_conditions)
         return '', 204
 
 
 class RHEditingEditReviewCondition(RHEditingManagementBase):
     def _process_args(self):
         RHEditingManagementBase._process_args(self)
+        self.editable_type = EditableType[request.view_args['type']]
         uuid = request.view_args['uuid']
-        conditions = editing_settings.get(self.event, 'review_conditions')
+        conditions = editing_settings.get(self.event, self.editable_type.name + '_review_conditions')
         self.uuid = unicode(uuid)
         if self.uuid not in conditions:
             raise NotFound
 
     def _process_DELETE(self):
-        new_conditions = editing_settings.get(self.event, 'review_conditions')
+        new_conditions = editing_settings.get(self.event, self.editable_type.name + '_review_conditions')
         del new_conditions[self.uuid]
-        editing_settings.set(self.event, 'review_conditions', new_conditions)
+        editing_settings.set(self.event, self.editable_type.name + '_review_conditions', new_conditions)
         return '', 204
 
     @use_rh_kwargs(EditingReviewConditionArgs)
     def _process_PATCH(self, file_types):
-        new_conditions = editing_settings.get(self.event, 'review_conditions')
+        new_conditions = editing_settings.get(self.event, self.editable_type.name + '_review_conditions')
         new_conditions[self.uuid] = file_types
-        editing_settings.set(self.event, 'review_conditions', new_conditions)
+        editing_settings.set(self.event, self.editable_type.name + '_review_conditions', new_conditions)
         return '', 204
 
 

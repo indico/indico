@@ -48,7 +48,11 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   ReactDOM.render(
     <Provider store={store}>
-      <ReviewConditionsManager eventId={eventId} fileTypes={fileTypes} />
+      <ReviewConditionsManager
+        eventId={eventId}
+        fileTypes={fileTypes}
+        editableType={editableType}
+      />
     </Provider>,
     reviewConditionsManager
   );

@@ -14,8 +14,12 @@ from indico.modules.events.settings import EventSettingsProxy
 
 
 editing_settings = EventSettingsProxy('editing', {
-    'review_conditions': OrderedDict(),
+    'paper_review_conditions': OrderedDict(),
+    'slides_review_conditions': OrderedDict(),
+    'poster_review_conditions': OrderedDict(),
     'editable_types': ['paper'],
 }, converters={
-    'review_conditions': OrderedDictConverter
+    'paper_review_conditions': OrderedDictConverter,
+    'slides_review_conditions': OrderedDictConverter,
+    'poster_review_conditions': OrderedDictConverter
 })

@@ -54,7 +54,7 @@ class EditingFileTypeSchema(mm.ModelSchema):
         return data
 
     def _is_used_in_condition(self, file_type):
-        conditions = editing_settings.get(file_type.event, 'review_conditions')
+        conditions = editing_settings.get(file_type.event, file_type.type.name + '_review_conditions')
         return any(file_type.id in cond for cond in conditions.values())
 
 
@@ -237,12 +237,13 @@ class EditableFileTypeArgs(mm.Schema):
 
 class EditingReviewConditionArgs(mm.Schema):
     class Meta:
-        rh_context = ('event',)
+        rh_context = ('event', 'editable_type')
 
     file_types = fields.List(fields.Int(), required=True, validate=not_empty)
 
     @validates('file_types')
     def _validate_file_types(self, file_types):
+        editable_type = self.context['editable_type']
         event = self.context['event']
         event_file_types = {ft.id for ft in event.editing_file_types}
         condition_types = set(file_types)
@@ -250,7 +251,7 @@ class EditingReviewConditionArgs(mm.Schema):
         if condition_types - event_file_types:
             raise ValidationError(_('Invalid file type used'))
 
-        event_conditions = editing_settings.get(event, 'review_conditions')
+        event_conditions = editing_settings.get(event, editable_type.name + '_review_conditions')
         if any(condition_types == set(event_condition) for event_condition in event_conditions.values()):
             raise ValidationError(_('Conditions have to be unique'))
 
