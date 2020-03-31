@@ -9,6 +9,7 @@ from __future__ import unicode_literals
 
 from indico.core.db import db
 from indico.core.db.sqlalchemy import PyIntEnum
+from indico.modules.events.editing.settings import editing_settings
 from indico.util.locators import locator_property
 from indico.util.string import format_repr, return_ascii
 from indico.util.struct.enum import IndicoEnum
@@ -91,3 +92,11 @@ class Editable(db.Model):
     def can_comment(self, user):
         return (self.event.can_manage(user, permission='paper_editing')
                 or self.contribution.is_user_associated(user, check_abstract=True))
+
+    @property
+    def review_conditions_valid(self):
+        review_conditions = editing_settings.get(self.event, 'review_conditions').values()
+        file_types = {file.file_type_id for file in self.revisions[-1].files}
+        if not review_conditions:
+            return True
+        return any(file_types >= set(cond) for cond in review_conditions)

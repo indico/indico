@@ -129,7 +129,8 @@ class EditingRevisionSchema(mm.ModelSchema):
 class EditableSchema(mm.ModelSchema):
     class Meta:
         model = Editable
-        fields = ('id', 'type', 'editor', 'revisions', 'contribution', 'can_comment', 'can_create_internal_comments')
+        fields = ('id', 'type', 'editor', 'revisions', 'contribution', 'can_comment', 'can_create_internal_comments',
+                  'review_conditions_valid')
 
     contribution = fields.Nested(ContributionSchema)
     editor = fields.Nested(UserSchema, only=('id', 'avatar_bg_color', 'full_name'))
@@ -138,6 +139,7 @@ class EditableSchema(mm.ModelSchema):
     can_create_internal_comments = fields.Function(
         lambda editable, ctx: editable.contribution.event.can_manage(ctx.get('user'), permission='paper_editing')
     )
+    review_conditions_valid = fields.Boolean()
 
 
 class EditingReviewAction(IndicoEnum):
