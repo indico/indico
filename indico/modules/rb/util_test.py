@@ -132,7 +132,8 @@ def test_get_booking_params_timezone(create_event):
     }
 
 
-def test_get_prebooking_collisions(create_reservation, dummy_user):
+def test_get_prebooking_collisions(create_reservation, dummy_user, freeze_time):
+    freeze_time(datetime(2020, 3, 20, 12, 0, 0))
     start_dt = datetime(2020, 4, 1, 9, 0)
     end_dt = datetime(2020, 4, 1, 12, 0)
 
