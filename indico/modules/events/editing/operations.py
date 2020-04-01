@@ -16,6 +16,7 @@ from indico.modules.events.editing import logger
 from indico.modules.events.editing.models.comments import EditingRevisionComment
 from indico.modules.events.editing.models.editable import Editable
 from indico.modules.events.editing.models.file_types import EditingFileType
+from indico.modules.events.editing.models.review_conditions import EditingReviewCondition
 from indico.modules.events.editing.models.revision_files import EditingRevisionFile
 from indico.modules.events.editing.models.revisions import EditingRevision, FinalRevisionState, InitialRevisionState
 from indico.modules.events.editing.models.tags import EditingTag
@@ -264,3 +265,21 @@ def update_file_type(file_type, **data):
 def delete_file_type(file_type):
     logger.info('File type %r deleted by %r', file_type, session.user)
     db.session.delete(file_type)
+
+
+def create_new_review_condition(event, editable_type, file_types):
+    review_condition = EditingReviewCondition(event=event, type=editable_type, file_types=file_types)
+    db.session.flush()
+    logger.info('Review condition %r created by %r', review_condition, session.user)
+    return review_condition
+
+
+def update_review_condition(condition, file_types):
+    condition.file_types = file_types
+    db.session.flush()
+    logger.info('Review condition %r updated by %r', condition, session.user)
+
+
+def delete_review_condition(condition):
+    logger.info('Review condition %r deleted by %r', condition, session.user)
+    db.session.delete(condition)

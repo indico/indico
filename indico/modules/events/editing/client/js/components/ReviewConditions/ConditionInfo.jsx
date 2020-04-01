@@ -22,11 +22,11 @@ import ReviewConditionsContext from './context';
 
 import './ConditionInfo.module.scss';
 
-export default function ConditionInfo({condition, uuid, editableType, onUpdate, disableActions}) {
+export default function ConditionInfo({fileTypes, condId, editableType, onUpdate, disableActions}) {
   const [isEditing, setIsEditing] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const {eventId} = useContext(ReviewConditionsContext);
-  const url = editReviewConditionURL({confId: eventId, uuid, type: editableType});
+  const url = editReviewConditionURL({confId: eventId, condition_id: condId, type: editableType});
 
   const deleteCondition = async () => {
     try {
@@ -43,7 +43,7 @@ export default function ConditionInfo({condition, uuid, editableType, onUpdate, 
 
   return isEditing ? (
     <ReviewConditionForm
-      types={condition.map(cond => cond.id)}
+      types={fileTypes.map(ft => ft.id)}
       onDismiss={() => setIsEditing(false)}
       onSubmit={async formData => {
         try {
@@ -61,12 +61,12 @@ export default function ConditionInfo({condition, uuid, editableType, onUpdate, 
   ) : (
     <>
       <div styleName="types-list">
-        {condition.map((type, index) => (
+        {fileTypes.map((type, index) => (
           <React.Fragment key={type.id}>
             <TooltipIfTruncated>
               <Label basic>{type.name}</Label>
             </TooltipIfTruncated>
-            {index !== condition.length - 1 && (
+            {index !== fileTypes.length - 1 && (
               <Label as="span" color="orange" size="small" circular>
                 <Translate>AND</Translate>
               </Label>
@@ -106,8 +106,8 @@ export default function ConditionInfo({condition, uuid, editableType, onUpdate, 
 }
 
 ConditionInfo.propTypes = {
-  condition: PropTypes.array.isRequired,
-  uuid: PropTypes.string.isRequired,
+  fileTypes: PropTypes.array.isRequired,
+  condId: PropTypes.number.isRequired,
   editableType: PropTypes.oneOf(Object.keys(EditableTypeTitles)).isRequired,
   onUpdate: PropTypes.func,
   disableActions: PropTypes.bool,

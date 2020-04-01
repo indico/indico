@@ -19,10 +19,10 @@ from indico.modules.events.contributions.schemas import ContributionSchema
 from indico.modules.events.editing.models.comments import EditingRevisionComment
 from indico.modules.events.editing.models.editable import Editable, EditableType
 from indico.modules.events.editing.models.file_types import EditingFileType
+from indico.modules.events.editing.models.review_conditions import EditingReviewCondition
 from indico.modules.events.editing.models.revision_files import EditingRevisionFile
 from indico.modules.events.editing.models.revisions import EditingRevision, InitialRevisionState
 from indico.modules.events.editing.models.tags import EditingTag
-from indico.modules.events.editing.settings import editing_settings
 from indico.modules.users.schemas import UserSchema
 from indico.util.i18n import _
 from indico.util.marshmallow import not_empty
@@ -44,18 +44,14 @@ class EditingFileTypeSchema(mm.ModelSchema):
         fields = ('id', 'name', 'extensions', 'allow_multiple_files', 'required', 'publishable', 'is_used',
                   'filename_template', 'is_used_in_condition')
 
-    is_used = fields.Function(lambda file_type: EditingRevisionFile.query.with_parent(file_type).has_rows())
-    is_used_in_condition = fields.Method('_is_used_in_condition')
+    is_used = fields.Function(lambda ft: EditingRevisionFile.query.with_parent(ft).has_rows())
+    is_used_in_condition = fields.Function(lambda ft: EditingReviewCondition.query.with_parent(ft).has_rows())
 
     @post_dump(pass_many=True)
     def sort_list(self, data, many, **kwargs):
         if many:
             data = sorted(data, key=lambda ft: natural_sort_key(ft['name']))
         return data
-
-    def _is_used_in_condition(self, file_type):
-        conditions = editing_settings.get(file_type.event, file_type.type.name + '_review_conditions')
-        return any(file_type.id in cond for cond in conditions.values())
 
 
 class EditingTagSchema(mm.ModelSchema):
@@ -251,8 +247,8 @@ class EditingReviewConditionArgs(mm.Schema):
         if condition_types - event_file_types:
             raise ValidationError(_('Invalid file type used'))
 
-        event_conditions = editing_settings.get(event, editable_type.name + '_review_conditions')
-        if any(condition_types == set(event_condition) for event_condition in event_conditions.values()):
+        event_conditions = EditingReviewCondition.query.with_parent(event).filter_by(type=editable_type).all()
+        if any(condition_types == {ft.id for ft in cond.file_types} for cond in event_conditions):
             raise ValidationError(_('Conditions have to be unique'))
 
 

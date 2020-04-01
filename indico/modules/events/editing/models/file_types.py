@@ -86,6 +86,7 @@ class EditingFileType(db.Model):
 
     # relationship backrefs:
     # - files (EditingRevisionFile.file_type)
+    # - review_conditions (EditingReviewCondition.file_types)
 
     @return_ascii
     def __repr__(self):

@@ -7,19 +7,9 @@
 
 from __future__ import unicode_literals
 
-from collections import OrderedDict
-
-from indico.core.settings.converters import OrderedDictConverter
 from indico.modules.events.settings import EventSettingsProxy
 
 
 editing_settings = EventSettingsProxy('editing', {
-    'paper_review_conditions': OrderedDict(),
-    'slides_review_conditions': OrderedDict(),
-    'poster_review_conditions': OrderedDict(),
     'editable_types': ['paper'],
-}, converters={
-    'paper_review_conditions': OrderedDictConverter,
-    'slides_review_conditions': OrderedDictConverter,
-    'poster_review_conditions': OrderedDictConverter
 })

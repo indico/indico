@@ -36,9 +36,9 @@ export default function ReviewConditionsManager() {
     return null;
   }
 
-  // map an array of ids to an array of file types objects
-  const reviewConditions = eventConditions.map(([uuid, condition]) => [
-    uuid,
+  // map an array of ids to an array of file type objects
+  const reviewConditions = eventConditions.map(([condId, condition]) => [
+    condId,
     condition.map(fileTypeId => fileTypes.find(({id}) => id === fileTypeId)),
   ]);
   const createNewCondition = async formData => {
@@ -66,12 +66,12 @@ export default function ReviewConditionsManager() {
         </Message>
       )}
       <div>
-        {reviewConditions.map(([uuid, reviewCondition], index) => (
-          <React.Fragment key={uuid}>
+        {reviewConditions.map(([condId, reviewCondition], index) => (
+          <React.Fragment key={condId}>
             <div styleName="condition-row">
               <ConditionInfo
-                condition={reviewCondition}
-                uuid={uuid}
+                fileTypes={reviewCondition}
+                condId={condId}
                 editableType={editableType}
                 onUpdate={() => reFetch()}
                 disableActions={loading}

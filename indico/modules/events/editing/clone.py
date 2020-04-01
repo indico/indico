@@ -7,17 +7,13 @@
 
 from __future__ import unicode_literals
 
-from collections import OrderedDict
-from uuid import uuid4
-
 from indico.core.db import db
 from indico.core.db.sqlalchemy.util.models import get_simple_column_attrs
 from indico.core.db.sqlalchemy.util.session import no_autoflush
 from indico.modules.events.cloning import EventCloner
-from indico.modules.events.editing.models.editable import EditableType
 from indico.modules.events.editing.models.file_types import EditingFileType
+from indico.modules.events.editing.models.review_conditions import EditingReviewCondition
 from indico.modules.events.editing.models.tags import EditingTag
-from indico.modules.events.editing.settings import editing_settings
 from indico.modules.events.models.events import EventType
 from indico.util.i18n import _
 
@@ -54,16 +50,11 @@ class EditingSettingsCloner(EventCloner):
             filetype.populate_from_attrs(old_filetype, attrs)
             new_event.editing_file_types.append(filetype)
             db.session.flush()
-            self._filetype_map[old_filetype.id] = filetype.id
+            self._filetype_map[old_filetype] = filetype
 
     def _clone_review_conditions(self, new_event):
-        for type_ in EditableType:
-            review_conditions = editing_settings.get(self.old_event, type_.name + '_review_conditions')
-            new_conditions = OrderedDict(
-                self._build_review_conditions(new_event, cond)
-                for cond in review_conditions.viewvalues()
-            )
-            editing_settings.set(new_event, type_.name + '_review_conditions', new_conditions)
-
-    def _build_review_conditions(self, new_event, value):
-        return unicode(uuid4()), [self._filetype_map[filetype_id] for filetype_id in value]
+        old_conditions = EditingReviewCondition.query.with_parent(self.old_event).all()
+        for condition in old_conditions:
+            new_filetypes = {self._filetype_map[ft] for ft in condition.file_types}
+            new_condition = EditingReviewCondition(type=condition.type, file_types=new_filetypes)
+            new_event.editing_review_conditions.append(new_condition)

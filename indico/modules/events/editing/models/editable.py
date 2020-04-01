@@ -9,7 +9,6 @@ from __future__ import unicode_literals
 
 from indico.core.db import db
 from indico.core.db.sqlalchemy import PyIntEnum
-from indico.modules.events.editing.settings import editing_settings
 from indico.util.i18n import _
 from indico.util.locators import locator_property
 from indico.util.string import format_repr, return_ascii
@@ -97,8 +96,10 @@ class Editable(db.Model):
 
     @property
     def review_conditions_valid(self):
-        review_conditions = editing_settings.get(self.event, self.type.name + '_review_conditions').values()
+        from indico.modules.events.editing.models.review_conditions import EditingReviewCondition
+        query = EditingReviewCondition.query.with_parent(self.event).filter_by(type=self.type)
+        review_conditions = [{ft.id for ft in cond.file_types} for cond in query]
         file_types = {file.file_type_id for file in self.revisions[-1].files}
         if not review_conditions:
             return True
-        return any(file_types >= set(cond) for cond in review_conditions)
+        return any(file_types >= cond for cond in review_conditions)

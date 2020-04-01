@@ -37,7 +37,7 @@ _bp.add_url_rule(contrib_prefix + '/<int:revision_id>/<int:file_id>/<filename>',
 review_cond_prefix = '/editing/api/<any(paper,slides,poster):type>/review-conditions'
 _bp.add_url_rule(review_cond_prefix, 'api_review_conditions',
                  management.RHEditingReviewConditions, methods=('GET', 'POST'))
-_bp.add_url_rule(review_cond_prefix + '/<uuid:uuid>', 'api_edit_review_condition',
+_bp.add_url_rule(review_cond_prefix + '/<int:condition_id>', 'api_edit_review_condition',
                  management.RHEditingEditReviewCondition, methods=('DELETE', 'PATCH'))
 _bp.add_url_rule('/editing/api/<any(paper,slides,poster):type>/file-types', 'api_file_types',
                  common.RHEditingFileTypes)
