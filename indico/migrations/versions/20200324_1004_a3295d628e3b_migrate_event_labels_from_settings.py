@@ -44,7 +44,7 @@ def upgrade():
         if not data['label']:
             continue
         label_id = mapping[data['label']]
-        label_message = data['message']
+        label_message = data.get('message', '')
         conn.execute("UPDATE events.events SET label_id = %s, label_message = %s WHERE id = %s",
                      (label_id, label_message, event_id))
     # cleanup
