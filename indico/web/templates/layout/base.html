@@ -3,12 +3,14 @@
          {% if self.page_id()|trim %}id="{% filter trim %}{% block page_id %}{% endblock %}{% endfilter %}"{% endif %}>
         {% if self.title() %}
             <header>
-                {% if self.back_button_url()|trim %}
-                    <a href="{% filter trim %}{% block back_button_url %}{% endblock %}{% endfilter %}"
-                       class="icon-prev back-button"
-                       title="{% if self.back_button_title()|trim %}{% block back_button_title %}{% endblock %}{% else %}{% trans %}Back{% endtrans %}{% endif %}">
-                    </a>
-                {% endif %}
+                <span class="back-button-container">
+                    {%- if self.back_button_url()|trim -%}
+                        <a href="{% filter trim %}{% block back_button_url %}{% endblock %}{% endfilter %}"
+                           class="icon-prev back-button"
+                           title="{% if self.back_button_title()|trim %}{% block back_button_title %}{% endblock %}{% else %}{% trans %}Back{% endtrans %}{% endif %}">
+                        </a>
+                    {%- endif -%}
+                </span>
                 <div class="title">
                     <div class="text">
                         <div class="title-with-actions">
@@ -21,9 +23,11 @@
                                 </div>
                             {%- endif -%}
                         </div>
-                        {% if self.subtitle()|trim -%}
-                            <h3>{% block subtitle %}{% endblock %}</h3>
-                        {% endif %}
+                        <div class="subtitle-container">
+                            {%- if self.subtitle()|trim -%}
+                                <h3>{% block subtitle %}{% endblock %}</h3>
+                            {%- endif -%}
+                        </div>
                     </div>
                     {% if self.page_actions()|trim %}
                         <div class="actions">

@@ -5,9 +5,13 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-import './tags';
+// general management
+import './management';
+
+// editable-type-specific management
+import './editableType';
 import './fileTypes';
 import './reviewConditions';
+
+// editing view
 import './editing';
-import './editableTypesList';
-import './editableType';

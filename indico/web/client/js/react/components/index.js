@@ -35,3 +35,5 @@ export {default as FileSubmission} from './FileSubmission';
 export {default as ClipboardButton} from './ClipboardButton';
 export {default as RequestConfirm} from './RequestConfirm';
 export {default as ReviewRating} from './ReviewRating';
+export {default as ManagementPageBackButton} from './ManagementPageBackButton';
+export {default as ManagementPageSubTitle} from './ManagementPageSubTitle';

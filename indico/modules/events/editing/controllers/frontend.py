@@ -47,11 +47,6 @@ class RHEditableTimeline(RHContributionEditableBase):
         )
 
 
-class RHManageEditingTags(RHEditingManagementBase):
-    def _process(self):
-        return WPEditing.render_template('management/tags.html', self.event)
-
-
 class RHManageEditingFileTypes(RHEditingManagementBase):
     def _process_args(self):
         RHEditingManagementBase._process_args(self)

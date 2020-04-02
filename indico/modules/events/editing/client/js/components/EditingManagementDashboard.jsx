@@ -1,0 +1,38 @@
+// This file is part of Indico.
+// Copyright (C) 2002 - 2020 CERN
+//
+// Indico is free software; you can redistribute it and/or
+// modify it under the terms of the MIT License; see the
+// LICENSE file for more details.
+
+import manageTagsURL from 'indico-url:event_editing.manage_tags';
+
+import React from 'react';
+import PropTypes from 'prop-types';
+import {Link} from 'react-router-dom';
+import {Translate} from 'indico/react/i18n';
+import EditableTypeList from './EditableTypeList';
+import Section from './Section';
+
+export default function EditingManagementDashboard({eventId}) {
+  return (
+    <>
+      <div className="action-box">
+        <Section
+          icon="tag"
+          label={Translate.string('Tags')}
+          description={Translate.string('Configure the tags that can be assigned to revisions')}
+        >
+          <Link to={manageTagsURL({confId: eventId})} className="i-button icon-settings">
+            <Translate>Configure</Translate>
+          </Link>
+        </Section>
+      </div>
+      <EditableTypeList eventId={eventId} />
+    </>
+  );
+}
+
+EditingManagementDashboard.propTypes = {
+  eventId: PropTypes.number.isRequired,
+};

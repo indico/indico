@@ -1,23 +1,5 @@
 {% extends 'events/editing/management/base.html' %}
 
 {% block content %}
-    <div class="page-content">
-        <div class="action-box">
-            <div class="section">
-                <span class="icon icon-tag" style="align-self: center;"></span>
-                <div class="text">
-                    <div class="label">
-                        {% trans %}Tags{% endtrans %}
-                    </div>
-                    {% trans %}Configure the tags that can be assigned to revisions{% endtrans %}
-                </div>
-                <div class="toolbar">
-                    <a href="{{ url_for('.manage_tags', event) }}" class="i-button icon-settings">
-                        {% trans %}Configure{% endtrans %}
-                    </a>
-                </div>
-            </div>
-        </div>
-        <div id="editable-type-list" data-event-id="{{ event.id }}"></div>
-    </div>
+    <div class="page-content" id="editing-management" data-event-id="{{ event.id }}"></div>
 {% endblock %}

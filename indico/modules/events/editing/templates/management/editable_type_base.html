@@ -1,7 +1,7 @@
 {% extends 'events/editing/management/base.html' %}
 
 {% block title %}
-    {{ editable_type.title }}
+    {% trans type=editable_type.title %}Editing ({{ type }}){% endtrans %}
 {% endblock %}
 
 {% block back_button_url -%}

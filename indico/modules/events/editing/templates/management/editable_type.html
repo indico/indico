@@ -4,6 +4,10 @@
     {{ type.title }}
 {% endblock %}
 
+{% block back_button_url -%}
+    {{ url_for('.dashboard', event) }}
+{%- endblock %}
+
 {% block content %}
     <div id="editable-type" data-event-id="{{ event.id }}" data-editable-type="{{ type.name }}"></div>
 {% endblock %}
