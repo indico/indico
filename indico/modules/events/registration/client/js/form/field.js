@@ -1043,7 +1043,7 @@ ndRegForm.directive('ndAccommodationField', function(url) {
                         editable: true,
                         edittype: "text",
                         editoptions: {size: "30"}
-                    }, 
+                    },
                     {
                         name: 'price',
                         index: 'price',
