@@ -45,7 +45,8 @@ ndRegForm.controller('FieldCtrl', function($scope, regFormFactory) {
                     $scope.section.items.push($scope.field);
                 }
             });
-        }, handleAjaxError);
+        },
+        handleAjaxError);
     };
 
     $scope.fieldApi.enableField = function(field) {
@@ -61,7 +62,8 @@ ndRegForm.controller('FieldCtrl', function($scope, regFormFactory) {
                     $scope.section.items.splice(lastEnabledIndex + 1, 0, $scope.field);
                 }
             });
-        }, handleAjaxError);
+        },
+        handleAjaxError);
     };
 
     $scope.fieldApi.removeField = function(field) {
@@ -81,7 +83,8 @@ ndRegForm.controller('FieldCtrl', function($scope, regFormFactory) {
                     $scope.field = angular.extend($scope.field, response.view_data);
                 }
             });
-        }, handleAjaxError);
+        },
+        handleAjaxError);
     };
 
     $scope.openFieldSettings = function() {
@@ -204,7 +207,8 @@ ndRegForm.controller('FieldCtrl', function($scope, regFormFactory) {
                 $scope.$apply();
             }
         });
-    }, 250);
+    },
+    250);
 
     function checkEmail(email) {
         email = email.trim();
@@ -228,7 +232,8 @@ ndRegForm.controller('FieldCtrl', function($scope, regFormFactory) {
         $('#registrationForm').on('change input', 'input[name=email]', _.debounce(function() {
             checkEmail($(this).val());
             $scope.$apply();
-        }, 250));
+        },
+        250));
         checkEmail($scope.userdata.email || '');
     }
 });
@@ -670,7 +675,8 @@ ndRegForm.directive('ndRadioField', function(url) {
                     editoptions: {
                         size: "30",
                     }
-                }, {
+                },
+                {
                     name: 'isBillable',
                     index: 'isBillable',
                     width: 50,
@@ -678,7 +684,8 @@ ndRegForm.directive('ndRadioField', function(url) {
                     align: 'center',
                     defaultVal: false,
                     edittype: 'bool_select'
-                }, {
+                },
+                {
                     name: 'priceInfo',
                     index: 'priceInfo',
                     align: 'center',
@@ -686,7 +693,8 @@ ndRegForm.directive('ndRadioField', function(url) {
                     editable: true,
                     edittype: "text",
                     editoptions: {size: "30"}
-                }, {
+                },
+                {
                     name: 'price',
                     index: 'price',
                     align: 'center',
@@ -698,7 +706,8 @@ ndRegForm.directive('ndRadioField', function(url) {
                         size: "7",
                         maxlength: "20"
                     }
-                }, {
+                },
+                {
                     name: 'placesLimit',
                     index: 'placesLimit',
                     align: 'center',
@@ -710,7 +719,8 @@ ndRegForm.directive('ndRadioField', function(url) {
                         size: "7",
                         maxlength: "20"
                     }
-                }, {
+                },
+                {
                     name: 'maxExtraSlots',
                     index: 'maxExtraSlots',
                     align: 'center',
@@ -723,7 +733,8 @@ ndRegForm.directive('ndRadioField', function(url) {
                         size: "7",
                         maxlength: "2"
                     }
-                }, {
+                },
+                {
                     name: 'extraSlotsPay',
                     index: 'extraSlotsPay',
                     align: 'center',
@@ -732,7 +743,8 @@ ndRegForm.directive('ndRadioField', function(url) {
                     edittype: "bool_select",
                     className: 'extra-slots',
                     defaultVal: false
-                }, {
+                },
+                {
                     name: 'isEnabled',
                     index: 'isEnabled',
                     width: 50,
@@ -1278,7 +1290,8 @@ ndRegForm.directive('ndFieldDialog', function(url) {
                 } else {
                     _.delay(function() {
                         $('.regform-table .extra-slots').hide();
-                    }, 500);
+                    },
+                    500);
                 }
             };
 
