@@ -97,7 +97,7 @@ class Editable(db.Model):
 
     @property
     def review_conditions_valid(self):
-        review_conditions = editing_settings.get(self.event, 'review_conditions').values()
+        review_conditions = editing_settings.get(self.event, self.type.name + '_review_conditions').values()
         file_types = {file.file_type_id for file in self.revisions[-1].files}
         if not review_conditions:
             return True
