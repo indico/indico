@@ -10,8 +10,7 @@ from __future__ import unicode_literals
 from flask import session
 from werkzeug.exceptions import Forbidden, NotFound
 
-from indico.modules.events.editing.controllers.base import (RHContributionEditableBase, RHEditableTypeManagementBase,
-                                                            RHEditingManagementBase)
+from indico.modules.events.editing.controllers.base import RHContributionEditableBase, RHEditingManagementBase
 from indico.modules.events.editing.views import WPEditing
 
 
@@ -44,20 +43,3 @@ class RHEditableTimeline(RHContributionEditableBase):
             editable=self.editable,
             contribution=self.contrib
         )
-
-
-class RHManageEditableType(RHEditableTypeManagementBase):
-    def _process(self):
-        return WPEditing.render_template('management/editable_type.html', self.event, type=self.editable_type)
-
-
-class RHManageEditingFileTypes(RHEditableTypeManagementBase):
-    def _process(self):
-        return WPEditing.render_template('management/filetypes.html', self.event,
-                                         editable_type=self.editable_type)
-
-
-class RHManageEditingReviewConditions(RHEditableTypeManagementBase):
-    def _process(self):
-        return WPEditing.render_template('management/review_conditions.html', self.event,
-                                         editable_type=self.editable_type)

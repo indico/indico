@@ -15,6 +15,5 @@ document.addEventListener('DOMContentLoaded', async () => {
   if (!editingManagementContainer) {
     return;
   }
-  const eventId = parseInt(editingManagementContainer.dataset.eventId, 10);
-  ReactDOM.render(<EditingManagement eventId={eventId} />, editingManagementContainer);
+  ReactDOM.render(<EditingManagement />, editingManagementContainer);
 });

@@ -18,7 +18,7 @@ import {indicoAxios} from 'indico/utils/axios';
 
 import ConditionInfo from './ConditionInfo';
 import ReviewConditionForm from './ReviewConditionForm';
-import {EditableTypeTitles} from '../models';
+import {EditableTypeTitles} from '../../models';
 
 import './ReviewConditionsManager.module.scss';
 

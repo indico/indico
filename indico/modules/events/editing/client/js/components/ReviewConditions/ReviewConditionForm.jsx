@@ -5,19 +5,19 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-import React from 'react';
+import React, {useContext} from 'react';
 import PropTypes from 'prop-types';
-import {useSelector} from 'react-redux';
 import {Form as FinalForm} from 'react-final-form';
 import {Button, Form} from 'semantic-ui-react';
 
 import {FinalDropdown, FinalSubmitButton} from 'indico/react/forms';
 import {Translate} from 'indico/react/i18n';
+import {ReviewConditionsContext} from '.';
 
 import './ReviewConditionForm.module.scss';
 
 export default function ReviewConditionForm({types, onSubmit, onDismiss}) {
-  const {fileTypes} = useSelector(state => state.staticData);
+  const {fileTypes} = useContext(ReviewConditionsContext);
   const options = fileTypes.map(fileType => ({text: fileType.name, value: fileType.id}));
 
   return (

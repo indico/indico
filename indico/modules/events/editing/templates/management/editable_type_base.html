@@ -1,9 +1,0 @@
-{% extends 'events/editing/management/base.html' %}
-
-{% block title %}
-    {% trans type=editable_type.title %}Editing ({{ type }}){% endtrans %}
-{% endblock %}
-
-{% block back_button_url -%}
-    {{ url_for('.manage_editable_type', event, type=editable_type.name) }}
-{%- endblock %}

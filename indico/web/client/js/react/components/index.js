@@ -37,3 +37,4 @@ export {default as RequestConfirm} from './RequestConfirm';
 export {default as ReviewRating} from './ReviewRating';
 export {default as ManagementPageBackButton} from './ManagementPageBackButton';
 export {default as ManagementPageSubTitle} from './ManagementPageSubTitle';
+export {default as ManagementPageTitle} from './ManagementPageTitle';

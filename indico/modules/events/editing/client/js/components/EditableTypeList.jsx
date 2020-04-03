@@ -11,6 +11,7 @@ import manageEditableTypeURL from 'indico-url:event_editing.manage_editable_type
 import React, {useState} from 'react';
 import PropTypes from 'prop-types';
 import {Button, Checkbox, Form, Loader, Popup} from 'semantic-ui-react';
+import {Link} from 'react-router-dom';
 import {Form as FinalForm} from 'react-final-form';
 import {Translate} from 'indico/react/i18n';
 import {useIndicoAxios} from 'indico/react/hooks';
@@ -107,12 +108,12 @@ export default function EditableTypeList({eventId}) {
               <a className="i-button icon-list">
                 <Translate>List</Translate>
               </a>
-              <a
+              <Link
                 className="i-button icon-settings"
-                href={manageEditableTypeURL({confId: eventId, type})}
+                to={manageEditableTypeURL({confId: eventId, type})}
               >
                 <Translate>Manage</Translate>
-              </a>
+              </Link>
             </div>
           </div>
         ))}

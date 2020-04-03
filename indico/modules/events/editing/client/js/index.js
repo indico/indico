@@ -5,13 +5,8 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-// general management
+// management
 import './management';
 
-// editable-type-specific management
-import './editableType';
-import './fileTypes';
-import './reviewConditions';
-
-// editing view
+// editing view & timeline
 import './editing';

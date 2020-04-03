@@ -5,6 +5,7 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
+import dashboardURL from 'indico-url:event_editing.dashboard';
 import tagsURL from 'indico-url:event_editing.api_tags';
 import createTagURL from 'indico-url:event_editing.api_create_tag';
 import editTagURL from 'indico-url:event_editing.api_edit_tag';
@@ -14,13 +15,18 @@ import PropTypes from 'prop-types';
 import {Button, Icon, Label, Loader, Message, Segment} from 'semantic-ui-react';
 
 import {Param, Translate} from 'indico/react/i18n';
-import {RequestConfirm} from 'indico/react/components';
+import {
+  RequestConfirm,
+  ManagementPageBackButton,
+  ManagementPageSubTitle,
+} from 'indico/react/components';
 import {getChangedValues, handleSubmitError} from 'indico/react/forms';
 import {useIndicoAxios} from 'indico/react/hooks';
 import {handleAxiosError, indicoAxios} from 'indico/utils/axios';
+import {useNumericParam} from 'indico/react/util/routing';
 import TagModal from './TagModal';
 
-import './TagManager.module.scss';
+import './EditingTagManagement.module.scss';
 
 const initialState = {
   tag: null,
@@ -42,7 +48,7 @@ function tagsReducer(state, action) {
   }
 }
 
-export default function TagManager({eventId}) {
+function TagManager({eventId}) {
   const [state, dispatch] = useReducer(tagsReducer, initialState);
   const {data, loading: isLoadingTags, reFetch, lastData} = useIndicoAxios({
     url: tagsURL({confId: eventId}),
@@ -172,3 +178,14 @@ export default function TagManager({eventId}) {
 TagManager.propTypes = {
   eventId: PropTypes.number.isRequired,
 };
+
+export default function EditingTagManagement() {
+  const eventId = useNumericParam('confId');
+  return (
+    <>
+      <ManagementPageBackButton url={dashboardURL({confId: eventId})} />
+      <ManagementPageSubTitle title={Translate.string('Tags')} />
+      <TagManager eventId={eventId} />
+    </>
+  );
+}

@@ -7,33 +7,50 @@
 
 import manageTagsURL from 'indico-url:event_editing.manage_tags';
 import dashboardURL from 'indico-url:event_editing.dashboard';
+import editableTypeURL from 'indico-url:event_editing.manage_editable_type';
+import manageFileTypesURL from 'indico-url:event_editing.manage_file_types';
+import manageReviewConditionsURL from 'indico-url:event_editing.manage_review_conditions';
 
 import React from 'react';
-import PropTypes from 'prop-types';
 import {BrowserRouter as Router, Route, Switch} from 'react-router-dom';
-import {ManagementPageBackButton, ManagementPageSubTitle} from 'indico/react/components';
-import {Translate} from 'indico/react/i18n';
+import {routerPathFromFlask} from 'indico/react/util/routing';
 
 import EditingManagementDashboard from './EditingManagementDashboard';
-import TagManager from './TagManager';
+import EditingTagManagement from './EditingTagManagement';
+import EditableTypeDashboard from './EditableTypeDashboard';
+import FileTypeManagement from './FileTypes';
+import ReviewConditionsManagement from './ReviewConditions';
 
-export default function EditingManagement({eventId}) {
+export default function EditingManagement() {
   return (
     <Router>
       <Switch>
-        <Route exact path={dashboardURL({confId: eventId})}>
-          <EditingManagementDashboard eventId={eventId} />
-        </Route>
-        <Route exact path={manageTagsURL({confId: eventId})}>
-          <ManagementPageBackButton url={dashboardURL({confId: eventId})} />
-          <ManagementPageSubTitle title={Translate.string('Tags')} />
-          <TagManager eventId={eventId} />
-        </Route>
+        <Route
+          exact
+          path={routerPathFromFlask(dashboardURL, ['confId'])}
+          component={EditingManagementDashboard}
+        />
+        <Route
+          exact
+          path={routerPathFromFlask(manageTagsURL, ['confId'])}
+          component={EditingTagManagement}
+        />
+        <Route
+          exact
+          path={routerPathFromFlask(editableTypeURL, ['confId', 'type'])}
+          component={EditableTypeDashboard}
+        />
+        <Route
+          exact
+          path={routerPathFromFlask(manageFileTypesURL, ['confId', 'type'])}
+          component={FileTypeManagement}
+        />
+        <Route
+          exact
+          path={routerPathFromFlask(manageReviewConditionsURL, ['confId', 'type'])}
+          component={ReviewConditionsManagement}
+        />
       </Switch>
     </Router>
   );
 }
-
-EditingManagement.propTypes = {
-  eventId: PropTypes.number.isRequired,
-};

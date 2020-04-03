@@ -5,21 +5,30 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
+import dashboardURL from 'indico-url:event_editing.dashboard';
 import manageFileTypesURL from 'indico-url:event_editing.manage_file_types';
 import manageReviewConditionsURL from 'indico-url:event_editing.manage_review_conditions';
 
 import React from 'react';
-import PropTypes from 'prop-types';
+import {useParams, Link} from 'react-router-dom';
 import {Checkbox} from 'semantic-ui-react';
+
 import {Translate} from 'indico/react/i18n';
+import {ManagementPageSubTitle, ManagementPageBackButton} from 'indico/react/components';
+import {useNumericParam} from 'indico/react/util/routing';
 import {EditableTypeTitles} from '../models';
 import Section from './Section';
 
-import './EditableType.module.scss';
+import './EditableTypeDashboard.module.scss';
 
-export default function EditableType({eventId, editableType}) {
+export default function EditableTypeDashboard() {
+  const eventId = useNumericParam('confId');
+  const {type} = useParams();
+
   return (
     <>
+      <ManagementPageSubTitle title={EditableTypeTitles[type]} />
+      <ManagementPageBackButton url={dashboardURL({confId: eventId})} />
       <div className="action-box">
         <Section
           icon="file"
@@ -46,24 +55,21 @@ export default function EditableType({eventId, editableType}) {
           label={Translate.string('File types')}
           description={Translate.string('Configure file types')}
         >
-          <a
-            className="i-button icon-settings"
-            href={manageFileTypesURL({confId: eventId, type: editableType})}
-          >
+          <Link className="i-button icon-settings" to={manageFileTypesURL({confId: eventId, type})}>
             <Translate>Configure</Translate>
-          </a>
+          </Link>
         </Section>
         <Section
           icon="equalizer"
           label={Translate.string('Ready for review conditions')}
           description={Translate.string('Configure conditions for reviewing')}
         >
-          <a
+          <Link
             className="i-button icon-settings"
-            href={manageReviewConditionsURL({confId: eventId, type: editableType})}
+            to={manageReviewConditionsURL({confId: eventId, type})}
           >
             <Translate>Configure</Translate>
-          </a>
+          </Link>
         </Section>
         <Section
           icon="users"
@@ -94,8 +100,3 @@ export default function EditableType({eventId, editableType}) {
     </>
   );
 }
-
-EditableType.propTypes = {
-  eventId: PropTypes.number.isRequired,
-  editableType: PropTypes.oneOf(Object.keys(EditableTypeTitles)).isRequired,
-};

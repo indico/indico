@@ -15,16 +15,18 @@ from indico.web.flask.wrappers import IndicoBlueprint
 _bp = IndicoBlueprint('event_editing', __name__, url_prefix='/event/<confId>', template_folder='templates',
                       virtual_template_folder='events/editing')
 
-# Frontend
-contrib_prefix = '/contributions/<int:contrib_id>/editing/<any(paper,slides,poster):type>'
+# Frontend (management)
 _bp.add_url_rule('/manage/editing/', 'dashboard', frontend.RHEditingDashboard)
 _bp.add_url_rule('/manage/editing/tags', 'manage_tags', frontend.RHEditingDashboard)
 _bp.add_url_rule('/manage/editing/<any(paper,slides,poster):type>/', 'manage_editable_type',
-                 frontend.RHManageEditableType)
+                 frontend.RHEditingDashboard)
 _bp.add_url_rule('/manage/editing/<any(paper,slides,poster):type>/types', 'manage_file_types',
-                 frontend.RHManageEditingFileTypes)
+                 frontend.RHEditingDashboard)
 _bp.add_url_rule('/manage/editing/<any(paper,slides,poster):type>/review-conditions', 'manage_review_conditions',
-                 frontend.RHManageEditingReviewConditions)
+                 frontend.RHEditingDashboard)
+
+# Frontend (timeline)
+contrib_prefix = '/contributions/<int:contrib_id>/editing/<any(paper,slides,poster):type>'
 _bp.add_url_rule(contrib_prefix, 'editable', frontend.RHEditableTimeline)
 _bp.add_url_rule(contrib_prefix + '/<int:revision_id>/files.zip', 'revision_files_export',
                  timeline.RHExportRevisionFiles)

@@ -8,13 +8,14 @@
 import manageTagsURL from 'indico-url:event_editing.manage_tags';
 
 import React from 'react';
-import PropTypes from 'prop-types';
 import {Link} from 'react-router-dom';
 import {Translate} from 'indico/react/i18n';
+import {useNumericParam} from 'indico/react/util/routing';
 import EditableTypeList from './EditableTypeList';
 import Section from './Section';
 
-export default function EditingManagementDashboard({eventId}) {
+export default function EditingManagementDashboard() {
+  const eventId = useNumericParam('confId');
   return (
     <>
       <div className="action-box">
@@ -32,7 +33,3 @@ export default function EditingManagementDashboard({eventId}) {
     </>
   );
 }
-
-EditingManagementDashboard.propTypes = {
-  eventId: PropTypes.number.isRequired,
-};

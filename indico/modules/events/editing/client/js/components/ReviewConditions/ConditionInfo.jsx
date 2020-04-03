@@ -7,9 +7,8 @@
 
 import editReviewConditionURL from 'indico-url:event_editing.api_edit_review_condition';
 
-import React, {useState} from 'react';
+import React, {useState, useContext} from 'react';
 import PropTypes from 'prop-types';
-import {useSelector} from 'react-redux';
 import {Icon, Label} from 'semantic-ui-react';
 
 import {RequestConfirm, TooltipIfTruncated} from 'indico/react/components';
@@ -18,14 +17,15 @@ import {handleSubmitError} from 'indico/react/forms';
 import {handleAxiosError, indicoAxios} from 'indico/utils/axios';
 
 import ReviewConditionForm from './ReviewConditionForm';
-import {EditableTypeTitles} from '../models';
+import {EditableTypeTitles} from '../../models';
+import {ReviewConditionsContext} from '.';
 
 import './ConditionInfo.module.scss';
 
 export default function ConditionInfo({condition, uuid, editableType, onUpdate, disableActions}) {
   const [isEditing, setIsEditing] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
-  const {eventId} = useSelector(state => state.staticData);
+  const {eventId} = useContext(ReviewConditionsContext);
   const url = editReviewConditionURL({confId: eventId, uuid, type: editableType});
 
   const deleteCondition = async () => {
