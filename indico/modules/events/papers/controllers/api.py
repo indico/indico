@@ -21,6 +21,8 @@ from indico.modules.events.papers.operations import (create_comment, create_pape
                                                      delete_comment, judge_paper, reset_paper_state, update_comment,
                                                      update_review)
 from indico.modules.events.papers.schemas import PaperSchema
+from indico.modules.events.papers.util import is_type_reviewing_possible
+from indico.util.i18n import _
 from indico.util.marshmallow import max_words, not_empty
 from indico.web.args import parser, use_kwargs
 
@@ -166,6 +168,12 @@ class RHCreateReview(RHPaperBase):
         }
     }
 
+    def _check_access(self):
+        RHPaperBase._check_access(self)
+
+        if not is_type_reviewing_possible(self.event.cfp, self.type.instance):
+            raise Forbidden(_('Reviewing is currently not possible'))
+
     def _check_paper_protection(self):
         if self.paper.last_revision.get_reviews(user=session.user, group=self.type.instance):
             return False
@@ -190,6 +198,12 @@ class RHUpdateReview(RHPaperBase):
 
     def _check_paper_protection(self):
         return self.review.can_edit(session.user, check_state=True)
+
+    def _check_access(self):
+        RHPaperBase._check_access(self)
+
+        if not is_type_reviewing_possible(self.event.cfp, self.review.type):
+            raise Forbidden(_('Reviewing is currently not possible'))
 
     def _process_args(self):
         RHPaperBase._process_args(self)

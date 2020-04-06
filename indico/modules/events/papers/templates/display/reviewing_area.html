@@ -22,6 +22,8 @@
         {% endcall %}
     {% endif %}
 
+    {% set layout_reviewing_enabled = event.cfp.layout_reviewing_enabled %}
+    {% set content_reviewing_enabled = event.cfp.content_reviewing_enabled %}
     {% set layout_deadline = event.cfp.layout_reviewer_deadline %}
     {% set content_deadline = event.cfp.content_reviewer_deadline %}
     {% if layout_deadline or content_deadline %}
@@ -30,14 +32,14 @@
             <span class="icon icon-calendar"></span>
             <div class="label">{% trans %}Reviewing deadlines{% endtrans %}</div>
             <div class="text">
-                {% if layout_deadline %}
+                {% if layout_reviewing_enabled and layout_deadline %}
                     <span>
                         {% trans date=layout_deadline|format_date(timezone=tz), time=layout_deadline|format_time(timezone=tz) -%}
                             Layout reviewing ends on <strong>{{ date }}</strong> at <strong>{{ time }}</strong>.
                         {%- endtrans %}
                     </span>
                 {% endif %}
-                {% if content_deadline %}
+                {% if content_reviewing_enabled and content_deadline %}
                     <span>
                         {% trans date=content_deadline|format_date(timezone=tz), time=content_deadline|format_time(timezone=tz) -%}
                             Content reviewing ends on <strong>{{ date }}</strong> at <strong>{{ time }}</strong>.

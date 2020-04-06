@@ -21,6 +21,7 @@ from indico.modules.events.papers.models.review_questions import PaperReviewQues
 from indico.modules.events.papers.models.review_ratings import PaperReviewRating
 from indico.modules.events.papers.models.reviews import PaperReview
 from indico.modules.events.papers.models.revisions import PaperRevision, PaperRevisionState
+from indico.modules.events.papers.util import is_type_reviewing_possible
 from indico.modules.users.schemas import UserSchema
 from indico.util.i18n import orig_string
 from indico.util.mimetypes import icon_from_mimetype
@@ -154,12 +155,17 @@ class PaperReviewSchema(mm.ModelSchema):
     ratings = Nested(PaperRatingSchema, many=True)
     group = Nested(PaperReviewTypeSchema, attribute='group.instance')
     comment_html = Function(lambda review: escape(review.comment))
-    can_edit = Function(lambda review, ctx: review.can_edit(ctx.get('user'), check_state=True))
+    can_edit = Method('_can_edit_review')
 
     class Meta:
         model = PaperReview
         fields = ('id', 'score', 'created_dt', 'user', 'comment', 'comment_html', 'modified_dt', 'visibility',
                   'proposed_action', 'group', 'ratings', 'can_edit')
+
+    def _can_edit_review(self, review):
+        user = self.context.get('user')
+        cfp = review.revision.paper.cfp
+        return review.can_edit(user, check_state=True) and is_type_reviewing_possible(cfp, review.type)
 
 
 class PaperReviewCommentSchema(mm.ModelSchema):

@@ -15,8 +15,10 @@ from indico.modules.events.abstracts.models.abstracts import Abstract
 from indico.modules.events.contributions import Contribution
 from indico.modules.events.contributions.models.persons import ContributionPersonLink
 from indico.modules.events.models.principals import EventPrincipal
+from indico.modules.events.papers.models.reviews import PaperReviewType
 from indico.modules.events.papers.models.revisions import PaperRevision, PaperRevisionState
 from indico.modules.users import User
+from indico.util.date_time import now_utc
 
 
 def _query_contributions_with_user_as_reviewer(event, user):
@@ -83,3 +85,14 @@ def get_user_submittable_contributions(event, user):
     return (_query_contributions_with_user_paper_submission_rights(event, user)
             .filter(db.or_(*criteria))
             .all())
+
+
+def is_type_reviewing_possible(cfp, review_type):
+    if review_type == PaperReviewType.content:
+        return (cfp.content_reviewing_enabled
+                and (not cfp.content_reviewer_deadline_enforced or cfp.content_reviewer_deadline > now_utc()))
+    elif review_type == PaperReviewType.layout:
+        return (cfp.layout_reviewing_enabled
+                and (not cfp.layout_reviewer_deadline_enforced or cfp.layout_reviewer_deadline > now_utc()))
+    else:
+        raise ValueError('invalid review type')
