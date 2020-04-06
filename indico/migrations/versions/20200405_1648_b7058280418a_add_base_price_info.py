@@ -20,7 +20,11 @@ def upgrade():
     op.add_column('registrations', sa.Column('base_price_info', sa.String(), nullable=True, server_default=''),
                   schema='event_registration')
     op.alter_column('registrations', 'base_price_info', server_default=None, schema='event_registration')
+    op.add_column('forms', sa.Column('base_price_info', sa.String(), nullable=True, server_default=''),
+                  schema='event_registration')
+    op.alter_column('forms', 'base_price_info', server_default=None, schema='event_registration')
 
 
 def downgrade():
     op.drop_column('registrations', 'base_price_info', schema='event_registration')
+    op.drop_column('forms', 'base_price_info', schema='event_registration')
