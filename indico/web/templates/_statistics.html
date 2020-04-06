@@ -21,22 +21,6 @@
     </div>
 {% endmacro %}
 
-
-{% macro scatter_plot(id, data) %}
-    <div id="{{ id }}" class="plot" style="height:100%;"
-        data-title="{{ title }}"
-        data-min-x="{{ data.min_x }}"
-        data-max-x="{{ data.max_x }}"
-        data-min-y="{{ data.min_y}}"
-        data-max-y="{{ data.max_y }}"
-        data-label-yaxis="{{ data.label_y }}"
-        data-label-xaxis="{{ data.label_x }}"
-        data-qbubble="{{ data.tooltip }}"
-        data-values="{{ data['values']|tojson|forceescape }}">
-    </div>
-{% endmacro %}
-
-
 {% macro stats_badge(label, value) %}
     <div class="i-badge">
         <div class="i-badge-content">

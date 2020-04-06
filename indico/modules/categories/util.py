@@ -71,6 +71,16 @@ def get_contribs_by_year(category_id=None):
     return OrderedDict(query)
 
 
+def get_min_year(category_id=None):
+    """Get the min year.
+
+    :param category_id: The category ID to get statistics for.
+    :return: A `datetime` Object.
+    """
+    category_filter = Event.category_chain_overlaps(category_id) if category_id else True
+    return db.session.query(db.func.min(Event.created_dt)).filter(~Event.is_deleted, category_filter).scalar()
+
+
 def get_attachment_count(category_id=None):
     """Get the number of attachments in events in a category.
 
@@ -114,7 +124,8 @@ def get_category_stats(category_id=None):
     return {'events_by_year': get_events_by_year(category_id),
             'contribs_by_year': get_contribs_by_year(category_id),
             'attachments': get_attachment_count(category_id),
-            'updated': now_utc()}
+            'updated': now_utc(),
+            'min_year': get_min_year(category_id)}
 
 
 @memoize_redis(3600)
