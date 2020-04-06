@@ -60,6 +60,9 @@ Improvements
   thanks :user:`giusedb` & :user:`omegak`)
 - Add category navigation dialog on category display page (:issue:`4282`,
   thanks :user:`omegak`)
+- Add UI for admins to block/unblock users (:issue:`3243`)
+- Show labels indicating whether a user is an admin, blocked or soft-deleted
+  (:issue:`4363`)
 
 Bugfixes
 ^^^^^^^^
