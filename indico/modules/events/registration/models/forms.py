@@ -157,7 +157,7 @@ class RegistrationForm(db.Model):
     )
     #: Base registration fee information
     base_price_info = db.Column(
-        db.String, 
+        db.String,
         nullable=False,
         default=''
     )
