@@ -33,6 +33,10 @@ class CallForPapers(object):
     judge_deadline = EventSettingProperty(paper_reviewing_settings, 'judge_deadline')
     layout_reviewer_deadline = EventSettingProperty(paper_reviewing_settings, 'layout_reviewer_deadline')
     content_reviewer_deadline = EventSettingProperty(paper_reviewing_settings, 'content_reviewer_deadline')
+    content_reviewer_deadline_enforced = EventSettingProperty(paper_reviewing_settings,
+                                                              'enforce_content_reviewer_deadline')
+    layout_reviewer_deadline_enforced = EventSettingProperty(paper_reviewing_settings,
+                                                             'enforce_layout_reviewer_deadline')
 
     @property
     def has_started(self):

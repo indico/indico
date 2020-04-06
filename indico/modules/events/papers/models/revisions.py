@@ -185,10 +185,15 @@ class PaperRevision(ProposalRevisionMixin, RenderModeMixin, db.Model):
 
     def get_reviewed_for_groups(self, user, include_reviewed=False):
         from indico.modules.events.papers.models.reviews import PaperTypeProxy
-        reviewed_for = {x.type for x in self.reviews if x.user == user} if include_reviewed else set()
-        if self.paper.cfp.content_reviewing_enabled and user in self.paper.cfp.content_reviewers:
+        from indico.modules.events.papers.util import is_type_reviewing_possible
+
+        cfp = self.paper.cfp
+        reviewed_for = set()
+        if include_reviewed:
+            reviewed_for = {x.type for x in self.reviews if x.user == user and is_type_reviewing_possible(cfp, x.type)}
+        if is_type_reviewing_possible(cfp, PaperReviewType.content) and user in self.paper.cfp.content_reviewers:
             reviewed_for.add(PaperReviewType.content)
-        if self.paper.cfp.layout_reviewing_enabled and user in self.paper.cfp.layout_reviewers:
+        if is_type_reviewing_possible(cfp, PaperReviewType.layout) and user in self.paper.cfp.layout_reviewers:
             reviewed_for.add(PaperReviewType.layout)
         return set(map(PaperTypeProxy, reviewed_for))
 
