@@ -1,6 +1,7 @@
 babel
 flake8
 flake8-colors
+flake8-quotes
 pojson>=0.4
 termcolor
 sphinx

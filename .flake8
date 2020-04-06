@@ -4,6 +4,12 @@ max-line-length = 120
 # colored output
 format = ${cyan}%(path)s${reset}:${yellow_bold}%(row)d${reset}:${green_bold}%(col)d${reset}: ${red_bold}%(code)s${reset} %(text)s
 
+# decent quote styles
+inline-quotes = single
+multiline-quotes = single
+docstring-quotes = double
+avoid-escape = true
+
 exclude =
     build
     dist
@@ -25,6 +31,10 @@ ignore =
     W504
     # allow assigning lambdas (it's useful for single-line functions defined inside other functions)
     E731
+    # while single quotes are nicer, we have double quotes in way too many places
+    Q000
+    # for non-docstring multiline strings we don't really enforce a quote style
+    Q001
 
 per-file-ignores =
     # signals use wildcard imports to expose everything in `indico.core.signals`
