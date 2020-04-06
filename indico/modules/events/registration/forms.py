@@ -80,8 +80,7 @@ class RegistrationFormForm(IndicoForm):
                               _check_if_payment_required], filters=[lambda x: x if x is not None else 0],
                               widget=NumberInput(step='0.01'),
                               description=_("A fixed fee all users have to pay when registering."))
-    base_price_info = StringField(_("Registration fee info"),
-                                  description=_("Used by the PayPal itemized cart."))
+    base_price_info = StringField(_("Registration fee info"), description=_("Used by the PayPal itemized cart."))
     currency = SelectField(_('Currency'), [DataRequired()], description=_('The currency for new registrations'))
     notification_sender_address = StringField(_('Notification sender address'), [IndicoEmail()],
                                               filters=[lambda x: (x or None)])
