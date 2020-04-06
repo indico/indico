@@ -642,6 +642,11 @@ class RHUserSearchInfo(RHProtected):
 
 
 class RHUserBlock(RHUserBase):
+    def _check_access(self):
+        RHUserBase._check_access(self)
+        if not session.user.is_admin:
+            raise Forbidden
+
     def _process_PUT(self):
         if self.user == session.user:
             raise Forbidden(_('You cannot block yourself'))
