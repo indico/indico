@@ -14,8 +14,7 @@ import {Translate} from 'indico/react/i18n';
 import {useIndicoAxios} from 'indico/react/hooks';
 import EditingTypeSubPageNav from '../EditingTypeSubPageNav';
 import ReviewConditionsManager from './ReviewConditionsManager';
-
-export const ReviewConditionsContext = React.createContext(null);
+import ReviewConditionsContext from './context';
 
 export default function ReviewConditionManagement() {
   const eventId = useNumericParam('confId');
@@ -32,7 +31,7 @@ export default function ReviewConditionManagement() {
       <EditingTypeSubPageNav title={Translate.string('Review conditions')} />
       {fileTypes !== null && (
         <ReviewConditionsContext.Provider value={{eventId, editableType: type, fileTypes}}>
-          <ReviewConditionsManager eventId={eventId} fileTypes={fileTypes} editableType={type} />
+          <ReviewConditionsManager />
         </ReviewConditionsContext.Provider>
       )}
     </>

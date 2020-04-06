@@ -12,7 +12,7 @@ import {Button, Form} from 'semantic-ui-react';
 
 import {FinalDropdown, FinalSubmitButton} from 'indico/react/forms';
 import {Translate} from 'indico/react/i18n';
-import {ReviewConditionsContext} from '.';
+import ReviewConditionsContext from './context';
 
 import './ReviewConditionForm.module.scss';
 

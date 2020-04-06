@@ -7,8 +7,7 @@
 
 import reviewConditionsURL from 'indico-url:event_editing.api_review_conditions';
 
-import React, {useState} from 'react';
-import PropTypes from 'prop-types';
+import React, {useState, useContext} from 'react';
 import {Button, Divider, Loader, Message} from 'semantic-ui-react';
 
 import {handleSubmitError} from 'indico/react/forms';
@@ -18,11 +17,12 @@ import {indicoAxios} from 'indico/utils/axios';
 
 import ConditionInfo from './ConditionInfo';
 import ReviewConditionForm from './ReviewConditionForm';
-import {EditableTypeTitles} from '../../models';
+import ReviewConditionsContext from './context';
 
 import './ReviewConditionsManager.module.scss';
 
-export default function ReviewConditionsManager({eventId, fileTypes, editableType}) {
+export default function ReviewConditionsManager() {
+  const {eventId, fileTypes, editableType} = useContext(ReviewConditionsContext);
   const [isAdding, setIsAdding] = useState(false);
   const {loading, reFetch, data: eventConditionsSetting, lastData} = useIndicoAxios({
     url: reviewConditionsURL({confId: eventId, type: editableType}),
@@ -110,9 +110,3 @@ export default function ReviewConditionsManager({eventId, fileTypes, editableTyp
     </div>
   );
 }
-
-ReviewConditionsManager.propTypes = {
-  eventId: PropTypes.number.isRequired,
-  fileTypes: PropTypes.array.isRequired,
-  editableType: PropTypes.oneOf(Object.keys(EditableTypeTitles)).isRequired,
-};
