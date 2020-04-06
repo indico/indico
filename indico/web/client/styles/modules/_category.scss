@@ -62,6 +62,18 @@
     padding: 2em;
 }
 
+.category-stats-container {
+    padding-top: 40px;
+
+    .ui.segments > .segment {
+        width: 50%;
+    }
+
+    .ui.statistic > .value {
+        font-size: 3rem !important;
+    }
+}
+
 .category-content {
     width: 100%;
     max-width: 850px;

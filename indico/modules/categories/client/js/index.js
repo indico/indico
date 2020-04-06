@@ -5,64 +5,30 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
+import React from 'react';
+import ReactDOM from 'react-dom';
+
 import './display';
+import {setMomentLocale} from 'indico/utils/date';
+import CategoryStatistics from './components/CategoryStatistics';
+import {LocaleContext} from './context.js';
 
 (function(global) {
   global.setupCategoryStats = function setupCategoryStats() {
-    $(document).ready(() => {
-      $('.plot-container .plot').each((__, element) => {
-        const $this = $(element);
-        const xMin = $this.data('min-x');
-        const xMax = $this.data('max-x');
-        const yMin = $this.data('min-y');
-        const yMax = $this.data('max-y');
-
-        var data = $this.data('values') || {};
-
-        const currentYear = new Date().getFullYear();
-        const current = [[currentYear, data[currentYear]]];
-
-        const options = {
-          axes: {
-            xaxis: {
-              label: $this.data('label-xaxis'),
-              max: xMax,
-              min: xMin,
-              tickOptions: {showGridline: false},
-            },
-            yaxis: {
-              label: $this.data('label-yaxis'),
-              max: yMax,
-              min: yMin,
-            },
-          },
-          height: 400,
-          highlighter: {
-            location: 'n',
-            tooltipAxes: 'yx',
-            tooltipSeparator: $this.data('qbubble'),
-          },
-          series: [
-            {
-              fillAlpha: 0.9,
-              fill: true,
-              fillAndStroke: true,
-            },
-            {
-              markerOptions: {
-                color: '#005272',
-                style: 'circle',
-              },
-            },
-          ],
-          width: 400,
-        };
-        data = [_.pairs(data).map(datum => [parseInt(datum[0], 10), datum[1]]), current];
-        const plot = global.$.jqplot(element.id, data, global.processJqPlotOptions(options));
-        $(window).resize(() => {
-          plot.replot({resetAxes: true});
-        });
-      });
+    document.addEventListener('DOMContentLoaded', async () => {
+      const rootElement = document.querySelector('#category-stats-root');
+      if (!rootElement) {
+        return;
+      }
+      const categoryId = parseInt(rootElement.dataset.categoryId, 10);
+      const lang = rootElement.dataset.lang;
+      setMomentLocale(lang);
+      ReactDOM.render(
+        <LocaleContext.Provider value={lang}>
+          <CategoryStatistics categoryId={categoryId} />
+        </LocaleContext.Provider>,
+        rootElement
+      );
     });
   };
 })(window);

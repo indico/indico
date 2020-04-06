@@ -13,11 +13,12 @@ from indico.modules.categories.compat import compat_category
 from indico.modules.categories.controllers.admin import RHManageUpcomingEvents
 from indico.modules.categories.controllers.display import (RHCategoryCalendarView, RHCategoryIcon, RHCategoryInfo,
                                                            RHCategoryLogo, RHCategoryOverview, RHCategorySearch,
-                                                           RHCategoryStatistics, RHCategoryUpcomingEvent,
-                                                           RHDisplayCategory, RHEventList, RHExportCategoryAtom,
-                                                           RHExportCategoryICAL, RHReachableCategoriesInfo,
-                                                           RHShowFutureEventsInCategory, RHShowPastEventsInCategory,
-                                                           RHSubcatInfo, RHXMLExportCategoryInfo)
+                                                           RHCategoryStatistics, RHCategoryStatisticsJSON,
+                                                           RHCategoryUpcomingEvent, RHDisplayCategory, RHEventList,
+                                                           RHExportCategoryAtom, RHExportCategoryICAL,
+                                                           RHReachableCategoriesInfo, RHShowFutureEventsInCategory,
+                                                           RHShowPastEventsInCategory, RHSubcatInfo,
+                                                           RHXMLExportCategoryInfo)
 from indico.modules.categories.controllers.management import (RHAddCategoryRole, RHAddCategoryRoleMembers,
                                                               RHCategoryRoleMembersImportCSV, RHCategoryRoles,
                                                               RHCreateCategory, RHDeleteCategory, RHDeleteCategoryRole,
@@ -86,6 +87,7 @@ _bp.add_url_rule('/overview', 'overview', RHCategoryOverview)
 _bp.add_url_rule('/show-future-events', 'show_future_events', RHShowFutureEventsInCategory, methods=('DELETE', 'PUT'))
 _bp.add_url_rule('/show-past-events', 'show_past_events', RHShowPastEventsInCategory, methods=('DELETE', 'PUT'))
 _bp.add_url_rule('/statistics', 'statistics', RHCategoryStatistics)
+_bp.add_url_rule('/statistics.json', 'statistics_json', RHCategoryStatisticsJSON)
 _bp.add_url_rule('/subcat-info', 'subcat_info', RHSubcatInfo)
 _bp.add_url_rule('/calendar', 'calendar', RHCategoryCalendarView)
 _bp.add_url_rule('/upcoming', 'upcoming_event', RHCategoryUpcomingEvent)

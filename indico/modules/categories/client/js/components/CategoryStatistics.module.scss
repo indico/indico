@@ -1,0 +1,20 @@
+// This file is part of Indico.
+// Copyright (C) 2002 - 2020 CERN
+//
+// Indico is free software; you can redistribute it and/or
+// modify it under the terms of the MIT License; see the
+// LICENSE file for more details.
+
+.chart-container {
+    width: 100%;
+    height: 300px;
+}
+
+.chart > svg {
+    width: 120% !important;
+    height: 300px !important;
+}
+
+.chart :global(.tooltip-wrap) td {
+    color: white;
+}
