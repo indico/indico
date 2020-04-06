@@ -11,14 +11,17 @@
                 </div>
                 <div class="i-box-buttons">
                     {% if not user.is_blocked %}
-                        <button class="ui negative small button"
-                                data-href="{{ url_for('.user_block') }}"
-                                data-method="PUT"
-                                data-confirm="{% trans %}This user will no longer have access to Indico.<br>
-                                Are you sure you want to revoke their access?{% endtrans %}"
-                                data-reload-after>
-                            {% trans %}Block User{% endtrans %}
-                        </button>
+                        <div {%- if user == session.user %} title="{% trans %}You cannot block yourself{% endtrans %}"{% endif %}>
+                            <button class="ui negative small button"
+                                    data-href="{{ url_for('.user_block') }}"
+                                    data-method="PUT"
+                                    data-confirm="{% trans %}This user will no longer have access to Indico.<br>
+                                    Are you sure you want to revoke their access?{% endtrans %}"
+                                    data-reload-after
+                                    {% if user == session.user %}disabled{% endif %}>
+                                {% trans %}Block User{% endtrans %}
+                            </button>
+                        </div>
                     {% else %}
                         <button class="ui small button"
                                 data-href="{{ url_for('.user_block') }}"

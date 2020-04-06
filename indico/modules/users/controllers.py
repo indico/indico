@@ -643,6 +643,8 @@ class RHUserSearchInfo(RHProtected):
 
 class RHUserBlock(RHUserBase):
     def _process_PUT(self):
+        if self.user == session.user:
+            raise Forbidden(_('You cannot block yourself'))
         self.user.is_blocked = True
         logger.info('User %s blocked %s', session.user, self.user)
         flash(_('{name} has been blocked.').format(name=self.user.name), 'success')
