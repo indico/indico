@@ -17,7 +17,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 
 import 'indico/modules/events/util/types_dialog';
-import EditableSubmissionButton from 'indico/modules/events/editing/components/EditableSubmissionButton';
+import EditableSubmissionButton from 'indico/modules/events/editing/editing/EditableSubmissionButton';
 import {$T} from 'indico/utils/i18n';
 import {PublicationSwitch} from 'indico/react/components';
 import {camelizeKeys} from 'indico/utils/case';
