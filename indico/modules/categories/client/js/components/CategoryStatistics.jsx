@@ -68,7 +68,10 @@ function getGraphData(data) {
 function CategoryStatisticsDisplay({data}) {
   const lang = useContext(LocaleContext);
   const userLanguage = lang.replace('_', '-');
-  const updatedTime = moment.utc(data.updated).format('LLL');
+  const updatedTime = moment
+    .utc(data.updated)
+    .local()
+    .format('LLL');
   const fmt = new Intl.NumberFormat(userLanguage);
   const totalEvents = fmt.format(data.totalEvents);
   const totalContributions = fmt.format(data.totalContributions);
