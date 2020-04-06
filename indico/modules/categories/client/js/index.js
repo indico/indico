@@ -22,7 +22,7 @@ import {LocaleContext} from './context.js';
       }
       const categoryId = parseInt(rootElement.dataset.categoryId, 10);
       const lang = rootElement.dataset.lang;
-      setMomentLocale(lang);
+      await setMomentLocale(lang);
       ReactDOM.render(
         <LocaleContext.Provider value={lang}>
           <CategoryStatistics categoryId={categoryId} />
