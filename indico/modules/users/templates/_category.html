@@ -16,7 +16,7 @@
     </span>
 {% endmacro %}
 
-{% macro _category_item(category, truncated_path, extra_info) %}
+{% macro _category_item(category, truncated_path, extra_info='') %}
     <li class="category-box flexrow f-a-center">
         <div class="category-box-info">
             <a href="{{ category.url }}">{{ category.title }}</a>
