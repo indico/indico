@@ -102,9 +102,11 @@
 
     color: $banner-color;
     max-width: 800px;
+    margin-top: 10px;
 
     &.full-width {
         max-width: none;
+        margin-bottom: -10%;
 
         .title {
             flex-grow: 1;
