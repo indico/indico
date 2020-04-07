@@ -548,8 +548,7 @@ class RHManageContributionPublicationREST(RHManageContributionsBase):
     """Manage contribution publication setting"""
 
     def _process_GET(self):
-        published = contribution_settings.get(self.event, 'published')
-        return jsonify(published=published)
+        return jsonify(contribution_settings.get(self.event, 'published'))
 
     def _process_PUT(self):
         contribution_settings.set(self.event, 'published', True)

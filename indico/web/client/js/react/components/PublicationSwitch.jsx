@@ -7,47 +7,18 @@
 
 import publicationURL from 'indico-url:contributions.manage_publication';
 
-import React, {useState, useEffect} from 'react';
+import React, {useState} from 'react';
 import PropTypes from 'prop-types';
 import {Header, Modal, Button, Checkbox, List} from 'semantic-ui-react';
-import {indicoAxios, handleAxiosError} from 'indico/utils/axios';
 import {Translate} from 'indico/react/i18n';
+import {useTogglableValue} from 'indico/react/hooks';
 
 export default function PublicationSwitch({eventId}) {
-  const [published, setPublished] = useState(true);
   const [modalOpen, setModalOpen] = useState(false);
-  const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    const fetchPublicationSetting = async () => {
-      setLoading(true);
-      let response;
-      try {
-        response = await indicoAxios.get(publicationURL({confId: eventId}));
-      } catch (error) {
-        handleAxiosError(error);
-        setLoading(false);
-        return;
-      }
-      setPublished(response.data.published);
-      setLoading(false);
-    };
-    fetchPublicationSetting();
-  }, [eventId]);
-
-  const changeState = async shouldPublish => {
-    try {
-      if (shouldPublish) {
-        await indicoAxios.put(publicationURL({confId: eventId}));
-      } else {
-        await indicoAxios.delete(publicationURL({confId: eventId}));
-      }
-    } catch (error) {
-      handleAxiosError(error);
-      return;
-    }
-    setPublished(shouldPublish);
-  };
+  const [published, togglePublished, loading, saving] = useTogglableValue(
+    publicationURL({confId: eventId})
+  );
 
   if (loading) {
     return null;
@@ -64,6 +35,7 @@ export default function PublicationSwitch({eventId}) {
           toggle
           onClick={() => setModalOpen(true)}
           checked={published}
+          disabled={saving}
         />
       }
       closeIcon
@@ -125,7 +97,7 @@ export default function PublicationSwitch({eventId}) {
         <Button
           primary
           onClick={() => {
-            changeState(!published);
+            togglePublished();
             setModalOpen(false);
           }}
         >
