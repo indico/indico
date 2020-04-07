@@ -123,6 +123,58 @@ export function useIndicoAxios({camelize, ...args}) {
 }
 
 /**
+ * A hook that provides an easy way of having a toggle switch whose value is
+ * loaded from a url and where toggling it sends PUT/DELETE to the same URL.
+ *
+ * @param {string} url - a url that accepts GET/PUT/DELETE requests
+ * @returns an array consisting of `[value, toggle, loading, saving]`
+ */
+export function useTogglableValue(url) {
+  const [newState, setNewState] = useState(null);
+  const [saving, setSaving] = useState(false);
+  const {data} = useIndicoAxios({
+    url,
+    trigger: url,
+  });
+
+  useEffect(() => {
+    // reset the cached new state in case the url changes.
+    // this is VERY unlikely to happen, but let's keep things correct...
+    setNewState(null);
+  }, [url]);
+
+  // if we don't have initial data yet, we show it as unchecked.
+  // it's up to the caller to hide in this case or just disable the toggle
+  if (data === null) {
+    return [false, () => null, true, false];
+  }
+
+  // if we changed the state locally, that one has priority, otherwise use the fetched value
+  const checked = newState === null ? data : newState;
+
+  const save = async enabled => {
+    try {
+      // we are optimistic and flip the switch without waiting for the action to finish
+      setSaving(true);
+      setNewState(enabled);
+      if (enabled) {
+        await indicoAxios.put(url);
+      } else {
+        await indicoAxios.delete(url);
+      }
+    } catch (error) {
+      setSaving(false);
+      setNewState(!enabled);
+      handleAxiosError(error);
+      return;
+    }
+    setSaving(false);
+  };
+
+  return [checked, () => save(!checked), false, saving];
+}
+
+/**
  * React hook to use `setTimeout` inside a react component.
  *
  * @param {Function} callback - the function to run at the end
