@@ -38,12 +38,23 @@ CategoryStatistics.propTypes = {
 };
 
 function getGraphData(data) {
-  const serialize = statsData =>
-    Object.entries(statsData)
-      .filter(([year]) => year <= data.maxYear + 3 && year >= data.minYear)
-      .map(([year, number]) => [moment(year, 'YYYY'), number]);
+  const serialize = statsData => {
+    const maxDate = parseInt(
+      Object.keys(statsData)
+        .reverse()
+        .find(date => date <= data.maxYear + 3),
+      10
+    );
+    return [
+      [moment(data.minYear - 1, 'YYYY'), null],
+      ...Object.entries(statsData)
+        .filter(([year]) => year <= maxDate && year >= data.minYear)
+        .map(([year, number]) => [moment(year, 'YYYY'), number]),
+      [moment(maxDate + 1, 'YYYY'), null],
+    ];
+  };
 
-  const series = {type: 'line'};
+  const series = {type: 'bar'};
   const tooltip = {align: 'left', anchor: 'left'};
   const axes = [
     {primary: true, type: 'time', position: 'bottom'},
