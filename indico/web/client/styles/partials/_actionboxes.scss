@@ -20,7 +20,9 @@
     > .section {
         @include clearfix();
         @extend .flexrow;
+
         align-items: center;
+        overflow: visible;
 
         > .toolbar {
             margin: 0;
@@ -32,7 +34,7 @@
                 padding-left: 0.5em;
             }
 
-            a:not(.i-button) {
+            a:not(.i-button), a:not(.ui.button) {
                 line-height: 2.2em;
             }
 

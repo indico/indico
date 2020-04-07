@@ -17,7 +17,7 @@ import {handleSubmitError} from 'indico/react/forms';
 import {handleAxiosError, indicoAxios} from 'indico/utils/axios';
 
 import ReviewConditionForm from './ReviewConditionForm';
-import {EditableTypeTitles} from '../../../models';
+import {EditableType} from '../../../models';
 import ReviewConditionsContext from './context';
 
 import './ConditionInfo.module.scss';
@@ -108,7 +108,7 @@ export default function ConditionInfo({fileTypes, condId, editableType, onUpdate
 ConditionInfo.propTypes = {
   fileTypes: PropTypes.array.isRequired,
   condId: PropTypes.number.isRequired,
-  editableType: PropTypes.oneOf(Object.keys(EditableTypeTitles)).isRequired,
+  editableType: PropTypes.oneOf(Object.values(EditableType)).isRequired,
   onUpdate: PropTypes.func,
   disableActions: PropTypes.bool,
 };

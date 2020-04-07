@@ -6,40 +6,43 @@
 // LICENSE file for more details.
 
 import editableURL from 'indico-url:event_editing.editable';
+import submitRevisionURL from 'indico-url:event_editing.api_create_editable';
+import apiUploadURL from 'indico-url:event_editing.api_upload';
 
 import _ from 'lodash';
 import React, {useState} from 'react';
 import PropTypes from 'prop-types';
-import {Button, Form, Modal} from 'semantic-ui-react';
+import {Button, Dropdown, Form, Modal} from 'semantic-ui-react';
 import {Form as FinalForm} from 'react-final-form';
+
 import {indicoAxios} from 'indico/utils/axios';
 import {FinalSubmitButton, handleSubmitError} from 'indico/react/forms';
-import {Translate} from 'indico/react/i18n';
+import {Param, Translate} from 'indico/react/i18n';
 
 import {FinalFileManager} from './timeline/FileManager';
 import {fileTypePropTypes} from './timeline/FileManager/util';
 import {getFileTypes} from './timeline/selectors';
+import {EditableTypeTitles, EditableType} from '../models';
 
 export default function EditableSubmissionButton({
   eventId,
   contributionId,
   contributionCode,
-  uploadURL,
   fileTypes,
-  type,
-  submitRevisionURL,
 }) {
-  fileTypes = getFileTypes({staticData: {fileTypes, contributionCode}});
-  const [open, setOpen] = useState(false);
-
+  const [currentType, setCurrentType] = useState(null);
   const submitRevision = async formData => {
     try {
-      await indicoAxios.put(submitRevisionURL, formData);
+      await indicoAxios.put(
+        submitRevisionURL({confId: eventId, contrib_id: contributionId, type: currentType}),
+        formData
+      );
     } catch (e) {
       return handleSubmitError(e);
     }
-    location.href = editableURL({confId: eventId, contrib_id: contributionId, type});
+    location.href = editableURL({confId: eventId, contrib_id: contributionId, type: currentType});
   };
+  const editableTypes = Object.keys(fileTypes);
 
   return (
     <>
@@ -51,47 +54,73 @@ export default function EditableSubmissionButton({
       >
         {({handleSubmit}) => (
           <Modal
-            open={open}
-            onClose={() => setOpen(false)}
+            open={currentType !== null}
+            onClose={() => setCurrentType(null)}
             closeIcon
             closeOnDimmerClick={false}
             closeOnEscape={false}
           >
             <Modal.Header>
-              {type === 'paper' && <Translate>Submit your paper</Translate>}
-              {type === 'slides' && <Translate>Submit your slides</Translate>}
+              {currentType === EditableType.paper && <Translate>Submit your paper</Translate>}
+              {currentType === EditableType.slides && <Translate>Submit your slides</Translate>}
+              {currentType === EditableType.poster && <Translate>Submit your poster</Translate>}
             </Modal.Header>
             <Modal.Content>
-              <Form id="submit-editable-form" onSubmit={handleSubmit}>
-                <FinalFileManager
-                  name="files"
-                  fileTypes={fileTypes}
-                  uploadURL={uploadURL}
-                  mustChange
-                />
-              </Form>
+              {currentType !== null && (
+                <Form id="submit-editable-form" onSubmit={handleSubmit}>
+                  <FinalFileManager
+                    name="files"
+                    fileTypes={getFileTypes({
+                      staticData: {
+                        fileTypes: fileTypes[currentType],
+                        contributionCode,
+                      },
+                    })}
+                    uploadURL={apiUploadURL({
+                      confId: eventId,
+                      contrib_id: contributionId,
+                      type: currentType,
+                    })}
+                    mustChange
+                  />
+                </Form>
+              )}
             </Modal.Content>
             <Modal.Actions style={{display: 'flex', justifyContent: 'flex-end'}}>
               <FinalSubmitButton form="submit-editable-form" label={Translate.string('Submit')} />
-              <Button onClick={() => setOpen(false)}>
+              <Button onClick={() => setCurrentType(null)}>
                 <Translate>Cancel</Translate>
               </Button>
             </Modal.Actions>
           </Modal>
         )}
       </FinalForm>
-      <button type="submit" className="i-button highlight" onClick={() => setOpen(true)}>
-        <Translate>Submit Files</Translate>
-      </button>
+      {editableTypes.length === 1 ? (
+        <Button onClick={() => setCurrentType(editableTypes[0])} primary>
+          <Translate>
+            Submit <Param name="editableType" value={editableTypes[0]} />
+          </Translate>
+        </Button>
+      ) : (
+        <Dropdown
+          className="primary"
+          text={Translate.string('Submit files')}
+          onChange={(__, {value}) => setCurrentType(value)}
+          options={editableTypes.map(editableType => ({
+            text: EditableTypeTitles[editableType],
+            value: editableType,
+          }))}
+          selectOnNavigation={false}
+          value={null}
+          button
+        />
+      )}
     </>
   );
 }
 
 EditableSubmissionButton.propTypes = {
-  uploadURL: PropTypes.string.isRequired,
-  type: PropTypes.string.isRequired,
-  submitRevisionURL: PropTypes.string.isRequired,
-  fileTypes: PropTypes.arrayOf(PropTypes.shape(fileTypePropTypes)).isRequired,
+  fileTypes: PropTypes.objectOf(PropTypes.arrayOf(PropTypes.shape(fileTypePropTypes))).isRequired,
   eventId: PropTypes.string.isRequired,
   contributionId: PropTypes.string.isRequired,
   contributionCode: PropTypes.string.isRequired,

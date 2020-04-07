@@ -565,6 +565,11 @@ class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionMan
         return get_display_tz(self, as_timezone=True)
 
     @property
+    def editable_types(self):
+        from indico.modules.events.editing.settings import editing_settings
+        return editing_settings.get(self, 'editable_types')
+
+    @property
     @contextmanager
     def logging_disabled(self):
         """Temporarily disables event logging

@@ -29,28 +29,27 @@ import PublicationSwitch from './PublicationSwitch';
     if (!editableSubmissionButton) {
       return;
     }
-    const {
-      eventId,
-      contributionId,
-      contributionCode,
-      apiEditableSubmitUrl,
-      type,
-      uploadUrl,
-    } = editableSubmissionButton.dataset;
 
-    let response;
+    const availableTypes = JSON.parse(editableSubmissionButton.dataset.availableTypes);
+    const {eventId, contributionId, contributionCode} = editableSubmissionButton.dataset;
+
+    let responses;
     try {
-      response = await indicoAxios.get(fileTypesURL({confId: eventId, type}));
+      responses = await Promise.all(
+        availableTypes.map(type => indicoAxios.get(fileTypesURL({confId: eventId, type})))
+      );
     } catch (e) {
       handleAxiosError(e);
+      return;
     }
-    const fileTypes = camelizeKeys(response.data);
+
+    const fileTypes = _.fromPairs(
+      responses.map((response, index) => [availableTypes[index], camelizeKeys(response.data)])
+    );
+
     ReactDOM.render(
       <EditableSubmissionButton
-        uploadURL={uploadUrl}
         fileTypes={fileTypes}
-        type={type}
-        submitRevisionURL={apiEditableSubmitUrl}
         eventId={eventId}
         contributionId={contributionId}
         contributionCode={contributionCode}

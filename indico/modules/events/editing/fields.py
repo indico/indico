@@ -19,16 +19,18 @@ from indico.util.marshmallow import FilesField, ModelField, ModelList
 
 
 class EditingFilesField(Dict):
-    def __init__(self, event, contrib, allow_claimed_files=False, **kwargs):
+    def __init__(self, event, contrib, editable_type, allow_claimed_files=False, **kwargs):
         self.event = event
         self.contrib = contrib
-        keys_field = ModelField(EditingFileType, get_query=lambda m: m.query.with_parent(event))
+        self.editing_file_types_query = EditingFileType.query.with_parent(event).filter_by(type=editable_type)
+
+        keys_field = ModelField(EditingFileType, get_query=lambda m: self.editing_file_types_query)
         values_field = FilesField(required=True, allow_claimed=allow_claimed_files)
         validators = kwargs.pop('validate', []) + [self.validate_files]
         super(EditingFilesField, self).__init__(keys=keys_field, values=values_field, validate=validators, **kwargs)
 
     def validate_files(self, value):
-        required_types = {ft for ft in self.event.editing_file_types if ft.required}
+        required_types = {ft for ft in self.editing_file_types_query if ft.required}
 
         # ensure all required file types have files
         required_missing = required_types - {ft for ft, files in value.viewitems() if files}

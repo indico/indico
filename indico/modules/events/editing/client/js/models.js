@@ -29,6 +29,12 @@ export const EditingReviewAction = {
   requestUpdate: 'request_update',
 };
 
+export const EditableType = {
+  paper: 'paper',
+  slides: 'slides',
+  poster: 'poster',
+};
+
 export const EditableTypeTitles = {
   paper: Translate.string('Paper'),
   slides: Translate.string('Slides'),

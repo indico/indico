@@ -93,13 +93,15 @@ class RHCreateEditable(RHContributionEditableBase):
             # XXX: should event managers be able to submit on behalf of the user?
             raise Forbidden
         # TODO: check if submitting papers for editing is allowed in the event
+        if self.editable_type.name not in self.contrib.allowed_types_for_editable:
+            raise Forbidden
 
     def _process(self):
         if self.editable:
             raise UserValueError(_('Editable already exists'))
 
         args = parser.parse({
-            'files': EditingFilesField(self.event, self.contrib, required=True)
+            'files': EditingFilesField(self.event, self.contrib, self.editable_type, required=True)
         })
 
         create_new_editable(self.contrib, self.editable_type, session.user, args['files'])
@@ -116,7 +118,8 @@ class RHReviewEditable(RHContributionEditableRevisionBase):
     def _process(self, action, comment):
         argmap = {'tags': EditingTagsField(self.event, missing=set())}
         if action in (EditingReviewAction.update, EditingReviewAction.update_accept):
-            argmap['files'] = EditingFilesField(self.event, self.contrib, allow_claimed_files=True, required=True)
+            argmap['files'] = EditingFilesField(self.event, self.contrib, self.editable_type, allow_claimed_files=True,
+                                                required=True)
         args = parser.parse(argmap)
         review_editable_revision(self.revision, session.user, action, comment, args['tags'], args.get('files'))
         return '', 204
@@ -148,7 +151,8 @@ class RHReplaceRevision(RHContributionEditableRevisionBase):
     })
     def _process(self, comment):
         args = parser.parse({
-            'files': EditingFilesField(self.event, self.contrib, allow_claimed_files=True, required=True)
+            'files': EditingFilesField(self.event, self.contrib, self.editable_type, allow_claimed_files=True,
+                                       required=True)
         })
 
         replace_revision(self.revision, session.user, comment, args['files'])
@@ -163,7 +167,8 @@ class RHCreateSubmitterRevision(RHContributionEditableRevisionBase):
 
     def _process(self):
         args = parser.parse({
-            'files': EditingFilesField(self.event, self.contrib, allow_claimed_files=True, required=True)
+            'files': EditingFilesField(self.event, self.contrib, self.editable_type, allow_claimed_files=True,
+                                       required=True)
         })
 
         create_submitter_revision(self.revision, session.user, args['files'])

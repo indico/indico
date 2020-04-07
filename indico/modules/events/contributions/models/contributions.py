@@ -494,6 +494,14 @@ class Contribution(DescriptionMixin, ProtectionManagersMixin, LocationMixin, Att
     def paper(self):
         return Paper(self) if self._paper_last_revision else None
 
+    @property
+    def allowed_types_for_editable(self):
+        if not self.event.has_feature('editing'):
+            return []
+
+        submitted_for = {editable.type.name for editable in self.editables}
+        return [editable_type for editable_type in self.event.editable_types if editable_type not in submitted_for]
+
     def is_paper_reviewer(self, user):
         return user in self.paper_content_reviewers or user in self.paper_layout_reviewers
 

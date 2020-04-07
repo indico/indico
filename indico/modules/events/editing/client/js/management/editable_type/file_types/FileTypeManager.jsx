@@ -18,7 +18,7 @@ import {getChangedValues, handleSubmitError} from 'indico/react/forms';
 import {useIndicoAxios} from 'indico/react/hooks';
 import {handleAxiosError, indicoAxios} from 'indico/utils/axios';
 import FileTypeModal from './FileTypeModal';
-import {EditableTypeTitles} from '../../../models';
+import {EditableType} from '../../../models';
 
 import './FileTypeManager.module.scss';
 
@@ -233,5 +233,5 @@ export default function FileTypeManager({eventId, editableType}) {
 
 FileTypeManager.propTypes = {
   eventId: PropTypes.number.isRequired,
-  editableType: PropTypes.oneOf(Object.keys(EditableTypeTitles)).isRequired,
+  editableType: PropTypes.oneOf(Object.values(EditableType)).isRequired,
 };
