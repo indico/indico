@@ -7,7 +7,7 @@
 
 import React from 'react';
 import PropTypes from 'prop-types';
-import {connect} from 'react-redux';
+import {useSelector} from 'react-redux';
 import {withRouter} from 'react-router-dom';
 
 /**
@@ -38,12 +38,22 @@ export function parametrize(Component, extraProps) {
   return ParametrizedComponent;
 }
 
+function useOverrides() {
+  try {
+    return useSelector(s => s._overrides);
+  } catch (e) {
+    // not using redux -> no overrides available
+    return {};
+  }
+}
+
 /**
  * Component that implements <Overridable />.
  */
-function _OverridableComponent({id, children, overrides, ...restProps}) {
+function Overridable({id, children, ...restProps}) {
   const child = children ? React.Children.only(children) : null;
   const childProps = child ? child.props : {};
+  const overrides = useOverrides();
   const Override = overrides[id];
 
   return Override !== undefined
@@ -55,12 +65,6 @@ function _OverridableComponent({id, children, overrides, ...restProps}) {
     ? React.cloneElement(child, childProps)
     : null;
 }
-
-_OverridableComponent.displayName = `Overridable`;
-
-const Overridable = connect(({_overrides}) => ({
-  overrides: _overrides,
-}))(_OverridableComponent);
 
 Overridable.propTypes = {
   /** The children of the component */
@@ -82,22 +86,20 @@ Overridable.defaultProps = {
  * @param {React.Component} Component - the react component to be wrapped
  */
 Overridable.component = (id, Component) => {
-  const _Overridable = ({children, overrides, ...props}) => {
+  const _Overridable = ({children, ...props}) => {
+    const overrides = useOverrides();
     // the logic here is simpler: the wrapped component is itself the content
     return React.createElement(overrides[id] ? overrides[id] : Component, props, children);
   };
   _Overridable.propTypes = {
     children: PropTypes.oneOfType([PropTypes.node, PropTypes.func]),
-    overrides: PropTypes.object.isRequired,
   };
   _Overridable.defaultProps = {
     children: null,
   };
   _Overridable.displayName = `Overridable(${Component.displayName || Component.name})`;
   _Overridable.originalComponent = Component;
-  return connect(({_overrides}) => ({
-    overrides: _overrides,
-  }))(_Overridable);
+  return _Overridable;
 };
 
 export default Overridable;
