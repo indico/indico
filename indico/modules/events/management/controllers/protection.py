@@ -29,7 +29,7 @@ from indico.modules.events.util import get_object_from_args
 from indico.util import json
 from indico.util.i18n import _
 from indico.util.marshmallow import PrincipalDict
-from indico.web.args import parser
+from indico.web.args import use_rh_kwargs
 from indico.web.flask.util import url_for
 from indico.web.forms.base import FormDefaults
 from indico.web.forms.fields.principals import PermissionsField, serialize_principal
@@ -114,13 +114,13 @@ class RHPermissionsDialog(RH):
 class RHEventPrincipals(PrincipalsMixin, RHManageEventBase):
     ALLOW_LOCKED = True
 
-    def _process_args(self):
-        RHManageEventBase._process_args(self)
-        args = parser.parse({
-            'values': PrincipalDict(allow_groups=True, allow_external_users=True, allow_event_roles=True,
-                                    allow_category_roles=True, event_id=self.event.id, missing={})
-        })
-        self.values = args['values']
+    @use_rh_kwargs({
+        'values': PrincipalDict(allow_groups=True, allow_external_users=True, allow_event_roles=True,
+                                allow_category_roles=True, missing={})
+    }, rh_context=('event',))
+    def _process(self, values):
+        self.values = values
+        return PrincipalsMixin._process(self)
 
 
 class RHEventRolesJSON(RHManageEventBase):

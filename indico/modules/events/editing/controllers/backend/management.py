@@ -20,7 +20,8 @@ from indico.modules.events.editing.operations import (create_new_file_type, crea
                                                       delete_file_type, delete_review_condition, delete_tag,
                                                       update_file_type, update_review_condition, update_tag)
 from indico.modules.events.editing.schemas import (EditableFileTypeArgs, EditableTagArgs, EditableTypeArgs,
-                                                   EditingFileTypeSchema, EditingReviewConditionArgs, EditingTagSchema)
+                                                   EditableTypePrincipalsSchema, EditingFileTypeSchema,
+                                                   EditingReviewConditionArgs, EditingTagSchema)
 from indico.modules.events.editing.settings import editable_type_settings, editing_settings
 from indico.util.i18n import _
 from indico.web.args import use_kwargs, use_rh_args, use_rh_kwargs
@@ -157,4 +158,21 @@ class RHEditableSetSelfAssign(RHEditableTypeManagementBase):
 
     def _process_DELETE(self):
         editable_type_settings[self.editable_type].set(self.event, 'self_assign_allowed', False)
+
+
+class RHEditableTypePrincipals(RHEditableTypeManagementBase):
+    def _process_GET(self):
+        return jsonify([p.principal.identifier for p in self.event.acl_entries
+                       if p.has_management_permission(self.editable_type.name + '_editing', explicit=True)])
+
+    @use_rh_kwargs(EditableTypePrincipalsSchema)
+    def _process_POST(self, principals):
+        permission_mapping = {'paper': 'paper_editing', 'slides': 'slides_editing', 'poster': 'poster_editing'}
+        permission_name = permission_mapping[self.editable_type.name]
+        old_principals = {p.principal for p in self.event.acl_entries
+                          if p.has_management_permission(permission_name, explicit=True)}
+        for p in principals - old_principals:
+            self.event.update_principal(p, add_permissions={permission_name})
+        for p in old_principals - principals:
+            self.event.update_principal(p, del_permissions={permission_name})
         return '', 204
