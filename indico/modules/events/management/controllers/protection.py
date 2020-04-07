@@ -7,17 +7,22 @@
 
 from __future__ import unicode_literals
 
-from flask import flash, redirect, request
+from operator import attrgetter
+
+from flask import flash, jsonify, redirect, request
 from werkzeug.exceptions import NotFound
 
 from indico.core.db.sqlalchemy.protection import ProtectionMode, render_acl
 from indico.core.permissions import get_permissions_info, get_principal_permissions, update_permissions
+from indico.modules.categories.models.roles import CategoryRole
+from indico.modules.categories.util import serialize_category_role
 from indico.modules.core.controllers import PrincipalsMixin
 from indico.modules.events import Event
 from indico.modules.events.management.controllers.base import RHManageEventBase
 from indico.modules.events.management.forms import EventProtectionForm
 from indico.modules.events.management.views import WPEventProtection
 from indico.modules.events.operations import update_event_protection
+from indico.modules.events.roles.util import serialize_event_role
 from indico.modules.events.sessions import COORDINATOR_PRIV_SETTINGS, session_settings
 from indico.modules.events.sessions.operations import update_session_coordinator_privs
 from indico.modules.events.util import get_object_from_args
@@ -116,3 +121,15 @@ class RHEventPrincipals(PrincipalsMixin, RHManageEventBase):
                                     allow_category_roles=True, event_id=self.event.id, missing={})
         })
         self.values = args['values']
+
+
+class RHEventRolesJSON(RHManageEventBase):
+    def _process(self):
+        event_roles = sorted(self.event.roles, key=attrgetter('code'))
+        return jsonify([serialize_event_role(er, legacy=False) for er in event_roles])
+
+
+class RHCategoryRolesJSON(RHManageEventBase):
+    def _process(self):
+        category_roles = CategoryRole.get_category_roles(self.event.category)
+        return jsonify([serialize_category_role(cr, legacy=False) for cr in category_roles])

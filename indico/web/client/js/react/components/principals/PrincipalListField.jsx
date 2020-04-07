@@ -8,10 +8,10 @@
 import _ from 'lodash';
 import React from 'react';
 import PropTypes from 'prop-types';
-import {Button, List} from 'semantic-ui-react';
+import {Button, Dropdown, List} from 'semantic-ui-react';
 import {Translate} from 'indico/react/i18n';
 import {UserSearch, GroupSearch} from './Search';
-import {useFetchPrincipals} from './hooks';
+import {useFetchEventCategoryRoles, useFetchEventRoles, useFetchPrincipals} from './hooks';
 import {PendingPrincipalListItem, PrincipalListItem} from './items';
 import {getPrincipalList, PrincipalType} from './util';
 import {FinalField} from '../../forms';
@@ -35,11 +35,31 @@ const PrincipalListField = props => {
     onBlur,
     withGroups,
     withExternalUsers,
+    withEventRoles,
+    withCategoryRoles,
+    eventId,
     favoriteUsersController,
   } = props;
   const [favoriteUsers, [handleAddFavorite, handleDelFavorite]] = favoriteUsersController;
 
-  const informationMap = useFetchPrincipals(value);
+  const usedIdentifiers = new Set(value);
+  const informationMap = useFetchPrincipals(value, eventId);
+  const eventRoles = useFetchEventRoles(withEventRoles ? eventId : null);
+  const categoryRoles = useFetchEventCategoryRoles(withCategoryRoles ? eventId : null);
+
+  const eventRoleOptions = eventRoles
+    .filter(r => !usedIdentifiers.has(r.identifier))
+    .map(r => ({
+      value: r.identifier,
+      text: r.name,
+    }));
+
+  const categoryRoleOptions = categoryRoles
+    .filter(r => !usedIdentifiers.has(r.identifier))
+    .map(r => ({
+      value: r.identifier,
+      text: r.name,
+    }));
 
   const markTouched = () => {
     onFocus();
@@ -64,6 +84,7 @@ const PrincipalListField = props => {
             key={data.identifier}
             name={data.name}
             detail={data.detail}
+            meta={data.meta}
             type={data.type}
             invalid={data.invalid}
             isPendingUser={data.type === PrincipalType.user && data.userId === null}
@@ -105,6 +126,36 @@ const PrincipalListField = props => {
               onClose={onBlur}
             />
           )}
+          {eventRoles.length !== 0 && (
+            <Dropdown
+              text={Translate.string('Event Role')}
+              button
+              upward
+              floating
+              disabled={eventRoleOptions.length === 0}
+              options={eventRoleOptions}
+              value={null}
+              openOnFocus={false}
+              selectOnBlur={false}
+              selectOnNavigation={false}
+              onChange={(e, data) => handleAddItems([{identifier: data.value}])}
+            />
+          )}
+          {categoryRoles.length !== 0 && (
+            <Dropdown
+              text={Translate.string('Category Role')}
+              button
+              upward
+              floating
+              disabled={categoryRoleOptions.length === 0}
+              options={categoryRoleOptions}
+              value={null}
+              openOnFocus={false}
+              selectOnBlur={false}
+              selectOnNavigation={false}
+              onChange={(e, data) => handleAddItems([{identifier: data.value}])}
+            />
+          )}
         </Button.Group>
       )}
     </>
@@ -121,11 +172,17 @@ PrincipalListField.propTypes = {
   favoriteUsersController: PropTypes.array.isRequired,
   withGroups: PropTypes.bool,
   withExternalUsers: PropTypes.bool,
+  withEventRoles: PropTypes.bool,
+  withCategoryRoles: PropTypes.bool,
+  eventId: PropTypes.number,
 };
 
 PrincipalListField.defaultProps = {
   withGroups: false,
   withExternalUsers: false,
+  withEventRoles: false,
+  withCategoryRoles: false,
+  eventId: null,
   readOnly: false,
 };
 
@@ -150,11 +207,17 @@ FinalPrincipalList.propTypes = {
   readOnly: PropTypes.bool,
   withGroups: PropTypes.bool,
   withExternalUsers: PropTypes.bool,
+  withEventRoles: PropTypes.bool,
+  withCategoryRoles: PropTypes.bool,
+  eventId: PropTypes.number,
   favoriteUsersController: PropTypes.array.isRequired,
 };
 
 FinalPrincipalList.defaultProps = {
   withGroups: false,
   withExternalUsers: false,
+  withEventRoles: false,
+  withCategoryRoles: false,
+  eventId: null,
   readOnly: false,
 };

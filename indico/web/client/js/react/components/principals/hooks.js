@@ -8,6 +8,8 @@
 import permissionInfoURL from 'indico-url:rb.permission_types';
 import principalsURL from 'indico-url:core.principals';
 import eventPrincipalsURL from 'indico-url:event_management.api_principals';
+import eventRolesURL from 'indico-url:event_management.api_event_roles';
+import eventCategoryRolesURL from 'indico-url:event_management.api_category_roles';
 
 import _ from 'lodash';
 import {useState, useEffect} from 'react';
@@ -67,4 +69,34 @@ export const usePermissionInfo = () => {
   }
 
   return [loaded ? new PermissionManager(data.tree, data.default) : null, data];
+};
+
+/**
+ * This hook fetches the list of event roles available for a given event.
+ * If the `eventId` is null, nothing is fetched.
+ */
+export const useFetchEventRoles = eventId => {
+  const {data} = useIndicoAxios({
+    url: eventRolesURL({confId: eventId}),
+    trigger: eventId,
+    forceDispatchEffect: () => eventId !== null,
+    camelize: true,
+  });
+
+  return data || [];
+};
+
+/**
+ * This hook fetches the list of category roles available for a given event.
+ * If the `eventId` is null, nothing is fetched.
+ */
+export const useFetchEventCategoryRoles = eventId => {
+  const {data} = useIndicoAxios({
+    url: eventCategoryRolesURL({confId: eventId}),
+    trigger: eventId,
+    forceDispatchEffect: () => eventId !== null,
+    camelize: true,
+  });
+
+  return data || [];
 };
