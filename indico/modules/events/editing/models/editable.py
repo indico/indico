@@ -16,7 +16,7 @@ from indico.util.struct.enum import RichIntEnum
 
 
 class EditableType(RichIntEnum):
-    __titles__ = [None, _("Paper"), _("Slides"), _("Poster")]
+    __titles__ = [None, _('Paper'), _('Slides'), _('Poster')]
     paper = 1
     slides = 2
     poster = 3

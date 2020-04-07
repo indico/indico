@@ -10,7 +10,7 @@ import manageFileTypesURL from 'indico-url:event_editing.manage_file_types';
 import manageReviewConditionsURL from 'indico-url:event_editing.manage_review_conditions';
 import selfAssignURL from 'indico-url:event_editing.api_self_assign_enabled';
 
-import React from 'react';
+import React, {useState} from 'react';
 import {useParams, Link} from 'react-router-dom';
 import {Checkbox, Loader} from 'semantic-ui-react';
 
@@ -20,12 +20,14 @@ import {useNumericParam} from 'indico/react/util/routing';
 import {useTogglableValue} from 'indico/react/hooks';
 import {EditableTypeTitles} from '../../models';
 import Section from '../Section';
+import TeamManagerModal from './TeamManagerModal';
 
 import './EditableTypeDashboard.module.scss';
 
 export default function EditableTypeDashboard() {
   const eventId = useNumericParam('confId');
   const {type} = useParams();
+  const [editorManagerVisible, setEditorManagerVisible] = useState(false);
 
   const [
     selfAssignEnabled,
@@ -95,9 +97,15 @@ export default function EditableTypeDashboard() {
               <a className="i-button icon-mail">
                 <Translate>Contact</Translate>
               </a>
-              <a className="i-button icon-users">
+              <a className="i-button icon-users" onClick={() => setEditorManagerVisible(true)}>
                 <Translate>Manage team</Translate>
               </a>
+              {editorManagerVisible && (
+                <TeamManagerModal
+                  editableType={type}
+                  onClose={() => setEditorManagerVisible(false)}
+                />
+              )}
             </Section>
             <Section
               icon="copy1"

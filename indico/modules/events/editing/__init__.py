@@ -56,7 +56,9 @@ def _get_feature_definitions(sender, **kwargs):
 
 @signals.acl.get_management_permissions.connect_via(Event)
 def _get_management_permissions(sender, **kwargs):
-    yield EditableEditorPermission
+    yield PaperEditorPermission
+    yield SlidesEditorPermission
+    yield PosterEditorPermission
 
 
 @signals.menu.items.connect_via('event-management-sidemenu')
@@ -72,8 +74,22 @@ def _get_cloners(sender, **kwargs):
     yield EditingSettingsCloner
 
 
-class EditableEditorPermission(ManagementPermission):
+class PaperEditorPermission(ManagementPermission):
     name = 'paper_editing'
     friendly_name = _('Paper Editor')
     description = _('Grants editor rights for paper editing on an event.')
+    user_selectable = True
+
+
+class SlidesEditorPermission(ManagementPermission):
+    name = 'slides_editing'
+    friendly_name = _('Slides Editor')
+    description = _('Grants editor rights for slides editing on an event.')
+    user_selectable = True
+
+
+class PosterEditorPermission(ManagementPermission):
+    name = 'poster_editing'
+    friendly_name = _('Poster Editor')
+    description = _('Grants editor rights for poster editing on an event.')
     user_selectable = True

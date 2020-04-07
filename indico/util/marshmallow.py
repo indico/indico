@@ -206,27 +206,27 @@ class PrincipalList(Field):
     """Marshmallow field for a list of principals."""
 
     def __init__(self, allow_groups=False, allow_external_users=False, allow_event_roles=False,
-                 allow_category_roles=False, event_id=None, **kwargs):
+                 allow_category_roles=False, **kwargs):
         self.allow_groups = allow_groups
         self.allow_external_users = allow_external_users
         self.allow_event_roles = allow_event_roles
         self.allow_category_roles = allow_category_roles
-        self.event_id = event_id
-        if allow_event_roles and event_id is None:
-            raise ValueError('event_id is required to use event roles')
         super(PrincipalList, self).__init__(**kwargs)
 
     def _serialize(self, value, attr, obj):
         return [x.identifier for x in value]
 
     def _deserialize(self, value, attr, data):
+        event_id = None
+        if self.allow_event_roles or self.allow_category_roles:
+            event_id = self.context['event'].id
         try:
             return set(principal_from_identifier(identifier,
                                                  allow_groups=self.allow_groups,
                                                  allow_external_users=self.allow_external_users,
                                                  allow_event_roles=self.allow_event_roles,
                                                  allow_category_roles=self.allow_category_roles,
-                                                 event_id=self.event_id)
+                                                 event_id=event_id)
                        for identifier in value)
         except ValueError as exc:
             raise ValidationError(unicode(exc))
@@ -236,13 +236,16 @@ class PrincipalDict(PrincipalList):
     # We need to keep identifiers separately since for pending users we
     # can't get the correct one back from the user
     def _deserialize(self, value, attr, data):
+        event_id = None
+        if self.allow_event_roles or self.allow_category_roles:
+            event_id = self.context['event'].id
         try:
             return {identifier: principal_from_identifier(identifier,
                                                           allow_groups=self.allow_groups,
                                                           allow_external_users=self.allow_external_users,
                                                           allow_event_roles=self.allow_event_roles,
                                                           allow_category_roles=self.allow_category_roles,
-                                                          event_id=self.event_id,
+                                                          event_id=event_id,
                                                           soft_fail=True)
                     for identifier in value}
         except ValueError as exc:

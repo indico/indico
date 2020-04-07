@@ -25,7 +25,7 @@ from indico.modules.events.editing.models.revisions import EditingRevision, Init
 from indico.modules.events.editing.models.tags import EditingTag
 from indico.modules.users.schemas import UserSchema
 from indico.util.i18n import _
-from indico.util.marshmallow import not_empty
+from indico.util.marshmallow import PrincipalList, not_empty
 from indico.util.string import natural_sort_key
 from indico.util.struct.enum import IndicoEnum
 from indico.web.flask.util import url_for
@@ -261,3 +261,10 @@ class EditingMenuItemSchema(mm.Schema):
 
 class EditableTypeArgs(mm.Schema):
     editable_types = fields.List(EnumField(EditableType), required=True)
+
+
+class EditableTypePrincipalsSchema(mm.Schema):
+    class Meta:
+        rh_context = ('event',)
+
+    principals = PrincipalList(many=True, allow_groups=True, allow_event_roles=True, allow_category_roles=True)
