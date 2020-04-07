@@ -40,6 +40,7 @@
                 {{ move_category_button(category, classes="i-button borderless") }}
                 {{ delete_category_button(category, classes="i-button borderless") }}
             {% endif %}
+            {{ template_hook('category-management-after-banner-actions', category=category) }}
         </div>
     </div>
     <script>
