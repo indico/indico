@@ -10,7 +10,7 @@ from __future__ import unicode_literals
 from flask import jsonify, request
 
 from indico.core.errors import UserValueError
-from indico.modules.events.editing.controllers.base import RHEditingManagementBase
+from indico.modules.events.editing.controllers.base import RHEditableTypeManagementBase, RHEditingManagementBase
 from indico.modules.events.editing.models.editable import EditableType
 from indico.modules.events.editing.models.file_types import EditingFileType
 from indico.modules.events.editing.models.review_conditions import EditingReviewCondition
@@ -21,7 +21,7 @@ from indico.modules.events.editing.operations import (create_new_file_type, crea
                                                       update_file_type, update_review_condition, update_tag)
 from indico.modules.events.editing.schemas import (EditableFileTypeArgs, EditableTagArgs, EditableTypeArgs,
                                                    EditingFileTypeSchema, EditingReviewConditionArgs, EditingTagSchema)
-from indico.modules.events.editing.settings import editing_settings
+from indico.modules.events.editing.settings import editable_type_settings, editing_settings
 from indico.util.i18n import _
 from indico.web.args import use_kwargs, use_rh_args, use_rh_kwargs
 
@@ -144,4 +144,17 @@ class RHEnabledEditableTypes(RHEditingManagementBase):
     def _process_POST(self, editable_types):
         editable_types_names = [t.name for t in editable_types]
         editing_settings.set(self.event, 'editable_types', editable_types_names)
+        return '', 204
+
+
+class RHEditableSetSelfAssign(RHEditableTypeManagementBase):
+    def _process_GET(self):
+        return jsonify(editable_type_settings[self.editable_type].get(self.event, 'self_assign_allowed'))
+
+    def _process_PUT(self):
+        editable_type_settings[self.editable_type].set(self.event, 'self_assign_allowed', True)
+        return '', 204
+
+    def _process_DELETE(self):
+        editable_type_settings[self.editable_type].set(self.event, 'self_assign_allowed', False)
         return '', 204
