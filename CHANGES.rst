@@ -5,7 +5,7 @@ Changelog
 Version 2.2.8
 -------------
 
-*Unreleased*
+*Released on April 08, 2020*
 
 Security fixes
 ^^^^^^^^^^^^^^
