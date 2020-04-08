@@ -7,10 +7,13 @@ Version 2.2.8
 
 *Unreleased*
 
-Bugfixes
-^^^^^^^^
+Security fixes
+^^^^^^^^^^^^^^
 
-- None so far :)
+- Update `bleach <https://github.com/mozilla/bleach>`_ to fix a regular expression
+  denial of service vulnerability
+- Update `Pillow <https://github.com/python-pillow/Pillow>`_ to fix a buffer overflow
+  vulnerability
 
 Version 2.2.7
 -------------
