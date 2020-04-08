@@ -51,6 +51,8 @@ _bp.add_url_rule('/editing/api/tag/<int:tag_id>', 'api_edit_tag', management.RHE
 _bp.add_url_rule('/editing/api/menu-entries', 'api_menu_entries', common.RHMenuEntries)
 _bp.add_url_rule('/editing/api/enabled-editable-types', 'api_enabled_editable_types',
                  management.RHEnabledEditableTypes, methods=('GET', 'POST'))
+_bp.add_url_rule('/editing/api/<any(paper,slides,poster):type>/editable-assignment/self-assign-enabled',
+                 'api_self_assign_enabled', management.RHEditableSetSelfAssign, methods=('GET', 'PUT', 'DELETE'))
 
 # Contribution/revision-level APIs
 contrib_api_prefix = '/api' + contrib_prefix

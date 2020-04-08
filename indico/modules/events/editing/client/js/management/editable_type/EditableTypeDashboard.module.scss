@@ -5,11 +5,17 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
+@import 'base/palette';
+@import 'base/typography';
+
 .toolbar-checkbox {
     align-self: center;
-}
+    margin-top: 0.4rem;
 
-.toolbar-label {
-    align-self: center;
-    padding: 0 1rem 0 0.5rem;
+    &:global(.ui.toggle.checkbox) input ~ label {
+        @extend %font-family-body;
+        color: $dark-gray !important;
+        padding-right: 1rem;
+        font-size: 0.9em !important;
+    }
 }
