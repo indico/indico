@@ -85,7 +85,7 @@ Internal Changes
 
 ----
 
-Version 2.2.8
+Version 2.2.9
 -------------
 
 *Unreleased*
@@ -94,6 +94,19 @@ Bugfixes
 ^^^^^^^^
 
 - None so far :)
+
+Version 2.2.8
+-------------
+
+*Released on April 08, 2020*
+
+Security fixes
+^^^^^^^^^^^^^^
+
+- Update `bleach <https://github.com/mozilla/bleach>`_ to fix a regular expression
+  denial of service vulnerability
+- Update `Pillow <https://github.com/python-pillow/Pillow>`_ to fix a buffer overflow
+  vulnerability
 
 Version 2.2.7
 -------------
