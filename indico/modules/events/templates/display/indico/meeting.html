@@ -30,11 +30,13 @@
                 <div class="event-date">
                     {{ render_event_time(event, timezone) }}
                 </div>
-                {% if event.has_location_info or event.address %}
-                    <div class="event-location">
-                        {{ render_location(event, class='header-data', header=true) }}
-                    </div>
-                {% endif %}
+                {% block location_info %}
+                    {% if event.has_location_info or event.address %}
+                        <div class="event-location">
+                            {{ render_location(event, class='header-data', header=true) }}
+                        </div>
+                    {% endif %}
+                {% endblock %}
                 {% set chairpersons = event.person_links | sort(attribute='display_order_key') %}
                 {% if chairpersons %}
                     <div class="event-chairs">
