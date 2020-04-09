@@ -29,26 +29,6 @@ $default-box-shadow-blur: 1px;
 $default-box-shadow-spread: null;
 $default-box-shadow-color: lighten($gray, $color-variation);
 
-%font-family-body {
-    font-family: verdana, arial, serif;
-}
-
-%font-family-monospace {
-    font-family: "Inconsolata", "Monaco", "Droid Sans Mono", "Profont", courier, monospace;
-}
-
-%font-family-serif {
-    font-family: "Georgia", "Garamond", "Droid serif", "Linux Libertine", "Palatino", serif;
-}
-
-%font-family-sans {
-    font-family: "Roboto", "Helvetica", sans;
-}
-
-%font-size-body {
-    font-size: 13px;
-}
-
 
 // -----------------------------------------------------------------------------
 // Custom mixins
