@@ -40,11 +40,13 @@
                 <div class="event-date">
                     {{ render_event_time(event, timezone) }}
                 </div>
-                {% if event.has_location_info or event.address %}
-                    <div class="event-location">
-                        {{ render_location(event, class='header-data') }}
-                    </div>
-                {% endif %}
+                {% block location_info %}
+                    {% if event.has_location_info or event.address %}
+                        <div class="event-location">
+                            {{ render_location(event, class='header-data') }}
+                        </div>
+                    {% endif %}
+                {% endblock %}
             </div>
         </div>
     {% endblock %}
