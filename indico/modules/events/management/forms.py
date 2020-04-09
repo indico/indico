@@ -17,8 +17,8 @@ from pytz import timezone
 from werkzeug.datastructures import ImmutableMultiDict
 from wtforms import BooleanField, FloatField, SelectField, StringField, TextAreaField
 from wtforms.ext.sqlalchemy.fields import QuerySelectField
-from wtforms.fields.html5 import IntegerField
-from wtforms.validators import DataRequired, InputRequired, NumberRange, Optional, ValidationError
+from wtforms.fields.html5 import IntegerField, URLField
+from wtforms.validators import URL, DataRequired, InputRequired, NumberRange, Optional, ValidationError
 
 from indico.core.config import config
 from indico.core.db import db
@@ -168,6 +168,13 @@ class EventDatesForm(IndicoForm):
 
 class EventLocationForm(IndicoForm):
     location_data = IndicoLocationField(_('Location'), allow_location_inheritance=False)
+    own_map_url = URLField(_('Map URL'), [Optional(), URL()])
+
+    def __init__(self, *args, **kwargs):
+        event = kwargs['event']
+        super(EventLocationForm, self).__init__(*args, **kwargs)
+        if event.room:
+            self.own_map_url.render_kw = {'placeholder': event.room.map_url}
 
 
 class EventPersonsForm(IndicoForm):

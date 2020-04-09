@@ -26,6 +26,7 @@
     !!python/unicode 'last_friendly_session_id': 1
     !!python/unicode 'logo': null
     !!python/unicode 'logo_metadata': null
+    !!python/unicode 'map_url': !!python/unicode ''
     !!python/unicode 'no_access_contact': !!python/unicode ''
     !!python/unicode 'protection_mode': !!python/object/apply:indico.core.db.sqlalchemy.protection.ProtectionMode
     - 1

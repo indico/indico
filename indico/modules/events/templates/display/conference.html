@@ -36,11 +36,7 @@
                             <div class="place">
                                 {{ event.venue_name }}
                             </div>
-                            {% if event.room and event.room.map_url %}
-                                <div class="room">
-                                    <a href="{{ event.room.map_url }}">{{ event.room_name }}</a>
-                                </div>
-                            {% elif event.room_name %}
+                            {% if event.room_name %}
                                 <div class="room">
                                     {{ event.room_name }}
                                 </div>
@@ -48,6 +44,12 @@
 
                             {% if event.address %}
                                 <div class="address nohtml">{{ event.address }}</div>
+                            {% endif %}
+
+                            {% if event.map_url %}
+                                <a href="{{ event.map_url }}" target="_blank" rel="noopener noreferrer">
+                                    {% trans %}Go to map{% endtrans %}
+                                </a>
                             {% endif %}
                         </div>
                     </div>
