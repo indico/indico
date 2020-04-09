@@ -8,7 +8,7 @@
 from __future__ import unicode_literals
 
 from indico.modules.events.editing.controllers import frontend
-from indico.modules.events.editing.controllers.backend import common, management, timeline
+from indico.modules.events.editing.controllers.backend import common, management, service, timeline
 from indico.web.flask.wrappers import IndicoBlueprint
 
 
@@ -55,6 +55,11 @@ _bp.add_url_rule('/editing/api/<any(paper,slides,poster):type>/editable-assignme
                  'api_self_assign_enabled', management.RHEditableSetSelfAssign, methods=('GET', 'PUT', 'DELETE'))
 _bp.add_url_rule('/editing/api/<any(paper,slides,poster):type>/principals', 'api_editable_type_principals',
                  management.RHEditableTypePrincipals, methods=('GET', 'POST'))
+_bp.add_url_rule('/editing/api/service/check-url', 'api_check_service_url', service.RHCheckServiceURL)
+_bp.add_url_rule('/editing/api/service/connect', 'api_service_connect', service.RHConnectService, methods=('POST',))
+_bp.add_url_rule('/editing/api/service/disconnect', 'api_service_disconnect', service.RHDisconnectService,
+                 methods=('POST',))
+_bp.add_url_rule('/editing/api/service/status', 'api_service_status', service.RHServiceStatus)
 
 # Contribution/revision-level APIs
 contrib_api_prefix = '/api' + contrib_prefix

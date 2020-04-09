@@ -23,7 +23,7 @@ export default function Section({icon, label, description, children}) {
 
 Section.propTypes = {
   icon: PropTypes.string.isRequired,
-  label: PropTypes.string.isRequired,
-  description: PropTypes.string.isRequired,
+  label: PropTypes.oneOfType([PropTypes.string, PropTypes.node]).isRequired,
+  description: PropTypes.oneOfType([PropTypes.string, PropTypes.node]).isRequired,
   children: PropTypes.node.isRequired,
 };

@@ -12,6 +12,8 @@ from indico.modules.events.settings import EventSettingsProxy
 
 
 editing_settings = EventSettingsProxy('editing', {
+    'service_url': None,
+    'service_token': None,
     'editable_types': ['paper'],
 })
 

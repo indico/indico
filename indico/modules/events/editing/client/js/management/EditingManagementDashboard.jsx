@@ -13,6 +13,7 @@ import {Translate} from 'indico/react/i18n';
 import {useNumericParam} from 'indico/react/util/routing';
 import EditableTypeList from './EditableTypeList';
 import Section from './Section';
+import ManageService from './ManageService';
 
 export default function EditingManagementDashboard() {
   const eventId = useNumericParam('confId');
@@ -28,6 +29,7 @@ export default function EditingManagementDashboard() {
             <Translate>Configure</Translate>
           </Link>
         </Section>
+        <ManageService eventId={eventId} />
       </div>
       <EditableTypeList eventId={eventId} />
     </>
