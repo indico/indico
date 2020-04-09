@@ -63,6 +63,8 @@ Improvements
 - Add UI for admins to block/unblock users (:issue:`3243`)
 - Show labels indicating whether a user is an admin, blocked or soft-deleted
   (:issue:`4363`)
+- Add map URL to events, allowing also to override room map URL (:issue:`4402`,
+  thanks :user:`omegak`)
 
 Bugfixes
 ^^^^^^^^

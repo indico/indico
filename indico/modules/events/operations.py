@@ -129,7 +129,8 @@ def update_event(event, update_timetable=False, **data):
     assert set(data.viewkeys()) <= {'title', 'description', 'url_shortcut', 'location_data', 'keywords',
                                     'person_link_data', 'start_dt', 'end_dt', 'timezone', 'keywords', 'references',
                                     'organizer_info', 'additional_info', 'contact_title', 'contact_emails',
-                                    'contact_phones', 'start_dt_override', 'end_dt_override', 'label', 'label_message'}
+                                    'contact_phones', 'start_dt_override', 'end_dt_override', 'label', 'label_message',
+                                    'own_map_url'}
     old_person_links = event.person_links[:]
     changes = {}
     if (update_timetable or event.type == EventType.lecture) and 'start_dt' in data:
@@ -168,6 +169,7 @@ def clone_event(event, start_dt, cloners, category=None):
         'timezone': event.timezone,
         'title': event.title,
         'description': event.description,
+        'own_map_url': event.own_map_url
     }
     new_event = create_event(category or event.category, event.type_, data,
                              features=features_event_settings.get(event, 'enabled'),
@@ -212,7 +214,8 @@ def _log_event_update(event, changes, visible_person_link_changes=False):
         'contact_emails': 'Contact emails',
         'contact_phones': 'Contact phone numbers',
         'label': {'title': 'Label', 'type': 'string', 'attr': 'title'},
-        'label_message': 'Label message'
+        'label_message': 'Label message',
+        'own_map_url': {'title': 'Map URL', 'type': 'string'}
     }
     _split_location_changes(changes)
     if not visible_person_link_changes:

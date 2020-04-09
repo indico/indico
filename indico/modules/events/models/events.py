@@ -244,6 +244,14 @@ class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionMan
         index=True,
         nullable=True
     )
+    #: The url to a map for the event
+    own_map_url = db.Column(
+        'map_url',
+        db.String,
+        nullable=False,
+        default=''
+    )
+
     #: The last user-friendly registration ID
     _last_friendly_registration_id = db.deferred(db.Column(
         'last_friendly_registration_id',
@@ -554,6 +562,14 @@ class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionMan
     def short_external_url(self):
         id_ = self.url_shortcut or self.id
         return url_for('events.shorturl', confId=id_, _external=True)
+
+    @property
+    def map_url(self):
+        if self.own_map_url:
+            return self.own_map_url
+        elif not self.room:
+            return ''
+        return self.room.map_url or ''
 
     @property
     def tzinfo(self):
