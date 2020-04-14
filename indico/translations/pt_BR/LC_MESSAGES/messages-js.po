@@ -1,5 +1,5 @@
 # Translations template for indico.
-# Copyright (C) 2019 ORGANIZATION
+# Copyright (C) 2020 ORGANIZATION
 # This file is distributed under the same license as the indico project.
 # 
 # Translators:
@@ -11,7 +11,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Indico\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2019-07-19 10:16+0200\n"
+"POT-Creation-Date: 2020-03-20 12:25+0100\n"
 "PO-Revision-Date: 2019-06-06 13:45+0000\n"
 "Last-Translator: Andre Garcia <sambombe@gmail.com>\n"
 "Language-Team: Portuguese (Brazil) (http://www.transifex.com/indico/indico/language/pt_BR/)\n"
@@ -787,7 +787,7 @@ msgstr "Salvar"
 
 #: indico/web/client/js/jquery/widgets/ajaxqbubble.js:20
 #: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Base.js:63
-#: indico/web/client/js/legacy/libs/timetable/Draw.js:787
+#: indico/web/client/js/legacy/libs/timetable/Draw.js:782
 msgid "Loading..."
 msgstr "Carregando..."
 
@@ -919,7 +919,7 @@ msgstr "Digite para adicionar {0}"
 
 #: indico/web/client/js/jquery/widgets/jinja/multiple_items_widget.js:34
 #: indico/web/client/js/jquery/widgets/multitextfield.js:278
-#: indico/web/client/js/legacy/libs/timetable/Draw.js:1659
+#: indico/web/client/js/legacy/libs/timetable/Draw.js:1654
 msgid "Delete"
 msgstr "Apagar"
 
@@ -977,7 +977,7 @@ msgstr[0] "<strong>1</strong> palavra restante"
 msgstr[1] "<strong>{0}</strong> palavras restantes"
 
 #: indico/web/client/js/jquery/widgets/jinja/multiple_items_widget.js:44
-#: indico/web/client/js/legacy/libs/timetable/Draw.js:1591
+#: indico/web/client/js/legacy/libs/timetable/Draw.js:1586
 msgid "Edit"
 msgstr "Editar"
 
@@ -1006,44 +1006,44 @@ msgstr "Deve estar abaixo de {0}"
 msgid "Please fill in the required fields."
 msgstr "Por favor preencha os campos requeridos."
 
-#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:141
+#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:145
 msgid "IP networks cannot have management permissions"
 msgstr "Redes IP não podem ter permissões de gerenciamento"
 
-#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:148
+#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:152
 msgid "Assign Permissions"
 msgstr "Atribuir Permissões"
 
-#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:165
+#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:169
 msgid "Delete entry '{0}'"
 msgstr "Apagar entrada '{0}'"
 
-#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:166
+#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:170
 #: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:1344
 msgid "Are you sure you want to remove yourself from the list?"
 msgstr "Tem certeza que deseja remover a si mesmo da lista?"
 
-#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:205
+#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:209
 msgid "All IP Networks were added"
 msgstr "Todas as redes IP foram adicionadas"
 
-#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:236
+#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:240
 msgid "This entry was already added"
 msgstr "Esta entrada já foi adicionada"
 
-#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:269
+#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:273
 msgid "Anonymous"
 msgstr "Anônimo"
 
-#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:276
+#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:280
 msgid "Category Managers"
 msgstr "Gerentes de categoria"
 
-#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:277
+#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:281
 msgid "Event Managers"
 msgstr "Gerentes de Eventos"
 
-#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:334
+#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:338
 msgid "Select a user or group to add"
 msgstr "Selecione um usuário ou grupo para adicionar"
 
@@ -1702,56 +1702,56 @@ msgstr "contribuição(ções)."
 msgid "Please click for more information."
 msgstr "Por favor clique para mais informações"
 
-#: indico/web/client/js/legacy/libs/timetable/Draw.js:737
+#: indico/web/client/js/legacy/libs/timetable/Draw.js:732
 msgid "Move entry"
 msgstr "Mover entrada"
 
-#: indico/web/client/js/legacy/libs/timetable/Draw.js:781
-#: indico/web/client/js/legacy/libs/timetable/Draw.js:792
+#: indico/web/client/js/legacy/libs/timetable/Draw.js:776
+#: indico/web/client/js/legacy/libs/timetable/Draw.js:787
 msgid "This timetable entry does not exist anymore. Please refresh the page."
 msgstr "Esta entrada de horário não existe mais. Por favor, atualize a página."
 
-#: indico/web/client/js/legacy/libs/timetable/Draw.js:793
+#: indico/web/client/js/legacy/libs/timetable/Draw.js:788
 msgid "Refresh"
 msgstr "Atualizar"
 
-#: indico/web/client/js/legacy/libs/timetable/Draw.js:896
+#: indico/web/client/js/legacy/libs/timetable/Draw.js:891
 msgid "Move up"
 msgstr "Mover para cima"
 
-#: indico/web/client/js/legacy/libs/timetable/Draw.js:905
+#: indico/web/client/js/legacy/libs/timetable/Draw.js:900
 msgid "Move down"
 msgstr "Mover para baixo"
 
-#: indico/web/client/js/legacy/libs/timetable/Draw.js:1593
+#: indico/web/client/js/legacy/libs/timetable/Draw.js:1588
 msgid "Edit poster"
 msgstr "Editar poster"
 
-#: indico/web/client/js/legacy/libs/timetable/Draw.js:1625
+#: indico/web/client/js/legacy/libs/timetable/Draw.js:1620
 msgid "Manage protection"
 msgstr "Gerenciar proteção"
 
-#: indico/web/client/js/legacy/libs/timetable/Draw.js:1627
+#: indico/web/client/js/legacy/libs/timetable/Draw.js:1622
 msgid "Manage poster protection"
 msgstr "Gerenciar proteção de poster"
 
-#: indico/web/client/js/legacy/libs/timetable/Draw.js:1655
+#: indico/web/client/js/legacy/libs/timetable/Draw.js:1650
 msgid "Unschedule"
 msgstr "Desmarcar"
 
-#: indico/web/client/js/legacy/libs/timetable/Draw.js:1656
+#: indico/web/client/js/legacy/libs/timetable/Draw.js:1651
 msgid "Unschedule poster"
 msgstr "Desmarcar poster"
 
-#: indico/web/client/js/legacy/libs/timetable/Draw.js:1657
+#: indico/web/client/js/legacy/libs/timetable/Draw.js:1652
 msgid "Are you sure you want to unschedule the poster?"
 msgstr "Você tem certeza de que você deseja desmarcar o poster?"
 
-#: indico/web/client/js/legacy/libs/timetable/Draw.js:1660
+#: indico/web/client/js/legacy/libs/timetable/Draw.js:1655
 msgid "Delete poster"
 msgstr "Apagar poster"
 
-#: indico/web/client/js/legacy/libs/timetable/Draw.js:1661
+#: indico/web/client/js/legacy/libs/timetable/Draw.js:1656
 msgid "Are you sure you want to delete the poster?"
 msgstr "Você tem certeza que você quer apagar o poster?"
 

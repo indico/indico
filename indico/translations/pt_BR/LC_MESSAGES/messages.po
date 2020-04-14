@@ -1,11 +1,11 @@
 # Translations template for indico.
-# Copyright (C) 2019 ORGANIZATION
+# Copyright (C) 2020 ORGANIZATION
 # This file is distributed under the same license as the indico project.
 # 
 # Translators:
 # Andre Garcia <sambombe@gmail.com>, 2017,2019
 # Edson Zanini <zanini@unicamp.br>, 2019
-# Fernanda Paulo Ramos <fernanda.ramos+transifex@gmail.com>, 2019
+# Fernanda Paulo Ramos <fernanda.ramos+transifex@gmail.com>, 2019-2020
 # Fernanda Paulo Ramos <fernanda.ramos+transifex@gmail.com>, 2019
 # Fernanda Paulo Ramos <fernanda.ramos+transifex@gmail.com>, 2019
 # Marcelo Oliveira <marceloqao@gmail.com>, 2018
@@ -15,9 +15,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Indico\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2019-07-19 10:16+0200\n"
-"PO-Revision-Date: 2019-07-23 13:16+0000\n"
-"Last-Translator: Fernanda Paulo Ramos <fernanda.ramos+transifex@gmail.com>\n"
+"POT-Creation-Date: 2020-03-20 12:25+0100\n"
+"PO-Revision-Date: 2020-03-20 11:34+0000\n"
+"Last-Translator: Adrian Mönnich\n"
 "Language-Team: Portuguese (Brazil) (http://www.transifex.com/indico/indico/language/pt_BR/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -67,7 +67,7 @@ msgid "Access the public areas of the selected contribution"
 msgstr "Acessar as áreas públicas da contribuição selecionada"
 
 #: indico/core/permissions.py:92
-#: indico/modules/events/abstracts/templates/management/overview.html:123
+#: indico/modules/events/abstracts/templates/management/overview.html:125
 #: indico/modules/events/papers/templates/management/overview.html:158
 #: indico/modules/events/registration/templates/management/regform.html:64
 #: indico/modules/events/registration/templates/management/regform.html:80
@@ -108,12 +108,12 @@ msgid "Periodic Tasks"
 msgstr "Tarefas periódicas"
 
 #: indico/core/celery/templates/celery_tasks.html:22
-#: indico/legacy/pdfinterface/conference.py:1135
+#: indico/legacy/pdfinterface/conference.py:1133
 #: indico/modules/attachments/forms.py:88
 #: indico/modules/designer/templates/template.html:70
 #: indico/modules/events/contributions/forms.py:185
 #: indico/modules/events/contributions/templates/management/types_dialog.html:19
-#: indico/modules/events/forms.py:32
+#: indico/modules/events/forms.py:35
 #: indico/modules/events/management/templates/_event_person_list.html:14
 #: indico/modules/events/papers/forms.py:189
 #: indico/modules/events/papers/templates/assign_role.html:14
@@ -170,8 +170,8 @@ msgstr "padrão"
 
 #: indico/core/db/sqlalchemy/links.py:25
 #: indico/modules/attachments/controllers/management/base.py:54
-#: indico/modules/categories/forms.py:156 indico/modules/events/forms.py:55
-#: indico/modules/events/management/forms.py:315
+#: indico/modules/categories/forms.py:156 indico/modules/events/forms.py:73
+#: indico/modules/events/management/forms.py:330
 #: indico/web/forms/fields/protection.py:42
 msgid "Category"
 msgstr "Categoria"
@@ -190,14 +190,14 @@ msgid "Event"
 msgstr "Evento"
 
 #: indico/core/db/sqlalchemy/links.py:25
-#: indico/legacy/pdfinterface/conference.py:841
+#: indico/legacy/pdfinterface/conference.py:839
 #: indico/modules/attachments/controllers/management/base.py:50
 #: indico/modules/categories/templates/display/overview/base.html:41
 #: indico/modules/events/management/util.py:40
 #: indico/modules/events/timetable/models/entries.py:29
 #: indico/modules/events/timetable/templates/balloons/contribution.html:22
 #: indico/modules/rb/event/forms.py:18
-#: indico/modules/rb/templates/booking_list.html:31
+#: indico/modules/rb/templates/booking_list.html:52
 #: indico/modules/vc/forms.py:72 indico/modules/vc/forms.py:75
 #: indico/modules/vc/templates/list_vc_rooms.html:33
 msgid "Contribution"
@@ -208,7 +208,7 @@ msgid "Subcontribution"
 msgstr "Sub-contribuição"
 
 #: indico/core/db/sqlalchemy/links.py:25
-#: indico/legacy/pdfinterface/conference.py:820
+#: indico/legacy/pdfinterface/conference.py:818
 #: indico/modules/attachments/controllers/management/base.py:48
 #: indico/modules/categories/templates/display/overview/base.html:38
 #: indico/modules/events/abstracts/forms.py:207
@@ -225,7 +225,7 @@ msgid "Session"
 msgstr "Sessão"
 
 #: indico/core/db/sqlalchemy/links.py:26 indico/modules/rb/event/forms.py:21
-#: indico/modules/rb/templates/booking_list.html:47
+#: indico/modules/rb/templates/booking_list.html:68
 #: indico/modules/vc/forms.py:78
 msgid "Session block"
 msgstr "Bloco de Sessão"
@@ -377,7 +377,7 @@ msgstr "Salvar"
 #: indico/modules/events/papers/templates/paper_list_filter.html:80
 #: indico/modules/events/payment/templates/event_plugin_edit.html:36
 #: indico/modules/events/persons/controllers.py:244
-#: indico/modules/events/registration/templates/management/email.html:9
+#: indico/modules/events/registration/templates/management/email.html:23
 #: indico/modules/events/registration/templates/management/import_registrations.html:38
 #: indico/modules/events/registration/templates/management/print_badges.html:16
 #: indico/modules/events/registration/templates/management/regform_display_form_columns.html:13
@@ -410,11 +410,11 @@ msgstr "Erro: Inteiro para Romanos: Argumento deve estar entre 1 e 3999"
 
 #: indico/legacy/pdfinterface/base.py:529
 #: indico/legacy/pdfinterface/base.py:623
-#: indico/legacy/pdfinterface/conference.py:242
+#: indico/legacy/pdfinterface/conference.py:241
 msgid "Table of contents"
 msgstr "Tabela de conteúdos"
 
-#: indico/legacy/pdfinterface/conference.py:224
+#: indico/legacy/pdfinterface/conference.py:223
 #: indico/modules/events/tracks/__init__.py:30
 #: indico/modules/events/tracks/forms.py:36
 #: indico/modules/events/tracks/templates/management.html:6
@@ -422,14 +422,14 @@ msgstr "Tabela de conteúdos"
 msgid "Programme"
 msgstr "Programa"
 
-#: indico/legacy/pdfinterface/conference.py:294
+#: indico/legacy/pdfinterface/conference.py:293
 msgid "Page {}"
 msgstr "Página {}"
 
-#: indico/legacy/pdfinterface/conference.py:364
-#: indico/legacy/pdfinterface/conference.py:440
+#: indico/legacy/pdfinterface/conference.py:363
+#: indico/legacy/pdfinterface/conference.py:439
 #: indico/legacy/pdfinterface/conference.py:664
-#: indico/legacy/pdfinterface/conference.py:851
+#: indico/legacy/pdfinterface/conference.py:849
 #: indico/modules/events/abstracts/settings.py:54
 #: indico/modules/events/timetable/templates/balloons/contribution.html:54
 msgid "Presenter"
@@ -446,17 +446,17 @@ msgstr[1] "Apresentadores"
 msgid "Conveners"
 msgstr "Convocadores"
 
-#: indico/legacy/pdfinterface/conference.py:754
+#: indico/legacy/pdfinterface/conference.py:752
 msgid "Simplified Programme"
 msgstr "Programa Simplificado"
 
-#: indico/legacy/pdfinterface/conference.py:824
-#: indico/legacy/pdfinterface/conference.py:845
-#: indico/legacy/pdfinterface/conference.py:862
+#: indico/legacy/pdfinterface/conference.py:822
+#: indico/legacy/pdfinterface/conference.py:843
+#: indico/legacy/pdfinterface/conference.py:860
 msgid "Time and Place"
 msgstr "Hora e Local"
 
-#: indico/legacy/pdfinterface/conference.py:831
+#: indico/legacy/pdfinterface/conference.py:829
 #: indico/modules/events/abstracts/templates/display/tracks.html:61
 #: indico/modules/events/timetable/templates/display/indico/_session_block.html:48
 msgid "Convener"
@@ -464,89 +464,89 @@ msgid_plural "Conveners"
 msgstr[0] "Convocador"
 msgstr[1] "Convocadores"
 
-#: indico/legacy/pdfinterface/conference.py:859
+#: indico/legacy/pdfinterface/conference.py:857
 #: indico/modules/events/timetable/models/entries.py:29
 #: indico/modules/events/timetable/templates/balloons/break.html:15
 msgid "Break"
 msgstr "Pausa"
 
-#: indico/legacy/pdfinterface/conference.py:895
+#: indico/legacy/pdfinterface/conference.py:893
 msgid "Daily Programme"
 msgstr "Programa diário"
 
-#: indico/legacy/pdfinterface/conference.py:913
+#: indico/legacy/pdfinterface/conference.py:911
 msgid "Registrant"
 msgstr "Participante"
 
-#: indico/legacy/pdfinterface/conference.py:983
+#: indico/legacy/pdfinterface/conference.py:981
 msgid "Registration details"
 msgstr "Detalhes do registro"
 
-#: indico/legacy/pdfinterface/conference.py:986
-#: indico/legacy/pdfinterface/conference.py:1147
+#: indico/legacy/pdfinterface/conference.py:984
+#: indico/legacy/pdfinterface/conference.py:1145
 msgid "Registration date"
 msgstr "Data de Registro"
 
-#: indico/legacy/pdfinterface/conference.py:988
-#: indico/legacy/pdfinterface/conference.py:1149
+#: indico/legacy/pdfinterface/conference.py:986
+#: indico/legacy/pdfinterface/conference.py:1147
 msgid "Registration state"
 msgstr "Estado de Registro"
 
-#: indico/legacy/pdfinterface/conference.py:990
-#: indico/legacy/pdfinterface/conference.py:1151
+#: indico/legacy/pdfinterface/conference.py:988
+#: indico/legacy/pdfinterface/conference.py:1149
 #: indico/modules/events/registration/lists.py:43
 #: indico/modules/events/registration/stats.py:386
 msgid "Price"
 msgstr "Preço"
 
-#: indico/legacy/pdfinterface/conference.py:993
+#: indico/legacy/pdfinterface/conference.py:991
 #: indico/modules/events/payment/templates/transaction_details.html:5
 #: indico/modules/events/registration/lists.py:60
 msgid "Payment date"
 msgstr "Data de pagamento"
 
-#: indico/legacy/pdfinterface/conference.py:996
-#: indico/legacy/pdfinterface/conference.py:1153
+#: indico/legacy/pdfinterface/conference.py:994
+#: indico/legacy/pdfinterface/conference.py:1151
 #: indico/modules/events/registration/lists.py:50
 #: indico/modules/events/registration/templates/display/participant_list.html:44
 #: indico/modules/events/registration/templates/management/_registration_details.html:179
 msgid "Checked in"
 msgstr "Verificado em / Checked in:"
 
-#: indico/legacy/pdfinterface/conference.py:999
-#: indico/legacy/pdfinterface/conference.py:1155
+#: indico/legacy/pdfinterface/conference.py:997
+#: indico/legacy/pdfinterface/conference.py:1153
 #: indico/modules/events/registration/lists.py:57
 msgid "Check-in date"
 msgstr "Data do Check-in"
 
-#: indico/legacy/pdfinterface/conference.py:1005
-#: indico/legacy/pdfinterface/conference.py:1142
+#: indico/legacy/pdfinterface/conference.py:1003
+#: indico/legacy/pdfinterface/conference.py:1140
 msgid "Arrival date"
 msgstr "Data de chegada"
 
-#: indico/legacy/pdfinterface/conference.py:1007
-#: indico/legacy/pdfinterface/conference.py:1143
+#: indico/legacy/pdfinterface/conference.py:1005
+#: indico/legacy/pdfinterface/conference.py:1141
 msgid "Departure date"
 msgstr "Data de Partida"
 
-#: indico/legacy/pdfinterface/conference.py:1029
+#: indico/legacy/pdfinterface/conference.py:1027
 msgid "Registrants Book"
 msgstr "Livro de Inscritos"
 
-#: indico/legacy/pdfinterface/conference.py:1059
+#: indico/legacy/pdfinterface/conference.py:1057
 #: indico/modules/events/layout/models/menu.py:31
 msgid "Page"
 msgstr "Página"
 
-#: indico/legacy/pdfinterface/conference.py:1085
+#: indico/legacy/pdfinterface/conference.py:1083
 msgid "Registrants List"
 msgstr "Lista de Participantes"
 
-#: indico/legacy/pdfinterface/conference.py:1112
+#: indico/legacy/pdfinterface/conference.py:1110
 msgid "List of registrants"
 msgstr "Lista de registrantes"
 
-#: indico/legacy/pdfinterface/conference.py:1134
+#: indico/legacy/pdfinterface/conference.py:1132
 #: indico/modules/categories/forms.py:150
 #: indico/modules/events/abstracts/settings.py:49
 #: indico/modules/events/abstracts/templates/management/_abstract_list.html:83
@@ -560,20 +560,20 @@ msgstr "Lista de registrantes"
 msgid "ID"
 msgstr "ID"
 
-#: indico/legacy/pdfinterface/latex.py:264
+#: indico/legacy/pdfinterface/latex.py:273
 msgid "Report of Abstracts"
 msgstr "Relatório de Resumos"
 
-#: indico/legacy/pdfinterface/latex.py:289
-#: indico/legacy/pdfinterface/latex.py:292
+#: indico/legacy/pdfinterface/latex.py:298
+#: indico/legacy/pdfinterface/latex.py:301
 msgid "{} (#{}: {})"
 msgstr "{} (#{}: {})"
 
-#: indico/legacy/pdfinterface/latex.py:330
+#: indico/legacy/pdfinterface/latex.py:339
 msgid "Proposed for other tracks: {}"
 msgstr "Proposto para outras trilhas: {}"
 
-#: indico/legacy/pdfinterface/latex.py:383
+#: indico/legacy/pdfinterface/latex.py:392
 msgid "Report of Contributions"
 msgstr "Relatório de Contribuições"
 
@@ -605,8 +605,8 @@ msgid "Homepage"
 msgstr "Página inicial"
 
 #: indico/modules/admin/__init__.py:34 indico/modules/admin/views.py:25
-#: indico/modules/api/templates/user_profile.html:98 indico/web/views.py:252
-#: indico/web/views.py:309
+#: indico/modules/api/templates/user_profile.html:98 indico/web/views.py:254
+#: indico/web/views.py:311
 msgid "Administration"
 msgstr "Administração"
 
@@ -814,6 +814,7 @@ msgstr "Token"
 
 #: indico/modules/api/templates/admin_keys.html:13
 #: indico/modules/events/registration/templates/management/regform_reglist.html:100
+#: indico/modules/events/templates/admin/_event_label_list.html:7
 #: indico/modules/events/templates/admin/_reference_type_list.html:9
 #: indico/modules/groups/templates/_group_members.html:12
 msgid "Actions"
@@ -966,7 +967,7 @@ msgstr "Não há chaves antigas"
 
 #: indico/modules/attachments/__init__.py:41
 #: indico/modules/attachments/__init__.py:53
-#: indico/modules/attachments/clone.py:23
+#: indico/modules/attachments/clone.py:25
 #: indico/modules/attachments/templates/attachments.html:4
 #: indico/modules/attachments/templates/generate_package.html:14
 #: indico/modules/categories/templates/display/sidebar.html:7
@@ -1020,9 +1021,9 @@ msgstr "A lista de usuários e grupos com permissão para acessar o material"
 #: indico/modules/events/contributions/templates/management/_contribution_list.html:18
 #: indico/modules/events/contributions/templates/management/_subcontribution_list.html:51
 #: indico/modules/events/contributions/templates/management/import_contributions.html:21
-#: indico/modules/events/layout/forms.py:121
+#: indico/modules/events/forms.py:58 indico/modules/events/layout/forms.py:121
 #: indico/modules/events/layout/forms.py:137
-#: indico/modules/events/management/forms.py:184
+#: indico/modules/events/management/forms.py:186
 #: indico/modules/events/management/templates/_settings.html:41
 #: indico/modules/events/papers/templates/_paper_list.html:42
 #: indico/modules/events/persons/forms.py:47
@@ -1051,10 +1052,10 @@ msgstr "Título"
 #: indico/modules/events/contributions/forms.py:37
 #: indico/modules/events/contributions/forms.py:110
 #: indico/modules/events/contributions/forms.py:189
-#: indico/modules/events/contributions/templates/display/contribution_display.html:149
+#: indico/modules/events/contributions/templates/display/contribution_display.html:151
 #: indico/modules/events/contributions/templates/management/types_dialog.html:22
-#: indico/modules/events/forms.py:82
-#: indico/modules/events/management/forms.py:60
+#: indico/modules/events/forms.py:100
+#: indico/modules/events/management/forms.py:62
 #: indico/modules/events/management/templates/_settings.html:44
 #: indico/modules/events/papers/forms.py:190
 #: indico/modules/events/papers/templates/management/_templates.html:10
@@ -1403,6 +1404,7 @@ msgstr "Gerenciar material para '%(title)s'"
 #: indico/modules/events/registration/templates/management/reglist_filter.html:62
 #: indico/modules/events/sessions/templates/management/session_list.html:51
 #: indico/modules/events/surveys/templates/management/survey.html:104
+#: indico/modules/rb/settings.py:17
 msgid "None"
 msgstr "Nenhum"
 
@@ -2126,7 +2128,7 @@ msgstr "Conteúdo"
 #: indico/modules/categories/templates/management/settings.html:25
 #: indico/modules/events/abstracts/templates/management/overview.html:32
 #: indico/modules/events/abstracts/templates/management/overview.html:80
-#: indico/modules/events/abstracts/templates/management/overview.html:106
+#: indico/modules/events/abstracts/templates/management/overview.html:107
 #: indico/modules/events/contributions/templates/management/contributions.html:13
 #: indico/modules/events/management/__init__.py:30
 #: indico/modules/events/management/templates/settings.html:4
@@ -2165,8 +2167,8 @@ msgstr "Categorias contendo apenas eventos não são permitidas."
 msgid "Categories containing subcategories are not allowed."
 msgstr "Categorias contendo subcategorias não são permitidas."
 
-#: indico/modules/categories/forms.py:36 indico/modules/events/forms.py:57
-#: indico/modules/events/management/forms.py:100
+#: indico/modules/categories/forms.py:36 indico/modules/events/forms.py:75
+#: indico/modules/events/management/forms.py:102
 #: indico/modules/events/management/templates/_settings.html:84
 #: indico/modules/users/forms.py:42
 msgid "Timezone"
@@ -2249,8 +2251,8 @@ msgstr "Logo que aparecerá ao lado da descrição da categoria. Será redimensi
 
 #: indico/modules/categories/forms.py:80
 #: indico/modules/events/contributions/forms.py:95
-#: indico/modules/events/forms.py:59
-#: indico/modules/events/management/forms.py:220
+#: indico/modules/events/forms.py:77
+#: indico/modules/events/management/forms.py:235
 #: indico/modules/events/sessions/forms.py:57
 msgid "Protection mode"
 msgstr "Modo de proteção"
@@ -2270,7 +2272,7 @@ msgid "Managers"
 msgstr "Gerentes"
 
 #: indico/modules/categories/forms.py:85
-#: indico/modules/events/management/forms.py:228
+#: indico/modules/events/management/forms.py:243
 msgid "No access contact"
 msgstr "Nenhum contato de acesso"
 
@@ -2441,47 +2443,47 @@ msgstr "Você não está autorizado a acessar esta categoria."
 msgid "If you believe you should have access, please contact {}"
 msgstr "Se você acredita que deve ter acesso, entre em contato com {}"
 
-#: indico/modules/categories/controllers/display.py:124
+#: indico/modules/categories/controllers/display.py:126
 msgid "Years"
 msgstr "Anos"
 
-#: indico/modules/categories/controllers/display.py:128
+#: indico/modules/categories/controllers/display.py:130
 msgid "Number of events"
 msgstr "Número de Eventos"
 
-#: indico/modules/categories/controllers/display.py:129
+#: indico/modules/categories/controllers/display.py:131
 msgid "The year is the one of the start date of the event."
 msgstr "O ano é o da data de início do evento."
 
-#: indico/modules/categories/controllers/display.py:131
+#: indico/modules/categories/controllers/display.py:133
 msgid "{value} events in {year}"
 msgstr "{value} eventos em {year}"
 
-#: indico/modules/categories/controllers/display.py:132
+#: indico/modules/categories/controllers/display.py:134
 msgid "Number of contributions"
 msgstr "Número de contribuições"
 
-#: indico/modules/categories/controllers/display.py:133
+#: indico/modules/categories/controllers/display.py:135
 msgid "The year is the one of the start date of the contribution."
 msgstr "O ano é o da data de início da contribuição."
 
-#: indico/modules/categories/controllers/display.py:135
+#: indico/modules/categories/controllers/display.py:137
 msgid "{value} contributions in {year}"
 msgstr "{value} contribuições em {year}"
 
-#: indico/modules/categories/controllers/display.py:136
+#: indico/modules/categories/controllers/display.py:138
 msgid "Number of attachments"
 msgstr "Número de anexos"
 
-#: indico/modules/categories/controllers/display.py:138
+#: indico/modules/categories/controllers/display.py:140
 msgid "Number of users"
 msgstr "Número de usuários"
 
-#: indico/modules/categories/controllers/display.py:339
+#: indico/modules/categories/controllers/display.py:354
 msgid "Events of \"{}\""
 msgstr "Eventos de \"{}\""
 
-#: indico/modules/categories/controllers/display.py:679
+#: indico/modules/categories/controllers/display.py:695
 msgid "There are no upcoming events for this category"
 msgstr "Não há eventos programados para esta categoria"
 
@@ -2660,7 +2662,7 @@ msgstr "Todos os eventos"
 
 #: indico/modules/categories/templates/display/base.html:21
 #: indico/modules/categories/templates/management/_events_list.html:89
-#: indico/modules/events/__init__.py:197
+#: indico/modules/events/__init__.py:199
 #: indico/modules/events/templates/forms/event_creation_form.html:15
 #: indico/modules/events/templates/management/_create_event_button.html:3
 msgid "Create event"
@@ -2729,9 +2731,13 @@ msgstr[1] "Há%(count)s eventos no passado."
 msgid "protected"
 msgstr "protegido"
 
-#: indico/modules/categories/templates/display/event_list.html:106
+#: indico/modules/categories/templates/display/event_list.html:107
 msgid "This event is new."
 msgstr "Este evento é novo."
+
+#: indico/modules/categories/templates/display/event_list.html:108
+msgid "new"
+msgstr ""
 
 #: indico/modules/categories/templates/display/root_category.html:12
 msgid ""
@@ -2782,7 +2788,7 @@ msgid "Period:"
 msgstr "Período"
 
 #: indico/modules/categories/templates/display/overview/base.html:17
-#: indico/modules/events/management/forms.py:354
+#: indico/modules/events/management/forms.py:369
 msgid "Day"
 msgstr "Dia"
 
@@ -3007,6 +3013,7 @@ msgstr[1] "Você está apagando as seguintes categorias: "
 #: indico/modules/events/management/templates/_action_menu.html:91
 #: indico/modules/events/reminders/templates/reminders.html:36
 #: indico/modules/events/surveys/templates/management/survey.html:136
+#: indico/modules/events/templates/admin/_event_label_list.html:25
 #: indico/modules/events/templates/admin/_reference_type_list.html:25
 #: indico/modules/oauth/templates/app_details.html:39
 msgid "Delete"
@@ -3309,7 +3316,7 @@ msgid "The template has been deleted"
 msgstr "O template foi deletado"
 
 #: indico/modules/designer/forms.py:22
-#: indico/modules/events/management/forms.py:275
+#: indico/modules/events/management/forms.py:290
 #: indico/modules/events/papers/forms.py:191
 #: indico/modules/events/registration/forms.py:362
 msgid "Template"
@@ -3847,24 +3854,28 @@ msgstr "Concede direitos de gerenciamento para materiais e atas em todo o evento
 msgid "External ID Types"
 msgstr "Tipos de ID Externo"
 
-#: indico/modules/events/__init__.py:202
+#: indico/modules/events/__init__.py:193
+msgid "Event Labels"
+msgstr ""
+
+#: indico/modules/events/__init__.py:204
 msgid "Create lecture"
 msgstr "Criar palestra"
 
-#: indico/modules/events/__init__.py:203
+#: indico/modules/events/__init__.py:205
 msgid "Create meeting"
 msgstr "Criar reunião"
 
-#: indico/modules/events/__init__.py:204
+#: indico/modules/events/__init__.py:206
 msgid "Create conference"
 msgstr "Criar conferência"
 
-#: indico/modules/events/__init__.py:215
+#: indico/modules/events/__init__.py:217
 #: indico/modules/events/registration/stats.py:300
 msgid "Overview"
 msgstr "Visão Geral"
 
-#: indico/modules/events/__init__.py:216
+#: indico/modules/events/__init__.py:218
 msgid "My Conference"
 msgstr "Minha Conferência"
 
@@ -3880,8 +3891,8 @@ msgstr "Pessoas"
 #: indico/modules/events/clone.py:72
 #: indico/modules/events/contributions/forms.py:67
 #: indico/modules/events/contributions/forms.py:113
-#: indico/modules/events/forms.py:81
-#: indico/modules/events/management/forms.py:178
+#: indico/modules/events/forms.py:99
+#: indico/modules/events/management/forms.py:180
 #: indico/modules/events/management/templates/_event_person_list.html:5
 #: indico/modules/events/management/templates/_settings.html:127
 #: indico/modules/events/persons/templates/management/person_list.html:132
@@ -3890,7 +3901,7 @@ msgid "Speakers"
 msgstr "Palestrantes"
 
 #: indico/modules/events/clone.py:74
-#: indico/modules/events/management/forms.py:172
+#: indico/modules/events/management/forms.py:174
 #: indico/modules/events/management/templates/_settings.html:129
 #: indico/modules/events/persons/templates/management/person_list.html:134
 #: indico/modules/events/templates/display/conference.html:57
@@ -3918,43 +3929,51 @@ msgstr "A pessoa com o email '{}' está duplicada"
 msgid "Category default"
 msgstr "Padrão de categoria"
 
-#: indico/modules/events/forms.py:32
+#: indico/modules/events/forms.py:35
 msgid "The name of the external ID type"
 msgstr "O nome do tipo de ID Externo"
 
-#: indico/modules/events/forms.py:33
+#: indico/modules/events/forms.py:36
 msgid "URL template"
 msgstr "URL do model"
 
-#: indico/modules/events/forms.py:34
+#: indico/modules/events/forms.py:37
 msgid "The URL template must contain the '{value}' placeholder."
 msgstr "A URL do modelo deve conter o '{value}'."
 
-#: indico/modules/events/forms.py:35
+#: indico/modules/events/forms.py:38
 #: indico/modules/events/templates/admin/_reference_type_list.html:8
 msgid "Scheme"
 msgstr "Esquema"
 
-#: indico/modules/events/forms.py:36
+#: indico/modules/events/forms.py:39
 msgid "The scheme/protocol of the external ID type"
 msgstr "O esquema / protocolo do tipo de ID externo"
 
-#: indico/modules/events/forms.py:47
+#: indico/modules/events/forms.py:50
 msgid "This name is already in use."
 msgstr "Este nome já está em uso."
 
-#: indico/modules/events/forms.py:51
+#: indico/modules/events/forms.py:54
 msgid "The URL template must contain the placeholder '{value}'."
 msgstr "A URL do modelo deve conter o '{value}'."
 
-#: indico/modules/events/forms.py:56
-#: indico/modules/events/management/forms.py:59
+#: indico/modules/events/forms.py:59
+msgid "Color"
+msgstr ""
+
+#: indico/modules/events/forms.py:69
+msgid "This title is already in use."
+msgstr ""
+
+#: indico/modules/events/forms.py:74
+#: indico/modules/events/management/forms.py:61
 msgid "Event title"
 msgstr "Título do Evento"
 
 #: indico/modules/events/contributions/forms.py:48
-#: indico/modules/events/forms.py:58
-#: indico/modules/events/management/forms.py:168
+#: indico/modules/events/forms.py:76
+#: indico/modules/events/management/forms.py:170
 #: indico/modules/events/sessions/forms.py:73
 #: indico/modules/events/sessions/forms.py:84
 #: indico/modules/events/templates/display/conference.html:33
@@ -3962,14 +3981,14 @@ msgstr "Título do Evento"
 msgid "Location"
 msgstr "Localização"
 
-#: indico/modules/events/forms.py:64
+#: indico/modules/events/forms.py:82
 msgid "You are not allowed to create events in this category."
 msgstr "Você não tem permissão para criar eventos nesta categoria."
 
 #: indico/modules/events/abstracts/forms.py:560
-#: indico/modules/events/forms.py:70
-#: indico/modules/events/management/forms.py:101
-#: indico/modules/events/management/forms.py:107
+#: indico/modules/events/forms.py:88
+#: indico/modules/events/management/forms.py:103
+#: indico/modules/events/management/forms.py:109
 #: indico/modules/events/papers/forms.py:96
 #: indico/modules/events/registration/forms.py:113
 #: indico/modules/events/surveys/forms.py:78
@@ -3977,20 +3996,20 @@ msgid "Start"
 msgstr "Início"
 
 #: indico/modules/events/abstracts/forms.py:562
-#: indico/modules/events/forms.py:71
-#: indico/modules/events/management/forms.py:102
-#: indico/modules/events/management/forms.py:110
+#: indico/modules/events/forms.py:89
+#: indico/modules/events/management/forms.py:104
+#: indico/modules/events/management/forms.py:112
 #: indico/modules/events/papers/forms.py:98
 #: indico/modules/events/registration/forms.py:115
 #: indico/modules/events/surveys/forms.py:81
 msgid "End"
 msgstr "Fim"
 
-#: indico/modules/events/forms.py:79
+#: indico/modules/events/forms.py:97
 msgid "Dates"
 msgstr "Datas"
 
-#: indico/modules/events/forms.py:83 indico/modules/events/layout/forms.py:69
+#: indico/modules/events/forms.py:101 indico/modules/events/layout/forms.py:69
 #: indico/modules/events/layout/forms.py:74
 #: indico/modules/events/layout/forms.py:155
 #: indico/modules/events/layout/templates/layout_conference.html:27
@@ -4590,7 +4609,7 @@ msgstr "Deixar um comentário..."
 
 #: indico/modules/events/abstracts/forms.py:577
 #: indico/modules/events/contributions/contrib_fields.py:36
-#: indico/modules/events/management/forms.py:231
+#: indico/modules/events/management/forms.py:246
 #: indico/modules/events/papers/forms.py:204
 msgid "Visibility"
 msgstr "Visibilidade"
@@ -4855,7 +4874,7 @@ msgstr "Campos Higgs"
 msgid "Higgs Fields Posters"
 msgstr "Posters do Campo de Higgs"
 
-#: indico/modules/events/abstracts/controllers/abstract.py:49
+#: indico/modules/events/abstracts/controllers/abstract.py:51
 msgid "Abstract modified successfully"
 msgstr "Resumo modificado com sucesso"
 
@@ -4899,17 +4918,17 @@ msgid_plural "{count} linked contributions have been deleted."
 msgstr[0] "A contribuição vinculada foi apagada."
 msgstr[1] "{count} contribuições vinculadas foram apagadas."
 
-#: indico/modules/events/abstracts/controllers/boa.py:30
+#: indico/modules/events/abstracts/controllers/boa.py:32
 msgid "Book of Abstract settings have been saved"
 msgstr "As configurações do livro de resumos foram salvas"
 
-#: indico/modules/events/abstracts/controllers/display.py:55
+#: indico/modules/events/abstracts/controllers/display.py:58
 msgid ""
 "The Call for Abstracts is closed. Please contact the event organizer for "
 "further assistance."
 msgstr "A chamada para resumos está fechada. Entre em contato com o organizador do evento para obter mais assistência."
 
-#: indico/modules/events/abstracts/controllers/display.py:66
+#: indico/modules/events/abstracts/controllers/display.py:69
 msgid ""
 "Your abstract '{}' has been successfully submitted. It is registered with "
 "the number #{}. You will be notified by email with the submission details."
@@ -5149,10 +5168,10 @@ msgid "My abstracts"
 msgstr "Meus resumos"
 
 #: indico/modules/events/abstracts/templates/display/call_for_abstracts.html:24
-#: indico/modules/events/abstracts/templates/management/abstract_list.html:202
+#: indico/modules/events/abstracts/templates/management/abstract_list.html:204
 #: indico/modules/events/contributions/templates/display/contribution_list.html:18
-#: indico/modules/events/contributions/templates/management/contributions.html:181
-#: indico/modules/events/papers/templates/_paper_list.html:367
+#: indico/modules/events/contributions/templates/management/contributions.html:183
+#: indico/modules/events/papers/templates/_paper_list.html:375
 #: indico/modules/events/papers/templates/display/call_for_papers.html:58
 #: indico/modules/events/papers/templates/display/reviewing_area.html:61
 #: indico/modules/events/papers/templates/display/reviewing_area.html:87
@@ -5160,13 +5179,13 @@ msgstr "Meus resumos"
 msgid "Enter #id or search string"
 msgstr "Digite #id ou string de pesquisa"
 
-#: indico/modules/events/abstracts/templates/display/call_for_abstracts.html:29
-#: indico/modules/events/contributions/templates/display/contribution_list.html:33
+#: indico/modules/events/abstracts/templates/display/call_for_abstracts.html:30
+#: indico/modules/events/contributions/templates/display/contribution_list.html:34
 #: indico/modules/events/templates/header.html:207
 msgid "Export to PDF"
 msgstr "Exportar para PDF"
 
-#: indico/modules/events/abstracts/templates/display/call_for_abstracts.html:52
+#: indico/modules/events/abstracts/templates/display/call_for_abstracts.html:54
 msgid "Last modified:"
 msgstr "Modificado por último:"
 
@@ -5340,6 +5359,7 @@ msgstr "Parar o processamento neste momento se acionado"
 #: indico/modules/events/abstracts/templates/management/_notification_tpl_list.html:40
 #: indico/modules/events/registration/templates/management/regform.html:23
 #: indico/modules/events/surveys/templates/management/survey.html:67
+#: indico/modules/events/templates/admin/_event_label_list.html:19
 #: indico/modules/events/templates/admin/_reference_type_list.html:19
 #: indico/modules/vc/templates/manage_event.html:44
 msgid "Edit"
@@ -5424,7 +5444,7 @@ msgid "Abstracts"
 msgstr "Resumos"
 
 #: indico/modules/events/abstracts/templates/management/abstract_list.html:18
-#: indico/modules/events/abstracts/templates/management/overview.html:117
+#: indico/modules/events/abstracts/templates/management/overview.html:119
 msgid "List of abstracts"
 msgstr "Lista de resumos"
 
@@ -5484,17 +5504,19 @@ msgstr "Marcar resumos selecionados como duplicados"
 #: indico/modules/events/abstracts/templates/management/abstract_list.html:147
 #: indico/modules/events/contributions/templates/management/contributions.html:87
 #: indico/modules/events/contributions/templates/management/contributions.html:92
+#: indico/modules/events/papers/templates/_paper_list.html:355
+#: indico/modules/events/papers/templates/_paper_list.html:360
 #: indico/modules/events/sessions/templates/management/session_list.html:79
 #: indico/modules/events/sessions/templates/management/session_list.html:84
 msgid "Author list"
 msgstr "Lista de Autores"
 
-#: indico/modules/events/abstracts/templates/management/abstract_list.html:186
+#: indico/modules/events/abstracts/templates/management/abstract_list.html:188
 #: indico/modules/events/registration/templates/management/regform_reglist.html:199
 msgid "Adapt columns width"
 msgstr "Adaptar larguras das colunas"
 
-#: indico/modules/events/abstracts/templates/management/abstract_list.html:193
+#: indico/modules/events/abstracts/templates/management/abstract_list.html:195
 #: indico/modules/events/registration/templates/management/regform_reglist.html:206
 msgid "Generate a URL for the selected filters and columns."
 msgstr "Gere um URL para os filtros e colunas selecionados."
@@ -5638,20 +5660,20 @@ msgstr "Configurar questões de revisão de resumos"
 msgid "Questions"
 msgstr "Questões"
 
-#: indico/modules/events/abstracts/templates/management/overview.html:95
+#: indico/modules/events/abstracts/templates/management/overview.html:96
 msgid "Book of abstracts"
 msgstr "Livro de resumos"
 
-#: indico/modules/events/abstracts/templates/management/overview.html:97
+#: indico/modules/events/abstracts/templates/management/overview.html:98
 #, python-format
 msgid "Customize and <a href=%(url)s>download</a> the book of abstracts"
 msgstr "Customizar e <a href=%(url)s>baixar</a> o livro de resumos"
 
-#: indico/modules/events/abstracts/templates/management/overview.html:104
+#: indico/modules/events/abstracts/templates/management/overview.html:105
 msgid "Configure the book of abstracts"
 msgstr "Configurar o livro de resumos"
 
-#: indico/modules/events/abstracts/templates/management/overview.html:119
+#: indico/modules/events/abstracts/templates/management/overview.html:121
 msgid "View and perform actions on abstracts"
 msgstr "Ver e performar ações em resumos"
 
@@ -5808,22 +5830,22 @@ msgstr "Mostrar questões"
 msgid "Hide questions"
 msgstr "Ocultar questões"
 
-#: indico/modules/events/abstracts/templates/reviewing/judgment.html:127
+#: indico/modules/events/abstracts/templates/reviewing/judgment.html:129
 #, python-format
 msgid "<strong>%(name)s</strong> proposes to %(action)s"
 msgstr "<strong>%(name)s</strong>propôs a %(action)s"
 
-#: indico/modules/events/abstracts/templates/reviewing/judgment.html:133
+#: indico/modules/events/abstracts/templates/reviewing/judgment.html:135
 msgid "See review"
 msgstr "Ver revisão"
 
-#: indico/modules/events/abstracts/templates/reviewing/judgment.html:159
+#: indico/modules/events/abstracts/templates/reviewing/judgment.html:161
 msgid "Reviewing for track:"
 msgid_plural "Reviewing for tracks:"
 msgstr[0] "Revisando por trilha:"
 msgstr[1] "Revisando por trilhas:"
 
-#: indico/modules/events/abstracts/templates/reviewing/judgment.html:177
+#: indico/modules/events/abstracts/templates/reviewing/judgment.html:179
 msgid "Edit track list"
 msgstr "Editar lista de trilhas"
 
@@ -6244,7 +6266,7 @@ msgid "I disagree"
 msgstr "Eu discordo"
 
 #: indico/modules/events/agreements/forms.py:25
-#: indico/modules/rb/templates/booking_list.html:67
+#: indico/modules/rb/templates/booking_list.html:88
 msgid "Reason"
 msgstr "Razão"
 
@@ -6257,11 +6279,11 @@ msgstr "Razão"
 msgid "From"
 msgstr "De"
 
-#: indico/modules/events/agreements/forms.py:30
+#: indico/modules/events/agreements/forms.py:31
 msgid "Warning: this email address will be able to sign the agreement!"
 msgstr "Aviso: este endereço de e-mail poderá assinar o contrato!"
 
-#: indico/modules/events/agreements/forms.py:31
+#: indico/modules/events/agreements/forms.py:32
 #: indico/modules/events/persons/forms.py:25
 #: indico/modules/events/registration/forms.py:148
 #: indico/modules/events/registration/forms.py:224
@@ -6269,40 +6291,40 @@ msgstr "Aviso: este endereço de e-mail poderá assinar o contrato!"
 msgid "Email body"
 msgstr "Corpo do e-mail"
 
-#: indico/modules/events/agreements/forms.py:43
+#: indico/modules/events/agreements/forms.py:44
 #: indico/modules/events/registration/forms.py:164
 #: indico/modules/events/registration/forms.py:243
 #: indico/modules/events/surveys/forms.py:136
 msgid "Missing placeholders: {}"
 msgstr "Espaços reservados ausentes: {}"
 
-#: indico/modules/events/agreements/forms.py:47
+#: indico/modules/events/agreements/forms.py:48
 msgid "Answer"
 msgstr "Resposta"
 
-#: indico/modules/events/agreements/forms.py:48
+#: indico/modules/events/agreements/forms.py:49
 msgid "Agreement"
 msgstr "Acordo"
 
-#: indico/modules/events/agreements/forms.py:48
+#: indico/modules/events/agreements/forms.py:49
 msgid "Disagreement"
 msgstr "Desacordo"
 
-#: indico/modules/events/agreements/forms.py:49
+#: indico/modules/events/agreements/forms.py:50
 msgid "Document"
 msgstr "Documento"
 
-#: indico/modules/events/agreements/forms.py:50
+#: indico/modules/events/agreements/forms.py:51
 msgid ""
 "I confirm that I'm uploading a document that clearly shows this person's "
 "answer"
 msgstr "Eu confirmo que estou enviando um documento que mostra claramente a resposta dessa pessoa"
 
-#: indico/modules/events/agreements/forms.py:52
+#: indico/modules/events/agreements/forms.py:53
 msgid "I understand that I'm answering the agreement on behalf of this person"
 msgstr "Eu entendo que estou respondendo o acordo em nome dessa pessoa"
 
-#: indico/modules/events/agreements/forms.py:53
+#: indico/modules/events/agreements/forms.py:54
 msgid "This answer is legally binding and can't be changed afterwards."
 msgstr "Esta resposta é juridicamente vinculativa e não pode ser alterada posteriormente."
 
@@ -6480,7 +6502,7 @@ msgstr "Para as pessoas selecionadas"
 
 #: indico/modules/events/agreements/templates/dialogs/agreement_email_form_send.html:16
 #: indico/modules/events/persons/controllers.py:244
-#: indico/modules/events/registration/templates/management/email.html:6
+#: indico/modules/events/registration/templates/management/email.html:20
 #: indico/modules/events/registration/templates/management/regform_invite.html:11
 msgid "Send"
 msgstr "Enviar"
@@ -6578,14 +6600,14 @@ msgid "People"
 msgstr "Pessoas"
 
 #: indico/modules/events/contributions/forms.py:49
-#: indico/modules/events/management/forms.py:208
+#: indico/modules/events/management/forms.py:210
 #: indico/modules/events/management/templates/_settings.html:181
 msgid "Keywords"
 msgstr "Palavras chave"
 
 #: indico/modules/events/contributions/forms.py:50
 #: indico/modules/events/contributions/forms.py:115
-#: indico/modules/events/management/forms.py:209
+#: indico/modules/events/management/forms.py:211
 #: indico/modules/events/management/templates/_settings.html:190
 msgid "External IDs"
 msgstr "IDs Externos"
@@ -6603,7 +6625,7 @@ msgid "With the current duration the contribution exceeds the event end date"
 msgstr "Com a duração atual, a contribuição excede a data de término do evento"
 
 #: indico/modules/events/contributions/forms.py:94
-#: indico/modules/events/management/forms.py:219
+#: indico/modules/events/management/forms.py:234
 #: indico/modules/events/sessions/forms.py:56
 msgid "Permissions"
 msgstr "Permissões"
@@ -6677,74 +6699,74 @@ msgid ""
 "filters"
 msgstr "A contribuição '{}' não é exibida na lista devido aos filtros ativados"
 
-#: indico/modules/events/contributions/util.py:204
+#: indico/modules/events/contributions/util.py:218
 #: indico/modules/events/registration/util.py:531
 msgid ""
 "Row {}: malformed CSV data - please check that the number of columns is "
 "correct"
 msgstr "Linha {}: dados CSV malformados - verifique se o número de colunas está correto"
 
-#: indico/modules/events/contributions/util.py:209
+#: indico/modules/events/contributions/util.py:223
 msgid "Row {row}: can't parse date: \"{date}\""
 msgstr "Linha {row}: não é possível analisar a data: \"{date}\""
 
-#: indico/modules/events/contributions/util.py:214
+#: indico/modules/events/contributions/util.py:228
 msgid "Row {row}: can't parse duration: {duration}"
 msgstr "Linha {row}: não é possível analisar a duração: {duration}"
 
-#: indico/modules/events/contributions/util.py:218
+#: indico/modules/events/contributions/util.py:232
 msgid "Row {}: contribution title is required"
 msgstr "Linha {}: o título da contribuição é obrigatório"
 
-#: indico/modules/events/contributions/util.py:221
+#: indico/modules/events/contributions/util.py:235
 msgid "Row {row}: invalid email address: {email}"
 msgstr "Linha {row}: endereço de e-mail inválido: {email}"
 
-#: indico/modules/events/contributions/controllers/management.py:177
+#: indico/modules/events/contributions/controllers/management.py:178
 msgid "Contribution '{}' created successfully"
 msgstr "Contribuição '{}' criada com sucesso"
 
-#: indico/modules/events/contributions/controllers/management.py:197
+#: indico/modules/events/contributions/controllers/management.py:198
 msgid "Contribution '{}' successfully updated"
 msgstr "Contribuição '{}' atualizada com sucesso"
 
-#: indico/modules/events/contributions/controllers/management.py:213
+#: indico/modules/events/contributions/controllers/management.py:214
 msgid "The contribution has been deleted."
 msgid_plural "{count} contributions have been deleted."
 msgstr[0] "A contribuição foi apagada."
 msgstr[1] "{count} contribuições foram apagadas."
 
-#: indico/modules/events/contributions/controllers/management.py:238
+#: indico/modules/events/contributions/controllers/management.py:239
 msgid "Contribution '{}' successfully deleted"
 msgstr "Contribuição '{}' apagada com sucesso"
 
-#: indico/modules/events/contributions/controllers/management.py:325
+#: indico/modules/events/contributions/controllers/management.py:326
 msgid "Subcontribution '{}' created successfully"
 msgstr "Subcontribuição '{}' criada com sucesso"
 
-#: indico/modules/events/contributions/controllers/management.py:337
+#: indico/modules/events/contributions/controllers/management.py:338
 msgid "Subcontribution '{}' updated successfully"
 msgstr "Subcontribuição '{}' atualizada com sucesso"
 
-#: indico/modules/events/contributions/controllers/management.py:350
+#: indico/modules/events/contributions/controllers/management.py:351
 msgid "Subcontribution '{}' deleted successfully"
 msgstr "Subcontribuição '{}' apagada com sucesso"
 
-#: indico/modules/events/contributions/controllers/management.py:430
+#: indico/modules/events/contributions/controllers/management.py:431
 msgid "The selected contributions do not have any materials."
 msgstr "As contribuições selecionadas não possuem materiais."
 
-#: indico/modules/events/contributions/controllers/management.py:501
+#: indico/modules/events/contributions/controllers/management.py:514
 msgid "{} contribution has been imported."
 msgid_plural "{} contributions have been imported."
 msgstr[0] "{} contribuição foi importada."
 msgstr[1] "{} contribuições foram importadas."
 
-#: indico/modules/events/contributions/controllers/management.py:503
+#: indico/modules/events/contributions/controllers/management.py:516
 msgid "Event dates/times adjusted due to imported data."
 msgstr "Datas / horários do evento ajustados devido a dados importados."
 
-#: indico/modules/events/contributions/controllers/management.py:525
+#: indico/modules/events/contributions/controllers/management.py:538
 msgid "Default contribution duration was changed successfully"
 msgstr "A duração da contribuição padrão foi alterada com sucesso"
 
@@ -6812,27 +6834,27 @@ msgstr "Quadro: %(board_number)s"
 msgid "Edit contribution"
 msgstr "Editar contribuição"
 
-#: indico/modules/events/contributions/templates/display/contribution_display.html:182
+#: indico/modules/events/contributions/templates/display/contribution_display.html:184
 msgid "Primary author"
 msgid_plural "Primary authors"
 msgstr[0] "Autor primário"
 msgstr[1] "Autores primários"
 
-#: indico/modules/events/contributions/templates/display/contribution_display.html:199
+#: indico/modules/events/contributions/templates/display/contribution_display.html:201
 #: indico/modules/events/management/templates/_event_person_list.html:36
 msgid "Co-author"
 msgid_plural "Co-authors"
 msgstr[0] "Co-autor"
 msgstr[1] "Co-autores"
 
-#: indico/modules/events/contributions/templates/display/contribution_display.html:217
+#: indico/modules/events/contributions/templates/display/contribution_display.html:219
 #: indico/modules/events/contributions/templates/management/_contribution_list.html:33
 #: indico/modules/events/contributions/templates/management/_contribution_list.html:139
 #: indico/modules/events/timetable/templates/balloons/contribution.html:76
 msgid "Subcontributions"
 msgstr "Subcontribuições"
 
-#: indico/modules/events/contributions/templates/display/contribution_display.html:235
+#: indico/modules/events/contributions/templates/display/contribution_display.html:237
 #: indico/modules/events/contributions/templates/display/subcontribution_display.html:35
 #, python-format
 msgid "Edit subcontribution '%(title)s'"
@@ -6843,21 +6865,21 @@ msgid "Download current contribution:"
 msgstr "Baixar contribuição atual:"
 
 #: indico/modules/events/contributions/templates/display/contribution_list.html:24
-#: indico/modules/events/contributions/templates/management/contributions.html:170
+#: indico/modules/events/contributions/templates/management/contributions.html:172
 msgid "Contribution list configuration"
 msgstr "Configuração da lista de contribuições"
 
 #: indico/modules/events/contributions/templates/display/contribution_list.html:28
-#: indico/modules/events/contributions/templates/management/contributions.html:174
+#: indico/modules/events/contributions/templates/management/contributions.html:176
 msgid "Filters"
 msgstr "Filtros"
 
-#: indico/modules/events/contributions/templates/display/contribution_list.html:38
-#: indico/modules/events/contributions/templates/management/contributions.html:178
+#: indico/modules/events/contributions/templates/display/contribution_list.html:40
+#: indico/modules/events/contributions/templates/management/contributions.html:180
 msgid "Generate a URL for the selected filters."
 msgstr "Gerar uma URL para os filtros selecionados."
 
-#: indico/modules/events/contributions/templates/display/contribution_list.html:49
+#: indico/modules/events/contributions/templates/display/contribution_list.html:51
 #: indico/modules/events/contributions/templates/display/contribution_person_list_base.html:81
 #: indico/modules/events/contributions/templates/display/user_contribution_list.html:40
 #: indico/modules/events/registration/templates/display/regform_list.html:92
@@ -6929,7 +6951,7 @@ msgstr "Não há palestrantes"
 #: indico/modules/events/contributions/templates/management/_contribution_list.html:21
 #: indico/modules/events/management/templates/_settings.html:81
 #: indico/modules/events/reminders/forms.py:38
-#: indico/modules/rb/templates/booking_list.html:70
+#: indico/modules/rb/templates/booking_list.html:91
 msgid "Time"
 msgstr "Tempo"
 
@@ -7128,50 +7150,50 @@ msgstr "Pacote de material"
 msgid "Export data"
 msgstr "Exportar dados"
 
-#: indico/modules/events/contributions/templates/management/contributions.html:108
+#: indico/modules/events/contributions/templates/management/contributions.html:109
 #: indico/modules/events/sessions/templates/management/session_list.html:96
 msgid "PDF"
 msgstr "PDF"
 
-#: indico/modules/events/contributions/templates/management/contributions.html:114
+#: indico/modules/events/contributions/templates/management/contributions.html:115
 msgid "PDF (book of abstracts)"
 msgstr "PDF (livro de resumos)"
 
-#: indico/modules/events/contributions/templates/management/contributions.html:120
+#: indico/modules/events/contributions/templates/management/contributions.html:121
 msgid "PDF (book of abstracts - sorted by board number)"
 msgstr "PDF (livro de resumos - ordenado por número do quadro)"
 
-#: indico/modules/events/contributions/templates/management/contributions.html:126
+#: indico/modules/events/contributions/templates/management/contributions.html:127
 msgid "PDF (book of abstracts - sorted by schedule and board number)"
 msgstr "PDF (livro de resumos - ordenado por reserva e número do quadro)"
 
-#: indico/modules/events/contributions/templates/management/contributions.html:132
+#: indico/modules/events/contributions/templates/management/contributions.html:133
 msgid "PDF (book of abstracts - sorted by session and board number)"
 msgstr "PDF (livro de resumos - ordenado pela sessão e número do quadro)"
 
-#: indico/modules/events/contributions/templates/management/contributions.html:138
+#: indico/modules/events/contributions/templates/management/contributions.html:139
 msgid "PDF (book of abstracts - sorted by session, schedule and board number)"
 msgstr "PDF (livro de resumos - ordenado por sessão, reserva e número do quadro)"
 
-#: indico/modules/events/contributions/templates/management/contributions.html:145
+#: indico/modules/events/contributions/templates/management/contributions.html:147
 #: indico/modules/events/surveys/templates/management/survey.html:119
 msgid "CSV"
 msgstr "CSV"
 
-#: indico/modules/events/contributions/templates/management/contributions.html:151
+#: indico/modules/events/contributions/templates/management/contributions.html:153
 #: indico/modules/events/surveys/templates/management/survey.html:125
 msgid "XLSX (Excel)"
 msgstr "XLSX (Excel)"
 
-#: indico/modules/events/contributions/templates/management/contributions.html:156
+#: indico/modules/events/contributions/templates/management/contributions.html:158
 msgid "Import contributions from CSV file"
 msgstr "Importar contribuições do arquivo CSV"
 
-#: indico/modules/events/contributions/templates/management/contributions.html:158
+#: indico/modules/events/contributions/templates/management/contributions.html:160
 msgid "Import contributions from CSV File"
 msgstr "Importar contribuições do arquivo CSV"
 
-#: indico/modules/events/contributions/templates/management/contributions.html:160
+#: indico/modules/events/contributions/templates/management/contributions.html:162
 #: indico/modules/events/registration/templates/management/regform_reglist.html:97
 #: indico/modules/events/surveys/templates/management/survey_questionnaire.html:22
 msgid "Import"
@@ -7264,17 +7286,29 @@ msgstr "Novo tipo de contribuição"
 msgid "There are no contribution types yet."
 msgstr "Ainda não há tipos de contribuição."
 
-#: indico/modules/events/controllers/admin.py:56
+#: indico/modules/events/controllers/admin.py:59
 msgid "External ID type '{}' created successfully"
 msgstr "Tipo de ID externo '{}' criado com sucesso"
 
-#: indico/modules/events/controllers/admin.py:68
+#: indico/modules/events/controllers/admin.py:71
 msgid "External ID type '{}' successfully updated"
 msgstr "Tipo de ID externo '{}' atualizado com sucesso"
 
-#: indico/modules/events/controllers/admin.py:78
+#: indico/modules/events/controllers/admin.py:81
 msgid "External ID type '{}' successfully deleted"
 msgstr "Tipo de ID externo '{}' apagado com sucesso"
+
+#: indico/modules/events/controllers/admin.py:119
+msgid "Event label '{}' created successfully"
+msgstr ""
+
+#: indico/modules/events/controllers/admin.py:131
+msgid "Event label '{}' successfully updated"
+msgstr ""
+
+#: indico/modules/events/controllers/admin.py:141
+msgid "Event label '{}' successfully deleted"
+msgstr ""
 
 #: indico/modules/events/controllers/base.py:23
 msgid "An event with this ID does not exist."
@@ -7740,8 +7774,8 @@ msgstr "Adicionar espaçador"
 msgid "Edit page"
 msgstr "Editar página"
 
-#: indico/modules/events/logs/models/entries.py:21 indico/web/views.py:250
-#: indico/web/views.py:307
+#: indico/modules/events/logs/models/entries.py:21 indico/web/views.py:252
+#: indico/web/views.py:309
 msgid "Management"
 msgstr "Gerenciamento"
 
@@ -7755,7 +7789,7 @@ msgid "Participants"
 msgstr "Participantes"
 
 #: indico/modules/events/logs/models/entries.py:21
-#: indico/modules/events/management/forms.py:185
+#: indico/modules/events/management/forms.py:187
 #: indico/modules/users/__init__.py:65
 #: indico/modules/users/templates/emails.html:9
 msgid "Emails"
@@ -7793,213 +7827,229 @@ msgstr "Relatórios"
 msgid "Advanced options"
 msgstr "Opções avançadas"
 
-#: indico/modules/events/management/forms.py:52
+#: indico/modules/events/management/forms.py:54
 msgid "Clone Once"
 msgstr "Clonar uma vez"
 
-#: indico/modules/events/management/forms.py:53
+#: indico/modules/events/management/forms.py:55
 msgid "Clone with fixed Interval"
 msgstr "Clonar com intervalo fixo"
 
-#: indico/modules/events/management/forms.py:54
+#: indico/modules/events/management/forms.py:56
 msgid "Clone with recurring Pattern"
 msgstr "Clonar com padrão recorrente"
 
-#: indico/modules/events/management/forms.py:61
+#: indico/modules/events/management/forms.py:63
 msgid "URL shortcut"
 msgstr "Atalho para URL"
 
-#: indico/modules/events/management/forms.py:68
+#: indico/modules/events/management/forms.py:70
 msgid ""
 "<strong>{}SHORTCUT</strong> - the URL shortcut must be unique within this "
 "Indico instance and is not case sensitive."
 msgstr "<strong>{}SHORTCUT</strong> - o atalho de URL deve ser único dentro desta instância Indico e não é case sensitive (isso é, maiúsculas e minúsculas não importam)."
 
-#: indico/modules/events/management/forms.py:76
+#: indico/modules/events/management/forms.py:78
 msgid ""
 "The URL shortcut must contain at least one character that is not a digit."
 msgstr "O atalho de URL deve conter pelo menos um caractere que não seja um dígito."
 
-#: indico/modules/events/management/forms.py:78
+#: indico/modules/events/management/forms.py:80
 msgid "The URL shortcut contains an invalid character."
 msgstr "O atalho da URL contém um caractere inválido."
 
-#: indico/modules/events/management/forms.py:80
+#: indico/modules/events/management/forms.py:82
 msgid "The URL shortcut may not contain two consecutive slashes."
 msgstr "O atalho de URL não pode conter duas barras consecutivas."
 
-#: indico/modules/events/management/forms.py:82
+#: indico/modules/events/management/forms.py:84
 msgid "The URL shortcut may not begin/end with a slash."
 msgstr "O atalho de URL não pode começar / terminar com uma barra."
 
-#: indico/modules/events/management/forms.py:89
+#: indico/modules/events/management/forms.py:91
 msgid "The URL shortcut is already used in another event."
 msgstr "O atalho de URL já é usado em outro evento."
 
-#: indico/modules/events/management/forms.py:93
+#: indico/modules/events/management/forms.py:95
 msgid "This URL shortcut is not available."
 msgstr "Este atalho de URL não está disponível."
 
-#: indico/modules/events/management/forms.py:104
+#: indico/modules/events/management/forms.py:106
 msgid "Update timetable"
 msgstr "Atualizar a tabela de horários"
 
-#: indico/modules/events/management/forms.py:105
+#: indico/modules/events/management/forms.py:107
 msgid ""
 "Move sessions/contributions/breaks in the timetable according to the new "
 "event start time."
 msgstr "Mova as sessões / contribuições / quebras na tabela de horários de acordo com o novo horário de início do evento."
 
-#: indico/modules/events/management/forms.py:108
+#: indico/modules/events/management/forms.py:110
 msgid ""
 "Specifying this date overrides the start date displayed on the main "
 "conference page."
 msgstr "A especificação dessa data substitui a data de início exibida na página principal da conferência."
 
-#: indico/modules/events/management/forms.py:112
+#: indico/modules/events/management/forms.py:114
 msgid ""
 "Specifying this date overrides the end date displayed on the main conference"
 " page."
 msgstr "A especificação dessa data substitui a data final exibida na página principal da conferência."
 
-#: indico/modules/events/management/forms.py:141
+#: indico/modules/events/management/forms.py:143
 msgid "To use this start date the timetable must be updated."
 msgstr "Para usar esta data de início, a tabela de horários deve ser atualizado."
 
-#: indico/modules/events/management/forms.py:154
+#: indico/modules/events/management/forms.py:156
 msgid ""
 "The event is too short to fit all timetable entries. It must be at least {} "
 "longer."
 msgstr "O evento é muito curto para caber em qualquer dos espaços disponíveis de horários. Deve ser pelo menos {} maior."
 
-#: indico/modules/events/management/forms.py:163
+#: indico/modules/events/management/forms.py:165
 msgid "The event cannot end before its last timetable entry, which is at {}."
 msgstr "O evento não pode terminar antes de sua última entrada de horário, que é {}."
 
-#: indico/modules/events/management/forms.py:185
+#: indico/modules/events/management/forms.py:187
 msgid "email"
 msgstr "e-mail"
 
-#: indico/modules/events/management/forms.py:186
+#: indico/modules/events/management/forms.py:188
 msgid "Phone numbers"
 msgstr "Números de Telefone"
 
-#: indico/modules/events/management/forms.py:186
+#: indico/modules/events/management/forms.py:188
 msgid "number"
 msgstr "Número"
 
-#: indico/modules/events/management/forms.py:188
+#: indico/modules/events/management/forms.py:190
 msgid "Organizers"
 msgstr "Organizadores"
 
-#: indico/modules/events/management/forms.py:189
+#: indico/modules/events/management/forms.py:191
 msgid "Additional information"
 msgstr "Informações Adicionais"
 
-#: indico/modules/events/management/forms.py:191
+#: indico/modules/events/management/forms.py:193
 msgid "This text is displayed on the main conference page."
 msgstr "Este texto é exibido na página principal da conferência."
 
-#: indico/modules/events/management/forms.py:204
+#: indico/modules/events/management/forms.py:206
 #: indico/web/forms/fields/simple.py:112
 msgid "Invalid email address: {}"
 msgstr "Endereço de E-mail inválido: {}"
 
-#: indico/modules/events/management/forms.py:224
+#: indico/modules/events/management/forms.py:215
+#: indico/modules/events/management/templates/_settings.html:203
+#: indico/modules/events/templates/admin/_event_label_list.html:6
+msgid "Label"
+msgstr ""
+
+#: indico/modules/events/management/forms.py:216
+msgid "Label message"
+msgstr ""
+
+#: indico/modules/events/management/forms.py:217
+msgid ""
+"You can optionally provide a message that is shown when hovering the "
+"selected label."
+msgstr ""
+
+#: indico/modules/events/management/forms.py:239
 msgid "Access key"
 msgstr "Chave de acesso"
 
-#: indico/modules/events/management/forms.py:225
+#: indico/modules/events/management/forms.py:240
 msgid ""
 "It is more secure to use only the ACL and not set an access key. <strong>It "
 "will have no effect if the event is not protected</strong>"
 msgstr "É mais seguro usar apenas a ACL e não definir uma chave de acesso. <strong>Não terá efeito se o evento não estiver protegido</strong>"
 
-#: indico/modules/events/management/forms.py:229
+#: indico/modules/events/management/forms.py:244
 msgid "Contact information shown when someone lacks access to the event"
 msgstr "Informações de contato mostradas quando alguém não tem acesso ao evento"
 
-#: indico/modules/events/management/forms.py:232
+#: indico/modules/events/management/forms.py:247
 msgid ""
 "From which point in the category tree this event will be visible from "
 "(number of categories upwards). Applies to \"Today's events\" and Calendar "
 "only. If the event is moved, this number will be preserved."
 msgstr "A partir de qual ponto na árvore de categorias este evento será visível a partir de (número de categorias para cima). Aplica-se apenas aos \"eventos de hoje\" e ao calendário somente. Se o evento for movido, esse número será preservado."
 
-#: indico/modules/events/management/forms.py:256
+#: indico/modules/events/management/forms.py:271
 msgid "This event's visibility is currently limited by that of '{}'."
 msgstr "A visibilidade deste evento é atualmente limitada por '{}'."
 
-#: indico/modules/events/management/forms.py:276
+#: indico/modules/events/management/forms.py:291
 msgid "Horizontal margins"
 msgstr "Margem horizontal"
 
-#: indico/modules/events/management/forms.py:277
+#: indico/modules/events/management/forms.py:292
 msgid "Vertical margins"
 msgstr "Margem vertical"
 
-#: indico/modules/events/management/forms.py:278
+#: indico/modules/events/management/forms.py:293
 #: indico/modules/events/registration/forms.py:367
 #: indico/modules/events/timetable/forms.py:183
 msgid "Page size"
 msgstr "Tamanho da página"
 
-#: indico/modules/events/management/forms.py:288
+#: indico/modules/events/management/forms.py:303
 msgid "How to repeat"
 msgstr "Como repetir"
 
-#: indico/modules/events/management/forms.py:292
+#: indico/modules/events/management/forms.py:307
 msgid "What to clone"
 msgstr "O que clonar"
 
-#: indico/modules/events/management/forms.py:319
+#: indico/modules/events/management/forms.py:334
 msgid "You have to select a category"
 msgstr "Você tem que selecionar uma categoria"
 
-#: indico/modules/events/management/forms.py:321
+#: indico/modules/events/management/forms.py:336
 msgid "You can't create events in this category"
 msgstr "Você não pode criar eventos nesta categoria"
 
-#: indico/modules/events/management/forms.py:347
+#: indico/modules/events/management/forms.py:362
 msgid "Starting"
 msgstr "Iniciando"
 
-#: indico/modules/events/management/forms.py:351
+#: indico/modules/events/management/forms.py:366
 #: indico/modules/events/management/templates/_action_menu.html:107
 #: indico/modules/events/management/templates/clone_event.html:111
 msgid "Clone"
 msgstr "Clonar"
 
-#: indico/modules/events/management/forms.py:352
+#: indico/modules/events/management/forms.py:367
 msgid "Until a given day (inclusive)"
 msgstr "Até um determinado dia (inclusive)"
 
-#: indico/modules/events/management/forms.py:353
+#: indico/modules/events/management/forms.py:368
 msgid "A number of times"
 msgstr "Um número de vezes"
 
-#: indico/modules/events/management/forms.py:355
+#: indico/modules/events/management/forms.py:370
 msgid "Number of times"
 msgstr "Número de vezes"
 
-#: indico/modules/events/management/forms.py:357
+#: indico/modules/events/management/forms.py:372
 msgid "You can clone a maximum of 100 times"
 msgstr "Você pode clonar no máximo 100 vezes"
 
-#: indico/modules/events/management/forms.py:366
-#: indico/modules/events/management/forms.py:376
+#: indico/modules/events/management/forms.py:381
+#: indico/modules/events/management/forms.py:391
 msgid "Every"
 msgstr "Todo"
 
-#: indico/modules/events/management/forms.py:372
+#: indico/modules/events/management/forms.py:387
 msgid "The time period must be positive"
 msgstr "O período de tempo deve ser positivo"
 
-#: indico/modules/events/management/forms.py:377
+#: indico/modules/events/management/forms.py:392
 msgid "Months"
 msgstr "Meses"
 
-#: indico/modules/events/management/forms.py:378
+#: indico/modules/events/management/forms.py:393
 msgid "Number of months between repetitions"
 msgstr "Número de meses entre repetições"
 
@@ -8241,7 +8291,7 @@ msgstr "Editar datas do evento"
 #: indico/modules/events/management/templates/_settings.html:72
 #: indico/modules/events/reminders/forms.py:37
 #: indico/modules/news/templates/admin/news.html:35
-#: indico/modules/rb/templates/booking_list.html:69
+#: indico/modules/rb/templates/booking_list.html:90
 msgid "Date"
 msgstr "Data"
 
@@ -8255,7 +8305,7 @@ msgid "Edit event location"
 msgstr "Editar local do evento"
 
 #: indico/modules/events/management/templates/_settings.html:106
-#: indico/modules/rb/templates/booking_list.html:66
+#: indico/modules/rb/templates/booking_list.html:87
 #: indico/web/templates/forms/location_widget.html:61
 msgid "Room"
 msgstr "Sala"
@@ -8290,12 +8340,12 @@ msgid "Contact title"
 msgstr "Tìtulo de Contato"
 
 #: indico/modules/events/management/templates/_settings.html:177
-msgid "Edit keywords / references"
-msgstr "Editar palavras chaves / referências"
+msgid "Edit keywords / references / label"
+msgstr ""
 
 #: indico/modules/events/management/templates/_settings.html:177
-msgid "Edit keywords"
-msgstr "Editar palavras chaves"
+msgid "Edit keywords / label"
+msgstr ""
 
 #: indico/modules/events/management/templates/base.html:24
 msgid "See the display page of the event"
@@ -8459,17 +8509,17 @@ msgstr "Não há reservas ativas vinculadas a este evento"
 msgid "Book the room"
 msgstr "Reserve a sala"
 
-#: indico/modules/events/models/events.py:52
+#: indico/modules/events/models/events.py:54
 #: indico/modules/events/templates/management/_create_event_button.html:8
 msgid "Lecture"
 msgstr "Palestra"
 
-#: indico/modules/events/models/events.py:52
+#: indico/modules/events/models/events.py:54
 #: indico/modules/events/templates/management/_create_event_button.html:9
 msgid "Meeting"
 msgstr "Reunião"
 
-#: indico/modules/events/models/events.py:52
+#: indico/modules/events/models/events.py:54
 #: indico/modules/events/templates/management/_create_event_button.html:10
 msgid "Conference"
 msgstr "Conferência"
@@ -8872,7 +8922,7 @@ msgstr "Rejeitar papers selecionados"
 msgid "Mark to be corrected selected papers"
 msgstr "Marcar para corrigir papéis selecionados"
 
-#: indico/modules/events/papers/templates/_paper_list.html:356
+#: indico/modules/events/papers/templates/_paper_list.html:364
 msgid "Download papers"
 msgstr "Baixar papers"
 
@@ -10267,34 +10317,34 @@ msgstr "Linha {}: um dos registros está com um e-mail que já existe"
 msgid "Row {}: email address is not unique"
 msgstr "Linha {}: endereço de e-mail não é único"
 
-#: indico/modules/events/registration/controllers/display.py:212
+#: indico/modules/events/registration/controllers/display.py:213
 msgid "Your invitation code is not valid."
 msgstr "Seu código de convite não é válido."
 
-#: indico/modules/events/registration/controllers/display.py:216
+#: indico/modules/events/registration/controllers/display.py:217
 msgid "This invitation does not exist or has been withdrawn."
 msgstr "O convite não existe ou foi retirado."
 
-#: indico/modules/events/registration/controllers/display.py:248
+#: indico/modules/events/registration/controllers/display.py:249
 msgid ""
 "You are trying to register with a form that requires you to be logged in"
 msgstr "Você está tentando se registrar com um formulário que requer que você esteja logado"
 
-#: indico/modules/events/registration/controllers/display.py:297
+#: indico/modules/events/registration/controllers/display.py:298
 msgid ""
 "We could not find a registration for you.  If have already registered, "
 "please use the direct access link from the email you received after "
 "registering."
 msgstr "Não conseguimos encontrar um registro para você. Se você já se registrou, por favor, use o link de acesso direto do e-mail que você recebeu após o registro."
 
-#: indico/modules/events/registration/controllers/display.py:300
+#: indico/modules/events/registration/controllers/display.py:301
 msgid ""
 "We could not find a registration for you.  If have already registered, "
 "please use the direct access link from the email you received after "
 "registering or log in to your Indico account."
 msgstr "Não conseguimos encontrar um registro para você. Se você já se registrou, use o link de acesso direto do e-mail que você recebeu após registrar-se ou faça login na sua conta Indico."
 
-#: indico/modules/events/registration/controllers/display.py:320
+#: indico/modules/events/registration/controllers/display.py:321
 msgid "You declined the invitation to register."
 msgstr "Você recusou o convite para se registrar."
 
@@ -10340,39 +10390,39 @@ msgstr "As inscrições para {} foram agendadas"
 msgid "The selected registrants have been removed."
 msgstr "Os inscritos selecionados foram apagados."
 
-#: indico/modules/events/registration/controllers/management/reglists.py:226
+#: indico/modules/events/registration/controllers/management/reglists.py:225
 msgid "The email was sent."
 msgid_plural "{num} emails were sent."
 msgstr[0] "O e-mail foi enviado."
 msgstr[1] "{num} e-mails foram enviados."
 
-#: indico/modules/events/registration/controllers/management/reglists.py:244
+#: indico/modules/events/registration/controllers/management/reglists.py:247
 msgid "Registration was deleted."
 msgid_plural "{num} registrations were deleted."
 msgstr[0] "Inscrição foi apagada."
 msgstr[1] "{num} inscrições foram apagadas."
 
-#: indico/modules/events/registration/controllers/management/reglists.py:273
+#: indico/modules/events/registration/controllers/management/reglists.py:276
 msgid "The registration was created."
 msgstr "O registro foi criado."
 
-#: indico/modules/events/registration/controllers/management/reglists.py:330
+#: indico/modules/events/registration/controllers/management/reglists.py:333
 msgid ""
 "Text too large to generate a PDF with table style. Please try again "
 "generating with book style."
 msgstr "Texto muito grande para gerar um PDF com estilo de tabela. Por favor, tente novamente gerar com estilo de livro."
 
-#: indico/modules/events/registration/controllers/management/reglists.py:375
+#: indico/modules/events/registration/controllers/management/reglists.py:378
 msgid "{} registration has been imported."
 msgid_plural "{} registrations have been imported."
 msgstr[0] "{} registro foi importado."
 msgstr[1] "{} registros foram importados."
 
-#: indico/modules/events/registration/controllers/management/reglists.py:587
+#: indico/modules/events/registration/controllers/management/reglists.py:590
 msgid "Selected registrations marked as {} successfully."
 msgstr "Registros selecionados marcados como {} com sucesso."
 
-#: indico/modules/events/registration/controllers/management/reglists.py:598
+#: indico/modules/events/registration/controllers/management/reglists.py:601
 msgid "The status of the selected registrations was updated successfully."
 msgstr "O status dos inscritos selecionados foi atualizado com sucesso."
 
@@ -10567,7 +10617,7 @@ msgid "Total registrations"
 msgstr "Total de inscrições"
 
 #: indico/modules/events/registration/templates/display/conference_home.html:73
-#: indico/modules/rb/templates/booking_list.html:124
+#: indico/modules/rb/templates/booking_list.html:154
 msgid "See details"
 msgstr "Ver detalhes"
 
@@ -10962,7 +11012,17 @@ msgid ""
 "Try to clear the filters from the \"Customize list\" dialog."
 msgstr "Os critérios de filtragem não correspondem a nenhum dos registros existentes. Tente limpar os filtros da caixa de diálogo \"Personalizar lista\"."
 
-#: indico/modules/events/registration/templates/management/email.html:7
+#: indico/modules/events/registration/templates/management/email.html:10
+#: indico/modules/events/registration/templates/management/print_badges.html:7
+#, python-format
+msgid "Tickets are currently not available for the selected registration."
+msgid_plural ""
+"Tickets are currently not available for %(count)s out of the %(total)s "
+"selected registrations."
+msgstr[0] "Os ingressos não estão disponíveis no momento para o registrante selecionado."
+msgstr[1] "Os ingressos não estão disponíveis para %(count)s de %(total)s registrantes selecionados."
+
+#: indico/modules/events/registration/templates/management/email.html:21
 #: indico/modules/events/reminders/templates/edit_reminder.html:27
 msgid "Preview email"
 msgstr "Visualizar email"
@@ -11005,15 +11065,6 @@ msgstr "Não há formulário de inscrição para os participantes"
 #: indico/modules/vc/templates/manage_event_select.html:11
 msgid "Create"
 msgstr "Criar"
-
-#: indico/modules/events/registration/templates/management/print_badges.html:7
-#, python-format
-msgid "Tickets are currently not available for the selected registration."
-msgid_plural ""
-"Tickets are currently not available for %(count)s out of the %(total)s "
-"selected registrations."
-msgstr[0] "Os ingressos não estão disponíveis no momento para o registrante selecionado."
-msgstr[1] "Os ingressos não estão disponíveis para %(count)s de %(total)s registrantes selecionados."
 
 #: indico/modules/events/registration/templates/management/print_badges.html:20
 msgid "Page configuration"
@@ -11732,6 +11783,10 @@ msgstr "Você pode solicitar serviços adicionais para o seu evento. Clique em u
 #: indico/modules/events/roles/templates/roles.html:4
 msgid "Roles Setup"
 msgstr "Configuração de perfis"
+
+#: indico/modules/events/roles/clone.py:21
+msgid "Event roles"
+msgstr "Papéis do evento"
 
 #: indico/modules/events/roles/forms.py:22
 msgid "The full name of the role"
@@ -12916,6 +12971,27 @@ msgid_plural "%(count)s additional events have been created."
 msgstr[0] "Um evento adicional foi criado."
 msgstr[1] "%(count)s eventos adicionais foram criados."
 
+#: indico/modules/events/templates/admin/_event_label_list.html:21
+#, python-format
+msgid "Edit event label '%(name)s'"
+msgstr ""
+
+#: indico/modules/events/templates/admin/_event_label_list.html:27
+#, python-format
+msgid "Delete event label '%(name)s'?"
+msgstr ""
+
+#: indico/modules/events/templates/admin/_event_label_list.html:28
+#, python-format
+msgid ""
+"Are you sure you want to permanently delete the event label '%(name)s'? This"
+" action will remove it from all events that use it."
+msgstr ""
+
+#: indico/modules/events/templates/admin/_event_label_list.html:38
+msgid "There are no event labels yet."
+msgstr ""
+
 #: indico/modules/events/templates/admin/_reference_type_list.html:21
 #, python-format
 msgid "Edit %(name)s external ID type"
@@ -12936,6 +13012,15 @@ msgstr "Você tem certeza de que você deseja APAGAR PERMANENTEMENTE o tipo de I
 #: indico/modules/events/templates/admin/_reference_type_list.html:38
 msgid "There are no external ID types yet."
 msgstr "Ainda não há tipos de ID externos."
+
+#: indico/modules/events/templates/admin/event_labels.html:7
+msgid "Existing event labels"
+msgstr ""
+
+#: indico/modules/events/templates/admin/event_labels.html:12
+#: indico/modules/events/templates/admin/event_labels.html:14
+msgid "Create new event label"
+msgstr ""
 
 #: indico/modules/events/templates/admin/reference_types.html:7
 msgid "Existing external ID types"
@@ -13076,7 +13161,7 @@ msgstr "Editar sub-contribuição"
 msgid "%(start)s to %(end)s"
 msgstr "%(start)s até %(end)s"
 
-#: indico/modules/events/templates/display/conference/base.html:48
+#: indico/modules/events/templates/display/conference/base.html:51
 #, python-format
 msgid "%(tz)s timezone"
 msgstr "Fuso horário %(tz)s"
@@ -13108,11 +13193,11 @@ msgstr "Da mesma série"
 msgid "Organized by"
 msgstr "Organizado por"
 
-#: indico/modules/events/templates/display/indico/lecture.html:32
+#: indico/modules/events/templates/display/indico/lecture.html:35
 msgid "by"
 msgstr "por"
 
-#: indico/modules/events/templates/display/indico/meeting.html:41
+#: indico/modules/events/templates/display/indico/meeting.html:42
 msgid "Chairperson"
 msgid_plural "Chairpersons"
 msgstr[0] "Organizador"
@@ -14259,53 +14344,86 @@ msgstr "%(app_name)s não terá mais acesso aos seus dados do Indico. <br>Tem ce
 msgid "Revoke"
 msgstr "Revogar"
 
-#: indico/modules/rb/__init__.py:58 indico/modules/rb/__init__.py:70
+#: indico/modules/rb/__init__.py:66 indico/modules/rb/__init__.py:78
 #: indico/modules/rb/views.py:17
 msgid "Room Booking"
 msgstr "Reserva de sala"
 
-#: indico/modules/rb/__init__.py:64
+#: indico/modules/rb/__init__.py:72
 msgid "Room booking"
 msgstr "Reserva de sala"
 
-#: indico/modules/rb/__init__.py:102
-#: indico/modules/rb/templates/booking_list.html:23
-#: indico/modules/rb/templates/booking_list.html:38
-#: indico/modules/rb/templates/booking_list.html:54
+#: indico/modules/rb/__init__.py:110
+#: indico/modules/rb/templates/booking_list.html:26
+#: indico/modules/rb/templates/booking_list.html:43
+#: indico/modules/rb/templates/booking_list.html:59
+#: indico/modules/rb/templates/booking_list.html:75
 msgid "Book"
 msgstr "Reservar"
 
-#: indico/modules/rb/__init__.py:103
+#: indico/modules/rb/__init__.py:111
 msgid "Allows booking the room"
 msgstr "Permitir reserva da sala"
 
-#: indico/modules/rb/__init__.py:110
+#: indico/modules/rb/__init__.py:118
 msgid "Prebook"
 msgstr "Pre-agendar"
 
-#: indico/modules/rb/__init__.py:111
+#: indico/modules/rb/__init__.py:119
 msgid "Allows prebooking the room"
 msgstr "Permite pré-reservar o quarto"
 
-#: indico/modules/rb/__init__.py:119
+#: indico/modules/rb/__init__.py:127
 msgid "Override"
 msgstr "Sobrepor"
 
-#: indico/modules/rb/__init__.py:120
+#: indico/modules/rb/__init__.py:128
 msgid "Allows overriding restrictions when booking the room"
 msgstr "Permitir restrições de sobreposição quando agendando a sala"
 
-#: indico/modules/rb/__init__.py:127
+#: indico/modules/rb/__init__.py:135
 msgid "Moderate"
 msgstr "Moderar"
 
-#: indico/modules/rb/__init__.py:128
+#: indico/modules/rb/__init__.py:136
 msgid "Allows moderating bookings (approving/rejecting/editing)"
 msgstr "Permitir moderar agendamentos (aprovar / rejeitar / editar)"
 
-#: indico/modules/rb/schemas.py:313
+#: indico/modules/rb/schemas.py:345
 msgid "Booking cannot end before it starts"
 msgstr "A reserva não pode terminar antes de começar"
+
+#: indico/modules/rb/settings.py:17
+msgid "Rooms I own"
+msgstr "Salas que sou dono"
+
+#: indico/modules/rb/settings.py:17
+msgid "Rooms I manage"
+msgstr "Salas que gerencio"
+
+#: indico/modules/rb/settings.py:17
+msgid "Rooms I own or manage"
+msgstr "Salas que sou dono ou gerencio"
+
+#: indico/modules/rb/user_prefs.py:28
+msgid "Room notifications"
+msgstr "Notificações das salas"
+
+#: indico/modules/rb/user_prefs.py:29
+msgid ""
+"If you own or manage any rooms, you can choose whether to receive "
+"notifications about activity related to them."
+msgstr "Se você é dono ou gerencia qualquer sala, você pode escolher entre receber notificações sobre atividades relacionadas a elas."
+
+#: indico/modules/rb/user_prefs.py:32
+msgid "Room blacklist"
+msgstr "Lista negra das salas"
+
+#: indico/modules/rb/user_prefs.py:36
+msgid ""
+"Regardless of the room notifications selected above, you will never receive "
+"notifications for rooms selected in this list."
+msgstr "Independente das notificações da sala selecionadas acima, você nunca irá receber notificações para as salas selecionadas nesta lista."
 
 #: indico/modules/rb/controllers/__init__.py:24
 msgid "The room booking module is not enabled."
@@ -14315,26 +14433,26 @@ msgstr "O módulo de reserva de sala não está ativado."
 msgid "You are not authorized to access the room booking system."
 msgstr "Você não está autorizado a acessar o sistema de reserva de salas."
 
-#: indico/modules/rb/controllers/backend/admin.py:113
+#: indico/modules/rb/controllers/backend/admin.py:115
 msgid "Cannot delete location with active rooms"
 msgstr "Não é possível apagar localização com salas ativas"
 
-#: indico/modules/rb/controllers/backend/admin.py:161
-#: indico/modules/rb/controllers/backend/admin.py:223
-#: indico/modules/rb/controllers/backend/admin.py:293
-#: indico/modules/rb/controllers/backend/admin.py:367
+#: indico/modules/rb/controllers/backend/admin.py:163
+#: indico/modules/rb/controllers/backend/admin.py:225
+#: indico/modules/rb/controllers/backend/admin.py:295
+#: indico/modules/rb/controllers/backend/admin.py:374
 msgid "Name must be unique"
 msgstr "Nome deve ser único"
 
-#: indico/modules/rb/controllers/backend/admin.py:412
+#: indico/modules/rb/controllers/backend/admin.py:422
 msgid "Start time should not be later than end time"
 msgstr "Horário de início não deve ser depois que o horário de fim"
 
-#: indico/modules/rb/controllers/backend/bookings.py:160
+#: indico/modules/rb/controllers/backend/bookings.py:163
 msgid "You cannot create a booking which starts in the past"
 msgstr "Você não pode criar uma reserva que começa no passado"
 
-#: indico/modules/rb/controllers/backend/bookings.py:165
+#: indico/modules/rb/controllers/backend/bookings.py:168
 msgid "Bookings for the room \"{}\" may not be longer than {} days"
 msgstr "Reservas para a sala \"{}\" pode ser não mais do que {} dias"
 
@@ -14363,7 +14481,7 @@ msgstr "A reserva não tem ocorrências válidas"
 msgid "You cannot book this room more than {} days in advance"
 msgstr "Não é possível reservar esta sala com mais de {} dias de antecedência"
 
-#: indico/modules/rb/operations/bookings.py:321
+#: indico/modules/rb/operations/bookings.py:337
 msgid ""
 "Booking could not be created. Probably somebody else booked the room in the "
 "meantime."
@@ -14377,23 +14495,23 @@ msgstr "Reservas de evento"
 msgid "Event has already finished"
 msgstr "Evento já foi terminado"
 
-#: indico/modules/rb/templates/booking_list.html:68
+#: indico/modules/rb/templates/booking_list.html:89
 msgid "For whom"
 msgstr "Para quem"
 
-#: indico/modules/rb/templates/booking_list.html:71
+#: indico/modules/rb/templates/booking_list.html:92
 msgid "Linked to"
 msgstr "Linkado a"
 
-#: indico/modules/rb/templates/booking_list.html:83
+#: indico/modules/rb/templates/booking_list.html:104
 msgid "Rejected:"
 msgstr "Rejeitado:"
 
-#: indico/modules/rb/templates/booking_list.html:86
+#: indico/modules/rb/templates/booking_list.html:107
 msgid "Pre-booking"
 msgstr "Pré-reserva"
 
-#: indico/modules/rb/templates/booking_list.html:94
+#: indico/modules/rb/templates/booking_list.html:115
 msgid "recurring"
 msgstr "recorrente"
 
@@ -14443,111 +14561,111 @@ msgstr "Este usuário está marcado como pendente, ou seja, ele foi anexado a al
 msgid "Your personal data was successfully updated."
 msgstr "Seus dados pessoais foram atualizados com sucesso."
 
-#: indico/modules/users/controllers.py:168
+#: indico/modules/users/controllers.py:169
 msgid "Preferences saved"
 msgstr "Preferências salvas"
 
-#: indico/modules/users/controllers.py:254
+#: indico/modules/users/controllers.py:255
 msgid ""
 "We have sent an email to {email}. Please click the link in that email within"
 " 24 hours to confirm your new email address."
 msgstr "Enviamos um email para {email}. Por favor, clique no link desse e-mail dentro de 24 horas para confirmar seu novo endereço de e-mail."
 
-#: indico/modules/users/controllers.py:266
+#: indico/modules/users/controllers.py:267
 msgid "The verification token is invalid or expired."
 msgstr "O token de verificação é inválido ou expirou."
 
-#: indico/modules/users/controllers.py:270
+#: indico/modules/users/controllers.py:271
 msgid ""
 "This token is for a different Indico user. Please login with the correct "
 "account"
 msgstr "Este token é para um usuário Indico diferente. Por favor, faça o login com a conta correta"
 
-#: indico/modules/users/controllers.py:275
+#: indico/modules/users/controllers.py:276
 msgid "This email address is already attached to your account."
 msgstr "Este endereço de e-mail já está conectado à sua conta."
 
-#: indico/modules/users/controllers.py:277
+#: indico/modules/users/controllers.py:278
 msgid "This email address is already in use by another account."
 msgstr "Este endereço de e-mail já está sendo usado por outra conta."
 
-#: indico/modules/users/controllers.py:297
+#: indico/modules/users/controllers.py:298
 msgid "Merged data from existing '{}' identity"
 msgstr "Dados mesclados da identidade '{}' existente"
 
-#: indico/modules/users/controllers.py:302
+#: indico/modules/users/controllers.py:303
 msgid "The email address {email} has been added to your account."
 msgstr "O endereço de e-mail {email} foi adicionado à sua conta."
 
-#: indico/modules/users/controllers.py:319
+#: indico/modules/users/controllers.py:320
 msgid "Your primary email was updated successfully."
 msgstr "Seu email principal foi atualizado com sucesso."
 
-#: indico/modules/users/controllers.py:338
+#: indico/modules/users/controllers.py:339
 msgid "Admin added: {name} ({email})"
 msgstr "Admin adicionado: {name} ({email})"
 
-#: indico/modules/users/controllers.py:342
+#: indico/modules/users/controllers.py:343
 msgid "Admin removed: {name} ({email})"
 msgstr "Admin removido: {name} ({email})"
 
-#: indico/modules/users/controllers.py:415
+#: indico/modules/users/controllers.py:416
 msgid "The account has been created."
 msgstr "A conta foi criada."
 
-#: indico/modules/users/controllers.py:417
+#: indico/modules/users/controllers.py:418
 msgid "Show details"
 msgstr "Mostrar detalhes"
 
-#: indico/modules/users/controllers.py:428
+#: indico/modules/users/controllers.py:429
 msgid "Users are the same!"
 msgstr "Usuários são os mesmos!"
 
-#: indico/modules/users/controllers.py:431
+#: indico/modules/users/controllers.py:432
 msgid "Users' names seem to be different!"
 msgstr "Os nomes dos usuários parecem ser diferentes!"
 
-#: indico/modules/users/controllers.py:433
+#: indico/modules/users/controllers.py:434
 msgid "Source user has never logged in to Indico!"
 msgstr "Usuário de origem nunca fez login no Indico!"
 
-#: indico/modules/users/controllers.py:435
+#: indico/modules/users/controllers.py:436
 msgid "Target user has never logged in to Indico!"
 msgstr "O usuário alvo nunca entrou no Indico!"
 
-#: indico/modules/users/controllers.py:437
+#: indico/modules/users/controllers.py:438
 msgid "Source user has been deleted!"
 msgstr "O usuário de origem foi apagado!"
 
-#: indico/modules/users/controllers.py:439
+#: indico/modules/users/controllers.py:440
 msgid "Target user has been deleted!"
 msgstr "Usuário destino foi apagado!"
 
-#: indico/modules/users/controllers.py:441
+#: indico/modules/users/controllers.py:442
 msgid "Source user is an administrator!"
 msgstr "Usuário origem é um administrador!"
 
-#: indico/modules/users/controllers.py:443
+#: indico/modules/users/controllers.py:444
 msgid "Target user is an administrator!"
 msgstr "Usuário destino é um administrador!"
 
-#: indico/modules/users/controllers.py:445
+#: indico/modules/users/controllers.py:446
 msgid "Source user is an administrator but target user isn't!"
 msgstr "O usuário de origem é um administrador, mas o usuário de destino não é!"
 
-#: indico/modules/users/controllers.py:459
+#: indico/modules/users/controllers.py:460
 msgid "Merge aborted due to failed sanity check"
 msgstr "Mesclar abortado devido a falha na verificação de sanidade"
 
-#: indico/modules/users/controllers.py:466
+#: indico/modules/users/controllers.py:467
 msgid "The users have been successfully merged."
 msgstr "Os usuários foram mesclados com sucesso."
 
-#: indico/modules/users/controllers.py:504
+#: indico/modules/users/controllers.py:505
 msgid "The request has been approved."
 msgstr "A solicitação foi aprovada."
 
-#: indico/modules/users/controllers.py:515
+#: indico/modules/users/controllers.py:516
 msgid "The request has been rejected."
 msgstr "A solicitação foi rejeitada."
 

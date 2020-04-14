@@ -1,11 +1,11 @@
 # Translators:
 # Andre Garcia <sambombe@gmail.com>, 2019
-# Fernanda Paulo Ramos <fernanda.ramos+transifex@gmail.com>, 2019
+# Fernanda Paulo Ramos <fernanda.ramos+transifex@gmail.com>, 2020
 # 
 msgid ""
 msgstr ""
-"POT-Creation-Date: 2019-07-19 10:16+0200\n"
-"Last-Translator: Fernanda Paulo Ramos <fernanda.ramos+transifex@gmail.com>, 2019\n"
+"POT-Creation-Date: 2020-03-20 12:25+0100\n"
+"Last-Translator: Fernanda Paulo Ramos <fernanda.ramos+transifex@gmail.com>, 2020\n"
 "Language-Team: Portuguese (Brazil) (https://www.transifex.com/indico/teams/6478/pt_BR/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -34,84 +34,84 @@ msgstr "Anterior"
 msgid "Next"
 msgstr "Próximo"
 
-#: indico/modules/rb/client/js/common/bookings/BookingDetails.jsx:85
+#: indico/modules/rb/client/js/common/bookings/BookingDetails.jsx:88
 msgid "Booked for"
 msgstr "Reservado para"
 
-#: indico/modules/rb/client/js/common/bookings/BookingDetails.jsx:109
+#: indico/modules/rb/client/js/common/bookings/BookingDetails.jsx:112
 msgid "Booking reason"
 msgstr "Razão da Reserva"
 
-#: indico/modules/rb/client/js/common/bookings/BookingDetails.jsx:168
+#: indico/modules/rb/client/js/common/bookings/BookingDetails.jsx:206
 msgid "{date} - {info} by {user}"
 msgstr "{date} - {info} pelo(a) {user}"
 
-#: indico/modules/rb/client/js/common/bookings/BookingDetails.jsx:181
+#: indico/modules/rb/client/js/common/bookings/BookingDetails.jsx:219
 msgid "Booking history"
 msgstr "Histórico da Reserva"
 
-#: indico/modules/rb/client/js/common/bookings/BookingDetails.jsx:203
+#: indico/modules/rb/client/js/common/bookings/BookingDetails.jsx:241
 msgid "The booking has been successfully split."
 msgstr "A reserva foi dividida com sucesso."
 
-#: indico/modules/rb/client/js/common/bookings/BookingDetails.jsx:205
+#: indico/modules/rb/client/js/common/bookings/BookingDetails.jsx:243
 msgid "You can consult your new booking {link}here{/link}."
 msgstr "Você pode consultar sua nova reserva {link}aqui{/link}."
 
-#: indico/modules/rb/client/js/common/bookings/BookingDetails.jsx:225
+#: indico/modules/rb/client/js/common/bookings/BookingDetails.jsx:263
 msgid "Pending Confirmation"
 msgstr "Pendente de Confirmação"
 
-#: indico/modules/rb/client/js/common/bookings/BookingDetails.jsx:226
+#: indico/modules/rb/client/js/common/bookings/BookingDetails.jsx:264
 msgid "This booking is subject to acceptance by the room owner"
 msgstr "Esta reserva está sujeita a aceitação pelo proprietário da sala."
 
-#: indico/modules/rb/client/js/common/bookings/BookingDetails.jsx:230
-#: indico/modules/rb/client/js/common/timeline/TimelineItem.jsx:216
-#: indico/modules/rb/client/js/util.jsx:247
+#: indico/modules/rb/client/js/common/bookings/BookingDetails.jsx:268
+#: indico/modules/rb/client/js/common/timeline/TimelineItem.jsx:217
+#: indico/modules/rb/client/js/util.jsx:251
 msgid "Cancelled"
 msgstr "Cancelada(o)"
 
-#: indico/modules/rb/client/js/common/bookings/BookingDetails.jsx:233
+#: indico/modules/rb/client/js/common/bookings/BookingDetails.jsx:271
 msgid "The booking was cancelled."
 msgstr "A reserva foi cancelada."
 
-#: indico/modules/rb/client/js/common/bookings/BookingDetails.jsx:237
-#: indico/modules/rb/client/js/common/bookings/BookingDetails.jsx:255
+#: indico/modules/rb/client/js/common/bookings/BookingDetails.jsx:275
+#: indico/modules/rb/client/js/common/bookings/BookingDetails.jsx:293
 #: indico/modules/rb/client/js/modules/blockings/BlockingModal.jsx:140
 msgid "Reason: {rejectionReason}"
 msgstr "Razão: {rejectionReason}"
 
-#: indico/modules/rb/client/js/common/bookings/BookingDetails.jsx:248
-#: indico/modules/rb/client/js/common/timeline/TimelineItem.jsx:235
-#: indico/modules/rb/client/js/util.jsx:246
+#: indico/modules/rb/client/js/common/bookings/BookingDetails.jsx:286
+#: indico/modules/rb/client/js/common/timeline/TimelineItem.jsx:236
+#: indico/modules/rb/client/js/util.jsx:250
 msgid "Rejected"
 msgstr "Rejeitado"
 
-#: indico/modules/rb/client/js/common/bookings/BookingDetails.jsx:251
+#: indico/modules/rb/client/js/common/bookings/BookingDetails.jsx:289
 msgid "The booking was rejected."
 msgstr "A reserva foi rejeitada."
 
-#: indico/modules/rb/client/js/common/bookings/BookingDetails.jsx:266
+#: indico/modules/rb/client/js/common/bookings/BookingDetails.jsx:304
 msgid "Accepted"
 msgstr "Aceito"
 
-#: indico/modules/rb/client/js/common/bookings/BookingDetails.jsx:267
+#: indico/modules/rb/client/js/common/bookings/BookingDetails.jsx:305
 msgid "The booking was accepted"
 msgstr "A reserva foi aceita"
 
-#: indico/modules/rb/client/js/common/bookings/BookingDetails.jsx:293
+#: indico/modules/rb/client/js/common/bookings/BookingDetails.jsx:331
 #: indico/modules/rb/client/js/modules/admin/AdminRoomItem.jsx:48
 #: indico/modules/rb/client/js/modules/admin/EditableListItem.jsx:143
 #: indico/modules/rb/client/js/modules/blockings/BlockingModal.jsx:306
 msgid "Confirm deletion"
 msgstr "Confirmar deleção"
 
-#: indico/modules/rb/client/js/common/bookings/BookingDetails.jsx:294
+#: indico/modules/rb/client/js/common/bookings/BookingDetails.jsx:332
 msgid "Are you sure you want to delete this booking?"
 msgstr "Você tem certeza que você quer apagar esta reserva?"
 
-#: indico/modules/rb/client/js/common/bookings/BookingDetails.jsx:295
+#: indico/modules/rb/client/js/common/bookings/BookingDetails.jsx:333
 #: indico/modules/rb/client/js/common/rooms/RoomPhoto.jsx:117
 #: indico/modules/rb/client/js/modules/admin/AdminRoomItem.jsx:50
 #: indico/modules/rb/client/js/modules/admin/EditableListItem.jsx:145
@@ -119,46 +119,46 @@ msgstr "Você tem certeza que você quer apagar esta reserva?"
 msgid "Delete"
 msgstr "Apagar"
 
-#: indico/modules/rb/client/js/common/bookings/BookingDetails.jsx:296
+#: indico/modules/rb/client/js/common/bookings/BookingDetails.jsx:334
 #: indico/modules/rb/client/js/common/filters/FilterDropdown.jsx:169
-#: indico/modules/rb/client/js/common/rooms/RoomEditModal.jsx:945
+#: indico/modules/rb/client/js/common/rooms/RoomEditModal.jsx:972
 #: indico/modules/rb/client/js/common/rooms/RoomPhoto.jsx:129
 #: indico/modules/rb/client/js/modules/admin/AdminRoomItem.jsx:51
 #: indico/modules/rb/client/js/modules/admin/EditableListItem.jsx:146
 #: indico/modules/rb/client/js/modules/admin/MapAreasPage.jsx:315
 #: indico/modules/rb/client/js/modules/blockings/BlockingModal.jsx:309
-#: indico/web/client/js/react/components/principals/PrincipalPermissions.jsx:98
+#: indico/web/client/js/react/components/principals/PrincipalPermissions.jsx:103
 #: indico/web/client/js/react/components/principals/Search.jsx:327
 msgid "Cancel"
 msgstr "Cancelar"
 
-#: indico/modules/rb/client/js/common/bookings/BookingDetails.jsx:357
+#: indico/modules/rb/client/js/common/bookings/BookingDetails.jsx:395
 msgid "Reject booking"
 msgstr "Rejeitar reserva"
 
-#: indico/modules/rb/client/js/common/bookings/BookingDetails.jsx:372
+#: indico/modules/rb/client/js/common/bookings/BookingDetails.jsx:410
 #: indico/modules/rb/client/js/common/timeline/RowActionsDropdown.jsx:109
 #: indico/modules/rb/client/js/modules/blockings/BlockingModal.jsx:157
 msgid "Provide the rejection reason"
 msgstr "Forneça o motivo da rejeição"
 
-#: indico/modules/rb/client/js/common/bookings/BookingDetails.jsx:384
+#: indico/modules/rb/client/js/common/bookings/BookingDetails.jsx:422
 #: indico/modules/rb/client/js/common/timeline/RowActionsDropdown.jsx:122
 #: indico/modules/rb/client/js/modules/blockings/BlockingModal.jsx:169
 msgid "Reject"
 msgstr "Rejeitar"
 
-#: indico/modules/rb/client/js/common/bookings/BookingDetails.jsx:401
-#: indico/modules/rb/client/js/common/bookings/BookingDetails.jsx:409
+#: indico/modules/rb/client/js/common/bookings/BookingDetails.jsx:439
+#: indico/modules/rb/client/js/common/bookings/BookingDetails.jsx:447
 msgid "Cancel booking"
 msgstr "Cancelar reserva"
 
-#: indico/modules/rb/client/js/common/bookings/BookingDetails.jsx:404
+#: indico/modules/rb/client/js/common/bookings/BookingDetails.jsx:442
 #: indico/modules/rb/client/js/common/timeline/RowActionsDropdown.jsx:189
 msgid "Confirm cancellation"
 msgstr "Confirmar cancelamento"
 
-#: indico/modules/rb/client/js/common/bookings/BookingDetails.jsx:405
+#: indico/modules/rb/client/js/common/bookings/BookingDetails.jsx:443
 msgid ""
 "Are you sure you want to cancel this booking? This will cancel future "
 "occurrences of this booking."
@@ -166,10 +166,10 @@ msgstr ""
 "Você tem certeza que você quer cancelar este agendamento? Isso irá cancelar "
 "futuras ocorrências deste agendamento."
 
-#: indico/modules/rb/client/js/common/bookings/BookingDetails.jsx:410
+#: indico/modules/rb/client/js/common/bookings/BookingDetails.jsx:448
 #: indico/modules/rb/client/js/common/bookings/BookingEdit.jsx:230
 #: indico/modules/rb/client/js/common/bookings/BookingExportModal.jsx:87
-#: indico/modules/rb/client/js/common/rooms/RoomEditModal.jsx:943
+#: indico/modules/rb/client/js/common/rooms/RoomEditModal.jsx:970
 #: indico/modules/rb/client/js/common/timeline/RowActionsDropdown.jsx:197
 #: indico/modules/rb/client/js/common/timeline/RowActionsDropdown.jsx:209
 #: indico/modules/rb/client/js/modules/blockings/BlockingModal.jsx:429
@@ -177,15 +177,15 @@ msgstr ""
 msgid "Close"
 msgstr "Fechar"
 
-#: indico/modules/rb/client/js/common/bookings/BookingDetails.jsx:434
+#: indico/modules/rb/client/js/common/bookings/BookingDetails.jsx:472
 msgid "Accept booking"
 msgstr "Aceitar reserva"
 
-#: indico/modules/rb/client/js/common/bookings/BookingDetails.jsx:487
+#: indico/modules/rb/client/js/common/bookings/BookingDetails.jsx:526
 msgid "Booking Details"
 msgstr "Detalhes de Reserva"
 
-#: indico/modules/rb/client/js/common/bookings/BookingDetails.jsx:525
+#: indico/modules/rb/client/js/common/bookings/BookingDetails.jsx:566
 #: indico/modules/rb/client/js/common/bookings/BookingEditCalendar.jsx:126
 msgid "Occurrences"
 msgstr "Ocorrências"
@@ -436,153 +436,158 @@ msgstr "Adicionar novos períodos não reservados"
 msgid "No non-bookable periods found"
 msgstr "Nenhum período não reservado foi encontrado"
 
-#: indico/modules/rb/client/js/common/rooms/RoomDetailsModal.jsx:194
+#: indico/modules/rb/client/js/common/rooms/RoomDetailsModal.jsx:206
 #: indico/modules/rb/client/js/modules/bookRoom/BookRoomModal.jsx:587
 msgid "Usage"
 msgstr "Uso"
 
-#: indico/modules/rb/client/js/common/rooms/RoomDetailsModal.jsx:214
+#: indico/modules/rb/client/js/common/rooms/RoomDetailsModal.jsx:228
 msgid "See all bookings"
 msgstr "Veja todas as reservas"
 
-#: indico/modules/rb/client/js/common/rooms/RoomDetailsModal.jsx:223
+#: indico/modules/rb/client/js/common/rooms/RoomDetailsModal.jsx:242
 msgid "Would you like to use this space?"
 msgstr "Você gostaria de usar este espaço?"
 
-#: indico/modules/rb/client/js/common/rooms/RoomDetailsModal.jsx:229
+#: indico/modules/rb/client/js/common/rooms/RoomDetailsModal.jsx:248
 msgid "Start booking"
 msgstr "Começar a reserva"
 
-#: indico/modules/rb/client/js/common/rooms/RoomDetailsModal.jsx:235
+#: indico/modules/rb/client/js/common/rooms/RoomDetailsModal.jsx:254
 msgid "Start pre-booking"
 msgstr "Começar a pré-reserva"
 
-#: indico/modules/rb/client/js/common/rooms/RoomDetailsModal.jsx:266
+#: indico/modules/rb/client/js/common/rooms/RoomDetailsModal.jsx:286
 msgid "Anyone can book this space."
 msgstr "Qualquer um pode reservar este espaço."
 
-#: indico/modules/rb/client/js/common/rooms/RoomDetailsModal.jsx:268
+#: indico/modules/rb/client/js/common/rooms/RoomDetailsModal.jsx:288
 msgid "You can book this space."
 msgstr "Você pode reservar este espaço."
 
-#: indico/modules/rb/client/js/common/rooms/RoomDetailsModal.jsx:273
+#: indico/modules/rb/client/js/common/rooms/RoomDetailsModal.jsx:293
 msgid "Max. {max_advance_days} days in advance"
 msgstr "Max. {max_advance_days} dias de antecedência"
 
-#: indico/modules/rb/client/js/common/rooms/RoomDetailsModal.jsx:288
+#: indico/modules/rb/client/js/common/rooms/RoomDetailsModal.jsx:308
 msgid "This space cannot be booked at the moment."
 msgstr "Este espaço não pode ser reservado no momento."
 
-#: indico/modules/rb/client/js/common/rooms/RoomDetailsModal.jsx:297
+#: indico/modules/rb/client/js/common/rooms/RoomDetailsModal.jsx:317
 msgid "You are not authorized to book this space."
 msgstr "Você não está autorizado a reservar este espaço."
 
-#: indico/modules/rb/client/js/common/rooms/RoomDetailsModal.jsx:51
+#: indico/modules/rb/client/js/common/rooms/RoomDetailsModal.jsx:53
 msgid "Room Details"
 msgstr "Detalhes da sala"
 
-#: indico/modules/rb/client/js/common/rooms/RoomEditModal.jsx:81
+#: indico/modules/rb/client/js/common/rooms/RoomEditModal.jsx:84
 msgid "Please provide a building."
 msgstr "Por favor, forneça um prédio."
 
-#: indico/modules/rb/client/js/common/rooms/RoomEditModal.jsx:84
+#: indico/modules/rb/client/js/common/rooms/RoomEditModal.jsx:87
 msgid "Please provide a floor."
 msgstr "Por favor, forneça um andar."
 
-#: indico/modules/rb/client/js/common/rooms/RoomEditModal.jsx:87
+#: indico/modules/rb/client/js/common/rooms/RoomEditModal.jsx:90
 msgid "Please provide a number."
 msgstr "Por favor, forneça um número."
 
-#: indico/modules/rb/client/js/common/rooms/RoomEditModal.jsx:90
+#: indico/modules/rb/client/js/common/rooms/RoomEditModal.jsx:93
 msgid "Please provide a valid capacity number."
 msgstr "Por favor, forneça um número de capacidade válido."
 
-#: indico/modules/rb/client/js/common/rooms/RoomEditModal.jsx:93
+#: indico/modules/rb/client/js/common/rooms/RoomEditModal.jsx:96
 msgid "Please provide a valid surface area."
 msgstr "Por favor, forneça uma área de superfície válida."
 
-#: indico/modules/rb/client/js/common/rooms/RoomEditModal.jsx:96
+#: indico/modules/rb/client/js/common/rooms/RoomEditModal.jsx:99
 msgid "The max. advance booking time must be at least 1 day or empty."
 msgstr ""
 "O max. tempo de reserva antecipada deve ser de pelo menos 1 dia ou vazio."
 
-#: indico/modules/rb/client/js/common/rooms/RoomEditModal.jsx:101
+#: indico/modules/rb/client/js/common/rooms/RoomEditModal.jsx:104
 msgid "The max. booking duration must be at least 1 day or empty."
 msgstr "O max. de duração da reserva deve ser de pelo menos 1 dia ou vazia."
 
-#: indico/modules/rb/client/js/common/rooms/RoomEditModal.jsx:117
+#: indico/modules/rb/client/js/common/rooms/RoomEditModal.jsx:120
 msgid "Number of days must be between 1 and 30"
 msgstr "O número de dias deve estar entre 1 e 30"
 
-#: indico/modules/rb/client/js/common/rooms/RoomEditModal.jsx:122
+#: indico/modules/rb/client/js/common/rooms/RoomEditModal.jsx:125
 msgid "Please provide valid non-bookable periods."
 msgstr "Por favor, forneça períodos válidos não reservados."
 
-#: indico/modules/rb/client/js/common/rooms/RoomEditModal.jsx:125
+#: indico/modules/rb/client/js/common/rooms/RoomEditModal.jsx:128
 msgid "You need to specify the owner of the room."
 msgstr "Você precisa especificar o proprietário da sala."
 
-#: indico/modules/rb/client/js/common/rooms/RoomEditModal.jsx:136
+#: indico/modules/rb/client/js/common/rooms/RoomEditModal.jsx:131
+#: indico/modules/rb/client/js/common/rooms/RoomEditModal.jsx:134
+msgid "Coordinates should be valid numbers."
+msgstr "Coordenadas devem ser números válidos."
+
+#: indico/modules/rb/client/js/common/rooms/RoomEditModal.jsx:145
 msgid "Photo"
 msgstr "Foto"
 
-#: indico/modules/rb/client/js/common/rooms/RoomEditModal.jsx:143
-#: indico/modules/rb/client/js/components/SidebarFooter.jsx:40
-#: indico/modules/rb/client/js/components/SidebarFooter.jsx:119
+#: indico/modules/rb/client/js/common/rooms/RoomEditModal.jsx:152
+#: indico/modules/rb/client/js/components/SidebarFooter.jsx:41
+#: indico/modules/rb/client/js/components/SidebarFooter.jsx:125
 msgid "Contact"
 msgstr "Contato"
 
-#: indico/modules/rb/client/js/common/rooms/RoomEditModal.jsx:148
+#: indico/modules/rb/client/js/common/rooms/RoomEditModal.jsx:157
 msgid "Owner"
 msgstr "Proprietário(a)"
 
-#: indico/modules/rb/client/js/common/rooms/RoomEditModal.jsx:153
+#: indico/modules/rb/client/js/common/rooms/RoomEditModal.jsx:162
 msgid "Where is the key?"
 msgstr "Onde está a chave?"
 
-#: indico/modules/rb/client/js/common/rooms/RoomEditModal.jsx:159
+#: indico/modules/rb/client/js/common/rooms/RoomEditModal.jsx:168
 msgid "Telephone"
 msgstr "Telefone"
 
-#: indico/modules/rb/client/js/common/rooms/RoomEditModal.jsx:164
+#: indico/modules/rb/client/js/common/rooms/RoomEditModal.jsx:173
 msgid "Information"
 msgstr "Informação"
 
-#: indico/modules/rb/client/js/common/rooms/RoomEditModal.jsx:173
+#: indico/modules/rb/client/js/common/rooms/RoomEditModal.jsx:182
 #: indico/modules/rb/client/js/components/RoomBasicDetails.jsx:159
 msgid "Capacity"
 msgstr "Capacidade"
 
-#: indico/modules/rb/client/js/common/rooms/RoomEditModal.jsx:184
+#: indico/modules/rb/client/js/common/rooms/RoomEditModal.jsx:193
 msgid "Division"
 msgstr "Divisão"
 
-#: indico/modules/rb/client/js/common/rooms/RoomEditModal.jsx:195
+#: indico/modules/rb/client/js/common/rooms/RoomEditModal.jsx:204
 msgid "Comments"
 msgstr "Comentários"
 
-#: indico/modules/rb/client/js/common/rooms/RoomEditModal.jsx:200
+#: indico/modules/rb/client/js/common/rooms/RoomEditModal.jsx:209
 msgid "Daily availability"
 msgstr "Disponibilidade diária"
 
-#: indico/modules/rb/client/js/common/rooms/RoomEditModal.jsx:207
+#: indico/modules/rb/client/js/common/rooms/RoomEditModal.jsx:216
 msgid "Permissions"
 msgstr "Permissões"
 
-#: indico/modules/rb/client/js/common/rooms/RoomEditModal.jsx:211
+#: indico/modules/rb/client/js/common/rooms/RoomEditModal.jsx:220
 msgid "Booking mode"
 msgstr "Modo de reserva"
 
-#: indico/modules/rb/client/js/common/rooms/RoomEditModal.jsx:215
+#: indico/modules/rb/client/js/common/rooms/RoomEditModal.jsx:224
 msgid "User and group permissions"
 msgstr "Permissões de usuário e de grupo"
 
-#: indico/modules/rb/client/js/common/rooms/RoomEditModal.jsx:222
+#: indico/modules/rb/client/js/common/rooms/RoomEditModal.jsx:231
 #: indico/modules/rb/client/js/components/RoomSelector.jsx:138
 msgid "Location"
 msgstr "Localização"
 
-#: indico/modules/rb/client/js/common/rooms/RoomEditModal.jsx:227
+#: indico/modules/rb/client/js/common/rooms/RoomEditModal.jsx:236
 #: indico/modules/rb/client/js/modules/admin/AttributesPage.jsx:78
 #: indico/modules/rb/client/js/modules/admin/EquipmentTypeList.jsx:79
 #: indico/modules/rb/client/js/modules/admin/LocationPage.jsx:103
@@ -590,171 +595,169 @@ msgstr "Localização"
 msgid "Name"
 msgstr "Nome"
 
-#: indico/modules/rb/client/js/common/rooms/RoomEditModal.jsx:236
+#: indico/modules/rb/client/js/common/rooms/RoomEditModal.jsx:245
 msgid "Site"
 msgstr "Site"
 
-#: indico/modules/rb/client/js/common/rooms/RoomEditModal.jsx:246
+#: indico/modules/rb/client/js/common/rooms/RoomEditModal.jsx:255
 #: indico/modules/rb/client/js/modules/roomList/RoomFilterBar.jsx:167
 #: indico/modules/rb/client/js/modules/roomList/filters/BuildingForm.jsx:55
 msgid "Building"
 msgstr "Prédio"
 
-#: indico/modules/rb/client/js/common/rooms/RoomEditModal.jsx:255
+#: indico/modules/rb/client/js/common/rooms/RoomEditModal.jsx:264
 msgid "Floor"
 msgstr "Andar"
 
-#: indico/modules/rb/client/js/common/rooms/RoomEditModal.jsx:264
+#: indico/modules/rb/client/js/common/rooms/RoomEditModal.jsx:273
 msgid "Number"
 msgstr "Número"
 
-#: indico/modules/rb/client/js/common/rooms/RoomEditModal.jsx:279
-msgid "Longitude"
-msgstr "Longitude"
-
-#: indico/modules/rb/client/js/common/rooms/RoomEditModal.jsx:289
+#: indico/modules/rb/client/js/common/rooms/RoomEditModal.jsx:288
 msgid "Latitude"
 msgstr "Latitude"
 
-#: indico/modules/rb/client/js/common/rooms/RoomEditModal.jsx:301
+#: indico/modules/rb/client/js/common/rooms/RoomEditModal.jsx:299
+msgid "Longitude"
+msgstr "Longitude"
+
+#: indico/modules/rb/client/js/common/rooms/RoomEditModal.jsx:312
 msgid "Surface Area (m²)"
 msgstr "Área de Superfície (m²)"
 
-#: indico/modules/rb/client/js/common/rooms/RoomEditModal.jsx:311
+#: indico/modules/rb/client/js/common/rooms/RoomEditModal.jsx:322
 msgid "Maximum advance time for bookings (days)"
 msgstr "Tempo máximo de antecedência para reservas (dias)"
 
-#: indico/modules/rb/client/js/common/rooms/RoomEditModal.jsx:321
+#: indico/modules/rb/client/js/common/rooms/RoomEditModal.jsx:332
 msgid "Max duration of a booking (day)"
 msgstr "Duração máxima de uma reserva (dia)"
 
-#: indico/modules/rb/client/js/common/rooms/RoomEditModal.jsx:330
+#: indico/modules/rb/client/js/common/rooms/RoomEditModal.jsx:341
 msgid "Options"
 msgstr "Opções"
 
-#: indico/modules/rb/client/js/common/rooms/RoomEditModal.jsx:335
+#: indico/modules/rb/client/js/common/rooms/RoomEditModal.jsx:346
 msgid "Bookable"
 msgstr "Reservável"
 
-#: indico/modules/rb/client/js/common/rooms/RoomEditModal.jsx:340
+#: indico/modules/rb/client/js/common/rooms/RoomEditModal.jsx:351
 msgid "Require confirmation (pre-bookings)"
 msgstr "Requer confirmação (pré-reserva)"
 
-#: indico/modules/rb/client/js/common/rooms/RoomEditModal.jsx:345
+#: indico/modules/rb/client/js/common/rooms/RoomEditModal.jsx:356
 msgid "Reminders enabled"
 msgstr "Lembretes habilitados"
 
-#: indico/modules/rb/client/js/common/rooms/RoomEditModal.jsx:350
+#: indico/modules/rb/client/js/common/rooms/RoomEditModal.jsx:361
 msgid "Reminders of finishing bookings enabled"
 msgstr "Lembretes de finalização de reserva habilitados"
 
-#: indico/modules/rb/client/js/common/rooms/RoomEditModal.jsx:354
+#: indico/modules/rb/client/js/common/rooms/RoomEditModal.jsx:365
 msgid "Notifications"
 msgstr "Notificações"
 
-#: indico/modules/rb/client/js/common/rooms/RoomEditModal.jsx:359
+#: indico/modules/rb/client/js/common/rooms/RoomEditModal.jsx:370
 msgid "Notification emails"
 msgstr "E-mails de Notificação"
 
-#: indico/modules/rb/client/js/common/rooms/RoomEditModal.jsx:365
+#: indico/modules/rb/client/js/common/rooms/RoomEditModal.jsx:376
 msgid "How many days in advance booking reminders should be sent"
 msgstr ""
 "Com quantos dias de antecedência os lembretes de reserva devem ser enviados"
 
-#: indico/modules/rb/client/js/common/rooms/RoomEditModal.jsx:370
+#: indico/modules/rb/client/js/common/rooms/RoomEditModal.jsx:381
 msgid "Single/Daily"
 msgstr "Única/Diária"
 
-#: indico/modules/rb/client/js/common/rooms/RoomEditModal.jsx:382
-#: indico/modules/rb/client/js/common/rooms/RoomEditModal.jsx:426
-#: indico/modules/rb/client/js/util.jsx:179
+#: indico/modules/rb/client/js/common/rooms/RoomEditModal.jsx:393
+#: indico/modules/rb/client/js/common/rooms/RoomEditModal.jsx:437
 msgid "Weekly"
-msgid_plural "Every {number} weeks"
-msgstr[0] "Semanalmente"
-msgstr[1] "A cada {number} semanas"
+msgstr "Semanalmente"
 
-#: indico/modules/rb/client/js/common/rooms/RoomEditModal.jsx:394
-#: indico/modules/rb/client/js/common/rooms/RoomEditModal.jsx:438
-#: indico/modules/rb/client/js/util.jsx:191
+#: indico/modules/rb/client/js/common/rooms/RoomEditModal.jsx:405
+#: indico/modules/rb/client/js/common/rooms/RoomEditModal.jsx:449
 msgid "Monthly"
-msgid_plural "Every {number} months"
-msgstr[0] "Mensalmente"
-msgstr[1] "A cada {number} meses"
+msgstr "Mensalmente"
 
-#: indico/modules/rb/client/js/common/rooms/RoomEditModal.jsx:409
+#: indico/modules/rb/client/js/common/rooms/RoomEditModal.jsx:420
 msgid "How many days before the end of a booking should reminders be sent"
 msgstr ""
 "Quantos dias antes do final de uma reserva os lembretes devem ser enviados"
 
-#: indico/modules/rb/client/js/common/rooms/RoomEditModal.jsx:414
+#: indico/modules/rb/client/js/common/rooms/RoomEditModal.jsx:425
 #: indico/modules/rb/client/js/modules/bookRoom/filters/RecurrenceForm.jsx:83
 #: indico/modules/rb/client/js/util.jsx:170
 msgid "Daily"
 msgstr "Diariamente"
 
-#: indico/modules/rb/client/js/common/rooms/RoomEditModal.jsx:454
+#: indico/modules/rb/client/js/common/rooms/RoomEditModal.jsx:465
 msgid "Custom attributes"
 msgstr "Atributos customizados"
 
-#: indico/modules/rb/client/js/common/rooms/RoomEditModal.jsx:458
+#: indico/modules/rb/client/js/common/rooms/RoomEditModal.jsx:469
 msgid "Add new attributes"
 msgstr "Adicionar novos atributos"
 
-#: indico/modules/rb/client/js/common/rooms/RoomEditModal.jsx:462
+#: indico/modules/rb/client/js/common/rooms/RoomEditModal.jsx:473
 msgid "Equipment available"
 msgstr "Equipamento disponível"
 
-#: indico/modules/rb/client/js/common/rooms/RoomEditModal.jsx:466
-#: indico/modules/rb/client/js/common/rooms/RoomEditModal.jsx:846
+#: indico/modules/rb/client/js/common/rooms/RoomEditModal.jsx:477
+#: indico/modules/rb/client/js/common/rooms/RoomEditModal.jsx:859
 msgid "Add new equipment"
 msgstr "Adicionar novo equipamento"
 
-#: indico/modules/rb/client/js/common/rooms/RoomEditModal.jsx:470
+#: indico/modules/rb/client/js/common/rooms/RoomEditModal.jsx:481
 msgid "Non-bookable periods"
 msgstr "Períodos não reserváveis"
 
-#: indico/modules/rb/client/js/common/rooms/RoomEditModal.jsx:764
+#: indico/modules/rb/client/js/common/rooms/RoomEditModal.jsx:776
 msgid "No custom attributes found"
 msgstr "Não foram encontrados atributos customizados"
 
-#: indico/modules/rb/client/js/common/rooms/RoomEditModal.jsx:874
+#: indico/modules/rb/client/js/common/rooms/RoomEditModal.jsx:887
 msgid "Restricted rooms can only be booked by users defined in the room ACL"
 msgstr ""
 "Salas restritas só podem ser reservadas por usuários definidos na ACL da "
 "sala"
 
-#: indico/modules/rb/client/js/common/rooms/RoomEditModal.jsx:879
+#: indico/modules/rb/client/js/common/rooms/RoomEditModal.jsx:892
 msgid "Public"
 msgstr "Público"
 
-#: indico/modules/rb/client/js/common/rooms/RoomEditModal.jsx:883
+#: indico/modules/rb/client/js/common/rooms/RoomEditModal.jsx:896
 msgid "Restricted"
 msgstr "Restrito"
 
-#: indico/modules/rb/client/js/common/rooms/RoomEditModal.jsx:914
+#: indico/modules/rb/client/js/common/rooms/RoomEditModal.jsx:927
 msgid "Add Room"
 msgstr "Adicionar Sala"
 
-#: indico/modules/rb/client/js/common/rooms/RoomEditModal.jsx:914
+#: indico/modules/rb/client/js/common/rooms/RoomEditModal.jsx:927
 msgid "Edit Room Details"
 msgstr "Editar Detalhes da Sala"
 
-#: indico/modules/rb/client/js/common/rooms/RoomEditModal.jsx:928
+#: indico/modules/rb/client/js/common/rooms/RoomEditModal.jsx:941
 msgid "Room has been successfully created."
 msgstr "A sala foi criada com sucesso."
 
-#: indico/modules/rb/client/js/common/rooms/RoomEditModal.jsx:931
+#: indico/modules/rb/client/js/common/rooms/RoomEditModal.jsx:944
 msgid "Room has been successfully updated."
 msgstr "Sala foi atualizada com sucesso."
 
-#: indico/modules/rb/client/js/common/rooms/RoomEditModal.jsx:934
+#: indico/modules/rb/client/js/common/rooms/RoomEditModal.jsx:948
 msgid "Room could not be updated."
 msgstr "Sala não pode ser atualizada."
 
 #: indico/modules/rb/client/js/common/rooms/RoomEditModal.jsx:955
+msgid "Reset form"
+msgstr "Reiniciar formulário"
+
+#: indico/modules/rb/client/js/common/rooms/RoomEditModal.jsx:982
 #: indico/modules/rb/client/js/common/rooms/RoomPhoto.jsx:104
 #: indico/modules/rb/client/js/modules/admin/EditableListItem.jsx:117
-#: indico/modules/rb/client/js/modules/admin/SettingsPage.jsx:259
+#: indico/modules/rb/client/js/modules/admin/SettingsPage.jsx:269
 msgid "Save"
 msgstr "Salvar"
 
@@ -804,6 +807,10 @@ msgid_plural "Last {days} days"
 msgstr[0] "Último dia"
 msgstr[1] "Últimos {dias} dias"
 
+#: indico/modules/rb/client/js/common/timeline/DailyTimelineContent.jsx:319
+msgid "Please turn your device horizontally to view this page."
+msgstr "Por favor gire o dispositivo horizontalmente para ver esta página"
+
 #: indico/modules/rb/client/js/common/timeline/DateNavigator.jsx:169
 msgid "Day"
 msgstr "Dia"
@@ -824,7 +831,7 @@ msgstr "Dica: clique e arraste para agendar!"
 msgid "Tip: click and drag to pre-book!"
 msgstr "Dica: clique e arraste para pré-reservar"
 
-#: indico/modules/rb/client/js/common/timeline/ElasticTimeline.jsx:46
+#: indico/modules/rb/client/js/common/timeline/ElasticTimeline.jsx:48
 msgid "No occurrences found"
 msgstr "Sem ocorrências encontradas"
 
@@ -854,50 +861,50 @@ msgstr ""
 msgid "Confirm rejection"
 msgstr "Confirmar rejeição"
 
-#: indico/modules/rb/client/js/common/timeline/TimelineItem.jsx:188
-#: indico/modules/rb/client/js/common/timeline/TimelineItem.jsx:193
+#: indico/modules/rb/client/js/common/timeline/TimelineItem.jsx:189
+#: indico/modules/rb/client/js/common/timeline/TimelineItem.jsx:194
 msgid "Space blocked: {reason}"
 msgstr "Espaço bloqueado: {reason}"
 
-#: indico/modules/rb/client/js/common/timeline/TimelineItem.jsx:194
+#: indico/modules/rb/client/js/common/timeline/TimelineItem.jsx:195
 msgid "(You are allowed to make a booking)"
 msgstr "(Você pode fazer uma reserva)"
 
-#: indico/modules/rb/client/js/common/timeline/TimelineItem.jsx:200
+#: indico/modules/rb/client/js/common/timeline/TimelineItem.jsx:201
 msgid "Not possible to book in this period"
 msgstr "Não é possível reservar neste período"
 
-#: indico/modules/rb/client/js/common/timeline/TimelineItem.jsx:206
+#: indico/modules/rb/client/js/common/timeline/TimelineItem.jsx:207
 msgid "Not possible to book between:"
 msgstr "Não é possível reservar entre:"
 
-#: indico/modules/rb/client/js/common/timeline/TimelineItem.jsx:219
-#: indico/modules/rb/client/js/common/timeline/TimelineItem.jsx:238
+#: indico/modules/rb/client/js/common/timeline/TimelineItem.jsx:220
+#: indico/modules/rb/client/js/common/timeline/TimelineItem.jsx:239
 msgid "Reason: {reason}"
 msgstr "Razão: {reason}"
 
-#: indico/modules/rb/client/js/common/timeline/TimelineItem.jsx:227
+#: indico/modules/rb/client/js/common/timeline/TimelineItem.jsx:228
 msgid "This occurrence will be cancelled"
 msgstr "Esta ocorrência será cancelada"
 
-#: indico/modules/rb/client/js/common/timeline/TimelineItem.jsx:246
+#: indico/modules/rb/client/js/common/timeline/TimelineItem.jsx:247
 msgid "This occurrence is conflicting with an existing booking"
 msgstr "Esta ocorrência conflita com uma reserva existente"
 
-#: indico/modules/rb/client/js/common/timeline/TimelineItem.jsx:255
+#: indico/modules/rb/client/js/common/timeline/TimelineItem.jsx:256
 msgid "Full overlap between two pre-bookings:"
 msgstr "Sobreposição completa entre duas pré-reservas:"
 
-#: indico/modules/rb/client/js/common/timeline/TimelineItem.jsx:260
+#: indico/modules/rb/client/js/common/timeline/TimelineItem.jsx:261
 #: indico/modules/rb/client/js/modules/bookRoom/BookRoomModal.jsx:326
 msgid "{time} by {bookedForName} ({bookingReason})"
 msgstr "{time} por {bookedForName} ({bookingReason})"
 
-#: indico/modules/rb/client/js/common/timeline/TimelineItem.jsx:279
+#: indico/modules/rb/client/js/common/timeline/TimelineItem.jsx:280
 msgid "Click to book it"
 msgstr "Clique para reservar"
 
-#: indico/modules/rb/client/js/common/timeline/TimelineItem.jsx:280
+#: indico/modules/rb/client/js/common/timeline/TimelineItem.jsx:281
 msgid "Click to pre-book it"
 msgstr "Clique para pré-reservar"
 
@@ -1002,21 +1009,21 @@ msgstr "Sala"
 msgid "There are no rooms selected."
 msgstr "Não há salas selecionadas."
 
-#: indico/modules/rb/client/js/components/SidebarFooter.jsx:28
+#: indico/modules/rb/client/js/components/SidebarFooter.jsx:29
 msgid "Help"
 msgstr "Ajuda"
 
-#: indico/modules/rb/client/js/components/SidebarFooter.jsx:53
-#: indico/modules/rb/client/js/components/SidebarFooter.jsx:136
+#: indico/modules/rb/client/js/components/SidebarFooter.jsx:54
+#: indico/modules/rb/client/js/components/SidebarFooter.jsx:142
 msgid "Terms and Conditions"
 msgstr "Termos e Condições"
 
-#: indico/modules/rb/client/js/components/SidebarFooter.jsx:66
-#: indico/modules/rb/client/js/components/SidebarFooter.jsx:146
+#: indico/modules/rb/client/js/components/SidebarFooter.jsx:67
+#: indico/modules/rb/client/js/components/SidebarFooter.jsx:152
 msgid "Privacy Policy"
 msgstr "Política de privacidade"
 
-#: indico/modules/rb/client/js/components/SidebarFooter.jsx:123
+#: indico/modules/rb/client/js/components/SidebarFooter.jsx:129
 msgid "If you need support, you can contact the following email address:"
 msgstr ""
 "Se você precisar de suporte, você pode contactar pelo seguinte endereço de "
@@ -1227,7 +1234,7 @@ msgid "Room name format"
 msgstr "Formato do nome da sala"
 
 #: indico/modules/rb/client/js/modules/admin/LocationPage.jsx:115
-#: indico/modules/rb/client/js/modules/admin/SettingsPage.jsx:128
+#: indico/modules/rb/client/js/modules/admin/SettingsPage.jsx:138
 msgid "Missing placeholder: {placeholders}"
 msgid_plural "Missing placeholders: {placeholders}"
 msgstr[0] "Espaço reservado ausente: {placeholders}"
@@ -1360,10 +1367,22 @@ msgstr ""
 "usuários / grupos."
 
 #: indico/modules/rb/client/js/modules/admin/SettingsPage.jsx:112
+msgid "Allow owners/managers to edit their rooms"
+msgstr "Permita proprietários e gerentes que editem suas salas."
+
+#: indico/modules/rb/client/js/modules/admin/SettingsPage.jsx:114
+msgid ""
+"By default only admins can modify rooms, but you can allow room owners and "
+"managers to modify them as well."
+msgstr ""
+"Por padrão, apenas admins podem modificar salas, mas você pode permitir que "
+"gerentes de salas e proprietários modifiquem-as também."
+
+#: indico/modules/rb/client/js/modules/admin/SettingsPage.jsx:122
 msgid "Tileserver URL"
 msgstr "Tileserver URL"
 
-#: indico/modules/rb/client/js/modules/admin/SettingsPage.jsx:114
+#: indico/modules/rb/client/js/modules/admin/SettingsPage.jsx:124
 msgid ""
 "If you want to use the map, specify the URL to a tileserver covering the "
 "area in which your rooms are located."
@@ -1371,63 +1390,63 @@ msgstr ""
 "Se você quiser usar o mapa, especifique a URL para um tileserver cobrindo a "
 "área em que suas salas estão localizadas."
 
-#: indico/modules/rb/client/js/modules/admin/SettingsPage.jsx:124
+#: indico/modules/rb/client/js/modules/admin/SettingsPage.jsx:134
 #: indico/web/client/js/react/forms/validators.js:53
 msgid "Please provide a valid URL"
 msgstr "Por favor, insira uma URL válida"
 
-#: indico/modules/rb/client/js/modules/admin/SettingsPage.jsx:143
+#: indico/modules/rb/client/js/modules/admin/SettingsPage.jsx:153
 msgid "Max. booking length"
 msgstr "Max. Comprimento de reserva"
 
-#: indico/modules/rb/client/js/modules/admin/SettingsPage.jsx:144
+#: indico/modules/rb/client/js/modules/admin/SettingsPage.jsx:154
 msgid "The maximum length (in days) a booking may last."
 msgstr "A duração máxima (em dias) de uma reserva pode durar."
 
-#: indico/modules/rb/client/js/modules/admin/SettingsPage.jsx:149
+#: indico/modules/rb/client/js/modules/admin/SettingsPage.jsx:159
 msgid "Send reminders for upcoming bookings"
 msgstr "Envie lembretes para as próximas reservas"
 
-#: indico/modules/rb/client/js/modules/admin/SettingsPage.jsx:154
+#: indico/modules/rb/client/js/modules/admin/SettingsPage.jsx:164
 msgid "Specify how many days in advance booking reminders should be sent"
 msgstr ""
 "Especifique quantos dias de antecedência os lembretes de reserva devem ser "
 "enviados"
 
-#: indico/modules/rb/client/js/modules/admin/SettingsPage.jsx:165
+#: indico/modules/rb/client/js/modules/admin/SettingsPage.jsx:175
 msgid "Single/Daily bookings"
 msgstr "Reservas individuais / diárias"
 
-#: indico/modules/rb/client/js/modules/admin/SettingsPage.jsx:174
-#: indico/modules/rb/client/js/modules/admin/SettingsPage.jsx:216
+#: indico/modules/rb/client/js/modules/admin/SettingsPage.jsx:184
+#: indico/modules/rb/client/js/modules/admin/SettingsPage.jsx:226
 msgid "Weekly bookings"
 msgstr "Reservas semanais"
 
-#: indico/modules/rb/client/js/modules/admin/SettingsPage.jsx:183
-#: indico/modules/rb/client/js/modules/admin/SettingsPage.jsx:225
+#: indico/modules/rb/client/js/modules/admin/SettingsPage.jsx:193
+#: indico/modules/rb/client/js/modules/admin/SettingsPage.jsx:235
 msgid "Monthly bookings"
 msgstr "Reservas mensais"
 
-#: indico/modules/rb/client/js/modules/admin/SettingsPage.jsx:191
+#: indico/modules/rb/client/js/modules/admin/SettingsPage.jsx:201
 msgid "Send reminders when bookings are about to end"
 msgstr "Enviar lembretes quando as reservas estão prestes a terminar"
 
-#: indico/modules/rb/client/js/modules/admin/SettingsPage.jsx:196
+#: indico/modules/rb/client/js/modules/admin/SettingsPage.jsx:206
 msgid ""
 "Specify how many days before the end of a booking reminders should be sent"
 msgstr ""
 "Especifique quantos dias antes do final da reserva lembretes devem ser "
 "enviados"
 
-#: indico/modules/rb/client/js/modules/admin/SettingsPage.jsx:207
+#: indico/modules/rb/client/js/modules/admin/SettingsPage.jsx:217
 msgid "Daily bookings"
 msgstr "Reservas diárias"
 
-#: indico/modules/rb/client/js/modules/admin/SettingsPage.jsx:235
+#: indico/modules/rb/client/js/modules/admin/SettingsPage.jsx:245
 msgid "Disable booking during event creation"
 msgstr "Desativar reserva durante a criação do evento"
 
-#: indico/modules/rb/client/js/modules/admin/SettingsPage.jsx:237
+#: indico/modules/rb/client/js/modules/admin/SettingsPage.jsx:247
 msgid ""
 "Specify the IDs of categories for which booking a room during event creation"
 " will not be suggested."
@@ -1435,11 +1454,11 @@ msgstr ""
 "Especifique os IDs das categorias para as quais a reserva de uma sala "
 "durante a criação do evento não será sugerida."
 
-#: indico/modules/rb/client/js/modules/admin/SettingsPage.jsx:249
+#: indico/modules/rb/client/js/modules/admin/SettingsPage.jsx:259
 msgid "Grace period"
 msgstr "Período de carência"
 
-#: indico/modules/rb/client/js/modules/admin/SettingsPage.jsx:251
+#: indico/modules/rb/client/js/modules/admin/SettingsPage.jsx:261
 msgid ""
 "Usually booking a space in the past is not allowed. This setting will allow "
 "to book a room with a start date within a specified number of hours in the "
@@ -1453,44 +1472,44 @@ msgstr ""
 "também."
 
 #: indico/modules/rb/client/js/modules/blockings/BlockingCard.jsx:32
-msgid "1 room"
+msgid "{count} room"
 msgid_plural "{count} rooms"
-msgstr[0] "1 sala"
+msgstr[0] "{count} sala"
 msgstr[1] "{count} salas"
 
 #: indico/modules/rb/client/js/modules/blockings/BlockingCard.jsx:71
 msgid "Created by {createdBy}"
 msgstr "Criado por {createdBy}"
 
-#: indico/modules/rb/client/js/modules/blockings/BlockingFilterBar.jsx:20
+#: indico/modules/rb/client/js/modules/blockings/BlockingFilterBar.jsx:21
 msgid "Active and future"
 msgstr "Ativo e futuro"
 
-#: indico/modules/rb/client/js/modules/blockings/BlockingFilterBar.jsx:21
+#: indico/modules/rb/client/js/modules/blockings/BlockingFilterBar.jsx:22
 msgid "All blockings this year"
 msgstr "Todos os bloqueios este ano"
 
-#: indico/modules/rb/client/js/modules/blockings/BlockingFilterBar.jsx:22
+#: indico/modules/rb/client/js/modules/blockings/BlockingFilterBar.jsx:23
 msgid "All blockings"
 msgstr "Todos os bloqueios"
 
-#: indico/modules/rb/client/js/modules/blockings/BlockingFilterBar.jsx:51
+#: indico/modules/rb/client/js/modules/blockings/BlockingFilterBar.jsx:52
 msgid "Filter by date"
 msgstr "Filtrar por data"
 
-#: indico/modules/rb/client/js/modules/blockings/BlockingFilterBar.jsx:64
+#: indico/modules/rb/client/js/modules/blockings/BlockingFilterBar.jsx:65
 msgid "Blockings in my rooms"
 msgstr "Bloqueios nas minhas salas"
 
-#: indico/modules/rb/client/js/modules/blockings/BlockingFilterBar.jsx:69
+#: indico/modules/rb/client/js/modules/blockings/BlockingFilterBar.jsx:70
 msgid "Show only blockings in my rooms"
 msgstr "Mostrar apenas bloqueios nas minhas salas"
 
-#: indico/modules/rb/client/js/modules/blockings/BlockingFilterBar.jsx:74
+#: indico/modules/rb/client/js/modules/blockings/BlockingFilterBar.jsx:75
 msgid "My blockings"
 msgstr "Meus bloqueios"
 
-#: indico/modules/rb/client/js/modules/blockings/BlockingFilterBar.jsx:79
+#: indico/modules/rb/client/js/modules/blockings/BlockingFilterBar.jsx:80
 msgid "Show only my blockings"
 msgstr "Mostrar apenas meus bloqueios"
 
@@ -1881,7 +1900,7 @@ msgstr ""
 "As reservas nesta sala não podem durar tanto tempo e serão reduzidas de "
 "acordo com as regras."
 
-#: indico/modules/rb/client/js/modules/bookRoom/BookingTimeline.jsx:75
+#: indico/modules/rb/client/js/modules/bookRoom/BookingTimeline.jsx:78
 msgid "There are no rooms matching the criteria."
 msgstr "Não há salas que correspondam aos critérios."
 
@@ -1926,7 +1945,7 @@ msgstr "Nenhum espaço conhecido corresponde à sua consulta"
 msgid "No spaces are available during that time slot"
 msgstr "Não há espaços disponíveis durante esse horário"
 
-#: indico/modules/rb/client/js/modules/bookRoom/UnavailableRoomsModal.jsx:81
+#: indico/modules/rb/client/js/modules/bookRoom/UnavailableRoomsModal.jsx:99
 msgid "Unavailable Rooms"
 msgstr "Salas indisponíveis"
 
@@ -1970,11 +1989,11 @@ msgstr "Reservado para {reservedFor}"
 msgid "There are no bookings matching the criteria."
 msgstr "Não há reservas correspondentes aos critérios."
 
-#: indico/modules/rb/client/js/modules/landing/Landing.jsx:112
+#: indico/modules/rb/client/js/modules/landing/Landing.jsx:132
 msgid "Start your booking..."
 msgstr "Comece sua reserva ..."
 
-#: indico/modules/rb/client/js/modules/landing/Landing.jsx:132
+#: indico/modules/rb/client/js/modules/landing/Landing.jsx:153
 msgid "Search only my favourites"
 msgstr "Pesquisar apenas meus favoritos"
 
@@ -2058,52 +2077,52 @@ msgstr "Salas que eu estou autorizado a reservar"
 msgid "Once"
 msgstr "Uma vez"
 
-#: indico/modules/rb/client/js/util.jsx:233
+#: indico/modules/rb/client/js/util.jsx:237
 msgid "Available"
 msgstr "Disponível"
 
-#: indico/modules/rb/client/js/util.jsx:234
+#: indico/modules/rb/client/js/util.jsx:238
 msgid "Booking"
 msgstr "Reserva"
 
-#: indico/modules/rb/client/js/util.jsx:235
+#: indico/modules/rb/client/js/util.jsx:239
 msgid "Pre-Booking"
 msgstr "Pré-reserva"
 
-#: indico/modules/rb/client/js/util.jsx:236
+#: indico/modules/rb/client/js/util.jsx:240
 msgid "Conflict"
 msgstr "Conflito"
 
-#: indico/modules/rb/client/js/util.jsx:238
+#: indico/modules/rb/client/js/util.jsx:242
 msgid "Conflict with Pre-Booking"
 msgstr "Conflito com Pré-Reserva"
 
-#: indico/modules/rb/client/js/util.jsx:242
+#: indico/modules/rb/client/js/util.jsx:246
 msgid "Invalid occurrence"
 msgstr "Ocorrência inválida"
 
-#: indico/modules/rb/client/js/util.jsx:245
+#: indico/modules/rb/client/js/util.jsx:249
 msgid "Other booking"
 msgstr "Outra reserva"
 
-#: indico/modules/rb/client/js/util.jsx:249
+#: indico/modules/rb/client/js/util.jsx:253
 msgid "Will be cancelled"
 msgstr "Será cancelado(a)"
 
-#: indico/modules/rb/client/js/util.jsx:252
+#: indico/modules/rb/client/js/util.jsx:256
 msgid "Blocking"
 msgstr "Bloqueando"
 
-#: indico/modules/rb/client/js/util.jsx:254
+#: indico/modules/rb/client/js/util.jsx:258
 msgid "Blocking (allowed)"
 msgstr "Bloqueio (permitido)"
 
-#: indico/modules/rb/client/js/util.jsx:257
-#: indico/modules/rb/client/js/util.jsx:258
+#: indico/modules/rb/client/js/util.jsx:261
+#: indico/modules/rb/client/js/util.jsx:262
 msgid "Not bookable"
 msgstr "Não reservável"
 
-#: indico/modules/rb/client/js/util.jsx:260
+#: indico/modules/rb/client/js/util.jsx:264
 msgid "Concurrent Pre-Bookings"
 msgstr "Pré reservas concorrentes"
 
@@ -2116,7 +2135,7 @@ msgstr "Por favor insira um endereço de e-mail"
 msgid "Add email"
 msgstr "Adicionar e-mail"
 
-#: indico/web/client/js/react/components/ScrollButton.jsx:30
+#: indico/web/client/js/react/components/ScrollButton.jsx:31
 msgid "Back to top"
 msgstr "Voltar para o topo"
 
@@ -2141,7 +2160,7 @@ msgstr "Sair"
 msgid "This list is currently empty"
 msgstr "Esta lista está atualmente vazia"
 
-#: indico/web/client/js/react/components/principals/PrincipalPermissions.jsx:85
+#: indico/web/client/js/react/components/principals/PrincipalPermissions.jsx:90
 msgid "Add permission"
 msgstr "Adicionar permissão"
 
@@ -2153,78 +2172,78 @@ msgstr "Selecione favorito"
 msgid "Confirm"
 msgstr "Confirmar"
 
-#: indico/web/client/js/react/components/principals/Search.jsx:381
-msgid "First name"
-msgstr "Nome (sem o sobrenome)"
-
-#: indico/web/client/js/react/components/principals/Search.jsx:383
-msgid "Last name"
+#: indico/web/client/js/react/components/principals/Search.jsx:380
+msgid "Family name"
 msgstr "Sobrenome"
 
-#: indico/web/client/js/react/components/principals/Search.jsx:388
+#: indico/web/client/js/react/components/principals/Search.jsx:382
+msgid "Given name"
+msgstr "Nome"
+
+#: indico/web/client/js/react/components/principals/Search.jsx:387
 #: indico/web/client/js/react/errors/component.jsx:77
 msgid "Email address"
 msgstr "E-mail "
 
-#: indico/web/client/js/react/components/principals/Search.jsx:390
+#: indico/web/client/js/react/components/principals/Search.jsx:389
 msgid "Affiliation"
 msgstr "Afiliação"
 
-#: indico/web/client/js/react/components/principals/Search.jsx:394
+#: indico/web/client/js/react/components/principals/Search.jsx:393
 msgid "Include users with no Indico account"
 msgstr "Incluir usuário sem conta indico"
 
-#: indico/web/client/js/react/components/principals/Search.jsx:397
-#: indico/web/client/js/react/components/principals/Search.jsx:495
+#: indico/web/client/js/react/components/principals/Search.jsx:396
+#: indico/web/client/js/react/components/principals/Search.jsx:494
 msgid "Exact matches only"
 msgstr "Apenas resultados exatos"
 
-#: indico/web/client/js/react/components/principals/Search.jsx:404
+#: indico/web/client/js/react/components/principals/Search.jsx:403
 msgid "User"
 msgstr "Usuário"
 
-#: indico/web/client/js/react/components/principals/Search.jsx:405
+#: indico/web/client/js/react/components/principals/Search.jsx:404
 msgid "Select user"
 msgstr "Selecionar usuário"
 
-#: indico/web/client/js/react/components/principals/Search.jsx:405
+#: indico/web/client/js/react/components/principals/Search.jsx:404
 msgid "Add users"
 msgstr "Adicionar usuários"
 
-#: indico/web/client/js/react/components/principals/Search.jsx:436
+#: indico/web/client/js/react/components/principals/Search.jsx:435
 msgid ""
 "Your query matched too many users. Please try more specific search criteria."
 msgstr ""
 "Sua consulta correspondeu a muitos usuários. Por favor, tente inserir "
 "critérios de pesquisa mais específicos."
 
-#: indico/web/client/js/react/components/principals/Search.jsx:439
+#: indico/web/client/js/react/components/principals/Search.jsx:438
 msgid "No users found"
 msgstr "Nenhum usuários encontrados"
 
-#: indico/web/client/js/react/components/principals/Search.jsx:442
+#: indico/web/client/js/react/components/principals/Search.jsx:441
 msgid "1 user found"
 msgid_plural "{count} users found"
 msgstr[0] "1 usuário encontrado"
 msgstr[1] "{count} usuários encontrados"
 
-#: indico/web/client/js/react/components/principals/Search.jsx:481
+#: indico/web/client/js/react/components/principals/Search.jsx:480
 msgid "Group"
 msgstr "Grupo"
 
-#: indico/web/client/js/react/components/principals/Search.jsx:483
+#: indico/web/client/js/react/components/principals/Search.jsx:482
 msgid "Select group"
 msgstr "Selecionar grupo"
 
-#: indico/web/client/js/react/components/principals/Search.jsx:483
+#: indico/web/client/js/react/components/principals/Search.jsx:482
 msgid "Add groups"
 msgstr "Adicionar grupos"
 
-#: indico/web/client/js/react/components/principals/Search.jsx:493
+#: indico/web/client/js/react/components/principals/Search.jsx:492
 msgid "Group name"
 msgstr "Nome do Grupo"
 
-#: indico/web/client/js/react/components/principals/Search.jsx:517
+#: indico/web/client/js/react/components/principals/Search.jsx:516
 msgid ""
 "Your query matched too many groups. Please try more specific search "
 "criteria."
@@ -2232,11 +2251,11 @@ msgstr ""
 "Sua busca correspondeu a muitos grupos. Por favor, tente critérios de busca "
 "mais específicos"
 
-#: indico/web/client/js/react/components/principals/Search.jsx:520
+#: indico/web/client/js/react/components/principals/Search.jsx:519
 msgid "No groups found"
 msgstr "Nenhum grupo encontrado"
 
-#: indico/web/client/js/react/components/principals/Search.jsx:523
+#: indico/web/client/js/react/components/principals/Search.jsx:522
 msgid "1 group found"
 msgid_plural "{count} groups found"
 msgstr[0] "1 grupo encontrado"
@@ -2349,12 +2368,26 @@ msgctxt "daily booking shortcut"
 msgid "D"
 msgstr "D"
 
-#: indico/modules/rb/client/js/util.jsx:181
+#: indico/modules/rb/client/js/util.jsx:179
+msgctxt "repetition"
+msgid "Weekly"
+msgid_plural "Every {number} weeks"
+msgstr[0] "Semanalmente"
+msgstr[1] "A cada {number} semanas"
+
+#: indico/modules/rb/client/js/util.jsx:193
+msgctxt "repetition"
+msgid "Monthly"
+msgid_plural "Every {number} months"
+msgstr[0] "Mensalmente"
+msgstr[1] "A cada {number} meses"
+
+#: indico/modules/rb/client/js/util.jsx:183
 msgctxt "weekly booking shortcut"
 msgid "{number}W"
 msgstr "{number}W"
 
-#: indico/modules/rb/client/js/util.jsx:193
+#: indico/modules/rb/client/js/util.jsx:197
 msgctxt "monthly booking shortcut"
 msgid "{number}M"
 msgstr "{number}M"
