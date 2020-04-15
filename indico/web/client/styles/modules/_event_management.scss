@@ -558,6 +558,7 @@ th.i-table {
         overflow: visible;
 
         & > .icon {
+            align-self: flex-start;
             color: $dark-gray !important;
         }
 
