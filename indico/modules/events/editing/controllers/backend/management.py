@@ -162,13 +162,13 @@ class RHEditableSetSelfAssign(RHEditableTypeManagementBase):
 
 class RHEditableTypePrincipals(RHEditableTypeManagementBase):
     def _process_GET(self):
+        permission_name = self.editable_type.editor_permission
         return jsonify([p.principal.identifier for p in self.event.acl_entries
-                       if p.has_management_permission(self.editable_type.name + '_editing', explicit=True)])
+                       if p.has_management_permission(permission_name, explicit=True)])
 
     @use_rh_kwargs(EditableTypePrincipalsSchema)
     def _process_POST(self, principals):
-        permission_mapping = {'paper': 'paper_editing', 'slides': 'slides_editing', 'poster': 'poster_editing'}
-        permission_name = permission_mapping[self.editable_type.name]
+        permission_name = self.editable_type.editor_permission
         old_principals = {p.principal for p in self.event.acl_entries
                           if p.has_management_permission(permission_name, explicit=True)}
         for p in principals - old_principals:

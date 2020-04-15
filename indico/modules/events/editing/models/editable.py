@@ -17,9 +17,14 @@ from indico.util.struct.enum import RichIntEnum
 
 class EditableType(RichIntEnum):
     __titles__ = [None, _('Paper'), _('Slides'), _('Poster')]
+    __editor_permissions__ = [None, 'paper_editing', 'slides_editing', 'poster_editing']
     paper = 1
     slides = 2
     poster = 3
+
+    @property
+    def editor_permission(self):
+        return self.__editor_permissions__[self]
 
 
 class Editable(db.Model):
@@ -91,7 +96,7 @@ class Editable(db.Model):
         return self.contribution.event
 
     def can_comment(self, user):
-        return (self.event.can_manage(user, permission='paper_editing')
+        return (self.event.can_manage(user, permission=self.type.editor_permission)
                 or self.contribution.is_user_associated(user, check_abstract=True))
 
     @property
