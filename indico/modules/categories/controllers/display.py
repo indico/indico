@@ -299,7 +299,8 @@ class RHDisplayCategory(RHDisplayCategoryEventsBase):
         managers = sorted(self.category.get_manager_list(), key=attrgetter('principal_type.name', 'name'))
 
         threshold_format = '%Y-%m'
-        params = {'event_count': len(events),
+        params = self.params
+        params.update({'event_count': len(events),
                   'events_by_month': events_by_month,
                   'format_event_date': self.format_event_date,
                   'future_event_count': future_event_count,
@@ -313,10 +314,9 @@ class RHDisplayCategory(RHDisplayCategoryEventsBase):
                   'past_threshold': past_threshold.strftime(threshold_format),
                   'json_ld': map(serialize_event_for_json_ld, json_ld_events),
                   'atom_feed_url': url_for('.export_atom', self.category),
-                  'atom_feed_title': _('Events of "{}"').format(self.category.title)}
+                  'atom_feed_title': _('Events of "{}"').format(self.category.title)})
         params.update(get_base_ical_parameters(session.user, 'category',
                                                '/export/categ/{0}.ics'.format(self.category.id), {'from': '-31d'}))
-
         if not self.category.is_root:
             return WPCategory.render_template('display/category.html', self.category, **params)
 
@@ -425,6 +425,11 @@ class RHXMLExportCategoryInfo(RH):
 class RHCategoryOverview(RHDisplayCategoryBase):
     """Display the events for a particular day, week or month"""
 
+    def _get_data(self):
+        return get_category_timetable([self.category.id], self.start_dt, self.end_dt,
+                                      detail_level=self.detail, tz=self.category.display_tzinfo,
+                                      from_categ=self.category, grouped=False)
+
     def _process_args(self):
         RHDisplayCategoryBase._process_args(self)
         self.detail = request.args.get('detail', 'event')
@@ -453,8 +458,7 @@ class RHCategoryOverview(RHDisplayCategoryBase):
             self.end_dt = self.start_dt + relativedelta(months=1)
 
     def _process(self):
-        info = get_category_timetable([self.category.id], self.start_dt, self.end_dt, detail_level=self.detail,
-                                      tz=self.category.display_tzinfo, from_categ=self.category, grouped=False)
+        info = self._get_data()
         events = info['events']
 
         # Only categories with icons are listed in the sidebar
@@ -472,7 +476,8 @@ class RHCategoryOverview(RHDisplayCategoryBase):
                     -mktime(event.first_occurence_start_dt.timetuple()) if ongoing else event.start_dt.time())
         events = sorted(events, key=_event_sort_key)
 
-        params = {
+        params = self.params
+        params.update({
             'detail': self.detail,
             'period': self.period,
             'subcategories': subcategories,
@@ -485,7 +490,7 @@ class RHCategoryOverview(RHDisplayCategoryBase):
             'previous_year_url': self._other_day_url(self.start_dt - relativedelta(years=1)),
             'next_year_url': self._other_day_url(self.start_dt + relativedelta(years=1)),
             'mathjax': True
-        }
+        })
 
         if self.detail != 'event':
             cte = self.category.get_protection_parent_cte()
