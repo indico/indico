@@ -29,7 +29,11 @@
                 {% else %}
                     {% set msg = _("Search among Indico users") %}
                 {% endif %}
-                <span id="add-existing-{{ field.id }}" class="i-button highlight text-color {{ 'disabled' if field.disable_user_search }}"
+                <span id="add-myself-{{ field.id }}" class="i-button highlight text-color"
+                      title="{% trans %}Add yourself as author{% endtrans %}">
+                     {% trans %}Add myself{% endtrans %}
+                </span>
+                <span id="add-existing-{{ field.id }}" class="i-button {{ 'disabled' if field.disable_user_search }}"
                       title="{{ msg }}">
                     {% trans %}Search{% endtrans %}
                 </span>
@@ -68,6 +72,9 @@
                 secondaryAuthor: {{ field.require_secondary_author | default(false) | tojson }},
                 submitter: {{ field.require_submitter_author | default(false) | tojson }},
                 speaker: {{ field.require_speaker_author | default(false) | tojson }}
+            },
+            sessionUser: {
+                email: {{ session.user.email | tojson }}
             }
         });
     </script>

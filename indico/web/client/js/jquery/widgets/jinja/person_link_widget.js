@@ -55,6 +55,7 @@
     var $noOtherPlaceholder = $fieldDisplay.find('#no-other-placeholder-' + options.fieldId);
     var $buttonAddExisting = $('#add-existing-' + options.fieldId);
     var $buttonAddNew = $('#add-new-' + options.fieldId);
+    var $buttonAddMyself = $('#add-myself-' + options.fieldId);
     var $buttonAlphaOrder = $fieldDisplay.find('.alpha-order-switch');
     var $form = $field.closest('form');
     var customOrder = !$buttonAlphaOrder.hasClass('active');
@@ -379,6 +380,20 @@
 
     $buttonAddNew.on('click', function() {
       $field.principalfield('enter');
+    });
+
+    $buttonAddMyself.on('click', function() {
+      indicoRequest('search.users', options.sessionUser, function(result, error) {
+        if (!error) {
+          if (result.length === 0) {
+            self.appendMessage("I can't seem to find you...");
+          } else {
+            $field.principalfield('add', result);
+          }
+        } else {
+            self.appendMessage('Error searching for you');
+        }
+      });
     });
 
     function getSortingMessage() {
