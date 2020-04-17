@@ -316,6 +316,7 @@ class RHDisplayCategory(RHDisplayCategoryEventsBase):
                   'atom_feed_title': _('Events of "{}"').format(self.category.title)}
         params.update(get_base_ical_parameters(session.user, 'category',
                                                '/export/categ/{0}.ics'.format(self.category.id), {'from': '-31d'}))
+
         if not self.category.is_root:
             return WPCategory.render_template('display/category.html', self.category, **params)
 
@@ -424,7 +425,7 @@ class RHXMLExportCategoryInfo(RH):
 class RHCategoryOverview(RHDisplayCategoryBase):
     """Display the events for a particular day, week or month"""
 
-    def _get_data(self):
+    def _get_timetable(self):
         return get_category_timetable([self.category.id], self.start_dt, self.end_dt,
                                       detail_level=self.detail, tz=self.category.display_tzinfo,
                                       from_categ=self.category, grouped=False)
@@ -457,7 +458,7 @@ class RHCategoryOverview(RHDisplayCategoryBase):
             self.end_dt = self.start_dt + relativedelta(months=1)
 
     def _process(self):
-        info = self._get_data()
+        info = self._get_timetable()
         events = info['events']
 
         # Only categories with icons are listed in the sidebar

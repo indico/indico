@@ -18,7 +18,6 @@
                 {% endif %}
             {% endblock %}
         </h1>
-
         {% block cat_toolbar %}
             <div id="category-toolbar" class="toolbar">
                 <div class="group">
@@ -42,7 +41,6 @@
                             </a>
                         {% endif %}
                     {% endblock %}
-
                     {% block cat_export %}
                         <a href="#"
                            class="i-button icon-calendar arrow js-export-ical"
@@ -52,7 +50,6 @@
                             {% include 'categories/category_export_ical.html' %}
                         {%- endwith %}
                     {% endblock %}
-
                     {% block cat_view_dropdown %}
                         <a class="i-button icon-eye arrow js-dropdown"
                            title="{% trans %}View{% endtrans %}"
@@ -75,7 +72,6 @@
                             </li>
                         </ul>
                     {% endblock %}
-
                     {% block cat_manage %}
                         {% if category.can_manage(session.user) %}
                             <a href="{{ url_for('categories.manage_content', category) }}"
@@ -83,9 +79,7 @@
                                title="{% trans %}Manage category{% endtrans %}"></a>
                         {% endif %}
                     {% endblock %}
-
                 </div>
-
                 {% block cat_user_favorites %}
                     {% if session.user and not category.is_root %}
                         <div class="group">
@@ -95,9 +89,8 @@
                                     data-favorites-href="{{ url_for('users.user_favorites') }}"></button>
                         </div>
                     {% endif %}
-            {% endblock %}
-
-        </div>
+                {% endblock %}
+            </div>
         {% endblock %}
     </div>
 
