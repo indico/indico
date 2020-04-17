@@ -12,7 +12,7 @@ import shortid from 'shortid';
 import {Button, Icon} from 'semantic-ui-react';
 import {Translate} from 'indico/react/i18n';
 import {serializeTime} from 'indico/utils/date';
-import TimeRangePicker from '../../components/TimeRangePicker';
+import TimeRangePicker from '../../../components/TimeRangePicker';
 
 import './DailyAvailability.module.scss';
 

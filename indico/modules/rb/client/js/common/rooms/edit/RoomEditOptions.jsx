@@ -1,4 +1,4 @@
-import {Dropdown, Form, Header} from 'semantic-ui-react';
+import {Dropdown, Form, Header, Tab} from 'semantic-ui-react';
 import React from 'react';
 import _ from 'lodash';
 import {FieldArray} from 'react-final-form-arrays';
@@ -10,7 +10,7 @@ import EquipmentList from './EquipmentList';
 import DailyAvailability from './DailyAvailability';
 import NonBookablePeriods from './NonBookablePeriods';
 
-function RoomEditOptions({showEquipment, globalAttributes}) {
+function RoomEditOptions({active, showEquipment, globalAttributes}) {
   // TODO: is null
   const attributeTitles = globalAttributes
     ? _.fromPairs(globalAttributes.map(x => [x.name, x.title]))
@@ -18,7 +18,7 @@ function RoomEditOptions({showEquipment, globalAttributes}) {
   const withKeyAttribute = value => value.map(e => ({...e, key: shortid.generate()}));
 
   return (
-    <>
+    <Tab.Pane active={active}>
       <Header>
         <Translate>Availability</Translate>
       </Header>
@@ -28,12 +28,14 @@ function RoomEditOptions({showEquipment, globalAttributes}) {
           component={DailyAvailability}
           isEqual={_.isEqual}
           format={value => (value === null ? [] : withKeyAttribute(value))}
+          hideErrorPopup={!active}
         />
         <FinalField
           name="nonbookablePeriods"
           component={NonBookablePeriods}
           isEqual={_.isEqual}
           format={value => (value === null ? [] : withKeyAttribute(value))}
+          hideErrorPopup={!active}
         />
       </Form.Group>
       <Header>
@@ -46,6 +48,7 @@ function RoomEditOptions({showEquipment, globalAttributes}) {
             component={EquipmentList}
             isEqual={_.isEqual}
             componentLabel={Translate.string('Add new equipment')}
+            hideErrorPopup={!active}
           />
         )}
         <FieldArray name="attributes" isEqual={_.isEqual}>
@@ -84,6 +87,7 @@ function RoomEditOptions({showEquipment, globalAttributes}) {
                     key={attribute}
                     name={`${attribute}.value`}
                     label={attributeTitles[fields.value[index].name]}
+                    hideErrorPopup={!active}
                     required
                     icon={{
                       name: 'remove',
@@ -107,22 +111,29 @@ function RoomEditOptions({showEquipment, globalAttributes}) {
         <Translate>Options</Translate>
       </Header>
       <Form.Group grouped>
-        <FinalCheckbox name="isReservable" label={Translate.string('Bookable')} />
+        <FinalCheckbox name="isReservable" label={Translate.string('Bookable')} hideErrorPopup />
         <FinalCheckbox
           name="reservationsNeedConfirmation"
           label={Translate.string('Require confirmation (pre-bookings)')}
+          hideErrorPopup={!active}
         />
-        <FinalCheckbox name="notificationsEnabled" label={Translate.string('Reminders enabled')} />
+        <FinalCheckbox
+          name="notificationsEnabled"
+          label={Translate.string('Reminders enabled')}
+          hideErrorPopup={!active}
+        />
         <FinalCheckbox
           name="endNotificationsEnabled"
           label={Translate.string('Reminders of finishing bookings enabled')}
+          hideErrorPopup={!active}
         />
       </Form.Group>
-    </>
+    </Tab.Pane>
   );
 }
 
 RoomEditOptions.propTypes = {
+  active: PropTypes.bool,
   showEquipment: PropTypes.bool,
   globalAttributes: PropTypes.arrayOf(
     PropTypes.shape({
@@ -133,6 +144,7 @@ RoomEditOptions.propTypes = {
 };
 
 RoomEditOptions.defaultProps = {
+  active: true,
   showEquipment: false,
   globalAttributes: [],
 };

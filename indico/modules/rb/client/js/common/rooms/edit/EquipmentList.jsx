@@ -11,7 +11,7 @@ import {connect} from 'react-redux';
 import _ from 'lodash';
 import {Dropdown, Icon, List} from 'semantic-ui-react';
 import {Translate} from 'indico/react/i18n';
-import * as roomsSelectors from './selectors';
+import * as roomsSelectors from '../selectors';
 
 import './EquipmentList.module.scss';
 

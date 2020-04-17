@@ -15,7 +15,7 @@ import updateRoomAttributesURL from 'indico-url:rb.admin_update_room_attributes'
 import updateRoomAvailabilityURL from 'indico-url:rb.admin_update_room_availability';
 
 import {Form as FinalForm, FormSpy} from 'react-final-form';
-import {Button, Form, Grid, Message, Modal, Tab} from 'semantic-ui-react';
+import {Button, Form, Grid, Label, Menu, Message, Modal, Tab} from 'semantic-ui-react';
 import React, {useEffect, useState, useCallback, useMemo} from 'react';
 import PropTypes from 'prop-types';
 import _ from 'lodash';
@@ -27,16 +27,17 @@ import {indicoAxios, handleAxiosError} from 'indico/utils/axios';
 import './RoomEditModal.module.scss';
 import {getChangedValues, handleSubmitError, parsers as p} from 'indico/react/forms';
 import RoomPhoto from './RoomPhoto';
-import RoomEditNotifications from './RoomEditNotifications';
-import RoomEditLocation from './RoomEditLocation';
-import RoomEditDetails from './RoomEditDetails';
-import RoomEditPermissions from './RoomEditPermissions';
-import RoomEditOptions from './RoomEditOptions';
+import RoomEditDetails from './edit/RoomEditDetails';
+import RoomEditNotifications from './edit/RoomEditNotifications';
+import RoomEditLocation from './edit/RoomEditLocation';
+import RoomEditPermissions from './edit/RoomEditPermissions';
+import RoomEditOptions from './edit/RoomEditOptions';
 
 function RoomEditModal({roomId, locationId, onClose, afterCreation}) {
   const [globalAttributes, setGlobalAttributes] = useState([]);
   const [newRoomId, setNewRoomId] = useState(null);
   const [wasEverUpdated, setWasEverUpdated] = useState(null);
+  const [tabsWithError, setTabsWithError] = useState([]);
 
   const [roomDetails, setRoomDetails] = useState({
     aclEntries: [],
@@ -80,6 +81,78 @@ function RoomEditModal({roomId, locationId, onClose, afterCreation}) {
     [setRoomDetails, setRoomAttributes, setRoomAvailability].forEach((x, i) => x(resp[i]));
   }, [fetch, roomId]);
 
+  const tabPanes = useMemo(
+    () =>
+      [
+        {
+          key: 'basic-details',
+          menuItem: <Translate>Basic Details</Translate>,
+          pane: <RoomEditDetails key="basic-details" />,
+          fields: ['owner', 'keyLocation', 'telephone', 'capacity', 'division', 'comments'],
+        },
+        {
+          key: 'location',
+          menuItem: <Translate>Location</Translate>,
+          pane: <RoomEditLocation key="location" />,
+          fields: [
+            'verboseName',
+            'site',
+            'building',
+            'floor',
+            'number',
+            'surfaceArea',
+            'latitude',
+            'longitude',
+            'maxAdvanceDays',
+            'bookingLimitDays',
+          ],
+        },
+        {
+          key: 'permissions',
+          menuItem: <Translate>Permissions</Translate>,
+          pane: <RoomEditPermissions key="permissions" />,
+          fields: ['protectionMode', 'aclEntries'],
+        },
+        {
+          key: 'notifications',
+          menuItem: <Translate>Notifications</Translate>,
+          pane: <RoomEditNotifications key="notifications" />,
+          fields: [
+            'notificationEmails',
+            'notificationBeforeDays',
+            'notificationBeforeDaysWeekly',
+            'notificationBeforeDaysMonthly',
+            'endNotificationDaily',
+            'endNotificationWeekly',
+            'endNotificationMonthly',
+          ],
+        },
+        {
+          key: 'options',
+          menuItem: <Translate>Options</Translate>,
+          pane: <RoomEditOptions key="options" showEquipment globalAttributes={globalAttributes} />,
+          fields: [
+            'bookableHours',
+            'nonbookablePeriods',
+            'availableEquipment',
+            'attributes',
+            'isReservable',
+            'reservationsNeedConfirmation',
+            'notificationsEnabled',
+            'endNotificationsEnabled',
+          ],
+        },
+      ].map(x => ({
+        ...x,
+        menuItem: (
+          <Menu.Item key={x.key}>
+            {x.menuItem} {tabsWithError.includes(x.key) ? <Label color="red">Error</Label> : null}
+          </Menu.Item>
+        ),
+      })),
+    [tabsWithError, globalAttributes]
+  );
+
   const handleSubmit = async (data, form) => {
     const changedValues = getChangedValues(data, form);
     const {
@@ -120,7 +193,14 @@ function RoomEditModal({roomId, locationId, onClose, afterCreation}) {
         fetchRoomData();
       }
     } catch (e) {
-      return camelizeKeys(handleSubmitError(e));
+      const submitErrors = camelizeKeys(handleSubmitError(e));
+      setTabsWithError(
+        Object.keys(submitErrors).map(err => {
+          const pane = tabPanes.find(t => t.fields && t.fields.includes(err));
+          return pane && pane.key;
+        })
+      );
+      return submitErrors;
     }
   };
 
@@ -137,40 +217,6 @@ function RoomEditModal({roomId, locationId, onClose, afterCreation}) {
       fetchRoomData();
     }
   }, [isNewRoom, fetchRoomData]);
-
-  const tabPanes = useMemo(
-    () => [
-      {
-        menuItem: 'Basic Details',
-        pane: {key: 'basic-details', content: <RoomEditDetails />},
-      },
-      {
-        menuItem: 'Location',
-        pane: {key: 'location', content: <RoomEditLocation />},
-      },
-      {
-        menuItem: 'Permissions',
-        pane: {key: 'permissions', content: <RoomEditPermissions />},
-      },
-      {
-        key: 'notifications',
-        menuItem: 'Notifications',
-        pane: {
-          key: 'notifications',
-          content: <RoomEditNotifications />,
-        },
-      },
-      {
-        key: 'options',
-        menuItem: 'Options',
-        pane: {
-          key: 'options',
-          content: <RoomEditOptions showEquipment globalAttributes={globalAttributes} />,
-        },
-      },
-    ],
-    [globalAttributes]
-  );
 
   const renderModal = formProps => {
     const {

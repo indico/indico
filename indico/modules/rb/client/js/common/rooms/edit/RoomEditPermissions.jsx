@@ -1,17 +1,18 @@
-import {Form, Header} from 'semantic-ui-react';
+import {Form, Header, Tab} from 'semantic-ui-react';
 import React from 'react';
 import _ from 'lodash';
+import PropTypes from 'prop-types';
 import {FavoritesProvider} from 'indico/react/hooks';
 import {ACLField} from 'indico/react/components';
 import {Translate} from 'indico/react/i18n';
 import {FinalField, FinalRadio, parsers as p} from 'indico/react/forms';
 import {usePermissionInfo} from 'indico/react/components/principals/hooks';
 
-function RoomEditPermissions() {
+function RoomEditPermissions({active}) {
   const [permissionManager, permissionInfo] = usePermissionInfo();
 
   return (
-    <>
+    <Tab.Pane active={active}>
       <Header>
         <Translate>Permissions</Translate>
       </Header>
@@ -25,11 +26,17 @@ function RoomEditPermissions() {
           </Translate>
         </p>
         <Form.Group>
-          <FinalRadio name="protectionMode" value="public" label={Translate.string('Public')} />
+          <FinalRadio
+            name="protectionMode"
+            value="public"
+            label={Translate.string('Public')}
+            hideErrorPopup={!active}
+          />
           <FinalRadio
             name="protectionMode"
             value="protected"
             label={Translate.string('Restricted')}
+            hideErrorPopup={!active}
           />
         </Form.Group>
       </Form.Field>
@@ -47,12 +54,21 @@ function RoomEditPermissions() {
               withGroups
               permissionInfo={permissionInfo}
               permissionManager={permissionManager}
+              hideErrorPopup={!active}
             />
           )}
         </FavoritesProvider>
       )}
-    </>
+    </Tab.Pane>
   );
 }
+
+RoomEditPermissions.propTypes = {
+  active: PropTypes.bool,
+};
+
+RoomEditPermissions.defaultProps = {
+  active: true,
+};
 
 export default RoomEditPermissions;
