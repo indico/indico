@@ -3,21 +3,12 @@
 
 {% block html %}
     <div class="datetime-widget i-form-field-fixed-width">
-        <input type="hidden" autofocus>
-        <input type="text" name="{{ field.name }}" id="{{ field.id }}-date" class="datepicker" placeholder="DD/MM/YYYY"
-               {% if field.data and not field.date_missing %}value="{{ field.data | format_date('code', timezone=field.timezone) }}"{% endif %}
-               {% if required %}required{% endif %}
-               {% if disabled %}disabled{% endif %}>{#--#}
-        <input type="time" name="{{ field.name }}" id="{{ field.id }}-time" class="timepicker"
-               placeholder="HH:MM" pattern="{{ time_regex_hhmm }}"
-               {% if field.data and not field.time_missing %}value="{{ field.data | format_time('code', timezone=field.timezone) }}"{% endif %}
-               {% if disabled %}disabled{% endif %}>{#--#}
-        <i class="timezone"></i>{#--#}
-        {% if field.allow_clear -%}
-            <span id="{{ field.id }}-reset"
-                  class="clear-pickers" style="display: none;"
-                  title="{% trans %}Clear date and time{% endtrans %}"></span>
-        {%- endif %}
+        {# the hidden field has autofocus on purpose to prevent our JS from focusing the date picker #}
+        <input type="hidden" name="{{ field.name }}" id="{{ field.id }}-datestorage" autofocus
+               {% if field.data and not field.date_missing %}value="{{ field.data | format_date('code', timezone=field.timezone) }}"{% endif %}>{#--#}
+        <input type="hidden" name="{{ field.name }}" id="{{ field.id }}-timestorage"
+                {% if field.data and not field.time_missing %}value="{{ field.data | format_time('code', timezone=field.timezone) }}"{% endif %}>
+        <span id="{{ field.id }}"></span>
     </div>
 {% endblock %}
 
@@ -28,23 +19,12 @@
             timezoneFieldId: {{ (field.timezone_field.id if field.timezone_field else none) | tojson }},
             timezone: {{ field.timezone | tojson }},
             defaultTime: {{ field.default_time | format_time('code', timezone=field.timezone) | tojson }},
-            hasData: {{ field.data | bool | tojson }},
-            {% if field.earliest_dt %}
-                earliest: {
-                    date: {{ field.earliest_dt | format_date('code', timezone=field.timezone) | tojson }},
-                    time: {{ field.earliest_dt | format_time('code', timezone=field.timezone) | tojson }}
-                },
-            {% else %}
-                earliest: null,
-            {% endif %}
-            {% if field.latest_dt %}
-                latest: {
-                    date: {{ field.latest_dt | format_date('code', timezone=field.timezone) | tojson }},
-                    time: {{ field.latest_dt | format_time('code', timezone=field.timezone) | tojson }}
-                },
-            {% else %}
-                latest: null,
-            {% endif %}
+            locale: {{ session.lang | tojson }},
+            required: {{ required|default(false) | tojson }},
+            disabled: {{ disabled|default(false) | tojson }},
+            allowClear: {{ (field.allow_clear if field.allow_clear else false) | tojson }},
+            earliest: {{ (field.earliest_dt.isoformat() if field.earliest_dt else None) | tojson }},
+            latest: {{ (field.latest_dt.isoformat() if field.latest_dt else None) | tojson }},
             {% if field.flags.linked_datetime %}
                 linkedField: {
                     id: {{ field.get_form()[field.linked_field].id | tojson }},

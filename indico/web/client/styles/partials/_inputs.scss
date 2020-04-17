@@ -273,8 +273,53 @@ $dropdown-transition: $dropdown-transition-step ease-out;
 }
 
 .datetime-widget {
-    .datepicker {
-        width: 40% !important;
+    .rc-time-picker-input {
+        width: 100% !important;
+        font-size: 1em;
+    }
+
+    .rc-time-picker-panel-select ul {
+        // undo the style changes caused by the `ul:not(.i-dropdown)` rule
+        // inside `.action-box`
+        padding-left: 0;
+        max-height: none;
+    }
+
+    .rc-time-picker {
+        width: 22% !important;
+        color: $black;
+        vertical-align: top;
+        font-size: 1em;
+    }
+
+    .rc-time-picker-panel-input-wrap {
+        // make sure time does not jump when opening the time picker
+        padding-left: calc(1em - 1px);
+        padding-top: calc(0.5em + 1px);
+    }
+
+    .rc-time-picker-panel-input,
+    .rc-time-picker-panel-select,
+    .rc-time-picker-panel-inner {
+        font-size: 1em;
+        color: $black;
+    }
+
+    .rc-time-picker-input[disabled] {
+        cursor: default;
+    }
+
+    .SingleDatePicker {
+        width: 170px;
+    }
+
+    .DayPicker_weekHeader_ul {
+        padding-left: 0 !important;
+        line-height: 1em;
+    }
+
+    .CalendarDay {
+        font-size: 1em;
     }
 
     .timezone {
@@ -297,6 +342,11 @@ $dropdown-transition: $dropdown-transition-step ease-out;
             cursor: pointer;
         }
     }
+}
+
+.i-form .form-group .form-field .datetime-widget input[type="text"] {
+    font-size: 1em;
+    width: 150px;
 }
 
 .has-warning {

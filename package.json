@@ -49,6 +49,7 @@
     "prop-types": "^15.7.2",
     "qs": "^6.9.1",
     "qtip2": "github:indico/qTip2",
+    "rc-time-picker": "^3.7.3",
     "react": "^16.12.0",
     "react-charts": "^2.0.0-beta.6",
     "react-dates": "^21.5.0",

@@ -12,6 +12,10 @@
     text-align: center;
 }
 
+.DateInput_input[disabled] {
+    font-style: normal;
+}
+
 .ui.form input[type='text'].DateInput_input__small {
     padding-left: 0.2em;
     padding-right: 0.2em;
@@ -25,6 +29,7 @@
 .SingleDatePicker_picker {
     // ensure date pickers don't have SUI checkbox switches (z-index 3) in front of them
     z-index: 4 !important;
+    line-height: normal;
 }
 
 .DateRangePicker_picker.DateRangePicker_picker__fullScreenPortal,

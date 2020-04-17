@@ -228,7 +228,7 @@ import PublicationSwitch from './PublicationSwitch';
         url: $this.data('href'),
         qBubbleOptions: {
           style: {
-            classes: 'qbubble-contrib-start-date',
+            classes: 'qbubble-contrib-start-date qtip-allow-overflow',
           },
         },
       });

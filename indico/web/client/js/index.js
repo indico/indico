@@ -13,6 +13,7 @@ import './legacy/timetable.js';
 
 import '../styles/screen.scss';
 import 'indico-sui-theme/semantic.css';
+import 'rc-time-picker/assets/index.css';
 
 import showReactErrorDialog from 'indico/react/errors';
 

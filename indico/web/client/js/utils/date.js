@@ -8,8 +8,15 @@
 import _ from 'lodash';
 import moment from 'moment';
 
-export function toMoment(dt, format) {
-  return dt ? moment(dt, format) : null;
+export function toMoment(dt, format, strict = false) {
+  if (!dt) {
+    return null;
+  }
+  const obj = moment(dt, format);
+  if (strict && !obj.isValid()) {
+    throw new Error(`Invalid dt: ${dt}`);
+  }
+  return obj;
 }
 
 export function serializeDate(dt, format = moment.HTML5_FMT.DATE) {
@@ -138,5 +145,15 @@ export function fullyOverlaps(preBookings) {
         )
       )
     )
+  );
+}
+
+export function localeUses24HourTime(locale) {
+  return (
+    new Intl.DateTimeFormat(locale, {
+      hour: 'numeric',
+    })
+      .formatToParts(new Date(2020, 0, 1, 13))
+      .find(part => part.type === 'hour').value.length === 2
   );
 }
