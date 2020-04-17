@@ -77,7 +77,6 @@ class RH(object):
 
     def __init__(self):
         self.commit = True
-        self.params = {}  # dict to aggregate params to be passed to template
 
     # Methods =============================================================
 

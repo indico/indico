@@ -146,9 +146,9 @@ def get_category_timetable(categ_ids, start_dt, end_dt, detail_level='event', tz
        :param from_categ: ``Category`` that will be taken into account to calculate
                           visibility
        :param grouped: Whether to group results by start date
-       :param includible: a callable, to allow further arbitrary custom filtering on whether
-                          to include (returns True) or not (returns False) each ``detail`` item.
-                          Default always returns True.
+       :param includible: a callable, to allow further arbitrary custom filtering (maybe from 3rd
+                          party plugins) on whether to include (returns True) or not (returns False)
+                          each ``detail`` item. Default always returns True.
        :returns: a dictionary containing timetable information in a
                  structured way. See source code for examples.
     """
