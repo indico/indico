@@ -425,6 +425,11 @@ class RHXMLExportCategoryInfo(RH):
 class RHCategoryOverview(RHDisplayCategoryBase):
     """Display the events for a particular day, week or month"""
 
+    def _get_timetable(self):
+        return get_category_timetable([self.category.id], self.start_dt, self.end_dt,
+                                      detail_level=self.detail, tz=self.category.display_tzinfo,
+                                      from_categ=self.category, grouped=False)
+
     def _process_args(self):
         RHDisplayCategoryBase._process_args(self)
         self.detail = request.args.get('detail', 'event')
@@ -453,8 +458,7 @@ class RHCategoryOverview(RHDisplayCategoryBase):
             self.end_dt = self.start_dt + relativedelta(months=1)
 
     def _process(self):
-        info = get_category_timetable([self.category.id], self.start_dt, self.end_dt, detail_level=self.detail,
-                                      tz=self.category.display_tzinfo, from_categ=self.category, grouped=False)
+        info = self._get_timetable()
         events = info['events']
 
         # Only categories with icons are listed in the sidebar

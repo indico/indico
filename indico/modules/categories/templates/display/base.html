@@ -18,64 +18,80 @@
                 {% endif %}
             {% endblock %}
         </h1>
-        <div id="category-toolbar" class="toolbar">
-            <div class="group">
-                {{ create_event_button(category, classes="highlight", text=_("Create event"), with_tooltip=false) }}
-            </div>
-            <div class="group">
-                <button id="navigate-button" class="i-button icon-compass2"
-                        title="{% trans %}Navigate categories{% endtrans %}">
-                    {% trans %}Navigate{% endtrans %}
-                </button>
-            </div>
-            <div class="group">
-                {% if not category.is_root %}
-                    <a class="i-button icon-arrow-up" href="{{ category.parent.url }}">
-                        {% trans %}Parent category{% endtrans %}
-                    </a>
-                {% endif %}
-                <a href="#"
-                   class="i-button icon-calendar arrow js-export-ical"
-                   title="{% trans %}Export to scheduling tool{% endtrans %}"
-                   data-id="{{ category.id }}"></a>
-                {% with item=category, ics_url=url_for('categories.export_ical', category) -%}
-                    {% include 'categories/category_export_ical.html' %}
-                {%- endwith %}
-                <a class="i-button icon-eye arrow js-dropdown"
-                   title="{% trans %}View{% endtrans %}"
-                   data-toggle="dropdown"></a>
-                <ul class="i-dropdown">
-                    <li>
-                        <a href="{{ url_for('.upcoming_event', category) }}">{% trans %}Upcoming event{% endtrans %}</a>
-                    </li>
-                    <li>
-                        <a href="{{ url_for('.overview', category, period='day') }}">{% trans %}Today's events{% endtrans %}</a>
-                    </li>
-                    <li>
-                        <a href="{{ url_for('.overview', category, period='week') }}">{% trans %}Week's events{% endtrans %}</a>
-                    </li>
-                    <li>
-                        <a href="{{ url_for('.calendar', category) }}">{% trans %}Calendar{% endtrans %}</a>
-                    </li>
-                    <li>
-                        <a href="{{ url_for('.statistics', category) }}">{% trans %}Category statistics{% endtrans %}</a>
-                    </li>
-                </ul>
-                {% if category.can_manage(session.user) %}
-                    <a href="{{ url_for('categories.manage_content', category) }}"
-                       class="i-button icon-edit"
-                       title="{% trans %}Manage category{% endtrans %}"></a>
-                {% endif %}
-            </div>
-            {% if session.user and not category.is_root %}
+        {% block cat_toolbar %}
+            <div id="category-toolbar" class="toolbar">
                 <div class="group">
-                    <button type="button"
-                            class="i-button fav-button icon-only icon-bookmark {{ 'enabled' if category in session.user.favorite_categories }}"
-                            data-href="{{ url_for('users.user_favorites_category_api', category) }}"
-                            data-favorites-href="{{ url_for('users.user_favorites') }}"></button>
+                    {% block cat_create_event %}
+                        {{ create_event_button(category, classes="highlight", text=_("Create event"), with_tooltip=false) }}
+                    {% endblock %}
                 </div>
-            {% endif %}
-        </div>
+                <div class="group">
+                    {% block cat_navigate %}
+                        <button id="navigate-button" class="i-button icon-compass2"
+                                title="{% trans %}Navigate categories{% endtrans %}">
+                            {% trans %}Navigate{% endtrans %}
+                        </button>
+                    {% endblock %}
+                </div>
+                <div class="group">
+                    {% block cat_parent %}
+                        {% if not category.is_root %}
+                            <a class="i-button icon-arrow-up" href="{{ category.parent.url }}">
+                                {% trans %}Parent category{% endtrans %}
+                            </a>
+                        {% endif %}
+                    {% endblock %}
+                    {% block cat_export %}
+                        <a href="#"
+                           class="i-button icon-calendar arrow js-export-ical"
+                           title="{% trans %}Export to scheduling tool{% endtrans %}"
+                           data-id="{{ category.id }}"></a>
+                        {% with item=category, ics_url=url_for('categories.export_ical', category) -%}
+                            {% include 'categories/category_export_ical.html' %}
+                        {%- endwith %}
+                    {% endblock %}
+                    {% block cat_view_dropdown %}
+                        <a class="i-button icon-eye arrow js-dropdown"
+                           title="{% trans %}View{% endtrans %}"
+                           data-toggle="dropdown"></a>
+                        <ul class="i-dropdown">
+                            <li>
+                                <a href="{{ url_for('.upcoming_event', category) }}">{% trans %}Upcoming event{% endtrans %}</a>
+                            </li>
+                            <li>
+                                <a href="{{ url_for('.overview', category, period='day') }}">{% trans %}Today's events{% endtrans %}</a>
+                            </li>
+                            <li>
+                                <a href="{{ url_for('.overview', category, period='week') }}">{% trans %}Week's events{% endtrans %}</a>
+                            </li>
+                            <li>
+                                <a href="{{ url_for('.calendar', category) }}">{% trans %}Calendar{% endtrans %}</a>
+                            </li>
+                            <li>
+                                <a href="{{ url_for('.statistics', category) }}">{% trans %}Category statistics{% endtrans %}</a>
+                            </li>
+                        </ul>
+                    {% endblock %}
+                    {% block cat_manage %}
+                        {% if category.can_manage(session.user) %}
+                            <a href="{{ url_for('categories.manage_content', category) }}"
+                               class="i-button icon-edit"
+                               title="{% trans %}Manage category{% endtrans %}"></a>
+                        {% endif %}
+                    {% endblock %}
+                </div>
+                {% block cat_user_favorites %}
+                    {% if session.user and not category.is_root %}
+                        <div class="group">
+                            <button type="button"
+                                    class="i-button fav-button icon-only icon-bookmark {{ 'enabled' if category in session.user.favorite_categories }}"
+                                    data-href="{{ url_for('users.user_favorites_category_api', category) }}"
+                                    data-favorites-href="{{ url_for('users.user_favorites') }}"></button>
+                        </div>
+                    {% endif %}
+                {% endblock %}
+            </div>
+        {% endblock %}
     </div>
 
     {% if self.sidebar() %}
