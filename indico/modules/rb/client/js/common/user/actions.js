@@ -43,12 +43,15 @@ export function fetchUserInfo() {
     const result = await ajaxAction(
       () => indicoAxios.get(fetchUserInfoURL()),
       FETCH_USER_INFO_REQUEST,
-      [USER_INFO_RECEIVED, FETCH_USER_INFO_SUCCESS],
+      USER_INFO_RECEIVED,
       FETCH_USER_INFO_ERROR
     )(dispatch);
 
     if (result.data) {
       await setMomentLocale(result.data.language);
+      // dispatch this explicitly after the async setMomentLocale to ensure
+      // we don't render something without the moment locale being loaded
+      dispatch({type: FETCH_USER_INFO_SUCCESS, data: result.data});
     }
     return result;
   };
