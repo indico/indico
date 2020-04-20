@@ -502,6 +502,16 @@ class Contribution(DescriptionMixin, ProtectionManagersMixin, LocationMixin, Att
         submitted_for = {editable.type.name for editable in self.editables}
         return [editable_type for editable_type in self.event.editable_types if editable_type not in submitted_for]
 
+    @property
+    def enabled_editables(self):
+        """Return all submitted editables with enabled types."""
+        from indico.modules.events.editing.settings import editing_settings
+        if not self.event.has_feature('editing'):
+            return []
+
+        enabled_editable_types = editing_settings.get(self.event, 'editable_types')
+        return [editable for editable in self.editables if editable.type.name in enabled_editable_types]
+
     def is_paper_reviewer(self, user):
         return user in self.paper_content_reviewers or user in self.paper_layout_reviewers
 
