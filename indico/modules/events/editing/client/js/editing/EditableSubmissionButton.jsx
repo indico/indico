@@ -111,6 +111,7 @@ export default function EditableSubmissionButton({
             value: editableType,
           }))}
           selectOnNavigation={false}
+          selectOnBlur={false}
           value={null}
           button
         />
