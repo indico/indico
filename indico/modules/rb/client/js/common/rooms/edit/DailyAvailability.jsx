@@ -39,7 +39,7 @@ export default class DailyAvailability extends React.Component {
 
   handleRemoveTimes = index => {
     const {onChange, value} = this.props;
-    onChange(value.filter((_, i) => i !== index));
+    onChange(value.filter((__, i) => i !== index));
   };
 
   renderEntry = (bookableHour, index) => {

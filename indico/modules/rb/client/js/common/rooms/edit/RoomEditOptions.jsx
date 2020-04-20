@@ -1,5 +1,12 @@
+// This file is part of Indico.
+// Copyright (C) 2002 - 2020 CERN
+//
+// Indico is free software; you can redistribute it and/or
+// modify it under the terms of the MIT License; see the
+// LICENSE file for more details.
+
 import {Dropdown, Form, Header, Tab} from 'semantic-ui-react';
-import React from 'react';
+import React, {useCallback, useMemo} from 'react';
 import _ from 'lodash';
 import {FieldArray} from 'react-final-form-arrays';
 import PropTypes from 'prop-types';
@@ -11,11 +18,14 @@ import DailyAvailability from './DailyAvailability';
 import NonBookablePeriods from './NonBookablePeriods';
 
 function RoomEditOptions({active, showEquipment, globalAttributes}) {
-  // TODO: is null
-  const attributeTitles = globalAttributes
-    ? _.fromPairs(globalAttributes.map(x => [x.name, x.title]))
-    : [];
-  const withKeyAttribute = value => value.map(e => ({...e, key: shortid.generate()}));
+  const attributeTitles = useMemo(
+    () => (globalAttributes ? _.fromPairs(globalAttributes.map(x => [x.name, x.title])) : []),
+    [globalAttributes]
+  );
+  const withKeyAttribute = useCallback(
+    value => value.map(e => ({...e, key: shortid.generate()})),
+    []
+  );
 
   return (
     <Tab.Pane active={active}>
@@ -24,17 +34,17 @@ function RoomEditOptions({active, showEquipment, globalAttributes}) {
       </Header>
       <Form.Group>
         <FinalField
-          name="bookableHours"
+          name="bookable_hours"
           component={DailyAvailability}
           isEqual={_.isEqual}
-          format={value => (value === null ? [] : withKeyAttribute(value))}
+          format={value => (value ? [] : withKeyAttribute(value))}
           hideErrorPopup={!active}
         />
         <FinalField
-          name="nonbookablePeriods"
+          name="nonbookable_periods"
           component={NonBookablePeriods}
           isEqual={_.isEqual}
-          format={value => (value === null ? [] : withKeyAttribute(value))}
+          format={value => (value ? [] : withKeyAttribute(value))}
           hideErrorPopup={!active}
         />
       </Form.Group>
@@ -44,7 +54,7 @@ function RoomEditOptions({active, showEquipment, globalAttributes}) {
       <Form.Group>
         {showEquipment && (
           <FinalField
-            name="availableEquipment"
+            name="available_equipment"
             component={EquipmentList}
             isEqual={_.isEqual}
             componentLabel={Translate.string('Add new equipment')}
@@ -111,19 +121,19 @@ function RoomEditOptions({active, showEquipment, globalAttributes}) {
         <Translate>Options</Translate>
       </Header>
       <Form.Group grouped>
-        <FinalCheckbox name="isReservable" label={Translate.string('Bookable')} hideErrorPopup />
+        <FinalCheckbox name="is_reservable" label={Translate.string('Bookable')} hideErrorPopup />
         <FinalCheckbox
-          name="reservationsNeedConfirmation"
+          name="reservations_need_confirmation"
           label={Translate.string('Require confirmation (pre-bookings)')}
           hideErrorPopup={!active}
         />
         <FinalCheckbox
-          name="notificationsEnabled"
+          name="notifications_enabled"
           label={Translate.string('Reminders enabled')}
           hideErrorPopup={!active}
         />
         <FinalCheckbox
-          name="endNotificationsEnabled"
+          name="end_notifications_enabled"
           label={Translate.string('Reminders of finishing bookings enabled')}
           hideErrorPopup={!active}
         />

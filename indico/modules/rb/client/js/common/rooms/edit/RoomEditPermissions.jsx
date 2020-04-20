@@ -1,3 +1,10 @@
+// This file is part of Indico.
+// Copyright (C) 2002 - 2020 CERN
+//
+// Indico is free software; you can redistribute it and/or
+// modify it under the terms of the MIT License; see the
+// LICENSE file for more details.
+
 import {Form, Header, Tab} from 'semantic-ui-react';
 import React from 'react';
 import _ from 'lodash';
@@ -6,11 +13,8 @@ import {FavoritesProvider} from 'indico/react/hooks';
 import {ACLField} from 'indico/react/components';
 import {Translate} from 'indico/react/i18n';
 import {FinalField, FinalRadio, parsers as p} from 'indico/react/forms';
-import {usePermissionInfo} from 'indico/react/components/principals/hooks';
 
-function RoomEditPermissions({active}) {
-  const [permissionManager, permissionInfo] = usePermissionInfo();
-
+function RoomEditPermissions({active, permissionManager, permissionInfo}) {
   return (
     <Tab.Pane active={active}>
       <Header>
@@ -27,13 +31,13 @@ function RoomEditPermissions({active}) {
         </p>
         <Form.Group>
           <FinalRadio
-            name="protectionMode"
+            name="protection_mode"
             value="public"
             label={Translate.string('Public')}
             hideErrorPopup={!active}
           />
           <FinalRadio
-            name="protectionMode"
+            name="protection_mode"
             value="protected"
             label={Translate.string('Restricted')}
             hideErrorPopup={!active}
@@ -44,7 +48,7 @@ function RoomEditPermissions({active}) {
         <FavoritesProvider>
           {favoriteUsersController => (
             <FinalField
-              name="aclEntries"
+              name="acl_entries"
               component={ACLField}
               favoriteUsersController={favoriteUsersController}
               label={Translate.string('Permissions')}
@@ -65,10 +69,20 @@ function RoomEditPermissions({active}) {
 
 RoomEditPermissions.propTypes = {
   active: PropTypes.bool,
+  permissionInfo: PropTypes.shape({
+    permissions: PropTypes.object,
+    tree: PropTypes.object,
+    default: PropTypes.string,
+  }),
+  permissionManager: PropTypes.shape({
+    setPermissionForId: PropTypes.func.isRequired,
+  }),
 };
 
 RoomEditPermissions.defaultProps = {
   active: true,
+  permissionInfo: null,
+  permissionManager: null,
 };
 
 export default RoomEditPermissions;

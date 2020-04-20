@@ -22,6 +22,6 @@
     }
 }
 
-.DateRangePicker_picker { // sass-lint:disable-line class-name-format
+:global(.DateRangePicker_picker) { // sass-lint:disable-line class-name-format
     z-index: 10;
 }

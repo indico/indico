@@ -15,68 +15,89 @@ import updateRoomAttributesURL from 'indico-url:rb.admin_update_room_attributes'
 import updateRoomAvailabilityURL from 'indico-url:rb.admin_update_room_availability';
 
 import {Form as FinalForm, FormSpy} from 'react-final-form';
-import {Button, Form, Grid, Label, Menu, Message, Modal, Tab} from 'semantic-ui-react';
+import {
+  Button,
+  Dimmer,
+  Form,
+  Grid,
+  Label,
+  Loader,
+  Menu,
+  Message,
+  Modal,
+  Tab,
+} from 'semantic-ui-react';
 import React, {useEffect, useState, useCallback, useMemo} from 'react';
 import PropTypes from 'prop-types';
 import _ from 'lodash';
 import arrayMutators from 'final-form-arrays';
-import {camelizeKeys, snakifyKeys} from 'indico/utils/case';
+import {useDispatch} from 'react-redux';
+import {snakifyKeys} from 'indico/utils/case';
 import {Translate} from 'indico/react/i18n';
 import {indicoAxios, handleAxiosError} from 'indico/utils/axios';
 
 import './RoomEditModal.module.scss';
 import {getChangedValues, handleSubmitError, parsers as p} from 'indico/react/forms';
+import {useFavoriteUsers} from 'indico/react/hooks';
+import {usePermissionInfo} from 'indico/react/components/principals/hooks';
 import RoomPhoto from './RoomPhoto';
 import RoomEditDetails from './edit/RoomEditDetails';
 import RoomEditNotifications from './edit/RoomEditNotifications';
 import RoomEditLocation from './edit/RoomEditLocation';
 import RoomEditPermissions from './edit/RoomEditPermissions';
 import RoomEditOptions from './edit/RoomEditOptions';
+import {actions as roomsActions} from '../../common/rooms';
+import {actions as userActions} from '../../common/user';
 
 function RoomEditModal({roomId, locationId, onClose, afterCreation}) {
+  const favoriteUsersController = useFavoriteUsers();
+  const [permissionManager, permissionInfo] = usePermissionInfo();
+  const dispatch = useDispatch();
+
   const [globalAttributes, setGlobalAttributes] = useState([]);
   const [newRoomId, setNewRoomId] = useState(null);
   const [wasEverUpdated, setWasEverUpdated] = useState(null);
   const [tabsWithError, setTabsWithError] = useState([]);
+  const [loading, setLoading] = useState(false);
 
   const [roomDetails, setRoomDetails] = useState({
-    aclEntries: [],
-    availableEquipment: [],
-    notificationEmails: [],
-    notificationsEnabled: true,
-    endNotificationsEnabled: true,
-    isReservable: true,
+    acl_entries: [],
+    available_equipment: [],
+    notification_emails: [],
+    notifications_enabled: true,
+    end_notifications_enabled: true,
+    is_reservable: true,
     owner: null,
-    reservationsNeedConfirmation: false,
+    reservations_need_confirmation: false,
     capacity: null,
     longitude: null,
     latitude: null,
-    protectionMode: 'public',
+    protection_mode: 'public',
   });
   const [roomAttributes, setRoomAttributes] = useState([]);
   const [roomAvailability, setRoomAvailability] = useState({
-    bookableHours: [],
-    nonbookablePeriods: [],
+    bookable_hours: [],
+    nonbookable_periods: [],
   });
 
   const isNewRoom = useCallback(() => roomId === undefined, [roomId]);
 
-  const fetch = useCallback(async (url, params = {}) => {
+  const fetch = useCallback(async url => {
     let response;
     try {
-      response = await indicoAxios.get(url(params));
+      response = await indicoAxios.get(url);
     } catch (error) {
       handleAxiosError(error);
       return;
     }
-    return camelizeKeys(response.data);
+    return response.data;
   }, []);
 
   const fetchRoomData = useCallback(async () => {
     const resp = await Promise.all([
-      fetch(roomURL, {room_id: roomId}),
-      fetch(fetchRoomAttributesURL, {room_id: roomId}),
-      fetch(fetchRoomAvailabilityURL, {room_id: roomId}),
+      fetch(roomURL({room_id: roomId})),
+      fetch(fetchRoomAttributesURL({room_id: roomId})),
+      fetch(fetchRoomAvailabilityURL({room_id: roomId})),
     ]);
     [setRoomDetails, setRoomAttributes, setRoomAvailability].forEach((x, i) => x(resp[i]));
   }, [fetch, roomId]);
@@ -87,44 +108,55 @@ function RoomEditModal({roomId, locationId, onClose, afterCreation}) {
         {
           key: 'basic-details',
           menuItem: <Translate>Basic Details</Translate>,
-          pane: <RoomEditDetails key="basic-details" />,
-          fields: ['owner', 'keyLocation', 'telephone', 'capacity', 'division', 'comments'],
+          pane: (
+            <RoomEditDetails
+              key="basic-details"
+              favoriteUsersController={favoriteUsersController}
+            />
+          ),
+          fields: ['owner', 'key_location', 'telephone', 'capacity', 'division', 'comments'],
         },
         {
           key: 'location',
           menuItem: <Translate>Location</Translate>,
           pane: <RoomEditLocation key="location" />,
           fields: [
-            'verboseName',
+            'verbose_name',
             'site',
             'building',
             'floor',
             'number',
-            'surfaceArea',
+            'surface_area',
             'latitude',
             'longitude',
-            'maxAdvanceDays',
-            'bookingLimitDays',
+            'max_advance_days',
+            'booking_limit_days',
           ],
         },
         {
           key: 'permissions',
           menuItem: <Translate>Permissions</Translate>,
-          pane: <RoomEditPermissions key="permissions" />,
-          fields: ['protectionMode', 'aclEntries'],
+          pane: (
+            <RoomEditPermissions
+              key="permissions"
+              permissionManager={permissionManager}
+              permissionInfo={permissionInfo}
+            />
+          ),
+          fields: ['protection_mode', 'acl_entries'],
         },
         {
           key: 'notifications',
           menuItem: <Translate>Notifications</Translate>,
           pane: <RoomEditNotifications key="notifications" />,
           fields: [
-            'notificationEmails',
-            'notificationBeforeDays',
-            'notificationBeforeDaysWeekly',
-            'notificationBeforeDaysMonthly',
-            'endNotificationDaily',
-            'endNotificationWeekly',
-            'endNotificationMonthly',
+            'notification_emails',
+            'notification_before_days',
+            'notification_before_days_weekly',
+            'notification_before_days_monthly',
+            'end_notification_daily',
+            'end_notification_weekly',
+            'end_notification_monthly',
           ],
         },
         {
@@ -132,14 +164,14 @@ function RoomEditModal({roomId, locationId, onClose, afterCreation}) {
           menuItem: <Translate>Options</Translate>,
           pane: <RoomEditOptions key="options" showEquipment globalAttributes={globalAttributes} />,
           fields: [
-            'bookableHours',
-            'nonbookablePeriods',
-            'availableEquipment',
+            'bookable_hours',
+            'nonbookable_periods',
+            'available_equipment',
             'attributes',
-            'isReservable',
-            'reservationsNeedConfirmation',
-            'notificationsEnabled',
-            'endNotificationsEnabled',
+            'is_reservable',
+            'reservations_need_confirmation',
+            'notifications_enabled',
+            'end_notifications_enabled',
           ],
         },
       ].map(x => ({
@@ -150,32 +182,31 @@ function RoomEditModal({roomId, locationId, onClose, afterCreation}) {
           </Menu.Item>
         ),
       })),
-    [tabsWithError, globalAttributes]
+    [favoriteUsersController, globalAttributes, permissionInfo, permissionManager, tabsWithError]
   );
 
   const handleSubmit = async (data, form) => {
     const changedValues = getChangedValues(data, form);
     const {
       attributes,
-      bookableHours,
-      nonbookablePeriods,
-      availableEquipment,
+      bookable_hours: bookableHours,
+      nonbookable_periods: nonbookablePeriods,
+      available_equipment: availableEquipment,
       ...basicDetails
     } = changedValues;
     try {
       if (isNewRoom()) {
-        const payload = snakifyKeys(basicDetails);
+        const payload = {...basicDetails};
         payload.location_id = locationId;
         const response = await indicoAxios.post(roomsURL(), payload);
         setNewRoomId(response.data.id);
       } else if (!_.isEmpty(basicDetails)) {
-        await indicoAxios.patch(roomURL({room_id: roomId}), snakifyKeys(basicDetails));
+        await indicoAxios.patch(roomURL({room_id: roomId}), basicDetails);
       }
       if (availableEquipment) {
-        await indicoAxios.post(
-          updateRoomEquipmentURL({room_id: roomId}),
-          snakifyKeys({available_equipment: availableEquipment})
-        );
+        await indicoAxios.post(updateRoomEquipmentURL({room_id: roomId}), {
+          available_equipment: availableEquipment,
+        });
       }
       if (attributes) {
         await indicoAxios.post(updateRoomAttributesURL({room_id: roomId}), {attributes});
@@ -193,7 +224,7 @@ function RoomEditModal({roomId, locationId, onClose, afterCreation}) {
         fetchRoomData();
       }
     } catch (e) {
-      const submitErrors = camelizeKeys(handleSubmitError(e));
+      const submitErrors = handleSubmitError(e);
       setTabsWithError(
         Object.keys(submitErrors).map(err => {
           const pane = tabPanes.find(t => t.fields && t.fields.includes(err));
@@ -204,18 +235,32 @@ function RoomEditModal({roomId, locationId, onClose, afterCreation}) {
     }
   };
 
-  const closeModal = () => {
+  const closeModal = async () => {
+    setLoading(true);
+    if ((roomId || newRoomId) !== null && wasEverUpdated) {
+      await Promise.all([
+        dispatch(roomsActions.fetchRoom(roomId)),
+        dispatch(roomsActions.fetchEquipmentTypes()),
+        dispatch(userActions.fetchRoomPermissions(roomId)),
+        dispatch(roomsActions.fetchDetails(roomId, true)),
+      ]);
+    }
+
     onClose(wasEverUpdated || afterCreation);
   };
 
   useEffect(() => {
-    (async () => setGlobalAttributes(await fetch(fetchAttributesURL)))();
+    (async () => setGlobalAttributes(await fetch(fetchAttributesURL())))();
   }, [fetch]);
 
   useEffect(() => {
-    if (!isNewRoom()) {
-      fetchRoomData();
-    }
+    (async () => {
+      if (!isNewRoom()) {
+        setLoading(true);
+        await fetchRoomData();
+        setLoading(false);
+      }
+    })();
   }, [isNewRoom, fetchRoomData]);
 
   const renderModal = formProps => {
@@ -226,6 +271,13 @@ function RoomEditModal({roomId, locationId, onClose, afterCreation}) {
       submitting,
       dirty,
     } = formProps;
+    if (loading) {
+      return (
+        <Dimmer active page>
+          <Loader />
+        </Dimmer>
+      );
+    }
     return (
       <Modal open onClose={closeModal} size="large" centered={false} closeIcon>
         <Modal.Header>
@@ -299,8 +351,6 @@ function RoomEditModal({roomId, locationId, onClose, afterCreation}) {
   };
 
   const renderForm = () => {
-    const {bookableHours, nonbookablePeriods} = roomAvailability || {};
-
     if (newRoomId) {
       return <RoomEditModal roomId={newRoomId} onClose={onClose} afterCreation />;
     }
@@ -310,9 +360,8 @@ function RoomEditModal({roomId, locationId, onClose, afterCreation}) {
         onSubmit={handleSubmit}
         initialValues={{
           ...roomDetails,
+          ...roomAvailability,
           attributes: roomAttributes,
-          bookableHours,
-          nonbookablePeriods,
         }}
         initialValuesEqual={_.isEqual}
         render={renderModal}
