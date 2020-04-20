@@ -31,7 +31,7 @@ import React, {useEffect, useState, useCallback, useMemo} from 'react';
 import PropTypes from 'prop-types';
 import _ from 'lodash';
 import arrayMutators from 'final-form-arrays';
-import {useDispatch} from 'react-redux';
+import {useDispatch, useSelector} from 'react-redux';
 import {snakifyKeys} from 'indico/utils/case';
 import {Translate} from 'indico/react/i18n';
 import {indicoAxios, handleAxiosError} from 'indico/utils/axios';
@@ -48,10 +48,12 @@ import RoomEditPermissions from './edit/RoomEditPermissions';
 import RoomEditOptions from './edit/RoomEditOptions';
 import {actions as roomsActions} from '../../common/rooms';
 import {actions as userActions} from '../../common/user';
+import {getAllEquipmentTypes} from './selectors';
 
 function RoomEditModal({roomId, locationId, onClose, afterCreation}) {
   const favoriteUsersController = useFavoriteUsers();
   const [permissionManager, permissionInfo] = usePermissionInfo();
+  const equipmentTypes = useSelector(getAllEquipmentTypes);
   const dispatch = useDispatch();
 
   const [globalAttributes, setGlobalAttributes] = useState([]);
@@ -67,11 +69,7 @@ function RoomEditModal({roomId, locationId, onClose, afterCreation}) {
     notifications_enabled: true,
     end_notifications_enabled: true,
     is_reservable: true,
-    owner: null,
     reservations_need_confirmation: false,
-    capacity: null,
-    longitude: null,
-    latitude: null,
     protection_mode: 'public',
   });
   const [roomAttributes, setRoomAttributes] = useState([]);
@@ -141,6 +139,7 @@ function RoomEditModal({roomId, locationId, onClose, afterCreation}) {
               key="permissions"
               permissionManager={permissionManager}
               permissionInfo={permissionInfo}
+              favoriteUsersController={favoriteUsersController}
             />
           ),
           fields: ['protection_mode', 'acl_entries'],
@@ -162,7 +161,13 @@ function RoomEditModal({roomId, locationId, onClose, afterCreation}) {
         {
           key: 'options',
           menuItem: <Translate>Options</Translate>,
-          pane: <RoomEditOptions key="options" showEquipment globalAttributes={globalAttributes} />,
+          pane: (
+            <RoomEditOptions
+              key="options"
+              showEquipment={!!equipmentTypes}
+              globalAttributes={globalAttributes}
+            />
+          ),
           fields: [
             'bookable_hours',
             'nonbookable_periods',
@@ -182,7 +187,14 @@ function RoomEditModal({roomId, locationId, onClose, afterCreation}) {
           </Menu.Item>
         ),
       })),
-    [favoriteUsersController, globalAttributes, permissionInfo, permissionManager, tabsWithError]
+    [
+      equipmentTypes,
+      favoriteUsersController,
+      globalAttributes,
+      permissionInfo,
+      permissionManager,
+      tabsWithError,
+    ]
   );
 
   const handleSubmit = async (data, form) => {
@@ -235,7 +247,7 @@ function RoomEditModal({roomId, locationId, onClose, afterCreation}) {
     }
   };
 
-  const closeModal = async () => {
+  const closeModal = useCallback(async () => {
     setLoading(true);
     if ((roomId || newRoomId) !== null && wasEverUpdated) {
       await Promise.all([
@@ -245,9 +257,8 @@ function RoomEditModal({roomId, locationId, onClose, afterCreation}) {
         dispatch(roomsActions.fetchDetails(roomId, true)),
       ]);
     }
-
     onClose(wasEverUpdated || afterCreation);
-  };
+  }, [dispatch, onClose, roomId, newRoomId, wasEverUpdated, afterCreation]);
 
   useEffect(() => {
     (async () => setGlobalAttributes(await fetch(fetchAttributesURL())))();
@@ -318,7 +329,7 @@ function RoomEditModal({roomId, locationId, onClose, afterCreation}) {
           <Grid columns="equal">
             {!isNewRoom() && (
               <Grid.Column width={4}>
-                <RoomPhoto roomId={roomId} hasPhoto={roomDetails.hasPhoto} />
+                <RoomPhoto roomId={roomId} hasPhoto={roomDetails && roomDetails.hasPhoto} />
               </Grid.Column>
             )}
             <Grid.Column>
@@ -353,6 +364,10 @@ function RoomEditModal({roomId, locationId, onClose, afterCreation}) {
   const renderForm = () => {
     if (newRoomId) {
       return <RoomEditModal roomId={newRoomId} onClose={onClose} afterCreation />;
+    }
+    if (!roomDetails || !roomAvailability || !roomAttributes) {
+      // In case of error, nothing is returned
+      return null;
     }
 
     return (

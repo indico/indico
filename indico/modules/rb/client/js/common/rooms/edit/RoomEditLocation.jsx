@@ -68,6 +68,7 @@ function RoomEditLocation({active}) {
           name="latitude"
           label={Translate.string('Latitude')}
           parse={f => p.number(f, false)}
+          validate={v.optional(v.number())}
           hideErrorPopup={!active}
         />
         <FinalInput
@@ -76,6 +77,7 @@ function RoomEditLocation({active}) {
           name="longitude"
           label={Translate.string('Longitude')}
           parse={f => p.number(f, false)}
+          validate={v.optional(v.number())}
           hideErrorPopup={!active}
         />
       </Form.Group>
