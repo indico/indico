@@ -39,6 +39,8 @@
 {% macro render_editables_section(contribution) %}
     {% set can_create_editable = contribution.allowed_types_for_editable|length > 0 %}
     {% set can_submit = contribution.is_user_associated(session.user, check_abstract=true) %}
+    {% set enabled_editables = contribution.enabled_editables %}
+    {% set has_enabled_types = enabled_editables|length > 0 %}
 
     {% if can_submit %}
         <section>
@@ -47,15 +49,24 @@
                 <h2>{% trans %}Editing{% endtrans %}</h2>
                 </div>
             </div>
-            {% for editable in contribution.editables -%}
-                <div>
-                    <a href="{{ url_for('event_editing.editable', editable) }}">
-                        {%- trans type=editable.type.name %}
-                            Go to timeline ({{ type }})
-                        {% endtrans -%}
-                    </a>
+            {% if has_enabled_types %}
+                <div class="action-box">
+                    {% for editable in enabled_editables -%}
+                        {% set latest_revision = editable.revisions|last %}
+                        {% set latest_state = latest_revision.final_state or latest_revision.initial_state %}
+                        <div class="section f-j-space-between">
+                            <div class="i-tag {{ latest_state.css_class }}">
+                                {{ editable.type.title }}: {{ latest_state.title }}
+                            </div>
+                            <div>
+                                <a href="{{ url_for('event_editing.editable', editable) }}">
+                                    {%- trans %}Go to timeline{% endtrans -%}
+                                </a>
+                            </div>
+                        </div>
+                    {%- endfor %}
                 </div>
-            {%- endfor %}
+            {% endif %}
             {% if can_create_editable %}
                 <div class="action-box highlight" style="margin-top: 10px;">
                     <div class="section flexrow">
