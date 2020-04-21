@@ -430,10 +430,11 @@ export function FinalSubmitButton({
   icon,
   children,
 }) {
-  const {hasValidationErrors, pristine, submitting} = useFormState({
-    subscription: {hasValidationErrors: true, pristine: true, submitting: true},
+  const {validating, hasValidationErrors, pristine, submitting} = useFormState({
+    subscription: {validating: true, hasValidationErrors: true, pristine: true, submitting: true},
   });
-  const disabled = hasValidationErrors || (disabledUntilChange && pristine) || submitting;
+  const disabled =
+    validating || hasValidationErrors || (disabledUntilChange && pristine) || submitting;
   return (
     <Form.Field disabled={disabled}>
       <Button
