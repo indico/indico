@@ -669,6 +669,20 @@ class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionMan
         """Check whether the user can lock/unlock the event"""
         return user and (user.is_admin or user == self.creator or self.category.can_manage(user))
 
+    def can_display(self):
+        """Check whether the user can display the event in the category.
+        To be replaced with new permission mechanism: can('display', self, session.user)."""
+        return self.visibility is None or self.can_manage(session.user)
+
+    @staticmethod
+    def get_hidden_events(category_id):
+        """Get all hidden events within the given category."""
+        category = Category.get(int(category_id), is_deleted=False)
+        return (Event.query.with_parent(category)
+                .filter(Event.category_id == category_id, Event.visibility == 0)
+                .order_by(Event.start_dt.desc(), Event.id.desc())
+                .all())
+
     def get_relative_event_ids(self):
         """Get the first, last, previous and next event IDs.
 
