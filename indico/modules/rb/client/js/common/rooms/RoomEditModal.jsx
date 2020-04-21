@@ -71,6 +71,7 @@ function RoomEditModal({roomId, locationId, onClose, afterCreation}) {
     is_reservable: true,
     reservations_need_confirmation: false,
     protection_mode: 'public',
+    has_photo: false
   });
   const [roomAttributes, setRoomAttributes] = useState([]);
   const [roomAvailability, setRoomAvailability] = useState({
@@ -253,8 +254,8 @@ function RoomEditModal({roomId, locationId, onClose, afterCreation}) {
       await Promise.all([
         dispatch(roomsActions.fetchRoom(roomId)),
         dispatch(roomsActions.fetchEquipmentTypes()),
-        dispatch(userActions.fetchRoomPermissions(roomId)),
         dispatch(roomsActions.fetchDetails(roomId, true)),
+        dispatch(userActions.fetchRoomPermissions(roomId)),
       ]);
     }
     onClose(wasEverUpdated || afterCreation);
@@ -329,7 +330,7 @@ function RoomEditModal({roomId, locationId, onClose, afterCreation}) {
           <Grid columns="equal">
             {!isNewRoom() && (
               <Grid.Column width={4}>
-                <RoomPhoto roomId={roomId} hasPhoto={roomDetails && roomDetails.hasPhoto} />
+                <RoomPhoto roomId={roomId} hasPhoto={roomDetails && roomDetails.has_photo} />
               </Grid.Column>
             )}
             <Grid.Column>

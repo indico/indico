@@ -6,11 +6,10 @@
 // LICENSE file for more details.
 
 import {Dropdown, Form, Header, Tab} from 'semantic-ui-react';
-import React, {useCallback, useMemo} from 'react';
+import React, {useMemo} from 'react';
 import _ from 'lodash';
 import {FieldArray} from 'react-final-form-arrays';
 import PropTypes from 'prop-types';
-import shortid from 'shortid';
 import {Translate} from 'indico/react/i18n';
 import {FinalCheckbox, FinalField, FinalInput} from 'indico/react/forms';
 import EquipmentList from './EquipmentList';
@@ -21,10 +20,6 @@ function RoomEditOptions({active, showEquipment, globalAttributes}) {
   const attributeTitles = useMemo(
     () => (globalAttributes ? _.fromPairs(globalAttributes.map(x => [x.name, x.title])) : []),
     [globalAttributes]
-  );
-  const withKeyAttribute = useCallback(
-    value => value.map(e => ({...e, key: shortid.generate()})),
-    []
   );
 
   return (
@@ -37,14 +32,12 @@ function RoomEditOptions({active, showEquipment, globalAttributes}) {
           name="bookable_hours"
           component={DailyAvailability}
           isEqual={_.isEqual}
-          format={value => (value ? [] : withKeyAttribute(value))}
           hideErrorPopup={!active}
         />
         <FinalField
           name="nonbookable_periods"
           component={NonBookablePeriods}
           isEqual={_.isEqual}
-          format={value => (value ? [] : withKeyAttribute(value))}
           hideErrorPopup={!active}
         />
       </Form.Group>

@@ -68,7 +68,7 @@ function optional(arg = null) {
     return chain(optional(), arg);
   }
   return value => {
-    if ([null, undefined].includes(value)) {
+    if (value === null || value === undefined) {
       return STOP_VALIDATION;
     }
   };
