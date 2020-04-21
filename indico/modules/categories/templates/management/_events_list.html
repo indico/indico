@@ -7,7 +7,7 @@
             <input type="checkbox" name="event_id" value="{{ event.id }}">
         </td>
         <td class="i-table column-icon">
-            {% if (event.visibility == 0) %}
+            {% if event.visibility == 0 %}
                 <span class="icon-eye icon-eye-blocked"></span>
             {% endif %}
         </td>
