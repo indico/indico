@@ -688,19 +688,16 @@ class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionMan
                             db.func.lag(Event.id).over(order_by=(Event.start_dt, Event.id)).label('prev'),
                             db.func.lead(Event.id).over(order_by=(Event.start_dt, Event.id)).label('next')])
                     .where((Event.category_id == self.category_id) & ~Event.is_deleted &
-                           (Event.visibility.is_(None) | (Event.visibility != 0)))
+                           (Event.visibility.is_(None) | (Event.visibility != 0) | (Event.id == self.id)))
                     .alias())
         rv = (db.session.query(subquery.c.first, subquery.c.last, subquery.c.prev, subquery.c.next)
               .filter(subquery.c.id == self.id)
-              .first())
-        if not rv:
-            rv = {'first': None, 'last': None, 'prev': None, 'next': None}
-        else:
-            rv = rv._asdict()
-            if rv['first'] == self.id:
-                rv['first'] = None
-            if rv['last'] == self.id:
-                rv['last'] = None
+              .one()
+              ._asdict())
+        if rv['first'] == self.id:
+            rv['first'] = None
+        if rv['last'] == self.id:
+            rv['last'] = None
         return rv
 
     def get_verbose_title(self, show_speakers=False, show_series_pos=False):

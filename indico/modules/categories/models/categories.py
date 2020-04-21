@@ -489,8 +489,8 @@ class Category(SearchableTitleMixin, DescriptionMixin, ProtectionManagersMixin, 
     def get_hidden_events(self, user=None):
         """Get all hidden events within the given category and user."""
         from indico.modules.events import Event
-        hidden_events = Event.query.with_parent(self).filter_by(visibility=0)
-        return filter(lambda e: not e.can_display(user), hidden_events)
+        hidden_events = Event.query.with_parent(self).filter_by(visibility=0).all()
+        return [event for event in hidden_events if not event.can_display(user)]
 
     @property
     def icon_url(self):
