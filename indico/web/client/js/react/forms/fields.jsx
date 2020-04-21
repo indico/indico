@@ -33,8 +33,9 @@ export function FormFieldAdapter({
   fieldProps,
   hideValidationError,
   hideErrorWhileActive,
+  loaderWhileValidating,
   undefinedValue,
-  meta: {touched, error, submitError, submitting, dirty, dirtySinceLastSubmit, active},
+  meta: {touched, error, submitError, submitting, dirty, dirtySinceLastSubmit, active, validating},
   as: Component,
   getValue,
   ...props
@@ -68,6 +69,10 @@ export function FormFieldAdapter({
     // some components such as the react-dates picker log an error if an
     // unexpected prop is passed, even if it's undefined...
     delete input.checked;
+  }
+
+  if (loaderWhileValidating) {
+    input.loading = validating;
   }
 
   const field = (
@@ -117,6 +122,7 @@ FormFieldAdapter.propTypes = {
   as: PropTypes.elementType.isRequired,
   children: PropTypes.node,
   defaultValue: PropTypes.any,
+  loaderWhileValidating: PropTypes.bool,
   fieldProps: PropTypes.object,
   getValue: PropTypes.func,
 };
@@ -132,6 +138,7 @@ FormFieldAdapter.defaultProps = {
   componentLabel: null,
   children: null,
   defaultValue: null,
+  loaderWhileValidating: false,
   fieldProps: {},
   getValue: null,
 };
@@ -285,7 +292,15 @@ export function FinalInput({name, label, type, nullIfEmpty, noAutoComplete, ...r
   }
 
   return (
-    <FinalField name={name} label={label} component={Input} type={type} {...extraProps} {...rest} />
+    <FinalField
+      name={name}
+      label={label}
+      component={Input}
+      loaderWhileValidating
+      type={type}
+      {...extraProps}
+      {...rest}
+    />
   );
 }
 
