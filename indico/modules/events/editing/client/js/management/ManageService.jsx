@@ -24,7 +24,10 @@ import {
 } from 'indico/react/forms';
 import {indicoAxios, handleAxiosError} from 'indico/utils/axios';
 import {useIndicoAxios} from 'indico/react/hooks';
+import {makeAsyncDebounce} from 'indico/utils/debounce';
 import Section from './Section';
+
+const debounce = makeAsyncDebounce(250);
 
 export default function ManageService({eventId}) {
   const [serviceURLInfo, setServiceURLInfo] = useState(false);
@@ -173,9 +176,11 @@ export default function ManageService({eventId}) {
                       try {
                         // this does send a request on each keypress, but in this particular case
                         // it's VERY likely that people paste a url, so it shouldn't be an issue
-                        resp = await indicoAxios.get(checkServiceURL({confId: eventId}), {
-                          params: {url: value},
-                        });
+                        resp = await debounce(() =>
+                          indicoAxios.get(checkServiceURL({confId: eventId}), {
+                            params: {url: value},
+                          })
+                        );
                       } catch (err) {
                         // the url validation is not exactly the same on the client and server
                         // side, so we have some edge cases (e.g. `http://test:`) which pass
