@@ -21,7 +21,13 @@
     padding-bottom: 42px !important;
 }
 
+.DateRangePicker_picker,
+.SingleDatePicker_picker {
+    // ensure date pickers don't have SUI checkbox switches (z-index 3) in front of them
+    z-index: 4 !important;
+}
+
 .DateRangePicker_picker.DateRangePicker_picker__fullScreenPortal,
 .SingleDatePicker_picker.SingleDatePicker_picker__fullScreenPortal {
-    z-index: 1001;
+    z-index: 1001 !important;
 }
