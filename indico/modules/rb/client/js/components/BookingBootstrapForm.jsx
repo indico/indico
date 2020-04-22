@@ -283,23 +283,27 @@ class BookingBootstrapForm extends React.Component {
           </Form.Group>
         )}
         {['every', 'daily'].includes(type) && (
-          <DateRangePicker
-            startDate={startDate}
-            endDate={endDate}
-            onDatesChange={({startDate: sd, endDate: ed}) => this.updateDates(sd, ed)}
-            isOutsideRange={dt => {
-              return !isBookingStartDateValid(dt, isAdminOverrideEnabled, bookingGracePeriod);
-            }}
-          />
+          <Form.Group inline>
+            <DateRangePicker
+              startDate={startDate}
+              endDate={endDate}
+              onDatesChange={({startDate: sd, endDate: ed}) => this.updateDates(sd, ed)}
+              isOutsideRange={dt => {
+                return !isBookingStartDateValid(dt, isAdminOverrideEnabled, bookingGracePeriod);
+              }}
+            />
+          </Form.Group>
         )}
         {type === 'single' && (
-          <SingleDatePicker
-            date={startDate}
-            onDateChange={date => this.updateDates(date, null)}
-            disabledDate={dt => {
-              return !isBookingStartDateValid(dt, isAdminOverrideEnabled, bookingGracePeriod);
-            }}
-          />
+          <Form.Group inline>
+            <SingleDatePicker
+              date={startDate}
+              onDateChange={date => this.updateDates(date, null)}
+              disabledDate={dt => {
+                return !isBookingStartDateValid(dt, isAdminOverrideEnabled, bookingGracePeriod);
+              }}
+            />
+          </Form.Group>
         )}
         {!dayBased && (
           <Form.Group inline>

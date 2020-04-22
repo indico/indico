@@ -5,10 +5,7 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-
-.SingleDatePicker, .DateRangePicker {
-    padding-bottom: 1em;
-}
+// sass-lint:disable class-name-format
 
 .ui.form input[type='text'].DateInput_input {
     border: none;
