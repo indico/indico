@@ -11,7 +11,7 @@ from flask import session
 from werkzeug.exceptions import Forbidden, NotFound
 
 from indico.modules.events.editing.controllers.base import RHContributionEditableBase, RHEditingManagementBase
-from indico.modules.events.editing.views import WPEditing
+from indico.modules.events.editing.views import WPEditing, WPEditingView
 
 
 class RHEditingDashboard(RHEditingManagementBase):
@@ -37,7 +37,7 @@ class RHEditableTimeline(RHContributionEditableBase):
             raise Forbidden
 
     def _process(self):
-        return WPEditing.render_template(
+        return WPEditingView.render_template(
             'editing.html',
             self.event,
             editable=self.editable,
