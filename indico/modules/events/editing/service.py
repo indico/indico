@@ -59,12 +59,18 @@ def _get_headers(event, include_token=True):
     return headers
 
 
-def _make_event_identifier(event):
+def make_event_identifier(event):
     data = url_parse(config.BASE_URL)
     parts = data.netloc.split('.')
     if data.path:
         parts += data.path.split('/')
     return '{}-{}'.format('-'.join(parts), event.id)
+
+
+def _get_event_identifier(event):
+    identifier = editing_settings.get(event, 'service_event_identifier')
+    assert identifier
+    return identifier
 
 
 def service_handle_enabled(event):
@@ -74,7 +80,7 @@ def service_handle_enabled(event):
         'token': editing_settings.get(event, 'service_token'),
     }
     try:
-        resp = requests.put(_build_url(event, '/event/{}'.format(_make_event_identifier(event))),
+        resp = requests.put(_build_url(event, '/event/{}'.format(_get_event_identifier(event))),
                             headers=_get_headers(event, include_token=False), data=data)
         resp.raise_for_status()
     except requests.RequestException as exc:
@@ -84,7 +90,7 @@ def service_handle_enabled(event):
 
 def service_handle_disconnected(event):
     try:
-        resp = requests.delete(_build_url(event, '/event/{}'.format(_make_event_identifier(event))),
+        resp = requests.delete(_build_url(event, '/event/{}'.format(_get_event_identifier(event))),
                                headers=_get_headers(event))
         resp.raise_for_status()
     except requests.RequestException as exc:
@@ -94,7 +100,7 @@ def service_handle_disconnected(event):
 
 def service_get_status(event):
     try:
-        resp = requests.get(_build_url(event, '/event/{}'.format(_make_event_identifier(event))),
+        resp = requests.get(_build_url(event, '/event/{}'.format(_get_event_identifier(event))),
                             headers=_get_headers(event))
         resp.raise_for_status()
     except requests.ConnectionError as exc:

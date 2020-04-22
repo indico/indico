@@ -16,8 +16,9 @@ from werkzeug.exceptions import BadRequest, ServiceUnavailable
 
 from indico.core.db import db
 from indico.modules.events.editing.controllers.base import RHEditingManagementBase
-from indico.modules.events.editing.service import (ServiceRequestFailed, check_service_url, service_get_status,
-                                                   service_handle_disconnected, service_handle_enabled)
+from indico.modules.events.editing.service import (ServiceRequestFailed, check_service_url, make_event_identifier,
+                                                   service_get_status, service_handle_disconnected,
+                                                   service_handle_enabled)
 from indico.modules.events.editing.settings import editing_settings
 from indico.util.i18n import _
 from indico.web.args import use_kwargs
@@ -47,6 +48,8 @@ class RHConnectService(RHEditingManagementBase):
         info = check_service_url(url)
         if info['error'] is not None:
             abort(422, messages={'url': [info['error']]})
+        if not editing_settings.get(self.event, 'service_event_identifier'):
+            editing_settings.set(self.event, 'service_event_identifier', make_event_identifier(self.event))
         editing_settings.set_multi(self.event, {
             'service_url': url,
             'service_token': unicode(uuid4()),
