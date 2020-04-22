@@ -193,6 +193,7 @@ class RHRegistrationFormEdit(RHManageRegFormBase):
         if form.validate_on_submit():
             form.populate_obj(self.regform)
             db.session.flush()
+            signals.event.registration_form_edited.send(self.regform)
             flash(_('Registration form has been successfully modified'), 'success')
             return redirect(url_for('.manage_regform', self.regform))
         return WPManageRegistration.render_template('management/regform_edit.html', self.event, form=form,

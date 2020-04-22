@@ -83,6 +83,7 @@ Internal Changes
 - Add ``before-regform`` template hook (:issue:`4171`, thanks :user:`giusedb`)
 - Add ``registrations`` kwarg to the ``event.designer.print_badge_template``
   signal (:issue:`4297`, thanks :user:`giusedb`)
+- Add ``registration_form_edited`` signal (:issue:`4421`, thanks :user:`omegak`)
 
 
 ----
