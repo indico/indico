@@ -47,6 +47,11 @@ Called when a new registration form is created. The `sender` is the
 `RegistrationForm` object.
 """)
 
+registration_form_edited = _signals.signal('registration-form-edited', """
+Called when a registration form is edited. The `sender` is the
+`RegistrationForm` object.
+""")
+
 generate_ticket_qr_code = _signals.signal('generate-ticket-qr-code', """
 Called when generating the QR code for a ticket. The data included in the QR code is passed
 in the `ticket_data` kwarg and may be modified.
