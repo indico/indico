@@ -64,6 +64,12 @@ export function FormFieldAdapter({
     }
   };
 
+  if (input.checked === undefined) {
+    // some components such as the react-dates picker log an error if an
+    // unexpected prop is passed, even if it's undefined...
+    delete input.checked;
+  }
+
   const field = (
     <Form.Field
       required={required}
