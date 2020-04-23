@@ -7,6 +7,11 @@
             <input type="checkbox" name="event_id" value="{{ event.id }}">
         </td>
         <td class="i-table column-icon">
+            {% if event.visibility == 0 %}
+                <span class="icon-eye icon-eye-blocked" title="{% trans %}Hidden{% endtrans %}"></span>
+            {% endif %}
+        </td>
+        <td class="i-table column-icon">
             {% if event.is_self_protected %}
                 <span class="icon-lock icon-protection-self"></span>
             {% elif event.is_public %}
@@ -40,6 +45,7 @@
     <table class="i-table event-management">
         <thead>
             <tr class="i-table">
+                <th class="i-table column-icon"></th>
                 <th class="i-table column-icon"></th>
                 <th class="i-table column-icon"></th>
                 <th class="i-table sortable-column">

@@ -214,7 +214,8 @@ class RHDisplayCategoryEventsBase(RHDisplayCategoryBase):
                             joinedload('label'),
                             load_only('id', 'category_id', 'created_dt', 'start_dt', 'end_dt', 'timezone',
                                       'protection_mode', 'title', 'type_', 'series_pos', 'series_count',
-                                      'own_address', 'own_venue_id', 'own_venue_name', 'label_id', 'label_message'))
+                                      'own_address', 'own_venue_id', 'own_venue_name', 'label_id', 'label_message',
+                                      'visibility'))
 
     def _process_args(self):
         RHDisplayCategoryBase._process_args(self)
@@ -263,12 +264,15 @@ class RHDisplayCategory(RHDisplayCategoryEventsBase):
         # If there are no events in this range, it will include the last and next month containing events.
         past_threshold = self.now - relativedelta(months=1, day=1, hour=0, minute=0)
         future_threshold = self.now + relativedelta(months=1, day=1, hour=0, minute=0)
+        hidden_event_ids = {e.id for e in self.category.get_hidden_events(user=session.user)}
         next_event_start_dt = (db.session.query(Event.start_dt)
-                               .filter(Event.start_dt >= self.now, Event.category_id == self.category.id)
+                               .filter(Event.start_dt >= self.now, Event.category_id == self.category.id,
+                                       Event.id.notin_(hidden_event_ids))
                                .order_by(Event.start_dt.asc(), Event.id.asc())
                                .first() or (None,))[0]
         previous_event_start_dt = (db.session.query(Event.start_dt)
-                                   .filter(Event.start_dt < self.now, Event.category_id == self.category.id)
+                                   .filter(Event.start_dt < self.now, Event.category_id == self.category.id,
+                                           Event.id.notin_(hidden_event_ids))
                                    .order_by(Event.start_dt.desc(), Event.id.desc())
                                    .first() or (None,))[0]
         if next_event_start_dt is not None and next_event_start_dt > future_threshold:
@@ -277,6 +281,7 @@ class RHDisplayCategory(RHDisplayCategoryEventsBase):
             past_threshold = previous_event_start_dt.replace(day=1, hour=0, minute=0)
         event_query = (Event.query.with_parent(self.category)
                        .options(*self._event_query_options)
+                       .filter(Event.id.notin_(hidden_event_ids))
                        .order_by(Event.start_dt.desc(), Event.id.desc()))
         past_event_query = event_query.filter(Event.start_dt < past_threshold)
         future_event_query = event_query.filter(Event.start_dt >= future_threshold)
@@ -287,6 +292,7 @@ class RHDisplayCategory(RHDisplayCategoryEventsBase):
 
         future_event_count = future_event_query.count()
         past_event_count = past_event_query.count()
+        has_hidden_events = bool(hidden_event_ids)
 
         if not session.user and future_event_count:
             json_ld_events = json_ld_events + future_event_query.all()
@@ -311,6 +317,7 @@ class RHDisplayCategory(RHDisplayCategoryEventsBase):
                   'past_event_count': past_event_count,
                   'show_past_events': show_past_events,
                   'past_threshold': past_threshold.strftime(threshold_format),
+                  'has_hidden_events': has_hidden_events,
                   'json_ld': map(serialize_event_for_json_ld, json_ld_events),
                   'atom_feed_url': url_for('.export_atom', self.category),
                   'atom_feed_title': _('Events of "{}"').format(self.category.title)}
@@ -342,8 +349,10 @@ class RHEventList(RHDisplayCategoryEventsBase):
         after = self._parse_year_month(request.args.get('after'))
         if before is None and after is None:
             raise BadRequest('"before" or "after" parameter must be specified')
+        hidden_event_ids = {e.id for e in self.category.get_hidden_events(user=session.user)}
         event_query = (Event.query.with_parent(self.category)
                        .options(*self._event_query_options)
+                       .filter(Event.id.notin_(hidden_event_ids))
                        .order_by(Event.start_dt.desc(), Event.id.desc()))
         if before:
             event_query = event_query.filter(Event.start_dt < before)

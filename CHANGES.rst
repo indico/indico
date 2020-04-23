@@ -13,6 +13,8 @@ Major Features
 - Add category roles, which are similar to local groups but within the
   scope of a category and its subcategories. They can be used for assigning
   permissions in any of these categories and events within such categories.
+- Events marked as "Invisible" are now hidden from the category's event list
+  for everyone except managers (:issue:`4419`, thanks :user:`openprojects`)
 
 Improvements
 ^^^^^^^^^^^^

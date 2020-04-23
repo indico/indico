@@ -669,6 +669,10 @@ class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionMan
         """Check whether the user can lock/unlock the event"""
         return user and (user.is_admin or user == self.creator or self.category.can_manage(user))
 
+    def can_display(self, user):
+        """Check whether the user can display the event in the category."""
+        return self.visibility != 0 or self.can_manage(user)
+
     def get_relative_event_ids(self):
         """Get the first, last, previous and next event IDs.
 
@@ -683,7 +687,9 @@ class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionMan
                                                               range_=(None, None)).label('last'),
                             db.func.lag(Event.id).over(order_by=(Event.start_dt, Event.id)).label('prev'),
                             db.func.lead(Event.id).over(order_by=(Event.start_dt, Event.id)).label('next')])
-                    .where((Event.category_id == self.category_id) & ~Event.is_deleted)
+                    .where(db.and_(Event.category_id == self.category_id,
+                                   ~Event.is_deleted,
+                                   (Event.visibility.is_(None) | (Event.visibility != 0) | (Event.id == self.id))))
                     .alias())
         rv = (db.session.query(subquery.c.first, subquery.c.last, subquery.c.prev, subquery.c.next)
               .filter(subquery.c.id == self.id)

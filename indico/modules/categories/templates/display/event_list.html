@@ -43,7 +43,19 @@
 
 {% macro event_list(events_by_month, format_event_date, is_recent, happening_now, category, future_event_count,
                     past_event_count, future_threshold, past_threshold, future_events_by_month=[],
-                    past_events_by_month=[], show_future_events=false, show_past_events=false) %}
+                    past_events_by_month=[], show_future_events=false, show_past_events=false,
+                    has_hidden_events=false) %}
+
+    {% if has_hidden_events %}
+        {% call message_box('highlight', icon=true) %}
+            <div class="content smaller">
+                <span class="js-show-message">
+                    {% trans %}Some events in the list below have been hidden.{% endtrans %}
+                </span>
+            </div>
+        {% endcall %}
+    {% endif %}
+
     <div class="event-list"
          data-show-future-events-url="{{ url_for('.show_future_events', category) }}"
          data-show-past-events-url="{{ url_for('.show_past_events', category) }}">
@@ -98,6 +110,12 @@
                                 {{ event.get_verbose_title(show_speakers=is_lecture, show_series_pos=is_lecture) | striptags }}
                             </a>
                             <span class="protected">
+                                {% if event.visibility == 0 %}
+                                    <span class="ui label mini grey"
+                                          title="{% trans %}This event is hidden.{% endtrans %}">
+                                        {%- trans %}hidden{% endtrans -%}
+                                    </span>
+                                {% endif %}
                                 {% if event.is_self_protected %}
                                     <span data-type="restricted">({% trans %}protected{% endtrans %})</span>
                                 {% endif %}
