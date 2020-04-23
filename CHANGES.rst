@@ -87,6 +87,8 @@ Internal Changes
 - Add ``registrations`` kwarg to the ``event.designer.print_badge_template``
   signal (:issue:`4297`, thanks :user:`giusedb`)
 - Add ``registration_form_edited`` signal (:issue:`4421`, thanks :user:`omegak`)
+- Make PyIntEnum freeze enums in Alembic revisions (:issue:`4425`, thanks
+  :user:`omegak`)
 
 
 ----
