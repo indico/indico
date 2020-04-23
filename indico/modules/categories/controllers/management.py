@@ -78,7 +78,7 @@ class RHManageCategoryContent(RHManageCategoryBase):
         query = (Event.query.with_parent(self.category)
                  .options(joinedload('series'), undefer_group('series'),
                           load_only('id', 'category_id', 'created_dt', 'end_dt', 'protection_mode', 'start_dt',
-                                    'title', 'type_', 'series_pos', 'series_count'))
+                                    'title', 'type_', 'series_pos', 'series_count', 'visibility'))
                  .order_by(getattr(order_column, direction)())
                  .order_by(Event.id))
         if page == 'all':

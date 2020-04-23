@@ -214,7 +214,8 @@ class RHDisplayCategoryEventsBase(RHDisplayCategoryBase):
                             joinedload('label'),
                             load_only('id', 'category_id', 'created_dt', 'start_dt', 'end_dt', 'timezone',
                                       'protection_mode', 'title', 'type_', 'series_pos', 'series_count',
-                                      'own_address', 'own_venue_id', 'own_venue_name', 'label_id', 'label_message'))
+                                      'own_address', 'own_venue_id', 'own_venue_name', 'label_id', 'label_message',
+                                      'visibility'))
 
     def _process_args(self):
         RHDisplayCategoryBase._process_args(self)
