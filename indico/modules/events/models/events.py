@@ -687,8 +687,9 @@ class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionMan
                                                               range_=(None, None)).label('last'),
                             db.func.lag(Event.id).over(order_by=(Event.start_dt, Event.id)).label('prev'),
                             db.func.lead(Event.id).over(order_by=(Event.start_dt, Event.id)).label('next')])
-                    .where((Event.category_id == self.category_id) & ~Event.is_deleted &
-                           (Event.visibility.is_(None) | (Event.visibility != 0) | (Event.id == self.id)))
+                    .where(db.and_(Event.category_id == self.category_id,
+                                   ~Event.is_deleted,
+                                   (Event.visibility.is_(None) | (Event.visibility != 0) | (Event.id == self.id))))
                     .alias())
         rv = (db.session.query(subquery.c.first, subquery.c.last, subquery.c.prev, subquery.c.next)
               .filter(subquery.c.id == self.id)
