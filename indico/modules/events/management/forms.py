@@ -248,8 +248,9 @@ class EventProtectionForm(IndicoForm):
     visibility = SelectField(_("Visibility"), [Optional()], coerce=lambda x: None if x == '' else int(x),
                              description=_("""From which point in the category tree this event will be visible from """
                                            """(number of categories upwards). Applies to "Today's events", """
-                                           """Calendar and Category view. If the event is moved, this number will """
-                                           """be preserved."""))
+                                           """Calendar. If the event is moved, this number will be preserved. """
+                                           """The "Invisible" option will also hide the event from the category's """
+                                           """event list except for managers."""))
     priv_fields = set()
 
     def __init__(self, *args, **kwargs):
