@@ -8,6 +8,7 @@
 from __future__ import absolute_import, unicode_literals
 
 import os
+import re
 from contextlib import contextmanager
 from uuid import uuid4
 
@@ -28,6 +29,7 @@ from indico.web.flask.templating import CustomizationLoader
 from indico.web.flask.util import make_view_func
 
 
+AUTH_BEARER_RE = re.compile(r'^Bearer (.+)$')
 _notset = object()
 
 
@@ -50,6 +52,16 @@ class IndicoRequest(Request):
             # convert ipv6-style ipv4 to the regular ipv4 notation
             ip = ip[7:]
         return ip
+
+    @cached_property
+    def bearer_token(self):
+        """Bearer token included in the request, if any."""
+        auth_header = request.headers.get('Authorization')
+        if not auth_header:
+            return None
+
+        m = AUTH_BEARER_RE.match(auth_header)
+        return m.group(1) if m else None
 
     def __repr__(self):
         rv = super(IndicoRequest, self).__repr__()
