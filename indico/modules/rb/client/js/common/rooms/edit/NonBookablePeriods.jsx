@@ -32,8 +32,8 @@ export default class NonBookablePeriods extends React.Component {
     onChange([
       ...value,
       {
-        startDt: serializeDate(moment()),
-        endDt: serializeDate(moment()),
+        start_dt: serializeDate(moment()),
+        end_dt: serializeDate(moment()),
       },
     ]);
     this.setTouched();
@@ -50,7 +50,7 @@ export default class NonBookablePeriods extends React.Component {
     onChange(
       value.map((v, vIndex) =>
         vIndex === index
-          ? {...v, startDt: serializeDate(startDate), endDt: serializeDate(endDate)}
+          ? {...v, start_dt: serializeDate(startDate), end_dt: serializeDate(endDate)}
           : v
       )
     );
@@ -66,7 +66,7 @@ export default class NonBookablePeriods extends React.Component {
   };
 
   renderEntry = (dateRangeItem, index) => {
-    const {startDt, endDt} = dateRangeItem;
+    const {start_dt: startDt, end_dt: endDt} = dateRangeItem;
     const key = shortid.generate();
     return (
       <div key={key} className="flex-container">

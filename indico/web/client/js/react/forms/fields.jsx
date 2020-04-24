@@ -34,7 +34,6 @@ export function FormFieldAdapter({
   hideValidationError,
   hideErrorWhileActive,
   loaderWhileValidating,
-  hideErrorPopup,
   undefinedValue,
   meta: {touched, error, submitError, submitting, dirty, dirtySinceLastSubmit, active, validating},
   as: Component,
@@ -56,7 +55,7 @@ export function FormFieldAdapter({
     errorMessage = submitError;
   }
 
-  const showErrorPopup = !hideErrorPopup && !!errorMessage && (!hideErrorWhileActive || !active);
+  const showErrorPopup = !!errorMessage && (!hideErrorWhileActive || !active);
 
   const handleChange = (...args) => {
     if (getValue) {
@@ -100,7 +99,14 @@ export function FormFieldAdapter({
   );
 
   return (
-    <Popup trigger={field} position="left center" open={showErrorPopup}>
+    // The open prop is only false when the is no error. If there is an error,
+    // we will let the `trigger` control it, as opposed to setting it true
+    <Popup
+      trigger={field}
+      position="left center"
+      open={showErrorPopup && undefined}
+      on={['hover', 'focus']}
+    >
       <div styleName="field-error">{errorMessage}</div>
     </Popup>
   );
@@ -112,7 +118,6 @@ FormFieldAdapter.propTypes = {
   required: PropTypes.bool,
   hideValidationError: PropTypes.bool,
   hideErrorWhileActive: PropTypes.bool,
-  hideErrorPopup: PropTypes.bool,
   undefinedValue: PropTypes.any,
   label: PropTypes.string,
   componentLabel: PropTypes.oneOfType([
@@ -134,7 +139,6 @@ FormFieldAdapter.defaultProps = {
   required: false,
   hideValidationError: false,
   hideErrorWhileActive: false,
-  hideErrorPopup: false,
   undefinedValue: '',
   placeholder: undefined,
   label: null,

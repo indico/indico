@@ -21,7 +21,3 @@
         flex-grow: 1 !important;
     }
 }
-
-:global(.DateRangePicker_picker) { // sass-lint:disable-line class-name-format
-    z-index: 10;
-}

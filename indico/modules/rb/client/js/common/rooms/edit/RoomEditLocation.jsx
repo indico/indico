@@ -5,13 +5,14 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-import {Form, Header, Tab} from 'semantic-ui-react';
 import React from 'react';
+import {Form, Header, Tab} from 'semantic-ui-react';
 import PropTypes from 'prop-types';
+import {Field as FinalField} from 'react-final-form';
 import {Translate} from 'indico/react/i18n';
 import {FinalInput, parsers as p, validators as v} from 'indico/react/forms';
 
-function RoomEditLocation({active}) {
+export default function RoomEditLocation({active}) {
   return (
     <Tab.Pane active={active}>
       <Header>
@@ -23,35 +24,14 @@ function RoomEditLocation({active}) {
         label={Translate.string('Name')}
         required={false}
         nullIfEmpty
-        hideErrorPopup={!active}
       />
       <Form.Group widths="four">
         <Form.Field width={8}>
-          <FinalInput
-            name="site"
-            label={Translate.string('Site')}
-            hideErrorPopup={!active}
-            required
-          />
+          <FinalInput name="site" label={Translate.string('Site')} required />
         </Form.Field>
-        <FinalInput
-          name="building"
-          label={Translate.string('Building')}
-          hideErrorPopup={!active}
-          required
-        />
-        <FinalInput
-          name="floor"
-          label={Translate.string('Floor')}
-          hideErrorPopup={!active}
-          required
-        />
-        <FinalInput
-          name="number"
-          label={Translate.string('Number')}
-          hideErrorPopup={!active}
-          required
-        />
+        <FinalInput name="building" label={Translate.string('Building')} required />
+        <FinalInput name="floor" label={Translate.string('Floor')} required />
+        <FinalInput name="number" label={Translate.string('Number')} required />
       </Form.Group>
       <Form.Group widths="equal">
         <FinalInput
@@ -60,26 +40,33 @@ function RoomEditLocation({active}) {
           name="surface_area"
           label={Translate.string('Surface Area (m²)')}
           validate={v.optional(v.min(0))}
-          hideErrorPopup={!active}
         />
-        <FinalInput
-          fluid
-          type="text"
-          name="latitude"
-          label={Translate.string('Latitude')}
-          parse={f => p.number(f, false)}
-          validate={v.optional(v.number())}
-          hideErrorPopup={!active}
-        />
-        <FinalInput
-          fluid
-          type="text"
-          name="longitude"
-          label={Translate.string('Longitude')}
-          parse={f => p.number(f, false)}
-          validate={v.optional(v.number())}
-          hideErrorPopup={!active}
-        />
+        <FinalField name="longitude" subscription={{value: true}}>
+          {({input}) => (
+            <FinalInput
+              fluid
+              type="text"
+              name="latitude"
+              label={Translate.string('Latitude')}
+              parse={f => p.number(f, false)}
+              validate={v.optional(v.number())}
+              required={!!input.value}
+            />
+          )}
+        </FinalField>
+        <FinalField name="latitude" subscription={{value: true}}>
+          {({input}) => (
+            <FinalInput
+              fluid
+              type="text"
+              name="longitude"
+              label={Translate.string('Longitude')}
+              parse={f => p.number(f, false)}
+              validate={v.optional(v.number())}
+              required={!!input.value}
+            />
+          )}
+        </FinalField>
       </Form.Group>
       <Form.Group widths="equal">
         <FinalInput
@@ -88,7 +75,6 @@ function RoomEditLocation({active}) {
           name="max_advance_days"
           label={Translate.string('Maximum advance time for bookings (days)')}
           validate={v.optional(v.min(1))}
-          hideErrorPopup={!active}
         />
         <FinalInput
           fluid
@@ -96,7 +82,6 @@ function RoomEditLocation({active}) {
           name="booking_limit_days"
           label={Translate.string('Max duration of a booking (day)')}
           validate={v.optional(v.min(1))}
-          hideErrorPopup={!active}
         />
       </Form.Group>
     </Tab.Pane>
@@ -110,5 +95,3 @@ RoomEditLocation.propTypes = {
 RoomEditLocation.defaultProps = {
   active: true,
 };
-
-export default RoomEditLocation;

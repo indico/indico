@@ -31,7 +31,7 @@ export default class DailyAvailability extends React.Component {
     onChange(
       value.map((v, vIndex) =>
         vIndex === index
-          ? {...v, startTime: serializeTime(startTime), endTime: serializeTime(endTime)}
+          ? {...v, start_time: serializeTime(startTime), end_time: serializeTime(endTime)}
           : v
       )
     );
@@ -43,7 +43,7 @@ export default class DailyAvailability extends React.Component {
   };
 
   renderEntry = (bookableHour, index) => {
-    const {startTime: startT, endTime: endT} = bookableHour;
+    const {start_time: startT, end_time: endT} = bookableHour;
     const key = shortid.generate();
     return (
       <div key={key} className="flex-container">
@@ -71,7 +71,7 @@ export default class DailyAvailability extends React.Component {
           className="room-edit-modal-add-btn"
           icon
           labelPosition="left"
-          onClick={() => onChange([...value, {startTime: '08:00', endTime: '17:00'}])}
+          onClick={() => onChange([...value, {start_time: '08:00', end_time: '17:00'}])}
         >
           <Icon name="plus" />
           <Translate>Add new Daily Availability</Translate>

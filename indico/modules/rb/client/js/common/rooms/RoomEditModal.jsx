@@ -7,9 +7,9 @@
 
 import roomURL from 'indico-url:rb.admin_room';
 import roomsURL from 'indico-url:rb.admin_rooms';
-import fetchRoomAttributesURL from 'indico-url:rb.admin_room_attributes';
-import fetchRoomAvailabilityURL from 'indico-url:rb.admin_room_availability';
-import fetchAttributesURL from 'indico-url:rb.admin_attributes';
+import roomAttributesURL from 'indico-url:rb.admin_room_attributes';
+import roomAvailabilityURL from 'indico-url:rb.admin_room_availability';
+import attributesURL from 'indico-url:rb.admin_attributes';
 import updateRoomEquipmentURL from 'indico-url:rb.admin_update_room_equipment';
 import updateRoomAttributesURL from 'indico-url:rb.admin_update_room_attributes';
 import updateRoomAvailabilityURL from 'indico-url:rb.admin_update_room_availability';
@@ -20,12 +20,12 @@ import {
   Dimmer,
   Form,
   Grid,
-  Label,
   Loader,
   Menu,
   Message,
   Modal,
   Tab,
+  Icon,
 } from 'semantic-ui-react';
 import React, {useEffect, useState, useCallback, useMemo} from 'react';
 import PropTypes from 'prop-types';
@@ -36,9 +36,8 @@ import {snakifyKeys} from 'indico/utils/case';
 import {Translate} from 'indico/react/i18n';
 import {indicoAxios, handleAxiosError} from 'indico/utils/axios';
 
-import './RoomEditModal.module.scss';
 import {getChangedValues, handleSubmitError, parsers as p} from 'indico/react/forms';
-import {useFavoriteUsers} from 'indico/react/hooks';
+import {useFavoriteUsers, useIndicoAxios} from 'indico/react/hooks';
 import {usePermissionInfo} from 'indico/react/components/principals/hooks';
 import RoomPhoto from './RoomPhoto';
 import RoomEditDetails from './edit/RoomEditDetails';
@@ -50,13 +49,18 @@ import {actions as roomsActions} from '../../common/rooms';
 import {actions as userActions} from '../../common/user';
 import {getAllEquipmentTypes} from './selectors';
 
+import './RoomEditModal.module.scss';
+
 function RoomEditModal({roomId, locationId, onClose, afterCreation}) {
   const favoriteUsersController = useFavoriteUsers();
   const [permissionManager, permissionInfo] = usePermissionInfo();
   const equipmentTypes = useSelector(getAllEquipmentTypes);
   const dispatch = useDispatch();
 
-  const [globalAttributes, setGlobalAttributes] = useState([]);
+  const {data: globalAttributes} = useIndicoAxios({
+    url: attributesURL(),
+    trigger: 'once',
+  });
   const [newRoomId, setNewRoomId] = useState(null);
   const [wasEverUpdated, setWasEverUpdated] = useState(null);
   const [tabsWithError, setTabsWithError] = useState([]);
@@ -71,7 +75,7 @@ function RoomEditModal({roomId, locationId, onClose, afterCreation}) {
     is_reservable: true,
     reservations_need_confirmation: false,
     protection_mode: 'public',
-    has_photo: false
+    has_photo: false,
   });
   const [roomAttributes, setRoomAttributes] = useState([]);
   const [roomAvailability, setRoomAvailability] = useState({
@@ -79,9 +83,9 @@ function RoomEditModal({roomId, locationId, onClose, afterCreation}) {
     nonbookable_periods: [],
   });
 
-  const isNewRoom = useCallback(() => roomId === undefined, [roomId]);
+  const isNewRoom = roomId === undefined;
 
-  const fetch = useCallback(async url => {
+  const fetchData = async url => {
     let response;
     try {
       response = await indicoAxios.get(url);
@@ -90,16 +94,16 @@ function RoomEditModal({roomId, locationId, onClose, afterCreation}) {
       return;
     }
     return response.data;
-  }, []);
+  };
 
   const fetchRoomData = useCallback(async () => {
     const resp = await Promise.all([
-      fetch(roomURL({room_id: roomId})),
-      fetch(fetchRoomAttributesURL({room_id: roomId})),
-      fetch(fetchRoomAvailabilityURL({room_id: roomId})),
+      fetchData(roomURL({room_id: roomId})),
+      fetchData(roomAttributesURL({room_id: roomId})),
+      fetchData(roomAvailabilityURL({room_id: roomId})),
     ]);
     [setRoomDetails, setRoomAttributes, setRoomAvailability].forEach((x, i) => x(resp[i]));
-  }, [fetch, roomId]);
+  }, [roomId]);
 
   const tabPanes = useMemo(
     () =>
@@ -180,11 +184,21 @@ function RoomEditModal({roomId, locationId, onClose, afterCreation}) {
             'end_notifications_enabled',
           ],
         },
-      ].map(x => ({
-        ...x,
+      ].map(pane => ({
+        ...pane,
         menuItem: (
-          <Menu.Item key={x.key}>
-            {x.menuItem} {tabsWithError.includes(x.key) ? <Label color="red">Error</Label> : null}
+          <Menu.Item key={pane.key}>
+            {pane.menuItem}{' '}
+            {tabsWithError.includes(pane.key) ? (
+              <Icon
+                circular
+                inverted
+                name="warning"
+                size="small"
+                color="red"
+                style={{margin: '0 0 0 10px'}}
+              />
+            ) : null}
           </Menu.Item>
         ),
       })),
@@ -208,7 +222,7 @@ function RoomEditModal({roomId, locationId, onClose, afterCreation}) {
       ...basicDetails
     } = changedValues;
     try {
-      if (isNewRoom()) {
+      if (isNewRoom) {
         const payload = {...basicDetails};
         payload.location_id = locationId;
         const response = await indicoAxios.post(roomsURL(), payload);
@@ -232,7 +246,7 @@ function RoomEditModal({roomId, locationId, onClose, afterCreation}) {
         );
       }
       // reload room so the form gets new initialValues
-      if (!isNewRoom()) {
+      if (!isNewRoom) {
         setWasEverUpdated(true);
         fetchRoomData();
       }
@@ -262,12 +276,8 @@ function RoomEditModal({roomId, locationId, onClose, afterCreation}) {
   }, [dispatch, onClose, roomId, newRoomId, wasEverUpdated, afterCreation]);
 
   useEffect(() => {
-    (async () => setGlobalAttributes(await fetch(fetchAttributesURL())))();
-  }, [fetch]);
-
-  useEffect(() => {
     (async () => {
-      if (!isNewRoom()) {
+      if (!isNewRoom) {
         setLoading(true);
         await fetchRoomData();
         setLoading(false);
@@ -293,7 +303,7 @@ function RoomEditModal({roomId, locationId, onClose, afterCreation}) {
     return (
       <Modal open onClose={closeModal} size="large" centered={false} closeIcon>
         <Modal.Header>
-          {isNewRoom() ? <Translate>Add Room</Translate> : <Translate>Edit Room Details</Translate>}
+          {isNewRoom ? <Translate>Add Room</Translate> : <Translate>Edit Room Details</Translate>}
         </Modal.Header>
         <Modal.Content>
           <Message styleName="submit-message" positive hidden={!afterCreation || wasEverUpdated}>
@@ -328,7 +338,7 @@ function RoomEditModal({roomId, locationId, onClose, afterCreation}) {
             }}
           </FormSpy>
           <Grid columns="equal">
-            {!isNewRoom() && (
+            {!isNewRoom && (
               <Grid.Column width={4}>
                 <RoomPhoto roomId={roomId} hasPhoto={roomDetails && roomDetails.has_photo} />
               </Grid.Column>

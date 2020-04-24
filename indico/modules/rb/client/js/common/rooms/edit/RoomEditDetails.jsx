@@ -5,14 +5,14 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-import {Form, Header, Tab} from 'semantic-ui-react';
 import React from 'react';
+import {Form, Header, Tab} from 'semantic-ui-react';
 import PropTypes from 'prop-types';
 import {FinalPrincipal} from 'indico/react/components';
 import {Translate} from 'indico/react/i18n';
-import {FinalInput, FinalTextArea, validators as v} from 'indico/react/forms';
+import {FinalInput, FinalTextArea} from 'indico/react/forms';
 
-function RoomEditDetails({active, favoriteUsersController}) {
+export default function RoomEditDetails({active, favoriteUsersController}) {
   return (
     <Tab.Pane active={active}>
       <Header>
@@ -22,23 +22,12 @@ function RoomEditDetails({active, favoriteUsersController}) {
         name="owner"
         favoriteUsersController={favoriteUsersController}
         label={Translate.string('Owner')}
-        hideErrorPopup={!active}
         allowNull
         required
       />
       <Form.Group widths="equal">
-        <FinalInput
-          fluid
-          name="key_location"
-          label={Translate.string('Where is the key?')}
-          hideErrorPopup={!active}
-        />
-        <FinalInput
-          fluid
-          name="telephone"
-          label={Translate.string('Telephone')}
-          hideErrorPopup={!active}
-        />
+        <FinalInput fluid name="key_location" label={Translate.string('Where is the key?')} />
+        <FinalInput fluid name="telephone" label={Translate.string('Telephone')} />
       </Form.Group>
       <Header>
         <Translate>Information</Translate>
@@ -49,23 +38,11 @@ function RoomEditDetails({active, favoriteUsersController}) {
           type="number"
           name="capacity"
           label={Translate.string('Capacity')}
-          validate={v.min(1)}
-          hideErrorPopup={!active}
           required
         />
-        <FinalInput
-          fluid
-          name="division"
-          label={Translate.string('Division')}
-          hideErrorPopup={!active}
-          required
-        />
+        <FinalInput fluid name="division" label={Translate.string('Division')} required />
       </Form.Group>
-      <FinalTextArea
-        name="comments"
-        label={Translate.string('Comments')}
-        hideErrorPopup={!active}
-      />
+      <FinalTextArea name="comments" label={Translate.string('Comments')} />
     </Tab.Pane>
   );
 }
@@ -78,5 +55,3 @@ RoomEditDetails.propTypes = {
 RoomEditDetails.defaultProps = {
   active: true,
 };
-
-export default RoomEditDetails;

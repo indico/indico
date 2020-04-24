@@ -5,24 +5,27 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-import {Form, Header, Tab} from 'semantic-ui-react';
 import React from 'react';
+import {Form, Header, Tab} from 'semantic-ui-react';
 import PropTypes from 'prop-types';
 import {Translate} from 'indico/react/i18n';
-import {FieldCondition, FinalInput, validators as v} from 'indico/react/forms';
+import {FieldCondition, FinalCheckbox, FinalInput, validators as v} from 'indico/react/forms';
 import {FinalEmailList} from 'indico/react/components';
 
-function RoomEditNotifications({active}) {
+export default function RoomEditNotifications({active}) {
   return (
     <Tab.Pane active={active}>
       <Header>
         <Translate>Notifications</Translate>
       </Header>
-      <FinalEmailList
-        name="notification_emails"
-        label={Translate.string('Notification emails')}
-        hideErrorPopup={!active}
-      />
+      <FinalEmailList name="notification_emails" label={Translate.string('Notification emails')} />
+      <Form.Group grouped>
+        <FinalCheckbox name="notifications_enabled" label={Translate.string('Reminders enabled')} />
+        <FinalCheckbox
+          name="end_notifications_enabled"
+          label={Translate.string('Reminders of finishing bookings enabled')}
+        />
+      </Form.Group>
       <FieldCondition when="notifications_enabled">
         <Header as="h5">
           <Translate>How many days in advance booking reminders should be sent</Translate>
@@ -34,7 +37,6 @@ function RoomEditNotifications({active}) {
             label={Translate.string('Single/Daily')}
             type="number"
             validate={v.optional(v.range(1, 30))}
-            hideErrorPopup={!active}
           />
           <FinalInput
             fluid
@@ -42,7 +44,6 @@ function RoomEditNotifications({active}) {
             label={Translate.string('Weekly')}
             type="number"
             validate={v.optional(v.range(1, 30))}
-            hideErrorPopup={!active}
           />
           <FinalInput
             fluid
@@ -50,7 +51,6 @@ function RoomEditNotifications({active}) {
             label={Translate.string('Monthly')}
             type="number"
             validate={v.optional(v.range(1, 30))}
-            hideErrorPopup={!active}
           />
         </Form.Group>
       </FieldCondition>
@@ -65,7 +65,6 @@ function RoomEditNotifications({active}) {
             label={Translate.string('Daily')}
             type="number"
             validate={v.optional(v.range(1, 30))}
-            hideErrorPopup={!active}
           />
           <FinalInput
             fluid
@@ -73,7 +72,6 @@ function RoomEditNotifications({active}) {
             label={Translate.string('Weekly')}
             type="number"
             validate={v.optional(v.range(1, 30))}
-            hideErrorPopup={!active}
           />
           <FinalInput
             fluid
@@ -81,7 +79,6 @@ function RoomEditNotifications({active}) {
             label={Translate.string('Monthly')}
             type="number"
             validate={v.optional(v.range(1, 30))}
-            hideErrorPopup={!active}
           />
         </Form.Group>
       </FieldCondition>
@@ -96,5 +93,3 @@ RoomEditNotifications.propTypes = {
 RoomEditNotifications.defaultProps = {
   active: true,
 };
-
-export default RoomEditNotifications;

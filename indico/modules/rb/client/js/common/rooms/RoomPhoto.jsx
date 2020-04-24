@@ -39,9 +39,9 @@ function RoomPhoto({roomId, hasPhoto, setRoomsSpriteToken}) {
     } catch (e) {
       handleAxiosError(e);
     }
+    setHasPreview(false);
     setFile(null);
     setLoading(false);
-    setHasPreview(false);
   };
 
   const savePhoto = async () => {
@@ -150,15 +150,16 @@ function RoomPhoto({roomId, hasPhoto, setRoomsSpriteToken}) {
 
   const thumbnail = (
     <div>
-      {hasPreview && (
+      {hasPreview ? (
         <Dimmer.Dimmable>
           <Dimmer active={loading}>
             <Loader />
           </Dimmer>
           <Image className="img" src={getPreview()} />
         </Dimmer.Dimmable>
+      ) : (
+        <Translate>No photo found.</Translate>
       )}
-      {!hasPreview && <Translate>No photo found.</Translate>}
     </div>
   );
 
