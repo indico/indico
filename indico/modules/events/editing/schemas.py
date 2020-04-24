@@ -42,10 +42,14 @@ class EditingFileTypeSchema(mm.ModelSchema):
     class Meta:
         model = EditingFileType
         fields = ('id', 'name', 'extensions', 'allow_multiple_files', 'required', 'publishable', 'is_used',
-                  'filename_template', 'is_used_in_condition')
+                  'filename_template', 'is_used_in_condition', 'url')
 
     is_used = fields.Function(lambda ft: EditingRevisionFile.query.with_parent(ft).has_rows())
     is_used_in_condition = fields.Function(lambda ft: EditingReviewCondition.query.with_parent(ft).has_rows())
+    url = fields.Function(lambda ft: url_for('.api_edit_file_type',
+                                             ft.event, type=ft.type.name,
+                                             file_type_id=ft.id,
+                                             _external=True))
 
     @post_dump(pass_many=True)
     def sort_list(self, data, many, **kwargs):
@@ -57,7 +61,12 @@ class EditingFileTypeSchema(mm.ModelSchema):
 class EditingTagSchema(mm.ModelSchema):
     class Meta:
         model = EditingTag
-        fields = ('id', 'code', 'title', 'color', 'system', 'verbose_title')
+        fields = (
+            'id', 'code', 'title', 'color', 'system', 'verbose_title', 'is_used_in_revision', 'url'
+        )
+
+    is_used_in_revision = fields.Function(lambda tag: EditingRevision.query.with_parent(tag).has_rows())
+    url = fields.Function(lambda tag: url_for('.api_edit_tag', tag.event, tag_id=tag.id, _external=True))
 
     @post_dump(pass_many=True)
     def sort_list(self, data, many, **kwargs):
