@@ -225,8 +225,8 @@ def delete_revision_comment(comment):
     logger.info('Comment on revision %r deleted: %r', comment.revision, comment)
 
 
-def create_new_tag(event, code, title, color, is_system=False):
-    tag = EditingTag(code=code, title=title, color=color, system=is_system, event=event)
+def create_new_tag(event, code, title, color, system=False):
+    tag = EditingTag(code=code, title=title, color=color, system=system, event=event)
     db.session.flush()
     logger.info('Tag %r created by %r', tag, session.user)
     return tag
