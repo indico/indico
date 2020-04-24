@@ -59,6 +59,14 @@
     }
 }
 
+:not(.ui) {
+    // the react timepicker has an input with no type
+    > input:not([type]),
+    > select {
+        font-family: inherit;
+    }
+}
+
 input[type=file] {
     &.hasError {
         @include border-all($red);
