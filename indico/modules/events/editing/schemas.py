@@ -174,11 +174,12 @@ class EditingConfirmationAction(IndicoEnum):
 
 class EditableTagArgs(mm.Schema):
     class Meta:
-        rh_context = ('event', 'tag')
+        rh_context = ('event', 'tag', 'is_service_call')
 
     code = fields.String(required=True, validate=not_empty)
     title = fields.String(required=True, validate=not_empty)
     color = fields.String(required=True, validate=validate.OneOf(get_sui_colors()))
+    system = fields.Bool(missing=False)
 
     @validates('code')
     def _check_for_unique_tag_code(self, code):
@@ -189,6 +190,11 @@ class EditableTagArgs(mm.Schema):
             query = query.filter(EditingTag.id != tag.id)
         if query.has_rows():
             raise ValidationError(_('Tag code must be unique'))
+
+    @validates('system')
+    def _check_only_services_set_system_tags(self, value):
+        if not self.context['is_service_call']:
+            raise ValidationError('Only custom editing workflows can set system tags')
 
 
 class EditableFileTypeArgs(mm.Schema):

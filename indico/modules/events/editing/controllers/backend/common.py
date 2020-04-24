@@ -19,6 +19,9 @@ from indico.util.signals import named_objects_from_signal
 
 class RHEditingFileTypes(RHEditingBase):
     """Return all editing file types defined in the event for the editable type."""
+
+    SERVICE_ALLOWED = True
+
     def _process_args(self):
         RHEditingBase._process_args(self)
         self.editable_type = EditableType[request.view_args['type']]
@@ -30,6 +33,8 @@ class RHEditingFileTypes(RHEditingBase):
 
 class RHEditingTags(RHEditingBase):
     """Return all editing tags defined in the event."""
+
+    SERVICE_ALLOWED = True
 
     def _process(self):
         return EditingTagSchema(many=True).jsonify(self.event.editing_tags)

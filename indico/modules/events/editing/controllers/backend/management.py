@@ -30,6 +30,8 @@ from indico.web.args import use_kwargs, use_rh_args, use_rh_kwargs
 class RHCreateTag(RHEditingManagementBase):
     """Create a new tag."""
 
+    SERVICE_ALLOWED = True
+
     @use_rh_args(EditableTagArgs)
     def _process(self, data):
         tag = create_new_tag(self.event, **data)
@@ -38,6 +40,8 @@ class RHCreateTag(RHEditingManagementBase):
 
 class RHEditTag(RHEditingManagementBase):
     """Delete/update a tag."""
+
+    SERVICE_ALLOWED = True
 
     def _process_args(self):
         RHEditingManagementBase._process_args(self)
@@ -58,6 +62,9 @@ class RHEditTag(RHEditingManagementBase):
 
 class RHCreateFileType(RHEditingManagementBase):
     """Create a new file type."""
+
+    SERVICE_ALLOWED = True
+
     def _process_args(self):
         RHEditingManagementBase._process_args(self)
         self.editable_type = EditableType[request.view_args['type']]
@@ -70,6 +77,8 @@ class RHCreateFileType(RHEditingManagementBase):
 
 class RHEditFileType(RHEditingManagementBase):
     """Delete/update a file type."""
+
+    SERVICE_ALLOWED = True
 
     def _process_args(self):
         RHEditingManagementBase._process_args(self)
@@ -138,6 +147,8 @@ class RHEditingEditReviewCondition(RHEditingManagementBase):
 
 
 class RHEnabledEditableTypes(RHEditingManagementBase):
+    SERVICE_ALLOWED = True
+
     def _process_GET(self):
         return jsonify(editing_settings.get(self.event, 'editable_types'))
 
