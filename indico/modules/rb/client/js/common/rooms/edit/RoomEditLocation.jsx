@@ -8,7 +8,6 @@
 import React from 'react';
 import {Form, Header, Tab} from 'semantic-ui-react';
 import PropTypes from 'prop-types';
-import {Field as FinalField} from 'react-final-form';
 import {Translate} from 'indico/react/i18n';
 import {FinalInput, parsers as p, validators as v} from 'indico/react/forms';
 
@@ -41,32 +40,22 @@ export default function RoomEditLocation({active}) {
           label={Translate.string('Surface Area (m²)')}
           validate={v.optional(v.min(0))}
         />
-        <FinalField name="longitude" subscription={{value: true}}>
-          {({input}) => (
-            <FinalInput
-              fluid
-              type="text"
-              name="latitude"
-              label={Translate.string('Latitude')}
-              parse={f => p.number(f, false)}
-              validate={v.optional(v.number())}
-              required={!!input.value}
-            />
-          )}
-        </FinalField>
-        <FinalField name="latitude" subscription={{value: true}}>
-          {({input}) => (
-            <FinalInput
-              fluid
-              type="text"
-              name="longitude"
-              label={Translate.string('Longitude')}
-              parse={f => p.number(f, false)}
-              validate={v.optional(v.number())}
-              required={!!input.value}
-            />
-          )}
-        </FinalField>
+        <FinalInput
+          fluid
+          type="text"
+          name="latitude"
+          label={Translate.string('Latitude')}
+          parse={f => p.number(f, false)}
+          validate={v.optional(v.number())}
+        />
+        <FinalInput
+          fluid
+          type="text"
+          name="longitude"
+          label={Translate.string('Longitude')}
+          parse={f => p.number(f, false)}
+          validate={v.optional(v.number())}
+        />
       </Form.Group>
       <Form.Group widths="equal">
         <FinalInput

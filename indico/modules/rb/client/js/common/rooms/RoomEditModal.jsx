@@ -285,6 +285,15 @@ function RoomEditModal({roomId, locationId, onClose, afterCreation}) {
     })();
   }, [isNewRoom, fetchRoomData]);
 
+  const formValidation = values => {
+    if (!values.latitude !== !values.longitude) {
+      // Validation for dependent fields is made at the form level, since field
+      // level won't handle it properly.
+      const error = 'You need to set both coordinates latitude and longitude.';
+      return {latitude: error, longitude: error};
+    }
+  };
+
   const renderModal = formProps => {
     const {
       handleSubmit: handleFormSubmit,
@@ -398,6 +407,7 @@ function RoomEditModal({roomId, locationId, onClose, afterCreation}) {
           dirty: true,
         }}
         mutators={{...arrayMutators}}
+        validate={formValidation}
       />
     );
   };

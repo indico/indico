@@ -82,34 +82,31 @@ class RoomDetailsModal extends React.Component {
       actions: {openBookRoom, openBookingForm, openBookingDetails},
     } = this.props;
     const {roomEditVisible} = this.state;
-    return (
-      <>
-        <Modal onClose={this.handleCloseModal} size="large" closeIcon open>
-          <Modal.Header styleName="room-details-header">
-            {title}
-            <Responsive.Tablet andLarger>
-              {room.canUserEdit && (
-                <span>
-                  <Button icon="pencil" circular onClick={this.showRoomEditModal} />
-                </span>
-              )}
-            </Responsive.Tablet>
-          </Modal.Header>
-          <Modal.Content>
-            <RoomDetails
-              room={room}
-              attributes={attributes}
-              availability={availability}
-              bookRoom={promptDatesOnBook ? openBookRoom : openBookingForm}
-              gotoAllBookings={gotoAllBookings}
-              onClickReservation={openBookingDetails}
-            />
-          </Modal.Content>
-        </Modal>
-        {roomEditVisible && (
-          <RoomEditModal roomId={room.id} onClose={this.handleCloseRoomEditModal} />
-        )}
-      </>
+    return !roomEditVisible ? (
+      <Modal onClose={this.handleCloseModal} size="large" closeIcon open>
+        <Modal.Header styleName="room-details-header">
+          {title}
+          <Responsive.Tablet andLarger>
+            {room.canUserEdit && (
+              <span>
+                <Button icon="pencil" circular onClick={this.showRoomEditModal} />
+              </span>
+            )}
+          </Responsive.Tablet>
+        </Modal.Header>
+        <Modal.Content>
+          <RoomDetails
+            room={room}
+            attributes={attributes}
+            availability={availability}
+            bookRoom={promptDatesOnBook ? openBookRoom : openBookingForm}
+            gotoAllBookings={gotoAllBookings}
+            onClickReservation={openBookingDetails}
+          />
+        </Modal.Content>
+      </Modal>
+    ) : (
+      <RoomEditModal roomId={room.id} onClose={this.handleCloseRoomEditModal} />
     );
   }
 }
