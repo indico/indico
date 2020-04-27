@@ -43,7 +43,7 @@ export default function RoomEditOptions({active, showEquipment, globalAttributes
             componentLabel={Translate.string('Add new equipment')}
           />
         )}
-        {globalAttributes && (
+        {globalAttributes && globalAttributes.length > 0 && (
           <FieldArray name="attributes" isEqual={_.isEqual}>
             {({fields}) => {
               if (!fields.value) {

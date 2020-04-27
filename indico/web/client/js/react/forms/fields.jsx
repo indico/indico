@@ -99,8 +99,8 @@ export function FormFieldAdapter({
   );
 
   return (
-    // The open prop is only false when the is no error. If there is an error,
-    // we will let the `trigger` control it, as opposed to setting it true
+    // The open prop is only false when there is no error. If there is an error,
+    // we will let the `trigger` control it, as opposed to setting it true.
     <Popup
       trigger={field}
       position="left center"

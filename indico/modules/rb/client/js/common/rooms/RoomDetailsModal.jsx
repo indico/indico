@@ -87,11 +87,7 @@ class RoomDetailsModal extends React.Component {
         <Modal.Header styleName="room-details-header">
           {title}
           <Responsive.Tablet andLarger>
-            {room.canUserEdit && (
-              <span>
-                <Button icon="pencil" circular onClick={this.showRoomEditModal} />
-              </span>
-            )}
+            {room.canUserEdit && <Button icon="pencil" circular onClick={this.showRoomEditModal} />}
           </Responsive.Tablet>
         </Modal.Header>
         <Modal.Content>
