@@ -266,6 +266,10 @@ class IndicoDateTimeField(DateTimeField):
                 return form.timezone
             return session.tzinfo.zone
 
+    @property
+    def tzinfo(self):
+        return pytz.timezone(self.timezone)
+
 
 class OccurrencesField(JSONField):
     """
