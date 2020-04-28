@@ -40,14 +40,14 @@ import {getChangedValues, handleSubmitError, parsers as p} from 'indico/react/fo
 import {useFavoriteUsers, useIndicoAxios} from 'indico/react/hooks';
 import {usePermissionInfo} from 'indico/react/components/principals/hooks';
 import RoomPhoto from './RoomPhoto';
-import RoomEditDetails from './edit/RoomEditDetails';
-import RoomEditNotifications from './edit/RoomEditNotifications';
-import RoomEditLocation from './edit/RoomEditLocation';
-import RoomEditPermissions from './edit/RoomEditPermissions';
-import RoomEditOptions from './edit/RoomEditOptions';
-import {actions as roomsActions} from '../../common/rooms';
-import {actions as userActions} from '../../common/user';
-import {getAllEquipmentTypes} from './selectors';
+import RoomEditDetails from './RoomEditDetails';
+import RoomEditNotifications from './RoomEditNotifications';
+import RoomEditLocation from './RoomEditLocation';
+import RoomEditPermissions from './RoomEditPermissions';
+import RoomEditOptions from './RoomEditOptions';
+import {actions as roomsActions} from '../../../common/rooms';
+import {actions as userActions} from '../../../common/user';
+import {getAllEquipmentTypes} from '../selectors';
 
 import './RoomEditModal.module.scss';
 
@@ -286,7 +286,7 @@ function RoomEditModal({roomId, locationId, onClose, afterCreation}) {
   }, [isNewRoom, fetchRoomData]);
 
   const formValidation = values => {
-    if (!values.latitude !== !values.longitude) {
+    if (!!values.latitude !== !!values.longitude) {
       // Validation for dependent fields is made at the form level, since field
       // level won't handle it properly.
       const error = 'You need to set both coordinates latitude and longitude.';

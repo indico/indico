@@ -29,7 +29,7 @@ import {actions as bookRoomActions} from '../../modules/bookRoom';
 import {actions as calendarActions} from '../../modules/calendar';
 import {actions as filtersActions} from '../../common/filters';
 import {actions as bookingsActions} from '../../common/bookings';
-import RoomEditModal from './RoomEditModal';
+import RoomEditModal from './edit/RoomEditModal';
 
 import './RoomDetailsModal.module.scss';
 
@@ -82,7 +82,10 @@ class RoomDetailsModal extends React.Component {
       actions: {openBookRoom, openBookingForm, openBookingDetails},
     } = this.props;
     const {roomEditVisible} = this.state;
-    return !roomEditVisible ? (
+    if (roomEditVisible) {
+      return <RoomEditModal roomId={room.id} onClose={this.handleCloseRoomEditModal} />;
+    }
+    return (
       <Modal onClose={this.handleCloseModal} size="large" closeIcon open>
         <Modal.Header styleName="room-details-header">
           {title}
@@ -101,8 +104,6 @@ class RoomDetailsModal extends React.Component {
           />
         </Modal.Content>
       </Modal>
-    ) : (
-      <RoomEditModal roomId={room.id} onClose={this.handleCloseRoomEditModal} />
     );
   }
 }

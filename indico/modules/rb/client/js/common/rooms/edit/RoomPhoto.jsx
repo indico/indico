@@ -14,7 +14,7 @@ import Dropzone from 'react-dropzone';
 import {Button, Dimmer, Image, Popup, Loader} from 'semantic-ui-react';
 import {indicoAxios, handleAxiosError} from 'indico/utils/axios';
 import {Translate} from 'indico/react/i18n';
-import {actions as configActions} from '../config';
+import {actions as configActions} from '../../config';
 
 import './RoomPhoto.module.scss';
 

@@ -49,14 +49,14 @@ export default function RoomEditOptions({active, showEquipment, globalAttributes
               if (!fields.value) {
                 return null;
               }
-              const fieldsByName = fields.value.map(x => x.name);
+              const fieldsByName = new Set(fields.value.map(x => x.name));
               const options = globalAttributes
                 .map(x => ({
                   key: x.name,
                   text: x.title,
                   value: x.name,
                 }))
-                .filter(attr => !fieldsByName.includes(attr.key));
+                .filter(attr => !fieldsByName.has(attr.key));
               return (
                 <div>
                   <Dropdown
