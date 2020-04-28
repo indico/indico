@@ -370,3 +370,12 @@ def merge_users(source, target, force=False):
 
 def get_color_for_username(username):
     return user_colors[crc32(username) % len(user_colors)]
+
+
+def get_picture_data(user):
+    return {
+        'url': user.picture_url,
+        'filename': user.picture_metadata['filename'],
+        'size': user.picture_metadata['size'],
+        'content_type': user.picture_metadata['content_type']
+    }

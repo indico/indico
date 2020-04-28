@@ -193,9 +193,16 @@
         }
 
         .ui.label {
-            font-size: 70px;
             color: $light-gray;
             margin-right: 34px;
+
+            &.default-avatar {
+                font-size: 70px;
+            }
+
+            &:not(.default-avatar) {
+                height: 140px;
+            }
         }
     }
 

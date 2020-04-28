@@ -13,7 +13,7 @@ from uuid import uuid4
 
 from flask import flash, g, has_request_context, session
 from flask_multipass import IdentityRetrievalFailed
-from sqlalchemy.dialects.postgresql import UUID
+from sqlalchemy.dialects.postgresql import JSONB, UUID
 from sqlalchemy.event import listens_for
 from sqlalchemy.ext.associationproxy import association_proxy
 from sqlalchemy.ext.hybrid import hybrid_property
@@ -33,6 +33,7 @@ from indico.util.i18n import _
 from indico.util.locators import locator_property
 from indico.util.string import format_full_name, format_repr, return_ascii
 from indico.util.struct.enum import RichIntEnum
+from indico.web.flask.util import url_for
 
 
 class UserTitle(RichIntEnum):
@@ -170,6 +171,7 @@ class User(PersonMixin, db.Model):
                       db.CheckConstraint('id != merged_into_id', 'not_merged_self'),
                       db.CheckConstraint("is_pending OR (first_name != '' AND last_name != '')",
                                          'not_pending_proper_names'),
+                      db.CheckConstraint("(picture IS NULL) = (picture_metadata::text = 'null')", 'valid_picture'),
                       {'schema': 'users'})
 
     #: the unique id of the user
@@ -251,6 +253,17 @@ class User(PersonMixin, db.Model):
         UUID,
         nullable=False,
         default=lambda: unicode(uuid4())
+    )
+    #: the user profile picture
+    picture = db.deferred(db.Column(
+        db.LargeBinary,
+        nullable=True
+    ))
+    #: user profile picture metadata
+    picture_metadata = db.Column(
+        JSONB,
+        nullable=False,
+        default=lambda: None
     )
 
     _affiliation = db.relationship(
@@ -510,6 +523,14 @@ class User(PersonMixin, db.Model):
         if identity is None:
             return {}
         return {field: (identity.data.get(field) or '') for field in multipass.synced_fields}
+
+    @property
+    def has_picture(self):
+        return self.picture_metadata is not None
+
+    @property
+    def picture_url(self):
+        return url_for('users.profile_picture_display', self, slug=self.picture_metadata['hash'])
 
     def __contains__(self, user):
         """Convenience method for `user in user_or_group`."""

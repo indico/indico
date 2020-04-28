@@ -15,6 +15,8 @@ Major Features
   permissions in any of these categories and events within such categories.
 - Events marked as "Invisible" are now hidden from the category's event list
   for everyone except managers (:issue:`4419`, thanks :user:`openprojects`)
+- Introduce profile picture, which is for now only visible on the user dashboard
+  (:issue:`4431`, thanks :user:`omegak`)
 
 Improvements
 ^^^^^^^^^^^^

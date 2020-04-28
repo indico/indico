@@ -37,9 +37,13 @@
             <div class="dashboard-col">
                 <div class="your-details">
                     <div class="avatar-image">
-                        <span class="ui large circular label" style="{{ user.avatar_css }}">
-                            {{ user.first_name[0] }}
-                        </span>
+                        {% if user.has_picture %}
+                            <img src="{{ user.picture_url }}" alt="" class="ui large circular label">
+                        {% else %}
+                            <span class="ui large circular label default-avatar" style="{{ user.avatar_css }}">
+                                {{ user.first_name[0] }}
+                            </span>
+                        {% endif %}
                     </div>
                     <div class="your-details-wrapper">
                         <h3>{{ user.full_name }}</h3>
