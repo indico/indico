@@ -41,6 +41,18 @@
     width: 100%;
 }
 
+.revision-file-row {
+    @include border-left($width: 3px);
+
+    &:hover {
+        border-color: $blue;
+    }
+}
+
+.conference-page .page-content .file-type-header {
+    color: $light-black;
+}
+
 #contribution-list {
     .subcontribution-count {
         // TODO: Make all .i-labels flexbox and remove the following line

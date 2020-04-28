@@ -2,7 +2,7 @@
 
 {% from 'events/display/common/_conferences.html' import render_attachments %}
 {% from 'events/display/indico/_common.html' import render_location, render_users, render_speakers %}
-{% from 'events/papers/_contributions.html' import render_paper_section, render_editables_section %}
+{% from 'events/papers/_contributions.html' import render_paper_section, render_editables_section, render_proceedings_section %}
 {% from 'message_box.html' import message_box %}
 
 {% block page_class %}conference-page item-summary{% endblock %}
@@ -261,6 +261,9 @@
     {% endif %}
     {% if contribution.event.has_feature('editing') %}
         {{ render_editables_section(contribution) }}
+        {% if contribution.has_published_editables %}
+            {{ render_proceedings_section(contribution) }}
+        {% endif %}
         <script>
             setupEditableSubmissionButton();
         </script>

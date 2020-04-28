@@ -512,6 +512,10 @@ class Contribution(DescriptionMixin, ProtectionManagersMixin, LocationMixin, Att
         enabled_editable_types = editing_settings.get(self.event, 'editable_types')
         return [editable for editable in self.editables if editable.type.name in enabled_editable_types]
 
+    @property
+    def has_published_editables(self):
+        return any(e.published_revision_id is not None for e in self.enabled_editables)
+
     def is_paper_reviewer(self, user):
         return user in self.paper_content_reviewers or user in self.paper_layout_reviewers
 

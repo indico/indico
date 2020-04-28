@@ -165,3 +165,10 @@ class EditingRevision(RenderModeMixin, db.Model):
     @locator_property
     def locator(self):
         return dict(self.editable.locator, revision_id=self.id)
+
+    def get_spotlight_file(self):
+        files = [file for file in self.files if file.file_type.publishable]
+        return files[0] if len(files) == 1 else None
+
+    def get_files_based_on_file_type(self, file_type):
+        return [file for file in self.files if file.file_type == file_type]

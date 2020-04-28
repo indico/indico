@@ -46,7 +46,7 @@
         <section>
             <div class="header">
                 <div class="header-row">
-                <h2>{% trans %}Editing{% endtrans %}</h2>
+                    <h2>{% trans %}Editing{% endtrans %}</h2>
                 </div>
             </div>
             {% if has_enabled_types %}
@@ -165,4 +165,68 @@
             {%- trans %}Please check the review and submit a revised version{% endtrans -%}
         </div>
     {% endif %}
+{% endmacro %}
+
+{% macro _render_file_type_section(revision_files, file_type) %}
+    <div class="files field-separator">
+        <div class="attachments-box">
+            <div class="attachments-box-header">
+                <h3 class="file-type-header">{{ file_type.name }}</h3>
+            </div>
+            <table class="tree">
+                {% for rev_file in revision_files %}
+                    {% set file = rev_file.file %}
+                    {% set download_url = rev_file.download_url %}
+                    {% set icon = icon_from_mimetype(file.content_type, 'icon-file-filled') %}
+                    <tr>
+                        <td class="revision-file-row">
+                            <a href="{{ download_url }}" class="attachment {{ icon }}" target="_blank">
+                                {{ file.filename }}
+                            </a>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </table>
+        </div>
+    </div>
+{% endmacro %}
+
+
+{% macro render_proceedings_section(contribution) %}
+    <section>
+        <div class="header">
+            <div class="header-row">
+                <h2>{% trans %}Proceedings{% endtrans %}</h2>
+            </div>
+        </div>
+        {% for editable in contribution.enabled_editables if editable.published_revision -%}
+            {% set published_revision = editable.published_revision %}
+            <section>
+                <div class="header">
+                    <div class="header-row">
+                        <h3 class="icon-file">{{ editable.type.title }}</h3>
+                    </div>
+                </div>
+                {% set spotlight_file = published_revision.get_spotlight_file() %}
+                {% if spotlight_file %}
+                    {% set icon = icon_from_mimetype(spotlight_file.file.content_type, 'icon-file-filled') %}
+                    <div class="paper-content flexcol">
+                        <div class="flexrow f-a-center spotlight-file i-button text-color borderless paper-file"
+                             title="{{ spotlight_file.filename }}">
+                            <a href="{{ spotlight_file.download_url }}"
+                               class="attachment spotlight-file-name flexrow f-a-center truncate-text {{ icon }}">
+                                <span class="title truncate-text">{{ spotlight_file.file.filename }}</span>
+                            </a>
+                        </div>
+                    </div>
+                {% else %}
+                    {% set file_types = contribution.event.editing_file_types %}
+                    {% for file_type in file_types if file_type.publishable and file_type.type == editable.type %}
+                        {% set published_revision_files = published_revision.get_files_based_on_file_type(file_type) %}
+                        {{ _render_file_type_section(published_revision_files, file_type) }}
+                    {% endfor %}
+                {% endif %}
+            </section>
+        {%- endfor %}
+    </section>
 {% endmacro %}
