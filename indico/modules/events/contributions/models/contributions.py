@@ -24,6 +24,7 @@ from indico.core.db.sqlalchemy.protection import ProtectionManagersMixin
 from indico.core.db.sqlalchemy.util.models import auto_table_args
 from indico.core.db.sqlalchemy.util.queries import increment_and_get
 from indico.core.db.sqlalchemy.util.session import no_autoflush
+from indico.modules.events.editing.models.editable import EditableType
 from indico.modules.events.management.util import get_non_inheriting_objects
 from indico.modules.events.models.persons import AuthorsSpeakersMixin, PersonLinkDataMixin
 from indico.modules.events.papers.models.papers import Paper
@@ -510,7 +511,9 @@ class Contribution(DescriptionMixin, ProtectionManagersMixin, LocationMixin, Att
             return []
 
         enabled_editable_types = editing_settings.get(self.event, 'editable_types')
-        return [editable for editable in self.editables if editable.type.name in enabled_editable_types]
+        enabled_editables = [editable for editable in self.editables if editable.type.name in enabled_editable_types]
+        order = list(EditableType)
+        return sorted(enabled_editables, key=lambda editable: order.index(editable.type))
 
     @property
     def has_published_editables(self):
