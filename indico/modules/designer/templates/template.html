@@ -301,7 +301,7 @@
                         {% for group_id, group in placeholders.viewitems() | sort(attribute='1.title') %}
                             {% if group_id not in config.disallow_groups %}
                                 <optgroup label="{{ group.title }}">
-                                    {% for option_id, option in group.options|dictsort(by='value') %}
+                                    {% for option_id, option in group.options|dictsort(by='key') %}
                                         <option value="{{ option_id }}">{{ option }}</option>
                                     {% endfor %}
                                 </optgroup>
