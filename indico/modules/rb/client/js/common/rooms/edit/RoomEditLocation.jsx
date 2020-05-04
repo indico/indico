@@ -26,7 +26,7 @@ export default function RoomEditLocation({active}) {
       />
       <Form.Group widths="four">
         <Form.Field width={8}>
-          <FinalInput name="site" label={Translate.string('Site')} required />
+          <FinalInput name="site" label={Translate.string('Site')} />
         </Form.Field>
         <FinalInput name="building" label={Translate.string('Building')} required />
         <FinalInput name="floor" label={Translate.string('Floor')} required />

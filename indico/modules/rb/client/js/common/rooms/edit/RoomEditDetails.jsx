@@ -40,7 +40,7 @@ export default function RoomEditDetails({active, favoriteUsersController}) {
           label={Translate.string('Capacity')}
           required
         />
-        <FinalInput fluid name="division" label={Translate.string('Division')} required />
+        <FinalInput fluid name="division" label={Translate.string('Division')} />
       </Form.Group>
       <FinalTextArea name="comments" label={Translate.string('Comments')} />
     </Tab.Pane>
