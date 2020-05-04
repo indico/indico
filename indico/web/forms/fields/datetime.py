@@ -282,8 +282,6 @@ class OccurrencesField(JSONField):
 
     def __init__(self, *args, **kwargs):
         self._timezone = kwargs.pop('timezone', None)
-        self.default_time = kwargs.pop('default_time', time(0, 0))
-        self.default_duration = kwargs.pop('default_duration', timedelta())
         kwargs.setdefault('default', [])
         super(OccurrencesField, self).__init__(*args, **kwargs)
 

@@ -10,15 +10,37 @@
         margin-top: 5px;
     }
 
-    .datepicker {
-        width: 40% !important;
+    .DateInput_input {
+        width: 100% !important;
     }
 
-    .timepicker {
-        width: 26% !important;
+    .rc-time-picker {
+        width: 22%;
+        vertical-align: top;
+        margin-left: 1em;
+        color: $black;
+        font-size: 1em;
+    }
+
+    .rc-time-picker-input {
+        width: 100% !important;
+    }
+
+    .rc-time-picker-panel-input-wrap {
+        // make sure time does not jump when opening the time picker
+        padding-left: calc(1em - 1px);
+        padding-top: calc(0.5em + 1px);
+    }
+
+    .rc-time-picker-panel-input,
+    .rc-time-picker-panel-select,
+    .rc-time-picker-panel-inner {
+        font-size: 1em;
+        color: $black;
     }
 
     .durationpicker {
+        margin-left: 1em;
         width: 20% !important;
 
         &::-webkit-inner-spin-button,
@@ -64,5 +86,11 @@
     .add-occurrence {
         display: inline-block;
         margin-top: 0.25em;
+        color: $blue;
+
+        &:hover {
+            color: $dark-blue;
+            cursor: pointer;
+        }
     }
 }

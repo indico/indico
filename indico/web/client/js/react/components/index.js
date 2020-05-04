@@ -38,3 +38,4 @@ export {default as ManagementPageBackButton} from './ManagementPageBackButton';
 export {default as ManagementPageSubTitle} from './ManagementPageSubTitle';
 export {default as ManagementPageTitle} from './ManagementPageTitle';
 export {default as WTFDateTimeField} from './WTFDateTimeField';
+export {default as WTFOccurrencesField} from './WTFOccurrencesField';

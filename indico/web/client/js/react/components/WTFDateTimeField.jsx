@@ -15,10 +15,7 @@ import {SingleDatePicker} from 'indico/react/components';
 import {Translate} from 'indico/react/i18n';
 import {toMoment} from 'indico/utils/date';
 
-import 'rc-time-picker/assets/index.css';
-import 'react-dates/lib/css/_datepicker.css';
-
-function trigger(id) {
+function triggerChange(id) {
   document.getElementById(id).dispatchEvent(new Event('change', {bubbles: true}));
 }
 
@@ -56,7 +53,7 @@ export default function WTFDateTimeField({
     value => {
       timeField.value = value ? value.format('HH:mm') : '';
       setTime(value);
-      trigger(timeId);
+      triggerChange(timeId);
     },
     [timeField, timeId]
   );
@@ -68,7 +65,7 @@ export default function WTFDateTimeField({
       }
       dateField.value = value ? value.format('DD/MM/YYYY') : '';
       setDate(value);
-      trigger(dateId);
+      triggerChange(dateId);
       timePickerRef.current.picker.required = value;
     },
     [dateField, timeField, dateId, defaultTime, updateTime]
@@ -170,7 +167,6 @@ export default function WTFDateTimeField({
         id=""
         date={date}
         onDateChange={updateDate}
-        numberOfMonths={1}
         placeholder="DD/MM/YYYY"
         isOutsideRange={isOutsideRange}
         required={!!time || required}

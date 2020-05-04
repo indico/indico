@@ -7,7 +7,7 @@
 
 from __future__ import unicode_literals
 
-from datetime import time, timedelta
+from datetime import time
 
 from flask import session
 from wtforms.fields import StringField, TextAreaField
@@ -95,8 +95,7 @@ class LectureCreationForm(EventCreationFormBase):
     _field_order = ('title', 'occurrences', 'timezone', 'location_data', 'person_link_data',
                     'protection_mode')
     _advanced_field_order = ('description', 'theme')
-    occurrences = OccurrencesField(_("Dates"), [DataRequired()], default_time=time(8),
-                                   default_duration=timedelta(minutes=90))
+    occurrences = OccurrencesField(_("Dates"), [DataRequired()])
     person_link_data = EventPersonLinkListField(_('Speakers'))
     description = TextAreaField(_('Description'), widget=CKEditorWidget())
     theme = IndicoThemeSelectField(_('Theme'), event_type=EventType.lecture, allow_default=True)

@@ -2,28 +2,16 @@
 {% from 'forms/_form.html' import form_field %}
 
 {% block html %}
-    <div class="occurrences-widget i-form-field-fixed-width" id="{{ field.id }}-container">
-        <input type="hidden" name="{{ field.name }}" id="{{ field.id }}" value="{{ field._value() }}" autofocus>
-        <a href="#" class="add-occurrence">Add occurrence</a>
-    </div>
+    <div class="occurrences-widget i-form-field-fixed-width" id="{{ field.id }}-container"></div>
+    <input type="hidden" name="{{ field.name }}" id="{{ field.id }}" value="{{ field._value() }}" autofocus>
 
-    <script type="text/html" id="{{ field.id }}-template">
-        <div class="occurrence">
-            <input type="text" class="datepicker" readonly>{#--#}
-            <input type="time" class="timepicker" placeholder="HH:MM" pattern="{{ time_regex_hhmm }}">{#--#}
-            <input type="number" class="durationpicker" step="1" min="1">{#--#}
-            <i class="duration-info" title="{% trans %}Duration in minutes{% endtrans %}"></i>{#--#}
-            <span class="icon-remove remove-occurrence" title="{% trans %}Remove occurrence{% endtrans %}"></span>
-        </div>
-    </script>
 {% endblock %}
 
 {% block javascript %}
     <script>
         setupOccurrencesWidget({
             fieldId: {{ field.id | tojson }},
-            defaultTime: {{ field.default_time | format_time('code', timezone=field.timezone) | tojson }},
-            defaultDuration: {{ (field.default_duration.total_seconds() // 60) | int | tojson }}
+            locale: {{ session.lang | tojson }}
         });
     </script>
 {% endblock %}
