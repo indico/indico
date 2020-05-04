@@ -16,9 +16,6 @@ from indico.web.flask.wrappers import IndicoBlueprint
 _bp = IndicoBlueprint('papers', __name__, url_prefix='/event/<confId>', template_folder='templates',
                       virtual_template_folder='events/papers')
 
-# CfP React
-_bp.add_url_rule('/papers/<int:contrib_id>/new', 'new_paper_timeline', display.RHNewPaperTimeline)
-
 # API
 _bp.add_url_rule('/papers/api/<int:contrib_id>', 'api_paper_details', api.RHPaperDetails)
 _bp.add_url_rule('/papers/api/<int:contrib_id>', 'api_reset_paper_state', api.RHResetPaperState, methods=('DELETE',))
@@ -44,22 +41,7 @@ _bp.add_url_rule('/papers/templates/<int:template_id>-<filename>', 'download_tem
                  templates.RHDownloadPaperTemplate)
 _bp.add_url_rule('/contributions/<int:contrib_id>/paper/submit', 'submit_revision',
                  display.RHSubmitPaper, methods=('GET', 'POST'))
-# Paper reviews/judgments
-_bp.add_url_rule('/papers/<int:contrib_id>/review/type/<review_type>', 'submit_review',
-                 display.RHSubmitPaperReview, methods=('GET', 'POST'))
-_bp.add_url_rule('/papers/<int:contrib_id>/revision/<int:revision_id>/review/<int:review_id>/edit', 'edit_review',
-                 display.RHEditPaperReview, methods=('GET', 'POST'))
-_bp.add_url_rule('/papers/<int:contrib_id>/judgment', 'judge_paper',
-                 display.RHJudgePaper, methods=('POST',))
-_bp.add_url_rule('/papers/<int:contrib_id>/judgment', 'reset_paper_state',
-                 display.RHResetPaperState, methods=('DELETE',))
-# Paper comments
-_bp.add_url_rule('/papers/<int:contrib_id>/comment', 'submit_comment',
-                 display.RHSubmitPaperComment, methods=('POST',))
-_bp.add_url_rule('/papers/<int:contrib_id>/revision/<int:revision_id>/comment/<int:comment_id>', 'edit_comment',
-                 display.RHEditPaperComment, methods=('GET', 'POST'))
-_bp.add_url_rule('/papers/<int:contrib_id>/revision/<int:revision_id>/comment/<int:comment_id>', 'delete_comment',
-                 display.RHDeletePaperComment, methods=('DELETE',))
+
 # Reviewing area
 _bp.add_url_rule('/papers/reviewing/', 'reviewing_area', display.RHReviewingArea)
 

@@ -22,12 +22,6 @@ class Paper(ProposalMixin):
     # Proposal mixin properties
     proposal_type = 'paper'
     call_for_proposals_attr = 'cfp'
-    create_comment_endpoint = 'papers.submit_comment'
-    delete_comment_endpoint = 'papers.delete_comment'
-    edit_comment_endpoint = 'papers.edit_comment'
-    create_review_endpoint = 'papers.submit_review'
-    edit_review_endpoint = 'papers.edit_review'
-    create_judgment_endpoint = 'papers.judge_paper'
     revisions_enabled = True
 
     def __init__(self, contribution):

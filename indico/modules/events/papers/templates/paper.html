@@ -1,55 +1,7 @@
-{% extends 'events/papers/_base.html' %}
+{%- extends 'events/papers/_base.html' -%}
 
-{% from 'events/abstracts/reviewing/timeline.html' import render_multiple_review_group_text %}
-{% from 'events/papers/reviewing/timeline.html' import render_paper_info, render_submission_info,
-                                                       render_paper_judgment, render_paper_revision_submission_form %}
-{% from 'events/reviews/timeline.html' import render_timeline %}
-{% from 'events/reviews/_common.html' import render_decision_box %}
-
-{% block back_button_url -%}
-    {% if management -%}
-        {{ url_for('contributions.display_contribution', paper.contribution) }}
-    {%- endif %}
+{% block content -%}
+    <div class="paper-timeline"
+         data-event-id="{{ event.id }}"
+         data-contrib-id="{{ paper.contribution.id }}"></div>
 {%- endblock %}
-
-{% block back_button_title -%}
-    {% if management %}
-        {%- trans %}Back to the contribution{% endtrans -%}
-    {% endif %}
-{% endblock %}
-
-{# Only for development purposes (Remove it at some point) #}
-{% block page_actions %}
-    <a class="i-button highlight" href="{{ url_for('.new_paper_timeline', paper) }}">
-        Switch to new view
-    </a>
-{% endblock -%}
-
-{% block content %}
-    {{ render_paper_info(paper) }}
-
-    {% call(block, revision) render_timeline(paper, comment_form, review_form, revision_form) %}
-        {% if block == 'multiple-review-group-text' %}
-            {{ render_multiple_review_group_text(paper) }}
-        {% elif block == 'revision-info' %}
-            {{ render_submission_info(revision) }}
-        {% elif block == 'revision-judgment' %}
-            {{ render_paper_judgment(revision) }}
-        {% elif block == 'submit-revision' %}
-            {{ render_paper_revision_submission_form(paper, revision_form) }}
-        {% endif %}
-    {% endcall %}
-
-    {# TODO: render review-summary-box #}
-    {% if not paper.event.is_locked and paper.can_judge(session.user, check_state=true) %}
-        <div id="proposal-decision-box" class="i-timeline i-timeline-item">
-            {{ render_decision_box(paper, judgment_form, session.user) }}
-        </div>
-    {% endif %}
-
-    {% if not no_javascript %}
-        <script>
-            setupReviewingPage();
-        </script>
-    {% endif %}
-{% endblock %}
