@@ -36,6 +36,8 @@ export default function RoomEditNotifications({active}) {
             name="notification_before_days"
             label={Translate.string('Single/Daily')}
             type="number"
+            min="1"
+            max="30"
             validate={v.optional(v.range(1, 30))}
           />
           <FinalInput
@@ -43,6 +45,8 @@ export default function RoomEditNotifications({active}) {
             name="notification_before_days_weekly"
             label={Translate.string('Weekly')}
             type="number"
+            min="1"
+            max="30"
             validate={v.optional(v.range(1, 30))}
           />
           <FinalInput
@@ -50,6 +54,8 @@ export default function RoomEditNotifications({active}) {
             name="notification_before_days_monthly"
             label={Translate.string('Monthly')}
             type="number"
+            min="1"
+            max="30"
             validate={v.optional(v.range(1, 30))}
           />
         </Form.Group>
@@ -64,6 +70,8 @@ export default function RoomEditNotifications({active}) {
             name="end_notification_daily"
             label={Translate.string('Daily')}
             type="number"
+            min="1"
+            max="30"
             validate={v.optional(v.range(1, 30))}
           />
           <FinalInput
@@ -71,6 +79,8 @@ export default function RoomEditNotifications({active}) {
             name="end_notification_weekly"
             label={Translate.string('Weekly')}
             type="number"
+            min="1"
+            max="30"
             validate={v.optional(v.range(1, 30))}
           />
           <FinalInput
@@ -78,6 +88,8 @@ export default function RoomEditNotifications({active}) {
             name="end_notification_monthly"
             label={Translate.string('Monthly')}
             type="number"
+            min="1"
+            max="30"
             validate={v.optional(v.range(1, 30))}
           />
         </Form.Group>

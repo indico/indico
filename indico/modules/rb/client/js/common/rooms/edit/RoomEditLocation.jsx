@@ -38,6 +38,7 @@ export default function RoomEditLocation({active}) {
           type="number"
           name="surface_area"
           label={Translate.string('Surface Area (m²)')}
+          min="0"
           validate={v.optional(v.min(0))}
         />
         <FinalInput
@@ -63,6 +64,7 @@ export default function RoomEditLocation({active}) {
           type="number"
           name="max_advance_days"
           label={Translate.string('Maximum advance time for bookings (days)')}
+          min="1"
           validate={v.optional(v.min(1))}
         />
         <FinalInput
@@ -70,6 +72,7 @@ export default function RoomEditLocation({active}) {
           type="number"
           name="booking_limit_days"
           label={Translate.string('Max duration of a booking (day)')}
+          min="1"
           validate={v.optional(v.min(1))}
         />
       </Form.Group>

@@ -10,7 +10,7 @@ import {Form, Header, Tab} from 'semantic-ui-react';
 import PropTypes from 'prop-types';
 import {FinalPrincipal} from 'indico/react/components';
 import {Translate} from 'indico/react/i18n';
-import {FinalInput, FinalTextArea} from 'indico/react/forms';
+import {FinalInput, FinalTextArea, validators as v} from 'indico/react/forms';
 
 export default function RoomEditDetails({active, favoriteUsersController}) {
   return (
@@ -38,6 +38,8 @@ export default function RoomEditDetails({active, favoriteUsersController}) {
           type="number"
           name="capacity"
           label={Translate.string('Capacity')}
+          min="1"
+          validate={v.min(1)}
           required
         />
         <FinalInput fluid name="division" label={Translate.string('Division')} />
