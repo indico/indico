@@ -11,8 +11,8 @@
     {% endif %}
     {{ form_rows(form, skip=('folder', 'protected', 'acl', 'files', 'file')) }}
     {{ form_rows(form, fields=('folder', 'protected')) }}
-    {{ protection_message | safe }}
     {{ form_rows(form, fields=('acl',)) }}
+    {{ protection_message | safe }}
     {% call form_footer(attach_form) %}
         <div class="dropzone-upload-btn">
             {% if existing_attachment -%}
