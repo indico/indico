@@ -41,7 +41,7 @@ def upgrade():
     for event_id, name, value in res:
         event_data[event_id][name] = value
     for event_id, data in event_data.items():
-        if not data['label']:
+        if not data.get('label'):
             continue
         label_id = mapping[data['label']]
         label_message = data.get('message', '')
