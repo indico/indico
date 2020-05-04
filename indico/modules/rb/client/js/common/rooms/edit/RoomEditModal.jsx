@@ -14,6 +14,10 @@ import updateRoomEquipmentURL from 'indico-url:rb.admin_update_room_equipment';
 import updateRoomAttributesURL from 'indico-url:rb.admin_update_room_attributes';
 import updateRoomAvailabilityURL from 'indico-url:rb.admin_update_room_availability';
 
+import _ from 'lodash';
+import React, {useEffect, useState, useCallback, useMemo} from 'react';
+import {useDispatch, useSelector} from 'react-redux';
+import PropTypes from 'prop-types';
 import {Form as FinalForm, FormSpy} from 'react-final-form';
 import {
   Button,
@@ -27,27 +31,24 @@ import {
   Tab,
   Icon,
 } from 'semantic-ui-react';
-import React, {useEffect, useState, useCallback, useMemo} from 'react';
-import PropTypes from 'prop-types';
-import _ from 'lodash';
 import arrayMutators from 'final-form-arrays';
-import {useDispatch, useSelector} from 'react-redux';
+
 import {snakifyKeys} from 'indico/utils/case';
 import {Translate} from 'indico/react/i18n';
 import {indicoAxios, handleAxiosError} from 'indico/utils/axios';
-
-import {getChangedValues, handleSubmitError, parsers as p} from 'indico/react/forms';
+import {getChangedValues, handleSubmitError} from 'indico/react/forms';
 import {useFavoriteUsers, useIndicoAxios} from 'indico/react/hooks';
 import {usePermissionInfo} from 'indico/react/components/principals/hooks';
+
+import {actions as roomsActions} from '../../../common/rooms';
+import {actions as userActions} from '../../../common/user';
+import {getAllEquipmentTypes} from '../selectors';
 import RoomPhoto from './RoomPhoto';
 import RoomEditDetails from './RoomEditDetails';
 import RoomEditNotifications from './RoomEditNotifications';
 import RoomEditLocation from './RoomEditLocation';
 import RoomEditPermissions from './RoomEditPermissions';
 import RoomEditOptions from './RoomEditOptions';
-import {actions as roomsActions} from '../../../common/rooms';
-import {actions as userActions} from '../../../common/user';
-import {getAllEquipmentTypes} from '../selectors';
 
 import './RoomEditModal.module.scss';
 
@@ -102,7 +103,7 @@ function RoomEditModal({roomId, locationId, onClose, afterCreation}) {
       fetchData(roomAttributesURL({room_id: roomId})),
       fetchData(roomAvailabilityURL({room_id: roomId})),
     ]);
-    [setRoomDetails, setRoomAttributes, setRoomAvailability].forEach((x, i) => x(resp[i]));
+    [setRoomDetails, setRoomAttributes, setRoomAvailability].forEach((fn, i) => fn(resp[i]));
   }, [roomId]);
 
   const tabPanes = useMemo(
@@ -289,7 +290,7 @@ function RoomEditModal({roomId, locationId, onClose, afterCreation}) {
     if (!!values.latitude !== !!values.longitude) {
       // Validation for dependent fields is made at the form level, since field
       // level won't handle it properly.
-      const error = 'You need to set both coordinates latitude and longitude.';
+      const error = 'Both latitude and longitude need to be set (or omitted).';
       return {latitude: error, longitude: error};
     }
   };
