@@ -64,6 +64,7 @@ function RoomEditModal({roomId, locationId, onClose, afterCreation}) {
   });
   const [newRoomId, setNewRoomId] = useState(null);
   const [wasEverUpdated, setWasEverUpdated] = useState(null);
+  const [activeTab, setActiveTab] = useState('basic-details');
   const [tabsWithError, setTabsWithError] = useState([]);
   const [loading, setLoading] = useState(false);
 
@@ -190,7 +191,7 @@ function RoomEditModal({roomId, locationId, onClose, afterCreation}) {
         menuItem: (
           <Menu.Item key={pane.key}>
             {pane.menuItem}{' '}
-            {tabsWithError.includes(pane.key) ? (
+            {pane.key !== activeTab && tabsWithError.includes(pane.key) ? (
               <Icon
                 circular
                 inverted
@@ -210,6 +211,7 @@ function RoomEditModal({roomId, locationId, onClose, afterCreation}) {
       permissionInfo,
       permissionManager,
       tabsWithError,
+      activeTab,
     ]
   );
 
@@ -252,14 +254,7 @@ function RoomEditModal({roomId, locationId, onClose, afterCreation}) {
         fetchRoomData();
       }
     } catch (e) {
-      const submitErrors = handleSubmitError(e);
-      setTabsWithError(
-        Object.keys(submitErrors).map(err => {
-          const pane = tabPanes.find(t => t.fields && t.fields.includes(err));
-          return pane && pane.key;
-        })
-      );
-      return submitErrors;
+      return handleSubmitError(e);
     }
   };
 
@@ -355,10 +350,27 @@ function RoomEditModal({roomId, locationId, onClose, afterCreation}) {
             )}
             <Grid.Column>
               <Form id="room-form" onSubmit={handleFormSubmit}>
-                <Tab renderActiveOnly={false} panes={tabPanes} />
+                <Tab
+                  renderActiveOnly={false}
+                  panes={tabPanes}
+                  onTabChange={(__, {activeIndex}) => {
+                    setActiveTab(tabPanes[activeIndex].key);
+                  }}
+                />
               </Form>
             </Grid.Column>
           </Grid>
+          <FormSpy
+            subscription={{errors: true, submitErrors: true}}
+            onChange={({errors, submitErrors}) => {
+              setTabsWithError(
+                Object.keys({...errors, ...submitErrors}).map(err => {
+                  const pane = tabPanes.find(t => t.fields && t.fields.includes(err));
+                  return pane && pane.key;
+                })
+              );
+            }}
+          />
         </Modal.Content>
         <Modal.Actions>
           <FormSpy subscription={{submitSucceeded: true}}>
