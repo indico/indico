@@ -134,8 +134,6 @@ function RoomEditModal({roomId, locationId, onClose, afterCreation}) {
             'surface_area',
             'latitude',
             'longitude',
-            'max_advance_days',
-            'booking_limit_days',
           ],
         },
         {
@@ -157,6 +155,8 @@ function RoomEditModal({roomId, locationId, onClose, afterCreation}) {
           pane: <RoomEditNotifications key="notifications" />,
           fields: [
             'notification_emails',
+            'notifications_enabled',
+            'end_notifications_enabled',
             'notification_before_days',
             'notification_before_days_weekly',
             'notification_before_days_monthly',
@@ -182,8 +182,8 @@ function RoomEditModal({roomId, locationId, onClose, afterCreation}) {
             'attributes',
             'is_reservable',
             'reservations_need_confirmation',
-            'notifications_enabled',
-            'end_notifications_enabled',
+            'max_advance_days',
+            'booking_limit_days',
           ],
         },
       ].map(pane => ({

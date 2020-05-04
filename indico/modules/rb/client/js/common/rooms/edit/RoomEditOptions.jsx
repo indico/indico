@@ -11,7 +11,7 @@ import _ from 'lodash';
 import {FieldArray} from 'react-final-form-arrays';
 import PropTypes from 'prop-types';
 import {Translate} from 'indico/react/i18n';
-import {FinalCheckbox, FinalField, FinalInput} from 'indico/react/forms';
+import {FinalCheckbox, FinalField, FinalInput, validators as v} from 'indico/react/forms';
 import EquipmentList from './EquipmentList';
 import DailyAvailability from './DailyAvailability';
 import NonBookablePeriods from './NonBookablePeriods';
@@ -103,6 +103,24 @@ export default function RoomEditOptions({active, showEquipment, globalAttributes
       <Header>
         <Translate>Options</Translate>
       </Header>
+      <Form.Group widths="equal">
+        <FinalInput
+          fluid
+          type="number"
+          name="max_advance_days"
+          label={Translate.string('Maximum advance time for bookings (days)')}
+          min="1"
+          validate={v.optional(v.min(1))}
+        />
+        <FinalInput
+          fluid
+          type="number"
+          name="booking_limit_days"
+          label={Translate.string('Max duration of a booking (day)')}
+          min="1"
+          validate={v.optional(v.min(1))}
+        />
+      </Form.Group>
       <Form.Group grouped>
         <FinalCheckbox name="is_reservable" label={Translate.string('Bookable')} />
         <FinalCheckbox

@@ -58,24 +58,6 @@ export default function RoomEditLocation({active}) {
           validate={v.optional(v.number())}
         />
       </Form.Group>
-      <Form.Group widths="equal">
-        <FinalInput
-          fluid
-          type="number"
-          name="max_advance_days"
-          label={Translate.string('Maximum advance time for bookings (days)')}
-          min="1"
-          validate={v.optional(v.min(1))}
-        />
-        <FinalInput
-          fluid
-          type="number"
-          name="booking_limit_days"
-          label={Translate.string('Max duration of a booking (day)')}
-          min="1"
-          validate={v.optional(v.min(1))}
-        />
-      </Form.Group>
     </Tab.Pane>
   );
 }
