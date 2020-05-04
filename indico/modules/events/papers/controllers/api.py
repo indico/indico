@@ -104,7 +104,6 @@ class RHJudgePaper(RHPaperBase):
 
 
 class RHSubmitNewRevision(RHPaperBase):
-    PAPER_REQUIRED = False
     ALLOW_LOCKED = True
 
     def _check_paper_protection(self):
@@ -113,8 +112,7 @@ class RHSubmitNewRevision(RHPaperBase):
                 return False
             if not self.contribution.is_user_associated(session.user, check_abstract=True):
                 return False
-        paper = self.contribution.paper
-        return paper is None or paper.state == PaperRevisionState.to_be_corrected
+        return self.contribution.paper.state == PaperRevisionState.to_be_corrected
 
     @use_kwargs({
         'files': fields.List(fields.Field(), location='files', required=True)
