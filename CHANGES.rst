@@ -67,6 +67,8 @@ Improvements
   (:issue:`4363`)
 - Add map URL to events, allowing also to override room map URL (:issue:`4402`,
   thanks :user:`omegak`)
+- Use custom time picker for time input fields taking into account the 12h/24h
+  format of the user's locale (:issue:`4399`)
 
 Bugfixes
 ^^^^^^^^
