@@ -78,6 +78,7 @@ Bugfixes
 - Stop icons from overlapping in the datetime widget (:issue:`4342`)
 - Fix alignment of materials in events (:issue:`4344`)
 - Fix misleading wording in protection info message (:issue:`4410`)
+- Allow guests to access public notes (:issue:`4436`)
 
 Internal Changes
 ^^^^^^^^^^^^^^^^

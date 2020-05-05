@@ -118,7 +118,6 @@ class RHViewNote(RHNoteBase):
     """Handles display of a note attached to an object inside an event"""
 
     def _check_access(self):
-        RHNoteBase._check_access(self)
         if not self.object.can_access(session.user):
             raise Forbidden
 
