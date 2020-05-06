@@ -42,5 +42,6 @@ per-file-ignores =
     indico/core/signals/__init__.py:F403,F401
     # allow long lines in migrations (only do that for raw SQL please)
     indico/migrations/versions/*.py:E501
+    indico/util/mdx_latex_test.py:E501
     # allow nicely aligned parametrizations
     indico/*_test.py:E241
