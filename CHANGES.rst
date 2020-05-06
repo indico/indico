@@ -83,6 +83,8 @@ Bugfixes
 - Fix alignment of materials in events (:issue:`4344`)
 - Fix misleading wording in protection info message (:issue:`4410`)
 - Allow guests to access public notes (:issue:`4436`)
+- Allow width of weekly event overview table to adjust to window
+  size (:issue:`4429`)
 
 Internal Changes
 ^^^^^^^^^^^^^^^^
