@@ -82,11 +82,10 @@ class EventLogoPlaceholder(DesignerPlaceholder):
 
     @classmethod
     def render(cls, registration):
-        try:
+        if registration.has_logo:
             buf = io.BytesIO(registration.logo)
             return Image.open(buf)
-        except IOError as e:
-            logger.error('Cannot get event image logo: %s', e)
+        else:
             return ''
 
 
