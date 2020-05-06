@@ -119,7 +119,8 @@ class EditingRevisionSchema(mm.ModelSchema):
         event = revision.editable.event
         editable_type_permission = revision.editable.type.editor_permission
         comments = [comment for comment in revision.comments
-                    if not comment.internal or event.can_manage(current_user, permission=editable_type_permission)]
+                    if not comment.internal or event.can_manage(current_user, permission=editable_type_permission)
+                    or event.can_manage(current_user, permission='editing_manager')]
         return EditingRevisionCommentSchema(context=self.context).dump(comments, many=True)
 
 
@@ -136,6 +137,8 @@ class EditableSchema(mm.ModelSchema):
     can_create_internal_comments = fields.Function(
         lambda editable, ctx: editable.contribution.event.can_manage(
             ctx.get('user'), permission=editable.type.editor_permission
+        ) or editable.contribution.event.can_manage(
+            ctx.get('user'), permission='editing_manager'
         )
     )
     review_conditions_valid = fields.Boolean()

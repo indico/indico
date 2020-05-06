@@ -97,6 +97,7 @@ class Editable(db.Model):
 
     def can_comment(self, user):
         return (self.event.can_manage(user, permission=self.type.editor_permission)
+                or self.event.can_manage(user, permission='editing_manager')
                 or self.contribution.is_user_associated(user, check_abstract=True))
 
     @property

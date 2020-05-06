@@ -77,6 +77,8 @@ class RHEditable(RHContributionEditableBase):
         RHContributionEditableBase._check_access(self)
         if self.event.can_manage(session.user, permission=self.editable_type.editor_permission):
             return
+        if self.event.can_manage(session.user, permission='editing_manager'):
+            return
         if not self._user_is_authorized_submitter() and not self._user_is_authorized_editor():
             raise Forbidden
 

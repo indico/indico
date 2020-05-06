@@ -105,7 +105,8 @@ class EditingRevisionComment(RenderModeMixin, db.Model):
         contribution = self.revision.editable.contribution
         editable_type_permission = self.revision.editable.type.editor_permission
         authorized_submitter = contribution.is_user_associated(user, check_abstract=True)
-        authorized_editor = contribution.event.can_manage(user, permission=editable_type_permission)
+        authorized_editor = (contribution.event.can_manage(user, permission=editable_type_permission)
+                             or contribution.event.can_manage(user, permission='editing_manager'))
 
         if self.user != user:
             return False

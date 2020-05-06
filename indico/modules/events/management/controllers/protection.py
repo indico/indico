@@ -113,6 +113,7 @@ class RHPermissionsDialog(RH):
 
 class RHEventPrincipals(PrincipalsMixin, RHManageEventBase):
     ALLOW_LOCKED = True
+    PERMISSION = 'ANY'
 
     @use_rh_kwargs({
         'values': PrincipalDict(allow_groups=True, allow_external_users=True, allow_event_roles=True,
@@ -124,12 +125,16 @@ class RHEventPrincipals(PrincipalsMixin, RHManageEventBase):
 
 
 class RHEventRolesJSON(RHManageEventBase):
+    PERMISSION = 'ANY'
+
     def _process(self):
         event_roles = sorted(self.event.roles, key=attrgetter('code'))
         return jsonify([serialize_event_role(er, legacy=False) for er in event_roles])
 
 
 class RHCategoryRolesJSON(RHManageEventBase):
+    PERMISSION = 'ANY'
+
     def _process(self):
         category_roles = CategoryRole.get_category_roles(self.event.category)
         return jsonify([serialize_category_role(cr, legacy=False) for cr in category_roles])
