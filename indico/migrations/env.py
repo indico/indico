@@ -39,7 +39,7 @@ def _render_item(type_, obj, autogen_context):
     func = getattr(obj, 'alembic_render_' + type_, None)
     if func is None:
         return False
-    return func(autogen_context)
+    return func(autogen_context, autogen_context.opts['template_args']['toplevel_code'])
 
 
 def run_migrations_offline():
@@ -56,7 +56,8 @@ def run_migrations_offline():
     """
     url = config.get_main_option('sqlalchemy.url')
     context.configure(url=url, target_metadata=target_metadata, include_schemas=True,
-                      version_table_schema='public', include_symbol=_include_symbol, render_item=_render_item)
+                      version_table_schema='public', include_symbol=_include_symbol, render_item=_render_item,
+                      template_args={'toplevel_code': set()})
 
     with context.begin_transaction():
         context.run_migrations()
@@ -75,7 +76,8 @@ def run_migrations_online():
 
     connection = engine.connect()
     context.configure(connection=connection, target_metadata=target_metadata, include_schemas=True,
-                      version_table_schema='public', include_symbol=_include_symbol, render_item=_render_item)
+                      version_table_schema='public', include_symbol=_include_symbol, render_item=_render_item,
+                      template_args={'toplevel_code': set()})
 
     try:
         with context.begin_transaction():

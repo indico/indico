@@ -60,6 +60,6 @@ class PyIPNetwork(TypeDecorator):
     def coerce_set_value(self, value):
         return _ip_network(value) if value is not None else None
 
-    def alembic_render_type(self, autogen_context):
+    def alembic_render_type(self, autogen_context, toplevel_code):
         autogen_context.imports.add('from indico.core.db.sqlalchemy import PyIPNetwork')
         return '{}()'.format(type(self).__name__)

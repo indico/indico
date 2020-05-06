@@ -20,6 +20,7 @@ branch_labels = ${repr(branch_labels)}
 depends_on = ${repr(depends_on)}
 
 
+${('\n' + '\n\n\n'.join(x.strip() for x in toplevel_code) + '\n\n') if toplevel_code else ''}
 def upgrade():
 % if not down_revision:
     op.execute(CreateSchema('plugin_${ current_plugin.name }'))
