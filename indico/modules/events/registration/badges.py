@@ -89,7 +89,6 @@ class RegistrantsListToBadgesPDF(DesignerPDFBase):
 
         for item in tpl_data.items:
             placeholder = placeholders.get(item['type'])
-
             if placeholder:
                 if placeholder.group == 'registrant':
                     text = placeholder.render(registration)

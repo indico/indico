@@ -7,7 +7,11 @@
 
 from __future__ import unicode_literals
 
+import io
+
+from PIL import Image
 from babel.numbers import format_currency
+from indico.modules.events import logger
 
 from indico.modules.events.registration.util import generate_ticket_qr_code
 from indico.util.date_time import format_date, format_datetime
@@ -26,7 +30,7 @@ __all__ = ('EventDatesPlaceholder', 'EventDescriptionPlaceholder', 'Registration
            'RegistrationFriendlyIDPlaceholder', 'RegistrationAffiliationPlaceholder',
            'RegistrationPositionPlaceholder', 'RegistrationAddressPlaceholder', 'RegistrationCountryPlaceholder',
            'RegistrationPhonePlaceholder', 'EventTitlePlaceholder', 'CategoryTitlePlaceholder', 'EventRoomPlaceholder',
-           'EventVenuePlaceholder', 'EventSpeakersPlaceholder')
+           'EventVenuePlaceholder', 'EventSpeakersPlaceholder', 'EventLogoPlaceholder')
 
 
 GROUP_TITLES = {
@@ -69,6 +73,22 @@ class FullNamePlaceholderBase(DesignerPlaceholder):
         name = (registration.get_personal_data().get('title', '') + ' ') if cls.with_title else ''
         name += registration.get_full_name(**cls.name_options)
         return name
+
+
+class EventLogoPlaceholder(DesignerPlaceholder):
+    group = 'event'
+    name = 'event_logo'
+    description = _("Event Logo")
+
+    @classmethod
+    def render(cls, registration):
+        try:
+            buf = io.BytesIO(registration.logo)
+            img = Image.open(buf)
+            return img
+        except Exception as e:
+            logger.error('Cannot get Event image logo: %s', e)
+        return None
 
 
 class EventDatesPlaceholder(DesignerPlaceholder):

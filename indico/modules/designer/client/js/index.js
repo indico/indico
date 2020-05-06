@@ -33,6 +33,13 @@
 
   var DEFAULT_PIXEL_CM = 50;
 
+  // Should add "is_image" property in the json and the PlaceHolder
+  var imageTypes = ["ticket_qr_code","event_logo"];
+
+  function isImage(type) {
+    return imageTypes.indexOf(type) > -1;
+  };
+
   function zoom(val) {
     return val * zoomFactor;
   }
@@ -76,8 +83,8 @@
       text_align: 'center',
       color: 'black',
       font_size: '15pt',
-      width: type === 'ticket_qr_code' ? 150 : 400,
-      height: type === 'ticket_qr_code' ? 150 : null,
+      width: isImage(type) ? 150 : 400,
+      height: isImage(type) ? 150 : null,
       text: $T('Fixed text'),
 
       // The following attributes have no meaning to the server
@@ -237,6 +244,7 @@
     $('#style-selector').val(itemStyles.length ? itemStyles.join('_') : 'normal');
     $('#color-selector').val(item.color);
     $('.js-element-width').val(item.width / pixelsPerCm);
+    $('.js-element-height').val(item.height / pixelsPerCm);
 
     var $fixedTextField = $('#fixed-text-field');
     var $fontTools = $('.font-tools');
@@ -245,7 +253,7 @@
       $fontTools.fadeIn();
       $fixedTextField.closest('.tool').fadeIn();
       $fixedTextField.val(item.text);
-    } else if (item.type === 'ticket_qr_code') {
+    } else if (isImage(item.type)) {
       $fontTools.fadeOut();
       $fixedTextField.closest('.tool').fadeOut();
     } else {
@@ -462,8 +470,12 @@
       width: function() {
         selectedItem.width = Math.round($('.js-element-width').val() * pixelsPerCm);
         if (selectedItem.type === 'ticket_qr_code') {
+          $('#element-height').val($('.js-element-width').val());
           selectedItem.height = selectedItem.width;
         }
+      },
+      height: function() {
+        selectedItem.height = Math.round($('.js-element-height').val() * pixelsPerCm);
       },
     }[attribute]());
 
@@ -847,6 +859,10 @@
 
       $('.js-element-width').on('keyup click', function() {
         setSelectedItemAttribute('width', config);
+      });
+
+      $('.js-element-height').on('keyup click', function() {
+        setSelectedItemAttribute('height', config);
       });
 
       $('#fixed-text-field').on('keyup', function() {
