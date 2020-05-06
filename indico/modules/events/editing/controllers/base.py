@@ -30,6 +30,7 @@ class RHEditingManagementBase(RHManageEventBase):
     """Base class for editing RHs that don't reference an editable."""
 
     EVENT_FEATURE = 'editing'
+    PERMISSION = 'editing_manager'
 
 
 class RHEditableTypeManagementBase(RHEditingManagementBase):

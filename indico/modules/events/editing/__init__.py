@@ -56,6 +56,7 @@ def _get_feature_definitions(sender, **kwargs):
 
 @signals.acl.get_management_permissions.connect_via(Event)
 def _get_management_permissions(sender, **kwargs):
+    yield EditingManagerPermission
     yield PaperEditorPermission
     yield SlidesEditorPermission
     yield PosterEditorPermission
@@ -63,15 +64,28 @@ def _get_management_permissions(sender, **kwargs):
 
 @signals.menu.items.connect_via('event-management-sidemenu')
 def _extend_event_management_menu(sender, event, **kwargs):
-    if not event.can_manage(session.user) or not EditingFeature.is_allowed_for_event(event):
+    if not event.can_manage(session.user, 'editing_manager') or not EditingFeature.is_allowed_for_event(event):
         return
     return SideMenuItem('editing', _('Editing'), url_for('event_editing.dashboard', event),
                         section='workflows')
 
 
+@signals.event_management.management_url.connect
+def _get_event_management_url(event, **kwargs):
+    if event.can_manage(session.user, 'editing_manager'):
+        return url_for('event_editing.dashboard', event)
+
+
 @signals.event_management.get_cloners.connect
 def _get_cloners(sender, **kwargs):
     yield EditingSettingsCloner
+
+
+class EditingManagerPermission(ManagementPermission):
+    name = 'editing_manager'
+    friendly_name = _('Editing manager')
+    description = _('Grants unrestricted access to the editing module.')
+    user_selectable = True
 
 
 class PaperEditorPermission(ManagementPermission):
