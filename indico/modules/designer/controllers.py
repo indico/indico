@@ -11,9 +11,7 @@ import shutil
 from collections import defaultdict
 from io import BytesIO
 
-from flask import flash, jsonify, request, session
 from PIL import Image
-from werkzeug.exceptions import Forbidden
 
 from indico.core.db import db
 from indico.core.errors import UserValueError
@@ -24,9 +22,9 @@ from indico.modules.designer.forms import AddTemplateForm
 from indico.modules.designer.models.images import DesignerImageFile
 from indico.modules.designer.models.templates import DesignerTemplate
 from indico.modules.designer.operations import update_template
-from indico.modules.designer.util import (get_all_templates, get_default_template_on_category, get_inherited_templates,
-                                          get_nested_placeholder_options, get_not_deletable_templates,
-                                          get_placeholder_options, get_images_placeholder_types)
+from indico.modules.designer.util import (
+    get_all_templates, get_default_template_on_category, get_images_placeholder_types, get_inherited_templates,
+    get_nested_placeholder_options, get_not_deletable_templates, get_placeholder_options)
 from indico.modules.designer.views import WPCategoryManagementDesigner, WPEventManagementDesigner
 from indico.modules.events import Event
 from indico.modules.events.management.controllers import RHManageEventBase
@@ -36,6 +34,9 @@ from indico.util.i18n import _
 from indico.web.flask.templating import get_template_module
 from indico.web.rh import RHProtected
 from indico.web.util import jsonify_data, jsonify_form, jsonify_template
+
+from flask import flash, jsonify, request, session
+from werkzeug.exceptions import Forbidden
 
 
 TEMPLATE_DATA_JSON_SCHEMA = {
