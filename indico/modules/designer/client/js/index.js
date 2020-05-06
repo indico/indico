@@ -34,7 +34,7 @@
   var DEFAULT_PIXEL_CM = 50;
 
   // Should add "is_image" property in the json and the PlaceHolder
-  var imageTypes = ["ticket_qr_code","event_logo"];
+  const imageTypes = ['ticket_qr_code', 'event_logo'];
 
   function isImage(type) {
     return imageTypes.indexOf(type) > -1;
