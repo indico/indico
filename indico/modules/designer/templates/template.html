@@ -377,7 +377,7 @@
             'use strict';
 
             setupDesigner({{ template_data | tojson }}, {{ backside_template_data | tojson}}, {{ config | tojson }},
-                          {{ placeholders | tojson }});
+                          {{ placeholders | tojson }}, {{ image_types | tojson }});
         })();
     </script>
 {% endblock %}

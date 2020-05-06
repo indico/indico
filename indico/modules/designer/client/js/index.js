@@ -33,8 +33,7 @@
 
   var DEFAULT_PIXEL_CM = 50;
 
-  // Should add "is_image" property in the json and the PlaceHolder
-  const imageTypes = ['ticket_qr_code', 'event_logo'];
+  var imageTypes = ['ticket_qr_code', 'event_logo'];
 
   function isImage(type) {
     return imageTypes.indexOf(type) > -1;
@@ -741,7 +740,7 @@
     showConfirmationDialog = false;
   }
 
-  global.setupDesigner = function setupDesigner(template, backsideTemplate, config, placeholders) {
+  global.setupDesigner = function setupDesigner(template, backsideTemplate, config, placeholders, image_types) {
     editing = !!template;
     itemTitles = _.partial(_.extend, {}).apply(
       null,
@@ -757,6 +756,9 @@
     initialOffset = pixelsPerCm;
 
     backsideTemplateID = backsideTemplate.id;
+
+    // Get image placeholder list
+    imageTypes = image_types;
 
     // Item class
     $(document).ready(function() {

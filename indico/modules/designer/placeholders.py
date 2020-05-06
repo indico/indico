@@ -79,11 +79,12 @@ class EventLogoPlaceholder(DesignerPlaceholder):
     group = 'event'
     name = 'event_logo'
     description = _("Event Logo")
+    is_image = True
 
     @classmethod
-    def render(cls, registration):
-        if registration.has_logo:
-            buf = io.BytesIO(registration.logo)
+    def render(cls, event):
+        if event.has_logo:
+            buf = io.BytesIO(event.logo)
             return Image.open(buf)
         else:
             return ''
@@ -318,6 +319,7 @@ class RegistrationTicketQRPlaceholder(DesignerPlaceholder):
     name = 'ticket_qr_code'
     description = _("Ticket QR Code")
     is_ticket = True
+    is_image = True
 
     @classmethod
     def render(cls, registration):
