@@ -9,10 +9,10 @@ from __future__ import unicode_literals
 
 import io
 
-from PIL import Image
 from babel.numbers import format_currency
-from indico.modules.events import logger
+from PIL import Image
 
+from indico.modules.events import logger
 from indico.modules.events.registration.util import generate_ticket_qr_code
 from indico.util.date_time import format_date, format_datetime
 from indico.util.i18n import _
