@@ -84,8 +84,7 @@ class EventLogoPlaceholder(DesignerPlaceholder):
     def render(cls, registration):
         try:
             buf = io.BytesIO(registration.logo)
-            img = Image.open(buf)
-            return img
+            return Image.open(buf)
         except Exception as e:
             logger.error('Cannot get Event image logo: %s', e)
         return None
