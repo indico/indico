@@ -28,7 +28,7 @@ def get_placeholder_options():
 def get_nested_placeholder_options():
     groups = {group_id: {'title': group_title, 'options': {}} for group_id, group_title in GROUP_TITLES.viewitems()}
     for name, placeholder in get_placeholder_options().viewitems():
-        groups[placeholder.group]['options'][name] = placeholder.description
+        groups[placeholder.group]['options'][name] = unicode(placeholder.description)
     return groups
 
 
