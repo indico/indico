@@ -44,12 +44,14 @@ export default function FileSubmission({onChange, disabled}) {
   const [files, setFiles] = useState([]);
   const onDrop = useCallback(
     acceptedFiles => {
+      const newFilenames = new Set(acceptedFiles.map(f => f.name));
+      acceptedFiles = files.filter(f => !newFilenames.has(f.name)).concat(acceptedFiles);
       setFiles(acceptedFiles);
       if (onChange) {
         onChange(acceptedFiles);
       }
     },
-    [setFiles, onChange]
+    [files, setFiles, onChange]
   );
 
   const removeFile = file => {
