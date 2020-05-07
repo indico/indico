@@ -291,6 +291,8 @@ class OccurrencesField(JSONField):
                 dt = dateutil.parser.parse('{} {}'.format(occ['date'], occ['time']))
             except ValueError:
                 raise ValueError('Invalid date/time: {} {}'.format(escape(occ['date']), escape(occ['time'])))
+            if occ['duration'] < 1:
+                raise ValueError('Invalid duration')
             return localize_as_utc(dt, self.timezone), timedelta(minutes=occ['duration'])
 
         self.data = []
