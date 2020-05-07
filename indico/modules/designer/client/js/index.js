@@ -33,7 +33,7 @@
 
   var DEFAULT_PIXEL_CM = 50;
 
-  let imageTypes = ['ticket_qr_code', 'event_logo'];
+  let imageTypes = null;
 
   function isImage(type) {
     return imageTypes.includes(type);
