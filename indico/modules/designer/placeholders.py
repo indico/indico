@@ -45,6 +45,8 @@ class DesignerPlaceholder(Placeholder):
     admin_only = False
     #: Whether a template containing this placeholder is considered a ticket
     is_ticket = False
+    #: Whether this placeholder is rendering an image
+    is_image = False
 
 
 class RegistrationPlaceholder(DesignerPlaceholder):

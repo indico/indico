@@ -33,10 +33,10 @@
 
   var DEFAULT_PIXEL_CM = 50;
 
-  var imageTypes = ['ticket_qr_code', 'event_logo'];
+  let imageTypes = ['ticket_qr_code', 'event_logo'];
 
   function isImage(type) {
-    return imageTypes.indexOf(type) > -1;
+    return imageTypes.includes(type);
   };
 
   function zoom(val) {
@@ -757,7 +757,6 @@
 
     backsideTemplateID = backsideTemplate.id;
 
-    // Get image placeholder list
     imageTypes = image_types;
 
     // Item class
