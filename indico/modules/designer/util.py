@@ -33,11 +33,7 @@ def get_nested_placeholder_options():
 
 
 def get_images_placeholder_types():
-    image_types = []
-    for name, placeholder in get_placeholder_options().viewitems():
-        if getattr(placeholder, 'is_image', False):
-            image_types.append(name)
-    return image_types
+    return [name for name, placeholder in get_placeholder_options().viewitems() if placeholder.is_image]
 
 
 def get_all_templates(obj):
