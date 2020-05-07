@@ -32,7 +32,7 @@ def get_nested_placeholder_options():
     return groups
 
 
-def get_images_placeholder_types():
+def get_image_placeholder_types():
     return [name for name, placeholder in get_placeholder_options().viewitems() if placeholder.is_image]
 
 

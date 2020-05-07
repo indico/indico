@@ -7,7 +7,7 @@
 
 from __future__ import unicode_literals
 
-import io
+from io import BytesIO
 
 from babel.numbers import format_currency
 from PIL import Image
@@ -84,11 +84,10 @@ class EventLogoPlaceholder(DesignerPlaceholder):
 
     @classmethod
     def render(cls, event):
-        if event.has_logo:
-            buf = io.BytesIO(event.logo)
-            return Image.open(buf)
-        else:
+        if not event.has_logo:
             return ''
+        buf = BytesIO(event.logo)
+        return Image.open(buf)
 
 
 class EventDatesPlaceholder(DesignerPlaceholder):
