@@ -54,6 +54,12 @@ TEMPLATE_DATA_JSON_SCHEMA = {
                     'text': {'type': 'string'},
                     'x': {'type': 'number', 'minimum': 0},
                     'y': {'type': 'number', 'minimum': 0},
+                    'height': {
+                        'anyOf': [
+                            {'type': 'integer', 'minimum': 0},
+                            {'type': 'null'},
+                        ],
+                    },
                     'width': {'type': 'integer', 'minimum': 0},
                     'color': {'type': 'string'},
                     'font_family': {'type': 'string'},
