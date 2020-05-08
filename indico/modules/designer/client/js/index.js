@@ -248,19 +248,23 @@ import {$T} from 'indico/utils/i18n';
     $('.js-element-height').val(item.height / pixelsPerCm);
 
     var $fixedTextField = $('#fixed-text-field');
+    const $itemHeightField = $('#subtool-element-height');
     var $fontTools = $('.font-tools');
 
     if (item.type === 'fixed') {
-      $fontTools.fadeIn();
-      $fixedTextField.closest('.tool').fadeIn();
+      $fontTools.show();
+      $fixedTextField.closest('.tool').show();
       $fixedTextField.val(item.text);
+      $itemHeightField.hide();
     } else if (isImage(item.type)) {
-      $fontTools.fadeOut();
-      $fixedTextField.closest('.tool').fadeOut();
+      $fontTools.hide();
+      $fixedTextField.closest('.tool').hide();
+      $itemHeightField.show();
     } else {
-      $fontTools.fadeIn();
-      $fixedTextField.closest('.tool').fadeOut();
+      $fontTools.show();
+      $fixedTextField.closest('.tool').hide();
       $fixedTextField.val('');
+      $itemHeightField.hide();
     }
   }
 
