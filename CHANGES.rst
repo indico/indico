@@ -71,6 +71,8 @@ Improvements
   thanks :user:`omegak`)
 - Use custom time picker for time input fields taking into account the 12h/24h
   format of the user's locale (:issue:`4399`)
+- Refactor the room edit modal to a tabbed layout and improve error
+  handling (:issue:`4408`)
 
 Bugfixes
 ^^^^^^^^

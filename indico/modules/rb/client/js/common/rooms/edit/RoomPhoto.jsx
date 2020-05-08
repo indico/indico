@@ -164,7 +164,14 @@ function RoomPhoto({roomId, hasPhoto, setRoomsSpriteToken}) {
   );
 
   return (
-    <Dropzone ref={dropzoneRef} onDrop={onDrop} multiple={false} noClick noKeyboard noDrag>
+    <Dropzone
+      ref={dropzoneRef}
+      onDrop={onDrop}
+      multiple={false}
+      noClick
+      noKeyboard
+      accept="image/*"
+    >
       {({getRootProps, getInputProps}) => (
         <section>
           <div {...getRootProps()} styleName="dropzone">
