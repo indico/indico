@@ -6,7 +6,7 @@
 // LICENSE file for more details.
 
 /* global AlertPopup: true */
-/* eslint-disable max-len */
+/* eslint-disable max-len, import/unambiguous */
 
 (function(global) {
   'use strict';
