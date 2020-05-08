@@ -248,9 +248,16 @@
                 </div>
                 <div class="tool">
                     <i class="icon-rulers" title="{% trans %}Element dimensions{% endtrans %}"></i>
-                    <label for="element-width">{% trans %}Width:{% endtrans %}</label>
-                    <input id="element-width" class="js-element-width" size="5" type="number">
-                    <span class="scale">cm</span>
+                    <div class="subtool">
+                        <label for="element-width">{% trans %}Width:{% endtrans %}</label>
+                        <input id="element-width" class="js-element-width" size="5" type="number">
+                        <span class="scale">cm</span>
+                    </div>
+                    <div class="subtool" id="subtool-element-height">
+                        <label for="element-height">{% trans %}Height:{% endtrans %}</label>
+                        <input id="element-height" class="js-element-height" size="5" type="number">
+                        <span class="scale">cm</span>
+                    </div>
                 </div>
                 <div class="tool" style="display: none;">
                     <label for="fixed-text-field">{% trans %}Text:{% endtrans %}</label>
@@ -369,8 +376,8 @@
         (function() {
             'use strict';
 
-            setupDesigner({{ template_data | tojson }}, {{ backside_template_data | tojson}}, {{ config | tojson }},
-                          {{ placeholders | tojson }});
+            setupDesigner({{ template_data | tojson }}, {{ backside_template_data | tojson }}, {{ config | tojson }},
+                          {{ placeholders | tojson }}, {{ image_types | tojson }});
         })();
     </script>
 {% endblock %}

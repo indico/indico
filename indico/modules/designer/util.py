@@ -32,6 +32,10 @@ def get_nested_placeholder_options():
     return groups
 
 
+def get_image_placeholder_types():
+    return [name for name, placeholder in get_placeholder_options().viewitems() if placeholder.is_image]
+
+
 def get_all_templates(obj):
     """Get all templates usable by an event/category"""
     category = obj.category if isinstance(obj, Event) else obj

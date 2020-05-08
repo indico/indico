@@ -7,7 +7,10 @@
 
 from __future__ import unicode_literals
 
+from io import BytesIO
+
 from babel.numbers import format_currency
+from PIL import Image
 
 from indico.modules.events.registration.util import generate_ticket_qr_code
 from indico.util.date_time import format_date, format_datetime
@@ -26,7 +29,7 @@ __all__ = ('EventDatesPlaceholder', 'EventDescriptionPlaceholder', 'Registration
            'RegistrationFriendlyIDPlaceholder', 'RegistrationAffiliationPlaceholder',
            'RegistrationPositionPlaceholder', 'RegistrationAddressPlaceholder', 'RegistrationCountryPlaceholder',
            'RegistrationPhonePlaceholder', 'EventTitlePlaceholder', 'CategoryTitlePlaceholder', 'EventRoomPlaceholder',
-           'EventVenuePlaceholder', 'EventSpeakersPlaceholder')
+           'EventVenuePlaceholder', 'EventSpeakersPlaceholder', 'EventLogoPlaceholder')
 
 
 GROUP_TITLES = {
@@ -42,6 +45,8 @@ class DesignerPlaceholder(Placeholder):
     admin_only = False
     #: Whether a template containing this placeholder is considered a ticket
     is_ticket = False
+    #: Whether this placeholder is rendering an image
+    is_image = False
 
 
 class RegistrationPlaceholder(DesignerPlaceholder):
@@ -69,6 +74,20 @@ class FullNamePlaceholderBase(DesignerPlaceholder):
         name = (registration.get_personal_data().get('title', '') + ' ') if cls.with_title else ''
         name += registration.get_full_name(**cls.name_options)
         return name
+
+
+class EventLogoPlaceholder(DesignerPlaceholder):
+    group = 'event'
+    name = 'event_logo'
+    description = _("Event Logo")
+    is_image = True
+
+    @classmethod
+    def render(cls, event):
+        if not event.has_logo:
+            return ''
+        buf = BytesIO(event.logo)
+        return Image.open(buf)
 
 
 class EventDatesPlaceholder(DesignerPlaceholder):
@@ -300,6 +319,7 @@ class RegistrationTicketQRPlaceholder(DesignerPlaceholder):
     name = 'ticket_qr_code'
     description = _("Ticket QR Code")
     is_ticket = True
+    is_image = True
 
     @classmethod
     def render(cls, registration):

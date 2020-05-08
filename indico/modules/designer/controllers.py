@@ -24,7 +24,8 @@ from indico.modules.designer.forms import AddTemplateForm
 from indico.modules.designer.models.images import DesignerImageFile
 from indico.modules.designer.models.templates import DesignerTemplate
 from indico.modules.designer.operations import update_template
-from indico.modules.designer.util import (get_all_templates, get_default_template_on_category, get_inherited_templates,
+from indico.modules.designer.util import (get_all_templates, get_default_template_on_category,
+                                          get_image_placeholder_types, get_inherited_templates,
                                           get_nested_placeholder_options, get_not_deletable_templates,
                                           get_placeholder_options)
 from indico.modules.designer.views import WPCategoryManagementDesigner, WPEventManagementDesigner
@@ -265,6 +266,7 @@ class RHEditDesignerTemplate(RHModifyDesignerTemplateBase):
             related_tpls_per_owner[bs_tpl.owner].append(bs_tpl)
         return self._render_template('template.html', template=self.template,
                                      placeholders=get_nested_placeholder_options(),
+                                     image_types=get_image_placeholder_types(),
                                      config=DEFAULT_CONFIG[self.template.type], owner=self.target,
                                      template_data=template_data, backside_template_data=backside_template_data,
                                      related_tpls_per_owner=related_tpls_per_owner, tpls_count=len(backside_templates))

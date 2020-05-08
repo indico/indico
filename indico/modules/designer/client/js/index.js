@@ -6,7 +6,7 @@
 // LICENSE file for more details.
 
 /* global AlertPopup: true */
-/* eslint-disable max-len */
+/* eslint-disable max-len, import/unambiguous */
 
 (function(global) {
   'use strict';
@@ -32,6 +32,12 @@
   var removeBackSide = false;
 
   var DEFAULT_PIXEL_CM = 50;
+
+  let imageTypes = null;
+
+  function isImage(type) {
+    return imageTypes.includes(type);
+  };
 
   function zoom(val) {
     return val * zoomFactor;
@@ -76,8 +82,8 @@
       text_align: 'center',
       color: 'black',
       font_size: '15pt',
-      width: type === 'ticket_qr_code' ? 150 : 400,
-      height: type === 'ticket_qr_code' ? 150 : null,
+      width: isImage(type) ? 150 : 400,
+      height: isImage(type) ? 150 : null,
       text: $T('Fixed text'),
 
       // The following attributes have no meaning to the server
@@ -237,6 +243,7 @@
     $('#style-selector').val(itemStyles.length ? itemStyles.join('_') : 'normal');
     $('#color-selector').val(item.color);
     $('.js-element-width').val(item.width / pixelsPerCm);
+    $('.js-element-height').val(item.height / pixelsPerCm);
 
     var $fixedTextField = $('#fixed-text-field');
     var $fontTools = $('.font-tools');
@@ -245,7 +252,7 @@
       $fontTools.fadeIn();
       $fixedTextField.closest('.tool').fadeIn();
       $fixedTextField.val(item.text);
-    } else if (item.type === 'ticket_qr_code') {
+    } else if (isImage(item.type)) {
       $fontTools.fadeOut();
       $fixedTextField.closest('.tool').fadeOut();
     } else {
@@ -462,7 +469,15 @@
       width: function() {
         selectedItem.width = Math.round($('.js-element-width').val() * pixelsPerCm);
         if (selectedItem.type === 'ticket_qr_code') {
+          $('.js-element-height').val($('.js-element-width').val());
           selectedItem.height = selectedItem.width;
+        }
+      },
+      height: function() {
+        selectedItem.height = Math.round($('.js-element-height').val() * pixelsPerCm);
+        if (selectedItem.type === 'ticket_qr_code') {
+          $('.js-element-width').val($('.js-element-height').val());
+          selectedItem.width = selectedItem.height;
         }
       },
     }[attribute]());
@@ -729,7 +744,7 @@
     showConfirmationDialog = false;
   }
 
-  global.setupDesigner = function setupDesigner(template, backsideTemplate, config, placeholders) {
+  global.setupDesigner = function setupDesigner(template, backsideTemplate, config, placeholders, image_types) {
     editing = !!template;
     itemTitles = _.partial(_.extend, {}).apply(
       null,
@@ -745,6 +760,8 @@
     initialOffset = pixelsPerCm;
 
     backsideTemplateID = backsideTemplate.id;
+
+    imageTypes = image_types;
 
     // Item class
     $(document).ready(function() {
@@ -847,6 +864,10 @@
 
       $('.js-element-width').on('keyup click', function() {
         setSelectedItemAttribute('width', config);
+      });
+
+      $('.js-element-height').on('keyup click', function() {
+        setSelectedItemAttribute('height', config);
       });
 
       $('#fixed-text-field').on('keyup', function() {

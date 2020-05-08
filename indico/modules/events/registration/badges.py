@@ -87,7 +87,11 @@ class RegistrantsListToBadgesPDF(DesignerPDFBase):
 
         placeholders = get_placeholders('designer-fields')
 
-        for item in tpl_data.items:
+        # Print images first
+        image_placeholders = {name for name, placeholder in placeholders.viewitems() if placeholder.is_image}
+        items = sorted(tpl_data.items, key=lambda item: item['type'] not in image_placeholders)
+
+        for item in items:
             placeholder = placeholders.get(item['type'])
 
             if placeholder:
