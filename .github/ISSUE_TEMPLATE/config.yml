@@ -1,0 +1,11 @@
+blank_issues_enabled: true
+contact_links:
+  - name: End-user help 📖
+    url: https://learn.getindico.io
+    about: Please consult our user documentation on how to use Indico.
+  - name: Installing & configuring Indico 🛠
+    url: https://docs.getindico.io/en/stable/installation/
+    about: We have a step-by-step guide on how to install Indico.
+  - name: Support Question ☎️
+    url: https://talk.getindico.io
+    about: Please use our forum for support questions not covered by the documentation.
