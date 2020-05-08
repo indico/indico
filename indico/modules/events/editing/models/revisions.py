@@ -8,6 +8,7 @@
 from __future__ import unicode_literals
 
 import re
+from collections import defaultdict
 
 from indico.core.db import db
 from indico.core.db.sqlalchemy import PyIntEnum, UTCDateTime
@@ -170,5 +171,10 @@ class EditingRevision(RenderModeMixin, db.Model):
         files = [file for file in self.files if file.file_type.publishable]
         return files[0] if len(files) == 1 else None
 
-    def get_files_based_on_file_type(self, file_type):
-        return [file for file in self.files if file.file_type == file_type]
+    def get_published_files(self):
+        """Get the published files, grouped by file type."""
+        files = defaultdict(list)
+        for file in self.files:
+            if file.file_type.publishable:
+                files[file.file_type].append(file)
+        return dict(files)
