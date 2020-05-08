@@ -1,7 +1,7 @@
 ---
 name: "Feature request \U0001F52E"
 about: If you've got an idea for a new shiny feature!
-
+labels: enhancement
 ---
 
 **Is your feature request related to a problem? Please describe.**

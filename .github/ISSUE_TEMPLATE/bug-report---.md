@@ -1,7 +1,7 @@
 ---
 name: "Bug report \U0001F41E"
 about: If something is broken or not behaving as expected.
-
+labels: bug
 ---
 
 **Describe the bug**
