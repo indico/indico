@@ -469,12 +469,16 @@
       width: function() {
         selectedItem.width = Math.round($('.js-element-width').val() * pixelsPerCm);
         if (selectedItem.type === 'ticket_qr_code') {
-          $('#element-height').val($('.js-element-width').val());
+          $('.js-element-height').val($('.js-element-width').val());
           selectedItem.height = selectedItem.width;
         }
       },
       height: function() {
         selectedItem.height = Math.round($('.js-element-height').val() * pixelsPerCm);
+        if (selectedItem.type === 'ticket_qr_code') {
+          $('.js-element-width').val($('.js-element-height').val());
+          selectedItem.width = selectedItem.height;
+        }
       },
     }[attribute]());
 
