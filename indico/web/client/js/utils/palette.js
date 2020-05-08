@@ -10,6 +10,12 @@ import {Translate} from 'indico/react/i18n';
 // base colors (must match entries in _palette.scss)
 const Palette = {
   blue: '#5d95ea',
+  grey: '#bbb',
+  yellow: '#e99e18',
+  red: '#f91f1f',
+  green: '#00c851',
+  purple: '#6e5494',
+  orange: '#f80',
 };
 
 // colors for specific purposes

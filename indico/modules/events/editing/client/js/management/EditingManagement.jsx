@@ -8,6 +8,7 @@
 import manageTagsURL from 'indico-url:event_editing.manage_tags';
 import dashboardURL from 'indico-url:event_editing.dashboard';
 import editableTypeURL from 'indico-url:event_editing.manage_editable_type';
+import editableListURL from 'indico-url:event_editing.manage_editable_type_list';
 import manageFileTypesURL from 'indico-url:event_editing.manage_file_types';
 import manageReviewConditionsURL from 'indico-url:event_editing.manage_review_conditions';
 
@@ -21,6 +22,7 @@ import {
   EditableTypeDashboard,
   FileTypeManagement,
   ReviewConditionsManagement,
+  EditableList,
 } from './editable_type';
 
 export default function EditingManagement() {
@@ -51,6 +53,11 @@ export default function EditingManagement() {
           exact
           path={routerPathFromFlask(manageReviewConditionsURL, ['confId', 'type'])}
           component={ReviewConditionsManagement}
+        />
+        <Route
+          exact
+          path={routerPathFromFlask(editableListURL, ['confId', 'type'])}
+          component={EditableList}
         />
       </Switch>
     </Router>

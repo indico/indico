@@ -7,6 +7,7 @@
 
 import enabledEditableTypesURL from 'indico-url:event_editing.api_enabled_editable_types';
 import manageEditableTypeURL from 'indico-url:event_editing.manage_editable_type';
+import manageEditableTypeListURL from 'indico-url:event_editing.manage_editable_type_list';
 
 import React, {useState} from 'react';
 import PropTypes from 'prop-types';
@@ -105,9 +106,12 @@ export default function EditableTypeList({eventId}) {
               <div className="label">{EditableTypeTitles[type]}</div>
             </div>
             <div className="toolbar">
-              <a className="i-button icon-list">
+              <Link
+                className="i-button icon-list"
+                to={manageEditableTypeListURL({confId: eventId, type})}
+              >
                 <Translate>List</Translate>
-              </a>
+              </Link>
               <Link
                 className="i-button icon-settings"
                 to={manageEditableTypeURL({confId: eventId, type})}

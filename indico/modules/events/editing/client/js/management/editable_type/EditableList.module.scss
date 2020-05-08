@@ -1,0 +1,85 @@
+// This file is part of Indico.
+// Copyright (C) 2002 - 2020 CERN
+//
+// Indico is free software; you can redistribute it and/or
+// modify it under the terms of the MIT License; see the
+// LICENSE file for more details.
+
+@import 'base/palette';
+
+$border: 1px solid $pastel-gray;
+
+.editable-topbar {
+    display: flex;
+    width: 1000px;
+    justify-content: space-between;
+}
+
+.editable-list {
+    .table {
+        font-family: 'Muli', 'Helvetica Neue', Arial, Helvetica, sans-serif;
+        margin-top: 20px;
+        margin-bottom: 50px;
+    }
+
+    .rowcolumn-tooltip {
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        overflow: hidden;
+        display: flex;
+    }
+
+    :global(.ReactVirtualized__Table__Grid) {
+        outline: none;
+    }
+
+    :global(.ReactVirtualized__Table__headerRow) {
+        font-weight: 700;
+        text-transform: uppercase;
+        display: flex;
+        border-top: $border;
+        border-bottom: $border;
+    }
+
+    :global(.ReactVirtualized__Table__row) {
+        display: flex;
+        border-bottom: $border;
+    }
+
+    :global(.ReactVirtualized__Table__headerTruncatedText) {
+        display: inline-block;
+        max-width: 100%;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        overflow: hidden;
+    }
+
+    :global(.ReactVirtualized__Table__headerColumn),
+    :global(.ReactVirtualized__Table__rowColumn) {
+        margin-right: 10px;
+        align-items: center;
+        display: flex;
+    }
+
+    :global(.ReactVirtualized__Table__headerColumn:first-of-type),
+    :global(.ReactVirtualized__Table__rowColumn:first-of-type) {
+        margin-left: 10px;
+    }
+
+    :global(.ReactVirtualized__Table__sortableHeaderColumn) {
+        cursor: pointer;
+        outline: none;
+    }
+
+    :global(.ReactVirtualized__Table__sortableHeaderIconContainer) {
+        display: flex;
+        align-items: center;
+    }
+
+    :global(.ReactVirtualized__Table__sortableHeaderIcon) {
+        flex: 0 0 24px;
+        height: 1em;
+        width: 1em;
+        fill: currentColor;
+    }
+}
