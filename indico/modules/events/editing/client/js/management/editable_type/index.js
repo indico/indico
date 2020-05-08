@@ -8,3 +8,4 @@
 export {default as EditableTypeDashboard} from './EditableTypeDashboard';
 export {default as FileTypeManagement} from './file_types';
 export {default as ReviewConditionsManagement} from './review_conditions';
+export {default as EditableList} from './EditableList';

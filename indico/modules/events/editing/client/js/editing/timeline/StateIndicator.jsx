@@ -8,6 +8,10 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import {Label, Popup} from 'semantic-ui-react';
+import Palette from 'indico/utils/palette';
+import {EditableStatus} from '../../models';
+
+import './StateIndicator.module.scss';
 
 const colors = {
   replaced: 'grey',
@@ -18,33 +22,45 @@ const colors = {
   needs_submitter_changes: 'orange',
 };
 
-export default function StateIndicator({text, circular, tooltip, state}) {
-  const trigger = (
-    <Label size="tiny" color={colors[state]} circular={circular}>
-      {text}
-    </Label>
-  );
+const labelColors = {
+  replaced: Palette.grey,
+  needs_submitter_confirmation: Palette.yellow,
+  rejected: Palette.red,
+  accepted: Palette.green,
+  assigned: Palette.purple,
+  needs_submitter_changes: Palette.orange,
+};
+
+export default function StateIndicator({label, circular, tooltip, state}) {
+  const trigger = <Label size="tiny" color={colors[state]} circular={circular} />;
 
   return (
-    <Popup
-      position="bottom center"
-      trigger={trigger}
-      content={tooltip}
-      on="hover"
-      disabled={!tooltip}
-    />
+    <>
+      <Popup
+        position="bottom center"
+        trigger={trigger}
+        content={tooltip}
+        on="hover"
+        disabled={!tooltip}
+      />
+      {label && (
+        <div styleName="label-text" style={{color: labelColors[state]}}>
+          {EditableStatus[state]}
+        </div>
+      )}
+    </>
   );
 }
 
 StateIndicator.propTypes = {
-  text: PropTypes.string,
+  label: PropTypes.bool,
   circular: PropTypes.bool,
   tooltip: PropTypes.string,
   state: PropTypes.oneOf(Object.keys(colors)).isRequired,
 };
 
 StateIndicator.defaultProps = {
-  text: null,
+  label: false,
   circular: false,
   tooltip: null,
 };
