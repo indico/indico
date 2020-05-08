@@ -5,12 +5,14 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-/* global AlertPopup: true */
-/* eslint-disable max-len, import/unambiguous */
+/* global alertPopup:false,confirmPrompt:false, handleAjaxError:false, handleFlashes:false,
+          ajaxDialog:false */
+/* eslint-disable max-len, no-var, object-shorthand, prefer-template */
+
+import _ from 'lodash';
+import {$T} from 'indico/utils/i18n';
 
 (function(global) {
-  'use strict';
-
   var snapToGrid = false;
   // Dimensions of the template space, in pixels, and previous dimensions (cm)
   var templateDimensions, previousTemplateDimensions, pixelsPerCm, initialOffset, zoomFactor;
@@ -37,7 +39,7 @@
 
   function isImage(type) {
     return imageTypes.includes(type);
-  };
+  }
 
   function zoom(val) {
     return val * zoomFactor;
@@ -487,7 +489,7 @@
 
   function save(template) {
     if ($('.js-template-name').val() === '') {
-      new AlertPopup($T('Warning'), $T.gettext('Please choose a name for the template')).open();
+      alertPopup($T.gettext('Please choose a name for the template'), $T('Warning'));
       return;
     }
     if (!Object.keys(items).length && !template.background_url) {
@@ -744,12 +746,15 @@
     showConfirmationDialog = false;
   }
 
-  global.setupDesigner = function setupDesigner(template, backsideTemplate, config, placeholders, image_types) {
+  global.setupDesigner = function setupDesigner(
+    template,
+    backsideTemplate,
+    config,
+    placeholders,
+    imageTypes_
+  ) {
     editing = !!template;
-    itemTitles = _.partial(_.extend, {}).apply(
-      null,
-      _.map(_.values(placeholders), _.property('options'))
-    );
+    itemTitles = Object.assign(...Object.values(placeholders).map(({options}) => options));
 
     zoomFactor = config.zoom_factor;
     // Number of pixels per cm
@@ -761,7 +766,7 @@
 
     backsideTemplateID = backsideTemplate.id;
 
-    imageTypes = image_types;
+    imageTypes = imageTypes_;
 
     // Item class
     $(document).ready(function() {
@@ -807,7 +812,7 @@
         iframe: false,
         success: function(data) {
           if (data.error) {
-            new AlertPopup($T('Error'), data.error).open();
+            alertPopup(data.error, $T('Error'));
             return;
           }
           template.background_url = data.image_url;
