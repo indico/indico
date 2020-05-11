@@ -21,9 +21,14 @@ import './ResetReviews.module.scss';
 
 export default function ResetReview({revisionId}) {
   const {eventId, contributionId, editableType} = useSelector(selectors.getStaticData);
+  const allowed = useSelector(selectors.canPerformEditorActions);
   const [submitting, setSubmitting] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
   const dispatch = useDispatch();
+
+  if (!allowed) {
+    return null;
+  }
 
   const resetRevisions = async () => {
     setSubmitting(true);
@@ -39,6 +44,7 @@ export default function ResetReview({revisionId}) {
     );
     setSubmitting(false);
   };
+
   return (
     <>
       <Popup

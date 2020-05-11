@@ -38,7 +38,7 @@
 
 {% macro render_editables_section(contribution) %}
     {% set can_create_editable = contribution.allowed_types_for_editable|length > 0 %}
-    {% set can_submit = contribution.is_user_associated(session.user, check_abstract=true) %}
+    {% set can_submit = contribution.can_submit_editables(session.user) %}
     {% set enabled_editables = contribution.enabled_editables %}
     {% set has_enabled_types = enabled_editables|length > 0 %}
 

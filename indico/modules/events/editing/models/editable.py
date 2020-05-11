@@ -95,6 +95,71 @@ class Editable(db.Model):
     def event(self):
         return self.contribution.event
 
+    def _has_general_editor_permissions(self, user):
+        """Whether the user has general editor permissions on the Editable.
+
+        This means that the user has editor permissions for the editable's type,
+        but does not need to be the assigned editor.
+        """
+        # Editing (and event) managers always have editor-like access
+        return (
+            self.event.can_manage(user, permission='editing_manager') or
+            self.event.can_manage(user, permission=self.type.editor_permission)
+        )
+
+    def can_see_timeline(self, user):
+        """Whether the user can see the editable's timeline.
+
+        This is pure read access, without any ability to make changes
+        or leave comments.
+        """
+        # Anyone with editor access to the editable's type can see the timeline.
+        # Users associated with the editable's contribution can do so as well.
+        return (
+            self._has_general_editor_permissions(user) or
+            self.contribution.is_user_associated(user, check_abstract=True)
+        )
+
+    def can_perform_submitter_actions(self, user):
+        """Whether the user can perform any submitter actions.
+
+        These are actions such as uploading a new revision after having
+        been asked to make changes or approving/rejecting changes made
+        by an editor.
+        """
+        # If the user can't even see the timeline, we never allow any modifications
+        if not self.can_see_timeline(user):
+            return False
+        # Anyone associated with the contribution can perform submitter actions.
+        # XXX: Do we want this? Should it be restricted to the person who submitted
+        #      the initial revision, or to people with submission rights on the
+        #      contribution?
+        return self.contribution.is_user_associated(user, check_abstract=True)
+
+    def can_perform_editor_actions(self, user):
+        """Whether the user can perform any Editing actions.
+
+        These are actions usually made by the assigned Editor of the
+        editable, such as making changes, asking the user to make changes,
+        or approving/rejecting the editable.
+        """
+        # If the user can't even see the timeline, we never allow any modifications
+        if not self.can_see_timeline(user):
+            return False
+        # Editing/event managers can perform actions without being the assigned editor
+        # XXX: Do we want this? Or should they have to assign themselves first if they
+        #      want to do actions that would usually be done by the assigned editor?
+        if self.event.can_manage(user, permission='editing_manager'):
+            return True
+        # Editors need the permission on the editable type and also be the assigned editor
+        if self.editor == user and self.event.can_manage(user, permission=self.type.editor_permission):
+            return True
+        return False
+
+    def can_use_internal_comments(self, user):
+        """Whether the user can create/see internal comments."""
+        return self._has_general_editor_permissions(user)
+
     def can_comment(self, user):
         return (self.event.can_manage(user, permission=self.type.editor_permission)
                 or self.event.can_manage(user, permission='editing_manager')

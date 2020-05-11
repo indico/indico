@@ -221,7 +221,21 @@ export const getLastRevertableRevisionId = createSelector(
   }
 );
 
+export const canPerformSubmitterActions = createSelector(
+  getDetails,
+  details => details && details.canPerformSubmitterActions
+);
+
+export const canPerformEditorActions = createSelector(
+  getDetails,
+  details => details && details.canPerformEditorActions
+);
+
 export const canJudgeLastRevision = createSelector(
   getLastRevision,
-  lastRevision => lastRevision.finalState.name === FinalRevisionState.none
+  canPerformEditorActions,
+  (lastRevision, allowed) =>
+    lastRevision.finalState.name === FinalRevisionState.none &&
+    lastRevision.initialState.name !== InitialRevisionState.needs_submitter_confirmation &&
+    allowed
 );

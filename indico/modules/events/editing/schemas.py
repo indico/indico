@@ -115,32 +115,27 @@ class EditingRevisionSchema(mm.ModelSchema):
             return url_for('event_editing.api_confirm_changes', revision)
 
     def _get_comments(self, revision):
-        current_user = self.context.get('user')
-        event = revision.editable.event
-        editable_type_permission = revision.editable.type.editor_permission
         comments = [comment for comment in revision.comments
-                    if not comment.internal or event.can_manage(current_user, permission=editable_type_permission)
-                    or event.can_manage(current_user, permission='editing_manager')]
+                    if not comment.internal or revision.editable.can_use_internal_comments(self.context.get('user'))]
         return EditingRevisionCommentSchema(context=self.context).dump(comments, many=True)
 
 
 class EditableSchema(mm.ModelSchema):
     class Meta:
         model = Editable
-        fields = ('id', 'type', 'editor', 'revisions', 'contribution', 'can_comment', 'can_create_internal_comments',
-                  'review_conditions_valid')
+        fields = ('id', 'type', 'editor', 'revisions', 'contribution', 'can_comment', 'review_conditions_valid',
+                  'can_perform_editor_actions', 'can_perform_submitter_actions', 'can_create_internal_comments')
 
     contribution = fields.Nested(ContributionSchema)
     editor = fields.Nested(UserSchema, only=('id', 'avatar_bg_color', 'full_name'))
     revisions = fields.List(fields.Nested(EditingRevisionSchema))
+    can_perform_editor_actions = fields.Function(
+        lambda editable, ctx: editable.can_perform_editor_actions(ctx.get('user')))
+    can_perform_submitter_actions = fields.Function(
+        lambda editable, ctx: editable.can_perform_submitter_actions(ctx.get('user')))
     can_comment = fields.Function(lambda editable, ctx: editable.can_comment(ctx.get('user')))
     can_create_internal_comments = fields.Function(
-        lambda editable, ctx: editable.contribution.event.can_manage(
-            ctx.get('user'), permission=editable.type.editor_permission
-        ) or editable.contribution.event.can_manage(
-            ctx.get('user'), permission='editing_manager'
-        )
-    )
+        lambda editable, ctx: editable.can_use_internal_comments(ctx.get('user')))
     review_conditions_valid = fields.Boolean()
 
 
