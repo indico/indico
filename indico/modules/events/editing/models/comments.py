@@ -102,11 +102,8 @@ class EditingRevisionComment(RenderModeMixin, db.Model):
         return dict(self.revision.locator, comment_id=self.id)
 
     def can_modify(self, user):
-        contribution = self.revision.editable.contribution
-        editable_type_permission = self.revision.editable.type.editor_permission
-        authorized_submitter = contribution.is_user_associated(user, check_abstract=True)
-        authorized_editor = (contribution.event.can_manage(user, permission=editable_type_permission)
-                             or contribution.event.can_manage(user, permission='editing_manager'))
+        authorized_submitter = self.revision.editable.can_perform_submitter_actions(user)
+        authorized_editor = self.revision.editable.can_perform_editor_actions(user)
 
         if self.user != user:
             return False

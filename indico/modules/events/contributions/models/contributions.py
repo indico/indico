@@ -515,6 +515,9 @@ class Contribution(DescriptionMixin, ProtectionManagersMixin, LocationMixin, Att
         order = list(EditableType)
         return sorted(enabled_editables, key=lambda editable: order.index(editable.type))
 
+    def can_submit_editables(self, user):
+        return self.is_user_associated(user, check_abstract=True)
+
     @property
     def has_published_editables(self):
         return any(e.published_revision_id is not None for e in self.enabled_editables)

@@ -75,11 +75,7 @@ class RHEditable(RHContributionEditableBase):
 
     def _check_access(self):
         RHContributionEditableBase._check_access(self)
-        if self.event.can_manage(session.user, permission=self.editable_type.editor_permission):
-            return
-        if self.event.can_manage(session.user, permission='editing_manager'):
-            return
-        if not self._user_is_authorized_submitter() and not self._user_is_authorized_editor():
+        if not self.editable.can_see_timeline(session.user):
             raise Forbidden
 
     def _process(self):
@@ -91,8 +87,7 @@ class RHCreateEditable(RHContributionEditableBase):
 
     def _check_access(self):
         RHContributionEditableBase._check_access(self)
-        if not self._user_is_authorized_submitter():
-            # XXX: should event managers be able to submit on behalf of the user?
+        if not self.contrib.can_submit_editables(session.user):
             raise Forbidden
         # TODO: check if submitting papers for editing is allowed in the event
         if self.editable_type.name not in self.contrib.allowed_types_for_editable:
@@ -114,7 +109,7 @@ class RHReviewEditable(RHContributionEditableRevisionBase):
     """Review the latest revision of an Editable."""
 
     def _check_revision_access(self):
-        return self._user_is_authorized_editor()
+        return self.editable.can_perform_editor_actions(session.user)
 
     @use_kwargs(ReviewEditableArgs)
     def _process(self, action, comment):
@@ -131,7 +126,7 @@ class RHConfirmEditableChanges(RHContributionEditableRevisionBase):
     """Confirm/reject the changes made by the editor on an Editable."""
 
     def _check_revision_access(self):
-        return self._user_is_authorized_submitter()
+        return self.editable.can_perform_submitter_actions(session.user)
 
     @use_kwargs({
         'action': EnumField(EditingConfirmationAction, required=True),
@@ -146,7 +141,8 @@ class RHReplaceRevision(RHContributionEditableRevisionBase):
     """Replace the latest revision of an Editable."""
 
     def _check_revision_access(self):
-        return self._user_is_authorized_submitter() and self.revision.editor is None
+        # XXX: we still need UI for this or expose it only to the microservice
+        return self.editable.editor is None and self.editable.can_perform_submitter_actions(session.user)
 
     @use_kwargs({
         'comment': fields.String(missing='')
@@ -165,7 +161,7 @@ class RHCreateSubmitterRevision(RHContributionEditableRevisionBase):
     """Create new revision from submitter."""
 
     def _check_revision_access(self):
-        return self._user_is_authorized_submitter()
+        return self.editable.can_perform_submitter_actions(session.user)
 
     def _process(self):
         args = parser.parse({
@@ -181,7 +177,7 @@ class RHUndoReview(RHContributionEditableRevisionBase):
     """Undo the last review/confirmation on an Editable."""
 
     def _check_revision_access(self):
-        return self._user_is_authorized_editor()
+        return self.editable.can_perform_editor_actions(session.user)
 
     def _process(self):
         undo_review(self.revision)
@@ -199,7 +195,7 @@ class RHCreateRevisionComment(RHContributionEditableRevisionBase):
         'internal': fields.Bool(missing=False)
     })
     def _process(self, text, internal):
-        if internal and not self._user_is_authorized_editor():
+        if internal and not self.editable.can_use_internal_comments(session.user):
             internal = False
         create_revision_comment(self.revision, session.user, text, internal)
         return '', 201
@@ -232,7 +228,7 @@ class RHEditRevisionComment(RHContributionEditableRevisionBase):
         updates = {}
         if text is not None:
             updates['text'] = text
-        if internal is not None and self._user_is_authorized_editor():
+        if internal is not None and self.editable.can_use_internal_comments(session.user):
             updates['internal'] = internal
         if updates:
             update_revision_comment(self.comment, updates)
@@ -247,7 +243,7 @@ class RHExportRevisionFiles(RHContributionEditableRevisionBase):
     """Export revision files as a ZIP archive"""
 
     def _check_revision_access(self):
-        return self._user_is_authorized_submitter() or self._user_is_authorized_editor()
+        return self.editable.can_see_timeline(session.user)
 
     def _process(self):
         buf = BytesIO()
@@ -282,7 +278,7 @@ class RHDownloadRevisionFile(RHContributionEditableRevisionBase):
                               .first_or_404())
 
     def _check_revision_access(self):
-        return self._user_is_authorized_submitter() or self._user_is_authorized_editor()
+        return self.editable.can_see_timeline(session.user)
 
     def _process(self):
         return self.revision_file.file.send()

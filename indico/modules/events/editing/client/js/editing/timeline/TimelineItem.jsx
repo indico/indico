@@ -28,6 +28,7 @@ export default function TimelineItem({block}) {
   const {submitter, createdDt} = block;
   const lastBlock = useSelector(selectors.getLastTimelineBlock);
   const needsSubmitterConfirmation = useSelector(selectors.needsSubmitterConfirmation);
+  const canPerformSubmitterActions = useSelector(selectors.canPerformSubmitterActions);
   const lastState = useSelector(selectors.getLastState);
   const {canComment} = useSelector(selectors.getDetails);
   const {fileTypes} = useSelector(selectors.getStaticData);
@@ -84,8 +85,9 @@ export default function TimelineItem({block}) {
                   files={block.files}
                   downloadURL={block.downloadFilesURL}
                 />
-                {/* TODO: Check whether the current user is submitter */}
-                {isLastBlock && needsSubmitterConfirmation && <ChangesConfirmation />}
+                {canPerformSubmitterActions && needsSubmitterConfirmation && isLastBlock && (
+                  <ChangesConfirmation />
+                )}
               </div>
             )}
           </div>

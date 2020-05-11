@@ -7,7 +7,7 @@
 
 from __future__ import unicode_literals
 
-from flask import request, session
+from flask import request
 
 from indico.modules.events.contributions.controllers.display import RHContributionDisplayBase
 from indico.modules.events.controllers.base import RHDisplayEventBase
@@ -64,15 +64,3 @@ class RHContributionEditableBase(RequireUserMixin, RHContributionDisplayBase):
                          .with_parent(self.contrib)
                          .filter_by(type=self.editable_type)
                          .first())
-
-    def _user_is_authorized_submitter(self):
-        if session.user.is_admin:
-            # XXX: not sure if we want to keep this, but for now it's useful to have!
-            return True
-        return self.contrib.is_user_associated(session.user, check_abstract=True)
-
-    def _user_is_authorized_editor(self):
-        if session.user.is_admin:
-            # XXX: not sure if we want to keep this, but for now it's useful to have!
-            return True
-        return self.editable.editor == session.user
