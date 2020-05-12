@@ -285,7 +285,7 @@ function RoomEditModal({roomId, locationId, onClose, afterCreation}) {
     if (!!values.latitude !== !!values.longitude) {
       // Validation for dependent fields is made at the form level, since field
       // level won't handle it properly.
-      const error = 'Both latitude and longitude need to be set (or omitted).';
+      const error = Translate.string('Both latitude and longitude need to be set (or omitted).');
       return {latitude: error, longitude: error};
     }
   };
@@ -394,42 +394,47 @@ function RoomEditModal({roomId, locationId, onClose, afterCreation}) {
     );
   };
 
-  const renderForm = () => {
-    if (newRoomId) {
-      return <RoomEditModal roomId={newRoomId} onClose={onClose} afterCreation />;
-    }
-    if (!roomDetails || !roomAvailability || !roomAttributes) {
-      // In case of error, nothing is returned
-      return null;
-    }
+  if (newRoomId) {
+    return <RoomEditModal roomId={newRoomId} onClose={onClose} afterCreation />;
+  }
+  if (!roomDetails || !roomAvailability || !roomAttributes) {
+    // In case of error, nothing is returned
+    return null;
+  }
 
-    return (
-      <FinalForm
-        onSubmit={handleSubmit}
-        initialValues={{
-          ...roomDetails,
-          ...roomAvailability,
-          attributes: roomAttributes,
-        }}
-        initialValuesEqual={_.isEqual}
-        render={renderModal}
-        subscription={{
-          submitting: true,
-          hasValidationErrors: true,
-          pristine: true,
-          dirty: true,
-        }}
-        mutators={{...arrayMutators}}
-        validate={formValidation}
-      />
-    );
-  };
-
-  return renderForm();
+  return (
+    <FinalForm
+      onSubmit={handleSubmit}
+      initialValues={{
+        ...roomDetails,
+        ...roomAvailability,
+        attributes: roomAttributes,
+      }}
+      initialValuesEqual={_.isEqual}
+      render={renderModal}
+      subscription={{
+        submitting: true,
+        hasValidationErrors: true,
+        pristine: true,
+        dirty: true,
+      }}
+      mutators={{...arrayMutators}}
+      validate={formValidation}
+    />
+  );
 }
 
 RoomEditModal.propTypes = {
   roomId: PropTypes.number,
+  locationId: PropTypes.number,
+  onClose: PropTypes.func.isRequired,
+  afterCreation: PropTypes.bool,
+};
+
+RoomEditModal.defaultProps = {
+  roomId: undefined,
+  locationId: undefined,
+  afterCreation: false,
 };
 
 export default RoomEditModal;
