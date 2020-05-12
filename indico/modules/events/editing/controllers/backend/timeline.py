@@ -87,7 +87,7 @@ class RHCreateEditable(RHContributionEditableBase):
 
     def _check_access(self):
         RHContributionEditableBase._check_access(self)
-        if not self.contrib.can_submit_editables(session.user):
+        if not self.contrib.can_submit_proceedings(session.user):
             raise Forbidden
         # TODO: check if submitting papers for editing is allowed in the event
         if self.editable_type.name not in self.contrib.allowed_types_for_editable:
