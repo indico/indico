@@ -8,7 +8,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import {Button, Card} from 'semantic-ui-react';
-import {Slot, Overridable} from 'indico/react/util';
+import Overridable from 'react-overridable';
+import {Slot} from 'indico/react/util';
 import Room from '../../components/Room';
 import {withHoverListener} from '../map/util';
 

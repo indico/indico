@@ -12,6 +12,7 @@ import {connect} from 'react-redux';
 import {Form, Message, Segment} from 'semantic-ui-react';
 import {Field, FormSpy} from 'react-final-form';
 import {START_DATE} from 'react-dates/constants';
+import Overridable from 'react-overridable';
 
 import {
   FieldCondition,
@@ -25,7 +26,6 @@ import {
 import {FavoritesProvider} from 'indico/react/hooks';
 import {FinalSingleDatePicker, FinalDatePeriod, FinalPrincipal} from 'indico/react/components';
 import {serializeDate} from 'indico/utils/date';
-import {Overridable} from 'indico/react/util';
 import {PluralTranslate, Translate} from 'indico/react/i18n';
 import {FinalTimeRangePicker} from '../../components/TimeRangePicker';
 import {selectors as userSelectors} from '../user';

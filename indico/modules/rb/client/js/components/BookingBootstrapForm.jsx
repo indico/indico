@@ -10,10 +10,10 @@ import moment from 'moment';
 import PropTypes from 'prop-types';
 import React from 'react';
 import {connect} from 'react-redux';
+import Overridable from 'react-overridable';
 import {Button, Form, Select} from 'semantic-ui-react';
 import {SingleDatePicker, DateRangePicker} from 'indico/react/components';
 import {PluralTranslate, Translate} from 'indico/react/i18n';
-import {Overridable} from 'indico/react/util';
 import {
   serializeDate,
   serializeTime,

@@ -12,11 +12,12 @@ import React from 'react';
 import {AutoSizer, List, WindowScroller} from 'react-virtualized';
 import {Icon, Message, Popup, Placeholder} from 'semantic-ui-react';
 import LazyScroll from 'redux-lazy-scroll';
+import Overridable from 'react-overridable';
 
 import {Translate} from 'indico/react/i18n';
 import {toMoment} from 'indico/utils/date';
 import {TooltipIfTruncated} from 'indico/react/components';
-import {Overridable, Responsive} from 'indico/react/util';
+import {Responsive} from 'indico/react/util';
 
 import RowActionsDropdown from './RowActionsDropdown';
 import TimelineItem from './TimelineItem';

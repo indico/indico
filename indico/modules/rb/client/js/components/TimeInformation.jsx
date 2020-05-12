@@ -7,9 +7,9 @@
 
 import React from 'react';
 import PropTypes from 'prop-types';
+import Overridable from 'react-overridable';
 import {Button, Icon, Segment} from 'semantic-ui-react';
 import {Param, Translate} from 'indico/react/i18n';
-import {Overridable} from 'indico/react/util';
 import {toMoment} from 'indico/utils/date';
 import {renderRecurrence} from '../util';
 

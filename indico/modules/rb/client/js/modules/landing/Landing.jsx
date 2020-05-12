@@ -9,10 +9,11 @@ import moment from 'moment';
 import React from 'react';
 import {connect} from 'react-redux';
 import PropTypes from 'prop-types';
+import Overridable from 'react-overridable';
 import {Card, Checkbox, Form, Grid} from 'semantic-ui-react';
 import {Translate} from 'indico/react/i18n';
 import {Carousel} from 'indico/react/components';
-import {Overridable, Responsive} from 'indico/react/util';
+import {Responsive} from 'indico/react/util';
 import {toMoment} from 'indico/utils/date';
 
 import {actions as filtersActions} from '../../common/filters';

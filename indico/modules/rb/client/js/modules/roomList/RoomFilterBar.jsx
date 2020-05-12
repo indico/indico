@@ -10,9 +10,10 @@ import {Button, Icon, Label} from 'semantic-ui-react';
 import PropTypes from 'prop-types';
 import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
+import Overridable from 'react-overridable';
 
 import {Translate, Param} from 'indico/react/i18n';
-import {Overridable, Responsive} from 'indico/react/util';
+import {Responsive} from 'indico/react/util';
 
 import CapacityForm from './filters/CapacityForm';
 import EquipmentForm from './filters/EquipmentForm';

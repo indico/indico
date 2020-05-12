@@ -9,9 +9,9 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import {Button} from 'semantic-ui-react';
 import {connect} from 'react-redux';
+import Overridable from 'react-overridable';
 
 import {Translate} from 'indico/react/i18n';
-import {Overridable} from 'indico/react/util';
 import {isBookingStartDateValid, getMinimumBookingStartTime, createDT} from 'indico/utils/date';
 import {FilterBarController, FilterDropdownFactory} from '../../common/filters/FilterBar';
 

@@ -11,9 +11,10 @@ import React from 'react';
 import {bindActionCreators} from 'redux';
 import {Button, Container, Grid, Icon, Popup} from 'semantic-ui-react';
 import {connect} from 'react-redux';
+import Overridable from 'react-overridable';
 
 import {Translate} from 'indico/react/i18n';
-import {Overridable, Responsive} from 'indico/react/util';
+import {Responsive} from 'indico/react/util';
 import {StickyWithScrollBack, ResponsivePopup} from 'indico/react/components';
 import {serializeDate} from 'indico/utils/date';
 

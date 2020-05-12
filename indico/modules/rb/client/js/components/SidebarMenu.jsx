@@ -11,7 +11,7 @@ import PropTypes from 'prop-types';
 import {Icon, Sidebar, Menu} from 'semantic-ui-react';
 import {connect} from 'react-redux';
 import {push as pushRoute} from 'connected-react-router';
-import {Overridable} from 'indico/react/util';
+import Overridable from 'react-overridable';
 import {Translate} from 'indico/react/i18n';
 
 import {selectors as userSelectors, actions as userActions} from '../common/user';
