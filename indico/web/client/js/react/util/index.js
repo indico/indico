@@ -7,12 +7,7 @@
 
 export {default as Preloader} from './Preloader';
 export {default as Slot} from './Slot';
-export {
-  default as Overridable,
-  OverridableContext,
-  RouteAwareOverridable,
-  parametrize,
-} from './Overridable';
+export {default as Overridable, parametrize, OverridableContext} from 'react-overridable';
 export {toClasses} from './html';
 export {default as IndicoPropTypes} from './propTypes';
 export {default as Markdown} from './Markdown';
