@@ -8,7 +8,6 @@
 // Page state
 export const INIT = 'INIT';
 export const RESET_PAGE_STATE = 'RESET_PAGE_STATE';
-export const EXTEND_OVERRIDES = 'EXTEND_OVERRIDES';
 
 export function init() {
   return {type: INIT};
@@ -16,8 +15,4 @@ export function init() {
 
 export function resetPageState(namespace) {
   return {type: RESET_PAGE_STATE, namespace};
-}
-
-export function extendOverrides(overrides) {
-  return {type: EXTEND_OVERRIDES, overrides};
 }

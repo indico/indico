@@ -11,10 +11,11 @@ import React from 'react';
 import {Provider} from 'react-redux';
 
 import setupUserMenu from 'indico/react/containers/UserMenu';
-import App from './components/App';
+import {OverridableContext} from 'indico/react/util';
 
+import App from './components/App';
 import createRBStore, {history} from './store';
-import {init, extendOverrides} from './actions';
+import {init} from './actions';
 import {actions as configActions, selectors as configSelectors} from './common/config';
 import {selectors as userSelectors, actions as userActions} from './common/user';
 import {actions as roomsActions} from './common/rooms';
@@ -33,14 +34,7 @@ export default function setup(overrides = {}, postReducers = []) {
 
   document.addEventListener('DOMContentLoaded', () => {
     const appContainer = document.getElementById('rb-app-container');
-    const store = createRBStore(overrides, postReducers);
-
-    // Use this function whenever you would like to override
-    // a component e.g. from within a plugin without
-    // using the `setup` function
-    window.registerOverride = externalOverrides => {
-      store.dispatch(extendOverrides(externalOverrides));
-    };
+    const store = createRBStore(postReducers);
 
     let oldPath = history.location.pathname;
     history.listen(({pathname: newPath}) => {
@@ -65,9 +59,11 @@ export default function setup(overrides = {}, postReducers = []) {
     );
 
     ReactDOM.render(
-      <Provider store={store}>
-        <App history={history} />
-      </Provider>,
+      <OverridableContext.Provider value={overrides}>
+        <Provider store={store}>
+          <App history={history} />
+        </Provider>
+      </OverridableContext.Provider>,
       appContainer
     );
   });
