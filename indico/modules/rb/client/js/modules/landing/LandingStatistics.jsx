@@ -9,9 +9,9 @@ import React from 'react';
 import {bindActionCreators} from 'redux';
 import {connect} from 'react-redux';
 import PropTypes from 'prop-types';
+import Overridable from 'react-overridable';
 import {Loader, Statistic} from 'semantic-ui-react';
 import {Translate} from 'indico/react/i18n';
-import {Overridable} from 'indico/react/util';
 
 import * as landingActions from './actions';
 import * as landingSelectors from './selectors';

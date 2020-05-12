@@ -14,9 +14,10 @@ import {bindActionCreators} from 'redux';
 import _ from 'lodash';
 import {Button, Card, Grid, Header, Icon, Popup, Divider} from 'semantic-ui-react';
 import LazyScroll from 'redux-lazy-scroll';
+import Overridable from 'react-overridable';
 
 import {Translate} from 'indico/react/i18n';
-import {Overridable, Slot, toClasses, IndicoPropTypes, Responsive} from 'indico/react/util';
+import {Slot, toClasses, IndicoPropTypes, Responsive} from 'indico/react/util';
 import {serializeTime, serializeDate} from 'indico/utils/date';
 import {StickyWithScrollBack, ResponsivePopup} from 'indico/react/components';
 

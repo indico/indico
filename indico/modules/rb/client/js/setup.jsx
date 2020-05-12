@@ -9,9 +9,9 @@ import _ from 'lodash';
 import ReactDOM from 'react-dom';
 import React from 'react';
 import {Provider} from 'react-redux';
+import {OverridableContext} from 'react-overridable';
 
 import setupUserMenu from 'indico/react/containers/UserMenu';
-import {OverridableContext} from 'indico/react/util';
 
 import App from './components/App';
 import createRBStore, {history} from './store';

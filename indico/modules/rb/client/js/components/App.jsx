@@ -11,9 +11,10 @@ import PropTypes from 'prop-types';
 import {Link, Redirect, Route, Switch} from 'react-router-dom';
 import {ConnectedRouter} from 'connected-react-router';
 import {Dimmer, Header, Icon, Loader, Responsive, Segment, Sidebar} from 'semantic-ui-react';
+import Overridable from 'react-overridable';
 
 import {Translate} from 'indico/react/i18n';
-import {Overridable, ConditionalRoute} from 'indico/react/util';
+import {ConditionalRoute} from 'indico/react/util';
 import SidebarMenu, {SidebarTrigger} from './SidebarMenu';
 import AdminArea from '../modules/admin';
 import Landing from '../modules/landing';

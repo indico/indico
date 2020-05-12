@@ -26,10 +26,10 @@ import {
 } from 'semantic-ui-react';
 import {FORM_ERROR} from 'final-form';
 import {Form as FinalForm} from 'react-final-form';
+import Overridable from 'react-overridable';
 import {FinalCheckbox, FinalInput, handleSubmitError} from 'indico/react/forms';
 import {Translate, PluralTranslate, Singular, Plural, Param} from 'indico/react/i18n';
 import {useIndicoAxios} from 'indico/react/hooks';
-import {Overridable} from 'indico/react/util';
 import {indicoAxios} from 'indico/utils/axios';
 import {camelizeKeys} from 'indico/utils/case';
 import {PrincipalType} from './util';

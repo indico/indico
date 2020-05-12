@@ -11,6 +11,7 @@ import React from 'react';
 import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
 import PropTypes from 'prop-types';
+import Overridable from 'react-overridable';
 import {Button, Checkbox, Form, Grid, Icon, List, Message, Modal, Segment} from 'semantic-ui-react';
 import {Form as FinalForm} from 'react-final-form';
 import createDecorator from 'final-form-calculate';
@@ -24,7 +25,7 @@ import {
 import {Param, Plural, PluralTranslate, Singular, Translate} from 'indico/react/i18n';
 import {FinalPrincipal} from 'indico/react/components';
 import {FavoritesProvider} from 'indico/react/hooks';
-import {Overridable, IndicoPropTypes} from 'indico/react/util';
+import {IndicoPropTypes} from 'indico/react/util';
 import {createDT, isBookingStartDTValid, serializeTime} from 'indico/utils/date';
 import TimeInformation from '../../components/TimeInformation';
 import {selectors as roomsSelectors} from '../../common/rooms';

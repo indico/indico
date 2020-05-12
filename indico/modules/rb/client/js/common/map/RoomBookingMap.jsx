@@ -10,7 +10,7 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import {connect} from 'react-redux';
 import {Map, TileLayer} from 'react-leaflet';
-import {Overridable} from 'indico/react/util';
+import Overridable from 'react-overridable';
 import {selectors as configSelectors} from '../config';
 import MapMarkers from './MapMarkers';
 
