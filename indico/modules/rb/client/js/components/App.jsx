@@ -13,7 +13,7 @@ import {ConnectedRouter} from 'connected-react-router';
 import {Dimmer, Header, Icon, Loader, Responsive, Segment, Sidebar} from 'semantic-ui-react';
 
 import {Translate} from 'indico/react/i18n';
-import {RouteAwareOverridable, Overridable, ConditionalRoute} from 'indico/react/util';
+import {Overridable, ConditionalRoute} from 'indico/react/util';
 import SidebarMenu, {SidebarTrigger} from './SidebarMenu';
 import AdminArea from '../modules/admin';
 import Landing from '../modules/landing';
@@ -141,9 +141,9 @@ class App extends React.Component {
               </h1>
             </div>
             <div styleName="rb-menu-bar-menu">
-              <RouteAwareOverridable id="Menu">
+              <Overridable id="Menu">
                 <Menu />
-              </RouteAwareOverridable>
+              </Overridable>
             </div>
             <div styleName="rb-menu-bar-side-right">
               <SidebarTrigger
