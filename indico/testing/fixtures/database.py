@@ -103,12 +103,14 @@ def db(database, monkeypatch):
     # Prevent database/session modifications
     monkeypatch.setattr(database.session, 'commit', database.session.flush)
     monkeypatch.setattr(database.session, 'remove', lambda: None)
+
     @contextmanager
     def _tmp_session():
         _old_commit = database.session.commit
         database.session.commit = lambda: None
         yield database.session
         database.session.commit = _old_commit
+
     monkeypatch.setattr(database, 'tmp_session', _tmp_session, lambda: None)
     yield database
     database.session.rollback()

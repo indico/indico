@@ -55,5 +55,5 @@ class Serializer(object):
         return self._data
 
 
-from indico.web.http_api.metadata.json import JSONSerializer  # noqa: F401
-from indico.web.http_api.metadata.xml import XMLSerializer  # noqa: F401
+from indico.web.http_api.metadata.json import JSONSerializer  # noqa: F401,E402
+from indico.web.http_api.metadata.xml import XMLSerializer  # noqa: F401,E402

@@ -347,7 +347,7 @@ class LinkMixin(object):
     def link_repr(self):
         """A kwargs-style string suitable for the object's repr"""
         info = [('link_type', self.link_type.name if self.link_type is not None else 'None')]
-        info.extend((key, getattr(self, key)) for key in _all_columns if getattr(self, key)is not None)
+        info.extend((key, getattr(self, key)) for key in _all_columns if getattr(self, key) is not None)
         return ', '.join('{}={}'.format(key, value) for key, value in info)
 
     @property
