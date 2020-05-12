@@ -107,11 +107,10 @@ class RHSubmitNewRevision(RHPaperBase):
     ALLOW_LOCKED = True
 
     def _check_paper_protection(self):
-        if not self.event.cfp.is_manager(session.user):
-            if not RHPaperBase._check_paper_protection(self):
-                return False
-            if not self.contribution.can_submit_proceedings(session.user):
-                return False
+        if not RHPaperBase._check_paper_protection(self):
+            return False
+        if not self.contribution.can_submit_proceedings(session.user):
+            return False
         return self.contribution.paper.state == PaperRevisionState.to_be_corrected
 
     @use_kwargs({

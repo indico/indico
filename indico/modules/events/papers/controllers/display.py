@@ -28,11 +28,10 @@ class RHSubmitPaper(RHPaperBase):
     ALLOW_LOCKED = True
 
     def _check_paper_protection(self):
-        if not self.event.cfp.is_manager(session.user):
-            if not RHPaperBase._check_paper_protection(self):
-                return False
-            if not self.contribution.can_submit_proceedings(session.user):
-                return False
+        if not RHPaperBase._check_paper_protection(self):
+            return False
+        if not self.contribution.can_submit_proceedings(session.user):
+            return False
         # this RH is only used for initial submission
         return self.paper is None
 
