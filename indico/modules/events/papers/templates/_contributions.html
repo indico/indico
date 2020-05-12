@@ -2,7 +2,7 @@
 
 {% macro render_paper_section(contribution) %}
     {% set paper = contribution.paper %}
-    {% set can_submit = contribution.is_user_associated(session.user, check_abstract=true) %}
+    {% set can_submit = contribution.can_submit_proceedings(session.user) %}
     {% set show_paper = paper and paper.accepted_revision %}
     {% set show_paper_status = paper and can_submit %}
     {% set show_paper_submission = contribution.event.cfp.is_open and can_submit %}
@@ -38,7 +38,7 @@
 
 {% macro render_editables_section(contribution) %}
     {% set can_create_editable = contribution.allowed_types_for_editable|length > 0 %}
-    {% set can_submit = contribution.can_submit_editables(session.user) %}
+    {% set can_submit = contribution.can_submit_proceedings(session.user) %}
     {% set enabled_editables = contribution.enabled_editables %}
     {% set has_enabled_types = enabled_editables|length > 0 %}
 

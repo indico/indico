@@ -117,6 +117,7 @@ class Editable(db.Model):
         # Users associated with the editable's contribution can do so as well.
         return (
             self._has_general_editor_permissions(user) or
+            self.contribution.can_submit_proceedings(user) or
             self.contribution.is_user_associated(user, check_abstract=True)
         )
 
@@ -130,11 +131,9 @@ class Editable(db.Model):
         # If the user can't even see the timeline, we never allow any modifications
         if not self.can_see_timeline(user):
             return False
-        # Anyone associated with the contribution can perform submitter actions.
-        # XXX: Do we want this? Should it be restricted to the person who submitted
-        #      the initial revision, or to people with submission rights on the
-        #      contribution?
-        return self.contribution.is_user_associated(user, check_abstract=True)
+        # Anyone who can submit new proceedings can also perform submitter actions,
+        # i.e. the abstract submitter and anyone with submission access to the contribution.
+        return self.contribution.can_submit_proceedings(user)
 
     def can_perform_editor_actions(self, user):
         """Whether the user can perform any Editing actions.
@@ -161,6 +160,9 @@ class Editable(db.Model):
         return self._has_general_editor_permissions(user)
 
     def can_comment(self, user):
+        """Whether the user can comment on the editable."""
+        # We allow any user associated with the contribution to comment, even if they are
+        # not authorized to actually perform submitter actions.
         return (self.event.can_manage(user, permission=self.type.editor_permission)
                 or self.event.can_manage(user, permission='editing_manager')
                 or self.contribution.is_user_associated(user, check_abstract=True))

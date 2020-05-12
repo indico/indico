@@ -515,9 +515,6 @@ class Contribution(DescriptionMixin, ProtectionManagersMixin, LocationMixin, Att
         order = list(EditableType)
         return sorted(enabled_editables, key=lambda editable: order.index(editable.type))
 
-    def can_submit_editables(self, user):
-        return self.is_user_associated(user, check_abstract=True)
-
     @property
     def has_published_editables(self):
         return any(e.published_revision_id is not None for e in self.enabled_editables)
@@ -550,6 +547,16 @@ class Contribution(DescriptionMixin, ProtectionManagersMixin, LocationMixin, Att
         if check_abstract and self.abstract and self.abstract.submitter == user:
             return True
         return any(pl.person.user == user for pl in self.person_links if pl.person.user)
+
+    def can_submit_proceedings(self, user):
+        """Whether the user can submit editables/papers."""
+        if user is None:
+            return False
+        # The submitter of the original abstract is always authorized
+        if self.abstract and self.abstract.submitter == user:
+            return True
+        # Otherwise only users with submission rights are authorized
+        return self.can_manage(user, 'submit', allow_admin=False, check_parent=False)
 
 
 Contribution.register_protection_events()

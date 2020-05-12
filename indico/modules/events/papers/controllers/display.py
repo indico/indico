@@ -31,7 +31,7 @@ class RHSubmitPaper(RHPaperBase):
         if not self.event.cfp.is_manager(session.user):
             if not RHPaperBase._check_paper_protection(self):
                 return False
-            if not self.contribution.is_user_associated(session.user, check_abstract=True):
+            if not self.contribution.can_submit_proceedings(session.user):
                 return False
         # this RH is only used for initial submission
         return self.paper is None
@@ -48,6 +48,7 @@ class RHSubmitPaper(RHPaperBase):
 class RHPaperTimeline(RHPaperBase):
     def _check_paper_protection(self):
         return (self.contribution.is_user_associated(session.user, check_abstract=True) or
+                self.contribution.can_submit_proceedings(session.user) or
                 self.event.cfp.is_manager(session.user) or
                 self.paper.can_review(session.user) or
                 self.paper.can_judge(session.user))
