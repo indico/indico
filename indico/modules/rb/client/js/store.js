@@ -53,11 +53,11 @@ export const history = createBrowserHistory({
  * @param {Array} additionalReducers - additional reducers provided by
  * e.g. a plugin
  */
-export default function createRBStore(overrides = {}, additionalReducers = []) {
+export default function createRBStore(additionalReducers = []) {
   return createReduxStore(
     'rb-new',
     getReducers(history),
-    {_overrides: overrides},
+    {},
     [routerMiddleware(history), queryStringMiddleware(history, getRouteConfig(), {usePush: false})],
     [
       qsRoomSearchReducer,
