@@ -4,8 +4,12 @@ python:
 git:
   submodules: false
   depth: 500
+branches:
+  only:
+    - 2.1-maintenance
+    - 2.2-maintenance
 addons:
-  postgresql: 9.6
+  postgresql: '9.6'
 env:
   - NODE_VERSION="12.16.1"
 before_install:
