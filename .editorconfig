@@ -11,6 +11,9 @@ insert_final_newline=true
 [{*.js,*.jsx}]
 indent_size=2
 
+[{*.css,*.scss}]
+indent_size=2
+
 [{*.yml,*.yaml}]
 indent_size=2
 

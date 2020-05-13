@@ -1,0 +1,65 @@
+extends:
+  - stylelint-prettier/recommended
+  - stylelint-config-recommended
+  - stylelint-config-recommended-scss
+
+ignoreFiles:
+  - indico/web/static/dist/**/*.css
+
+rules:
+  # this rule is quite noisy in our existing code, but still somewhat useful
+  no-descending-specificity:
+    - true
+    - severity: warning
+
+  # complains about css rules after `@include` without an empty line
+  declaration-empty-line-before: null
+
+  # `:global()` has special meaning in css modules
+  selector-pseudo-class-no-unknown:
+    - true
+    - ignorePseudoClasses: [global]
+
+  font-family-no-missing-generic-family-keyword:
+    - true
+    - ignoreFontFamilies: [icomoon-ultimate]
+
+  at-rule-empty-line-before:
+    - always
+    - except:
+        - first-nested
+      ignore:
+        - blockless-after-same-name-blockless
+        - after-comment
+        - inside-block
+
+  color-hex-length: short
+  length-zero-no-unit: true
+
+  rule-empty-line-before:
+    - always
+    - except: [first-nested]
+      ignore: [after-comment]
+
+  value-keyword-case: lower
+
+  scss/at-import-no-partial-leading-underscore: true
+  scss/at-import-partial-extension: never
+  scss/at-function-pattern: ^([a-z][a-z0-9]*)(-[a-z0-9]+)*$
+  scss/at-mixin-argumentless-call-parentheses: always
+  scss/at-mixin-pattern: ^_?([a-z][a-z0-9]*)(-[a-z0-9]+)*$
+  scss/at-rule-conditional-no-parentheses: true
+  scss/dollar-variable-pattern: ^([a-z][a-z0-9]*)(-[a-z0-9]+)*$
+  scss/percent-placeholder-pattern: ^([a-z][a-z0-9]*)(-[a-z0-9]+)*$
+  scss/double-slash-comment-whitespace-inside: always
+  scss/declaration-nested-properties: never
+  scss/dimension-no-non-numeric-values: true
+  scss/media-feature-value-dollar-variable:
+    - always
+    - ignore: [keywords]
+      severity: warning
+  scss/no-duplicate-dollar-variables:
+    - true
+    - ignoreInside: [at-rule, nested-at-rule]
+      ignoreInsideAtRules: [if, else, function, each]
+  scss/no-duplicate-mixins: true
