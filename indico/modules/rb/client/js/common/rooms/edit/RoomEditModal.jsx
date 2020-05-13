@@ -19,18 +19,7 @@ import React, {useEffect, useState, useCallback, useMemo} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
 import PropTypes from 'prop-types';
 import {Form as FinalForm, FormSpy} from 'react-final-form';
-import {
-  Button,
-  Dimmer,
-  Form,
-  Grid,
-  Loader,
-  Menu,
-  Message,
-  Modal,
-  Tab,
-  Icon,
-} from 'semantic-ui-react';
+import {Button, Dimmer, Form, Grid, Loader, Menu, Message, Modal, Tab} from 'semantic-ui-react';
 import arrayMutators from 'final-form-arrays';
 
 import {snakifyKeys} from 'indico/utils/case';
@@ -49,6 +38,7 @@ import RoomEditNotifications from './RoomEditNotifications';
 import RoomEditLocation from './RoomEditLocation';
 import RoomEditPermissions from './RoomEditPermissions';
 import RoomEditOptions from './RoomEditOptions';
+import TabPaneError from './TabPaneError';
 
 import './RoomEditModal.module.scss';
 
@@ -65,7 +55,6 @@ function RoomEditModal({roomId, locationId, onClose, afterCreation}) {
   const [newRoomId, setNewRoomId] = useState(null);
   const [wasEverUpdated, setWasEverUpdated] = useState(null);
   const [activeTab, setActiveTab] = useState('basic-details');
-  const [tabsWithError, setTabsWithError] = useState([]);
   const [loading, setLoading] = useState(false);
 
   const [roomDetails, setRoomDetails] = useState({
@@ -190,17 +179,7 @@ function RoomEditModal({roomId, locationId, onClose, afterCreation}) {
         ...pane,
         menuItem: (
           <Menu.Item key={pane.key}>
-            {pane.menuItem}{' '}
-            {pane.key !== activeTab && tabsWithError.includes(pane.key) ? (
-              <Icon
-                circular
-                inverted
-                name="warning"
-                size="small"
-                color="red"
-                style={{margin: '0 0 0 10px'}}
-              />
-            ) : null}
+            {pane.menuItem} {pane.key !== activeTab && <TabPaneError fields={pane.fields} />}
           </Menu.Item>
         ),
       })),
@@ -210,7 +189,6 @@ function RoomEditModal({roomId, locationId, onClose, afterCreation}) {
       globalAttributes,
       permissionInfo,
       permissionManager,
-      tabsWithError,
       activeTab,
     ]
   );
@@ -360,17 +338,6 @@ function RoomEditModal({roomId, locationId, onClose, afterCreation}) {
               </Form>
             </Grid.Column>
           </Grid>
-          <FormSpy
-            subscription={{errors: true, submitErrors: true}}
-            onChange={({errors, submitErrors}) => {
-              setTabsWithError(
-                Object.keys({...errors, ...submitErrors}).map(err => {
-                  const pane = tabPanes.find(t => t.fields && t.fields.includes(err));
-                  return pane && pane.key;
-                })
-              );
-            }}
-          />
         </Modal.Content>
         <Modal.Actions>
           <FormSpy subscription={{submitSucceeded: true}}>
