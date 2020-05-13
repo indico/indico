@@ -95,7 +95,6 @@ $i-label-color: $light-black;
   margin: 0 5px;
 
   &.striped {
-    background-color: lighten($pastel-gray, $light-color-variation);
     background: repeating-linear-gradient(
       -40deg,
       lighten($pastel-gray, 0.5 * $color-variation),
@@ -128,7 +127,6 @@ $i-label-color: $light-black;
 
     &.striped {
       color: white;
-      background-color: lighten($blue, $light-color-variation);
       background: repeating-linear-gradient(
         -40deg,
         $blue,
@@ -149,7 +147,6 @@ $i-label-color: $light-black;
     color: $light-black;
 
     &.striped {
-      background-color: lighten($pastel-gray, $light-color-variation);
       background: repeating-linear-gradient(
         -40deg,
         $pastel-gray,

@@ -56,9 +56,7 @@
   > input[type='week'] {
     @extend %text-input;
   }
-}
 
-:not(.ui) {
   // the react timepicker has an input with no type
   > input:not([type]),
   > select {
@@ -383,7 +381,6 @@ $dropdown-transition: $dropdown-transition-step ease-out;
 
 %tilted-strips-bg {
   @include placeholder-color($color: $light-black);
-  background-color: lighten($gray, $light-color-variation);
   background: repeating-linear-gradient(
     -40deg,
     lighten($gray, 0.7 * $color-variation),
@@ -482,7 +479,6 @@ dd > .i-has-action {
 }
 
 .PluginOptionPeopleListDiv.disabled {
-  background-color: lighten($pastel-gray, $light-color-variation);
   background: repeating-linear-gradient(
     -40deg,
     lighten($pastel-gray, 0.5 * $color-variation),

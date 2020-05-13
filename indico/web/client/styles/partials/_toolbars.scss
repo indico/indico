@@ -72,7 +72,7 @@ $i-button-spacing: 0.3rem;
     }
   }
 
-  :not(ui) > input[type='text'] {
+  :not(.ui) > input[type='text'] {
     color: $black;
     display: inline-block;
     float: left;

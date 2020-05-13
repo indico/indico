@@ -20,7 +20,6 @@
 [data-icon]::before {
   font-family: 'icomoon-ultimate';
   content: attr(data-icon);
-  speak: none;
   font-weight: normal;
   font-variant: normal;
   text-transform: none;
@@ -38,7 +37,6 @@ you can use the generic selector below, but it's slower:
 [class^='icon-']::before,
 [class*=' icon-']::before {
   font-family: 'icomoon-ultimate';
-  speak: none;
   font-style: normal;
   font-weight: normal;
   font-variant: normal;

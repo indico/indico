@@ -24,7 +24,6 @@
       margin-right: 1.6em;
 
       &.i-badge-disabled {
-        background-color: lighten($dark-blue, $light-color-variation);
         background: repeating-linear-gradient(
           -40deg,
           $dark-blue,

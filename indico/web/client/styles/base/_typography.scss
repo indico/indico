@@ -38,7 +38,7 @@
 }
 
 %font-family-sans {
-  font-family: 'Roboto', 'Helvetica', sans;
+  font-family: 'Roboto', 'Helvetica', sans-serif;
 }
 
 %font-family-form {
@@ -46,7 +46,7 @@
 }
 
 %font-family-logo {
-  font-family: 'Maven Pro';
+  font-family: 'Maven Pro', sans-serif;
 }
 
 %font-size-body {
@@ -183,7 +183,7 @@ td.groupSubTitle {
 }
 
 .reviewingsubtitle {
-  font-family: 'Times New Roman', Verdana, Arial;
+  font-family: 'Times New Roman', Verdana, Arial, sans-serif;
   font-size: 15pt;
   color: #4e4c46;
   letter-spacing: 1px;

@@ -25,7 +25,7 @@
   &::before {
     color: $color;
   }
-  &:hover:not(.disabled):not(disabled)::before {
+  &:hover:not(.disabled):not(:disabled)::before {
     color: lighten($color, $light-color-variation) !important;
   }
 }
@@ -329,7 +329,7 @@
   }
   .folder .i-button.attachment,
   .folder .attachments {
-    font-family: Roboto;
+    font-family: Roboto, sans-serif;
     font-weight: normal;
 
     white-space: nowrap;

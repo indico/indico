@@ -127,7 +127,8 @@
 .week-timetable .row .time {
   position: absolute;
   background: rgba(0, 0, 0, 0.3);
-  color: #000;
+  color: white;
+  font-weight: bold;
   width: 35px;
   height: 100%;
   display: inline-block;
@@ -159,11 +160,6 @@
 
 .week-timetable .row.has-session.has-multi .main {
   padding-right: 29px;
-}
-
-.week-timetable .row .time {
-  color: white;
-  font-weight: bold;
 }
 
 .week-timetable .row .more-contribs {

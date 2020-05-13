@@ -196,6 +196,7 @@ form {
   vertical-align: middle;
 }
 
+// stylelint-disable-next-line no-duplicate-selectors
 .i-form .form-group .form-field {
   @extend %form-field-block;
 
