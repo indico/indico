@@ -6,54 +6,54 @@
 // LICENSE file for more details.
 
 .footer {
-    color: $light-black;
-    padding: 10px 5px 10px 10px;
+  color: $light-black;
+  padding: 10px 5px 10px 10px;
 
-    &.dark {
-        color: $gray;
+  &.dark {
+    color: $gray;
+  }
+
+  img {
+    vertical-align: middle;
+  }
+
+  .footer-logo {
+    height: 40px;
+  }
+
+  * {
+    line-height: 40px;
+  }
+
+  .footer-links {
+    list-style-type: none;
+    padding: 0;
+    color: $gray;
+
+    li {
+      display: inline-block;
     }
 
-    img {
-        vertical-align: middle;
+    li:not(:first-child)::before {
+      content: '|';
     }
+  }
 
-    .footer-logo {
-        height: 40px;
-    }
-
-    * {
-        line-height: 40px;
-    }
-
-    .footer-links {
-        list-style-type: none;
-        padding: 0;
-        color: $gray;
-
-        li {
-            display: inline-block;
-        }
-
-        li:not(:first-child)::before {
-            content: '|';
-        }
-    }
-
-    .footer-extra {
-        text-align: right;
-    }
+  .footer-extra {
+    text-align: right;
+  }
 }
 
 .social-share {
-    display: none;
+  display: none;
 }
 
 .social-button-container {
-    display: none;
-    border-radius: 10px;
-    opacity: 0.5;
+  display: none;
+  border-radius: 10px;
+  opacity: 0.5;
 
-    .social-button:hover {
-        cursor: pointer;
-    }
+  .social-button:hover {
+    cursor: pointer;
+  }
 }

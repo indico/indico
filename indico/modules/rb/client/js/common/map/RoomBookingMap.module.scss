@@ -9,63 +9,63 @@
 @import 'rb:styles/util';
 
 .map-container {
-    :global(.leaflet-container) {
-        @include remaining-screen-height(40px);
-        font-size: 14px;
+  :global(.leaflet-container) {
+    @include remaining-screen-height(40px);
+    font-size: 14px;
+  }
+
+  // Overrides leaflet control styles to match Semantic-UI ones.
+  :global(.leaflet-control) {
+    font-family: $sui-font-family;
+    border: none;
+    box-shadow: 0.1em 0.1em 0.25em $dark-gray;
+    height: 100%;
+  }
+
+  :global(.leaflet-top.leaflet-left) {
+    display: flex;
+  }
+
+  :global(.marker-cluster),
+  :global(.rb-map-marker) {
+    border-radius: 50%;
+  }
+
+  :global(.rb-map-cluster) {
+    background-color: rgba($highlight-color, 0.8);
+    border: 2px solid darken($highlight-color, 10%);
+    color: $light-gray;
+    height: 50px;
+    width: 50px;
+    line-height: 37px;
+    text-align: center;
+    font-weight: bold;
+    font-size: 1.1em;
+    font-family: $sui-font-family;
+    text-shadow: 1px 1px $light-black;
+
+    &:global(.highlight) {
+      background-color: rgba($orange, 0.9);
+      border: 2px solid darken($orange, 10%);
     }
+  }
 
-    // Overrides leaflet control styles to match Semantic-UI ones.
-    :global(.leaflet-control) {
-        font-family: $sui-font-family;
-        border: none;
-        box-shadow: 0.1em 0.1em 0.25em $dark-gray;
-        height: 100%;
+  :global(.rb-map-marker) {
+    background-color: saturate(rgba($highlight-color, 0.9), 30%);
+    border: 2px solid darken($highlight-color, 20%);
+
+    &:global(.highlight) {
+      background-color: saturate(rgba($orange, 0.9), 30%);
+      border: 2px solid darken($orange, 10%);
     }
+  }
 
-    :global(.leaflet-top.leaflet-left) {
-        display: flex;
+  :global(.search-control) {
+    opacity: 0;
+    transition: opacity 0.5s ease-in;
+
+    &:global(.visible) {
+      opacity: 1;
     }
-
-    :global(.marker-cluster), :global(.rb-map-marker) {
-        border-radius: 50%;
-    }
-
-    :global(.rb-map-cluster) {
-        background-color: rgba($highlight-color, 0.8);
-        border: 2px solid darken($highlight-color, 10%);
-        color: $light-gray;
-        height: 50px;
-        width: 50px;
-        line-height: 37px;
-        text-align: center;
-        font-weight: bold;
-        font-size: 1.1em;
-        font-family: $sui-font-family;
-        text-shadow: 1px 1px $light-black;
-
-        &:global(.highlight) {
-            background-color: rgba($orange, 0.9);
-            border: 2px solid darken($orange, 10%);
-        }
-
-    }
-
-    :global(.rb-map-marker) {
-        background-color: saturate(rgba($highlight-color, 0.9), 30%);
-        border: 2px solid darken($highlight-color, 20%);
-
-        &:global(.highlight) {
-            background-color: saturate(rgba($orange, 0.9), 30%);
-            border: 2px solid darken($orange, 10%);
-        }
-    }
-
-    :global(.search-control) {
-        opacity: 0;
-        transition: opacity 0.5s ease-in;
-
-        &:global(.visible) {
-            opacity: 1;
-        }
-    }
+  }
 }

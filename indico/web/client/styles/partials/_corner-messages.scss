@@ -6,103 +6,103 @@
 // LICENSE file for more details.
 
 @keyframes _fadein {
-    from {
-        opacity: 0;
-    }
-    to {
-        opacity: 1;
-    }
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
 @keyframes _barberpole {
   from {
-      background-position: 0 0;
+    background-position: 0 0;
   }
   to {
-      background-position: 50px 50px;
+    background-position: 50px 50px;
   }
 }
 
 @mixin _progress($dark, $light) {
-    &.progress {
-        @include indico-animation(_barberpole, 3s, linear, infinite);
-        background-color: $dark;
-        background-image: linear-gradient(
-        -45deg,
-        $dark 25%,
-        $light 25%,
-        $light 50%,
-        $dark 50%,
-        $dark 75%,
-        $light 75%,
-        $light
-        );
-        background-size: 50px 50px;
-    }
+  &.progress {
+    @include indico-animation(_barberpole, 3s, linear, infinite);
+    background-color: $dark;
+    background-image: linear-gradient(
+      -45deg,
+      $dark 25%,
+      $light 25%,
+      $light 50%,
+      $dark 50%,
+      $dark 75%,
+      $light 75%,
+      $light
+    );
+    background-size: 50px 50px;
+  }
 }
 
 #corner-message-container {
-    position: fixed;
-    bottom: 60px;
-    right: 20px;
-    max-width: 500px;
+  position: fixed;
+  bottom: 60px;
+  right: 20px;
+  max-width: 500px;
 }
 
 .corner-message {
-    @extend %font-family-title;
-    @include border-all($light-black);
-    box-shadow: 0 3px 2px rgba(150, 150, 150, 0.2);
-    @include transition(background-color 0.5s, color 0.5s, border-color 0.5s, width 0.5s);
-    @include indico-animation(_fadein, 0.5s, normal forwards ease-in-out, 1);
-    @include _progress(darken($light-gray, 0.3*$color-variation), $light-gray);
+  @extend %font-family-title;
+  @include border-all($light-black);
+  box-shadow: 0 3px 2px rgba(150, 150, 150, 0.2);
+  @include transition(background-color 0.5s, color 0.5s, border-color 0.5s, width 0.5s);
+  @include indico-animation(_fadein, 0.5s, normal forwards ease-in-out, 1);
+  @include _progress(darken($light-gray, 0.3 * $color-variation), $light-gray);
 
-    display: flex;
-    flex: 1;
-    margin-bottom: 1em;
+  display: flex;
+  flex: 1;
+  margin-bottom: 1em;
+  color: $light-black;
+  background-color: $light-gray;
+  border-radius: 2px;
+
+  &.success {
+    @include _progress($light-green, lighten($light-green, 0.5 * $color-variation));
+    color: $pastel-green;
+    border-color: $dark-green;
+    background-color: $light-green;
+  }
+
+  &.warning {
+    @include _progress($light-yellow, lighten($light-yellow, 0.5 * $color-variation));
+    color: $dark-yellow;
+    background-color: $light-yellow;
+    border-color: $dark-yellow;
+  }
+
+  &.error {
+    @include _progress($light-red, lighten($light-red, 0.2 * $color-variation));
+    color: $dark-red;
+    background-color: $light-red;
+    border-color: $dark-red;
+  }
+
+  &.highlight {
+    @include _progress($pastel-blue, $light-blue);
     color: $light-black;
-    background-color: $light-gray;
-    border-radius: 2px;
+    background-color: $light-blue;
+    border-color: $dark-blue;
+  }
 
-    &.success {
-        @include _progress($light-green, lighten($light-green, 0.5*$color-variation));
-        color: $pastel-green;
-        border-color: $dark-green;
-        background-color: $light-green;
-    }
+  .corner-message-text,
+  .corner-message-action {
+    padding: 0 1.2em;
+    margin: 1.2em 0;
+  }
 
-    &.warning {
-        @include _progress($light-yellow, lighten($light-yellow, 0.5*$color-variation));
-        color: $dark-yellow;
-        background-color: $light-yellow;
-        border-color: $dark-yellow;
-    }
-
-    &.error {
-        @include _progress($light-red, lighten($light-red, 0.2*$color-variation));
-        color: $dark-red;
-        background-color: $light-red;
-        border-color: $dark-red;
-    }
-
-    &.highlight {
-        @include _progress($pastel-blue, $light-blue);
-        color: $light-black;
-        background-color: $light-blue;
-        border-color: $dark-blue;
-    }
-
-    .corner-message-text,
-    .corner-message-action {
-        padding: 0 1.2em;
-        margin: 1.2em 0;
-    }
-
-    .corner-message-action {
-        @include border-left($pastel-gray, solid);
-        display: flex;
-        align-items: center;
-        font-weight: bold;
-        text-transform: uppercase;
-        flex: none;
-    }
+  .corner-message-action {
+    @include border-left($pastel-gray, solid);
+    display: flex;
+    align-items: center;
+    font-weight: bold;
+    text-transform: uppercase;
+    flex: none;
+  }
 }

@@ -10,125 +10,126 @@
 @import 'rb:styles/responsive';
 
 @keyframes fade-slide-down {
-    0% {
-        opacity: 0;
-        transform: translate(-2rem, -2rem);
-    }
+  0% {
+    opacity: 0;
+    transform: translate(-2rem, -2rem);
+  }
 
-    100% {
-        opacity: 1;
-        transform: none;
-    }
+  100% {
+    opacity: 1;
+    transform: none;
+  }
 }
 
 .landing-page:global(.ui.grid) {
+  @include remaining-screen-height();
+  align-content: space-between;
+  flex-direction: column;
+
+  &::before {
+    @extend %rb-splash-background;
     @include remaining-screen-height();
-    align-content: space-between;
-    flex-direction: column;
+    content: ' ';
+    position: absolute;
+    left: 0;
+    box-sizing: border-box;
+    width: 120%;
+    animation: fade-slide-down 2s ease-out forwards;
+  }
+
+  .landing-page-form {
+    flex-grow: 1;
+
+    :global(.ui.form) {
+      display: flex;
+      align-items: center;
+      flex-direction: column;
+    }
 
     &::before {
-        @extend %rb-splash-background;
-        @include remaining-screen-height();
-        content: ' ';
-        position: absolute;
-        left: 0;
-        box-sizing: border-box;
-        width: 120%;
-        animation: fade-slide-down 2s ease-out forwards;
+      content: ' ';
+      width: 100%;
+      height: 100%;
+      position: absolute;
+      background-color: rgba(255, 255, 255, 0.4);
     }
 
-    .landing-page-form {
-        flex-grow: 1;
+    :global(.ui.checkbox.radio) {
+      padding: 0.5em;
+      border-radius: 0.4em;
 
-        :global(.ui.form) {
-            display: flex;
-            align-items: center;
-            flex-direction: column;
+      :global(label) {
+        color: $dark-black;
+        font-weight: bold;
+      }
+
+      &:global(.checked) {
+        background-color: $dark-highlight-color;
+
+        :global(label) {
+          color: #fff;
         }
-
-        &::before {
-            content: ' ';
-            width: 100%;
-            height: 100%;
-            position: absolute;
-            background-color: rgba(255, 255, 255, 0.4);
-        }
-
-        :global(.ui.checkbox.radio) {
-            padding: 0.5em;
-            border-radius: 0.4em;
-
-            :global(label) {
-                color: $dark-black;
-                font-weight: bold;
-            }
-
-            &:global(.checked) {
-                background-color: $dark-highlight-color;
-
-                :global(label) {
-                    color: #fff;
-                }
-            }
-        }
-
-        .search-input {
-            padding: 0;
-        }
+      }
     }
 
-    .landing-page-card:global(.ui.card) {
-        transition: max-height 0.25s ease-out;
-        margin: 10vh auto auto auto;
+    .search-input {
+      padding: 0;
+    }
+  }
 
-        @media (max-width: $tablet-width) {
-            width: 100%;
-            max-height: 100%;
-            margin-top: 1rem;
-        }
+  .landing-page-card:global(.ui.card) {
+    transition: max-height 0.25s ease-out;
+    margin: 10vh auto auto auto;
 
-        @media (min-width: $tablet-width) {
-            min-width: 520px;
-        }
-
-        @media (max-height: 600px) {
-            margin-top: auto;
-        }
-
-        .landing-page-card-content {
-            padding: 1em;
-
-            @media (max-width: $tablet-width) {
-                margin: auto 1em;
-            }
-        }
+    @media (max-width: $tablet-width) {
+      width: 100%;
+      max-height: 100%;
+      margin-top: 1rem;
     }
 
-    .landing-page-lower-row {
-        height: 300px;
-        background-color: #fff;
-        padding: 1em 0 0 0;
-        // to compensate margin from SUI containers
-        margin-bottom: -1rem;
-
-        .lower-row {
-            :global(.statistics) {
-                :global(.value), :global(.label) {
-                    color: $highlight-color;
-                }
-
-                &:not(:last-child) {
-                    margin-right: 70px;
-                }
-
-                :global(.statistic + .statistic) {
-                    margin-left: 3em;
-                }
-
-                :global(.statistic:nth-child(even)) > * {
-                    color: darken($highlight-color, 20%);
-                }
-            }
-        }
+    @media (min-width: $tablet-width) {
+      min-width: 520px;
     }
+
+    @media (max-height: 600px) {
+      margin-top: auto;
+    }
+
+    .landing-page-card-content {
+      padding: 1em;
+
+      @media (max-width: $tablet-width) {
+        margin: auto 1em;
+      }
+    }
+  }
+
+  .landing-page-lower-row {
+    height: 300px;
+    background-color: #fff;
+    padding: 1em 0 0 0;
+    // to compensate margin from SUI containers
+    margin-bottom: -1rem;
+
+    .lower-row {
+      :global(.statistics) {
+        :global(.value),
+        :global(.label) {
+          color: $highlight-color;
+        }
+
+        &:not(:last-child) {
+          margin-right: 70px;
+        }
+
+        :global(.statistic + .statistic) {
+          margin-left: 3em;
+        }
+
+        :global(.statistic:nth-child(even)) > * {
+          color: darken($highlight-color, 20%);
+        }
+      }
+    }
+  }
 }

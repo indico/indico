@@ -6,99 +6,98 @@
 // LICENSE file for more details.
 
 .i-taglist-field {
-    @extend %default-border-radius;
-    @include border-all();
+  @extend %default-border-radius;
+  @include border-all();
 
-    height: auto;
-    cursor: text;
-    padding: 0.3rem;
-    position: relative;
-    background: #fff;
-    display: flex;
-    align-items: center;
+  height: auto;
+  cursor: text;
+  padding: 0.3rem;
+  position: relative;
+  background: #fff;
+  display: flex;
+  align-items: center;
 
-    ul.taggle_list {
-        padding: 0;
-        margin: -0.3rem 0 0;
-        float: left;
-        width: 100%;
-        list-style-type: none;
+  ul.taggle_list {
+    padding: 0;
+    margin: -0.3rem 0 0;
+    float: left;
+    width: 100%;
+    list-style-type: none;
 
-        li {
-            float: left;
-            display: inline-block;
-            white-space: nowrap;
-            font-weight: 500;
-            margin-top: 0.3rem;
-            height: 1.8rem;
+    li {
+      float: left;
+      display: inline-block;
+      white-space: nowrap;
+      font-weight: 500;
+      margin-top: 0.3rem;
+      height: 1.8rem;
 
-            &.taggle {
-                margin-right: 0.5rem;
-                background: $pastel-blue;
-                padding: 0.3rem 0.7rem;
-                border-radius: 2px;
-                position: relative;
-                cursor: pointer;
-                transition: all .3s;
+      &.taggle {
+        margin-right: 0.5rem;
+        background: $pastel-blue;
+        padding: 0.3rem 0.7rem;
+        border-radius: 2px;
+        position: relative;
+        cursor: pointer;
+        transition: all 0.3s;
 
-                &:hover {
-                    padding: 0.3rem 1.1rem 0.3rem 0.3rem;
-                    transition: all .3s;
+        &:hover {
+          padding: 0.3rem 1.1rem 0.3rem 0.3rem;
+          transition: all 0.3s;
 
-                    > .close {
-                        display: block;
-                    }
-                }
-
-                .close {
-                    height: 0.7em;
-                    font-size: 1.1rem;
-                    position: absolute;
-                    top: 0.55em;
-                    right: 0;
-                    text-decoration: none;
-                    padding-left: 2px;
-                    line-height: 0.5;
-                    color: #ccc;
-                    color: rgba(0, 0, 0, 0.2);
-                    display: none;
-                    border: 0;
-                    background: none;
-                    cursor: pointer;
-                }
-
-                .taggle_text {
-                    padding: 0.3rem;
-                }
-            }
-
-            .taggle_input {
-                border: none;
-                outline: none;
-                background: none;
-                float: left;
-                width: 0.7em;
-                max-width: 100%;
-                padding: 0.3rem 0 !important;
-                font-weight: 500;
-                height: auto !important;
-            }
+          > .close {
+            display: block;
+          }
         }
 
-    }
+        .close {
+          height: 0.7em;
+          font-size: 1.1rem;
+          position: absolute;
+          top: 0.55em;
+          right: 0;
+          text-decoration: none;
+          padding-left: 2px;
+          line-height: 0.5;
+          color: #ccc;
+          color: rgba(0, 0, 0, 0.2);
+          display: none;
+          border: 0;
+          background: none;
+          cursor: pointer;
+        }
 
-    .taggle_placeholder {
-        color: #ccc;
-        position: absolute;
-        transition: opacity, .25s;
-    }
+        .taggle_text {
+          padding: 0.3rem;
+        }
+      }
 
-    .taggle_sizer {
-        padding: 0;
-        margin: 0;
-        position: absolute;
-        top: -500px;
-        z-index: -1;
-        visibility: hidden;
+      .taggle_input {
+        border: none;
+        outline: none;
+        background: none;
+        float: left;
+        width: 0.7em;
+        max-width: 100%;
+        padding: 0.3rem 0 !important;
+        font-weight: 500;
+        height: auto !important;
+      }
     }
+  }
+
+  .taggle_placeholder {
+    color: #ccc;
+    position: absolute;
+    transition: opacity, 0.25s;
+  }
+
+  .taggle_sizer {
+    padding: 0;
+    margin: 0;
+    position: absolute;
+    top: -500px;
+    z-index: -1;
+    visibility: hidden;
+  }
 }

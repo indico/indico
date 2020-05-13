@@ -8,16 +8,16 @@
 @import 'rb:styles/palette';
 
 .admin-override-bar {
-    display: flex;
-    padding: 0 20px 0 10px;
-    margin: 0;
-    height: 30px;
-    line-height: 30px;
-    background-color: $orange;
-    color: $white;
+  display: flex;
+  padding: 0 20px 0 10px;
+  margin: 0;
+  height: 30px;
+  line-height: 30px;
+  background-color: $orange;
+  color: $white;
 
-    .disable {
-        margin-left: auto;
-        cursor: pointer;
-    }
+  .disable {
+    margin-left: auto;
+    cursor: pointer;
+  }
 }

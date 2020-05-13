@@ -5,37 +5,42 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-
 .i-plugins-list {
-    & > h2 { margin-top: 2em; }
+  & > h2 {
+    margin-top: 2em;
+  }
 
-    & > .i-badges-list {
-        display: flex;
-        justify-content: flex-start;
+  & > .i-badges-list {
+    display: flex;
+    justify-content: flex-start;
 
-        & > .i-badge {
-            @include transition(background-color $default-transition-duration $default-transition-function);
+    & > .i-badge {
+      @include transition(
+        background-color $default-transition-duration $default-transition-function
+      );
 
-            width: 10em;
-            margin-left: 0;
-            margin-right: 1.6em;
+      width: 10em;
+      margin-left: 0;
+      margin-right: 1.6em;
 
-            &.i-badge-disabled {
-                background-color: lighten($dark-blue, $light-color-variation);
-                background: repeating-linear-gradient(
-                    -40deg,
-                    $dark-blue,
-                    $dark-blue 10px,
-                    lighten($dark-blue, 0.5*$light-color-variation) 10px,
-                    lighten($dark-blue, 0.5*$light-color-variation) 20px
-                );
-            }
+      &.i-badge-disabled {
+        background-color: lighten($dark-blue, $light-color-variation);
+        background: repeating-linear-gradient(
+          -40deg,
+          $dark-blue,
+          $dark-blue 10px,
+          lighten($dark-blue, 0.5 * $light-color-variation) 10px,
+          lighten($dark-blue, 0.5 * $light-color-variation) 20px
+        );
+      }
 
-            &:not(.i-badge-disabled):hover {
-                background-color: darken($dark-blue, 2*$light-color-variation);
-            }
+      &:not(.i-badge-disabled):hover {
+        background-color: darken($dark-blue, 2 * $light-color-variation);
+      }
 
-            & > .i-badge-content { height: 4.2em; }
-        }
+      & > .i-badge-content {
+        height: 4.2em;
+      }
     }
+  }
 }

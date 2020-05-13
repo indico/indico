@@ -6,158 +6,158 @@
 // LICENSE file for more details.
 
 #form-group-roles .form-field {
-    width: inherit;
+  width: inherit;
 }
 
 #reviewing-role-form {
-    margin-top: 0;
+  margin-top: 0;
 }
 
 .abstract-role-widget {
-    padding-right: 20px;
-    max-height: 700px;
-    width: 800px;
-    overflow-y: auto;
+  padding-right: 20px;
+  max-height: 700px;
+  width: 800px;
+  overflow-y: auto;
 }
 
 .abstract-role-list {
-    margin: 0;
+  margin: 0;
+  padding-left: 0;
+
+  li.i-box {
+    margin: 20px 0;
+    display: block;
+
+    &:first-child {
+      margin-top: 0;
+    }
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+  }
+
+  .user-role-list {
     padding-left: 0;
 
-    li.i-box {
-        margin: 20px 0;
-        display: block;
+    .event-user {
+      margin-top: 0.1em;
 
-        &:first-child {
-            margin-top: 0;
-        }
+      .icon-cross {
+        vertical-align: middle;
+        font-size: 0.8em;
+        margin-left: 0.5em;
+      }
+    }
+  }
 
-        &:last-child {
-            margin-bottom: 0;
-        }
+  .actions {
+    overflow: auto;
+  }
+
+  .role-description {
+    margin: 1em 0 0.5em 0;
+    overflow: auto;
+
+    .title {
+      font-size: 1.2em;
     }
 
-    .user-role-list {
-        padding-left: 0;
+    .add-user {
+      padding: 0;
+      height: 1.8em !important;
+    }
+  }
 
-        .event-user {
-            margin-top: 0.1em;
+  .reviewer-container {
+    margin: 0 -10px;
+    padding-left: 10px;
+    padding-right: 10px;
 
-            .icon-cross {
-                vertical-align: middle;
-                font-size: 0.8em;
-                margin-left: 0.5em;
-            }
-        }
+    &:not(:first-child) {
+      @include border-top();
     }
 
-    .actions {
-        overflow: auto;
+    &:not(:last-child) {
+      padding-bottom: 1em;
     }
-
-    .role-description {
-        margin: 1em 0 0.5em 0;
-        overflow: auto;
-
-        .title {
-            font-size: 1.2em;
-        }
-
-        .add-user {
-            padding: 0;
-            height: 1.8em !important;
-        }
-    }
-
-    .reviewer-container {
-        margin: 0 -10px;
-        padding-left: 10px;
-        padding-right: 10px;
-
-        &:not(:first-child) {
-            @include border-top();
-        }
-
-        &:not(:last-child) {
-            padding-bottom: 1em;
-        }
-    }
+  }
 }
 
 .event-roles {
-    .list-filter {
-        padding: 0;
+  .list-filter {
+    padding: 0;
 
-        li {
-            padding: 0.1em 0.7em !important;
+    li {
+      padding: 0.1em 0.7em !important;
 
-            & > ::before {
-                cursor: pointer;
-            }
+      & > ::before {
+        cursor: pointer;
+      }
 
-            &.separator {
-                cursor: default;
-            }
+      &.separator {
+        cursor: default;
+      }
 
-            &:not(.enabled):not(.separator) {
-                background-color: inherit !important;
-            }
+      &:not(.enabled):not(.separator) {
+        background-color: inherit !important;
+      }
 
-            input[type='checkbox'] {
-                display: none;
+      input[type='checkbox'] {
+        display: none;
 
-                &:not(:checked) + .icon-checkmark {
-                    visibility: hidden;
-                }
-            }
-
-            .icon-checkmark {
-                color: $black;
-                padding-right: 0.5em;
-            }
-
-            .icon-stop.no-account {
-                color: $yellow;
-            }
-
-            span.titled-rule {
-                width: 100%;
-            }
+        &:not(:checked) + .icon-checkmark {
+          visibility: hidden;
         }
+      }
+
+      .icon-checkmark {
+        color: $black;
+        padding-right: 0.5em;
+      }
+
+      .icon-stop.no-account {
+        color: $yellow;
+      }
+
+      span.titled-rule {
+        width: 100%;
+      }
+    }
+  }
+
+  #event-participants-list {
+    .registration-column {
+      padding-top: 0.9em;
+
+      .icon-ticket {
+        color: $pastel-gray;
+
+        &.exists {
+          color: $blue;
+        }
+      }
     }
 
-    #event-participants-list {
-        .registration-column {
-            padding-top: 0.9em;
+    .roles-column {
+      & > span {
+        color: $light-gray;
+        margin: 0.4em;
 
-            .icon-ticket {
-                color: $pastel-gray;
-
-                &.exists {
-                    color: $blue;
-                }
-            }
+        .badge {
+          background-color: $light-gray;
         }
+      }
 
-        .roles-column {
-            & > span {
-                color: $light-gray;
-                margin: 0.4em;
-
-                .badge {
-                    background-color: $light-gray;
-                }
-            }
-
-            & > span:not(.custom) {
-                border-color: $pastel-gray !important;
-            }
-        }
-
-        .edit-column {
-            .i-link.disabled {
-                color: $pastel-gray;
-            }
-        }
+      & > span:not(.custom) {
+        border-color: $pastel-gray !important;
+      }
     }
+
+    .edit-column {
+      .i-link.disabled {
+        color: $pastel-gray;
+      }
+    }
+  }
 }

@@ -5,15 +5,14 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-
 .timeline {
-    position: relative;
+  position: relative;
 
-    :global(.ReactVirtualized__Grid.ReactVirtualized__List) {
-        overflow: unset !important;
-    }
+  :global(.ReactVirtualized__Grid.ReactVirtualized__List) {
+    overflow: unset !important;
+  }
 
-    :global(.redux-lazy-scroll) {
-        overflow: hidden !important;
-    }
+  :global(.redux-lazy-scroll) {
+    overflow: hidden !important;
+  }
 }

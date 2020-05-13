@@ -6,97 +6,100 @@
 // LICENSE file for more details.
 
 .infogrid {
-    margin: 1em 0 2em 0;
+  margin: 1em 0 2em 0;
 
-    &:after {
-        content: "";
-        display: table;
-        clear: both;
-    }
+  &::after {
+    content: '';
+    display: table;
+    clear: both;
+  }
 
-    &.condensed {
-        .infoline {
-            margin-top: 0;
-        }
+  &.condensed {
+    .infoline {
+      margin-top: 0;
     }
+  }
 }
 
 .infoline {
-    color: $light-black;
-    float: left;
-    overflow: auto;
-    width: 50%;
-    margin-top: 1em;
-    display: flex;
-    flex-flow: row nowrap;
-    line-height: initial;
+  color: $light-black;
+  float: left;
+  overflow: auto;
+  width: 50%;
+  margin-top: 1em;
+  display: flex;
+  flex-flow: row nowrap;
+  line-height: initial;
 
-    &, &:after, &:before {
-        box-sizing: border-box;
+  &,
+  &::after,
+  &::before {
+    box-sizing: border-box;
+  }
+
+  i,
+  .icon {
+    color: $gray;
+    font-size: 2rem;
+    padding-right: 0.5em;
+  }
+
+  .text {
+    flex-grow: 1;
+  }
+
+  .attachments-box {
+    padding: 0;
+  }
+
+  .toolbar {
+    margin-bottom: 0;
+  }
+
+  .label {
+    font-weight: bold;
+
+    &.big {
+      font-size: 1rem;
+      line-height: 2rem;
     }
-
-    i, .icon {
-        color: $gray;
-        font-size: 2rem;
-        padding-right: 0.5em;
-    }
-
-    .text {
-        flex-grow: 1;
-    }
-
-    .attachments-box {
-        padding: 0;
-    }
-
-    .toolbar {
-        margin-bottom: 0;
-    }
-
-    .label {
-        font-weight: bold;
-
-        &.big {
-            font-size: 1rem;
-            line-height: 2rem;
-        }
-    }
+  }
 }
 
 .infoline.date {
-    font-size: 1.1em;
+  font-size: 1.1em;
 
-    .datetime {
-        color: $black;
-    }
+  .datetime {
+    color: $black;
+  }
 
-    .timezone {
-        color: $gray;
-    }
+  .timezone {
+    color: $gray;
+  }
 }
 
 .infoline.info {
-    padding: 10px;
-    clear: both;
-    width: 100%;
-    background: #f4f4f4;
+  padding: 10px;
+  clear: both;
+  width: 100%;
+  background: #f4f4f4;
 }
 
 .infoline.location {
-    .address {
-        margin-top: 0.5em;
-    }
+  .address {
+    margin-top: 0.5em;
+  }
 
-    .place {
-        color: #444;
-        font-size: 1.1em;
-    }
+  .place {
+    color: #444;
+    font-size: 1.1em;
+  }
 }
 
 .infoline.material {
-    > ul {
-        margin: 0;
-        padding: 0 3rem 0 3rem;
-        list-style-type: none;
-    }
+  > ul {
+    margin: 0;
+    padding: 0 3rem 0 3rem;
+    list-style-type: none;
+  }
 }

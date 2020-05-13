@@ -8,20 +8,21 @@
 @import 'rb:styles/palette';
 
 .link-bar {
-    display: flex;
-    padding: 0 20px 0 10px;
-    margin: 0;
-    height: 30px;
-    line-height: 30px;
-    background-color: $primary-color;
-    color: $white;
+  display: flex;
+  padding: 0 20px 0 10px;
+  margin: 0;
+  height: 30px;
+  line-height: 30px;
+  background-color: $primary-color;
+  color: $white;
 
-    a, a:hover {
-        color: $light-yellow;
-    }
+  a,
+  a:hover {
+    color: $light-yellow;
+  }
 
-    .clear {
-        margin-left: auto;
-        cursor: pointer;
-    }
+  .clear {
+    margin-left: auto;
+    cursor: pointer;
+  }
 }

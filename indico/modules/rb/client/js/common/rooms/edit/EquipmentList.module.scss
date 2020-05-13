@@ -8,11 +8,11 @@
 @import 'rb:styles/palette';
 
 .equipment-button {
-    cursor: pointer;
-    color: $red;
-    opacity: 0.5 !important;
+  cursor: pointer;
+  color: $red;
+  opacity: 0.5 !important;
 
-    &:hover {
-        opacity: 1 !important;
-    }
+  &:hover {
+    opacity: 1 !important;
+  }
 }

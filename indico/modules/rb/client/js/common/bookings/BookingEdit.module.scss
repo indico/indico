@@ -6,16 +6,16 @@
 // LICENSE file for more details.
 
 .booking-edit-modal-header {
-    display: flex !important;
-    justify-content: space-between;
-    align-items: center;
+  display: flex !important;
+  justify-content: space-between;
+  align-items: center;
 }
 
 .ongoing-booking-info :global(.icon.play) {
-    font-size: 1.5em !important;
+  font-size: 1.5em !important;
 }
 
 .booking-conflicts-info {
-    flex-grow: unset !important;
-    margin-top: 20px;
+  flex-grow: unset !important;
+  margin-top: 20px;
 }

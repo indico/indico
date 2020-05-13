@@ -8,28 +8,29 @@
 @import '../common';
 
 :global(.ui.modal) {
-    :global(.disabled.field) {
-        background: none;
-    }
+  :global(.disabled.field) {
+    background: none;
+  }
 }
 
 .choice-bar {
-    display: flex;
-    justify-content: space-between;
-    align-items: baseline;
-    margin-bottom: 1em;
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 1em;
 }
 
 .judgment-type-button:global(.ui.button) {
-    @extend %editing-states-bg;
-    color: white;
+  @extend %editing-states-bg;
+  color: white;
 
-    &:global(.active), &:global(.active:hover) {
-        color: white;
-    }
+  &:global(.active),
+  &:global(.active:hover) {
+    color: white;
+  }
 }
 
 .judgment-submit-button {
-    display: flex;
-    justify-content: flex-end;
+  display: flex;
+  justify-content: flex-end;
 }

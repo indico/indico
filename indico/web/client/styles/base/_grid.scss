@@ -6,9 +6,9 @@
 // LICENSE file for more details.
 
 @mixin grid-column($ncols) {
-    width: 100% / $ncols;
+  width: 100% / $ncols;
 
-    &:nth-child(#{$ncols}n) {
-        clear: right;
-    }
+  &:nth-child(#{$ncols}n) {
+    clear: right;
+  }
 }

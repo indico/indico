@@ -6,43 +6,42 @@
 // LICENSE file for more details.
 
 .occurrence-count {
-    display: flex;
-    margin-left: auto !important;
+  display: flex;
+  margin-left: auto !important;
 
-    :global(.label):first-child {
-        align-self: center;
+  :global(.label):first-child {
+    align-self: center;
+  }
+
+  :global(.new-occurrences-count) {
+    &:global(.single-arrow) {
+      display: flex;
+      align-items: center;
     }
 
-    :global(.new-occurrences-count) {
-        &:global(.single-arrow) {
-            display: flex;
-            align-items: center;
-
-        }
-
-        .arrow {
-            display: inline-block;
-        }
-
-        &:not(:global(.single-arrow)) {
-            :global(.label) {
-                margin-top: 8px;
-            }
-
-            .arrow {
-                transform: rotate(15deg) scale(1.4);
-            }
-        }
+    .arrow {
+      display: inline-block;
     }
 
-    .old-occurrences-count {
-        :global(.label) {
-            margin-bottom: 8px;
-        }
+    &:not(:global(.single-arrow)) {
+      :global(.label) {
+        margin-top: 8px;
+      }
 
-        .arrow {
-            display: inline-block;
-            transform: rotate(-15deg) scale(1.4);
-        }
+      .arrow {
+        transform: rotate(15deg) scale(1.4);
+      }
     }
+  }
+
+  .old-occurrences-count {
+    :global(.label) {
+      margin-bottom: 8px;
+    }
+
+    .arrow {
+      display: inline-block;
+      transform: rotate(-15deg) scale(1.4);
+    }
+  }
 }

@@ -9,59 +9,60 @@
 @import './TimelineContent.module.scss';
 
 .timeline-day-divider {
-    position: absolute;
-    top: 0;
-    height: 100%;
-    border-left: 1px solid $pastel-gray;
+  position: absolute;
+  top: 0;
+  height: 100%;
+  border-left: 1px solid $pastel-gray;
 
-    &:global(.hidden) {
-        opacity: 0.35;
-        background-color: $pastel-gray;
-    }
+  &:global(.hidden) {
+    opacity: 0.35;
+    background-color: $pastel-gray;
+  }
 
-    &:global(.hidden) + :global(.visible) {
-        border-left: none;
-    }
+  &:global(.hidden) + :global(.visible) {
+    border-left: none;
+  }
 
-    &.weekend {
-        background-color: lighten($blue, 55%);
-    }
+  &.weekend {
+    background-color: lighten($blue, 55%);
+  }
 }
 
 .timeline-row-content {
-    display: flex;
-    flex: 1;
-    width: 100%;
-    height: $row-height;
+  display: flex;
+  flex: 1;
+  width: 100%;
+  height: $row-height;
 }
 
 .timeline-header-labels {
-    flex: 1;
-    display: flex;
-    position: relative;
+  flex: 1;
+  display: flex;
+  position: relative;
 }
 
 .timeline-header-label {
-    flex: 1;
-    height: 100%;
-    line-height: $row-height;
-    text-align: center;
+  flex: 1;
+  height: 100%;
+  line-height: $row-height;
+  text-align: center;
 
-    &:global(.weekly), &:global(.monthly) {
-        .timeline-label-text {
-            cursor: pointer;
-        }
-    }
-
+  &:global(.weekly),
+  &:global(.monthly) {
     .timeline-label-text {
-        display: inline-block;
-        color: $gray;
+      cursor: pointer;
     }
+  }
 
-    &.weekend {
-        .timeline-label-text {
-            font-weight: bold;
-            color: lighten($blue, 30%);
-        }
+  .timeline-label-text {
+    display: inline-block;
+    color: $gray;
+  }
+
+  &.weekend {
+    .timeline-label-text {
+      font-weight: bold;
+      color: lighten($blue, 30%);
     }
+  }
 }

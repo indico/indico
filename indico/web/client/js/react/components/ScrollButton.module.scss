@@ -8,22 +8,22 @@
 @import 'base/palette';
 
 :global(.ui.button).scroll-btn {
-    background-color: $teal;
+  background-color: $teal;
+  color: $light-gray;
+  position: fixed;
+  bottom: 10px;
+  right: 10px;
+  opacity: 0;
+  z-index: 1001;
+  transition: opacity 0.25s ease-in;
+
+  &.visible {
+    opacity: 0.75;
+  }
+
+  &:hover,
+  &:focus {
+    background-color: $dark-teal;
     color: $light-gray;
-    position: fixed;
-    bottom: 10px;
-    right: 10px;
-    opacity: 0;
-    z-index: 1001;
-    transition: opacity 0.25s ease-in;
-
-    &.visible {
-        opacity: 0.75;
-    }
-
-    &:hover,
-    &:focus {
-        background-color: $dark-teal;
-        color: $light-gray;
-    }
+  }
 }

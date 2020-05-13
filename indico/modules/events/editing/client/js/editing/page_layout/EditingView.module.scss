@@ -8,21 +8,20 @@
 @import 'base/palette';
 
 .editing-view {
+  display: flex;
+
+  .contents {
     display: flex;
+    flex-direction: column;
+    flex: 1;
 
-    .contents {
-        display: flex;
-        flex-direction: column;
-        flex: 1;
-
-        .timeline {
-            max-width: 800px;
-            margin-top: 25px;
-        }
-
-        .timeline.header {
-            color: $black;
-        }
+    .timeline {
+      max-width: 800px;
+      margin-top: 25px;
     }
-}
 
+    .timeline.header {
+      color: $black;
+    }
+  }
+}

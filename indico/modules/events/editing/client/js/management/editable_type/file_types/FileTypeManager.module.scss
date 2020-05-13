@@ -8,38 +8,37 @@
 @import 'base/palette';
 
 .file-types-container {
-    max-width: 300px !important;
+  max-width: 300px !important;
 
-    .filetype-segment {
+  .filetype-segment {
+    .filetype-header {
+      width: 85%;
 
-        .filetype-header {
-            width: 85%;
+      h3 {
+        margin-bottom: 0;
+        display: flex;
 
-            h3 {
-                margin-bottom: 0;
-                display: flex;
-
-                .name {
-                    overflow: hidden;
-                    text-overflow: ellipsis;
-                    white-space: nowrap;
-                }
-            }
+        .name {
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap;
         }
-
-        .file-extensions {
-            font-style: italic;
-            color: $gray;
-            margin: 0.2em 0;
-            padding: 0;
-
-            li {
-                display: inline;
-            }
-
-            li:not(:last-child)::after {
-                content: ', ';
-            }
-        }
+      }
     }
+
+    .file-extensions {
+      font-style: italic;
+      color: $gray;
+      margin: 0.2em 0;
+      padding: 0;
+
+      li {
+        display: inline;
+      }
+
+      li:not(:last-child)::after {
+        content: ', ';
+      }
+    }
+  }
 }

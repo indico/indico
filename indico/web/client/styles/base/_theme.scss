@@ -6,85 +6,85 @@
 // LICENSE file for more details.
 
 $semantic-color-map: (
-    highlight: $blue,
-    success: $green,
-    error: $red,
-    warning: $yellow,
-    visited: $purple,
-    strong: $black
+  highlight: $blue,
+  success: $green,
+  error: $red,
+  warning: $yellow,
+  visited: $purple,
+  strong: $black,
 );
 
 $semantic-styles: (highlight, success, error, warning, visited, strong);
 
 @mixin _semantic-background($color) {
-    @include border-all($color);
-    background: $color;
+  @include border-all($color);
+  background: $color;
 }
 
 @mixin _semantic-outline($color) {
-    @include border-all($color);
-    color: $color;
+  @include border-all($color);
+  color: $color;
 }
 
 @mixin _semantic_versions {
-    @each $style in $semantic-styles {
-        &.#{$style} {
-            @content;
-        }
+  @each $style in $semantic-styles {
+    &.#{$style} {
+      @content;
     }
+  }
 }
 
 @mixin _semantic_colors {
-    @each $style in $semantic-styles {
-        &.#{$style} {
-            color: map-get($semantic-color-map, $style);
-        }
+  @each $style in $semantic-styles {
+    &.#{$style} {
+      color: map-get($semantic-color-map, $style);
     }
+  }
 }
 
 %semantic-background {
-    @include _semantic-background($dark-gray);
-    color: white;
+  @include _semantic-background($dark-gray);
+  color: white;
 
-    @each $style in $semantic-styles {
-        &.#{$style} {
-            @include _semantic-background(map-get($semantic-color-map, $style));
-        }
+  @each $style in $semantic-styles {
+    &.#{$style} {
+      @include _semantic-background(map-get($semantic-color-map, $style));
     }
+  }
 }
 
 %semantic-outline {
-    @include _semantic-outline($dark-gray);
+  @include _semantic-outline($dark-gray);
 
-    @each $style in $semantic-styles {
-        &.#{$style} {
-            @include _semantic-outline(map-get($semantic-color-map, $style));
-        }
+  @each $style in $semantic-styles {
+    &.#{$style} {
+      @include _semantic-outline(map-get($semantic-color-map, $style));
     }
+  }
 }
 
 %semantic-link {
+  color: $gray;
+
+  &:not(.disabled) {
+    &:hover,
+    &:active,
+    &.active {
+      color: $black;
+      @include _semantic_colors;
+    }
+  }
+
+  &.disabled {
     color: $gray;
-
-    &:not(.disabled) {
-        &:hover,
-        &:active,
-        &.active {
-            color: $black;
-            @include _semantic_colors;
-        }
-    }
-
-    &.disabled {
-        color: $gray;
-    }
+  }
 }
 
 .semantic-text {
-    color: $dark-gray;
-    @include _semantic_colors;
+  color: $dark-gray;
+  @include _semantic_colors;
 }
 
 .semantic-background {
-    @extend %semantic-background;
+  @extend %semantic-background;
 }

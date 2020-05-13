@@ -9,367 +9,383 @@ $i-button-background-color: darken($light-gray, 5%);
 $i-button-spacing: 0.3rem;
 
 %button {
-    user-select: none;
-    @extend %default-border-radius;
-    @include border-all();
-    box-sizing: border-box;
-    display: inline-block;
-    cursor: pointer;
-    color: $light-black;
-    outline: none;
-    text-align: center;
-    vertical-align: middle;
+  user-select: none;
+  @extend %default-border-radius;
+  @include border-all();
+  box-sizing: border-box;
+  display: inline-block;
+  cursor: pointer;
+  color: $light-black;
+  outline: none;
+  text-align: center;
+  vertical-align: middle;
 }
 
 %button-disabled {
-    border-color: $default-border-color !important;
-    background: $i-button-background-color !important;
-    box-shadow: none !important;
-    color: $gray !important;
-    cursor: default;
+  border-color: $default-border-color !important;
+  background: $i-button-background-color !important;
+  box-shadow: none !important;
+  color: $gray !important;
+  cursor: default;
 }
 
 @mixin _i-button-borderless($color, $dark-color) {
-    &.borderless {
-        box-shadow: none !important;
-        background: none !important;
-        border-color: transparent !important;
-        color: $color;
+  &.borderless {
+    box-shadow: none !important;
+    background: none !important;
+    border-color: transparent !important;
+    color: $color;
 
-        &:hover,
-        &:active {
-            color: $dark-color;
-        }
+    &:hover,
+    &:active {
+      color: $dark-color;
     }
+  }
 }
 
 @mixin _i-button-outlines($color, $dark-color) {
-    &.text-color {
-        &:not(.color-on-hover) {
-            color: $color;
-        }
-
-        &.color-on-hover:hover {
-            color: $color;
-        }
-
-        &:hover,
-        &:active {
-            color: $dark-color;
-        }
-
-        &.outline {
-            border-color: $color;
-            background: white;
-        }
-
-        &.dashed {
-            border-style: dashed;
-            background: white;
-        }
-
-        &.subtle:not(:hover):not(:active) {
-            box-shadow: none;
-            background: transparent;
-            border-color: transparent;
-        }
+  &.text-color {
+    &:not(.color-on-hover) {
+      color: $color;
     }
+
+    &.color-on-hover:hover {
+      color: $color;
+    }
+
+    &:hover,
+    &:active {
+      color: $dark-color;
+    }
+
+    &.outline {
+      border-color: $color;
+      background: white;
+    }
+
+    &.dashed {
+      border-style: dashed;
+      background: white;
+    }
+
+    &.subtle:not(:hover):not(:active) {
+      box-shadow: none;
+      background: transparent;
+      border-color: transparent;
+    }
+  }
 }
 
-@mixin _i-button-states($flavor-color, $border-color, $border-accent-color, $font-color, $font-accent-color, $with-modes: true) {
-    $flavor-darkened-color: darken($flavor-color, 5%);
-    $no-modes: '';
+@mixin _i-button-states(
+  $flavor-color,
+  $border-color,
+  $border-accent-color,
+  $font-color,
+  $font-accent-color,
+  $with-modes: true
+) {
+  $flavor-darkened-color: darken($flavor-color, 5%);
+  $no-modes: '';
 
-    @if $with-modes == true {
-        $no-modes: ':not(.borderless):not(.text-color)';
-    }
+  @if $with-modes == true {
+    $no-modes: ':not(.borderless):not(.text-color)';
+  }
 
-    &:not(.label)#{$no-modes} {
-        background: $flavor-color;
-        border-color: $border-color;
-        color: $font-color;
+  &:not(.label)#{$no-modes} {
+    background: $flavor-color;
+    border-color: $border-color;
+    color: $font-color;
 
-        &:hover,
-        &:active {
-            border-color: $border-accent-color;
-            color: $font-accent-color;
-        }
-
-        &:hover {
-            @include gradient($flavor-color, $flavor-darkened-color);
-        }
-
-        &:active,
-        &.open {
-            @include gradient($flavor-darkened-color, $flavor-color);
-        }
-    }
-}
-
-@mixin i-button-flavor($flavor-color, $border-color) {
-    $flavor-darkened-color: darken($flavor-color, 5%);
-    @include _i-button-states($flavor-color, $border-color, $border-color, $light-gray, white);
-    @include _i-button-borderless($flavor-color, $flavor-darkened-color);
-    @include _i-button-outlines($flavor-color, $flavor-darkened-color);
-}
-
-@mixin i-button-custom($line-height: 1.6em, $font-size: 1.1em) {
-    @extend %button;
-    box-sizing: content-box;
-
-    border: none;
-    width: $line-height;
-    height: $line-height;
-
-    i {
-        line-height: $line-height;
-        font-size: $font-size;
-    }
-
-    &:hover i {
-        color: darken($light-black, $color-variation);
-    }
-}
-
-.i-button {
-    @extend %button;
-    @include transition(color);
-    @include _i-button-states($i-button-background-color, $default-border-color, $gray, $light-black, $black, false);
-    @include _i-button-borderless($light-black, $black);
-    @include _i-button-outlines($light-black, $black);
-    margin: 0;
-    padding: 4px 10px 4px;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    white-space: nowrap;
-
-    & ~ .i-button,
-    & ~ .group {
-        margin-left: $i-button-spacing;
+    &:hover,
+    &:active {
+      border-color: $border-accent-color;
+      color: $font-accent-color;
     }
 
     &:hover {
-        box-shadow: 1px 1px 4px rgba(20, 20, 20, 0.1);
+      @include gradient($flavor-color, $flavor-darkened-color);
     }
 
     &:active,
     &.open {
-        box-shadow: 1px 1px 4px rgba(20, 20, 20, 0.1) inset;
+      @include gradient($flavor-darkened-color, $flavor-color);
+    }
+  }
+}
+
+@mixin i-button-flavor($flavor-color, $border-color) {
+  $flavor-darkened-color: darken($flavor-color, 5%);
+  @include _i-button-states($flavor-color, $border-color, $border-color, $light-gray, white);
+  @include _i-button-borderless($flavor-color, $flavor-darkened-color);
+  @include _i-button-outlines($flavor-color, $flavor-darkened-color);
+}
+
+@mixin i-button-custom($line-height: 1.6em, $font-size: 1.1em) {
+  @extend %button;
+  box-sizing: content-box;
+
+  border: none;
+  width: $line-height;
+  height: $line-height;
+
+  i {
+    line-height: $line-height;
+    font-size: $font-size;
+  }
+
+  &:hover i {
+    color: darken($light-black, $color-variation);
+  }
+}
+
+.i-button {
+  @extend %button;
+  @include transition(color);
+  @include _i-button-states(
+    $i-button-background-color,
+    $default-border-color,
+    $gray,
+    $light-black,
+    $black,
+    false
+  );
+  @include _i-button-borderless($light-black, $black);
+  @include _i-button-outlines($light-black, $black);
+  margin: 0;
+  padding: 4px 10px 4px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  white-space: nowrap;
+
+  & ~ .i-button,
+  & ~ .group {
+    margin-left: $i-button-spacing;
+  }
+
+  &:hover {
+    box-shadow: 1px 1px 4px rgba(20, 20, 20, 0.1);
+  }
+
+  &:active,
+  &.open {
+    box-shadow: 1px 1px 4px rgba(20, 20, 20, 0.1) inset;
+  }
+
+  &:disabled,
+  &.disabled {
+    @extend %button-disabled;
+  }
+
+  &[class*='icon-'] {
+    &::before {
+      font-size: 1.2em;
     }
 
-    &:disabled,
-    &.disabled {
-        @extend %button-disabled;
+    &:not(:empty)::before {
+      margin-right: 0.5em;
+    }
+  }
+
+  &.accept {
+    @include i-button-flavor($green, $dark-green);
+  }
+
+  &.danger {
+    @include i-button-flavor($red, $dark-red);
+  }
+
+  &.highlight {
+    @include i-button-flavor($blue, $dark-blue);
+  }
+
+  &.warning {
+    @include i-button-flavor($yellow, $dark-yellow);
+  }
+
+  &.label,
+  &.label:hover,
+  &.label:active {
+    background: white;
+    box-shadow: none;
+    color: $light-black;
+    cursor: default;
+    font-weight: normal;
+
+    &.heavy {
+      background: $light-gray;
     }
 
-    &[class*="icon-"] {
-        &::before {
-            font-size: 1.2em;
-        }
-
-        &:not(:empty)::before {
-            margin-right: 0.5em;
-        }
+    &.active {
+      background-color: $light-yellow;
+      border-color: $dark-yellow;
+      color: $dark-yellow;
     }
 
-    &.accept {
-        @include i-button-flavor($green, $dark-green);
+    &.clickable {
+      cursor: pointer;
     }
-
-    &.danger {
-        @include i-button-flavor($red, $dark-red);
-    }
-
-    &.highlight {
-        @include i-button-flavor($blue, $dark-blue);
-    }
-
-    &.warning {
-        @include i-button-flavor($yellow, $dark-yellow);
-    }
-
-    &.label,
-    &.label:hover,
-    &.label:active {
-        background: white;
-        box-shadow: none;
-        color: $light-black;
-        cursor: default;
-        font-weight: normal;
-
-        &.heavy {
-            background: $light-gray;
-        }
-
-        &.active {
-            background-color: $light-yellow;
-            border-color: $dark-yellow;
-            color: $dark-yellow;
-        }
-
-        &.clickable {
-            cursor: pointer;
-        }
-    }
+  }
 }
 
 // Fix for Firefox
 button.i-button,
-input.i-button[type="submit"] {
-    line-height: 1em;
-    display: inline-block;
+input.i-button[type='submit'] {
+  line-height: 1em;
+  display: inline-block;
 
-    &[class*="icon-"] {
-        &:before {
-            vertical-align: -15%;
-        }
+  &[class*='icon-'] {
+    &::before {
+      vertical-align: -15%;
     }
+  }
 
-    &.arrow:after {
-        vertical-align: -10%;
-    }
+  &.arrow::after {
+    vertical-align: -10%;
+  }
 }
 
 a.i-big-button {
-    $size: 60px;
-    @extend %button;
+  $size: 60px;
+  @extend %button;
 
-    background: #FFF;
-    width: $size;
-    height: $size;
+  background: #fff;
+  width: $size;
+  height: $size;
 
+  i {
+    display: block;
+    font-size: 3em;
+    line-height: ($size/3) * 2;
+  }
+
+  span {
+    font-weight: bold;
+    line-height: $size/3;
+    overflow: hidden;
+    white-space: nowrap;
+  }
+
+  &:hover {
+    background: $light-black;
+    transition: background 0.25s ease-out;
+
+    > i,
+    > span {
+      color: white;
+      transition: color 0.25s ease-out;
+    }
+  }
+
+  &.icon-only {
     i {
-        display: block;
-        font-size: 3em;
-        line-height: ($size/3)*2;
+      line-height: $size;
     }
-
-    span {
-        font-weight: bold;
-        line-height: $size/3;
-        overflow: hidden;
-        white-space: nowrap;
-    }
-
-    &:hover {
-        background: $light-black;
-        transition: background .25s ease-out;
-
-        > i,
-        > span {
-            color: white;
-            transition: color .25s ease-out;
-        }
-    }
-
-    &.icon-only {
-        i {
-            line-height: $size;
-        }
-    }
+  }
 }
 
 .i-button.signin {
-    display: block;
-    text-align: left;
-    margin-top: 5px;
+  display: block;
+  text-align: left;
+  margin-top: 5px;
 
-    .auth-id {
-        font-weight: bold;
-    }
+  .auth-id {
+    font-weight: bold;
+  }
 
-    .login-arrow {
-        float: right;
-        @include icon-before('icon-arrow-right-sparse');
-    }
+  .login-arrow {
+    float: right;
+    @include icon-before('icon-arrow-right-sparse');
+  }
 }
 
 .i-button.next {
-    @include icon-after('icon-next');
-    font-weight: bold;
+  @include icon-after('icon-next');
+  font-weight: bold;
 }
 
 button::-moz-focus-inner {
   border: 0;
 }
 
-
 .fav-button.enabled:hover {
-    color: #F5F1C5 !important;
+  color: #f5f1c5 !important;
 }
 
 .fav-button.enabled {
-    background-color: #FAD74C;
-    background-image: linear-gradient(to bottom, #FAD74C, #DAC34A);
+  background-color: #fad74c;
+  background-image: linear-gradient(to bottom, #fad74c, #dac34a);
 
-    border-color: #B6AD6F;
-    color: #E2E28B !important;
-    text-shadow: 0 0 1px rgba(0, 0, 0, 0.5);
-    box-shadow: 0 0 6px #E6DB64;
+  border-color: #b6ad6f;
+  color: #e2e28b !important;
+  text-shadow: 0 0 1px rgba(0, 0, 0, 0.5);
+  box-shadow: 0 0 6px #e6db64;
 }
 
 /* ******************** */
+
 /* Button modifications */
+
 /* ******************** */
-.i-button.big[class*="icon-"]:before {
-    display: block;
-    font-size: 2em;
-    margin-right: 0;
-    margin-bottom: 0.2em;
-    text-align: center;
+.i-button.big[class*='icon-']::before {
+  display: block;
+  font-size: 2em;
+  margin-right: 0;
+  margin-bottom: 0.2em;
+  text-align: center;
 }
 
 .i-button.big {
-    padding: 0.7em;
-    font-weight: bold;
-    font-size: 1.1em;
+  padding: 0.7em;
+  font-weight: bold;
+  font-size: 1.1em;
 }
 
 .i-button-small {
-    font-size: 11px;
-    line-height: 16px;
-    padding: 9px;
+  font-size: 11px;
+  line-height: 16px;
+  padding: 9px;
 }
 
 .i-button.inline {
-    padding: 0;
+  padding: 0;
 }
 
 .i-button.right {
-    margin-left: 5px;
-    margin-top: 5px;
+  margin-left: 5px;
+  margin-top: 5px;
 }
 
 .i-button.bottom {
-    margin-top: 1em;
+  margin-top: 1em;
 }
 
-.i-button[class*="icon-"].icon-only:before {
-    margin-right: 0;
+.i-button[class*='icon-'].icon-only::before {
+  margin-right: 0;
 }
 
-.i-button > [class*="icon-"]:before {
-    font-size: 1.2em;
-    vertical-align: -15%;
+.i-button > [class*='icon-']::before {
+  font-size: 1.2em;
+  vertical-align: -15%;
 }
 
-a.arrow, .i-button.arrow {
-    @include icon-after('icon-arrow-down');
+a.arrow,
+.i-button.arrow {
+  @include icon-after('icon-arrow-down');
 }
 
 .i-button.color-button {
-    @include icon-before(icon-text-color);
+  @include icon-before(icon-text-color);
 
-    padding: 1px;
-    border-radius: 50%;
-    vertical-align: baseline;
+  padding: 1px;
+  border-radius: 50%;
+  vertical-align: baseline;
 }
 
 /* Remove special border added in Firefox */
 button::-moz-focus-inner,
-input[type="button"]::-moz-focus-inner,
-input[type="submit"]::-moz-focus-inner,
-input[type="reset"]::-moz-focus-inner {
-    border: 0 none !important;
+input[type='button']::-moz-focus-inner,
+input[type='submit']::-moz-focus-inner,
+input[type='reset']::-moz-focus-inner {
+  border: 0 none !important;
 }

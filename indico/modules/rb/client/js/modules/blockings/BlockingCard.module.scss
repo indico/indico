@@ -5,13 +5,12 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-
 .blocking-item {
-    cursor: pointer;
+  cursor: pointer;
 
-    .blocking-reason {
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: pre;
-    }
+  .blocking-reason {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: pre;
+  }
 }

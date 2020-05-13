@@ -8,152 +8,152 @@
 @import 'base/animation';
 
 .sideBar {
-    float: right;
-    width: 340px;
+  float: right;
+  width: 340px;
 
-    h1 {
-        margin: 0;
-        padding: 0;
-        color: $light-black;
-        font-size: 15px;
+  h1 {
+    margin: 0;
+    padding: 0;
+    color: $light-black;
+    font-size: 15px;
+  }
+
+  ul {
+    padding: 0;
+    list-style-type: none;
+  }
+
+  em {
+    color: $light-black;
+  }
+
+  .content {
+    @extend %default-border-radius;
+    background-color: #ececec;
+    padding: 2em;
+  }
+
+  a {
+    &.advanced {
+      font-style: italic;
     }
 
-    ul {
-        padding: 0;
-        list-style-type: none;
+    &.subLink {
+      font-style: italic;
+      font-size: 14px;
     }
-
-    em {
-        color: $light-black;
-    }
-
-    .content {
-        @extend %default-border-radius;
-        background-color: #ECECEC;
-        padding: 2em;
-    }
-
-    a {
-        &.advanced {
-            font-style: italic;
-        }
-
-        &.subLink {
-            font-style: italic;
-            font-size: 14px;
-        }
-    }
+  }
 }
 
 .side-menu {
-    @extend %font-family-title;
-    user-select: none;
-    @include single-box-shadow();
-    @include border-all();
-    @extend %default-border-radius;
-    font-size: 1.1em;
+  @extend %font-family-title;
+  user-select: none;
+  @include single-box-shadow();
+  @include border-all();
+  @extend %default-border-radius;
+  font-size: 1.1em;
 
-    ul.menu-items > li.section {
-        padding: 0;
+  ul.menu-items > li.section {
+    padding: 0;
 
-        .title-wrapper {
-            @include icon-before('icon-arrow-down');
-            cursor: pointer;
+    .title-wrapper {
+      @include icon-before('icon-arrow-down');
+      cursor: pointer;
 
-            &:before {
-                @include rotate-transform(0.3s);
-                display: inline-block;
-            }
-        }
-
-        &.collapsed {
-            // We do not hide the <ul> here since we use JS to animate opening/closing a section
-            .title-wrapper:before {
-                transform: rotate(-90deg);
-            }
-        }
+      &::before {
+        @include rotate-transform(0.3s);
+        display: inline-block;
+      }
     }
 
-    ul.menu-items {
+    &.collapsed {
+      // We do not hide the <ul> here since we use JS to animate opening/closing a section
+      .title-wrapper::before {
+        transform: rotate(-90deg);
+      }
+    }
+  }
+
+  ul.menu-items {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+
+    > li {
+      @include border-bottom();
+      display: block;
+      margin: 0;
+
+      &.disabled {
+        color: $dark-gray;
+      }
+
+      &:last-child {
+        border-bottom: none;
+      }
+
+      .title-wrapper {
+        display: block;
+        min-height: 2.6em;
+        line-height: 2.6em;
+        padding-left: 9px;
+
+        .title {
+          display: inline;
+          padding-left: 3px;
+        }
+      }
+
+      .title {
+        display: block;
+        min-height: 2.6em;
+        line-height: 2.6em;
+        color: $black;
+        padding-left: 26px;
+
+        &::before {
+          margin-right: 0.5em;
+        }
+      }
+
+      a.title {
+        color: $dark-blue;
+      }
+
+      > ul {
         list-style-type: none;
+        font-size: 0.95em;
         padding: 0;
-        margin: 0;
 
-        > li {
-            @include border-bottom();
-            display: block;
-            margin: 0;
-
-            &.disabled {
-                color: $dark-gray;
-            }
-
-            &:last-child {
-                border-bottom: none;
-            }
-
-            .title-wrapper {
-                display: block;
-                min-height: 2.6em;
-                line-height: 2.6em;
-                padding-left: 9px;
-
-                .title {
-                    display: inline;
-                    padding-left: 3px;
-                }
-            }
-
-            .title {
-                display: block;
-                min-height: 2.6em;
-                line-height: 2.6em;
-                color: $black;
-                padding-left: 26px;
-
-                &:before {
-                    margin-right: 0.5em;
-                }
-            }
-
-            a.title {
-                color: $dark-blue;
-            }
-
-            > ul {
-                list-style-type: none;
-                font-size: 0.95em;
-                padding: 0;
-
-                > li .title {
-                    min-height: 2em;
-                    line-height: 2em;
-                    padding-left: 51px;
-                }
-            }
-
-            &:last-child > ul > li:last-child {
-                margin-bottom: 0;
-            }
-
-            &:not(.active) a.title:hover {
-                color: $darker-blue;
-                background-color: $light-gray;
-            }
-
-            &.active a.title {
-                color: $darker-blue;
-            }
+        > li .title {
+          min-height: 2em;
+          line-height: 2em;
+          padding-left: 51px;
         }
+      }
+
+      &:last-child > ul > li:last-child {
+        margin-bottom: 0;
+      }
+
+      &:not(.active) a.title:hover {
+        color: $darker-blue;
+        background-color: $light-gray;
+      }
+
+      &.active a.title {
+        color: $darker-blue;
+      }
     }
+  }
 }
 
 ul.menu-items li.active {
-    @include inner-border-left($link, $width: 2px);
-    position: relative;
-    background-color: $light-blue;
+  @include inner-border-left($link, $width: 2px);
+  position: relative;
+  background-color: $light-blue;
 
-    > a {
-        font-weight: normal;
-    }
+  > a {
+    font-weight: normal;
+  }
 }

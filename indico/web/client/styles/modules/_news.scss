@@ -6,44 +6,43 @@
 // LICENSE file for more details.
 
 .news-toolbar {
-    padding: 1em;
+  padding: 1em;
 }
 
 .news-item {
-    background-color: lighten($light-gray, 1%);
-    overflow: hidden;
-    border: 1px $gray solid;
-    box-shadow: 0 2px 1px -1px $pastel-gray;
-    padding: 1em;
+  background-color: lighten($light-gray, 1%);
+  overflow: hidden;
+  border: 1px $gray solid;
+  box-shadow: 0 2px 1px -1px $pastel-gray;
+  padding: 1em;
 
-    &:not(:last-child) {
-        margin-bottom: 3em;
+  &:not(:last-child) {
+    margin-bottom: 3em;
+  }
+
+  .news-item-info {
+    color: $gray;
+  }
+
+  .new-label {
+    font-size: 1.2em;
+    vertical-align: middle;
+    color: $yellow;
+    margin-left: 0.2em;
+  }
+
+  > h2 {
+    font-size: 1.8em;
+    margin-top: 0;
+    margin-bottom: 1.5em;
+  }
+
+  .content {
+    color: $light-black;
+    padding-left: 1em;
+
+    img {
+      max-width: 100%;
     }
-
-    .news-item-info {
-        color: $gray;
-    }
-
-    .new-label {
-        font-size: 1.2em;
-        vertical-align: middle;
-        color: $yellow;
-        margin-left: 0.2em;
-    }
-
-    > h2 {
-        font-size: 1.8em;
-        margin-top: 0;
-        margin-bottom: 1.5em;
-    }
-
-    .content {
-        color: $light-black;
-        padding-left: 1em;
-
-        img {
-            max-width: 100%;
-        }
-    }
+  }
 }
-

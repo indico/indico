@@ -8,507 +8,495 @@
 @import 'base';
 @import 'partials/boxes';
 
-
 .reviewing-page {
-    @extend %font-family-body;
-    position: relative;
+  @extend %font-family-body;
+  position: relative;
 
-    .i-form {
-        margin-top: 0;
+  .i-form {
+    margin-top: 0;
+  }
+
+  .form-group:first-of-type .form-field {
+    margin-top: 0;
+  }
+
+  .form-field {
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+  }
+
+  .markdown-text {
+    p:first-child {
+      margin-top: 0;
     }
 
-    .form-group:first-of-type .form-field {
-        margin-top: 0;
+    p:last-child {
+      margin-bottom: 0;
     }
+  }
 
-    .form-field {
-        padding-left: 0 !important;
-        padding-right: 0 !important;
-    }
+  textarea.grow {
+    width: 100% !important;
+  }
 
-    .markdown-text {
-        p:first-child {
-            margin-top: 0;
-        }
-
-        p:last-child {
-            margin-bottom: 0;
-        }
-    }
-
-    textarea.grow {
-        width: 100% !important;
-    }
-
-    .open-review-notification-log {
-        margin-top: 5px;
-        margin-right: 10px;
-        position: absolute;
-        right: 0;
-        z-index: 1;
-    }
+  .open-review-notification-log {
+    margin-top: 5px;
+    margin-right: 10px;
+    position: absolute;
+    right: 0;
+    z-index: 1;
+  }
 }
-
 
 .review-group {
-    @include border-bottom($style: dashed);
-    max-width: 15em;
-    display: inline-block;
-    vertical-align: text-top;
+  @include border-bottom($style: dashed);
+  max-width: 15em;
+  display: inline-block;
+  vertical-align: text-top;
 }
-
 
 .submission-title {
-    h3 {
-        color: $blue !important;
-        font-size: 1.4em;
-        margin: 0;
-    }
+  h3 {
+    color: $blue !important;
+    font-size: 1.4em;
+    margin: 0;
+  }
 
-    .submission-id {
-        color: $gray;
-    }
+  .submission-id {
+    color: $gray;
+  }
 
-    .submission-code {
-        font-size: 0.8em;
-        border: 1px solid $dark-gray;
-        border-radius: 3px;
-        padding: 0 0.2em;
-        background-color: $dark-gray;
-        color: $light-gray;
-        margin-left: 5px;
-    }
+  .submission-code {
+    font-size: 0.8em;
+    border: 1px solid $dark-gray;
+    border-radius: 3px;
+    padding: 0 0.2em;
+    background-color: $dark-gray;
+    color: $light-gray;
+    margin-left: 5px;
+  }
 
-    .toolbar {
-        padding: 0;
-        margin: 0;
-        margin-left: 0.5rem;
+  .toolbar {
+    padding: 0;
+    margin: 0;
+    margin-left: 0.5rem;
 
-        .group {
-            display: inline-flex;
-            margin-bottom: 0;
-        }
+    .group {
+      display: inline-flex;
+      margin-bottom: 0;
     }
+  }
 }
-
 
 .review-summary {
-    margin-top: 0.5rem;
+  margin-top: 0.5rem;
 
-    .review-summary-badge {
-        margin-right: 1rem;
+  .review-summary-badge {
+    margin-right: 1rem;
 
-        .i-tag {
-            font-size: 1.1em;
-        }
+    .i-tag {
+      font-size: 1.1em;
     }
+  }
 
-    .review-summary-content {
-        color: $black;
-    }
+  .review-summary-content {
+    color: $black;
+  }
 }
-
 
 .submission-info {
-    .info-line {
-        &:not(:first-child) {
-            margin-top: 1em;
-        }
-
-        label {
-            display: block;
-        }
-
-        .author-list {
-            font-size: 0.95em;
-            list-style-type: none;
-            margin: 0.2em 0 0 1em;
-            padding: 0;
-            display: inline-block;
-
-            li {
-                background-color: $light-gray;
-                display: inline-flex;
-                align-items: center;
-            }
-        }
+  .info-line {
+    &:not(:first-child) {
+      margin-top: 1em;
     }
 
-    .custom-field-values {
-        margin: 0;
-
-        .field-value {
-            &:not(:first-child) {
-                margin-top: 0.5em;
-            }
-
-            > * {
-                display: block;
-            }
-
-            &.single-choice > * {
-                display: inline-block;
-            }
-
-            &.single-choice .value {
-                @extend %default-border-radius;
-                background-color: $light-gray;
-                padding: 0.1em;
-            }
-
-            .value {
-                padding-left: 1em;
-
-                &.empty {
-                    @extend .text-superfluous;
-                }
-            }
-        }
+    label {
+      display: block;
     }
+
+    .author-list {
+      font-size: 0.95em;
+      list-style-type: none;
+      margin: 0.2em 0 0 1em;
+      padding: 0;
+      display: inline-block;
+
+      li {
+        background-color: $light-gray;
+        display: inline-flex;
+        align-items: center;
+      }
+    }
+  }
+
+  .custom-field-values {
+    margin: 0;
+
+    .field-value {
+      &:not(:first-child) {
+        margin-top: 0.5em;
+      }
+
+      > * {
+        display: block;
+      }
+
+      &.single-choice > * {
+        display: inline-block;
+      }
+
+      &.single-choice .value {
+        @extend %default-border-radius;
+        background-color: $light-gray;
+        padding: 0.1em;
+      }
+
+      .value {
+        padding-left: 1em;
+
+        &.empty {
+          @extend .text-superfluous;
+        }
+      }
+    }
+  }
 }
-
 
 .review-comment-edited {
-    cursor: default;
-    color: $gray;
+  cursor: default;
+  color: $gray;
 
-    &:hover {
-        color: $dark-gray;
-    }
+  &:hover {
+    color: $dark-gray;
+  }
 }
-
 
 .review-timeline-input {
-    .empty-input-title {
-        color: $blue;
-        font-weight: bold;
+  .empty-input-title {
+    color: $blue;
+    font-weight: bold;
+  }
+
+  .empty-input-description {
+    color: $dark-gray;
+  }
+
+  .comment-or-review {
+    align-self: center;
+    color: $gray;
+    font-size: 1.1em;
+    font-weight: bold;
+    padding-left: 1em;
+    padding-right: 1em;
+  }
+
+  .review-trigger {
+    white-space: nowrap;
+    align-items: center;
+
+    .judgment-btn,
+    .judgment-btn.active {
+      align-self: center;
+      display: flex;
+      background-color: #2185d0;
+      color: white;
     }
 
-    .empty-input-description {
-        color: $dark-gray;
+    .i-button {
+      height: 2.1rem;
+      display: flex;
+
+      &::after {
+        vertical-align: bottom;
+      }
     }
-
-    .comment-or-review {
-        align-self: center;
-        color: $gray;
-        font-size: 1.1em;
-        font-weight: bold;
-        padding-left: 1em;
-        padding-right: 1em;
-    }
-
-    .review-trigger {
-        white-space: nowrap;
-        align-items: center;
-
-        .judgment-btn, .judgment-btn.active {
-            align-self: center;
-            display: flex;
-            background-color: #2185d0;
-            color: white;
-        }
-
-        .i-button {
-            height: 2.1rem;
-            display: flex;
-
-            &::after {
-                vertical-align: bottom;
-            }
-        }
-    }
+  }
 }
-
 
 .review-timeline-input .new-comment {
+  margin-top: 0;
+
+  .form-field {
     margin-top: 0;
 
-    .form-field {
-        margin-top: 0;
+    textarea {
+      @include transition(height 0.2s);
+      height: 5em;
+    }
+  }
+
+  &.unfocused {
+    > .form-group {
+      .form-field {
+        @include transition(margin-bottom 0.2s);
+        margin-bottom: 0;
 
         textarea {
-            @include transition(height 0.2s);
-            height: 5em;
+          resize: none;
+          height: 2.6em;
         }
-    }
+      }
 
-    &.unfocused {
-        > .form-group {
-            .form-field {
-                @include transition(margin-bottom 0.2s);
-                margin-bottom: 0;
+      & ~ .form-group {
+        display: none;
 
-                textarea {
-                    resize: none;
-                    height: 2.6em;
-                }
-            }
-
-            & ~ .form-group {
-                display: none;
-
-                .form-field {
-                    margin-bottom: 0.7em;
-                }
-            }
+        .form-field {
+          margin-bottom: 0.7em;
         }
+      }
     }
+  }
 }
-
 
 .review-comment-visibility {
-    &.judges, &.internal {
-        color: $red;
-    }
+  &.judges,
+  &.internal {
+    color: $red;
+  }
 
-    &.conveners {
-        color: $yellow;
-    }
+  &.conveners {
+    color: $yellow;
+  }
 
-    &.reviewers {
-        color: $dark-gray;
-    }
+  &.reviewers {
+    color: $dark-gray;
+  }
 }
-
 
 .review-badges {
-    flex-grow: 1;
-    color: $gray;
+  flex-grow: 1;
+  color: $gray;
 }
-
 
 .review-comment-actions {
-    margin-left: 0.5em;
+  margin-left: 0.5em;
 }
-
 
 .review-summary-box {
-    .global-state-icon {
-        @extend %semantic-background;
-        align-self: flex-start;
-        margin-right: 10px;
-        border-radius: 50%;
-        width: 2em;
-        height: 2em;
+  .global-state-icon {
+    @extend %semantic-background;
+    align-self: flex-start;
+    margin-right: 10px;
+    border-radius: 50%;
+    width: 2em;
+    height: 2em;
+  }
+
+  .group-state-icon {
+    @extend %semantic-outline;
+    border: none !important;
+    margin-right: 10px;
+    // Align with header icon by adding its width and border
+    width: calc(2em + 2px);
+
+    > span {
+      display: flex;
+
+      &::before {
+        line-height: normal;
+      }
+    }
+  }
+
+  .global-review-summary {
+    margin-bottom: 10px;
+    color: $light-black;
+
+    .summary-title {
+      font-size: 1.3em;
+      font-weight: bold;
     }
 
-    .group-state-icon {
-        @extend %semantic-outline;
-        border: none !important;
-        margin-right: 10px;
-        // Align with header icon by adding its width and border
-        width: calc(2em + 2px);
+    .summary-description {
+      color: $light-black;
+    }
+  }
 
-        > span {
-            display: flex;
+  .group-review-summary {
+    @extend %i-box-cancel-horizontal-margin;
+    @extend %i-box-horizontal-padding;
+    @include border-top();
+    padding: 0;
 
-            &::before {
-                line-height: normal;
-            }
-        }
+    &__summary {
+      padding: 5px 10px;
+      min-height: 2em;
+      min-width: 0;
     }
 
-    .global-review-summary {
-        margin-bottom: 10px;
-        color: $light-black;
+    &__details {
+      background-color: $light-gray;
 
-        .summary-title {
-            font-size: 1.3em;
-            font-weight: bold;
-        }
+      .details-content-row {
+        color: $dark-gray;
+        padding: 5px 10px 5px calc(22px + 2em);
 
-        .summary-description {
-            color: $light-black;
+        &:not(:first-child) {
+          @include border-top($style: dashed);
         }
+      }
     }
 
-    .group-review-summary {
-        @extend %i-box-cancel-horizontal-margin;
-        @extend %i-box-horizontal-padding;
-        @include border-top();
-        padding: 0;
-
-        &__summary {
-            padding: 5px 10px;
-            min-height: 2em;
-            min-width: 0;
-        }
-
-        &__details {
-            background-color: $light-gray;
-
-            .details-content-row {
-                color: $dark-gray;
-                padding: 5px 10px 5px calc(22px + 2em);
-
-                &:not(:first-child) {
-                    @include border-top($style: dashed);
-                }
-            }
-        }
-
-        &__link {
-            font-size: small;
-            margin-right: 10px;
-            flex-shrink: 0;
-        }
-
-        &__track {
-            margin-right: 10px;
-        }
+    &__link {
+      font-size: small;
+      margin-right: 10px;
+      flex-shrink: 0;
     }
 
-    .i-box-footer {
-        margin-top: 0;
+    &__track {
+      margin-right: 10px;
     }
+  }
 
-    .details-content-inner {
-        box-shadow: inset 0 15px 20px -20px $gray;
+  .i-box-footer {
+    margin-top: 0;
+  }
 
-        .i-tag {
-            border-color: transparent;
-        }
+  .details-content-inner {
+    box-shadow: inset 0 15px 20px -20px $gray;
+
+    .i-tag {
+      border-color: transparent;
     }
+  }
 
-    .i-timeline-item-box {
-        padding-bottom: 0;
-    }
+  .i-timeline-item-box {
+    padding-bottom: 0;
+  }
 }
-
 
 .review-questions,
 .review-form {
-    .form-preface {
-        font-weight: bold;
-    }
+  .form-preface {
+    font-weight: bold;
+  }
 
-    .question-index {
-        font-weight: bold;
-        background: $pastel-gray;
-        color: $light-black;
-        padding: 0 6px;
-    }
+  .question-index {
+    font-weight: bold;
+    background: $pastel-gray;
+    color: $light-black;
+    padding: 0 6px;
+  }
 
-    .question-text {
-        color: $dark-gray;
-        font-style: italic;
-        padding: 0 1em;
-        word-wrap: break-word;
-        white-space: pre-line;
-    }
+  .question-text {
+    color: $dark-gray;
+    font-style: italic;
+    padding: 0 1em;
+    word-wrap: break-word;
+    white-space: pre-line;
+  }
 
-    .question-required {
-        color: $red;
-    }
+  .question-required {
+    color: $red;
+  }
 
-    .review-instructions {
-        margin: 0 0 1em 0;
+  .review-instructions {
+    margin: 0 0 1em 0;
 
-        .message-box-content {
-            font-size: 0.85em;
-        }
+    .message-box-content {
+      font-size: 0.85em;
     }
+  }
 }
 
-
 .review-questions {
-    list-style-type: none;
-    padding-left: 0;
-    margin: 0;
+  list-style-type: none;
+  padding-left: 0;
+  margin: 0;
 
-    %rating-bullet-selected {
-        background-color: $blue;
+  %rating-bullet-selected {
+    background-color: $blue;
+  }
+
+  li,
+  .form-group {
+    .form-field {
+      margin: 0;
     }
 
-    li,
-    .form-group {
-        .form-field {
-            margin: 0;
+    .rating-scale {
+      .score {
+        margin-left: 0.25em;
+        color: $light-black;
+        width: 1em;
+        text-align: right;
+      }
+
+      .bullet {
+        display: inline-block;
+        vertical-align: middle;
+        padding-right: 0.2em;
+
+        &::after {
+          background-color: $pastel-gray;
+          content: '';
+          display: block;
+          width: 0.8em;
+          height: 1.2em;
+          border-radius: 1em;
         }
 
-        .rating-scale {
-            .score {
-                margin-left: 0.25em;
-                color: $light-black;
-                width: 1em;
-                text-align: right;
-            }
-
-            .bullet {
-                display: inline-block;
-                vertical-align: middle;
-                padding-right: 0.2em;
-
-                &::after {
-                    background-color: $pastel-gray;
-                    content: '';
-                    display: block;
-                    width: 0.8em;
-                    height: 1.2em;
-                    border-radius: 1em;
-                }
-
-                &.full::after {
-                    @extend %rating-bullet-selected;
-                }
-            }
+        &.full::after {
+          @extend %rating-bullet-selected;
         }
+      }
+    }
+  }
+
+  li:not(:first-child),
+  .form-group:not(:first-child) .form-field {
+    margin-top: 1em;
+  }
+
+  .question-row:not(:first-child) {
+    margin-top: 1em;
+    align-items: center;
+  }
+
+  .form-group .rating-scale {
+    flex-direction: row-reverse;
+
+    input[type='radio'] {
+      display: none;
     }
 
-    li:not(:first-child),
-    .form-group:not(:first-child) .form-field {
-        margin-top: 1em;
+    input:checked ~ label.bullet::after {
+      @extend %rating-bullet-selected;
+      border: none;
     }
 
-    .question-row:not(:first-child) {
-        margin-top: 1em;
-        align-items: center;
+    &:not(:checked) > label.bullet:hover::after,
+    &:not(:checked) > label.bullet:hover ~ label.bullet::after {
+      background-image: linear-gradient(300deg, $blue, $blue 45%, $pastel-gray 55%);
+      background-repeat: no-repeat;
+      border: none;
     }
 
-    .form-group .rating-scale {
-        flex-direction: row-reverse;
-
-        input[type='radio'] {
-            display: none;
-        }
-
-        input:checked ~ label.bullet::after {
-            @extend %rating-bullet-selected;
-            border: none;
-        }
-
-        &:not(:checked) > label.bullet:hover::after,
-        &:not(:checked) > label.bullet:hover ~ label.bullet::after {
-            background-image: linear-gradient(300deg, $blue, $blue 45%, $pastel-gray 55%);
-            background-repeat: no-repeat;
-            border: none;
-        }
-
-        input:checked + label.bullet:hover::after,
-        input:checked ~ label.bullet:hover::after,
-        label.bullet:hover ~ input:checked ~ label.bullet::after,
-        input:checked ~ label.bullet:hover ~ label.bullet::after {
-            background-image: linear-gradient(300deg, $blue, $blue 45%, $pastel-blue 55%);
-            background-repeat: no-repeat;
-        }
-
-        .bullet {
-            cursor: pointer;
-
-            &::after {
-                @include border-all($color: $pastel-gray, $width: 2px);
-                background: transparent;
-            }
-        }
+    input:checked + label.bullet:hover::after,
+    input:checked ~ label.bullet:hover::after,
+    label.bullet:hover ~ input:checked ~ label.bullet::after,
+    input:checked ~ label.bullet:hover ~ label.bullet::after {
+      background-image: linear-gradient(300deg, $blue, $blue 45%, $pastel-blue 55%);
+      background-repeat: no-repeat;
     }
+
+    .bullet {
+      cursor: pointer;
+
+      &::after {
+        @include border-all($color: $pastel-gray, $width: 2px);
+        background: transparent;
+      }
+    }
+  }
 }
 
 .review-item-content {
-    @extend .i-box;
-    @extend .i-box.no-shadow;
-    margin-top: 1rem;
+  @extend .i-box;
+  @extend .i-box.no-shadow;
+  margin-top: 1rem;
 }
 
 .toggle-link {
-    user-select: none;
+  user-select: none;
 }

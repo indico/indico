@@ -6,174 +6,176 @@
 // LICENSE file for more details.
 
 %survey-results-text-box {
-    @extend %default-border-radius;
-    background: $light-gray;
-    color: $light-black;
-    margin: 1em 0;
-    padding: 1em;
+  @extend %default-border-radius;
+  background: $light-gray;
+  color: $light-black;
+  margin: 1em 0;
+  padding: 1em;
 }
 
 #survey-list {
-    .survey-actions {
-        text-align: right;
-    }
+  .survey-actions {
+    text-align: right;
+  }
 }
 
 #survey-questionnaire {
-    .form-group + .form-group, .form-group + fieldset, fieldset + fieldset {
-        margin-top: 1.5em;
-    }
+  .form-group + .form-group,
+  .form-group + fieldset,
+  fieldset + fieldset {
+    margin-top: 1.5em;
+  }
 
-    // "No selection" option
-    .radio-item-0:not(.inline-vcentered) input:not([required]) + label {
-        color: $gray;
-        font-style: italic;
-    }
+  // "No selection" option
+  .radio-item-0:not(.inline-vcentered) input:not([required]) + label {
+    color: $gray;
+    font-style: italic;
+  }
 }
 
 #survey-questionnaire-preview {
-    .i-box {
-        .standalone-section-title {
-            color: $dark-gray;
-            font-style: italic;
-            padding-right: 0.5rem;
-        }
-
-        .item-action-buttons {
-            visibility: hidden;
-        }
-
-        li.survey-item:hover {
-            .item-action-buttons,
-            .item-sortable-handle {
-                visibility: visible;
-            }
-        }
+  .i-box {
+    .standalone-section-title {
+      color: $dark-gray;
+      font-style: italic;
+      padding-right: 0.5rem;
     }
 
-    .i-box-content > ul {
-        @extend %i-box-cancel-margin;
+    .item-action-buttons {
+      visibility: hidden;
+    }
 
-        & > li.survey-item {
-            background-color: white;
+    li.survey-item:hover {
+      .item-action-buttons,
+      .item-sortable-handle {
+        visibility: visible;
+      }
+    }
+  }
 
-            .item-row {
-                margin-top: 10px;
-                margin-bottom: 10px;
+  .i-box-content > ul {
+    @extend %i-box-cancel-margin;
 
-                > .i-form {
-                    flex-grow: 1;
-                    margin-top: 0;
-                }
+    & > li.survey-item {
+      background-color: white;
 
-                > .item-action-buttons {
-                    flex-grow: 0;
-                    flex-shrink: 0;
-                    margin-right: $i-box-padding;
-                }
-            }
+      .item-row {
+        margin-top: 10px;
+        margin-bottom: 10px;
+
+        > .i-form {
+          flex-grow: 1;
+          margin-top: 0;
         }
-    }
 
-    .empty-msg {
-        display: none;
+        > .item-action-buttons {
+          flex-grow: 0;
+          flex-shrink: 0;
+          margin-right: $i-box-padding;
+        }
+      }
     }
+  }
 
-    .empty > .empty-msg {
-        display: block;
-    }
+  .empty-msg {
+    display: none;
+  }
+
+  .empty > .empty-msg {
+    display: block;
+  }
 }
 
 #survey-results {
-    h4 {
-        font-size: 1.5em;
-        margin-bottom: 0.5em;
+  h4 {
+    font-size: 1.5em;
+    margin-bottom: 0.5em;
+  }
+
+  .chart-answer {
+    display: inline-block;
+    vertical-align: top;
+    width: 49%;
+    position: relative;
+
+    .axis-x-label {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      text-align: center;
+      color: $gray;
     }
 
-    .chart-answer {
-        display: inline-block;
-        vertical-align: top;
-        width: 49%;
-        position: relative;
+    .axis-y-label {
+      position: absolute;
+      bottom: 50%;
+      left: 0;
+      text-align: center;
+      transform: rotate(-90deg);
+      color: $gray;
+    }
+  }
 
-        .axis-x-label {
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            text-align: center;
-            color: $gray;
-        }
+  .number-answer {
+    text-align: center;
+  }
 
-        .axis-y-label {
-            position: absolute;
-            bottom: 50%;
-            left: 0;
-            text-align: center;
-            transform: rotate(-90deg);
-            color: $gray;
-        }
+  .text-answer {
+    @extend %survey-results-text-box;
+    font-style: italic;
+
+    &:last-of-type {
+      margin-bottom: 0;
+    }
+  }
+
+  .chart-option-details {
+    @extend %survey-results-text-box;
+
+    &:first-child {
+      margin-top: 0;
     }
 
-    .number-answer {
-        text-align: center;
+    &:last-child {
+      margin-bottom: 0;
     }
+  }
 
-    .text-answer {
-        @extend %survey-results-text-box;
-        font-style: italic;
-
-        &:last-of-type {
-            margin-bottom: 0;
-        }
+  .survey-pie-chart,
+  .survey-bar-chart {
+    .ct-label {
+      font-weight: bold;
     }
+  }
 
-    .chart-option-details {
-        @extend %survey-results-text-box;
-
-        &:first-child {
-            margin-top: 0;
-        }
-
-        &:last-child {
-            margin-bottom: 0;
-        }
-    }
-
-    .survey-pie-chart,
-    .survey-bar-chart {
-        .ct-label {
-            font-weight: bold;
-        }
-    }
-
-    .survey-summary {
-        margin-bottom: 1em;
-        color: $gray;
-        font-style: italic;
-    }
+  .survey-summary {
+    margin-bottom: 1em;
+    color: $gray;
+    font-style: italic;
+  }
 }
 
 #survey-submission {
-    .answer-data {
-        list-style-type: none;
-        padding: 0;
-        margin: 0;
-    }
+  .answer-data {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+  }
 
-    .i-box {
-        margin-bottom: 1em;
-    }
+  .i-box {
+    margin-bottom: 1em;
+  }
 }
 
 .survey-active {
-    color: $blue !important;
+  color: $blue !important;
 }
 
 .survey-finished {
-    color: $green !important;
+  color: $green !important;
 }
 
 .survey-limit-reached {
-    color: $purple !important;
+  color: $purple !important;
 }

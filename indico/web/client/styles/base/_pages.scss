@@ -6,235 +6,236 @@
 // LICENSE file for more details.
 
 %indico-page {
-    header {
-        $separator-margin: 0.42rem;
-        position: relative;
-        margin-bottom: 1.8em;
+  header {
+    $separator-margin: 0.42rem;
+    position: relative;
+    margin-bottom: 1.8em;
 
-        h2, h3 {
-            display: inline-block;
-            margin-top: 0;
-            margin-bottom: 0;
-        }
-
-        h2 {
-            margin-right: 0.5rem;
-        }
-
-        h3 {
-            color: $light-black;
-            margin-top: $separator-margin;
-        }
-
-        .back-button {
-            position: absolute;
-            top: 11px;
-            left: -20px;
-            font-size: 15px;
-            color: $pastel-gray;
-
-            &:hover {
-                color: $dark-gray;
-            }
-        }
-
-        .title {
-            display: flex;
-            align-items: flex-start;
-            padding-top: 0.4rem;
-            min-height: 2rem;
-            border-bottom: 1px solid $separator-color;
-            margin-bottom: 1rem;
-
-            > .text {
-                flex-grow: 1;
-
-                > .title-with-actions {
-                    h2, h3 {
-                        display: inline;
-                        margin-right: 0;
-                    }
-
-                    .actions {
-                        display: inline-block;
-                        vertical-align: bottom;
-                    }
-                }
-            }
-
-            > .actions {
-                flex-grow: 0;
-                flex-shrink: 0;
-                white-space: nowrap;
-            }
-        }
-
-        .page-description {
-            @extend %font-family-title-light;
-            @extend .fixed-width;
-            color: $dark-gray;
-            font-size: 1.2em;
-            margin-top: $separator-margin;
-        }
-
-        .page-info {
-            @extend %font-family-title;
-            color: $dark-gray;
-            margin-top: $separator-margin;
-        }
-    }
-}
-
-%indico-page-standalone {
-    @extend %indico-page;
-
-    header {
-        margin-top: 1em;
-    }
-}
-
-.banner {
-    @extend .flexrow;
-
-    $banner-color: #000;
-    $banner-title-color: $dark-orange;
-    $banner-subtitle-color: $dark-gray;
-
-    color: $banner-color;
-    max-width: 800px;
-    margin-top: 10px;
-
-    &.full-width {
-        max-width: none;
-        margin-bottom: -10%;
-
-        .title {
-            flex-grow: 1;
-        }
+    h2,
+    h3 {
+      display: inline-block;
+      margin-top: 0;
+      margin-bottom: 0;
     }
 
-    .toolbar {
-        padding: 0;
+    h2 {
+      margin-right: 0.5rem;
+    }
+
+    h3 {
+      color: $light-black;
+      margin-top: $separator-margin;
+    }
+
+    .back-button {
+      position: absolute;
+      top: 11px;
+      left: -20px;
+      font-size: 15px;
+      color: $pastel-gray;
+
+      &:hover {
+        color: $dark-gray;
+      }
     }
 
     .title {
-        margin-bottom: 19px;
-        font-family: 'Roboto Light', sans-serif;
-        font-size: 2em;
-        color: $banner-title-color;
+      display: flex;
+      align-items: flex-start;
+      padding-top: 0.4rem;
+      min-height: 2rem;
+      border-bottom: 1px solid $separator-color;
+      margin-bottom: 1rem;
 
-        a:not(:hover) {
-            color: inherit;
+      > .text {
+        flex-grow: 1;
+
+        > .title-with-actions {
+          h2,
+          h3 {
+            display: inline;
+            margin-right: 0;
+          }
+
+          .actions {
+            display: inline-block;
+            vertical-align: bottom;
+          }
         }
+      }
 
-        .subtitle {
-            color: $banner-subtitle-color;
-            font-size: 0.5em;
-
-            a {
-                border-bottom: 1px dashed;
-            }
-        }
-
-        .date {
-            color: $banner-color;
-            font-size: 0.75em;
-            font-style: italic;
-
-        }
+      > .actions {
+        flex-grow: 0;
+        flex-shrink: 0;
+        white-space: nowrap;
+      }
     }
+
+    .page-description {
+      @extend %font-family-title-light;
+      @extend .fixed-width;
+      color: $dark-gray;
+      font-size: 1.2em;
+      margin-top: $separator-margin;
+    }
+
+    .page-info {
+      @extend %font-family-title;
+      color: $dark-gray;
+      margin-top: $separator-margin;
+    }
+  }
+}
+
+%indico-page-standalone {
+  @extend %indico-page;
+
+  header {
+    margin-top: 1em;
+  }
+}
+
+.banner {
+  @extend .flexrow;
+
+  $banner-color: #000;
+  $banner-title-color: $dark-orange;
+  $banner-subtitle-color: $dark-gray;
+
+  color: $banner-color;
+  max-width: 800px;
+  margin-top: 10px;
+
+  &.full-width {
+    max-width: none;
+    margin-bottom: -10%;
+
+    .title {
+      flex-grow: 1;
+    }
+  }
+
+  .toolbar {
+    padding: 0;
+  }
+
+  .title {
+    margin-bottom: 19px;
+    font-family: 'Roboto Light', sans-serif;
+    font-size: 2em;
+    color: $banner-title-color;
+
+    a:not(:hover) {
+      color: inherit;
+    }
+
+    .subtitle {
+      color: $banner-subtitle-color;
+      font-size: 0.5em;
+
+      a {
+        border-bottom: 1px dashed;
+      }
+    }
+
+    .date {
+      color: $banner-color;
+      font-size: 0.75em;
+      font-style: italic;
+    }
+  }
 }
 
 .dialog-page {
-    @extend %indico-page;
+  @extend %indico-page;
 
-    max-width: 800px;
+  max-width: 800px;
 }
 
 .management-page {
-    @extend %indico-page;
+  @extend %indico-page;
 
-    div.page-content {
-        @extend .fixed-width;
-    }
+  div.page-content {
+    @extend .fixed-width;
+  }
 
-    &.wide {
-        .page-content {
-            max-width: 1000px !important;
-        }
+  &.wide {
+    .page-content {
+      max-width: 1000px !important;
     }
+  }
 }
 
 .fixed-width-standalone-page {
-    @extend %indico-page-standalone;
+  @extend %indico-page-standalone;
 
-    margin-left: auto;
-    margin-right: auto;
-    width: 1000px;
+  margin-left: auto;
+  margin-right: auto;
+  width: 1000px;
 
-    .page-content {
-        max-width: 1000px;
-    }
+  .page-content {
+    max-width: 1000px;
+  }
 }
 
 .fixed-width-standalone-text-page {
-    // standalone page that looks good if there's just a big bunch of text
-    // which would look ugly with 1000px width and the default font size
-    // which is rather small
-    @extend .fixed-width-standalone-page;
+  // standalone page that looks good if there's just a big bunch of text
+  // which would look ugly with 1000px width and the default font size
+  // which is rather small
+  @extend .fixed-width-standalone-page;
 
-    width: 800px;
+  width: 800px;
 
-    .page-content {
-        max-width: 800px;
-        font-size: 1.2em;
+  .page-content {
+    max-width: 800px;
+    font-size: 1.2em;
 
-        p:first-child {
-            margin-top: 0;
-        }
-
-        p:last-child {
-            margin-bottom: 0;
-        }
+    p:first-child {
+      margin-top: 0;
     }
+
+    p:last-child {
+      margin-bottom: 0;
+    }
+  }
 }
 
 .conference-page {
-    @extend %indico-page;
+  @extend %indico-page;
 
-    header h2 {
-        color: $dark-orange;
-        padding-right: 5px;
+  header h2 {
+    color: $dark-orange;
+    padding-right: 5px;
 
-        .track-name {
-            font-style: italic;
-        }
+    .track-name {
+      font-style: italic;
     }
+  }
 }
 
 .meeting-header {
-    max-width: 800px;
-    margin: 2em auto 0 auto;
+  max-width: 800px;
+  margin: 2em auto 0 auto;
 
-    h1 {
-        color: $dark-blue;
-    }
+  h1 {
+    color: $dark-blue;
+  }
 }
 
 .meeting-page {
-    @extend %indico-page;
-    max-width: 800px;
-    margin: 2em auto 0 auto;
+  @extend %indico-page;
+  max-width: 800px;
+  margin: 2em auto 0 auto;
 }
 
 .event-wrapper {
-    width: 1000px;
-    margin: 30px auto;
-    margin-top: 18px;
+  width: 1000px;
+  margin: 30px auto;
+  margin-top: 18px;
 }
 
 .conference-title-link {
-   font-size: 33px;
-   background: transparent;
-   color: white;
+  font-size: 33px;
+  background: transparent;
+  color: white;
 }

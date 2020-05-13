@@ -6,30 +6,30 @@
 // LICENSE file for more details.
 
 .i-spinner {
-    position: relative;
-    height: 1em;
-    width: 1em;
+  position: relative;
+  height: 1em;
+  width: 1em;
 
-    &:before,
-    &:after {
-        border-radius: 50%;
-        @include border-all($width: 0.1em);
-        box-sizing: border-box;
-        content: '';
-        position: absolute;
-        width: 100%;
-        height: 100%;
-    }
+  &::before,
+  &::after {
+    border-radius: 50%;
+    @include border-all($width: 0.1em);
+    box-sizing: border-box;
+    content: '';
+    position: absolute;
+    width: 100%;
+    height: 100%;
+  }
 
-    &:before {
-        border-color: $dark-gray;
-    }
+  &::before {
+    border-color: $dark-gray;
+  }
 
-    &:after {
-        -webkit-animation: button-spin 0.5s linear;
-        animation: button-spin 0.5s linear;
-        -webkit-animation-iteration-count: infinite;
-        animation-iteration-count: infinite;
-        border-color: $indico-blue transparent transparent;
-    }
+  &::after {
+    -webkit-animation: button-spin 0.5s linear;
+    animation: button-spin 0.5s linear;
+    -webkit-animation-iteration-count: infinite;
+    animation-iteration-count: infinite;
+    border-color: $indico-blue transparent transparent;
+  }
 }

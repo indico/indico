@@ -8,24 +8,24 @@
 @import 'base/palette';
 
 .editable-list {
-    margin-top: 2rem;
-    font-size: 1rem;
+  margin-top: 2rem;
+  font-size: 1rem;
 }
 
 .type-switch {
-    margin-right: 0.5rem;
+  margin-right: 0.5rem;
 }
 
 .switch-toolbar {
-    align-items: center;
+  align-items: center;
 }
 
 .disabled {
-    font-style: italic;
-    color: $gray;
+  font-style: italic;
+  color: $gray;
 }
 
 .header {
-    display: flex;
-    justify-content: space-between;
+  display: flex;
+  justify-content: space-between;
 }

@@ -6,25 +6,25 @@
 // LICENSE file for more details.
 
 .i-tag {
-    @extend %semantic-background;
-    @extend %default-border-radius;
-    padding: 0.3em 0.6em;
-    font-weight: bold;
-    box-sizing: initial;
+  @extend %semantic-background;
+  @extend %default-border-radius;
+  padding: 0.3em 0.6em;
+  font-weight: bold;
+  box-sizing: initial;
 
-    &.outline {
-        @extend %semantic-outline;
-        background: transparent;
+  &.outline {
+    @extend %semantic-outline;
+    background: transparent;
 
-        @include _semantic_versions {
-            background: transparent;
-        }
-
-        &.dashed {
-            border-style: dashed;
-        }
-        &.contrast {
-            background: white;
-        }
+    @include _semantic_versions {
+      background: transparent;
     }
+
+    &.dashed {
+      border-style: dashed;
+    }
+    &.contrast {
+      background: white;
+    }
+  }
 }

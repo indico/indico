@@ -5,7 +5,6 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-
 // -----------------------------------------------------------------------------
 // Custom mixins default variables
 // -----------------------------------------------------------------------------
@@ -29,27 +28,30 @@ $default-box-shadow-blur: 1px;
 $default-box-shadow-spread: null;
 $default-box-shadow-color: lighten($gray, $color-variation);
 
-
 // -----------------------------------------------------------------------------
 // Custom mixins
 // -----------------------------------------------------------------------------
 
 @mixin gradient($start-color, $end-color) {
-    background: $start-color;
-    background-image: linear-gradient(to bottom, $start-color, $end-color);
+  background: $start-color;
+  background-image: linear-gradient(to bottom, $start-color, $end-color);
 }
 
 @mixin placeholder-color($color: inherit) {
-    &::-webkit-input-placeholder {  // Chrome/Opera/Safari
-      color: $color;
-    }
-    &::-moz-placeholder {  // Firefox 19+
-      color: $color;
-    }
-    &:-ms-input-placeholder {  // IE 10+
-      color: $color;
-    }
-    &:-moz-placeholder {  // Firefox 18-
-      color: $color;
-    }
+  &::-webkit-input-placeholder {
+    // Chrome/Opera/Safari
+    color: $color;
+  }
+  &::-moz-placeholder {
+    // Firefox 19+
+    color: $color;
+  }
+  &:-ms-input-placeholder {
+    // IE 10+
+    color: $color;
+  }
+  &:-moz-placeholder {
+    // Firefox 18-
+    color: $color;
+  }
 }

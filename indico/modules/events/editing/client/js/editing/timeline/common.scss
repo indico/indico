@@ -8,22 +8,23 @@
 @import 'base/palette';
 
 @mixin editing-state($state, $color) {
-    &:global(.#{$state}) {
-        background-color: $color;
+  &:global(.#{$state}) {
+    background-color: $color;
 
-        &:global(.active), &:global(.active:hover) {
-            background-color: darken($color, 10%);
-        }
-
-        &:hover {
-            background-color: lighten($color, 10%);
-        }
+    &:global(.active),
+    &:global(.active:hover) {
+      background-color: darken($color, 10%);
     }
+
+    &:hover {
+      background-color: lighten($color, 10%);
+    }
+  }
 }
 
 %editing-states-bg {
-    @include editing-state('accepted', $pastel-green);
-    @include editing-state('rejected', $pastel-red);
-    @include editing-state('needs-submitter-confirmation', $yellow);
-    @include editing-state('needs-submitter-changes', $orange);
+  @include editing-state('accepted', $pastel-green);
+  @include editing-state('rejected', $pastel-red);
+  @include editing-state('needs-submitter-confirmation', $yellow);
+  @include editing-state('needs-submitter-changes', $orange);
 }

@@ -6,190 +6,189 @@
 // LICENSE file for more details.
 
 #event-note-section {
-    @include border-bottom($gray);
-    background: white;
-    padding: 10px 50px;
+  @include border-bottom($gray);
+  background: white;
+  padding: 10px 50px;
 }
 
 .timetable-title {
-    @extend %font-family-title;
-    color: $black;
+  @extend %font-family-title;
+  color: $black;
 
-    &.top-level {
-        font-size: 1.2em;
-    }
+  &.top-level {
+    font-size: 1.2em;
+  }
 }
 
-.i-selection.note-visibility-toggle input[type=checkbox] {
-    & + label {
-        border-style: dashed !important;
-    }
+.i-selection.note-visibility-toggle input[type='checkbox'] {
+  & + label {
+    border-style: dashed !important;
+  }
 
-    &:not(:checked) + label,
-    &:not(:checked) + label:hover {
-        background: transparent;
-    }
+  &:not(:checked) + label,
+  &:not(:checked) + label:hover {
+    background: transparent;
+  }
 
-    &:checked + label {
-        background: $postit-yellow !important;
-        color: $light-black !important;
-    }
+  &:checked + label {
+    background: $postit-yellow !important;
+    color: $light-black !important;
+  }
 
-    &:checked + label:hover {
-        color: $black !important;
-    }
+  &:checked + label:hover {
+    color: $black !important;
+  }
 }
-
 
 li > table + .note-area-wrapper {
-    margin-top: 0.9em;
+  margin-top: 0.9em;
 }
-
 
 .padded-box-content {
-    .note-actions {
-        float: right;
+  .note-actions {
+    float: right;
 
-        a {
-            @include transition;
-            @include transition(opacity);
-            color: darken($pastel-blue, $color-variation);
+    a {
+      @include transition;
+      @include transition(opacity);
+      color: darken($pastel-blue, $color-variation);
 
-            &:hover {
-                color: $blue;
-            }
-        }
+      &:hover {
+        color: $blue;
+      }
+    }
+  }
+
+  .note-text {
+    h2,
+    h1 {
+      color: $black;
     }
 
-    .note-text {
-        h2, h1 {
-            color: $black;
-        }
-
-        > :first-child {
-            margin-top: 0;
-        }
-
-        > :last-child {
-            margin-bottom: 0;
-        }
+    > :first-child {
+      margin-top: 0;
     }
 
-    .no-note-text {
-        color: $dark-gray;
-        font-style: italic;
-        font-size: 1.1em;
+    > :last-child {
+      margin-bottom: 0;
     }
+  }
 
-    .note-metadata {
-        float: right;
-        clear: both;
-        opacity: 0.6;
-        margin-top: 0.5em;
-        font-size: 0.9em;
+  .no-note-text {
+    color: $dark-gray;
+    font-style: italic;
+    font-size: 1.1em;
+  }
 
-        .modification-date {
-            color: $dark-gray;
-        }
+  .note-metadata {
+    float: right;
+    clear: both;
+    opacity: 0.6;
+    margin-top: 0.5em;
+    font-size: 0.9em;
+
+    .modification-date {
+      color: $dark-gray;
     }
+  }
 }
 .participant-list-wrapper {
-    position: relative;
+  position: relative;
 
-    &.collapsible {
-        &.transparent-overlay {
-            cursor: pointer;
-        }
-
-        &.collapsed {
-            max-height: 4.75em;
-            overflow: hidden;
-        }
-
-        &:hover {
-            & > .trigger {
-                color: $light-black;
-            }
-        }
-
-        & > .trigger {
-            display: inline-block;
-            position: absolute;
-            cursor: pointer;
-            right: 0.6em;
-            top: 0;
-            color: $dark-gray;
-            user-select: none;
-        }
-
-        & > ul.participant-list {
-            width: 95%; // To avoid overlap with expansion arrow
-        }
+  &.collapsible {
+    &.transparent-overlay {
+      cursor: pointer;
     }
 
-    .trigger {
-        display: none;
+    &.collapsed {
+      max-height: 4.75em;
+      overflow: hidden;
     }
 
-    ul.participant-list {
-        @extend %font-family-title;
-
-        padding: 0;
-        margin: 0;
-        list-style-type: none;
+    &:hover {
+      & > .trigger {
+        color: $light-black;
+      }
     }
+
+    & > .trigger {
+      display: inline-block;
+      position: absolute;
+      cursor: pointer;
+      right: 0.6em;
+      top: 0;
+      color: $dark-gray;
+      user-select: none;
+    }
+
+    & > ul.participant-list {
+      width: 95%; // To avoid overlap with expansion arrow
+    }
+  }
+
+  .trigger {
+    display: none;
+  }
+
+  ul.participant-list {
+    @extend %font-family-title;
+
+    padding: 0;
+    margin: 0;
+    list-style-type: none;
+  }
 }
 
 .event-user {
-    &.checked-in {
-        @include border-all($pastel-green);
-        background: lighten($pastel-green, 30%);
-        color: darken($pastel-green, 20%);
+  &.checked-in {
+    @include border-all($pastel-green);
+    background: lighten($pastel-green, 30%);
+    color: darken($pastel-green, 20%);
 
-        &:before {
-            color: $pastel-green;
-        }
+    &::before {
+      color: $pastel-green;
     }
+  }
 
-    &.no-label {
-        background: none;
-        border: none;
-        color: $dark-gray;
-        padding: 0;
+  &.no-label {
+    background: none;
+    border: none;
+    color: $dark-gray;
+    padding: 0;
 
-        &:before {
-            color: $gray;
-        }
+    &::before {
+      color: $gray;
     }
+  }
 }
 
 .reference-list {
-    list-style-type: none;
-    margin: 0;
-    padding: 0;
-    display: block;
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+  display: block;
 
-    li {
-        &:before {
-            color: $yellow;
-        }
-
-        display: inline-block;
-        margin: 0.2em 0.2em;
-        border-radius: 2px;
-        padding: 0.2em 0.5em;
-        background-color: lighten($light-yellow, 5%);
-
-        &:first-child {
-            margin-left: 0;
-        }
-
-        .type-name {
-            color: $light-black;
-        }
+  li {
+    &::before {
+      color: $yellow;
     }
+
+    display: inline-block;
+    margin: 0.2em 0.2em;
+    border-radius: 2px;
+    padding: 0.2em 0.5em;
+    background-color: lighten($light-yellow, 5%);
+
+    &:first-child {
+      margin-left: 0;
+    }
+
+    .type-name {
+      color: $light-black;
+    }
+  }
 }
 
 .session-block-form {
-    width: 840px !important;
+  width: 840px !important;
 }

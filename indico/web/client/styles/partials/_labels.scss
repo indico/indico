@@ -10,199 +10,204 @@ $i-label-vertical-padding: 4px;
 $i-label-color: $light-black;
 
 %label {
-    @extend %default-border-radius;
-    @include border-all($gray);
-    user-select: none;
-    box-sizing: border-box;
-    display: inline-flex;
-    color: $i-label-color;
-    outline: none;
-    justify-content: center;
-    align-items: center;
-    line-height: 1em;
-    padding: $i-label-vertical-padding $i-label-horizontal-padding;
+  @extend %default-border-radius;
+  @include border-all($gray);
+  user-select: none;
+  box-sizing: border-box;
+  display: inline-flex;
+  color: $i-label-color;
+  outline: none;
+  justify-content: center;
+  align-items: center;
+  line-height: 1em;
+  padding: $i-label-vertical-padding $i-label-horizontal-padding;
 }
 
 @mixin _i-label-borderless($color) {
-    &.borderless {
-        box-shadow: none !important;
-        background: none !important;
-        border-color: transparent !important;
-        color: $color;
-    }
+  &.borderless {
+    box-shadow: none !important;
+    background: none !important;
+    border-color: transparent !important;
+    color: $color;
+  }
 }
 
 @mixin _i-label-outlines($color) {
-    &.text-color {
-        &:not(.color-on-hover) {
-            color: $color;
-        }
-
-        &.color-on-hover:hover {
-            color: $color;
-        }
-
-        &.outline {
-            border-color: $color;
-            background: white;
-        }
-
-        &.dashed {
-            border-style: dashed;
-            background: white;
-        }
-
-        &.subtle:not(:hover) {
-            box-shadow: none;
-            background: transparent;
-            border-color: transparent;
-        }
+  &.text-color {
+    &:not(.color-on-hover) {
+      color: $color;
     }
+
+    &.color-on-hover:hover {
+      color: $color;
+    }
+
+    &.outline {
+      border-color: $color;
+      background: white;
+    }
+
+    &.dashed {
+      border-style: dashed;
+      background: white;
+    }
+
+    &.subtle:not(:hover) {
+      box-shadow: none;
+      background: transparent;
+      border-color: transparent;
+    }
+  }
 }
 
-@mixin _i-label-states($flavor-color, $border-color, $border-accent-color, $font-color,
-    $font-accent-color, $with-modes: true) {
-    $no-modes: '';
+@mixin _i-label-states(
+  $flavor-color,
+  $border-color,
+  $border-accent-color,
+  $font-color,
+  $font-accent-color,
+  $with-modes: true
+) {
+  $no-modes: '';
 
-    @if $with-modes == true {
-        $no-modes: ':not(.borderless):not(.text-color):not(.striped)';
-    }
+  @if $with-modes == true {
+    $no-modes: ':not(.borderless):not(.text-color):not(.striped)';
+  }
 
-    &:not(.label)#{$no-modes} {
-        background: $flavor-color;
-        border-color: $border-color;
-        color: $font-color;
-    }
+  &:not(.label)#{$no-modes} {
+    background: $flavor-color;
+    border-color: $border-color;
+    color: $font-color;
+  }
 }
 
 @mixin i-label-flavor($flavor-color, $border-color) {
-    @include _i-label-states($flavor-color, $border-color, $border-color, $light-gray, white);
-    @include _i-label-borderless($flavor-color);
-    @include _i-label-outlines($flavor-color);
+  @include _i-label-states($flavor-color, $border-color, $border-color, $light-gray, white);
+  @include _i-label-borderless($flavor-color);
+  @include _i-label-outlines($flavor-color);
 }
 
 .i-label {
-    @extend %label;
-    @include _i-label-borderless($light-black);
-    @include _i-label-outlines($light-black);
-    background: white;
-    margin: 0 5px;
+  @extend %label;
+  @include _i-label-borderless($light-black);
+  @include _i-label-outlines($light-black);
+  background: white;
+  margin: 0 5px;
+
+  &.striped {
+    background-color: lighten($pastel-gray, $light-color-variation);
+    background: repeating-linear-gradient(
+      -40deg,
+      lighten($pastel-gray, 0.5 * $color-variation),
+      lighten($pastel-gray, 0.5 * $color-variation) 10px,
+      lighten($pastel-gray, 0.7 * $color-variation) 10px,
+      lighten($pastel-gray, 0.7 * $color-variation) 20px
+    );
+  }
+
+  &.small {
+    padding: 3px 5px;
+  }
+
+  // same as in _buttons.scss
+  &.accept {
+    @include i-label-flavor($green, $dark-green);
+  }
+
+  &.color-teal {
+    @include i-label-flavor($teal, $dark-teal);
+  }
+
+  &.danger,
+  &.color-red {
+    @include i-label-flavor($red, $dark-red);
+  }
+
+  &.highlight {
+    @include i-label-flavor($blue, $dark-blue);
 
     &.striped {
-        background-color: lighten($pastel-gray, $light-color-variation);
-        background: repeating-linear-gradient(
-            -40deg,
-            lighten($pastel-gray, 0.5*$color-variation),
-            lighten($pastel-gray, 0.5*$color-variation) 10px,
-            lighten($pastel-gray, 0.7*$color-variation) 10px,
-            lighten($pastel-gray, 0.7*$color-variation) 20px
-        );
+      color: white;
+      background-color: lighten($blue, $light-color-variation);
+      background: repeating-linear-gradient(
+        -40deg,
+        $blue,
+        $blue 10px,
+        lighten($blue, 0.3 * $color-variation) 10px,
+        lighten($blue, 0.3 * $color-variation) 20px
+      );
+    }
+  }
+
+  &.warning {
+    @include i-label-flavor($yellow, $dark-yellow);
+  }
+
+  &.disabled {
+    @include border-all(darken($pastel-gray, $light-color-variation));
+    background: $pastel-gray;
+    color: $light-black;
+
+    &.striped {
+      background-color: lighten($pastel-gray, $light-color-variation);
+      background: repeating-linear-gradient(
+        -40deg,
+        $pastel-gray,
+        $pastel-gray 10px,
+        darken($pastel-gray, 0.3 * $color-variation) 10px,
+        darken($pastel-gray, 0.3 * $color-variation) 20px
+      );
+    }
+  }
+
+  &[class*='icon-'] {
+    &::before {
+      font-size: 1.2em;
     }
 
-    &.small {
-        padding: 3px 5px;
+    &:not(:empty)::before {
+      margin-right: 0.5em;
+    }
+  }
+
+  /* Handle on the left of the i-box indicating it can be moved. */
+  > .handle:first-child {
+    @include icon-before('icon-handle');
+    margin-left: -$i-label-horizontal-padding;
+    margin-right: $i-label-horizontal-padding/2;
+  }
+}
+
+.label-group {
+  display: inline-block;
+
+  .i-label {
+    border-radius: none;
+    margin: 0;
+    float: left;
+    border-right-width: 0;
+
+    &:first-child {
+      border-bottom-left-radius: $default-border-radius;
+      border-top-left-radius: $default-border-radius;
     }
 
-    // same as in _buttons.scss
-    &.accept {
-        @include i-label-flavor($green, $dark-green);
-    }
-
-    &.color-teal {
-        @include i-label-flavor($teal, $dark-teal);
-    }
-
-    &.danger, &.color-red {
-        @include i-label-flavor($red, $dark-red);
+    &:last-child {
+      border-bottom-right-radius: $default-border-radius;
+      border-top-right-radius: $default-border-radius;
+      border-right-width: 1px;
     }
 
     &.highlight {
-        @include i-label-flavor($blue, $dark-blue);
+      border-right-width: 1px;
 
-        &.striped {
-            color: white;
-            background-color: lighten($blue, $light-color-variation);
-            background: repeating-linear-gradient(
-                -40deg,
-                $blue,
-                $blue 10px,
-                lighten($blue, 0.3*$color-variation) 10px,
-                lighten($blue, 0.3*$color-variation) 20px
-            );
-        }
+      + .i-label {
+        border-left: none;
+      }
+
+      > a::before {
+        color: white;
+      }
     }
-
-    &.warning {
-        @include i-label-flavor($yellow, $dark-yellow);
-    }
-
-    &.disabled {
-        @include border-all(darken($pastel-gray, $light-color-variation));
-        background: $pastel-gray;
-        color: $light-black;
-
-        &.striped {
-            background-color: lighten($pastel-gray, $light-color-variation);
-            background: repeating-linear-gradient(
-                -40deg,
-                $pastel-gray,
-                $pastel-gray 10px,
-                darken($pastel-gray, 0.3*$color-variation) 10px,
-                darken($pastel-gray, 0.3*$color-variation) 20px
-            );
-        }
-    }
-
-    &[class*='icon-'] {
-        &::before {
-            font-size: 1.2em;
-        }
-
-        &:not(:empty)::before {
-            margin-right: 0.5em;
-        }
-    }
-
-    /* Handle on the left of the i-box indicating it can be moved. */
-    > .handle:first-child {
-        @include icon-before('icon-handle');
-        margin-left: -$i-label-horizontal-padding;
-        margin-right: $i-label-horizontal-padding/2;
-    }
-}
-
-
-.label-group {
-    display: inline-block;
-
-    .i-label {
-        border-radius: none;
-        margin: 0;
-        float: left;
-        border-right-width: 0;
-
-        &:first-child {
-            border-bottom-left-radius: $default-border-radius;
-            border-top-left-radius: $default-border-radius;
-        }
-
-        &:last-child {
-            border-bottom-right-radius: $default-border-radius;
-            border-top-right-radius: $default-border-radius;
-            border-right-width: 1px;
-        }
-
-        &.highlight {
-            border-right-width: 1px;
-
-            + .i-label {
-                border-left: none;
-            }
-
-            > a::before {
-                color: white;
-            }
-        }
-    }
-
+  }
 }

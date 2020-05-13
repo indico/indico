@@ -19,582 +19,596 @@ $tt-additional-text-color: $light-black !default;
 $selected-color: $indico-blue !default;
 
 @mixin header-logo($image, $position: 15px, $padding-left: 150px, $scale: none) {
-    div.event-header {
-        background: $header-bg-color url($image) left top no-repeat;
-        background-position: $position;
-        background-size: $scale;
-        padding-left: $padding-left;
-    }
+  div.event-header {
+    background: $header-bg-color url($image) left top no-repeat;
+    background-position: $position;
+    background-size: $scale;
+    padding-left: $padding-left;
+  }
 }
 
 @mixin drop-shadow {
-    box-shadow: 0 2px 10px 1px rgba(50, 50, 50, 0.4);
+  box-shadow: 0 2px 10px 1px rgba(50, 50, 50, 0.4);
 }
 
 @mixin ribbon($color) {
-    @include transition(background-color .5s linear);
-    border-radius: 0 2px 2px 0;
-    $darkened-color: darken($color, 10%);
+  @include transition(background-color 0.5s linear);
+  border-radius: 0 2px 2px 0;
+  $darkened-color: darken($color, 10%);
 
-    background-color: $color;
-    &:before {
-        content: ' ';
-        position: absolute;
-        width: 0;
-        height: 0;
-        left: 0px;
-        top: 100%;
-        border-width: 5px 5px;
-        border-style: solid;
-        border-color: $darkened-color $darkened-color transparent transparent;
-    }
+  background-color: $color;
+  &::before {
+    content: ' ';
+    position: absolute;
+    width: 0;
+    height: 0;
+    left: 0;
+    top: 100%;
+    border-width: 5px 5px;
+    border-style: solid;
+    border-color: $darkened-color $darkened-color transparent transparent;
+  }
 }
 
 body {
-    background: #424242;
+  background: #424242;
 }
 
 .contrib-description {
-    &.plain {
-        white-space: pre-line;
-    }
+  &.plain {
+    white-space: pre-line;
+  }
 }
 
 .item-location {
-    @include ellipsis;
+  @include ellipsis;
 
-    box-sizing: border-box;
-    border-radius: 0.2em;
+  box-sizing: border-box;
+  border-radius: 0.2em;
+  color: $tt-secondary-color;
+  font-size: 1em;
+  float: right;
+  max-width: 200px;
+  margin: 0.5rem 0.7em 0 0;
+
+  &::before {
     color: $tt-secondary-color;
-    font-size: 1em;
-    float: right;
-    max-width: 200px;
-    margin: 0.5rem 0.7em 0 0;
+    margin-right: 0.2em;
+    vertical-align: middle;
+  }
 
-    &:before {
-        color: $tt-secondary-color;
-        margin-right: 0.2em;
-        vertical-align: middle;
-    }
-
-    &.header-data {
-        padding: 0;
-    }
+  &.header-data {
+    padding: 0;
+  }
 }
 
 %highlighted-data {
-    display: inline-block;
-    padding: 0 0.25em 0 0.25em;
-    line-height: 1.5rem;
-    background-color: $tt-primary-color;
-    color: $light-gray;
+  display: inline-block;
+  padding: 0 0.25em 0 0.25em;
+  line-height: 1.5rem;
+  background-color: $tt-primary-color;
+  color: $light-gray;
 }
 
 %highlighted-header-data {
-    @extend %highlighted-data;
-    @extend %default-border-radius;
-    color: $header-text-color !important;
-    background-color: lighten($header-bg-color, 5%);
+  @extend %highlighted-data;
+  @extend %default-border-radius;
+  color: $header-text-color !important;
+  background-color: lighten($header-bg-color, 5%);
 }
 
 .event-time-data {
-    time {
-        @extend %highlighted-header-data;
-    }
+  time {
+    @extend %highlighted-header-data;
+  }
 
-    .date {
-        color: $gray;
-    }
+  .date {
+    color: $gray;
+  }
 
-    .timezone {
-        font-size: 0.8em;
-    }
+  .timezone {
+    font-size: 0.8em;
+  }
 }
 
 .header-data {
-    &:before {
-        color: $header-icon-color;
-        text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
-        margin-right: 0.4em;
-        vertical-align: middle;
-    }
+  &::before {
+    color: $header-icon-color;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
+    margin-right: 0.4em;
+    vertical-align: middle;
+  }
 
-    color: $light-gray;
-    background-color: transparent;
-    display: flex;
-    align-items: center;
+  color: $light-gray;
+  background-color: transparent;
+  display: flex;
+  align-items: center;
 }
 
 .event-location {
-    .text {
-        @extend %highlighted-header-data;
-    }
+  .text {
+    @extend %highlighted-header-data;
+  }
 
-    .icon-location {
-        vertical-align: middle;
-    }
+  .icon-location {
+    vertical-align: middle;
+  }
 }
 
-.event-location, .event-chairs, .event-date {
-    @extend .flexrow;
+.event-location,
+.event-chairs,
+.event-date {
+  @extend .flexrow;
 
-    &.event-location, &.event-chairs {
-        margin-top: 0.5em;
-    }
+  &.event-location,
+  &.event-chairs {
+    margin-top: 0.5em;
+  }
 }
 
 .timetable-contrib {
-    .timetable-title {
-        margin-right: 0.2em;
-        color: $tt-primary-color;
-    }
+  .timetable-title {
+    margin-right: 0.2em;
+    color: $tt-primary-color;
+  }
 }
 
-.speaker-list, .chairperson-list, .convener-list {
-    margin: 0.1em 55px 0 0;
+.speaker-list,
+.chairperson-list,
+.convener-list {
+  margin: 0.1em 55px 0 0;
 
-    .label {
-        font-weight: bold;
-    }
+  .label {
+    font-weight: bold;
+  }
 
-    .affiliation {
-        font-size: 0.8em;
-        opacity: 0.7;
-    }
+  .affiliation {
+    font-size: 0.8em;
+    opacity: 0.7;
+  }
 }
 
 .chairperson-list .author {
-    @extend %highlighted-header-data;
-    margin-bottom: 2px;
+  @extend %highlighted-header-data;
+  margin-bottom: 2px;
 }
 
-.speaker-list, .convener-list {
-    color: $tt-additional-text-color;
+.speaker-list,
+.convener-list {
+  color: $tt-additional-text-color;
 }
 
 .details .address {
-    color: #aaa;
-    font-size: 12px;
-    text-shadow: none;
+  color: #aaa;
+  font-size: 12px;
+  text-shadow: none;
 }
 
 div.event-header {
-    border-top-left-radius: $default-border-radius;
-    border-top-right-radius: $default-border-radius;
+  border-top-left-radius: $default-border-radius;
+  border-top-right-radius: $default-border-radius;
 
-    background: $header-bg-color;
+  background: $header-bg-color;
+  color: $header-text-color;
+  font-size: 12pt;
+  position: relative;
+
+  min-height: 125px;
+  margin: 0;
+  padding: 10px 30px 10px;
+
+  h1 {
+    font-size: 20pt;
     color: $header-text-color;
-    font-size: 12pt;
-    position: relative;
+    font-weight: normal;
+    margin-top: 10px;
+    margin-bottom: 10px;
+  }
 
-    min-height: 125px;
-    margin: 0px;
-    padding: 10px 30px 10px;
-
-    h1 {
-        font-size: 20pt;
-        color: $header-text-color;
-        font-weight: normal;
-        margin-top: 10px;
-        margin-bottom: 10px;
-    }
-
-    &.round-bottom-corners {
-        border-bottom-left-radius: $default-border-radius;
-        border-bottom-right-radius: $default-border-radius;
-    }
+  &.round-bottom-corners {
+    border-bottom-left-radius: $default-border-radius;
+    border-bottom-right-radius: $default-border-radius;
+  }
 }
 
 .event-header {
-    @extend %font-family-title-light;
+  @extend %font-family-title-light;
 
-    .event-label {
-        margin-left: 1em !important;
-        text-transform: uppercase;
-    }
+  .event-label {
+    margin-left: 1em !important;
+    text-transform: uppercase;
+  }
 }
 
-.meeting-timetable, .meeting-sub-timetable {
-    list-style-type: none;
-    padding: 0;
+.meeting-timetable,
+.meeting-sub-timetable {
+  list-style-type: none;
+  padding: 0;
 }
 
 .item-description {
-    &.session-description,
-    &.break-description,
-    &.contrib-description,
-    &.subcontrib-description {
-        font-size: 0.9em;
-        padding: 0.5em 0;
-    }
-    .event-description {
-        color: $black;
-    }
+  &.session-description,
+  &.break-description,
+  &.contrib-description,
+  &.subcontrib-description {
+    font-size: 0.9em;
+    padding: 0.5em 0;
+  }
+  .event-description {
+    color: $black;
+  }
 
-    ul {
-        margin-bottom: 0.5em;
-    }
+  ul {
+    margin-bottom: 0.5em;
+  }
 
-    @extend %font-family-modern-body;
-    color: $light-black;
+  @extend %font-family-modern-body;
+  color: $light-black;
 }
 
 // Meeting Timetable-specific
 
 ul.day-list {
-    list-style-type: none;
-    padding-left: 0px;
-    margin-left: 0px;
-    margin-top: 10px;
+  list-style-type: none;
+  padding-left: 0;
+  margin-left: 0;
+  margin-top: 10px;
 }
 
 .day-header {
-    margin-top: 25px;
-    position: relative;
-    text-align: center;
+  margin-top: 25px;
+  position: relative;
+  text-align: center;
 
-    .day-title {
-        display: inline-block;
-        font-variant: small-caps;
-        font-size: 1.7em;
-        color: $light-gray;
-        padding: 0.5em;
-    }
+  .day-title {
+    display: inline-block;
+    font-variant: small-caps;
+    font-size: 1.7em;
+    color: $light-gray;
+    padding: 0.5em;
+  }
 
-    a.js-go-to-day {
-        display: inline-block;
-        color: $gray;
-        font-size: 1.4em;
-        position: absolute;
-        padding-bottom: 0.5em;
-        right: 0;
-        bottom: 0;
-    }
+  a.js-go-to-day {
+    display: inline-block;
+    color: $gray;
+    font-size: 1.4em;
+    position: absolute;
+    padding-bottom: 0.5em;
+    right: 0;
+    bottom: 0;
+  }
 }
 
 .meeting-timetable {
-    @extend %font-family-modern-body;
-    @extend %default-border-radius;
-    @include drop-shadow;
+  @extend %font-family-modern-body;
+  @extend %default-border-radius;
+  @include drop-shadow;
 
-    padding: 1em 1em 0.5em 0;
-    background-color: white;
+  padding: 1em 1em 0.5em 0;
+  background-color: white;
 
-    .toolbar, .toolbar .group {
-        margin-bottom: 0;
-        padding: 0;
+  .toolbar,
+  .toolbar .group {
+    margin-bottom: 0;
+    padding: 0;
+  }
+
+  .timetable-item {
+    display: flex;
+
+    &:not(:first-child) {
+      margin-top: 1em;
     }
 
-    .timetable-item {
-        display: flex;
+    .timetable-duration {
+      margin: 0.5rem 0.7em 0 0;
+      min-width: 4em;
+      text-align: right;
+      box-sizing: border-box;
+      color: $dark-gray;
 
-        &:not(:first-child) {
-            margin-top: 1em;
-        }
-
-        .timetable-duration {
-            margin: 0.5rem 0.7em 0 0;
-            min-width: 4em;
-            text-align: right;
-            box-sizing: border-box;
-            color: $dark-gray;
-
-            &:before {
-                color: $dark-gray;
-                margin-right: 0.2em;
-            }
-        }
+      &::before {
+        color: $dark-gray;
+        margin-right: 0.2em;
+      }
     }
+  }
 }
 
 .timetable-item-body {
+  flex: auto;
+  padding-bottom: 0.5rem;
+
+  /* Without the following IE11 doesn't correctly compute the width of the element. */
+  width: 100%;
+
+  &:not(:hover)
+    > .timetable-item-header
+    .timetable-item-actions
+    .manage-button:not(.selected)
+    .i-button {
+    background-color: #fff;
+    border-color: $gray !important;
+  }
+
+  &:not(:first-child) {
+    margin-left: 1em;
+  }
+
+  .timetable-item-header {
     flex: auto;
-    padding-bottom: 0.5rem;
 
-    /* Without the following IE11 doesn't correctly compute the width of the element. */
-    width: 100%;
+    .timetable-title {
+      font-weight: bold;
+      font-size: 1.1em;
+      padding-top: 0.5rem;
+      @extend %font-family-title;
+      flex: auto;
+      line-height: 1rem;
 
-    &:not(:hover) > .timetable-item-header .timetable-item-actions .manage-button:not(.selected) .i-button {
-        background-color: #fff;
-        border-color: $gray !important;
+      &.nested {
+        color: $tt-primary-color;
+      }
     }
 
-    &:not(:first-child) {
-        margin-left: 1em;
-    }
+    .timetable-item-actions {
+      flex-shrink: 0;
+      padding-top: 0.25rem;
+      max-height: 2em;
 
-    .timetable-item-header {
-        flex: auto;
-
-        .timetable-title {
-            font-weight: bold;
-            font-size: 1.1em;
-            padding-top: 0.5rem;
-            @extend %font-family-title;
-            flex: auto;
-            line-height: 1rem;
-
-            &.nested {
-                color: $tt-primary-color;
-            }
+      .manage-button {
+        .i-button {
+          @include transition(background-color 0.25s linear);
         }
-
-        .timetable-item-actions {
-            flex-shrink: 0;
-            padding-top: 0.25rem;
-            max-height: 2em;
-
-            .manage-button {
-                .i-button {
-                    @include transition(background-color .25s linear);
-                }
-            }
-        }
+      }
     }
+  }
 
-    .material-list {
-        padding-top: 0.4em;
-    }
+  .material-list {
+    padding-top: 0.4em;
+  }
 }
 
 .event-manage-button {
-    margin-top: 10px;
-    font-size: 10pt;
+  margin-top: 10px;
+  font-size: 10pt;
 }
 
 .meeting-sub-timetable {
-    margin-top: 1em;
+  margin-top: 1em;
 }
 
 .subcontrib-list {
-    list-style-type: none;
-    padding: 0;
+  list-style-type: none;
+  padding: 0;
 
-    font-size: 0.9em;
+  font-size: 0.9em;
 
-    .timetable-item.timetable-subcontrib {
-        border-left: 2px dotted $gray;
-        padding-left: 1em;
+  .timetable-item.timetable-subcontrib {
+    border-left: 2px dotted $gray;
+    padding-left: 1em;
 
-        .timetable-title {
-            font-weight: normal;
-        }
-
-        .speaker-list {
-            padding-top: 0.5em;
-        }
+    .timetable-title {
+      font-weight: normal;
     }
+
+    .speaker-list {
+      padding-top: 0.5em;
+    }
+  }
 }
 
 .timetable-time {
-    color: $tt-primary-color !important;
-    flex-shrink: 0;
-    line-height: 2rem;
+  color: $tt-primary-color !important;
+  flex-shrink: 0;
+  line-height: 2rem;
 
-    &.top-level {
-        .start-time {
-            background-color: $tt-primary-color;
-            font-weight: bold;
-            box-shadow: 1px 1px 2px 1px rgba(0, 0, 0, 0.1);
-            margin-left: -10px;
-            padding: 0 10px 0 20px;
-            position: relative;
-            @include ribbon($tt-primary-color);
-        }
+  &.top-level {
+    .start-time {
+      background-color: $tt-primary-color;
+      font-weight: bold;
+      box-shadow: 1px 1px 2px 1px rgba(0, 0, 0, 0.1);
+      margin-left: -10px;
+      padding: 0 10px 0 20px;
+      position: relative;
+      @include ribbon($tt-primary-color);
     }
+  }
 
-    &.nested {
-        @include transition(border-color .5s linear);
-        margin-right: 0.5em;
-        border-right: 3px solid $tt-nested-time-color;
-
-        .start-time {
-            padding: 0 5px 0 10px;
-            background-color: $tt-nested-time-color;
-        }
-    }
-
-    &.break {
-        color: $tt-secondary-color !important;
-        border-color: $tt-secondary-color;
-
-        .end-time {
-            color: $tt-secondary-color !important;
-        }
-
-        &.top-level .start-time {
-            @include ribbon($tt-secondary-color);
-        }
-
-        &.nested .start-time {
-            background-color: $tt-secondary-color;
-        }
-    }
+  &.nested {
+    @include transition(border-color 0.5s linear);
+    margin-right: 0.5em;
+    border-right: 3px solid $tt-nested-time-color;
 
     .start-time {
-        @extend %highlighted-data;
-        border-radius: 2px 0 0 2px;
-        @include transition(background-color .5s linear);
-        color: $light-gray !important;
+      padding: 0 5px 0 10px;
+      background-color: $tt-nested-time-color;
     }
+  }
+
+  &.break {
+    color: $tt-secondary-color !important;
+    border-color: $tt-secondary-color;
 
     .end-time {
-        color: $tt-primary-color;
+      color: $tt-secondary-color !important;
     }
+
+    &.top-level .start-time {
+      @include ribbon($tt-secondary-color);
+    }
+
+    &.nested .start-time {
+      background-color: $tt-secondary-color;
+    }
+  }
+
+  .start-time {
+    @extend %highlighted-data;
+    border-radius: 2px 0 0 2px;
+    @include transition(background-color 0.5s linear);
+    color: $light-gray !important;
+  }
+
+  .end-time {
+    color: $tt-primary-color;
+  }
 }
 
 .timetable-item.timetable-break {
-    .timetable-item-body {
-        .timetable-title {
-            text-align: center;
-            color: $tt-secondary-color !important;
-        }
-
-        .timetable-duration, .timetable-duration:before {
-            color: $tt-secondary-color !important;
-        }
-
-        .timetable-item-header {
-            background-color: $light-gray;
-            padding-bottom: 0.5em;
-        }
+  .timetable-item-body {
+    .timetable-title {
+      text-align: center;
+      color: $tt-secondary-color !important;
     }
 
-    .location-info {
-        margin-left: 1em;
+    .timetable-duration,
+    .timetable-duration::before {
+      color: $tt-secondary-color !important;
     }
+
+    .timetable-item-header {
+      background-color: $light-gray;
+      padding-bottom: 0.5em;
+    }
+  }
+
+  .location-info {
+    margin-left: 1em;
+  }
 }
 
 .event-sub-header {
-    border-radius: 0 0 2px 2px;
-    @include drop-shadow;
-    @extend %font-family-title-light;
+  border-radius: 0 0 2px 2px;
+  @include drop-shadow;
+  @extend %font-family-title-light;
 
-    background: white;
-    font-size: 12px;
-    color: black;
-    margin: 0;
-    padding: 3px 10px;
+  background: white;
+  font-size: 12px;
+  color: black;
+  margin: 0;
+  padding: 3px 10px;
 }
 
 .note-area-wrapper .note-area {
-    @extend %font-family-modern-body;
-    margin-top: 10px;
+  @extend %font-family-modern-body;
+  margin-top: 10px;
 }
 
 // Lectures
 
 .event-header-lecture {
-    & > h1 {
-        margin-top: 1em;
-    }
+  & > h1 {
+    margin-top: 1em;
+  }
 
-    & > h2 {
-        font-size: 1.1em;
-        color: $gray;
-    }
+  & > h2 {
+    font-size: 1.1em;
+    color: $gray;
+  }
 
-    .lecture-category {
-        color: $tt-secondary-pastel;
-    }
+  .lecture-category {
+    color: $tt-secondary-pastel;
+  }
 }
 
 a.lecture-series-link {
-    display: inline-block;
-    padding: 0.2em 0.5em;
-    background: $header-bg-color;
-    color: $light-gray !important;
-    margin-right: 0.1em;
+  display: inline-block;
+  padding: 0.2em 0.5em;
+  background: $header-bg-color;
+  color: $light-gray !important;
+  margin-right: 0.1em;
 }
 
 .timetable-item:target {
-    .timetable-time {
-        border-color: $selected-color;
+  .timetable-time {
+    border-color: $selected-color;
 
-        .start-time {
-            background-color: $selected-color;
-        }
+    .start-time {
+      background-color: $selected-color;
     }
+  }
 
-    .timetable-title {
-        color: $selected-color !important;
-    }
+  .timetable-title {
+    color: $selected-color !important;
+  }
 
-    &.timetable-block > .timetable-time .start-time {
-        @include ribbon($selected-color);
-    }
+  &.timetable-block > .timetable-time .start-time {
+    @include ribbon($selected-color);
+  }
 
-    &.timetable-subcontrib, .timetable-subcontrib {
-        border-color: $selected-color;
-    }
+  &.timetable-subcontrib,
+  .timetable-subcontrib {
+    border-color: $selected-color;
+  }
 }
 
 .days-dropdown {
-    li {
-        white-space: nowrap;
-    }
+  li {
+    white-space: nowrap;
+  }
 }
 
 .agenda-placeholder {
-    @extend %default-border-radius;
-    background-color: white;
-    margin-top: 10px;
-    flex-grow: 1;
-    color: $gray;
-    text-align: center;
-    height: 250px;
+  @extend %default-border-radius;
+  background-color: white;
+  margin-top: 10px;
+  flex-grow: 1;
+  color: $gray;
+  text-align: center;
+  height: 250px;
 
-    .placeholder-icon {
-        font-size: 5em;
-    }
+  .placeholder-icon {
+    font-size: 5em;
+  }
 
-    .agenda-placeholder-content {
-        margin: auto;
-    }
+  .agenda-placeholder-content {
+    margin: auto;
+  }
 
-    .placeholder-text {
-        font-size: 1.5em;
-        font-weight: bold;
-    }
+  .placeholder-text {
+    font-size: 1.5em;
+    font-weight: bold;
+  }
 
-    a {
-        color: $link;
-    }
+  a {
+    color: $link;
+  }
 
-    a:hover {
-        text-decoration: underline;
-    }
+  a:hover {
+    text-decoration: underline;
+  }
 }
 
 div.event-details {
-    font-size: 1.1em;
+  font-size: 1.1em;
 
-    .event-details-row {
-        display: flex;
-        align-items: flex-start;
-        margin-bottom: 0.5em;
+  .event-details-row {
+    display: flex;
+    align-items: flex-start;
+    margin-bottom: 0.5em;
+  }
+
+  .event-details-label {
+    width: 120px;
+    text-align: right;
+    font-weight: bold;
+    margin-right: 1em;
+
+    &.align-top {
+      align-self: flex-start;
     }
+  }
 
-    .event-details-label {
-        width: 120px;
-        text-align: right;
-        font-weight: bold;
-        margin-right: 1em;
-
-        &.align-top {
-            align-self: flex-start;
-        }
-    }
-
-    .event-details-content {
-        flex: 1;
-    }
+  .event-details-content {
+    flex: 1;
+  }
 }
 
 .attachments-display-container {
-    flex-wrap: wrap;
+  flex-wrap: wrap;
 
-    // needed to nullify the margin of the items in this flexbox
-    // for the very first items of each row
-    margin-left: -0.2em;
+  // needed to nullify the margin of the items in this flexbox
+  // for the very first items of each row
+  margin-left: -0.2em;
 }

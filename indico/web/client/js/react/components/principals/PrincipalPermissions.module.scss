@@ -8,20 +8,20 @@
 @import 'base/palette';
 
 .permission-add-button:global(.circular.icon) {
-    margin: 0.2em 0 0.2em 0.2em;
-    cursor: pointer;
+  margin: 0.2em 0 0.2em 0.2em;
+  cursor: pointer;
 
-    &:hover {
-        color: $gray;
-    }
+  &:hover {
+    color: $gray;
+  }
 }
 
 .principal-permission {
-    :global(.ui.label) {
-        margin: 0.2em 0 0 0.2em;
-    }
+  :global(.ui.label) {
+    margin: 0.2em 0 0 0.2em;
+  }
 
-    :global(.ui.icon.button i) {
-        margin: 0;
-    }
+  :global(.ui.icon.button i) {
+    margin: 0;
+  }
 }

@@ -8,41 +8,40 @@
 @import 'rb:styles/palette';
 
 .actions-dropdown {
+  :global(.dropdown.icon) {
+    display: none;
+  }
 
-    :global(.dropdown.icon) {
-        display: none;
+  .dropdown-button {
+    color: $gray;
+    background: none !important;
+    padding-bottom: 1em;
+
+    &:hover {
+      color: $booking-color;
     }
 
-    .dropdown-button {
-        color: $gray;
-        background: none !important;
-        padding-bottom: 1em;
-
-        &:hover {
-            color: $booking-color;
-        }
-
-        &:global(.button) {
-            padding: 0 !important;
-        }
+    &:global(.button) {
+      padding: 0 !important;
     }
+  }
 
-    .open {
-        :global(.icon) {
-            color: $dark-orange !important;
-        }
+  .open {
+    :global(.icon) {
+      color: $dark-orange !important;
     }
+  }
 }
 
 .rejection-form {
-    margin: 1.25em;
+  margin: 1.25em;
 
-    :global(.button) {
-        background-color: $dark-red !important;
-        margin-top: 1.3em;
-    }
+  :global(.button) {
+    background-color: $dark-red !important;
+    margin-top: 1.3em;
+  }
 
-    .form-description {
-        padding-bottom: 1em;
-    }
+  .form-description {
+    padding-bottom: 1em;
+  }
 }

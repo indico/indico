@@ -6,53 +6,53 @@
 // LICENSE file for more details.
 
 .i-dropdown {
-    @include border-all();
-    @extend %default-border-radius;
-    @include single-box-shadow();
-    background: $light-gray;
-    margin-top: 0px;
-    padding: 0;
-    position: absolute;
-    z-index: 1;
-    display: none;
-    box-sizing: initial;
+  @include border-all();
+  @extend %default-border-radius;
+  @include single-box-shadow();
+  background: $light-gray;
+  margin-top: 0;
+  padding: 0;
+  position: absolute;
+  z-index: 1;
+  display: none;
+  box-sizing: initial;
 
-    > li {
-        cursor: pointer;
-        display: block;
-        list-style-type: none;
-        height: 1.7rem;
-        min-width: 1em;
-        padding: 0.1em 1em !important;
+  > li {
+    cursor: pointer;
+    display: block;
+    list-style-type: none;
+    height: 1.7rem;
+    min-width: 1em;
+    padding: 0.1em 1em !important;
 
-        a {
-            display: block;
-            line-height: 1.7rem;
-            width: 100%;
+    a {
+      display: block;
+      line-height: 1.7rem;
+      width: 100%;
 
-            &[class*='icon-']::before {
-                font-size: 1.2rem;
-                margin-right: 0.3em;
-                vertical-align: -10%;
-            }
+      &[class*='icon-']::before {
+        font-size: 1.2rem;
+        margin-right: 0.3em;
+        vertical-align: -10%;
+      }
 
-            &.disabled {
-                color: $gray;
-                cursor: default;
-            }
-        }
-
-        &:hover a:not(.disabled),
-        &:hover a:not(.disabled)[class*='icon-']::before {
-            color: $light-black;
-        }
+      &.disabled {
+        color: $gray;
+        cursor: default;
+      }
     }
+
+    &:hover a:not(.disabled),
+    &:hover a:not(.disabled)[class*='icon-']::before {
+      color: $light-black;
+    }
+  }
 }
 
 .dropup-menu {
-    @include icon-after('icon-arrow-down');
+  @include icon-after('icon-arrow-down');
 
-    &:after {
-        transform: rotate(-180deg);
-    }
+  &::after {
+    transform: rotate(-180deg);
+  }
 }

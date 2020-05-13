@@ -8,24 +8,24 @@
 @import 'rb:styles/util';
 
 .areas-map-container {
-    :global(.leaflet-container) {
-        height: 1000px;
-        font-size: 14px;
-    }
+  :global(.leaflet-container) {
+    height: 1000px;
+    font-size: 14px;
+  }
 
-    :global(.leaflet-draw-section) {
-        border: none;
-        font-family: $sui-font-family;
-    }
+  :global(.leaflet-draw-section) {
+    border: none;
+    font-family: $sui-font-family;
+  }
 }
 
 :global(.area-default) {
-    margin-left: 5px;
-    font-weight: bold;
+  margin-left: 5px;
+  font-weight: bold;
 }
 
 :global(.actions) {
-    :global(.field) {
-        display: inline-block;
-    }
+  :global(.field) {
+    display: inline-block;
+  }
 }

@@ -6,243 +6,243 @@
 // LICENSE file for more details.
 
 .i-location-field {
-    max-width: 400px;
+  max-width: 400px;
 
-    .wrapper {
+  .wrapper {
+    .typeahead__container,
+    .typeahead__field {
+      display: inline-block;
+      position: relative;
+      float: left;
+      font-size: 1em;
 
-        .typeahead__container,
-        .typeahead__field {
-            display: inline-block;
-            position: relative;
-            float: left;
-            font-size: 1em;
+      &.venue-container {
+        width: 40%;
+        padding-right: 10px;
+      }
 
-            &.venue-container {
-                width: 40%;
-                padding-right: 10px;
+      &.room-container {
+        width: 60%;
+
+        input[type='text'] {
+          width: 100% !important;
+        }
+      }
+
+      .typeahead__result {
+        position: absolute;
+        left: 0;
+
+        .typeahead__list {
+          box-shadow: none;
+          margin: 0;
+          padding: 0;
+          overflow: auto;
+          max-height: 30em;
+          width: 20em;
+          position: relative;
+          border-radius: 0;
+          border-color: $gray;
+
+          > li {
+            background: white;
+          }
+
+          &.empty {
+            border-width: 0 0 1px 0;
+            border-style: solid;
+            border-color: $gray;
+
+            li:first-child {
+              display: none;
             }
-
-            &.room-container {
-                width: 60%;
-
-                input[type='text'] {
-                    width: 100% !important;
-                }
-            }
-
-            .typeahead__result {
-                position: absolute;
-                left: 0;
-
-                .typeahead__list {
-                    box-shadow: none;
-                    margin: 0;
-                    padding: 0;
-                    overflow: auto;
-                    max-height: 30em;
-                    width: 20em;
-                    position: relative;
-                    border-radius: 0;
-                    border-color: $gray;
-
-                    > li {
-                        background: white;
-                    }
-
-                    &.empty {
-                        border-width: 0px 0px 1px 0px;
-                        border-style: solid;
-                        border-color: $gray;
-
-                        li:first-child {
-                            display: none;
-                        }
-                    }
-                }
-
-                .just-use-option {
-                    display: none;
-                    background-color: white;
-                    text-align: center;
-                    border-width: 0px 1px 1px 1px;
-                    border-style: solid;
-                    border-color: $gray;
-                    font-style: italic;
-
-                    &:hover, &.active {
-                        background-color: #ebebeb;  // same as in typeahead
-                    }
-
-                    a {
-                        padding: 6px 20px;
-                        display: block;
-                        color: $black;
-                    }
-                }
-            }
-
-            &.result {
-                .i-location-input-field {
-                    &.typeahead__hint {
-                        z-index: 0 !important;
-                        background-color: white !important;
-                    }
-                }
-
-                .just-use-option {
-                    display: block;
-                }
-            }
+          }
         }
 
-        input.i-location-input-field {
-            width: 11.5em !important;
-            background-color: transparent;
-            padding-right: 2em !important;
-            position: relative;
-            z-index: 1;
+        .just-use-option {
+          display: none;
+          background-color: white;
+          text-align: center;
+          border-width: 0 1px 1px 1px;
+          border-style: solid;
+          border-color: $gray;
+          font-style: italic;
 
-            &.disabled {
-                @extend %tilted-strips-bg;
-                opacity: 1;
-            }
+          &:hover,
+          &.active {
+            background-color: #ebebeb; // same as in typeahead
+          }
 
-            &:focus {
-              box-shadow: 0 0 5px $blue;
-              @include border-all($color: $blue !important, $width: 1px);
-            }
+          a {
+            padding: 6px 20px;
+            display: block;
+            color: $black;
+          }
+        }
+      }
 
-            &::-ms-clear {
-                display: none;
-            }
-
-            &:-ms-input-placeholder {
-                color: $gray;
-            }
+      &.result {
+        .i-location-input-field {
+          &.typeahead__hint {
+            z-index: 0 !important;
+            background-color: white !important;
+          }
         }
 
-        .toggle-results-list {
-            position: absolute;
-            padding: 0.5em 0.6em;
-            top: 0.3em;
-            right: 0;
-            line-height: 1.5;
-            cursor: pointer;
-            z-index: 2;
+        .just-use-option {
+          display: block;
         }
-
-        .location-inheritance-field {
-            height: 2.5em;
-
-            .checkbox-container {
-                vertical-align: middle;
-                line-height: 2.5;
-
-                input[type='checkbox'] {
-                    vertical-align: baseline;
-                }
-            }
-        }
-
-        .availability-message-container {
-            display: none;
-            padding-top: 50px;
-
-            .availability-message {
-                align-items: center;
-                justify-content: flex-start;
-                display: flex;
-                padding: 0.6em;
-
-                &.error {
-                    @include border-all($red);
-                    background-color: $light-red;
-
-                    .icon {
-                        color: $red;
-                    }
-                }
-
-                &.info {
-                    @include border-all($blue);
-                    background-color: $light-blue;
-
-                    .icon {
-                        color: $blue;
-                    }
-                }
-
-                &.success {
-                    @include border-all($green);
-                    background-color: $light-green;
-
-                    .icon {
-                        color: $green;
-                    }
-                }
-
-                &.warning {
-                    @include border-all($yellow);
-                    background-color: $light-yellow;
-
-                    .icon {
-                        color: $yellow;
-                    }
-                }
-
-                .icon {
-                    font-size: 1.4em;
-                    margin: 0.2em 0.6em;
-                }
-
-                a, .switch {
-                    margin-left: auto;
-                }
-            }
-        }
-
-
-        > textarea {
-            width: 100%;
-            margin-top: 0.4em;
-
-            &.disabled {
-                @extend %tilted-strips-bg;
-            }
-
-            &:-ms-input-placeholder {
-                color: $gray;
-            }
-        }
+      }
     }
 
-    &.disabled {
-        background-color: inherit;
+    input.i-location-input-field {
+      width: 11.5em !important;
+      background-color: transparent;
+      padding-right: 2em !important;
+      position: relative;
+      z-index: 1;
 
-        .keyword-highlighter {
-            display: none !important;
-        }
+      &.disabled {
+        @extend %tilted-strips-bg;
+        opacity: 1;
+      }
 
-        .toggle-results-list {
-            cursor: inherit;
-        }
+      &:focus {
+        box-shadow: 0 0 5px $blue;
+        @include border-all($color: $blue !important, $width: 1px);
+      }
+
+      &::-ms-clear {
+        display: none;
+      }
+
+      &:-ms-input-placeholder {
+        color: $gray;
+      }
     }
+
+    .toggle-results-list {
+      position: absolute;
+      padding: 0.5em 0.6em;
+      top: 0.3em;
+      right: 0;
+      line-height: 1.5;
+      cursor: pointer;
+      z-index: 2;
+    }
+
+    .location-inheritance-field {
+      height: 2.5em;
+
+      .checkbox-container {
+        vertical-align: middle;
+        line-height: 2.5;
+
+        input[type='checkbox'] {
+          vertical-align: baseline;
+        }
+      }
+    }
+
+    .availability-message-container {
+      display: none;
+      padding-top: 50px;
+
+      .availability-message {
+        align-items: center;
+        justify-content: flex-start;
+        display: flex;
+        padding: 0.6em;
+
+        &.error {
+          @include border-all($red);
+          background-color: $light-red;
+
+          .icon {
+            color: $red;
+          }
+        }
+
+        &.info {
+          @include border-all($blue);
+          background-color: $light-blue;
+
+          .icon {
+            color: $blue;
+          }
+        }
+
+        &.success {
+          @include border-all($green);
+          background-color: $light-green;
+
+          .icon {
+            color: $green;
+          }
+        }
+
+        &.warning {
+          @include border-all($yellow);
+          background-color: $light-yellow;
+
+          .icon {
+            color: $yellow;
+          }
+        }
+
+        .icon {
+          font-size: 1.4em;
+          margin: 0.2em 0.6em;
+        }
+
+        a,
+        .switch {
+          margin-left: auto;
+        }
+      }
+    }
+
+    > textarea {
+      width: 100%;
+      margin-top: 0.4em;
+
+      &.disabled {
+        @extend %tilted-strips-bg;
+      }
+
+      &:-ms-input-placeholder {
+        color: $gray;
+      }
+    }
+  }
+
+  &.disabled {
+    background-color: inherit;
+
+    .keyword-highlighter {
+      display: none !important;
+    }
+
+    .toggle-results-list {
+      cursor: inherit;
+    }
+  }
 }
 
 .keyword-highlighter {
-    @extend %default-border-radius;
-    @include ellipsis;
+  @extend %default-border-radius;
+  @include ellipsis;
 
-    display: none !important;
-    background-color: $pastel-blue;
-    padding: 2px;
-    position: absolute;
-    top: 0.6em;
-    left: 0.95em;
-    max-width: 84%;
-    color: transparent;
+  display: none !important;
+  background-color: $pastel-blue;
+  padding: 2px;
+  position: absolute;
+  top: 0.6em;
+  left: 0.95em;
+  max-width: 84%;
+  color: transparent;
 
-    &.visible {
-        display: block !important;
-    }
+  &.visible {
+    display: block !important;
+  }
 }

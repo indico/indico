@@ -5,136 +5,158 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-
 // ============================================================================
 // Base definitions
 // ============================================================================
 
 %action-box {
-    box-sizing: border-box;
-    @extend %default-border-radius;
-    margin-bottom: 1rem;
-    padding: 10px;
-    width: 100%;
+  box-sizing: border-box;
+  @extend %default-border-radius;
+  margin-bottom: 1rem;
+  padding: 10px;
+  width: 100%;
 
-    > .section {
-        @include clearfix();
-        @extend .flexrow;
+  > .section {
+    @include clearfix();
+    @extend .flexrow;
 
-        align-items: center;
-        overflow: visible;
+    align-items: center;
+    overflow: visible;
 
-        > .toolbar {
-            margin: 0;
-            padding: 0 0 0 0.5em;
-            flex-shrink: 0;
-            margin-left: auto;
+    > .toolbar {
+      margin: 0;
+      padding: 0 0 0 0.5em;
+      flex-shrink: 0;
+      margin-left: auto;
 
-            &.right {
-                padding-left: 0.5em;
-            }
+      &.right {
+        padding-left: 0.5em;
+      }
 
-            a:not(.i-button), a:not(.ui.button) {
-                line-height: 2.2em;
-            }
+      a:not(.i-button),
+      a:not(.ui.button) {
+        line-height: 2.2em;
+      }
 
-            > .group {
-                margin-bottom: 0;
-            }
-        }
-
-        &:not(:first-child) {
-            margin-top: 5px;
-            padding-top: 5px;
-            border-top: 1px solid $gray;
-        }
+      > .group {
+        margin-bottom: 0;
+      }
     }
 
-    > .section > .text {
-        flex-grow: 1;
-
-        > .label {
-            font-weight: bold;
-        }
+    &:not(:first-child) {
+      margin-top: 5px;
+      padding-top: 5px;
+      border-top: 1px solid $gray;
     }
+  }
 
-    > .section > .icon {
-        font-size: 2rem;
-        padding-right: 0.5rem;
-        flex-shrink: 0;
-        align-self: center;
-    }
+  > .section > .text {
+    flex-grow: 1;
 
-    &.for-form {
-        width: 400px;
+    > .label {
+      font-weight: bold;
     }
+  }
+
+  > .section > .icon {
+    font-size: 2rem;
+    padding-right: 0.5rem;
+    flex-shrink: 0;
+    align-self: center;
+  }
+
+  &.for-form {
+    width: 400px;
+  }
 }
-
 
 @mixin action-box-colors($color, $emphasis-color, $background-color, $border-color) {
-    @include border-all($border-color);
-    background: $background-color;
-    color: $color;
+  @include border-all($border-color);
+  background: $background-color;
+  color: $color;
 
-    .section:not(.highlight):not(.warning):not(.danger):not(.disabled):not(.accept):not(.plain) {
-        > .icon {
-            color: $emphasis-color;
-        }
-
-        .text .label {
-            color: $emphasis-color;
-        }
+  .section:not(.highlight):not(.warning):not(.danger):not(.disabled):not(.accept):not(.plain) {
+    > .icon {
+      color: $emphasis-color;
     }
-}
 
+    .text .label {
+      color: $emphasis-color;
+    }
+  }
+}
 
 // ============================================================================
 // Element and flavors
 // ============================================================================
 
 .action-box {
-    @extend %action-box;
-    @include action-box-colors($color: $dark-gray, $emphasis-color: $light-black,
-                               $background-color: $light-gray, $border-color: $dark-gray);
+  @extend %action-box;
+  @include action-box-colors(
+    $color: $dark-gray,
+    $emphasis-color: $light-black,
+    $background-color: $light-gray,
+    $border-color: $dark-gray
+  );
 
-    &.highlight {
-        @include action-box-colors($color: $light-black, $emphasis-color: $blue,
-                                   $background-color: $light-blue, $border-color: $blue);
-    }
+  &.highlight {
+    @include action-box-colors(
+      $color: $light-black,
+      $emphasis-color: $blue,
+      $background-color: $light-blue,
+      $border-color: $blue
+    );
+  }
 
-    &.warning {
-        @include action-box-colors($color: $dark-gray, $emphasis-color: $yellow,
-                                   $background-color: $light-yellow, $border-color: $yellow);
-    }
+  &.warning {
+    @include action-box-colors(
+      $color: $dark-gray,
+      $emphasis-color: $yellow,
+      $background-color: $light-yellow,
+      $border-color: $yellow
+    );
+  }
 
-    &.danger {
-        @include action-box-colors($color: $light-black, $emphasis-color: $red,
-                                   $background-color: $light-red, $border-color: $red);
-    }
+  &.danger {
+    @include action-box-colors(
+      $color: $light-black,
+      $emphasis-color: $red,
+      $background-color: $light-red,
+      $border-color: $red
+    );
+  }
 
-    &.disabled {
-        @include action-box-colors($color: $light-black, $emphasis-color: $black,
-                                   $background-color: $pastel-gray, $border-color: $black);
-    }
+  &.disabled {
+    @include action-box-colors(
+      $color: $light-black,
+      $emphasis-color: $black,
+      $background-color: $pastel-gray,
+      $border-color: $black
+    );
+  }
 
-    &.accept {
-        @include action-box-colors($color: $light-black, $emphasis-color: $green,
-                                   $background-color: $light-green, $border-color: $green);
-    }
+  &.accept {
+    @include action-box-colors(
+      $color: $light-black,
+      $emphasis-color: $green,
+      $background-color: $light-green,
+      $border-color: $green
+    );
+  }
 
-    &.plain {
-        border: none;
-        background-color: transparent;
-    }
+  &.plain {
+    border: none;
+    background-color: transparent;
+  }
 
-    ul:not(.i-dropdown) {
-        margin: 0;
-        padding-left: 1.5em;
-        max-height: 100px;
-        overflow: auto;
-    }
+  ul:not(.i-dropdown) {
+    margin: 0;
+    padding-left: 1.5em;
+    max-height: 100px;
+    overflow: auto;
+  }
 
-    .date {
-        font-weight: bold;
-    }
+  .date {
+    font-weight: bold;
+  }
 }

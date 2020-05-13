@@ -7,145 +7,159 @@
 
 $switch-transition-step: 0.05s;
 $switch-label-transition: $switch-transition-step ease-out;
-$switch-handle-transition: 2*$switch-transition-step ease-out;
+$switch-handle-transition: 2 * $switch-transition-step ease-out;
 $switch-shadow-color: lighten($light-black, $color-variation);
 $switch-shadow-border: inset 0 0 0 0.08em;
 $switch-shadow-blur: 0.16em;
 $switch-left-shadow: -(0.05em + $switch-shadow-blur) 0 $switch-shadow-blur (-$switch-shadow-blur) $switch-shadow-color;
-$switch-right-shadow: (0.05em + $switch-shadow-blur) 0 $switch-shadow-blur (-$switch-shadow-blur) $switch-shadow-color;
+$switch-right-shadow: (0.05em + $switch-shadow-blur) 0 $switch-shadow-blur (-$switch-shadow-blur)
+  $switch-shadow-color;
 $switch-inner-shadow: inset 0 0 0.4em $switch-shadow-color;
 
 %switch-elem {
-    position: relative;
-    z-index: 100;
+  position: relative;
+  z-index: 100;
+
+  display: inline-block;
+  width: 50%;
+  height: 100%;
+
+  text-align: center;
+  text-transform: uppercase;
+  line-height: 2;
+  font-size: 0.8em;
+  font-weight: normal;
+}
+
+%switch-elem-visible {
+  visibility: visible;
+  opacity: 1;
+  @include transition(
+    visibility $switch-label-transition 3 * $switch-transition-step,
+    opacity $switch-label-transition 2 * $switch-transition-step
+  );
+}
+
+%switch-elem-hidden {
+  visibility: hidden;
+  opacity: 0;
+  @include transition(
+    visibility $switch-label-transition 1 * $switch-transition-step,
+    opacity $switch-label-transition 0 * $switch-transition-step
+  );
+}
+
+.switch {
+  position: relative;
+
+  display: inline-block;
+  width: 6em;
+  height: 1.6em;
+
+  @extend %default-border-radius;
+  background-color: lighten($dark-gray, $color-variation);
+  box-shadow: $switch-shadow-border $dark-gray, $switch-inner-shadow;
+  user-select: none;
+
+  & > .switch-label {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    cursor: pointer;
+
+    &::before {
+      @extend %switch-elem;
+      @extend %switch-elem-visible;
+      color: $light-black;
+      content: attr(data-off);
+    }
+    &::after {
+      @extend %switch-elem;
+      @extend %switch-elem-hidden;
+      color: $light-blue;
+      content: attr(data-on);
+    }
+  }
+
+  & > .switch-handle {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    z-index: 99;
 
     display: inline-block;
     width: 50%;
     height: 100%;
-
-    text-align: center;
-    text-transform: uppercase;
-    line-height: 2;
-    font-size: 0.8em;
-    font-weight: normal;
-}
-
-%switch-elem-visible {
-    visibility: visible;
-    opacity: 1.0;
-    @include transition(visibility $switch-label-transition 3*$switch-transition-step,
-                        opacity $switch-label-transition 2*$switch-transition-step);
-}
-
-%switch-elem-hidden {
-    visibility: hidden;
-    opacity: 0.0;
-    @include transition(visibility $switch-label-transition 1*$switch-transition-step,
-                        opacity $switch-label-transition 0*$switch-transition-step);
-}
-
-.switch {
-    position: relative;
-
-    display: inline-block;
-    width: 6em;
-    height: 1.6em;
-
     @extend %default-border-radius;
-    background-color: lighten($dark-gray, $color-variation);
-    box-shadow: $switch-shadow-border $dark-gray, $switch-inner-shadow;
-    user-select: none;
 
-    & > .switch-label {
-        position: absolute;
-        top: 0;
-        bottom: 0;
-        left: 0;
-        right: 0;
-        cursor: pointer;
+    background: #eaeaea;
+    box-shadow: $switch-shadow-border $gray, $switch-right-shadow;
 
-        &:before {
-            @extend %switch-elem;
-            @extend %switch-elem-visible;
-            color: $light-black;
-            content: attr(data-off);
+    @include transition(
+      left $switch-handle-transition 1 * $switch-transition-step,
+      background $switch-handle-transition 1 * $switch-transition-step,
+      box-shadow $switch-handle-transition 1 * $switch-transition-step
+    );
+    cursor: pointer;
+  }
+
+  input {
+    position: absolute;
+    top: 0;
+    left: -1000em;
+    display: block;
+    opacity: 0;
+
+    &:checked {
+      & + .switch-label {
+        &::before {
+          @extend %switch-elem-hidden;
         }
-        &:after {
-            @extend %switch-elem;
-            @extend %switch-elem-hidden;
-            color: $light-blue;
-            content: attr(data-on);
+        &::after {
+          @extend %switch-elem-visible;
         }
+
+        & + .switch-handle {
+          left: 50%;
+          background-color: $blue;
+          box-shadow: $switch-shadow-border $dark-blue, $switch-left-shadow;
+        }
+      }
     }
 
-    & > .switch-handle {
-        position: absolute;
-        top: 0;
-        bottom: 0;
-        left: 0;
-        z-index: 99;
+    &:disabled {
+      & + .switch-label {
+        cursor: default;
+        &::before,
+        &::after {
+          color: $gray;
+        }
+      }
 
-        display: inline-block;
-        width: 50%;
-        height: 100%;
-        @extend %default-border-radius;
-
-        background: #EAEAEA;
+      & + .switch-label + .switch-handle {
+        background-color: #eaeaea;
         box-shadow: $switch-shadow-border $gray, $switch-right-shadow;
+        cursor: default;
+      }
 
-        @include transition(left $switch-handle-transition 1*$switch-transition-step,
-                            background $switch-handle-transition 1*$switch-transition-step,
-                            box-shadow $switch-handle-transition 1*$switch-transition-step);
-        cursor: pointer;
+      &:checked + .switch-label + .switch-handle {
+        box-shadow: $switch-shadow-border $gray, $switch-left-shadow;
+      }
     }
 
-    input {
-        position: absolute;
-        top: 0;
-        left: -1000em;
-        display: block;
-        opacity: 0;
+    &:not(:disabled) {
+      & + .switch-label:hover + .switch-handle {
+        background: #e2e2e2;
+        @include gradient(#f7f7f7, #e2e2e2);
+      }
 
-        &:checked {
-            & + .switch-label {
-                &:before { @extend %switch-elem-hidden; }
-                &:after { @extend %switch-elem-visible; }
-
-                & + .switch-handle {
-                    left: 50%;
-                    background-color: $blue;
-                    box-shadow: $switch-shadow-border $dark-blue, $switch-left-shadow;
-                 }
-            }
-        }
-
-        &:disabled {
-            & + .switch-label {
-                cursor: default;
-                &:before, &:after { color: $gray; }
-            }
-
-            & + .switch-label + .switch-handle {
-                    background-color: #EAEAEA;
-                    box-shadow: $switch-shadow-border $gray, $switch-right-shadow;
-                    cursor: default;
-            }
-
-            &:checked + .switch-label + .switch-handle {
-                box-shadow: $switch-shadow-border $gray, $switch-left-shadow;
-            }
-        }
-
-        &:not(:disabled) {
-            & + .switch-label:hover + .switch-handle {
-                background: #E2E2E2;
-                @include gradient(#F7F7F7, #E2E2E2);
-            }
-
-            &:checked + .switch-label:hover + .switch-handle {
-                background: darken($blue, $color-variation);
-                @include gradient($blue, darken($blue, $color-variation));
-            }
-        }
+      &:checked + .switch-label:hover + .switch-handle {
+        background: darken($blue, $color-variation);
+        @include gradient($blue, darken($blue, $color-variation));
+      }
     }
+  }
 }

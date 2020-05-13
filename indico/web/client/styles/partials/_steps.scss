@@ -5,118 +5,118 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
- @keyframes step-fade-in-background {
-     0% {
-         background-color: $pastel-gray;
-     }
+@keyframes step-fade-in-background {
+  0% {
+    background-color: $pastel-gray;
+  }
 
-     100% {
-         background-color: $indico-blue;
-     }
- }
+  100% {
+    background-color: $indico-blue;
+  }
+}
 
- @keyframes step-fade-in-border {
-     0% {
-         border-color: $pastel-gray;
-     }
+@keyframes step-fade-in-border {
+  0% {
+    border-color: $pastel-gray;
+  }
 
-     100% {
-         border-color: $indico-blue;
-     }
- }
+  100% {
+    border-color: $indico-blue;
+  }
+}
 
 ul.steps {
-    list-style-type: none;
-    padding: 0;
+  list-style-type: none;
+  padding: 0;
+  color: $light-black;
+
+  li {
+    flex-grow: 1;
+    flex-basis: 0;
+
+    &.completed {
+      .circle::before {
+        background-color: $indico-blue;
+        border-color: $indico-blue;
+      }
+
+      .text {
+        color: $indico-blue;
+      }
+
+      .horizontal-line {
+        background-color: $indico-blue;
+      }
+    }
+
+    &.current {
+      .circle::before {
+        border-color: $indico-blue;
+        animation: step-fade-in-border 0.5s linear;
+      }
+
+      .horizontal-line {
+        background-color: $indico-blue;
+        animation: step-fade-in-background 0.5s linear;
+      }
+    }
+
+    &.before-current {
+      .circle::before {
+        animation: step-fade-in-background 0.5s linear;
+      }
+    }
+
+    &:first-child {
+      .horizontal-line {
+        border-top-left-radius: $default-border-radius;
+        border-bottom-left-radius: $default-border-radius;
+      }
+    }
+
+    &:last-child {
+      .horizontal-line {
+        border-top-right-radius: $default-border-radius;
+        border-bottom-right-radius: $default-border-radius;
+      }
+    }
+  }
+
+  .label {
+    @extend %font-family-title-light;
     color: $light-black;
+    font-size: 1.1em;
+    text-align: center;
 
-    li {
-        flex-grow: 1;
-        flex-basis: 0;
-
-        &.completed {
-            .circle::before {
-                background-color: $indico-blue;
-                border-color: $indico-blue;
-            }
-
-            .text {
-                color: $indico-blue;
-            }
-
-            .horizontal-line {
-                background-color: $indico-blue;
-            }
-        }
-
-        &.current {
-            .circle::before {
-                border-color: $indico-blue;
-                animation: step-fade-in-border .5s linear;
-            }
-
-            .horizontal-line {
-                background-color: $indico-blue;
-                animation: step-fade-in-background .5s linear;
-            }
-        }
-
-        &.before-current {
-            .circle::before {
-                animation: step-fade-in-background .5s linear;
-            }
-        }
-
-        &:first-child {
-            .horizontal-line {
-                border-top-left-radius: $default-border-radius;
-                border-bottom-left-radius: $default-border-radius;
-            }
-        }
-
-        &:last-child {
-            .horizontal-line {
-                border-top-right-radius: $default-border-radius;
-                border-bottom-right-radius: $default-border-radius;
-            }
-        }
+    &.top {
+      margin-bottom: 20px;
     }
 
-    .label {
-        @extend %font-family-title-light;
-        color: $light-black;
-        font-size: 1.1em;
-        text-align: center;
-
-        &.top {
-            margin-bottom: 20px;
-        }
-
-        &.bottom {
-            margin-top: 10px;
-        }
+    &.bottom {
+      margin-top: 10px;
     }
+  }
 
-    .horizontal-line {
-        height: 3px;
-        background-color: $pastel-gray;
-    }
+  .horizontal-line {
+    height: 3px;
+    background-color: $pastel-gray;
+  }
 
-    .circle {
-        &::before {
-            @include border-all($width: 2px);
-            border-radius: 25px;
-            content: '';
-            width: 25px;
-            height: 25px;
-            background-color: white;
-            margin-top: -15px;
-        }
+  .circle {
+    &::before {
+      @include border-all($width: 2px);
+      border-radius: 25px;
+      content: '';
+      width: 25px;
+      height: 25px;
+      background-color: white;
+      margin-top: -15px;
     }
+  }
 
-    .text {
-        position: relative;
-        font-weight: bold;
-        margin-top: 10px;
-    }
+  .text {
+    position: relative;
+    font-weight: bold;
+    margin-top: 10px;
+  }
 }

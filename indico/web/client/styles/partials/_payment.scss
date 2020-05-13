@@ -5,56 +5,64 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-
 .i-payments-list {
-    & > .i-badge {
+  & > .i-badge {
+    &.i-payment-enabled {
+      background-color: $light-green;
 
-        &.i-payment-enabled {
-            background-color: $light-green;
+      &,
+      & * {
+        color: $green;
+      }
 
-            &, & * { color: $green; }
+      &:hover {
+        background-color: darken($light-green, $light-color-variation);
+      }
 
-            &:hover {
-                background-color: darken($light-green, $light-color-variation);
-            }
+      & > .i-badge-legend {
+        border-color: $dark-green;
 
-            & > .i-badge-legend {
-                border-color: $dark-green;
-
-                &> .i-payment-status-disabled { display: none; }
-            }
+        & > .i-payment-status-disabled {
+          display: none;
         }
-
-        &.i-payment-disabled {
-            background-color: $light-gray;
-
-            &, & * { color: $black; }
-
-            &:hover {
-                background-color: darken($light-gray, $light-color-variation);
-            }
-
-            & > .i-badge-legend {
-                border-color: $dark-gray;
-
-                &> .i-payment-status-enabled { display: none; }
-            }
-        }
-
-        &.i-payment-manual {
-            &:hover {
-                cursor: default;
-                background-color: $light-green;
-            }
-
-            .i-badge-img {
-                color: $black;
-                font-size: 3em;
-
-                &:before {
-                    vertical-align: text-bottom;
-                }
-            }
-        }
+      }
     }
+
+    &.i-payment-disabled {
+      background-color: $light-gray;
+
+      &,
+      & * {
+        color: $black;
+      }
+
+      &:hover {
+        background-color: darken($light-gray, $light-color-variation);
+      }
+
+      & > .i-badge-legend {
+        border-color: $dark-gray;
+
+        & > .i-payment-status-enabled {
+          display: none;
+        }
+      }
+    }
+
+    &.i-payment-manual {
+      &:hover {
+        cursor: default;
+        background-color: $light-green;
+      }
+
+      .i-badge-img {
+        color: $black;
+        font-size: 3em;
+
+        &::before {
+          vertical-align: text-bottom;
+        }
+      }
+    }
+  }
 }

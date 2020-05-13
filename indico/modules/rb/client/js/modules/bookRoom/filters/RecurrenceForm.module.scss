@@ -6,11 +6,11 @@
 // LICENSE file for more details.
 
 .recurrence-every:global(.fields.inline) {
-    :global .ui.selection.dropdown {
-        min-width: 100px;
-    }
+  :global .ui.selection.dropdown {
+    min-width: 100px;
+  }
 
-    :global .field .ui.input input {
-        width: 80px;
-    }
+  :global .field .ui.input input {
+    width: 80px;
+  }
 }

@@ -9,311 +9,311 @@
 @import 'rb:styles/util';
 
 .timeline-item {
-    position: relative;
-    height: 100%;
-    width: 100%;
-    display: flex;
-    align-items: center;
+  position: relative;
+  height: 100%;
+  width: 100%;
+  display: flex;
+  align-items: center;
 
-    .timeline-occurrence {
-        box-sizing: border-box;
-        margin: 0;
-        position: absolute;
-        padding: 0.7em 0.2em;
-        z-index: 3;
-        border-radius: 0;
-        border: 0.5px solid rgba(0, 0, 0, 0.2);
+  .timeline-occurrence {
+    box-sizing: border-box;
+    margin: 0;
+    position: absolute;
+    padding: 0.7em 0.2em;
+    z-index: 3;
+    border-radius: 0;
+    border: 0.5px solid rgba(0, 0, 0, 0.2);
 
-        &:hover:not(:global(.other)) {
-            opacity: 0.75;
-        }
-
-        &:global(.pre-booking) {
-            @include stripes($pre-booking-stripe-colors...);
-
-            &:hover {
-                z-index: 5;
-                border-color: rgba(0, 0, 0, 0.5);
-            }
-
-            &.overflow-right {
-                @include right-fade-out-stripes($pre-booking-stripe-colors...);
-                border-right-style: none;
-            }
-
-            &.overflow-left {
-                @include left-fade-out-stripes($pre-booking-stripe-colors...);
-                border-left-style: none;
-            }
-
-            &.overflow-right.overflow-left {
-                @include fade-out-stripes($pre-booking-stripe-colors...);
-            }
-        }
-
-        &:global(.available) {
-            background-color: $available-color;
-
-            &:hover {
-                z-index: 4;
-            }
-
-            &.overflow-right {
-                @include right-fade-out($available-fadeout-colors...);
-                border-right-style: none;
-            }
-
-            &.overflow-left {
-                @include left-fade-out($available-fadeout-colors...);
-                border-left-style: none;
-            }
-
-            &.overflow-right.overflow-left {
-                @include fade-out($available-fadeout-colors...);
-            }
-        }
-
-        &:global(.booking) {
-            background-color: $booking-color;
-
-            &.overflow-right {
-                @include right-fade-out($booking-fadeout-colors...);
-                border-right-style: none;
-            }
-
-            &.overflow-left {
-                @include left-fade-out($booking-fadeout-colors...);
-                border-left-style: none;
-            }
-
-            &.overflow-right.overflow-left {
-                @include fade-out($booking-fadeout-colors...);
-            }
-        }
-
-        &:global(.conflict) {
-            background-color: $conflict-color;
-            z-index: 4;
-
-            &.overflow-right {
-                @include right-fade-out($conflict-fadeout-colors...);
-                border-right-style: none;
-            }
-
-            &.overflow-left {
-                @include left-fade-out($conflict-fadeout-colors...);
-                border-left-style: none;
-            }
-
-            &.overflow-right.overflow-left {
-                @include fade-out($conflict-fadeout-colors...);
-            }
-        }
-
-        &:global(.pre-booking-conflict) {
-            @include thiner-stripes($pre-booking-conflict-stripe-colors...);
-            z-index: 4;
-
-            &:hover ~ :global(.available) {
-                z-index: 4;
-            }
-
-            &.overflow-right {
-                @include right-fade-out-stripes($pre-booking-conflict-stripe-colors...);
-                border-right-style: none;
-            }
-
-            &.overflow-left {
-                @include left-fade-out-stripes($pre-booking-conflict-stripe-colors...);
-                border-left-style: none;
-            }
-
-            &.overflow-right.overflow-left {
-                @include fade-out-stripes($pre-booking-conflict-stripe-colors...);
-            }
-        }
-
-        &:global(.concurrent-pre-booking) {
-            @include thiner-stripes($pre-booking-concurrent-stripe-colors...);
-        }
-
-        &:global(.conflicting-candidates) {
-            background-color: $conflicting-candidate-color;
-
-            &.overflow-right {
-                @include right-fade-out($conflicting-candidate-fadeout-colors...);
-                border-right-style: none;
-            }
-
-            &.overflow-left {
-                @include left-fade-out($conflicting-candidate-fadeout-colors...);
-                border-left-style: none;
-            }
-
-            &.overflow-right.overflow-left {
-                @include fade-out($conflicting-candidate-fadeout-colors...);
-            }
-        }
-
-        &:global(.unbookable-periods) {
-            @include thin-stripes($unbookable-stripe-colors...);
-            background-size: 30px 30px;
-            z-index: 2;
-            height: 30px;
-            border: 1px solid $unbookable-color;
-        }
-
-        &:global(.unbookable-hours) {
-            @include thin-stripes($unbookable-stripe-colors...);
-            background-size: 30px 30px;
-            z-index: 1;
-            height: 30px;
-            border: 1px solid $unbookable-color;
-        }
-
-        &:global(.blocking) {
-            @include thin-stripes($blocking-stripe-colors...);
-            background-size: 30px 30px;
-            z-index: 1;
-            border: 1px solid lighten($conflict-color, 20%);
-            padding: 0.9em 0.2em;
-        }
-
-        &:global(.overridable-blocking) {
-            @include thin-stripes($overridable-blocking-stripe-colors...);
-            background-size: 30px 30px;
-            z-index: 1;
-            border: 1px solid $overridable-blocking-color;
-            padding: 0.9em 0.2em;
-        }
-
-        &:global(.cancellation) {
-            background-color: $cancellation-color;
-            border: 1px solid darken($cancellation-color, 15%);
-
-            &.overflow-right {
-                @include right-fade-out($conflicting-candidate-fadeout-colors...);
-                border-right-style: none;
-            }
-
-            &.overflow-left {
-                @include left-fade-out($conflicting-candidate-fadeout-colors...);
-                border-left-style: none;
-            }
-
-            &.overflow-right.overflow-left {
-                @include fade-out($conflicting-candidate-fadeout-colors...);
-            }
-        }
-
-        &:global(.pending-cancellations) {
-            background-color: $pending-cancellation-color;
-            z-index: 4;
-
-            &.overflow-right {
-                @include right-fade-out($pending-cancellation-fadeout-colors...);
-                border-right-style: none;
-            }
-
-            &.overflow-left {
-                @include left-fade-out($pending-cancellation-fadeout-colors...);
-                border-left-style: none;
-            }
-
-            &.overflow-right.overflow-left {
-                @include fade-out($pending-cancellation-fadeout-colors...);
-            }
-        }
-
-        &:global(.rejection) {
-            background-color: $rejection-color;
-            border: 1px solid darken($rejection-color, 25%);
-
-            &.overflow-right {
-                @include right-fade-out($rejection-fadeout-colors...);
-                border-right-style: none;
-            }
-
-            &.overflow-left {
-                @include left-fade-out($rejection-fadeout-colors...);
-                border-left-style: none;
-            }
-
-            &.overflow-right.overflow-left {
-                @include fade-out($rejection-fadeout-colors...);
-            }
-        }
-
-        &:global(.other) {
-            background-color: $other-booking-color;
-            border: 1px solid darken($other-booking-color, 10%);
-
-            &.overflow-right {
-                @include right-fade-out($other-booking-fadeout-colors...);
-                border-right-style: none;
-            }
-
-            &.overflow-left {
-                @include left-fade-out($other-booking-fadeout-colors...);
-                border-left-style: none;
-            }
-
-            &.overflow-right.overflow-left {
-                @include fade-out($other-booking-fadeout-colors...);
-            }
-
-            &:hover {
-                background-color: lighten($other-booking-color, 1%);
-                border: 1px solid darken($other-booking-color, 30%);
-                z-index: 4;
-            }
-        }
-
-        &:global(.clickable) {
-            cursor: pointer;
-        }
+    &:hover:not(:global(.other)) {
+      opacity: 0.75;
     }
+
+    &:global(.pre-booking) {
+      @include stripes($pre-booking-stripe-colors...);
+
+      &:hover {
+        z-index: 5;
+        border-color: rgba(0, 0, 0, 0.5);
+      }
+
+      &.overflow-right {
+        @include right-fade-out-stripes($pre-booking-stripe-colors...);
+        border-right-style: none;
+      }
+
+      &.overflow-left {
+        @include left-fade-out-stripes($pre-booking-stripe-colors...);
+        border-left-style: none;
+      }
+
+      &.overflow-right.overflow-left {
+        @include fade-out-stripes($pre-booking-stripe-colors...);
+      }
+    }
+
+    &:global(.available) {
+      background-color: $available-color;
+
+      &:hover {
+        z-index: 4;
+      }
+
+      &.overflow-right {
+        @include right-fade-out($available-fadeout-colors...);
+        border-right-style: none;
+      }
+
+      &.overflow-left {
+        @include left-fade-out($available-fadeout-colors...);
+        border-left-style: none;
+      }
+
+      &.overflow-right.overflow-left {
+        @include fade-out($available-fadeout-colors...);
+      }
+    }
+
+    &:global(.booking) {
+      background-color: $booking-color;
+
+      &.overflow-right {
+        @include right-fade-out($booking-fadeout-colors...);
+        border-right-style: none;
+      }
+
+      &.overflow-left {
+        @include left-fade-out($booking-fadeout-colors...);
+        border-left-style: none;
+      }
+
+      &.overflow-right.overflow-left {
+        @include fade-out($booking-fadeout-colors...);
+      }
+    }
+
+    &:global(.conflict) {
+      background-color: $conflict-color;
+      z-index: 4;
+
+      &.overflow-right {
+        @include right-fade-out($conflict-fadeout-colors...);
+        border-right-style: none;
+      }
+
+      &.overflow-left {
+        @include left-fade-out($conflict-fadeout-colors...);
+        border-left-style: none;
+      }
+
+      &.overflow-right.overflow-left {
+        @include fade-out($conflict-fadeout-colors...);
+      }
+    }
+
+    &:global(.pre-booking-conflict) {
+      @include thiner-stripes($pre-booking-conflict-stripe-colors...);
+      z-index: 4;
+
+      &:hover ~ :global(.available) {
+        z-index: 4;
+      }
+
+      &.overflow-right {
+        @include right-fade-out-stripes($pre-booking-conflict-stripe-colors...);
+        border-right-style: none;
+      }
+
+      &.overflow-left {
+        @include left-fade-out-stripes($pre-booking-conflict-stripe-colors...);
+        border-left-style: none;
+      }
+
+      &.overflow-right.overflow-left {
+        @include fade-out-stripes($pre-booking-conflict-stripe-colors...);
+      }
+    }
+
+    &:global(.concurrent-pre-booking) {
+      @include thiner-stripes($pre-booking-concurrent-stripe-colors...);
+    }
+
+    &:global(.conflicting-candidates) {
+      background-color: $conflicting-candidate-color;
+
+      &.overflow-right {
+        @include right-fade-out($conflicting-candidate-fadeout-colors...);
+        border-right-style: none;
+      }
+
+      &.overflow-left {
+        @include left-fade-out($conflicting-candidate-fadeout-colors...);
+        border-left-style: none;
+      }
+
+      &.overflow-right.overflow-left {
+        @include fade-out($conflicting-candidate-fadeout-colors...);
+      }
+    }
+
+    &:global(.unbookable-periods) {
+      @include thin-stripes($unbookable-stripe-colors...);
+      background-size: 30px 30px;
+      z-index: 2;
+      height: 30px;
+      border: 1px solid $unbookable-color;
+    }
+
+    &:global(.unbookable-hours) {
+      @include thin-stripes($unbookable-stripe-colors...);
+      background-size: 30px 30px;
+      z-index: 1;
+      height: 30px;
+      border: 1px solid $unbookable-color;
+    }
+
+    &:global(.blocking) {
+      @include thin-stripes($blocking-stripe-colors...);
+      background-size: 30px 30px;
+      z-index: 1;
+      border: 1px solid lighten($conflict-color, 20%);
+      padding: 0.9em 0.2em;
+    }
+
+    &:global(.overridable-blocking) {
+      @include thin-stripes($overridable-blocking-stripe-colors...);
+      background-size: 30px 30px;
+      z-index: 1;
+      border: 1px solid $overridable-blocking-color;
+      padding: 0.9em 0.2em;
+    }
+
+    &:global(.cancellation) {
+      background-color: $cancellation-color;
+      border: 1px solid darken($cancellation-color, 15%);
+
+      &.overflow-right {
+        @include right-fade-out($conflicting-candidate-fadeout-colors...);
+        border-right-style: none;
+      }
+
+      &.overflow-left {
+        @include left-fade-out($conflicting-candidate-fadeout-colors...);
+        border-left-style: none;
+      }
+
+      &.overflow-right.overflow-left {
+        @include fade-out($conflicting-candidate-fadeout-colors...);
+      }
+    }
+
+    &:global(.pending-cancellations) {
+      background-color: $pending-cancellation-color;
+      z-index: 4;
+
+      &.overflow-right {
+        @include right-fade-out($pending-cancellation-fadeout-colors...);
+        border-right-style: none;
+      }
+
+      &.overflow-left {
+        @include left-fade-out($pending-cancellation-fadeout-colors...);
+        border-left-style: none;
+      }
+
+      &.overflow-right.overflow-left {
+        @include fade-out($pending-cancellation-fadeout-colors...);
+      }
+    }
+
+    &:global(.rejection) {
+      background-color: $rejection-color;
+      border: 1px solid darken($rejection-color, 25%);
+
+      &.overflow-right {
+        @include right-fade-out($rejection-fadeout-colors...);
+        border-right-style: none;
+      }
+
+      &.overflow-left {
+        @include left-fade-out($rejection-fadeout-colors...);
+        border-left-style: none;
+      }
+
+      &.overflow-right.overflow-left {
+        @include fade-out($rejection-fadeout-colors...);
+      }
+    }
+
+    &:global(.other) {
+      background-color: $other-booking-color;
+      border: 1px solid darken($other-booking-color, 10%);
+
+      &.overflow-right {
+        @include right-fade-out($other-booking-fadeout-colors...);
+        border-right-style: none;
+      }
+
+      &.overflow-left {
+        @include left-fade-out($other-booking-fadeout-colors...);
+        border-left-style: none;
+      }
+
+      &.overflow-right.overflow-left {
+        @include fade-out($other-booking-fadeout-colors...);
+      }
+
+      &:hover {
+        background-color: lighten($other-booking-color, 1%);
+        border: 1px solid darken($other-booking-color, 30%);
+        z-index: 4;
+      }
+    }
+
+    &:global(.clickable) {
+      cursor: pointer;
+    }
+  }
 }
 
 .editable-timeline-canvas {
-    position: absolute;
-    width: 100%;
-    height: 1.4em;
-    cursor: pointer;
-    transition: background-color 0.25s ease-in;
-    z-index: 1;
-    opacity: 0.4;
+  position: absolute;
+  width: 100%;
+  height: 1.4em;
+  cursor: pointer;
+  transition: background-color 0.25s ease-in;
+  z-index: 1;
+  opacity: 0.4;
 
-    &:hover {
-        background-color: $gray;
-    }
+  &:hover {
+    background-color: $gray;
+  }
 }
 
 .editable-timeline-slot {
-    position: absolute;
-    z-index: 2;
-    background-color: $green;
-    top: 0;
-    height: 100%;
+  position: absolute;
+  z-index: 2;
+  background-color: $green;
+  top: 0;
+  height: 100%;
 }
 
 .editable-timeline-time-popup:global(.ui.top.left.popup) {
-    margin-left: -1em;
+  margin-left: -1em;
 }
 
 .popup-center {
-    text-align: center;
+  text-align: center;
 
-    .allowed {
-        font-size: 0.8em;
-        color: darken($available-color, 10%);
-    }
+  .allowed {
+    font-size: 0.8em;
+    color: darken($available-color, 10%);
+  }
 }
 
 .header-center {
-    text-align: center;
+  text-align: center;
 }
 
 :global(.ui.list).concurrent-pre-booking-list {
-    font-size: 0.9em;
+  font-size: 0.9em;
 }

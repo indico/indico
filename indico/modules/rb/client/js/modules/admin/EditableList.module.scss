@@ -6,42 +6,42 @@
 // LICENSE file for more details.
 
 .header {
-    display: flex;
-    justify-content: space-between;
+  display: flex;
+  justify-content: space-between;
 }
 
 .item {
-    display: flex;
-    align-items: center;
+  display: flex;
+  align-items: center;
 
-    &.editing {
-        align-items: normal;
+  &.editing {
+    align-items: normal;
+  }
+
+  .info {
+    flex-grow: 1;
+
+    .name {
+      font-size: 1.1em;
+      margin-right: 0.5em;
     }
+  }
 
-    .info {
-        flex-grow: 1;
+  form {
+    flex-grow: 1;
+    padding-right: 2em;
+  }
 
-        .name {
-            font-size: 1.1em;
-            margin-right: 0.5em;
-        }
+  .actions {
+    white-space: nowrap;
+
+    button:global(.basic) {
+      &,
+      &:global(.negative),
+      &:global(.negative):hover {
+        // remove the border of the buttons
+        box-shadow: none !important;
+      }
     }
-
-    form {
-        flex-grow: 1;
-        padding-right: 2em;
-
-    }
-
-    .actions {
-        white-space: nowrap;
-
-        button:global(.basic) {
-            &, &:global(.negative), &:global(.negative):hover {
-                // remove the border of the buttons
-                box-shadow: none !important;
-            }
-        }
-    }
-
+  }
 }

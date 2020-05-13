@@ -8,89 +8,86 @@
 /* Animation utility constructs */
 
 @mixin indico-animation($name, $duration, $timing-function, $count) {
-    animation-name: $name;
-    -webkit-animation-name: $name;
-    -moz-animation-name: $name;
+  animation-name: $name;
+  -webkit-animation-name: $name;
+  -moz-animation-name: $name;
 
-    animation-duration: $duration;
-    -webkit-animation-duration: $duration;
-    -moz-animation-duration: $duration;
+  animation-duration: $duration;
+  -webkit-animation-duration: $duration;
+  -moz-animation-duration: $duration;
 
-    animation-timing-function: $timing-function;
-    -webkit-animation-timing-function: $timing-function;
-    -moz-animation-timing-function: $timing-function;
+  animation-timing-function: $timing-function;
+  -webkit-animation-timing-function: $timing-function;
+  -moz-animation-timing-function: $timing-function;
 
-    animation-iteration-count: $count;
-    -webkit-animation-iteration-count: $count;
-    -moz-animation-iteration-count: $count;
+  animation-iteration-count: $count;
+  -webkit-animation-iteration-count: $count;
+  -moz-animation-iteration-count: $count;
 }
 
 @function flatten($list) {
-    $result: ();
-    @each $value in $list {
-        @if type-of($value) == list {
-            $result: join($result, flatten($value));
-        }
-        @else {
-            $result: append($result, $value);
-        }
+  $result: ();
+  @each $value in $list {
+    @if type-of($value) == list {
+      $result: join($result, flatten($value));
+    } @else {
+      $result: append($result, $value);
     }
-    @return $result;
+  }
+  @return $result;
 }
 
 @mixin transition($values...) {
-    $result: ();
-    @each $value in $values {
-        $value: flatten($value);
-        $duration: $default-transition-duration;
-        $function: $default-transition-function;
-        $delay: $default-transition-delay;
-        $property: nth($value, 1);
+  $result: ();
+  @each $value in $values {
+    $value: flatten($value);
+    $duration: $default-transition-duration;
+    $function: $default-transition-function;
+    $delay: $default-transition-delay;
+    $property: nth($value, 1);
 
-        @if length($value) > 1 {
-            $duration: nth($value, 2);
-        }
-        @if length($value) > 2 {
-            $function: nth($value, 3)
-        }
-        @if length($value) > 3 {
-            $delay: nth($value, 4)
-        }
-        $result: append($result, ($property $duration $function $delay), 'comma');
+    @if length($value) > 1 {
+      $duration: nth($value, 2);
     }
-    transition: $result;
+    @if length($value) > 2 {
+      $function: nth($value, 3);
+    }
+    @if length($value) > 3 {
+      $delay: nth($value, 4);
+    }
+    $result: append($result, ($property $duration $function $delay), 'comma');
+  }
+  transition: $result;
 }
-
 
 @mixin rotate-transform($delay) {
-    transition: transform $delay ease-out;
-    -webkit-transform-origin: 50% 51%; // improve blurry text on rotate with chrome
+  transition: transform $delay ease-out;
+  -webkit-transform-origin: 50% 51%; // improve blurry text on rotate with chrome
 }
 
-
 @keyframes highlight {
-    0% {
-        background-color: $blue;
-    }
+  0% {
+    background-color: $blue;
+  }
 
-    100% {
-        background-color: inherit;
-    }
+  100% {
+    background-color: inherit;
+  }
 }
 
 :not(.ui) > .slide.open {
-    overflow: hidden;
-    opacity: 1;
-    transition-property: all;
-    transition-duration: 0.5s;
-    transition-timing-function: ease-out;
+  overflow: hidden;
+  opacity: 1;
+  transition-property: all;
+  transition-duration: 0.5s;
+  transition-timing-function: ease-out;
 }
 
 :not(.ui) > .slide.close {
-    overflow: hidden;
-    max-height: 0 !important;
-    opacity: 0;
-    transition-property: all;
-    transition-duration: 0.5s;
-    transition-timing-function: ease-out;
+  overflow: hidden;
+  max-height: 0 !important;
+  opacity: 0;
+  transition-property: all;
+  transition-duration: 0.5s;
+  transition-timing-function: ease-out;
 }

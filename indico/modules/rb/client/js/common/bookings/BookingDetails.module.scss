@@ -8,59 +8,59 @@
 @import 'rb:styles/palette';
 @import 'rb:styles/responsive';
 
-
 :global(.ui.icon.message).message-icon :global(.icon) {
-    font-size: 2em;
+  font-size: 2em;
 }
 
 .popup-center {
-    text-align: center;
+  text-align: center;
 }
 
 .log-list {
-    max-height: 140px;
-    overflow: auto;
+  max-height: 140px;
+  overflow: auto;
 }
 
 .log-date {
-    color: $gray;
+  color: $gray;
 }
 
-.booking-logs, .concurrent-reservations {
-    margin-top: 20px;
+.booking-logs,
+.concurrent-reservations {
+  margin-top: 20px;
 }
 
 :global(.ui.modal .header).booking-modal-header {
-    display: flex;
-    align-items: center;
+  display: flex;
+  align-items: center;
 
-    .header-text {
-        flex: 1;
+  .header-text {
+    flex: 1;
 
-        @media (max-width: $tablet-width) {
-            flex: 3;
-        }
+    @media (max-width: $tablet-width) {
+      flex: 3;
     }
+  }
 
-    .booking-status {
-        flex: 4;
+  .booking-status {
+    flex: 4;
 
-        @media (max-width: $tablet-width) {
-            flex: 2;
-        }
+    @media (max-width: $tablet-width) {
+      flex: 2;
     }
+  }
 }
 
 .rejection-form {
-    width: 350px;
+  width: 350px;
 }
 
 .accept-with-message {
-    border-left: 1px solid darken($green, 5%) !important;
+  border-left: 1px solid darken($green, 5%) !important;
 }
 
 .concurrent-reservations-list {
-    max-height: 150px;
-    overflow: auto;
-    min-height: 20px;
+  max-height: 150px;
+  overflow: auto;
+  min-height: 20px;
 }

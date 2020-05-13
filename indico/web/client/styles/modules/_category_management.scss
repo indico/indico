@@ -5,63 +5,64 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-table.category-management, table.event-management {
-    margin-top: 0;
-    margin-bottom: 25px;
+table.category-management,
+table.event-management {
+  margin-top: 0;
+  margin-bottom: 25px;
 
-    th {
-        &.sortable-column {
-            a {
-                display: block;
-                width: 100%;
+  th {
+    &.sortable-column {
+      a {
+        display: block;
+        width: 100%;
 
-                &:hover {
-                    cursor: pointer;
-                }
-
-                &.desc {
-                    @include icon-before('icon-arrow-down');
-                }
-
-                &.asc {
-                    @include icon-before('icon-arrow-down');
-
-                    &:before {
-                        display: inline-block;
-                        transform: rotate(-180deg);
-                    }
-                }
-            }
+        &:hover {
+          cursor: pointer;
         }
-    }
 
-    .actions {
-        width: 6em;
-        text-align: right;
-    }
-
-    .column-icon {
-        width: 1.6em;
-        text-align: center;
-    }
-
-    .handle .icon-handle {
-        cursor: move;
-
-        &:hover, &:active {
-            color: $dark-gray;
+        &.desc {
+          @include icon-before('icon-arrow-down');
         }
-    }
 
-    & + .pagination {
-        margin-top: 8px;
-        float: right;
-    }
+        &.asc {
+          @include icon-before('icon-arrow-down');
 
+          &::before {
+            display: inline-block;
+            transform: rotate(-180deg);
+          }
+        }
+      }
+    }
+  }
+
+  .actions {
+    width: 6em;
+    text-align: right;
+  }
+
+  .column-icon {
+    width: 1.6em;
+    text-align: center;
+  }
+
+  .handle .icon-handle {
+    cursor: move;
+
+    &:hover,
+    &:active {
+      color: $dark-gray;
+    }
+  }
+
+  & + .pagination {
+    margin-top: 8px;
+    float: right;
+  }
 }
 
 #selection-message {
-    display: none;
-    margin: 0;
-    font-weight: bold;
+  display: none;
+  margin: 0;
+  font-weight: bold;
 }

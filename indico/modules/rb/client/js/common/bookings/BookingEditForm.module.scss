@@ -6,13 +6,14 @@
 // LICENSE file for more details.
 
 .booking-edit-form {
-    margin-top: 15px;
+  margin-top: 15px;
 
-    :global(.field .SingleDatePicker), :global(.field .DateRangePicker) {
-        padding: 0;
+  :global(.field .SingleDatePicker),
+  :global(.field .DateRangePicker) {
+    padding: 0;
 
-        :global(.DateRangePicker_picker) {
-            z-index: 1000;
-        }
+    :global(.DateRangePicker_picker) {
+      z-index: 1000;
     }
+  }
 }

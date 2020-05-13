@@ -6,52 +6,52 @@
 // LICENSE file for more details.
 
 .palette-picker-qtip {
-    @extend %default-border-radius;
-    @include single-box-shadow();
-    background: #FFF;
-    background-clip: padding-box;
-    border: thin solid lighten($gray, $color-variation);
-    box-shadow: 0 6px 12px lighten($gray, $color-variation);
-    padding: 3px;
+  @extend %default-border-radius;
+  @include single-box-shadow();
+  background: #fff;
+  background-clip: padding-box;
+  border: thin solid lighten($gray, $color-variation);
+  box-shadow: 0 6px 12px lighten($gray, $color-variation);
+  padding: 3px;
 }
 
 table.palette-picker {
-    border-spacing: 8px;
+  border-spacing: 8px;
 
-    .palette-color {
-        cursor: pointer;
-        padding: 2px;
-        border-radius: 15px;
+  .palette-color {
+    cursor: pointer;
+    padding: 2px;
+    border-radius: 15px;
 
-        .text-box {
-            width: 8px;
-            height: 8px;
-            margin: auto;
-            border-radius: 3px;
-        }
-
-        .background-box {
-            @extend .flexrow;
-            justify-content: center;
-            align-items: center;
-            width: 22px;
-            height: 22px;
-            border-radius: 15px;
-            border: 2px solid transparent;
-        }
-
-        &.selected {
-            background-color: black;
-
-            .background-box {
-                border-color: white;
-            }
-        }
+    .text-box {
+      width: 8px;
+      height: 8px;
+      margin: auto;
+      border-radius: 3px;
     }
+
+    .background-box {
+      @extend .flexrow;
+      justify-content: center;
+      align-items: center;
+      width: 22px;
+      height: 22px;
+      border-radius: 15px;
+      border: 2px solid transparent;
+    }
+
+    &.selected {
+      background-color: black;
+
+      .background-box {
+        border-color: white;
+      }
+    }
+  }
 }
 
 a.palette-picker-trigger.icon-palette {
-    &:before {
-        margin-right: 0 !important;
-    }
+  &::before {
+    margin-right: 0 !important;
+  }
 }

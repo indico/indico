@@ -8,30 +8,30 @@
 @import 'rb:styles/responsive';
 
 .booking-type-field {
-    display: flex;
-    justify-content: center;
+  display: flex;
+  justify-content: center;
 }
 
 :global(.ui.form) .recurrence-field:global(.inline.fields) {
-    display: flex;
-    justify-content: space-around;
+  display: flex;
+  justify-content: space-around;
 
-    > * {
-        flex: 1;
+  > * {
+    flex: 1;
 
-        :global(.ui.input input) {
-            width: 100%;
-            min-width: 60px;
-        }
+    :global(.ui.input input) {
+      width: 100%;
+      min-width: 60px;
     }
+  }
 
-    > :global(.dropdown) {
-        min-width: 0;
-    }
+  > :global(.dropdown) {
+    min-width: 0;
+  }
 }
 
 @media (max-width: $tablet-width) {
-    :global(.DateInput) {
-        width: 110px;
-    }
- }
+  :global(.DateInput) {
+    width: 110px;
+  }
+}

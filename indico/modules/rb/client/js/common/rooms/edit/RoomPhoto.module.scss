@@ -8,51 +8,51 @@
 @import 'rb:styles/palette';
 
 .dropzone {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding: 10px;
-    border-width: 2px;
-    border-radius: 2px;
-    border-color: $pastel-gray;
-    border-style: dashed;
-    background-color: $light-gray;
-    color: $gray;
-    outline: none;
-    transition: border 0.24s ease-in-out;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 10px;
+  border-width: 2px;
+  border-radius: 2px;
+  border-color: $pastel-gray;
+  border-style: dashed;
+  background-color: $light-gray;
+  color: $gray;
+  outline: none;
+  transition: border 0.24s ease-in-out;
 }
 
 .photo-actions {
-    display: flex;
-    justify-content: flex-end;
-    width: 100%;
-    padding-top: 10px;
+  display: flex;
+  justify-content: flex-end;
+  width: 100%;
+  padding-top: 10px;
 
-    .upload-icon {
-        background-color: $indico-blue !important;
-        color: white !important;
+  .upload-icon {
+    background-color: $indico-blue !important;
+    color: white !important;
 
-        &:hover {
-            background-color: $dark-blue !important;
-        }
+    &:hover {
+      background-color: $dark-blue !important;
     }
+  }
 
-    .remove-icon {
-        background-color: $red !important;
-        color: white !important;
+  .remove-icon {
+    background-color: $red !important;
+    color: white !important;
 
-        &:hover {
-            background-color: $dark-red !important;
-        }
+    &:hover {
+      background-color: $dark-red !important;
     }
+  }
 
-    .save-icon {
-        background-color: $green !important;
-        color: white !important;
+  .save-icon {
+    background-color: $green !important;
+    color: white !important;
 
-        &:hover {
-            background-color: $dark-green !important;
-        }
+    &:hover {
+      background-color: $dark-green !important;
     }
+  }
 }

@@ -10,89 +10,93 @@
 
 $display-preview-bg-color: white;
 
+@mixin md-display-rules(
+  $background-color,
+  $pre-bg-color: lighten($background-color, 10%),
+  $pre-color: darken($background-color, 40%),
+  $blockquote-color: $background-color
+) {
+  h1,
+  h2,
+  h3,
+  h4 {
+    @extend %font-family-serif;
+  }
 
-@mixin md-display-rules($background-color,
-                        $pre-bg-color: lighten($background-color, 10%),
-                        $pre-color: darken($background-color, 40%),
-                        $blockquote-color: $background-color) {
-    h1, h2, h3, h4 {
-        @extend %font-family-serif;
-    }
+  h1 {
+    font-size: 1.5em;
+  }
 
-    h1 {
-        font-size: 1.5em;
-    }
+  h2 {
+    font-size: 1.3em;
+  }
 
-    h2 {
-        font-size: 1.3em;
-    }
+  h3 {
+    font-size: 1.2em;
+  }
 
-    h3 {
-        font-size: 1.2em;
-    }
+  h4 {
+    font-size: 1.1em;
+  }
 
-    h4 {
-        font-size: 1.1em;
-    }
+  pre {
+    color: $pre-color;
+    font-size: 1em;
+    padding: 1em;
+    background-color: $pre-bg-color;
+  }
 
-    pre {
-        color: $pre-color;
-        font-size: 1em;
-        padding: 1em;
-        background-color: $pre-bg-color;
-    }
-
-    blockquote {
-        font-style: italic;
-        border-left: 2px solid darken($blockquote-color, 10%);
-        padding: 0.2em 0.2em 0.2em 1em;
-        margin-left: 0;
-        background-color: darken($blockquote-color, 5%);
-        overflow: auto;
-    }
+  blockquote {
+    font-style: italic;
+    border-left: 2px solid darken($blockquote-color, 10%);
+    padding: 0.2em 0.2em 0.2em 1em;
+    margin-left: 0;
+    background-color: darken($blockquote-color, 5%);
+    overflow: auto;
+  }
 }
 
 @mixin md-preview-wrapper-mixin($background-color, $max-height: 500px) {
-    @include md-display-rules($background-color);
-    @include transition(height .25s ease-out, background-color 1s ease-in, color 1s ease-in);
-    @extend %font-family-serif;
+  @include md-display-rules($background-color);
+  @include transition(height 0.25s ease-out, background-color 1s ease-in, color 1s ease-in);
+  @extend %font-family-serif;
 
-    background-color: $background-color;
-    font-size: 1.1em;
+  background-color: $background-color;
+  font-size: 1.1em;
 
-    color: $black;
-    max-height: $max-height;
-    overflow-y: auto;
+  color: $black;
+  max-height: $max-height;
+  overflow-y: auto;
 
-    &.empty {
-        @extend %font-family-sans;
-        background-color: lighten($background-color, 2%);
-        color: $gray;
-        min-height: 2em;
-        text-align: center;
-        overflow-y: hidden;
-        font-size: 1em;
-
-        .instructions {
-            padding: 10px;
-            display: block;
-        }
-
-        .wmd-preview {
-            display: none;
-        }
-    }
+  &.empty {
+    @extend %font-family-sans;
+    background-color: lighten($background-color, 2%);
+    color: $gray;
+    min-height: 2em;
+    text-align: center;
+    overflow-y: hidden;
+    font-size: 1em;
 
     .instructions {
-        display: none;
+      padding: 10px;
+      display: block;
     }
 
     .wmd-preview {
-        padding: 10px;
+      display: none;
     }
+  }
+
+  .instructions {
+    display: none;
+  }
+
+  .wmd-preview {
+    padding: 10px;
+  }
 }
 
 .md-preview-wrapper.display {
-    padding: 1em 1em 1em 0;
-    @include md-preview-wrapper-mixin($display-preview-bg-color, none);
+  padding: 1em 1em 1em 0;
+  @include md-preview-wrapper-mixin($display-preview-bg-color, none);
 }

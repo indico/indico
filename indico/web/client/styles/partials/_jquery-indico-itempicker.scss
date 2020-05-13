@@ -6,77 +6,77 @@
 // LICENSE file for more details.
 
 .item-picker-qbubble {
-    @extend %default-border-radius;
-    @include single-box-shadow();
-    @include border-all();
+  @extend %default-border-radius;
+  @include single-box-shadow();
+  @include border-all();
 
-    .qtip-content {
-        width: 210px;
-    }
+  .qtip-content {
+    width: 210px;
+  }
 
-    .dropdown-container {
+  .dropdown-container {
+    width: 100%;
+
+    .dropdown-filter-wrapper {
+      .clearableinput,
+      .filter-input {
         width: 100%;
+      }
 
-        .dropdown-filter-wrapper {
-            .clearableinput,
-            .filter-input {
-                width: 100%;
-            }
-
-            .clearableinput .clearabletext {
-                height: 2.2em;
-            }
-        }
-
-        .dropdown-items-container {
-            overflow-x: hidden;
-            overflow-y: auto;
-            margin: 0 -5px;
-            max-height: 250px;
-
-            .dropdown-item {
-                @extend .flexrow;
-                align-items: center;
-                margin-top: 5px;
-                padding: 5px 5px;
-                cursor: pointer;
-                font-size: 1em;
-
-                &:hover {
-                    background: $pastel-gray;
-                }
-
-                &.active {
-                    background: $gray;
-
-                    .active-item-icon {
-                        visibility: visible;
-                    }
-                }
-
-                .active-item-icon {
-                    margin: 0 4px;
-                    visibility: hidden;
-                }
-
-                .item-icon {
-                    font-size: 1.2em;
-                }
-
-                .item-title {
-                    flex-grow: 1;
-                    margin: 0 2px;
-                    white-space: normal;
-                    color: $black;
-                    overflow: hidden;
-                }
-            }
-        }
-
-        .divider {
-            background: $separator-color;
-            height: 1px;
-            margin: 5px -5px;
-        }
+      .clearableinput .clearabletext {
+        height: 2.2em;
+      }
     }
+
+    .dropdown-items-container {
+      overflow-x: hidden;
+      overflow-y: auto;
+      margin: 0 -5px;
+      max-height: 250px;
+
+      .dropdown-item {
+        @extend .flexrow;
+        align-items: center;
+        margin-top: 5px;
+        padding: 5px 5px;
+        cursor: pointer;
+        font-size: 1em;
+
+        &:hover {
+          background: $pastel-gray;
+        }
+
+        &.active {
+          background: $gray;
+
+          .active-item-icon {
+            visibility: visible;
+          }
+        }
+
+        .active-item-icon {
+          margin: 0 4px;
+          visibility: hidden;
+        }
+
+        .item-icon {
+          font-size: 1.2em;
+        }
+
+        .item-title {
+          flex-grow: 1;
+          margin: 0 2px;
+          white-space: normal;
+          color: $black;
+          overflow: hidden;
+        }
+      }
+    }
+
+    .divider {
+      background: $separator-color;
+      height: 1px;
+      margin: 5px -5px;
+    }
+  }
 }

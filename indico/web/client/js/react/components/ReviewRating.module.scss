@@ -8,16 +8,17 @@
 @import 'base/palette';
 
 .rating-field {
-    display: flex;
-    align-items: center;
+  display: flex;
+  align-items: center;
 
-    :global(.active.icon)::before, :global(.selected.icon)::before {
-        color: $blue;
-    }
+  :global(.active.icon)::before,
+  :global(.selected.icon)::before {
+    color: $blue;
+  }
 
-    .rating-value {
-        margin-left: 5px;
-        text-align: center;
-        min-width: 15px;
-    }
+  .rating-value {
+    margin-left: 5px;
+    text-align: center;
+    min-width: 15px;
+  }
 }

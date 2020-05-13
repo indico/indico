@@ -6,298 +6,296 @@
 // LICENSE file for more details.
 
 %categorynav-sizing {
-    width: 800px;
-    height: 600px;
+  width: 800px;
+  height: 600px;
 }
 
 .categorynav-dialog-content {
-    @extend %categorynav-sizing;
+  @extend %categorynav-sizing;
 }
 
 .categorynav {
-    @extend %categorynav-sizing;
-    @extend .flexcol;
+  @extend %categorynav-sizing;
+  @extend .flexcol;
 
-   :not(.ui) >  input[type='search'] {
-        @extend %form-field-input;
-        width: 100%;
-        flex-shrink: 0;
-        padding-left: 10px;
-        padding-right: 35px !important;
+  :not(.ui) > input[type='search'] {
+    @extend %form-field-input;
+    width: 100%;
+    flex-shrink: 0;
+    padding-left: 10px;
+    padding-right: 35px !important;
+  }
+
+  .clearableinput {
+    .button-box {
+      padding-right: 10px;
+
+      a {
+        padding-right: 0;
+      }
     }
-
-    .clearableinput {
-        .button-box {
-            padding-right: 10px;
-
-            a {
-                padding-right: 0;
-            }
-        }
-    }
+  }
 }
 
 .categorynav .category-list {
-    @extend .i-box;
-    @extend .i-box.no-shadow;
-    @extend .i-box.just-group-list;
-    @extend .i-box.just-group-list.with-hover-effect;
-    @extend .flexcol;
+  @extend .i-box;
+  @extend .i-box.no-shadow;
+  @extend .i-box.just-group-list;
+  @extend .i-box.just-group-list.with-hover-effect;
+  @extend .flexcol;
 
-    background: $light-gray;
-    flex-grow: 1;
-    margin-top: 10px;
+  background: $light-gray;
+  flex-grow: 1;
+  margin-top: 10px;
 
-    // Needed for Firefox to actually overflow on .group-list
-    overflow: hidden;
+  // Needed for Firefox to actually overflow on .group-list
+  overflow: hidden;
 
-    &:not(.loading) .spinner-wrapper {
-        display: none;
+  &:not(.loading) .spinner-wrapper {
+    display: none;
+  }
+
+  &.loading {
+    pointer-events: none;
+  }
+
+  a {
+    color: $link;
+  }
+
+  .group-list {
+    overflow: auto;
+    overflow-y: auto;
+
+    // Needed to avoid double border in case of overflow
+    margin-bottom: -1px !important;
+
+    &.with-protected .item {
+      padding-left: 27px;
     }
+  }
 
-    &.loading {
-        pointer-events: none;
-    }
-
-    a {
-        color: $link;
-    }
-
-    .group-list {
-        overflow: auto;
-        overflow-y: auto;
-
-        // Needed to avoid double border in case of overflow
-        margin-bottom: -1px !important;
-
-        &.with-protected .item {
-            padding-left: 27px;
-        }
-    }
-
-    .spinner-wrapper {
-        @extend .flexrow;
-        align-items: center;
-        align-self: center;
-        flex-grow: 1;
-        font-size: 6em;
-    }
-}
-
-.categorynav .category-list .item {
-    @extend .flexrow;
-    align-items: center;
-    background: white;
-
-    &:last-child {
-        border-bottom: 1px solid lighten($gray, $color-variation);
-    }
-
-    &:hover {
-        @include inner-border-left($indico-blue, $width: 3px);
-
-        .action-button {
-            visibility: visible !important;
-        }
-    }
-
-    .title-wrapper {
-        flex-grow: 1;
-        .title {
-            @extend %font-family-title-light;
-            display: block;
-        }
-    }
-
-    .button-wrapper {
-        @extend .flexrow;
-        align-items: center;
-        flex-shrink: 0;
-        margin-left: auto;
-
-        > * {
-            margin: 0 0.5rem;
-        }
-
-        > *:first-child {
-            margin-left: 0;
-        }
-
-        > *:last-child {
-            margin-right: 0;
-        }
-
-        .action-button {
-            @extend .i-button;
-            @extend .i-button.highlight;
-            visibility: hidden;
-        }
-    }
-
-    .protection {
-        min-width: 13px;
-        display: inline-block;
-
-        &:before {
-            color: $pastel-red;
-        }
-    }
-
-    ul.breadcrumbs {
-        display: inline-block;
-        font-size: 0.9em;
-        list-style: none;
-        padding: 0;
-        margin: 0;
-
-        li {
-            display: inline;
-
-            a {
-                color: inherit;
-
-                &:hover {
-                    text-decoration: underline;
-                }
-            }
-
-            &:not(:last-child):after {
-                content: '»';
-                padding: 0 0.5em;
-            }
-        }
-
-        li.ellipsis:before {
-            content: '...';
-        }
-    }
-}
-
-.categorynav .category-list .item.current-category {
-    box-shadow: 0 2px 2px 0 $light-gray;
-    @include inner-border-left($indico-blue, $width: 3px);
-    border-bottom: 1px solid lighten($gray, $color-variation);
-    min-height: 40px;
-    margin-left: -10px;
-    margin-right: -10px;
-    padding: 10px 10px;
-    position: relative;
-    overflow: hidden;
-    color: $light-black;
-
-    .title {
-        font-size: 1.2em;
-        font-weight: bold;
-        color: $dark-blue;
-    }
-
-    .protection:after {
-        // Adds whitespace
-        content: '\00a0';
-    }
-
-    .navigate-up {
-        padding: 10px;
-        &:hover {
-            background-color: $pastel-gray;
-        }
-    }
-}
-
-.categorynav .category-list .item.subcategory {
-    @extend .flexrow;
-
-    &.can-access {
-        cursor: pointer;
-    }
-
-    .icon-wrapper {
-        @extend .flexrow;
-
-        i {
-            border-radius: 50%;
-            border: 2px solid $blue;
-            color: $blue;
-            font-size: 16px;
-            margin-right: 10px;
-            text-align: center;
-            height: 1.5em;
-            width: 1.5em;
-
-            &:before {
-                vertical-align: middle;
-            }
-        }
-    }
-
-    .protection-wrapper .protection {
-        margin-right: 0.5rem;
-    }
-
-    .stats {
-        font-size: 0.85em;
-        line-height: 0.85;
-
-        &:before {
-            margin-right: 5px;
-        }
-
-        .events-count {
-            color: $dark-gray;
-        }
-    }
-}
-
-.categorynav .category-list .placeholder {
+  .spinner-wrapper {
     @extend .flexrow;
     align-items: center;
     align-self: center;
-    color: $gray;
     flex-grow: 1;
-    text-align: center;
+    font-size: 6em;
+  }
+}
 
-    &:empty {
-        display: none;
+.categorynav .category-list .item {
+  @extend .flexrow;
+  align-items: center;
+  background: white;
+
+  &:last-child {
+    border-bottom: 1px solid lighten($gray, $color-variation);
+  }
+
+  &:hover {
+    @include inner-border-left($indico-blue, $width: 3px);
+
+    .action-button {
+      visibility: visible !important;
+    }
+  }
+
+  .title-wrapper {
+    flex-grow: 1;
+    .title {
+      @extend %font-family-title-light;
+      display: block;
+    }
+  }
+
+  .button-wrapper {
+    @extend .flexrow;
+    align-items: center;
+    flex-shrink: 0;
+    margin-left: auto;
+
+    > * {
+      margin: 0 0.5rem;
     }
 
-    .placeholder-text {
-        font-size: 1.5em;
-        font-weight: bold;
-
+    > *:first-child {
+      margin-left: 0;
     }
 
-    a:hover {
-        text-decoration: underline;
+    > *:last-child {
+      margin-right: 0;
     }
+
+    .action-button {
+      @extend .i-button;
+      @extend .i-button.highlight;
+      visibility: hidden;
+    }
+  }
+
+  .protection {
+    min-width: 13px;
+    display: inline-block;
+
+    &::before {
+      color: $pastel-red;
+    }
+  }
+
+  ul.breadcrumbs {
+    display: inline-block;
+    font-size: 0.9em;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+
+    li {
+      display: inline;
+
+      a {
+        color: inherit;
+
+        &:hover {
+          text-decoration: underline;
+        }
+      }
+
+      &:not(:last-child)::after {
+        content: '»';
+        padding: 0 0.5em;
+      }
+    }
+
+    li.ellipsis::before {
+      content: '...';
+    }
+  }
+}
+
+.categorynav .category-list .item.current-category {
+  box-shadow: 0 2px 2px 0 $light-gray;
+  @include inner-border-left($indico-blue, $width: 3px);
+  border-bottom: 1px solid lighten($gray, $color-variation);
+  min-height: 40px;
+  margin-left: -10px;
+  margin-right: -10px;
+  padding: 10px 10px;
+  position: relative;
+  overflow: hidden;
+  color: $light-black;
+
+  .title {
+    font-size: 1.2em;
+    font-weight: bold;
+    color: $dark-blue;
+  }
+
+  .protection::after {
+    // Adds whitespace
+    content: '\00a0';
+  }
+
+  .navigate-up {
+    padding: 10px;
+    &:hover {
+      background-color: $pastel-gray;
+    }
+  }
+}
+
+.categorynav .category-list .item.subcategory {
+  @extend .flexrow;
+
+  &.can-access {
+    cursor: pointer;
+  }
+
+  .icon-wrapper {
+    @extend .flexrow;
+
+    i {
+      border-radius: 50%;
+      border: 2px solid $blue;
+      color: $blue;
+      font-size: 16px;
+      margin-right: 10px;
+      text-align: center;
+      height: 1.5em;
+      width: 1.5em;
+
+      &::before {
+        vertical-align: middle;
+      }
+    }
+  }
+
+  .protection-wrapper .protection {
+    margin-right: 0.5rem;
+  }
+
+  .stats {
+    font-size: 0.85em;
+    line-height: 0.85;
+
+    &::before {
+      margin-right: 5px;
+    }
+
+    .events-count {
+      color: $dark-gray;
+    }
+  }
+}
+
+.categorynav .category-list .placeholder {
+  @extend .flexrow;
+  align-items: center;
+  align-self: center;
+  color: $gray;
+  flex-grow: 1;
+  text-align: center;
+
+  &:empty {
+    display: none;
+  }
+
+  .placeholder-text {
+    font-size: 1.5em;
+    font-weight: bold;
+  }
+
+  a:hover {
+    text-decoration: underline;
+  }
 }
 
 .categorynav .category-list .search-result-info {
-    @extend .flexrow;
-    align-items: center;
-    border-bottom: 1px solid lighten($gray, $color-variation);
-    background-color: $light-gray;
-    margin: 0 -10px;
-    padding: 5px 10px;
-    color: $light-black;
+  @extend .flexrow;
+  align-items: center;
+  border-bottom: 1px solid lighten($gray, $color-variation);
+  background-color: $light-gray;
+  margin: 0 -10px;
+  padding: 5px 10px;
+  color: $light-black;
 
-    .clear {
-        margin-left: auto;
-        flex-shrink: 0;
+  .clear {
+    margin-left: auto;
+    flex-shrink: 0;
 
-        &:hover {
-            text-decoration: underline;
-        }
+    &:hover {
+      text-decoration: underline;
     }
+  }
 }
 
-
 .categorynav .category-list .search-results-list {
-    .breadcrumbs {
-        color: $dark-gray;
-        font-size: 0.85em;
-    }
+  .breadcrumbs {
+    color: $dark-gray;
+    font-size: 0.85em;
+  }
 
-    .title strong {
-        @extend %font-family-title;
-    }
+  .title strong {
+    @extend %font-family-title;
+  }
 }

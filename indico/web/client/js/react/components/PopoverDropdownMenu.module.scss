@@ -6,15 +6,15 @@
 // LICENSE file for more details.
 
 .trigger-container {
-    display: inline-block;
+  display: inline-block;
 }
 
 .dropdown-container {
-    padding: 2px;
-    z-index: 1000;
-    overflow: auto;
+  padding: 2px;
+  z-index: 1000;
+  overflow: auto;
 
-    &:global(.ui.dropdown .menu) {
-        position: relative;
-    }
+  &:global(.ui.dropdown .menu) {
+    position: relative;
+  }
 }

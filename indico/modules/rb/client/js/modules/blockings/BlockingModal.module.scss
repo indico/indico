@@ -6,22 +6,22 @@
 // LICENSE file for more details.
 
 :global(.ui.modal .header).blocking-modal-header {
-    display: flex;
-    justify-content: space-between;
+  display: flex;
+  justify-content: space-between;
 }
 
 .blocking-actions {
-    display: inline-block;
+  display: inline-block;
 
-    :global(.icon) {
-        font-size: 1em !important;
+  :global(.icon) {
+    font-size: 1em !important;
 
-        &.action {
-            cursor: pointer;
-        }
+    &.action {
+      cursor: pointer;
     }
+  }
 }
 
 .rejection-form {
-    width: 350px;
+  width: 350px;
 }

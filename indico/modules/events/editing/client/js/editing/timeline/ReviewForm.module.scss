@@ -8,10 +8,10 @@
 @import 'base/palette';
 
 .judgment-form {
-    :global(.ui.form) {
-        :global(.field) {
-            display: flex;
-            align-items: center;
-        }
+  :global(.ui.form) {
+    :global(.field) {
+      display: flex;
+      align-items: center;
     }
+  }
 }

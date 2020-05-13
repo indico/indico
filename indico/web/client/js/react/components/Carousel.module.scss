@@ -8,64 +8,65 @@
 @import 'rb:styles/palette';
 
 .carousel {
-    padding: 1em 0 0 0;
+  padding: 1em 0 0 0;
 
-    .pane-container {
-        display: flex;
-        width: 100%;
-        height: 100%;
-        overflow: hidden;
-    }
+  .pane-container {
+    display: flex;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+  }
 }
 
 .carousel-page {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    min-width: 100%;
-    min-height: 100%;
-    transition: margin-left 1s ease-out;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-width: 100%;
+  min-height: 100%;
+  transition: margin-left 1s ease-out;
 }
 
 .progress-indicator {
-    transition: background-color 0.25s ease-in;
-    background-color: $pastel-gray;
-    width: 100px;
-    height: 2px;
-    margin: 10px auto;
+  transition: background-color 0.25s ease-in;
+  background-color: $pastel-gray;
+  width: 100px;
+  height: 2px;
+  margin: 10px auto;
 
-    &:global(.disabled), &:global(.disabled) .progress-bar {
-        background-color: $light-gray;
-    }
+  &:global(.disabled),
+  &:global(.disabled) .progress-bar {
+    background-color: $light-gray;
+  }
 
-    .progress-bar {
-        height: 100%;
-        background-color: $primary-color;
-        transition: width 0.25s linear;
-        width: 0;
-    }
+  .progress-bar {
+    height: 100%;
+    background-color: $primary-color;
+    transition: width 0.25s linear;
+    width: 0;
+  }
 }
 
 .pane-switcher {
-    list-style-type: none;
-    padding: 0;
-    margin: 0.5em 0 0 0;
+  list-style-type: none;
+  padding: 0;
+  margin: 0.5em 0 0 0;
 
-    .pane-switcher-item {
-        display: inline-block;
-        border: 1px solid $primary-color;
-        width: 15px;
-        height: 15px;
-        border-radius: 100%;
-        cursor: pointer;
-        transition: background-color 0.25s ease-in;
+  .pane-switcher-item {
+    display: inline-block;
+    border: 1px solid $primary-color;
+    width: 15px;
+    height: 15px;
+    border-radius: 100%;
+    cursor: pointer;
+    transition: background-color 0.25s ease-in;
 
-        &:not(:last-child) {
-            margin-right: 0.5em;
-        }
-
-        &:global(.active) {
-            background-color: $primary-color;
-        }
+    &:not(:last-child) {
+      margin-right: 0.5em;
     }
+
+    &:global(.active) {
+      background-color: $primary-color;
+    }
+  }
 }

@@ -9,134 +9,135 @@
 @import 'partials/boxes';
 
 .person-link-list {
-    @extend .i-box;
-    @extend .i-box.no-shadow;
-    width: 400px;
+  @extend .i-box;
+  @extend .i-box.no-shadow;
+  width: 400px;
 
-    &.no-border-top {
-        border-top-left-radius: 0;
-        border-top-right-radius: 0;
-        border-top: none;
+  &.no-border-top {
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
+    border-top: none;
+  }
+
+  .person-list {
+    @extend %i-box-cancel-horizontal-margin;
+  }
+
+  .nobody-placeholder {
+    color: $gray;
+    font-style: italic;
+    height: 2em;
+    line-height: 2em;
+  }
+
+  .person-row {
+    @extend %i-box-horizontal-padding;
+    @extend .flexrow;
+    @extend .f-a-center;
+    @include transition(background-color);
+
+    .name {
+      @include ellipsis();
+      flex-grow: 1;
+      flex-shrink: 1;
+      flex-basis: 0;
     }
 
-    .person-list {
-        @extend %i-box-cancel-horizontal-margin;
-    }
+    .person-roles {
+      margin-right: 10px;
 
-    .nobody-placeholder {
-        color: $gray;
-        font-style: italic;
-        height: 2em;
-        line-height: 2em;
-    }
-
-    .person-row {
-        @extend %i-box-horizontal-padding;
-        @extend .flexrow;
-        @extend .f-a-center;
-        @include transition(background-color);
-
-        .name {
-            @include ellipsis();
-            flex-grow: 1;
-            flex-shrink: 1;
-            flex-basis: 0;
-        }
-
-        .person-roles {
-            margin-right: 10px;
-
-            .i-label {
-                margin-right: 0;
-                margin-top: 1px;
-                min-width: 5.5em;
-                vertical-align: top;
-                cursor: default;
-
-                &:not(.selected) {
-                    color: $gray !important;
-                    border-color: $gray;
-
-                    &:hover {
-                        color: $dark-gray !important;
-                    }
-                }
-
-                &.selected {
-                    color: $indico-blue !important;
-                    border-color: $indico-blue;
-                }
-
-                &:not(.other) {
-                    cursor: pointer;
-
-                    &.selected:hover {
-                        color: $blue !important;
-                        border-color: $blue;
-                    }
-                }
-            }
-        }
-
-        .i-link {
-            margin: 0 1px;
-
-            &:first-child {
-                margin-left: 0;
-            }
-
-            &:last-child {
-                margin-right: 0;
-            }
-        }
-
-        .sort-handle {
-            @include icon-before('icon-handle');
-            color: $dark-gray;
-            margin-right: 0.5em;
-            cursor: move;
-        }
-
-        &:hover,
-        &.active {
-            background: $light-gray;
-
-            .person-buttons {
-                opacity: 1;
-            }
-        }
-    }
-
-    .person-buttons {
-        @include transition(opacity 0.5s);
-        display: inline-block;
-        height: 2em;
-        line-height: 2;
-        text-align: right;
-
-        .i-link {
-            font-size: 1.1em;
-            vertical-align: sub;
-        }
+      .i-label {
+        margin-right: 0;
+        margin-top: 1px;
+        min-width: 5.5em;
+        vertical-align: top;
+        cursor: default;
 
         &:not(.selected) {
-            opacity: 0.3;
+          color: $gray !important;
+          border-color: $gray;
+
+          &:hover {
+            color: $dark-gray !important;
+          }
         }
+
+        &.selected {
+          color: $indico-blue !important;
+          border-color: $indico-blue;
+        }
+
+        &:not(.other) {
+          cursor: pointer;
+
+          &.selected:hover {
+            color: $blue !important;
+            border-color: $blue;
+          }
+        }
+      }
     }
 
-    .i-box-footer {
-        .info-helper {
-            vertical-align: sub;
-        }
+    .i-link {
+      margin: 0 1px;
 
-        .alpha-order-switch, .alpha-order-switch:hover {
-            cursor: pointer !important;
-        }
+      &:first-child {
+        margin-left: 0;
+      }
+
+      &:last-child {
+        margin-right: 0;
+      }
     }
+
+    .sort-handle {
+      @include icon-before('icon-handle');
+      color: $dark-gray;
+      margin-right: 0.5em;
+      cursor: move;
+    }
+
+    &:hover,
+    &.active {
+      background: $light-gray;
+
+      .person-buttons {
+        opacity: 1;
+      }
+    }
+  }
+
+  .person-buttons {
+    @include transition(opacity 0.5s);
+    display: inline-block;
+    height: 2em;
+    line-height: 2;
+    text-align: right;
+
+    .i-link {
+      font-size: 1.1em;
+      vertical-align: sub;
+    }
+
+    &:not(.selected) {
+      opacity: 0.3;
+    }
+  }
+
+  .i-box-footer {
+    .info-helper {
+      vertical-align: sub;
+    }
+
+    .alpha-order-switch,
+    .alpha-order-switch:hover {
+      cursor: pointer !important;
+    }
+  }
 }
 
 .person-link-qbubble {
-    .qtip-content {
-        width: 200px;
-    }
+  .qtip-content {
+    width: 200px;
+  }
 }

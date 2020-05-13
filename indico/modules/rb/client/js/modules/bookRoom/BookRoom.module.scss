@@ -9,114 +9,113 @@
 @import 'rb:styles/responsive';
 
 .view-icons {
-    height: 100%;
-    margin-left: auto;
+  height: 100%;
+  margin-left: auto;
 
-    :global(.ui.active.button),
-    :global(.ui.active.button:hover) {
-        background-color: $primary-color;
-        color: $white;
-        cursor: default;
+  :global(.ui.active.button),
+  :global(.ui.active.button:hover) {
+    background-color: $primary-color;
+    color: $white;
+    cursor: default;
 
-        .switcher-icon {
-            cursor: default;
-        }
+    .switcher-icon {
+      cursor: default;
     }
+  }
 
-    :global(i.icons) {
-        height: 32px;
+  :global(i.icons) {
+    height: 32px;
+  }
+
+  :global(i:not(.disabled):hover) {
+    cursor: pointer;
+  }
+
+  :global(i.disabled:hover) {
+    cursor: default;
+  }
+
+  .icons-wrapper {
+    display: flex;
+    justify-content: flex-end;
+
+    :global(.icon:last-child) {
+      margin-right: 0.75em;
     }
-
-    :global(i:not(.disabled):hover) {
-        cursor: pointer;
-    }
-
-    :global(i.disabled:hover) {
-        cursor: default;
-    }
-
-    .icons-wrapper {
-        display: flex;
-        justify-content: flex-end;
-
-        :global(.icon:last-child) {
-            margin-right: 0.75em;
-        }
-    }
+  }
 }
 
 .available-room-list {
-    .results-count {
-        margin-bottom: 10px;
+  .results-count {
+    margin-bottom: 10px;
 
-        :global(.ui.menu .item > i.icon) {
-            margin-right: 0.5em;
-        }
-
-        .results-count-menu {
-            position: relative;
-            transition: opacity 0.25s ease-in;
-
-            @media (max-width: $tablet-width) {
-                :global(.item) {
-                    padding: 0.4em;
-
-                    :global(.label) {
-                        margin-left: 0;
-                    }
-                }
-            }
-
-            &:global(.loading) {
-                opacity: 0.3;
-                width: 50%;
-            }
-        }
-
-        .loading-indicator {
-            padding: 8px;
-            box-sizing: border-box;
-            width: 100%;
-            height: 43.6px;
-
-            :global(.bar) {
-                background: $pastel-gray;
-                width: 100%;
-                height: 7px;
-
-                &:not(:last-child) {
-                    margin-bottom: 4px;
-                }
-            }
-        }
+    :global(.ui.menu .item > i.icon) {
+      margin-right: 0.5em;
     }
 
-    :global(.redux-lazy-scroll) {
-        overflow: visible !important;
-        margin: 0.15em;
+    .results-count-menu {
+      position: relative;
+      transition: opacity 0.25s ease-in;
+
+      @media (max-width: $tablet-width) {
+        :global(.item) {
+          padding: 0.4em;
+
+          :global(.label) {
+            margin-left: 0;
+          }
+        }
+      }
+
+      &:global(.loading) {
+        opacity: 0.3;
+        width: 50%;
+      }
     }
 
+    .loading-indicator {
+      padding: 8px;
+      box-sizing: border-box;
+      width: 100%;
+      height: 43.6px;
 
-    :global(.corner.icon).prebooking-corner-icon {
-        cursor: pointer;
-        color: $white;
-        font-size: 0.8em;
-        right: 4px;
-        bottom: 2px;
-        text-shadow: none;
+      :global(.bar) {
+        background: $pastel-gray;
+        width: 100%;
+        height: 7px;
+
+        &:not(:last-child) {
+          margin-bottom: 4px;
+        }
+      }
     }
+  }
+
+  :global(.redux-lazy-scroll) {
+    overflow: visible !important;
+    margin: 0.15em;
+  }
+
+  :global(.corner.icon).prebooking-corner-icon {
+    cursor: pointer;
+    color: $white;
+    font-size: 0.8em;
+    right: 4px;
+    bottom: 2px;
+    text-shadow: none;
+  }
 }
 
 .message-nothing:global(.ui.message) {
-    margin-bottom: 3em;
+  margin-bottom: 3em;
 }
 
 .suggestions-container {
-    .divider-icon:global(.circular.icon) {
-        font-size: 2em;
-    }
+  .divider-icon:global(.circular.icon) {
+    font-size: 2em;
+  }
 
-    .header {
-        margin: 0 0 2em 0;
-    }
+  .header {
+    margin: 0 0 2em 0;
+  }
 }

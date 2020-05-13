@@ -8,20 +8,20 @@
 @import 'base/palette';
 
 .sticky-content {
-    margin-bottom: 10px;
+  margin-bottom: 10px;
 
-    > :nth-child(2) {
-        z-index: 15;
-        background-color: white;
-    }
+  > :nth-child(2) {
+    z-index: 15;
+    background-color: white;
+  }
 
-    &:global(.ui.stuck-container + div) {
-        padding-top: 130px;
-    }
+  &:global(.ui.stuck-container + div) {
+    padding-top: 130px;
+  }
 
-    :global(.ui.sticky.fixed.top) {
-        padding-top: 30px;
-        box-shadow: rgba($black, 0.2) 0 25px 30px -20px;
-        transition: all, 0.25s ease-in;
-    }
+  :global(.ui.sticky.fixed.top) {
+    padding-top: 30px;
+    box-shadow: rgba($black, 0.2) 0 25px 30px -20px;
+    transition: all, 0.25s ease-in;
+  }
 }

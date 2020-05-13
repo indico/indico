@@ -6,18 +6,18 @@
 // LICENSE file for more details.
 
 .button-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding-bottom: 10px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: 10px;
 }
 
 .submit-message {
-    margin: 0 0 1em !important;
+  margin: 0 0 1em !important;
 }
 
 .room-form {
-    :global(.fields) > :global(.field) {
-        flex-grow: 1 !important;
-    }
+  :global(.fields) > :global(.field) {
+    flex-grow: 1 !important;
+  }
 }

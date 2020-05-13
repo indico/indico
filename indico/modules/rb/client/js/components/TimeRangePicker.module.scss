@@ -6,33 +6,33 @@
 // LICENSE file for more details.
 
 .time-range-picker {
-    display: flex;
-    justify-content: space-between;
-    width: 200px;
+  display: flex;
+  justify-content: space-between;
+  width: 200px;
 
-    .start-time-dropdown {
-        max-width: 100px !important;
-        min-width: 90px !important;
-        text-align: center !important;
+  .start-time-dropdown {
+    max-width: 100px !important;
+    min-width: 90px !important;
+    text-align: center !important;
+  }
+
+  .end-time-dropdown {
+    max-width: 100px !important;
+    min-width: 90px !important;
+    text-align: center !important;
+
+    :global(.menu) {
+      min-width: 140px !important;
     }
+  }
 
-    .end-time-dropdown {
-        max-width: 100px !important;
-        min-width: 90px !important;
-        text-align: center !important;
+  .duration {
+    font-size: 0.7em;
+    color: #808c99;
+    white-space: nowrap;
+  }
 
-        :global(.menu) {
-            min-width: 140px !important;
-        }
-    }
-
-    .duration {
-        font-size: 0.7em;
-        color: #808c99;
-        white-space: nowrap;
-    }
-
-    .end-time-item {
-        white-space: nowrap;
-    }
+  .end-time-item {
+    white-space: nowrap;
+  }
 }

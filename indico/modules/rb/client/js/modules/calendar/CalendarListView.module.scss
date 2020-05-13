@@ -6,37 +6,38 @@
 // LICENSE file for more details.
 
 .active-bookings {
-    margin-top: 15px;
+  margin-top: 15px;
 
-    :global(.redux-lazy-scroll) {
-        overflow: unset !important;
+  :global(.redux-lazy-scroll) {
+    overflow: unset !important;
+  }
+
+  .day-cards {
+    .day-cards-header {
+      display: flex;
+      align-items: center;
+      height: 50px;
     }
 
-    .day-cards {
-        .day-cards-header {
-            display: flex;
-            align-items: center;
-            height: 50px;
-        }
-
-        .day-cards-container {
-            margin-right: 1em;
-        }
-
-        :global(.icon.calendar.outline) {
-            font-size: 1.2em;
-        }
-
-        :global(.cards) {
-            margin-top: 0;
-        }
-
-        .booking-card {
-            .booking-card-header, .booking-booked-for {
-                text-overflow: ellipsis;
-                overflow: hidden;
-                white-space: nowrap;
-            }
-        }
+    .day-cards-container {
+      margin-right: 1em;
     }
+
+    :global(.icon.calendar.outline) {
+      font-size: 1.2em;
+    }
+
+    :global(.cards) {
+      margin-top: 0;
+    }
+
+    .booking-card {
+      .booking-card-header,
+      .booking-booked-for {
+        text-overflow: ellipsis;
+        overflow: hidden;
+        white-space: nowrap;
+      }
+    }
+  }
 }

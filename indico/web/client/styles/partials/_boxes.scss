@@ -7,78 +7,76 @@
 
 @import 'partials/toolbars';
 
-
 // ============================================================================
 // Base classes and mixins
 // ============================================================================
 
 %i-box-title {
-    @extend %font-family-title-light;
-    color: $dark-blue;
-    display: inline-block;
-    font-size: 1.5em;
-    font-weight: bold;
+  @extend %font-family-title-light;
+  color: $dark-blue;
+  display: inline-block;
+  font-size: 1.5em;
+  font-weight: bold;
 }
 
 %i-box-description {
-    @extend %font-family-description;
-    color: $dark-gray;
-    font-size: 14px;
+  @extend %font-family-description;
+  color: $dark-gray;
+  font-size: 14px;
 }
 
 %box-hr {
-    @include border-bottom();
-    height: 0;
-    overflow: hidden;
-    background: transparent;
-    border: none;
-    margin-left: -10px;
-    margin-right: -10px;
+  @include border-bottom();
+  height: 0;
+  overflow: hidden;
+  background: transparent;
+  border: none;
+  margin-left: -10px;
+  margin-right: -10px;
 
-    &.inline {
-        margin-left: 0;
-        margin-right: 0;
-    }
+  &.inline {
+    margin-left: 0;
+    margin-right: 0;
+  }
 }
 
 %i-box-empty {
-    color: $dark-gray;
-    display: block;
-    font-size: 1em;
-    font-style: italic;
-    text-align: left;
+  color: $dark-gray;
+  display: block;
+  font-size: 1em;
+  font-style: italic;
+  text-align: left;
 }
 
 %i-box-sortable-handle-background {
-    @include transition(background-color $default-transition-duration $default-transition-function);
-    background-color: lighten($dark-gray, $color-variation);
-    cursor: move;
+  @include transition(background-color $default-transition-duration $default-transition-function);
+  background-color: lighten($dark-gray, $color-variation);
+  cursor: move;
+
+  &::before,
+  > .handle::before {
+    color: $light-gray;
+  }
+
+  &:active,
+  &:hover {
+    background-color: white;
 
     &::before,
     > .handle::before {
-        color: $light-gray;
+      color: $dark-gray;
     }
-
-    &:active,
-    &:hover {
-        background-color: white;
-
-        &::before,
-        > .handle::before {
-            color: $dark-gray;
-        }
-    }
+  }
 }
 
 %i-box-sortable-handle-grip {
-    @include icon-before('icon-handle');
+  @include icon-before('icon-handle');
 }
 
 %i-box-sortable-handle {
-    @extend %i-box-sortable-handle-background;
-    @extend %i-box-sortable-handle-grip;
+  @extend %i-box-sortable-handle-background;
+  @extend %i-box-sortable-handle-grip;
 }
-
 
 // ============================================================================
 // Boxes
@@ -87,231 +85,236 @@
 $i-box-padding: 10px;
 
 %i-box-horizontal-padding {
-    padding-left: $i-box-padding;
-    padding-right: $i-box-padding;
+  padding-left: $i-box-padding;
+  padding-right: $i-box-padding;
 }
 
 %i-box-cancel-horizontal-margin {
-    margin-left: -$i-box-padding;
-    margin-right: -$i-box-padding;
+  margin-left: -$i-box-padding;
+  margin-right: -$i-box-padding;
 }
 
 %i-box-vertical-padding {
-    padding-top: $i-box-padding;
-    padding-bottom: $i-box-padding;
+  padding-top: $i-box-padding;
+  padding-bottom: $i-box-padding;
 }
 
 %i-box-cancel-vertical-margin {
-    margin-top: -$i-box-padding;
-    margin-bottom: -$i-box-padding;
+  margin-top: -$i-box-padding;
+  margin-bottom: -$i-box-padding;
 }
 
 %i-box-padding {
-    @extend %i-box-horizontal-padding;
-    @extend %i-box-vertical-padding;
+  @extend %i-box-horizontal-padding;
+  @extend %i-box-vertical-padding;
 }
 
 %i-box-cancel-margin {
-    @extend %i-box-cancel-horizontal-margin;
-    @extend %i-box-cancel-vertical-margin;
+  @extend %i-box-cancel-horizontal-margin;
+  @extend %i-box-cancel-vertical-margin;
 }
 
 // Use the titled-rule as the top border of the i-box. Combine with .titled on the i-box.
 %i-box-titled-rule-header {
-    @extend %i-box-cancel-horizontal-margin;
-    margin-top: -18px; // Pure magic number to align the rule with the i-box border
+  @extend %i-box-cancel-horizontal-margin;
+  margin-top: -18px; // Pure magic number to align the rule with the i-box border
 }
 
-@mixin single-box-shadow($hoff: $default-box-shadow-h-offset, $voff: $default-box-shadow-v-offset,
-    $blur: $default-box-shadow-blur, $spread: $default-box-shadow-spread,
-    $color: $default-box-shadow-color, $inset: $default-box-shadow-inset) {
-    box-shadow: $inset $hoff $voff $blur $spread $color;
+@mixin single-box-shadow(
+  $hoff: $default-box-shadow-h-offset,
+  $voff: $default-box-shadow-v-offset,
+  $blur: $default-box-shadow-blur,
+  $spread: $default-box-shadow-spread,
+  $color: $default-box-shadow-color,
+  $inset: $default-box-shadow-inset
+) {
+  box-shadow: $inset $hoff $voff $blur $spread $color;
 }
 
 .i-box {
+  @extend %i-box-padding;
+  @extend %default-border-radius;
+  @include border-all();
+  @include single-box-shadow();
+  @include transition();
+  @include transition(padding-bottom);
+
+  box-sizing: border-box;
+  background: white;
+  color: $black;
+
+  hr {
+    @extend %box-hr;
+  }
+
+  > .empty {
+    @extend %i-box-empty;
+  }
+
+  .ui-i-box-sortable-handle {
+    @extend %i-box-sortable-handle;
+    @include transition(
+      background-color $default-transition-duration $default-transition-function,
+      height $default-transition-duration $default-transition-function
+    );
+
+    font-size: 1.2em;
+    height: 10px;
+    margin: -10px -10px 10px -10px;
+    text-align: center;
+
+    &:hover,
+    &:active {
+      @include border-bottom();
+      height: 20px;
+
+      &::before {
+        color: $dark-gray;
+        top: 3px;
+      }
+    }
+
+    &::before {
+      @include transition(top);
+      transform: rotate(90deg);
+      display: inline-block;
+      position: relative;
+      top: -3px;
+    }
+  }
+
+  .titled-rule {
+    margin-top: 5px;
+    margin-bottom: 5px;
+  }
+
+  > .titled-rule:first-child,
+  > *:first-child > .titled-rule:first-child {
+    @extend %i-box-titled-rule-header;
+  }
+
+  // For i-box without headers where the first child is a .titled-rule
+  &.titled {
+    border-top: none;
+  }
+
+  .i-box-footer {
+    @extend %i-box-cancel-margin;
+    background-color: $light-gray;
+    box-shadow: inset 0 15px 20px -20px $gray;
+    overflow: auto;
+    padding: $i-box-padding;
+    margin-top: $i-box-padding;
+  }
+
+  .i-box-header {
+    @extend %i-box-cancel-margin;
     @extend %i-box-padding;
-    @extend %default-border-radius;
-    @include border-all();
-    @include single-box-shadow();
-    @include transition();
-    @include transition(padding-bottom);
+    @include border-bottom();
+    @include transition(margin-bottom);
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    background-color: $light-gray;
+    overflow: hidden;
+    margin-bottom: $i-box-padding;
+    word-break: break-word;
 
-    box-sizing: border-box;
-    background: white;
-    color: $black;
-
-    hr {
-        @extend %box-hr;
+    .i-box-header-text {
+      float: left;
     }
 
-    > .empty {
-        @extend %i-box-empty;
+    .i-box-title {
+      @extend %i-box-title;
     }
 
-    .ui-i-box-sortable-handle {
-        @extend %i-box-sortable-handle;
-        @include transition(
-            background-color $default-transition-duration $default-transition-function,
-            height $default-transition-duration $default-transition-function
-        );
+    .i-box-description {
+      @extend %i-box-description;
+    }
 
-        font-size: 1.2em;
-        height: 10px;
-        margin: -10px -10px 10px -10px;
-        text-align: center;
+    .i-box-buttons {
+      margin: 0;
+      padding: 0;
+    }
 
-        &:hover,
-        &:active {
-            @include border-bottom();
-            height: 20px;
+    .i-box-metadata {
+      float: right;
+      line-height: $toolbar-thin-height;
 
-            &::before {
-                color: $dark-gray;
-                top: 3px;
-            }
+      .label {
+        color: $black;
+        font-weight: bold;
+
+        &:not(:first-child) {
+          margin-left: 0.7em;
         }
+      }
 
-        &::before {
-            @include transition(top);
-            transform: rotate(90deg);
-            display: inline-block;
-            position: relative;
-            top: -3px;
-        }
+      .content {
+        color: $light-black;
+        font-style: italic;
+      }
     }
 
-    .titled-rule {
-        margin-top: 5px;
-        margin-bottom: 5px;
+    .i-box-buttons + .i-box-metadata {
+      margin-right: 1em;
+    }
+  }
+
+  .i-box-table-widget {
+    @extend %i-box-cancel-margin;
+
+    > table.i-table-widget {
+      border: none;
     }
 
-    > .titled-rule:first-child,
-    > *:first-child > .titled-rule:first-child {
-        @extend %i-box-titled-rule-header;
+    > *:not(table) {
+      @extend %i-box-padding;
     }
+  }
 
-    // For i-box without headers where the first child is a .titled-rule
-    &.titled {
-        border-top: none;
-    }
-
-    .i-box-footer {
-        @extend %i-box-cancel-margin;
-        background-color: $light-gray;
-        box-shadow: inset 0 15px 20px -20px $gray;
-        overflow: auto;
-        padding: $i-box-padding;
-        margin-top: $i-box-padding;
-    }
+  @mixin header-only-sizing() {
+    padding-bottom: 0;
 
     .i-box-header {
-        @extend %i-box-cancel-margin;
-        @extend %i-box-padding;
-        @include border-bottom();
-        @include transition(margin-bottom);
-        display: flex;
-        flex-direction: row;
-        justify-content: space-between;
-        align-items: center;
-        background-color: $light-gray;
-        overflow: hidden;
-        margin-bottom: $i-box-padding;
-        word-break: break-word;
-
-        .i-box-header-text {
-            float: left;
-        }
-
-        .i-box-title {
-            @extend %i-box-title;
-        }
-
-        .i-box-description {
-            @extend %i-box-description;
-        }
-
-        .i-box-buttons {
-            margin: 0;
-            padding: 0;
-        }
-
-        .i-box-metadata {
-            float: right;
-            line-height: $toolbar-thin-height;
-
-            .label {
-                color: $black;
-                font-weight: bold;
-
-                &:not(:first-child) {
-                    margin-left: 0.7em;
-                }
-            }
-
-            .content {
-                color: $light-black;
-                font-style: italic;
-            }
-        }
-
-        .i-box-buttons + .i-box-metadata {
-            margin-right: 1em;
-        }
+      margin-bottom: 0;
     }
+  }
 
-    .i-box-table-widget {
-        @extend %i-box-cancel-margin;
+  &.header-only {
+    @include header-only-sizing();
 
-        > table.i-table-widget {
-            border: none;
-        }
-
-        > *:not(table) {
-            @extend %i-box-padding;
-        }
+    .i-box-header {
+      border-bottom: none;
     }
+  }
 
-    @mixin header-only-sizing() {
-        padding-bottom: 0;
-
-        .i-box-header {
-            margin-bottom: 0;
-        }
-    }
-
-    &.header-only {
-        @include header-only-sizing();
-
-        .i-box-header {
-            border-bottom: none;
-        }
-    }
-
-    &.header-only-transition {
-        @include header-only-sizing();
-    }
+  &.header-only-transition {
+    @include header-only-sizing();
+  }
 }
 
 .i-box.no-shadow {
-    @include single-box-shadow(none);
+  @include single-box-shadow(none);
 }
 
 .i-box.highlight {
-    border-color: $pastel-blue;
+  border-color: $pastel-blue;
 
-    .i-box-header {
-        background-color: $light-blue;
-        border-bottom-color: $pastel-blue;
-    }
+  .i-box-header {
+    background-color: $light-blue;
+    border-bottom-color: $pastel-blue;
+  }
 }
 
 .i-box.footer-only {
-    padding-top: 0;
+  padding-top: 0;
 
-    .i-box-footer {
-        @include single-box-shadow(none);
-        margin-top: 0;
-    }
+  .i-box-footer {
+    @include single-box-shadow(none);
+    margin-top: 0;
+  }
 }
 
 // ============================================================================
@@ -319,200 +322,199 @@ $i-box-padding: 10px;
 // ============================================================================
 
 .i-box-group {
-    $margin: 15px;
+  $margin: 15px;
 
-    & + & {
-        margin-top: $margin;
+  & + & {
+    margin-top: $margin;
+  }
+
+  &.horz {
+    overflow: hidden;
+    padding-bottom: $margin;
+
+    .i-box {
+      float: left;
+      margin-right: $margin;
+
+      &:last-child {
+        margin-right: 0;
+      }
     }
+  }
 
-    &.horz {
-        overflow: hidden;
-        padding-bottom: $margin;
+  &.vert {
+    .i-box {
+      margin-bottom: $margin;
 
-        .i-box {
-            float: left;
-            margin-right: $margin;
-
-            &:last-child {
-                margin-right: 0;
-            }
-        }
+      &:last-child {
+        margin-bottom: 0;
+      }
     }
+  }
 
-    &.vert {
-        .i-box {
-            margin-bottom: $margin;
-
-            &:last-child {
-                margin-bottom: 0;
-            }
-        }
-    }
-
-    .i-box-sortable-placeholder {
-        @include border-all($style: dashed);
-        background-color: $light-gray;
-        margin-bottom: $margin;
-    }
+  .i-box-sortable-placeholder {
+    @include border-all($style: dashed);
+    background-color: $light-gray;
+    margin-bottom: $margin;
+  }
 }
-
 
 // ============================================================================
 // Boxed group lists
 // ============================================================================
 
 .i-box.just-group-list {
-    padding-bottom: 0;
-    padding-top: 0;
+  padding-bottom: 0;
+  padding-top: 0;
 
-    .i-box-header {
-        margin-bottom: 0;
-        margin-top: 0;
+  .i-box-header {
+    margin-bottom: 0;
+    margin-top: 0;
+  }
+
+  ul.group-list {
+    > li {
+      &:first-child {
+        border-top: none;
+      }
+
+      &[class*='icon-']:not(:empty)::before {
+        margin-right: 0.5em;
+      }
     }
+  }
 
-    ul.group-list {
-        > li {
-            &:first-child {
-                border-top: none;
-            }
-
-            &[class*='icon-']:not(:empty)::before {
-                margin-right: 0.5em;
-            }
-        }
+  &.with-hover-effect {
+    ul.group-list > li:hover {
+      background-color: $light-gray;
     }
-
-    &.with-hover-effect {
-        ul.group-list > li:hover {
-            background-color: $light-gray;
-        }
-    }
+  }
 }
 
 .i-box ul.group-list {
-    color: $light-black;
-    list-style: outside none none;
-    padding: 0;
-    margin: 0 -10px;
+  color: $light-black;
+  list-style: outside none none;
+  padding: 0;
+  margin: 0 -10px;
 
-    // Sortable <li> will use absolute positioning while being moved thus the
-    // <ul> must use relative positioning for correct alignment.
-    position: relative;
+  // Sortable <li> will use absolute positioning while being moved thus the
+  // <ul> must use relative positioning for correct alignment.
+  position: relative;
 
-    > li {
-        @include border-top();
-        padding: 10px;
+  > li {
+    @include border-top();
+    padding: 10px;
 
-        > span:not(:last-child) {
-            margin-right: 10px;
-        }
-
-        .list-item-title {
-            font-weight: bold;
-        }
-
-        .list-item-info {
-            margin: 0 1em;
-
-            > span:not(:last-child) {
-                margin-right: 0.7em;
-            }
-
-            .label {
-                font-weight: bold;
-            }
-
-            .content {
-                font-style: italic;
-            }
-        }
-
-        // Sortable row with handle on the left
-        &.ui-sortable {
-            display: flex;
-            margin: 0;
-
-            > .ui-sortable-handle {
-                @extend %i-box-sortable-handle-background;
-                display: flex;
-                align-items: center;
-                visibility: hidden;
-                width: 1em;
-
-                > .handle {
-                    @extend %i-box-sortable-handle-grip;
-                }
-            }
-
-            &:hover {
-                > .ui-sortable-handle {
-                    visibility: visible;
-                }
-            }
-
-            > .ui-sortable-content {
-                flex-grow: 1;
-            }
-        }
-
-        &.ui-sortable-helper {
-            @include border-vert(lighten($gray, $color-variation));
-            border-top-width: 1px !important;
-        }
+    > span:not(:last-child) {
+      margin-right: 10px;
     }
 
-    &.content-after {
-        margin-top: -$i-box-padding;
-        margin-bottom: $i-box-padding;
-
-        > li:first-child {
-            border-top: none;
-        }
-
-        > li:last-child {
-            @include border-bottom();
-        }
+    .list-item-title {
+      font-weight: bold;
     }
 
-    &.no-content-before {
-        > li:first-child {
-            border-top-width: 0;
-        }
+    .list-item-info {
+      margin: 0 1em;
+
+      > span:not(:last-child) {
+        margin-right: 0.7em;
+      }
+
+      .label {
+        font-weight: bold;
+      }
+
+      .content {
+        font-style: italic;
+      }
     }
 
-    &.with-buttons {
-        line-height: 1.8em;
+    // Sortable row with handle on the left
+    &.ui-sortable {
+      display: flex;
+      margin: 0;
 
-        .i-button {
-            margin-top: 0;
+      > .ui-sortable-handle {
+        @extend %i-box-sortable-handle-background;
+        display: flex;
+        align-items: center;
+        visibility: hidden;
+        width: 1em;
+
+        > .handle {
+          @extend %i-box-sortable-handle-grip;
         }
+      }
+
+      &:hover {
+        > .ui-sortable-handle {
+          visibility: visible;
+        }
+      }
+
+      > .ui-sortable-content {
+        flex-grow: 1;
+      }
     }
+
+    &.ui-sortable-helper {
+      @include border-vert(lighten($gray, $color-variation));
+      border-top-width: 1px !important;
+    }
+  }
+
+  &.content-after {
+    margin-top: -$i-box-padding;
+    margin-bottom: $i-box-padding;
+
+    > li:first-child {
+      border-top: none;
+    }
+
+    > li:last-child {
+      @include border-bottom();
+    }
+  }
+
+  &.no-content-before {
+    > li:first-child {
+      border-top-width: 0;
+    }
+  }
+
+  &.with-buttons {
+    line-height: 1.8em;
+
+    .i-button {
+      margin-top: 0;
+    }
+  }
 }
 
 .error-box {
-    @include border-all();
-    font-size: 1.2em;
-    padding: 2em;
-    background-color: $light-gray;
-    width: 400px;
-    margin: 50px auto;
-    padding-top: 20px;
-    text-align: center;
-    border-radius: 0.5em;
+  @include border-all();
+  font-size: 1.2em;
+  padding: 2em;
+  background-color: $light-gray;
+  width: 400px;
+  margin: 50px auto;
+  padding-top: 20px;
+  text-align: center;
+  border-radius: 0.5em;
 
-    h1 {
-        color: $dark-blue;
-        font-size: 2em;
-        padding-bottom: 10px;
-    }
+  h1 {
+    color: $dark-blue;
+    font-size: 2em;
+    padding-bottom: 10px;
+  }
 
-    p {
-        color: $light-black;
-        word-wrap: break-word;
-    }
+  p {
+    color: $light-black;
+    word-wrap: break-word;
+  }
 
-    .error-box-small {
-        margin-top: 2em;
-        font-size: 0.8em;
-    }
+  .error-box-small {
+    margin-top: 2em;
+    font-size: 0.8em;
+  }
 }

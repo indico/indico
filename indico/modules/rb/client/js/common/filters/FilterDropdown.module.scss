@@ -9,51 +9,51 @@
 @import 'rb:styles/responsive';
 
 .filter-dropdown {
-    .filter-dropdown-actions {
-        margin-top: 15px;
-    }
+  .filter-dropdown-actions {
+    margin-top: 15px;
+  }
 }
 
 :global(.ui.button).filter-dropdown-button {
-    position: relative;
-    transition: width 0.15s ease-out;
+  position: relative;
+  transition: width 0.15s ease-out;
+
+  @media (max-width: $computer-width) {
+    padding-left: 0.75em;
+    padding-right: 0.75em;
+  }
+
+  > :global(i.icon.angle.down) {
+    padding-left: 1em;
+    transition: padding-left 0.15s ease-out;
 
     @media (max-width: $computer-width) {
-        padding-left: 0.75em;
-        padding-right: 0.75em;
+      margin: 0;
+      padding-left: 0.5em;
     }
-
-    > :global(i.icon.angle.down) {
-        padding-left: 1em;
-        transition: padding-left 0.15s ease-out;
-
-        @media (max-width: $computer-width) {
-            margin: 0;
-            padding-left: 0.5em;
-        }
-    }
+  }
 }
 
 :global(.ui.small.buttons .button).filter-dropdown-button {
-    @media (max-width: $computer-width) {
-        font-size: 0.8rem;
-    }
+  @media (max-width: $computer-width) {
+    font-size: 0.8rem;
+  }
 }
 
 :global(.ui.button).filter-dropdown-button-counter {
-    @extend .filter-dropdown-button;
+  @extend .filter-dropdown-button;
 
-    > :global(.ui.white.label) {
-        color: $primary-color;
-        background-color: $white;
-        margin-left: 0.5em;
-    }
+  > :global(.ui.white.label) {
+    color: $primary-color;
+    background-color: $white;
+    margin-left: 0.5em;
+  }
 
-    &:global(.primary) > :global(i.icon.angle.down) {
-        padding-left: 2.5em;
-    }
+  &:global(.primary) > :global(i.icon.angle.down) {
+    padding-left: 2.5em;
+  }
 }
 
 .filter-dropdown-footer:global(.ui.buttons) {
-    margin-top: 10px;
+  margin-top: 10px;
 }

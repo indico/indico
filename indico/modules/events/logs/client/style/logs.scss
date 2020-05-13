@@ -11,194 +11,196 @@
 @import 'base/utilities';
 
 %line-style {
-    line-height: 2em;
-    padding: 0.25em 0;
-    margin: 0;
+  line-height: 2em;
+  padding: 0.25em 0;
+  margin: 0;
 }
 
 .event-log {
-    position: relative;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+
+  .toolbars {
     display: flex;
-    flex-direction: column;
+  }
 
-    .toolbars {
-        display: flex;
+  .paginator {
+    display: flex;
+
+    .i-button {
+      line-height: normal;
     }
+  }
 
-    .paginator {
-        display: flex;
-
-        .i-button {
-            line-height: normal;
-        }
-    }
-
-    .info-message-box {
-        margin-top: 1em;
-    }
+  .info-message-box {
+    margin-top: 1em;
+  }
 }
 
 .event-log-list-spinner {
-    position: absolute;
-    font-size: 5em;
-    left: 45%;
-    top: 250px;
+  position: absolute;
+  font-size: 5em;
+  left: 45%;
+  top: 250px;
 }
 
 .event-log-list {
+  display: flex;
+  flex-direction: column;
+  padding: 0;
+  list-style-type: none;
+  color: $black;
+
+  &.loading {
+    background-color: #fff;
+    opacity: 0.2;
+    pointer-events: none;
+  }
+
+  li.log-realm-emails span.log-module span.log-icon i.log-realm {
+    @include icon-before('icon-mail');
+  }
+
+  li.log-realm-event span.log-module span.log-icon i.log-realm {
+    @include icon-before('icon-time');
+  }
+
+  li.log-realm-reviewing span.log-module span.log-icon i.log-realm {
+    @include icon-before('icon-user-reading');
+  }
+
+  li.log-realm-participants span.log-module span.log-icon i.log-realm {
+    @include icon-before('icon-users');
+  }
+
+  li.log-realm-management span.log-module span.log-icon i.log-realm {
+    @include icon-before('icon-medal');
+  }
+
+  li.log-kind-positive span.log-module span.log-icon i.log-kind,
+  li.log-realm-emails.log-kind-positive span.log-module span.log-icon {
+    color: $green;
+  }
+
+  li.log-kind-negative span.log-module span.log-icon i.log-kind,
+  li.log-realm-emails.log-kind-negative span.log-module span.log-icon {
+    color: $red;
+  }
+
+  li.log-kind-change span.log-module span.log-icon i.log-kind,
+  li.log-realm-emails.log-kind-change span.log-module span.log-icon {
+    color: $blue;
+  }
+
+  li.log-kind-other span.log-module span.log-icon i.log-kind,
+  li.log-realm-emails span.log-module span.log-icon i.log-kind {
+    display: none;
+  }
+
+  > li {
+    @extend %line-style;
     display: flex;
-    flex-direction: column;
-    padding: 0;
-    list-style-type: none;
-    color: $black;
+    align-items: center;
+    width: 100%;
+    border-bottom: 1px solid $pastel-gray;
 
-    &.loading {
-        background-color: #fff;
-        opacity: 0.2;
-        pointer-events: none;
-    }
+    .log-module {
+      @extend .flexrow;
 
-    li.log-realm-emails span.log-module span.log-icon i.log-realm {
-        @include icon-before('icon-mail');
-    }
+      display: flex;
+      flex: 0.6;
 
-    li.log-realm-event span.log-module span.log-icon i.log-realm {
-        @include icon-before('icon-time');
-    }
-
-    li.log-realm-reviewing span.log-module span.log-icon i.log-realm {
-        @include icon-before('icon-user-reading');
-    }
-
-    li.log-realm-participants span.log-module span.log-icon i.log-realm {
-        @include icon-before('icon-users');
-    }
-
-    li.log-realm-management span.log-module span.log-icon i.log-realm {
-        @include icon-before('icon-medal');
-    }
-
-    li.log-kind-positive span.log-module span.log-icon i.log-kind,
-    li.log-realm-emails.log-kind-positive span.log-module span.log-icon {
-        color: $green;
-    }
-
-    li.log-kind-negative span.log-module span.log-icon i.log-kind,
-    li.log-realm-emails.log-kind-negative span.log-module span.log-icon {
-        color: $red;
-    }
-
-    li.log-kind-change span.log-module span.log-icon i.log-kind,
-    li.log-realm-emails.log-kind-change span.log-module span.log-icon {
-        color: $blue;
-    }
-
-    li.log-kind-other span.log-module span.log-icon i.log-kind,
-    li.log-realm-emails span.log-module span.log-icon i.log-kind {
-        display: none;
-    }
-
-    > li {
-        @extend %line-style;
+      .log-icon {
         display: flex;
-        align-items: center;
-        width: 100%;
-        border-bottom: 1px solid $pastel-gray;
+        color: $dark-gray;
+        font-size: 1.2em;
+        position: relative;
+        width: 1.8em;
 
-        .log-module {
-            @extend .flexrow;
-
-            display: flex;
-            flex: 0.6;
-
-            .log-icon {
-                display: flex;
-                color: $dark-gray;
-                font-size: 1.2em;
-                position: relative;
-                width: 1.8em;
-
-                i.log-kind {
-                    line-height: 1em;
-                    font-size: 0.7em;
-                    position: absolute;
-                    right: 3px;
-                    top: 1px;
-                }
-            }
+        i.log-kind {
+          line-height: 1em;
+          font-size: 0.7em;
+          position: absolute;
+          right: 3px;
+          top: 1px;
         }
-
-        .log-entry-description {
-            cursor: pointer;
-            flex: 2 0 0%;
-            word-wrap: break-word;
-            text-decoration: dotted underline $gray;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-
-        .log-entry-details {
-            @extend .text-superfluous;
-
-            display: flex;
-            flex: 0.65;
-            align-items: center;
-            justify-content: space-between;
-            margin-left: 1em;
-
-            .avatar-placeholder {
-                cursor: default;
-                opacity: 0.8;
-                width: 25px;
-                height: 25px;
-                display: flex;
-                justify-content: center;
-                color: rgba(#fff, 0.9);
-                background-color: #45f;
-                font-size: 1em;
-                border-radius: 50%;
-            }
-
-            time {
-                vertical-align: middle;
-            }
-        }
+      }
     }
+
+    .log-entry-description {
+      cursor: pointer;
+      flex: 2 0 0%;
+      word-wrap: break-word;
+      text-decoration: dotted underline $gray;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .log-entry-details {
+      @extend .text-superfluous;
+
+      display: flex;
+      flex: 0.65;
+      align-items: center;
+      justify-content: space-between;
+      margin-left: 1em;
+
+      .avatar-placeholder {
+        cursor: default;
+        opacity: 0.8;
+        width: 25px;
+        height: 25px;
+        display: flex;
+        justify-content: center;
+        color: rgba(#fff, 0.9);
+        background-color: #45f;
+        font-size: 1em;
+        border-radius: 50%;
+      }
+
+      time {
+        vertical-align: middle;
+      }
+    }
+  }
 }
 
 .log-modal-author-info {
-    margin-top: 1em;
-    font-size: 1.2em;
+  margin-top: 1em;
+  font-size: 1.2em;
 
-    .log-modal-user, .log-modal-time {
-        color: $light-black;
-    }
+  .log-modal-user,
+  .log-modal-time {
+    color: $light-black;
+  }
 }
 
 table.log-modal-details {
-    width: 100%;
-    margin: 0;
+  width: 100%;
+  margin: 0;
 
-    td.log-caption {
-        width: 200px;
+  td.log-caption {
+    width: 200px;
+  }
+
+  .diff {
+    ins {
+      background: $light-green;
+      text-decoration: none;
     }
 
-    .diff {
-        ins {
-            background: $light-green;
-            text-decoration: none;
-        }
-
-        del {
-            background: $light-red;
-            text-decoration: none;
-        }
+    del {
+      background: $light-red;
+      text-decoration: none;
     }
+  }
 
-    .mail {
-        .header, .content {
-            white-space: normal;
-        }
+  .mail {
+    .header,
+    .content {
+      white-space: normal;
     }
+  }
 }

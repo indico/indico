@@ -5,306 +5,306 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-@mixin user-action($color, $final-color:$color) {
-    @extend %user-action-button;
-    color: $color;
-    opacity: 0.7;
+@mixin user-action($color, $final-color: $color) {
+  @extend %user-action-button;
+  color: $color;
+  opacity: 0.7;
 
-    &:hover {
-        opacity: 1;
-    }
+  &:hover {
+    opacity: 1;
+  }
 }
 
 %user-action-button {
-    @include transition(color .25s, opacity, .25s);
-    display: inline;
-    height: 1.3em;
-    font-size: 1.3em;
-    line-height: 1.3em;
-    margin-left: 0.3em;
-    cursor: pointer;
-    vertical-align: baseline;
+  @include transition(color 0.25s, opacity, 0.25s);
+  display: inline;
+  height: 1.3em;
+  font-size: 1.3em;
+  line-height: 1.3em;
+  margin-left: 0.3em;
+  cursor: pointer;
+  vertical-align: baseline;
 }
 
 .suggested-users {
-    max-width: 250px;
-    max-height: 450px;
-    overflow-y: scroll;
+  max-width: 250px;
+  max-height: 450px;
+  overflow-y: scroll;
 
-    .user-list li .info {
-        max-width: 200px;
-    }
+  .user-list li .info {
+    max-width: 200px;
+  }
 }
 
 .suggested-users,
 .user-search-results {
-    overflow: auto;
-    .user-list {
-        li {
-            cursor: pointer;
-        }
-
-        .listMessage {
-            cursor: normal;
-            color: $dark-gray;
-            border: 0;
-            font-style: italic;
-            text-align: center;
-            cursor: auto;
-        }
+  overflow: auto;
+  .user-list {
+    li {
+      cursor: pointer;
     }
+
+    .listMessage {
+      cursor: normal;
+      color: $dark-gray;
+      border: 0;
+      font-style: italic;
+      text-align: center;
+      cursor: auto;
+    }
+  }
 }
 
 .event-user {
-    @extend %default-border-radius;
-    @include icon-before('icon-user');
+  @extend %default-border-radius;
+  @include icon-before('icon-user');
 
-    display: inline-block;
-    font-size: 0.95em;
-    padding: 0.2em 0.5em;
-    margin-bottom: 0.1em;
-    color: $black;
-    background: $pastel-gray;
+  display: inline-block;
+  font-size: 0.95em;
+  padding: 0.2em 0.5em;
+  margin-bottom: 0.1em;
+  color: $black;
+  background: $pastel-gray;
 
-    &:before {
-        color: $gray;
-        margin-right: 0.4em;
-    }
+  &::before {
+    color: $gray;
+    margin-right: 0.4em;
+  }
 
-    &:not(:first-child) {
-        margin-left: 0.1em;
-    }
+  &:not(:first-child) {
+    margin-left: 0.1em;
+  }
 
-    .affiliation {
-        color: $dark-gray;
-        font-size: 0.9em;
-    }
+  .affiliation {
+    color: $dark-gray;
+    font-size: 0.9em;
+  }
 }
 
 .user-search-results {
-    height: 300px;
-    border: 1px solid $gray;
-    width: 450px;
-    overflow: auto;
+  height: 300px;
+  border: 1px solid $gray;
+  width: 450px;
+  overflow: auto;
 }
 
 .user-list {
-    list-style-type: none;
-    padding-left: 0;
-    margin: 0;
-    max-width: 500px;
+  list-style-type: none;
+  padding-left: 0;
+  margin: 0;
+  max-width: 500px;
 
-    li {
-        display: table;
-        box-sizing: border-box;
-        width: 100%;
-        height: 3em;
-        padding: 0.4em;
-        background-color: transparent;
-        @include transition(background-color .25s);
+  li {
+    display: table;
+    box-sizing: border-box;
+    width: 100%;
+    height: 3em;
+    padding: 0.4em;
+    background-color: transparent;
+    @include transition(background-color 0.25s);
 
-        &:before {
-            display: table-cell;
-            width: 2em;
-            vertical-align: middle;
-            font-size: 1.5em;
-            color: $gray;
-            font-family: 'icomoon-ultimate';
-        }
+    &::before {
+      display: table-cell;
+      width: 2em;
+      vertical-align: middle;
+      font-size: 1.5em;
+      color: $gray;
+      font-family: 'icomoon-ultimate';
+    }
 
-        &.item-user:before {
-            content: "\48";
-        }
+    &.item-user::before {
+      content: '\48';
+    }
 
-        &.item-group:before {
-            content: "\47";
-        }
+    &.item-group::before {
+      content: '\47';
+    }
 
-        &.selected {
-            background-color: $pastel-blue;
+    &.selected {
+      background-color: $pastel-blue;
 
-            &:hover:not(.listMessage) {
-                background-color: transparentize($pastel-blue, 0.1);
-            }
-        }
+      &:hover:not(.listMessage) {
+        background-color: transparentize($pastel-blue, 0.1);
+      }
+    }
 
-        &:hover:not(.listMessage) {
-            background-color: $light-gray;
-        }
+    &:hover:not(.listMessage) {
+      background-color: $light-gray;
+    }
+
+    &:not(:last-child) {
+      border-bottom: 1px solid lighten($gray, 20%);
+    }
+
+    .info {
+      display: table-cell;
+      overflow: hidden;
+      max-width: 500px;
+      vertical-align: middle;
+
+      > * {
+        @include ellipsis;
+
+        display: table-cell;
 
         &:not(:last-child) {
-            border-bottom: 1px solid lighten($gray, 20%);
+          padding-right: 0.5em;
         }
+      }
 
-        .info {
-            display: table-cell;
-            overflow: hidden;
-            max-width: 500px;
-            vertical-align: middle;
+      .name {
+        display: block;
 
-            > * {
-                @include ellipsis;
-
-                display: table-cell;
-
-                &:not(:last-child) {
-                    padding-right: 0.5em;
-                }
-            }
-
-            .name {
-                display: block;
-
-                &:not(:last-child) {
-                    margin-bottom: 0.2em;
-                }
-            }
-
-            .affiliation {
-                color: $gray;
-                font-size: 0.8em;
-            }
-
-            .email {
-                color: $dark-gray;
-                font-size: 0.8em;
-            }
-
-            .role {
-                font-size: 0.8em;
-                margin: 0.2em 0.2em 0 0;
-                padding: 0.2em;
-                border-radius: 0.3em;
-                background-color: transparentize($blue, 0.2);
-                color: $light-gray;
-            }
-
-            .email + .affiliation {
-                width: 99%;
-                max-width: 0;
-            }
-
-            .name + .affiliation:last-child {
-                max-width: 400px;
-            }
+        &:not(:last-child) {
+          margin-bottom: 0.2em;
         }
+      }
 
-        .actions {
-            display: table-cell;
-            text-align: right;
-            vertical-align: middle;
-            width: 0;
+      .affiliation {
+        color: $gray;
+        font-size: 0.8em;
+      }
 
-            .remove-user {
-                @include user-action($dark-gray, $red);
-            }
+      .email {
+        color: $dark-gray;
+        font-size: 0.8em;
+      }
 
-            .edit-user {
-                @include user-action($light-black);
-            }
+      .role {
+        font-size: 0.8em;
+        margin: 0.2em 0.2em 0 0;
+        padding: 0.2em;
+        border-radius: 0.3em;
+        background-color: transparentize($blue, 0.2);
+        color: $light-gray;
+      }
 
-            .user-menu {
-                @include user-action($light-black);
-            }
+      .email + .affiliation {
+        width: 99%;
+        max-width: 0;
+      }
 
-            .favorite-user {
-                &:not(.active) {
-                    @include user-action($pastel-blue);
-                }
-                &.active {
-                    @include user-action($blue);
-                }
-            }
-
-            .event-person {
-                @extend %user-action-button;
-                @include icon-before('icon-ticket');
-                color: $gray;
-            }
-        }
+      .name + .affiliation:last-child {
+        max-width: 400px;
+      }
     }
+
+    .actions {
+      display: table-cell;
+      text-align: right;
+      vertical-align: middle;
+      width: 0;
+
+      .remove-user {
+        @include user-action($dark-gray, $red);
+      }
+
+      .edit-user {
+        @include user-action($light-black);
+      }
+
+      .user-menu {
+        @include user-action($light-black);
+      }
+
+      .favorite-user {
+        &:not(.active) {
+          @include user-action($pastel-blue);
+        }
+        &.active {
+          @include user-action($blue);
+        }
+      }
+
+      .event-person {
+        @extend %user-action-button;
+        @include icon-before('icon-ticket');
+        color: $gray;
+      }
+    }
+  }
 }
 
 .account-no-identities {
-    color: $dark-gray;
-    font-style: italic;
+  color: $dark-gray;
+  font-style: italic;
 }
 
 .category-box {
+  position: relative;
+  box-sizing: border-box;
+  padding: 0.5rem !important;
+
+  > div {
     position: relative;
-    box-sizing: border-box;
-    padding: 0.5rem !important;
 
-    > div {
-        position: relative;
+    display: table;
+    overflow: hidden;
 
-        display: table;
+    width: 100%;
+
+    table-layout: fixed;
+  }
+  .category-box-info,
+  .category-action {
+    position: relative;
+
+    display: table-cell;
+    float: none;
+
+    padding: 0;
+
+    vertical-align: middle;
+  }
+  .category-box-info {
+    .category-box-title,
+    .category-path {
+      @include ellipsis;
+
+      display: block;
+    }
+    .category-path {
+      line-height: 1;
+
+      margin-top: 0.4em;
+      ul {
+        font-weight: normal;
         overflow: hidden;
 
-        width: 100%;
-
-        table-layout: fixed;
-    }
-    .category-box-info,
-    .category-action {
-        position: relative;
-
-        display: table-cell;
-        float: none;
-
+        max-width: 92%;
         padding: 0;
 
-        vertical-align: middle;
-    }
-    .category-box-info {
-        .category-box-title,
-        .category-path {
-            @include ellipsis;
+        list-style: none;
 
-            display: block;
+        text-align: left;
+
+        color: $dark-gray;
+        li {
+          @include ellipsis;
+
+          display: inline-block;
+          padding: 0;
+          border-bottom: 0;
+          &:last-child {
+            max-width: 100%;
+          }
+          & + li::before {
+            padding: 0 0.2em;
+
+            content: '»';
+          }
         }
-        .category-path {
-            line-height: 1;
-
-            margin-top: 0.4em;
-            ul {
-                font-weight: normal;
-                overflow: hidden;
-
-                max-width: 92%;
-                padding: 0;
-
-                list-style: none;
-
-                text-align: left;
-
-                color: $dark-gray;
-                li {
-                    @include ellipsis;
-
-                    display: inline-block;
-                    padding: 0;
-                    border-bottom: 0;
-                    &:last-child {
-                        max-width: 100%;
-                    }
-                    & + li:before {
-                        padding: 0 0.2em;
-
-                        content: '»';
-                    }
-                }
-            }
-        }
+      }
     }
-    .category-action {
-        width: 1.2em;
-        font-size: 1.2em;
-    }
-    .category-action-extra {
-        font-size: 0.8em;
-        font-weight: normal;
+  }
+  .category-action {
+    width: 1.2em;
+    font-size: 1.2em;
+  }
+  .category-action-extra {
+    font-size: 0.8em;
+    font-weight: normal;
 
-        margin-top: 0.2rem;
-    }
+    margin-top: 0.2rem;
+  }
 }

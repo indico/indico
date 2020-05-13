@@ -8,103 +8,109 @@
 @import 'base/palette';
 
 body {
-   color: #000;
-   background: #fff;
-   font-family: helvetica, verdana, sans-serif;
+  color: #000;
+  background: #fff;
+  font-family: helvetica, verdana, sans-serif;
 }
-p,br,dl,strong,em,h1,h2,a {
-   font-family: helvetica, verdana, sans-serif;
-   font-size: 8pt;
-   color: #000;
+p,
+br,
+dl,
+strong,
+em,
+h1,
+h2,
+a {
+  font-family: helvetica, verdana, sans-serif;
+  font-size: 8pt;
+  color: #000;
 }
 
 td {
-   font-family: helvetica, verdana, sans-serif;
-   font-size: 8pt;
-   color: #000;
+  font-family: helvetica, verdana, sans-serif;
+  font-size: 8pt;
+  color: #000;
 }
 
 table p {
-    margin-top: 0;
+  margin-top: 0;
 }
 
 .headerselected {
-    color: #fff;
-    background: #006;
- }
+  color: #fff;
+  background: #006;
+}
 
 a:visited {
-   color: #0000FF;
-   background: transparent;
-   text-decoration: none;
+  color: #00f;
+  background: transparent;
+  text-decoration: none;
 }
 a:active {
-   color: $bright-orange;
-   background: transparent;
+  color: $bright-orange;
+  background: transparent;
 }
 a:hover {
-   color: $bright-orange;
-   background: transparent;
+  color: $bright-orange;
+  background: transparent;
 }
 a.img:hover {
-   color: #00c;
-   background: transparent;
+  color: #00c;
+  background: transparent;
 }
 a.img:active {
-   color: #00c;
-   background: transparent;
-   font-weight: normal;
+  color: #00c;
+  background: transparent;
+  font-weight: normal;
 }
 
 table.eventHeader {
-    background: white;
-    width:100%;
+  background: white;
+  width: 100%;
 }
 
 table.headerLegendsBorder {
-    background: silver;
-    border-spacing:3px;
-    border: 0px;
-    text-align: right;
+  background: silver;
+  border-spacing: 3px;
+  border: 0;
+  text-align: right;
 }
 
 table.headerLegendsContent {
-    background: white;
-    border-spacing:0px;
-    border: 0px;
-    width:100%;
-    text-align: right;
+  background: white;
+  border-spacing: 0;
+  border: 0;
+  width: 100%;
+  text-align: right;
 }
 
 td.headerLegends {
-    text-align: right;
+  text-align: right;
 }
 
 td.sessionsLegend {
-    background: #90c0f0;
+  background: #90c0f0;
 }
 
 td.contribsLegendSilver {
-    background: silver;
+  background: silver;
 }
 td.contribsLegendGrey {
-    background: #D2D2D2;
+  background: #d2d2d2;
 }
 td.breaksLegend {
-    background: #FFcccc;
+  background: #fcc;
 }
 
 table.dayList {
-    background: white;
-    border-spacing:1px;
-    border: 0px;
-    width:100%;
+  background: white;
+  border-spacing: 1px;
+  border: 0;
+  width: 100%;
 }
 .titleClass {
-    font-weight: bold;
+  font-weight: bold;
 }
 
-.speakerList{
-    color: green;
-
+.speakerList {
+  color: green;
 }

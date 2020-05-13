@@ -6,321 +6,330 @@
 // LICENSE file for more details.
 
 @mixin base-list-properties() {
-    overflow: auto;
-    list-style-type: none;
-    padding: 0;
+  overflow: auto;
+  list-style-type: none;
+  padding: 0;
 
-
-    li.item {
-        &:hover {
-            background: $light-blue;
-        }
-
-        padding: 5px;
-        cursor: pointer;
-
-        &.selected {
-            background: $indico-blue;
-        }
-
-        &:not(:last-child) {
-            border-bottom: 1px solid $separator-color;
-        }
+  li.item {
+    &:hover {
+      background: $light-blue;
     }
+
+    padding: 5px;
+    cursor: pointer;
+
+    &.selected {
+      background: $indico-blue;
+    }
+
+    &:not(:last-child) {
+      border-bottom: 1px solid $separator-color;
+    }
+  }
 }
 
 #wholeLegend {
-    margin: 60px 0 0 0;
+  margin: 60px 0 0 0;
 }
 
 #legendMainToggle {
-    @include border-all();
-    border-top-width: 0;
-    background: $gray;
-    color: $black;
-    cursor: pointer;
-    font-size: 11px;
-    padding: 4px 5px 3px 5px;
-    position: absolute;
-    text-align: center;
-    width: 116px;
+  @include border-all();
+  border-top-width: 0;
+  background: $gray;
+  color: $black;
+  cursor: pointer;
+  font-size: 11px;
+  padding: 4px 5px 3px 5px;
+  position: absolute;
+  text-align: center;
+  width: 116px;
 
-    &:hover {
-        color: white;
-        background: $dark-gray;
-    }
+  &:hover {
+    color: white;
+    background: $dark-gray;
+  }
 
-    &.active {
-        background: #DFC87B;
-    }
+  &.active {
+    background: #dfc87b;
+  }
 
-    &.active:hover {
-        background: #9F883B;
-    }
+  &.active:hover {
+    background: #9f883b;
+  }
 }
 
 .timeTableLegend {
-    @include border-all();
+  @include border-all();
+  @extend %default-border-radius;
+  background: $light-gray;
+  font-size: 11px;
+  overflow: hidden;
+  padding: 5px;
+  z-index: 1;
+  box-sizing: initial;
+
+  &.scrolling {
+    @include single-box-shadow();
+    position: fixed;
+    top: 1px;
+  }
+
+  #legendItemContainer {
+    overflow: auto;
+  }
+
+  .legendItem {
     @extend %default-border-radius;
-    background: $light-gray;
-    font-size: 11px;
-    overflow: hidden;
+    background: $pastel-gray;
+    color: $black;
+    float: left;
+    height: 15px;
+    margin: 2px;
     padding: 5px;
-    z-index: 1;
-    box-sizing: initial;
+    overflow: hidden;
+    max-width: 200px;
+  }
 
-    &.scrolling {
-        @include single-box-shadow();
-        position: fixed;
-        top: 1px;
+  .timeTableItemColour {
+    border-radius: 50%;
+    @include border-all(white, $width: 2px);
+    float: left;
+    margin-right: 3px;
+    margin-top: -2px;
+    height: 15px;
+    width: 15px;
+  }
+
+  .legendCloseButton {
+    @include icon-before('icon-cross');
+    color: $dark-gray;
+    cursor: pointer;
+    float: right;
+    font-size: 1.2em;
+    margin: 1px 2px 0 2px;
+
+    &:hover {
+      color: $gray;
     }
+  }
 
-    #legendItemContainer {
-        overflow: auto;
+  .showMoreLink {
+    color: $dark-gray;
+    display: block;
+    float: right;
+    text-align: right;
+
+    &:hover {
+      color: $gray;
     }
-
-    .legendItem {
-        @extend %default-border-radius;
-        background: $pastel-gray;
-        color: $black;
-        float: left;
-        height: 15px;
-        margin: 2px;
-        padding: 5px;
-        overflow: hidden;
-        max-width: 200px;
-    }
-
-    .timeTableItemColour {
-        border-radius: 50%;
-        @include border-all(white, $width: 2px);
-        float: left;
-        margin-right: 3px;
-        margin-top: -2px;
-        height: 15px;
-        width: 15px;
-    }
-
-    .legendCloseButton {
-        @include icon-before('icon-cross');
-        color: $dark-gray;
-        cursor: pointer;
-        float: right;
-        font-size: 1.2em;
-        margin: 1px 2px 0 2px;
-
-        &:hover {
-            color: $gray;
-        }
-    }
-
-    .showMoreLink {
-        color: $dark-gray;
-        display: block;
-        float: right;
-        text-align: right;
-
-        &:hover {
-            color: $gray;
-        }
-    }
+  }
 }
 
 #move-timetable-entry-dialog {
-    width: 800px;
-    height: 440px;
+  width: 800px;
+  height: 440px;
 
-    .section-title {
-        font-size: 1.2em;
+  .section-title {
+    font-size: 1.2em;
+    color: $black;
+    margin-bottom: 5px;
+    margin-top: 10px;
+  }
+
+  .days {
+    &.scrollable-container {
+      height: 70px;
+    }
+
+    .scroll-btn {
+      @include icon-before('icon-next');
+      font-size: 1.2em;
+      color: $light-black;
+      cursor: pointer;
+
+      &:hover {
         color: $black;
-        margin-bottom: 5px;
-        margin-top: 10px;
+      }
+
+      &.scroll-left {
+        transform: rotate(180deg);
+        margin-right: 10px;
+      }
+
+      &.scroll-right {
+        margin-left: 10px;
+      }
+    }
+  }
+
+  .days-container {
+    overflow-x: auto;
+    overflow: hidden;
+    white-space: nowrap;
+    position: relative;
+
+    &.scrollable {
+      padding: 5px;
     }
 
-    .days {
-        &.scrollable-container {
-            height: 70px;
-        }
+    .day:not(:last-child) {
+      margin-right: 0.5em;
+    }
+  }
 
-        .scroll-btn {
-            @include icon-before('icon-next');
-            font-size: 1.2em;
-            color: $light-black;
-            cursor: pointer;
+  .days-container-wrapper {
+    max-width: 730px;
+    position: relative;
+  }
 
-            &:hover {
-                color: $black;
-            }
+  .fader {
+    position: absolute;
+    width: 6%;
+    top: 0;
+    bottom: 0;
+    pointer-events: none;
+    display: none;
 
-            &.scroll-left {
-               transform: rotate(180deg);
-               margin-right: 10px;
-            }
-
-            &.scroll-right {
-                margin-left: 10px;
-            }
-        }
+    &.fader-right {
+      background: linear-gradient(
+        to left,
+        white 0%,
+        rgba(251, 251, 251, 0.5) 40%,
+        rgba(251, 251, 251, 0) 100%
+      );
+      right: 0;
     }
 
-    .days-container {
-        overflow-x: auto;
-        overflow: hidden;
-        white-space: nowrap;
-        position: relative;
-
-        &.scrollable {
-            padding: 5px;
-        }
-
-        .day:not(:last-child) {
-            margin-right: 0.5em;
-        }
+    &.fader-left {
+      background: linear-gradient(
+        to right,
+        white 0%,
+        rgba(251, 251, 251, 0.5) 40%,
+        rgba(251, 251, 251, 0) 100%
+      );
+      left: 0;
     }
 
-    .days-container-wrapper {
-        max-width: 730px;
-        position: relative;
+    &.visible {
+      display: block;
+    }
+  }
+
+  .blocks {
+    max-height: 300px;
+    overflow: auto;
+    overflow-y: auto;
+  }
+
+  .item {
+    @extend .flexrow;
+
+    &:not(.selected) {
+      cursor: pointer;
     }
 
-    .fader {
-        position: absolute;
-        width: 6%;
-        top: 0;
-        bottom: 0;
-        pointer-events: none;
+    &.selected {
+      border-left: 4px solid $blue;
+    }
+
+    .icon {
+      font-size: 22px;
+
+      &::before {
+        margin-right: 10px;
+      }
+    }
+
+    .item-icon {
+      flex-shrink: 0;
+      width: 22px;
+      height: 22px;
+      border-radius: 15px;
+      margin-right: 10px;
+    }
+
+    .start-dt {
+      flex-shrink: 0;
+      margin-left: auto;
+      color: $dark-gray;
+    }
+
+    .move-btn {
+      position: relative;
+      padding-left: 10px;
+      max-height: 22px; // Workaround to avoid jQuery "jumping" effect
+
+      &:not(.active) {
         display: none;
+      }
 
-        &.fader-right {
-            background: linear-gradient(to left, white 0%, rgba(251, 251, 251, 0.5) 40%, rgba(251, 251, 251, 0.0) 100%);
-            right: 0;
-        }
-
-        &.fader-left {
-            background: linear-gradient(to right, white 0%, rgba(251, 251, 251, 0.5) 40%, rgba(251, 251, 251, 0.0) 100%);
-            left: 0;
-        }
-
-        &.visible {
-            display: block;
-        }
+      button {
+        white-space: nowrap;
+      }
     }
-
-    .blocks {
-        max-height: 300px;
-        overflow: auto;
-        overflow-y: auto;
-    }
-
-    .item {
-        @extend .flexrow;
-
-        &:not(.selected) {
-            cursor: pointer;
-        }
-
-        &.selected {
-            border-left: 4px solid $blue;
-        }
-
-        .icon {
-            font-size: 22px;
-
-            &:before {
-                margin-right: 10px;
-            }
-        }
-
-        .item-icon {
-            flex-shrink: 0;
-            width: 22px;
-            height: 22px;
-            border-radius: 15px;
-            margin-right: 10px;
-        }
-
-        .start-dt {
-            flex-shrink: 0;
-            margin-left: auto;
-            color: $dark-gray;
-        }
-
-        .move-btn {
-            position: relative;
-            padding-left: 10px;
-            max-height: 22px; // Workaround to avoid jQuery "jumping" effect
-
-            &:not(.active) {
-                display: none;
-            }
-
-            button {
-                white-space: nowrap;
-            }
-        }
-    }
+  }
 }
 
 .bottomTip {
-    @include border-all();
-    @extend %default-border-radius;
-    background: $light-gray;
-    color: $light-black;
-    display: none;
-    padding: 10px;
-    position: fixed;
-    bottom: 15px;
-    right: 20px;
-    text-align: center;
+  @include border-all();
+  @extend %default-border-radius;
+  background: $light-gray;
+  color: $light-black;
+  display: none;
+  padding: 10px;
+  position: fixed;
+  bottom: 15px;
+  right: 20px;
+  text-align: center;
 
-    .circle {
-        float: left;
-        background: transparent url('static:images/circle.png') scroll no-repeat;
-        width: 20px;
-        height: 14px;
-    }
+  .circle {
+    float: left;
+    background: transparent url('static:images/circle.png') scroll no-repeat;
+    width: 20px;
+    height: 14px;
+  }
 }
 
 %timetable-entry-button {
-    background: white;
-    height: 19px;
-    padding: 2px;
+  background: white;
+  height: 19px;
+  padding: 2px;
 }
 
 .entry-arrows {
-    @extend %timetable-entry-button;
-    @include border-horz();
-    @include border-bottom();
-    border-bottom-left-radius: $default-border-radius;
-    border-bottom-right-radius: $default-border-radius;
-    cursor: default;
-    position: absolute;
-    right: 0;
-    right: 18px;
-    visibility: hidden;
+  @extend %timetable-entry-button;
+  @include border-horz();
+  @include border-bottom();
+  border-bottom-left-radius: $default-border-radius;
+  border-bottom-right-radius: $default-border-radius;
+  cursor: default;
+  position: absolute;
+  right: 0;
+  right: 18px;
+  visibility: hidden;
 
-    a {
-        background: transparent !important;
-        &:first-child {
-            margin-right: 2px;
-        }
+  a {
+    background: transparent !important;
+    &:first-child {
+      margin-right: 2px;
     }
+  }
 }
 
 .timetableBlock {
-    &:hover .entry-arrows {
-        visibility: visible;
-    }
+  &:hover .entry-arrows {
+    visibility: visible;
+  }
 }
 
 .entry-attachments {
-    @extend %timetable-entry-button;
-    border-bottom-left-radius: $default-border-radius;
-    border-top-right-radius: $default-border-radius;
-    @include border-left();
-    @include border-bottom();
-    @include icon-before(icon-attachment);
-    position: absolute;
-    right: 0;
-    top: 0;
+  @extend %timetable-entry-button;
+  border-bottom-left-radius: $default-border-radius;
+  border-top-right-radius: $default-border-radius;
+  @include border-left();
+  @include border-bottom();
+  @include icon-before(icon-attachment);
+  position: absolute;
+  right: 0;
+  top: 0;
 }

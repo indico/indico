@@ -6,259 +6,259 @@
 // LICENSE file for more details.
 
 #competences-dialog {
-    width: 100%;
+  width: 100%;
 
-    .form-group-footer .form-field {
-        margin-top: 1rem;
+  .form-group-footer .form-field {
+    margin-top: 1rem;
+  }
+
+  .i-taglist-field {
+    width: auto;
+  }
+
+  .name-column {
+    width: 15rem;
+  }
+
+  .competences-user {
+    color: $light-black;
+
+    &::before {
+      margin-right: 5px;
+      color: $dark-gray;
     }
-
-    .i-taglist-field {
-        width: auto;
-    }
-
-    .name-column {
-        width: 15rem;
-    }
-
-    .competences-user {
-        color: $light-black;
-
-        &::before {
-            margin-right: 5px;
-            color: $dark-gray;
-        }
-    }
+  }
 }
 
 #assign-role-table {
-    min-width: 500px;
-    margin-bottom: 15px;
+  min-width: 500px;
+  margin-bottom: 15px;
 
-    .i-tag {
-        display: inline-block;
-        background-color: $pastel-blue;
-        margin-right: 5px;
-        font-weight: normal;
-        color: $light-black;
-        border-width: 0;
+  .i-tag {
+    display: inline-block;
+    background-color: $pastel-blue;
+    margin-right: 5px;
+    font-weight: normal;
+    color: $light-black;
+    border-width: 0;
+  }
+
+  label {
+    font-weight: normal;
+  }
+
+  .affiliation {
+    font-size: 0.8em;
+
+    .warning-text {
+      color: $yellow;
     }
-
-    label {
-        font-weight: normal;
-    }
-
-    .affiliation {
-        font-size: 0.8em;
-
-        .warning-text {
-            color: $yellow;
-        }
-    }
+  }
 }
 
 #assignment-list {
-    .revision-column {
-        width: 4rem;
-    }
+  .revision-column {
+    width: 4rem;
+  }
 
-    table > tbody > tr > td {
-        vertical-align: baseline;
-    }
+  table > tbody > tr > td {
+    vertical-align: baseline;
+  }
 }
 
 .paper-contribution-list {
-    @extend %font-family-modern-body;
+  @extend %font-family-modern-body;
 
-    .contribution-row {
-        @include border-left($width: 3px);
-        padding-left: 10px;
-        margin-bottom: 1em;
+  .contribution-row {
+    @include border-left($width: 3px);
+    padding-left: 10px;
+    margin-bottom: 1em;
 
-        &:hover {
-            border-color: $blue;
-        }
-
-        .row-title {
-            @include border-bottom();
-            font-size: 14pt;
-        }
-
-        .submitter {
-            color: $light-black;
-            margin-top: 7px;
-        }
-
-        .label {
-            border: None;
-            margin-top: 7px;
-            display: inline-block;
-            padding: 5px 7px;
-
-            &.review-role {
-                @include border-all($gray);
-                margin-right: 10px;
-                background-color: white;
-                color: $light-black;
-
-                i {
-                    color: $blue;
-                }
-            }
-        }
+    &:hover {
+      border-color: $blue;
     }
 
-    ul {
-        list-style-type: none;
-        padding-left: 0;
+    .row-title {
+      @include border-bottom();
+      font-size: 14pt;
     }
+
+    .submitter {
+      color: $light-black;
+      margin-top: 7px;
+    }
+
+    .label {
+      border: none;
+      margin-top: 7px;
+      display: inline-block;
+      padding: 5px 7px;
+
+      &.review-role {
+        @include border-all($gray);
+        margin-right: 10px;
+        background-color: white;
+        color: $light-black;
+
+        i {
+          color: $blue;
+        }
+      }
+    }
+  }
+
+  ul {
+    list-style-type: none;
+    padding-left: 0;
+  }
 }
 
 .call-for-papers {
-    .cfp-infoline-section {
-        .infoline {
-            float: none;
-        }
+  .cfp-infoline-section {
+    .infoline {
+      float: none;
     }
+  }
 
-    .cfp-announcement {
-        color: $light-black;
-        padding: 20px 0 10px;
+  .cfp-announcement {
+    color: $light-black;
+    padding: 20px 0 10px;
+  }
+
+  .template-list {
+    font-size: 1.3em;
+    list-style-type: none;
+    padding-left: 0;
+
+    .info {
+      color: $gray;
     }
-
-    .template-list {
-        font-size: 1.3em;
-        list-style-type: none;
-        padding-left: 0;
-
-        .info {
-            color: $gray;
-        }
-    }
+  }
 }
 
 #select-contribution-dialog {
-    min-width: 500px;
-    padding: 0 20px;
+  min-width: 500px;
+  padding: 0 20px;
 
-    ul {
-        list-style-type: none;
-        padding-left: 0;
-    }
+  ul {
+    list-style-type: none;
+    padding-left: 0;
+  }
 
-    ul li {
-        @include border-bottom($light-gray);
-        padding-bottom: 3px;
-        margin-bottom: 10px;
-        font-size: 1.1em;
-    }
+  ul li {
+    @include border-bottom($light-gray);
+    padding-bottom: 3px;
+    margin-bottom: 10px;
+    font-size: 1.1em;
+  }
 
-    .contrib-list {
-        max-height: 600px;
-        overflow-y: auto;
-        margin-bottom: 15px;
-    }
-
+  .contrib-list {
+    max-height: 600px;
+    overflow-y: auto;
+    margin-bottom: 15px;
+  }
 }
 
 .deadline-info {
-    @include border-all($blue);
-    background: $light-blue;
-    padding: 10px;
+  @include border-all($blue);
+  background: $light-blue;
+  padding: 10px;
 
-    .label {
-        font-size: 11pt;
-        font-weight: bold;
-        color: $blue;
-        margin-bottom: 5px;
-    }
+  .label {
+    font-size: 11pt;
+    font-weight: bold;
+    color: $blue;
+    margin-bottom: 5px;
+  }
 
-    .text {
-        color: $light-black;
-        position: relative;
-    }
+  .text {
+    color: $light-black;
+    position: relative;
+  }
 
-    .icon {
-        color: $blue;
-        float: left;
-        font-size: 2rem;
-        padding-right: 0.5em;
-    }
+  .icon {
+    color: $blue;
+    float: left;
+    font-size: 2rem;
+    padding-right: 0.5em;
+  }
 
-    span {
-        margin-right: 5px;
-    }
+  span {
+    margin-right: 5px;
+  }
 }
 
 .paper-content {
-    .paper-file {
-        background-color: $light-gray !important;
-        border-bottom: 1px solid $pastel-gray !important;
+  .paper-file {
+    background-color: $light-gray !important;
+    border-bottom: 1px solid $pastel-gray !important;
+  }
+
+  .spotlight-file {
+    max-width: 50%;
+    justify-content: flex-start;
+  }
+
+  .spotlight-file-name {
+    @extend %font-family-title;
+    font-size: 1.2em;
+    color: $light-black;
+
+    &:hover {
+      color: $black;
     }
 
-    .spotlight-file {
-        max-width: 50%;
-        justify-content: flex-start;
+    &::before {
+      font-size: 2em;
+      margin-right: 5px;
     }
+  }
 
-    .spotlight-file-name {
-        @extend %font-family-title;
-        font-size: 1.2em;
-        color: $light-black;
+  .paper-files-list-label {
+    color: $light-black;
+  }
 
-        &:hover {
-            color: $black;
-        }
+  .paper-files {
+    margin: 0 0 0 10px;
+    padding: 0;
+    list-style-type: none;
+    margin-bottom: -5px; // In order to remove the margin of the last list items row
 
-        &::before {
-            font-size: 2em;
-            margin-right: 5px;
-        }
+    li {
+      margin-right: 5px;
+
+      a {
+        max-width: 150px;
+        margin-bottom: 5px;
+      }
     }
+  }
 
-    .paper-files-list-label {
-        color: $light-black;
+  .spotlight-file,
+  .paper-files {
+    &.full-width {
+      width: 100%;
+      max-width: 100%;
     }
-
-    .paper-files {
-        margin: 0 0 0 10px;
-        padding: 0;
-        list-style-type: none;
-        margin-bottom: -5px;  // In order to remove the margin of the last list items row
-
-        li {
-            margin-right: 5px;
-
-            a {
-                max-width: 150px;
-                margin-bottom: 5px;
-            }
-        }
-    }
-
-    .spotlight-file, .paper-files {
-        &.full-width {
-            width: 100%;
-            max-width: 100%;
-        }
-    }
+  }
 }
 
 .paper-metadata {
-    align-self: flex-end;
+  align-self: flex-end;
+  color: $gray;
+  margin-top: 10px;
+
+  .paper-metadata-dt {
+    border-bottom: 1px dotted $gray;
     color: $gray;
-    margin-top: 10px;
+    margin: 0 3px;
 
-    .paper-metadata-dt {
-        border-bottom: 1px dotted $gray;
-        color: $gray;
-        margin: 0 3px;
-
-        &:hover {
-            color: $light-black;
-        }
+    &:hover {
+      color: $light-black;
     }
+  }
 }
 
 .paper-timeline {
-    min-height: 500px;
+  min-height: 500px;
 }

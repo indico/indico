@@ -6,32 +6,32 @@
 // LICENSE file for more details.
 
 .code {
-    @extend %default-border-radius;
-    border: 1px solid $gray;
-    background: $light-gray;
-    padding: 1em 1.5em;
+  @extend %default-border-radius;
+  border: 1px solid $gray;
+  background: $light-gray;
+  padding: 1em 1.5em;
 }
 
 .merge-info {
-    padding: 0;
-    margin: 0;
-    float: right;
-    list-style-type: none;
+  padding: 0;
+  margin: 0;
+  float: right;
+  list-style-type: none;
 
-    span.caption {
-        font-weight: bold;
-    }
+  span.caption {
+    font-weight: bold;
+  }
 }
 
 .tasks .i-label {
-    width: 100%;
+  width: 100%;
 }
 
 table.ip-network-group .actions {
-    width: 3em;
-    text-align: right;
+  width: 3em;
+  text-align: right;
 }
 
 #event-labels .event-label {
-    text-transform: uppercase;
+  text-transform: uppercase;
 }

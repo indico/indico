@@ -6,133 +6,132 @@
 // LICENSE file for more details.
 
 .message {
-    color: #555;
-    background: #f8f5f4;
-    border: 1px solid #e7e0dd;
-    padding: 1em;
+  color: #555;
+  background: #f8f5f4;
+  border: 1px solid #e7e0dd;
+  padding: 1em;
 }
 
 .message.info {
-    background: #ebf2f3;
-    border: 1px solid #cfdee0;
+  background: #ebf2f3;
+  border: 1px solid #cfdee0;
 }
 
 .confirmation-dialog {
-    overflow: auto;
-    display: inline-block;
+  overflow: auto;
+  display: inline-block;
 }
 
 .confirmation-dialog .body {
-    max-width: 600px;
-    padding: 8px 15px 8px 15px;
-    margin-bottom: 0.5em;
-    background-color: #eee;
-    border: 1px solid;
-    border-color: #dbdbdb #dbdbdb #c0c0c0 #dbdbdb;
+  max-width: 600px;
+  padding: 8px 15px 8px 15px;
+  margin-bottom: 0.5em;
+  background-color: #eee;
+  border: 1px solid;
+  border-color: #dbdbdb #dbdbdb #c0c0c0 #dbdbdb;
 
-    color: #555;
-    float: left;
-    line-height: 1.8em;
+  color: #555;
+  float: left;
+  line-height: 1.8em;
 }
 
 .confirmation-dialog .body .target {
-    font-family: Georgia, Times, Serif;
-    padding-left: 10px;
-    color: #777;
-    margin: 1em 0 1em 0;
-    font-size: 1.2em;
+  font-family: Georgia, Times, serif;
+  padding-left: 10px;
+  color: #777;
+  margin: 1em 0 1em 0;
+  font-size: 1.2em;
 }
 
 .confirmation-dialog .body.element {
-   display: block;
+  display: block;
 }
 
 .confirmation-dialog .body.bordered {
-    border-left: 1px solid #CACACA;
+  border-left: 1px solid #cacaca;
 }
 
 .confirmation-dialog .body h3 {
-    width: auto;
-    margin: 0 0 0.3em 0;
-    font-size: 1.3em;
-    font-weight: bold;
+  width: auto;
+  margin: 0 0 0.3em 0;
+  font-size: 1.3em;
+  font-weight: bold;
 }
 
 .confirmation-dialog .clearer {
-    clear: both;
+  clear: both;
 }
 
 .confirmation-dialog > h3 {
-    margin-bottom: 0.1em;
-    font-size: 1.7em;
-    font-weight: bold;
-    padding-bottom: 10px;
+  margin-bottom: 0.1em;
+  font-size: 1.7em;
+  font-weight: bold;
+  padding-bottom: 10px;
 }
 
 .confirmation-dialog > h3.warning {
-    color: #E99E18;
+  color: #e99e18;
 }
 
 .confirmation-dialog > h3.danger {
-    color: #AF0000;
+  color: #af0000;
 }
 
 .confirmation-dialog > h3.accept {
-    color: #0B8D00;
+  color: #0b8d00;
 }
 
 .confirmation-dialog > h3.highlight {
-    color: #0B63A5;
+  color: #0b63a5;
 }
 
-
 .confirmation-dialog .body ul.categ-list {
-    padding-left: 13px;
-    margin: 0;
+  padding-left: 13px;
+  margin: 0;
 }
 
 .confirmation-dialog ul.categ-list span.event-date {
-    padding-left: 10px;
-    color: #888888;
-    font-size: 0.9em;
-    margin: 0;
+  padding-left: 10px;
+  color: #888;
+  font-size: 0.9em;
+  margin: 0;
 }
 
 .confirmation-dialog ul.categ-list span.event-title {
-    font-style: italic;
+  font-style: italic;
 }
 
 .dialog-window {
-    &.no-page-header {
-        header {
-            display: none;
-        }
+  &.no-page-header {
+    header {
+      display: none;
     }
+  }
 }
 
 .dialog-subtitle {
-    background-color: $light-gray;
-    border-bottom: 1px solid $pastel-gray;
-    padding: 5px 15px;
-    box-shadow: inset 0px 15px 20px -20px $gray;
-    color: $black;
+  background-color: $light-gray;
+  border-bottom: 1px solid $pastel-gray;
+  padding: 5px 15px;
+  box-shadow: inset 0 15px 20px -20px $gray;
+  color: $black;
 }
 
 .confirmation-dialog-content {
+  font-size: 1.2em;
+  margin-bottom: 15px;
+
+  strong {
     font-size: 1.2em;
-    margin-bottom: 15px;
+  }
 
-    strong {
-        font-size: 1.2em;
-    }
-
-    ul {
-        font-size: 0.85em;
-        max-height: 100px;
-        overflow: auto;
-    }
+  ul {
+    font-size: 0.85em;
+    max-height: 100px;
+    overflow: auto;
+  }
 }
 
 form.confirmation-dialog {
-    max-width: 800px;
+  max-width: 800px;
 }

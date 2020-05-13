@@ -6,39 +6,38 @@
 // LICENSE file for more details.
 
 .vc-management {
-    .add-room-options {
-        margin-top: 1em;
+  .add-room-options {
+    margin-top: 1em;
 
-        & > * {
-            display: inline-block;
-            vertical-align: middle;
-        }
-
-        .i-button {
-            line-height: 2em;
-            img {
-                vertical-align: middle;
-                width: 1.8em;
-            }
-        }
+    & > * {
+      display: inline-block;
+      vertical-align: middle;
     }
 
-    .i-table-widget > tbody {
-        > tr.deleted {
-            background: $light-gray;
-            > td {
-                color: $gray !important;
-            }
-        }
-
-        img.plugin-logo {
-            height: 2em;
-        }
+    .i-button {
+      line-height: 2em;
+      img {
+        vertical-align: middle;
+        width: 1.8em;
+      }
     }
+  }
+
+  .i-table-widget > tbody {
+    > tr.deleted {
+      background: $light-gray;
+      > td {
+        color: $gray !important;
+      }
+    }
+
+    img.plugin-logo {
+      height: 2em;
+    }
+  }
 }
 
-@keyframes text-changed
-{
+@keyframes text-changed {
   from {
     color: $dark-blue;
   }
@@ -47,14 +46,14 @@
   }
 }
 
-input[type="radio"]:disabled + label {
-    color: $gray;
+input[type='radio']:disabled + label {
+  color: $gray;
 }
 
-input[type="text"]#vc-name.highlight {
-    animation: text-changed .75s linear;
+input[type='text']#vc-name.highlight {
+  animation: text-changed 0.75s linear;
 }
 
 .selectize-dropdown {
-    z-index: 101 !important;
+  z-index: 101 !important;
 }

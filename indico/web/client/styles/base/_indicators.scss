@@ -6,102 +6,110 @@
 // LICENSE file for more details.
 
 @mixin _indicator-base($top) {
-    &::after,
-    &::before {
-        border-color: transparent;
-        content: '';
-        top: $top;
-        position: absolute;
-    }
+  &::after,
+  &::before {
+    border-color: transparent;
+    content: '';
+    top: $top;
+    position: absolute;
+  }
 
-    &::after {
-        margin-top: 1px;
-        border-width: 7px;
-    }
+  &::after {
+    margin-top: 1px;
+    border-width: 7px;
+  }
 
-    &::before {
-        border-width: 8px;
-    }
+  &::before {
+    border-width: 8px;
+  }
 }
 
 @mixin _indicator-top-base($background-color, $border-color) {
-    &::after,
-    &::before {
-        border-color: transparent;
-        border-style: solid outset solid;
-        content: '';
-        position: absolute;
-        top: -15px;
-    }
+  &::after,
+  &::before {
+    border-color: transparent;
+    border-style: solid outset solid;
+    content: '';
+    position: absolute;
+    top: -15px;
+  }
 
-    &::after {
-        margin-top: 1px;
-        border-width: 7px;
-        border-bottom-color: $background-color;
-    }
+  &::after {
+    margin-top: 1px;
+    border-width: 7px;
+    border-bottom-color: $background-color;
+  }
 
-    &::before {
-        border-width: 7px;
-        border-bottom-color: $border-color;
-    }
+  &::before {
+    border-width: 7px;
+    border-bottom-color: $border-color;
+  }
 }
 
 @mixin indicator-left($background-color: white, $border-color: $default-border-color, $top: 10px) {
-    @include _indicator-base($top);
+  @include _indicator-base($top);
 
-    &::after,
-    &::before {
-        border-style: solid solid outset;
-        right: 100%;
-    }
+  &::after,
+  &::before {
+    border-style: solid solid outset;
+    right: 100%;
+  }
 
-    &::after {
-        border-right-color: $background-color;
-        margin-left: 2px;
-    }
+  &::after {
+    border-right-color: $background-color;
+    margin-left: 2px;
+  }
 
-    &::before {
-        border-right-color: $border-color;
-    }
+  &::before {
+    border-right-color: $border-color;
+  }
 }
 
 @mixin indicator-right($background-color: white, $border-color: $default-border-color, $top: 10px) {
-    @include _indicator-base($top);
+  @include _indicator-base($top);
 
-    &::after,
-    &::before {
-        border-style: solid outset solid;
-        left: 100%;
-    }
+  &::after,
+  &::before {
+    border-style: solid outset solid;
+    left: 100%;
+  }
 
-    &::after {
-        border-left-color: $background-color;
-        margin-right: 2px;
-    }
+  &::after {
+    border-left-color: $background-color;
+    margin-right: 2px;
+  }
 
-    &::before {
-        border-left-color: $border-color;
-    }
+  &::before {
+    border-left-color: $border-color;
+  }
 }
 
-@mixin indicator-top-left($background-color: white, $border-color: $default-border-color, $left: 10px) {
-    @include _indicator-top-base($background-color, $border-color);
+@mixin indicator-top-left(
+  $background-color: white,
+  $border-color: $default-border-color,
+  $left: 10px
+) {
+  @include _indicator-top-base($background-color, $border-color);
 
-    &::after,
-    &::before {
-        left: $left;
-    }
+  &::after,
+  &::before {
+    left: $left;
+  }
 
-    &::after {
-        margin-right: 2px;
-    }
+  &::after {
+    margin-right: 2px;
+  }
 }
 
-@mixin indicator-top-right($background-color: white, $border-color: $default-border-color, $right: 10px) {
-    @include _indicator-top-base($background-color, $border-color);
+@mixin indicator-top-right(
+  $background-color: white,
+  $border-color: $default-border-color,
+  $right: 10px
+) {
+  @include _indicator-top-base($background-color, $border-color);
 
-    &::after,
-    &::before {
-        right: $right;
-    }
+  &::after,
+  &::before {
+    right: $right;
+  }
 }

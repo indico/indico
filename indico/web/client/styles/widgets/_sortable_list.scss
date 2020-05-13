@@ -5,140 +5,141 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-@import "base";
-@import "partials/icons";
-@import "partials/_boxes";
-@import "partials/_labels";
+@import 'base';
+@import 'partials/icons';
+@import 'partials/boxes';
+@import 'partials/labels';
 
 .sortable-list {
-    margin-bottom: 10px;
+  margin-bottom: 10px;
 
-    ul {
-        @extend %i-box-cancel-horizontal-margin;
-        padding: 0;
-        margin-top: 0;
-        margin-bottom: 0;
-        min-height: 2em;
-        list-style-type: none;
+  ul {
+    @extend %i-box-cancel-horizontal-margin;
+    padding: 0;
+    margin-top: 0;
+    margin-bottom: 0;
+    min-height: 2em;
+    list-style-type: none;
 
-        li {
-            @extend .flexrow;
-            margin: 0px;
-            padding: 10px;
+    li {
+      @extend .flexrow;
+      margin: 0;
+      padding: 10px;
 
-            &.draggable {
-                cursor: move;
-            }
+      &.draggable {
+        cursor: move;
+      }
 
-            &.i-label {
-                text-align: left;
-                border-color: transparent;
-                transition: color 0s, background-color 0.4s;
+      &.i-label {
+        text-align: left;
+        border-color: transparent;
+        transition: color 0s, background-color 0.4s;
 
-                > .title {
-                    flex-grow: 1;
-                    margin: 0 0.5em;
-                }
-
-                .toggle-enabled {
-                    cursor: pointer;
-                }
-
-                .handle:first-child {
-                    margin-left: 0;
-                }
-            }
-
-            .actions, .handle {
-                color: lighten($i-label-color, 30%);
-                transition: color 0.4s;
-                flex-shrink: 0;
-                align-self: center;
-            }
-
-            &:hover,
-            &.ui-sortable-helper {
-                &.i-label {
-                    background-color: lighten($i-label-color, 50%);
-                    transition: color 0s, background-color 0s;
-                }
-
-                .actions, .handle {
-                    color: $i-label-color;
-                    transition: color 0s;
-                }
-            }
-
-            &.placeholder {
-                border: 1px $i-label-color dashed;
-            }
-
-            .handle.invisible {
-                visibility: hidden;
-            }
-
+        > .title {
+          flex-grow: 1;
+          margin: 0 0.5em;
         }
 
-        &.enabled li .toggle-enabled {
-            @include icon-before('icon-eye');
+        .toggle-enabled {
+          cursor: pointer;
         }
 
-        &.disabled li {
-            &:hover:not(.ui-sortable-helper) {
-                @extend .i-label.striped;
-                background-color: lighten($i-label-color, 50%);
-            }
-
-            .toggle-enabled {
-                @include icon-before('icon-eye-blocked');
-            }
-
-            .icon-settings {
-                display: none;
-            }
+        .handle:first-child {
+          margin-left: 0;
         }
+      }
+
+      .actions,
+      .handle {
+        color: lighten($i-label-color, 30%);
+        transition: color 0.4s;
+        flex-shrink: 0;
+        align-self: center;
+      }
+
+      &:hover,
+      &.ui-sortable-helper {
+        &.i-label {
+          background-color: lighten($i-label-color, 50%);
+          transition: color 0s, background-color 0s;
+        }
+
+        .actions,
+        .handle {
+          color: $i-label-color;
+          transition: color 0s;
+        }
+      }
+
+      &.placeholder {
+        border: 1px $i-label-color dashed;
+      }
+
+      .handle.invisible {
+        visibility: hidden;
+      }
     }
 
-   &.two-columns {
-       @extend .flexrow;
-
-       > div {
-           flex-grow: 1;
-
-           > .titled-rule {
-               @extend %i-box-titled-rule-header;
-           }
-
-           &:first-child ul {
-               margin-right: 0;
-           }
-
-           &:nth-child(2) {
-               border-left: 1px solid $gray;
-
-               ul {
-                   margin-left: 0;
-               }
-           }
-       }
+    &.enabled li .toggle-enabled {
+      @include icon-before('icon-eye');
     }
 
-    &.tiles {
+    &.disabled li {
+      &:hover:not(.ui-sortable-helper) {
+        @extend .i-label.striped;
+        background-color: lighten($i-label-color, 50%);
+      }
+
+      .toggle-enabled {
+        @include icon-before('icon-eye-blocked');
+      }
+
+      .icon-settings {
+        display: none;
+      }
+    }
+  }
+
+  &.two-columns {
+    @extend .flexrow;
+
+    > div {
+      flex-grow: 1;
+
+      > .titled-rule {
+        @extend %i-box-titled-rule-header;
+      }
+
+      &:first-child ul {
+        margin-right: 0;
+      }
+
+      &:nth-child(2) {
+        border-left: 1px solid $gray;
+
         ul {
-            margin: 0;
+          margin-left: 0;
         }
-
-        li.i-label {
-            @extend %default-border-radius;
-
-            &:not(:last-child) {
-                margin-bottom: 5px;
-            }
-
-            &:not(.placeholder) {
-                @include border-all();
-                background-color: $light-gray;
-            }
-        }
+      }
     }
+  }
+
+  &.tiles {
+    ul {
+      margin: 0;
+    }
+
+    li.i-label {
+      @extend %default-border-radius;
+
+      &:not(:last-child) {
+        margin-bottom: 5px;
+      }
+
+      &:not(.placeholder) {
+        @include border-all();
+        background-color: $light-gray;
+      }
+    }
+  }
 }

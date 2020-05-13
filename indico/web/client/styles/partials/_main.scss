@@ -5,265 +5,266 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-
 @import 'base';
 @import 'partials/icons';
 
 /* Styles for the main menu */
 
 .toolbar.global-menu {
-    @extend %font-family-title-light;
+  @extend %font-family-title-light;
 
+  height: 3em;
+  line-height: 3em;
+
+  padding: 0 0 0 20px;
+  background: $black;
+  border: none;
+  margin-bottom: 0;
+
+  > a {
+    @include transition(background-color);
+
+    display: inline-block;
     height: 3em;
     line-height: 3em;
 
-    padding: 0 0 0 20px;
-    background: $black;
-    border: none;
-    margin-bottom: 0;
+    color: white;
+    padding: 0 20px;
 
-    > a {
-        @include transition(background-color);
-
-        display: inline-block;
-        height: 3em;
-        line-height: 3em;
-
-        color: white;
-        padding: 0 20px;
-
-        &:first-child, &.arrow:last-of-type {
-            border-radius: 0;
-        }
-
-        &:hover, &.open {
-            background: $light-black !important;
-        }
-
-        &.arrow {
-            @include icon-after('icon-arrow-down');
-
-            &::after {
-                vertical-align: middle;
-            }
-        }
+    &:first-child,
+    &.arrow:last-of-type {
+      border-radius: 0;
     }
+
+    &:hover,
+    &.open {
+      background: $light-black !important;
+    }
+
+    &.arrow {
+      @include icon-after('icon-arrow-down');
+
+      &::after {
+        vertical-align: middle;
+      }
+    }
+  }
 }
 
 /* Header */
 
 div.page-header {
-    position: relative;
-    background-color: $dark-blue;
-    width: 100%;
+  position: relative;
+  background-color: $dark-blue;
+  width: 100%;
 
-    img.header-logo {
-        margin: 17px 0 10px 40px;
-        border: none;
-        height: 60px;
-    }
+  img.header-logo {
+    margin: 17px 0 10px 40px;
+    border: none;
+    height: 60px;
+  }
 }
 
 div.page-header-dark {
-    background: #424242;
+  background: #424242;
 }
 
 /* Announcements */
 div.announcement-bar {
-    @extend %font-family-title;
+  @extend %font-family-title;
 
-    display: flex;
-    align-items: center;
-    padding: 0.75em;
+  display: flex;
+  align-items: center;
+  padding: 0.75em;
+  font-size: 1.1em;
+  text-align: center;
+
+  .icon {
+    margin-right: 0.25em;
     font-size: 1.1em;
-    text-align: center;
+  }
+
+  .close-button {
+    display: flex;
+    font-size: 1.5em;
+    cursor: pointer;
+  }
+
+  &.warning {
+    background-color: lighten($light-yellow, 5%);
+    color: $dark-black;
 
     .icon {
-        margin-right: 0.25em;
-        font-size: 1.1em;
+      color: $yellow;
     }
 
     .close-button {
-        display: flex;
-        font-size: 1.5em;
-        cursor: pointer;
+      color: $dark-yellow;
+    }
+  }
+
+  &.error {
+    background-color: $dark-red;
+    color: $light-red;
+
+    .icon {
+      color: $light-red;
     }
 
-    &.warning {
-        background-color: lighten($light-yellow, 5%);
-        color: $dark-black;
-
-        .icon {
-            color: $yellow;
-        }
-
-        .close-button {
-            color: $dark-yellow;
-        }
+    .close-button {
+      color: $light-red;
     }
+  }
 
-    &.error {
-        background-color: $dark-red;
-        color: $light-red;
-
-        .icon {
-            color: $light-red;
-        }
-
-        .close-button {
-            color: $light-red;
-        }
-    }
-
-    &.weak-hidden {
-        display: none;
-    }
+  &.weak-hidden {
+    display: none;
+  }
 }
 
 /* Breadcrumbs */
 
 div.main-breadcrumb {
-    @extend %font-family-title;
+  @extend %font-family-title;
 
-    background-color: darken($light-gray, 5%);
-    border-bottom: 1px solid $gray;
-    padding: 0.6em 0 0.6em 40px;
+  background-color: darken($light-gray, 5%);
+  border-bottom: 1px solid $gray;
+  padding: 0.6em 0 0.6em 40px;
 
-    &.management {
-        background-color: #fff;
+  &.management {
+    background-color: #fff;
+  }
+
+  .path {
+    .sep {
+      color: $dark-gray;
+      padding: 0 0.5em;
     }
 
-    .path {
-        .sep {
-            color: $dark-gray;
-            padding: 0 0.5em;
-        }
-
-        .item {
-            color: $light-black;
-            font-size: 12px;
-        }
-
-        a.item:hover {
-            color: $dark-blue;
-        }
+    .item {
+      color: $light-black;
+      font-size: 12px;
     }
+
+    a.item:hover {
+      color: $dark-blue;
+    }
+  }
 }
 
 /* Styles for the session bar at the top right corner */
 
 div.session-bar {
-    @extend %font-family-title;
+  @extend %font-family-title;
 
-    margin: 0.5em 0.5em 0 0;
+  margin: 0.5em 0.5em 0 0;
 
-    .toolbar {
-        padding: 0;
-        margin: 0;
+  .toolbar {
+    padding: 0;
+    margin: 0;
+  }
+
+  .icon-shield {
+    vertical-align: middle;
+  }
+
+  .i-button {
+    font-weight: normal;
+
+    &.protection-public {
+      @extend .i-button.accept;
     }
 
-    .icon-shield {
-        vertical-align: middle;
+    &.protection-restricted {
+      @extend .i-button.danger;
     }
 
-    .i-button {
-        font-weight: normal;
-
-        &.protection-public {
-            @extend .i-button.accept;
-        }
-
-        &.protection-restricted {
-            @extend .i-button.danger;
-        }
-
-        &.protection-network {
-            @extend .i-button.warning;
-        }
+    &.protection-network {
+      @extend .i-button.warning;
     }
+  }
 
-    &.scrolling {
-        background-color: transparent;
-        box-shadow: none;
-        right: 0;
-        margin-top: 0;
-        padding: 0 0 5px 5px;
-        z-index: 999;
-    }
+  &.scrolling {
+    background-color: transparent;
+    box-shadow: none;
+    right: 0;
+    margin-top: 0;
+    padding: 0 0 5px 5px;
+    z-index: 999;
+  }
 }
 
 div.tz-selector-widget {
-    .tz-mode-container > div {
-        margin-bottom: 0.5em;
-    }
+  .tz-mode-container > div {
+    margin-bottom: 0.5em;
+  }
 
-    .tz-update-user-container {
-        margin: 1em 0;
-    }
+  .tz-update-user-container {
+    margin: 1em 0;
+  }
 
-    .tz-save-container {
-        text-align: center;
-        margin-top: 1em;
-    }
+  .tz-save-container {
+    text-align: center;
+    margin-top: 1em;
+  }
 }
 
 /* Impersonation header */
 
 div.impersonation-header {
-    padding: 0.5em;
-    background-color: $dark-black;
-    color: lighten($yellow, 15%);
-    font-family: Verdana;
-    font-size: 1.1em;
+  padding: 0.5em;
+  background-color: $dark-black;
+  color: lighten($yellow, 15%);
+  font-family: Verdana;
+  font-size: 1.1em;
 
-    .text {
-        display: inline-block;
+  .text {
+    display: inline-block;
 
-        .logged-user-name {
-            font-weight: bold;
-            color: lighten($yellow, 30%);
-            margin: 0.1em;
-            line-height: 1em;
-            max-width: 200px;
-        }
-
-        &::before {
-            margin-right: 0.4em;
-            font-size: 1.5em;
-            line-height: 1em;
-            vertical-align: middle;
-        }
-
+    .logged-user-name {
+      font-weight: bold;
+      color: lighten($yellow, 30%);
+      margin: 0.1em;
+      line-height: 1em;
+      max-width: 200px;
     }
 
-    .undo-login-as {
-        color: inherit;
-        float: right;
-        margin-right: 2px;
-        vertical-align: middle;
-        font-size: 1.5em;
-        line-height: 1em;
+    &::before {
+      margin-right: 0.4em;
+      font-size: 1.5em;
+      line-height: 1em;
+      vertical-align: middle;
     }
+  }
+
+  .undo-login-as {
+    color: inherit;
+    float: right;
+    margin-right: 2px;
+    vertical-align: middle;
+    font-size: 1.5em;
+    line-height: 1em;
+  }
 }
 
 .location-info-tip {
-    .location-address {
-        color: $gray;
-        white-space: pre;
-    }
+  .location-address {
+    color: $gray;
+    white-space: pre;
+  }
 
-    .map-link {
-        float: right;
-        margin-top: 0.5em;
-    }
+  .map-link {
+    float: right;
+    margin-top: 0.5em;
+  }
 
-    h3, h4 {
-        line-height: 1.2em;
-        margin-top: 0 !important;
-        margin-bottom: 0;
+  h3,
+  h4 {
+    line-height: 1.2em;
+    margin-top: 0 !important;
+    margin-bottom: 0;
 
-        &:not(:last-child) {
-            margin-bottom: 0.4em;
-        }
+    &:not(:last-child) {
+      margin-bottom: 0.4em;
     }
+  }
 }

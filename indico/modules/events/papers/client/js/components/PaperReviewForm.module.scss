@@ -6,20 +6,20 @@
 // LICENSE file for more details.
 
 .review-input {
-    form [name='visibility'] {
-        width: 60% !important;
-    }
+  form [name='visibility'] {
+    width: 60% !important;
+  }
 
-    form :global(.disabled) {
-        background: none;
-    }
+  form :global(.disabled) {
+    background: none;
+  }
 
-    :global(.menu) :global(.item) {
-        display: flex !important;
-        justify-content: space-between;
+  :global(.menu) :global(.item) {
+    display: flex !important;
+    justify-content: space-between;
 
-        :global(.icon) {
-            margin-right: 0 !important;
-        }
+    :global(.icon) {
+      margin-right: 0 !important;
     }
+  }
 }

@@ -6,70 +6,70 @@
 // LICENSE file for more details.
 
 .role-list-row {
-    background: #eee;
+  background: #eee;
 
-    td {
-        padding: 0 !important;
+  td {
+    padding: 0 !important;
 
-        .content-area {
-            background: #fff;
-            margin: 0 0 0 58px !important;
+    .content-area {
+      background: #fff;
+      margin: 0 0 0 58px !important;
 
-            .empty {
-                padding: 10px;
-                font-style: italic;
-                color: $dark-gray;
-            }
+      .empty {
+        padding: 10px;
+        font-style: italic;
+        color: $dark-gray;
+      }
 
-            .toolbar {
-                padding: 10px;
-            }
-        }
+      .toolbar {
+        padding: 10px;
+      }
     }
+  }
 
-    .i-tag {
-        display: inline-flex;
-        justify-content: center;
-        align-items: baseline;
-    }
+  .i-tag {
+    display: inline-flex;
+    justify-content: center;
+    align-items: baseline;
+  }
 }
 
 .role-list {
-    padding: 10px;
-    box-sizing: border-box;
-    list-style-type: none;
+  padding: 10px;
+  box-sizing: border-box;
+  list-style-type: none;
 
-    li {
-        font-size: 11px !important;
-        display: inline-block;
-        margin-right: 0.3em;
-        margin-bottom: 0.7em;
+  li {
+    font-size: 11px !important;
+    display: inline-block;
+    margin-right: 0.3em;
+    margin-bottom: 0.7em;
 
-        &::before {
-            margin-right: 0.3em;
-        }
+    &::before {
+      margin-right: 0.3em;
     }
+  }
 }
 
 .badge-column {
-    width: 20px;
+  width: 20px;
 }
 
 .role-badge {
-    display: inline-block;
-    width: 25px;
-    text-align: center;
+  display: inline-block;
+  width: 25px;
+  text-align: center;
 }
 
 .role-members-summary {
-    text-align: right;
+  text-align: right;
 }
 
 .toggle-members {
-    cursor: pointer;
+  cursor: pointer;
 }
 
 .i-button[class*='icon-cross']::before {
-    font-size: 1em !important;
-    vertical-align: -5% !important;
+  font-size: 1em !important;
+  vertical-align: -5% !important;
 }

@@ -5,37 +5,36 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
- .i-progress {
-    &, &> [class^="i-progress-"] {
-        height: 1.5em;
-        line-height: 1.5em;
-        width: 100%;
-        color: $light-gray;
-        text-align: center;
-        position: relative;
-        display: inline-block;
-        vertical-align: middle;
-    }
-    overflow: hidden;
-    min-width: 100px;
-    background-color: $dark-gray;
-    &> .i-progress-bar {
-        float: left;
-        width: 0%;
-        background-color: $dark-blue;
-        @include transition(width 0.8s linear);
-    }
-    &> .i-progress-label {
-        position: absolute;
-        left: 0;
-        right: 0;
-    }
-    &.i-progress-small {
-        min-width: 6em;
-    }
-    &.i-progress-large {
-        min-width: 9em;
-    }
+.i-progress {
+  &,
+  & > [class^='i-progress-'] {
+    height: 1.5em;
+    line-height: 1.5em;
+    width: 100%;
+    color: $light-gray;
+    text-align: center;
+    position: relative;
+    display: inline-block;
+    vertical-align: middle;
+  }
+  overflow: hidden;
+  min-width: 100px;
+  background-color: $dark-gray;
+  & > .i-progress-bar {
+    float: left;
+    width: 0%;
+    background-color: $dark-blue;
+    @include transition(width 0.8s linear);
+  }
+  & > .i-progress-label {
+    position: absolute;
+    left: 0;
+    right: 0;
+  }
+  &.i-progress-small {
+    min-width: 6em;
+  }
+  &.i-progress-large {
+    min-width: 9em;
+  }
 }
-
-

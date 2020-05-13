@@ -6,11 +6,11 @@
 // LICENSE file for more details.
 
 body {
-    @extend .flexcol;
+  @extend .flexcol;
 }
 
 body > .main {
-    flex-grow: 1;
+  flex-grow: 1;
 }
 
 /* Work around issues in WebKit (used by Safari) which shrinks the contained
@@ -18,113 +18,112 @@ body > .main {
  * children of the flexbox to be shrinked which is ok since we want the page to
  * scroll anyway. */
 body > * {
-    flex-shrink: 0;
+  flex-shrink: 0;
 }
 
 .fixed-width {
-    max-width: 800px !important;
+  max-width: 800px !important;
 }
 
 .full-width-content-wrapper {
-    .management-page > .page-content {
-        max-width: 100% !important;
-    }
+  .management-page > .page-content {
+    max-width: 100% !important;
+  }
 }
 
 .layout-wrapper {
-    .row {
-        .column {
-            box-sizing: border-box;
-            float: left;
-            padding: 0 1em 0 1em;
+  .row {
+    .column {
+      box-sizing: border-box;
+      float: left;
+      padding: 0 1em 0 1em;
 
-            &.col-40 {
-                width: 40%;
-            }
+      &.col-40 {
+        width: 40%;
+      }
 
-            &.col-50 {
-                width: 50%;
-            }
+      &.col-50 {
+        width: 50%;
+      }
 
-            &.col-60 {
-                width: 60%;
-            }
+      &.col-60 {
+        width: 60%;
+      }
 
-            &.col-full {
-                width: 100%;
-            }
+      &.col-full {
+        width: 100%;
+      }
 
-            &:first-of-type {
-                padding-left: 0;
-            }
+      &:first-of-type {
+        padding-left: 0;
+      }
 
-            &:last-of-type {
-                padding-right: 0;
-            }
-        }
-
-        &:after { // same as .clearfix
-            content: ".";
-            display: block;
-            height: 0;
-            clear: both;
-            visibility: hidden;
-        }
+      &:last-of-type {
+        padding-right: 0;
+      }
     }
+
+    &::after {
+      // same as .clearfix
+      content: '.';
+      display: block;
+      height: 0;
+      clear: both;
+      visibility: hidden;
+    }
+  }
 }
 
 .layout-side-menu {
-    @extend .flexrow;
-    min-height: 100%;
-    margin-left: 30px;
+  @extend .flexrow;
+  min-height: 100%;
+  margin-left: 30px;
+  margin-right: 30px;
+
+  &:first-of-type {
+    margin-top: 20px;
+  }
+
+  .banner {
+    > .menu-column {
+      flex-grow: 0;
+      width: 200px;
+      margin-left: 30px;
+      margin-right: 30px;
+    }
+
+    > .page-column {
+      flex-grow: 1;
+    }
+
+    .action-menu {
+      flex-shrink: 0;
+      margin-top: -0.5%;
+    }
+  }
+
+  > .menu-column {
+    width: 200px;
     margin-right: 30px;
 
-    &:first-of-type {
-        margin-top: 20px;
+    .group:first-child {
+      margin-top: 5px;
+      margin-bottom: 23px;
+
+      a {
+        width: 100%;
+        padding: 5px 5px 5px 26px;
+        text-align: left;
+      }
     }
+  }
 
-    .banner {
-        > .menu-column {
-            flex-grow: 0;
-            width: 200px;
-            margin-left: 30px;
-            margin-right: 30px;
-        }
-
-        > .page-column {
-            flex-grow: 1;
-        }
-
-        .action-menu {
-            flex-shrink: 0;
-            margin-top: -0.5%;
-        }
-    }
-
-
-    > .menu-column {
-        width: 200px;
-        margin-right: 30px;
-
-        .group:first-child {
-            margin-top: 5px;
-            margin-bottom: 23px;
-
-            a {
-                width: 100%;
-                padding: 5px 5px 5px 26px;
-                text-align: left;
-            }
-        }
-    }
-
-    > .content-column {
-        flex-grow: 1;
-        width: 0;
-    }
+  > .content-column {
+    flex-grow: 1;
+    width: 0;
+  }
 }
 
-
 @mixin clearfix() {
-    overflow: hidden;
+  overflow: hidden;
 }

@@ -13,211 +13,211 @@
 $indico-top-bar-height: 50px;
 
 input {
-    font-size: 100%;
+  font-size: 100%;
 }
 
 body {
-    overflow-y: scroll;
+  overflow-y: scroll;
 }
 
 a {
-    cursor: pointer;
+  cursor: pointer;
 }
 
 /* SemanticUI overrides for small screens */
 .ui.selection.dropdown {
-    @media (max-width: $tablet-width) {
-        min-width: 100%;
-    }
+  @media (max-width: $tablet-width) {
+    min-width: 100%;
+  }
 }
 
 // TODO: move this to Indico-wide file
 .indico-top-bar {
-    background-color: $dark-blue;
-    height: $indico-top-bar-height;
+  background-color: $dark-blue;
+  height: $indico-top-bar-height;
+  display: flex;
+  align-items: center;
+  padding: 0 20px;
+
+  .indico-top-bar-logo {
     display: flex;
     align-items: center;
-    padding: 0 20px;
 
-    .indico-top-bar-logo {
-        display: flex;
-        align-items: center;
-
-        img {
-            height: 30px;
-        }
+    img {
+      height: 30px;
     }
+  }
 
-    .indico-user-menu {
-        margin-left: auto;
-    }
+  .indico-user-menu {
+    margin-left: auto;
+  }
 }
 
 .room-edit-modal-add-btn {
-    margin-bottom: 15px !important;
+  margin-bottom: 15px !important;
 }
 
 .flex-container {
-    display: flex;
-    align-items: center;
-    margin-bottom: 5px;
+  display: flex;
+  align-items: center;
+  margin-bottom: 5px;
 
-    .DateRangePicker {
-        padding-bottom: 0 !important;
-    }
+  .DateRangePicker {
+    padding-bottom: 0 !important;
+  }
 }
 
 .delete-button {
-    cursor: pointer;
-    color: $red;
-    opacity: 0.5 !important;
-    padding-left: 15px;
+  cursor: pointer;
+  color: $red;
+  opacity: 0.5 !important;
+  padding-left: 15px;
 
-    &:hover {
-        opacity: 1 !important;
-    }
+  &:hover {
+    opacity: 1 !important;
+  }
 }
 
 .header.legend-header {
-    display: flex !important;
-    align-items: center;
+  display: flex !important;
+  align-items: center;
 
-    .icon.legend-info-icon {
-        display: flex;
-        align-items: center;
-        color: $gray;
-        margin-left: 0.5em;
-        font-size: 0.9em;
-    }
+  .icon.legend-info-icon {
+    display: flex;
+    align-items: center;
+    color: $gray;
+    margin-left: 0.5em;
+    font-size: 0.9em;
+  }
 }
 
 .filter-row {
+  display: flex;
+  align-items: baseline;
+  flex-direction: row;
+  margin-bottom: 10px;
+
+  .filter-row-filters {
     display: flex;
-    align-items: baseline;
     flex-direction: row;
-    margin-bottom: 10px;
+    flex-wrap: wrap;
 
-    .filter-row-filters {
-        display: flex;
-        flex-direction: row;
-        flex-wrap: wrap;
-
-        > * {
-            margin-right: 10px !important;
-            margin-bottom: 10px !important;
-        }
+    > * {
+      margin-right: 10px !important;
+      margin-bottom: 10px !important;
     }
+  }
 }
 
 .event-booking-page {
-    .section.searchable-field {
-        overflow: visible;
+  .section.searchable-field {
+    overflow: visible;
 
-        .selectize-control {
-            width: 500px;
-        }
+    .selectize-control {
+      width: 500px;
+    }
+  }
+
+  .time-column,
+  .link-column {
+    width: 8em;
+  }
+
+  .room-column {
+    width: 6em;
+  }
+
+  .link-data span {
+    text-decoration: dotted underline $gray;
+  }
+
+  tr.disabled {
+    background-color: $light-gray;
+
+    td {
+      color: $dark-gray;
+    }
+  }
+
+  .booking-status {
+    padding-left: 0.5em;
+
+    &.icon-disable {
+      color: $pastel-red;
     }
 
-    .time-column,
-    .link-column {
-        width: 8em;
+    &.icon-time {
+      color: $orange;
     }
-
-    .room-column {
-        width: 6em;
-    }
-
-    .link-data span {
-        text-decoration: dotted underline $gray;
-    }
-
-    tr.disabled {
-        background-color: $light-gray;
-
-        td {
-            color: $dark-gray;
-        }
-    }
-
-    .booking-status {
-        padding-left: 0.5em;
-
-        &.icon-disable {
-            color: $pastel-red;
-        }
-
-        &.icon-time {
-            color: $orange;
-        }
-    }
+  }
 }
 
 %banner-bar {
-    height: 50px;
+  height: 50px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 20px;
+
+  .content {
     display: flex;
-    justify-content: space-between;
+    flex-grow: 1;
     align-items: center;
-    padding: 0 20px;
+  }
 
-    .content {
-        display: flex;
-        flex-grow: 1;
-        align-items: center;
-    }
+  .icon {
+    margin-right: 0.5em;
+  }
 
-    .icon {
-        margin-right: 0.5em;
-    }
-
-    &.weak-hidden {
-        display: none;
-    }
+  &.weak-hidden {
+    display: none;
+  }
 }
 
 .announcement-bar {
-    @extend %banner-bar;
+  @extend %banner-bar;
 
-    &.warning {
-        background-color: lighten($light-yellow, 5%);
-        color: $dark-yellow;
-    }
+  &.warning {
+    background-color: lighten($light-yellow, 5%);
+    color: $dark-yellow;
+  }
 
-    &.error {
-        background-color: $red;
-        color: $light-red;
-    }
+  &.error {
+    background-color: $red;
+    color: $light-red;
+  }
 
-    .close-button {
-        margin-left: auto;
-        cursor: pointer;
-        line-height: 1em;
-    }
+  .close-button {
+    margin-left: auto;
+    cursor: pointer;
+    line-height: 1em;
+  }
 }
 
 $text-yellow: lighten($yellow, 15%);
 
 .impersonation-bar {
-    @extend %banner-bar;
-    height: 50px;
-    background-color: $dark-black;
+  @extend %banner-bar;
+  height: 50px;
+  background-color: $dark-black;
+  color: $text-yellow;
+  box-shadow: 0 -5px 1px -2px rgba(#000, 0.2) inset;
+
+  strong {
+    color: lighten($yellow, 30%);
+  }
+
+  .icon {
     color: $text-yellow;
-    box-shadow: 0 -5px 1px -2px rgba(#000, 0.2) inset;
+  }
 
-    strong {
-        color: lighten($yellow, 30%);
-    }
-
-    .icon {
-        color: $text-yellow;
-    }
-
-    .undo-login-as {
-        margin-left: auto;
-        cursor: pointer;
-        line-height: 1em;
-    }
+  .undo-login-as {
+    margin-left: auto;
+    cursor: pointer;
+    line-height: 1em;
+  }
 }
 
 .scrolling-disabled {
-    overflow-y: hidden;
+  overflow-y: hidden;
 }

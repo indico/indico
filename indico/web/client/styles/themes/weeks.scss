@@ -5,242 +5,242 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-@import "base/palette";
-@import "base/defaults";
-@import "base/borders";
+@import 'base/palette';
+@import 'base/defaults';
+@import 'base/borders';
 
 .event-info-header {
-    color: white;
-    text-align: left;
-    border-top: 3px solid #234173;
-    border-bottom: 1px solid #0f4c80;
-    background: #1a64a0;
+  color: white;
+  text-align: left;
+  border-top: 3px solid #234173;
+  border-bottom: 1px solid #0f4c80;
+  background: #1a64a0;
 }
 
 .event-info-header > div {
-    padding: 1em 3em;
+  padding: 1em 3em;
 }
 
 .event-title {
-    font-family: Roboto, 'Helvetica Neue', Helvetica, Verdana, Arial, sans-serif;
-    font-size: 22pt;
-    display: block;
-    color: white;
+  font-family: Roboto, 'Helvetica Neue', Helvetica, Verdana, Arial, sans-serif;
+  font-size: 22pt;
+  display: block;
+  color: white;
 }
 
 .week-timetable-wrapper {
-    width: 99%;
-    margin: 0 auto;
-    padding-top: 1em;
+  width: 99%;
+  margin: 0 auto;
+  padding-top: 1em;
 }
 
 .week-timetable {
-    font-family: helvetica,verdana,sans-serif;
-    font-size: 8pt;
-    line-height: 18px;
+  font-family: helvetica, verdana, sans-serif;
+  font-size: 8pt;
+  line-height: 18px;
 }
 
 .week-timetable + .week-timetable {
-    margin-top: 1em;
+  margin-top: 1em;
 }
 
 .week-timetable > ul {
-    width: 100%;
-    padding: 0;
-    list-style: none;
-    box-sizing: border-box;
-    -moz-box-sizing: border-box;
+  width: 100%;
+  padding: 0;
+  list-style: none;
+  box-sizing: border-box;
+  -moz-box-sizing: border-box;
 }
 
 .week-timetable > ul > li {
-    float: left;
-    width: 13.95%;
-    display: inline-block;
-    border: 1px #bbb solid;
-    background: #fff;
-    box-sizing: border-box;
-    -moz-box-sizing: border-box;
-    border-radius: 0.2em;
-    box-shadow: 1px 1px 1px #e1e1e1;
+  float: left;
+  width: 13.95%;
+  display: inline-block;
+  border: 1px #bbb solid;
+  background: #fff;
+  box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  border-radius: 0.2em;
+  box-shadow: 1px 1px 1px #e1e1e1;
 }
 
 .week-timetable > ul > li.spacer {
-    width: 0.39%;
-    visibility: hidden;
+  width: 0.39%;
+  visibility: hidden;
 }
 
 .week-timetable.no-weekends > ul > li {
-    width: 19.53%;
+  width: 19.53%;
 }
 
 .week-timetable.no-weekends > ul > li.spacer {
-    width: 0.58%;
+  width: 0.58%;
 }
 
 .week-timetable .row {
-    height: 18px;
-    position: relative;
-    border-top: solid 1px #f9f9f9;
-    box-sizing: border-box;
+  height: 18px;
+  position: relative;
+  border-top: solid 1px #f9f9f9;
+  box-sizing: border-box;
 }
 
 .week-timetable .row .title {
-    font-weight: bold;
+  font-weight: bold;
 }
 
 .week-timetable .row.day-header {
-    background: #f9f9f9;
-    color: #1756B5;
-    text-align: center;
-    font-weight: bold;
-    border-bottom: 1px solid #bbb;
+  background: #f9f9f9;
+  color: #1756b5;
+  text-align: center;
+  font-weight: bold;
+  border-bottom: 1px solid #bbb;
 }
 
 .week-timetable .row.placeholder {
-    border-top: 1px solid #f9f9f9;
+  border-top: 1px solid #f9f9f9;
 }
 
 .week-timetable .row.placeholder + .placeholder {
-    border-top: 1px dashed #ddd;
+  border-top: 1px dashed #ddd;
 }
 
 .week-timetable .row.day-header + .row {
-    border-top: none;
+  border-top: none;
 }
 
 .week-timetable .row.break {
-    background-color: #ddd;
+  background-color: #ddd;
 }
 
 .week-timetable .row.break:hover {
-    background-color: #cfcfcf;
+  background-color: #cfcfcf;
 }
 
 .week-timetable .row.contrib {
-    background-color: #EDF3FD;
+  background-color: #edf3fd;
 }
 
 .week-timetable .row.contrib:hover {
-    background-color: #e4eaf4;
+  background-color: #e4eaf4;
 }
 
 .week-timetable .row .time {
-    position: absolute;
-    background: rgba(0, 0, 0, 0.3);
-    color: #000;
-    width: 35px;
-    height: 100%;
-    display: inline-block;
-    text-align: center;
+  position: absolute;
+  background: rgba(0, 0, 0, 0.3);
+  color: #000;
+  width: 35px;
+  height: 100%;
+  display: inline-block;
+  text-align: center;
 }
 
 .week-timetable .row .time .end-time {
-    display: inline-block;
-    position: absolute;
-    left: 0;
-    bottom: 0;
-    width: 35px;
-    margin: auto 0;
-    color: #ccc;
+  display: inline-block;
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 35px;
+  margin: auto 0;
+  color: #ccc;
 }
 
 .week-timetable .row .main {
-    position: absolute;
-    padding-left: 40px;
-    width: 100%;
-    -moz-box-sizing: border-box;
-    box-sizing: border-box;
+  position: absolute;
+  padding-left: 40px;
+  width: 100%;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
 }
 
 .week-timetable .row.has-session .main,
 .week-timetable .row.has-multi .main {
-    padding-right: 19px;
+  padding-right: 19px;
 }
 
 .week-timetable .row.has-session.has-multi .main {
-    padding-right: 29px;
+  padding-right: 29px;
 }
 
 .week-timetable .row .time {
-    color: white;
-    font-weight: bold;
+  color: white;
+  font-weight: bold;
 }
 
 .week-timetable .row .more-contribs {
-    color: #999;
-    position: absolute;
-    right: 0;
-    display: inline-block;
-    padding: 1px 5px 0 5px;
+  color: #999;
+  position: absolute;
+  right: 0;
+  display: inline-block;
+  padding: 1px 5px 0 5px;
 }
 
 .week-timetable .row .session-mark + .more-contribs {
-    margin-right: 18px;
+  margin-right: 18px;
 }
 
 .week-timetable .row .session-mark {
-    font-size: 1.5em;
-    position: absolute;
-    right: 0;
-    display: inline-block;
-    margin: 1px 2px 0 0;
-    text-shadow: -1px 0 #ccc, 0 1px #ccc, 1px 0 #ccc, 0 -1px #ccc;
+  font-size: 1.5em;
+  position: absolute;
+  right: 0;
+  display: inline-block;
+  margin: 1px 2px 0 0;
+  text-shadow: -1px 0 #ccc, 0 1px #ccc, 1px 0 #ccc, 0 -1px #ccc;
 }
 
 .week-anchor {
-    color: black !important;
+  color: black !important;
 }
 
 .qtip-content {
+  display: inline-block;
+  padding: 10px;
+  box-sizing: border-box;
+
+  span {
+    line-height: 1.1em;
+  }
+
+  .title {
+    width: 100%;
+    font-weight: bold;
     display: inline-block;
-    padding: 10px;
-    box-sizing: border-box;
+  }
 
-    span {
-        line-height: 1.1em;
+  .entry-time {
+    margin: 0.5em 0 0.5em 0;
+  }
+
+  .description {
+    font-size: 0.8em;
+  }
+
+  .contrib-list {
+    width: 100%;
+    text-align: left;
+
+    ul {
+      padding-left: 0 !important;
     }
 
-    .title {
-        width: 100%;
-        font-weight: bold;
-        display: inline-block;
+    strong {
+      @include border-bottom($dark-gray);
+      width: 100%;
+      display: block;
+      margin-top: 0.5em;
     }
 
-    .entry-time {
-        margin: 0.5em 0 0.5em 0;
+    .tooltip-contrib {
+      display: inline-flex;
+      justify-content: space-between;
+
+      .time {
+        height: 100%;
+        margin-right: 5px;
+      }
+
+      .title {
+        width: auto;
+      }
     }
-
-    .description {
-        font-size: 0.8em;
-    }
-
-    .contrib-list {
-        width: 100%;
-        text-align: left;
-
-        ul {
-            padding-left: 0 !important;
-        }
-
-        strong {
-            @include border-bottom($dark-gray);
-            width: 100%;
-            display: block;
-            margin-top: 0.5em
-        }
-
-        .tooltip-contrib {
-            display: inline-flex;
-            justify-content: space-between;
-            
-            .time {
-                height: 100%;
-                margin-right: 5px;
-            }
-
-            .title {
-                width: auto;
-            }
-        }
-    }
+  }
 }

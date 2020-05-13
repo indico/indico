@@ -6,79 +6,79 @@
 // LICENSE file for more details.
 
 #abstract-notification-log {
-    $padding: 0.25rem;
+  $padding: 0.25rem;
 
-    width: 800px;
-    min-height: 400px;
-    max-height: 400px;
-    overflow-y: auto;
+  width: 800px;
+  min-height: 400px;
+  max-height: 400px;
+  overflow-y: auto;
 
-    .log-entry {
-        @include border-top();
-        padding: $padding;
+  .log-entry {
+    @include border-top();
+    padding: $padding;
 
-        &:last-child {
-            @include border-bottom();
-        }
+    &:last-child {
+      @include border-bottom();
+    }
+  }
+
+  .log-entry > .metadata {
+    margin: -$padding;
+    padding: $padding;
+    padding-left: $padding * 2;
+
+    .subject {
+      font-weight: bold;
     }
 
-    .log-entry > .metadata {
-        margin: -$padding;
-        padding: $padding;
-        padding-left: $padding * 2;
-
-        .subject {
-            font-weight: bold;
-        }
-
-        .template {
-            @include border-bottom($style: dashed);
-            font-weight: normal;
-        }
-
-        time {
-            color: $dark-gray;
-        }
+    .template {
+      @include border-bottom($style: dashed);
+      font-weight: normal;
     }
 
-    .log-entry > .metadata:not(.legacy) {
-        cursor: pointer;
+    time {
+      color: $dark-gray;
+    }
+  }
 
-        &:hover,
-        &.open {
-            @include inner-border-left($gray, $width: 2px);
-            background-color: $light-gray;
-            background-origin: border-box;
-        }
+  .log-entry > .metadata:not(.legacy) {
+    cursor: pointer;
+
+    &:hover,
+    &.open {
+      @include inner-border-left($gray, $width: 2px);
+      background-color: $light-gray;
+      background-origin: border-box;
+    }
+  }
+
+  .log-entry .content {
+    @include inner-border-left($gray, $width: 2px);
+    display: none;
+    margin-left: -$padding;
+    margin-top: $padding * 2;
+    padding-left: $padding * 2;
+
+    .metadata {
+      color: $dark-gray;
+      font-size: 0.9em;
     }
 
-    .log-entry .content {
-        @include inner-border-left($gray, $width: 2px);
-        display: none;
-        margin-left: -$padding;
-        margin-top: $padding * 2;
-        padding-left: $padding * 2;
-
-        .metadata {
-            color: $dark-gray;
-            font-size: 0.9em;
-        }
-
-        .recipients {
-            margin-left: 0.5em;
-            align-self: center;
-        }
-
-        .template {
-            @include border-bottom($style: dashed);
-            align-self: center;
-            margin-left: 0.5em;
-            word-break: break-word;
-        }
-
-        .body {
-            margin-top: $padding;
-            word-break: break-word;
-        }
+    .recipients {
+      margin-left: 0.5em;
+      align-self: center;
     }
+
+    .template {
+      @include border-bottom($style: dashed);
+      align-self: center;
+      margin-left: 0.5em;
+      word-break: break-word;
+    }
+
+    .body {
+      margin-top: $padding;
+      word-break: break-word;
+    }
+  }
 }

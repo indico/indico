@@ -6,28 +6,28 @@
 // LICENSE file for more details.
 
 .group-review-form {
-    :global(.form-preface) {
-        font-size: 13px;
-        font-weight: bold;
+  :global(.form-preface) {
+    font-size: 13px;
+    font-weight: bold;
+  }
+
+  :global(.fields):last-child {
+    margin-bottom: 0;
+  }
+
+  .question-field {
+    display: flex;
+    flex: 1.5;
+    justify-content: flex-end;
+
+    :global(.field) {
+      justify-content: flex-end;
+      display: flex;
+      flex: 1;
+
+      &:global(.required) :global(.checkbox)::after {
+        content: none;
+      }
     }
-
-    :global(.fields):last-child {
-        margin-bottom: 0;
-    }
-
-    .question-field {
-        display: flex;
-        flex: 1.5;
-        justify-content: flex-end;
-
-        :global(.field) {
-            justify-content: flex-end;
-            display: flex;
-            flex: 1;
-
-            &:global(.required) :global(.checkbox)::after {
-                content: none;
-            }
-        }
-    }
+  }
 }

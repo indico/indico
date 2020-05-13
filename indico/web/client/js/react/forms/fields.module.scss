@@ -8,13 +8,14 @@
 @import 'base/palette';
 
 .field-error {
-    color: $red !important;
-    border-color: $red !important;
-    font-weight: bold;
+  color: $red !important;
+  border-color: $red !important;
+  font-weight: bold;
 }
 
-.field-description, :global(.field-description) {
-    font-style: italic;
-    font-size: 0.9em;
-    color: $dark-gray;
+.field-description,
+:global(.field-description) {
+  font-style: italic;
+  font-size: 0.9em;
+  color: $dark-gray;
 }

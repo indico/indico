@@ -6,30 +6,30 @@
 // LICENSE file for more details.
 
 .condition-form {
+  flex: 1;
+
+  :global(.ui.form) {
+    display: flex;
     flex: 1;
+    align-items: center;
 
-    :global(.ui.form) {
-        display: flex;
-        flex: 1;
-        align-items: center;
-
-        :global(.ui.search) {
-            font-size: 0.85em;
-        }
-
-        .file-types-dropdown {
-            margin-bottom: 0;
-            flex: 1;
-        }
-
-        .action-buttons {
-            display: flex;
-            flex: 0.3;
-            justify-content: flex-end;
-
-            :global(.field) {
-                margin-bottom: 0;
-            }
-        }
+    :global(.ui.search) {
+      font-size: 0.85em;
     }
+
+    .file-types-dropdown {
+      margin-bottom: 0;
+      flex: 1;
+    }
+
+    .action-buttons {
+      display: flex;
+      flex: 0.3;
+      justify-content: flex-end;
+
+      :global(.field) {
+        margin-bottom: 0;
+      }
+    }
+  }
 }

@@ -10,13 +10,13 @@
 // ============================================================================
 
 %regform-section {
-    @extend .i-box;
-    margin-top: 25px;
+  @extend .i-box;
+  margin-top: 25px;
 }
 
 .regform-section-title {
-    @extend %i-box-title;
-    margin-right: 10px;
+  @extend %i-box-title;
+  margin-right: 10px;
 }
 
 // ============================================================================
@@ -24,175 +24,175 @@
 // ============================================================================
 
 .regform-section {
-    @extend %regform-section;
+  @extend %regform-section;
 
-    .i-box-header {
-        table {
-            td {
-                vertical-align: top;
-            }
+  .i-box-header {
+    table {
+      td {
+        vertical-align: top;
+      }
 
-            .section-header-content {
-                width: 100%;
-                max-width: 568px;
-            }
+      .section-header-content {
+        width: 100%;
+        max-width: 568px;
+      }
 
-            .section-toolbar {
-                width: 150px;
-            }
-        }
-
-        .clearableinput + .clearableinput {
-            margin-top: 3px;
-        }
+      .section-toolbar {
+        width: 150px;
+      }
     }
 
-    .section-field-divisor {
-        & > span {
-            color: $gray;
-            font-size: 1.2em;
-            margin-left: 4px;
-            vertical-align: -8%;
-        }
+    .clearableinput + .clearableinput {
+      margin-top: 3px;
+    }
+  }
+
+  .section-field-divisor {
+    & > span {
+      color: $gray;
+      font-size: 1.2em;
+      margin-left: 4px;
+      vertical-align: -8%;
+    }
+  }
+
+  .section-group-title {
+    font-weight: bold;
+    margin-top: 15px;
+  }
+
+  .section-placeholder {
+    color: $gray;
+    font-style: italic;
+  }
+
+  .section-sortable-handle {
+    @include icon-before('icon-handle');
+    @include transition(
+      background-color $default-transition-duration $default-transition-function,
+      height $default-transition-duration $default-transition-function
+    );
+
+    background-color: lighten($dark-gray, $color-variation);
+    cursor: move;
+    font-size: 1.2em;
+    height: 10px;
+    margin: -10px -10px 10px -10px;
+    text-align: center;
+
+    &:hover,
+    &:active {
+      @include border-bottom();
+      background-color: white;
+      height: 20px;
+
+      &::before {
+        color: $dark-gray;
+        top: 3px;
+      }
     }
 
-    .section-group-title {
-        font-weight: bold;
-        margin-top: 15px;
+    &::before {
+      transform: rotate(90deg);
+      @include transition(top);
+      color: $light-gray;
+      display: inline-block;
+      position: relative;
+      top: -3px;
     }
+  }
 
-    .section-placeholder {
-        color: $gray;
-        font-style: italic;
-    }
-
+  &.manager-only {
     .section-sortable-handle {
-        @include icon-before('icon-handle');
-        @include transition(
-            background-color $default-transition-duration $default-transition-function,
-            height $default-transition-duration $default-transition-function
-        );
-
-        background-color: lighten($dark-gray, $color-variation);
-        cursor: move;
-        font-size: 1.2em;
-        height: 10px;
-        margin: -10px -10px 10px -10px;
-        text-align: center;
-
-        &:hover,
-        &:active {
-            @include border-bottom();
-            background-color: white;
-            height: 20px;
-
-            &:before {
-                color: $dark-gray;
-                top: 3px;
-            }
-        }
-
-        &:before {
-            transform: rotate(90deg);
-            @include transition(top);
-            color: $light-gray;
-            display: inline-block;
-            position: relative;
-            top: -3px;
-        }
+      background-color: $dark-yellow;
+      &:hover {
+        background-color: white;
+      }
     }
-
-    &.manager-only {
-        .section-sortable-handle {
-            background-color: $dark-yellow;
-            &:hover {
-                background-color: white;
-            }
-        }
-        .i-box-title {
-            @include icon-before('icon-user-reading');
-        }
+    .i-box-title {
+      @include icon-before('icon-user-reading');
     }
+  }
 }
 
 .regform-field {
-    @include transition(background-color);
+  @include transition(background-color);
 
-    min-height: 27px;
-    margin: 2px -10px;
-    padding: 0 10px;
-    // TODO Any better idea? This is hackish as hell
-    width: 102.6%;
-    word-break: break-word;
+  min-height: 27px;
+  margin: 2px -10px;
+  padding: 0 10px;
+  // TODO Any better idea? This is hackish as hell
+  width: 102.6%;
+  word-break: break-word;
 
-    &.disabled {
-        background: $light-gray;
+  &.disabled {
+    background: $light-gray;
 
-        & .field-caption {
-            color: $dark-gray;
-        }
+    & .field-caption {
+      color: $dark-gray;
+    }
+  }
+
+  .field-actions {
+    visibility: hidden;
+    float: right;
+    line-height: 27px;
+    padding: 0 5px;
+    white-space: nowrap;
+
+    a {
+      color: $blue;
+      display: inline-block;
+    }
+  }
+
+  .field-caption {
+    width: 125px;
+    padding: 4px 0;
+    vertical-align: top;
+  }
+
+  .field-description {
+    color: $dark-gray;
+    font-size: 11px;
+    max-width: 440px;
+    text-align: justify;
+    padding: 5px 2px 10px 2px;
+  }
+
+  .email-info {
+    margin-top: 0.5em;
+    padding: 0.2em;
+    background-color: $light-green;
+    color: $light-black;
+
+    &.warning {
+      @include icon-before(icon-warning);
+      background-color: $light-yellow;
+      &::before {
+        margin-right: 0.2em;
+      }
     }
 
-    .field-actions {
-        visibility: hidden;
-        float: right;
-        line-height: 27px;
-        padding: 0 5px;
-        white-space: nowrap;
-
-        a {
-            color: $blue;
-            display: inline-block;
-        }
+    &.error {
+      @include icon-before(icon-warning);
+      background-color: $light-red;
+      &::before {
+        margin-right: 0.2em;
+      }
     }
+  }
 
-    .field-caption {
-        width: 125px;
-        padding: 4px 0;
-        vertical-align: top;
+  .field-input {
+    vertical-align: top;
+    padding-top: 3px;
+
+    .field-input-only-content {
+      display: inline-block;
+      max-width: 570px;
+      padding-bottom: 3px;
     }
-
-    .field-description {
-        color: $dark-gray;
-        font-size: 11px;
-        max-width: 440px;
-        text-align: justify;
-        padding: 5px 2px 10px 2px;
-    }
-
-    .email-info {
-        margin-top: 0.5em;
-        padding: 0.2em;
-        background-color: $light-green;
-        color: $light-black;
-
-        &.warning {
-            @include icon-before(icon-warning);
-            background-color: $light-yellow;
-            &:before {
-                margin-right: 0.2em;
-            }
-        }
-
-        &.error {
-            @include icon-before(icon-warning);
-            background-color: $light-red;
-            &:before {
-                margin-right: 0.2em;
-            }
-        }
-    }
-
-    .field-input {
-        vertical-align: top;
-        padding-top: 3px;
-
-        .field-input-only-content {
-            display: inline-block;
-            max-width: 570px;
-            padding-bottom: 3px;
-        }
-    }
+  }
 }
 
 // ============================================================================
@@ -200,248 +200,248 @@
 // ============================================================================
 
 .regform-done {
-    @extend %regform-section;
-    margin-bottom: 15px;
+  @extend %regform-section;
+  margin-bottom: 15px;
 
-    table.registration-info {
-        border-collapse: collapse;
-        width: 100%;
+  table.registration-info {
+    border-collapse: collapse;
+    width: 100%;
 
-        &.payment-info {
-            td {
-                padding: 3px;
-            }
-        }
+    &.payment-info {
+      td {
+        padding: 3px;
+      }
+    }
+  }
+
+  tr.regform-done-title {
+    td {
+      @include border-bottom(lighten($gray, $color-variation));
+      padding: 15px 0 5px 0;
+      font-size: 1.3em;
     }
 
-    tr.regform-done-title {
-        td {
-            @include border-bottom(lighten($gray, $color-variation));
-            padding: 15px 0 5px 0;
-            font-size: 1.3em;
-        }
-
-        &:first-child td {
-            padding: 0;
-        }
+    &:first-child td {
+      padding: 0;
     }
+  }
 
-    tr:first-child .regform-done-title {
-        margin-top: 0;
+  tr:first-child .regform-done-title {
+    margin-top: 0;
+  }
+
+  .regform-done-caption {
+    border-bottom: 1px dashed lighten($gray, $color-variation);
+    border-right: 1px dashed lighten($gray, $color-variation);
+    color: $dark-gray;
+    font-weight: normal;
+    text-align: right;
+    padding: 0 8px 0 0;
+    width: 120px;
+  }
+
+  .regform-done-data {
+    padding: 0 0 0 5px;
+    vertical-align: top;
+  }
+
+  .regform-done-table-title {
+    @include border-bottom(lighten($gray, $color-variation));
+    font-weight: bold;
+
+    &:not(:first-child) {
+      padding: 0 0 0 15px;
     }
+  }
 
-    .regform-done-caption {
-        border-bottom: 1px dashed lighten($gray, $color-variation);
-        border-right: 1px dashed lighten($gray, $color-variation);
+  .regform-done-table-item {
+    td {
+      vertical-align: top;
+
+      &:not(:first-child) {
+        padding: 0 0 0 15px;
+      }
+
+      span.section-name {
         color: $dark-gray;
-        font-weight: normal;
-        text-align: right;
-        padding: 0 8px 0 0;
-        width: 120px;
+      }
     }
 
-    .regform-done-data {
-        padding: 0 0 0 5px;
-        vertical-align: top;
+    &:nth-child(odd) {
+      background: $light-gray;
+    }
+  }
+
+  .regform-done-table-total {
+    @include border-top(lighten($gray, $color-variation));
+    font-weight: bold;
+    padding-top: 5px;
+
+    strong {
+      padding-right: 1em;
+    }
+  }
+
+  .regform-done-footer {
+    margin-top: 20px;
+
+    input[type='checkbox'] {
+      float: left;
+      margin-left: 1px;
     }
 
-    .regform-done-table-title {
-        @include border-bottom(lighten($gray, $color-variation));
-        font-weight: bold;
-
-        &:not(:first-child) {
-            padding: 0 0 0 15px;
-        }
+    label {
+      font-weight: normal;
     }
 
-    .regform-done-table-item {
-        td {
-            vertical-align: top;
-
-            &:not(:first-child) {
-                padding: 0 0 0 15px;
-            }
-
-            span.section-name {
-                color: $dark-gray;
-            }
-        }
-
-        &:nth-child(odd) {
-            background: $light-gray;
-        }
+    td:first-child {
+      width: 100%;
     }
 
-    .regform-done-table-total {
-        @include border-top(lighten($gray, $color-variation));
-        font-weight: bold;
-        padding-top: 5px;
+    td.regform-done-footer-button {
+      .i-button {
+        white-space: nowrap;
+      }
+    }
+  }
 
-        strong {
-            padding-right: 1em;
-        }
+  .regform-done-checkout {
+    font-size: 1.1em;
+    margin-top: 10px;
+  }
+
+  .not-selected {
+    color: $gray;
+    font-style: italic;
+  }
+
+  .payment-status {
+    font-weight: bold;
+
+    &.payment-done {
+      color: $green;
     }
 
-    .regform-done-footer {
-        margin-top: 20px;
-
-        input[type=checkbox] {
-            float: left;
-            margin-left: 1px;
-        }
-
-        label {
-            font-weight: normal;
-        }
-
-        td:first-child {
-            width: 100%;
-        }
-
-        td.regform-done-footer-button {
-            .i-button {
-                white-space: nowrap;
-            }
-        }
+    &.payment-pending {
+      color: $yellow;
     }
 
-    .regform-done-checkout {
-        font-size: 1.1em;
-        margin-top: 10px;
+    &.payment-not-paid {
+      color: $red;
     }
 
-    .not-selected {
-        color: $gray;
-        font-style: italic;
+    i {
+      font-size: 1.5em;
+      &::before {
+        vertical-align: -15%;
+      }
     }
+  }
 
-    .payment-status {
-        font-weight: bold;
-
-        &.payment-done {
-            color: $green;
-        }
-
-        &.payment-pending {
-            color: $yellow;
-        }
-
-        &.payment-not-paid {
-            color: $red;
-        }
-
-        i {
-            font-size: 1.5em;
-            &:before {
-                vertical-align: -15%;
-            }
-        }
-    }
-
-    .payment-conditions-agreement {
-        color: $light-black;
-    }
+  .payment-conditions-agreement {
+    color: $light-black;
+  }
 }
 
 .action-button {
-    @extend .i-button;
-    @extend .i-button.big;
-    @extend .i-button.highlight;
-    @extend .i-button.next;
-    font-weight: bold;
-    margin-left: 2em;
-    margin-right: 0;
-    white-space: nowrap;
+  @extend .i-button;
+  @extend .i-button.big;
+  @extend .i-button.highlight;
+  @extend .i-button.next;
+  font-weight: bold;
+  margin-left: 2em;
+  margin-right: 0;
+  white-space: nowrap;
 }
 
 .permalink-text {
+  color: $light-black;
+  margin-top: 2em;
+  text-align: center;
+
+  .permalink {
+    @extend %font-family-monospace;
     color: $light-black;
-    margin-top: 2em;
+    font-size: 0.8em;
+    margin-top: 0.5em;
     text-align: center;
+    width: 100%;
+  }
 
-    .permalink {
-        @extend %font-family-monospace;
-        color: $light-black;
-        font-size: 0.8em;
-        margin-top: 0.5em;
-        text-align: center;
-        width: 100%;
-    }
-
-    .management-page & {
-        margin-bottom: 1em;
-    }
+  .management-page & {
+    margin-bottom: 1em;
+  }
 }
-
 
 // ============================================================================
 // Editable-specific
 // ============================================================================
 
 .regform-field.editable {
-    &:hover,
-    &:active {
-        background-color: $light-blue;
+  &:hover,
+  &:active {
+    background-color: $light-blue;
 
-        .field-actions {
-            visibility: visible;
-        }
+    .field-actions {
+      visibility: visible;
     }
+  }
 }
 
 .regform-table {
-    thead {
-        th {
-            @include border-bottom();
-            padding-bottom: 4px;
-            vertical-align: top;
-        }
-
-        td {
-            background: white !important;
-        }
-
-        th:first-of-type {
-            text-align: left;
-        }
+  thead {
+    th {
+      @include border-bottom();
+      padding-bottom: 4px;
+      vertical-align: top;
     }
 
-    td, th {
-        padding: 4px 4px;
+    td {
+      background: white !important;
     }
 
-    tr {
-        &:hover td {
-            background: $light-blue;
-        }
+    th:first-of-type {
+      text-align: left;
+    }
+  }
 
-        &.empty-row:hover td {
-            background: white !important;
-        }
+  td,
+  th {
+    padding: 4px 4px;
+  }
 
-        td.row-actions {
-            span {
-                padding-right: 6px;
-            }
-
-            a {
-                color: $blue;
-                visibility: hidden;
-            }
-        }
-
-        &:hover td.row-actions a {
-            visibility: visible;
-        }
+  tr {
+    &:hover td {
+      background: $light-blue;
     }
 
-    .accompanying-col {
-        background: $light-gray;
+    &.empty-row:hover td {
+      background: white !important;
     }
 
-    .no-accommodation-row td {
-        padding-bottom: 1em;
+    td.row-actions {
+      span {
+        padding-right: 6px;
+      }
+
+      a {
+        color: $blue;
+        visibility: hidden;
+      }
     }
+
+    &:hover td.row-actions a {
+      visibility: visible;
+    }
+  }
+
+  .accompanying-col {
+    background: $light-gray;
+  }
+
+  .no-accommodation-row td {
+    padding-bottom: 1em;
+  }
 }
 
 // ============================================================================
@@ -449,93 +449,92 @@
 // ============================================================================
 
 .regform-field {
-    label {
-        font-weight: normal;
+  label {
+    font-weight: normal;
+  }
+
+  textarea {
+    resize: none;
+  }
+
+  ul {
+    margin: 0;
+    padding-left: 0;
+
+    li {
+      list-style: none;
+    }
+  }
+
+  .accommodation-option-item {
+    padding-left: 15px;
+  }
+
+  .checkbox-info {
+    margin: 3px 0 0 21px;
+  }
+
+  .label-price {
+    margin-left: 2px;
+    padding-left: 2px;
+  }
+
+  .label-text {
+    text-align: justify;
+  }
+
+  .file-link {
+    @include icon-before('icon-file');
+    padding-left: 2px;
+  }
+
+  .remove-file {
+    @include icon-before('icon-close');
+    color: $light-black;
+    font-size: 1.1em;
+
+    &:hover {
+      color: $red;
+    }
+  }
+
+  .dateField {
+    img {
+      right: 22px;
     }
 
-    textarea {
-        resize: none;
+    input[type='text'] {
+      margin: 0 2px;
     }
+  }
 
-    ul {
-        margin: 0;
-        padding-left: 0;
-
-        li {
-            list-style: none;
-        }
-    }
-
-    .accommodation-option-item {
-        padding-left : 15px;
-    }
-
-    .checkbox-info {
-        margin: 3px 0 0 21px;
-    }
-
-    .label-price {
-        margin-left: 2px;
-        padding-left: 2px;
-    }
-
-    .label-text {
-        text-align: justify;
-    }
-
-    .file-link {
-        @include icon-before('icon-file');
-        padding-left: 2px;
-    }
-
-    .remove-file {
-        @include icon-before('icon-close');
-        color: $light-black;
-        font-size: 1.1em;
-
-        &:hover {
-            color: $red;
-        }
-    }
-
-    .dateField {
-        img {
-            right: 22px;
-        }
-
-        input[type=text] {
-            margin: 0 2px;
-        }
-    }
-
-    .item-warning {
-        margin-left: 0.5em;
-        color: $yellow;
-    }
+  .item-warning {
+    margin-left: 0.5em;
+    color: $yellow;
+  }
 }
 
 .regform-field.billable-disabled {
-    background-color: lighten($pastel-gray, 5%);
-    padding-top: 10px;
+  background-color: lighten($pastel-gray, 5%);
+  padding-top: 10px;
 
-    .billable-disabled-warning {
-        width: 50px;
-        margin-left: 0.5em;
-        font-size: 2em;
-        color: $gray;
-    }
+  .billable-disabled-warning {
+    width: 50px;
+    margin-left: 0.5em;
+    font-size: 2em;
+    color: $gray;
+  }
 }
-
 
 // ============================================================================
 // Section-specific
 // ============================================================================
 
 .regform-section {
-    textarea.reason-input {
-        max-width: 100%;
-        width: 100%;
-    }
+  textarea.reason-input {
+    max-width: 100%;
+    width: 100%;
+  }
 }
 
 // ============================================================================
@@ -543,16 +542,16 @@
 // ============================================================================
 
 .no-currency-selected {
-    color: $red;
-    vertical-align: -5%;
+  color: $red;
+  vertical-align: -5%;
 }
 
 .available-text {
-    color: green;
+  color: green;
 }
 
 .unavailable-text {
-    color: red;
+  color: red;
 }
 
 // ============================================================================
@@ -560,151 +559,153 @@
 // ============================================================================
 
 .regform-dialog {
-    .mandatory-check {
-        float: left;
-        line-height: 21px;
-        position: absolute;
+  .mandatory-check {
+    float: left;
+    line-height: 21px;
+    position: absolute;
 
-        span {
-            vertical-align: 10%;
-        }
+    span {
+      vertical-align: 10%;
     }
+  }
 
-    .description-input {
-        margin: 0 2px;
-        width: 345px;
-        resize: none;
-    }
+  .description-input {
+    margin: 0 2px;
+    width: 345px;
+    resize: none;
+  }
 
-    .caption-input {
-        margin: 0 2px;
-        width: 230px;
-        resize: none;
-    }
+  .caption-input {
+    margin: 0 2px;
+    width: 230px;
+    resize: none;
+  }
 
-    .free-text-input {
-        margin: 0 2px;
-        width: 260px;
-        resize: none;
-    }
+  .free-text-input {
+    margin: 0 2px;
+    width: 260px;
+    resize: none;
+  }
 }
 
 .regFormSectionNewSection {
-    @extend %font-family-title-light;
-    width:625px;
-    font-size: 20px;
-    color: #0C4566;
-    padding: 10px;
-    font-weight: bold;
-    margin: 0px;
+  @extend %font-family-title-light;
+  width: 625px;
+  font-size: 20px;
+  color: #0c4566;
+  padding: 10px;
+  font-weight: bold;
+  margin: 0;
 }
 
 .regFormDialogTabContent {
-    margin-top: 20px;
-    min-width: 480px;
+  margin-top: 20px;
+  min-width: 480px;
 }
 
 .regFormDialogEditionTable {
-    margin-bottom: 20px;
-    margin-right: 20px;
+  margin-bottom: 20px;
+  margin-right: 20px;
 }
 
 .regFormDialogIntroText {
-    margin-bottom: 15px;
+  margin-bottom: 15px;
 }
 
 .regFormDialogEditLine {
-    clear: both;
-    margin-right: 30px;
-    margin-bottom: 15px;
+  clear: both;
+  margin-right: 30px;
+  margin-bottom: 15px;
 }
 
 .regFormDialogEditDatesOffset {
-    border-collapse: collapse;
-    margin-bottom: 15px;
+  border-collapse: collapse;
+  margin-bottom: 15px;
 
-    td {
-        padding: 3px;
-    }
+  td {
+    padding: 3px;
+  }
 
-    tr:not(.regFormDialogCaptionLine) td:first-child {
-        padding-left: 20px;
-    }
+  tr:not(.regFormDialogCaptionLine) td:first-child {
+    padding-left: 20px;
+  }
 
-    tr.regFormDialogCaptionLine td {
-        padding-top: 0.5em;
-    }
+  tr.regFormDialogCaptionLine td {
+    padding-top: 0.5em;
+  }
 }
 
 .regFormDialogCaption {
-    margin-top: 3px;
-    width: 90px;
-    display: inline-block;
-    vertical-align: top;
-    white-space: normal;
+  margin-top: 3px;
+  width: 90px;
+  display: inline-block;
+  vertical-align: top;
+  white-space: normal;
 }
 
 .regFormDialogCaptionLine {
-    min-width: 180px;
-    margin-bottom: 7px
+  min-width: 180px;
+  margin-bottom: 7px;
 }
 
-.regFormEditLine{
-    padding-bottom : 7px;
+.regFormEditLine {
+  padding-bottom: 7px;
 }
 
 /* Form Display CSS */
 
 .regform-mandatory-info {
-    margin: 10px 0px;
-    text-align: center;
-    color: $black;
-    font-style: italic;
+  margin: 10px 0;
+  text-align: center;
+  color: $black;
+  font-style: italic;
 }
 
 /* Form Edition CSS */
 
 input.regFormTitleInputMgmt {
-    @extend %font-family-title-light;
-    width : 600px;
-    font-size: 20px;
-    color: $dark-blue;
-    font-style: normal;
-    font-weight: bold;
+  @extend %font-family-title-light;
+  width: 600px;
+  font-size: 20px;
+  color: $dark-blue;
+  font-style: normal;
+  font-weight: bold;
 }
 
-input[name='price'].ng-invalid, input[name='placesLimit'].ng-invalid, input[name='maxExtraSlots'].ng-invalid {
-    border: 1px solid red;
+input[name='price'].ng-invalid,
+input[name='placesLimit'].ng-invalid,
+input[name='maxExtraSlots'].ng-invalid {
+  border: 1px solid red;
 }
 
 textarea.regFormDescriptionInputMgmt {
-    @extend %font-family-description;
-    width : 600px;
-    font-size: 14px;
-    color: rgb(34, 34, 34);
-    font-style: italic;
-    font-weight: normal;
+  @extend %font-family-description;
+  width: 600px;
+  font-size: 14px;
+  color: rgb(34, 34, 34);
+  font-style: italic;
+  font-weight: normal;
 }
 
 .regFormSectionTable,
 .regFormDoneTable {
-    border: 1px solid #CCC;
-    border-radius: 5px;
-    -moz-border-radius: 5px;
-    padding: 15px;
-    width:70%;
-    padding-bottom:10px;
-    margin-top: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  -moz-border-radius: 5px;
+  padding: 15px;
+  width: 70%;
+  padding-bottom: 10px;
+  margin-top: 10px;
 }
 
 .regFormMandatoryField {
-    color: #812;
-    font-weight: normal;
+  color: #812;
+  font-weight: normal;
 }
 
 /* CSS for the tabs */
 
-[class*="span"] {
+[class*='span'] {
   float: left;
 }
 .container,
@@ -721,12 +722,12 @@ textarea.regFormDescriptionInputMgmt {
   *zoom: 1;
   white-space: nowrap;
 }
-.tabbable:before,
-.tabbable:after {
+.tabbable::before,
+.tabbable::after {
   display: table;
-  content: "";
+  content: '';
 }
-.tabbable:after {
+.tabbable::after {
   clear: both;
 }
 .tabs-left > .nav-tabs {
@@ -755,12 +756,12 @@ textarea.regFormDescriptionInputMgmt {
   border-radius: 4px 0 0 4px;
 }
 .tabs-left > .nav-tabs > li > a:hover {
-  border-color: #eeeeee #dddddd #eeeeee #eeeeee;
+  border-color: #eee #ddd #eee #eee;
 }
 .tabs-left > .nav-tabs .active > a,
 .tabs-left > .nav-tabs .active > a:hover {
   border-color: #ddd transparent #ddd #ddd;
-  *border-right-color: #ffffff;
+  *border-right-color: #fff;
 }
 
 .nav {
@@ -773,7 +774,7 @@ textarea.regFormDescriptionInputMgmt {
 }
 .nav > li > a:hover {
   text-decoration: none;
-  background-color: #eeeeee;
+  background-color: #eee;
 }
 .nav .nav-header {
   display: block;
@@ -781,10 +782,9 @@ textarea.regFormDescriptionInputMgmt {
   font-size: 11px;
   font-weight: bold;
   line-height: 18px;
-  color: #999999;
+  color: #999;
   text-shadow: 0 1px 0 rgba(255, 255, 255, 0.5);
   text-transform: uppercase;
-
 }
 .nav li + .nav-header {
   margin-top: 9px;
@@ -815,12 +815,12 @@ textarea.regFormDescriptionInputMgmt {
   border-radius: 4px 4px 0 0;
 }
 .nav-tabs > li > a:hover {
-  border-color: #eeeeee #eeeeee #dddddd;
+  border-color: #eee #eee #ddd;
 }
 .nav-tabs > .active > a,
 .nav-tabs > .active > a:hover {
-  color: #555555;
-  background-color: #ffffff;
+  color: #555;
+  background-color: #fff;
   border: 1px solid #ddd;
   border-bottom-color: transparent;
   cursor: default;
@@ -846,57 +846,57 @@ textarea.regFormDescriptionInputMgmt {
 // ============================================================================
 
 %regform-sortable-placeholder {
-    background-color: $light-gray;
+  background-color: $light-gray;
 }
 
 .regform-field-sortable-placeholder {
-    @extend %regform-sortable-placeholder;
-    @include border-vert($gray, dashed);
-    margin: 2px -10px;
-    // TODO Any better idea? This is hackish as hell
-    width: 102.9%;
+  @extend %regform-sortable-placeholder;
+  @include border-vert($gray, dashed);
+  margin: 2px -10px;
+  // TODO Any better idea? This is hackish as hell
+  width: 102.9%;
 }
 
 .regform-section-sortable-placeholder {
-    @extend %regform-sortable-placeholder;
-    @extend %regform-section;
-    @include border-all($gray, dashed);
-    box-shadow: none;
+  @extend %regform-sortable-placeholder;
+  @extend %regform-section;
+  @include border-all($gray, dashed);
+  box-shadow: none;
 }
 
 .regform-table-sortable-placeholder {
-    background-color: $light-blue;
-    line-height: 1.6em;
+  background-color: $light-blue;
+  line-height: 1.6em;
 }
 
 .regform-field.editable {
-    .field-sortable-handle {
-        color: $dark-gray;
-        line-height: 26px;
-        vertical-align: top;
-        width: 15px;
-    }
+  .field-sortable-handle {
+    color: $dark-gray;
+    line-height: 26px;
+    vertical-align: top;
+    width: 15px;
+  }
 
-    &:not(.disabled):hover .field-sortable-handle,
-    &:not(.disabled):active .field-sortable-handle {
-        @include icon-before('icon-handle');
-        cursor: move;
-    }
+  &:not(.disabled):hover .field-sortable-handle,
+  &:not(.disabled):active .field-sortable-handle {
+    @include icon-before('icon-handle');
+    cursor: move;
+  }
 }
 
 .regform-table {
-    padding-bottom: 25px;
+  padding-bottom: 25px;
 
-    tr:hover .table-sortable-handle,
-    td:active .table-sortable-handle{
-        @include icon-before('icon-handle');
-    }
+  tr:hover .table-sortable-handle,
+  td:active .table-sortable-handle {
+    @include icon-before('icon-handle');
+  }
 
-    .table-sortable-handle {
-        color: $dark-gray;
-        width: 15px;
-        cursor: move;
-    }
+  .table-sortable-handle {
+    color: $dark-gray;
+    width: 15px;
+    cursor: move;
+  }
 }
 
 // ============================================================================
@@ -905,12 +905,12 @@ textarea.regFormDescriptionInputMgmt {
 
 .regform-section .i-box-header,
 .i-button.highlightable {
-    @include transition(background, 1s, ease-out);
+  @include transition(background, 1s, ease-out);
 }
 
 .section-highlight-enter .regform-section .i-box-header,
 .button-highlight-enter {
-    background: $yellow;
+  background: $yellow;
 }
 
 // ============================================================================
@@ -918,25 +918,25 @@ textarea.regFormDescriptionInputMgmt {
 // ============================================================================
 
 .regform-section .i-box-title[contenteditable] {
-    display: block;
+  display: block;
 }
 
 .regform-section .i-box-description[contenteditable],
 .regFormText[contenteditable] {
-    &.focus {
-        min-height: 27px !important;
-    }
+  &.focus {
+    min-height: 27px !important;
+  }
 
-    &+.button-box a {
-        font-size: 1.5em !important;
-        line-height: 27px !important;
-    }
+  & + .button-box a {
+    font-size: 1.5em !important;
+    line-height: 27px !important;
+  }
 }
 
 .regform-section .i-box-description[contenteditable] {
-    &.focus {
-        padding-right: 3.6em !important;
-    }
+  &.focus {
+    padding-right: 3.6em !important;
+  }
 }
 
 // ============================================================================
@@ -944,278 +944,320 @@ textarea.regFormDescriptionInputMgmt {
 // ============================================================================
 
 .registrant-stats > .i-box {
-    &> .i-box-content {
-        &> table {
-            border-collapse: collapse;
-            width: 100%;
+  & > .i-box-content {
+    & > table {
+      border-collapse: collapse;
+      width: 100%;
 
-            thead {
-                tr:last-child th {
-                    font-weight: bold;
-                    border-bottom: 2px solid $gray;
-                    padding-right: 5px;
-                }
-                th {
-                    padding-right: 10px;
-                    text-align: center;
-                }
-            }
-            tbody {
-                tr {
-                    &:nth-child(even) { background-color: $light-gray; }
-                    &:nth-child(odd) { background-color: white; }
-                    &:first-child td { border-top: 0; }
-
-                    &:not(.sub-row) td.cancelled-item:first-child {
-                        position: relative;
-
-                        &:after {
-                            border-bottom: 2px solid $light-black;
-                            content: "";
-                            left: 1%;
-                            position: absolute;
-                            right: 1%;
-                            top: 48%;
-                            width: 98%;
-                        }
-                    }
-                }
-                td {
-                    border-top: 1px solid $gray;
-
-                    &:first-child, &:last-child { font-weight: bold; }
-
-                    &.paid-unpaid-progress > .i-progress > .i-progress-bar {
-                        &:first-child { background: $pastel-green; }
-                        &:nth-child(2) { background: $pastel-red; }
-                    }
-                    &.no-stats-data { color: $dark-gray; }
-                    &.paid-amount span { color: $green; }
-                    &.unpaid-amount {
-                        &:before { content: "("; }
-                        &:after { content: ")"; }
-                        span { color: $red; }
-                    }
-                    &.stick-left { padding-right: 1px; }
-                    &.stick-right { padding-left: 1px; }
-                }
-            }
-            tr {
-                td:first-child:before {
-                    display: inline-block;
-                    line-height: 1em;
-                    font-size: 1.2em;
-                    vertical-align: middle;
-                    font-weight: bold;
-                }
-                &.header-row  {
-                    cursor: pointer;
-                    user-select: none;
-
-                    td:first-child {
-                        @include icon-before('icon-arrow-down');
-
-                        border-bottom: 0;
-                        &:before {
-                            @include rotate-transform(0.15s);
-                        }
-                    }
-                    &.collapsed td:first-child:before { transform: rotate(-90deg); }
-                }
-                &.single-row td:first-child:before { content: "\2001"; }
-                &.sub-row td:first-child { border-top: 0px; }
-            }
-            th, td {
-                padding: 5px;
-                text-align: right;
-
-                &:first-child { text-align: left; }
-                i[class^="icon-"] { vertical-align: middle; }
-            }
+      thead {
+        tr:last-child th {
+          font-weight: bold;
+          border-bottom: 2px solid $gray;
+          padding-right: 5px;
         }
-
-        .stats-overview {
-            font-size: 2em;
-            font-weight: bold;
-            color: $light-black;
-            display: block;
-
-            &> *.no-info {
-                font-size: 1em;
-                color: $dark-gray;
-                font-style: italic;
-                font-weight: lighter;
-            }
-            &> *:last-child {
-                float: right;
-                clear: both;
-            }
+        th {
+          padding-right: 10px;
+          text-align: center;
         }
+      }
+      tbody {
+        tr {
+          &:nth-child(even) {
+            background-color: $light-gray;
+          }
+          &:nth-child(odd) {
+            background-color: white;
+          }
+          &:first-child td {
+            border-top: 0;
+          }
 
-        .stats-item {
-            display: block;
-            width: 100%;
+          &:not(.sub-row) td.cancelled-item:first-child {
             position: relative;
-            margin: 0.6em 0;
-            font-size: 1.2em;
-            height: 1.5em;
-            vertical-align: middle;
-            color: $black;
-            &> * {
-                &:first-child {
-                    position: relative;
-                    line-height: 1.5em;
-                    float: left;
-                    margin-right: 0.4em;
-                }
-                &:last-child {
-                    display: block;
-                    overflow: auto;
 
-                    & > .i-progress {
-                        background-color: $pastel-green;
-
-                        & > .i-progress-bar {
-                            background-color: $pastel-red;
-                        }
-                    }
-                }
+            &::after {
+              border-bottom: 2px solid $light-black;
+              content: '';
+              left: 1%;
+              position: absolute;
+              right: 1%;
+              top: 48%;
+              width: 98%;
             }
+          }
         }
+        td {
+          border-top: 1px solid $gray;
 
-        &> .i-badges-list > .i-badge > .i-badge-content { height: 6.5em; }
+          &:first-child,
+          &:last-child {
+            font-weight: bold;
+          }
 
-        .jqplot-point-label {
-            color: white;
-            z-index: 100;
+          &.paid-unpaid-progress > .i-progress > .i-progress-bar {
+            &:first-child {
+              background: $pastel-green;
+            }
+            &:nth-child(2) {
+              background: $pastel-red;
+            }
+          }
+          &.no-stats-data {
+            color: $dark-gray;
+          }
+          &.paid-amount span {
+            color: $green;
+          }
+          &.unpaid-amount {
+            &::before {
+              content: '(';
+            }
+            &::after {
+              content: ')';
+            }
+            span {
+              color: $red;
+            }
+          }
+          &.stick-left {
+            padding-right: 1px;
+          }
+          &.stick-right {
+            padding-left: 1px;
+          }
         }
-        .jqplot-yaxis-tick {
-            right: 0;
-            margin-right: 0.5em;
+      }
+      tr {
+        td:first-child::before {
+          display: inline-block;
+          line-height: 1em;
+          font-size: 1.2em;
+          vertical-align: middle;
+          font-weight: bold;
         }
-        .jqplot-xaxis-tick { margin-top: 0.2em; }
+        &.header-row {
+          cursor: pointer;
+          user-select: none;
+
+          td:first-child {
+            @include icon-before('icon-arrow-down');
+
+            border-bottom: 0;
+            &::before {
+              @include rotate-transform(0.15s);
+            }
+          }
+          &.collapsed td:first-child::before {
+            transform: rotate(-90deg);
+          }
+        }
+        &.single-row td:first-child::before {
+          content: '\2001';
+        }
+        &.sub-row td:first-child {
+          border-top: 0;
+        }
+      }
+      th,
+      td {
+        padding: 5px;
+        text-align: right;
+
+        &:first-child {
+          text-align: left;
+        }
+        i[class^='icon-'] {
+          vertical-align: middle;
+        }
+      }
     }
 
-    #countriesPlot {
-        user-select: none;
+    .stats-overview {
+      font-size: 2em;
+      font-weight: bold;
+      color: $light-black;
+      display: block;
 
-        margin-top: -1.2em;
+      & > *.no-info {
+        font-size: 1em;
+        color: $dark-gray;
+        font-style: italic;
+        font-weight: lighter;
+      }
+      & > *:last-child {
+        float: right;
+        clear: both;
+      }
     }
+
+    .stats-item {
+      display: block;
+      width: 100%;
+      position: relative;
+      margin: 0.6em 0;
+      font-size: 1.2em;
+      height: 1.5em;
+      vertical-align: middle;
+      color: $black;
+      & > * {
+        &:first-child {
+          position: relative;
+          line-height: 1.5em;
+          float: left;
+          margin-right: 0.4em;
+        }
+        &:last-child {
+          display: block;
+          overflow: auto;
+
+          & > .i-progress {
+            background-color: $pastel-green;
+
+            & > .i-progress-bar {
+              background-color: $pastel-red;
+            }
+          }
+        }
+      }
+    }
+
+    & > .i-badges-list > .i-badge > .i-badge-content {
+      height: 6.5em;
+    }
+
+    .jqplot-point-label {
+      color: white;
+      z-index: 100;
+    }
+    .jqplot-yaxis-tick {
+      right: 0;
+      margin-right: 0.5em;
+    }
+    .jqplot-xaxis-tick {
+      margin-top: 0.2em;
+    }
+  }
+
+  #countriesPlot {
+    user-select: none;
+
+    margin-top: -1.2em;
+  }
 }
 
 .invitation-list {
-    border-top: 0;
+  border-top: 0;
 
-    .invitation-table {
-        border-collapse: collapse;
-        border-spacing: 0;
-        width: 100%;
+  .invitation-table {
+    border-collapse: collapse;
+    border-spacing: 0;
+    width: 100%;
 
-        td {
-            padding: 0.35rem 5px 0.35rem 0;
+    td {
+      padding: 0.35rem 5px 0.35rem 0;
 
-            &:first-child {
-                padding-left: 5px;
-            }
+      &:first-child {
+        padding-left: 5px;
+      }
 
-            &.name {
-                font-weight: bold;
-                width: 34%;
-            }
+      &.name {
+        font-weight: bold;
+        width: 34%;
+      }
 
-            &.email {
-                width: 34%;
-            }
+      &.email {
+        width: 34%;
+      }
 
-            &.affiliation {
-                width: 30%;
-            }
+      &.affiliation {
+        width: 30%;
+      }
 
-            &.actions {
-                font-size: 1.2em;
-                padding: 0 5px;
-                width: 2%;
-                white-space: nowrap;
+      &.actions {
+        font-size: 1.2em;
+        padding: 0 5px;
+        width: 2%;
+        white-space: nowrap;
 
-                a {
-                    color: $dark-gray;
-                    vertical-align: sub;
-                    visibility: hidden;
+        a {
+          color: $dark-gray;
+          vertical-align: sub;
+          visibility: hidden;
 
-                    &:hover {
-                        color: $blue;
-                    }
-                }
-            }
+          &:hover {
+            color: $blue;
+          }
         }
-
-        tr:nth-child(odd) > td {
-            background: $light-gray;
-        }
-
-        tr:hover > td {
-            background: $light-blue !important;
-
-            &.actions a {
-                visibility: visible;
-            }
-        }
-
-        &:not(:last-child) {
-            margin-bottom: 2em;
-        }
+      }
     }
 
-    .titled-rule {
-        margin-top: 0;
+    tr:nth-child(odd) > td {
+      background: $light-gray;
     }
+
+    tr:hover > td {
+      background: $light-blue !important;
+
+      &.actions a {
+        visibility: visible;
+      }
+    }
+
+    &:not(:last-child) {
+      margin-bottom: 2em;
+    }
+  }
+
+  .titled-rule {
+    margin-top: 0;
+  }
 }
 
 .registration-info {
-    tr.deleted-field {
-        background-color: $light-yellow;
+  tr.deleted-field {
+    background-color: $light-yellow;
 
-        td {
-            padding: 0.5em;
+    td {
+      padding: 0.5em;
 
-            .deleted-field-warning {
-                color: $yellow;
-            }
-        }
+      .deleted-field-warning {
+        color: $yellow;
+      }
     }
+  }
 }
 
 #registration-details {
-    .registration-unpaid {
-        color: $yellow;
-    }
-    .registration-complete,
-    .registration-checked-in {
-        color: $green;
-    }
-    .registration-rejected,
-    .registration-withdrawn {
-        color: $red;
-    }
+  .registration-unpaid {
+    color: $yellow;
+  }
+  .registration-complete,
+  .registration-checked-in {
+    color: $green;
+  }
+  .registration-rejected,
+  .registration-withdrawn {
+    color: $red;
+  }
 }
 
 .regform-list {
-    h3 {
-        margin-top: 2em;
-    }
+  h3 {
+    margin-top: 2em;
+  }
 }
 
 .disabled-sections {
-    display: none;
+  display: none;
 }
 
 .disabled-caption {
-    color: $dark-gray;
-    margin: 30px 0 0 0;
+  color: $dark-gray;
+  margin: 30px 0 0 0;
 
-    a {
-        padding: 0 10px;
-        box-sizing: border-box;
-        color: $dark-gray;
-    }
+  a {
+    padding: 0 10px;
+    box-sizing: border-box;
+    color: $dark-gray;
+  }
 }

@@ -6,123 +6,123 @@
 // LICENSE file for more details.
 
 #flashed-messages {
-    &:empty {
-        display: none;
-    }
+  &:empty {
+    display: none;
+  }
 }
 
 .speaker-list {
-    @extend %font-family-modern-body;
+  @extend %font-family-modern-body;
 
-    color: $black;
+  color: $black;
 
-    .speaker-item {
-        display: block;
+  .speaker-item {
+    display: block;
 
-        &::before {
-            color: $dark-blue;
-            margin-right: 0.2em;
-        }
-
-        .affiliation {
-            color: $dark-gray;
-            font-size: 0.8em;
-
-            .text {
-                @include ellipsis();
-
-                display: inline-block;
-                max-width: 10em;
-                vertical-align: text-bottom;
-            }
-        }
+    &::before {
+      color: $dark-blue;
+      margin-right: 0.2em;
     }
 
-    .speaker-item-inline {
-        @extend .speaker-item;
+    .affiliation {
+      color: $dark-gray;
+      font-size: 0.8em;
+
+      .text {
+        @include ellipsis();
 
         display: inline-block;
+        max-width: 10em;
+        vertical-align: text-bottom;
+      }
     }
+  }
+
+  .speaker-item-inline {
+    @extend .speaker-item;
+
+    display: inline-block;
+  }
 }
 
 .event-message {
-    margin: 20px auto 5px auto;
-    width: 1000px !important;
-    box-sizing: border-box;
-    line-height: initial;
+  margin: 20px auto 5px auto;
+  width: 1000px !important;
+  box-sizing: border-box;
+  line-height: initial;
 }
 
-
 .event-page-header {
-    .session-bar {
-        margin-top: 0;
-        margin-right: 0.8em;
+  .session-bar {
+    margin-top: 0;
+    margin-right: 0.8em;
+  }
+
+  .main-action-bar {
+    height: 50px;
+    min-height: 50px;
+  }
+
+  .button-bar {
+    align-self: stretch;
+
+    .i-button {
+      @include _i-button-states($black, transparent, transparent, $gray, white, false);
+      border-radius: 0;
+      padding: 0 0.8em;
+      font-size: 1.1em;
+      margin: 0;
+      border: none;
     }
 
-    .main-action-bar {
-        height: 50px;
-        min-height: 50px;
+    .separator {
+      margin: 10px 5px;
+      width: 1px;
+      border-right: 1px dotted $light-black;
     }
 
-    .button-bar {
-        align-self: stretch;
+    .i-dropdown {
+      @include border-all($color: $black);
+      @include single-box-shadow($color: $black);
 
-        .i-button {
-            @include _i-button-states($black, transparent, transparent, $gray, white, false);
-            border-radius: 0;
-            padding: 0 0.8em;
-            font-size: 1.1em;
-            margin: 0;
-            border: none;
+      background: $dark-black;
+
+      li {
+        a {
+          color: $dark-gray;
         }
 
-        .separator {
-            margin: 10px 5px;
-            width: 1px;
-            border-right: 1px dotted $light-black;
+        &:hover a:not(.disabled) {
+          color: $light-gray;
         }
-
-        .i-dropdown {
-            @include border-all($color: $black);
-            @include single-box-shadow($color: $black);
-
-            background: $dark-black;
-
-            li {
-                a {
-                    color: $dark-gray;
-                }
-
-                &:hover a:not(.disabled) {
-                    color: $light-gray;
-                }
-            }
-        }
-
-        .filter-link {
-            &.active, &.active:hover {
-                color: $bright-orange;
-                font-weight: bold;
-            }
-        }
-
-        .themes-separator {
-            @include border-bottom($black);
-            height: auto;
-            margin: 0 1em;
-        }
+      }
     }
 
-    .event-filters {
-        margin-top: 5px;
-        padding: 10px 10px 10px 75px;
-        border-top: 1px solid black;
-        border-bottom: 1px solid black;
-        background-color: #777;
-        display: none;
-
-        strong {
-            color: white;
-        }
+    .filter-link {
+      &.active,
+      &.active:hover {
+        color: $bright-orange;
+        font-weight: bold;
+      }
     }
+
+    .themes-separator {
+      @include border-bottom($black);
+      height: auto;
+      margin: 0 1em;
+    }
+  }
+
+  .event-filters {
+    margin-top: 5px;
+    padding: 10px 10px 10px 75px;
+    border-top: 1px solid black;
+    border-bottom: 1px solid black;
+    background-color: #777;
+    display: none;
+
+    strong {
+      color: white;
+    }
+  }
 }

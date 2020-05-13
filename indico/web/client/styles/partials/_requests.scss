@@ -6,28 +6,37 @@
 // LICENSE file for more details.
 
 @mixin i-request-state($state, $color, $light-color, $dark-color) {
-    &.i-request-#{$state} {
-        background-color: $light-color;
-        &, & * { color: $color; }
-        &:hover { background-color: darken($light-color, $light-color-variation); }
-        & > .i-badge-legend { border-color: $dark-color; }
+  &.i-request-#{$state} {
+    background-color: $light-color;
+    &,
+    & * {
+      color: $color;
     }
+    &:hover {
+      background-color: darken($light-color, $light-color-variation);
+    }
+    & > .i-badge-legend {
+      border-color: $dark-color;
+    }
+  }
 }
 
 .i-requests-list {
-    & > .i-badge {
-        @include transition(background-color $default-transition-duration $default-transition-function);
+  & > .i-badge {
+    @include transition(background-color $default-transition-duration $default-transition-function);
 
-        width: 10em;
+    width: 10em;
 
-        @include i-request-state(accepted, $green, $light-green, $dark-green);
-        @include i-request-state(rejected, $red, $light-red, $dark-red);
-        @include i-request-state(pending, $yellow, $light-yellow, $dark-yellow);
-        @include i-request-state(withdrawn, $gray, $light-gray, $dark-gray);
+    @include i-request-state(accepted, $green, $light-green, $dark-green);
+    @include i-request-state(rejected, $red, $light-red, $dark-red);
+    @include i-request-state(pending, $yellow, $light-yellow, $dark-yellow);
+    @include i-request-state(withdrawn, $gray, $light-gray, $dark-gray);
 
-        & > .i-badge-content {
-            height: 4.2em;
-            & > .i-badge-title { font-size: 1em; }
-        }
+    & > .i-badge-content {
+      height: 4.2em;
+      & > .i-badge-title {
+        font-size: 1em;
+      }
     }
+  }
 }

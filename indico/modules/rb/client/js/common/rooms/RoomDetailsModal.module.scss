@@ -6,21 +6,21 @@
 // LICENSE file for more details.
 
 :global(.ui.modal .header).room-details-header {
-    display: flex;
-    justify-content: space-between;
+  display: flex;
+  justify-content: space-between;
 }
 
 .room-details {
-    :global(.ui.icon.message).message-icon :global(.icon) {
-        font-size: 2em;
-    }
+  :global(.ui.icon.message).message-icon :global(.icon) {
+    font-size: 2em;
+  }
 
-    .attribute-title {
-        padding-right: 1em;
-    }
+  .attribute-title {
+    padding-right: 1em;
+  }
 }
 
 :global(.ui.basic.blue.button).all-bookings {
-    margin-left: auto;
-    box-shadow: none !important;
+  margin-left: auto;
+  box-shadow: none !important;
 }

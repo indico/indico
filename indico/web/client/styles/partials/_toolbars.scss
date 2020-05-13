@@ -11,294 +11,293 @@ $toolbar-spacing: 10px;
 $i-button-spacing: 0.3rem;
 
 .scrolling .toolbar {
-    margin: 0.5em 0em 0.5em 0em;
+  margin: 0.5em 0 0.5em 0;
 }
 
 .toolbar {
-    $toolbar-button-height: 1.7em;
+  $toolbar-button-height: 1.7em;
 
-    display: flex;
-    flex-shrink: 0;
-    min-height: $toolbar-height;
+  display: flex;
+  flex-shrink: 0;
+  min-height: $toolbar-height;
 
-    &.space-before {
-        margin-top: $toolbar-spacing;
+  &.space-before {
+    margin-top: $toolbar-spacing;
+  }
+
+  &.space-after {
+    margin-bottom: $toolbar-spacing;
+  }
+
+  &.thin {
+    $thin-button-height: 1.4em;
+    min-height: $toolbar-thin-height;
+
+    & .i-button {
+      height: $toolbar-thin-height;
     }
 
-    &.space-after {
-        margin-bottom: $toolbar-spacing;
+    & input[type='text'] {
+      height: $toolbar-thin-height;
+    }
+  }
+
+  &.thinner {
+    min-height: 1em;
+
+    & .i-button {
+      height: 1.5em;
+    }
+    & .i-button[class*='icon-']::before {
+      font-size: 1em;
+    }
+  }
+
+  & > .option {
+    line-height: 2.5em;
+    margin-right: 1em;
+  }
+
+  .i-button {
+    height: $toolbar-height;
+    padding: 0.2em 0.7em 0.1em 0.7em !important;
+
+    &:not(.label) {
+      font-weight: bold;
     }
 
-    &.thin {
-        $thin-button-height: 1.4em;
-        min-height: $toolbar-thin-height;
-
-        & .i-button {
-            height: $toolbar-thin-height;
-        }
-
-        & input[type=text] {
-            height: $toolbar-thin-height;
-        }
+    &.arrow:last-of-type:not(.borderless) {
+      border-right-width: 1px;
+      border-right-style: solid;
     }
+  }
 
-    &.thinner {
-        min-height: 1em;
+  :not(ui) > input[type='text'] {
+    color: $black;
+    display: inline-block;
+    float: left;
+    height: $toolbar-height;
+    margin: 0;
+    padding: 0.2em 0.7em 0.1em 0.7em;
+  }
 
-        & .i-button {
-            height: 1.5em;
-        }
-        & .i-button[class*="icon-"]:before {
-            font-size: 1em;
-        }
+  .i-dropdown {
+    z-index: 1;
 
+    & > li {
+      white-space: nowrap;
     }
+  }
 
-    & > .option {
-        line-height: 2.5em;
-        margin-right: 1em;
+  .switch {
+    height: 2.2em;
+
+    .switch-label {
+      line-height: 2.2em;
+
+      &::before,
+      &::after {
+        font-size: 1em;
+        font-weight: bold;
+        text-transform: initial;
+      }
     }
+  }
 
-    .i-button {
-        height: $toolbar-height;
-        padding: 0.2em 0.7em 0.1em 0.7em !important;
-
-        &:not(.label) {
-            font-weight: bold;
-        }
-
-        &.arrow:last-of-type:not(.borderless) {
-            border-right-width: 1px;
-            border-right-style: solid;
-        }
-    }
-
-    :not(ui) > input[type=text] {
-        color: $black;
-        display: inline-block;
-        float: left;
-        height: $toolbar-height;
-        margin: 0;
-        padding: 0.2em 0.7em 0.1em 0.7em;
-    }
-
-    .i-dropdown {
-        z-index: 1;
-
-        & > li {
-            white-space: nowrap;
-        }
-    }
-
-    .switch {
-        height: 2.2em;
-
-        .switch-label {
-            line-height: 2.2em;
-
-            &:before,
-            &:after {
-                font-size: 1em;
-                font-weight: bold;
-                text-transform: initial;
-            }
-        }
-    }
-
-    .group {
-        @extend %toolbar-group;
-    }
+  .group {
+    @extend %toolbar-group;
+  }
 }
 
 .toolbars {
-    display: flex;
-    flex-direction: row;
-    justify-content: space-between;
-    flex-wrap: wrap;
-    margin-top: -$toolbar-spacing;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  margin-top: -$toolbar-spacing;
 
-    &.space-before {
-        margin-top: 0;
+  &.space-before {
+    margin-top: 0;
+  }
+
+  &.space-after {
+    margin-bottom: $toolbar-spacing;
+  }
+
+  .toolbar {
+    margin-top: $toolbar-spacing;
+
+    &:not(:last-child) {
+      margin-right: 0.5em;
     }
-
-    &.space-after {
-        margin-bottom: $toolbar-spacing;
-    }
-
-    .toolbar {
-        margin-top: $toolbar-spacing;
-
-        &:not(:last-child) {
-            margin-right: 0.5em;
-        }
-    }
+  }
 }
 
 .toolbar.table {
-    display: table;
-    table-layout: fixed;
+  display: table;
+  table-layout: fixed;
 
-    .group {
-        display: table-row;
+  .group {
+    display: table-row;
 
-        .i-button {
-            @include ellipsis;
+    .i-button {
+      @include ellipsis;
 
-            display: table-cell;
-            float: none;
-        }
+      display: table-cell;
+      float: none;
     }
+  }
 }
 
 %toolbar-group {
-    @extend %toolbar-group-inputs;
-    @extend %toolbar-group-datepicker;
-    @extend %toolbar-group-slider;
-    @extend .flexrow;
+  @extend %toolbar-group-inputs;
+  @extend %toolbar-group-datepicker;
+  @extend %toolbar-group-slider;
+  @extend .flexrow;
 
-    & ~ .i-button,
-    & ~ .group {
-        margin-left: $i-button-spacing;
+  & ~ .i-button,
+  & ~ .group {
+    margin-left: $i-button-spacing;
+  }
+
+  .i-button {
+    border-radius: 0;
+    border-right-width: 0;
+    margin: 0;
+
+    // i-button flavors don't change border color on hover
+    &:not(.label):not(.accept):not(.danger):not(.highlight):not(.warning):not(.disabled):not(:disabled) {
+      &:hover + .i-button {
+        border-left-color: $gray;
+      }
     }
 
-    .i-button {
-        border-radius: 0;
-        border-right-width: 0px;
-        margin: 0;
+    &.arrow:last-of-type {
+      border-bottom-right-radius: $default-border-radius;
+      border-top-right-radius: $default-border-radius;
+    }
+  }
 
-        // i-button flavors don't change border color on hover
-        &:not(.label):not(.accept):not(.danger):not(.highlight):not(.warning):not(.disabled):not(:disabled) {
-            &:hover + .i-button {
-                border-left-color: $gray;
-            }
-        }
-
-        &.arrow:last-of-type {
-            border-bottom-right-radius: $default-border-radius;
-            border-top-right-radius: $default-border-radius;
-        }
+  .i-button:not(.hidden) {
+    &:first-child {
+      border-bottom-left-radius: $default-border-radius;
+      border-top-left-radius: $default-border-radius;
     }
 
-    .i-button:not(.hidden) {
-        &:first-child {
-            border-bottom-left-radius: $default-border-radius;
-            border-top-left-radius: $default-border-radius;
-        }
-
-        &:last-child {
-            border-bottom-right-radius: $default-border-radius;
-            border-top-right-radius: $default-border-radius;
-            border-right-width: 1px;
-        }
-
-        &.label {
-            &:not(:last-child) {
-                border-bottom-right-radius: 0;
-                border-top-right-radius: 0;
-                border-right: none !important;
-            }
-
-            & ~ .i-button:not(.hidden):first-child {
-                border-bottom-left-radius: 0;
-                border-top-left-radius: 0;
-            }
-        }
+    &:last-child {
+      border-bottom-right-radius: $default-border-radius;
+      border-top-right-radius: $default-border-radius;
+      border-right-width: 1px;
     }
+
+    &.label {
+      &:not(:last-child) {
+        border-bottom-right-radius: 0;
+        border-top-right-radius: 0;
+        border-right: none !important;
+      }
+
+      & ~ .i-button:not(.hidden):first-child {
+        border-bottom-left-radius: 0;
+        border-top-left-radius: 0;
+      }
+    }
+  }
 }
 
 %toolbar-group-inputs {
-    label.i-button {
-        &:not(.label) {
-            &:hover ~ .i-button {
-                border-left-color: $gray;
-            }
-            &:hover ~ .i-button ~ .i-button {
-                border-left-color: $default-border-color;
-            }
-        }
+  label.i-button {
+    &:not(.label) {
+      &:hover ~ .i-button {
+        border-left-color: $gray;
+      }
+      &:hover ~ .i-button ~ .i-button {
+        border-left-color: $default-border-color;
+      }
     }
+  }
 
-    input[type=radio]:first-child,
-    input[type=text]:first-child,
-    input[type=password]:first-child {
-        + .i-button {
-            border-bottom-left-radius: $default-border-radius;
-            border-top-left-radius: $default-border-radius;
-        }
+  input[type='radio']:first-child,
+  input[type='text']:first-child,
+  input[type='password']:first-child {
+    + .i-button {
+      border-bottom-left-radius: $default-border-radius;
+      border-top-left-radius: $default-border-radius;
     }
+  }
 
-    > .clearableinput {
-        float: left;
-    }
+  > .clearableinput {
+    float: left;
+  }
 
-    > input[type=text]:first-child,
-    > input[type=password]:first-child,
-    > .clearableinput:first-child input[type=text] {
-        border-bottom-right-radius: $default-border-radius;
-        border-top-right-radius: $default-border-radius;
-    }
+  > input[type='text']:first-child,
+  > input[type='password']:first-child,
+  > .clearableinput:first-child input[type='text'] {
+    border-bottom-right-radius: $default-border-radius;
+    border-top-right-radius: $default-border-radius;
+  }
 
-    > input[type=text]:last-child,
-    > input[type=password]:last-child,
-    > .clearableinput:last-child input[type=text] {
-        border-bottom-left-radius: 0;
-        border-top-left-radius: 0;
-    }
+  > input[type='text']:last-child,
+  > input[type='password']:last-child,
+  > .clearableinput:last-child input[type='text'] {
+    border-bottom-left-radius: 0;
+    border-top-left-radius: 0;
+  }
 
-    > input[type=text]:not(:last-child),
-    > input[type=password]:not(:last-child),
-    > .clearableinput:not(:last-child) {
-        border-bottom-right-radius: 0;
-        border-top-right-radius: 0;
-        & + .i-button {
-            border-left: none;
-            border-bottom-left-radius: 0;
-            border-top-left-radius: 0;
-        }
+  > input[type='text']:not(:last-child),
+  > input[type='password']:not(:last-child),
+  > .clearableinput:not(:last-child) {
+    border-bottom-right-radius: 0;
+    border-top-right-radius: 0;
+    & + .i-button {
+      border-left: none;
+      border-bottom-left-radius: 0;
+      border-top-left-radius: 0;
     }
+  }
 }
 
 %toolbar-group-slider {
-    &.with-slider {
-        .slider {
-            padding-left: 1em !important;
-            padding-right: 1em !important;
-            width: 150px;
+  &.with-slider {
+    .slider {
+      padding-left: 1em !important;
+      padding-right: 1em !important;
+      width: 150px;
 
-            .ui-slider {
-                display: inline-block !important;
-                margin-top: 3px;
-                margin-left: -2px;
-                width: 100% !important;
-            }
-        }
+      .ui-slider {
+        display: inline-block !important;
+        margin-top: 3px;
+        margin-left: -2px;
+        width: 100% !important;
+      }
     }
+  }
 }
 
 %toolbar-group-datepicker {
-    &.with-datepicker {
-        .datepicker {
-            position: relative;
+  &.with-datepicker {
+    .datepicker {
+      position: relative;
 
-            &:last-child {
-                input[type=text] {
-                    border-bottom-right-radius: $default-border-radius;
-                    border-top-right-radius: $default-border-radius;
-                }
-            }
-
-            .ui-datepicker-trigger {
-                float: right;
-                font-size: 1em;
-                position: absolute;
-                margin: 0;
-                right: 5px;
-                top: auto;
-            }
-
-            &.thin .ui-datepicker-trigger {
-                line-height: $toolbar-thin-height;
-            }
+      &:last-child {
+        input[type='text'] {
+          border-bottom-right-radius: $default-border-radius;
+          border-top-right-radius: $default-border-radius;
         }
+      }
+
+      .ui-datepicker-trigger {
+        float: right;
+        font-size: 1em;
+        position: absolute;
+        margin: 0;
+        right: 5px;
+        top: auto;
+      }
+
+      &.thin .ui-datepicker-trigger {
+        line-height: $toolbar-thin-height;
+      }
     }
+  }
 }

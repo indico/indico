@@ -6,40 +6,40 @@
 // LICENSE file for more details.
 
 .clearableinput {
-    display: flex;
-    align-items: center;
-    position: relative;
+  display: flex;
+  align-items: center;
+  position: relative;
 
-    .clearabletext {
-        padding-right: 1.7em !important;
+  .clearabletext {
+    padding-right: 1.7em !important;
 
-        &.actionabletext {
-            padding-right: 3.1em !important;
-            word-break: break-all;
-        }
-
-        &::-webkit-search-cancel-button {
-            display: none;
-        }
+    &.actionabletext {
+      padding-right: 3.1em !important;
+      word-break: break-all;
     }
 
-    .button-box {
-        position: absolute;
-        padding: 0 2px;
-        right: 0;
-        height: 1.1em;
-
-        a.i-link {
-            padding-left: 2px;
-            visibility: hidden;
-
-            &::before {
-                font-size: 1.1em;
-            }
-
-            &:last-child {
-                padding-right: 2px;
-            }
-        }
+    &::-webkit-search-cancel-button {
+      display: none;
     }
+  }
+
+  .button-box {
+    position: absolute;
+    padding: 0 2px;
+    right: 0;
+    height: 1.1em;
+
+    a.i-link {
+      padding-left: 2px;
+      visibility: hidden;
+
+      &::before {
+        font-size: 1.1em;
+      }
+
+      &:last-child {
+        padding-right: 2px;
+      }
+    }
+  }
 }

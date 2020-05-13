@@ -6,10 +6,10 @@
 // LICENSE file for more details.
 
 .filter-bar-button-label:global(.ui.label) {
-    // this is not very pretty but seems to be the only
-    // way to center the label without making the button
-    // expand
-    margin-left: 0.5em;
-    position: absolute;
-    top: calc(50% - 1em);
+  // this is not very pretty but seems to be the only
+  // way to center the label without making the button
+  // expand
+  margin-left: 0.5em;
+  position: absolute;
+  top: calc(50% - 1em);
 }

@@ -6,162 +6,162 @@
 // LICENSE file for more details.
 
 div.event-service-association-title {
-    margin-bottom: 0.3em;
-    margin-top: 1em;
+  margin-bottom: 0.3em;
+  margin-top: 1em;
 
-    span.event-service-association-subtitle {
-        color: #bbb;
-        font-size: 17px;
-        margin-left: 0.5em;
-    }
+  span.event-service-association-subtitle {
+    color: #bbb;
+    font-size: 17px;
+    margin-left: 0.5em;
+  }
 }
 
 div.event-service-row {
-    border: 1px solid $pastel-gray;
-    background-color: $light-gray;
-    box-shadow: 0 2px 1px -1px $pastel-gray;
-    padding: 0.3em 0.6em;
-    margin-bottom: 0.5em;
+  border: 1px solid $pastel-gray;
+  background-color: $light-gray;
+  box-shadow: 0 2px 1px -1px $pastel-gray;
+  padding: 0.3em 0.6em;
+  margin-bottom: 0.5em;
+  position: relative;
+
+  &.info {
+    background-color: $light-blue;
+    border-color: $pastel-blue;
+    box-shadow: 0 2px 1px -1px $pastel-blue;
+  }
+
+  & > .event-service-row-collapsed {
     position: relative;
 
-    &.info {
-        background-color: $light-blue;
-        border-color: $pastel-blue;
-        box-shadow: 0 2px 1px -1px $pastel-blue;
+    & > .event-service-toolbar {
+      margin-bottom: 0;
+      padding: 0;
+      margin-right: 2em;
+
+      .join-button {
+        min-width: 5em;
+      }
     }
 
-    & > .event-service-row-collapsed {
-        position: relative;
-
-        & > .event-service-toolbar {
-            margin-bottom: 0;
-            padding: 0;
-            margin-right: 2em;
-
-            .join-button {
-                min-width: 5em;
-            }
-        }
-
-        .event-service-row-toggle {
-            cursor: pointer;
-        }
-
-        .event-service-toolbar{
-            &.toolbar {
-                min-height: 0;
-            }
-        }
-
-        & > .event-service-info {
-            & > .event-service-title {
-                margin-left: 0.5em;
-                vertical-align: top;
-                line-height: 2;
-                font-size: 1em;
-
-                user-select: none;
-            }
-
-            & > i:before {
-                font-size: 1.2em;
-                color: $black;
-                line-height: calc(2/1.2);
-            }
-
-            & > img {
-                margin-top: 0.3em;
-            }
-        }
+    .event-service-row-toggle {
+      cursor: pointer;
     }
 
-    div.event-service-details {
-        display: none;
-
-        & > dl {
-            clear: left;
-            font-size: 90%;
-            margin: 0.3em 0 0 2.2em;
-            vertical-align: middle;
-
-            & > dt {
-                float: left;
-                color: #777;
-            }
-
-            & > dd {
-                margin-left: 100px;
-                display: block;
-            }
-
-            & > dt.large-row {
-                line-height: 2.3em;
-                vertical-align: middle;
-                margin-bottom: 0;
-            }
-
-            & > dd.large-row {
-                margin-bottom: 0.3em;
-
-                & > .i-has-action {
-                    vertical-align: middle;
-                    line-height: 2em;
-                }
-                & > .i-has-action-message {
-                    height: 2em;
-                    line-height: 2.3em;
-                }
-            }
-        }
+    .event-service-toolbar {
+      &.toolbar {
+        min-height: 0;
+      }
     }
 
-    &:hover {
-        & > .trigger {
-            color: $light-black;
-        }
-    }
+    & > .event-service-info {
+      & > .event-service-title {
+        margin-left: 0.5em;
+        vertical-align: top;
+        line-height: 2;
+        font-size: 1em;
 
-    & > .trigger {
-        position: absolute;
-        cursor: pointer;
-        right: 0.6em;
-        top: 0.8em;
-        color: $dark-gray;
         user-select: none;
+      }
+
+      & > i::before {
+        font-size: 1.2em;
+        color: $black;
+        line-height: calc(2 / 1.2);
+      }
+
+      & > img {
+        margin-top: 0.3em;
+      }
     }
+  }
+
+  div.event-service-details {
+    display: none;
+
+    & > dl {
+      clear: left;
+      font-size: 90%;
+      margin: 0.3em 0 0 2.2em;
+      vertical-align: middle;
+
+      & > dt {
+        float: left;
+        color: #777;
+      }
+
+      & > dd {
+        margin-left: 100px;
+        display: block;
+      }
+
+      & > dt.large-row {
+        line-height: 2.3em;
+        vertical-align: middle;
+        margin-bottom: 0;
+      }
+
+      & > dd.large-row {
+        margin-bottom: 0.3em;
+
+        & > .i-has-action {
+          vertical-align: middle;
+          line-height: 2em;
+        }
+        & > .i-has-action-message {
+          height: 2em;
+          line-height: 2.3em;
+        }
+      }
+    }
+  }
+
+  &:hover {
+    & > .trigger {
+      color: $light-black;
+    }
+  }
+
+  & > .trigger {
+    position: absolute;
+    cursor: pointer;
+    right: 0.6em;
+    top: 0.8em;
+    color: $dark-gray;
+    user-select: none;
+  }
 }
 
 .vc-room-info-qtip {
-    dl {
-        clear: left;
-        font-size: 100%;
+  dl {
+    clear: left;
+    font-size: 100%;
 
-        & > dt {
-            float: left;
-            color: #777;
-        }
-
-        & > dd {
-            margin-left: 100px;
-            display: block;
-        }
-
-        & > dt.large-row {
-            line-height: 2.3em;
-            vertical-align: middle;
-            margin-bottom: -0.6em;
-        }
-
-        & > dd.large-row {
-            margin-bottom: 0.3em;
-            & > .i-has-action {
-                vertical-align: middle;
-                line-height: 1em;
-            }
-        }
+    & > dt {
+      float: left;
+      color: #777;
     }
+
+    & > dd {
+      margin-left: 100px;
+      display: block;
+    }
+
+    & > dt.large-row {
+      line-height: 2.3em;
+      vertical-align: middle;
+      margin-bottom: -0.6em;
+    }
+
+    & > dd.large-row {
+      margin-bottom: 0.3em;
+      & > .i-has-action {
+        vertical-align: middle;
+        line-height: 1em;
+      }
+    }
+  }
 }
 
 .vc-toolbar {
-    margin-right: 1em;
+  margin-right: 1em;
 }

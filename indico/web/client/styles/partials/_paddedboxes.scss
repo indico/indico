@@ -5,40 +5,39 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-
 .padded-box {
-    box-sizing: border-box;
-    @include border-all($color: $pastel-gray, $width: 2px);
-    background: $pastel-gray;
-    display: table;
-    width: 100%;
+  box-sizing: border-box;
+  @include border-all($color: $pastel-gray, $width: 2px);
+  background: $pastel-gray;
+  display: table;
+  width: 100%;
 
-    &:before {
-        display: table-row;
+  &::before {
+    display: table-row;
+  }
+
+  .padded-box-pad {
+    color: $light-black;
+    display: table-cell;
+    font-size: 25px;
+    padding: 10px 0 5px;
+    text-align: center;
+    width: 40px;
+  }
+
+  .padded-box-content {
+    @extend %default-border-radius;
+    color: $black;
+    display: table-cell;
+    padding: 10px;
+    margin-left: 40px;
+    background: white;
+    vertical-align: middle;
+    word-break: break-word;
+
+    hr {
+      @extend %box-hr;
+      @include border-bottom($color: $pastel-gray, $width: 2px);
     }
-
-    .padded-box-pad {
-        color: $light-black;
-        display: table-cell;
-        font-size: 25px;
-        padding: 10px 0 5px;
-        text-align: center;
-        width: 40px;
-    }
-
-    .padded-box-content {
-        @extend %default-border-radius;
-        color: $black;
-        display: table-cell;
-        padding: 10px;
-        margin-left: 40px;
-        background: white;
-        vertical-align: middle;
-        word-break: break-word;
-
-        hr {
-            @extend %box-hr;
-            @include border-bottom($color: $pastel-gray, $width: 2px);
-        }
-    }
+  }
 }

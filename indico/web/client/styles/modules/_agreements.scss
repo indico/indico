@@ -6,217 +6,217 @@
 // LICENSE file for more details.
 
 .agreement-form-sections {
-    @extend .i-box-group;
-    @extend .i-box-group.vert;
-    color: $black;
-    margin-bottom: 1em;
+  @extend .i-box-group;
+  @extend .i-box-group.vert;
+  color: $black;
+  margin-bottom: 1em;
 
-    .i-box.info-body {
-        padding: 20px 10px;
+  .i-box.info-body {
+    padding: 20px 10px;
 
-        .info-section {
-            padding: 0 20px;
-        }
-
-        .info-person {
-            > div {
-                display: inline-block;
-                vertical-align: top;
-            }
-
-            i {
-                color: $gray;
-                font-size: 2rem;
-                line-height: 0;
-                padding-right: 0.25em;
-            }
-
-            .info-person-text {
-                .info-person-name {
-                    font-size: 1.1em;
-                    font-weight: bold;
-                    padding-bottom: 0.05em;
-                }
-
-                .info-person-email {
-                    color: $dark-gray;
-                }
-            }
-        }
-
-        .info-event {
-            .info-event-title {
-                font-size: 1.1em;
-                font-weight: bold;
-                margin-bottom: 1em;
-                text-align: justify;
-            }
-
-            .info-event-details:not(:last-of-type) {
-                margin-bottom: 0.1em;
-            }
-
-            i {
-                padding-right: 0.2em;
-            }
-        }
-
-        .info-tabular {
-            border-spacing: 0;
-            width: 100%;
-
-            td {
-                padding-top: 0.25em;
-                padding-bottom: 0.25em;
-                vertical-align: middle;
-
-                &:first-child {
-                    font-weight: bold;
-                    padding-right: 0.5em;
-                    width: 1%;
-                    white-space: nowrap;
-                }
-            }
-        }
+    .info-section {
+      padding: 0 20px;
     }
 
-    .i-box.no-actions-notice {
-        background: lighten($gray, $color-variation);
-        font-size: 0.9em;
-        font-style: italic;
-        padding-left: 8.8rem;
-        padding-right: 8.8rem;
+    .info-person {
+      > div {
+        display: inline-block;
+        vertical-align: top;
+      }
+
+      i {
+        color: $gray;
+        font-size: 2rem;
+        line-height: 0;
+        padding-right: 0.25em;
+      }
+
+      .info-person-text {
+        .info-person-name {
+          font-size: 1.1em;
+          font-weight: bold;
+          padding-bottom: 0.05em;
+        }
+
+        .info-person-email {
+          color: $dark-gray;
+        }
+      }
+    }
+
+    .info-event {
+      .info-event-title {
+        font-size: 1.1em;
+        font-weight: bold;
+        margin-bottom: 1em;
         text-align: justify;
+      }
+
+      .info-event-details:not(:last-of-type) {
+        margin-bottom: 0.1em;
+      }
+
+      i {
+        padding-right: 0.2em;
+      }
     }
 
-    .legal-body {
-        @extend .text-paper;
-        padding: 10px 10em;
+    .info-tabular {
+      border-spacing: 0;
+      width: 100%;
+
+      td {
+        padding-top: 0.25em;
+        padding-bottom: 0.25em;
+        vertical-align: middle;
+
+        &:first-child {
+          font-weight: bold;
+          padding-right: 0.5em;
+          width: 1%;
+          white-space: nowrap;
+        }
+      }
+    }
+  }
+
+  .i-box.no-actions-notice {
+    background: lighten($gray, $color-variation);
+    font-size: 0.9em;
+    font-style: italic;
+    padding-left: 8.8rem;
+    padding-right: 8.8rem;
+    text-align: justify;
+  }
+
+  .legal-body {
+    @extend .text-paper;
+    padding: 10px 10em;
+  }
+
+  .legal-confirmation {
+    padding: 0 10em;
+
+    textarea {
+      width: 100%;
     }
 
-    .legal-confirmation {
-        padding: 0 10em;
-
-        textarea {
-            width: 100%;
-        }
-
-        .section + .section {
-            margin-top: 1.5em;
-        }
-
-        .question {
-            font-weight: bold;
-            margin-bottom: 1em;
-        }
-
-        .i-radio label {
-            font-weight: normal;
-        }
+    .section + .section {
+      margin-top: 1.5em;
     }
+
+    .question {
+      font-weight: bold;
+      margin-bottom: 1em;
+    }
+
+    .i-radio label {
+      font-weight: normal;
+    }
+  }
 }
 
 .agreement-dashboard {
-    @extend .fixed-width;
+  @extend .fixed-width;
 
-    .agreement-definition {
-        vertical-align: top;
+  .agreement-definition {
+    vertical-align: top;
 
-        .i-badge {
-            margin: 0;
-            padding: 0.3em;
-            font-weight: bold;
-            font-size: 1.2em;
-        }
+    .i-badge {
+      margin: 0;
+      padding: 0.3em;
+      font-weight: bold;
+      font-size: 1.2em;
     }
+  }
 
-    .action-box {
-        .i-button {
-            width: 10em;
-        }
+  .action-box {
+    .i-button {
+      width: 10em;
     }
+  }
 }
 
 .agreement-list {
-    .agreement-table {
-        border-collapse: collapse;
-        border-spacing: 0;
-        width: 100%;
+  .agreement-table {
+    border-collapse: collapse;
+    border-spacing: 0;
+    width: 100%;
 
-        td {
-            padding: 0.35rem 5px 0.35rem 0;
+    td {
+      padding: 0.35rem 5px 0.35rem 0;
 
-            &:first-child {
-                padding-left: 5px;
-            }
+      &:first-child {
+        padding-left: 5px;
+      }
 
-            &.agreement-checkbox,
-            &.agreement-answer {
-                width: 1%;
+      &.agreement-checkbox,
+      &.agreement-answer {
+        width: 1%;
 
-                i {
-                    margin: 4px;
+        i {
+          margin: 4px;
 
-                    &.icon-disable {
-                        color: $red;
-                    }
+          &.icon-disable {
+            color: $red;
+          }
 
-                    &.icon-checkmark {
-                        color: $green;
-                    }
-                }
-            }
+          &.icon-checkmark {
+            color: $green;
+          }
+        }
+      }
 
-            &.person-name {
-                font-weight: bold;
-                width: 25%;
-            }
+      &.person-name {
+        font-weight: bold;
+        width: 25%;
+      }
 
-            &.person-email {
-                width: 32%;
-            }
+      &.person-email {
+        width: 32%;
+      }
 
-            &.agreement-actions {
-                font-size: 1.2em;
-                padding: 0 5px;
-                width: 7%;
-                white-space: nowrap;
+      &.agreement-actions {
+        font-size: 1.2em;
+        padding: 0 5px;
+        width: 7%;
+        white-space: nowrap;
 
-                a {
-                    color: $dark-gray;
-                    vertical-align: sub;
-                    visibility: hidden;
+        a {
+          color: $dark-gray;
+          vertical-align: sub;
+          visibility: hidden;
 
-                    &:hover {
-                        color: $blue;
-                    }
-                }
-
-                .i-button {
-                    padding-top: 0;
-                    padding-bottom: 0;
-                }
-            }
+          &:hover {
+            color: $blue;
+          }
         }
 
-        tr:nth-child(odd) > td {
-            background: $light-gray;
+        .i-button {
+          padding-top: 0;
+          padding-bottom: 0;
         }
-
-        tr:hover > td {
-            background: $light-blue !important;
-
-            &.agreement-actions a {
-                visibility: visible;
-            }
-        }
-
-        &:not(:last-child) {
-            margin-bottom: 2em;
-        }
+      }
     }
 
-    .titled-rule {
-        margin-top: 0;
+    tr:nth-child(odd) > td {
+      background: $light-gray;
     }
+
+    tr:hover > td {
+      background: $light-blue !important;
+
+      &.agreement-actions a {
+        visibility: visible;
+      }
+    }
+
+    &:not(:last-child) {
+      margin-bottom: 2em;
+    }
+  }
+
+  .titled-rule {
+    margin-top: 0;
+  }
 }

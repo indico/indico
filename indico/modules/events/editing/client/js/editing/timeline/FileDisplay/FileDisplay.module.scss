@@ -8,43 +8,43 @@
 @import 'base/palette';
 
 .file-display-wrapper {
-    display: flex;
-    flex-direction: column;
+  display: flex;
+  flex-direction: column;
 }
 
 .file-display {
-    display: flex;
-    flex-wrap: wrap;
+  display: flex;
+  flex-wrap: wrap;
 
-    .file-type-display {
-        overflow: hidden;
-        margin-bottom: 1em;
-        padding: 1em;
-        flex: 0 0 32%;
+  .file-type-display {
+    overflow: hidden;
+    margin-bottom: 1em;
+    padding: 1em;
+    flex: 0 0 32%;
 
-        &:not(:nth-child(3n)) {
-            margin-right: 0.9em;
-        }
+    &:not(:nth-child(3n)) {
+      margin-right: 0.9em;
     }
+  }
 }
 
 .file-list-display {
-    list-style-type: none;
-    padding: 0;
+  list-style-type: none;
+  padding: 0;
 
-    .file-row {
-        display: flex;
+  .file-row {
+    display: flex;
 
-        .file-name {
-            font-weight: bold;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
+    .file-name {
+      font-weight: bold;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
+  }
 }
 
 .no-files {
-    font-style: italic;
-    color: $gray;
+  font-style: italic;
+  color: $gray;
 }

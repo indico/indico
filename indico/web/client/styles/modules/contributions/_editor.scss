@@ -11,181 +11,175 @@
 $editor-preview-bg-color: $light-gray;
 
 .wmd-input {
-    @extend %font-family-monospace;
-    @include transition(height .25s ease-out);
+  @extend %font-family-monospace;
+  @include transition(height 0.25s ease-out);
 
-    &:focus {
-        height: 300px;
-    }
+  &:focus {
+    height: 300px;
+  }
 
-    height: 100px;
+  height: 100px;
 
-    width: 100%;
-    max-width: 800px;
-    padding: 1em;
-    font-size: 0.9em;
+  width: 100%;
+  max-width: 800px;
+  padding: 1em;
+  font-size: 0.9em;
 }
 
 .wmd-panel {
-    max-width: 800px;
+  max-width: 800px;
 }
 
-.wmd-button-row
-{
-    max-width: 800px;
-    position: relative;
-    padding: .5em;
-    height: 2em;
-    margin: 0;
-    background-color: $light-gray;
+.wmd-button-row {
+  max-width: 800px;
+  position: relative;
+  padding: 0.5em;
+  height: 2em;
+  margin: 0;
+  background-color: $light-gray;
 }
 
-.wmd-spacer
-{
-    width: 1px;
-    height: 1em;
-    margin: 0 1em 0 1em;
-    display: inline-block;
-    background-color: $dark-gray;
-    display: inline-block;
-    list-style: none;
+.wmd-spacer {
+  width: 1px;
+  height: 1em;
+  margin: 0 1em 0 1em;
+  display: inline-block;
+  background-color: $dark-gray;
+  display: inline-block;
+  list-style: none;
 }
 
 .wmd-button-bar {
-    position: relative;
+  position: relative;
 
-    .save-button {
-        @include transition(opacity);
-        @include transition(background-color);
-        @include single-box-shadow(0, 0, 1px, 1px, #fff);
-        position: absolute;
-        right: 50px;
-        display: inline-block;
-        color: white;
-        z-index: 1;
-        top: 8px;
-        opacity: 0;
-        visibility: hidden;
+  .save-button {
+    @include transition(opacity);
+    @include transition(background-color);
+    @include single-box-shadow(0, 0, 1px, 1px, #fff);
+    position: absolute;
+    right: 50px;
+    display: inline-block;
+    color: white;
+    z-index: 1;
+    top: 8px;
+    opacity: 0;
+    visibility: hidden;
 
-        &.waiting-save {
-            visibility: visible;
-            opacity: 1.0;
-        }
-
-        &.saving {
-            background-color: #E4E4B0;
-            visibility: visible;
-            opacity: 1.0;
-            color: $dark-gray !important;
-        }
-
-        &.saved {
-            background-color: #E2F0E2;
-            visibility: visible;
-            opacity: 0.8;
-        }
+    &.waiting-save {
+      visibility: visible;
+      opacity: 1;
     }
+
+    &.saving {
+      background-color: #e4e4b0;
+      visibility: visible;
+      opacity: 1;
+      color: $dark-gray !important;
+    }
+
+    &.saved {
+      background-color: #e2f0e2;
+      visibility: visible;
+      opacity: 0.8;
+    }
+  }
 }
 
 .wmd-button {
-    @include transition(color);
-    width: 2em;
-    height: 2em;
-    line-height: 2em;
-    display: inline-block;
-    color: $black;
-    text-align: center;
-    cursor: pointer;
+  @include transition(color);
+  width: 2em;
+  height: 2em;
+  line-height: 2em;
+  display: inline-block;
+  color: $black;
+  text-align: center;
+  cursor: pointer;
 
-    &:hover {
-        color: $gray;
-    }
+  &:hover {
+    color: $gray;
+  }
 }
 
 .wmd-button > span {
-    font-family: 'icomoon-ultimate';
-    vertical-align: middle;
+  font-family: 'icomoon-ultimate';
+  vertical-align: middle;
 }
 
-
-[id ^="wmd-bold-button"] span:before {
-    content: "\e454";
+[id^='wmd-bold-button'] span::before {
+  content: '\e454';
 }
 
-[id ^="wmd-italic-button"] span:before {
-    content: "\e456";
+[id^='wmd-italic-button'] span::before {
+  content: '\e456';
 }
 
-[id ^="wmd-link-button"] span:before {
-    content: "\e2cd";
+[id^='wmd-link-button'] span::before {
+  content: '\e2cd';
 }
 
-[id ^="wmd-quote-button"] span:before {
-    content: "\e16d";
+[id^='wmd-quote-button'] span::before {
+  content: '\e16d';
 }
 
-[id ^="wmd-code-button"] span:before {
-    content: "\e480";
+[id^='wmd-code-button'] span::before {
+  content: '\e480';
 }
 
-[id ^="wmd-image-button"] span:before {
-    content: "\e02b";
+[id^='wmd-image-button'] span::before {
+  content: '\e02b';
 }
 
-[id ^="wmd-olist-button"] span:before {
-    content: "\e29c";
+[id^='wmd-olist-button'] span::before {
+  content: '\e29c';
 }
 
-[id ^="wmd-ulist-button"] span:before {
-    content: "\e299";
+[id^='wmd-ulist-button'] span::before {
+  content: '\e299';
 }
 
-
-[id ^="wmd-heading-button"] span:before {
-    content: "\e449";
+[id^='wmd-heading-button'] span::before {
+  content: '\e449';
 }
 
-[id ^="wmd-hr-button"] span:before {
-    content: "\e463";
+[id^='wmd-hr-button'] span::before {
+  content: '\e463';
 }
 
-[id ^="wmd-undo-button"] span:before {
-    content: "\27";
+[id^='wmd-undo-button'] span::before {
+  content: '\27';
 }
 
-[id ^="wmd-redo-button"] span:before {
-    content: "\e14c";
+[id^='wmd-redo-button'] span::before {
+  content: '\e14c';
 }
 
-.wmd-prompt-background
-{
-    background-color: Black;
+.wmd-prompt-background {
+  background-color: black;
 }
 
-.wmd-prompt-dialog
-{
-    border: 1px solid #999999;
-    background-color: #F5F5F5;
+.wmd-prompt-dialog {
+  border: 1px solid #999;
+  background-color: #f5f5f5;
 }
 
 .wmd-prompt-dialog > div {
-    font-size: 0.8em;
-    font-family: arial, helvetica, sans-serif;
+  font-size: 0.8em;
+  font-family: arial, helvetica, sans-serif;
 }
 
-.wmd-prompt-dialog > form > input[type="text"] {
-    border: 1px solid #999999;
-    color: black;
+.wmd-prompt-dialog > form > input[type='text'] {
+  border: 1px solid #999;
+  color: black;
 }
 
-.wmd-prompt-dialog > form > input[type="button"]{
-    border: 1px solid #888888;
-    font-family: trebuchet MS, helvetica, sans-serif;
-    font-size: 0.8em;
-    font-weight: bold;
+.wmd-prompt-dialog > form > input[type='button'] {
+  border: 1px solid #888;
+  font-family: trebuchet MS, helvetica, sans-serif;
+  font-size: 0.8em;
+  font-weight: bold;
 }
 
 .md-preview-wrapper.edit {
-    max-width: 800px;
-    @include md-preview-wrapper-mixin($editor-preview-bg-color);
+  max-width: 800px;
+  @include md-preview-wrapper-mixin($editor-preview-bg-color);
 }

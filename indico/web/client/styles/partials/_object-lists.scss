@@ -5,239 +5,237 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-
 .list {
-    .i-table {
-        thead {
-            font-weight: bold;
-            border-bottom: 2px solid $pastel-gray;
-            color: $black;
+  .i-table {
+    thead {
+      font-weight: bold;
+      border-bottom: 2px solid $pastel-gray;
+      color: $black;
 
-            tr {
-                border-top: 0;
-            }
+      tr {
+        border-top: 0;
+      }
+    }
+
+    th {
+      &.tablesorter-header:not(.sorter-false) {
+        cursor: pointer;
+
+        &:hover {
+          @include transition(background-color 0.2s);
+          background-color: darken($light-gray, 5%);
         }
+      }
 
-        th {
-            &.tablesorter-header:not(.sorter-false){
-                cursor: pointer;
+      &::before {
+        @include rotate-transform(0.3s);
+        display: inline-block;
+      }
 
-                &:hover {
-                    @include transition(background-color .2s);
-                    background-color: darken($light-gray, 5%);
-                }
-            }
+      &.header-sort-asc {
+        @include icon-before('icon-arrow-down');
 
-            &:before {
-                @include rotate-transform(0.3s);
-                display: inline-block;
-            }
-
-            &.header-sort-asc {
-                @include icon-before('icon-arrow-down');
-
-                &:before {
-                    transform: rotate(-180deg);
-                }
-            }
-
-            &.header-sort-desc {
-                @include icon-before('icon-arrow-down');
-            }
-
-            > div {
-                display: inline-block;
-            }
+        &::before {
+          transform: rotate(-180deg);
         }
+      }
 
-        td {
-            vertical-align: top;
-            padding: 12px 5px;
+      &.header-sort-desc {
+        @include icon-before('icon-arrow-down');
+      }
 
-            .vertical-aligner {
-                display: block;
-                padding-top: 0.27em;  // Ensure that single line text cells are aligned in the middle
-            }
-        }
+      > div {
+        display: inline-block;
+      }
     }
 
-    .entry-action-buttons {
-        > a {
-            font-size: 1.2em;
-            margin-left: 3px;
-        }
-    }
+    td {
+      vertical-align: top;
+      padding: 12px 5px;
 
-    .person-row {
-        @include ellipsis;
-
-        &:before {
-            color: $gray;
-            margin-right: 5px;
-        }
+      .vertical-aligner {
+        display: block;
+        padding-top: 0.27em; // Ensure that single line text cells are aligned in the middle
+      }
     }
+  }
 
-    table.i-table {
-        margin-top: 0;
+  .entry-action-buttons {
+    > a {
+      font-size: 1.2em;
+      margin-left: 3px;
     }
+  }
 
-    .scrollable {
-        overflow-x: auto;
-        width: 100%;
+  .person-row {
+    @include ellipsis;
 
-        table {
-            width: auto;
-            table-layout: auto;
-        }
+    &::before {
+      color: $gray;
+      margin-right: 5px;
     }
+  }
 
-    .change-columns-width:not(.active) {
-        @include icon-before('icon-enlarge');
+  table.i-table {
+    margin-top: 0;
+  }
+
+  .scrollable {
+    overflow-x: auto;
+    width: 100%;
+
+    table {
+      width: auto;
+      table-layout: auto;
     }
-    .change-columns-width.active {
-        @include icon-before('icon-shrink');
-    }
+  }
+
+  .change-columns-width:not(.active) {
+    @include icon-before('icon-enlarge');
+  }
+  .change-columns-width.active {
+    @include icon-before('icon-shrink');
+  }
 }
 
 .list-filter-dialog {
-    max-width: 1200px;
+  max-width: 1200px;
 }
 
 %enabled-action {
-    @include icon-before('icon-eye');
+  @include icon-before('icon-eye');
 }
 
 %not-enabled-action {
-    @include icon-before('icon-eye-blocked');
-    color: $red !important;
+  @include icon-before('icon-eye-blocked');
+  color: $red !important;
 }
 
 .list-filter {
-    padding-bottom: 14em;
-    position: relative;
+  padding-bottom: 14em;
+  position: relative;
 
-    .list-column {
-        @extend .flexrow;
-        margin: 5px;
-        width: 14.2em;
+  .list-column {
+    @extend .flexrow;
+    margin: 5px;
+    width: 14.2em;
 
-        > .filter {
-            @extend .flexrow;
-            align-items: center;
-            cursor: pointer;
-            padding: 0;
+    > .filter {
+      @extend .flexrow;
+      align-items: center;
+      cursor: pointer;
+      padding: 0;
 
-            > a {
-                color: $light-black;
-                padding: $i-label-vertical-padding $i-label-horizontal-padding;
-            }
+      > a {
+        color: $light-black;
+        padding: $i-label-vertical-padding $i-label-horizontal-padding;
+      }
 
-            .i-dropdown {
-                z-index: 100;
-            }
+      .i-dropdown {
+        z-index: 100;
+      }
 
-            &:hover {
-                > a:before {
-                    color: $yellow !important;
-                }
-            }
+      &:hover {
+        > a::before {
+          color: $yellow !important;
         }
+      }
     }
+  }
 
-    .i-label {
-        text-align: left;
-        font-weight: bold;
-        min-height: 2em;
+  .i-label {
+    text-align: left;
+    font-weight: bold;
+    min-height: 2em;
 
-        &.title-wrapper {
-            @include ellipsis;
+    &.title-wrapper {
+      @include ellipsis;
 
-            display: inline-flex;
-            align-items: center;
-            cursor: pointer;
-            flex-grow: 1;
+      display: inline-flex;
+      align-items: center;
+      cursor: pointer;
+      flex-grow: 1;
 
-            &:not(.striped) {
-                border-color: $dark-blue;
-                color: $dark-blue !important;
+      &:not(.striped) {
+        border-color: $dark-blue;
+        color: $dark-blue !important;
 
-                + .filter {
-                    border-color: $dark-blue;
-                }
-
-                > .title {
-                    color: $dark-blue;
-                }
-            }
-
-            > .title {
-                @include ellipsis;
-
-                flex-grow: 1;
-                color: $dark-gray;
-                margin-left: 4px;
-
-                &:before {
-                    margin-right: 0.5em;
-                }
-            }
-
-            > .actions {
-                flex-shrink: 0;
-
-                > .visibility {
-                    &.enabled {
-                        @extend %enabled-action;
-                        display: none;
-                    }
-                    &:not(.enabled) {
-                        @extend %not-enabled-action;
-                    }
-
-                }
-            }
-
-            &:hover > .actions > .visibility {
-                display: inline;
-            }
+        + .filter {
+          border-color: $dark-blue;
         }
-    }
 
-    ul.i-dropdown {
-        line-height: auto;
-        height: auto;
-        z-index: 1;
-        max-height: 12em;
-        overflow: auto;
-        min-width: 12em;
-        box-sizing: border-box;
-
-        > li {
-            @extend .flexrow;
-            align-items: center;
-
-            > label {
-                color: $black;
-                margin-left: 0.5em;
-                vertical-align: middle;
-                cursor: pointer;
-            }
+        > .title {
+          color: $dark-blue;
         }
-    }
+      }
 
-    > .bottom-buttons {
-        position: absolute;
-        bottom: 0;
-        right: 0;
+      > .title {
+        @include ellipsis;
+
+        flex-grow: 1;
+        color: $dark-gray;
+        margin-left: 4px;
+
+        &::before {
+          margin-right: 0.5em;
+        }
+      }
+
+      > .actions {
+        flex-shrink: 0;
+
+        > .visibility {
+          &.enabled {
+            @extend %enabled-action;
+            display: none;
+          }
+          &:not(.enabled) {
+            @extend %not-enabled-action;
+          }
+        }
+      }
+
+      &:hover > .actions > .visibility {
+        display: inline;
+      }
     }
+  }
+
+  ul.i-dropdown {
+    line-height: auto;
+    height: auto;
+    z-index: 1;
+    max-height: 12em;
+    overflow: auto;
+    min-width: 12em;
+    box-sizing: border-box;
+
+    > li {
+      @extend .flexrow;
+      align-items: center;
+
+      > label {
+        color: $black;
+        margin-left: 0.5em;
+        vertical-align: middle;
+        cursor: pointer;
+      }
+    }
+  }
+
+  > .bottom-buttons {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+  }
 }
 
 #filter-placeholder {
-    @extend %font-family-title;
+  @extend %font-family-title;
 
-    display: none;
-    font-size: 1.2em;
-    color: $dark-gray;
-    text-align: center;
-    margin-top: 1em;
+  display: none;
+  font-size: 1.2em;
+  color: $dark-gray;
+  text-align: center;
+  margin-top: 1em;
 }

@@ -8,35 +8,35 @@
 @import 'base/palette';
 
 .editing-footer {
-    margin-top: auto;
+  margin-top: auto;
+  display: flex;
+  align-items: center;
+  padding: 60px 0 20px;
+
+  .logo {
     display: flex;
     align-items: center;
-    padding: 60px 0 20px;
+    flex-grow: 1;
 
-    .logo {
-        display: flex;
-        align-items: center;
-        flex-grow: 1;
-
-        .image {
-            height: 40px;
-        }
-
-        .text {
-            flex-grow: 1;
-            color: $light-black;
-        }
+    .image {
+      height: 40px;
     }
 
-    .information {
-        flex-grow: 2;
-
-        span {
-            color: $gray;
-        }
-
-        span:not(:last-child)::after {
-            content: ' | ';
-        }
+    .text {
+      flex-grow: 1;
+      color: $light-black;
     }
+  }
+
+  .information {
+    flex-grow: 2;
+
+    span {
+      color: $gray;
+    }
+
+    span:not(:last-child)::after {
+      content: ' | ';
+    }
+  }
 }

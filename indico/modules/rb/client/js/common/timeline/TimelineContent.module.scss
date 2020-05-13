@@ -12,170 +12,169 @@ $row-height: 40px;
 $split-row-height: $row-height/2;
 
 @keyframes rotate90 {
-    0% {
-        transform: rotate(0deg);
-    }
+  0% {
+    transform: rotate(0deg);
+  }
 
-    100% {
-        transform: rotate(-90deg);
-    }
+  100% {
+    transform: rotate(-90deg);
+  }
 }
 
 .timeline-header {
-    display: flex;
-    min-height: $row-height;
+  display: flex;
+  min-height: $row-height;
 
-    .timeline-header-labels {
-        flex: 1;
-        position: relative;
+  .timeline-header-labels {
+    flex: 1;
+    position: relative;
+  }
+
+  .timeline-header-label {
+    height: 100%;
+    line-height: $row-height;
+    text-align: left;
+
+    .timeline-label-text {
+      width: 5em;
+      margin-left: -2.5em;
+      display: inline-block;
+      text-align: center;
+      color: $gray;
     }
+  }
 
-    .timeline-header-label {
-        height: 100%;
-        line-height: $row-height;
-        text-align: left;
+  &:global(.timeline-non-selectable) {
+    user-select: none;
+  }
 
-        .timeline-label-text {
-            width: 5em;
-            margin-left: -2.5em;
-            display: inline-block;
-            text-align: center;
-            color: $gray;
-        }
-    }
-
-    &:global(.timeline-non-selectable) {
-        user-select: none;
-    }
-
-    .timeline-header-actions {
-        width: 70px;
-    }
+  .timeline-header-actions {
+    width: 70px;
+  }
 }
 
 .timeline-lines {
-    position: absolute;
-    height: 100%;
-    top: 0;
+  position: absolute;
+  height: 100%;
+  top: 0;
 
-    .timeline-divider {
-        position: absolute;
-        top: 0;
-        height: 100%;
-        border-left: 1px solid $light-gray;
-    }
+  .timeline-divider {
+    position: absolute;
+    top: 0;
+    height: 100%;
+    border-left: 1px solid $light-gray;
+  }
 }
 
 .timeline-content {
-    position: relative;
+  position: relative;
 
-    .timeline-row {
-        height: $row-height;
-        width: 100%;
-        display: flex;
+  .timeline-row {
+    height: $row-height;
+    width: 100%;
+    display: flex;
 
-        .timeline-row-label {
-            height: 100%;
-            line-height: $row-height;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
+    .timeline-row-label {
+      height: 100%;
+      line-height: $row-height;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
 
-            .label {
-                overflow: hidden;
-                text-overflow: ellipsis;
-                white-space: nowrap;
-                margin-right: 1.5em;
-                padding-right: 0.5em;
-                text-align: right;
+      .label {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        margin-right: 1.5em;
+        padding-right: 0.5em;
+        text-align: right;
 
-                &.gutter {
-                    border-left: 5px solid lighten($highlight-color, 25%);
-                    background-color: lighten($highlight-color, 35%);
-                }
-
-                .split-label {
-                    line-height: $split-row-height;
-                }
-
-                .sub-label {
-                    overflow: hidden;
-                    text-overflow: ellipsis;
-                    white-space: nowrap;
-                }
-            }
+        &.gutter {
+          border-left: 5px solid lighten($highlight-color, 25%);
+          background-color: lighten($highlight-color, 35%);
         }
 
-        .timeline-row-content {
-            flex: 1;
-            position: relative;
-            height: $row-height;
+        .split-label {
+          line-height: $split-row-height;
         }
 
-        .timeline-row-actions {
-            color: $gray;
-            font-size: 1.8em;
-            z-index: 4;
-            text-align: right;
-            width: 70px;
+        .sub-label {
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap;
         }
-
-        &:hover .timeline-row-actions :global(.icon) {
-            color: $booking-color;
-        }
+      }
     }
 
-    &:global(.timeline-non-selectable) {
-        user-select: none;
+    .timeline-row-content {
+      flex: 1;
+      position: relative;
+      height: $row-height;
     }
+
+    .timeline-row-actions {
+      color: $gray;
+      font-size: 1.8em;
+      z-index: 4;
+      text-align: right;
+      width: 70px;
+    }
+
+    &:hover .timeline-row-actions :global(.icon) {
+      color: $booking-color;
+    }
+  }
+
+  &:global(.timeline-non-selectable) {
+    user-select: none;
+  }
 }
 
 .timeline-item-placeholder {
-    position: relative;
-    z-index: 1000;
+  position: relative;
+  z-index: 1000;
 
-    :global(.line) {
-        height: 1em !important;
-        background-color: unset !important;
-    }
+  :global(.line) {
+    height: 1em !important;
+    background-color: unset !important;
+  }
 }
 
 .timeline-loader:global(.ui.loader) {
-    margin-top: 2em !important;
-    color: rgba(0, 0, 0, 0.87) !important;
-    position: fixed;
-    bottom: 10px;
-    top: auto;
+  margin-top: 2em !important;
+  color: rgba(0, 0, 0, 0.87) !important;
+  position: fixed;
+  bottom: 10px;
+  top: auto;
 
-    &::before {
-        border-color: rgba(0, 0, 0, 0.1) !important;
-    }
+  &::before {
+    border-color: rgba(0, 0, 0, 0.1) !important;
+  }
 
-    &::after {
-        border-color: $gray transparent transparent !important;
-    }
+  &::after {
+    border-color: $gray transparent transparent !important;
+  }
 }
 
 .auto-sizer-wrapper {
-    overflow-x: hidden;
-    overflow-y: auto;
+  overflow-x: hidden;
+  overflow-y: auto;
 }
 
 .daily-timeline {
-    display: flex;
-    flex-direction: column;
-    flex: 1;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
 
-    :global(.ReactVirtualized__Grid__innerScrollContainer) {
-        margin-right: 2em;
-    }
+  :global(.ReactVirtualized__Grid__innerScrollContainer) {
+    margin-right: 2em;
+  }
 
-    .timeline-header {
-        margin-right: 2em;
-    }
+  .timeline-header {
+    margin-right: 2em;
+  }
 }
 
-
 .rotate-icon {
-    animation: rotate90 1s ease-out 1s forwards;
+  animation: rotate90 1s ease-out 1s forwards;
 }

@@ -6,20 +6,21 @@
 // LICENSE file for more details.
 
 .manage-types {
-    max-width: 600px;
+  max-width: 600px;
 
-    table.i-table {
-        table-layout: auto;
-        min-width: 360px;
-        margin-bottom: 1.5em;
+  table.i-table {
+    table-layout: auto;
+    min-width: 360px;
+    margin-bottom: 1.5em;
 
-        th, td {
-            white-space: normal;
-        }
-
-        .action-column {
-            white-space: nowrap;
-            width: 1px;
-        }
+    th,
+    td {
+      white-space: normal;
     }
+
+    .action-column {
+      white-space: nowrap;
+      width: 1px;
+    }
+  }
 }

@@ -6,164 +6,165 @@
 // LICENSE file for more details.
 
 .ui-datepicker {
-    @include border-all();
-    @include single-box-shadow();
+  @include border-all();
+  @include single-box-shadow();
+  background: white;
+  z-index: 2;
+
+  .ui-datepicker-header {
+    @include border-bottom();
+    border-radius: 0;
+    background-color: $light-gray !important;
+    color: $dark-blue !important;
+    margin: -0.2em -0.2em 0;
+
+    .ui-datepicker-month,
+    .ui-datepicker-year {
+      width: 48%;
+      margin: 0 1px;
+    }
+
+    .ui-datepicker-prev,
+    .ui-datepicker-next {
+      transition: background;
+      transition: color;
+      border: none !important;
+      color: $gray;
+      margin-top: 0.1em;
+      text-align: center;
+      top: 1px !important;
+
+      &::before {
+        vertical-align: -30%;
+      }
+    }
+
+    &.ui-state-disabled {
+      .ui-datepicker-prev,
+      .ui-datepicker-next {
+        background: none !important;
+        cursor: default;
+      }
+    }
+
+    &:not(.ui-state-disabled) {
+      .ui-datepicker-prev:hover,
+      .ui-datepicker-next:hover {
+        color: white;
+        background: $blue;
+      }
+    }
+
+    .ui-datepicker-prev {
+      @include icon-before('icon-prev');
+      left: 3px !important;
+    }
+
+    .ui-datepicker-next {
+      @include icon-before('icon-next');
+      right: 3px !important;
+    }
+
+    .ui-icon {
+      display: none;
+    }
+  }
+
+  .ui-datepicker-calendar {
     background: white;
-    z-index: 2;
+    padding: 0 0.2em;
+    table-layout: fixed;
 
-    .ui-datepicker-header {
-        @include border-bottom();
-        border-radius: 0;
-        background-color: $light-gray !important;
-        color: $dark-blue !important;
-        margin: -0.2em -0.2em 0;
-
-        .ui-datepicker-month,
-        .ui-datepicker-year {
-            width: 48%;
-            margin: 0 1px;
-        }
-
-        .ui-datepicker-prev,
-        .ui-datepicker-next {
-            transition: background;
-            transition: color;
-            border: none !important;
-            color: $gray;
-            margin-top: .1em;
-            text-align: center;
-            top: 1px !important;
-
-            &:before {
-                vertical-align: -30%;
-            }
-        }
-
-        &.ui-state-disabled {
-            .ui-datepicker-prev,
-            .ui-datepicker-next {
-                background: none !important;
-                cursor: default;
-            }
-        }
-
-        &:not(.ui-state-disabled) {
-            .ui-datepicker-prev:hover,
-            .ui-datepicker-next:hover {
-                color: white;
-                background: $blue;
-            }
-        }
-
-        .ui-datepicker-prev {
-            @include icon-before('icon-prev');
-            left: 3px !important;
-        }
-
-        .ui-datepicker-next {
-            @include icon-before('icon-next');
-            right: 3px !important;
-        }
-
-        .ui-icon {
-            display: none;
-        }
+    th {
+      cursor: default;
     }
 
-    .ui-datepicker-calendar {
-        background: white;
-        padding: 0 .2em;
-        table-layout: fixed;
+    td {
+      padding: 0;
 
-        th {
-            cursor: default;
-        }
-
-        td {
-            padding: 0;
-
-            a, span {
-                @include transition(background);
-                border: 1px solid white;
-                text-align: center;
-            }
-        }
-
-        &.ui-state-disabled .ui-datepicker-current-day a {
-            cursor: default;
-        }
-
-        .ui-state-default {
-            background: $light-blue;
-        }
-
-        .ui-state-active {
-            background: $blue;
-            color: white !important;
-            font-weight: bold;
-        }
-
-        .ui-state-hover {
-            background: $blue;
-            color: white !important;
-        }
+      a,
+      span {
+        @include transition(background);
+        border: 1px solid white;
+        text-align: center;
+      }
     }
 
-    .ui-datepicker-buttonpane {
-        margin: 0;
-        padding: 0;
-
-        button.ui-datepicker-current {
-            @include transition;
-            @include transition(background, color);
-            background: $light-blue;
-            border: none !important;
-            float: right;
-            margin-bottom: .2em;
-            margin-right: 1px;
-            margin-top: .2em;
-            opacity: 1;
-            outline: none;
-        }
-
-        &:not(.ui-state-disabled) button.ui-datepicker-current:hover {
-            background: $blue;
-            color: white;
-        }
-
-        &.ui-state-disabled button.ui-datepicker-current {
-            cursor: default;
-        }
+    &.ui-state-disabled .ui-datepicker-current-day a {
+      cursor: default;
     }
+
+    .ui-state-default {
+      background: $light-blue;
+    }
+
+    .ui-state-active {
+      background: $blue;
+      color: white !important;
+      font-weight: bold;
+    }
+
+    .ui-state-hover {
+      background: $blue;
+      color: white !important;
+    }
+  }
+
+  .ui-datepicker-buttonpane {
+    margin: 0;
+    padding: 0;
+
+    button.ui-datepicker-current {
+      @include transition;
+      @include transition(background, color);
+      background: $light-blue;
+      border: none !important;
+      float: right;
+      margin-bottom: 0.2em;
+      margin-right: 1px;
+      margin-top: 0.2em;
+      opacity: 1;
+      outline: none;
+    }
+
+    &:not(.ui-state-disabled) button.ui-datepicker-current:hover {
+      background: $blue;
+      color: white;
+    }
+
+    &.ui-state-disabled button.ui-datepicker-current {
+      cursor: default;
+    }
+  }
 }
 
 .ui-datepicker-trigger {
-    @include icon-before('icon-calendar');
-    background: transparent;
-    border: none;
-    color: $light-black;
-    cursor: pointer;
-    outline: none;
-    padding: 0;
-    position: relative;
-    right: 20px;
-    top: 2px;
+  @include icon-before('icon-calendar');
+  background: transparent;
+  border: none;
+  color: $light-black;
+  cursor: pointer;
+  outline: none;
+  padding: 0;
+  position: relative;
+  right: 20px;
+  top: 2px;
 
-    &:hover:before {
-        color: $blue;
-    }
+  &:hover::before {
+    color: $blue;
+  }
 
-    &:active:before {
-        color: $dark-blue;
-    }
+  &:active::before {
+    color: $dark-blue;
+  }
 }
 
 input.hasDatepicker {
-    @include icon-before('icon-calendar');
-    margin: 0 2px;
-    padding-right: 22px !important;
+  @include icon-before('icon-calendar');
+  margin: 0 2px;
+  padding-right: 22px !important;
 
-    &:disabled + button {
-        pointer-events: none;
-    }
+  &:disabled + button {
+    pointer-events: none;
+  }
 }

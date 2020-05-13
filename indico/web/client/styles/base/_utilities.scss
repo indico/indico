@@ -5,62 +5,62 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-@import "partials/icons";
+@import 'partials/icons';
 
 %adjacent-icon {
-    font-family: 'icomoon-ultimate';
-    speak: none;
-    font-style: normal;
-    font-weight: normal;
-    font-variant: normal;
-    text-transform: none;
-    -webkit-font-smoothing: antialiased;
+  font-family: 'icomoon-ultimate';
+  speak: none;
+  font-style: normal;
+  font-weight: normal;
+  font-variant: normal;
+  text-transform: none;
+  -webkit-font-smoothing: antialiased;
 }
 
 @mixin icon-after($icon-class) {
-    @extend .#{$icon-class}-after;
-    &:after {
-        @extend %adjacent-icon;
-        margin-left: 0.2em;
-    }
+  @extend .#{$icon-class}-after;
+  &::after {
+    @extend %adjacent-icon;
+    margin-left: 0.2em;
+  }
 }
 
 @mixin icon-before($icon-class) {
-    @extend .#{$icon-class};
-    &:before {
-        @extend %adjacent-icon;
-    }
+  @extend .#{$icon-class};
+  &::before {
+    @extend %adjacent-icon;
+  }
 }
 
 @mixin apply-to-inputs($class) {
-    input[type=date],
-    input[type=datetime],
-    input[type=datetime-local],
-    input[type=email],
-    input[type=month],
-    input[type=number],
-    input[type=password],
-    input[type=search],
-    input[type=tel],
-    input[type=text],
-    input[type=time],
-    input[type=url],
-    input[type=week] {
-        @extend #{$class};
-    }
+  input[type='date'],
+  input[type='datetime'],
+  input[type='datetime-local'],
+  input[type='email'],
+  input[type='month'],
+  input[type='number'],
+  input[type='password'],
+  input[type='search'],
+  input[type='tel'],
+  input[type='text'],
+  input[type='time'],
+  input[type='url'],
+  input[type='week'] {
+    @extend #{$class};
+  }
 }
 
 @mixin apply-to-text-inputs($class) {
-    input[type=datetime],
-    input[type=datetime-local],
-    input[type=email],
-    input[type=month],
-    input[type=password],
-    input[type=search],
-    input[type=tel],
-    input[type=text],
-    input[type=url],
-    input[type=week] {
-        @extend #{$class};
-    }
+  input[type='datetime'],
+  input[type='datetime-local'],
+  input[type='email'],
+  input[type='month'],
+  input[type='password'],
+  input[type='search'],
+  input[type='tel'],
+  input[type='text'],
+  input[type='url'],
+  input[type='week'] {
+    @extend #{$class};
+  }
 }

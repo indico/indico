@@ -7,66 +7,66 @@
 
 .flexrow,
 .flexcol {
-    display: flex;
+  display: flex;
 }
 
 .flexrow {
-    flex-flow: row nowrap;
+  flex-flow: row nowrap;
 }
 
 .flexcol {
-    flex-flow: column nowrap;
+  flex-flow: column nowrap;
 }
 
 .f-j-start {
-    justify-content: flex-start;
+  justify-content: flex-start;
 }
 
 .f-j-end {
-    justify-content: flex-end;
+  justify-content: flex-end;
 }
 
 .f-j-center {
-    justify-content: center;
+  justify-content: center;
 }
 
 .f-j-space-between {
-    justify-content: space-between;
+  justify-content: space-between;
 }
 
 .f-j-space-around {
-    justify-content: space-around;
+  justify-content: space-around;
 }
 
 .f-a-start {
-    align-items: flex-start;
+  align-items: flex-start;
 }
 
 .f-a-end {
-    align-items: flex-end;
+  align-items: flex-end;
 }
 
 .f-a-center {
-    align-items: center;
+  align-items: center;
 }
 
 .f-a-stretch {
-    align-items: stretch;
+  align-items: stretch;
 }
 
 .f-a-baseline {
-    align-items: baseline;
+  align-items: baseline;
 }
 
 .f-wrap {
-    flex-wrap: wrap;
+  flex-wrap: wrap;
 }
 
 .f-self-stretch {
-    flex-grow: 1;
-    flex-basis: 0%;
+  flex-grow: 1;
+  flex-basis: 0%;
 }
 
 .f-self-no-shrink {
-    flex-shrink: 0;
+  flex-shrink: 0;
 }

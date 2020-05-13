@@ -6,96 +6,96 @@
 // LICENSE file for more details.
 
 .multi-text-fields {
-    $height: 1.6em;
-    $width: 200px;
-    $input-width: 160px;
+  $height: 1.6em;
+  $width: 200px;
+  $input-width: 160px;
 
-    max-height: 150px;
-    overflow-y: auto;
-    overflow-x: hidden;
+  max-height: 150px;
+  overflow-y: auto;
+  overflow-x: hidden;
 
+  .handle {
+    @include icon-before('icon-handle');
+    @include border-left();
+    @include border-vert();
+    @include transition(background);
+    @include transition(color);
+    box-sizing: border-box;
+    border-top-left-radius: $default-border-radius;
+    border-bottom-left-radius: $default-border-radius;
+    user-select: none;
+    background: $light-gray;
+    color: $gray;
+    cursor: move;
+    display: inline-block;
+    height: $height;
+    line-height: $height;
+    text-align: center;
+    width: 1.1em;
+  }
+
+  .ui-sortable-placeholder {
+    height: $height;
+  }
+
+  .ui-sortable-helper {
+    input,
     .handle {
-        @include icon-before('icon-handle');
-        @include border-left();
-        @include border-vert();
-        @include transition(background);
-        @include transition(color);
-        box-sizing: border-box;
-        border-top-left-radius: $default-border-radius;
-        border-bottom-left-radius: $default-border-radius;
-        user-select: none;
-        background: $light-gray;
-        color: $gray;
-        cursor: move;
-        display: inline-block;
-        height: $height;
-        line-height: $height;
-        text-align: center;
-        width: 1.1em;
+      box-shadow: 2px 2px 3px $gray;
+    }
+  }
+
+  input {
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+    display: inline-block;
+    margin: 0;
+    vertical-align: top;
+    max-width: $input-width;
+
+    &.width-scrolling {
+      width: ($input-width - 10);
+    }
+  }
+
+  a.i-button-remove {
+    @include i-button-custom($height);
+    display: inline-block;
+    vertical-align: middle;
+    visibility: hidden;
+  }
+
+  ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  li {
+    margin-bottom: 3px;
+    overflow: initial;
+    width: $width;
+
+    &:hover a.i-button-remove {
+      visibility: visible;
     }
 
-    .ui-sortable-placeholder {
-        height: $height;
-    }
+    &:last-of-type {
+      margin-bottom: 1px;
 
-    .ui-sortable-helper {
-        input,
-        .handle {
-            box-shadow: 2px 2px 3px $gray;
-        }
-    }
+      .handle {
+        cursor: default;
+        background: white;
+        color: white;
+      }
 
-    input {
-        border-top-left-radius: 0;
-        border-bottom-left-radius: 0;
-        display: inline-block;
-        margin: 0;
-        vertical-align: top;
-        max-width: $input-width;
-
-        &.width-scrolling {
-            width: ($input-width - 10);
-        }
-    }
-
-    a.i-button-remove {
-        @include i-button-custom($height);
-        display: inline-block;
-        vertical-align: middle;
+      a.i-button-remove {
         visibility: hidden;
+      }
     }
 
-    ul {
-        list-style: none;
-        margin: 0;
-        padding: 0;
+    &.ui-sortable-helper a.i-button-remove {
+      visibility: hidden;
     }
-
-    li {
-        margin-bottom: 3px;
-        overflow: initial;
-        width: $width;
-
-        &:hover a.i-button-remove {
-            visibility: visible;
-        }
-
-        &:last-of-type {
-            margin-bottom: 1px;
-
-            .handle {
-                cursor: default;
-                background: white;
-                color: white;
-            }
-
-            a.i-button-remove {
-                visibility: hidden;
-            }
-        }
-
-        &.ui-sortable-helper a.i-button-remove {
-            visibility: hidden;
-        }
-    }
+  }
 }

@@ -9,31 +9,30 @@
 @import 'partials/boxes';
 
 .abstract-contribution-type {
-    @include border-bottom($style: dashed);
+  @include border-bottom($style: dashed);
 }
 
 .abstract-content {
-    @extend .text-paper;
-    padding: 10px 10em;
+  @extend .text-paper;
+  padding: 10px 10em;
 
-    .abstract-authorship-block {
-        margin-top: 0.5em;
+  .abstract-authorship-block {
+    margin-top: 0.5em;
 
-        &:first-child {
-            margin-top: 1em;
-        }
-
-        .abstract-authorship-label {
-            font-weight: bold;
-            text-align: right;
-            white-space: nowrap;
-
-        }
-
-        .abstract-authorship-list {
-            font-style: italic;
-            margin-left: 0.5em;
-            text-indent: 0;
-        }
+    &:first-child {
+      margin-top: 1em;
     }
+
+    .abstract-authorship-label {
+      font-weight: bold;
+      text-align: right;
+      white-space: nowrap;
+    }
+
+    .abstract-authorship-list {
+      font-style: italic;
+      margin-left: 0.5em;
+      text-indent: 0;
+    }
+  }
 }

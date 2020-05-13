@@ -8,37 +8,37 @@
 @import 'rb:styles/palette';
 
 :global(.ui.list) > .upcoming-bookings-item:global(.item) {
-    cursor: pointer;
+  cursor: pointer;
 
-    :global(.description) {
-        margin: 0.5em 0;
-    }
+  :global(.description) {
+    margin: 0.5em 0;
+  }
 
-    .booking-reason {
-        font-style: italic;
-        color: $dark-gray;
-    }
+  .booking-reason {
+    font-style: italic;
+    color: $dark-gray;
+  }
 }
 
 .upcoming-bookings-list {
-    overflow: hidden;
-    max-height: 150px;
+  overflow: hidden;
+  max-height: 150px;
 }
 
 .upcoming-item-img-container {
-    position: relative;
-    width: 80%;
-    margin: auto;
+  position: relative;
+  width: 80%;
+  margin: auto;
 
-    .upcoming-item-room-notch {
-        position: absolute;
-        bottom: 0;
-        width: 100%;
+  .upcoming-item-room-notch {
+    position: absolute;
+    bottom: 0;
+    width: 100%;
 
-        .upcoming-item-room-name {
-            background: $white;
-            padding: 0.2em 0.5em;
-            border-radius: 2px 0 0 2px;
-        }
+    .upcoming-item-room-name {
+      background: $white;
+      padding: 0.2em 0.5em;
+      border-radius: 2px 0 0 2px;
     }
+  }
 }

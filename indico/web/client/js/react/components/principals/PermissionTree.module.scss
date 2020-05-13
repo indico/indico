@@ -8,15 +8,15 @@
 @import 'base/palette';
 
 .permission-tree {
-    padding: 0 1em 0.5em 1em;
+  padding: 0 1em 0.5em 1em;
 
-    > .permission-tree {
-        border-left: 3px solid $pastel-gray;
-        padding: 0 0 0 0.3em;
-        margin: 0 0 0.3em 0.3em;
-    }
+  > .permission-tree {
+    border-left: 3px solid $pastel-gray;
+    padding: 0 0 0 0.3em;
+    margin: 0 0 0.3em 0.3em;
+  }
 
-    .permission-option {
-        padding: 0.1em 0;
-    }
+  .permission-option {
+    padding: 0.1em 0;
+  }
 }

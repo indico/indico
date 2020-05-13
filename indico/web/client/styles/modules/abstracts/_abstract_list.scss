@@ -6,32 +6,33 @@
 // LICENSE file for more details.
 
 .submitter-column {
-    text-align: center;
+  text-align: center;
 }
 
 .accepted-on-other-track {
-    td, a {
-        color: #777;
-    }
+  td,
+  a {
+    color: #777;
+  }
 }
 
 .state-badge {
-    display: inline-block;
+  display: inline-block;
 }
 
 .num-reviews-tooltip {
-    padding: 0.1em 0.25em;
+  padding: 0.1em 0.25em;
 
-    .title {
-        padding-bottom: 0.3em;
-    }
+  .title {
+    padding-bottom: 0.3em;
+  }
 
-    .semantic-text {
-        padding: 0.15em 0;
-    }
+  .semantic-text {
+    padding: 0.15em 0;
+  }
 
-    .contrib-types {
-        font-size: 0.9em;
-        color: $dark-gray;
-    }
+  .contrib-types {
+    font-size: 0.9em;
+    color: $dark-gray;
+  }
 }

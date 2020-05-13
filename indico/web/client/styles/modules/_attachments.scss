@@ -6,485 +6,491 @@
 // LICENSE file for more details.
 
 %attachment-line {
-    line-height: 1rem;
+  line-height: 1rem;
 
-    vertical-align: middle;
+  vertical-align: middle;
 }
 
 %attachment-icon {
-    @extend %attachment-line;
+  @extend %attachment-line;
 
-    font-size: 0.8rem;
+  font-size: 0.8rem;
 
-    width: 1px;
+  width: 1px;
 
-    white-space: nowrap;
+  white-space: nowrap;
 }
 
 @mixin colored-icon($color) {
-    &:before {
-        color: $color;
-    }
-    &:hover:not(.disabled):not(disabled):before {
-        color: lighten($color, $light-color-variation) !important;
-    }
+  &::before {
+    color: $color;
+  }
+  &:hover:not(.disabled):not(disabled)::before {
+    color: lighten($color, $light-color-variation) !important;
+  }
 }
 
 .attachment-editor {
-    width: 800px;
+  width: 800px;
 }
 
 .dialog-window .attachments-container {
-    max-height: 50vh;
-    overflow-y: auto;
+  max-height: 50vh;
+  overflow-y: auto;
 }
 
 .tree {
-    width: 100%;
+  width: 100%;
 
-    border-collapse: collapse;
-    tr {
-        > td {
-            font-size: 0.9rem;
+  border-collapse: collapse;
+  tr {
+    > td {
+      font-size: 0.9rem;
 
-            padding: 0.2rem 0.3rem;
-            &:first-child {
-                @include ellipsis;
+      padding: 0.2rem 0.3rem;
+      &:first-child {
+        @include ellipsis;
 
-                max-width: 1px;
+        max-width: 1px;
 
-                &:before {
-                    display: inline-block;
-                }
-
-                > .custom-protection:before {
-                    @extend %attachment-icon;
-
-                    color: $pastel-red;
-                }
-
-                > a.icon-file-pdf {
-                    @include colored-icon($red);
-                }
-
-                > a.icon-file-excel {
-                    @include colored-icon($green);
-                }
-
-                > a.icon-file-word {
-                    @include colored-icon($dark-blue);
-                }
-
-                > a.icon-file-image {
-                    @include colored-icon($blue);
-                }
-
-                > a.icon-calendar {
-                    @include colored-icon($dark-yellow);
-                }
-
-                > a.icon-file-presentation {
-                    @include colored-icon($yellow);
-                }
-            }
-            > * {
-                @extend %attachment-line;
-            }
-
-            i {
-                float: none;
-                display: inline-block;
-            }
+        &::before {
+          display: inline-block;
         }
-        &:not(.sub-tree) {
-            > td {
-                &:first-child:before, > a, > span {
-                    color: $light-black;
-                }
-                > a {
-                    &:hover {
-                        color: $black;
-                    }
 
-                    &:before {
-                        margin-right: 0.5em;
-                    }
-                }
-                &.actions,
-                &.actions > *,
-                &.date {
-                    @extend %attachment-icon;
+        > .custom-protection::before {
+          @extend %attachment-icon;
 
-                    color: $gray;
-                }
-                &.actions {
-                    width: 2.2rem;
-
-                    text-align: right;
-                    > * {
-                        visibility: hidden;
-
-                        cursor: pointer;
-
-                        opacity: 0;
-                        &.icon-remove:hover:before {
-                            color: $red;
-                        }
-                        &.icon-edit:hover:before,
-                        &.icon-file-download:hover:before {
-                            color: $blue;
-                        }
-                    }
-                }
-            }
-            &:hover:not(.empty) > td {
-                background-color: $pastel-blue;
-                &:first-child {
-                    border-top-left-radius: $default-border-radius;
-                    border-bottom-left-radius: $default-border-radius;
-                }
-                &:last-child {
-                    border-top-right-radius: $default-border-radius;
-                    border-bottom-right-radius: $default-border-radius;
-                }
-                &.actions > *,
-                &.date {
-                    color: $dark-gray;
-                }
-                &.actions > * {
-                    visibility: visible;
-
-                    opacity: 1;
-                }
-            }
+          color: $pastel-red;
         }
-        &.expandable {
-            user-select: none;
+
+        > a.icon-file-pdf {
+          @include colored-icon($red);
+        }
+
+        > a.icon-file-excel {
+          @include colored-icon($green);
+        }
+
+        > a.icon-file-word {
+          @include colored-icon($dark-blue);
+        }
+
+        > a.icon-file-image {
+          @include colored-icon($blue);
+        }
+
+        > a.icon-calendar {
+          @include colored-icon($dark-yellow);
+        }
+
+        > a.icon-file-presentation {
+          @include colored-icon($yellow);
+        }
+      }
+      > * {
+        @extend %attachment-line;
+      }
+
+      i {
+        float: none;
+        display: inline-block;
+      }
+    }
+    &:not(.sub-tree) {
+      > td {
+        &:first-child::before,
+        > a,
+        > span {
+          color: $light-black;
+        }
+        > a {
+          &:hover {
+            color: $black;
+          }
+
+          &::before {
+            margin-right: 0.5em;
+          }
+        }
+        &.actions,
+        &.actions > *,
+        &.date {
+          @extend %attachment-icon;
+
+          color: $gray;
+        }
+        &.actions {
+          width: 2.2rem;
+
+          text-align: right;
+          > * {
+            visibility: hidden;
 
             cursor: pointer;
-            > td {
-                &:first-child {
-                    border-top-left-radius: 2px;
-                    border-bottom-left-radius: 2px;
 
-                    font-weight: bold;
-                    &:before {
-                        @include rotate-transform(0.15s);
-                    }
-                    > span {
-                        &:before {
-                            margin-right: 0.25em;
-                        }
-
-                        @include icon-before('icon-folder-open');
-                    }
-                }
-                &:last-child {
-                   border-top-right-radius: 2px;
-                }
+            opacity: 0;
+            &.icon-remove:hover::before {
+              color: $red;
             }
-            &.collapsed > td:first-child {
-                > span {
-                    @include icon-before('icon-folder');
-                }
+            &.icon-edit:hover::before,
+            &.icon-file-download:hover::before {
+              color: $blue;
             }
+          }
         }
-        &.sub-tree > td {
-            padding: 0 0 0 1.4em;
-            &:first-child:before {
-                display: none; // no icon space for nested files
-            }
-            > div > .tree {
-                border-radius: 2px;
-
-                background-color: $light-gray;
-                tr > td:first-child:before {
-                    display: none; // no icon space for nested files
-                }
-            }
+      }
+      &:hover:not(.empty) > td {
+        background-color: $pastel-blue;
+        &:first-child {
+          border-top-left-radius: $default-border-radius;
+          border-bottom-left-radius: $default-border-radius;
         }
-        &.empty > td {
-            font-style: italic;
-
-            color: $dark-gray;
+        &:last-child {
+          border-top-right-radius: $default-border-radius;
+          border-bottom-right-radius: $default-border-radius;
         }
+        &.actions > *,
+        &.date {
+          color: $dark-gray;
+        }
+        &.actions > * {
+          visibility: visible;
+
+          opacity: 1;
+        }
+      }
     }
+    &.expandable {
+      user-select: none;
+
+      cursor: pointer;
+      > td {
+        &:first-child {
+          border-top-left-radius: 2px;
+          border-bottom-left-radius: 2px;
+
+          font-weight: bold;
+          &::before {
+            @include rotate-transform(0.15s);
+          }
+          > span {
+            &::before {
+              margin-right: 0.25em;
+            }
+
+            @include icon-before('icon-folder-open');
+          }
+        }
+        &:last-child {
+          border-top-right-radius: 2px;
+        }
+      }
+      &.collapsed > td:first-child {
+        > span {
+          @include icon-before('icon-folder');
+        }
+      }
+    }
+    &.sub-tree > td {
+      padding: 0 0 0 1.4em;
+      &:first-child::before {
+        display: none; // no icon space for nested files
+      }
+      > div > .tree {
+        border-radius: 2px;
+
+        background-color: $light-gray;
+        tr > td:first-child::before {
+          display: none; // no icon space for nested files
+        }
+      }
+    }
+    &.empty > td {
+      font-style: italic;
+
+      color: $dark-gray;
+    }
+  }
 }
 
 %protected-colors {
-    border-bottom: 2px solid $red;
-    &:hover:before {
-        color: $red !important;
-    }
-    &:hover {
-        border-bottom-color: $red !important;
-    }
+  border-bottom: 2px solid $red;
+  &:hover::before {
+    color: $red !important;
+  }
+  &:hover {
+    border-bottom-color: $red !important;
+  }
 }
 
 .attachment.icon-file-pdf {
-    @include colored-icon($red);
+  @include colored-icon($red);
 }
 
 .attachment.icon-file-excel {
-    @include colored-icon($green);
+  @include colored-icon($green);
 }
 
 .attachment.icon-file-word {
-    @include colored-icon($dark-blue);
+  @include colored-icon($dark-blue);
 }
 
 .attachment.icon-file-image {
-    @include colored-icon($blue);
+  @include colored-icon($blue);
 }
 
 .attachment.icon-calendar {
-    @include colored-icon($dark-yellow);
+  @include colored-icon($dark-yellow);
 }
 
 .attachment.icon-file-presentation {
-    @include colored-icon($yellow);
+  @include colored-icon($yellow);
 }
 
 .attachments-box {
-    padding: 5px;
+  padding: 5px;
 
-    > .attachments-box-header {
-        > * {
-            color: $dark-gray;
-            display: inline-block;
+  > .attachments-box-header {
+    > * {
+      color: $dark-gray;
+      display: inline-block;
 
-            vertical-align: middle;
-        }
-        > h2 {
-            &:before {
-                margin-right: 0.2em;
-            }
-            margin: 0 0 0.25em 0;
-        }
-        > .i-button.right {
-            margin-top: 0;
-        }
-
-        margin-bottom: 0.5em;
+      vertical-align: middle;
     }
-    .tree tr.sub-tree > td > div > .tree {
-        background-color: white;
+    > h2 {
+      &::before {
+        margin-right: 0.2em;
+      }
+      margin: 0 0 0.25em 0;
     }
+    > .i-button.right {
+      margin-top: 0;
+    }
+
+    margin-bottom: 0.5em;
+  }
+  .tree tr.sub-tree > td > div > .tree {
+    background-color: white;
+  }
 }
 
 .category-sidebar > .attachments-box > .attachments-box-header {
-    margin-top: 20px;
-    padding-bottom: 0.2em;
+  margin-top: 20px;
+  padding-bottom: 0.2em;
 
-    border-bottom: 1px solid #ebebeb;
-    box-shadow: 0 1px 0 #fafafa;
-    > h2 {
-        padding-bottom: 0;
+  border-bottom: 1px solid #ebebeb;
+  box-shadow: 0 1px 0 #fafafa;
+  > h2 {
+    padding-bottom: 0;
 
-        border-bottom: 0;
-        box-shadow: none;
-    }
+    border-bottom: 0;
+    box-shadow: none;
+  }
 }
 
 .contribution-display .row.files .column .attachments-box > .attachments-box-header {
-    > h2 {
-        margin-top: 0;
-        padding-bottom: 0;
-        border-bottom: 0;
-    }
-    > .i-button.right {
-        margin: 0 !important;
-    }
-    padding-bottom: 0.5em;
-    border-bottom: 1px solid darken($light-gray, 10%);
+  > h2 {
+    margin-top: 0;
+    padding-bottom: 0;
+    border-bottom: 0;
+  }
+  > .i-button.right {
+    margin: 0 !important;
+  }
+  padding-bottom: 0.5em;
+  border-bottom: 1px solid darken($light-gray, 10%);
 }
 
 .inline-attachments-icon {
+  vertical-align: middle !important;
+  line-height: 1.7em;
+  &::before {
     vertical-align: middle !important;
-    line-height: 1.7em;
-    &:before {
-        vertical-align: middle !important;
-        display: inline-block;
-        margin-top: 0.3em;
-        font-size: 1.4em;
-        color: $dark-gray;
-    }
+    display: inline-block;
+    margin-top: 0.3em;
+    font-size: 1.4em;
+    color: $dark-gray;
+  }
 }
 
 .material-list {
-    .folder .attachment {
-        @include ellipsis;
+  .folder .attachment {
+    @include ellipsis;
 
-        max-width: 150px;
-        padding-left: 0.2em !important;
+    max-width: 150px;
+    padding-left: 0.2em !important;
 
-        .title {
-            @include ellipsis;
+    .title {
+      @include ellipsis;
 
-            color: $light-black;
-            font-size: 0.9em;
-        }
+      color: $light-black;
+      font-size: 0.9em;
     }
-    .folder .i-button.attachment,
-    .folder .attachments {
-        font-family: Roboto;
-        font-weight: normal;
+  }
+  .folder .i-button.attachment,
+  .folder .attachments {
+    font-family: Roboto;
+    font-weight: normal;
 
-        white-space: nowrap;
+    white-space: nowrap;
 
-        margin-top: 0.2em;
+    margin-top: 0.2em;
 
+    &.is-protected {
+      @extend %protected-colors;
+    }
+    &.has-label {
+      margin: 0;
+      padding-left: 0.7em !important;
+    }
+  }
+  .folder {
+    display: inline-flex;
+    margin-left: 0.2em;
+
+    &.is-protected {
+      .i-button.label {
+        @extend %protected-colors;
+
+        border-bottom-color: $red !important;
+      }
+    }
+  }
+  .folder .i-dropdown {
+    & > li {
+      padding: 0.1em 0.2em !important;
+
+      .attachment {
+        max-width: 250px;
         &.is-protected {
-            @extend %protected-colors;
+          color: $red;
         }
-        &.has-label {
-            margin: 0;
-            padding-left: 0.7em !important;
-        }
+      }
     }
-    .folder {
-        display: inline-flex;
-        margin-left: 0.2em;
-
-        &.is-protected {
-            .i-button.label {
-                @extend %protected-colors;
-
-                border-bottom-color: $red !important;
-            }
-        }
-    }
-    .folder .i-dropdown {
-        & > li {
-            padding: 0.1em 0.2em !important;
-
-            .attachment {
-                max-width: 250px;
-                &.is-protected {
-                    color: $red;
-                }
-            }
-        }
-    }
+  }
 }
 
-.folder-main, div.main > .attachments-package {
-    max-width: 1024px;
-    margin: auto;
-    margin-top: 2em;
-    padding: 2em;
-    background-color: $light-gray;
+.folder-main,
+div.main > .attachments-package {
+  max-width: 1024px;
+  margin: auto;
+  margin-top: 2em;
+  padding: 2em;
+  background-color: $light-gray;
 }
 
 .attachment-preview-top-bar {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    background-color: $black;
-    color: white;
-    padding: 10px;
-    z-index: 10;
-    box-sizing: border-box;
-    align-items: center;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  background-color: $black;
+  color: white;
+  padding: 10px;
+  z-index: 10;
+  box-sizing: border-box;
+  align-items: center;
 
-    .attachment-title {
-        > span {
-            font-size: 1.1em;
+  .attachment-title {
+    > span {
+      font-size: 1.1em;
 
-            &:before {
-                margin-right: 0.5em;
-            }
-        }
-    }
-
-    .attachment-preview-close {
-        > a {
-            font-size: 1.5em;
-            color: darken($light-gray, 5%);
-        }
-    }
-
-    .attachment-actions {
+      &::before {
         margin-right: 0.5em;
-
-        > a {
-            font-size: 1.3em;
-        }
+      }
     }
+  }
+
+  .attachment-preview-close {
+    > a {
+      font-size: 1.5em;
+      color: darken($light-gray, 5%);
+    }
+  }
+
+  .attachment-actions {
+    margin-right: 0.5em;
+
+    > a {
+      font-size: 1.3em;
+    }
+  }
 }
 
 .attachment-preview-dialog {
-    .exclusivePopup {
-        padding: 0;
-        position: fixed;
-        width: 100%;
-        height: 100%;
-        left: 0;
-        top: 0;
-        background-color: transparent;
+  .exclusivePopup {
+    padding: 0;
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    left: 0;
+    top: 0;
+    background-color: transparent;
 
-        .attachment-preview-content-wrapper {
-            height: auto;
-            width: 100%;
-            position: absolute;
-            top: 50px;
-            bottom: 0;
+    .attachment-preview-content-wrapper {
+      height: auto;
+      width: 100%;
+      position: absolute;
+      top: 50px;
+      bottom: 0;
 
-            .attachment-preview-content {
-                > img {
-                    position: absolute;
-                    margin: auto;
-                    top: 0;
-                    left: 0;
-                    right: 0;
-                    bottom: 0;
-                    max-width: 90%;
-                    max-height: 80%;
-                }
-
-                > iframe, .text-preview-content {
-                    position: absolute;
-                    margin: auto;
-                    left: 0;
-                    right: 0;
-                    height: 100%;
-                    width: 900px;
-                }
-
-                > .text-preview-content {
-                    padding: 2vw;
-                    background-color: white;
-                    overflow: auto;
-                    box-sizing: border-box;
-                }
-            }
+      .attachment-preview-content {
+        > img {
+          position: absolute;
+          margin: auto;
+          top: 0;
+          left: 0;
+          right: 0;
+          bottom: 0;
+          max-width: 90%;
+          max-height: 80%;
         }
+
+        > iframe,
+        .text-preview-content {
+          position: absolute;
+          margin: auto;
+          left: 0;
+          right: 0;
+          height: 100%;
+          width: 900px;
+        }
+
+        > .text-preview-content {
+          padding: 2vw;
+          background-color: white;
+          overflow: auto;
+          box-sizing: border-box;
+        }
+      }
     }
+  }
 }
 
 .attachment-preview-overlay {
-    opacity: 0.9;
+  opacity: 0.9;
 }
 
 .attachments-tooltip-button {
-    @include icon-before('icon-folder');
-    cursor: pointer;
-    color: $gray;
+  @include icon-before('icon-folder');
+  cursor: pointer;
+  color: $gray;
 
-    &:hover, &.open {
-        color: $dark-gray;
-    }
+  &:hover,
+  &.open {
+    color: $dark-gray;
+  }
 
-    &.open {
-        @include icon-before('icon-folder-open');
-    }
+  &.open {
+    @include icon-before('icon-folder-open');
+  }
 }
 
 form#attachment-upload-form.full-width .dropzone {
-    width: 770px;
+  width: 770px;
 
-    .select-files-btn, .dropzone-previews {
-        display: block;
-    }
+  .select-files-btn,
+  .dropzone-previews {
+    display: block;
+  }
 }

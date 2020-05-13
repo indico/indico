@@ -10,339 +10,343 @@
         Do not custom this CSS
     */
 
-    /*     ------Wrapper------ */
-    /*     this is the wrapper of whole conference page */
+/*     ------Wrapper------ */
+
+/*     this is the wrapper of whole conference page */
 
 .conf {
-    width: 100%;
-    border: none;
-    margin: 0;
+  width: 100%;
+  border: none;
+  margin: 0;
 }
 
 /*
     Header
 */
 .confheader {
-    background: #1a64a0;
+  background: #1a64a0;
 }
 
 .confheader .event-label {
-    margin-left: 1em !important;
-    text-transform: uppercase;
+  margin-left: 1em !important;
+  text-transform: uppercase;
 }
 
 .confLogoBox {
-    height: 100%;
-    float: left;
-    padding-right: 10px;
-    background: transparent none repeat scroll 0 0;
+  height: 100%;
+  float: left;
+  padding-right: 10px;
+  background: transparent none repeat scroll 0 0;
 }
 
 .confTitleBox {
-    color: white;
-    min-height: 90px;
-    text-align:left;
-    background: #1a64a0;
+  color: white;
+  min-height: 90px;
+  text-align: left;
+  background: #1a64a0;
 }
 
 .confTitle {
-    width: 950px;
-    margin: 0 auto;
+  width: 950px;
+  margin: 0 auto;
 }
 
 .confTitle h1 {
-    font-weight: normal;
-    margin: 0;
+  font-weight: normal;
+  margin: 0;
 }
 
 .conference-title-link {
-    font-size:22pt;
-    display: block;
-    padding: 25px 0;
-    color: white;
+  font-size: 22pt;
+  display: block;
+  padding: 25px 0;
+  color: white;
 }
 
 .confSubTitleBox {
-    background: #f5faff;
-    border-bottom: 1px solid #d5e4f1;
-    border-top: 1px solid #d5e4f1;
-    padding: 0.5rem 0;
+  background: #f5faff;
+  border-bottom: 1px solid #d5e4f1;
+  border-top: 1px solid #d5e4f1;
+  padding: 0.5rem 0;
 }
 
 .confSubTitleBox .toolbar {
-    margin: 0;
+  margin: 0;
 }
 
 .confSubTitleContent {
-    width: 950px;
-    margin: 0 auto;
-    font-size: 11pt;
-    color: #24425a;
+  width: 950px;
+  margin: 0 auto;
+  font-size: 11pt;
+  color: #24425a;
 }
 
 .confSubTitle a {
-    font-size: 11pt;
+  font-size: 11pt;
 }
 
 .datePlace {
-    font-size: 12pt;
+  font-size: 12pt;
 }
 
 div.datePlace > div.timezone {
-    font-size: 10px;
-    color: #777;
+  font-size: 10px;
+  color: #777;
 }
 
 /* ------Main content------ */
 
 #confSectionsBox {
-    width: 950px;
-    margin: 0 auto;
-    margin-top: 30px;
+  width: 950px;
+  margin: 0 auto;
+  margin-top: 30px;
 }
 
 /* ------Menu------ */
-/* here is layout and style for creating default menu for conferences */
 
+/* here is layout and style for creating default menu for conferences */
 
 /* Styles for all menu Items */
 
 #outer {
-    width: 100%;
-    position:relative;
-    background: #f6f6f6;
+  width: 100%;
+  position: relative;
+  background: #f6f6f6;
 
-    border: 1px solid #ccc;
+  border: 1px solid #ccc;
 
-    list-style-image: none;
-    list-style-position: outside;
-    list-style-type: none;
+  list-style-image: none;
+  list-style-position: outside;
+  list-style-type: none;
 }
 
 #outer > li.menuConfTitle {
-    display: block;
+  display: block;
 }
 
 #outer li a {
-    display: block;
-    text-decoration: none;
+  display: block;
+  text-decoration: none;
 
-    font-family:verdana,arial,sans-serif;
-    font-size: 10pt;
+  font-family: verdana, arial, sans-serif;
+  font-size: 10pt;
 }
 
-#outer li a.no-link, #outer li a.no-link:hover {
-    color: #555;
-    cursor: default
+#outer li a.no-link,
+#outer li a.no-link:hover {
+  color: #555;
+  cursor: default;
 }
 
 #outer li a:not(.no-link):hover {
-    background: #e0e0e0;
+  background: #e0e0e0;
 }
 
 .conf_leftMenu {
-    float:left;
-    width:200px;
-    background:transparent none repeat scroll 0 0;
+  float: left;
+  width: 200px;
+  background: transparent none repeat scroll 0 0;
 }
 
-
 .menuConfTitle {
-    text-align:left;
+  text-align: left;
 }
 
 .menuConfTitle a {
-    color: #275C86;
-    padding: 7px 12px;
+  color: #275c86;
+  padding: 7px 12px;
 }
 
 /* sub menu item */
 
 li.menuConfMiddleCell {
-    font-weight: normal;
+  font-weight: normal;
 }
 
 .sublink {
-        color: #777;
+  color: #777;
 }
 
 li.menuConfMiddleCell a {
-    padding: 0 0 0 30px;
+  padding: 0 0 0 30px;
 }
 
-    /* selected menu item */
+/* selected menu item */
 
-.menuConfSelected, .menuConfMiddleCellSelected {
-    color: #BD891A;
-    background: #dadada;
-    border-bottom: 1px solid #d0d0d0;
-    border-top: 1px solid #d0d0d0;
+.menuConfSelected,
+.menuConfMiddleCellSelected {
+  color: #bd891a;
+  background: #dadada;
+  border-bottom: 1px solid #d0d0d0;
+  border-top: 1px solid #d0d0d0;
 }
 
 .menuConfBottomCell {
-    border-bottom:0px;
-    border-top:0px;
-    background:transparent none repeat scroll 0 0;
-    display: none;
+  border-bottom: 0;
+  border-top: 0;
+  background: transparent none repeat scroll 0 0;
+  display: none;
 }
 
-    /* Support link */
+/* Support link */
 
-    /*For dynamic menu*/
+/* For dynamic menu */
 
 .inner {
-    font-family: arial,sans-serif;
-    top:0px;
-    position:relative;
-    list-style-image: none;
-    list-style-position: outside;
-    list-style-type: none;
-    margin: 0 0 5px 0;
-    padding:0pt;
-    width:100%;
+  font-family: arial, sans-serif;
+  top: 0;
+  position: relative;
+  list-style-image: none;
+  list-style-position: outside;
+  list-style-type: none;
+  margin: 0 0 5px 0;
+  padding: 0;
+  width: 100%;
 }
-
 
 .conf_leftMenu ul {
-    list-style:none;
-    margin: 0;
-    padding: 0;
+  list-style: none;
+  margin: 0;
+  padding: 0;
 }
 
+/* Fix IE. Hide from IE Mac \ */
+* html ul li {
+  float: left;
+  height: 1%;
+}
+* html ul li a {
+  height: 1%;
+}
 
-/* Fix IE. Hide from IE Mac \*/
-* html ul li { float: left; height: 1%; }
-* html ul li a { height: 1%; }
 /* End */
 
-
 li ul.inner li a {
-    padding: 3px 12px 3px 30px;
-    background: transparent url(/images/conf/left_menu_bullet.png) scroll no-repeat 15px center;
+  padding: 3px 12px 3px 30px;
+  background: transparent url(/images/conf/left_menu_bullet.png) scroll no-repeat 15px center;
 } /* Sub Menu Styles */
 
-li:hover ul, li.over ul { display: block; } /* For dynamic */
-
+li:hover ul,
+li.over ul {
+  display: block;
+} /* For dynamic */
 
 /* ------Content------ */
 
 /* wrapper of content and bradcrumps */
 
 .confBodyBox {
-    margin-left:230px;
-    background:transparent none repeat scroll 0 0;
-
+  margin-left: 230px;
+  background: transparent none repeat scroll 0 0;
 }
 
 /* This is for if someday you have more than one column in content */
 
 .mainContent {
-    width:100%;
+  width: 100%;
 }
-
 
 .col2 {
-    width:100%;
-    float:left;
-    font-family: verdana,arial,sans-serif;;
+  width: 100%;
+  float: left;
+  font-family: verdana, arial, sans-serif;
 }
-
 
 /* ------Misc------ */
 
 .conferenceDetails .description {
-    color: #777;
-    font-size: 1.2em;
-    margin: 1em 0 2em 0;
+  color: #777;
+  font-size: 1.2em;
+  margin: 1em 0 2em 0;
 }
 
 table.conferenceDetails td {
-    font-size: 11pt;
-    color: #444;
+  font-size: 11pt;
+  color: #444;
 }
 
 table.conferenceDetails .displayField {
-    text-align:left;
-    font-weight: bold;
-    font-size: 10pt;
-    padding-right: 20px;
-    color: #444;
+  text-align: left;
+  font-weight: bold;
+  font-size: 10pt;
+  padding-right: 20px;
+  color: #444;
 }
 
 .italic {
-    font-style:italic;
+  font-style: italic;
 }
 
-.menuConfTopCell { display: none;}
-
+.menuConfTopCell {
+  display: none;
+}
 
 /* General elements */
 
 pre {
-    margin: 0;
-    color: #444;
-    font-size: 11pt;
+  margin: 0;
+  color: #444;
+  font-size: 11pt;
 }
 
 .simpleTextAnnouncement {
-    background: #F5FAFF url(static:images/conf/sprites_blue.png) repeat-x scroll 0 -400px;
-    border-top: 1px solid #c2d6e7;
-    padding: 8px 0;
-    font-family: Verdana;
-    font-weight: bold;
-    font-size: 10pt;
-    text-align: center;
-    color: #0f283d;
+  background: #f5faff url(static:images/conf/sprites_blue.png) repeat-x scroll 0 -400px;
+  border-top: 1px solid #c2d6e7;
+  padding: 8px 0;
+  font-family: Verdana;
+  font-weight: bold;
+  font-size: 10pt;
+  text-align: center;
+  color: #0f283d;
 }
-
 
 /* Elements not part of the conference itself */
 
 ul.chair_list {
-    padding: 0;
-    margin: 0;
-    list-style-type: none;
+  padding: 0;
+  margin: 0;
+  list-style-type: none;
 }
 
 .conf_leftMenu .spacer {
-    height: 1em;
+  height: 1em;
 }
 
 .support_box {
-    margin-top: 10px !important;
-    width: 100%;
-    color: #aaa;
-    background: #f6f6f6;
-    border: 1px solid #ccc;
+  margin-top: 10px !important;
+  width: 100%;
+  color: #aaa;
+  background: #f6f6f6;
+  border: 1px solid #ccc;
 }
 
 .support_box > h3 {
-    color: #f3f3f3;
-    background: #1a64a0;
-    margin: 0 0 5px 0;
-    padding: 5px;
-    font-weight: normal;
+  color: #f3f3f3;
+  background: #1a64a0;
+  margin: 0 0 5px 0;
+  padding: 5px;
+  font-weight: normal;
 }
 
 .support_box > ul > li {
-    white-space: nowrap;
-    margin: 0 5px 5px 10px;
-    vertical-align: middle;
-    text-overflow: ellipsis;
-    overflow: hidden;
+  white-space: nowrap;
+  margin: 0 5px 5px 10px;
+  vertical-align: middle;
+  text-overflow: ellipsis;
+  overflow: hidden;
 }
 
 .support_box > ul > li .icon {
-    color: #777;
-    font-size: 1.5em;
-    vertical-align: middle;
+  color: #777;
+  font-size: 1.5em;
+  vertical-align: middle;
 }
 
 .support_box > ul > li > a {
-    margin-left: 5px;
-    line-height: 1.5em;
-    vertical-align: middle;
-    min-width: 0;
-    overflow: hidden;
-    text-overflow: ellipsis;
+  margin-left: 5px;
+  line-height: 1.5em;
+  vertical-align: middle;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }

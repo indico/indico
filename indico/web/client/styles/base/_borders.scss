@@ -5,93 +5,136 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-
 %inner-border-base {
-    position: relative;
+  position: relative;
 
-    &:before {
-        content: ".";
-        color: transparent;
-        font-size: 0;
-        position: absolute;
-    }
+  &::before {
+    content: '.';
+    color: transparent;
+    font-size: 0;
+    position: absolute;
+  }
 }
 
 %default-border-radius {
-    border-radius: $default-border-radius;
+  border-radius: $default-border-radius;
 }
 
-@mixin border-top($color: $default-border-color, $style: $default-border-style, $width: $default-border-width) {
-    border-top: $width $style $color;
+@mixin border-top(
+  $color: $default-border-color,
+  $style: $default-border-style,
+  $width: $default-border-width
+) {
+  border-top: $width $style $color;
 }
 
-@mixin border-right($color: $default-border-color, $style: $default-border-style, $width: $default-border-width) {
-    border-right: $width $style $color;
+@mixin border-right(
+  $color: $default-border-color,
+  $style: $default-border-style,
+  $width: $default-border-width
+) {
+  border-right: $width $style $color;
 }
 
-@mixin border-bottom($color: $default-border-color, $style: $default-border-style, $width: $default-border-width) {
-    border-bottom: $width $style $color;
+@mixin border-bottom(
+  $color: $default-border-color,
+  $style: $default-border-style,
+  $width: $default-border-width
+) {
+  border-bottom: $width $style $color;
 }
 
-@mixin border-left($color: $default-border-color, $style: $default-border-style, $width: $default-border-width) {
-    border-left: $width $style $color;
+@mixin border-left(
+  $color: $default-border-color,
+  $style: $default-border-style,
+  $width: $default-border-width
+) {
+  border-left: $width $style $color;
 }
 
-@mixin border-vert($color: $default-border-color, $style: $default-border-style, $width: $default-border-width) {
+@mixin border-vert(
+  $color: $default-border-color,
+  $style: $default-border-style,
+  $width: $default-border-width
+) {
+  @include border-top($color, $style, $width);
+  @include border-bottom($color, $style, $width);
+}
+
+@mixin border-horz(
+  $color: $default-border-color,
+  $style: $default-border-style,
+  $width: $default-border-width
+) {
+  @include border-right($color, $style, $width);
+  @include border-left($color, $style, $width);
+}
+
+@mixin border-all(
+  $color: $default-border-color,
+  $style: $default-border-style,
+  $width: $default-border-width
+) {
+  @include border-vert($color, $style, $width);
+  @include border-horz($color, $style, $width);
+}
+
+@mixin inner-border-top(
+  $color: $default-border-color,
+  $style: $default-border-style,
+  $width: $default-border-width
+) {
+  @extend %inner-border-base;
+
+  &::before {
     @include border-top($color, $style, $width);
-    @include border-bottom($color, $style, $width);
+    width: 100%;
+    left: 0;
+    top: 0;
+  }
 }
 
-@mixin border-horz($color: $default-border-color, $style: $default-border-style, $width: $default-border-width) {
+@mixin inner-border-right(
+  $color: $default-border-color,
+  $style: $default-border-style,
+  $width: $default-border-width
+) {
+  @extend %inner-border-base;
+
+  &::before {
     @include border-right($color, $style, $width);
+    height: 100%;
+    right: 0;
+    top: 0;
+  }
+}
+
+@mixin inner-border-bottom(
+  $color: $default-border-color,
+  $style: $default-border-style,
+  $width: $default-border-width
+) {
+  @extend %inner-border-base;
+
+  &::before {
+    @include border-bottom($color, $style, $width);
+    height: 100%;
+    left: 0;
+    bottom: 0;
+  }
+}
+
+@mixin inner-border-left(
+  $color: $default-border-color,
+  $style: $default-border-style,
+  $width: $default-border-width
+) {
+  @extend %inner-border-base;
+
+  &::before {
     @include border-left($color, $style, $width);
-}
-
-@mixin border-all($color: $default-border-color, $style: $default-border-style, $width: $default-border-width) {
-    @include border-vert($color, $style, $width);
-    @include border-horz($color, $style, $width);
-}
-
-@mixin inner-border-top($color: $default-border-color, $style: $default-border-style, $width: $default-border-width) {
-    @extend %inner-border-base;
-
-    &:before {
-        @include border-top($color, $style, $width);
-        width: 100%;
-        left: 0;
-        top: 0;
-    }
-}
-
-@mixin inner-border-right($color: $default-border-color, $style: $default-border-style, $width: $default-border-width) {
-    @extend %inner-border-base;
-
-    &:before {
-        @include border-right($color, $style, $width);
-        height: 100%;
-        right: 0;
-        top: 0;
-    }
-}
-
-@mixin inner-border-bottom($color: $default-border-color, $style: $default-border-style, $width: $default-border-width) {
-    @extend %inner-border-base;
-
-    &:before {
-        @include border-bottom($color, $style, $width);
-        height: 100%;
-        left: 0;
-        bottom: 0;
-    }
-}
-
-@mixin inner-border-left($color: $default-border-color, $style: $default-border-style, $width: $default-border-width) {
-    @extend %inner-border-base;
-
-    &:before {
-        @include border-left($color, $style, $width);
-        height: 100%;
-        left: 0;
-        top: 0;
-    }
+    height: 100%;
+    left: 0;
+    top: 0;
+  }
 }

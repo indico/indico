@@ -8,139 +8,139 @@
 @import 'base/palette';
 
 .dropzone {
-    width: 100%;
-    border: 2px dashed $gray;
-    border-radius: 3px;
-    text-align: center;
-    padding: 0.5em;
-    cursor: pointer;
+  width: 100%;
+  border: 2px dashed $gray;
+  border-radius: 3px;
+  text-align: center;
+  padding: 0.5em;
+  cursor: pointer;
 
-    &:hover {
-        opacity: 0.5;
-    }
+  &:hover {
+    opacity: 0.5;
+  }
 
-    &:global(.active) {
-        opacity: 0.5;
-    }
+  &:global(.active) {
+    opacity: 0.5;
+  }
 }
 
 .file-manager-wrapper {
-    display: flex;
-    flex-direction: column;
+  display: flex;
+  flex-direction: column;
 }
 
 .file-manager {
-    display: flex;
-    flex-wrap: wrap;
+  display: flex;
+  flex-wrap: wrap;
 
-    .file-type {
-        overflow: hidden;
-        margin-bottom: 1em;
-        border: 1px solid $gray;
-        border-radius: 3px;
-        padding: 1em;
-        flex: 0 0 32%;
+  .file-type {
+    overflow: hidden;
+    margin-bottom: 1em;
+    border: 1px solid $gray;
+    border-radius: 3px;
+    padding: 1em;
+    flex: 0 0 32%;
 
-        &:not(:nth-child(3n)) {
-            margin-right: 0.9em;
-        }
-
-        .file-extensions {
-            font-style: italic;
-            color: $gray;
-            list-style-type: none;
-            margin: 0.2em 0;
-            padding: 0;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-
-            li {
-                display: inline;
-
-                &:not(:last-child)::after {
-                    content: ', ';
-                }
-            }
-        }
+    &:not(:nth-child(3n)) {
+      margin-right: 0.9em;
     }
 
-    .file-type h3 {
-        margin-bottom: 0;
+    .file-extensions {
+      font-style: italic;
+      color: $gray;
+      list-style-type: none;
+      margin: 0.2em 0;
+      padding: 0;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+
+      li {
+        display: inline;
+
+        &:not(:last-child)::after {
+          content: ', ';
+        }
+      }
     }
+  }
+
+  .file-type h3 {
+    margin-bottom: 0;
+  }
 }
 
 .file-list {
-    list-style-type: none;
-    padding: 0;
+  list-style-type: none;
+  padding: 0;
 
-    .file-row {
-        display: flex;
-        justify-content: space-between;
-    }
+  .file-row {
+    display: flex;
+    justify-content: space-between;
+  }
 }
 
 .delete-icon {
-    color: $red;
-    cursor: pointer;
+  color: $red;
+  cursor: pointer;
 
-    &:hover {
-        color: $dark-red;
-    }
+  &:hover {
+    color: $dark-red;
+  }
 }
 
 .undo-icon {
-    color: $blue;
-    cursor: pointer;
+  color: $blue;
+  cursor: pointer;
 
-    &:hover {
-        color: $dark-blue;
-    }
+  &:hover {
+    color: $dark-blue;
+  }
 }
 
 .exchange-icon {
-    color: $dark-gray;
-    cursor: pointer;
+  color: $dark-gray;
+  cursor: pointer;
 
-    &:hover {
-        color: $light-black;
-    }
+  &:hover {
+    color: $light-black;
+  }
 }
 
 .file-state {
-    font-weight: bold;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    flex: 4;
+  font-weight: bold;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  flex: 4;
 
-    &:global(.added) {
-        color: $green;
-    }
+  &:global(.added) {
+    color: $green;
+  }
 
-    &:global(.modified) {
-        color: $dark-orange;
-    }
+  &:global(.modified) {
+    color: $dark-orange;
+  }
 
-    &:global(.deleted) {
-        text-decoration: line-through;
-        color: $dark-red;
-    }
+  &:global(.deleted) {
+    text-decoration: line-through;
+    color: $dark-red;
+  }
 
-    &:global(.uploading) {
-        color: $gray;
-    }
+  &:global(.uploading) {
+    color: $gray;
+  }
 
-    &:global(.error) {
-        color: $dark-red;
-    }
+  &:global(.error) {
+    color: $dark-red;
+  }
 }
 
 .uploading-file-list {
-    @extend .file-list;
-    padding-bottom: 1em;
+  @extend .file-list;
+  padding-bottom: 1em;
 
-    .uploading-file-row {
-        display: flex;
-    }
+  .uploading-file-row {
+    display: flex;
+  }
 }

@@ -10,96 +10,96 @@
 @import 'rb:styles/responsive';
 
 .rb-layout {
-    // this will reset the stacking context,
-    // which will allow us to use z-indexes
-    display: flex;
-    flex-direction: column;
+  // this will reset the stacking context,
+  // which will allow us to use z-indexes
+  display: flex;
+  flex-direction: column;
 }
 
 .rb-menu-bar {
-    background-color: $highlight-color;
-    padding: 0 20px;
+  background-color: $highlight-color;
+  padding: 0 20px;
+  margin: 0;
+  height: $menu-height;
+  line-height: $menu-height;
+  display: flex;
+
+  // make dropdown menus overlap whatever
+  // is in the content page
+  z-index: 2;
+
+  :global(.row) {
+    padding: 0;
+  }
+
+  a {
+    text-decoration: none;
+  }
+
+  h1 {
+    display: inline-block;
     margin: 0;
-    height: $menu-height;
+    color: $white;
     line-height: $menu-height;
-    display: flex;
-
-    // make dropdown menus overlap whatever
-    // is in the content page
-    z-index: 2;
-
-    :global(.row) {
-        padding: 0;
-    }
 
     a {
-        text-decoration: none;
+      color: $white;
+      margin-left: 0.2em;
     }
+  }
 
-    h1 {
-        display: inline-block;
-        margin: 0;
-        color: $white;
-        line-height: $menu-height;
-
-        a {
-            color: $white;
-            margin-left: 0.2em;
-        }
-    }
-
-    :global(.column) {
-        display: flex;
-    }
+  :global(.column) {
+    display: flex;
+  }
 }
 
 %rb-menu-bar-side {
-    flex-grow: 1;
-    display: flex;
+  flex-grow: 1;
+  display: flex;
 }
 
 .rb-menu-bar-side-left {
-    @extend %rb-menu-bar-side;
+  @extend %rb-menu-bar-side;
 
-    * {
-        margin-right: auto;
-    }
+  * {
+    margin-right: auto;
+  }
 }
 
 .rb-menu-bar-side-right {
-    @extend %rb-menu-bar-side;
+  @extend %rb-menu-bar-side;
 
-    * {
-        margin-left: auto;
-    }
+  * {
+    margin-left: auto;
+  }
 }
 
 .rb-menu-bar-menu {
-    flex-grow: 3;
+  flex-grow: 3;
 }
 
 .rb-content {
-    // lower z-index than menu
-    z-index: 1;
+  // lower z-index than menu
+  z-index: 1;
 
-    & > :global(.ui.grid:not(.landing-wrapper)) {
-        padding: $rb-content-padding;
+  & > :global(.ui.grid:not(.landing-wrapper)) {
+    padding: $rb-content-padding;
 
-        @media(max-width: $tablet-width) {
-            padding-top: 1em;
-        }
+    @media (max-width: $tablet-width) {
+      padding-top: 1em;
     }
+  }
 }
 
 .rb-pushable {
-    // make sure that side bar takes the whole remaining height of the page
-    min-height: calc(100vh - #{$menu-height} - var(--extra-bars, 0) * 50px - 50px);
-    // unset `transform` which breaks the Sticky filter bar and set `position` here
-    // so that rb-pusher positions itself correctly
-    transform: unset !important;
-    position: relative;
+  // make sure that side bar takes the whole remaining height of the page
+  min-height: calc(100vh - #{$menu-height} - var(--extra-bars, 0) * 50px - 50px);
+  // unset `transform` which breaks the Sticky filter bar and set `position` here
+  // so that rb-pusher positions itself correctly
+  transform: unset !important;
+  position: relative;
 
-    .rb-pusher:global(.pusher) {
-        min-height: calc(100vh - #{$menu-height} - var(--extra-bars, 0) * 50px - 50px);
-    }
+  .rb-pusher:global(.pusher) {
+    min-height: calc(100vh - #{$menu-height} - var(--extra-bars, 0) * 50px - 50px);
+  }
 }

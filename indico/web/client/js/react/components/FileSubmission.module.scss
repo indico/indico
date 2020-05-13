@@ -6,26 +6,26 @@
 // LICENSE file for more details.
 
 .dropzone-area {
-    :global(.ui.segment) {
-        border: 2px dashed #007cac !important;
+  :global(.ui.segment) {
+    border: 2px dashed #007cac !important;
+  }
+
+  .file-card {
+    :global(i.icon) {
+      position: absolute;
+      top: 3px;
+      right: 2px;
     }
 
-    .file-card {
-        :global(i.icon) {
-            position: absolute;
-            top: 3px;
-            right: 2px;
-        }
-
-        :global(.content) :global(.header) {
-            text-overflow: ellipsis;
-            overflow: hidden;
-            white-space: nowrap;
-        }
+    :global(.content) :global(.header) {
+      text-overflow: ellipsis;
+      overflow: hidden;
+      white-space: nowrap;
     }
+  }
 
-    .file-selection-btn {
-        margin-top: 10px;
-        max-width: none !important;
-    }
+  .file-selection-btn {
+    margin-top: 10px;
+    max-width: none !important;
+  }
 }

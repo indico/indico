@@ -9,108 +9,108 @@ $result-group-padding: 1rem;
 $result-group-header-padding: 0.55rem;
 
 %content-fit-cell {
-    width: 1%;
+  width: 1%;
 }
 
 %results-title {
-    color: $light-black;
-    font-size: 1.5em;
-    font-weight: bold;
-    padding-bottom: $result-group-padding;
-    padding-top: $result-group-padding;
+  color: $light-black;
+  font-size: 1.5em;
+  font-weight: bold;
+  padding-bottom: $result-group-padding;
+  padding-top: $result-group-padding;
 }
 
 %result-group {
-    td {
-        padding-bottom: $result-group-padding / 2;
-        padding-top: $result-group-padding / 2;
+  td {
+    padding-bottom: $result-group-padding / 2;
+    padding-top: $result-group-padding / 2;
 
-        &:first-child {
-            padding-left: calc(#{$result-group-padding} + 1em);
-        }
+    &:first-child {
+      padding-left: calc(#{$result-group-padding} + 1em);
     }
+  }
 }
 
 .overview-results {
-    padding: 0;
+  padding: 0;
 
-    table {
-        border-collapse: collapse;
-        border-spacing: 0;
-        width: 100%;
+  table {
+    border-collapse: collapse;
+    border-spacing: 0;
+    width: 100%;
 
-        td {
-            padding-right: $result-group-padding;
+    td {
+      padding-right: $result-group-padding;
 
-            &:first-child {
-                padding-left: $result-group-padding;
-            }
-        }
-
-        tr.no-results-title td {
-            @extend %results-title;
-            color: $gray;
-            font-style: italic;
-        }
-
-        tr.result-group-title {
-            td {
-                @extend %results-title;
-                padding-bottom: $result-group-padding / 2;
-            }
-
-            &:not(:first-child) td {
-                border-top: $gray;
-            }
-        }
-
-        tr.result-group-header {
-            @extend %result-group;
-
-            td .title {
-                border-bottom: 1px dotted $gray;
-                color: $dark-gray;
-                margin-bottom: -$result-group-header-padding;
-                padding-bottom: $result-group-header-padding;
-            }
-        }
-
-        tr.result-group-entry {
-            @extend %result-group;
-
-            &:hover {
-                background: $light-blue;
-            }
-        }
-
-        td.entry-time {
-            @extend %content-fit-cell;
-            font-weight: bold;
-        }
-
-        td.entry-type {
-            @extend %content-fit-cell;
-
-            img {
-                max-height: 2em;
-            }
-        }
-
-        td.entry-location {
-            @extend %content-fit-cell;
-
-            .location {
-                color: $dark-gray;
-            }
-
-            .room {
-                font-weight: bold;
-            }
-
-            .no-location {
-                color: $gray;
-                font-style: italic;
-            }
-        }
+      &:first-child {
+        padding-left: $result-group-padding;
+      }
     }
+
+    tr.no-results-title td {
+      @extend %results-title;
+      color: $gray;
+      font-style: italic;
+    }
+
+    tr.result-group-title {
+      td {
+        @extend %results-title;
+        padding-bottom: $result-group-padding / 2;
+      }
+
+      &:not(:first-child) td {
+        border-top: $gray;
+      }
+    }
+
+    tr.result-group-header {
+      @extend %result-group;
+
+      td .title {
+        border-bottom: 1px dotted $gray;
+        color: $dark-gray;
+        margin-bottom: -$result-group-header-padding;
+        padding-bottom: $result-group-header-padding;
+      }
+    }
+
+    tr.result-group-entry {
+      @extend %result-group;
+
+      &:hover {
+        background: $light-blue;
+      }
+    }
+
+    td.entry-time {
+      @extend %content-fit-cell;
+      font-weight: bold;
+    }
+
+    td.entry-type {
+      @extend %content-fit-cell;
+
+      img {
+        max-height: 2em;
+      }
+    }
+
+    td.entry-location {
+      @extend %content-fit-cell;
+
+      .location {
+        color: $dark-gray;
+      }
+
+      .room {
+        font-weight: bold;
+      }
+
+      .no-location {
+        color: $gray;
+        font-style: italic;
+      }
+    }
+  }
 }

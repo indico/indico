@@ -8,119 +8,120 @@
 /* Basic elements */
 
 .right {
-    float: right;
-    margin-left: auto;
+  float: right;
+  margin-left: auto;
 }
 
 .left {
-    float: left;
+  float: left;
 }
 
 .center {
-    margin: 0px auto;
-    text-align: center;
+  margin: 0 auto;
+  text-align: center;
 }
 
 .text-left {
-    text-align: left;
+  text-align: left;
 }
 
 .text-right {
-    text-align: right;
+  text-align: right;
 }
 
 .text-center {
-    text-align: center;
+  text-align: center;
 }
 
 .inline-vcentered {
-    display: inline-block;
-    vertical-align: middle;
+  display: inline-block;
+  vertical-align: middle;
 }
 
 .header-aligned {
-    margin-top: 0.35em;
+  margin-top: 0.35em;
 }
 
 .clear {
-    clear: both;
+  clear: both;
 }
 
 .hidden {
-    display: none !important;
+  display: none !important;
 }
 
 .weak-hidden {
-    display: none;
+  display: none;
 }
 
 .hidden-if-empty:empty {
-    display: none !important;
+  display: none !important;
 }
 
 .icon-medium {
-    font-size: 3em;
+  font-size: 3em;
 }
 
 .icon-large {
-    font-size: 5em;
+  font-size: 5em;
 }
 
 .icon-background {
-    font-size: 10em;
-    color: #EEE;
+  font-size: 10em;
+  color: #eee;
 }
 
 .area {
-    color: #555;
-    margin-top: 1em;
-    padding: 1em;
-    background: #fafafa;
+  color: #555;
+  margin-top: 1em;
+  padding: 1em;
+  background: #fafafa;
 }
 
 .area h2:first-of-type {
-    margin-top: 0;
+  margin-top: 0;
 }
 
 .area h2 {
-    color: #aaa;
+  color: #aaa;
 }
 
 .prevent-scrolling {
-    overflow-x: hidden;
-    overflow-y: auto;
+  overflow-x: hidden;
+  overflow-y: auto;
 }
 
 .transparent-overlay {
-    position: relative;
+  position: relative;
 
-    &:before {
-        @include gradient(transparent, white);
-        bottom: 0;
-        content: '';
-        height: 3em;
-        position: absolute;
-        width: 100%;
-    }
+  &::before {
+    @include gradient(transparent, white);
+    bottom: 0;
+    content: '';
+    height: 3em;
+    position: absolute;
+    width: 100%;
+  }
 }
 
 .truncate-text {
-    @include ellipsis;
+  @include ellipsis;
 }
 
 @media print {
-    .noprint {
-        visibility: hidden;
-    }
-    .print {
-        visibility: visible;
-    }
+  .noprint {
+    visibility: hidden;
+  }
+  .print {
+    visibility: visible;
+  }
 }
 
 img {
-    border: 0;
+  border: 0;
 }
 
-label:not(.ui.checkbox), .label:not(.ui.checkbox) {
-    font-weight: bold;
+label:not(.ui.checkbox),
+.label:not(.ui.checkbox) {
+  font-weight: bold;
 }

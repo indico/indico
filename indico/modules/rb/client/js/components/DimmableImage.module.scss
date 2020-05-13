@@ -8,48 +8,47 @@
 @import 'rb:styles/responsive';
 
 .dimmable-image {
-    position: relative;
+  position: relative;
 
-    .content {
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-    }
+  .content {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+  }
 
+  .hover-content {
+    opacity: 0;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+    width: 160px;
+  }
+  @media (max-width: $tablet-width) {
     .hover-content {
-        opacity: 0;
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        text-align: center;
-        width: 160px;
-
-    }
-    @media (max-width: $tablet-width) {
-        .hover-content {
-            opacity: 1;
-        }
-
-        :global(.img) {
-            filter: brightness(80%);
-        }
+      opacity: 1;
     }
 
-    @media (min-width: $tablet-width) {
-        &:hover :global(.img) {
-            filter: blur(2px) contrast(150%) brightness(40%);
-            transition: all 30ms ease;
-        }
-
-        &:hover .hover-content {
-            opacity: 1;
-        }
-
-        &:hover .content {
-            opacity: 0;
-        }
+    :global(.img) {
+      filter: brightness(80%);
     }
+  }
+
+  @media (min-width: $tablet-width) {
+    &:hover :global(.img) {
+      filter: blur(2px) contrast(150%) brightness(40%);
+      transition: all 30ms ease;
+    }
+
+    &:hover .hover-content {
+      opacity: 1;
+    }
+
+    &:hover .content {
+      opacity: 0;
+    }
+  }
 }

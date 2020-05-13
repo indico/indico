@@ -8,13 +8,13 @@
 @import 'base/palette';
 
 .list {
-    margin-top: 0 !important;
-    max-height: 200px;
-    overflow-y: scroll;
+  margin-top: 0 !important;
+  max-height: 200px;
+  overflow-y: scroll;
 }
 
 .empty {
-    padding-top: 20px !important;
-    text-align: center;
-    color: $light-black;
+  padding-top: 20px !important;
+  text-align: center;
+  color: $light-black;
 }

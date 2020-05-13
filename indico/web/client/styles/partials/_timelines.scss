@@ -6,163 +6,163 @@
 // LICENSE file for more details.
 
 %time-information {
-    time {
-        color: $gray;
+  time {
+    color: $gray;
 
-        &::before {
-            // bullet+nbsp
-            content: '\00B7\00a0';
-        }
+    &::before {
+      // bullet+nbsp
+      content: '\00B7\00a0';
     }
+  }
 }
 
 .i-timeline {
-    z-index: 0;
-    position: relative;
+  z-index: 0;
+  position: relative;
 
-    & .i-timeline {
-        margin-left: 51px;
-    }
+  & .i-timeline {
+    margin-left: 51px;
+  }
 
-    .with-line::before {
-        background-color: $pastel-gray;
-        content: '';
-        position: absolute;
-        top: 0;
-        bottom: 0;
-        left: 19px;
-        display: block;
-        width: 2px;
-        z-index: -1;
-    }
+  .with-line::before {
+    background-color: $pastel-gray;
+    content: '';
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 19px;
+    display: block;
+    width: 2px;
+    z-index: -1;
+  }
 
-    .to-separator-wrapper {
-        z-index: -1;
-    }
+  .to-separator-wrapper {
+    z-index: -1;
+  }
 }
 
 .i-timeline-item {
-    @extend .flexrow;
-    $min-height: 19px;
+  @extend .flexrow;
+  $min-height: 19px;
 
-    align-items: start;
-    margin-top: 1rem;
+  align-items: start;
+  margin-top: 1rem;
 
-    .i-timeline-item-label {
-        @extend %default-border-radius;
-        @include border-all($color: transparent);
-        box-sizing: border-box;
-        margin-right: 12px;
-        outline: 2px solid white;
-        flex-shrink: 0;
-        // To match i-box-header height
-        height: 39px;
-        width: 39px;
+  .i-timeline-item-label {
+    @extend %default-border-radius;
+    @include border-all($color: transparent);
+    box-sizing: border-box;
+    margin-right: 12px;
+    outline: 2px solid white;
+    flex-shrink: 0;
+    // To match i-box-header height
+    height: 39px;
+    width: 39px;
+  }
+
+  .i-timeline-item-box {
+    @extend .i-box;
+    @extend .i-box.no-shadow;
+    flex-grow: 1;
+    position: relative;
+    min-width: 0;
+
+    .i-box-header {
+      @extend %time-information;
+      // To match i-timeline-item-label height
+      min-height: $min-height;
+
+      &.header-only {
+        margin-bottom: -10px;
+      }
     }
 
-    .i-timeline-item-box {
-        @extend .i-box;
-        @extend .i-box.no-shadow;
-        flex-grow: 1;
-        position: relative;
-        min-width: 0;
-
-        .i-box-header {
-            @extend %time-information;
-            // To match i-timeline-item-label height
-            min-height: $min-height;
-
-            &.header-only {
-                margin-bottom: -10px;
-            }
-        }
-
-        &.header-indicator-top {
-            @include indicator-top-left($background-color: $light-gray);
-        }
-
-        &.header-indicator-left {
-            @include indicator-left($background-color: $light-gray);
-        }
-
-        &.content-indicator-top {
-            @include indicator-top-left();
-        }
-
-        &.content-indicator-left {
-            @include indicator-left();
-        }
-
-        &:target {
-            animation: highlight 0.5s linear;
-        }
+    &.header-indicator-top {
+      @include indicator-top-left($background-color: $light-gray);
     }
 
-    .i-timeline-item-content {
-        flex-direction: column;
-        flex: 1;
+    &.header-indicator-left {
+      @include indicator-left($background-color: $light-gray);
     }
 
-    .i-timeline-item-metadata {
-        @extend %time-information;
-        display: flex;
-        align-items: center;
-        color: $light-black;
-        // Matches .i-timeline-item-label height
-        // Also keeps correct v-alignment and separation with i-timeline-item-box on multiline
-        min-height: 19px;
-        padding: 10px 0;
+    &.content-indicator-top {
+      @include indicator-top-left();
     }
+
+    &.content-indicator-left {
+      @include indicator-left();
+    }
+
+    &:target {
+      animation: highlight 0.5s linear;
+    }
+  }
+
+  .i-timeline-item-content {
+    flex-direction: column;
+    flex: 1;
+  }
+
+  .i-timeline-item-metadata {
+    @extend %time-information;
+    display: flex;
+    align-items: center;
+    color: $light-black;
+    // Matches .i-timeline-item-label height
+    // Also keeps correct v-alignment and separation with i-timeline-item-box on multiline
+    min-height: 19px;
+    padding: 10px 0;
+  }
 }
 
 .i-timeline-item-label.action {
-    @extend %semantic-background;
-    display: flex;
-    color: white;
-    background: $dark-gray;
-    // Icon centering
-    align-items: center;
-    justify-content: center;
+  @extend %semantic-background;
+  display: flex;
+  color: white;
+  background: $dark-gray;
+  // Icon centering
+  align-items: center;
+  justify-content: center;
 
-    &::before {
-        font-size: 2em;
-    }
+  &::before {
+    font-size: 2em;
+  }
 }
 
 .i-timeline .i-timeline-item-label.avatar-placeholder {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: rgba(#fff, 0.9);
-    font-size: 1.65em;
-    border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: rgba(#fff, 0.9);
+  font-size: 1.65em;
+  border-radius: 50%;
 }
 
 .i-timeline-separator {
-    @include border-top($width: 2px);
-    margin: 2em 0;
+  @include border-top($width: 2px);
+  margin: 2em 0;
 }
 
 .i-timeline-connect-down {
-    @include border-left($width: 2px);
-    margin-left: 19px;
-    height: 2em;
+  @include border-left($width: 2px);
+  margin-left: 19px;
+  height: 2em;
 
-    &.to-separator {
-        margin-bottom: -2em;
-    }
+  &.to-separator {
+    margin-bottom: -2em;
+  }
 }
 
 .i-timeline-connect-up {
-    @include border-left($width: 2px);
-    margin-left: 19px;
-    height: 2em;
+  @include border-left($width: 2px);
+  margin-left: 19px;
+  height: 2em;
 
-    &.from-separator {
-        margin-top: -2em;
-    }
+  &.from-separator {
+    margin-top: -2em;
+  }
 
-    & + .i-timeline-item {
-        margin-top: 0;
-    }
+  & + .i-timeline-item {
+    margin-top: 0;
+  }
 }

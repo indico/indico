@@ -5,378 +5,377 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-
 .designer-canvas-wrapper {
-    margin-top: 2em;
+  margin-top: 2em;
 
-    .controls {
-        .template-side-controls,
-        .insert-element-controls {
-            margin-bottom: 1em;
-        }
-
-        .insert-element-controls {
-            @include transition(opacity .2s);
-
-            label {
-                font-weight: normal;
-                margin-right: 0.5em;
-                color: $light-black;
-            }
-
-        }
-
-        .insert-element-btn {
-            margin-left: 1em;
-        }
+  .controls {
+    .template-side-controls,
+    .insert-element-controls {
+      margin-bottom: 1em;
     }
 
-    .ruler {
-        position: relative;
+    .insert-element-controls {
+      @include transition(opacity 0.2s);
+
+      label {
+        font-weight: normal;
+        margin-right: 0.5em;
+        color: $light-black;
+      }
     }
 
-    .ruler#horizontal-ruler {
-        top: -16px;
-        left: 16px;
+    .insert-element-btn {
+      margin-left: 1em;
+    }
+  }
+
+  .ruler {
+    position: relative;
+  }
+
+  .ruler#horizontal-ruler {
+    top: -16px;
+    left: 16px;
+  }
+
+  .ruler#vertical-ruler {
+    width: 10px;
+    left: -6px;
+  }
+
+  .ruler .marking {
+    box-sizing: border-box;
+    position: absolute;
+    border: 1px solid #aaa;
+    color: #aaa;
+    background: #eee;
+    vertical-align: middle;
+    font-size: 0.7em;
+  }
+
+  .ruler#vertical-ruler .marking {
+    border-width: 1px 0 0 0;
+    text-align: center;
+    width: 15px;
+  }
+
+  .ruler#horizontal-ruler .marking {
+    border-width: 0 0 0 1px;
+    padding-left: 5px;
+    line-height: 15px;
+    height: 15px;
+  }
+
+  .designer-item {
+    border: 1px dashed $dark-blue;
+
+    &.selected {
+      background-color: $pastel-blue;
+
+      &[data-type='fixed'] {
+        background-color: lighten($pastel-red, 20%);
+      }
     }
 
-    .ruler#vertical-ruler {
-        width: 10px;
-        left: -6px;
+    &[data-type='fixed'] {
+      border-color: $dark-orange;
     }
+  }
 
-    .ruler .marking {
-        box-sizing: border-box;
+  .template-container {
+    border: 1px solid $gray;
+    user-select: none;
+    width: 425px;
+    height: 270px;
+    position: relative;
+    left: 0;
+    top: 0;
+    perspective: 1000px;
+
+    .template-content {
+      width: 100%;
+      height: 100%;
+      position: absolute;
+
+      .template-side {
+        margin: 0;
         position: absolute;
-        border: 1px solid #aaa;
-        color: #aaa;
-        background: #eee;
-        vertical-align: middle;
-        font-size: 0.7em;
-    }
+        width: 100%;
+        height: 100%;
+        transition: transform 1s;
+        transform-style: preserve-3d;
+        -ms-transform-style: none;
+        backface-visibility: hidden;
+        -ms-backface-visibility: hidden;
 
-    .ruler#vertical-ruler .marking {
-        border-width: 1px 0 0 0;
-        text-align: center;
-        width: 15px;
-    }
+        &.back {
+          transform: rotateY(-180deg);
+        }
+      }
 
-    .ruler#horizontal-ruler .marking {
-        border-width: 0 0 0 1px;
-        padding-left: 5px;
-        line-height: 15px;
-        height: 15px;
-    }
-
-    .designer-item {
-        border: 1px dashed $dark-blue;
-
-        &.selected {
-            background-color: $pastel-blue;
-
-            &[data-type='fixed'] {
-                background-color: lighten($pastel-red, 20%);
-            }
+      &.flipped {
+        .front {
+          transform: rotateY(180deg);
         }
 
-        &[data-type='fixed'] {
-            border-color: $dark-orange;
+        .back {
+          transform: rotateY(0deg);
         }
+      }
     }
-
-    .template-container {
-        border: 1px solid $gray;
-        user-select: none;
-        width: 425px;
-        height: 270px;
-        position: relative;
-        left: 0;
-        top: 0;
-        perspective: 1000px;
-
-        .template-content {
-            width: 100%;
-            height: 100%;
-            position: absolute;
-
-            .template-side {
-                margin: 0;
-                position: absolute;
-                width: 100%;
-                height: 100%;
-                transition: transform 1s;
-                transform-style: preserve-3d;
-                -ms-transform-style: none;
-                backface-visibility: hidden;
-                -ms-backface-visibility: hidden;
-
-                &.back {
-                    transform: rotateY(-180deg);
-                }
-            }
-
-            &.flipped {
-                .front {
-                    transform: rotateY(180deg);
-                }
-
-                .back {
-                    transform: rotateY(0deg);
-                }
-            }
-        }
-    }
+  }
 }
 
 .disappear {
-    visibility: hidden;
+  visibility: hidden;
 }
 
 #badge-settings-form .form-group-footer {
-    margin-top: 10px;
+  margin-top: 10px;
 }
 
 .margin-editor .form-group {
-    max-width: 120px;
+  max-width: 120px;
 
-    .form-label {
-        width: inherit;
-    }
+  .form-label {
+    width: inherit;
+  }
 
-    .form-field input {
-        max-width: 90px;
-    }
+  .form-field input {
+    max-width: 90px;
+  }
 }
 
 .margin-editor .margins-between .form-group {
-    .form-label {
-        width: 200px;
-    }
+  .form-label {
+    width: 200px;
+  }
 
-    &#form-group-margin_columns .form-label {
-        color: $red;
-    }
+  &#form-group-margin_columns .form-label {
+    color: $red;
+  }
 
-    &#form-group-margin_rows .form-label {
-        color: $dark-blue;
-    }
+  &#form-group-margin_rows .form-label {
+    color: $dark-blue;
+  }
 }
 
 .designer-template-type-icon {
-    font-size: 1.2em;
-    color: $dark-gray;
+  font-size: 1.2em;
+  color: $dark-gray;
 
-    &.template-icon-poster {
-        @include icon-before('icon-file-image');
-        color: $dark-orange;
-    }
+  &.template-icon-poster {
+    @include icon-before('icon-file-image');
+    color: $dark-orange;
+  }
 
-    &.template-icon-badge {
-        @include icon-before('icon-id-badge');
-        color: $blue;
-    }
+  &.template-icon-badge {
+    @include icon-before('icon-id-badge');
+    color: $blue;
+  }
 }
 
 .custom-template-list {
-    margin-top: 20px;
+  margin-top: 20px;
 }
 
 .designer-tools {
-    min-height: 120px;
+  min-height: 120px;
 
-    .designer-tools-row {
-        display: flex;
-        flex-wrap: wrap;
-        background-color: $light-gray;
-        color: $light-black;
+  .designer-tools-row {
+    display: flex;
+    flex-wrap: wrap;
+    background-color: $light-gray;
+    color: $light-black;
 
-        &:not(:first-child) {
-            @include transition(opacity .2s);
-            border-top: 1px dashed $pastel-gray;
-        }
+    &:not(:first-child) {
+      @include transition(opacity 0.2s);
+      border-top: 1px dashed $pastel-gray;
+    }
+  }
+
+  input[type='text'],
+  input[type='number'] {
+    @extend %text-input;
+  }
+
+  input[type='number'] {
+    width: 5em;
+  }
+
+  input[type='file'] {
+    display: none;
+  }
+
+  label {
+    font-weight: normal;
+  }
+
+  .tool {
+    display: flex;
+    align-items: center;
+    margin: 1em 0;
+    min-height: 37px;
+
+    &:not(:first-child) {
+      padding-left: 1em;
+      border-left: 1px solid $gray;
     }
 
-    input[type=text],
-    input[type=number] {
-        @extend %text-input;
+    &:first-child {
+      margin-left: 1em;
     }
 
-    input[type=number] {
-        width: 5em;
+    &:not(:last-child) {
+      padding-right: 1em;
     }
 
-    input[type=file] {
-        display: none;
+    &:last-child {
+      margin-right: 1em;
+    }
+
+    i {
+      margin-right: 0.5em;
+      font-size: 1.5em;
+      color: $gray;
     }
 
     label {
-        font-weight: normal;
+      margin-right: 0.3em;
     }
 
-    .tool {
-        display: flex;
-        align-items: center;
-        margin: 1em 0;
-        min-height: 37px;
-
-        &:not(:first-child) {
-            padding-left: 1em;
-            border-left: 1px solid $gray;
-        }
-
-        &:first-child {
-            margin-left: 1em;
-        }
-
-        &:not(:last-child) {
-            padding-right: 1em;
-        }
-
-        &:last-child {
-            margin-right: 1em;
-        }
-
-        i {
-            margin-right: 0.5em;
-            font-size: 1.5em;
-            color: $gray;
-        }
-
-        label {
-            margin-right: 0.3em;
-        }
-
-        .scale {
-            margin-left: 0.2em;
-            color: $dark-gray;
-        }
-
-        .background-label {
-            max-width: 10em;
-        }
-
-        &.font-tools .subtool {
-            margin-right: 0.5em;
-        }
-
-        .selection-text {
-            margin-right: 1em;
-            font-weight: bold;
-        }
+    .scale {
+      margin-left: 0.2em;
+      color: $dark-gray;
     }
 
-    .subtool {
-        display: flex;
-        align-items: center;
-
-        &:not(:last-child) {
-            margin-right: 1em;
-        }
-
-        &.background-position {
-            flex-direction: column;
-            align-items: flex-start;
-        }
+    .background-label {
+      max-width: 10em;
     }
 
-    .backside-tools,
-    .element-tools {
-        display: flex;
+    &.font-tools .subtool {
+      margin-right: 0.5em;
     }
+
+    .selection-text {
+      margin-right: 1em;
+      font-weight: bold;
+    }
+  }
+
+  .subtool {
+    display: flex;
+    align-items: center;
+
+    &:not(:last-child) {
+      margin-right: 1em;
+    }
+
+    &.background-position {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+  }
+
+  .backside-tools,
+  .element-tools {
+    display: flex;
+  }
 }
 
 .backside-placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: $light-gray;
+  width: 100%;
+  height: 100%;
+
+  .placeholder-content {
+    padding: 40px;
     display: flex;
-    align-items: center;
-    justify-content: center;
-    background-color: $light-gray;
-    width: 100%;
-    height: 100%;
+    flex-direction: column;
+    text-align: center;
 
-    .placeholder-content {
-        padding: 40px;
-        display: flex;
-        flex-direction: column;
-        text-align: center;
+    > div {
+      color: $gray;
 
-        > div {
-            color: $gray;
-
-            &:first-child {
-                font-size: 2em;
-            }
-        }
+      &:first-child {
+        font-size: 2em;
+      }
     }
+  }
 }
 
 .to-be-removed {
-    position: absolute;
-    z-index: 1000;
-    opacity: 0.9;
+  position: absolute;
+  z-index: 1000;
+  opacity: 0.9;
 }
 
 .backside-template-title {
-    font-weight: bold;
-    margin-left: 0.5em;
-    margin-right: 1em;
+  font-weight: bold;
+  margin-left: 0.5em;
+  margin-right: 1em;
 }
 
 .badge-backside-list {
-    li {
-        padding: 0 !important;
+  li {
+    padding: 0 !important;
 
-        a {
-            display: flex;
-            align-items: center;
-            padding: 10px;
-        }
-
-        .template-icon-badge {
-            margin-right: 1em;
-        }
-
-        &.not-selectable-backside {
-            background-color: $light-gray;
-
-            * {
-                cursor: not-allowed;
-                color: $dark-gray;
-            }
-        }
+    a {
+      display: flex;
+      align-items: center;
+      padding: 10px;
     }
+
+    .template-icon-badge {
+      margin-right: 1em;
+    }
+
+    &.not-selectable-backside {
+      background-color: $light-gray;
+
+      * {
+        cursor: not-allowed;
+        color: $dark-gray;
+      }
+    }
+  }
 }
 
 .template-side.back:not(.empty) {
-    pointer-events: none;
+  pointer-events: none;
 }
 
 .toggle-default {
-    opacity: 0.3;
+  opacity: 0.3;
 
-    &.default-on-category {
-        opacity: 1;
+  &.default-on-category {
+    opacity: 1;
+    color: $blue;
+
+    &.inherited {
+      opacity: 0.6;
+      cursor: default;
+
+      &:hover {
         color: $blue;
-
-        &.inherited {
-            opacity: 0.6;
-            cursor: default;
-
-            &:hover {
-                color: $blue;
-            }
-        }
-
-        &.global-default {
-            cursor: default;
-
-            &:hover {
-                color: $blue;
-            }
-        }
+      }
     }
+
+    &.global-default {
+      cursor: default;
+
+      &:hover {
+        color: $blue;
+      }
+    }
+  }
 }
 
-.not-deletable, .not-clonable {
-    opacity: 0.2;
-    cursor: default;
+.not-deletable,
+.not-clonable {
+  opacity: 0.2;
+  cursor: default;
 }

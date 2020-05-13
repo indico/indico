@@ -6,87 +6,90 @@
 // LICENSE file for more details.
 
 /* ************* */
+
 /* Ordered Lists */
+
 /* ************* */
 .ordered-list {
-    margin:0;
-    padding:0;
-    display: inline-block;
-    min-width: 450px;
+  margin: 0;
+  padding: 0;
+  display: inline-block;
+  min-width: 450px;
 }
 
 .ordered-list > li {
-    border-bottom: 1px solid #DDDDDD;
-    padding: 5px 0;
-    list-style-type: none;
+  border-bottom: 1px solid #ddd;
+  padding: 5px 0;
+  list-style-type: none;
 }
 .ordered-list > li > .list-item-title {
-    font-size:14px;
-    font-weight:bold;
-    color: #666;
-    padding-bottom: 5px;
+  font-size: 14px;
+  font-weight: bold;
+  color: #666;
+  padding-bottom: 5px;
 }
 .ordered-list > li > .list-item-content {
-    color: #888;
-    padding-top: 2px;
+  color: #888;
+  padding-top: 2px;
 }
 .ordered-list > li > .list-item-content > .list-item-content-title {
-    font-weight:bold;
-    padding-right: 5px;
+  font-weight: bold;
+  padding-right: 5px;
 }
 .ordered-list > li > .list-item-content > .list-item-content-data {
-    float:right;
+  float: right;
 }
 
 dl.i-data-list {
-    @extend %font-family-form;
-    max-width: 800px;
-    color: $light-black;
-    margin-top: 1em;
-    line-height: 1.5;
+  @extend %font-family-form;
+  max-width: 800px;
+  color: $light-black;
+  margin-top: 1em;
+  line-height: 1.5;
 
-    dt, dd {
-        box-sizing: border-box;
-        display: inline-block;
-        margin: 0 0 0.7em 0;
-        padding: 0.3em 1em 0.3em 1em;
+  dt,
+  dd {
+    box-sizing: border-box;
+    display: inline-block;
+    margin: 0 0 0.7em 0;
+    padding: 0.3em 1em 0.3em 1em;
 
-        &:last-of-type {
-            margin-bottom: 0px;
-        }
+    &:last-of-type {
+      margin-bottom: 0;
     }
+  }
 
-    dt {
-        font-weight: bold;
-        text-align: right;
-        width: 20%;
-    }
+  dt {
+    font-weight: bold;
+    text-align: right;
+    width: 20%;
+  }
 
-    dd {
-        width: 79%;
-        vertical-align: top;
-    }
+  dd {
+    width: 79%;
+    vertical-align: top;
+  }
 
-    &.dt-select-disabled dt {
-        user-select: none;
-    }
+  &.dt-select-disabled dt {
+    user-select: none;
+  }
 }
 
 .file-list {
-    list-style: none;
-    margin: 0;
-    padding: 0;
-    font-size: 1.1em;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  font-size: 1.1em;
 
-    li {
-        line-height: 2em;
+  li {
+    line-height: 2em;
 
-        a {
-            color: $light-black;
+    a {
+      color: $light-black;
 
-            &:hover {
-                color: $black;
-            }
-        }
+      &:hover {
+        color: $black;
+      }
     }
+  }
 }

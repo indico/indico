@@ -9,45 +9,45 @@
 @import 'rb:styles/responsive';
 
 .room-stats {
-    display: flex;
-    justify-content: space-around;
-    color: $gray;
-    @media (min-width: $tablet-width) {
-        padding: 0 3em;
+  display: flex;
+  justify-content: space-around;
+  color: $gray;
+  @media (min-width: $tablet-width) {
+    padding: 0 3em;
+  }
+
+  .stats-box {
+    text-transform: uppercase;
+    background-color: $light-gray;
+    width: 100%;
+
+    .title {
+      font-weight: bold;
+      padding: 0.5em 1em;
+      background-color: lighten($dark-highlight-color, 45%);
     }
 
-    .stats-box {
-        text-transform: uppercase;
-        background-color: $light-gray;
-        width: 100%;
+    .value-box {
+      padding: 0.5em 1em;
 
-        .title {
-            font-weight: bold;
-            padding: 0.5em 1em;
-            background-color: lighten($dark-highlight-color, 45%);
-        }
+      .days {
+        font-size: 0.8em;
+      }
 
-        .value-box {
-            padding: 0.5em 1em;
-
-            .days {
-                font-size: 0.8em;
-            }
-
-            .value {
-                font-size: 1.25em;
-                font-weight: bold;
-            }
-        }
-
-        .note {
-            text-transform: none;
-            padding: 0 1em;
-            font-size: 0.85em;
-        }
+      .value {
+        font-size: 1.25em;
+        font-weight: bold;
+      }
     }
+
+    .note {
+      text-transform: none;
+      padding: 0 1em;
+      font-size: 0.85em;
+    }
+  }
 }
 
 .placeholder {
-    margin: 0 3em;
+  margin: 0 3em;
 }

@@ -6,251 +6,268 @@
 // LICENSE file for more details.
 
 %font-family-body {
-    font-family: "Liberation Sans", sans-serif;
+  font-family: 'Liberation Sans', sans-serif;
 }
 
 %font-family-modern-body {
-    font-family: "Roboto", sans-serif;
+  font-family: 'Roboto', sans-serif;
 }
 
 %font-family-sui {
-    font-family: "Muli", "Helvetica Neue", Arial, Helvetica, sans-serif;
+  font-family: 'Muli', 'Helvetica Neue', Arial, Helvetica, sans-serif;
 }
 
 %font-family-title {
-    font-family: "Roboto", sans-serif;
+  font-family: 'Roboto', sans-serif;
 }
 
 %font-family-title-light {
-    font-family: "Roboto Light", sans-serif;
+  font-family: 'Roboto Light', sans-serif;
 }
 
 %font-family-description {
-    font-family: "Liberation Serif", serif;
+  font-family: 'Liberation Serif', serif;
 }
 
 %font-family-monospace {
-    font-family: "Liberation Mono", monospace;
+  font-family: 'Liberation Mono', monospace;
 }
 
 %font-family-serif {
-    font-family: "Liberation Serif", serif;
+  font-family: 'Liberation Serif', serif;
 }
 
 %font-family-sans {
-    font-family: "Roboto", "Helvetica", sans;
+  font-family: 'Roboto', 'Helvetica', sans;
 }
 
 %font-family-form {
-    font-family: "Liberation Sans", sans-serif;
+  font-family: 'Liberation Sans', sans-serif;
 }
 
 %font-family-logo {
-  font-family: "Maven Pro";
+  font-family: 'Maven Pro';
 }
 
 %font-size-body {
-    font-size: 13px;
+  font-size: 13px;
 }
 
 @mixin ellipsis($no-wrap: true) {
-    @if ($no-wrap) {
-        white-space: nowrap;
-    }
-    overflow: hidden;
-    text-overflow: ellipsis;
+  @if ($no-wrap) {
+    white-space: nowrap;
+  }
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 html,
 body {
-    height: 100%;
+  height: 100%;
 }
 
 body {
-    background: #fff;
-    padding: 0px;
-    margin: 0px;
-    @extend %font-family-body;
-    @extend %font-size-body;
+  background: #fff;
+  padding: 0;
+  margin: 0;
+  @extend %font-family-body;
+  @extend %font-size-body;
 }
 
 .ui {
-    @extend %font-family-sui;
+  @extend %font-family-sui;
 }
 
-h1, h2, h3, h4, h5, h6, td, dl, ol, blockquote {
-    color: $black;
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+td,
+dl,
+ol,
+blockquote {
+  color: $black;
 }
 
 h1 {
-    @extend %font-family-title;
-    font-size: 1.7em;
+  @extend %font-family-title;
+  font-size: 1.7em;
 }
 
 h1.category-title {
-    font-size: 2em;
+  font-size: 2em;
 }
 
-h2, h3, h4 {
-    @extend %font-family-title-light;
+h2,
+h3,
+h4 {
+  @extend %font-family-title-light;
 }
 
 h2 {
-    font-size: 1.6em;
+  font-size: 1.6em;
 }
 
 h3 {
-    font-size: 1.2em;
+  font-size: 1.2em;
 }
 
-sup, sub {
-    vertical-align: baseline;
-    position: relative;
-    top: -0.4em;
+sup,
+sub {
+  vertical-align: baseline;
+  position: relative;
+  top: -0.4em;
 }
 
 sub {
-    top: 0.4em;
+  top: 0.4em;
 }
 
 pre {
-   white-space: pre-wrap;       /* css-3 */
-   white-space: -moz-pre-wrap;  /* Mozilla, since 1999 */
-   white-space: -o-pre-wrap;    /* Opera 7 */
-   word-wrap: break-word;       /* Internet Explorer 5.5+ */
-   margin: 0px;
+  white-space: pre-wrap; /* css-3 */
+  white-space: -moz-pre-wrap; /* Mozilla, since 1999 */
+  white-space: -o-pre-wrap; /* Opera 7 */
+  word-wrap: break-word; /* Internet Explorer 5.5+ */
+  margin: 0;
 }
 
 /* Elements */
 
 .page-title {
-    margin-top: 0;
-    font-size: 2em;
-    font-weight: normal;
-    color: $dark-orange;
+  margin-top: 0;
+  font-size: 2em;
+  font-weight: normal;
+  color: $dark-orange;
 }
 
 .group-title {
-    border-bottom: 2px solid #eaeaea;
-    display: block;
-    font-size: 2em;
-    font-weight: normal;
+  border-bottom: 2px solid #eaeaea;
+  display: block;
+  font-size: 2em;
+  font-weight: normal;
 
-    & > i {
-        font-size: 1.2em;
-        padding-right: 0.2em;
-        vertical-align: middle;
-    }
+  & > i {
+    font-size: 1.2em;
+    padding-right: 0.2em;
+    vertical-align: middle;
+  }
 }
 
-.groupTitle, .groupTitleNoBorder, .groupSubTitle {
-   display: block;
-   width: 100%;
-   font-family: "Helvetica Neue", Helvetica, Verdana, Arial, Sans-serif;
-   font-size: 24px;
-   font-weight: normal;
-   color: #4a4a4a;
-   padding: 3px 3px 5px 3px;
-   border-bottom: 1px solid #AAA;
-   margin-bottom: 1em;
+.groupTitle,
+.groupTitleNoBorder,
+.groupSubTitle {
+  display: block;
+  width: 100%;
+  font-family: 'Helvetica Neue', Helvetica, Verdana, Arial, sans-serif;
+  font-size: 24px;
+  font-weight: normal;
+  color: #4a4a4a;
+  padding: 3px 3px 5px 3px;
+  border-bottom: 1px solid #aaa;
+  margin-bottom: 1em;
 }
 
-td.groupTitle, td.groupTitleNoBorder, td.groupSubTitle {
+td.groupTitle,
+td.groupTitleNoBorder,
+td.groupSubTitle {
   display: table-cell;
 }
 
-.groupTitle > [class*="icon-"],
-.groupTitleNoBorder > [class*="icon-"] {
-    color: #CCC;
-    font-size: 1.2em;
-    vertical-align: middle;
+.groupTitle > [class*='icon-'],
+.groupTitleNoBorder > [class*='icon-'] {
+  color: #ccc;
+  font-size: 1.2em;
+  vertical-align: middle;
 }
 
 .reviewingsubtitle {
-   font-family: "Times New Roman", Verdana, Arial;
-   font-size: 15pt;
-   color: #4E4C46;
-   letter-spacing: 1px;
-   padding: 3px;
-   margin: 10px 0;
+  font-family: 'Times New Roman', Verdana, Arial;
+  font-size: 15pt;
+  color: #4e4c46;
+  letter-spacing: 1px;
+  padding: 3px;
+  margin: 10px 0;
 }
 
 .groupTitleNoBorder {
-   border-bottom: none;
+  border-bottom: none;
 }
 
 .quotation {
-    margin: 10px;
-    padding-left: 10px;
-    color: #777;
-    border-left: 4px solid #ddd;
+  margin: 10px;
+  padding-left: 10px;
+  color: #777;
+  border-left: 4px solid #ddd;
 }
 
 /* Quick rules */
 
 .nohtml {
-    white-space: pre-line;
+  white-space: pre-line;
 }
 
 .overflow {
-    overflow: auto;
+  overflow: auto;
 }
 
 .bold {
-    font-weight: bold;
+  font-weight: bold;
 }
 
 .italic {
-    font-style: italic;
+  font-style: italic;
 }
 
 .text-right {
-    text-align: right;
+  text-align: right;
 }
 
 .text-important {
-    color: #111;
+  color: #111;
 }
 
 .text-normal {
-    color: #444;
+  color: #444;
 }
 
 .text-error {
-    color: $red;
+  color: $red;
 }
 
 .text-not-important {
-    color: #777;
+  color: #777;
 }
 
 .text-superfluous {
-    color: #BBB;
+  color: #bbb;
 }
 
 .text-paper {
-    @extend %font-family-serif;
-    text-align: justify;
-    text-indent: 2em;
+  @extend %font-family-serif;
+  text-align: justify;
+  text-indent: 2em;
 
-    h3 {
-        color: inherit;
-        font-family: inherit;
-        font-size: 1.1em;
-        font-weight: inherit;
-        margin: 0 0 1.2em 0;
-        text-align: center;
-        text-indent: 0;
-        text-transform: uppercase;
-    }
+  h3 {
+    color: inherit;
+    font-family: inherit;
+    font-size: 1.1em;
+    font-weight: inherit;
+    margin: 0 0 1.2em 0;
+    text-align: center;
+    text-indent: 0;
+    text-transform: uppercase;
+  }
 }
 
 a.small-link {
-    color: $light-black;
-    font-size: 11px;
+  color: $light-black;
+  font-size: 11px;
 }
 
-.mono, code {
+.mono,
+code {
   @extend %font-family-monospace;
 }
 
@@ -261,17 +278,17 @@ textarea.log {
 }
 
 .preformatted {
-    white-space: pre-wrap;
+  white-space: pre-wrap;
 }
 
 .pre-line {
-    white-space: pre-line;
+  white-space: pre-line;
 }
 
 .underline {
-    text-decoration: underline;
+  text-decoration: underline;
 }
 
 .ellipsis {
-    @include ellipsis;
+  @include ellipsis;
 }

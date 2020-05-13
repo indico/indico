@@ -8,36 +8,36 @@
 @import 'partials/qtips';
 
 .qtip-default.qbubble {
-    @extend %qtip-light;
-    @extend %default-border-radius;
-    @include single-box-shadow();
-    @include border-all();
-    color: $light-black;
+  @extend %qtip-light;
+  @extend %default-border-radius;
+  @include single-box-shadow();
+  @include border-all();
+  color: $light-black;
 
-    .qtip-content {
-        padding: 5px;
-        text-align: left;
+  .qtip-content {
+    padding: 5px;
+    text-align: left;
+  }
+
+  .action-row {
+    @include transition(background);
+    cursor: pointer;
+    display: block;
+    margin: 0 -5px;
+    padding: 5px 10px;
+
+    &:hover {
+      color: $black;
+      background-color: $light-gray;
     }
+  }
 
-    .action-row {
-        @include transition(background);
-        cursor: pointer;
-        display: block;
-        margin: 0 -5px;
-        padding: 5px 10px;
+  .titled-rule {
+    margin-bottom: 5px;
+    margin-top: 5px;
+  }
 
-        &:hover {
-            color: $black;
-            background-color: $light-gray;
-        }
-    }
-
-    .titled-rule {
-        margin-bottom: 5px;
-        margin-top: 5px;
-    }
-
-    &.no-max-width {
-        max-width: none;
-    }
+  &.no-max-width {
+    max-width: none;
+  }
 }

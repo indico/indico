@@ -6,242 +6,242 @@
 // LICENSE file for more details.
 
 @mixin role-code() {
-    @include border-all();
-    @extend %default-border-radius;
-    padding: 0.3em 0.1em;
-    font-size: 0.8em;
-    font-weight: bold;
+  @include border-all();
+  @extend %default-border-radius;
+  padding: 0.3em 0.1em;
+  font-size: 0.8em;
+  font-weight: bold;
 }
 
 @mixin permission-label($color) {
-    color: $light-gray;
-    background-color: $color;
-    border-color: darken($color, 5%);
+  color: $light-gray;
+  background-color: $color;
+  border-color: darken($color, 5%);
 }
 
 .permissions-widget {
-    padding-bottom: 2em;
+  padding-bottom: 2em;
 
-    .permissions-widget-list {
-        @include border-left($width: 3px);
-        padding-left: 1em;
+  .permissions-widget-list {
+    @include border-left($width: 3px);
+    padding-left: 1em;
 
-        & > li {
-            padding: 0.25em 0;
+    & > li {
+      padding: 0.25em 0;
 
-            &.disabled {
-                opacity: 0.5;
-            }
-        }
-
-        ul {
-            padding: 0;
-            list-style-type: none;
-        }
-
-        .label-box {
-            width: 30%;
-            margin-right: 1em;
-
-            .entry-icon,
-            .role-code {
-                flex-shrink: 0;
-                text-align: center;
-                width: 35px;
-            }
-
-            .entry-icon {
-                margin-right: 0.75em;
-            }
-
-            .entry-icon::before {
-                color: $light-black;
-                font-size: 1.3em;
-            }
-
-            .entry-icon.icon-mail::before {
-                vertical-align: middle;
-            }
-
-            .role-code {
-                @include role-code();
-                margin-right: 0.9em;
-            }
-        }
-
-        .entry-label {
-            @include ellipsis($no-wrap: false);
-            white-space: nowrap;
-        }
-
-        .entry-label-extra {
-            font-size: 0.8em;
-        }
-
-        .permissions-box {
-            @include border-all($style: dashed);
-            @include transition(background-color 0.25s);
-            cursor: initial;
-            padding: 0.3em 0.5em;
-            width: 100%;
-
-            &:hover {
-                background-color: $light-gray;
-            }
-
-            ul {
-                li {
-                    font-size: 0.8em;
-                    margin: 0.4em 0.5em;
-                    padding: 0.6em 1em;
-                    text-transform: uppercase;
-
-                    &.disabled {
-                        opacity: 0.5;
-                    }
-
-                    // Permission label palette
-                    &.permission-event-submit {
-                        @include permission-label($yellow);
-                    }
-
-                    &.permission-event-paper_manager {
-                        @include permission-label($purple);
-                    }
-
-                    &.permission-event-registration {
-                        @include permission-label($blue);
-                    }
-
-                    &.permission-event-surveys {
-                        @include permission-label($bright-orange);
-                    }
-
-                    &.permission-contribution-submit {
-                        @include permission-label($yellow);
-                    }
-
-                    &.permission-session-coordinate {
-                        @include permission-label($blue);
-                    }
-                }
-            }
-
-            .group {
-                margin-left: auto;
-
-                & > button {
-                    margin: 0;
-                    padding: 0.2em 0.7em;
-                }
-            }
-        }
+      &.disabled {
+        opacity: 0.5;
+      }
     }
 
-    .add-entry-decoration {
-        border-color: $pastel-gray !important;
+    ul {
+      padding: 0;
+      list-style-type: none;
     }
 
-    .i-dropdown {
-        .separator {
-            @include border-bottom();
-            height: 0;
-            margin: 0.3em 1em 0;
-        }
+    .label-box {
+      width: 30%;
+      margin-right: 1em;
 
-        .entry-item {
-            height: auto;
+      .entry-icon,
+      .role-code {
+        flex-shrink: 0;
+        text-align: center;
+        width: 35px;
+      }
 
-            .dropdown-icon {
-                display: inline-block;
-                font-size: 1.2em;
-                margin-right: 0.75em;
-                line-height: normal;
-                text-align: center;
-                vertical-align: middle;
-                width: 35px;
+      .entry-icon {
+        margin-right: 0.75em;
+      }
 
-                &.role-code {
-                    @include role-code();
-                }
-            }
+      .entry-icon::before {
+        color: $light-black;
+        font-size: 1.3em;
+      }
 
-            &.new-role-btn {
-                .dropdown-icon {
-                    margin-right: 0.25em;
-                }
-            }
-        }
+      .entry-icon.icon-mail::before {
+        vertical-align: middle;
+      }
+
+      .role-code {
+        @include role-code();
+        margin-right: 0.9em;
+      }
     }
 
+    .entry-label {
+      @include ellipsis($no-wrap: false);
+      white-space: nowrap;
+    }
+
+    .entry-label-extra {
+      font-size: 0.8em;
+    }
+
+    .permissions-box {
+      @include border-all($style: dashed);
+      @include transition(background-color 0.25s);
+      cursor: initial;
+      padding: 0.3em 0.5em;
+      width: 100%;
+
+      &:hover {
+        background-color: $light-gray;
+      }
+
+      ul {
+        li {
+          font-size: 0.8em;
+          margin: 0.4em 0.5em;
+          padding: 0.6em 1em;
+          text-transform: uppercase;
+
+          &.disabled {
+            opacity: 0.5;
+          }
+
+          // Permission label palette
+          &.permission-event-submit {
+            @include permission-label($yellow);
+          }
+
+          &.permission-event-paper_manager {
+            @include permission-label($purple);
+          }
+
+          &.permission-event-registration {
+            @include permission-label($blue);
+          }
+
+          &.permission-event-surveys {
+            @include permission-label($bright-orange);
+          }
+
+          &.permission-contribution-submit {
+            @include permission-label($yellow);
+          }
+
+          &.permission-session-coordinate {
+            @include permission-label($blue);
+          }
+        }
+      }
+
+      .group {
+        margin-left: auto;
+
+        & > button {
+          margin: 0;
+          padding: 0.2em 0.7em;
+        }
+      }
+    }
+  }
+
+  .add-entry-decoration {
+    border-color: $pastel-gray !important;
+  }
+
+  .i-dropdown {
+    .separator {
+      @include border-bottom();
+      height: 0;
+      margin: 0.3em 1em 0;
+    }
+
+    .entry-item {
+      height: auto;
+
+      .dropdown-icon {
+        display: inline-block;
+        font-size: 1.2em;
+        margin-right: 0.75em;
+        line-height: normal;
+        text-align: center;
+        vertical-align: middle;
+        width: 35px;
+
+        &.role-code {
+          @include role-code();
+        }
+      }
+
+      &.new-role-btn {
+        .dropdown-icon {
+          margin-right: 0.25em;
+        }
+      }
+    }
+  }
 }
 
 .protection-dialog-permissions {
-    margin-left: 2.5em;
+  margin-left: 2.5em;
 }
 
 @mixin circle-checkbox-checked() {
-    background-color: $pastel-blue;
-    border: 2px solid $darker-blue;
+  background-color: $pastel-blue;
+  border: 2px solid $darker-blue;
 }
 
 .permissions-dialog {
-    .permissions {
-        list-style-type: none;
-        padding: 0.25em 1em;
+  .permissions {
+    list-style-type: none;
+    padding: 0.25em 1em;
 
-        label {
-            color: $light-black;
-            cursor: pointer;
-            font-family: 'Roboto', sans-serif;
-            font-size: 14px;
-            font-weight: normal;
-        }
-
-        .item {
-            padding: 0.25em 1em;
-        }
-
-        .permissions > .item {
-            @include border-left(lighten($pastel-gray, 7%), $width: 2px);
-        }
-
-        .circle-checkbox {
-            display: none;
-
-            & + label::before {
-                @include border-all($gray, $width: 2px);
-                border-radius: 3em;
-                content: '';
-                display: inline-block;
-                margin-right: 0.25em;
-                vertical-align: middle;
-                height: 23px;
-                width: 23px;
-            }
-
-            &:hover:not(:checked) + label::before {
-                background-color: $light-blue;
-            }
-
-            &:checked + label::before {
-                @include circle-checkbox-checked();
-            }
-
-            &:hover:checked:not(:disabled) + label::before {
-                background-color: $light-blue;
-                border-color: $dark-blue;
-            }
-
-            &:checked ~ ul {
-                label {
-                    opacity: 0.5;
-                }
-
-                label::before, .circle-checkbox:hover + label::before {
-                    @include circle-checkbox-checked();
-                }
-            }
-        }
+    label {
+      color: $light-black;
+      cursor: pointer;
+      font-family: 'Roboto', sans-serif;
+      font-size: 14px;
+      font-weight: normal;
     }
+
+    .item {
+      padding: 0.25em 1em;
+    }
+
+    .permissions > .item {
+      @include border-left(lighten($pastel-gray, 7%), $width: 2px);
+    }
+
+    .circle-checkbox {
+      display: none;
+
+      & + label::before {
+        @include border-all($gray, $width: 2px);
+        border-radius: 3em;
+        content: '';
+        display: inline-block;
+        margin-right: 0.25em;
+        vertical-align: middle;
+        height: 23px;
+        width: 23px;
+      }
+
+      &:hover:not(:checked) + label::before {
+        background-color: $light-blue;
+      }
+
+      &:checked + label::before {
+        @include circle-checkbox-checked();
+      }
+
+      &:hover:checked:not(:disabled) + label::before {
+        background-color: $light-blue;
+        border-color: $dark-blue;
+      }
+
+      &:checked ~ ul {
+        label {
+          opacity: 0.5;
+        }
+
+        label::before,
+        .circle-checkbox:hover + label::before {
+          @include circle-checkbox-checked();
+        }
+      }
+    }
+  }
 }

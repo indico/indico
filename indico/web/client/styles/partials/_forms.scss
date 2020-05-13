@@ -10,322 +10,327 @@ $i-form-line-height: 1.5;
 $i-form-button-line-height: 1.8;
 
 %form-field-block {
-    padding-left: 1em;
-    padding-right: 1em;
-    margin-bottom: 0.7em;
+  padding-left: 1em;
+  padding-right: 1em;
+  margin-bottom: 0.7em;
 }
 
 %form-field-input {
-    line-height: $i-form-line-height;
-    padding: 0.5em 1em;
-    vertical-align: top;
-    height: $i-form-height;
+  line-height: $i-form-line-height;
+  padding: 0.5em 1em;
+  vertical-align: top;
+  height: $i-form-height;
 }
 
 %form-field-button {
-    height: $i-form-height;
+  height: $i-form-height;
 }
 
 form {
-    margin: 0;
+  margin: 0;
 }
 
 .i-form-field-fixed-width {
-    width: 400px;
+  width: 400px;
 }
 
 .i-form {
-    @extend %font-family-form;
-    box-sizing: border-box;
-    max-width: 800px;
-    display: block;
+  @extend %font-family-form;
+  box-sizing: border-box;
+  max-width: 800px;
+  display: block;
+  font-size: 1em;
+  color: $light-black;
+  margin-top: 1em;
+
+  *,
+  *::before,
+  *::after {
+    box-sizing: inherit;
+  }
+
+  &.management-area {
+    box-shadow: 0 2px 1px -1px $pastel-gray;
+    padding-top: 1em;
+    border: 1px solid $pastel-gray;
+    background-color: $light-gray;
+  }
+
+  &.horizontal,
+  .form-group.horizontal {
+    .form-label {
+      float: left;
+      text-align: right;
+      width: 20%;
+    }
+
+    .form-field {
+      float: left;
+      width: 80%;
+    }
+  }
+
+  &.vertical,
+  .form-group.vertical {
+    .form-label {
+      float: none;
+      height: 1em;
+      margin-bottom: -1em;
+      text-align: left;
+    }
+
+    .form-label-empty {
+      margin-top: 0;
+    }
+
+    .form-field {
+      width: 100%;
+      margin-top: 0.4em;
+    }
+
+    .form-group-footer .form-label {
+      display: none;
+    }
+  }
+
+  &.no-block-padding {
+    .form-label,
+    .form-field {
+      padding-left: 0;
+    }
+  }
+
+  .typeahead__field {
     font-size: 1em;
-    color: $light-black;
-    margin-top: 1em;
+  }
 
-    *, *:before, *:after {
-        box-sizing: inherit;
-    }
-
-    &.management-area {
-        box-shadow: 0 2px 1px -1px $pastel-gray;
-        padding-top: 1em;
-        border: 1px solid $pastel-gray;
-        background-color: $light-gray;
-    }
-
-    &.horizontal,
-    .form-group.horizontal {
-        .form-label {
-            float: left;
-            text-align: right;
-            width: 20%;
-        }
-
-        .form-field {
-            float: left;
-            width: 80%;
-        }
-    }
-
-    &.vertical,
-    .form-group.vertical {
-        .form-label {
-            float: none;
-            height: 1em;
-            margin-bottom: -1em;
-            text-align: left;
-        }
-
-        .form-label-empty {
-            margin-top: 0;
-        }
-
-        .form-field {
-            width: 100%;
-            margin-top: 0.4em;
-        }
-
-        .form-group-footer .form-label {
-            display: none;
-        }
-    }
-
-    &.no-block-padding {
-        .form-label,
-        .form-field {
-            padding-left: 0;
-        }
-    }
-
-    .typeahead__field {
-        font-size: 1em;
-    }
-
-    &.no-max-width {
-        max-width: none;
-    }
+  &.no-max-width {
+    max-width: none;
+  }
 }
 
 .i-form .form-group {
-    clear: both;
-    display: inline-block;
-    width: 100%;
+  clear: both;
+  display: inline-block;
+  width: 100%;
+
+  .form-field {
+    .form-field-description {
+      font-style: italic;
+      margin-top: 0.25em;
+      margin-bottom: 0.5em;
+      width: 400px;
+    }
+
+    .static-text {
+      display: block;
+      padding: 0.5em 0.5em 0 0;
+      line-height: $i-form-line-height;
+      color: $black;
+      width: 400px;
+
+      .form-field-description {
+        font-style: italic;
+        color: $light-black;
+      }
+    }
+
+    &.fit-to-parent {
+      width: 100%;
+    }
+  }
+
+  &.has-error {
+    .form-label,
+    .form-field-error {
+      color: $red;
+    }
 
     .form-field {
-        .form-field-description {
-            font-style: italic;
-            margin-top: 0.25em;
-            margin-bottom: 0.5em;
-            width: 400px;
-        }
-
-        .static-text {
-            display: block;
-            padding: 0.5em 0.5em 0 0;
-            line-height: $i-form-line-height;
-            color: $black;
-            width: 400px;
-
-            .form-field-description {
-                font-style: italic;
-                color: $light-black;
-            }
-        }
-
-        &.fit-to-parent {
-            width: 100%;
-        }
+      input,
+      select,
+      textarea,
+      .i-table-widget {
+        @extend %input-invalid;
+      }
     }
-
-    &.has-error {
-        .form-label,
-        .form-field-error {
-            color: $red;
-        }
-
-        .form-field {
-            input, select, textarea, .i-table-widget {
-                @extend %input-invalid;
-            }
-        }
-    }
+  }
 }
 
 .i-form .form-group .form-label {
-    @extend %form-field-block;
-    display: inline-block;
-    line-height: $i-form-line-height;
-    margin-top: 0;
-    margin-bottom: 0;
-    min-height: 2.5em;
-    position: relative;
-    word-wrap: break-word;
+  @extend %form-field-block;
+  display: inline-block;
+  line-height: $i-form-line-height;
+  margin-top: 0;
+  margin-bottom: 0;
+  min-height: 2.5em;
+  position: relative;
+  word-wrap: break-word;
 
-    > .required {
-        position: absolute;
-        right: 0.1em;
-        color: #af0000;
-        font-size: 1.4em;
-        top: 0.03em;
+  > .required {
+    position: absolute;
+    right: 0.1em;
+    color: #af0000;
+    font-size: 1.4em;
+    top: 0.03em;
+  }
+
+  &.form-label-empty {
+    height: 1px;
+  }
+
+  &.form-label-middle {
+    padding-top: 0.5em;
+
+    .required {
+      top: 0.4em;
     }
-
-    &.form-label-empty {
-        height: 1px;
-    }
-
-    &.form-label-middle {
-        padding-top: 0.5em;
-
-        .required {
-            top: 0.4em;
-        }
-    }
+  }
 }
 
 .i-form .form-group .form-checkbox-label {
-    bottom: 1px;
-    display: inline-block;
-    margin-left: 0.5em;
-    position: relative;
-    vertical-align: middle;
+  bottom: 1px;
+  display: inline-block;
+  margin-left: 0.5em;
+  position: relative;
+  vertical-align: middle;
 }
 
 .i-form .form-group .form-field {
-    @extend %form-field-block;
+  @extend %form-field-block;
 
-    @include apply-to-text-inputs('.i-form-field-fixed-width');
-    > select,
-    > textarea {
-        @extend .i-form-field-fixed-width;
+  @include apply-to-text-inputs('.i-form-field-fixed-width');
+  > select,
+  > textarea {
+    @extend .i-form-field-fixed-width;
+  }
+
+  @include apply-to-inputs('%form-field-input');
+  .selectize-control input[type='text'] {
+    height: auto;
+  }
+  textarea {
+    @extend %form-field-input;
+    height: auto;
+  }
+  select {
+    @extend %form-field-input;
+    padding-left: 0.7em;
+
+    &[multiple] {
+      height: auto;
     }
+  }
 
-    @include apply-to-inputs('%form-field-input');
-    .selectize-control input[type=text] {
-        height: auto;
+  input[type='number'] {
+    min-width: 80px;
+  }
+
+  input[type='number'],
+  input[type='time'] {
+    padding-right: 0 !important;
+
+    &::-webkit-inner-spin-button {
+      height: 2.3em;
+      margin-left: 1em;
     }
-    textarea {
-        @extend %form-field-input;
-        height: auto;
+  }
+
+  button,
+  input[type='button'],
+  input[type='submit'] {
+    @extend %form-field-button;
+  }
+
+  a.i-button {
+    @extend %form-field-button;
+    line-height: $i-form-button-line-height;
+  }
+
+  .i-has-action.i-synced-input.i-form-field-fixed-width {
+    > label.i-synced-label {
+      @extend %form-field-button;
     }
-    select {
-        @extend %form-field-input;
-        padding-left: 0.7em;
+  }
 
-        &[multiple] {
-            height: auto;
-        }
+  .cke {
+    width: 100% !important;
+  }
+
+  .hasDatepicker {
+    margin: 0;
+    padding-right: 26px !important;
+  }
+
+  .ui-datepicker-trigger {
+    right: 24px;
+  }
+
+  .multi-text-fields {
+    max-height: none;
+    max-width: 400px;
+
+    .handle {
+      height: $i-form-height;
+      line-height: $i-form-height;
     }
-
-    input[type=number] {
-        min-width: 80px;
-    }
-
-    input[type=number],
-    input[type=time] {
-        padding-right: 0 !important;
-
-        &::-webkit-inner-spin-button {
-            height: 2.3em;
-            margin-left: 1em;
-        }
-    }
-
-    button,
-    input[type="button"],
-    input[type="submit"] {
-        @extend %form-field-button;
-    }
-
-    a.i-button {
-        @extend %form-field-button;
-        line-height: $i-form-button-line-height;
-    }
-
-    .i-has-action.i-synced-input.i-form-field-fixed-width {
-        > label.i-synced-label {
-            @extend %form-field-button;
-        }
-    }
-
-    .cke {
-        width: 100% !important;
-    }
-
-    .hasDatepicker {
-        margin: 0;
-        padding-right: 26px !important;
-    }
-
-    .ui-datepicker-trigger {
-        right: 24px;
-    }
-
-    .multi-text-fields {
-        max-height: none;
-        max-width: 400px;
-
-        .handle {
-            height: $i-form-height;
-            line-height: $i-form-height;
-        }
-    }
+  }
 }
 
 .i-form .form-group-footer {
-    .i-button {
-        @extend %form-field-button;
-        line-height: 1 !important;
-    }
+  .i-button {
+    @extend %form-field-button;
+    line-height: 1 !important;
+  }
 
-    .form-field {
-        margin-bottom: 0;
-    }
+  .form-field {
+    margin-bottom: 0;
+  }
 
-    .no-padding {
-        padding: 0;
-    }
+  .no-padding {
+    padding: 0;
+  }
 }
 
 .i-form fieldset {
-    border: 0;
-    margin-bottom: 1em;
-    padding: 0;
+  border: 0;
+  margin-bottom: 1em;
+  padding: 0;
 
-    legend {
-        font-weight: bold;
-        font-size: 1.3em;
-        border-bottom: 1px solid #ebebeb;
-        width: 100%;
-        padding-left: 0;
-        padding-bottom: 0.5em;
-        margin-bottom: 0.3em;
-    }
+  legend {
+    font-weight: bold;
+    font-size: 1.3em;
+    border-bottom: 1px solid #ebebeb;
+    width: 100%;
+    padding-left: 0;
+    padding-bottom: 0.5em;
+    margin-bottom: 0.3em;
+  }
 
-    p.description {
-        margin: 0.2em 0 0 0;
-        font-size: 1.1em;
-        padding-left: 2px; // align it with the legend
-        color: $dark-gray;
-    }
+  p.description {
+    margin: 0.2em 0 0 0;
+    font-size: 1.1em;
+    padding-left: 2px; // align it with the legend
+    color: $dark-gray;
+  }
 
-    .form-group:first-of-type {
-        margin-top: 2em;
-    }
+  .form-group:first-of-type {
+    margin-top: 2em;
+  }
 
-    & + .form-group-footer {
-        margin-top: -1em;
-    }
+  & + .form-group-footer {
+    margin-top: -1em;
+  }
 
-    &.collapsible legend {
-        cursor: pointer;
-    }
+  &.collapsible legend {
+    cursor: pointer;
+  }
 
-    &.initially-collapsed div.fieldset-content {
-        display: none;
-    }
+  &.initially-collapsed div.fieldset-content {
+    display: none;
+  }
 }
 
 .i-form .form-field-warning {
-    margin-top: 2px;
+  margin-top: 2px;
 }

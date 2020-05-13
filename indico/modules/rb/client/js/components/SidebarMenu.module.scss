@@ -8,33 +8,33 @@
 @import 'rb:styles/palette';
 
 .sidebar:global(.inverted.menu) {
-    background-color: darken($primary-color, 10%);
-    top: calc(125px + var(--extra-bars, 0) * 50px - var(--offset, 0) * 1px);
-    height: calc(100% - 125px - var(--extra-bars, 0) * 50px + var(--offset, 0) * 1px) !important;
-    position: fixed !important;
+  background-color: darken($primary-color, 10%);
+  top: calc(125px + var(--extra-bars, 0) * 50px - var(--offset, 0) * 1px);
+  height: calc(100% - 125px - var(--extra-bars, 0) * 50px + var(--offset, 0) * 1px) !important;
+  position: fixed !important;
 
-    .bottom-align {
-        position: absolute;
-        bottom: 0;
-        width: 100%;
-    }
+  .bottom-align {
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+  }
 }
 
 .sidebar-button {
-    transition: color 0.25s ease-in, transform 0.25s ease-in;
-    color: $white;
-    cursor: pointer;
+  transition: color 0.25s ease-in, transform 0.25s ease-in;
+  color: $white;
+  cursor: pointer;
 
-    &:hover {
-        color: darken($highlight-color, 20%);
-    }
+  &:hover {
+    color: darken($highlight-color, 20%);
+  }
 
-    &:global(.active) {
-        color: darken($highlight-color, 30%);
-        transform: rotate(90deg);
-    }
+  &:global(.active) {
+    color: darken($highlight-color, 30%);
+    transform: rotate(90deg);
+  }
 
-    i:global(.icon) {
-        margin: 0;
-    }
+  i:global(.icon) {
+    margin: 0;
+  }
 }

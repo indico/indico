@@ -9,15 +9,15 @@
 @import 'rb:styles/util';
 
 ul.rb-menu {
-    list-style-type: none;
-    display: flex;
-    flex-direction: row;
-    justify-content: space-around;
-    background-color: $highlight-color;
-    border-bottom: none;
-    line-height: $menu-height;
-    margin-bottom: 0;
-    margin-top: 0;
-    padding: 0;
-    width: 100%;
+  list-style-type: none;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-around;
+  background-color: $highlight-color;
+  border-bottom: none;
+  line-height: $menu-height;
+  margin-bottom: 0;
+  margin-top: 0;
+  padding: 0;
+  width: 100%;
 }

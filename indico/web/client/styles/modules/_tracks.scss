@@ -6,135 +6,134 @@
 // LICENSE file for more details.
 
 .track-list {
-    list-style-type: none;
-    padding-left: 0;
+  list-style-type: none;
+  padding-left: 0;
 
-    .track-row {
-        padding: 10px 10px 0 10px;
+  .track-row {
+    padding: 10px 10px 0 10px;
 
-        &:last-child {
-            margin-bottom: 150px;
-        }
-
-        .i-box-header {
-            margin-bottom: 0;
-        }
-
-        .i-box-content {
-            word-wrap: break-word;
-            padding: 10px 0;
-        }
-
-        .default-session::before {
-            font-size: 0.9em;
-        }
-
-        .i-label.default-session {
-            border-color: transparent;
-        }
-
+    &:last-child {
+      margin-bottom: 150px;
     }
 
-    .track-content-collapsible {
-        cursor: pointer;
+    .i-box-header {
+      margin-bottom: 0;
     }
 
-    .track-content-collapsed {
-        @extend .transparent-overlay;
-        max-height: 50px;
-        overflow: hidden;
+    .i-box-content {
+      word-wrap: break-word;
+      padding: 10px 0;
     }
+
+    .default-session::before {
+      font-size: 0.9em;
+    }
+
+    .i-label.default-session {
+      border-color: transparent;
+    }
+  }
+
+  .track-content-collapsible {
+    cursor: pointer;
+  }
+
+  .track-content-collapsed {
+    @extend .transparent-overlay;
+    max-height: 50px;
+    overflow: hidden;
+  }
 }
 
 ul.sub-tracks {
-    list-style-type: none;
-    padding-left: 30px;
+  list-style-type: none;
+  padding-left: 30px;
 
-    li h3 {
-        font-size: 14px !important;
-    }
+  li h3 {
+    font-size: 14px !important;
+  }
 }
 
 .embedded-track-list {
-    padding: 30px 20px;
-    border: 1px solid $pastel-gray;
-    background-color: $light-gray;
-    margin: 10px 0;
+  padding: 30px 20px;
+  border: 1px solid $pastel-gray;
+  background-color: $light-gray;
+  margin: 10px 0;
 }
 
 .track-group-handle {
-    background-color: $dark-gray !important;
+  background-color: $dark-gray !important;
 }
 
 .no-tracks-message {
-    color: $dark-gray;
+  color: $dark-gray;
 }
 
 .no-tracks-message:not(:only-child) {
-    display: none;
+  display: none;
 }
 
 .track-placeholder {
-    background: $light-gray;
-    border: 1px dashed $gray;
-    margin-bottom: 15px;
+  background: $light-gray;
+  border: 1px dashed $gray;
+  margin-bottom: 15px;
 }
 
 .track-review-list {
-    ul {
-        padding-left: 10px;
-    }
+  ul {
+    padding-left: 10px;
+  }
 }
 
 .track-review-row {
-    list-style-type: none;
+  list-style-type: none;
 
-    .title {
-        font-size: 14pt;
+  .title {
+    font-size: 14pt;
+  }
+
+  .label {
+    background-color: $gray;
+    border: none;
+    cursor: default;
+    display: inline-block;
+    margin: 10px 5px 10px 0;
+    padding: 3px;
+
+    &.no-unreviewed {
+      background-color: $green;
     }
-
-    .label {
-        background-color: $gray;
-        border: none;
-        cursor: default;
-        display: inline-block;
-        margin: 10px 5px 10px 0;
-        padding: 3px;
-
-        &.no-unreviewed {
-            background-color: $green;
-        }
-    }
+  }
 }
 
 ul.tracks {
-    list-style-type: none;
-    padding-left: 0;
+  list-style-type: none;
+  padding-left: 0;
 
-    li {
-        color: $black;
-        margin-top: 2em;
+  li {
+    color: $black;
+    margin-top: 2em;
 
-        .track-title {
-            @include border-bottom($separator-color);
-            margin-bottom: 1em;
+    .track-title {
+      @include border-bottom($separator-color);
+      margin-bottom: 1em;
 
-            .track-code {
-                color: $dark-yellow;
-            }
+      .track-code {
+        color: $dark-yellow;
+      }
 
-            .track-link {
-                margin-left: 0.5em;
-                font-size: 1.5em;
-            }
+      .track-link {
+        margin-left: 0.5em;
+        font-size: 1.5em;
+      }
 
-            h3 {
-                margin: 0;
-            }
-        }
-
-        .description {
-            color: $light-black;
-        }
+      h3 {
+        margin: 0;
+      }
     }
+
+    .description {
+      color: $light-black;
+    }
+  }
 }

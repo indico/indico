@@ -7,18 +7,18 @@
 
 @import 'rb:styles/responsive';
 
-
 .blockings-container {
-    padding: 2em;
-    @media (min-width: $computer-width) {
-        width: 75% !important;
-    }
+  padding: 2em;
+  @media (min-width: $computer-width) {
+    width: 75% !important;
+  }
 
-    .blockings-list, :global(.blockings-placeholders) {
-        margin: 10px 0 0 -5px;
-    }
+  .blockings-list,
+  :global(.blockings-placeholders) {
+    margin: 10px 0 0 -5px;
+  }
 
-    :global(.ui.stuck-container) + .blockings-list {
-        padding-top: 60px;
-    }
+  :global(.ui.stuck-container) + .blockings-list {
+    padding-top: 60px;
+  }
 }

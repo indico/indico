@@ -13,175 +13,176 @@ $dropzone-padding: 20;
 $dropzone-border-width: 2;
 
 .dropzone {
-    border-radius: 2px;
-    border: 2px dashed $dark-blue;
-    padding: 30px 20px;
-    margin-bottom: 3em;
-    width: (($dropzone-padding + $dropzone-border-width) * 2 +
-            ($image-preview-width + ($image-preview-margin * 2)) * 5) * 1px;
+  border-radius: 2px;
+  border: 2px dashed $dark-blue;
+  padding: 30px 20px;
+  margin-bottom: 3em;
+  width: (
+      ($dropzone-padding + $dropzone-border-width) * 2 +
+        ($image-preview-width + ($image-preview-margin * 2)) * 5
+    ) * 1px;
+  cursor: pointer;
+
+  .dz-preview.dz-file-preview .dz-image,
+  .dz-preview .dz-image {
+    border-radius: 5px;
+
+    > img {
+      object-fit: cover;
+      width: 120px;
+      height: 120px;
+    }
+  }
+
+  .dz-message {
+    font-size: 1.5em;
+    color: $dark-gray;
+    margin: 0 0 1em 0;
+
+    .message-separator {
+      display: block;
+      margin-top: 1em;
+      font-size: small;
+    }
+  }
+
+  .select-files-btn {
+    text-align: center;
     cursor: pointer;
 
-    .dz-preview.dz-file-preview .dz-image,
-    .dz-preview .dz-image {
-        border-radius: 5px;
-
-        > img {
-            object-fit: cover;
-            width: 120px;
-            height: 120px;
-        }
+    .i-button {
+      cursor: pointer;
     }
 
     .dz-message {
-        font-size: 1.5em;
-        color: $dark-gray;
-        margin: 0 0 1em 0;
-
-        .message-separator {
-            display: block;
-            margin-top: 1em;
-            font-size: small;
-        }
+      margin: 1em 0 0 0;
     }
-
-    .select-files-btn {
-        text-align: center;
-        cursor: pointer;
-
-        .i-button {
-            cursor: pointer;
-        }
-
-        .dz-message {
-            margin: 1em 0 0 0;
-        }
-    }
+  }
 }
 
 .form-group {
+  .form-field.fit-to-parent .dropzone {
+    width: 100%;
+  }
 
-    .form-field.fit-to-parent .dropzone {
-        width: 100%;
+  .dropzone {
+    padding: 0;
+    margin-bottom: 1em;
+    width: 400px;
+    display: table;
+
+    .dropzone-inner {
+      display: table-row;
+
+      .dropzone-previews {
+        display: table-cell;
+        text-align: center;
+
+        .dz-message {
+          display: none;
+        }
+      }
+
+      .select-files-btn {
+        display: table-cell;
+        vertical-align: middle;
+        text-align: center;
+
+        button {
+          margin: $image-preview-margin * 1px;
+          height: inherit;
+        }
+      }
     }
 
-    .dropzone {
+    &.thin {
+      min-height: inherit;
+
+      .dropzone-inner {
+        display: block;
+        padding: 10px;
+      }
+
+      .dropzone-previews {
+        display: block;
+        text-align: left;
+      }
+
+      .dz-preview {
+        display: flex;
+        min-height: inherit;
+        margin: 0 0 5px 0;
+
+        &:hover {
+          @include transition(background-color 0.2s);
+          background-color: $light-gray;
+        }
+      }
+
+      .dz-details {
+        opacity: 1;
+        font-size: 1em;
         padding: 0;
-        margin-bottom: 1em;
-        width: 400px;
-        display: table;
+        text-align: inherit;
+        color: $black;
+        min-width: inherit;
+        position: inherit;
+        flex-grow: 1;
+        cursor: inherit;
+        width: 300px;
+      }
 
-        .dropzone-inner {
-            display: table-row;
+      .select-files-btn {
+        display: block;
 
-            .dropzone-previews {
-                display: table-cell;
-                text-align: center;
+        button {
+          margin: 5px 0 0 0;
+        }
+      }
 
-                .dz-message {
-                    display: none;
-                }
-            }
+      .dz-message {
+        font-size: 1em;
+        margin: 0;
+      }
 
-            .select-files-btn {
-                display: table-cell;
-                vertical-align: middle;
-                text-align: center;
+      .message-separator {
+        font-size: 1em;
+        margin-top: 0;
+      }
 
-                button {
-                    margin: $image-preview-margin * 1px;
-                    height: inherit;
-                }
-            }
+      .dz-filename {
+        span:hover {
+          @include transition(background-color 0.2s);
+          background-color: $light-gray;
+          border-color: transparent;
         }
 
-        &.thin {
-            min-height: inherit;
-
-            .dropzone-inner {
-                display: block;
-                padding: 10px;
-            }
-
-            .dropzone-previews {
-                display: block;
-                text-align: left;
-            }
-
-            .dz-preview {
-                display: flex;
-                min-height: inherit;
-                margin: 0 0 5px 0;
-
-                &:hover {
-                    @include transition(background-color .2s);
-                    background-color: $light-gray;
-                }
-            }
-
-            .dz-details {
-                opacity: 1;
-                font-size: 1em;
-                padding: 0;
-                text-align: inherit;
-                color: $black;
-                min-width: inherit;
-                position: inherit;
-                flex-grow: 1;
-                cursor: inherit;
-                width: 300px;
-            }
-
-            .select-files-btn {
-                display: block;
-
-                button {
-                    margin: 5px 0 0 0;
-                }
-            }
-
-            .dz-message {
-                font-size: 1em;
-                margin: 0;
-            }
-
-            .message-separator {
-                font-size: 1em;
-                margin-top: 0;
-            }
-
-            .dz-filename{
-                span:hover {
-                    @include transition(background-color .2s);
-                    background-color: $light-gray;
-                    border-color: transparent;
-                }
-
-                &:hover {
-                    span {
-                        @include transition(background-color .2s);
-                        background-color: $light-gray;
-                        border-color: transparent;
-                    }
-                }
-            }
-
-            .dz-remove {
-                margin-left: 5px;
-                color: $link;
-
-                i:before {
-                    cursor: pointer;
-                }
-
-                &:hover {
-                    color: $bright-orange;
-                    text-decoration: initial;
-                }
-            }
+        &:hover {
+          span {
+            @include transition(background-color 0.2s);
+            background-color: $light-gray;
+            border-color: transparent;
+          }
         }
+      }
+
+      .dz-remove {
+        margin-left: 5px;
+        color: $link;
+
+        i::before {
+          cursor: pointer;
+        }
+
+        &:hover {
+          color: $bright-orange;
+          text-decoration: initial;
+        }
+      }
     }
+  }
 }
 
 .dropzone-upload-btn {
-    text-align: right;
+  text-align: right;
 }

@@ -8,215 +8,222 @@
 $default-spacing: 10px;
 
 %message-box {
-    @extend %default-border-radius;
+  @extend %default-border-radius;
+  @extend .flexrow;
+  flex-wrap: wrap;
+  color: $light-black;
+  padding: $default-spacing;
+  margin-bottom: 18px;
+
+  .message-box-content {
     @extend .flexrow;
-    flex-wrap: wrap;
-    color: $light-black;
+  }
+
+  .message-text {
+    flex-grow: 1;
+    align-self: center;
+    font-size: 1.2em;
+
+    p:first-child {
+      margin-top: 0;
+    }
+
+    p:last-child {
+      margin-bottom: 0;
+    }
+
+    &.normal-size {
+      font-size: 1em;
+    }
+  }
+
+  .icon {
+    flex-shrink: 0;
+    font-size: 1.5em;
+    color: $gray;
+    margin-right: 0.5em;
+  }
+
+  .message-box-footer {
+    @include single-box-shadow(
+      $light-gray,
+      0,
+      $default-spacing,
+      $default-spacing,
+      -$default-spacing,
+      inset
+    );
+    flex: 1 100%;
+    margin: $default-spacing -#{$default-spacing} -#{$default-spacing} -#{$default-spacing};
     padding: $default-spacing;
-    margin-bottom: 18px;
-
-    .message-box-content {
-        @extend .flexrow;
-    }
-
-    .message-text {
-        flex-grow: 1;
-        align-self: center;
-        font-size: 1.2em;
-
-        p:first-child {
-            margin-top: 0;
-        }
-
-        p:last-child {
-            margin-bottom: 0;
-        }
-
-        &.normal-size {
-            font-size: 1em;
-        }
-    }
-
-    .icon {
-        flex-shrink: 0;
-        font-size: 1.5em;
-        color: $gray;
-        margin-right: 0.5em;
-    }
-
-    .message-box-footer {
-        @include single-box-shadow($light-gray, 0, $default-spacing, $default-spacing, -$default-spacing, inset);
-        flex: 1 100%;
-        margin: $default-spacing -#{$default-spacing} -#{$default-spacing} -#{$default-spacing};
-        padding: $default-spacing;
-    }
+  }
 }
 
 %message-box.large-icon {
-    .icon {
-        font-size: 2.7em;
-        margin-bottom: $default-spacing;
-    }
+  .icon {
+    font-size: 2.7em;
+    margin-bottom: $default-spacing;
+  }
 }
 
 %message-tag {
-    @extend %default-border-radius;
-    padding: 0 4px;
+  @extend %default-border-radius;
+  padding: 0 4px;
 }
 
 .info-message {
-    color: #3A87AD;
-    background-color: #D9EDF7;
-    padding: 8px 14px 8px 14px;
-    margin-bottom: 18px;
-    text-shadow: 0 1px 0 rgba(255, 255, 255, 0.5);
-    border: 1px solid #BCE8F1;
-    -webkit-border-radius: 4px;
-    -moz-border-radius: 4px;
-    border-radius: 4px;
-    text-align: center;
+  color: #3a87ad;
+  background-color: #d9edf7;
+  padding: 8px 14px 8px 14px;
+  margin-bottom: 18px;
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.5);
+  border: 1px solid #bce8f1;
+  -webkit-border-radius: 4px;
+  -moz-border-radius: 4px;
+  border-radius: 4px;
+  text-align: center;
 }
 
 .error-message {
-    color: #A76766;
-    background-color: #F2DEDE;
-    padding: 8px 14px 8px 14px;
-    margin-bottom: 18px;
-    text-shadow: 0 1px 0 rgba(255, 255, 255, 0.5);
-    border: 1px solid #A76766;
-    -webkit-border-radius: 4px;
-    -moz-border-radius: 4px;
-    border-radius: 4px;
-    text-align: center;
+  color: #a76766;
+  background-color: #f2dede;
+  padding: 8px 14px 8px 14px;
+  margin-bottom: 18px;
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.5);
+  border: 1px solid #a76766;
+  -webkit-border-radius: 4px;
+  -moz-border-radius: 4px;
+  border-radius: 4px;
+  text-align: center;
 }
 
 .warning-message {
-    color: #BE9056;
-    background-color: #FFF3E2;
-    padding: 8px 14px 8px 14px;
-    margin-bottom: 18px;
-    text-shadow: 0 1px 0 rgba(255, 255, 255, 0.5);
-    border: 1px solid #BE9056;
-    -webkit-border-radius: 4px;
-    -moz-border-radius: 4px;
-    border-radius: 4px;
-    text-align: center;
+  color: #be9056;
+  background-color: #fff3e2;
+  padding: 8px 14px 8px 14px;
+  margin-bottom: 18px;
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.5);
+  border: 1px solid #be9056;
+  -webkit-border-radius: 4px;
+  -moz-border-radius: 4px;
+  border-radius: 4px;
+  text-align: center;
 }
 
 .success-message {
-    color: #638864;
-    background-color: #DBEED3;
-    padding: 8px 14px 8px 14px;
-    margin-bottom: 18px;
-    text-shadow: 0 1px 0 rgba(255, 255, 255, 0.5);
-    border: 1px solid #638864;
-    -webkit-border-radius: 4px;
-    -moz-border-radius: 4px;
-    border-radius: 4px;
-    text-align: center;
+  color: #638864;
+  background-color: #dbeed3;
+  padding: 8px 14px 8px 14px;
+  margin-bottom: 18px;
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.5);
+  border: 1px solid #638864;
+  -webkit-border-radius: 4px;
+  -moz-border-radius: 4px;
+  border-radius: 4px;
+  text-align: center;
 }
 
 .info-message-box,
-.message-message-box {      // Needed for default category 'message' of flash() in flashed_messages.html
-    @extend %message-box;
-    background-color: #FAFAFA;
-    border: 1px solid #DDD;
+.message-message-box {
+  // Needed for default category 'message' of flash() in flashed_messages.html
+  @extend %message-box;
+  background-color: #fafafa;
+  border: 1px solid #ddd;
 
-    .icon {
-        @include icon-before('icon-info');
-    }
+  .icon {
+    @include icon-before('icon-info');
+  }
 
-    .message-box-footer {
-        background: darken(#FAFAFA, 5%);
-    }
+  .message-box-footer {
+    background: darken(#fafafa, 5%);
+  }
 }
 
 .highlight-message-box {
-    @extend %message-box;
-    background-color: $light-blue;
-    border: 1px solid $dark-blue;
+  @extend %message-box;
+  background-color: $light-blue;
+  border: 1px solid $dark-blue;
 
-    .icon {
-        @include icon-before('icon-lamp');
-        color: $dark-blue;
-    }
+  .icon {
+    @include icon-before('icon-lamp');
+    color: $dark-blue;
+  }
 
-    .message-box-footer {
-        background: darken($light-blue, 5%);
-    }
+  .message-box-footer {
+    background: darken($light-blue, 5%);
+  }
 }
 
 .success-message-box {
-    @extend %message-box;
-    background-color: #EEFAEE;
-    border: 1px solid #CDC;
+  @extend %message-box;
+  background-color: #eefaee;
+  border: 1px solid #cdc;
 
-    .icon {
-        @include icon-before('icon-checkmark');
-    }
+  .icon {
+    @include icon-before('icon-checkmark');
+  }
 
-    &:before {
-        color: #CDC;
-    }
+  &::before {
+    color: #cdc;
+  }
 
-    .message-box-footer {
-        background: darken(#EEFAEE, 5%);
-    }
+  .message-box-footer {
+    background: darken(#eefaee, 5%);
+  }
 }
 
 .warning-message-box {
-    @extend %message-box;
-    background-color: #FFF3E2;
-    border: 1px solid #BE9056;
+  @extend %message-box;
+  background-color: #fff3e2;
+  border: 1px solid #be9056;
 
-    .icon {
-        @include icon-before('icon-warning');
-        color: #BE9056;
-    }
+  .icon {
+    @include icon-before('icon-warning');
+    color: #be9056;
+  }
 
-    .message-box-footer {
-        background: darken(#FFF3E2, 5%);
-    }
+  .message-box-footer {
+    background: darken(#fff3e2, 5%);
+  }
 }
 
 .error-message-box {
-    @extend %message-box;
-    background-color: $light-red;
-    border: 1px solid $dark-red;
+  @extend %message-box;
+  background-color: $light-red;
+  border: 1px solid $dark-red;
 
-    .icon {
-        @include icon-before('icon-disable');
-        color: $dark-red;
-    }
+  .icon {
+    @include icon-before('icon-disable');
+    color: $dark-red;
+  }
 
-    .message-box-footer {
-        background: darken($light-red, 5%);
-    }
+  .message-box-footer {
+    background: darken($light-red, 5%);
+  }
 }
 
 .danger-message-box {
-    @extend %message-box;
-    background-color: $light-red;
-    border: 1px solid $dark-red;
+  @extend %message-box;
+  background-color: $light-red;
+  border: 1px solid $dark-red;
 
-    .icon {
-        @include icon-before('icon-warning');
-        color: $dark-red;
-    }
+  .icon {
+    @include icon-before('icon-warning');
+    color: $dark-red;
+  }
 
-    .message-box-footer {
-        background: darken($light-red, 5%);
-    }
+  .message-box-footer {
+    background: darken($light-red, 5%);
+  }
 }
 
-
 .error-message-tag {
-    @extend %message-tag;
-    background-color: $red;
-    color: $light-gray;
-    margin-left: $default-spacing;
+  @extend %message-tag;
+  background-color: $red;
+  color: $light-gray;
+  margin-left: $default-spacing;
 }
 
 .error-message-underline {
-    @include border-bottom($red);
+  @include border-bottom($red);
 }

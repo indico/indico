@@ -6,227 +6,227 @@
 // LICENSE file for more details.
 
 .login-page {
-    font-family: Helvetica, Verdana, sans-serif;
-    background-color: #f9f9f9;
-    background-position: center;
-    background-size: cover;
-    margin: 0;
-    padding: 0;
-    text-align: center;
-    display: table;
-    position: absolute;
-    height: 100%;
-    width: 100%;
+  font-family: Helvetica, Verdana, sans-serif;
+  background-color: #f9f9f9;
+  background-position: center;
+  background-size: cover;
+  margin: 0;
+  padding: 0;
+  text-align: center;
+  display: table;
+  position: absolute;
+  height: 100%;
+  width: 100%;
 
-    .middle {
-        display: table-cell;
-        vertical-align: middle;
+  .middle {
+    display: table-cell;
+    vertical-align: middle;
 
-        .centered-column-wrapper {
-            margin: auto;
-            width: 800px;
+    .centered-column-wrapper {
+      margin: auto;
+      width: 800px;
 
-            @media (max-width: 800px) {
-                width: 400px;
-            }
+      @media (max-width: 800px) {
+        width: 400px;
+      }
 
-            .centered-column {
-                width: 300px;
-                margin: 100px auto;
+      .centered-column {
+        width: 300px;
+        margin: 100px auto;
 
-                &.wide {
-                    width: 500px;
-                }
-            }
-
-            .header-logo {
-                margin-bottom: 20px;
-                height: 100px;
-            }
-
-            .footer {
-                margin-top: 0;
-                position: absolute;
-                bottom: 0;
-                text-align: left;
-            }
+        &.wide {
+          width: 500px;
         }
-    }
+      }
 
-    form {
-        margin-bottom: 10px;
-    }
+      .header-logo {
+        margin-bottom: 20px;
+        height: 100px;
+      }
 
-    @mixin login-form-button() {
-        width: 100%;
-        height: 2.5em;
-        padding: 0.5em 1em;
-        line-height: 1.5;
-        margin-bottom: 10px;
-        position: relative;
-
-        &:last-of-type {
-            margin-bottom: 0;
-        }
-    }
-
-    .login-form-button, .provider-with-form {
-        @include login-form-button();
-    }
-
-    form input:not([type='submit']) {
-        height: 2.5em;
-        padding: 0.5em 1em;
-        line-height: 1.5;
-        width: 100%;
-        color: #555;
-        border: 1px solid #bbb;
-        margin-top: -1px;
-
-        &:first-of-type {
-            border-top-right-radius: 0.2em;
-            border-top-left-radius: 0.2em;
-            margin-top: 0;
-        }
-
-        &:last-of-type {
-            border-bottom-right-radius: 0.2em;
-            border-bottom-left-radius: 0.2em;
-        }
-    }
-
-    .login-providers {
-        margin-top: 20px;
-
-        .i-button {
-            @include login-form-button();
-
-            &.external-provider-facebook {
-                color: white !important;
-                background-color: #3b579d;
-                border-color: #3b579d;
-
-                &:hover {
-                    background: #3f5da8;
-                    border-color: #3f5da8;
-                }
-            }
-
-            &.external-provider-twitter {
-                color: white !important;
-                background-color: #4092cc;
-                border-color: #4092cc;
-
-                &:hover {
-                    background: #55acee;
-                    border-color: #55acee;
-                }
-            }
-
-            &.external-provider-github {
-                color: white !important;
-                background-color: #666;
-                border-color: #666;
-
-                &:hover {
-                    background: #999;
-                    border-color: #999;
-                }
-            }
-        }
-
-        .i-button ~ .i-button {
-            margin-left: 0;
-        }
-    }
-
-    .titled-rule {
-        color: $gray;
-        font-size: 1em;
-        margin: 20px 0;
-
-        &::before,
-        &::after {
-            background: $gray;
-        }
-    }
-
-    .link {
+      .footer {
+        margin-top: 0;
+        position: absolute;
+        bottom: 0;
         text-align: left;
-        margin-top: 20px;
+      }
+    }
+  }
+
+  form {
+    margin-bottom: 10px;
+  }
+
+  @mixin login-form-button() {
+    width: 100%;
+    height: 2.5em;
+    padding: 0.5em 1em;
+    line-height: 1.5;
+    margin-bottom: 10px;
+    position: relative;
+
+    &:last-of-type {
+      margin-bottom: 0;
+    }
+  }
+
+  .login-form-button,
+  .provider-with-form {
+    @include login-form-button();
+  }
+
+  form input:not([type='submit']) {
+    height: 2.5em;
+    padding: 0.5em 1em;
+    line-height: 1.5;
+    width: 100%;
+    color: #555;
+    border: 1px solid #bbb;
+    margin-top: -1px;
+
+    &:first-of-type {
+      border-top-right-radius: 0.2em;
+      border-top-left-radius: 0.2em;
+      margin-top: 0;
     }
 
-    .forgot-my-password {
-        text-align: right;
-        margin-top: 10px;
+    &:last-of-type {
+      border-bottom-right-radius: 0.2em;
+      border-bottom-left-radius: 0.2em;
+    }
+  }
+
+  .login-providers {
+    margin-top: 20px;
+
+    .i-button {
+      @include login-form-button();
+
+      &.external-provider-facebook {
+        color: white !important;
+        background-color: #3b579d;
+        border-color: #3b579d;
+
+        &:hover {
+          background: #3f5da8;
+          border-color: #3f5da8;
+        }
+      }
+
+      &.external-provider-twitter {
+        color: white !important;
+        background-color: #4092cc;
+        border-color: #4092cc;
+
+        &:hover {
+          background: #55acee;
+          border-color: #55acee;
+        }
+      }
+
+      &.external-provider-github {
+        color: white !important;
+        background-color: #666;
+        border-color: #666;
+
+        &:hover {
+          background: #999;
+          border-color: #999;
+        }
+      }
     }
 
-    .register {
-        color: #555;
+    .i-button ~ .i-button {
+      margin-left: 0;
     }
+  }
 
-    .footer-links {
-        display: none;
+  .titled-rule {
+    color: $gray;
+    font-size: 1em;
+    margin: 20px 0;
+
+    &::before,
+    &::after {
+      background: $gray;
     }
+  }
+
+  .link {
+    text-align: left;
+    margin-top: 20px;
+  }
+
+  .forgot-my-password {
+    text-align: right;
+    margin-top: 10px;
+  }
+
+  .register {
+    color: #555;
+  }
+
+  .footer-links {
+    display: none;
+  }
 }
 
 .login-reason-box {
-    @extend %default-border-radius;
-    background: $indico-blue;
-    color: white;
-    font-weight: bold;
-    margin: 1em 0;
-    padding: 1em;
+  @extend %default-border-radius;
+  background: $indico-blue;
+  color: white;
+  font-weight: bold;
+  margin: 1em 0;
+  padding: 1em;
 }
-
 
 /* OAuth application authentication page */
 
 .app-auth-box {
-    font-size: 1.1em;
+  font-size: 1.1em;
 
-    .row {
-        padding: 20px;
+  .row {
+    padding: 20px;
 
-        & + .row {
-            padding-top: 0;
-        }
+    & + .row {
+      padding-top: 0;
     }
+  }
 }
 
 .auth-stakeholder-info {
-    width: 120px;
+  width: 120px;
 
-    i {
-        font-size: 4em;
-    }
+  i {
+    font-size: 4em;
+  }
 
-    div {
-        font-weight: bold;
-    }
+  div {
+    font-weight: bold;
+  }
 }
 
 .auth-scopes {
-    display: inline-block;
-    font-size: 1.1em;
+  display: inline-block;
+  font-size: 1.1em;
 
-    ul {
-        list-style-type: none;
-        margin-bottom: 0;
-        margin-top: 0.5em;
-        padding-left: 1em;
-        text-align: left;
+  ul {
+    list-style-type: none;
+    margin-bottom: 0;
+    margin-top: 0.5em;
+    padding-left: 1em;
+    text-align: left;
+  }
+
+  li {
+    @include icon-before('icon-checkbox-checked');
+
+    &::before {
+      padding-right: 0.5em;
     }
 
-    li {
-        @include icon-before('icon-checkbox-checked');
-
-        &::before {
-            padding-right: 0.5em;
-        }
-
-        &.authorized {
-            @extend .text-superfluous;
-        }
+    &.authorized {
+      @extend .text-superfluous;
     }
+  }
 }

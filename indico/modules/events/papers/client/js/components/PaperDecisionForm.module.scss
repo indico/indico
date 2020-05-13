@@ -6,11 +6,11 @@
 // LICENSE file for more details.
 
 .paper-decision-box {
-    form :global(.field):first-child {
-        width: 50%;
-    }
+  form :global(.field):first-child {
+    width: 50%;
+  }
 
-    form :global(.disabled) {
-        background: none;
-    }
+  form :global(.disabled) {
+    background: none;
+  }
 }

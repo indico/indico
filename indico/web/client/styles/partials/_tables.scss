@@ -10,339 +10,343 @@
 @import 'partials/icons';
 
 @mixin sortable-table-header() {
-    &.tablesorter-header:not(.sorter-false) {
-        cursor: pointer;
-    }
+  &.tablesorter-header:not(.sorter-false) {
+    cursor: pointer;
+  }
 
-    &:before {
-        @include rotate-transform(0.3s);
-        display: inline-block;
-    }
+  &::before {
+    @include rotate-transform(0.3s);
+    display: inline-block;
+  }
 
-    &.header-sort-desc {
-        @include icon-before('icon-arrow-down');
-    }
+  &.header-sort-desc {
+    @include icon-before('icon-arrow-down');
+  }
 
-    &.header-sort-asc {
-        @include icon-before('icon-arrow-down');
+  &.header-sort-asc {
+    @include icon-before('icon-arrow-down');
 
-        &:before {
-            transform: rotate(-180deg);
-        }
+    &::before {
+      transform: rotate(-180deg);
     }
+  }
 }
 
 %i-table-base {
-    width: 100%;
+  width: 100%;
 
-    th, td {
-        &.thin-column {
-            width: 2.5em;
-            min-width: 2.5em;
-        }
-
-        &[class*='icon-'] {
-            &:not(:empty)::before {
-                margin-right: 0.5em;
-            }
-        }
+  th,
+  td {
+    &.thin-column {
+      width: 2.5em;
+      min-width: 2.5em;
     }
 
-    th {
-        @include sortable-table-header();
-        background-color: $light-gray;
+    &[class*='icon-'] {
+      &:not(:empty)::before {
+        margin-right: 0.5em;
+      }
     }
+  }
+
+  th {
+    @include sortable-table-header();
+    background-color: $light-gray;
+  }
 }
 
 table.i-table {
-    @extend %i-table-base;
-    border-collapse: collapse;
-    margin-top: 1.6em;
-    table-layout: fixed;
+  @extend %i-table-base;
+  border-collapse: collapse;
+  margin-top: 1.6em;
+  table-layout: fixed;
 
-    &.no-margin {
-        margin-top: 0em;
+  &.no-margin {
+    margin-top: 0;
+  }
+
+  thead th {
+    padding: 10px 5px;
+    font-weight: bold;
+    text-align: left;
+
+    &.centered {
+      text-align: center;
     }
-
-    thead th {
-        padding: 10px 5px;
-        font-weight: bold;
-        text-align: left;
-
-        &.centered {
-            text-align: center;
-        }
-    }
+  }
 }
 
 tr.i-table {
-    border-bottom: 1px solid $pastel-gray;
-    border-top: 1px solid $pastel-gray;
+  border-bottom: 1px solid $pastel-gray;
+  border-top: 1px solid $pastel-gray;
 
-    &.selected {
-        background-color: $pastel-blue !important;
-    }
+  &.selected {
+    background-color: $pastel-blue !important;
+  }
 
-    &:hover {
-        @include transition(background-color .2s);
-        background-color: $light-blue;
-    }
+  &:hover {
+    @include transition(background-color 0.2s);
+    background-color: $light-blue;
+  }
 }
 
-td.i-table, th.i-table {
-    box-sizing: border-box;
-    @include ellipsis;
+td.i-table,
+th.i-table {
+  box-sizing: border-box;
+  @include ellipsis;
 
-    padding: 5px 3px 5px 3px;
-    vertical-align: middle;
+  padding: 5px 3px 5px 3px;
+  vertical-align: middle;
 
-    &.empty {
-        color: $dark-gray;
-        font-style: italic;
-    }
+  &.empty {
+    color: $dark-gray;
+    font-style: italic;
+  }
 
-    &.id-column {
-        width: 4em;
-        text-overflow: initial;
-    }
+  &.id-column {
+    width: 4em;
+    text-overflow: initial;
+  }
 }
 
 h3.i-table {
-    color: $light-black;
-    font-size: 1.2em;
-    font-weight: bold;
-    margin-bottom: 0em;
-    margin-top: 1em;
-    padding: 3px 3px 5px 3px;
+  color: $light-black;
+  font-size: 1.2em;
+  font-weight: bold;
+  margin-bottom: 0;
+  margin-top: 1em;
+  padding: 3px 3px 5px 3px;
 
-    &.emphasis {
-        font-style: italic;
-    }
+  &.emphasis {
+    font-style: italic;
+  }
 
-    &.border {
-        border-bottom: 1px solid $pastel-gray;
-    }
+  &.border {
+    border-bottom: 1px solid $pastel-gray;
+  }
 
-    & + table.i-table {
-        margin-top: 0em;
-    }
+  & + table.i-table {
+    margin-top: 0;
+  }
 }
-
 
 // ============================================================================
 // Interactive rows
 // ============================================================================
 
 tr.i-table.interactive {
+  > td {
+    user-select: none;
+    cursor: pointer;
+  }
+
+  &.active {
+    @include transition(background-color);
+    background-color: $light-gray;
+
     > td {
-        user-select: none;
-        cursor: pointer;
+      border-left-color: lighten($default-border-color, $color-variation);
     }
+  }
 
-    &.active {
-        @include transition(background-color);
-        background-color: $light-gray;
-
-        > td {
-            border-left-color: lighten($default-border-color, $color-variation);
-        }
+  &:hover {
+    > td,
+    + tr.details-row > td.i-table {
+      border-left-color: $blue;
     }
+  }
 
-    &:hover {
-        > td,
-        + tr.details-row > td.i-table {
-            border-left-color: $blue;
-        }
-    }
+  &.show-details {
+    border-bottom: none !important;
+  }
 
-    &.show-details {
-        border-bottom: none !important;
-    }
-
-    &:not(.show-details) + tr.details-row {
-        display: none;
-    }
+  &:not(.show-details) + tr.details-row {
+    display: none;
+  }
 }
 
 tr.i-table.details-row {
-    border-top: none;
+  border-top: none;
 
-    > td {
-        border-left-color: lighten($default-border-color, $color-variation);
-        padding: 0px;
-    }
+  > td {
+    border-left-color: lighten($default-border-color, $color-variation);
+    padding: 0;
+  }
 }
 
 tr.i-table.content {
-    border: none;
+  border: none;
 
+  > td.i-table.caption,
+  > td.i-table.value {
+    padding: 3px 5px 3px 5px;
+  }
+
+  > td.i-table.caption {
+    @include border-bottom(lighten($gray, $color-variation), dashed);
+    @include border-right(lighten($gray, $color-variation), dashed);
+    font-weight: bold;
+    text-align: right;
+    vertical-align: top;
+  }
+
+  > td.i-table.value {
+    border-bottom: 1px solid transparent;
+    color: $light-black;
+
+    &.plain-text-email {
+      white-space: pre-line;
+    }
+  }
+
+  &:last-of-type {
     > td.i-table.caption,
     > td.i-table.value {
-        padding: 3px 5px 3px 5px;
+      border-bottom: none;
     }
-
-    > td.i-table.caption {
-        @include border-bottom(lighten($gray, $color-variation), dashed);
-        @include border-right(lighten($gray, $color-variation), dashed);
-        font-weight: bold;
-        text-align: right;
-        vertical-align: top;
-    }
-
-    > td.i-table.value {
-        border-bottom: 1px solid transparent;
-        color: $light-black;
-
-        &.plain-text-email {
-            white-space: pre-line;
-        }
-    }
-
-    &:last-of-type {
-        > td.i-table.caption,
-        > td.i-table.value {
-            border-bottom: none;
-        }
-    }
+  }
 }
 
-td, th {
-    &.small-column, &.action-column {
-        white-space: nowrap;
-        width: 1px;
-    }
+td,
+th {
+  &.small-column,
+  &.action-column {
+    white-space: nowrap;
+    width: 1px;
+  }
 }
-
 
 // ============================================================================
 // Widget table
 // ============================================================================
 
 .i-table-widget {
-    @extend %default-border-radius;
-    @include border-all();
-    @extend %i-table-base;
-    max-width: 100%;
-    border-spacing: 0;
+  @extend %default-border-radius;
+  @include border-all();
+  @extend %i-table-base;
+  max-width: 100%;
+  border-spacing: 0;
+  text-align: left;
+
+  tr > td,
+  tr > th {
+    padding: 8px;
+    line-height: 1.5;
+    vertical-align: top;
+  }
+
+  tr > td {
+    @include border-top();
+    vertical-align: middle;
+  }
+
+  &.multi-tbody tbody:first-child tr:first-child td,
+  &:not(.multi-tbody) tr:first-child td {
+    border-top: 0;
+  }
+
+  th {
+    @include border-bottom();
+  }
+
+  .col-50 {
+    width: 50%;
+  }
+
+  a.action-icon {
+    margin-right: 5px;
+
+    &:first-child {
+      margin-left: 0;
+    }
+  }
+
+  .toolbar {
+    margin: 0;
+  }
+
+  // Collapsable rows
+  .toggle-details {
+    color: $light-black;
+  }
+
+  .details-row {
+    padding: 0;
+    border: none;
+  }
+
+  dl.details-container {
     text-align: left;
+    padding: 8px;
+    overflow: hidden;
+    display: none;
 
-    tr > td, tr > th {
-        padding: 8px;
-        line-height: 1.5;
-        vertical-align: top;
+    dt,
+    dd {
+      @include border-top($pastel-gray, dashed);
+      display: inline-block;
+      float: left;
+      padding: 0.4em;
+      box-sizing: border-box;
     }
 
-    tr > td {
-        @include border-top();
+    dt {
+      @include border-right($pastel-gray, dashed);
+      clear: left;
+      width: 20%;
+      font-weight: bold;
+      text-align: right;
+    }
+
+    dd {
+      width: 80%;
+      margin: 0;
+      > * {
         vertical-align: middle;
+      }
+    }
+  }
+
+  input {
+    width: 100%;
+  }
+
+  & + .i-button {
+    margin-top: 0.5em;
+  }
+
+  .ui-sortable-handle {
+    @include icon-before('icon-handle');
+    @include transition(background-color, height);
+
+    color: $gray;
+    font-size: 1.2em;
+    height: 10px;
+    cursor: move;
+    text-align: left;
+    padding: 0;
+
+    &:hover,
+    &:active {
+      @include border-left();
+      height: 20px;
+
+      &::before {
+        color: $dark-gray;
+      }
     }
 
-    &.multi-tbody tbody:first-child tr:first-child td,
-    &:not(.multi-tbody) tr:first-child td {
-        border-top: 0;
+    &::before {
+      transform: rotate(180deg);
+      @include transition(top);
+      display: inline-block;
+      position: relative;
+      top: 1px;
     }
+  }
 
-    th {
-        @include border-bottom();
-    }
-
-    .col-50 {
-        width: 50%;
-    }
-
-    a.action-icon {
-        margin-right: 5px;
-
-        &:first-child {
-            margin-left: 0;
-        }
-    }
-
-    .toolbar {
-        margin: 0;
-    }
-
-    // Collapsable rows
-    .toggle-details {
-        color: $light-black;
-    }
-
-    .details-row {
-        padding: 0;
-        border: none;
-    }
-
-    dl.details-container {
-        text-align: left;
-        padding: 8px;
-        overflow: hidden;
-        display: none;
-
-        dt, dd {
-            @include border-top($pastel-gray, dashed);
-            display: inline-block;
-            float: left;
-            padding: 0.4em;
-            box-sizing: border-box;
-        }
-
-        dt {
-            @include border-right($pastel-gray, dashed);
-            clear: left;
-            width: 20%;
-            font-weight: bold;
-            text-align: right;
-        }
-
-        dd {
-            width: 80%;
-            margin: 0;
-            > * {
-                vertical-align: middle;
-            }
-        }
-    }
-
-    input {
-        width: 100%;
-    }
-
-    & + .i-button {
-        margin-top: 0.5em;
-    }
-
-    .ui-sortable-handle {
-        @include icon-before('icon-handle');
-        @include transition(background-color, height);
-
-        color: $gray;
-        font-size: 1.2em;
-        height: 10px;
-        cursor: move;
-        text-align: left;
-        padding: 0;
-
-        &:hover,
-        &:active {
-            @include border-left();
-            height: 20px;
-
-            &:before {
-                color: $dark-gray;
-            }
-        }
-
-        &:before {
-            transform: rotate(180deg);
-            @include transition(top);
-            display: inline-block;
-            position: relative;
-            top: 1px;
-        }
-    }
-
-    .sortable-placeholder {
-        @include border-all($style: dashed);
-        margin-bottom: 15px;
-    }
+  .sortable-placeholder {
+    @include border-all($style: dashed);
+    margin-bottom: 15px;
+  }
 }

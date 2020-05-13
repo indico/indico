@@ -5,201 +5,200 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-
 %badges-list {
-    @extend .flexrow;
-    flex-wrap: wrap;
+  @extend .flexrow;
+  flex-wrap: wrap;
 
-    margin-top: -0.8em;
-    margin-bottom: 0.8em;
+  margin-top: -0.8em;
+  margin-bottom: 0.8em;
 }
 
 .i-badges-list {
-    @extend %badges-list;
-    text-align: center;
-    justify-content: space-around;
+  @extend %badges-list;
+  text-align: center;
+  justify-content: space-around;
 
-    > .i-badge:first-child {
-        margin-left: 0;
-    }
+  > .i-badge:first-child {
+    margin-left: 0;
+  }
 }
 
 .i-badges-list.left {
-    @extend %badges-list;
-    float: none; // disable default .left style
-    text-align: left;
-    justify-content: flex-start;
+  @extend %badges-list;
+  float: none; // disable default .left style
+  text-align: left;
+  justify-content: flex-start;
 }
 
 .i-badges-list.center {
-    @extend %badges-list;
-    margin: -0.8em 0 0.8em 0; // disable default .center style
-    text-align: center;
-    justify-content: center;
+  @extend %badges-list;
+  margin: -0.8em 0 0.8em 0; // disable default .center style
+  text-align: center;
+  justify-content: center;
 }
-
 
 .i-badges-list-hover {
-    @extend %badges-list;
+  @extend %badges-list;
 
-    & > .i-badge {
-        @include transition(background-color $default-transition-duration $default-transition-function);
+  & > .i-badge {
+    @include transition(background-color $default-transition-duration $default-transition-function);
 
-        width: 10em;
-        height: 10em;
+    width: 10em;
+    height: 10em;
 
-        &:not(.i-badge-disabled):hover {
-            background-color: darken($light-gray, 2*$light-color-variation);
-        }
-
-        & > .i-badge-content {
-            height: 7em;
-
-            &:first-child {
-                height: 8.8em;
-            }
-
-            & > .i-badge-title {
-                font-size: 1em;
-            }
-
-            & .i-badge-img > img {
-                max-height: 4em;
-            }
-        }
-    }
-}
-
-%i-badge-elem {
-    position: relative;
-    display: block;
-    margin: 0 auto;
-}
-
-.i-badge {
-    @extend %default-border-radius;
-    position: relative;
-    display: inline-block;
-    min-width: 10em;
-    margin: 0.8em;
-    padding: 0;
-    vertical-align: top;
-    text-align: center;
-    box-shadow: 0 2px 1px 0 $gray;
-    background-color: $dark-blue;
-    box-sizing: initial;
-    line-height: initial;
-
-    &, & * {
-        color: $light-blue;
-    }
-
-    &.i-badge-gray {
-        background-color: $light-gray;
-
-        &, & * {
-            color: $light-black;
-        }
-
-        & > .i-badge-legend {
-            border-color: $gray;
-        }
-    }
-
-    &.i-badge-disabled {
-        cursor: default;
-        background-color: $dark-gray;
+    &:not(.i-badge-disabled):hover {
+      background-color: darken($light-gray, 2 * $light-color-variation);
     }
 
     & > .i-badge-content {
-        position: relative;
-        margin: 0 auto;
+      height: 7em;
 
-        text-align: center;
-        display: inline-flex;
-        flex-direction: column;
-        justify-content: space-around;
+      &:first-child {
+        height: 8.8em;
+      }
 
-        width: 80%;
-        height: 100%;
-        padding: 0.4em 10% 0.8em;
+      & > .i-badge-title {
+        font-size: 1em;
+      }
 
-        & > .i-badge-value {
-            @extend %i-badge-elem;
+      & .i-badge-img > img {
+        max-height: 4em;
+      }
+    }
+  }
+}
 
-            font-size: 3.6em;
-            font-weight: bold;
-        }
+%i-badge-elem {
+  position: relative;
+  display: block;
+  margin: 0 auto;
+}
 
-        & > .i-badge-img {
-            @extend %i-badge-elem;
+.i-badge {
+  @extend %default-border-radius;
+  position: relative;
+  display: inline-block;
+  min-width: 10em;
+  margin: 0.8em;
+  padding: 0;
+  vertical-align: top;
+  text-align: center;
+  box-shadow: 0 2px 1px 0 $gray;
+  background-color: $dark-blue;
+  box-sizing: initial;
+  line-height: initial;
 
-            width: 100%;
+  &,
+  & * {
+    color: $light-blue;
+  }
 
-            & > img {
-                display: block;
-                margin: auto;
-                max-width: 100%;
-                max-height: 100%;
-            }
-        }
+  &.i-badge-gray {
+    background-color: $light-gray;
 
-        & > .i-badge-title {
-            @extend %i-badge-elem;
-
-            max-width: 100%;
-            margin-top: 0.2em;
-            margin-bottom: 0.2em;
-
-            font-size: 1.1em;
-            font-weight: bold;
-            text-overflow: ellipsis;
-            overflow: visible;
-        }
+    &,
+    & * {
+      color: $light-black;
     }
 
-    /* The rule below adds a margin after the content to leave space
+    & > .i-badge-legend {
+      border-color: $gray;
+    }
+  }
+
+  &.i-badge-disabled {
+    cursor: default;
+    background-color: $dark-gray;
+  }
+
+  & > .i-badge-content {
+    position: relative;
+    margin: 0 auto;
+
+    text-align: center;
+    display: inline-flex;
+    flex-direction: column;
+    justify-content: space-around;
+
+    width: 80%;
+    height: 100%;
+    padding: 0.4em 10% 0.8em;
+
+    & > .i-badge-value {
+      @extend %i-badge-elem;
+
+      font-size: 3.6em;
+      font-weight: bold;
+    }
+
+    & > .i-badge-img {
+      @extend %i-badge-elem;
+
+      width: 100%;
+
+      & > img {
+        display: block;
+        margin: auto;
+        max-width: 100%;
+        max-height: 100%;
+      }
+    }
+
+    & > .i-badge-title {
+      @extend %i-badge-elem;
+
+      max-width: 100%;
+      margin-top: 0.2em;
+      margin-bottom: 0.2em;
+
+      font-size: 1.1em;
+      font-weight: bold;
+      text-overflow: ellipsis;
+      overflow: visible;
+    }
+  }
+
+  /* The rule below adds a margin after the content to leave space
      * for the legend.
      * Since there is no 'previous sibling' selector in CSS,
      * the legend needs to appear just before the content in the DOM.
      * It will be placed correctly at the bottom below the content
      * using CSS.
      */
-    & > .i-badge-legend + .i-badge-content {
-        margin-bottom: 1.8em;
+  & > .i-badge-legend + .i-badge-content {
+    margin-bottom: 1.8em;
+  }
+
+  & > .i-badge-legend {
+    @extend %i-badge-elem;
+
+    display: block;
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    margin: 0 0 0.5em;
+    padding: 0.4em 0.6em 0;
+    font-size: 1em;
+    height: 1em;
+    border-top: 1px solid $light-blue;
+
+    & > .i-badge-legend-left {
+      float: left;
     }
 
-
-    & > .i-badge-legend {
-        @extend %i-badge-elem;
-
-        display: block;
-        position: absolute;
-        bottom: 0;
-        left: 0;
-        right: 0;
-        margin: 0 0 0.5em;
-        padding: 0.4em 0.6em 0;
-        font-size: 1em;
-        height: 1em;
-        border-top: 1px solid $light-blue;
-
-        & > .i-badge-legend-left {
-            float: left;
-        }
-
-        & > .i-badge-legend-right {
-            float: right;
-        }
+    & > .i-badge-legend-right {
+      float: right;
     }
+  }
 }
 
 span.badge {
-    border-radius: 5px;
-    padding: 0.1em 0.4em;
-    font-size: 0.8em;
-    margin-left: 0.5em;
-    color: #fff;
-    background: $blue;
-    white-space: nowrap;
+  border-radius: 5px;
+  padding: 0.1em 0.4em;
+  font-size: 0.8em;
+  margin-left: 0.5em;
+  color: #fff;
+  background: $blue;
+  white-space: nowrap;
 }

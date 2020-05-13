@@ -6,29 +6,29 @@
 // LICENSE file for more details.
 
 .room-selector {
-    .selected-rooms-row {
-        padding-top: 0 !important;
+  .selected-rooms-row {
+    padding-top: 0 !important;
 
-        .rooms-list {
-            max-height: 140px;
-            overflow: hidden;
-            overflow-y: auto;
+    .rooms-list {
+      max-height: 140px;
+      overflow: hidden;
+      overflow-y: auto;
 
-            :global(.item) {
-                display: flex;
-                overflow: hidden;
-                align-items: center;
+      :global(.item) {
+        display: flex;
+        overflow: hidden;
+        align-items: center;
 
-                .room-actions {
-                    margin-left: auto;
-                    display: flex;
-                    align-items: center;
-                }
-
-                .room-actions :global(.icon.remove) {
-                    cursor: pointer;
-                }
-            }
+        .room-actions {
+          margin-left: auto;
+          display: flex;
+          align-items: center;
         }
+
+        .room-actions :global(.icon.remove) {
+          cursor: pointer;
+        }
+      }
     }
+  }
 }

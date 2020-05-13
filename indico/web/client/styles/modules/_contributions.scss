@@ -5,150 +5,150 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-@import "contributions/display";
-@import "contributions/editor";
-@import "types_dialog";
+@import 'contributions/display';
+@import 'contributions/editor';
+@import 'types_dialog';
 
 @mixin picker-root-element-label() {
-    .label {
-        @include ellipsis;
+  .label {
+    @include ellipsis;
 
-        flex-grow: 1;
-        flex-basis: 0%;
-        display: inline-block;
-        line-height: 1.2em;
-        text-align: left;
-    }
+    flex-grow: 1;
+    flex-basis: 0%;
+    display: inline-block;
+    line-height: 1.2em;
+    text-align: left;
+  }
 }
 
 #pub-switch {
-    display: inline-block;
-    position: absolute;
-    right: 0;
+  display: inline-block;
+  position: absolute;
+  right: 0;
 }
 
 .session-item-picker {
-    @include picker-root-element-label();
+  @include picker-root-element-label();
 
-    width: 100%;
-    line-height: 0.9em;
-    white-space: nowrap;
+  width: 100%;
+  line-height: 0.9em;
+  white-space: nowrap;
 }
 
 .track-item-picker {
-    @include picker-root-element-label();
+  @include picker-root-element-label();
 
-    width: 100%;
+  width: 100%;
 }
 
 .revision-file-row {
-    @include border-left($width: 3px);
+  @include border-left($width: 3px);
 
-    &:hover {
-        border-color: $blue;
-    }
+  &:hover {
+    border-color: $blue;
+  }
 }
 
 .conference-page .page-content .file-type-header {
-    color: $light-black;
+  color: $light-black;
 }
 
 #contribution-list {
-    .subcontribution-count {
-        // TODO: Make all .i-labels flexbox and remove the following line
-        display: inline-flex;
-        align-items: center;
+  .subcontribution-count {
+    // TODO: Make all .i-labels flexbox and remove the following line
+    display: inline-flex;
+    align-items: center;
 
-        .label {
-            @include ellipsis;
+    .label {
+      @include ellipsis;
 
-            line-height: 15px;
-            vertical-align: middle;
-        }
-
-        .badge {
-            display: inline-block;
-        }
+      line-height: 15px;
+      vertical-align: middle;
     }
 
-    .icon-user {
-        color: $pastel-gray;
+    .badge {
+      display: inline-block;
+    }
+  }
 
-        &.exists {
-            color: $light-black;
-        }
+  .icon-user {
+    color: $pastel-gray;
+
+    &.exists {
+      color: $light-black;
+    }
+  }
+
+  .tablesorter {
+    .material-column {
+      width: 5em;
     }
 
-    .tablesorter {
-        .material-column {
-            width: 5em;
-        }
-
-        .id-column {
-            width: 4em;
-        }
-
-        .time-column {
-            width: 11em;
-        }
-
-        .duration-column {
-            width: 6em;
-        }
-
-        .code-column {
-            width: 6em;
-        }
-
-        .type-column {
-            width: 6em;
-        }
-
-        .actions-column {
-            width: 6em;
-            box-sizing: initial;
-        }
-
-        .title-column {
-            min-width: 10em;
-        }
+    .id-column {
+      width: 4em;
     }
+
+    .time-column {
+      width: 11em;
+    }
+
+    .duration-column {
+      width: 6em;
+    }
+
+    .code-column {
+      width: 6em;
+    }
+
+    .type-column {
+      width: 6em;
+    }
+
+    .actions-column {
+      width: 6em;
+      box-sizing: initial;
+    }
+
+    .title-column {
+      min-width: 10em;
+    }
+  }
 }
 
 #subcontribution-list {
-    width: 600px;
+  width: 600px;
 
-    table {
-        td.subcontribution-title {
-            @include ellipsis;
+  table {
+    td.subcontribution-title {
+      @include ellipsis;
 
-            max-width: 150px;
-        }
+      max-width: 150px;
     }
+  }
 }
 
 .qbubble-contrib-start-date {
-    max-width: 450px !important;
+  max-width: 450px !important;
 
-    .datetime-widget {
-        width: 100% !important;
-    }
+  .datetime-widget {
+    width: 100% !important;
+  }
 
-    .timepicker {
-        width: 35% !important;
-    }
+  .timepicker {
+    width: 35% !important;
+  }
 }
 
 .qbubble-contrib-duration {
-    max-width: 420px !important;
+  max-width: 420px !important;
 }
 
 #contributions-fixed-fields {
-    margin-bottom: 5px;
+  margin-bottom: 5px;
 }
 
 #display-contribution-list {
-    .contrib-id {
-        color: $light-black;
-    }
+  .contrib-id {
+    color: $light-black;
+  }
 }

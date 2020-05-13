@@ -8,23 +8,23 @@
 @import 'rb:styles/responsive';
 
 :global(.ui.grid > .row).row {
-    display: block;
+  display: block;
 }
 
 .calendar-filters {
+  display: flex;
+  justify-content: space-between;
+
+  > :not(:first-child) {
+    margin-bottom: 10px;
+  }
+
+  .view-switch {
     display: flex;
-    justify-content: space-between;
+    align-items: flex-start;
 
-    > :not(:first-child) {
-        margin-bottom: 10px;
+    :global(.icon:last-child) {
+      margin-right: 0.75em;
     }
-
-    .view-switch {
-        display: flex;
-        align-items: flex-start;
-
-        :global(.icon:last-child) {
-            margin-right: 0.75em;
-        }
-    }
+  }
 }

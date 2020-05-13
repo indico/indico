@@ -8,234 +8,237 @@
 @import 'base/palette';
 @import 'rb:styles/responsive';
 
-.banner.user-dashboard, .user-dashboard {
-    margin-left: auto;
-    margin-right: auto;
-    max-width: 90%;
-    display: flex;
+.banner.user-dashboard,
+.user-dashboard {
+  margin-left: auto;
+  margin-right: auto;
+  max-width: 90%;
+  display: flex;
 
-    @media (max-width: $wide-screen-width) {
-        max-width: 100%;
-    }
+  @media (max-width: $wide-screen-width) {
+    max-width: 100%;
+  }
 
-    & > .page-content {
-        width: 100%;
-    }
+  & > .page-content {
+    width: 100%;
+  }
 }
 
 .banner.user-dashboard {
-    justify-content: space-between;
+  justify-content: space-between;
 }
 
 .dashboard-tab {
-    margin-top: 2em;
+  margin-top: 2em;
 }
 
 .quick-access-pane {
-    @media (min-width: $computer-width) {
-        display: flex;
-    }
+  @media (min-width: $computer-width) {
+    display: flex;
+  }
 }
 
 .dashboard-col {
-    @media (min-width: $computer-width) {
-        width: 50%;
-    }
-    vertical-align: top;
+  @media (min-width: $computer-width) {
+    width: 50%;
+  }
+  vertical-align: top;
 }
 
 .dashboard-col:last-child {
-    @media (min-width: $computer-width) {
-        padding-left: 10px;
-    }
+  @media (min-width: $computer-width) {
+    padding-left: 10px;
+  }
 }
 
 .dashboard-col:first-child {
-    @media (min-width: $computer-width) {
-        padding-right: 10px;
-        padding-left: 0;
-    }
+  @media (min-width: $computer-width) {
+    padding-right: 10px;
+    padding-left: 0;
+  }
 }
 
 .dashboard-box {
-    border: 1px solid #ddd;
-    border-radius: 0.3em;
-    box-sizing: border-box;
-    -moz-box-sizing: border-box;
-    -webkit-box-sizing: border-box;
-    margin-bottom: 44px;
+  border: 1px solid #ddd;
+  border-radius: 0.3em;
+  box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  -webkit-box-sizing: border-box;
+  margin-bottom: 44px;
 }
 
 .dashboard-box h3 {
-    background: #f7f7f7;
-    border-bottom: 1px solid #ddd;
-    border-top-left-radius: 0.3em;
-    border-top-right-radius: 0.3em;
-    font-size: 14px;
-    line-height: 100%;
-    margin: 0;
-    padding: 10px;
+  background: #f7f7f7;
+  border-bottom: 1px solid #ddd;
+  border-top-left-radius: 0.3em;
+  border-top-right-radius: 0.3em;
+  font-size: 14px;
+  line-height: 100%;
+  margin: 0;
+  padding: 10px;
 }
 
 .dashboard-box.suggestions h3 {
-    background: #dcebf5;
+  background: #dcebf5;
 }
 
 .dashboard-box ol {
-    list-style: none;
-    margin: 0;
-    padding: 0;
-    border: none;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  border: none;
 }
 
 .dashboard-box ol li {
-    border-bottom: 1px solid #e5e5e5;
-    padding: 10px 10px 5px 10px;
+  border-bottom: 1px solid #e5e5e5;
+  padding: 10px 10px 5px 10px;
 }
 
-.dashboard-box ol li a, .dashboard-box ol li.no-event span {
-    font-size: 1.2em;
-    line-height: 18px;
-    position: relative;
-    user-select: none;
-    -webkit-touch-callout: none;
-    -webkit-user-select: none;
-    -moz-user-select: none;
-    -ms-user-select: none;
+.dashboard-box ol li a,
+.dashboard-box ol li.no-event span {
+  font-size: 1.2em;
+  line-height: 18px;
+  position: relative;
+  user-select: none;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
 }
 
 .dashboard-box.suggestions ol li > a {
-    margin-right: 15px;
+  margin-right: 15px;
 }
 
 .dashboard-box ol li .actions {
-    font-size: 10px;
-    padding: 0 0 5px 10px;
+  font-size: 10px;
+  padding: 0 0 5px 10px;
 }
 
 .dashboard-box ol li .actions a:hover span {
-    text-decoration: underline;
+  text-decoration: underline;
 }
 
 .dashboard-box.suggestions ol .item-legend {
-    display: none;
+  display: none;
 }
 
-.dashboard-box ol li:last-child > a, .dashboard-box ol li.no-event:last-child span {
-    border-bottom: none;
+.dashboard-box ol li:last-child > a,
+.dashboard-box ol li.no-event:last-child span {
+  border-bottom: none;
 }
 
 .dashboard-box ol li > a:hover .event-title {
-    text-decoration: underline;
+  text-decoration: underline;
 }
 
 .dashboard-box ol .event-title {
-    vertical-align: middle;
+  vertical-align: middle;
 }
 
 .dashboard-box ol .event-date,
 .dashboard-box ol .event-category {
-    color: $dark-gray;
-    display: inline-block;
-    font-weight: normal;
-    vertical-align: middle;
+  color: $dark-gray;
+  display: inline-block;
+  font-weight: normal;
+  vertical-align: middle;
 }
 
 .dashboard-box ol .event-date {
-    display: inline-block;
-    font-size: 12px;
-    width: 85px;
+  display: inline-block;
+  font-size: 12px;
+  width: 85px;
 }
 
 .dashboard-box ol .event-category {
-    display: block;
-    font-size: 0.8em;
+  display: block;
+  font-size: 0.8em;
 }
 
 .dashboard-box ol .item-legend {
-    max-width: 150px;
-    position: relative;
-    float: right;
+  max-width: 150px;
+  position: relative;
+  float: right;
 }
 
 .dashboard-box ol li .close-box {
-    display: none;
-    font-size: 18px;
-    position: absolute;
-    right: 0;
-    top: 0;
-    margin: 10px 10px 0 0;
+  display: none;
+  font-size: 18px;
+  position: absolute;
+  right: 0;
+  top: 0;
+  margin: 10px 10px 0 0;
 }
 
 .dashboard-box ol li:hover .close-box {
-    display: inline-block;
+  display: inline-block;
 }
 
 .item-legend [class*='icon-'] {
-    color: #ddd;
-    font-size: 18px;
+  color: #ddd;
+  font-size: 18px;
 }
 
 .item-legend [class*='icon-'].active {
-    color: #777;
+  color: #777;
 }
 
 .your-details {
-    display: flex;
-    flex-flow: row nowrap;
-    margin-bottom: 15px;
+  display: flex;
+  flex-flow: row nowrap;
+  margin-bottom: 15px;
 
-    .avatar-image {
-        display: none;
+  .avatar-image {
+    display: none;
 
-        @media (min-width: $tablet-width) {
-            display: block;
-        }
-
-        .ui.label {
-            color: $light-gray;
-            margin-right: 34px;
-
-            &.default-avatar {
-                font-size: 70px;
-            }
-
-            &:not(.default-avatar) {
-                height: 140px;
-            }
-        }
+    @media (min-width: $tablet-width) {
+      display: block;
     }
 
-    .your-details-wrapper {
-        color: $black;
-        font-size: 1.2em;
-        line-height: 1.5;
-        max-width: 300px;
-        margin-right: 5px;
+    .ui.label {
+      color: $light-gray;
+      margin-right: 34px;
 
-        h3 {
-            margin-top: 0;
-            margin-bottom: 10px;
-        }
+      &.default-avatar {
+        font-size: 70px;
+      }
 
-        i {
-            color: $dark-gray;
-            margin-right: 10px;
-        }
+      &:not(.default-avatar) {
+        height: 140px;
+      }
+    }
+  }
 
-        .your-labels {
-            display: flex;
-            flex-flow: row wrap;
-            margin-bottom: 1rem;
+  .your-details-wrapper {
+    color: $black;
+    font-size: 1.2em;
+    line-height: 1.5;
+    max-width: 300px;
+    margin-right: 5px;
 
-            .label {
-                margin: 0 7px 7px 0;
-            }
-        }
+    h3 {
+      margin-top: 0;
+      margin-bottom: 10px;
     }
 
-    .actions {
-        flex-shrink: 0;
-        margin-left: auto;
+    i {
+      color: $dark-gray;
+      margin-right: 10px;
     }
+
+    .your-labels {
+      display: flex;
+      flex-flow: row wrap;
+      margin-bottom: 1rem;
+
+      .label {
+        margin: 0 7px 7px 0;
+      }
+    }
+  }
+
+  .actions {
+    flex-shrink: 0;
+    margin-left: auto;
+  }
 }

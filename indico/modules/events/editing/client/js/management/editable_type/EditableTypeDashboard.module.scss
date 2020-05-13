@@ -9,13 +9,13 @@
 @import 'base/typography';
 
 .toolbar-checkbox {
-    align-self: center;
-    margin-top: 0.4rem;
+  align-self: center;
+  margin-top: 0.4rem;
 
-    &:global(.ui.toggle.checkbox) input ~ label {
-        @extend %font-family-body;
-        color: $dark-gray !important;
-        padding-right: 1rem;
-        font-size: 0.9em !important;
-    }
+  &:global(.ui.toggle.checkbox) input ~ label {
+    @extend %font-family-body;
+    color: $dark-gray !important;
+    padding-right: 1rem;
+    font-size: 0.9em !important;
+  }
 }

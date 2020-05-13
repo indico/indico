@@ -5,30 +5,29 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-
 .types-list {
-    display: flex;
-    flex: 1;
-    flex-wrap: wrap;
-    align-items: center;
-    margin-top: -5px;
-    margin-bottom: -5px;
+  display: flex;
+  flex: 1;
+  flex-wrap: wrap;
+  align-items: center;
+  margin-top: -5px;
+  margin-bottom: -5px;
 
-    & > :global(.label) {
-        margin: 5px !important;
-        max-width: 150;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
-    }
+  & > :global(.label) {
+    margin: 5px !important;
+    max-width: 150;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
 }
 
 .condition-actions {
-    flex: 0.1;
-    display: flex;
-    justify-content: flex-end;
+  flex: 0.1;
+  display: flex;
+  justify-content: flex-end;
 
-    :global(.icon):not(:global(.disabled)) {
-        cursor: pointer;
-    }
+  :global(.icon):not(:global(.disabled)) {
+    cursor: pointer;
+  }
 }

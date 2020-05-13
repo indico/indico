@@ -6,19 +6,19 @@
 // LICENSE file for more details.
 
 .show-only-filter {
-    display: flex;
-    align-items: center;
-    width: 300px;
+  display: flex;
+  align-items: center;
+  width: 300px;
 
-    &:not(:nth-last-child(2)) {
-        margin-bottom: 10px;
-    }
+  &:not(:nth-last-child(2)) {
+    margin-bottom: 10px;
+  }
 
-    :global(.toggle.checkbox) {
-        margin-right: 10px;
-    }
+  :global(.toggle.checkbox) {
+    margin-right: 10px;
+  }
 
-    :global(.icon) {
-        height: 100%;
-    }
+  :global(.icon) {
+    height: 100%;
+  }
 }

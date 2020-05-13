@@ -6,91 +6,91 @@
 // LICENSE file for more details.
 
 .occurrences-widget {
-    .occurrence + .occurrence {
-        margin-top: 5px;
+  .occurrence + .occurrence {
+    margin-top: 5px;
+  }
+
+  .DateInput_input {
+    width: 100% !important;
+  }
+
+  .rc-time-picker {
+    width: 22%;
+    vertical-align: top;
+    margin-left: 1em;
+    color: $black;
+    font-size: 1em;
+  }
+
+  .rc-time-picker-input {
+    width: 100% !important;
+  }
+
+  .rc-time-picker-panel-input-wrap {
+    // make sure time does not jump when opening the time picker
+    padding-left: calc(1em - 1px);
+    padding-top: calc(0.5em + 1px);
+  }
+
+  .rc-time-picker-panel-input,
+  .rc-time-picker-panel-select,
+  .rc-time-picker-panel-inner {
+    font-size: 1em;
+    color: $black;
+  }
+
+  .durationpicker {
+    margin-left: 1em;
+    width: 20% !important;
+
+    &::-webkit-inner-spin-button,
+    &::-webkit-outer-spin-button {
+      display: none;
     }
+  }
 
-    .DateInput_input {
-        width: 100% !important;
+  .ui-datepicker-trigger {
+    width: 0;
+  }
+
+  input ~ input {
+    margin-left: 1em;
+  }
+
+  .timezone {
+    @include icon-before('icon-earth');
+    color: $light-black;
+    position: relative;
+    right: 24px;
+    top: 2px;
+  }
+
+  .duration-info {
+    @include icon-before('icon-time');
+    color: $light-black;
+    position: relative;
+    right: 24px;
+    top: 2px;
+  }
+
+  .remove-occurrence {
+    font-size: 1.3em;
+    vertical-align: sub;
+
+    &:hover {
+      color: $red;
+      cursor: pointer;
     }
+  }
 
-    .rc-time-picker {
-        width: 22%;
-        vertical-align: top;
-        margin-left: 1em;
-        color: $black;
-        font-size: 1em;
+  .add-occurrence {
+    display: inline-block;
+    margin-top: 0.25em;
+    color: $blue;
+
+    &:hover {
+      color: $dark-blue;
+      cursor: pointer;
     }
-
-    .rc-time-picker-input {
-        width: 100% !important;
-    }
-
-    .rc-time-picker-panel-input-wrap {
-        // make sure time does not jump when opening the time picker
-        padding-left: calc(1em - 1px);
-        padding-top: calc(0.5em + 1px);
-    }
-
-    .rc-time-picker-panel-input,
-    .rc-time-picker-panel-select,
-    .rc-time-picker-panel-inner {
-        font-size: 1em;
-        color: $black;
-    }
-
-    .durationpicker {
-        margin-left: 1em;
-        width: 20% !important;
-
-        &::-webkit-inner-spin-button,
-        &::-webkit-outer-spin-button {
-            display: none;
-        }
-    }
-
-    .ui-datepicker-trigger {
-        width: 0;
-    }
-
-    input ~ input {
-        margin-left: 1em;
-    }
-
-    .timezone {
-        @include icon-before('icon-earth');
-        color: $light-black;
-        position: relative;
-        right: 24px;
-        top: 2px;
-    }
-
-    .duration-info {
-        @include icon-before('icon-time');
-        color: $light-black;
-        position: relative;
-        right: 24px;
-        top: 2px;
-    }
-
-    .remove-occurrence {
-        font-size: 1.3em;
-        vertical-align: sub;
-
-        &:hover {
-            color: $red;
-            cursor: pointer;
-        }
-    }
-
-    .add-occurrence {
-        display: inline-block;
-        margin-top: 0.25em;
-        color: $blue;
-
-        &:hover {
-            color: $dark-blue;
-            cursor: pointer;
-        }
-    }
+  }
 }

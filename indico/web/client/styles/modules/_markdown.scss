@@ -8,321 +8,327 @@
 $editor-preview-bg-color: $light-gray;
 $display-preview-bg-color: white;
 
-@mixin md-display-rules($background-color,
-                        $pre-bg-color: lighten($background-color, 10%),
-                        $pre-color: darken($background-color, 40%),
-                        $blockquote-color: $background-color) {
-    h1, h2, h3, h4 {
-        @extend %font-family-serif;
-    }
+@mixin md-display-rules(
+  $background-color,
+  $pre-bg-color: lighten($background-color, 10%),
+  $pre-color: darken($background-color, 40%),
+  $blockquote-color: $background-color
+) {
+  h1,
+  h2,
+  h3,
+  h4 {
+    @extend %font-family-serif;
+  }
 
-    h1 {
-        font-size: 1.5em;
-    }
+  h1 {
+    font-size: 1.5em;
+  }
 
-    h2 {
-        font-size: 1.3em;
-    }
+  h2 {
+    font-size: 1.3em;
+  }
 
-    h3 {
-        font-size: 1.2em;
-    }
+  h3 {
+    font-size: 1.2em;
+  }
 
-    h4 {
-        font-size: 1.1em;
-    }
+  h4 {
+    font-size: 1.1em;
+  }
 
-    pre {
-        color: $pre-color;
-        font-size: 1em;
-        padding: 1em;
-        background-color: $pre-bg-color;
-    }
+  pre {
+    color: $pre-color;
+    font-size: 1em;
+    padding: 1em;
+    background-color: $pre-bg-color;
+  }
 
-    blockquote {
-        font-style: italic;
-        border-left: 2px solid darken($blockquote-color, 10%);
-        padding: 0.2em 0.2em 0.2em 1em;
-        margin-left: 0;
-        background-color: darken($blockquote-color, 5%);
-        overflow: auto;
-    }
+  blockquote {
+    font-style: italic;
+    border-left: 2px solid darken($blockquote-color, 10%);
+    padding: 0.2em 0.2em 0.2em 1em;
+    margin-left: 0;
+    background-color: darken($blockquote-color, 5%);
+    overflow: auto;
+  }
 }
 
 @mixin md-preview-wrapper-mixin($background-color, $max-height: 500px) {
-    @include md-display-rules($background-color);
-    @include transition(height .25s ease-out, background-color 1s ease-in, color 1s ease-in);
-    @include border-all();
-    border-bottom-right-radius: $default-border-radius;
-    border-bottom-left-radius: $default-border-radius;
-    @include border-top($width: 0);
-    @extend %font-family-serif;
+  @include md-display-rules($background-color);
+  @include transition(height 0.25s ease-out, background-color 1s ease-in, color 1s ease-in);
+  @include border-all();
+  border-bottom-right-radius: $default-border-radius;
+  border-bottom-left-radius: $default-border-radius;
+  @include border-top($width: 0);
+  @extend %font-family-serif;
 
-    background-color: $background-color;
-    font-size: 1.1em;
+  background-color: $background-color;
+  font-size: 1.1em;
 
-    color: $black;
-    max-height: $max-height;
-    overflow-y: auto;
+  color: $black;
+  max-height: $max-height;
+  overflow-y: auto;
 
-    &.empty {
-        @extend %font-family-sans;
-        background-color: lighten($background-color, 2%);
-        color: $gray;
-        min-height: 2em;
-        text-align: center;
-        overflow-y: hidden;
-        font-size: 1em;
-
-        .instructions {
-            padding: 10px;
-            display: block;
-        }
-
-        .wmd-preview {
-            display: none;
-        }
-    }
+  &.empty {
+    @extend %font-family-sans;
+    background-color: lighten($background-color, 2%);
+    color: $gray;
+    min-height: 2em;
+    text-align: center;
+    overflow-y: hidden;
+    font-size: 1em;
 
     .instructions {
-        display: none;
+      padding: 10px;
+      display: block;
     }
 
     .wmd-preview {
-        padding: 10px;
-
-        p {
-            white-space: pre-line;
-        }
+      display: none;
     }
+  }
+
+  .instructions {
+    display: none;
+  }
+
+  .wmd-preview {
+    padding: 10px;
+
+    p {
+      white-space: pre-line;
+    }
+  }
 }
 
 .md-preview-wrapper.display {
-    padding: 1em 1em 1em 0;
-    @include md-preview-wrapper-mixin($display-preview-bg-color, none);
+  padding: 1em 1em 1em 0;
+  @include md-preview-wrapper-mixin($display-preview-bg-color, none);
 }
 
-.wmd-input, .wmd-input:focus {
-    @extend %font-family-monospace;
-    @include transition(height .25s ease-out);
-    box-shadow: none;
-    @include border-all($width: 0);
+.wmd-input,
+.wmd-input:focus {
+  @extend %font-family-monospace;
+  @include transition(height 0.25s ease-out);
+  box-shadow: none;
+  @include border-all($width: 0);
 
-    min-height: 200px;
-    width: 100%;
-    max-width: 800px;
-    padding: 1em;
-    font-size: 0.9em;
+  min-height: 200px;
+  width: 100%;
+  max-width: 800px;
+  padding: 1em;
+  font-size: 0.9em;
 
-    &.has-length-info {
-        @include border-bottom(white, solid, 2em);
-    }
+  &.has-length-info {
+    @include border-bottom(white, solid, 2em);
+  }
 }
 
 .wmd-panel {
-    @include border-all();
-    border-top-right-radius: $default-border-radius;
-    border-top-left-radius: $default-border-radius;
-    box-shadow: none;
-    position: relative;
-    max-width: 800px;
+  @include border-all();
+  border-top-right-radius: $default-border-radius;
+  border-top-left-radius: $default-border-radius;
+  box-shadow: none;
+  position: relative;
+  max-width: 800px;
 
-    &.focused {
-        @include transition(border);
-        @include border-all($blue);
-    }
+  &.focused {
+    @include transition(border);
+    @include border-all($blue);
+  }
 }
 
 .wmd-button-row {
-    max-width: 800px;
-    position: relative;
-    padding: .5em;
-    height: 2em;
-    margin: 0;
-    background-color: $light-gray;
-    display: flex;
-    align-items: center;
-    justify-content: flex-end;
+  max-width: 800px;
+  position: relative;
+  padding: 0.5em;
+  height: 2em;
+  margin: 0;
+  background-color: $light-gray;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
 }
 
 .wmd-spacer {
-    width: 1px;
-    height: 1em;
-    margin: 0 1em 0 1em;
-    display: inline-block;
-    background-color: $dark-gray;
-    list-style: none;
+  width: 1px;
+  height: 1em;
+  margin: 0 1em 0 1em;
+  display: inline-block;
+  background-color: $dark-gray;
+  list-style: none;
 }
 
 .wmd-button-bar {
-    box-sizing: content-box;
-    position: relative;
+  box-sizing: content-box;
+  position: relative;
 
-    .save-button {
-        @include transition(opacity);
-        @include transition(background-color);
-        @include single-box-shadow(0, 0, 1px, 1px, #fff);
-        position: absolute;
-        right: 50px;
-        display: inline-block;
-        color: white;
-        z-index: 1;
-        top: 8px;
-        opacity: 0;
-        visibility: hidden;
+  .save-button {
+    @include transition(opacity);
+    @include transition(background-color);
+    @include single-box-shadow(0, 0, 1px, 1px, #fff);
+    position: absolute;
+    right: 50px;
+    display: inline-block;
+    color: white;
+    z-index: 1;
+    top: 8px;
+    opacity: 0;
+    visibility: hidden;
 
-        &.waiting-save {
-            visibility: visible;
-            opacity: 1.0;
-        }
-
-        &.saving {
-            background-color: #E4E4B0;
-            visibility: visible;
-            opacity: 1.0;
-            color: $dark-gray !important;
-        }
-
-        &.saved {
-            background-color: #E2F0E2;
-            visibility: visible;
-            opacity: 0.8;
-        }
+    &.waiting-save {
+      visibility: visible;
+      opacity: 1;
     }
+
+    &.saving {
+      background-color: #e4e4b0;
+      visibility: visible;
+      opacity: 1;
+      color: $dark-gray !important;
+    }
+
+    &.saved {
+      background-color: #e2f0e2;
+      visibility: visible;
+      opacity: 0.8;
+    }
+  }
 }
 
 .wmd-button {
-    @include transition(color);
-    width: 2em;
-    height: 2em;
-    line-height: 2em;
-    display: inline-block;
-    color: $black;
-    text-align: center;
-    cursor: pointer;
+  @include transition(color);
+  width: 2em;
+  height: 2em;
+  line-height: 2em;
+  display: inline-block;
+  color: $black;
+  text-align: center;
+  cursor: pointer;
 
-    &:hover {
-        color: $gray;
-    }
+  &:hover {
+    color: $gray;
+  }
 }
 
 .wmd-button > span {
-    font-family: 'icomoon-ultimate';
-    vertical-align: middle;
+  font-family: 'icomoon-ultimate';
+  vertical-align: middle;
 }
 
-[id^="wmd-bold-button"] span {
-    @include icon-before('icon-bold');
+[id^='wmd-bold-button'] span {
+  @include icon-before('icon-bold');
 }
 
-[id^="wmd-italic-button"] span {
-    @include icon-before('icon-italic');
+[id^='wmd-italic-button'] span {
+  @include icon-before('icon-italic');
 }
 
-[id^="wmd-link-button"] span {
-    @include icon-before('icon-link');
+[id^='wmd-link-button'] span {
+  @include icon-before('icon-link');
 }
 
-[id^="wmd-quote-button"] span {
-    @include icon-before('icon-bubble-quote');
+[id^='wmd-quote-button'] span {
+  @include icon-before('icon-bubble-quote');
 }
 
-[id^="wmd-code-button"] span {
-    @include icon-before('icon-code');
+[id^='wmd-code-button'] span {
+  @include icon-before('icon-code');
 }
 
-[id^="wmd-image-button"] span {
-    @include icon-before('icon-image');
+[id^='wmd-image-button'] span {
+  @include icon-before('icon-image');
 }
 
-[id^="wmd-olist-button"] span {
-    @include icon-before('icon-numbered-list');
+[id^='wmd-olist-button'] span {
+  @include icon-before('icon-numbered-list');
 }
 
-[id^="wmd-ulist-button"] span {
-    @include icon-before('icon-list');
+[id^='wmd-ulist-button'] span {
+  @include icon-before('icon-list');
 }
 
-[id^="wmd-heading-button"] span {
-    @include icon-before('icon-type');
+[id^='wmd-heading-button'] span {
+  @include icon-before('icon-type');
 }
 
-[id^="wmd-hr-button"] span {
-    @include icon-before('icon-pagebreak');
+[id^='wmd-hr-button'] span {
+  @include icon-before('icon-pagebreak');
 }
 
-[id^="wmd-undo-button"] span {
-    @include icon-before('icon-undo');
+[id^='wmd-undo-button'] span {
+  @include icon-before('icon-undo');
 }
 
-[id^="wmd-redo-button"] span {
-    @include icon-before('icon-redo');
+[id^='wmd-redo-button'] span {
+  @include icon-before('icon-redo');
 }
 
 .wmd-help-button {
-    @include icon-before('icon-info');
+  @include icon-before('icon-info');
 
-    margin-left: auto;
+  margin-left: auto;
 }
 
 .wmd-prompt-background {
-    background-color: Black;
+  background-color: black;
 }
 
 .wmd-prompt-dialog {
-    border: 1px solid #999999;
-    background-color: #F5F5F5;
+  border: 1px solid #999;
+  background-color: #f5f5f5;
 }
 
 .wmd-prompt-dialog > div {
-    font-size: 0.8em;
-    font-family: arial, helvetica, sans-serif;
+  font-size: 0.8em;
+  font-family: arial, helvetica, sans-serif;
 }
 
-.wmd-prompt-dialog > form > input[type="text"] {
-    border: 1px solid #999999;
-    color: black;
+.wmd-prompt-dialog > form > input[type='text'] {
+  border: 1px solid #999;
+  color: black;
 }
 
-.wmd-prompt-dialog > form > input[type="button"] {
-    border: 1px solid #888888;
-    font-family: trebuchet MS, helvetica, sans-serif;
-    font-size: 0.8em;
-    font-weight: bold;
+.wmd-prompt-dialog > form > input[type='button'] {
+  border: 1px solid #888;
+  font-family: trebuchet MS, helvetica, sans-serif;
+  font-size: 0.8em;
+  font-weight: bold;
 }
 
 .md-preview-wrapper.edit {
-    max-width: 800px;
-    @include md-preview-wrapper-mixin($editor-preview-bg-color);
+  max-width: 800px;
+  @include md-preview-wrapper-mixin($editor-preview-bg-color);
 }
 
 .markdown-help-qtip {
-    max-width: 500px;
+  max-width: 500px;
 }
 
 .max-length-info {
-    padding: .5em;
-    height: 2em;
-    margin: 0;
-    position: absolute;
-    bottom: 0;
-    right: 0;
-    pointer-events: none;
+  padding: 0.5em;
+  height: 2em;
+  margin: 0;
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  pointer-events: none;
 
-    span {
-        color: $gray;
+  span {
+    color: $gray;
 
-        &.limit-close {
-            color: $yellow;
-        }
-
-        &.limit-exceeded {
-            color: $red;
-        }
-
-        & + span:before {
-            content: ' | ';
-            color: $gray;
-        }
+    &.limit-close {
+      color: $yellow;
     }
+
+    &.limit-exceeded {
+      color: $red;
+    }
+
+    & + span::before {
+      content: ' | ';
+      color: $gray;
+    }
+  }
 }

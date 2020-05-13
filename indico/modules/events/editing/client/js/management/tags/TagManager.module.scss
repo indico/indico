@@ -6,23 +6,23 @@
 // LICENSE file for more details.
 
 .tags-container {
-    max-width: 600px !important;
+  max-width: 600px !important;
 
-    .tag-segment {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
+  .tag-segment {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
 
-        .tag-actions {
-            width: 45px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
+    .tag-actions {
+      width: 45px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
 
-            i:global(.icon) {
-                margin-right: 0;
-                cursor: pointer;
-            }
-        }
+      i:global(.icon) {
+        margin-right: 0;
+        cursor: pointer;
+      }
     }
+  }
 }

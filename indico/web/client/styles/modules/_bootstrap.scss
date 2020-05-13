@@ -6,283 +6,283 @@
 // LICENSE file for more details.
 
 .bootstrap-header {
-    @extend %font-family-form;
+  @extend %font-family-form;
 
-    font-weight: bolder;
+  font-weight: bolder;
 
-    z-index: 1;
+  z-index: 1;
 
-    display: block;
+  display: block;
 
-    width: 100%;
-    height: 350px;
-    padding-top: 20px;
+  width: 100%;
+  height: 350px;
+  padding-top: 20px;
 
-    text-align: center;
+  text-align: center;
 
-    border-bottom: 5px solid white;
-    background-color: $darker-blue;
-    background-repeat: no-repeat;
-    background-position: 20px 20px;
+  border-bottom: 5px solid white;
+  background-color: $darker-blue;
+  background-repeat: no-repeat;
+  background-position: 20px 20px;
 
+  .header-logo {
+    height: 50%;
+
+    color: white;
+  }
+
+  .header-title {
+    @extend %font-family-logo;
+
+    font-size: 54px;
+
+    color: $pastel-blue;
+  }
+
+  .header-subtitle {
+    @extend %font-family-logo;
+
+    font-size: 26px;
+
+    color: white;
+  }
+
+  &.mini {
+    position: fixed;
+    top: 0;
+
+    height: 120px;
+
+    text-align: left;
     .header-logo {
-        height: 50%;
+      float: left;
 
-        color: white;
+      height: 75%;
+      margin-left: 50px;
+      padding-right: 30px;
+    }
+  }
+
+  .language-selector {
+    position: fixed;
+    z-index: 1;
+    top: 10px;
+    right: 10px;
+
+    padding: 0;
+
+    .i-button.arrow {
+      width: 102px;
+
+      color: darken(white, 10%) !important;
+      border: 0;
+
+      &:hover:not(.disabled):not(:disabled) {
+        color: white !important;
+      }
     }
 
-    .header-title {
-        @extend %font-family-logo;
+    .i-dropdown {
+      width: 200px;
 
-        font-size: 54px;
-
-        color: $pastel-blue;
+      text-align: left;
     }
-
-    .header-subtitle {
-        @extend %font-family-logo;
-
-        font-size: 26px;
-
-        color: white;
-    }
-
-    &.mini {
-        position: fixed;
-        top: 0;
-
-        height: 120px;
-
-        text-align: left;
-        .header-logo {
-            float: left;
-
-            height: 75%;
-            margin-left: 50px;
-            padding-right: 30px;
-        }
-    }
-
-    .language-selector {
-        position: fixed;
-        z-index: 1;
-        top: 10px;
-        right: 10px;
-
-        padding: 0;
-
-        .i-button.arrow {
-            width: 102px;
-
-            color: darken(white, 10%) !important;
-            border: 0;
-
-            &:hover:not(.disabled):not(:disabled) {
-                color: white !important;
-            }
-        }
-
-        .i-dropdown {
-            width: 200px;
-
-            text-align: left;
-        }
-    }
+  }
 }
 
-.bootstrap-body:before,
-.bootstrap-body:after {
-    line-height: 0;
+.bootstrap-body::before,
+.bootstrap-body::after {
+  line-height: 0;
 
-    display: table;
+  display: table;
 
-    content: '';
+  content: '';
 }
 
 .bootstrap-body {
-    @extend %font-family-form;
+  @extend %font-family-form;
 
+  width: 100%;
+  min-width: 800px;
+  max-width: 1140px;
+  margin-right: auto;
+  margin-left: auto;
+  padding-top: 30px;
+  padding-bottom: 50px;
+
+  border-left: 3px $darker-blue solid;
+  background: white;
+  @media only screen and (min-width: 481px) and (max-width: 768px) {
+    min-width: 480px;
+    max-width: 492px;
+  }
+  @media only screen and (min-width: 769px) and (max-width: 1024px) {
+    min-width: 600px;
+    max-width: 680px;
+  }
+  @media only screen and (min-width: 1025px) and (max-width: 1230px) {
+    max-width: 937px;
+  }
+  &.mini {
+    margin-top: 120px;
+  }
+
+  #flashed-messages {
+    width: 85%;
+    margin: 0 auto;
+  }
+
+  .bootstrap-form {
     width: 100%;
-    min-width: 800px;
-    max-width: 1140px;
-    margin-right: auto;
-    margin-left: auto;
-    padding-top: 30px;
-    padding-bottom: 50px;
+    max-width: none;
+    height: 100%;
 
-    border-left: 3px $darker-blue solid;
-    background: white;
-    @media only screen and (min-width: 481px) and (max-width: 768px) {
-        min-width: 480px;
-        max-width: 492px;
-    }
-    @media only screen and (min-width: 769px) and (max-width: 1024px) {
-        min-width: 600px;
-        max-width: 680px;
-    }
-    @media only screen and (min-width: 1025px) and (max-width: 1230px) {
-        max-width: 937px;
-    }
-    &.mini {
-        margin-top: 120px;
-    }
+    .step-wrapper {
+      width: 100%;
+      padding-top: 75px;
 
-    #flashed-messages {
+      color: $black;
+      div {
+        @include clearfix;
+      }
+
+      .step-icon {
+        box-sizing: border-box;
+
+        float: left;
+
+        width: 100px;
+        height: 100px;
+        margin-top: 1em;
+        margin-left: -50px;
+        padding: 0;
+
+        border: 5px solid white;
+        border-radius: 50%;
+        background-color: $darker-blue;
+        i {
+          font-size: 50px;
+
+          position: relative;
+          z-index: 0;
+          top: 20px;
+          left: 20px;
+
+          color: white;
+        }
+      }
+
+      .step-container {
         width: 85%;
-        margin: 0 auto;
-    }
 
-    .bootstrap-form {
-        width: 100%;
-        max-width: none;
-        height: 100%;
+        text-align: left;
 
-        .step-wrapper {
-            width: 100%;
-            padding-top: 75px;
+        .step-title {
+          @extend %font-family-logo;
 
-            color: $black;
-            div {
-                @include clearfix;
-            }
+          font-size: 4em;
+          font-weight: bold;
 
-            .step-icon {
-                box-sizing: border-box;
+          padding-bottom: 0.6em;
+          padding-left: 2%;
 
-                float: left;
-
-                width: 100px;
-                height: 100px;
-                margin-top: 1em;
-                margin-left: -50px;
-                padding: 0;
-
-                border: 5px solid white;
-                border-radius: 50%;
-                background-color: $darker-blue;
-                i {
-                    font-size: 50px;
-
-                    position: relative;
-                    z-index: 0;
-                    top: 20px;
-                    left: 20px;
-
-                    color: white;
-                }
-            }
-
-            .step-container {
-                width: 85%;
-
-                text-align: left;
-
-                .step-title {
-                    @extend %font-family-logo;
-
-                    font-size: 4em;
-                    font-weight: bold;
-
-                    padding-bottom: 0.6em;
-                    padding-left: 2%;
-
-                    color: $darker-blue;
-                }
-
-                .step-description {
-                    font-size: 1.4em;
-
-                    float: left;
-
-                    width: 40%;
-                    padding-left: 2%;
-
-                    text-align: justify;
-
-                    color: #555555;
-
-                    div {
-                        padding-bottom: 1em;
-                    }
-
-                    .additional-information {
-                        color: $gray;
-                    }
-                }
-
-                .fields-container {
-                    float: right;
-
-                    width: 50%;
-
-                    > .form-group > .form-label > .required {
-                        display: none;
-                    }
-
-                    > .warning-message-box {
-                        margin-left: 1.2em;
-                        width: 400px;
-                    }
-                }
-
-                > div {
-                    width: 100%;
-                }
-
-                input,
-                select,
-                label {
-                    font-size: 1.2em;
-                }
-            }
-
-            .i-button {
-                @extend %font-family-logo;
-            }
+          color: $darker-blue;
         }
-    }
 
-    .form-group-footer {
-        float: right;
-        margin-bottom: 2em;
-        text-align: center;
-        width: 100%;
+        .step-description {
+          font-size: 1.4em;
 
-        .i-button.big {
-            font-size: 2em;
+          float: left;
 
-            width: 40%;
-            padding: 0.5em;
+          width: 40%;
+          padding-left: 2%;
+
+          text-align: justify;
+
+          color: #555;
+
+          div {
+            padding-bottom: 1em;
+          }
+
+          .additional-information {
+            color: $gray;
+          }
         }
+
+        .fields-container {
+          float: right;
+
+          width: 50%;
+
+          > .form-group > .form-label > .required {
+            display: none;
+          }
+
+          > .warning-message-box {
+            margin-left: 1.2em;
+            width: 400px;
+          }
+        }
+
+        > div {
+          width: 100%;
+        }
+
+        input,
+        select,
+        label {
+          font-size: 1.2em;
+        }
+      }
+
+      .i-button {
+        @extend %font-family-logo;
+      }
     }
+  }
+
+  .form-group-footer {
+    float: right;
+    margin-bottom: 2em;
+    text-align: center;
+    width: 100%;
+
+    .i-button.big {
+      font-size: 2em;
+
+      width: 40%;
+      padding: 0.5em;
+    }
+  }
 }
 
 .transparent-button {
+  border-color: transparent;
+  background-color: transparent !important;
+
+  &:hover:not(.disabled):not(:disabled) {
+    @include gradient(transparent, transparent);
+
     border-color: transparent;
-    background-color: transparent !important;
+    box-shadow: none;
+  }
 
-    &:hover:not(.disabled):not(:disabled) {
-        @include gradient(transparent, transparent);
+  &:active:not(.disabled):not(:disabled) {
+    @include gradient(transparent, transparent);
 
-        border-color: transparent;
-        box-shadow: none;
-    }
-
-    &:active:not(.disabled):not(:disabled) {
-        @include gradient(transparent, transparent);
-
-        border-color: transparent;
-    }
+    border-color: transparent;
+  }
 }
 
 #step1 .form-group .form-field,
 #step2 .form-group:nth-last-child(2) .form-field,
-#step3 .form-group:nth-child(n+2) .form-field {
-    margin-bottom: 1.6em;
+#step3 .form-group:nth-child(n + 2) .form-field {
+  margin-bottom: 1.6em;
 }
 
 #step1 .form-group .form-label,
 #step2 .form-group:last-child .form-label,
-#step3 .form-group:nth-child(n+2) .form-label {
-    display: none;
+#step3 .form-group:nth-child(n + 2) .form-label {
+  display: none;
 }

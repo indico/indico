@@ -9,58 +9,58 @@
 @import 'rb:styles/responsive';
 
 .pre-booking-color {
-    color: $orange;
+  color: $orange;
 }
 
 .events-segment-description {
-    color: $gray;
-    padding-bottom: 1em;
+  color: $gray;
+  padding-bottom: 1em;
 }
 
 .event-checkbox {
-    display: flex;
-    align-items: center;
+  display: flex;
+  align-items: center;
 
-    .description {
-        margin-left: 1em;
-        color: $gray;
-    }
+  .description {
+    margin-left: 1em;
+    color: $gray;
+  }
 
-    .checkbox {
-        margin-left: auto;
-    }
+  .checkbox {
+    margin-left: auto;
+  }
 
-    .link-active {
-        margin-left: 0.5em;
-        margin-bottom: 0.15em;
-    }
+  .link-active {
+    margin-left: 0.5em;
+    margin-bottom: 0.15em;
+  }
 }
 
 .event-dropdown {
-    display: flex;
-    align-items: center;
+  display: flex;
+  align-items: center;
 
-    :global(.field) {
-        flex-grow: 1;
-        padding-right: 1em;
-        margin: 0 !important;
-    }
+  :global(.field) {
+    flex-grow: 1;
+    padding-right: 1em;
+    margin: 0 !important;
+  }
 
-    .link-active .link-inactive {
-        margin-left: auto;
-    }
+  .link-active .link-inactive {
+    margin-left: auto;
+  }
 
-    .link-inactive :global(.icon) {
-        color: $gray;
-    }
+  .link-inactive :global(.icon) {
+    color: $gray;
+  }
 }
 
 :global(.ui.segment).pre-conflicts-segment {
-    padding-left: 2em;
+  padding-left: 2em;
 }
 
 .usage-radio :global(.ui.radio) {
-    @media (max-width: $tablet-width) {
-        padding-bottom: 0.5em;
-    }
+  @media (max-width: $tablet-width) {
+    padding-bottom: 0.5em;
+  }
 }

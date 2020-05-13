@@ -8,47 +8,47 @@
 a,
 .fake-link,
 .ui-widget-content a {
-    color: $blue;
+  color: $blue;
 
-    &:hover {
-        color: $dark-orange;
-        cursor: pointer;
-    }
+  &:hover {
+    color: $dark-orange;
+    cursor: pointer;
+  }
 
-    &:link,
-    &:visited {
-        text-decoration: none;
-    }
+  &:link,
+  &:visited {
+    text-decoration: none;
+  }
 }
 
 .i-link {
-    @extend %semantic-link;
-    @include transition(color);
-    cursor: pointer;
+  @extend %semantic-link;
+  @include transition(color);
+  cursor: pointer;
 
-    &.disabled {
-        cursor: default !important;
-    }
+  &.disabled {
+    cursor: default !important;
+  }
 }
 
 a.discreet-link {
-    color: inherit;
+  color: inherit;
 
-    &:hover {
-        text-decoration: underline;
-    }
+  &:hover {
+    text-decoration: underline;
+  }
 }
 
 [data-anchor]:hover {
-    .anchor-link {
-        opacity: 1;
-    }
+  .anchor-link {
+    opacity: 1;
+  }
 }
 
 .anchor-link {
-    @extend %font-family-body;
-    @include transition(opacity 0.25s ease-out);
-    opacity: 0;
-    margin-left: 0.5em;
-    color: $gray !important;
+  @extend %font-family-body;
+  @include transition(opacity 0.25s ease-out);
+  opacity: 0;
+  margin-left: 0.5em;
+  color: $gray !important;
 }
