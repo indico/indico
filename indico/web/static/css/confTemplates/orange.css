@@ -1,84 +1,82 @@
-﻿
 .confTitleBox {
-    border-top: 3px solid #e05e00;
-    border-bottom: 1px solid #c05000;
-    background: #fa6900 url("/images/conf/sprites_orange.png") repeat-x 0 -24px;
+  border-top: 3px solid #e05e00;
+  border-bottom: 1px solid #c05000;
+  background: #fa6900 url('/images/conf/sprites_orange.png') repeat-x 0 -24px;
 }
 
 .confSubTitleBox {
-    background: #e0e4cc url("/images/conf/sprites_orange.png") repeat-x 0 -213px;
-    border-bottom: 1px solid #bfc3ae;
-    border-top: 1px solid #bfc3ae;
+  background: #e0e4cc url('/images/conf/sprites_orange.png') repeat-x 0 -213px;
+  border-bottom: 1px solid #bfc3ae;
+  border-top: 1px solid #bfc3ae;
 }
 
 .confSubTitleContent {
-    width: 950px;
-    margin: 0 auto;
+  width: 950px;
+  margin: 0 auto;
 }
 
 .conference-title-link {
-    color: white;
+  color: white;
 }
 
-
 /* ------Menu------ */
-/* here is layout and style for creating default menu for conferences */
 
+/* here is layout and style for creating default menu for conferences */
 
 /* Styles for all menu Items */
 
 #outer {
-    background: #dfe7e7;
-    border: 1px solid #7e8383;
+  background: #dfe7e7;
+  border: 1px solid #7e8383;
 }
 
 #outer li a:hover {
-    background: #777;
-    color: white;
+  background: #777;
+  color: white;
 }
 
 .support_box {
-    background: #dfe7e7;
-    border: 1px solid #7e8383;
+  background: #dfe7e7;
+  border: 1px solid #7e8383;
 }
 
 .support_box > h3 {
-    background: #fa6900;
+  background: #fa6900;
 }
 
 .conf_leftMenu {
-    float:left;
-    width:200px;
-    background:transparent none repeat scroll 0 0;
+  float: left;
+  width: 200px;
+  background: transparent none repeat scroll 0 0;
 }
 
 .menuConfTitle {
-    text-align:left;
-    color:#0200C6;
+  text-align: left;
+  color: #0200c6;
 }
 
 .menuConfTitle a {
-    color: #4e4c46;
-    padding: 7px 12px;
+  color: #4e4c46;
+  padding: 7px 12px;
 }
 
 .menuConfSelected a {
-    padding: 7px 12px;
-    color: #4e4c46;
+  padding: 7px 12px;
+  color: #4e4c46;
 }
 
 li ul.inner li a {
-    padding: 3px 12px 3px 30px;
-    background: transparent url(/images/conf/left_menu_bullet.png) scroll no-repeat 15px center;
+  padding: 3px 12px 3px 30px;
+  background: transparent url(/images/conf/left_menu_bullet.png) scroll no-repeat 15px center;
 } /* Sub Menu Styles */
 
 .confSubTitle {
-    color: #5b5d53;
+  color: #5b5d53;
 }
 
 .simpleTextAnnouncement {
-    background: #F5FAFF url(/images/conf/sprites_orange.png) repeat-x scroll 0 -400px;
-    border-top: none;
-    border-bottom: 1px solid #CCC;
-    color: #0f283d;
+  background: #f5faff url(/images/conf/sprites_orange.png) repeat-x scroll 0 -400px;
+  border-top: none;
+  border-bottom: 1px solid #ccc;
+  color: #0f283d;
 }

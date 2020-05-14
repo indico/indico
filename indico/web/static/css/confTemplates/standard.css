@@ -3,28 +3,26 @@
     conference.
 */
 
-
-
 /* ----------- Styles for the conference header ----------- */
 
 /*
     The wrapper of the whole conference page.
 */
 .conf {
-    width: 100%;
-    border: none;
-    margin: auto;
+  width: 100%;
+  border: none;
+  margin: auto;
 }
 
 /*
     Wraps around the upper part of the conference header.
 */
 .confTitleBox {
-    color: white;
-    min-height: 90px;
-    border-top: 3px solid #234173;
-    border-bottom: 1px solid #0f4c80;
-    background: #1a64a0;
+  color: white;
+  min-height: 90px;
+  border-top: 3px solid #234173;
+  border-bottom: 1px solid #0f4c80;
+  background: #1a64a0;
 }
 
 /*
@@ -32,8 +30,8 @@
     Is set to 950px and centered by default.
 */
 .confTitle {
-    width: 950px;
-    margin: 0 auto;
+  width: 950px;
+  margin: 0 auto;
 }
 
 /*
@@ -41,28 +39,28 @@
     on the left of the conference title.
 */
 .confLogoBox {
-    float: left;
-    padding-right: 10px;
+  float: left;
+  padding-right: 10px;
 }
 
 /*
     The style for the title text.
 */
 .conference-title-link {
-    font-size:22pt;
-    display: block;
-    padding: 25px 0;
-    color: white;
+  font-size: 22pt;
+  display: block;
+  padding: 25px 0;
+  color: white;
 }
 
 /*
     Wrapper around the bottom part of the conference header
 */
 .confSubTitleBox {
-    background: #f5faff;
-    border-bottom: 1px solid #d5e4f1;
-    border-top: 1px solid #d5e4f1;
-    padding: 0.5rem 0;
+  background: #f5faff;
+  border-bottom: 1px solid #d5e4f1;
+  border-top: 1px solid #d5e4f1;
+  padding: 0.5rem 0;
 }
 
 /*
@@ -70,41 +68,39 @@
     centered and has a fixed width.
 */
 .confSubTitleContent {
-    width: 950px;
-    margin: 0 auto;
-    font-size: 11pt;
-    color: #24425a;
+  width: 950px;
+  margin: 0 auto;
+  font-size: 11pt;
+  color: #24425a;
 }
 
 /*
     Style for links in the lower part of the header
 */
 .confSubTitle a {
-    font-size: 11pt;
+  font-size: 11pt;
 }
 
 /*
     Styles for the date and place information.
 */
 .datePlace {
-    font-size: 12pt;
+  font-size: 12pt;
 }
-
 
 /*
     Announcement styles
 */
 .simpleTextAnnouncement {
-    background: #F5FAFF url(/images/conf/sprites_blue.png) repeat-x scroll 0 -400px;
-    border-top: 1px solid #c2d6e7;
-    font-family: Verdana;
-    font-weight: bold;
-    font-size: 10pt;
-    text-align: center;
-    color: #0f283d;
-    padding: 8px 0;
+  background: #f5faff url(/images/conf/sprites_blue.png) repeat-x scroll 0 -400px;
+  border-top: 1px solid #c2d6e7;
+  font-family: Verdana;
+  font-weight: bold;
+  font-size: 10pt;
+  text-align: center;
+  color: #0f283d;
+  padding: 8px 0;
 }
-
 
 /* ----------- Styles for the main content ----------- */
 
@@ -113,15 +109,12 @@
     By default centered with a fix width.
 */
 #confSectionsBox {
-    width: 950px;
-    margin: 0 auto;
-    margin-top: 30px;
+  width: 950px;
+  margin: 0 auto;
+  margin-top: 30px;
 }
 
-
-
 /* ----------- Styles for the menu ----------- */
-
 
 /* Styles for all menu Items */
 
@@ -129,79 +122,78 @@
     Wrapper around the menu
 */
 .conf_leftMenu {
-    float:left;
-    width:200px;
+  float: left;
+  width: 200px;
 }
 
 /*
     Styles for the menu box
 */
 #outer {
-    border: 1px solid #ccc;
-    background: #f6f6f6;
+  border: 1px solid #ccc;
+  background: #f6f6f6;
 }
 
 /*
     The menu item
 */
 #outer li a {
-    font-family:verdana,arial,sans-serif;
-    font-size: 10pt;
+  font-family: verdana, arial, sans-serif;
+  font-size: 10pt;
 }
 
 /*
     The menu item when doing mouseover
 */
 #outer li a:hover {
-    background: #e0e0e0;
+  background: #e0e0e0;
 }
 
 /*
     A non selected menu item
 */
 .menuConfTitle {
-    text-align: left;
+  text-align: left;
 }
 
 .menuConfTitle a {
-    color: #275C86;
-    padding: 7px 12px;
+  color: #275c86;
+  padding: 7px 12px;
 }
 
 /*
     A selected menu item
 */
 
-.menuConfTitle.selected > a, .menuConfMiddleCell.selected > a {
-    color: #BD891A;
-    background: #dadada;
-    border-bottom: 1px solid #d0d0d0;
-    border-top: 1px solid #d0d0d0;
+.menuConfTitle.selected > a,
+.menuConfMiddleCell.selected > a {
+  color: #bd891a;
+  background: #dadada;
+  border-bottom: 1px solid #d0d0d0;
+  border-top: 1px solid #d0d0d0;
 }
 
 /*
     sub menu item
 */
 li ul.inner li a {
-    padding: 3px 12px 3px 30px;
-    background: transparent url(/images/conf/left_menu_bullet.png) scroll no-repeat 15px center;
+  padding: 3px 12px 3px 30px;
+  background: transparent url(/images/conf/left_menu_bullet.png) scroll no-repeat 15px center;
 }
-
 
 /*
     Support box
 */
 
 .support_box {
-    background: #f6f6f6;
-    border: 1px solid #ccc;
+  background: #f6f6f6;
+  border: 1px solid #ccc;
 }
 
 .support_box > h3 {
-    color: #f3f3f3;
-    background: #1a64a0;
+  color: #f3f3f3;
+  background: #1a64a0;
 }
-
 
 /* ----------- Styles for the page content ----------- */
 
@@ -209,7 +201,5 @@ li ul.inner li a {
     Wrapper around the content
 */
 .confBodyBox {
-    margin-left: 230px;
+  margin-left: 230px;
 }
-
-

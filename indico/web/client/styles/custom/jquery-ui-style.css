@@ -7,169 +7,184 @@
  */
 
 .ui-button {
-    background: #DDDDDD !important;
+  background: #ddd !important;
 }
 
 /* make "today" less prominent */
 .ui-datepicker-today .ui-state-highlight {
-    background: none;
+  background: none;
 }
 
 /* ensure daterange selectors are large enough to prevent wrapping */
 .ui-daterange {
-    width: 37em;
+  width: 37em;
 }
 
 .ui-dialog-content .ui-daterange {
-    width: 100%;
+  width: 100%;
 }
 
 .ui-dialog {
-    width: auto !important;
-    padding: 0px;
+  width: auto !important;
+  padding: 0;
 }
 
 .ui-dialog .ui-dialog-buttonpane {
-    border-top: 1px solid #CCCCCC;
-    margin: 0px;
-    padding: 0.3em 1em 0.5em 0.4em !important;
-    background: #FCFCFC;
-
+  border-top: 1px solid #ccc;
+  margin: 0;
+  padding: 0.3em 1em 0.5em 0.4em !important;
+  background: #fcfcfc;
 }
 
 .ui-dialog .ui-dialog-title {
-    max-width: 800px;
+  max-width: 800px;
 }
 
 .ui-dialog-content {
-    padding: 0px !important;
+  padding: 0 !important;
 }
 
 .ui-state-active a {
-    color: #555555 !important;
+  color: #555 !important;
 }
 
-.ui-state-default a, .ui-state-default a:link, .ui-state-default a:visited {
-    color: #555555;
-    text-decoration: none;
+.ui-state-default a,
+.ui-state-default a:link,
+.ui-state-default a:visited {
+  color: #555;
+  text-decoration: none;
 }
 
-.ui-state-default, .ui-widget-content .ui-state-default, .ui-widget-header .ui-state-default {
-    border: 1px solid #d3d3d3;
-    font-weight: normal;
-    color: #555555;
+.ui-state-default,
+.ui-widget-content .ui-state-default,
+.ui-widget-header .ui-state-default {
+  border: 1px solid #d3d3d3;
+  font-weight: normal;
+  color: #555;
 }
 
-.ui-state-hover, .ui-widget-content .ui-state-hover, .ui-widget-header .ui-state-hover, .ui-state-focus, .ui-widget-content .ui-state-focus, .ui-widget-header .ui-state-focus {
-    border: 1px solid #999999;
-    background: #dadada;
-    font-weight: normal;
-    color: #212121;
+.ui-state-hover,
+.ui-widget-content .ui-state-hover,
+.ui-widget-header .ui-state-hover,
+.ui-state-focus,
+.ui-widget-content .ui-state-focus,
+.ui-widget-header .ui-state-focus {
+  border: 1px solid #999;
+  background: #dadada;
+  font-weight: normal;
+  color: #212121;
 }
 
-.ui-state-hover a, .ui-state-hover a:hover {
-    color: #212121;
-    text-decoration: none;
+.ui-state-hover a,
+.ui-state-hover a:hover {
+  color: #212121;
+  text-decoration: none;
 }
 
-.ui-state-active, .ui-widget-content .ui-state-active, .ui-widget-header .ui-state-active {
-    border: 1px solid #aaaaaa;
-    background: #ffffff;
-    font-weight: normal;
-    color: #212121;
+.ui-state-active,
+.ui-widget-content .ui-state-active,
+.ui-widget-header .ui-state-active {
+  border: 1px solid #aaa;
+  background: #fff;
+  font-weight: normal;
+  color: #212121;
 }
 
-.ui-state-active a, .ui-state-active a:link, .ui-state-active a:visited {
-    color: #555555;
-    text-decoration: none;
-    font-weight: bold;
+.ui-state-active a,
+.ui-state-active a:link,
+.ui-state-active a:visited {
+  color: #555;
+  text-decoration: none;
+  font-weight: bold;
 }
 
 .ui-widget-header {
-    border: none;
-    background: none !important;
-    color: inherit !important;
+  border: none;
+  background: none !important;
+  color: inherit !important;
 }
 
 .ui-dialog-titlebar {
-    border-bottom: 1px solid #CCCCCC !important;
-    font-weight: normal;
-    font-size: 17px;
-    background-color: #FCFCFC !important;
+  border-bottom: 1px solid #ccc !important;
+  font-weight: normal;
+  font-size: 17px;
+  background-color: #fcfcfc !important;
 }
 
 .ui-dialog-titlebar-close:not(.ui-state-hover) {
-    border: none !important;
-    background: none !important;
+  border: none !important;
+  background: none !important;
 }
 
 .ui-tabs a {
-    outline: none;
+  outline: none;
 }
 
 .ui-tabs .ui-tabs-nav li {
-    padding: 0;
-    outline: none;
+  padding: 0;
+  outline: none;
 }
 
 .ui-tabs .ui-tabs-nav .ui-state-disabled {
-    display: none;
+  display: none;
 }
 
 .ui-tabs .ui-tabs-hide {
-    position: absolute;
-    top: -10000px;
-    left: -10000px;
+  position: absolute;
+  top: -10000px;
+  left: -10000px;
 }
 
 .ui-tabs-nav {
-    border-bottom: 1px solid #AAAAAA;
+  border-bottom: 1px solid #aaa;
 }
 
 .ui-tabs li.ui-state-default {
-    background: #FFFFFF !important;
+  background: #fff !important;
 }
 
-.ui-tabs li.ui-corner-top, .ui-tabs li.ui-corner-all {
-    border-radius: 0;
+.ui-tabs li.ui-corner-top,
+.ui-tabs li.ui-corner-all {
+  border-radius: 0;
 }
 
 .ui-tabs .tab-scroll-button .ui-icon {
-    background-image: url(~jquery-ui/themes/base/images/ui-icons_777620_256x240.png);
+  background-image: url(~jquery-ui/themes/base/images/ui-icons_777620_256x240.png);
 }
 
 .ui-tabs {
-    position: relative;
-    border: none !important;
-    padding: 0;
-    zoom: 1;
+  position: relative;
+  border: none !important;
+  padding: 0;
+  zoom: 1;
 }
 
 .ui-tabs .ui-tabs-nav {
-    margin: 0;
+  margin: 0;
 }
 
 .ui-tabs .ui-tabs-nav li a.ui-tabs-anchor {
-    float: left;
-    padding: 6px 8px 3px 8px;
-    text-decoration: none;
+  float: left;
+  padding: 6px 8px 3px 8px;
+  text-decoration: none;
 }
 
 .ui-tabs .ui-tabs-nav li a.pendingTab {
-    background-color: #FFFFBB;
-    font-weight: bold;
+  background-color: #ffb;
+  font-weight: bold;
 }
 
 .ui-tabs .ui-tabs-nav li.ui-tabs-selected a.pendingTab {
-    background-color: #FFFFFF;
+  background-color: #fff;
 }
 
 .ui-widget-content {
-    background: #FFFFFF;
-    border: none;
+  background: #fff;
+  border: none;
 }
 
 .ui-widget-overlay {
-    background: #444444 url(~jquery-ui/themes/base/images/ui-bg_flat_0_aaaaaa_40x100.png) 50% 50% repeat;
-    opacity: .50;
+  background: #444 url(~jquery-ui/themes/base/images/ui-bg_flat_0_aaaaaa_40x100.png) 50% 50%
+    repeat;
+  opacity: 0.5;
 }

@@ -7,395 +7,402 @@
  */
 
 div.timetableHeader {
-    padding: 20px 5px 10px 5px;
-    margin-top: 20px;
-    border-bottom: 2px solid #777777;
-    font-size: 20px;
-    color: rgb(68, 68, 68);
-    background: white;
+  padding: 20px 5px 10px 5px;
+  margin-top: 20px;
+  border-bottom: 2px solid #777;
+  font-size: 20px;
+  color: rgb(68, 68, 68);
+  background: white;
 }
 
 div.timetableFullScreenHeader {
-    padding: 5px 5px 5px 5px;
-    margin-top: 20px;
-    border-bottom: 1px solid black;
-    font-size: 20px;
-    color: rgb(68, 68, 68);
-    text-align: center;
-    background: white;
+  padding: 5px 5px 5px 5px;
+  margin-top: 20px;
+  border-bottom: 1px solid black;
+  font-size: 20px;
+  color: rgb(68, 68, 68);
+  text-align: center;
+  background: white;
 }
 .timetableInfoBox {
-    margin: 17px 10px;
-    color: #444444;
-    font-family: Verdana;
-    -moz-border-radius: 5px;
-    -webkit-border-radius: 5px;
-    border-radius: 5px;
+  margin: 17px 10px;
+  color: #444;
+  font-family: Verdana;
+  -moz-border-radius: 5px;
+  -webkit-border-radius: 5px;
+  border-radius: 5px;
 }
 
 .timetableBlock {
-    cursor: pointer;
-    border: 1px solid #bbb;
-    border-radius: 3px;
-    -moz-border-radius: 3px;
-    -webkit-border-radius:3px;
-    color: #202020;
+  cursor: pointer;
+  border: 1px solid #bbb;
+  border-radius: 3px;
+  -moz-border-radius: 3px;
+  -webkit-border-radius: 3px;
+  color: #202020;
 }
 
 .timetableBlockPileEffect {
-    border-bottom: none;
-    margin: 1px -1px;
-    box-shadow: none !important;
-    height: 3px;
-    min-height: 0 !important;
-    border-bottom-left-radius: 0;
-    border-bottom-right-radius: 0;
+  border-bottom: none;
+  margin: 1px -1px;
+  box-shadow: none !important;
+  height: 3px;
+  min-height: 0 !important;
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
 }
 
-div.timetableContribution  {
-    background-color: #f8f2e8;
+div.timetableContribution {
+  background-color: #f8f2e8;
 }
 
 .timetableBlock {
-    box-shadow: 0px 0px 5px #DDD;
-    min-height: 26px;
+  box-shadow: 0 0 5px #ddd;
+  min-height: 26px;
 }
 
 /* Timetable drag n drop */
 #tt_hour_tip {
-    cursor: pointer;
-    overflow: auto;
-    background: white;
-    position: absolute;
-    z-index: 1;
+  cursor: pointer;
+  overflow: auto;
+  background: white;
+  position: absolute;
+  z-index: 1;
 }
 
 #tt_hour_tip:hover {
-    opacity: 0.7;
+  opacity: 0.7;
 }
 
 .hourLine {
-    position: absolute;
-    border-top: 1px solid #E8E8E8;
-    font-size: 11px;
+  position: absolute;
+  border-top: 1px solid #e8e8e8;
+  font-size: 11px;
 }
 
 .ui-state-disabled.hourLine {
-    opacity: 1.0 !important;
+  opacity: 1 !important;
 }
 
 .ui-droppable-disabled {
-    opacity: 0.7 !important;
+  opacity: 0.7 !important;
 }
 
 .key {
-        display: inline;
-        min-width: 1em;
-        padding: .2em .3em;
-        text-align: center;
-        -moz-border-radius: .3em;
-        -webkit-border-radius: .3em;
-        border-radius: .3em;
-        border: none;
-        cursor: default;
-        background: rgb(250, 250, 250);
-        color:  rgb(50, 50, 50);
-        text-shadow: 0 0 2px rgb(255, 255, 255);
-        -moz-box-shadow: inset 0 0 1px rgb(255, 255, 255), inset 0 0 .4em rgb(200, 200, 200), 0 .1em 0 rgb(130, 130, 130), 0 .11em 0 rgba(0, 0, 0, .4), 0 .1em .11em rgba(0, 0, 0, .9);
-        -webkit-box-shadow: inset 0 0 1px rgb(255, 255, 255), inset 0 0 .4em rgb(200, 200, 200), 0 .1em 0 rgb(130, 130, 130), 0 .11em 0 rgba(0, 0, 0, .4), 0 .1em .11em rgba(0, 0, 0, .9);
-        box-shadow: inset 0 0 1px rgb(255, 255, 255), inset 0 0 .4em rgb(200, 200, 200), 0 .1em 0 rgb(130, 130, 130), 0 .11em 0 rgba(0, 0, 0, .4), 0 .1em .11em rgba(0, 0, 0, .9);
+  display: inline;
+  min-width: 1em;
+  padding: 0.2em 0.3em;
+  text-align: center;
+  -moz-border-radius: 0.3em;
+  -webkit-border-radius: 0.3em;
+  border-radius: 0.3em;
+  border: none;
+  cursor: default;
+  background: rgb(250, 250, 250);
+  color: rgb(50, 50, 50);
+  text-shadow: 0 0 2px rgb(255, 255, 255);
+  -moz-box-shadow: inset 0 0 1px rgb(255, 255, 255), inset 0 0 0.4em rgb(200, 200, 200),
+    0 0.1em 0 rgb(130, 130, 130), 0 0.11em 0 rgba(0, 0, 0, 0.4), 0 0.1em 0.11em rgba(0, 0, 0, 0.9);
+  -webkit-box-shadow: inset 0 0 1px rgb(255, 255, 255), inset 0 0 0.4em rgb(200, 200, 200),
+    0 0.1em 0 rgb(130, 130, 130), 0 0.11em 0 rgba(0, 0, 0, 0.4), 0 0.1em 0.11em rgba(0, 0, 0, 0.9);
+  box-shadow: inset 0 0 1px rgb(255, 255, 255), inset 0 0 0.4em rgb(200, 200, 200),
+    0 0.1em 0 rgb(130, 130, 130), 0 0.11em 0 rgba(0, 0, 0, 0.4), 0 0.1em 0.11em rgba(0, 0, 0, 0.9);
 }
 
 div.ui-draggable.timetableBlock:hover {
-    cursor: move;
+  cursor: move;
 }
 
 div.ui-draggable-dragging.timetableBlock {
-    z-index: 9000;
-    opacity: 0.5;
+  z-index: 9000;
+  opacity: 0.5;
 }
 
 div.entry-content {
-    display: flex;
-    flex-direction: column;
-    flex-wrap: wrap;
-    overflow: hidden;
-    line-height: normal;
-    padding: 4px;
+  display: flex;
+  flex-direction: column;
+  flex-wrap: wrap;
+  overflow: hidden;
+  line-height: normal;
+  padding: 4px;
 }
 
 div.timetableBlockWrapper {
-    display: flex;
-    flex-direction: row;
-    flex-wrap: wrap;
-    justify-content: space-between;
-    margin-right: 4px;
-    width: 100%;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  margin-right: 4px;
+  width: 100%;
 }
 
 div.timetableBlockWrapper > * {
-    overflow: hidden;
-    text-overflow: ellipsis;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 div.timetableBlockTitle {
-    font-weight: bold;
-    font-size: 11px;
-    order: 1;
+  font-weight: bold;
+  font-size: 11px;
+  order: 1;
 }
 
 a.entry-attachments + div.timetableBlockPresenters {
-    margin-right: 24px;
+  margin-right: 24px;
 }
 
 div.timetableBlockPresenters {
-    float: right;
-    margin-right: 7px;
-    font-size: 11px;
-    font-style: italic;
-    max-width: 50%;
-    order: 2;
+  float: right;
+  margin-right: 7px;
+  font-size: 11px;
+  font-style: italic;
+  max-width: 50%;
+  order: 2;
 }
 
 div.timetableBlockTime {
-    margin-right: 7px;
-    padding-top: 4px;
-    font-size: 11px;
-    order: 3;
+  margin-right: 7px;
+  padding-top: 4px;
+  font-size: 11px;
+  order: 3;
 }
 
 div.timetableBlockTimeDiscreet {
-    float: left;
-    margin: 4px 7px;
-    font-size: 11px;
+  float: left;
+  margin: 4px 7px;
+  font-size: 11px;
 }
 
 div.timetableBlockLocation {
-    bottom: 4px;
-    left: 4px;
-    font-style: italic;
-    padding-top: 4px;
-    font-size: 11px;
-    order: 2;
+  bottom: 4px;
+  left: 4px;
+  font-style: italic;
+  padding-top: 4px;
+  font-size: 11px;
+  order: 2;
 }
 
 div.timetableBlockConvener {
-    font-style: italic;
-    font-size: 11px;
-    order: 2;
+  font-style: italic;
+  font-size: 11px;
+  order: 2;
 }
 
 div.timetablePreLoading {
-    background: transparent url('static:images/load_big.gif') scroll no-repeat center center;
+  background: transparent url('static:images/load_big.gif') scroll no-repeat center center;
 }
 div.timetablePreLoading .text {
-    color: #777;
-    text-align: center;
-    font-family: Verdana;
-    letter-spacing: 2px;
+  color: #777;
+  text-align: center;
+  font-family: Verdana;
+  letter-spacing: 2px;
 }
 
 div.timetableLoading {
-    position: absolute;
-    top: 40px;
-    left: 0px;
-    padding: 10px 0 6px 35px;
-    background: transparent url('static:images/loading.gif') scroll no-repeat 10px center;
-    color: #444;
+  position: absolute;
+  top: 40px;
+  left: 0;
+  padding: 10px 0 6px 35px;
+  background: transparent url('static:images/loading.gif') scroll no-repeat 10px center;
+  color: #444;
 }
 
 .timetableFilter {
-    width: 100%;
-    position: fixed;
-    bottom: 0;
-    left: 0;
+  width: 100%;
+  position: fixed;
+  bottom: 0;
+  left: 0;
 }
 
 .timetableFilter .content {
-    width: 900px;
-    margin: 0 auto;
-    background: #ECECEC;
-    border: 1px solid #777;
-    border-bottom: none;
-    position: relative;
+  width: 900px;
+  margin: 0 auto;
+  background: #ececec;
+  border: 1px solid #777;
+  border-bottom: none;
+  position: relative;
 }
 
 .timetableFilter .content table {
-    background: white;
-    width: 100%;
+  background: white;
+  width: 100%;
 }
 
 .timetableFilter .content td {
-    padding: 13px 30px;
-    white-space: nowrap;
-    background-color: #ECECEC;
-    vertical-align: middle;
-    width: 1px;
+  padding: 13px 30px;
+  white-space: nowrap;
+  background-color: #ececec;
+  vertical-align: middle;
+  width: 1px;
 }
 
 .timetableFilter .closeButton {
-    position: absolute;
-    top: 15px;
-    right: 15px;
-    width: 16px;
-    height: 16px;
-    cursor: pointer;
-    background: transparent url('static:images/close_button.png') scroll no-repeat 0 0;
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+  background: transparent url('static:images/close_button.png') scroll no-repeat 0 0;
 }
 
 .timetableFilter .closeButton:hover {
-    background-position: 0 -16px;
+  background-position: 0 -16px;
 }
 
 ul.timetableSectionPopupList ul.subPopupList {
-   max-height: 250px;
-   overflow-y: auto;
+  max-height: 250px;
+  overflow-y: auto;
 }
 
 div.timetableManagementInfoArea {
-    width: 50%;
-    background:#FFFFDD;
-    border: 1px solid #aaaaaa;
-    border-radius: 3px;
-    -moz-border-radius: 3px;
-    -webkit-border-radius:3px;
-    -moz-box-shadow:2px 2px 2px #888888;
-    -webkit-box-shadow:2px 2px 2px #888888;
-    box-shadow:2px 2px 2px #888888;
-    margin-left: auto;
-    margin-right: auto;
-    padding: 5px;
-    font-size: 11px;
-    position: relative;
+  width: 50%;
+  background: #ffd;
+  border: 1px solid #aaa;
+  border-radius: 3px;
+  -moz-border-radius: 3px;
+  -webkit-border-radius: 3px;
+  -moz-box-shadow: 2px 2px 2px #888;
+  -webkit-box-shadow: 2px 2px 2px #888;
+  box-shadow: 2px 2px 2px #888;
+  margin-left: auto;
+  margin-right: auto;
+  padding: 5px;
+  font-size: 11px;
+  position: relative;
 }
 
 div.timetableManagementInfoArea div {
-    padding:5px;
+  padding: 5px;
 }
 
 div.timetableManagementInfoArea ul {
-    top: 2px;
-    padding-left: 10px;
-    margin-top: 5px;
-    margin-bottom:10px;
-    list-style: none;
-    margin-left: 5px;
+  top: 2px;
+  padding-left: 10px;
+  margin-top: 5px;
+  margin-bottom: 10px;
+  list-style: none;
+  margin-left: 5px;
 }
 
-div.timetableManagementInfoArea ul li{
-    padding-left: 0px;
-    overflow: auto;
-    margin-bottom:5px;
+div.timetableManagementInfoArea ul li {
+  padding-left: 0;
+  overflow: auto;
+  margin-bottom: 5px;
 }
 
-.printButton, .printButtonWhite, .buttonWhite, .buttonWhite {
-    padding: 4px 6px;
-    margin-left: 6px;
-    cursor: pointer;
+.printButton,
+.printButtonWhite,
+.buttonWhite,
+.buttonWhite {
+  padding: 4px 6px;
+  margin-left: 6px;
+  cursor: pointer;
 }
 
-.printButtonWhite, .buttonWhite, .buttonWhite {
-    color: white;
+.printButtonWhite,
+.buttonWhite,
+.buttonWhite {
+  color: white;
 }
 
 .printButton {
-    padding-left: 20px;
-    background: transparent url('static:images/printer_blue.png') scroll no-repeat center left;
+  padding-left: 20px;
+  background: transparent url('static:images/printer_blue.png') scroll no-repeat center left;
 }
 
 .printButtonWhite {
-    padding-left: 20px;
-    background: transparent url('static:images/printer_white.png') scroll no-repeat center left;
+  padding-left: 20px;
+  background: transparent url('static:images/printer_white.png') scroll no-repeat center left;
 }
 
 .linkButtonWhite {
-    padding-left: 20px;
-    background: transparent url('static:images/link_white.png') scroll no-repeat center left;
+  padding-left: 20px;
+  background: transparent url('static:images/link_white.png') scroll no-repeat center left;
 }
 
 #tt_menu .go_back .arrow_up {
-    color: #aaa;
-    margin-right: 5px;
+  color: #aaa;
+  margin-right: 5px;
 }
 
 div.UnscheduledContribListDiv {
-    margin-bottom: 10px;
-    height:300px;
-    width: 400px;
-    border: 1px solid #CCCCCC;
-    overflow: auto;
-    margin-top: 10px;
-    margin-right: 35px;
+  margin-bottom: 10px;
+  height: 300px;
+  width: 400px;
+  border: 1px solid #ccc;
+  overflow: auto;
+  margin-top: 10px;
+  margin-right: 35px;
 }
 
 div.UnscheduledContribListDiv .toolbar {
-    border-bottom: 1px solid #ccc;
-    text-align: right;
-    color: #999;
-    padding: 2px;
+  border-bottom: 1px solid #ccc;
+  text-align: right;
+  color: #999;
+  padding: 2px;
 }
 
 ul.UnscheduledContribList {
-    border: none;
-    display: block;
-    list-style-type: none;
-    padding-left: 0px;
-    margin: 0;
-
+  border: none;
+  display: block;
+  list-style-type: none;
+  padding-left: 0;
+  margin: 0;
 }
 
 ul.UnscheduledContribList li {
-    cursor: pointer;
-    padding: 5px;
-    border-bottom: 1px solid #eee;
+  cursor: pointer;
+  padding: 5px;
+  border-bottom: 1px solid #eee;
 }
 
 ul.UnscheduledContribList li.selected {
-    background-color: #CDEB8B;
+  background-color: #cdeb8b;
 }
 
 div.rescheduleSection {
-    padding-bottom: 20px;
+  padding-bottom: 20px;
 }
 
 div.rescheduleTitle {
-    font-size: 18px;
-    padding-bottom: 5px;
+  font-size: 18px;
+  padding-bottom: 5px;
 }
 
 tr.selectedAction {
-    background-color: #CDEB8B;
+  background-color: #cdeb8b;
 }
 
 td.rescheduleAction {
-    vertical-align:top;
-    padding-bottom: 5px;
-    padding-top: 5px;
+  vertical-align: top;
+  padding-bottom: 5px;
+  padding-top: 5px;
 }
 
 div.rescheduleLabelTitle {
-    font-size:16px;
-    cursor: default;
+  font-size: 16px;
+  cursor: default;
 }
 
 label.rescheduleLabelTitle {
-    font-weight: normal;
-    font-size: 16px;
-    color: #444444
+  font-weight: normal;
+  font-size: 16px;
+  color: #444;
 }
 
 div.rescheduleLabelDetails {
-    font-size:12px;
-    font-style: italic;
-    cursor: default;
-    color: #888888
+  font-size: 12px;
+  font-style: italic;
+  cursor: default;
+  color: #888;
 }
 
 .rescheduleWarning {
-    font-weight: bold;
-    color: #881122;
+  font-weight: bold;
+  color: #812;
 }
 
 div.fitInnerTimetableDialog {
-    width: 350px;
+  width: 350px;
 }

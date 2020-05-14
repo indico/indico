@@ -1,78 +1,75 @@
-
 .confTitleBox {
-    border-top: 3px solid #300018;
-    border-bottom: 1px solid #300018;
-    background: #5a3d31 url("/images/conf/sprites_brown.png") repeat-x 0 -24px;
+  border-top: 3px solid #300018;
+  border-bottom: 1px solid #300018;
+  background: #5a3d31 url('/images/conf/sprites_brown.png') repeat-x 0 -24px;
 }
 
 .confSubTitleBox {
-    background: #e0e4cc;
-    border-bottom: 1px solid #837b47;
-    border-top: 1px solid #837b47;
+  background: #e0e4cc;
+  border-bottom: 1px solid #837b47;
+  border-top: 1px solid #837b47;
 }
 
 .confSubTitleContent {
-    width: 950px;
-    margin: 0 auto;
-    color: #4a431a;
+  width: 950px;
+  margin: 0 auto;
+  color: #4a431a;
 }
 
 .conference-title-link {
-    color: white;
+  color: white;
 }
 
-
 /* ------Menu------ */
-/* here is layout and style for creating default menu for conferences */
 
+/* here is layout and style for creating default menu for conferences */
 
 /* Styles for all menu Items */
 
 #outer {
-    background: #dfe7e7;
-    border: 1px solid #7e8383;
+  background: #dfe7e7;
+  border: 1px solid #7e8383;
 }
 
 .support_box {
-    background: #dfe7e7;
-    border: 1px solid #7e8383;
+  background: #dfe7e7;
+  border: 1px solid #7e8383;
 }
 
 .support_box > h3 {
-    background: #5a3d31;
+  background: #5a3d31;
 }
 
 #outer li a:hover {
-    background: #777;
-    color: white;
+  background: #777;
+  color: white;
 }
 
 .conf_leftMenu {
-    float:left;
-    width:200px;
-    background:transparent none repeat scroll 0 0;
+  float: left;
+  width: 200px;
+  background: transparent none repeat scroll 0 0;
 }
 
-
 .menuConfTitle {
-    color:#0200C6;
+  color: #0200c6;
 }
 
 .menuConfTitle a {
-    color: #4e4c46;
+  color: #4e4c46;
 }
 
 .menuConfSelected a {
-    color: #4e4c46;
+  color: #4e4c46;
 }
 
 li ul.inner li a {
-    background: transparent url(/images/conf/left_menu_bullet.png) scroll no-repeat 15px center;
+  background: transparent url(/images/conf/left_menu_bullet.png) scroll no-repeat 15px center;
 } /* Sub Menu Styles */
 
 .simpleTextAnnouncement {
-    background: #F5FAFF url(/images/conf/sprites_brown.png) repeat-x scroll 0 -400px;
-    border-top: none;
-    border-bottom: 1px solid #BBB;
-    color: #0f283d;
+  background: #f5faff url(/images/conf/sprites_brown.png) repeat-x scroll 0 -400px;
+  border-top: none;
+  border-bottom: 1px solid #bbb;
+  color: #0f283d;
 }
