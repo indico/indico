@@ -6,7 +6,7 @@
 /* ----------- Styles for the conference header ----------- */
 
 /*
-    The wrapper of the whole conference page.
+The wrapper of the whole conference page.
 */
 .conf {
   width: 100%;
@@ -15,7 +15,7 @@
 }
 
 /*
-    Wraps around the upper part of the conference header.
+Wraps around the upper part of the conference header.
 */
 .confTitleBox {
   color: white;
@@ -26,8 +26,8 @@
 }
 
 /*
-    Sets the width of the upper part of the conference header.
-    Is set to 950px and centered by default.
+Sets the width of the upper part of the conference header.
+Is set to 950px and centered by default.
 */
 .confTitle {
   width: 950px;
@@ -35,8 +35,8 @@
 }
 
 /*
-    The box containing the logo. By the default the logo is placed
-    on the left of the conference title.
+The box containing the logo. By the default the logo is placed
+on the left of the conference title.
 */
 .confLogoBox {
   float: left;
@@ -44,7 +44,7 @@
 }
 
 /*
-    The style for the title text.
+The style for the title text.
 */
 .conference-title-link {
   font-size: 22pt;
@@ -54,7 +54,7 @@
 }
 
 /*
-    Wrapper around the bottom part of the conference header
+Wrapper around the bottom part of the conference header
 */
 .confSubTitleBox {
   background: #f5faff;
@@ -64,8 +64,8 @@
 }
 
 /*
-    The content of the lower part of the header. Is by default
-    centered and has a fixed width.
+The content of the lower part of the header. Is by default
+centered and has a fixed width.
 */
 .confSubTitleContent {
   width: 950px;
@@ -75,26 +75,26 @@
 }
 
 /*
-    Style for links in the lower part of the header
+Style for links in the lower part of the header
 */
 .confSubTitle a {
   font-size: 11pt;
 }
 
 /*
-    Styles for the date and place information.
+Styles for the date and place information.
 */
 .datePlace {
   font-size: 12pt;
 }
 
 /*
-    Announcement styles
+Announcement styles
 */
 .simpleTextAnnouncement {
   background: #f5faff url(/images/conf/sprites_blue.png) repeat-x scroll 0 -400px;
   border-top: 1px solid #c2d6e7;
-  font-family: Verdana;
+  font-family: Verdana, sans-serif;
   font-weight: bold;
   font-size: 10pt;
   text-align: center;
@@ -105,8 +105,8 @@
 /* ----------- Styles for the main content ----------- */
 
 /*
-    The wrapper around the menu and the page content.
-    By default centered with a fix width.
+The wrapper around the menu and the page content.
+By default centered with a fix width.
 */
 #confSectionsBox {
   width: 950px;
@@ -119,7 +119,7 @@
 /* Styles for all menu Items */
 
 /*
-    Wrapper around the menu
+Wrapper around the menu
 */
 .conf_leftMenu {
   float: left;
@@ -127,7 +127,7 @@
 }
 
 /*
-    Styles for the menu box
+Styles for the menu box
 */
 #outer {
   border: 1px solid #ccc;
@@ -135,7 +135,7 @@
 }
 
 /*
-    The menu item
+The menu item
 */
 #outer li a {
   font-family: verdana, arial, sans-serif;
@@ -143,14 +143,14 @@
 }
 
 /*
-    The menu item when doing mouseover
+The menu item when doing mouseover
 */
 #outer li a:hover {
   background: #e0e0e0;
 }
 
 /*
-    A non selected menu item
+A non selected menu item
 */
 .menuConfTitle {
   text-align: left;
@@ -162,7 +162,7 @@
 }
 
 /*
-    A selected menu item
+A selected menu item
 */
 
 .menuConfTitle.selected > a,
@@ -174,7 +174,7 @@
 }
 
 /*
-    sub menu item
+sub menu item
 */
 li ul.inner li a {
   padding: 3px 12px 3px 30px;
@@ -182,7 +182,7 @@ li ul.inner li a {
 }
 
 /*
-    Support box
+Support box
 */
 
 .support_box {
@@ -198,7 +198,7 @@ li ul.inner li a {
 /* ----------- Styles for the page content ----------- */
 
 /*
-    Wrapper around the content
+Wrapper around the content
 */
 .confBodyBox {
   margin-left: 230px;

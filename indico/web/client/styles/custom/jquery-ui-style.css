@@ -184,7 +184,6 @@
 }
 
 .ui-widget-overlay {
-  background: #444 url(~jquery-ui/themes/base/images/ui-bg_flat_0_aaaaaa_40x100.png) 50% 50%
-    repeat;
+  background: #444 url(~jquery-ui/themes/base/images/ui-bg_flat_0_aaaaaa_40x100.png) 50% 50% repeat;
   opacity: 0.5;
 }

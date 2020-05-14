@@ -27,7 +27,7 @@ div.timetableFullScreenHeader {
 .timetableInfoBox {
   margin: 17px 10px;
   color: #444;
-  font-family: Verdana;
+  font-family: Verdana, sans-serif;
   -moz-border-radius: 5px;
   -webkit-border-radius: 5px;
   border-radius: 5px;
@@ -40,6 +40,8 @@ div.timetableFullScreenHeader {
   -moz-border-radius: 3px;
   -webkit-border-radius: 3px;
   color: #202020;
+  box-shadow: 0 0 5px #ddd;
+  min-height: 26px;
 }
 
 .timetableBlockPileEffect {
@@ -54,11 +56,6 @@ div.timetableFullScreenHeader {
 
 div.timetableContribution {
   background-color: #f8f2e8;
-}
-
-.timetableBlock {
-  box-shadow: 0 0 5px #ddd;
-  min-height: 26px;
 }
 
 /* Timetable drag n drop */
@@ -194,7 +191,7 @@ div.timetablePreLoading {
 div.timetablePreLoading .text {
   color: #777;
   text-align: center;
-  font-family: Verdana;
+  font-family: Verdana, sans-serif;
   letter-spacing: 2px;
 }
 
@@ -293,7 +290,6 @@ div.timetableManagementInfoArea ul li {
 
 .printButton,
 .printButtonWhite,
-.buttonWhite,
 .buttonWhite {
   padding: 4px 6px;
   margin-left: 6px;
@@ -301,7 +297,6 @@ div.timetableManagementInfoArea ul li {
 }
 
 .printButtonWhite,
-.buttonWhite,
 .buttonWhite {
   color: white;
 }

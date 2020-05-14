@@ -20,6 +20,7 @@
   display: none;
   overflow: hidden;
   left: 0;
+  /* stylelint-disable-next-line declaration-block-no-duplicate-properties */
   position: fixed;
   text-align: center;
   text-transform: uppercase;
