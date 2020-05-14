@@ -122,6 +122,31 @@ jobs:
              indico/web/client/js/react/
              indico/modules/users/
 
+      - name: Run stylelint for all files
+        if: github.event_name == 'push' && (success() || failure())
+        run: |
+          echo "::add-matcher::.github/matchers/stylelint-problem-matcher.json"
+          npx stylelint --formatter unix 'indico/**/*.{scss,css}'
+          echo "::remove-matcher owner=stylelint::"
+
+      # GitHub shows annotations for files not touched in the PR, which is very noisy in case
+      # of stylelint warnings, so we only run it for changed files when running on PRs
+      # https://github.com/actions/toolkit/issues/457
+      - name: Get list of changed files
+        if: github.event_name == 'pull_request' && (success() || failure())
+        uses: ThiefMaster/changed-files-action@json-output
+        with:
+          repo-token: ${{ github.token }}
+          pattern: '^.+\.s?css$'
+
+      - name: Run stylelint for changed files
+        if: github.event_name == 'pull_request' && (success() || failure())
+        run: |
+          echo "::add-matcher::.github/matchers/stylelint-problem-matcher.json"
+          jq -rs '(.[0] + .[1]) | unique | .[]' ~/files_{created,updated}.json | tr '\n' '\0' | xargs -0 -r \
+            npx stylelint --formatter unix
+          echo "::remove-matcher owner=stylelint::"
+
 
   test-python:
     needs: setup
