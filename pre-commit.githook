@@ -6,7 +6,7 @@
 
 FLAKE8_CMD='flake8'
 ESLINT_CMD='npx eslint'
-SASSLINT_CMD='npx sass-lint'
+STYLELINT_CMD='npx stylelint'
 
 RED=$(echo -e $"\033[1;31m")
 YELLOW=$(echo -e $"\033[0;33m")
@@ -30,9 +30,9 @@ _get_files() {
 # bottom and thus less likely to scroll out of view immediately
 
 # SASSLint
-_get_files '*.scss'
+_get_files '*.scss' '*.css'
 if [[ ${#FILES[@]} -ne 0 ]]; then
-    if ! RESULT=$(FORCE_COLOR=1 $SASSLINT_CMD -vq "${FILES[@]}"); then
+    if ! RESULT=$(FORCE_COLOR=1 $STYLELINT_CMD -q "${FILES[@]}"); then
         STATUS=1
         echo "${RED}There are SCSS errors in your code:${RESET}"
         echo "$RESULT"

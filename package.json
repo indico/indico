@@ -138,7 +138,6 @@
     "preval.macro": "^3.0.0",
     "progress-bar-webpack-plugin": "^1.12.1",
     "resolve-url-loader": "^3.1.1",
-    "sass-lint": "^1.13.1",
     "sass-loader": "^8.0.0",
     "script-loader": "^0.7.2",
     "semver": "^6.3.0",
