@@ -18,7 +18,8 @@ import {validateFilters} from '../../common/filters';
 import {preProcessParameters} from '../../util';
 import {actions as modalActions} from '../../modals';
 
-import {roomSearchActionsFactory, ajaxRules as ajaxFilterRules} from '../../common/roomSearch';
+import {roomSearchActionsFactory} from '../../common/roomSearch/actions';
+import {ajax as ajaxFilterRules} from '../../common/roomSearch/serializers';
 import {selectors as userSelectors} from '../../common/user';
 
 // Booking creation

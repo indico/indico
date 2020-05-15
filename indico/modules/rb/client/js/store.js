@@ -5,26 +5,25 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-import {createBrowserHistory} from 'history';
 import {queryStringMiddleware} from 'redux-router-querystring';
 import {routerMiddleware} from 'connected-react-router';
 import createReduxStore from 'indico/utils/redux';
 
 import getReducers from './reducers';
-import {queryStringReducer as qsRoomSearchReducer} from './common/roomSearch';
-import {routeConfig as roomListRouteConfig} from './modules/roomList';
+import {queryStringReducer as qsRoomSearchReducer} from './common/roomSearch/queryString';
+import {routeConfig as roomListRouteConfig} from './modules/roomList/queryString';
 import {
   routeConfig as bookRoomRouteConfig,
   queryStringReducer as qsBookRoomReducer,
-} from './modules/bookRoom';
+} from './modules/bookRoom/queryString';
 import {
   routeConfig as calendarRouteConfig,
   queryStringReducer as qsCalendarReducer,
-} from './modules/calendar';
+} from './modules/calendar/queryString';
 import {
   routeConfig as blockingsRouteConfig,
   queryStringReducer as qsBlockingsReducer,
-} from './modules/blockings';
+} from './modules/blockings/queryString';
 
 function getRouteConfig() {
   return {
@@ -41,10 +40,6 @@ function getRouteConfig() {
     },
   };
 }
-
-export const history = createBrowserHistory({
-  basename: `${Indico.Urls.BasePath}/rooms`,
-});
 
 /**
  * Create the redux store of the RB module.

@@ -8,9 +8,9 @@
 import moment from 'moment';
 import {createSelector} from 'reselect';
 import {RequestState} from 'indico/utils/redux';
-import {roomSearchSelectorFactory} from '../../common/roomSearch';
-import {selectors as roomsSelectors} from '../../common/rooms';
-import {selectors as userSelectors} from '../../common/user';
+import {roomSearchSelectorFactory} from '../../common/roomSearch/selectors';
+import * as roomsSelectors from '../../common/rooms/selectors';
+import * as userSelectors from '../../common/user/selectors';
 
 const {
   getFilters,

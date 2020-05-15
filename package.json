@@ -173,6 +173,7 @@
   },
   "homepage": "https://github.com/indico/indico#readme",
   "jest": {
+    "transformIgnorePatterns": ["/node_modules/(?!geodesy)"],
     "moduleNameMapper": {
       "^.+\\.(s?css)$": "identity-obj-proxy",
       "^indico/modules/events/(reviewing|util)/(.*)$": "<rootDir>/indico/modules/events/client/js/$1/$2",

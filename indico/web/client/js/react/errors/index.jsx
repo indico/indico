@@ -9,6 +9,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import {Provider} from 'react-redux';
 
+// eslint-disable-next-line import/no-cycle
 import createReduxStore from 'indico/utils/redux';
 import {addError, showReportForm} from './actions';
 import reducer from './reducers';

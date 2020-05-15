@@ -11,7 +11,7 @@ import {boolStateField, defaultStateField} from '../../util';
 
 import * as globalActions from '../../actions';
 import * as actions from './actions';
-import {history} from '../../store';
+import {history} from '../../history';
 import {initialTimelineState} from './reducers';
 import {actions as filtersActions} from '../../common/filters';
 import {queryStringRules as queryFilterRules} from '../../common/roomSearch';

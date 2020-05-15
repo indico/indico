@@ -9,7 +9,7 @@ import _ from 'lodash';
 import {createQueryStringReducer, validator as v} from 'redux-router-querystring';
 import {LOCATION_CHANGE} from 'connected-react-router';
 
-import {history} from '../../store';
+import {history} from '../../history';
 import * as actions from '../../actions';
 import {initialRoomFilterStateFactory} from './reducers';
 import {boolStateField} from '../../util';

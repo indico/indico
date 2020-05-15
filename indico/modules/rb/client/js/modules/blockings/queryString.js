@@ -8,7 +8,7 @@
 import _ from 'lodash';
 import {createQueryStringReducer, validator as v} from 'redux-router-querystring';
 
-import {history} from '../../store';
+import {history} from '../../history';
 import {initialFilterStateFactory} from './reducers';
 import * as actions from '../../actions';
 import {boolStateField} from '../../util';

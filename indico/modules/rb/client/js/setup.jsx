@@ -14,7 +14,8 @@ import {OverridableContext} from 'react-overridable';
 import setupUserMenu from 'indico/react/containers/UserMenu';
 
 import App from './components/App';
-import createRBStore, {history} from './store';
+import createRBStore from './store';
+import {history} from './history';
 import {init} from './actions';
 import {actions as configActions, selectors as configSelectors} from './common/config';
 import {selectors as userSelectors, actions as userActions} from './common/user';

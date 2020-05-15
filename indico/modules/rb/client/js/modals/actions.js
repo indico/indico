@@ -8,7 +8,7 @@
 import {push} from 'connected-react-router';
 import qs from 'qs';
 
-import {history} from '../store';
+import {history} from '../history';
 
 /**
  * Open a history-friendly modal, by setting the corresponding query string.

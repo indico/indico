@@ -10,7 +10,7 @@ import moment from 'moment';
 import {createQueryStringReducer, validator as v} from 'redux-router-querystring';
 
 import * as actions from '../../actions';
-import {history} from '../../store';
+import {history} from '../../history';
 import {initialState} from './reducers';
 import {defaultStateField, boolStateField} from '../../util';
 import {actions as filtersActions} from '../../common/filters';

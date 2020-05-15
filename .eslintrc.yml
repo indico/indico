@@ -40,6 +40,8 @@ rules:
   import/no-unresolved:
     - error
     - ignore: ['^indico-url:']
+  import/no-cycle:
+    - warn
   new-cap:
     - error
     - capIsNewExceptionPattern: '\$\.(Event|Deferred)$'
