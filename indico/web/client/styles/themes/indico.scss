@@ -62,7 +62,7 @@ body {
 }
 
 .item-location {
-  @include ellipsis;
+  @include ellipsis();
 
   box-sizing: border-box;
   border-radius: 0.2em;
@@ -284,7 +284,7 @@ ul.day-list {
 .meeting-timetable {
   @extend %font-family-modern-body;
   @extend %default-border-radius;
-  @include drop-shadow;
+  @include drop-shadow();
 
   padding: 1em 1em 0.5em 0;
   background-color: white;
@@ -482,7 +482,7 @@ ul.day-list {
 
 .event-sub-header {
   border-radius: 0 0 2px 2px;
-  @include drop-shadow;
+  @include drop-shadow();
   @extend %font-family-title-light;
 
   background: white;

@@ -231,7 +231,7 @@
 
 .keyword-highlighter {
   @extend %default-border-radius;
-  @include ellipsis;
+  @include ellipsis();
 
   display: none !important;
   background-color: $pastel-blue;

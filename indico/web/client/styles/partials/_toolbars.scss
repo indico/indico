@@ -142,7 +142,7 @@ $i-button-spacing: 0.3rem;
     display: table-row;
 
     .i-button {
-      @include ellipsis;
+      @include ellipsis();
 
       display: table-cell;
       float: none;

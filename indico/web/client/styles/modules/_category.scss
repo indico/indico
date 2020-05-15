@@ -225,7 +225,7 @@
     list-style-type: none;
 
     .title {
-      @include ellipsis;
+      @include ellipsis();
 
       font-size: 1em;
       display: block;

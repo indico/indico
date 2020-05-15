@@ -49,7 +49,7 @@ li > table + .note-area-wrapper {
     float: right;
 
     a {
-      @include transition;
+      @include transition();
       @include transition(opacity);
       color: darken($pastel-blue, $color-variation);
 

@@ -54,7 +54,7 @@
 }
 
 @mixin ellipsis($no-wrap: true) {
-  @if ($no-wrap) {
+  @if $no-wrap {
     white-space: nowrap;
   }
   overflow: hidden;
@@ -290,5 +290,5 @@ textarea.log {
 }
 
 .ellipsis {
-  @include ellipsis;
+  @include ellipsis();
 }

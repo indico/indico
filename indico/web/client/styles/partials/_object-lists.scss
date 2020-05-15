@@ -68,7 +68,7 @@
   }
 
   .person-row {
-    @include ellipsis;
+    @include ellipsis();
 
     &::before {
       color: $gray;
@@ -150,7 +150,7 @@
     min-height: 2em;
 
     &.title-wrapper {
-      @include ellipsis;
+      @include ellipsis();
 
       display: inline-flex;
       align-items: center;
@@ -171,7 +171,7 @@
       }
 
       > .title {
-        @include ellipsis;
+        @include ellipsis();
 
         flex-grow: 1;
         color: $dark-gray;

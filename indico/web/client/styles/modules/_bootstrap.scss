@@ -146,7 +146,7 @@
       color: $black;
 
       div {
-        @include clearfix;
+        @include clearfix();
       }
 
       .step-icon {

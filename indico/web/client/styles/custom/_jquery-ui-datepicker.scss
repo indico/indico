@@ -115,7 +115,7 @@
     padding: 0;
 
     button.ui-datepicker-current {
-      @include transition;
+      @include transition();
       @include transition(background, color);
       background: $light-blue;
       border: none !important;

@@ -16,7 +16,7 @@
     @extend %semantic-outline;
     background: transparent;
 
-    @include _semantic_versions {
+    @include _semantic-versions() {
       background: transparent;
     }
 

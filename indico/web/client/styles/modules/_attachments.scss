@@ -52,7 +52,7 @@
       padding: 0.2rem 0.3rem;
 
       &:first-child {
-        @include ellipsis;
+        @include ellipsis();
 
         max-width: 1px;
 
@@ -350,13 +350,13 @@
 
 .material-list {
   .folder .attachment {
-    @include ellipsis;
+    @include ellipsis();
 
     max-width: 150px;
     padding-left: 0.2em !important;
 
     .title {
-      @include ellipsis;
+      @include ellipsis();
 
       color: $light-black;
       font-size: 0.9em;

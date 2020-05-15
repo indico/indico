@@ -26,7 +26,7 @@ $semantic-styles: (highlight, success, error, warning, visited, strong);
   color: $color;
 }
 
-@mixin _semantic_versions {
+@mixin _semantic-versions {
   @each $style in $semantic-styles {
     &.#{$style} {
       @content;
@@ -34,7 +34,7 @@ $semantic-styles: (highlight, success, error, warning, visited, strong);
   }
 }
 
-@mixin _semantic_colors {
+@mixin _semantic-colors {
   @each $style in $semantic-styles {
     &.#{$style} {
       color: map-get($semantic-color-map, $style);
@@ -71,7 +71,7 @@ $semantic-styles: (highlight, success, error, warning, visited, strong);
     &:active,
     &.active {
       color: $black;
-      @include _semantic_colors;
+      @include _semantic-colors();
     }
   }
 
@@ -82,7 +82,7 @@ $semantic-styles: (highlight, success, error, warning, visited, strong);
 
 .semantic-text {
   color: $dark-gray;
-  @include _semantic_colors;
+  @include _semantic-colors();
 }
 
 .semantic-background {

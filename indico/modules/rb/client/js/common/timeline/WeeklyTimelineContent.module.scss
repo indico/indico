@@ -6,6 +6,7 @@
 // LICENSE file for more details.
 
 @import 'rb:styles/palette';
+// stylelint-disable-next-line scss/at-import-partial-extension
 @import './TimelineContent.module.scss';
 
 .timeline-day-divider {

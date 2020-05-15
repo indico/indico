@@ -93,7 +93,7 @@ tr.i-table {
 td.i-table,
 th.i-table {
   box-sizing: border-box;
-  @include ellipsis;
+  @include ellipsis();
 
   padding: 5px 3px 5px 3px;
   vertical-align: middle;

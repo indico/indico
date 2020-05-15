@@ -11,7 +11,7 @@
 
 @mixin picker-root-element-label() {
   .label {
-    @include ellipsis;
+    @include ellipsis();
 
     flex-grow: 1;
     flex-basis: 0%;
@@ -60,7 +60,7 @@
     align-items: center;
 
     .label {
-      @include ellipsis;
+      @include ellipsis();
 
       line-height: 15px;
       vertical-align: middle;
@@ -120,7 +120,7 @@
 
   table {
     td.subcontribution-title {
-      @include ellipsis;
+      @include ellipsis();
 
       max-width: 150px;
     }

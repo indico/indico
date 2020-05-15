@@ -138,7 +138,7 @@
 
         /* menu title */
         > .title {
-          @include ellipsis;
+          @include ellipsis();
 
           flex: 1;
 
@@ -573,7 +573,7 @@ th.i-table {
 
   .truncate {
     .text p {
-      @include ellipsis;
+      @include ellipsis();
 
       max-height: 30px;
     }
