@@ -5,6 +5,8 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
+// stylelint-disable rule-empty-line-before
+
 @import 'base/palette';
 
 @font-face {
@@ -541,7 +543,6 @@ i[class^='icon-']::before {
 .icon-equalizer::before {
   content: '\e90a';
 }
-
 /* End of icomoon's icon definitions */
 
 /* animated spinner icon */
@@ -586,6 +587,7 @@ i[class^='icon-']::before {
   @extend .icon-unlocked;
   color: $green;
 }
+
 .icon-protection-self {
   @extend .icon-lock;
   color: $red;

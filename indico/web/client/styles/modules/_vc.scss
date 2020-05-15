@@ -16,6 +16,7 @@
 
     .i-button {
       line-height: 2em;
+
       img {
         vertical-align: middle;
         width: 1.8em;
@@ -26,6 +27,7 @@
   .i-table-widget > tbody {
     > tr.deleted {
       background: $light-gray;
+
       > td {
         color: $gray !important;
       }
@@ -41,6 +43,7 @@
   from {
     color: $dark-blue;
   }
+
   to {
     color: $black;
   }

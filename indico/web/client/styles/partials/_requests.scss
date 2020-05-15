@@ -8,13 +8,16 @@
 @mixin i-request-state($state, $color, $light-color, $dark-color) {
   &.i-request-#{$state} {
     background-color: $light-color;
+
     &,
     & * {
       color: $color;
     }
+
     &:hover {
       background-color: darken($light-color, $light-color-variation);
     }
+
     & > .i-badge-legend {
       border-color: $dark-color;
     }
@@ -34,6 +37,7 @@
 
     & > .i-badge-content {
       height: 4.2em;
+
       & > .i-badge-title {
         font-size: 1em;
       }

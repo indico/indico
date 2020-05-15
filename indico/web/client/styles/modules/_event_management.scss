@@ -19,6 +19,7 @@
 
   .clones a {
     @include icon-after('icon-arrow-down');
+
     &::after {
       vertical-align: -10%;
     }
@@ -46,6 +47,7 @@
 
 .static-sites {
   width: 650px;
+
   .i-table-widget {
     // date
     th:nth-child(2),
@@ -63,6 +65,7 @@
     th:nth-child(3),
     td:nth-child(3) {
       text-align: center;
+
       .i-label {
         width: 100%;
       }
@@ -93,11 +96,14 @@
   margin-top: 0;
 
   list-style: none;
+
   > li {
     margin-top: 5px;
+
     &:first-child {
       margin-top: 0;
     }
+
     > .menu-entry {
       > .i-label {
         margin: 0;
@@ -109,19 +115,23 @@
         &.drag-handle {
           cursor: move;
         }
+
         > * {
           line-height: 1.2em;
           height: 1.2em;
           vertical-align: middle;
         }
+
         > .entry-internal_link,
         > .entry-user_link,
         > .entry-plugin_link {
           @include icon-before('icon-link');
         }
+
         > .entry-page {
           @include icon-before('icon-file');
         }
+
         > .entry-separator {
           @include icon-before('icon-arrows-vert');
         }
@@ -138,104 +148,130 @@
             color: $gray;
           }
         }
+
         > .actions {
           max-width: 33%;
           margin-right: -5px;
+
           a,
           a:active,
           a:focus {
             outline: none;
           }
+
           > * {
             padding: 0 2px;
 
             color: $dark-gray;
             opacity: 0.6;
+
             &:hover {
               color: $blue;
             }
           }
+
           > .enabled {
             @extend %enabled-action;
+
             &:hover {
               @extend %not-enabled-action;
             }
           }
+
           > .not-enabled {
             @extend %not-enabled-action;
             opacity: 1;
+
             &:hover {
               @extend %enabled-action;
             }
           }
+
           > .default {
             @include icon-before('icon-home');
             color: #46f936 !important;
             opacity: 1;
           }
+
           > .not-default {
             @include icon-before('icon-home');
           }
+
           > .edit-entry {
             @include icon-before('icon-edit');
           }
+
           > .delete-entry {
             @include icon-before('icon-remove');
+
             &:hover {
               color: $red !important;
             }
           }
         }
+
         &.disabled {
           .position {
             color: $light-black;
           }
+
           > .actions > * {
             color: $light-black;
           }
         }
+
         &.highlight {
           .position {
             color: white;
           }
+
           > .actions > * {
             color: white;
+
             &:hover {
               color: $link;
             }
           }
         }
+
         &:hover > .actions {
           > * {
             opacity: 1;
           }
+
           > .not-default {
             display: inline !important;
           }
         }
       }
     }
+
     &.menu-entry-placeholder {
       background: $light-gray;
       border: 1px dashed $gray;
       margin: 4px -5px -1px 5px;
     }
   }
+
   > .ui-sortable-helper:first-child + .menu-entry-placeholder,
   > .menu-entry-placeholder:first-child {
     margin-top: 0;
     margin-bottom: -2px;
   }
+
   &.empty,
   &.hide-placeholder > li.menu-entry-placeholder {
     display: none;
   }
+
   &.empty {
     display: none;
     height: 2.8em;
+
     &.expand {
       display: block;
     }
+
     &::before {
       content: attr(data-empty-text);
       color: $dark-gray;
@@ -258,6 +294,7 @@
       font-weight: normal;
       margin: 0;
     }
+
     .menu-entry-placeholder {
       margin-left: 0;
       margin-right: 0;

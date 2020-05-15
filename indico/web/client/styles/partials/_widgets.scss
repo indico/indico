@@ -43,15 +43,19 @@ i.info-helper {
     cursor: move;
     @include icon-before('icon-handle');
   }
+
   .ui-sortable-helper {
     display: table;
   }
+
   .thin-column {
     white-space: nowrap;
   }
+
   .multiline {
     white-space: pre-line;
   }
+
   textarea {
     width: 100%;
   }

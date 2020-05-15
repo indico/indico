@@ -103,6 +103,7 @@
 
   .title-wrapper {
     flex-grow: 1;
+
     .title {
       @extend %font-family-title-light;
       display: block;
@@ -198,6 +199,7 @@
 
   .navigate-up {
     padding: 10px;
+
     &:hover {
       background-color: $pastel-gray;
     }

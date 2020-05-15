@@ -263,6 +263,7 @@ $dropdown-transition: $dropdown-transition-step ease-out;
     opacity: 0;
     visibility: hidden;
   }
+
   &.loading::before {
     opacity: 0.4;
     visibility: visible;
@@ -439,6 +440,7 @@ $dropdown-transition: $dropdown-transition-step ease-out;
   > input[type='checkbox']:not(:checked) ~ .i-synced-label::before {
     color: $light-black;
   }
+
   > input[type='checkbox']:checked ~ .i-synced-label::before {
     color: $blue;
   }
@@ -454,11 +456,13 @@ $dropdown-transition: $dropdown-transition-step ease-out;
 
 dd > .i-has-action {
   vertical-align: middle;
+
   > .i-button,
   > input {
     height: 2em;
     font-size: 90%;
   }
+
   > input {
     width: 18em;
     background-color: white;
@@ -469,6 +473,7 @@ dd > .i-has-action {
   > * {
     line-height: 1em;
   }
+
   > input {
     width: 110px;
   }
@@ -486,6 +491,7 @@ dd > .i-has-action {
     lighten($pastel-gray, 0.7 * $color-variation) 10px,
     lighten($pastel-gray, 0.7 * $color-variation) 20px
   );
+
   span.info {
     font-style: italic;
   }

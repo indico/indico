@@ -22,20 +22,24 @@
   padding: 5px 0;
   list-style-type: none;
 }
+
 .ordered-list > li > .list-item-title {
   font-size: 14px;
   font-weight: bold;
   color: #666;
   padding-bottom: 5px;
 }
+
 .ordered-list > li > .list-item-content {
   color: #888;
   padding-top: 2px;
 }
+
 .ordered-list > li > .list-item-content > .list-item-content-title {
   font-weight: bold;
   padding-right: 5px;
 }
+
 .ordered-list > li > .list-item-content > .list-item-content-data {
   float: right;
 }

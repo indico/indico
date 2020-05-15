@@ -54,6 +54,7 @@
     height: 120px;
 
     text-align: left;
+
     .header-logo {
       float: left;
 
@@ -123,6 +124,7 @@
   @media only screen and (min-width: 1025px) and (max-width: 1230px) {
     max-width: 937px;
   }
+
   &.mini {
     margin-top: 120px;
   }
@@ -142,6 +144,7 @@
       padding-top: 75px;
 
       color: $black;
+
       div {
         @include clearfix;
       }
@@ -160,6 +163,7 @@
         border: 5px solid white;
         border-radius: 50%;
         background-color: $darker-blue;
+
         i {
           font-size: 50px;
 

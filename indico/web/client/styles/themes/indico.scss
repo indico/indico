@@ -37,6 +37,7 @@ $selected-color: $indico-blue !default;
   $darkened-color: darken($color, 10%);
 
   background-color: $color;
+
   &::before {
     content: ' ';
     position: absolute;
@@ -234,6 +235,7 @@ div.event-header {
     font-size: 0.9em;
     padding: 0.5em 0;
   }
+
   .event-description {
     color: $black;
   }

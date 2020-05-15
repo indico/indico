@@ -58,6 +58,7 @@ body {
 .timetable-item {
   &.timetable-break .timetable-item-header {
     background: transparent !important;
+
     .timetable-title {
       @extend %black-and-white;
     }

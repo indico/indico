@@ -8,12 +8,14 @@
 .confirmation-dialog .body ul.categ-list {
   padding-left: 13px;
   margin: 0;
+
   span.event-date {
     padding-left: 10px;
     color: #888;
     font-size: 0.9em;
     margin: 0;
   }
+
   span.event-title {
     font-style: italic;
   }
@@ -206,6 +208,7 @@
     display: inline-block;
     line-height: 1em;
     color: $dark-gray;
+
     &:hover {
       color: $gray;
     }
@@ -216,9 +219,11 @@
   a {
     color: $dark-blue;
   }
+
   li {
     margin-bottom: 0.5em;
     list-style-type: none;
+
     .title {
       @include ellipsis;
 
@@ -226,6 +231,7 @@
       display: block;
       max-width: 100%;
     }
+
     .timing {
       font-size: 0.8em;
       display: block;
@@ -239,6 +245,7 @@
 #manager-list {
   li {
     margin-bottom: 0.2em;
+
     &::before {
       margin-right: 0.5em;
     }
@@ -252,6 +259,7 @@ ul.category-list {
 
   border-left: 1px solid #fafafa;
   border-right: 1px solid #e6e6e6;
+
   li {
     @include transition(color);
 
@@ -297,13 +305,16 @@ ul.category-list {
 
     &:hover {
       color: $light-black;
+
       a {
         color: darken($dark-blue, 6%);
       }
+
       &::before {
         color: $light-black;
       }
     }
+
     &::before {
       @include transition(color);
       color: #ccc;

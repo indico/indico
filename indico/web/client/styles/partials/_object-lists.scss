@@ -93,6 +93,7 @@
   .change-columns-width:not(.active) {
     @include icon-before('icon-enlarge');
   }
+
   .change-columns-width.active {
     @include icon-before('icon-shrink');
   }
@@ -189,6 +190,7 @@
             @extend %enabled-action;
             display: none;
           }
+
           &:not(.enabled) {
             @extend %not-enabled-action;
           }

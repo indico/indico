@@ -109,10 +109,12 @@
   &.manager-only {
     .section-sortable-handle {
       background-color: $dark-yellow;
+
       &:hover {
         background-color: white;
       }
     }
+
     .i-box-title {
       @include icon-before('icon-user-reading');
     }
@@ -173,6 +175,7 @@
     &.warning {
       @include icon-before(icon-warning);
       background-color: $light-yellow;
+
       &::before {
         margin-right: 0.2em;
       }
@@ -181,6 +184,7 @@
     &.error {
       @include icon-before(icon-warning);
       background-color: $light-red;
+
       &::before {
         margin-right: 0.2em;
       }
@@ -336,6 +340,7 @@
 
     i {
       font-size: 1.5em;
+
       &::before {
         vertical-align: -15%;
       }
@@ -712,6 +717,7 @@ textarea.regFormDescriptionInputMgmt {
 [class*='span'] {
   float: left;
 }
+
 .container,
 .navbar-fixed-top .container,
 .navbar-fixed-bottom .container {
@@ -726,42 +732,51 @@ textarea.regFormDescriptionInputMgmt {
   *zoom: 1;
   white-space: nowrap;
 }
+
 .tabbable::before,
 .tabbable::after {
   display: table;
   content: '';
 }
+
 .tabbable::after {
   clear: both;
 }
+
 .tabs-left > .nav-tabs {
   border-bottom: 0;
 }
+
 .tabs-left > .nav-tabs > li,
 .tabs-right > .nav-tabs > li {
   float: none;
 }
+
 .tabs-left > .nav-tabs > li > a,
 .tabs-right > .nav-tabs > li > a {
   min-width: 74px;
   margin-right: 0;
   margin-bottom: 3px;
 }
+
 .tabs-left > .nav-tabs {
   display: inline-block;
   vertical-align: top;
   margin-right: 19px;
   border-right: 1px solid #ddd;
 }
+
 .tabs-left > .nav-tabs > li > a {
   margin-right: -1px;
   -webkit-border-radius: 4px 0 0 4px;
   -moz-border-radius: 4px 0 0 4px;
   border-radius: 4px 0 0 4px;
 }
+
 .tabs-left > .nav-tabs > li > a:hover {
   border-color: #eee #ddd #eee #eee;
 }
+
 .tabs-left > .nav-tabs .active > a,
 .tabs-left > .nav-tabs .active > a:hover {
   border-color: #ddd transparent #ddd #ddd;
@@ -773,13 +788,16 @@ textarea.regFormDescriptionInputMgmt {
   margin-bottom: 18px;
   list-style: none;
 }
+
 .nav > li > a {
   display: block;
 }
+
 .nav > li > a:hover {
   text-decoration: none;
   background-color: #eee;
 }
+
 .nav .nav-header {
   display: block;
   padding: 3px 15px;
@@ -790,6 +808,7 @@ textarea.regFormDescriptionInputMgmt {
   text-shadow: 0 1px 0 rgba(255, 255, 255, 0.5);
   text-transform: uppercase;
 }
+
 .nav li + .nav-header {
   margin-top: 9px;
 }
@@ -797,18 +816,22 @@ textarea.regFormDescriptionInputMgmt {
 .nav-tabs > li {
   float: left;
 }
+
 .nav-tabs > li > a {
   padding-right: 12px;
   padding-left: 12px;
   margin-right: 2px;
   line-height: 14px;
 }
+
 .nav-tabs {
   border-bottom: 1px solid #ddd;
 }
+
 .nav-tabs > li {
   margin-bottom: -1px;
 }
+
 .nav-tabs > li > a {
   padding-top: 8px;
   padding-bottom: 8px;
@@ -818,9 +841,11 @@ textarea.regFormDescriptionInputMgmt {
   -moz-border-radius: 4px 4px 0 0;
   border-radius: 4px 4px 0 0;
 }
+
 .nav-tabs > li > a:hover {
   border-color: #eee #eee #ddd;
 }
+
 .nav-tabs > .active > a,
 .nav-tabs > .active > a:hover {
   color: #555;
@@ -829,18 +854,22 @@ textarea.regFormDescriptionInputMgmt {
   border-bottom-color: transparent;
   cursor: default;
 }
+
 .tab-content {
   display: inline-block;
   overflow: auto;
 }
+
 .tabs-below > .nav-tabs,
 .tabs-right > .nav-tabs,
 .tabs-left > .nav-tabs {
   border-bottom: 0;
 }
+
 .tab-content > .tab-pane {
   display: none;
 }
+
 .tab-content > .active {
   display: block;
 }
@@ -959,19 +988,23 @@ textarea.regFormDescriptionInputMgmt {
           border-bottom: 2px solid $gray;
           padding-right: 5px;
         }
+
         th {
           padding-right: 10px;
           text-align: center;
         }
       }
+
       tbody {
         tr {
           &:nth-child(even) {
             background-color: $light-gray;
           }
+
           &:nth-child(odd) {
             background-color: white;
           }
+
           &:first-child td {
             border-top: 0;
           }
@@ -990,6 +1023,7 @@ textarea.regFormDescriptionInputMgmt {
             }
           }
         }
+
         td {
           border-top: 1px solid $gray;
 
@@ -1002,35 +1036,44 @@ textarea.regFormDescriptionInputMgmt {
             &:first-child {
               background: $pastel-green;
             }
+
             &:nth-child(2) {
               background: $pastel-red;
             }
           }
+
           &.no-stats-data {
             color: $dark-gray;
           }
+
           &.paid-amount span {
             color: $green;
           }
+
           &.unpaid-amount {
             &::before {
               content: '(';
             }
+
             &::after {
               content: ')';
             }
+
             span {
               color: $red;
             }
           }
+
           &.stick-left {
             padding-right: 1px;
           }
+
           &.stick-right {
             padding-left: 1px;
           }
         }
       }
+
       tr {
         td:first-child::before {
           display: inline-block;
@@ -1039,6 +1082,7 @@ textarea.regFormDescriptionInputMgmt {
           vertical-align: middle;
           font-weight: bold;
         }
+
         &.header-row {
           cursor: pointer;
           user-select: none;
@@ -1047,21 +1091,26 @@ textarea.regFormDescriptionInputMgmt {
             @include icon-before('icon-arrow-down');
 
             border-bottom: 0;
+
             &::before {
               @include rotate-transform(0.15s);
             }
           }
+
           &.collapsed td:first-child::before {
             transform: rotate(-90deg);
           }
         }
+
         &.single-row td:first-child::before {
           content: '\2001';
         }
+
         &.sub-row td:first-child {
           border-top: 0;
         }
       }
+
       th,
       td {
         padding: 5px;
@@ -1070,6 +1119,7 @@ textarea.regFormDescriptionInputMgmt {
         &:first-child {
           text-align: left;
         }
+
         i[class^='icon-'] {
           vertical-align: middle;
         }
@@ -1088,6 +1138,7 @@ textarea.regFormDescriptionInputMgmt {
         font-style: italic;
         font-weight: lighter;
       }
+
       & > *:last-child {
         float: right;
         clear: both;
@@ -1103,6 +1154,7 @@ textarea.regFormDescriptionInputMgmt {
       height: 1.5em;
       vertical-align: middle;
       color: $black;
+
       & > * {
         &:first-child {
           position: relative;
@@ -1110,6 +1162,7 @@ textarea.regFormDescriptionInputMgmt {
           float: left;
           margin-right: 0.4em;
         }
+
         &:last-child {
           display: block;
           overflow: auto;
@@ -1133,10 +1186,12 @@ textarea.regFormDescriptionInputMgmt {
       color: white;
       z-index: 100;
     }
+
     .jqplot-yaxis-tick {
       right: 0;
       margin-right: 0.5em;
     }
+
     .jqplot-xaxis-tick {
       margin-top: 0.2em;
     }
@@ -1235,10 +1290,12 @@ textarea.regFormDescriptionInputMgmt {
   .registration-unpaid {
     color: $yellow;
   }
+
   .registration-complete,
   .registration-checked-in {
     color: $green;
   }
+
   .registration-rejected,
   .registration-withdrawn {
     color: $red;

@@ -48,6 +48,7 @@ $i-button-spacing: 0.3rem;
     & .i-button {
       height: 1.5em;
     }
+
     & .i-button[class*='icon-']::before {
       font-size: 1em;
     }
@@ -211,6 +212,7 @@ $i-button-spacing: 0.3rem;
       &:hover ~ .i-button {
         border-left-color: $gray;
       }
+
       &:hover ~ .i-button ~ .i-button {
         border-left-color: $default-border-color;
       }
@@ -249,6 +251,7 @@ $i-button-spacing: 0.3rem;
   > .clearableinput:not(:last-child) {
     border-bottom-right-radius: 0;
     border-top-right-radius: 0;
+
     & + .i-button {
       border-left: none;
       border-bottom-left-radius: 0;

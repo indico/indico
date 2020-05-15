@@ -25,6 +25,7 @@
   &::before {
     color: $color;
   }
+
   &:hover:not(.disabled):not(:disabled)::before {
     color: lighten($color, $light-color-variation) !important;
   }
@@ -43,11 +44,13 @@
   width: 100%;
 
   border-collapse: collapse;
+
   tr {
     > td {
       font-size: 0.9rem;
 
       padding: 0.2rem 0.3rem;
+
       &:first-child {
         @include ellipsis;
 
@@ -87,6 +90,7 @@
           @include colored-icon($yellow);
         }
       }
+
       > * {
         @extend %attachment-line;
       }
@@ -96,6 +100,7 @@
         display: inline-block;
       }
     }
+
     &:not(.sub-tree) {
       > td {
         &:first-child::before,
@@ -103,6 +108,7 @@
         > span {
           color: $light-black;
         }
+
         > a {
           &:hover {
             color: $black;
@@ -112,6 +118,7 @@
             margin-right: 0.5em;
           }
         }
+
         &.actions,
         &.actions > *,
         &.date {
@@ -119,19 +126,23 @@
 
           color: $gray;
         }
+
         &.actions {
           width: 2.2rem;
 
           text-align: right;
+
           > * {
             visibility: hidden;
 
             cursor: pointer;
 
             opacity: 0;
+
             &.icon-remove:hover::before {
               color: $red;
             }
+
             &.icon-edit:hover::before,
             &.icon-file-download:hover::before {
               color: $blue;
@@ -139,20 +150,25 @@
           }
         }
       }
+
       &:hover:not(.empty) > td {
         background-color: $pastel-blue;
+
         &:first-child {
           border-top-left-radius: $default-border-radius;
           border-bottom-left-radius: $default-border-radius;
         }
+
         &:last-child {
           border-top-right-radius: $default-border-radius;
           border-bottom-right-radius: $default-border-radius;
         }
+
         &.actions > *,
         &.date {
           color: $dark-gray;
         }
+
         &.actions > * {
           visibility: visible;
 
@@ -160,19 +176,23 @@
         }
       }
     }
+
     &.expandable {
       user-select: none;
 
       cursor: pointer;
+
       > td {
         &:first-child {
           border-top-left-radius: 2px;
           border-bottom-left-radius: 2px;
 
           font-weight: bold;
+
           &::before {
             @include rotate-transform(0.15s);
           }
+
           > span {
             &::before {
               margin-right: 0.25em;
@@ -181,30 +201,37 @@
             @include icon-before('icon-folder-open');
           }
         }
+
         &:last-child {
           border-top-right-radius: 2px;
         }
       }
+
       &.collapsed > td:first-child {
         > span {
           @include icon-before('icon-folder');
         }
       }
     }
+
     &.sub-tree > td {
       padding: 0 0 0 1.4em;
+
       &:first-child::before {
         display: none; // no icon space for nested files
       }
+
       > div > .tree {
         border-radius: 2px;
 
         background-color: $light-gray;
+
         tr > td:first-child::before {
           display: none; // no icon space for nested files
         }
       }
     }
+
     &.empty > td {
       font-style: italic;
 
@@ -215,9 +242,11 @@
 
 %protected-colors {
   border-bottom: 2px solid $red;
+
   &:hover::before {
     color: $red !important;
   }
+
   &:hover {
     border-bottom-color: $red !important;
   }
@@ -257,18 +286,21 @@
 
       vertical-align: middle;
     }
+
     > h2 {
       &::before {
         margin-right: 0.2em;
       }
       margin: 0 0 0.25em 0;
     }
+
     > .i-button.right {
       margin-top: 0;
     }
 
     margin-bottom: 0.5em;
   }
+
   .tree tr.sub-tree > td > div > .tree {
     background-color: white;
   }
@@ -280,6 +312,7 @@
 
   border-bottom: 1px solid #ebebeb;
   box-shadow: 0 1px 0 #fafafa;
+
   > h2 {
     padding-bottom: 0;
 
@@ -294,6 +327,7 @@
     padding-bottom: 0;
     border-bottom: 0;
   }
+
   > .i-button.right {
     margin: 0 !important;
   }
@@ -304,6 +338,7 @@
 .inline-attachments-icon {
   vertical-align: middle !important;
   line-height: 1.7em;
+
   &::before {
     vertical-align: middle !important;
     display: inline-block;
@@ -327,6 +362,7 @@
       font-size: 0.9em;
     }
   }
+
   .folder .i-button.attachment,
   .folder .attachments {
     font-family: Roboto, sans-serif;
@@ -339,11 +375,13 @@
     &.is-protected {
       @extend %protected-colors;
     }
+
     &.has-label {
       margin: 0;
       padding-left: 0.7em !important;
     }
   }
+
   .folder {
     display: inline-flex;
     margin-left: 0.2em;
@@ -356,12 +394,14 @@
       }
     }
   }
+
   .folder .i-dropdown {
     & > li {
       padding: 0.1em 0.2em !important;
 
       .attachment {
         max-width: 250px;
+
         &.is-protected {
           color: $red;
         }

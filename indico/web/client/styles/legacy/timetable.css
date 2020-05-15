@@ -24,6 +24,7 @@ div.timetableFullScreenHeader {
   text-align: center;
   background: white;
 }
+
 .timetableInfoBox {
   margin: 17px 10px;
   color: #444;
@@ -188,6 +189,7 @@ div.timetableBlockConvener {
 div.timetablePreLoading {
   background: transparent url('static:images/load_big.gif') scroll no-repeat center center;
 }
+
 div.timetablePreLoading .text {
   color: #777;
   text-align: center;

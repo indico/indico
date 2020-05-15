@@ -12,6 +12,7 @@ body {
   background: #fff;
   font-family: helvetica, verdana, sans-serif;
 }
+
 p,
 br,
 dl,
@@ -45,18 +46,22 @@ a:visited {
   background: transparent;
   text-decoration: none;
 }
+
 a:active {
   color: $bright-orange;
   background: transparent;
 }
+
 a:hover {
   color: $bright-orange;
   background: transparent;
 }
+
 a.img:hover {
   color: #00c;
   background: transparent;
 }
+
 a.img:active {
   color: #00c;
   background: transparent;
@@ -94,9 +99,11 @@ td.sessionsLegend {
 td.contribsLegendSilver {
   background: silver;
 }
+
 td.contribsLegendGrey {
   background: #d2d2d2;
 }
+
 td.breaksLegend {
   background: #fcc;
 }
@@ -107,6 +114,7 @@ table.dayList {
   border: 0;
   width: 100%;
 }
+
 .titleClass {
   font-weight: bold;
 }

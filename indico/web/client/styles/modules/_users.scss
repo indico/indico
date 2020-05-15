@@ -39,6 +39,7 @@
 .suggested-users,
 .user-search-results {
   overflow: auto;
+
   .user-list {
     li {
       cursor: pointer;
@@ -210,6 +211,7 @@
         &:not(.active) {
           @include user-action($pastel-blue);
         }
+
         &.active {
           @include user-action($blue);
         }
@@ -244,6 +246,7 @@
 
     table-layout: fixed;
   }
+
   .category-box-info,
   .category-action {
     position: relative;
@@ -255,6 +258,7 @@
 
     vertical-align: middle;
   }
+
   .category-box-info {
     .category-box-title,
     .category-path {
@@ -262,10 +266,12 @@
 
       display: block;
     }
+
     .category-path {
       line-height: 1;
 
       margin-top: 0.4em;
+
       ul {
         font-weight: normal;
         overflow: hidden;
@@ -278,15 +284,18 @@
         text-align: left;
 
         color: $dark-gray;
+
         li {
           @include ellipsis;
 
           display: inline-block;
           padding: 0;
           border-bottom: 0;
+
           &:last-child {
             max-width: 100%;
           }
+
           & + li::before {
             padding: 0 0.2em;
 
@@ -296,10 +305,12 @@
       }
     }
   }
+
   .category-action {
     width: 1.2em;
     font-size: 1.2em;
   }
+
   .category-action-extra {
     font-size: 0.8em;
     font-weight: normal;

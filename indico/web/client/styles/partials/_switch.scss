@@ -75,6 +75,7 @@ $switch-inner-shadow: inset 0 0 0.4em $switch-shadow-color;
       color: $light-black;
       content: attr(data-off);
     }
+
     &::after {
       @extend %switch-elem;
       @extend %switch-elem-hidden;
@@ -118,6 +119,7 @@ $switch-inner-shadow: inset 0 0 0.4em $switch-shadow-color;
         &::before {
           @extend %switch-elem-hidden;
         }
+
         &::after {
           @extend %switch-elem-visible;
         }
@@ -133,6 +135,7 @@ $switch-inner-shadow: inset 0 0 0.4em $switch-shadow-color;
     &:disabled {
       & + .switch-label {
         cursor: default;
+
         &::before,
         &::after {
           color: $gray;

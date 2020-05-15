@@ -201,19 +201,23 @@ form {
   @extend %form-field-block;
 
   @include apply-to-text-inputs('.i-form-field-fixed-width');
+
   > select,
   > textarea {
     @extend .i-form-field-fixed-width;
   }
 
   @include apply-to-inputs('%form-field-input');
+
   .selectize-control input[type='text'] {
     height: auto;
   }
+
   textarea {
     @extend %form-field-input;
     height: auto;
   }
+
   select {
     @extend %form-field-input;
     padding-left: 0.7em;
