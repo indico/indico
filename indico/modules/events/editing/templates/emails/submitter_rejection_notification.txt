@@ -1,0 +1,7 @@
+{% extends 'events/editing/emails/base_email.txt' %}
+
+{% block subject -%}Submitter rejected changes{%- endblock %}
+
+{% block body_text -%}
+Your revision changes have been rejected by {{ submitter_name }}.
+{% endblock %}
