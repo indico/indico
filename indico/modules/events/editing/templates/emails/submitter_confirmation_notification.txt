@@ -1,0 +1,7 @@
+{% extends 'events/editing/emails/base_email.txt' %}
+
+{% block subject -%}Submitter confirmed changes{%- endblock %}
+
+{% block body_text -%}
+Your revision changes have been confirmed by {{ submitter_name }}.
+{% endblock %}

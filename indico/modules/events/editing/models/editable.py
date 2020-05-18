@@ -13,6 +13,7 @@ from indico.util.i18n import _
 from indico.util.locators import locator_property
 from indico.util.string import format_repr, return_ascii
 from indico.util.struct.enum import RichIntEnum
+from indico.web.flask.util import url_for
 
 
 class EditableType(RichIntEnum):
@@ -206,3 +207,7 @@ class Editable(db.Model):
     def editing_enabled(self):
         from indico.modules.events.editing.settings import editable_type_settings
         return editable_type_settings[self.type].get(self.event, 'editing_enabled')
+
+    @property
+    def external_timeline_url(self):
+        return url_for('event_editing.editable', self, _external=True)

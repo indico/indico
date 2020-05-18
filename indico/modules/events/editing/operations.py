@@ -24,6 +24,9 @@ from indico.modules.events.editing.models.review_conditions import EditingReview
 from indico.modules.events.editing.models.revision_files import EditingRevisionFile
 from indico.modules.events.editing.models.revisions import EditingRevision, FinalRevisionState, InitialRevisionState
 from indico.modules.events.editing.models.tags import EditingTag
+from indico.modules.events.editing.notifications import (notify_editor_comment, notify_editor_judgment,
+                                                         notify_submitter_comment, notify_submitter_confirmation,
+                                                         notify_submitter_upload)
 from indico.modules.events.editing.schemas import EditingConfirmationAction, EditingReviewAction
 from indico.modules.events.logs import EventLogKind, EventLogRealm
 from indico.util.date_time import now_utc
@@ -126,6 +129,7 @@ def review_editable_revision(revision, editor, action, comment, tags, files=None
                                        tags=revision.tags)
         revision.editable.revisions.append(new_revision)
     db.session.flush()
+    notify_editor_judgment(revision, session.user)
     logger.info('Revision %r reviewed by %s [%s]', revision, editor, action.name)
 
 
@@ -143,6 +147,7 @@ def confirm_editable_changes(revision, submitter, action, comment):
     if action == EditingConfirmationAction.accept:
         publish_editable_revision(revision)
     db.session.flush()
+    notify_submitter_confirmation(revision, submitter, action)
     logger.info('Revision %r confirmed by %s [%s]', revision, submitter, action.name)
 
 
@@ -172,6 +177,7 @@ def create_submitter_revision(prev_revision, user, files):
                                    tags=prev_revision.tags)
     prev_revision.editable.revisions.append(new_revision)
     db.session.flush()
+    notify_submitter_upload(new_revision)
     logger.info('Revision %r created by submitter %s', new_revision, user)
 
 
@@ -212,6 +218,10 @@ def create_revision_comment(revision, user, text, internal=False):
     comment = EditingRevisionComment(user=user, text=text, internal=internal)
     revision.comments.append(comment)
     db.session.flush()
+    if revision.editable.can_perform_submitter_actions(user):
+        notify_submitter_comment(comment)
+    if revision.editable.can_perform_editor_actions(user):
+        notify_editor_comment(comment)
     logger.info('Comment on revision %r created by %r: %r', revision, user, comment)
 
 
