@@ -656,7 +656,7 @@ class ZipGeneratorMixin:
             for item in self._iter_items(files_holder):
                 name = self._prepare_folder_structure(item)
                 self.used_filenames.add(name)
-                with item.storage.get_local_path(item.storage_file_id) as filepath:
+                with item.get_local_path() as filepath:
                     zip_handler.write(filepath.encode('utf-8'), name)
 
         temp_file.delete = False

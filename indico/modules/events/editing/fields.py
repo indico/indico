@@ -13,6 +13,8 @@ import os
 from marshmallow import ValidationError
 from marshmallow.fields import Dict
 
+from indico.modules.events.contributions import Contribution
+from indico.modules.events.editing.models.editable import Editable
 from indico.modules.events.editing.models.file_types import EditingFileType
 from indico.modules.events.editing.models.tags import EditingTag
 from indico.util.marshmallow import FilesField, ModelField, ModelList
@@ -79,3 +81,12 @@ class EditingTagsField(ModelList):
             return query
 
         super(EditingTagsField, self).__init__(model=EditingTag, get_query=_get_query, collection_class=set, **kwargs)
+
+
+class EditableList(ModelList):
+    def __init__(self, event, editable_type, **kwargs):
+        def _get_query(m):
+            return (m.query
+                    .join(Contribution)
+                    .filter(Contribution.event_id == event.id, m.type == editable_type))
+        super(EditableList, self).__init__(model=Editable, get_query=_get_query, collection_class=set, **kwargs)
