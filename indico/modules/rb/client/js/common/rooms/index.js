@@ -5,8 +5,8 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-import * as actions from './actions';
 import * as selectors from './selectors';
+import * as actions from './actions';
 
 export {default as reducer} from './reducers';
 export {default as RoomDetailsPreloader} from './RoomDetailsPreloader';
