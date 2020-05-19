@@ -12,10 +12,13 @@ from werkzeug.exceptions import Unauthorized
 
 from indico.modules.events.contributions.controllers.display import RHContributionDisplayBase
 from indico.modules.events.controllers.base import RHDisplayEventBase
+from indico.modules.events.editing.fields import EditableList
 from indico.modules.events.editing.models.editable import Editable, EditableType
 from indico.modules.events.editing.settings import editing_settings
 from indico.modules.events.management.controllers.base import RHManageEventBase
 from indico.modules.events.models.events import Event
+from indico.util.marshmallow import not_empty
+from indico.web.args import parser
 from indico.web.rh import RequireUserMixin
 
 
@@ -96,3 +99,15 @@ class RHContributionEditableBase(RequireUserMixin, RHContributionDisplayBase):
                          .with_parent(self.contrib)
                          .filter_by(type=self.editable_type)
                          .first())
+
+
+class RHEditablesBase(RHEditingManagementBase):
+    """Base class for operations on multiple editables."""
+
+    def _process_args(self):
+        RHEditingManagementBase._process_args(self)
+        self.editable_type = EditableType[request.view_args['type']]
+        self.editables = parser.parse({
+            'editables': EditableList(required=True, event=self.event, editable_type=self.editable_type,
+                                      validate=not_empty)
+        })['editables']

@@ -8,7 +8,7 @@
 from __future__ import unicode_literals
 
 from indico.modules.events.editing.controllers import frontend
-from indico.modules.events.editing.controllers.backend import common, management, service, timeline
+from indico.modules.events.editing.controllers.backend import common, editable_list, management, service, timeline
 from indico.web.flask.wrappers import IndicoBlueprint
 
 
@@ -66,12 +66,22 @@ _bp.add_url_rule('/editing/api/service/connect', 'api_service_connect', service.
 _bp.add_url_rule('/editing/api/service/disconnect', 'api_service_disconnect', service.RHDisconnectService,
                  methods=('POST',))
 _bp.add_url_rule('/editing/api/service/status', 'api_service_status', service.RHServiceStatus)
+_bp.add_url_rule('/editing/api/<any(paper,slides,poster):type>/editables/prepare-archive', 'prepare_editables_archive',
+                 editable_list.RHPrepareEditablesArchive, methods=('POST',))
+_bp.add_url_rule('/editing/<any(paper,slides,poster):type>/editables/archive/<uuid:uuid>.zip', 'download_archive',
+                 editable_list.RHDownloadArchive)
+_bp.add_url_rule('/editing/api/<any(paper,slides,poster):type>/editables/assign', 'assign_editor',
+                 editable_list.RHAssignEditor, methods=('POST',))
+_bp.add_url_rule('/editing/api/<any(paper,slides,poster):type>/editables/assign/me', 'assign_myself',
+                 editable_list.RHAssignMyselfAsEditor, methods=('POST',))
+_bp.add_url_rule('/editing/api/<any(paper,slides,poster):type>/editables/unassign', 'unassign_editor',
+                 editable_list.RHUnassignEditor, methods=('POST',))
 
 # Contribution/revision-level APIs
 contrib_api_prefix = '/api' + contrib_prefix
-_bp.add_url_rule(contrib_api_prefix + '/upload', 'api_upload', timeline.RHEditingUploadFile, methods=('POST',))
 _bp.add_url_rule(contrib_api_prefix, 'api_editable', timeline.RHEditable)
 _bp.add_url_rule(contrib_api_prefix, 'api_create_editable', timeline.RHCreateEditable, methods=('PUT',))
+_bp.add_url_rule(contrib_api_prefix + '/upload', 'api_upload', timeline.RHEditingUploadFile, methods=('POST',))
 _bp.add_url_rule(contrib_api_prefix + '/<int:revision_id>/review', 'api_review_editable',
                  timeline.RHReviewEditable, methods=('POST',))
 _bp.add_url_rule(contrib_api_prefix + '/<int:revision_id>/confirm', 'api_confirm_changes',

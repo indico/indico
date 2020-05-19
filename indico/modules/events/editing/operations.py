@@ -7,6 +7,10 @@
 
 from __future__ import unicode_literals
 
+import os
+from io import BytesIO
+from zipfile import ZipFile
+
 from flask import session
 from werkzeug.exceptions import BadRequest
 
@@ -21,8 +25,11 @@ from indico.modules.events.editing.models.revision_files import EditingRevisionF
 from indico.modules.events.editing.models.revisions import EditingRevision, FinalRevisionState, InitialRevisionState
 from indico.modules.events.editing.models.tags import EditingTag
 from indico.modules.events.editing.schemas import EditingConfirmationAction, EditingReviewAction
+from indico.modules.events.logs import EventLogKind, EventLogRealm
 from indico.util.date_time import now_utc
+from indico.util.fs import secure_filename
 from indico.util.i18n import _
+from indico.web.flask.util import send_file
 
 
 FILE_TYPE_ATTRS = ('name', 'extensions', 'allow_multiple_files', 'required', 'publishable', 'filename_template')
@@ -283,3 +290,52 @@ def update_review_condition(condition, file_types):
 def delete_review_condition(condition):
     logger.info('Review condition %r deleted by %r', condition, session.user)
     db.session.delete(condition)
+
+
+def assign_editor(editable, editor):
+    editable.editor = editor
+    logger.info('Editable %r assigned to editor %r', editable, editor)
+    editable.event.log(EventLogRealm.management, EventLogKind.change, 'Editing',
+                       'Editable assigned to an editor', session.user, data={'Editor': editor.full_name})
+    db.session.flush()
+
+
+def unassign_editor(editable):
+    editor = editable.editor
+    editable.editor = None
+    logger.info('Editor %r has been unassigned from %r', editor, editable)
+    editable.event.log(EventLogRealm.management, EventLogKind.change, 'Editing',
+                       'Editable has been unassigned from the editor', session.user,
+                       data={'Unassigned from': editor.full_name})
+    db.session.flush()
+
+
+def generate_editables_zip(editables):
+    buf = BytesIO()
+    with ZipFile(buf, 'w', allowZip64=True) as zip_file:
+        for editable in editables:
+            for revision_file in editable.revisions[-1].files:
+                file_obj = revision_file.file
+                with file_obj.get_local_path() as src_file:
+                    zip_file.write(src_file, _compose_filepath(editable, revision_file))
+
+    buf.seek(0)
+    return send_file('files.zip', buf, 'application/zip', inline=False)
+
+
+def _compose_filepath(editable, revision_file):
+    file_obj = revision_file.file
+    contrib = editable.contribution
+    editable_type = editable.type.name
+    code = 'Editable-{}'.format(contrib.friendly_id)
+
+    if contrib.code:
+        code += '-{}'.format(contrib.code)
+
+    filepath = os.path.join(secure_filename('{}-{}'.format(contrib.title, contrib.id),
+                                            'contribution-{}'.format(contrib.id)),
+                            editable_type, code, revision_file.file_type.name)
+    filename, ext = os.path.splitext(file_obj.filename)
+    filename = secure_filename(file_obj.filename,
+                               'revision-file-{}-{}{}'.format(revision_file.revision_id, file_obj.id, ext))
+    return os.path.join(filepath, filename)
