@@ -6,14 +6,4 @@
 // LICENSE file for more details.
 
 import mockAxios from 'jest-mock-axios';
-
-// https://github.com/knee-cola/jest-mock-axios/issues/42
-mockAxios.mustGetReqByUrl = url => {
-  const req = mockAxios.getReqByUrl(url);
-  if (!req) {
-    throw new Error('No request to respond to!');
-  }
-  return req;
-};
-
 export default mockAxios;

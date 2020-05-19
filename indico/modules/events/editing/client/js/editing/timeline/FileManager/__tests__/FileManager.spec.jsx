@@ -108,17 +108,14 @@ async function simulateFileUpload(dropzone, name, type) {
   });
 
   await act(async () => {
-    mockAxios.mockResponse(
-      {
-        data: {
-          uuid,
-          filename: name,
-          claimed: false,
-          downloadURL: 'goes://nowhere',
-        },
+    mockAxios.mockResponseFor('goes://nowhere', {
+      data: {
+        uuid,
+        filename: name,
+        claimed: false,
+        downloadURL: 'goes://nowhere',
       },
-      mockAxios.mustGetReqByUrl('goes://nowhere')
-    );
+    });
   });
 
   return uuid;
@@ -139,7 +136,7 @@ async function uploadFile(dropzone, onChange, name, type, deletedFile = null) {
     const deleteUrl = `flask://files.delete_file/uuid=${deletedFile}`;
     expect(mockAxios.delete).toHaveBeenCalledWith(deleteUrl);
     await act(async () => {
-      mockAxios.mockResponse(undefined, mockAxios.mustGetReqByUrl(deleteUrl));
+      mockAxios.mockResponseFor(deleteUrl, undefined);
     });
   } else {
     expect(mockAxios.delete).not.toHaveBeenCalled();
@@ -207,10 +204,7 @@ describe('File manager', () => {
     // perform an undo - this needs to go back to an empty file list
     await act(async () => {
       fileEntry.find('FileAction').simulate('click');
-      mockAxios.mockResponse(
-        undefined,
-        mockAxios.mustGetReqByUrl(`flask://files.delete_file/uuid=${uuid}`)
-      );
+      mockAxios.mockResponseFor(`flask://files.delete_file/uuid=${uuid}`, undefined);
     });
     expect(mockAxios.delete).toHaveBeenCalledWith(`flask://files.delete_file/uuid=${uuid}`);
     expect(onChange).toHaveBeenCalledWith({});
@@ -252,10 +246,7 @@ describe('File manager', () => {
     // perform an undo - this needs to revert to the initial file!
     await act(async () => {
       fileEntry.find('FileAction').simulate('click');
-      mockAxios.mockResponse(
-        undefined,
-        mockAxios.mustGetReqByUrl(`flask://files.delete_file/uuid=${uuid}`)
-      );
+      mockAxios.mockResponseFor(`flask://files.delete_file/uuid=${uuid}`, undefined);
     });
     expect(mockAxios.delete).toHaveBeenCalledWith(`flask://files.delete_file/uuid=${uuid}`);
     expect(onChange).toHaveBeenCalledWith({'2': ['file1']});
@@ -298,17 +289,14 @@ describe('File manager', () => {
     expect(onChange).not.toHaveBeenCalled();
 
     await act(async () => {
-      mockAxios.mockResponse(
-        {
-          data: {
-            uuid: 'newfile2',
-            filename: file1.name,
-            claimed: false,
-            downloadURL: 'goes://nowhere',
-          },
+      mockAxios.mockResponseFor('http://upload/endpoint', {
+        data: {
+          uuid: 'newfile2',
+          filename: file1.name,
+          claimed: false,
+          downloadURL: 'goes://nowhere',
         },
-        mockAxios.mustGetReqByUrl('http://upload/endpoint')
-      );
+      });
     });
 
     // once the upload finished, the state is updated
