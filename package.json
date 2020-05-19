@@ -137,6 +137,7 @@
     "prettier": "~1.18.2",
     "preval.macro": "^5.0.0",
     "progress-bar-webpack-plugin": "^2.1.0",
+    "redux-mock-store": "^1.5.4",
     "resolve-url-loader": "^3.1.1",
     "sass-loader": "^8.0.2",
     "script-loader": "^0.7.2",
@@ -173,7 +174,9 @@
   },
   "homepage": "https://github.com/indico/indico#readme",
   "jest": {
-    "transformIgnorePatterns": ["/node_modules/(?!geodesy)"],
+    "transformIgnorePatterns": [
+      "/node_modules/(?!geodesy|semantic-ui-react)"
+    ],
     "moduleNameMapper": {
       "^.+\\.(s?css)$": "identity-obj-proxy",
       "^indico/modules/events/(reviewing|util)/(.*)$": "<rootDir>/indico/modules/events/client/js/$1/$2",
@@ -185,6 +188,11 @@
       "<rootDir>/setupTests.js"
     ],
     "globals": {
+      "Indico": {
+        "Urls": {
+          "BasePath": ""
+        }
+      },
       "REACT_TRANSLATIONS": {
         "indico": {
           "": {
