@@ -292,6 +292,7 @@ class User(PersonMixin, db.Model):
         'UserEmail',
         lazy=True,
         viewonly=True,
+        sync_backref=False,
         primaryjoin='User.id == UserEmail.user_id',
         collection_class=set,
         backref=db.backref('user', lazy=False)
