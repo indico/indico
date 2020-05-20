@@ -26,7 +26,7 @@ to the ``[base]`` and ``[updates]`` sections, as described in the
 
 .. code-block:: shell
 
-    yum install -y https://download.postgresql.org/pub/repos/yum/9.6/redhat/rhel-7-x86_64/pgdg-centos96-9.6-3.noarch.rpm
+    yum install -y yum install https://download.postgresql.org/pub/repos/yum/reporpms/EL-7-x86_64/pgdg-redhat-repo-latest.noarch.rpm
     yum install -y postgresql96 postgresql96-server postgresql96-libs postgresql96-devel postgresql96-contrib
     yum install -y httpd mod_proxy_uwsgi mod_ssl mod_xsendfile
     yum install -y gcc redis uwsgi uwsgi-plugin-python2
@@ -156,6 +156,18 @@ Now enable the uwsgi proxy module in apache:
 .. code-block:: shell
 
     echo 'LoadModule proxy_uwsgi_module modules/mod_proxy_uwsgi.so' > /etc/httpd/conf.modules.d/proxy_uwsgi.conf
+
+
+You also need to create a systemd drop-in config to ensure uWSGI works correctly:
+
+.. code-block:: shell
+
+    mkdir -p /etc/systemd/system/uwsgi.service.d
+    cat > /etc/systemd/system/uwsgi.service.d/old-exec-start.conf <<'EOF'
+    [Service]
+    ExecStart=
+    ExecStart=/usr/sbin/uwsgi --ini /etc/uwsgi.ini
+    EOF
 
 
 .. _centos-apache-ssl:
