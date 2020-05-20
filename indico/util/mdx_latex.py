@@ -314,23 +314,21 @@ class LaTeXExtension(markdown.Extension):
 
         # remove escape pattern -- \\(.*) -- as this messes up any embedded
         # math and we don't need to escape stuff any more for html
-        for key, pat in self.md.inlinePatterns.iteritems():
-            if pat.pattern == markdown.inlinepatterns.ESCAPE_RE:
-                self.md.inlinePatterns.pop(key)
-                break
+        self.md.inlinePatterns.deregister('escape')
 
         latex_tp = LaTeXTreeProcessor(self.configs)
         math_pp = MathTextPostProcessor()
         link_pp = LinkTextPostProcessor()
         unescape_html_pp = UnescapeHtmlTextPostProcessor()
 
-        md.treeprocessors['latex'] = latex_tp
-        md.postprocessors['unescape_html'] = unescape_html_pp
-        md.postprocessors['math'] = math_pp
-        md.postprocessors['link'] = link_pp
+        md.treeprocessors.register(latex_tp, 'latex', md.treeprocessors._priority[-1].priority - 1)
+        md.postprocessors.register(unescape_html_pp, 'unescape_html', md.postprocessors._priority[-1].priority - 1)
+        md.postprocessors.register(math_pp, 'math', md.postprocessors._priority[-1].priority - 1)
+        md.postprocessors.register(link_pp, 'link', md.postprocessors._priority[-1].priority - 1)
 
         # Needed for LaTeX postprocessors not to choke on URL-encoded urls
-        md.inlinePatterns['automail'] = NonEncodedAutoMailPattern(markdown.inlinepatterns.AUTOMAIL_RE, md)
+        md.inlinePatterns.register(NonEncodedAutoMailPattern(markdown.inlinepatterns.AUTOMAIL_RE, md), 'automail',
+                                   md.treeprocessors._priority[-1].priority - 1)
 
     def reset(self):
         pass
