@@ -28,7 +28,7 @@ to the ``[base]`` and ``[updates]`` sections, as described in the
 
 .. code-block:: shell
 
-    yum install -y https://download.postgresql.org/pub/repos/yum/9.6/redhat/rhel-7-x86_64/pgdg-centos96-9.6-3.noarch.rpm
+    yum install -y yum install https://download.postgresql.org/pub/repos/yum/reporpms/EL-7-x86_64/pgdg-redhat-repo-latest.noarch.rpm
     yum install -y postgresql96 postgresql96-server postgresql96-libs postgresql96-devel postgresql96-contrib
     yum install -y gcc redis nginx uwsgi uwsgi-plugin-python2
     yum install -y python-devel python-virtualenv libjpeg-turbo-devel libxslt-devel libxml2-devel libffi-devel pcre-devel libyaml-devel
@@ -168,6 +168,18 @@ most cases.
         client_max_body_size 1G;
       }
     }
+    EOF
+
+
+You also need to create a systemd drop-in config to ensure uWSGI works correctly:
+
+.. code-block:: shell
+
+    mkdir -p /etc/systemd/system/uwsgi.service.d
+    cat > /etc/systemd/system/uwsgi.service.d/old-exec-start.conf <<'EOF'
+    [Service]
+    ExecStart=
+    ExecStart=/usr/sbin/uwsgi --ini /etc/uwsgi.ini
     EOF
 
 
