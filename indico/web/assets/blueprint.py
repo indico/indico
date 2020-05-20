@@ -62,7 +62,7 @@ def js_vars_global():
         with open(cache_file, 'wb') as f:
             f.write(data)
 
-    return send_file('global.js', cache_file, mimetype='application/javascript', no_cache=False, conditional=True)
+    return send_file('global.js', cache_file, mimetype='application/javascript', conditional=True)
 
 
 @assets_blueprint.route('/js-vars/user.js')
@@ -97,7 +97,7 @@ def _get_i18n_locale(locale_name, react=False):
             f.write("window.{} = {};".format('REACT_TRANSLATIONS' if react else 'TRANSLATIONS', i18n_data))
 
     return send_file('{}{}.js'.format(locale_name, react_suffix), cache_file, mimetype='application/javascript',
-                     no_cache=False, conditional=True)
+                     conditional=True)
 
 
 @assets_blueprint.route('!/static/custom/<any(css,js):folder>/<path:filename>', endpoint='custom')

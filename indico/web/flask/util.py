@@ -258,12 +258,12 @@ def send_file(name, path_or_fd, mimetype, last_modified=None, no_cache=True, inl
     `path_or_fd` is either the physical path to the file or a file-like object (e.g. a StringIO).
     `mimetype` SHOULD be a proper MIME type such as image/png. It may also be an indico-style file type such as JPG.
     `last_modified` may contain a unix timestamp or datetime object indicating the last modification of the file.
-    `no_cache` can be set to False to disable no-cache headers.
+    `no_cache` can be set to False to disable no-cache headers. Setting `conditional` to `True` overrides it (`False`).
     `inline` defaults to true except for certain filetypes like XML and CSV. It SHOULD be set to false only when you
     want to force the user's browser to download the file. Usually it is much nicer if e.g. a PDF file can be displayed
     inline so don't disable it unless really necessary.
     `conditional` is very useful when sending static files such as CSS/JS/images. It will allow the browser to retrieve
-    the file only if it has been modified (based on mtime and size).
+    the file only if it has been modified (based on mtime and size). Setting it will override `no_cache`.
     `safe` adds some basic security features such a adding a content-security-policy and forcing inline=False for
     text/html mimetypes
     """
@@ -295,7 +295,8 @@ def send_file(name, path_or_fd, mimetype, last_modified=None, no_cache=True, inl
         if not isinstance(last_modified, int):
             last_modified = int(time.mktime(last_modified.timetuple()))
         rv.last_modified = last_modified
-    if no_cache:
+    # if the request is conditional, then caching shouldn't be disabled
+    if not conditional and no_cache:
         del rv.expires
         del rv.cache_control.max_age
         rv.cache_control.public = False
