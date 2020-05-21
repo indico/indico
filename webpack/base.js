@@ -277,10 +277,11 @@ export function webpackDefaults(env, config, bundles) {
             {
               test: /\.module\.scss$/,
               use: buildSCSSLoader({
-                context: path.resolve(globalBuildConfig.clientPath, '../../modules'),
-                modules: true,
+                modules: {
+                  context: path.resolve(globalBuildConfig.clientPath, '../../modules'),
+                  localIdentName: '[path]___[name]__[local]___[hash:base64:5]',
+                },
                 importLoaders: 1,
-                localIdentName: '[path]___[name]__[local]___[hash:base64:5]',
               }),
             },
             {

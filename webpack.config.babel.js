@@ -131,14 +131,16 @@ export default env => {
       ],
     },
     plugins: [
-      new CopyWebpackPlugin([
-        {
-          from: path.resolve(modulesDir, 'ckeditor/dev/builder/release/ckeditor'),
-          to: 'js/ckeditor',
-          transform,
-        },
-        {from: path.resolve(modulesDir, 'mathjax'), to: 'js/mathjax', transform},
-      ]),
+      new CopyWebpackPlugin({
+        patterns: [
+          {
+            from: path.resolve(modulesDir, 'ckeditor/dev/builder/release/ckeditor'),
+            to: 'js/ckeditor',
+            transform,
+          },
+          {from: path.resolve(modulesDir, 'mathjax'), to: 'js/mathjax', transform},
+        ],
+      }),
       new webpack.ProvidePlugin({
         _: ['underscore', 'default'],
         moment: 'moment',

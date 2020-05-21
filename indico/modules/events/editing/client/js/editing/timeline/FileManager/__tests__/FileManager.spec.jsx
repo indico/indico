@@ -327,7 +327,7 @@ describe('File manager', () => {
   });
 
   it('handles upload errors properly', async () => {
-    // eslint-disable-next-line import/namespace
+    // eslint-disable-next-line import/namespace, no-import-assign
     axiosUtils.handleAxiosError = jest
       .spyOn(axiosUtils, 'handleAxiosError')
       .mockImplementation(() => {});
