@@ -44,7 +44,7 @@
         },
       });
 
-      _(ready_listeners).each(function(listener) {
+      ready_listeners.forEach(listener => {
         listener();
       });
     });

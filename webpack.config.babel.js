@@ -140,7 +140,7 @@ export default env => {
         {from: path.resolve(modulesDir, 'mathjax'), to: 'js/mathjax', transform},
       ]),
       new webpack.ProvidePlugin({
-        _: 'underscore',
+        _: ['underscore', 'default'],
         moment: 'moment',
       }),
     ],
