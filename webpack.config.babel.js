@@ -74,7 +74,7 @@ export default env => {
   // Minification of copied files (e.g. CKEditor and MathJax)
   const transform =
     currentEnv === 'development'
-      ? null
+      ? undefined
       : (content, filePath) => {
           if (!filePath.match(/\.js$/)) {
             return content;
