@@ -56,6 +56,9 @@ export:
       - PaperCompetence.event_id
       - PaperReviewQuestion.event_id
       - PaperTemplate.event_id
+      - EditingFileType.event_id
+      - EditingReviewCondition.event_id
+      - EditingTag.event_id
       - ContributionType.event_id
       - ContributionField.event_id
       - TrackGroup.event_id
@@ -107,6 +110,7 @@ export:
       - ContributionFieldValue.contribution_id
       - PaperFile._contribution_id
       - PaperRevision._contribution_id
+      - Editable.contribution_id
       - Contribution.paper_content_reviewers.prop.secondary.c.contribution_id
       - Contribution.paper_layout_reviewers.prop.secondary.c.contribution_id
       - Contribution.paper_judges.prop.secondary.c.contribution_id
@@ -269,6 +273,27 @@ export:
   event_paper_reviewing.layout_reviewers: {}
   event_paper_reviewing.judges: {}
 
+  # editing
+  EditingFileType: {}
+  EditingReviewCondition:
+    fks:
+      - EditingFileType.review_conditions.prop.secondary.c.review_condition_id
+  EditingTag: {}
+  Editable:
+    fks:
+      - EditingRevision.editable_id
+  EditingRevision:
+    fks:
+      - EditingRevisionFile.revision_id
+      - EditingRevisionComment.revision_id
+      - EditingRevision.tags.prop.secondary.c.revision_id
+  EditingRevisionFile:
+    fks_out:
+      - file_id
+  EditingRevisionComment: {}
+  event_editing.review_condition_file_types: {}
+  event_editing.revision_tags: {}
+
 
   # registration & payment
   RegistrationForm:
@@ -346,6 +371,15 @@ export:
   EventPage: {}
 
 
+  # generic files
+  File:
+    cols:
+      uuid: ~
+    # a file can be referenced from multiple places, e.g. multiple editable revisions
+    # can use the same file
+    allow_duplicates: true
+
+
 
 import:
   # Static default values used when there is no value in the exported data.
@@ -399,6 +433,7 @@ import:
     Abstract.judge_id: system
     PaperRevision.submitter_id: system
     PaperRevision.judge_id: system
+    EditingRevision.submitter_id: system
     # set to none
     EventPerson.user_id: none
     EventLogEntry.user_id: none
@@ -407,6 +442,9 @@ import:
     AbstractComment.modified_by_id: none
     AbstractEmailLogEntry.user_id: none
     PaperReviewComment.modified_by_id: none
+    Editable.editor_id: none
+    EditingRevision.editor_id: none
+    EditingRevisionComment.user_id: none
     # skip row
     EventRole.members.prop.secondary.c.user_id: skip
     EventPrincipal.user_id: skip
