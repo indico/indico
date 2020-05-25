@@ -27,7 +27,7 @@ import searchBarFactory from '../../components/SearchBar';
 import CardPlaceholder from '../../components/CardPlaceholder';
 import {BlockingModal} from '../blockings';
 import {BookingExportModal} from '../../common/bookings';
-import {queryStringRules as queryStringSerializer} from '../../common/roomSearch';
+import {rules as queryStringSerializer} from '../../common/roomSearch/queryString';
 import {mapControllerFactory, selectors as mapSelectors} from '../../common/map';
 import {actions as roomsActions, RoomRenderer} from '../../common/rooms';
 import * as roomsListActions from './actions';

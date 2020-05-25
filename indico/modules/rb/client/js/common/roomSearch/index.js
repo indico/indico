@@ -6,7 +6,5 @@
 // LICENSE file for more details.
 
 export {roomSearchActionsFactory} from './actions';
-export {roomSearchReducerFactory} from './reducers';
 export {roomSearchSelectorFactory} from './selectors';
-export {queryStringReducer, rules as queryStringRules} from './queryString';
 export {ajax as ajaxRules} from './serializers';

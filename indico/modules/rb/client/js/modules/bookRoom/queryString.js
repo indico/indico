@@ -14,7 +14,7 @@ import * as actions from './actions';
 import {history} from '../../history';
 import {initialTimelineState} from './reducers';
 import {actions as filtersActions} from '../../common/filters';
-import {queryStringRules as queryFilterRules} from '../../common/roomSearch';
+import {rules as queryFilterRules} from '../../common/roomSearch/queryString';
 
 export const rules = {
   timeline: {

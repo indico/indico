@@ -14,7 +14,7 @@ import {history} from '../../history';
 import {initialState} from './reducers';
 import {defaultStateField, boolStateField} from '../../util';
 import {actions as filtersActions} from '../../common/filters';
-import {queryStringRules as roomSearchQueryStringRules} from '../../common/roomSearch';
+import {rules as roomSearchQueryStringRules} from '../../common/roomSearch/queryString';
 import * as calendarActions from './actions';
 
 const rules = {

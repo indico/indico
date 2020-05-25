@@ -6,7 +6,7 @@
 // LICENSE file for more details.
 
 import {actions as filtersActions} from '../../common/filters';
-import {queryStringRules as queryFilterRules} from '../../common/roomSearch';
+import {rules as queryFilterRules} from '../../common/roomSearch/queryString';
 
 export const routeConfig = {
   '/rooms': {

@@ -12,7 +12,7 @@ import {requestReducer} from 'indico/utils/redux';
 import {filterReducerFactory} from '../filters';
 import {mapSearchReducerFactory} from '../map';
 import {roomSearchActionsFactory} from './actions';
-import {actions as bookRoomActions} from '../../modules/bookRoom';
+import * as bookRoomActions from '../../modules/bookRoom/actions';
 import {actions as adminActions} from '../../modules/admin';
 import {sanitizeRecurrence} from '../../util';
 

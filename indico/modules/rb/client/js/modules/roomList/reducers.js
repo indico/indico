@@ -5,6 +5,6 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-import {roomSearchReducerFactory} from '../../common/roomSearch';
+import {roomSearchReducerFactory} from '../../common/roomSearch/reducers';
 
 export default roomSearchReducerFactory('roomList');

@@ -28,7 +28,7 @@ import {roomFilterBarFactory} from '../../modules/roomList';
 import BookingTimeline from './BookingTimeline';
 import SearchResultCount from './SearchResultCount';
 import {TimelineHeader} from '../../common/timeline';
-import {queryStringRules as qsFilterRules} from '../../common/roomSearch';
+import {rules as qsFilterRules} from '../../common/roomSearch/queryString';
 import {rules as qsBookRoomRules} from './queryString';
 import * as bookRoomActions from './actions';
 import {actions as filtersActions} from '../../common/filters';
