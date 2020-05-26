@@ -21,7 +21,7 @@ from indico.modules.events.layout.forms import AddImagesForm
 from indico.modules.events.layout.models.images import ImageFile
 from indico.modules.events.layout.views import WPImages
 from indico.modules.events.management.controllers import RHManageEventBase
-from indico.util.fs import secure_filename
+from indico.util.fs import secure_client_filename
 from indico.util.i18n import _, ngettext
 from indico.web.util import jsonify_data
 
@@ -47,7 +47,7 @@ class RHImageUpload(RHManageImagesBase):
         files = request.files.getlist('image')
         num = 0
         for f in files:
-            filename = secure_filename(f.filename, 'image')
+            filename = secure_client_filename(f.filename)
             data = BytesIO()
             shutil.copyfileobj(f, data)
             data.seek(0)

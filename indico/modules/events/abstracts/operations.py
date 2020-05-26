@@ -29,7 +29,7 @@ from indico.modules.events.logs.models.entries import EventLogKind, EventLogReal
 from indico.modules.events.logs.util import make_diff_log
 from indico.modules.events.util import set_custom_fields
 from indico.util.date_time import now_utc
-from indico.util.fs import secure_filename
+from indico.util.fs import secure_client_filename
 from indico.util.i18n import orig_string
 
 
@@ -61,7 +61,7 @@ def add_abstract_files(abstract, files, log_action=True):
     if not files:
         return
     for f in files:
-        filename = secure_filename(f.filename, 'attachment')
+        filename = secure_client_filename(f.filename)
         content_type = mimetypes.guess_type(f.filename)[0] or f.mimetype or 'application/octet-stream'
         abstract_file = AbstractFile(filename=filename, content_type=content_type, abstract=abstract)
         abstract_file.save(f.stream)

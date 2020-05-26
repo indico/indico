@@ -21,7 +21,7 @@ from indico.modules.attachments.models.attachments import Attachment, Attachment
 from indico.modules.attachments.models.folders import AttachmentFolder
 from indico.modules.attachments.operations import add_attachment_link
 from indico.modules.attachments.util import get_attached_items
-from indico.util.fs import secure_filename
+from indico.util.fs import secure_client_filename
 from indico.util.i18n import _, ngettext
 from indico.util.string import to_unicode
 from indico.web.flask.templating import get_template_module
@@ -84,7 +84,7 @@ class AddAttachmentFilesMixin:
             files = form.files.data
             folder = form.folder.data or AttachmentFolder.get_or_create_default(linked_object=self.object)
             for f in files:
-                filename = secure_filename(f.filename, 'attachment')
+                filename = secure_client_filename(f.filename)
                 attachment = Attachment(folder=folder, user=session.user, title=to_unicode(f.filename),
                                         type=AttachmentType.file, protection_mode=form.protection_mode.data)
                 if attachment.is_self_protected:
@@ -142,7 +142,7 @@ class EditAttachmentMixin(SpecificAttachmentMixin):
                 file = form.file.data['added']
                 if file:
                     self.attachment.file = AttachmentFile(user=session.user, content_type=file.mimetype,
-                                                          filename=secure_filename(file.filename, 'attachment'))
+                                                          filename=secure_client_filename(file.filename))
                     self.attachment.file.save(file.stream)
 
             signals.attachments.attachment_updated.send(self.attachment, user=session.user)

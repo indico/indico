@@ -12,6 +12,7 @@ import posixpath
 from indico.core.config import config
 from indico.core.db import db
 from indico.core.storage.models import StoredFileMixin
+from indico.util.fs import secure_filename
 from indico.util.locators import locator_property
 from indico.util.string import format_repr, return_ascii, strict_unicode, text_to_repr
 
@@ -85,5 +86,6 @@ class PaperFile(StoredFileMixin, db.Model):
         self.assign_id()
         path_segments = ['event', strict_unicode(self._contribution.event.id), 'papers',
                          '{}_{}'.format(self.id, strict_unicode(self._contribution.id))]
-        path = posixpath.join(*(path_segments + [self.filename]))
+        filename = secure_filename(self.filename, 'paper')
+        path = posixpath.join(*(path_segments + [filename]))
         return config.ATTACHMENT_STORAGE, path

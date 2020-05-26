@@ -30,6 +30,7 @@ from indico.modules.events.payment.models.transactions import TransactionStatus
 from indico.modules.users.models.users import format_display_full_name
 from indico.util.date_time import now_utc
 from indico.util.decorators import classproperty
+from indico.util.fs import secure_filename
 from indico.util.i18n import L_
 from indico.util.locators import locator_property
 from indico.util.signals import values_from_signal
@@ -597,7 +598,7 @@ class RegistrationData(StoredFileMixin, db.Model):
                          strict_unicode(self.registration.registration_form.id), strict_unicode(self.registration.id)]
         assert None not in path_segments
         # add timestamp in case someone uploads the same file again
-        filename = '{}-{}-{}'.format(self.field_data.field_id, int(time.time()), self.filename)
+        filename = '{}-{}-{}'.format(self.field_data.field_id, int(time.time()), secure_filename(self.filename, 'file'))
         path = posixpath.join(*(path_segments + [filename]))
         return config.ATTACHMENT_STORAGE, path
 

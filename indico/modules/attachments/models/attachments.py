@@ -23,6 +23,7 @@ from indico.modules.attachments.models.principals import AttachmentPrincipal
 from indico.modules.attachments.preview import get_file_previewer
 from indico.modules.attachments.util import can_manage_attachments
 from indico.util.date_time import now_utc
+from indico.util.fs import secure_filename
 from indico.util.i18n import _
 from indico.util.string import return_ascii, strict_unicode
 from indico.util.struct.enum import RichIntEnum
@@ -99,7 +100,7 @@ class AttachmentFile(StoredFileMixin, db.Model):
                 path_segments.append(strict_unicode(folder.subcontribution.id))
         self.attachment.assign_id()
         self.assign_id()
-        filename = '{}-{}-{}'.format(self.attachment.id, self.id, self.filename)
+        filename = '{}-{}-{}'.format(self.attachment.id, self.id, secure_filename(self.filename, 'file'))
         path = posixpath.join(*(path_segments + [filename]))
         return config.ATTACHMENT_STORAGE, path
 
