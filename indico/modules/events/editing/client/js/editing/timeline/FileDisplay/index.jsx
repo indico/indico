@@ -7,7 +7,7 @@
 
 import React from 'react';
 import PropTypes from 'prop-types';
-import {Button, Icon} from 'semantic-ui-react';
+import {Button, Icon, Label} from 'semantic-ui-react';
 import {TooltipIfTruncated} from 'indico/react/components';
 import {Translate} from 'indico/react/i18n';
 import {fileTypePropTypes, filePropTypes, mapFileTypes} from '../FileManager/util';
@@ -53,7 +53,7 @@ FileTypeDisplay.propTypes = {
   fileType: PropTypes.shape(fileTypePropTypes).isRequired,
 };
 
-export default function FileDisplay({downloadURL, fileTypes, files}) {
+export default function FileDisplay({downloadURL, fileTypes, files, tags}) {
   return (
     <div styleName="file-display-wrapper">
       <div styleName="file-display">
@@ -61,13 +61,29 @@ export default function FileDisplay({downloadURL, fileTypes, files}) {
           <FileTypeDisplay key={fileType.id} fileType={fileType} />
         ))}
       </div>
-      {downloadURL && files.length !== 0 && (
-        <div>
-          <Button as="a" href={downloadURL} floated="right" icon primary>
-            <Icon name="download" /> <Translate>Download ZIP</Translate>
-          </Button>
+      <div styleName="download-tag-wrapper">
+        <div styleName="tag-display">
+          {tags.map(tag => (
+            <Label color={tag.color} key={tag.id}>
+              {tag.verboseTitle}
+            </Label>
+          ))}
         </div>
-      )}
+        {files.length !== 0 && (
+          <div>
+            <Button
+              as="a"
+              href={downloadURL}
+              floated="right"
+              styleName="download-button"
+              icon
+              primary
+            >
+              <Icon name="download" /> <Translate>Download ZIP</Translate>
+            </Button>
+          </div>
+        )}
+      </div>
     </div>
   );
 }
@@ -76,4 +92,11 @@ FileDisplay.propTypes = {
   downloadURL: PropTypes.string.isRequired,
   fileTypes: PropTypes.arrayOf(PropTypes.shape(fileTypePropTypes)).isRequired,
   files: PropTypes.arrayOf(PropTypes.shape(filePropTypes)).isRequired,
+  tags: PropTypes.arrayOf(
+    PropTypes.shape({
+      color: PropTypes.string.isRequired,
+      id: PropTypes.number.isRequired,
+      verboseTitle: PropTypes.string.isRequired,
+    })
+  ).isRequired,
 };

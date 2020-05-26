@@ -45,7 +45,7 @@ export default function RequestChangesForm({setLoading, onSuccess}) {
     <FinalForm
       onSubmit={requestChanges}
       subscription={{}}
-      initialValues={{comment: '', tags: lastRevision.tags}}
+      initialValues={{comment: '', tags: lastRevision.tags.map(t => t.id)}}
     >
       {fprops => (
         <Form onSubmit={fprops.handleSubmit}>

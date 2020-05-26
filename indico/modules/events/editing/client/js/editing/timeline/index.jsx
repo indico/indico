@@ -51,6 +51,7 @@ export default function Timeline() {
           fileTypes={fileTypes}
           files={lastRevision.files}
           downloadURL={lastRevision.downloadFilesURL}
+          tags={lastRevision.tags}
         />
       </TimelineHeader>
       <TimelineContent blocks={timelineBlocks} itemComponent={TimelineItem} />

@@ -27,7 +27,7 @@ export default function AcceptRejectForm({action, setLoading}) {
 
   return (
     <FinalForm
-      initialValues={{comment: '', tags: lastRevision.tags}}
+      initialValues={{comment: '', tags: lastRevision.tags.map(t => t.id)}}
       onSubmit={async formData => {
         setLoading(true);
         const rv = await dispatch(reviewEditable(lastRevision, {...formData, action}));
