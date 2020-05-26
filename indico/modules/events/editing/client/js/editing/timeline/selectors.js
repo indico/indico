@@ -38,18 +38,21 @@ export function processRevisions(revisions) {
   const newRevisions = [];
   let numberOfRevisions = 1;
   let currentRevision = revisions[0];
+  let previousRevision = null;
   let items = [...currentRevision.comments];
 
   for (const [index, revision] of revisions.entries()) {
     const {initialState, finalState} = revision;
-
     if (!currentRevision) {
       currentRevision = {...revision};
       items = [...currentRevision.comments];
     }
 
     if (initialState.name === InitialRevisionState.needs_submitter_confirmation) {
-      currentRevision.header = Translate.string('Editor has made some changes to the paper');
+      currentRevision.header = Translate.string(
+        '{editorName} (editor) has made some changes to the paper',
+        {editorName: previousRevision.editor.fullName}
+      );
     }
 
     if (finalState.name === FinalRevisionState.replaced) {
@@ -118,6 +121,7 @@ export function processRevisions(revisions) {
       );
     }
 
+    previousRevision = currentRevision;
     if (shouldCreateNewRevision(revision)) {
       newRevisions.push({
         ..._.omit(currentRevision, 'comments'),
