@@ -10,12 +10,17 @@ from __future__ import unicode_literals
 import errno
 import hashlib
 import os
+import re
 import time
 from datetime import datetime
 
 from werkzeug.utils import secure_filename as _secure_filename
 
 from indico.util.string import to_unicode, unicode_to_ascii
+
+
+_control_char_re = re.compile(r'[\x00-\x1f]+')
+_path_seps_re = re.compile(r'[:/\\]+')
 
 
 def silentremove(filename):
@@ -32,7 +37,11 @@ def secure_filename(filename, fallback):
     """Returns a secure version of a filename.
 
     This removes possibly dangerous characters and also converts the
-    filename to plain ASCII for maximum compatibility.
+    filename to plain ASCII for maximum compatibility. It should only
+    be used for file system storage, since especially filenames written
+    in asian languages likely become useless when stripping anything
+    that's not ASCII; use :func:`secure_client_filename` for client-facing
+    filenames.
 
     :param filename: A filename
     :param fallback: The filename to use if there were no safe chars
@@ -41,6 +50,41 @@ def secure_filename(filename, fallback):
     if not filename:
         return fallback
     return _secure_filename(unicode_to_ascii(to_unicode(filename))) or fallback
+
+
+def secure_client_filename(filename, fallback='file'):
+    """Return a secure version of filename for clients.
+
+    This removes possibly dangerous characters (which would result in
+    unexpected behavior in URLs or archive paths).
+    It should never be used to sanitize filenames for server-side storage;
+    use :func:`secure_filename` in that case.
+
+    :param filename: A filename
+    :param fallback: The filename to use if there are no safe chars
+                     after cleaning up the filename.
+    """
+    if not filename:
+        return fallback
+    # strip path separators (they may break flask urls not expecting slashes)
+    # `:` isn't allowed on windows
+    filename = _path_seps_re.sub('_', filename)
+    # normalize all kinds of whitespace to a single space
+    filename = ' '.join(filename.split())
+    # surrounding whitespace is awful
+    filename = filename.strip()
+    # get rid of control chars
+    filename = _control_char_re.sub('', filename)
+    # avoid dot-only filenames
+    if set(filename) == {'.'}:
+        # filenames consisting of 3 or more dots and nothing else would be OK,
+        # but still look awfully like special directories, so we just replace
+        # any dot-only filename with underscores
+        filename = '_' * len(filename)
+    # ending dots are invalid on windows and likely break any urlize logic when
+    # pasting a link ending in such a filename
+    filename = filename.rstrip('.')
+    return filename or fallback
 
 
 def resolve_link(link):
