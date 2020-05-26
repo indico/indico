@@ -19,7 +19,7 @@ from wtforms.validators import InputRequired, NumberRange, ValidationError
 from indico.modules.events.registration.fields.base import RegistrationFormBillableField, RegistrationFormFieldBase
 from indico.util.countries import get_countries, get_country
 from indico.util.date_time import strftime_all_years
-from indico.util.fs import secure_filename
+from indico.util.fs import secure_client_filename
 from indico.util.i18n import L_, _
 from indico.util.string import normalize_phone_number
 from indico.web.forms.fields import IndicoRadioField
@@ -252,7 +252,7 @@ class FileField(RegistrationFormFieldBase):
             # we have a file -> always save it
             data['file'] = {
                 'data': file_.stream,
-                'name': secure_filename(file_.filename, 'attachment'),
+                'name': secure_client_filename(file_.filename),
                 'content_type': mimetypes.guess_type(file_.filename)[0] or file_.mimetype or 'application/octet-stream'
             }
         elif not value['keep_existing']:

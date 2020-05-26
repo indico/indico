@@ -34,7 +34,7 @@ from indico.modules.events.papers.settings import PaperReviewingRole, paper_revi
 from indico.modules.events.util import update_object_principals
 from indico.modules.users import User
 from indico.util.date_time import now_utc
-from indico.util.fs import secure_filename
+from indico.util.fs import secure_client_filename
 from indico.util.i18n import orig_string
 
 
@@ -143,7 +143,7 @@ def close_cfp(event):
 def create_paper_revision(paper, submitter, files):
     revision = PaperRevision(paper=paper, submitter=submitter)
     for f in files:
-        filename = secure_filename(f.filename, 'paper')
+        filename = secure_client_filename(f.filename)
         content_type = mimetypes.guess_type(f.filename)[0] or f.mimetype or 'application/octet-stream'
         pf = PaperFile(filename=filename, content_type=content_type, paper_revision=revision,
                        _contribution=paper.contribution)
@@ -189,13 +189,12 @@ def reset_paper_state(paper):
 
 def _store_paper_template_file(template, file):
     content_type = mimetypes.guess_type(file.filename)[0] or file.mimetype or 'application/octet-stream'
-    filename = secure_filename(file.filename, 'template')
     # reset fields in case an existing file is replaced so we can save() again
     template.storage_backend = None
     template.storage_file_id = None
     template.size = None
     template.content_type = content_type
-    template.filename = filename
+    template.filename = secure_client_filename(file.filename)
     template.save(file.stream)
 
 

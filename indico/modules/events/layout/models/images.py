@@ -12,6 +12,7 @@ import posixpath
 from indico.core.config import config
 from indico.core.db import db
 from indico.core.storage import StoredFileMixin
+from indico.util.fs import secure_filename
 from indico.util.string import return_ascii, strict_unicode
 
 
@@ -55,7 +56,7 @@ class ImageFile(StoredFileMixin, db.Model):
     def _build_storage_path(self):
         path_segments = ['event', strict_unicode(self.event.id), 'images']
         self.assign_id()
-        filename = '{}-{}'.format(self.id, self.filename)
+        filename = '{}-{}'.format(self.id, secure_filename(self.filename, 'file'))
         path = posixpath.join(*(path_segments + [filename]))
         return config.ATTACHMENT_STORAGE, path
 

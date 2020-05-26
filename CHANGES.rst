@@ -73,6 +73,7 @@ Improvements
   format of the user's locale (:issue:`4399`)
 - Refactor the room edit modal to a tabbed layout and improve error
   handling (:issue:`4408`)
+- Preserve non-ascii characters in file names (:issue:`4465`)
 
 Bugfixes
 ^^^^^^^^
