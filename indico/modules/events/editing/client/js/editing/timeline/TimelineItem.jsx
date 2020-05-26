@@ -84,6 +84,7 @@ export default function TimelineItem({block}) {
                   fileTypes={fileTypes}
                   files={block.files}
                   downloadURL={block.downloadFilesURL}
+                  tags={block.tags}
                 />
                 {canPerformSubmitterActions && needsSubmitterConfirmation && isLastBlock && (
                   <ChangesConfirmation />

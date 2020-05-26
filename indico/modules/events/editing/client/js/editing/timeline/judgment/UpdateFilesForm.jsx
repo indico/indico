@@ -66,7 +66,7 @@ export default function UpdateFilesForm({setLoading}) {
 
   return (
     <FinalForm
-      initialValues={{comment: '', tags: lastRevision.tags, files}}
+      initialValues={{comment: '', tags: lastRevision.tags.map(t => t.id), files}}
       initialValuesEqual={_.isEqual}
       subscription={{}}
       onSubmit={submitReview}

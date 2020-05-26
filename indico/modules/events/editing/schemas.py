@@ -102,6 +102,7 @@ class EditingRevisionSchema(mm.ModelSchema):
     submitter = fields.Nested(UserSchema, only=('id', 'avatar_bg_color', 'full_name'))
     editor = fields.Nested(UserSchema, only=('id', 'avatar_bg_color', 'full_name'))
     files = fields.List(fields.Nested(EditingRevisionFileSchema))
+    tags = fields.List(fields.Nested(EditingTagSchema))
     comments = fields.Method('_get_comments')
     initial_state = fields.Nested(RevisionState)
     final_state = fields.Nested(RevisionState)
