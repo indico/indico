@@ -292,10 +292,14 @@ function RoomEditModal({roomId, locationId, onClose, afterCreation}) {
           <Message styleName="submit-message" positive hidden={!afterCreation || wasEverUpdated}>
             <Translate>Room has been successfully created.</Translate>
           </Message>
-          <FormSpy subscription={{submitSucceeded: true}}>
-            {({submitSucceeded}) => {
+          <FormSpy subscription={{submitSucceeded: true, modifiedSinceLastSubmit: true}}>
+            {({submitSucceeded, modifiedSinceLastSubmit}) => {
               return (
-                <Message styleName="submit-message" positive hidden={!submitSucceeded || dirty}>
+                <Message
+                  styleName="submit-message"
+                  positive
+                  hidden={!submitSucceeded || modifiedSinceLastSubmit}
+                >
                   <Translate>Room has been successfully updated.</Translate>
                 </Message>
               );
