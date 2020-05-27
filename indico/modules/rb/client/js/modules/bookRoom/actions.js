@@ -16,7 +16,7 @@ import {ajaxAction, submitFormAction} from 'indico/utils/redux';
 import {ajax as ajaxRules} from './serializers';
 import {validateFilters} from '../../common/filters';
 import {preProcessParameters} from '../../util';
-import {actions as modalActions} from '../../modals';
+import {openModal} from '../../actions';
 
 import {roomSearchActionsFactory, ajaxRules as ajaxFilterRules} from '../../common/roomSearch';
 import {selectors as userSelectors} from '../../common/user';
@@ -212,11 +212,9 @@ export function resetRoomSuggestions() {
 
 export const {searchRooms} = roomSearchActionsFactory('bookRoom');
 
-export const openBookRoom = (roomId, data = null) =>
-  modalActions.openModal('book-room', roomId, data);
-export const openUnavailableRooms = () => modalActions.openModal('unavailable-rooms');
-export const openBookingForm = (roomId, data) =>
-  modalActions.openModal('booking-form', roomId, data);
+export const openBookRoom = (roomId, data = null) => openModal('book-room', roomId, data);
+export const openUnavailableRooms = () => openModal('unavailable-rooms');
+export const openBookingForm = (roomId, data) => openModal('booking-form', roomId, data);
 export function setTimelineDate(date) {
   return {type: SET_TIMELINE_DATE, date};
 }

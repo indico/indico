@@ -5,7 +5,4 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-import * as actions from './actions';
-
 export {default} from './ModalController';
-export {actions};

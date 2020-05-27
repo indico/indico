@@ -13,7 +13,7 @@ import bookingOccurrenceStateActionsURL from 'indico-url:rb.booking_occurrence_s
 
 import {indicoAxios} from 'indico/utils/axios';
 import {ajaxAction, submitFormAction} from 'indico/utils/redux';
-import {actions as modalActions} from '../../modals';
+import {openModal} from '../../actions';
 
 export const BOOKING_DETAILS_RECEIVED = 'bookings/BOOKING_DETAILS_RECEIVED';
 export const FETCH_BOOKING_DETAILS_REQUEST = 'bookings/FETCH_BOOKING_DETAILS_REQUEST';
@@ -51,7 +51,7 @@ export function fetchBookingDetails(id) {
   );
 }
 
-export const openBookingDetails = bookingId => modalActions.openModal('booking-details', bookingId);
+export const openBookingDetails = bookingId => openModal('booking-details', bookingId);
 
 export function changeBookingState(id, action, params = {}) {
   return ajaxAction(

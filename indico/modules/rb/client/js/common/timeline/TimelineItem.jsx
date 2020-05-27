@@ -15,7 +15,7 @@ import {List, Popup} from 'semantic-ui-react';
 import {Translate, Param} from 'indico/react/i18n';
 import {fullyOverlaps, serializeTime} from 'indico/utils/date';
 import {ResponsivePopup} from 'indico/react/components';
-import {actions as modalActions} from '../../modals';
+import {openModal} from '../../actions';
 
 import './TimelineItem.module.scss';
 
@@ -370,8 +370,7 @@ export default connect(
   dispatch => ({
     actions: bindActionCreators(
       {
-        openBookingDetails: bookingId =>
-          modalActions.openModal('booking-details', bookingId, null, true),
+        openBookingDetails: bookingId => openModal('booking-details', bookingId, null, true),
       },
       dispatch
     ),

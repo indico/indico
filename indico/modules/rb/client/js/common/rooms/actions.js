@@ -14,7 +14,7 @@ import fetchRoomAttributesURL from 'indico-url:rb.room_attributes';
 import {indicoAxios} from 'indico/utils/axios';
 import {camelizeKeys} from 'indico/utils/case';
 import {ajaxAction} from 'indico/utils/redux';
-import {actions as modalActions} from '../../modals';
+import {openModal} from '../../actions';
 
 export const FETCH_EQUIPMENT_TYPES_REQUEST = 'rooms/FETCH_EQUIPMENT_TYPES_REQUEST';
 export const FETCH_EQUIPMENT_TYPES_SUCCESS = 'rooms/FETCH_EQUIPMENT_TYPES_SUCCESS';
@@ -111,5 +111,5 @@ export function fetchAttributes(id, force = false) {
   };
 }
 
-export const openRoomDetails = roomId => modalActions.openModal('room-details', roomId);
-export const openRoomDetailsBook = roomId => modalActions.openModal('room-details-book', roomId);
+export const openRoomDetails = roomId => openModal('room-details', roomId);
+export const openRoomDetailsBook = roomId => openModal('room-details-book', roomId);

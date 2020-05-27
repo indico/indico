@@ -43,7 +43,7 @@ import {
 import RoomBasicDetails from '../../components/RoomBasicDetails';
 import RoomKeyLocation from '../../components/RoomKeyLocation';
 import TimeInformation from '../../components/TimeInformation';
-import {actions as modalActions} from '../../modals';
+import {openModal} from '../../actions';
 import LazyBookingObjectLink from './LazyBookingObjectLink';
 import * as bookingsSelectors from './selectors';
 import * as bookingsActions from './actions';
@@ -899,8 +899,7 @@ export default connect(
         changeBookingState: bookingsActions.changeBookingState,
         changeBookingOccurrenceState: bookingsActions.changeBookingOccurrenceState,
         deleteBooking: bookingsActions.deleteBooking,
-        openBookingDetails: bookingId =>
-          modalActions.openModal('booking-details', bookingId, null, true),
+        openBookingDetails: bookingId => openModal('booking-details', bookingId, null, true),
         fetchBookingDetails: bookingsActions.fetchBookingDetails,
       },
       dispatch

@@ -10,6 +10,7 @@ import {routerMiddleware} from 'connected-react-router';
 import createReduxStore from 'indico/utils/redux';
 
 import getReducers from './reducers';
+import {history} from './history';
 import {queryStringReducer as qsRoomSearchReducer} from './common/roomSearch/queryString';
 import {routeConfig as roomListRouteConfig} from './modules/roomList/queryString';
 import {

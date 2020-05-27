@@ -32,7 +32,7 @@ import {selectors as roomsSelectors} from '../../common/rooms';
 import {selectors as linkingSelectors, linkDataShape} from '../../common/linking';
 import RoomBasicDetails from '../../components/RoomBasicDetails';
 import * as actions from './actions';
-import {actions as modalActions} from '../../modals';
+import {openModal} from '../../actions';
 import {selectors as userSelectors} from '../../common/user';
 import {selectors as configSelectors} from '../../common/config';
 import * as bookRoomSelectors from './selectors';
@@ -740,8 +740,7 @@ export default connect(
             isAdminOverrideEnabled
           );
         },
-        openBookingDetails: bookingId =>
-          modalActions.openModal('booking-details', bookingId, null, true),
+        openBookingDetails: bookingId => openModal('booking-details', bookingId, null, true),
       },
       dispatch
     ),

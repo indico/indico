@@ -17,7 +17,7 @@ import {ajaxAction, submitFormAction} from 'indico/utils/redux';
 import {preProcessParameters} from '../../util';
 import {ajax as ajaxRules} from './serializers';
 import {actions as filtersActions} from '../../common/filters';
-import {actions as modalActions} from '../../modals';
+import {openModal} from '../../actions';
 
 export const FETCH_BLOCKINGS_REQUEST = 'blockings/FETCH_BLOCKINGS_REQUEST';
 export const FETCH_BLOCKINGS_SUCCESS = 'blockings/FETCH_BLOCKINGS_SUCCESS';
@@ -133,5 +133,5 @@ export function deleteBlocking(blockingId) {
 }
 
 export function openBlockingDetails(blockingId, overridePath = null) {
-  return modalActions.openModal('blocking-details', blockingId, null, false, overridePath);
+  return openModal('blocking-details', blockingId, null, false, overridePath);
 }
