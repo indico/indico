@@ -206,3 +206,20 @@ class RHEditableSetSubmission(RHEditableTypeManagementBase):
                        'Closed {} submission'.format(orig_string(self.editable_type.title)), session.user)
         editable_type_settings[self.editable_type].set(self.event, 'submission_enabled', False)
         return '', 204
+
+
+class RHEditableSetEditing(RHEditableTypeManagementBase):
+    def _process_GET(self):
+        return jsonify(editable_type_settings[self.editable_type].get(self.event, 'editing_enabled'))
+
+    def _process_PUT(self):
+        self.event.log(EventLogRealm.management, EventLogKind.positive, 'Editing',
+                       'Opened {} editing'.format(orig_string(self.editable_type.title)), session.user)
+        editable_type_settings[self.editable_type].set(self.event, 'editing_enabled', True)
+        return '', 204
+
+    def _process_DELETE(self):
+        self.event.log(EventLogRealm.management, EventLogKind.negative, 'Editing',
+                       'Closed {} editing'.format(orig_string(self.editable_type.title)), session.user)
+        editable_type_settings[self.editable_type].set(self.event, 'editing_enabled', False)
+        return '', 204

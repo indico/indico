@@ -142,6 +142,8 @@ class Editable(db.Model):
         editable, such as making changes, asking the user to make changes,
         or approving/rejecting the editable.
         """
+        from indico.modules.events.editing.settings import editable_type_settings
+
         # If the user can't even see the timeline, we never allow any modifications
         if not self.can_see_timeline(user):
             return False
@@ -150,6 +152,9 @@ class Editable(db.Model):
         #      want to do actions that would usually be done by the assigned editor?
         if self.event.can_manage(user, permission='editing_manager'):
             return True
+        # Editing needs to be enabled in the settings
+        if not editable_type_settings[self.type].get(self.event, 'editing_enabled'):
+            return False
         # Editors need the permission on the editable type and also be the assigned editor
         if self.editor == user and self.event.can_manage(user, permission=self.type.editor_permission):
             return True
@@ -176,3 +181,8 @@ class Editable(db.Model):
         if not review_conditions:
             return True
         return any(file_types >= cond for cond in review_conditions)
+
+    @property
+    def editing_enabled(self):
+        from indico.modules.events.editing.settings import editable_type_settings
+        return editable_type_settings[self.type].get(self.event, 'editing_enabled')

@@ -21,6 +21,8 @@ export default function TimelineHeader({
   submitter,
   eventId,
   reviewConditionsValid,
+  canEdit,
+  editingEnabled,
 }) {
   return (
     <>
@@ -67,6 +69,18 @@ export default function TimelineHeader({
             <Translate>This editable is not fulfilling reviewing conditions.</Translate>
           </Message>
         )}
+        {!editingEnabled && (
+          <Message warning>
+            <Icon name="warning sign" />
+            <Translate>Editing is currently not enabled.</Translate>
+            {canEdit && (
+              <>
+                {' '}
+                <Translate>Since you are a manager you can edit anyway.</Translate>
+              </>
+            )}
+          </Message>
+        )}
         <div className="review-item-content">{children}</div>
       </div>
     </>
@@ -90,8 +104,12 @@ TimelineHeader.propTypes = {
   eventId: PropTypes.number.isRequired,
   children: PropTypes.node.isRequired,
   reviewConditionsValid: PropTypes.bool,
+  canEdit: PropTypes.bool,
+  editingEnabled: PropTypes.bool,
 };
 
 TimelineHeader.defaultProps = {
   reviewConditionsValid: true,
+  canEdit: true,
+  editingEnabled: true,
 };

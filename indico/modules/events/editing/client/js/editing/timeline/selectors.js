@@ -231,6 +231,11 @@ export const canPerformEditorActions = createSelector(
   details => details && details.canPerformEditorActions
 );
 
+export const editingEnabled = createSelector(
+  getDetails,
+  details => details && details.editingEnabled
+);
+
 export const canJudgeLastRevision = createSelector(
   getLastRevision,
   canPerformEditorActions,

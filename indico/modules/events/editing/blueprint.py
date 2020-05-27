@@ -59,6 +59,8 @@ _bp.add_url_rule('/editing/api/<any(paper,slides,poster):type>/principals', 'api
                  management.RHEditableTypePrincipals, methods=('GET', 'POST'))
 _bp.add_url_rule('/editing/api/<any(paper,slides,poster):type>/submission-enabled',
                  'api_submission_enabled', management.RHEditableSetSubmission, methods=('GET', 'PUT', 'DELETE'))
+_bp.add_url_rule('/editing/api/<any(paper,slides,poster):type>/editing-enabled',
+                 'api_editing_enabled', management.RHEditableSetEditing, methods=('GET', 'PUT', 'DELETE'))
 _bp.add_url_rule('/editing/api/service/check-url', 'api_check_service_url', service.RHCheckServiceURL)
 _bp.add_url_rule('/editing/api/service/connect', 'api_service_connect', service.RHConnectService, methods=('POST',))
 _bp.add_url_rule('/editing/api/service/disconnect', 'api_service_disconnect', service.RHDisconnectService,

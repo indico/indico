@@ -18,7 +18,11 @@ editing_settings = EventSettingsProxy('editing', {
     'editable_types': ['paper'],
 })
 
-_defaults = {'self_assign_allowed': False, 'submission_enabled': False}
+_defaults = {
+    'self_assign_allowed': False,
+    'submission_enabled': False,
+    'editing_enabled': False,
+}
 
 editable_type_settings = {
     EditableType.paper: EventSettingsProxy('editing_paper', _defaults),

@@ -27,6 +27,8 @@ export default function Timeline() {
   const lastRevision = useSelector(selectors.getLastRevision);
   const timelineBlocks = useSelector(selectors.getTimelineBlocks);
   const {eventId, contributionId, editableType, fileTypes} = useSelector(selectors.getStaticData);
+  const canEdit = useSelector(selectors.canPerformEditorActions);
+  const editingEnabled = useSelector(selectors.editingEnabled);
 
   useEffect(() => {
     dispatch(actions.loadTimeline(eventId, contributionId, editableType));
@@ -46,6 +48,8 @@ export default function Timeline() {
         submitter={timelineBlocks[0].submitter}
         eventId={eventId}
         reviewConditionsValid={details.reviewConditionsValid}
+        canEdit={canEdit}
+        editingEnabled={editingEnabled}
       >
         <FileDisplay
           fileTypes={fileTypes}

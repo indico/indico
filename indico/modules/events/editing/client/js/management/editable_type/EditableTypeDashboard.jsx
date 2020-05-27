@@ -10,6 +10,7 @@ import manageFileTypesURL from 'indico-url:event_editing.manage_file_types';
 import manageReviewConditionsURL from 'indico-url:event_editing.manage_review_conditions';
 import selfAssignURL from 'indico-url:event_editing.api_self_assign_enabled';
 import enableSubmissionURL from 'indico-url:event_editing.api_submission_enabled';
+import enableEditingURL from 'indico-url:event_editing.api_editing_enabled';
 
 import React, {useState} from 'react';
 import {useParams, Link} from 'react-router-dom';
@@ -41,11 +42,15 @@ export default function EditableTypeDashboard() {
     enableSubmissionURL({confId: eventId, type})
   );
 
+  const [editingEnabled, toggleEditing, editingLoading] = useTogglableValue(
+    enableEditingURL({confId: eventId, type})
+  );
+
   return (
     <>
       <ManagementPageSubTitle title={EditableTypeTitles[type]} />
       <ManagementPageBackButton url={dashboardURL({confId: eventId})} />
-      {selfAssignLoading || submissionLoading ? (
+      {selfAssignLoading || submissionLoading || editingLoading ? (
         <Loader active />
       ) : (
         <>
@@ -65,11 +70,15 @@ export default function EditableTypeDashboard() {
             </Section>
             <Section
               icon="edit"
-              label={Translate.string('Editing is not open yet')}
-              description={Translate.string('Start now')}
+              label={
+                editingEnabled
+                  ? Translate.string('Editing is open')
+                  : Translate.string('Editing is not open')
+              }
+              description={Translate.string('Toggle whether editors can review submissions')}
             >
-              <a className="i-button highlight icon-list">
-                <Translate>Start now</Translate>
+              <a className="i-button highlight icon-list" onClick={toggleEditing}>
+                {editingEnabled ? Translate.string('Close now') : Translate.string('Start now')}
               </a>
             </Section>
           </div>
