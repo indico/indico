@@ -170,9 +170,9 @@ class VCPluginMixin(object):
         if link_type == VCRoomLinkType.event:
             event_vc_room.link_object = event
         elif link_type == VCRoomLinkType.contribution:
-            event_vc_room.link_object = Contribution.get_one(contribution_id)
+            event_vc_room.link_object = Contribution.get_or_404(contribution_id)
         elif link_type == VCRoomLinkType.block:
-            event_vc_room.link_object = SessionBlock.get_one(block_id)
+            event_vc_room.link_object = SessionBlock.get_or_404(block_id)
         event_vc_room.vc_room = vc_room
         event_vc_room.show = data.pop('show')
         if event_vc_room.data is None:

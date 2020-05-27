@@ -90,7 +90,7 @@ class RHRegistrationFormInvitationBase(RHManageRegFormBase):
 
     def _process_args(self):
         RHManageRegFormBase._process_args(self)
-        self.invitation = RegistrationInvitation.get_one(request.view_args['invitation_id'])
+        self.invitation = RegistrationInvitation.get_or_404(request.view_args['invitation_id'])
 
 
 class RHRegistrationFormDeleteInvitation(RHRegistrationFormInvitationBase):

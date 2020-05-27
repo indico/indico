@@ -237,7 +237,7 @@ class RHReviewingQuestionBase(RHManageAbstractsBase):
 
     def _process_args(self):
         RHManageAbstractsBase._process_args(self)
-        self.question = AbstractReviewQuestion.get_one(request.view_args['question_id'])
+        self.question = AbstractReviewQuestion.get_or_404(request.view_args['question_id'])
 
 
 class RHEditAbstractReviewingQuestion(RHReviewingQuestionBase):

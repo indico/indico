@@ -120,7 +120,14 @@ class IndicoModel(Model):
         return obj
 
     @classmethod
-    def get_one(cls, oid, is_deleted=None):
+    def get_or_404(cls, oid, is_deleted=None):
+        """Get an object based on its primary key, raising a 404 if not found.
+
+        :param oid: The primary key of the object
+        :param is_deleted: If specified, a 404 error will be returned if the
+                           `is_deleted` attribute of the object does not match
+                           the specified value.
+        """
         obj = cls.get(oid, is_deleted=is_deleted)
         if obj is None:
             raise NoResultFound()

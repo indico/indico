@@ -45,7 +45,7 @@ class RHDisplaySessionBase(RHDisplayEventBase):
 
     def _process_args(self):
         RHDisplayEventBase._process_args(self)
-        self.session = Session.get_one(request.view_args['session_id'], is_deleted=False)
+        self.session = Session.get_or_404(request.view_args['session_id'], is_deleted=False)
 
 
 class RHDisplaySession(RHDisplaySessionBase):

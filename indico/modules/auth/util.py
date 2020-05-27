@@ -88,7 +88,7 @@ def undo_impersonate_user():
     except KeyError:
         # The user probably already switched back from another tab
         return
-    user = User.get_one(entry['user_id'])
+    user = User.get_or_404(entry['user_id'])
     logger.info('Admin %r stopped impersonating user %r', user, session.user)
     session.user = user
     session.update(entry['session_data'])

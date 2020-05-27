@@ -37,7 +37,7 @@ class RHManagePaperTemplateBase(RHManagePapersBase):
 
     def _process_args(self):
         RHManagePapersBase._process_args(self)
-        self.template = PaperTemplate.get_one(request.view_args['template_id'])
+        self.template = PaperTemplate.get_or_404(request.view_args['template_id'])
 
 
 def _render_teplate_list(event):
@@ -90,7 +90,7 @@ class RHDownloadPaperTemplate(RHPapersBase):
 
     def _process_args(self):
         RHPapersBase._process_args(self)
-        self.template = PaperTemplate.get_one(request.view_args['template_id'])
+        self.template = PaperTemplate.get_or_404(request.view_args['template_id'])
 
     def _process(self):
         return self.template.send()

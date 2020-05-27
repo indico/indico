@@ -65,7 +65,7 @@ class RHContributionDisplayBase(RHDisplayEventBase):
 
     def _process_args(self):
         RHDisplayEventBase._process_args(self)
-        self.contrib = Contribution.get_one(request.view_args['contrib_id'], is_deleted=False)
+        self.contrib = Contribution.get_or_404(request.view_args['contrib_id'], is_deleted=False)
 
 
 class RHDisplayProtectionBase(RHDisplayEventBase):
@@ -256,7 +256,7 @@ class RHSubcontributionDisplay(RHDisplayEventBase):
 
     def _process_args(self):
         RHDisplayEventBase._process_args(self)
-        self.subcontrib = SubContribution.get_one(request.view_args['subcontrib_id'], is_deleted=False)
+        self.subcontrib = SubContribution.get_or_404(request.view_args['subcontrib_id'], is_deleted=False)
 
     def _process(self):
         return self.view_class.render_template('display/subcontribution_display.html', self.event,

@@ -39,7 +39,7 @@ class RHSpecificReminderBase(RHRemindersBase):
 
     def _process_args(self):
         RHRemindersBase._process_args(self)
-        self.reminder = EventReminder.get_one(request.view_args['reminder_id'])
+        self.reminder = EventReminder.get_or_404(request.view_args['reminder_id'])
 
 
 class RHListReminders(RHRemindersBase):

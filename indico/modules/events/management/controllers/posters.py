@@ -48,7 +48,7 @@ class RHPosterPrintSettings(RHManageEventBase):
 class RHPrintEventPoster(RHManageEventBase):
     def _process_args(self):
         RHManageEventBase._process_args(self)
-        self.template = DesignerTemplate.get_one(request.view_args['template_id'])
+        self.template = DesignerTemplate.get_or_404(request.view_args['template_id'])
 
     def _check_access(self):
         RHManageEventBase._check_access(self)

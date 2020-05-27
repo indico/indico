@@ -52,7 +52,7 @@ class RHAdminNetworkGroupBase(RHNetworkBase):
     """Base class for managing in IPNetworkGroup"""
 
     def _process_args(self):
-        self.network_group = IPNetworkGroup.get_one(request.view_args['network_group_id'])
+        self.network_group = IPNetworkGroup.get_or_404(request.view_args['network_group_id'])
 
 
 class RHEditNetworkGroup(RHAdminNetworkGroupBase):

@@ -119,7 +119,7 @@ class RHDisplayAbstractListBase(RHAbstractsBase):
 
     def _process_args(self):
         RHAbstractsBase._process_args(self)
-        self.track = Track.get_one(request.view_args['track_id'])
+        self.track = Track.get_or_404(request.view_args['track_id'])
         self.list_generator = AbstractListGeneratorDisplay(event=self.event, track=self.track)
 
     def _check_access(self):
@@ -144,7 +144,7 @@ class RHSubmitAbstractReview(RHAbstractBase):
 
     def _process_args(self):
         RHAbstractBase._process_args(self)
-        self.track = Track.get_one(request.view_args['track_id'])
+        self.track = Track.get_or_404(request.view_args['track_id'])
 
     def _process(self):
         form = build_review_form(self.abstract, self.track)
@@ -168,7 +168,7 @@ class RHEditAbstractReview(RHAbstractBase):
 
     def _process_args(self):
         RHAbstractBase._process_args(self)
-        self.review = AbstractReview.get_one(request.view_args['review_id'])
+        self.review = AbstractReview.get_or_404(request.view_args['review_id'])
 
     def _process(self):
         form = build_review_form(review=self.review)
@@ -201,7 +201,7 @@ class RHAbstractCommentBase(RHAbstractBase):
 
     def _process_args(self):
         RHAbstractBase._process_args(self)
-        self.comment = AbstractComment.get_one(request.view_args['comment_id'], is_deleted=False)
+        self.comment = AbstractComment.get_or_404(request.view_args['comment_id'], is_deleted=False)
 
     def _check_access(self):
         RHAbstractBase._check_access(self)

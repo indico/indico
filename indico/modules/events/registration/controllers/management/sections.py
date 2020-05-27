@@ -29,7 +29,7 @@ class RHManageRegFormSectionBase(RHManageRegFormBase):
 
     def _process_args(self):
         RHManageRegFormBase._process_args(self)
-        self.section = RegistrationFormSection.get_one(request.view_args['section_id'])
+        self.section = RegistrationFormSection.get_or_404(request.view_args['section_id'])
 
 
 class RHRegistrationFormAddSection(RHManageRegFormBase):

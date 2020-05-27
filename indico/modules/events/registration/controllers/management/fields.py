@@ -45,7 +45,7 @@ class RHManageRegFormFieldBase(RHManageRegFormSectionBase):
 
     def _process_args(self):
         RHManageRegFormSectionBase._process_args(self)
-        self.field = self.field_class.get_one(request.view_args['field_id'])
+        self.field = self.field_class.get_or_404(request.view_args['field_id'])
 
 
 class RHRegistrationFormToggleFieldState(RHManageRegFormFieldBase):

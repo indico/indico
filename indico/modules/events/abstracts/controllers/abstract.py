@@ -74,7 +74,7 @@ class RHAbstractsDownloadAttachment(RHAbstractBase):
 
     def _process_args(self):
         RHAbstractBase._process_args(self)
-        self.abstract_file = AbstractFile.get_one(request.view_args['file_id'])
+        self.abstract_file = AbstractFile.get_or_404(request.view_args['file_id'])
 
     def _process(self):
         return self.abstract_file.send()

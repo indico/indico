@@ -71,7 +71,7 @@ class RHSettings(RHRoomBookingAdminBase):
 class RHLocations(RHRoomBookingAdminBase):
     def _process_args(self):
         id_ = request.view_args.get('location_id')
-        self.location = Location.get_one(id_, is_deleted=False) if id_ is not None else None
+        self.location = Location.get_or_404(id_, is_deleted=False) if id_ is not None else None
 
     def _jsonify_one(self, location):
         return jsonify(admin_locations_schema.dump(location, many=False))
@@ -124,7 +124,7 @@ class RHLocations(RHRoomBookingAdminBase):
 class RHFeatures(RHRoomBookingAdminBase):
     def _process_args(self):
         id_ = request.view_args.get('feature_id')
-        self.feature = RoomFeature.get_one(id_) if id_ is not None else None
+        self.feature = RoomFeature.get_or_404(id_) if id_ is not None else None
 
     def _dump_features(self):
         query = RoomFeature.query.order_by(RoomFeature.title)
@@ -169,7 +169,7 @@ class RHFeatures(RHRoomBookingAdminBase):
 class RHEquipmentTypes(RHRoomBookingAdminBase):
     def _process_args(self):
         id_ = request.view_args.get('equipment_type_id')
-        self.equipment_type = EquipmentType.get_one(id_) if id_ is not None else None
+        self.equipment_type = EquipmentType.get_or_404(id_) if id_ is not None else None
 
     def _dump_equipment_types(self):
         query = EquipmentType.query.options(joinedload('features')).order_by(EquipmentType.name)
@@ -229,7 +229,7 @@ class RHAttributes(RHRoomBookingAdminBase):
 
     def _process_args(self):
         id_ = request.view_args.get('attribute_id')
-        self.attribute = RoomAttribute.get_one(id_) if id_ is not None else None
+        self.attribute = RoomAttribute.get_or_404(id_) if id_ is not None else None
 
     def _dump_attributes(self):
         query = RoomAttribute.query.order_by(RoomAttribute.title)
@@ -285,7 +285,7 @@ class RHAttributes(RHRoomBookingAdminBase):
 
 class RHRoomAdminBase(RHRoomBookingAdminBase):
     def _process_args(self):
-        self.room = Room.get_one(request.view_args['room_id'], is_deleted=False)
+        self.room = Room.get_or_404(request.view_args['room_id'], is_deleted=False)
 
     def _skip_admin_check(self):
         return rb_settings.get('managers_edit_rooms') and self.room.can_manage(session.user)

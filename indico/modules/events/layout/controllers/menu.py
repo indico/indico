@@ -86,7 +86,7 @@ class RHMenuEntryEditBase(RHMenuBase):
 
     def _process_args(self):
         RHMenuBase._process_args(self)
-        self.entry = MenuEntry.get_one(request.view_args['menu_entry_id'])
+        self.entry = MenuEntry.get_or_404(request.view_args['menu_entry_id'])
 
 
 class RHMenuEntryEdit(RHMenuEntryEditBase):
@@ -244,7 +244,7 @@ class RHPageDisplay(RHDisplayEventBase):
 
     def _process_args(self):
         RHDisplayEventBase._process_args(self)
-        self.page = EventPage.get_one(request.view_args['page_id'])
+        self.page = EventPage.get_or_404(request.view_args['page_id'])
 
     def _process(self):
         return WPPage.render_template('page.html', self.event, page=self.page)

@@ -83,7 +83,7 @@ class RHManageEventRole(RHManageEventBase):
 
     def _process_args(self):
         RHManageEventBase._process_args(self)
-        self.role = EventRole.get_one(request.view_args['role_id'])
+        self.role = EventRole.get_or_404(request.view_args['role_id'])
 
 
 class RHEditEventRole(RHManageEventRole):
@@ -119,7 +119,7 @@ class RHRemoveEventRoleMember(RHManageEventRole):
 
     def _process_args(self):
         RHManageEventRole._process_args(self)
-        self.user = User.get_one(request.view_args['user_id'])
+        self.user = User.get_or_404(request.view_args['user_id'])
 
     def _process(self):
         if self.user in self.role.members:

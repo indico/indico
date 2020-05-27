@@ -48,7 +48,7 @@ class UserInfoHook(HTTPAPIHook):
 
 class RHUserFavoritesAPI(RHProtected):
     def _process_args(self):
-        self.user = User.get_one(request.view_args['user_id']) if 'user_id' in request.view_args else None
+        self.user = User.get_or_404(request.view_args['user_id']) if 'user_id' in request.view_args else None
 
     def _process_GET(self):
         return jsonify(sorted(u.id for u in session.user.favorite_users))

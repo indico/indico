@@ -41,7 +41,7 @@ class RHUpdateRoomBlocking(RHRoomBookingBase):
             raise Forbidden
 
     def _process_args(self):
-        self.blocking = Blocking.get_one(request.view_args['blocking_id'])
+        self.blocking = Blocking.get_or_404(request.view_args['blocking_id'])
 
     @use_args({
         'room_ids': fields.List(fields.Int(), required=True),
@@ -68,7 +68,7 @@ class RHRoomBlockings(RHRoomBookingBase):
 
 class RHRoomBlockingBase(RHRoomBookingBase):
     def _process_args(self):
-        self.blocking = Blocking.get_one(request.view_args['blocking_id'])
+        self.blocking = Blocking.get_or_404(request.view_args['blocking_id'])
 
 
 class RHRoomBlocking(RHRoomBlockingBase):

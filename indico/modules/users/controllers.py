@@ -301,7 +301,7 @@ class RHUserFavoritesUserRemove(RHUserBase):
 class RHUserFavoritesCategoryAPI(RHUserBase):
     def _process_args(self):
         RHUserBase._process_args(self)
-        self.category = Category.get_one(request.view_args['category_id'])
+        self.category = Category.get_or_404(request.view_args['category_id'])
         self.suggestion = self.user.suggested_categories.filter_by(category=self.category).first()
 
     def _process_PUT(self):
@@ -572,8 +572,8 @@ class RHUsersAdminMerge(RHAdminBase):
 
 class RHUsersAdminMergeCheck(RHAdminBase):
     def _process(self):
-        source = User.get_one(request.args['source'])
-        target = User.get_one(request.args['target'])
+        source = User.get_or_404(request.args['source'])
+        target = User.get_or_404(request.args['target'])
         errors, warnings = _get_merge_problems(source, target)
         return jsonify(errors=errors, warnings=warnings)
 
@@ -591,7 +591,7 @@ class RHRegistrationRequestBase(RHAdminBase):
 
     def _process_args(self):
         RHAdminBase._process_args(self)
-        self.request = RegistrationRequest.get_one(request.view_args['request_id'])
+        self.request = RegistrationRequest.get_or_404(request.view_args['request_id'])
 
 
 class RHAcceptRegistrationRequest(RHRegistrationRequestBase):

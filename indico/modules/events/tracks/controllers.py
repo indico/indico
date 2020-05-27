@@ -52,7 +52,7 @@ class RHManageTrackBase(RHManageTracksBase):
 
     def _process_args(self):
         RHManageTracksBase._process_args(self)
-        self.track = Track.get_one(request.view_args['track_id'])
+        self.track = Track.get_or_404(request.view_args['track_id'])
 
 
 class RHManageTrackGroupBase(RHManageEventBase):
@@ -64,7 +64,7 @@ class RHManageTrackGroupBase(RHManageEventBase):
 
     def _process_args(self):
         RHManageEventBase._process_args(self)
-        self.track_group = TrackGroup.get_one(request.view_args['track_group_id'])
+        self.track_group = TrackGroup.get_or_404(request.view_args['track_group_id'])
 
 
 class RHManageTracks(RHManageTracksBase):

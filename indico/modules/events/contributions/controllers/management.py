@@ -114,7 +114,7 @@ class RHManageSubContributionBase(RHManageContributionBase):
 
     def _process_args(self):
         RHManageContributionBase._process_args(self)
-        self.subcontrib = SubContribution.get_one(request.view_args['subcontrib_id'], is_deleted=False)
+        self.subcontrib = SubContribution.get_or_404(request.view_args['subcontrib_id'], is_deleted=False)
 
 
 class RHManageContributionsActionsBase(RHManageContributionsBase):
@@ -574,7 +574,7 @@ class RHManageContributionTypeBase(RHManageContributionsBase):
 
     def _process_args(self):
         RHManageContributionsBase._process_args(self)
-        self.contrib_type = ContributionType.get_one(request.view_args['contrib_type_id'])
+        self.contrib_type = ContributionType.get_or_404(request.view_args['contrib_type_id'])
 
 
 class RHEditContributionType(RHManageContributionTypeBase):
@@ -683,7 +683,7 @@ class RHManageContributionFieldBase(RHManageContributionsBase):
 
     def _process_args(self):
         RHManageContributionsBase._process_args(self)
-        self.contrib_field = ContributionField.get_one(request.view_args['contrib_field_id'])
+        self.contrib_field = ContributionField.get_or_404(request.view_args['contrib_field_id'])
 
 
 class RHEditContributionField(RHManageContributionFieldBase):

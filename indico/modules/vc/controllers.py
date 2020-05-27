@@ -81,7 +81,7 @@ class RHEventVCRoomMixin:
     }
 
     def _process_args(self):
-        self.event_vc_room = VCRoomEventAssociation.get_one(request.view_args['event_vc_room_id'])
+        self.event_vc_room = VCRoomEventAssociation.get_or_404(request.view_args['event_vc_room_id'])
         self.vc_room = self.event_vc_room.vc_room
 
 

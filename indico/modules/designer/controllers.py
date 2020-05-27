@@ -130,7 +130,7 @@ class SpecificTemplateMixin(TemplateDesignerMixin):
             check_event_locked(self, self.target)
 
     def _process_args(self):
-        self.template = DesignerTemplate.get_one(request.view_args['template_id'])
+        self.template = DesignerTemplate.get_or_404(request.view_args['template_id'])
 
 
 class BacksideTemplateProtectionMixin(object):
@@ -172,7 +172,7 @@ class CloneTemplateMixin(TargetFromURLMixin):
             raise Forbidden
 
     def _process_args(self):
-        self.template = DesignerTemplate.get_one(request.view_args['template_id'])
+        self.template = DesignerTemplate.get_or_404(request.view_args['template_id'])
 
     def _process(self):
         title = "{} (copy)".format(self.template.title)
@@ -367,7 +367,7 @@ class RHGetTemplateData(BacksideTemplateProtectionMixin, RHModifyDesignerTemplat
 
 class RHToggleTemplateDefaultOnCategory(RHManageCategoryBase):
     def _process(self):
-        template = DesignerTemplate.get_one(request.view_args['template_id'])
+        template = DesignerTemplate.get_or_404(request.view_args['template_id'])
         if template not in get_all_templates(self.category):
             raise Exception('Invalid template')
         if template == self.category.default_ticket_template:

@@ -393,7 +393,7 @@ class RHRegistrationsPrintBadges(RHRegistrationsActionBase):
 
     def _process_args(self):
         RHRegistrationsActionBase._process_args(self)
-        self.template = DesignerTemplate.get_one(request.view_args['template_id'])
+        self.template = DesignerTemplate.get_or_404(request.view_args['template_id'])
 
     def _check_access(self):
         RHRegistrationsActionBase._check_access(self)

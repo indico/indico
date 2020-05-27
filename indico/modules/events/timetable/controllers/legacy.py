@@ -281,7 +281,7 @@ class RHLegacyTimetableGetUnscheduledContributions(RHManageTimetableBase):
         RHManageTimetableBase._process_args(self)
         self.session_id = None
         if 'session_block_id' in request.args:
-            self.session_id = SessionBlock.get_one(request.args['session_block_id']).session_id
+            self.session_id = SessionBlock.get_or_404(request.args['session_block_id']).session_id
             if self.session and self.session.id != self.session_id:
                 raise BadRequest
 

@@ -230,7 +230,7 @@ class RHManageSessionBlock(RHManageSessionBase):
 
     def _process_args(self):
         RHManageSessionBase._process_args(self)
-        self.session_block = SessionBlock.get_one(request.view_args['block_id'])
+        self.session_block = SessionBlock.get_or_404(request.view_args['block_id'])
 
     def _process(self):
         form = MeetingSessionBlockForm(obj=FormDefaults(**self._get_form_defaults()), event=self.event,
@@ -276,7 +276,7 @@ class RHManageSessionTypeBase(RHManageSessionsBase):
 
     def _process_args(self):
         RHManageSessionsBase._process_args(self)
-        self.session_type = SessionType.get_one(request.view_args['session_type_id'])
+        self.session_type = SessionType.get_or_404(request.view_args['session_type_id'])
 
 
 class RHEditSessionType(RHManageSessionTypeBase):

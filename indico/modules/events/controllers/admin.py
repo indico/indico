@@ -95,7 +95,7 @@ class RHManageEventLabelBase(RHAdminBase):
 
     def _process_args(self):
         RHAdminBase._process_args(self)
-        self.event_label = EventLabel.get_one(request.view_args['event_label_id'])
+        self.event_label = EventLabel.get_or_404(request.view_args['event_label_id'])
 
 
 class RHEventLabels(RHAdminBase):

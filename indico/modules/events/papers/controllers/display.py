@@ -67,7 +67,7 @@ class RHDownloadPaperFile(RHPaperBase):
 
     def _process_args(self):
         RHPaperBase._process_args(self)
-        self.file = PaperFile.get_one(request.view_args['file_id'])
+        self.file = PaperFile.get_or_404(request.view_args['file_id'])
 
     def _process(self):
         return self.file.send()

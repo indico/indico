@@ -86,7 +86,7 @@ def create_area(bounds, name, default=False):
 def update_area(area_id, area_data):
     top = area_data['bounds']['north_east']
     bottom = area_data['bounds']['south_west']
-    map_area = MapArea.get_one(area_id)
+    map_area = MapArea.get_or_404(area_id)
     if 'name' in area_data:
         map_area.name = area_data['name']
     if 'default' in area_data:

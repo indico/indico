@@ -323,7 +323,7 @@ def check_room_available(room, start_dt, end_dt):
 
 def create_booking_for_event(room_id, event):
     try:
-        room = Room.get_one(room_id)
+        room = Room.get_or_404(room_id)
         default_timezone = timezone(config.DEFAULT_TIMEZONE)
         start_dt = event.start_dt.astimezone(default_timezone).replace(tzinfo=None)
         end_dt = event.end_dt.astimezone(default_timezone).replace(tzinfo=None)

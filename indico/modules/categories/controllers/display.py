@@ -424,7 +424,7 @@ class RHXMLExportCategoryInfo(RH):
             id_ = int(request.args['id'])
         except ValueError:
             raise BadRequest('Invalid Category ID')
-        self.category = Category.get_one(id_, is_deleted=False)
+        self.category = Category.get_or_404(id_, is_deleted=False)
 
     def _process(self):
         category_xml_info = XMLCategorySerializer(self.category).serialize_category()

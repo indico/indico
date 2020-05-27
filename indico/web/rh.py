@@ -345,7 +345,7 @@ class RHTokenProtected(RH):
     """A request handler which is protected through a signature token parameter."""
 
     def _process_args(self):
-        self.user = db.m.User.get_one(request.view_args['user_id'])
+        self.user = db.m.User.get_or_404(request.view_args['user_id'])
 
     def _check_access(self):
         token = request.args.get('token')

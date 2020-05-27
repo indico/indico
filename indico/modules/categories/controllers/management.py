@@ -266,7 +266,7 @@ class RHMoveCategoryBase(RHManageCategoryBase):
         if target_category_id is None:
             self.target_category = None
         else:
-            self.target_category = Category.get_one(int(target_category_id), is_deleted=False)
+            self.target_category = Category.get_or_404(int(target_category_id), is_deleted=False)
             if not self.target_category.can_manage(session.user):
                 raise Forbidden(_("You are not allowed to manage the selected destination."))
             if self.target_category.events:
@@ -411,7 +411,7 @@ class RHSplitCategory(RHManageCategorySelectedEventsBase):
 class RHMoveEvents(RHManageCategorySelectedEventsBase):
     def _process_args(self):
         RHManageCategorySelectedEventsBase._process_args(self)
-        self.target_category = Category.get_one(int(request.form['target_category_id']), is_deleted=False)
+        self.target_category = Category.get_or_404(int(request.form['target_category_id']), is_deleted=False)
         if not self.target_category.can_create_events(session.user):
             raise Forbidden(_("You may only move events to categories where you are allowed to create events."))
 
@@ -462,7 +462,7 @@ class RHManageCategoryRole(RHManageCategoryBase):
 
     def _process_args(self):
         RHManageCategoryBase._process_args(self)
-        self.role = CategoryRole.get_one(request.view_args['role_id'])
+        self.role = CategoryRole.get_or_404(request.view_args['role_id'])
 
 
 class RHEditCategoryRole(RHManageCategoryRole):
@@ -494,7 +494,7 @@ class RHRemoveCategoryRoleMember(RHManageCategoryRole):
 
     def _process_args(self):
         RHManageCategoryRole._process_args(self)
-        self.user = User.get_one(request.view_args['user_id'])
+        self.user = User.get_or_404(request.view_args['user_id'])
 
     def _process(self):
         if self.user in self.role.members:

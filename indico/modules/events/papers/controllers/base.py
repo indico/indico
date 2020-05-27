@@ -69,7 +69,7 @@ class RHPaperBase(RHPapersBase):
 
     def _process_args(self):
         RHPapersBase._process_args(self)
-        self.contribution = Contribution.get_one(request.view_args['contrib_id'], is_deleted=False)
+        self.contribution = Contribution.get_or_404(request.view_args['contrib_id'], is_deleted=False)
         self.paper = self.contribution.paper
         if self.paper is None and self.PAPER_REQUIRED:
             raise NotFound

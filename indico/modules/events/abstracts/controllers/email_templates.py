@@ -66,7 +66,7 @@ class RHEditEmailTemplateBase(RHManageAbstractsBase):
 
     def _process_args(self):
         RHManageAbstractsBase._process_args(self)
-        self.email_tpl = AbstractEmailTemplate.get_one(request.view_args['email_tpl_id'])
+        self.email_tpl = AbstractEmailTemplate.get_or_404(request.view_args['email_tpl_id'])
 
 
 class RHEditEmailTemplateRules(RHEditEmailTemplateBase):

@@ -101,7 +101,7 @@ class RHImageDisplay(RHDisplayEventBase):
     def _process_args(self):
         RHDisplayEventBase._process_args(self)
         image_id = request.view_args['image_id']
-        self.image = ImageFile.get_one(image_id)
+        self.image = ImageFile.get_or_404(image_id)
 
     def _process(self):
         return self.image.send()

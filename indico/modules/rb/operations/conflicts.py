@@ -56,14 +56,14 @@ def get_rooms_conflicts(rooms, start_dt, end_dt, repeat_frequency, repeat_interv
 
     if not (allow_admin and rb_is_admin(session.user)):
         for room_id, occurrences in nonbookable_periods.iteritems():
-            room = Room.get_one(room_id)
+            room = Room.get_or_404(room_id)
             if not room.can_override(session.user, allow_admin=allow_admin):
                 conflicts, conflicting_candidates = get_room_nonbookable_periods_conflicts(candidates, occurrences)
                 rooms_conflicts[room_id] |= conflicts
                 rooms_conflicting_candidates[room_id] |= conflicting_candidates
 
         for room_id, occurrences in unbookable_hours.iteritems():
-            room = Room.get_one(room_id)
+            room = Room.get_or_404(room_id)
             if not room.can_override(session.user, allow_admin=allow_admin):
                 conflicts, conflicting_candidates = get_room_unbookable_hours_conflicts(candidates, occurrences)
                 rooms_conflicts[room_id] |= conflicts

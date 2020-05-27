@@ -47,7 +47,7 @@ class RHAgreementForm(RHDisplayEventBase):
 
     def _process_args(self):
         RHDisplayEventBase._process_args(self)
-        self.agreement = Agreement.get_one(request.view_args['id'])
+        self.agreement = Agreement.get_or_404(request.view_args['id'])
         if self.agreement.is_orphan():
             raise NotFound('The agreement is not active anymore')
 
@@ -210,7 +210,7 @@ class RHAgreementManagerDetailsAgreementBase(RHAgreementManagerDetails):
 
     def _process_args(self):
         RHAgreementManagerDetails._process_args(self)
-        self.agreement = Agreement.get_one(request.view_args['id'])
+        self.agreement = Agreement.get_or_404(request.view_args['id'])
 
 
 class RHAgreementManagerDetailsSubmitAnswer(RHAgreementManagerDetails):
@@ -219,7 +219,7 @@ class RHAgreementManagerDetailsSubmitAnswer(RHAgreementManagerDetails):
     def _process_args(self):
         RHAgreementManagerDetails._process_args(self)
         if 'id' in request.view_args:
-            self.agreement = Agreement.get_one(request.view_args['id'])
+            self.agreement = Agreement.get_or_404(request.view_args['id'])
             if self.event != self.agreement.event:
                 raise NotFound
             if not self.agreement.pending:

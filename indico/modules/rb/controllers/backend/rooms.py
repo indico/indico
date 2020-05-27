@@ -116,7 +116,7 @@ class RHSearchRooms(RHRoomBookingBase):
 
 class RHRoomBase(RHRoomBookingBase):
     def _process_args(self):
-        self.room = Room.get_one(request.view_args['room_id'], is_deleted=False)
+        self.room = Room.get_or_404(request.view_args['room_id'], is_deleted=False)
 
 
 class RHRoom(RHRoomBase):
@@ -162,7 +162,7 @@ class RHRoomFavorites(RHRoomBookingBase):
     def _process_args(self):
         self.room = None
         if 'room_id' in request.view_args:
-            self.room = Room.get_one(request.view_args['room_id'])
+            self.room = Room.get_or_404(request.view_args['room_id'])
 
     def _process_GET(self):
         query = (db.session.query(favorite_room_table.c.room_id)

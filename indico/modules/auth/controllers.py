@@ -356,7 +356,7 @@ class RHRemoveAccount(RHUserBase):
 
     def _process_args(self):
         RHUserBase._process_args(self)
-        self.identity = Identity.get_one(request.view_args['identity'])
+        self.identity = Identity.get_or_404(request.view_args['identity'])
         if self.identity.user != self.user:
             raise NotFound()
 
@@ -600,7 +600,7 @@ class RHAdminImpersonate(RHAdminBase):
     })
     def _process_args(self, undo, user_id):
         RHAdminBase._process_args(self)
-        self.user = None if undo else User.get_one(user_id, is_deleted=False)
+        self.user = None if undo else User.get_or_404(user_id, is_deleted=False)
 
     def _check_access(self):
         if self.user:

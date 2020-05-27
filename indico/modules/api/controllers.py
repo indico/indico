@@ -152,13 +152,13 @@ class RHAPIBuildURLs(RH):
         data = request.json
         self.object = None
         if 'categId' in data:
-            self.object = Category.get_one(data['categId'])
+            self.object = Category.get_or_404(data['categId'])
         elif 'contribId' in data:
-            self.object = Contribution.get_one(data['contribId'])
+            self.object = Contribution.get_or_404(data['contribId'])
         elif 'sessionId' in data:
-            self.object = Session.get_one(data['sessionId'])
+            self.object = Session.get_or_404(data['sessionId'])
         elif 'confId' in data:
-            self.object = Event.get_one(data['confId'])
+            self.object = Event.get_or_404(data['confId'])
 
         if self.object is None:
             raise BadRequest
