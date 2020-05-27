@@ -497,11 +497,17 @@ class Contribution(DescriptionMixin, ProtectionManagersMixin, LocationMixin, Att
 
     @property
     def allowed_types_for_editable(self):
+        from indico.modules.events.editing.settings import editable_type_settings
         if not self.event.has_feature('editing'):
             return []
 
         submitted_for = {editable.type.name for editable in self.editables}
-        return [editable_type for editable_type in self.event.editable_types if editable_type not in submitted_for]
+        return [
+            editable_type
+            for editable_type in self.event.editable_types
+            if editable_type not in submitted_for
+            and editable_type_settings[EditableType[editable_type]].get(self.event, 'submission_enabled')
+        ]
 
     @property
     def enabled_editables(self):

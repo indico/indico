@@ -7,7 +7,7 @@
 
 from __future__ import unicode_literals
 
-from flask import jsonify, request
+from flask import jsonify, request, session
 
 from indico.core.errors import UserValueError
 from indico.modules.events.editing.controllers.base import RHEditableTypeManagementBase, RHEditingManagementBase
@@ -23,7 +23,8 @@ from indico.modules.events.editing.schemas import (EditableFileTypeArgs, Editabl
                                                    EditableTypePrincipalsSchema, EditingFileTypeSchema,
                                                    EditingReviewConditionArgs, EditingTagSchema)
 from indico.modules.events.editing.settings import editable_type_settings, editing_settings
-from indico.util.i18n import _
+from indico.modules.events.logs import EventLogKind, EventLogRealm
+from indico.util.i18n import _, orig_string
 from indico.web.args import use_kwargs, use_rh_args, use_rh_kwargs
 
 
@@ -169,6 +170,7 @@ class RHEditableSetSelfAssign(RHEditableTypeManagementBase):
 
     def _process_DELETE(self):
         editable_type_settings[self.editable_type].set(self.event, 'self_assign_allowed', False)
+        return '', 204
 
 
 class RHEditableTypePrincipals(RHEditableTypeManagementBase):
@@ -186,4 +188,21 @@ class RHEditableTypePrincipals(RHEditableTypeManagementBase):
             self.event.update_principal(p, add_permissions={permission_name})
         for p in old_principals - principals:
             self.event.update_principal(p, del_permissions={permission_name})
+        return '', 204
+
+
+class RHEditableSetSubmission(RHEditableTypeManagementBase):
+    def _process_GET(self):
+        return jsonify(editable_type_settings[self.editable_type].get(self.event, 'submission_enabled'))
+
+    def _process_PUT(self):
+        self.event.log(EventLogRealm.management, EventLogKind.positive, 'Editing',
+                       'Opened {} submission'.format(orig_string(self.editable_type.title)), session.user)
+        editable_type_settings[self.editable_type].set(self.event, 'submission_enabled', True)
+        return '', 204
+
+    def _process_DELETE(self):
+        self.event.log(EventLogRealm.management, EventLogKind.negative, 'Editing',
+                       'Closed {} submission'.format(orig_string(self.editable_type.title)), session.user)
+        editable_type_settings[self.editable_type].set(self.event, 'submission_enabled', False)
         return '', 204

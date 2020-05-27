@@ -42,7 +42,7 @@
     {% set enabled_editables = contribution.enabled_editables %}
     {% set has_enabled_types = enabled_editables|length > 0 %}
 
-    {% if can_submit %}
+    {% if can_submit and (has_enabled_types or can_create_editable) %}
         <section>
             <div class="header">
                 <div class="header-row">

@@ -9,6 +9,7 @@ import dashboardURL from 'indico-url:event_editing.dashboard';
 import manageFileTypesURL from 'indico-url:event_editing.manage_file_types';
 import manageReviewConditionsURL from 'indico-url:event_editing.manage_review_conditions';
 import selfAssignURL from 'indico-url:event_editing.api_self_assign_enabled';
+import enableSubmissionURL from 'indico-url:event_editing.api_submission_enabled';
 
 import React, {useState} from 'react';
 import {useParams, Link} from 'react-router-dom';
@@ -36,22 +37,30 @@ export default function EditableTypeDashboard() {
     selfAssignSaving,
   ] = useTogglableValue(selfAssignURL({confId: eventId, type}));
 
+  const [submissionEnabled, toggleSubmission, submissionLoading] = useTogglableValue(
+    enableSubmissionURL({confId: eventId, type})
+  );
+
   return (
     <>
       <ManagementPageSubTitle title={EditableTypeTitles[type]} />
       <ManagementPageBackButton url={dashboardURL({confId: eventId})} />
-      {selfAssignLoading ? (
+      {selfAssignLoading || submissionLoading ? (
         <Loader active />
       ) : (
         <>
           <div className="action-box">
             <Section
               icon="file"
-              label={Translate.string('Submission is not open yet')}
-              description={Translate.string('Start now')}
+              label={
+                submissionEnabled
+                  ? Translate.string('Submission is open')
+                  : Translate.string('Submission is not open')
+              }
+              description={Translate.string('Toggle whether users can submit new editables')}
             >
-              <a className="i-button highlight icon-list">
-                <Translate>Start now</Translate>
+              <a className="i-button highlight icon-list" onClick={toggleSubmission}>
+                {submissionEnabled ? Translate.string('Close now') : Translate.string('Start now')}
               </a>
             </Section>
             <Section
