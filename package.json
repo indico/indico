@@ -206,5 +206,8 @@
     "hooks": {
       "pre-commit": "bash pre-commit.githook"
     }
+  },
+  "scarfSettings": {
+    "enabled": false
   }
 }
