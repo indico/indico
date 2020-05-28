@@ -43,8 +43,8 @@ export default function TimelineItem({block}) {
               <div className="f-self-stretch">
                 <Translate>
                   <Param name="submitterName" value={submitterName} wrapper={<strong />} />{' '}
-                  submitted paper revision <Param name="revisionNumber" value={`#${number}`} />{' '}
-                </Translate>
+                  submitted paper revision <Param name="revisionNumber" value={`#${number}`} />
+                </Translate>{' '}
                 <time dateTime={serializeDate(submittedDt, moment.HTML5_FMT.DATETIME_LOCAL)}>
                   {serializeDate(submittedDt, 'LL')}
                 </time>
