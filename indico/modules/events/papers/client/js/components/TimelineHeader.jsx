@@ -10,20 +10,10 @@ import contributionDisplayURL from 'indico-url:contributions.display_contributio
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import {Message, Icon} from 'semantic-ui-react';
 import {Param, Translate} from 'indico/react/i18n';
 import {MathJax} from 'indico/react/components';
 
-export default function TimelineHeader({
-  children,
-  contribution,
-  state,
-  submitter,
-  eventId,
-  reviewConditionsValid,
-  canEdit,
-  editingEnabled,
-}) {
+export default function TimelineHeader({children, contribution, state, submitter, eventId}) {
   return (
     <>
       <div className="submission-title flexrow">
@@ -37,13 +27,7 @@ export default function TimelineHeader({
       <div className="paper-public">
         <div className="review-summary flexrow f-a-baseline">
           <div className="review-summary-badge">
-            {reviewConditionsValid ? (
-              <div className={`i-tag ${state.cssClass}`}>{state.title}</div>
-            ) : (
-              <div className="i-tag">
-                <Translate>Not Ready</Translate>
-              </div>
-            )}
+            <div className={`i-tag ${state.cssClass}`}>{state.title}</div>
           </div>
           <div className="review-summary-content f-self-stretch">
             <div>
@@ -63,24 +47,6 @@ export default function TimelineHeader({
             </div>
           </div>
         </div>
-        {!reviewConditionsValid && (
-          <Message warning>
-            <Icon name="warning sign" />
-            <Translate>This editable is not fulfilling reviewing conditions.</Translate>
-          </Message>
-        )}
-        {!editingEnabled && (
-          <Message warning>
-            <Icon name="warning sign" />
-            <Translate>Editing is currently not enabled.</Translate>
-            {canEdit && (
-              <>
-                {' '}
-                <Translate>Since you are a manager you can edit anyway.</Translate>
-              </>
-            )}
-          </Message>
-        )}
         <div className="review-item-content">{children}</div>
       </div>
     </>
@@ -103,13 +69,4 @@ TimelineHeader.propTypes = {
   }).isRequired,
   eventId: PropTypes.number.isRequired,
   children: PropTypes.node.isRequired,
-  reviewConditionsValid: PropTypes.bool,
-  canEdit: PropTypes.bool,
-  editingEnabled: PropTypes.bool,
-};
-
-TimelineHeader.defaultProps = {
-  reviewConditionsValid: true,
-  canEdit: true,
-  editingEnabled: true,
 };

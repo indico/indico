@@ -135,7 +135,7 @@ class EditableSchema(mm.ModelSchema):
         model = Editable
         fields = ('id', 'type', 'editor', 'revisions', 'contribution', 'can_comment', 'review_conditions_valid',
                   'can_perform_editor_actions', 'can_perform_submitter_actions', 'can_create_internal_comments',
-                  'editing_enabled')
+                  'can_unassign', 'can_assign_self', 'editing_enabled')
 
     contribution = fields.Nested(ContributionSchema)
     editor = fields.Nested(UserSchema, only=('id', 'avatar_bg_color', 'full_name'))
@@ -147,6 +147,10 @@ class EditableSchema(mm.ModelSchema):
     can_comment = fields.Function(lambda editable, ctx: editable.can_comment(ctx.get('user')))
     can_create_internal_comments = fields.Function(
         lambda editable, ctx: editable.can_use_internal_comments(ctx.get('user')))
+    can_unassign = fields.Function(
+        lambda editable, ctx: editable.can_unassign(ctx.get('user')))
+    can_assign_self = fields.Function(
+        lambda editable, ctx: editable.can_assign_self(ctx.get('user')))
     review_conditions_valid = fields.Boolean()
     editing_enabled = fields.Boolean()
 

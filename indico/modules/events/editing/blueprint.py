@@ -77,8 +77,14 @@ _bp.add_url_rule('/editing/api/<any(paper,slides,poster):type>/editables/assign/
 _bp.add_url_rule('/editing/api/<any(paper,slides,poster):type>/editables/unassign', 'unassign_editor',
                  editable_list.RHUnassignEditor, methods=('POST',))
 
-# Contribution/revision-level APIs
+# Editable-level APIs
 contrib_api_prefix = '/api' + contrib_prefix
+_bp.add_url_rule(contrib_api_prefix + '/editor/', 'api_unassign_editable', timeline.RHEditableUnassign,
+                 methods=('DELETE',))
+_bp.add_url_rule(contrib_api_prefix + '/editor/me', 'api_assign_editable_self', timeline.RHEditableAssignMe,
+                 methods=('PUT',))
+
+# Contribution/revision-level APIs
 _bp.add_url_rule(contrib_api_prefix, 'api_editable', timeline.RHEditable)
 _bp.add_url_rule(contrib_api_prefix, 'api_create_editable', timeline.RHCreateEditable, methods=('PUT',))
 _bp.add_url_rule(contrib_api_prefix + '/upload', 'api_upload', timeline.RHEditingUploadFile, methods=('POST',))

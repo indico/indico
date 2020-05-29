@@ -22,10 +22,11 @@ from indico.modules.events.editing.fields import EditingFilesField, EditingTagsF
 from indico.modules.events.editing.models.comments import EditingRevisionComment
 from indico.modules.events.editing.models.revision_files import EditingRevisionFile
 from indico.modules.events.editing.models.revisions import EditingRevision
-from indico.modules.events.editing.operations import (confirm_editable_changes, create_new_editable,
+from indico.modules.events.editing.operations import (assign_editor, confirm_editable_changes, create_new_editable,
                                                       create_revision_comment, create_submitter_revision,
                                                       delete_revision_comment, replace_revision,
-                                                      review_editable_revision, undo_review, update_revision_comment)
+                                                      review_editable_revision, unassign_editor, undo_review,
+                                                      update_revision_comment)
 from indico.modules.events.editing.schemas import (EditableSchema, EditingConfirmationAction, EditingReviewAction,
                                                    ReviewEditableArgs)
 from indico.modules.files.controllers import UploadFileMixin
@@ -282,3 +283,25 @@ class RHDownloadRevisionFile(RHContributionEditableRevisionBase):
 
     def _process(self):
         return self.revision_file.file.send()
+
+
+class RHEditableUnassign(RHContributionEditableBase):
+    def _check_access(self):
+        RHContributionEditableBase._check_access(self)
+        if not self.editable.can_unassign(session.user):
+            raise Forbidden(_('You do not have the permission to unassign this user'))
+
+    def _process_DELETE(self):
+        unassign_editor(self.editable)
+        return '', 204
+
+
+class RHEditableAssignMe(RHContributionEditableBase):
+    def _check_access(self):
+        RHContributionEditableBase._check_access(self)
+        if not self.editable.can_assign_self(session.user):
+            raise Forbidden(_('You do not have the permission to assign yourself'))
+
+    def _process_PUT(self):
+        assign_editor(self.editable, session.user)
+        return '', 204

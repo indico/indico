@@ -10,8 +10,8 @@ import PropTypes from 'prop-types';
 import {useDispatch, useSelector} from 'react-redux';
 import {Loader} from 'semantic-ui-react';
 
-import TimelineHeader from 'indico/modules/events/reviewing/components/TimelineHeader';
 import TimelineContent from 'indico/modules/events/reviewing/components/TimelineContent';
+import TimelineHeader from './TimelineHeader';
 import {fetchPaperDetails} from '../actions';
 import {getPaperDetails, isFetchingInitialPaperDetails} from '../selectors';
 import PaperDecisionForm from './PaperDecisionForm';

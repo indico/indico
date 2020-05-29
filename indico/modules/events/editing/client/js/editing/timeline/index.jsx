@@ -9,7 +9,7 @@ import React, {useEffect} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
 import {Loader} from 'semantic-ui-react';
 
-import TimelineHeader from 'indico/modules/events/reviewing/components/TimelineHeader';
+import TimelineHeader from 'indico/modules/events/editing/editing/timeline/TimelineHeader';
 import TimelineContent from 'indico/modules/events/reviewing/components/TimelineContent';
 import SubmitRevision from './SubmitRevision';
 
@@ -27,8 +27,6 @@ export default function Timeline() {
   const lastRevision = useSelector(selectors.getLastRevision);
   const timelineBlocks = useSelector(selectors.getTimelineBlocks);
   const {eventId, contributionId, editableType, fileTypes} = useSelector(selectors.getStaticData);
-  const canEdit = useSelector(selectors.canPerformEditorActions);
-  const editingEnabled = useSelector(selectors.editingEnabled);
 
   useEffect(() => {
     dispatch(actions.loadTimeline(eventId, contributionId, editableType));
@@ -47,9 +45,6 @@ export default function Timeline() {
         state={lastState}
         submitter={timelineBlocks[0].submitter}
         eventId={eventId}
-        reviewConditionsValid={details.reviewConditionsValid}
-        canEdit={canEdit}
-        editingEnabled={editingEnabled}
       >
         <FileDisplay
           fileTypes={fileTypes}
