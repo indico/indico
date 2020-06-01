@@ -25,16 +25,12 @@ except ImportError:
 
 
 def run_cmd(info, **kwargs):
-    inside_watchman = 'INDICO_WATCHMAN_RUN' in os.environ
-    if kwargs['reloader_type'] == 'watchman' and not inside_watchman:
+    if kwargs['reloader_type'] == 'watchman':
         if pywatchman is None:
             print('watchman is not available - you need to `pip install pywatchman`')
             return
         run_watchman()
         return
-    if inside_watchman:
-        # disable flask reloader when running inside watchman
-        kwargs['reloader_type'] = 'none'
     run_server(info, **kwargs)
 
 
