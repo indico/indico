@@ -18,7 +18,36 @@ from werkzeug.serving import WSGIRequestHandler, run_simple
 from werkzeug.urls import url_parse
 
 
-def run_cmd(info, host, port, url, ssl, ssl_key, ssl_cert, quiet, proxy, enable_evalex, evalex_from, reloader_type):
+try:
+    import pywatchman
+except ImportError:
+    pywatchman = None
+
+
+def run_cmd(info, **kwargs):
+    inside_watchman = 'INDICO_WATCHMAN_RUN' in os.environ
+    if kwargs['reloader_type'] == 'watchman' and not inside_watchman:
+        if pywatchman is None:
+            print('watchman is not available - you need to `pip install pywatchman`')
+            return
+        run_watchman()
+        return
+    if inside_watchman:
+        # disable flask reloader when running inside watchman
+        kwargs['reloader_type'] = 'none'
+    run_server(info, **kwargs)
+
+
+def run_watchman():
+    from .watchman import Watchman
+    try:
+        Watchman().run()
+    except pywatchman.WatchmanError as exc:
+        from indico.util.console import cformat
+        print(cformat('%{red!}watchman error: {}').format(exc))
+
+
+def run_server(info, host, port, url, ssl, ssl_key, ssl_cert, quiet, proxy, enable_evalex, evalex_from, reloader_type):
     if port is None:
         port = 8443 if ssl else 8000
 
