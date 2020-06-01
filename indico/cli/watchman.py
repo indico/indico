@@ -24,6 +24,16 @@ def _patterns_to_terms(patterns):
     return ['anyof'] + [['match', p, 'wholename', {'includedotfiles': True}] for p in patterns]
 
 
+def _disable_reloader(argv):
+    argv = list(argv)  # we usually pass sys.argv, so let's not modify that
+    for i, arg in enumerate(argv):
+        if arg == '--reloader' and argv[i + 1] == 'watchman':
+            argv[i + 1] = 'none'
+        elif arg.startswith('--reloader') and '=' in arg:
+            argv[i] = '--reloader=none'
+    return argv
+
+
 class Watcher(object):
     def __init__(self, path, patterns):
         self.path = path
@@ -134,7 +144,8 @@ class Watchman(object):
         if not quiet and not retry:
             print(cformat('%{green!}Launching Indico'))
         try:
-            self._proc = subprocess.Popen(sys.argv, env=dict(os.environ, INDICO_WATCHMAN_RUN='1'))
+            argv = _disable_reloader(sys.argv)
+            self._proc = subprocess.Popen(argv)
         except OSError as exc:
             delay = (retry + 1) * 0.5
             print(cformat('%{red!}Could not launch Indico: {}').format(exc))
