@@ -59,7 +59,7 @@
     "react-final-form": "^6.5.0",
     "react-final-form-arrays": "^3.1.1",
     "react-final-form-listeners": "^1.0.2",
-    "react-jsx-i18n": "^0.2.2",
+    "react-jsx-i18n": "^0.3.0",
     "react-leaflet": "^2.7.0",
     "react-leaflet-draw": "^0.19.0",
     "react-leaflet-markercluster": "^2.0.0",
