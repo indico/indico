@@ -147,12 +147,11 @@ class Editable(db.Model):
         # If the user can't even see the timeline, we never allow any modifications
         if not self.can_see_timeline(user):
             return False
-        # Editing/event managers can perform actions without being the assigned editor
-        # XXX: Do we want this? Or should they have to assign themselves first if they
-        #      want to do actions that would usually be done by the assigned editor?
-        if self.event.can_manage(user, permission='editing_manager'):
+        # Editing/event managers can perform actions when they are the assigned editor
+        # even when editing is disabled in the settings
+        if self.editor == user and self.event.can_manage(user, permission='editing_manager'):
             return True
-        # Editing needs to be enabled in the settings
+        # Editing needs to be enabled in the settings otherwise
         if not editable_type_settings[self.type].get(self.event, 'editing_enabled'):
             return False
         # Editors need the permission on the editable type and also be the assigned editor
