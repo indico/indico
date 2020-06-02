@@ -24,7 +24,7 @@ export default function TimelineHeader({children, contribution, state, submitter
   const {
     canAssignSelf,
     canUnassign,
-    canEdit,
+    canPerformEditorActions,
     type,
     editor,
     editingEnabled,
@@ -132,7 +132,7 @@ export default function TimelineHeader({children, contribution, state, submitter
           <Message warning>
             <Icon name="warning sign" />
             <Translate>Editing is currently not enabled.</Translate>
-            {canEdit && (
+            {canPerformEditorActions && (
               <>
                 {' '}
                 <Translate>Since you are a manager you can edit anyway.</Translate>
