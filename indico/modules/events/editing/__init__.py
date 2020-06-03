@@ -92,18 +92,15 @@ class PaperEditorPermission(ManagementPermission):
     name = 'paper_editing'
     friendly_name = _('Paper Editor')
     description = _('Grants editor rights for paper editing on an event.')
-    user_selectable = True
 
 
 class SlidesEditorPermission(ManagementPermission):
     name = 'slides_editing'
     friendly_name = _('Slides Editor')
     description = _('Grants editor rights for slides editing on an event.')
-    user_selectable = True
 
 
 class PosterEditorPermission(ManagementPermission):
     name = 'poster_editing'
     friendly_name = _('Poster Editor')
     description = _('Grants editor rights for poster editing on an event.')
-    user_selectable = True
