@@ -108,6 +108,8 @@ class UnavailableRoomsModal extends React.Component {
             datePicker={datePicker}
             fixedHeight="70vh"
             onClickReservation={actions.openBookingDetails}
+            setMode={actions.setMode}
+            setDate={actions.setDate}
           />
         </Modal.Content>
       </Modal>
