@@ -42,13 +42,13 @@ describe('RoomEditModal', () => {
       expect(pane).toHaveProperty('fields');
       expect(pane.fields).toBeInstanceOf(Array);
       expect(
-        tabCmp
-          .find(pane.pane.type)
-          .findWhere(e => [FinalField, FieldArray].includes(e.type()))
-          .map(x => x.prop('name'))
-          .filter((v, i, a) => a.indexOf(v) === i)
-          .sort()
-      ).toEqual(pane.fields.sort());
+        new Set(
+          tabCmp
+            .find(pane.pane.type)
+            .findWhere(e => [FinalField, FieldArray].includes(e.type()))
+            .map(x => x.prop('name'))
+        )
+      ).toEqual(new Set(pane.fields));
     }
   });
 });
