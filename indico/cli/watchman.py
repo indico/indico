@@ -62,7 +62,11 @@ class Watcher(object):
         data = client.getSubscription(self.name)
         if data:
             files = sorted(f for record in data for f in record.get('files', []))
-            print(cformat('%{cyan}Changes found in %{cyan!}{}%{reset}%{cyan}:').format(os.path.relpath(self.path)))
+            relpath = os.path.relpath(self.path)
+            if relpath == '.':
+                print(cformat('%{cyan}Changes found:').format(relpath))
+            else:
+                print(cformat('%{cyan}Changes found in %{cyan!}{}%{reset}%{cyan}:').format(relpath))
             for f in files:
                 print(cformat(' * %{blue!}{}').format(f))
             self.triggered = True
