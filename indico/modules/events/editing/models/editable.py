@@ -174,17 +174,23 @@ class Editable(db.Model):
     def can_assign_self(self, user):
         """Whether the user can assign themself on the editable."""
         from indico.modules.events.editing.settings import editable_type_settings
+        type_settings = editable_type_settings[self.type]
+        if self.editor and not self.can_unassign(user):
+            return False
         return ((self.event.can_manage(user, permission=self.type.editor_permission)
-                 and editable_type_settings[self.type].get(self.event, 'editing_enabled'))
+                 and type_settings.get(self.event, 'editing_enabled')
+                 and type_settings.get(self.event, 'self_assign_allowed'))
                 or self.event.can_manage(user, permission='editing_manager'))
 
     def can_unassign(self, user):
         """Whether the user can unassign the editor of the editable."""
         from indico.modules.events.editing.settings import editable_type_settings
+        type_settings = editable_type_settings[self.type]
         return (self.event.can_manage(user, permission='editing_manager')
                 or (self.editor == user
                     and self.event.can_manage(user, permission=self.type.editor_permission)
-                    and editable_type_settings[self.type].get(self.event, 'editing_enabled')))
+                    and type_settings.get(self.event, 'editing_enabled')
+                    and type_settings.get(self.event, 'self_assign_allowed')))
 
     @property
     def review_conditions_valid(self):
