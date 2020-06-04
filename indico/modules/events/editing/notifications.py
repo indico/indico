@@ -10,34 +10,40 @@ from indico.modules.events.editing.schemas import EditingConfirmationAction
 from indico.web.flask.templating import get_template_module
 
 
-def notify_submitter_comment(comment):
-    """
-    Notify the editor about comments made by a submitter.
-    """
+def _get_commenting_users(revision, check_internal_access=False):
+    return {
+        c.user
+        for c in revision.comments
+        if not check_internal_access or revision.editable.can_use_internal_comments(c.user)
+    }
+
+
+def notify_comment(comment):
+    """Notify about a new comments on a revision."""
     revision = comment.revision
     editor = revision.editable.editor
-    submitter = comment.user
-    if not editor:
-        return
-    tpl = get_template_module('events/editing/emails/submitter_comment_notification.txt',
-                              submitter_name=submitter.first_name,
-                              timeline_url=revision.editable.external_timeline_url,
-                              recipient_name=editor.first_name)
-    send_email(make_email(editor.email, template=tpl))
+    author = comment.user
+    if comment.internal:
+        # internal comments notify the editor and anyone who commented + can see internal comments
+        recipients = _get_commenting_users(revision, check_internal_access=True) | {editor}
+    elif author == editor:
+        # editor comments notify the submitter and anyone else who commented
+        recipients = _get_commenting_users(revision) | {revision.submitter}
+    elif revision.editable.can_perform_submitter_actions(author):
+        # submitter comments notify the editor and anyone else who commented
+        recipients = _get_commenting_users(revision) | {editor}
+    else:
+        # comments from someone else (managers) notify everyone
+        recipients = _get_commenting_users(revision) | {editor, revision.submitter}
 
-
-def notify_editor_comment(comment):
-    """
-    Notify the submitter about comments made by an editor.
-    """
-    revision = comment.revision
-    editor = comment.user
-    submitter = revision.submitter
-    tpl = get_template_module('events/editing/emails/editor_comment_notification.txt',
-                              editor_name=editor.first_name,
-                              timeline_url=revision.editable.external_timeline_url,
-                              recipient_name=submitter.first_name)
-    send_email(make_email(submitter.email, template=tpl))
+    recipients.discard(None)  # in case there's no editor assigned
+    recipients.discard(author)  # never bother people about their own comments
+    for recipient in recipients:
+        tpl = get_template_module('events/editing/emails/comment_notification.txt',
+                                  author_name=author.first_name,
+                                  timeline_url=revision.editable.external_timeline_url,
+                                  recipient_name=recipient.first_name)
+        send_email(make_email(recipient.email, template=tpl))
 
 
 def notify_editor_judgment(revision, editor):

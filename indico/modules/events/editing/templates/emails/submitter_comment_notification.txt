@@ -1,7 +1,0 @@
-{% extends 'events/editing/emails/base_email.txt' %}
-
-{% block subject -%}New submitter comment{%- endblock %}
-
-{% block body_text -%}
-{{ submitter_name }} has left a comment to an editable you are editor of.
-{% endblock %}
