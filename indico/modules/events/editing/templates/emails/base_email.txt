@@ -4,5 +4,6 @@
 
 {% block body -%}
 {% block body_text %}{% endblock %}
-You can view this action in the following link: {{ timeline_url }}
+You can view details on the following URL:
+{{ timeline_url }}
 {%- endblock %}
