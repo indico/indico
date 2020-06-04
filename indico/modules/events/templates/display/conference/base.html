@@ -1,21 +1,8 @@
 {% extends 'layout/conference_page_base.html' %}
 
 {% from 'events/display/_event_header_message.html' import render_event_header_msg %}
+{% from 'events/display/conference/_util.html' import format_event_date %}
 {% from 'events/layout/_menu.html' import menu_entry_display %}
-
-{%- macro _format_event_date(event) -%}
-    {% set start_dt = event.start_dt_display.astimezone(event.display_tzinfo) %}
-    {% set end_dt = event.end_dt_display.astimezone(event.display_tzinfo) %}
-    {% if start_dt.date() == end_dt.date() %}
-        {{ start_dt | format_date('long') }}
-    {% elif start_dt.year == end_dt.year and start_dt.month == end_dt.month %}
-        {{ start_dt.day }}-{{ end_dt.day }} {{ start_dt | format_date('MMMM yyyy') }}
-    {% else %}
-        {% trans start=start_dt|format_date('long'), end=end_dt|format_date('long') -%}
-            {{ start }} to {{ end }}
-        {%- endtrans %}
-    {% endif %}
-{%- endmacro -%}
 
 
 {% block page %}
@@ -43,7 +30,7 @@
                         {{ template_hook('conference-header', event=event) }}
                         <div class="datePlace">
                             <div class="date">
-                                {{- _format_event_date(event) -}}
+                                {{- format_event_date(event) -}}
                                 {{- event.get_label_markup() -}}
                             </div>
                             <div class="place">{{ event.venue_name }}</div>
