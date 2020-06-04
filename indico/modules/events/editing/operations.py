@@ -24,9 +24,8 @@ from indico.modules.events.editing.models.review_conditions import EditingReview
 from indico.modules.events.editing.models.revision_files import EditingRevisionFile
 from indico.modules.events.editing.models.revisions import EditingRevision, FinalRevisionState, InitialRevisionState
 from indico.modules.events.editing.models.tags import EditingTag
-from indico.modules.events.editing.notifications import (notify_editor_comment, notify_editor_judgment,
-                                                         notify_submitter_comment, notify_submitter_confirmation,
-                                                         notify_submitter_upload)
+from indico.modules.events.editing.notifications import (notify_comment, notify_editor_judgment,
+                                                         notify_submitter_confirmation, notify_submitter_upload)
 from indico.modules.events.editing.schemas import EditingConfirmationAction, EditingReviewAction
 from indico.modules.events.logs import EventLogKind, EventLogRealm
 from indico.util.date_time import now_utc
@@ -218,10 +217,7 @@ def create_revision_comment(revision, user, text, internal=False):
     comment = EditingRevisionComment(user=user, text=text, internal=internal)
     revision.comments.append(comment)
     db.session.flush()
-    if revision.editable.can_perform_submitter_actions(user):
-        notify_submitter_comment(comment)
-    if revision.editable.can_perform_editor_actions(user):
-        notify_editor_comment(comment)
+    notify_comment(comment)
     logger.info('Comment on revision %r created by %r: %r', revision, user, comment)
 
 

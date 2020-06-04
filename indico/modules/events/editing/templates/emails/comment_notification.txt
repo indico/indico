@@ -1,0 +1,7 @@
+{% extends 'events/editing/emails/base_email.txt' %}
+
+{% block subject -%}New comment{%- endblock %}
+
+{% block body_text -%}
+{{ author_name }} has posted a new comment.
+{% endblock %}
