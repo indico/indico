@@ -16,6 +16,7 @@ import {EditingReviewAction} from '../../../models';
 import AcceptRejectForm from './AcceptRejectForm';
 import RequestChangesForm from './RequestChangesForm';
 import UpdateFilesForm from './UpdateFilesForm';
+import JudgmentDropdownItems from './JudgmentDropdownItems';
 
 import './JudgmentBox.module.scss';
 
@@ -42,16 +43,11 @@ export default function JudgmentBox({block, onClose, judgmentType: _judgmentType
             className={option.class}
           >
             <Dropdown.Menu>
-              {options.map(({value, text}) => (
-                <Dropdown.Item
-                  key={value}
-                  selected={value === judgmentType}
-                  onClick={() => {
-                    setJudgmentType(value);
-                  }}
-                  text={text}
-                />
-              ))}
+              <JudgmentDropdownItems
+                options={options}
+                judgmentType={judgmentType}
+                setJudgmentType={setJudgmentType}
+              />
             </Dropdown.Menu>
           </Dropdown>
           <Button icon="delete" disabled={loading} onClick={onClose} />
