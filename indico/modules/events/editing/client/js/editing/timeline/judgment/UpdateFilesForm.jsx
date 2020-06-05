@@ -11,11 +11,11 @@ import _ from 'lodash';
 import React, {useState} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
 import PropTypes from 'prop-types';
-import {Form as FinalForm} from 'react-final-form';
-import {Form, Dropdown, Button} from 'semantic-ui-react';
+import {Field, Form as FinalForm} from 'react-final-form';
+import {Form, Dropdown, Button, Message} from 'semantic-ui-react';
 
 import {FinalSubmitButton, FinalTextArea} from 'indico/react/forms';
-import {Translate} from 'indico/react/i18n';
+import {Translate, Param, Plural, PluralTranslate, Singular} from 'indico/react/i18n';
 
 import {reviewEditable} from '../actions';
 import * as selectors from '../selectors';
@@ -43,6 +43,7 @@ export default function UpdateFilesForm({setLoading}) {
   const staticData = useSelector(selectors.getStaticData);
   const {eventId, contributionId, editableType} = staticData;
   const fileTypes = useSelector(selectors.getFileTypes);
+  const publishableFileTypes = useSelector(selectors.getPublishableFileTypes);
   const dispatch = useDispatch();
   const files = getFilesFromRevision(fileTypes, lastRevision);
   const option = confirmOptions.find(x => x.value === confirmationType);
@@ -85,6 +86,44 @@ export default function UpdateFilesForm({setLoading}) {
               })}
               mustChange
             />
+            <Field name="files" subscription={{value: true}}>
+              {({input: {value: currentFiles}}) => {
+                if (publishableFileTypes.some(fileType => fileType.id in currentFiles)) {
+                  return null;
+                }
+                return (
+                  <>
+                    <Message styleName="publishable-warning" visible warning>
+                      <PluralTranslate count={publishableFileTypes.length}>
+                        <Singular>
+                          There are no publishable files. Please upload a{' '}
+                          <Param
+                            name="types"
+                            wrapper={<strong />}
+                            value={publishableFileTypes.map(ft => ft.name).join(', ')}
+                          />{' '}
+                          file.
+                        </Singular>
+                        <Plural>
+                          There are no publishable files. Please upload a file in at least one of
+                          the following types:{' '}
+                          <Param
+                            name="types"
+                            wrapper={<strong />}
+                            value={publishableFileTypes.map(ft => ft.name).join(', ')}
+                          />
+                        </Plural>
+                      </PluralTranslate>
+                    </Message>
+                    <Field
+                      name="_nopublishables"
+                      validate={() => Translate.string('There is no publishable file uploaded.')}
+                      render={() => null}
+                    />
+                  </>
+                );
+              }}
+            </Field>
             <FinalTextArea
               name="comment"
               placeholder={Translate.string('Leave a comment...')}

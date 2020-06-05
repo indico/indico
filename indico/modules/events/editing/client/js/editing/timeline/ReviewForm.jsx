@@ -14,6 +14,7 @@ import UserAvatar from 'indico/modules/events/reviewing/components/UserAvatar';
 import {Translate} from 'indico/react/i18n';
 
 import JudgmentBox from './judgment/JudgmentBox';
+import JudgmentDropdownItems from './judgment/JudgmentDropdownItems';
 import CommentForm from './CommentForm';
 import {blockPropTypes} from './util';
 import {createRevisionComment} from './actions';
@@ -82,11 +83,7 @@ export default function ReviewForm({block}) {
             floating
           >
             <Dropdown.Menu>
-              {judgmentOptions.map(({value, text}) => (
-                <Dropdown.Item key={value} onClick={() => setJudgmentType(value)}>
-                  {text}
-                </Dropdown.Item>
-              ))}
+              <JudgmentDropdownItems options={judgmentOptions} setJudgmentType={setJudgmentType} />
             </Dropdown.Menu>
           </Dropdown>
         </div>

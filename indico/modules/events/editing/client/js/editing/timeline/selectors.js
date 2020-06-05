@@ -198,6 +198,20 @@ export const getFileTypes = createSelector(
   }
 );
 
+export const getPublishableFileTypes = createSelector(
+  getFileTypes,
+  fileTypes => fileTypes.filter(ft => ft.publishable)
+);
+
+export const hasPublishableFiles = createSelector(
+  getPublishableFileTypes,
+  getLastTimelineBlock,
+  (publishableFileTypes, block) => {
+    const usedFileTypes = new Set(block.files.map(f => f.fileType));
+    return publishableFileTypes.some(ft => usedFileTypes.has(ft.id));
+  }
+);
+
 export const getLastRevertableRevisionId = createSelector(
   getDetails,
   details => {

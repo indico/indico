@@ -113,6 +113,7 @@ def review_editable_revision(revision, editor, action, comment, tags, files=None
 
     db.session.flush()
     if action == EditingReviewAction.accept:
+        _ensure_publishable_files(revision)
         publish_editable_revision(revision)
     elif action in (EditingReviewAction.update, EditingReviewAction.update_accept):
         final_state = FinalRevisionState.none
@@ -126,6 +127,7 @@ def review_editable_revision(revision, editor, action, comment, tags, files=None
                                        final_state=final_state,
                                        files=_make_editable_files(revision.editable, files),
                                        tags=revision.tags)
+        _ensure_publishable_files(new_revision)
         revision.editable.revisions.append(new_revision)
     db.session.flush()
     notify_editor_judgment(revision, session.user)
@@ -144,6 +146,7 @@ def confirm_editable_changes(revision, submitter, action, comment):
         revision.comment = comment
     db.session.flush()
     if action == EditingConfirmationAction.accept:
+        _ensure_publishable_files(revision)
         publish_editable_revision(revision)
     db.session.flush()
     notify_submitter_confirmation(revision, submitter, action)
@@ -345,3 +348,8 @@ def _compose_filepath(editable, revision_file):
     filename = secure_filename(file_obj.filename,
                                'revision-file-{}-{}{}'.format(revision_file.revision_id, file_obj.id, ext))
     return os.path.join(filepath, filename)
+
+
+def _ensure_publishable_files(revision):
+    if not any(f.file_type.publishable for f in revision.files):
+        raise InvalidEditableState
