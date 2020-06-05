@@ -14,6 +14,7 @@ from zipfile import ZipFile
 from flask import request, session
 from marshmallow import fields
 from marshmallow_enum import EnumField
+from sqlalchemy.orm import joinedload
 from werkzeug.exceptions import Forbidden, NotFound
 
 from indico.core.errors import UserValueError
@@ -73,6 +74,14 @@ class RHContributionEditableRevisionBase(RHContributionEditableBase):
 
 class RHEditable(RHContributionEditableBase):
     """Retrieve an Editable with all its data."""
+
+    @property
+    def _editable_query_options(self):
+        revisions_strategy = joinedload('revisions')
+        revisions_strategy.selectinload('comments').joinedload('user')
+        revisions_strategy.selectinload('tags')
+        revisions_strategy.selectinload('files').joinedload('file')
+        return (revisions_strategy,)
 
     def _check_access(self):
         RHContributionEditableBase._check_access(self)

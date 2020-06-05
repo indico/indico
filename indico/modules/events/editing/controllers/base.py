@@ -88,6 +88,8 @@ class RHContributionEditableBase(RequireUserMixin, RHContributionDisplayBase):
         'preserved_args': {'type'}
     }
 
+    _editable_query_options = ()
+
     def _check_access(self):
         RequireUserMixin._check_access(self)
         RHContributionDisplayBase._check_access(self)
@@ -98,6 +100,7 @@ class RHContributionEditableBase(RequireUserMixin, RHContributionDisplayBase):
         self.editable = (Editable.query
                          .with_parent(self.contrib)
                          .filter_by(type=self.editable_type)
+                         .options(*self._editable_query_options)
                          .first())
 
 

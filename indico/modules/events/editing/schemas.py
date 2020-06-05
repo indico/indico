@@ -24,6 +24,7 @@ from indico.modules.events.editing.models.revision_files import EditingRevisionF
 from indico.modules.events.editing.models.revisions import EditingRevision, InitialRevisionState
 from indico.modules.events.editing.models.tags import EditingTag
 from indico.modules.users.schemas import UserSchema
+from indico.util.caching import memoize_request
 from indico.util.i18n import _
 from indico.util.marshmallow import PrincipalList, not_empty
 from indico.util.string import natural_sort_key
@@ -65,7 +66,9 @@ class EditingTagSchema(mm.ModelSchema):
             'id', 'code', 'title', 'color', 'system', 'verbose_title', 'is_used_in_revision', 'url'
         )
 
-    is_used_in_revision = fields.Function(lambda tag: EditingRevision.query.with_parent(tag).has_rows())
+    is_used_in_revision = fields.Function(
+        memoize_request(lambda tag: EditingRevision.query.with_parent(tag).has_rows())
+    )
     url = fields.Function(lambda tag: url_for('.api_edit_tag', tag.event, tag_id=tag.id, _external=True))
 
     @post_dump(pass_many=True)
