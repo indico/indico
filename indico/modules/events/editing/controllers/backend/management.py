@@ -27,6 +27,7 @@ from indico.modules.events.editing.util import get_editors
 from indico.modules.events.logs import EventLogKind, EventLogRealm
 from indico.util.i18n import _, orig_string
 from indico.web.args import use_kwargs, use_rh_args, use_rh_kwargs
+from indico.web.util import jsonify_template
 
 
 class RHCreateTag(RHEditingManagementBase):
@@ -230,3 +231,12 @@ class RHEditableSetEditing(RHEditableTypeManagementBase):
                        'Closed {} editing'.format(orig_string(self.editable_type.title)), session.user)
         editable_type_settings[self.editable_type].set(self.event, 'editing_enabled', False)
         return '', 204
+
+
+class RHContactEditingTeam(RHEditableTypeManagementBase):
+    """Send emails to editing team."""
+
+    def _process(self):
+        editors = get_editors(self.event, self.editable_type)
+        return jsonify_template('events/editing/management/editor_list.html',
+                                event_persons=editors, event=self.event)

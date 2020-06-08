@@ -4,6 +4,7 @@
 // Indico is free software; you can redistribute it and/or
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
+/* global ajaxDialog:false */
 
 import dashboardURL from 'indico-url:event_editing.dashboard';
 import manageEditableTypeListURL from 'indico-url:event_editing.manage_editable_type_list';
@@ -12,6 +13,7 @@ import manageReviewConditionsURL from 'indico-url:event_editing.manage_review_co
 import selfAssignURL from 'indico-url:event_editing.api_self_assign_enabled';
 import enableSubmissionURL from 'indico-url:event_editing.api_submission_enabled';
 import enableEditingURL from 'indico-url:event_editing.api_editing_enabled';
+import contactEditingTeamURL from 'indico-url:event_editing.contact_team';
 
 import React, {useState} from 'react';
 import {useParams, Link} from 'react-router-dom';
@@ -46,6 +48,13 @@ export default function EditableTypeDashboard() {
   const [editingEnabled, toggleEditing, editingLoading] = useTogglableValue(
     enableEditingURL({confId: eventId, type})
   );
+
+  const contactEditingTeam = () => {
+    ajaxDialog({
+      url: contactEditingTeamURL({confId: eventId, type}),
+      title: Translate.string('Send emails to the editing team'),
+    });
+  };
 
   return (
     <>
@@ -113,7 +122,7 @@ export default function EditableTypeDashboard() {
               label={Translate.string('Editing team')}
               description={Translate.string('Configure editing team')}
             >
-              <a className="i-button icon-mail">
+              <a className="i-button icon-mail" onClick={contactEditingTeam}>
                 <Translate>Contact</Translate>
               </a>
               <a className="i-button icon-users" onClick={() => setEditorManagerVisible(true)}>

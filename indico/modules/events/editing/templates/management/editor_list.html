@@ -1,0 +1,24 @@
+{% extends 'events/management/_base_person_list.html' %}
+
+{% block table_head %}
+    <th class="i-table thin-column hide-if-locked" data-sorter="false"></th>
+    <th class="i-table name-column">{% trans %}Name{% endtrans %}</th>
+    <th class="i-table email-column">{% trans %}Email{% endtrans %}</th>
+{% endblock %}
+
+{% block table_body %}
+    {% for user in event_persons -%}
+        <tr class="i-table">
+            <td class="i-table thin-column hide-if-locked">
+                <input type="checkbox" name="user_id" value="{{ user.id }}" class="select-row"
+                       {{ 'disabled' if not user.email }}>
+            </td>
+            <td class="i-table name-column">{{ user.full_name }}</td>
+            <td class="i-table email-column">{{ user.email }}</td>
+        </tr>
+    {%- else -%}
+        <tr class="i-table">
+            <td colspan="3">{% trans %}There is no editing team assigned yet{% endtrans %}</td>
+        </tr>
+    {%- endfor %}
+{% endblock %}

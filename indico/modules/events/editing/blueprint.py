@@ -35,6 +35,10 @@ _bp.add_url_rule(contrib_prefix + '/<int:revision_id>/files.zip', 'revision_file
 _bp.add_url_rule(contrib_prefix + '/<int:revision_id>/<int:file_id>/<filename>', 'download_file',
                  timeline.RHDownloadRevisionFile)
 
+# Non-API backend
+_bp.add_url_rule('/manage/editing/<any(paper,slides,poster):type>/contact-team', 'contact_team',
+                 management.RHContactEditingTeam)
+
 # Event-level APIs
 review_cond_prefix = '/editing/api/<any(paper,slides,poster):type>/review-conditions'
 _bp.add_url_rule(review_cond_prefix, 'api_review_conditions',

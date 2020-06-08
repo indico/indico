@@ -15,10 +15,12 @@
                     </a>
                 </li>
             </ul>
-            <div class="group i-selection">
-                <span class="i-button label">{% trans %}Show{% endtrans %}</span>
-                {% block selection_toolbar %}{% endblock %}
-            </div>
+            {% if self.selection_toolbar() %}
+                <div class="group i-selection">
+                    <span class="i-button label">{% trans %}Show{% endtrans %}</span>
+                    {% block selection_toolbar %}{% endblock %}
+                </div>
+            {% endif %}
         </div>
     </div>
     <div id="person-list-table">
