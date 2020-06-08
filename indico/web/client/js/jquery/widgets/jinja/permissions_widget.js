@@ -60,7 +60,7 @@ import Palette from 'indico/utils/palette';
       const $text = $('<span>', {
         'class': 'text-normal entry-label',
         'text': principal.name,
-        'data-tooltip': principal.name,
+        'data-tooltip-text': principal.name,
       });
       const $code = this._renderRoleCode(principal.code, principal.color);
       return [$code, $text];
@@ -70,7 +70,10 @@ import Palette from 'indico/utils/palette';
       const extraText = principal.category;
       const $code = this._renderRoleCode(principal.code, principal.color);
       const tooltip = `${text} (${extraText})`;
-      const textDiv = $('<div>', {'class': 'text-normal entry-label', 'data-tooltip': tooltip});
+      const textDiv = $('<div>', {
+        'class': 'text-normal entry-label',
+        'data-tooltip-text': tooltip,
+      });
       textDiv.append($('<span>', {text: text}));
       textDiv.append('<br>');
       textDiv.append($('<span>', {class: 'text-not-important entry-label-extra', text: extraText}));
@@ -97,7 +100,7 @@ import Palette from 'indico/utils/palette';
       }
       const text = principal.name;
       const tooltip = extraText ? `${text} (${extraText})` : text;
-      const textDiv = $('<div>', {'class': 'text-normal entry-label', 'data-tooltip': tooltip});
+      const textDiv = $('<div>', {'class': 'text-normal entry-label', 'data-tooltip-text': tooltip});
       textDiv.append($('<span>', {text}));
       if (extraText) {
         textDiv.append('<br>');
@@ -296,10 +299,7 @@ import Palette from 'indico/utils/palette';
       } else {
         managersTitle = $T.gettext('Event Managers');
       }
-      const managers = [
-        {_type: 'DefaultEntry', name: managersTitle},
-        [FULL_ACCESS_PERMISSIONS],
-      ];
+      const managers = [{_type: 'DefaultEntry', name: managersTitle}, [FULL_ACCESS_PERMISSIONS]];
       this.$permissionsWidgetList.prepend(this._renderItem(managers));
       this.$permissionsWidgetList.find('.anonymous').toggle(!this.isEventProtected);
 
@@ -411,7 +411,7 @@ import Palette from 'indico/utils/palette';
       this.$permissionsWidgetList.on('mouseenter', '.entry-label', function() {
         const $this = $(this);
         if (this.offsetWidth < this.scrollWidth && !$this.attr('title')) {
-          $this.attr('title', $this.attr('data-tooltip'));
+          $this.attr('title', $this.attr('data-tooltip-text'));
         }
       });
     },
