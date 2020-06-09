@@ -32,10 +32,13 @@ class UploadFileMixin(object):
         'file': fields.Field(location='files', required=True)
     })
     def _process(self, file):
+        return self._save_file(file, file.stream)
+
+    def _save_file(self, file, stream):
         context = self.get_file_context()
         content_type = mimetypes.guess_type(file.filename)[0] or file.mimetype or 'application/octet-stream'
         f = File(filename=file.filename, content_type=content_type)
-        f.save(context, file.stream)
+        f.save(context, stream)
         db.session.add(f)
         db.session.flush()
         logger.info('File %r uploaded (context: %r)', f, context)

@@ -43,6 +43,20 @@ class RHEditingUploadFile(UploadFileMixin, RHContributionEditableBase):
         return 'event', self.event.id, 'editing', self.contrib.id, self.editable_type.name
 
 
+class RHEditingUploadFromLastRevision(RHEditingUploadFile):
+    @use_kwargs({
+        'id': fields.Int()
+    })
+    def _process(self, id):
+        last_rev = self.contrib.paper.get_last_revision()
+        if last_rev:
+            found = next(f for f in last_rev.files if f.id == id)
+            if found:
+                with found.open() as stream:
+                    return self._save_file(found, stream)
+        raise UserValueError(_('No such file was found in the previous revision'))
+
+
 class RHContributionEditableRevisionBase(RHContributionEditableBase):
     """Base class for operations on the latest revision of an Editable."""
 
@@ -85,6 +99,8 @@ class RHEditable(RHContributionEditableBase):
 
     def _check_access(self):
         RHContributionEditableBase._check_access(self)
+        if not self.editable:
+            raise NotFound(_('There is no editable for this contribution yet.'))
         if not self.editable.can_see_timeline(session.user):
             raise Forbidden
 

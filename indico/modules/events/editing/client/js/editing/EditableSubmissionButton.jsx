@@ -8,6 +8,7 @@
 import editableURL from 'indico-url:event_editing.editable';
 import submitRevisionURL from 'indico-url:event_editing.api_create_editable';
 import apiUploadURL from 'indico-url:event_editing.api_upload';
+import apiUploadExistingURL from 'indico-url:event_editing.api_upload_last_revision';
 
 import _ from 'lodash';
 import React, {useState} from 'react';
@@ -19,8 +20,9 @@ import {indicoAxios} from 'indico/utils/axios';
 import {FinalSubmitButton, handleSubmitError} from 'indico/react/forms';
 import {Param, Translate} from 'indico/react/i18n';
 
+import {fileTypePropTypes} from 'indico/modules/events/editing/editing/timeline/FileManager/util';
 import {FinalFileManager} from './timeline/FileManager';
-import {fileTypePropTypes} from './timeline/FileManager/util';
+
 import {getFileTypes} from './timeline/selectors';
 import {EditableTypeTitles, EditableType} from '../models';
 
@@ -29,6 +31,7 @@ export default function EditableSubmissionButton({
   contributionId,
   contributionCode,
   fileTypes,
+  existingFiles,
 }) {
   const [currentType, setCurrentType] = useState(null);
   const submitRevision = async formData => {
@@ -81,6 +84,12 @@ export default function EditableSubmissionButton({
                       contrib_id: contributionId,
                       type: currentType,
                     })}
+                    uploadExistingURL={apiUploadExistingURL({
+                      confId: eventId,
+                      contrib_id: contributionId,
+                      type: currentType,
+                    })}
+                    existingFiles={existingFiles}
                     mustChange
                   />
                 </Form>
@@ -125,4 +134,9 @@ EditableSubmissionButton.propTypes = {
   eventId: PropTypes.string.isRequired,
   contributionId: PropTypes.string.isRequired,
   contributionCode: PropTypes.string.isRequired,
+  existingFiles: PropTypes.any, // TODO: derive a props shape from fileTypePropTypes
+};
+
+EditableSubmissionButton.defaultProps = {
+  existingFiles: [],
 };

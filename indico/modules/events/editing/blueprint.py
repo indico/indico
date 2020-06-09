@@ -93,9 +93,11 @@ _bp.add_url_rule(contrib_api_prefix + '/editor/me', 'api_assign_editable_self', 
                  methods=('PUT',))
 
 # Contribution/revision-level APIs
-_bp.add_url_rule(contrib_api_prefix, 'api_editable', timeline.RHEditable)
+_bp.add_url_rule(contrib_api_prefix, 'api_editable', timeline.RHEditable, methods=('GET',))
 _bp.add_url_rule(contrib_api_prefix, 'api_create_editable', timeline.RHCreateEditable, methods=('PUT',))
 _bp.add_url_rule(contrib_api_prefix + '/upload', 'api_upload', timeline.RHEditingUploadFile, methods=('POST',))
+_bp.add_url_rule(contrib_api_prefix + '/upload_last_revision', 'api_upload_last_revision',
+                 timeline.RHEditingUploadFromLastRevision, methods=('POST',))
 _bp.add_url_rule(contrib_api_prefix + '/<int:revision_id>/review', 'api_review_editable',
                  timeline.RHReviewEditable, methods=('POST',))
 _bp.add_url_rule(contrib_api_prefix + '/<int:revision_id>/confirm', 'api_confirm_changes',

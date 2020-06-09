@@ -11,11 +11,13 @@ import _ from 'lodash';
 import React from 'react';
 import PropTypes from 'prop-types';
 import {indicoAxios, handleAxiosError} from 'indico/utils/axios';
+import {snakifyKeys} from 'indico/utils/case';
 import * as actions from './actions';
 import {getFiles} from './selectors';
 
 export const FileManagerContext = React.createContext(null);
 
+// TODO: refactor this props to be re-used as a generic file
 export const filePropTypes = {
   filename: PropTypes.string.isRequired,
   downloadURL: PropTypes.string,
@@ -24,6 +26,7 @@ export const filePropTypes = {
   state: PropTypes.oneOf(['added', 'modified', 'deleted']),
 };
 
+// TODO: refactor this props since files isn't always needed
 export const fileTypePropTypes = {
   name: PropTypes.string.isRequired,
   files: PropTypes.arrayOf(PropTypes.shape(filePropTypes)),
@@ -32,7 +35,7 @@ export const fileTypePropTypes = {
   id: PropTypes.number.isRequired,
 };
 
-async function uploadFile(file, url, onUploadProgress) {
+export async function uploadFile(url, file, onUploadProgress) {
   const formData = new FormData();
   formData.append('file', file);
 
@@ -48,13 +51,24 @@ async function uploadFile(file, url, onUploadProgress) {
   }
 }
 
+export async function uploadAny(url, obj) {
+  // TODO: needs a new name, perhaps merge with with the top method
+  try {
+    const {data} = await indicoAxios.post(url, snakifyKeys(obj));
+    return data;
+  } catch (e) {
+    handleAxiosError(e);
+    return null;
+  }
+}
+
 /**
  * Upload file using axios while triggering all needed actions to update progress.
  *
  * @param {Function} action - the action to be executed after upload is done
  * @param {String} fileTypeId - the id of the File Type
  * @param {Array} acceptedFiles - the "accepted files" array sent by react-dropzone
- * @param {String} uploadURL - the URL to POST the files to
+ * @param {String} uploadCallback - the function to be called on file upload
  * @param {Function} dispatch - the dispatch function for reducer actions
  * @param {String?} fileId - the ID of the file to modify, if any
  * @param {Function} onError - the function to be called on file upload error
@@ -63,7 +77,7 @@ export function uploadFiles(
   action,
   fileTypeId,
   acceptedFiles,
-  uploadURL,
+  uploadCallback,
   dispatch,
   fileId = null,
   onError = null
@@ -74,7 +88,7 @@ export function uploadFiles(
 
   return Promise.all(
     _.zip(acceptedFiles, tmpFileIds).map(async ([acceptedFile, tmpFileId]) => {
-      const uploadedFile = await uploadFile(acceptedFile, uploadURL, e =>
+      const uploadedFile = await uploadCallback(acceptedFile, e =>
         dispatch(actions.progress(fileTypeId, tmpFileId, Math.floor((e.loaded / e.total) * 100)))
       );
 

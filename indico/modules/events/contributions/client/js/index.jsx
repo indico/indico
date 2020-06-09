@@ -10,6 +10,7 @@
 /* global enableIfChecked:true */
 
 import fileTypesURL from 'indico-url:event_editing.api_file_types';
+import paperInfoURL from 'indico-url:papers.api_paper_details';
 
 import _ from 'lodash';
 import moment from 'moment';
@@ -29,23 +30,30 @@ import PublicationSwitch from './PublicationSwitch';
     if (!editableSubmissionButton) {
       return;
     }
-
     const availableTypes = JSON.parse(editableSubmissionButton.dataset.availableTypes);
     const {eventId, contributionId, contributionCode} = editableSubmissionButton.dataset;
 
-    let responses;
-    try {
-      responses = await Promise.all(
+    const tasks = await Promise.allSettled([
+      Promise.all(
         availableTypes.map(type => indicoAxios.get(fileTypesURL({confId: eventId, type})))
-      );
-    } catch (e) {
-      handleAxiosError(e);
+      ),
+      indicoAxios.get(paperInfoURL({confId: eventId, contrib_id: contributionId})),
+    ]);
+    if (tasks[0].status === 'rejected') {
+      handleAxiosError(tasks[0].reason);
       return;
     }
-
     const fileTypes = _.fromPairs(
-      responses.map((response, index) => [availableTypes[index], camelizeKeys(response.data)])
+      tasks[0].value.map((response, index) => [availableTypes[index], camelizeKeys(response.data)])
     );
+
+    let lastRevFiles;
+    if (tasks[1].status === 'fulfilled') {
+      const paperInfo = camelizeKeys(tasks[1].value.data);
+      if (paperInfo.lastRevision) {
+        lastRevFiles = paperInfo.lastRevision.files;
+      }
+    }
 
     ReactDOM.render(
       <EditableSubmissionButton
@@ -53,6 +61,7 @@ import PublicationSwitch from './PublicationSwitch';
         eventId={eventId}
         contributionId={contributionId}
         contributionCode={contributionCode}
+        existingFiles={lastRevFiles}
       />,
       editableSubmissionButton
     );

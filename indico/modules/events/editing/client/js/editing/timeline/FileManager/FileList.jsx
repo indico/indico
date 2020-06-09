@@ -13,6 +13,7 @@ import {
   FileManagerContext,
   filePropTypes,
   uploadFiles,
+  uploadFile,
   deleteFile,
   fileTypePropTypes,
 } from './util';
@@ -53,7 +54,7 @@ function FileEntry({uploadURL, fileType, file: {uuid, filename, state, claimed, 
         actions.markModified,
         fileType.id,
         acceptedFiles,
-        uploadURL,
+        uploadFile.bind(null, uploadURL),
         dispatch,
         uuid,
         () => setActiveButton(null)
