@@ -6,6 +6,7 @@
 // LICENSE file for more details.
 
 import dashboardURL from 'indico-url:event_editing.dashboard';
+import manageEditableTypeListURL from 'indico-url:event_editing.manage_editable_type_list';
 import manageFileTypesURL from 'indico-url:event_editing.manage_file_types';
 import manageReviewConditionsURL from 'indico-url:event_editing.manage_review_conditions';
 import selfAssignURL from 'indico-url:event_editing.api_self_assign_enabled';
@@ -137,9 +138,12 @@ export default function EditableTypeDashboard() {
                 onClick={!selfAssignSaving ? toggleSelfAssign : null}
                 label={Translate.string('Allow editors to self-assign editables')}
               />
-              <a className="i-button icon-settings">
-                <Translate>Assign</Translate>
-              </a>
+              <Link
+                className="i-button icon-settings"
+                to={manageEditableTypeListURL({confId: eventId, type})}
+              >
+                <Translate>List</Translate>
+              </Link>
             </Section>
           </div>
         </>
