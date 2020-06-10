@@ -68,15 +68,15 @@ _bp.add_url_rule('/editing/api/service/connect', 'api_service_connect', service.
 _bp.add_url_rule('/editing/api/service/disconnect', 'api_service_disconnect', service.RHDisconnectService,
                  methods=('POST',))
 _bp.add_url_rule('/editing/api/service/status', 'api_service_status', service.RHServiceStatus)
-_bp.add_url_rule('/editing/api/<any(paper,slides,poster):type>/editables/prepare-archive', 'prepare_editables_archive',
-                 editable_list.RHPrepareEditablesArchive, methods=('POST',))
+_bp.add_url_rule('/editing/api/<any(paper,slides,poster):type>/editables/prepare-archive',
+                 'api_prepare_editables_archive', editable_list.RHPrepareEditablesArchive, methods=('POST',))
 _bp.add_url_rule('/editing/<any(paper,slides,poster):type>/editables/archive/<uuid:uuid>.zip', 'download_archive',
                  editable_list.RHDownloadArchive)
-_bp.add_url_rule('/editing/api/<any(paper,slides,poster):type>/editables/assign', 'assign_editor',
+_bp.add_url_rule('/editing/api/<any(paper,slides,poster):type>/editables/assign', 'api_assign_editor',
                  editable_list.RHAssignEditor, methods=('POST',))
-_bp.add_url_rule('/editing/api/<any(paper,slides,poster):type>/editables/assign/me', 'assign_myself',
+_bp.add_url_rule('/editing/api/<any(paper,slides,poster):type>/editables/assign/me', 'api_assign_myself',
                  editable_list.RHAssignMyselfAsEditor, methods=('POST',))
-_bp.add_url_rule('/editing/api/<any(paper,slides,poster):type>/editables/unassign', 'unassign_editor',
+_bp.add_url_rule('/editing/api/<any(paper,slides,poster):type>/editables/unassign', 'api_unassign_editor',
                  editable_list.RHUnassignEditor, methods=('POST',))
 
 # Editable-level APIs
