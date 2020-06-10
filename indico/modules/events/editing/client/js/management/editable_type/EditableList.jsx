@@ -58,7 +58,8 @@ function EditableListDisplay({editableList, codePresent, editableType, eventId})
   const [sortDirection, setSortDirection] = useState('ASC');
   const [sortedList, setSortedList] = useState(editableList);
   const [checked, setChecked] = useState([]);
-  const hasCheckedRows = checked.length === 0;
+  const editables = sortedList.filter(x => x.editable);
+  const hasCheckedEditables = checked.length > 0;
   const title = {
     [EditableType.paper]: Translate.string('List of papers'),
     [EditableType.slides]: Translate.string('List of slides'),
@@ -158,14 +159,14 @@ function EditableListDisplay({editableList, codePresent, editableType, eventId})
 
   const toggleSelectAll = dataChecked => {
     if (dataChecked) {
-      setChecked(sortedList.map(row => row.id));
+      setChecked(editables.map(row => row.editable.id));
     } else {
       setChecked([]);
     }
   };
 
   const toggleSelectRow = dataIndex => {
-    const newRow = sortedList[dataIndex].id;
+    const newRow = sortedList[dataIndex].editable.id;
     if (checked.includes(newRow)) {
       setChecked(old => old.filter(row => row !== newRow));
     } else {
@@ -179,15 +180,18 @@ function EditableListDisplay({editableList, codePresent, editableType, eventId})
       <ManagementPageBackButton url={dashboardURL({confId: eventId})} />
       <div styleName="editable-topbar">
         <div>
-          <Button disabled={hasCheckedRows} content={Translate.string('Assign')} />
-          <Button disabled={hasCheckedRows} content={Translate.string('Unassign')} />
-          <Button disabled={hasCheckedRows} content={Translate.string('Set status')} />
+          <Button disabled={!hasCheckedEditables} content={Translate.string('Assign')} />
+          <Button disabled={!hasCheckedEditables} content={Translate.string('Unassign')} />
+          <Button disabled={!hasCheckedEditables} content={Translate.string('Set status')} />
           <Button
-            disabled={hasCheckedRows}
+            disabled={!hasCheckedEditables}
             color="blue"
             content={Translate.string('Assign to myself')}
           />
-          <Button disabled={hasCheckedRows} content={Translate.string('Download all files')} />
+          <Button
+            disabled={!hasCheckedEditables}
+            content={Translate.string('Download all files')}
+          />
         </div>
         <Search disabled={!sortedList.length} />
       </div>
@@ -217,14 +221,19 @@ function EditableListDisplay({editableList, codePresent, editableType, eventId})
                   width={30}
                   headerRenderer={() => (
                     <Checkbox
-                      indeterminate={checked.length > 0 && checked.length < sortedList.length}
-                      checked={checked.length === sortedList.length}
+                      indeterminate={checked.length > 0 && checked.length < editables.length}
+                      checked={checked.length === editables.length}
                       onChange={(e, data) => toggleSelectAll(data.checked)}
                     />
                   )}
                   cellRenderer={({rowIndex}) => (
                     <Checkbox
-                      checked={checked.includes(sortedList[rowIndex].id)}
+                      disabled={!sortedList[rowIndex].editable}
+                      checked={
+                        sortedList[rowIndex].editable
+                          ? checked.includes(sortedList[rowIndex].editable.id)
+                          : false
+                      }
                       onChange={(e, data) => toggleSelectRow(data.index)}
                       index={rowIndex}
                     />
