@@ -29,8 +29,7 @@ export default function TimelineItem({block}) {
   const lastBlock = useSelector(selectors.getLastTimelineBlock);
   const needsSubmitterConfirmation = useSelector(selectors.needsSubmitterConfirmation);
   const canPerformSubmitterActions = useSelector(selectors.canPerformSubmitterActions);
-  const lastState = useSelector(selectors.getLastState);
-  const {canComment} = useSelector(selectors.getDetails);
+  const {canComment, state: editableState} = useSelector(selectors.getDetails);
   const {fileTypes} = useSelector(selectors.getStaticData);
   const isLastBlock = lastBlock.id === block.id;
   const [visible, setVisible] = useState(isLastBlock);
@@ -96,7 +95,7 @@ export default function TimelineItem({block}) {
       </div>
       {visible && (
         <RevisionLog items={block.items} separator={isLastBlock}>
-          {isLastBlock && !['accepted', 'rejected'].includes(lastState.name) && canComment && (
+          {isLastBlock && !['accepted', 'rejected'].includes(editableState.name) && canComment && (
             <ReviewForm block={block} />
           )}
         </RevisionLog>

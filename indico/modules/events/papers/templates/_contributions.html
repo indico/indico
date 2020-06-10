@@ -52,11 +52,9 @@
             {% if has_enabled_types %}
                 <div class="action-box">
                     {% for editable in enabled_editables -%}
-                        {% set latest_revision = editable.revisions|last %}
-                        {% set latest_state = latest_revision.final_state or latest_revision.initial_state %}
                         <div class="section f-j-space-between">
-                            <div class="i-tag {{ latest_state.css_class }}">
-                                {{ editable.type.title }}: {{ latest_state.title }}
+                            <div class="i-tag {{ editable.state.css_class }}">
+                                {{ editable.type.title }}: {{ editable.state.title }}
                             </div>
                             <div>
                                 <a href="{{ url_for('event_editing.editable', editable) }}">

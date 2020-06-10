@@ -157,18 +157,6 @@ export const getLastRevision = createSelector(
   getDetails,
   details => details && details.revisions[details.revisions.length - 1]
 );
-export const getLastState = createSelector(
-  getLastRevision,
-  lastRevision =>
-    lastRevision &&
-    (lastRevision.finalState.name === FinalRevisionState.none
-      ? lastRevision.initialState
-      : lastRevision.finalState)
-);
-export const hasLastState = createSelector(
-  getLastRevision,
-  lastRevision => lastRevision && lastRevision.finalState.name !== FinalRevisionState.none
-);
 export const needsSubmitterChanges = createSelector(
   getLastRevision,
   lastRevision =>

@@ -22,7 +22,6 @@ export default function Timeline() {
   const dispatch = useDispatch();
   const details = useSelector(selectors.getDetails);
   const isInitialEditableDetailsLoading = useSelector(selectors.isInitialEditableDetailsLoading);
-  const lastState = useSelector(selectors.getLastState);
   const needsSubmitterChanges = useSelector(selectors.needsSubmitterChanges);
   const canPerformSubmitterActions = useSelector(selectors.canPerformSubmitterActions);
   const lastRevision = useSelector(selectors.getLastRevision);
@@ -43,7 +42,7 @@ export default function Timeline() {
     <>
       <TimelineHeader
         contribution={details.contribution}
-        state={lastState}
+        state={details.state}
         submitter={timelineBlocks[0].submitter}
         eventId={eventId}
       >

@@ -7,6 +7,11 @@
 
 from __future__ import unicode_literals
 
+from sqlalchemy import orm
+from sqlalchemy.event import listens_for
+from sqlalchemy.orm import column_property
+from sqlalchemy.sql import select
+
 from indico.core.db import db
 from indico.core.db.sqlalchemy import PyIntEnum
 from indico.util.i18n import _
@@ -26,6 +31,19 @@ class EditableType(RichIntEnum):
     @property
     def editor_permission(self):
         return self.__editor_permissions__[self]
+
+
+class EditableState(RichIntEnum):
+    __titles__ = [None, _('New'), _('Ready for Review'), _('Needs Confirmation'), _('Needs Changes'),
+                  _('Accepted'), _('Rejected')]
+    __css_classes__ = [None, 'highlight', 'ready', 'warning', 'warning', 'success', 'error']
+
+    new = 1
+    ready_for_review = 2
+    needs_submitter_confirmation = 3
+    needs_submitter_changes = 4
+    accepted = 5
+    rejected = 6
 
 
 class Editable(db.Model):
@@ -85,8 +103,6 @@ class Editable(db.Model):
     @return_ascii
     def __repr__(self):
         return format_repr(self, 'id', 'contribution_id', 'type')
-
-    # TODO: state - either a column property referencing the newest revision's state or a normal column
 
     @locator_property
     def locator(self):
@@ -209,15 +225,36 @@ class Editable(db.Model):
         return editable_type_settings[self.type].get(self.event, 'editing_enabled')
 
     @property
-    def state(self):
-        latest_revision = self.revisions[-1]
-        latest_state = latest_revision.final_state or latest_revision.initial_state
-        return latest_state.name
-
-    @property
     def external_timeline_url(self):
         return url_for('event_editing.editable', self, _external=True)
 
     @property
     def timeline_url(self):
         return url_for('event_editing.editable', self)
+
+
+@listens_for(orm.mapper, 'after_configured', once=True)
+def _mappers_configured():
+    from .revisions import EditingRevision, InitialRevisionState, FinalRevisionState
+
+    # Editable.state -- the state of the editable itself
+    cases = db.cast(db.case({
+        FinalRevisionState.none: db.case({
+            InitialRevisionState.new: EditableState.new,
+            InitialRevisionState.ready_for_review: EditableState.ready_for_review,
+            InitialRevisionState.needs_submitter_confirmation: EditableState.needs_submitter_confirmation
+        }, value=EditingRevision.initial_state),
+        # the states resulting in None are always followed by another revision, so we don't ever
+        # expect the latest revision of an editable to have such a state
+        FinalRevisionState.replaced: None,
+        FinalRevisionState.needs_submitter_confirmation: None,
+        FinalRevisionState.needs_submitter_changes: EditableState.needs_submitter_changes,
+        FinalRevisionState.accepted: EditableState.accepted,
+        FinalRevisionState.rejected: EditableState.rejected,
+    }, value=EditingRevision.final_state), PyIntEnum(EditableState))
+    query = (select([cases])
+             .where(EditingRevision.editable_id == Editable.id)
+             .order_by(EditingRevision.created_dt.desc())
+             .limit(1)
+             .correlate_except(EditingRevision))
+    Editable.state = column_property(query)

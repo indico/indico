@@ -18,7 +18,7 @@ from indico.core.marshmallow import mm
 from indico.modules.events.contributions.models.contributions import Contribution
 from indico.modules.events.contributions.schemas import ContributionSchema
 from indico.modules.events.editing.models.comments import EditingRevisionComment
-from indico.modules.events.editing.models.editable import Editable, EditableType
+from indico.modules.events.editing.models.editable import Editable, EditableState, EditableType
 from indico.modules.events.editing.models.file_types import EditingFileType
 from indico.modules.events.editing.models.review_conditions import EditingReviewCondition
 from indico.modules.events.editing.models.revision_files import EditingRevisionFile
@@ -34,7 +34,13 @@ from indico.web.flask.util import url_for
 from indico.web.forms.colors import get_sui_colors
 
 
-class RevisionState(mm.Schema):
+class RevisionStateSchema(mm.Schema):
+    title = fields.String()
+    name = fields.String()
+    css_class = fields.String()
+
+
+class EditableStateSchema(mm.Schema):
     title = fields.String()
     name = fields.String()
     css_class = fields.String()
@@ -117,8 +123,8 @@ class EditingRevisionSchema(mm.ModelSchema):
     files = fields.List(fields.Nested(EditingRevisionFileSchema))
     tags = fields.List(fields.Nested(EditingTagSchema))
     comments = fields.Method('_get_comments')
-    initial_state = fields.Nested(RevisionState)
-    final_state = fields.Nested(RevisionState)
+    initial_state = fields.Nested(RevisionStateSchema)
+    final_state = fields.Nested(RevisionStateSchema)
     create_comment_url = fields.Function(lambda revision: url_for('event_editing.api_create_comment', revision))
     download_files_url = fields.Function(lambda revision: url_for('event_editing.revision_files_export', revision))
     review_url = fields.Function(lambda revision: url_for('event_editing.api_review_editable', revision))
@@ -139,7 +145,7 @@ class EditableSchema(mm.ModelSchema):
         model = Editable
         fields = ('id', 'type', 'editor', 'revisions', 'contribution', 'can_comment', 'review_conditions_valid',
                   'can_perform_editor_actions', 'can_perform_submitter_actions', 'can_create_internal_comments',
-                  'can_unassign', 'can_assign_self', 'editing_enabled')
+                  'can_unassign', 'can_assign_self', 'editing_enabled', 'state')
 
     contribution = fields.Nested(ContributionSchema)
     editor = fields.Nested(UserSchema, only=('id', 'avatar_bg_color', 'full_name'))
@@ -157,6 +163,7 @@ class EditableSchema(mm.ModelSchema):
         lambda editable, ctx: editable.can_assign_self(ctx.get('user')))
     review_conditions_valid = fields.Boolean()
     editing_enabled = fields.Boolean()
+    state = fields.Nested(EditableStateSchema)
 
 
 class EditableBasicSchema(mm.ModelSchema):
@@ -164,7 +171,7 @@ class EditableBasicSchema(mm.ModelSchema):
         model = Editable
         fields = ('id', 'type', 'state', 'editor', 'timeline_url')
 
-    state = fields.String()
+    state = EnumField(EditableState)
     editor = fields.Nested(UserSchema, only=('id', 'avatar_bg_color', 'full_name'))
     timeline_url = fields.String()
 
