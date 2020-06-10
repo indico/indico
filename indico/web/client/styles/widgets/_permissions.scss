@@ -43,6 +43,15 @@
       width: 30%;
       margin-right: 1em;
 
+      &.disabled {
+        opacity: 50%;
+      }
+
+      &.additional {
+        padding-top: 0.8em;
+        align-self: baseline;
+      }
+
       .entry-icon,
       .role-code {
         flex-shrink: 0;
@@ -87,6 +96,25 @@
 
       &:hover {
         background-color: $light-gray;
+      }
+
+      .hidden-permissions-icon {
+        margin-left: auto;
+      }
+
+      .hidden-permissions-description {
+        padding-left: 0.4em;
+      }
+
+      .hidden-permissions-list {
+        padding-left: 1.5em;
+
+        li {
+          font-size: 1em;
+          text-transform: none;
+          margin: 0;
+          padding: 0;
+        }
       }
 
       ul {

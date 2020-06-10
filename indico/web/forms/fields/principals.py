@@ -13,7 +13,7 @@ from operator import attrgetter
 from wtforms import HiddenField
 
 from indico.core.db.sqlalchemy.principals import PrincipalType, serialize_email_principal
-from indico.core.permissions import get_permissions_info
+from indico.core.permissions import get_available_permissions, get_permissions_info
 from indico.modules.events import Event
 from indico.modules.events.contributions.models.contributions import Contribution
 from indico.modules.events.roles.util import serialize_event_role
@@ -168,6 +168,12 @@ class PermissionsField(JSONField):
     @property
     def permissions_info(self):
         return get_permissions_info(PermissionsField.type_mapping[self.object_type])[0]
+
+    @property
+    def hidden_permissions_info(self):
+        all_permissions = get_available_permissions(PermissionsField.type_mapping[self.object_type])
+        visible_permissions = get_permissions_info(PermissionsField.type_mapping[self.object_type])[0]
+        return {k: all_permissions[k].friendly_name for k in set(all_permissions) - set(visible_permissions)}
 
     def _value(self):
         return self.data if self.data else []

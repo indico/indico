@@ -17,6 +17,8 @@ import Palette from 'indico/utils/palette';
     options: {
       objectType: null,
       permissionsInfo: null,
+      hiddenPermissions: null,
+      hiddenPermissionsInfo: null,
     },
 
     _update() {
@@ -74,7 +76,7 @@ import Palette from 'indico/utils/palette';
         'class': 'text-normal entry-label',
         'data-tooltip-text': tooltip,
       });
-      textDiv.append($('<span>', {text: text}));
+      textDiv.append($('<span>', {text}));
       textDiv.append('<br>');
       textDiv.append($('<span>', {class: 'text-not-important entry-label-extra', text: extraText}));
       return [$code, textDiv];
@@ -100,7 +102,10 @@ import Palette from 'indico/utils/palette';
       }
       const text = principal.name;
       const tooltip = extraText ? `${text} (${extraText})` : text;
-      const textDiv = $('<div>', {'class': 'text-normal entry-label', 'data-tooltip-text': tooltip});
+      const textDiv = $('<div>', {
+        'class': 'text-normal entry-label',
+        'data-tooltip-text': tooltip,
+      });
       textDiv.append($('<span>', {text}));
       if (extraText) {
         textDiv.append('<br>');
@@ -119,7 +124,7 @@ import Palette from 'indico/utils/palette';
         !_.contains(permissions, READ_ACCESS_PERMISSIONS)
       ) {
         permissions.push(READ_ACCESS_PERMISSIONS);
-        if (principal._type !== 'DefaultEntry') {
+        if (principal._type !== 'DefaultEntry' && principal._type !== 'AdditionalUsers') {
           this._updateItem(principal, permissions);
         }
       }
@@ -140,7 +145,7 @@ import Palette from 'indico/utils/palette';
           }).append(permissionInfo.title)
         );
       });
-      if (principal._type !== 'DefaultEntry') {
+      if (principal._type !== 'DefaultEntry' && principal._type !== 'AdditionalUsers') {
         $permissions.append(this._renderPermissionsButtons(principal, permissions));
       }
       return $permissions;
@@ -200,6 +205,51 @@ import Palette from 'indico/utils/palette';
       $item.append(this._renderPermissions(principal, permissions));
       $item.toggleClass(`disabled ${principal.id}`, principal._type === 'DefaultEntry');
       return $item;
+    },
+    _renderHiddenPermissions(item) {
+      const $item = $('<li>', {
+        class: 'flexrow f-a-center',
+      });
+      const [principal, description, $permissionsList] = item;
+      $permissionsList.hide();
+
+      const $dropdownButton = $('<button>', {
+        type: 'button',
+        class: 'i-button text-color borderless icon-only icon-expand hidden-permissions-icon',
+      }).on('click', () => {
+        $permissionsList.toggle();
+        $dropdownButton.toggleClass('icon-expand icon-collapse');
+      });
+      const $hiddenPermissionsDiv = $('<div>', {
+        class: 'permissions-box f-a-center f-self-stretch',
+      });
+      const $descriptionDiv = $('<div>', {class: 'flexrow f-a-center'});
+
+      $descriptionDiv.append(
+        $('<div>', {class: 'hidden-permissions-description', text: description})
+      );
+      $descriptionDiv.append($dropdownButton);
+      $hiddenPermissionsDiv.append($descriptionDiv);
+      $hiddenPermissionsDiv.append($permissionsList);
+      $item.append(this._renderLabel(principal).toggleClass(`disabled ${principal.id}`));
+      $item.append($hiddenPermissionsDiv);
+      return $item;
+    },
+    _renderHiddenPermissionsList(hiddenUserPermissions, permissionsInfo) {
+      const $list = $('<ul>', {class: 'hidden-permissions-list'});
+      hiddenUserPermissions.forEach(([user, perms]) => {
+        const permissionList = perms
+          .map(x => permissionsInfo[x])
+          .filter(x => x !== null)
+          .join(', ');
+        const $user = $('<strong />', {text: user.name});
+        const $permissions = `: ${permissionList}`;
+        const $entry = $('<li>')
+          .append($user)
+          .append($permissions);
+        $list.append($entry);
+      });
+      return $list;
     },
     _renderDropdown($dropdown) {
       $dropdown.children(':not(.default)').remove();
@@ -290,6 +340,24 @@ import Palette from 'indico/utils/palette';
         [READ_ACCESS_PERMISSIONS],
       ];
       this.$permissionsWidgetList.append(this._renderItem(anonymous));
+
+      if (this.options.hiddenPermissions.length > 0) {
+        const additionalPermissions = [
+          {
+            _type: 'AdditionalUsers',
+            name: $T.gettext('Additional users'),
+            id: 'additional',
+          },
+          $T
+            .gettext('{0} users have implicit read access due to other roles')
+            .format(this.options.hiddenPermissions.length),
+          this._renderHiddenPermissionsList(
+            this.options.hiddenPermissions,
+            this.options.hiddenPermissionsInfo
+          ),
+        ];
+        this.$permissionsWidgetList.append(this._renderHiddenPermissions(additionalPermissions));
+      }
 
       let managersTitle;
       if (this.options.objectType === 'event') {

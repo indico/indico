@@ -13,7 +13,8 @@ from flask import flash, jsonify, redirect, request
 from werkzeug.exceptions import NotFound
 
 from indico.core.db.sqlalchemy.protection import ProtectionMode, render_acl
-from indico.core.permissions import get_permissions_info, get_principal_permissions, update_permissions
+from indico.core.permissions import (get_available_permissions, get_permissions_info, get_principal_permissions,
+                                     update_permissions)
 from indico.modules.categories.models.roles import CategoryRole
 from indico.modules.categories.util import serialize_category_role
 from indico.modules.core.controllers import PrincipalsMixin
@@ -72,6 +73,13 @@ class RHEventProtection(RHManageEventBase):
 
     def _process(self):
         form = EventProtectionForm(obj=FormDefaults(**self._get_defaults()), event=self.event)
+        selectable_permissions = {k for k, v in get_available_permissions(Event).viewitems() if v.user_selectable}
+        user_permissions = [(p.principal, set(p.permissions)) for p in self.event.acl_entries]
+        form.permissions.hidden_permissions = [
+            (serialize_principal(principal), sorted(perms))
+            for principal, perms in user_permissions
+            if perms and not (perms & selectable_permissions)
+        ]
         if form.validate_on_submit():
             update_permissions(self.event, form)
             update_event_protection(self.event, {'protection_mode': form.protection_mode.data,

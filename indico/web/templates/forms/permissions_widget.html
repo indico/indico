@@ -50,7 +50,9 @@
     <script>
         $('#permissions-widget-{{ field.id }}').permissionswidget({
             objectType: {{ field.object_type|tojson }},
-            permissionsInfo: {{ field.permissions_info|tojson }}
+            permissionsInfo: {{ field.permissions_info|tojson }},
+            hiddenPermissions: {{ field.hidden_permissions|tojson }},
+            hiddenPermissionsInfo: {{ field.hidden_permissions_info|tojson }}
         });
     </script>
 {% endblock %}
