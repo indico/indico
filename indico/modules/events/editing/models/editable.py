@@ -209,5 +209,15 @@ class Editable(db.Model):
         return editable_type_settings[self.type].get(self.event, 'editing_enabled')
 
     @property
+    def state(self):
+        latest_revision = self.revisions[-1]
+        latest_state = latest_revision.final_state or latest_revision.initial_state
+        return latest_state.name
+
+    @property
     def external_timeline_url(self):
         return url_for('event_editing.editable', self, _external=True)
+
+    @property
+    def timeline_url(self):
+        return url_for('event_editing.editable', self)

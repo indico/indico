@@ -20,6 +20,8 @@ const colors = {
   accepted: 'green',
   assigned: 'purple',
   needs_submitter_changes: 'orange',
+  not_submitted: 'blue',
+  ready_for_review: 'olive',
 };
 
 const labelColors = {
@@ -29,6 +31,8 @@ const labelColors = {
   accepted: Palette.green,
   assigned: Palette.purple,
   needs_submitter_changes: Palette.orange,
+  not_submitted: Palette.blue,
+  ready_for_review: Palette.olive,
 };
 
 export default function StateIndicator({label, circular, tooltip, state}) {

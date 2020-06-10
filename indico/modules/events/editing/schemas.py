@@ -15,6 +15,7 @@ from marshmallow_enum import EnumField
 from sqlalchemy import func
 
 from indico.core.marshmallow import mm
+from indico.modules.events.contributions.models.contributions import Contribution
 from indico.modules.events.contributions.schemas import ContributionSchema
 from indico.modules.events.editing.models.comments import EditingRevisionComment
 from indico.modules.events.editing.models.editable import Editable, EditableType
@@ -156,6 +157,31 @@ class EditableSchema(mm.ModelSchema):
         lambda editable, ctx: editable.can_assign_self(ctx.get('user')))
     review_conditions_valid = fields.Boolean()
     editing_enabled = fields.Boolean()
+
+
+class EditableBasicSchema(mm.ModelSchema):
+    class Meta:
+        model = Editable
+        fields = ('id', 'type', 'state', 'editor', 'timeline_url')
+
+    state = fields.String()
+    editor = fields.Nested(UserSchema, only=('id', 'avatar_bg_color', 'full_name'))
+    timeline_url = fields.String()
+
+
+class EditingEditableListSchema(mm.ModelSchema):
+    class Meta:
+        model = Contribution
+        fields = ('id', 'friendly_id', 'title', 'code', 'editable')
+
+    editable = fields.Method('_get_editable')
+
+    def _get_editable(self, contribution):
+        editable_type = self.context['editable_type']
+        editable = contribution.get_editable(editable_type)
+        if not editable:
+            return None
+        return EditableBasicSchema().dump(editable)
 
 
 class EditingReviewAction(IndicoEnum):

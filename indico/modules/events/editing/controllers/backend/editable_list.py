@@ -10,12 +10,15 @@ from __future__ import unicode_literals
 import uuid
 
 from flask import jsonify, request, session
+from sqlalchemy.orm import joinedload
 from werkzeug.exceptions import Forbidden
 
 from indico.legacy.common.cache import GenericCache
+from indico.modules.events.contributions.models.contributions import Contribution
 from indico.modules.events.editing.controllers.base import RHEditablesBase, RHEditableTypeManagementBase
 from indico.modules.events.editing.models.editable import Editable
 from indico.modules.events.editing.operations import assign_editor, generate_editables_zip, unassign_editor
+from indico.modules.events.editing.schemas import EditingEditableListSchema
 from indico.util.i18n import _
 from indico.util.marshmallow import Principal
 from indico.web.args import use_kwargs
@@ -23,6 +26,21 @@ from indico.web.flask.util import url_for
 
 
 archive_cache = GenericCache('editables-archive')
+
+
+class RHEditableList(RHEditableTypeManagementBase):
+    """Return the list of editables of the event for a given type"""
+    def _process_args(self):
+        RHEditableTypeManagementBase._process_args(self)
+        self.contributions = (Contribution.query
+                              .with_parent(self.event)
+                              .options(joinedload('editables'))
+                              .order_by(Contribution.friendly_id)
+                              .all())
+
+    def _process(self):
+        return (EditingEditableListSchema(many=True, context={'editable_type': self.editable_type})
+                .jsonify(self.contributions))
 
 
 class RHPrepareEditablesArchive(RHEditablesBase):

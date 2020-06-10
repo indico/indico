@@ -16,6 +16,7 @@ const Palette = {
   green: '#00c851',
   purple: '#6e5494',
   orange: '#f80',
+  olive: '#b5cc18',
 };
 
 // colors for specific purposes

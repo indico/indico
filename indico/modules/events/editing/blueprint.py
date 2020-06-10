@@ -45,6 +45,8 @@ _bp.add_url_rule('/editing/api/<any(paper,slides,poster):type>/file-types', 'api
                  common.RHEditingFileTypes)
 _bp.add_url_rule('/editing/api/<any(paper,slides,poster):type>/file-types', 'api_add_file_type',
                  management.RHCreateFileType, methods=('POST',))
+_bp.add_url_rule('/editing/api/<any(paper,slides,poster):type>/list', 'api_editable_list',
+                 editable_list.RHEditableList)
 _bp.add_url_rule('/editing/api/<any(paper,slides,poster):type>/file-types/<int:file_type_id>', 'api_edit_file_type',
                  management.RHEditFileType, methods=('PATCH', 'DELETE'))
 _bp.add_url_rule('/editing/api/tags', 'api_tags', common.RHEditingTags)

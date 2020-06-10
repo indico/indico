@@ -6,11 +6,12 @@
 // LICENSE file for more details.
 
 import dashboardURL from 'indico-url:event_editing.dashboard';
-// import manageEditableTypeListURL from 'indico-url:event_editing.manage_editable_type_list'; Uncomment when we have backend ready
+import editableListURL from 'indico-url:event_editing.api_editable_list';
 
 import React, {useState} from 'react';
+import PropTypes from 'prop-types';
 import {useParams} from 'react-router-dom';
-import {Button, Icon, Checkbox, Message, Search} from 'semantic-ui-react';
+import {Button, Icon, Loader, Checkbox, Message, Search} from 'semantic-ui-react';
 import {Column, Table, SortDirection, WindowScroller} from 'react-virtualized';
 import _ from 'lodash';
 import {
@@ -20,36 +21,75 @@ import {
 } from 'indico/react/components';
 import {useNumericParam} from 'indico/react/util/routing';
 import {Translate} from 'indico/react/i18n';
+import {useIndicoAxios} from 'indico/react/hooks';
+import {userPropTypes} from '../../editing/timeline/util';
 import {EditableType} from '../../models';
 import StateIndicator from '../../editing/timeline/StateIndicator';
 
 import './EditableList.module.scss';
 
 export default function EditableList() {
-  const list = []; // Replace it with list from server
   const eventId = useNumericParam('confId');
   const {type} = useParams();
-  const [sortBy, setSortBy] = useState('id');
+  const {data, loading: isLoadingEditableList, lastData} = useIndicoAxios({
+    url: editableListURL({confId: eventId, type}),
+    camelize: true,
+    trigger: eventId,
+  });
+  const editableList = data || lastData;
+  if (isLoadingEditableList && !lastData) {
+    return <Loader inline="centered" active />;
+  } else if (!editableList) {
+    return null;
+  }
+  const codePresent = Object.values(editableList).some(c => c.code);
+  return (
+    <EditableListDisplay
+      editableList={editableList}
+      codePresent={codePresent}
+      editableType={type}
+      eventId={eventId}
+    />
+  );
+}
+
+function EditableListDisplay({editableList, codePresent, editableType, eventId}) {
+  const [sortBy, setSortBy] = useState('friendly_id');
   const [sortDirection, setSortDirection] = useState('ASC');
-  const [sortedList, setSortedList] = useState(list); // list from server
+  const [sortedList, setSortedList] = useState(editableList);
   const [checked, setChecked] = useState([]);
   const hasCheckedRows = checked.length === 0;
   const title = {
     [EditableType.paper]: Translate.string('List of papers'),
     [EditableType.slides]: Translate.string('List of slides'),
     [EditableType.poster]: Translate.string('List of posters'),
-  }[type];
+  }[editableType];
   const columnHeaders = [
-    ['id', Translate.string('ID'), 60],
-    ['code', Translate.string('Code'), 80],
+    ['friendlyId', Translate.string('ID'), 60],
+    ...(codePresent ? [['code', Translate.string('Code'), 80]] : []),
     ['title', Translate.string('Title'), 600],
-    ['status', Translate.string('Status'), 150],
-    ['assigned', Translate.string('Assigned'), 400],
+    ['status', Translate.string('Status'), 200],
+    ['editor', Translate.string('Editor'), 400],
   ];
+
+  const sortEditor = contribution =>
+    contribution.editable &&
+    contribution.editable.editor &&
+    contribution.editable.editor.fullName.toLowerCase();
+  const sortStatus = contribution =>
+    contribution.editable && contribution.editable.state.toLowerCase();
+  const sortTitle = contribution => contribution.title.toLowerCase();
+
+  const sortFuncs = {
+    title: sortTitle,
+    status: sortStatus,
+    editor: sortEditor,
+  };
 
   // eslint-disable-next-line no-shadow
   const _sortList = ({sortBy, sortDirection}) => {
-    const newList = _.sortBy(list, [sortBy]);
+    const fn = sortFuncs[sortBy] || (x => x);
+    const newList = _.sortBy(editableList, fn);
     if (sortDirection === SortDirection.DESC) {
       newList.reverse();
     }
@@ -63,17 +103,51 @@ export default function EditableList() {
     setSortedList(_sortList({sortBy, sortDirection}));
   };
 
+  const renderCode = code => code || Translate.string('n/a');
+  const renderEditor = editable => {
+    return editable && editable.editor ? (
+      <div>
+        <Icon name="user outline" />
+        {editable.editor.fullName}
+      </div>
+    ) : (
+      <div />
+    );
+  };
+  // eslint-disable-next-line no-shadow
+  const renderTitle = (title, index) => {
+    return sortedList[index].editable ? (
+      <a href={sortedList[index].editable.timelineURL}>{title}</a>
+    ) : (
+      <div>{title}</div>
+    );
+  };
+  const renderStatus = editable => {
+    return <StateIndicator state={editable ? editable.state : 'not_submitted'} circular label />;
+  };
+  const renderFuncs = {
+    title: renderTitle,
+    code: renderCode,
+    status: renderStatus,
+    editor: renderEditor,
+  };
+
   // eslint-disable-next-line react/prop-types
   const renderCell = ({dataKey, rowIndex}) => {
+    let data = sortedList[rowIndex][dataKey];
+    if (dataKey === 'status' || dataKey === 'editor') {
+      data = sortedList[rowIndex]['editable'];
+    }
+    const fn = renderFuncs[dataKey] || (x => x);
     return (
       <TooltipIfTruncated>
-        <div index={rowIndex} styleName="rowcolumn-tooltip" role="gridcell">
-          {dataKey === 'assigned' && <Icon name="user outline" />}
-          {dataKey === 'status' ? (
-            <StateIndicator index={rowIndex} state={sortedList[rowIndex][dataKey]} circular label />
-          ) : (
-            sortedList[rowIndex][dataKey]
-          )}
+        <div
+          index={rowIndex}
+          styleName="rowcolumn-tooltip"
+          role="gridcell"
+          style={dataKey === 'title' ? {display: 'block'} : {}}
+        >
+          {fn(data, rowIndex)}
         </div>
       </TooltipIfTruncated>
     );
@@ -112,7 +186,7 @@ export default function EditableList() {
           />
           <Button disabled={hasCheckedRows} content={Translate.string('Download all files')} />
         </div>
-        <Search />
+        <Search disabled={!sortedList.length} />
       </div>
       {sortedList.length ? (
         <div styleName="editable-list">
@@ -175,3 +249,24 @@ export default function EditableList() {
     </>
   );
 }
+
+EditableListDisplay.propTypes = {
+  editableList: PropTypes.arrayOf(
+    PropTypes.shape({
+      id: PropTypes.number.isRequired,
+      friendlyId: PropTypes.number.isRequired,
+      title: PropTypes.string.isRequired,
+      code: PropTypes.string.isRequired,
+      editable: PropTypes.shape({
+        id: PropTypes.number,
+        editor: PropTypes.shape(userPropTypes),
+        state: PropTypes.string,
+        type: PropTypes.oneOf(Object.values(EditableType)),
+        timelineURL: PropTypes.string,
+      }),
+    })
+  ).isRequired,
+  codePresent: PropTypes.bool.isRequired,
+  editableType: PropTypes.oneOf(Object.values(EditableType)).isRequired,
+  eventId: PropTypes.number.isRequired,
+};

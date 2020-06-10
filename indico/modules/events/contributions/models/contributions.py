@@ -564,6 +564,10 @@ class Contribution(DescriptionMixin, ProtectionManagersMixin, LocationMixin, Att
         # Otherwise only users with submission rights are authorized
         return self.can_manage(user, 'submit', allow_admin=False, check_parent=False)
 
+    def get_editable(self, editable_type):
+        """Get the editable of the given type."""
+        return next((e for e in self.editables if e.type == editable_type), None)
+
 
 Contribution.register_protection_events()
 
