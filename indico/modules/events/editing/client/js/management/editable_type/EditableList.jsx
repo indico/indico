@@ -7,6 +7,7 @@
 
 import dashboardURL from 'indico-url:event_editing.dashboard';
 import editableListURL from 'indico-url:event_editing.api_editable_list';
+import editablesArchiveURL from 'indico-url:event_editing.api_prepare_editables_archive';
 
 import React, {useState} from 'react';
 import PropTypes from 'prop-types';
@@ -22,6 +23,7 @@ import {
 import {useNumericParam} from 'indico/react/util/routing';
 import {Translate} from 'indico/react/i18n';
 import {useIndicoAxios} from 'indico/react/hooks';
+import {indicoAxios, handleAxiosError} from 'indico/utils/axios';
 import {userPropTypes} from '../../editing/timeline/util';
 import {EditableType} from '../../models';
 import StateIndicator from '../../editing/timeline/StateIndicator';
@@ -174,6 +176,21 @@ function EditableListDisplay({editableList, codePresent, editableType, eventId})
     }
   };
 
+  const downloadAllFiles = async () => {
+    let response;
+    try {
+      response = await indicoAxios.post(
+        editablesArchiveURL({confId: eventId, type: editableType}),
+        {editables: checked}
+      );
+    } catch (error) {
+      handleAxiosError(error);
+      return;
+    }
+
+    location.href = response.data.download_url;
+  };
+
   return (
     <>
       <ManagementPageSubTitle title={title} />
@@ -191,6 +208,7 @@ function EditableListDisplay({editableList, codePresent, editableType, eventId})
           <Button
             disabled={!hasCheckedEditables}
             content={Translate.string('Download all files')}
+            onClick={downloadAllFiles}
           />
         </div>
         <Search disabled={!sortedList.length} />
