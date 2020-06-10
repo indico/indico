@@ -68,6 +68,7 @@ function EditableListDisplay({editableList, codePresent, editableType, eventId})
     ['friendlyId', Translate.string('ID'), 60],
     ...(codePresent ? [['code', Translate.string('Code'), 80]] : []),
     ['title', Translate.string('Title'), 600],
+    ['revision', Translate.string('Rev.'), 80],
     ['status', Translate.string('Status'), 200],
     ['editor', Translate.string('Editor'), 400],
   ];
@@ -82,6 +83,7 @@ function EditableListDisplay({editableList, codePresent, editableType, eventId})
 
   const sortFuncs = {
     title: sortTitle,
+    revision: contribution => contribution.editable && contribution.editable.revisionCount,
     status: sortStatus,
     editor: sortEditor,
   };
@@ -128,6 +130,7 @@ function EditableListDisplay({editableList, codePresent, editableType, eventId})
   const renderFuncs = {
     title: renderTitle,
     code: renderCode,
+    revision: editable => (editable ? editable.revisionCount : ''),
     status: renderStatus,
     editor: renderEditor,
   };
@@ -135,8 +138,8 @@ function EditableListDisplay({editableList, codePresent, editableType, eventId})
   // eslint-disable-next-line react/prop-types
   const renderCell = ({dataKey, rowIndex}) => {
     let data = sortedList[rowIndex][dataKey];
-    if (dataKey === 'status' || dataKey === 'editor') {
-      data = sortedList[rowIndex]['editable'];
+    if (['editor', 'revision', 'status'].includes(dataKey)) {
+      data = sortedList[rowIndex].editable;
     }
     const fn = renderFuncs[dataKey] || (x => x);
     return (

@@ -169,7 +169,7 @@ class EditableSchema(mm.ModelSchema):
 class EditableBasicSchema(mm.ModelSchema):
     class Meta:
         model = Editable
-        fields = ('id', 'type', 'state', 'editor', 'timeline_url')
+        fields = ('id', 'type', 'state', 'editor', 'timeline_url', 'revision_count')
 
     state = EnumField(EditableState)
     editor = fields.Nested(UserSchema, only=('id', 'avatar_bg_color', 'full_name'))

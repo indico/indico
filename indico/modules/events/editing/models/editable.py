@@ -258,3 +258,9 @@ def _mappers_configured():
              .limit(1)
              .correlate_except(EditingRevision))
     Editable.state = column_property(query)
+
+    # Editable.revision_count -- the number of revisions the editable has
+    query = (select([db.func.count(EditingRevision.id)])
+             .where(EditingRevision.editable_id == Editable.id)
+             .correlate_except(EditingRevision))
+    Editable.revision_count = column_property(query)
