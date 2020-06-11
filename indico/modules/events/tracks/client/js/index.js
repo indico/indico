@@ -40,8 +40,9 @@
     const heightLimit = 50;
     $('#track-list-container')
       .on('indico:htmlUpdated', function() {
-        const $this = $(this);
-        $this.find('.track-list .track-content').each(function() {
+        const $container = $(this);
+        $container.find('.track-list .track-content').each(function() {
+          const $this = $(this);
           if ($this.height() > heightLimit) {
             $this.addClass('track-content-collapsed track-content-collapsible');
             $this.on('click', function() {
@@ -50,7 +51,7 @@
           }
         });
 
-        $this.find('.track-list').sortable({
+        $container.find('.track-list').sortable({
           items: '.track-row',
           handle: '.ui-i-box-sortable-handle',
           axis: 'y',
