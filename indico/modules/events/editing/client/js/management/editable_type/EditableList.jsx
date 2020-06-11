@@ -41,12 +41,12 @@ export default function EditableList() {
   const {data: editableList, loading: isLoadingEditableList} = useIndicoAxios({
     url: editableListURL({confId: eventId, type}),
     camelize: true,
-    trigger: eventId,
+    trigger: [eventId, type],
   });
   const {data: editors, loading: isLoadingEditors} = useIndicoAxios({
     url: editorsURL({confId: eventId, type}),
     camelize: true,
-    trigger: eventId,
+    trigger: [eventId, type],
   });
   if (isLoadingEditableList || isLoadingEditors) {
     return <Loader inline="centered" active />;
