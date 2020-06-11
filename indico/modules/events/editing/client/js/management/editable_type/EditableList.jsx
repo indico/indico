@@ -5,14 +5,18 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-import dashboardURL from 'indico-url:event_editing.dashboard';
+import editableTypeURL from 'indico-url:event_editing.manage_editable_type';
+import editorsURL from 'indico-url:event_editing.api_editable_type_editors';
 import editableListURL from 'indico-url:event_editing.api_editable_list';
 import editablesArchiveURL from 'indico-url:event_editing.api_prepare_editables_archive';
+import assignEditorURL from 'indico-url:event_editing.api_assign_editor';
+import assignSelfEditorURL from 'indico-url:event_editing.api_assign_myself';
+import unassignEditorURL from 'indico-url:event_editing.api_unassign_editor';
 
-import React, {useState} from 'react';
+import React, {useState, useMemo} from 'react';
 import PropTypes from 'prop-types';
 import {useParams} from 'react-router-dom';
-import {Button, Icon, Loader, Checkbox, Message, Search} from 'semantic-ui-react';
+import {Button, Icon, Loader, Checkbox, Message, Search, Dropdown} from 'semantic-ui-react';
 import {Column, Table, SortDirection, WindowScroller} from 'react-virtualized';
 import _ from 'lodash';
 import {
@@ -24,6 +28,7 @@ import {useNumericParam} from 'indico/react/util/routing';
 import {Translate} from 'indico/react/i18n';
 import {useIndicoAxios} from 'indico/react/hooks';
 import {indicoAxios, handleAxiosError} from 'indico/utils/axios';
+import {camelizeKeys} from 'indico/utils/case';
 import {userPropTypes} from '../../editing/timeline/util';
 import {EditableType} from '../../models';
 import StateIndicator from '../../editing/timeline/StateIndicator';
@@ -33,15 +38,19 @@ import './EditableList.module.scss';
 export default function EditableList() {
   const eventId = useNumericParam('confId');
   const {type} = useParams();
-  const {data, loading: isLoadingEditableList, lastData} = useIndicoAxios({
+  const {data: editableList, loading: isLoadingEditableList} = useIndicoAxios({
     url: editableListURL({confId: eventId, type}),
     camelize: true,
     trigger: eventId,
   });
-  const editableList = data || lastData;
-  if (isLoadingEditableList && !lastData) {
+  const {data: editors, loading: isLoadingEditors} = useIndicoAxios({
+    url: editorsURL({confId: eventId, type}),
+    camelize: true,
+    trigger: eventId,
+  });
+  if (isLoadingEditableList || isLoadingEditors) {
     return <Loader inline="centered" active />;
-  } else if (!editableList) {
+  } else if (!editableList || !editors) {
     return null;
   }
   const codePresent = Object.values(editableList).some(c => c.code);
@@ -51,22 +60,46 @@ export default function EditableList() {
       codePresent={codePresent}
       editableType={type}
       eventId={eventId}
+      editors={editors}
     />
   );
 }
 
-function EditableListDisplay({editableList, codePresent, editableType, eventId}) {
+function EditableListDisplay({
+  editableList: origEditableList,
+  codePresent,
+  editableType,
+  eventId,
+  editors,
+}) {
   const [sortBy, setSortBy] = useState('friendly_id');
   const [sortDirection, setSortDirection] = useState('ASC');
+  const [editableList, setEditableList] = useState(origEditableList);
   const [sortedList, setSortedList] = useState(editableList);
   const [checked, setChecked] = useState([]);
-  const editables = sortedList.filter(x => x.editable);
+  const editables = editableList.filter(x => x.editable);
   const hasCheckedEditables = checked.length > 0;
+  const checkedSet = new Set(checked);
+  const checkedEditables = editables.filter(x => checkedSet.has(x.editable.id));
+  const [activeRequest, setActiveRequest] = useState(null);
+
+  const editorOptions = useMemo(
+    () =>
+      _.sortBy(editors, 'fullName').map(e => ({
+        key: e.identifier,
+        icon: 'user',
+        text: e.fullName,
+        value: e.identifier,
+      })),
+    [editors]
+  );
+
   const title = {
     [EditableType.paper]: Translate.string('List of papers'),
     [EditableType.slides]: Translate.string('List of slides'),
     [EditableType.poster]: Translate.string('List of posters'),
   }[editableType];
+
   const columnHeaders = [
     ['friendlyId', Translate.string('ID'), 60],
     ...(codePresent ? [['code', Translate.string('Code'), 80]] : []),
@@ -92,7 +125,7 @@ function EditableListDisplay({editableList, codePresent, editableType, eventId})
   };
 
   // eslint-disable-next-line no-shadow
-  const _sortList = ({sortBy, sortDirection}) => {
+  const _sortList = (sortBy, sortDirection) => {
     const fn = sortFuncs[sortBy] || (x => x);
     const newList = _.sortBy(editableList, fn);
     if (sortDirection === SortDirection.DESC) {
@@ -105,7 +138,19 @@ function EditableListDisplay({editableList, codePresent, editableType, eventId})
   const _sort = ({sortBy, sortDirection}) => {
     setSortBy(sortBy);
     setSortDirection(sortDirection);
-    setSortedList(_sortList({sortBy, sortDirection}));
+    setSortedList(_sortList(sortBy, sortDirection));
+  };
+
+  const patchList = updatedEditables => {
+    updatedEditables = new Map(updatedEditables.map(x => [x.id, x]));
+    const _mapper = contrib => {
+      if (!contrib.editable || !updatedEditables.has(contrib.editable.id)) {
+        return contrib;
+      }
+      return {...contrib, editable: updatedEditables.get(contrib.editable.id)};
+    };
+    setEditableList(list => list.map(_mapper));
+    setSortedList(list => list.map(_mapper));
   };
 
   const renderCode = code => code || Translate.string('n/a');
@@ -176,19 +221,53 @@ function EditableListDisplay({editableList, codePresent, editableType, eventId})
     }
   };
 
-  const downloadAllFiles = async () => {
+  const checkedEditablesRequest = async (urlFunc, data = {}) => {
     let response;
     try {
-      response = await indicoAxios.post(
-        editablesArchiveURL({confId: eventId, type: editableType}),
-        {editables: checked}
-      );
+      response = await indicoAxios.post(urlFunc({confId: eventId, type: editableType}), {
+        editables: checked,
+        ...data,
+      });
     } catch (error) {
       handleAxiosError(error);
-      return;
+      return null;
+    } finally {
+      setActiveRequest(null);
     }
 
-    location.href = response.data.download_url;
+    return camelizeKeys(response.data);
+  };
+
+  const downloadAllFiles = async () => {
+    setActiveRequest('download');
+    const rv = await checkedEditablesRequest(editablesArchiveURL);
+    if (rv) {
+      location.href = rv.downloadURL;
+    }
+  };
+
+  const assignEditor = async editor => {
+    setActiveRequest('assign');
+    const rv = await checkedEditablesRequest(assignEditorURL, {editor});
+    if (rv) {
+      patchList(rv);
+    }
+  };
+
+  const assignSelfEditor = async () => {
+    setActiveRequest('assign-self');
+    const rv = await checkedEditablesRequest(assignSelfEditorURL);
+    if (rv) {
+      patchList(rv);
+    }
+  };
+
+  const unassignEditor = async () => {
+    setActiveRequest('unassign');
+    const rv = await checkedEditablesRequest(unassignEditorURL);
+    if (rv) {
+      patchList(rv);
+    }
   };
 
   return (
@@ -197,18 +276,43 @@ function EditableListDisplay({editableList, codePresent, editableType, eventId})
       <ManagementPageBackButton url={editableTypeURL({confId: eventId, type: editableType})} />
       <div styleName="editable-topbar">
         <div>
-          <Button disabled={!hasCheckedEditables} content={Translate.string('Assign')} />
-          <Button disabled={!hasCheckedEditables} content={Translate.string('Unassign')} />
-          <Button disabled={!hasCheckedEditables} content={Translate.string('Set status')} />
+          <Button.Group>
+            <Dropdown
+              disabled={!hasCheckedEditables || !editors.length || !!activeRequest}
+              options={editorOptions}
+              icon={null}
+              value={null}
+              selectOnBlur={false}
+              selectOnNavigation={false}
+              onChange={(evt, {value}) => {
+                assignEditor(value);
+              }}
+              trigger={
+                <Button icon loading={activeRequest === 'assign'}>
+                  <Translate>Assign</Translate>
+                  <Icon name="caret down" />
+                </Button>
+              }
+            />
+            <Button
+              disabled={!hasCheckedEditables || !!activeRequest}
+              color="blue"
+              content={Translate.string('Assign to myself')}
+              onClick={assignSelfEditor}
+              loading={activeRequest === 'assign-self'}
+            />
+            <Button
+              disabled={!checkedEditables.some(x => x.editable.editor) || !!activeRequest}
+              content={Translate.string('Unassign')}
+              onClick={unassignEditor}
+              loading={activeRequest === 'unassign'}
+            />
+          </Button.Group>{' '}
           <Button
-            disabled={!hasCheckedEditables}
-            color="blue"
-            content={Translate.string('Assign to myself')}
-          />
-          <Button
-            disabled={!hasCheckedEditables}
+            disabled={!hasCheckedEditables || !!activeRequest}
             content={Translate.string('Download all files')}
             onClick={downloadAllFiles}
+            loading={activeRequest === 'download'}
           />
         </div>
         <Search disabled={!sortedList.length} />
@@ -242,11 +346,12 @@ function EditableListDisplay({editableList, codePresent, editableType, eventId})
                       indeterminate={checked.length > 0 && checked.length < editables.length}
                       checked={checked.length === editables.length}
                       onChange={(e, data) => toggleSelectAll(data.checked)}
+                      disabled={!!activeRequest}
                     />
                   )}
                   cellRenderer={({rowIndex}) => (
                     <Checkbox
-                      disabled={!sortedList[rowIndex].editable}
+                      disabled={!sortedList[rowIndex].editable || !!activeRequest}
                       checked={
                         sortedList[rowIndex].editable
                           ? checked.includes(sortedList[rowIndex].editable.id)
@@ -296,6 +401,7 @@ EditableListDisplay.propTypes = {
       }),
     })
   ).isRequired,
+  editors: PropTypes.arrayOf(PropTypes.shape(userPropTypes)).isRequired,
   codePresent: PropTypes.bool.isRequired,
   editableType: PropTypes.oneOf(Object.values(EditableType)).isRequired,
   eventId: PropTypes.number.isRequired,

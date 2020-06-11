@@ -10,6 +10,7 @@ import PropTypes from 'prop-types';
 import {filePropTypes} from './FileManager/util';
 
 export const userPropTypes = {
+  identifier: PropTypes.string.isRequired,
   fullName: PropTypes.string.isRequired,
   avatarBgColor: PropTypes.string.isRequired,
   id: PropTypes.number.isRequired,

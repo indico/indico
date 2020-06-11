@@ -21,8 +21,9 @@ from indico.modules.events.editing.operations import (create_new_file_type, crea
                                                       update_file_type, update_review_condition, update_tag)
 from indico.modules.events.editing.schemas import (EditableFileTypeArgs, EditableTagArgs, EditableTypeArgs,
                                                    EditableTypePrincipalsSchema, EditingFileTypeSchema,
-                                                   EditingReviewConditionArgs, EditingTagSchema)
+                                                   EditingReviewConditionArgs, EditingTagSchema, EditingUserSchema)
 from indico.modules.events.editing.settings import editable_type_settings, editing_settings
+from indico.modules.events.editing.util import get_editors
 from indico.modules.events.logs import EventLogKind, EventLogRealm
 from indico.util.i18n import _, orig_string
 from indico.web.args import use_kwargs, use_rh_args, use_rh_kwargs
@@ -189,6 +190,12 @@ class RHEditableTypePrincipals(RHEditableTypeManagementBase):
         for p in old_principals - principals:
             self.event.update_principal(p, del_permissions={permission_name})
         return '', 204
+
+
+class RHEditableTypeEditors(RHEditableTypeManagementBase):
+    def _process(self):
+        users = get_editors(self.event, self.editable_type)
+        return EditingUserSchema(many=True).jsonify(users)
 
 
 class RHEditableSetSubmission(RHEditableTypeManagementBase):

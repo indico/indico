@@ -18,7 +18,7 @@ from indico.modules.events.contributions.models.contributions import Contributio
 from indico.modules.events.editing.controllers.base import RHEditablesBase, RHEditableTypeManagementBase
 from indico.modules.events.editing.models.editable import Editable
 from indico.modules.events.editing.operations import assign_editor, generate_editables_zip, unassign_editor
-from indico.modules.events.editing.schemas import EditingEditableListSchema
+from indico.modules.events.editing.schemas import EditableBasicSchema, EditingEditableListSchema
 from indico.util.i18n import _
 from indico.util.marshmallow import Principal
 from indico.web.args import use_kwargs
@@ -72,9 +72,10 @@ class RHAssignEditor(RHEditablesBase):
         self.editor = editor
 
     def _process(self):
-        for editable in self.editables:
+        editables = [e for e in self.editables if e.editor != self.editor]
+        for editable in editables:
             assign_editor(editable, self.editor)
-        return '', 204
+        return EditableBasicSchema(many=True).jsonify(editables)
 
 
 class RHAssignMyselfAsEditor(RHEditablesBase):
@@ -85,13 +86,15 @@ class RHAssignMyselfAsEditor(RHEditablesBase):
             raise Forbidden(_('You are not an editor of the {} type').format(self.editable_type.name))
 
     def _process(self):
-        for editable in self.editables:
+        editables = [e for e in self.editables if e.editor != session.user]
+        for editable in editables:
             assign_editor(editable, session.user)
-        return '', 204
+        return EditableBasicSchema(many=True).jsonify(editables)
 
 
 class RHUnassignEditor(RHEditablesBase):
     def _process(self):
-        for editable in self.editables:
+        editables = [e for e in self.editables if e.editor]
+        for editable in editables:
             unassign_editor(editable)
-        return '', 204
+        return EditableBasicSchema(many=True).jsonify(editables)
