@@ -194,7 +194,7 @@ function EditableListDisplay({editableList, codePresent, editableType, eventId})
   return (
     <>
       <ManagementPageSubTitle title={title} />
-      <ManagementPageBackButton url={dashboardURL({confId: eventId})} />
+      <ManagementPageBackButton url={editableTypeURL({confId: eventId, type: editableType})} />
       <div styleName="editable-topbar">
         <div>
           <Button disabled={!hasCheckedEditables} content={Translate.string('Assign')} />
