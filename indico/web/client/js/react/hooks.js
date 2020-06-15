@@ -103,11 +103,11 @@ FavoritesProvider.propTypes = {
   children: PropTypes.func.isRequired,
 };
 
-export function useIndicoAxios({camelize, unHandledErrors, ...args}) {
+export function useIndicoAxios({camelize, unhandledErrors = [], ...args}) {
   const lastData = useRef(null);
   const {response, error, loading, reFetch} = useAxios({
     customHandler: err =>
-      err && !unHandledErrors.includes(err.response.status) && handleAxiosError(err),
+      err && !unhandledErrors.includes(err.response.status) && handleAxiosError(err),
     ...args,
     axios: indicoAxios,
   });

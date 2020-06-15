@@ -49,19 +49,19 @@ import PublicationSwitch from './PublicationSwitch';
 
     let lastRevFiles;
     if (tasks[1].status === 'fulfilled') {
-      const paperInfo = camelizeKeys(tasks[1].value.data);
-      if (paperInfo.lastRevision) {
-        lastRevFiles = paperInfo.lastRevision.files;
+      const {isInFinalState, lastRevision} = camelizeKeys(tasks[1].value.data);
+      if (isInFinalState && lastRevision) {
+        lastRevFiles = lastRevision.files;
       }
     }
 
     ReactDOM.render(
       <EditableSubmissionButton
         fileTypes={fileTypes}
-        eventId={eventId}
-        contributionId={contributionId}
+        eventId={Number(eventId)}
+        contributionId={Number(contributionId)}
         contributionCode={contributionCode}
-        existingFiles={lastRevFiles}
+        uploadableFiles={lastRevFiles}
       />,
       editableSubmissionButton
     );

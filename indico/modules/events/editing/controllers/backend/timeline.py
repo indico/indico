@@ -39,22 +39,24 @@ from indico.web.flask.util import send_file
 
 
 class RHEditingUploadFile(UploadFileMixin, RHContributionEditableBase):
+    EDITABLE_REQUIRED = False
+
     def get_file_context(self):
         return 'event', self.event.id, 'editing', self.contrib.id, self.editable_type.name
 
 
-class RHEditingUploadFromLastRevision(RHEditingUploadFile):
+class RHEditingUploadPaperLastRevision(RHEditingUploadFile):
     @use_kwargs({
         'id': fields.Int()
     })
     def _process(self, id):
         last_rev = self.contrib.paper.get_last_revision()
         if last_rev:
-            found = next(f for f in last_rev.files if f.id == id)
+            found = next((f for f in last_rev.files if f.id == id), None)
             if found:
                 with found.open() as stream:
                     return self._save_file(found, stream)
-        raise UserValueError(_('No such file was found in the previous revision'))
+        raise UserValueError(_('No such file was found within the paper'))
 
 
 class RHContributionEditableRevisionBase(RHContributionEditableBase):
@@ -99,8 +101,6 @@ class RHEditable(RHContributionEditableBase):
 
     def _check_access(self):
         RHContributionEditableBase._check_access(self)
-        if not self.editable:
-            raise NotFound(_('There is no editable for this contribution yet.'))
         if not self.editable.can_see_timeline(session.user):
             raise Forbidden
 
@@ -110,6 +110,8 @@ class RHEditable(RHContributionEditableBase):
 
 class RHCreateEditable(RHContributionEditableBase):
     """Create a new Editable for a contribution."""
+
+    EDITABLE_REQUIRED = False
 
     def _check_access(self):
         RHContributionEditableBase._check_access(self)

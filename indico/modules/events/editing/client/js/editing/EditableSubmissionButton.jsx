@@ -8,7 +8,7 @@
 import editableURL from 'indico-url:event_editing.editable';
 import submitRevisionURL from 'indico-url:event_editing.api_create_editable';
 import apiUploadURL from 'indico-url:event_editing.api_upload';
-import apiUploadExistingURL from 'indico-url:event_editing.api_upload_last_revision';
+import apiUploadExistingURL from 'indico-url:event_editing.api_add_paper_file';
 
 import _ from 'lodash';
 import React, {useState} from 'react';
@@ -31,7 +31,7 @@ export default function EditableSubmissionButton({
   contributionId,
   contributionCode,
   fileTypes,
-  existingFiles,
+  uploadableFiles,
 }) {
   const [currentType, setCurrentType] = useState(null);
   const submitRevision = async formData => {
@@ -89,7 +89,7 @@ export default function EditableSubmissionButton({
                       contrib_id: contributionId,
                       type: currentType,
                     })}
-                    existingFiles={existingFiles}
+                    uploadableFiles={uploadableFiles}
                     mustChange
                   />
                 </Form>
@@ -131,12 +131,12 @@ export default function EditableSubmissionButton({
 
 EditableSubmissionButton.propTypes = {
   fileTypes: PropTypes.objectOf(PropTypes.arrayOf(PropTypes.shape(fileTypePropTypes))).isRequired,
-  eventId: PropTypes.string.isRequired,
-  contributionId: PropTypes.string.isRequired,
+  eventId: PropTypes.number.isRequired,
+  contributionId: PropTypes.number.isRequired,
   contributionCode: PropTypes.string.isRequired,
-  existingFiles: PropTypes.arrayOf(PropTypes.shape(uploadablePropTypes)),
+  uploadableFiles: PropTypes.arrayOf(PropTypes.shape(uploadablePropTypes)),
 };
 
 EditableSubmissionButton.defaultProps = {
-  existingFiles: [],
+  uploadableFiles: [],
 };

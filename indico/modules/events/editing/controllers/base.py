@@ -8,7 +8,7 @@
 from __future__ import unicode_literals
 
 from flask import request, session
-from werkzeug.exceptions import Unauthorized
+from werkzeug.exceptions import NotFound, Unauthorized
 
 from indico.modules.events.contributions.controllers.display import RHContributionDisplayBase
 from indico.modules.events.controllers.base import RHDisplayEventBase
@@ -80,6 +80,7 @@ class RHContributionEditableBase(RequireUserMixin, RHContributionDisplayBase):
     """Base class for operations on an editable."""
 
     EVENT_FEATURE = 'editing'
+    EDITABLE_REQUIRED = True
 
     normalize_url_spec = {
         'locators': {
@@ -102,6 +103,8 @@ class RHContributionEditableBase(RequireUserMixin, RHContributionDisplayBase):
                          .filter_by(type=self.editable_type)
                          .options(*self._editable_query_options)
                          .first())
+        if self.editable is None and self.EDITABLE_REQUIRED:
+            raise NotFound
 
 
 class RHEditablesBase(RHEditingManagementBase):

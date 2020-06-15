@@ -17,14 +17,16 @@ import {useIndicoAxios} from 'indico/react/hooks';
 import EditableSubmissionButton from 'indico/modules/events/editing/editing/EditableSubmissionButton';
 import {EditableType} from 'indico/modules/events/editing/models';
 import {Translate} from 'indico/react/i18n';
-import {fileTypePropTypes} from 'indico/modules/events/editing/editing/timeline/FileManager/util';
+import {
+  fileTypePropTypes,
+  uploadablePropTypes,
+} from 'indico/modules/events/editing/editing/timeline/FileManager/util';
 import TimelineHeader from './TimelineHeader';
 import {fetchPaperDetails} from '../actions';
 import {getPaperDetails, isFetchingInitialPaperDetails} from '../selectors';
 import PaperDecisionForm from './PaperDecisionForm';
 import PaperContent from './PaperContent';
 import TimelineItem from './TimelineItem';
-import {PaperState} from '../models';
 
 export default function Paper({eventId, contributionId}) {
   const dispatch = useDispatch();
@@ -38,7 +40,7 @@ export default function Paper({eventId, contributionId}) {
   const {data: editable} = useIndicoAxios({
     url: editableURL({confId: eventId, contrib_id: contributionId, type: 'paper'}),
     trigger: [eventId, contributionId],
-    unHandledErrors: [404],
+    unhandledErrors: [404],
     camelize: true,
   });
 
@@ -57,6 +59,7 @@ export default function Paper({eventId, contributionId}) {
     lastRevision: {submitter, files},
     revisions,
     state,
+    isInFinalState,
   } = paper;
 
   return (
@@ -70,10 +73,10 @@ export default function Paper({eventId, contributionId}) {
         <PaperContent />
       </TimelineHeader>
       <PaperSteps
-        isAccepted={state.name === PaperState.accepted}
+        isAccepted={isInFinalState}
         hasEditable={!!editable}
         fileTypes={fileTypes}
-        existingFiles={files}
+        uploadableFiles={files}
       />
       <TimelineContent itemComponent={TimelineItem} blocks={revisions} />
       <PaperDecisionForm />
@@ -86,7 +89,7 @@ Paper.propTypes = {
   contributionId: PropTypes.number.isRequired,
 };
 
-function PaperSteps({isAccepted, hasEditable, fileTypes, existingFiles}) {
+function PaperSteps({isAccepted, hasEditable, fileTypes, uploadableFiles}) {
   const {event, contribution} = useSelector(getPaperDetails);
 
   return (
@@ -94,7 +97,7 @@ function PaperSteps({isAccepted, hasEditable, fileTypes, existingFiles}) {
       <Step completed={isAccepted}>
         <Step.Content>
           <Step.Title>Peer Reviewing</Step.Title>
-          <Step.Description style={{marginBottom: '0'}}>
+          <Step.Description style={{marginBottom: 0}}>
             {isAccepted ? (
               <Translate>The paper was accepted</Translate>
             ) : (
@@ -116,7 +119,7 @@ function PaperSteps({isAccepted, hasEditable, fileTypes, existingFiles}) {
                 contributionId={contribution.id}
                 contributionCode={contribution.code}
                 fileTypes={{[EditableType.paper]: fileTypes}}
-                existingFiles={existingFiles}
+                uploadableFiles={uploadableFiles}
               />
             )}
           </Step.Title>
@@ -130,9 +133,9 @@ PaperSteps.propTypes = {
   isAccepted: PropTypes.bool.isRequired,
   hasEditable: PropTypes.bool.isRequired,
   fileTypes: PropTypes.arrayOf(PropTypes.shape(fileTypePropTypes)).isRequired,
-  existingFiles: PropTypes.any,
+  uploadableFiles: PropTypes.arrayOf(PropTypes.shape(uploadablePropTypes)),
 };
 
 PaperSteps.defaultProps = {
-  existingFiles: [],
+  uploadableFiles: [],
 };
