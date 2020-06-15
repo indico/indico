@@ -20,7 +20,7 @@ import {indicoAxios} from 'indico/utils/axios';
 import {FinalSubmitButton, handleSubmitError} from 'indico/react/forms';
 import {Param, Translate} from 'indico/react/i18n';
 
-import {fileTypePropTypes} from 'indico/modules/events/editing/editing/timeline/FileManager/util';
+import {fileTypePropTypes, uploadablePropTypes} from './timeline/FileManager/util';
 import {FinalFileManager} from './timeline/FileManager';
 
 import {getFileTypes} from './timeline/selectors';
@@ -134,7 +134,7 @@ EditableSubmissionButton.propTypes = {
   eventId: PropTypes.string.isRequired,
   contributionId: PropTypes.string.isRequired,
   contributionCode: PropTypes.string.isRequired,
-  existingFiles: PropTypes.any, // TODO: derive a props shape from fileTypePropTypes
+  existingFiles: PropTypes.arrayOf(PropTypes.shape(uploadablePropTypes)),
 };
 
 EditableSubmissionButton.defaultProps = {

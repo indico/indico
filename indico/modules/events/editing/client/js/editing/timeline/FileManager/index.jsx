@@ -18,10 +18,11 @@ import {Param, Translate} from 'indico/react/i18n';
 import {
   FileManagerContext,
   filePropTypes,
+  uploadablePropTypes,
   fileTypePropTypes,
   uploadFiles,
   uploadFile,
-  uploadAny,
+  uploadAnExistingFile,
   deleteFile,
   mapFileTypes,
 } from './util';
@@ -35,7 +36,8 @@ import './FileManager.module.scss';
 
 export function Dropzone({
   uploadURL,
-  fileType: {id, allowMultipleFiles, files, extensions, filenameTemplate},
+  fileType: {id, allowMultipleFiles, extensions, filenameTemplate},
+  files,
 }) {
   const dispatch = useContext(FileManagerContext);
   // we only want to modify the existing file if we do not allow multiple files and
@@ -110,9 +112,22 @@ export function Dropzone({
 Dropzone.propTypes = {
   uploadURL: PropTypes.string.isRequired,
   fileType: PropTypes.shape(fileTypePropTypes).isRequired,
+  files: PropTypes.arrayOf(PropTypes.shape(filePropTypes)),
 };
 
-function FileType({uploadURL, uploadExistingURL, fileType, uploads, dispatch, existingFiles}) {
+Dropzone.defaultProps = {
+  files: [],
+};
+
+function FileType({
+  uploadURL,
+  uploadExistingURL,
+  fileType,
+  files,
+  uploads,
+  dispatch,
+  uploadableFiles,
+}) {
   const ref = useRef(null);
   return (
     <div styleName="file-type">
@@ -138,7 +153,7 @@ function FileType({uploadURL, uploadExistingURL, fileType, uploads, dispatch, ex
             : Translate.string('(no extension restrictions)')}
         </ul>
       </TooltipIfTruncated>
-      <FileList files={fileType.files} fileType={fileType} uploadURL={uploadURL} />
+      <FileList files={files} fileType={fileType} uploadURL={uploadURL} />
       {!_.isEmpty(uploads) && <Uploads uploads={uploads} />}
       {!_.isEmpty(fileType.invalidFiles) && (
         <div style={{paddingBottom: '1em'}}>
@@ -166,19 +181,20 @@ function FileType({uploadURL, uploadExistingURL, fileType, uploads, dispatch, ex
           ))}
         </div>
       )}
-      <Dropzone dropzoneRef={ref} fileType={fileType} uploadURL={uploadURL} />
-      {existingFiles && existingFiles.length > 0 && (
+      <Dropzone dropzoneRef={ref} fileType={fileType} files={files} uploadURL={uploadURL} />
+      {uploadableFiles && uploadableFiles.length > 0 && (
         <Dropdown
           className="primary"
           style={{marginTop: '1em'}}
           text={Translate.string('Use an existing file')}
-          options={existingFiles.map((f, i) => ({text: f.filename, value: i}))}
+          options={uploadableFiles.map((f, i) => ({text: f.filename, value: i}))}
           onChange={(__, {value}) =>
             uploadFiles(
               actions.markUploaded,
               fileType.id,
-              [existingFiles[value]],
-              uploadAny.bind(null, uploadExistingURL),
+              // Use a fake file handle to seamlessly refer to an existing uploadable
+              [new File([], uploadableFiles[value].filename)],
+              uploadAnExistingFile.bind(null, uploadExistingURL, uploadableFiles[value]),
               dispatch
             )
           }
@@ -193,8 +209,9 @@ function FileType({uploadURL, uploadExistingURL, fileType, uploads, dispatch, ex
 
 FileType.propTypes = {
   uploadURL: PropTypes.string.isRequired,
-  uploadExistingURL: PropTypes.string.isRequired,
+  uploadExistingURL: PropTypes.string,
   fileType: PropTypes.shape(fileTypePropTypes).isRequired,
+  files: PropTypes.arrayOf(PropTypes.shape(filePropTypes)),
   uploads: PropTypes.objectOf(
     PropTypes.shape({
       file: PropTypes.object.isRequired,
@@ -202,12 +219,14 @@ FileType.propTypes = {
     })
   ),
   dispatch: PropTypes.func.isRequired,
-  existingFiles: PropTypes.any,
+  uploadableFiles: PropTypes.arrayOf(PropTypes.shape(uploadablePropTypes)),
 };
 
 FileType.defaultProps = {
+  files: [],
   uploads: {},
-  existingFiles: [],
+  uploadableFiles: [],
+  uploadExistingURL: null,
 };
 
 export default function FileManager({
@@ -219,10 +238,14 @@ export default function FileManager({
   finalFieldName,
   pristine,
   mustChange,
-  existingFiles,
+  uploadableFiles,
 }) {
   const lastPristineRef = useRef(pristine);
-  const _fileTypes = useMemo(() => mapFileTypes(fileTypes, files), [fileTypes, files]);
+  const _fileTypes = useMemo(() => mapFileTypes(fileTypes, files, uploadableFiles), [
+    fileTypes,
+    files,
+    uploadableFiles,
+  ]);
   const [state, dispatch] = useReducer(reducer, {
     fileTypes: _fileTypes,
     uploads: {},
@@ -264,11 +287,10 @@ export default function FileManager({
               uploadURL={uploadURL}
               uploadExistingURL={uploadExistingURL}
               fileType={fileType}
+              files={fileType.files}
               uploads={state.uploads[fileType.id]}
               dispatch={dispatch}
-              existingFiles={existingFiles.filter(file =>
-                fileType.extensions.includes(file.filename.split('.').pop())
-              )}
+              uploadableFiles={fileType.uploadableFiles}
             />
           ))}
         </FileManagerContext.Provider>
@@ -307,7 +329,7 @@ FileManager.propTypes = {
   finalFieldName: PropTypes.string,
   pristine: PropTypes.bool,
   mustChange: PropTypes.bool,
-  existingFiles: PropTypes.any,
+  uploadableFiles: PropTypes.arrayOf(PropTypes.shape(uploadablePropTypes)),
 };
 
 FileManager.defaultProps = {
@@ -316,7 +338,7 @@ FileManager.defaultProps = {
   finalFieldName: null,
   pristine: null,
   mustChange: false,
-  existingFiles: [],
+  uploadableFiles: [],
 };
 
 export function FinalFileManager({
@@ -324,8 +346,9 @@ export function FinalFileManager({
   uploadURL,
   uploadExistingURL,
   fileTypes,
+  files,
   mustChange,
-  existingFiles,
+  uploadableFiles,
   ...rest
 }) {
   // We do not use FinalField here since the file manager is more "standalone"
@@ -339,10 +362,10 @@ export function FinalFileManager({
           uploadExistingURL={uploadExistingURL}
           fileTypes={fileTypes}
           finalFieldName={input.name}
-          files={rest.files}
+          files={files}
           pristine={pristine}
           mustChange={mustChange}
-          existingFiles={existingFiles}
+          uploadableFiles={uploadableFiles}
         />
       )}
     </Field>
@@ -354,12 +377,14 @@ FinalFileManager.propTypes = {
   uploadURL: PropTypes.string.isRequired,
   uploadExistingURL: PropTypes.string,
   fileTypes: PropTypes.arrayOf(PropTypes.shape(fileTypePropTypes)).isRequired,
+  files: PropTypes.arrayOf(PropTypes.shape(filePropTypes)),
   mustChange: PropTypes.bool,
-  existingFiles: PropTypes.any,
+  uploadableFiles: PropTypes.arrayOf(PropTypes.shape(uploadablePropTypes)),
 };
 
 FinalFileManager.defaultProps = {
   uploadExistingURL: null,
   mustChange: false,
-  existingFiles: [],
+  files: [],
+  uploadableFiles: [],
 };

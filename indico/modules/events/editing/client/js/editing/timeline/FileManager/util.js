@@ -17,7 +17,6 @@ import {getFiles} from './selectors';
 
 export const FileManagerContext = React.createContext(null);
 
-// TODO: refactor this props to be re-used as a generic file
 export const filePropTypes = {
   filename: PropTypes.string.isRequired,
   downloadURL: PropTypes.string,
@@ -26,10 +25,14 @@ export const filePropTypes = {
   state: PropTypes.oneOf(['added', 'modified', 'deleted']),
 };
 
-// TODO: refactor this props since files isn't always needed
+export const uploadablePropTypes = {
+  filename: PropTypes.string.isRequired,
+  downloadURL: PropTypes.string,
+  id: PropTypes.number,
+};
+
 export const fileTypePropTypes = {
   name: PropTypes.string.isRequired,
-  files: PropTypes.arrayOf(PropTypes.shape(filePropTypes)),
   extensions: PropTypes.arrayOf(PropTypes.string).isRequired,
   allowMultipleFiles: PropTypes.bool.isRequired,
   id: PropTypes.number.isRequired,
@@ -51,10 +54,9 @@ export async function uploadFile(url, file, onUploadProgress) {
   }
 }
 
-export async function uploadAny(url, obj) {
-  // TODO: needs a new name, perhaps merge with with the top method
+export async function uploadAnExistingFile(url, file) {
   try {
-    const {data} = await indicoAxios.post(url, snakifyKeys(obj));
+    const {data} = await indicoAxios.post(url, snakifyKeys(file));
     return data;
   } catch (e) {
     handleAxiosError(e);
@@ -68,7 +70,7 @@ export async function uploadAny(url, obj) {
  * @param {Function} action - the action to be executed after upload is done
  * @param {String} fileTypeId - the id of the File Type
  * @param {Array} acceptedFiles - the "accepted files" array sent by react-dropzone
- * @param {String} uploadCallback - the function to be called on file upload
+ * @param {Function} uploadCallback - the function to be called on file upload
  * @param {Function} dispatch - the dispatch function for reducer actions
  * @param {String?} fileId - the ID of the file to modify, if any
  * @param {Function} onError - the function to be called on file upload error
@@ -122,11 +124,14 @@ export async function deleteFile(uuid) {
   }
 }
 
-export function mapFileTypes(fileTypes, files) {
+export function mapFileTypes(fileTypes, files, uploadableFiles = []) {
   return fileTypes.map(fileType => ({
     ...fileType,
     files: files.filter(file => file.fileType === fileType.id).map(f => ({...f, claimed: true})),
     invalidFiles: [],
+    uploadableFiles: uploadableFiles.filter(file =>
+      fileType.extensions.includes(file.filename.split('.').pop())
+    ),
   }));
 }
 

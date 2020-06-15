@@ -172,6 +172,7 @@ describe('File manager', () => {
         ...fileTypes[i],
         files: fileList.filter(f => f.fileType === i + 1),
         invalidFiles: [],
+        uploadableFiles: [],
       });
       expect(node.prop('uploads')).toEqual({});
     });
