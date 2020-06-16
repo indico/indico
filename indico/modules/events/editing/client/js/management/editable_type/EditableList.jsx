@@ -56,7 +56,7 @@ export default function EditableList() {
   const codePresent = Object.values(editableList).some(c => c.code);
   return (
     <EditableListDisplay
-      editableList={editableList}
+      initialEditableList={editableList}
       codePresent={codePresent}
       editableType={type}
       eventId={eventId}
@@ -65,16 +65,10 @@ export default function EditableList() {
   );
 }
 
-function EditableListDisplay({
-  editableList: origEditableList,
-  codePresent,
-  editableType,
-  eventId,
-  editors,
-}) {
+function EditableListDisplay({initialEditableList, codePresent, editableType, eventId, editors}) {
   const [sortBy, setSortBy] = useState('friendly_id');
   const [sortDirection, setSortDirection] = useState('ASC');
-  const [editableList, setEditableList] = useState(origEditableList);
+  const [editableList, setEditableList] = useState(initialEditableList);
   const [sortedList, setSortedList] = useState(editableList);
   const [checked, setChecked] = useState([]);
   const editables = editableList.filter(x => x.editable);
@@ -246,28 +240,24 @@ function EditableListDisplay({
     }
   };
 
-  const assignEditor = async editor => {
-    setActiveRequest('assign');
-    const rv = await checkedEditablesRequest(assignEditorURL, {editor});
+  const updateCheckedEditablesRequest = async (type, urlFunc, data = {}) => {
+    setActiveRequest(type);
+    const rv = await checkedEditablesRequest(urlFunc, data);
     if (rv) {
       patchList(rv);
     }
   };
 
-  const assignSelfEditor = async () => {
-    setActiveRequest('assign-self');
-    const rv = await checkedEditablesRequest(assignSelfEditorURL);
-    if (rv) {
-      patchList(rv);
-    }
+  const assignEditor = editor => {
+    updateCheckedEditablesRequest('assign', assignEditorURL, {editor});
+  };
+
+  const assignSelfEditor = () => {
+    updateCheckedEditablesRequest('assign-self', assignSelfEditorURL);
   };
 
   const unassignEditor = async () => {
-    setActiveRequest('unassign');
-    const rv = await checkedEditablesRequest(unassignEditorURL);
-    if (rv) {
-      patchList(rv);
-    }
+    updateCheckedEditablesRequest('unassign', unassignEditorURL);
   };
 
   return (
@@ -284,9 +274,7 @@ function EditableListDisplay({
               value={null}
               selectOnBlur={false}
               selectOnNavigation={false}
-              onChange={(evt, {value}) => {
-                assignEditor(value);
-              }}
+              onChange={(evt, {value}) => assignEditor(value)}
               trigger={
                 <Button icon loading={activeRequest === 'assign'}>
                   <Translate>Assign</Translate>
@@ -386,7 +374,7 @@ function EditableListDisplay({
 }
 
 EditableListDisplay.propTypes = {
-  editableList: PropTypes.arrayOf(
+  initialEditableList: PropTypes.arrayOf(
     PropTypes.shape({
       id: PropTypes.number.isRequired,
       friendlyId: PropTypes.number.isRequired,
