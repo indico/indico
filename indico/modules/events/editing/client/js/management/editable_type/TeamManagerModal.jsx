@@ -66,7 +66,6 @@ export default function TeamManager({editableType, onClose}) {
                 <Message>
                   <FinalPrincipalList
                     name="principals"
-                    withGroups
                     withEventRoles
                     withCategoryRoles
                     favoriteUsersController={favoriteUsersController}

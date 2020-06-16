@@ -332,4 +332,4 @@ class EditableTypePrincipalsSchema(mm.Schema):
     class Meta:
         rh_context = ('event',)
 
-    principals = PrincipalList(many=True, allow_groups=True, allow_event_roles=True, allow_category_roles=True)
+    principals = PrincipalList(many=True, allow_event_roles=True, allow_category_roles=True)
