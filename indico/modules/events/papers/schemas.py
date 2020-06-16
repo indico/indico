@@ -14,6 +14,8 @@ from marshmallow_enum import EnumField
 
 from indico.core.marshmallow import mm
 from indico.modules.events.contributions.schemas import ContributionSchema
+from indico.modules.events.editing.models.editable import EditableType
+from indico.modules.events.editing.settings import editable_type_settings
 from indico.modules.events.models.events import Event
 from indico.modules.events.papers.models.comments import PaperReviewComment
 from indico.modules.events.papers.models.files import PaperFile
@@ -192,6 +194,10 @@ class PaperSchema(mm.Schema):
     can_judge = Function(lambda paper, ctx: paper.can_judge(ctx.get('user')))
     can_comment = Function(lambda paper, ctx: paper.can_comment(ctx.get('user'), check_state=True))
     can_review = Function(lambda paper, ctx: paper.can_review(ctx.get('user')))
+    can_submit_proceedings = Function(lambda paper, ctx: paper.contribution.can_submit_proceedings(ctx.get('user')))
+    editing_enabled = Function(
+        lambda paper, : editable_type_settings[EditableType.paper].get(paper.event, 'editing_enabled')
+    )
 
 
 paper_schema = PaperSchema()

@@ -8,7 +8,7 @@
 import React, {useEffect} from 'react';
 import PropTypes from 'prop-types';
 import {useDispatch, useSelector} from 'react-redux';
-import {Loader, Step} from 'semantic-ui-react';
+import {Icon, Loader, Step} from 'semantic-ui-react';
 
 import fileTypesURL from 'indico-url:event_editing.api_file_types';
 import editableURL from 'indico-url:event_editing.api_editable';
@@ -27,6 +27,7 @@ import {getPaperDetails, isFetchingInitialPaperDetails} from '../selectors';
 import PaperDecisionForm from './PaperDecisionForm';
 import PaperContent from './PaperContent';
 import TimelineItem from './TimelineItem';
+import {PaperState} from '../models';
 
 export default function Paper({eventId, contributionId}) {
   const dispatch = useDispatch();
@@ -60,6 +61,8 @@ export default function Paper({eventId, contributionId}) {
     revisions,
     state,
     isInFinalState,
+    canSubmitProceedings,
+    editingEnabled,
   } = paper;
 
   return (
@@ -72,12 +75,15 @@ export default function Paper({eventId, contributionId}) {
       >
         <PaperContent />
       </TimelineHeader>
-      <PaperSteps
-        isAccepted={isInFinalState}
-        hasEditable={!!editable}
-        fileTypes={fileTypes}
-        uploadableFiles={files}
-      />
+      {canSubmitProceedings && editingEnabled && (
+        <PaperSteps
+          isInFinalState={isInFinalState}
+          isRejected={state.name === PaperState.rejected}
+          hasEditable={!!editable}
+          fileTypes={fileTypes}
+          uploadableFiles={files}
+        />
+      )}
       <TimelineContent itemComponent={TimelineItem} blocks={revisions} />
       <PaperDecisionForm />
     </>
@@ -89,30 +95,30 @@ Paper.propTypes = {
   contributionId: PropTypes.number.isRequired,
 };
 
-function PaperSteps({isAccepted, hasEditable, fileTypes, uploadableFiles}) {
+function PaperSteps({isInFinalState, isRejected, hasEditable, fileTypes, uploadableFiles}) {
   const {event, contribution} = useSelector(getPaperDetails);
 
   return (
-    <Step.Group ordered fluid>
-      <Step completed={isAccepted}>
+    <Step.Group fluid>
+      <Step active={!isInFinalState} completed={isInFinalState}>
+        <Icon name="copy outline" />
         <Step.Content>
           <Step.Title>Peer Reviewing</Step.Title>
           <Step.Description style={{marginBottom: 0}}>
-            {isAccepted ? (
-              <Translate>The paper was accepted</Translate>
+            {isInFinalState ? (
+              <Translate>The paper was reviewed</Translate>
             ) : (
               <Translate>Your paper is under review</Translate>
             )}
           </Step.Description>
         </Step.Content>
       </Step>
-      <Step completed={hasEditable}>
+      <Step active={isInFinalState} completed={hasEditable} disabled={isRejected}>
+        <Icon name="pencil alternate" />
         <Step.Content>
           <Step.Title>
-            {hasEditable || !isAccepted ? ( // TODO: editing not enabled
-              <p>
-                <Translate>Submit for Editing</Translate>
-              </p>
+            {hasEditable || !isInFinalState || isRejected ? (
+              <Translate>Submit for Editing</Translate>
             ) : (
               <EditableSubmissionButton
                 eventId={event.id}
@@ -130,7 +136,8 @@ function PaperSteps({isAccepted, hasEditable, fileTypes, uploadableFiles}) {
 }
 
 PaperSteps.propTypes = {
-  isAccepted: PropTypes.bool.isRequired,
+  isInFinalState: PropTypes.bool.isRequired,
+  isRejected: PropTypes.bool.isRequired,
   hasEditable: PropTypes.bool.isRequired,
   fileTypes: PropTypes.arrayOf(PropTypes.shape(fileTypePropTypes)).isRequired,
   uploadableFiles: PropTypes.arrayOf(PropTypes.shape(uploadablePropTypes)),
