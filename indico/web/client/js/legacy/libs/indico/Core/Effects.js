@@ -15,20 +15,20 @@ IndicoUI.Effect = {
       var eloffset = $(this).data('original-offset');
       var windowpos = $(window).scrollTop();
       if (windowpos > eloffset.top) {
-        if (!$(this).hasClass('scrolling')) {
+        if (!$(this).hasClass('sticky-scrolling')) {
           $(this).data({
             'original-left': $(this).css('left'),
             'original-width': $(this).css('width'),
           });
           $(this).css('width', $(this).width());
           $(this).css('left', eloffset.left);
-          $(this).addClass('scrolling');
+          $(this).addClass('sticky-scrolling');
         }
       } else {
-        if ($(this).hasClass('scrolling')) {
+        if ($(this).hasClass('sticky-scrolling')) {
           $(this).css('left', $(this).data('original-left'));
           $(this).css('width', $(this).data('original-width'));
-          $(this).removeClass('scrolling');
+          $(this).removeClass('sticky-scrolling');
         }
       }
     });

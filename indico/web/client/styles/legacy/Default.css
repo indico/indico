@@ -654,7 +654,7 @@ body.cke_show_borders {
   color: red;
 }
 
-.scrolling {
+.sticky-scrolling {
   background-color: #fff;
   box-shadow: 0 12px 6px -6px rgba(0, 0, 0, 0.2);
   position: fixed;

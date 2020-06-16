@@ -190,10 +190,10 @@
         }
 
         if (windowpos > eloffset.top) {
-          elem.addClass('scrolling');
+          elem.addClass('sticky-scrolling');
           return false;
         } else {
-          elem.removeClass('scrolling');
+          elem.removeClass('sticky-scrolling');
           return true;
         }
       };

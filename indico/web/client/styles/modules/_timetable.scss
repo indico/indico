@@ -68,7 +68,7 @@
   z-index: 1;
   box-sizing: initial;
 
-  &.scrolling {
+  &.sticky-scrolling {
     @include single-box-shadow();
     position: fixed;
     top: 1px;
