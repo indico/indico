@@ -21,6 +21,7 @@
             {% endif %}
         </div>
 
+        {{ template_hook('before-registration-summary', registration=registration) }}
         {{ render_registration_summary(registration, from_management=True) }}
         {% call render_invoice(registration, payment_enabled) %}
             <table class="regform-done-footer registration-info">
