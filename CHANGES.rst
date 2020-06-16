@@ -99,7 +99,7 @@ Internal Changes
 - Add ``registration_form_edited`` signal (:issue:`4421`, thanks :user:`omegak`)
 - Make PyIntEnum freeze enums in Alembic revisions (:issue:`4425`, thanks
   :user:`omegak`)
-- Add ``before-registration-summary`` template hook (:issue:`....`, thanks
+- Add ``before-registration-summary`` template hook (:issue:`4495`, thanks
   :user:`omegak`)
 
 
