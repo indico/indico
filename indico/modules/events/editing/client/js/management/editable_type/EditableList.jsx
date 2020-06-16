@@ -270,6 +270,7 @@ function EditableListDisplay({initialEditableList, codePresent, editableType, ev
             <Dropdown
               disabled={!hasCheckedEditables || !editors.length || !!activeRequest}
               options={editorOptions}
+              scrolling
               icon={null}
               value={null}
               selectOnBlur={false}
