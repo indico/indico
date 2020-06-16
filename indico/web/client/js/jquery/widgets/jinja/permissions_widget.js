@@ -237,12 +237,12 @@ import Palette from 'indico/utils/palette';
     },
     _renderHiddenPermissionsList(hiddenUserPermissions, permissionsInfo) {
       const $list = $('<ul>', {class: 'hidden-permissions-list'});
-      hiddenUserPermissions.forEach(([user, perms]) => {
+      hiddenUserPermissions.forEach(([name, perms]) => {
         const permissionList = perms
           .map(x => permissionsInfo[x])
           .filter(x => x !== null)
           .join(', ');
-        const $user = $('<strong />', {text: user.name});
+        const $user = $('<strong />', {text: name});
         const $permissions = `: ${permissionList}`;
         const $entry = $('<li>')
           .append($user)
@@ -349,7 +349,11 @@ import Palette from 'indico/utils/palette';
             id: 'additional',
           },
           $T
-            .gettext('{0} users have implicit read access due to other roles')
+            .ngettext(
+              '{0} user has implicit read access due to other roles',
+              '{0} users have implicit read access due to other roles',
+              this.options.hiddenPermissions.length
+            )
             .format(this.options.hiddenPermissions.length),
           this._renderHiddenPermissionsList(
             this.options.hiddenPermissions,
