@@ -16,7 +16,7 @@ import unassignEditorURL from 'indico-url:event_editing.api_unassign_editor';
 import React, {useState, useMemo} from 'react';
 import PropTypes from 'prop-types';
 import {useParams} from 'react-router-dom';
-import {Button, Icon, Loader, Checkbox, Message, Search, Dropdown} from 'semantic-ui-react';
+import {Button, Icon, Input, Loader, Checkbox, Message, Dropdown} from 'semantic-ui-react';
 import {Column, Table, SortDirection, WindowScroller} from 'react-virtualized';
 import _ from 'lodash';
 import {
@@ -29,6 +29,7 @@ import {Translate} from 'indico/react/i18n';
 import {useIndicoAxios} from 'indico/react/hooks';
 import {indicoAxios, handleAxiosError} from 'indico/utils/axios';
 import {camelizeKeys} from 'indico/utils/case';
+import Palette from 'indico/utils/palette';
 import {userPropTypes} from '../../editing/timeline/util';
 import {EditableType} from '../../models';
 import StateIndicator from '../../editing/timeline/StateIndicator';
@@ -38,7 +39,7 @@ import './EditableList.module.scss';
 export default function EditableList() {
   const eventId = useNumericParam('confId');
   const {type} = useParams();
-  const {data: editableList, loading: isLoadingEditableList} = useIndicoAxios({
+  const {data: contribList, loading: isLoadingContribList} = useIndicoAxios({
     url: editableListURL({confId: eventId, type}),
     camelize: true,
     trigger: [eventId, type],
@@ -48,15 +49,15 @@ export default function EditableList() {
     camelize: true,
     trigger: [eventId, type],
   });
-  if (isLoadingEditableList || isLoadingEditors) {
+  if (isLoadingContribList || isLoadingEditors) {
     return <Loader inline="centered" active />;
-  } else if (!editableList || !editors) {
+  } else if (!contribList || !editors) {
     return null;
   }
-  const codePresent = Object.values(editableList).some(c => c.code);
+  const codePresent = Object.values(contribList).some(c => c.code);
   return (
     <EditableListDisplay
-      initialEditableList={editableList}
+      initialContribList={contribList}
       codePresent={codePresent}
       editableType={type}
       eventId={eventId}
@@ -65,16 +66,23 @@ export default function EditableList() {
   );
 }
 
-function EditableListDisplay({initialEditableList, codePresent, editableType, eventId, editors}) {
+function EditableListDisplay({initialContribList, codePresent, editableType, eventId, editors}) {
   const [sortBy, setSortBy] = useState('friendly_id');
   const [sortDirection, setSortDirection] = useState('ASC');
-  const [editableList, setEditableList] = useState(initialEditableList);
-  const [sortedList, setSortedList] = useState(editableList);
+
+  const [contribList, setContribList] = useState(initialContribList);
+  const [sortedList, setSortedList] = useState(contribList);
+  const contribsWithEditables = contribList.filter(x => x.editable);
+  const contribIdSet = new Set(contribsWithEditables.map(x => x.id));
+  const [filteredSet, setFilteredSet] = useState(new Set(contribList.map(e => e.id)));
+  const [searchValue, setSearchValue] = useState('');
+
   const [checked, setChecked] = useState([]);
-  const editables = editableList.filter(x => x.editable);
-  const hasCheckedEditables = checked.length > 0;
+  const hasCheckedContribs = checked.length > 0;
   const checkedSet = new Set(checked);
-  const checkedEditables = editables.filter(x => checkedSet.has(x.editable.id));
+  const checkedContribsWithEditables = contribsWithEditables.filter(x =>
+    checkedSet.has(x.editable.id)
+  );
   const [activeRequest, setActiveRequest] = useState(null);
 
   const editorOptions = useMemo(
@@ -119,20 +127,22 @@ function EditableListDisplay({initialEditableList, codePresent, editableType, ev
   };
 
   // eslint-disable-next-line no-shadow
-  const _sortList = (sortBy, sortDirection) => {
+  const _sortList = (sortBy, sortDirection, filteredResults) => {
     const fn = sortFuncs[sortBy] || (x => x);
-    const newList = _.sortBy(editableList, fn);
+    const newList = _.sortBy(contribList, fn);
     if (sortDirection === SortDirection.DESC) {
       newList.reverse();
     }
-    return newList;
+    const matching = newList.filter(e => filteredResults.has(e.id));
+    const notMatching = newList.filter(e => !filteredResults.has(e.id));
+    return [...matching, ...notMatching];
   };
 
   // eslint-disable-next-line no-shadow
   const _sort = ({sortBy, sortDirection}) => {
     setSortBy(sortBy);
     setSortDirection(sortDirection);
-    setSortedList(_sortList(sortBy, sortDirection));
+    setSortedList(_sortList(sortBy, sortDirection, filteredSet));
   };
 
   const patchList = updatedEditables => {
@@ -143,8 +153,38 @@ function EditableListDisplay({initialEditableList, codePresent, editableType, ev
       }
       return {...contrib, editable: updatedEditables.get(contrib.editable.id)};
     };
-    setEditableList(list => list.map(_mapper));
+    setContribList(list => list.map(_mapper));
     setSortedList(list => list.map(_mapper));
+  };
+
+  const setFilter = value => {
+    setSearchValue(value);
+    value = value.toLowerCase().trim();
+
+    const isMatch = result => {
+      if (!value) {
+        return true;
+      }
+      const match = value.match(/^#(\d+)$/);
+      if (match) {
+        return result.friendlyId === +match[1];
+      }
+      return (
+        result.title.toLowerCase().includes(value) ||
+        (result.editable &&
+          result.editable.editor &&
+          result.editable.editor.fullName.toLowerCase().includes(value)) ||
+        (result.code && result.code.toLowerCase().includes(value))
+      );
+    };
+    const filteredResults = new Set(contribList.filter(isMatch).map(e => e.id));
+    setFilteredSet(filteredResults);
+    setSortedList(_sortList(sortBy, sortDirection, filteredResults));
+    setChecked(
+      contribsWithEditables
+        .filter(row => checked.includes(row.editable.id) && filteredResults.has(row.id))
+        .map(row => row.editable.id)
+    );
   };
 
   const renderCode = code => code || Translate.string('n/a');
@@ -166,8 +206,15 @@ function EditableListDisplay({initialEditableList, codePresent, editableType, ev
       <div>{title}</div>
     );
   };
-  const renderStatus = editable => {
-    return <StateIndicator state={editable ? editable.state : 'not_submitted'} circular label />;
+  const renderStatus = (editable, rowIndex) => {
+    return (
+      <StateIndicator
+        state={editable ? editable.state : 'not_submitted'}
+        circular
+        label
+        monochrome={!filteredSet.has(sortedList[rowIndex].id)}
+      />
+    );
   };
   const renderFuncs = {
     title: renderTitle,
@@ -200,7 +247,9 @@ function EditableListDisplay({initialEditableList, codePresent, editableType, ev
 
   const toggleSelectAll = dataChecked => {
     if (dataChecked) {
-      setChecked(editables.map(row => row.editable.id));
+      setChecked(
+        contribsWithEditables.filter(row => filteredSet.has(row.id)).map(row => row.editable.id)
+      );
     } else {
       setChecked([]);
     }
@@ -268,7 +317,7 @@ function EditableListDisplay({initialEditableList, codePresent, editableType, ev
         <div>
           <Button.Group>
             <Dropdown
-              disabled={!hasCheckedEditables || !editors.length || !!activeRequest}
+              disabled={!hasCheckedContribs || !editors.length || !!activeRequest}
               options={editorOptions}
               scrolling
               icon={null}
@@ -284,27 +333,41 @@ function EditableListDisplay({initialEditableList, codePresent, editableType, ev
               }
             />
             <Button
-              disabled={!hasCheckedEditables || !!activeRequest}
+              disabled={!hasCheckedContribs || !!activeRequest}
               color="blue"
               content={Translate.string('Assign to myself')}
               onClick={assignSelfEditor}
               loading={activeRequest === 'assign-self'}
             />
             <Button
-              disabled={!checkedEditables.some(x => x.editable.editor) || !!activeRequest}
+              disabled={
+                !checkedContribsWithEditables.some(x => x.editable.editor) || !!activeRequest
+              }
               content={Translate.string('Unassign')}
               onClick={unassignEditor}
               loading={activeRequest === 'unassign'}
             />
           </Button.Group>{' '}
           <Button
-            disabled={!hasCheckedEditables || !!activeRequest}
+            disabled={!hasCheckedContribs || !!activeRequest}
             content={Translate.string('Download all files')}
             onClick={downloadAllFiles}
             loading={activeRequest === 'download'}
           />
         </div>
-        <Search disabled={!sortedList.length} />
+        <Input
+          placeholder={Translate.string('Search')}
+          onChange={(evt, {value}) => setFilter(value)}
+          value={searchValue}
+          icon={
+            <Icon
+              name="close"
+              link
+              onClick={() => setFilter('')}
+              style={searchValue ? {} : {display: 'none'}}
+            />
+          }
+        />
       </div>
       {sortedList.length ? (
         <div styleName="editable-list">
@@ -325,6 +388,11 @@ function EditableListDisplay({initialEditableList, codePresent, editableType, ev
                 rowCount={sortedList.length}
                 scrollTop={scrollTop}
                 rowGetter={({index}) => sortedList[index]}
+                rowStyle={({index}) =>
+                  index !== -1 && !filteredSet.has(sortedList[index].id)
+                    ? {backgroundColor: Palette.pastelGray, opacity: '60%'}
+                    : {}
+                }
               >
                 <Column
                   disableSort
@@ -332,24 +400,32 @@ function EditableListDisplay({initialEditableList, codePresent, editableType, ev
                   width={30}
                   headerRenderer={() => (
                     <Checkbox
-                      indeterminate={checked.length > 0 && checked.length < editables.length}
-                      checked={checked.length === editables.length}
+                      indeterminate={
+                        checked.length > 0 &&
+                        checked.length < [...filteredSet].filter(x => contribIdSet.has(x)).length
+                      }
+                      checked={
+                        checked.length > 0 &&
+                        checked.length === [...filteredSet].filter(x => contribIdSet.has(x)).length
+                      }
                       onChange={(e, data) => toggleSelectAll(data.checked)}
                       disabled={!!activeRequest}
                     />
                   )}
-                  cellRenderer={({rowIndex}) => (
-                    <Checkbox
-                      disabled={!sortedList[rowIndex].editable || !!activeRequest}
-                      checked={
-                        sortedList[rowIndex].editable
-                          ? checked.includes(sortedList[rowIndex].editable.id)
-                          : false
-                      }
-                      onChange={(e, data) => toggleSelectRow(data.index)}
-                      index={rowIndex}
-                    />
-                  )}
+                  cellRenderer={({rowIndex}) =>
+                    sortedList[rowIndex].editable && (
+                      <Checkbox
+                        disabled={!!activeRequest || !filteredSet.has(sortedList[rowIndex].id)}
+                        checked={
+                          sortedList[rowIndex].editable
+                            ? checked.includes(sortedList[rowIndex].editable.id)
+                            : false
+                        }
+                        onChange={(e, data) => toggleSelectRow(data.index)}
+                        index={rowIndex}
+                      />
+                    )
+                  }
                 />
                 {columnHeaders.map(([key, label, width, extraProps]) => (
                   <Column
@@ -375,7 +451,7 @@ function EditableListDisplay({initialEditableList, codePresent, editableType, ev
 }
 
 EditableListDisplay.propTypes = {
-  initialEditableList: PropTypes.arrayOf(
+  initialContribList: PropTypes.arrayOf(
     PropTypes.shape({
       id: PropTypes.number.isRequired,
       friendlyId: PropTypes.number.isRequired,

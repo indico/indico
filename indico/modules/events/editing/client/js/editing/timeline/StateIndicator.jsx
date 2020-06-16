@@ -25,7 +25,7 @@ const colors = {
 };
 
 const labelColors = {
-  replaced: Palette.grey,
+  replaced: Palette.gray,
   needs_submitter_confirmation: Palette.yellow,
   rejected: Palette.red,
   accepted: Palette.green,
@@ -35,8 +35,10 @@ const labelColors = {
   ready_for_review: Palette.olive,
 };
 
-export default function StateIndicator({label, circular, tooltip, state}) {
-  const trigger = <Label size="tiny" color={colors[state]} circular={circular} />;
+export default function StateIndicator({label, circular, tooltip, state, monochrome}) {
+  const trigger = (
+    <Label size="tiny" color={monochrome ? 'grey' : colors[state]} circular={circular} />
+  );
 
   return (
     <>
@@ -48,7 +50,7 @@ export default function StateIndicator({label, circular, tooltip, state}) {
         disabled={!tooltip}
       />
       {label && (
-        <div styleName="label-text" style={{color: labelColors[state]}}>
+        <div styleName="label-text" style={{color: monochrome ? Palette.gray : labelColors[state]}}>
           {EditableStatus[state]}
         </div>
       )}
@@ -61,10 +63,12 @@ StateIndicator.propTypes = {
   circular: PropTypes.bool,
   tooltip: PropTypes.string,
   state: PropTypes.oneOf(Object.keys(colors)).isRequired,
+  monochrome: PropTypes.bool,
 };
 
 StateIndicator.defaultProps = {
   label: false,
   circular: false,
   tooltip: null,
+  monochrome: false,
 };
