@@ -33,23 +33,27 @@ import PublicationSwitch from './PublicationSwitch';
     const availableTypes = JSON.parse(editableSubmissionButton.dataset.availableTypes);
     const {eventId, contributionId, contributionCode} = editableSubmissionButton.dataset;
 
-    const tasks = await Promise.allSettled([
-      Promise.all(
-        availableTypes.map(type => indicoAxios.get(fileTypesURL({confId: eventId, type})))
-      ),
-      indicoAxios.get(paperInfoURL({confId: eventId, contrib_id: contributionId})),
-    ]);
-    if (tasks[0].status === 'rejected') {
-      handleAxiosError(tasks[0].reason);
+    let responses, lastRevFiles;
+    try {
+      responses = await Promise.all([
+        Promise.all(
+          availableTypes.map(type => indicoAxios.get(fileTypesURL({confId: eventId, type})))
+        ),
+        indicoAxios
+          .get(paperInfoURL({confId: eventId, contrib_id: contributionId}))
+          // eslint-disable-next-line no-unused-vars
+          .catch(e => undefined),
+      ]);
+    } catch (e) {
+      handleAxiosError(e);
       return;
     }
     const fileTypes = _.fromPairs(
-      tasks[0].value.map((response, index) => [availableTypes[index], camelizeKeys(response.data)])
+      responses[0].map((response, index) => [availableTypes[index], camelizeKeys(response.data)])
     );
 
-    let lastRevFiles;
-    if (tasks[1].status === 'fulfilled') {
-      const {isInFinalState, lastRevision} = camelizeKeys(tasks[1].value.data);
+    if (responses[1]) {
+      const {isInFinalState, lastRevision} = camelizeKeys(responses[1].data);
       if (isInFinalState && lastRevision) {
         lastRevFiles = lastRevision.files;
       }

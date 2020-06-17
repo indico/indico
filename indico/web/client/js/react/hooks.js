@@ -107,7 +107,9 @@ export function useIndicoAxios({camelize, unhandledErrors = [], ...args}) {
   const lastData = useRef(null);
   const {response, error, loading, reFetch} = useAxios({
     customHandler: err =>
-      err && !unhandledErrors.includes(err.response.status) && handleAxiosError(err),
+      err &&
+      (!err.response || !unhandledErrors.includes(err.response.status)) &&
+      handleAxiosError(err),
     ...args,
     axios: indicoAxios,
   });

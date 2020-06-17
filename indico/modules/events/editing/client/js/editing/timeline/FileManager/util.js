@@ -72,8 +72,9 @@ export async function uploadAnExistingFile(url, file) {
  * @param {Array} acceptedFiles - the "accepted files" array sent by react-dropzone
  * @param {Function} uploadCallback - the function to be called on file upload
  * @param {Function} dispatch - the dispatch function for reducer actions
- * @param {String?} fileId - the ID of the file to modify, if any
+ * @param {String?} replaceFileId - the ID of the file to modify, if any
  * @param {Function} onError - the function to be called on file upload error
+ * @param {Number} fileId - the id of the file, if any, used to cross-reference uploadables
  */
 export function uploadFiles(
   action,
@@ -81,8 +82,9 @@ export function uploadFiles(
   acceptedFiles,
   uploadCallback,
   dispatch,
-  fileId = null,
-  onError = null
+  replaceFileId = null,
+  onError = null,
+  fileId = null
 ) {
   const tmpFileIds = acceptedFiles.map(() => _.uniqueId(_.now()));
 
@@ -103,8 +105,9 @@ export function uploadFiles(
         return null;
       } else {
         dispatch(
-          action(fileTypeId, fileId, tmpFileId, {
+          action(fileTypeId, replaceFileId, tmpFileId, {
             filename: uploadedFile.filename,
+            id: fileId,
             uuid: uploadedFile.uuid,
             claimed: false,
             fileType: fileTypeId,

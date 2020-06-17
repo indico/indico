@@ -196,7 +196,7 @@ class PaperSchema(mm.Schema):
     can_review = Function(lambda paper, ctx: paper.can_review(ctx.get('user')))
     can_submit_proceedings = Function(lambda paper, ctx: paper.contribution.can_submit_proceedings(ctx.get('user')))
     editing_enabled = Function(
-        lambda paper, : editable_type_settings[EditableType.paper].get(paper.event, 'editing_enabled')
+        lambda paper, ctx: editable_type_settings[EditableType.paper].get(paper.event, 'editing_enabled')
     )
 
 

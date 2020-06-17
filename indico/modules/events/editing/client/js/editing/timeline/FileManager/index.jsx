@@ -187,7 +187,11 @@ function FileType({
           className="primary"
           style={{marginTop: '1em'}}
           text={Translate.string('Use an existing file')}
-          options={uploadableFiles.map((f, i) => ({text: f.filename, value: i}))}
+          options={uploadableFiles.map((uf, i) => ({
+            text: uf.filename,
+            value: i,
+            disabled: files.some(f => f.id === uf.id),
+          }))}
           onChange={(__, {value}) =>
             uploadFiles(
               actions.markUploaded,
@@ -195,7 +199,10 @@ function FileType({
               // Use a fake file handle to seamlessly refer to an existing uploadable
               [new File([], uploadableFiles[value].filename)],
               uploadAnExistingFile.bind(null, uploadExistingURL, uploadableFiles[value]),
-              dispatch
+              dispatch,
+              null,
+              null,
+              uploadableFiles[value].id
             )
           }
           selectOnNavigation={false}
