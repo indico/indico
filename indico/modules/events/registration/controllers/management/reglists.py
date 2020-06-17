@@ -565,6 +565,20 @@ class RHRegistrationReject(RHManageRegistrationBase):
         return jsonify_data(html=_render_registration_details(self.registration))
 
 
+class RHRegistrationReset(RHManageRegistrationBase):
+    """Reset a registration back to a non-approved status"""
+
+    def _process(self):
+        if self.registration.state in (RegistrationState.complete, RegistrationState.unpaid):
+            self.registration.update_state(approved=False)
+        elif self.registration.state == RegistrationState.rejected:
+            self.registration.update_state(rejected=False)
+        else:
+            raise BadRequest(_('The registration cannot be reset in its current state.'))
+        logger.info('Registration %r was reset by %r', self.registration, session.user)
+        return jsonify_data(html=_render_registration_details(self.registration))
+
+
 class RHRegistrationCheckIn(RHManageRegistrationBase):
     """Set checked in state of a registration"""
 
