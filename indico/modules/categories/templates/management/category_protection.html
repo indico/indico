@@ -1,6 +1,6 @@
 {% extends 'categories/management/content.html' %}
 
-{% from 'forms/_form.html' import form_rows, form_header, form_footer, form_fieldset %}
+{% from 'forms/_form.html' import form_row, form_rows, form_header, form_footer, form_fieldset %}
 
 {% block title %}
     {% trans %}Category protection{% endtrans %}
@@ -8,7 +8,8 @@
 
 {% block content %}
     {{ form_header(form) }}
-    {{ form_rows(form, skip=form._event_creation_fields,
+    {{ form_row(form.permissions, skip_label=true) }}
+    {{ form_rows(form, skip=(form._event_creation_fields + ('permissions',)),
                  widget_attrs={'own_no_access_contact': {'placeholder': category.no_access_contact}}) }}
     {% call form_fieldset(_('Event creation settings')) %}
         {{ form_rows(form, fields=form._event_creation_fields) }}
