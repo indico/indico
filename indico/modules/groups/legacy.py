@@ -7,7 +7,6 @@
 
 from __future__ import unicode_literals
 
-from indico.core.auth import multipass
 from indico.legacy.fossils.user import IGroupFossil
 from indico.modules.groups import GroupProxy
 from indico.util.fossilize import Fossilizable, fossilizes
@@ -36,25 +35,8 @@ class GroupWrapper(Fossilizable):
     def getName(self):
         raise NotImplementedError
 
-    def getFullName(self):
-        return self.getName()
-
     def getEmail(self):
         return ''
-
-    def exists(self):
-        return self.group.group is not None
-
-    def __eq__(self, other):
-        if not hasattr(other, 'group') or not isinstance(other.group, GroupProxy):
-            return False
-        return self.group == other.group
-
-    def __ne__(self, other):
-        return not (self == other)
-
-    def __hash__(self):
-        return hash(self.group)
 
     @return_ascii
     def __repr__(self):
@@ -65,31 +47,22 @@ class LocalGroupWrapper(GroupWrapper):
     is_local = True
     groupType = 'Default'
 
-    @property
-    def group(self):
-        return GroupProxy(self.id)
-
     @encode_utf8
     def getName(self):
-        return self.group.group.name if self.exists() else self.id
+        return GroupProxy(self.id).name
 
 
 class LDAPGroupWrapper(GroupWrapper):
     is_local = False
-    provider_name = None
     groupType = 'LDAP'
+
+    def __init__(self, group_id, provider_name):
+        super(LDAPGroupWrapper, self).__init__(group_id)
+        self.provider_name = provider_name
 
     @property
     def provider(self):
-        if self.provider_name:
-            return self.provider_name
-        provider = multipass.default_group_provider
-        assert provider, 'No identity provider has default_group_provider enabled'
-        return provider.name
-
-    @property
-    def group(self):
-        return GroupProxy(self.id, self.provider)
+        return self.provider_name
 
     @encode_utf8
     def getName(self):

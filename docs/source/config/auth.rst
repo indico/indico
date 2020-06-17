@@ -64,11 +64,6 @@ The following keys are available in the provider data:
   providers you have installed.
 - ``title`` -- The title of the provider (shown in the account list
   of the user profile).  If omitted, the provider name is used.
-- ``default_group_provider`` -- If you have any providers which have
-  group support (usually the case for LDAP), you should enable this
-  for exactly one provider.  This is used by legacy parts of Indico
-  such as the room booking module which support groups but only take
-  a group name and no information from which provider to get them.
 - ``trusted_email`` -- Set this to ``True`` if all email addresses
   received from the provider are trustworthy, i.e. if it is guaranteed
   that an email address actually belongs to the user (either because
@@ -193,7 +188,6 @@ for your own config and then adapt it to your own environment:
                 'phone': 'telephoneNumber'
             },
             'trusted_email': True,
-            'default_group_provider': True,
             'synced_fields': {'first_name', 'last_name', 'affiliation', 'phone', 'address'}
         }
     }

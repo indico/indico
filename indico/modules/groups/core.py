@@ -108,20 +108,6 @@ class GroupProxy(object):
         raise NotImplementedError
 
     @classmethod
-    def get_named_default_group(cls, name):
-        """Gets the group with the matching name from the default group provider.
-
-        If there is no default group provider, local groups will be
-        used and `name` is the group's ID.
-
-        This method should only be used for legacy code or code that
-        gets the group name from an external source which does not
-        contain a provider identifier.
-        """
-        group_provider = multipass.default_group_provider
-        return cls(name, group_provider.name if group_provider else None)
-
-    @classmethod
     def search(cls, name, exact=False, providers=None):
         """Searches for groups
 
@@ -234,7 +220,7 @@ class _MultipassGroupProxy(GroupProxy):
     @cached_property
     def as_legacy_group(self):
         from indico.modules.groups.legacy import LDAPGroupWrapper
-        return LDAPGroupWrapper(self.name)
+        return LDAPGroupWrapper(self.name, self.provider)
 
     @property
     def provider_title(self):

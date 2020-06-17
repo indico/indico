@@ -54,9 +54,20 @@ def _get_attr_value(conn, room_id, attr_id):
     return conn.execute(query, (room_id, attr_id)).scalar()
 
 
+def _get_default_group_provider():
+    try:
+        provider = multipass.default_group_provider
+    except AttributeError:
+        xargs = context.get_x_argument(as_dictionary=True)
+        return xargs.get('default_group_provider')
+    else:
+        return provider.name
+
+
 def _group_to_kwargs(group):
-    if multipass.default_group_provider:
-        return {'mp_group_provider': multipass.default_group_provider.name, 'mp_group_name': group}
+    default_group_provider = _get_default_group_provider()
+    if default_group_provider:
+        return {'mp_group_provider': default_group_provider, 'mp_group_name': group}
     else:
         try:
             return {'local_group_id': int(group)}
@@ -129,6 +140,7 @@ def _set_attribute_value(conn, room_id, attribute_id, value):
 
 
 def _downgrade_permissions():
+    default_group_provider = _get_default_group_provider()
     conn = op.get_bind()
     booking_group_attr_id = conn.execute('SELECT id FROM roombooking.room_attributes WHERE name = %s',
                                          ('allowed-booking-group',)).scalar()
@@ -147,13 +159,13 @@ def _downgrade_permissions():
         for row in res:
             if row.type == PrincipalType.user and row.user_id == owner_id:
                 continue
-            if row.type == PrincipalType.local_group and not multipass.default_group_provider:
+            if row.type == PrincipalType.local_group and not default_group_provider:
                 if row.full_access:
                     _set_attribute_value(conn, room_id, manager_group_attr_id, unicode(row.local_group_id))
                 if 'book' in row.permissions or 'prebook' in row.permissions:
                     _set_attribute_value(conn, room_id, booking_group_attr_id, unicode(row.local_group_id))
-            elif (row.type == PrincipalType.multipass_group and multipass.default_group_provider and
-                    row.mp_group_provider == multipass.default_group_provider.name):
+            elif (row.type == PrincipalType.multipass_group and default_group_provider and
+                    row.mp_group_provider == default_group_provider.name):
                 if row.full_access:
                     _set_attribute_value(conn, room_id, manager_group_attr_id, row.mp_group_name)
                 if 'book' in row.permissions or 'prebook' in row.permissions:
