@@ -103,7 +103,7 @@ class RHCategoryStatisticsJSON(RHDisplayCategoryBase):
             'updated': stats['updated'].isoformat(),
             'total_events': sum(stats['events_by_year'].values()),
             'total_contributions': sum(stats['contribs_by_year'].values()),
-            'min_year': stats['min_year'].year,
+            'min_year': stats['min_year'],
             'max_year': date.today().year,
         }
         if self.category.is_root:

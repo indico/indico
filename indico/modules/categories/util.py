@@ -8,7 +8,7 @@
 from __future__ import unicode_literals
 
 from collections import OrderedDict
-from datetime import timedelta
+from datetime import date, timedelta
 
 from pytz import timezone
 from sqlalchemy.orm import load_only
@@ -75,10 +75,11 @@ def get_min_year(category_id=None):
     """Get the min year.
 
     :param category_id: The category ID to get statistics for.
-    :return: A `datetime` Object.
+    :return: The year.
     """
     category_filter = Event.category_chain_overlaps(category_id) if category_id else True
-    return db.session.query(db.func.min(Event.created_dt)).filter(~Event.is_deleted, category_filter).scalar()
+    min_dt = db.session.query(db.func.min(Event.created_dt)).filter(~Event.is_deleted, category_filter).scalar()
+    return min_dt.year if min_dt else date.today().year
 
 
 def get_attachment_count(category_id=None):
