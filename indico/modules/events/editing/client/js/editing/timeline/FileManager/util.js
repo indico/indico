@@ -54,7 +54,7 @@ export async function uploadFile(url, file, onUploadProgress) {
   }
 }
 
-export async function uploadAnExistingFile(url, file) {
+export async function uploadExistingFile(url, file) {
   try {
     const {data} = await indicoAxios.post(url, snakifyKeys(file));
     return data;
@@ -70,29 +70,29 @@ export async function uploadAnExistingFile(url, file) {
  * @param {Function} action - the action to be executed after upload is done
  * @param {String} fileTypeId - the id of the File Type
  * @param {Array} acceptedFiles - the "accepted files" array sent by react-dropzone
- * @param {Function} uploadCallback - the function to be called on file upload
+ * @param {Function} uploadFunc - the function to be called on file upload
  * @param {Function} dispatch - the dispatch function for reducer actions
- * @param {String?} replaceFileId - the ID of the file to modify, if any
  * @param {Function} onError - the function to be called on file upload error
- * @param {Number} fileId - the id of the file, if any, used to cross-reference uploadables
+ * @param rest - optional arguments
+ * @param {String?} rest.replaceFileId - the ID of the file to modify, if any
+ * @param {Number?} rest.fileId - the id of the file, if any, used to cross-reference uploadables
  */
-export function uploadFiles(
+export function uploadFiles({
   action,
   fileTypeId,
   acceptedFiles,
-  uploadCallback,
+  uploadFunc,
   dispatch,
-  replaceFileId = null,
   onError = null,
-  fileId = null
-) {
+  ...rest
+}) {
   const tmpFileIds = acceptedFiles.map(() => _.uniqueId(_.now()));
 
   dispatch(actions.startUploads(fileTypeId, acceptedFiles, tmpFileIds));
 
   return Promise.all(
     _.zip(acceptedFiles, tmpFileIds).map(async ([acceptedFile, tmpFileId]) => {
-      const uploadedFile = await uploadCallback(acceptedFile, e =>
+      const uploadedFile = await uploadFunc(acceptedFile, e =>
         dispatch(actions.progress(fileTypeId, tmpFileId, Math.floor((e.loaded / e.total) * 100)))
       );
 
@@ -105,9 +105,9 @@ export function uploadFiles(
         return null;
       } else {
         dispatch(
-          action(fileTypeId, replaceFileId, tmpFileId, {
+          action(fileTypeId, rest.replaceFileId, tmpFileId, {
             filename: uploadedFile.filename,
-            id: fileId,
+            id: rest.fileId,
             uuid: uploadedFile.uuid,
             claimed: false,
             fileType: fileTypeId,
@@ -132,12 +132,21 @@ export function mapFileTypes(fileTypes, files, uploadableFiles = []) {
     ...fileType,
     files: files.filter(file => file.fileType === fileType.id).map(f => ({...f, claimed: true})),
     invalidFiles: [],
-    uploadableFiles: uploadableFiles.filter(file =>
-      fileType.extensions.includes(file.filename.split('.').pop())
+    uploadableFiles: uploadableFiles.filter(
+      file =>
+        !fileType.extensions.length || fileType.extensions.includes(file.filename.split('.').pop())
     ),
   }));
 }
 
 export function getFilesFromRevision(fileTypes, revision) {
   return getFiles({fileTypes: mapFileTypes(fileTypes, revision.files)});
+}
+
+export function getFileToDelete(files, allowMultipleFiles = false) {
+  // if we don't allow multiple files and have a file in the added or modified state,
+  // that file can always be deleted from the server after the upload
+  return !allowMultipleFiles && files.length && ['added', 'modified'].includes(files[0].state)
+    ? files[0]
+    : null;
 }

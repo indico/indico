@@ -39,10 +39,9 @@ import PublicationSwitch from './PublicationSwitch';
         Promise.all(
           availableTypes.map(type => indicoAxios.get(fileTypesURL({confId: eventId, type})))
         ),
-        indicoAxios
-          .get(paperInfoURL({confId: eventId, contrib_id: contributionId}))
-          // eslint-disable-next-line no-unused-vars
-          .catch(e => undefined),
+        indicoAxios.get(paperInfoURL({confId: eventId, contrib_id: contributionId}), {
+          validateStatus: status => status >= 200 && status <= 404,
+        }),
       ]);
     } catch (e) {
       handleAxiosError(e);
@@ -62,8 +61,8 @@ import PublicationSwitch from './PublicationSwitch';
     ReactDOM.render(
       <EditableSubmissionButton
         fileTypes={fileTypes}
-        eventId={Number(eventId)}
-        contributionId={Number(contributionId)}
+        eventId={+eventId}
+        contributionId={+contributionId}
         contributionCode={contributionCode}
         uploadableFiles={lastRevFiles}
       />,

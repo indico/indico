@@ -22,9 +22,10 @@ import {
   fileTypePropTypes,
   uploadFiles,
   uploadFile,
-  uploadAnExistingFile,
+  uploadExistingFile,
   deleteFile,
   mapFileTypes,
+  getFileToDelete,
 } from './util';
 import FileList from './FileList';
 import Uploads from './Uploads';
@@ -45,12 +46,7 @@ export function Dropzone({
   // a freshly uploaded file which can be simply replaced)
   const fileToReplace =
     !allowMultipleFiles && files.length && files[0].state !== 'added' ? files[0] : null;
-  // if we don't allow multiple files and have a file in the added or modified state,
-  // that file can always be deleted from the server after the upload
-  const fileToDelete =
-    !allowMultipleFiles && files.length && ['added', 'modified'].includes(files[0].state)
-      ? files[0]
-      : null;
+  const fileToDelete = getFileToDelete(files, allowMultipleFiles);
   // as far as the user is concerned, they upload a "new" file when there are no files or
   // multiple files are supported for the file type
   const showNewFileIcon = files.length === 0 || allowMultipleFiles;
@@ -60,14 +56,14 @@ export function Dropzone({
       if (!allowMultipleFiles) {
         acceptedFiles = acceptedFiles.splice(0, 1);
       }
-      const rv = await uploadFiles(
-        fileToReplace ? actions.markModified : actions.markUploaded,
-        id,
+      const rv = await uploadFiles({
+        action: fileToReplace ? actions.markModified : actions.markUploaded,
+        fileTypeId: id,
         acceptedFiles,
-        uploadFile.bind(null, uploadURL),
+        uploadFunc: uploadFile.bind(null, uploadURL),
         dispatch,
-        fileToReplace ? fileToReplace.uuid : null
-      );
+        replaceFileId: fileToReplace ? fileToReplace.uuid : null,
+      });
       // only delete if there is a file to delete and the upload of a new file didn't fail
       if (fileToDelete && rv[0] !== null) {
         // we're modifying a freshly uploaded file, so we can get rid of the current one
@@ -129,6 +125,22 @@ function FileType({
   uploadableFiles,
 }) {
   const ref = useRef(null);
+  const fileToDelete = getFileToDelete(files, fileType.allowMultipleFiles);
+  const onChangeDropdown = async (__, {value: fileIdx}) => {
+    const rv = await uploadFiles({
+      action: actions.markUploaded,
+      fileTypeId: fileType.id,
+      // Use a fake file handle to seamlessly refer to an existing uploadable
+      acceptedFiles: [new File([], uploadableFiles[fileIdx].filename)],
+      uploadFunc: uploadExistingFile.bind(null, uploadExistingURL, uploadableFiles[fileIdx]),
+      dispatch,
+      fileId: uploadableFiles[fileIdx].id,
+    });
+    if (fileToDelete && rv[0] !== null) {
+      deleteFile(fileToDelete.uuid);
+    }
+  };
+
   return (
     <div styleName="file-type">
       <h3>
@@ -192,19 +204,7 @@ function FileType({
             value: i,
             disabled: files.some(f => f.id === uf.id),
           }))}
-          onChange={(__, {value}) =>
-            uploadFiles(
-              actions.markUploaded,
-              fileType.id,
-              // Use a fake file handle to seamlessly refer to an existing uploadable
-              [new File([], uploadableFiles[value].filename)],
-              uploadAnExistingFile.bind(null, uploadExistingURL, uploadableFiles[value]),
-              dispatch,
-              null,
-              null,
-              uploadableFiles[value].id
-            )
-          }
+          onChange={onChangeDropdown}
           selectOnNavigation={false}
           selectOnBlur={false}
           value={null}

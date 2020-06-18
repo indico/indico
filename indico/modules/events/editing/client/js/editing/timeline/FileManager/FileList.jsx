@@ -50,15 +50,15 @@ function FileEntry({uploadURL, fileType, file: {uuid, filename, state, claimed, 
   const onDropAccepted = useCallback(
     async acceptedFiles => {
       setActiveButton('replace');
-      await uploadFiles(
-        actions.markModified,
-        fileType.id,
+      await uploadFiles({
+        action: actions.markModified,
+        fileTypeId: fileType.id,
         acceptedFiles,
-        uploadFile.bind(null, uploadURL),
+        uploadFunc: uploadFile.bind(null, uploadURL),
         dispatch,
-        uuid,
-        () => setActiveButton(null)
-      );
+        replaceFileId: uuid,
+        onError: () => setActiveButton(null),
+      });
       // when we're done, the component will have been unmounted,
       // so there's no need to unset the active button
     },
