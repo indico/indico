@@ -182,7 +182,7 @@ function EditableListDisplay({initialContribList, codePresent, editableType, eve
     setSortedList(_sortList(sortBy, sortDirection, filteredResults));
     setChecked(
       contribsWithEditables
-        .filter(row => checked.includes(row.editable.id) && filteredResults.has(row.id))
+        .filter(row => checkedSet.has(row.editable.id) && filteredResults.has(row.id))
         .map(row => row.editable.id)
     );
   };
@@ -256,11 +256,11 @@ function EditableListDisplay({initialContribList, codePresent, editableType, eve
   };
 
   const toggleSelectRow = dataIndex => {
-    const newRow = sortedList[dataIndex].editable.id;
-    if (checked.includes(newRow)) {
-      setChecked(old => old.filter(row => row !== newRow));
+    const newId = sortedList[dataIndex].editable.id;
+    if (checkedSet.has(newId)) {
+      setChecked(old => old.filter(id => id !== newId));
     } else {
-      setChecked(old => [...old, newRow]);
+      setChecked(old => [...old, newId]);
     }
   };
 
@@ -418,7 +418,7 @@ function EditableListDisplay({initialContribList, codePresent, editableType, eve
                         disabled={!!activeRequest || !filteredSet.has(sortedList[rowIndex].id)}
                         checked={
                           sortedList[rowIndex].editable
-                            ? checked.includes(sortedList[rowIndex].editable.id)
+                            ? checkedSet.has(sortedList[rowIndex].editable.id)
                             : false
                         }
                         onChange={(e, data) => toggleSelectRow(data.index)}
