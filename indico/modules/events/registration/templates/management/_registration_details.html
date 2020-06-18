@@ -19,6 +19,7 @@
             {% if registration.state.name in ('unpaid', 'complete') %}
                 {{ _render_check_in(registration) }}
             {% endif %}
+            {{ template_hook('extra-registration-actions', registration=registration) }}
         </div>
 
         {{ template_hook('before-registration-summary', registration=registration) }}

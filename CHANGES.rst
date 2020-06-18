@@ -101,6 +101,8 @@ Internal Changes
   :user:`omegak`)
 - Add ``before-registration-summary`` template hook (:issue:`4495`, thanks
   :user:`omegak`)
+- Add ``extra-registration-actions`` template hook (:issue:`4500`, thanks
+  :user:`omegak`)
 
 
 ----
