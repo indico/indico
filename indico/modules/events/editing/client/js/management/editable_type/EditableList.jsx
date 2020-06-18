@@ -356,7 +356,7 @@ function EditableListDisplay({initialContribList, codePresent, editableType, eve
           />
         </div>
         <Input
-          placeholder={Translate.string('Search')}
+          placeholder={Translate.string('Enter #id or search string')}
           onChange={(evt, {value}) => setFilter(value)}
           value={searchValue}
           icon={
