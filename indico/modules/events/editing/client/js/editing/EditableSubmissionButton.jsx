@@ -18,13 +18,13 @@ import {Form as FinalForm} from 'react-final-form';
 
 import {indicoAxios} from 'indico/utils/axios';
 import {FinalSubmitButton, handleSubmitError} from 'indico/react/forms';
-import {Param, Translate} from 'indico/react/i18n';
+import {Translate} from 'indico/react/i18n';
 
 import {fileTypePropTypes, uploadablePropTypes} from './timeline/FileManager/util';
 import {FinalFileManager} from './timeline/FileManager';
 
 import {getFileTypes} from './timeline/selectors';
-import {EditableTypeTitles, EditableType} from '../models';
+import {EditableTypeTitles} from '../models';
 
 export default function EditableSubmissionButton({
   eventId,
@@ -32,6 +32,7 @@ export default function EditableSubmissionButton({
   contributionCode,
   fileTypes,
   uploadableFiles,
+  text,
 }) {
   const [currentType, setCurrentType] = useState(null);
   const submitRevision = async formData => {
@@ -46,6 +47,11 @@ export default function EditableSubmissionButton({
     location.href = editableURL({confId: eventId, contrib_id: contributionId, type: currentType});
   };
   const editableTypes = Object.keys(fileTypes);
+  const textByType = {
+    paper: Translate.string('Submit paper'),
+    poster: Translate.string('Submit poster'),
+    slides: Translate.string('Submit slides'),
+  };
 
   return (
     <>
@@ -63,11 +69,7 @@ export default function EditableSubmissionButton({
             closeOnDimmerClick={false}
             closeOnEscape={false}
           >
-            <Modal.Header>
-              {currentType === EditableType.paper && <Translate>Submit your paper</Translate>}
-              {currentType === EditableType.slides && <Translate>Submit your slides</Translate>}
-              {currentType === EditableType.poster && <Translate>Submit your poster</Translate>}
-            </Modal.Header>
+            <Modal.Header>{textByType[currentType]}</Modal.Header>
             <Modal.Content>
               {currentType !== null && (
                 <Form id="submit-editable-form" onSubmit={handleSubmit}>
@@ -106,9 +108,7 @@ export default function EditableSubmissionButton({
       </FinalForm>
       {editableTypes.length === 1 ? (
         <Button onClick={() => setCurrentType(editableTypes[0])} primary>
-          <Translate>
-            Submit <Param name="editableType" value={editableTypes[0]} />
-          </Translate>
+          {text || textByType[editableTypes[0]]}
         </Button>
       ) : (
         <Dropdown
@@ -130,6 +130,7 @@ export default function EditableSubmissionButton({
 }
 
 EditableSubmissionButton.propTypes = {
+  text: PropTypes.string,
   fileTypes: PropTypes.objectOf(PropTypes.arrayOf(PropTypes.shape(fileTypePropTypes))).isRequired,
   eventId: PropTypes.number.isRequired,
   contributionId: PropTypes.number.isRequired,
@@ -138,5 +139,6 @@ EditableSubmissionButton.propTypes = {
 };
 
 EditableSubmissionButton.defaultProps = {
+  text: undefined,
   uploadableFiles: [],
 };

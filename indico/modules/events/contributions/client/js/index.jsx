@@ -33,14 +33,14 @@ import PublicationSwitch from './PublicationSwitch';
     const availableTypes = JSON.parse(editableSubmissionButton.dataset.availableTypes);
     const {eventId, contributionId, contributionCode} = editableSubmissionButton.dataset;
 
-    let responses, lastRevFiles;
+    let fileTypeResponses, paperInfoResponse, lastRevFiles;
     try {
-      responses = await Promise.all([
+      [fileTypeResponses, paperInfoResponse] = await Promise.all([
         Promise.all(
           availableTypes.map(type => indicoAxios.get(fileTypesURL({confId: eventId, type})))
         ),
         indicoAxios.get(paperInfoURL({confId: eventId, contrib_id: contributionId}), {
-          validateStatus: status => status >= 200 && status <= 404,
+          validateStatus: status => (status >= 200 && status < 300) || status === 404,
         }),
       ]);
     } catch (e) {
@@ -48,11 +48,14 @@ import PublicationSwitch from './PublicationSwitch';
       return;
     }
     const fileTypes = _.fromPairs(
-      responses[0].map((response, index) => [availableTypes[index], camelizeKeys(response.data)])
+      fileTypeResponses.map((response, index) => [
+        availableTypes[index],
+        camelizeKeys(response.data),
+      ])
     );
 
-    if (responses[1]) {
-      const {isInFinalState, lastRevision} = camelizeKeys(responses[1].data);
+    if (paperInfoResponse) {
+      const {isInFinalState, lastRevision} = camelizeKeys(paperInfoResponse.data);
       if (isInFinalState && lastRevision) {
         lastRevFiles = lastRevision.files;
       }

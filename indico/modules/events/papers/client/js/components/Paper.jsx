@@ -8,7 +8,7 @@
 import React, {useEffect} from 'react';
 import PropTypes from 'prop-types';
 import {useDispatch, useSelector} from 'react-redux';
-import {Icon, Loader, Placeholder, Step} from 'semantic-ui-react';
+import {Icon, Loader, Step} from 'semantic-ui-react';
 
 import fileTypesURL from 'indico-url:event_editing.api_file_types';
 import editableDetailsURL from 'indico-url:event_editing.api_editable';
@@ -37,6 +37,7 @@ export default function Paper({eventId, contributionId}) {
   const {data: fileTypes, loading: isFileTypesLoading} = useIndicoAxios({
     url: fileTypesURL({confId: eventId, type: EditableType.paper}),
     trigger: eventId,
+    unhandledErrors: [404], // if editing module is disabled
     camelize: true,
   });
   const {data: editable, loading: isEditableLoading} = useIndicoAxios({
@@ -46,7 +47,7 @@ export default function Paper({eventId, contributionId}) {
       type: EditableType.paper,
     }),
     trigger: [eventId, contributionId],
-    unhandledErrors: [404],
+    unhandledErrors: [404], // if there is no editable yet
     camelize: true,
   });
 
@@ -54,7 +55,7 @@ export default function Paper({eventId, contributionId}) {
     dispatch(fetchPaperDetails(eventId, contributionId));
   }, [dispatch, contributionId, eventId]);
 
-  if (isInitialPaperDetailsLoading) {
+  if (isInitialPaperDetailsLoading || isFileTypesLoading || isEditableLoading) {
     return <Loader active />;
   } else if (!paper) {
     return null;
@@ -68,7 +69,10 @@ export default function Paper({eventId, contributionId}) {
     isInFinalState,
     canSubmitProceedings,
     editingEnabled,
+    editingOpen,
   } = paper;
+
+  const isEditingEnabled = editingEnabled && editingOpen && !!fileTypes;
 
   return (
     <>
@@ -80,19 +84,18 @@ export default function Paper({eventId, contributionId}) {
       >
         <PaperContent />
       </TimelineHeader>
-      {canSubmitProceedings && editingEnabled && (
+      {canSubmitProceedings && isEditingEnabled && (
         <PaperSteps
           isInFinalState={isInFinalState}
           isRejected={state.name === PaperState.rejected}
           hasEditable={!!editable}
-          fileTypes={fileTypes || []}
+          fileTypes={fileTypes}
           uploadableFiles={files}
           editableURL={editableURL({
             confId: eventId,
             contrib_id: contributionId,
             type: EditableType.paper,
           })}
-          loading={isFileTypesLoading || isEditableLoading}
         />
       )}
       <TimelineContent itemComponent={TimelineItem} blocks={revisions} />
@@ -114,20 +117,8 @@ function PaperSteps({
   editableURL,
   fileTypes,
   uploadableFiles,
-  loading,
 }) {
   const {event, contribution} = useSelector(getPaperDetails);
-
-  if (loading) {
-    return (
-      <Placeholder fluid style={{margin: '2em 0'}}>
-        <Placeholder.Header image>
-          <Placeholder.Line />
-          <Placeholder.Line />
-        </Placeholder.Header>
-      </Placeholder>
-    );
-  }
 
   return (
     <Step.Group fluid>
@@ -159,6 +150,7 @@ function PaperSteps({
                 contributionCode={contribution.code}
                 fileTypes={{[EditableType.paper]: fileTypes}}
                 uploadableFiles={uploadableFiles}
+                text={Translate.string('Submit for editing')}
               />
             )}
           </Step.Title>
@@ -166,7 +158,9 @@ function PaperSteps({
             <Step.Description style={{marginBottom: 0}}>
               <Translate>
                 The paper was{' '}
-                <Param name="submittedURL" value="submitted" wrapper={<a href={editableURL} />} />{' '}
+                <Param name="url" wrapper={<a href={editableURL} />}>
+                  submitted
+                </Param>{' '}
                 for editing
               </Translate>
             </Step.Description>
@@ -184,11 +178,9 @@ PaperSteps.propTypes = {
   editableURL: PropTypes.string,
   fileTypes: PropTypes.arrayOf(PropTypes.shape(fileTypePropTypes)).isRequired,
   uploadableFiles: PropTypes.arrayOf(PropTypes.shape(uploadablePropTypes)),
-  loading: PropTypes.bool,
 };
 
 PaperSteps.defaultProps = {
   uploadableFiles: [],
   editableURL: undefined,
-  loading: false,
 };
