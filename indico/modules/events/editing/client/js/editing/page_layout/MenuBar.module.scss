@@ -7,40 +7,17 @@
 
 @import 'base/palette';
 
-$header-height: calc(100vh - var(--header-height) * 1px);
-
 .menu-bar {
   color: $white;
-  background-color: $light-purple;
   padding: 20px 30px;
   margin-right: 25px;
-  max-width: 200px;
-  min-height: $header-height;
 
   .header {
+    border-radius: 3px;
+    background-color: $dark-blue;
+    text-align: center;
+    padding: 0.5rem;
     color: $white;
-    white-space: nowrap;
-    text-overflow: ellipsis;
-  }
-
-  .list {
-    margin-top: 15px;
-    list-style-type: none;
-    padding-inline-start: 0;
-
-    li .inner-list {
-      list-style-type: none;
-      padding-inline-start: 20px;
-    }
-
-    li .inner-list a .inner-list-item {
-      padding-top: 5px;
-      color: $light-gray;
-
-      &:hover {
-        color: $black;
-      }
-    }
   }
 }
 

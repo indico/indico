@@ -53,3 +53,9 @@ export const EditableStatus = {
   not_submitted: Translate.string('Not submitted'),
   ready_for_review: Translate.string('Ready for review'),
 };
+
+export const EditableEditingTitles = {
+  paper: Translate.string('Paper Editing'),
+  slides: Translate.string('Slides Editing'),
+  poster: Translate.string('Poster Editing'),
+};

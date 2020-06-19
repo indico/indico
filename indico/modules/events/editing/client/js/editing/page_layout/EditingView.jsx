@@ -16,7 +16,7 @@ import Footer from './Footer';
 
 import './EditingView.module.scss';
 
-export default function EditingView({eventId, eventTitle, children}) {
+export default function EditingView({eventId, eventTitle, editableType, children}) {
   const {data, lastData} = useIndicoAxios({
     url: menuEntriesURL({confId: eventId}),
     trigger: eventId,
@@ -29,7 +29,12 @@ export default function EditingView({eventId, eventTitle, children}) {
 
   return (
     <div styleName="editing-view">
-      <MenuBar eventId={eventId} eventTitle={eventTitle} menuItems={menuItems} />
+      <MenuBar
+        eventId={eventId}
+        eventTitle={eventTitle}
+        menuItems={menuItems}
+        editableType={editableType}
+      />
       <div styleName="contents">
         <div styleName="timeline">
           <Header as="h2" styleName="header">
@@ -46,5 +51,6 @@ export default function EditingView({eventId, eventTitle, children}) {
 EditingView.propTypes = {
   eventId: PropTypes.number.isRequired,
   eventTitle: PropTypes.string.isRequired,
+  editableType: PropTypes.string.isRequired,
   children: PropTypes.node.isRequired,
 };

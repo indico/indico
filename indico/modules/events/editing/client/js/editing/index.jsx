@@ -75,7 +75,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   ReactDOM.render(
     <Provider store={store}>
-      <EditingView eventId={eventId} eventTitle={eventTitle}>
+      <EditingView eventId={eventId} eventTitle={eventTitle} editableType={editableType}>
         <Timeline />
       </EditingView>
     </Provider>,

@@ -9,55 +9,51 @@ import displayURL from 'indico-url:events.display';
 
 import React from 'react';
 import PropTypes from 'prop-types';
-import {Header, Icon} from 'semantic-ui-react';
+import {Header, Icon, Menu} from 'semantic-ui-react';
 import {Translate} from 'indico/react/i18n';
+import Palette from 'indico/utils/palette';
+import {EditableType, EditableEditingTitles} from '../../models';
 
 import './MenuBar.module.scss';
 
-export default function MenuBar({eventId, menuItems}) {
+export default function MenuBar({eventId, menuItems, editableType}) {
   return (
     <div styleName="menu-bar">
       <Header as="h2" styleName="header">
-        <Translate>Paper Editing</Translate>
+        {EditableEditingTitles[editableType]}
       </Header>
-      <ul styleName="list">
-        <li>
-          <span styleName="capitalized">
+      <Menu vertical>
+        <Menu.Item header>
+          <span styleName="capitalized" style={{color: Palette.black}}>
             <Translate>other modules</Translate>
           </span>
-          <ul styleName="inner-list">
-            {menuItems.map(item => (
-              <a key={item.name} href={item.url}>
-                <li styleName="inner-list-item">
-                  {item.icon && <Icon name={item.icon.replace('icon-', '')} />}
-                  {item.title}
-                </li>
-              </a>
-            ))}
-          </ul>
-        </li>
-      </ul>
-      <ul styleName="list">
-        <li>
-          <span styleName="capitalized">
+        </Menu.Item>
+        {menuItems.map(item => (
+          <Menu.Item key={item.name} name={item.name} as="a" href={item.url}>
+            <span style={{color: Palette.blue}}>
+              {item.icon && <Icon name={item.icon.replace('icon-', '')} />}
+              {item.title}
+            </span>
+          </Menu.Item>
+        ))}
+      </Menu>
+      <Menu vertical>
+        <Menu.Item header>
+          <span styleName="capitalized" style={{color: Palette.black}}>
             <Translate>other views</Translate>
           </span>
-          <ul styleName="inner-list">
-            <a href={displayURL({confId: eventId})}>
-              <li styleName="inner-list-item">
-                <Icon name="tv" />
-                <Translate>Display</Translate>
-              </li>
-            </a>
-            <a href={managementURL({confId: eventId})}>
-              <li styleName="inner-list-item">
-                <Icon name="pencil" />
-                <Translate>Management</Translate>
-              </li>
-            </a>
-          </ul>
-        </li>
-      </ul>
+        </Menu.Item>
+        <Menu.Item name="display" as="a" href={displayURL({confId: eventId})}>
+          <span style={{color: Palette.blue}}>
+            <Icon name="tv" /> <Translate>Display</Translate>
+          </span>
+        </Menu.Item>
+        <Menu.Item name="management" as="a" href={managementURL({confId: eventId})}>
+          <span style={{color: Palette.blue}}>
+            <Icon name="pencil" /> <Translate>Management</Translate>
+          </span>
+        </Menu.Item>
+      </Menu>
     </div>
   );
 }
@@ -71,4 +67,5 @@ const menuEntryPropTypes = {
 MenuBar.propTypes = {
   eventId: PropTypes.number.isRequired,
   menuItems: PropTypes.arrayOf(PropTypes.shape(menuEntryPropTypes)).isRequired,
+  editableType: PropTypes.oneOf(EditableType).isRequired,
 };
