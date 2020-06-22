@@ -11,15 +11,12 @@ import tagsURL from 'indico-url:event_editing.api_tags';
 
 import React from 'react';
 import ReactDOM from 'react-dom';
-import {Provider} from 'react-redux';
 
 import {camelizeKeys} from 'indico/utils/case';
 import {indicoAxios, handleAxiosError} from 'indico/utils/axios';
-import createReduxStore from 'indico/utils/redux';
 
 import EditingView from './page_layout';
-import Timeline from './timeline';
-import reducer from './timeline/reducer';
+import ReduxTimeline from './ReduxTimeline';
 
 document.addEventListener('DOMContentLoaded', async () => {
   const editingElement = document.querySelector('#editing-view');
@@ -53,32 +50,24 @@ document.addEventListener('DOMContentLoaded', async () => {
     return;
   }
 
-  const store = createReduxStore(
-    'editing-timeline',
-    {timeline: reducer},
-    {
-      staticData: {
-        eventId,
-        contributionId,
-        contributionCode,
-        editableType,
-        fileTypes,
-        tags,
-        editableDetailsURL: editableDetailsURL({
-          confId: eventId,
-          contrib_id: contributionId,
-          type: editableType,
-        }),
-      },
-    }
-  );
+  const storeData = {
+    eventId,
+    contributionId,
+    contributionCode,
+    editableType,
+    fileTypes,
+    tags,
+    editableDetailsURL: editableDetailsURL({
+      confId: eventId,
+      contrib_id: contributionId,
+      type: editableType,
+    }),
+  };
 
   ReactDOM.render(
-    <Provider store={store}>
-      <EditingView eventId={eventId} eventTitle={eventTitle} editableType={editableType}>
-        <Timeline />
-      </EditingView>
-    </Provider>,
+    <EditingView eventId={eventId} eventTitle={eventTitle} editableType={editableType}>
+      <ReduxTimeline storeData={storeData} />
+    </EditingView>,
     editingElement
   );
 });
