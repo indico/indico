@@ -30,6 +30,7 @@ _bp.add_url_rule('/manage/editing/<any(paper,slides,poster):type>/review-conditi
 # Frontend (timeline)
 contrib_prefix = '/contributions/<int:contrib_id>/editing/<any(paper,slides,poster):type>'
 _bp.add_url_rule(contrib_prefix, 'editable', frontend.RHEditableTimeline)
+_bp.add_url_rule('/editing/<any(paper,slides,poster):type>/list', 'editable_type_list', frontend.RHEditableTypeList)
 _bp.add_url_rule(contrib_prefix + '/<int:revision_id>/files.zip', 'revision_files_export',
                  timeline.RHExportRevisionFiles)
 _bp.add_url_rule(contrib_prefix + '/<int:revision_id>/<int:file_id>/<filename>', 'download_file',

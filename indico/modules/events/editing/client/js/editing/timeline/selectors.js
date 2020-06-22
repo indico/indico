@@ -145,7 +145,7 @@ export function processRevisions(revisions) {
   return newRevisions;
 }
 
-export const getDetails = state => state.timeline.details;
+export const getDetails = state => (state.timeline ? state.timeline.details : null);
 export const isInitialEditableDetailsLoading = state =>
   state.timeline.loading && !state.timeline.details;
 export const getTimelineBlocks = state => state.timeline.timelineBlocks;
@@ -172,15 +172,19 @@ export const needsSubmitterConfirmation = createSelector(
 export const getStaticData = state => state.staticData;
 
 export const getFileTypes = createSelector(
+  getDetails,
   getStaticData,
-  staticData => {
+  (details, staticData) => {
     return staticData.fileTypes.map(fileType => {
       if (!fileType.filenameTemplate) {
         return fileType;
       }
       return {
         ...fileType,
-        filenameTemplate: fileType.filenameTemplate.replace('{code}', staticData.contributionCode),
+        filenameTemplate: fileType.filenameTemplate.replace(
+          '{code}',
+          details ? details.contribution.code : staticData.contributionCode
+        ),
       };
     });
   }

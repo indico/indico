@@ -6,8 +6,10 @@
 // LICENSE file for more details.
 import managementURL from 'indico-url:event_management.settings';
 import displayURL from 'indico-url:events.display';
+import editableTypeListURL from 'indico-url:event_editing.editable_type_list';
 
 import React from 'react';
+import {Link} from 'react-router-dom';
 import PropTypes from 'prop-types';
 import {Header, Icon, Menu} from 'semantic-ui-react';
 import {Translate} from 'indico/react/i18n';
@@ -16,12 +18,39 @@ import {EditableType, EditableEditingTitles} from '../../models';
 
 import './MenuBar.module.scss';
 
+function EditableListMenu({eventId, editableType}) {
+  if (location.pathname === editableTypeListURL({confId: eventId, type: editableType})) {
+    return (
+      <Menu vertical>
+        <Menu.Item active>
+          <Translate>Editable list</Translate>
+        </Menu.Item>
+      </Menu>
+    );
+  }
+  return (
+    <Menu vertical>
+      <Menu.Item as={Link} to={editableTypeListURL({confId: eventId, type: editableType})}>
+        <span style={{color: Palette.blue}}>
+          <Translate>Editable list</Translate>
+        </span>
+      </Menu.Item>
+    </Menu>
+  );
+}
+
+EditableListMenu.propTypes = {
+  eventId: PropTypes.number.isRequired,
+  editableType: PropTypes.oneOf(Object.values(EditableType)).isRequired,
+};
+
 export default function MenuBar({eventId, menuItems, editableType}) {
   return (
     <div styleName="menu-bar">
       <Header as="h2" styleName="header">
         {EditableEditingTitles[editableType]}
       </Header>
+      <EditableListMenu eventId={eventId} editableType={editableType} />
       <Menu vertical>
         <Menu.Item header>
           <span styleName="capitalized" style={{color: Palette.black}}>
@@ -67,5 +96,5 @@ const menuEntryPropTypes = {
 MenuBar.propTypes = {
   eventId: PropTypes.number.isRequired,
   menuItems: PropTypes.arrayOf(PropTypes.shape(menuEntryPropTypes)).isRequired,
-  editableType: PropTypes.oneOf(EditableType).isRequired,
+  editableType: PropTypes.oneOf(Object.values(EditableType)).isRequired,
 };

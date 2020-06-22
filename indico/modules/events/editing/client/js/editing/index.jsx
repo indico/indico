@@ -5,18 +5,17 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-import fileTypesURL from 'indico-url:event_editing.api_file_types';
-import editableDetailsURL from 'indico-url:event_editing.api_editable';
-import tagsURL from 'indico-url:event_editing.api_tags';
+import timelineURL from 'indico-url:event_editing.editable';
+import editableTypeListURL from 'indico-url:event_editing.editable_type_list';
 
 import React from 'react';
 import ReactDOM from 'react-dom';
-
-import {camelizeKeys} from 'indico/utils/case';
-import {indicoAxios, handleAxiosError} from 'indico/utils/axios';
+import {BrowserRouter as Router, Route, Switch} from 'react-router-dom';
+import {routerPathFromFlask} from 'indico/react/util/routing';
 
 import EditingView from './page_layout';
 import ReduxTimeline from './ReduxTimeline';
+import {EditableList} from '../management/editable_type';
 
 document.addEventListener('DOMContentLoaded', async () => {
   const editingElement = document.querySelector('#editing-view');
@@ -30,44 +29,30 @@ document.addEventListener('DOMContentLoaded', async () => {
     document.querySelector('div.main-breadcrumb').getBoundingClientRect().height;
   document.body.style.setProperty('--header-height', headerHeight);
 
-  const eventId = parseInt(editingElement.dataset.eventId, 10);
   const eventTitle = editingElement.dataset.eventTitle;
-  const contributionId = parseInt(editingElement.dataset.contributionId, 10);
-  const contributionCode = editingElement.dataset.contributionCode;
-  const editableType = editingElement.dataset.editableType;
-
-  let fileTypes, tags;
-
-  try {
-    const [fileTypeResponse, tagResponse] = await Promise.all([
-      indicoAxios.get(fileTypesURL({confId: eventId, type: editableType})),
-      indicoAxios.get(tagsURL({confId: eventId})),
-    ]);
-    fileTypes = camelizeKeys(fileTypeResponse.data);
-    tags = camelizeKeys(tagResponse.data);
-  } catch (e) {
-    handleAxiosError(e);
-    return;
-  }
-
-  const storeData = {
-    eventId,
-    contributionId,
-    contributionCode,
-    editableType,
-    fileTypes,
-    tags,
-    editableDetailsURL: editableDetailsURL({
-      confId: eventId,
-      contrib_id: contributionId,
-      type: editableType,
-    }),
-  };
 
   ReactDOM.render(
-    <EditingView eventId={eventId} eventTitle={eventTitle} editableType={editableType}>
-      <ReduxTimeline storeData={storeData} />
-    </EditingView>,
+    <Router>
+      <Route
+        path={[
+          routerPathFromFlask(timelineURL, ['confId', 'contrib_id', 'type']),
+          routerPathFromFlask(editableTypeListURL, ['confId', 'type']),
+        ]}
+      >
+        <EditingView eventTitle={eventTitle}>
+          <Switch>
+            <Route
+              exact
+              path={routerPathFromFlask(timelineURL, ['confId', 'contrib_id', 'type'])}
+              component={ReduxTimeline}
+            />
+            <Route exact path={routerPathFromFlask(editableTypeListURL, ['confId', 'type'])}>
+              <EditableList management={false} />
+            </Route>
+          </Switch>
+        </EditingView>
+      </Route>
+    </Router>,
     editingElement
   );
 });

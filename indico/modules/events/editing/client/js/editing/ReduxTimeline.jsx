@@ -5,21 +5,60 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
+import fileTypesURL from 'indico-url:event_editing.api_file_types';
+import editableDetailsURL from 'indico-url:event_editing.api_editable';
+import tagsURL from 'indico-url:event_editing.api_tags';
+
 import React from 'react';
-import PropTypes from 'prop-types';
+import {useParams} from 'react-router-dom';
 import {Provider} from 'react-redux';
+import {Loader} from 'semantic-ui-react';
 import createReduxStore from 'indico/utils/redux';
-import {fileTypePropTypes} from './timeline/FileManager/util';
+import {useNumericParam} from 'indico/react/util/routing';
+import {useIndicoAxios} from 'indico/react/hooks';
 
 import Timeline from './timeline';
 import reducer from './timeline/reducer';
 
-export default function ReduxTimeline({storeData}) {
+export default function ReduxTimeline() {
+  const eventId = useNumericParam('confId');
+  const contributionId = useNumericParam('contrib_id');
+  const {type: editableType} = useParams();
+
+  const {data: fileTypes, loading: isLoadingFileTypes} = useIndicoAxios({
+    url: fileTypesURL({confId: eventId, type: editableType}),
+    camelize: true,
+    trigger: [eventId, editableType],
+  });
+
+  const {data: tags, loading: isLoadingTags} = useIndicoAxios({
+    url: tagsURL({confId: eventId}),
+    camelize: true,
+    trigger: [eventId],
+  });
+
+  if (isLoadingFileTypes || isLoadingTags) {
+    return <Loader inline="centered" active />;
+  } else if (!fileTypes || !tags) {
+    return null;
+  }
+
   const store = createReduxStore(
     'editing-timeline',
     {timeline: reducer},
     {
-      staticData: storeData,
+      staticData: {
+        eventId,
+        contributionId,
+        editableType,
+        fileTypes,
+        tags,
+        editableDetailsURL: editableDetailsURL({
+          confId: eventId,
+          contrib_id: contributionId,
+          type: editableType,
+        }),
+      },
     }
   );
   return (
@@ -28,13 +67,3 @@ export default function ReduxTimeline({storeData}) {
     </Provider>
   );
 }
-
-ReduxTimeline.propTypes = {
-  storeData: PropTypes.shape({
-    eventId: PropTypes.number.isRequired,
-    contributionId: PropTypes.number.isRequired,
-    contributionCode: PropTypes.string.isRequired,
-    fileTypes: PropTypes.arrayOf(PropTypes.shape(fileTypePropTypes)).isRequired,
-    editableType: PropTypes.string.isRequired,
-  }).isRequired,
-};

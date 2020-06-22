@@ -7,16 +7,20 @@
 import menuEntriesURL from 'indico-url:event_editing.api_menu_entries';
 
 import React from 'react';
+import {useParams} from 'react-router-dom';
 import PropTypes from 'prop-types';
 import {Header} from 'semantic-ui-react';
 import {useIndicoAxios} from 'indico/react/hooks';
+import {useNumericParam} from 'indico/react/util/routing';
 
 import MenuBar from './MenuBar';
 import Footer from './Footer';
 
 import './EditingView.module.scss';
 
-export default function EditingView({eventId, eventTitle, editableType, children}) {
+export default function EditingView({eventTitle, children}) {
+  const eventId = useNumericParam('confId');
+  const {type} = useParams();
   const {data, lastData} = useIndicoAxios({
     url: menuEntriesURL({confId: eventId}),
     trigger: eventId,
@@ -29,12 +33,7 @@ export default function EditingView({eventId, eventTitle, editableType, children
 
   return (
     <div styleName="editing-view">
-      <MenuBar
-        eventId={eventId}
-        eventTitle={eventTitle}
-        menuItems={menuItems}
-        editableType={editableType}
-      />
+      <MenuBar eventId={eventId} menuItems={menuItems} editableType={type} />
       <div styleName="contents">
         <div styleName="timeline">
           <Header as="h2" styleName="header">
@@ -49,8 +48,6 @@ export default function EditingView({eventId, eventTitle, editableType, children
 }
 
 EditingView.propTypes = {
-  eventId: PropTypes.number.isRequired,
   eventTitle: PropTypes.string.isRequired,
-  editableType: PropTypes.string.isRequired,
   children: PropTypes.node.isRequired,
 };

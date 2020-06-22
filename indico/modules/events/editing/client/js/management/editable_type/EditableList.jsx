@@ -15,7 +15,7 @@ import unassignEditorURL from 'indico-url:event_editing.api_unassign_editor';
 
 import React, {useState, useMemo} from 'react';
 import PropTypes from 'prop-types';
-import {useParams} from 'react-router-dom';
+import {useParams, Link} from 'react-router-dom';
 import {Button, Icon, Input, Loader, Checkbox, Message, Dropdown} from 'semantic-ui-react';
 import {Column, Table, SortDirection, WindowScroller} from 'react-virtualized';
 import _ from 'lodash';
@@ -36,7 +36,7 @@ import StateIndicator from '../../editing/timeline/StateIndicator';
 
 import './EditableList.module.scss';
 
-export default function EditableList() {
+export default function EditableList({management}) {
   const eventId = useNumericParam('confId');
   const {type} = useParams();
   const {data: contribList, loading: isLoadingContribList} = useIndicoAxios({
@@ -62,11 +62,27 @@ export default function EditableList() {
       editableType={type}
       eventId={eventId}
       editors={editors}
+      management={management}
     />
   );
 }
 
-function EditableListDisplay({initialContribList, codePresent, editableType, eventId, editors}) {
+EditableList.propTypes = {
+  management: PropTypes.bool,
+};
+
+EditableList.defaultProps = {
+  management: true,
+};
+
+function EditableListDisplay({
+  initialContribList,
+  codePresent,
+  editableType,
+  eventId,
+  editors,
+  management,
+}) {
   const [sortBy, setSortBy] = useState('friendly_id');
   const [sortDirection, setSortDirection] = useState('ASC');
 
@@ -200,11 +216,14 @@ function EditableListDisplay({initialContribList, codePresent, editableType, eve
   };
   // eslint-disable-next-line no-shadow
   const renderTitle = (title, index) => {
-    return sortedList[index].editable ? (
-      <a href={sortedList[index].editable.timelineURL}>{title}</a>
-    ) : (
-      <div>{title}</div>
-    );
+    if (sortedList[index].editable) {
+      return management ? (
+        <a href={sortedList[index].editable.timelineURL}>{title}</a>
+      ) : (
+        <Link to={sortedList[index].editable.timelineURL}>{title}</Link>
+      );
+    }
+    return <div>{title}</div>;
   };
   const renderStatus = (editable, rowIndex) => {
     return (
@@ -311,8 +330,10 @@ function EditableListDisplay({initialContribList, codePresent, editableType, eve
 
   return (
     <>
-      <ManagementPageSubTitle title={title} />
-      <ManagementPageBackButton url={editableTypeURL({confId: eventId, type: editableType})} />
+      {management && <ManagementPageSubTitle title={title} />}
+      {management && (
+        <ManagementPageBackButton url={editableTypeURL({confId: eventId, type: editableType})} />
+      )}
       <div styleName="editable-topbar">
         <div>
           <Button.Group>
@@ -470,4 +491,5 @@ EditableListDisplay.propTypes = {
   codePresent: PropTypes.bool.isRequired,
   editableType: PropTypes.oneOf(Object.values(EditableType)).isRequired,
   eventId: PropTypes.number.isRequired,
+  management: PropTypes.bool.isRequired,
 };
