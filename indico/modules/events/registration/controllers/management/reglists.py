@@ -242,7 +242,8 @@ class RHRegistrationDelete(RHRegistrationsActionBase):
             logger.info('Registration %s deleted by %s', registration, session.user)
             self.event.log(EventLogRealm.management, EventLogKind.negative, 'Registration',
                            'Registration deleted: {}'.format(registration.full_name),
-                           session.user, data={'Email': registration.email})
+                           session.user, data={'Email': registration.email},
+                           meta={'registration_id': registration.id})
         num_reg_deleted = len(self.registrations)
         flash(ngettext("Registration was deleted.",
                        "{num} registrations were deleted.", num_reg_deleted).format(num=num_reg_deleted), 'success')

@@ -44,7 +44,8 @@ def _notify_registration(registration, template, to_managers=False):
     from_address = registration.registration_form.sender_address if not to_managers else None
     mail = make_email(to_list=to_list, template=template, html=True, from_address=from_address, attachments=attachments)
     user = session.user if session else None
-    send_email(mail, event=registration.registration_form.event, module='Registration', user=user)
+    send_email(mail, event=registration.registration_form.event, module='Registration', user=user,
+               log_metadata={'registration_id': registration.id})
 
 
 def notify_registration_creation(registration, notify_user=True):

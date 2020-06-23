@@ -109,6 +109,8 @@ Internal Changes
   :user:`omegak`)
 - Add ``event-management-after-title`` template hook (:issue: `4504`, thanks
   :user:`meluru`)
+- Save registration id in related event log entries (:issue:`4503`, thanks
+  :user:`omegak`)
 
 
 ----

@@ -240,7 +240,8 @@ def create_registration(regform, data, invitation=None, management=False, notify
     logger.info('New registration %s by %s', registration, user)
     regform.event.log(EventLogRealm.management if management else EventLogRealm.participants,
                       EventLogKind.positive, 'Registration',
-                      'New registration: {}'.format(registration.full_name), user, data={'Email': registration.email})
+                      'New registration: {}'.format(registration.full_name), user, data={'Email': registration.email},
+                      meta={'registration_id': registration.id})
     return registration
 
 
@@ -292,7 +293,8 @@ def modify_registration(registration, data, management=False, notify_user=True):
     regform.event.log(EventLogRealm.management if management else EventLogRealm.participants,
                       EventLogKind.change, 'Registration',
                       'Registration modified: {}'.format(registration.full_name),
-                      session.user, data={'Email': registration.email})
+                      session.user, data={'Email': registration.email},
+                      meta={'registration_id': registration.id})
 
 
 def generate_spreadsheet_from_registrations(registrations, regform_items, static_items):

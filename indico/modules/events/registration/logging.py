@@ -27,7 +27,8 @@ def log_registration_check_in(registration, **kwargs):
     else:
         log_text = '"{}" check-in has been reset'
     registration.event.log(EventLogRealm.participants, EventLogKind.change, 'Registration',
-                           log_text.format(registration.full_name), session.user)
+                           log_text.format(registration.full_name), session.user,
+                           meta={'registration_id': registration.id})
 
 
 def log_registration_updated(registration, previous_state, **kwargs):
@@ -56,4 +57,4 @@ def log_registration_updated(registration, previous_state, **kwargs):
         log_text = 'Registration for "{{}}" has been changed from {} to {}'.format(previous_state_title, state_title)
         kind = EventLogKind.change
     registration.event.log(EventLogRealm.participants, kind, 'Registration', log_text.format(registration.full_name),
-                           session.user)
+                           session.user, meta={'registration_id': registration.id})
