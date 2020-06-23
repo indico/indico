@@ -818,7 +818,7 @@ class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionMan
         from indico.modules.events.notes.util import get_scheduled_notes
         return get_scheduled_notes(self)
 
-    def log(self, realm, kind, module, summary, user=None, type_='simple', data=None):
+    def log(self, realm, kind, module, summary, user=None, type_='simple', data=None, meta=None):
         """Creates a new log entry for the event
 
         :param realm: A value from :class:`.EventLogRealm` indicating
@@ -832,6 +832,7 @@ class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionMan
         :param type_: The type of the log entry. This is used for custom
                       rendering of the log message/data
         :param data: JSON-serializable data specific to the log type.
+        :param meta: JSON-serializable data that won't be displayed.
         :return: The newly created `EventLogEntry`
 
         In most cases the ``simple`` log type is fine. For this type,
@@ -843,7 +844,7 @@ class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionMan
         if self.__logging_disabled:
             return
         entry = EventLogEntry(user=user, realm=realm, kind=kind, module=module, type=type_, summary=summary,
-                              data=data or {})
+                              data=(data or {}), meta=(meta or {}))
         self.log_entries.append(entry)
         return entry
 

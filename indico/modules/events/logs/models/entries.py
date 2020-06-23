@@ -7,7 +7,7 @@
 
 from __future__ import unicode_literals
 
-from sqlalchemy.dialects.postgresql import JSON
+from sqlalchemy.dialects.postgresql import JSON, JSONB
 
 from indico.core.db import db
 from indico.core.db.sqlalchemy import PyIntEnum, UTCDateTime
@@ -36,7 +36,8 @@ class EventLogKind(int, IndicoEnum):
 class EventLogEntry(db.Model):
     """Log entries for events"""
     __tablename__ = 'logs'
-    __table_args__ = {'schema': 'events'}
+    __table_args__ = (db.Index(None, 'meta', postgresql_using='gin'),
+                      {'schema': 'events'})
 
     #: The ID of the log entry
     id = db.Column(
@@ -94,6 +95,11 @@ class EventLogEntry(db.Model):
     #: Type-specific data
     data = db.Column(
         JSON,
+        nullable=False
+    )
+    #: Non-displayable data
+    meta = db.Column(
+        JSONB,
         nullable=False
     )
 

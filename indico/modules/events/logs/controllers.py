@@ -7,6 +7,8 @@
 
 from __future__ import unicode_literals
 
+import json
+
 from flask import jsonify, request
 
 from indico.core.db import db
@@ -37,9 +39,10 @@ class RHEventLogsJSON(RHManageEventBase):
     def _process(self):
         page = int(request.args.get('page', 1))
         filters = request.args.getlist('filters')
+        data = json.loads(request.args.get('data'))
         text = request.args.get('q')
 
-        if not filters:
+        if not filters and not data:
             return jsonify(current_page=1, pages=[], entries=[], total_page_count=0)
 
         query = self.event.log_entries.order_by(EventLogEntry.logged_dt.desc())
@@ -59,6 +62,9 @@ class RHEventLogsJSON(RHManageEventBase):
                        _contains(EventLogEntry.data['to'].astext, text),
                        _contains(EventLogEntry.data['cc'].astext, text))
             ).outerjoin(db.m.User)
+
+        if data:
+            query = query.filter(EventLogEntry.meta.contains(data))
 
         query = query.paginate(page, LOG_PAGE_SIZE)
         entries = [dict(serialize_log_entry(entry), index=index, html=entry.render())
