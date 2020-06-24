@@ -181,11 +181,9 @@
             {%- endtrans %}
         </div>
     </div>
-    {% if registration.registration_form.moderation_enabled %}
-        <div class="toolbar hide-if-locked">
-            {{ _render_reset_registration_button(registration, _('Reset rejection')) }}
-        </div>
-    {% endif %}
+    <div class="toolbar hide-if-locked">
+        {{ _render_reset_registration_button(registration, _('Reset rejection')) }}
+    </div>
 {% endmacro %}
 
 
