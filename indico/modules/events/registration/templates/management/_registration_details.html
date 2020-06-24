@@ -189,12 +189,12 @@
 
 {% macro _render_reset_registration_button(registration, action_text) %}
     <a class="i-button warning"
-        data-update="#registration-details"
-        data-method="POST"
-        data-href="{{ url_for('.reset_registration', registration) }}"
-        data-confirm="{% trans %}Are you sure you want to reset this registration status? This action will not be notified to the registrant.{% endtrans %}"
-        data-title="{{ action_text }}">
-        {{ action_text }}
+       data-update="#registration-details"
+       data-method="POST"
+       data-href="{{ url_for('.reset_registration', registration) }}"
+       data-confirm="{% trans %}Are you sure you want to reset this registration status? This action will not be notified to the registrant.{% endtrans %}"
+       data-title="{{ action_text }}">
+       {{ action_text }}
     </a>
 {% endmacro %}
 
