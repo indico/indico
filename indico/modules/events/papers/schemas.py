@@ -199,7 +199,8 @@ class PaperSchema(mm.Schema):
         lambda paper, ctx: editable_type_settings[EditableType.paper].get(paper.event, 'submission_enabled')
     )
     editing_enabled = Function(
-        lambda paper, ctx: 'paper' in editing_settings.get(paper.event, 'editable_types')
+        lambda paper, ctx: paper.event.has_feature('editing')
+        and 'paper' in editing_settings.get(paper.event, 'editable_types')
     )
 
 
