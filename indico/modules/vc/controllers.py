@@ -122,7 +122,7 @@ class RHVCManageEventCreate(RHVCManageEventCreateBase):
         if not self.plugin.can_manage_vc_rooms(session.user, self.event):
             flash(_('You are not allowed to create {plugin_name} rooms for this event.').format(
                 plugin_name=self.plugin.friendly_name), 'error')
-            return redirect(url_for('.manage_vc_rooms', self.event))
+            raise Forbidden
 
         form = self.plugin.create_form(event=self.event)
 
@@ -133,7 +133,7 @@ class RHVCManageEventCreate(RHVCManageEventCreateBase):
 
             event_vc_room = process_vc_room_association(self.plugin, self.event, vc_room, form)
             if not event_vc_room:
-                return redirect(url_for('.manage_vc_rooms', self.event))
+                return jsonify_data(flash=False)
 
             with db.session.no_autoflush:
                 self.plugin.update_data_vc_room(vc_room, form.data)
@@ -179,7 +179,7 @@ class RHVCManageEventModify(RHVCSystemEventBase):
         if not self.plugin.can_manage_vc_rooms(session.user, self.event):
             flash(_('You are not allowed to modify {} rooms for this event.').format(self.plugin.friendly_name),
                   'error')
-            return redirect(url_for('.manage_vc_rooms', self.event))
+            raise Forbidden
 
         form = self.plugin.create_form(self.event,
                                        existing_vc_room=self.vc_room,
@@ -192,7 +192,7 @@ class RHVCManageEventModify(RHVCSystemEventBase):
             event_vc_room = process_vc_room_association(
                 self.plugin, self.event, self.vc_room, form, event_vc_room=self.event_vc_room, allow_same_room=True)
             if not event_vc_room:
-                return redirect(url_for('.manage_vc_rooms', self.event))
+                return jsonify_data(flash=False)
 
             self.vc_room.modified_dt = now_utc()
 
@@ -202,7 +202,7 @@ class RHVCManageEventModify(RHVCSystemEventBase):
                 Logger.get('modules.vc').warning("VC room %r not found. Setting it as deleted.", self.vc_room)
                 self.vc_room.status = VCRoomStatus.deleted
                 flash(err.message, 'error')
-                return redirect(url_for('.manage_vc_rooms', self.event))
+                return jsonify_data(flash=False)
             except VCRoomError as err:
                 if err.field is None:
                     raise
@@ -231,7 +231,7 @@ class RHVCManageEventRefresh(RHVCSystemEventBase):
         if not self.plugin.can_manage_vc_rooms(session.user, self.event):
             flash(_('You are not allowed to refresh {plugin_name} rooms for this event.').format(
                 plugin_name=self.plugin.friendly_name), 'error')
-            return redirect(url_for('.manage_vc_rooms', self.event))
+            raise Forbidden
 
         Logger.get('modules.vc').info("Refreshing VC room %r from event %r", self.vc_room, self.event)
 
@@ -255,7 +255,7 @@ class RHVCManageEventRemove(RHVCSystemEventBase):
         if not self.plugin.can_manage_vc_rooms(session.user, self.event):
             flash(_('You are not allowed to remove {} rooms from this event.').format(self.plugin.friendly_name),
                   'error')
-            return redirect(url_for('.manage_vc_rooms', self.event))
+            raise Forbidden
 
         delete_all = request.args.get('delete_all') == '1'
         self.event_vc_room.delete(session.user, delete_all=delete_all)
