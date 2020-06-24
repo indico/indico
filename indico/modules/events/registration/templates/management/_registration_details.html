@@ -13,7 +13,7 @@
                 {% elif registration.state.name == 'complete' %}
                     {{ _render_complete_actions(registration) }}
                 {% elif registration.state.name in ('rejected', 'withdrawn') %}
-                    {{ _render_cancalled_actions(registration) }}
+                    {{ _render_cancelled_actions(registration) }}
                 {% endif %}
             </div>
             {% if registration.state.name in ('unpaid', 'complete') %}
@@ -92,7 +92,9 @@
             <a class="i-button accept"
                data-update="#registration-details"
                data-method="POST"
-               data-href="{{ url_for('.approve_registration', registration) }}">
+               data-href="{{ url_for('.approve_registration', registration) }}"
+               data-confirm="{% trans %}Are you sure you want to approve this registration? This will trigger a notification email.{% endtrans %}"
+               data-title="{% trans %}Approve registration{% endtrans %}">
                 {%- trans %}Approve{% endtrans -%}
             </a>
         </div>
@@ -101,7 +103,7 @@
                data-update="#registration-details"
                data-method="POST"
                data-href="{{ url_for('.reject_registration', registration) }}"
-               data-confirm="{% trans %}Are you sure you want to reject this registration? This action is not reversible.{% endtrans %}"
+               data-confirm="{% trans %}Are you sure you want to reject this registration? This will trigger a notification email.{% endtrans %}"
                data-title="{% trans %}Reject registration{% endtrans %}">
                 {%- trans %}Reject{% endtrans -%}
             </a>
@@ -137,6 +139,9 @@
                     {% trans %}Mark as paid{% endtrans %}
                 </a>
             </div>
+            {% if registration.registration_form.moderation_enabled %}
+                {{ _render_reset_registration_button(registration, _('Reset approval')) }}
+            {% endif %}
         </div>
     {% endif %}
 {% endmacro %}
@@ -151,17 +156,24 @@
             Submitted: {{ submitted }}
         {%- endtrans %}
     </div>
-    {% if registration.registration_form.tickets_enabled and not registration.is_ticket_blocked %}
+    {% set can_reset = registration.registration_form.moderation_enabled and not registration.is_paid %}
+    {% set can_get_ticket = registration.registration_form.tickets_enabled and not registration.is_ticket_blocked %}
+    {% if can_reset or can_get_ticket %}
         <div class="toolbar">
-            <a href="{{ url_for('.ticket_download', registration.locator.registrant) }}" class="i-button accept icon-ticket">
-                {% trans %}Get ticket{% endtrans %}
-            </a>
+            {% if can_reset %}
+                {{ _render_reset_registration_button(registration, _('Reset approval')) }}
+            {% endif %}
+            {% if can_get_ticket %}
+                <a href="{{ url_for('.ticket_download', registration.locator.registrant) }}" class="i-button accept icon-ticket">
+                    {% trans %}Get ticket{% endtrans %}
+                </a>
+            {% endif %}
         </div>
     {% endif %}
 {% endmacro %}
 
 
-{% macro _render_cancalled_actions(registration) %}
+{% macro _render_cancelled_actions(registration) %}
     <div class="text">
         <div class="label">
             {% trans state=registration.state.title|lower -%}
@@ -169,6 +181,21 @@
             {%- endtrans %}
         </div>
     </div>
+    <div class="toolbar hide-if-locked">
+        {{ _render_reset_registration_button(registration, _('Reset rejection')) }}
+    </div>
+{% endmacro %}
+
+
+{% macro _render_reset_registration_button(registration, action_text) %}
+    <a class="i-button warning"
+       data-update="#registration-details"
+       data-method="POST"
+       data-href="{{ url_for('.reset_registration', registration) }}"
+       data-confirm="{% trans %}Are you sure you want to reset this registration status? This action will not be notified to the registrant.{% endtrans %}"
+       data-title="{{ action_text }}">
+       {{ action_text }}
+    </a>
 {% endmacro %}
 
 

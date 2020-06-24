@@ -74,6 +74,8 @@ Improvements
 - Refactor the room edit modal to a tabbed layout and improve error
   handling (:issue:`4408`)
 - Preserve non-ascii characters in file names (:issue:`4465`)
+- Allow resetting moderation state from registration management view
+  (:issue:`4498`, thanks :user:`omegak`)
 
 Bugfixes
 ^^^^^^^^
