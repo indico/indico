@@ -101,6 +101,7 @@
   $banner-color: #000;
   $banner-title-color: $dark-orange;
   $banner-subtitle-color: $dark-gray;
+  $banner-title-margin: 19px;
 
   color: $banner-color;
   max-width: 800px;
@@ -108,7 +109,7 @@
 
   &.full-width {
     max-width: none;
-    margin-bottom: -10%;
+    margin-bottom: -$banner-title-margin;
 
     .title {
       flex-grow: 1;
@@ -120,7 +121,7 @@
   }
 
   .title {
-    margin-bottom: 19px;
+    margin-bottom: $banner-title-margin;
     font-family: 'Roboto Light', sans-serif;
     font-size: 2em;
     color: $banner-title-color;
