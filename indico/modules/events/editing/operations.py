@@ -129,6 +129,9 @@ def review_editable_revision(revision, editor, action, comment, tags, files=None
                                        tags=revision.tags)
         _ensure_publishable_files(new_revision)
         revision.editable.revisions.append(new_revision)
+        if action == EditingReviewAction.update_accept:
+            db.session.flush()
+            publish_editable_revision(new_revision)
     db.session.flush()
     notify_editor_judgment(revision, session.user)
     logger.info('Revision %r reviewed by %s [%s]', revision, editor, action.name)
@@ -204,6 +207,7 @@ def undo_review(revision):
     if (revision.initial_state == InitialRevisionState.needs_submitter_confirmation and
             revision.final_state == FinalRevisionState.accepted and revision.editor is not None):
         revision = revision.editable.revisions[-2]
+        revision.editable.published_revision = None
         db.session.delete(latest_revision)
     elif revision.final_state == FinalRevisionState.accepted:
         revision.editable.published_revision = None
