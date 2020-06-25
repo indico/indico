@@ -6,6 +6,7 @@
 // LICENSE file for more details.
 
 import moment from 'moment';
+import qs from 'qs';
 import React from 'react';
 import PropTypes from 'prop-types';
 
@@ -20,6 +21,7 @@ export default class LogEntryModal extends React.Component {
     setDetailedView: PropTypes.func.isRequired,
     prevEntry: PropTypes.func.isRequired,
     nextEntry: PropTypes.func.isRequired,
+    relatedEntries: PropTypes.func.isRequired,
     currentPage: PropTypes.number.isRequired,
     totalPageCount: PropTypes.number.isRequired,
   };
@@ -34,6 +36,7 @@ export default class LogEntryModal extends React.Component {
     this.onClose = this.onClose.bind(this);
     this.prevEntry = this.prevEntry.bind(this);
     this.nextEntry = this.nextEntry.bind(this);
+    this.relatedEntries = this.relatedEntries.bind(this);
   }
 
   componentDidUpdate() {
@@ -62,6 +65,14 @@ export default class LogEntryModal extends React.Component {
     nextEntry();
   }
 
+  relatedEntries() {
+    const {currentViewIndex, entries, relatedEntries} = this.props;
+    const entry = entries[currentViewIndex];
+    const queryString = qs.stringify({meta: entry.meta}, {allowDots: true});
+    relatedEntries(entry.meta);
+    history.replaceState({}, null, `${location.pathname}?${queryString}`);
+  }
+
   _isFirstEntry() {
     const {currentPage, currentViewIndex} = this.props;
     return currentPage === 1 && currentViewIndex === 0;
@@ -70,6 +81,12 @@ export default class LogEntryModal extends React.Component {
   _isLastEntry() {
     const {currentPage, totalPageCount, currentViewIndex, entries} = this.props;
     return currentPage === totalPageCount && currentViewIndex === entries.length - 1;
+  }
+
+  _hasRelatedEntries() {
+    const {currentViewIndex, entries} = this.props;
+    const entry = entries[currentViewIndex];
+    return Object.keys(entry.meta).length !== 0;
   }
 
   render() {
@@ -115,6 +132,10 @@ export default class LogEntryModal extends React.Component {
               disabled={this._isFirstEntry()}
             >
               <Translate>Previous</Translate>
+            </IButton>
+
+            <IButton onClick={this.relatedEntries} disabled={!this._hasRelatedEntries()}>
+              <Translate>Related entries</Translate>
             </IButton>
             <IButton
               title="Next"

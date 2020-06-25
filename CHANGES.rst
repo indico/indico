@@ -78,6 +78,8 @@ Improvements
 - Preserve non-ascii characters in file names (:issue:`4465`)
 - Allow resetting moderation state from registration management view
   (:issue:`4498`, thanks :user:`omegak`)
+- Allow filtering event log by related entries (:issue:`4503`, thanks
+  :user:`omegak`)
 
 Bugfixes
 ^^^^^^^^

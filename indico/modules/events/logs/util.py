@@ -171,6 +171,7 @@ def serialize_log_entry(entry):
         'kind': entry.kind.name,
         'module': entry.module,
         'description': entry.summary,
+        'meta': entry.meta,
         'time': entry.logged_dt.astimezone(entry.event.tzinfo).isoformat(),
         'payload': entry.data,
         'user': {

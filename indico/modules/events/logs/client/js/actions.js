@@ -16,6 +16,7 @@ export const FETCH_FAILED = 'FETCH_FAILED';
 export const SET_DETAILED_VIEW = 'SET_DETAILED_VIEW';
 export const VIEW_PREV_ENTRY = 'VIEW_PREV_ENTRY';
 export const VIEW_NEXT_ENTRY = 'VIEW_NEXT_ENTRY';
+export const SET_METADATA_QUERY = 'SET_METADATA_QUERY';
 
 export function setKeyword(keyword) {
   return {type: SET_KEYWORD, keyword};
@@ -31,6 +32,10 @@ export function setPage(currentPage) {
 
 export function setDetailedView(entryIndex) {
   return {type: SET_DETAILED_VIEW, currentViewIndex: entryIndex};
+}
+
+export function setMetadataQuery(metadataQuery) {
+  return {type: SET_METADATA_QUERY, metadataQuery};
 }
 
 export function viewPrevEntry() {
@@ -90,15 +95,15 @@ export function fetchFailed() {
 export function fetchLogEntries() {
   return async (dispatch, getStore) => {
     dispatch(fetchStarted());
-
     const {
-      logs: {filters, keyword, currentPage},
+      logs: {filters, keyword, currentPage, metadataQuery},
       staticData: {fetchLogsUrl},
     } = getStore();
 
     const params = {
       page: currentPage,
       filters: [],
+      data: JSON.stringify(metadataQuery),
     };
     if (keyword) {
       params.q = keyword;

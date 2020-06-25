@@ -12,7 +12,7 @@ import {Provider} from 'react-redux';
 import createReduxStore from 'indico/utils/redux';
 
 import EventLog from './components/EventLog';
-import {fetchLogEntries} from './actions';
+import {fetchLogEntries, setMetadataQuery} from './actions';
 import reducer from './reducers';
 
 import '../style/logs.scss';
@@ -33,6 +33,7 @@ window.addEventListener('load', () => {
     },
     initialData
   );
+  store.dispatch(setMetadataQuery(JSON.parse(rootElement.dataset.metadataQuery)));
 
   ReactDOM.render(
     <Provider store={store}>

@@ -12,6 +12,7 @@ const initialState = {
   keyword: null,
   currentPage: 1,
   isFetching: false,
+  metadataQuery: {},
   filters: {
     event: true,
     management: true,
@@ -46,6 +47,8 @@ export default function logReducer(state = initialState, action) {
       return {...state, isFetching: false};
     case actions.SET_DETAILED_VIEW:
       return {...state, currentViewIndex: action.currentViewIndex};
+    case actions.SET_METADATA_QUERY:
+      return {...state, metadataQuery: action.metadataQuery};
     default:
       return state;
   }

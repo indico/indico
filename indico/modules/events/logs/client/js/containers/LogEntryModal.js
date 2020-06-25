@@ -8,7 +8,14 @@
 import {connect} from 'react-redux';
 
 import LogEntryModal from '../components/LogEntryModal';
-import {setDetailedView, viewPrevEntry, viewNextEntry} from '../actions';
+import {
+  fetchLogEntries,
+  setDetailedView,
+  setMetadataQuery,
+  setPage,
+  viewNextEntry,
+  viewPrevEntry,
+} from '../actions';
 
 const mapStateToProps = ({logs}) => ({
   currentViewIndex: logs.currentViewIndex,
@@ -25,6 +32,12 @@ const mapDispatchToProps = dispatch => ({
   },
   nextEntry: () => {
     dispatch(viewNextEntry());
+  },
+  relatedEntries: async metadataQuery => {
+    dispatch(setMetadataQuery(metadataQuery));
+    await dispatch(fetchLogEntries());
+    dispatch(setDetailedView(null));
+    dispatch(setPage(1));
   },
 });
 

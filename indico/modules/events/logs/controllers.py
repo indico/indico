@@ -31,15 +31,17 @@ class RHEventLogs(RHManageEventBase):
     """Shows the modification/action log for the event"""
 
     def _process(self):
+        metadata_query = {k[len('meta.'):]: int(v) if v.isdigit() else v
+                          for k, v in request.args.iteritems() if k.startswith('meta.')}
         realms = {realm.name: realm.title for realm in EventLogRealm}
-        return WPEventLogs.render_template('logs.html', self.event, realms=realms)
+        return WPEventLogs.render_template('logs.html', self.event, realms=realms, metadata_query=metadata_query)
 
 
 class RHEventLogsJSON(RHManageEventBase):
     def _process(self):
         page = int(request.args.get('page', 1))
         filters = request.args.getlist('filters')
-        data = json.loads(request.args.get('data'))
+        data = json.loads(request.args.get('data', '{}'))
         text = request.args.get('q')
 
         if not filters and not data:
