@@ -5,7 +5,7 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {useSelector} from 'react-redux';
 import moment from 'moment';
 import PropTypes from 'prop-types';
@@ -34,6 +34,14 @@ export default function TimelineItem({block}) {
   const isLastBlock = lastBlock.id === block.id;
   const [visible, setVisible] = useState(isLastBlock);
   const headerOnly = !visible || (!isLastBlock && block.items.length === 0 && !block.comment);
+
+  useEffect(() => {
+    // when undoing a judgment deletes the last revision this revision may become the
+    // latest one, and thus needs to be unhidden if it had been collapsed before.
+    if (isLastBlock && !visible) {
+      setVisible(true);
+    }
+  }, [isLastBlock, visible]);
 
   return (
     <>
