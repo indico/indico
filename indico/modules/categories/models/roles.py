@@ -21,6 +21,7 @@ class CategoryRole(db.Model):
 
     is_group = False
     is_event_role = False
+    is_registration_form = False
     is_category_role = True
     is_single_person = True
     is_network = False

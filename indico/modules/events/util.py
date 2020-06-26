@@ -36,6 +36,7 @@ from indico.modules.events.models.events import EventType
 from indico.modules.events.models.persons import EventPerson
 from indico.modules.events.models.principals import EventPrincipal
 from indico.modules.events.models.static_list_links import StaticListLink
+from indico.modules.events.registration.models.forms import RegistrationForm
 from indico.modules.events.sessions.models.sessions import Session
 from indico.modules.events.timetable.models.breaks import Break
 from indico.modules.events.timetable.models.entries import TimetableEntry
@@ -599,12 +600,17 @@ def set_custom_fields(obj, custom_fields_data):
     return changes
 
 
-def check_permissions(event, field, allow_networks=False):
+def check_permissions(event, field, allow_networks=False, allow_registration_forms=False):
     for principal_fossil, permissions in field.data:
         principal = principal_from_fossil(principal_fossil, allow_emails=True, allow_networks=allow_networks,
-                                          allow_pending=True, event=event, category=event.category)
+                                          allow_pending=True, allow_registration_forms=allow_registration_forms,
+                                          event=event, category=event.category)
         if allow_networks and isinstance(principal, IPNetworkGroup) and set(permissions) - {READ_ACCESS_PERMISSION}:
             msg = _('IP networks cannot have management permissions: {}').format(principal.name)
+            return msg
+        if (allow_registration_forms and isinstance(principal, RegistrationForm)
+                and set(permissions) - {READ_ACCESS_PERMISSION}):
+            msg = _('Registrants cannot have management permissions: {}').format(principal.name)
             return msg
         if FULL_ACCESS_PERMISSION in permissions and len(permissions) != 1:
             # when full access permission is set, discard rest of permissions

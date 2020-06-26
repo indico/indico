@@ -23,7 +23,7 @@ from indico.util.i18n import _
 class AttachmentCloner(EventCloner):
     name = 'attachments'
     friendly_name = _('Materials')
-    uses = {'sessions', 'contributions', 'event_roles'}
+    uses = {'sessions', 'contributions', 'event_roles', 'registration_forms'}
 
     @property
     def is_available(self):
@@ -31,7 +31,7 @@ class AttachmentCloner(EventCloner):
 
     def run(self, new_event, cloners, shared_data):
         self._clone_nested_attachments = False
-        self._event_role_map = self._session_map = self._contrib_map = self._subcontrib_map = None
+        self._event_role_map = self._session_map = self._contrib_map = self._subcontrib_map = self._regform_map = None
         if cloners >= {'sessions', 'contributions'}:
             self._clone_nested_attachments = True
             self._session_map = shared_data['sessions']['session_map']
@@ -39,6 +39,8 @@ class AttachmentCloner(EventCloner):
             self._subcontrib_map = shared_data['contributions']['subcontrib_map']
         if 'event_roles' in cloners:
             self._event_role_map = shared_data['event_roles']['event_role_map']
+        if 'registration_forms' in cloners:
+            self._regform_map = shared_data['registration_forms']['form_map']
         with db.session.no_autoflush:
             self._clone_attachments(new_event)
         db.session.flush()
@@ -78,12 +80,13 @@ class AttachmentCloner(EventCloner):
         attachment_attrs = (get_simple_column_attrs(Attachment) | {'user'}) - {'modified_dt'}
         folder = AttachmentFolder(object=new_object)
         folder.populate_from_attrs(old_folder, folder_attrs)
-        folder.acl_entries = clone_principals(AttachmentFolderPrincipal, old_folder.acl_entries, self._event_role_map)
+        folder.acl_entries = clone_principals(AttachmentFolderPrincipal, old_folder.acl_entries,
+                                              self._event_role_map, self._regform_map)
         for old_attachment in old_folder.attachments:
             attachment = Attachment(folder=folder)
             attachment.populate_from_attrs(old_attachment, attachment_attrs)
             attachment.acl_entries = clone_principals(AttachmentPrincipal, old_attachment.acl_entries,
-                                                      self._event_role_map)
+                                                      self._event_role_map, self._regform_map)
             if attachment.type == AttachmentType.file:
                 old_file = old_attachment.file
                 attachment.file = AttachmentFile(attachment=attachment, user=old_file.user, filename=old_file.filename,

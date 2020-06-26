@@ -41,6 +41,13 @@
                     <ul class="i-dropdown entry-ip-network-dropdown"
                         data-items='{{ field.ip_networks|tojson|forceescape }}'></ul>
                 {% endif %}
+                {% if field.registration_forms %}
+                    <a class="i-button arrow js-dropdown" data-toggle="dropdown">
+                        {%- trans %}Registrants{% endtrans -%}
+                    </a>
+                    <ul class="i-dropdown entry-reg-form-dropdown"
+                        data-items='{{ field.registration_forms|tojson|forceescape }}'></ul>
+                {% endif %}
             </div>
         </div>
     </div>

@@ -588,3 +588,13 @@ def get_registered_event_persons(event):
                                                   or_(Registration.user_id == EventPerson.user_id,
                                                       Registration.email == EventPerson.email)))
     return set(query)
+
+
+def serialize_registration_form(regform):
+    """Serialize registration form to JSON-like object"""
+    return {
+        'id': regform.id,
+        'name': regform.title,
+        'identifier': 'RegistrationForm:{}'.format(regform.id),
+        '_type': 'RegistrationForm'
+    }

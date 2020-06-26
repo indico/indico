@@ -92,6 +92,8 @@ import Palette from 'indico/utils/palette';
         iconClass = 'icon-question';
       } else if (type === 'IPNetworkGroup') {
         iconClass = 'icon-lan';
+      } else if (type === 'RegistrationForm') {
+        iconClass = 'icon-ticket';
       } else if (type === 'LocalGroup') {
         iconClass = 'icon-users';
       } else if (type === 'MultipassGroup') {
@@ -159,11 +161,15 @@ import Palette from 'indico/utils/palette';
       return $buttonsGroup;
     },
     _renderEditBtn(principal, permissions) {
-      if (principal._type === 'IPNetworkGroup') {
+      if (principal._type === 'IPNetworkGroup' || principal._type === 'RegistrationForm') {
+        const title = {
+          IPNetworkGroup: $T.gettext('IP networks cannot have management permissions'),
+          RegistrationForm: $T.gettext('Registrants cannot have management permissions'),
+        }[principal._type];
         return $('<button>', {
           type: 'button',
           class: 'i-button text-color borderless icon-only icon-edit disabled',
-          title: $T.gettext('IP networks cannot have management permissions'),
+          title: title,
         });
       } else {
         return $('<button>', {
@@ -384,6 +390,9 @@ import Palette from 'indico/utils/palette';
       if (this.$ipNetworkDropdown.length) {
         this._renderDropdown(this.$ipNetworkDropdown);
       }
+      if (this.$registrationFormDropdown.length) {
+        this._renderDropdown(this.$registrationFormDropdown);
+      }
     },
     _findEntryIndex(principal) {
       return _.findIndex(this.data, item => item[0].identifier === principal.identifier);
@@ -451,6 +460,7 @@ import Palette from 'indico/utils/palette';
       this.$eventRoleDropdown = this.element.find('.entry-role-dropdown');
       this.$categoryRoleDropdown = this.element.find('.entry-category-role-dropdown');
       this.$ipNetworkDropdown = this.element.find('.entry-ip-network-dropdown');
+      this.$registrationFormDropdown = this.element.find('.entry-reg-form-dropdown');
       this.data = JSON.parse(this.$dataField.val());
       this._update();
       this._render();

@@ -194,6 +194,7 @@ def update_permissions(obj, form):
             allow_emails=True,
             allow_networks=True,
             allow_pending=True,
+            allow_registration_forms=True,
             event=event,
             category=category,
         ): set(permissions)

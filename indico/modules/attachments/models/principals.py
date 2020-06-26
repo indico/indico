@@ -21,6 +21,7 @@ class AttachmentFolderPrincipal(PrincipalMixin, db.Model):
     unique_columns = ('folder_id',)
     allow_event_roles = True
     allow_category_roles = True
+    allow_registration_forms = True
 
     @declared_attr
     def __table_args__(cls):
@@ -52,6 +53,7 @@ class AttachmentPrincipal(PrincipalMixin, db.Model):
     unique_columns = ('attachment_id',)
     allow_event_roles = True
     allow_category_roles = True
+    allow_registration_forms = True
 
     @declared_attr
     def __table_args__(cls):

@@ -24,7 +24,7 @@ class SessionCloner(EventCloner):
     name = 'sessions'
     friendly_name = _('Sessions')
     requires = {'event_persons'}
-    uses = {'event_roles'}
+    uses = {'event_roles', 'registration_forms'}
     is_internal = True
 
     # We do not override `is_available` as we have cloners depending
@@ -32,6 +32,7 @@ class SessionCloner(EventCloner):
 
     def run(self, new_event, cloners, shared_data):
         self._event_role_map = shared_data['event_roles']['event_role_map'] if 'event_roles' in cloners else None
+        self._regform_map = shared_data['registration_forms']['form_map'] if 'registration_forms' in cloners else None
         self._person_map = shared_data['event_persons']['person_map']
         self._session_map = {}
         self._session_block_map = {}
@@ -52,7 +53,8 @@ class SessionCloner(EventCloner):
             sess = Session()
             sess.populate_from_attrs(old_sess, attrs)
             sess.blocks = list(self._clone_session_blocks(old_sess.blocks))
-            sess.acl_entries = clone_principals(SessionPrincipal, old_sess.acl_entries, self._event_role_map)
+            sess.acl_entries = clone_principals(SessionPrincipal, old_sess.acl_entries,
+                                                self._event_role_map, self._regform_map)
             new_event.sessions.append(sess)
             self._session_map[old_sess] = sess
 

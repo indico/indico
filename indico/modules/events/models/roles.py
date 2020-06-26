@@ -24,6 +24,7 @@ class EventRole(db.Model):
     is_category_role = False
     is_single_person = True
     is_network = False
+    is_registration_form = False
     principal_order = 2
     principal_type = PrincipalType.event_role
 

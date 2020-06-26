@@ -16,6 +16,7 @@ from indico.core.db.sqlalchemy.principals import PrincipalType, serialize_email_
 from indico.core.permissions import get_available_permissions, get_permissions_info
 from indico.modules.events import Event
 from indico.modules.events.contributions.models.contributions import Contribution
+from indico.modules.events.registration.util import serialize_registration_form
 from indico.modules.events.roles.util import serialize_event_role
 from indico.modules.events.sessions.models.sessions import Session
 from indico.modules.groups import GroupProxy
@@ -41,6 +42,8 @@ def serialize_principal(principal):
         return serialize_event_role(principal)
     elif principal.principal_type == PrincipalType.category_role:
         return serialize_category_role(principal)
+    elif principal.principal_type == PrincipalType.registration_form:
+        return serialize_registration_form(principal)
     elif principal.is_group:
         return serialize_group(principal)
     else:
@@ -53,6 +56,8 @@ class PrincipalListField(HiddenField):
     :param groups: If groups should be selectable.
     :param allow_networks: If ip networks should be selectable.
     :param allow_emails: If emails should be allowed.
+    :param allow_registration_forms: If registration form associated
+                                     to an event should be selectable.
     :param allow_external: If "search users with no indico account"
                            should be available.  Selecting such a user
                            will automatically create a pending user once
@@ -66,7 +71,9 @@ class PrincipalListField(HiddenField):
         self.allow_emails = kwargs.pop('allow_emails', False)
         self.groups = kwargs.pop('groups', False)
         self.allow_networks = kwargs.pop('allow_networks', False)
+        self.allow_registration_forms = kwargs.pop('allow_registration_forms', False)
         self.ip_networks = []
+        self.registration_forms = []
         if self.allow_networks:
             self.ip_networks = map(serialize_ip_network_group, IPNetworkGroup.query.filter_by(hidden=False))
         # Whether it is allowed to search for external users with no indico account
@@ -74,11 +81,14 @@ class PrincipalListField(HiddenField):
         # Whether the add user dialog is opened immediately when the field is displayed
         self.open_immediately = kwargs.pop('open_immediately', False)
         self._event = kwargs.pop('event')(kwargs['_form']) if 'event' in kwargs else None
+        if self._event and self.allow_registration_forms:
+            self.registration_forms = map(serialize_registration_form, self._event.registration_forms)
         super(PrincipalListField, self).__init__(*args, **kwargs)
 
     def _convert_principal(self, principal):
         return principal_from_fossil(principal, allow_pending=self.allow_external,
                                      allow_emails=self.allow_emails, allow_networks=self.allow_networks,
+                                     allow_registration_forms=self.allow_registration_forms,
                                      existing_data=self.object_data, event=self._event)
 
     def process_formdata(self, valuelist):
@@ -164,6 +174,11 @@ class PermissionsField(JSONField):
         from indico.modules.categories.models.roles import CategoryRole
         category_roles = CategoryRole.get_category_roles(self.category)
         return [serialize_category_role(role, legacy=True) for role in category_roles]
+
+    @property
+    def registration_forms(self):
+        registration_forms = self.event.registration_forms
+        return [serialize_registration_form(regform) for regform in registration_forms]
 
     @property
     def permissions_info(self):

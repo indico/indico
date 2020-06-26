@@ -20,9 +20,10 @@ from werkzeug.exceptions import BadRequest
 
 from indico.core.db import db
 from indico.core.db.sqlalchemy import PyIntEnum, UTCDateTime
+from indico.core.db.sqlalchemy.principals import PrincipalType
 from indico.modules.designer.models.templates import DesignerTemplate
 from indico.modules.events.registration.models.form_fields import RegistrationFormPersonalDataField
-from indico.modules.events.registration.models.registrations import Registration
+from indico.modules.events.registration.models.registrations import Registration, RegistrationState
 from indico.util.caching import memoize_request
 from indico.util.date_time import now_utc
 from indico.util.i18n import L_
@@ -41,6 +42,15 @@ class RegistrationForm(db.Model):
     """A registration form for an event"""
 
     __tablename__ = 'forms'
+    principal_type = PrincipalType.registration_form
+    principal_order = 2
+    is_group = False
+    is_network = False
+    is_single_person = False
+    is_event_role = False
+    is_category_role = False
+    is_registration_form = True
+
     __table_args__ = (db.Index('ix_uq_forms_participation', 'event_id', unique=True,
                                postgresql_where=db.text('is_participation AND NOT is_deleted')),
                       db.UniqueConstraint('id', 'event_id'),  # useless but needed for the registrations fkey
@@ -280,6 +290,28 @@ class RegistrationForm(db.Model):
             lazy=True
         )
     )
+
+    # relationship backrefs:
+    # - in_attachment_acls (AttachmentPrincipal.registration_form)
+    # - in_attachment_folder_acls (AttachmentFolderPrincipal.registration_form)
+    # - in_contribution_acls (ContributionPrincipal.registration_form)
+    # - in_event_acls (EventPrincipal.registration_form)
+    # - in_session_acls (SessionPrincipal.registration_form)
+
+    def __contains__(self, user):
+        if user is None:
+            return False
+        return (Registration.query.with_parent(self)
+                .join(Registration.registration_form)
+                .filter(Registration.user == user,
+                        Registration.state.in_([RegistrationState.unpaid, RegistrationState.complete]),
+                        ~Registration.is_deleted,
+                        ~RegistrationForm.is_deleted)
+                .has_rows())
+
+    @property
+    def identifier(self):
+        return 'RegistrationForm:{}'.format(self.id)
 
     @hybrid_property
     def has_ended(self):

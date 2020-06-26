@@ -29,10 +29,12 @@ def iter_acl(acl):
 
 
 def principal_from_fossil(fossil, allow_pending=False, allow_groups=True, allow_missing_groups=False,
-                          allow_emails=False, allow_networks=False, existing_data=None, event=None, category=None):
+                          allow_emails=False, allow_networks=False, allow_registration_forms=False,
+                          existing_data=None, event=None, category=None):
     from indico.modules.networks.models.networks import IPNetworkGroup
     from indico.modules.events.models.roles import EventRole
     from indico.modules.categories.models.roles import CategoryRole
+    from indico.modules.events.registration.models.forms import RegistrationForm
     from indico.modules.groups import GroupProxy
     from indico.modules.users import User
 
@@ -106,18 +108,29 @@ def principal_from_fossil(fossil, allow_pending=False, allow_groups=True, allow_
         if role.event != event:
             raise ValueError('Event role "{}" does not belong to "{}"'.format(role_name, event.title))
         return role
+    elif allow_registration_forms and type_ == 'RegistrationForm':
+        registration_form = RegistrationForm.get(id_)
+        reg_form_name = fossil.get('title')
+        if registration_form is None:
+            raise ValueError('Registration form "{}" does not exist'.format(reg_form_name))
+        if registration_form.event != event:
+            raise ValueError('Registration form "{}" does not belong to "{}"'.format(reg_form_name, event.title))
+        return registration_form
     else:
         raise ValueError('Unexpected fossil type: {}'.format(type_))
 
 
 def principal_from_identifier(identifier, allow_groups=False, allow_external_users=False, allow_event_roles=False,
-                              allow_category_roles=False, event_id=None, soft_fail=False):
+                              allow_category_roles=False, allow_registration_forms=False, event_id=None,
+                              soft_fail=False):
     # XXX: this is currently only used in PrincipalList
-    # if we ever need to support more than just users, groups, event roles and category roles
+    # if we ever need to support more than just users, groups, event roles,
+    # category roles and registration forms
     # make sure to add it in here as well
     from indico.modules.events.models.events import Event
     from indico.modules.events.models.roles import EventRole
     from indico.modules.categories.models.roles import CategoryRole
+    from indico.modules.events.registration.models.forms import RegistrationForm
     from indico.modules.groups import GroupProxy
     from indico.modules.users import User
 
@@ -200,5 +213,18 @@ def principal_from_identifier(identifier, allow_groups=False, allow_external_use
         if category_role is None:
             raise ValueError('Invalid category role: {}'.format(category_role_id))
         return category_role
+    elif type_ == 'RegistrationForm':
+        if not allow_registration_forms:
+            raise ValueError('Registration forms are not allowed')
+
+        try:
+            reg_form_id = int(data)
+        except ValueError:
+            raise ValueError('Invalid data')
+
+        registration_form = RegistrationForm.get(reg_form_id, is_deleted=(None if soft_fail else False))
+        if registration_form is None or registration_form.event_id != event_id:
+            raise ValueError('Invalid registration form: {}'.format(reg_form_id))
+        return registration_form
     else:
         raise ValueError('Invalid data')

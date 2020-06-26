@@ -160,6 +160,7 @@ class User(PersonMixin, db.Model):
     is_single_person = True
     is_event_role = False
     is_category_role = False
+    is_registration_form = False
     is_network = False
     principal_order = 0
     principal_type = PrincipalType.user

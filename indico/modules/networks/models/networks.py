@@ -28,6 +28,7 @@ class IPNetworkGroup(db.Model):
     is_single_person = False
     is_event_role = False
     is_category_role = False
+    is_registration_form = False
 
     @declared_attr
     def __table_args__(cls):

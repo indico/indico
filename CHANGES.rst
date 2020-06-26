@@ -17,6 +17,8 @@ Major Features
   for everyone except managers (:issue:`4419`, thanks :user:`openprojects`)
 - Introduce profile picture, which is for now only visible on the user dashboard
   (:issue:`4431`, thanks :user:`omegak`)
+- Registrants can now be added to event ACLs. This can be used to easily restrict
+  parts of an event to registered participants. (:issue:`4477`)
 
 Improvements
 ^^^^^^^^^^^^
