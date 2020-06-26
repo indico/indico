@@ -32,12 +32,14 @@
             {% endcall %}
         {% endif %}
     {% else %}
-        {{ category_list(category) }}
-        {{ event_list(events_by_month=events_by_month, format_event_date=format_event_date, is_recent=is_recent,
-                      happening_now=happening_now, category=category, future_event_count=future_event_count,
-                      past_event_count=past_event_count, future_threshold=future_threshold, past_threshold=past_threshold,
-                      show_future_events=show_future_events, show_past_events=show_past_events,
-                      has_hidden_events=has_hidden_events) }}
+        {% block category_content %}
+            {{ category_list(category) }}
+            {{ event_list(events_by_month=events_by_month, format_event_date=format_event_date, is_recent=is_recent,
+                          happening_now=happening_now, category=category, future_event_count=future_event_count,
+                          past_event_count=past_event_count, future_threshold=future_threshold, past_threshold=past_threshold,
+                          show_future_events=show_future_events, show_past_events=show_past_events,
+                          has_hidden_events=has_hidden_events) }}
+        {% endblock %}
     {% endif %}
 {% endblock %}
 
