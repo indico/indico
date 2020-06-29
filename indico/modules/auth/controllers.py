@@ -241,7 +241,7 @@ class RHRegister(RH):
             if prevalidated:
                 flash(_("You may change your email address after finishing the registration process."), 'info')
             else:
-                flash(_('You have successfully validated your email address and can now proceeed with the '
+                flash(_('You have successfully validated your email address and can now proceed with the '
                         'registration.'), 'success')
             return redirect(url_for('.register', provider=self.provider_name))
 
