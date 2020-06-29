@@ -30,7 +30,8 @@
 
   global.setupCategoryDisplayEventList = function setupCategoryDisplayEventList(
     showFutureEvents,
-    showPastEvents
+    showPastEvents,
+    requestParams
   ) {
     var $eventList = $('.event-list');
     var $futureEvents = $eventList.find('.future-events');
@@ -96,6 +97,7 @@
             data: {
               before: $content.data('event-list-before'),
               after: $content.data('event-list-after'),
+              ...requestParams
             },
             error: handleAjaxError,
             success: function(data) {

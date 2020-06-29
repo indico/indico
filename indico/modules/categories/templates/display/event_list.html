@@ -44,8 +44,8 @@
 {% macro event_list(events_by_month, format_event_date, is_recent, happening_now, category, future_event_count,
                     past_event_count, future_threshold, past_threshold, future_events_by_month=[],
                     past_events_by_month=[], show_future_events=false, show_past_events=false,
-                    has_hidden_events=false) %}
-
+                    has_hidden_events=false, request_params={}) %}
+    {#- request_params parameter provided for template extensions -#}
     {% if has_hidden_events %}
         {% call message_box('highlight', icon=true) %}
             <div class="content smaller">
@@ -85,7 +85,8 @@
     </div>
     <script>
         setupCategoryDisplayEventList({{ (show_future_events and not future_events_by_month) | tojson }},
-                                      {{ (show_past_events and not past_events_by_month) | tojson }});
+                                      {{ (show_past_events and not past_events_by_month) | tojson }},
+                                      {{ request_params | tojson }});
     </script>
 {% endmacro %}
 
