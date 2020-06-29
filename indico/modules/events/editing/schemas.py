@@ -197,6 +197,30 @@ class EditingEditableListSchema(mm.ModelSchema):
         return EditableBasicSchema().dump(editable)
 
 
+class FilteredEditableSchema(mm.ModelSchema):
+    class Meta:
+        model = Editable
+        fields = ('contribution_id', 'contribution_title', 'contribution_code', 'contribution_friendly_id',
+                  'id', 'state', 'timeline_url', 'editor', 'can_assign_self')
+
+    contribution_friendly_id = fields.String(attribute='contribution.friendly_id')
+    contribution_code = fields.String(attribute='contribution.code')
+    contribution_title = fields.String(attribute='contribution.title')
+    state = EnumField(EditableState)
+    timeline_url = fields.String()
+    editor = fields.Nested(EditingUserSchema)
+    can_assign_self = fields.Function(lambda editable, ctx: editable.can_assign_self(ctx.get('user')))
+
+    @post_dump(pass_many=True)
+    def sort_list(self, data, many, **kwargs):
+        if many:
+            data = sorted(data, key=lambda editable: (
+                editable['editor'] is not None,
+                editable['contribution_friendly_id'],
+            ))
+        return data
+
+
 class EditingReviewAction(IndicoEnum):
     accept = 'accept'
     reject = 'reject'

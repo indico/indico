@@ -84,6 +84,8 @@ _bp.add_url_rule('/editing/api/<any(paper,slides,poster):type>/editables/unassig
                  editable_list.RHUnassignEditor, methods=('POST',))
 _bp.add_url_rule('/editing/api/<any(paper,slides,poster):type>/editors', 'api_editable_type_editors',
                  management.RHEditableTypeEditors)
+_bp.add_url_rule('/editing/api/<any(paper,slides,poster):type>/list-with-filetypes',
+                 'api_filter_editables_by_filetypes', editable_list.RHFilterEditablesByFileTypes, methods=('POST',))
 
 # Editable-level APIs
 contrib_api_prefix = '/api' + contrib_prefix
