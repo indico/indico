@@ -25,7 +25,8 @@ import {useNumericParam} from 'indico/react/util/routing';
 import {useTogglableValue} from 'indico/react/hooks';
 import {EditableTypeTitles} from '../../models';
 import Section from '../Section';
-import TeamManagerModal from './TeamManagerModal';
+import TeamManager from './TeamManager';
+import NextEditable from './NextEditable';
 
 import './EditableTypeDashboard.module.scss';
 
@@ -33,6 +34,7 @@ export default function EditableTypeDashboard() {
   const eventId = useNumericParam('confId');
   const {type} = useParams();
   const [editorManagerVisible, setEditorManagerVisible] = useState(false);
+  const [selfAssignModalVisible, setSelfAssignModalVisible] = useState(false);
 
   const [
     selfAssignEnabled,
@@ -129,10 +131,7 @@ export default function EditableTypeDashboard() {
                 <Translate>Manage team</Translate>
               </a>
               {editorManagerVisible && (
-                <TeamManagerModal
-                  editableType={type}
-                  onClose={() => setEditorManagerVisible(false)}
-                />
+                <TeamManager editableType={type} onClose={() => setEditorManagerVisible(false)} />
               )}
             </Section>
             <Section
@@ -153,6 +152,19 @@ export default function EditableTypeDashboard() {
               >
                 <Translate>List</Translate>
               </Link>
+              <a
+                className="i-button icon-arrow-right-sparse"
+                onClick={() => setSelfAssignModalVisible(true)}
+              >
+                <Translate>Get next editable</Translate>
+              </a>
+              {selfAssignModalVisible && (
+                <NextEditable
+                  eventId={eventId}
+                  editableType={type}
+                  onClose={() => setSelfAssignModalVisible(false)}
+                />
+              )}
             </Section>
           </div>
         </>
