@@ -512,7 +512,7 @@ class RHLegacyTimetableEditEntryDateTime(RHManageTimetableEntryBase):
                 raise UserValueError(_("Session block cannot be shortened this much because contributions contained "
                                        "wouldn't fit."))
         notifications = get_time_changes_notifications(changes, tzinfo=self.event.tzinfo, entry=self.entry)
-        return jsonify_data(flash=False, update=serialize_entry_update(self.entry, session_=self.session),
+        return jsonify_data(update=serialize_entry_update(self.entry, session_=self.session),
                             notifications=notifications)
 
 
