@@ -46,7 +46,7 @@ from indico.util.string import RichMarkup, alpha_enum, crc32, html_to_plaintext,
 from indico.web.flask.errors import errors_bp
 from indico.web.flask.stats import get_request_stats, setup_request_stats
 from indico.web.flask.templating import (EnsureUnicodeExtension, call_template_hook, dedent, groupby, instanceof,
-                                         markdown, natsort, subclassof, underline)
+                                         markdown, natsort, plusdelta, subclassof, underline)
 from indico.web.flask.util import ListConverter, XAccelMiddleware, discover_blueprints, url_for, url_rule_to_js
 from indico.web.flask.wrappers import IndicoFlask
 from indico.web.forms.jinja_helpers import is_single_line_field, iter_form_fields, render_field
@@ -200,6 +200,7 @@ def setup_jinja(app):
     app.add_template_filter(html_to_plaintext)
     app.add_template_filter(natsort)
     app.add_template_filter(groupby)
+    app.add_template_filter(plusdelta)
     app.add_template_filter(any)
     app.add_template_filter(alpha_enum)
     app.add_template_filter(crc32)
