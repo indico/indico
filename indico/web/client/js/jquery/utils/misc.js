@@ -75,6 +75,9 @@ import Palette from '../../utils/palette';
   };
 
   global.handleNotifications = function handleNotifications(data) {
+    if (data && data.flashed_messages) {
+      handleFlashes(data);
+    }
     if (data && data.notifications) {
       _.each(data.notifications, function(notification) {
         cornerMessage({
