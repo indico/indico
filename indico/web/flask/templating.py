@@ -13,6 +13,7 @@ import posixpath
 import re
 from operator import itemgetter
 
+from dateutil.relativedelta import relativedelta
 from flask import current_app
 from flask_pluginengine.util import get_state
 from jinja2 import environmentfilter
@@ -78,6 +79,11 @@ def groupby(environment, value, attribute, reverse=False):
     expr = make_attrgetter(environment, attribute)
     return [_GroupTuple(key, list(values))
             for key, values in itertools.groupby(sorted(value, key=expr, reverse=reverse), expr)]
+
+
+def plusdelta(value, **kwargs):
+    """Add a relativedelta to a datetime object."""
+    return value + relativedelta(**kwargs)
 
 
 def instanceof(value, type_):
