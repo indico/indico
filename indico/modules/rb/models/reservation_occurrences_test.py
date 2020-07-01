@@ -258,7 +258,7 @@ def test_cancel(smtp, create_reservation, dummy_user, silent, reason):
     else:
         assert occurrence.reservation.edit_logs.count() == 1
         assert occurrence.reservation.edit_logs[0].user_name == dummy_user.full_name
-        extract_emails(smtp, count=2, regex=True, subject=r'Booking cancelled on .+ \(SINGLE OCCURRENCE\)')
+        extract_emails(smtp, count=2, regex=True, subject=r'Booking cancelled .+ \(SINGLE OCCURRENCE\)')
         if reason:
             assert len(occurrence.reservation.edit_logs[0].info) == 2
         else:
@@ -280,7 +280,7 @@ def test_cancel_single_occurrence(smtp, create_occurrence, dummy_user, silent, f
         assert not occ.reservation.edit_logs.count()
     else:
         assert occ.reservation.edit_logs.count()
-        mails = extract_emails(smtp, count=2, regex=True, subject=r'Booking cancelled on')
+        mails = extract_emails(smtp, count=2, regex=True, subject=r'Booking cancelled')
         assert not any('SINGLE OCCURRENCE' in mail['subject'] for mail in mails)
     assert not smtp.outbox
 
@@ -318,7 +318,7 @@ def test_reject_single_occurrence(smtp, dummy_occurrence, dummy_user, silent):
         assert not dummy_occurrence.reservation.edit_logs.count()
     else:
         assert dummy_occurrence.reservation.edit_logs.count()
-        mails = extract_emails(smtp, count=2, regex=True, subject='Booking rejected on')
+        mails = extract_emails(smtp, count=2, regex=True, subject='Booking rejected')
         assert not any('SINGLE OCCURRENCE' in mail['subject'] for mail in mails)
     assert not smtp.outbox
 
