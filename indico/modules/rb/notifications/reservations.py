@@ -48,7 +48,7 @@ class ReservationNotification(object):
         self.start_dt = format_datetime(reservation.start_dt)
 
     def _get_email_subject(self, **mail_params):
-        return u'{prefix}[{room}] {subject} {date} {suffix}'.format(
+        return u'{prefix}[{room}] {subject} ({date}) {suffix}'.format(
             prefix=to_unicode(mail_params.get('subject_prefix', '')),
             room=self.reservation.room.full_name,
             subject=to_unicode(mail_params.get('subject', '')),
@@ -101,11 +101,11 @@ def notify_cancellation(reservation):
     notification = ReservationNotification(reservation)
     return filter(None, [
         notification.compose_email_to_user(
-            subject='Booking cancelled on',
+            subject='Booking cancelled',
             template_name='cancellation_email_to_user'
         ),
         notification.compose_email_to_manager(
-            subject='Booking cancelled on',
+            subject='Booking cancelled',
             template_name='cancellation_email_to_manager'
         ),
     ])
@@ -118,12 +118,12 @@ def notify_confirmation(reservation, reason=None):
     notification = ReservationNotification(reservation)
     return filter(None, [
         notification.compose_email_to_user(
-            subject='Booking confirmed on',
+            subject='Booking confirmed',
             template_name='confirmation_email_to_user',
             reason=reason
         ),
         notification.compose_email_to_manager(
-            subject='Booking confirmed on',
+            subject='Booking confirmed',
             template_name='confirmation_email_to_manager',
             reason=reason
         ),
@@ -135,7 +135,7 @@ def notify_creation(reservation):
     notification = ReservationNotification(reservation)
     return filter(None, [
         notification.compose_email_to_user(
-            subject='New Booking on' if reservation.is_accepted else 'Pre-Booking awaiting acceptance',
+            subject='New Booking' if reservation.is_accepted else 'Pre-Booking awaiting acceptance',
             template_name='creation_email_to_user' if reservation.is_accepted else 'creation_pre_email_to_user'
         ),
         notification.compose_email_to_manager(
@@ -152,11 +152,11 @@ def notify_rejection(reservation):
     notification = ReservationNotification(reservation)
     return filter(None, [
         notification.compose_email_to_user(
-            subject='Booking rejected on',
+            subject='Booking rejected',
             template_name='rejection_email_to_user',
         ),
         notification.compose_email_to_manager(
-            subject='Booking rejected on',
+            subject='Booking rejected',
             template_name='rejection_email_to_manager',
         )
     ])
@@ -167,11 +167,11 @@ def notify_modification(reservation, changes):
     notification = ReservationNotification(reservation)
     return filter(None, [
         notification.compose_email_to_user(
-            subject='Booking modified on',
+            subject='Booking modified',
             template_name='modification_email_to_user'
         ),
         notification.compose_email_to_manager(
-            subject='Booking modified on',
+            subject='Booking modified',
             template_name='modification_email_to_manager'
         ),
     ])
