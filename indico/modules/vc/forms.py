@@ -7,7 +7,6 @@
 
 from __future__ import unicode_literals
 
-import re
 from datetime import date, timedelta
 from operator import attrgetter
 
@@ -24,11 +23,8 @@ from indico.util.i18n import _
 from indico.web.flask.util import url_for
 from indico.web.forms.base import IndicoForm, generated_data
 from indico.web.forms.fields import EmailListField, IndicoDateField, IndicoRadioField, PrincipalListField
-from indico.web.forms.validators import Exclusive, IndicoRegexp, UsedIf
+from indico.web.forms.validators import Exclusive, UsedIf
 from indico.web.forms.widgets import JinjaWidget, SelectizeWidget, SwitchWidget
-
-
-ROOM_NAME_RE = re.compile(r'[\w\-]+')
 
 
 class VCRoomField(HiddenField):
@@ -109,9 +105,7 @@ class VCRoomFormBase(VCRoomLinkFormBase):
     advanced_fields = {'show'}
     skip_fields = advanced_fields | VCRoomLinkFormBase.conditional_fields
 
-    name = StringField(_('Name'), [DataRequired(), Length(min=3, max=60), IndicoRegexp(ROOM_NAME_RE)],
-                       description=_('The name of the room. It can contain only alphanumerical characters, underscores '
-                                     'and dashes. No spaces allowed.'))
+    name = StringField(_('Name'), [DataRequired(), Length(min=3, max=60)], description=_('The name of the room.'))
 
     def validate_name(self, field):
         if field.data:
