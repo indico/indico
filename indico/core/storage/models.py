@@ -21,6 +21,7 @@ from __future__ import unicode_literals
 
 from sqlalchemy.event import listen
 from sqlalchemy.ext.declarative import declared_attr
+from sqlalchemy.orm import column_property
 
 from indico.core.db import db
 from indico.core.db.sqlalchemy import UTCDateTime
@@ -105,6 +106,11 @@ class StoredFileMixin(object):
             db.String,
             nullable=not cls.file_required
         )
+
+    @declared_attr
+    def extension(cls):
+        """The extension of the file"""
+        return column_property(db.func.regexp_replace(cls.filename, r'^.*\.', ''), deferred=True)
 
     @declared_attr
     def content_type(cls):
