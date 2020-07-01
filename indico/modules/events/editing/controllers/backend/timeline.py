@@ -12,17 +12,18 @@ from io import BytesIO
 from zipfile import ZipFile
 
 from flask import request, session
-from marshmallow import fields
+from marshmallow import fields, validate
 from marshmallow_enum import EnumField
 from sqlalchemy.orm import joinedload
 from werkzeug.exceptions import Forbidden, NotFound
 
+from indico.core.db import db
 from indico.core.errors import UserValueError
-from indico.modules.events.editing.controllers.base import RHContributionEditableBase
+from indico.modules.events.editing.controllers.base import RHContributionEditableBase, TokenAccessMixin
 from indico.modules.events.editing.fields import EditingFilesField, EditingTagsField
 from indico.modules.events.editing.models.comments import EditingRevisionComment
 from indico.modules.events.editing.models.revision_files import EditingRevisionFile
-from indico.modules.events.editing.models.revisions import EditingRevision
+from indico.modules.events.editing.models.revisions import EditingRevision, InitialRevisionState
 from indico.modules.events.editing.operations import (assign_editor, confirm_editable_changes, create_new_editable,
                                                       create_revision_comment, create_submitter_revision,
                                                       delete_revision_comment, replace_revision,
@@ -30,7 +31,10 @@ from indico.modules.events.editing.operations import (assign_editor, confirm_edi
                                                       update_revision_comment)
 from indico.modules.events.editing.schemas import (EditableSchema, EditingConfirmationAction, EditingReviewAction,
                                                    ReviewEditableArgs)
+from indico.modules.events.editing.service import service_handle_editable
+from indico.modules.events.editing.settings import editing_settings
 from indico.modules.files.controllers import UploadFileMixin
+from indico.modules.users import User
 from indico.util.fs import secure_filename
 from indico.util.i18n import _
 from indico.util.marshmallow import not_empty
@@ -39,6 +43,7 @@ from indico.web.flask.util import send_file
 
 
 class RHEditingUploadFile(UploadFileMixin, RHContributionEditableBase):
+    SERVICE_ALLOWED = True
     EDITABLE_REQUIRED = False
 
     def get_file_context(self):
@@ -83,9 +88,11 @@ class RHContributionEditableRevisionBase(RHContributionEditableBase):
         raise NotImplementedError
 
     def _check_access(self):
-        RHContributionEditableBase._check_access(self)
-        if not self._check_revision_access():
-            raise UserValueError(_('You cannot perform this action on this revision'))
+        self.is_service_call = TokenAccessMixin._token_can_access(self)
+        if not self.is_service_call:
+            RHContributionEditableBase._check_access(self)
+            if not self._check_revision_access():
+                raise UserValueError(_('You cannot perform this action on this revision'))
 
 
 class RHEditable(RHContributionEditableBase):
@@ -128,8 +135,13 @@ class RHCreateEditable(RHContributionEditableBase):
         args = parser.parse({
             'files': EditingFilesField(self.event, self.contrib, self.editable_type, required=True)
         })
+        service_url = editing_settings.get(self.event, 'service_url')
+        initial_state = InitialRevisionState.new if service_url else InitialRevisionState.ready_for_review
 
-        create_new_editable(self.contrib, self.editable_type, session.user, args['files'])
+        editable = create_new_editable(self.contrib, self.editable_type, session.user, args['files'], initial_state)
+        db.session.commit()
+        if service_url:
+            service_handle_editable(editable)
         return '', 201
 
 
@@ -168,20 +180,24 @@ class RHConfirmEditableChanges(RHContributionEditableRevisionBase):
 class RHReplaceRevision(RHContributionEditableRevisionBase):
     """Replace the latest revision of an Editable."""
 
+    SERVICE_ALLOWED = True
+
     def _check_revision_access(self):
         # XXX: we still need UI for this or expose it only to the microservice
         return self.editable.editor is None and self.editable.can_perform_submitter_actions(session.user)
 
     @use_kwargs({
-        'comment': fields.String(missing='')
+        'comment': fields.String(missing=''),
+        'state': fields.String(validate=validate.OneOf(InitialRevisionState.__members__))
     })
-    def _process(self, comment):
+    def _process(self, comment, state):
         args = parser.parse({
             'files': EditingFilesField(self.event, self.contrib, self.editable_type, allow_claimed_files=True,
                                        required=True)
         })
 
-        replace_revision(self.revision, session.user, comment, args['files'])
+        user = User.get_system_user() if self.is_service_call else session.user
+        replace_revision(self.revision, user, comment, args['files'], InitialRevisionState[state])
         return '', 204
 
 
@@ -291,6 +307,8 @@ class RHExportRevisionFiles(RHContributionEditableRevisionBase):
 
 class RHDownloadRevisionFile(RHContributionEditableRevisionBase):
     """Download a revision file"""
+
+    SERVICE_ALLOWED = True
 
     normalize_url_spec = {
         'locators': {

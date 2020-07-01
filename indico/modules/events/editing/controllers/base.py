@@ -86,7 +86,7 @@ class RHEditableTypeEditorBase(RHEditableTypeManagementBase):
         RHEditableTypeManagementBase._check_access(self)
 
 
-class RHContributionEditableBase(RequireUserMixin, RHContributionDisplayBase):
+class RHContributionEditableBase(TokenAccessMixin, RequireUserMixin, RHContributionDisplayBase):
     """Base class for operations on an editable."""
 
     EVENT_FEATURE = 'editing'
@@ -102,8 +102,10 @@ class RHContributionEditableBase(RequireUserMixin, RHContributionDisplayBase):
     _editable_query_options = ()
 
     def _check_access(self):
-        RequireUserMixin._check_access(self)
-        RHContributionDisplayBase._check_access(self)
+        self.is_service_call = TokenAccessMixin._token_can_access(self)
+        if not self.is_service_call:
+            RequireUserMixin._check_access(self)
+            RHContributionDisplayBase._check_access(self)
 
     def _process_args(self):
         RHContributionDisplayBase._process_args(self)

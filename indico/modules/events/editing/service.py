@@ -14,6 +14,7 @@ import indico
 from indico.core.config import config
 from indico.modules.events.editing import logger
 from indico.modules.events.editing.models.editable import EditableType
+from indico.modules.events.editing.schemas import EditingRevisionFileSchema
 from indico.modules.events.editing.settings import editing_settings
 from indico.util.caching import memoize_redis
 from indico.util.i18n import _
@@ -80,7 +81,7 @@ def service_handle_enabled(event):
         'title': event.title,
         'url': event.external_url,
         'token': editing_settings.get(event, 'service_token'),
-        'config_endpoints': {
+        'endpoints': {
             'tags': {
                 'create': url_for('.api_create_tag', event, _external=True),
                 'list': url_for('.api_tags', event, _external=True)
@@ -123,3 +124,29 @@ def service_get_status(event):
     except requests.RequestException as exc:
         return {'status': None, 'error': unicode(ServiceRequestFailed(exc))}
     return {'status': resp.json(), 'error': None}
+
+
+def service_handle_editable(editable):
+    revision = editable.revisions[-1]
+    data = {
+        'files': EditingRevisionFileSchema().dump(revision.files, many=True),
+        'endpoints': {
+            'revisions': {
+                'replace': url_for('.api_replace_revision', editable.event,
+                                   contrib_id=editable.contribution_id, type=editable.type.name,
+                                   revision_id=revision.id, _external=True)
+            },
+            'file_upload': url_for('.api_upload', editable.event,
+                                   contrib_id=editable.contribution_id, type=editable.type.name,
+                                   _external=True)
+        }
+    }
+    try:
+        resp = requests.post(_build_url(editable.event, '/event/{}/contributions/{}/editing/{}'
+                                        .format(_get_event_identifier(editable.event),
+                                                editable.contribution_id, editable.type.name)),
+                             headers=_get_headers(editable.event), json=data)
+        resp.raise_for_status()
+    except requests.RequestException as exc:
+        logger.exception('Failed calling listener for editable')
+        raise ServiceRequestFailed(exc)
