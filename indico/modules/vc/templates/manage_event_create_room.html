@@ -13,27 +13,3 @@
     <input class="i-button big highlight" type="submit" value="{% trans %}Save{% endtrans %}">
     <a href="{{ url_for('vc.manage_vc_rooms', event) }}" class="i-button big" data-button-back>{% trans %}Cancel{% endtrans %}</a>
 {% endcall %}
-
-<script>
-    (function() {
-        'use strict';
-
-        function sanitize(text) {
-            return text.trim().replace(/[^\w-]+/g, '_');
-        }
-
-        $('#vc-name').on('change', function() {
-            var $this = $(this),
-                current_val = $this.val(),
-                sanitized_val = sanitize($this.val());
-
-            if (current_val != sanitized_val) {
-                $this.addClass('highlight')
-                     .val(sanitized_val);
-                setTimeout(function() {
-                  $this.removeClass('highlight');
-                }, 1000);
-            }
-        });
-    })();
-</script>
