@@ -151,7 +151,6 @@ class RHVCManageEventCreate(RHVCManageEventCreateBase):
                 db.session.rollback()  # otherwise the incomplete vc room would be added to the db!
             else:
                 db.session.add(vc_room)
-                # TODO: notify_created(vc_room, self.event, session.user)
 
                 flash(_("{plugin_name} room '{room.name}' created").format(
                     plugin_name=self.plugin.friendly_name, room=vc_room), 'success')
