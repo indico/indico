@@ -78,10 +78,10 @@ def _make_editable_files(editable, files):
 
 
 @no_autoflush
-def create_new_editable(contrib, type_, submitter, files):
+def create_new_editable(contrib, type_, submitter, files, initial_state=InitialRevisionState.ready_for_review):
     editable = Editable(contribution=contrib, type=type_)
     revision = EditingRevision(submitter=submitter,
-                               initial_state=InitialRevisionState.ready_for_review,
+                               initial_state=initial_state,
                                files=_make_editable_files(editable, files))
     editable.revisions.append(revision)
     db.session.flush()
@@ -157,7 +157,7 @@ def confirm_editable_changes(revision, submitter, action, comment):
 
 
 @no_autoflush
-def replace_revision(revision, user, comment, files):
+def replace_revision(revision, user, comment, files, initial_state=None):
     _ensure_latest_revision(revision)
     _ensure_state(revision,
                   initial=(InitialRevisionState.new, InitialRevisionState.ready_for_review),
@@ -165,7 +165,7 @@ def replace_revision(revision, user, comment, files):
     revision.comment = comment
     revision.final_state = FinalRevisionState.replaced
     new_revision = EditingRevision(submitter=user,
-                                   initial_state=revision.initial_state,
+                                   initial_state=initial_state or revision.initial_state,
                                    files=_make_editable_files(revision.editable, files))
     revision.editable.revisions.append(new_revision)
     db.session.flush()

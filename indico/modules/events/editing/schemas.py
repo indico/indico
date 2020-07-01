@@ -94,13 +94,14 @@ class EditingTagSchema(mm.ModelSchema):
 class EditingRevisionFileSchema(mm.ModelSchema):
     class Meta:
         model = EditingRevisionFile
-        fields = ('uuid', 'filename', 'size', 'content_type', 'file_type', 'download_url')
+        fields = ('uuid', 'filename', 'size', 'content_type', 'file_type', 'download_url', 'external_download_url')
 
     uuid = fields.String(attribute='file.uuid')
     filename = fields.String(attribute='file.filename')
     size = fields.Int(attribute='file.size')
     content_type = fields.String(attribute='file.content_type')
     download_url = fields.String()
+    external_download_url = fields.String()
 
 
 class EditingRevisionCommentSchema(mm.ModelSchema):

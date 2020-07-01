@@ -73,3 +73,7 @@ class EditingRevisionFile(db.Model):
     @property
     def download_url(self):
         return url_for('event_editing.download_file', self)
+
+    @property
+    def external_download_url(self):
+        return url_for('event_editing.download_file', self, _external=True)
