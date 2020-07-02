@@ -139,6 +139,7 @@ function NextEditableDisplay({eventId, editableType, onClose, fileTypes}) {
                       <Button.Group size="small">
                         {fileType.extensions.map(extension => (
                           <Button
+                            disabled={loading}
                             content={extension}
                             key={extension}
                             onClick={() => updateExtensionFilter(fileType.id, extension)}
@@ -155,6 +156,7 @@ function NextEditableDisplay({eventId, editableType, onClose, fileTypes}) {
                     </>
                   ) : (
                     <Button
+                      disabled={loading}
                       size="small"
                       content={Translate.string('has files')}
                       color={filters[fileType.id] === true ? 'blue' : null}
@@ -163,6 +165,7 @@ function NextEditableDisplay({eventId, editableType, onClose, fileTypes}) {
                     />
                   )}
                   <Button
+                    disabled={loading}
                     size="small"
                     content={Translate.string('has no files')}
                     color={filters[fileType.id] === false ? 'orange' : null}
