@@ -9,13 +9,14 @@
 {%- endmacro %}
 
 {% macro form_header(form, method='post', action='', orientation='horizontal', id=none, classes='', multipart=false,
-                     i_form=true, no_ajax=false, disable_if_locked=true) -%}
+                     i_form=true, no_ajax=false, disable_if_locked=true, extra_attrs={}) -%}
     <form method="{{ method }}" {%- if action %} action="{{ action }}"{% endif %}
           class="{{ 'i-form' if i_form }} {{ 'disable-fields-if-locked' if disable_if_locked }} {{ orientation }} {{ classes }}"
           {% if id %}id="{{ id }}"{% endif %}
           {% if multipart %}enctype="multipart/form-data"{% endif %}
           {% if caller %}{{ caller() }}{% endif %}
-          {% if no_ajax %}data-no-ajax{% endif %}>
+          {% if no_ajax %}data-no-ajax{% endif %}
+          {{ extra_attrs|html_params }}>
         {% if form.meta.csrf -%}
             {{ form.csrf_token() }}
         {% endif %}
