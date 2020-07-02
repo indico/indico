@@ -1,6 +1,6 @@
 {% from 'forms/_form.html' import form_header, form_fieldset, form_footer, form_row, form_rows %}
 
-{{ form_header(form, id='vc-room-form') }}
+{{ form_header(form, id='vc-room-form', extra_attrs={'data-vc-type': plugin.service_name}) }}
 
 {{ form_row(form._fields.name) }}
 {{ form_rows(form, skip=skip_fields) }}
