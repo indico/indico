@@ -12,15 +12,12 @@ import {Param, Translate} from 'indico/react/i18n';
 
 import LogEntryList from '../containers/LogEntryList';
 import Toolbar from './Toolbar';
-import {fetchLogEntries, setMetadataQuery, setPage} from '../actions';
+import {clearMetadataQuery} from '../actions';
 
 function MetadataQueryMessage() {
   const dispatch = useDispatch();
   const resetURLFiltering = () => {
-    dispatch(setMetadataQuery({}));
-    dispatch(setPage(1));
-    dispatch(fetchLogEntries());
-    history.replaceState({}, null, location.pathname);
+    dispatch(clearMetadataQuery());
   };
 
   return (

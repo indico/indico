@@ -5,6 +5,8 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
+import qs from 'qs';
+
 import {indicoAxios, handleAxiosError} from 'indico/utils/axios';
 
 export const SET_KEYWORD = 'SET_KEYWORD';
@@ -36,6 +38,32 @@ export function setDetailedView(entryIndex) {
 
 export function setMetadataQuery(metadataQuery) {
   return {type: SET_METADATA_QUERY, metadataQuery};
+}
+
+export function clearMetadataQuery() {
+  return dispatch => {
+    dispatch(setMetadataQuery({}));
+    dispatch(setPage(1));
+    dispatch(setDetailedView(null));
+    dispatch(fetchLogEntries());
+    history.replaceState({}, null, location.pathname);
+  };
+}
+
+export function showRelatedEntries() {
+  return (dispatch, getStore) => {
+    const {
+      logs: {entries, currentViewIndex},
+    } = getStore();
+
+    const entry = entries[currentViewIndex];
+    const queryString = qs.stringify({meta: entry.meta}, {allowDots: true});
+    dispatch(setMetadataQuery(entry.meta));
+    dispatch(setPage(1));
+    dispatch(setDetailedView(null));
+    dispatch(fetchLogEntries());
+    history.replaceState({}, null, `${location.pathname}?${queryString}`);
+  };
 }
 
 export function viewPrevEntry() {

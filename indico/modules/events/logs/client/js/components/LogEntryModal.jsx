@@ -6,7 +6,6 @@
 // LICENSE file for more details.
 
 import moment from 'moment';
-import qs from 'qs';
 import React from 'react';
 import PropTypes from 'prop-types';
 
@@ -66,11 +65,8 @@ export default class LogEntryModal extends React.Component {
   }
 
   relatedEntries() {
-    const {currentViewIndex, entries, relatedEntries} = this.props;
-    const entry = entries[currentViewIndex];
-    const queryString = qs.stringify({meta: entry.meta}, {allowDots: true});
-    relatedEntries(entry.meta);
-    history.replaceState({}, null, `${location.pathname}?${queryString}`);
+    const {relatedEntries} = this.props;
+    relatedEntries();
   }
 
   _isFirstEntry() {
