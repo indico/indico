@@ -37,21 +37,17 @@ function createNewCustomItemFromRevision(revision, updates) {
 export function processRevisions(revisions) {
   const newRevisions = [];
   let numberOfRevisions = 1;
-  let currentRevision = revisions[0];
-  let previousRevision = null;
-  let items = [...currentRevision.comments];
+  let items = [...revisions[0].comments];
+  let currRevision = null;
 
   for (const [index, revision] of revisions.entries()) {
     const {initialState, finalState} = revision;
-    if (!currentRevision) {
-      currentRevision = {...revision};
-      items = [...currentRevision.comments];
-    }
 
     if (initialState.name === InitialRevisionState.needs_submitter_confirmation) {
-      currentRevision.header = Translate.string(
+      const prevRevision = revisions[index - 1];
+      revision.header = Translate.string(
         '{editorName} (editor) has made some changes to the paper',
-        {editorName: previousRevision.editor.fullName}
+        {editorName: prevRevision && prevRevision.editor ? prevRevision.editor.fullName : ''}
       );
     }
 
@@ -121,25 +117,16 @@ export function processRevisions(revisions) {
       );
     }
 
-    previousRevision = currentRevision;
-    if (shouldCreateNewRevision(revision)) {
+    currRevision = currRevision || revision;
+    if (shouldCreateNewRevision(revision) || index === revisions.length - 1) {
       newRevisions.push({
-        ..._.omit(currentRevision, 'comments'),
+        ..._.omit(currRevision, 'comments'),
         number: numberOfRevisions++,
         items,
       });
-
-      currentRevision = null;
+      currRevision = null;
       items = [];
     }
-  }
-
-  if (currentRevision) {
-    newRevisions.push({
-      ..._.omit(currentRevision, 'comments'),
-      number: numberOfRevisions++,
-      items,
-    });
   }
 
   return newRevisions;
