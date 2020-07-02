@@ -88,5 +88,5 @@ class EditableList(ModelList):
         def _get_query(m):
             return (m.query
                     .join(Contribution)
-                    .filter(Contribution.event_id == event.id, m.type == editable_type))
+                    .filter(~Contribution.is_deleted, Contribution.event_id == event.id, m.type == editable_type))
         super(EditableList, self).__init__(model=Editable, get_query=_get_query, collection_class=set, **kwargs)
