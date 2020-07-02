@@ -7,8 +7,6 @@
 
 from __future__ import unicode_literals
 
-import json
-
 from flask import jsonify, request
 
 from indico.core.db import db
@@ -27,12 +25,17 @@ def _contains(field, text):
             .match(db.func.indico.indico_unaccent(preprocess_ts_string(text)), postgresql_regconfig='simple'))
 
 
+def _get_metadata_query():
+    return {k[len('meta.'):]: int(v) if v.isdigit() else v
+            for k, v in request.args.iteritems()
+            if k.startswith('meta.')}
+
+
 class RHEventLogs(RHManageEventBase):
     """Shows the modification/action log for the event"""
 
     def _process(self):
-        metadata_query = {k[len('meta.'):]: int(v) if v.isdigit() else v
-                          for k, v in request.args.iteritems() if k.startswith('meta.')}
+        metadata_query = _get_metadata_query()
         realms = {realm.name: realm.title for realm in EventLogRealm}
         return WPEventLogs.render_template('logs.html', self.event, realms=realms, metadata_query=metadata_query)
 
@@ -41,10 +44,10 @@ class RHEventLogsJSON(RHManageEventBase):
     def _process(self):
         page = int(request.args.get('page', 1))
         filters = request.args.getlist('filters')
-        data = json.loads(request.args.get('data', '{}'))
+        metadata_query = _get_metadata_query()
         text = request.args.get('q')
 
-        if not filters and not data:
+        if not filters and not metadata_query:
             return jsonify(current_page=1, pages=[], entries=[], total_page_count=0)
 
         query = self.event.log_entries.order_by(EventLogEntry.logged_dt.desc())
@@ -65,8 +68,8 @@ class RHEventLogsJSON(RHManageEventBase):
                        _contains(EventLogEntry.data['cc'].astext, text))
             ).outerjoin(db.m.User)
 
-        if data:
-            query = query.filter(EventLogEntry.meta.contains(data))
+        if metadata_query:
+            query = query.filter(EventLogEntry.meta.contains(metadata_query))
 
         query = query.paginate(page, LOG_PAGE_SIZE)
         entries = [dict(serialize_log_entry(entry), index=index, html=entry.render())

@@ -131,7 +131,7 @@ export function fetchLogEntries() {
     const params = {
       page: currentPage,
       filters: [],
-      data: JSON.stringify(metadataQuery),
+      meta: metadataQuery,
     };
     if (keyword) {
       params.q = keyword;
@@ -145,7 +145,10 @@ export function fetchLogEntries() {
 
     let response;
     try {
-      response = await indicoAxios.get(fetchLogsUrl, {params});
+      response = await indicoAxios.get(fetchLogsUrl, {
+        params,
+        paramsSerializer: p => qs.stringify(p, {arrayFormat: 'repeat', allowDots: true}),
+      });
     } catch (error) {
       handleAxiosError(error);
       dispatch(fetchFailed());
