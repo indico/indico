@@ -12,7 +12,7 @@ import fileTypesURL from 'indico-url:event_editing.api_file_types';
 import _ from 'lodash';
 import React, {useState, useEffect} from 'react';
 import PropTypes from 'prop-types';
-import {Button, Loader, Modal, Table, Checkbox} from 'semantic-ui-react';
+import {Button, Loader, Modal, Table, Checkbox, Dimmer} from 'semantic-ui-react';
 import {camelizeKeys} from 'indico/utils/case';
 import {Translate} from 'indico/react/i18n';
 import {indicoAxios, handleAxiosError} from 'indico/utils/axios';
@@ -55,10 +55,12 @@ function NextEditableDisplay({eventId, editableType, onClose, fileTypes}) {
   const [filters, setFilters] = useState({});
   const [filteredEditables, setFilteredEditables] = useState(null);
   const [selectedEditable, setSelectedEditable] = useState(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     (async () => {
       setSelectedEditable(null);
+      setLoading(true);
       let response;
       try {
         response = await indicoAxios.post(editableListURL({confId: eventId, type: editableType}), {
@@ -67,9 +69,11 @@ function NextEditableDisplay({eventId, editableType, onClose, fileTypes}) {
         });
       } catch (e) {
         handleAxiosError(e);
+        setLoading(false);
         return;
       }
       setFilteredEditables(camelizeKeys(response.data));
+      setLoading(false);
     })();
   }, [eventId, editableType, filters]);
 
@@ -170,13 +174,16 @@ function NextEditableDisplay({eventId, editableType, onClose, fileTypes}) {
             );
           })}
         </div>
-        <div styleName="filtered-editables">
+        <Dimmer.Dimmable styleName="filtered-editables" dimmed={loading}>
           <NextEditableTable
             filteredEditables={filteredEditables}
             selectedEditable={selectedEditable}
             setSelectedEditable={setSelectedEditable}
           />
-        </div>
+          <Dimmer active={loading} inverted>
+            <Loader />
+          </Dimmer>
+        </Dimmer.Dimmable>
       </Modal.Content>
       <Modal.Actions style={{display: 'flex', justifyContent: 'flex-end'}}>
         <Button onClick={onClose}>
@@ -199,7 +206,7 @@ NextEditableDisplay.propTypes = {
 
 function NextEditableTable({filteredEditables, selectedEditable, setSelectedEditable}) {
   if (filteredEditables === null) {
-    return <Loader active inline="centered" />;
+    return null;
   }
 
   const codePresent = Object.values(filteredEditables).some(c => c.contributionCode);

@@ -27,15 +27,3 @@
   text-align: center;
   color: $gray;
 }
-
-:global(.ui.loader) {
-  color: rgba(0, 0, 0, 0.87) !important;
-
-  &::before {
-    border-color: rgba(0, 0, 0, 0.1) !important;
-  }
-
-  &::after {
-    border-color: $gray transparent transparent !important;
-  }
-}
