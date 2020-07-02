@@ -163,6 +163,9 @@ import {$T} from '../../utils/i18n';
             dialogClasses: $this.data('dialog-classes'),
             hidePageHeader: $this.data('hide-page-header') !== undefined,
             confirmCloseUnsaved: $this.data('confirm-close-unsaved') !== undefined,
+            onOpen: ({dialogElement}) => {
+              dialogElement.trigger('indico:dialogOpen');
+            },
             onClose: function(data, customData) {
               if (data) {
                 handleFlashes(data, true, $this);
