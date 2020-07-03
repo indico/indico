@@ -132,20 +132,18 @@ def service_handle_editable(editable):
         'files': EditingRevisionFileSchema().dump(revision.files, many=True),
         'endpoints': {
             'revisions': {
-                'replace': url_for('.api_replace_revision', editable.event,
-                                   contrib_id=editable.contribution_id, type=editable.type.name,
-                                   revision_id=revision.id, _external=True)
+                'replace': url_for('.api_replace_revision', revision, _external=True)
             },
-            'file_upload': url_for('.api_upload', editable.event,
-                                   contrib_id=editable.contribution_id, type=editable.type.name,
-                                   _external=True)
+            'file_upload': url_for('.api_upload', editable.contribution, type=editable.type.name, _external=True)
         }
     }
     try:
-        resp = requests.post(_build_url(editable.event, '/event/{}/contributions/{}/editing/{}'
-                                        .format(_get_event_identifier(editable.event),
-                                                editable.contribution_id, editable.type.name)),
-                             headers=_get_headers(editable.event), json=data)
+        path = '/event/{}/contributions/{}/editing/{}'.format(
+            _get_event_identifier(editable.event),
+            editable.contribution_id,
+            editable.type.name
+        )
+        resp = requests.post(_build_url(editable.event, path), headers=_get_headers(editable.event), json=data)
         resp.raise_for_status()
     except requests.RequestException as exc:
         logger.exception('Failed calling listener for editable')

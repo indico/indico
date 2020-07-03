@@ -89,6 +89,14 @@ def create_new_editable(contrib, type_, submitter, files, initial_state=InitialR
     return editable
 
 
+def delete_editable(editable):
+    db.session.delete(editable)
+    for revision in editable.revisions:
+        for ef in revision.files:
+            ef.file.unclaim()
+    db.session.flush()
+
+
 def publish_editable_revision(revision):
     _ensure_latest_revision(revision)
     revision.editable.published_revision = revision
@@ -165,7 +173,7 @@ def replace_revision(revision, user, comment, files, initial_state=None):
     revision.comment = comment
     revision.final_state = FinalRevisionState.replaced
     new_revision = EditingRevision(submitter=user,
-                                   initial_state=initial_state or revision.initial_state,
+                                   initial_state=(initial_state or revision.initial_state),
                                    files=_make_editable_files(revision.editable, files))
     revision.editable.revisions.append(new_revision)
     db.session.flush()
