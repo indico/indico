@@ -19,6 +19,7 @@ from werkzeug.exceptions import BadRequest, Forbidden, NotFound
 
 from indico.core.db import db
 from indico.core.errors import UserValueError
+from indico.modules.events import logger
 from indico.modules.events.editing.controllers.base import RHContributionEditableBase, TokenAccessMixin
 from indico.modules.events.editing.fields import EditingFilesField, EditingTagsField
 from indico.modules.events.editing.models.comments import EditingRevisionComment
@@ -88,8 +89,7 @@ class RHContributionEditableRevisionBase(RHContributionEditableBase):
         raise NotImplementedError
 
     def _check_access(self):
-        self.is_service_call = TokenAccessMixin._token_can_access(self)
-        if not self.is_service_call:
+        if not TokenAccessMixin._token_can_access(self):
             RHContributionEditableBase._check_access(self)
             if not self._check_revision_access():
                 raise UserValueError(_('You cannot perform this action on this revision'))
@@ -143,9 +143,10 @@ class RHCreateEditable(RHContributionEditableBase):
         if service_url:
             try:
                 service_handle_editable(editable)
-            except ServiceRequestFailed:
+            except ServiceRequestFailed as exc:
                 delete_editable(editable)
                 db.session.commit()
+                logger.exception('Failed to contact service. Got: %r', exc.message)
                 raise BadRequest(_('Failed while submitting for editing. The associated service is not available.'))
         return '', 201
 
