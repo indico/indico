@@ -80,6 +80,8 @@ Improvements
   (:issue:`4498`, thanks :user:`omegak`)
 - Allow filtering event log by related entries (:issue:`4503`, thanks
   :user:`omegak`)
+- Do not automatically show the browser's print dialog in a meeting's print
+  view (:issue:`4513`)
 
 Bugfixes
 ^^^^^^^^
