@@ -25,6 +25,10 @@ from indico.web.rh import RequireUserMixin
 class TokenAccessMixin(object):
     SERVICE_ALLOWED = False
 
+    def __init__(self):
+        super(TokenAccessMixin, self).__init__()
+        self.is_service_call = False
+
     def _token_can_access(self):
         # we need to "fish" the event here because at this point _check_params
         # hasn't run yet
@@ -36,7 +40,8 @@ class TokenAccessMixin(object):
         if request.bearer_token != event_token:
             raise Unauthorized('Invalid bearer token')
 
-        return True
+        self.is_service_call = True
+        return self.is_service_call
 
     def _check_csrf(self):
         # check CSRF if there is no bearer token or there's a session cookie
@@ -50,8 +55,7 @@ class RHEditingBase(TokenAccessMixin, RequireUserMixin, RHDisplayEventBase):
     EVENT_FEATURE = 'editing'
 
     def _check_access(self):
-        self.is_service_call = TokenAccessMixin._token_can_access(self)
-        if not self.is_service_call:
+        if not TokenAccessMixin._token_can_access(self):
             RHDisplayEventBase._check_access(self)
             RequireUserMixin._check_access(self)
 
@@ -63,8 +67,7 @@ class RHEditingManagementBase(TokenAccessMixin, RHManageEventBase):
     PERMISSION = 'editing_manager'
 
     def _check_access(self):
-        self.is_service_call = TokenAccessMixin._token_can_access(self)
-        if not self.is_service_call:
+        if not TokenAccessMixin._token_can_access(self):
             super(RHEditingManagementBase, self)._check_access()
 
 
@@ -102,8 +105,7 @@ class RHContributionEditableBase(TokenAccessMixin, RequireUserMixin, RHContribut
     _editable_query_options = ()
 
     def _check_access(self):
-        self.is_service_call = TokenAccessMixin._token_can_access(self)
-        if not self.is_service_call:
+        if not TokenAccessMixin._token_can_access(self):
             RequireUserMixin._check_access(self)
             RHContributionDisplayBase._check_access(self)
 
