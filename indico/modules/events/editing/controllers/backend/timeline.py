@@ -12,10 +12,10 @@ from io import BytesIO
 from zipfile import ZipFile
 
 from flask import request, session
-from marshmallow import fields, validate
+from marshmallow import fields
 from marshmallow_enum import EnumField
 from sqlalchemy.orm import joinedload
-from werkzeug.exceptions import Forbidden, NotFound
+from werkzeug.exceptions import BadRequest, Forbidden, NotFound
 
 from indico.core.db import db
 from indico.core.errors import UserValueError
@@ -26,12 +26,12 @@ from indico.modules.events.editing.models.revision_files import EditingRevisionF
 from indico.modules.events.editing.models.revisions import EditingRevision, InitialRevisionState
 from indico.modules.events.editing.operations import (assign_editor, confirm_editable_changes, create_new_editable,
                                                       create_revision_comment, create_submitter_revision,
-                                                      delete_revision_comment, replace_revision,
+                                                      delete_editable, delete_revision_comment, replace_revision,
                                                       review_editable_revision, unassign_editor, undo_review,
                                                       update_revision_comment)
 from indico.modules.events.editing.schemas import (EditableSchema, EditingConfirmationAction, EditingReviewAction,
                                                    ReviewEditableArgs)
-from indico.modules.events.editing.service import service_handle_editable
+from indico.modules.events.editing.service import ServiceRequestFailed, service_handle_editable
 from indico.modules.events.editing.settings import editing_settings
 from indico.modules.files.controllers import UploadFileMixin
 from indico.modules.users import User
@@ -141,7 +141,12 @@ class RHCreateEditable(RHContributionEditableBase):
         editable = create_new_editable(self.contrib, self.editable_type, session.user, args['files'], initial_state)
         db.session.commit()
         if service_url:
-            service_handle_editable(editable)
+            try:
+                service_handle_editable(editable)
+            except ServiceRequestFailed:
+                delete_editable(editable)
+                db.session.commit()
+                raise BadRequest(_('Failed while submitting for editing. The associated service is not available.'))
         return '', 201
 
 
@@ -188,7 +193,7 @@ class RHReplaceRevision(RHContributionEditableRevisionBase):
 
     @use_kwargs({
         'comment': fields.String(missing=''),
-        'state': fields.String(validate=validate.OneOf(InitialRevisionState.__members__))
+        'state': EnumField(InitialRevisionState)
     })
     def _process(self, comment, state):
         args = parser.parse({
@@ -197,7 +202,7 @@ class RHReplaceRevision(RHContributionEditableRevisionBase):
         })
 
         user = User.get_system_user() if self.is_service_call else session.user
-        replace_revision(self.revision, user, comment, args['files'], InitialRevisionState[state])
+        replace_revision(self.revision, user, comment, args['files'], state)
         return '', 204
 
 
