@@ -9,6 +9,7 @@ import React, {useContext, useCallback, useState} from 'react';
 import PropTypes from 'prop-types';
 import {useDropzone} from 'react-dropzone';
 import {Icon} from 'semantic-ui-react';
+import {TooltipIfTruncated} from 'indico/react/components';
 import {
   FileManagerContext,
   filePropTypes,
@@ -73,15 +74,17 @@ function FileEntry({uploadURL, fileType, file: {uuid, filename, state, claimed, 
 
   return (
     <>
-      <span styleName="file-state" className={state || ''}>
-        {downloadURL ? (
-          <a href={downloadURL} target="_blank" rel="noopener noreferrer">
-            {filename}
-          </a>
-        ) : (
-          filename
-        )}
-      </span>
+      <TooltipIfTruncated>
+        <span styleName="file-state" className={state || ''}>
+          {downloadURL ? (
+            <a href={downloadURL} target="_blank" rel="noopener noreferrer">
+              {filename}
+            </a>
+          ) : (
+            filename
+          )}
+        </span>
+      </TooltipIfTruncated>
       <span>
         {!state && fileType.allowMultipleFiles && (
           <>

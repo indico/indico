@@ -96,7 +96,7 @@ export function Dropzone({
   });
 
   return (
-    <div {...getRootProps()}>
+    <div {...getRootProps()} styleName="outer-dropzone">
       <input {...getInputProps()} />
       <div styleName="dropzone" className={isDragActive ? 'active' : ''}>
         <Icon color="grey" size="big" name={showNewFileIcon ? 'plus circle' : 'exchange'} />
@@ -154,26 +154,8 @@ function FileType({
             }
           />
         )}
-        {fileType.filenameTemplate !== null && (
-          <Popup
-            position="bottom center"
-            content={
-              <Translate>
-                Filenames must have the format{' '}
-                <Param name="template" value={fileType.filenameTemplate} wrapper={<code />} />
-              </Translate>
-            }
-            trigger={<Icon corner="top right" name="info" />}
-          />
-        )}
       </h3>
-      <TooltipIfTruncated tooltip={fileType.extensions.join(', ')}>
-        <ul styleName="file-extensions">
-          {fileType.extensions.length !== 0
-            ? fileType.extensions.map(ext => <li key={ext}>{ext}</li>)
-            : Translate.string('(no extension restrictions)')}
-        </ul>
-      </TooltipIfTruncated>
+      <FileRequirements fileType={fileType} />
       <FileList files={files} fileType={fileType} uploadURL={uploadURL} />
       {!_.isEmpty(uploads) && <Uploads uploads={uploads} />}
       {!_.isEmpty(fileType.invalidFiles) && (
@@ -243,6 +225,45 @@ FileType.defaultProps = {
   uploads: {},
   uploadableFiles: [],
   uploadExistingURL: null,
+};
+
+function FileRequirements({fileType}) {
+  let extensionInfo = null;
+  let templateInfo = null;
+  if (fileType.filenameTemplate !== null) {
+    const pattern = fileType.filenameTemplate;
+    const extension = fileType.extensions.length === 1 ? fileType.extensions[0] : '*';
+    templateInfo = (
+      <Translate>
+        Filename pattern:{' '}
+        <Param name="pattern" wrapper={<code />} value={`${pattern}.${extension}`} />
+      </Translate>
+    );
+  }
+  if (
+    fileType.extensions.length > 1 ||
+    (fileType.extensions.length !== 0 && fileType.filenameTemplate === null)
+  ) {
+    extensionInfo = fileType.extensions.join(', ');
+  }
+  return (
+    <>
+      {extensionInfo && (
+        <TooltipIfTruncated>
+          <div styleName="file-requirements">{extensionInfo}</div>
+        </TooltipIfTruncated>
+      )}
+      {templateInfo && (
+        <TooltipIfTruncated>
+          <div styleName="file-requirements">{templateInfo}</div>
+        </TooltipIfTruncated>
+      )}
+    </>
+  );
+}
+
+FileRequirements.propTypes = {
+  fileType: PropTypes.shape(fileTypePropTypes).isRequired,
 };
 
 export default function FileManager({

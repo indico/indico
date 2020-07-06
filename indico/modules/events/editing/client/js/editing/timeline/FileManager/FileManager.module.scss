@@ -7,6 +7,10 @@
 
 @import 'base/palette';
 
+.outer-dropzone {
+  margin-top: auto;
+}
+
 .dropzone {
   width: 100%;
   border: 2px dashed $gray;
@@ -32,35 +36,26 @@
 .file-manager {
   display: flex;
   flex-wrap: wrap;
+  margin-left: -0.9em;
 
   .file-type {
+    display: flex;
+    flex-direction: column;
     margin-bottom: 1em;
     border: 1px solid $gray;
     border-radius: 3px;
     padding: 1em;
-    flex: 0 0 32%;
+    width: 31%;
+    margin-left: 0.9em;
 
-    &:not(:nth-child(3n)) {
-      margin-right: 0.9em;
-    }
-
-    .file-extensions {
+    .file-requirements {
       font-style: italic;
       color: $gray;
-      list-style-type: none;
       margin: 0.2em 0;
       padding: 0;
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
-
-      li {
-        display: inline;
-
-        &:not(:last-child)::after {
-          content: ', ';
-        }
-      }
     }
   }
 
