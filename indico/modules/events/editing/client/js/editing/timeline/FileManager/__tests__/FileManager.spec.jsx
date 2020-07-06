@@ -151,7 +151,7 @@ function getFileEntryForFileType(wrapper, fileTypeId) {
 }
 
 function checkFileEntry(fileEntry, name, icon) {
-  expect(fileEntry.find('span:first-child').text()).toEqual(name);
+  expect(fileEntry.find('TooltipIfTruncated > span').text()).toEqual(name);
   expect(fileEntry.find('FileAction').prop('icon')).toEqual(icon);
 }
 
@@ -311,7 +311,7 @@ describe('File manager', () => {
 
     // modified file renders properly
     const fileEntry = getFileEntryForFileType(wrapper, 2);
-    expect(fileEntry.find('span:first-child').text()).toEqual('test.pdf');
+    expect(fileEntry.find('TooltipIfTruncated > span').text()).toEqual('test.pdf');
     expect(fileEntry.find('FileAction').prop('icon')).toEqual('undo');
   });
 
