@@ -21,6 +21,7 @@
         showEmptyCoauthors: true,
         sort: true,
         sortByLastName: false,
+        sessionUser: null,
         allow: {
           authors: false,
           submitters: false,
@@ -55,6 +56,7 @@
     var $noOtherPlaceholder = $fieldDisplay.find('#no-other-placeholder-' + options.fieldId);
     var $buttonAddExisting = $('#add-existing-' + options.fieldId);
     var $buttonAddNew = $('#add-new-' + options.fieldId);
+    var $buttonAddMyself = $('#add-myself-' + options.fieldId);
     var $buttonAlphaOrder = $fieldDisplay.find('.alpha-order-switch');
     var $form = $field.closest('form');
     var customOrder = !$buttonAlphaOrder.hasClass('active');
@@ -379,6 +381,10 @@
 
     $buttonAddNew.on('click', function() {
       $field.principalfield('enter');
+    });
+
+    $buttonAddMyself.on('click', function() {
+      $field.principalfield('add', [options.sessionUser]);
     });
 
     function getSortingMessage() {

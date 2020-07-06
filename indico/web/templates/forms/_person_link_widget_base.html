@@ -29,11 +29,17 @@
                 {% else %}
                     {% set msg = _("Search among Indico users") %}
                 {% endif %}
-                <span id="add-existing-{{ field.id }}" class="i-button highlight text-color {{ 'disabled' if field.disable_user_search }}"
+                {% if session.user %}
+                    <span id="add-myself-{{ field.id }}" class="i-button icon-user"
+                          title="{% trans %}Add yourself to the list{% endtrans %}">
+                        {% trans %}Add myself{% endtrans %}
+                    </span>
+                {% endif %}
+                <span id="add-existing-{{ field.id }}" class="i-button highlight {{ 'disabled' if field.disable_user_search }}"
                       title="{{ msg }}">
                     {% trans %}Search{% endtrans %}
                 </span>
-                <span id="add-new-{{ field.id }}" class="i-button"
+                <span id="add-new-{{ field.id }}" class="i-button highlight"
                       title="{% trans %}Enter person information manually{% endtrans %}">
                     {% trans %}Enter manually{% endtrans %}
                 </span>
@@ -68,7 +74,19 @@
                 secondaryAuthor: {{ field.require_secondary_author | default(false) | tojson }},
                 submitter: {{ field.require_submitter_author | default(false) | tojson }},
                 speaker: {{ field.require_speaker_author | default(false) | tojson }}
-            }
+            },
+            sessionUser: {{ ({
+                'id': session.user.id,
+                'title': session.user.title,
+                'identifier': session.user.identifier,
+                'name': session.user.display_full_name,
+                'familyName': session.user.last_name,
+                'firstName': session.user.first_name,
+                'affiliation': session.user.affiliation,
+                'phone': session.user.phone,
+                'email': session.user.email,
+                '_type': 'Avatar'
+            } if session.user else none) | tojson }}
         });
     </script>
 {% endblock %}

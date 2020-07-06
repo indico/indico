@@ -82,6 +82,8 @@ Improvements
   :user:`omegak`)
 - Do not automatically show the browser's print dialog in a meeting's print
   view (:issue:`4513`)
+- Add "Add myself" button to person list fields (e.g. for abstract authors)
+  (:issue:`4411`, thanks :user:`jgrigera`)
 
 Bugfixes
 ^^^^^^^^
