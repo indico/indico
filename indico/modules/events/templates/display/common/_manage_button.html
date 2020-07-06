@@ -150,6 +150,17 @@
                 </a>
             </li>
         {% endif %}
+        {% if item_type == 'CONTRIBUTION' and item.can_manage(session.user) %}
+            <li>
+                <a href=""
+                   class="subcontributions-edit"
+                   data-href="{{ url_for('contributions.manage_subcontributions', item) }}"
+                   data-title="{% trans title=item.title %}Manage subcontributions{% endtrans %}"
+                   data-subtitle="{{ item.title }}">
+                    {% trans %}Manage subcontributions{% endtrans %}
+                </a>
+            </li>
+        {% endif %}
     </ul>
 {%- endmacro %}
 
