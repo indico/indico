@@ -86,6 +86,12 @@ def plusdelta(value, **kwargs):
     return value + relativedelta(**kwargs)
 
 
+def decodeprincipal(value, **kwargs):
+    """Decode a principal into an actual object."""
+    from indico.util.user import principal_from_identifier
+    return principal_from_identifier(value, soft_fail=True, **kwargs)
+
+
 def instanceof(value, type_):
     """Checks if `value` is an instance of `type_`
 
