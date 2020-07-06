@@ -145,6 +145,15 @@ function FileType({
     <div styleName="file-type">
       <h3>
         {fileType.name}
+        {fileType.required && (
+          <Popup
+            position="bottom center"
+            content={<Translate>This file type is required</Translate>}
+            trigger={
+              <Icon corner="top right" name="asterisk" color={files.length ? 'black' : 'red'} />
+            }
+          />
+        )}
         {fileType.filenameTemplate !== null && (
           <Popup
             position="bottom center"
