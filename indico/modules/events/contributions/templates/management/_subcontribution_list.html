@@ -87,7 +87,8 @@
                                 <td class="i-table hide-if-locked">
                                     <div class="group right">
                                         <a href="#" class="icon-edit i-link"
-                                           data-title="{% trans %}Edit the subcontribution{% endtrans %}"
+                                           data-title="{% trans %}Edit subcontribution{% endtrans %}"
+                                           data-subtitle="{{ subcontribution.title }}"
                                            data-href="{{ url_for('.manage_edit_subcontrib', subcontribution) }}"
                                            data-update="#subcontribution-list"
                                            data-ajax-dialog>

@@ -132,7 +132,8 @@
                 <li>
                     <a href=""
                        class="subcontribution-edit"
-                       data-title="{% trans %}Edit the subcontribution{% endtrans %}"
+                       data-title="{% trans %}Edit subcontribution{% endtrans %}"
+                       data-subtitle="{{ item.title }}"
                        data-href="{{ url_for('contributions.manage_edit_subcontrib', item) }}">
                         {% trans %}Edit subcontribution{% endtrans %}
                     </a>
