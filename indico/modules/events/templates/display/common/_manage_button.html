@@ -130,10 +130,11 @@
             {% endif %}
             {% if item.can_manage(session.user) %}
                 <li>
-                    <a href="" class="subcontribution-edit"
+                    <a href=""
+                       class="subcontribution-edit"
                        data-title="{% trans %}Edit the subcontribution{% endtrans %}"
                        data-href="{{ url_for('contributions.manage_edit_subcontrib', item) }}">
-                        {% trans %}Edit Sub-contribution{% endtrans %}
+                        {% trans %}Edit subcontribution{% endtrans %}
                     </a>
                 </li>
             {% endif %}
