@@ -64,10 +64,6 @@ class File(StoredFileMixin, db.Model):
         # file was already claimed?
         self.meta = meta
 
-    def unclaim(self):
-        self.claimed = False
-        self.meta = {}
-
     def _build_storage_path(self):
         path_segments = list(map(strict_unicode, self.__context))
         self.assign_id()

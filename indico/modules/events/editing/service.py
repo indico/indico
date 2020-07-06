@@ -126,7 +126,7 @@ def service_get_status(event):
     return {'status': resp.json(), 'error': None}
 
 
-def service_handle_editable(editable):
+def service_handle_new_editable(editable):
     revision = editable.revisions[-1]
     data = {
         'files': EditingRevisionFileSchema().dump(revision.files, many=True),
@@ -134,7 +134,7 @@ def service_handle_editable(editable):
             'revisions': {
                 'replace': url_for('.api_replace_revision', revision, _external=True)
             },
-            'file_upload': url_for('.api_upload', editable.contribution, type=editable.type.name, _external=True)
+            'file_upload': url_for('.api_upload', editable, _external=True)
         }
     }
     try:

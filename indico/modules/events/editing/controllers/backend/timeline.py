@@ -15,11 +15,10 @@ from flask import request, session
 from marshmallow import fields
 from marshmallow_enum import EnumField
 from sqlalchemy.orm import joinedload
-from werkzeug.exceptions import BadRequest, Forbidden, NotFound
+from werkzeug.exceptions import Forbidden, NotFound, ServiceUnavailable
 
 from indico.core.db import db
 from indico.core.errors import UserValueError
-from indico.modules.events import logger
 from indico.modules.events.editing.controllers.base import RHContributionEditableBase, TokenAccessMixin
 from indico.modules.events.editing.fields import EditingFilesField, EditingTagsField
 from indico.modules.events.editing.models.comments import EditingRevisionComment
@@ -32,7 +31,7 @@ from indico.modules.events.editing.operations import (assign_editor, confirm_edi
                                                       update_revision_comment)
 from indico.modules.events.editing.schemas import (EditableSchema, EditingConfirmationAction, EditingReviewAction,
                                                    ReviewEditableArgs)
-from indico.modules.events.editing.service import ServiceRequestFailed, service_handle_editable
+from indico.modules.events.editing.service import ServiceRequestFailed, service_handle_new_editable
 from indico.modules.events.editing.settings import editing_settings
 from indico.modules.files.controllers import UploadFileMixin
 from indico.modules.users import User
@@ -142,12 +141,11 @@ class RHCreateEditable(RHContributionEditableBase):
         db.session.commit()
         if service_url:
             try:
-                service_handle_editable(editable)
-            except ServiceRequestFailed as exc:
+                service_handle_new_editable(editable)
+            except ServiceRequestFailed:
                 delete_editable(editable)
                 db.session.commit()
-                logger.exception('Failed to contact service. Got: %r', exc.message)
-                raise BadRequest(_('Failed while submitting for editing. The associated service is not available.'))
+                raise ServiceUnavailable(_('Submission failed, please try again later.'))
         return '', 201
 
 
