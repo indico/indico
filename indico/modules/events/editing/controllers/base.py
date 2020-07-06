@@ -24,10 +24,7 @@ from indico.web.rh import RequireUserMixin
 
 class TokenAccessMixin(object):
     SERVICE_ALLOWED = False
-
-    def __init__(self):
-        super(TokenAccessMixin, self).__init__()
-        self.is_service_call = False
+    is_service_call = False
 
     def _token_can_access(self):
         # we need to "fish" the event here because at this point _check_params
@@ -41,7 +38,7 @@ class TokenAccessMixin(object):
             raise Unauthorized('Invalid bearer token')
 
         self.is_service_call = True
-        return self.is_service_call
+        return True
 
     def _check_csrf(self):
         # check CSRF if there is no bearer token or there's a session cookie

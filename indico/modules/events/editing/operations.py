@@ -93,7 +93,8 @@ def delete_editable(editable):
     db.session.delete(editable)
     for revision in editable.revisions:
         for ef in revision.files:
-            ef.file.unclaim()
+            ef.file.claimed = False
+            ef.file.meta = {}
     db.session.flush()
 
 
