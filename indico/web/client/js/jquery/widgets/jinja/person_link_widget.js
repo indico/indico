@@ -21,6 +21,7 @@
         showEmptyCoauthors: true,
         sort: true,
         sortByLastName: false,
+        sessionUser: null,
         allow: {
           authors: false,
           submitters: false,
@@ -383,17 +384,7 @@
     });
 
     $buttonAddMyself.on('click', function() {
-      indicoRequest('search.users', options.sessionUser, function(result, error) {
-        if (!error) {
-          if (result.length === 0) {
-            self.appendMessage("I can't seem to find you...");
-          } else {
-            $field.principalfield('add', result);
-          }
-        } else {
-            self.appendMessage('Error searching for you');
-        }
-      });
+      $field.principalfield('add', [options.sessionUser]);
     });
 
     function getSortingMessage() {
