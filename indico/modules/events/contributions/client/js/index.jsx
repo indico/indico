@@ -337,6 +337,10 @@ import PublicationSwitch from './PublicationSwitch';
     $('#subcontribution-list').on('attachments:updated', function(evt) {
       const target = $(evt.target);
       reloadManagementAttachmentInfoColumn(target.data('locator'), target.closest('td'));
+      $(this).trigger('ajaxDialog:setData', [true]);
+    });
+    $('#subcontribution-list').on('indico:htmlUpdated', function(evt) {
+      $(this).trigger('ajaxDialog:setData', [true]);
     });
 
     $('#subcontribution-list table').sortable({
@@ -359,6 +363,8 @@ import PublicationSwitch from './PublicationSwitch';
           data: {subcontrib_ids: self.sortable('toArray')},
           error: handleAjaxError,
         });
+
+        self.trigger('ajaxDialog:setData', [true]);
       },
     });
   };
