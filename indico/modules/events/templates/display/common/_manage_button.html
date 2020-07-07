@@ -109,7 +109,7 @@
                     <a href="" class="contribution-edit"
                                data-href="{{ url_for('contributions.manage_update_contrib', item) }}"
                                data-title="{% trans title=item.title %}Edit contribution '{{ title }}'{% endtrans %}">
-                        {% trans %}Edit Contribution{% endtrans %}
+                        {% trans %}Edit contribution{% endtrans %}
                     </a>
                 </li>
                 <li>
@@ -130,10 +130,12 @@
             {% endif %}
             {% if item.can_manage(session.user) %}
                 <li>
-                    <a href="" class="subcontribution-edit"
-                       data-title="{% trans %}Edit the subcontribution{% endtrans %}"
+                    <a href=""
+                       class="subcontribution-edit"
+                       data-title="{% trans %}Edit subcontribution{% endtrans %}"
+                       data-subtitle="{{ item.title }}"
                        data-href="{{ url_for('contributions.manage_edit_subcontrib', item) }}">
-                        {% trans %}Edit Sub-contribution{% endtrans %}
+                        {% trans %}Edit subcontribution{% endtrans %}
                     </a>
                 </li>
             {% endif %}
@@ -145,7 +147,18 @@
                            data-reload-on-change
                            data-title="{% trans title=item.title %}Manage materials for '{{ title }}'{% endtrans %}"
                            data-locator="{{ item.locator | tojson | forceescape }}">
-                    {%- trans %}Material Editor{% endtrans -%}
+                    {%- trans %}Material editor{% endtrans -%}
+                </a>
+            </li>
+        {% endif %}
+        {% if item_type == 'CONTRIBUTION' and item.can_manage(session.user) %}
+            <li>
+                <a href=""
+                   class="subcontributions-edit"
+                   data-href="{{ url_for('contributions.manage_subcontributions', item) }}"
+                   data-title="{% trans title=item.title %}Manage subcontributions{% endtrans %}"
+                   data-subtitle="{{ item.title }}">
+                    {% trans %}Manage subcontributions{% endtrans %}
                 </a>
             </li>
         {% endif %}

@@ -90,7 +90,7 @@ class WPEventAdmin(WPAdmin):
 
 class WPEventBase(WPDecorated):
     ALLOW_JSON = False
-    bundles = ('module_events.display.js',)
+    bundles = ('module_events.display.js', 'module_events.contributions.js')
 
     @property
     def page_metadata(self):

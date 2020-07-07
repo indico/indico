@@ -14,6 +14,7 @@ import './util/social';
     function openAjaxDialog($element) {
       ajaxDialog({
         title: $element.data('title'),
+        subtitle: $element.data('subtitle'),
         url: $element.data('href'),
         confirmCloseUnsaved: true,
         onClose: function(data, customData) {
@@ -50,7 +51,12 @@ import './util/social';
         return false;
       });
 
-    var selectors = ['.notes-compile', '.contribution-edit', '.subcontribution-edit'].join(', ');
+    const selectors = [
+      '.notes-compile',
+      '.contribution-edit',
+      '.subcontribution-edit',
+      '.subcontributions-edit',
+    ].join(', ');
     $('body').on('click', selectors, function(e) {
       e.preventDefault();
       openAjaxDialog($(this));
