@@ -109,7 +109,7 @@
                     <a href="" class="contribution-edit"
                                data-href="{{ url_for('contributions.manage_update_contrib', item) }}"
                                data-title="{% trans title=item.title %}Edit contribution '{{ title }}'{% endtrans %}">
-                        {% trans %}Edit Contribution{% endtrans %}
+                        {% trans %}Edit contribution{% endtrans %}
                     </a>
                 </li>
                 <li>
@@ -147,7 +147,7 @@
                            data-reload-on-change
                            data-title="{% trans title=item.title %}Manage materials for '{{ title }}'{% endtrans %}"
                            data-locator="{{ item.locator | tojson | forceescape }}">
-                    {%- trans %}Material Editor{% endtrans -%}
+                    {%- trans %}Material editor{% endtrans -%}
                 </a>
             </li>
         {% endif %}
