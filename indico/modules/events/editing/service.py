@@ -143,7 +143,7 @@ def service_handle_new_editable(editable):
             editable.contribution_id,
             editable.type.name
         )
-        resp = requests.post(_build_url(editable.event, path), headers=_get_headers(editable.event), json=data)
+        resp = requests.put(_build_url(editable.event, path), headers=_get_headers(editable.event), json=data)
         resp.raise_for_status()
     except requests.RequestException as exc:
         logger.exception('Failed calling listener for editable')

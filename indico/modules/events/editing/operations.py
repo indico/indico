@@ -90,11 +90,12 @@ def create_new_editable(contrib, type_, submitter, files, initial_state=InitialR
 
 
 def delete_editable(editable):
-    db.session.delete(editable)
+    db.session.expire(editable)
     for revision in editable.revisions:
         for ef in revision.files:
             ef.file.claimed = False
             ef.file.meta = {}
+    db.session.delete(editable)
     db.session.flush()
 
 
