@@ -220,7 +220,7 @@
                             </div>
                         </div>
                     {% else %}
-                        {% for file_type, files in published_files %}
+                        {% for file_type, files in published_files.items() %}
                             {{ _render_file_type_section(files, file_type) }}
                         {% endfor %}
                     {% endif %}
