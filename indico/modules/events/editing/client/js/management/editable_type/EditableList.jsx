@@ -48,10 +48,11 @@ export default function EditableList({management}) {
     url: editorsURL({confId: eventId, type}),
     camelize: true,
     trigger: [eventId, type],
+    forceDispatchEffect: () => management,
   });
   if (isLoadingContribList || isLoadingEditors) {
     return <Loader inline="centered" active />;
-  } else if (!contribList || !editors) {
+  } else if (!contribList || (management && !editors)) {
     return null;
   }
   const codePresent = Object.values(contribList).some(c => c.code);
@@ -61,7 +62,7 @@ export default function EditableList({management}) {
       codePresent={codePresent}
       editableType={type}
       eventId={eventId}
-      editors={editors}
+      editors={management ? editors : []}
       management={management}
     />
   );
@@ -336,45 +337,49 @@ function EditableListDisplay({
       )}
       <div styleName="editable-topbar">
         <div>
-          <Button.Group>
-            <Dropdown
-              disabled={!hasCheckedContribs || !editors.length || !!activeRequest}
-              options={editorOptions}
-              scrolling
-              icon={null}
-              value={null}
-              selectOnBlur={false}
-              selectOnNavigation={false}
-              onChange={(evt, {value}) => assignEditor(value)}
-              trigger={
-                <Button icon loading={activeRequest === 'assign'}>
-                  <Translate>Assign</Translate>
-                  <Icon name="caret down" />
-                </Button>
-              }
-            />
-            <Button
-              disabled={!hasCheckedContribs || !!activeRequest}
-              color="blue"
-              content={Translate.string('Assign to myself')}
-              onClick={assignSelfEditor}
-              loading={activeRequest === 'assign-self'}
-            />
-            <Button
-              disabled={
-                !checkedContribsWithEditables.some(x => x.editable.editor) || !!activeRequest
-              }
-              content={Translate.string('Unassign')}
-              onClick={unassignEditor}
-              loading={activeRequest === 'unassign'}
-            />
-          </Button.Group>{' '}
-          <Button
-            disabled={!hasCheckedContribs || !!activeRequest}
-            content={Translate.string('Download all files')}
-            onClick={downloadAllFiles}
-            loading={activeRequest === 'download'}
-          />
+          {management && (
+            <>
+              <Button.Group>
+                <Dropdown
+                  disabled={!hasCheckedContribs || !editors.length || !!activeRequest}
+                  options={editorOptions}
+                  scrolling
+                  icon={null}
+                  value={null}
+                  selectOnBlur={false}
+                  selectOnNavigation={false}
+                  onChange={(evt, {value}) => assignEditor(value)}
+                  trigger={
+                    <Button icon loading={activeRequest === 'assign'}>
+                      <Translate>Assign</Translate>
+                      <Icon name="caret down" />
+                    </Button>
+                  }
+                />
+                <Button
+                  disabled={!hasCheckedContribs || !!activeRequest}
+                  color="blue"
+                  content={Translate.string('Assign to myself')}
+                  onClick={assignSelfEditor}
+                  loading={activeRequest === 'assign-self'}
+                />
+                <Button
+                  disabled={
+                    !checkedContribsWithEditables.some(x => x.editable.editor) || !!activeRequest
+                  }
+                  content={Translate.string('Unassign')}
+                  onClick={unassignEditor}
+                  loading={activeRequest === 'unassign'}
+                />
+              </Button.Group>{' '}
+              <Button
+                disabled={!hasCheckedContribs || !!activeRequest}
+                content={Translate.string('Download all files')}
+                onClick={downloadAllFiles}
+                loading={activeRequest === 'download'}
+              />
+            </>
+          )}
         </div>
         <Input
           placeholder={Translate.string('Enter #id or search string')}
@@ -415,39 +420,42 @@ function EditableListDisplay({
                     : {}
                 }
               >
-                <Column
-                  disableSort
-                  dataKey="checkbox"
-                  width={30}
-                  headerRenderer={() => (
-                    <Checkbox
-                      indeterminate={
-                        checked.length > 0 &&
-                        checked.length < [...filteredSet].filter(x => contribIdSet.has(x)).length
-                      }
-                      checked={
-                        checked.length > 0 &&
-                        checked.length === [...filteredSet].filter(x => contribIdSet.has(x)).length
-                      }
-                      onChange={(e, data) => toggleSelectAll(data.checked)}
-                      disabled={!!activeRequest}
-                    />
-                  )}
-                  cellRenderer={({rowIndex}) =>
-                    sortedList[rowIndex].editable && (
+                {management && (
+                  <Column
+                    disableSort
+                    dataKey="checkbox"
+                    width={30}
+                    headerRenderer={() => (
                       <Checkbox
-                        disabled={!!activeRequest || !filteredSet.has(sortedList[rowIndex].id)}
-                        checked={
-                          sortedList[rowIndex].editable
-                            ? checkedSet.has(sortedList[rowIndex].editable.id)
-                            : false
+                        indeterminate={
+                          checked.length > 0 &&
+                          checked.length < [...filteredSet].filter(x => contribIdSet.has(x)).length
                         }
-                        onChange={(e, data) => toggleSelectRow(data.index)}
-                        index={rowIndex}
+                        checked={
+                          checked.length > 0 &&
+                          checked.length ===
+                            [...filteredSet].filter(x => contribIdSet.has(x)).length
+                        }
+                        onChange={(e, data) => toggleSelectAll(data.checked)}
+                        disabled={!!activeRequest}
                       />
-                    )
-                  }
-                />
+                    )}
+                    cellRenderer={({rowIndex}) =>
+                      sortedList[rowIndex].editable && (
+                        <Checkbox
+                          disabled={!!activeRequest || !filteredSet.has(sortedList[rowIndex].id)}
+                          checked={
+                            sortedList[rowIndex].editable
+                              ? checkedSet.has(sortedList[rowIndex].editable.id)
+                              : false
+                          }
+                          onChange={(e, data) => toggleSelectRow(data.index)}
+                          index={rowIndex}
+                        />
+                      )
+                    }
+                  />
+                )}
                 {columnHeaders.map(([key, label, width, extraProps]) => (
                   <Column
                     key={key}

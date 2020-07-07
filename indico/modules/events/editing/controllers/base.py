@@ -76,6 +76,16 @@ class RHEditableTypeManagementBase(RHEditingManagementBase):
         self.editable_type = EditableType[request.view_args['type']]
 
 
+class RHEditableTypeEditorBase(RHEditableTypeManagementBase):
+    """Base class for editable type RHs accessible by editors."""
+
+    def _check_access(self):
+        if session.user and self.event.can_manage(session.user, self.editable_type.editor_permission):
+            # editors have access here without the need for any management permission
+            return
+        RHEditableTypeManagementBase._check_access(self)
+
+
 class RHContributionEditableBase(RequireUserMixin, RHContributionDisplayBase):
     """Base class for operations on an editable."""
 

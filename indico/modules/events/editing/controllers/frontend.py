@@ -7,10 +7,10 @@
 
 from __future__ import unicode_literals
 
-from flask import request, session
+from flask import session
 from werkzeug.exceptions import Forbidden, NotFound
 
-from indico.modules.events.editing.controllers.base import (EditableType, RHContributionEditableBase, RHEditingBase,
+from indico.modules.events.editing.controllers.base import (RHContributionEditableBase, RHEditableTypeEditorBase,
                                                             RHEditingManagementBase)
 from indico.modules.events.editing.views import WPEditing, WPEditingView
 
@@ -35,25 +35,9 @@ class RHEditableTimeline(RHContributionEditableBase):
             raise Forbidden
 
     def _process(self):
-        return WPEditingView.render_template(
-            'editing.html',
-            self.event,
-        )
+        return WPEditingView.render_template('editing.html', self.event)
 
 
-class RHEditableTypeList(RHEditingBase):
-    def _process_args(self):
-        RHEditingBase._process_args(self)
-        self.editable_type = EditableType[request.view_args['type']]
-
-    def _check_access(self):
-        RHEditingBase._check_access(self)
-        if (not self.event.can_manage(session.user, self.editable_type.editor_permission)
-                and not self.event.can_manage(session.user, 'editing_manager')):
-            raise Forbidden
-
+class RHEditableTypeList(RHEditableTypeEditorBase):
     def _process(self):
-        return WPEditingView.render_template(
-            'editing.html',
-            self.event,
-        )
+        return WPEditingView.render_template('editing.html', self.event)

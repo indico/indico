@@ -18,7 +18,8 @@ from werkzeug.exceptions import Forbidden
 from indico.core.db import db
 from indico.legacy.common.cache import GenericCache
 from indico.modules.events.contributions.models.contributions import Contribution
-from indico.modules.events.editing.controllers.base import RHEditablesBase, RHEditableTypeManagementBase
+from indico.modules.events.editing.controllers.base import (RHEditablesBase, RHEditableTypeEditorBase,
+                                                            RHEditableTypeManagementBase)
 from indico.modules.events.editing.models.editable import Editable
 from indico.modules.events.editing.models.revision_files import EditingRevisionFile
 from indico.modules.events.editing.models.revisions import EditingRevision
@@ -34,10 +35,10 @@ from indico.web.flask.util import url_for
 archive_cache = GenericCache('editables-archive')
 
 
-class RHEditableList(RHEditableTypeManagementBase):
+class RHEditableList(RHEditableTypeEditorBase):
     """Return the list of editables of the event for a given type"""
     def _process_args(self):
-        RHEditableTypeManagementBase._process_args(self)
+        RHEditableTypeEditorBase._process_args(self)
         self.contributions = (Contribution.query
                               .with_parent(self.event)
                               .options(joinedload('editables'))
