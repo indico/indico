@@ -10,7 +10,8 @@ Version 2.2.9
 Bugfixes
 ^^^^^^^^
 
-- None so far :)
+- Fix error when building LaTeX PDFs if the temporary event logo path contained
+  an underscore (:issue:`4521`)
 
 Version 2.2.8
 -------------
