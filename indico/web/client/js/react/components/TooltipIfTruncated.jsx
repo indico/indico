@@ -5,33 +5,31 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-import React from 'react';
+import React, {useRef} from 'react';
 import PropTypes from 'prop-types';
 
-export default class TooltipIfTruncated extends React.Component {
-  static propTypes = {
-    children: PropTypes.any.isRequired,
-    tooltip: PropTypes.string,
-  };
+export default function TooltipIfTruncated({children, tooltip}) {
+  const ref = useRef();
 
-  static defaultProps = {
-    tooltip: null,
-  };
-
-  mouseEnter(event) {
-    const {tooltip} = this.props;
-    const element = event.target;
+  const handleMouseEnter = () => {
+    const element = ref.current;
     const overflows =
       element.offsetWidth < element.scrollWidth || element.offsetHeight < element.scrollHeight;
 
     if (overflows && !element.getAttribute('title')) {
       element.setAttribute('title', tooltip || element.innerText);
     }
-  }
+  };
 
-  render() {
-    const {children} = this.props;
-    const child = React.Children.only(children);
-    return React.cloneElement(child, {onMouseEnter: event => this.mouseEnter(event)});
-  }
+  const child = React.Children.only(children);
+  return React.cloneElement(child, {onMouseEnter: handleMouseEnter, ref});
 }
+
+TooltipIfTruncated.propTypes = {
+  children: PropTypes.any.isRequired,
+  tooltip: PropTypes.string,
+};
+
+TooltipIfTruncated.defaultProps = {
+  tooltip: null,
+};
