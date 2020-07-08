@@ -129,6 +129,7 @@ export default class RoomBasicDetails extends React.PureComponent {
       capacity,
       telephone,
       fullName: name,
+      site,
     } = room;
     return (
       <Grid columns={2} stackable>
@@ -142,6 +143,14 @@ export default class RoomBasicDetails extends React.PureComponent {
           </Header>
           <ul styleName="room-basic-details">
             <li>{location}</li>
+            <li className="has-icon">
+              {site && (
+                <>
+                  <AnnotatedIcon name="street view" text={Translate.string('Site')} />
+                  {room.site}
+                </>
+              )}
+            </li>
             <li className="has-icon">
               <AnnotatedIcon name="id badge outline" text={Translate.string('Room Owner')} />
               {owner}
