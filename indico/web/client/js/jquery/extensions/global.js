@@ -53,7 +53,7 @@ $(document).ready(function() {
         (!qtipHTML && !title) ||
         this.disabled ||
         $target.data('no-qtip') ||
-        $target.closest('.ui:not(.ui-qtip)').length
+        ($target.closest('.ui:not(.ui-qtip)').length && !$target.hasClass('ui-qtip'))
       ) {
         return;
       }
@@ -81,8 +81,8 @@ $(document).ready(function() {
       } else if (position === 'bottom') {
         positionOptions = {
           my: 'top center',
-          at: 'bottom center'
-        }
+          at: 'bottom center',
+        };
       }
 
       /* Attach the qTip to a new element to avoid side-effects on all elements with "title" attributes. */
