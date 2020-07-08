@@ -346,7 +346,7 @@ function RoomEditModal({roomId, locationId, onClose, afterCreation}) {
         <Modal.Actions>
           <FormSpy subscription={{submitSucceeded: true}}>
             {({submitSucceeded}) => (
-              <Button onClick={onClose}>
+              <Button onClick={closeModal}>
                 {submitSucceeded ? <Translate>Close</Translate> : <Translate>Cancel</Translate>}
               </Button>
             )}
