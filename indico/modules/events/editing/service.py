@@ -138,10 +138,10 @@ def service_handle_new_editable(editable):
         }
     }
     try:
-        path = '/event/{}/contributions/{}/editing/{}'.format(
+        path = '/event/{}/editable/{}/{}'.format(
             _get_event_identifier(editable.event),
+            editable.type.name,
             editable.contribution_id,
-            editable.type.name
         )
         resp = requests.put(_build_url(editable.event, path), headers=_get_headers(editable.event), json=data)
         resp.raise_for_status()
