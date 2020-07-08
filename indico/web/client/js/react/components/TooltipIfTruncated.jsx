@@ -18,6 +18,7 @@ export default function TooltipIfTruncated({children, tooltip}) {
 
     if (overflows && !element.getAttribute('title')) {
       element.setAttribute('title', tooltip || element.innerText);
+      element.classList.add('ui-qtip');
     }
   };
 
