@@ -5,6 +5,7 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
+import _ from 'lodash';
 import React from 'react';
 import PropTypes from 'prop-types';
 import {useDispatch, useSelector} from 'react-redux';
@@ -16,13 +17,13 @@ import {Translate} from 'indico/react/i18n';
 
 import {EditingReviewAction} from '../../../models';
 import {reviewEditable} from '../actions';
-import {getLastRevision, getStaticData} from '../selectors';
+import {getLastRevision, getNonSystemTags} from '../selectors';
 import FinalTagInput from './TagInput';
 
 export default function RequestChangesForm({setLoading, onSuccess}) {
   const dispatch = useDispatch();
   const lastRevision = useSelector(getLastRevision);
-  const {tags: tagOptions} = useSelector(getStaticData);
+  const tagOptions = useSelector(getNonSystemTags);
 
   const requestChanges = async formData => {
     setLoading(true);
@@ -45,7 +46,11 @@ export default function RequestChangesForm({setLoading, onSuccess}) {
     <FinalForm
       onSubmit={requestChanges}
       subscription={{}}
-      initialValues={{comment: '', tags: lastRevision.tags.map(t => t.id)}}
+      initialValues={{
+        comment: '',
+        tags: lastRevision.tags.filter(t => !t.system).map(t => t.id),
+      }}
+      initialValuesEqual={_.isEqual}
     >
       {fprops => (
         <Form onSubmit={fprops.handleSubmit}>
