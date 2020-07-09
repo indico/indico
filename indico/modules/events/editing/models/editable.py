@@ -189,10 +189,10 @@ class Editable(db.Model):
                 or self.contribution.is_user_associated(user, check_abstract=True))
 
     def can_assign_self(self, user):
-        """Whether the user can assign themself on the editable."""
+        """Whether the user can assign themselves on the editable."""
         from indico.modules.events.editing.settings import editable_type_settings
         type_settings = editable_type_settings[self.type]
-        if self.editor and not self.can_unassign(user):
+        if self.editor and (self.editor == user or not self.can_unassign(user)):
             return False
         return ((self.event.can_manage(user, permission=self.type.editor_permission)
                  and type_settings.get(self.event, 'editing_enabled')

@@ -163,6 +163,7 @@ export default function EditableTypeDashboard() {
                   eventId={eventId}
                   editableType={type}
                   onClose={() => setSelfAssignModalVisible(false)}
+                  management
                 />
               )}
             </Section>

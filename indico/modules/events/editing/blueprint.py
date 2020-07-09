@@ -83,6 +83,8 @@ _bp.add_url_rule('/editing/api/<any(paper,slides,poster):type>/editables/assign/
                  editable_list.RHAssignMyselfAsEditor, methods=('POST',))
 _bp.add_url_rule('/editing/api/<any(paper,slides,poster):type>/editables/unassign', 'api_unassign_editor',
                  editable_list.RHUnassignEditor, methods=('POST',))
+_bp.add_url_rule('/editing/api/<any(paper,slides,poster):type>/editables/self-assign-allowed',
+                 'api_editor_self_assign_allowed', common.RHEditableCheckSelfAssign)
 _bp.add_url_rule('/editing/api/<any(paper,slides,poster):type>/editors', 'api_editable_type_editors',
                  management.RHEditableTypeEditors)
 _bp.add_url_rule('/editing/api/<any(paper,slides,poster):type>/list-with-filetypes',
