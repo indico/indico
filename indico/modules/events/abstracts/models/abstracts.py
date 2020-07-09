@@ -23,7 +23,9 @@ from indico.core.db.sqlalchemy.util.models import auto_table_args
 from indico.modules.events.abstracts.models.review_questions import AbstractReviewQuestion
 from indico.modules.events.abstracts.models.review_ratings import AbstractReviewRating
 from indico.modules.events.abstracts.models.reviews import AbstractAction, AbstractReview
+from indico.modules.events.abstracts.settings import AllowEditingType
 from indico.modules.events.contributions.models.contributions import CustomFieldsMixin, _get_next_friendly_id
+from indico.modules.events.contributions.models.persons import AuthorType
 from indico.modules.events.models.persons import AuthorsSpeakersMixin
 from indico.modules.events.models.reviews import ProposalMixin, ProposalRevisionMixin
 from indico.util.date_time import now_utc
@@ -491,6 +493,10 @@ class Abstract(ProposalMixin, ProposalRevisionMixin, DescriptionMixin, CustomFie
     def is_in_final_state(self):
         return self.state != AbstractState.submitted
 
+    @property
+    def modification_ended(self):
+        return self.event.cfa.modification_ended
+
     @return_ascii
     def __repr__(self):
         return format_repr(self, 'id', 'event_id', is_deleted=False, _text=text_to_repr(self.title))
@@ -564,13 +570,31 @@ class Abstract(ProposalMixin, ProposalRevisionMixin, DescriptionMixin, CustomFie
     def can_edit(self, user):
         if not user:
             return False
-        is_manager = self.event.can_manage(user)
-        if not self.user_owns(user) and not is_manager:
-            return False
-        elif is_manager and self.public_state in (AbstractPublicState.under_review, AbstractPublicState.withdrawn):
+
+        manager_edit_states = (
+            AbstractPublicState.under_review,
+            AbstractPublicState.withdrawn,
+            AbstractPublicState.awaiting,
+            AbstractPublicState.invited,
+        )
+        if self.public_state in manager_edit_states and self.event.can_manage(user):
             return True
-        elif (self.public_state in (AbstractPublicState.awaiting, AbstractPublicState.invited) and
-                (is_manager or self.event.cfa.can_edit_abstracts(user))):
+        elif self.public_state not in (AbstractPublicState.awaiting, AbstractPublicState.invited):
+            return False
+        elif not self.user_owns(user) or not self.event.cfa.can_edit_abstracts(user):
+            return False
+
+        editing_allowed = self.event.cfa.allow_editing
+        author_type = next((x.author_type for x in self.person_links if x.person.user == user), None)
+        is_primary = author_type == AuthorType.primary
+        is_secondary = author_type == AuthorType.secondary
+        if user == self.submitter:
+            return True
+        elif editing_allowed == AllowEditingType.submitter_all:
+            return True
+        elif editing_allowed == AllowEditingType.submitter_primary and is_primary:
+            return True
+        elif editing_allowed == AllowEditingType.submitter_authors and (is_primary or is_secondary):
             return True
         else:
             return False

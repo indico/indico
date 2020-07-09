@@ -79,9 +79,12 @@
                     {% elif abstract.public_state.name != 'awaiting' %}
                         <a class="i-button icon-edit disabled"
                            title="{% trans %}The abstract cannot be edited because it has already been processed{% endtrans %}"></a>
-                    {% else %}
+                    {% elif abstract.modification_ended %}
                         <a class="i-button icon-edit disabled"
                            title="{% trans %}The abstract cannot be edited because the modification deadline has passed{% endtrans %}"></a>
+                    {% else %}
+                        <a class="i-button icon-edit disabled"
+                           title="{% trans %}You are not authorized to edit this abstract{% endtrans %}"></a>
                     {% endif %}
                 </div>
             {% endif %}

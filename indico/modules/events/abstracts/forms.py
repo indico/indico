@@ -23,8 +23,8 @@ from indico.modules.events.abstracts.fields import (AbstractField, AbstractPerso
                                                     TrackRoleField)
 from indico.modules.events.abstracts.models.abstracts import EditTrackMode
 from indico.modules.events.abstracts.models.reviews import AbstractAction, AbstractCommentVisibility
-from indico.modules.events.abstracts.settings import (BOACorrespondingAuthorType, BOALinkFormat, BOASortField,
-                                                      abstracts_settings)
+from indico.modules.events.abstracts.settings import (AllowEditingType, BOACorrespondingAuthorType, BOALinkFormat,
+                                                      BOASortField, abstracts_settings)
 from indico.modules.events.contributions.models.persons import AuthorType
 from indico.modules.events.contributions.models.types import ContributionType
 from indico.modules.events.sessions.models.sessions import Session
@@ -121,6 +121,7 @@ class AbstractSubmissionSettingsForm(IndicoForm):
                                   description=_("Allow the selection of the abstract speakers"))
     speakers_required = BooleanField(_('Require a speaker'), [HiddenUnless('allow_speakers')], widget=SwitchWidget(),
                                      description=_("Make the selection of at least one author as speaker mandatory"))
+    allow_editing = IndicoEnumSelectField(_('Allow editing'), enum=AllowEditingType, sorted=True)
     authorized_submitters = PrincipalListField(_("Authorized submitters"),
                                                description=_("These users may always submit abstracts, even outside "
                                                              "the regular submission period."))
