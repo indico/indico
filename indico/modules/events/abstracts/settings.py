@@ -32,6 +32,13 @@ class BOACorrespondingAuthorType(RichEnum):
     speakers = 'speakers'
 
 
+class AllowEditingType(RichEnum):
+    submitter_all = 'submitter_all'
+    submitter_authors = 'submitter_authors'
+    submitter_primary = 'submitter_primary'
+    submitter = 'submitter'
+
+
 class BOALinkFormat(RichEnum):
     """LaTeX book of abstracts link format setting
 
@@ -64,11 +71,17 @@ BOACorrespondingAuthorType.__titles__ = {
     BOACorrespondingAuthorType.speakers: _('Speakers')
 }
 
-
 BOALinkFormat.__titles__ = {
     BOALinkFormat.frame: _('Border around links (screen only)'),
     BOALinkFormat.colorlinks: _('Color links'),
     BOALinkFormat.unstyled: _('Do not highlight links')
+}
+
+AllowEditingType.__titles__ = {
+    AllowEditingType.submitter_all: _('All involved people (submitter, authors, speakers)'),
+    AllowEditingType.submitter_authors: _('Abstract submitter and all authors (primary and co-authors)'),
+    AllowEditingType.submitter_primary: _('Abstract submitter and primary authors'),
+    AllowEditingType.submitter: _('Abstract submitter only')
 }
 
 abstracts_settings = EventSettingsProxy('abstracts', {
@@ -89,6 +102,7 @@ abstracts_settings = EventSettingsProxy('abstracts', {
     'copy_attachments': False,
     'allow_speakers': True,
     'speakers_required': True,
+    'allow_editing': AllowEditingType.submitter_all,
     'contrib_type_required': False,
     'submission_instructions': ''
 }, acls={
@@ -96,7 +110,8 @@ abstracts_settings = EventSettingsProxy('abstracts', {
 }, converters={
     'start_dt': DatetimeConverter,
     'end_dt': DatetimeConverter,
-    'modification_end_dt': DatetimeConverter
+    'modification_end_dt': DatetimeConverter,
+    'allow_editing': EnumConverter(AllowEditingType),
 })
 
 
