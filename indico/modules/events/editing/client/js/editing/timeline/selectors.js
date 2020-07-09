@@ -58,6 +58,7 @@ export function processRevisions(revisions) {
         createNewCustomItemFromRevision(updatedRevision, {
           header: Translate.string('Revision has been replaced'),
           state: FinalRevisionState.replaced,
+          html: revision.commentHtml,
         })
       );
 
