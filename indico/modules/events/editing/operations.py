@@ -167,12 +167,13 @@ def confirm_editable_changes(revision, submitter, action, comment):
 
 
 @no_autoflush
-def replace_revision(revision, user, comment, files, initial_state=None):
+def replace_revision(revision, user, comment, files, tags, initial_state=None):
     _ensure_latest_revision(revision)
     _ensure_state(revision,
                   initial=(InitialRevisionState.new, InitialRevisionState.ready_for_review),
                   final=FinalRevisionState.none)
     revision.comment = comment
+    revision.tags = tags
     revision.final_state = FinalRevisionState.replaced
     new_revision = EditingRevision(submitter=user,
                                    initial_state=(initial_state or revision.initial_state),

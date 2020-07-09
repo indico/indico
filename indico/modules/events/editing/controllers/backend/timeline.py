@@ -196,12 +196,13 @@ class RHReplaceRevision(RHContributionEditableRevisionBase):
     })
     def _process(self, comment, state):
         args = parser.parse({
+            'tags': EditingTagsField(self.event, allow_system_tags=self.is_service_call, missing=set()),
             'files': EditingFilesField(self.event, self.contrib, self.editable_type, allow_claimed_files=True,
                                        required=True)
         })
 
         user = User.get_system_user() if self.is_service_call else session.user
-        replace_revision(self.revision, user, comment, args['files'], state)
+        replace_revision(self.revision, user, comment, args['files'], args['tags'], state)
         return '', 204
 
 
