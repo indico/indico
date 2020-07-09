@@ -113,9 +113,11 @@ Internal Changes
   :user:`omegak`)
 - Add ``extra-registration-actions`` template hook (:issue:`4500`, thanks
   :user:`omegak`)
-- Add ``event-management-after-title`` template hook (:issue: `4504`, thanks
+- Add ``event-management-after-title`` template hook (:issue:`4504`, thanks
   :user:`meluru`)
 - Save registration id in related event log entries (:issue:`4503`, thanks
+  :user:`omegak`)
+- Add ``before-registration-actions`` template hook (:issue:`4524`, thanks
   :user:`omegak`)
 
 
