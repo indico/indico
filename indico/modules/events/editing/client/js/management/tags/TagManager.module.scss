@@ -22,6 +22,10 @@
       i:global(.icon) {
         margin-right: 0;
         cursor: pointer;
+
+        &:global(.disabled) {
+          cursor: default;
+        }
       }
     }
   }
