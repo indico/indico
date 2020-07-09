@@ -38,7 +38,7 @@
             </div>
             <div class="i-box-content">
                 {# Profile picture form #}
-                {{ form_header(pic_form, action=url_for('.upload_profile_picture', event), classes='pic-form') }}
+                {{ form_header(pic_form, action=url_for('.upload_profile_picture', user), classes='pic-form') }}
                 <div class="flashed-messages"></div>
                 {{ form_rows(pic_form) }}
                 {% call form_footer(pic_form) %}
@@ -46,7 +46,7 @@
                         {% trans %}Upload{% endtrans %}
                     </button>
                     <button class="ui button negative js-remove-button danger{% if not pic_form.picture._value() %} hidden{% endif %}"
-                            data-href="{{ url_for('.delete_profile_picture', event) }}" data-method="DELETE">
+                            data-href="{{ url_for('.delete_profile_picture', user) }}" data-method="DELETE">
                         {% trans %}Delete{% endtrans %}
                     </button>
                 {% endcall %}
