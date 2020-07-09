@@ -158,6 +158,11 @@ export const needsSubmitterConfirmation = createSelector(
 );
 export const getStaticData = state => state.staticData;
 
+export const getNonSystemTags = createSelector(
+  getStaticData,
+  staticData => staticData.tags.filter(t => !t.system)
+);
+
 export const getFileTypes = createSelector(
   getDetails,
   getStaticData,

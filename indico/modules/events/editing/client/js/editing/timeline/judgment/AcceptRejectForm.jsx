@@ -5,6 +5,7 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
+import _ from 'lodash';
 import React from 'react';
 import {useDispatch, useSelector} from 'react-redux';
 import PropTypes from 'prop-types';
@@ -15,19 +16,23 @@ import {FinalSubmitButton, FinalTextArea} from 'indico/react/forms';
 import {Translate} from 'indico/react/i18n';
 
 import {reviewEditable} from '../actions';
-import {getLastRevision, getStaticData} from '../selectors';
+import {getLastRevision, getNonSystemTags} from '../selectors';
 import FinalTagInput from './TagInput';
 
 import './JudgmentBox.module.scss';
 
 export default function AcceptRejectForm({action, setLoading}) {
   const lastRevision = useSelector(getLastRevision);
-  const {tags: tagOptions} = useSelector(getStaticData);
+  const tagOptions = useSelector(getNonSystemTags);
   const dispatch = useDispatch();
 
   return (
     <FinalForm
-      initialValues={{comment: '', tags: lastRevision.tags.map(t => t.id)}}
+      initialValues={{
+        comment: '',
+        tags: lastRevision.tags.filter(t => !t.system).map(t => t.id),
+      }}
+      initialValuesEqual={_.isEqual}
       onSubmit={async formData => {
         setLoading(true);
         const rv = await dispatch(reviewEditable(lastRevision, {...formData, action}));

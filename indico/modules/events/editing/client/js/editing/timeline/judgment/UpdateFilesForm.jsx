@@ -47,6 +47,7 @@ export default function UpdateFilesForm({setLoading}) {
   const dispatch = useDispatch();
   const files = getFilesFromRevision(fileTypes, lastRevision);
   const option = confirmOptions.find(x => x.value === confirmationType);
+  const tagOptions = useSelector(selectors.getNonSystemTags);
 
   const submitReview = async formData => {
     setLoading(true);
@@ -67,7 +68,11 @@ export default function UpdateFilesForm({setLoading}) {
 
   return (
     <FinalForm
-      initialValues={{comment: '', tags: lastRevision.tags.map(t => t.id), files}}
+      initialValues={{
+        comment: '',
+        tags: lastRevision.tags.filter(t => !t.system).map(t => t.id),
+        files,
+      }}
       initialValuesEqual={_.isEqual}
       subscription={{}}
       onSubmit={submitReview}
@@ -131,7 +136,7 @@ export default function UpdateFilesForm({setLoading}) {
               hideValidationError
               autoFocus
             />
-            <FinalTagInput name="tags" options={staticData.tags} />
+            <FinalTagInput name="tags" options={tagOptions} />
           </Form>
           <div styleName="judgment-submit-button">
             <Button.Group color="blue">
