@@ -265,7 +265,7 @@ class EditableTagArgs(mm.Schema):
 
     @validates('system')
     def _check_only_services_set_system_tags(self, value):
-        if not self.context['is_service_call']:
+        if value and not self.context['is_service_call']:
             raise ValidationError('Only custom editing workflows can set system tags')
 
 

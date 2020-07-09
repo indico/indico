@@ -11,7 +11,7 @@ import editTagURL from 'indico-url:event_editing.api_edit_tag';
 
 import React, {useReducer} from 'react';
 import PropTypes from 'prop-types';
-import {Button, Icon, Label, Loader, Message, Segment} from 'semantic-ui-react';
+import {Button, Icon, Label, Loader, Message, Segment, Popup} from 'semantic-ui-react';
 
 import {Param, Translate} from 'indico/react/i18n';
 import {RequestConfirm} from 'indico/react/components';
@@ -96,22 +96,37 @@ export default function TagManager({eventId}) {
         <Segment key={tag.id} styleName="tag-segment">
           <Label color={tag.color}>{tag.verboseTitle}</Label>
           <div styleName="tag-actions">
-            <Icon
-              name="pencil"
-              color="grey"
-              size="small"
-              onClick={() => dispatch({type: 'EDIT_TAG', tag})}
-              circular
-              inverted
-            />
-            <Icon
-              name="remove"
-              color="red"
-              size="small"
-              onClick={() => dispatch({type: 'DELETE_TAG', tag})}
-              circular
-              inverted
-            />
+            <Popup
+              on="hover"
+              position="right center"
+              disabled={!tag.system}
+              trigger={
+                <span>
+                  <Icon
+                    name="pencil"
+                    color="grey"
+                    size="small"
+                    onClick={() => dispatch({type: 'EDIT_TAG', tag})}
+                    disabled={tag.system}
+                    circular
+                    inverted
+                  />
+                  <Icon
+                    name="remove"
+                    color="red"
+                    size="small"
+                    onClick={() => dispatch({type: 'DELETE_TAG', tag})}
+                    disabled={tag.system}
+                    circular
+                    inverted
+                  />
+                </span>
+              }
+            >
+              <Translate>
+                System tags are managed by the editing workflow service and cannot be modified.
+              </Translate>
+            </Popup>
           </div>
         </Segment>
       ))}

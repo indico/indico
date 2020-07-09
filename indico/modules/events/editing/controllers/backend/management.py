@@ -8,6 +8,7 @@
 from __future__ import unicode_literals
 
 from flask import jsonify, request, session
+from werkzeug.exceptions import Forbidden
 
 from indico.core.errors import UserValueError
 from indico.modules.events.editing.controllers.base import RHEditableTypeManagementBase, RHEditingManagementBase
@@ -55,10 +56,14 @@ class RHEditTag(RHEditingManagementBase):
 
     @use_rh_args(EditableTagArgs, partial=True)
     def _process_PATCH(self, data):
+        if self.tag.system and not self.is_service_call:
+            raise Forbidden
         update_tag(self.tag, **data)
         return EditingTagSchema().jsonify(self.tag)
 
     def _process_DELETE(self):
+        if self.tag.system and not self.is_service_call:
+            raise Forbidden
         delete_tag(self.tag)
         return '', 204
 
