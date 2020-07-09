@@ -3,6 +3,7 @@
 
 {% macro render_registration_details(registration, payment_enabled) %}
     <div id="registration-details">
+        {{ template_hook('before-registration-actions', registration=registration) }}
         <div class="action-box">
            <div class="section">
                <div class="icon icon-quill registration-{{ registration.state.name }}"></div>
