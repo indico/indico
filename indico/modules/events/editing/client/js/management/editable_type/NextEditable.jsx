@@ -11,6 +11,7 @@ import fileTypesURL from 'indico-url:event_editing.api_file_types';
 
 import _ from 'lodash';
 import React, {useState, useEffect} from 'react';
+import {useHistory} from 'react-router-dom';
 import PropTypes from 'prop-types';
 import {Button, Loader, Modal, Table, Checkbox, Dimmer} from 'semantic-ui-react';
 import {camelizeKeys} from 'indico/utils/case';
@@ -22,7 +23,7 @@ import {fileTypePropTypes} from '../../editing/timeline/FileManager/util';
 
 import './NextEditable.module.scss';
 
-export default function NextEditable({eventId, editableType, onClose}) {
+export default function NextEditable({eventId, editableType, onClose, management}) {
   const {data: fileTypes, loading: isLoadingFileTypes} = useIndicoAxios({
     url: fileTypesURL({confId: eventId, type: editableType}),
     camelize: true,
@@ -41,6 +42,7 @@ export default function NextEditable({eventId, editableType, onClose}) {
       editableType={editableType}
       onClose={onClose}
       fileTypes={fileTypes}
+      management={management}
     />
   );
 }
@@ -49,13 +51,15 @@ NextEditable.propTypes = {
   eventId: PropTypes.number.isRequired,
   editableType: PropTypes.oneOf(Object.values(EditableType)).isRequired,
   onClose: PropTypes.func.isRequired,
+  management: PropTypes.bool.isRequired,
 };
 
-function NextEditableDisplay({eventId, editableType, onClose, fileTypes}) {
+function NextEditableDisplay({eventId, editableType, onClose, fileTypes, management}) {
   const [filters, setFilters] = useState({});
   const [filteredEditables, setFilteredEditables] = useState(null);
   const [selectedEditable, setSelectedEditable] = useState(null);
   const [loading, setLoading] = useState(true);
+  const history = useHistory();
 
   useEffect(() => {
     (async () => {
@@ -115,7 +119,11 @@ function NextEditableDisplay({eventId, editableType, onClose, fileTypes}) {
       handleAxiosError(error);
       return;
     }
-    location.href = selectedEditable.timelineURL;
+    if (management) {
+      location.href = selectedEditable.timelineURL;
+    } else {
+      history.push(selectedEditable.timelineURL);
+    }
   };
 
   const titleByType = {
@@ -205,6 +213,7 @@ NextEditableDisplay.propTypes = {
   editableType: PropTypes.string.isRequired,
   onClose: PropTypes.func.isRequired,
   fileTypes: PropTypes.arrayOf(PropTypes.shape(fileTypePropTypes)).isRequired,
+  management: PropTypes.bool.isRequired,
 };
 
 function NextEditableTable({filteredEditables, selectedEditable, setSelectedEditable}) {
@@ -227,7 +236,7 @@ function NextEditableTable({filteredEditables, selectedEditable, setSelectedEdit
       </Table.Header>
       <Table.Body>
         {filteredEditables.map(editable => (
-          <Table.Row key={editable.id}>
+          <Table.Row key={editable.id} style={editable.canAssignSelf ? {} : {opacity: '50%'}}>
             <Table.Cell>
               <Checkbox
                 radio

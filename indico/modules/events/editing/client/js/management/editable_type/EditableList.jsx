@@ -12,6 +12,7 @@ import editablesArchiveURL from 'indico-url:event_editing.api_prepare_editables_
 import assignEditorURL from 'indico-url:event_editing.api_assign_editor';
 import assignSelfEditorURL from 'indico-url:event_editing.api_assign_myself';
 import unassignEditorURL from 'indico-url:event_editing.api_unassign_editor';
+import canAssignSelfURL from 'indico-url:event_editing.api_editor_self_assign_allowed';
 
 import React, {useState, useMemo} from 'react';
 import PropTypes from 'prop-types';
@@ -33,6 +34,7 @@ import Palette from 'indico/utils/palette';
 import {userPropTypes} from '../../editing/timeline/util';
 import {EditableType} from '../../models';
 import StateIndicator from '../../editing/timeline/StateIndicator';
+import NextEditable from './NextEditable';
 
 import './EditableList.module.scss';
 
@@ -50,7 +52,13 @@ export default function EditableList({management}) {
     trigger: [eventId, type],
     forceDispatchEffect: () => management,
   });
-  if (isLoadingContribList || isLoadingEditors) {
+  const {data: canAssignSelf, loading: isLoadingCanAssignSelf} = useIndicoAxios({
+    url: canAssignSelfURL({confId: eventId, type}),
+    trigger: [eventId, type],
+    forceDispatchEffect: () => !management,
+  });
+
+  if (isLoadingContribList || isLoadingEditors || isLoadingCanAssignSelf) {
     return <Loader inline="centered" active />;
   } else if (!contribList || (management && !editors)) {
     return null;
@@ -64,6 +72,7 @@ export default function EditableList({management}) {
       eventId={eventId}
       editors={management ? editors : []}
       management={management}
+      canAssignSelf={management ? false : canAssignSelf}
     />
   );
 }
@@ -83,6 +92,7 @@ function EditableListDisplay({
   eventId,
   editors,
   management,
+  canAssignSelf,
 }) {
   const [sortBy, setSortBy] = useState('friendly_id');
   const [sortDirection, setSortDirection] = useState('ASC');
@@ -93,6 +103,7 @@ function EditableListDisplay({
   const contribIdSet = new Set(contribsWithEditables.map(x => x.id));
   const [filteredSet, setFilteredSet] = useState(new Set(contribList.map(e => e.id)));
   const [searchValue, setSearchValue] = useState('');
+  const [selfAssignModalVisible, setSelfAssignModalVisible] = useState(false);
 
   const [checked, setChecked] = useState([]);
   const hasCheckedContribs = checked.length > 0;
@@ -337,6 +348,20 @@ function EditableListDisplay({
       )}
       <div styleName="editable-topbar">
         <div>
+          {canAssignSelf && (
+            <Button
+              content={Translate.string('Get next editable')}
+              onClick={() => setSelfAssignModalVisible(true)}
+            />
+          )}
+          {selfAssignModalVisible && (
+            <NextEditable
+              eventId={eventId}
+              editableType={editableType}
+              onClose={() => setSelfAssignModalVisible(false)}
+              management={management}
+            />
+          )}
           {management && (
             <>
               <Button.Group>
@@ -500,4 +525,5 @@ EditableListDisplay.propTypes = {
   editableType: PropTypes.oneOf(Object.values(EditableType)).isRequired,
   eventId: PropTypes.number.isRequired,
   management: PropTypes.bool.isRequired,
+  canAssignSelf: PropTypes.bool.isRequired,
 };

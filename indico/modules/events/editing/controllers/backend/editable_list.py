@@ -107,7 +107,7 @@ class RHUnassignEditor(RHEditablesBase):
         return EditableBasicSchema(many=True).jsonify(editables)
 
 
-class RHFilterEditablesByFileTypes(RHEditableTypeManagementBase):
+class RHFilterEditablesByFileTypes(RHEditableTypeEditorBase):
     """Return the list of editables that have certain files."""
 
     def _make_revision_file_type_filter(self, subquery, file_type_id, *criteria):
