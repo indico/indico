@@ -110,7 +110,7 @@ export default function TagManager({eventId}) {
                     disabled={tag.system}
                     circular
                     inverted
-                  />
+                  />{' '}
                   <Icon
                     name="remove"
                     color="red"
