@@ -133,6 +133,8 @@ Bugfixes
 
 - Fix error when building LaTeX PDFs if the temporary event logo path contained
   an underscore (:issue:`4521`)
+- Disallow storing invalid timezones in user settings and reduce risk of sending
+  wrong timezone names when people automatically translate their UI (:issue:`4529`)
 
 Version 2.2.8
 -------------

@@ -156,7 +156,7 @@ class RHChangeTimezone(RH):
 
         if update_user:
             session.user.settings.set('force_timezone', mode != 'local')
-            if tz:
+            if tz and tz in common_timezones_set:
                 session.user.settings.set('timezone', tz)
 
         return '', 204
