@@ -30,12 +30,6 @@
   }
 }
 
-%text-input {
-  @extend %text-input-base;
-  height: 1.6em;
-  -webkit-appearance: textfield;
-}
-
 %input-invalid {
   @include border-all($red);
 }
@@ -54,7 +48,7 @@
   > input[type='time'],
   > input[type='url'],
   > input[type='week'] {
-    @extend %text-input;
+    @extend %text-input-base;
   }
 
   // the react timepicker has an input with no type

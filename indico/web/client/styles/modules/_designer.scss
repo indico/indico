@@ -196,7 +196,7 @@
 
   input[type='text'],
   input[type='number'] {
-    @extend %text-input;
+    @extend %text-input-base;
   }
 
   input[type='number'] {
