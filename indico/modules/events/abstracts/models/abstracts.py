@@ -596,8 +596,7 @@ class Abstract(ProposalMixin, ProposalRevisionMixin, DescriptionMixin, CustomFie
             return True
         elif editing_allowed == AllowEditingType.submitter_authors and (is_primary or is_secondary):
             return True
-        else:
-            return False
+        return False
 
     def can_withdraw(self, user, check_state=False):
         if not user:

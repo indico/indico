@@ -90,6 +90,8 @@ Improvements
 - Add "Add myself" button to person list fields (e.g. for abstract authors)
   (:issue:`4411`, thanks :user:`jgrigera`)
 - Add CfA setting to control whether authors can edit abstracts (:issue:`3431`)
+- Add CfA setting to control whether only speakers or also authors should
+  get submission rights once the abstract gets accepted (:issue:`3431`)
 
 Bugfixes
 ^^^^^^^^
