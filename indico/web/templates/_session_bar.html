@@ -82,7 +82,7 @@
             </div>
             <select name="tz" class="tz-select" size="12" {{ 'disabled' if timezone_data.tz_mode != 'custom' }}>
                 {% for tz in timezone_data.timezones -%}
-                    <option {{ 'selected' if tz == session.tzinfo.zone }}>{{ tz }}</option>
+                    <option value="{{ tz }}" {{ 'selected' if tz == session.tzinfo.zone }}>{{ tz }}</option>
                 {%- endfor %}
             </select>
             {% if session.user %}
