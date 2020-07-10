@@ -14,6 +14,7 @@ from indico.core.db import db
 from indico.core.db.sqlalchemy.util.session import no_autoflush
 from indico.modules.attachments.models.attachments import Attachment, AttachmentFile, AttachmentType
 from indico.modules.attachments.models.folders import AttachmentFolder
+from indico.modules.events.abstracts.settings import SubmissionRightsType
 from indico.modules.events.contributions import contribution_settings, logger
 from indico.modules.events.contributions.models.contributions import Contribution
 from indico.modules.events.contributions.models.persons import ContributionPersonLink
@@ -156,13 +157,13 @@ def create_contribution_from_abstract(abstract, contrib_session=None):
 
     event = abstract.event
     contrib_person_links = set()
+    author_submission_rights = (event.cfa.contribution_submitters == SubmissionRightsType.all)
     person_link_attrs = {'_title', 'address', 'affiliation', 'first_name', 'last_name', 'phone', 'author_type',
                          'is_speaker', 'display_order'}
     for abstract_person_link in abstract.person_links:
         link = ContributionPersonLink(person=abstract_person_link.person)
         link.populate_from_attrs(abstract_person_link, person_link_attrs)
         contrib_person_links.add(link)
-
     if contrib_session:
         duration = contrib_session.default_contribution_duration
     else:
@@ -176,7 +177,8 @@ def create_contribution_from_abstract(abstract, contrib_session=None):
                                           'type': abstract.accepted_contrib_type,
                                           'track': abstract.accepted_track,
                                           'session': contrib_session,
-                                          'person_link_data': {link: True for link in contrib_person_links}},
+                                          'person_link_data': {link: (author_submission_rights or link.is_speaker)
+                                                               for link in contrib_person_links}},
                                   custom_fields_data=custom_fields_data)
     if abstracts_settings.get(event, 'copy_attachments') and abstract.files:
         folder = AttachmentFolder.get_or_create_default(contrib)

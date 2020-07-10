@@ -39,6 +39,11 @@ class AllowEditingType(RichEnum):
     submitter = 'submitter'
 
 
+class SubmissionRightsType(RichEnum):
+    speakers = 'speakers'
+    all = 'all'
+
+
 class BOALinkFormat(RichEnum):
     """LaTeX book of abstracts link format setting
 
@@ -84,6 +89,11 @@ AllowEditingType.__titles__ = {
     AllowEditingType.submitter: _('Abstract submitter only')
 }
 
+SubmissionRightsType.__titles__ = {
+    SubmissionRightsType.speakers: _('Speakers'),
+    SubmissionRightsType.all: _('Speakers and authors')
+}
+
 abstracts_settings = EventSettingsProxy('abstracts', {
     'description_settings': {
         'is_active': True,
@@ -103,6 +113,7 @@ abstracts_settings = EventSettingsProxy('abstracts', {
     'allow_speakers': True,
     'speakers_required': True,
     'allow_editing': AllowEditingType.submitter_all,
+    'contribution_submitters': SubmissionRightsType.all,
     'contrib_type_required': False,
     'submission_instructions': ''
 }, acls={
