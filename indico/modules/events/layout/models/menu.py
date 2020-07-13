@@ -68,7 +68,7 @@ class MenuEntryMixin(object):
             data = self.default_data
             if data.static_site and isinstance(data.static_site, basestring) and g.get('static_site'):
                 return data.static_site
-            kwargs = {}
+            kwargs = dict(data.url_kwargs)
             if self.name == 'timetable':
                 from indico.modules.events. layout import layout_settings
                 if layout_settings.get(self.event_ref, 'timetable_by_room'):

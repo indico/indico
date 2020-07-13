@@ -94,11 +94,13 @@ class MenuEntryData(object):
         be shown in the menu of a static site.  When set to a string,
         the string will be used instead of a mangled version of the
         endpoint's URL.
+    :param url_kwargs: dict -- Additional data passed to ``url_for``
+        when building the url the menu item points to.
     """
     plugin = None
 
     def __init__(self, title, name, endpoint=None, position=-1, is_enabled=True, visible=None, parent=None,
-                 static_site=False):
+                 static_site=False, url_kwargs=None):
         self.title = title
         self._name = name
         self.endpoint = endpoint
@@ -107,6 +109,7 @@ class MenuEntryData(object):
         self.is_enabled = is_enabled
         self.parent = parent
         self.static_site = static_site
+        self.url_kwargs = url_kwargs or {}
 
     @property
     def name(self):
