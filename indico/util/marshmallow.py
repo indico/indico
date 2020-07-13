@@ -206,11 +206,12 @@ class PrincipalList(Field):
     """Marshmallow field for a list of principals."""
 
     def __init__(self, allow_groups=False, allow_external_users=False, allow_event_roles=False,
-                 allow_category_roles=False, **kwargs):
+                 allow_category_roles=False, allow_registration_forms=False, **kwargs):
         self.allow_groups = allow_groups
         self.allow_external_users = allow_external_users
         self.allow_event_roles = allow_event_roles
         self.allow_category_roles = allow_category_roles
+        self.allow_registration_forms = allow_registration_forms
         super(PrincipalList, self).__init__(**kwargs)
 
     def _serialize(self, value, attr, obj):
@@ -226,6 +227,7 @@ class PrincipalList(Field):
                                                  allow_external_users=self.allow_external_users,
                                                  allow_event_roles=self.allow_event_roles,
                                                  allow_category_roles=self.allow_category_roles,
+                                                 allow_registration_forms=self.allow_registration_forms,
                                                  event_id=event_id)
                        for identifier in value)
         except ValueError as exc:
@@ -245,6 +247,7 @@ class PrincipalDict(PrincipalList):
                                                           allow_external_users=self.allow_external_users,
                                                           allow_event_roles=self.allow_event_roles,
                                                           allow_category_roles=self.allow_category_roles,
+                                                          allow_registration_forms=self.allow_registration_forms,
                                                           event_id=event_id,
                                                           soft_fail=True)
                     for identifier in value}

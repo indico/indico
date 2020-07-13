@@ -98,6 +98,7 @@ export class PrincipalType {
   static multipassGroup = 'multipass_group';
   static eventRole = 'event_role';
   static categoryRole = 'category_role';
+  static registrationForm = 'registration_form';
   /* eslint-enable lines-between-class-members */
 
   static propType = PropTypes.oneOf([
@@ -106,6 +107,7 @@ export class PrincipalType {
     PrincipalType.multipassGroup,
     PrincipalType.eventRole,
     PrincipalType.categoryRole,
+    PrincipalType.registrationForm,
   ]);
 
   static getPendingText(type) {
@@ -115,6 +117,7 @@ export class PrincipalType {
       [PrincipalType.multipassGroup]: Translate.string('Unknown group'),
       [PrincipalType.eventRole]: Translate.string('Unknown event role'),
       [PrincipalType.categoryRole]: Translate.string('Unknown category role'),
+      [PrincipalType.registrationForm]: Translate.string('Unknown registration form'),
     }[type];
   }
 
@@ -129,7 +132,7 @@ export class PrincipalType {
       [PrincipalType.multipassGroup]: Translate.string(
         'This group does not exist anymore. Please choose a different one.'
       ),
-      // event/category roles are hard-deleted
+      // event/category roles and forms are hard-deleted
     }[type];
   }
 
@@ -138,6 +141,7 @@ export class PrincipalType {
       [PrincipalType.user]: 'user',
       [PrincipalType.localGroup]: 'users',
       [PrincipalType.multipassGroup]: 'users',
+      [PrincipalType.registrationForm]: 'id badge outline',
       // event/category roles have no icon but their code
     }[type];
   }
@@ -148,7 +152,8 @@ export class PrincipalType {
       [PrincipalType.multipassGroup]: 0,
       [PrincipalType.eventRole]: 1,
       [PrincipalType.categoryRole]: 2,
-      [PrincipalType.user]: 3,
+      [PrincipalType.registrationForm]: 3,
+      [PrincipalType.user]: 4,
     }[type];
   }
 }
@@ -164,6 +169,8 @@ export function getTypeFromIdentifier(identifier) {
     return PrincipalType.eventRole;
   } else if (identifier.startsWith('CategoryRole:')) {
     return PrincipalType.categoryRole;
+  } else if (identifier.startsWith('RegistrationForm:')) {
+    return PrincipalType.registrationForm;
   } else {
     throw new Error(`Identifier ${identifier} has unknown type`);
   }

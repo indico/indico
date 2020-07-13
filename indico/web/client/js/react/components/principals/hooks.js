@@ -10,6 +10,7 @@ import principalsURL from 'indico-url:core.principals';
 import eventPrincipalsURL from 'indico-url:event_management.api_principals';
 import eventRolesURL from 'indico-url:event_management.api_event_roles';
 import eventCategoryRolesURL from 'indico-url:event_management.api_category_roles';
+import registrationFormsURL from 'indico-url:event_management.api_registration_forms';
 
 import _ from 'lodash';
 import {useState, useEffect} from 'react';
@@ -93,6 +94,21 @@ export const useFetchEventRoles = eventId => {
 export const useFetchEventCategoryRoles = eventId => {
   const {data} = useIndicoAxios({
     url: eventCategoryRolesURL({confId: eventId}),
+    trigger: eventId,
+    forceDispatchEffect: () => eventId !== null,
+    camelize: true,
+  });
+
+  return data || [];
+};
+
+/**
+ * This hook fetches
+ * If the `eventId` is null, nothing is fetched.
+ */
+export const useFetchRegistrationForms = eventId => {
+  const {data} = useIndicoAxios({
+    url: registrationFormsURL({confId: eventId}),
     trigger: eventId,
     forceDispatchEffect: () => eventId !== null,
     camelize: true,

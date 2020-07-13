@@ -6,12 +6,17 @@
 // LICENSE file for more details.
 
 import _ from 'lodash';
-import React from 'react';
+import React, {useCallback} from 'react';
 import PropTypes from 'prop-types';
 import {Button, Dropdown, List} from 'semantic-ui-react';
 import {Translate} from 'indico/react/i18n';
 import {UserSearch, GroupSearch} from './Search';
-import {useFetchEventCategoryRoles, useFetchEventRoles, useFetchPrincipals} from './hooks';
+import {
+  useFetchEventCategoryRoles,
+  useFetchEventRoles,
+  useFetchPrincipals,
+  useFetchRegistrationForms,
+} from './hooks';
 import {PendingPrincipalListItem, PrincipalListItem} from './items';
 import {getPrincipalList, PrincipalType} from './util';
 import {FinalField} from '../../forms';
@@ -37,6 +42,7 @@ const PrincipalListField = props => {
     withExternalUsers,
     withEventRoles,
     withCategoryRoles,
+    withRegistrants,
     eventId,
     favoriteUsersController,
   } = props;
@@ -46,20 +52,21 @@ const PrincipalListField = props => {
   const informationMap = useFetchPrincipals(value, eventId);
   const eventRoles = useFetchEventRoles(withEventRoles ? eventId : null);
   const categoryRoles = useFetchEventCategoryRoles(withCategoryRoles ? eventId : null);
+  const registrationForms = useFetchRegistrationForms(withRegistrants ? eventId : null);
 
-  const eventRoleOptions = eventRoles
-    .filter(r => !usedIdentifiers.has(r.identifier))
-    .map(r => ({
-      value: r.identifier,
-      text: r.name,
-    }));
-
-  const categoryRoleOptions = categoryRoles
-    .filter(r => !usedIdentifiers.has(r.identifier))
-    .map(r => ({
-      value: r.identifier,
-      text: r.name,
-    }));
+  const asOptions = useCallback(
+    data =>
+      data
+        .filter(r => !usedIdentifiers.has(r.identifier))
+        .map(r => ({
+          value: r.identifier,
+          text: r.name,
+        })),
+    [usedIdentifiers]
+  );
+  const eventRoleOptions = asOptions(eventRoles);
+  const categoryRoleOptions = asOptions(categoryRoles);
+  const registrationFormOptions = asOptions(registrationForms);
 
   const markTouched = () => {
     onFocus();
@@ -156,6 +163,20 @@ const PrincipalListField = props => {
               onChange={(e, data) => handleAddItems([{identifier: data.value}])}
             />
           )}
+          {registrationForms.length !== 0 && (
+            <Dropdown
+              text={Translate.string('Registration Form')}
+              button
+              upward
+              floating
+              disabled={registrationFormOptions.length === 0}
+              options={registrationFormOptions}
+              openOnFocus={false}
+              selectOnBlur={false}
+              selectOnNavigation={false}
+              onChange={(e, data) => handleAddItems([{identifier: data.value}])}
+            />
+          )}
         </Button.Group>
       )}
     </>
@@ -174,6 +195,7 @@ PrincipalListField.propTypes = {
   withExternalUsers: PropTypes.bool,
   withEventRoles: PropTypes.bool,
   withCategoryRoles: PropTypes.bool,
+  withRegistrants: PropTypes.bool,
   eventId: PropTypes.number,
 };
 
@@ -182,6 +204,7 @@ PrincipalListField.defaultProps = {
   withExternalUsers: false,
   withEventRoles: false,
   withCategoryRoles: false,
+  withRegistrants: false,
   eventId: null,
   readOnly: false,
 };
@@ -209,6 +232,7 @@ FinalPrincipalList.propTypes = {
   withExternalUsers: PropTypes.bool,
   withEventRoles: PropTypes.bool,
   withCategoryRoles: PropTypes.bool,
+  withRegistrants: PropTypes.bool,
   eventId: PropTypes.number,
   favoriteUsersController: PropTypes.array.isRequired,
 };
@@ -218,6 +242,7 @@ FinalPrincipalList.defaultProps = {
   withExternalUsers: false,
   withEventRoles: false,
   withCategoryRoles: false,
+  withRegistrants: false,
   eventId: null,
   readOnly: false,
 };
