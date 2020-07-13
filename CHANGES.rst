@@ -19,6 +19,11 @@ Major Features
   (:issue:`4431`, thanks :user:`omegak`)
 - Registrants can now be added to event ACLs. This can be used to easily restrict
   parts of an event to registered participants. (:issue:`4477`)
+- Add a new Editing module for papers, slides and posters which provides a workflow
+  for having a team review the layout/formatting of such proceedings and then publish
+  the final version on the page of the corresponding contribution. The Editing module
+  can also be connected to an external microservice to handle more advanced workflows
+  beyond what is supported natively by Indico.
 
 Improvements
 ^^^^^^^^^^^^
