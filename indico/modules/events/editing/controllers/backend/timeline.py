@@ -187,8 +187,8 @@ class RHReplaceRevision(RHContributionEditableRevisionBase):
     SERVICE_ALLOWED = True
 
     def _check_revision_access(self):
-        # XXX: we still need UI for this or expose it only to the microservice
-        return self.editable.editor is None and self.editable.can_perform_submitter_actions(session.user)
+        # this endpoint is microservice-only
+        return False
 
     @use_kwargs({
         'comment': fields.String(missing=''),
