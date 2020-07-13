@@ -201,7 +201,7 @@ def _check_menu(event):
                       joinedload('children').load_only('id', 'parent_id', 'name', 'position')))
 
     existing = {entry.name: entry for entry in query}
-    pos_gen = count(start=(max(x.position for x in existing.itervalues() if not x.parent)))
+    pos_gen = count(start=(max(x.position for x in existing.itervalues() if not x.parent) + 1))
     entries = []
     top_created = set()
     for name, data in top_data.iteritems():
