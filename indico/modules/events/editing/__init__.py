@@ -81,6 +81,41 @@ def _get_cloners(sender, **kwargs):
     yield EditingSettingsCloner
 
 
+@signals.event.sidemenu.connect
+def _extend_event_menu(sender, **kwargs):
+    from indico.modules.events.editing.models.editable import EditableType
+    from indico.modules.events.layout.util import MenuEntryData
+
+    def _editing_visible(event, specific_type=None):
+        if not session.user or not event.has_feature('editing'):
+            return False
+
+        enabled_types = {
+            EditableType[et]
+            for et in event.editable_types
+            if (specific_type is None or specific_type.name == et)
+        }
+        if not enabled_types:
+            return False
+        elif event.can_manage(session.user, 'editing_manager'):
+            return True
+        return any(event.can_manage(session.user, et.editor_permission) for et in enabled_types)
+
+    def _make_visible(editable_type):
+        return lambda event: _editing_visible(event, editable_type)
+
+    yield MenuEntryData(title=_('Editing'), name='editing', position=8, visible=_editing_visible)
+    yield MenuEntryData(title=_('Papers'), name='editing_papers', parent='editing',
+                        endpoint='event_editing.editable_type_list', position=0,
+                        visible=_make_visible(EditableType.paper), url_kwargs={'type': 'paper'})
+    yield MenuEntryData(title=_('Slides'), name='editing_slides', parent='editing',
+                        endpoint='event_editing.editable_type_list', position=1,
+                        visible=_make_visible(EditableType.slides), url_kwargs={'type': 'slides'})
+    yield MenuEntryData(title=_('Posters'), name='editing_posters', parent='editing',
+                        endpoint='event_editing.editable_type_list', position=2,
+                        visible=_make_visible(EditableType.poster), url_kwargs={'type': 'poster'})
+
+
 class EditingManagerPermission(ManagementPermission):
     name = 'editing_manager'
     friendly_name = _('Editing manager')
