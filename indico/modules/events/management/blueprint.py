@@ -45,6 +45,8 @@ _bp.add_url_rule('!/permissions-dialog/<any(event,session,contribution,category)
 # Cloning
 _bp.add_url_rule('/clone', 'clone', cloning.RHCloneEvent, methods=('GET', 'POST'))
 _bp.add_url_rule('/clone/preview', 'clone_preview', cloning.RHClonePreview, methods=('GET', 'POST'))
+_bp.add_url_rule('/import', 'import', cloning.RHImportFromEvent, methods=('GET', 'POST'))
+_bp.add_url_rule('/import/event-details', 'import_event_details', cloning.RHImportEventDetails, methods=('POST',))
 # Posters
 _bp.add_url_rule('/print-poster/settings', 'poster_settings', posters.RHPosterPrintSettings, methods=('GET', 'POST'))
 _bp.add_url_rule('/print-poster/<int:template_id>/<uuid>', 'print_poster', posters.RHPrintEventPoster)

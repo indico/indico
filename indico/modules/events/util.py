@@ -10,6 +10,7 @@ from __future__ import unicode_literals
 import json
 import os
 import random
+import re
 import warnings
 from collections import defaultdict
 from contextlib import contextmanager
@@ -22,6 +23,7 @@ from flask import current_app, flash, g, redirect, request, session
 from sqlalchemy import inspect
 from sqlalchemy.orm import load_only, noload
 from werkzeug.exceptions import BadRequest, Forbidden
+from werkzeug.urls import url_parse
 
 from indico.core import signals
 from indico.core.config import config
@@ -615,6 +617,20 @@ def check_permissions(event, field, allow_networks=False, allow_registration_for
         if FULL_ACCESS_PERMISSION in permissions and len(permissions) != 1:
             # when full access permission is set, discard rest of permissions
             permissions[:] = [FULL_ACCESS_PERMISSION]
+
+
+def get_event_from_url(url):
+    data = url_parse(url)
+    if not all([data.scheme, data.netloc, data.path]):
+        raise ValueError(_('Invalid event URL'))
+    event_path = re.match(r'/event/(\d+)(/|$)', data.path)
+    if not event_path:
+        raise ValueError(_('Invalid event URL'))
+    event_id = event_path.group(1)
+    event = Event.get(event_id, is_deleted=False)
+    if not event:
+        raise ValueError(_('This event does not exist'))
+    return event
 
 
 class ZipGeneratorMixin:

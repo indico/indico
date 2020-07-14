@@ -58,6 +58,9 @@ class EventCloner(object):
     #: would result in people having to explicitly enable the other
     #: cloner even if it makes no sense to not run it.
     always_available_dep = False
+    #: Whether cloner allows cloning only into new events and excludes
+    #: cloning into exisitng events
+    new_event_only = False
 
     @classmethod
     def get_cloners(cls, old_event):
@@ -66,11 +69,18 @@ class EventCloner(object):
                       key=attrgetter('friendly_name'))
 
     @classmethod
-    def run_cloners(cls, old_event, new_event, cloners):
+    def run_cloners(cls, old_event, new_event, cloners, event_exists=False):
         all_cloners = OrderedDict((name, cloner_cls(old_event))
                                   for name, cloner_cls in get_event_cloners().iteritems())
         if any(cloner.is_internal for name, cloner in all_cloners.iteritems() if name in cloners):
             raise Exception('An internal cloner was selected')
+
+        if event_exists:
+            if any(cloner.new_event_only for name, cloner in all_cloners.viewitems() if name in cloners):
+                raise Exception('A new event only cloner was selected')
+            if any(cloner.has_conflicts(new_event) for name, cloner in all_cloners.viewitems() if name in cloners):
+                raise Exception('Cloner target is not empty')
+
         # enable internal cloners that are enabled by default or required by another cloner
         cloners |= {c.name
                     for c in all_cloners.itervalues()
@@ -91,7 +101,8 @@ class EventCloner(object):
         shared_data = {}
         cloner_names = set(active_cloners)
         for name, cloner in active_cloners.iteritems():
-            shared_data[name] = cloner.run(new_event, cloner_names, cloner._prepare_shared_data(shared_data))
+            shared_data[name] = cloner.run(new_event, cloner_names, cloner._prepare_shared_data(shared_data),
+                                           event_exists=event_exists)
 
     @cached_classproperty
     @classmethod
@@ -123,7 +134,7 @@ class EventCloner(object):
     def __init__(self, old_event):
         self.old_event = old_event
 
-    def run(self, new_event, cloners, shared_data):
+    def run(self, new_event, cloners, shared_data, event_exists=False):
         """Performs the cloning operation.
 
         :param new_event: The `Event` that's created by the cloning
@@ -140,6 +151,7 @@ class EventCloner(object):
                             cloner. This would indicate that the
                             cloner was executed but did not return
                             any data.
+        :param event_exists: If cloning into an existing event
         :return: data that may be used by other cloners depending on
                  or using this cloner
         """
@@ -160,6 +172,14 @@ class EventCloner(object):
 
         Use this to disable options if selecting them wouldn't make
         sense, e.g. because there is nothing to clone.
+        """
+        return True
+
+    def has_conflicts(self, target_event):
+        """Check for conflicts between source event and target event
+
+        Use this when cloning into an existing event to disable options
+        where target_event data would conflict with cloned data.
         """
         return True
 

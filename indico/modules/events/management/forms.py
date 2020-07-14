@@ -407,3 +407,28 @@ class ProgramCodesForm(IndicoForm):
     session_block_template = StringField(_('Session blocks'))
     contribution_template = StringField(_('Contributions'))
     subcontribution_template = StringField(_('Subcontributions'))
+
+
+class ImportSourceEventForm(IndicoForm):
+    source_event_url = URLField(_('Event URL'), [DataRequired(), URL()])
+
+
+class ImportContentsForm(ImportSourceEventForm):
+    selected_items = IndicoSelectMultipleCheckboxField(_('What to clone'))
+
+    def __init__(self, source_event, target_event, set_defaults=False, **kwargs):
+        options = EventCloner.get_cloners(source_event)
+        visible_options = filter(attrgetter('is_visible'), options)
+
+        if set_defaults:
+            form_params = {
+                'source_event_url': request.form.get('source_event_url', kwargs.pop('source_event_url', None)),
+                'selected_items': request.form.getlist('selected_items'),
+                'csrf_token': request.form.get('csrf_token')
+            }
+            kwargs['formdata'] = ImmutableMultiDict(form_params)
+
+        super(ImportContentsForm, self).__init__(**kwargs)
+        self.selected_items.choices = [(option.name, option.friendly_name) for option in visible_options]
+        self.selected_items.disabled_choices = [option.name for option in visible_options if not option.is_available
+                                                or option.has_conflicts(target_event)]

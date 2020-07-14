@@ -18,8 +18,10 @@ from indico.modules.events.cloning import EventCloner
 from indico.modules.events.management.controllers import RHManageEventBase
 from indico.modules.events.management.forms import (CLONE_REPEAT_CHOICES, CloneCategorySelectForm, CloneContentsForm,
                                                     CloneRepeatabilityForm, CloneRepeatIntervalForm,
-                                                    CloneRepeatOnceForm, CloneRepeatPatternForm)
-from indico.modules.events.operations import clone_event
+                                                    CloneRepeatOnceForm, CloneRepeatPatternForm, ImportContentsForm,
+                                                    ImportSourceEventForm)
+from indico.modules.events.operations import clone_event, clone_into_event
+from indico.modules.events.util import get_event_from_url
 from indico.util.i18n import _
 from indico.web.flask.util import url_for
 from indico.web.util import jsonify_data, jsonify_template
@@ -196,3 +198,62 @@ class RHCloneEvent(RHManageEventBase):
                         for c in EventCloner.get_cloners(self.event)}
         return jsonify_template('events/management/clone_event.html', event=self.event, step=step, form=form,
                                 cloner_dependencies=dependencies, **tpl_args)
+
+
+class RHImportFromEvent(RHManageEventBase):
+    """Import data from another event."""
+
+    def _form_for_step(self, step, set_defaults=True):
+        if step == 1:
+            return ImportSourceEventForm()
+        elif step == 2:
+            source_event = get_event_from_url(request.form.get('source_event_url'))
+            return ImportContentsForm(source_event, self.event, set_defaults=set_defaults)
+        else:
+            return None
+
+    def _process(self):
+        step = int(request.form.get('step', 1))
+        form = self._form_for_step(step, set_defaults=True)
+        prev_form = self._form_for_step(step - 1)
+
+        if prev_form and not prev_form.validate():
+            form = prev_form
+            step = step - 1
+
+        elif step > 2:
+            # last step - perform actual cloning
+            source_event = get_event_from_url(request.form.get('source_event_url'))
+            form = ImportContentsForm(source_event, self.event)
+
+            if form.validate_on_submit():
+                updated_event = clone_into_event(source_event, self.event, set(form.selected_items.data))
+                flash(_('Data properly imported!'), 'success')
+                return jsonify_data(redirect=url_for('event_management.settings', updated_event), flash=False)
+            else:
+                # back to step 2, since there's been an error
+                step = 2
+        dependencies = {c.name: {'requires': list(c.requires_deep), 'required_by': list(c.required_by_deep)}
+                        for c in EventCloner.get_cloners(self.event)}
+        return jsonify_template('events/management/import_event.html', event=self.event, step=step, form=form,
+                                cloner_dependencies=dependencies)
+
+
+class RHImportEventDetails(RHManageEventBase):
+    ALLOW_LOCKED = True
+
+    def _process(self):
+        from indico.modules.events.schemas import EventDetailsSchema
+        schema = EventDetailsSchema()
+        form = ImportSourceEventForm()
+        try:
+            event = get_event_from_url(form.source_event_url.data)
+            if event == self.event:
+                raise ValueError(_('Cannot import from the same event'))
+            if event.type != self.event.type:
+                raise ValueError(_('Cannot import from a different type of event'))
+            if not event.can_manage(session.user):
+                raise ValueError(_('You do not have management rights to this event'))
+        except ValueError as e:
+            return jsonify(error={'message': e.message})
+        return jsonify_data(event=schema.dump(event))

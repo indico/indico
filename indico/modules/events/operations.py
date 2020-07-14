@@ -187,6 +187,23 @@ def clone_event(event, start_dt, cloners, category=None):
     return new_event
 
 
+def clone_into_event(source_event, target_event, cloners):
+    """Clone data into an exisiting event.
+
+    Runs all required cloners.
+
+    :param source_event: The `Event` to clone data from;
+    :param target_event: The `Event` to clone data into;
+    :param cloners: A set containing the names of all enabled cloners.
+    """
+
+    # Run the modular cloning system
+    EventCloner.run_cloners(source_event, target_event, cloners, event_exists=True)
+    signals.event.cloned.send(source_event, new_event=target_event)
+
+    return target_event
+
+
 def _log_event_update(event, changes, visible_person_link_changes=False):
     log_fields = {
         'title': {'title': 'Title', 'type': 'string'},
