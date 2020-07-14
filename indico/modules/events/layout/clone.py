@@ -27,14 +27,17 @@ class ImageCloner(EventCloner):
 
     @property
     def is_available(self):
-        return self._find_images().has_rows()
+        return self._find_images(self.old_event).has_rows()
 
-    def _find_images(self):
-        return self.old_event.layout_images
+    def has_conflicts(self, target_event):
+        return self._find_images(target_event).has_rows()
 
-    def run(self, new_event, cloners, shared_data):
+    def _find_images(self, event):
+        return event.layout_images
+
+    def run(self, new_event, cloners, shared_data, event_exists=False):
         from indico.modules.events.layout.models.images import ImageFile
-        for old_image in self._find_images():
+        for old_image in self._find_images(self.old_event):
             new_image = ImageFile(filename=old_image.filename, content_type=old_image.content_type)
             new_event.layout_images.append(new_image)
             with old_image.open() as fd:
@@ -45,12 +48,13 @@ class ImageCloner(EventCloner):
 class LayoutCloner(EventCloner):
     name = 'layout'
     friendly_name = _('Layout settings and menu customization')
+    new_event_only = True
 
     @property
     def is_visible(self):
         return self.old_event.type_ == EventType.conference
 
-    def run(self, new_event, cloners, shared_data):
+    def run(self, new_event, cloners, shared_data, event_exists=False):
         for col in ('logo_metadata', 'logo', 'stylesheet_metadata', 'stylesheet'):
             setattr(new_event, col, getattr(self.old_event, col))
 

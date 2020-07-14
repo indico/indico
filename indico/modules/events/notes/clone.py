@@ -23,9 +23,12 @@ class NoteCloner(EventCloner):
 
     @property
     def is_available(self):
-        return bool(self.old_event.all_notes.filter_by(is_deleted=False).count())
+        return self._has_content(self.old_event)
 
-    def run(self, new_event, cloners, shared_data):
+    def has_conflicts(self, target_event):
+        return self._has_content(target_event)
+
+    def run(self, new_event, cloners, shared_data, event_exists=False):
         self._clone_nested_notes = False
         self._session_map = self._contrib_map = self._subcontrib_map = None
         if cloners >= {'sessions', 'contributions'}:
@@ -36,6 +39,9 @@ class NoteCloner(EventCloner):
         with db.session.no_autoflush:
             self._clone_notes(new_event)
         db.session.flush()
+
+    def _has_content(self, event):
+        return bool(event.all_notes.filter_by(is_deleted=False).count())
 
     def _query_notes(self):
         return (self.old_event.all_notes

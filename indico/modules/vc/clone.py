@@ -27,9 +27,15 @@ class VCCloner(EventCloner):
 
     @property
     def is_available(self):
-        return VCRoomEventAssociation.find_for_event(self.old_event, include_hidden=True).has_rows()
+        return self._has_content(self.old_event)
 
-    def run(self, new_event, cloners, shared_data):
+    def has_conflicts(self, target_event):
+        return self._has_content(target_event)
+
+    def _has_content(self, event):
+        return VCRoomEventAssociation.find_for_event(event, include_hidden=True).has_rows()
+
+    def run(self, new_event, cloners, shared_data, event_exists=False):
         self._clone_nested_vc_rooms = False
         self._session_block_map = self._contrib_map = None
         if cloners >= {'sessions', 'contributions'}:

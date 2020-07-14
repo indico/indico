@@ -21,13 +21,14 @@ from indico.util.i18n import _
 class EditingSettingsCloner(EventCloner):
     name = 'editing_settings'
     friendly_name = _('Editing (configured tags, file types, review conditions)')
+    new_event_only = True
 
     @property
     def is_visible(self):
         return self.old_event.type_ == EventType.conference
 
     @no_autoflush
-    def run(self, new_event, cloners, shared_data):
+    def run(self, new_event, cloners, shared_data, event_exists=False):
         self._filetype_map = {}
         self._clone_tags(new_event)
         self._clone_filetypes(new_event)

@@ -27,8 +27,11 @@ class AbstractSettingsCloner(EventCloner):
     def is_visible(self):
         return self.old_event.type_ == EventType.conference
 
+    def has_conflicts(self, target_event):
+        return bool(target_event.abstract_review_questions) or bool(target_event.abstract_email_templates)
+
     @no_autoflush
-    def run(self, new_event, cloners, shared_data):
+    def run(self, new_event, cloners, shared_data, event_exists=False):
         self._contrib_type_id_map = {old.id: new.id
                                      for old, new in shared_data['contribution_types']['contrib_type_map'].iteritems()}
         self._track_id_map = {old.id: new.id for old, new in shared_data['tracks']['track_map'].iteritems()}

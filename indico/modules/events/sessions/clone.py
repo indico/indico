@@ -30,7 +30,10 @@ class SessionCloner(EventCloner):
     # We do not override `is_available` as we have cloners depending
     # on this internal cloner even if it won't clone anything.
 
-    def run(self, new_event, cloners, shared_data):
+    def has_conflicts(self, target_event):
+        return bool(target_event.sessions)
+
+    def run(self, new_event, cloners, shared_data, event_exists=False):
         self._event_role_map = shared_data['event_roles']['event_role_map'] if 'event_roles' in cloners else None
         self._regform_map = shared_data['registration_forms']['form_map'] if 'registration_forms' in cloners else None
         self._person_map = shared_data['event_persons']['person_map']

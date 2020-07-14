@@ -25,7 +25,7 @@ class TimetableCloner(EventCloner):
 
     @property
     def is_available(self):
-        return bool(self.old_event.timetable_entries.count())
+        return self._has_content(self.old_event)
 
     @property
     def is_default(self):
@@ -35,12 +35,18 @@ class TimetableCloner(EventCloner):
     def is_visible(self):
         return self.old_event.type_ in {EventType.meeting, EventType.conference}
 
-    def run(self, new_event, cloners, shared_data):
+    def has_conflicts(self, target_event):
+        return self._has_content(target_event)
+
+    def run(self, new_event, cloners, shared_data, event_exists=False):
         self._session_block_map = shared_data['sessions']['session_block_map']
         self._contrib_map = shared_data['contributions']['contrib_map']
         with db.session.no_autoflush:
             self._clone_timetable(new_event)
         db.session.flush()
+
+    def _has_content(self, event):
+        return event.timetable_entries.has_rows()
 
     def _clone_timetable(self, new_event):
         offset = new_event.start_dt - self.old_event.start_dt

@@ -27,9 +27,12 @@ class AttachmentCloner(EventCloner):
 
     @property
     def is_available(self):
-        return bool(self.old_event.all_attachment_folders.filter(AttachmentFolder.attachments.any()).count())
+        return self._has_content(self.old_event)
 
-    def run(self, new_event, cloners, shared_data):
+    def has_conflicts(self, target_event):
+        return self._has_content(target_event)
+
+    def run(self, new_event, cloners, shared_data, event_exists=False):
         self._clone_nested_attachments = False
         self._event_role_map = self._session_map = self._contrib_map = self._subcontrib_map = self._regform_map = None
         if cloners >= {'sessions', 'contributions'}:
@@ -44,6 +47,9 @@ class AttachmentCloner(EventCloner):
         with db.session.no_autoflush:
             self._clone_attachments(new_event)
         db.session.flush()
+
+    def _has_content(self, event):
+        return event.all_attachment_folders.filter(AttachmentFolder.attachments.any()).has_rows()
 
     def _query_folders(self, base_query, for_event):
         query = (base_query

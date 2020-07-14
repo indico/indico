@@ -30,16 +30,22 @@ class TrackCloner(EventCloner):
 
     @property
     def is_available(self):
-        return bool(self.old_event.tracks)
+        return self._has_content(self.old_event)
+
+    def has_conflicts(self, target_event):
+        return self._has_content(target_event)
 
     @no_autoflush
-    def run(self, new_event, cloners, shared_data):
+    def run(self, new_event, cloners, shared_data, event_exists=False):
         self._track_map = {}
         self._track_group_map = {}
         self._clone_track_groups(new_event)
         self._clone_tracks(new_event)
         db.session.flush()
         return {'track_map': self._track_map}
+
+    def _has_content(self, event):
+        return bool(event.tracks)
 
     def _clone_tracks(self, new_event):
         attrs = get_simple_column_attrs(Track)

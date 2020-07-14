@@ -65,15 +65,18 @@ class ReminderCloner(EventCloner):
 
     @property
     def is_available(self):
-        return self._find_reminders().has_rows()
+        return self._find_reminders(self.old_event).has_rows()
 
-    def _find_reminders(self):
-        return self.old_event.reminders.filter(db.m.EventReminder.is_relative)
+    def has_conflicts(self, target_event):
+        return self._find_reminders(target_event).has_rows()
 
-    def run(self, new_event, cloners, shared_data):
+    def _find_reminders(self, event):
+        return event.reminders.filter(db.m.EventReminder.is_relative)
+
+    def run(self, new_event, cloners, shared_data, event_exists=False):
         attrs = get_simple_column_attrs(db.m.EventReminder) - {'created_dt', 'scheduled_dt', 'is_sent'}
         attrs |= {'creator_id'}
-        for old_reminder in self._find_reminders():
+        for old_reminder in self._find_reminders(self.old_event):
             scheduled_dt = new_event.start_dt - old_reminder.event_start_delta
             # Skip anything that's would have been sent on a past date.
             # We ignore the time on purpose so cloning an event shortly before will

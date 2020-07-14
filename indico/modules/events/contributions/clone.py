@@ -35,7 +35,10 @@ class ContributionTypeCloner(EventCloner):
     # We do not override `is_available` as we have cloners depending
     # on this internal cloner even if it won't clone anything.
 
-    def run(self, new_event, cloners, shared_data):
+    def has_conflicts(self, target_event):
+        return target_event.contribution_types.has_rows()
+
+    def run(self, new_event, cloners, shared_data, event_exists=False):
         self._contrib_type_map = {}
         self._clone_contrib_types(new_event)
         db.session.flush()
@@ -58,7 +61,10 @@ class ContributionFieldCloner(EventCloner):
     # We do not override `is_available` as we have cloners depending
     # on this internal cloner even if it won't clone anything.
 
-    def run(self, new_event, cloners, shared_data):
+    def has_conflicts(self, target_event):
+        return bool(target_event.contribution_fields)
+
+    def run(self, new_event, cloners, shared_data, event_exists=False):
         self._contrib_field_map = {}
         self._clone_contrib_fields(new_event)
         db.session.flush()
@@ -83,6 +89,9 @@ class ContributionCloner(EventCloner):
 
     # We do not override `is_available` as we have cloners depending
     # on this internal cloner even if it won't clone anything.
+
+    def has_conflicts(self, target_event):
+        return bool(target_event.contributions)
 
     @classmethod
     @no_autoflush
@@ -113,7 +122,7 @@ class ContributionCloner(EventCloner):
         db.session.flush()
         return new_contribution
 
-    def run(self, new_event, cloners, shared_data):
+    def run(self, new_event, cloners, shared_data, event_exists=False):
         self._event_role_map = shared_data['event_roles']['event_role_map'] if 'event_roles' in cloners else None
         self._person_map = shared_data['event_persons']['person_map']
         self._session_map = shared_data['sessions']['session_map']

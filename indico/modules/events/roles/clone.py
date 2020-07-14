@@ -27,13 +27,19 @@ class EventRoleCloner(EventCloner):
 
     @property
     def is_available(self):
-        return bool(self.old_event.roles)
+        return self._has_content(self.old_event)
 
-    def run(self, new_event, cloners, shared_data):
+    def has_conflicts(self, target_event):
+        return self._has_content(target_event)
+
+    def run(self, new_event, cloners, shared_data, event_exists):
         self._event_role_map = {}
         self._clone_event_roles(new_event)
         db.session.flush()
         return {'event_role_map': self._event_role_map}
+
+    def _has_content(self, event):
+        return bool(event.roles)
 
     @no_autoflush
     def _clone_event_roles(self, new_event):

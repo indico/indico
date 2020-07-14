@@ -31,10 +31,13 @@ class RegistrationFormCloner(EventCloner):
 
     @property
     def is_available(self):
-        return bool(self.old_event.registration_forms)
+        return self._has_content(self.old_event)
+
+    def has_conflicts(self, target_event):
+        return self._has_content(target_event)
 
     @no_autoflush
-    def run(self, new_event, cloners, shared_data):
+    def run(self, new_event, cloners, shared_data, event_exists=False):
         # if the registration cloner is also enabled, we have to keep
         # all revisions since they are likely to be in use
         clone_all_revisions = 'registrations' in cloners
@@ -49,6 +52,9 @@ class RegistrationFormCloner(EventCloner):
             self._form_map[old_form] = new_form
         return {'form_map': self._form_map,
                 'field_data_map': self._field_data_map}
+
+    def _has_content(self, event):
+        return bool(event.registration_forms)
 
     def _clone_form_items(self, old_form, new_form, clone_all_revisions):
         old_sections = RegistrationFormSection.find(RegistrationFormSection.registration_form_id == old_form.id)
@@ -90,21 +96,27 @@ class RegistrationCloner(EventCloner):
 
     @property
     def is_available(self):
-        return (RegistrationForm.query.with_parent(self.old_event)
-                .filter(RegistrationForm.registrations.any(Registration.is_active))
-                .has_rows())
+        return self._has_content(self.old_event)
 
     @property
     def is_default(self):
         return self.old_event.type_ == EventType.meeting
 
-    def run(self, new_event, cloners, shared_data):
+    def has_conflicts(self, target_event):
+        return self._has_content(target_event)
+
+    def run(self, new_event, cloners, shared_data, event_exists=False):
         form_map = shared_data['registration_forms']['form_map']
         field_data_map = shared_data['registration_forms']['field_data_map']
         for old_form, new_form in form_map.iteritems():
             self._clone_registrations(old_form, new_form, field_data_map)
         self._synchronize_registration_friendly_id(new_event)
         db.session.flush()
+
+    def _has_content(self, event):
+        return (RegistrationForm.query.with_parent(event)
+                .filter(RegistrationForm.registrations.any(Registration.is_active))
+                .has_rows())
 
     def _clone_registrations(self, old_form, new_form, field_data_map):
         registration_attrs = get_simple_column_attrs(Registration) - {

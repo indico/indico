@@ -25,12 +25,18 @@ class EventLocationCloner(EventCloner):
 
     @property
     def is_available(self):
-        return self.old_event.has_location_info
+        return self._has_content(self.old_event)
 
-    def run(self, new_event, cloners, shared_data):
+    def has_conflicts(self, target_event):
+        return self._has_content(target_event)
+
+    def run(self, new_event, cloners, shared_data, event_exists=False):
         with db.session.no_autoflush:
             self._clone_location(new_event)
         db.session.flush()
+
+    def _has_content(self, event):
+        return bool(event.has_location_info)
 
     def _clone_location(self, new_event):
         new_event.location_data = self.old_event.location_data
@@ -45,7 +51,10 @@ class EventPersonCloner(EventCloner):
     # We do not override `is_available` as we have cloners depending
     # on this internal cloner even if it won't clone anything.
 
-    def run(self, new_event, cloners, shared_data):
+    def has_conflicts(self, target_event):
+        return target_event.persons.has_rows()
+
+    def run(self, new_event, cloners, shared_data, event_exists=False):
         self._person_map = {}
         with db.session.no_autoflush:
             self._clone_persons(new_event)
@@ -75,13 +84,19 @@ class EventPersonLinkCloner(EventCloner):
 
     @property
     def is_available(self):
-        return bool(self.old_event.person_links)
+        return self._has_content(self.old_event)
 
-    def run(self, new_event, cloners, shared_data):
+    def has_conflicts(self, target_event):
+        return self._has_content(target_event)
+
+    def run(self, new_event, cloners, shared_data, event_exists=False):
         self._person_map = shared_data['event_persons']['person_map']
         with db.session.no_autoflush:
             self._clone_person_links(new_event)
         db.session.flush()
+
+    def _has_content(self, event):
+        return bool(event.person_links)
 
     def _clone_person_links(self, new_event):
         attrs = get_simple_column_attrs(EventPersonLink)
@@ -98,13 +113,19 @@ class EventProtectionCloner(EventCloner):
     is_default = True
     uses = {'event_roles', 'registration_forms'}
 
-    def run(self, new_event, cloners, shared_data):
+    def has_conflicts(self, target_event):
+        if target_event.access_key != '':
+            return True
+        entries = list(target_event.acl_entries)
+        return len(entries) != 1 or entries[0].user != target_event.creator
+
+    def run(self, new_event, cloners, shared_data, event_exists=False):
         self._event_role_map = shared_data['event_roles']['event_role_map'] if 'event_roles' in cloners else None
         self._regform_map = shared_data['registration_forms']['form_map'] if 'registration_forms' in cloners else None
         with db.session.no_autoflush:
             self._clone_protection(new_event)
             self._clone_session_coordinator_privs(new_event)
-            self._clone_acl(new_event)
+            self._clone_acl(new_event, event_exists)
             self._clone_visibility(new_event)
         db.session.flush()
 
@@ -122,6 +143,13 @@ class EventProtectionCloner(EventCloner):
             'coordinators_manage_blocks': session_settings_data['coordinators_manage_blocks']
         })
 
-    def _clone_acl(self, new_event):
-        new_event.acl_entries = clone_principals(EventPrincipal, self.old_event.acl_entries,
-                                                 self._event_role_map, self._regform_map)
+    def _clone_acl(self, new_event, event_exists):
+        if event_exists:
+            acl_entries = {principal for principal in self.old_event.acl_entries if principal.user != new_event.creator}
+            new_event.acl_entries = clone_principals(EventPrincipal, acl_entries,
+                                                     self._event_role_map, self._regform_map)
+            db.session.flush()
+            new_event.update_principal(new_event.creator, full_access=True)
+        else:
+            new_event.acl_entries = clone_principals(EventPrincipal, self.old_event.acl_entries,
+                                                     self._event_role_map, self._regform_map)
