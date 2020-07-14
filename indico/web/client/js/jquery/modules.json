@@ -9,6 +9,7 @@
     "event_cloning": "events/cloning",
     "event_creation": "events/creation",
     "event_display": "events/display",
+    "event_importing": "events/importing",
     "event_layout": "events/layout",
     "event_management": "events/management",
     "event_roles": "events/roles",

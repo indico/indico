@@ -144,7 +144,7 @@ class WPSimpleEventDisplayBase(MathjaxMixin, WPEventBase):
 
 
 class WPSimpleEventDisplay(WPSimpleEventDisplayBase):
-    bundles = ('module_vc.js', 'module_vc.css', 'module_events.cloning.js')
+    bundles = ('module_vc.js', 'module_vc.css', 'module_events.cloning.js', 'module_events.importing.js')
 
     def __init__(self, rh, conf, theme_id, theme_override=False):
         WPSimpleEventDisplayBase.__init__(self, rh, conf)

@@ -1,0 +1,113 @@
+{% from 'forms/_form.html' import form_header, form_fieldset, form_footer, form_row, form_rows %}
+{% from 'message_box.html' import message_box %}
+{% from 'steps.html' import render_steps, render_step %}
+
+{% macro invisible_field(field) -%}
+    {% set field_value = field._value() if field._value else field.data %}
+    {% set data = [field_value] if field_value is string else ([field_value|tojson] if field_value is mapping else field_value) %}
+    {% for value in data %}
+        <input type="hidden" name="{{ field.name }}" value="{{ value | forceescape }}">
+    {% endfor %}
+{%- endmacro %}
+
+{% macro invisible_fields(form, skip) %}
+    {% for field in form if field.short_name not in skip %}
+        {{ invisible_field(field) }}
+    {% endfor %}
+{% endmacro %}
+
+{% block content %}
+    <div id="event-import-form-container"
+         data-event-details-url="{{ url_for('.import_event_details', event) }}"
+         data-cloner-dependencies="{{ cloner_dependencies | tojson | forceescape }}"
+         data-step="{{ step }}">
+        {% call form_header(form, id='event-import-form', classes='step-%d'|format(step),
+                            action=url_for('.import', event), disable_if_locked=false) %}
+            data-ajax-form
+        {% endcall %}
+
+        <div class="clone-event-dialog-content">
+            {% call render_steps() %}
+                {{ render_step(_("1. Select event"),
+                               current=step == 1,
+                               before_current=step-1 == 1,
+                               completed=step > 1,
+                               label_position='bottom') }}
+
+                {{ render_step(_("2. Contents"),
+                               current=step == 2,
+                               before_current=step-1 == 2,
+                               completed=step > 2,
+                               label_position='bottom') }}
+            {% endcall %}
+
+            {% if step == 1 %}
+                {% call form_fieldset(_("Which event should be imported?")) %}
+                    {{ form_rows(form) }}
+                    {% call message_box('highlight', large_icon=true, fixed_width=true, id='event-details') -%}
+                        {% set event_title %}
+                            <div class="import-event-title"></div>
+                        {% endset %}
+                        {% set event_dates %}
+                            <div class="import-event-dates"></div>
+                        {% endset %}
+                        {% set event_category %}
+                            <div class="import-event-category"></div>
+                        {% endset %}
+                        <div>
+                            {% trans %}You will import data from the following event:{% endtrans %}
+                        </div>
+                        {{ event_title }}
+                        {{ event_dates }}
+                        {{ event_category }}
+                    {%- endcall %}
+                    {{ message_box('error', '-', fixed_width=true, id='clone-errors') }}
+                {% endcall %}
+
+            {% elif step == 2 %}
+                {% call form_fieldset(_("What should be imported?")) %}
+                    {% call message_box('info') %}
+                        {% trans %}Some options might not be available because:{% endtrans %}
+                        <ul>
+                            <li>{% trans %}target event already has data in the module{% endtrans %}</li>
+                            <li>{% trans %}source event does not have any data in the module{% endtrans %}</li>
+                        </ul>
+                    {% endcall %}
+                    {{ form_rows(form, skip=('source_event_url',), skip_labels=true) }}
+                    {{ invisible_field(form.source_event_url) }}
+                    {{ message_box('error', '-', fixed_width=true, id='clone-errors') }}
+                {% endcall %}
+            {% endif %}
+        </div>
+        {% call form_footer(form, skip_label=true, classes='clone-event-dialog-footer') %}
+            {% set button_message %}
+                {% if step == 2 %}
+                    {% trans %}Import{% endtrans %}
+                {% else %}
+                    {% trans %}Next{% endtrans %}
+                {% endif %}
+            {% endset %}
+
+            <div class="flexrow f-j-space-between">
+                {% if step > 1 %}
+                    <button class="i-button icon-prev back-action-button"
+                            type="submit"
+                            name="step"
+                            value="{{ step - 1 }}">
+                            {% trans %}Previous{% endtrans %}
+                    </button>
+                {% endif %}
+                <button class="i-button icon-next highlight clone-action-button"
+                        type="submit"
+                        name="step"
+                        value="{{ step + 1 }}">
+                    {{ button_message }}
+                </button>
+            </div>
+        {% endcall %}
+    </div>
+
+    <script>
+        setupImportDialog();
+    </script>
+{% endblock %}
