@@ -18,7 +18,7 @@ from wtforms.validators import DataRequired
 
 from indico.core.db import db
 from indico.modules.events import EventLogKind, EventLogRealm
-from indico.modules.events.controllers.base import RHDisplayEventBase
+from indico.modules.events.controllers.base import RegistrationRequired, RHDisplayEventBase
 from indico.modules.events.layout import layout_settings, logger, theme_settings
 from indico.modules.events.layout.forms import (ConferenceLayoutForm, CSSForm, CSSSelectionForm,
                                                 LectureMeetingLayoutForm, LogoForm)
@@ -203,7 +203,6 @@ class RHLayoutCSSUpload(RHLayoutBase):
 
 
 class RHLayoutCSSDelete(RHLayoutBase):
-
     def _process(self):
         self.event.stylesheet = None
         self.event.stylesheet_metadata = None
@@ -234,6 +233,13 @@ class RHLayoutCSSSaveTheme(RHLayoutBase):
 
 
 class RHLogoDisplay(RHDisplayEventBase):
+    def _check_access(self):
+        try:
+            RHDisplayEventBase._check_access(self)
+        except RegistrationRequired:
+            # in case registrants need to register they should be able to see the logo
+            pass
+
     def _process(self):
         if not self.event.has_logo:
             raise NotFound
@@ -243,6 +249,13 @@ class RHLogoDisplay(RHDisplayEventBase):
 
 
 class RHLayoutCSSDisplay(RHDisplayEventBase):
+    def _check_access(self):
+        try:
+            RHDisplayEventBase._check_access(self)
+        except RegistrationRequired:
+            # in case registrants need to register they should be able to see the css
+            pass
+
     def _process(self):
         if not self.event.has_stylesheet:
             raise NotFound

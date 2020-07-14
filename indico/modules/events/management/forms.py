@@ -251,6 +251,11 @@ class EventProtectionForm(IndicoForm):
                                            """Calendar. If the event is moved, this number will be preserved. """
                                            """The "Invisible" option will also hide the event from the category's """
                                            """event list except for managers."""))
+    public_regform_access = BooleanField(_('Public registration'), widget=SwitchWidget(),
+                                         description=_('Allow users who cannot access the event to register. This will '
+                                                       'expose open registration forms to anyone with a link to the '
+                                                       'event, so you can let users register without giving access '
+                                                       'to anything else in your event.'))
     priv_fields = set()
 
     def __init__(self, *args, **kwargs):

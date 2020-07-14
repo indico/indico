@@ -15,7 +15,7 @@ from sqlalchemy.orm import contains_eager, subqueryload
 from werkzeug.exceptions import Forbidden, NotFound
 
 from indico.modules.auth.util import redirect_to_login
-from indico.modules.events.controllers.base import RHDisplayEventBase
+from indico.modules.events.controllers.base import RegistrationRequired, RHDisplayEventBase
 from indico.modules.events.models.events import EventType
 from indico.modules.events.payment import payment_event_settings
 from indico.modules.events.registration import registration_settings
@@ -36,11 +36,21 @@ from indico.web.flask.util import send_file, url_for
 
 
 class RHRegistrationFormDisplayBase(RHDisplayEventBase):
+    #: Whether to allow access for users who cannot access the event itself.
+    ALLOW_PROTECTED_EVENT = False
+
     @property
     def view_class(self):
         return (WPDisplayRegistrationFormConference
                 if self.event.type_ == EventType.conference
                 else WPDisplayRegistrationFormSimpleEvent)
+
+    def _check_access(self):
+        try:
+            RHDisplayEventBase._check_access(self)
+        except RegistrationRequired:
+            if not self.ALLOW_PROTECTED_EVENT:
+                raise
 
 
 class RHRegistrationFormBase(RegistrationFormMixin, RHRegistrationFormDisplayBase):
@@ -69,6 +79,8 @@ class RHRegistrationFormRegistrationBase(RHRegistrationFormBase):
 
 class RHRegistrationFormList(RHRegistrationFormDisplayBase):
     """List of all registration forms in the event"""
+
+    ALLOW_PROTECTED_EVENT = True
 
     def _process(self):
         displayed_regforms, user_registrations = get_event_regforms_registrations(self.event, session.user)
@@ -217,6 +229,8 @@ class InvitationMixin:
 class RHRegistrationFormCheckEmail(RHRegistrationFormBase):
     """Checks how an email will affect the registration"""
 
+    ALLOW_PROTECTED_EVENT = True
+
     def _process(self):
         email = request.args['email'].lower().strip()
         update = request.args.get('update')
@@ -233,6 +247,7 @@ class RHRegistrationForm(InvitationMixin, RHRegistrationFormRegistrationBase):
     """Display a registration form and registrations, and process submissions"""
 
     REGISTRATION_REQUIRED = False
+    ALLOW_PROTECTED_EVENT = True
 
     normalize_url_spec = {
         'locators': {
@@ -287,6 +302,7 @@ class RHRegistrationDisplayEdit(RegistrationEditMixin, RHRegistrationFormRegistr
     template_file = 'display/registration_modify.html'
     management = False
     REGISTRATION_REQUIRED = False
+    ALLOW_PROTECTED_EVENT = True
 
     def _process_args(self):
         RHRegistrationFormRegistrationBase._process_args(self)
@@ -307,6 +323,8 @@ class RHRegistrationDisplayEdit(RegistrationEditMixin, RHRegistrationFormRegistr
 
 class RHRegistrationFormDeclineInvitation(InvitationMixin, RHRegistrationFormBase):
     """Decline an invitation to register"""
+
+    ALLOW_PROTECTED_EVENT = True
 
     def _process_args(self):
         RHRegistrationFormBase._process_args(self)

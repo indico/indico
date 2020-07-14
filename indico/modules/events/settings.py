@@ -241,7 +241,8 @@ event_core_settings = EventSettingsProxy('core', {
     'start_dt_override': None,
     'end_dt_override': None,
     'organizer_info': '',
-    'additional_info': ''
+    'additional_info': '',
+    'public_regform_access': False
 }, converters={
     'start_dt_override': DatetimeConverter,
     'end_dt_override': DatetimeConverter

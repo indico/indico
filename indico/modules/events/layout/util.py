@@ -10,6 +10,7 @@ from __future__ import unicode_literals
 from collections import OrderedDict, defaultdict
 from itertools import chain, count
 
+from flask import session
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import joinedload, load_only
 from werkzeug.urls import url_parse
@@ -100,7 +101,7 @@ class MenuEntryData(object):
     plugin = None
 
     def __init__(self, title, name, endpoint=None, position=-1, is_enabled=True, visible=None, parent=None,
-                 static_site=False, url_kwargs=None):
+                 static_site=False, url_kwargs=None, hide_if_restricted=True):
         self.title = title
         self._name = name
         self.endpoint = endpoint
@@ -110,12 +111,15 @@ class MenuEntryData(object):
         self.parent = parent
         self.static_site = static_site
         self.url_kwargs = url_kwargs or {}
+        self.hide_if_restricted = hide_if_restricted
 
     @property
     def name(self):
         return build_menu_entry_name(self._name, self.plugin)
 
     def visible(self, event):
+        if self.hide_if_restricted and not event.can_access(session.user):
+            return False
         return self._visible(event) if self._visible else True
 
     @return_ascii
