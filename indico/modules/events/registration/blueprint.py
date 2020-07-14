@@ -172,6 +172,7 @@ _bp.add_url_rule('!/api/events/<int:event_id>/registrants/<int:registrant_id>', 
                  api.RHAPIRegistrant, methods=('GET', 'PATCH'))
 _bp.add_url_rule('!/api/events/<int:event_id>/registrants', 'api_registrants',
                  api.RHAPIRegistrants)
+_bp.add_url_rule('/api/registration-forms', 'api_registration_forms', api.RHAPIRegistrationForms)
 
 
 # Participants

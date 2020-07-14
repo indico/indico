@@ -132,7 +132,7 @@ export class PrincipalType {
       [PrincipalType.multipassGroup]: Translate.string(
         'This group does not exist anymore. Please choose a different one.'
       ),
-      // event/category roles and forms are hard-deleted
+      // event/category roles are hard-deleted
     }[type];
   }
 

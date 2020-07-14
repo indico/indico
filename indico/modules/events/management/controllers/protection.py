@@ -23,7 +23,6 @@ from indico.modules.events.management.controllers.base import RHManageEventBase
 from indico.modules.events.management.forms import EventProtectionForm
 from indico.modules.events.management.views import WPEventProtection
 from indico.modules.events.operations import update_event_protection
-from indico.modules.events.registration.schemas import RegistrationFormSchema
 from indico.modules.events.roles.util import serialize_event_role
 from indico.modules.events.sessions import COORDINATOR_PRIV_SETTINGS, session_settings
 from indico.modules.events.sessions.operations import update_session_coordinator_privs
@@ -148,10 +147,3 @@ class RHCategoryRolesJSON(RHManageEventBase):
     def _process(self):
         category_roles = CategoryRole.get_category_roles(self.event.category)
         return jsonify([serialize_category_role(cr, legacy=False) for cr in category_roles])
-
-
-class RHRegistrationFormsJSON(RHManageEventBase):  # TODO: Give this the API prefix instead of JSON?
-    PERMISSION = 'ANY'
-
-    def _process(self):
-        return jsonify(RegistrationFormSchema().dump(self.event.registration_forms, many=True))
