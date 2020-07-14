@@ -247,7 +247,7 @@ class PrincipalsMixin(object):
         elif principal.principal_type == PrincipalType.registration_form:
             return {'identifier': identifier,
                     'type': 'registration_form',
-                    'invalid': False,
+                    'invalid': principal.is_deleted,
                     'name': principal.title}
 
     def _process(self):

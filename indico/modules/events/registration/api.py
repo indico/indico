@@ -12,7 +12,9 @@ from sqlalchemy.orm import joinedload
 from werkzeug.exceptions import BadRequest, Forbidden
 
 from indico.core import signals
+from indico.modules.events.controllers.base import RHProtectedEventBase
 from indico.modules.events.models.events import Event
+from indico.modules.events.registration.schemas import RegistrationFormSchema
 from indico.modules.events.registration.util import build_registration_api_data, build_registrations_api_data
 from indico.modules.oauth import oauth
 from indico.web.rh import RH
@@ -67,3 +69,8 @@ class RHAPIRegistrants(RH):
 
     def _process_GET(self):
         return jsonify(registrants=build_registrations_api_data(self.event))
+
+
+class RHAPIRegistrationForms(RHProtectedEventBase):
+    def _process(self):
+        return jsonify(RegistrationFormSchema().dump(self.event.registration_forms, many=True))

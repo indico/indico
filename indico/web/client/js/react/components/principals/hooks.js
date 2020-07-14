@@ -10,7 +10,7 @@ import principalsURL from 'indico-url:core.principals';
 import eventPrincipalsURL from 'indico-url:event_management.api_principals';
 import eventRolesURL from 'indico-url:event_management.api_event_roles';
 import eventCategoryRolesURL from 'indico-url:event_management.api_category_roles';
-import registrationFormsURL from 'indico-url:event_management.api_registration_forms';
+import registrationFormsURL from 'indico-url:event_registration.api_registration_forms';
 
 import _ from 'lodash';
 import {useState, useEffect} from 'react';
@@ -103,7 +103,7 @@ export const useFetchEventCategoryRoles = eventId => {
 };
 
 /**
- * This hook fetches
+ * This hook fetches the list of registration forms available for a given event.
  * If the `eventId` is null, nothing is fetched.
  */
 export const useFetchRegistrationForms = eventId => {

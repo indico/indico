@@ -25,7 +25,18 @@ class RHEventBase(RH):
             raise NotFound(_('This event has been deleted.'))
 
 
-class RHDisplayEventBase(RHEventBase):
+class RHProtectedEventBase(RHEventBase):
+    def _require_user(self):
+        if session.user is None:
+            raise Forbidden
+
+    def _check_access(self):
+        self._require_user()
+        if not self.event.can_access(session.user):
+            raise Forbidden
+
+
+class RHDisplayEventBase(RHProtectedEventBase):
     def _forbidden_if_not_admin(self):
         if not request.is_xhr and session.user and session.user.is_admin:
             flash(_('This page is currently not visible by non-admin users (menu entry disabled)!'), 'warning')
@@ -33,13 +44,12 @@ class RHDisplayEventBase(RHEventBase):
             raise Forbidden
 
     def _check_access(self):
-        if self.event.can_access(session.user):
-            return
-        elif self.event.access_key:
-            raise AccessKeyRequired
-        elif session.user is None:
-            raise Forbidden
-        else:
+        try:
+            RHProtectedEventBase._check_access(self)
+        except Forbidden:
+            if self.event.access_key:
+                raise AccessKeyRequired
+
             msg = [_("You are not authorized to access this event.")]
             if self.event.no_access_contact:
                 msg.append(_("If you believe you should have access, please contact {}")
