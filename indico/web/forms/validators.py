@@ -8,12 +8,12 @@
 from __future__ import unicode_literals
 
 import re
-from datetime import timedelta
+from datetime import date, timedelta
 from types import NoneType
 
 from wtforms.validators import EqualTo, Length, Regexp, StopValidation, ValidationError
 
-from indico.util.date_time import as_utc, format_datetime, format_human_timedelta, format_time, now_utc
+from indico.util.date_time import as_utc, format_date, format_datetime, format_human_timedelta, format_time, now_utc
 from indico.util.i18n import _, ngettext
 from indico.util.string import is_valid_mail
 
@@ -109,8 +109,55 @@ class IndicoEmail(object):
             raise ValidationError(msg)
 
 
+class DateRange(object):
+    """Validates that a date is within the specified boundaries"""
+
+    field_flags = ('date_range',)
+
+    def __init__(self, earliest='today', latest=None):
+        self.earliest = earliest
+        self.latest = latest
+        # set to true in get_earliest/get_latest if applicable
+        self.earliest_today = False
+        self.latest_today = False
+
+    def __call__(self, form, field):
+        if field.data is None:
+            return
+        field_date = field.data
+        earliest_date = self.get_earliest(form, field)
+        latest_date = self.get_latest(form, field)
+        if field_date != field.object_data:
+            if earliest_date and field_date < earliest_date:
+                if self.earliest_today:
+                    msg = _("'{}' can't be in the past").format(field.label)
+                else:
+                    msg = _("'{}' can't be before {}").format(field.label, format_date(earliest_date))
+                raise ValidationError(msg)
+            if latest_date and field_date > latest_date:
+                if self.latest_today:
+                    msg = _("'{}' can't be in the future").format(field.label)
+                else:
+                    msg = _("'{}' can't be after {}").format(field.label, format_date(latest_date))
+                raise ValidationError(msg)
+
+    def get_earliest(self, form, field):
+        earliest = self.earliest(form, field) if callable(self.earliest) else self.earliest
+        if earliest == 'today':
+            self.earliest_today = True
+            return date.today()
+        return earliest
+
+    def get_latest(self, form, field):
+        latest = self.latest(form, field) if callable(self.latest) else self.latest
+        if latest == 'today':
+            self.latest_today = True
+            return date.today()
+        return latest
+
+
 class DateTimeRange(object):
-    """Validates a datetime is within the specified boundaries"""
+    """Validates that a datetime is within the specified boundaries"""
 
     field_flags = ('datetime_range',)
 
@@ -158,8 +205,41 @@ class DateTimeRange(object):
         return as_utc(latest) if latest else latest
 
 
+class LinkedDate(object):
+    """Validates that a date field happens before or/and after another.
+
+    If both ``not_before`` and ``not_after`` are set to ``True``, both fields have to
+    be equal.
+    """
+
+    field_flags = ('linked_date',)
+
+    def __init__(self, field, not_before=True, not_after=False, not_equal=False):
+        if not not_before and not not_after:
+            raise ValueError("Invalid validation")
+        self.not_before = not_before
+        self.not_after = not_after
+        self.not_equal = not_equal
+        self.linked_field = field
+
+    def __call__(self, form, field):
+        if field.data is None:
+            return
+        linked_field = form[self.linked_field]
+        if linked_field.data is None:
+            return
+        linked_field_date = linked_field.data
+        field_date = field.data
+        if self.not_before and field_date < linked_field_date:
+            raise ValidationError(_("{} can't be before {}").format(field.label, linked_field.label))
+        if self.not_after and field_date > linked_field_date:
+            raise ValidationError(_("{} can't be after {}").format(field.label, linked_field.label))
+        if self.not_equal and field_date == linked_field_date:
+            raise ValidationError(_("{} can't be equal to {}").format(field.label, linked_field.label))
+
+
 class LinkedDateTime(object):
-    """Validates a datetime field happens before or/and after another.
+    """Validates that a datetime field happens before or/and after another.
 
     If both ``not_before`` and ``not_after`` are set to ``True``, both fields have to
     be equal.

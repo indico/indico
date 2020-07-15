@@ -8,6 +8,7 @@
 import './category_picker_widget';
 import './ckeditor_widget';
 import './color_picker_widget';
+import './date_widget';
 import './datetime_widget';
 import './linking_widget';
 import './location_widget';

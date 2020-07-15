@@ -127,6 +127,8 @@ Internal Changes
   :user:`omegak`)
 - Add ``before-registration-actions`` template hook (:issue:`4524`, thanks
   :user:`omegak`)
+- Add ``LinkedDate`` and ``DateRange`` form field validators (:issue:`4535`,
+  thanks :user:`omegak`)
 
 
 ----

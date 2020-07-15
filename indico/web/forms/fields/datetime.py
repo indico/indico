@@ -23,7 +23,7 @@ from indico.core.config import config
 from indico.util.date_time import localize_as_utc, relativedelta
 from indico.util.i18n import _, get_current_locale
 from indico.web.forms.fields import JSONField
-from indico.web.forms.validators import DateTimeRange, LinkedDateTime
+from indico.web.forms.validators import DateRange, DateTimeRange, LinkedDate, LinkedDateTime
 from indico.web.forms.widgets import JinjaWidget
 
 
@@ -179,8 +179,35 @@ class IndicoDateField(DateField):
     widget = JinjaWidget('forms/date_widget.html', single_line=True, single_kwargs=True)
 
     def __init__(self, *args, **kwargs):
+        self.allow_clear = kwargs.pop('allow_clear', True)
         super(IndicoDateField, self).__init__(*args, parse_kwargs={'dayfirst': True},
                                               display_format='%d/%m/%Y', **kwargs)
+
+    @property
+    def earliest_date(self):
+        if self.flags.date_range:
+            for validator in self.validators:
+                if isinstance(validator, DateRange):
+                    return validator.get_earliest(self.get_form(), self)
+
+    @property
+    def latest_date(self):
+        if self.flags.date_range:
+            for validator in self.validators:
+                if isinstance(validator, DateRange):
+                    return validator.get_latest(self.get_form(), self)
+
+    @property
+    def linked_field(self):
+        validator = self.linked_date_validator
+        return validator.linked_field if validator else None
+
+    @property
+    def linked_date_validator(self):
+        if self.flags.linked_date:
+            for validator in self.validators:
+                if isinstance(validator, LinkedDate):
+                    return validator
 
 
 class IndicoDateTimeField(DateTimeField):
