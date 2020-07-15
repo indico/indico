@@ -1,11 +1,18 @@
+# This file is part of Indico.
+# Copyright (C) 2002 - 2020 CERN
+#
+# Indico is free software; you can redistribute it and/or
+# modify it under the terms of the MIT License; see the
+# LICENSE file for more details.
+
 from marshmallow.fields import String
 
 from indico.core.marshmallow import mm
-from indico.modules.events.registration.models.forms import RegistrationForm
 
 
 class RegistrationFormSchema(mm.ModelSchema):
     class Meta:
+        from indico.modules.events.registration.models.forms import RegistrationForm
         model = RegistrationForm
         fields = ('id', 'name', 'identifier')
 

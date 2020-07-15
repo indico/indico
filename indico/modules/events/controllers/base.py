@@ -26,12 +26,10 @@ class RHEventBase(RH):
 
 
 class RHProtectedEventBase(RHEventBase):
-    def _require_user(self):
-        if session.user is None:
-            raise Forbidden
-
+    """
+    Requires event access, regardless of the user being logged in
+    """
     def _check_access(self):
-        self._require_user()
         if not self.event.can_access(session.user):
             raise Forbidden
 
