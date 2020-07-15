@@ -187,7 +187,7 @@ export default function WTFDateTimeField({
         disabledMinutes={getDisabledMinutes}
         disabled={disabled}
         ref={timePickerRef}
-        // keep te picker in the DOM tree of the surrounding element to avoid
+        // keep the picker in the DOM tree of the surrounding element to avoid
         // e.g. qbubbles from closing when a picker is used inside one and the
         // user clicks something in the picker
         getPopupContainer={node => node}
