@@ -7,10 +7,8 @@ ignoreFiles:
   - indico/web/static/dist/**/*.css
 
 rules:
-  # this rule is quite noisy in our existing code, but still somewhat useful
-  no-descending-specificity:
-    - true
-    - severity: warning
+  # this rule is too noisy
+  no-descending-specificity: null
 
   # complains about css rules after `@include` without an empty line
   declaration-empty-line-before: null
