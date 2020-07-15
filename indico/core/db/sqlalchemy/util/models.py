@@ -212,10 +212,11 @@ class IndicoModel(Model):
             if not hasattr(cls, key):
                 raise ValueError("{} has no attribute '{}'".format(cls.__name__, key))
             old_value = getattr(self, key, None)
-            if old_value != value:
-                # XXX: we copy because of https://bitbucket.org/zzzeek/sqlalchemy/issues/3913/
-                changed[key] = (copy(old_value), value)
-                setattr(self, key, value)
+            setattr(self, key, value)
+            new_value = getattr(self, key)
+            if old_value != new_value:
+                # XXX: we copy because of https://github.com/sqlalchemy/sqlalchemy/issues/3913
+                changed[key] = (copy(old_value), copy(new_value))
         return changed
 
     def populate_from_attrs(self, obj, attrs):
