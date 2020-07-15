@@ -27,6 +27,7 @@ from wtforms.widgets import html_params
 import indico
 from indico.core import signals
 from indico.core.auth import multipass
+from indico.core.cache import cache
 from indico.core.celery import celery
 from indico.core.config import IndicoConfig, config, load_config
 from indico.core.db.sqlalchemy import db
@@ -77,6 +78,7 @@ def configure_app(app, set_path=False):
     app.config['TRAP_BAD_REQUEST_ERRORS'] = config.DEBUG
     app.config['SESSION_COOKIE_NAME'] = 'indico_session'
     app.config['PERMANENT_SESSION_LIFETIME'] = config.SESSION_LIFETIME
+    configure_cache(app, config)
     configure_multipass(app, config)
     app.config['PLUGINENGINE_NAMESPACE'] = 'indico.plugins'
     app.config['PLUGINENGINE_PLUGINS'] = config.PLUGINS
@@ -90,6 +92,21 @@ def configure_app(app, set_path=False):
     if config.USE_PROXY:
         app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_proto=1, x_host=1)
     configure_webpack(app)
+
+
+def configure_cache(app, config):
+    # TODO: remove anything but redis in 3.0; nobody is using it and it
+    # has not been tested recently.
+    app.config['CACHE_DEFAULT_TIMEOUT'] = -1
+    if config.CACHE_BACKEND == 'redis':
+        app.config['CACHE_TYPE'] = 'redis'
+        app.config['CACHE_REDIS_URL'] = config.REDIS_CACHE_URL
+    elif config.CACHE_BACKEND == 'memcached':
+        app.config['CACHE_TYPE'] = 'memcached'
+        app.config['CACHE_MEMCACHED_SERVERS'] = config.MEMCACHED_SERVERS
+    elif config.CACHE_BACKEND == 'files':
+        app.config['CACHE_TYPE'] = 'filesystem'
+        app.config['CACHE_DIR'] = os.path.join(config.CACHE_DIR, 'flask-cache')
 
 
 def configure_multipass(app, config):
@@ -341,6 +358,7 @@ def make_app(set_path=False, testing=False, config_override=None):
         if not testing:
             Logger.init(app)
         celery.init_app(app)
+        cache.init_app(app)
         babel.init_app(app)
         multipass.init_app(app)
         oauth.init_app(app)
