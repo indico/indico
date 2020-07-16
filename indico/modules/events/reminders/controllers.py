@@ -80,11 +80,8 @@ class RHEditReminder(RHSpecificReminderBase):
             defaults_kwargs = {'schedule_type': 'relative',
                                'relative_delta': reminder.event_start_delta}
         else:
-            # Use the user's preferred event timezone
-            dt = reminder.scheduled_dt.astimezone(self.event.tzinfo)
             defaults_kwargs = {'schedule_type': 'absolute',
-                               'absolute_date': dt.date(),
-                               'absolute_time': dt.time()}
+                               'absolute_dt': reminder.scheduled_dt}
         return FormDefaults(reminder, **defaults_kwargs)
 
     def _process(self):
@@ -125,8 +122,7 @@ class RHAddReminder(RHRemindersBase):
                       .format(to_unicode(format_datetime(reminder.scheduled_dt))), 'success')
             return jsonify_data(flash=False)
 
-        return jsonify_template('events/reminders/edit_reminder.html', event=self.event, reminder=None, form=form,
-                                widget_attrs=form.default_widget_attrs)
+        return jsonify_template('events/reminders/edit_reminder.html', event=self.event, reminder=None, form=form)
 
 
 class RHPreviewReminder(RHRemindersBase):
