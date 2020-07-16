@@ -179,9 +179,11 @@ class IndicoDateField(DateField):
     widget = JinjaWidget('forms/date_widget.html', single_line=True, single_kwargs=True)
 
     def __init__(self, *args, **kwargs):
+        self.allow_clear = kwargs.pop('allow_clear', None)
         super(IndicoDateField, self).__init__(*args, parse_kwargs={'dayfirst': True},
                                               display_format='%d/%m/%Y', **kwargs)
-        self.allow_clear = kwargs.pop('allow_clear', not self.flags.required)
+        if self.allow_clear is None:
+            self.allow_clear = not self.flags.required
 
     @property
     def earliest_date(self):
@@ -226,8 +228,10 @@ class IndicoDateTimeField(DateTimeField):
         self.default_time = kwargs.pop('default_time', time(0, 0))
         self.date_missing = False
         self.time_missing = False
-        self.allow_clear = kwargs.pop('allow_clear', True)
+        self.allow_clear = kwargs.pop('allow_clear', None)
         super(IndicoDateTimeField, self).__init__(*args, parse_kwargs={'dayfirst': True}, **kwargs)
+        if self.allow_clear is None:
+            self.allow_clear = not self.flags.required
 
     def pre_validate(self, form):
         if self.date_missing:
