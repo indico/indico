@@ -11,7 +11,6 @@ import './ajaxcheckbox';
 import './ajaxqbubble';
 import './categorynavigator';
 import './colorpicker';
-import './daterange';
 import './dropdown';
 import './dttbutton';
 import './itempicker';

@@ -158,7 +158,6 @@
     "watch": "webpack --watch",
     "build": "webpack -p --env.NODE_ENV=production",
     "profile": "webpack --profile --json -p --env.NODE_ENV=production > webpack-stats.json",
-    "postinstall": "patch --dry-run -N -p0 -d node_modules/jquery-ui < indico/web/client/js/jquery/contrib/jquery-ui-changes.diff && patch -N -p0 -d node_modules/jquery-ui < indico/web/client/js/jquery/contrib/jquery-ui-changes.diff || true",
     "eslint": "eslint ./indico",
     "update-browsers": "node ./bin/maintenance/update_browsers.js",
     "test": "jest"

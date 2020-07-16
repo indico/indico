@@ -15,15 +15,6 @@
   background: none;
 }
 
-/* ensure daterange selectors are large enough to prevent wrapping */
-.ui-daterange {
-  width: 37em;
-}
-
-.ui-dialog-content .ui-daterange {
-  width: 100%;
-}
-
 .ui-dialog {
   width: auto !important;
   padding: 0;
