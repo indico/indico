@@ -117,6 +117,9 @@ export default function WTFDateTimeField({
 
   const getDisabledHours = useCallback(() => {
     const hours = [];
+    if ((earliestMoment || latestMoment) && !date) {
+      return _.range(24);
+    }
     if (earliestMoment && date.isSame(earliestMoment, 'day')) {
       hours.push(_.range(earliestMoment.hour()));
     }
@@ -129,6 +132,9 @@ export default function WTFDateTimeField({
 
   const getDisabledMinutes = useCallback(
     h => {
+      if ((earliestMoment || latestMoment) && !date) {
+        return _.range(60);
+      }
       const minutes = [];
       if (earliestMoment && date.isSame(earliestMoment, 'day') && h === earliestMoment.hour()) {
         minutes.push(_.range(earliestMoment.minutes()));
