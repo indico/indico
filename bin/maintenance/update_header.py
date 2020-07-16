@@ -125,6 +125,7 @@ def _update_header(project, file_path, year, substring, regex, data):
             file_write.write(content)
     elif not found:
         print(cformat('%{yellow}Missing header in %{yellow!}{}').format(os.path.relpath(file_path)))
+        return True
 
 
 def update_header(project, file_path, year):
@@ -133,7 +134,8 @@ def update_header(project, file_path, year):
         return
     if os.path.basename(file_path)[0] == '.':
         return
-    _update_header(project, file_path, year, SUBSTRING, SUPPORTED_FILES[ext]['regex'], SUPPORTED_FILES[ext]['format'])
+    return _update_header(project, file_path, year, SUBSTRING, SUPPORTED_FILES[ext]['regex'],
+                          SUPPORTED_FILES[ext]['format'])
 
 
 def _process_args(args):
@@ -179,6 +181,7 @@ def main():
         sys.exit(1)
 
     project, year, path, file_ = _process_args(sys.argv[1:])
+    error = False
 
     if path is not None:
         print(cformat("Updating headers to the year %{yellow!}{year}%{reset} for all the files in "
@@ -186,11 +189,11 @@ def main():
         for root, _, filenames in os.walk(path):
             for filename in filenames:
                 if not blacklisted(path, root):
-                    update_header(project, os.path.join(root, filename), year)
+                    error = update_header(project, os.path.join(root, filename), year) or error
     elif file_ is not None:
         print(cformat("Updating headers to the year %{yellow!}{year}%{reset} for the file "
                       "%{yellow!}{file}%{reset}...").format(year=year, file=file_))
-        update_header(project, file_, year)
+        error = update_header(project, file_, year) or error
     else:
         print(cformat("Updating headers to the year %{yellow!}{year}%{reset} for all "
                       "git-tracked files...").format(year=year))
@@ -198,11 +201,14 @@ def main():
             for path in subprocess.check_output(['git', 'ls-files']).splitlines():
                 path = os.path.abspath(path)
                 if not blacklisted(os.getcwd(), os.path.dirname(path)):
-                    update_header(project, path, year)
+                    error = update_header(project, path, year) or error
         except subprocess.CalledProcessError:
             print(cformat('%{red!}[ERROR] you must be within a git repository to run this script.'), file=sys.stderr)
             print(USAGE)
             sys.exit(1)
+
+    if error:
+        sys.exit(1)
 
 
 if __name__ == '__main__':

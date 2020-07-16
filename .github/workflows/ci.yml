@@ -99,6 +99,10 @@ jobs:
         if: success() || failure()
         run: python bin/maintenance/update_backrefs.py --ci
 
+      - name: Check headers
+        if: success() || failure()
+        run: python bin/maintenance/update_header.py indico
+
       - name: Run flake8
         if: success() || failure()
         run: |
