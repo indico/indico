@@ -4,7 +4,8 @@
     <div class="date-widget i-form-field-fixed-width">
         {# the hidden field has autofocus on purpose to prevent our JS from focusing the date picker #}
         <input type="hidden" name="{{ field.name }}" id="{{ field.id }}-datestorage" autofocus
-               {% if field.data and not field.date_missing %}value="{{ field.data|format_date('code') }}"{% endif %}>
+               {% if field.data and not field.date_missing %}value="{{ field.data|format_date('code') }}"{% endif %}
+               {{ input_args | html_params }}>
         <span id="{{ field.id }}"></span>
     </div>
 {% endblock %}

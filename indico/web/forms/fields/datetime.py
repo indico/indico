@@ -219,7 +219,7 @@ class IndicoDateTimeField(DateTimeField):
     during form submission.
     """
 
-    widget = JinjaWidget('forms/datetime_widget.html', single_line=True)
+    widget = JinjaWidget('forms/datetime_widget.html', single_line=True, single_kwargs=True)
 
     def __init__(self, *args, **kwargs):
         self._timezone = kwargs.pop('timezone', None)
