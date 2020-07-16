@@ -14,6 +14,8 @@ $default-spacing: 10px;
   color: $light-black;
   padding: $default-spacing;
   margin-bottom: 18px;
+  // overrides custom line-height set by semantic ui that breaks message-boxes
+  line-height: normal;
 
   .message-box-content {
     @extend .flexrow;
