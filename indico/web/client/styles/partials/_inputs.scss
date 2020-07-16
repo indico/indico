@@ -276,7 +276,8 @@ $dropdown-transition: $dropdown-transition-step ease-out;
   }
 }
 
-.datetime-widget {
+.datetime-widget,
+.date-widget {
   .rc-time-picker-input {
     width: 100% !important;
     font-size: 1em;
@@ -348,9 +349,18 @@ $dropdown-transition: $dropdown-transition-step ease-out;
   }
 }
 
-.i-form .form-group .form-field .datetime-widget input[type='text'] {
-  font-size: 1em;
-  width: 150px;
+.date-widget .clear-pickers {
+  left: 0;
+}
+
+.i-form .form-group .form-field {
+  .datetime-widget,
+  .date-widget {
+    input[type='text'] {
+      font-size: 1em;
+      width: 150px;
+    }
+  }
 }
 
 .has-warning {
