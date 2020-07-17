@@ -41,7 +41,7 @@
     "leaflet": "^1.6.0",
     "leaflet-draw": "^1.0.4",
     "leaflet.markercluster": "^1.4.1",
-    "lodash": "^4.17.15",
+    "lodash": "^4.17.19",
     "mathjax": "^2.7.8",
     "moment": "^2.26.0",
     "pagedown": "^1.1.0",
