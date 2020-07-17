@@ -199,7 +199,7 @@ def clone_into_event(source_event, target_event, cloners):
 
     # Run the modular cloning system
     EventCloner.run_cloners(source_event, target_event, cloners, event_exists=True)
-    signals.event.cloned.send(source_event, new_event=target_event)
+    signals.event.imported.send(target_event, source_event=source_event)
 
     return target_event
 
