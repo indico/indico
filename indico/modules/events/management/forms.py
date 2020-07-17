@@ -417,8 +417,9 @@ class ImportContentsForm(ImportSourceEventForm):
     selected_items = IndicoSelectMultipleCheckboxField(_('What to clone'))
 
     def __init__(self, source_event, target_event, set_defaults=False, **kwargs):
-        options = EventCloner.get_cloners(source_event)
-        visible_options = filter(attrgetter('is_visible'), options)
+        cloners = EventCloner.get_cloners(source_event)
+        visible_options = {cloner for cloner in cloners if cloner.is_visible and not cloner.new_event_only}
+        conflicts = {cloner.name: cloner.has_conflicts(target_event) for cloner in cloners}
 
         if set_defaults:
             form_params = {
@@ -430,5 +431,8 @@ class ImportContentsForm(ImportSourceEventForm):
 
         super(ImportContentsForm, self).__init__(**kwargs)
         self.selected_items.choices = [(option.name, option.friendly_name) for option in visible_options]
+        # We disable all cloners that are not available, handle only cloning to new events,
+        # have conflicts with target_event or any of their dependencies has conflicts with target_event
         self.selected_items.disabled_choices = [option.name for option in visible_options if not option.is_available
-                                                or option.has_conflicts(target_event)]
+                                                or conflicts[option.name]
+                                                or any(conflicts[dep] for dep in option.requires)]
