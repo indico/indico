@@ -8,11 +8,11 @@
 from marshmallow.fields import String
 
 from indico.core.marshmallow import mm
+from indico.modules.events.registration.models.forms import RegistrationForm
 
 
-class RegistrationFormSchema(mm.ModelSchema):
+class RegistrationFormPrincipalSchema(mm.ModelSchema):
     class Meta:
-        from indico.modules.events.registration.models.forms import RegistrationForm
         model = RegistrationForm
         fields = ('id', 'name', 'identifier')
 
