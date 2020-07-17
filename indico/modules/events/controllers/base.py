@@ -27,7 +27,10 @@ class RHEventBase(RH):
 
 class RHProtectedEventBase(RHEventBase):
     """
-    Requires event access, regardless of the user being logged in
+    Base class for events that check if the user can access it.
+
+    This includes unauthenticated users who have access to the event
+    for any other reason (e.g. due to a whitelisted IP address).
     """
     def _check_access(self):
         if not self.event.can_access(session.user):

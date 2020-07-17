@@ -327,9 +327,8 @@ class RHSimple(RH):
 
 
 class RHProtected(RH):
-    """
-    Requires the session to have a user
-    """
+    """Base RH that requires the user to be authenticated."""
+
     def _require_user(self):
         if session.user is None:
             raise Forbidden

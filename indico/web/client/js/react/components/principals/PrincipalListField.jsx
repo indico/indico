@@ -64,9 +64,6 @@ const PrincipalListField = props => {
         })),
     [usedIdentifiers]
   );
-  const eventRoleOptions = asOptions(eventRoles);
-  const categoryRoleOptions = asOptions(categoryRoles);
-  const registrationFormOptions = asOptions(registrationForms);
 
   const markTouched = () => {
     onFocus();
@@ -134,47 +131,24 @@ const PrincipalListField = props => {
             />
           )}
           {eventRoles.length !== 0 && (
-            <Dropdown
+            <AddPrincipalDropdown
               text={Translate.string('Event Role')}
-              button
-              upward
-              floating
-              disabled={eventRoleOptions.length === 0}
-              options={eventRoleOptions}
-              value={null}
-              openOnFocus={false}
-              selectOnBlur={false}
-              selectOnNavigation={false}
-              onChange={(e, data) => handleAddItems([{identifier: data.value}])}
+              options={asOptions(eventRoles)}
+              onChange={handleAddItems}
             />
           )}
           {categoryRoles.length !== 0 && (
-            <Dropdown
+            <AddPrincipalDropdown
               text={Translate.string('Category Role')}
-              button
-              upward
-              floating
-              disabled={categoryRoleOptions.length === 0}
-              options={categoryRoleOptions}
-              value={null}
-              openOnFocus={false}
-              selectOnBlur={false}
-              selectOnNavigation={false}
-              onChange={(e, data) => handleAddItems([{identifier: data.value}])}
+              options={asOptions(categoryRoles)}
+              onChange={handleAddItems}
             />
           )}
           {registrationForms.length !== 0 && (
-            <Dropdown
+            <AddPrincipalDropdown
               text={Translate.string('Registration Form')}
-              button
-              upward
-              floating
-              disabled={registrationFormOptions.length === 0}
-              options={registrationFormOptions}
-              openOnFocus={false}
-              selectOnBlur={false}
-              selectOnNavigation={false}
-              onChange={(e, data) => handleAddItems([{identifier: data.value}])}
+              options={asOptions(registrationForms)}
+              onChange={handleAddItems}
             />
           )}
         </Button.Group>
@@ -210,6 +184,29 @@ PrincipalListField.defaultProps = {
 };
 
 export default React.memo(PrincipalListField);
+
+function AddPrincipalDropdown({text, options, onChange}) {
+  return (
+    <Dropdown
+      text={text}
+      button
+      upward
+      floating
+      disabled={options.length === 0}
+      options={options}
+      openOnFocus={false}
+      selectOnBlur={false}
+      selectOnNavigation={false}
+      value={null}
+      onChange={(e, data) => onChange([{identifier: data.value}])}
+    />
+  );
+}
+AddPrincipalDropdown.propTypes = {
+  text: PropTypes.string.isRequired,
+  options: PropTypes.array.isRequired,
+  onChange: PropTypes.func.isRequired,
+};
 
 /**
  * Like `FinalField` but for a `PrincipalListField`.

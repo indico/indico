@@ -72,5 +72,5 @@ class RHAPIRegistrants(RH):
 
 class RHAPIRegistrationForms(RHProtectedEventBase):
     def _process(self):
-        from indico.modules.events.registration.schemas import RegistrationFormSchema
-        return RegistrationFormSchema(many=True).jsonify(self.event.registration_forms)
+        from indico.modules.events.registration.schemas import RegistrationFormPrincipalSchema
+        return RegistrationFormPrincipalSchema(many=True).jsonify(self.event.registration_forms)
