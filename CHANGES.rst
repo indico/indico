@@ -113,6 +113,7 @@ Improvements
 - Allow choosing a default badge in categories (:pr:`4574`, thanks
   :user:`omegak`)
 - Display event labels on the user's dashboard as well (:pr:`4592`)
+- Event modules can now be imported from another event (:issue:`4518`, thanks :user:`meluru`)
 
 Bugfixes
 ^^^^^^^^
