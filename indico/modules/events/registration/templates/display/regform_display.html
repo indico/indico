@@ -26,8 +26,7 @@
 
 
 {% block content %}
-    {# the only way to get here without access is if the regform is publicly accessible #}
-    {% if not event.can_access(session.user) %}
+    {% if is_restricted_access %}
         {% call message_box('warning') %}
             {% trans -%}
                 Access to the rest of this event is restricted to registered participants.

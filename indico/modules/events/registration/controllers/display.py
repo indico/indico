@@ -39,6 +39,10 @@ class RHRegistrationFormDisplayBase(RHDisplayEventBase):
     #: Whether to allow access for users who cannot access the event itself.
     ALLOW_PROTECTED_EVENT = False
 
+    #: Whether the current request is accessing this page in restricted mode
+    #: due to lack of access to the event.
+    is_restricted_access = False
+
     @property
     def view_class(self):
         return (WPDisplayRegistrationFormConference
@@ -49,14 +53,21 @@ class RHRegistrationFormDisplayBase(RHDisplayEventBase):
         try:
             RHDisplayEventBase._check_access(self)
         except RegistrationRequired:
-            if not self.ALLOW_PROTECTED_EVENT:
-                raise
+            self.is_restricted_access = True
+            if not self.ALLOW_PROTECTED_EVENT or not self._check_restricted_event_access():
+                raise Forbidden
+
+    def _check_restricted_event_access(self):
+        return True
 
 
 class RHRegistrationFormBase(RegistrationFormMixin, RHRegistrationFormDisplayBase):
     def _process_args(self):
         RHRegistrationFormDisplayBase._process_args(self)
         RegistrationFormMixin._process_args(self)
+
+    def _check_restricted_event_access(self):
+        return self.regform.in_event_acls.filter_by(event_id=self.event.id).has_rows()
 
 
 class RHRegistrationFormRegistrationBase(RHRegistrationFormBase):
@@ -83,12 +94,14 @@ class RHRegistrationFormList(RHRegistrationFormDisplayBase):
     ALLOW_PROTECTED_EVENT = True
 
     def _process(self):
-        displayed_regforms, user_registrations = get_event_regforms_registrations(self.event, session.user)
+        displayed_regforms, user_registrations = get_event_regforms_registrations(self.event, session.user,
+                                                                                  only_in_acl=self.is_restricted_access)
         if len(displayed_regforms) == 1:
             return redirect(url_for('.display_regform', displayed_regforms[0]))
         return self.view_class.render_template('display/regform_list.html', self.event,
                                                regforms=displayed_regforms,
-                                               user_registrations=user_registrations)
+                                               user_registrations=user_registrations,
+                                               is_restricted_access=self.is_restricted_access)
 
 
 class RHParticipantList(RHRegistrationFormDisplayBase):
@@ -293,7 +306,8 @@ class RHRegistrationForm(InvitationMixin, RHRegistrationFormRegistrationBase):
                                                invitation=self.invitation,
                                                registration=self.registration,
                                                management=False,
-                                               login_required=self.regform.require_login and not session.user)
+                                               login_required=self.regform.require_login and not session.user,
+                                               is_restricted_access=self.is_restricted_access)
 
 
 class RHRegistrationDisplayEdit(RegistrationEditMixin, RHRegistrationFormRegistrationBase):
