@@ -412,7 +412,7 @@ class RHContributionUpdateDuration(RHManageContributionBase):
         if form.validate_on_submit():
             with track_time_changes():
                 update_contribution(self.contrib, {'duration': form.duration.data})
-            return jsonify_data(new_value=format_human_timedelta(self.contrib.duration))
+            return jsonify_data(new_value=format_human_timedelta(self.contrib.duration, narrow=True))
         return jsonify_form(form, back_button=False, disabled_until_change=True)
 
 
