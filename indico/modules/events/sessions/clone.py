@@ -37,15 +37,16 @@ class SessionCloner(EventCloner):
         self._event_role_map = shared_data['event_roles']['event_role_map'] if 'event_roles' in cloners else None
         self._regform_map = shared_data['registration_forms']['form_map'] if 'registration_forms' in cloners else None
         self._person_map = shared_data['event_persons']['person_map']
+        self._new_event_persons = {person.user_id: person for person in new_event.persons} if event_exists else {}
         self._session_map = {}
         self._session_block_map = {}
         with db.session.no_autoflush:
-            self._clone_sessions(new_event)
+            self._clone_sessions(new_event, event_exists=event_exists)
         self._synchronize_friendly_id(new_event)
         db.session.flush()
         return {'session_map': self._session_map, 'session_block_map': self._session_block_map}
 
-    def _clone_sessions(self, new_event):
+    def _clone_sessions(self, new_event, event_exists=False):
         attrs = get_simple_column_attrs(Session) | {'own_room', 'own_venue'}
         query = (Session.query.with_parent(self.old_event)
                  .options(joinedload('blocks'),
@@ -55,27 +56,32 @@ class SessionCloner(EventCloner):
         for old_sess in query:
             sess = Session()
             sess.populate_from_attrs(old_sess, attrs)
-            sess.blocks = list(self._clone_session_blocks(old_sess.blocks))
+            sess.blocks = list(self._clone_session_blocks(old_sess.blocks, event_exists=event_exists))
             sess.acl_entries = clone_principals(SessionPrincipal, old_sess.acl_entries,
                                                 self._event_role_map, self._regform_map)
             new_event.sessions.append(sess)
             self._session_map[old_sess] = sess
 
-    def _clone_session_blocks(self, blocks):
+    def _clone_session_blocks(self, blocks, event_exists=False):
         attrs = get_simple_column_attrs(SessionBlock) | {'own_room', 'own_venue'}
         for old_block in blocks:
             block = SessionBlock()
             block.populate_from_attrs(old_block, attrs)
-            block.person_links = list(self._clone_person_links(old_block.person_links))
+            block.person_links = list(self._clone_person_links(old_block.person_links,
+                                                               event_exists=event_exists))
             self._session_block_map[old_block] = block
             yield block
 
-    def _clone_person_links(self, person_links):
+    def _clone_person_links(self, person_links, event_exists=False):
         attrs = get_simple_column_attrs(SessionBlockPersonLink)
         for old_link in person_links:
             link = SessionBlockPersonLink()
             link.populate_from_attrs(old_link, attrs)
-            link.person = self._person_map[old_link.person]
+            current_person = self._person_map[old_link.person]
+            if event_exists and current_person.user_id in self._new_event_persons:
+                link.person = self._new_event_persons[current_person.user_id]
+            else:
+                link.person = current_person
             yield link
 
     def _synchronize_friendly_id(self, new_event):

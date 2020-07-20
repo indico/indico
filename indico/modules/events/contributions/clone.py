@@ -129,24 +129,28 @@ class ContributionCloner(EventCloner):
         self._session_block_map = shared_data['sessions']['session_block_map']
         self._contrib_type_map = shared_data['contribution_types']['contrib_type_map']
         self._contrib_field_map = shared_data['contribution_fields']['contrib_field_map']
+        self._new_event_persons = {person.user_id: person for person in new_event.persons} if event_exists else {}
         self._contrib_map = {}
         self._subcontrib_map = {}
         with db.session.no_autoflush:
-            self._clone_contribs(new_event)
+            self._clone_contribs(new_event, event_exists=event_exists)
         self._synchronize_friendly_id(new_event)
         db.session.flush()
         return {'contrib_map': self._contrib_map, 'subcontrib_map': self._subcontrib_map}
 
-    def _create_new_contribution(self, event, old_contrib, preserve_session=True, excluded_attrs=None):
+    def _create_new_contribution(self, event, old_contrib, preserve_session=True, excluded_attrs=None,
+                                 event_exists=False):
         attrs = (get_simple_column_attrs(Contribution) | {'own_room', 'own_venue'}) - {'abstract_id'}
         if excluded_attrs is not None:
             attrs -= excluded_attrs
         new_contrib = Contribution()
         new_contrib.populate_from_attrs(old_contrib, attrs)
-        new_contrib.subcontributions = list(self._clone_subcontribs(old_contrib.subcontributions))
+        new_contrib.subcontributions = list(self._clone_subcontribs(old_contrib.subcontributions,
+                                                                    event_exists=event_exists))
         new_contrib.acl_entries = clone_principals(ContributionPrincipal, old_contrib.acl_entries, self._event_role_map)
         new_contrib.references = list(self._clone_references(ContributionReference, old_contrib.references))
-        new_contrib.person_links = list(self._clone_person_links(ContributionPersonLink, old_contrib.person_links))
+        new_contrib.person_links = list(self._clone_person_links(ContributionPersonLink, old_contrib.person_links,
+                                                                 event_exists=event_exists))
         new_contrib.field_values = list(self._clone_fields(old_contrib.field_values))
         if old_contrib.type is not None:
             new_contrib.type = self._contrib_type_map[old_contrib.type]
@@ -158,7 +162,7 @@ class ContributionCloner(EventCloner):
         event.contributions.append(new_contrib)
         return new_contrib
 
-    def _clone_contribs(self, new_event):
+    def _clone_contribs(self, new_event, event_exists=False):
         query = (Contribution.query.with_parent(self.old_event)
                  .options(undefer('_last_friendly_subcontribution_id'),
                           joinedload('own_venue'),
@@ -172,16 +176,18 @@ class ContributionCloner(EventCloner):
                           subqueryload('person_links'),
                           subqueryload('field_values')))
         for old_contrib in query:
-            self._contrib_map[old_contrib] = self._create_new_contribution(new_event, old_contrib)
+            self._contrib_map[old_contrib] = self._create_new_contribution(new_event, old_contrib,
+                                                                           event_exists=event_exists)
 
-    def _clone_subcontribs(self, subcontribs):
+    def _clone_subcontribs(self, subcontribs, event_exists=False):
         attrs = get_simple_column_attrs(SubContribution)
         for old_subcontrib in subcontribs:
             subcontrib = SubContribution()
             subcontrib.populate_from_attrs(old_subcontrib, attrs)
             subcontrib.references = list(self._clone_references(SubContributionReference, old_subcontrib.references))
             subcontrib.person_links = list(self._clone_person_links(SubContributionPersonLink,
-                                                                    old_subcontrib.person_links))
+                                                                    old_subcontrib.person_links,
+                                                                    event_exists=event_exists))
             self._subcontrib_map[old_subcontrib] = subcontrib
             yield subcontrib
 
@@ -192,12 +198,16 @@ class ContributionCloner(EventCloner):
             ref.populate_from_attrs(old_ref, attrs)
             yield ref
 
-    def _clone_person_links(self, cls, person_links):
+    def _clone_person_links(self, cls, person_links, event_exists=False):
         attrs = get_simple_column_attrs(cls)
         for old_link in person_links:
             link = cls()
             link.populate_from_attrs(old_link, attrs)
-            link.person = self._person_map[old_link.person]
+            current_person = self._person_map[old_link.person]
+            if event_exists and current_person.user_id in self._new_event_persons.keys():
+                link.person = self._new_event_persons[current_person.user_id]
+            else:
+                link.person = current_person
             yield link
 
     def _clone_fields(self, fields):
