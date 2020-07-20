@@ -29,7 +29,7 @@ export default function EditingManagementDashboard() {
             <Translate>Configure</Translate>
           </Link>
         </Section>
-        <ManageService eventId={eventId} />
+        {Indico.Debug && <ManageService eventId={eventId} />}
       </div>
       <EditableTypeList eventId={eventId} />
     </>

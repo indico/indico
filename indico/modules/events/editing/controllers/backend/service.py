@@ -14,6 +14,7 @@ from webargs import fields
 from webargs.flaskparser import abort
 from werkzeug.exceptions import BadRequest, ServiceUnavailable
 
+from indico.core.config import config
 from indico.core.db import db
 from indico.modules.events.editing.controllers.base import RHEditingManagementBase
 from indico.modules.events.editing.service import (ServiceRequestFailed, check_service_url, make_event_identifier,
@@ -42,6 +43,8 @@ class RHConnectService(RHEditingManagementBase):
         'url': fields.URL(schemes={'http', 'https'}, required=True),
     })
     def _process(self, url):
+        if not config.DEBUG:
+            raise ServiceUnavailable('This functionality is not available yet')
         if editing_settings.get(self.event, 'service_url'):
             raise BadRequest('Service URL already set')
         url = url.rstrip('/')
