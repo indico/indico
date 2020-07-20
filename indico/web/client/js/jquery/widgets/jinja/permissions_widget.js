@@ -257,7 +257,7 @@ import Palette from 'indico/utils/palette';
       });
       return $list;
     },
-    _renderDropdown($dropdown) {
+    _renderDropdown($dropdown, getText = null) {
       $dropdown.children(':not(.default)').remove();
       $dropdown.parent().dropdown({
         selector: '.js-dropdown',
@@ -268,9 +268,9 @@ import Palette from 'indico/utils/palette';
       items.forEach(item => {
         if (this._findEntryIndex(item) === -1) {
           if (isRoleDropdown) {
-            $dropdown.find('.separator').before(this._renderDropdownItem(item));
+            $dropdown.find('.separator').before(this._renderDropdownItem(item, getText));
           } else {
-            $dropdown.append(this._renderDropdownItem(item));
+            $dropdown.append(this._renderDropdownItem(item, getText));
           }
         }
       });
@@ -283,7 +283,7 @@ import Palette from 'indico/utils/palette';
         $dropdownLink.removeClass('disabled');
       }
     },
-    _renderDropdownItem(principal) {
+    _renderDropdownItem(principal, getText) {
       const self = this;
       const $dropdownItem = $('<li>', {
         'class': 'entry-item',
@@ -295,7 +295,7 @@ import Palette from 'indico/utils/palette';
           this._renderRoleCode(principal.code, principal.color).addClass('dropdown-icon')
         );
       }
-      const $text = $('<span>', {text: principal.name});
+      const $text = $('<span>', {text: getText ? getText(principal.name) : principal.name});
       $dropdownItem.append($itemContent.append($text)).on('click', function() {
         // Grant read access by default
         self._addItems([$(this).data('principal')], [READ_ACCESS_PERMISSIONS]);
@@ -391,7 +391,9 @@ import Palette from 'indico/utils/palette';
         this._renderDropdown(this.$ipNetworkDropdown);
       }
       if (this.$registrationFormDropdown.length) {
-        this._renderDropdown(this.$registrationFormDropdown);
+        this._renderDropdown(this.$registrationFormDropdown, name =>
+          $T.gettext('Registrants in "{0}"').format(name)
+        );
       }
     },
     _findEntryIndex(principal) {

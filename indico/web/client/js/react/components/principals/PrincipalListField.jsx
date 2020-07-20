@@ -55,12 +55,12 @@ const PrincipalListField = props => {
   const registrationForms = useFetchRegistrationForms(withRegistrants ? eventId : null);
 
   const asOptions = useCallback(
-    data =>
+    (data, getText = null) =>
       data
         .filter(r => !usedIdentifiers.has(r.identifier))
         .map(r => ({
           value: r.identifier,
-          text: r.name,
+          text: getText ? getText(r.name) : r.name,
         })),
     [usedIdentifiers]
   );
@@ -146,8 +146,10 @@ const PrincipalListField = props => {
           )}
           {registrationForms.length !== 0 && (
             <AddPrincipalDropdown
-              text={Translate.string('Registration Form')}
-              options={asOptions(registrationForms)}
+              text={Translate.string('Registrants')}
+              options={asOptions(registrationForms, form =>
+                Translate.string('Registrants in "{form}"', {form})
+              )}
               onChange={handleAddItems}
             />
           )}
