@@ -684,3 +684,7 @@ class Abstract(ProposalMixin, ProposalRevisionMixin, DescriptionMixin, CustomFie
         if not user:
             return None
         return user == self.submitter or any(x.person.user == user for x in self.person_links)
+
+    def log(self, *args, **kwargs):
+        """Log with prefilled metadata for the abstract."""
+        self.event.log(*args, meta={'abstract_id': self.id}, **kwargs)

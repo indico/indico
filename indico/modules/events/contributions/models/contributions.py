@@ -568,6 +568,10 @@ class Contribution(DescriptionMixin, ProtectionManagersMixin, LocationMixin, Att
         """Get the editable of the given type."""
         return next((e for e in self.editables if e.type == editable_type), None)
 
+    def log(self, *args, **kwargs):
+        """Log with prefilled metadata for the contribution."""
+        self.event.log(*args, meta={'contribution_id': self.id}, **kwargs)
+
 
 Contribution.register_protection_events()
 

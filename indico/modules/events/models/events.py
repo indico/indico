@@ -808,7 +808,7 @@ class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionMan
 
     @memoize_request
     def has_feature(self, feature):
-        """Checks if a feature is enabled for the event"""
+        """Check if a feature is enabled for the event"""
         from indico.modules.events.features.util import is_feature_enabled
         return is_feature_enabled(self, feature)
 
@@ -819,7 +819,7 @@ class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionMan
         return get_scheduled_notes(self)
 
     def log(self, realm, kind, module, summary, user=None, type_='simple', data=None, meta=None):
-        """Creates a new log entry for the event
+        """Create a new log entry for the event.
 
         :param realm: A value from :class:`.EventLogRealm` indicating
                       the realm of the action.

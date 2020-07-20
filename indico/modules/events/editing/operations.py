@@ -330,7 +330,7 @@ def assign_editor(editable, editor):
     log_msg = '"{}" ({}) assigned to {}'.format(editable.contribution.title,
                                                 orig_string(editable.type.title),
                                                 editor.full_name)
-    editable.event.log(EventLogRealm.management, EventLogKind.positive, 'Editing', log_msg, session.user, data=log_data)
+    editable.log(EventLogRealm.management, EventLogKind.positive, 'Editing', log_msg, session.user, data=log_data)
     db.session.flush()
 
 
@@ -346,7 +346,7 @@ def unassign_editor(editable):
     log_msg = '"{}" ({}) unassigned from {}'.format(editable.contribution.title,
                                                     orig_string(editable.type.title),
                                                     editor.full_name)
-    editable.event.log(EventLogRealm.management, EventLogKind.negative, 'Editing', log_msg, session.user, data=log_data)
+    editable.log(EventLogRealm.management, EventLogKind.negative, 'Editing', log_msg, session.user, data=log_data)
     db.session.flush()
 
 

@@ -26,7 +26,8 @@ def create_session(event, data):
     event_session.populate_from_dict(data)
     db.session.flush()
     event.log(EventLogRealm.management, EventLogKind.positive, 'Sessions',
-              'Session "{}" has been created'.format(event_session.title), session.user)
+              'Session "{}" has been created'.format(event_session.title), session.user,
+              meta={'session_id': event_session.id})
     logger.info('Session %s created by %s', event_session, session.user)
     return event_session
 
@@ -37,7 +38,8 @@ def create_session_block(session_, data):
     db.session.flush()
     session_.event.log(EventLogRealm.management, EventLogKind.positive, 'Sessions',
                        'Session block "{}" for session "{}" has been created'
-                       .format(block.title, session_.title), session.user)
+                       .format(block.title, session_.title), session.user,
+                       meta={'session_block_id': block.id})
     logger.info("Session block %s created by %s", block, session.user)
     return block
 
@@ -48,7 +50,8 @@ def update_session(event_session, data):
     db.session.flush()
     signals.event.session_updated.send(event_session)
     event_session.event.log(EventLogRealm.management, EventLogKind.change, 'Sessions',
-                            'Session "{}" has been updated'.format(event_session.title), session.user)
+                            'Session "{}" has been updated'.format(event_session.title), session.user,
+                            meta={'session_id': event_session.id})
     logger.info('Session %s modified by %s', event_session, session.user)
 
 
@@ -71,6 +74,9 @@ def delete_session(event_session):
         contribution.session = None
     _delete_session_timetable_entries(event_session)
     signals.event.session_deleted.send(event_session)
+    event_session.event.log(EventLogRealm.management, EventLogKind.negative, 'Sessions',
+                            'Session "{}" has been deleted'.format(event_session.title), session.user,
+                            meta={'session_id': event_session.id})
     logger.info('Session %s deleted by %s', event_session, session.user)
 
 
@@ -85,7 +91,8 @@ def update_session_block(session_block, data):
     session_block.populate_from_dict(data)
     db.session.flush()
     session_block.event.log(EventLogRealm.management, EventLogKind.change, 'Sessions',
-                            'Session block "{}" has been updated'.format(session_block.title), session.user)
+                            'Session block "{}" has been updated'.format(session_block.title), session.user,
+                            meta={'session_block_id': session_block.id})
     logger.info('Session block %s modified by %s', session_block, session.user)
 
 
@@ -109,6 +116,9 @@ def delete_session_block(session_block):
     if not session_.blocks and session_.event.type != 'conference':
         delete_session(session_)
     db.session.flush()
+    session_block.event.log(EventLogRealm.management, EventLogKind.negative, 'Sessions',
+                            'Session block "{}" has been deleted'.format(session_block.title), session.user,
+                            meta={'session_block_id': session_block.id})
     logger.info('Session block %s deleted by %s', session_block, session.user)
 
 

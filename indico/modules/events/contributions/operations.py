@@ -65,8 +65,8 @@ def create_contribution(event, contrib_data, custom_fields_data=None, session_bl
         schedule_contribution(contrib, start_dt=start_dt, session_block=session_block, extend_parent=extend_parent)
     signals.event.contribution_created.send(contrib)
     logger.info('Contribution %s created by %s', contrib, user)
-    contrib.event.log(EventLogRealm.management, EventLogKind.positive, 'Contributions',
-                      'Contribution "{}" has been created'.format(contrib.title), user)
+    contrib.log(EventLogRealm.management, EventLogKind.positive, 'Contributions',
+                'Contribution "{}" has been created'.format(contrib.title), user)
     return contrib
 
 
@@ -105,8 +105,8 @@ def update_contribution(contrib, contrib_data, custom_fields_data=None):
     if changes:
         signals.event.contribution_updated.send(contrib, changes=changes)
         logger.info('Contribution %s updated by %s', contrib, session.user)
-        contrib.event.log(EventLogRealm.management, EventLogKind.change, 'Contributions',
-                          'Contribution "{}" has been updated'.format(contrib.title), session.user)
+        contrib.log(EventLogRealm.management, EventLogKind.change, 'Contributions',
+                    'Contribution "{}" has been updated'.format(contrib.title), session.user)
     return rv
 
 
@@ -117,8 +117,8 @@ def delete_contribution(contrib):
     db.session.flush()
     signals.event.contribution_deleted.send(contrib)
     logger.info('Contribution %s deleted by %s', contrib, session.user)
-    contrib.event.log(EventLogRealm.management, EventLogKind.negative, 'Contributions',
-                      'Contribution "{}" has been deleted'.format(contrib.title), session.user)
+    contrib.log(EventLogRealm.management, EventLogKind.negative, 'Contributions',
+                'Contribution "{}" has been deleted'.format(contrib.title), session.user)
 
 
 def create_subcontribution(contrib, data):
@@ -129,7 +129,8 @@ def create_subcontribution(contrib, data):
     signals.event.subcontribution_created.send(subcontrib)
     logger.info('Subcontribution %s created by %s', subcontrib, session.user)
     subcontrib.event.log(EventLogRealm.management, EventLogKind.positive, 'Subcontributions',
-                         'Subcontribution "{}" has been created'.format(subcontrib.title), session.user)
+                         'Subcontribution "{}" has been created'.format(subcontrib.title), session.user,
+                         meta={'subcontribution_id': subcontrib.id})
     return subcontrib
 
 
@@ -139,7 +140,8 @@ def update_subcontribution(subcontrib, data):
     signals.event.subcontribution_updated.send(subcontrib)
     logger.info('Subcontribution %s updated by %s', subcontrib, session.user)
     subcontrib.event.log(EventLogRealm.management, EventLogKind.change, 'Subcontributions',
-                         'Subcontribution "{}" has been updated'.format(subcontrib.title), session.user)
+                         'Subcontribution "{}" has been updated'.format(subcontrib.title), session.user,
+                         meta={'subcontribution_id': subcontrib.id})
 
 
 def delete_subcontribution(subcontrib):
@@ -148,7 +150,8 @@ def delete_subcontribution(subcontrib):
     signals.event.subcontribution_deleted.send(subcontrib)
     logger.info('Subcontribution %s deleted by %s', subcontrib, session.user)
     subcontrib.event.log(EventLogRealm.management, EventLogKind.negative, 'Subcontributions',
-                         'Subcontribution "{}" has been deleted'.format(subcontrib.title), session.user)
+                         'Subcontribution "{}" has been deleted'.format(subcontrib.title), session.user,
+                         meta={'subcontribution_id': subcontrib.id})
 
 
 @no_autoflush
