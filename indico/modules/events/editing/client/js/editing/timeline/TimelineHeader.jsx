@@ -131,7 +131,7 @@ export default function TimelineHeader({children, contribution, state, submitter
         {!editingEnabled && (
           <Message warning>
             <Icon name="warning sign" />
-            <Translate>Editing is currently not enabled.</Translate>
+            <Translate>The Editing period hasn't started yet.</Translate>
             {canPerformEditorActions && (
               <>
                 {' '}
