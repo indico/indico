@@ -55,7 +55,7 @@ export default function ReviewConditionsManager() {
     <div styleName="conditions-container">
       <Message info>
         <Translate>
-          Here you can define what filetype-related conditions have to be met for a paper to be
+          Here you can define what filetype-related conditions have to be met for a submission to be
           eligible for review. In order to start the review process, uploaded files must meet one of
           the specified criteria.
         </Translate>

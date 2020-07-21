@@ -1,6 +1,6 @@
 msgid ""
 msgstr ""
-"POT-Creation-Date: 2020-07-20 12:35+0200\n"
+"POT-Creation-Date: 2020-07-20 16:14+0200\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "MIME-Version: 1.0\n"
@@ -977,7 +977,7 @@ msgstr ""
 #: indico/modules/events/editing/client/js/management/editable_type/review_conditions/ReviewConditionsManager.jsx:57
 msgid ""
 "Here you can define what filetype-related conditions have to be met for a "
-"paper to be eligible for review. In order to start the review process, "
+"submission to be eligible for review. In order to start the review process, "
 "uploaded files must meet one of the specified criteria."
 msgstr ""
 
