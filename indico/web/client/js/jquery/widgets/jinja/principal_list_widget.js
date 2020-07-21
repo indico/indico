@@ -21,25 +21,24 @@ import {WTFPrincipalListField} from 'indico/react/components/WTFPrincipalListFie
       },
       ...options,
     };
-    return options.legacy
+    options.legacy
       ? _setupLegacyPrincipalListWidget(options)
       : _setupPrincipalListWidget(options);
   };
 
-  function _setupPrincipalListWidget(options) {
-    const field = document.getElementById(options.fieldId);
+  function _setupPrincipalListWidget({fieldId, ...options}) {
+    const field = document.getElementById(fieldId);
     const principals = JSON.parse(field.value);
 
     ReactDOM.render(
       <WTFPrincipalListField
-        fieldId={options.fieldId}
+        fieldId={fieldId}
         defaultValue={principals}
-        protectedFieldId={options.protectedFieldId}
         {...options}
         // TBR: I eventually changed this to spread because I thought we might wanted to add new props
         // in the future and avoid modifying the widget and WTF component just to add a new definition
       />,
-      document.getElementById('userGroupList-' + options.fieldId)
+      document.getElementById('userGroupList-' + fieldId)
     );
   }
 

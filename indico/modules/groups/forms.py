@@ -14,7 +14,7 @@ from indico.core.db import db
 from indico.modules.groups.models.groups import LocalGroup
 from indico.util.i18n import _
 from indico.web.forms.base import IndicoForm
-from indico.web.forms.fields import _LegacyPrincipalListField
+from indico.web.forms.fields.principals import PrincipalListField
 
 
 class SearchForm(IndicoForm):
@@ -25,7 +25,7 @@ class SearchForm(IndicoForm):
 
 class EditGroupForm(IndicoForm):
     name = StringField(_('Group name'), [DataRequired()])
-    members = _LegacyPrincipalListField(_('Group members'))
+    members = PrincipalListField(_('Group members'))
 
     def __init__(self, *args, **kwargs):
         self.group = kwargs.pop('group', None)

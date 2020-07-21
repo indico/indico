@@ -7,7 +7,6 @@
 
 from __future__ import unicode_literals
 
-import json
 from datetime import time
 from operator import itemgetter
 
@@ -32,6 +31,7 @@ from indico.util.placeholders import get_missing_placeholders, render_placeholde
 from indico.web.forms.base import IndicoForm, generated_data
 from indico.web.forms.fields import (EmailListField, FileField, IndicoDateTimeField, IndicoEnumSelectField, JSONField,
                                      _LegacyPrincipalListField)
+from indico.web.forms.fields.principals import PrincipalListField
 from indico.web.forms.fields.simple import HiddenFieldList, IndicoEmailRecipientsField
 from indico.web.forms.validators import HiddenUnless, IndicoEmail, LinkedDateTime
 from indico.web.forms.widgets import CKEditorWidget, SwitchWidget
@@ -126,21 +126,6 @@ class RegistrationFormScheduleForm(IndicoForm):
         super(RegistrationFormScheduleForm, self).__init__(*args, **kwargs)
 
 
-class _UsersField(_LegacyPrincipalListField):
-    def __init__(self, *args, **kwargs):
-        super(_UsersField, self).__init__(*args, allow_external=True, **kwargs)
-
-    def process_formdata(self, valuelist):
-        if valuelist:
-            self.data = json.loads(valuelist[0])
-
-    def _value(self):
-        return self._get_data()
-
-    def pre_validate(self, form):
-        pass
-
-
 class InvitationFormBase(IndicoForm):
     _invitation_fields = ('skip_moderation',)
     _email_fields = ('email_from', 'email_subject', 'email_body')
@@ -192,7 +177,8 @@ class InvitationFormNew(InvitationFormBase):
 
 class InvitationFormExisting(InvitationFormBase):
     _invitation_fields = ('users_field',) + InvitationFormBase._invitation_fields
-    users_field = _UsersField(_('Users'), [DataRequired()], description=_("Select the users to invite."))
+    users_field = PrincipalListField(_('Users'), [DataRequired()], allow_external_users=True,
+                                     description=_("Select the users to invite."))
 
     @generated_data
     def users(self):
@@ -342,7 +328,7 @@ class RegistrationManagersForm(IndicoForm):
 class CreateMultipleRegistrationsForm(IndicoForm):
     """Form to create multiple registrations of Indico users at the same time."""
 
-    user_principals = _LegacyPrincipalListField(_("Indico users"), [DataRequired()])
+    user_principals = PrincipalListField(_("Indico users"), [DataRequired()])
     notify_users = BooleanField(_("Send e-mail notifications"),
                                 default=True,
                                 description=_("Notify the users about the registration."),

@@ -33,7 +33,7 @@
             withCategoryRoles: {{ field.allow_category_roles | default(False) | tojson }},
             withRegistrationForms: {{ field.allow_registration_forms | default(False) | tojson }},
             withNetworks: {{ field.allow_networks | default(False) | tojson }},
-            protectedFieldId: {{ field.protected_field | default(None) | tojson }},
+            protectedFieldId: {{ field.protected_field_id | default(None) | tojson }},
             legacy: {{ field.legacy | default(False) | tojson }}
         });
     </script>
