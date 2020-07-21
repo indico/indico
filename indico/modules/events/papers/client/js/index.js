@@ -26,6 +26,18 @@ import setupReactPaperTimeline from './setup';
     setupTableSorter('#assignment-list .tablesorter');
     enableIfChecked('#assignment-list', 'input[name=contribution_id]', '.js-enable-if-checked');
     setupListGenerator(filterConfig);
+
+    $('#assignment-list .tablesorter').on(
+      'mouseover',
+      '.title-column .vertical-aligner, .track-column .vertical-aligner',
+      function() {
+        const title = $(this);
+        // Show a qtip if the text is ellipsized
+        if (this.offsetWidth < this.scrollWidth) {
+          title.qtip({hide: 'mouseout', content: title.text(), overwrite: false}).qtip('show');
+        }
+      }
+    );
   };
 
   global.setupReviewingAreaList = function setupReviewingAreaList(options) {

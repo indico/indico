@@ -93,7 +93,8 @@
                 </span>
             {%- endif %}
             {% if contribution.track -%}
-                <span class="icon-stack contrib-track">
+                <span class="icon-stack contrib-track"
+                      title="{{ contribution.track.title_with_group if contribution.track.track_group }}">
                     {{ contribution.track.title }}
                 </span>
             {%- endif %}

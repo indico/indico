@@ -119,11 +119,11 @@
                                         {% endif %}
                                     </td>
                                 {% elif item.id == 'track' %}
-                                    <td class="i-table"
+                                    <td class="i-table track-column"
                                         data-searchable="{{ contrib.track.title | lower }}">
                                         <span class="vertical-aligner">
                                             {%- if contrib.track -%}
-                                                {{ contrib.track.title }}
+                                                {{ contrib.track.title_with_group }}
                                             {%- else -%}
                                                 {% trans %}No track{% endtrans %}
                                             {%- endif -%}
