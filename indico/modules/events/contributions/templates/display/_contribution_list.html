@@ -46,7 +46,9 @@
         {%- endif %}
         <div>
             {% if contrib.track -%}
-                <div class="contrib-track small" data-searchable="{{ contrib.track.title|lower }}">
+                <div class="contrib-track small"
+                     data-searchable="{{ contrib.track.title|lower }}"
+                     title="{{ contrib.track.title_with_group if contrib.track.track_group }}">
                     {{ contrib.track.title }}
                 </div>
             {%- endif %}

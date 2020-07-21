@@ -61,6 +61,11 @@
     width: 4rem;
   }
 
+  .vertical-aligner {
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
   table > tbody > tr > td {
     vertical-align: baseline;
   }

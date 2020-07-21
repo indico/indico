@@ -132,7 +132,7 @@ class ContributionListGenerator(ListGeneratorBase):
         contributions = [c for c in self._filter_list_entries(contributions_query, self.list_config['filters'])
                          if not self.check_access or c.can_access(session.user)]
         sessions = [{'id': s.id, 'title': s.title, 'colors': s.colors} for s in self.event.sessions]
-        tracks = [{'id': int(t.id), 'title': t.title} for t in self.event.tracks]
+        tracks = [{'id': int(t.id), 'title': t.title_with_group} for t in self.event.tracks]
         total_duration = (sum((c.duration for c in contributions), timedelta()),
                           sum((c.duration for c in contributions if c.timetable_entry), timedelta()))
         selected_entry = request.args.get('selected')
