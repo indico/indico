@@ -31,7 +31,7 @@ from indico.util.i18n import _
 from indico.util.placeholders import get_missing_placeholders, render_placeholder_info
 from indico.web.forms.base import IndicoForm, generated_data
 from indico.web.forms.fields import (EmailListField, FileField, IndicoDateTimeField, IndicoEnumSelectField, JSONField,
-                                     PrincipalListField)
+                                     _LegacyPrincipalListField)
 from indico.web.forms.fields.simple import HiddenFieldList, IndicoEmailRecipientsField
 from indico.web.forms.validators import HiddenUnless, IndicoEmail, LinkedDateTime
 from indico.web.forms.widgets import CKEditorWidget, SwitchWidget
@@ -126,7 +126,7 @@ class RegistrationFormScheduleForm(IndicoForm):
         super(RegistrationFormScheduleForm, self).__init__(*args, **kwargs)
 
 
-class _UsersField(PrincipalListField):
+class _UsersField(_LegacyPrincipalListField):
     def __init__(self, *args, **kwargs):
         super(_UsersField, self).__init__(*args, allow_external=True, **kwargs)
 
@@ -329,9 +329,10 @@ class ParticipantsDisplayFormColumnsForm(IndicoForm):
 class RegistrationManagersForm(IndicoForm):
     """Form to manage users with privileges to modify registration-related items"""
 
-    managers = PrincipalListField(_('Registration managers'), groups=True, allow_emails=True, allow_external=True,
-                                  description=_('List of users allowed to modify registrations'),
-                                  event=lambda form: form.event)
+    managers = _LegacyPrincipalListField(_('Registration managers'), groups=True, allow_emails=True,
+                                         allow_external=True,
+                                         description=_('List of users allowed to modify registrations'),
+                                         event=lambda form: form.event)
 
     def __init__(self, *args, **kwargs):
         self.event = kwargs.pop('event')
@@ -341,7 +342,7 @@ class RegistrationManagersForm(IndicoForm):
 class CreateMultipleRegistrationsForm(IndicoForm):
     """Form to create multiple registrations of Indico users at the same time."""
 
-    user_principals = PrincipalListField(_("Indico users"), [DataRequired()])
+    user_principals = _LegacyPrincipalListField(_("Indico users"), [DataRequired()])
     notify_users = BooleanField(_("Send e-mail notifications"),
                                 default=True,
                                 description=_("Notify the users about the registration."),

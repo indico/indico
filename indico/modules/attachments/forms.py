@@ -32,7 +32,8 @@ class AttachmentFormBase(IndicoForm):
                               description=_("Adding materials to folders allow grouping and easier permission "
                                             "management."))
     acl = AccessControlListField(_("Access control list"), [UsedIf(lambda form, field: form.protected.data)],
-                                 groups=True, allow_external=True, default_text=_('Restrict access to this material'),
+                                 allow_groups=True, allow_external_users=True,
+                                 default_text=_('Restrict access to this material'),
                                  description=_("The list of users and groups allowed to access the material"))
 
     def __init__(self, *args, **kwargs):
@@ -90,7 +91,8 @@ class AttachmentFolderForm(IndicoForm):
     description = TextAreaField(_("Description"), description=_("Description of the folder and its content"))
     protected = BooleanField(_("Protected"), widget=SwitchWidget())
     acl = AccessControlListField(_("Access control list"), [UsedIf(lambda form, field: form.protected.data)],
-                                 groups=True, allow_external=True, default_text=_('Restrict access to this folder'),
+                                 allow_groups=True, allow_external_users=True,
+                                 default_text=_('Restrict access to this folder'),
                                  description=_("The list of users and groups allowed to access the folder"))
     is_always_visible = BooleanField(_("Always Visible"),
                                      [HiddenUnless('is_hidden', value=False)],

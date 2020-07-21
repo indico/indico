@@ -1,28 +1,49 @@
-// This file is part of Indico.
-// Copyright (C) 2002 - 2020 CERN
-//
-// Indico is free software; you can redistribute it and/or
-// modify it under the terms of the MIT License; see the
-// LICENSE file for more details.
+import React from 'react';
+import ReactDOM from 'react-dom';
+import {WTFPrincipalListField} from 'indico/react/components/WTFPrincipalListField';
 
 (function(global) {
   'use strict';
 
   global.setupPrincipalListWidget = function setupPrincipalListWidget(options) {
-    options = $.extend(
-      true,
-      {
+    options = {
+      ...{
         fieldId: null,
         eventId: null,
         openImmediately: false,
-        groups: null,
-        allowExternal: false,
-        allowNetworks: false,
+        withGroups: false,
+        withExternalUsers: false,
+        withEventRoles: false,
+        withCategoryRoles: false,
+        withRegistrationForms: false,
+        withNetworks: false,
         networks: [],
       },
-      options
-    );
+      ...options,
+    };
+    return options.legacy
+      ? _setupLegacyPrincipalListWidget(options)
+      : _setupPrincipalListWidget(options);
+  };
 
+  function _setupPrincipalListWidget(options) {
+    const field = document.getElementById(options.fieldId);
+    const principals = JSON.parse(field.value);
+
+    ReactDOM.render(
+      <WTFPrincipalListField
+        fieldId={options.fieldId}
+        defaultValue={principals}
+        protectedFieldId={options.protectedFieldId}
+        {...options}
+        // TBR: I eventually changed this to spread because I thought we might wanted to add new props
+        // in the future and avoid modifying the widget and WTF component just to add a new definition
+      />,
+      document.getElementById('userGroupList-' + options.fieldId)
+    );
+  }
+
+  function _setupLegacyPrincipalListWidget(options) {
     var field = $('#' + options.fieldId);
     var principals = JSON.parse(field.val());
 
@@ -67,7 +88,7 @@
       true,
       null,
       true,
-      options.groups,
+      options.withGroups,
       options.eventId,
       null,
       false,
@@ -78,8 +99,8 @@
       addPrincipal,
       userListNothing,
       removePrincipal,
-      options.allowExternal,
-      options.allowNetworks,
+      options.withExternalUsers,
+      options.withNetworks,
       options.networks
     );
 
@@ -88,5 +109,5 @@
     if (options.openImmediately) {
       $('#userGroupList-' + options.fieldId + ' input[type=button]').trigger('click');
     }
-  };
+  }
 })(window);
