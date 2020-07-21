@@ -129,6 +129,8 @@ Internal Changes
   :user:`omegak`)
 - Add ``LinkedDate`` and ``DateRange`` form field validators (:issue:`4535`,
   thanks :user:`omegak`)
+- Add ``extra-regform-settings`` template hook (:issue:`4553`, thanks
+  :user:`meluru`)
 
 
 ----
