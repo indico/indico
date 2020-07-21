@@ -51,5 +51,9 @@ export function useFlaskRouteParams(urlFunc, params) {
  */
 export function useNumericParam(name) {
   const params = useParams();
-  return parseInt(params[name], 10);
+  const value = params[name];
+  if (value === undefined) {
+    return null;
+  }
+  return parseInt(value, 10);
 }

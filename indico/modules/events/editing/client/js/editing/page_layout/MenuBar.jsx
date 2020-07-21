@@ -4,8 +4,10 @@
 // Indico is free software; you can redistribute it and/or
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
-import managementURL from 'indico-url:event_management.settings';
+
 import displayURL from 'indico-url:events.display';
+import contribDisplayURL from 'indico-url:contributions.display_contribution';
+import manageEditableTypeURL from 'indico-url:event_editing.manage_editable_type';
 import editableTypeListURL from 'indico-url:event_editing.editable_type_list';
 
 import React from 'react';
@@ -44,7 +46,13 @@ EditableListMenu.propTypes = {
   editableType: PropTypes.oneOf(Object.values(EditableType)).isRequired,
 };
 
-export default function MenuBar({eventId, menuItems, editableType}) {
+export default function MenuBar({eventId, menuItems, editableType, contribId}) {
+  const displayViewURL =
+    contribId === null
+      ? displayURL({confId: eventId})
+      : contribDisplayURL({confId: eventId, contrib_id: contribId});
+  const managementViewURL = manageEditableTypeURL({confId: eventId, type: editableType});
+
   return (
     <div styleName="menu-bar">
       <Header as="h2" styleName="header">
@@ -72,12 +80,12 @@ export default function MenuBar({eventId, menuItems, editableType}) {
             <Translate>other views</Translate>
           </span>
         </Menu.Item>
-        <Menu.Item name="display" as="a" href={displayURL({confId: eventId})}>
+        <Menu.Item name="display" as="a" href={displayViewURL}>
           <span style={{color: Palette.blue}}>
             <Icon name="tv" /> <Translate>Display</Translate>
           </span>
         </Menu.Item>
-        <Menu.Item name="management" as="a" href={managementURL({confId: eventId})}>
+        <Menu.Item name="management" as="a" href={managementViewURL}>
           <span style={{color: Palette.blue}}>
             <Icon name="pencil" /> <Translate>Management</Translate>
           </span>
@@ -93,8 +101,14 @@ const menuEntryPropTypes = {
   url: PropTypes.string.isRequired,
   icon: PropTypes.string,
 };
+
 MenuBar.propTypes = {
   eventId: PropTypes.number.isRequired,
+  contribId: PropTypes.number,
   menuItems: PropTypes.arrayOf(PropTypes.shape(menuEntryPropTypes)).isRequired,
   editableType: PropTypes.oneOf(Object.values(EditableType)).isRequired,
+};
+
+MenuBar.defaultProps = {
+  contribId: null,
 };
