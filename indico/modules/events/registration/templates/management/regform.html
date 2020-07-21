@@ -108,6 +108,7 @@
             </div>
         </div>
     </div>
+    {{ template_hook('extra-regform-settings', regform=regform) }}
     <div class="toolbar right">
         <a class="i-button icon-chart" href="{{ url_for('.regform_stats', regform) }}">
             {% trans %}Stats{% endtrans %}
