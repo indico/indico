@@ -20,6 +20,7 @@ import './EditingView.module.scss';
 
 export default function EditingView({eventTitle, children}) {
   const eventId = useNumericParam('confId');
+  const contribId = useNumericParam('contrib_id');
   const {type} = useParams();
   const {data, lastData} = useIndicoAxios({
     url: menuEntriesURL({confId: eventId}),
@@ -33,7 +34,7 @@ export default function EditingView({eventTitle, children}) {
 
   return (
     <div styleName="editing-view">
-      <MenuBar eventId={eventId} menuItems={menuItems} editableType={type} />
+      <MenuBar eventId={eventId} menuItems={menuItems} editableType={type} contribId={contribId} />
       <div styleName="contents">
         <div styleName="timeline">
           <Header as="h2" styleName="header">
