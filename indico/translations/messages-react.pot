@@ -1,6 +1,6 @@
 msgid ""
 msgstr ""
-"POT-Creation-Date: 2020-07-20 16:46+0200\n"
+"POT-Creation-Date: 2020-07-20 12:35+0200\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "MIME-Version: 1.0\n"
@@ -435,7 +435,7 @@ msgid "This editable is not fulfilling reviewing conditions."
 msgstr ""
 
 #: indico/modules/events/editing/client/js/editing/timeline/TimelineHeader.jsx:134
-msgid "Editing is currently not enabled."
+msgid "The Editing period hasn't started yet."
 msgstr ""
 
 #: indico/modules/events/editing/client/js/editing/timeline/TimelineHeader.jsx:138
