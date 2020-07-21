@@ -37,6 +37,9 @@ settings:
     version: detect
 
 rules:
+  curly:
+    - error
+    - all
   import/no-unresolved:
     - error
     - ignore: ['^indico-url:']
