@@ -22,7 +22,7 @@ from indico.modules.vc.models import VCRoom, VCRoomStatus
 from indico.util.i18n import _
 from indico.web.flask.util import url_for
 from indico.web.forms.base import IndicoForm, generated_data
-from indico.web.forms.fields import EmailListField, IndicoDateField, IndicoRadioField, PrincipalListField
+from indico.web.forms.fields import EmailListField, IndicoDateField, IndicoRadioField, _LegacyPrincipalListField
 from indico.web.forms.validators import Exclusive, UsedIf
 from indico.web.forms.widgets import JinjaWidget, SelectizeWidget, SwitchWidget
 
@@ -52,9 +52,9 @@ class LinkingWidget(JinjaWidget):
 
 
 class VCPluginSettingsFormBase(IndicoForm):
-    managers = PrincipalListField(_('Managers'), groups=True, description=_('Service managers'))
-    acl = PrincipalListField(_('ACL'), groups=True,
-                             description=_('Users and Groups authorised to create videoconference rooms'))
+    managers = _LegacyPrincipalListField(_('Managers'), groups=True, description=_('Service managers'))
+    acl = _LegacyPrincipalListField(_('ACL'), groups=True,
+                                    description=_('Users and Groups authorised to create videoconference rooms'))
     notification_emails = EmailListField(_('Notification email addresses'),
                                          description=_('Notifications about videoconference rooms are sent to '
                                                        'these email addresses (one per line).'))

@@ -24,7 +24,7 @@ from .files import EditableFileField, FileField
 from .itemlists import MultipleItemsField, MultiStringField, OverrideMultipleItemsField
 from .location import IndicoLocationField
 from .markdown import IndicoMarkdownField
-from .principals import AccessControlListField, PrincipalField, PrincipalListField
+from .principals import AccessControlListField, PrincipalField, _LegacyPrincipalListField
 from .protection import IndicoProtectionField
 from .sqlalchemy import IndicoQuerySelectMultipleCheckboxField, IndicoQuerySelectMultipleField
 
@@ -34,7 +34,7 @@ __all__ = ('IndicoSelectMultipleCheckboxField', 'IndicoRadioField', 'JSONField',
            'IndicoPalettePickerField', 'IndicoSinglePalettePickerField', 'TimeDeltaField', 'IndicoDateTimeField',
            'OccurrencesField', 'IndicoTimezoneSelectField', 'IndicoEnumSelectField', 'IndicoEnumRadioField',
            'HiddenEnumField', 'FileField', 'MultiStringField', 'MultipleItemsField', 'OverrideMultipleItemsField',
-           'PrincipalListField', 'PrincipalField', 'AccessControlListField', 'IndicoQuerySelectMultipleField',
+           '_LegacyPrincipalListField', 'PrincipalField', 'AccessControlListField', 'IndicoQuerySelectMultipleField',
            'EditableFileField', 'IndicoQuerySelectMultipleCheckboxField', 'IndicoLocationField', 'IndicoMarkdownField',
            'IndicoDateField', 'IndicoProtectionField', 'IndicoSelectMultipleCheckboxBooleanField', 'RelativeDeltaField',
            'IndicoWeekDayRepetitionField', 'IndicoEmailRecipientsField')

@@ -23,7 +23,7 @@ from indico.modules.events.util import serialize_person_link
 from indico.modules.users.models.users import UserTitle
 from indico.modules.users.util import get_user_by_email
 from indico.util.i18n import _, orig_string
-from indico.web.forms.fields import MultipleItemsField, PrincipalListField
+from indico.web.forms.fields import MultipleItemsField, _LegacyPrincipalListField
 from indico.web.forms.widgets import JinjaWidget
 
 
@@ -70,7 +70,7 @@ class ReferencesField(MultipleItemsField):
             return [{'id': r.id, 'type': unicode(r.reference_type_id), 'value': r.value} for r in self.data]
 
 
-class EventPersonListField(PrincipalListField):
+class EventPersonListField(_LegacyPrincipalListField):
     """A field that lets you select a list Indico user and EventPersons
 
     Requires its form to have an event set.

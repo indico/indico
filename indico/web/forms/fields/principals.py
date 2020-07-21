@@ -25,7 +25,7 @@ from indico.modules.networks.models.networks import IPNetworkGroup
 from indico.modules.networks.util import serialize_ip_network_group
 from indico.modules.users import User
 from indico.modules.users.util import serialize_user
-from indico.util.user import principal_from_fossil
+from indico.util.user import principal_from_fossil, principal_from_identifier
 from indico.web.forms.fields import JSONField
 from indico.web.forms.widgets import JinjaWidget
 
@@ -53,6 +53,52 @@ def serialize_principal(principal):
 class PrincipalListField(HiddenField):
     """A field that lets you select a list Indico user/group ("principal")
 
+    :param allow_groups: If groups should be selectable.
+    :param allow_registration_forms: If registration form associated
+                                        to an event should be selectable.
+    :param allow_event_roles: If event roles should be selectable.
+    :param allow_category_roles: If category roles should be selectable.
+    :param allow_external_users: If "search users with no indico account"
+                                 should be available.  Selecting such a user
+                                 will automatically create a pending user once
+                                 the form is submitted, even if other fields
+                                 in the form fail to validate!
+    """
+
+    widget = JinjaWidget('forms/principal_list_widget.html', single_kwargs=True)
+
+    def __init__(self, *args, **kwargs):
+        self.data = []
+        self.allow_groups = kwargs.pop('allow_groups', False)
+        # Whether it is allowed to search for external users with no indico account
+        self.allow_external_users = kwargs.pop('allow_external_users', False)
+        self.allow_registration_forms = kwargs.pop('allow_registration_forms', False)
+        self.allow_event_roles = kwargs.pop('allow_event_roles', False)
+        self.allow_category_roles = kwargs.pop('allow_category_roles', False)
+        self._event = kwargs.pop('event')(kwargs['_form']) if 'event' in kwargs else None
+        super(PrincipalListField, self).__init__(*args, **kwargs)
+
+    def _convert_principal(self, principal):
+        return principal_from_identifier(principal, event_id=self._event, allow_groups=self.allow_groups,
+                                         allow_external_users=self.allow_external_users,
+                                         allow_event_roles=self.allow_event_roles,
+                                         allow_category_roles=self.allow_category_roles,
+                                         allow_registration_forms=self.allow_registration_forms)
+
+    def process_formdata(self, valuelist):
+        if valuelist:
+            self.data = {self._convert_principal(x) for x in json.loads(valuelist[0])}
+
+    def _value(self):
+        return [x.identifier for x in self._get_data()]
+
+    def _get_data(self):
+        return sorted(self.data) if self.data else []
+
+
+class _LegacyPrincipalListField(PrincipalListField):
+    """A legacy field that lets you select a list Indico user/group ("principal")
+
     :param groups: If groups should be selectable.
     :param allow_networks: If ip networks should be selectable.
     :param allow_emails: If emails should be allowed.
@@ -65,35 +111,29 @@ class PrincipalListField(HiddenField):
                            in the form fail to validate!
     """
 
-    widget = JinjaWidget('forms/principal_list_widget.html', single_kwargs=True)
+    legacy = True
 
     def __init__(self, *args, **kwargs):
-        self.allow_emails = kwargs.pop('allow_emails', False)
         self.groups = kwargs.pop('groups', False)
+        self.allow_emails = kwargs.pop('allow_emails', False)
         self.allow_networks = kwargs.pop('allow_networks', False)
-        self.allow_registration_forms = kwargs.pop('allow_registration_forms', False)
-        self.ip_networks = []
-        self.registration_forms = []
-        if self.allow_networks:
-            self.ip_networks = map(serialize_ip_network_group, IPNetworkGroup.query.filter_by(hidden=False))
-        # Whether it is allowed to search for external users with no indico account
         self.allow_external = kwargs.pop('allow_external', False)
+        self.allow_emails = kwargs.pop('allow_emails', False)
         # Whether the add user dialog is opened immediately when the field is displayed
         self.open_immediately = kwargs.pop('open_immediately', False)
-        self._event = kwargs.pop('event')(kwargs['_form']) if 'event' in kwargs else None
+        super(_LegacyPrincipalListField, self).__init__(*args, **kwargs)
+        self.ip_networks = []
+        if self.allow_networks:
+            self.ip_networks = map(serialize_ip_network_group, IPNetworkGroup.query.filter_by(hidden=False))
+        self.registration_forms = []
         if self._event and self.allow_registration_forms:
             self.registration_forms = map(serialize_registration_form, self._event.registration_forms)
-        super(PrincipalListField, self).__init__(*args, **kwargs)
 
     def _convert_principal(self, principal):
         return principal_from_fossil(principal, allow_pending=self.allow_external,
                                      allow_emails=self.allow_emails, allow_networks=self.allow_networks,
                                      allow_registration_forms=self.allow_registration_forms,
                                      existing_data=self.object_data, event=self._event)
-
-    def process_formdata(self, valuelist):
-        if valuelist:
-            self.data = {self._convert_principal(x) for x in json.loads(valuelist[0])}
 
     def pre_validate(self, form):
         if not self.groups and any(isinstance(p, GroupProxy) for p in self._get_data()):
@@ -111,20 +151,17 @@ class PrincipalListField(HiddenField):
         principals = sorted(self._get_data(), key=key)
         return map(serialize_principal, principals)
 
-    def _get_data(self):
-        return sorted(self.data) if self.data else []
-
 
 class AccessControlListField(PrincipalListField):
-    widget = JinjaWidget('forms/principal_list_widget.html', single_kwargs=True, acl=True)
-
     def __init__(self, *args, **kwargs):
         # The text of the link that changes the protection mode of the object to protected
         self.default_text = kwargs.pop('default_text')
+        # Hardcoded value of the protected field for legacy compatibility
+        self.protected_field_id = 'protected'
         super(AccessControlListField, self).__init__(*args, **kwargs)
 
 
-class PrincipalField(PrincipalListField):
+class PrincipalField(_LegacyPrincipalListField):
     """A field that lets you select an Indico user/group ("principal")"""
 
     widget = JinjaWidget('forms/principal_widget.html', single_line=True, single_kwargs=True)

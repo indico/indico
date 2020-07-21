@@ -36,7 +36,7 @@ from indico.web.forms.base import FormDefaults, IndicoForm, generated_data
 from indico.web.forms.fields import (EditableFileField, EmailListField, HiddenEnumField, HiddenFieldList,
                                      IndicoDateTimeField, IndicoEnumSelectField, IndicoMarkdownField,
                                      IndicoQuerySelectMultipleCheckboxField, IndicoQuerySelectMultipleField,
-                                     IndicoRadioField, PrincipalField, PrincipalListField)
+                                     IndicoRadioField, PrincipalField, _LegacyPrincipalListField)
 from indico.web.forms.util import inject_validators
 from indico.web.forms.validators import HiddenUnless, LinkedDateTime, SoftLength, UsedIf, WordCount
 from indico.web.forms.widgets import JinjaWidget, SwitchWidget
@@ -127,9 +127,9 @@ class AbstractSubmissionSettingsForm(IndicoForm):
                                                     enum=SubmissionRightsType, sorted=True,
                                                     description=_("Specify who will get contribution submission rights "
                                                                   "once an abstract has been accepted"))
-    authorized_submitters = PrincipalListField(_("Authorized submitters"),
-                                               description=_("These users may always submit abstracts, even outside "
-                                                             "the regular submission period"))
+    authorized_submitters = _LegacyPrincipalListField(_("Authorized submitters"),
+                                                      description=_("These users may always submit abstracts, "
+                                                                    "even outside the regular submission period."))
     submission_instructions = IndicoMarkdownField(_('Instructions'), editor=True,
                                                   description=_("These instructions will be displayed right before the "
                                                                 "submission form"))

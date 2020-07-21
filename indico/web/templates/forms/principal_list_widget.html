@@ -26,11 +26,15 @@
         setupPrincipalListWidget({
             fieldId: {{ field.id | tojson }},
             eventId: {{ (field.event.id if field.event else none) | tojson }},
-            openImmediately: {{ field.open_immediately | tojson }},
-            groups: {{ field.groups | tojson }},
-            allowExternal: {{ field.allow_external | tojson }},
-            allowNetworks: {{ field.allow_networks | tojson }},
-            networks: {{ field.ip_networks | sort(attribute='name') | tojson }}
+            openImmediately: {{ field.open_immediately | default(False) | tojson }},
+            withGroups: {{  (field.groups or field.allow_groups) | tojson }},
+            withExternalUsers: {{ (field.allow_external or field.allow_external_users) | tojson }},
+            withEventRoles: {{ field.allow_event_roles | default(False) | tojson }},
+            withCategoryRoles: {{ field.allow_category_roles | default(False) | tojson }},
+            withRegistrationForms: {{ field.allow_registration_forms | default(False) | tojson }},
+            withNetworks: {{ field.allow_networks | default(False) | tojson }},
+            protectedFieldId: {{ field.protected_field | default(None) | tojson }},
+            legacy: {{ field.legacy | default(False) | tojson }}
         });
     </script>
 {% endblock %}
