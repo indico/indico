@@ -39,6 +39,7 @@
   width: 3.5em;
   text-align: center;
   color: $light-black;
+  flex-shrink: 0;
 }
 
 .content {

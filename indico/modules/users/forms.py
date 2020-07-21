@@ -23,7 +23,8 @@ from indico.modules.users.models.users import NameFormat, UserTitle
 from indico.modules.users.util import get_picture_data
 from indico.util.i18n import _, get_all_locales
 from indico.web.forms.base import IndicoForm, SyncedInputsMixin
-from indico.web.forms.fields import EditableFileField, IndicoEnumSelectField, PrincipalField, _LegacyPrincipalListField
+from indico.web.forms.fields import EditableFileField, IndicoEnumSelectField, PrincipalField
+from indico.web.forms.fields.principals import PrincipalListField
 from indico.web.forms.util import inject_validators
 from indico.web.forms.validators import HiddenUnless, used_if_not_synced
 from indico.web.forms.widgets import SwitchWidget, SyncedInputWidget
@@ -132,4 +133,4 @@ class AdminAccountRegistrationForm(LocalRegistrationForm):
 
 
 class AdminsForm(IndicoForm):
-    admins = _LegacyPrincipalListField(_('Admins'), [DataRequired()])
+    admins = PrincipalListField(_('Admins'), [DataRequired()])

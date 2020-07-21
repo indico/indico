@@ -14,17 +14,19 @@ export function WTFPrincipalListField({fieldId, defaultValue, protectedFieldId, 
   const [disabled, setDisabled] = useState(!!protectedField && !protectedField.checked);
 
   useEffect(() => {
-    if (!protectedField) return;
-    function onChangeProtected() {
-      setDisabled(!protectedField.checked);
+    if (!protectedField) {
+      return;
     }
+    const onChangeProtected = () => {
+      setDisabled(!protectedField.checked);
+    };
     protectedField.addEventListener('change', onChangeProtected);
     return () => protectedField.removeEventListener('change', onChangeProtected);
   }, [protectedField]);
 
   const onChangePrincipal = useCallback(
     principals => {
-      inputField.value = principals;
+      inputField.value = JSON.stringify(principals);
       setValue(principals);
       inputField.dispatchEvent(new Event('change'));
     },
@@ -48,7 +50,7 @@ export function WTFPrincipalListField({fieldId, defaultValue, protectedFieldId, 
 WTFPrincipalListField.propTypes = {
   fieldId: PropTypes.string.isRequired,
   defaultValue: PropTypes.arrayOf(PropTypes.string),
-  protectedFieldId: PropTypes.instanceOf(Element),
+  protectedFieldId: PropTypes.instanceOf(PropTypes.string),
 };
 
 WTFPrincipalListField.defaultProps = {

@@ -19,8 +19,8 @@ from indico.util.i18n import _
 from indico.web.flask.util import url_for
 from indico.web.forms.base import IndicoForm
 from indico.web.forms.fields import (EditableFileField, FileField, HiddenEnumField, HiddenFieldList,
-                                     IndicoDateTimeField, IndicoMarkdownField, IndicoTagListField,
-                                     _LegacyPrincipalListField)
+                                     IndicoDateTimeField, IndicoMarkdownField, IndicoTagListField)
+from indico.web.forms.fields.principals import PrincipalListField
 from indico.web.forms.util import inject_validators
 from indico.web.forms.validators import HiddenUnless, LinkedDateTime, UsedIf
 from indico.web.forms.widgets import SwitchWidget
@@ -36,16 +36,16 @@ def make_competences_form(event):
 
 
 class PaperTeamsForm(IndicoForm):
-    managers = _LegacyPrincipalListField(_('Paper managers'), groups=True, event=lambda form: form.event,
-                                         description=_('List of users allowed to manage the paper peer reviewing module'))
-    judges = _LegacyPrincipalListField(_('Judges'),
-                                       description=_('List of users allowed to judge papers'))
-    content_reviewers = _LegacyPrincipalListField(_('Content reviewers'),
-                                                  description=_('List of users allowed to review the content of '
-                                                                'the assigned papers'))
-    layout_reviewers = _LegacyPrincipalListField(_('Layout reviewers'),
-                                                 description=_('List of users allowed to review the layout of the '
-                                                               'assigned papers'))
+    managers = PrincipalListField(_('Paper managers'), with_groups=True, event=lambda form: form.event,
+                                  description=_('List of users allowed to manage the paper peer reviewing module'))
+    judges = PrincipalListField(_('Judges'),
+                                description=_('List of users allowed to judge papers'))
+    content_reviewers = PrincipalListField(_('Content reviewers'),
+                                           description=_('List of users allowed to review the content of '
+                                                         'the assigned papers'))
+    layout_reviewers = PrincipalListField(_('Layout reviewers'),
+                                          description=_('List of users allowed to review the layout of the '
+                                                        'assigned papers'))
 
     def __init__(self, *args, **kwargs):
         self.event = kwargs.pop('event')
