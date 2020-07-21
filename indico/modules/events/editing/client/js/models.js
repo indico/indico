@@ -60,3 +60,9 @@ export const EditableEditingTitles = {
   slides: Translate.string('Slides Editing'),
   poster: Translate.string('Poster Editing'),
 };
+
+export const GetNextEditableTitles = {
+  paper: Translate.string('Get next paper'),
+  poster: Translate.string('Get next poster'),
+  slides: Translate.string('Get next slides'),
+};

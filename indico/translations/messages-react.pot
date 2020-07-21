@@ -1,6 +1,6 @@
 msgid ""
 msgstr ""
-"POT-Creation-Date: 2020-07-20 16:14+0200\n"
+"POT-Creation-Date: 2020-07-20 16:21+0200\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "MIME-Version: 1.0\n"
@@ -156,7 +156,7 @@ msgstr ""
 #: indico/modules/events/editing/client/js/editing/timeline/CommentItem.jsx:116
 #: indico/modules/events/editing/client/js/management/EditableTypeList.jsx:83
 #: indico/modules/events/editing/client/js/management/ManageService.jsx:225
-#: indico/modules/events/editing/client/js/management/editable_type/NextEditable.jsx:201
+#: indico/modules/events/editing/client/js/management/editable_type/NextEditable.jsx:195
 #: indico/modules/events/editing/client/js/management/editable_type/TeamManager.jsx:81
 #: indico/modules/events/editing/client/js/management/editable_type/file_types/FileTypeModal.jsx:116
 #: indico/modules/events/editing/client/js/management/tags/TagModal.jsx:65
@@ -188,7 +188,7 @@ msgid "Help"
 msgstr ""
 
 #: indico/modules/events/editing/client/js/editing/page_layout/Footer.jsx:39
-#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:128
+#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:134
 #: indico/modules/rb/client/js/common/rooms/edit/RoomEditDetails.jsx:19
 #: indico/modules/rb/client/js/components/SidebarFooter.jsx:41
 #: indico/modules/rb/client/js/components/SidebarFooter.jsx:125
@@ -542,7 +542,7 @@ msgid ""
 msgstr ""
 
 #: indico/modules/events/editing/client/js/management/EditableTypeList.jsx:113
-#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:153
+#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:159
 msgid "List"
 msgstr ""
 
@@ -568,8 +568,8 @@ msgid "Configure the tags that can be assigned to revisions"
 msgstr ""
 
 #: indico/modules/events/editing/client/js/management/EditingManagementDashboard.jsx:29
-#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:107
-#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:119
+#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:113
+#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:125
 msgid "Configure"
 msgstr ""
 
@@ -696,13 +696,8 @@ msgid "Editor"
 msgstr ""
 
 #: indico/modules/events/editing/client/js/management/editable_type/EditableList.jsx:218
-#: indico/modules/events/editing/client/js/management/editable_type/NextEditable.jsx:252
+#: indico/modules/events/editing/client/js/management/editable_type/NextEditable.jsx:246
 msgid "n/a"
-msgstr ""
-
-#: indico/modules/events/editing/client/js/management/editable_type/EditableList.jsx:353
-#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:159
-msgid "Get next editable"
 msgstr ""
 
 #: indico/modules/events/editing/client/js/management/editable_type/EditableList.jsx:379
@@ -710,7 +705,7 @@ msgid "Assign"
 msgstr ""
 
 #: indico/modules/events/editing/client/js/management/editable_type/EditableList.jsx:387
-#: indico/modules/events/editing/client/js/management/editable_type/NextEditable.jsx:204
+#: indico/modules/events/editing/client/js/management/editable_type/NextEditable.jsx:198
 msgid "Assign to myself"
 msgstr ""
 
@@ -734,78 +729,86 @@ msgstr ""
 msgid "Send emails to the editing team"
 msgstr ""
 
-#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:74
+#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:62
+msgid "Assign an editor to papers"
+msgstr ""
+
+#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:63
+msgid "Assign an editor to posters"
+msgstr ""
+
+#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:64
+msgid "Assign an editor to slides"
+msgstr ""
+
+#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:80
 msgid "Submission is open"
 msgstr ""
 
-#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:75
+#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:81
 msgid "Submission is not open"
 msgstr ""
 
-#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:77
+#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:83
 msgid "Toggle whether users can submit new editables"
 msgstr ""
 
-#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:80
-#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:93
+#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:86
+#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:99
 msgid "Close now"
 msgstr ""
 
-#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:80
-#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:93
+#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:86
+#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:99
 msgid "Start now"
 msgstr ""
 
-#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:87
+#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:93
 msgid "Editing is open"
 msgstr ""
 
-#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:88
+#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:94
 msgid "Editing is not open"
 msgstr ""
 
-#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:90
+#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:96
 msgid "Toggle whether editors can review submissions"
 msgstr ""
 
-#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:100
+#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:106
 #: indico/modules/events/editing/client/js/management/editable_type/file_types/index.jsx:21
 msgid "File types"
 msgstr ""
 
-#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:101
+#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:107
 msgid "Configure file types"
 msgstr ""
 
-#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:112
+#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:118
 msgid "Ready for review conditions"
 msgstr ""
 
-#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:113
+#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:119
 msgid "Configure conditions for reviewing"
 msgstr ""
 
-#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:124
+#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:130
 msgid "Editing team"
 msgstr ""
 
-#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:125
+#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:131
 msgid "Configure editing team"
 msgstr ""
 
-#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:131
+#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:137
 msgid "Manage team"
 msgstr ""
 
-#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:139
-msgid "Editable assignment"
+#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:145
+msgid "Editor assignment"
 msgstr ""
 
-#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:140
-msgid "Assign editors"
-msgstr ""
-
-#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:147
+#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:153
 msgid "Allow editors to self-assign editables"
 msgstr ""
 
@@ -813,27 +816,15 @@ msgstr ""
 msgid "Editing ({type})"
 msgstr ""
 
-#: indico/modules/events/editing/client/js/management/editable_type/NextEditable.jsx:130
-msgid "Get next paper"
-msgstr ""
-
-#: indico/modules/events/editing/client/js/management/editable_type/NextEditable.jsx:131
-msgid "Get next poster"
-msgstr ""
-
-#: indico/modules/events/editing/client/js/management/editable_type/NextEditable.jsx:132
-msgid "Get next slides"
-msgstr ""
-
-#: indico/modules/events/editing/client/js/management/editable_type/NextEditable.jsx:169
+#: indico/modules/events/editing/client/js/management/editable_type/NextEditable.jsx:163
 msgid "has files"
 msgstr ""
 
-#: indico/modules/events/editing/client/js/management/editable_type/NextEditable.jsx:178
+#: indico/modules/events/editing/client/js/management/editable_type/NextEditable.jsx:172
 msgid "has no files"
 msgstr ""
 
-#: indico/modules/events/editing/client/js/management/editable_type/NextEditable.jsx:267
+#: indico/modules/events/editing/client/js/management/editable_type/NextEditable.jsx:261
 msgid "There are no editables available."
 msgstr ""
 
@@ -1094,6 +1085,18 @@ msgstr ""
 
 #: indico/modules/events/editing/client/js/models.js:61
 msgid "Poster Editing"
+msgstr ""
+
+#: indico/modules/events/editing/client/js/models.js:65
+msgid "Get next paper"
+msgstr ""
+
+#: indico/modules/events/editing/client/js/models.js:66
+msgid "Get next poster"
+msgstr ""
+
+#: indico/modules/events/editing/client/js/models.js:67
+msgid "Get next slides"
 msgstr ""
 
 #: indico/modules/events/logs/client/js/components/EventLog.jsx:27

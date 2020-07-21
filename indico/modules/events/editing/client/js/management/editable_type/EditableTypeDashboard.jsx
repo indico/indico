@@ -23,7 +23,7 @@ import {Translate} from 'indico/react/i18n';
 import {ManagementPageSubTitle, ManagementPageBackButton} from 'indico/react/components';
 import {useNumericParam} from 'indico/react/util/routing';
 import {useTogglableValue} from 'indico/react/hooks';
-import {EditableTypeTitles} from '../../models';
+import {EditableTypeTitles, GetNextEditableTitles} from '../../models';
 import Section from '../Section';
 import TeamManager from './TeamManager';
 import NextEditable from './NextEditable';
@@ -57,6 +57,12 @@ export default function EditableTypeDashboard() {
       title: Translate.string('Send emails to the editing team'),
     });
   };
+
+  const editorAssignmentDescription = {
+    paper: Translate.string('Assign an editor to papers'),
+    poster: Translate.string('Assign an editor to posters'),
+    slides: Translate.string('Assign an editor to slides'),
+  }[type];
 
   return (
     <>
@@ -136,8 +142,8 @@ export default function EditableTypeDashboard() {
             </Section>
             <Section
               icon="copy1"
-              label={Translate.string('Editable assignment')}
-              description={Translate.string('Assign editors')}
+              label={Translate.string('Editor assignment')}
+              description={editorAssignmentDescription}
             >
               <Checkbox
                 styleName="toolbar-checkbox"
@@ -156,7 +162,7 @@ export default function EditableTypeDashboard() {
                 className="i-button icon-arrow-right-sparse"
                 onClick={() => setSelfAssignModalVisible(true)}
               >
-                <Translate>Get next editable</Translate>
+                {GetNextEditableTitles[type]}
               </a>
               {selfAssignModalVisible && (
                 <NextEditable

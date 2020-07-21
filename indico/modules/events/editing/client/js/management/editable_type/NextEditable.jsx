@@ -18,7 +18,7 @@ import {camelizeKeys} from 'indico/utils/case';
 import {Translate} from 'indico/react/i18n';
 import {indicoAxios, handleAxiosError} from 'indico/utils/axios';
 import {useIndicoAxios} from 'indico/react/hooks';
-import {EditableType} from '../../models';
+import {EditableType, GetNextEditableTitles} from '../../models';
 import {fileTypePropTypes} from '../../editing/timeline/FileManager/util';
 
 import './NextEditable.module.scss';
@@ -126,15 +126,9 @@ function NextEditableDisplay({eventId, editableType, onClose, fileTypes, managem
     }
   };
 
-  const titleByType = {
-    paper: Translate.string('Get next paper'),
-    poster: Translate.string('Get next poster'),
-    slides: Translate.string('Get next slides'),
-  };
-
   return (
     <Modal onClose={onClose} closeOnDimmerClick={false} open>
-      <Modal.Header>{titleByType[editableType]}</Modal.Header>
+      <Modal.Header>{GetNextEditableTitles[editableType]}</Modal.Header>
       <Modal.Content>
         <div styleName="filetype-list">
           {fileTypes.map(fileType => {

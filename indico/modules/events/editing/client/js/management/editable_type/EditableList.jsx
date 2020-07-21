@@ -32,7 +32,7 @@ import {indicoAxios, handleAxiosError} from 'indico/utils/axios';
 import {camelizeKeys} from 'indico/utils/case';
 import Palette from 'indico/utils/palette';
 import {userPropTypes} from '../../editing/timeline/util';
-import {EditableType} from '../../models';
+import {EditableType, GetNextEditableTitles} from '../../models';
 import StateIndicator from '../../editing/timeline/StateIndicator';
 import NextEditable from './NextEditable';
 
@@ -350,7 +350,7 @@ function EditableListDisplay({
         <div>
           {canAssignSelf && (
             <Button
-              content={Translate.string('Get next editable')}
+              content={GetNextEditableTitles[editableType]}
               onClick={() => setSelfAssignModalVisible(true)}
             />
           )}
