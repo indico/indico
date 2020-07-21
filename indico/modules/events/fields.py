@@ -23,7 +23,8 @@ from indico.modules.events.util import serialize_person_link
 from indico.modules.users.models.users import UserTitle
 from indico.modules.users.util import get_user_by_email
 from indico.util.i18n import _, orig_string
-from indico.web.forms.fields import MultipleItemsField, _LegacyPrincipalListField
+from indico.web.forms.fields import MultipleItemsField
+from indico.web.forms.fields.principals import PrincipalListField
 from indico.web.forms.widgets import JinjaWidget
 
 
@@ -70,7 +71,7 @@ class ReferencesField(MultipleItemsField):
             return [{'id': r.id, 'type': unicode(r.reference_type_id), 'value': r.value} for r in self.data]
 
 
-class EventPersonListField(_LegacyPrincipalListField):
+class EventPersonListField(PrincipalListField):
     """A field that lets you select a list Indico user and EventPersons
 
     Requires its form to have an event set.
@@ -82,7 +83,7 @@ class EventPersonListField(_LegacyPrincipalListField):
 
     def __init__(self, *args, **kwargs):
         self.event_person_conversions = {}
-        super(EventPersonListField, self).__init__(*args, groups=False, allow_external=True, **kwargs)
+        super(EventPersonListField, self).__init__(*args, allow_groups=False, allow_external_users=True, **kwargs)
 
     @property
     def event(self):
@@ -102,10 +103,6 @@ class EventPersonListField(_LegacyPrincipalListField):
         if not isinstance(principal, EventPerson):
             return super(EventPersonListField, self)._serialize_principal(principal)
         return serialize_event_person(principal)
-
-    def pre_validate(self, form):
-        # Override parent behavior
-        pass
 
     def process_formdata(self, valuelist):
         if valuelist:

@@ -36,8 +36,8 @@ def make_competences_form(event):
 
 
 class PaperTeamsForm(IndicoForm):
-    managers = PrincipalListField(_('Paper managers'), with_groups=True, event=lambda form: form.event,
-                                  description=_('List of users allowed to manage the paper peer reviewing module'))
+    managers = PrincipalListField(_('Paper managers'), allow_groups=True, event=lambda form: form.event,
+                                  description=_('List of users allowed to manage the call for papers'))
     judges = PrincipalListField(_('Judges'),
                                 description=_('List of users allowed to judge papers'))
     content_reviewers = PrincipalListField(_('Content reviewers'),

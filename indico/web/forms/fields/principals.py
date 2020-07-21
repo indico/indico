@@ -68,7 +68,6 @@ class PrincipalListField(HiddenField):
     widget = JinjaWidget('forms/principal_list_widget.html', single_kwargs=True)
 
     def __init__(self, *args, **kwargs):
-        self.data = []
         self.allow_groups = kwargs.pop('allow_groups', False)
         # Whether it is allowed to search for external users with no indico account
         self.allow_external_users = kwargs.pop('allow_external_users', False)
