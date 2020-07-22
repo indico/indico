@@ -1,3 +1,10 @@
+// This file is part of Indico.
+// Copyright (C) 2002 - 2020 CERN
+//
+// Indico is free software; you can redistribute it and/or
+// modify it under the terms of the MIT License; see the
+// LICENSE file for more details.
+
 import React from 'react';
 import ReactDOM from 'react-dom';
 import {WTFPrincipalListField} from 'indico/react/components/WTFPrincipalListField';
@@ -21,9 +28,7 @@ import {WTFPrincipalListField} from 'indico/react/components/WTFPrincipalListFie
       },
       ...options,
     };
-    options.legacy
-      ? _setupLegacyPrincipalListWidget(options)
-      : _setupPrincipalListWidget(options);
+    options.legacy ? _setupLegacyPrincipalListWidget(options) : _setupPrincipalListWidget(options);
   };
 
   function _setupPrincipalListWidget({fieldId, ...options}) {
@@ -31,13 +36,7 @@ import {WTFPrincipalListField} from 'indico/react/components/WTFPrincipalListFie
     const principals = JSON.parse(field.value);
 
     ReactDOM.render(
-      <WTFPrincipalListField
-        fieldId={fieldId}
-        defaultValue={principals}
-        {...options}
-        // TBR: I eventually changed this to spread because I thought we might wanted to add new props
-        // in the future and avoid modifying the widget and WTF component just to add a new definition
-      />,
+      <WTFPrincipalListField fieldId={fieldId} defaultValue={principals} {...options} />,
       document.getElementById('userGroupList-' + fieldId)
     );
   }

@@ -16,8 +16,7 @@
             fieldId: {{ field.id | tojson }},
             eventId: {{ (field.event.id if field.event else none) | tojson }},
             required: {{ field.flags.required | tojson }},
-            allowExternal: {{ field.allow_external | tojson }}
+            withExternalUsers: {{ field.allow_external_users | default(False) | tojson }}
         });
     </script>
 {% endblock %}
-
