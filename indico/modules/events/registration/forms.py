@@ -29,8 +29,7 @@ from indico.modules.events.registration.models.registrations import Registration
 from indico.util.i18n import _
 from indico.util.placeholders import get_missing_placeholders, render_placeholder_info
 from indico.web.forms.base import IndicoForm, generated_data
-from indico.web.forms.fields import (EmailListField, FileField, IndicoDateTimeField, IndicoEnumSelectField, JSONField,
-                                     _LegacyPrincipalListField)
+from indico.web.forms.fields import EmailListField, FileField, IndicoDateTimeField, IndicoEnumSelectField, JSONField
 from indico.web.forms.fields.principals import PrincipalListField
 from indico.web.forms.fields.simple import HiddenFieldList, IndicoEmailRecipientsField
 from indico.web.forms.validators import HiddenUnless, IndicoEmail, LinkedDateTime
@@ -315,10 +314,10 @@ class ParticipantsDisplayFormColumnsForm(IndicoForm):
 class RegistrationManagersForm(IndicoForm):
     """Form to manage users with privileges to modify registration-related items"""
 
-    managers = _LegacyPrincipalListField(_('Registration managers'), groups=True, allow_emails=True,
-                                         allow_external=True,
-                                         description=_('List of users allowed to modify registrations'),
-                                         event=lambda form: form.event)
+    managers = PrincipalListField(_('Registration managers'), allow_groups=True, allow_emails=True,
+                                  allow_external_users=True,
+                                  description=_('List of users allowed to modify registrations'),
+                                  event=lambda form: form.event)
 
     def __init__(self, *args, **kwargs):
         self.event = kwargs.pop('event')

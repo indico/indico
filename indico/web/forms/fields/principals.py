@@ -19,13 +19,11 @@ from indico.modules.events.contributions.models.contributions import Contributio
 from indico.modules.events.registration.util import serialize_registration_form
 from indico.modules.events.roles.util import serialize_event_role
 from indico.modules.events.sessions.models.sessions import Session
-from indico.modules.groups import GroupProxy
 from indico.modules.groups.util import serialize_group
 from indico.modules.networks.models.networks import IPNetworkGroup
 from indico.modules.networks.util import serialize_ip_network_group
-from indico.modules.users import User
 from indico.modules.users.util import serialize_user
-from indico.util.user import principal_from_fossil, principal_from_identifier
+from indico.util.user import principal_from_identifier
 from indico.web.forms.fields import JSONField
 from indico.web.forms.widgets import JinjaWidget
 
@@ -55,11 +53,11 @@ class PrincipalListField(HiddenField):
 
     :param allow_groups: If groups should be selectable.
     :param allow_registration_forms: If registration form associated
-                                        to an event should be selectable.
+                                     to an event should be selectable.
     :param allow_event_roles: If event roles should be selectable.
     :param allow_category_roles: If category roles should be selectable.
     :param allow_external_users: If "search users with no indico account"
-                                 should be available.  Selecting such a user
+                                 should be available. Selecting such a user
                                  will automatically create a pending user once
                                  the form is submitted, even if other fields
                                  in the form fail to validate!
@@ -74,6 +72,7 @@ class PrincipalListField(HiddenField):
         self.allow_registration_forms = kwargs.pop('allow_registration_forms', False)
         self.allow_event_roles = kwargs.pop('allow_event_roles', False)
         self.allow_category_roles = kwargs.pop('allow_category_roles', False)
+        self.allow_emails = kwargs.pop('allow_emails', False)
         self._event = kwargs.pop('event')(kwargs['_form']) if 'event' in kwargs else None
         super(PrincipalListField, self).__init__(*args, **kwargs)
 
@@ -82,7 +81,8 @@ class PrincipalListField(HiddenField):
                                          allow_external_users=self.allow_external_users,
                                          allow_event_roles=self.allow_event_roles,
                                          allow_category_roles=self.allow_category_roles,
-                                         allow_registration_forms=self.allow_registration_forms)
+                                         allow_registration_forms=self.allow_registration_forms,
+                                         allow_emails=self.allow_emails)
 
     def process_formdata(self, valuelist):
         if valuelist:
@@ -93,62 +93,6 @@ class PrincipalListField(HiddenField):
 
     def _get_data(self):
         return sorted(self.data) if self.data else []
-
-
-class _LegacyPrincipalListField(PrincipalListField):
-    """A legacy field that lets you select a list Indico user/group ("principal")
-
-    :param groups: If groups should be selectable.
-    :param allow_networks: If ip networks should be selectable.
-    :param allow_emails: If emails should be allowed.
-    :param allow_registration_forms: If registration form associated
-                                     to an event should be selectable.
-    :param allow_external: If "search users with no indico account"
-                           should be available.  Selecting such a user
-                           will automatically create a pending user once
-                           the form is submitted, even if other fields
-                           in the form fail to validate!
-    """
-
-    legacy = True
-
-    def __init__(self, *args, **kwargs):
-        self.groups = kwargs.pop('groups', False)
-        self.allow_emails = kwargs.pop('allow_emails', False)
-        self.allow_networks = kwargs.pop('allow_networks', False)
-        self.allow_external = kwargs.pop('allow_external', False)
-        self.allow_emails = kwargs.pop('allow_emails', False)
-        # Whether the add user dialog is opened immediately when the field is displayed
-        self.open_immediately = kwargs.pop('open_immediately', False)
-        super(_LegacyPrincipalListField, self).__init__(*args, **kwargs)
-        self.ip_networks = []
-        if self.allow_networks:
-            self.ip_networks = map(serialize_ip_network_group, IPNetworkGroup.query.filter_by(hidden=False))
-        self.registration_forms = []
-        if self._event and self.allow_registration_forms:
-            self.registration_forms = map(serialize_registration_form, self._event.registration_forms)
-
-    def _convert_principal(self, principal):
-        return principal_from_fossil(principal, allow_pending=self.allow_external,
-                                     allow_emails=self.allow_emails, allow_networks=self.allow_networks,
-                                     allow_registration_forms=self.allow_registration_forms,
-                                     existing_data=self.object_data, event=self._event)
-
-    def pre_validate(self, form):
-        if not self.groups and any(isinstance(p, GroupProxy) for p in self._get_data()):
-            raise ValueError('You cannot select groups')
-
-    def _value(self):
-        from indico.modules.events.models.persons import PersonLinkBase
-
-        def key(obj):
-            if isinstance(obj, PersonLinkBase):
-                return obj.display_full_name.lower()
-            name = obj.display_full_name if isinstance(obj, User) else obj.name
-            return obj.principal_type, name.lower()
-
-        principals = sorted(self._get_data(), key=key)
-        return map(serialize_principal, principals)
 
 
 class AccessControlListField(PrincipalListField):
