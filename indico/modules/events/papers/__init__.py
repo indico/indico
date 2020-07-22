@@ -6,7 +6,7 @@
 # LICENSE file for more details.
 
 """
-The ``papers`` module handles the Indico's Paper Reviewing workflow.
+The ``papers`` module handles the Indico's Paper Peer Reviewing workflow.
 The "inputs" of this module are the conference papers, which will be uploaded
 by the corresponding authors/submitters.
 """
@@ -32,7 +32,7 @@ logger = Logger.get('events.papers')
 def _extend_event_management_menu(sender, event, **kwargs):
     if not event.cfp.is_manager(session.user) or not PapersFeature.is_allowed_for_event(event):
         return
-    return SideMenuItem('papers', _('Call for Papers'), url_for('papers.management', event),
+    return SideMenuItem('papers', _('Peer Reviewing'), url_for('papers.management', event),
                         section='workflows', weight=20)
 
 
@@ -43,7 +43,7 @@ def _extend_editing_menu(sender, event, **kwargs):
         return None
     if (has_contributions_with_user_paper_submission_rights(event, session.user) or
             event.cfp.is_staff(session.user)):
-        return SideMenuItem('papers', _('Call for Papers'), url_for('papers.call_for_papers', event))
+        return SideMenuItem('papers', _('Peer Reviewing'), url_for('papers.call_for_papers', event))
 
 
 @signals.event_management.management_url.connect
@@ -87,9 +87,9 @@ def _get_management_permissions(sender, **kwargs):
 
 class PapersFeature(EventFeature):
     name = 'papers'
-    friendly_name = _('Call for Papers')
-    description = _('Gives event managers the opportunity to open a "Call for Papers" and use the paper '
-                    'reviewing workflow.')
+    friendly_name = _('Paper Peer Reviewing')
+    description = _('Gives event managers the opportunity to let contribution authors '
+                    'submit papers and use the paper peer reviewing workflow.')
 
     @classmethod
     def is_allowed_for_event(cls, event):
@@ -99,7 +99,7 @@ class PapersFeature(EventFeature):
 class PaperManagerPermission(ManagementPermission):
     name = 'paper_manager'
     friendly_name = _('Paper Manager')
-    description = _('Grants management rights for paper reviewing on an event.')
+    description = _('Grants management rights for paper peer reviewing on an event.')
     user_selectable = True
 
 
@@ -142,7 +142,7 @@ def _extend_event_menu(sender, **kwargs):
         return (has_contributions_with_user_paper_submission_rights(event, session.user) or
                 event.cfp.is_staff(session.user))
 
-    yield MenuEntryData(title=_("Call for Papers"), name='call_for_papers',
+    yield MenuEntryData(title=_("Paper Peer Reviewing"), name='call_for_papers',
                         endpoint='papers.call_for_papers', position=8,
                         visible=_call_for_papers_visible)
 
