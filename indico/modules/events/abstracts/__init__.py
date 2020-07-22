@@ -51,7 +51,7 @@ def _extend_event_management_menu(sender, event, **kwargs):
     if not event.can_manage(session.user) or not AbstractsFeature.is_allowed_for_event(event):
         return
     return SideMenuItem('abstracts', _('Call for Abstracts'), url_for('abstracts.management', event),
-                        section='workflows')
+                        section='workflows', weight=30)
 
 
 @signals.event.get_feature_definitions.connect

@@ -33,7 +33,7 @@ def _extend_event_management_menu(sender, event, **kwargs):
     if not event.cfp.is_manager(session.user) or not PapersFeature.is_allowed_for_event(event):
         return
     return SideMenuItem('papers', _('Call for Papers'), url_for('papers.management', event),
-                        section='workflows')
+                        section='workflows', weight=20)
 
 
 @signals.menu.items.connect_via('event-editing-sidemenu')
