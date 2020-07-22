@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: indico 2.3-dev\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2020-07-20 16:44+0200\n"
+"POT-Creation-Date: 2020-07-22 14:43+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -8441,14 +8441,19 @@ msgid "Do you want to delete the attached minutes?"
 msgstr ""
 
 #: indico/modules/events/papers/__init__.py:35 indico/modules/events/papers/__init__.py:46
+msgid "Peer Reviewing"
+msgstr ""
+
 #: indico/modules/events/papers/__init__.py:90 indico/modules/events/papers/__init__.py:145
 #: indico/modules/events/papers/templates/management/_base.html:7
 #: indico/modules/events/papers/templates/management/assignment.html:5
-msgid "Call for Papers"
+msgid "Paper Peer Reviewing"
 msgstr ""
 
 #: indico/modules/events/papers/__init__.py:91
-msgid "Gives event managers the opportunity to open a \"Call for Papers\" and use the paper reviewing workflow."
+msgid ""
+"Gives event managers the opportunity to let contribution authors submit papers and use the paper peer reviewing "
+"workflow."
 msgstr ""
 
 #: indico/modules/events/papers/__init__.py:101
@@ -8456,7 +8461,7 @@ msgid "Paper Manager"
 msgstr ""
 
 #: indico/modules/events/papers/__init__.py:102
-msgid "Grants management rights for paper reviewing on an event."
+msgid "Grants management rights for paper peer reviewing on an event."
 msgstr ""
 
 #: indico/modules/events/papers/__init__.py:109
@@ -8490,7 +8495,7 @@ msgid "Paper managers"
 msgstr ""
 
 #: indico/modules/events/papers/forms.py:39
-msgid "List of users allowed to manage the call for papers"
+msgid "List of users allowed to manage the paper peer reviewing module"
 msgstr ""
 
 #: indico/modules/events/papers/forms.py:40 indico/modules/events/papers/templates/_paper_list.html:52
@@ -8987,13 +8992,13 @@ msgid ""
 msgstr ""
 
 #: indico/modules/events/papers/templates/management/disabled.html:9
-msgid "Call for Papers disabled"
+msgid "Paper Peer Reviewing disabled"
 msgstr ""
 
 #: indico/modules/events/papers/templates/management/disabled.html:11
 msgid ""
-"\"Call for Papers\" provides an integrated paper management and reviewing module that will allow you to set up a full"
-" paper submission and reviewing workflow."
+"\"Paper Peer Reviewing\" provides an integrated paper management and peer reviewing module that will allow you to set"
+" up a full paper submission and peer reviewing workflow."
 msgstr ""
 
 #: indico/modules/events/papers/templates/management/overview.html:18
