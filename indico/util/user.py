@@ -121,8 +121,8 @@ def principal_from_fossil(fossil, allow_pending=False, allow_groups=True, allow_
 
 
 def principal_from_identifier(identifier, allow_groups=False, allow_external_users=False, allow_event_roles=False,
-                              allow_category_roles=False, allow_registration_forms=False, event_id=None,
-                              soft_fail=False):
+                              allow_category_roles=False, allow_registration_forms=False, allow_emails=False,
+                              event_id=None, soft_fail=False):
     # XXX: this is currently only used in PrincipalList
     # if we ever need to support more than just users, groups, event roles,
     # category roles and registration forms
@@ -198,7 +198,6 @@ def principal_from_identifier(identifier, allow_groups=False, allow_external_use
     elif type_ == 'CategoryRole':
         if not allow_category_roles:
             raise ValueError('Category roles are not allowed')
-
         event = Event.get(event_id)
         if event is None:
             raise ValueError('Invalid event id: {}'.format(event_id))
@@ -226,5 +225,9 @@ def principal_from_identifier(identifier, allow_groups=False, allow_external_use
         if registration_form is None or registration_form.event_id != event_id:
             raise ValueError('Invalid registration form: {}'.format(reg_form_id))
         return registration_form
+    elif type_ == 'Email':
+        if not allow_emails:
+            raise ValueError('Emails are not allowed')
+        return EmailPrincipal(data)
     else:
         raise ValueError('Invalid data')

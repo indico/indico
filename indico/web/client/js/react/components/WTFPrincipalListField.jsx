@@ -35,7 +35,7 @@ export function WTFPrincipalListField({fieldId, defaultValue, protectedFieldId, 
     principals => {
       inputField.value = JSON.stringify(principals);
       setValue(principals);
-      inputField.dispatchEvent(new Event('change'));
+      inputField.dispatchEvent(new Event('change', {bubbles: true}));
     },
     [inputField]
   );
