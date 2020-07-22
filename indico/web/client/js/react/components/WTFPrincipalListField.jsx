@@ -1,3 +1,10 @@
+// This file is part of Indico.
+// Copyright (C) 2002 - 2020 CERN
+//
+// Indico is free software; you can redistribute it and/or
+// modify it under the terms of the MIT License; see the
+// LICENSE file for more details.
+
 import React, {useCallback, useEffect, useMemo, useState} from 'react';
 import PropTypes from 'prop-types';
 import {PrincipalListField} from 'indico/react/components/principals';
@@ -41,7 +48,6 @@ export function WTFPrincipalListField({fieldId, defaultValue, protectedFieldId, 
       onFocus={() => {}}
       onBlur={() => {}}
       value={value}
-      required
       {...otherProps}
     />
   );
@@ -50,7 +56,7 @@ export function WTFPrincipalListField({fieldId, defaultValue, protectedFieldId, 
 WTFPrincipalListField.propTypes = {
   fieldId: PropTypes.string.isRequired,
   defaultValue: PropTypes.arrayOf(PropTypes.string),
-  protectedFieldId: PropTypes.instanceOf(PropTypes.string),
+  protectedFieldId: PropTypes.string,
 };
 
 WTFPrincipalListField.defaultProps = {

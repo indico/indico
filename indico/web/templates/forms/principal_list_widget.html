@@ -31,7 +31,7 @@
             withExternalUsers: {{ (field.allow_external or field.allow_external_users) | tojson }},
             withEventRoles: {{ field.allow_event_roles | default(False) | tojson }},
             withCategoryRoles: {{ field.allow_category_roles | default(False) | tojson }},
-            withRegistrationForms: {{ field.allow_registration_forms | default(False) | tojson }},
+            withRegistrationForms: {{ field.allow_registration_forms | tojson }},
             withNetworks: {{ field.allow_networks | default(False) | tojson }},
             protectedFieldId: {{ field.protected_field_id | default(None) | tojson }},
             legacy: {{ field.legacy | default(False) | tojson }}

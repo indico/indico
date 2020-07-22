@@ -617,7 +617,8 @@ class InvitedAbstractMixin(object):
                                              choices=(('existing', _('Existing user')),
                                                       ('new', _('New user'))))
     submitter = PrincipalField(_('Submitter'),
-                               [HiddenUnless('users_with_no_account', 'existing'), DataRequired()], allow_external=True,
+                               [HiddenUnless('users_with_no_account', 'existing'), DataRequired()],
+                               allow_external_users=True,
                                description=_('The person invited to submit the abstract'))
     first_name = StringField(_('First name'), [HiddenUnless('users_with_no_account', 'new'), DataRequired()])
     last_name = StringField(_('Family name'), [HiddenUnless('users_with_no_account', 'new'), DataRequired()])

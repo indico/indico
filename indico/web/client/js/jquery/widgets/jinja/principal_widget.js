@@ -15,7 +15,7 @@
         fieldId: null,
         eventId: null,
         required: false,
-        allowExternal: false,
+        withExternalUsers: false,
       },
       options
     );
@@ -36,7 +36,8 @@
 
     field.principalfield({
       eventId: options.eventId,
-      allowExternalUsers: options.allowExternal,
+      allowExternalUsers: options.withExternalUsers,
+      groups: true,
       enableGroupsTab: false,
       render: function(users) {
         var name = users[0] ? users[0].name : '';
