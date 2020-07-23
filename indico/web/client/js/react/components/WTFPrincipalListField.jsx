@@ -10,7 +10,12 @@ import PropTypes from 'prop-types';
 import {PrincipalListField} from 'indico/react/components/principals';
 import {useFavoriteUsers} from 'indico/react/hooks';
 
-export function WTFPrincipalListField({fieldId, defaultValue, protectedFieldId, ...otherProps}) {
+export default function WTFPrincipalListField({
+  fieldId,
+  defaultValue,
+  protectedFieldId,
+  ...otherProps
+}) {
   const favoriteUsersController = useFavoriteUsers();
   const protectedField = useMemo(
     () => protectedFieldId && document.getElementById(protectedFieldId),
