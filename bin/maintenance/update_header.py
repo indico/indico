@@ -157,9 +157,9 @@ def blacklisted(root, path, _cache={}):
 @click.command(help=USAGE)
 @click.option('--ci', is_flag=True, help='Indicate that the script is running during CI and should use a non-zero '
                                          'exit code unless all headers were already up to date.')
-@click.option('--year', type=click.IntRange(min=1000), default=date.today().year,
+@click.option('--year', '-y', type=click.IntRange(min=1000), default=date.today().year, metavar='YEAR',
               help='Indicate the target year (1000+)')
-@click.option('--path', type=click.Path(exists=True), help='Restrict updates to a specific file or directory')
+@click.option('--path', '-p', type=click.Path(exists=True), help='Restrict updates to a specific file or directory')
 @click.argument('project')
 @click.pass_context
 def main(ctx, ci, project, year, path):
