@@ -20,7 +20,9 @@ Major Features
 - Registrants can now be added to event ACLs. This can be used to easily restrict
   parts of an event to registered participants. If registration is open and a registration
   form is in the ACL, people will be able to access the registration form even if they
-  would otherwise not have access to the event itself. (:issue:`4477`, :issue:`4528`)
+  would otherwise not have access to the event itself. It is also possible to restrict
+  individual event materials to registered participants. (:issue:`4477`, :issue:`4528`,
+  :issue:`4505`)
 - Add a new Editing module for papers, slides and posters which provides a workflow
   for having a team review the layout/formatting of such proceedings and then publish
   the final version on the page of the corresponding contribution. The Editing module
