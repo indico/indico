@@ -126,6 +126,7 @@ def _update_header(project, file_path, year, substring, regex, data):
         print(cformat('%{green!}Updating header of %{blue!}{}').format(os.path.relpath(file_path)))
         with open(file_path, 'wb') as file_write:
             file_write.write(content)
+        return True
     elif not found:
         print('Missing header in {}'.format(os.path.relpath(file_path)))
         return True
