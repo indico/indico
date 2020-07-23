@@ -18,7 +18,7 @@ window.setupPrincipalListWidget = function setupPrincipalListWidget({fieldId, ..
       withEventRoles: false,
       withCategoryRoles: false,
       withRegistrants: false,
-      withEmails: true,
+      withEmails: false,
     },
     ...options,
   };
