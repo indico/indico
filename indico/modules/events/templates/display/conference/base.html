@@ -38,13 +38,17 @@
                                 {%- trans tz=event.display_tzinfo.zone %}{{ tz }} timezone{% endtrans -%}
                             </div>
                         </div>
-                        {{ template_hook('now-happening', event=event, text_color_css=conf_layout_params.text_color_css) }}
-                        {{ template_hook('conference-header-subtitle', event=event) }}
+                        {% if event.can_access(session.user) %}
+                            {{ template_hook('now-happening', event=event, text_color_css=conf_layout_params.text_color_css) }}
+                            {{ template_hook('conference-header-subtitle', event=event) }}
+                        {% endif %}
                     </div>
-                    {{ template_hook('conference-header-right-column', event=event) }}
+                    {% if event.can_access(session.user) %}
+                        {{ template_hook('conference-header-right-column', event=event) }}
+                    {% endif %}
                 </div>
             </div>
-            {% if conf_layout_params.announcement %}
+            {% if conf_layout_params.announcement and event.can_access(session.user) %}
                 <div class="simpleTextAnnouncement">{{ conf_layout_params.announcement }}</div>
             {% endif %}
         </div>

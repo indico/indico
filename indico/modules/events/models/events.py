@@ -422,6 +422,7 @@ class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionMan
     contact_title = _EventSettingProperty(event_contact_settings, 'title')
     contact_emails = _EventSettingProperty(event_contact_settings, 'emails')
     contact_phones = _EventSettingProperty(event_contact_settings, 'phones')
+    public_regform_access = _EventSettingProperty(event_core_settings, 'public_regform_access')
 
     @classmethod
     def category_chain_overlaps(cls, category_ids):
@@ -584,6 +585,14 @@ class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionMan
     def editable_types(self):
         from indico.modules.events.editing.settings import editing_settings
         return editing_settings.get(self, 'editable_types')
+
+    @property
+    def has_regform_in_acl(self):
+        return any(
+            entry.registration_form.is_scheduled
+            for entry in self.acl_entries
+            if entry.type == PrincipalType.registration_form
+        )
 
     @property
     @contextmanager

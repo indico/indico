@@ -190,31 +190,32 @@
                 {{ _render_nav_bar() }}
             {% endif %}
 
-            {% if print_url %}
-                <a class="i-button text-color subtle icon-print" href="{{ print_url }}"
-                   title="{% trans %}Printable version{% endtrans %}"></a>
+            {% if event.can_access(session.user) %}
+                {% if print_url %}
+                    <a class="i-button text-color subtle icon-print" href="{{ print_url }}"
+                       title="{% trans %}Printable version{% endtrans %}"></a>
+                {% endif %}
+
+                {% if show_filter_button %}
+                    {{ _render_filters() }}
+                {% endif %}
+
+                <a class="i-button text-color subtle icon-calendar js-export-ical" id="exportIcal{{ event.id }}" data-id="{{ event.id }}"
+                   title="{% trans %}Export to iCal{% endtrans %}"></a>
+                {{ template_hook('event-ical-export', event=event) }}
+
+                {% if event.type == 'meeting' %}
+                    <a class="i-button text-color subtle icon-file-pdf" title="{% trans %}Export to PDF{% endtrans %}"
+                       data-href="{{ url_for('timetable.export_pdf', event) }}"
+                       data-ajax-dialog></a>
+                {% endif %}
+
+                <a class="i-button text-color subtle icon-package-download" href="{{ url_for('attachments.package', event) }}"
+                   title="{% trans %}Download material{% endtrans %}"></a>
+
+                {{ _render_theme_selector() }}
+                <span class="separator"></span>
             {% endif %}
-
-            {% if show_filter_button %}
-                {{ _render_filters() }}
-            {% endif %}
-
-            <a class="i-button text-color subtle icon-calendar js-export-ical" id="exportIcal{{ event.id }}" data-id="{{ event.id }}"
-               title="{% trans %}Export to iCal{% endtrans %}"></a>
-            {{ template_hook('event-ical-export', event=event) }}
-
-            {% if event.type == 'meeting' %}
-                <a class="i-button text-color subtle icon-file-pdf" title="{% trans %}Export to PDF{% endtrans %}"
-                   data-href="{{ url_for('timetable.export_pdf', event) }}"
-                   data-ajax-dialog></a>
-            {% endif %}
-
-            <a class="i-button text-color subtle icon-package-download" href="{{ url_for('attachments.package', event) }}"
-               title="{% trans %}Download material{% endtrans %}"></a>
-
-            {{ _render_theme_selector() }}
-
-            <span class="separator"></span>
 
             {{ template_hook('url-shortener', event=event, classes='i-button text-color subtle icon-link') }}
 

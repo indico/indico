@@ -4,12 +4,21 @@
     {% extends 'events/registration/display/_meeting_registration_base.html' %}
 {% endif %}
 
+{% from 'message_box.html' import message_box %}
+
 {% block subtitle %}
     {% trans %}Available forms{% endtrans %}
 {% endblock %}
 
 {% block content %}
-{% set any_published_registrations = regforms|selectattr('publish_registration_count')|any %}
+    {% set any_published_registrations = regforms|selectattr('publish_registration_count')|any %}
+    {% if is_restricted_access %}
+        {% call message_box('warning') %}
+            {% trans -%}
+                Access to the rest of this event is restricted to registered participants.
+            {%- endtrans %}
+        {% endcall %}
+    {% endif %}
     <table id="regforms-list" class="i-table-widget">
         <thead>
             <tr>
@@ -86,7 +95,7 @@
             {% endfor %}
         </tbody>
     </table>
-    {% if event.type != 'conference' %}
+    {% if event.type != 'conference' and event.can_access(session.user) %}
         <p>
             <a href="{{ event.url }}" class="i-button">
                 {%- trans %}Back to the event{% endtrans -%}

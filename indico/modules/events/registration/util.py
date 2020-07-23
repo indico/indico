@@ -466,7 +466,7 @@ def generate_ticket_qr_code(registration):
     return qr.make_image()._img
 
 
-def get_event_regforms(event, user, with_registrations=False):
+def get_event_regforms(event, user, with_registrations=False, only_in_acl=False):
     """Get registration forms with information about user registrations.
 
     :param event: the `Event` to get registration forms for
@@ -474,6 +474,8 @@ def get_event_regforms(event, user, with_registrations=False):
     :param with_registrations: Whether to return the user's
                                registration instead of just
                                whether they have one
+    :param only_in_acl: Whether to include only registration forms
+                        that are in the event's ACL
     """
     if not user:
         registered_user = db.literal(None if with_registrations else False)
@@ -485,6 +487,8 @@ def get_event_regforms(event, user, with_registrations=False):
              .with_entities(RegistrationForm, registered_user)
              .options(undefer('active_registration_count'))
              .order_by(db.func.lower(RegistrationForm.title)))
+    if only_in_acl:
+        query = query.filter(RegistrationForm.in_event_acls.any(event=event))
     if with_registrations:
         query = query.outerjoin(Registration, db.and_(Registration.registration_form_id == RegistrationForm.id,
                                                       Registration.user == user,
@@ -492,18 +496,20 @@ def get_event_regforms(event, user, with_registrations=False):
     return query.all()
 
 
-def get_event_regforms_registrations(event, user, include_scheduled=True):
+def get_event_regforms_registrations(event, user, include_scheduled=True, only_in_acl=False):
     """Get regforms and the associated registrations for an event+user.
 
     :param event: the `Event` to get registration forms for
     :param user: A `User`
     :param include_scheduled: Whether to include scheduled
                               but not open registration forms
+    :param only_in_acl: Whether to include only registration forms
+                        that are in the event's ACL
     :return: A tuple, which includes:
             - All registration forms which are scheduled, open or registered.
             - A dict mapping all registration forms to the user's registration if they have one.
     """
-    all_regforms = get_event_regforms(event, user, with_registrations=True)
+    all_regforms = get_event_regforms(event, user, with_registrations=True, only_in_acl=only_in_acl)
     if include_scheduled:
         displayed_regforms = [regform for regform, registration in all_regforms
                               if regform.is_scheduled or registration]

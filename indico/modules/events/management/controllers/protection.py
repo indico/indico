@@ -86,7 +86,8 @@ class RHEventProtection(RHManageEventBase):
             update_event_protection(self.event, {'protection_mode': form.protection_mode.data,
                                                  'own_no_access_contact': form.own_no_access_contact.data,
                                                  'access_key': form.access_key.data,
-                                                 'visibility': form.visibility.data})
+                                                 'visibility': form.visibility.data,
+                                                 'public_regform_access': form.public_regform_access.data})
             self._update_session_coordinator_privs(form)
             flash(_('Protection settings have been updated'), 'success')
             return redirect(url_for('.protection', self.event))
@@ -104,7 +105,9 @@ class RHEventProtection(RHManageEventBase):
 
         return dict({'protection_mode': self.event.protection_mode, 'registration_managers': registration_managers,
                      'access_key': self.event.access_key, 'visibility': self.event.visibility,
-                     'own_no_access_contact': self.event.own_no_access_contact, 'permissions': permissions},
+                     'own_no_access_contact': self.event.own_no_access_contact,
+                     'public_regform_access': self.event.public_regform_access,
+                     'permissions': permissions},
                     **coordinator_privs)
 
     def _update_session_coordinator_privs(self, form):

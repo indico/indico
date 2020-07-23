@@ -7,12 +7,14 @@
 
 from __future__ import unicode_literals
 
-from flask import flash, request, session
+from flask import flash, redirect, request, session
 from werkzeug.exceptions import Forbidden, NotFound
 
 from indico.modules.events import Event
+from indico.modules.events.registration.util import get_event_regforms_registrations
 from indico.modules.events.views import WPAccessKey
 from indico.util.i18n import _
+from indico.web.flask.util import url_for
 from indico.web.rh import RH
 
 
@@ -50,6 +52,8 @@ class RHDisplayEventBase(RHProtectedEventBase):
         except Forbidden:
             if self.event.access_key:
                 raise AccessKeyRequired
+            elif self.event.has_regform_in_acl and self.event.public_regform_access:
+                raise RegistrationRequired
 
             msg = [_("You are not authorized to access this event.")]
             if self.event.no_access_contact:
@@ -60,12 +64,26 @@ class RHDisplayEventBase(RHProtectedEventBase):
     def _show_access_key_form(self):
         return WPAccessKey.render_template('display/access_key.html', event=self.event)
 
+    def _show_registration_form(self):
+        displayed_regforms, user_registrations = get_event_regforms_registrations(self.event, session.user)
+        if len(displayed_regforms) == 1:
+            return redirect(url_for('event_registration.display_regform', displayed_regforms[0]))
+        return redirect(url_for('event_registration.display_regform_list', self.event))
+
     def _do_process(self):
         try:
             return RHEventBase._do_process(self)
         except AccessKeyRequired:
             return self._show_access_key_form()
+        except RegistrationRequired:
+            if request.is_xhr:
+                raise
+            return self._show_registration_form()
 
 
 class AccessKeyRequired(Forbidden):
+    pass
+
+
+class RegistrationRequired(Forbidden):
     pass

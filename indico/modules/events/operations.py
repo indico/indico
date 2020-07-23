@@ -275,7 +275,8 @@ def _format_person(data):
 
 
 def update_event_protection(event, data):
-    assert set(data.viewkeys()) <= {'protection_mode', 'own_no_access_contact', 'access_key', 'visibility'}
+    assert set(data.viewkeys()) <= {'protection_mode', 'own_no_access_contact', 'access_key',
+                                    'visibility', 'public_regform_access'}
     changes = event.populate_from_dict(data)
     db.session.flush()
     signals.event.updated.send(event, changes=changes)
@@ -285,7 +286,8 @@ def update_event_protection(event, data):
                       'own_no_access_contact': 'No access contact',
                       'access_key': {'title': 'Access key', 'type': 'string'},
                       'visibility': {'title': 'Visibility', 'type': 'string',
-                                     'convert': lambda changes: [_format_visibility(event, x) for x in changes]}}
+                                     'convert': lambda changes: [_format_visibility(event, x) for x in changes]},
+                      'public_regform_access': 'Public registration form access'}
         event.log(EventLogRealm.management, EventLogKind.change, 'Event', 'Protection updated', session.user,
                   data={'Changes': make_diff_log(changes, log_fields)})
 
