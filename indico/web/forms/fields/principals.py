@@ -87,10 +87,14 @@ class PrincipalListField(HiddenField):
 
     def process_formdata(self, valuelist):
         if valuelist:
-            self.data = {self._convert_principal(x) for x in json.loads(valuelist[0])}
+            self._submitted_data = json.loads(valuelist[0])
+            self.data = {self._convert_principal(x) for x in self._submitted_data}
 
     def _value(self):
-        return [x.identifier for x in self._get_data()]
+        try:
+            return self._submitted_data
+        except AttributeError:
+            return [x.identifier for x in self._get_data()]
 
     def _get_data(self):
         return sorted(self.data) if self.data else []
