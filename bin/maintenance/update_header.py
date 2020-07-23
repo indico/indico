@@ -95,7 +95,7 @@ to the current year.
 You need to specify which project it is (one of {projects}) to the correct
 headers are used.
 
-You can specify a year (1000+) to update to as well as a file or directory.
+You can specify a year to update to as well as a file or directory.
 This will update all the supported files in the scope including those not tracked
 by git. If the directory does not contain any supported files (or if the file
 specified is not supported) nothing will be updated.
@@ -162,7 +162,7 @@ def blacklisted(root, path, _cache={}):
                                          'exit code unless all headers were already up to date. This also prevents '
                                          'files from actually being updated.')
 @click.option('--year', '-y', type=click.IntRange(min=1000), default=date.today().year, metavar='YEAR',
-              help='Indicate the target year (1000+)')
+              help='Indicate the target year')
 @click.option('--path', '-p', type=click.Path(exists=True), help='Restrict updates to a specific file or directory')
 @click.argument('project')
 @click.pass_context
