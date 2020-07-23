@@ -153,10 +153,13 @@
 {# Renders a form with the most common default markup #}
 {% macro simple_form(form, fields=none, submit=none, back=none, back_url=none, back_button=true,
                      disabled_until_change=true, disabled_fields=(), form_header_kwargs={}, skip_labels=false,
-                     save_reminder=false, footer_align_right=false, disable_if_locked=true) %}
+                     save_reminder=false, footer_align_right=false, disable_if_locked=true, message=none) %}
     {% set submit = submit or _('Save') %}
     {% set back = back or _('Back') %}
     {{ form_header(form, disable_if_locked=disable_if_locked, **form_header_kwargs) }}
+    {% if message %}
+        {{ message_box('warning', message=message, icon=true) }}
+    {% endif %}
     {% if caller %}
         {{ caller() }}
     {% else %}

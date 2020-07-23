@@ -252,6 +252,13 @@ class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionMan
         default=''
     )
 
+    #: The ID of the uploaded custom book of abstracts (if available)
+    custom_boa_id = db.Column(
+        db.Integer,
+        db.ForeignKey('indico.files.id'),
+        nullable=True
+    )
+
     #: The last user-friendly registration ID
     _last_friendly_registration_id = db.deferred(db.Column(
         'last_friendly_registration_id',
@@ -359,6 +366,15 @@ class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionMan
         lazy=True,
         backref=db.backref(
             'events',
+            lazy=True
+        )
+    )
+    #: The custom book of abstracts
+    custom_boa = db.relationship(
+        'File',
+        lazy=True,
+        backref=db.backref(
+            'custom_boa_of',
             lazy=True
         )
     )
@@ -593,6 +609,10 @@ class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionMan
             for entry in self.acl_entries
             if entry.type == PrincipalType.registration_form
         )
+
+    @property
+    def has_custom_boa(self):
+        return self.custom_boa_id is not None
 
     @property
     @contextmanager

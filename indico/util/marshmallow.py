@@ -326,3 +326,22 @@ class FilesField(ModelList):
         if not self.allow_claimed and any(f.claimed for f in rv):
             self.fail('claimed')
         return rv
+
+
+class FileField(ModelField):
+    """Marshmallow field for one previously-uploaded file"""
+
+    default_error_messages = dict(ModelList.default_error_messages, **{
+        'claimed': 'File has already been claimed',
+    })
+
+    def __init__(self, allow_claimed=False, **kwargs):
+        from indico.modules.files.models.files import File
+        self.allow_claimed = allow_claimed
+        super(FileField, self).__init__(model=File, column='uuid', column_type=UUID, **kwargs)
+
+    def _deserialize(self, value, attr, data):
+        rv = super(FileField, self)._deserialize(value, attr, data)
+        if not self.allow_claimed and rv is not None and rv.claimed:
+            self.fail('claimed')
+        return rv

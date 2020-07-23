@@ -50,6 +50,7 @@ class File(StoredFileMixin, db.Model):
 
     # relationship backrefs:
     # - editing_revision_files (EditingRevisionFile.file)
+    # - custom_boa_of (Event.custom_boa)
 
     def claim(self, **meta):
         """Mark the file as claimed by some object it's linked to.

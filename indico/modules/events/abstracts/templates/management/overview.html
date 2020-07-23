@@ -94,16 +94,23 @@
                 <div class="label">
                     {%- trans %}Book of abstracts{% endtrans -%}
                 </div>
-                {% if indico_config.LATEX_ENABLED %}
+                {% if indico_config.LATEX_ENABLED or event.has_custom_boa %}
                     {% set link_start %}<a class="arrow js-dropdown" data-toggle="dropdown">{% endset %}
                     {% set link_end %}</a>{% endset %}
                     {%- trans -%}
                         Customize and {{ link_start }}download{{ link_end }} the book of abstracts
                     {%- endtrans -%}
                     <ul class="i-dropdown">
-                        <li>
-                            <a href="{{ url_for('.export_boa', event) }}">PDF</a>
-                        </li>
+                        {% if event.has_custom_boa %}
+                            <li>
+                                <a href="{{ url_for('.export_boa', event) }}">Custom PDF</a>
+                            </li>
+                        {% endif %}
+                        {% if indico_config.LATEX_ENABLED %}
+                            <li>
+                                <a href="{{ url_for('.export_boa', event, latex='1') }}">PDF</a>
+                            </li>
+                        {% endif %}
                         <li>
                             <a href="{{ url_for('.export_boa_tex', event) }}">LaTeX</a>
                         </li>
@@ -117,11 +124,12 @@
                 {% endif %}
             </div>
             <div class="toolbar">
+                <div id="boa-custom-upload" data-event-id="{{ event.id }}"></div>
                 <a href="#" class="i-button icon-settings"
-                   data-href="{{ url_for('.manage_boa', event) }}"
+                   data-href="{{ url_for('.manage_boa_settings', event) }}"
                    data-title="{% trans %}Configure the book of abstracts{% endtrans %}"
                    data-ajax-dialog>
-                    {%- trans %}Settings{% endtrans -%}
+                    {%- trans %}LaTeX Settings{% endtrans -%}
                 </a>
             </div>
         </div>

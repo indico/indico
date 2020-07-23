@@ -120,6 +120,7 @@ export default function FileSubmission({onChange, disabled}) {
                     <Translate>Or</Translate>
                   </Divider>
                   <Button
+                    type="button"
                     styleName="file-selection-btn"
                     icon="upload"
                     content={Translate.string('Choose from your computer')}

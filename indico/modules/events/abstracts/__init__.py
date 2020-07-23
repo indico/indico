@@ -151,8 +151,8 @@ def _extend_event_menu(sender, **kwargs):
     from indico.modules.events.contributions import contribution_settings
 
     def _boa_visible(event):
-        return (config.LATEX_ENABLED and event.has_feature('abstracts')
-                and contribution_settings.get(event, 'published'))
+        return (event.has_feature('abstracts') and contribution_settings.get(event, 'published')
+                and (config.LATEX_ENABLED or event.has_custom_boa))
 
     def _reviewing_area_visible(event):
         if not session.user or not event.has_feature('abstracts'):
