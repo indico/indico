@@ -101,7 +101,10 @@ jobs:
 
       - name: Check headers
         if: success() || failure()
-        run: python bin/maintenance/update_header.py indico
+        run: |
+          echo "::add-matcher::.github/matchers/headers-problem-matcher.json"
+          python bin/maintenance/update_header.py indico --ci
+          echo "::remove-matcher owner=headers::"
 
       - name: Run flake8
         if: success() || failure()
