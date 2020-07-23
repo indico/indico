@@ -19,7 +19,7 @@
                 return $('<ul class="merge-info">').append(
                     _.map(FIELDS, function(caption, field) {
                         return $('<li>').append($('<span class="caption">').text(caption + ': '),
-                                                $('<span>').text(data[field]));
+                                                $('<span>').text(data[field] || '-'));
                     }));
             }
 
@@ -29,12 +29,12 @@
         }
 
         function check_users() {
-            var source = JSON.parse($('#source_user').val()),
-                target = JSON.parse($('#target_user').val()),
+            var source = $('#source_user').val(),
+                target = $('#target_user').val(),
                 $form = $('#merge-form'),
                 $submit = $form.find('input[type=submit]');
 
-            if (!source.length || !target.length) {
+            if (!source || !target) {
                 $submit.prop('disabled', true);
                 return;
             }
@@ -42,12 +42,9 @@
             $.ajax({
                 method: 'GET',
                 url: {{ url_for('.users_merge_check') | tojson }},
-                data: {
-                    source: source[0].id,
-                    target: target[0].id
-                }
+                data: {source, target}
             }).done(function(result) {
-                update_data(source[0], target[0]);
+                update_data(result.source, result.target);
 
                 var allow_submit = true,
                     warnings = false;

@@ -109,18 +109,32 @@ class AccessControlListField(PrincipalListField):
         super(AccessControlListField, self).__init__(*args, **kwargs)
 
 
-class PrincipalField(PrincipalListField):
-    """A field that lets you select an Indico user/group ("principal")"""
+class PrincipalField(HiddenField):
+    """A field that lets you select a single Indico user.
 
-    widget = JinjaWidget('forms/principal_widget.html', single_line=True, single_kwargs=True)
+    :param allow_external_users: If "search users with no indico account"
+                                 should be available. Selecting such a user
+                                 will automatically create a pending user once
+                                 the form is submitted, even if other fields
+                                 in the form fail to validate!
+    """
 
-    def _get_data(self):
-        return [] if self.data is None else [self.data]
+    widget = JinjaWidget('forms/principal_widget.html', single_kwargs=True)
+
+    def __init__(self, *args, **kwargs):
+        self.allow_external_users = kwargs.pop('allow_external_users', False)
+        super(PrincipalField, self).__init__(*args, **kwargs)
 
     def process_formdata(self, valuelist):
         if valuelist:
-            data = map(self._convert_principal, json.loads(valuelist[0]))
-            self.data = None if not data else data[0]
+            self._submitted_data = valuelist[0]
+            self.data = principal_from_identifier(self._submitted_data, allow_external_users=self.allow_external_users)
+
+    def _value(self):
+        try:
+            return self._submitted_data
+        except AttributeError:
+            return self.data.identifier if self.data else ''
 
 
 class PermissionsField(JSONField):

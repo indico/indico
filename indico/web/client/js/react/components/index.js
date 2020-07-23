@@ -41,3 +41,4 @@ export {default as WTFDateField} from './WTFDateField';
 export {default as WTFDateTimeField} from './WTFDateTimeField';
 export {default as WTFOccurrencesField} from './WTFOccurrencesField';
 export {default as WTFPrincipalListField} from './WTFPrincipalListField';
+export {default as WTFPrincipalField} from './WTFPrincipalField';
