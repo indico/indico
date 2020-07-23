@@ -9,28 +9,24 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import {WTFPrincipalListField} from 'indico/react/components/WTFPrincipalListField';
 
-(function(global) {
-  'use strict';
-
-  global.setupPrincipalListWidget = function setupPrincipalListWidget({fieldId, ...options}) {
-    options = {
-      ...{
-        eventId: null,
-        withGroups: false,
-        withExternalUsers: false,
-        withEventRoles: false,
-        withCategoryRoles: false,
-        withRegistrationForms: false,
-        withEmails: true,
-      },
-      ...options,
-    };
-    const field = document.getElementById(fieldId);
-    const principals = JSON.parse(field.value);
-
-    ReactDOM.render(
-      <WTFPrincipalListField fieldId={fieldId} defaultValue={principals} {...options} />,
-      document.getElementById('userGroupList-' + fieldId)
-    );
+window.setupPrincipalListWidget = function setupPrincipalListWidget({fieldId, ...options}) {
+  options = {
+    ...{
+      eventId: null,
+      withGroups: false,
+      withExternalUsers: false,
+      withEventRoles: false,
+      withCategoryRoles: false,
+      withRegistrants: false,
+      withEmails: true,
+    },
+    ...options,
   };
-})(window);
+  const field = document.getElementById(fieldId);
+  const principals = JSON.parse(field.value);
+
+  ReactDOM.render(
+    <WTFPrincipalListField fieldId={fieldId} defaultValue={principals} {...options} />,
+    document.getElementById(`userGroupList-${fieldId}`)
+  );
+};
