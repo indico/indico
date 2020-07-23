@@ -4,7 +4,7 @@
       "owner": "headers",
       "pattern": [
         {
-          "regexp": "^(Missing header) in\\s(.+)$",
+          "regexp": "^((?:Missing|Incorrect) header) in (.+)$",
           "message": 1,
           "file": 2
         }
