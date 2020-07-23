@@ -23,7 +23,7 @@ script:
   - FORCE_COLOR=1 npx react-jsx-i18n extract --ext jsx indico/web/client/ indico/modules/ > /dev/null
   - isort -rc --diff --check-only indico/
   - python bin/maintenance/update_backrefs.py --ci
-  - python bin/maintenance/update_header.py indico
+  - python bin/maintenance/update_header.py indico --ci
   - flake8
   - npx eslint --ext .js --ext .jsx indico/modules/rb/ indico/modules/events/logs/ indico/web/client/js/react/
     indico/modules/users/

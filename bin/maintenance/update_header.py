@@ -95,7 +95,7 @@ to the current year.
 You need to specify which project it is (one of {projects}) to the correct
 headers are used.
 
-You can specify a year (1000-2999) to update to as well as a file or directory.
+You can specify a year (1000+) to update to as well as a file or directory.
 This will update all the supported files in the scope including those not tracked
 by git. If the directory does not contain any supported files (or if the file
 specified is not supported) nothing will be updated.
@@ -141,14 +141,6 @@ def update_header(project, file_path, year):
                           SUPPORTED_FILES[ext]['format'])
 
 
-def _process_year(ctx, param, value):
-    year_regex = re.compile('^[12][0-9]{3}$')  # Year range 1000 - 2999
-    if value and not year_regex.match(value):
-        click.echo(ctx.get_help())
-        sys.exit(1)
-    return value or date.today().year
-
-
 def blacklisted(root, path, _cache={}):
     orig_path = path
     if path not in _cache:
@@ -164,9 +156,10 @@ def blacklisted(root, path, _cache={}):
 @click.command(help=USAGE)
 @click.option('--ci', is_flag=True, help='Indicate that the script is running during CI and should use a non-zero '
                                          'exit code unless all headers were already up to date.')
-@click.argument('project', nargs=1)
-@click.argument('year', nargs=1, required=False, callback=_process_year)
-@click.argument('path', nargs=1, required=False, type=click.Path(exists=True))
+@click.option('--year', type=click.IntRange(min=1000), default=date.today().year,
+              help='Indicate the target year (1000+)')
+@click.option('--path', type=click.Path(exists=True), help='Restrict updates to a specific file or directory')
+@click.argument('project')
 @click.pass_context
 def main(ctx, ci, project, year, path):
     if project not in HEADERS:
@@ -191,10 +184,10 @@ def main(ctx, ci, project, year, path):
         print(cformat("Updating headers to the year %{yellow!}{year}%{reset} for all "
                       "git-tracked files...").format(year=year))
         try:
-            for _path in subprocess.check_output(['git', 'ls-files']).splitlines():
-                _path = os.path.abspath(_path)
-                if not blacklisted(os.getcwd(), os.path.dirname(_path)):
-                    if update_header(project, _path, year):
+            for filepath in subprocess.check_output(['git', 'ls-files']).splitlines():
+                filepath = os.path.abspath(filepath)
+                if not blacklisted(os.getcwd(), os.path.dirname(filepath)):
+                    if update_header(project, filepath, year):
                         error = True
         except subprocess.CalledProcessError:
             raise click.UsageError(cformat('%{red!}You must be within a git repository to run this script.'))
