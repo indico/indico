@@ -77,7 +77,8 @@ class PrincipalListField(HiddenField):
         super(PrincipalListField, self).__init__(*args, **kwargs)
 
     def _convert_principal(self, principal):
-        return principal_from_identifier(principal, event_id=self._event, allow_groups=self.allow_groups,
+        event_id = self._event.id if self._event else None
+        return principal_from_identifier(principal, event_id=event_id, allow_groups=self.allow_groups,
                                          allow_external_users=self.allow_external_users,
                                          allow_event_roles=self.allow_event_roles,
                                          allow_category_roles=self.allow_category_roles,

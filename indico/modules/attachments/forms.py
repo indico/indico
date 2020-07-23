@@ -32,12 +32,15 @@ class AttachmentFormBase(IndicoForm):
                               description=_("Adding materials to folders allow grouping and easier permission "
                                             "management."))
     acl = AccessControlListField(_("Access control list"), [UsedIf(lambda form, field: form.protected.data)],
-                                 allow_groups=True, allow_external_users=True,
+                                 allow_groups=True, allow_external_users=True, allow_event_roles=True,
+                                 allow_category_roles=True, allow_registration_forms=True,
+                                 event=lambda form: form.event,
                                  default_text=_('Restrict access to this material'),
                                  description=_("The list of users and groups allowed to access the material"))
 
     def __init__(self, *args, **kwargs):
         linked_object = kwargs.pop('linked_object')
+        self.event = getattr(linked_object, 'event', None)  # not present in categories
         super(AttachmentFormBase, self).__init__(*args, **kwargs)
         self.folder.query = (AttachmentFolder
                              .find(object=linked_object, is_default=False, is_deleted=False)
