@@ -249,6 +249,11 @@ class PrincipalsMixin(object):
                     'type': 'registration_form',
                     'invalid': principal.is_deleted,
                     'name': principal.title}
+        elif principal.principal_type == PrincipalType.email:
+            return {'identifier': identifier,
+                    'type': 'email',
+                    'invalid': False,
+                    'name': principal.name}
 
     def _process(self):
         return jsonify({identifier: self._serialize_principal(identifier, principal)
@@ -264,7 +269,7 @@ class RHPrincipals(PrincipalsMixin, RHProtected):
     """
 
     @use_kwargs({
-        'values': PrincipalDict(allow_groups=True, allow_external_users=True, missing={})
+        'values': PrincipalDict(allow_groups=True, allow_external_users=True, allow_emails=True, missing={})
     })
     def _process_args(self, values):
         self.values = values
