@@ -54,27 +54,29 @@ class PrincipalListField(HiddenField):
     Principals are users or other objects represending users such as
     groups or roles that can be added to ACLs.
 
-    :param allow_groups: If groups should be selectable.
-    :param allow_registration_forms: If registration form associated
-                                     to an event should be selectable.
-    :param allow_event_roles: If event roles should be selectable.
-    :param allow_category_roles: If category roles should be selectable.
     :param allow_external_users: If "search users with no indico account"
                                  should be available. Selecting such a user
                                  will automatically create a pending user once
                                  the form is submitted, even if other fields
                                  in the form fail to validate!
+    :param allow_groups: If groups should be selectable.
+    :param allow_event_roles: If event roles should be selectable.
+    :param allow_category_roles: If category roles should be selectable.
+    :param allow_registration_forms: If registration form associated
+                                     to an event should be selectable.
+    :param allow_emails: If the field should allow bare emails. Those are not
+                         selectable in the widget, but may be added to an ACL
+                         through other means.
     """
 
     widget = JinjaWidget('forms/principal_list_widget.html', single_kwargs=True)
 
     def __init__(self, *args, **kwargs):
-        self.allow_groups = kwargs.pop('allow_groups', False)
-        # Whether it is allowed to search for external users with no indico account
         self.allow_external_users = kwargs.pop('allow_external_users', False)
-        self.allow_registration_forms = kwargs.pop('allow_registration_forms', False)
+        self.allow_groups = kwargs.pop('allow_groups', False)
         self.allow_event_roles = kwargs.pop('allow_event_roles', False)
         self.allow_category_roles = kwargs.pop('allow_category_roles', False)
+        self.allow_registration_forms = kwargs.pop('allow_registration_forms', False)
         self.allow_emails = kwargs.pop('allow_emails', False)
         self._event = kwargs.pop('event')(kwargs['_form']) if 'event' in kwargs else None
         super(PrincipalListField, self).__init__(*args, **kwargs)
