@@ -7,7 +7,7 @@
 
 import React from 'react';
 import ReactDOM from 'react-dom';
-import {WTFPrincipalListField} from 'indico/react/components/WTFPrincipalListField';
+import {WTFPrincipalListField} from 'indico/react/components';
 
 window.setupPrincipalListWidget = function setupPrincipalListWidget({fieldId, ...options}) {
   options = {
