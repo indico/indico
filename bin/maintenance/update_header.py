@@ -107,7 +107,7 @@ def gen_header(project, data, end_year):
     return '\n'.join(line.rstrip() for line in HEADERS[project].format(**data).strip().splitlines()).encode('ascii')
 
 
-def _update_header(project, file_path, year, substring, regex, data):
+def _update_header(project, file_path, year, substring, regex, data, ci):
     found = False
     with open(file_path, 'rb') as file_read:
         content = orig_content = file_read.read()
@@ -123,23 +123,26 @@ def _update_header(project, file_path, year, substring, regex, data):
         if shebang_line:
             content = shebang_line + '\n' + content
     if content != orig_content:
-        print(cformat('%{green!}Updating header of %{blue!}{}').format(os.path.relpath(file_path)))
-        with open(file_path, 'wb') as file_write:
-            file_write.write(content)
+        msg = 'Incorrect header in {}' if ci else cformat('%{green!}Updating header of %{blue!}{}')
+        print(msg.format(os.path.relpath(file_path)))
+        if not ci:
+            with open(file_path, 'wb') as file_write:
+                file_write.write(content)
         return True
     elif not found:
-        print('Missing header in {}'.format(os.path.relpath(file_path)))
+        msg = 'Missing header in {}' if ci else cformat('%{red!}Missing header%{reset} in %{blue!}{}')
+        print(msg.format(os.path.relpath(file_path)))
         return True
 
 
-def update_header(project, file_path, year):
+def update_header(project, file_path, year, ci):
     ext = file_path.rsplit('.', 1)[-1]
     if ext not in SUPPORTED_FILES or not os.path.isfile(file_path):
         return False
     if os.path.basename(file_path)[0] == '.':
         return False
     return _update_header(project, file_path, year, SUBSTRING, SUPPORTED_FILES[ext]['regex'],
-                          SUPPORTED_FILES[ext]['format'])
+                          SUPPORTED_FILES[ext]['format'], ci)
 
 
 def blacklisted(root, path, _cache={}):
@@ -156,7 +159,8 @@ def blacklisted(root, path, _cache={}):
 
 @click.command(help=USAGE)
 @click.option('--ci', is_flag=True, help='Indicate that the script is running during CI and should use a non-zero '
-                                         'exit code unless all headers were already up to date.')
+                                         'exit code unless all headers were already up to date. This also prevents '
+                                         'files from actually being updated.')
 @click.option('--year', '-y', type=click.IntRange(min=1000), default=date.today().year, metavar='YEAR',
               help='Indicate the target year (1000+)')
 @click.option('--path', '-p', type=click.Path(exists=True), help='Restrict updates to a specific file or directory')
@@ -169,32 +173,40 @@ def main(ctx, ci, project, year, path):
 
     error = False
     if path and os.path.isdir(path):
-        print(cformat("Updating headers to the year %{yellow!}{year}%{reset} for all the files in "
-                      "%{yellow!}{path}%{reset}...").format(year=year, path=path))
+        if not ci:
+            print(cformat("Updating headers to the year %{yellow!}{year}%{reset} for all the files in "
+                          "%{yellow!}{path}%{reset}...").format(year=year, path=path))
         for root, _, filenames in os.walk(path):
             for filename in filenames:
                 if not blacklisted(path, root):
-                    if update_header(project, os.path.join(root, filename), year):
+                    if update_header(project, os.path.join(root, filename), year, ci):
                         error = True
     elif path and os.path.isfile(path):
-        print(cformat("Updating headers to the year %{yellow!}{year}%{reset} for the file "
-                      "%{yellow!}{file}%{reset}...").format(year=year, file=path))
-        if update_header(project, path, year):
+        if not ci:
+            print(cformat("Updating headers to the year %{yellow!}{year}%{reset} for the file "
+                          "%{yellow!}{file}%{reset}...").format(year=year, file=path))
+        if update_header(project, path, year, ci):
             error = True
     else:
-        print(cformat("Updating headers to the year %{yellow!}{year}%{reset} for all "
-                      "git-tracked files...").format(year=year))
+        if not ci:
+            print(cformat("Updating headers to the year %{yellow!}{year}%{reset} for all "
+                          "git-tracked files...").format(year=year))
         try:
             for filepath in subprocess.check_output(['git', 'ls-files']).splitlines():
                 filepath = os.path.abspath(filepath)
                 if not blacklisted(os.getcwd(), os.path.dirname(filepath)):
-                    if update_header(project, filepath, year):
+                    if update_header(project, filepath, year, ci):
                         error = True
         except subprocess.CalledProcessError:
             raise click.UsageError(cformat('%{red!}You must be within a git repository to run this script.'))
 
-    if ci and error:
+    if not error:
+        print(cformat('%{green}\u2705 All headers are up to date').encode('utf-8'))
+    elif ci:
+        print(cformat('%{red}\u274C Some headers need to be updated or added').encode('utf-8'))
         sys.exit(1)
+    else:
+        print(cformat('%{yellow}\U0001F504 Some headers have been updated (or are missing)').encode('utf-8'))
 
 
 if __name__ == '__main__':
