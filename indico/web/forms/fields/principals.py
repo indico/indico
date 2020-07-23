@@ -49,7 +49,10 @@ def serialize_principal(principal):
 
 
 class PrincipalListField(HiddenField):
-    """A field that lets you select a list Indico user/group ("principal")
+    """A field that lets you select a list of principals.
+
+    Principals are users or other objects represending users such as
+    groups or roles that can be added to ACLs.
 
     :param allow_groups: If groups should be selectable.
     :param allow_registration_forms: If registration form associated
