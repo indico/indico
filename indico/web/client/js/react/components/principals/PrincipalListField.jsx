@@ -135,6 +135,7 @@ const PrincipalListField = props => {
               text={Translate.string('Event Role')}
               options={asOptions(eventRoles)}
               onChange={handleAddItems}
+              disabled={disabled}
             />
           )}
           {categoryRoles.length !== 0 && (
@@ -142,6 +143,7 @@ const PrincipalListField = props => {
               text={Translate.string('Category Role')}
               options={asOptions(categoryRoles)}
               onChange={handleAddItems}
+              disabled={disabled}
             />
           )}
           {registrationForms.length !== 0 && (
@@ -151,6 +153,7 @@ const PrincipalListField = props => {
                 Translate.string('Registrants in "{form}"', {form})
               )}
               onChange={handleAddItems}
+              disabled={disabled}
             />
           )}
         </Button.Group>
@@ -187,14 +190,14 @@ PrincipalListField.defaultProps = {
 
 export default React.memo(PrincipalListField);
 
-function AddPrincipalDropdown({text, options, onChange}) {
+function AddPrincipalDropdown({text, options, disabled, onChange}) {
   return (
     <Dropdown
       text={text}
       button
       upward
       floating
-      disabled={options.length === 0}
+      disabled={disabled || options.length === 0}
       options={options}
       openOnFocus={false}
       selectOnBlur={false}
@@ -208,6 +211,7 @@ AddPrincipalDropdown.propTypes = {
   text: PropTypes.string.isRequired,
   options: PropTypes.array.isRequired,
   onChange: PropTypes.func.isRequired,
+  disabled: PropTypes.bool.isRequired,
 };
 
 /**
