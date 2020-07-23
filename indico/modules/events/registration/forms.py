@@ -18,6 +18,7 @@ from wtforms.fields.html5 import DecimalField, EmailField
 from wtforms.validators import DataRequired, Email, InputRequired, NumberRange, Optional, ValidationError
 from wtforms.widgets.html5 import NumberInput
 
+from indico.core import signals
 from indico.core.config import config
 from indico.modules.designer import PageLayout, PageOrientation, PageSize, TemplateType
 from indico.modules.designer.util import get_default_template_on_category, get_inherited_templates
@@ -383,6 +384,7 @@ class BadgeSettingsForm(IndicoForm):
     def __init__(self, event, **kwargs):
         all_templates = set(event.designer_templates) | get_inherited_templates(event)
         badge_templates = [tpl for tpl in all_templates if tpl.type.name == 'badge']
+        signals.event.filter_selectable_badges.send(type(self), badge_templates=badge_templates)
         tickets = kwargs.pop('tickets')
         super(BadgeSettingsForm, self).__init__(**kwargs)
         self.template.choices = sorted(((unicode(tpl.id), tpl.title)

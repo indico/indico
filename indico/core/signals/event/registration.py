@@ -80,3 +80,10 @@ the ticket qr code is considered a ticket, and the restriction applies to
 both users trying to get their own ticket and managers trying to get a
 ticket for a registrant.
 """)
+
+filter_selectable_badges = _signals.signal('filter-selectable-badges', """
+Called when composing lists of badge templates. The `sender` may be either
+``BadgeSettingsForm``, ``RHListEventTemplates`` or ``RHListCategoryTemplates``.
+The list of badge templates is passed in the `badge_templates` kwarg.
+The signal handler is expected to mutate the list.
+""")

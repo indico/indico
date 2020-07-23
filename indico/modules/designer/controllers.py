@@ -15,6 +15,7 @@ from flask import flash, jsonify, request, session
 from PIL import Image
 from werkzeug.exceptions import Forbidden
 
+from indico.core import signals
 from indico.core.db import db
 from indico.core.errors import UserValueError
 from indico.modules.categories import Category
@@ -162,8 +163,10 @@ class TemplateListMixin(TargetFromURLMixin):
         templates = get_inherited_templates(self.target)
         not_deletable = get_not_deletable_templates(self.target)
         default_template = get_default_template_on_category(self.target) if isinstance(self.target, Category) else None
+        signals.event.filter_selectable_badges.send(type(self), badge_templates=templates)
+        signals.event.filter_selectable_badges.send(type(self), badge_templates=not_deletable)
         return self._render_template('list.html', inherited_templates=templates, not_deletable_templates=not_deletable,
-                                     default_template=default_template,)
+                                     default_template=default_template)
 
 
 class CloneTemplateMixin(TargetFromURLMixin):
