@@ -51,7 +51,7 @@ from indico.util.event import truncate_path
 from indico.util.fs import secure_filename
 from indico.util.i18n import _
 from indico.util.images import square
-from indico.util.marshmallow import HumanizedDate, validate_with_message
+from indico.util.marshmallow import HumanizedDate, Principal, validate_with_message
 from indico.util.signals import values_from_signal
 from indico.util.string import crc32, make_unique_token
 from indico.web.args import use_kwargs
@@ -571,11 +571,13 @@ class RHUsersAdminMerge(RHAdminBase):
 
 
 class RHUsersAdminMergeCheck(RHAdminBase):
-    def _process(self):
-        source = User.get_or_404(request.args['source'])
-        target = User.get_or_404(request.args['target'])
+    @use_kwargs({
+        'source': Principal(allow_external_users=True, required=True),
+        'target': Principal(allow_external_users=True, required=True),
+    })
+    def _process(self, source, target):
         errors, warnings = _get_merge_problems(source, target)
-        return jsonify(errors=errors, warnings=warnings)
+        return jsonify(errors=errors, warnings=warnings, source=serialize_user(source), target=serialize_user(target))
 
 
 class RHRegistrationRequestList(RHAdminBase):

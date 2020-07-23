@@ -5,52 +5,24 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-(function(global) {
-  'use strict';
+import React from 'react';
+import ReactDOM from 'react-dom';
+import {WTFPrincipalField} from 'indico/react/components';
 
-  global.setupPrincipalWidget = function setupPrincipalWidget(options) {
-    options = $.extend(
-      true,
-      {
-        fieldId: null,
-        eventId: null,
-        required: false,
-        withExternalUsers: false,
-      },
-      options
-    );
+window.setupPrincipalWidget = function setupPrincipalWidget({
+  fieldId,
+  required,
+  withExternalUsers,
+}) {
+  const field = document.getElementById(fieldId);
 
-    var field = $('#' + options.fieldId);
-    var button = $('#choose-' + options.fieldId);
-    var display = $('#display-' + options.fieldId);
-
-    if (!options.required) {
-      display.clearableinput({
-        clearOnEscape: false,
-        focusOnClear: false,
-        onClear: function() {
-          field.principalfield('remove');
-        },
-      });
-    }
-
-    field.principalfield({
-      eventId: options.eventId,
-      allowExternalUsers: options.withExternalUsers,
-      groups: true,
-      enableGroupsTab: false,
-      render: function(users) {
-        var name = users[0] ? users[0].name : '';
-        if (!options.required) {
-          display.clearableinput('setValue', name);
-        } else {
-          display.val(name);
-        }
-      },
-    });
-
-    display.add(button).on('click', function() {
-      field.principalfield('choose');
-    });
-  };
-})(window);
+  ReactDOM.render(
+    <WTFPrincipalField
+      fieldId={fieldId}
+      defaultValue={field.value}
+      required={required}
+      withExternalUsers={withExternalUsers}
+    />,
+    document.getElementById(`principalField-${fieldId}`)
+  );
+};

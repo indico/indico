@@ -14,9 +14,9 @@ import {indicoAxios, handleAxiosError} from 'indico/utils/axios';
 import {camelizeKeys} from 'indico/utils/case';
 import {UserSearch} from './Search';
 import {EmptyPrincipalListItem, PendingPrincipalListItem, PrincipalListItem} from './items';
+import {FinalField} from '../../forms';
 
 import './items.module.scss';
-import {FinalField} from '../../forms';
 
 /**
  * A field that lets the user select a user.
@@ -31,6 +31,7 @@ const PrincipalField = props => {
     onBlur,
     favoriteUsersController,
     withExternalUsers,
+    className,
   } = props;
   const [favoriteUsers, [handleAddFavorite, handleDelFavorite]] = favoriteUsersController;
 
@@ -103,7 +104,7 @@ const PrincipalField = props => {
   return (
     <div className="ui input">
       <div className="fake-input">
-        <List relaxed>
+        <List relaxed className={className}>
           {!value ? (
             <EmptyPrincipalListItem search={userSearch} />
           ) : details ? (
@@ -138,12 +139,14 @@ PrincipalField.propTypes = {
   onBlur: PropTypes.func.isRequired,
   favoriteUsersController: PropTypes.array.isRequired,
   withExternalUsers: PropTypes.bool,
+  className: PropTypes.string,
 };
 
 PrincipalField.defaultProps = {
   value: null,
   required: false,
   withExternalUsers: false,
+  className: '',
 };
 
 export default React.memo(PrincipalField);
