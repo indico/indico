@@ -131,6 +131,7 @@ Internal Changes
   thanks :user:`omegak`)
 - Add ``extra-regform-settings`` template hook (:issue:`4553`, thanks
   :user:`meluru`)
+- Add ``filter_selectable_badges`` signal (:issue:`4557`, thanks :user:`omegak`)
 
 
 ----
