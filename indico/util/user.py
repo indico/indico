@@ -123,10 +123,6 @@ def principal_from_fossil(fossil, allow_pending=False, allow_groups=True, allow_
 def principal_from_identifier(identifier, allow_groups=False, allow_external_users=False, allow_event_roles=False,
                               allow_category_roles=False, allow_registration_forms=False, allow_emails=False,
                               event_id=None, soft_fail=False):
-    # XXX: this is currently only used in PrincipalList
-    # if we ever need to support more than just users, groups, event roles,
-    # category roles and registration forms
-    # make sure to add it in here as well
     from indico.modules.events.models.events import Event
     from indico.modules.events.models.roles import EventRole
     from indico.modules.categories.models.roles import CategoryRole
