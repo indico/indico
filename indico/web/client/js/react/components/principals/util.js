@@ -99,6 +99,7 @@ export class PrincipalType {
   static eventRole = 'event_role';
   static categoryRole = 'category_role';
   static registrationForm = 'registration_form';
+  static email = 'email';
   /* eslint-enable lines-between-class-members */
 
   static propType = PropTypes.oneOf([
@@ -108,6 +109,7 @@ export class PrincipalType {
     PrincipalType.eventRole,
     PrincipalType.categoryRole,
     PrincipalType.registrationForm,
+    PrincipalType.email,
   ]);
 
   static getPendingText(type) {
@@ -145,6 +147,7 @@ export class PrincipalType {
       [PrincipalType.localGroup]: 'users',
       [PrincipalType.multipassGroup]: 'users',
       [PrincipalType.registrationForm]: 'id badge outline',
+      [PrincipalType.email]: 'envelope outline',
       // event/category roles have no icon but their code
     }[type];
   }
@@ -157,6 +160,7 @@ export class PrincipalType {
       [PrincipalType.categoryRole]: 2,
       [PrincipalType.registrationForm]: 3,
       [PrincipalType.user]: 4,
+      [PrincipalType.email]: 5,
     }[type];
   }
 }
@@ -174,6 +178,8 @@ export function getTypeFromIdentifier(identifier) {
     return PrincipalType.categoryRole;
   } else if (identifier.startsWith('RegistrationForm:')) {
     return PrincipalType.registrationForm;
+  } else if (identifier.startsWith('Email:')) {
+    return PrincipalType.email;
   } else {
     throw new Error(`Identifier ${identifier} has unknown type`);
   }
