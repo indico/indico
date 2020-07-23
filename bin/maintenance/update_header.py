@@ -13,7 +13,12 @@ import subprocess
 import sys
 from datetime import date
 
+import click
+
 from indico.util.console import cformat
+
+
+click.disable_unicode_literals_warning = True
 
 
 HEADERS = {
@@ -83,8 +88,6 @@ SUBSTRING = b'This file is part of'
 
 
 USAGE = """
-python bin/maintenance/update_header.py <PROJECT> [YEAR] [PATH]
-
 Updates all the headers in the supported files ({supported_files}).
 By default, all the files tracked by git in the current repository are updated
 to the current year.
@@ -109,7 +112,7 @@ def _update_header(project, file_path, year, substring, regex, data):
     with open(file_path, 'rb') as file_read:
         content = orig_content = file_read.read()
         if not content.strip():
-            return
+            return False
         shebang_line = None
         if content.startswith(b'#!/'):
             shebang_line, content = content.split('\n', 1)
@@ -131,36 +134,19 @@ def _update_header(project, file_path, year, substring, regex, data):
 def update_header(project, file_path, year):
     ext = file_path.rsplit('.', 1)[-1]
     if ext not in SUPPORTED_FILES or not os.path.isfile(file_path):
-        return
+        return False
     if os.path.basename(file_path)[0] == '.':
-        return
+        return False
     return _update_header(project, file_path, year, SUBSTRING, SUPPORTED_FILES[ext]['regex'],
                           SUPPORTED_FILES[ext]['format'])
 
 
-def _process_args(args):
+def _process_year(ctx, param, value):
     year_regex = re.compile('^[12][0-9]{3}$')  # Year range 1000 - 2999
-    year = date.today().year
-
-    project = args[0]
-    args = args[1:]
-    if project not in HEADERS:
-        print(USAGE)
+    if value and not year_regex.match(value):
+        click.echo(ctx.get_help())
         sys.exit(1)
-
-    # Take year argument if we have one
-    if args and year_regex.match(args[0]):
-        year = int(args[0])
-        args = args[1:]
-    if not args:
-        return project, year, None, None
-    elif os.path.isdir(args[0]):
-        return project, year, args[0], None
-    elif os.path.isfile(args[0]):
-        return project, year, None, args[0]
-    else:
-        print(USAGE)
-        sys.exit(1)
+    return value or date.today().year
 
 
 def blacklisted(root, path, _cache={}):
@@ -175,39 +161,45 @@ def blacklisted(root, path, _cache={}):
     return _cache[orig_path]
 
 
-def main():
-    if '-h' in sys.argv[1:] or '--help' in sys.argv[1:] or not sys.argv[1:]:
-        print(USAGE)
+@click.command(help=USAGE)
+@click.option('--ci', is_flag=True, help='Indicate that the script is running during CI and should use a non-zero '
+                                         'exit code unless all headers were already up to date.')
+@click.argument('project', nargs=1)
+@click.argument('year', nargs=1, required=False, callback=_process_year)
+@click.argument('path', nargs=1, required=False, type=click.Path(exists=True))
+@click.pass_context
+def main(ctx, ci, project, year, path):
+    if project not in HEADERS:
+        click.echo(ctx.get_help())
         sys.exit(1)
 
-    project, year, path, file_ = _process_args(sys.argv[1:])
     error = False
-
-    if path is not None:
+    if path and os.path.isdir(path):
         print(cformat("Updating headers to the year %{yellow!}{year}%{reset} for all the files in "
                       "%{yellow!}{path}%{reset}...").format(year=year, path=path))
         for root, _, filenames in os.walk(path):
             for filename in filenames:
                 if not blacklisted(path, root):
-                    error = update_header(project, os.path.join(root, filename), year) or error
-    elif file_ is not None:
+                    if update_header(project, os.path.join(root, filename), year):
+                        error = True
+    elif path and os.path.isfile(path):
         print(cformat("Updating headers to the year %{yellow!}{year}%{reset} for the file "
-                      "%{yellow!}{file}%{reset}...").format(year=year, file=file_))
-        error = update_header(project, file_, year) or error
+                      "%{yellow!}{file}%{reset}...").format(year=year, file=path))
+        if update_header(project, path, year):
+            error = True
     else:
         print(cformat("Updating headers to the year %{yellow!}{year}%{reset} for all "
                       "git-tracked files...").format(year=year))
         try:
-            for path in subprocess.check_output(['git', 'ls-files']).splitlines():
-                path = os.path.abspath(path)
-                if not blacklisted(os.getcwd(), os.path.dirname(path)):
-                    error = update_header(project, path, year) or error
+            for _path in subprocess.check_output(['git', 'ls-files']).splitlines():
+                _path = os.path.abspath(_path)
+                if not blacklisted(os.getcwd(), os.path.dirname(_path)):
+                    if update_header(project, _path, year):
+                        error = True
         except subprocess.CalledProcessError:
-            print(cformat('%{red!}[ERROR] you must be within a git repository to run this script.'), file=sys.stderr)
-            print(USAGE)
-            sys.exit(1)
+            raise click.UsageError(cformat('%{red!}You must be within a git repository to run this script.'))
 
-    if error:
+    if ci and error:
         sys.exit(1)
 
 
