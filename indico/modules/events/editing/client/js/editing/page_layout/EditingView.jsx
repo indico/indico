@@ -14,7 +14,6 @@ import {useIndicoAxios} from 'indico/react/hooks';
 import {useNumericParam} from 'indico/react/util/routing';
 
 import MenuBar from './MenuBar';
-import Footer from './Footer';
 
 import './EditingView.module.scss';
 
@@ -42,7 +41,6 @@ export default function EditingView({eventTitle, children}) {
           </Header>
           {children}
         </div>
-        <Footer />
       </div>
     </div>
   );

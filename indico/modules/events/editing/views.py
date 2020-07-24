@@ -19,6 +19,3 @@ class WPEditing(WPEventManagement):
 
 class WPEditingView(WPEditing):
     MANAGEMENT = False
-
-    def _get_footer(self):
-        return ''
