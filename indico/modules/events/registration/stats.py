@@ -377,7 +377,7 @@ class AccommodationStats(FieldStats, StatsBase):
         return DataItem(**data)
 
     def _get_table_head(self):
-        head = [Cell(type='str', data=_("Accomodation")), Cell(type='str', data=_("Registrants"))]
+        head = [Cell(type='str', data=_("Accommodation")), Cell(type='str', data=_("Registrants"))]
 
         if self.has_capacity:
             head.append(Cell(type='str', data=_("Occupancy")))
