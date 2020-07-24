@@ -45,6 +45,7 @@ const PrincipalListField = props => {
     withRegistrants,
     eventId,
     favoriteUsersController,
+    className,
   } = props;
   const [favoriteUsers, [handleAddFavorite, handleDelFavorite]] = favoriteUsersController;
 
@@ -82,7 +83,7 @@ const PrincipalListField = props => {
 
   return (
     <>
-      <List divided relaxed styleName="list">
+      <List divided relaxed styleName="list" className={className}>
         {entries.map(data => (
           <PrincipalListItem
             key={data.identifier}
@@ -176,6 +177,7 @@ PrincipalListField.propTypes = {
   withCategoryRoles: PropTypes.bool,
   withRegistrants: PropTypes.bool,
   eventId: PropTypes.number,
+  className: PropTypes.string,
 };
 
 PrincipalListField.defaultProps = {
@@ -186,6 +188,7 @@ PrincipalListField.defaultProps = {
   withRegistrants: false,
   eventId: null,
   readOnly: false,
+  className: undefined,
 };
 
 export default React.memo(PrincipalListField);

@@ -10,6 +10,8 @@ import PropTypes from 'prop-types';
 import {PrincipalListField} from 'indico/react/components/principals';
 import {useFavoriteUsers} from 'indico/react/hooks';
 
+import './WTFPrincipalListField.module.scss';
+
 export default function WTFPrincipalListField({
   fieldId,
   defaultValue,
@@ -53,6 +55,7 @@ export default function WTFPrincipalListField({
       onFocus={() => {}}
       onBlur={() => {}}
       value={value}
+      styleName="opaque"
       {...otherProps}
     />
   );
