@@ -87,17 +87,26 @@ export default function FileSubmission({onChange, disabled}) {
                           centered={files.length === 1}
                           raised
                         >
-                          {!disabled && (
-                            <Icon name="trash" onClick={() => removeFile(file)} color="red" />
-                          )}
                           <Card.Content>
-                            <TooltipIfTruncated>
-                              <Card.Header textAlign="center">{file.name}</Card.Header>
-                            </TooltipIfTruncated>
+                            <Card.Header textAlign="center">
+                              <TooltipIfTruncated>
+                                <div style={{textOverflow: 'ellipsis', overflow: 'hidden'}}>
+                                  {file.name}
+                                </div>
+                              </TooltipIfTruncated>
+                            </Card.Header>
                             <Card.Meta textAlign="center">
                               {humanReadableBytes(file.size)}
                             </Card.Meta>
                           </Card.Content>
+                          {!disabled && (
+                            <Icon
+                              name="trash"
+                              color="red"
+                              style={{cursor: 'pointer'}}
+                              onClick={() => removeFile(file)}
+                            />
+                          )}
                         </Card>
                       ))}
                     </Card.Group>
