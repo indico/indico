@@ -15,6 +15,7 @@ from flask import _app_ctx_stack, request
 from flask.helpers import get_root_path
 from flask_pluginengine import current_plugin, plugins_loaded
 from markupsafe import Markup
+from packaging.version import Version
 from pywebpack import WebpackBundleProject
 from sqlalchemy.orm import configure_mappers
 from werkzeug.exceptions import BadRequest
@@ -149,6 +150,14 @@ def configure_xsendfile(app, method):
         raise ValueError('Invalid static file method: %s' % method)
 
 
+def _get_indico_version():
+    version = Version(indico.__version__)
+    version_parts = [version.base_version]
+    if version.is_prerelease:
+        version_parts.append('pre')
+    return 'v' + '-'.join(version_parts)
+
+
 def setup_jinja(app):
     app.jinja_env.policies['ext.i18n.trimmed'] = True
     # Unicode hack
@@ -177,6 +186,7 @@ def setup_jinja(app):
     app.add_template_global(lambda: date_time_util.now_utc(False), 'now')
     app.add_template_global(render_session_bar)
     app.add_template_global(get_request_stats)
+    app.add_template_global(_get_indico_version(), 'indico_version')
     # Global variables
     app.add_template_global(LocalProxy(get_current_locale), 'current_locale')
     app.add_template_global(LocalProxy(lambda: current_plugin.manifest if current_plugin else None), 'plugin_webpack')

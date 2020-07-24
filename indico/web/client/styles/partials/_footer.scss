@@ -42,6 +42,14 @@
   .footer-extra {
     text-align: right;
   }
+
+  .version {
+    color: $gray;
+  }
+
+  &.dark .version {
+    color: $dark-gray;
+  }
 }
 
 .social-share {

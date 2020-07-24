@@ -96,6 +96,7 @@ Improvements
 - Add CfA setting to control whether authors can edit abstracts (:issue:`3431`)
 - Add CfA setting to control whether only speakers or also authors should
   get submission rights once the abstract gets accepted (:issue:`3431`)
+- Show the Indico version in the footer again (:issue:`4558`)
 
 Bugfixes
 ^^^^^^^^
