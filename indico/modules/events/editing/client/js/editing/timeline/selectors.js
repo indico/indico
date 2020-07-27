@@ -37,11 +37,15 @@ function createNewCustomItemFromRevision(revision, updates) {
 export function processRevisions(revisions) {
   const newRevisions = [];
   let numberOfRevisions = 1;
-  let items = [...revisions[0].comments];
+  let items = [];
   let currRevision = null;
 
   for (const [index, revision] of revisions.entries()) {
     const {initialState, finalState} = revision;
+    if (!currRevision) {
+      currRevision = revision;
+      items = [...revision.comments];
+    }
 
     if (initialState.name === InitialRevisionState.needs_submitter_confirmation) {
       const prevRevision = revisions[index - 1];
@@ -118,7 +122,6 @@ export function processRevisions(revisions) {
       );
     }
 
-    currRevision = currRevision || revision;
     if (shouldCreateNewRevision(revision) || index === revisions.length - 1) {
       newRevisions.push({
         ..._.omit(currRevision, 'comments'),
@@ -126,7 +129,6 @@ export function processRevisions(revisions) {
         items,
       });
       currRevision = null;
-      items = [];
     }
   }
 
