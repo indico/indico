@@ -31,6 +31,13 @@
       );
       field.closest('.form-group').toggle(active);
       var realField = field.is(':input') ? field : field.find(':input');
+      if (realField.attr('type') === 'hidden') {
+        // in case of custom widgets with multiple fields (e.g. the new react-based
+        // date/time field) we need to select all inputs explicitly since the hidden
+        // field is rather meaningless and the non-hidden fields break the form if they
+        // are visually hidden but not actually disabled
+        realField = field.closest('.form-group').find(':input');
+      }
       if (realField.length) {
         // Selectize clones the field and copies the `required` flag so we need
         // to make sure to also disable the clone to avoid validation errors!
