@@ -87,6 +87,16 @@ class IndicoSession(BaseSession):
     def lang(self, lang):
         self['_lang'] = lang
 
+    @property
+    def moment_lang(self):
+        parts = self.lang.lower().split('_')  # e.g. `en_GB` or `zh_Hans_CN`
+        lang = parts[0]
+        territory = parts[-1]
+        if lang == territory:
+            return lang
+        else:
+            return '{}-{}'.format(lang, territory)
+
     @cached_property
     def csrf_token(self):
         if '_csrf_token' not in self:

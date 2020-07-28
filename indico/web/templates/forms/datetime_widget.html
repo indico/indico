@@ -20,7 +20,7 @@
             timezoneFieldId: {{ (field.timezone_field.id if field.timezone_field else none) | tojson }},
             timezone: {{ field.timezone | tojson }},
             defaultTime: {{ field.default_time | format_time('code', timezone=field.timezone) | tojson }},
-            locale: {{ session.lang | tojson }},
+            locale: {{ session.moment_lang | tojson }},
             required: {{ input_args.required | default(false) | tojson }},
             disabled: {{ input_args.disabled | default(false) | tojson }},
             allowClear: {{ (field.allow_clear if field.allow_clear else false) | tojson }},

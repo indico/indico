@@ -11,7 +11,7 @@
     <script>
         setupOccurrencesWidget({
             fieldId: {{ field.id | tojson }},
-            locale: {{ session.lang | tojson }}
+            locale: {{ session.moment_lang | tojson }}
         });
     </script>
 {% endblock %}

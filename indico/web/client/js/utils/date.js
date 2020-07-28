@@ -28,7 +28,9 @@ export function serializeTime(dt, format = moment.HTML5_FMT.TIME) {
 }
 
 export async function setMomentLocale(locale) {
-  const [language, territory] = locale.toLowerCase().split('_');
+  const parts = locale.toLowerCase().split('_'); // e.g. `en_GB` or `zh_Hans_CN`
+  const language = parts[0];
+  const territory = parts[parts.length - 1];
   let momentLocale;
 
   if (language === territory) {
