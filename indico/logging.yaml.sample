@@ -14,6 +14,9 @@
 # - All log formaters may use `%(request_id)s` to get a random ID unique to each
 #   request which makes it easier to grep for all other log entries that belong to
 #   a specific request.
+# - All log formatters may also use `%(user_id)s` to get the ID of the user
+#   associated with the request context making it easier to grep for all log
+#   entries triggered by a specific user.
 # - Setting `append_request_info` to `true` in a formatter will append various
 #   information about the current request to the log message.  This will result in
 #   a multi-line message and is only recommended for errors; usually in a handler
@@ -58,12 +61,12 @@ handlers:
 
 formatters:
   default:
-    format: '%(asctime)s  %(levelname)-7s  %(request_id)s  %(name)-25s %(message)s'
+    format: '%(asctime)s  %(levelname)-7s  %(request_id)s  %(user_id)-6s  %(name)-25s %(message)s'
   simple:
     format: '%(asctime)s  %(levelname)-7s  %(name)-25s %(message)s'
   email:
     append_request_info: true
-    format: "%(asctime)s  %(request_id)s  %(name)s - %(levelname)s %(filename)s:%(lineno)d -- %(message)s\n\n"
+    format: "%(asctime)s  %(request_id)s  %(user_id)-6s  %(name)s - %(levelname)s %(filename)s:%(lineno)d -- %(message)s\n\n"
 
 filters:
   indico:

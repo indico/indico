@@ -142,6 +142,8 @@ Internal Changes
 - Add ``extra-regform-settings`` template hook (:issue:`4553`, thanks
   :user:`meluru`)
 - Add ``filter_selectable_badges`` signal (:issue:`4557`, thanks :user:`omegak`)
+- Add user ID in every log record logged in a request context (:issue:`4570`,
+  thanks :user:`omegak`)
 
 
 ----

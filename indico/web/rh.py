@@ -265,8 +265,8 @@ class RH(object):
         if self.EVENT_FEATURE is not None:
             self._check_event_feature()
 
-        logger.info('%s %s [IP=%s] [PID=%s] [UID=%r]',
-                    request.method, request.relative_url, request.remote_addr, os.getpid(), session.get('_user_id'))
+        logger.info('%s %s [IP=%s] [PID=%s]',
+                    request.method, request.relative_url, request.remote_addr, os.getpid())
 
         try:
             fossilize.clearCache()

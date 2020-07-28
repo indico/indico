@@ -44,6 +44,12 @@ class AddRequestIDFilter(object):
         return True
 
 
+class AddUserIDFilter(object):
+    def filter(self, record):
+        record.user_id = unicode(session.user.id) if has_request_context() and session.user else '-'
+        return True
+
+
 class RequestInfoFormatter(logging.Formatter):
     def format(self, record):
         rv = super(RequestInfoFormatter, self).format(record)
@@ -110,9 +116,13 @@ class Logger(object):
         data['disable_existing_loggers'] = False
         data['incremental'] = False
         # Make the request ID available in all loggers
-        data.setdefault('filters', {})['_add_request_id'] = {'()': AddRequestIDFilter}
+        data.setdefault('filters', {})
+        data['filters']['_add_request_id'] = {'()': AddRequestIDFilter}
+        data['filters']['_add_user_id'] = {'()': AddUserIDFilter}
         for handler in data['handlers'].itervalues():
-            handler.setdefault('filters', []).insert(0, '_add_request_id')
+            handler.setdefault('filters', [])
+            handler['filters'].insert(0, '_add_request_id')
+            handler['filters'].insert(1, '_add_user_id')
             if handler['class'] == 'logging.FileHandler' and handler['filename'][0] != '/':
                 # Make relative paths relative to the log dir
                 handler['filename'] = os.path.join(config.LOG_DIR, handler['filename'])
