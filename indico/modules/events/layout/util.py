@@ -10,7 +10,6 @@ from __future__ import unicode_literals
 from collections import OrderedDict, defaultdict
 from itertools import chain, count
 
-from flask import session
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import joinedload, load_only
 from werkzeug.urls import url_parse
@@ -118,8 +117,6 @@ class MenuEntryData(object):
         return build_menu_entry_name(self._name, self.plugin)
 
     def visible(self, event):
-        if self.hide_if_restricted and not event.can_access(session.user):
-            return False
         return self._visible(event) if self._visible else True
 
     @return_ascii

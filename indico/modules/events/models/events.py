@@ -927,6 +927,23 @@ class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionMan
         return format_repr(self, 'id', 'start_dt', 'end_dt', is_deleted=False, is_locked=False,
                            _text=text_to_repr(self.title, max_length=75))
 
+    def is_user_registered(self, user):
+        """Check whether the user is registered in the event.
+
+        This takes both unpaid and complete registrations into account.
+        """
+        from indico.modules.events.registration.models.forms import RegistrationForm
+        from indico.modules.events.registration.models.registrations import Registration, RegistrationState
+        if user is None:
+            return False
+        return (Registration.query.with_parent(self)
+                .join(Registration.registration_form)
+                .filter(Registration.user == user,
+                        Registration.state.in_([RegistrationState.unpaid, RegistrationState.complete]),
+                        ~Registration.is_deleted,
+                        ~RegistrationForm.is_deleted)
+                .has_rows())
+
 
 Event.register_location_events()
 Event.register_protection_events()

@@ -242,6 +242,12 @@ class RHPageDisplay(RHDisplayEventBase):
         }
     }
 
+    def _check_access(self):
+        RHDisplayEventBase._check_access(self)
+        if (self.page.menu_entry.registered_only and not self.event.is_user_registered(session.user)
+                and not self.event.can_manage(session.user)):
+            raise Forbidden
+
     def _process_args(self):
         RHDisplayEventBase._process_args(self)
         self.page = EventPage.get_or_404(request.view_args['page_id'])

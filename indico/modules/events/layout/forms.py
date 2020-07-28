@@ -161,6 +161,8 @@ class MenuUserEntryFormBase(IndicoForm):
     title = StringField(_("Title"), [DataRequired()])
     is_enabled = BooleanField(_("Show"), widget=SwitchWidget())
     new_tab = BooleanField(_("Open in a new tab"), widget=SwitchWidget())
+    registered_only = BooleanField(_("Restricted"), widget=SwitchWidget(),
+                                   description=_("Visible to registered users only."))
 
 
 class MenuLinkForm(MenuUserEntryFormBase):

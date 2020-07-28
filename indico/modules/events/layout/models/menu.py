@@ -7,7 +7,7 @@
 
 from __future__ import unicode_literals
 
-from flask import g
+from flask import g, session
 from sqlalchemy.orm import joinedload
 from werkzeug.utils import cached_property
 
@@ -125,12 +125,17 @@ class MenuEntryMixin(object):
     def is_visible(self):
         if not self.is_enabled:
             return False
+        if (self.registered_only and not self.event_ref.is_user_registered(session.user)
+                and not self.event_ref.can_manage(session.user)):
+            return False
         if not self.name:
             return True
         if self.is_orphaned:
             return False
 
         data = self.default_data
+        if data.hide_if_restricted and not self.event_ref.can_access(session.user):
+            return False
         if not data.static_site and g.get('static_site'):
             return False
         return data.visible(self.event_ref)
@@ -177,6 +182,7 @@ class TransientMenuEntry(MenuEntryMixin):
         self.link_url = None
         self.page_id = None
         self.is_root = True
+        self.registered_only = False
         for child in self.children:
             child.is_root = False
 
@@ -263,6 +269,12 @@ class MenuEntry(MenuEntryMixin, db.Model):
     )
     #: Whether the menu entry should be opened in a new tab or window
     new_tab = db.Column(
+        db.Boolean,
+        nullable=False,
+        default=False
+    )
+    #: Whether the menu entry should be viewable only by registered users
+    registered_only = db.Column(
         db.Boolean,
         nullable=False,
         default=False
