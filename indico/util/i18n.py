@@ -195,6 +195,11 @@ class IndicoTranslations(Translations):
 IndicoTranslations().install(unicode=True)
 
 
+def _remove_locale_script(locale):
+    parts = locale.split('_')  # e.g. `en_GB` or `zh_Hans_CN`
+    return '{}_{}'.format(parts[0], parts[-1])
+
+
 @babel.localeselector
 def set_best_lang(check_session=True):
     """
@@ -212,9 +217,12 @@ def set_best_lang(check_session=True):
     elif check_session and session.lang is not None:
         return session.lang
 
+    # chinese uses `zh-Hans-CN`, but browsers send `zh-CN`
+    all_locales = {_remove_locale_script(loc): loc for loc in get_all_locales()}
+
     # try to use browser language
     preferred = [x.replace('-', '_') for x in request.accept_languages.values()]
-    resolved_lang = negotiate_locale(preferred, list(get_all_locales()), aliases=LOCALE_ALIASES)
+    resolved_lang = negotiate_locale(preferred, list(all_locales), aliases=LOCALE_ALIASES)
 
     if not resolved_lang:
         if current_app.config['TESTING']:
@@ -222,6 +230,9 @@ def set_best_lang(check_session=True):
 
         # fall back to server default
         resolved_lang = config.DEFAULT_LOCALE
+
+    # restore script information if necessary
+    resolved_lang = all_locales[resolved_lang]
 
     # normalize to xx_YY capitalization
     resolved_lang = re.sub(r'^([a-zA-Z]+)_([a-zA-Z]+)$',
