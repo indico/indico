@@ -42,7 +42,7 @@ export async function setMomentLocale(locale) {
   if (momentLocale !== 'en') {
     await import(/* webpackChunkName: "moment-locale/[request]" */ `moment/locale/${momentLocale}`);
   }
-  moment.locale(momentLocale);
+  moment.locale([momentLocale, 'en']);
 }
 
 export function dayRange(start, end, step = 1) {

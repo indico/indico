@@ -47,7 +47,7 @@
 
     {% block late_js %}
         <script>
-            moment.locale({{ session.moment_lang|tojson }});
+            moment.locale([{{ session.moment_lang|tojson }}, 'en']);
             IndicoGlobalVars.isUserAuthenticated = {{ session.user|bool|tojson }};
         </script>
     {% endblock %}
