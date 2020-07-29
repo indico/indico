@@ -121,9 +121,9 @@ def review_editable_revision(revision, editor, action, comment, tags, files=None
     }[action]
 
     db.session.flush()
+    new_revision = None
     if action == EditingReviewAction.accept:
         _ensure_publishable_files(revision)
-        publish_editable_revision(revision)
     elif action in (EditingReviewAction.update, EditingReviewAction.update_accept):
         final_state = FinalRevisionState.none
         editable_editor = None
@@ -138,12 +138,17 @@ def review_editable_revision(revision, editor, action, comment, tags, files=None
                                        tags=revision.tags)
         _ensure_publishable_files(new_revision)
         revision.editable.revisions.append(new_revision)
-        if action == EditingReviewAction.update_accept:
-            db.session.flush()
-            publish_editable_revision(new_revision)
     db.session.flush()
     notify_editor_judgment(revision, session.user)
     logger.info('Revision %r reviewed by %s [%s]', revision, editor, action.name)
+    return new_revision
+
+
+@no_autoflush
+def delete_revision(revision):
+    db.session.delete(revision)
+    db.session.flush()
+    logger.info('Revision %r deleted', revision)
 
 
 @no_autoflush
@@ -159,7 +164,6 @@ def confirm_editable_changes(revision, submitter, action, comment):
     db.session.flush()
     if action == EditingConfirmationAction.accept:
         _ensure_publishable_files(revision)
-        publish_editable_revision(revision)
     db.session.flush()
     notify_submitter_confirmation(revision, submitter, action)
     logger.info('Revision %r confirmed by %s [%s]', revision, submitter, action.name)

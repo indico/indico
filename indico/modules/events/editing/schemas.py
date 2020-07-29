@@ -104,6 +104,10 @@ class EditingRevisionFileSchema(mm.ModelSchema):
     external_download_url = fields.String()
 
 
+class EditingRevisionUnclaimedFileSchema(EditingRevisionFileSchema):
+    external_download_url = fields.String(attribute='file.external_download_url')
+
+
 class EditingRevisionCommentSchema(mm.ModelSchema):
     class Meta:
         model = EditingRevisionComment
@@ -121,8 +125,8 @@ class EditingRevisionSchema(mm.ModelSchema):
     class Meta:
         model = EditingRevision
         fields = ('id', 'created_dt', 'submitter', 'editor', 'files', 'comment', 'comment_html', 'comments',
-                  'initial_state', 'final_state', 'tags', 'create_comment_url', 'download_files_url', 'review_url',
-                  'confirm_url')
+                  'initial_state', 'final_state', 'tags', 'create_comment_url', 'external_create_comment_url',
+                  'download_files_url', 'review_url', 'confirm_url')
 
     comment_html = fields.Function(lambda rev: escape(rev.comment))
     submitter = fields.Nested(EditingUserSchema)
@@ -133,7 +137,13 @@ class EditingRevisionSchema(mm.ModelSchema):
     initial_state = fields.Nested(RevisionStateSchema)
     final_state = fields.Nested(RevisionStateSchema)
     create_comment_url = fields.Function(lambda revision: url_for('event_editing.api_create_comment', revision))
+    external_create_comment_url = fields.Function(
+        lambda revision: url_for('event_editing.api_create_comment', revision, _external=True)
+    )
     download_files_url = fields.Function(lambda revision: url_for('event_editing.revision_files_export', revision))
+    external_download_files_url = fields.Function(
+        lambda revision: url_for('event_editing.revision_files_export', revision, _external=True)
+    )
     review_url = fields.Function(lambda revision: url_for('event_editing.api_review_editable', revision))
     confirm_url = fields.Method('_get_confirm_url')
 
@@ -150,6 +160,10 @@ class EditingRevisionSchema(mm.ModelSchema):
     def sort_tags(self, data, **kwargs):
         data['tags'].sort(key=lambda tag: natural_sort_key(tag['verbose_title']))
         return data
+
+
+class EditingRevisionUnclaimedSchema(EditingRevisionSchema):
+    files = fields.List(fields.Nested(EditingRevisionUnclaimedFileSchema))
 
 
 class EditableSchema(mm.ModelSchema):
@@ -363,3 +377,10 @@ class EditableTypePrincipalsSchema(mm.Schema):
         rh_context = ('event',)
 
     principals = PrincipalList(many=True, allow_event_roles=True, allow_category_roles=True)
+
+
+class ServiceReviewEditableSchema(mm.Schema):
+    publish = fields.Boolean(default=True)
+    comment = fields.String()
+    comments = fields.List(fields.String())
+    tags = fields.List(fields.String())
