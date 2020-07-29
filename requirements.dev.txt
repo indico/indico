@@ -8,7 +8,6 @@ sphinx
 sphinx-autobuild
 sphinx-rtd-theme
 sphinx-issues
-repoze.sphinx.autointerface
 pygments
 sqlparse
 isort
