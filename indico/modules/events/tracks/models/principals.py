@@ -21,7 +21,6 @@ class TrackPrincipal(PrincipalPermissionsMixin, db.Model):
     principal_backref_name = 'in_track_acls'
     principal_for = 'Track'
     unique_columns = ('track_id',)
-    allow_emails = True
     allow_event_roles = True
     allow_category_roles = True
 
