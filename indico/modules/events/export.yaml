@@ -180,21 +180,31 @@ export:
   # acls
   EventPrincipal:
     skipif: ROW.type.name not in ('user', 'email', 'event_role', 'registration_form')
+    fks_out:
+      - registration_form_id
 
   EventSettingPrincipal:
     skipif: ROW.type.name not in ('user', 'event_role')
 
   ContributionPrincipal:
     skipif: ROW.type.name not in ('user', 'email', 'event_role', 'registration_form')
+    fks_out:
+      - registration_form_id
 
   SessionPrincipal:
     skipif: ROW.type.name not in ('user', 'email', 'event_role', 'registration_form')
+    fks_out:
+      - registration_form_id
 
   AttachmentPrincipal:
     skipif: ROW.type.name not in ('user', 'event_role', 'registration_form')
+    fks_out:
+      - registration_form_id
 
   AttachmentFolderPrincipal:
     skipif: ROW.type.name not in ('user', 'event_role', 'registration_form')
+    fks_out:
+      - registration_form_id
 
   TrackPrincipal:
     skipif: ROW.type.name not in ('user', 'event_role')
@@ -298,6 +308,7 @@ export:
 
   # registration & payment
   RegistrationForm:
+    allow_duplicates: true
     fks:
       - RegistrationFormItem.registration_form_id
       - Registration.registration_form_id
