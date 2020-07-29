@@ -17,8 +17,8 @@ msgstr ""
 "Project-Id-Version: Indico\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
 "POT-Creation-Date: 2020-07-22 14:43+0200\n"
-"PO-Revision-Date: 2020-07-22 13:41+0000\n"
-"Last-Translator: Adrian Mönnich\n"
+"PO-Revision-Date: 2020-07-23 08:05+0000\n"
+"Last-Translator: Thomas Baron <thomas.baron@cern.ch>\n"
 "Language-Team: French (France) (http://www.transifex.com/indico/indico/language/fr_FR/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -9194,20 +9194,20 @@ msgstr "Voulez-vous supprimer le compte-rendu?"
 #: indico/modules/events/papers/__init__.py:35
 #: indico/modules/events/papers/__init__.py:46
 msgid "Peer Reviewing"
-msgstr ""
+msgstr "Examen par les Pairs"
 
 #: indico/modules/events/papers/__init__.py:90
 #: indico/modules/events/papers/__init__.py:145
 #: indico/modules/events/papers/templates/management/_base.html:7
 #: indico/modules/events/papers/templates/management/assignment.html:5
 msgid "Paper Peer Reviewing"
-msgstr ""
+msgstr "Examen par les Pairs des Articles"
 
 #: indico/modules/events/papers/__init__.py:91
 msgid ""
 "Gives event managers the opportunity to let contribution authors submit "
 "papers and use the paper peer reviewing workflow."
-msgstr ""
+msgstr "Donne aux organisateurs de l'événement la possibilité de laisser les auteurs de contribution déposer les articles et utiliser le flux de travail d'examen par les pairs des articles."
 
 #: indico/modules/events/papers/__init__.py:101
 msgid "Paper Manager"
@@ -9215,7 +9215,7 @@ msgstr "Responsable des articles"
 
 #: indico/modules/events/papers/__init__.py:102
 msgid "Grants management rights for paper peer reviewing on an event."
-msgstr ""
+msgstr "Donne les droits d'administration pour l'examen par les pairs des articles pour un événement."
 
 #: indico/modules/events/papers/__init__.py:109
 msgid "Grants paper judgment rights for assigned papers."
@@ -9249,7 +9249,7 @@ msgstr "Responsables des articles"
 
 #: indico/modules/events/papers/forms.py:39
 msgid "List of users allowed to manage the paper peer reviewing module"
-msgstr ""
+msgstr "Liste des utilisateurs autorisés à gérer le module d'examen par les pairs des articles"
 
 #: indico/modules/events/papers/forms.py:40
 #: indico/modules/events/papers/templates/_paper_list.html:52
@@ -9771,14 +9771,14 @@ msgstr "Définir des compétences pour les membres de l'équipe peut être utile
 
 #: indico/modules/events/papers/templates/management/disabled.html:9
 msgid "Paper Peer Reviewing disabled"
-msgstr ""
+msgstr "Examen par les pairs des articles désactivé"
 
 #: indico/modules/events/papers/templates/management/disabled.html:11
 msgid ""
 "\"Paper Peer Reviewing\" provides an integrated paper management and peer "
 "reviewing module that will allow you to set up a full paper submission and "
 "peer reviewing workflow."
-msgstr ""
+msgstr "\"L'Examen par les Pairs des Articles\" fournit un module intégré de gestion des articles et d'examen par les pairs qui vous permettra de mettre en place un flux de travail complet pour le dépôt et l'évaluation des articles."
 
 #: indico/modules/events/papers/templates/management/overview.html:18
 msgid "Content reviewing"

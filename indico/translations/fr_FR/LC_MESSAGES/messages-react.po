@@ -774,15 +774,15 @@ msgstr "Envoyer les courriels à l'équipe d'édition"
 
 #: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:62
 msgid "Assign an editor to papers"
-msgstr ""
+msgstr "Assigner un éditeur aux articles"
 
 #: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:63
 msgid "Assign an editor to posters"
-msgstr ""
+msgstr "Assigner un éditeur aux posters"
 
 #: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:64
 msgid "Assign an editor to slides"
-msgstr ""
+msgstr "Assigner un éditeur aux diapositives"
 
 #: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:80
 msgid "Submission is open"
@@ -849,7 +849,7 @@ msgstr "Gérer l'équipe"
 
 #: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:145
 msgid "Editor assignment"
-msgstr ""
+msgstr "Affectation de l'éditeur"
 
 #: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:153
 msgid "Allow editors to self-assign editables"
@@ -1025,6 +1025,10 @@ msgid ""
 "submission to be eligible for review. In order to start the review process, "
 "uploaded files must meet one of the specified criteria."
 msgstr ""
+"Vous pouvez définir ici quelles conditions liées au type de fichier doivent "
+"être remplies pour qu'un dépôt soit éligible à la relecture. Pour pouvoir "
+"commencer le processus de relecture, les fichiers téléchargés doivent "
+"remplir un des critères."
 
 #: indico/modules/events/editing/client/js/management/editable_type/review_conditions/ReviewConditionsManager.jsx:65
 msgid "No reviewing conditions have been defined"
