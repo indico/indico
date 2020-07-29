@@ -64,6 +64,7 @@ export:
       - TrackGroup.event_id
       - Track.event_id
       - Session.event_id
+      - SessionType.event_id
       - Contribution.event_id
       - TimetableEntry.event_id
       - ImageFile.event_id
