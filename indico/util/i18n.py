@@ -232,7 +232,12 @@ def set_best_lang(check_session=True):
         resolved_lang = config.DEFAULT_LOCALE
 
     # restore script information if necessary
-    resolved_lang = all_locales[resolved_lang]
+    try:
+        resolved_lang = all_locales[resolved_lang]
+    except KeyError:
+        # this happens if we have e.g. a development setup with no built languages.
+        # in this case `get_all_locales()` only contains `en_EN`
+        return 'en_GB'
 
     # normalize to xx_YY capitalization
     resolved_lang = re.sub(r'^([a-zA-Z]+)_([a-zA-Z]+)$',
