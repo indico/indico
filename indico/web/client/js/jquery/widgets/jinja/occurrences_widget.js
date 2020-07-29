@@ -10,25 +10,21 @@ import React from 'react';
 import {WTFOccurrencesField} from 'indico/react/components';
 import {localeUses24HourTime} from 'indico/utils/date';
 
-(function(global) {
-  'use strict';
+window.setupOccurrencesWidget = function setupOccurrencesWidget(options) {
+  options = $.extend(
+    true,
+    {
+      fieldId: null,
+      locale: null,
+    },
+    options
+  );
 
-  global.setupOccurrencesWidget = function setupOccurrencesWidget(options) {
-    options = $.extend(
-      true,
-      {
-        fieldId: null,
-        locale: null,
-      },
-      options
-    );
-
-    ReactDOM.render(
-      <WTFOccurrencesField
-        fieldId={options.fieldId}
-        uses24HourFormat={localeUses24HourTime(options.locale.replace('_', '-'))}
-      />,
-      document.getElementById(options.fieldId + '-container')
-    );
-  };
-})(window);
+  ReactDOM.render(
+    <WTFOccurrencesField
+      fieldId={options.fieldId}
+      uses24HourFormat={localeUses24HourTime(options.locale.replace('_', '-'))}
+    />,
+    document.getElementById(`${options.fieldId}-container`)
+  );
+};

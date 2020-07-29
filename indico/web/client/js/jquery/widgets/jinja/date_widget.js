@@ -9,44 +9,40 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import {WTFDateField} from 'indico/react/components';
 
-(function(global) {
-  'use strict';
-
-  global.setupDateWidget = function setupDateWidget(options) {
-    options = $.extend(
-      true,
-      {
-        fieldId: null,
-        required: false,
-        disabled: false,
-        allowClear: false,
-        earliest: null,
-        latest: null,
-        linkedField: {
-          id: null,
-          notBefore: false,
-          notAfter: false,
-        },
+window.setupDateWidget = function setupDateWidget(options) {
+  options = $.extend(
+    true,
+    {
+      fieldId: null,
+      required: false,
+      disabled: false,
+      allowClear: false,
+      earliest: null,
+      latest: null,
+      linkedField: {
+        id: null,
+        notBefore: false,
+        notAfter: false,
       },
-      options
-    );
+    },
+    options
+  );
 
-    // Make sure the results dropdown are displayed above the dialog.
-    const field = $(`#${options.fieldId}`);
-    field.closest('.ui-dialog-content').css('overflow', 'inherit');
-    field.closest('.exclusivePopup').css('overflow', 'inherit');
+  // Make sure the results dropdown are displayed above the dialog.
+  const field = $(`#${options.fieldId}`);
+  field.closest('.ui-dialog-content').css('overflow', 'inherit');
+  field.closest('.exclusivePopup').css('overflow', 'inherit');
 
-    ReactDOM.render(
-      <WTFDateField
-        dateId={options.fieldId + '-datestorage'}
-        required={options.required}
-        disabled={options.disabled}
-        allowClear={options.allowClear}
-        earliest={options.earliest}
-        latest={options.latest}
-        linkedField={options.linkedField}
-      />,
-      document.getElementById(options.fieldId)
-    );
-  };
-})(window);
+  ReactDOM.render(
+    <WTFDateField
+      dateId={`${options.fieldId}-datestorage`}
+      required={options.required}
+      disabled={options.disabled}
+      allowClear={options.allowClear}
+      earliest={options.earliest}
+      latest={options.latest}
+      linkedField={options.linkedField}
+    />,
+    document.getElementById(options.fieldId)
+  );
+};
