@@ -7,6 +7,11 @@ Version 2.3
 
 *Unreleased*
 
+.. note::
+
+    We also published a `blog post <https://getindico.io/indico/update/release/milestone/2020/07/22/indico-2-3-news.html>`_
+    summarizing the most relevant changes for end users.
+
 Major Features
 ^^^^^^^^^^^^^^
 
