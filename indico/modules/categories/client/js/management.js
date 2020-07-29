@@ -312,7 +312,7 @@
         dataType: 'json',
         error: function(xhr) {
           // XXX: Re-enable error handling once we skip retrieving protected parents
-          if (xhr.status !== 403) {
+          if (xhr.status && xhr.status !== 403) {
             handleAjaxError(xhr);
           }
         },
