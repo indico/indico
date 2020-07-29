@@ -179,25 +179,25 @@ export:
 
   # acls
   EventPrincipal:
-    skipif: ROW.type.name not in ('user', 'email', 'event_role')
+    skipif: ROW.type.name not in ('user', 'email', 'event_role', 'registration_form')
 
   EventSettingPrincipal:
-    skipif: ROW.type.name != 'user'
+    skipif: ROW.type.name not in ('user', 'event_role')
 
   ContributionPrincipal:
-    skipif: ROW.type.name not in ('user', 'email')
+    skipif: ROW.type.name not in ('user', 'email', 'event_role', 'registration_form')
 
   SessionPrincipal:
-    skipif: ROW.type.name not in ('user', 'email')
+    skipif: ROW.type.name not in ('user', 'email', 'event_role', 'registration_form')
 
   AttachmentPrincipal:
-    skipif: ROW.type.name != 'user'
+    skipif: ROW.type.name not in ('user', 'event_role', 'registration_form')
 
   AttachmentFolderPrincipal:
-    skipif: ROW.type.name != 'user'
+    skipif: ROW.type.name not in ('user', 'event_role', 'registration_form')
 
   TrackPrincipal:
-    skipif: ROW.type.name not in ('user', 'local_group', 'multipass_group', 'event_role')
+    skipif: ROW.type.name not in ('user', 'event_role')
 
   # misc stuff
   EventLogEntry: {}

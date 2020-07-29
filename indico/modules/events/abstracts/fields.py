@@ -198,7 +198,7 @@ class AbstractField(QuerySelectField):
 
 
 class TrackRoleField(JSONField):
-    """A field that stores a list of e-mail template rules."""
+    """A field to assign track roles to principals."""
 
     CAN_POPULATE = True
     widget = JinjaWidget('events/abstracts/forms/track_role_widget.html')
