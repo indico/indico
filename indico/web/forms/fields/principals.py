@@ -181,6 +181,8 @@ class PermissionsField(JSONField):
 
     @property
     def registration_forms(self):
+        if not self.event.has_feature('registration'):
+            return []
         registration_forms = self.event.registration_forms
         return [serialize_registration_form(regform) for regform in registration_forms]
 
