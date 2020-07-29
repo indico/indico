@@ -103,14 +103,21 @@ FavoritesProvider.propTypes = {
   children: PropTypes.func.isRequired,
 };
 
-export function useIndicoAxios({camelize, unhandledErrors = [], ...args}) {
+export function useIndicoAxios({camelize, unhandledErrors = [], options = {}, ...args}) {
   const lastData = useRef(null);
+  if (unhandledErrors.length) {
+    options.headers = {
+      ...(options.headers || {}),
+      'X-Indico-No-Report-Error': unhandledErrors.join(','),
+    };
+  }
   const {response, error, loading, reFetch} = useAxios({
     customHandler: err =>
       err &&
       (!err.response || !unhandledErrors.includes(err.response.status)) &&
       handleAxiosError(err),
     ...args,
+    options,
     axios: indicoAxios,
   });
 

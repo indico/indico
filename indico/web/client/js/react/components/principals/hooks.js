@@ -112,6 +112,7 @@ export const useFetchRegistrationForms = eventId => {
     trigger: eventId,
     forceDispatchEffect: () => eventId !== null,
     camelize: true,
+    unhandledErrors: [404], // feature may be disabled
   });
 
   return data || [];

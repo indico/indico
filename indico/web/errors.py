@@ -68,9 +68,20 @@ def _need_json_response():
     return request.is_xhr or request.is_json
 
 
+def _is_error_reporting_opted_out(code):
+    header = request.headers.get('X-Indico-No-Report-Error')
+    if not header:
+        return
+    codes = header.split(',')
+    return unicode(code) in codes
+
+
 def _is_error_reportable(exc):
+    # client explicitly opted out from reporting this (expected) error
+    if hasattr(exc, 'code') and _is_error_reporting_opted_out(exc.code):
+        return False
     # error marked as not reportable
-    if isinstance(exc, NoReportError) or getattr(exc, '_disallow_report', False):
+    elif isinstance(exc, NoReportError) or getattr(exc, '_disallow_report', False):
         return False
     elif isinstance(exc, BadData):
         # itsdangerous stuff - should only fail if someone tampers with a link
