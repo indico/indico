@@ -129,7 +129,9 @@ class MenuEntryMixin(object):
                 and not self.event_ref.can_manage(session.user)):
             return False
         if not self.name:
-            return True
+            # we don't have `hide_if_restricted` for custom menu items, so we
+            # always hide them if the user cannot access the event
+            return self.event_ref.can_access(session.user)
         if self.is_orphaned:
             return False
 
