@@ -7,6 +7,7 @@
 
 from __future__ import absolute_import, unicode_literals
 
+import os
 import re
 from uuid import UUID
 
@@ -48,6 +49,21 @@ def not_empty(value):
 
     if not value:
         raise ValidationError(_('This field cannot be empty.'))
+
+
+def file_extension(*exts):
+    """Validator which checks the file extension."""
+
+    exts = frozenset('.' + ext.lstrip('.') for ext in exts)
+
+    def validate(file):
+        if not file:
+            return
+        ext = os.path.splitext(file.filename)[1].lower()
+        if ext not in exts:
+            raise ValidationError(_('Invalid file extension'))
+
+    return validate
 
 
 def max_words(max):

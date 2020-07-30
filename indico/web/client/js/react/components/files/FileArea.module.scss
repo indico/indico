@@ -11,10 +11,11 @@
   }
 
   .file-card {
-    :global(i.icon) {
+    .action {
       position: absolute;
       top: 3px;
       right: 2px;
+      cursor: pointer;
     }
 
     :global(.content) :global(.header) {

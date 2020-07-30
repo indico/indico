@@ -11,7 +11,7 @@ import mimetypes
 
 from flask import request
 from marshmallow import fields
-from werkzeug.exceptions import Forbidden
+from werkzeug.exceptions import Forbidden, UnprocessableEntity
 
 from indico.core.db import db
 from indico.modules.files import logger
@@ -32,6 +32,11 @@ class UploadFileMixin(object):
         'file': fields.Field(location='files', required=True)
     })
     def _process(self, file):
+        if not self.validate_file(file):
+            # XXX: we could include a nicer error message, but none of the upload
+            # widgets show it right now, so no need to add more (translatable) strings
+            # nobody sees
+            raise UnprocessableEntity
         return self._save_file(file, file.stream)
 
     def _save_file(self, file, stream):
@@ -54,6 +59,13 @@ class UploadFileMixin(object):
         ``event/EVENTID/...`` in the storage backend.
         """
         raise NotImplementedError
+
+    def validate_file(self, file):
+        """Validate the uploaded file.
+
+        If this function returns false, the upload is rejected.
+        """
+        return True
 
 
 class RHFileBase(RHProtected):

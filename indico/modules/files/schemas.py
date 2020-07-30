@@ -15,3 +15,8 @@ class FileSchema(mm.ModelSchema):
     class Meta:
         model = File
         fields = ('claimed', 'content_type', 'created_dt', 'filename', 'size', 'uuid')
+
+
+class BasicFileSchema(FileSchema):
+    class Meta:
+        fields = ('filename', 'size', 'uuid')

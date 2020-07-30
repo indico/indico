@@ -46,7 +46,6 @@ export default function FileSubmission({onChange, disabled}) {
     <FileArea
       dropzone={dropzone}
       files={files.map(({name, size}) => ({filename: name, size}))}
-      disabled={disabled}
       fileAction={{
         icon: 'trash',
         color: 'red',

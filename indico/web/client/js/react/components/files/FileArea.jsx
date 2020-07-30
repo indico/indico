@@ -7,7 +7,7 @@
 
 import React from 'react';
 import PropTypes from 'prop-types';
-import {Button, Card, Divider, Grid, Header, Segment, Icon} from 'semantic-ui-react';
+import {Button, Card, Divider, Grid, Header, Segment, Icon, Progress} from 'semantic-ui-react';
 import {TooltipIfTruncated} from 'indico/react/components';
 import {Translate, Param} from 'indico/react/i18n';
 import {fileDetailsShape} from './props';
@@ -43,24 +43,27 @@ const dropzoneShape = PropTypes.shape({
   getRootProps: PropTypes.func.isRequired,
   getInputProps: PropTypes.func.isRequired,
   isDragActive: PropTypes.bool.isRequired,
-  open: PropTypes.func.isRequired,
+  open: PropTypes.func,
 });
 
 const fileActionShape = PropTypes.shape({
   icon: PropTypes.string.isRequired,
-  color: PropTypes.string.isRequired,
+  color: PropTypes.string,
   onClick: PropTypes.func.isRequired,
 });
 
 export function FileArea({
   dropzone: {getRootProps, getInputProps, isDragActive, open: openFileDialog},
   files,
-  disabled,
   dragText,
   uploadButtonText,
   uploadButtonIcon,
   fileAction,
 }) {
+  // unfortunately dropzone does not include the `disabled` flag, but the
+  // `open` function is always null when the dropzone is disabled
+  const dropzoneDisabled = openFileDialog === null;
+
   return (
     <div {...getRootProps()} styleName="dropzone-area">
       <input {...getInputProps()} />
@@ -81,17 +84,33 @@ export function FileArea({
                         <Card.Header textAlign="center">
                           <TooltipIfTruncated>
                             <div style={{textOverflow: 'ellipsis', overflow: 'hidden'}}>
+                              {file.upload && !file.upload.finished && (
+                                <Icon
+                                  loading
+                                  name={file.upload.failed ? 'exclamation' : 'spinner'}
+                                />
+                              )}
                               {file.filename}
                             </div>
                           </TooltipIfTruncated>
                         </Card.Header>
                         <Card.Meta textAlign="center">{humanReadableBytes(file.size)}</Card.Meta>
+                        {file.upload && !file.upload.finished && (
+                          <Progress
+                            percent={file.upload.progress}
+                            error={file.upload.failed}
+                            size="tiny"
+                            active
+                            color="blue"
+                            style={{margin: 0}}
+                          />
+                        )}
                       </Card.Content>
-                      {!disabled && fileAction && (
+                      {fileAction && (
                         <Icon
+                          styleName="action"
                           name={fileAction.icon}
                           color={fileAction.color}
-                          style={{cursor: 'pointer'}}
                           onClick={() => fileAction.onClick(file)}
                         />
                       )}
@@ -113,7 +132,7 @@ export function FileArea({
                     icon={uploadButtonIcon}
                     content={uploadButtonText}
                     onClick={() => openFileDialog()}
-                    disabled={disabled}
+                    disabled={dropzoneDisabled}
                   />
                 </>
               )}
@@ -128,7 +147,6 @@ export function FileArea({
 FileArea.propTypes = {
   dropzone: dropzoneShape.isRequired,
   files: PropTypes.arrayOf(fileDetailsShape).isRequired,
-  disabled: PropTypes.bool.isRequired,
   dragText: PropTypes.string,
   uploadButtonText: PropTypes.string,
   uploadButtonIcon: PropTypes.string,
@@ -165,7 +183,6 @@ export function SingleFileArea({file, ...rest}) {
 SingleFileArea.propTypes = {
   dropzone: dropzoneShape.isRequired,
   file: fileDetailsShape,
-  disabled: PropTypes.bool.isRequired,
   fileAction: fileActionShape,
 };
 

@@ -20,7 +20,7 @@ from indico.modules.events.abstracts.util import clear_boa_cache, create_boa, cr
 from indico.modules.events.contributions import contribution_settings
 from indico.modules.files.controllers import UploadFileMixin
 from indico.util.i18n import _
-from indico.util.marshmallow import FileField
+from indico.util.marshmallow import FileField, file_extension
 from indico.web.args import use_kwargs
 from indico.web.flask.util import send_file
 from indico.web.forms.base import FormDefaults
@@ -50,23 +50,23 @@ class RHUploadBOAFile(UploadFileMixin, RHManageAbstractsBase):
     def get_file_context(self):
         return 'event', self.event.id, 'boa'
 
+    def validate_file(self, file):
+        return os.path.splitext(file.filename)[1].lower() == '.pdf'
+
 
 class RHUploadBOA(RHManageAbstractsBase):
-    """Upload custom book of abstracts"""
+    """Upload custom book of abstracts."""
 
     @use_kwargs({
-        'file': FileField(required=True),
+        'file': FileField(required=True, validate=file_extension('pdf')),
     })
     def _process_POST(self, file):
-        if os.path.splitext(file.filename)[1] == '.pdf':
-            raise Exception('Uploaded book of abstracts needs to be a ".pdf".')
         self.event.custom_boa = file
         file.claim(event_id=self.event.id)
         return '', 204
 
     def _process_DELETE(self):
-        if self.event.custom_boa is not None:
-            self.event.custom_boa = None
+        self.event.custom_boa = None
         return '', 204
 
 

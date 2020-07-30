@@ -32,6 +32,7 @@ from indico.modules.events.schemas import event_permissions_schema
 from indico.modules.events.tracks.models.tracks import Track
 from indico.modules.events.tracks.schemas import track_permissions_schema
 from indico.modules.events.util import update_object_principals
+from indico.modules.files.schemas import BasicFileSchema
 from indico.util.i18n import _
 from indico.util.string import handle_legacy_description
 from indico.util.user import principal_from_identifier
@@ -51,8 +52,12 @@ class RHAbstractsDashboard(RHManageAbstractsBase):
             return WPManageAbstracts.render_template('management/disabled.html', self.event)
         else:
             abstracts_count = Abstract.query.with_parent(self.event).count()
+            custom_boa = None
+            if self.event.has_custom_boa:
+                custom_boa = BasicFileSchema().dump(self.event.custom_boa)
             return WPManageAbstracts.render_template('management/overview.html', self.event,
-                                                     abstracts_count=abstracts_count, cfa=self.event.cfa)
+                                                     abstracts_count=abstracts_count, cfa=self.event.cfa,
+                                                     custom_boa=custom_boa)
 
 
 class RHScheduleCFA(RHManageAbstractsBase):
