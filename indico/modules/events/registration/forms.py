@@ -20,7 +20,7 @@ from wtforms.widgets.html5 import NumberInput
 from indico.core import signals
 from indico.core.config import config
 from indico.modules.designer import PageLayout, PageOrientation, PageSize, TemplateType
-from indico.modules.designer.util import get_default_template_on_category, get_inherited_templates
+from indico.modules.designer.util import get_default_ticket_on_category, get_inherited_templates
 from indico.modules.events.features.util import is_feature_enabled
 from indico.modules.events.payment import payment_settings
 from indico.modules.events.registration.models.forms import ModificationMode
@@ -257,7 +257,7 @@ class TicketsForm(IndicoForm):
     def __init__(self, *args, **kwargs):
         event = kwargs.pop('event')
         super(TicketsForm, self).__init__(*args, **kwargs)
-        default_tpl = get_default_template_on_category(event.category)
+        default_tpl = get_default_ticket_on_category(event.category)
         all_templates = set(event.designer_templates) | get_inherited_templates(event)
         badge_templates = [(tpl.id, tpl.title) for tpl in all_templates
                            if tpl.type == TemplateType.badge and tpl != default_tpl]

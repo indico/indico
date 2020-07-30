@@ -11,7 +11,7 @@ from indico.modules.designer.controllers import (RHAddCategoryTemplate, RHAddEve
                                                  RHCloneEventTemplate, RHDeleteDesignerTemplate,
                                                  RHDownloadTemplateImage, RHEditDesignerTemplate, RHGetTemplateData,
                                                  RHListBacksideTemplates, RHListCategoryTemplates, RHListEventTemplates,
-                                                 RHToggleBadgeDefaultOnCategory, RHToggleTemplateDefaultOnCategory,
+                                                 RHToggleBadgeDefaultOnCategory, RHToggleTicketDefaultOnCategory,
                                                  RHUploadBackgroundImage)
 from indico.util.caching import memoize
 from indico.web.flask.util import make_view_func
@@ -32,8 +32,8 @@ def _dispatch(event_rh, category_rh):
     return view_func
 
 
-_bp.add_url_rule('/category/<int:category_id>/manage/designer/<int:template_id>/toggle-default',
-                 'toggle_category_default', RHToggleTemplateDefaultOnCategory, methods=('POST',))
+_bp.add_url_rule('/category/<int:category_id>/manage/designer/<int:template_id>/toggle-default-ticket',
+                 'toggle_category_default_ticket', RHToggleTicketDefaultOnCategory, methods=('POST',))
 _bp.add_url_rule('/category/<int:category_id>/manage/designer/<int:template_id>/toggle-default-badge',
                  'toggle_category_default_badge', RHToggleBadgeDefaultOnCategory, methods=('POST',))
 

@@ -520,10 +520,10 @@ def get_event_regforms_registrations(event, user, include_scheduled=True, only_i
 
 
 def generate_ticket(registration):
-    from indico.modules.designer.util import get_default_template_on_category
+    from indico.modules.designer.util import get_default_ticket_on_category
     from indico.modules.events.registration.controllers.management.tickets import DEFAULT_TICKET_PRINTING_SETTINGS
     template = (registration.registration_form.ticket_template or
-                get_default_template_on_category(registration.event.category))
+                get_default_ticket_on_category(registration.event.category))
     signals.event.designer.print_badge_template.send(template, regform=registration.registration_form,
                                                      registrations=[registration])
     pdf_class = RegistrantsListToBadgesPDFFoldable if template.backside_template else RegistrantsListToBadgesPDF

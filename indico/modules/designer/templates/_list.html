@@ -41,7 +41,7 @@
     {% endif %}
 {% endmacro %}
 
-{% macro _render_template(tpl, target, inherited=false, event=none, default_template=none, default_badge=none,
+{% macro _render_template(tpl, target, inherited=false, event=none, default_ticket=none, default_badge=none,
                           not_deletable_templates=[]) -%}
     <tr>
         <td class="i-table id-column">
@@ -64,11 +64,11 @@
             <div class="thin toolbar right">
                 <div class="group">
                     {% if not event and tpl.type.name == 'badge' %}
-                        {% set inherited_default = default_template == tpl and tpl.category != target and
+                        {% set inherited_default = default_ticket == tpl and tpl.category != target and
                                 not target.default_ticket_template %}
-                        {% set global_default = default_template == tpl and target.is_root %}
+                        {% set global_default = default_ticket == tpl and target.is_root %}
                         <a class="i-button icon-ticket icon-only borderless hide-if-locked toggle-default
-                            {{ 'default-on-category' if default_template == tpl }}
+                            {{ 'default-on-category' if default_ticket == tpl }}
                             {{ 'inherited' if inherited_default }}
                             {{ 'global-default' if global_default }}"
                             {% if inherited_default %}
@@ -77,7 +77,7 @@
                                 title="{% trans %}This is the global default ticket template{% endtrans %}"
                             {% else %}
                                 title="{% trans %}Toggle default ticket template for this category{% endtrans %}"
-                                data-href="{{ url_for('.toggle_category_default', target, template_id=tpl.id) }}"
+                                data-href="{{ url_for('.toggle_category_default_ticket', target, template_id=tpl.id) }}"
                                 data-method="POST"
                                 data-update="#template-list"
                             {% endif %}>
@@ -185,7 +185,7 @@
     </tr>
 {% endmacro -%}
 
-{% macro render_template_list(templates, target, inherited_templates=[], event=none, default_template=none,
+{% macro render_template_list(templates, target, inherited_templates=[], event=none, default_ticket=none,
                               default_badge=none, not_deletable_templates=[]) -%}
     {% if inherited_templates %}
         <section>
@@ -194,7 +194,7 @@
                 <tbody>
                     {% for tpl in inherited_templates | sort(attribute='title') | sort(attribute='type') %}
                         {{ _render_template(tpl, target, inherited=true, event=event,
-                                            default_template=default_template, default_badge=default_badge,
+                                            default_ticket=default_ticket, default_badge=default_badge,
                                             not_deletable_templates=not_deletable_templates) }}
                     {% endfor %}
                 </tbody>
@@ -217,7 +217,9 @@
             <table class="i-table-widget">
                 <tbody>
                     {% for tpl in templates | sort(attribute='title') | sort(attribute='type') %}
-                        {{ _render_template(tpl, target, event=event, default_template=default_template, default_badge=default_badge, not_deletable_templates=not_deletable_templates) }}
+                        {{ _render_template(tpl, target, event=event, default_ticket=default_ticket,
+                                            default_badge=default_badge,
+                                            not_deletable_templates=not_deletable_templates) }}
                     {% endfor %}
                 </tbody>
             </table>

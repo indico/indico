@@ -26,7 +26,7 @@ from indico.modules.designer.models.images import DesignerImageFile
 from indico.modules.designer.models.templates import DesignerTemplate
 from indico.modules.designer.operations import update_template
 from indico.modules.designer.util import (get_all_templates, get_default_badge_on_category,
-                                          get_default_template_on_category, get_image_placeholder_types,
+                                          get_default_ticket_on_category, get_image_placeholder_types,
                                           get_inherited_templates, get_nested_placeholder_options,
                                           get_not_deletable_templates, get_placeholder_options)
 from indico.modules.designer.views import WPCategoryManagementDesigner, WPEventManagementDesigner
@@ -80,10 +80,10 @@ TEMPLATE_DATA_JSON_SCHEMA = {
 
 def _render_template_list(target, event=None):
     tpl = get_template_module('designer/_list.html')
-    default_template = get_default_template_on_category(target) if isinstance(target, Category) else None
+    default_ticket = get_default_ticket_on_category(target) if isinstance(target, Category) else None
     default_badge = get_default_badge_on_category(target) if isinstance(target, Category) else None
     not_deletable = get_not_deletable_templates(target)
-    return tpl.render_template_list(target.designer_templates, target, event=event, default_template=default_template,
+    return tpl.render_template_list(target.designer_templates, target, event=event, default_ticket=default_ticket,
                                     default_badge=default_badge, inherited_templates=get_inherited_templates(target),
                                     not_deletable_templates=not_deletable)
 
@@ -163,12 +163,12 @@ class TemplateListMixin(TargetFromURLMixin):
     def _process(self):
         templates = get_inherited_templates(self.target)
         not_deletable = get_not_deletable_templates(self.target)
-        default_template = get_default_template_on_category(self.target) if isinstance(self.target, Category) else None
+        default_ticket = get_default_ticket_on_category(self.target) if isinstance(self.target, Category) else None
         default_badge = get_default_badge_on_category(self.target) if isinstance(self.target, Category) else None
         signals.event.filter_selectable_badges.send(type(self), badge_templates=templates)
         signals.event.filter_selectable_badges.send(type(self), badge_templates=not_deletable)
         return self._render_template('list.html', inherited_templates=templates, not_deletable_templates=not_deletable,
-                                     default_template=default_template, default_badge=default_badge)
+                                     default_ticket=default_ticket, default_badge=default_badge)
 
 
 class CloneTemplateMixin(TargetFromURLMixin):
@@ -376,7 +376,7 @@ class RHGetTemplateData(BacksideTemplateProtectionMixin, RHModifyDesignerTemplat
         return jsonify(template=template_data, backside_template_id=self.template.id)
 
 
-class RHToggleTemplateDefaultOnCategory(RHManageCategoryBase):
+class RHToggleTicketDefaultOnCategory(RHManageCategoryBase):
     def _process(self):
         template = DesignerTemplate.get_or_404(request.view_args['template_id'])
         if template not in get_all_templates(self.category):
@@ -384,7 +384,7 @@ class RHToggleTemplateDefaultOnCategory(RHManageCategoryBase):
         if template == self.category.default_ticket_template:
             # already the default -> clear it
             self.category.default_ticket_template = None
-        elif template == get_default_template_on_category(self.category, only_inherited=True):
+        elif template == get_default_ticket_on_category(self.category, only_inherited=True):
             # already the inherited default -> clear it instead of setting it explicitly
             self.category.default_ticket_template = None
         else:
