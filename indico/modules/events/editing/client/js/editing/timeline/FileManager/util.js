@@ -5,8 +5,6 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-import deleteFileURL from 'indico-url:files.delete_file';
-
 import _ from 'lodash';
 import React from 'react';
 import PropTypes from 'prop-types';
@@ -37,22 +35,6 @@ export const fileTypePropTypes = {
   allowMultipleFiles: PropTypes.bool.isRequired,
   id: PropTypes.number.isRequired,
 };
-
-export async function uploadFile(url, file, onUploadProgress) {
-  const formData = new FormData();
-  formData.append('file', file);
-
-  try {
-    const {data} = await indicoAxios.post(url, formData, {
-      headers: {'content-type': 'multipart/form-data'},
-      onUploadProgress,
-    });
-    return data;
-  } catch (e) {
-    handleAxiosError(e);
-    return null;
-  }
-}
 
 export async function uploadExistingFile(url, file) {
   try {
@@ -117,14 +99,6 @@ export function uploadFiles({
       }
     })
   );
-}
-
-export async function deleteFile(uuid) {
-  try {
-    await indicoAxios.delete(deleteFileURL({uuid}));
-  } catch (e) {
-    handleAxiosError(e);
-  }
 }
 
 export function mapFileTypes(fileTypes, files, uploadableFiles = []) {

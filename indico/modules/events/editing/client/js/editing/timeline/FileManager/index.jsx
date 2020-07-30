@@ -14,6 +14,7 @@ import {useDropzone} from 'react-dropzone';
 import {Field} from 'react-final-form';
 import {Dropdown, Icon, Message, Popup} from 'semantic-ui-react';
 import {TooltipIfTruncated} from 'indico/react/components';
+import {uploadFile, deleteFile} from 'indico/react/components/files/util';
 import {Param, Translate} from 'indico/react/i18n';
 import {
   FileManagerContext,
@@ -21,9 +22,7 @@ import {
   uploadablePropTypes,
   fileTypePropTypes,
   uploadFiles,
-  uploadFile,
   uploadExistingFile,
-  deleteFile,
   mapFileTypes,
   getFileToDelete,
 } from './util';

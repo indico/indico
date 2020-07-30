@@ -10,14 +10,8 @@ import PropTypes from 'prop-types';
 import {useDropzone} from 'react-dropzone';
 import {Icon} from 'semantic-ui-react';
 import {TooltipIfTruncated} from 'indico/react/components';
-import {
-  FileManagerContext,
-  filePropTypes,
-  uploadFiles,
-  uploadFile,
-  deleteFile,
-  fileTypePropTypes,
-} from './util';
+import {uploadFile, deleteFile} from 'indico/react/components/files/util';
+import {FileManagerContext, filePropTypes, uploadFiles, fileTypePropTypes} from './util';
 import * as actions from './actions';
 
 import './FileManager.module.scss';
