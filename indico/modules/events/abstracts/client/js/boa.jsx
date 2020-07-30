@@ -6,7 +6,7 @@
 // LICENSE file for more details.
 
 import uploadBOAFileURL from 'indico-url:abstracts.upload_boa_file';
-import uploadBOAURL from 'indico-url:abstracts.upload_boa';
+import customBOAURL from 'indico-url:abstracts.manage_custom_boa';
 
 import React, {useState} from 'react';
 import ReactDOM from 'react-dom';
@@ -28,7 +28,7 @@ export default function CustomBOAModal({eventId, initialFile}) {
   const deleteExistingBOA = async () => {
     setDeleting(true);
     try {
-      await indicoAxios.delete(uploadBOAURL({confId: eventId}));
+      await indicoAxios.delete(customBOAURL({confId: eventId}));
     } catch (e) {
       handleAxiosError(e);
       setDeleting(false);
@@ -39,7 +39,7 @@ export default function CustomBOAModal({eventId, initialFile}) {
 
   const handleSubmit = async ({file}) => {
     try {
-      await indicoAxios.post(uploadBOAURL({confId: eventId}), {file});
+      await indicoAxios.post(customBOAURL({confId: eventId}), {file});
     } catch (e) {
       return handleSubmitError(e);
     }

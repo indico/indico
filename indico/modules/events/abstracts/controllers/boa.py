@@ -54,8 +54,8 @@ class RHUploadBOAFile(UploadFileMixin, RHManageAbstractsBase):
         return os.path.splitext(file.filename)[1].lower() == '.pdf'
 
 
-class RHUploadBOA(RHManageAbstractsBase):
-    """Upload custom book of abstracts."""
+class RHCustomBOA(RHManageAbstractsBase):
+    """Manage custom book of abstracts."""
 
     @use_kwargs({
         'file': FileField(required=True, validate=file_extension('pdf')),
