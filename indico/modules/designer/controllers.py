@@ -25,10 +25,10 @@ from indico.modules.designer.forms import AddTemplateForm
 from indico.modules.designer.models.images import DesignerImageFile
 from indico.modules.designer.models.templates import DesignerTemplate
 from indico.modules.designer.operations import update_template
-from indico.modules.designer.util import (get_all_templates, get_default_template_on_category,
-                                          get_image_placeholder_types, get_inherited_templates,
-                                          get_nested_placeholder_options, get_not_deletable_templates,
-                                          get_placeholder_options)
+from indico.modules.designer.util import (get_all_templates, get_default_badge_on_category,
+                                          get_default_template_on_category, get_image_placeholder_types,
+                                          get_inherited_templates, get_nested_placeholder_options,
+                                          get_not_deletable_templates, get_placeholder_options)
 from indico.modules.designer.views import WPCategoryManagementDesigner, WPEventManagementDesigner
 from indico.modules.events import Event
 from indico.modules.events.management.controllers import RHManageEventBase
@@ -81,9 +81,10 @@ TEMPLATE_DATA_JSON_SCHEMA = {
 def _render_template_list(target, event=None):
     tpl = get_template_module('designer/_list.html')
     default_template = get_default_template_on_category(target) if isinstance(target, Category) else None
+    default_badge = get_default_badge_on_category(target) if isinstance(target, Category) else None
     not_deletable = get_not_deletable_templates(target)
     return tpl.render_template_list(target.designer_templates, target, event=event, default_template=default_template,
-                                    inherited_templates=get_inherited_templates(target),
+                                    default_badge=default_badge, inherited_templates=get_inherited_templates(target),
                                     not_deletable_templates=not_deletable)
 
 
@@ -163,10 +164,11 @@ class TemplateListMixin(TargetFromURLMixin):
         templates = get_inherited_templates(self.target)
         not_deletable = get_not_deletable_templates(self.target)
         default_template = get_default_template_on_category(self.target) if isinstance(self.target, Category) else None
+        default_badge = get_default_badge_on_category(self.target) if isinstance(self.target, Category) else None
         signals.event.filter_selectable_badges.send(type(self), badge_templates=templates)
         signals.event.filter_selectable_badges.send(type(self), badge_templates=not_deletable)
         return self._render_template('list.html', inherited_templates=templates, not_deletable_templates=not_deletable,
-                                     default_template=default_template)
+                                     default_template=default_template, default_badge=default_badge)
 
 
 class CloneTemplateMixin(TargetFromURLMixin):
@@ -336,12 +338,18 @@ class RHDeleteDesignerTemplate(RHModifyDesignerTemplateBase):
     def _process(self):
         db.session.delete(self.template)
         root = Category.get_root()
+        # if we deleted the root category's default templates, pick
+        # a system template as the new default (this always exists)
         if not root.default_ticket_template:
-            # if we deleted the root category's default template, pick
-            # a system template as the new default (this always exists)
-            system_template = DesignerTemplate.find_first(DesignerTemplate.is_system_template,
-                                                          DesignerTemplate.type == TemplateType.badge)
+            system_templates = DesignerTemplate.query.filter(DesignerTemplate.is_system_template,
+                                                             DesignerTemplate.type == TemplateType.badge).all()
+            system_template = next(tpl for tpl in system_templates if tpl.is_ticket)
             root.default_ticket_template = system_template
+        if not root.default_badge_template:
+            system_templates = DesignerTemplate.query.filter(DesignerTemplate.is_system_template,
+                                                             DesignerTemplate.type == TemplateType.badge).all()
+            system_template = next(tpl for tpl in system_templates if not tpl.is_ticket)
+            root.default_badge_template = system_template
         db.session.flush()
         flash(_('The template has been deleted'), 'success')
         return jsonify_data(html=_render_template_list(self.target, event=self.event_or_none))
@@ -382,5 +390,25 @@ class RHToggleTemplateDefaultOnCategory(RHManageCategoryBase):
         else:
             self.category.default_ticket_template = template
         if self.category.is_root and not self.category.default_ticket_template:
+            raise Exception('Cannot clear default ticket template on root category')
+        return jsonify_data(html=_render_template_list(self.category))
+
+
+class RHToggleBadgeDefaultOnCategory(RHManageCategoryBase):
+    def _process(self):
+        template = DesignerTemplate.get_or_404(request.view_args['template_id'])
+        all_badge_templates = [tpl for tpl in get_all_templates(self.category)
+                               if tpl.type == TemplateType.badge and not tpl.is_ticket]
+        if template not in all_badge_templates:
+            raise Exception('Invalid template')
+        if template == self.category.default_badge_template:
+            # already the default -> clear it
+            self.category.default_badge_template = None
+        elif template == get_default_badge_on_category(self.category, only_inherited=True):
+            # already the inherited default -> clear it instead of setting it explicitly
+            self.category.default_badge_template = None
+        else:
+            self.category.default_badge_template = template
+        if self.category.is_root and not self.category.default_badge_template:
             raise Exception('Cannot clear default ticket template on root category')
         return jsonify_data(html=_render_template_list(self.category))

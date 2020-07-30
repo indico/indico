@@ -15,7 +15,7 @@ from indico.core.db.sqlalchemy.protection import ProtectionMode
 from indico.util.console import cformat
 
 
-DEFAULT_TEMPLATE_DATA = {
+DEFAULT_TICKET_DATA = {
     'background_position': 'stretch', 'width': 850, 'height': 1350, 'items': [
         {'font_size': '24pt', 'bold': False, 'color': 'black', 'text': 'Fixed text', 'selected': False,
          'text_align': 'center', 'font_family': 'sans-serif', 'width': 400, 'italic': False, 'y': 190, 'x': 330,
@@ -38,6 +38,28 @@ DEFAULT_TEMPLATE_DATA = {
         {'font_size': '13.5pt', 'bold': False, 'color': 'black', 'text': 'Fixed text', 'selected': False,
          'text_align': 'left', 'font_family': 'sans-serif', 'width': 400, 'italic': False, 'y': 90, 'x': 50,
          'height': None, 'type': 'event_room', 'id': 6}]
+}
+
+DEFAULT_BADGE_DATA = {
+    'background_position': 'stretch', 'width': 425, 'height': 270, 'items': [
+        {'font_family': 'sans-serif', 'font_size': '10pt', 'bold': False, 'color': 'black', 'text': 'Fixed text',
+         'selected': False, 'text_align': 'right', 'height': None, 'width': 275, 'italic': False, 'y': 42, 'x': 129,
+         'type': 'event_title', 'id': 0},
+        {'font_family': 'sans-serif', 'font_size': '7pt', 'bold': False, 'color': 'black', 'text': 'Fixed text',
+         'selected': False, 'text_align': 'right', 'height': None, 'width': 275, 'italic': False, 'y': 85, 'x': 128,
+         'type': 'event_dates', 'id': 1},
+        {'font_family': 'sans-serif', 'font_size': '10pt', 'bold': False, 'color': 'black', 'text': 'Fixed text',
+         'selected': False, 'text_align': 'left', 'height': None, 'width': 385, 'italic': False, 'y': 168, 'x': 20,
+         'type': 'affiliation', 'id': 2},
+        {'font_family': 'sans-serif', 'font_size': '12pt', 'bold': True, 'color': 'black', 'text': 'Fixed text',
+         'selected': False, 'text_align': 'left', 'height': None, 'width': 385, 'italic': False, 'y': 123, 'x': 20,
+         'type': 'full_name_b', 'id': 3},
+        {'font_family': 'sans-serif', 'font_size': '7.5pt', 'bold': False, 'color': 'black', 'text': 'Fixed text',
+         'selected': False, 'text_align': 'left', 'height': None, 'width': 385, 'italic': False, 'y': 194, 'x': 20,
+         'type': 'position', 'id': 4},
+        {'font_family': 'sans-serif', 'font_size': '7pt', 'bold': False, 'color': 'black', 'text': 'Fixed text',
+         'selected': False, 'text_align': 'left', 'height': None, 'width': 385, 'italic': False, 'y': 218, 'x': 20,
+         'type': 'country', 'id': 5}]
 }
 
 
@@ -104,10 +126,14 @@ def create_all_tables(db, verbose=False, add_initial_data=True):
         db.session.flush()
         if verbose:
             print(cformat('%{green}Creating default ticket template for root category '))
-        dt = DesignerTemplate(category_id=0, title='Default ticket', type=TemplateType.badge,
-                              data=DEFAULT_TEMPLATE_DATA, is_system_template=True)
-        cat.default_ticket_template = dt
-        db.session.add(dt)
+        dtt = DesignerTemplate(category_id=0, title='Default ticket', type=TemplateType.badge,
+                               data=DEFAULT_TICKET_DATA, is_system_template=True)
+        dbt = DesignerTemplate(category_id=0, title='Default badge', type=TemplateType.badge,
+                               data=DEFAULT_BADGE_DATA, is_system_template=True)
+        cat.default_ticket_template = dtt
+        cat.default_badge_template = dbt
+        db.session.add(dtt)
+        db.session.add(dbt)
         if verbose:
             print(cformat('%{green}Creating system oauth apps'))
         for sat in SystemAppType:

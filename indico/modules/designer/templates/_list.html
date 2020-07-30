@@ -41,7 +41,8 @@
     {% endif %}
 {% endmacro %}
 
-{% macro _render_template(tpl, target, inherited=false, event=none, default_template=none, not_deletable_templates=[]) -%}
+{% macro _render_template(tpl, target, inherited=false, event=none, default_template=none, default_badge=none,
+                          not_deletable_templates=[]) -%}
     <tr>
         <td class="i-table id-column">
             <i class="designer-template-type-icon template-icon-{{ tpl.type.name }}"
@@ -77,6 +78,26 @@
                             {% else %}
                                 title="{% trans %}Toggle default ticket template for this category{% endtrans %}"
                                 data-href="{{ url_for('.toggle_category_default', target, template_id=tpl.id) }}"
+                                data-method="POST"
+                                data-update="#template-list"
+                            {% endif %}>
+                        </a>
+                    {% endif %}
+                    {% if not event and tpl.type.name == 'badge' and not tpl.is_ticket %}
+                        {% set inherited_default = default_badge == tpl and tpl.category != target and
+                                not target.default_badge_template%}
+                        {% set global_default = default_badge == tpl and target.is_root %}
+                        <a class="i-button icon-tag icon-only borderless hide-if-locked toggle-default
+                            {{ 'default-on-category' if default_badge == tpl }}
+                            {{ 'inherited' if inherited_default }}
+                            {{ 'global-default' if global_default }}"
+                            {% if inherited_default %}
+                                title="{% trans %}This is the inherited default badge template{% endtrans %}"
+                            {% elif global_default %}
+                                title="{% trans %}This is the global default badge template{% endtrans %}"
+                            {% else %}
+                                title="{% trans %}Toggle default badge template for this category{% endtrans %}"
+                                data-href="{{ url_for('.toggle_category_default_badge', target, template_id=tpl.id) }}"
                                 data-method="POST"
                                 data-update="#template-list"
                             {% endif %}>
@@ -164,14 +185,17 @@
     </tr>
 {% endmacro -%}
 
-{% macro render_template_list(templates, target, inherited_templates=[], event=none, default_template=none, not_deletable_templates=[]) -%}
+{% macro render_template_list(templates, target, inherited_templates=[], event=none, default_template=none,
+                              default_badge=none, not_deletable_templates=[]) -%}
     {% if inherited_templates %}
         <section>
             <h3>{% trans %}Inherited templates{% endtrans %}</h3>
             <table class="i-table-widget">
                 <tbody>
                     {% for tpl in inherited_templates | sort(attribute='title') | sort(attribute='type') %}
-                        {{ _render_template(tpl, target, inherited=true, event=event, default_template=default_template, not_deletable_templates=not_deletable_templates) }}
+                        {{ _render_template(tpl, target, inherited=true, event=event,
+                                            default_template=default_template, default_badge=default_badge,
+                                            not_deletable_templates=not_deletable_templates) }}
                     {% endfor %}
                 </tbody>
             </table>
@@ -193,7 +217,7 @@
             <table class="i-table-widget">
                 <tbody>
                     {% for tpl in templates | sort(attribute='title') | sort(attribute='type') %}
-                        {{ _render_template(tpl, target, event=event, default_template=default_template, not_deletable_templates=not_deletable_templates) }}
+                        {{ _render_template(tpl, target, event=event, default_template=default_template, default_badge=default_badge, not_deletable_templates=not_deletable_templates) }}
                     {% endfor %}
                 </tbody>
             </table>

@@ -64,3 +64,11 @@ def get_default_template_on_category(category, only_inherited=False):
     parent_chain = category.parent_chain_query.options(joinedload('default_ticket_template')).all()
     return next((category.default_ticket_template for
                  category in reversed(parent_chain) if category.default_ticket_template), None)
+
+
+def get_default_badge_on_category(category, only_inherited=False):
+    if not only_inherited and category.default_badge_template:
+        return category.default_badge_template
+    parent_chain = category.parent_chain_query.options(joinedload('default_badge_template')).all()
+    return next((category.default_badge_template for
+                 category in reversed(parent_chain) if category.default_badge_template), None)
