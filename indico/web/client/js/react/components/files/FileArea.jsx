@@ -57,6 +57,8 @@ export function FileArea({
   files,
   disabled,
   dragText,
+  uploadButtonText,
+  uploadButtonIcon,
   fileAction,
 }) {
   return (
@@ -108,8 +110,8 @@ export function FileArea({
                   <Button
                     type="button"
                     styleName="file-selection-btn"
-                    icon="upload"
-                    content={Translate.string('Choose from your computer')}
+                    icon={uploadButtonIcon}
+                    content={uploadButtonText}
                     onClick={() => openFileDialog()}
                     disabled={disabled}
                   />
@@ -128,16 +130,36 @@ FileArea.propTypes = {
   files: PropTypes.arrayOf(fileDetailsShape).isRequired,
   disabled: PropTypes.bool.isRequired,
   dragText: PropTypes.string,
+  uploadButtonText: PropTypes.string,
+  uploadButtonIcon: PropTypes.string,
   fileAction: fileActionShape,
 };
 FileArea.defaultProps = {
   dragText: Translate.string('Drag file(s) here'),
+  uploadButtonText: Translate.string('Choose from your computer'),
+  uploadButtonIcon: 'upload',
   fileAction: null,
 };
 
 export function SingleFileArea({file, ...rest}) {
   const files = file ? [file] : [];
-  return <FileArea files={files} dragText={Translate.string('Drag file here')} {...rest} />;
+  const dragText = file
+    ? Translate.string('Drag file here to replace')
+    : Translate.string('Drag file here');
+  const uploadButtonText = file
+    ? Translate.string('Choose new file from your computer')
+    : Translate.string('Choose from your computer');
+  const uploadButtonIcon = file ? 'exchange' : 'upload';
+
+  return (
+    <FileArea
+      files={files}
+      dragText={dragText}
+      uploadButtonIcon={uploadButtonIcon}
+      uploadButtonText={uploadButtonText}
+      {...rest}
+    />
+  );
 }
 
 SingleFileArea.propTypes = {
