@@ -26,7 +26,7 @@ export default function FileSubmission({onChange, disabled}) {
     [files, setFiles, onChange]
   );
 
-  const {getRootProps, getInputProps, isDragActive, open: openFileDialog} = useDropzone({
+  const dropzone = useDropzone({
     onDrop,
     disabled,
     multiple: true,
@@ -44,12 +44,9 @@ export default function FileSubmission({onChange, disabled}) {
 
   return (
     <FileArea
-      dropzoneRootProps={getRootProps()}
-      dropzoneInputProps={getInputProps()}
-      hideFiles={isDragActive}
+      dropzone={dropzone}
       files={files.map(({name, size}) => ({filename: name, size}))}
       disabled={disabled}
-      onChooseFileClick={openFileDialog}
       fileAction={{
         icon: 'trash',
         color: 'red',

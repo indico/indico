@@ -10,9 +10,9 @@ import PropTypes from 'prop-types';
 import {Button, Card, Divider, Grid, Header, Segment, Icon} from 'semantic-ui-react';
 import {TooltipIfTruncated} from 'indico/react/components';
 import {Translate, Param} from 'indico/react/i18n';
+import {fileDetailsShape} from './props';
 
 import './FileArea.module.scss';
-import {fileDetailsShape} from './props';
 
 function humanReadableBytes(bytes) {
   const kiloBytes = 1000;
@@ -39,23 +39,33 @@ function humanReadableBytes(bytes) {
   }
 }
 
+const dropzoneShape = PropTypes.shape({
+  getRootProps: PropTypes.func.isRequired,
+  getInputProps: PropTypes.func.isRequired,
+  isDragActive: PropTypes.bool.isRequired,
+  open: PropTypes.func.isRequired,
+});
+
+const fileActionShape = PropTypes.shape({
+  icon: PropTypes.string.isRequired,
+  color: PropTypes.string.isRequired,
+  onClick: PropTypes.func.isRequired,
+});
+
 export function FileArea({
-  dropzoneRootProps,
-  dropzoneInputProps,
-  hideFiles,
+  dropzone: {getRootProps, getInputProps, isDragActive, open: openFileDialog},
   files,
   disabled,
-  onChooseFileClick,
   dragText,
   fileAction,
 }) {
   return (
-    <div {...dropzoneRootProps} styleName="dropzone-area">
-      <input {...dropzoneInputProps} />
+    <div {...getRootProps()} styleName="dropzone-area">
+      <input {...getInputProps()} />
       <Segment textAlign="center" placeholder>
         <Grid celled="internally">
           <Grid.Row columns={files.length === 0 ? 1 : 2}>
-            {!hideFiles && files.length !== 0 && (
+            {!isDragActive && files.length !== 0 && (
               <Grid.Column width={10} verticalAlign="middle">
                 <Card.Group itemsPerRow={files.length === 1 ? 1 : 2} centered>
                   {files.map(file => (
@@ -88,9 +98,9 @@ export function FileArea({
                 </Card.Group>
               </Grid.Column>
             )}
-            <Grid.Column verticalAlign="middle" width={files.length === 0 || hideFiles ? 16 : 6}>
+            <Grid.Column verticalAlign="middle" width={files.length === 0 || isDragActive ? 16 : 6}>
               <Header>{dragText}</Header>
-              {!hideFiles && (
+              {!isDragActive && (
                 <>
                   <Divider horizontal>
                     <Translate>Or</Translate>
@@ -100,7 +110,7 @@ export function FileArea({
                     styleName="file-selection-btn"
                     icon="upload"
                     content={Translate.string('Choose from your computer')}
-                    onClick={() => onChooseFileClick()}
+                    onClick={() => openFileDialog()}
                     disabled={disabled}
                   />
                 </>
@@ -114,47 +124,27 @@ export function FileArea({
 }
 
 FileArea.propTypes = {
-  dropzoneRootProps: PropTypes.object.isRequired,
-  dropzoneInputProps: PropTypes.object.isRequired,
-  hideFiles: PropTypes.bool.isRequired,
+  dropzone: dropzoneShape.isRequired,
   files: PropTypes.arrayOf(fileDetailsShape).isRequired,
   disabled: PropTypes.bool.isRequired,
-  onChooseFileClick: PropTypes.func.isRequired,
   dragText: PropTypes.string,
-  fileAction: PropTypes.shape({
-    icon: PropTypes.string.isRequired,
-    color: PropTypes.string.isRequired,
-    onClick: PropTypes.func.isRequired,
-  }),
+  fileAction: fileActionShape,
 };
 FileArea.defaultProps = {
   dragText: Translate.string('Drag file(s) here'),
   fileAction: null,
 };
 
-export function SingleFileArea({hideFile, file, ...rest}) {
-  return (
-    <FileArea
-      hideFiles={hideFile}
-      files={file ? [file] : []}
-      dragText={Translate.string('Drag file here')}
-      {...rest}
-    />
-  );
+export function SingleFileArea({file, ...rest}) {
+  const files = file ? [file] : [];
+  return <FileArea files={files} dragText={Translate.string('Drag file here')} {...rest} />;
 }
 
 SingleFileArea.propTypes = {
-  dropzoneRootProps: PropTypes.object.isRequired,
-  dropzoneInputProps: PropTypes.object.isRequired,
-  hideFile: PropTypes.bool.isRequired,
+  dropzone: dropzoneShape.isRequired,
   file: fileDetailsShape,
   disabled: PropTypes.bool.isRequired,
-  onChooseFileClick: PropTypes.func.isRequired,
-  fileAction: PropTypes.shape({
-    icon: PropTypes.string.isRequired,
-    color: PropTypes.string.isRequired,
-    onClick: PropTypes.func.isRequired,
-  }),
+  fileAction: fileActionShape,
 };
 
 SingleFileArea.defaultProps = {
