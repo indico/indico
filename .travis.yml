@@ -18,7 +18,7 @@ install:
   - pip install -U pip setuptools
   - pip install -r requirements.dev.txt
   - pip install -e .
-  - npm install
+  - npm ci
 script:
   - FORCE_COLOR=1 npx react-jsx-i18n extract --ext jsx indico/web/client/ indico/modules/ > /dev/null
   - isort -rc --diff --check-only indico/

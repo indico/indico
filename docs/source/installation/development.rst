@@ -133,7 +133,7 @@ Let's get into the Indico virtualenv::
     cd src
     pip install -r requirements.dev.txt
     pip install -e .
-    npm install
+    npm ci
 
 Then, follow the instructions given by the wizard::
 
