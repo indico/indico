@@ -218,7 +218,7 @@ def set_best_lang(check_session=True):
         return session.lang
 
     # chinese uses `zh-Hans-CN`, but browsers send `zh-CN`
-    all_locales = {_remove_locale_script(loc): loc for loc in get_all_locales()}
+    all_locales = {_remove_locale_script(loc).lower(): loc for loc in get_all_locales()}
 
     # try to use browser language
     preferred = [x.replace('-', '_') for x in request.accept_languages.values()]
@@ -233,7 +233,7 @@ def set_best_lang(check_session=True):
 
     # restore script information if necessary
     try:
-        resolved_lang = all_locales[resolved_lang]
+        resolved_lang = all_locales[resolved_lang.lower()]
     except KeyError:
         # this happens if we have e.g. a development setup with no built languages.
         # in this case `get_all_locales()` only contains `en_EN`
