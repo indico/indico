@@ -10,6 +10,7 @@
     !!python/unicode 'creator_id': !!python/tuple
     - !!python/unicode 'userref'
     - !!python/unicode '00000000-0000-4000-8000-000000000001'
+    !!python/unicode 'custom_boa_id': null
     !!python/unicode 'default_page_id': null
     !!python/unicode 'description': !!python/unicode ''
     !!python/unicode 'end_dt': !!python/tuple
