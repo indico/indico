@@ -156,7 +156,7 @@ class Room extends React.Component {
         {isFavorite && <Label corner="right" icon="star" color="yellow" />}
         {this.renderCardImage(room, content, actions)}
         <Card.Content>
-          <TooltipIfTruncated>
+          <TooltipIfTruncated useEventTarget>
             <Card.Header styleName="room-title">{room.fullName}</Card.Header>
           </TooltipIfTruncated>
           <Card.Meta style={{fontSize: '0.8em'}}>{room.division}</Card.Meta>

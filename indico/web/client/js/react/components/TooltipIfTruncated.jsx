@@ -8,11 +8,20 @@
 import React, {useRef} from 'react';
 import PropTypes from 'prop-types';
 
-export default function TooltipIfTruncated({children, tooltip}) {
+/*
+ * Show a tooltip if the contents were truncated/ellipsized via CSS.
+ *
+ * By default the check will act on the immediate child of this component,
+ * but in case of React components which do not forward refs, this will not
+ * work. In this case, ``useEventTarget`` can be used to apply the check and
+ * tooltip to the element triggering the mouseenter event. This generally only
+ * works well if there is exactly one element inside.
+ */
+export default function TooltipIfTruncated({children, useEventTarget, tooltip}) {
   const ref = useRef();
 
   const handleMouseEnter = () => {
-    const element = ref.current;
+    const element = useEventTarget ? event.target : ref.current;
     const overflows =
       element.offsetWidth < element.scrollWidth || element.offsetHeight < element.scrollHeight;
 
@@ -23,14 +32,20 @@ export default function TooltipIfTruncated({children, tooltip}) {
   };
 
   const child = React.Children.only(children);
-  return React.cloneElement(child, {onMouseEnter: handleMouseEnter, ref});
+  const cloneProps = {onMouseEnter: handleMouseEnter};
+  if (!useEventTarget) {
+    cloneProps.ref = ref;
+  }
+  return React.cloneElement(child, cloneProps);
 }
 
 TooltipIfTruncated.propTypes = {
   children: PropTypes.any.isRequired,
+  useEventTarget: PropTypes.bool,
   tooltip: PropTypes.string,
 };
 
 TooltipIfTruncated.defaultProps = {
   tooltip: null,
+  useEventTarget: false,
 };
