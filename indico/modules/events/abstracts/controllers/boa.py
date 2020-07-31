@@ -18,6 +18,7 @@ from indico.modules.events.abstracts.forms import BOASettingsForm
 from indico.modules.events.abstracts.settings import boa_settings
 from indico.modules.events.abstracts.util import clear_boa_cache, create_boa, create_boa_tex
 from indico.modules.events.contributions import contribution_settings
+from indico.modules.events.logs.models.entries import EventLogKind, EventLogRealm
 from indico.modules.files.controllers import UploadFileMixin
 from indico.util.i18n import _
 from indico.util.marshmallow import FileField, file_extension
@@ -63,10 +64,14 @@ class RHCustomBOA(RHManageAbstractsBase):
     def _process_POST(self, file):
         self.event.custom_boa = file
         file.claim(event_id=self.event.id)
+        self.event.log(EventLogRealm.reviewing, EventLogKind.positive, 'Abstracts',
+                       'Custom Book of Abstracts uploaded', session.user)
         return '', 204
 
     def _process_DELETE(self):
         self.event.custom_boa = None
+        self.event.log(EventLogRealm.reviewing, EventLogKind.negative, 'Abstracts',
+                       'Custom Book of Abstracts deleted', session.user)
         return '', 204
 
 
