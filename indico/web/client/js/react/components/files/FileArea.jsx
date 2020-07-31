@@ -83,7 +83,7 @@ export function FileArea({
                       <Card.Content>
                         <Card.Header textAlign="center">
                           <TooltipIfTruncated>
-                            <div style={{textOverflow: 'ellipsis', overflow: 'hidden'}}>
+                            <div styleName="filename">
                               {file.upload && !file.upload.finished && (
                                 <Icon
                                   loading
@@ -102,7 +102,6 @@ export function FileArea({
                             size="tiny"
                             active
                             color="blue"
-                            style={{margin: 0}}
                           />
                         )}
                       </Card.Content>

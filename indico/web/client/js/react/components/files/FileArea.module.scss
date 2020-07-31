@@ -22,6 +22,15 @@
       text-overflow: ellipsis;
       overflow: hidden;
       white-space: nowrap;
+
+      .filename {
+        text-overflow: ellipsis;
+        overflow: hidden;
+      }
+    }
+
+    :global(.ui.progress) {
+      margin: 0;
     }
   }
 
