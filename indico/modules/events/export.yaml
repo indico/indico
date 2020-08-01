@@ -80,6 +80,8 @@ export:
       - AbstractEmailTemplate.event_id
       - AbstractReviewQuestion.event_id
       - Abstract.event_id
+    fks_out:
+      - custom_boa_id
 
 
   # core event objects (contributions etc.) & timetable

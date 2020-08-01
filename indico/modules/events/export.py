@@ -477,7 +477,10 @@ class EventImporter(object):
                         .format(self.data['indico_version'], indico.__version__), fg='red')
             return None
         self._load_users(self.data)
-        for tablename, tabledata in self.data['objects']:
+        # we need the event first since it generates the event id, which may be needed
+        # in case of outgoing FKs on the event model
+        objects = sorted(self.data['objects'], key=lambda x: x[0] != 'events.events')
+        for tablename, tabledata in objects:
             self._deserialize_object(db.metadata.tables[tablename], tabledata)
         if self.deferred_idrefs:
             # Any reference to an ID that was exported need to be replaced
@@ -611,7 +614,7 @@ class EventImporter(object):
                     set_idref = value[1]
                     continue
                 elif value[0] == 'file':
-                    # import files later in case we end up skipping the column due to  a missing user
+                    # import files later in case we end up skipping the column due to a missing user
                     assert file_data is None
                     file_data = value[1]
                     continue
