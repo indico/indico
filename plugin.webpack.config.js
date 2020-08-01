@@ -11,7 +11,7 @@
 const path = require('path');
 const process = require('process');
 const glob = require('glob');
-const merge = require('webpack-merge');
+const {mergeWithCustomize, customizeArray} = require('webpack-merge');
 const _ = require('lodash');
 
 const config = require(path.join(process.env.INDICO_PLUGIN_ROOT, 'webpack-build-config'));
@@ -39,8 +39,10 @@ function generateModuleAliases() {
 }
 
 module.exports = env => {
-  return merge.strategy({
-    'resolve.alias': 'prepend',
+  return mergeWithCustomize({
+    customizeArray: customizeArray({
+      'resolve.alias': 'prepend',
+    }),
   })(base.webpackDefaults(env, config, bundles), {
     entry,
     externals: {
