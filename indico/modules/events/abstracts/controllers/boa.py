@@ -39,10 +39,14 @@ class RHBOASettings(RHManageAbstractsBase):
             flash(_('Book of Abstract settings have been saved'), 'success')
             return jsonify_data()
         if self.event.has_custom_boa:
-            message = _("You are currently using an uploaded custom book of abstracts PDF. Please note "
-                        "that every change in these settings will only change the LaTeX files and "
-                        "not the custom PDF, which is the one displayed via the 'Book of Abstracts' "
-                        "menu item in the display view.")
+            if config.LATEX_ENABLED:
+                message = _('You are currently using a custom Book of Abstracts. Please note that any change '
+                            'in the settings below will only affect the LaTeX files and not the custom PDF. '
+                            'You need to rebuild the Book of Abstracts and upload the new version yourself.')
+            else:
+                message = _('Please note that any change in the settings below will only affect the LaTeX files '
+                            'and not the Book of Abstracts itself. You need to rebuild it and upload the new '
+                            'version yourself.')
             return jsonify_form(form, message=message)
         return jsonify_form(form)
 

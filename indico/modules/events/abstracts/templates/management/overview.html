@@ -126,7 +126,8 @@
             <div class="toolbar">
                 <div id="boa-custom-upload"
                      data-event-id="{{ event.id }}"
-                     data-file="{{ custom_boa|tojson|forceescape }}"></div>
+                     data-file="{{ custom_boa|tojson|forceescape }}"
+                     {{ 'data-has-latex' if indico_config.LATEX_ENABLED }}></div>
                 <a href="#" class="i-button icon-settings"
                    data-href="{{ url_for('.manage_boa_settings', event) }}"
                    data-title="{% trans %}Configure the book of abstracts{% endtrans %}"
