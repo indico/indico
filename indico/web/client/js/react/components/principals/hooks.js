@@ -72,48 +72,44 @@ export const usePermissionInfo = () => {
   return [loaded ? new PermissionManager(data.tree, data.default) : null, data];
 };
 
-/**
- * This hook fetches the list of event roles available for a given event.
- * If the `eventId` is null, nothing is fetched.
- */
-export const useFetchEventRoles = eventId => {
-  const {data} = useIndicoAxios({
-    url: eventRolesURL({confId: eventId}),
-    trigger: eventId,
-    forceDispatchEffect: () => eventId !== null,
+const _useFetchPrincipalList = (eventId, enabled, urlFunc, options = {}) => {
+  const {data, loading} = useIndicoAxios({
+    url: urlFunc({confId: eventId}),
+    trigger: enabled ? eventId : null,
+    forceDispatchEffect: () => enabled && eventId !== null,
     camelize: true,
+    ...options,
   });
 
-  return data || [];
+  return [data || [], loading];
 };
 
 /**
- * This hook fetches the list of category roles available for a given event.
- * If the `eventId` is null, nothing is fetched.
+ * This hook fetches the list of selectable principals available for a given event.
+ * If the `eventId` is null or a principal type is disabled, nothing is fetched.
  */
-export const useFetchEventCategoryRoles = eventId => {
-  const {data} = useIndicoAxios({
-    url: eventCategoryRolesURL({confId: eventId}),
-    trigger: eventId,
-    forceDispatchEffect: () => eventId !== null,
-    camelize: true,
-  });
-
-  return data || [];
-};
-
-/**
- * This hook fetches the list of registration forms available for a given event.
- * If the `eventId` is null, nothing is fetched.
- */
-export const useFetchRegistrationForms = eventId => {
-  const {data} = useIndicoAxios({
-    url: registrationFormsURL({confId: eventId}),
-    trigger: eventId,
-    forceDispatchEffect: () => eventId !== null,
-    camelize: true,
-    unhandledErrors: [404], // feature may be disabled
-  });
-
-  return data || [];
+export const useFetchAvailablePrincipals = ({
+  eventId,
+  withEventRoles,
+  withCategoryRoles,
+  withRegistrants,
+}) => {
+  const [eventRoles, loadingEventRoles] = _useFetchPrincipalList(
+    eventId,
+    withEventRoles,
+    eventRolesURL
+  );
+  const [categoryRoles, loadingCategoryRoles] = _useFetchPrincipalList(
+    eventId,
+    withCategoryRoles,
+    eventCategoryRolesURL
+  );
+  const [registrationForms, loadingRegistrationForms] = _useFetchPrincipalList(
+    eventId,
+    withRegistrants,
+    registrationFormsURL,
+    {unhandledErrors: [404]} // feature may be disabled
+  );
+  const loading = loadingEventRoles || loadingCategoryRoles || loadingRegistrationForms;
+  return {eventRoles, categoryRoles, registrationForms, loading};
 };

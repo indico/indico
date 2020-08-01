@@ -11,12 +11,7 @@ import PropTypes from 'prop-types';
 import {Button, Dropdown, List} from 'semantic-ui-react';
 import {Translate} from 'indico/react/i18n';
 import {UserSearch, GroupSearch} from './Search';
-import {
-  useFetchEventCategoryRoles,
-  useFetchEventRoles,
-  useFetchPrincipals,
-  useFetchRegistrationForms,
-} from './hooks';
+import {useFetchPrincipals, useFetchAvailablePrincipals} from './hooks';
 import {PendingPrincipalListItem, PrincipalListItem} from './items';
 import {getPrincipalList, PrincipalType} from './util';
 import {FinalField} from '../../forms';
@@ -51,9 +46,17 @@ const PrincipalListField = props => {
 
   const usedIdentifiers = new Set(value);
   const informationMap = useFetchPrincipals(value, eventId);
-  const eventRoles = useFetchEventRoles(withEventRoles ? eventId : null);
-  const categoryRoles = useFetchEventCategoryRoles(withCategoryRoles ? eventId : null);
-  const registrationForms = useFetchRegistrationForms(withRegistrants ? eventId : null);
+  const {
+    eventRoles,
+    categoryRoles,
+    registrationForms,
+    loading: loadingAvailablePrincipals,
+  } = useFetchAvailablePrincipals({
+    eventId,
+    withEventRoles,
+    withCategoryRoles,
+    withRegistrants,
+  });
 
   const asOptions = useCallback(
     (data, getText = null) =>
@@ -112,50 +115,54 @@ const PrincipalListField = props => {
       </List>
       {!readOnly && (
         <Button.Group>
-          <Button icon="add" as="div" disabled />
-          <UserSearch
-            existing={value}
-            onAddItems={handleAddItems}
-            favorites={favoriteUsers}
-            disabled={disabled}
-            withExternalUsers={withExternalUsers}
-            onOpen={onFocus}
-            onClose={onBlur}
-          />
-          {withGroups && (
-            <GroupSearch
-              existing={value}
-              onAddItems={handleAddItems}
-              disabled={disabled}
-              onOpen={onFocus}
-              onClose={onBlur}
-            />
-          )}
-          {eventRoles.length !== 0 && (
-            <AddPrincipalDropdown
-              text={Translate.string('Event Role')}
-              options={asOptions(eventRoles)}
-              onChange={handleAddItems}
-              disabled={disabled}
-            />
-          )}
-          {categoryRoles.length !== 0 && (
-            <AddPrincipalDropdown
-              text={Translate.string('Category Role')}
-              options={asOptions(categoryRoles)}
-              onChange={handleAddItems}
-              disabled={disabled}
-            />
-          )}
-          {registrationForms.length !== 0 && (
-            <AddPrincipalDropdown
-              text={Translate.string('Registrants')}
-              options={asOptions(registrationForms, form =>
-                Translate.string('Registrants in "{form}"', {form})
+          <Button icon="add" as="div" disabled loading={loadingAvailablePrincipals} />
+          {!loadingAvailablePrincipals && (
+            <>
+              <UserSearch
+                existing={value}
+                onAddItems={handleAddItems}
+                favorites={favoriteUsers}
+                disabled={disabled}
+                withExternalUsers={withExternalUsers}
+                onOpen={onFocus}
+                onClose={onBlur}
+              />
+              {withGroups && (
+                <GroupSearch
+                  existing={value}
+                  onAddItems={handleAddItems}
+                  disabled={disabled}
+                  onOpen={onFocus}
+                  onClose={onBlur}
+                />
               )}
-              onChange={handleAddItems}
-              disabled={disabled}
-            />
+              {eventRoles.length !== 0 && (
+                <AddPrincipalDropdown
+                  text={Translate.string('Event Role')}
+                  options={asOptions(eventRoles)}
+                  onChange={handleAddItems}
+                  disabled={disabled}
+                />
+              )}
+              {categoryRoles.length !== 0 && (
+                <AddPrincipalDropdown
+                  text={Translate.string('Category Role')}
+                  options={asOptions(categoryRoles)}
+                  onChange={handleAddItems}
+                  disabled={disabled}
+                />
+              )}
+              {registrationForms.length !== 0 && (
+                <AddPrincipalDropdown
+                  text={Translate.string('Registrants')}
+                  options={asOptions(registrationForms, form =>
+                    Translate.string('Registrants in "{form}"', {form})
+                  )}
+                  onChange={handleAddItems}
+                  disabled={disabled}
+                />
+              )}
+            </>
           )}
         </Button.Group>
       )}
