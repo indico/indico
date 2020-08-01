@@ -90,7 +90,7 @@ export default function CommentForm({onSubmit, onToggleExpand, comment, expanded
               {...inputProps}
               name="comment"
               placeholder={Translate.string('Leave a comment...')}
-              required
+              required={commentFormVisible}
             />
             {commentFormVisible && (
               <>
