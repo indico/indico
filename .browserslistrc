@@ -7,24 +7,30 @@ last 2 Safari versions
 last 2 Firefox versions
 last 2 FirefoxAndroid versions
 Firefox esr
+edge 18
+edge 17
 
 # begin generated code
 # use `npm run update-browsers` to update
 [production]
-and_chr 74
-and_ff 67
-chrome 75
-chrome 74
-chrome 73
+and_chr 84
+and_ff 68
+chrome 84
+chrome 83
+chrome 81
+edge 84
+edge 83
 edge 18
 edge 17
-firefox 67
-firefox 66
-firefox 60
-ios_saf 12.2
-safari 12.1
-safari 12
-samsung 9.2
+firefox 79
+firefox 78
+firefox 77
+firefox 68
+ios_saf 13.4-13.5
+ios_saf 13.3
+safari 13.1
+safari 13
+samsung 11.1-11.2
 # end generated code
 
 [supported]
@@ -32,9 +38,12 @@ last 2 Chrome versions
 last 2 Firefox versions
 last 2 Edge versions
 last 2 Safari versions
+edge 18
+edge 17
 
 [development]
 last 2 Chrome versions
 last 2 Firefox versions
 last 2 Edge versions
 last 2 Safari versions
+edge 18
