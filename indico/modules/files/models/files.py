@@ -41,7 +41,9 @@ class File(StoredFileMixin, db.Model):
         nullable=False,
         default=False
     )
-    #: Metadata that may be set when the file gets claimed.
+    #: Arbitrary metadata related to the file. Tis may be set at any time,
+    #: but code setting it on an already-claimed file should take into account
+    #: that it may already contain some data.
     meta = db.Column(
         JSONB,
         nullable=False,
@@ -52,18 +54,12 @@ class File(StoredFileMixin, db.Model):
     # - custom_boa_of (Event.custom_boa)
     # - editing_revision_files (EditingRevisionFile.file)
 
-    def claim(self, **meta):
+    def claim(self):
         """Mark the file as claimed by some object it's linked to.
 
-        By claiming a file the linked object takes ownership of it so the
-        file will not be automatically deleted.
-
-        :param force: Whether the file can already
+        Once a file is claimed it will not be automatically deleted anymore.
         """
         self.claimed = True
-        # XXX: Should we check for conflicts with existing metadata in case the
-        # file was already claimed?
-        self.meta = meta
 
     def _build_storage_path(self):
         path_segments = list(map(strict_unicode, self.__context))

@@ -67,7 +67,7 @@ class RHCustomBOA(RHManageAbstractsBase):
     })
     def _process_POST(self, file):
         self.event.custom_boa = file
-        file.claim(event_id=self.event.id)
+        file.claim()
         self.event.log(EventLogRealm.reviewing, EventLogKind.positive, 'Abstracts',
                        'Custom Book of Abstracts uploaded', session.user)
         return '', 204
