@@ -73,7 +73,7 @@ def _make_editable_files(editable, files):
         for file in file_list
     ]
     for ef in editable_files:
-        ef.file.claim(contrib_id=editable.contribution.id, editable_type=editable.type.name)
+        ef.file.claim()
     return editable_files
 
 
@@ -94,7 +94,6 @@ def delete_editable(editable):
     for revision in editable.revisions:
         for ef in revision.files:
             ef.file.claimed = False
-            ef.file.meta = {}
     db.session.delete(editable)
     db.session.flush()
 
