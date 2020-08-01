@@ -10,7 +10,7 @@ import PropTypes from 'prop-types';
 import {bindActionCreators} from 'redux';
 import {connect} from 'react-redux';
 import {List, Icon} from 'semantic-ui-react';
-import {ICONS_AND_ALIASES} from 'semantic-ui-react/dist/es/lib/SUI';
+import {ICONS_AND_ALIASES} from 'semantic-ui-react/dist/commonjs/lib/SUI';
 import {formatters, FinalDropdown, FinalInput} from 'indico/react/forms';
 import {Param, Plural, PluralTranslate, Singular, Translate} from 'indico/react/i18n';
 import * as adminActions from './actions';

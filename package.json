@@ -79,7 +79,7 @@
     "redux-thunk": "^2.3.0",
     "reselect": "^4.0.0",
     "selectize": "^0.12.6",
-    "semantic-ui-react": "^0.88.2",
+    "semantic-ui-react": "^1.1.0",
     "shortid": "^2.2.15",
     "slugify": "^1.4.5",
     "tablesorter": "^2.31.3",
