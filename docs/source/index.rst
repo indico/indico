@@ -97,9 +97,9 @@ Contact
     contact/index.rst
 
 
-.. |build-status| image:: https://travis-ci.com/indico/indico.png?branch=master
-                   :alt: Travis Build Status
-                   :target: https://travis-ci.com/indico/indico
+.. |build-status| image:: https://github.com/indico/indico/workflows/CI/badge.svg
+                   :alt: CI Build Status
+                   :target: https://github.com/indico/indico/actions
 .. |pypi-ver| image:: https://img.shields.io/pypi/v/indico.png
                    :alt: Available on PyPI
                    :target: https://pypi.python.org/pypi/indico/

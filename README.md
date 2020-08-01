@@ -1,4 +1,4 @@
-# Indico [![Travis Build Status](https://travis-ci.com/indico/indico.svg?branch=master)](https://travis-ci.com/indico/indico) [![License](https://img.shields.io/github/license/indico/indico.svg)](https://github.com/indico/indico/blob/master/LICENSE) [![Available on PyPI](https://img.shields.io/pypi/v/indico.svg)](https://pypi.python.org/pypi/indico/) [![Made at CERN!](https://img.shields.io/badge/CERN-Open%20Source-%232980b9.svg)](https://home.cern)
+# Indico ![CI Status](https://github.com/indico/indico/workflows/CI/badge.svg) [![License](https://img.shields.io/github/license/indico/indico.svg)](https://github.com/indico/indico/blob/master/LICENSE) [![Available on PyPI](https://img.shields.io/pypi/v/indico.svg)](https://pypi.python.org/pypi/indico/) [![Made at CERN!](https://img.shields.io/badge/CERN-Open%20Source-%232980b9.svg)](https://home.cern)
 
 <img src="https://github.com/indico/indico/raw/master/indico/web/static/images/logo_indico.png"
      align="right"
