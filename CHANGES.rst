@@ -102,11 +102,14 @@ Improvements
 - Add CfA setting to control whether only speakers or also authors should
   get submission rights once the abstract gets accepted (:issue:`3431`)
 - Show the Indico version in the footer again (:issue:`4558`)
+- Event managers can upload a custom Book of Abstract PDF (:issue:`3039`,
+  :pr:`4577`)
 
 Bugfixes
 ^^^^^^^^
 
-- Hide Book of Abstracts menu item if LaTeX is disabled
+- Hide Book of Abstracts menu item if LaTeX is disabled and no custom Book
+  of Abstracts has been uploaded
 - Use a more consistent order when cloning the timetable (:issue:`4227`)
 - Do not show unrelated rooms with similar names when booking room from an
   event (:issue:`4089`)
