@@ -7,7 +7,7 @@
 
 import path from 'path';
 import glob from 'glob';
-import merge from 'webpack-merge';
+import {customizeArray, mergeWithCustomize} from 'webpack-merge';
 import CopyWebpackPlugin from 'copy-webpack-plugin';
 import {minify} from 'uglify-js';
 import webpack from 'webpack';
@@ -86,10 +86,10 @@ export default env => {
           return result.code;
         };
 
-  return merge.strategy({
-    // resolve module aliases first, since the ones
-    // in base.js are more general
-    'resolve.alias': 'prepend',
+  return mergeWithCustomize({
+    customizeArray: customizeArray({
+      'resolve.alias': 'prepend',
+    }),
   })(webpackDefaults(env, config), {
     entry: entryPoints,
     module: {
