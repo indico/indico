@@ -82,7 +82,7 @@ export default function EditableTypeDashboard() {
               }
               description={Translate.string('Toggle whether users can submit new editables')}
             >
-              <a className="i-button highlight icon-list" onClick={toggleSubmission}>
+              <a className="i-button highlight" onClick={toggleSubmission}>
                 {submissionEnabled ? Translate.string('Close now') : Translate.string('Start now')}
               </a>
             </Section>
@@ -95,7 +95,7 @@ export default function EditableTypeDashboard() {
               }
               description={Translate.string('Toggle whether editors can review submissions')}
             >
-              <a className="i-button highlight icon-list" onClick={toggleEditing}>
+              <a className="i-button highlight" onClick={toggleEditing}>
                 {editingEnabled ? Translate.string('Close now') : Translate.string('Start now')}
               </a>
             </Section>
