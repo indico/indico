@@ -43,7 +43,9 @@ def create_break_entry(event, data, session_block=None):
     break_ = Break()
     entry_data = {'object': break_,
                   'start_dt': data.pop('start_dt')}
-    break_.populate_from_dict(data)
+    # XXX: disable change tracking since `location_data` cannot be read back at this point
+    #      due to the break having no valid `location_parent`
+    break_.populate_from_dict(data, track_changes=False)
     parent = session_block.timetable_entry if session_block else None
     return create_timetable_entry(event, entry_data, parent=parent, extend_parent=True)
 
