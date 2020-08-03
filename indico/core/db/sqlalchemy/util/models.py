@@ -195,12 +195,15 @@ class IndicoModel(Model):
             id_ = db.session.query(db.func.nextval(db.func.pg_get_serial_sequence(table_name, col_name))).scalar()
         setattr(self, attr_name, id_)
 
-    def populate_from_dict(self, data, keys=None, skip=None):
+    def populate_from_dict(self, data, keys=None, skip=None, track_changes=True):
         """Populates the object with values in a dictionary
 
         :param data: a dict containing values to populate the object.
         :param keys: If set, only keys from that list are populated.
         :param skip: If set, keys from that list are skipped.
+        :param track_changes: Set to false to disable change tracking, e.g. if
+                              you have any data keys pointing to properties whose
+                              attributes cannot be read back yet.
         """
         cls = type(self)
         changed = {}
@@ -211,13 +214,17 @@ class IndicoModel(Model):
                 continue
             if not hasattr(cls, key):
                 raise ValueError("{} has no attribute '{}'".format(cls.__name__, key))
+            if not track_changes:
+                setattr(self, key, value)
+                continue
+            # Track the old and new value so we can log the change
             old_value = getattr(self, key, None)
             setattr(self, key, value)
             new_value = getattr(self, key)
             if old_value != new_value:
                 # XXX: we copy because of https://github.com/sqlalchemy/sqlalchemy/issues/3913
                 changed[key] = (copy(old_value), copy(new_value))
-        return changed
+        return changed if track_changes else None
 
     def populate_from_attrs(self, obj, attrs):
         """Populates the object from another object's attributes
