@@ -68,7 +68,6 @@ translitcodec==0.4.0
 webargs==5.5.3
 Werkzeug==0.16.1
 wsgiref==0.1.2
-WTForms-Components==0.10.4
 WTForms[ipaddress,email]==2.3.3
 xlsxwriter==1.3.0
 zope.interface==3.8.0
