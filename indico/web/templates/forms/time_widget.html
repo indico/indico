@@ -1,0 +1,22 @@
+{% extends 'forms/base_widget.html' %}
+
+{% block html %}
+    <div class="time-widget">
+        {# the hidden field has autofocus on purpose to prevent our JS from focusing the time picker #}
+        <input type="hidden" name="{{ field.name }}" id="{{ field.id }}-timestorage" autofocus
+               {% if field.data is not none %}value="{{ field.data.strftime('%H:%M') }}"{% endif %}
+               {{ input_args | html_params }}>
+        <span id="{{ field.id }}"></span>
+    </div>
+{% endblock %}
+
+{% block javascript %}
+    <script>
+        setupTimeWidget({
+            fieldId: {{ field.id | tojson }},
+            required: {{ input_args.required | default(false) | tojson }},
+            disabled: {{ input_args.disabled | default(false) | tojson }},
+            locale: {{ session.moment_lang | tojson }},
+        });
+    </script>
+{% endblock %}

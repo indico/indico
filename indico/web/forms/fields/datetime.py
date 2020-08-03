@@ -17,6 +17,7 @@ from flask import session
 from markupsafe import escape
 from wtforms import Field, SelectField
 from wtforms.ext.dateutil.fields import DateField, DateTimeField
+from wtforms.fields import TimeField
 from wtforms.validators import StopValidation
 
 from indico.core.config import config
@@ -173,6 +174,10 @@ class RelativeDeltaField(Field):
         if self.data is None:
             return '', ''
         return self.split_data
+
+
+class IndicoTimeField(TimeField):
+    widget = JinjaWidget('forms/time_widget.html', single_line=True, single_kwargs=True)
 
 
 class IndicoDateField(DateField):
