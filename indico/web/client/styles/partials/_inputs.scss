@@ -277,7 +277,8 @@ $dropdown-transition: $dropdown-transition-step ease-out;
 }
 
 .datetime-widget,
-.date-widget {
+.date-widget,
+.time-widget {
   .rc-time-picker-input {
     width: 100% !important;
     font-size: 1em;

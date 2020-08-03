@@ -40,6 +40,7 @@ export {default as ManagementPageSubTitle} from './ManagementPageSubTitle';
 export {default as ManagementPageTitle} from './ManagementPageTitle';
 export {default as WTFDateField} from './WTFDateField';
 export {default as WTFDateTimeField} from './WTFDateTimeField';
+export {default as WTFTimeField} from './WTFTimeField';
 export {default as WTFOccurrencesField} from './WTFOccurrencesField';
 export {default as WTFPrincipalListField} from './WTFPrincipalListField';
 export {default as WTFPrincipalField} from './WTFPrincipalField';

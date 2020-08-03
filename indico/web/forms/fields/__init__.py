@@ -17,8 +17,8 @@ from .simple import (EmailListField, HiddenFieldList, IndicoEmailRecipientsField
                      IndicoTagListField, JSONField, TextListField)
 
 from .colors import IndicoPalettePickerField, IndicoSinglePalettePickerField
-from .datetime import (IndicoDateField, IndicoDateTimeField, IndicoTimezoneSelectField, IndicoWeekDayRepetitionField,
-                       OccurrencesField, RelativeDeltaField, TimeDeltaField)
+from .datetime import (IndicoDateField, IndicoDateTimeField, IndicoTimeField, IndicoTimezoneSelectField,
+                       IndicoWeekDayRepetitionField, OccurrencesField, RelativeDeltaField, TimeDeltaField)
 from .enums import HiddenEnumField, IndicoEnumRadioField, IndicoEnumSelectField
 from .files import EditableFileField, FileField
 from .itemlists import MultipleItemsField, MultiStringField, OverrideMultipleItemsField
@@ -37,4 +37,4 @@ __all__ = ('IndicoSelectMultipleCheckboxField', 'IndicoRadioField', 'JSONField',
            'PrincipalListField', 'PrincipalField', 'AccessControlListField', 'IndicoQuerySelectMultipleField',
            'EditableFileField', 'IndicoQuerySelectMultipleCheckboxField', 'IndicoLocationField', 'IndicoMarkdownField',
            'IndicoDateField', 'IndicoProtectionField', 'IndicoSelectMultipleCheckboxBooleanField', 'RelativeDeltaField',
-           'IndicoWeekDayRepetitionField', 'IndicoEmailRecipientsField')
+           'IndicoWeekDayRepetitionField', 'IndicoEmailRecipientsField', 'IndicoTimeField')

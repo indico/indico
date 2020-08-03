@@ -14,7 +14,6 @@ from pytz import utc
 from wtforms.fields import BooleanField, HiddenField, IntegerField, SelectField, StringField, TextAreaField
 from wtforms.validators import DataRequired, InputRequired, NumberRange, ValidationError
 from wtforms.widgets.html5 import NumberInput
-from wtforms_components import TimeField
 
 from indico.modules.events.contributions import contribution_settings
 from indico.modules.events.contributions.forms import ContributionForm
@@ -25,7 +24,7 @@ from indico.util.i18n import _
 from indico.web.forms.base import FormDefaults, IndicoForm, generated_data
 from indico.web.forms.colors import get_colors
 from indico.web.forms.fields import (FileField, IndicoLocationField, IndicoPalettePickerField,
-                                     IndicoSelectMultipleCheckboxBooleanField, TimeDeltaField)
+                                     IndicoSelectMultipleCheckboxBooleanField, IndicoTimeField, TimeDeltaField)
 from indico.web.forms.util import get_form_field_names
 from indico.web.forms.validators import HiddenUnless, MaxDuration
 from indico.web.forms.widgets import SwitchWidget
@@ -36,7 +35,7 @@ class EntryFormMixin(object):
     _default_duration = None
     _display_fields = None
 
-    time = TimeField(_("Start time"), [InputRequired()])
+    time = IndicoTimeField(_("Start time"), [InputRequired()])
     duration = TimeDeltaField(_("Duration"), [DataRequired(), MaxDuration(timedelta(hours=24))],
                               units=('minutes', 'hours'))
 
