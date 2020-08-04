@@ -39,7 +39,8 @@ def _get_next_friendly_id(context):
 class Session(DescriptionMixin, ColorMixin, ProtectionManagersMixin, LocationMixin, AttachedItemsMixin,
               AttachedNotesMixin, db.Model):
     __tablename__ = 'sessions'
-    __auto_table_args = (db.Index(None, 'friendly_id', 'event_id', unique=True),
+    __auto_table_args = (db.Index(None, 'friendly_id', 'event_id', unique=True,
+                                  postgresql_where=db.text('NOT is_deleted')),
                          {'schema': 'events'})
     location_backref_name = 'sessions'
     disallowed_protection_modes = frozenset()
