@@ -4,60 +4,60 @@
 {% set class_mapping = {'complete': 'accept', 'pending': 'warning', 'unpaid': 'warning'} %}
 
 <div class="action-box {{ class_mapping[registration.state.name] }}">
-   <div class="section">
-       <div class="icon icon-quill"></div>
-       <div class="text">
-           {% if registration.state.name == 'complete' %}
-               <div class="label">
-                   {% trans %}Your registration has been completed{% endtrans %}
-               </div>
-           {% elif registration.state.name == 'pending' %}
-               <div class="label">
-                   {% trans %}Your registration is awaiting approval{% endtrans %}
-               </div>
-               {% trans -%}
-                   An event manager will manually validate it.
-               {%- endtrans %}
-           {% elif registration.state.name == 'unpaid' %}
-               <div class="label">
-                   {% trans %}Your registration is awaiting payment{% endtrans %}
-               </div>
-               {% if not registration.transaction or registration.transaction.status.name not in ('successful', 'pending') %}
-                   {% trans %}Awaiting your payment.{% endtrans %}
-               {% elif registration.transaction.status.name == 'pending' %}
-                   {% trans %}Awaiting payment confirmation.{% endtrans %}
-               {% endif %}
-               <a href="#payment-summary" class="js-highlight-payment">
-                   {%- trans %}Proceed to checkout{% endtrans -%}
-               </a>.
-           {% endif %}
-       </div>
-       <div class="toolbar">
-           {% if registration.registration_form.modification_mode.name != 'not_allowed' %}
-               <div class="group">
-                   <a href="{{ url_for('.edit_registration_display', registration.locator.registrant) }}"
-                      class="i-button icon-edit {% if not registration.can_be_modified %}disabled{% endif %}"
-                       {% if not registration.can_be_modified %}
-                           {% if not registration.registration_form.is_modification_open -%}
-                               title="{% trans %}The modification period is over{% endtrans %}"
-                           {%- elif registration.registration_form.modification_mode.name == 'allowed_until_payment' -%}
-                               title="{% trans %}Modifications are not allowed after payment{% endtrans %}"
-                           {%- endif %}
-                       {% endif %}>
-                       {% trans %}Modify{% endtrans %}
-                   </a>
-               </div>
-           {% endif %}
-           {% if registration.state.name == 'complete' and registration.registration_form.tickets_enabled and
-                 registration.registration_form.ticket_on_summary_page and not registration.is_ticket_blocked %}
+    <div class="section">
+        <div class="icon icon-quill"></div>
+        <div class="text">
+            {% if registration.state.name == 'complete' %}
+                <div class="label">
+                    {% trans %}Your registration has been completed{% endtrans %}
+                </div>
+            {% elif registration.state.name == 'pending' %}
+                <div class="label">
+                    {% trans %}Your registration is awaiting approval{% endtrans %}
+                </div>
+                {% trans -%}
+                    An event manager will manually validate it.
+                {%- endtrans %}
+            {% elif registration.state.name == 'unpaid' %}
+                <div class="label">
+                    {% trans %}Your registration is awaiting payment{% endtrans %}
+                </div>
+                {% if not registration.transaction or registration.transaction.status.name not in ('successful', 'pending') %}
+                    {% trans %}Awaiting your payment.{% endtrans %}
+                {% elif registration.transaction.status.name == 'pending' %}
+                    {% trans %}Awaiting payment confirmation.{% endtrans %}
+                {% endif %}
+                <a href="#payment-summary" class="js-highlight-payment">
+                    {%- trans %}Proceed to checkout{% endtrans -%}
+                </a>.
+            {% endif %}
+        </div>
+        <div class="toolbar">
+            {% if registration.registration_form.modification_mode.name != 'not_allowed' %}
+                <div class="group">
+                    <a href="{{ url_for('.edit_registration_display', registration.locator.registrant) }}"
+                       class="i-button icon-edit {% if not registration.can_be_modified %}disabled{% endif %}"
+                        {% if not registration.can_be_modified %}
+                            {% if not registration.registration_form.is_modification_open -%}
+                                title="{% trans %}The modification period is over{% endtrans %}"
+                            {%- elif registration.registration_form.modification_mode.name == 'allowed_until_payment' -%}
+                                title="{% trans %}Modifications are not allowed after payment{% endtrans %}"
+                            {%- endif %}
+                        {% endif %}>
+                        {% trans %}Modify{% endtrans %}
+                    </a>
+                </div>
+            {% endif %}
+            {% if registration.state.name == 'complete' and registration.registration_form.tickets_enabled and
+                  registration.registration_form.ticket_on_summary_page and not registration.is_ticket_blocked %}
                 <div class="group">
                     <a href="{{ url_for('.ticket_download', registration.locator.registrant) }}" class="i-button accept icon-ticket">
                         {% trans %}Get ticket{% endtrans %}
                     </a>
                 </div>
             {% endif %}
-       </div>
-   </div>
+        </div>
+    </div>
 </div>
 
 {{ render_registration_summary(registration) }}
