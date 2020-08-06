@@ -181,14 +181,14 @@ class InvitationFormExisting(InvitationFormBase):
 
     @generated_data
     def users(self):
-        return [{'first_name': x['firstName'],
-                 'last_name': x['familyName'],
-                 'email': x['email'].lower(),
-                 'affiliation': x['affiliation']}
+        return [{'first_name': x.first_name,
+                 'last_name': x.last_name,
+                 'email': x.email.lower(),
+                 'affiliation': x.affiliation}
                 for x in self.users_field.data]
 
     def validate_users_field(self, field):
-        emails = {x['email'].lower() for x in field.data}
+        emails = {x.email.lower() for x in field.data}
         # invitations
         existing = {x.email for x in self.regform.invitations} & emails
         if existing:
