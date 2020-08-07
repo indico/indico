@@ -4,10 +4,11 @@
 {% block html %}
     {# cannot use loop.index due to https://github.com/pallets/jinja/issues/555 #}
     {%- set ns = namespace(i=0) -%}
+    {%- set has_groups = field.get_grouped_choices()|selectattr('0.0')|any -%}
     {% for (group, group_label), objects in field.get_grouped_choices() %}
         {% if group %}
             <label><strong>{{ group_label }}</strong></label>
-        {% else %}
+        {% elif has_groups %}
             <label><em>No group</em></label>
         {% endif %}
         {% for val, label, selected, _group, _group_label in objects %}
