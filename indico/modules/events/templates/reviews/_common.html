@@ -15,15 +15,15 @@
     {% endif %}
 {% endmacro %}
 
-{% macro render_group(title, url=none, long_title=none) %}
+{% macro render_group(title, url=none, long_title=none) -%}
     <div class="review-group truncate-text">
-        {% if url %}
+        {%- if url -%}
             <a href="{{ url }}" title="{{ long_title or title }}">{{ title }}</a>
-        {% else %}
+        {%- else -%}
             <span title="{{ long_title or title }}">{{ title }}</span>
-        {% endif %}
+        {%- endif -%}
     </div>
-{% endmacro %}
+{%- endmacro %}
 
 {% macro render_instruction_box(container_id, instructions, title) %}
     {% if instructions|trim %}
