@@ -8,11 +8,12 @@
 import React, {useEffect, useRef, useState} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
 import {Loader, Message} from 'semantic-ui-react';
-
 import _ from 'lodash';
+
 import TimelineHeader from 'indico/modules/events/editing/editing/timeline/TimelineHeader';
 import TimelineContent from 'indico/modules/events/reviewing/components/TimelineContent';
 import {indicoAxios} from 'indico/utils/axios';
+import {Param, Translate} from 'indico/react/i18n';
 import SubmitRevision from './SubmitRevision';
 
 import * as actions from './actions';
@@ -20,7 +21,7 @@ import * as selectors from './selectors';
 import TimelineItem from './TimelineItem';
 import FileDisplay from './FileDisplay';
 
-const POOLING_SECONDS = 10;
+const POLLING_SECONDS = 10;
 
 export default function Timeline() {
   const dispatch = useDispatch();
@@ -52,7 +53,7 @@ export default function Timeline() {
         newDetails.current = resp.data;
         setIsOutdated(true);
       }
-    }, POOLING_SECONDS * 1000);
+    }, POLLING_SECONDS * 1000);
     return () => {
       clearInterval(task);
     };
@@ -74,11 +75,14 @@ export default function Timeline() {
       {isOutdated && (
         <Message
           warning
-          header="This revision has been updated"
+          header={Translate.string('This revision has been updated')}
           content={
-            <span>
-              <a onClick={refresh}>Click here to refresh</a> and see the most recent changes.
-            </span>
+            <Translate>
+              <Param name="link" wrapper={<a onClick={refresh} />}>
+                Click here to refresh
+              </Param>{' '}
+              and see the most recent version.
+            </Translate>
           }
         />
       )}
