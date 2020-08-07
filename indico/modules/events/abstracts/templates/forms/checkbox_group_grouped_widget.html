@@ -12,7 +12,8 @@
         {% endif %}
         {% for val, label, selected, _group, _group_label in objects %}
             <div class="i-checkbox">
-                <input id="{{ field.id }}-{{ ns.i }}" name="{{ field.id }}" type="checkbox" value="{{ val }}">
+                <input id="{{ field.id }}-{{ ns.i }}" name="{{ field.id }}" type="checkbox" value="{{ val }}"
+                       {{ 'checked' if selected }}>
                 <label for="{{ field.id }}-{{ ns.i }}">{{ label }}</label>
             </div>
             {% set ns.i = ns.i + 1 %}
