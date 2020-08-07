@@ -5,18 +5,22 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-import React, {useEffect} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
-import {Loader} from 'semantic-ui-react';
+import {Loader, Message} from 'semantic-ui-react';
 
+import _ from 'lodash';
 import TimelineHeader from 'indico/modules/events/editing/editing/timeline/TimelineHeader';
 import TimelineContent from 'indico/modules/events/reviewing/components/TimelineContent';
+import {indicoAxios} from 'indico/utils/axios';
 import SubmitRevision from './SubmitRevision';
 
 import * as actions from './actions';
 import * as selectors from './selectors';
 import TimelineItem from './TimelineItem';
 import FileDisplay from './FileDisplay';
+
+const POOLING_SECONDS = 10;
 
 export default function Timeline() {
   const dispatch = useDispatch();
@@ -26,11 +30,38 @@ export default function Timeline() {
   const canPerformSubmitterActions = useSelector(selectors.canPerformSubmitterActions);
   const lastRevision = useSelector(selectors.getLastRevision);
   const timelineBlocks = useSelector(selectors.getTimelineBlocks);
-  const {eventId, contributionId, editableType, fileTypes} = useSelector(selectors.getStaticData);
+  const {eventId, contributionId, editableType, fileTypes, editableDetailsURL} = useSelector(
+    selectors.getStaticData
+  );
+  const [isOutdated, setIsOutdated] = useState(false);
+  const newDetails = useRef(null);
 
   useEffect(() => {
-    dispatch(actions.loadTimeline(eventId, contributionId, editableType));
-  }, [contributionId, eventId, editableType, dispatch]);
+    dispatch(
+      actions.loadTimeline(data => {
+        newDetails.current = data;
+        return data;
+      })
+    );
+  }, [editableDetailsURL, contributionId, eventId, editableType, dispatch]);
+
+  useEffect(() => {
+    const task = setInterval(async () => {
+      const resp = await indicoAxios.get(editableDetailsURL);
+      if (!_.isEqual(newDetails.current, resp.data)) {
+        newDetails.current = resp.data;
+        setIsOutdated(true);
+      }
+    }, POOLING_SECONDS * 1000);
+    return () => {
+      clearInterval(task);
+    };
+  }, [timelineBlocks, editableDetailsURL]);
+
+  const refresh = () => {
+    dispatch({type: actions.SET_DETAILS, data: newDetails.current});
+    setIsOutdated(false);
+  };
 
   if (isInitialEditableDetailsLoading) {
     return <Loader active />;
@@ -40,6 +71,17 @@ export default function Timeline() {
 
   return (
     <>
+      {isOutdated && (
+        <Message
+          warning
+          header="This revision has been updated"
+          content={
+            <span>
+              <a onClick={refresh}>Click here to refresh</a> and see the most recent changes.
+            </span>
+          }
+        />
+      )}
       <TimelineHeader
         contribution={details.contribution}
         state={details.state}

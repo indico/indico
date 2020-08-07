@@ -13,10 +13,16 @@ import {getStaticData} from './selectors';
 export const SET_LOADING = 'SET_LOADING';
 export const SET_DETAILS = 'SET_DETAILS';
 
-export function loadTimeline() {
+export function loadTimeline(transformData = d => d) {
   return async (dispatch, getStore) => {
     const {editableDetailsURL: url} = getStaticData(getStore());
-    return await ajaxAction(() => indicoAxios.get(url), SET_LOADING, SET_DETAILS)(dispatch);
+    return await ajaxAction(
+      () => indicoAxios.get(url),
+      SET_LOADING,
+      SET_DETAILS,
+      null,
+      transformData
+    )(dispatch);
   };
 }
 
