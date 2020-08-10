@@ -94,7 +94,9 @@ class AttachmentFolderForm(IndicoForm):
     description = TextAreaField(_("Description"), description=_("Description of the folder and its content"))
     protected = BooleanField(_("Protected"), widget=SwitchWidget())
     acl = AccessControlListField(_("Access control list"), [UsedIf(lambda form, field: form.protected.data)],
-                                 allow_groups=True, allow_external_users=True,
+                                 allow_groups=True, allow_external_users=True, allow_event_roles=True,
+                                 allow_category_roles=True, allow_registration_forms=True,
+                                 event=lambda form: form.event,
                                  default_text=_('Restrict access to this folder'),
                                  description=_("The list of users and groups allowed to access the folder"))
     is_always_visible = BooleanField(_("Always Visible"),
@@ -112,6 +114,7 @@ class AttachmentFolderForm(IndicoForm):
 
     def __init__(self, *args, **kwargs):
         self.linked_object = kwargs.pop('linked_object')
+        self.event = getattr(self.linked_object, 'event', None)  # not present in categories
         super(AttachmentFolderForm, self).__init__(*args, **kwargs)
         self.title.choices = self._get_title_suggestions()
 
