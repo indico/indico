@@ -40,6 +40,12 @@ class RHNews(RH):
 
 
 class RHNewsItem(RH):
+    normalize_url_spec = {
+        'locators': {
+            lambda self: self.item.locator.slugged
+        }
+    }
+
     def _process_args(self):
         self.item = NewsItem.get_or_404(request.view_args['news_id'])
 

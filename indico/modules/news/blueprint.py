@@ -16,6 +16,7 @@ _bp = IndicoBlueprint('news', __name__, template_folder='templates', virtual_tem
 
 _bp.add_url_rule('/news/', 'display', RHNews)
 _bp.add_url_rule('/news/<int:news_id>', 'display_item', RHNewsItem)
+_bp.add_url_rule('/news/<int:news_id>-<slug>', 'display_item', RHNewsItem)
 _bp.add_url_rule('/admin/news/', 'manage', RHManageNews)
 _bp.add_url_rule('/admin/news/settings', 'settings', RHNewsSettings, methods=('GET', 'POST'))
 _bp.add_url_rule('/admin/news/create', 'create_news', RHCreateNews, methods=('GET', 'POST'))
