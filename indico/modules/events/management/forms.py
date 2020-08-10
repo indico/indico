@@ -387,7 +387,7 @@ class CloneRepeatUntilFormBase(CloneRepeatOnceForm):
 
 
 class CloneRepeatIntervalForm(CloneRepeatUntilFormBase):
-    recurrence = RelativeDeltaField(_('Every'), [DataRequired(), NumberRange(min=1)],
+    recurrence = RelativeDeltaField(_('Every'), [DataRequired()],
                                     units=('years', 'months', 'weeks', 'days'),
                                     default=relativedelta(weeks=1))
 
