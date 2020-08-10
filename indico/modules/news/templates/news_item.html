@@ -1,0 +1,10 @@
+{% extends 'news/news.html' %}
+{% from 'news/_news.html' import render_news_item %}
+
+{% block title %}
+    {% trans %}News{% endtrans %}
+{% endblock %}
+
+{% block content %}
+    {{ render_news_item(item, show_permalink=false) }}
+{% endblock %}

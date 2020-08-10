@@ -1,4 +1,5 @@
 {% extends 'layout/base.html' %}
+{% from 'news/_news.html' import render_news_item %}
 
 {% block page_class %}fixed-width-standalone-page{% endblock %}
 
@@ -8,17 +9,6 @@
 
 {% block content %}
     {% for item in news %}
-        <div class="news-item" id="{{ item.anchor }}">
-            <div class="right news-item-info">
-                <span class="date-time">{{ item.created_dt|format_date(timezone=session.tzinfo) }}</span>
-            </div>
-            <h2 data-anchor="{{ item.anchor }}">
-                {{ item.title }}
-                {% if _is_new(item) %}<i class="icon-new new-label"></i>{% endif %}
-            </h2>
-            <div class="content">
-                {{ item.content | sanitize_html }}
-            </div>
-        </div>
+        {{ render_news_item(item, is_new=_is_new(item)) }}
     {% endfor %}
 {% endblock %}

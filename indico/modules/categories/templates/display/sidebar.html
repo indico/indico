@@ -44,7 +44,7 @@
         <ul class="main-page-list">
             {% for news in news_list %}
                 <li>
-                    <a class="title" href="{{ url_for('news.display', _anchor="news-{}".format(news.id)) }}">
+                    <a class="title" href="{{ news.url }}">
                         {{ news.title }}
                     </a>
                     <span class="timing">

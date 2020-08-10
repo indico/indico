@@ -39,7 +39,8 @@ a.discreet-link {
   }
 }
 
-[data-anchor]:hover {
+[data-anchor]:hover,
+[data-permalink]:hover {
   .anchor-link {
     opacity: 1;
   }

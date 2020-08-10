@@ -39,6 +39,14 @@ class RHNews(RH):
         return WPNews.render_template('news.html', news=news, _is_new=self._is_new)
 
 
+class RHNewsItem(RH):
+    def _process_args(self):
+        self.item = NewsItem.get_or_404(request.view_args['news_id'])
+
+    def _process(self):
+        return WPNews.render_template('news_item.html', item=self.item)
+
+
 class RHManageNewsBase(RHAdminBase):
     pass
 

@@ -341,12 +341,13 @@ import {$T} from '../../utils/i18n';
   }
 
   function setupAnchorLinks() {
-    $('[data-anchor]').each(function() {
-      var $elem = $(this);
-      var fragment = $elem.data('anchor');
+    $('[data-anchor], [data-permalink]').each(function() {
+      const $elem = $(this);
+      const fragment = $elem.data('anchor');
+      const permalink = $elem.data('permalink');
       $('<a>', {
         class: 'anchor-link',
-        href: '#' + fragment,
+        href: permalink || `#${fragment}`,
         title: $elem.data('anchor-text') || $T.gettext('Direct link to this item'),
       })
         .html('&para;')

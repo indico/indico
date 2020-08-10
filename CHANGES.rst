@@ -104,6 +104,8 @@ Improvements
 - Show the Indico version in the footer again (:issue:`4558`)
 - Event managers can upload a custom Book of Abstract PDF (:issue:`3039`,
   :pr:`4577`)
+- Display each news item on a separate page instead of together with all the
+  other news items (:pr:`4587`)
 
 Bugfixes
 ^^^^^^^^

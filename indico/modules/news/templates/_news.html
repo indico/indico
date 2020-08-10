@@ -1,0 +1,14 @@
+{%- macro render_news_item(item, is_new=false, show_permalink=true) -%}
+    <div class="news-item" id="{{ item.anchor }}">
+        <div class="right news-item-info">
+            <span class="date-time">{{ item.created_dt|format_date(timezone=session.tzinfo) }}</span>
+        </div>
+        <h2 {% if show_permalink %}data-permalink="{{ item.url }}"{% endif %}>
+            {{ item.title }}
+            {% if is_new %}<i class="icon-new new-label"></i>{% endif %}
+        </h2>
+        <div class="content">
+            {{ item.content | sanitize_html }}
+        </div>
+    </div>
+{%- endmacro -%}

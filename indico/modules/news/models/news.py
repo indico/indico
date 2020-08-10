@@ -12,6 +12,7 @@ from indico.core.db.sqlalchemy import UTCDateTime
 from indico.util.date_time import now_utc
 from indico.util.locators import locator_property
 from indico.util.string import format_repr, return_ascii
+from indico.web.flask.util import url_for
 
 
 class NewsItem(db.Model):
@@ -47,6 +48,10 @@ class NewsItem(db.Model):
     @property
     def anchor(self):
         return 'news-{}'.format(self.id)
+
+    @property
+    def url(self):
+        return url_for('news.display_item', self)
 
     @return_ascii
     def __repr__(self):
