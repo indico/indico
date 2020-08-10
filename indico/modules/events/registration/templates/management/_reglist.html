@@ -45,7 +45,8 @@
                                     #{{ registration.friendly_id }}
                                 </td>
                                 <td class="i-table">
-                                    <a href="{{ url_for('event_registration.registration_details', registration) }}">
+                                    <a href="{{ url_for('event_registration.registration_details', registration) }}"
+                                       {% if registration.state.name in ('rejected', 'withdrawn') %}style="text-decoration: line-through;"{% endif %}>
                                         {{- registration.display_full_name -}}
                                     </a>
                                 </td>
