@@ -184,18 +184,19 @@
     </div>
     <div class="toolbar hide-if-locked">
         {% set action = _('Reset rejection') if registration.state.name == 'rejected' else _('Reset withdrawal') %}
-        {{ _render_reset_registration_button(registration, action) }}
+        {{ _render_reset_registration_button(registration, action, registration.has_conflict()) }}
     </div>
 {% endmacro %}
 
 
-{% macro _render_reset_registration_button(registration, action_text) %}
-    <a class="i-button warning"
+{% macro _render_reset_registration_button(registration, action_text, conflict=false) %}
+    <a class="i-button warning {{ 'disabled' if conflict }}"
        data-update="#registration-details"
        data-method="POST"
        data-href="{{ url_for('.reset_registration', registration) }}"
        data-confirm="{% trans %}Are you sure you want to reset this registration status? This action will not be notified to the registrant.{% endtrans %}"
-       data-title="{{ action_text }}">
+       data-title="{{ action_text }}"
+       {% if conflict %}title="{% trans %}There is another valid registration for this user so it cannot be restored.{% endtrans %}"{% endif %}>
        {{ action_text }}
     </a>
 {% endmacro %}

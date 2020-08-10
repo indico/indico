@@ -525,6 +525,23 @@ class Registration(db.Model):
         if self.state != initial_state:
             signals.event.registration_state_updated.send(self, previous_state=initial_state)
 
+    def has_conflict(self):
+        """Check if there are other valid registrations for the same user.
+
+        This is intended for cases where this registration is currenly invalid
+        (rejected or withdrawn) to determine whether it would be acceptable to
+        restore it.
+        """
+        conflict_criteria = [Registration.email == self.email]
+        if self.user_id is not None:
+            conflict_criteria.append(Registration.user_id == self.user_id)
+        return (Registration.query
+                .with_parent(self.registration_form)
+                .filter(Registration.id != self.id,
+                        db.or_(*conflict_criteria),
+                        Registration.state.notin_([RegistrationState.rejected, RegistrationState.withdrawn]))
+                .has_rows())
+
 
 class RegistrationData(StoredFileMixin, db.Model):
     """Data entry within a registration for a field in a registration form"""
