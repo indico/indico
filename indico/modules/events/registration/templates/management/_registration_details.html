@@ -183,7 +183,8 @@
         </div>
     </div>
     <div class="toolbar hide-if-locked">
-        {{ _render_reset_registration_button(registration, _('Reset rejection')) }}
+        {% set action = _('Reset rejection') if registration.state.name == 'rejected' else _('Reset withdrawal') %}
+        {{ _render_reset_registration_button(registration, action) }}
     </div>
 {% endmacro %}
 
