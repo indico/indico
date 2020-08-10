@@ -19,6 +19,7 @@ from indico.modules.categories.models.roles import CategoryRole
 from indico.modules.categories.util import serialize_category_role
 from indico.modules.core.controllers import PrincipalsMixin
 from indico.modules.events import Event
+from indico.modules.events.controllers.base import RHAuthenticatedEventBase
 from indico.modules.events.management.controllers.base import RHManageEventBase
 from indico.modules.events.management.forms import EventProtectionForm
 from indico.modules.events.management.views import WPEventProtection
@@ -123,10 +124,7 @@ class RHPermissionsDialog(RH):
                                 permissions=request.form.getlist('permissions'), principal=principal)
 
 
-class RHEventPrincipals(PrincipalsMixin, RHManageEventBase):
-    ALLOW_LOCKED = True
-    PERMISSION = 'ANY'
-
+class RHEventPrincipals(PrincipalsMixin, RHAuthenticatedEventBase):
     @use_rh_kwargs({
         'values': PrincipalDict(allow_groups=True, allow_external_users=True, allow_event_roles=True,
                                 allow_category_roles=True, allow_registration_forms=True, allow_emails=True,
@@ -137,17 +135,13 @@ class RHEventPrincipals(PrincipalsMixin, RHManageEventBase):
         return PrincipalsMixin._process(self)
 
 
-class RHEventRolesJSON(RHManageEventBase):
-    PERMISSION = 'ANY'
-
+class RHEventRolesJSON(RHAuthenticatedEventBase):
     def _process(self):
         event_roles = sorted(self.event.roles, key=attrgetter('code'))
         return jsonify([serialize_event_role(er, legacy=False) for er in event_roles])
 
 
-class RHCategoryRolesJSON(RHManageEventBase):
-    PERMISSION = 'ANY'
-
+class RHCategoryRolesJSON(RHAuthenticatedEventBase):
     def _process(self):
         category_roles = CategoryRole.get_category_roles(self.event.category)
         return jsonify([serialize_category_role(cr, legacy=False) for cr in category_roles])
