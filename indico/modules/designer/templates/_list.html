@@ -63,7 +63,7 @@
         <td>
             <div class="thin toolbar right">
                 <div class="group">
-                    {% if not event and tpl.type.name == 'badge' %}
+                    {% if not event and tpl.type.name == 'badge' and tpl.is_ticket %}
                         {% set inherited_default = default_ticket == tpl and tpl.category != target and
                                 not target.default_ticket_template %}
                         {% set global_default = default_ticket == tpl and target.is_root %}

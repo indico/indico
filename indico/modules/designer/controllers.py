@@ -379,7 +379,9 @@ class RHGetTemplateData(BacksideTemplateProtectionMixin, RHModifyDesignerTemplat
 class RHToggleTicketDefaultOnCategory(RHManageCategoryBase):
     def _process(self):
         template = DesignerTemplate.get_or_404(request.view_args['template_id'])
-        if template not in get_all_templates(self.category):
+        all_ticket_templates = [tpl for tpl in get_all_templates(self.category)
+                                if tpl.type == TemplateType.badge and tpl.is_ticket]
+        if template not in all_ticket_templates:
             raise Exception('Invalid template')
         if template == self.category.default_ticket_template:
             # already the default -> clear it
