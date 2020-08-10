@@ -13,6 +13,7 @@ import 'jquery-colorbox/example1/colorbox.css';
 import 'jquery-form';
 
 // moment.js locales
+import 'moment/locale/zh-cn';
 import 'moment/locale/es';
 import 'moment/locale/fr';
 import 'moment/locale/en-gb';
