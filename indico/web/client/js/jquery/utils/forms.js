@@ -7,6 +7,7 @@
 
 /* global countWords:false, initForms:false, showFormErrors:false, toggleAclField:false */
 
+// eslint-disable-next-line import/unambiguous
 (function(global) {
   function validatePasswordConfirmation(passwordField, confirmField) {
     if ('setCustomValidity' in confirmField[0]) {
@@ -155,11 +156,17 @@
     // HiddenUnless validator
     forms.find(':input[data-hidden-unless]:disabled').data('initiallyDisabled', true);
     forms.find(':input[data-hidden-unless]').each(function() {
-      var field = $(this);
-      var data = field.data('hidden-unless');
-      var conditionField = $(this.form).find(':input[name="{0}"]'.format(data.field));
+      const field = $(this);
+      const data = field.data('hidden-unless');
+      const conditionField = $(this.form).find(':input[name="{0}"]'.format(data.field));
       hideFieldUnless(field, conditionField, data.values, data.checked_only);
-      conditionField.triggerHandler('change');
+      setTimeout(() => {
+        // we defer this call since react-based fields may no have fully rendered yet,
+        // so if we call it too early we end up disabling only the hidden fields but
+        // not the actual inputs in the react field (which is a problem e.g. in case
+        // of the WTFDateTimeField).
+        conditionField.triggerHandler('change');
+      }, 0);
     });
 
     // SoftLength/WordCount validators
