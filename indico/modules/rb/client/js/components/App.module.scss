@@ -101,5 +101,6 @@
 
   .rb-pusher:global(.pusher) {
     min-height: calc(100vh - #{$menu-height} - var(--extra-bars, 0) * 50px - 50px);
+    overflow-y: unset;
   }
 }

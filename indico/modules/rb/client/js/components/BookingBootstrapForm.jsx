@@ -291,6 +291,7 @@ class BookingBootstrapForm extends React.Component {
               isOutsideRange={dt => {
                 return !isBookingStartDateValid(dt, isAdminOverrideEnabled, bookingGracePeriod);
               }}
+              withFullScreenPortal={window.innerHeight < 730}
             />
           </Form.Group>
         )}
@@ -302,6 +303,7 @@ class BookingBootstrapForm extends React.Component {
               disabledDate={dt => {
                 return !isBookingStartDateValid(dt, isAdminOverrideEnabled, bookingGracePeriod);
               }}
+              withFullScreenPortal={window.innerHeight < 730} // Temporary fix to ensure vertical responsiveness
             />
           </Form.Group>
         )}
