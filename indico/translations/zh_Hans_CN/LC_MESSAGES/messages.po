@@ -3,6 +3,7 @@
 # This file is distributed under the same license as the indico project.
 # 
 # Translators:
+# Adrian Mönnich, 2020
 # Lanxin Ma <ma@ihep.ac.cn>, 2019-2020
 # 中天 梁 <liangzt@ihep.ac.cn>, 2020
 msgid ""
@@ -10,7 +11,7 @@ msgstr ""
 "Project-Id-Version: Indico\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
 "POT-Creation-Date: 2020-08-10 17:06+0200\n"
-"PO-Revision-Date: 2020-08-10 15:08+0000\n"
+"PO-Revision-Date: 2020-08-11 07:11+0000\n"
 "Last-Translator: Adrian Mönnich\n"
 "Language-Team: Chinese (China) (GB2312) (http://www.transifex.com/indico/indico/language/zh_CN.GB2312/)\n"
 "MIME-Version: 1.0\n"
@@ -16262,7 +16263,7 @@ msgstr "是/否"
 
 #: indico/web/flask/app.py:108
 msgid "Login failed: {error}"
-msgstr "登录失败：{错误}"
+msgstr "登录失败：{error}"
 
 #: indico/web/flask/errors.py:36
 msgid "Please log in to access this page."
