@@ -144,7 +144,7 @@ class BooleanField(RegistrationFormBillableField):
 
     @property
     def wtf_field_kwargs(self):
-        return {'choices': [(True, _('Yes')), (False, _('No'))],
+        return {'choices': [('yes', _('Yes')), ('no', _('No'))],
                 'coerce': lambda x: {'yes': True, 'no': False}.get(x, None)}
 
     @property
