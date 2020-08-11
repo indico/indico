@@ -100,6 +100,7 @@ def delete_session_block(session_block):
     from indico.modules.events.contributions.operations import delete_contribution
     from indico.modules.events.timetable.operations import delete_timetable_entry
     session_ = session_block.session
+    event = session_.event
     unschedule_contribs = session_.event.type_ == EventType.conference
     for contribution in session_block.contributions[:]:
         contribution.session_block = None
@@ -116,9 +117,9 @@ def delete_session_block(session_block):
     if not session_.blocks and session_.event.type != 'conference':
         delete_session(session_)
     db.session.flush()
-    session_block.event.log(EventLogRealm.management, EventLogKind.negative, 'Sessions',
-                            'Session block "{}" has been deleted'.format(session_block.title), session.user,
-                            meta={'session_block_id': session_block.id})
+    event.log(EventLogRealm.management, EventLogKind.negative, 'Sessions',
+              'Session block "{}" has been deleted'.format(session_block.title), session.user,
+              meta={'session_block_id': session_block.id})
     logger.info('Session block %s deleted by %s', session_block, session.user)
 
 
