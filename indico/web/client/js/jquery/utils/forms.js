@@ -23,15 +23,15 @@
 
   function hideFieldUnless(field, conditionField, requiredValues, checkedOnly) {
     conditionField.on('change', function() {
-      var value = checkedOnly
+      const value = checkedOnly
         ? conditionField.filter(':checked').val() || false
         : conditionField.val();
-      var active = !!(
+      const active = !!(
         (!requiredValues.length && value) ||
         (requiredValues.length && _.contains(requiredValues, value))
       );
       field.closest('.form-group').toggle(active);
-      var realField = field.is(':input') ? field : field.find(':input');
+      let realField = field.is(':input') ? field : field.find(':input');
       if (realField.attr('type') === 'hidden') {
         // in case of custom widgets with multiple fields (e.g. the new react-based
         // date/time field) we need to select all inputs explicitly since the hidden
@@ -42,7 +42,7 @@
       if (realField.length) {
         // Selectize clones the field and copies the `required` flag so we need
         // to make sure to also disable the clone to avoid validation errors!
-        var selectizeField = realField[0].selectize
+        const selectizeField = realField[0].selectize
           ? $('#{0}-selectized'.format(realField[0].id))
           : $();
         if (!field.data('initiallyDisabled')) {
@@ -58,15 +58,15 @@
       return;
     }
 
-    var minChars = $field.data('min-length');
-    var maxChars = $field.data('max-length');
-    var minWords = $field.data('min-words');
-    var maxWords = $field.data('max-words');
+    const minChars = $field.data('min-length');
+    const maxChars = $field.data('max-length');
+    const minWords = $field.data('min-words');
+    const maxWords = $field.data('max-words');
 
     $field.on('change input', function() {
-      var msg = '';
-      var charCount = $field.val().trim().length;
-      var wordCount = countWords($field.val());
+      let msg = '';
+      const charCount = $field.val().trim().length;
+      const wordCount = countWords($field.val());
 
       if ((minChars && charCount < minChars) || (maxChars && charCount > maxChars)) {
         if (!maxChars) {
@@ -118,10 +118,10 @@
   }
 
   function isElementInView(elem) {
-    var docViewTop = $(window).scrollTop();
-    var docViewBottom = docViewTop + $(window).height();
-    var elemTop = $(elem).offset().top;
-    var elemBottom = elemTop + $(elem).height();
+    const docViewTop = $(window).scrollTop();
+    const docViewBottom = docViewTop + $(window).height();
+    const elemTop = $(elem).offset().top;
+    const elemBottom = elemTop + $(elem).height();
     return elemBottom <= docViewBottom && elemTop >= docViewTop;
   }
 
@@ -131,7 +131,7 @@
       progressMessage: $T.gettext('Saving...'),
       message: $T.gettext('Do not forget to save your changes!'),
       class: 'highlight save-corner-message',
-      actionCallback: function() {
+      actionCallback() {
         $form.submit();
       },
     });
@@ -146,10 +146,9 @@
   global.initForms = function initForms(forms) {
     // ConfirmPassword validator
     forms.find('input[data-confirm-password]').each(function() {
-      var confirmField = $(this);
-      var passwordField = $(this.form).find(
-        'input[name="' + confirmField.data('confirmPassword') + '"]'
-      );
+      const confirmField = $(this);
+      const confirmFieldName = confirmField.data('confirmPassword');
+      const passwordField = $(this.form).find(`input[name="${confirmFieldName}"]`);
       validatePasswordConfirmation(passwordField, confirmField);
     });
 
@@ -170,7 +169,7 @@
     });
 
     // SoftLength/WordCount validators
-    var selectors = '[data-min-words], [data-max-words], [data-min-length], [data-max-length]';
+    const selectors = '[data-min-words], [data-max-words], [data-min-length], [data-max-length]';
     forms
       .find('input, textarea')
       .filter(selectors)
@@ -182,7 +181,7 @@
     forms.find('[data-disabled-until-change]').prop('disabled', true);
     forms
       .each(function() {
-        var $this = $(this);
+        const $this = $(this);
 
         if ($this.data('initialized')) {
           console.warn('re-initialized form', this); // eslint-disable-line no-console
@@ -201,9 +200,9 @@
         });
       })
       .on('change input', function() {
-        var $this = $(this);
-        var untouched = $.param($this.serializeArray(), true) === $this.data('initialData');
-        var $cornerMessage = $('.save-corner-message');
+        const $this = $(this);
+        const untouched = $.param($this.serializeArray(), true) === $this.data('initialData');
+        const $cornerMessage = $('.save-corner-message');
         $this.find('[data-disabled-until-change]').prop('disabled', untouched);
         $this.closest('form').data('fieldsChanged', !untouched);
         if ($this.find('[data-save-reminder]').length && !$this.data('locked-event-disabled')) {
@@ -225,10 +224,10 @@
       .on(
         'scroll.initForms',
         _.debounce(function() {
-          var $form = forms.find('[data-save-reminder]').closest('form');
+          const $form = forms.find('[data-save-reminder]').closest('form');
           if ($form.length) {
-            var $cornerMessage = $('.save-corner-message');
-            var untouched = $.param($form.serializeArray(), true) === $form.data('initialData');
+            const $cornerMessage = $('.save-corner-message');
+            const untouched = $.param($form.serializeArray(), true) === $form.data('initialData');
             if (isElementInView($form.find('[data-save-reminder]'))) {
               hideSaveCornerMessage($cornerMessage);
             } else if (!untouched && !$cornerMessage.length) {
@@ -240,21 +239,21 @@
 
     forms.find('fieldset.collapsible > legend').on('click', function(evt) {
       evt.preventDefault();
-      var $this = $(this);
-      var $collapseIcon = $this.find('div > span');
+      const $this = $(this);
+      const $collapseIcon = $this.find('div > span');
       $this.next('.fieldset-content').slideToggle();
       $collapseIcon.toggleClass('icon-next icon-expand');
     });
 
     forms.find('fieldset.collapsible.initially-collapsed').each(function() {
-      var $this = $(this);
+      const $this = $(this);
       if ($this.find('div.form-field[data-error]').length) {
         $this.find('legend').trigger('click');
       }
     });
 
     if (forms.closest('.event-locked').length) {
-      var lockedForms = forms.filter('.disable-fields-if-locked');
+      const lockedForms = forms.filter('.disable-fields-if-locked');
       lockedForms.data('locked-event-disabled', true);
       lockedForms.find(':input:not([type=hidden]):not([data-button-back])').prop('disabled', true);
       lockedForms.find(':input:submit').hide();
@@ -312,7 +311,7 @@
     folderProtection
   ) {
     folderField.on('change', function() {
-      var selectedFolder = $(this);
+      const selectedFolder = $(this);
       if (protectionInfo[selectedFolder.val()] && !protectionField.prop('checked')) {
         selfProtection.hide();
         inheritedProtection.hide();
@@ -346,10 +345,10 @@
     extraCheckCallback
   ) {
     function _update(force) {
-      var $checkboxes = $(checkboxContainer)
+      const $checkboxes = $(checkboxContainer)
         .find(checkboxSelector)
         .filter(':checked');
-      var checked = force || !!$checkboxes.length;
+      let checked = force || !!$checkboxes.length;
       if (extraCheckCallback && extraCheckCallback($checkboxes) === false) {
         checked = false;
       }
@@ -397,12 +396,12 @@
         totalRows: 0,
         messages: {
           // message shown when all items on all pages are selected
-          allSelected: function(total) {
+          allSelected(total) {
             // never used with total == 1. empty string is invalid so we use `*` instead
             return $T.ngettext('*', 'All {0} rows are currently selected.').format(total);
           },
           // message shown when all items on the current page are selected
-          pageSelected: function(selected, total) {
+          pageSelected(selected, total) {
             // never used with total == 1
             return $T
               .ngettext(
@@ -417,15 +416,15 @@
       options
     );
 
-    var container = $(options.containerSelector);
+    const container = $(options.containerSelector);
     container.on('change', options.checkboxSelector, _update);
     _update();
 
     function _update() {
-      var messageContainer = $(options.selectionMessageSelector).empty();
-      var numChecked = container.find(options.checkboxSelector + ':checked').length;
-      var numUnchecked = container.find(options.checkboxSelector + ':not(:checked)').length;
-      var numRows = numChecked + numUnchecked;
+      const messageContainer = $(options.selectionMessageSelector).empty();
+      const numChecked = container.find(`${options.checkboxSelector}:checked`).length;
+      const numUnchecked = container.find(`${options.checkboxSelector}:not(:checked)`).length;
+      const numRows = numChecked + numUnchecked;
 
       if (numChecked < numRows) {
         // not everything selected
@@ -445,7 +444,7 @@
           $('<a>', {
             href: '#',
             text: $T.gettext('Select only the current page.'),
-            click: function(evt) {
+            click(evt) {
               evt.preventDefault();
               _setAllSelected(false);
               _update();
@@ -459,7 +458,7 @@
           $('<a>', {
             href: '#',
             text: $T.gettext('Click here to select them all.'),
-            click: function(evt) {
+            click(evt) {
               evt.preventDefault();
               _setAllSelected(true);
               _update();
@@ -487,15 +486,15 @@
   };
 
   global.getDropzoneFiles = function getDropzoneFiles($form) {
-    var files = {};
-    var dropzoneField = $form.data('dropzoneField');
+    const files = {};
+    const dropzoneField = $form.data('dropzoneField');
     if (dropzoneField) {
       files[dropzoneField.id] = $form[0].dropzone.getUploadingFiles();
     }
     return files;
   };
 
-  var DROPZONE_FILE_KEYS = [
+  const DROPZONE_FILE_KEYS = [
     'upload',
     'status',
     'previewElement',
@@ -509,7 +508,7 @@
   ];
 
   global.setDropzoneFiles = function setDropzoneFiles($field, files) {
-    var dropzone = $field.closest('form')[0].dropzone;
+    const dropzone = $field.closest('form')[0].dropzone;
     _.defer(function() {
       files.forEach(function(file) {
         DROPZONE_FILE_KEYS.forEach(function(key) {
@@ -524,8 +523,8 @@
     initForms($('form'));
 
     $('body').on('indico:htmlUpdated', function(evt) {
-      var $target = $(evt.target);
-      var $forms = $target.find('form');
+      const $target = $(evt.target);
+      const $forms = $target.find('form');
       if ($forms.length) {
         initForms($forms);
         showFormErrors($target);
