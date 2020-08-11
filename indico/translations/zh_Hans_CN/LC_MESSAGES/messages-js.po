@@ -10,7 +10,7 @@ msgstr ""
 "Project-Id-Version: Indico\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
 "POT-Creation-Date: 2020-08-01 22:38+0200\n"
-"PO-Revision-Date: 2020-08-06 14:24+0000\n"
+"PO-Revision-Date: 2020-08-11 09:01+0000\n"
 "Last-Translator: Lanxin Ma <ma@ihep.ac.cn>\n"
 "Language-Team: Chinese (China) (GB2312) (http://www.transifex.com/indico/indico/language/zh_CN.GB2312/)\n"
 "MIME-Version: 1.0\n"
@@ -111,7 +111,7 @@ msgstr "至少一个已选类别不能被删除因为它不为空。"
 #: indico/modules/categories/client/js/management.js:188
 msgid "Delete the selected category"
 msgid_plural "Delete {0} selected categories"
-msgstr[0] "删除{0}已选类别"
+msgstr[0] "删除{0}个已选类别"
 
 #: indico/modules/categories/client/js/management.js:196
 msgid "Select the categories to delete first."
@@ -763,7 +763,7 @@ msgstr "查询"
 
 #: indico/web/client/js/jquery/widgets/categorynavigator.js:194
 msgid "in"
-msgstr "在...里"
+msgstr "在类别"
 
 #: indico/web/client/js/jquery/widgets/categorynavigator.js:198
 msgid "Go to: {0}"
