@@ -46,7 +46,7 @@ class AddRequestIDFilter(object):
 
 class AddUserIDFilter(object):
     def filter(self, record):
-        record.user_id = unicode(session.user.id) if has_request_context() and session.user else '-'
+        record.user_id = unicode(session.user.id) if has_request_context() and session and session.user else '-'
         return True
 
 
