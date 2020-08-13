@@ -36,7 +36,7 @@ class SingleChoiceConfigForm(object):
                                              ('select', _('Drop-down list'))],
                                     default='radio')
     radio_display_type = IndicoRadioField(_('Alignment'),
-                                          [DataRequired(), HiddenUnless('display_type', 'radio')],
+                                          [HiddenUnless('display_type', 'radio'), DataRequired()],
                                           description=_('The arrangement of the options'),
                                           choices=[('vertical', _('Vertical')),
                                                    ('horizontal', _('Horizontal'))])

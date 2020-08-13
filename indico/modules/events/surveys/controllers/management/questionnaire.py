@@ -98,7 +98,7 @@ class RHImportSurveyQuestionnaire(RHManageSurveyBase):
             data = field_cls.process_imported_data(data)
             form = field_cls.create_config_form(formdata=MultiDict(data.items()), csrf_enabled=False)
             if not form.validate():
-                raise ValueError('Invalid question')
+                raise ValueError('Invalid question: {}'.format('\n'.join(form.error_list)))
             add_survey_question(section, field_cls, form.data)
 
     def _process(self):
@@ -108,6 +108,7 @@ class RHImportSurveyQuestionnaire(RHManageSurveyBase):
                 data = json.load(form.json_file.data.stream)
                 self._import_data(data)
             except ValueError as exception:
+                db.session.rollback()
                 logger.info('%s tried to import an invalid JSON file: %s', session.user, exception.message)
                 flash(_("Invalid file selected."), 'error')
             else:
