@@ -106,7 +106,7 @@ Improvements
   :pr:`4577`)
 - Display each news item on a separate page instead of together with all the
   other news items (:pr:`4587`)
-- Allow registrants to withdraw their application (:issue:`2715`, :pr:`4166`,
+- Allow registrants to withdraw their application (:issue:`2715`, :pr:`4585`,
   thanks :user:`brabemi` & :user:`omegak`)
 - Allow choosing a default badge in categories (:pr:`4574`, thanks
   :user:`omegak`)
