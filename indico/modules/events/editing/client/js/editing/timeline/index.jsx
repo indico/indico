@@ -5,14 +5,12 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-import React, {useEffect, useRef, useState} from 'react';
+import React, {useEffect} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
 import {Loader, Message} from 'semantic-ui-react';
-import _ from 'lodash';
 
 import TimelineHeader from 'indico/modules/events/editing/editing/timeline/TimelineHeader';
 import TimelineContent from 'indico/modules/events/reviewing/components/TimelineContent';
-import {indicoAxios} from 'indico/utils/axios';
 import {Param, Translate} from 'indico/react/i18n';
 import SubmitRevision from './SubmitRevision';
 
@@ -31,37 +29,24 @@ export default function Timeline() {
   const canPerformSubmitterActions = useSelector(selectors.canPerformSubmitterActions);
   const lastRevision = useSelector(selectors.getLastRevision);
   const timelineBlocks = useSelector(selectors.getTimelineBlocks);
-  const {eventId, contributionId, editableType, fileTypes, editableDetailsURL} = useSelector(
-    selectors.getStaticData
-  );
-  const [isOutdated, setIsOutdated] = useState(false);
-  const newDetails = useRef(null);
+  const {eventId, contributionId, editableType, fileTypes} = useSelector(selectors.getStaticData);
+  const isOutdated = useSelector(selectors.isTimelineOutdated);
 
   useEffect(() => {
-    dispatch(
-      actions.loadTimeline(data => {
-        newDetails.current = data;
-        return data;
-      })
-    );
-  }, [editableDetailsURL, contributionId, eventId, editableType, dispatch]);
+    dispatch(actions.loadTimeline());
+  }, [contributionId, eventId, editableType, dispatch]);
 
   useEffect(() => {
     const task = setInterval(async () => {
-      const resp = await indicoAxios.get(editableDetailsURL);
-      if (!_.isEqual(newDetails.current, resp.data)) {
-        newDetails.current = resp.data;
-        setIsOutdated(true);
-      }
+      dispatch(actions.checkTimelineUpdates());
     }, POLLING_SECONDS * 1000);
     return () => {
       clearInterval(task);
     };
-  }, [timelineBlocks, editableDetailsURL]);
+  }, [dispatch]);
 
   const refresh = () => {
-    dispatch({type: actions.SET_DETAILS, data: newDetails.current});
-    setIsOutdated(false);
+    dispatch(actions.useUpdatedTimeline());
   };
 
   if (isInitialEditableDetailsLoading) {
