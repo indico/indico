@@ -101,10 +101,10 @@
             {% if event.can_manage(session.user) %}
                 <div class="group">
                     <a class="i-button icon-upload" title="{% trans %}Import from event{% endtrans %}"
-                        data-href="{{ url_for('event_management.import', event) }}"
-                        data-title="{% trans %}Import from Event{% endtrans %}"
-                        data-ajax-dialog>
-                     {% trans %}Import{% endtrans %}
+                       data-href="{{ url_for('event_management.import', event) }}"
+                       data-title="{% trans %}Import from Event{% endtrans %}"
+                       data-ajax-dialog>
+                        {% trans %}Import{% endtrans %}
                     </a>
                     <a class="i-button icon-copy" title="{% trans %}Clone event{% endtrans %}"
                        data-href="{{ url_for('event_management.clone', event) }}"

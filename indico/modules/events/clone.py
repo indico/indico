@@ -36,7 +36,7 @@ class EventLocationCloner(EventCloner):
         db.session.flush()
 
     def _has_content(self, event):
-        return bool(event.has_location_info)
+        return event.has_location_info
 
     def _clone_location(self, new_event):
         new_event.location_data = self.old_event.location_data

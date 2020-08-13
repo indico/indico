@@ -41,7 +41,7 @@ class NoteCloner(EventCloner):
         db.session.flush()
 
     def _has_content(self, event):
-        return bool(event.all_notes.filter_by(is_deleted=False).count())
+        return event.all_notes.filter_by(is_deleted=False).has_rows()
 
     def _query_notes(self):
         return (self.old_event.all_notes

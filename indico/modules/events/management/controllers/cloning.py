@@ -228,7 +228,7 @@ class RHImportFromEvent(RHManageEventBase):
 
             if form.validate_on_submit():
                 updated_event = clone_into_event(source_event, self.event, set(form.selected_items.data))
-                flash(_('Data properly imported!'), 'success')
+                flash(_('Import successful!'), 'success')
                 return jsonify_data(redirect=url_for('event_management.settings', updated_event), flash=False)
             else:
                 # back to step 2, since there's been an error
@@ -250,7 +250,7 @@ class RHImportEventDetails(RHManageEventBase):
             event = get_event_from_url(form.source_event_url.data)
             if event == self.event:
                 raise ValueError(_('Cannot import from the same event'))
-            if event.type != self.event.type:
+            if event.type_ != self.event.type_:
                 raise ValueError(_('Cannot import from a different type of event'))
             if not event.can_manage(session.user):
                 raise ValueError(_('You do not have management rights to this event'))

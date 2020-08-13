@@ -5,6 +5,7 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
+import _ from 'lodash';
 import {serializeDateTimeRange} from 'indico/utils/date';
 
 (function(global) {
@@ -50,7 +51,7 @@ import {serializeDateTimeRange} from 'indico/utils/date';
       $form.ajaxSubmit({
         url: $formContainer.data('event-details-url'),
         method: 'POST',
-        success: function(data) {
+        success(data) {
           if (data.success) {
             const $eventTitle = $eventDetails.find('.import-event-title');
             const $eventCategory = $eventDetails.find('.import-event-category');

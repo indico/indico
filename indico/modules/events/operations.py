@@ -188,7 +188,7 @@ def clone_event(event, start_dt, cloners, category=None):
 
 
 def clone_into_event(source_event, target_event, cloners):
-    """Clone data into an exisiting event.
+    """Clone data into an existing event.
 
     Runs all required cloners.
 

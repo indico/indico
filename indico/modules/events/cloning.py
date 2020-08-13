@@ -58,8 +58,8 @@ class EventCloner(object):
     #: would result in people having to explicitly enable the other
     #: cloner even if it makes no sense to not run it.
     always_available_dep = False
-    #: Whether cloner allows cloning only into new events and excludes
-    #: cloning into exisitng events
+    #: Whether this cloner only allows cloning into new events and
+    #: is not available when importing into an existing event.
     new_event_only = False
 
     @classmethod
@@ -176,10 +176,10 @@ class EventCloner(object):
         return True
 
     def has_conflicts(self, target_event):
-        """Check for conflicts between source event and target event
+        """Check for conflicts between source event and target event.
 
         Use this when cloning into an existing event to disable options
-        where target_event data would conflict with cloned data.
+        where ``target_event`` data would conflict with cloned data.
         """
         return True
 

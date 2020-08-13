@@ -49,7 +49,9 @@ class AttachmentCloner(EventCloner):
         db.session.flush()
 
     def _has_content(self, event):
-        return event.all_attachment_folders.filter(AttachmentFolder.attachments.any()).has_rows()
+        return (event.all_attachment_folders
+                .filter(~AttachmentFolder.is_deleted, AttachmentFolder.attachments.any(is_deleted=False))
+                .has_rows())
 
     def _query_folders(self, base_query, for_event):
         query = (base_query

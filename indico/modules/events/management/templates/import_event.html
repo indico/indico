@@ -45,21 +45,12 @@
                 {% call form_fieldset(_("Which event should be imported?")) %}
                     {{ form_rows(form) }}
                     {% call message_box('highlight', large_icon=true, fixed_width=true, id='event-details') -%}
-                        {% set event_title %}
-                            <div class="import-event-title"></div>
-                        {% endset %}
-                        {% set event_dates %}
-                            <div class="import-event-dates"></div>
-                        {% endset %}
-                        {% set event_category %}
-                            <div class="import-event-category"></div>
-                        {% endset %}
                         <div>
                             {% trans %}You will import data from the following event:{% endtrans %}
                         </div>
-                        {{ event_title }}
-                        {{ event_dates }}
-                        {{ event_category }}
+                        <div class="import-event-title"></div>
+                        <div class="import-event-dates"></div>
+                        <div class="import-event-category"></div>
                     {%- endcall %}
                     {{ message_box('error', '-', fixed_width=true, id='clone-errors') }}
                 {% endcall %}

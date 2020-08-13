@@ -114,6 +114,8 @@ Improvements
   :user:`omegak`)
 - Display event labels on the user's dashboard as well (:pr:`4592`)
 - Event modules can now be imported from another event (:issue:`4518`, thanks :user:`meluru`)
+- Event modules can now be imported from another event (:issue:`4518`, :pr:`4533`,
+  thanks :user:`meluru`)
 
 Bugfixes
 ^^^^^^^^

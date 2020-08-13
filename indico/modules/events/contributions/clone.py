@@ -62,7 +62,7 @@ class ContributionFieldCloner(EventCloner):
     # on this internal cloner even if it won't clone anything.
 
     def has_conflicts(self, target_event):
-        return bool(target_event.contribution_fields)
+        return target_event.contribution_fields.has_rows()
 
     def run(self, new_event, cloners, shared_data, event_exists=False):
         self._contrib_field_map = {}
@@ -204,7 +204,7 @@ class ContributionCloner(EventCloner):
             link = cls()
             link.populate_from_attrs(old_link, attrs)
             current_person = self._person_map[old_link.person]
-            if event_exists and current_person.user_id in self._new_event_persons.keys():
+            if event_exists and current_person.user_id in self._new_event_persons:
                 link.person = self._new_event_persons[current_person.user_id]
             else:
                 link.person = current_person
