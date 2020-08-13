@@ -40,7 +40,8 @@ export function processRevisions(revisions) {
   let items = [];
   let currRevision = null;
 
-  for (const [index, revision] of revisions.entries()) {
+  for (const [index, _revision] of revisions.entries()) {
+    const revision = {..._revision};
     const {initialState, finalState} = revision;
     if (!currRevision) {
       currRevision = revision;
@@ -136,8 +137,14 @@ export function processRevisions(revisions) {
 }
 
 export const getDetails = state => (state.timeline ? state.timeline.details : null);
+export const getNewDetails = state => (state.timeline ? state.timeline.newDetails : null);
 export const isInitialEditableDetailsLoading = state =>
   state.timeline.loading && !state.timeline.details;
+export const isTimelineOutdated = createSelector(
+  getDetails,
+  getNewDetails,
+  (details, newDetails) => newDetails !== null && !_.isEqual(details, newDetails)
+);
 export const getTimelineBlocks = state => state.timeline.timelineBlocks;
 export const getLastTimelineBlock = createSelector(
   getTimelineBlocks,

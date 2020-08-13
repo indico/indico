@@ -146,6 +146,11 @@ class EditingRevisionSchema(mm.ModelSchema):
                     if not comment.internal or revision.editable.can_use_internal_comments(self.context.get('user'))]
         return EditingRevisionCommentSchema(context=self.context).dump(comments, many=True)
 
+    @post_dump()
+    def sort_tags(self, data, **kwargs):
+        data['tags'].sort(key=lambda tag: natural_sort_key(tag['verbose_title']))
+        return data
+
 
 class EditableSchema(mm.ModelSchema):
     class Meta:

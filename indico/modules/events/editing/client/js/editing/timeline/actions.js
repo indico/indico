@@ -8,15 +8,32 @@
 import {indicoAxios} from 'indico/utils/axios';
 import {ajaxAction, submitFormAction} from 'indico/utils/redux';
 
-import {getStaticData} from './selectors';
+import {getStaticData, getNewDetails} from './selectors';
 
 export const SET_LOADING = 'SET_LOADING';
 export const SET_DETAILS = 'SET_DETAILS';
+export const SET_NEW_DETAILS = 'SET_NEW_DETAILS';
 
 export function loadTimeline() {
   return async (dispatch, getStore) => {
     const {editableDetailsURL: url} = getStaticData(getStore());
     return await ajaxAction(() => indicoAxios.get(url), SET_LOADING, SET_DETAILS)(dispatch);
+  };
+}
+
+export function checkTimelineUpdates() {
+  return async (dispatch, getStore) => {
+    const {editableDetailsURL: url} = getStaticData(getStore());
+    return await ajaxAction(() => indicoAxios.get(url), null, SET_NEW_DETAILS)(dispatch);
+  };
+}
+
+export function useUpdatedTimeline() {
+  return (dispatch, getStore) => {
+    dispatch({
+      type: SET_DETAILS,
+      data: getNewDetails(getStore()),
+    });
   };
 }
 

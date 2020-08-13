@@ -1,6 +1,6 @@
 msgid ""
 msgstr ""
-"POT-Creation-Date: 2020-08-20 22:38+0200\n"
+"POT-Creation-Date: 2020-08-20 13:15+0200\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "MIME-Version: 1.0\n"
@@ -508,6 +508,14 @@ msgstr ""
 msgid "Show old revision"
 msgstr ""
 
+#: indico/modules/events/editing/client/js/editing/timeline/index.jsx:63
+msgid "This revision has been updated"
+msgstr ""
+
+#: indico/modules/events/editing/client/js/editing/timeline/index.jsx:65
+msgid "{link}Click here to refresh{/link} and see the most recent version."
+msgstr ""
+
 #: indico/modules/events/editing/client/js/editing/timeline/judgment/AcceptRejectForm.jsx:63
 #: indico/modules/events/editing/client/js/editing/timeline/judgment/UpdateFilesForm.jsx:32
 #: indico/web/client/js/react/components/RequestConfirm.jsx:60
@@ -543,39 +551,39 @@ msgstr[1] ""
 msgid "There is no publishable file uploaded."
 msgstr ""
 
-#: indico/modules/events/editing/client/js/editing/timeline/selectors.js:52
+#: indico/modules/events/editing/client/js/editing/timeline/selectors.js:53
 msgid "{editorName} (editor) has made some changes to the paper"
 msgstr ""
 
-#: indico/modules/events/editing/client/js/editing/timeline/selectors.js:63
+#: indico/modules/events/editing/client/js/editing/timeline/selectors.js:64
 msgid "Revision has been replaced"
 msgstr ""
 
-#: indico/modules/events/editing/client/js/editing/timeline/selectors.js:76
+#: indico/modules/events/editing/client/js/editing/timeline/selectors.js:77
 msgid "Editor has accepted after making some changes"
 msgstr ""
 
-#: indico/modules/events/editing/client/js/editing/timeline/selectors.js:78
+#: indico/modules/events/editing/client/js/editing/timeline/selectors.js:79
 msgid "Submitter has accepted proposed changes"
 msgstr ""
 
-#: indico/modules/events/editing/client/js/editing/timeline/selectors.js:80
+#: indico/modules/events/editing/client/js/editing/timeline/selectors.js:81
 msgid "Revision has been accepted"
 msgstr ""
 
-#: indico/modules/events/editing/client/js/editing/timeline/selectors.js:93
+#: indico/modules/events/editing/client/js/editing/timeline/selectors.js:94
 msgid "Revision has been rejected"
 msgstr ""
 
-#: indico/modules/events/editing/client/js/editing/timeline/selectors.js:101
+#: indico/modules/events/editing/client/js/editing/timeline/selectors.js:102
 msgid "Submitter rejected proposed changes"
 msgstr ""
 
-#: indico/modules/events/editing/client/js/editing/timeline/selectors.js:103
+#: indico/modules/events/editing/client/js/editing/timeline/selectors.js:104
 msgid "Submitter has been asked to make some changes"
 msgstr ""
 
-#: indico/modules/events/editing/client/js/editing/timeline/selectors.js:118
+#: indico/modules/events/editing/client/js/editing/timeline/selectors.js:119
 msgid "Editor made some changes"
 msgstr ""
 

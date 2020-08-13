@@ -7,16 +7,19 @@
 
 import React, {useEffect} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
-import {Loader} from 'semantic-ui-react';
+import {Loader, Message} from 'semantic-ui-react';
 
 import TimelineHeader from 'indico/modules/events/editing/editing/timeline/TimelineHeader';
 import TimelineContent from 'indico/modules/events/reviewing/components/TimelineContent';
+import {Param, Translate} from 'indico/react/i18n';
 import SubmitRevision from './SubmitRevision';
 
 import * as actions from './actions';
 import * as selectors from './selectors';
 import TimelineItem from './TimelineItem';
 import FileDisplay from './FileDisplay';
+
+const POLLING_SECONDS = 10;
 
 export default function Timeline() {
   const dispatch = useDispatch();
@@ -27,10 +30,24 @@ export default function Timeline() {
   const lastRevision = useSelector(selectors.getLastRevision);
   const timelineBlocks = useSelector(selectors.getTimelineBlocks);
   const {eventId, contributionId, editableType, fileTypes} = useSelector(selectors.getStaticData);
+  const isOutdated = useSelector(selectors.isTimelineOutdated);
 
   useEffect(() => {
-    dispatch(actions.loadTimeline(eventId, contributionId, editableType));
+    dispatch(actions.loadTimeline());
   }, [contributionId, eventId, editableType, dispatch]);
+
+  useEffect(() => {
+    const task = setInterval(async () => {
+      dispatch(actions.checkTimelineUpdates());
+    }, POLLING_SECONDS * 1000);
+    return () => {
+      clearInterval(task);
+    };
+  }, [dispatch]);
+
+  const refresh = () => {
+    dispatch(actions.useUpdatedTimeline());
+  };
 
   if (isInitialEditableDetailsLoading) {
     return <Loader active />;
@@ -40,6 +57,20 @@ export default function Timeline() {
 
   return (
     <>
+      {isOutdated && (
+        <Message
+          warning
+          header={Translate.string('This revision has been updated')}
+          content={
+            <Translate>
+              <Param name="link" wrapper={<a onClick={refresh} />}>
+                Click here to refresh
+              </Param>{' '}
+              and see the most recent version.
+            </Translate>
+          }
+        />
+      )}
       <TimelineHeader
         contribution={details.contribution}
         state={details.state}
