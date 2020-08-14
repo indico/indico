@@ -93,6 +93,17 @@
 {% endmacro %}
 
 
+{% macro _render_import_event(event) %}
+    <button class="i-button borderless icon-upload hide-if-locked"
+            title="{% trans %}Import from event{% endtrans %}"
+            data-title="{% trans %}Import from other event{% endtrans %}"
+            data-href="{{ url_for('event_management.import', event) }}"
+            data-ajax-dialog>
+        {% trans %}Import{% endtrans %}
+    </button>
+{% endmacro %}
+
+
 {% macro render_action_menu(event, event_types) %}
     {% set clones = event.clones|rejectattr('is_deleted')|list %}
 
@@ -100,12 +111,6 @@
         <div class="toolbar">
             {% if event.can_manage(session.user) %}
                 <div class="group">
-                    <a class="i-button icon-upload" title="{% trans %}Import from event{% endtrans %}"
-                       data-href="{{ url_for('event_management.import', event) }}"
-                       data-title="{% trans %}Import from Event{% endtrans %}"
-                       data-ajax-dialog>
-                        {% trans %}Import{% endtrans %}
-                    </a>
                     <a class="i-button icon-copy" title="{% trans %}Clone event{% endtrans %}"
                        data-href="{{ url_for('event_management.clone', event) }}"
                        data-title="{% trans %}Clone Event{% endtrans %}"
@@ -125,6 +130,7 @@
                 <div id="event-action-menu-actions">
                     <div class="action-menu-buttons {{ 'event-locked' if event.is_locked }}">
                         {{ _render_move_event(event) }}
+                        {{ _render_import_event(event) }}
                         {{ _render_lock_event(event) }}
                         {{ _render_delete_event(event) }}
                         {{ _render_change_event_type(event, event_types) }}
