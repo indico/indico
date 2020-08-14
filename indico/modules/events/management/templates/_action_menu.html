@@ -94,7 +94,7 @@
 
 
 {% macro _render_import_event(event) %}
-    <button class="i-button borderless icon-upload hide-if-locked"
+    <button class="i-button borderless icon-import hide-if-locked"
             title="{% trans %}Import from event{% endtrans %}"
             data-title="{% trans %}Import from other event{% endtrans %}"
             data-href="{{ url_for('event_management.import', event) }}"
