@@ -10,7 +10,6 @@ from __future__ import unicode_literals
 from marshmallow import fields
 
 from indico.core.marshmallow import mm
-from indico.modules.categories.schemas import CategorySchema
 from indico.modules.events.models.events import Event
 from indico.modules.events.models.principals import EventPrincipal
 from indico.util.marshmallow import PrincipalPermissionList
@@ -23,9 +22,9 @@ class EventPermissionsSchema(mm.Schema):
 class EventDetailsSchema(mm.ModelSchema):
     class Meta:
         model = Event
-        fields = ('id', 'category', 'title', 'start_dt', 'end_dt')
+        fields = ('id', 'category_chain', 'title', 'start_dt', 'end_dt')
 
-    category = fields.Nested(CategorySchema)
+    category_chain = fields.List(fields.String(), attribute='category.chain_titles')
 
 
 event_permissions_schema = EventPermissionsSchema()

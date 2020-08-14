@@ -57,7 +57,7 @@ import {serializeDateTimeRange} from 'indico/utils/date';
             const $eventCategory = $eventDetails.find('.import-event-category');
             const $eventDates = $eventDetails.find('.import-event-dates');
             $eventTitle.text(data.event.title);
-            $eventCategory.text(data.event.category.title);
+            $eventCategory.text(data.event.category_chain.join(' » '));
             $eventDates.text(serializeDateTimeRange(data.event.start_dt, data.event.end_dt));
             $cloneErrors.hide();
             $eventDetails.show();
