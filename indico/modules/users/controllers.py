@@ -77,9 +77,11 @@ def get_events_in_categories(category_ids, user, limit=10):
                      Event.start_dt.astimezone(session.tzinfo) >= today)
              .options(joinedload('category').load_only('id', 'title'),
                       joinedload('series'),
+                      joinedload('label'),
                       subqueryload('acl_entries'),
                       load_only('id', 'category_id', 'start_dt', 'end_dt', 'title', 'access_key',
-                                'protection_mode', 'series_id', 'series_pos', 'series_count'))
+                                'protection_mode', 'series_id', 'series_pos', 'series_count',
+                                'label_id', 'label_message'))
              .order_by(Event.start_dt, Event.id))
     return get_n_matching(query, limit, lambda x: x.can_access(user))
 

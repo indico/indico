@@ -112,6 +112,7 @@ Improvements
   thanks :user:`brabemi` & :user:`omegak`)
 - Allow choosing a default badge in categories (:pr:`4574`, thanks
   :user:`omegak`)
+- Display event labels on the user's dashboard as well (:pr:`4592`)
 
 Bugfixes
 ^^^^^^^^

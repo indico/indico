@@ -143,8 +143,10 @@ def get_linked_events(user, dt, limit=None, load_also=()):
              .filter(~Event.is_deleted,
                      Event.id.in_(links))
              .options(joinedload('series'),
+                      joinedload('label'),
                       load_only('id', 'category_id', 'title', 'start_dt', 'end_dt',
-                                'series_id', 'series_pos', 'series_count', *load_also))
+                                'series_id', 'series_pos', 'series_count', 'label_id', 'label_message',
+                                *load_also))
              .order_by(Event.start_dt, Event.id))
     if limit is not None:
         query = query.limit(limit)

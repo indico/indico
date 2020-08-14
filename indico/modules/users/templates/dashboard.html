@@ -91,6 +91,7 @@
                                     <a href="{{ event.url }}">
                                         {{ event.get_verbose_title(show_series_pos=true) }}
                                     </a>
+                                    {{ event.get_label_markup('mini') }}
                                 </span>
                                 <span class="item-legend">
                                     <span {% if roles.management %}title="{% trans %}You have management rights{% endtrans %}"{% endif %}
@@ -165,6 +166,7 @@
                                             <a href="{{ event.url }}">
                                                 {{ event.get_verbose_title(show_series_pos=true) }}
                                             </a>
+                                            {{ event.get_label_markup('mini') }}
                                         </span>
                                         <span class="event-category">
                                             {{ event.category.title }}
