@@ -36,7 +36,7 @@ class TimetableCloner(EventCloner):
         return self.old_event.type_ in {EventType.meeting, EventType.conference}
 
     def has_conflicts(self, target_event):
-        return self._has_content(target_event)
+        return self._has_content(target_event) or self.old_event.duration > target_event.duration
 
     def run(self, new_event, cloners, shared_data, event_exists=False):
         self._session_block_map = shared_data['sessions']['session_block_map']
