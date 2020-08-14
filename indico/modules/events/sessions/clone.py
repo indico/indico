@@ -37,7 +37,10 @@ class SessionCloner(EventCloner):
         self._event_role_map = shared_data['event_roles']['event_role_map'] if 'event_roles' in cloners else None
         self._regform_map = shared_data['registration_forms']['form_map'] if 'registration_forms' in cloners else None
         self._person_map = shared_data['event_persons']['person_map']
-        self._new_event_persons = {person.user_id: person for person in new_event.persons} if event_exists else {}
+        self._new_event_persons = {}
+        if event_exists:
+            self._new_event_persons = {person.user_id: person for person in new_event.persons
+                                       if person.user_id is not None}
         self._session_map = {}
         self._session_block_map = {}
         with db.session.no_autoflush:

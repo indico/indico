@@ -129,7 +129,10 @@ class ContributionCloner(EventCloner):
         self._session_block_map = shared_data['sessions']['session_block_map']
         self._contrib_type_map = shared_data['contribution_types']['contrib_type_map']
         self._contrib_field_map = shared_data['contribution_fields']['contrib_field_map']
-        self._new_event_persons = {person.user_id: person for person in new_event.persons} if event_exists else {}
+        self._new_event_persons = {}
+        if event_exists:
+            self._new_event_persons = {person.user_id: person for person in new_event.persons
+                                       if person.user_id is not None}
         self._contrib_map = {}
         self._subcontrib_map = {}
         with db.session.no_autoflush:
