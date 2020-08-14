@@ -61,10 +61,10 @@ i[class^='icon-']::before {
  *  1. Login into icomoon app https://icomoon.io/app/
  *  2. Remove any existing project (Top-left hamburger icon, "Manage projects", "Remove" button)
  *  3. Import "selection.json" from Indico repository (Top-left hamburger icon, "Import project",
- *     choose 'indico/htdocs/static/fonts/icomoon/selection.json'
+ *     choose 'indico/web/static/fonts/icomoon/selection.json'
  *  4. Load the project (it should be named "Untitled Project")
  *  5. Deselect all icons (Top-left hamburger icon, "Clear selection")
- *  6. Add the IcoMoon Ultimate pack (Click on "Library" button then on "Add)
+ *  6. Add the IcoMoon Ultimate pack (Click on "Library" button then on "Add")
  *  7. Search for the icon you want to add using the search box
  *  8. Select the icons to add with the selection tool
  *  9. Add the new icons to our set (Click the hamburger icon to the right of our set that
@@ -76,7 +76,7 @@ i[class^='icon-']::before {
  *      - Click the hamburger icon to the right of our project
  *      - Choose "Select all".
  *      - Click that hamburger icon again and choose "Rearrange icons".
- *      - Choose "Order by name" and "Rearrange
+ *      - Choose "Order by name" and "Rearrange"
  * 13. Click on the "Generate font" tab at the bottom of the screen
  * 14. Click on "Download" at the bottom right of the screen
  * 15. Copy files:
@@ -110,6 +110,9 @@ i[class^='icon-']::before {
 }
 .icon-attachment::before {
   content: '\eca9';
+}
+.icon-bell::before {
+  content: '\e908';
 }
 .icon-bold::before {
   content: '\e454';
@@ -165,8 +168,14 @@ i[class^='icon-']::before {
 .icon-collapse::before {
   content: '\e3b0';
 }
+.icon-compass2::before {
+  content: '\e94a';
+}
 .icon-copy::before {
   content: '\30';
+}
+.icon-copy1::before {
+  content: '\e909';
 }
 .icon-cross::before {
   content: '\ed6d';
@@ -188,6 +197,9 @@ i[class^='icon-']::before {
 }
 .icon-enter::before {
   content: '\e37b';
+}
+.icon-equalizer::before {
+  content: '\e90a';
 }
 .icon-exit::before {
   content: '\e37c';
@@ -296,6 +308,9 @@ i[class^='icon-']::before {
 }
 .icon-image::before {
   content: '\31';
+}
+.icon-import::before {
+  content: '\ec81';
 }
 .icon-info::before {
   content: '\69';
@@ -530,18 +545,6 @@ i[class^='icon-']::before {
 }
 .icon-id-badge::before {
   content: '\e907';
-}
-.icon-compass2::before {
-  content: '\e94a';
-}
-.icon-bell::before {
-  content: '\e908';
-}
-.icon-copy1::before {
-  content: '\e909';
-}
-.icon-equalizer::before {
-  content: '\e90a';
 }
 /* End of icomoon's icon definitions */
 
