@@ -200,15 +200,30 @@ class RHCloneEvent(RHManageEventBase):
                                 cloner_dependencies=dependencies, **tpl_args)
 
 
+def _get_import_source_from_url(target_event, url):
+    event = get_event_from_url(url)
+    if event == target_event:
+        raise ValueError(_('Cannot import from the same event'))
+    if event.type_ != target_event.type_:
+        raise ValueError(_('Cannot import from a different type of event'))
+    if not event.can_manage(session.user):
+        raise ValueError(_('You do not have management rights to this event'))
+    return event
+
+
 class RHImportFromEvent(RHManageEventBase):
     """Import data from another event."""
+
+    def _process_args(self):
+        RHManageEventBase._process_args(self)
+        url = request.form.get('source_event_url')
+        self.source_event = _get_import_source_from_url(self.event, url) if url else None
 
     def _form_for_step(self, step, set_defaults=True):
         if step == 1:
             return ImportSourceEventForm()
         elif step == 2:
-            source_event = get_event_from_url(request.form.get('source_event_url'))
-            return ImportContentsForm(source_event, self.event, set_defaults=set_defaults)
+            return ImportContentsForm(self.source_event, self.event, set_defaults=set_defaults)
         else:
             return None
 
@@ -223,11 +238,10 @@ class RHImportFromEvent(RHManageEventBase):
 
         elif step > 2:
             # last step - perform actual cloning
-            source_event = get_event_from_url(request.form.get('source_event_url'))
-            form = ImportContentsForm(source_event, self.event)
+            form = ImportContentsForm(self.source_event, self.event)
 
             if form.validate_on_submit():
-                updated_event = clone_into_event(source_event, self.event, set(form.selected_items.data))
+                updated_event = clone_into_event(self.source_event, self.event, set(form.selected_items.data))
                 flash(_('Import successful!'), 'success')
                 return jsonify_data(redirect=url_for('event_management.settings', updated_event), flash=False)
             else:
@@ -247,13 +261,7 @@ class RHImportEventDetails(RHManageEventBase):
         schema = EventDetailsSchema()
         form = ImportSourceEventForm()
         try:
-            event = get_event_from_url(form.source_event_url.data)
-            if event == self.event:
-                raise ValueError(_('Cannot import from the same event'))
-            if event.type_ != self.event.type_:
-                raise ValueError(_('Cannot import from a different type of event'))
-            if not event.can_manage(session.user):
-                raise ValueError(_('You do not have management rights to this event'))
+            event = _get_import_source_from_url(self.event, form.source_event_url.data)
         except ValueError as e:
             return jsonify(error={'message': e.message})
         return jsonify_data(event=schema.dump(event))
