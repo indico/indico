@@ -418,7 +418,7 @@ class ImportContentsForm(ImportSourceEventForm):
 
     def __init__(self, source_event, target_event, set_defaults=False, **kwargs):
         cloners = EventCloner.get_cloners(source_event)
-        visible_options = {cloner for cloner in cloners if cloner.is_visible and not cloner.new_event_only}
+        visible_options = [cloner for cloner in cloners if cloner.is_visible and not cloner.new_event_only]
         conflicts = {cloner.name: cloner.has_conflicts(target_event) for cloner in cloners}
 
         if set_defaults:
