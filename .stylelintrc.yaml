@@ -18,6 +18,8 @@ rules:
     - true
     - ignorePseudoClasses: [global]
 
+  selector-pseudo-element-colon-notation: double
+
   font-family-no-missing-generic-family-keyword:
     - true
     - ignoreFontFamilies: [icomoon-ultimate]
