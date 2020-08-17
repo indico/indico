@@ -420,15 +420,15 @@ class RegistrationForm(db.Model):
         if (bool(user) + bool(uuid) + bool(email)) != 1:
             raise ValueError("Exactly one of `user`, `uuid` and `email` must be specified")
         if user:
-            return user.registrations.filter_by(registration_form=self).filter(Registration.is_active).first()
+            return user.registrations.filter_by(registration_form=self).filter(~Registration.is_deleted).first()
         if uuid:
             try:
                 UUID(hex=uuid)
             except ValueError:
                 raise BadRequest('Malformed registration token')
-            return Registration.query.with_parent(self).filter_by(uuid=uuid).filter(Registration.is_active).first()
+            return Registration.query.with_parent(self).filter_by(uuid=uuid).filter(~Registration.is_deleted).first()
         if email:
-            return Registration.query.with_parent(self).filter_by(email=email).filter(Registration.is_active).first()
+            return Registration.query.with_parent(self).filter_by(email=email).filter(~Registration.is_deleted).first()
 
     def render_base_price(self):
         return format_currency(self.base_price, self.currency, locale=session.lang or 'en_GB')

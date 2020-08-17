@@ -292,7 +292,9 @@ class Registration(db.Model):
     @property
     def can_be_withdrawn(self):
         from indico.modules.events.registration.models.forms import ModificationMode
-        if self.is_paid:
+        if not self.is_active:
+            return False
+        elif self.is_paid:
             return False
         elif self.event.end_dt < now_utc():
             return False

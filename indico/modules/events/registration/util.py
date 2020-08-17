@@ -482,7 +482,7 @@ def get_event_regforms(event, user, with_registrations=False, only_in_acl=False)
     elif with_registrations:
         registered_user = Registration
     else:
-        registered_user = RegistrationForm.registrations.any((Registration.user == user) & Registration.is_active)
+        registered_user = RegistrationForm.registrations.any((Registration.user == user) & ~Registration.is_deleted)
     query = (RegistrationForm.query.with_parent(event)
              .with_entities(RegistrationForm, registered_user)
              .options(undefer('active_registration_count'))
@@ -492,7 +492,7 @@ def get_event_regforms(event, user, with_registrations=False, only_in_acl=False)
     if with_registrations:
         query = query.outerjoin(Registration, db.and_(Registration.registration_form_id == RegistrationForm.id,
                                                       Registration.user == user,
-                                                      Registration.is_active))
+                                                      ~Registration.is_deleted))
     return query.all()
 
 

@@ -118,6 +118,9 @@ Improvements
   thanks :user:`meluru`)
 - Include the event keywords in the event API data (:issue:`4598`, :pr:`4599`,
   thanks :user:`chernals`)
+- Allow registrants to check details for non-active registrations and prevent
+  them from registering twice with the same registration form (:issue:`4594`,
+  :pr:`4595`, thanks :user:`omegak`)
 
 Bugfixes
 ^^^^^^^^

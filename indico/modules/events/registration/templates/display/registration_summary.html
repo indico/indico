@@ -1,7 +1,8 @@
 {% from 'events/registration/display/_registration_summary_blocks.html' import render_registration_summary,
                                                                                render_invoice %}
 
-{% set class_mapping = {'complete': 'accept', 'pending': 'warning', 'unpaid': 'warning'} %}
+{% set class_mapping = {'complete': 'accept', 'pending': 'warning', 'rejected': 'danger', 'unpaid': 'warning',
+                        'withdrawn': 'danger'} %}
 
 <div class="action-box {{ class_mapping[registration.state.name] }}">
     <div class="section">
@@ -11,6 +12,20 @@
                 <div class="label">
                     {% trans %}Your registration has been completed{% endtrans %}
                 </div>
+            {% elif registration.state.name == 'rejected' %}
+                <div class="label">
+                    {% trans %}Your registration has been rejected{% endtrans %}
+                </div>
+                {% trans -%}
+                    Contact an event manager if you think this is an error.
+                {%- endtrans %}
+            {% elif registration.state.name == 'withdrawn' %}
+                <div class="label">
+                    {% trans %}You have withdrawn your registration{% endtrans %}
+                </div>
+                {% trans -%}
+                    Contact an event manager if you changed your mind.
+                {%- endtrans %}
             {% elif registration.state.name == 'pending' %}
                 <div class="label">
                     {% trans %}Your registration is awaiting approval{% endtrans %}
@@ -33,7 +48,7 @@
             {% endif %}
         </div>
         <div class="toolbar">
-            {% if registration.registration_form.modification_mode.name != 'not_allowed' %}
+            {% if registration.registration_form.modification_mode.name != 'not_allowed' and registration.is_active %}
                 <div class="group">
                     <a href="{{ url_for('.edit_registration_display', registration.locator.registrant) }}"
                        class="i-button icon-edit {% if not registration.can_be_modified %}disabled{% endif %}"

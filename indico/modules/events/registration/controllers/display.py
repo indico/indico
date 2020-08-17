@@ -281,7 +281,9 @@ class RHRegistrationForm(InvitationMixin, RHRegistrationFormRegistrationBase):
             return redirect(url_for('.display_regform', self.invitation.registration.locator.registrant))
 
     def _can_register(self):
-        return not self.regform.limit_reached and (self.regform.is_active or self.invitation)
+        registration = self.regform.get_registration(user=session.user)
+        already_registered = registration is not None
+        return not self.regform.limit_reached and (self.regform.is_active or self.invitation) and not already_registered
 
     def _process(self):
         form = make_registration_form(self.regform)()
@@ -318,6 +320,11 @@ class RHRegistrationDisplayEdit(RegistrationEditMixin, RHRegistrationFormRegistr
     REGISTRATION_REQUIRED = False
     ALLOW_PROTECTED_EVENT = True
 
+    def _check_access(self):
+        RHRegistrationFormRegistrationBase._check_access(self)
+        if not self.registration.is_active:
+            raise Forbidden
+
     def _process_args(self):
         RHRegistrationFormRegistrationBase._process_args(self)
         if self.registration is None:
@@ -338,12 +345,15 @@ class RHRegistrationDisplayEdit(RegistrationEditMixin, RHRegistrationFormRegistr
 class RHRegistrationWithdraw(RHRegistrationFormRegistrationBase):
     """Withdraw a registration"""
 
-    def _process(self):
+    def _check_access(self):
+        RHRegistrationFormRegistrationBase._check_access(self)
         if not self.registration.can_be_withdrawn:
             raise Forbidden
+
+    def _process(self):
         self.registration.update_state(withdrawn=True)
         flash(_('Your registration has been withdrawn.'), 'success')
-        return redirect(self.event.url)
+        return redirect(url_for('.display_regform', self.registration.locator.registrant))
 
 
 class RHRegistrationFormDeclineInvitation(InvitationMixin, RHRegistrationFormBase):
