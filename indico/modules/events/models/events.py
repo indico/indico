@@ -896,7 +896,9 @@ class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionMan
             end_dt = end_dt.astimezone(tzinfo)
         duration = (end_dt.replace(hour=23, minute=59) - start_dt.replace(hour=0, minute=0)).days
         for offset in xrange(duration + 1):
-            yield (start_dt + timedelta(days=offset)).date()
+            day = (start_dt + timedelta(days=offset)).date()
+            if day <= end_dt.date():
+                yield day
 
     def preload_all_acl_entries(self):
         db.m.Contribution.preload_acl_entries(self)

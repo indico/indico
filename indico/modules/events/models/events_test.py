@@ -7,7 +7,7 @@
 
 from __future__ import unicode_literals
 
-from datetime import date, datetime, timedelta
+from datetime import date, datetime, time, timedelta
 
 import pytest
 import pytz
@@ -80,13 +80,48 @@ def test_effective_protection_mode(db, dummy_category, dummy_event, category_pm,
     assert dummy_event.effective_protection_mode == effective_pm
 
 
+@pytest.mark.parametrize('tz', ('UTC', 'Europe/Zurich'))
 @pytest.mark.parametrize(('start_dt', 'end_dt', 'days'), (
     (datetime(2019, 8, 16, 10, 0), datetime(2019, 8, 16, 15, 0), [date(2019, 8, 16)]),
     (datetime(2019, 8, 16, 10, 0), datetime(2019, 8, 17, 15, 0), [date(2019, 8, 16), date(2019, 8, 17)]),
     (datetime(2019, 8, 16, 10, 0), datetime(2019, 8, 17, 8, 0), [date(2019, 8, 16), date(2019, 8, 17)]),
     (datetime(2019, 8, 16, 0, 0), datetime(2019, 8, 17, 0, 0), [date(2019, 8, 16), date(2019, 8, 17)]),
+    (datetime(2020, 9, 24, 12, 0), datetime(2020, 9, 25, 14, 0), [date(2020, 9, 24), date(2020, 9, 25)]),
 ))
-def test_iter_days(dummy_event, start_dt, end_dt, days):
-    dummy_event.start_dt = pytz.utc.localize(start_dt)
-    dummy_event.end_dt = pytz.utc.localize(end_dt)
+def test_iter_days(dummy_event, tz, start_dt, end_dt, days):
+    tzinfo = pytz.timezone(tz)
+    dummy_event.start_dt = tzinfo.localize(start_dt)
+    dummy_event.end_dt = tzinfo.localize(end_dt)
     assert list(dummy_event.iter_days()) == days
+
+
+@pytest.mark.parametrize('tz', ('UTC', 'Europe/Zurich'))
+@pytest.mark.parametrize(('start_time', 'end_time'), (
+    (time(0), time(0)),
+    (time(1), time(1)),
+    (time(1), time(2)),
+    (time(2), time(2)),
+    (time(12), time(14)),
+    (time(22), time(22)),
+    (time(22), time(23)),
+    (time(23), time(23)),
+))
+@pytest.mark.parametrize(('start_date', 'end_date', 'days'), (
+    # no dst change
+    (date(2020, 9, 24), date(2020, 9, 25), [date(2020, 9, 24), date(2020, 9, 25)]),
+    # one dst change (UTC+1 to UTC+2)
+    (date(2020, 3, 28), date(2020, 3, 29), [date(2020, 3, 28), date(2020, 3, 29)]),
+    # one dst change (UTC+2 to UTC+1)
+    (date(2020, 10, 24), date(2020, 10, 25), [date(2020, 10, 24), date(2020, 10, 25)]),
+    # two dst changes
+    (date(2020, 10, 24), date(2021, 3, 30), [date(2020, 10, 24), date(2021, 3, 30)]),
+))
+def test_iter_days_dst(dummy_event, tz, start_time, end_time, start_date, end_date, days):
+    start_dt = datetime.combine(start_date, start_time)
+    end_dt = datetime.combine(end_date, end_time)
+    tzinfo = pytz.timezone(tz)
+    dummy_event.start_dt = tzinfo.localize(start_dt)
+    dummy_event.end_dt = tzinfo.localize(end_dt)
+    all_days = list(dummy_event.iter_days())
+    assert all_days[0] == days[0]
+    assert all_days[-1] == days[-1]
