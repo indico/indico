@@ -538,6 +538,7 @@ class Registration(db.Model):
         return (Registration.query
                 .with_parent(self.registration_form)
                 .filter(Registration.id != self.id,
+                        ~Registration.is_deleted,
                         db.or_(*conflict_criteria),
                         Registration.state.notin_([RegistrationState.rejected, RegistrationState.withdrawn]))
                 .has_rows())
