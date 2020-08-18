@@ -153,7 +153,7 @@ Internal Changes
 - Add ``filter_selectable_badges`` signal (:issue:`4557`, thanks :user:`omegak`)
 - Add user ID in every log record logged in a request context (:issue:`4570`,
   thanks :user:`omegak`)
-- Add ``extra-registration-settings`` template hook (:issue:`4596`, thanks
+- Add ``extra-registration-settings`` template hook (:pr:`4596`, thanks
   :user:`meluru`)
 
 
