@@ -68,6 +68,7 @@
             </div>
         </div>
     </div>
+    {{ template_hook('extra-registration-settings', event=event) }}
     <div class="regform-list">
         <h3>{% trans %}List of registration forms{% endtrans %}</h3>
         {% for regform in regforms %}
