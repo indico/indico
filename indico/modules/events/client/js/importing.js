@@ -75,6 +75,7 @@ import {serializeDateTimeRange} from 'indico/utils/date';
     }, 300);
 
     if (step === 1) {
+      $nextButton.prop('disabled', true);
       $form.on('change', 'input', _.partial(updateEventDetails, false));
       $form.on('keyup', 'input', function(e) {
         e.preventDefault();
