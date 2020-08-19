@@ -446,7 +446,9 @@ const InnerUserSearch = searchFactory({
   // eslint-disable-next-line react/display-name
   getResultsText: total => (
     <PluralTranslate count={total}>
-      <Singular>1 user found</Singular>
+      <Singular>
+        <Param name="count" value={total} /> user found
+      </Singular>
       <Plural>
         <Param name="count" value={total} /> users found
       </Plural>
@@ -527,7 +529,9 @@ export const GroupSearch = searchFactory({
   // eslint-disable-next-line react/display-name
   getResultsText: total => (
     <PluralTranslate count={total}>
-      <Singular>1 group found</Singular>
+      <Singular>
+        <Param name="count" value={total} /> group found
+      </Singular>
       <Plural>
         <Param name="count" value={total} /> groups found
       </Plural>
