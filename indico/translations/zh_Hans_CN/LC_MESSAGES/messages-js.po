@@ -9,8 +9,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Indico\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2020-08-01 22:38+0200\n"
-"PO-Revision-Date: 2020-08-11 09:01+0000\n"
+"POT-Creation-Date: 2020-08-19 09:34+0200\n"
+"PO-Revision-Date: 2020-08-14 08:57+0000\n"
 "Last-Translator: Lanxin Ma <ma@ihep.ac.cn>\n"
 "Language-Team: Chinese (China) (GB2312) (http://www.transifex.com/indico/indico/language/zh_CN.GB2312/)\n"
 "MIME-Version: 1.0\n"
@@ -47,16 +47,16 @@ msgstr "今天"
 
 #: indico/modules/categories/client/js/calendar.js:50
 msgid "Events happening on {0}"
-msgstr "事件发生在{0}"
+msgstr "事件发生在 {0}"
 
 #: indico/modules/categories/client/js/calendar.js:62
 msgid "{0} long-lasting event not shown"
 msgid_plural "{0} long-lasting events not shown"
-msgstr[0] "{0} 未显示长期事件"
+msgstr[0] "{0} 个持久事件未显示"
 
 #: indico/modules/categories/client/js/calendar.js:72
 msgid "Long lasting events"
-msgstr "长期事件"
+msgstr "持久事件"
 
 #: indico/modules/categories/client/js/display.js:23
 msgid "empty"
@@ -132,15 +132,15 @@ msgstr "先选择要移动的类别"
 
 #: indico/modules/categories/client/js/management.js:291
 #: indico/modules/vc/client/js/index.js:54
-#: indico/web/client/js/jquery/utils/forms.js:395
+#: indico/web/client/js/jquery/utils/forms.js:401
 msgid "*"
 msgid_plural "All {0} events in this category are currently selected."
-msgstr[0] "此类别中的所有事件 {0} 现在已被选中了。"
+msgstr[0] "当前已选择此类别中的所有{0}个事件。"
 
 #: indico/modules/categories/client/js/management.js:296
 msgid "Only {0} out of {1} events is currently selected."
 msgid_plural "Only {0} out of {1} events are currently selected."
-msgstr[0] "当前只选择了{1}事件中的{0}。"
+msgstr[0] "当前只选择了{1}个事件中的{0}个。"
 
 #: indico/modules/categories/client/js/management.js:334
 #: indico/modules/categories/client/js/management.js:399
@@ -176,7 +176,7 @@ msgstr[0] "移动事件"
 #: indico/modules/categories/client/js/management.js:403
 msgid "Select category destination for the event"
 msgid_plural "Select category destination for {0} selected events"
-msgstr[0] "为 {0 }选中事件选择类别目标"
+msgstr[0] "为 {0} 个选中事件选择类别目的地"
 
 #: indico/modules/categories/client/js/management.js:416
 msgid "The event is already here"
@@ -332,7 +332,7 @@ msgstr "没有符合查询条件的条目。"
 msgid ""
 "You are about to move the event to the category \"{0}\". Are you sure you "
 "want to proceed?"
-msgstr "您将要移动事件到类别“{0}”。您确定要继续吗？"
+msgstr "您将要移动事件到类别 \"{0}\"。您确定要继续吗？"
 
 #: indico/modules/events/management/client/js/index.js:278
 msgid "Undoing previous operation..."
@@ -350,7 +350,7 @@ msgstr "邮件预览"
 #: indico/modules/events/registration/client/js/reglists.js:46
 msgid "Do you really want to delete the selected registration?"
 msgid_plural "Do you really want to delete the {0} selected registrations?"
-msgstr[0] "您确实要删除选中的{0}号注册吗？"
+msgstr[0] "您确实要删除选中的{0}个注册吗？"
 
 #: indico/modules/events/registration/client/js/form/field.js:144
 msgid "New Field"
@@ -615,7 +615,7 @@ msgstr "您尚未保存的更改将丢失。"
 msgid "Confirm action"
 msgstr "确认操作"
 
-#: indico/web/client/js/jquery/utils/declarative.js:350
+#: indico/web/client/js/jquery/utils/declarative.js:351
 msgid "Direct link to this item"
 msgstr "直接连接到此项"
 
@@ -633,61 +633,61 @@ msgstr "前一个"
 msgid "Something went wrong"
 msgstr "出了问题"
 
-#: indico/web/client/js/jquery/utils/forms.js:15
+#: indico/web/client/js/jquery/utils/forms.js:16
 msgid "The passwords do not match."
 msgstr "密码不匹配"
 
-#: indico/web/client/js/jquery/utils/forms.js:73
+#: indico/web/client/js/jquery/utils/forms.js:74
 msgid "Field must be at least {0} character long."
 msgid_plural "Field must be at least {0} characters long."
 msgstr[0] "字段必须至少 {0} 个字符长。"
 
-#: indico/web/client/js/jquery/utils/forms.js:81
+#: indico/web/client/js/jquery/utils/forms.js:82
 msgid "Field cannot be longer than {0} character."
 msgid_plural "Field cannot be longer than {0} characters."
 msgstr[0] "字段不能超过 {0} 个字符。"
 
-#: indico/web/client/js/jquery/utils/forms.js:89
+#: indico/web/client/js/jquery/utils/forms.js:90
 msgid "Field must be between {0} and {1} characters long."
 msgstr "字段必须在 {0} 和 {1} 个字符之间。"
 
-#: indico/web/client/js/jquery/utils/forms.js:95
+#: indico/web/client/js/jquery/utils/forms.js:96
 msgid "Field must contain at least {0} word."
 msgid_plural "Field must contain at least {0} words."
 msgstr[0] "字段必须包含至少 {0} 个词。"
 
-#: indico/web/client/js/jquery/utils/forms.js:103
+#: indico/web/client/js/jquery/utils/forms.js:104
 msgid "Field cannot contain more than {0} word."
 msgid_plural "Field cannot contain more than {0} words."
 msgstr[0] "字段不能包含 {0} 个以上的词。"
 
-#: indico/web/client/js/jquery/utils/forms.js:111
+#: indico/web/client/js/jquery/utils/forms.js:112
 msgid "Field must contain between {0} and {1} words."
 msgstr "字段必须包含{0}到{1}个词。"
 
-#: indico/web/client/js/jquery/utils/forms.js:129
+#: indico/web/client/js/jquery/utils/forms.js:130
 msgid "Save now"
 msgstr "现在保存"
 
-#: indico/web/client/js/jquery/utils/forms.js:130
+#: indico/web/client/js/jquery/utils/forms.js:131
 #: indico/web/client/js/jquery/utils/pagedown_mathjax.js:295
 msgid "Saving..."
 msgstr "保存..."
 
-#: indico/web/client/js/jquery/utils/forms.js:131
+#: indico/web/client/js/jquery/utils/forms.js:132
 msgid "Do not forget to save your changes!"
 msgstr "别忘了保存您的更改！"
 
-#: indico/web/client/js/jquery/utils/forms.js:401
+#: indico/web/client/js/jquery/utils/forms.js:407
 msgid "Only {0} out of {1} rows is currently selected"
 msgid_plural "Only {0} out of {1} rows are currently selected."
 msgstr[0] "当前只选择了 {1} 行中的 {0}。"
 
-#: indico/web/client/js/jquery/utils/forms.js:440
+#: indico/web/client/js/jquery/utils/forms.js:446
 msgid "Select only the current page."
 msgstr "只选择当前页。"
 
-#: indico/web/client/js/jquery/utils/forms.js:454
+#: indico/web/client/js/jquery/utils/forms.js:460
 msgid "Click here to select them all."
 msgstr "点击这里全部选中。"
 
@@ -710,7 +710,7 @@ msgstr "操作失败！"
 
 #: indico/web/client/js/jquery/utils/pagedown_mathjax.js:300
 msgid "Saved"
-msgstr "保存了"
+msgstr "已保存"
 
 #: indico/web/client/js/jquery/utils/pagedown_mathjax.js:333
 #: indico/web/client/js/jquery/widgets/jinja/multiple_items_widget.js:39
@@ -807,7 +807,7 @@ msgstr "你的搜索与任何类别都不匹配"
 msgid ""
 "You can <a class=\"js-search\">modify</a> or <a class=\"js-clear-"
 "search\">clear</a> your search."
-msgstr "你可以 <a calss=\"js-search\"> 修改 </a> 或 <a class=\"js-claear-search\"> 清除 </a> 你的搜索。"
+msgstr "你可以 <a class=\"js-search\"> 修改 </a> 或 <a class=\"js-clear-search\"> 清除 </a> 你的搜索。"
 
 #: indico/web/client/js/jquery/widgets/categorynavigator.js:444
 msgid "In favourite categories"
@@ -819,7 +819,7 @@ msgstr "查询结果"
 
 #: indico/web/client/js/jquery/widgets/categorynavigator.js:472
 msgid "Displaying {0} out of {1} results."
-msgstr "显示 {1} 个结果中的 {0}。"
+msgstr "显示 {1} 个结果中的 {0}个。"
 
 #: indico/web/client/js/jquery/widgets/categorynavigator.js:473
 msgid "There are no results."
@@ -972,7 +972,7 @@ msgstr "其他用户"
 #: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:358
 msgid "{0} user has implicit read access due to other roles"
 msgid_plural "{0} users have implicit read access due to other roles"
-msgstr[0] "{0} 用户由于其他角色具有隐式读取权限"
+msgstr[0] "{0} 个用户由于其他角色具有隐式读取权限"
 
 #: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:374
 msgid "Category Managers"
@@ -996,7 +996,7 @@ msgstr "选择用户或组去添加"
 
 #: indico/web/client/js/jquery/widgets/jinja/person_link_widget.js:169
 msgid "Speaker"
-msgstr "发言者"
+msgstr "发言人"
 
 #: indico/web/client/js/jquery/widgets/jinja/person_link_widget.js:180
 msgid "Remove person"
@@ -1028,15 +1028,15 @@ msgstr "转移到其他人"
 
 #: indico/web/client/js/jquery/widgets/jinja/person_link_widget.js:288
 msgid "Not a speaker anymore"
-msgstr "不再是发言者"
+msgstr "不再是发言人"
 
 #: indico/web/client/js/jquery/widgets/jinja/person_link_widget.js:289
 msgid "Make a speaker"
-msgstr "产生发言者"
+msgstr "产生发言人"
 
 #: indico/web/client/js/jquery/widgets/jinja/person_link_widget.js:300
 msgid "People in the 'Others' section <strong>must</strong> be speakers."
-msgstr "“其他” 部分的人 <strong> 必须 </strong> 是发言者。"
+msgstr "“其他” 部分的人 <strong> 必须 </strong> 是发言人。"
 
 #: indico/web/client/js/jquery/widgets/jinja/person_link_widget.js:320
 msgid "Revoke submission rights"
@@ -1075,7 +1075,7 @@ msgstr "你必须添加至少一个作者"
 msgid ""
 "You cannot have users in the Other section, please make them authors or co-"
 "authors"
-msgstr "您无法在“其他”部分中拥有用户，请让他们成为作者或合著者"
+msgstr "您无法在其他部分中拥有用户，请让他们成为作者或合著者"
 
 #: indico/web/client/js/legacy/angular/directives.js:67
 msgid "Ok"
@@ -1316,7 +1316,7 @@ msgid ""
 "Please note that you have added a user that does not exist in Indico.\n"
 "                                    Non existing users will be asked via email to create an account so\n"
 "                                    that they will be able to use the privileges below."
-msgstr "请注意，您添加了一个Indico中不存在的用户。\n将通过电子邮件要求不存在用户创建一个帐户\n以便他们能够使用下面的权限。"
+msgstr "请注意，您添加了一个Indico中不存在的用户。\n不存在用户将被要求通过电子邮件创建一个帐户\n以便他们能够使用下面的权限。"
 
 #: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:1450
 msgid ""
@@ -1508,7 +1508,7 @@ msgstr "您的更改触发了某些设置的自动修改："
 #: indico/web/client/js/legacy/libs/timetable/Base.js:786
 #: indico/web/client/js/legacy/libs/timetable/Base.js:790
 msgid "The <strong>starting time</strong> of the session interval <strong>"
-msgstr "分会间隔 <strong> 的 <strong> 开始时间 </strong>"
+msgstr "分会间隔 <strong> 的 </strong> 开始时间 <strong>"
 
 #: indico/web/client/js/legacy/libs/timetable/Base.js:788
 #: indico/web/client/js/legacy/libs/timetable/Base.js:792
@@ -1521,12 +1521,12 @@ msgstr "</strong> 被移动了从"
 msgid ""
 "The <strong>starting time</strong> of the <strong>Event</strong> was moved "
 "from "
-msgstr "<strong> 事件 </strong> 的 <strong> 开始 </strong> 时间被移动了从"
+msgstr "<strong> 事件 </strong> 的 <strong> 开始时间 </strong> 被移动了从"
 
 #: indico/web/client/js/legacy/libs/timetable/Base.js:799
 #: indico/web/client/js/legacy/libs/timetable/Base.js:803
 msgid "The <strong>ending time</strong> of the session interval <strong>"
-msgstr "分会间隔 <strong> 的 <strong> 结束时间 </strong>"
+msgstr "分会间隔 <strong> 的 </strong> 结束时间 <strong>"
 
 #: indico/web/client/js/legacy/libs/timetable/Base.js:806
 msgid ""
@@ -1845,7 +1845,7 @@ msgstr "步骤3：选择适合其内容的分会"
 msgid ""
 "This changes the start and end times of the session blocks occuring on  in "
 "order to fit their respective content "
-msgstr "这将更改正在发生的分会块的开始和结束时间，以适应它们各自的内容。"
+msgstr "这将更改正在发生的分会块的开始和结束时间，以适应它们各自的内容"
 
 #: indico/web/client/js/legacy/libs/timetable/Management.js:594
 msgid "before"
@@ -1865,7 +1865,7 @@ msgstr "条目将被间隔分开"
 
 #: indico/web/client/js/legacy/libs/timetable/Management.js:626
 msgid "1 hour "
-msgstr "1小时"
+msgstr "1 小时"
 
 #: indico/web/client/js/legacy/libs/timetable/Management.js:628
 msgid " hours "
@@ -1951,7 +1951,7 @@ msgstr "您确定要处理吗？"
 
 #: indico/web/client/js/legacy/libs/timetable/Management.js:876
 msgid "Fitting..."
-msgstr "适合的..."
+msgstr "调整..."
 
 #: indico/web/client/js/legacy/libs/timetable/Management.js:890
 msgid "Fit timetable to content"

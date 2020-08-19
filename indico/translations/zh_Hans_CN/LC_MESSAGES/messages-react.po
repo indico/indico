@@ -2,11 +2,12 @@
 # Translators:
 # 中天 梁 <liangzt@ihep.ac.cn>, 2020
 # Lanxin Ma <ma@ihep.ac.cn>, 2020
+# Adrian Mönnich, 2020
 # 
 msgid ""
 msgstr ""
-"POT-Creation-Date: 2020-08-20 22:38+0200\n"
-"Last-Translator: Lanxin Ma <ma@ihep.ac.cn>, 2020\n"
+"POT-Creation-Date: 2020-08-20 09:35+0200\n"
+"Last-Translator: Adrian Mönnich, 2020\n"
 "Language-Team: Chinese (China) (GB2312) (https://www.transifex.com/indico/teams/6478/zh_CN.GB2312/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -516,6 +517,14 @@ msgstr "隐藏旧修订"
 msgid "Show old revision"
 msgstr "显示旧修订"
 
+#: indico/modules/events/editing/client/js/editing/timeline/index.jsx:63
+msgid "This revision has been updated"
+msgstr ""
+
+#: indico/modules/events/editing/client/js/editing/timeline/index.jsx:65
+msgid "{link}Click here to refresh{/link} and see the most recent version."
+msgstr ""
+
 #: indico/modules/events/editing/client/js/editing/timeline/judgment/AcceptRejectForm.jsx:63
 #: indico/modules/events/editing/client/js/editing/timeline/judgment/UpdateFilesForm.jsx:32
 #: indico/web/client/js/react/components/RequestConfirm.jsx:60
@@ -551,39 +560,39 @@ msgstr[0] "没有可发布的文件。 请上传至少以下一种类型的文�
 msgid "There is no publishable file uploaded."
 msgstr "没有已上传的可发布文件。"
 
-#: indico/modules/events/editing/client/js/editing/timeline/selectors.js:52
+#: indico/modules/events/editing/client/js/editing/timeline/selectors.js:53
 msgid "{editorName} (editor) has made some changes to the paper"
 msgstr "{editorName} (editor) 对论文进行了一些更改"
 
-#: indico/modules/events/editing/client/js/editing/timeline/selectors.js:63
+#: indico/modules/events/editing/client/js/editing/timeline/selectors.js:64
 msgid "Revision has been replaced"
 msgstr "修订已替换"
 
-#: indico/modules/events/editing/client/js/editing/timeline/selectors.js:76
+#: indico/modules/events/editing/client/js/editing/timeline/selectors.js:77
 msgid "Editor has accepted after making some changes"
 msgstr "进行一些更改后，编辑人已接收"
 
-#: indico/modules/events/editing/client/js/editing/timeline/selectors.js:78
+#: indico/modules/events/editing/client/js/editing/timeline/selectors.js:79
 msgid "Submitter has accepted proposed changes"
 msgstr "提交人已接受提议的修改"
 
-#: indico/modules/events/editing/client/js/editing/timeline/selectors.js:80
+#: indico/modules/events/editing/client/js/editing/timeline/selectors.js:81
 msgid "Revision has been accepted"
 msgstr "修订已接受"
 
-#: indico/modules/events/editing/client/js/editing/timeline/selectors.js:93
+#: indico/modules/events/editing/client/js/editing/timeline/selectors.js:94
 msgid "Revision has been rejected"
 msgstr "修改已拒绝"
 
-#: indico/modules/events/editing/client/js/editing/timeline/selectors.js:101
+#: indico/modules/events/editing/client/js/editing/timeline/selectors.js:102
 msgid "Submitter rejected proposed changes"
 msgstr "提交人拒绝了建议的更改"
 
-#: indico/modules/events/editing/client/js/editing/timeline/selectors.js:103
+#: indico/modules/events/editing/client/js/editing/timeline/selectors.js:104
 msgid "Submitter has been asked to make some changes"
 msgstr "已要求提交人进行一些更改"
 
-#: indico/modules/events/editing/client/js/editing/timeline/selectors.js:118
+#: indico/modules/events/editing/client/js/editing/timeline/selectors.js:119
 msgid "Editor made some changes"
 msgstr "编辑人做了一些修改"
 
@@ -599,11 +608,7 @@ msgstr "保存"
 msgid ""
 "No editable types enabled yet. Click the toggle to enable any editable "
 "types."
-msgstr ""
-"No editable types enabled yet. Click the toggle to enable any editable types.\n"
-"\n"
-" \n"
-"尚未启用可编辑类型。单击切换以启用任何可编辑类型。"
+msgstr "尚未启用可编辑类型。单击切换以启用任何可编辑类型。"
 
 #: indico/modules/events/editing/client/js/management/EditableTypeList.jsx:113
 #: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:159
@@ -1295,7 +1300,7 @@ msgstr "给提交人留下评论..."
 
 #: indico/modules/events/papers/client/js/components/PaperMetadata.jsx:31
 msgid "Submitted on {date} by {submitter}"
-msgstr "由{submitter}在{date}提交"
+msgstr "由 {submitter} 在 {date} 提交"
 
 #: indico/modules/events/papers/client/js/components/PaperReviewForm.jsx:62
 #: indico/modules/events/papers/client/js/components/PaperReviewForm.jsx:70
@@ -1308,7 +1313,7 @@ msgstr "更改审核"
 
 #: indico/modules/events/papers/client/js/components/RevisionComment.jsx:80
 msgid "On {modificationDate} by {modifiedBy}"
-msgstr "在{modificationDate}由{modifiedBy}修改"
+msgstr "在 {modificationDate} 由 {modifiedBy} 修改"
 
 #: indico/modules/events/papers/client/js/components/RevisionJudgment.jsx:40
 msgid "{judgeName} accepted this paper."
@@ -1358,7 +1363,7 @@ msgstr "提议 {actionName}接收{/actionName}"
 
 #: indico/modules/events/papers/client/js/components/RevisionReview.jsx:119
 msgid "Proposed to {actionName}reject{/actionName}"
-msgstr "提议{actionName}拒绝{/ actionName}"
+msgstr "提议{actionName}拒绝{/actionName}"
 
 #: indico/modules/events/papers/client/js/components/RevisionReview.jsx:127
 msgid "Proposed to {actionName}correct{/actionName}"
@@ -1366,7 +1371,7 @@ msgstr "提议 {actionName}更正{/actionName}"
 
 #: indico/modules/events/papers/client/js/components/RevisionReview.jsx:137
 msgid "· score {prettyScore}"
-msgstr "·得分{prettyScore}"
+msgstr ".得分{prettyScore}"
 
 #: indico/modules/events/papers/client/js/components/RevisionReview.jsx:145
 msgid "Score: {score} / {maxScore}"
@@ -1420,7 +1425,7 @@ msgstr "仍然接收"
 
 #: indico/modules/rb/client/js/common/bookings/BookingDetails.jsx:212
 msgid "There is no occurrence on this date ({date})."
-msgstr "此日期（{date}）没有发生。"
+msgstr "此日期({date})没有发生。"
 
 #: indico/modules/rb/client/js/common/bookings/BookingDetails.jsx:219
 #: indico/modules/rb/client/js/common/bookings/BookingDetails.jsx:236
@@ -1442,7 +1447,7 @@ msgstr "无法取消"
 
 #: indico/modules/rb/client/js/common/bookings/BookingDetails.jsx:230
 msgid "The occurrence you chose ({date}) cannot be cancelled."
-msgstr "您选择的事件（{date}）无法取消。"
+msgstr "您选择的事件({date})无法取消。"
 
 #: indico/modules/rb/client/js/common/bookings/BookingDetails.jsx:244
 #: indico/modules/rb/client/js/common/bookings/BookingDetails.jsx:685
@@ -1452,7 +1457,7 @@ msgstr "确认取消"
 
 #: indico/modules/rb/client/js/common/bookings/BookingDetails.jsx:247
 msgid "Are you sure you want to cancel this occurrence ({date})?"
-msgstr "您确定要取消此事件({date})吗？"
+msgstr "您确定要取消此事件({date})？"
 
 #: indico/modules/rb/client/js/common/bookings/BookingDetails.jsx:256
 msgid "Cancel this occurrence"
@@ -1476,15 +1481,15 @@ msgstr "预订已经被成功拆分。"
 
 #: indico/modules/rb/client/js/common/bookings/BookingDetails.jsx:405
 msgid "You can consult your new booking {link}here{/link}."
-msgstr "您可以 {link}在这里{/link} 查看您的新预订"
+msgstr "您可以 {link}在这里{/link} 查看您的新预订。"
 
 #: indico/modules/rb/client/js/common/bookings/BookingDetails.jsx:425
 msgid "Pending Confirmation"
-msgstr "等待确认。"
+msgstr "等待确认"
 
 #: indico/modules/rb/client/js/common/bookings/BookingDetails.jsx:426
 msgid "This booking is subject to acceptance by the room owner"
-msgstr "此预订须会议室拥有着同意。"
+msgstr "此预订须会议室拥有着同意"
 
 #: indico/modules/rb/client/js/common/bookings/BookingDetails.jsx:430
 #: indico/modules/rb/client/js/common/timeline/TimelineItem.jsx:217
@@ -1508,7 +1513,7 @@ msgstr "预订被拒绝。"
 
 #: indico/modules/rb/client/js/common/bookings/BookingDetails.jsx:467
 msgid "The booking was accepted"
-msgstr "此预订已接收。"
+msgstr "此预订已接收"
 
 #: indico/modules/rb/client/js/common/bookings/BookingDetails.jsx:494
 msgid "Are you sure you want to delete this booking?"
@@ -1522,7 +1527,7 @@ msgstr "拒绝预订"
 #: indico/modules/rb/client/js/common/timeline/RowActionsDropdown.jsx:109
 #: indico/modules/rb/client/js/modules/blockings/BlockingModal.jsx:157
 msgid "Provide the rejection reason"
-msgstr "提供拒绝理由。"
+msgstr "提供拒绝理由"
 
 #: indico/modules/rb/client/js/common/bookings/BookingDetails.jsx:615
 msgid "I understand that this will reject all occurrences of the booking."
@@ -1589,7 +1594,7 @@ msgstr "此预订已经开始。"
 
 #: indico/modules/rb/client/js/common/bookings/BookingEdit.jsx:227
 msgid "Save changes"
-msgstr "保存改变"
+msgstr "保存更改"
 
 #: indico/modules/rb/client/js/common/bookings/BookingEdit.jsx:250
 msgid "Conflicts with new booking"
@@ -1862,11 +1867,11 @@ msgstr[0] "最后 {days} 天"
 
 #: indico/modules/rb/client/js/common/rooms/edit/DailyAvailability.jsx:77
 msgid "Add new Daily Availability"
-msgstr "添加新的每天可用性"
+msgstr "添加新的每天可用"
 
 #: indico/modules/rb/client/js/common/rooms/edit/DailyAvailability.jsx:82
 msgid "No daily availability found"
-msgstr "找不到每日可用性"
+msgstr "找不到每日可用"
 
 #: indico/modules/rb/client/js/common/rooms/edit/EquipmentList.jsx:78
 msgid "No equipment found"
@@ -1980,15 +1985,15 @@ msgstr "编辑会议室详细信息"
 
 #: indico/modules/rb/client/js/common/rooms/edit/RoomEditModal.jsx:293
 msgid "Room has been successfully created."
-msgstr "房间已成功建立了。"
+msgstr "会议室已成功创建。"
 
 #: indico/modules/rb/client/js/common/rooms/edit/RoomEditModal.jsx:303
 msgid "Room has been successfully updated."
-msgstr "房间已被成功更新。"
+msgstr "会议室已被成功更新。"
 
 #: indico/modules/rb/client/js/common/rooms/edit/RoomEditModal.jsx:313
 msgid "Room could not be updated."
-msgstr "房间不能被更新。"
+msgstr "会议室不能被更新。"
 
 #: indico/modules/rb/client/js/common/rooms/edit/RoomEditModal.jsx:320
 msgid "Reset form"
@@ -2153,7 +2158,7 @@ msgstr "拒绝事件"
 
 #: indico/modules/rb/client/js/common/timeline/RowActionsDropdown.jsx:183
 msgid "Show room timeline"
-msgstr "显示房间的时间轴"
+msgstr "显示房间的时间线"
 
 #: indico/modules/rb/client/js/common/timeline/RowActionsDropdown.jsx:190
 msgid "Are you sure you want to cancel this occurrence ({serializedDate})?"
@@ -2280,7 +2285,7 @@ msgstr "未指定"
 
 #: indico/modules/rb/client/js/components/RoomBasicDetails.jsx:155
 msgid "Room Owner"
-msgstr "房间拥有者"
+msgstr "会议室拥有者"
 
 #: indico/modules/rb/client/js/components/RoomBasicDetails.jsx:161
 msgid "Phone number"
@@ -2301,11 +2306,11 @@ msgstr "地理坐标"
 
 #: indico/modules/rb/client/js/components/RoomSelector.jsx:155
 msgid "Room"
-msgstr "房间"
+msgstr "会议室"
 
 #: indico/modules/rb/client/js/components/RoomSelector.jsx:197
 msgid "There are no rooms selected."
-msgstr "没有选中的房间。"
+msgstr "没有选中的会议室。"
 
 #: indico/modules/rb/client/js/components/SidebarFooter.jsx:29
 msgid "Help"
@@ -2360,11 +2365,11 @@ msgstr "{count} 个事件"
 
 #: indico/modules/rb/client/js/components/TimeInformation.jsx:77
 msgid "See on timeline"
-msgstr " 查看时间轴"
+msgstr " 查看时间线"
 
 #: indico/modules/rb/client/js/components/TimeRangePicker.jsx:26
 msgid "1 hour"
-msgstr "1小时"
+msgstr "1 小时"
 
 #: indico/modules/rb/client/js/components/TimeRangePicker.jsx:28
 msgid "{time} hours"
@@ -2384,11 +2389,11 @@ msgstr "位置: {location}"
 
 #: indico/modules/rb/client/js/modules/admin/AdminLocationRooms.jsx:59
 msgid "Add room"
-msgstr "添加房间"
+msgstr "添加会议室"
 
 #: indico/modules/rb/client/js/modules/admin/AdminLocationRooms.jsx:73
 msgid "There are no rooms for the specified location."
-msgstr "指定位置没有房间。"
+msgstr "指定位置没有会议室。"
 
 #: indico/modules/rb/client/js/modules/admin/AdminMenu.jsx:56
 msgid "General settings"
@@ -2508,7 +2513,7 @@ msgstr "自定义"
 
 #: indico/modules/rb/client/js/modules/admin/LocationPage.jsx:83
 msgid "No rooms"
-msgstr "没有房间"
+msgstr "没有会议室"
 
 #: indico/modules/rb/client/js/modules/admin/LocationPage.jsx:85
 msgid "{count}1{/count} room"
@@ -2517,7 +2522,7 @@ msgstr[0] "{count} 个会议室"
 
 #: indico/modules/rb/client/js/modules/admin/LocationPage.jsx:107
 msgid "Room name format"
-msgstr "房间名格式"
+msgstr "会议室名格式"
 
 #: indico/modules/rb/client/js/modules/admin/LocationPage.jsx:115
 #: indico/modules/rb/client/js/modules/admin/SettingsPage.jsx:138
@@ -2594,7 +2599,7 @@ msgstr "更新"
 #: indico/modules/rb/client/js/modules/admin/RoomFeatureList.jsx:46
 msgid "Provided by {count}1{/count} equipment type"
 msgid_plural "Provided by {count} equipment types"
-msgstr[0] "提供了 {count} 设别类型"
+msgstr[0] "提供了 {count} 设备类型"
 
 #: indico/modules/rb/client/js/modules/admin/RoomFeatureList.jsx:89
 msgid "Icon"
@@ -2782,7 +2787,7 @@ msgstr "请选择有效期限。 "
 
 #: indico/modules/rb/client/js/modules/blockings/BlockingModal.jsx:31
 msgid "Please provide the reason for the blocking."
-msgstr "请提供禁用的理由"
+msgstr "请提供禁用的理由。"
 
 #: indico/modules/rb/client/js/modules/blockings/BlockingModal.jsx:34
 msgid "Please choose at least one room for this blocking."
@@ -3042,15 +3047,15 @@ msgstr "将会议室 {room} 分配给此分会块"
 
 #: indico/modules/rb/client/js/modules/bookRoom/BookRoomModal.jsx:495
 msgid "Assign the room {room} to this event (instead of {oldRoom})"
-msgstr "将会议室 {room} 分配给此事件（而不是 {oldRoom}）"
+msgstr "将会议室 {room} 分配给此事件 (而不是 {oldRoom})"
 
 #: indico/modules/rb/client/js/modules/bookRoom/BookRoomModal.jsx:501
 msgid "Assign the room {room} to this contribution (instead of {oldRoom})"
-msgstr "将会议室 {room} 分配给此报告（而不是 {oldRoom}）"
+msgstr "将会议室 {room} 分配给此报告 (而不是 {oldRoom})"
 
 #: indico/modules/rb/client/js/modules/bookRoom/BookRoomModal.jsx:508
 msgid "Assign the room {room} to this session block (instead of {oldRoom})"
-msgstr "将会议室 {room} 分配给此分会块（而不是 {oldRoom}）"
+msgstr "将会议室 {room} 分配给此分会块 (而不是 {oldRoom})"
 
 #: indico/modules/rb/client/js/modules/bookRoom/BookRoomModal.jsx:662
 msgid "I've changed my mind!"
@@ -3093,7 +3098,7 @@ msgstr "我们将更改您的预订开始时间使其适合于您"
 #: indico/modules/rb/client/js/modules/bookRoom/BookingSuggestion.jsx:109
 msgid "One minute shorter"
 msgid_plural "{duration} minutes shorter"
-msgstr[0] "更短的 {duration} 分钟"
+msgstr[0] "缩短 {duration} 分钟"
 
 #: indico/modules/rb/client/js/modules/bookRoom/BookingSuggestion.jsx:115
 msgid "We'll shorten your booking to make it fit"
@@ -3146,7 +3151,7 @@ msgstr "不可用 {count}"
 
 #: indico/modules/rb/client/js/modules/bookRoom/SearchResultCount.jsx:137
 msgid "Spaces unavailable during that time slot (click for details)."
-msgstr "那个时间段里没有空会议室 (点击查看详细信息)。"
+msgstr "那个时间段里没有空会议室 (点击查看详情)。"
 
 #: indico/modules/rb/client/js/modules/bookRoom/SearchResultCount.jsx:161
 msgid "Unauthorized{count}"
@@ -3264,12 +3269,12 @@ msgstr "动作"
 
 #: indico/modules/rb/client/js/modules/roomList/RoomList.jsx:211
 msgid "There are no rooms matching the criteria"
-msgstr "没找到符合条件的房"
+msgstr "没找到符合条件的会议室"
 
 #: indico/modules/rb/client/js/modules/roomList/RoomList.jsx:213
 msgid "There is {count} match"
 msgid_plural "There are {count} matches"
-msgstr[0] "有 {count} 个符合条件的"
+msgstr[0] "有 {count} 个匹配"
 
 #: indico/modules/rb/client/js/modules/roomList/filters/BuildingForm.jsx:45
 msgid "Building {buildingNumber}"
@@ -3360,7 +3365,7 @@ msgstr "您可以将以下URL复制粘贴到计划应用程序中。 内容将�
 
 #: indico/modules/users/client/js/ICSCalendarLink.jsx:105
 msgid "Loading…"
-msgstr "上传中..."
+msgstr "加载中..."
 
 #: indico/modules/users/client/js/ICSCalendarLink.jsx:117
 msgid "Copied!"
@@ -3421,7 +3426,7 @@ msgstr "清除日期和时间"
 
 #: indico/web/client/js/react/components/WTFOccurrencesField.jsx:81
 msgid "Add occurrence"
-msgstr "添加事件"
+msgstr "添加发生"
 
 #: indico/web/client/js/react/components/WTFOccurrencesField.jsx:147
 msgid "Duration in minutes"
@@ -3521,7 +3526,7 @@ msgid "Include users with no Indico account"
 msgstr "包含没有indico帐号的用户"
 
 #: indico/web/client/js/react/components/principals/Search.jsx:403
-#: indico/web/client/js/react/components/principals/Search.jsx:501
+#: indico/web/client/js/react/components/principals/Search.jsx:503
 msgid "Exact matches only"
 msgstr "只精确匹配"
 
@@ -3547,38 +3552,38 @@ msgid "No users found"
 msgstr "找不到用户"
 
 #: indico/web/client/js/react/components/principals/Search.jsx:448
-msgid "1 user found"
+msgid "{count} user found"
 msgid_plural "{count} users found"
 msgstr[0] "找到 {count} 个用户"
 
-#: indico/web/client/js/react/components/principals/Search.jsx:487
+#: indico/web/client/js/react/components/principals/Search.jsx:489
 msgid "Group"
 msgstr "组"
 
-#: indico/web/client/js/react/components/principals/Search.jsx:489
+#: indico/web/client/js/react/components/principals/Search.jsx:491
 msgid "Select group"
 msgstr "选择组"
 
-#: indico/web/client/js/react/components/principals/Search.jsx:489
+#: indico/web/client/js/react/components/principals/Search.jsx:491
 msgid "Add groups"
 msgstr "添加组"
 
-#: indico/web/client/js/react/components/principals/Search.jsx:499
+#: indico/web/client/js/react/components/principals/Search.jsx:501
 msgid "Group name"
 msgstr "组名"
 
-#: indico/web/client/js/react/components/principals/Search.jsx:523
+#: indico/web/client/js/react/components/principals/Search.jsx:525
 msgid ""
 "Your query matched too many groups. Please try more specific search "
 "criteria."
 msgstr "您的查询匹配太多用户。请尝试更严格查询条件。"
 
-#: indico/web/client/js/react/components/principals/Search.jsx:526
+#: indico/web/client/js/react/components/principals/Search.jsx:528
 msgid "No groups found"
 msgstr "找不到组"
 
-#: indico/web/client/js/react/components/principals/Search.jsx:529
-msgid "1 group found"
+#: indico/web/client/js/react/components/principals/Search.jsx:531
+msgid "{count} group found"
 msgid_plural "{count} groups found"
 msgstr[0] "找到 {count} 个组"
 
@@ -3661,7 +3666,7 @@ msgstr "感谢您的错误报告。"
 
 #: indico/web/client/js/react/errors/component.jsx:153
 msgid "Dismiss (show next error)"
-msgstr "取消 (显示下一个错误)"
+msgstr "消除 (显示下一个错误)"
 
 #: indico/web/client/js/react/errors/component.jsx:155
 msgid "Dismiss"
