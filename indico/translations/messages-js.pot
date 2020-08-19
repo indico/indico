@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: indico 2.3-dev\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2020-08-01 22:38+0200\n"
+"POT-Creation-Date: 2020-08-19 09:34+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -126,7 +126,7 @@ msgid "Select the categories to move first."
 msgstr ""
 
 #: indico/modules/categories/client/js/management.js:291 indico/modules/vc/client/js/index.js:54
-#: indico/web/client/js/jquery/utils/forms.js:395
+#: indico/web/client/js/jquery/utils/forms.js:401
 msgid "*"
 msgid_plural "All {0} events in this category are currently selected."
 msgstr[0] ""
@@ -589,7 +589,7 @@ msgstr ""
 msgid "Confirm action"
 msgstr ""
 
-#: indico/web/client/js/jquery/utils/declarative.js:350
+#: indico/web/client/js/jquery/utils/declarative.js:351
 msgid "Direct link to this item"
 msgstr ""
 
@@ -606,65 +606,65 @@ msgstr ""
 msgid "Something went wrong"
 msgstr ""
 
-#: indico/web/client/js/jquery/utils/forms.js:15
+#: indico/web/client/js/jquery/utils/forms.js:16
 msgid "The passwords do not match."
 msgstr ""
 
-#: indico/web/client/js/jquery/utils/forms.js:73
+#: indico/web/client/js/jquery/utils/forms.js:74
 msgid "Field must be at least {0} character long."
 msgid_plural "Field must be at least {0} characters long."
 msgstr[0] ""
 msgstr[1] ""
 
-#: indico/web/client/js/jquery/utils/forms.js:81
+#: indico/web/client/js/jquery/utils/forms.js:82
 msgid "Field cannot be longer than {0} character."
 msgid_plural "Field cannot be longer than {0} characters."
 msgstr[0] ""
 msgstr[1] ""
 
-#: indico/web/client/js/jquery/utils/forms.js:89
+#: indico/web/client/js/jquery/utils/forms.js:90
 msgid "Field must be between {0} and {1} characters long."
 msgstr ""
 
-#: indico/web/client/js/jquery/utils/forms.js:95
+#: indico/web/client/js/jquery/utils/forms.js:96
 msgid "Field must contain at least {0} word."
 msgid_plural "Field must contain at least {0} words."
 msgstr[0] ""
 msgstr[1] ""
 
-#: indico/web/client/js/jquery/utils/forms.js:103
+#: indico/web/client/js/jquery/utils/forms.js:104
 msgid "Field cannot contain more than {0} word."
 msgid_plural "Field cannot contain more than {0} words."
 msgstr[0] ""
 msgstr[1] ""
 
-#: indico/web/client/js/jquery/utils/forms.js:111
+#: indico/web/client/js/jquery/utils/forms.js:112
 msgid "Field must contain between {0} and {1} words."
 msgstr ""
 
-#: indico/web/client/js/jquery/utils/forms.js:129
+#: indico/web/client/js/jquery/utils/forms.js:130
 msgid "Save now"
 msgstr ""
 
-#: indico/web/client/js/jquery/utils/forms.js:130 indico/web/client/js/jquery/utils/pagedown_mathjax.js:295
+#: indico/web/client/js/jquery/utils/forms.js:131 indico/web/client/js/jquery/utils/pagedown_mathjax.js:295
 msgid "Saving..."
 msgstr ""
 
-#: indico/web/client/js/jquery/utils/forms.js:131
+#: indico/web/client/js/jquery/utils/forms.js:132
 msgid "Do not forget to save your changes!"
 msgstr ""
 
-#: indico/web/client/js/jquery/utils/forms.js:401
+#: indico/web/client/js/jquery/utils/forms.js:407
 msgid "Only {0} out of {1} rows is currently selected"
 msgid_plural "Only {0} out of {1} rows are currently selected."
 msgstr[0] ""
 msgstr[1] ""
 
-#: indico/web/client/js/jquery/utils/forms.js:440
+#: indico/web/client/js/jquery/utils/forms.js:446
 msgid "Select only the current page."
 msgstr ""
 
-#: indico/web/client/js/jquery/utils/forms.js:454
+#: indico/web/client/js/jquery/utils/forms.js:460
 msgid "Click here to select them all."
 msgstr ""
 

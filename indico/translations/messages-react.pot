@@ -1,6 +1,6 @@
 msgid ""
 msgstr ""
-"POT-Creation-Date: 2020-08-20 13:15+0200\n"
+"POT-Creation-Date: 2020-08-20 09:35+0200\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "MIME-Version: 1.0\n"
@@ -3527,7 +3527,7 @@ msgid "Include users with no Indico account"
 msgstr ""
 
 #: indico/web/client/js/react/components/principals/Search.jsx:403
-#: indico/web/client/js/react/components/principals/Search.jsx:501
+#: indico/web/client/js/react/components/principals/Search.jsx:503
 msgid "Exact matches only"
 msgstr ""
 
@@ -3552,39 +3552,39 @@ msgid "No users found"
 msgstr ""
 
 #: indico/web/client/js/react/components/principals/Search.jsx:448
-msgid "1 user found"
+msgid "{count} user found"
 msgid_plural "{count} users found"
 msgstr[0] ""
 msgstr[1] ""
 
-#: indico/web/client/js/react/components/principals/Search.jsx:487
+#: indico/web/client/js/react/components/principals/Search.jsx:489
 msgid "Group"
 msgstr ""
 
-#: indico/web/client/js/react/components/principals/Search.jsx:489
+#: indico/web/client/js/react/components/principals/Search.jsx:491
 msgid "Select group"
 msgstr ""
 
-#: indico/web/client/js/react/components/principals/Search.jsx:489
+#: indico/web/client/js/react/components/principals/Search.jsx:491
 msgid "Add groups"
 msgstr ""
 
-#: indico/web/client/js/react/components/principals/Search.jsx:499
+#: indico/web/client/js/react/components/principals/Search.jsx:501
 msgid "Group name"
 msgstr ""
 
-#: indico/web/client/js/react/components/principals/Search.jsx:523
+#: indico/web/client/js/react/components/principals/Search.jsx:525
 msgid ""
 "Your query matched too many groups. Please try more specific search "
 "criteria."
 msgstr ""
 
-#: indico/web/client/js/react/components/principals/Search.jsx:526
+#: indico/web/client/js/react/components/principals/Search.jsx:528
 msgid "No groups found"
 msgstr ""
 
-#: indico/web/client/js/react/components/principals/Search.jsx:529
-msgid "1 group found"
+#: indico/web/client/js/react/components/principals/Search.jsx:531
+msgid "{count} group found"
 msgid_plural "{count} groups found"
 msgstr[0] ""
 msgstr[1] ""
