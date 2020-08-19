@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: indico 2.3-dev\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2020-08-19 09:34+0200\n"
+"POT-Creation-Date: 2020-08-19 11:10+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -69,7 +69,7 @@ msgstr ""
 #: indico/modules/events/papers/templates/management/overview.html:158
 #: indico/modules/events/registration/templates/management/regform.html:64
 #: indico/modules/events/registration/templates/management/regform.html:80
-#: indico/modules/events/registration/templates/management/regform_list.html:94
+#: indico/modules/events/registration/templates/management/regform_list.html:95
 #: indico/modules/events/surveys/templates/management/survey.html:84
 #: indico/modules/events/surveys/templates/management/survey_list.html:42
 msgid "Manage"
@@ -9731,7 +9731,7 @@ msgid "Registration forms"
 msgstr ""
 
 #: indico/modules/events/registration/clone.py:90
-#: indico/modules/events/registration/templates/management/regform_list.html:83
+#: indico/modules/events/registration/templates/management/regform_list.html:84
 #: indico/modules/events/registration/templates/management/regform_stats.html:37
 msgid "Registrations"
 msgstr ""
@@ -10117,12 +10117,8 @@ msgstr ""
 msgid "Registration Date"
 msgstr ""
 
-#: indico/modules/events/registration/stats.py:329
+#: indico/modules/events/registration/stats.py:329 indico/modules/events/registration/stats.py:380
 msgid "Accommodation"
-msgstr ""
-
-#: indico/modules/events/registration/stats.py:380
-msgid "Accomodation"
 msgstr ""
 
 #: indico/modules/events/registration/stats.py:380 indico/web/templates/forms/permissions_widget.html:46
@@ -11021,7 +11017,7 @@ msgstr ""
 
 #: indico/modules/events/registration/templates/management/regform_display.html:32
 #: indico/modules/events/registration/templates/management/regform_edit.html:8
-#: indico/modules/events/registration/templates/management/regform_list.html:118
+#: indico/modules/events/registration/templates/management/regform_list.html:119
 msgid "Create form"
 msgstr ""
 
@@ -11165,24 +11161,24 @@ msgstr ""
 msgid "Customize"
 msgstr ""
 
-#: indico/modules/events/registration/templates/management/regform_list.html:72
+#: indico/modules/events/registration/templates/management/regform_list.html:73
 msgid "List of registration forms"
 msgstr ""
 
-#: indico/modules/events/registration/templates/management/regform_list.html:99
+#: indico/modules/events/registration/templates/management/regform_list.html:100
 msgid "Delete this registration form"
 msgstr ""
 
-#: indico/modules/events/registration/templates/management/regform_list.html:103
+#: indico/modules/events/registration/templates/management/regform_list.html:104
 msgid "Delete registration form?"
 msgstr ""
 
-#: indico/modules/events/registration/templates/management/regform_list.html:104
+#: indico/modules/events/registration/templates/management/regform_list.html:105
 #, python-format
 msgid "Do you really want to delete the registration form &quot;%(title)s&quot;?"
 msgstr ""
 
-#: indico/modules/events/registration/templates/management/regform_list.html:111
+#: indico/modules/events/registration/templates/management/regform_list.html:112
 msgid "There are no registration forms yet."
 msgstr ""
 
