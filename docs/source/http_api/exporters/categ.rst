@@ -62,7 +62,8 @@ This is the result of the following the query https://my.indico/export/categ/2.j
                 "timezone": "Europe/Zurich",
                 "type": "conference",
                 "id": "137344",
-                "room": "1-1-025"
+                "room": "1-1-025",
+                "keywords": []
             },
             {
                 "category": "TEST Category",
@@ -85,7 +86,8 @@ This is the result of the following the query https://my.indico/export/categ/2.j
                 "timezone": "Europe/Zurich",
                 "type": "meeting",
                 "id": "137346",
-                "room": null
+                "room": null,
+                "keywords": []
             }
         ]
     }

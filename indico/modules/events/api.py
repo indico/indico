@@ -571,7 +571,8 @@ class CategoryEventFetcher(IteratedDataFetcher, SerializerBase):
             'roomMapURL': event.room.map_url if event.room else None,
             'folders': build_folders_api_data(event),
             'chairs': self._serialize_persons(event.person_links, person_type='ConferenceChair', can_manage=can_manage),
-            'material': build_material_legacy_api_data(event) + filter(None, [build_note_legacy_api_data(event.note)])
+            'material': build_material_legacy_api_data(event) + filter(None, [build_note_legacy_api_data(event.note)]),
+            'keywords': event.keywords,
         })
 
         event_category_path = event.category.chain

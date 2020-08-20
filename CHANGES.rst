@@ -116,6 +116,8 @@ Improvements
 - Event modules can now be imported from another event (:issue:`4518`, thanks :user:`meluru`)
 - Event modules can now be imported from another event (:issue:`4518`, :pr:`4533`,
   thanks :user:`meluru`)
+- Include the event keywords in the event API data (:issue:`4598`, :pr:`4599`,
+  thanks :user:`chernals`)
 
 Bugfixes
 ^^^^^^^^

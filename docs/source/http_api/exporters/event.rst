@@ -52,6 +52,7 @@ Result for https://indico.server/export/event/137346.json?occ=yes&pretty=yes::
                 "title": "Export Test",
                 "url": "http://indico.server/conferenceDisplay.py?confId=137346",
                 "room": null,
+                "keywords": [],
                 "occurrences": [
                     {
                         "_fossil": "period",
@@ -125,6 +126,7 @@ Output for https://indico.server/export/event/137346.json?detail=contributions&p
                 "location": "CERN",
                 "_fossil": "conferenceMetadataWithContribs",
                 "timezone": "Europe/Zurich",
+                "keywords": [],
                 "contributions": [
                     {
                         "startDate": {
@@ -264,6 +266,7 @@ For example, https://indico.server/export/event/137346.json?detail=sessions&pret
                 "description": "",
                 "title": "Export Test",
                 "url": "http://indico.server/conferenceDisplay.py?confId=137346",
+                "keywords": [],
                 "contributions": [
                     {
                         "startDate": {
@@ -395,4 +398,3 @@ For example, https://indico.server/export/event/137346.json?detail=sessions&pret
             }
         ]
     }
-
