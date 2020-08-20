@@ -5,6 +5,9 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
+/* global handleAjaxError:false */
+
+import moment from 'moment';
 import rbURL from 'indico-url:rb.roombooking';
 import checkRoomAvailabilityURL from 'indico-url:rb.check_room_available';
 
@@ -84,10 +87,10 @@ import {camelizeKeys} from 'indico/utils/case';
     }
 
     function initAvailabilityValues() {
-      const startDate = $('#event-creation-start_dt-date').val();
-      const startTime = $('#event-creation-start_dt-time').val();
-      const endDate = $('#event-creation-end_dt-date').val();
-      const endTime = $('#event-creation-end_dt-time').val();
+      const startDate = $('#event-creation-start_dt-datestorage').val();
+      const startTime = $('#event-creation-start_dt-timestorage').val();
+      const endDate = $('#event-creation-end_dt-datestorage').val();
+      const endTime = $('#event-creation-end_dt-timestorage').val();
       const occurrencesVal = $('#event-creation-occurrences').val();
       const occurrences = occurrencesVal ? JSON.parse(occurrencesVal) : null;
 
@@ -217,11 +220,11 @@ import {camelizeKeys} from 'indico/utils/case';
         }
       });
 
-      $('#event-creation-start_dt-date').on('change', function() {
+      $('#event-creation-start_dt-datestorage').on('change', function() {
         const startDate = $(this).val();
-        const startTime = $('#event-creation-start_dt-time').val();
-        const endDate = $('#event-creation-end_dt-date').val();
-        const endTime = $('#event-creation-end_dt-time').val();
+        const startTime = $('#event-creation-start_dt-timestorage').val();
+        const endDate = $('#event-creation-end_dt-datestorage').val();
+        const endTime = $('#event-creation-end_dt-timestorage').val();
         startDt = moment(`${startDate} ${startTime}`, 'DD/MM/YYYY HH:mm');
         endDt = moment(`${endDate} ${endTime}`, 'DD/MM/YYYY HH:mm');
         // workaround for automatic end date update if start date is after end date
@@ -231,22 +234,22 @@ import {camelizeKeys} from 'indico/utils/case';
         updateAvailability();
       });
 
-      $('#event-creation-start_dt-time').on('change', function() {
-        const startDate = $('#event-creation-start_dt-date').val();
-        const startTime = $('#event-creation-start_dt-time').val();
+      $('#event-creation-start_dt-timestorage').on('change', function() {
+        const startDate = $('#event-creation-start_dt-datestorage').val();
+        const startTime = $('#event-creation-start_dt-timestorage').val();
         startDt = moment(`${startDate} ${startTime}`, 'DD/MM/YYYY HH:mm');
         updateAvailability();
       });
 
-      $('#event-creation-end_dt-date').on('change', function() {
+      $('#event-creation-end_dt-datestorage').on('change', function() {
         const endDate = $(this).val();
-        const endTime = $('#event-creation-end_dt-time').val();
+        const endTime = $('#event-creation-end_dt-timestorage').val();
         endDt = moment(`${endDate} ${endTime}`, 'DD/MM/YYYY HH:mm');
         updateAvailability();
       });
 
-      $('#event-creation-end_dt-time').on('change', function() {
-        const endDate = $('#event-creation-end_dt-date').val();
+      $('#event-creation-end_dt-timestorage').on('change', function() {
+        const endDate = $('#event-creation-end_dt-datestorage').val();
         const endTime = $(this).val();
         endDt = moment(`${endDate} ${endTime}`, 'DD/MM/YYYY HH:mm');
         updateAvailability();
