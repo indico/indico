@@ -31,7 +31,7 @@
         });
 
       input.on('keydown keypress', function(e) {
-        if (e.which === K.ENTER && self.options.enterKeyEnabled) {
+        if (e.key === 'Enter' && self.options.enterKeyEnabled) {
           self._action();
         }
       });

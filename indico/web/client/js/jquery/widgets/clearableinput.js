@@ -40,7 +40,7 @@
         })
         .on('keyup', function(e) {
           if (self.options.clearOnEscape) {
-            if (e.which === K.ESCAPE) {
+            if (e.key === 'Escape') {
               self.element.val('value');
               self._clear();
             }

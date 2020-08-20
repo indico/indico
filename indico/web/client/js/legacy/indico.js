@@ -21,7 +21,6 @@ import './libs/indico/Core/Dialogs/Util.js';
 import './libs/indico/Core/Dialogs/Users.js';
 import './libs/indico/Core/Browser.js';
 import './libs/indico/Core/Util.js';
-import './libs/indico/Core/keymap.js';
 
 import './libs/indico/Legacy/Widgets.js';
 import './libs/indico/Legacy/Util.js';

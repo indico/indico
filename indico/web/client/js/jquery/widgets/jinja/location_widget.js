@@ -5,6 +5,7 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
+// eslint-disable-next-line import/unambiguous
 (function(global) {
   'use strict';
 
@@ -274,20 +275,16 @@
         var typeaheadField = $this.parent();
         var resultsAreOpen = typeaheadField.parent().hasClass('result');
         var activeItem = typeaheadField.find('.active');
-        if (
-          (evt.keyCode == K.TAB || evt.keyCode == K.ENTER) &&
-          activeItem.length &&
-          resultsAreOpen
-        ) {
+        if ((evt.key === 'Tab' || evt.key === 'Enter') && activeItem.length && resultsAreOpen) {
           preventGuessing = true;
-          if (evt.keyCode == K.ENTER) {
+          if (evt.key === 'Enter') {
             evt.preventDefault();
           }
           evt.stopImmediatePropagation();
           activeItem.find('a').click();
-        } else if (evt.keyCode == K.TAB && node.val()) {
+        } else if (evt.key === 'Tab' && node.val()) {
           evt.stopImmediatePropagation();
-        } else if (evt.keyCode == K.ESCAPE) {
+        } else if (evt.key === 'Escape') {
           evt.preventDefault();
           evt.stopImmediatePropagation();
           resetSelectedOption();
@@ -535,7 +532,7 @@
         latestUsedField = $(this);
       })
       .on('keydown', function(evt) {
-        if (~[K.UP, K.DOWN].indexOf(evt.keyCode)) {
+        if (evt.key === 'ArrowUp' || evt.key === 'ArrowDown') {
           var $this = $(this);
           scrollResultsList($this);
           $this.trigger('focus.typeahead');

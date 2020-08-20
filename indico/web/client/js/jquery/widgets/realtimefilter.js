@@ -56,7 +56,7 @@ import 'jquery.typewatch';
 
       if (opt.disableenter) {
         element.on('keydown', function(e) {
-          if (e.which === K.ENTER) {
+          if (e.key === 'Enter') {
             e.preventDefault();
           }
         });
