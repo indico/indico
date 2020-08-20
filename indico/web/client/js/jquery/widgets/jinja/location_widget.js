@@ -533,9 +533,7 @@
       })
       .on('keydown', function(evt) {
         if (evt.key === 'ArrowUp' || evt.key === 'ArrowDown') {
-          var $this = $(this);
-          scrollResultsList($this);
-          $this.trigger('focus.typeahead');
+          scrollResultsList($(this));
         }
       })
       .on('click', function() {
