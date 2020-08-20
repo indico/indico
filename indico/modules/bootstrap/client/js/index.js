@@ -5,6 +5,7 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
+// eslint-disable-next-line import/unambiguous
 $(document).ready(function() {
   'use strict';
 
@@ -21,7 +22,8 @@ $(document).ready(function() {
   });
 
   // Instance Tracking slider
-  $('#form-group-enable_tracking .switch-input').on('change', function() {
+  const toggleCheckbox = $('#form-group-enable_tracking input:checkbox');
+  toggleCheckbox.on('change', function() {
     var $this = $(this);
     var enabled = $this.prop('checked');
     var itEmail = $('#contact_email');
@@ -43,5 +45,5 @@ $(document).ready(function() {
       itContact.trigger('input');
     }
   });
-  $('#form-group-enable_tracking .switch-input').trigger('change');
+  toggleCheckbox.trigger('change');
 });
