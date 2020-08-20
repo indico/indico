@@ -8,6 +8,8 @@
 .bootstrap-header {
   @extend %font-family-form;
 
+  line-height: initial;
+
   font-weight: bolder;
 
   z-index: 1;
