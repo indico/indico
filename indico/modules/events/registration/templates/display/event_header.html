@@ -16,6 +16,15 @@
                                 {% else %}
                                     {{ regform.title }}
                                 {% endif %}
+                                {% if registration %}
+                                    {% if registration.state.name == 'withdrawn' %}
+                                        <span class="event-label ui-qtip ui label basic red mini">Withdrawn</span>
+                                    {% elif registration.state.name == 'rejected' %}
+                                        <span class="event-label ui-qtip ui label basic red mini">Rejected</span>
+                                    {% elif registration.state.name == 'pending' %}
+                                        <span class="event-label ui-qtip ui label basic orange mini">Pending</span>
+                                    {% endif %}
+                                {% endif %}
                             </span>
                         </div>
                         {% if not g.static_site %}
