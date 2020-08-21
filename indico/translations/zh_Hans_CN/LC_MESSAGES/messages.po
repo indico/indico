@@ -10,8 +10,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Indico\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2020-08-19 09:34+0200\n"
-"PO-Revision-Date: 2020-08-19 07:36+0000\n"
+"POT-Creation-Date: 2020-08-21 15:28+0200\n"
+"PO-Revision-Date: 2020-08-21 13:54+0000\n"
 "Last-Translator: Adrian Mönnich\n"
 "Language-Team: Chinese (China) (GB2312) (http://www.transifex.com/indico/indico/language/zh_CN.GB2312/)\n"
 "MIME-Version: 1.0\n"
@@ -76,7 +76,7 @@ msgstr "查看类别及其事件"
 #: indico/modules/events/papers/templates/management/overview.html:158
 #: indico/modules/events/registration/templates/management/regform.html:64
 #: indico/modules/events/registration/templates/management/regform.html:80
-#: indico/modules/events/registration/templates/management/regform_list.html:94
+#: indico/modules/events/registration/templates/management/regform_list.html:95
 #: indico/modules/events/surveys/templates/management/survey.html:84
 #: indico/modules/events/surveys/templates/management/survey_list.html:42
 msgid "Manage"
@@ -4121,11 +4121,11 @@ msgstr "注册人不能具有管理权限：{}"
 
 #: indico/modules/events/util.py:625 indico/modules/events/util.py:628
 msgid "Invalid event URL"
-msgstr ""
+msgstr "无效的事件URL"
 
 #: indico/modules/events/util.py:632
 msgid "This event does not exist"
-msgstr ""
+msgstr "此事件不存在"
 
 #: indico/modules/events/abstracts/__init__.py:53
 #: indico/modules/events/abstracts/__init__.py:91
@@ -6086,9 +6086,9 @@ msgstr "撤回摘要"
 
 #: indico/modules/events/abstracts/templates/reviewing/public.html:38
 #: indico/modules/events/abstracts/templates/reviewing/public.html:48
-#: indico/modules/events/registration/templates/display/registration_summary.html:53
-#: indico/modules/events/registration/templates/display/registration_summary.html:55
-#: indico/modules/events/registration/templates/display/registration_summary.html:60
+#: indico/modules/events/registration/templates/display/registration_summary.html:68
+#: indico/modules/events/registration/templates/display/registration_summary.html:70
+#: indico/modules/events/registration/templates/display/registration_summary.html:75
 msgid "Withdraw"
 msgstr "撤回"
 
@@ -6819,7 +6819,7 @@ msgstr "管理此报告的外部资源"
 #: indico/modules/events/sessions/forms.py:72
 #: indico/modules/events/sessions/forms.py:107
 msgid "Programme code"
-msgstr "议程代码"
+msgstr "程序代码"
 
 #: indico/modules/events/contributions/forms.py:87
 msgid "With the current duration the contribution exceeds the block end date"
@@ -7429,7 +7429,7 @@ msgstr "导入"
 #: indico/modules/events/sessions/templates/management/session_list.html:110
 #: indico/modules/events/sessions/templates/management/session_list.html:116
 msgid "Assign programme codes"
-msgstr "分配议程代码"
+msgstr "分配程序代码"
 
 #: indico/modules/events/contributions/templates/management/fields_dialog.html:7
 msgid "Add new field"
@@ -8232,7 +8232,7 @@ msgstr "管理"
 
 #: indico/modules/events/logs/models/entries.py:21
 #: indico/modules/events/registration/__init__.py:49
-#: indico/modules/events/registration/templates/display/event_header.html:67
+#: indico/modules/events/registration/templates/display/event_header.html:81
 #: indico/modules/events/registration/templates/management/participants.html:4
 #: indico/modules/events/reminders/forms.py:36
 #: indico/modules/events/surveys/forms.py:50
@@ -8280,7 +8280,7 @@ msgstr "高级选项"
 
 #: indico/modules/events/management/__init__.py:36
 msgid "Programme Codes"
-msgstr "议程代码"
+msgstr "程序代码"
 
 #: indico/modules/events/management/forms.py:54
 msgid "Clone Once"
@@ -8535,7 +8535,7 @@ msgstr "分会块"
 
 #: indico/modules/events/management/forms.py:413
 msgid "Event URL"
-msgstr ""
+msgstr "事件URL"
 
 #: indico/modules/events/management/program_codes.py:54
 msgid ""
@@ -8692,19 +8692,19 @@ msgstr "{} 个新事件已创建。"
 
 #: indico/modules/events/management/controllers/cloning.py:206
 msgid "Cannot import from the same event"
-msgstr ""
+msgstr "无法从同一事件导入"
 
 #: indico/modules/events/management/controllers/cloning.py:208
 msgid "Cannot import from a different type of event"
-msgstr ""
+msgstr "无法从其他类型的事件中导入"
 
 #: indico/modules/events/management/controllers/cloning.py:210
 msgid "You do not have management rights to this event"
-msgstr ""
+msgstr "您没有此事件的管理权限"
 
 #: indico/modules/events/management/controllers/cloning.py:245
 msgid "Import successful!"
-msgstr ""
+msgstr "导入成功！"
 
 #: indico/modules/events/management/controllers/posters.py:45
 #: indico/modules/events/registration/templates/management/print_badges.html:17
@@ -8714,7 +8714,7 @@ msgstr "下载 PDF"
 
 #: indico/modules/events/management/controllers/program_codes.py:91
 msgid "The programme codes have been successfully assigned"
-msgstr "议程代码已成功分配"
+msgstr "程序代码已成功分配"
 
 #: indico/modules/events/management/controllers/program_codes.py:96
 msgid "No codes have been changed"
@@ -8781,11 +8781,11 @@ msgstr "移动"
 
 #: indico/modules/events/management/templates/_action_menu.html:98
 msgid "Import from event"
-msgstr ""
+msgstr "从事件导入"
 
 #: indico/modules/events/management/templates/_action_menu.html:99
 msgid "Import from other event"
-msgstr ""
+msgstr "从其他事件导入"
 
 #: indico/modules/events/management/templates/_action_menu.html:114
 msgid "Clone event"
@@ -8939,7 +8939,7 @@ msgstr "编辑 关键字 / 标签"
 msgid ""
 "Some placeholders returned an empty string.<br> Make sure their "
 "corresponding objects already have programme codes assigned."
-msgstr "某些占位符返回一个空字符串。<br> 确保它们的相应对象已经分配了代码。"
+msgstr "某些占位符返回一个空字符串。<br> 确保它们的相应对象已经分配了程序代码。"
 
 #: indico/modules/events/management/templates/assign_program_codes.html:19
 msgid "Empty placeholders:"
@@ -9111,31 +9111,31 @@ msgstr "查看分会主要数据 (不能修改)"
 
 #: indico/modules/events/management/templates/import_event.html:31
 msgid "1. Select event"
-msgstr ""
+msgstr "1. 选择事件"
 
 #: indico/modules/events/management/templates/import_event.html:45
 msgid "Which event should be imported?"
-msgstr ""
+msgstr "应该导入哪个事件？"
 
 #: indico/modules/events/management/templates/import_event.html:49
 msgid "You will import data from the following event:"
-msgstr ""
+msgstr "您将从以下事件中导入数据："
 
 #: indico/modules/events/management/templates/import_event.html:59
 msgid "What should be imported?"
-msgstr ""
+msgstr "应该导入什么？"
 
 #: indico/modules/events/management/templates/import_event.html:61
 msgid "Some options might not be available because:"
-msgstr ""
+msgstr "某些选项可能不可用，因为："
 
 #: indico/modules/events/management/templates/import_event.html:63
 msgid "target event already has data in the module"
-msgstr ""
+msgstr "目标事件在模块中已经有数据"
 
 #: indico/modules/events/management/templates/import_event.html:64
 msgid "source event does not have any data in the module"
-msgstr ""
+msgstr "源事件在模块中没有任何数据"
 
 #: indico/modules/events/management/templates/lock_event.html:4
 msgid ""
@@ -9156,25 +9156,25 @@ msgstr "以下对象具有自定义保护设置。<br>单击它们的标题将�
 
 #: indico/modules/events/management/templates/program_codes.html:3
 msgid "Programme codes"
-msgstr "议程代码"
+msgstr "程序代码"
 
 #: indico/modules/events/management/templates/program_codes.html:6
 msgid ""
 "You can automatically assign programme codes in your event to have more "
 "meaningful ways of referencing e.g. certain contributions outside Indico."
-msgstr "您可以在您的事件中自动分配议程代码，以获得更有意义的引用方式，例如Indico 之外的某些报告。"
+msgstr "您可以在您的事件中自动分配程序代码，以获得更有意义的引用方式，例如Indico 之外的某些报告。"
 
 #: indico/modules/events/management/templates/program_codes.html:14
 msgid "Programme code templates"
-msgstr "议程代码模板"
+msgstr "程序代码模板"
 
 #: indico/modules/events/management/templates/program_codes.html:17
 msgid "Edit programme code templates"
-msgstr "编辑议程代码模板"
+msgstr "编辑程序代码模板"
 
 #: indico/modules/events/management/templates/program_codes.html:27
 msgid "Assign programme codes to sessions"
-msgstr "给分会分配议程代码"
+msgstr "给分会分配程序代码"
 
 #: indico/modules/events/management/templates/program_codes.html:32
 #: indico/modules/events/management/templates/program_codes.html:45
@@ -9185,15 +9185,15 @@ msgstr "无已定义模板"
 
 #: indico/modules/events/management/templates/program_codes.html:40
 msgid "Assign programme codes to session blocks"
-msgstr "给分会块分配议程代码"
+msgstr "给分会块分配程序代码"
 
 #: indico/modules/events/management/templates/program_codes.html:52
 msgid "Assign programme codes to contributions"
-msgstr "给报告分配议程代码"
+msgstr "给报告分配程序代码"
 
 #: indico/modules/events/management/templates/program_codes.html:65
 msgid "Assign programme codes to subcontributions"
-msgstr "给子报告分配议程代码"
+msgstr "给子报告分配程序代码"
 
 #: indico/modules/events/management/templates/settings.html:13
 msgid "Book the event location"
@@ -9828,7 +9828,7 @@ msgstr "论文分配"
 msgid ""
 "Assign <strong>reviewers</strong> and <strong>judges</strong> to "
 "contributions in order to allow assessing their paper revisions."
-msgstr "给这些报告指派 <strong> 审核人 </strong> 和 <strong> 评委 </strong>，以便评估他们的论文修订。"
+msgstr "给这些报告指派 <strong> 审核人 </strong> 和 <strong> 评委 </strong>，以便评估他们的论文修订版。"
 
 #: indico/modules/events/papers/templates/management/competences.html:7
 msgid ""
@@ -10155,7 +10155,7 @@ msgid "The following payment plugins are available:"
 msgstr "下面的付款插件可用："
 
 #: indico/modules/events/payment/templates/event_checkout.html:10
-#: indico/modules/events/registration/templates/display/registration_summary.html:111
+#: indico/modules/events/registration/templates/display/registration_summary.html:126
 msgid "Checkout"
 msgstr "结帐"
 
@@ -10494,7 +10494,7 @@ msgid "Registration forms"
 msgstr "注册表"
 
 #: indico/modules/events/registration/clone.py:90
-#: indico/modules/events/registration/templates/management/regform_list.html:83
+#: indico/modules/events/registration/templates/management/regform_list.html:84
 #: indico/modules/events/registration/templates/management/regform_stats.html:37
 msgid "Registrations"
 msgstr "注册"
@@ -10898,11 +10898,8 @@ msgid "Registration Date"
 msgstr "注册日期"
 
 #: indico/modules/events/registration/stats.py:329
-msgid "Accommodation"
-msgstr "住宿"
-
 #: indico/modules/events/registration/stats.py:380
-msgid "Accomodation"
+msgid "Accommodation"
 msgstr "住宿"
 
 #: indico/modules/events/registration/stats.py:380
@@ -10960,25 +10957,25 @@ msgid ""
 "You are trying to register with a form that requires you to be logged in"
 msgstr "您正在尝试使用要求您登录的表单进行注册"
 
-#: indico/modules/events/registration/controllers/display.py:325
+#: indico/modules/events/registration/controllers/display.py:332
 msgid ""
 "We could not find a registration for you.  If have already registered, "
 "please use the direct access link from the email you received after "
 "registering."
 msgstr "我们找不到您的注册信息。如果已经注册，请使用注册后收到的电子邮件中的直接访问链接。"
 
-#: indico/modules/events/registration/controllers/display.py:328
+#: indico/modules/events/registration/controllers/display.py:335
 msgid ""
 "We could not find a registration for you.  If have already registered, "
 "please use the direct access link from the email you received after "
 "registering or log in to your Indico account."
 msgstr "我们找不到您的注册信息。如果已经注册，请使用注册后收到的电子邮件中的直接访问链接或登录到您的Indico帐户。"
 
-#: indico/modules/events/registration/controllers/display.py:345
+#: indico/modules/events/registration/controllers/display.py:355
 msgid "Your registration has been withdrawn."
 msgstr "您的注册已被撤消。"
 
-#: indico/modules/events/registration/controllers/display.py:361
+#: indico/modules/events/registration/controllers/display.py:371
 msgid "You declined the invitation to register."
 msgstr "你拒绝了注册邀请。"
 
@@ -11219,7 +11216,7 @@ msgid "Price adjustment"
 msgstr "价格调整"
 
 #: indico/modules/events/registration/templates/display/conference_home.html:5
-#: indico/modules/events/registration/templates/display/registration_summary.html:69
+#: indico/modules/events/registration/templates/display/registration_summary.html:84
 #: indico/modules/events/registration/templates/management/_registration_details.html:169
 msgid "Get ticket"
 msgstr "买票"
@@ -11249,7 +11246,7 @@ msgid "Registration for this event is currently open."
 msgstr "此事件的注册当前已打开。"
 
 #: indico/modules/events/registration/templates/display/conference_home.html:61
-#: indico/modules/events/registration/templates/display/event_header.html:24
+#: indico/modules/events/registration/templates/display/event_header.html:33
 #: indico/modules/events/registration/templates/management/regform.html:55
 #: indico/modules/events/registration/templates/management/regform_reglist.html:209
 msgid "Total registrations"
@@ -11272,29 +11269,34 @@ msgstr "现在注册"
 msgid "This event is open to new participants."
 msgstr "此事件对新参会人是打开的。"
 
-#: indico/modules/events/registration/templates/display/event_header.html:36
+#: indico/modules/events/registration/templates/display/event_header.html:45
 #: indico/modules/events/registration/templates/display/registration_modify.html:10
 msgid "Modify registration"
 msgstr "修改注册"
 
-#: indico/modules/events/registration/templates/display/event_header.html:41
+#: indico/modules/events/registration/templates/display/event_header.html:50
+#: indico/modules/events/registration/templates/display/regform_list.html:70
+msgid "Check details"
+msgstr " 查看详情"
+
+#: indico/modules/events/registration/templates/display/event_header.html:55
 #: indico/modules/events/registration/templates/display/regform_display.html:50
 msgid "There are no more places available."
 msgstr "没有更多位置可用。"
 
-#: indico/modules/events/registration/templates/display/event_header.html:42
-#: indico/modules/events/registration/templates/display/event_header.html:52
+#: indico/modules/events/registration/templates/display/event_header.html:56
+#: indico/modules/events/registration/templates/display/event_header.html:66
 #: indico/modules/events/registration/templates/display/regform_list.html:40
 #: indico/modules/events/registration/templates/management/regform_reglist.html:37
 #: indico/modules/oauth/templates/app_new.html:12
 msgid "Register"
 msgstr "注册"
 
-#: indico/modules/events/registration/templates/display/event_header.html:47
+#: indico/modules/events/registration/templates/display/event_header.html:61
 msgid "Apply for participation"
 msgstr "申请参加"
 
-#: indico/modules/events/registration/templates/display/event_header.html:77
+#: indico/modules/events/registration/templates/display/event_header.html:91
 msgid "See the full list"
 msgstr "看完整列表"
 
@@ -11403,10 +11405,6 @@ msgstr "没最后期限"
 msgid "You have already registered"
 msgstr "你已注册"
 
-#: indico/modules/events/registration/templates/display/regform_list.html:70
-msgid "Check details"
-msgstr " 查看详情"
-
 #: indico/modules/events/registration/templates/display/regform_list.html:79
 msgid "The maximum number of registrations has been reached"
 msgstr "已达到注册的最大数量。"
@@ -11416,7 +11414,7 @@ msgid "No registration forms available for this event"
 msgstr "该事件没有可用的注册表"
 
 #: indico/modules/events/registration/templates/display/registration_modify.html:39
-#: indico/modules/events/registration/templates/display/registration_summary.html:42
+#: indico/modules/events/registration/templates/display/registration_summary.html:57
 msgid "The modification period is over"
 msgstr "修改期过了"
 
@@ -11428,62 +11426,78 @@ msgstr "付款后不可以修改。"
 msgid "The event organizer has disabled data modification."
 msgstr "事件组织者已禁用数据修改。"
 
-#: indico/modules/events/registration/templates/display/registration_summary.html:12
+#: indico/modules/events/registration/templates/display/registration_summary.html:13
 msgid "Your registration has been completed"
 msgstr "你的注册已完成"
 
-#: indico/modules/events/registration/templates/display/registration_summary.html:16
+#: indico/modules/events/registration/templates/display/registration_summary.html:17
+msgid "Your registration has been rejected"
+msgstr ""
+
+#: indico/modules/events/registration/templates/display/registration_summary.html:19
+msgid "Contact an event manager if you think this is an error."
+msgstr ""
+
+#: indico/modules/events/registration/templates/display/registration_summary.html:24
+msgid "You have withdrawn your registration"
+msgstr ""
+
+#: indico/modules/events/registration/templates/display/registration_summary.html:26
+msgid "Contact an event manager if you changed your mind."
+msgstr ""
+
+#: indico/modules/events/registration/templates/display/registration_summary.html:31
 msgid "Your registration is awaiting approval"
 msgstr "你的注册等待批准"
 
-#: indico/modules/events/registration/templates/display/registration_summary.html:18
+#: indico/modules/events/registration/templates/display/registration_summary.html:33
 msgid "An event manager will manually validate it."
 msgstr "事件管理员将手工验证它。"
 
-#: indico/modules/events/registration/templates/display/registration_summary.html:23
+#: indico/modules/events/registration/templates/display/registration_summary.html:38
 msgid "Your registration is awaiting payment"
 msgstr "您的注册等待付款"
 
-#: indico/modules/events/registration/templates/display/registration_summary.html:26
+#: indico/modules/events/registration/templates/display/registration_summary.html:41
 msgid "Awaiting your payment."
 msgstr "等待您的付款"
 
-#: indico/modules/events/registration/templates/display/registration_summary.html:28
+#: indico/modules/events/registration/templates/display/registration_summary.html:43
 msgid "Awaiting payment confirmation."
 msgstr "等待付款确认。"
 
-#: indico/modules/events/registration/templates/display/registration_summary.html:31
+#: indico/modules/events/registration/templates/display/registration_summary.html:46
 msgid "Proceed to checkout"
 msgstr "去结帐"
 
-#: indico/modules/events/registration/templates/display/registration_summary.html:44
+#: indico/modules/events/registration/templates/display/registration_summary.html:59
 msgid "Modifications are not allowed after payment"
 msgstr "付款后不允许修改"
 
-#: indico/modules/events/registration/templates/display/registration_summary.html:47
+#: indico/modules/events/registration/templates/display/registration_summary.html:62
 #: indico/modules/events/registration/templates/management/registration_details.html:25
 msgid "Modify"
 msgstr "修改"
 
-#: indico/modules/events/registration/templates/display/registration_summary.html:54
+#: indico/modules/events/registration/templates/display/registration_summary.html:69
 msgid ""
 "Are you sure that you want to withdraw your registration? This action cannot"
 " be undone."
 msgstr "您确定要撤消注册吗？ 此操作无法撤消。"
 
-#: indico/modules/events/registration/templates/display/registration_summary.html:59
+#: indico/modules/events/registration/templates/display/registration_summary.html:74
 msgid ""
 "The registration can no longer be withdrawn. Please contact an organizer."
 msgstr "不能再撤销注册。请联系组织者。"
 
-#: indico/modules/events/registration/templates/display/registration_summary.html:88
+#: indico/modules/events/registration/templates/display/registration_summary.html:103
 #: indico/modules/legal/templates/tos_footer.html:2
 #: indico/modules/legal/templates/tos_footer.html:5
 #: indico/modules/legal/templates/tos_footer.html:10
 msgid "Terms and conditions"
 msgstr "条款和条件"
 
-#: indico/modules/events/registration/templates/display/registration_summary.html:98
+#: indico/modules/events/registration/templates/display/registration_summary.html:113
 #, python-format
 msgid ""
 "I have read and accepted the %(link_start)sterms and conditions%(link_end)s "
@@ -11491,7 +11505,7 @@ msgid ""
 "binding transaction."
 msgstr "我已阅读并接受的%(link_start)s条款和条件%(link_end)s，并明白通过确认此订单，我将进入一个有约束力的交易。"
 
-#: indico/modules/events/registration/templates/display/registration_summary.html:121
+#: indico/modules/events/registration/templates/display/registration_summary.html:136
 msgid ""
 "Use this link to come back to this page.<br> Make sure to keep it private as"
 " you do not need to be logged in to access it."
@@ -11841,7 +11855,7 @@ msgstr "从创建注册表开始。"
 
 #: indico/modules/events/registration/templates/management/regform_display.html:32
 #: indico/modules/events/registration/templates/management/regform_edit.html:8
-#: indico/modules/events/registration/templates/management/regform_list.html:118
+#: indico/modules/events/registration/templates/management/regform_list.html:119
 msgid "Create form"
 msgstr "创建表"
 
@@ -11992,25 +12006,25 @@ msgstr "定义参会人列表如何显示在会议页面"
 msgid "Customize"
 msgstr "定制化"
 
-#: indico/modules/events/registration/templates/management/regform_list.html:72
+#: indico/modules/events/registration/templates/management/regform_list.html:73
 msgid "List of registration forms"
 msgstr "注册表列表"
 
-#: indico/modules/events/registration/templates/management/regform_list.html:99
+#: indico/modules/events/registration/templates/management/regform_list.html:100
 msgid "Delete this registration form"
 msgstr "删除此注册表"
 
-#: indico/modules/events/registration/templates/management/regform_list.html:103
+#: indico/modules/events/registration/templates/management/regform_list.html:104
 msgid "Delete registration form?"
 msgstr "删除注册表？"
 
-#: indico/modules/events/registration/templates/management/regform_list.html:104
+#: indico/modules/events/registration/templates/management/regform_list.html:105
 #, python-format
 msgid ""
 "Do you really want to delete the registration form &quot;%(title)s&quot;?"
 msgstr "你确实要删除 &quot;%(title)s&quot; 注册表吗？"
 
-#: indico/modules/events/registration/templates/management/regform_list.html:111
+#: indico/modules/events/registration/templates/management/regform_list.html:112
 msgid "There are no registration forms yet."
 msgstr "还没有注册表。"
 
@@ -13900,7 +13914,7 @@ msgstr "%(displayed_num)s / %(total_num)s 显示"
 #: indico/modules/events/templates/management/_lists.html:11
 #, python-format
 msgid "%(total)s total duration of which %(scheduled)s are scheduled"
-msgstr "持续 %(total)s 秒，规划 %(scheduled)s 秒"
+msgstr "总持续 %(total)s ，规划 %(scheduled)s "
 
 #: indico/modules/events/templates/management/_lists.html:19
 msgid "Reviews"
