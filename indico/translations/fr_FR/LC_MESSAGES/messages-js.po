@@ -4,7 +4,7 @@
 # 
 # Translators:
 # Adrian Mönnich, 2018
-# Dirk Hoffmann <Hoffmann@cppm.in2p3.fr>, 2012
+# Dirk Hoffmann <Hoffmann@cppm.in2p3.fr>, 2012,2020
 # FIRST AUTHOR <EMAIL@ADDRESS>, 2011
 # Jean-René Rouet <rouet@in2p3.fr>, 2017
 # Thomas Baron <thomas.baron@cern.ch>, 2013-2015
@@ -14,9 +14,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Indico\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2020-07-20 16:44+0200\n"
-"PO-Revision-Date: 2020-07-21 15:03+0000\n"
-"Last-Translator: Thomas Baron <thomas.baron@cern.ch>\n"
+"POT-Creation-Date: 2020-08-19 09:34+0200\n"
+"PO-Revision-Date: 2020-08-19 10:35+0000\n"
+"Last-Translator: Dirk Hoffmann <Hoffmann@cppm.in2p3.fr>\n"
 "Language-Team: French (France) (http://www.transifex.com/indico/indico/language/fr_FR/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -87,7 +87,7 @@ msgstr "Ajouter à vos favoris"
 msgid ""
 "This will make events in this category visible on your <a "
 "href=\"{0}\">Dashboard</a>."
-msgstr "Ceci ajoutera les événements de cette catégorie à votre <a href=\"{0}\">tableau de bord</a>."
+msgstr "Ceci fera apparaître les événements de cette catégorie sur votre <a href=\"{0}\">tableau de bord</a>."
 
 #: indico/modules/categories/client/js/management.js:49
 #: indico/modules/events/management/client/js/index.js:280
@@ -141,7 +141,7 @@ msgstr "Commencez par sélectionner les catégories à transférer."
 
 #: indico/modules/categories/client/js/management.js:291
 #: indico/modules/vc/client/js/index.js:54
-#: indico/web/client/js/jquery/utils/forms.js:388
+#: indico/web/client/js/jquery/utils/forms.js:401
 msgid "*"
 msgid_plural "All {0} events in this category are currently selected."
 msgstr[0] "*"
@@ -162,7 +162,7 @@ msgstr "Déplacer ici"
 msgid "Move category"
 msgid_plural "Move categories"
 msgstr[0] "Transférer la catégorie"
-msgstr[1] "Transférer les catégories"
+msgstr[1] "Déplacer les catégories"
 
 #: indico/modules/categories/client/js/management.js:337
 msgid "Select new category parent for the category"
@@ -321,12 +321,12 @@ msgstr "Erreur"
 msgid "Choose a file"
 msgstr "Choisissez un fichier"
 
-#: indico/modules/events/abstracts/client/js/index.js:74
-#: indico/modules/events/abstracts/client/js/index.js:87
+#: indico/modules/events/abstracts/client/js/index.js:76
+#: indico/modules/events/abstracts/client/js/index.js:89
 msgid "Show preview"
 msgstr "Montrer l'aperçu"
 
-#: indico/modules/events/abstracts/client/js/index.js:78
+#: indico/modules/events/abstracts/client/js/index.js:80
 msgid "Hide preview"
 msgstr "Cacher l'aperçu"
 
@@ -634,7 +634,7 @@ msgstr "Vous avez des modifications non enregistrées qui seront perdues."
 msgid "Confirm action"
 msgstr "Confirmer l'action"
 
-#: indico/web/client/js/jquery/utils/declarative.js:350
+#: indico/web/client/js/jquery/utils/declarative.js:351
 msgid "Direct link to this item"
 msgstr "Lien direct vers cet élément"
 
@@ -652,66 +652,66 @@ msgstr "Précédent"
 msgid "Something went wrong"
 msgstr "Une erreur s'est produite"
 
-#: indico/web/client/js/jquery/utils/forms.js:15
+#: indico/web/client/js/jquery/utils/forms.js:16
 msgid "The passwords do not match."
 msgstr "Les mots de passe ne correspondent pas."
 
-#: indico/web/client/js/jquery/utils/forms.js:66
+#: indico/web/client/js/jquery/utils/forms.js:74
 msgid "Field must be at least {0} character long."
 msgid_plural "Field must be at least {0} characters long."
 msgstr[0] "Le champ doit comprendre au moins {0} caractère."
 msgstr[1] "Le champ doit comprendre au moins {0} caractères."
 
-#: indico/web/client/js/jquery/utils/forms.js:74
+#: indico/web/client/js/jquery/utils/forms.js:82
 msgid "Field cannot be longer than {0} character."
 msgid_plural "Field cannot be longer than {0} characters."
 msgstr[0] "Le champ ne peut pas contenir plus de {0} caractère."
 msgstr[1] "Le champ ne peut pas contenir plus de {0} caractères."
 
-#: indico/web/client/js/jquery/utils/forms.js:82
+#: indico/web/client/js/jquery/utils/forms.js:90
 msgid "Field must be between {0} and {1} characters long."
 msgstr "Le champ doit comprendre entre {0} et {1} caractères."
 
-#: indico/web/client/js/jquery/utils/forms.js:88
+#: indico/web/client/js/jquery/utils/forms.js:96
 msgid "Field must contain at least {0} word."
 msgid_plural "Field must contain at least {0} words."
 msgstr[0] "Le champ doit contenir au moins {0} mot."
 msgstr[1] "Le champ doit contenir au moins {0} mots."
 
-#: indico/web/client/js/jquery/utils/forms.js:96
+#: indico/web/client/js/jquery/utils/forms.js:104
 msgid "Field cannot contain more than {0} word."
 msgid_plural "Field cannot contain more than {0} words."
 msgstr[0] "Le champ ne peut pas contenir plus de {0} mot."
 msgstr[1] "Le champ ne peut pas contenir plus de {0} mots."
 
-#: indico/web/client/js/jquery/utils/forms.js:104
+#: indico/web/client/js/jquery/utils/forms.js:112
 msgid "Field must contain between {0} and {1} words."
 msgstr "Le champ doit contenir entre {0} et {1} mots."
 
-#: indico/web/client/js/jquery/utils/forms.js:122
+#: indico/web/client/js/jquery/utils/forms.js:130
 msgid "Save now"
 msgstr "Sauver maintenant"
 
-#: indico/web/client/js/jquery/utils/forms.js:123
+#: indico/web/client/js/jquery/utils/forms.js:131
 #: indico/web/client/js/jquery/utils/pagedown_mathjax.js:295
 msgid "Saving..."
 msgstr "Sauvegarde..."
 
-#: indico/web/client/js/jquery/utils/forms.js:124
+#: indico/web/client/js/jquery/utils/forms.js:132
 msgid "Do not forget to save your changes!"
 msgstr "N'oubliez pas de sauver vos modifications!"
 
-#: indico/web/client/js/jquery/utils/forms.js:394
+#: indico/web/client/js/jquery/utils/forms.js:407
 msgid "Only {0} out of {1} rows is currently selected"
 msgid_plural "Only {0} out of {1} rows are currently selected."
 msgstr[0] "Seuls {0} événement sur {1} est actuellement sélectionné."
 msgstr[1] "Seuls {0} événements sur {1} sont actuellement sélectionnés."
 
-#: indico/web/client/js/jquery/utils/forms.js:433
+#: indico/web/client/js/jquery/utils/forms.js:446
 msgid "Select only the current page."
 msgstr "Choisir seulement la page actuelle."
 
-#: indico/web/client/js/jquery/utils/forms.js:447
+#: indico/web/client/js/jquery/utils/forms.js:460
 msgid "Click here to select them all."
 msgstr "Cliquer ici pour tout sélectionner"
 
