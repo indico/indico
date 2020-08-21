@@ -322,7 +322,7 @@ class RHRegistrationDisplayEdit(RegistrationEditMixin, RHRegistrationFormRegistr
 
     def _check_access(self):
         RHRegistrationFormRegistrationBase._check_access(self)
-        if not self.registration.is_active:
+        if not self.registration.can_be_modified:
             raise Forbidden
 
     def _process_args(self):

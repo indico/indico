@@ -138,6 +138,8 @@ Bugfixes
   size (:issue:`4429`)
 - Fix whitespace before punctuation in Book of Abstracts (:pr:`4604`)
 - Fix empty entries in corresponding authors (:pr:`4604`)
+- Actually prevent users from editing registrations if modification is
+  disabled
 
 Internal Changes
 ^^^^^^^^^^^^^^^^
