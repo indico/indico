@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: indico 2.3-dev\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2020-08-19 11:10+0200\n"
+"POT-Creation-Date: 2020-08-21 15:28+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -5558,9 +5558,9 @@ msgstr ""
 
 #: indico/modules/events/abstracts/templates/reviewing/public.html:38
 #: indico/modules/events/abstracts/templates/reviewing/public.html:48
-#: indico/modules/events/registration/templates/display/registration_summary.html:53
-#: indico/modules/events/registration/templates/display/registration_summary.html:55
-#: indico/modules/events/registration/templates/display/registration_summary.html:60
+#: indico/modules/events/registration/templates/display/registration_summary.html:68
+#: indico/modules/events/registration/templates/display/registration_summary.html:70
+#: indico/modules/events/registration/templates/display/registration_summary.html:75
 msgid "Withdraw"
 msgstr ""
 
@@ -7588,7 +7588,7 @@ msgid "Management"
 msgstr ""
 
 #: indico/modules/events/logs/models/entries.py:21 indico/modules/events/registration/__init__.py:49
-#: indico/modules/events/registration/templates/display/event_header.html:67
+#: indico/modules/events/registration/templates/display/event_header.html:81
 #: indico/modules/events/registration/templates/management/participants.html:4 indico/modules/events/reminders/forms.py:36
 #: indico/modules/events/surveys/forms.py:50
 msgid "Participants"
@@ -9410,7 +9410,7 @@ msgid "The following payment plugins are available:"
 msgstr ""
 
 #: indico/modules/events/payment/templates/event_checkout.html:10
-#: indico/modules/events/registration/templates/display/registration_summary.html:111
+#: indico/modules/events/registration/templates/display/registration_summary.html:126
 msgid "Checkout"
 msgstr ""
 
@@ -10174,23 +10174,23 @@ msgstr ""
 msgid "You are trying to register with a form that requires you to be logged in"
 msgstr ""
 
-#: indico/modules/events/registration/controllers/display.py:325
+#: indico/modules/events/registration/controllers/display.py:332
 msgid ""
 "We could not find a registration for you.  If have already registered, please use the direct access link from the "
 "email you received after registering."
 msgstr ""
 
-#: indico/modules/events/registration/controllers/display.py:328
+#: indico/modules/events/registration/controllers/display.py:335
 msgid ""
 "We could not find a registration for you.  If have already registered, please use the direct access link from the "
 "email you received after registering or log in to your Indico account."
 msgstr ""
 
-#: indico/modules/events/registration/controllers/display.py:345
+#: indico/modules/events/registration/controllers/display.py:355
 msgid "Your registration has been withdrawn."
 msgstr ""
 
-#: indico/modules/events/registration/controllers/display.py:361
+#: indico/modules/events/registration/controllers/display.py:371
 msgid "You declined the invitation to register."
 msgstr ""
 
@@ -10428,7 +10428,7 @@ msgid "Price adjustment"
 msgstr ""
 
 #: indico/modules/events/registration/templates/display/conference_home.html:5
-#: indico/modules/events/registration/templates/display/registration_summary.html:69
+#: indico/modules/events/registration/templates/display/registration_summary.html:84
 #: indico/modules/events/registration/templates/management/_registration_details.html:169
 msgid "Get ticket"
 msgstr ""
@@ -10456,7 +10456,7 @@ msgid "Registration for this event is currently open."
 msgstr ""
 
 #: indico/modules/events/registration/templates/display/conference_home.html:61
-#: indico/modules/events/registration/templates/display/event_header.html:24
+#: indico/modules/events/registration/templates/display/event_header.html:33
 #: indico/modules/events/registration/templates/management/regform.html:55
 #: indico/modules/events/registration/templates/management/regform_reglist.html:209
 msgid "Total registrations"
@@ -10479,29 +10479,34 @@ msgstr ""
 msgid "This event is open to new participants."
 msgstr ""
 
-#: indico/modules/events/registration/templates/display/event_header.html:36
+#: indico/modules/events/registration/templates/display/event_header.html:45
 #: indico/modules/events/registration/templates/display/registration_modify.html:10
 msgid "Modify registration"
 msgstr ""
 
-#: indico/modules/events/registration/templates/display/event_header.html:41
+#: indico/modules/events/registration/templates/display/event_header.html:50
+#: indico/modules/events/registration/templates/display/regform_list.html:70
+msgid "Check details"
+msgstr ""
+
+#: indico/modules/events/registration/templates/display/event_header.html:55
 #: indico/modules/events/registration/templates/display/regform_display.html:50
 msgid "There are no more places available."
 msgstr ""
 
-#: indico/modules/events/registration/templates/display/event_header.html:42
-#: indico/modules/events/registration/templates/display/event_header.html:52
+#: indico/modules/events/registration/templates/display/event_header.html:56
+#: indico/modules/events/registration/templates/display/event_header.html:66
 #: indico/modules/events/registration/templates/display/regform_list.html:40
 #: indico/modules/events/registration/templates/management/regform_reglist.html:37
 #: indico/modules/oauth/templates/app_new.html:12
 msgid "Register"
 msgstr ""
 
-#: indico/modules/events/registration/templates/display/event_header.html:47
+#: indico/modules/events/registration/templates/display/event_header.html:61
 msgid "Apply for participation"
 msgstr ""
 
-#: indico/modules/events/registration/templates/display/event_header.html:77
+#: indico/modules/events/registration/templates/display/event_header.html:91
 msgid "See the full list"
 msgstr ""
 
@@ -10608,10 +10613,6 @@ msgstr ""
 msgid "You have already registered"
 msgstr ""
 
-#: indico/modules/events/registration/templates/display/regform_list.html:70
-msgid "Check details"
-msgstr ""
-
 #: indico/modules/events/registration/templates/display/regform_list.html:79
 msgid "The maximum number of registrations has been reached"
 msgstr ""
@@ -10621,7 +10622,7 @@ msgid "No registration forms available for this event"
 msgstr ""
 
 #: indico/modules/events/registration/templates/display/registration_modify.html:39
-#: indico/modules/events/registration/templates/display/registration_summary.html:42
+#: indico/modules/events/registration/templates/display/registration_summary.html:57
 msgid "The modification period is over"
 msgstr ""
 
@@ -10633,65 +10634,81 @@ msgstr ""
 msgid "The event organizer has disabled data modification."
 msgstr ""
 
-#: indico/modules/events/registration/templates/display/registration_summary.html:12
+#: indico/modules/events/registration/templates/display/registration_summary.html:13
 msgid "Your registration has been completed"
 msgstr ""
 
-#: indico/modules/events/registration/templates/display/registration_summary.html:16
-msgid "Your registration is awaiting approval"
+#: indico/modules/events/registration/templates/display/registration_summary.html:17
+msgid "Your registration has been rejected"
 msgstr ""
 
-#: indico/modules/events/registration/templates/display/registration_summary.html:18
-msgid "An event manager will manually validate it."
+#: indico/modules/events/registration/templates/display/registration_summary.html:19
+msgid "Contact an event manager if you think this is an error."
 msgstr ""
 
-#: indico/modules/events/registration/templates/display/registration_summary.html:23
-msgid "Your registration is awaiting payment"
+#: indico/modules/events/registration/templates/display/registration_summary.html:24
+msgid "You have withdrawn your registration"
 msgstr ""
 
 #: indico/modules/events/registration/templates/display/registration_summary.html:26
-msgid "Awaiting your payment."
-msgstr ""
-
-#: indico/modules/events/registration/templates/display/registration_summary.html:28
-msgid "Awaiting payment confirmation."
+msgid "Contact an event manager if you changed your mind."
 msgstr ""
 
 #: indico/modules/events/registration/templates/display/registration_summary.html:31
+msgid "Your registration is awaiting approval"
+msgstr ""
+
+#: indico/modules/events/registration/templates/display/registration_summary.html:33
+msgid "An event manager will manually validate it."
+msgstr ""
+
+#: indico/modules/events/registration/templates/display/registration_summary.html:38
+msgid "Your registration is awaiting payment"
+msgstr ""
+
+#: indico/modules/events/registration/templates/display/registration_summary.html:41
+msgid "Awaiting your payment."
+msgstr ""
+
+#: indico/modules/events/registration/templates/display/registration_summary.html:43
+msgid "Awaiting payment confirmation."
+msgstr ""
+
+#: indico/modules/events/registration/templates/display/registration_summary.html:46
 msgid "Proceed to checkout"
 msgstr ""
 
-#: indico/modules/events/registration/templates/display/registration_summary.html:44
+#: indico/modules/events/registration/templates/display/registration_summary.html:59
 msgid "Modifications are not allowed after payment"
 msgstr ""
 
-#: indico/modules/events/registration/templates/display/registration_summary.html:47
+#: indico/modules/events/registration/templates/display/registration_summary.html:62
 #: indico/modules/events/registration/templates/management/registration_details.html:25
 msgid "Modify"
 msgstr ""
 
-#: indico/modules/events/registration/templates/display/registration_summary.html:54
+#: indico/modules/events/registration/templates/display/registration_summary.html:69
 msgid "Are you sure that you want to withdraw your registration? This action cannot be undone."
 msgstr ""
 
-#: indico/modules/events/registration/templates/display/registration_summary.html:59
+#: indico/modules/events/registration/templates/display/registration_summary.html:74
 msgid "The registration can no longer be withdrawn. Please contact an organizer."
 msgstr ""
 
-#: indico/modules/events/registration/templates/display/registration_summary.html:88
+#: indico/modules/events/registration/templates/display/registration_summary.html:103
 #: indico/modules/legal/templates/tos_footer.html:2 indico/modules/legal/templates/tos_footer.html:5
 #: indico/modules/legal/templates/tos_footer.html:10
 msgid "Terms and conditions"
 msgstr ""
 
-#: indico/modules/events/registration/templates/display/registration_summary.html:98
+#: indico/modules/events/registration/templates/display/registration_summary.html:113
 #, python-format
 msgid ""
 "I have read and accepted the %(link_start)sterms and conditions%(link_end)s and understand that by confirming this "
 "order I will be entering into a binding transaction."
 msgstr ""
 
-#: indico/modules/events/registration/templates/display/registration_summary.html:121
+#: indico/modules/events/registration/templates/display/registration_summary.html:136
 msgid ""
 "Use this link to come back to this page.<br> Make sure to keep it private as you do not need to be logged in to "
 "access it."
