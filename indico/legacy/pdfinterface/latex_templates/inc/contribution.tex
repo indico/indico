@@ -128,7 +128,7 @@
             \JINJA{endif}
             \JINJA{for author, affil_id in affiliation_contribs[contrib.id].authors_affil}
                 \VAR{author.full_name}\textsuperscript{\VAR{affil_id}}
-                \JINJA{if not loop.last}
+                \JINJA{-if not loop.last-}
                     ;
                 \JINJA{endif}
             \JINJA{endfor}
@@ -142,8 +142,8 @@
                 \VAR{author.full_name}
                 \JINJA{if affil_id is not none}
                     \textsuperscript{\VAR{affil_id}}
-                \JINJA{endif}
-                \JINJA{if not loop.last}
+                \JINJA{-endif-}
+                \JINJA{-if not loop.last-}
                     ;
                 \JINJA{endif}
             \JINJA{endfor}

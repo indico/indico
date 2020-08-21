@@ -444,9 +444,11 @@ class ContributionBook(PDFLaTeXBase):
 
             # figure out "corresponding author(s)"
             if boa_settings.get(event, 'corresponding_author') == BOACorrespondingAuthorType.submitter:
-                corresp_authors[contrib.id] = [pl.person.email for pl in contrib.person_links if pl.is_submitter]
+                corresp_authors[contrib.id] = [pl.person.email for pl in contrib.person_links
+                                               if pl.is_submitter and pl.person.email]
             if boa_settings.get(event, 'corresponding_author') == BOACorrespondingAuthorType.speakers:
-                corresp_authors[contrib.id] = [speaker.person.email for speaker in contrib.speakers]
+                corresp_authors[contrib.id] = [speaker.person.email for speaker in contrib.speakers
+                                               if speaker.person.email]
 
         self._args.update({
             'affiliation_contribs': affiliation_contribs,
