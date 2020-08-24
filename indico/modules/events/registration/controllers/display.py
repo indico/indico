@@ -281,9 +281,13 @@ class RHRegistrationForm(InvitationMixin, RHRegistrationFormRegistrationBase):
             return redirect(url_for('.display_regform', self.invitation.registration.locator.registrant))
 
     def _can_register(self):
-        registration = self.regform.get_registration(user=session.user)
-        already_registered = registration is not None
-        return not self.regform.limit_reached and (self.regform.is_active or self.invitation) and not already_registered
+        if self.regform.limit_reached:
+            return False
+        elif not self.regform.is_active and self.invitation is None:
+            return False
+        elif session.user and self.regform.get_registration(user=session.user):
+            return False
+        return True
 
     def _process(self):
         form = make_registration_form(self.regform)()
