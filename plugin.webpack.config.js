@@ -43,10 +43,16 @@ module.exports = env => {
     customizeArray: customizeArray({
       'resolve.alias': 'prepend',
     }),
-  })(base.webpackDefaults(env, config, bundles), {
+  })(base.webpackDefaults(env, config, bundles, true), {
     entry,
     externals: {
-      jquery: 'jQuery',
+      'jquery': 'jQuery',
+      'react': '_IndicoCoreReact',
+      'react-dom': '_IndicoCoreReactDom',
+      'react-redux': '_IndicoCoreReactRedux',
+      'prop-types': '_IndicoCorePropTypes',
+      'redux': '_IndicoCoreRedux',
+      'semantic-ui-react': '_IndicoCoreSUIR',
     },
     module: {
       rules: [

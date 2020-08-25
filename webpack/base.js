@@ -96,7 +96,7 @@ export function generateAssetPath(config, virtualVersion = false) {
   };
 }
 
-export function webpackDefaults(env, config, bundles) {
+export function webpackDefaults(env, config, bundles, isPlugin = false) {
   const globalBuildConfig = config.indico ? config.indico.build : config.build;
   const currentEnv = (env ? env.NODE_ENV : null) || 'development';
   const nodeModules = [
@@ -339,33 +339,35 @@ export function webpackDefaults(env, config, bundles) {
     mode: currentEnv,
     optimization: {
       splitChunks: {
-        cacheGroups: {
-          // 'common' chunk, which should include common dependencies
-          common: {
-            name: 'common',
-            chunks: chunk =>
-              chunk.canBeInitial() &&
-              // outdatedbrowser must be fully standalone since we can assume all other
-              // bundles to be broken in legacy browsers
-              chunk.name !== 'outdatedbrowser' &&
-              // having theme/print css in the common css bundle would break the interface
-              !/\.print$|^themes_/.test(chunk.name),
-            minChunks: 2,
-          },
-          // react/redux and friends since they are pretty big
-          react: {
-            test: /\/node_modules\/(react|redux|prop-types\/|lodash-es\/|fbjs\/)/,
-            name: 'react',
-            chunks: 'initial',
-            priority: 10,
-          },
-          semanticui: {
-            test: /node_modules\/(semantic-ui|indico-sui-theme)/,
-            name: 'semantic-ui',
-            chunks: 'initial',
-            priority: 10,
-          },
-        },
+        cacheGroups: isPlugin
+          ? {}
+          : {
+              // 'common' chunk, which should include common dependencies
+              common: {
+                name: 'common',
+                chunks: chunk =>
+                  chunk.canBeInitial() &&
+                  // outdatedbrowser must be fully standalone since we can assume all other
+                  // bundles to be broken in legacy browsers
+                  chunk.name !== 'outdatedbrowser' &&
+                  // having theme/print css in the common css bundle would break the interface
+                  !/\.print$|^themes_/.test(chunk.name),
+                minChunks: 2,
+              },
+              // react/redux and friends since they are pretty big
+              react: {
+                test: /\/node_modules\/(react|redux|prop-types\/|lodash-es\/|fbjs\/)/,
+                name: 'react',
+                chunks: 'initial',
+                priority: 10,
+              },
+              semanticui: {
+                test: /node_modules\/(semantic-ui|indico-sui-theme)/,
+                name: 'semantic-ui',
+                chunks: 'initial',
+                priority: 10,
+              },
+            },
       },
       minimizer: [
         new TerserPlugin({

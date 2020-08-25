@@ -159,6 +159,7 @@ class WPJinjaMixin(object):
 
 
 class WPBundleMixin(object):
+    bundles = ('exports.js',)
     print_bundles = tuple()
 
     @classproperty
