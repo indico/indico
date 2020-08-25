@@ -46,15 +46,15 @@ class LoggedLayoutForm(IndicoForm):
             return {'title': orig_string(field.label.text),
                     'default': orig_string(field.none)}
         elif field.short_name == 'theme':
-            choices = {k if k else None: orig_string(v) for k, v in field.choices}
+            choices = {(k or None): orig_string(v) for k, v in field.choices}
             return {'title': orig_string(field.label.text),
                     'type': 'string',
-                    'convert': lambda changes: [choices[x] for x in changes]}
+                    'convert': lambda changes: [choices.get(x) for x in changes]}
         elif field.short_name == 'timetable_theme':
-            choices = {k if k else None: v for k, v in field.choices}
+            choices = {(k or None): v for k, v in field.choices}
             return {'title': orig_string(field.label.text),
                     'type': 'string',
-                    'convert': lambda changes: [choices[x] for x in changes]}
+                    'convert': lambda changes: [choices.get(x) for x in changes]}
         else:
             return orig_string(field.label.text)
 
