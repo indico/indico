@@ -204,7 +204,7 @@ def _patch_version(add_version_suffix, file_name, search, replace):
         yield
         return
     rev = subprocess.check_output(['git', 'rev-parse', '--short', 'HEAD']).strip()
-    suffix = '+{}.{}'.format(datetime.now().strftime('%Y%m%d.%H%M'), rev)
+    suffix = '+{}.{}'.format(datetime.now().strftime('%Y%m%d%H%M'), rev)
     info('adding version suffix: ' + suffix, unimportant=True)
     with open(file_name, 'rb+') as f:
         old_content = f.read()
