@@ -35,7 +35,7 @@
             <i class="icon-location {{ 'header-data' if header }}"></i>
             <span class="text">
                 {%- if show_venue and show_room -%}
-                    {{ item.room_name }} ({{ item.venue_name }})
+                    {{ item.room_name }}{% if item.venue_name %} ({{ item.venue_name }}){% endif %}
                 {%- elif show_venue -%}
                     {{ item.venue_name }}
                 {%- else -%}
