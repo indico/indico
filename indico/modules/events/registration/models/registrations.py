@@ -545,6 +545,10 @@ class Registration(db.Model):
                         Registration.state.notin_([RegistrationState.rejected, RegistrationState.withdrawn]))
                 .has_rows())
 
+    def log(self, *args, **kwargs):
+        """Log with prefilled metadata for the registration."""
+        self.event.log(*args, meta={'registration_id': self.id}, **kwargs)
+
 
 class RegistrationData(StoredFileMixin, db.Model):
     """Data entry within a registration for a field in a registration form"""

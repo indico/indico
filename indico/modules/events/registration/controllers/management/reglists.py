@@ -240,10 +240,9 @@ class RHRegistrationDelete(RHRegistrationsActionBase):
             registration.is_deleted = True
             signals.event.registration_deleted.send(registration)
             logger.info('Registration %s deleted by %s', registration, session.user)
-            self.event.log(EventLogRealm.management, EventLogKind.negative, 'Registration',
-                           'Registration deleted: {}'.format(registration.full_name),
-                           session.user, data={'Email': registration.email},
-                           meta={'registration_id': registration.id})
+            registration.log(EventLogRealm.management, EventLogKind.negative, 'Registration',
+                             'Registration deleted: {}'.format(registration.full_name),
+                             session.user, data={'Email': registration.email})
         num_reg_deleted = len(self.registrations)
         flash(ngettext("Registration was deleted.",
                        "{num} registrations were deleted.", num_reg_deleted).format(num=num_reg_deleted), 'success')
@@ -579,9 +578,23 @@ class RHRegistrationReset(RHManageRegistrationBase):
             self.registration.update_state(rejected=False)
         elif self.registration.state == RegistrationState.withdrawn:
             self.registration.update_state(withdrawn=False)
+            notify_registration_state_update(self.registration)
         else:
             raise BadRequest(_('The registration cannot be reset in its current state.'))
         logger.info('Registration %r was reset by %r', self.registration, session.user)
+        return jsonify_data(html=_render_registration_details(self.registration))
+
+
+class RHRegistrationManageWithdraw(RHManageRegistrationBase):
+    """Let a manager withdraw a registration."""
+
+    def _process(self):
+        if self.registration.state in (RegistrationState.withdrawn, RegistrationState.rejected):
+            raise BadRequest(_('The registration cannot be withdrawn in its current state.'))
+        self.registration.update_state(withdrawn=True)
+        flash(_('The registration has been withdrawn.'), 'success')
+        logger.info('Registration %r was withdrawn by %r', self.registration, session.user)
+        notify_registration_state_update(self.registration)
         return jsonify_data(html=_render_registration_details(self.registration))
 
 

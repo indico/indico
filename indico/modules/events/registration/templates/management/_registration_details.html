@@ -22,6 +22,9 @@
             {% endif %}
             {{ template_hook('extra-registration-actions', registration=registration) }}
         </div>
+        {% if registration.state.name not in ('rejected', 'withdrawn') %}
+            {{ _render_withdraw_actions(registration) }}
+        {% endif %}
 
         {{ template_hook('before-registration-summary', registration=registration) }}
         {{ render_registration_summary(registration, from_management=True) }}
@@ -190,11 +193,18 @@
 
 
 {% macro _render_reset_registration_button(registration, action_text, conflict=false) %}
+    {% set confirm_notification -%}
+        {%- if registration.state.name == 'withdrawn' -%}
+            {% trans %}This will trigger a notification email.{% endtrans %}
+        {%- else -%}
+            {% trans %}This action will not be notified to the registrant.{% endtrans %}
+        {%- endif -%}
+    {%- endset %}
     <a class="i-button warning {{ 'disabled' if conflict }}"
        data-update="#registration-details"
        data-method="POST"
        data-href="{{ url_for('.reset_registration', registration) }}"
-       data-confirm="{% trans %}Are you sure you want to reset this registration status? This action will not be notified to the registrant.{% endtrans %}"
+       data-confirm="{% trans %}Are you sure you want to reset this registration status?{% endtrans %} {{ confirm_notification }}"
        data-title="{{ action_text }}"
        {% if conflict %}title="{% trans %}There is another valid registration for this user so it cannot be restored.{% endtrans %}"{% endif %}>
        {{ action_text }}
@@ -250,5 +260,33 @@
                 </a>
             </div>
         {% endif %}
+    </div>
+{% endmacro %}
+
+{% macro _render_withdraw_actions(registration) %}
+    <div class="action-box">
+        <div class="section">
+            <div class="icon icon-exit"></div>
+            <div class="text">
+                <div class="label">
+                    {% trans %}Withdraw registration{% endtrans %}
+                </div>
+                {% trans -%}
+                    If the participant decided to no longer attend the event, you can withdraw their registration.
+                {%- endtrans %}
+            </div>
+            <div class="toolbar">
+                <div class="group">
+                    <a class="i-button"
+                       data-href="{{ url_for('.manage_withdraw_registration', registration) }}"
+                       data-update="#registration-details"
+                       data-method="POST"
+                       data-title="{% trans %}Withdraw{% endtrans %}"
+                       data-confirm="{% trans %}Are you sure that you want to withdraw this registration? This will trigger a notification email.{% endtrans %}">
+                        {% trans %}Withdraw{% endtrans %}
+                    </a>
+                </div>
+            </div>
+        </div>
     </div>
 {% endmacro %}

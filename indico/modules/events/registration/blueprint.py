@@ -73,6 +73,8 @@ _bp.add_url_rule('/manage/registration/<int:reg_form_id>/registrations/<int:regi
                  'reject_registration', reglists.RHRegistrationReject, methods=('POST',))
 _bp.add_url_rule('/manage/registration/<int:reg_form_id>/registrations/<int:registration_id>/reset',
                  'reset_registration', reglists.RHRegistrationReset, methods=('POST',))
+_bp.add_url_rule('/manage/registration/<int:reg_form_id>/registrations/<int:registration_id>/withdraw',
+                 'manage_withdraw_registration', reglists.RHRegistrationManageWithdraw, methods=('POST',))
 _bp.add_url_rule('/manage/registration/<int:reg_form_id>/registrations/<int:registration_id>/check-in',
                  'registration_check_in', reglists.RHRegistrationCheckIn, methods=('PUT', 'DELETE'))
 _bp.add_url_rule('/manage/registration/<int:reg_form_id>/registrations/email', 'email_registrants',
