@@ -26,15 +26,15 @@ def log_registration_check_in(registration, **kwargs):
         log_text = '"{}" has been checked in'.format(registration.full_name)
     else:
         log_text = '"{}" check-in has been reset'
-    registration.event.log(EventLogRealm.participants, EventLogKind.change, 'Registration',
-                           log_text.format(registration.full_name), session.user,
-                           meta={'registration_id': registration.id})
+    registration.log(EventLogRealm.participants, EventLogKind.change, 'Registration',
+                     log_text.format(registration.full_name), session.user)
 
 
 def log_registration_updated(registration, previous_state, **kwargs):
     """Log the registration status change to the event log."""
     if not previous_state:
         return
+    previous_state_title = orig_string(previous_state.title)
     if (previous_state == RegistrationState.pending
             and registration.state in (RegistrationState.complete, RegistrationState.unpaid)):
         log_text = 'Registration for "{}" has been approved'
@@ -52,9 +52,9 @@ def log_registration_updated(registration, previous_state, **kwargs):
         log_text = 'Registration for "{}" has been withdrawn'
         kind = EventLogKind.negative
     else:
-        previous_state_title = orig_string(previous_state.title).lower()
         state_title = orig_string(registration.state.title).lower()
-        log_text = 'Registration for "{{}}" has been changed from {} to {}'.format(previous_state_title, state_title)
+        log_text = 'Registration for "{{}}" has been changed from {} to {}'.format(previous_state_title.lower(),
+                                                                                   state_title)
         kind = EventLogKind.change
-    registration.event.log(EventLogRealm.participants, kind, 'Registration', log_text.format(registration.full_name),
-                           session.user, meta={'registration_id': registration.id})
+    registration.log(EventLogRealm.participants, kind, 'Registration', log_text.format(registration.full_name),
+                     session.user, data={'Previous state': previous_state_title})
