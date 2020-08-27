@@ -1,4 +1,5 @@
 .. _installation-plugins:
+
 Plugins
 =======
 
