@@ -163,7 +163,7 @@
 
 
 {% macro _render_language_selector(languages, lightweight=false) %}
-    {% set lang = languages[session.lang][0] if session.lang in languages else _('English') %}
+    {% set lang = languages[session.lang][0] if session.lang in languages else 'English' %}
     {% if lightweight %}
         <a id="language-selector-link" class="arrow js-dropdown" data-toggle="dropdown">
             {% trans %}My language ({{ lang }}){% endtrans %}

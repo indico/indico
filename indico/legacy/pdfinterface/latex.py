@@ -318,10 +318,9 @@ class ConfManagerAbstractToPDF(AbstractToPDF):
     def _get_status(abstract):
         state_title = abstract.state.title.upper()
         if abstract.state == AbstractState.duplicate:
-            return _(u"{} (#{}: {})").format(state_title, abstract.duplicate_of.friendly_id,
-                                             abstract.duplicate_of.title)
+            return u"{} (#{}: {})".format(state_title, abstract.duplicate_of.friendly_id, abstract.duplicate_of.title)
         elif abstract.state == AbstractState.merged:
-            return _(u"{} (#{}: {})").format(state_title, abstract.merged_into.friendly_id, abstract.merged_into.title)
+            return u"{} (#{}: {})".format(state_title, abstract.merged_into.friendly_id, abstract.merged_into.title)
         else:
             return abstract.state.title.upper()
 
