@@ -116,6 +116,10 @@ class IndicoPlugin(Plugin):
         # which could contain more than one plugin this is not easily possible.
         for name, model in added_models:
             schema = model.__table__.schema
+            # Allow models with non-plugin schema if they specify `polymorphic_identity` without a dedicated table
+            if ('polymorphic_identity' in getattr(model, '__mapper_args__', ())
+                    and '__tablename__' not in model.__dict__):
+                continue
             if not schema.startswith('plugin_'):
                 raise Exception("Plugin '{}' added a model which is not in a plugin schema ('{}' in '{}')"
                                 .format(self.name, name, schema))
