@@ -244,7 +244,7 @@ def test_email_content(monkeypatch, abstract_objects, create_email_template, dum
             Presentation type: Poster
 
             For a more detailed summary please visit the page of your abstract:
-            http://localhost/event/-314/abstracts/1234/.
+            http://localhost/event/-314/abstracts/1234/
 
             Kind regards,
             The organizers of {event.title}
