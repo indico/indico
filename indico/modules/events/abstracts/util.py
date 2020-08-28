@@ -29,7 +29,6 @@ from indico.modules.events.contributions.models.fields import ContributionFieldV
 from indico.modules.events.models.persons import EventPerson
 from indico.modules.events.tracks.models.principals import TrackPrincipal
 from indico.modules.events.tracks.models.tracks import Track
-from indico.util.i18n import _
 from indico.util.spreadsheets import unique_col
 from indico.web.flask.templating import get_template_module
 
@@ -121,9 +120,9 @@ def create_mock_abstract(event):
     kibble = User(full_name="Tom Kibble", first_name="Tom", last_name="Kibble", title="Prof.")
     higgs = User(full_name="Peter Higgs", first_name="Peter", last_name="Higgs", title="Prof.")
 
-    track = Track(title=_("Higgs Fields"))
-    session = Session(title=_("Higgs Fields Posters"))
-    contribution_type = ContributionType(name=_("Poster"))
+    track = Track(title="Higgs Fields")
+    session = Session(title="Higgs Fields Posters")
+    contribution_type = ContributionType(name="Poster")
     contribution = Contribution(title="Broken Symmetry and the Mass of Gauge Vector Mesons",
                                 track=track,
                                 session=session,
