@@ -29,7 +29,6 @@ from indico.modules.events.contributions.models.fields import ContributionFieldV
 from indico.modules.events.models.persons import EventPerson
 from indico.modules.events.tracks.models.principals import TrackPrincipal
 from indico.modules.events.tracks.models.tracks import Track
-from indico.util.i18n import _
 from indico.util.spreadsheets import unique_col
 from indico.web.flask.templating import get_template_module
 
