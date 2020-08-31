@@ -143,6 +143,7 @@ You can then initialize the DB::
 
     indico db prepare
 
+.. _run-dev:
 
 Running Indico
 --------------

@@ -1,3 +1,5 @@
+.. _contact:
+
 Contact
 =======
 
@@ -32,5 +34,3 @@ Twitter
 
 Indico has an official Twitter account, `@getindico <https://twitter.com/getindico>`_
 which is occasionally used for announcements.
-
-
