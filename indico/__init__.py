@@ -16,4 +16,6 @@ register_custom_mimetypes()
 
 # TODO: remove in 3.0
 warnings.filterwarnings('ignore', message='Python 2 is no longer supported by the Python core team.',
+                        module='authlib')
+warnings.filterwarnings('ignore', message='Python 2 is no longer supported by the Python core team.',
                         module='cryptography')
