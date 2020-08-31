@@ -1,95 +1,94 @@
-.. _install-dev:
-
 Translations
 ************
 
-Indico comes with a number of languages by default. In release 2.3, those are: 
+Indico comes with a number of languages by default. In release 2.3, those are:
 English (default), French, Portuguese, Spanish and Chinese (in the order of integration).
 Additional languages are being prepared on the Transifex platform.
 
-In order to use (partially) existing translations from Transifex or to contribute 
+In order to use (partially) existing translations from Transifex or to contribute
 translations, you need to register with the
 `Indico project on the Transifex platform <https://www.transifex.com/indico/>`_.
 
 Additional Translations
 =======================
 
-This is a guide 
-(courtesy `pedrovsky <https://talk.getindico.io/t/including-a-new-language-in-indico/1864/5>`_) 
-to set up an Indico instance with a new language. 
-It is useful for translators when applying their revisions to verify how the translation looks in production
+This is a guide to set up an Indico instance with a new language.
+It is useful for translators to verify how the translation looks in production
 or for administrators who just want to lurk at the incubated translation embryos.
 
 Create your own Indico instance
 -------------------------------
 
-This could be in our own computer, in a shared machine or even your organisation, if the latter gives you permission.
+This should usually be done on your own computer or a virtual machine.
 
 For creating your own Indico instance, we provide two different guides:
-The first one is for a `production system <../installation/production>`_, 
-it will prepare Indico to be served to users and used in all the different purposes you may have besides translations. 
-The second is `development <../installation/development>`_ a light-weight, 
+The first one is for a :ref:`production system <install-prod>`,
+it will prepare Indico to be served to users and used in all the different purposes you may have besides translations.
+The second is :ref:`development <install-dev>` a light-weight,
 easier to set up, version oriented to testing purposes, that should not be exposed to the public.
 
-However, for the purpose of translation **development** or **testing** which are the purpose of this guide, 
-we recommend and only provide the steps when using the development version.
+For the purpose of translation **development** or **testing**, which this guide is about,
+we recommend using the development version.
 
-Install the `transifex client <https://docs.transifex.com/client/installing-the-client>`_
---------------------------------------------------------------------------------------------
+Install the transifex client
+----------------------------
 
-Follow instructions on transifex site.
+Follow the instructions on the `transifex site <https://docs.transifex.com/client/installing-the-client>`_.
 
 Get an API token
 ----------------
 
-Go `here <https://www.transifex.com/user/settings/api/>`_ and generate your API token. 
-Afterwards, you should run the command ``tx init --skipsetup``. 
-It will request the token you just copied from the previous settings and save it locally so you can start using transifex locally.
-If you do not know how to run this command, 
-please refer to the guide `here <https://docs.transifex.com/client/init>`_.
+Go `to your transifex settings <https://www.transifex.com/user/settings/api/>`_ and generate an API token.
+Afterwards, you should run the command ``tx init --skipsetup``.
+It will request the token you just copied from the previous settings and save it locally so you can start
+using transifex locally.
+If you do not know how to run this command, please refer to the
+`transifex client guide <https://docs.transifex.com/client/init>`_.
 
 Install the translations
 ------------------------
 
-Navigate to ``~/dev/indico/src`` (if you 
-you made a `standard dev installation <../installation/development>`_, 
-else to the appropriate checkout location on your computer).
+Navigate to ``~/dev/indico/src`` (assuming you used the standard locations from the dev setup guide).
 
-Run ``tx pull -f -l <language_code>``. 
-Languages codes can be obtained `here <https://www.transifex.com/indico/>`_. 
-For example, Chinese (China) is zh_CN.GB2312.
+Run ``tx pull -f -l <language_code>``.
+Languages codes can be obtained `here <https://www.transifex.com/indico/>`_.
 
-Compile and Run Indico
-----------------------
+For example, Chinese (China) is ``zh_CN.GB2312``.
 
-Run the commands ``indico i18n compile-catalog`` 
-and ``indico i18n compile-catalog-react`` 
-and `launch Indico <../installation/development/#running-indico>`_. 
+Compile translations and run Indico
+-----------------------------------
+
+Run the commands ``indico i18n compile-catalog``
+and ``indico i18n compile-catalog-react``
+and :ref:`launch Indico <run-dev>`.
 The language should now show up as an option in the top right corner.
+
+In case you modified the ``.js`` resources, you also need to delete the cached
+files in ``~/dev/indico/data/cache/assets_i18n_*.js``.
 
 FAQ
 ---
 
-Why isn’t Indico loading my language?
+Why isn't Indico loading my language?
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Some languages in transifex use codes that Indico is not able to recognize.
-One example is the Chinese's **zh_CN.GB2312**.
-The easy fix for this is to rename the folder in ``indico/translations/zh_CN.GB2312`` 
-to the standard locale code |zh_Hant_TW|_.
-Unfortunately, there is no list with mappings for all the languages. 
-So if by any reason it doesn’t work for you, feel free to `ask us <../contact>`_.
+One example is the Chinese's ``zh_CN.GB2312``.
+The easy fix for this is to rename the folder ``zh_CN.GB2312`` (inside
+``indico/translations/``) to the standard locale code |zh_Hant_TW|_.
+Unfortunately, there is no list with mappings for all the languages.
+So if by any reason it doesn't work for you, feel free to :ref:`ask us <contact>`.
 
-.. |zh_Hant_TW| replace:: **zh_Hant_TW**
+.. |zh_Hant_TW| replace:: ``zh_Hant_TW``
 .. _zh_Hant_TW: https://www.localeplanet.com/icu/zh-Hant-TW/index.html
 
 
 Contributing
-************
+============
 
-As a **translator**, you should have a good knowledge of the Indico functions 
+As a **translator**, you should have a good knowledge of the Indico functions
 (from the user side at least). Then you can subscribe to the abovementioned
-`Transifex site for Indico <https://www.transifex.com/indico/>`_ 
+`Transifex site for Indico <https://www.transifex.com/indico/>`_
 and request membership of one of the translation teams. You should also contact
 the coordinators; some languages have specific coordinators assigned.
 They may point you to places, where work is needed and which rules have
@@ -98,32 +97,32 @@ been agreed for the translations.
 The glossary is usually of big help to obtain a uniform translation of all
 technical terms. Use it!
 
-As a **programmer** or **developer**, you will have to be aware of the needs and 
-difficulties of translation work. 
+As a **programmer** or **developer**, you will have to be aware of the needs and
+difficulties of translation work.
 A `Wiki page for Internationalisation <https://github.com/indico/indico/wiki/Internationalisation>`_
-is available from github.
-It describes the interface between translating and programming and some 
-conventions to be obeyed.
-Everyone involved in translating or programming Indico should have read it 
-before starting the work.
+is available from github (slightly outdated and we should eventually move it to this documentation).
+It describes the interface between translating and programming and some conventions to be followed.
+Everyone involved in translating or programming Indico should have read it before starting the work.
 
 CAVEAT: The codebase contains legacy code, which may not follow all rules.
 The next paragraph applies to this as well.
 
-Whenever translaters spot difficult code (forgotten pluralisation, typos), they 
+Whenever translaters spot difficult code (forgotten pluralization, typos), they
 should do their best to avoid double (or rather: multiple) work to their fellow translators.
 What is a problem for their translation, usually will be a problem for all translations.
-Don't hesitate to open an issue or pull request on 
-`github <https://github.com/indico/>`_.
-Repair first, then translate (and be aware that after repair,
-the translation has to be made again for all languages).
+Don't hesitate to open an issue or pull request on `GitHub <https://github.com/indico/indico>`_.
+Repair first, then translate (and be aware that after repair, the translation has to be made
+again for all languages).
 
 Organisation of PO files
 ========================
 
-The relationship between 
+The relationship between
+
 - transifex resources names
 - PO file names and
 - the actual place, where the strings are found
-is not obvious. 
-A `thread has started here <https://talk.getindico.io/t/relationship-between-resources-and-po-files-in-transifex/1890>`_. It contains some first insights and results of the discussion should be migrated here.
+
+is not always obvious.
+A `thread has started here <https://talk.getindico.io/t/relationship-between-resources-and-po-files-in-transifex/1890>`_.
+It contains some first insights and results of the discussion should be migrated here.
