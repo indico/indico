@@ -212,7 +212,7 @@ class LocationMixin(object):
         room = self.room
         if room is not None:
             return room.full_name if full else room.name
-        return self.own_room_name if not self.inherit_location else self.location_parent.room_name
+        return self.own_room_name if not self.inherit_location else self.location_parent.get_room_name(full=full)
 
     @property
     def room_name(self):
