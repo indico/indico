@@ -212,7 +212,7 @@ OAuth SSO
 If you are using OAuth-based SSO you need to update ``indico.conf`` as the ``oauth``
 auth provider type has been replaced by the more modern and flexible ``authlib`` one.
 Please see the `Flask-Multipass documentation`_ on how to configure it.  You
-can also ask in our forum if you need any help with updating your SSO config.
+can also ask in `our forum`_ if you need any help with updating your SSO config.
 
 
 
@@ -266,3 +266,4 @@ Run ``indico setup create-logging-config /opt/indico/etc/``  to create the new
 
 .. _in the code: https://github.com/indico/indico/blob/master/indico/core/config.py#L31
 .. _Flask-Multipass documentation: https://flask-multipass.readthedocs.io/en/latest/
+.. _our forum: https://talk.getindico.io/
