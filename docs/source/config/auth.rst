@@ -31,7 +31,7 @@ needed for the given provider.
 The following keys are available in the provider data:
 
 - ``type`` -- **Required.** The type of the provider. Valid values
-  are e.g. ``ldap``, ``oauth``, ``shibboleth``, and whatever custom
+  are e.g. ``ldap``, ``authlib``, ``shibboleth``, and whatever custom
   providers you have installed.
 - ``title`` -- The title of the provider (shown on the login page).
   If omitted, the provider name is used.
@@ -60,7 +60,7 @@ provider has been used, its name must not be changed.
 The following keys are available in the provider data:
 
 - ``type`` -- **Required.** The type of the provider. Valid values
-  are e.g. ``ldap``, ``oauth``, ``shibboleth``, and whatever custom
+  are e.g. ``ldap``, ``authlib``, ``shibboleth``, and whatever custom
   providers you have installed.
 - ``title`` -- The title of the provider (shown in the account list
   of the user profile).  If omitted, the provider name is used.
