@@ -174,6 +174,48 @@ If you are using customizations using the :data:`CUSTOMIZATION_DIR` setting, see
 updated documentation as you will have to update those customizations.
 
 
+
+Upgrading from 2.2 to 2.3
+-------------------------
+
+Logging config
+^^^^^^^^^^^^^^
+
+We changed the way the user id is logged in ``indico.log`` (it's now logged in a more
+structured way and included in every log message instead of just the one indicating
+the start of a request).
+
+If you have not modified the logging config the easiest option is deleting
+``/opt/indico/etc/logging.yaml`` and running ``indico setup create-logging-config /opt/indico/etc/``
+to recreate it.
+
+If you do have custom changes or don't remember whether you do, you can apply the change
+from the diff below manually.
+
+.. code-block:: diff
+
+     formatters:
+       default:
+    -    format: '%(asctime)s  %(levelname)-7s  %(request_id)s  %(name)-25s %(message)s'
+    +    format: '%(asctime)s  %(levelname)-7s  %(request_id)s  %(user_id)-6s  %(name)-25s %(message)s'
+       simple:
+         format: '%(asctime)s  %(levelname)-7s  %(name)-25s %(message)s'
+       email:
+         append_request_info: true
+    -    format: "%(asctime)s  %(request_id)s  %(name)s - %(levelname)s %(filename)s:%(lineno)d -- %(message)s\n\n"
+    +    format: "%(asctime)s  %(request_id)s  %(user_id)-6s  %(name)s - %(levelname)s %(filename)s:%(lineno)d -- %(message)s\n\n"
+
+
+OAuth SSO
+^^^^^^^^^
+
+If you are using OAuth-based SSO you need to update ``indico.conf`` as the ``oauth``
+auth provider type has been replaced by the more modern and flexible ``authlib`` one.
+Please see the `Flask-Multipass documentation`_ on how to configure it.  You
+can also ask in our forum if you need any help with updating your SSO config.
+
+
+
 Upgrading from 1.9.11 to 2.0
 ----------------------------
 
@@ -223,3 +265,4 @@ Run ``indico setup create-logging-config /opt/indico/etc/``  to create the new
 ``logging.yaml`` which can then be customized if needed.
 
 .. _in the code: https://github.com/indico/indico/blob/master/indico/core/config.py#L31
+.. _Flask-Multipass documentation: https://flask-multipass.readthedocs.io/en/latest/
