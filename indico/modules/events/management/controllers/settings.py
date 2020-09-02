@@ -19,6 +19,7 @@ from indico.modules.events.management.forms import (EventClassificationForm, Eve
                                                     EventDatesForm, EventLocationForm, EventPersonsForm)
 from indico.modules.events.management.util import flash_if_unregistered
 from indico.modules.events.management.views import WPEventSettings, render_event_management_header_right
+from indico.modules.events.models.events import EventType
 from indico.modules.events.models.labels import EventLabel
 from indico.modules.events.models.references import ReferenceType
 from indico.modules.events.operations import update_event
@@ -49,6 +50,8 @@ class RHEventSettings(RHManageEventBase):
         RHManageEventBase._check_access(self)  # mainly to trigger the legacy "event locked" check
 
     def _process(self):
+        from indico.modules.events.contributions import contribution_settings
+
         show_booking_warning = False
         if (config.ENABLE_ROOMBOOKING and not self.event.has_ended and self.event.room
                 and not self.event.room_reservation_links):
@@ -69,8 +72,11 @@ class RHEventSettings(RHManageEventBase):
             show_booking_warning = not has_overlap
         has_reference_types = ReferenceType.query.has_rows()
         has_event_labels = EventLabel.query.has_rows()
+        show_draft_warning = (self.event.type_ == EventType.conference and
+                              not contribution_settings.get(self.event, 'published'))
         return WPEventSettings.render_template('settings.html', self.event, 'settings',
                                                show_booking_warning=show_booking_warning,
+                                               show_draft_warning=show_draft_warning,
                                                has_reference_types=has_reference_types,
                                                has_event_labels=has_event_labels)
 

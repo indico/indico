@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: indico 2.3-dev\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2020-09-02 11:00+0200\n"
+"POT-Creation-Date: 2020-09-02 13:51+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -8498,6 +8498,18 @@ msgstr ""
 
 #: indico/modules/events/management/templates/settings.html:22
 msgid "Book the room"
+msgstr ""
+
+#: indico/modules/events/management/templates/settings.html:34
+msgid "Contributions are in draft mode"
+msgstr ""
+
+#: indico/modules/events/management/templates/settings.html:35
+msgid "While in draft mode, regular users cannot see the contributions and timetable."
+msgstr ""
+
+#: indico/modules/events/management/templates/settings.html:43
+msgid "Manage Contributions"
 msgstr ""
 
 #: indico/modules/events/models/events.py:54 indico/modules/events/templates/management/_create_event_button.html:8
