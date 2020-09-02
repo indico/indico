@@ -199,20 +199,30 @@ class LocationMixin(object):
     def venue_name(self, venue_name):
         self.own_venue_name = venue_name
 
-    def get_room_name(self, full=True):
+    def get_room_name(self, full=True, verbose=False):
         """The name of the room where this item is located.
 
-        :param full: by default, if the room has a "friendly name" too
-                     (e.g. 'Main Amphitheatre'), a composite name will be
-                     returned. If ``full`` is set to ``False``, only the
-                     "friendly name" will be returned in that case.
+        If both ``full`` and ``verbose`` are set to ``False``, the
+        "friendly name" will be returned in that case. Both ``full`` and
+        ``verbose`` cannot be set to ``True``.
+
+        :param full: If the room has a "friendly name" (e.g. 'Main
+                     Amphitheatre'), a composite name will be returned.
+        :param verbose: The `verbose_name` of the room will be returned.
         """
+        assert sum([full, verbose]) <= 1
         if self.inherit_location and self.location_parent is None:
             return ''
         room = self.room
         if room is not None:
-            return room.full_name if full else room.name
-        return self.own_room_name if not self.inherit_location else self.location_parent.get_room_name(full=full)
+            if full:
+                return room.full_name
+            elif verbose and room.verbose_name:
+                return room.verbose_name
+            else:
+                return room.name
+        return (self.own_room_name if not self.inherit_location
+                else self.location_parent.get_room_name(full=full, verbose=verbose))
 
     @property
     def room_name(self):
