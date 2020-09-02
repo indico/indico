@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: indico 2.3-dev\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2020-08-21 15:28+0200\n"
+"POT-Creation-Date: 2020-09-02 11:00+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -243,7 +243,7 @@ msgstr ""
 msgid "Other"
 msgstr ""
 
-#: indico/core/plugins/__init__.py:313 indico/core/plugins/templates/index.html:4
+#: indico/core/plugins/__init__.py:317 indico/core/plugins/templates/index.html:4
 msgid "Plugins"
 msgstr ""
 
@@ -430,7 +430,7 @@ msgstr ""
 #: indico/legacy/pdfinterface/conference.py:1007 indico/legacy/pdfinterface/conference.py:1164
 #: indico/modules/events/registration/lists.py:49
 #: indico/modules/events/registration/templates/display/participant_list.html:44
-#: indico/modules/events/registration/templates/management/_registration_details.html:211
+#: indico/modules/events/registration/templates/management/_registration_details.html:221
 msgid "Checked in"
 msgstr ""
 
@@ -479,15 +479,11 @@ msgstr ""
 msgid "Report of Abstracts"
 msgstr ""
 
-#: indico/legacy/pdfinterface/latex.py:321 indico/legacy/pdfinterface/latex.py:324
-msgid "{} (#{}: {})"
-msgstr ""
-
-#: indico/legacy/pdfinterface/latex.py:362
+#: indico/legacy/pdfinterface/latex.py:361
 msgid "Proposed for other tracks: {}"
 msgstr ""
 
-#: indico/legacy/pdfinterface/latex.py:415
+#: indico/legacy/pdfinterface/latex.py:414
 msgid "Report of Contributions"
 msgstr ""
 
@@ -518,7 +514,7 @@ msgid "Homepage"
 msgstr ""
 
 #: indico/modules/admin/__init__.py:34 indico/modules/admin/views.py:26 indico/modules/api/templates/user_profile.html:146
-#: indico/web/views.py:255 indico/web/views.py:312
+#: indico/web/views.py:256 indico/web/views.py:313
 msgid "Administration"
 msgstr ""
 
@@ -2949,9 +2945,8 @@ msgstr ""
 msgid "Badge"
 msgstr ""
 
-#: indico/modules/designer/__init__.py:20 indico/modules/events/abstracts/util.py:126
-#: indico/modules/events/editing/models/editable.py:25 indico/modules/events/sessions/forms.py:105
-#: indico/modules/events/sessions/templates/management/types_dialog.html:22
+#: indico/modules/designer/__init__.py:20 indico/modules/events/editing/models/editable.py:25
+#: indico/modules/events/sessions/forms.py:105 indico/modules/events/sessions/templates/management/types_dialog.html:22
 msgid "Poster"
 msgstr ""
 
@@ -4190,7 +4185,7 @@ msgstr ""
 #: indico/modules/events/abstracts/forms.py:456 indico/modules/events/abstracts/models/reviews.py:21
 #: indico/modules/events/abstracts/templates/management/abstract_list.html:134
 #: indico/modules/events/papers/models/reviews.py:21
-#: indico/modules/events/registration/templates/management/_registration_details.html:109
+#: indico/modules/events/registration/templates/management/_registration_details.html:112
 #: indico/modules/events/requests/base.py:38 indico/modules/users/templates/registration_requests.html:31
 msgid "Reject"
 msgstr ""
@@ -4552,14 +4547,6 @@ msgstr ""
 
 #: indico/modules/events/abstracts/settings.py:94
 msgid "Speakers and authors"
-msgstr ""
-
-#: indico/modules/events/abstracts/util.py:124
-msgid "Higgs Fields"
-msgstr ""
-
-#: indico/modules/events/abstracts/util.py:125
-msgid "Higgs Fields Posters"
 msgstr ""
 
 #: indico/modules/events/abstracts/controllers/abstract.py:59
@@ -5561,6 +5548,8 @@ msgstr ""
 #: indico/modules/events/registration/templates/display/registration_summary.html:68
 #: indico/modules/events/registration/templates/display/registration_summary.html:70
 #: indico/modules/events/registration/templates/display/registration_summary.html:75
+#: indico/modules/events/registration/templates/management/_registration_details.html:284
+#: indico/modules/events/registration/templates/management/_registration_details.html:286
 msgid "Withdraw"
 msgstr ""
 
@@ -6337,7 +6326,7 @@ msgstr ""
 msgid "The contribution '{}' is not displayed in the list due to the enabled filters"
 msgstr ""
 
-#: indico/modules/events/contributions/util.py:253 indico/modules/events/registration/util.py:565
+#: indico/modules/events/contributions/util.py:253 indico/modules/events/registration/util.py:563
 msgid "Row {}: malformed CSV data - please check that the number of columns is correct"
 msgstr ""
 
@@ -7583,7 +7572,7 @@ msgstr ""
 msgid "Logs"
 msgstr ""
 
-#: indico/modules/events/logs/models/entries.py:21 indico/web/views.py:253 indico/web/views.py:310
+#: indico/modules/events/logs/models/entries.py:21 indico/web/views.py:254 indico/web/views.py:311
 msgid "Management"
 msgstr ""
 
@@ -10142,23 +10131,23 @@ msgstr ""
 msgid "Total"
 msgstr ""
 
-#: indico/modules/events/registration/util.py:569
+#: indico/modules/events/registration/util.py:567
 msgid "Row {}: missing e-mail address"
 msgstr ""
 
-#: indico/modules/events/registration/util.py:571
+#: indico/modules/events/registration/util.py:569
 msgid "Row {}: invalid e-mail address"
 msgstr ""
 
-#: indico/modules/events/registration/util.py:573
+#: indico/modules/events/registration/util.py:571
 msgid "Row {}: missing first or last name"
 msgstr ""
 
-#: indico/modules/events/registration/util.py:575
+#: indico/modules/events/registration/util.py:573
 msgid "Row {}: a registration with this email already exists"
 msgstr ""
 
-#: indico/modules/events/registration/util.py:577 indico/util/roles.py:40
+#: indico/modules/events/registration/util.py:575 indico/util/roles.py:40
 msgid "Row {}: email address is not unique"
 msgstr ""
 
@@ -10174,23 +10163,23 @@ msgstr ""
 msgid "You are trying to register with a form that requires you to be logged in"
 msgstr ""
 
-#: indico/modules/events/registration/controllers/display.py:332
+#: indico/modules/events/registration/controllers/display.py:336
 msgid ""
 "We could not find a registration for you.  If have already registered, please use the direct access link from the "
 "email you received after registering."
 msgstr ""
 
-#: indico/modules/events/registration/controllers/display.py:335
+#: indico/modules/events/registration/controllers/display.py:339
 msgid ""
 "We could not find a registration for you.  If have already registered, please use the direct access link from the "
 "email you received after registering or log in to your Indico account."
 msgstr ""
 
-#: indico/modules/events/registration/controllers/display.py:355
+#: indico/modules/events/registration/controllers/display.py:359
 msgid "Your registration has been withdrawn."
 msgstr ""
 
-#: indico/modules/events/registration/controllers/display.py:371
+#: indico/modules/events/registration/controllers/display.py:375
 msgid "You declined the invitation to register."
 msgstr ""
 
@@ -10242,27 +10231,27 @@ msgid_plural "{num} emails were sent."
 msgstr[0] ""
 msgstr[1] ""
 
-#: indico/modules/events/registration/controllers/management/reglists.py:248
+#: indico/modules/events/registration/controllers/management/reglists.py:247
 msgid "Registration was deleted."
 msgid_plural "{num} registrations were deleted."
 msgstr[0] ""
 msgstr[1] ""
 
-#: indico/modules/events/registration/controllers/management/reglists.py:277
+#: indico/modules/events/registration/controllers/management/reglists.py:276
 msgid "The registration was created."
 msgstr ""
 
-#: indico/modules/events/registration/controllers/management/reglists.py:334
+#: indico/modules/events/registration/controllers/management/reglists.py:333
 msgid "Text too large to generate a PDF with table style. Please try again generating with book style."
 msgstr ""
 
-#: indico/modules/events/registration/controllers/management/reglists.py:379
+#: indico/modules/events/registration/controllers/management/reglists.py:378
 msgid "{} registration has been imported."
 msgid_plural "{} registrations have been imported."
 msgstr[0] ""
 msgstr[1] ""
 
-#: indico/modules/events/registration/controllers/management/reglists.py:574
+#: indico/modules/events/registration/controllers/management/reglists.py:573
 msgid "Cannot reset this registration since there is another valid registration for the same user or email."
 msgstr ""
 
@@ -10270,11 +10259,19 @@ msgstr ""
 msgid "The registration cannot be reset in its current state."
 msgstr ""
 
-#: indico/modules/events/registration/controllers/management/reglists.py:612
+#: indico/modules/events/registration/controllers/management/reglists.py:593
+msgid "The registration cannot be withdrawn in its current state."
+msgstr ""
+
+#: indico/modules/events/registration/controllers/management/reglists.py:595
+msgid "The registration has been withdrawn."
+msgstr ""
+
+#: indico/modules/events/registration/controllers/management/reglists.py:625
 msgid "Selected registrations marked as {} successfully."
 msgstr ""
 
-#: indico/modules/events/registration/controllers/management/reglists.py:623
+#: indico/modules/events/registration/controllers/management/reglists.py:636
 msgid "The status of the selected registrations was updated successfully."
 msgstr ""
 
@@ -10429,7 +10426,7 @@ msgstr ""
 
 #: indico/modules/events/registration/templates/display/conference_home.html:5
 #: indico/modules/events/registration/templates/display/registration_summary.html:84
-#: indico/modules/events/registration/templates/management/_registration_details.html:169
+#: indico/modules/events/registration/templates/management/_registration_details.html:172
 msgid "Get ticket"
 msgstr ""
 
@@ -10756,136 +10753,156 @@ msgstr ""
 msgid "Manage form \"%(title)s\""
 msgstr ""
 
-#: indico/modules/events/registration/templates/management/_registration_details.html:35
+#: indico/modules/events/registration/templates/management/_registration_details.html:38
 #, python-format
 msgid "Last updated by %(updated_by)s on %(timestamp)s."
 msgstr ""
 
-#: indico/modules/events/registration/templates/management/_registration_details.html:50
-#: indico/modules/events/registration/templates/management/_registration_details.html:140
+#: indico/modules/events/registration/templates/management/_registration_details.html:53
+#: indico/modules/events/registration/templates/management/_registration_details.html:143
 msgid "Mark as paid"
 msgstr ""
 
-#: indico/modules/events/registration/templates/management/_registration_details.html:58
+#: indico/modules/events/registration/templates/management/_registration_details.html:61
 msgid "Mark as unpaid"
 msgstr ""
 
-#: indico/modules/events/registration/templates/management/_registration_details.html:70
+#: indico/modules/events/registration/templates/management/_registration_details.html:73
 msgid "Payment transaction"
 msgstr ""
 
-#: indico/modules/events/registration/templates/management/_registration_details.html:85
+#: indico/modules/events/registration/templates/management/_registration_details.html:88
 msgid "Registration awaiting manager approval"
 msgstr ""
 
-#: indico/modules/events/registration/templates/management/_registration_details.html:87
+#: indico/modules/events/registration/templates/management/_registration_details.html:90
 msgid "You can validate or reject this registration and the user will receive a notification."
 msgstr ""
 
-#: indico/modules/events/registration/templates/management/_registration_details.html:97
+#: indico/modules/events/registration/templates/management/_registration_details.html:100
 msgid "Are you sure you want to approve this registration? This will trigger a notification email."
 msgstr ""
 
-#: indico/modules/events/registration/templates/management/_registration_details.html:98
+#: indico/modules/events/registration/templates/management/_registration_details.html:101
 msgid "Approve registration"
 msgstr ""
 
-#: indico/modules/events/registration/templates/management/_registration_details.html:99
+#: indico/modules/events/registration/templates/management/_registration_details.html:102
 msgid "Approve"
 msgstr ""
 
-#: indico/modules/events/registration/templates/management/_registration_details.html:107
+#: indico/modules/events/registration/templates/management/_registration_details.html:110
 msgid "Are you sure you want to reject this registration? This will trigger a notification email."
 msgstr ""
 
-#: indico/modules/events/registration/templates/management/_registration_details.html:108
+#: indico/modules/events/registration/templates/management/_registration_details.html:111
 msgid "Reject registration"
 msgstr ""
 
-#: indico/modules/events/registration/templates/management/_registration_details.html:119
+#: indico/modules/events/registration/templates/management/_registration_details.html:122
 msgid "Registration not paid yet"
 msgstr ""
 
-#: indico/modules/events/registration/templates/management/_registration_details.html:122
+#: indico/modules/events/registration/templates/management/_registration_details.html:125
 msgid "The current transaction is still pending."
 msgstr ""
 
-#: indico/modules/events/registration/templates/management/_registration_details.html:124
+#: indico/modules/events/registration/templates/management/_registration_details.html:127
 msgid "You can mark the registration as paid manually."
 msgstr ""
 
-#: indico/modules/events/registration/templates/management/_registration_details.html:144
-#: indico/modules/events/registration/templates/management/_registration_details.html:165
+#: indico/modules/events/registration/templates/management/_registration_details.html:147
+#: indico/modules/events/registration/templates/management/_registration_details.html:168
 msgid "Reset approval"
 msgstr ""
 
-#: indico/modules/events/registration/templates/management/_registration_details.html:154
+#: indico/modules/events/registration/templates/management/_registration_details.html:157
 msgid "This registration is complete"
 msgstr ""
 
-#: indico/modules/events/registration/templates/management/_registration_details.html:156
+#: indico/modules/events/registration/templates/management/_registration_details.html:159
 #, python-format
 msgid "Submitted: %(submitted)s"
 msgstr ""
 
-#: indico/modules/events/registration/templates/management/_registration_details.html:180
+#: indico/modules/events/registration/templates/management/_registration_details.html:183
 #, python-format
 msgid "This registration is %(state)s"
 msgstr ""
 
-#: indico/modules/events/registration/templates/management/_registration_details.html:186
+#: indico/modules/events/registration/templates/management/_registration_details.html:189
 msgid "Reset rejection"
 msgstr ""
 
-#: indico/modules/events/registration/templates/management/_registration_details.html:186
+#: indico/modules/events/registration/templates/management/_registration_details.html:189
 msgid "Reset withdrawal"
 msgstr ""
 
-#: indico/modules/events/registration/templates/management/_registration_details.html:197
-msgid "Are you sure you want to reset this registration status? This action will not be notified to the registrant."
+#: indico/modules/events/registration/templates/management/_registration_details.html:198
+msgid "This will trigger a notification email."
 msgstr ""
 
-#: indico/modules/events/registration/templates/management/_registration_details.html:199
+#: indico/modules/events/registration/templates/management/_registration_details.html:200
+msgid "This action will not be notified to the registrant."
+msgstr ""
+
+#: indico/modules/events/registration/templates/management/_registration_details.html:207
+msgid "Are you sure you want to reset this registration status?"
+msgstr ""
+
+#: indico/modules/events/registration/templates/management/_registration_details.html:209
 msgid "There is another valid registration for this user so it cannot be restored."
 msgstr ""
 
-#: indico/modules/events/registration/templates/management/_registration_details.html:213
+#: indico/modules/events/registration/templates/management/_registration_details.html:223
 #, python-format
 msgid "Checked in: %(checked_in_dt)s"
 msgstr ""
 
-#: indico/modules/events/registration/templates/management/_registration_details.html:218
+#: indico/modules/events/registration/templates/management/_registration_details.html:228
 msgid "Mark as not checked in"
 msgstr ""
 
-#: indico/modules/events/registration/templates/management/_registration_details.html:222
+#: indico/modules/events/registration/templates/management/_registration_details.html:232
 #: indico/modules/events/registration/templates/management/regform_reglist.html:189
 msgid "Are you sure you want to reset the check-in info? The original check-in time will be lost."
 msgstr ""
 
-#: indico/modules/events/registration/templates/management/_registration_details.html:223
+#: indico/modules/events/registration/templates/management/_registration_details.html:233
 msgid "Reset check-in info"
 msgstr ""
 
-#: indico/modules/events/registration/templates/management/_registration_details.html:224
+#: indico/modules/events/registration/templates/management/_registration_details.html:234
 msgid "reset"
 msgstr ""
 
-#: indico/modules/events/registration/templates/management/_registration_details.html:232
+#: indico/modules/events/registration/templates/management/_registration_details.html:242
 msgid "Not checked in"
 msgstr ""
 
-#: indico/modules/events/registration/templates/management/_registration_details.html:235
+#: indico/modules/events/registration/templates/management/_registration_details.html:245
 msgid "You can mark the registration as checked in manually here or with the Indico Check in app."
 msgstr ""
 
-#: indico/modules/events/registration/templates/management/_registration_details.html:239
+#: indico/modules/events/registration/templates/management/_registration_details.html:249
 msgid "You can mark the registration as checked in manually."
 msgstr ""
 
-#: indico/modules/events/registration/templates/management/_registration_details.html:249
+#: indico/modules/events/registration/templates/management/_registration_details.html:259
 #: indico/modules/events/registration/templates/management/regform_reglist.html:181
 msgid "Check-in"
+msgstr ""
+
+#: indico/modules/events/registration/templates/management/_registration_details.html:272
+msgid "Withdraw registration"
+msgstr ""
+
+#: indico/modules/events/registration/templates/management/_registration_details.html:274
+msgid "If the participant decided to no longer attend the event, you can withdraw their registration."
+msgstr ""
+
+#: indico/modules/events/registration/templates/management/_registration_details.html:285
+msgid "Are you sure that you want to withdraw this registration? This will trigger a notification email."
 msgstr ""
 
 #: indico/modules/events/registration/templates/management/_reglist.html:11
@@ -15695,10 +15712,6 @@ msgstr ""
 
 #: indico/web/templates/_session_bar.html:154
 msgid "Logout"
-msgstr ""
-
-#: indico/web/templates/_session_bar.html:166
-msgid "English"
 msgstr ""
 
 #: indico/web/templates/_session_bar.html:169
