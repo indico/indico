@@ -26,7 +26,7 @@ import './ProfilePicture.module.scss';
 function ProfilePictureCard({image, text, email, children, source}) {
   const {
     input: {onChange, value},
-  } = useField('option');
+  } = useField('source');
 
   const active = value === source;
   return (
@@ -116,7 +116,7 @@ CustomPictureUpload.propTypes = {
 
 const formDecorator = createDecorator({
   field: 'file',
-  updates: value => (value === null ? {} : {option: 'custom'}),
+  updates: value => (value === null ? {} : {source: 'custom'}),
 });
 
 function ProfilePicture({email, current, pictureHash}) {
@@ -130,7 +130,7 @@ function ProfilePicture({email, current, pictureHash}) {
       headers: {'content-type': 'multipart/form-data'},
     };
     try {
-      await indicoAxios.post(manageURL({type: formData.option}), bodyFormData, config);
+      await indicoAxios.post(manageURL({type: formData.source}), bodyFormData, config);
     } catch (e) {
       handleAxiosError(e);
       return;
@@ -149,8 +149,8 @@ function ProfilePicture({email, current, pictureHash}) {
   }, []);
 
   const validate = values => {
-    if (values.option === 'custom' && !values.file) {
-      return {option: 'invalid'};
+    if (values.source === 'custom' && !values.file) {
+      return {source: 'invalid'};
     }
     return {};
   };
@@ -159,7 +159,7 @@ function ProfilePicture({email, current, pictureHash}) {
     <div styleName="profile-picture-selection">
       <FinalForm
         onSubmit={submitPicture}
-        initialValues={{file: null, option: current}}
+        initialValues={{file: null, source: current}}
         validate={validate}
         subscription={{}}
         decorators={[formDecorator]}
