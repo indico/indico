@@ -16,7 +16,7 @@ from indico.core.settings import SettingsProxy
 from indico.core.settings.converters import EnumConverter
 from indico.modules.users.ext import ExtraUserPreferences
 from indico.modules.users.models.settings import UserSetting, UserSettingsProxy
-from indico.modules.users.models.users import NameFormat, SelectedProfilePicture, User
+from indico.modules.users.models.users import NameFormat, User
 from indico.util.i18n import _
 from indico.web.flask.templating import get_template_module
 from indico.web.flask.util import url_for
@@ -37,10 +37,8 @@ user_settings = UserSettingsProxy('users', {
     'use_previewer_pdf': True,
     'synced_fields': None,  # None to synchronize all fields, empty set to not synchronize
     'suggest_categories': False,  # whether the user should receive category suggestions
-    'selected_avatar': SelectedProfilePicture.standard
 }, converters={
     'name_format': EnumConverter(NameFormat),
-    'selected_avatar': EnumConverter(SelectedProfilePicture)
 })
 
 user_management_settings = SettingsProxy('user_management', {

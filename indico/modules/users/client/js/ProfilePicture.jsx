@@ -5,7 +5,7 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-import manageURL from 'indico-url:users.manage_profile_picture';
+import uploadURL from 'indico-url:users.upload_profile_picture';
 import pictureURL from 'indico-url:users.profile_picture_display';
 import gravatarURL from 'indico-url:users.profile_picture_gravatar';
 
@@ -130,7 +130,7 @@ function ProfilePicture({email, current, pictureHash}) {
       headers: {'content-type': 'multipart/form-data'},
     };
     try {
-      await indicoAxios.post(manageURL({type: formData.source}), bodyFormData, config);
+      await indicoAxios.post(uploadURL({type: formData.source}), bodyFormData, config);
     } catch (e) {
       handleAxiosError(e);
       return;

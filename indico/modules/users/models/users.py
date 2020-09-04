@@ -274,6 +274,12 @@ class User(PersonMixin, db.Model):
         nullable=False,
         default=lambda: None
     )
+    #: user profile picture source
+    picture_source = db.Column(
+        PyIntEnum(SelectedProfilePicture),
+        nullable=False,
+        default=SelectedProfilePicture.standard,
+    )
 
     _affiliation = db.relationship(
         'UserAffiliation',
