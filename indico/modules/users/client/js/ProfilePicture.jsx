@@ -9,12 +9,13 @@ import manageURL from 'indico-url:users.manage_profile_picture';
 import pictureURL from 'indico-url:users.profile_picture_display';
 import gravatarURL from 'indico-url:users.profile_picture_gravatar';
 
-import React, {useState, useCallback, useRef} from 'react';
+import React, {useState, useCallback} from 'react';
 import ReactDOM from 'react-dom';
 import PropTypes from 'prop-types';
-import {Form as FinalForm, Field, useField} from 'react-final-form';
-import Dropzone from 'react-dropzone';
+import {Form as FinalForm, useField, useFormState} from 'react-final-form';
+import {useDropzone} from 'react-dropzone';
 import {Button, Form, Icon, Image, Card} from 'semantic-ui-react';
+import createDecorator from 'final-form-calculate';
 import {FinalSubmitButton} from 'indico/react/forms';
 import {indicoAxios, handleAxiosError} from 'indico/utils/axios';
 
@@ -68,13 +69,61 @@ ProfilePictureCard.defaultProps = {
   children: null,
 };
 
+function CustomPictureUpload({onFileSelected}) {
+  const {submitting} = useFormState({
+    subscription: {submitting: true},
+  });
+
+  const {
+    input: {onChange},
+  } = useField('file', {allowNull: true});
+
+  const {getRootProps, getInputProps, open} = useDropzone({
+    onDropAccepted: ([file]) => {
+      onFileSelected(file);
+      onChange(file);
+    },
+    multiple: false,
+    noClick: true,
+    noKeyboard: true,
+    accept: 'image/*',
+    disabled: submitting,
+  });
+
+  return (
+    <section>
+      <div {...getRootProps()}>
+        <input {...getInputProps()} />
+        <Button
+          disabled={submitting}
+          type="button"
+          icon="upload"
+          content={Translate.string('Upload')}
+          size="small"
+          onClick={evt => {
+            evt.stopPropagation();
+            open();
+          }}
+        />
+      </div>
+    </section>
+  );
+}
+
+CustomPictureUpload.propTypes = {
+  onFileSelected: PropTypes.func.isRequired,
+};
+
+const formDecorator = createDecorator({
+  field: 'file',
+  updates: value => (value === null ? {} : {option: 'custom'}),
+});
+
 function ProfilePicture({email, current, pictureHash}) {
   const [previewFile, setPreviewFile] = useState(null);
   const [hasPreview, setHasPreview] = useState(pictureHash !== null);
-  const [loading, setLoading] = useState(false);
 
   const submitPicture = async formData => {
-    setLoading(true);
     const bodyFormData = new FormData();
     bodyFormData.append('picture', formData.file);
     const config = {
@@ -84,11 +133,9 @@ function ProfilePicture({email, current, pictureHash}) {
       await indicoAxios.post(manageURL({type: formData.option}), bodyFormData, config);
     } catch (e) {
       handleAxiosError(e);
-      setLoading(false);
       return;
     }
     setPreviewFile(null);
-    setLoading(false);
     setHasPreview(true);
   };
 
@@ -96,18 +143,16 @@ function ProfilePicture({email, current, pictureHash}) {
     return previewFile ? URL.createObjectURL(previewFile) : pictureURL({slug: 'default'});
   };
 
-  const onDrop = useCallback(acceptedFiles => {
-    setPreviewFile(acceptedFiles[0]);
+  const handleFileSelected = useCallback(file => {
+    setPreviewFile(file);
     setHasPreview(true);
   }, []);
 
-  const dropzoneRef = useRef();
-
-  const openDialog = () => {
-    // Note that the ref is set async, so it might be null at some point
-    if (dropzoneRef.current) {
-      dropzoneRef.current.open();
+  const validate = values => {
+    if (values.option === 'custom' && !values.file) {
+      return {option: 'invalid'};
     }
+    return {};
   };
 
   return (
@@ -115,20 +160,13 @@ function ProfilePicture({email, current, pictureHash}) {
       <FinalForm
         onSubmit={submitPicture}
         initialValues={{file: null, option: current}}
+        validate={validate}
         subscription={{}}
-        mutators={{
-          setFile: ([file], state, utils) => {
-            utils.changeValue(state, 'file', () => file);
-          },
-          setOption: ([option], state, utils) => {
-            utils.changeValue(state, 'option', () => option);
-          },
-        }}
+        decorators={[formDecorator]}
       >
         {fprops => (
           <div>
             <Form onSubmit={fprops.handleSubmit}>
-              <Field name="file" render={() => null} />
               <Card.Group itemsPerRow={4} centered>
                 <ProfilePictureCard
                   image={gravatarURL({type: 'standard'})}
@@ -152,37 +190,7 @@ function ProfilePicture({email, current, pictureHash}) {
                   text={Translate.string('Custom picture')}
                   source="custom"
                 >
-                  <Dropzone
-                    ref={dropzoneRef}
-                    onDrop={acceptedFiles => {
-                      onDrop(acceptedFiles);
-                      fprops.form.mutators.setFile(acceptedFiles[0]);
-                      fprops.form.mutators.setOption('custom');
-                    }}
-                    multiple={false}
-                    noClick
-                    noKeyboard
-                    accept="image/*"
-                  >
-                    {({getRootProps, getInputProps}) => (
-                      <section>
-                        <div {...getRootProps()}>
-                          <input {...getInputProps()} />
-                          <Button
-                            disabled={loading}
-                            type="button"
-                            icon="upload"
-                            content={Translate.string('Upload')}
-                            size="small"
-                            onClick={e => {
-                              e.stopPropagation();
-                              openDialog();
-                            }}
-                          />
-                        </div>
-                      </section>
-                    )}
-                  </Dropzone>
+                  <CustomPictureUpload onFileSelected={handleFileSelected} />
                 </ProfilePictureCard>
               </Card.Group>
               <FinalSubmitButton
