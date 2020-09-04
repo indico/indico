@@ -7,13 +7,16 @@
 
 from __future__ import unicode_literals
 
+import hashlib
 import os
+import urllib
 from collections import namedtuple
 from io import BytesIO
 from operator import attrgetter, itemgetter
 
+import requests
 from dateutil.relativedelta import relativedelta
-from flask import flash, jsonify, redirect, request, session
+from flask import flash, jsonify, redirect, render_template, request, session
 from markupsafe import Markup, escape
 from marshmallow import fields
 from PIL import Image
@@ -45,7 +48,7 @@ from indico.modules.users.models.emails import UserEmail
 from indico.modules.users.operations import create_user
 from indico.modules.users.util import (get_linked_events, get_picture_data, get_related_categories,
                                        get_suggested_categories, merge_users, search_users, serialize_user)
-from indico.modules.users.views import WPUser, WPUserDashboard, WPUsersAdmin
+from indico.modules.users.views import WPUser, WPUserDashboard, WPUserProfilePic, WPUsersAdmin
 from indico.util.date_time import now_utc
 from indico.util.event import truncate_path
 from indico.util.fs import secure_filename
@@ -198,13 +201,80 @@ class RHPersonalData(RHUserBase):
                                       pic_form=pic_form)
 
 
+class RHProfilePicturePage(RHUserBase):
+    allow_system_user = True
+
+    def _process(self):
+        return WPUserProfilePic.render_template('profile_picture.html', 'profile_picture',
+                                                user=self.user,
+                                                current_selection=self.user.settings.get('selected_avatar').title)
+
+
+class RHProfilePictureGravatar(RHUserBase):
+    def _process(self):
+        if request.view_args['type'] == 'standard':
+            first_name = self.user.first_name[0].upper() if self.user.first_name else ""
+            return render_template('users/avatar.svg', bg_color=self.user.avatar_bg_color,
+                                   text=first_name), 200, {'Content-Type': 'image/svg+xml'}
+        email = session.user.email
+        size = 80
+        gravatar_url = "https://www.gravatar.com/avatar/" + hashlib.md5(email.lower()).hexdigest() + "?"
+        if request.view_args['type'] == 'identicon':
+            gravatar_url += urllib.urlencode({'d': 'identicon', 's': str(size), 'forcedefault': 'y'})
+        else:
+            gravatar_url += urllib.urlencode({'d': 'mp', 's': str(size)})
+        resp = requests.get(gravatar_url, allow_redirects=False)
+        resp.raise_for_status()
+        if resp.status_code != 200:
+            raise requests.HTTPError('Unexpected status code: {}'.format(resp.status_code), response=resp)
+        return send_file('gravatar.png', BytesIO(resp.content), mimetype='image/png',
+                         conditional=True)
+
+
 class RHProfilePictureDisplay(RHUserBase):
     def _process(self):
-        if not self.user.has_picture:
-            raise NotFound
+        # if self.user.settings['current_avatar'] == SelectedProfilePicture.standard:
+        #     raise NotFound
         metadata = self.user.picture_metadata
         return send_file('user.png', BytesIO(self.user.picture), mimetype=metadata['content_type'],
                          conditional=True)
+
+
+class RHManageProfilePicture(RHUserBase):
+    def _process_POST(self):
+        f = request.files['picture']
+        try:
+            pic = Image.open(f)
+        except IOError:
+            raise UserValueError(_('You cannot upload this file as profile picture.'))
+        if pic.format.lower() not in {'jpeg', 'png', 'gif'}:
+            raise UserValueError(_('The file has an invalid format ({format}).').format(format=pic.format))
+        if pic.mode not in {'RGB', 'RGBA'}:
+            pic = pic.convert('RGB')
+        image_bytes = BytesIO()
+        pic = square(pic)
+        if pic.height > 256:
+            pic = pic.resize((256, 256), resample=Image.BICUBIC)
+        pic.save(image_bytes, 'PNG')
+        image_bytes.seek(0)
+        content = image_bytes.read()
+        self.user.picture = content
+        self.user.picture_metadata = {
+            'hash': crc32(content),
+            'size': len(content),
+            'filename': os.path.splitext(secure_filename(f.filename, 'user'))[0] + '.png',
+            'content_type': 'image/png'
+        }
+        flash(_('Profile picture uploaded'), 'success')
+        logger.info('Profile picture of user %s uploaded by %s', self.user, session.user)
+        return jsonify_data(content=get_picture_data(self.user))
+
+    def _process_DELETE(self):
+        self.user.picture = None
+        self.user.picture_metadata = None
+        flash(_('Profile picture deleted'), 'success')
+        logger.info('Profile picture of user %s deleted by %s', self.user, session.user)
+        return jsonify_data(content=None)
 
 
 class RHProfilePicture(RHUserBase):

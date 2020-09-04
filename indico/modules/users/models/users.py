@@ -59,6 +59,14 @@ class NameFormat(RichIntEnum):
     f_last_upper = 7
 
 
+class SelectedProfilePicture(RichIntEnum):
+    __titles__ = (_('Standard'), _('Identicon'), _('Gravatar'), _('Custom'))
+    standard = 0
+    identicon = 1
+    gravatar = 2
+    custom = 3
+
+
 class PersonMixin(object):
     """Add convenience properties and methods to person classes.
 

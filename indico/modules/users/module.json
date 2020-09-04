@@ -1,6 +1,7 @@
 {
     "name": "users",
     "partials": {
-        "dashboard": "./dashboard.jsx"
+        "dashboard": "./dashboard.jsx",
+        "profile_picture": "./ProfilePicture.jsx"
     }
 }

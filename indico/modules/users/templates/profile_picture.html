@@ -1,0 +1,24 @@
+{% extends 'users/base.html' %}
+
+{% block user_content %}
+    <div class="i-box-group vert">
+        <div class="i-box">
+            <div class="i-box-header">
+                <div class="i-box-title">
+                    {%- trans %}Profile picture{% endtrans -%}
+                </div>
+            </div>
+            <div class="i-box-content">
+                <div id="profile-picture-selection"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        setupPictureSelection(
+            {{ user.email | tojson }},
+            {{ current_selection | tojson }},
+            {{ (user.picture_metadata['hash'] if user.picture_metadata else none) | tojson }}
+        );
+    </script>
+{% endblock %}
