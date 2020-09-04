@@ -22,6 +22,48 @@ import {Translate, Param} from 'indico/react/i18n';
 
 import './ProfilePicture.module.scss';
 
+function ProfilePictureCard({active, image, text, email, children, onClick}) {
+  return (
+    <Card
+      color={active ? 'blue' : null}
+      onClick={onClick}
+      style={active ? {backgroundColor: '#f5f5f5'} : null}
+    >
+      <Card.Description>
+        {image ? (
+          <Image src={image} circular size="tiny" />
+        ) : (
+          <Icon name="question circle outline" size="huge" />
+        )}
+        {text}
+      </Card.Description>
+      {email && (
+        <Card.Content extra>
+          <Translate>
+            Based on <Param name="email" value={email} />
+          </Translate>
+        </Card.Content>
+      )}
+      {children && <Card.Content extra>{children}</Card.Content>}
+    </Card>
+  );
+}
+
+ProfilePictureCard.propTypes = {
+  active: PropTypes.bool.isRequired,
+  image: PropTypes.string,
+  text: PropTypes.string.isRequired,
+  email: PropTypes.string,
+  children: PropTypes.node,
+  onClick: PropTypes.func.isRequired,
+};
+
+ProfilePictureCard.defaultProps = {
+  image: null,
+  email: null,
+  children: null,
+};
+
 function ProfilePicture({email, current, pictureHash}) {
   const [previewFile, setPreviewFile] = useState(null);
   const [hasPreview, setHasPreview] = useState(pictureHash !== null);
@@ -82,97 +124,67 @@ function ProfilePicture({email, current, pictureHash}) {
         {fprops => (
           <div>
             <Form onSubmit={fprops.handleSubmit}>
+              <Field name="option" render={() => null} />
+              <Field name="file" render={() => null} />
               <Card.Group itemsPerRow={4} centered>
-                <Card
-                  color={fprops.values.option === 'standard' ? 'blue' : null}
+                <ProfilePictureCard
+                  active={fprops.values.option === 'standard'}
+                  image={gravatarURL({type: 'standard'})}
+                  text={Translate.string('System-assigned icon')}
                   onClick={() => fprops.form.mutators.setOption('standard')}
-                  style={fprops.values.option === 'standard' ? {backgroundColor: '#f5f5f5'} : null}
-                >
-                  <Card.Description>
-                    <Image src={gravatarURL({type: 'standard'})} circular size="tiny" />
-                    <Translate> System assigned profile picture</Translate>
-                  </Card.Description>
-                </Card>
-                <Card
-                  color={fprops.values.option === 'identicon' ? 'blue' : null}
+                />
+                <ProfilePictureCard
+                  active={fprops.values.option === 'identicon'}
+                  image={gravatarURL({type: 'identicon'})}
+                  text={Translate.string('Identicon')}
                   onClick={() => fprops.form.mutators.setOption('identicon')}
-                  style={fprops.values.option === 'identicon' ? {backgroundColor: '#f5f5f5'} : null}
-                >
-                  <Card.Description>
-                    <Image src={gravatarURL({type: 'identicon'})} circular size="tiny" />
-                    Identicon
-                  </Card.Description>
-                  <Card.Content extra>
-                    <Translate>
-                      Based on <Param name="email" value={email} />
-                    </Translate>
-                  </Card.Content>
-                </Card>
-                <Card
-                  color={fprops.values.option === 'gravatar' ? 'blue' : null}
+                  email={email}
+                />
+                <ProfilePictureCard
+                  active={fprops.values.option === 'gravatar'}
+                  image={gravatarURL({type: 'gravatar'})}
+                  text={Translate.string('Gravatar')}
                   onClick={() => fprops.form.mutators.setOption('gravatar')}
-                  style={fprops.values.option === 'gravatar' ? {backgroundColor: '#f5f5f5'} : null}
-                >
-                  <Card.Description>
-                    <Image src={gravatarURL({type: 'gravatar'})} circular size="tiny" />
-                    Gravatar
-                  </Card.Description>
-                  <Card.Content extra>
-                    <Translate>
-                      Based on <Param name="email" value={email} />
-                    </Translate>
-                  </Card.Content>
-                </Card>
-                <Card
-                  color={fprops.values.option === 'custom' ? 'blue' : null}
+                  email={email}
+                />
+                <ProfilePictureCard
+                  active={fprops.values.option === 'custom'}
+                  image={hasPreview ? getPreview() : null}
+                  text={Translate.string('Custom picture')}
                   onClick={() => fprops.form.mutators.setOption('custom')}
-                  style={fprops.values.option === 'custom' ? {backgroundColor: '#f5f5f5'} : null}
                 >
-                  <Card.Description>
-                    {hasPreview ? (
-                      <Image src={getPreview()} circular size="tiny" />
-                    ) : (
-                      <Icon name="question circle outline" size="huge" />
+                  <Dropzone
+                    ref={dropzoneRef}
+                    onDrop={acceptedFiles => {
+                      onDrop(acceptedFiles);
+                      fprops.form.mutators.setFile(acceptedFiles[0]);
+                      fprops.form.mutators.setOption('custom');
+                    }}
+                    multiple={false}
+                    noClick
+                    noKeyboard
+                    accept="image/*"
+                  >
+                    {({getRootProps, getInputProps}) => (
+                      <section>
+                        <div {...getRootProps()}>
+                          <input {...getInputProps()} />
+                          <Button
+                            disabled={loading}
+                            type="button"
+                            icon="upload"
+                            content={Translate.string('Upload')}
+                            size="small"
+                            onClick={e => {
+                              e.stopPropagation();
+                              openDialog();
+                            }}
+                          />
+                        </div>
+                      </section>
                     )}
-
-                    <Translate>Custom picture</Translate>
-                  </Card.Description>
-                  <Card.Content extra>
-                    <Dropzone
-                      ref={dropzoneRef}
-                      onDrop={acceptedFiles => {
-                        onDrop(acceptedFiles);
-                        fprops.form.mutators.setFile(acceptedFiles[0]);
-                        fprops.form.mutators.setOption('custom');
-                      }}
-                      multiple={false}
-                      noClick
-                      noKeyboard
-                      accept="image/*"
-                    >
-                      {({getRootProps, getInputProps}) => (
-                        <section>
-                          <div {...getRootProps()}>
-                            <input {...getInputProps()} />
-                            <Button
-                              disabled={loading}
-                              type="button"
-                              icon="upload"
-                              content={Translate.string('Upload')}
-                              size="small"
-                              onClick={e => {
-                                e.stopPropagation();
-                                openDialog();
-                              }}
-                            />
-                          </div>
-                        </section>
-                      )}
-                    </Dropzone>
-                    <Field name="file" render={() => null} />
-                    <Field name="option" render={() => null} />
-                  </Card.Content>
-                </Card>
+                  </Dropzone>
+                </ProfilePictureCard>
               </Card.Group>
               <FinalSubmitButton
                 label={Translate.string('Save changes')}
