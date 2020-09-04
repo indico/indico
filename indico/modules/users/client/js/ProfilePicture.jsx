@@ -12,7 +12,7 @@ import gravatarURL from 'indico-url:users.profile_picture_gravatar';
 import React, {useState, useCallback, useRef} from 'react';
 import ReactDOM from 'react-dom';
 import PropTypes from 'prop-types';
-import {Form as FinalForm, Field} from 'react-final-form';
+import {Form as FinalForm, Field, useField} from 'react-final-form';
 import Dropzone from 'react-dropzone';
 import {Button, Form, Icon, Image, Card} from 'semantic-ui-react';
 import {FinalSubmitButton} from 'indico/react/forms';
@@ -22,11 +22,16 @@ import {Translate, Param} from 'indico/react/i18n';
 
 import './ProfilePicture.module.scss';
 
-function ProfilePictureCard({active, image, text, email, children, onClick}) {
+function ProfilePictureCard({image, text, email, children, source}) {
+  const {
+    input: {onChange, value},
+  } = useField('option');
+
+  const active = value === source;
   return (
     <Card
       color={active ? 'blue' : null}
-      onClick={onClick}
+      onClick={() => onChange(source)}
       style={active ? {backgroundColor: '#f5f5f5'} : null}
     >
       <Card.Description>
@@ -50,12 +55,11 @@ function ProfilePictureCard({active, image, text, email, children, onClick}) {
 }
 
 ProfilePictureCard.propTypes = {
-  active: PropTypes.bool.isRequired,
   image: PropTypes.string,
   text: PropTypes.string.isRequired,
   email: PropTypes.string,
   children: PropTypes.node,
-  onClick: PropTypes.func.isRequired,
+  source: PropTypes.oneOf(['standard', 'identicon', 'gravatar', 'custom']).isRequired,
 };
 
 ProfilePictureCard.defaultProps = {
@@ -111,7 +115,7 @@ function ProfilePicture({email, current, pictureHash}) {
       <FinalForm
         onSubmit={submitPicture}
         initialValues={{file: null, option: current}}
-        subscription={{values: true}}
+        subscription={{}}
         mutators={{
           setFile: ([file], state, utils) => {
             utils.changeValue(state, 'file', () => file);
@@ -124,34 +128,29 @@ function ProfilePicture({email, current, pictureHash}) {
         {fprops => (
           <div>
             <Form onSubmit={fprops.handleSubmit}>
-              <Field name="option" render={() => null} />
               <Field name="file" render={() => null} />
               <Card.Group itemsPerRow={4} centered>
                 <ProfilePictureCard
-                  active={fprops.values.option === 'standard'}
                   image={gravatarURL({type: 'standard'})}
                   text={Translate.string('System-assigned icon')}
-                  onClick={() => fprops.form.mutators.setOption('standard')}
+                  source="standard"
                 />
                 <ProfilePictureCard
-                  active={fprops.values.option === 'identicon'}
                   image={gravatarURL({type: 'identicon'})}
                   text={Translate.string('Identicon')}
-                  onClick={() => fprops.form.mutators.setOption('identicon')}
+                  source="identicon"
                   email={email}
                 />
                 <ProfilePictureCard
-                  active={fprops.values.option === 'gravatar'}
                   image={gravatarURL({type: 'gravatar'})}
                   text={Translate.string('Gravatar')}
-                  onClick={() => fprops.form.mutators.setOption('gravatar')}
+                  source="gravatar"
                   email={email}
                 />
                 <ProfilePictureCard
-                  active={fprops.values.option === 'custom'}
                   image={hasPreview ? getPreview() : null}
                   text={Translate.string('Custom picture')}
-                  onClick={() => fprops.form.mutators.setOption('custom')}
+                  source="custom"
                 >
                   <Dropzone
                     ref={dropzoneRef}
