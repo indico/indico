@@ -104,9 +104,6 @@ is available from github (slightly outdated and we should eventually move it to 
 It describes the interface between translating and programming and some conventions to be followed.
 Everyone involved in translating or programming Indico should have read it before starting the work.
 
-CAVEAT: The codebase contains legacy code, which may not follow all rules.
-The next paragraph applies to this as well.
-
 Whenever translaters spot difficult code (forgotten pluralization, typos), they
 should do their best to avoid double (or rather: multiple) work to their fellow translators.
 What is a problem for their translation, usually will be a problem for all translations.
@@ -114,15 +111,36 @@ Don't hesitate to open an issue or pull request on `GitHub <https://github.com/i
 Repair first, then translate (and be aware that after repair, the translation has to be made
 again for all languages).
 
-Organisation of PO files
-========================
+.. note::
+
+    The codebase also contains legacy code, which may not follow all rules.
+
+File Organisation
+=================
 
 The relationship between
 
-- transifex resources names
-- PO file names and
+- transifex resources names (core.js, core.py, core.react.js)
+- PO file names (messages-js.po, messages.po, messages-react.po) and
 - the actual place, where the strings are found
 
-is not always obvious.
-A `thread has started here <https://talk.getindico.io/t/relationship-between-resources-and-po-files-in-transifex/1890>`_.
-It contains some first insights and results of the discussion should be migrated here.
+is not always obvious. Starting with the resource names, the files ending in
+
+- ``.py`` refer to translations used with python and jinja templates,
+- ``.js`` refer to translations used with generic or legacy javascript,
+- ``react.js`` refer to translations used with the new react-based javascript.
+
+These contain a relationship to PO files, as defined in the following example extracted
+from ``src/.tx/config``.
+
+.. code-block:: none
+
+    [indico.<transifex resource slug>]
+    file_filter = indico/translations/<lang>/LC_MESSAGES/<PO file name>.po
+    source_file = indico/translations/<source file name>.pot
+    source_lang = en
+    type = PO
+
+.. note::
+
+    The transifex resource slug is a name-like alias that identifies a particular file.
