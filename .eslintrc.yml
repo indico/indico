@@ -55,6 +55,9 @@ rules:
     # where it should NOT remove the `{', '}` since it's required for proper spacing
     - error
     - children: ignore
+  no-restricted-globals:
+    - error
+    - event
 
 globals:
   Indico: false

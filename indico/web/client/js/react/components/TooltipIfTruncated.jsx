@@ -20,7 +20,7 @@ import PropTypes from 'prop-types';
 export default function TooltipIfTruncated({children, useEventTarget, tooltip}) {
   const ref = useRef();
 
-  const handleMouseEnter = () => {
+  const handleMouseEnter = event => {
     const element = useEventTarget ? event.target : ref.current;
     const overflows =
       element.offsetWidth < element.scrollWidth || element.offsetHeight < element.scrollHeight;
