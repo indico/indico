@@ -17,6 +17,7 @@ import {useDropzone} from 'react-dropzone';
 import {Button, Form, Icon, Image, Card} from 'semantic-ui-react';
 import createDecorator from 'final-form-calculate';
 import {FinalSubmitButton} from 'indico/react/forms';
+import {TooltipIfTruncated} from 'indico/react/components';
 import {indicoAxios, handleAxiosError} from 'indico/utils/axios';
 
 import {Translate, Param} from 'indico/react/i18n';
@@ -44,11 +45,13 @@ function ProfilePictureCard({image, text, email, children, source}) {
         {text}
       </Card.Description>
       {email && (
-        <Card.Content extra>
-          <Translate>
-            Based on <Param name="email" value={email} />
-          </Translate>
-        </Card.Content>
+        <TooltipIfTruncated useEventTarget>
+          <Card.Content extra>
+            <Translate>
+              Based on <Param name="email" value={email} />
+            </Translate>
+          </Card.Content>
+        </TooltipIfTruncated>
       )}
       {children && <Card.Content extra>{children}</Card.Content>}
     </Card>
