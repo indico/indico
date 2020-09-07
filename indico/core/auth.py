@@ -78,8 +78,12 @@ class IndicoMultipass(Multipass):
             logger.warning('Invalid credentials (ip=%s, provider=%s): %s',
                            request.remote_addr, exc.provider.name if exc.provider else None, exc)
         else:
-            logger.error('Authentication via %s failed: %s (%r)', exc.provider.name if exc.provider else None, exc,
-                         exc.details)
+            exc_str = str(exc)
+            fn = logger.error
+            if exc_str.startswith('mismatching_state:'):
+                fn = logger.debug
+            fn('Authentication via %s failed: %s (%r)', exc.provider.name if exc.provider else None, exc_str,
+               exc.details)
         return super(IndicoMultipass, self).handle_auth_error(exc, redirect_to_login=redirect_to_login)
 
 
