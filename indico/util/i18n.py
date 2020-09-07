@@ -22,6 +22,7 @@ from flask_pluginengine import current_plugin
 from speaklater import is_lazy_string, make_lazy_string
 from werkzeug.utils import cached_property
 
+from indico.core.config import config
 from indico.util.caching import memoize_request
 
 
@@ -259,12 +260,15 @@ def get_current_locale():
 
 def get_all_locales():
     """
-    List all available locales/names e.g. {'pt_PT': 'Portuguese'}
+    List all available locales/names e.g. ``{'pt_PT': ('Portuguese', 'Portugal)}``
     """
     if babel.app is None:
         return {}
     else:
-        return {str(t): (t.language_name.title(), t.territory_name) for t in babel.list_translations()}
+        missing = object()
+        return {str(t): config.CUSTOM_LANGUAGES.get(str(t), (t.language_name.title(), t.territory_name))
+                for t in babel.list_translations()
+                if config.CUSTOM_LANGUAGES.get(str(t), missing) is not None}
 
 
 def set_session_lang(lang):

@@ -121,6 +121,8 @@ Improvements
 - Allow registrants to check details for non-active registrations and prevent
   them from registering twice with the same registration form (:issue:`4594`,
   :pr:`4595`, thanks :user:`omegak`)
+- Add a new :data:`CUSTOM_LANGUAGES` setting to ``indico.conf`` to override the
+  name/territory of a language or disable it altogether (:pr:`4620`)
 
 Bugfixes
 ^^^^^^^^

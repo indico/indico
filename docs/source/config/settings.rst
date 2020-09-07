@@ -38,8 +38,8 @@ Authentication
 
     This setting controls whether local Indico groups are available.
     If no centralized authentication infrastructure that supports groups
-    (e.g. LDAP) is used, local groups are the only way to define groups in 
-    Indico, but if you do have central groups it may be useful to disable 
+    (e.g. LDAP) is used, local groups are the only way to define groups in
+    Indico, but if you do have central groups it may be useful to disable
     local ones to have all groups in one central place.
 
     Default: ``True``
@@ -305,6 +305,30 @@ Customization
     .. code-block:: python
 
         CUSTOM_COUNTRIES = {'KP': 'North Korea'}
+
+    Default: ``{}``
+
+.. data:: CUSTOM_LANGUAGES
+
+    A dict with language/territory name overrides.  This can be useful if the
+    official territory name that goes along with a language does not match what
+    your Indico instance's target audience expects for a country, e.g. due to
+    political situations.
+
+    For example, to replace "Chinese (Simplified)" with "Chinese (China)",
+    you would use:
+
+    .. code-block:: python
+
+        CUSTOM_LANGUAGES = {'zh_Hans_CN': ('Chinese', 'Simplified')}
+
+    Note that the language and territory name should be written in that
+    particular language to be consistent with the defaults. So in the example
+    above, you would write "Chinese" and "Simplified" in Simplified Chinese.
+
+    Setting the territory (second element in the tuple) to ``None`` will hide
+    it and only show the language name itself.  Setting the dict value to ``None``
+    will effectively hide the language altogether.
 
     Default: ``{}``
 
