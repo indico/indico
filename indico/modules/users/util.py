@@ -7,10 +7,14 @@
 
 from __future__ import unicode_literals
 
+import hashlib
 from collections import OrderedDict
+from io import BytesIO
 from operator import itemgetter
 
+import requests
 from flask import session
+from PIL import Image
 from sqlalchemy.orm import contains_eager, joinedload, load_only, undefer
 from sqlalchemy.sql.expression import nullslast
 
@@ -29,6 +33,7 @@ from indico.modules.users.models.emails import UserEmail
 from indico.modules.users.models.favorites import favorite_user_table
 from indico.modules.users.models.suggestions import SuggestedCategory
 from indico.util.event import truncate_path
+from indico.util.i18n import _
 from indico.util.string import crc32, remove_accents
 
 
@@ -381,3 +386,21 @@ def get_picture_data(user):
         'size': user.picture_metadata['size'],
         'content_type': user.picture_metadata['content_type']
     }
+
+
+def get_gravatar_for_user(user, identicon, size=256):
+    gravatar_url = 'https://www.gravatar.com/avatar/{}'.format(hashlib.md5(user.email.lower()).hexdigest())
+    if identicon:
+        params = {'d': 'identicon', 's': unicode(size), 'forcedefault': 'y'}
+    else:
+        params = {'d': 'mp', 's': unicode(size)}
+    resp = requests.get(gravatar_url, params=params)
+    if resp.status_code != 200:
+        raise RuntimeError(_('Could not retrieve gravatar.'))
+    pic = Image.open(BytesIO(resp.content))
+    if pic.mode not in ('RGB', 'RGBA'):
+        pic = pic.convert('RGB')
+    image_bytes = BytesIO()
+    pic.save(image_bytes, 'PNG')
+    image_bytes.seek(0)
+    return image_bytes.read()

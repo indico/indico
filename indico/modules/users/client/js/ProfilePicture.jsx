@@ -5,9 +5,9 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-import uploadURL from 'indico-url:users.upload_profile_picture';
+import saveURL from 'indico-url:users.save_profile_picture';
 import pictureURL from 'indico-url:users.profile_picture_display';
-import gravatarURL from 'indico-url:users.profile_picture_gravatar';
+import gravatarURL from 'indico-url:users.profile_picture_preview';
 
 import React, {useState, useCallback} from 'react';
 import ReactDOM from 'react-dom';
@@ -40,7 +40,7 @@ function ProfilePictureCard({image, text, email, children, source}) {
         {image ? (
           <Image src={image} circular size="tiny" />
         ) : (
-          <Icon name="question circle outline" size="huge" />
+          <Icon name="question circle outline" size="huge" styleName="placeholder" />
         )}
         {text}
       </Card.Description>
@@ -128,12 +128,15 @@ function ProfilePicture({email, current}) {
 
   const submitPicture = async formData => {
     const bodyFormData = new FormData();
-    bodyFormData.append('picture', formData.file);
+    if (formData.source === 'custom') {
+      bodyFormData.append('picture', formData.file);
+    }
+    bodyFormData.append('source', formData.source);
     const config = {
       headers: {'content-type': 'multipart/form-data'},
     };
     try {
-      await indicoAxios.post(uploadURL({type: formData.source}), bodyFormData, config);
+      await indicoAxios.post(saveURL(), bodyFormData, config);
     } catch (e) {
       handleAxiosError(e);
       return;

@@ -5,6 +5,8 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
+@import 'base/palette';
+
 .profile-picture-selection {
   margin: 15px 10px;
 
@@ -29,11 +31,11 @@
       text-overflow: ellipsis;
     }
 
-    :global(i.icon.question) {
+    .placeholder {
       font-size: 80px;
       margin: 15px auto;
       display: table;
-      color: #cacbcd;
+      color: $pastel-gray;
     }
   }
 

@@ -7,18 +7,16 @@
 
 from __future__ import unicode_literals
 
-import hashlib
 import os
-import urllib
 from collections import namedtuple
 from io import BytesIO
 from operator import attrgetter, itemgetter
 
-import requests
 from dateutil.relativedelta import relativedelta
 from flask import flash, jsonify, redirect, render_template, request, session
 from markupsafe import Markup, escape
 from marshmallow import fields
+from marshmallow_enum import EnumField
 from PIL import Image
 from sqlalchemy.orm import joinedload, load_only, subqueryload, undefer
 from sqlalchemy.orm.exc import StaleDataError
@@ -42,13 +40,13 @@ from indico.modules.events import Event
 from indico.modules.events.util import serialize_event_for_ical
 from indico.modules.users import User, logger, user_management_settings
 from indico.modules.users.forms import (AdminAccountRegistrationForm, AdminsForm, AdminUserSettingsForm, MergeForm,
-                                        SearchForm, UserDetailsForm, UserEmailsForm, UserPictureForm,
-                                        UserPreferencesForm)
+                                        SearchForm, UserDetailsForm, UserEmailsForm, UserPreferencesForm)
 from indico.modules.users.models.emails import UserEmail
-from indico.modules.users.models.users import SelectedProfilePicture
+from indico.modules.users.models.users import ProfilePictureSource
 from indico.modules.users.operations import create_user
-from indico.modules.users.util import (get_linked_events, get_picture_data, get_related_categories,
-                                       get_suggested_categories, merge_users, search_users, serialize_user)
+from indico.modules.users.util import (get_gravatar_for_user, get_linked_events, get_picture_data,
+                                       get_related_categories, get_suggested_categories, merge_users, search_users,
+                                       serialize_user)
 from indico.modules.users.views import WPUser, WPUserDashboard, WPUserProfilePic, WPUsersAdmin
 from indico.util.date_time import now_utc
 from indico.util.event import truncate_path
@@ -189,77 +187,67 @@ class RHPersonalData(RHUserBase):
     def _process(self):
         form = UserDetailsForm(obj=FormDefaults(self.user, skip_attrs={'title'}, title=self.user._title),
                                synced_fields=self.user.synced_fields, synced_values=self.user.synced_values)
-        pic_form = UserPictureForm()
         if form.validate_on_submit():
             self.user.synced_fields = form.synced_fields
             form.populate_obj(self.user, skip=self.user.synced_fields)
             self.user.synchronize_data(refresh=True)
             flash(_('Your personal data was successfully updated.'), 'success')
             return redirect(url_for('.user_profile'))
-        elif self.user.has_picture:
-            pic_form.picture.data = self.user
-        return WPUser.render_template('personal_data.html', 'personal_data', user=self.user, form=form,
-                                      pic_form=pic_form)
+        return WPUser.render_template('personal_data.html', 'personal_data', user=self.user, form=form)
 
 
 class RHProfilePicturePage(RHUserBase):
-    allow_system_user = True
-
     def _process(self):
         return WPUserProfilePic.render_template('profile_picture.html', 'profile_picture',
                                                 user=self.user,
                                                 current_selection=self.user.picture_source.title)
 
 
-class RHProfilePictureGravatar(RHUserBase):
+class RHProfilePicturePreview(RHUserBase):
     def _process(self):
         if request.view_args['type'] == 'standard':
-            first_name = self.user.first_name[0].upper() if self.user.first_name else ""
+            first_name = self.user.first_name[0].upper() if self.user.first_name else ''
             return render_template('users/avatar.svg', bg_color=self.user.avatar_bg_color,
                                    text=first_name), 200, {'Content-Type': 'image/svg+xml'}
-        email = session.user.email
-        size = 80
-        gravatar_url = "https://www.gravatar.com/avatar/" + hashlib.md5(email.lower()).hexdigest() + "?"
-        if request.view_args['type'] == 'identicon':
-            gravatar_url += urllib.urlencode({'d': 'identicon', 's': str(size), 'forcedefault': 'y'})
-        else:
-            gravatar_url += urllib.urlencode({'d': 'mp', 's': str(size)})
-        resp = requests.get(gravatar_url, allow_redirects=False)
-        resp.raise_for_status()
-        if resp.status_code != 200:
-            raise requests.HTTPError('Unexpected status code: {}'.format(resp.status_code), response=resp)
-        return send_file('gravatar.png', BytesIO(resp.content), mimetype='image/png',
+        gravatar = get_gravatar_for_user(self.user, request.view_args['type'] == 'identicon', 80)
+        return send_file('gravatar.png', BytesIO(gravatar), mimetype='image/png',
                          conditional=True)
 
 
 class RHProfilePictureDisplay(RHUserBase):
+    allow_system_user = True
+
     def _process(self):
-        # if self.user.settings['current_avatar'] == SelectedProfilePicture.standard:
-        #     raise NotFound
+        if self.user.picture_source == ProfilePictureSource.standard:
+            first_name = self.user.first_name[0].upper() if self.user.first_name else ''
+            return render_template('users/avatar.svg', bg_color=self.user.avatar_bg_color,
+                                   text=first_name), 200, {'Content-Type': 'image/svg+xml'}
         metadata = self.user.picture_metadata
         return send_file('user.png', BytesIO(self.user.picture), mimetype=metadata['content_type'],
                          conditional=True)
 
 
-class RHProfilePicture(RHUserBase):
-    def _process(self):
-        self.user.picture_source = SelectedProfilePicture[request.view_args['type']]
-        if request.view_args['type'] == 'standard':
+class RHSaveProfilePicture(RHUserBase):
+    @use_kwargs({
+        'source': EnumField(ProfilePictureSource)
+    })
+    def _process(self, source):
+        self.user.picture_source = source
+        if source == ProfilePictureSource.standard:
             self.user.picture = None
             self.user.picture_metadata = None
-            logger.info('Profile picture of user %s changed to standard by %s', self.user, session.user)
+            logger.info('Profile picture of user %s removed by %s', self.user, session.user)
             return jsonify_data(content=None)
 
-        if request.view_args['type'] == 'custom':
+        if source == ProfilePictureSource.custom:
             f = request.files['picture']
-            print(type(f))
             try:
                 pic = Image.open(f)
             except IOError:
                 raise UserValueError(_('You cannot upload this file as profile picture.'))
             if pic.format.lower() not in {'jpeg', 'png', 'gif'}:
                 raise UserValueError(_('The file has an invalid format ({format}).').format(format=pic.format))
-            if pic.mode not in {'RGB', 'RGBA'}:
+            if pic.mode not in ('RGB', 'RGBA'):
                 pic = pic.convert('RGB')
             pic = square(pic)
             if pic.height > 256:
@@ -270,18 +258,8 @@ class RHProfilePicture(RHUserBase):
             content = image_bytes.read()
             filename = f.filename
         else:
-            gravatar_url = ("https://www.gravatar.com/avatar/"
-                            + hashlib.md5(session.user.email.lower()).hexdigest() + "?")
-            if request.view_args['type'] == 'identicon':
-                gravatar_url += urllib.urlencode({'d': 'identicon', 's': '256', 'forcedefault': 'y'})
-            else:
-                gravatar_url += urllib.urlencode({'d': 'mp', 's': '256'})
-            resp = requests.get(gravatar_url, allow_redirects=False)
-            resp.raise_for_status()
-            if resp.status_code != 200:
-                raise requests.HTTPError('Unexpected status code: {}'.format(resp.status_code), response=resp)
-            content = resp.content
-            filename = request.view_args['type']
+            content = get_gravatar_for_user(self.user, source == ProfilePictureSource.identicon, 256)
+            filename = source.name
 
         self.user.picture = content
         self.user.picture_metadata = {
@@ -291,7 +269,7 @@ class RHProfilePicture(RHUserBase):
             'content_type': 'image/png'
         }
         flash(_('Profile picture changed'), 'success')
-        logger.info('Profile picture of user %s uploaded by %s', self.user, session.user)
+        logger.info('Profile picture of user %s updated by %s', self.user, session.user)
         return jsonify_data(content=get_picture_data(self.user))
 
 

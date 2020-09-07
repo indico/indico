@@ -90,3 +90,8 @@ def _registered(user, identity, from_moderation, **kwargs):
         return
     tpl = get_template_module('users/emails/profile_registered_admins.txt', user=user)
     send_email(make_email(get_admin_emails(), template=tpl))
+
+
+@signals.import_tasks.connect
+def _import_tasks(sender, **kwargs):
+    import indico.modules.users.tasks  # noqa: F401

@@ -59,7 +59,7 @@ class NameFormat(RichIntEnum):
     f_last_upper = 7
 
 
-class SelectedProfilePicture(RichIntEnum):
+class ProfilePictureSource(RichIntEnum):
     __titles__ = (_('Standard'), _('Identicon'), _('Gravatar'), _('Custom'))
     standard = 0
     identicon = 1
@@ -276,9 +276,9 @@ class User(PersonMixin, db.Model):
     )
     #: user profile picture source
     picture_source = db.Column(
-        PyIntEnum(SelectedProfilePicture),
+        PyIntEnum(ProfilePictureSource),
         nullable=False,
-        default=SelectedProfilePicture.standard,
+        default=ProfilePictureSource.standard,
     )
 
     _affiliation = db.relationship(
