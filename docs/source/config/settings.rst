@@ -315,8 +315,8 @@ Customization
     your Indico instance's target audience expects for a country, e.g. due to
     political situations.
 
-    For example, to use "Chinese (Simplified)" instead of "Chinese (China)",
-    you would use this
+    For example, to replace "Chinese (Simplified)" with "Chinese (China)",
+    you would use:
 
     .. code-block:: python
 
