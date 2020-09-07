@@ -37,20 +37,6 @@
                 {% endif %}
             </div>
             <div class="i-box-content">
-                {# Profile picture form #}
-                {{ form_header(pic_form, action=url_for('.upload_profile_picture', user), classes='pic-form') }}
-                <div class="flashed-messages"></div>
-                {{ form_rows(pic_form) }}
-                {% call form_footer(pic_form) %}
-                    <button class="ui primary button" data-disabled-until-change>
-                        {% trans %}Upload{% endtrans %}
-                    </button>
-                    <button class="ui button negative js-remove-button danger{% if not pic_form.picture._value() %} hidden{% endif %}"
-                            data-href="{{ url_for('.delete_profile_picture', user) }}" data-method="DELETE">
-                        {% trans %}Delete{% endtrans %}
-                    </button>
-                {% endcall %}
-
                 {# Personal details form #}
                 {{ form_header(form) }}
                 {{ form_rows(form) }}
@@ -63,29 +49,4 @@
             </div>
         </div>
     </div>
-
-    <script>
-        $('.pic-form').on('indico:fieldsSaved', function(e, response) {
-            const hidden = !response.content;
-            const $this = $(this);
-            $this.find('.js-remove-button').toggleClass('hidden', hidden).prop('disabled', hidden);
-        }).on('click', '.js-remove-button', function(e) {
-            const $this = $(this);
-            const $form = $this.closest('form');
-            const dropzone = $form.get(0).dropzone;
-            $this.prop('disabled', true);
-            e.preventDefault();
-            $.ajax({
-                url: $this.data('href'),
-                method: $this.data('method'),
-                complete: IndicoUI.Dialogs.Util.progress(),
-                error: handleAjaxError,
-                success: function(data) {
-                    handleFlashes(data, true, $form.find('.flashed-messages'));
-                    dropzone.removeAllFiles();
-                    $form.trigger('indico:fieldsSaved', data);
-                }
-            });
-        });
-    </script>
 {% endblock %}

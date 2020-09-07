@@ -119,9 +119,9 @@ const formDecorator = createDecorator({
   updates: value => (value === null ? {} : {source: 'custom'}),
 });
 
-function ProfilePicture({email, current, pictureHash}) {
+function ProfilePicture({email, current}) {
   const [previewFile, setPreviewFile] = useState(null);
-  const [hasPreview, setHasPreview] = useState(pictureHash !== null);
+  const [hasPreview, setHasPreview] = useState(current === 'custom');
 
   const submitPicture = async formData => {
     const bodyFormData = new FormData();
@@ -135,8 +135,9 @@ function ProfilePicture({email, current, pictureHash}) {
       handleAxiosError(e);
       return;
     }
-    setPreviewFile(null);
-    setHasPreview(true);
+    location.reload();
+    // never finish submitting to avoid fields being re-enabled
+    await new Promise(() => {});
   };
 
   const getPreview = () => {
@@ -208,11 +209,6 @@ function ProfilePicture({email, current, pictureHash}) {
 ProfilePicture.propTypes = {
   email: PropTypes.string.isRequired,
   current: PropTypes.string.isRequired,
-  pictureHash: PropTypes.number,
-};
-
-ProfilePicture.defaultProps = {
-  pictureHash: null,
 };
 
 window.setupPictureSelection = function setupPictureSelection(email, current, pictureHash) {

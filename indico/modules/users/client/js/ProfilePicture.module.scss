@@ -19,6 +19,9 @@
 
     :global(.ui.image) {
       margin: 15px auto;
+      height: 80px;
+      width: 80px;
+      object-fit: cover;
     }
 
     :global(.extra) {

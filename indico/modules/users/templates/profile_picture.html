@@ -17,8 +17,7 @@
     <script>
         setupPictureSelection(
             {{ user.email | tojson }},
-            {{ current_selection | tojson }},
-            {{ (user.picture_metadata['hash'] if user.picture_metadata else none) | tojson }}
+            {{ current_selection | tojson }}
         );
     </script>
 {% endblock %}
