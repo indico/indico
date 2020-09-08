@@ -546,7 +546,8 @@ class User(PersonMixin, db.Model):
 
     @property
     def picture_url(self):
-        return url_for('users.profile_picture_display', self, slug=self.picture_metadata['hash'])
+        slug = self.picture_metadata['hash'] if self.picture_metadata else 'default'
+        return url_for('users.profile_picture_display', self, slug=slug)
 
     def __contains__(self, user):
         """Convenience method for `user in user_or_group`."""
