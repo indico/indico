@@ -8,6 +8,7 @@
 from __future__ import unicode_literals
 
 import mimetypes
+from uuid import UUID
 
 from flask import request
 from marshmallow import fields
@@ -17,6 +18,7 @@ from indico.core.db import db
 from indico.modules.files import logger
 from indico.modules.files.models.files import File
 from indico.modules.files.schemas import FileSchema
+from indico.util.signing import secure_serializer
 from indico.web.args import use_kwargs
 from indico.web.rh import RHProtected
 
@@ -88,3 +90,15 @@ class RHDeleteFile(RHFileBase):
 class RHFileInfo(RHFileBase):
     def _process(self):
         return FileSchema().jsonify(self.file)
+
+
+class RHFileDownload(RHFileBase):
+    """Download a file using a unique token"""
+
+    def _check_access(self):
+        uuid = secure_serializer.loads(request.args['token'], salt='file-download', max_age=86400)
+        if UUID(uuid) != self.file.uuid:
+            raise Forbidden
+
+    def _process(self):
+        return self.file.send()
