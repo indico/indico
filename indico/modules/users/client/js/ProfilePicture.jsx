@@ -121,9 +121,11 @@ const formDecorator = createDecorator({
   updates: value => (value === null ? {} : {source: 'custom'}),
 });
 
-function ProfilePicture({email, source}) {
+function ProfilePicture({userId, email, source}) {
   const [previewFile, setPreviewFile] = useState(null);
   const [hasPreview, setHasPreview] = useState(source === 'custom');
+
+  const userIdArgs = userId !== null ? {user_id: userId} : {};
 
   const submitPicture = async formData => {
     const bodyFormData = new FormData();
@@ -135,7 +137,7 @@ function ProfilePicture({email, source}) {
       headers: {'content-type': 'multipart/form-data'},
     };
     try {
-      await indicoAxios.post(saveURL(), bodyFormData, config);
+      await indicoAxios.post(saveURL(userIdArgs), bodyFormData, config);
     } catch (e) {
       handleAxiosError(e);
       return;
@@ -146,7 +148,9 @@ function ProfilePicture({email, source}) {
   };
 
   const getPreview = () => {
-    return previewFile ? URL.createObjectURL(previewFile) : previewURL({source: 'custom'});
+    return previewFile
+      ? URL.createObjectURL(previewFile)
+      : previewURL({...userIdArgs, source: 'custom'});
   };
 
   const handleFileSelected = useCallback(file => {
@@ -175,18 +179,18 @@ function ProfilePicture({email, source}) {
             <Form onSubmit={fprops.handleSubmit}>
               <Card.Group itemsPerRow={4} centered>
                 <ProfilePictureCard
-                  image={previewURL({source: 'standard'})}
+                  image={previewURL({...userIdArgs, source: 'standard'})}
                   text={Translate.string('System-assigned icon')}
                   source="standard"
                 />
                 <ProfilePictureCard
-                  image={previewURL({source: 'identicon'})}
+                  image={previewURL({...userIdArgs, source: 'identicon'})}
                   text={Translate.string('Identicon')}
                   source="identicon"
                   email={email}
                 />
                 <ProfilePictureCard
-                  image={previewURL({source: 'gravatar'})}
+                  image={previewURL({...userIdArgs, source: 'gravatar'})}
                   text={Translate.string('Gravatar')}
                   source="gravatar"
                   email={email}
@@ -212,14 +216,19 @@ function ProfilePicture({email, source}) {
 }
 
 ProfilePicture.propTypes = {
+  userId: PropTypes.number,
   email: PropTypes.string.isRequired,
   source: PropTypes.string.isRequired,
 };
 
-window.setupPictureSelection = function setupPictureSelection(email, source) {
+ProfilePicture.defaultProps = {
+  userId: null,
+};
+
+window.setupPictureSelection = function setupPictureSelection(userId, email, source) {
   document.addEventListener('DOMContentLoaded', () => {
     ReactDOM.render(
-      <ProfilePicture email={email} source={source} />,
+      <ProfilePicture userId={userId} email={email} source={source} />,
       document.querySelector('#profile-picture-selection')
     );
   });

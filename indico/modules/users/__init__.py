@@ -62,7 +62,7 @@ def _extend_admin_menu(sender, **kwargs):
 def _sidemenu_items(sender, user, **kwargs):
     yield SideMenuItem('dashboard', _('Dashboard'), url_for('users.user_dashboard'), 100, disabled=user.is_system)
     yield SideMenuItem('personal_data', _('Personal data'), url_for('users.user_profile'), 90)
-    yield SideMenuItem('profile_picture', _('Profile picture'), url_for('users.profile_picture_page'), 80,
+    yield SideMenuItem('profile_picture', _('Profile picture'), url_for('users.user_profile_picture_page'), 80,
                        disabled=user.is_system)
     yield SideMenuItem('emails', _('Emails'), url_for('users.user_emails'), 70, disabled=user.is_system)
     yield SideMenuItem('preferences', _('Preferences'), url_for('users.user_preferences'), 60, disabled=user.is_system)

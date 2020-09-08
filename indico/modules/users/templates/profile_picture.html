@@ -15,6 +15,10 @@
     </div>
 
     <script>
-        setupPictureSelection({{ user.email | tojson }}, {{ source | tojson }});
+        setupPictureSelection(
+            {{ (user.id if user != session.user else none) | tojson }},
+            {{ user.email | tojson }},
+            {{ source | tojson }}
+        );
     </script>
 {% endblock %}

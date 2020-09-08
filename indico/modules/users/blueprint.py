@@ -43,15 +43,20 @@ _bp.add_url_rule('!/admin/users/registration-requests/<int:request_id>/reject', 
 
 # User profile
 with _bp.add_prefixed_rules('/<int:user_id>'):
+    # XXX: endpoint names here should start with `user_` so the `_add_user_id`
+    # function below does it job properly!
+    # also, when adding new code here, make sure to test acting on a different user
+    # to make sure everything works correctly, ie you are not changing/showing
+    # something for the wrong user (yourself)!
     _bp.add_url_rule('/dashboard/', 'user_dashboard', RHUserDashboard)
     _bp.add_url_rule('/suggestions/categories/<int:category_id>', 'user_suggestions_remove', RHUserSuggestionsRemove,
                      methods=('DELETE',))
     _bp.add_url_rule('/profile/', 'user_profile', RHPersonalData, methods=('GET', 'POST'))
-    _bp.add_url_rule('/profile/picture', 'profile_picture_page', RHProfilePicturePage)
+    _bp.add_url_rule('/profile/picture', 'user_profile_picture_page', RHProfilePicturePage)
     _bp.add_url_rule('/profile/picture', 'save_profile_picture', RHSaveProfilePicture, methods=('POST',))
     _bp.add_url_rule('/profile/picture/preview/<any(standard,gravatar,identicon,custom):source>',
                      'profile_picture_preview', RHProfilePicturePreview)
-    _bp.add_url_rule('/picture-<slug>', 'profile_picture_display', RHProfilePictureDisplay)
+    _bp.add_url_rule('/picture-<slug>', 'user_profile_picture_display', RHProfilePictureDisplay)
     _bp.add_url_rule('/preferences/', 'user_preferences', RHUserPreferences, methods=('GET', 'POST'))
     _bp.add_url_rule('/favorites/', 'user_favorites', RHUserFavorites)
     _bp.add_url_rule('/favorites/users/', 'user_favorites_users_add', RHUserFavoritesUsersAdd, methods=('POST',))
