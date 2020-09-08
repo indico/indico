@@ -6,7 +6,7 @@
 // LICENSE file for more details.
 
 import _ from 'lodash';
-import React, {useCallback} from 'react';
+import React from 'react';
 import PropTypes from 'prop-types';
 import {Button, Dropdown, List} from 'semantic-ui-react';
 import {Translate} from 'indico/react/i18n';
@@ -58,16 +58,13 @@ const PrincipalListField = props => {
     withRegistrants,
   });
 
-  const asOptions = useCallback(
-    (data, getText = null) =>
-      data
-        .filter(r => !usedIdentifiers.has(r.identifier))
-        .map(r => ({
-          value: r.identifier,
-          text: getText ? getText(r.name) : r.name,
-        })),
-    [usedIdentifiers]
-  );
+  const asOptions = (data, getText = null) =>
+    data
+      .filter(r => !usedIdentifiers.has(r.identifier))
+      .map(r => ({
+        value: r.identifier,
+        text: getText ? getText(r.name) : r.name,
+      }));
 
   const markTouched = () => {
     onFocus();
