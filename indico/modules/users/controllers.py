@@ -266,7 +266,7 @@ class RHSaveProfilePicture(RHUserBase):
                 pic = Image.open(f)
             except IOError:
                 raise UserValueError(_('You cannot upload this file as profile picture.'))
-            if pic.format.lower() not in {'jpeg', 'png', 'gif'}:
+            if pic.format.lower() not in {'jpeg', 'png', 'gif', 'webp'}:
                 raise UserValueError(_('The file has an invalid format ({format}).').format(format=pic.format))
             if pic.mode not in ('RGB', 'RGBA'):
                 pic = pic.convert('RGB')
