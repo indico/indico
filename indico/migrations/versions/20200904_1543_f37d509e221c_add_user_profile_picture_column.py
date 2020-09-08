@@ -20,8 +20,9 @@ depends_on = None
 
 
 def upgrade():
-    op.add_column('users', sa.Column('picture_source', PyIntEnum(ProfilePictureSource), nullable=False,
-                  server_default='0'), schema='users')
+    op.add_column('users',
+                  sa.Column('picture_source', PyIntEnum(ProfilePictureSource), nullable=False, server_default='0'),
+                  schema='users')
     op.alter_column('users', 'picture_source', server_default=None, schema='users')
     op.execute('UPDATE users.users SET picture_source = 3 WHERE picture IS NOT NULL')
 
