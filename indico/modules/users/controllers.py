@@ -196,22 +196,40 @@ class RHPersonalData(RHUserBase):
 
 
 class RHProfilePicturePage(RHUserBase):
+    """Page to manage the profile picture."""
+
     def _process(self):
         return WPUserProfilePic.render_template('profile_picture.html', 'profile_picture',
                                                 user=self.user, source=self.user.picture_source.name)
 
 
 class RHProfilePicturePreview(RHUserBase):
-    def _process(self):
-        if request.view_args['type'] == 'standard':
+    """Preview the different profile pictures.
+
+    This always uses a fresh picture without any caching.
+    """
+
+    @use_kwargs({
+        'source': EnumField(ProfilePictureSource, location='view_args')
+    })
+    def _process(self, source):
+        if source == ProfilePictureSource.standard:
             first_name = self.user.first_name[0].upper() if self.user.first_name else ''
-            return render_template('users/avatar.svg', bg_color=self.user.avatar_bg_color,
-                                   text=first_name), 200, {'Content-Type': 'image/svg+xml'}
-        gravatar = get_gravatar_for_user(self.user, request.view_args['type'] == 'identicon', size=80)[0]
-        return send_file('gravatar.png', BytesIO(gravatar), mimetype='image/png')
+            avatar = render_template('users/avatar.svg', bg_color=self.user.avatar_bg_color, text=first_name)
+            return send_file('avatar.svg', BytesIO(avatar.encode('utf-8')), mimetype='image/svg+xml',
+                             no_cache=True, inline=True, safe=False)
+        elif source == ProfilePictureSource.custom:
+            metadata = self.user.picture_metadata
+            return send_file('avatar.png', BytesIO(self.user.picture), mimetype=metadata['content_type'],
+                             no_cache=True, inline=True)
+        else:
+            gravatar = get_gravatar_for_user(self.user, source == ProfilePictureSource.identicon, size=80)[0]
+            return send_file('avatar.png', BytesIO(gravatar), mimetype='image/png')
 
 
 class RHProfilePictureDisplay(RHUserBase):
+    """Display the user's profile picture."""
+
     allow_system_user = True
 
     def _process(self):
@@ -219,7 +237,8 @@ class RHProfilePictureDisplay(RHUserBase):
             first_name = self.user.first_name[0].upper() if self.user.first_name else ''
             avatar = render_template('users/avatar.svg', bg_color=self.user.avatar_bg_color, text=first_name)
             return send_file('avatar.svg', BytesIO(avatar.encode('utf-8')), mimetype='image/svg+xml',
-                             no_cache=False, inline=True, cache_timeout=(86400*7))
+                             no_cache=False, inline=True, safe=False, cache_timeout=(86400*7))
+
         metadata = self.user.picture_metadata
         return send_file('avatar.png', BytesIO(self.user.picture), mimetype=metadata['content_type'],
                          inline=True, conditional=True, last_modified=parse_date(metadata['lastmod']),
@@ -227,11 +246,14 @@ class RHProfilePictureDisplay(RHUserBase):
 
 
 class RHSaveProfilePicture(RHUserBase):
+    """Update the user's profile picture."""
+
     @use_kwargs({
         'source': EnumField(ProfilePictureSource)
     })
     def _process(self, source):
         self.user.picture_source = source
+
         if source == ProfilePictureSource.standard:
             self.user.picture = None
             self.user.picture_metadata = None

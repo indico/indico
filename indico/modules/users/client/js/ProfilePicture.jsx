@@ -6,8 +6,7 @@
 // LICENSE file for more details.
 
 import saveURL from 'indico-url:users.save_profile_picture';
-import pictureURL from 'indico-url:users.profile_picture_display';
-import gravatarURL from 'indico-url:users.profile_picture_preview';
+import previewURL from 'indico-url:users.profile_picture_preview';
 
 import React, {useState, useCallback} from 'react';
 import ReactDOM from 'react-dom';
@@ -147,7 +146,7 @@ function ProfilePicture({email, source}) {
   };
 
   const getPreview = () => {
-    return previewFile ? URL.createObjectURL(previewFile) : pictureURL({slug: 'custom'});
+    return previewFile ? URL.createObjectURL(previewFile) : previewURL({source: 'custom'});
   };
 
   const handleFileSelected = useCallback(file => {
@@ -176,18 +175,18 @@ function ProfilePicture({email, source}) {
             <Form onSubmit={fprops.handleSubmit}>
               <Card.Group itemsPerRow={4} centered>
                 <ProfilePictureCard
-                  image={gravatarURL({type: 'standard'})}
+                  image={previewURL({source: 'standard'})}
                   text={Translate.string('System-assigned icon')}
                   source="standard"
                 />
                 <ProfilePictureCard
-                  image={gravatarURL({type: 'identicon'})}
+                  image={previewURL({source: 'identicon'})}
                   text={Translate.string('Identicon')}
                   source="identicon"
                   email={email}
                 />
                 <ProfilePictureCard
-                  image={gravatarURL({type: 'gravatar'})}
+                  image={previewURL({source: 'gravatar'})}
                   text={Translate.string('Gravatar')}
                   source="gravatar"
                   email={email}
