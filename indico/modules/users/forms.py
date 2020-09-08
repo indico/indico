@@ -20,10 +20,9 @@ from indico.modules.auth.forms import LocalRegistrationForm, _check_existing_ema
 from indico.modules.users import User
 from indico.modules.users.models.emails import UserEmail
 from indico.modules.users.models.users import NameFormat, UserTitle
-from indico.modules.users.util import get_picture_data
 from indico.util.i18n import _, get_all_locales
 from indico.web.forms.base import IndicoForm, SyncedInputsMixin
-from indico.web.forms.fields import EditableFileField, IndicoEnumSelectField, PrincipalField, PrincipalListField
+from indico.web.forms.fields import IndicoEnumSelectField, PrincipalField, PrincipalListField
 from indico.web.forms.util import inject_validators
 from indico.web.forms.validators import HiddenUnless, used_if_not_synced
 from indico.web.forms.widgets import SwitchWidget, SyncedInputWidget
@@ -36,11 +35,6 @@ class UserDetailsForm(SyncedInputsMixin, IndicoForm):
     affiliation = StringField(_('Affiliation'), widget=SyncedInputWidget())
     address = TextAreaField(_('Address'), widget=SyncedInputWidget(textarea=True))
     phone = StringField(_('Phone number'), widget=SyncedInputWidget())
-
-
-class UserPictureForm(IndicoForm):
-    picture = EditableFileField(_('Profile picture'), accepted_file_types='image/jpeg,image/jpg,image/png,image/gif',
-                                add_remove_links=False, handle_flashes=True, get_metadata=get_picture_data)
 
 
 class UserPreferencesForm(IndicoForm):

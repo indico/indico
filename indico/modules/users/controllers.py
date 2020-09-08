@@ -44,9 +44,9 @@ from indico.modules.users.forms import (AdminAccountRegistrationForm, AdminsForm
 from indico.modules.users.models.emails import UserEmail
 from indico.modules.users.models.users import ProfilePictureSource
 from indico.modules.users.operations import create_user
-from indico.modules.users.util import (get_gravatar_for_user, get_linked_events, get_picture_data,
-                                       get_related_categories, get_suggested_categories, merge_users, search_users,
-                                       serialize_user, set_user_avatar)
+from indico.modules.users.util import (get_gravatar_for_user, get_linked_events, get_related_categories,
+                                       get_suggested_categories, merge_users, search_users, serialize_user,
+                                       set_user_avatar)
 from indico.modules.users.views import WPUser, WPUserDashboard, WPUserProfilePic, WPUsersAdmin
 from indico.util.date_time import now_utc
 from indico.util.event import truncate_path
@@ -258,7 +258,7 @@ class RHSaveProfilePicture(RHUserBase):
             self.user.picture = None
             self.user.picture_metadata = None
             logger.info('Profile picture of user %s removed by %s', self.user, session.user)
-            return jsonify_data(content=None)
+            return '', 204
 
         if source == ProfilePictureSource.custom:
             f = request.files['picture']
@@ -280,9 +280,9 @@ class RHSaveProfilePicture(RHUserBase):
         else:
             content, lastmod = get_gravatar_for_user(self.user, source == ProfilePictureSource.identicon, 256)
             set_user_avatar(self.user, content, source.name, lastmod)
-        flash(_('Profile picture changed'), 'success')
+
         logger.info('Profile picture of user %s updated by %s', self.user, session.user)
-        return jsonify_data(content=get_picture_data(self.user))
+        return '', 204
 
 
 class RHUserPreferences(RHUserBase):

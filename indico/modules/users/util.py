@@ -384,15 +384,6 @@ def get_color_for_username(username):
     return user_colors[crc32(username) % len(user_colors)]
 
 
-def get_picture_data(user):
-    return {
-        'url': user.picture_url,
-        'filename': user.picture_metadata['filename'],
-        'size': user.picture_metadata['size'],
-        'content_type': user.picture_metadata['content_type']
-    }
-
-
 def get_gravatar_for_user(user, identicon, size=256, lastmod=None):
     gravatar_url = 'https://www.gravatar.com/avatar/{}'.format(hashlib.md5(user.email.lower()).hexdigest())
     if identicon:
