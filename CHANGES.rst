@@ -142,6 +142,7 @@ Bugfixes
 - Fix empty entries in corresponding authors (:pr:`4604`)
 - Actually prevent users from editing registrations if modification is
   disabled
+- Handle LaTeX images with broken redirects (:pr:`4623`, thanks :user:`bcc`)
 
 Internal Changes
 ^^^^^^^^^^^^^^^^
