@@ -199,8 +199,7 @@ class RHPersonalData(RHUserBase):
 class RHProfilePicturePage(RHUserBase):
     def _process(self):
         return WPUserProfilePic.render_template('profile_picture.html', 'profile_picture',
-                                                user=self.user,
-                                                current_selection=self.user.picture_source.title)
+                                                user=self.user, source=self.user.picture_source.name)
 
 
 class RHProfilePicturePreview(RHUserBase):

@@ -15,9 +15,6 @@
     </div>
 
     <script>
-        setupPictureSelection(
-            {{ user.email | tojson }},
-            {{ current_selection | tojson }}
-        );
+        setupPictureSelection({{ user.email | tojson }}, {{ source | tojson }});
     </script>
 {% endblock %}

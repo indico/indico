@@ -122,9 +122,9 @@ const formDecorator = createDecorator({
   updates: value => (value === null ? {} : {source: 'custom'}),
 });
 
-function ProfilePicture({email, current}) {
+function ProfilePicture({email, source}) {
   const [previewFile, setPreviewFile] = useState(null);
-  const [hasPreview, setHasPreview] = useState(current === 'custom');
+  const [hasPreview, setHasPreview] = useState(source === 'custom');
 
   const submitPicture = async formData => {
     const bodyFormData = new FormData();
@@ -147,7 +147,7 @@ function ProfilePicture({email, current}) {
   };
 
   const getPreview = () => {
-    return previewFile ? URL.createObjectURL(previewFile) : pictureURL({slug: 'default'});
+    return previewFile ? URL.createObjectURL(previewFile) : pictureURL({slug: 'custom'});
   };
 
   const handleFileSelected = useCallback(file => {
@@ -166,7 +166,7 @@ function ProfilePicture({email, current}) {
     <div styleName="profile-picture-selection">
       <FinalForm
         onSubmit={submitPicture}
-        initialValues={{file: null, source: current}}
+        initialValues={{file: null, source}}
         validate={validate}
         subscription={{}}
         decorators={[formDecorator]}
@@ -214,13 +214,13 @@ function ProfilePicture({email, current}) {
 
 ProfilePicture.propTypes = {
   email: PropTypes.string.isRequired,
-  current: PropTypes.string.isRequired,
+  source: PropTypes.string.isRequired,
 };
 
-window.setupPictureSelection = function setupPictureSelection(email, current, pictureHash) {
+window.setupPictureSelection = function setupPictureSelection(email, source) {
   document.addEventListener('DOMContentLoaded', () => {
     ReactDOM.render(
-      <ProfilePicture email={email} current={current.toLowerCase()} pictureHash={pictureHash} />,
+      <ProfilePicture email={email} source={source} />,
       document.querySelector('#profile-picture-selection')
     );
   });
