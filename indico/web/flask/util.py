@@ -10,7 +10,6 @@ from __future__ import absolute_import, unicode_literals
 import inspect
 import os
 import re
-import time
 import unicodedata
 from importlib import import_module
 
@@ -281,7 +280,7 @@ def send_file(name, path_or_fd, mimetype, last_modified=None, no_cache=True, inl
         inline = False
     try:
         rv = _send_file(path_or_fd, mimetype=mimetype, as_attachment=not inline, attachment_filename=name,
-                        conditional=conditional, **kwargs)
+                        conditional=conditional, last_modified=last_modified, **kwargs)
     except IOError:
         if not current_app.debug:
             raise
@@ -291,10 +290,6 @@ def send_file(name, path_or_fd, mimetype, last_modified=None, no_cache=True, inl
     if inline:
         # send_file does not add this header if as_attachment is False
         rv.headers.add('Content-Disposition', 'inline', **make_content_disposition_args(name))
-    if last_modified:
-        if not isinstance(last_modified, int):
-            last_modified = int(time.mktime(last_modified.timetuple()))
-        rv.last_modified = last_modified
     # if the request is conditional, then caching shouldn't be disabled
     if not conditional and no_cache:
         del rv.expires
