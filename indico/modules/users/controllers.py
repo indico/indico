@@ -7,7 +7,6 @@
 
 from __future__ import unicode_literals
 
-import os
 from collections import namedtuple
 from io import BytesIO
 from operator import attrgetter, itemgetter
@@ -22,6 +21,7 @@ from sqlalchemy.orm import joinedload, load_only, subqueryload, undefer
 from sqlalchemy.orm.exc import StaleDataError
 from webargs import validate
 from werkzeug.exceptions import BadRequest, Forbidden, NotFound
+from werkzeug.http import parse_date
 
 from indico.core import signals
 from indico.core.auth import multipass
@@ -46,16 +46,15 @@ from indico.modules.users.models.users import ProfilePictureSource
 from indico.modules.users.operations import create_user
 from indico.modules.users.util import (get_gravatar_for_user, get_linked_events, get_picture_data,
                                        get_related_categories, get_suggested_categories, merge_users, search_users,
-                                       serialize_user)
+                                       serialize_user, set_user_avatar)
 from indico.modules.users.views import WPUser, WPUserDashboard, WPUserProfilePic, WPUsersAdmin
 from indico.util.date_time import now_utc
 from indico.util.event import truncate_path
-from indico.util.fs import secure_filename
 from indico.util.i18n import _
 from indico.util.images import square
 from indico.util.marshmallow import HumanizedDate, Principal, validate_with_message
 from indico.util.signals import values_from_signal
-from indico.util.string import crc32, make_unique_token
+from indico.util.string import make_unique_token
 from indico.web.args import use_kwargs
 from indico.web.flask.templating import get_template_module
 from indico.web.flask.util import send_file, url_for
@@ -208,9 +207,8 @@ class RHProfilePicturePreview(RHUserBase):
             first_name = self.user.first_name[0].upper() if self.user.first_name else ''
             return render_template('users/avatar.svg', bg_color=self.user.avatar_bg_color,
                                    text=first_name), 200, {'Content-Type': 'image/svg+xml'}
-        gravatar = get_gravatar_for_user(self.user, request.view_args['type'] == 'identicon', 80)
-        return send_file('gravatar.png', BytesIO(gravatar), mimetype='image/png',
-                         conditional=True)
+        gravatar = get_gravatar_for_user(self.user, request.view_args['type'] == 'identicon', size=80)[0]
+        return send_file('gravatar.png', BytesIO(gravatar), mimetype='image/png')
 
 
 class RHProfilePictureDisplay(RHUserBase):
@@ -219,11 +217,13 @@ class RHProfilePictureDisplay(RHUserBase):
     def _process(self):
         if self.user.picture_source == ProfilePictureSource.standard:
             first_name = self.user.first_name[0].upper() if self.user.first_name else ''
-            return render_template('users/avatar.svg', bg_color=self.user.avatar_bg_color,
-                                   text=first_name), 200, {'Content-Type': 'image/svg+xml'}
+            avatar = render_template('users/avatar.svg', bg_color=self.user.avatar_bg_color, text=first_name)
+            return send_file('avatar.svg', BytesIO(avatar.encode('utf-8')), mimetype='image/svg+xml',
+                             no_cache=False, inline=True, cache_timeout=(86400*7))
         metadata = self.user.picture_metadata
-        return send_file('user.png', BytesIO(self.user.picture), mimetype=metadata['content_type'],
-                         conditional=True)
+        return send_file('avatar.png', BytesIO(self.user.picture), mimetype=metadata['content_type'],
+                         inline=True, conditional=True, last_modified=parse_date(metadata['lastmod']),
+                         cache_timeout=(86400*7))
 
 
 class RHSaveProfilePicture(RHUserBase):
@@ -254,19 +254,10 @@ class RHSaveProfilePicture(RHUserBase):
             image_bytes = BytesIO()
             pic.save(image_bytes, 'PNG')
             image_bytes.seek(0)
-            content = image_bytes.read()
-            filename = f.filename
+            set_user_avatar(self.user, image_bytes.read(), f.filename)
         else:
-            content = get_gravatar_for_user(self.user, source == ProfilePictureSource.identicon, 256)
-            filename = source.name
-
-        self.user.picture = content
-        self.user.picture_metadata = {
-            'hash': crc32(content),
-            'size': len(content),
-            'filename': os.path.splitext(secure_filename(filename, 'user'))[0] + '.png',
-            'content_type': 'image/png'
-        }
+            content, lastmod = get_gravatar_for_user(self.user, source == ProfilePictureSource.identicon, 256)
+            set_user_avatar(self.user, content, source.name, lastmod)
         flash(_('Profile picture changed'), 'success')
         logger.info('Profile picture of user %s updated by %s', self.user, session.user)
         return jsonify_data(content=get_picture_data(self.user))
@@ -438,9 +429,14 @@ class RHUserEmailsDelete(RHUserBase):
 
 class RHUserEmailsSetPrimary(RHUserBase):
     def _process(self):
+        from .tasks import update_gravatars
+
         email = request.form['email']
         if email in self.user.secondary_emails:
             self.user.make_email_primary(email)
+            db.session.commit()
+            if self.user.picture_source in (ProfilePictureSource.gravatar, ProfilePictureSource.identicon):
+                update_gravatars.delay(self.user)
             flash(_('Your primary email was updated successfully.'), 'success')
         return redirect(url_for('.user_emails'))
 

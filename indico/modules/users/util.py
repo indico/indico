@@ -8,7 +8,9 @@
 from __future__ import unicode_literals
 
 import hashlib
+import os
 from collections import OrderedDict
+from datetime import datetime
 from io import BytesIO
 from operator import itemgetter
 
@@ -17,6 +19,7 @@ from flask import session
 from PIL import Image
 from sqlalchemy.orm import contains_eager, joinedload, load_only, undefer
 from sqlalchemy.sql.expression import nullslast
+from werkzeug.http import http_date
 
 from indico.core import signals
 from indico.core.auth import multipass
@@ -32,7 +35,9 @@ from indico.modules.users.models.affiliations import UserAffiliation
 from indico.modules.users.models.emails import UserEmail
 from indico.modules.users.models.favorites import favorite_user_table
 from indico.modules.users.models.suggestions import SuggestedCategory
+from indico.util.date_time import now_utc
 from indico.util.event import truncate_path
+from indico.util.fs import secure_filename
 from indico.util.i18n import _
 from indico.util.string import crc32, remove_accents
 
@@ -388,14 +393,17 @@ def get_picture_data(user):
     }
 
 
-def get_gravatar_for_user(user, identicon, size=256):
+def get_gravatar_for_user(user, identicon, size=256, lastmod=None):
     gravatar_url = 'https://www.gravatar.com/avatar/{}'.format(hashlib.md5(user.email.lower()).hexdigest())
     if identicon:
         params = {'d': 'identicon', 's': unicode(size), 'forcedefault': 'y'}
     else:
         params = {'d': 'mp', 's': unicode(size)}
-    resp = requests.get(gravatar_url, params=params)
-    if resp.status_code != 200:
+    headers = {'If-Modified-Since': lastmod} if lastmod is not None else {}
+    resp = requests.get(gravatar_url, params=params, headers=headers)
+    if resp.status_code == 304:
+        return None, resp.headers.get('Last-Modified')
+    elif resp.status_code != 200:
         raise RuntimeError(_('Could not retrieve gravatar.'))
     pic = Image.open(BytesIO(resp.content))
     if pic.mode not in ('RGB', 'RGBA'):
@@ -403,4 +411,19 @@ def get_gravatar_for_user(user, identicon, size=256):
     image_bytes = BytesIO()
     pic.save(image_bytes, 'PNG')
     image_bytes.seek(0)
-    return image_bytes.read()
+    return image_bytes.read(), resp.headers.get('Last-Modified')
+
+
+def set_user_avatar(user, avatar, filename, lastmod=None):
+    if lastmod is None:
+        lastmod = http_date(now_utc())
+    elif isinstance(lastmod, datetime):
+        lastmod = http_date(lastmod)
+    user.picture = avatar
+    user.picture_metadata = {
+        'hash': crc32(avatar),
+        'size': len(avatar),
+        'filename': os.path.splitext(secure_filename(filename, 'avatar'))[0] + '.png',
+        'content_type': 'image/png',
+        'lastmod': lastmod,
+    }
