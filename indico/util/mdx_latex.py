@@ -264,6 +264,8 @@ def latex_render_image(src, alt, tmpdir, strict=False):
                 raise ImageURLException("Cannot understand URL '{}'".format(src))
             except (requests.Timeout, ConnectionError):
                 raise ImageURLException("Problem downloading image ({})".format(src))
+            except requests.TooManyRedirects:
+                raise ImageURLException("Too many redirects downloading image ({})".format(src))
             extension = None
 
             if resp.status_code != 200:
