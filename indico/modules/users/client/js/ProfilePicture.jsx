@@ -185,13 +185,13 @@ function ProfilePicture({userId, email, source}) {
                 />
                 <ProfilePictureCard
                   image={previewURL({...userIdArgs, source: 'identicon'})}
-                  text={Translate.string('Identicon')}
+                  text="Identicon"
                   source="identicon"
                   email={email}
                 />
                 <ProfilePictureCard
                   image={previewURL({...userIdArgs, source: 'gravatar'})}
-                  text={Translate.string('Gravatar')}
+                  text="Gravatar"
                   source="gravatar"
                   email={email}
                 />

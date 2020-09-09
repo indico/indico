@@ -60,7 +60,7 @@ class NameFormat(RichIntEnum):
 
 
 class ProfilePictureSource(RichIntEnum):
-    __titles__ = (_('Standard'), _('Identicon'), _('Gravatar'), _('Custom'))
+    __titles__ = (_('Standard'), 'Identicon', 'Gravatar', _('Custom'))
     standard = 0
     identicon = 1
     gravatar = 2
