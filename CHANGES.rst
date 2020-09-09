@@ -175,6 +175,9 @@ Internal Changes
   :user:`meluru`)
 - Allow extending polymorphic models in plugins (:pr:`4608`, thanks
   :user:`omegak`)
+- Wrap registration form AngularJS directive in jinja block for more easily
+  overriding arguments passed to the app in plugins (:pr:`4624`, thanks
+  :user:`omegak`)
 
 
 ----

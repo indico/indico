@@ -8,14 +8,16 @@
 
 {% block content %}
     <div ng-app="nd" ng-controller="AppCtrl">
-        <div nd-reg-form
-             conf-id="{{ event.id }}"
-             conf-form-id="{{ regform.id }}"
-             conf-sections="{{ sections | tojson | forceescape }}"
-             conf-currency="{{ regform.currency }}"
-             event-start-date="{{ event.start_dt }}"
-             event-end-date="{{ event.end_dt }}"
-             edit-mode="true"></div>
+        {% block regform %}
+            <div nd-reg-form
+                 conf-id="{{ event.id }}"
+                 conf-form-id="{{ regform.id }}"
+                 conf-sections="{{ sections | tojson | forceescape }}"
+                 conf-currency="{{ regform.currency }}"
+                 event-start-date="{{ event.start_dt }}"
+                 event-end-date="{{ event.end_dt }}"
+                 edit-mode="true"></div>
+        {% endblock %}
     </div>
     <div class="toolbar right">
         <a href="{{ url_for('.manage_regform', regform) }}" class="i-button big">

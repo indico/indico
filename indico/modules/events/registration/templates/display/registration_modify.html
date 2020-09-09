@@ -19,17 +19,19 @@
         {{ template_hook('before-regform', event=event, regform=registration.registration_form,
                          registration=registration, management=false) }}
         <div ng-app="nd" ng-controller="AppCtrl">
-            <div nd-reg-form
-                 conf-id="{{ event.id }}"
-                 conf-sections="{{ sections | tojson | forceescape }}"
-                 conf-currency="{{ registration.currency }}"
-                 post-url="{{ request.url | tojson | forceescape }}"
-                 check-email-url="{{ url_for('.check_email', regform) | tojson | forceescape }}"
-                 registration-data="{{ registration_data | tojson | forceescape }}"
-                 registration-meta-data="{{ registration_metadata | tojson | forceescape }}"
-                 registration-uuid="{{ registration.uuid }}"
-                 update-mode="true">
-            </div>
+            {% block regform %}
+                <div nd-reg-form
+                     conf-id="{{ event.id }}"
+                     conf-sections="{{ sections | tojson | forceescape }}"
+                     conf-currency="{{ registration.currency }}"
+                     post-url="{{ request.url | tojson | forceescape }}"
+                     check-email-url="{{ url_for('.check_email', regform) | tojson | forceescape }}"
+                     registration-data="{{ registration_data | tojson | forceescape }}"
+                     registration-meta-data="{{ registration_metadata | tojson | forceescape }}"
+                     registration-uuid="{{ registration.uuid }}"
+                     update-mode="true">
+                </div>
+            {% endblock %}
         </div>
         {{ template_hook('after-regform', event=event, regform=registration.registration_form,
                          registration=registration, management=false) }}
