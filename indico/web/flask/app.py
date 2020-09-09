@@ -98,7 +98,9 @@ def configure_cache(app, config):
     # TODO: remove anything but redis in 3.0; nobody is using it and it
     # has not been tested recently.
     app.config['CACHE_DEFAULT_TIMEOUT'] = -1
-    if config.CACHE_BACKEND == 'redis':
+    if app.config['TESTING']:
+        app.config['CACHE_TYPE'] = 'simple'
+    elif config.CACHE_BACKEND == 'redis':
         app.config['CACHE_TYPE'] = 'redis'
         app.config['CACHE_REDIS_URL'] = config.REDIS_CACHE_URL
     elif config.CACHE_BACKEND == 'memcached':
