@@ -115,14 +115,17 @@
 
   border-left: 3px $darker-blue solid;
   background: white;
+  // stylelint-disable-next-line scss/media-feature-value-dollar-variable
   @media only screen and (min-width: 481px) and (max-width: 768px) {
     min-width: 480px;
     max-width: 492px;
   }
+  // stylelint-disable-next-line scss/media-feature-value-dollar-variable
   @media only screen and (min-width: 769px) and (max-width: 1024px) {
     min-width: 600px;
     max-width: 680px;
   }
+  // stylelint-disable-next-line scss/media-feature-value-dollar-variable
   @media only screen and (min-width: 1025px) and (max-width: 1230px) {
     max-width: 937px;
   }

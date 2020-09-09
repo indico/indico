@@ -26,6 +26,7 @@
       margin: auto;
       width: 800px;
 
+      // stylelint-disable-next-line scss/media-feature-value-dollar-variable
       @media (max-width: 800px) {
         width: 400px;
       }

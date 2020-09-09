@@ -91,6 +91,7 @@
       min-width: 520px;
     }
 
+    // stylelint-disable-next-line scss/media-feature-value-dollar-variable
     @media (max-height: 600px) {
       margin-top: auto;
     }
