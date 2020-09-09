@@ -395,7 +395,9 @@ def get_gravatar_for_user(user, identicon, size=256, lastmod=None):
     if resp.status_code == 304:
         return None, resp.headers.get('Last-Modified')
     elif resp.status_code != 200:
-        raise RuntimeError(_('Could not retrieve gravatar.'))
+        # XXX: Identicon/Gravatar are names that should never be translated
+        raise RuntimeError(_('Could not retrieve {gravatar_type}')
+                           .format(gravatar_type=('Identicon' if identicon else 'Gravatar')))
     pic = Image.open(BytesIO(resp.content))
     if pic.mode not in ('RGB', 'RGBA'):
         pic = pic.convert('RGB')
