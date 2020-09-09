@@ -9,8 +9,10 @@ from enum import Enum
 
 import sqlalchemy as sa
 from alembic import op
+from werkzeug.http import http_date
 
 from indico.core.db.sqlalchemy import PyIntEnum
+from indico.util.date_time import now_utc
 
 
 # revision identifiers, used by Alembic.
@@ -33,6 +35,11 @@ def upgrade():
                   schema='users')
     op.alter_column('users', 'picture_source', server_default=None, schema='users')
     op.execute('UPDATE users.users SET picture_source = 3 WHERE picture IS NOT NULL')
+    op.execute('''
+        UPDATE users.users
+        SET picture_metadata = picture_metadata || '{"lastmod": "%s"}'::jsonb
+        WHERE picture_source = 3 AND NOT (picture_metadata ? 'lastmod')
+    ''' % http_date(now_utc()))
 
 
 def downgrade():
