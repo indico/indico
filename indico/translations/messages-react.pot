@@ -1,6 +1,6 @@
 msgid ""
 msgstr ""
-"POT-Creation-Date: 2020-08-20 09:35+0200\n"
+"POT-Creation-Date: 2020-09-20 09:51+0200\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "MIME-Version: 1.0\n"
@@ -1578,6 +1578,7 @@ msgid "This booking has already started."
 msgstr ""
 
 #: indico/modules/rb/client/js/common/bookings/BookingEdit.jsx:227
+#: indico/modules/users/client/js/ProfilePicture.jsx:207
 msgid "Save changes"
 msgstr ""
 
@@ -2079,6 +2080,7 @@ msgid "Restricted"
 msgstr ""
 
 #: indico/modules/rb/client/js/common/rooms/edit/RoomPhoto.jsx:91
+#: indico/modules/users/client/js/ProfilePicture.jsx:103
 msgid "Upload"
 msgstr ""
 
@@ -3372,6 +3374,18 @@ msgstr ""
 msgid "Copied!"
 msgstr ""
 
+#: indico/modules/users/client/js/ProfilePicture.jsx:49
+msgid "Based on {email}"
+msgstr ""
+
+#: indico/modules/users/client/js/ProfilePicture.jsx:183
+msgid "System-assigned icon"
+msgstr ""
+
+#: indico/modules/users/client/js/ProfilePicture.jsx:200
+msgid "Custom picture"
+msgstr ""
+
 #: indico/modules/users/client/js/dashboard.jsx:22
 msgid "Events at hand"
 msgstr ""
@@ -3475,25 +3489,25 @@ msgid "Upload failed"
 msgstr ""
 
 #: indico/web/client/js/react/components/principals/ACLField.jsx:148
-#: indico/web/client/js/react/components/principals/PrincipalListField.jsx:112
+#: indico/web/client/js/react/components/principals/PrincipalListField.jsx:109
 msgid "This list is currently empty"
 msgstr ""
 
 #: indico/web/client/js/react/components/principals/ACLField.jsx:166
-#: indico/web/client/js/react/components/principals/PrincipalListField.jsx:141
+#: indico/web/client/js/react/components/principals/PrincipalListField.jsx:138
 msgid "Event Role"
 msgstr ""
 
 #: indico/web/client/js/react/components/principals/ACLField.jsx:181
-#: indico/web/client/js/react/components/principals/PrincipalListField.jsx:149
+#: indico/web/client/js/react/components/principals/PrincipalListField.jsx:146
 msgid "Category Role"
 msgstr ""
 
-#: indico/web/client/js/react/components/principals/PrincipalListField.jsx:157
+#: indico/web/client/js/react/components/principals/PrincipalListField.jsx:154
 msgid "Registrants"
 msgstr ""
 
-#: indico/web/client/js/react/components/principals/PrincipalListField.jsx:159
+#: indico/web/client/js/react/components/principals/PrincipalListField.jsx:156
 msgid "Registrants in \"{form}\""
 msgstr ""
 

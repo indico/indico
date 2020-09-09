@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: indico 2.3-dev\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2020-08-19 09:34+0200\n"
+"POT-Creation-Date: 2020-09-09 09:51+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -850,15 +850,15 @@ msgstr ""
 msgid "Select an option"
 msgstr ""
 
-#: indico/web/client/js/jquery/widgets/jinja/location_widget.js:67
+#: indico/web/client/js/jquery/widgets/jinja/location_widget.js:68
 msgid "Using default location from: {0} ({1})"
 msgstr ""
 
-#: indico/web/client/js/jquery/widgets/jinja/location_widget.js:69
+#: indico/web/client/js/jquery/widgets/jinja/location_widget.js:70
 msgid "Using custom location"
 msgstr ""
 
-#: indico/web/client/js/jquery/widgets/jinja/location_widget.js:165
+#: indico/web/client/js/jquery/widgets/jinja/location_widget.js:166
 msgid "Just use \"{0}\""
 msgstr ""
 
