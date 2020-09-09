@@ -75,7 +75,7 @@ Why isn't Indico loading my language?
 Some languages in transifex use codes that Indico is not able to recognize.
 One example is the Chinese's ``zh_CN.GB2312``.
 The easy fix for this is to rename the folder ``zh_CN.GB2312`` (inside
-``indico/translations/``) to the standard locale code |zh_Hant_TW|_.
+``indico/translations/``) to the extended locale code |zh_Hant_TW|_.
 Unfortunately, there is no list with mappings for all the languages.
 So if by any reason it doesn't work for you, feel free to :ref:`ask us <contact>`.
 
@@ -144,3 +144,5 @@ from ``src/.tx/config``.
 .. note::
 
     The transifex resource slug is a name-like alias that identifies a particular file.
+
+For more information regarding this subject a `thread has started here <https://talk.getindico.io/t/relationship-between-resources-and-po-files-in-transifex/1890>`_.
