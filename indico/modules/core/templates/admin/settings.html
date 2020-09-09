@@ -39,6 +39,13 @@
             A new Indico version (<strong id="new-indico-version"></strong>) is available!
             Your current version is <strong id="cur-indico-version"></strong>.
         {%- endtrans %}
+        {# TODO remove in 3.0 #}
+        {# not translated since it's very temporary and only targets admins anyway #}
+        <p class="js-indico-version-v3-message" style="display: none;">
+            This is a <strong>major upgrade</strong> which requires infrastructure changes (Python 3).
+            Please make sure to read the <a href="https://docs.getindico.io/en/stable/installation/">upgrade guide</a>
+            carefully to ensure a smooth upgrade!
+        </p>
     {%- endcall %}
 
     {% call message_box('highlight', classes='js-indico-plugins-version-message', style='display: none;') -%}
@@ -103,6 +110,9 @@
                         $('#cur-indico-version').text(data.indico.current_version);
                         $('#new-indico-version').text(data.indico.latest_version);
                         $('.js-indico-version-message').show();
+                        if (data.indico.latest_version.startsWith('3.')) {
+                            $('.js-indico-version-v3-message').show();
+                        }
                     }
                     if (data.plugins && data.plugins.outdated) {
                         $('#cur-indico-plugins-version').text(data.plugins.current_version);
