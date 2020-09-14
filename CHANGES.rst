@@ -34,6 +34,11 @@ Major Features
   can also be connected to an external microservice to handle more advanced workflows
   beyond what is supported natively by Indico.
 
+Internationalization
+^^^^^^^^^^^^^^^^^^^^
+
+- New translation: Chinese (Simplified)
+
 Improvements
 ^^^^^^^^^^^^
 
