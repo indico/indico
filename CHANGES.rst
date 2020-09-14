@@ -5,7 +5,7 @@ Changelog
 Version 2.3
 -----------
 
-*Unreleased*
+*Released on September 14, 2020*
 
 .. note::
 
