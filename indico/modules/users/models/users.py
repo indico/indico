@@ -8,6 +8,7 @@
 from __future__ import unicode_literals
 
 import itertools
+from enum import Enum
 from operator import attrgetter
 from uuid import uuid4
 
@@ -59,8 +60,7 @@ class NameFormat(RichIntEnum):
     f_last_upper = 7
 
 
-class ProfilePictureSource(RichIntEnum):
-    __titles__ = (_('Standard'), 'Identicon', 'Gravatar', _('Custom'))
+class ProfilePictureSource(int, Enum):
     standard = 0
     identicon = 1
     gravatar = 2

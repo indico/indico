@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: indico 2.3-dev\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2020-09-09 16:15+0200\n"
+"POT-Creation-Date: 2020-09-14 12:32+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -14644,14 +14644,6 @@ msgstr ""
 
 #: indico/modules/users/models/users.py:51
 msgid "J. DOE"
-msgstr ""
-
-#: indico/modules/users/models/users.py:63
-msgid "Standard"
-msgstr ""
-
-#: indico/modules/users/models/users.py:63
-msgid "Custom"
 msgstr ""
 
 #: indico/modules/users/models/users.py:136
