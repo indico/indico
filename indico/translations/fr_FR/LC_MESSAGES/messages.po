@@ -16,8 +16,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Indico\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2020-09-02 13:51+0200\n"
-"PO-Revision-Date: 2020-09-03 12:15+0000\n"
+"POT-Creation-Date: 2020-09-14 12:32+0200\n"
+"PO-Revision-Date: 2020-09-14 12:46+0000\n"
 "Last-Translator: Thomas Baron <thomas.baron@cern.ch>\n"
 "Language-Team: French (France) (http://www.transifex.com/indico/indico/language/fr_FR/)\n"
 "MIME-Version: 1.0\n"
@@ -346,7 +346,7 @@ msgstr "Ce plugin n'a aucun paramètre."
 #: indico/modules/events/surveys/templates/management/edit_survey.html:11
 #: indico/modules/events/templates/forms/session_block_form.html:12
 #: indico/modules/groups/templates/group_edit.html:20
-#: indico/modules/users/templates/personal_data.html:60
+#: indico/modules/users/templates/personal_data.html:46
 #: indico/modules/users/templates/preferences.html:16
 #: indico/modules/users/templates/users_admin_create.html:13
 #: indico/modules/vc/templates/attach_room.html:9
@@ -1069,7 +1069,7 @@ msgstr "La liste des utilisateurs et des groupes autorisés à accéder à ce do
 #: indico/modules/events/tracks/forms.py:23
 #: indico/modules/events/tracks/forms.py:48 indico/modules/news/forms.py:33
 #: indico/modules/news/templates/admin/news.html:34
-#: indico/modules/users/forms.py:33 indico/web/fields/base.py:21
+#: indico/modules/users/forms.py:32 indico/web/fields/base.py:21
 msgid "Title"
 msgstr "Titre"
 
@@ -1497,7 +1497,6 @@ msgstr "Fermer"
 #: indico/modules/categories/templates/management/settings.html:12
 #: indico/modules/events/layout/templates/images.html:18
 #: indico/modules/events/roles/templates/import_members.html:14
-#: indico/modules/users/templates/personal_data.html:46
 msgid "Upload"
 msgstr "Télécharger"
 
@@ -1574,7 +1573,7 @@ msgstr "{provider} ({identifier}) a bien été supprimé de vos comptes"
 msgid "Your password has been changed successfully."
 msgstr "Votre mot de passe a bien été modifié."
 
-#: indico/modules/auth/forms.py:28 indico/modules/users/forms.py:89
+#: indico/modules/auth/forms.py:28 indico/modules/users/forms.py:83
 msgid "This email address is already in use."
 msgstr "Cette adresse électronique est déjà utilisée."
 
@@ -1614,7 +1613,7 @@ msgstr "Le mot de passe actuel est incorrect"
 #: indico/modules/auth/forms.py:88 indico/modules/auth/forms.py:96
 #: indico/modules/auth/forms.py:111 indico/modules/bootstrap/forms.py:23
 #: indico/modules/events/abstracts/forms.py:625
-#: indico/modules/users/forms.py:117
+#: indico/modules/users/forms.py:111
 msgid "Email address"
 msgstr "Adresse électronique"
 
@@ -1626,15 +1625,15 @@ msgstr "Sélectionnez l'adresse électronique à vérifier."
 #: indico/modules/events/abstracts/forms.py:623
 #: indico/modules/events/persons/forms.py:48
 #: indico/modules/events/registration/forms.py:154
-#: indico/modules/users/forms.py:34 indico/modules/users/forms.py:94
+#: indico/modules/users/forms.py:33 indico/modules/users/forms.py:88
 #: indico/modules/users/templates/registration_requests.html:12
 msgid "First name"
 msgstr "Prénom"
 
 #: indico/modules/auth/forms.py:80 indico/modules/auth/forms.py:86
 #: indico/modules/events/abstracts/forms.py:624
-#: indico/modules/events/persons/forms.py:49 indico/modules/users/forms.py:35
-#: indico/modules/users/forms.py:93
+#: indico/modules/events/persons/forms.py:49 indico/modules/users/forms.py:34
+#: indico/modules/users/forms.py:87
 msgid "Family name"
 msgstr "Nom de famille"
 
@@ -1645,7 +1644,7 @@ msgstr "Nom de famille"
 #: indico/modules/events/persons/templates/management/person_list.html:211
 #: indico/modules/events/registration/forms.py:160
 #: indico/modules/events/registration/templates/management/import_registrations.html:17
-#: indico/modules/users/forms.py:36 indico/modules/users/forms.py:96
+#: indico/modules/users/forms.py:35 indico/modules/users/forms.py:90
 #: indico/modules/users/templates/registration_requests.html:14
 msgid "Affiliation"
 msgstr "Affiliation"
@@ -1657,13 +1656,13 @@ msgstr "Prénom"
 
 #: indico/modules/auth/forms.py:89 indico/modules/designer/placeholders.py:301
 #: indico/modules/events/management/templates/_settings.html:112
-#: indico/modules/events/persons/forms.py:51 indico/modules/users/forms.py:37
+#: indico/modules/events/persons/forms.py:51 indico/modules/users/forms.py:36
 #: indico/web/templates/forms/location_widget.html:72
 msgid "Address"
 msgstr "Adresse"
 
 #: indico/modules/auth/forms.py:90 indico/modules/events/persons/forms.py:52
-#: indico/modules/users/forms.py:38
+#: indico/modules/users/forms.py:37
 msgid "Phone number"
 msgstr "Numéro de téléphone"
 
@@ -2173,7 +2172,7 @@ msgstr "Contenu"
 #: indico/modules/events/sessions/templates/management/session_list.html:14
 #: indico/modules/news/templates/admin/news.html:16
 #: indico/modules/news/templates/admin/news.html:17
-#: indico/modules/users/templates/dashboard.html:76
+#: indico/modules/users/templates/dashboard.html:70
 msgid "Settings"
 msgstr "Paramètres"
 
@@ -2216,7 +2215,7 @@ msgstr "Les catégories contenant des sous-catégories ne sont pas autorisées."
 #: indico/modules/categories/forms.py:39 indico/modules/events/forms.py:76
 #: indico/modules/events/management/forms.py:102
 #: indico/modules/events/management/templates/_settings.html:84
-#: indico/modules/users/forms.py:48
+#: indico/modules/users/forms.py:42
 msgid "Timezone"
 msgstr "Fuseau horaire"
 
@@ -3081,7 +3080,6 @@ msgstr "Ajouter un rôle"
 #: indico/modules/events/templates/admin/_event_label_list.html:25
 #: indico/modules/events/templates/admin/_reference_type_list.html:25
 #: indico/modules/oauth/templates/app_details.html:39
-#: indico/modules/users/templates/personal_data.html:50
 msgid "Delete"
 msgstr "Supprimer"
 
@@ -7811,7 +7809,7 @@ msgstr "\"Édition\" fournit un flux de travail d'édition intégré pour les ar
 #: indico/modules/events/registration/templates/management/regform_reglist.html:110
 #: indico/modules/events/surveys/templates/management/survey.html:149
 #: indico/modules/groups/templates/_group_members.html:10
-#: indico/modules/users/forms.py:95
+#: indico/modules/users/forms.py:89
 msgid "Email"
 msgstr "Adresse électronique"
 
@@ -7928,7 +7926,7 @@ msgid "Show social badges"
 msgstr "Afficher les badges sociaux"
 
 #: indico/modules/events/layout/forms.py:74
-#: indico/modules/events/layout/forms.py:115 indico/modules/users/forms.py:65
+#: indico/modules/events/layout/forms.py:115 indico/modules/users/forms.py:59
 msgid "Name format"
 msgstr "Format des noms"
 
@@ -8280,7 +8278,7 @@ msgstr "Participants"
 
 #: indico/modules/events/logs/models/entries.py:21
 #: indico/modules/events/management/forms.py:194
-#: indico/modules/users/__init__.py:65
+#: indico/modules/users/__init__.py:67
 #: indico/modules/users/templates/emails.html:9
 msgid "Emails"
 msgstr "Courriels"
@@ -14680,7 +14678,7 @@ msgstr "Fournisseur"
 msgid "Group name"
 msgstr "Nom du groupe"
 
-#: indico/modules/groups/forms.py:23 indico/modules/users/forms.py:97
+#: indico/modules/groups/forms.py:23 indico/modules/users/forms.py:91
 msgid "Exact match"
 msgstr "Correspondance exacte"
 
@@ -15269,7 +15267,7 @@ msgid "You cannot upload this file as a room picture."
 msgstr "Téléchargement de ce fichier comme photo de salle impossible."
 
 #: indico/modules/rb/controllers/backend/admin.py:384
-#: indico/modules/users/controllers.py:218
+#: indico/modules/users/controllers.py:270
 msgid "The file has an invalid format ({format})."
 msgstr "Le fichier a un format incorrect ({format})."
 
@@ -15344,7 +15342,7 @@ msgstr "Pré-réservation"
 msgid "recurring"
 msgstr "recurrente"
 
-#: indico/modules/users/__init__.py:57 indico/modules/users/forms.py:135
+#: indico/modules/users/__init__.py:57 indico/modules/users/forms.py:129
 #: indico/modules/users/templates/admins.html:5
 msgid "Admins"
 msgstr "Administrateurs"
@@ -15358,29 +15356,34 @@ msgstr "Tableau de bord"
 msgid "Personal data"
 msgstr "Données personnelles"
 
-#: indico/modules/users/__init__.py:66
+#: indico/modules/users/__init__.py:65
+#: indico/modules/users/templates/profile_picture.html:8
+msgid "Profile picture"
+msgstr "Photo de profil"
+
+#: indico/modules/users/__init__.py:68
 #: indico/modules/users/templates/preferences.html:9
 msgid "Preferences"
 msgstr "Préférences"
 
-#: indico/modules/users/__init__.py:67
+#: indico/modules/users/__init__.py:69
 msgid "Favourites"
 msgstr "Favoris"
 
-#: indico/modules/users/__init__.py:73
+#: indico/modules/users/__init__.py:75
 #: indico/web/templates/_session_bar.html:124
 msgid "My profile"
 msgstr "Mon profil"
 
-#: indico/modules/users/controllers.py:105
+#: indico/modules/users/controllers.py:106
 msgid "This user has been merged into <a href=\"{url}\">another user</a>."
 msgstr "Cet utilisateur a été fusionné dans <a href=\"{url}\">autre utilisateur</a>."
 
-#: indico/modules/users/controllers.py:108
+#: indico/modules/users/controllers.py:109
 msgid "This user is marked as deleted."
 msgstr "Cet utilisateur est marqué comme supprimé."
 
-#: indico/modules/users/controllers.py:110
+#: indico/modules/users/controllers.py:111
 msgid ""
 "This user is marked as pending, i.e. it has been attached to something but "
 "never logged in."
@@ -15390,238 +15393,230 @@ msgstr "Cet utilisateur est marqué en attente, c'est à dire qu'il a été util
 msgid "Your personal data was successfully updated."
 msgstr "Vos données personnelles ont été mises à jour avec succès."
 
-#: indico/modules/users/controllers.py:216
+#: indico/modules/users/controllers.py:268
 msgid "You cannot upload this file as profile picture."
 msgstr "Téléchargement de ce fichier comme photo de profil impossible."
 
-#: indico/modules/users/controllers.py:235
-msgid "Profile picture uploaded"
-msgstr "Photo de profil téléchargée"
-
-#: indico/modules/users/controllers.py:244
-msgid "Profile picture deleted"
-msgstr "Photo de profil supprimée"
-
-#: indico/modules/users/controllers.py:267
+#: indico/modules/users/controllers.py:306
 msgid "Preferences saved"
 msgstr "Préférences sauvegardées"
 
-#: indico/modules/users/controllers.py:353
+#: indico/modules/users/controllers.py:392
 msgid ""
 "We have sent an email to {email}. Please click the link in that email within"
 " 24 hours to confirm your new email address."
 msgstr "Un courriel a été envoyé à {email}. Veuillez cliquer sur le lien contenu dans ce courriel dans les 24 heures pour confirmer votre nouvelle adresse électronique."
 
-#: indico/modules/users/controllers.py:365
+#: indico/modules/users/controllers.py:404
 msgid "The verification token is invalid or expired."
 msgstr "Le jeton de vérification est incorrect ou expiré."
 
-#: indico/modules/users/controllers.py:369
+#: indico/modules/users/controllers.py:408
 msgid ""
 "This token is for a different Indico user. Please login with the correct "
 "account"
 msgstr "Ce jeton est pour un utilisateur Indico différent. Veuillez vous connecter avec le compte approprié"
 
-#: indico/modules/users/controllers.py:374
+#: indico/modules/users/controllers.py:413
 msgid "This email address is already attached to your account."
 msgstr "Cette adresse électronique est déjà attachée à votre compte."
 
-#: indico/modules/users/controllers.py:376
+#: indico/modules/users/controllers.py:415
 msgid "This email address is already in use by another account."
 msgstr "Cette adresse électronique est déjà utilisée par un autre compte."
 
-#: indico/modules/users/controllers.py:396
+#: indico/modules/users/controllers.py:435
 msgid "Merged data from existing '{}' identity"
 msgstr "Données fusionnées d'une identité '{}' existante"
 
-#: indico/modules/users/controllers.py:401
+#: indico/modules/users/controllers.py:440
 msgid "The email address {email} has been added to your account."
 msgstr "L'adresse électronique {email} a été ajoutée à votre compte."
 
-#: indico/modules/users/controllers.py:418
+#: indico/modules/users/controllers.py:462
 msgid "Your primary email was updated successfully."
 msgstr "Votre adresse principale a été mise à jour avec succès."
 
-#: indico/modules/users/controllers.py:437
+#: indico/modules/users/controllers.py:481
 msgid "Admin added: {name} ({email})"
 msgstr "Administrateur ajouté: {name} ({email})"
 
-#: indico/modules/users/controllers.py:441
+#: indico/modules/users/controllers.py:485
 msgid "Admin removed: {name} ({email})"
 msgstr "Administrateur supprimé: {name} ({email})"
 
-#: indico/modules/users/controllers.py:514
+#: indico/modules/users/controllers.py:558
 msgid "The account has been created."
 msgstr "Le compte a été créé."
 
-#: indico/modules/users/controllers.py:516
+#: indico/modules/users/controllers.py:560
 msgid "Show details"
 msgstr "Afficher les détails"
 
-#: indico/modules/users/controllers.py:527
+#: indico/modules/users/controllers.py:571
 msgid "Users are the same!"
 msgstr "Les utilisateurs sont les mêmes!"
 
-#: indico/modules/users/controllers.py:530
+#: indico/modules/users/controllers.py:574
 msgid "Users' names seem to be different!"
 msgstr "Les noms des utilisateurs semblent être différents!"
 
-#: indico/modules/users/controllers.py:532
+#: indico/modules/users/controllers.py:576
 msgid "Source user has never logged in to Indico!"
 msgstr "L'utilisateur source ne s'est jamais connecté dans Indico!"
 
-#: indico/modules/users/controllers.py:534
+#: indico/modules/users/controllers.py:578
 msgid "Target user has never logged in to Indico!"
 msgstr "L'utilisateur cible ne s'est jamais connecté dans Indico!"
 
-#: indico/modules/users/controllers.py:536
+#: indico/modules/users/controllers.py:580
 msgid "Source user is blocked!"
 msgstr "L'utilisateur source est bloqué!"
 
-#: indico/modules/users/controllers.py:538
+#: indico/modules/users/controllers.py:582
 msgid "Target user is blocked!"
 msgstr "L'utilisateur cible est bloqué!"
 
-#: indico/modules/users/controllers.py:540
+#: indico/modules/users/controllers.py:584
 msgid "Source user has been deleted!"
 msgstr "L'utilisateur source a été supprimé!"
 
-#: indico/modules/users/controllers.py:542
+#: indico/modules/users/controllers.py:586
 msgid "Target user has been deleted!"
 msgstr "L'utilisateur cible a été supprimé!"
 
-#: indico/modules/users/controllers.py:544
+#: indico/modules/users/controllers.py:588
 msgid "Source user is an administrator!"
 msgstr "L'utilisateur source est un administrateur!"
 
-#: indico/modules/users/controllers.py:546
+#: indico/modules/users/controllers.py:590
 msgid "Target user is an administrator!"
 msgstr "L'utilisateur cible est un administrateur!"
 
-#: indico/modules/users/controllers.py:548
+#: indico/modules/users/controllers.py:592
 msgid "Source user is an administrator but target user isn't!"
 msgstr "L'utilisateur source est un administrateur mais l'utilisateur cible ne l'est pas!"
 
-#: indico/modules/users/controllers.py:562
+#: indico/modules/users/controllers.py:606
 msgid "Merge aborted due to failed sanity check"
 msgstr "Fusion abandonnée suite aux vérifications"
 
-#: indico/modules/users/controllers.py:569
+#: indico/modules/users/controllers.py:613
 msgid "The users have been successfully merged."
 msgstr "Les utilisateurs ont été fusionnés avec succès."
 
-#: indico/modules/users/controllers.py:609
+#: indico/modules/users/controllers.py:653
 msgid "The request has been approved."
 msgstr "La requête a été approuvée."
 
-#: indico/modules/users/controllers.py:620
+#: indico/modules/users/controllers.py:664
 msgid "The request has been rejected."
 msgstr "La requête a été refusée."
 
-#: indico/modules/users/controllers.py:714
+#: indico/modules/users/controllers.py:758
 #: indico/modules/users/templates/personal_data.html:15
 msgid "You cannot block yourself"
 msgstr "Vous ne pouvez pas vous bloquer vous-même"
 
-#: indico/modules/users/controllers.py:717
+#: indico/modules/users/controllers.py:761
 msgid "{name} has been blocked."
 msgstr "{name} a été bloqué"
 
-#: indico/modules/users/controllers.py:723
+#: indico/modules/users/controllers.py:767
 msgid "{name} has been unblocked."
 msgstr "{name} a été débloqué."
 
-#: indico/modules/users/forms.py:42
-msgid "Profile picture"
-msgstr "Photo de profil"
-
-#: indico/modules/users/forms.py:47
+#: indico/modules/users/forms.py:41
 msgid "Language"
 msgstr "Langue"
 
-#: indico/modules/users/forms.py:51
+#: indico/modules/users/forms.py:45
 msgid "Use my timezone"
 msgstr "Utiliser mon fuseau horaire"
 
-#: indico/modules/users/forms.py:53
+#: indico/modules/users/forms.py:47
 msgid "Always use my current timezone instead of an event's timezone."
 msgstr "Toujours utiliser mon fuseau horaire actuel au lieu du fuseau de l'événement."
 
-#: indico/modules/users/forms.py:56
+#: indico/modules/users/forms.py:50
 msgid "Show future events"
 msgstr "Afficher les événements futurs"
 
-#: indico/modules/users/forms.py:58
+#: indico/modules/users/forms.py:52
 msgid "Show future events by default."
 msgstr "Afficher les événements futurs par défaut."
 
-#: indico/modules/users/forms.py:61
+#: indico/modules/users/forms.py:55
 msgid "Show past events"
 msgstr "Afficher les événements passés"
 
-#: indico/modules/users/forms.py:63
+#: indico/modules/users/forms.py:57
 msgid "Show past events by default."
 msgstr "Afficher les événements passés par défaut."
 
-#: indico/modules/users/forms.py:66
+#: indico/modules/users/forms.py:60
 msgid "Default format in which names are displayed"
 msgstr "Format par défaut pour l'affichage des noms"
 
-#: indico/modules/users/forms.py:69
+#: indico/modules/users/forms.py:63
 msgid "Use previewer for PDF files"
 msgstr "Utiliser l'aperçu pour les fichiers PDF"
 
-#: indico/modules/users/forms.py:71
+#: indico/modules/users/forms.py:65
 msgid ""
 "The previewer is used by default for image and text files, but not for PDF "
 "files."
 msgstr "L'aperçu est utilisé par défaut pour les images et les fichiers texte, mais pas pour les fichiers PDF."
 
-#: indico/modules/users/forms.py:85
+#: indico/modules/users/forms.py:79
 msgid "Add new email address"
 msgstr "Ajouter une nouvelle adresse électronique"
 
-#: indico/modules/users/forms.py:98
+#: indico/modules/users/forms.py:92
 msgid "Include deleted"
 msgstr "Inclure les supprimés"
 
-#: indico/modules/users/forms.py:99
+#: indico/modules/users/forms.py:93
 msgid "Include pending"
 msgstr "Inclure les en attente"
 
-#: indico/modules/users/forms.py:100
+#: indico/modules/users/forms.py:94
 msgid "External"
 msgstr "Externe"
 
-#: indico/modules/users/forms.py:104
+#: indico/modules/users/forms.py:98
 msgid "Source user"
 msgstr "Utilisateur source"
 
-#: indico/modules/users/forms.py:105
+#: indico/modules/users/forms.py:99
 msgid "The user that will be merged into the target one"
 msgstr "L'utilisateur qui sera fusionné dans la cible"
 
-#: indico/modules/users/forms.py:106
+#: indico/modules/users/forms.py:100
 msgid "Target user"
 msgstr "Utilisateur cible"
 
-#: indico/modules/users/forms.py:107
+#: indico/modules/users/forms.py:101
 msgid "The user that will remain active in the end"
 msgstr "L'utilisateur qui restera actif à la fin du processus"
 
-#: indico/modules/users/forms.py:111
+#: indico/modules/users/forms.py:105
 msgid "Registration notifications"
 msgstr "Notifications d'enregistrement"
 
-#: indico/modules/users/forms.py:112
+#: indico/modules/users/forms.py:106
 msgid ""
 "Send an email to all administrators whenever someone registers a new local "
 "account."
 msgstr "Envoyer un courriel à tous les administrateurs quand quelqu'un enregistre un nouveau compte local."
 
-#: indico/modules/users/forms.py:119
+#: indico/modules/users/forms.py:113
 msgid "Set login details"
 msgstr "Modifier les détails de connexion"
+
+#: indico/modules/users/util.py:399
+msgid "Could not retrieve {gravatar_type}"
+msgstr "Impossible de récupérer {gravatar_type}"
 
 #: indico/modules/users/views.py:37
 msgid "Profile of {name}"
@@ -15683,33 +15678,33 @@ msgstr "MARTIN, J."
 msgid "J. DOE"
 msgstr "J. MARTIN"
 
-#: indico/modules/users/models/users.py:128
+#: indico/modules/users/models/users.py:136
 msgid "first name"
 msgstr "prénom"
 
-#: indico/modules/users/models/users.py:129
+#: indico/modules/users/models/users.py:137
 msgid "family name"
 msgstr "nom de famille"
 
-#: indico/modules/users/models/users.py:130
+#: indico/modules/users/models/users.py:138
 msgid "affiliation"
 msgstr "affiliation"
 
-#: indico/modules/users/models/users.py:131
+#: indico/modules/users/models/users.py:139
 msgid "address"
 msgstr "adresse"
 
-#: indico/modules/users/models/users.py:132
+#: indico/modules/users/models/users.py:140
 msgid "phone number"
 msgstr "numéro de téléphone"
 
-#: indico/modules/users/models/users.py:626
+#: indico/modules/users/models/users.py:641
 msgid ""
 "Your {field_name} has been synchronised from '{old_value}' to '{new_value}'."
 msgstr "Votre {field_name} a été synchronisé(e) de '{old_value}' à '{new_value}'."
 
 #: indico/modules/users/templates/_category.html:33
-#: indico/modules/users/templates/dashboard.html:97
+#: indico/modules/users/templates/dashboard.html:91
 msgid "You have management rights"
 msgstr "Vous avez les droits d'administration"
 
@@ -15763,40 +15758,40 @@ msgstr "Ceci est l'utilisateur système. La plupart des fonctionnalités utilisa
 msgid "Now"
 msgstr "Maintenant"
 
-#: indico/modules/users/templates/dashboard.html:82
+#: indico/modules/users/templates/dashboard.html:76
 msgid "Your events at hand"
 msgstr "Vos événements à portée de main"
 
-#: indico/modules/users/templates/dashboard.html:99
+#: indico/modules/users/templates/dashboard.html:93
 msgid "You are a reviewer"
 msgstr "Vous êtes évaluateur/réviseur"
 
-#: indico/modules/users/templates/dashboard.html:101
+#: indico/modules/users/templates/dashboard.html:95
 msgid "You are an attendee"
 msgstr "Vous êtes un participant"
 
-#: indico/modules/users/templates/dashboard.html:108
+#: indico/modules/users/templates/dashboard.html:102
 msgid "You have no events."
 msgstr "Vous n'avez pas d'événement."
 
-#: indico/modules/users/templates/dashboard.html:116
+#: indico/modules/users/templates/dashboard.html:110
 msgid "You might be interested in the following categories..."
 msgstr "Vous pourriez être intéressé.e par les catégories suivantes..."
 
-#: indico/modules/users/templates/dashboard.html:127
+#: indico/modules/users/templates/dashboard.html:121
 msgid "Your categories"
 msgstr "Vos catégories"
 
-#: indico/modules/users/templates/dashboard.html:132
-#: indico/modules/users/templates/dashboard.html:148
+#: indico/modules/users/templates/dashboard.html:126
+#: indico/modules/users/templates/dashboard.html:142
 msgid "You have no categories."
 msgstr "Vous n'avez pas de catégorie."
 
-#: indico/modules/users/templates/dashboard.html:143
+#: indico/modules/users/templates/dashboard.html:137
 msgid "Happening in your categories"
 msgstr "Ce qui se passe dans vos catégories"
 
-#: indico/modules/users/templates/dashboard.html:154
+#: indico/modules/users/templates/dashboard.html:148
 msgid "Nothing happening in your categories."
 msgstr "Pas d'activité dans vos catégories."
 

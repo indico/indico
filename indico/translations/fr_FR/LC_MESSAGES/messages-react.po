@@ -7,7 +7,7 @@
 # 
 msgid ""
 msgstr ""
-"POT-Creation-Date: 2020-08-20 09:35+0200\n"
+"POT-Creation-Date: 2020-09-20 09:51+0200\n"
 "Last-Translator: Thomas Baron <thomas.baron@cern.ch>, 2020\n"
 "Language-Team: French (France) (https://www.transifex.com/indico/teams/6478/fr_FR/)\n"
 "MIME-Version: 1.0\n"
@@ -1662,6 +1662,7 @@ msgid "This booking has already started."
 msgstr "Cette réservation a déjà commencé."
 
 #: indico/modules/rb/client/js/common/bookings/BookingEdit.jsx:227
+#: indico/modules/users/client/js/ProfilePicture.jsx:207
 msgid "Save changes"
 msgstr "Sauver les modifications"
 
@@ -2174,6 +2175,7 @@ msgid "Restricted"
 msgstr "Privée"
 
 #: indico/modules/rb/client/js/common/rooms/edit/RoomPhoto.jsx:91
+#: indico/modules/users/client/js/ProfilePicture.jsx:103
 msgid "Upload"
 msgstr "Télécharger"
 
@@ -3532,6 +3534,18 @@ msgstr "Chargement..."
 msgid "Copied!"
 msgstr "Copié!"
 
+#: indico/modules/users/client/js/ProfilePicture.jsx:49
+msgid "Based on {email}"
+msgstr "Basée sur {email}"
+
+#: indico/modules/users/client/js/ProfilePicture.jsx:183
+msgid "System-assigned icon"
+msgstr "Icône assignée par le système"
+
+#: indico/modules/users/client/js/ProfilePicture.jsx:200
+msgid "Custom picture"
+msgstr "Image personnalisée"
+
 #: indico/modules/users/client/js/dashboard.jsx:22
 msgid "Events at hand"
 msgstr "Événements à portée de main"
@@ -3635,25 +3649,25 @@ msgid "Upload failed"
 msgstr "Echec du téléchargement"
 
 #: indico/web/client/js/react/components/principals/ACLField.jsx:148
-#: indico/web/client/js/react/components/principals/PrincipalListField.jsx:112
+#: indico/web/client/js/react/components/principals/PrincipalListField.jsx:109
 msgid "This list is currently empty"
 msgstr "Cette liste est actuellement vide"
 
 #: indico/web/client/js/react/components/principals/ACLField.jsx:166
-#: indico/web/client/js/react/components/principals/PrincipalListField.jsx:141
+#: indico/web/client/js/react/components/principals/PrincipalListField.jsx:138
 msgid "Event Role"
 msgstr "Rôle dans l'événement"
 
 #: indico/web/client/js/react/components/principals/ACLField.jsx:181
-#: indico/web/client/js/react/components/principals/PrincipalListField.jsx:149
+#: indico/web/client/js/react/components/principals/PrincipalListField.jsx:146
 msgid "Category Role"
 msgstr "Rôle de Catégorie"
 
-#: indico/web/client/js/react/components/principals/PrincipalListField.jsx:157
+#: indico/web/client/js/react/components/principals/PrincipalListField.jsx:154
 msgid "Registrants"
 msgstr "Participants"
 
-#: indico/web/client/js/react/components/principals/PrincipalListField.jsx:159
+#: indico/web/client/js/react/components/principals/PrincipalListField.jsx:156
 msgid "Registrants in \"{form}\""
 msgstr "Participants dans \"{form}\""
 

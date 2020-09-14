@@ -14,7 +14,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Indico\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2020-08-19 09:34+0200\n"
+"POT-Creation-Date: 2020-09-09 09:51+0200\n"
 "PO-Revision-Date: 2020-08-19 10:35+0000\n"
 "Last-Translator: Dirk Hoffmann <Hoffmann@cppm.in2p3.fr>\n"
 "Language-Team: French (France) (http://www.transifex.com/indico/indico/language/fr_FR/)\n"
@@ -905,15 +905,15 @@ msgstr "Choisissez une personne"
 msgid "Select an option"
 msgstr "Sélectionnez une option"
 
-#: indico/web/client/js/jquery/widgets/jinja/location_widget.js:67
+#: indico/web/client/js/jquery/widgets/jinja/location_widget.js:68
 msgid "Using default location from: {0} ({1})"
 msgstr "Utilisation du site par défaut de: {0} ({1})"
 
-#: indico/web/client/js/jquery/widgets/jinja/location_widget.js:69
+#: indico/web/client/js/jquery/widgets/jinja/location_widget.js:70
 msgid "Using custom location"
 msgstr "Utilisation d'un site personnalisé"
 
-#: indico/web/client/js/jquery/widgets/jinja/location_widget.js:165
+#: indico/web/client/js/jquery/widgets/jinja/location_widget.js:166
 msgid "Just use \"{0}\""
 msgstr "Utiliser simplement \"{0}\""
 
