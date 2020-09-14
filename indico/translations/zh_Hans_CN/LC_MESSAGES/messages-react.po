@@ -6,7 +6,7 @@
 # 
 msgid ""
 msgstr ""
-"POT-Creation-Date: 2020-08-20 09:35+0200\n"
+"POT-Creation-Date: 2020-09-20 09:51+0200\n"
 "Last-Translator: Lanxin Ma <ma@ihep.ac.cn>, 2020\n"
 "Language-Team: Chinese (China) (GB2312) (https://www.transifex.com/indico/teams/6478/zh_CN.GB2312/)\n"
 "MIME-Version: 1.0\n"
@@ -351,7 +351,7 @@ msgstr "{userName} 发表了评论"
 
 #: indico/modules/events/editing/client/js/editing/timeline/CommentItem.jsx:67
 msgid "Visible only to editors"
-msgstr "只对不兼容可见"
+msgstr "只对编辑人可见"
 
 #: indico/modules/events/editing/client/js/editing/timeline/CommentItem.jsx:76
 msgid "On {modificationDate}"
@@ -519,11 +519,11 @@ msgstr "显示旧修订"
 
 #: indico/modules/events/editing/client/js/editing/timeline/index.jsx:63
 msgid "This revision has been updated"
-msgstr ""
+msgstr "此修订版已更新"
 
 #: indico/modules/events/editing/client/js/editing/timeline/index.jsx:65
 msgid "{link}Click here to refresh{/link} and see the most recent version."
-msgstr ""
+msgstr "{link}点击此处刷新{/link}并查看更多最新版本。"
 
 #: indico/modules/events/editing/client/js/editing/timeline/judgment/AcceptRejectForm.jsx:63
 #: indico/modules/events/editing/client/js/editing/timeline/judgment/UpdateFilesForm.jsx:32
@@ -692,7 +692,7 @@ msgid ""
 " to disconnect and reconnect will most likely not fix it.{/strong}"
 msgstr ""
 "在不可用时断开编辑工作流程服务的连接可能会使您的编辑过程处于不一致的状态。 如果您打算以后继续使用工作流服务，请不要执行此操作。 {strong} "
-"工作流程服务当前的错误很可能是暂时的。 尝试断开连接并重新连接很可能无法解决。{/ strong}"
+"工作流程服务当前的错误很可能是暂时的。 尝试断开连接并重新连接很可能无法解决。{/strong}"
 
 #: indico/modules/events/editing/client/js/management/ManageService.jsx:140
 msgid ""
@@ -1186,7 +1186,7 @@ msgstr "获取下一个幻灯片"
 msgid ""
 "Log entries are currently filtered by URL. {link}Click here{/link} to "
 "disable the filter."
-msgstr "日志条目当前按URL过滤。 {link}点击此处{/ link}以禁用过滤器。"
+msgstr "日志条目当前按URL过滤。 {link}点击此处{/link}以禁用过滤器。"
 
 #: indico/modules/events/logs/client/js/components/LogEntryList.jsx:39
 msgid "This email is pending and will be sent soon."
@@ -1288,7 +1288,7 @@ msgstr "提交编辑"
 
 #: indico/modules/events/papers/client/js/components/Paper.jsx:159
 msgid "The paper was {url}submitted{/url} for editing"
-msgstr "论文已{url}提交{/ url}进行编辑"
+msgstr "论文已{url}提交{/url}进行编辑"
 
 #: indico/modules/events/papers/client/js/components/PaperContent.jsx:52
 msgid "Paper files"
@@ -1417,7 +1417,7 @@ msgstr "在此期间，有多个预订请求。 接受此预订将自动拒绝�
 
 #: indico/modules/rb/client/js/common/bookings/BookingDetails.jsx:180
 msgid "Close without accepting"
-msgstr "关闭而不接受"
+msgstr "关闭不接受"
 
 #: indico/modules/rb/client/js/common/bookings/BookingDetails.jsx:191
 msgid "Accept anyway"
@@ -1593,6 +1593,7 @@ msgid "This booking has already started."
 msgstr "此预订已经开始。"
 
 #: indico/modules/rb/client/js/common/bookings/BookingEdit.jsx:227
+#: indico/modules/users/client/js/ProfilePicture.jsx:207
 msgid "Save changes"
 msgstr "保存更改"
 
@@ -1912,7 +1913,7 @@ msgstr "部门"
 
 #: indico/modules/rb/client/js/common/rooms/edit/RoomEditDetails.jsx:47
 msgid "Comments"
-msgstr "评论"
+msgstr "注释"
 
 #: indico/modules/rb/client/js/common/rooms/edit/RoomEditLocation.jsx:18
 #: indico/modules/rb/client/js/common/rooms/edit/RoomEditModal.jsx:115
@@ -2092,6 +2093,7 @@ msgid "Restricted"
 msgstr "受限的"
 
 #: indico/modules/rb/client/js/common/rooms/edit/RoomPhoto.jsx:91
+#: indico/modules/users/client/js/ProfilePicture.jsx:103
 msgid "Upload"
 msgstr "上传"
 
@@ -2675,7 +2677,7 @@ msgstr "最长预订时间"
 
 #: indico/modules/rb/client/js/modules/admin/SettingsPage.jsx:154
 msgid "The maximum length (in days) a booking may last."
-msgstr "预订的最长时间（以天为单位）。"
+msgstr "预订的最长时间（天）。"
 
 #: indico/modules/rb/client/js/modules/admin/SettingsPage.jsx:159
 msgid "Send reminders for upcoming bookings"
@@ -3371,6 +3373,18 @@ msgstr "加载中..."
 msgid "Copied!"
 msgstr "复制！"
 
+#: indico/modules/users/client/js/ProfilePicture.jsx:49
+msgid "Based on {email}"
+msgstr "基于 {email}"
+
+#: indico/modules/users/client/js/ProfilePicture.jsx:183
+msgid "System-assigned icon"
+msgstr "系统分配的图标"
+
+#: indico/modules/users/client/js/ProfilePicture.jsx:200
+msgid "Custom picture"
+msgstr "自定义图片"
+
 #: indico/modules/users/client/js/dashboard.jsx:22
 msgid "Events at hand"
 msgstr "手中的事件"
@@ -3474,25 +3488,25 @@ msgid "Upload failed"
 msgstr "上传失败"
 
 #: indico/web/client/js/react/components/principals/ACLField.jsx:148
-#: indico/web/client/js/react/components/principals/PrincipalListField.jsx:112
+#: indico/web/client/js/react/components/principals/PrincipalListField.jsx:109
 msgid "This list is currently empty"
 msgstr "此列表现在为空"
 
 #: indico/web/client/js/react/components/principals/ACLField.jsx:166
-#: indico/web/client/js/react/components/principals/PrincipalListField.jsx:141
+#: indico/web/client/js/react/components/principals/PrincipalListField.jsx:138
 msgid "Event Role"
 msgstr "事件角色"
 
 #: indico/web/client/js/react/components/principals/ACLField.jsx:181
-#: indico/web/client/js/react/components/principals/PrincipalListField.jsx:149
+#: indico/web/client/js/react/components/principals/PrincipalListField.jsx:146
 msgid "Category Role"
 msgstr "类别角色"
 
-#: indico/web/client/js/react/components/principals/PrincipalListField.jsx:157
+#: indico/web/client/js/react/components/principals/PrincipalListField.jsx:154
 msgid "Registrants"
 msgstr "注册人"
 
-#: indico/web/client/js/react/components/principals/PrincipalListField.jsx:159
+#: indico/web/client/js/react/components/principals/PrincipalListField.jsx:156
 msgid "Registrants in \"{form}\""
 msgstr "\"{form}\"中的注册人"
 

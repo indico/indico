@@ -9,8 +9,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Indico\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2020-08-19 09:34+0200\n"
-"PO-Revision-Date: 2020-08-14 08:57+0000\n"
+"POT-Creation-Date: 2020-09-09 09:51+0200\n"
+"PO-Revision-Date: 2020-09-14 02:45+0000\n"
 "Last-Translator: Lanxin Ma <ma@ihep.ac.cn>\n"
 "Language-Team: Chinese (China) (GB2312) (http://www.transifex.com/indico/indico/language/zh_CN.GB2312/)\n"
 "MIME-Version: 1.0\n"
@@ -66,7 +66,7 @@ msgstr "空"
 #: indico/web/client/js/jquery/widgets/categorynavigator.js:298
 msgid "{0} event"
 msgid_plural "{0} events"
-msgstr[0] "{0} 事件"
+msgstr[0] "{0} 个事件"
 
 #: indico/modules/categories/client/js/display.js:155
 msgid "Remove from your favourites"
@@ -213,7 +213,7 @@ msgstr "此服务器没有注册成为社区的一部分。"
 
 #: indico/modules/cephalopod/client/js/index.js:110
 msgid "Synchronized"
-msgstr "同步的"
+msgstr "已同步"
 
 #: indico/modules/cephalopod/client/js/index.js:111
 msgid "This server is registered as part of the community and is up to date."
@@ -253,7 +253,7 @@ msgstr "用这个做背面的模板背面将被删除。"
 #: indico/modules/designer/client/js/index.js:33
 #: indico/modules/designer/client/js/index.js:709
 msgid "Disassociate back sides"
-msgstr "分离背面"
+msgstr "解除背面关联"
 
 #: indico/modules/designer/client/js/index.js:89
 #: indico/modules/designer/client/js/index.js:232
@@ -277,19 +277,19 @@ msgstr "模板不能为空。添加一些元素或背景图片。"
 
 #: indico/modules/designer/client/js/index.js:528
 msgid "Are you sure you want to change the dimensions of this template?"
-msgstr "您确定要更改此模板的维度？"
+msgstr "您确定要更改此模板的尺寸？"
 
 #: indico/modules/designer/client/js/index.js:697
 msgid "This back side template will be removed"
-msgstr "这个背面模板将被删除"
+msgstr "此背面模板将被删除"
 
 #: indico/modules/designer/client/js/index.js:699
 msgid "The back side of this template will be removed"
-msgstr "这个模板的背面将被删除"
+msgstr "此模板的背面将被删除"
 
 #: indico/modules/designer/client/js/index.js:700
 msgid "Disassociate back side"
-msgstr "分离背面"
+msgstr "解除背面关联"
 
 #: indico/modules/designer/client/js/index.js:704
 msgid "The back side is empty."
@@ -483,12 +483,12 @@ msgstr "位置限制"
 #: indico/modules/events/registration/client/js/form/field.js:704
 #: indico/modules/events/registration/client/js/form/field.js:1159
 msgid "Max. extra slots"
-msgstr "最大额外插槽数"
+msgstr "最大额外槽数"
 
 #: indico/modules/events/registration/client/js/form/field.js:705
 #: indico/modules/events/registration/client/js/form/field.js:1160
 msgid "Extra slots pay"
-msgstr "额外插槽付款"
+msgstr "额外付款"
 
 #: indico/modules/events/registration/client/js/form/field.js:706
 #: indico/modules/events/registration/client/js/form/field.js:1081
@@ -585,7 +585,7 @@ msgstr "创建新会议"
 
 #: indico/web/client/js/jquery/extensions/global.js:257
 msgid "Create new conference"
-msgstr "创建新会议"
+msgstr "创建新大会"
 
 #: indico/web/client/js/jquery/utils/ajaxdialog.js:79
 msgid ""
@@ -681,7 +681,7 @@ msgstr "别忘了保存您的更改！"
 #: indico/web/client/js/jquery/utils/forms.js:407
 msgid "Only {0} out of {1} rows is currently selected"
 msgid_plural "Only {0} out of {1} rows are currently selected."
-msgstr[0] "当前只选择了 {1} 行中的 {0}。"
+msgstr[0] "当前只选择了 {1} 行中的 {0} 行。"
 
 #: indico/web/client/js/jquery/utils/forms.js:446
 msgid "Select only the current page."
@@ -722,7 +722,7 @@ msgstr "保存"
 #: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Base.js:63
 #: indico/web/client/js/legacy/libs/timetable/Draw.js:670
 msgid "Loading..."
-msgstr "上传..."
+msgstr "加载..."
 
 #: indico/web/client/js/jquery/widgets/categorynavigator.js:19
 msgid "Select"
@@ -823,7 +823,7 @@ msgstr "显示 {1} 个结果中的 {0}个。"
 
 #: indico/web/client/js/jquery/widgets/categorynavigator.js:473
 msgid "There are no results."
-msgstr "无结果"
+msgstr "无结果。"
 
 #: indico/web/client/js/jquery/widgets/categorynavigator.js:477
 msgid "Make the search more specific for more accurate results"
@@ -880,15 +880,15 @@ msgstr "输入人员"
 msgid "Select an option"
 msgstr "选择选项"
 
-#: indico/web/client/js/jquery/widgets/jinja/location_widget.js:67
+#: indico/web/client/js/jquery/widgets/jinja/location_widget.js:68
 msgid "Using default location from: {0} ({1})"
 msgstr "使用默认的位置来自：{0} ({1})"
 
-#: indico/web/client/js/jquery/widgets/jinja/location_widget.js:69
+#: indico/web/client/js/jquery/widgets/jinja/location_widget.js:70
 msgid "Using custom location"
 msgstr "使用自定义位置"
 
-#: indico/web/client/js/jquery/widgets/jinja/location_widget.js:165
+#: indico/web/client/js/jquery/widgets/jinja/location_widget.js:166
 msgid "Just use \"{0}\""
 msgstr "只使用 \"{0}\""
 
@@ -959,7 +959,7 @@ msgstr "所有选项已添加"
 
 #: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:312
 msgid "This entry was already added"
-msgstr "这个条目已被添加"
+msgstr "此条目已被添加"
 
 #: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:345
 msgid "Anonymous"
@@ -1057,19 +1057,19 @@ msgstr "字母排序已打开。单击可将其关闭. "
 
 #: indico/web/client/js/jquery/widgets/jinja/person_link_widget.js:439
 msgid "You must add at least one speaker"
-msgstr "你必须添加至少一个发言者"
+msgstr "您必须添加至少一个发言者"
 
 #: indico/web/client/js/jquery/widgets/jinja/person_link_widget.js:442
 msgid "You must add at least one submitter"
-msgstr "你必须添加至少一个提交人"
+msgstr "您必须添加至少一个提交人"
 
 #: indico/web/client/js/jquery/widgets/jinja/person_link_widget.js:445
 msgid "You must add at least one co-author"
-msgstr "你必须添加至少一个合作作者"
+msgstr "您必须添加至少一个合作作者"
 
 #: indico/web/client/js/jquery/widgets/jinja/person_link_widget.js:448
 msgid "You must add at least one author"
-msgstr "你必须添加至少一个作者"
+msgstr "您必须添加至少一个作者"
 
 #: indico/web/client/js/jquery/widgets/jinja/person_link_widget.js:456
 msgid ""
@@ -1209,7 +1209,7 @@ msgstr "注册后用户将自动获得"
 
 #: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:999
 msgid " submission rights."
-msgstr "提交权限"
+msgstr "提交权限。"
 
 #: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:1005
 msgid "Give management rights"
@@ -1237,7 +1237,7 @@ msgstr "给予协调权限"
 
 #: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:1038
 msgid " given coordination rights."
-msgstr "具有协调权限"
+msgstr "具有协调权限。"
 
 #: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:1053
 msgid " given the rights."
@@ -1526,7 +1526,7 @@ msgstr "<strong> 事件 </strong> 的 <strong> 开始时间 </strong> 被移动�
 #: indico/web/client/js/legacy/libs/timetable/Base.js:799
 #: indico/web/client/js/legacy/libs/timetable/Base.js:803
 msgid "The <strong>ending time</strong> of the session interval <strong>"
-msgstr "分会间隔 <strong> 的 </strong> 结束时间 <strong>"
+msgstr "分会间隔 <strong> 的 <strong> 结束时间 </strong>"
 
 #: indico/web/client/js/legacy/libs/timetable/Base.js:806
 msgid ""
