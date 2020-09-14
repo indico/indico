@@ -13,13 +13,16 @@ from flask import request
 from wtforms.fields import BooleanField, HiddenField, IntegerField, SelectField, StringField
 from wtforms.validators import DataRequired, InputRequired, Length, NumberRange, Optional, ValidationError
 
+from indico.core.permissions import FULL_ACCESS_PERMISSION, READ_ACCESS_PERMISSION
 from indico.modules.categories.models.categories import Category, EventMessageMode
 from indico.modules.categories.models.roles import CategoryRole
 from indico.modules.categories.util import get_image_data, get_visibility_options
 from indico.modules.events import Event
 from indico.modules.events.fields import IndicoThemeSelectField
 from indico.modules.events.models.events import EventType
+from indico.modules.networks import IPNetworkGroup
 from indico.util.i18n import _
+from indico.util.user import principal_from_fossil
 from indico.web.forms.base import IndicoForm
 from indico.web.forms.colors import get_role_colors
 from indico.web.forms.fields import (EditableFileField, EmailListField, HiddenFieldList, IndicoEnumSelectField,
@@ -105,6 +108,17 @@ class CategoryProtectionForm(IndicoForm):
         if real_horizon and real_horizon.is_descendant_of(own_horizon):
             self.visibility.warning = _("This category's visibility is currently limited by that of '{}'.").format(
                 real_horizon.title)
+
+    def validate_permissions(self, field):
+        for principal_fossil, permissions in field.data:
+            principal = principal_from_fossil(principal_fossil, allow_networks=True, allow_pending=True,
+                                              category=self.category)
+            if isinstance(principal, IPNetworkGroup) and set(permissions) - {READ_ACCESS_PERMISSION}:
+                msg = _('IP networks cannot have management permissions: {}').format(principal.name)
+                raise ValidationError(msg)
+            if FULL_ACCESS_PERMISSION in permissions and len(permissions) != 1:
+                # when full access permission is set, discard rest of permissions
+                permissions[:] = [FULL_ACCESS_PERMISSION]
 
 
 class CreateCategoryForm(IndicoForm):
