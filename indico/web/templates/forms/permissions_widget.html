@@ -34,7 +34,7 @@
                     <ul class="i-dropdown entry-category-role-dropdown"
                         data-items='{{ category_roles|tojson|forceescape }}'></ul>
                 {% endif %}
-                {% if field.object_type == 'event' and field.ip_networks %}
+                {% if field.object_type in ('event', 'category') and field.ip_networks %}
                     <a class="i-button arrow js-dropdown" data-toggle="dropdown">
                         {%- trans %}IP Network{% endtrans -%}
                     </a>
