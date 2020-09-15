@@ -143,6 +143,13 @@ You can then initialize the DB::
 
     indico db prepare
 
+To build the locales, use:
+
+.. code-block:: shell
+
+    indico i18n compile-catalog
+    indico i18n compile-catalog-react
+
 .. _run-dev:
 
 Running Indico
