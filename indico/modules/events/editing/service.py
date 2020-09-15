@@ -8,6 +8,7 @@
 from __future__ import unicode_literals
 
 import requests
+from marshmallow import ValidationError
 from werkzeug.urls import url_parse
 
 import indico
@@ -153,10 +154,7 @@ def service_handle_review_editable(editable, action, parent_revision, revision=N
         resp = requests.post(_build_url(editable.event, path), headers=_get_headers(editable.event),
                              json=data)
         resp.raise_for_status()
-        try:
-            resp = ServiceReviewEditableSchema().load(resp.json())
-        except ValueError:
-            return {}
+        resp = ServiceReviewEditableSchema().load(resp.json())
 
         if 'comment' in resp:
             parent_revision.comment = resp.get('comment')
@@ -166,7 +164,7 @@ def service_handle_review_editable(editable, action, parent_revision, revision=N
 
         db.session.flush()
         return resp
-    except (requests.RequestException, ValueError) as exc:
+    except (requests.RequestException, ValidationError) as exc:
         logger.exception('Failed calling listener for editable revision')
         raise ServiceRequestFailed(exc)
 
