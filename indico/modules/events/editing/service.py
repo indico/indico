@@ -139,7 +139,7 @@ def service_handle_new_editable(editable):
 def service_handle_review_editable(editable, action, parent_revision, revision=None):
     new_revision = revision or parent_revision
     data = {
-        'action': action.value,
+        'action': action.name,
         'revision': EditingRevisionUnclaimedSchema().dump(new_revision),
         'endpoints': _get_revision_endpoints(new_revision)
     }
@@ -154,15 +154,15 @@ def service_handle_review_editable(editable, action, parent_revision, revision=N
                              json=data)
         resp.raise_for_status()
         try:
-            resp = ServiceReviewEditableSchema().dump(resp.json())
+            resp = ServiceReviewEditableSchema().load(resp.json())
         except ValueError:
-            return dict()
+            return {}
 
         if 'comment' in resp:
             parent_revision.comment = resp.get('comment')
         if 'tags' in resp:
-            parent_revision.tags = set([tag for tag in editable.event.editing_tags
-                                        if tag.id in map(int, resp.get('tags'))])
+            parent_revision.tags = {tag for tag in editable.event.editing_tags
+                                    if tag.id in map(int, resp.get('tags'))}
 
         db.session.flush()
         return resp

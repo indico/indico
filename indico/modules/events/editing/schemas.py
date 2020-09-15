@@ -105,7 +105,7 @@ class EditingRevisionFileSchema(mm.ModelSchema):
 
 
 class EditingRevisionUnclaimedFileSchema(EditingRevisionFileSchema):
-    external_download_url = fields.String(attribute='file.external_download_url')
+    signed_download_url = fields.String(attribute='file.signed_download_url')
 
 
 class EditingRevisionCommentSchema(mm.ModelSchema):

@@ -163,19 +163,19 @@ class RHReviewEditable(RHContributionEditableRevisionBase):
         args = parser.parse(argmap)
         service_url = editing_settings.get(self.event, 'service_url')
 
-        revision = review_editable_revision(self.revision, session.user, action, comment, args['tags'],
-                                            args.get('files'))
+        new_revision = review_editable_revision(self.revision, session.user, action, comment, args['tags'],
+                                                args.get('files'))
 
         publish = True
         if service_url:
             try:
-                resp = service_handle_review_editable(self.editable, action, self.revision, revision)
+                resp = service_handle_review_editable(self.editable, action, self.revision, new_revision)
                 publish = resp.get('publish', True)
             except ServiceRequestFailed:
-                raise ServiceUnavailable(_('Revision failed, please try again later.'))
+                raise ServiceUnavailable(_('Failed processing review, please try again later.'))
 
         if publish and action in (EditingReviewAction.accept, EditingReviewAction.update_accept):
-            publish_editable_revision(revision or self.revision)
+            publish_editable_revision(new_revision or self.revision)
         return '', 204
 
 
@@ -199,7 +199,7 @@ class RHConfirmEditableChanges(RHContributionEditableRevisionBase):
                 resp = service_handle_review_editable(self.editable, action, self.revision)
                 publish = resp.get('publish', True)
             except ServiceRequestFailed:
-                raise ServiceUnavailable(_('Revision failed, please try again later.'))
+                raise ServiceUnavailable(_('Failed processing review, please try again later.'))
 
         if publish and action == EditingConfirmationAction.accept:
             publish_editable_revision(self.revision)

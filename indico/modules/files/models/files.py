@@ -7,7 +7,6 @@
 
 from __future__ import unicode_literals
 
-import posixpath
 from uuid import uuid4
 
 from sqlalchemy.dialects.postgresql import JSONB, UUID
@@ -19,6 +18,8 @@ from indico.util.fs import secure_filename
 from indico.util.signing import secure_serializer
 from indico.util.string import format_repr, return_ascii, strict_unicode
 from indico.web.flask.util import url_for
+
+import posixpath
 
 
 class File(StoredFileMixin, db.Model):

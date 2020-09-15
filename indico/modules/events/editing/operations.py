@@ -145,13 +145,6 @@ def review_editable_revision(revision, editor, action, comment, tags, files=None
 
 
 @no_autoflush
-def delete_revision(revision):
-    db.session.delete(revision)
-    db.session.flush()
-    logger.info('Revision %r deleted', revision)
-
-
-@no_autoflush
 def confirm_editable_changes(revision, submitter, action, comment):
     _ensure_latest_revision(revision)
     _ensure_state(revision, initial=InitialRevisionState.needs_submitter_confirmation, final=FinalRevisionState.none)
