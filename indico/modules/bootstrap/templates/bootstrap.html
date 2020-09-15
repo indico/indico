@@ -13,30 +13,32 @@
         <img class="header-logo" src="{{ url_for('assets.image', filename='logo_indico_white.png') }}">
         <div class="header-title">{% trans %}Hello there!{% endtrans %}</div>
         <div class="header-subtitle">{% trans %}Indico needs just a little bit more data from you...{% endtrans %}</div>
-        <div id="language-selector" class="toolbar language-selector">
-            <a class="i-button transparent-button borderless icon-earth arrow js-dropdown" data-toggle="dropdown">
-                {{ languages[session.lang][0] }}
-            </a>
-            <ul class="i-dropdown">
-                {% for name, (title, territory) in languages|dictsort(by='value') %}
-                    <li>
-                        {% if name == session.lang %}
-                            <a class="disabled" title="{% trans %}This is your current language.{% endtrans %}">
-                                {{- title }} ({{ territory }})
-                            </a>
-                        {% else %}
-                            <a data-href="{{ url_for('core.change_lang') }}"
-                               data-method="POST"
-                               data-params='{{ {'lang': name}|tojson|forceescape }}'
-                               data-reload-after
-                               data-ajax>
-                                {{- title }} ({{ territory }})
-                            </a>
-                        {% endif %}
-                    </li>
-                {% endfor %}
-            </ul>
-        </div>
+        {% if languages and session.lang in languages %}
+            <div id="language-selector" class="toolbar language-selector">
+                <a class="i-button transparent-button borderless icon-earth arrow js-dropdown" data-toggle="dropdown">
+                    {{ languages[session.lang][0] }}
+                </a>
+                <ul class="i-dropdown">
+                    {% for name, (title, territory) in languages|dictsort(by='value') %}
+                        <li>
+                            {% if name == session.lang %}
+                                <a class="disabled" title="{% trans %}This is your current language.{% endtrans %}">
+                                    {{- title }} ({{ territory }})
+                                </a>
+                            {% else %}
+                                <a data-href="{{ url_for('core.change_lang') }}"
+                                data-method="POST"
+                                data-params='{{ {'lang': name}|tojson|forceescape }}'
+                                data-reload-after
+                                data-ajax>
+                                    {{- title }} ({{ territory }})
+                                </a>
+                            {% endif %}
+                        </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        {% endif %}
     </div>
 
     <div class="bootstrap-body">
