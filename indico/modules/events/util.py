@@ -633,7 +633,7 @@ def get_event_from_url(url):
     return event
 
 
-class ZipGeneratorMixin:
+class ZipGeneratorMixin(object):
     """Mixin for RHs that generate zip with files"""
 
     def _adjust_path_length(self, segments):
@@ -662,14 +662,14 @@ class ZipGeneratorMixin:
         for f in files_holder:
             yield f
 
-    def _generate_zip_file(self, files_holder, name_prefix='material', name_suffix=None):
+    def _generate_zip_file(self, files_holder, name_prefix='material', name_suffix=None, return_file=False):
         """Generate a zip file containing the files passed.
 
         :param files_holder: An iterable (or an iterable containing) object that
                              contains the files to be added in the zip file.
         :param name_prefix: The prefix to the zip file name
         :param name_suffix: The suffix to the zip file name
-        :return: The generated zip file.
+        :param return_file: Return the temp file instead of a response
         """
 
         temp_file = NamedTemporaryFile(suffix='indico.tmp', dir=config.TEMP_DIR)
@@ -681,9 +681,11 @@ class ZipGeneratorMixin:
                 with item.get_local_path() as filepath:
                     zip_handler.write(filepath.encode('utf-8'), name)
 
-        temp_file.delete = False
         zip_file_name = '{}-{}.zip'.format(name_prefix, name_suffix) if name_suffix else '{}.zip'.format(name_prefix)
         chmod_umask(temp_file.name)
+        if return_file:
+            return temp_file
+        temp_file.delete = False
         return send_file(zip_file_name, temp_file.name, 'application/zip', inline=False)
 
     def _prepare_folder_structure(self, item):

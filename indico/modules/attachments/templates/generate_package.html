@@ -45,7 +45,8 @@
 
 {% block content %}
     {% call wrap_in_ibox(management) %}
-        {{ form_header(form, disable_if_locked=false) }}
+        {{ form_header(form, disable_if_locked=false, id='download-package-form') }}
+        <div class="flashed-messages"></div>
         {{ form_rows(form) }}
         {% call form_footer(form) %}
             <input type="submit" class='i-button big highlight' value="{% trans %}Download package{% endtrans %}">
@@ -53,15 +54,6 @@
     {% endcall %}
 
     <script>
-        (function() {
-            'use strict';
-
-            $('#filter_type input:radio').on('change', function() {
-                $('#form-group-sessions').toggle(this.value === 'sessions');
-                $('#form-group-contributions').toggle(this.value === 'contributions');
-                $('#form-group-dates').toggle(this.value === 'dates');
-            });
-            $('#filter_type input:radio:checked').trigger('change');
-        })();
+        setupGeneratePackage({{ event.id | tojson }});
     </script>
 {% endblock %}

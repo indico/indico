@@ -59,3 +59,8 @@ def _extend_category_management_menu(sender, category, **kwargs):
 def _get_attachment_cloner(sender, **kwargs):
     from indico.modules.attachments.clone import AttachmentCloner
     return AttachmentCloner
+
+
+@signals.import_tasks.connect
+def _import_tasks(sender, **kwargs):
+    import indico.modules.attachments.tasks  # noqa: F401
