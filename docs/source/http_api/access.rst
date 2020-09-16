@@ -71,7 +71,7 @@ To sign a request, you need the following:
 * The requested path, e.g. */export/categ/123.json*
 * Any additional params, e.g. *limit=10*
 * The current UNIX timestamp
-* You *API key* and *secret key*
+* Your *API key* and *secret key*
 
 1) Add your API key to the params (*limit=10&ak=your-api-key*)
 2) Add the current timestamp to the params (*limit=10&ak=your-api-key&timestamp=1234567890*)
