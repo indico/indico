@@ -15,6 +15,7 @@ from indico.modules.attachments.controllers.display.category import RHDownloadCa
 from indico.modules.attachments.controllers.display.event import (RHDownloadEventAttachment,
                                                                   RHListEventAttachmentFolder,
                                                                   RHPackageEventAttachmentsDisplay)
+from indico.modules.attachments.controllers.event_package import RHPackageEventAttachmentsStatus
 from indico.modules.attachments.controllers.management.category import (RHAddCategoryAttachmentFiles,
                                                                         RHAddCategoryAttachmentLink,
                                                                         RHCreateCategoryFolder,
@@ -109,6 +110,8 @@ _bp.add_url_rule('/event/<confId>/attachments/package', 'package',
                  RHPackageEventAttachmentsDisplay, methods=('GET', 'POST'))
 _bp.add_url_rule('/event/<confId>/manage/attachments/package', 'package_management',
                  RHPackageEventAttachmentsManagement, methods=('GET', 'POST'))
+_bp.add_url_rule('/event/<confId>/attachments/package/status/<task_id>', 'package_status',
+                 RHPackageEventAttachmentsStatus)
 
 
 # Legacy redirects for the old URLs

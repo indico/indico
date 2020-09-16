@@ -27,11 +27,12 @@ from indico.web.flask.util import url_for
 from indico.web.menu import SideMenuItem
 
 
-__all__ = ('celery',)
+__all__ = ('celery', 'AsyncResult')
 
 
 #: The Celery instance for all Indico tasks
 celery = IndicoCelery('indico')
+AsyncResult = celery.AsyncResult
 
 
 celery_settings = SettingsProxy('celery', {

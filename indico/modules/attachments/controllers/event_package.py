@@ -10,17 +10,22 @@ from __future__ import unicode_literals
 import os
 from collections import OrderedDict
 
-from flask import flash, session
+from celery.exceptions import TimeoutError
+from flask import flash, jsonify, request, session
 from markupsafe import escape
 from sqlalchemy import Date, cast
 
+from indico.core.celery import AsyncResult
 from indico.core.db import db
 from indico.core.db.sqlalchemy.links import LinkType
+from indico.core.errors import IndicoError
 from indico.modules.attachments.forms import AttachmentPackageForm
 from indico.modules.attachments.models.attachments import Attachment, AttachmentFile, AttachmentType
 from indico.modules.attachments.models.folders import AttachmentFolder
+from indico.modules.attachments.tasks import generate_materials_package
 from indico.modules.events.contributions.models.contributions import Contribution
 from indico.modules.events.contributions.models.subcontributions import SubContribution
+from indico.modules.events.controllers.base import RHDisplayEventBase
 from indico.modules.events.sessions.models.sessions import Session
 from indico.modules.events.util import ZipGeneratorMixin
 from indico.util.date_time import format_date, format_time
@@ -28,6 +33,7 @@ from indico.util.fs import secure_filename
 from indico.util.i18n import _
 from indico.util.string import natural_sort_key, to_unicode
 from indico.web.forms.base import FormDefaults
+from indico.web.util import jsonify_data
 
 
 def _get_start_dt(obj):
@@ -179,11 +185,16 @@ class AttachmentPackageMixin(AttachmentPackageGeneratorMixin):
     def _process(self):
         form = self._prepare_form()
         if form.validate_on_submit():
-            attachments = self._filter_attachments(form.data)
+            attachments = [attachment.id for attachment in self._filter_attachments(form.data)]
             if attachments:
-                return self._generate_zip_file(attachments)
+                task = generate_materials_package.delay(attachments, self.event)
+                return jsonify(task_id=task.id, success=True)
             else:
                 flash(_('There are no materials matching your criteria.'), 'warning')
+                return jsonify_data(success=False)
+        elif form.is_submitted():
+            flash('; '.join(form.error_list), 'warning')
+            return jsonify_data(success=False)
 
         return self.wp.render_template('generate_package.html', self.event, form=form, management=self.management)
 
@@ -229,3 +240,19 @@ class AttachmentPackageMixin(AttachmentPackageGeneratorMixin):
     def _iter_event_days(self):
         for day in self.event.iter_days():
             yield day.isoformat(), format_date(day, 'short').decode('utf-8')
+
+
+class RHPackageEventAttachmentsStatus(RHDisplayEventBase):
+    def _process(self):
+        res = AsyncResult(request.view_args['task_id'])
+        try:
+            download_url = res.get(5, propagate=False)
+        except TimeoutError:
+            return jsonify(download_url=None)
+        try:
+            if res.successful():
+                return jsonify(download_url=download_url)
+            else:
+                raise IndicoError(_('Material package generation failed'))
+        finally:
+            res.forget()

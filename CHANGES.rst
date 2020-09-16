@@ -7,6 +7,12 @@ Version 2.3.1
 
 *Unreleased*
 
+Improvements
+^^^^^^^^^^^^
+
+- Generate material packages in a background task to avoid timeouts or using excessive
+  amounts of disk space in case of people submitting several times (:pr:`4630`)
+
 Bugfixes
 ^^^^^^^^
 
