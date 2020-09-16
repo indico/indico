@@ -14,6 +14,7 @@ from indico.core import signals
 from indico.core.config import config
 from indico.core.db import db
 from indico.core.db.sqlalchemy.util.queries import db_dates_overlap
+from indico.modules.events.contributions.models.contributions import Contribution
 from indico.modules.events.management.controllers.base import RHManageEventBase
 from indico.modules.events.management.forms import (EventClassificationForm, EventContactInfoForm, EventDataForm,
                                                     EventDatesForm, EventLocationForm, EventPersonsForm)
@@ -23,6 +24,7 @@ from indico.modules.events.models.events import EventType
 from indico.modules.events.models.labels import EventLabel
 from indico.modules.events.models.references import ReferenceType
 from indico.modules.events.operations import update_event
+from indico.modules.events.timetable.models.entries import TimetableEntry
 from indico.modules.events.util import track_time_changes
 from indico.modules.rb.models.reservation_occurrences import ReservationOccurrence
 from indico.modules.rb.models.reservations import Reservation
@@ -73,7 +75,9 @@ class RHEventSettings(RHManageEventBase):
         has_reference_types = ReferenceType.query.has_rows()
         has_event_labels = EventLabel.query.has_rows()
         show_draft_warning = (self.event.type_ == EventType.conference and
-                              not contribution_settings.get(self.event, 'published'))
+                              not contribution_settings.get(self.event, 'published') and
+                              (TimetableEntry.query.with_parent(self.event).has_rows() or
+                               Contribution.query.with_parent(self.event).has_rows()))
         return WPEventSettings.render_template('settings.html', self.event, 'settings',
                                                show_booking_warning=show_booking_warning,
                                                show_draft_warning=show_draft_warning,

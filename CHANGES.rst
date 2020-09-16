@@ -10,7 +10,8 @@ Version 2.3.1
 Bugfixes
 ^^^^^^^^
 
-- None so far :)
+- Only show the warning about draft mode in a conference if it actually has any
+  contributions or timetable entries
 
 Version 2.3
 -----------
