@@ -72,6 +72,8 @@ We will need a virtualenv where to run Indico::
     virtualenv env -p /usr/bin/python2.7
 
 
+.. _cloning:
+
 Cloning Indico
 --------------
 

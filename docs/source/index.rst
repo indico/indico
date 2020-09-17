@@ -39,6 +39,15 @@ Configuration
     config/index.rst
 
 
+Compilation
++++++++++++++
+
+.. toctree::
+    :maxdepth: 2
+
+    compilation/index.rst
+
+
 Plugins
 +++++++
 

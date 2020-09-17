@@ -221,11 +221,13 @@ def _patch_version(add_version_suffix, file_name, search, replace):
 
 
 @click.group()
-@click.option('--target-dir', '-d', type=click.Path(exists=True, file_okay=False, resolve_path=True), default='dist/',
+@click.option('--target-dir', '-d', type=click.Path(file_okay=False, resolve_path=True), default='dist/',
               help='target dir for build wheels relative to the current dir')
 @click.pass_obj
 def cli(obj, target_dir):
     obj['target_dir'] = target_dir
+    if not os.path.exists(target_dir):
+        os.makedirs(target_dir)
     os.chdir(os.path.join(os.path.dirname(__file__), '..', '..'))
 
 

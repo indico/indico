@@ -16,6 +16,9 @@ This is a guide to set up an Indico instance with a new language.
 It is useful for translators to verify how the translation looks in production
 or for administrators who just want to lurk at the incubated translation embryos.
 
+Alternatively, you may use this guide to expose a translation we do not officially support,
+in your production version.
+
 Create your own Indico instance
 -------------------------------
 
@@ -27,8 +30,7 @@ it will prepare Indico to be served to users and used in all the different purpo
 The second is :ref:`development <install-dev>` a light-weight,
 easier to set up, version oriented to testing purposes, that should not be exposed to the public.
 
-For the purpose of translation **development** or **testing**, which this guide is about,
-we recommend using the development version.
+For the purpose of translation **development** or **testing** we recommend using the development version.
 
 Install the transifex client
 ----------------------------
@@ -60,7 +62,12 @@ Compile translations and run Indico
 
 Run the commands ``indico i18n compile-catalog``
 and ``indico i18n compile-catalog-react``
-and :ref:`launch Indico <run-dev>`.
+and:
+
+- :ref:`launch Indico <run-dev>`, or
+- :ref:`compile and deploy your own version of Indico <compilation>`, if you wish to deploy the translation
+  in a production version.
+
 The language should now show up as an option in the top right corner.
 
 In case you modified the ``.js`` resources, you also need to delete the cached
