@@ -386,4 +386,4 @@ class ServiceReviewEditableSchema(mm.Schema):
     publish = fields.Boolean(default=True)
     comment = fields.String()
     comments = fields.List(fields.String())
-    tags = fields.List(fields.String())
+    tags = fields.List(fields.Int())
