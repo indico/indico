@@ -19,7 +19,7 @@ or for administrators who just want to lurk at the incubated translation embryos
 Alternatively, you may use this guide to expose a translation we do not officially support,
 in your production version.
 
-Create your own Indico instance
+1. Create your own Indico instance
 -------------------------------
 
 This should usually be done on your own computer or a virtual machine.
@@ -32,12 +32,12 @@ easier to set up, version oriented to testing purposes, that should not be expos
 
 For the purpose of translation **development** or **testing** we recommend using the development version.
 
-Install the transifex client
+2. Install the transifex client
 ----------------------------
 
 Follow the instructions on the `transifex site <https://docs.transifex.com/client/installing-the-client>`_.
 
-Get an API token
+3. Get an API token
 ----------------
 
 Go `to your transifex settings <https://www.transifex.com/user/settings/api/>`_ and generate an API token.
@@ -47,7 +47,7 @@ using transifex locally.
 If you do not know how to run this command, please refer to the
 `transifex client guide <https://docs.transifex.com/client/init>`_.
 
-Install the translations
+4. Install the translations
 ------------------------
 
 Navigate to ``~/dev/indico/src`` (assuming you used the standard locations from the dev setup guide).
@@ -57,7 +57,7 @@ Languages codes can be obtained `here <https://www.transifex.com/indico/>`_.
 
 For example, Chinese (China) is ``zh_CN.GB2312``.
 
-Compile translations and run Indico
+5. Compile translations and run Indico
 -----------------------------------
 
 Run the commands ``indico i18n compile-catalog``
@@ -65,8 +65,8 @@ and ``indico i18n compile-catalog-react``
 and:
 
 - :ref:`launch Indico <run-dev>`, or
-- :ref:`compile and deploy your own version of Indico <compilation>`, if you wish to deploy the translation
-  in a production version.
+- :ref:`build <building>` and :ref:`deploy your own version of Indico <install-prod>`,
+  if you wish to deploy the translation in a production version.
 
 The language should now show up as an option in the top right corner.
 

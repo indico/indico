@@ -39,13 +39,13 @@ Configuration
     config/index.rst
 
 
-Compilation
-+++++++++++++
+Building
+++++++++
 
 .. toctree::
     :maxdepth: 2
 
-    compilation/index.rst
+    building/index.rst
 
 
 Plugins

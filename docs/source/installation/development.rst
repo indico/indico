@@ -124,6 +124,8 @@ Creating the DB
     createdb indico -T indico_template
 
 
+.. _configuring-dev:
+
 Configuring
 -----------
 
