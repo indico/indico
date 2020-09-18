@@ -84,6 +84,11 @@ export function Dropzone({
 
       const templateRe = globToRegExp(filenameTemplate);
       return eventFiles.filter(file => {
+        if (file.name === undefined) {
+          // most likely the file is just being dragged over and hasn't been dropped yet.
+          // in that case only its type is available but not the name
+          return true;
+        }
         const filename = file.name.slice(0, file.name.indexOf('.'));
         if (!templateRe.test(filename)) {
           dispatch(actions.invalidTemplate(id, file.name));
