@@ -70,6 +70,19 @@ def _get_headers(event, include_token=True):
     return headers
 
 
+def _log_service_error(exc, msg):
+    payload = None
+    if exc.response is not None:
+        try:
+            payload = exc.response.json()
+        except ValueError:
+            pass
+    if payload is not None:
+        logger.exception('{}: %s'.format(msg), payload)
+    else:
+        logger.exception(msg)
+
+
 def make_event_identifier(event):
     data = url_parse(config.BASE_URL)
     parts = data.netloc.split('.')
@@ -96,7 +109,7 @@ def service_handle_enabled(event):
                             headers=_get_headers(event, include_token=False), json=data)
         resp.raise_for_status()
     except requests.RequestException as exc:
-        logger.exception('Registering event with service failed')
+        _log_service_error(exc, 'Registering event with service failed')
         raise ServiceRequestFailed(exc)
 
 
@@ -106,7 +119,7 @@ def service_handle_disconnected(event):
                                headers=_get_headers(event))
         resp.raise_for_status()
     except requests.RequestException as exc:
-        logger.exception('Disconnecting event from service failed')
+        _log_service_error(exc, 'Disconnecting event from service failed')
         raise ServiceRequestFailed(exc)
 
 
@@ -138,7 +151,7 @@ def service_handle_new_editable(editable):
         resp = requests.put(_build_url(editable.event, path), headers=_get_headers(editable.event), json=data)
         resp.raise_for_status()
     except requests.RequestException as exc:
-        logger.exception('Failed calling listener for editable')
+        _log_service_error(exc, 'Calling listener for new editable failed')
         raise ServiceRequestFailed(exc)
 
 
@@ -172,7 +185,7 @@ def service_handle_review_editable(editable, action, parent_revision, revision=N
         db.session.flush()
         return resp
     except (requests.RequestException, ValidationError) as exc:
-        logger.exception('Failed calling listener for editable revision')
+        _log_service_error(exc, 'Calling listener for editable revision failed')
         raise ServiceRequestFailed(exc)
 
 
@@ -195,7 +208,7 @@ def service_get_custom_actions(editable, revision, user):
         resp.raise_for_status()
         return ServiceActionSchema(many=True).load(resp.json())
     except (requests.RequestException, ValidationError) as exc:
-        logger.exception('Failed calling listener to get custom actions')
+        _log_service_error(exc, 'Calling listener for custom actions failed')
         raise ServiceRequestFailed(exc)
 
 
@@ -218,7 +231,7 @@ def service_handle_custom_action(editable, revision, user, action):
         resp.raise_for_status()
         resp = ServiceActionResultSchema().load(resp.json())
     except (requests.RequestException, ValidationError) as exc:
-        logger.exception('Failed calling listener for custom action')
+        _log_service_error(exc, 'Calling listener for triggering custom action failed')
         raise ServiceRequestFailed(exc)
 
     if revision.final_state == FinalRevisionState.accepted:
