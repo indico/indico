@@ -105,6 +105,9 @@ class EditingRevisionFileSchema(mm.ModelSchema):
 
 
 class EditingRevisionUnclaimedFileSchema(EditingRevisionFileSchema):
+    class Meta(EditingRevisionFileSchema.Meta):
+        fields = ('uuid', 'filename', 'size', 'content_type', 'file_type', 'signed_download_url')
+
     signed_download_url = fields.String(attribute='file.signed_download_url')
 
 
