@@ -214,6 +214,7 @@ export const getLastRevertableRevisionId = createSelector(
     }
     const latestRevision = details.revisions[details.revisions.length - 1];
     const lastFinalRev = details.revisions
+      .slice()
       .reverse()
       .find(r => r.finalState.name !== FinalRevisionState.none);
 
