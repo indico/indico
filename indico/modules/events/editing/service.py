@@ -159,14 +159,14 @@ def service_handle_review_editable(editable, action, parent_revision, revision=N
         resp = ServiceReviewEditableSchema().load(resp.json())
 
         if 'comment' in resp:
-            parent_revision.comment = resp.get('comment')
+            parent_revision.comment = resp['comment']
         if 'tags' in resp:
             parent_revision.tags = {tag for tag in editable.event.editing_tags
-                                    if tag.id in map(int, resp.get('tags'))}
+                                    if tag.id in map(int, resp['tags'])}
         if 'comments' in resp:
-            for comment in resp.get('comments'):
-                create_revision_comment(new_revision, User.get_system_user(), comment.get('text'),
-                                        internal=comment.get('internal'))
+            for comment in resp.get('comments', []):
+                create_revision_comment(new_revision, User.get_system_user(), comment['text'],
+                                        internal=comment['internal'])
 
         db.session.flush()
         return resp
