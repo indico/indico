@@ -191,6 +191,7 @@ def create_submitter_revision(prev_revision, user, files):
     db.session.flush()
     notify_submitter_upload(new_revision)
     logger.info('Revision %r created by submitter %s', new_revision, user)
+    return new_revision
 
 
 def _ensure_latest_revision_with_final_state(revision):

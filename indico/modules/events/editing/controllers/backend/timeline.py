@@ -243,7 +243,15 @@ class RHCreateSubmitterRevision(RHContributionEditableRevisionBase):
                                        required=True)
         })
 
-        create_submitter_revision(self.revision, session.user, args['files'])
+        service_url = editing_settings.get(self.event, 'service_url')
+        new_revision = create_submitter_revision(self.revision, session.user, args['files'])
+
+        if service_url:
+            try:
+                service_handle_review_editable(self.editable, EditingReviewAction.update,
+                                               self.revision, new_revision)
+            except ServiceRequestFailed:
+                raise ServiceUnavailable(_('Failed processing review, please try again later.'))
         return '', 204
 
 

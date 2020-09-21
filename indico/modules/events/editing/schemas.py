@@ -382,8 +382,13 @@ class EditableTypePrincipalsSchema(mm.Schema):
     principals = PrincipalList(many=True, allow_event_roles=True, allow_category_roles=True)
 
 
+class ReviewCommentSchema(mm.Schema):
+    text = fields.String(required=True)
+    internal = fields.Boolean(default=False)
+
+
 class ServiceReviewEditableSchema(mm.Schema):
     publish = fields.Boolean(default=True)
     comment = fields.String()
-    comments = fields.List(fields.String())
+    comments = fields.List(fields.Nested(ReviewCommentSchema))
     tags = fields.List(fields.Int())

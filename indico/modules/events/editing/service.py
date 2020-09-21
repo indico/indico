@@ -16,9 +16,11 @@ from indico.core.config import config
 from indico.core.db import db
 from indico.modules.events.editing import logger
 from indico.modules.events.editing.models.editable import EditableType
+from indico.modules.events.editing.operations import create_revision_comment
 from indico.modules.events.editing.schemas import (EditableBasicSchema, EditingRevisionUnclaimedSchema,
                                                    ServiceReviewEditableSchema)
 from indico.modules.events.editing.settings import editing_settings
+from indico.modules.users import User
 from indico.util.caching import memoize_redis
 from indico.util.i18n import _
 from indico.web.flask.util import url_for
@@ -161,6 +163,10 @@ def service_handle_review_editable(editable, action, parent_revision, revision=N
         if 'tags' in resp:
             parent_revision.tags = {tag for tag in editable.event.editing_tags
                                     if tag.id in map(int, resp.get('tags'))}
+        if 'comments' in resp:
+            for comment in resp.get('comments'):
+                create_revision_comment(new_revision, User.get_system_user(), comment.get('text'),
+                                        internal=comment.get('internal'))
 
         db.session.flush()
         return resp
