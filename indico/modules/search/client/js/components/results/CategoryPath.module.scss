@@ -7,13 +7,14 @@
 @import 'base/palette';
 
 .path:global(.ui.breadcrumb) {
-    :global(a.section), :global(a.section:hover) {
-        font-size: 13px;
-        font-style: italic;
-        color: $dark-gray;
-    }
+  :global(a.section),
+  :global(a.section:hover) {
+    font-size: 13px;
+    font-style: italic;
+    color: $dark-gray;
+  }
 
-    :global(.divider) {
-        color: $dark-gray;
-    }
+  :global(.divider) {
+    color: $dark-gray;
+  }
 }

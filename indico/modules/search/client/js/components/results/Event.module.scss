@@ -7,39 +7,40 @@
 @import 'base/palette';
 
 .event {
-    padding: 1em 0;
-    color: $dark-gray;
+  padding: 1em 0;
+  color: $dark-gray;
 
-    .description {
-        padding: 0.5em 0;
+  .description {
+    padding: 0.5em 0;
 
-        i {
-            color: $dark-gray;
-        }
-
-        .high-priority {
-            font-size: 15px;
-        }
-
-        .med-priority {
-            font-size: 13px;
-            color: $dark-gray;
-            font-style: italic;
-        }
-
-        .low-priority {
-            font-size: 11px;
-            font-style: italic;
-
-            a, a:hover {
-                font-size: 11px;
-                color: $dark-gray;
-            }
-
-            i {
-                padding-right: 1.4em;
-                padding-left: 0.1em;
-            }
-        }
+    i {
+      color: $dark-gray;
     }
+
+    .high-priority {
+      font-size: 15px;
+    }
+
+    .med-priority {
+      font-size: 13px;
+      color: $dark-gray;
+      font-style: italic;
+    }
+
+    .low-priority {
+      font-size: 11px;
+      font-style: italic;
+
+      a,
+      a:hover {
+        font-size: 11px;
+        color: $dark-gray;
+      }
+
+      i {
+        padding-right: 1.4em;
+        padding-left: 0.1em;
+      }
+    }
+  }
 }

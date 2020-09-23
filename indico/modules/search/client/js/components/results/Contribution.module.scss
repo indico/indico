@@ -7,50 +7,52 @@
 @import 'base/palette';
 
 .contribution {
-    padding: 1em 0;
-    color: $dark-gray;
+  padding: 1em 0;
+  color: $dark-gray;
 
-    .description {
-        padding: 0.4em 0;
+  .description {
+    padding: 0.4em 0;
 
-        a, a:hover {
-            font-size: 15px;
-            color: $dark-gray;
-        }
-
-        .high-priority {
-            font-size: 15px;
-            padding: 0;
-            margin-top: 0.2em;
-            margin-bottom: 0.2em;
-            color: $dark-gray;
-
-            a, a:hover {
-                color: $dark-gray;
-            }
-
-            li {
-                display: inline;
-                color: $dark-gray;
-
-                &::after {
-                    content: ', ';
-                }
-
-                &:last-child::after {
-                    content: '';
-                }
-            }
-        }
-
-        .med-priority {
-            font-size: 13px;
-            color: $dark-gray;
-            font-style: italic;
-
-            i {
-                color: $dark-gray;
-            }
-        }
+    a,
+    a:hover {
+      font-size: 15px;
+      color: $dark-gray;
     }
+
+    .high-priority {
+      font-size: 15px;
+      padding: 0;
+      margin-top: 0.2em;
+      margin-bottom: 0.2em;
+      color: $dark-gray;
+
+      a,
+      a:hover {
+        color: $dark-gray;
+      }
+
+      li {
+        display: inline;
+        color: $dark-gray;
+
+        &::after {
+          content: ', ';
+        }
+
+        &:last-child::after {
+          content: '';
+        }
+      }
+    }
+
+    .med-priority {
+      font-size: 13px;
+      color: $dark-gray;
+      font-style: italic;
+
+      i {
+        color: $dark-gray;
+      }
+    }
+  }
 }

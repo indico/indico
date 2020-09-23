@@ -27,7 +27,9 @@ export default function SideBar({filterType}) {
   };
 
   // it's going to change soon
-  if (filterType !== 'Contributions') return;
+  if (filterType !== 'Contributions') {
+    return;
+  }
   return (
     <div styleName="sidebar">
       <Table celled padded>
