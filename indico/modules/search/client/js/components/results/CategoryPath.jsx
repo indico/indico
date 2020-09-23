@@ -13,7 +13,7 @@ export default function CategoryPath({path}) {
 
   return (
     <>
-      <Icon name="sitemap alternate" />
+      <Icon name="sitemap" />
       <Breadcrumb styleName="path" divider="»" sections={sections} />
     </>
   );

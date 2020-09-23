@@ -32,7 +32,7 @@ const File = ({title, url, type, contributionTitle, date, contribURL, persons}) 
     </List.Header>
     <List.Description styleName="description">
       <List.Item styleName="high-priority">
-        <Icon name="clockwise rotated level up alternate" />
+        <Icon rotated="clockwise" name="level up alternate" />
         <a href={contribURL}>{contributionTitle}</a>
       </List.Item>
       <List.Item>
