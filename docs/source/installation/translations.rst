@@ -19,8 +19,8 @@ or for administrators who just want to lurk at the incubated translation embryos
 Alternatively, you may use this guide to expose a translation we do not officially support,
 in your production version.
 
-1. Create your own Indico instance
--------------------------------
+1. Setup an Indico dev environment
+----------------------------------
 
 This should usually be done on your own computer or a virtual machine.
 
@@ -33,12 +33,12 @@ easier to set up, version oriented to testing purposes, that should not be expos
 For the purpose of translation **development** or **testing** we recommend using the development version.
 
 2. Install the transifex client
-----------------------------
+-------------------------------
 
 Follow the instructions on the `transifex site <https://docs.transifex.com/client/installing-the-client>`_.
 
 3. Get an API token
-----------------
+-------------------
 
 Go `to your transifex settings <https://www.transifex.com/user/settings/api/>`_ and generate an API token.
 Afterwards, you should run the command ``tx init --skipsetup``.
@@ -48,7 +48,7 @@ If you do not know how to run this command, please refer to the
 `transifex client guide <https://docs.transifex.com/client/init>`_.
 
 4. Install the translations
-------------------------
+---------------------------
 
 Navigate to ``~/dev/indico/src`` (assuming you used the standard locations from the dev setup guide).
 
@@ -58,7 +58,7 @@ Languages codes can be obtained `here <https://www.transifex.com/indico/>`_.
 For example, Chinese (China) is ``zh_CN.GB2312``.
 
 5. Compile translations and run Indico
------------------------------------
+--------------------------------------
 
 Run the commands ``indico i18n compile-catalog``
 and ``indico i18n compile-catalog-react``
