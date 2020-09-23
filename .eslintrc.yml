@@ -28,6 +28,7 @@ settings:
         - ['indico/modules/core', './indico/modules/core/client/js']
         - ['indico/modules/rb', './indico/modules/rb/client/js']
         - ['indico/modules/users', './indico/modules/users/client/js']
+        - ['indico/modules/search', './indico/modules/search/client/js']
         - ['indico/modules/events/reviewing', './indico/modules/events/client/js/reviewing']
         - ['indico/modules/events/editing', './indico/modules/events/editing/client/js']
         - ['indico/modules/events', './indico/modules/events/client/js']
