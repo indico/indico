@@ -134,6 +134,7 @@ jobs:
              indico/modules/events/papers/client/js/
              indico/web/client/js/react/
              indico/modules/users/
+             indico/modules/search/
 
       - name: Run stylelint for all files
         if: github.event_name == 'push' && (success() || failure())
