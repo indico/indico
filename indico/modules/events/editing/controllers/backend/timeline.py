@@ -11,7 +11,7 @@ import os
 from io import BytesIO
 from zipfile import ZipFile
 
-from flask import request, session
+from flask import jsonify, request, session
 from marshmallow import fields
 from marshmallow_enum import EnumField
 from sqlalchemy.orm import joinedload
@@ -25,12 +25,14 @@ from indico.modules.events.editing.models.revision_files import EditingRevisionF
 from indico.modules.events.editing.models.revisions import EditingRevision, InitialRevisionState
 from indico.modules.events.editing.operations import (assign_editor, confirm_editable_changes, create_new_editable,
                                                       create_revision_comment, create_submitter_revision,
-                                                      delete_revision_comment, publish_editable_revision,
-                                                      replace_revision, review_editable_revision, unassign_editor,
-                                                      undo_review, update_revision_comment)
+                                                      delete_revision_comment, ensure_latest_revision,
+                                                      publish_editable_revision, replace_revision,
+                                                      review_editable_revision, unassign_editor, undo_review,
+                                                      update_revision_comment)
 from indico.modules.events.editing.schemas import (EditableSchema, EditingConfirmationAction, EditingReviewAction,
                                                    ReviewEditableArgs)
-from indico.modules.events.editing.service import (ServiceRequestFailed, service_handle_new_editable,
+from indico.modules.events.editing.service import (ServiceRequestFailed, service_get_custom_actions,
+                                                   service_handle_custom_action, service_handle_new_editable,
                                                    service_handle_review_editable)
 from indico.modules.events.editing.settings import editing_settings
 from indico.modules.files.controllers import UploadFileMixin
@@ -111,8 +113,49 @@ class RHEditable(RHContributionEditableBase):
         if not self.editable.can_see_timeline(session.user):
             raise Forbidden
 
+    def _get_custom_actions(self):
+        if not editing_settings.get(self.event, 'service_url'):
+            return []
+
+        if (
+            not self.editable.can_perform_submitter_actions(session.user) and
+            not self.editable.can_perform_editor_actions(session.user)
+        ):
+            return []
+
+        try:
+            return service_get_custom_actions(self.editable, self.editable.revisions[-1], session.user)
+        except ServiceRequestFailed:
+            # unlikely to fail, but if it does we don't break the whole timeline
+            return []
+
     def _process(self):
-        return EditableSchema(context={'user': session.user}).jsonify(self.editable)
+        custom_actions = self._get_custom_actions()
+        custom_actions_ctx = {self.editable.revisions[-1]: custom_actions}
+        schema = EditableSchema(context={'user': session.user, 'custom_actions': custom_actions_ctx})
+        return schema.jsonify(self.editable)
+
+
+class RHTriggerExtraRevisionAction(RHContributionEditableRevisionBase):
+    """Trigger an extra action provided by the editing service."""
+
+    def _check_revision_access(self):
+        if not editing_settings.get(self.event, 'service_url'):
+            return False
+        # It's up to the editing service to decide who can do what, so we
+        # just require the user to have more than just read access
+        return (
+            self.editable.can_perform_submitter_actions(session.user) or
+            self.editable.can_perform_editor_actions(session.user)
+        )
+
+    @use_kwargs({
+        'action': fields.String(required=True)
+    })
+    def _process(self, action):
+        ensure_latest_revision(self.revision)
+        resp = service_handle_custom_action(self.editable, self.revision, session.user, action)
+        return jsonify(redirect=resp.get('redirect'))
 
 
 class RHCreateEditable(RHContributionEditableBase):

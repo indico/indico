@@ -21,6 +21,7 @@ import {blockPropTypes} from './util';
 import * as selectors from './selectors';
 import FileDisplay from './FileDisplay';
 import StateIndicator from './StateIndicator';
+import CustomActions from './CustomActions';
 
 import './TimelineItem.module.scss';
 
@@ -97,6 +98,9 @@ export default function TimelineItem({block}) {
                   <ChangesConfirmation />
                 )}
               </div>
+            )}
+            {!!block.customActions.length && (
+              <CustomActions url={block.customActionURL} actions={block.customActions} />
             )}
           </div>
         </div>

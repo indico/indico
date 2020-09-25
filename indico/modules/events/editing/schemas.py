@@ -129,7 +129,7 @@ class EditingRevisionSchema(mm.ModelSchema):
         model = EditingRevision
         fields = ('id', 'created_dt', 'submitter', 'editor', 'files', 'comment', 'comment_html', 'comments',
                   'initial_state', 'final_state', 'tags', 'create_comment_url', 'download_files_url',
-                  'review_url', 'confirm_url')
+                  'review_url', 'confirm_url', 'custom_actions', 'custom_action_url')
 
     comment_html = fields.Function(lambda rev: escape(rev.comment))
     submitter = fields.Nested(EditingUserSchema)
@@ -143,6 +143,8 @@ class EditingRevisionSchema(mm.ModelSchema):
     download_files_url = fields.Function(lambda revision: url_for('event_editing.revision_files_export', revision))
     review_url = fields.Function(lambda revision: url_for('event_editing.api_review_editable', revision))
     confirm_url = fields.Method('_get_confirm_url')
+    custom_action_url = fields.Function(lambda revision: url_for('event_editing.api_custom_action', revision))
+    custom_actions = fields.Function(lambda revision, ctx: ctx.get('custom_actions', {}).get(revision, []))
 
     def _get_confirm_url(self, revision):
         if revision.initial_state == InitialRevisionState.needs_submitter_confirmation and not revision.final_state:
@@ -386,3 +388,18 @@ class ServiceReviewEditableSchema(mm.Schema):
     comment = fields.String()
     comments = fields.List(fields.Nested(ReviewCommentSchema))
     tags = fields.List(fields.Int())
+
+
+class ServiceActionSchema(mm.Schema):
+    name = fields.String(required=True)
+    title = fields.String(required=True)
+    color = fields.String(missing=None)
+    icon = fields.String(missing=None)
+    confirm = fields.String(missing=None)
+
+
+class ServiceActionResultSchema(mm.Schema):
+    publish = fields.Boolean()
+    comments = fields.List(fields.Nested(ReviewCommentSchema))
+    tags = fields.List(fields.Int())
+    redirect = fields.String()

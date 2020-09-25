@@ -117,3 +117,5 @@ _bp.add_url_rule(contrib_api_prefix + '/<int:revision_id>/comments/', 'api_creat
                  timeline.RHCreateRevisionComment, methods=('POST',),)
 _bp.add_url_rule(contrib_api_prefix + '/<int:revision_id>/comments/<int:comment_id>',
                  'api_edit_comment', timeline.RHEditRevisionComment, methods=('PATCH', 'DELETE'),)
+_bp.add_url_rule(contrib_api_prefix + '/<int:revision_id>/custom-action', 'api_custom_action',
+                 timeline.RHTriggerExtraRevisionAction, methods=('POST',),)

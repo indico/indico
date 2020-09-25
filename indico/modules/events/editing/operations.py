@@ -48,7 +48,7 @@ class InvalidEditableState(BadRequest):
         super(InvalidEditableState, self).__init__(_('The requested action is not possible on this revision'))
 
 
-def _ensure_latest_revision(revision):
+def ensure_latest_revision(revision):
     if revision != revision.editable.revisions[-1]:
         raise InvalidEditableState
 
@@ -99,7 +99,7 @@ def delete_editable(editable):
 
 
 def publish_editable_revision(revision):
-    _ensure_latest_revision(revision)
+    ensure_latest_revision(revision)
     revision.editable.published_revision = revision
     db.session.flush()
     logger.info('Revision %r marked as published', revision)
@@ -107,7 +107,7 @@ def publish_editable_revision(revision):
 
 @no_autoflush
 def review_editable_revision(revision, editor, action, comment, tags, files=None):
-    _ensure_latest_revision(revision)
+    ensure_latest_revision(revision)
     _ensure_state(revision, initial=InitialRevisionState.ready_for_review, final=FinalRevisionState.none)
     revision.editor = editor
     revision.comment = comment
@@ -146,7 +146,7 @@ def review_editable_revision(revision, editor, action, comment, tags, files=None
 
 @no_autoflush
 def confirm_editable_changes(revision, submitter, action, comment):
-    _ensure_latest_revision(revision)
+    ensure_latest_revision(revision)
     _ensure_state(revision, initial=InitialRevisionState.needs_submitter_confirmation, final=FinalRevisionState.none)
     revision.final_state = {
         EditingConfirmationAction.accept: FinalRevisionState.accepted,
@@ -164,7 +164,7 @@ def confirm_editable_changes(revision, submitter, action, comment):
 
 @no_autoflush
 def replace_revision(revision, user, comment, files, tags, initial_state=None):
-    _ensure_latest_revision(revision)
+    ensure_latest_revision(revision)
     _ensure_state(revision,
                   initial=(InitialRevisionState.new, InitialRevisionState.ready_for_review),
                   final=FinalRevisionState.none)
@@ -181,7 +181,7 @@ def replace_revision(revision, user, comment, files, tags, initial_state=None):
 
 @no_autoflush
 def create_submitter_revision(prev_revision, user, files):
-    _ensure_latest_revision(prev_revision)
+    ensure_latest_revision(prev_revision)
     _ensure_state(prev_revision, final=FinalRevisionState.needs_submitter_changes)
     new_revision = EditingRevision(submitter=user,
                                    initial_state=InitialRevisionState.ready_for_review,
@@ -228,7 +228,7 @@ def undo_review(revision):
 
 @no_autoflush
 def create_revision_comment(revision, user, text, internal=False):
-    _ensure_latest_revision(revision)
+    ensure_latest_revision(revision)
     comment = EditingRevisionComment(user=user, text=text, internal=internal)
     revision.comments.append(comment)
     db.session.flush()
@@ -238,7 +238,7 @@ def create_revision_comment(revision, user, text, internal=False):
 
 @no_autoflush
 def update_revision_comment(comment, updates):
-    _ensure_latest_revision(comment.revision)
+    ensure_latest_revision(comment.revision)
     comment.populate_from_dict(updates)
     comment.modified_dt = now_utc()
     db.session.flush()
@@ -247,7 +247,7 @@ def update_revision_comment(comment, updates):
 
 @no_autoflush
 def delete_revision_comment(comment):
-    _ensure_latest_revision(comment.revision)
+    ensure_latest_revision(comment.revision)
     comment.is_deleted = True
     db.session.flush()
     logger.info('Comment on revision %r deleted: %r', comment.revision, comment)
