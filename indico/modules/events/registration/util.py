@@ -161,6 +161,8 @@ def make_registration_form(regform, management=False, registration=None):
 
         field_impl = form_item.field_impl
         setattr(RegistrationFormWTF, form_item.html_field_name, field_impl.create_wtf_field())
+    signals.event.registration_form_wtform_created.send(regform, registration=registration, management=management,
+                                                        wtform_cls=RegistrationFormWTF)
 
     RegistrationFormWTF.modified_registration = registration
     return RegistrationFormWTF
@@ -235,7 +237,7 @@ def create_registration(regform, data, invitation=None, management=False, notify
         invitation.registration = registration
     registration.sync_state(_skip_moderation=skip_moderation)
     db.session.flush()
-    signals.event.registration_created.send(registration, management=management)
+    signals.event.registration_created.send(registration, management=management, data=data)
     notify_registration_creation(registration, notify_user)
     logger.info('New registration %s by %s', registration, user)
     registration.log(EventLogRealm.management if management else EventLogRealm.participants,
@@ -286,7 +288,7 @@ def modify_registration(registration, data, management=False, notify_user=True):
                         old_price, registration.price)
     if personal_data_changes:
         signals.event.registration_personal_data_modified.send(registration, change=personal_data_changes)
-    signals.event.registration_updated.send(registration, management=management)
+    signals.event.registration_updated.send(registration, management=management, data=data)
     notify_registration_modification(registration, notify_user)
     logger.info('Registration %s modified by %s', registration, session.user)
     registration.log(EventLogRealm.management if management else EventLogRealm.participants,
