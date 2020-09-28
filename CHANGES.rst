@@ -19,6 +19,14 @@ Bugfixes
 - Only show the warning about draft mode in a conference if it actually has any
   contributions or timetable entries
 
+Internal Changes
+^^^^^^^^^^^^^^^^
+
+- Add ``registration_form_wtform_created`` signal and send form data in
+  ``registration_created`` and ``registration_updated`` signals (:pr:`4642`,
+  thanks :user:`omegak`)
+
+
 Version 2.3
 -----------
 

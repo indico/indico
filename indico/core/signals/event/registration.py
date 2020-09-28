@@ -30,16 +30,27 @@ Called when the checkin state of a registration changes. The `sender` is the
 
 registration_created = _signals.signal('registration-created', """
 Called when a new registration has been created. The `sender` is the `Registration` object.
+The `data` kwarg contains the form data used to populate the registration fields.
 The `management` kwarg is set to `True` if the registration was created from the event management area.
 """)
 
 registration_updated = _signals.signal('registration-updated', """
 Called when a registration has been updated. The `sender` is the `Registration` object.
+The `data` kwarg contains the form data used to populate the registration fields.
 The `management` kwarg is set to `True` if the registration was updated from the event management area.
 """)
 
 registration_deleted = _signals.signal('registration-deleted', """
 Called when a registration is removed. The `sender` is the `Registration` object.
+""")
+
+registration_form_wtform_created = _signals.signal('registration_form_wtform_created', """
+Called when a the wtform is created for rendering/processing a registration form.
+The sender is the `RegistrationForm` object. The generated WTForm class is
+passed in the `wtform_cls` kwarg and it may be modified. The `registration`
+kwarg contains a `Registration` object when called from registration edit
+endpoints. The `management` kwarg is set to `True` if the registration form is
+rendered/processed from the event management area.
 """)
 
 registration_form_created = _signals.signal('registration-form-created', """
