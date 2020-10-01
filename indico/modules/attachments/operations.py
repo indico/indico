@@ -17,7 +17,7 @@ from indico.modules.attachments.models.folders import AttachmentFolder
 
 
 def add_attachment_link(data, linked_object):
-    """Add a link attachment to linked_object"""
+    """Add a link attachment to linked_object."""
     folder = data.pop('folder', None)
     if not folder:
         folder = AttachmentFolder.get_or_create_default(linked_object=linked_object)

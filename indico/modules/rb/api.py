@@ -223,7 +223,7 @@ class BookRoomHook(HTTPAPIHook):
 
 
 def _export_reservations(hook, limit_per_room, include_rooms, extra_filters=None):
-    """Exports reservations.
+    """Export reservations.
 
     :param hook: The HTTPAPIHook instance
     :param limit_per_room: Should the limit/offset be applied per room
@@ -260,7 +260,7 @@ def _export_reservations(hook, limit_per_room, include_rooms, extra_filters=None
 
 
 def _serializable_room(room_data, reservations=None):
-    """Serializable room data
+    """Serializable room data.
 
     :param room_data: Room data
     :param reservations: MultiDict mapping for room id => reservations
@@ -273,7 +273,7 @@ def _serializable_room(room_data, reservations=None):
 
 
 def _serializable_room_minimal(room):
-    """Serializable minimal room data (inside reservations)
+    """Serializable minimal room data (inside reservations).
 
     :param room: A `Room`
     """
@@ -283,7 +283,7 @@ def _serializable_room_minimal(room):
 
 
 def _serializable_reservation(reservation_data, include_room=False):
-    """Serializable reservation (standalone or inside room)
+    """Serializable reservation (standalone or inside room).
 
     :param reservation_data: Reservation data
     :param include_room: Include minimal room information

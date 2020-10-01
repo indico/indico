@@ -15,8 +15,10 @@ from indico.util.caching import memoize_request
 
 
 class AttachedItemsMixin(object):
-    """Allows for easy retrieval of structured information about
-       items attached to the object"""
+    """
+    Allow for easy retrieval of structured information about
+    items attached to the object.
+    """
 
     #: When set to ``True`` will preload all items that exist for the same event.
     #: Should be set to False when not applicable (no object.event[_new] property).

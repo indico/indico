@@ -94,7 +94,7 @@ class EmailRuleListField(JSONField):
 
 
 class AbstractPersonLinkListField(PersonLinkListFieldBase):
-    """A field to configure a list of abstract persons"""
+    """A field to configure a list of abstract persons."""
 
     person_link_cls = AbstractPersonLink
     linked_object_attr = 'abstract'

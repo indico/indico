@@ -61,7 +61,7 @@ class SystemAppType(int, IndicoEnum):
 
 
 class OAuthApplication(db.Model):
-    """OAuth applications registered in Indico"""
+    """OAuth applications registered in Indico."""
 
     __tablename__ = 'applications'
 

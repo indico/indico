@@ -15,7 +15,7 @@ from indico.web.flask.templating import get_template_module
 
 
 def notify_event_creation(event, occurrences=None):
-    """Send email notifications when a new Event is created
+    """Send email notifications when a new Event is created.
 
     :param event: The `Event` that has been created.
     :param occurrences: A list of event occurrences in case of a

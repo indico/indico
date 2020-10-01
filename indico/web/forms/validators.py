@@ -19,10 +19,11 @@ from indico.util.string import is_valid_mail
 
 
 class UsedIf(object):
-    """Makes a WTF field "used" if a given condition evaluates to True.
+    """Make a WTF field "used" if a given condition evaluates to True.
 
     If the field is not used, validation stops.
     """
+
     field_flags = ('conditional',)
 
     def __init__(self, condition):
@@ -39,7 +40,7 @@ class UsedIf(object):
 
 
 class HiddenUnless(object):
-    """Hides and disables a field unless another field has a certain value.
+    """Hide and disable a field unless another field has a certain value.
 
     :param field: The name of the other field to check
     :param value: The value to check for.  If unspecified, any truthy
@@ -48,6 +49,7 @@ class HiddenUnless(object):
                           ``object_data`` it had before (i.e. data set
                           via `FormDefaults`).
     """
+
     field_flags = ('initially_hidden',)
 
     def __init__(self, field, value=None, preserve_data=False):
@@ -75,10 +77,11 @@ class HiddenUnless(object):
 
 
 class Exclusive(object):
-    """Makes a WTF field mutually exclusive with other fields.
+    """Make a WTF field mutually exclusive with other fields.
 
     If any of the given fields have a value, the validated field may not have one.
     """
+
     def __init__(self, *fields):
         self.fields = fields
 
@@ -99,7 +102,8 @@ class ConfirmPassword(EqualTo):
 
 
 class IndicoEmail(object):
-    """Validates one or more email addresses"""
+    """Validate one or more email addresses."""
+
     def __init__(self, multi=False):
         self.multi = multi
 
@@ -110,7 +114,7 @@ class IndicoEmail(object):
 
 
 class DateRange(object):
-    """Validates that a date is within the specified boundaries"""
+    """Validate that a date is within the specified boundaries."""
 
     field_flags = ('date_range',)
 
@@ -157,7 +161,7 @@ class DateRange(object):
 
 
 class DateTimeRange(object):
-    """Validates that a datetime is within the specified boundaries"""
+    """Validate that a datetime is within the specified boundaries."""
 
     field_flags = ('datetime_range',)
 
@@ -206,7 +210,7 @@ class DateTimeRange(object):
 
 
 class LinkedDate(object):
-    """Validates that a date field happens before or/and after another.
+    """Validate that a date field happens before or/and after another.
 
     If both ``not_before`` and ``not_after`` are set to ``True``, both fields have to
     be equal.
@@ -239,7 +243,7 @@ class LinkedDate(object):
 
 
 class LinkedDateTime(object):
-    """Validates that a datetime field happens before or/and after another.
+    """Validate that a datetime field happens before or/and after another.
 
     If both ``not_before`` and ``not_after`` are set to ``True``, both fields have to
     be equal.
@@ -291,7 +295,7 @@ class UsedIfChecked(UsedIf):
 
 
 class MaxDuration(object):
-    """Validates if TimeDeltaField value doesn't exceed `max_duration`"""
+    """Validate if TimeDeltaField value doesn't exceed `max_duration`."""
 
     def __init__(self, max_duration=None, **kwargs):
         assert max_duration or kwargs
@@ -327,7 +331,7 @@ class TimeRange(object):
 
 
 class WordCount(object):
-    """Validates the word count of a string.
+    """Validate the word count of a string.
 
     :param min: The minimum number of words in the string.  If not
                 provided, the minimum word count will not be checked.

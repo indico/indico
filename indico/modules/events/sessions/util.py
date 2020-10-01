@@ -29,7 +29,7 @@ from indico.web.flask.util import url_for
 
 
 def can_manage_sessions(user, event, permission=None):
-    """Check whether a user can manage any sessions in an event"""
+    """Check whether a user can manage any sessions in an event."""
     if event.can_manage(user):
         return True
     return any(s.can_manage(user, permission)
@@ -95,7 +95,7 @@ class SessionListToPDF(PDFBase):
 
 
 def generate_pdf_from_sessions(sessions):
-    """Generate a PDF file from a given session list"""
+    """Generate a PDF file from a given session list."""
     pdf = SessionListToPDF(sessions)
     return BytesIO(pdf.getPDFBin())
 
@@ -116,8 +116,9 @@ def session_coordinator_priv_enabled(event, priv):
 
 
 def get_events_with_linked_sessions(user, dt=None):
-    """Returns a dict with keys representing event_id and the values containing
-    data about the user rights for sessions within the event
+    """
+    Return a dict with keys representing event_id and the values containing
+    data about the user rights for sessions within the event.
 
     :param user: A `User`
     :param dt: Only include events taking place on/after that date

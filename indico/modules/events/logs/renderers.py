@@ -26,7 +26,7 @@ class EventLogRendererBase(object):
 
     @classmethod
     def render_entry(cls, entry):
-        """Renders the log entry row
+        """Render the log entry row.
 
         :param entry: A :class:`.EventLogEntry`
         """
@@ -35,7 +35,7 @@ class EventLogRendererBase(object):
 
     @classmethod
     def get_data(cls, entry):
-        """Returns the entry data in a format suitable for the template.
+        """Return the entry data in a format suitable for the template.
 
         This method may be overridden if the entry's data needs to be
         preprocessed before being passed to the template.

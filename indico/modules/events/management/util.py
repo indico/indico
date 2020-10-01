@@ -72,7 +72,7 @@ class _ProtectedObjectWrapper(object):
 
 @materialize_iterable(set)
 def get_non_inheriting_objects(root):
-    """Get a set of child objects that do not inherit protection
+    """Get a set of child objects that do not inherit protection.
 
     :param root: An event object (`Event`, `Session`, `Contribution`
                  or `AttachmentFolder`) which may contain objects
@@ -172,7 +172,7 @@ def get_non_inheriting_objects(root):
 
 @contextmanager
 def flash_if_unregistered(event, get_person_links):
-    """Flash message when adding users with no indico account
+    """Flash message when adding users with no Indico account.
 
     :param event: Current event
     :param get_person_links: Callable returning list of person links to

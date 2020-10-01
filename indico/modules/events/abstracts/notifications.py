@@ -132,7 +132,7 @@ class ContributionTypeCondition(EmailNotificationCondition):
 
 
 def get_abstract_notification_tpl_module(email_tpl, abstract):
-    """Get the Jinja template module for a notification email
+    """Get the Jinja template module for a notification email.
 
     :param email_tpl: the abstract email template used to populate the
                       email subject/body

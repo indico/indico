@@ -12,7 +12,7 @@ from indico.util.string import format_repr, return_ascii
 
 
 class LegacyContributionMapping(db.Model):
-    """Legacy contribution id mapping
+    """Legacy contribution id mapping.
 
     Legacy contributions had ids unique only within their event.
     Additionally, some very old contributions had non-numeric IDs.
@@ -65,7 +65,7 @@ class LegacyContributionMapping(db.Model):
 
 
 class LegacySubContributionMapping(db.Model):
-    """Legacy subcontribution id mapping
+    """Legacy subcontribution id mapping.
 
     Legacy subcontributions had ids unique only within their event
     and contribution.  This table maps those ids to the new globally

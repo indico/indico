@@ -28,7 +28,7 @@ class RequestState(RichIntEnum):
 
 
 class Request(db.Model):
-    """Event-related requests, e.g. for a webcast"""
+    """Event-related requests, e.g. for a webcast."""
     __tablename__ = 'requests'
     __table_args__ = {'schema': 'events'}
 
@@ -133,7 +133,7 @@ class Request(db.Model):
 
     @property
     def can_be_modified(self):
-        """Determines if the request can be modified or if a new one must be sent"""
+        """Determine if the request can be modified or if a new one must be sent."""
         return self.state in {RequestState.pending, RequestState.accepted}
 
     @property
@@ -147,7 +147,7 @@ class Request(db.Model):
 
     @classmethod
     def find_latest_for_event(cls, event, type_=None):
-        """Returns the latest requests for a given event.
+        """Return the latest requests for a given event.
 
         :param event: the event to find the requests for
         :param type_: the request type to retrieve, or `None` to get all

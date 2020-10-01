@@ -10,10 +10,7 @@ from indico.web.http_api.metadata.serializer import Serializer
 
 
 class JSONSerializer(Serializer):
-
-    """
-    Does basically direct translation from the fossi
-    """
+    """Basically direct translation from the fossil."""
 
     _mime = 'application/json'
 

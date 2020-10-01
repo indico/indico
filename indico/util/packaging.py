@@ -15,7 +15,7 @@ import pkg_resources
 
 
 def package_is_editable(package):
-    """Check whether the Python package is installed in 'editable' mode"""
+    """Check whether the Python package is installed in 'editable' mode."""
     # based on pip.dist_is_editable
     dist = pkg_resources.get_distribution(package)
     for path_item in sys.path:
@@ -26,7 +26,7 @@ def package_is_editable(package):
 
 
 def get_package_root_path(import_name):
-    """Get the root path of a package
+    """Get the root path of a package.
 
     Returns ``None`` if the specified import name is invalid or
     points to a module instead of a package.

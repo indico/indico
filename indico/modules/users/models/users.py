@@ -77,7 +77,7 @@ class PersonMixin(object):
     """
 
     def _get_title(self):
-        """Return title text"""
+        """Return title text."""
         if self._title is None:
             return get_default_values(type(self)).get('_title', UserTitle.none).title
         return self._title.title
@@ -161,7 +161,7 @@ def format_display_full_name(user, obj):
 
 
 class User(PersonMixin, db.Model):
-    """Indico users"""
+    """Indico users."""
 
     # Useful when dealing with both users and groups in the same code
     is_group = False
@@ -447,7 +447,7 @@ class User(PersonMixin, db.Model):
 
     @property
     def as_principal(self):
-        """The serializable principal identifier of this user"""
+        """The serializable principal identifier of this user."""
         return 'User', self.id
 
     @property
@@ -477,23 +477,23 @@ class User(PersonMixin, db.Model):
 
     @property
     def external_identities(self):
-        """The external identities of the user"""
+        """The external identities of the user."""
         return {x for x in self.identities if x.provider != 'indico'}
 
     @property
     def local_identities(self):
-        """The local identities of the user"""
+        """The local identities of the user."""
         return {x for x in self.identities if x.provider == 'indico'}
 
     @property
     def local_identity(self):
-        """The main (most recently used) local identity"""
+        """The main (most recently used) local identity."""
         identities = sorted(self.local_identities, key=attrgetter('safe_last_login_dt'), reverse=True)
         return identities[0] if identities else None
 
     @property
     def secondary_local_identities(self):
-        """The local identities of the user except the main one"""
+        """The local identities of the user except the main one."""
         return self.local_identities - {self.local_identity}
 
     @locator_property
@@ -502,7 +502,7 @@ class User(PersonMixin, db.Model):
 
     @cached_property
     def settings(self):
-        """Returns the user settings proxy for this user"""
+        """Return the user settings proxy for this user."""
         from indico.modules.users import user_settings
         return user_settings.bind(self)
 
@@ -558,7 +558,7 @@ class User(PersonMixin, db.Model):
         return format_repr(self, 'id', 'email', is_deleted=False, is_pending=False, _text=self.full_name)
 
     def can_be_modified(self, user):
-        """If this user can be modified by the given user"""
+        """If this user can be modified by the given user."""
         return self == user or user.is_admin
 
     def iter_identifiers(self, check_providers=False, providers=None):
@@ -587,13 +587,15 @@ class User(PersonMixin, db.Model):
 
     @property
     def can_get_all_multipass_groups(self):
-        """Check whether it is possible to get all multipass groups the user is in."""
+        """
+        Check whether it is possible to get all multipass groups the user is in.
+        """
         return all(multipass.identity_providers[x.provider].supports_get_identity_groups
                    for x in self.identities
                    if x.provider != 'indico' and x.provider in multipass.identity_providers)
 
     def iter_all_multipass_groups(self):
-        """Iterate over all multipass groups the user is in"""
+        """Iterate over all multipass groups the user is in."""
         return itertools.chain.from_iterable(multipass.identity_providers[x.provider].get_identity_groups(x.identifier)
                                              for x in self.identities
                                              if x.provider != 'indico' and x.provider in multipass.identity_providers)
@@ -603,7 +605,7 @@ class User(PersonMixin, db.Model):
         return super(User, self).get_full_name(*args, **kwargs)
 
     def make_email_primary(self, email):
-        """Promotes a secondary email address to the primary email address
+        """Promote a secondary email address to the primary email address.
 
         :param email: an email address that is currently a secondary email
         """

@@ -37,7 +37,7 @@ class _MenuSectionBase(object):
 
 
 class SideMenuSection(_MenuSectionBase):
-    """Defines a side menu section (item set).
+    """Define a side menu section (item set).
 
     :param name: the unique name of the section
     :param title: the title of the section (displayed)
@@ -61,7 +61,7 @@ class SideMenuSection(_MenuSectionBase):
 
 
 class SideMenuItem(object):
-    """Defines a side menu item.
+    """Define a side menu item.
 
     :param name: the unique name (within the menu) of the item
     :param title: the title of the menu item (displayed)
@@ -91,7 +91,7 @@ class SideMenuItem(object):
 
 
 class TopMenuSection(_MenuSectionBase):
-    """Defines a top menu section (dropdown).
+    """Define a top menu section (dropdown).
 
     :param name: the unique name of the section
     :param title: the title of the section (displayed)
@@ -104,7 +104,7 @@ class TopMenuSection(_MenuSectionBase):
 
 
 class TopMenuItem(object):
-    """Defines a top menu item.
+    """Define a top menu item.
 
     :param name: the unique name (within the menu) of the item
     :param title: the title of the menu item (displayed)

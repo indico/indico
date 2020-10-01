@@ -42,7 +42,7 @@ RE_REMOVE_EXTENSION = re.compile(r'\.(\w+)(?:$|(?=\?))')
 
 
 def normalizeQuery(path, query, remove=('signature',), separate=False):
-    """Normalize request path and query so it can be used for caching and signing
+    """Normalize request path and query so it can be used for caching and signing.
 
     Returns a string consisting of path and sorted query string.
     Dynamic arguments like signature and timestamp are removed from the query string.

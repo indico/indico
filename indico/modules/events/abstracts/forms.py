@@ -44,7 +44,7 @@ from indico.web.forms.widgets import JinjaWidget, SwitchWidget
 
 
 def make_review_form(event):
-    """Extends the abstract WTForm to add the extra fields.
+    """Extend the abstract WTForm to add the extra fields.
 
     Each extra field will use a field named ``custom_ID``.
 
@@ -79,7 +79,7 @@ def build_review_form(abstract=None, track=None, review=None):
 
 
 class AbstractContentSettingsForm(IndicoForm):
-    """Configure the content field of abstracts"""
+    """Configure the content field of abstracts."""
 
     is_active = BooleanField(_('Active'), widget=SwitchWidget(),
                              description=_("Whether the content field is available."))
@@ -90,7 +90,7 @@ class AbstractContentSettingsForm(IndicoForm):
 
 
 class BOASettingsForm(IndicoForm):
-    """Settings form for the 'Book of Abstracts'"""
+    """Settings form for the 'Book of Abstracts'."""
 
     extra_text = IndicoMarkdownField(_('Additional text'), editor=True, mathjax=True)
     extra_text_end = IndicoMarkdownField(_('Additional text at end'), editor=True, mathjax=True)
@@ -105,7 +105,7 @@ class BOASettingsForm(IndicoForm):
 
 
 class AbstractSubmissionSettingsForm(IndicoForm):
-    """Settings form for abstract submission"""
+    """Settings form for abstract submission."""
 
     announcement = IndicoMarkdownField(_('Announcement'), editor=True)
     allow_multiple_tracks = BooleanField(_('Multiple tracks'), widget=SwitchWidget(),
@@ -149,7 +149,7 @@ class AbstractSubmissionSettingsForm(IndicoForm):
 
 
 class AbstractReviewingSettingsForm(IndicoForm):
-    """Settings form for abstract reviewing"""
+    """Settings form for abstract reviewing."""
 
     RATING_FIELDS = ('scale_lower', 'scale_upper')
 
@@ -201,7 +201,7 @@ class AbstractReviewingSettingsForm(IndicoForm):
 
 
 class AbstractJudgmentFormBase(IndicoForm):
-    """Form base class for abstract judgment operations"""
+    """Form base class for abstract judgment operations."""
 
     _order = ('judgment', 'accepted_track', 'accepted_contrib_type', 'session', 'duplicate_of', 'merged_into',
               'merge_persons', 'judgment_comment', 'send_notifications')
@@ -260,7 +260,7 @@ class AbstractJudgmentFormBase(IndicoForm):
 
 
 class AbstractJudgmentForm(AbstractJudgmentFormBase):
-    """Form for judging an abstract"""
+    """Form for judging an abstract."""
 
     judgment = IndicoEnumSelectField(_("Judgment"), [DataRequired()], enum=AbstractAction,
                                      skip={AbstractAction.change_tracks})
@@ -282,7 +282,7 @@ class AbstractJudgmentForm(AbstractJudgmentFormBase):
 
 
 class AbstractReviewForm(IndicoForm):
-    """Form for reviewing an abstract"""
+    """Form for reviewing an abstract."""
 
     _order = ('proposed_action', 'proposed_contribution_type', 'proposed_related_abstract', 'proposed_tracks',
               'comment')
@@ -399,7 +399,7 @@ BulkAbstractJudgmentForm._add_contrib_type_hidden_unless()
 
 
 class AbstractReviewingRolesForm(IndicoForm):
-    """Settings form for abstract reviewing roles"""
+    """Settings form for abstract reviewing roles."""
 
     roles = TrackRoleField()
 

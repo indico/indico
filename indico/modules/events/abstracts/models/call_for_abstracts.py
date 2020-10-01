@@ -15,7 +15,7 @@ from indico.util.string import return_ascii
 
 
 class CallForAbstracts(object):
-    """Proxy class to facilitate access to the call for abstracts settings"""
+    """Proxy class to facilitate access to the call for abstracts settings."""
 
     def __init__(self, event):
         self.event = event

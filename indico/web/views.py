@@ -110,7 +110,7 @@ class WPJinjaMixin(object):
 
     @classmethod
     def render_template(cls, template_name_or_list=None, *wp_args, **context):
-        """Renders a jinja template inside the WP
+        """Render a jinja template inside the WP.
 
         :param template_name_or_list: the name of the template - if unsed, the
                                       `_template` attribute of the class is used.
@@ -129,7 +129,7 @@ class WPJinjaMixin(object):
 
     @classmethod
     def render_string(cls, html, *wp_args):
-        """Renders a string inside the WP
+        """Render a string inside the WP.
 
         :param html: a string containing html
         :param wp_args: list of arguments to be passed to the WP's' constructor
@@ -211,7 +211,7 @@ class WPBase(WPBundleMixin):
         self._kwargs = kwargs
 
     def get_extra_css_files(self):
-        """Return CSS urls that will be included after all other CSS"""
+        """Return CSS urls that will be included after all other CSS."""
         return []
 
     @classproperty
@@ -225,10 +225,9 @@ class WPBase(WPBundleMixin):
         return _bundles
 
     def _get_head_content(self):
-        """
-        Returns _additional_ content between <head></head> tags.
-        Please note that <title>, <meta> and standard CSS are always included.
+        """Return _additional_ content between <head></head> tags.
 
+        Please note that <title>, <meta> and standard CSS are always included.
         Override this method to add your own, page-specific loading of
         JavaScript, CSS and other legal content for HTML <head> tag.
         """

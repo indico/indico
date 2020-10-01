@@ -65,7 +65,7 @@ _regex_mapping = [(re.compile(regex), icon) for regex, icon in _regex_mapping]
 
 
 def icon_from_mimetype(mimetype, default_icon='icon-file-filled'):
-    """Gets the most suitable icon for a MIME type."""
+    """Get the most suitable icon for a MIME type."""
     mimetype = mimetype.lower()
     try:
         return _exact_mapping[mimetype]
@@ -77,7 +77,7 @@ def icon_from_mimetype(mimetype, default_icon='icon-file-filled'):
 
 
 def register_custom_mimetypes():
-    """Registers additional extension/mimetype mappings.
+    """Register additional extension/mimetype mappings.
 
     This is used for mimetypes/extensions that are not in the official
     mapping but useful, e.g. because indico has special handling for

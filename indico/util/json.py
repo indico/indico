@@ -20,8 +20,8 @@ except ImportError:
 
 
 class IndicoJSONEncoder(_json.JSONEncoder):
-    """
-    Custom JSON encoder that supports more types
+    """Custom JSON encoder that supports more types.
+
      * datetime objects
     """
     def __init__(self, *args, **kwargs):
@@ -42,9 +42,7 @@ class IndicoJSONEncoder(_json.JSONEncoder):
 
 
 def dumps(obj, **kwargs):
-    """
-    Simple wrapper around json.dumps()
-    """
+    """Simple wrapper around json.dumps()."""
     if kwargs.pop('pretty', False):
         kwargs['indent'] = 4 * ' '
     textarea = kwargs.pop('textarea', False)
@@ -57,7 +55,5 @@ def dumps(obj, **kwargs):
 
 
 def loads(string):
-    """
-    Simple wrapper around json.decode()
-    """
+    """Simple wrapper around json.decode()."""
     return _json.loads(string)

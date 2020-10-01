@@ -81,7 +81,7 @@ class RHAbstractsDownloadAttachment(RHAbstractBase):
 
 
 class RHAbstractNotificationLog(RHAbstractBase):
-    """Show the notifications sent for an abstract"""
+    """Show the notifications sent for an abstract."""
 
     def _check_abstract_protection(self):
         return self.abstract.can_judge(session.user)
@@ -100,7 +100,7 @@ class RHAbstractExportPDF(RHAbstractBase):
 
 
 class RHAbstractExportFullPDF(RHAbstractBase):
-    """Export an abstract as PDF (with review details)"""
+    """Export an abstract as PDF (with review details)."""
 
     def _check_abstract_protection(self):
         return self.abstract.can_see_reviews(session.user)

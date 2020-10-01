@@ -28,7 +28,7 @@ from indico.web.util import jsonify_data
 
 
 def discover_blueprints():
-    """Discovers all blueprints inside the indico package
+    """Discover all blueprints inside the indico package.
 
     Only blueprints in a ``blueprint.py`` module or inside a
     ``blueprints`` package are loaded. Any other files are not touched
@@ -69,7 +69,7 @@ def discover_blueprints():
 
 @memoize
 def make_view_func(obj):
-    """Turns an object in to a view function.
+    """Turn an object in to a view function.
 
     This function is called on each view_func passed to IndicoBlueprint.add_url_route().
     It handles RH classes and normal functions.
@@ -97,7 +97,7 @@ def make_view_func(obj):
 
 @memoize
 def redirect_view(endpoint, code=302):
-    """Creates a view function that redirects to the given endpoint."""
+    """Create a view function that redirects to the given endpoint."""
     def _redirect(**kwargs):
         params = dict(request.args.to_dict(), **kwargs)
         return redirect(_url_for(endpoint, **params), code=code)
@@ -169,7 +169,7 @@ def url_for(endpoint, *targets, **values):
 
 
 def url_rule_to_js(endpoint):
-    """Converts the rule(s) of an endpoint to a JavaScript object.
+    """Convert the rule(s) of an endpoint to a JavaScript object.
 
     Use this if you need to build an URL in JavaScript, but only if
     you really have to do that instead of e.g. building the URL on
@@ -211,7 +211,7 @@ def url_rule_to_js(endpoint):
 
 
 def redirect_or_jsonify(location, flash=True, **json_data):
-    """Returns a redirect or json response.
+    """Return a redirect or json response.
 
     If the request was an XHR we return JSON, otherwise we redirect.
     Unless set to another value, the JSON data includes `success=True`
@@ -251,7 +251,7 @@ def make_content_disposition_args(attachment_filename):
 
 def send_file(name, path_or_fd, mimetype, last_modified=None, no_cache=True, inline=None, conditional=False, safe=True,
               **kwargs):
-    """Sends a file to the user.
+    """Send a file to the user.
 
     `name` is required and should be the filename visible to the user.
     `path_or_fd` is either the physical path to the file or a file-like object (e.g. a StringIO).
@@ -325,7 +325,7 @@ def endpoint_for_url(url, base_url=None):
 # Note: When adding custom converters please do not forget to add them to converter_functions in routing.js
 # if they need any custom processing (i.e. not just encodeURIComponent) in JavaScript.
 class ListConverter(BaseConverter):
-    """Matches a dash-separated list"""
+    """Match a dash-separated list."""
 
     def __init__(self, map):
         BaseConverter.__init__(self, map)

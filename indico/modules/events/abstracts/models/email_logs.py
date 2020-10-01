@@ -95,7 +95,7 @@ class AbstractEmailLogEntry(db.Model):
 
     @classmethod
     def create_from_email(cls, email_data, email_tpl, user=None):
-        """Create a new log entry from the data used to send an email
+        """Create a new log entry from the data used to send an email.
 
         :param email_data: email data as returned from `make_email`
         :param email_tpl: the abstract email template that created the

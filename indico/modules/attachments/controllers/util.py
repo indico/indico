@@ -15,7 +15,7 @@ from indico.modules.attachments.models.folders import AttachmentFolder
 
 
 class SpecificAttachmentMixin:
-    """Mixin for RHs that reference a specific attachment"""
+    """Mixin for RHs that reference a specific attachment."""
 
     normalize_url_spec = {
         'args': {
@@ -36,7 +36,7 @@ class SpecificAttachmentMixin:
 
 
 class SpecificFolderMixin:
-    """Mixin for RHs that reference a specific folder"""
+    """Mixin for RHs that reference a specific folder."""
 
     normalize_url_spec = {
         'locators': {

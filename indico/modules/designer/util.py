@@ -37,19 +37,18 @@ def get_image_placeholder_types():
 
 
 def get_all_templates(obj):
-    """Get all templates usable by an event/category"""
+    """Get all templates usable by an event/category."""
     category = obj.category if isinstance(obj, Event) else obj
     return set(DesignerTemplate.find_all(DesignerTemplate.category_id.in_(categ['id'] for categ in category.chain)))
 
 
 def get_inherited_templates(obj):
-    """Get all templates inherited by a given event/category"""
+    """Get all templates inherited by a given event/category."""
     return get_all_templates(obj) - set(obj.designer_templates)
 
 
 def get_not_deletable_templates(obj):
-    """Get all non-deletable templates for an event/category"""
-
+    """Get all non-deletable templates for an event/category."""
     not_deletable_criteria = [
         DesignerTemplate.is_system_template,
         DesignerTemplate.backside_template_of != None,  # noqa

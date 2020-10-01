@@ -12,9 +12,9 @@ import pytest
 
 @pytest.fixture(autouse=True)
 def disallow_emails(monkeypatch):
-    """Prevents any code from connecting to a SMTP server.
+    """Prevent any code from connecting to a SMTP server.
 
-    Returns a set where you can add `(host, port)` combinations that
+    Return a set where you can add `(host, port)` combinations that
     should be exempt from the SMTP restriction.
     """
 

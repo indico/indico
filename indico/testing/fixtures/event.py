@@ -16,7 +16,7 @@ from indico.util.date_time import now_utc
 
 @pytest.fixture
 def create_event(dummy_user, dummy_category, db):
-    """Returns a callable which lets you create dummy events"""
+    """Return a callable which lets you create dummy events."""
 
     def _create_event(id_=None, **kwargs):
         # we specify `acl_entries` so SA doesn't load it when accessing it for
@@ -37,5 +37,5 @@ def create_event(dummy_user, dummy_category, db):
 
 @pytest.fixture
 def dummy_event(create_event):
-    """Creates a mocked dummy event"""
+    """Create a mocked dummy event."""
     return create_event(0)

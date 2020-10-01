@@ -27,17 +27,19 @@ from indico.util.string import truncate
 class _NoneValue(object):
     @classmethod
     def replace(cls, value):
-        """Replaces `None` with a `_NoneValue`"""
+        """Replace `None` with a `_NoneValue`."""
         return cls() if value is None else value
 
     @classmethod
     def restore(cls, value):
-        """Replaces `_NoneValue` with `None`"""
+        """Replace `_NoneValue` with `None`."""
         return None if isinstance(value, cls) else value
 
 
 class CacheClient(object):
-    """This is an abstract class. A cache client provide a simple API to get/set/delete cache entries.
+    """
+    This is an abstract class. A cache client provide a simple API to
+    get/set/delete cache entries.
 
     Implementation must provide the following methods:
     - set(self, key, val, ttl)
@@ -46,6 +48,7 @@ class CacheClient(object):
 
     The unit for the ttl arguments is a second.
     """
+
     def set_multi(self, mapping, ttl=0):
         for key, val in mapping.iteritems():
             self.set(key, val, ttl)
@@ -73,7 +76,7 @@ class CacheClient(object):
 
 
 class NullCacheClient(CacheClient):
-    """Does nothing"""
+    """Do nothing."""
 
     def set(self, key, val, ttl=0):
         pass
@@ -86,7 +89,7 @@ class NullCacheClient(CacheClient):
 
 
 class RedisCacheClient(CacheClient):
-    """Redis-based cache client with a simple API"""
+    """Redis-based cache client with a simple API."""
 
     key_prefix = 'cache/gen/'
 
@@ -222,7 +225,7 @@ class FileCacheClient(CacheClient):
 
 
 class MemcachedCacheClient(CacheClient):
-    """Memcached-based cache client"""
+    """Memcached-based cache client."""
 
     @staticmethod
     def convert_ttl(ttl):
@@ -248,6 +251,7 @@ class GenericCache(object):
 
     The backends are accessed through the CacheClient interface.
     """
+
     def __init__(self, namespace):
         self._client = None
         self._namespace = namespace

@@ -64,7 +64,7 @@ class EventCloner(object):
 
     @classmethod
     def get_cloners(cls, old_event):
-        """Return the list of cloners (sorted for display)"""
+        """Return the list of cloners (sorted for display)."""
         return sorted((cloner_cls(old_event) for cloner_cls in get_event_cloners().itervalues()),
                       key=attrgetter('friendly_name'))
 

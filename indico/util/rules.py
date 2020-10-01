@@ -37,14 +37,14 @@ class Condition(object):
 
     @classmethod
     def is_used(cls, rule):
-        """Check whether the condition is used in a rule"""
+        """Check whether the condition is used in a rule."""
         return rule.get(cls.name) is not None
 
     @classmethod
     def is_none(cls, **kwargs):
         """Check whether the condition requires a null value.
 
-            Inheriting methods should overload this
+        Inheriting methods should overload this
         """
         raise NotImplementedError
 

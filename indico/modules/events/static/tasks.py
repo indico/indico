@@ -61,7 +61,7 @@ def notify_static_site_success(static_site):
 
 @celery.periodic_task(name='static_sites_cleanup', run_every=crontab(minute='30', hour='3', day_of_week='monday'))
 def static_sites_cleanup(days=30):
-    """Clean up old static sites
+    """Clean up old static sites.
 
     :param days: number of days after which to remove static sites
     """

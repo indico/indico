@@ -21,7 +21,7 @@ class WPManageUpcomingEvents(WPAdmin):
 
 
 class WPCategory(MathjaxMixin, WPJinjaMixin, WPDecorated):
-    """WP for category display pages"""
+    """WP for category display pages."""
 
     template_prefix = 'categories/'
     ALLOW_JSON = False
@@ -61,13 +61,13 @@ class WPCategory(MathjaxMixin, WPJinjaMixin, WPDecorated):
 
 
 class WPCategoryCalendar(WPCategory):
-    """WP for category calendar page"""
+    """WP for category calendar page."""
 
     bundles = ('module_categories.calendar.js', 'module_categories.calendar.css')
 
 
 class WPCategoryManagement(WPCategory):
-    """WP for category management pages"""
+    """WP for category management pages."""
 
     MANAGEMENT = True
     bundles = ('module_categories.management.js',)

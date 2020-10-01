@@ -32,11 +32,11 @@ from indico.web.views import WPJinjaMixin
 
 
 class RHAgreementManagerBase(RHManageEventBase):
-    """Base class for agreement management RHs"""
+    """Base class for agreement management RHs."""
 
 
 class RHAgreementForm(RHDisplayEventBase):
-    """Agreement form page"""
+    """Agreement form page."""
 
     normalize_url_spec = {
         'locators': {
@@ -85,7 +85,7 @@ class RHAgreementForm(RHDisplayEventBase):
 
 
 class RHAgreementManager(RHAgreementManagerBase):
-    """Agreements types page (admin)"""
+    """Agreements types page (admin)."""
 
     def _process(self):
         definitions = get_agreement_definitions().values()
@@ -93,7 +93,7 @@ class RHAgreementManager(RHAgreementManagerBase):
 
 
 class RHAgreementManagerDetails(RHAgreementManagerBase):
-    """Management page for all agreements of a certain type (admin)"""
+    """Management page for all agreements of a certain type (admin)."""
 
     def _process_args(self):
         RHAgreementManagerBase._process_args(self)
@@ -116,7 +116,7 @@ class RHAgreementManagerDetails(RHAgreementManagerBase):
 
 
 class RHAgreementManagerDetailsToggleNotifications(RHAgreementManagerDetails):
-    """Toggles notifications to managers for an agreement type on an event"""
+    """Toggle notifications to managers for an agreement type on an event."""
 
     def _process(self):
         enabled = request.form['enabled'] == '1'
@@ -214,7 +214,7 @@ class RHAgreementManagerDetailsAgreementBase(RHAgreementManagerDetails):
 
 
 class RHAgreementManagerDetailsSubmitAnswer(RHAgreementManagerDetails):
-    """Submits the answer of an agreement on behalf of the person"""
+    """Submit the answer of an agreement on behalf of the person."""
 
     def _process_args(self):
         RHAgreementManagerDetails._process_args(self)

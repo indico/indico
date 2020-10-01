@@ -286,7 +286,7 @@ def render_session_timetable(session, timetable_layout=None, management=False):
 
 
 def get_session_block_entries(event, day):
-    """Returns a list of event top-level session blocks for the given `day`"""
+    """Return a list of event top-level session blocks for the given `day`."""
     return (event.timetable_entries
             .filter(db.cast(TimetableEntry.start_dt.astimezone(event.tzinfo), db.Date) == day.date(),
                     TimetableEntry.type == TimetableEntryType.SESSION_BLOCK)
@@ -294,7 +294,7 @@ def get_session_block_entries(event, day):
 
 
 def shift_following_entries(entry, shift, session_=None):
-    """Reschedules entries starting after the given entry by the given shift."""
+    """Reschedule entries starting after the given entry by the given shift."""
     query = entry.siblings_query.filter(TimetableEntry.start_dt >= entry.end_dt)
     if session_ and not entry.parent:
         query.filter(TimetableEntry.type == TimetableEntryType.SESSION_BLOCK,

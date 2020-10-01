@@ -46,9 +46,7 @@ class outputGenerator(object):
             return "INDICOSEARCH.PUBLIC"
 
     def _generateACLDatafield(self, eType, memberList, objId, out):
-        """
-        Generates a specific MARCXML 506 field containing the ACL
-        """
+        """Generate a specific MARCXML 506 field containing the ACL."""
         if eType:
             out.openTag("datafield", [["tag", "506"],
                                       ["ind1", "1"], ["ind2", " "]])
@@ -75,7 +73,6 @@ class outputGenerator(object):
         obj could be a Conference, Session, Contribution, Material, Resource
         or SubContribution object.
         """
-
         if acl is None:
             acl = obj.get_access_list()
 

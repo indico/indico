@@ -237,7 +237,7 @@ def cli(obj, target_dir):
 @click.option('--ignore-unclean', is_flag=True, help='Ignore unclean working tree')
 @click.pass_obj
 def build_indico(obj, assets, add_version_suffix, ignore_unclean):
-    """Builds the indico wheel."""
+    """Build the indico wheel."""
     target_dir = obj['target_dir']
     # check for unclean git status
     clean, output = git_is_clean_indico()
@@ -280,7 +280,7 @@ def _plugin_has_assets(plugin_dir):
 @click.option('--ignore-unclean', is_flag=True, help='Ignore unclean working tree')
 @click.pass_obj
 def build_plugin(obj, assets, plugin_dir, add_version_suffix, ignore_unclean):
-    """Builds a plugin wheel.
+    """Build a plugin wheel.
 
     PLUGIN_DIR is the path to the folder containing the plugin's setup.py
     """
@@ -312,7 +312,7 @@ def build_plugin(obj, assets, plugin_dir, add_version_suffix, ignore_unclean):
 @click.option('--ignore-unclean', is_flag=True, help='Ignore unclean working tree')
 @click.pass_context
 def build_all_plugins(ctx, plugins_dir, add_version_suffix, ignore_unclean):
-    """Builds all plugin wheels in a directory.
+    """Build all plugin wheels in a directory.
 
     PLUGINS_DIR is the path to the folder containing the plugin directories
     """

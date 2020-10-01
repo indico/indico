@@ -12,7 +12,7 @@ from indico.util.string import return_ascii
 
 
 class LegacyEventMapping(db.Model):
-    """Legacy event ID mapping
+    """Legacy event ID mapping.
 
     Legacy events (imported from CDS agenda) have non-numeric IDs
     which are not supported by any new code. This mapping maps them

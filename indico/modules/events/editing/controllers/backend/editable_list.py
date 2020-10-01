@@ -36,7 +36,7 @@ archive_cache = GenericCache('editables-archive')
 
 
 class RHEditableList(RHEditableTypeEditorBase):
-    """Return the list of editables of the event for a given type"""
+    """Return the list of editables of the event for a given type."""
     def _process_args(self):
         RHEditableTypeEditorBase._process_args(self)
         self.contributions = (Contribution.query

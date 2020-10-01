@@ -29,7 +29,7 @@ class RHFeaturesBase(RHManageEventBase):
 
 
 class RHFeatures(RHFeaturesBase):
-    """Shows the list of available event features"""
+    """Show the list of available event features."""
 
     def _make_form(self):
         form_class = type(b'FeaturesForm', (IndicoForm,), {})
@@ -49,7 +49,7 @@ class RHFeatures(RHFeaturesBase):
 
 
 class RHSwitchFeature(RHFeaturesBase):
-    """Enables/disables a feature"""
+    """Enable/disable a feature."""
 
     def render_event_menu(self):
         return render_sidemenu('event-management-sidemenu', active_item=WPFeatures.sidemenu_option,

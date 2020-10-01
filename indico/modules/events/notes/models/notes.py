@@ -86,7 +86,7 @@ class EventNote(LinkMixin, db.Model):
 
     @classmethod
     def get_for_linked_object(cls, linked_object, preload_event=True):
-        """Gets the note for the given object.
+        """Get the note for the given object.
 
         This only returns a note that hasn't been deleted.
 
@@ -115,7 +115,7 @@ class EventNote(LinkMixin, db.Model):
 
     @classmethod
     def get_or_create(cls, linked_object):
-        """Gets the note for the given object or creates a new one.
+        """Get the note for the given object or creates a new one.
 
         If there is an existing note for the object, it will be returned
         even.  Otherwise a new note is created.
@@ -126,12 +126,12 @@ class EventNote(LinkMixin, db.Model):
         return note
 
     def delete(self, user):
-        """Marks the note as deleted and adds a new empty revision"""
+        """Mark the note as deleted and adds a new empty revision."""
         self.create_revision(self.current_revision.render_mode, '', user)
         self.is_deleted = True
 
     def create_revision(self, render_mode, source, user):
-        """Creates a new revision if needed and marks it as undeleted if it was
+        """Create a new revision if needed and marks it as undeleted if it was.
 
         Any change to the render mode or the source causes a new
         revision to be created.  The user is not taken into account

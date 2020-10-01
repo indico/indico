@@ -13,7 +13,7 @@ from indico.web.flask.templating import get_overridable_template_name, get_templ
 
 
 def notify_created(plugin, room, room_assoc, event, user):
-    """Notifies about the creation of a vc_room.
+    """Notify about the creation of a vc_room.
 
     :param room: the vc_room
     :param event: the event
@@ -27,7 +27,7 @@ def notify_created(plugin, room, room_assoc, event, user):
 
 
 def notify_deleted(plugin, room, room_assoc, event, user):
-    """Notifies about the deletion of a vc_room from the system.
+    """Notify about the deletion of a vc_room from the system.
 
     :param room: the vc_room
     :param event: the event

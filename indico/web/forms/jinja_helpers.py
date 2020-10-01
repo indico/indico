@@ -77,7 +77,7 @@ def _attrs_for_validators(field, validators):
 
 
 def render_field(field, widget_attrs, disabled=None):
-    """Renders a WTForms field, taking into account validators"""
+    """Render a WTForms field, taking into account validators."""
     if not widget_attrs.get('placeholder'):
         widget_attrs = dict(widget_attrs)
         widget_attrs.pop('placeholder', None)
@@ -92,7 +92,7 @@ def render_field(field, widget_attrs, disabled=None):
 
 
 def iter_form_fields(form, fields=None, skip=None, hidden_fields=False):
-    """Iterates over the fields in a WTForm
+    """Iterate over the fields in a WTForm.
 
     :param fields: If specified only fields that are in this list are
                    yielded. This also overrides the field order.

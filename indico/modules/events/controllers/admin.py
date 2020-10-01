@@ -33,7 +33,7 @@ def _render_reference_type_list():
 
 
 class RHManageReferenceTypeBase(RHAdminBase):
-    """Base class for a specific reference type"""
+    """Base class for a specific reference type."""
 
     def _process_args(self):
         RHAdminBase._process_args(self)
@@ -41,7 +41,7 @@ class RHManageReferenceTypeBase(RHAdminBase):
 
 
 class RHReferenceTypes(RHAdminBase):
-    """Manage reference types in server admin area"""
+    """Manage reference types in server admin area."""
 
     def _process(self):
         types = _get_all_reference_types()
@@ -49,7 +49,7 @@ class RHReferenceTypes(RHAdminBase):
 
 
 class RHCreateReferenceType(RHAdminBase):
-    """Create a new reference type"""
+    """Create a new reference type."""
 
     def _process(self):
         form = ReferenceTypeForm()
@@ -61,7 +61,7 @@ class RHCreateReferenceType(RHAdminBase):
 
 
 class RHEditReferenceType(RHManageReferenceTypeBase):
-    """Edit an existing reference type"""
+    """Edit an existing reference type."""
 
     def _process(self):
         form = ReferenceTypeForm(obj=FormDefaults(self.reference_type), reference_type=self.reference_type)
@@ -73,7 +73,7 @@ class RHEditReferenceType(RHManageReferenceTypeBase):
 
 
 class RHDeleteReferenceType(RHManageReferenceTypeBase):
-    """Delete an existing reference type"""
+    """Delete an existing reference type."""
 
     def _process_DELETE(self):
         delete_reference_type(self.reference_type)
@@ -91,7 +91,7 @@ def _render_event_label_list():
 
 
 class RHManageEventLabelBase(RHAdminBase):
-    """Base class for a specific event label"""
+    """Base class for a specific event label."""
 
     def _process_args(self):
         RHAdminBase._process_args(self)
@@ -99,7 +99,7 @@ class RHManageEventLabelBase(RHAdminBase):
 
 
 class RHEventLabels(RHAdminBase):
-    """Manage event labels in server admin area"""
+    """Manage event labels in server admin area."""
 
     def _process(self):
         labels = _get_all_event_labels()
@@ -107,7 +107,7 @@ class RHEventLabels(RHAdminBase):
 
 
 class RHCreateEventLabel(RHAdminBase):
-    """Create a new event label"""
+    """Create a new event label."""
 
     def _process(self):
         form = EventLabelForm()
@@ -119,7 +119,7 @@ class RHCreateEventLabel(RHAdminBase):
 
 
 class RHEditEventLabel(RHManageEventLabelBase):
-    """Edit an existing event label"""
+    """Edit an existing event label."""
 
     def _process(self):
         form = EventLabelForm(obj=FormDefaults(self.event_label), event_label=self.event_label)
@@ -131,7 +131,7 @@ class RHEditEventLabel(RHManageEventLabelBase):
 
 
 class RHDeleteEventLabel(RHManageEventLabelBase):
-    """Delete an existing event label"""
+    """Delete an existing event label."""
 
     def _process_DELETE(self):
         delete_event_label(self.event_label)

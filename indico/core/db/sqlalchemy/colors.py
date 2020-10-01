@@ -95,7 +95,7 @@ class ColorMixin(object):
 
     @property
     def colors(self):
-        """The current set of colors or None if no colors are set"""
+        """The current set of colors or None if no colors are set."""
         colors = ColorTuple(self.text_color, self.background_color)
         return colors or self.default_colors
 

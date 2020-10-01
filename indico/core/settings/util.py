@@ -30,7 +30,7 @@ def _preload_settings(cls, proxy, cache, **kwargs):
 
 
 def get_all_settings(cls, acl_cls, proxy, no_defaults, **kwargs):
-    """Helper function for SettingsProxy.get_all"""
+    """Helper function for SettingsProxy.get_all."""
     if no_defaults:
         rv = cls.get_all(proxy.module, **kwargs)
         if acl_cls and proxy.acl_names:
@@ -48,7 +48,7 @@ def get_all_settings(cls, acl_cls, proxy, no_defaults, **kwargs):
 
 
 def get_setting(cls, proxy, name, default, cache, **kwargs):
-    """Helper function for SettingsProxy.get"""
+    """Helper function for SettingsProxy.get."""
     from indico.core.settings import SettingsProxyBase
 
     cache_key = _get_cache_key(proxy, name, kwargs)
@@ -67,7 +67,7 @@ def get_setting(cls, proxy, name, default, cache, **kwargs):
 
 
 def get_setting_acl(cls, proxy, name, cache, **kwargs):
-    """Helper function for ACLProxy.get"""
+    """Helper function for ACLProxy.get."""
     cache_key = _get_cache_key(proxy, name, kwargs)
     try:
         return cache[cache_key]

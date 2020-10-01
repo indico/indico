@@ -75,7 +75,7 @@ def process_identity(identity_info):
 
 
 def login_user(user, identity=None, admin_impersonation=False):
-    """Set the session user and performs on-login logic
+    """Set the session user and performs on-login logic.
 
     When specifying `identity`, the provider/identitifer information
     is saved in the session so the identity management page can prevent

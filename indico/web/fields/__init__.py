@@ -16,7 +16,7 @@ __all__ = ('BaseField', 'get_field_definitions')
 
 
 def get_field_definitions(for_):
-    """Gets a dict containing all field definitions
+    """Get a dict containing all field definitions.
 
     :param for_: The identifier/object passed to the `get_fields`
                  signal to identify which fields to get.

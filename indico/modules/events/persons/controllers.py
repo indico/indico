@@ -214,7 +214,7 @@ class RHPersonsList(RHPersonsBase):
 
 
 class RHEmailEventPersons(RHManageEventBase):
-    """Send emails to selected EventPersons"""
+    """Send emails to selected EventPersons."""
 
     def _process_args(self):
         self.no_account = request.args.get('no_account') == '1'
@@ -281,7 +281,7 @@ class RHEmailEventPersons(RHManageEventBase):
 
 
 class RHGrantSubmissionRights(RHManageEventBase):
-    """Grants submission rights to all contribution speakers"""
+    """Grant submission rights to all contribution speakers."""
 
     def _process(self):
         count = 0
@@ -302,7 +302,7 @@ class RHGrantSubmissionRights(RHManageEventBase):
 
 
 class RHGrantModificationRights(RHManageEventBase):
-    """Grants session modification rights to all session conveners"""
+    """Grant session modification rights to all session conveners."""
 
     def _process(self):
         count = 0
@@ -320,7 +320,7 @@ class RHGrantModificationRights(RHManageEventBase):
 
 
 class RHRevokeSubmissionRights(RHManageEventBase):
-    """Revokes submission rights"""
+    """Revoke submission rights."""
 
     def _process(self):
         count = 0

@@ -15,9 +15,7 @@ from indico.modules.events.controllers.base import AccessKeyRequired, RHDisplayE
 
 @pytest.mark.usefixtures('request_context')
 def test_event_public_access(db, create_event):
-    """
-    Ensure if a null user can access a public event
-    """
+    """Ensure if a null user can access a public event."""
     rh = RHProtectedEventBase()
     rh.event = create_event(1, protection_mode=ProtectionMode.public)
     rh._check_access()
@@ -26,8 +24,8 @@ def test_event_public_access(db, create_event):
 @pytest.mark.usefixtures('request_context')
 def test_event_protected_access(db, create_user, create_event):
     """
-    Ensure a null user cannot access a protected event
-    Ensure a user with respective ACL entry can access a protected event
+    Ensure a null user cannot access a protected event. Ensure a user
+    with respective ACL entry can access a protected event.
     """
     rh = RHProtectedEventBase()
     rh.event = create_event(2, protection_mode=ProtectionMode.protected)
@@ -44,7 +42,7 @@ def test_event_protected_access(db, create_user, create_event):
 @pytest.mark.usefixtures('request_context')
 def test_event_key_access(create_user, create_event):
     """
-    Ensure the event doesn't reject the user if an access key is required
+    Ensure the event doesn't reject the user if an access key is required.
     """
     rh = RHDisplayEventBase()
     rh.event = create_event(2, protection_mode=ProtectionMode.protected, access_key='abc')

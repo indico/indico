@@ -61,7 +61,7 @@ class TimeDeltaField(Field):
 
     @property
     def best_unit(self):
-        """Return the largest unit that covers the current timedelta"""
+        """Return the largest unit that covers the current timedelta."""
         if self.data is None:
             return None
         seconds = int(self.data.total_seconds())
@@ -373,7 +373,7 @@ class IndicoTimezoneSelectField(SelectField):
 
 
 class IndicoWeekDayRepetitionField(Field):
-    """ Field that lets you select an ordinal day of the week."""
+    """Field that lets you select an ordinal day of the week."""
 
     widget = JinjaWidget('forms/week_day_repetition_widget.html', single_line=True)
 

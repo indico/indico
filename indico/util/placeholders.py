@@ -67,12 +67,12 @@ class Placeholder(object):
 
     @classmethod
     def is_in(cls, text, **kwargs):
-        """Checks whether the placeholder is used in a string"""
+        """Check whether the placeholder is used in a string."""
         return cls.get_regex(**kwargs).search(text) is not None
 
     @classmethod
     def is_empty(cls, text, **kwargs):
-        """Checks whether the placeholder renders an empty string
+        """Check whether the placeholder renders an empty string.
 
         :param text: The text to replace placeholders in
         :param kwargs: arguments specific to the placeholder's context
@@ -89,7 +89,7 @@ class Placeholder(object):
 
     @classmethod
     def render(cls, **kwargs):
-        """Converts the placeholder to a string
+        """Convert the placeholder to a string.
 
         When a placeholder contains HTML that should not be escaped,
         the returned value should be returned as a
@@ -104,7 +104,7 @@ class Placeholder(object):
 
 
 class ParametrizedPlaceholder(Placeholder):
-    """Base class for placeholders that can take an argument
+    """Base class for placeholders that can take an argument.
 
     Such placeholders are used like this: ``{something:arg}`` with
     ``:arg`` being optional; if omitted the argument will be ``None``.
@@ -137,7 +137,7 @@ class ParametrizedPlaceholder(Placeholder):
 
     @classmethod
     def iter_param_info(cls, **kwargs):
-        """Yields information for known params.
+        """Yield information for known params.
 
         Each item yielded must be a ``(value, description)`` tuple.
 
@@ -157,7 +157,7 @@ class ParametrizedPlaceholder(Placeholder):
 
     @classmethod
     def is_empty(cls, text, **kwargs):
-        """Checks whether the placeholder renders an empty string
+        """Check whether the placeholder renders an empty string.
 
         :param text: The text to replace placeholders in
         :param kwargs: arguments specific to the placeholder's context
@@ -182,7 +182,7 @@ def get_placeholders(context, **kwargs):
 
 
 def replace_placeholders(context, text, escape_html=True, **kwargs):
-    """Replaces placeholders in a string.
+    """Replace placeholders in a string.
 
     :param context: the context where the placeholders are used
     :param text: the text to replace placeholders in
@@ -220,7 +220,7 @@ def get_missing_placeholders(context, text, **kwargs):
 
 
 def render_placeholder_info(context, **kwargs):
-    """Renders the list of available placeholders.
+    """Render the list of available placeholders.
 
     :param context: the context where the placeholders are used
     :param kwargs: arguments specific to the context

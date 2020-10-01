@@ -34,7 +34,7 @@ def _fill_form_field_with_data(field, field_data, set_data=True):
 
 
 class RHManageRegFormFieldBase(RHManageRegFormSectionBase):
-    """Base class for a specific field within a registration form"""
+    """Base class for a specific field within a registration form."""
 
     field_class = RegistrationFormField
     normalize_url_spec = {
@@ -49,7 +49,7 @@ class RHManageRegFormFieldBase(RHManageRegFormSectionBase):
 
 
 class RHRegistrationFormToggleFieldState(RHManageRegFormFieldBase):
-    """Enable/Disable a field"""
+    """Enable/Disable a field."""
 
     def _process(self):
         enabled = request.args.get('enable') == 'true'
@@ -64,7 +64,7 @@ class RHRegistrationFormToggleFieldState(RHManageRegFormFieldBase):
 
 
 class RHRegistrationFormModifyField(RHManageRegFormFieldBase):
-    """Remove/Modify a field"""
+    """Remove/Modify a field."""
 
     def _process_DELETE(self):
         if self.field.type == RegistrationFormItemType.field_pd:
@@ -87,7 +87,7 @@ class RHRegistrationFormModifyField(RHManageRegFormFieldBase):
 
 
 class RHRegistrationFormMoveField(RHManageRegFormFieldBase):
-    """Change position of a field within the section"""
+    """Change position of a field within the section."""
 
     def _process(self):
         new_position = request.json['endPos'] + 1
@@ -113,7 +113,7 @@ class RHRegistrationFormMoveField(RHManageRegFormFieldBase):
 
 
 class RHRegistrationFormAddField(RHManageRegFormSectionBase):
-    """Add a field to the section"""
+    """Add a field to the section."""
 
     def _process(self):
         field_data = snakify_keys(request.json['fieldData'])
@@ -125,12 +125,12 @@ class RHRegistrationFormAddField(RHManageRegFormSectionBase):
 
 
 class RHRegistrationFormToggleTextState(RHRegistrationFormToggleFieldState):
-    """Enable/Disable a static text field"""
+    """Enable/Disable a static text field."""
     field_class = RegistrationFormText
 
 
 class RHRegistrationFormModifyText(RHRegistrationFormModifyField):
-    """Remove/Modify a static text field"""
+    """Remove/Modify a static text field."""
     field_class = RegistrationFormText
 
     def _process_PATCH(self):
@@ -141,12 +141,12 @@ class RHRegistrationFormModifyText(RHRegistrationFormModifyField):
 
 
 class RHRegistrationFormMoveText(RHRegistrationFormMoveField):
-    """Change position of a static text field within the section"""
+    """Change position of a static text field within the section."""
     field_class = RegistrationFormText
 
 
 class RHRegistrationFormAddText(RHManageRegFormSectionBase):
-    """Add a static text field to a section"""
+    """Add a static text field to a section."""
 
     def _process(self):
         field_data = snakify_keys(request.json['fieldData'])

@@ -37,7 +37,7 @@ def encodeUnicode(text, sourceEncoding="utf-8"):
 
 
 def unicodeSlice(s, start, end, encoding='utf-8'):
-    """Returns a slice of the string s, based on its encoding."""
+    """Return a slice of the string s, based on its encoding."""
     return s.decode(encoding, 'replace')[start:end]
 
 
@@ -49,16 +49,12 @@ class OSSpecific(object):
 
     @classmethod
     def _lockFilePosix(cls, f, lockType):
-        """
-        Locks file f with lock type lockType
-        """
+        """Lock file f with lock type lockType."""
         fcntl.flock(f, lockType)
 
     @classmethod
     def _lockFileOthers(cls, f, lockType):
-        """
-        Win32/others file locking could be implemented here
-        """
+        """Win32/others file locking could be implemented here."""
         pass
 
     @classmethod

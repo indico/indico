@@ -12,7 +12,7 @@ from indico.util.string import format_repr, return_ascii
 
 
 class LegacyRegistrationMapping(db.Model):
-    """Legacy registration id/token mapping
+    """Legacy registration id/token mapping.
 
     Legacy registrations had tokens which are not compatible with the
     new UUID-based ones.

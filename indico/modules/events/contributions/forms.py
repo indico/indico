@@ -186,7 +186,7 @@ class ContributionDefaultDurationForm(IndicoForm):
 
 
 class ContributionTypeForm(IndicoForm):
-    """Form to create or edit a ContributionType"""
+    """Form to create or edit a ContributionType."""
 
     name = StringField(_("Name"), [DataRequired()])
     is_private = BooleanField(_("Private"), widget=SwitchWidget(),

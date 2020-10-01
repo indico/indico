@@ -18,7 +18,7 @@ from indico.util.date_time import now_utc
 
 @memoize_redis(3600)
 def get_recent_news():
-    """Get a list of recent news for the home page"""
+    """Get a list of recent news for the home page."""
     settings = news_settings.get_all()
     if not settings['show_recent']:
         return []

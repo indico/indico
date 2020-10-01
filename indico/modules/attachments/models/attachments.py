@@ -224,7 +224,7 @@ class Attachment(ProtectionMixin, VersionedResourceMixin, db.Model):
         return dict(self.folder.locator, attachment_id=self.id)
 
     def get_download_url(self, absolute=False):
-        """Returns the download url for the attachment.
+        """Return the download url for the attachment.
 
         During static site generation this returns a local URL for the
         file or the target URL for the link.
@@ -239,16 +239,16 @@ class Attachment(ProtectionMixin, VersionedResourceMixin, db.Model):
 
     @property
     def download_url(self):
-        """The download url for the attachment"""
+        """The download url for the attachment."""
         return self.get_download_url()
 
     @property
     def absolute_download_url(self):
-        """The absolute download url for the attachment"""
+        """The absolute download url for the attachment."""
         return self.get_download_url(absolute=True)
 
     def can_access(self, user, *args, **kwargs):
-        """Checks if the user is allowed to access the attachment.
+        """Check if the user is allowed to access the attachment.
 
         This is the case if the user has access to see the attachment
         or if the user can manage attachments for the linked object.

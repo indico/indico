@@ -46,7 +46,7 @@ class PluginCategory(unicode, IndicoEnum):
 
 
 class IndicoPlugin(Plugin):
-    """Base class for an Indico plugin
+    """Base class for an Indico plugin.
 
     All your plugins need to inherit from this class. It extends the
     `Plugin` class from Flask-PluginEngine with useful indico-specific
@@ -131,7 +131,7 @@ class IndicoPlugin(Plugin):
         signal.connect(func, **connect_kwargs)
 
     def get_blueprints(self):
-        """Return blueprints to be registered on the application
+        """Return blueprints to be registered on the application.
 
         A single blueprint can be returned directly, for multiple blueprint you need
         to yield them or return an iterable.
@@ -139,21 +139,21 @@ class IndicoPlugin(Plugin):
         pass
 
     def get_vars_js(self):
-        """Return a dictionary with variables to be added to vars.js file"""
+        """Return a dictionary with variables to be added to vars.js file."""
         return None
 
     @cached_property
     def translation_path(self):
-        """
-        Return translation files to be used by the plugin.
-        By default, get <root_path>/translations, unless it does not exist
+        """Return translation files to be used by the plugin.
+
+        By default, get <root_path>/translations, unless it does not exist.
         """
         translations_path = os.path.join(self.root_path, 'translations')
         return translations_path if os.path.exists(translations_path) else None
 
     @cached_property
     def translation_domain(self):
-        """Return the domain for this plugin's translation_path"""
+        """Return the domain for this plugin's translation_path."""
         path = self.translation_path
         return Domain(path) if path else NullDomain()
 
@@ -178,7 +178,7 @@ class IndicoPlugin(Plugin):
         return self._get_manifest()
 
     def inject_bundle(self, name, view_class=None, subclasses=True, condition=None):
-        """Injects an asset bundle into Indico's pages
+        """Inject an asset bundle into Indico's pages.
 
         :param name: Name of the bundle
         :param view_class: If a WP class is specified, only inject it into pages using that class
@@ -203,15 +203,18 @@ class IndicoPlugin(Plugin):
             self.connect(signals.plugin.inject_bundle, _func)
 
     def inject_vars_js(self):
-        """Returns a string that will define variables for the plugin in the vars.js file"""
+        """
+        Return a string that will define variables for the plugin in
+        the vars.js file.
+        """
         vars_js = self.get_vars_js()
         if vars_js:
             return 'var {}Plugin = {};'.format(self.name.title(), json.dumps(vars_js))
 
     def template_hook(self, name, receiver, priority=50, markup=True):
-        """Registers a function to be called when a template hook is invoked.
+        """Register a function to be called when a template hook is invoked.
 
-        For details see :func:`~indico.web.flask.templating.register_template_hook`
+        For details see :func:`~indico.web.flask.templating.register_template_hook`.
         """
         register_template_hook(name, receiver, priority, markup, self)
 
@@ -223,7 +226,7 @@ class IndicoPlugin(Plugin):
     @cached_classproperty
     @classmethod
     def settings(cls):
-        """:class:`SettingsProxy` for the plugin's settings"""
+        """:class:`SettingsProxy` for the plugin's settings."""
         if cls.name is None:
             raise RuntimeError('Plugin has not been loaded yet')
         instance = cls.instance
@@ -234,7 +237,7 @@ class IndicoPlugin(Plugin):
     @cached_classproperty
     @classmethod
     def event_settings(cls):
-        """:class:`EventSettingsProxy` for the plugin's event-specific settings"""
+        """:class:`EventSettingsProxy` for the plugin's event-specific settings."""
         if cls.name is None:
             raise RuntimeError('Plugin has not been loaded yet')
         instance = cls.instance
@@ -246,7 +249,7 @@ class IndicoPlugin(Plugin):
     @cached_classproperty
     @classmethod
     def user_settings(cls):
-        """:class:`UserSettingsProxy` for the plugin's user-specific settings"""
+        """:class:`UserSettingsProxy` for the plugin's user-specific settings."""
         if cls.name is None:
             raise RuntimeError('Plugin has not been loaded yet')
         instance = cls.instance

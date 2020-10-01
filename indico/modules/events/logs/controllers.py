@@ -32,7 +32,7 @@ def _get_metadata_query():
 
 
 class RHEventLogs(RHManageEventBase):
-    """Shows the modification/action log for the event"""
+    """Show the modification/action log for the event."""
 
     def _process(self):
         metadata_query = _get_metadata_query()

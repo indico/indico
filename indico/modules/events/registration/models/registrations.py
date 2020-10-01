@@ -56,7 +56,7 @@ def _get_next_friendly_id(context):
 
 
 class Registration(db.Model):
-    """Somebody's registration for an event through a registration form"""
+    """Somebody's registration for an event through a registration form."""
     __tablename__ = 'registrations'
     __table_args__ = (db.CheckConstraint('email = lower(email)', 'lowercase_email'),
                       db.Index(None, 'friendly_id', 'event_id', unique=True,
@@ -281,7 +281,7 @@ class Registration(db.Model):
 
     @locator.uuid
     def locator(self):
-        """A locator that uses uuid instead of id"""
+        """A locator that uses uuid instead of id."""
         return dict(self.registration_form.locator, token=self.uuid)
 
     @property
@@ -315,7 +315,7 @@ class Registration(db.Model):
 
     @property
     def full_name(self):
-        """Returns the user's name in 'Firstname Lastname' notation."""
+        """Return the user's name in 'Firstname Lastname' notation."""
         return self.get_full_name(last_name_first=False)
 
     @property
@@ -325,18 +325,18 @@ class Registration(db.Model):
 
     @property
     def is_ticket_blocked(self):
-        """Check whether the ticket is blocked by a plugin"""
+        """Check whether the ticket is blocked by a plugin."""
         return any(values_from_signal(signals.event.is_ticket_blocked.send(self), single_value=True))
 
     @property
     def is_paid(self):
-        """Returns whether the registration has been paid for."""
+        """Return whether the registration has been paid for."""
         paid_states = {TransactionStatus.successful, TransactionStatus.pending}
         return self.transaction is not None and self.transaction.status in paid_states
 
     @property
     def payment_dt(self):
-        """The date/time when the registration has been paid for"""
+        """The date/time when the registration has been paid for."""
         return self.transaction.timestamp if self.is_paid else None
 
     @property
@@ -360,7 +360,7 @@ class Registration(db.Model):
 
     @property
     def summary_data(self):
-        """Export registration data nested in sections and fields"""
+        """Export registration data nested in sections and fields."""
 
         def _fill_from_regform():
             for section in self.registration_form.sections:
@@ -405,7 +405,7 @@ class Registration(db.Model):
                            user_id=None, is_deleted=False, _text=self.full_name)
 
     def get_full_name(self, last_name_first=True, last_name_upper=False, abbrev_first_name=False):
-        """Returns the user's in the specified notation.
+        """Return the user's in the specified notation.
 
         If not format options are specified, the name is returned in
         the 'Lastname, Firstname' notation.
@@ -448,7 +448,7 @@ class Registration(db.Model):
         return self._render_price(self.price_adjustment)
 
     def sync_state(self, _skip_moderation=True):
-        """Sync the state of the registration"""
+        """Sync the state of the registration."""
         initial_state = self.state
         regform = self.registration_form
         invitation = self.invitation
@@ -473,7 +473,7 @@ class Registration(db.Model):
             signals.event.registration_state_updated.send(self, previous_state=initial_state)
 
     def update_state(self, approved=None, paid=None, rejected=None, withdrawn=None, _skip_moderation=False):
-        """Update the state of the registration for a given action
+        """Update the state of the registration for a given action.
 
         The accepted kwargs are the possible actions. ``True`` means that the
         action occured and ``False`` that it was reverted.
@@ -551,7 +551,7 @@ class Registration(db.Model):
 
 
 class RegistrationData(StoredFileMixin, db.Model):
-    """Data entry within a registration for a field in a registration form"""
+    """Data entry within a registration for a field in a registration form."""
 
     __tablename__ = 'registration_data'
     __table_args__ = {'schema': 'event_registration'}

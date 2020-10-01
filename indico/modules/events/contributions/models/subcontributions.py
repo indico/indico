@@ -130,12 +130,12 @@ class SubContribution(DescriptionMixin, AttachedItemsMixin, AttachedNotesMixin, 
 
     @property
     def session(self):
-        """Convenience property so all event entities have it"""
+        """Convenience property so all event entities have it."""
         return self.contribution.session if self.contribution.session_id is not None else None
 
     @property
     def timetable_entry(self):
-        """Convenience property so all event entities have it"""
+        """Convenience property so all event entities have it."""
         return self.contribution.timetable_entry
 
     @property

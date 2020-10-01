@@ -27,14 +27,14 @@ from indico.core.db.sqlalchemy.util.models import IndicoBaseQuery, IndicoModel
 
 
 class ConstraintViolated(Exception):
-    """Indicates that a constraint trigger was violated"""
+    """Indicate that a constraint trigger was violated."""
     def __init__(self, message, orig):
         super(ConstraintViolated, self).__init__(message)
         self.orig = orig
 
 
 def handle_sqlalchemy_database_error():
-    """Handle a SQLAlchemy DatabaseError exception nicely
+    """Handle a SQLAlchemy DatabaseError exception nicely.
 
     Currently this only takes care of custom INDX exception
     raised from constraint triggers.  It must be invoked from an
@@ -75,7 +75,7 @@ class IndicoSQLAlchemy(SQLAlchemy):
         return session
 
     def enforce_constraints(self):
-        """Enables immedaite enforcing of deferred constraints.
+        """Enable immediate enforcing of deferred constraints.
 
         This should be done at the end of normal request processing
         and exceptions should be handled in a clean way that goes
@@ -98,7 +98,7 @@ class IndicoSQLAlchemy(SQLAlchemy):
 
     @contextmanager
     def tmp_session(self):
-        """Provides a contextmanager with a temporary SQLAlchemy session.
+        """Provide a contextmanager with a temporary SQLAlchemy session.
 
         This allows you to use SQLAlchemy e.g. in a `after_this_request`
         callback without having to worry about things like the ZODB extension,

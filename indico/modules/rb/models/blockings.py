@@ -95,7 +95,7 @@ class Blocking(db.Model):
         return user == self.created_by_user or (allow_admin and rb_is_admin(user))
 
     def can_override(self, user, room=None, explicit_only=False, allow_admin=True):
-        """Check if a user can override the blocking
+        """Check if a user can override the blocking.
 
         The following persons are authorized to override a blocking:
         - the creator of the blocking

@@ -171,7 +171,7 @@ class SurveyQuestion(SurveyItem):
         return [a for a in self.answers if not a.is_empty]
 
     def get_summary(self, **kwargs):
-        """Returns the summary of answers submitted for this question."""
+        """Return the summary of answers submitted for this question."""
         if self.field:
             return self.field.get_summary(**kwargs)
 

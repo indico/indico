@@ -21,7 +21,7 @@ from indico.modules.rb.models.rooms import Room
 
 @pytest.fixture
 def create_location(db):
-    """Returns a callable which lets you create locations"""
+    """Return a callable which lets you create locations."""
 
     def _create_location(name, **params):
         location = Location(name=name, **params)
@@ -34,7 +34,7 @@ def create_location(db):
 
 @pytest.fixture
 def dummy_location(db, create_location):
-    """Gives you a dummy default location"""
+    """Give you a dummy default location."""
     loc = create_location(u'Test')
     db.session.flush()
     return loc
@@ -42,7 +42,7 @@ def dummy_location(db, create_location):
 
 @pytest.fixture
 def create_reservation(db, dummy_room, dummy_user):
-    """Returns a callable which lets you create reservations"""
+    """Return a callable which lets you create reservations."""
     def _create_reservation(**params):
         params.setdefault('start_dt', date.today() + relativedelta(hour=8, minute=30))
         params.setdefault('end_dt', date.today() + relativedelta(hour=17, minute=30))
@@ -63,13 +63,13 @@ def create_reservation(db, dummy_room, dummy_user):
 
 @pytest.fixture
 def dummy_reservation(create_reservation):
-    """Gives you a dummy reservation"""
+    """Give you a dummy reservation."""
     return create_reservation()
 
 
 @pytest.fixture
 def create_occurrence(create_reservation):
-    """Returns a callable which lets you create reservation occurrences"""
+    """Return a callable which lets you create reservation occurrences."""
     def _create_occurrence(start_dt=None, end_dt=None, room=None):
         params = {}
         if start_dt is not None:
@@ -86,13 +86,13 @@ def create_occurrence(create_reservation):
 
 @pytest.fixture
 def dummy_occurrence(create_occurrence):
-    """Gives you a dummy reservation occurrence"""
+    """Give you a dummy reservation occurrence."""
     return create_occurrence()
 
 
 @pytest.fixture
 def create_room(db, dummy_location, dummy_user):
-    """Returns a callable which lets you create rooms"""
+    """Return a callable which lets you create rooms."""
     def _create_room(**params):
         params.setdefault('building', u'1')
         params.setdefault('floor', u'2')
@@ -110,13 +110,13 @@ def create_room(db, dummy_location, dummy_user):
 
 @pytest.fixture
 def dummy_room(create_room):
-    """Gives you a dummy room"""
+    """Give you a dummy room."""
     return create_room()
 
 
 @pytest.fixture
 def create_room_attribute(db):
-    """Returns a callable which let you create room attributes"""
+    """Return a callable which let you create room attributes."""
 
     def _create_attribute(name):
         attr = RoomAttribute(name=name, title=name)
@@ -129,7 +129,7 @@ def create_room_attribute(db):
 
 @pytest.fixture
 def create_equipment_type(db):
-    """Returns a callable which let you create equipment types"""
+    """Return a callable which let you create equipment types."""
 
     def _create_equipment_type(name):
         eq = EquipmentType(name=name)
@@ -142,7 +142,7 @@ def create_equipment_type(db):
 
 @pytest.fixture
 def create_blocking(db, dummy_room, dummy_user):
-    """Returns a callable which lets you create blockings"""
+    """Return a callable which lets you create blockings."""
     def _create_blocking(**params):
         room = params.pop('room', dummy_room)
         state = params.pop('state', BlockedRoom.State.pending)
@@ -164,5 +164,5 @@ def create_blocking(db, dummy_room, dummy_user):
 
 @pytest.fixture
 def dummy_blocking(create_blocking):
-    """Gives you a dummy blocking"""
+    """Give you a dummy blocking."""
     return create_blocking()

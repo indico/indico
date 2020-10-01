@@ -9,7 +9,7 @@ from functools import wraps
 
 
 def proxy_to_reservation_if_last_valid_occurrence(f):
-    """Forwards a method call to `self.reservation` if there is only one occurrence."""
+    """Forward a method call to `self.reservation` if there is only one occurrence."""
     @wraps(f)
     def wrapper(self, *args, **kwargs):
         from indico.modules.rb.models.reservation_occurrences import ReservationOccurrence

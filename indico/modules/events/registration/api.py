@@ -20,7 +20,7 @@ from indico.web.rh import RH
 
 
 class RHAPIRegistrant(RH):
-    """RESTful registrant API"""
+    """RESTful registrant API."""
 
     CSRF_ENABLED = False
 
@@ -56,7 +56,7 @@ class RHAPIRegistrant(RH):
 
 
 class RHAPIRegistrants(RH):
-    """RESTful registrants API"""
+    """RESTful registrants API."""
 
     @oauth.require_oauth('registrants')
     def _check_access(self):

@@ -34,7 +34,7 @@ def silentremove(filename):
 
 
 def secure_filename(filename, fallback):
-    """Returns a secure version of a filename.
+    """Return a secure version of a filename.
 
     This removes possibly dangerous characters and also converts the
     filename to plain ASCII for maximum compatibility. It should only

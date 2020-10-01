@@ -22,7 +22,7 @@ def _get_next_position(context):
 
 
 class AbstractEmailTemplate(db.Model):
-    """Represents an email template for abstracts notifications."""
+    """An email template for abstracts notifications."""
 
     __tablename__ = 'email_templates'
     __table_args__ = {'schema': 'event_abstracts'}

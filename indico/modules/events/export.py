@@ -76,7 +76,7 @@ def import_event(source_file, category_id=0, create_users=None, verbose=False, f
 
 
 def _model_to_table(name):
-    """Resolve a model name to a full table name (unless it's already one)"""
+    """Resolve a model name to a full table name (unless it's already one)."""
     return getattr(db.m, name).__table__.fullname if name[0].isupper() else name
 
 
@@ -133,7 +133,7 @@ def _has_single_pk(table):
 
 
 def _get_inserted_pk(result):
-    """Get the single PK value inserted by a query"""
+    """Get the single PK value inserted by a query."""
     assert len(result.inserted_primary_key) == 1
     return result.inserted_primary_key[0]
 
@@ -191,7 +191,7 @@ class EventExporter(object):
         return {_model_to_table(k): _process_tablespec(_model_to_table(k), v) for k, v in spec['export'].iteritems()}
 
     def _get_reverse_fk_map(self):
-        """Build a mapping between columns and incoming FKs"""
+        """Build a mapping between columns and incoming FKs."""
         legacy_tables = {'events.legacy_contribution_id_map', 'events.legacy_subcontribution_id_map',
                          'attachments.legacy_attachment_id_map', 'event_registration.legacy_registration_map',
                          'events.legacy_session_block_id_map', 'events.legacy_image_id_map',

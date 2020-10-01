@@ -75,7 +75,7 @@ class StaticListLink(db.Model):
 
     @classmethod
     def load(cls, event, type_, uuid):
-        """Load the data associated with a link
+        """Load the data associated with a link.
 
         :param event: the `Event` the link belongs to
         :param type_: the type of the link

@@ -223,10 +223,10 @@ class OverrideMultipleItemsField(HiddenField):
         return self.data or {}
 
     def get_overridden_value(self, row, name):
-        """Utility for the widget to get the entered value for an editable field"""
+        """Utility for the widget to get the entered value for an editable field."""
         key = self.get_row_key(row)
         return self._value().get(key, {}).get(name, '')
 
     def get_row_key(self, row):
-        """Utility for the widget to get the unique value for a row"""
+        """Utility for the widget to get the unique value for a row."""
         return row[self.unique_field]

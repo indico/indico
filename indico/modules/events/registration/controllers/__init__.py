@@ -16,7 +16,7 @@ from indico.util.string import camelize_keys
 
 
 class RegistrationFormMixin:
-    """Mixin for single registration form RH"""
+    """Mixin for single registration form RH."""
 
     normalize_url_spec = {
         'locators': {

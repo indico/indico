@@ -49,7 +49,7 @@ def _get_provider(name, external):
 
 
 class RHLogin(RH):
-    """The login page"""
+    """The login page."""
 
     # Disable global CSRF check. The form might not be an IndicoForm
     # but a normal WTForm from Flask-WTF which does not use the same
@@ -100,7 +100,7 @@ class RHLogin(RH):
 
 
 class RHLoginForm(RH):
-    """Retrieves a login form (json)"""
+    """Retrieve a login form (json)."""
 
     def _process(self):
         provider = _get_provider(request.view_args['provider'], False)
@@ -110,7 +110,7 @@ class RHLoginForm(RH):
 
 
 class RHLogout(RH):
-    """Logs the user out"""
+    """Log the user out."""
 
     def _process(self):
         return multipass.logout(request.args.get('next') or url_for_index(), clear_session=True)
@@ -129,7 +129,7 @@ def _send_confirmation(email, salt, endpoint, template, template_args=None, url_
 
 
 class RHLinkAccount(RH):
-    """Links a new identity with an existing user.
+    """Link a new identity with an existing user.
 
     This RH is only used if the identity information contains an
     email address and an existing user was found.
@@ -196,7 +196,7 @@ class RHLinkAccount(RH):
 
 
 class RHRegister(RH):
-    """Creates a new indico user.
+    """Create a new indico user.
 
     This handles two cases:
     - creation of a new user with a locally stored username and password
@@ -220,7 +220,7 @@ class RHRegister(RH):
             raise Forbidden('Local registration is disabled')
 
     def _get_verified_email(self):
-        """Checks if there is an email verification token."""
+        """Check if there is an email verification token."""
         try:
             token = request.args['token']
         except KeyError:
@@ -317,7 +317,7 @@ class RHRegister(RH):
 
 
 class RHAccounts(RHUserBase):
-    """Displays user accounts"""
+    """Display user accounts."""
 
     def _create_form(self):
         if self.user.local_identity:
@@ -352,7 +352,7 @@ class RHAccounts(RHUserBase):
 
 
 class RHRemoveAccount(RHUserBase):
-    """Removes an identity linked to a user"""
+    """Remove an identity linked to a user."""
 
     def _process_args(self):
         RHUserBase._process_args(self)
@@ -547,7 +547,7 @@ class LocalRegistrationHandler(RegistrationHandler):
 
 
 class RHResetPassword(RH):
-    """Resets the password for a local identity."""
+    """Reset the password for a local identity."""
 
     def _process_args(self):
         if not config.LOCAL_IDENTITIES:

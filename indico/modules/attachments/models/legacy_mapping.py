@@ -60,14 +60,14 @@ class _LegacyLinkMixin(object):
 
     @property
     def link_repr(self):
-        """A kwargs-style string suitable for the object's repr"""
+        """A kwargs-style string suitable for the object's repr."""
         _all_columns = {'event_id', 'contribution_id', 'subcontribution_id', 'session_id'}
         info = [(key, getattr(self, key)) for key in _all_columns if getattr(self, key) is not None]
         return ', '.join('{}={}'.format(key, value) for key, value in info)
 
 
 class LegacyAttachmentFolderMapping(_LegacyLinkMixin, db.Model):
-    """Legacy attachmentfolder id mapping
+    """Legacy attachmentfolder id mapping.
 
     Legacy folders ("materials") had ids unique only within their
     linked object.  This table maps those ids for a specific object
@@ -105,7 +105,7 @@ class LegacyAttachmentFolderMapping(_LegacyLinkMixin, db.Model):
 
 
 class LegacyAttachmentMapping(_LegacyLinkMixin, db.Model):
-    """Legacy attachment id mapping
+    """Legacy attachment id mapping.
 
     Legacy attachments ("resources") had ids unique only within their
     folder and its linked object.  This table maps those ids for a

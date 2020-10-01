@@ -20,7 +20,7 @@ from indico.web.fields.choices import MultiSelectField, SingleChoiceField
 class _AddUUIDMixin(object):
     @staticmethod
     def process_imported_data(data):
-        """Generate the options' IDs"""
+        """Generate the options' IDs."""
         data = deepcopy(data)
         if 'options' in data:
             for option in data['options']:

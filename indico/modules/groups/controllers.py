@@ -33,7 +33,7 @@ from indico.web.rh import RHProtected
 
 
 class RHGroups(RHAdminBase):
-    """Admin group overview"""
+    """Admin group overview."""
 
     def _process(self):
         query = LocalGroup.query.options(joinedload(LocalGroup.members)).order_by(db.func.lower(LocalGroup.name))
@@ -77,7 +77,7 @@ class RHGroupBase(RHAdminBase):
 
 
 class RHGroupDetails(RHGroupBase):
-    """Admin group details"""
+    """Admin group details."""
 
     def _process(self):
         group = self.group
@@ -86,7 +86,7 @@ class RHGroupDetails(RHGroupBase):
 
 
 class RHGroupMembers(RHGroupBase):
-    """Admin group memberlist (json)"""
+    """Admin group memberlist (json)."""
 
     def _process(self):
         group = self.group
@@ -95,7 +95,7 @@ class RHGroupMembers(RHGroupBase):
 
 
 class RHGroupEdit(RHAdminBase):
-    """Admin group modification/creation"""
+    """Admin group modification/creation."""
 
     def _process_args(self):
         if not config.LOCAL_GROUPS:
@@ -135,7 +135,7 @@ class RHLocalGroupBase(RHAdminBase):
 
 
 class RHGroupDelete(RHLocalGroupBase):
-    """Admin group deletion"""
+    """Admin group deletion."""
 
     def _process(self):
         db.session.delete(self.group)
@@ -144,7 +144,7 @@ class RHGroupDelete(RHLocalGroupBase):
 
 
 class RHGroupDeleteMember(RHLocalGroupBase):
-    """Admin group member deletion (ajax)"""
+    """Admin group member deletion (ajax)."""
 
     def _process(self):
         self.group.members.discard(User.get(request.view_args['user_id']))

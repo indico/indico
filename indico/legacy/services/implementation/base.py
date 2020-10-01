@@ -27,7 +27,7 @@ class ServiceBase(object):
 
     def process(self):
         """
-        Processes the request, analyzing the parameters, and feeding them to the
+        Process the request, analyzing the parameters, and feeding them to the
         _getAnswer() method (implemented by derived classes)
         """
 

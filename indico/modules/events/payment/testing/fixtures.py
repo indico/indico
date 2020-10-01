@@ -12,7 +12,7 @@ from indico.modules.events.payment.models.transactions import PaymentTransaction
 
 @pytest.fixture
 def create_transaction():
-    """Returns a callable which lets you create transactions"""
+    """Return a callable which lets you create transactions."""
 
     def _create_transaction(status, **params):
         params.setdefault('amount', 10)
@@ -26,5 +26,5 @@ def create_transaction():
 
 @pytest.fixture
 def dummy_transaction(create_transaction):
-    """Gives you a dummy successful transaction"""
+    """Return a dummy successful transaction."""
     return create_transaction(status=TransactionStatus.successful)

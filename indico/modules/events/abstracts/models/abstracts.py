@@ -84,7 +84,7 @@ class EditTrackMode(int, IndicoEnum):
 
 class Abstract(ProposalMixin, ProposalRevisionMixin, DescriptionMixin, CustomFieldsMixin, AuthorsSpeakersMixin,
                db.Model):
-    """Represents an abstract that can be associated to a Contribution."""
+    """An abstract that can be associated to a Contribution."""
 
     __tablename__ = 'abstracts'
     __auto_table_args = (db.Index(None, 'friendly_id', 'event_id', unique=True,

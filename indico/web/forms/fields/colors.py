@@ -14,7 +14,7 @@ from indico.web.forms.widgets import JinjaWidget
 
 
 class IndicoPalettePickerField(JSONField):
-    """Field allowing user to pick a color from a set of predefined values"""
+    """Field allowing user to pick a color from a set of predefined values."""
 
     widget = JinjaWidget('forms/palette_picker_widget.html')
     CAN_POPULATE = True

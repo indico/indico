@@ -19,7 +19,7 @@ from indico.util.string import return_ascii
 
 
 class ACLProxyBase(object):
-    """Base Proxy class for ACL settings"""
+    """Base Proxy class for ACL settings."""
 
     def __init__(self, proxy):
         self.proxy = proxy
@@ -37,7 +37,7 @@ class ACLProxyBase(object):
 
 
 class SettingsProxyBase(object):
-    """Base proxy class to access settings for a certain module
+    """Base proxy class to access settings for a certain module.
 
     :param module: the module to use
     :param defaults: default values to use if there's nothing in the db
@@ -77,7 +77,7 @@ class SettingsProxyBase(object):
             return '<{}({})>'.format(type(self).__name__, self.module)
 
     def bind(self, *args):
-        """Returns a version of this proxy that is bound to some arguments.
+        """Return a version of this proxy that is bound to some arguments.
 
         This is useful for specialized versions of the proxy such as
         EventSettingsProxy where one might want to provide an easy-to-use
@@ -87,7 +87,6 @@ class SettingsProxyBase(object):
         :param args: The positional argument that are prepended to each
                      function call.
         """
-
         self_type = type(self)
         bound = self_type(self.module, self.defaults, self.strict)
         bound._bound_args = args
@@ -158,10 +157,10 @@ class SettingsProxyBase(object):
 
 
 class ACLProxy(ACLProxyBase):
-    """Proxy class for core ACL settings"""
+    """Proxy class for core ACL settings."""
 
     def get(self, name):
-        """Retrieves an ACL setting
+        """Retrieve an ACL setting.
 
         :param name: Setting name
         """
@@ -169,7 +168,7 @@ class ACLProxy(ACLProxyBase):
         return get_setting_acl(SettingPrincipal, self, name, self._cache)
 
     def set(self, name, acl):
-        """Replaces an ACL with a new one
+        """Replace an ACL with a new one.
 
         :param name: Setting name
         :param acl: A set containing principals (users/groups)
@@ -179,7 +178,7 @@ class ACLProxy(ACLProxyBase):
         self._flush_cache()
 
     def contains_user(self, name, user):
-        """Checks if a user is in an ACL.
+        """Check if a user is in an ACL.
 
         To pass this check, the user can either be in the ACL itself
         or in a group in the ACL.
@@ -191,7 +190,7 @@ class ACLProxy(ACLProxyBase):
         return any(user in principal for principal in iter_acl(self.get(name)))
 
     def add_principal(self, name, principal):
-        """Adds a principal to an ACL
+        """Add a principal to an ACL.
 
         :param name: Setting name
         :param principal: A :class:`.User` or a :class:`.GroupProxy`
@@ -201,7 +200,7 @@ class ACLProxy(ACLProxyBase):
         self._flush_cache()
 
     def remove_principal(self, name, principal):
-        """Removes a principal from an ACL
+        """Remove a principal from an ACL.
 
         :param name: Setting name
         :param principal: A :class:`.User` or a :class:`.GroupProxy`
@@ -211,18 +210,18 @@ class ACLProxy(ACLProxyBase):
         self._flush_cache()
 
     def merge_users(self, target, source):
-        """Replaces all ACL user entries for `source` with `target`"""
+        """Replace all ACL user entries for `source` with `target`."""
         SettingPrincipal.merge_users(self.module, target, source)
         self._flush_cache()
 
 
 class SettingsProxy(SettingsProxyBase):
-    """Proxy class to access settings for a certain module"""
+    """Proxy class to access settings for a certain module."""
 
     acl_proxy_class = ACLProxy
 
     def get_all(self, no_defaults=False):
-        """Retrieves all settings, including ACLs
+        """Retrieve all settings, including ACLs.
 
         :param no_defaults: Only return existing settings and ignore defaults.
         :return: Dict containing the settings
@@ -230,7 +229,7 @@ class SettingsProxy(SettingsProxyBase):
         return get_all_settings(Setting, SettingPrincipal, self, no_defaults)
 
     def get(self, name, default=SettingsProxyBase.default_sentinel):
-        """Retrieves the value of a single setting.
+        """Retrieve the value of a single setting.
 
         :param name: Setting name
         :param default: Default value in case the setting does not exist
@@ -240,7 +239,7 @@ class SettingsProxy(SettingsProxyBase):
         return get_setting(Setting, self, name, default, self._cache)
 
     def set(self, name, value):
-        """Sets a single setting.
+        """Set a single setting.
 
         :param name: Setting name
         :param value: Setting value; must be JSON-serializable
@@ -250,7 +249,7 @@ class SettingsProxy(SettingsProxyBase):
         self._flush_cache()
 
     def set_multi(self, items):
-        """Sets multiple settings at once.
+        """Set multiple settings at once.
 
         :param items: Dict containing the new settings
         """
@@ -261,7 +260,7 @@ class SettingsProxy(SettingsProxyBase):
         self._flush_cache()
 
     def delete(self, *names):
-        """Deletes settings.
+        """Delete settings.
 
         :param names: One or more names of settings to delete
         """
@@ -271,7 +270,7 @@ class SettingsProxy(SettingsProxyBase):
         self._flush_cache()
 
     def delete_all(self):
-        """Deletes all settings."""
+        """Delete all settings."""
         Setting.delete_all(self.module)
         SettingPrincipal.delete_all(self.module)
         self._flush_cache()
@@ -336,7 +335,7 @@ class AttributeProxyProperty(object):
 
 
 class PrefixSettingsProxy(object):
-    """A SettingsProxy that exposes settings with prefixes
+    """A SettingsProxy that exposes settings with prefixes.
 
     This allows for simple form handling when a single form contains
     settings from more than one proxy.

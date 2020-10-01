@@ -21,7 +21,9 @@ from indico.util.i18n import orig_string
 
 
 def create_session(event, data):
-    """Create a new session with the information passed in the `data` argument"""
+    """
+    Create a new session with the information passed in the `data` argument.
+    """
     event_session = Session(event=event)
     event_session.populate_from_dict(data)
     db.session.flush()
@@ -45,7 +47,7 @@ def create_session_block(session_, data):
 
 
 def update_session(event_session, data):
-    """Update a session based on the information in the `data`"""
+    """Update a session based on the information in the `data`."""
     event_session.populate_from_dict(data)
     db.session.flush()
     signals.event.session_updated.send(event_session)
@@ -68,7 +70,7 @@ def _delete_session_timetable_entries(event_session):
 
 
 def delete_session(event_session):
-    """Delete session from the event"""
+    """Delete session from the event."""
     event_session.is_deleted = True
     for contribution in event_session.contributions[:]:
         contribution.session = None
@@ -81,7 +83,7 @@ def delete_session(event_session):
 
 
 def update_session_block(session_block, data):
-    """Update a session block with data passed in the `data` argument"""
+    """Update a session block with data passed in the `data` argument."""
     from indico.modules.events.timetable.operations import update_timetable_entry
 
     start_dt = data.pop('start_dt', None)

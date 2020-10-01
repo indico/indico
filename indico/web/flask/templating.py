@@ -41,13 +41,15 @@ def markdown(value):
 
 
 def dedent(value):
-    """Removes leading whitespace from each line"""
+    """Remove leading whitespace from each line."""
     return indentation_re.sub('', value)
 
 
 @environmentfilter
 def natsort(environment, value, reverse=False, case_sensitive=False, attribute=None):
-    """Sort an iterable in natural order.  Per default it sorts ascending,
+    """Sort an iterable in natural order.
+
+    Per default it sorts ascending,
     if you pass it true as first argument it will reverse the sorting.
 
     If the iterable is made of strings the third parameter can be used to
@@ -93,7 +95,7 @@ def decodeprincipal(value, **kwargs):
 
 
 def instanceof(value, type_):
-    """Checks if `value` is an instance of `type_`
+    """Check if `value` is an instance of `type_`.
 
     :param value: an object
     :param type_: a type
@@ -102,7 +104,7 @@ def instanceof(value, type_):
 
 
 def subclassof(value, type_):
-    """Checks if `value` is a subclass of `type_`
+    """Check if `value` is a subclass of `type_`.
 
     :param value: a type
     :param type_: a type
@@ -111,7 +113,7 @@ def subclassof(value, type_):
 
 
 def get_overridable_template_name(name, plugin, core_prefix='', plugin_prefix=''):
-    """Returns template names for templates that may be overridden in a plugin.
+    """Return template names for templates that may be overridden in a plugin.
 
     :param name: the name of the template
     :param plugin: the :class:`IndicoPlugin` that may override it (can be none)
@@ -127,7 +129,7 @@ def get_overridable_template_name(name, plugin, core_prefix='', plugin_prefix=''
 
 
 def get_template_module(template_name_or_list, **context):
-    """Returns the python module of a template.
+    """Return the python module of a template.
 
     This allows you to call e.g. macros inside it from Python code."""
     current_app.update_template_context(context)
@@ -136,7 +138,7 @@ def get_template_module(template_name_or_list, **context):
 
 
 def register_template_hook(name, receiver, priority=50, markup=True, plugin=None):
-    """Registers a function to be called when a template hook is invoked.
+    """Register a function to be called when a template hook is invoked.
 
     The receiver function should always support arbitrary ``**kwargs``
     to prevent breakage in future Indico versions which might add new
@@ -165,7 +167,7 @@ def register_template_hook(name, receiver, priority=50, markup=True, plugin=None
 
 
 def template_hook(name, priority=50, markup=True):
-    """Decorator for register_template_hook"""
+    """Decorator for register_template_hook."""
     def decorator(func):
         register_template_hook(name, func, priority, markup)
         return func
@@ -254,13 +256,14 @@ class CustomizationLoader(BaseLoader):
 
 
 class EnsureUnicodeExtension(Extension):
-    """Ensures all strings in Jinja are unicode"""
+    """Ensure all strings in Jinja are unicode."""
 
     @classmethod
     def wrap_func(cls, f):
-        """Wraps a function to make sure it returns unicode.
+        """Wrap a function to make sure it returns unicode.
 
-        Useful for custom filters."""
+        Useful for custom filters.
+        """
 
         @functools.wraps(f)
         def wrapper(*args, **kwargs):
@@ -270,7 +273,10 @@ class EnsureUnicodeExtension(Extension):
 
     @staticmethod
     def ensure_unicode(s):
-        """Converts a bytestring to unicode. Must be registered as a filter!"""
+        """Convert a bytestring to unicode.
+
+        Must be registered as a filter!
+        """
         if isinstance(s, str):
             return s.decode('utf-8')
         return s

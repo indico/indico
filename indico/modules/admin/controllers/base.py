@@ -15,7 +15,7 @@ from indico.web.rh import RHProtected
 
 
 class RHAdminBase(RHProtected):
-    """Base class for all admin-only RHs"""
+    """Base class for all admin-only RHs."""
 
     DENY_FRAMES = True
 

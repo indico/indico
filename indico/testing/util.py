@@ -11,7 +11,7 @@ from itertools import imap, product
 
 
 def bool_matrix(template, mask=None, expect=None):
-    """Creates a boolean matrix suitable for parametrized tests.
+    """Create a boolean matrix suitable for parametrized tests.
 
     This function lets you create a boolean matrix with certain columns being
     fixed to a static value or certain combinations being skipped. It also adds
@@ -109,7 +109,7 @@ def bool_matrix(template, mask=None, expect=None):
 
 
 def extract_emails(smtp, required=True, count=None, one=False, regex=False, **kwargs):
-    """Extracts emails from an smtp outbox.
+    """Extract emails from an smtp outbox.
 
     :param smtp: The `smtp` fixture from the testcase
     :param required: Fail if no matching emails were found
@@ -144,7 +144,7 @@ def extract_emails(smtp, required=True, count=None, one=False, regex=False, **kw
 
 
 def extract_logs(caplog, required=True, count=None, one=False, regex=False, **kwargs):
-    """Extracts log records from python's logging system.
+    """Extract log records from python's logging system.
 
     :param caplog: The `caplog` fixture from the testcase
     :param required: Fail if no matching records were found

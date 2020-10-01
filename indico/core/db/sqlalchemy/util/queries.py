@@ -17,8 +17,7 @@ TS_REGEX = re.compile(r'([@<>!()&|:\'])')
 
 
 def limit_groups(query, model, partition_by, order_by, limit=None, offset=0):
-    """Limits the number of rows returned for each group
-
+    """Limit the number of rows returned for each group.
 
     This utility allows you to apply a limit/offset to grouped rows of a query.
     Note that the query will only contain the data from `model`; i.e. you cannot
@@ -51,7 +50,7 @@ def db_dates_overlap(entity, start_column, start, end_column, end, inclusive=Fal
 
 
 def escape_like(value):
-    """Escapes a string to be used as a plain string in LIKE"""
+    """Escape a string to be used as a plain string in LIKE."""
     escape_char = '\\'
     return (value
             .replace(escape_char, escape_char * 2)  # literal escape char needs to be escaped
@@ -65,7 +64,7 @@ def preprocess_ts_string(text, prefix=True):
 
 
 def has_extension(conn, name):
-    """Checks if the postgres database has a certain extension installed"""
+    """Check if the postgres database has a certain extension installed."""
     return conn.execute("SELECT EXISTS(SELECT TRUE FROM pg_extension WHERE extname = %s)", (name,)).scalar()
 
 
@@ -76,7 +75,7 @@ def get_postgres_version():
 
 
 def increment_and_get(col, filter_, n=1):
-    """Increments and returns a numeric column.
+    """Increment and returns a numeric column.
 
     This is committed to the database immediately in a separate
     transaction to avoid possible conflicts.

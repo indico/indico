@@ -798,7 +798,7 @@ class SimplifiedTimeTablePlain(PDFBase):
         self._styles["day"] = dayStl
 
     def _haveSessionSlotsTitles(self, session):
-        """Checks if the session has slots with titles or not"""
+        """Check if the session has slots with titles or not."""
         for ss in session.blocks:
             if ss.title.strip():
                 return True

@@ -21,7 +21,7 @@ from indico.web.forms.widgets import SwitchWidget
 
 
 def get_contrib_field_types():
-    """Get a dict containing all contribution field types"""
+    """Get a dict containing all contribution field types."""
     return get_field_definitions(ContributionField)
 
 

@@ -73,7 +73,7 @@ class RHOAuthToken(RH):
 
 
 class RHOAuthAdmin(RHAdminBase):
-    """OAuth server administration settings"""
+    """OAuth server administration settings."""
 
     def _process(self):
         applications = OAuthApplication.find().order_by(db.func.lower(OAuthApplication.name)).all()
@@ -81,13 +81,13 @@ class RHOAuthAdmin(RHAdminBase):
 
 
 class RHOAuthAdminApplicationBase(RHAdminBase):
-    """Base class for single OAuth application RHs"""
+    """Base class for single OAuth application RHs."""
     def _process_args(self):
         self.application = OAuthApplication.get(request.view_args['id'])
 
 
 class RHOAuthAdminApplication(RHOAuthAdminApplicationBase):
-    """Handles application details page"""
+    """Handle application details page."""
 
     def _process(self):
         form = ApplicationForm(obj=self.application, application=self.application)
@@ -102,7 +102,7 @@ class RHOAuthAdminApplication(RHOAuthAdminApplicationBase):
 
 
 class RHOAuthAdminApplicationDelete(RHOAuthAdminApplicationBase):
-    """Handles OAuth application deletion"""
+    """Handle OAuth application deletion."""
 
     def _check_access(self):
         RHOAuthAdminApplicationBase._check_access(self)
@@ -117,7 +117,7 @@ class RHOAuthAdminApplicationDelete(RHOAuthAdminApplicationBase):
 
 
 class RHOAuthAdminApplicationNew(RHAdminBase):
-    """Handles OAuth application registration"""
+    """Handle OAuth application registration."""
 
     def _process(self):
         form = ApplicationForm(obj=FormDefaults(is_enabled=True))
@@ -133,7 +133,7 @@ class RHOAuthAdminApplicationNew(RHAdminBase):
 
 
 class RHOAuthAdminApplicationReset(RHOAuthAdminApplicationBase):
-    """Resets the client secret of the OAuth application"""
+    """Reset the client secret of the OAuth application."""
 
     def _process(self):
         self.application.reset_client_secret()
@@ -143,7 +143,7 @@ class RHOAuthAdminApplicationReset(RHOAuthAdminApplicationBase):
 
 
 class RHOAuthAdminApplicationRevoke(RHOAuthAdminApplicationBase):
-    """Revokes all user tokens associated to the OAuth application"""
+    """Revoke all user tokens associated to the OAuth application."""
 
     def _process(self):
         self.application.tokens.delete()
@@ -153,7 +153,7 @@ class RHOAuthAdminApplicationRevoke(RHOAuthAdminApplicationBase):
 
 
 class RHOAuthUserProfile(RHUserBase):
-    """OAuth overview (user)"""
+    """OAuth overview (user)."""
 
     def _process(self):
         tokens = self.user.oauth_tokens.all()
@@ -161,7 +161,7 @@ class RHOAuthUserProfile(RHUserBase):
 
 
 class RHOAuthUserTokenRevoke(RHUserBase):
-    """Revokes user token"""
+    """Revoke user token."""
 
     def _process_args(self):
         RHUserBase._process_args(self)

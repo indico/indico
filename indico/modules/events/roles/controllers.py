@@ -45,14 +45,14 @@ def _render_role(role, collapsed=True):
 
 
 class RHEventRoles(RHManageEventBase):
-    """Event role management"""
+    """Event role management."""
 
     def _process(self):
         return WPEventRoles.render_template('roles.html', self.event, roles=_get_roles(self.event))
 
 
 class RHAddEventRole(RHManageEventBase):
-    """Add a new event role"""
+    """Add a new event role."""
 
     def _process(self):
         form = EventRoleForm(event=self.event, color=self._get_color())
@@ -73,7 +73,7 @@ class RHAddEventRole(RHManageEventBase):
 
 
 class RHManageEventRole(RHManageEventBase):
-    """Base class to manage a specific event role"""
+    """Base class to manage a specific event role."""
 
     normalize_url_spec = {
         'locators': {
@@ -87,7 +87,7 @@ class RHManageEventRole(RHManageEventBase):
 
 
 class RHEditEventRole(RHManageEventRole):
-    """Edit an event role"""
+    """Edit an event role."""
 
     def _process(self):
         form = EventRoleForm(obj=self.role, event=self.event)
@@ -102,7 +102,7 @@ class RHEditEventRole(RHManageEventRole):
 
 
 class RHDeleteEventRole(RHManageEventRole):
-    """Delete an event role"""
+    """Delete an event role."""
 
     def _process(self):
         db.session.delete(self.role)
@@ -113,7 +113,7 @@ class RHDeleteEventRole(RHManageEventRole):
 
 
 class RHRemoveEventRoleMember(RHManageEventRole):
-    """Remove a user from an event role"""
+    """Remove a user from an event role."""
 
     normalize_url_spec = dict(RHManageEventRole.normalize_url_spec, preserved_args={'user_id'})
 
@@ -133,7 +133,7 @@ class RHRemoveEventRoleMember(RHManageEventRole):
 
 
 class RHAddEventRoleMembers(RHManageEventRole):
-    """Add users to an event role"""
+    """Add users to an event role."""
 
     def _process(self):
         for data in request.json['users']:
@@ -149,6 +149,6 @@ class RHAddEventRoleMembers(RHManageEventRole):
 
 
 class RHEventRoleMembersImportCSV(ImportRoleMembersMixin, RHManageEventRole):
-    """Add users to an event role from CSV"""
+    """Add users to an event role from CSV."""
 
     logger = logger

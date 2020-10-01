@@ -26,7 +26,7 @@ from indico.util.string import sanitize_html
 
 
 def serialize_categories_ical(category_ids, user, event_filter=True, event_filter_fn=None, update_query=None):
-    """Export the events in a category to iCal
+    """Export the events in a category to iCal.
 
     :param category_ids: Category IDs to export
     :param user: The user who needs to be able to access the events
@@ -103,7 +103,7 @@ def serialize_categories_ical(category_ids, user, event_filter=True, event_filte
 
 
 def serialize_category_atom(category, url, user, event_filter):
-    """Export the events in a category to Atom
+    """Export the events in a category to Atom.
 
     :param category: The category to export
     :param url: The URL of the feed

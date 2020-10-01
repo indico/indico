@@ -17,7 +17,7 @@ from indico.util.i18n import _
 
 class StatsBase(object):
     def __init__(self, title, subtitle, type, **kwargs):
-        """Base class for registration form statistics
+        """Base class for registration form statistics.
 
         :param title: str -- the title for the stats box
         :param subtitle: str -- the subtitle for the stats box
@@ -34,7 +34,7 @@ class StatsBase(object):
 
 
 class Cell(namedtuple('Cell', ['type', 'data', 'colspan', 'classes', 'qtip'])):
-    """Hold data and type for a cell of a stats table"""
+    """Hold data and type for a cell of a stats table."""
 
     _type_defaults = {
         'str': '',
@@ -88,7 +88,7 @@ class DataItem(namedtuple('DataItem', ['regs', 'attendance', 'capacity', 'billab
     def __new__(cls, regs=0, attendance=0, capacity=0, billable=False, cancelled=False, price=0, fixed_price=False,
                 paid=0, paid_amount=0, unpaid=0, unpaid_amount=0):
         """
-        Holds the aggregation of some data, intended for stats tables as
+        Hold the aggregation of some data, intended for stats tables as
         a aggregation from which to generate cells.
 
         :param regs: int -- number of registrant
@@ -113,7 +113,7 @@ class DataItem(namedtuple('DataItem', ['regs', 'attendance', 'capacity', 'billab
 
 
 class FieldStats(object):
-    """Holds stats for a registration form field"""
+    """Hold stats for a registration form field."""
 
     def __init__(self, field, **kwargs):
         kwargs.setdefault('type', 'table')
@@ -138,7 +138,7 @@ class FieldStats(object):
                                          RegistrationData.data != {})
 
     def _build_data(self):
-        """Build data from registration data and field choices
+        """Build data from registration data and field choices.
 
         :returns: (dict, bool) -- the data and a boolean to indicate
                   whether the data contains billing information or not.
@@ -158,7 +158,7 @@ class FieldStats(object):
         return data, bool(choices['billed'])
 
     def get_table(self):
-        """Returns a table containing the stats for each item.
+        """Return a table containing the stats for each item.
 
         :return: dict -- A table with a list of head cells
                  (key: `'head'`) and a list of rows (key: `'rows'`)
@@ -180,7 +180,7 @@ class FieldStats(object):
         return table
 
     def _get_billing_cells(self, data_items):
-        """Return cells with billing information from data items
+        """Return cells with billing information from data items.
 
         :params data_items: [DataItem] -- Data items containing billing info
         :returns: [Cell] -- Cells containing billing information.
@@ -203,7 +203,7 @@ class FieldStats(object):
                 Cell(type='currency', data=total_amount)]
 
     def _get_billing_details_cells(self, detail):
-        """Return cells with detailed billing information
+        """Return cells with detailed billing information.
 
         :params item_details: DataItem -- Data items containing billing info
         :returns: [Cell] -- Cells containing billing information.
@@ -225,7 +225,7 @@ class FieldStats(object):
                 Cell(type='currency', data=detail.paid_amount + detail.unpaid_amount)]
 
     def _build_key(self, item):
-        """Return the key to sort and group field choices
+        """Return the key to sort and group field choices.
 
         It must include the caption and the id of the item as well as other
         billing information by which to aggregate.
@@ -236,7 +236,7 @@ class FieldStats(object):
         raise NotImplementedError
 
     def _build_regitems_data(self, key, regitems):
-        """Return a `DataItem` aggregating data from registration items
+        """Return a `DataItem` aggregating data from registration items.
 
         :param regitems: list -- list of registrations items to be aggregated
         :returns: DataItem -- the data aggregation
@@ -245,7 +245,7 @@ class FieldStats(object):
 
     def _build_choice_data(self, item):
         """
-        Returns a `DataItem` containing the aggregation of an item which
+        Return a `DataItem` containing the aggregation of an item which
         is billed to the registrants.
 
         :param item: list -- item to be aggregated
@@ -255,7 +255,7 @@ class FieldStats(object):
 
     def _get_table_head(self):
         """
-        Returns a list of `Cell` corresponding to the headers of a the
+        Return a list of `Cell` corresponding to the headers of a the
         table.
 
         :returns: [Cell] -- the headers of the table.
@@ -264,7 +264,7 @@ class FieldStats(object):
 
     def _get_main_row_cells(self, item_details, choice_caption, total_regs):
         """
-        Returns the cells of the main (header or single) row of the table.
+        Return the cells of the main (header or single) row of the table.
 
         Each `item` has a main row. The row is a list of `Cell` which matches
         the table head.
@@ -280,7 +280,7 @@ class FieldStats(object):
 
     def _get_sub_row_cells(self, details, total_regs):
         """
-        Returns the cells of the sub row of the table.
+        Return the cells of the sub row of the table.
 
         An `item` can have a sub row. The row is a list of `Cell` which
         matches the table head.
@@ -294,7 +294,7 @@ class FieldStats(object):
 
 
 class OverviewStats(StatsBase):
-    """Generic stats for a registration form"""
+    """Generic stats for a registration form."""
 
     def __init__(self, regform):
         super(OverviewStats, self).__init__(title=_("Overview"), subtitle="", type='overview')

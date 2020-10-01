@@ -64,15 +64,15 @@ class RHDisplayEvent(RHDisplayEventBase):
             return self._display_simple()
 
     def _display_conference_page(self):
-        """Display the custom conference home page"""
+        """Display the custom conference home page."""
         return WPPage.render_template('page.html', self.event, page=self.event.default_page)
 
     def _display_conference(self):
-        """Display the conference overview page"""
+        """Display the conference overview page."""
         return WPConferenceDisplay(self, self.event).display()
 
     def _display_simple(self):
-        """Display a simple single-page event (meeting/lecture)"""
+        """Display a simple single-page event (meeting/lecture)."""
         return WPSimpleEventDisplay(self, self.event, self.theme_id, self.theme_override).display()
 
 

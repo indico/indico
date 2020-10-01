@@ -30,14 +30,14 @@ def _query_contributions_with_user_as_reviewer(event, user):
 
 
 def get_user_reviewed_contributions(event, user):
-    """Get the list of contributions where user already reviewed paper"""
+    """Get the list of contributions where user already reviewed paper."""
     contribs = _query_contributions_with_user_as_reviewer(event, user).all()
     contribs = [contrib for contrib in contribs if contrib.paper.last_revision.has_user_reviewed(user)]
     return contribs
 
 
 def get_user_contributions_to_review(event, user):
-    """Get the list of contributions where user has paper to review"""
+    """Get the list of contributions where user has paper to review."""
     contribs = _query_contributions_with_user_as_reviewer(event, user).all()
     contribs = [contrib for contrib in contribs if not contrib.paper.last_revision.has_user_reviewed(user)]
     return contribs

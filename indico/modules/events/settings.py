@@ -36,7 +36,7 @@ def event_or_id(f):
 
 
 class EventACLProxy(ACLProxyBase):
-    """Proxy class for event-specific ACL settings"""
+    """Proxy class for event-specific ACL settings."""
 
     @event_or_id
     def get(self, event, name):
@@ -50,7 +50,7 @@ class EventACLProxy(ACLProxyBase):
 
     @event_or_id
     def set(self, event, name, acl):
-        """Replaces an ACL with a new one
+        """Replace an ACL with a new one.
 
         :param event: Event (or its ID)
         :param name: Setting name
@@ -62,7 +62,7 @@ class EventACLProxy(ACLProxyBase):
 
     @event_or_id
     def contains_user(self, event, name, user):
-        """Checks if a user is in an ACL.
+        """Check if a user is in an ACL.
 
         To pass this check, the user can either be in the ACL itself
         or in a group in the ACL.
@@ -75,7 +75,7 @@ class EventACLProxy(ACLProxyBase):
 
     @event_or_id
     def add_principal(self, event, name, principal):
-        """Adds a principal to an ACL
+        """Add a principal to an ACL.
 
         :param event: Event (or its ID)
         :param name: Setting name
@@ -87,7 +87,7 @@ class EventACLProxy(ACLProxyBase):
 
     @event_or_id
     def remove_principal(self, event, name, principal):
-        """Removes a principal from an ACL
+        """Remove a principal from an ACL.
 
         :param event: Event (or its ID)
         :param name: Setting name
@@ -98,24 +98,24 @@ class EventACLProxy(ACLProxyBase):
         self._flush_cache()
 
     def merge_users(self, target, source):
-        """Replaces all ACL user entries for `source` with `target`"""
+        """Replace all ACL user entries for `source` with `target`."""
         EventSettingPrincipal.merge_users(self.module, target, source)
         self._flush_cache()
 
 
 class EventSettingsProxy(SettingsProxyBase):
-    """Proxy class to access event-specific settings for a certain module"""
+    """Proxy class to access event-specific settings for a certain module."""
 
     acl_proxy_class = EventACLProxy
 
     @property
     def query(self):
-        """Returns a query object filtering by the proxy's module."""
+        """Return a query object filtering by the proxy's module."""
         return EventSetting.find(module=self.module)
 
     @event_or_id
     def get_all(self, event, no_defaults=False):
-        """Retrieves all settings
+        """Retrieve all settings.
 
         :param event: Event (or its ID)
         :param no_defaults: Only return existing settings and ignore defaults.
@@ -125,7 +125,7 @@ class EventSettingsProxy(SettingsProxyBase):
 
     @event_or_id
     def get(self, event, name, default=SettingsProxyBase.default_sentinel):
-        """Retrieves the value of a single setting.
+        """Retrieve the value of a single setting.
 
         :param event: Event (or its ID)
         :param name: Setting name
@@ -137,7 +137,7 @@ class EventSettingsProxy(SettingsProxyBase):
 
     @event_or_id
     def set(self, event, name, value):
-        """Sets a single setting.
+        """Set a single setting.
 
         :param event: Event (or its ID)
         :param name: Setting name
@@ -149,7 +149,7 @@ class EventSettingsProxy(SettingsProxyBase):
 
     @event_or_id
     def set_multi(self, event, items):
-        """Sets multiple settings at once.
+        """Set multiple settings at once.
 
         :param event: Event (or its ID)
         :param items: Dict containing the new settings
@@ -162,7 +162,7 @@ class EventSettingsProxy(SettingsProxyBase):
 
     @event_or_id
     def delete(self, event, *names):
-        """Deletes settings.
+        """Delete settings.
 
         :param event: Event (or its ID)
         :param names: One or more names of settings to delete
@@ -174,7 +174,7 @@ class EventSettingsProxy(SettingsProxyBase):
 
     @event_or_id
     def delete_all(self, event):
-        """Deletes all settings.
+        """Delete all settings.
 
         :param event: Event (or its ID)
         """

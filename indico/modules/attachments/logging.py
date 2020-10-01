@@ -28,7 +28,7 @@ def connect_log_signals():
 
 def _ignore_non_loggable(f):
     """
-    Only calls the decorated function the attachment/folder is not
+    Only call the decorated function if the attachment/folder is not
     linked to a category.
     """
     @wraps(f)

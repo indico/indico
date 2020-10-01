@@ -13,8 +13,10 @@ from indico.util.caching import memoize_request
 
 
 class AttachedNotesMixin(object):
-    """Allows for easy retrieval of structured information about
-       items attached to the object"""
+    """
+    Allow for easy retrieval of structured information about
+    items attached to the object.
+    """
     # When set to ``True`` .has_note preload all notes that exist for the same event
     # Should be set to False when not applicable (no object.event property)
     PRELOAD_EVENT_NOTES = False

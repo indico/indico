@@ -28,7 +28,7 @@ class AbstractAction(RichIntEnum):
 
 
 class AbstractReview(ProposalReviewMixin, RenderModeMixin, db.Model):
-    """Represents an abstract review, emitted by a reviewer"""
+    """An abstract review, emitted by a reviewer."""
 
     possible_render_modes = {RenderMode.markdown}
     default_render_mode = RenderMode.markdown
@@ -200,7 +200,7 @@ class AbstractReview(ProposalReviewMixin, RenderModeMixin, db.Model):
 
 
 class AbstractCommentVisibility(RichIntEnum):
-    """Most to least restrictive visibility for abstract comments"""
+    """Most to least restrictive visibility for abstract comments."""
     __titles__ = [None,
                   _("Visible only to judges"),
                   _("Visible to conveners and judges"),

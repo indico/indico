@@ -132,7 +132,7 @@ def get_category_stats(category_id=None):
 @memoize_redis(3600)
 @materialize_iterable()
 def get_upcoming_events():
-    """Get the global list of upcoming events"""
+    """Get the global list of upcoming events."""
     from indico.modules.events import Event
     data = upcoming_events_settings.get_all()
     if not data['max_entries'] or not data['entries']:
@@ -210,7 +210,7 @@ def get_image_data(image_type, category):
 
 
 def serialize_category_role(role, legacy=True):
-    """Serialize role to JSON-like object"""
+    """Serialize role to JSON-like object."""
     if legacy:
         return {
             'id': role.id,

@@ -93,7 +93,7 @@ class RHFileInfo(RHFileBase):
 
 
 class RHFileDownload(RHFileBase):
-    """Download a file using a unique token"""
+    """Download a file using a unique token."""
 
     def _check_access(self):
         uuid = secure_serializer.loads(request.args['token'], salt='file-download', max_age=86400)

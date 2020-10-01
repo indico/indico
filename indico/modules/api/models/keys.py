@@ -18,7 +18,7 @@ from indico.util.string import return_ascii
 
 
 class APIKey(db.Model):
-    """API keys for users"""
+    """API keys for users."""
     __tablename__ = 'api_keys'
     __table_args__ = (db.Index(None, 'user_id', unique=True, postgresql_where=db.text('is_active')),
                       {'schema': 'users'})
@@ -110,7 +110,7 @@ class APIKey(db.Model):
         return '<APIKey({}, {}, {})>'.format(self.token, self.user_id, self.last_used_dt or 'never')
 
     def register_used(self, ip, uri, authenticated):
-        """Updates the last used information"""
+        """Update the last used information."""
         self.last_used_dt = now_utc()
         self.last_used_ip = ip
         self.last_used_uri = uri

@@ -34,7 +34,7 @@ _use_context = object()
 
 
 def get_translation_domain(plugin_name=_use_context):
-    """Get the translation domain for the given plugin
+    """Get the translation domain for the given plugin.
 
     If `plugin_name` is omitted, the plugin will be taken from current_plugin.
     If `plugin_name` is None, the core translation domain ('indico') will be used.
@@ -79,7 +79,7 @@ def lazy_gettext(string, plugin_name=None):
 
 
 def orig_string(lazy_string):
-    """Get the original string from a lazy string"""
+    """Get the original string from a lazy string."""
     return lazy_string._args[0] if is_lazy_string(lazy_string) else lazy_string
 
 
@@ -105,12 +105,16 @@ def smart_func(func_name, plugin_name=None, force_unicode=False):
 
 
 def make_bound_gettext(plugin_name, force_unicode=False):
-    """Creates a smart gettext callable bound to the domain of the specified plugin"""
+    """
+    Create a smart gettext callable bound to the domain of the specified plugin.
+    """
     return smart_func('ugettext', plugin_name=plugin_name, force_unicode=force_unicode)
 
 
 def make_bound_ngettext(plugin_name, force_unicode=False):
-    """Creates a smart ngettext callable bound to the domain of the specified plugin"""
+    """
+    Create a smart ngettext callable bound to the domain of the specified plugin.
+    """
     return smart_func('ungettext', plugin_name=plugin_name, force_unicode=force_unicode)
 
 
@@ -129,7 +133,7 @@ N_ = lambda text: text  # noqa
 
 
 class NullDomain(Domain):
-    """A `Domain` that doesn't contain any translations"""
+    """A `Domain` that doesn't contain any translations."""
 
     def __init__(self):
         super(NullDomain, self).__init__()
@@ -140,14 +144,10 @@ class NullDomain(Domain):
 
 
 class IndicoLocale(Locale):
-    """
-    Extends the Babel Locale class with some utility methods
-    """
+    """Extend the Babel Locale class with some utility methods."""
 
     def weekday(self, daynum, short=True):
-        """
-        Returns the week day given the index
-        """
+        """Return the week day given the index."""
         return self.days['format']['abbreviated' if short else 'wide'][daynum].encode('utf-8')
 
     @cached_property
@@ -160,7 +160,7 @@ class IndicoLocale(Locale):
 
 class IndicoTranslations(Translations):
     """
-    Routes translations through the 'smart' translators defined above
+    Route translations through the 'smart' translators defined above.
     """
 
     def _check_stack(self):
@@ -203,11 +203,12 @@ def _remove_locale_script(locale):
 
 @babel.localeselector
 def set_best_lang(check_session=True):
-    """
-    Get the best language/locale for the current user. This means that first
-    the session will be checked, and then in the absence of an explicitly-set
-    language, we will try to guess it from the browser settings and only
-    after that fall back to the server's default.
+    """Get the best language/locale for the current user.
+
+    This means that first the session will be checked, and then in the
+    absence of an explicitly-set language, we will try to guess it from
+    the browser settings and only after that fall back to
+    the server's default.
     """
     from indico.core.config import config
 
@@ -260,7 +261,7 @@ def get_current_locale():
 
 def get_all_locales():
     """
-    List all available locales/names e.g. ``{'pt_PT': ('Portuguese', 'Portugal)}``
+    List all available locales/names e.g. ``{'pt_PT': ('Portuguese', 'Portugal)}``.
     """
     if babel.app is None:
         return {}
@@ -272,17 +273,13 @@ def get_all_locales():
 
 
 def set_session_lang(lang):
-    """
-    Set the current language in the current request context
-    """
+    """Set the current language in the current request context."""
     session.lang = lang
 
 
 @contextmanager
 def session_language(lang):
-    """
-    Context manager that temporarily sets session language
-    """
+    """Context manager that temporarily sets session language."""
     old_lang = session.lang
 
     set_session_lang(lang)
@@ -291,9 +288,7 @@ def session_language(lang):
 
 
 def parse_locale(locale):
-    """
-    Get a Locale object from a locale id
-    """
+    """Get a Locale object from a locale id."""
     return IndicoLocale.parse(locale)
 
 
@@ -310,9 +305,7 @@ def extract_node(node, keywords, commentTags, options, parents=[None]):
 
 
 def po_to_json(po_file, locale=None, domain=None):
-    """
-    Converts *.po file to a json-like data structure
-    """
+    """Convert *.po file to a json-like data structure."""
     with open(po_file, 'rb') as f:
         po_data = read_po(f, locale=locale, domain=domain)
 

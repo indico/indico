@@ -49,12 +49,12 @@ user_colors = ['#e06055', '#ff8a65', '#e91e63', '#f06292', '#673ab7', '#ba68c8',
 
 
 def get_admin_emails():
-    """Get the email addresses of all Indico admins"""
+    """Get the email addresses of all Indico admins."""
     return {u.email for u in User.query.filter_by(is_admin=True, is_deleted=False)}
 
 
 def get_related_categories(user, detailed=True):
-    """Gets the related categories of a user for the dashboard"""
+    """Get the related categories of a user for the dashboard."""
     favorites = set()
     if user.favorite_categories:
         favorites = set(Category.query
@@ -81,7 +81,7 @@ def get_related_categories(user, detailed=True):
 
 
 def get_suggested_categories(user):
-    """Gets the suggested categories of a user for the dashboard"""
+    """Get the suggested categories of a user for the dashboard."""
     related = set(get_related_categories(user, detailed=False))
     res = []
     category_strategy = contains_eager('category')
@@ -108,7 +108,7 @@ def get_suggested_categories(user):
 
 
 def get_linked_events(user, dt, limit=None, load_also=()):
-    """Get the linked events and the user's roles in them
+    """Get the linked events and the user's roles in them.
 
     :param user: A `User`
     :param dt: Only include events taking place on/after that date
@@ -164,7 +164,7 @@ def get_linked_events(user, dt, limit=None, load_also=()):
 
 
 def serialize_user(user):
-    """Serialize user to JSON-like object"""
+    """Serialize user to JSON-like object."""
     return {
         'id': user.id,
         'title': user.title,
@@ -232,7 +232,7 @@ def build_user_search_query(criteria, exact=False, include_deleted=False, includ
 
 def search_users(exact=False, include_deleted=False, include_pending=False, include_blocked=False,
                  external=False, allow_system_user=False, **criteria):
-    """Searches for users.
+    """Search for users.
 
     :param exact: Indicates if only exact matches should be returned.
                   This is MUCH faster than a non-exact saerch,
@@ -294,7 +294,7 @@ def search_users(exact=False, include_deleted=False, include_pending=False, incl
 
 
 def get_user_by_email(email, create_pending=False):
-    """finds a user based on his email address.
+    """Find a user based on his email address.
 
     :param email: The email address of the user.
     :param create_pending: If True, this function searches for external
@@ -328,7 +328,7 @@ def get_user_by_email(email, create_pending=False):
 
 
 def merge_users(source, target, force=False):
-    """Merge two users together, unifying all related data
+    """Merge two users together, unifying all related data.
 
     :param source: source user (will be set as deleted)
     :param target: target user (final)

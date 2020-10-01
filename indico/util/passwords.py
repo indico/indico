@@ -39,7 +39,7 @@ class BCryptPassword(object):
 
 
 class PasswordProperty(object):
-    """Defines a hashed password property.
+    """Define a hashed password property.
 
     When reading this property, it will return an object which will
     let you use the ``==`` operator to compare  the password against

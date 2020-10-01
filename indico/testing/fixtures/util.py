@@ -16,7 +16,7 @@ from sqlalchemy.sql.functions import _FunctionGenerator
 
 @pytest.fixture
 def monkeypatch_methods(monkeypatch):
-    """Monkeypatches all methods from `cls` onto `target`
+    """Monkeypatch all methods from `cls` onto `target`.
 
     This utility lets you easily mock multiple methods in an existing class.
     In case of classmethods the binding will not be changed, i.e. `cls` will
@@ -35,7 +35,7 @@ def monkeypatch_methods(monkeypatch):
 
 @pytest.fixture
 def freeze_time(monkeypatch):
-    """Returns a function that freezes the current time
+    """Return a function that freezes the current time.
 
     It affects datetime.now, date.today, etc. and also SQLAlchemy's `func.now()`
     which simply returns the current time from `datetime.now()` instead of

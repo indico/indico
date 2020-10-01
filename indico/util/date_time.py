@@ -27,7 +27,7 @@ from indico.util.string import inject_unicode_debug
 
 
 class relativedelta(_relativedelta):
-    """Improved `relativedelta`"""
+    """Improved `relativedelta`."""
 
     def __abs__(self):
         return self.__class__(years=abs(self.years),
@@ -49,7 +49,7 @@ class relativedelta(_relativedelta):
 
 
 def now_utc(exact=True):
-    """Get the current date/time in UTC
+    """Get the current date/time in UTC.
 
     :param exact: Set to ``False`` to set seconds/microseconds to 0.
     :return: A timezone-aware `datetime` object
@@ -61,14 +61,14 @@ def now_utc(exact=True):
 
 
 def as_utc(dt):
-    """Returns the given naive datetime with tzinfo=UTC."""
+    """Return the given naive datetime with tzinfo=UTC."""
     if dt.tzinfo and dt.tzinfo != pytz.utc:
         raise ValueError("{} already contains non-UTC tzinfo data".format(dt))
     return pytz.utc.localize(dt) if dt.tzinfo is None else dt
 
 
 def localize_as_utc(dt, timezone='UTC'):
-    """Localizes a naive datetime with the timezone and returns it as UTC.
+    """Localize a naive datetime with the timezone and returns it as UTC.
 
     :param dt: A naive :class:`datetime.datetime` object.
     :param timezone: The timezone from which to localize.  UTC by default.
@@ -78,24 +78,23 @@ def localize_as_utc(dt, timezone='UTC'):
 
 
 def server_to_utc(dt):
-    """Converts the given datetime in the server's TZ to UTC.
+    """Convert the given datetime in the server's TZ to UTC.
 
-    The given datetime **MUST** be naive but already contain the correct time in the server's TZ.
+    The given datetime **MUST** be naive but already contain the
+    correct time in the server's TZ.
     """
     server_tz = get_timezone(config.DEFAULT_TIMEZONE)
     return server_tz.localize(dt).astimezone(pytz.utc)
 
 
 def utc_to_server(dt):
-    """Converts the given UTC datetime to the server's TZ."""
+    """Convert the given UTC datetime to the server's TZ."""
     server_tz = get_timezone(config.DEFAULT_TIMEZONE)
     return dt.astimezone(server_tz)
 
 
 def format_datetime(dt, format='medium', locale=None, timezone=None, as_unicode=False):
-    """
-    Basically a wrapper around Babel's own format_datetime
-    """
+    """Basically a wrapper around Babel's own format_datetime."""
     inject_unicode = True
     if format == 'code':
         format = 'dd/MM/yyyy HH:mm'
@@ -112,9 +111,7 @@ def format_datetime(dt, format='medium', locale=None, timezone=None, as_unicode=
 
 
 def format_date(d, format='medium', locale=None, timezone=None, as_unicode=False):
-    """
-    Basically a wrapper around Babel's own format_date
-    """
+    """Basically a wrapper around Babel's own format_date."""
     inject_unicode = True
     if format == 'code':
         format = 'dd/MM/yyyy'
@@ -131,9 +128,7 @@ def format_date(d, format='medium', locale=None, timezone=None, as_unicode=False
 
 
 def format_time(t, format='short', locale=None, timezone=None, server_tz=False, as_unicode=False):
-    """
-    Basically a wrapper around Babel's own format_time
-    """
+    """Basically a wrapper around Babel's own format_time."""
     inject_unicode = True
     if format == 'code':
         format = 'HH:mm'
@@ -153,9 +148,7 @@ def format_time(t, format='short', locale=None, timezone=None, server_tz=False, 
 
 
 def format_timedelta(td, format='short', threshold=0.85, locale=None, as_unicode=False):
-    """
-    Basically a wrapper around Babel's own format_timedelta
-    """
+    """Basically a wrapper around Babel's own format_timedelta."""
     if not locale:
         locale = get_current_locale()
 
@@ -166,7 +159,7 @@ def format_timedelta(td, format='short', threshold=0.85, locale=None, as_unicode
 
 
 def format_human_timedelta(delta, granularity='seconds', narrow=False):
-    """Formats a timedelta in a human-readable way
+    """Format a timedelta in a human-readable way.
 
     :param delta: the timedelta to format
     :param granularity: the granularity, i.e. the lowest unit that is
@@ -222,6 +215,7 @@ def format_human_timedelta(delta, granularity='seconds', narrow=False):
 def format_human_date(dt, format='medium', locale=None, as_unicode=False):
     """
     Return the date in a human-like format for yesterday, today and tomorrow.
+
     Format the date otherwise.
     """
     today = now_utc().date()
@@ -309,8 +303,8 @@ def format_number(number, locale=None):
 
 def timedelta_split(delta):
     """
-    Decomposes a timedelta into hours, minutes and seconds
-    (timedelta only stores days and seconds)n
+    Decompose a timedelta into hours, minutes and seconds
+    (timedelta only stores days and seconds).
     """
     sec = delta.seconds + delta.days * 24 * 3600
     hours, remainder = divmod(sec, 3600)
@@ -389,7 +383,7 @@ def get_day_end(day, tzinfo=None):
 
 
 def strftime_all_years(dt, fmt):
-    """Exactly like datetime.strftime but supports year<1900"""
+    """Exactly like datetime.strftime but supports year<1900."""
     assert '%%Y' not in fmt  # unlikely but just in case
     if dt.year >= 1900:
         return dt.strftime(fmt)

@@ -18,7 +18,7 @@ from indico.util.string import return_ascii
 
 
 class OAuthToken(db.Model):
-    """OAuth tokens"""
+    """OAuth tokens."""
 
     __tablename__ = 'tokens'
     __table_args__ = (db.UniqueConstraint('application_id', 'user_id'),
@@ -107,7 +107,7 @@ class OAuthToken(db.Model):
 
 
 class OAuthGrant(object):
-    """OAuth grant token"""
+    """OAuth grant token."""
 
     #: cache entry to store grant tokens
     _cache = GenericCache('oauth-grant-tokens')

@@ -13,7 +13,7 @@ from werkzeug.utils import cached_property
 
 
 class locator_property(object):
-    """Defines a smart locator property.
+    """Define a smart locator property.
 
     This behaves pretty much like a normal read-only property and the
     decorated function should return a dict containing the necessary
@@ -62,7 +62,7 @@ class locator_property(object):
 
 
 def get_locator(obj):
-    """Retrieves the locator data from an object.
+    """Retrieve the locator data from an object.
 
     The object may be a dictionary (in case a locator is passed) or
     an object with a ``locator`` property.

@@ -58,7 +58,7 @@ def check_event_locked(rh, event, force=False):
 
 
 def get_object_from_args(args=None):
-    """Retrieves an event object from request arguments.
+    """Retrieve an event object from request arguments.
 
     This utility is meant to be used in cases where the same controller
     can deal with objects attached to various parts of an event which
@@ -123,7 +123,7 @@ def get_theme(event, override_theme_id=None):
 
 
 def get_events_managed_by(user, dt=None):
-    """Gets the IDs of events where the user has management privs.
+    """Get the IDs of events where the user has management privs.
 
     :param user: A `User`
     :param dt: Only include events taking place on/after that date
@@ -138,7 +138,7 @@ def get_events_managed_by(user, dt=None):
 
 
 def get_events_created_by(user, dt=None):
-    """Gets the IDs of events created by the user
+    """Get the IDs of events created by the user.
 
     :param user: A `User`
     :param dt: Only include events taking place on/after that date
@@ -152,7 +152,7 @@ def get_events_created_by(user, dt=None):
 
 def get_events_with_linked_event_persons(user, dt=None):
     """
-    Returns a dict containing the event ids and role for all events
+    Return a dict containing the event ids and role for all events
     where the user is a chairperson or (in case of a lecture) speaker.
 
     :param user: A `User`
@@ -175,7 +175,7 @@ def get_random_color(event):
 
 
 def serialize_event_person(person):
-    """Serialize EventPerson to JSON-like object"""
+    """Serialize EventPerson to JSON-like object."""
     return {'_type': 'EventPerson',
             'id': person.id,
             'email': person.email,
@@ -190,7 +190,7 @@ def serialize_event_person(person):
 
 
 def serialize_person_link(person_link):
-    """Serialize PersonLink to JSON-like object"""
+    """Serialize PersonLink to JSON-like object."""
     data = {'email': person_link.person.email,
             'name': person_link.display_full_name,
             'fullName': person_link.display_full_name,
@@ -216,7 +216,7 @@ def serialize_person_link(person_link):
 
 
 def update_object_principals(obj, new_principals, read_access=False, full_access=False, permission=None):
-    """Updates an object's ACL with a new list of principals
+    """Update an object's ACL with a new list of principals.
 
     Exactly one argument out of `read_access`, `full_access` and `role` must be specified.
 
@@ -299,7 +299,7 @@ class ListGeneratorBase(object):
         return session.get(session_key, self.default_list_config)
 
     def _split_item_ids(self, item_ids, separator_type=None):
-        """Separate the dynamic item ids from the static
+        """Separate the dynamic item ids from the static.
 
         :param item_ids: The list of ids to be splitted.
         :param separator_type: The type of the item to base the partitioning on.
@@ -384,7 +384,7 @@ class ListGeneratorBase(object):
 
 
 def get_base_ical_parameters(user, detail, path, params=None):
-    """Returns a dict of all parameters expected by iCal template"""
+    """Return a dict of all parameters expected by iCal template."""
 
     from indico.web.http_api.util import generate_public_auth_request
 
@@ -410,7 +410,7 @@ def get_base_ical_parameters(user, detail, path, params=None):
 
 
 def create_event_logo_tmp_file(event, tmpdir=None):
-    """Creates a temporary file with the event's logo
+    """Create a temporary file with the event's logo.
 
     If `tmpdir` is specified, the logo file is created in there and
     a path relative to that directory is returned.
@@ -486,7 +486,7 @@ def track_time_changes(auto_extend=False, user=None):
 
 
 def register_time_change(entry):
-    """Register a time-related change for a timetable entry
+    """Register a time-related change for a timetable entry.
 
     This is an internal helper function used in the models to record
     changes of the start time or duration.  The changes are exposed
@@ -513,7 +513,7 @@ def register_time_change(entry):
 
 
 def register_event_time_change(event):
-    """Register a time-related change for an event
+    """Register a time-related change for an event.
 
     This is an internal helper function used in the model to record
     changes of the start time or end time.  The changes are exposed
@@ -586,7 +586,7 @@ def serialize_person_for_json_ld(person):
 
 
 def get_field_values(form_data):
-    """Split the form fields between custom and static"""
+    """Split the form fields between custom and static."""
     fields = {x: form_data[x] for x in form_data.iterkeys() if not x.startswith('custom_')}
     custom_fields = {x: form_data[x] for x in form_data.iterkeys() if x.startswith('custom_')}
     return fields, custom_fields
@@ -634,11 +634,10 @@ def get_event_from_url(url):
 
 
 class ZipGeneratorMixin(object):
-    """Mixin for RHs that generate zip with files"""
+    """Mixin for RHs that generate zip with files."""
 
     def _adjust_path_length(self, segments):
-        """
-        Shorten the path length to < 260 chars.
+        """Shorten the path length to < 260 chars.
 
         Windows' built-in ZIP tool doesn't like files whose
         total path exceeds ~260 chars. Here we progressively

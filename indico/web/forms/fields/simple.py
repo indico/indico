@@ -123,7 +123,7 @@ class IndicoPasswordField(PasswordField):
 
 
 class IndicoStaticTextField(Field):
-    """Return an html element with text taken from this field's value"""
+    """Return an html element with text taken from this field's value."""
 
     widget = JinjaWidget('forms/static_text_widget.html')
 

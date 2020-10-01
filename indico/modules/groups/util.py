@@ -9,7 +9,7 @@ from __future__ import unicode_literals
 
 
 def serialize_group(group):
-    """Serialize group to JSON-like object"""
+    """Serialize group to JSON-like object."""
     return {
         'id': group.id if group.is_local else group.name,
         'name': group.name,

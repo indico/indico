@@ -63,7 +63,10 @@ class RegistrantsListToBadgesPDF(DesignerPDFBase):
             self._draw_badge(canvas, registration, self.template, self.tpl_data, x * cm, y * cm)
 
     def _draw_badge(self, canvas, registration, template, tpl_data, pos_x, pos_y):
-        """Draw a badge for a given registration, at position pos_x, pos_y (top-left corner)."""
+        """
+        Draw a badge for a given registration, at position pos_x,
+        pos_y (top-left corner).
+        """
         config = self.config
         badge_rect = (pos_x, self.height - pos_y - tpl_data.height_cm * cm,
                       tpl_data.width_cm * cm, tpl_data.height_cm * cm)

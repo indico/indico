@@ -30,7 +30,7 @@ from indico.web.util import jsonify_data
 
 
 class RHAPIAdminSettings(RHAdminBase):
-    """API settings (admin)"""
+    """API settings (admin)."""
 
     def _process(self):
         form = AdminSettingsForm(obj=FormDefaults(**api_settings.get_all()))
@@ -43,7 +43,7 @@ class RHAPIAdminSettings(RHAdminBase):
 
 
 class RHAPIAdminKeys(RHAdminBase):
-    """API key list (admin)"""
+    """API key list (admin)."""
 
     def _process(self):
         keys = sorted(APIKey.find_all(is_active=True), key=lambda ak: (ak.use_count == 0, ak.user.full_name))
@@ -51,13 +51,13 @@ class RHAPIAdminKeys(RHAdminBase):
 
 
 class RHUserAPIBase(RHUserBase):
-    """Base class for user API management"""
+    """Base class for user API management."""
 
     allow_system_user = True
 
 
 class RHAPIUserProfile(RHUserAPIBase):
-    """API key details (user)"""
+    """API key details (user)."""
 
     def _process(self):
         key = self.user.api_key
@@ -72,7 +72,7 @@ class RHAPIUserProfile(RHUserAPIBase):
 
 
 class RHAPICreateKey(RHUserAPIBase):
-    """API key creation"""
+    """API key creation."""
 
     def _process(self):
         quiet = request.form.get('quiet') == '1'
@@ -105,7 +105,7 @@ class RHAPICreateKey(RHUserAPIBase):
 
 
 class RHAPIDeleteKey(RHUserAPIBase):
-    """API key deletion"""
+    """API key deletion."""
 
     def _process(self):
         key = self.user.api_key
@@ -115,7 +115,7 @@ class RHAPIDeleteKey(RHUserAPIBase):
 
 
 class RHAPITogglePersistent(RHUserAPIBase):
-    """API key - persistent signatures on/off"""
+    """API key - persistent signatures on/off."""
 
     def _process(self):
         quiet = request.form.get('quiet') == '1'
@@ -130,7 +130,7 @@ class RHAPITogglePersistent(RHUserAPIBase):
 
 
 class RHAPIBlockKey(RHUserAPIBase):
-    """API key blocking/unblocking"""
+    """API key blocking/unblocking."""
 
     def _check_access(self):
         RHUserAPIBase._check_access(self)

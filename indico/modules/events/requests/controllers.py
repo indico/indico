@@ -37,7 +37,7 @@ class EventOrRequestManagerMixin:
 
 
 class RHRequestsEventRequests(EventOrRequestManagerMixin, RHManageEventBase):
-    """Overview of existing requests (event)"""
+    """Overview of existing requests (event)."""
 
     def _process(self):
         definitions = get_request_definitions()
@@ -53,7 +53,7 @@ class RHRequestsEventRequests(EventOrRequestManagerMixin, RHManageEventBase):
 
 
 class RHRequestsEventRequestBase(RHManageEventBase):
-    """Base class for pages handling a specific request type"""
+    """Base class for pages handling a specific request type."""
 
     #: if a request must be present in the database
     _require_request = True
@@ -70,7 +70,7 @@ class RHRequestsEventRequestBase(RHManageEventBase):
 
 
 class RHRequestsEventRequestDetailsBase(EventOrRequestManagerMixin, RHRequestsEventRequestBase):
-    """Base class for the details/edit/manage views of a specific request"""
+    """Base class for the details/edit/manage views of a specific request."""
 
     def _process(self):
         self.is_manager = self.definition.can_be_managed(session.user)
@@ -99,7 +99,7 @@ class RHRequestsEventRequestDetailsBase(EventOrRequestManagerMixin, RHRequestsEv
 
 
 class RHRequestsEventRequestDetails(RHRequestsEventRequestDetailsBase):
-    """Details/form for a specific request"""
+    """Details/form for a specific request."""
 
     _require_request = False
 
@@ -135,7 +135,7 @@ class RHRequestsEventRequestDetails(RHRequestsEventRequestDetailsBase):
 
 
 class RHRequestsEventRequestProcess(RHRequestsEventRequestDetailsBase):
-    """Accept/Reject a request"""
+    """Accept/Reject a request."""
 
     def _check_access(self):
         self._require_user()
@@ -173,7 +173,7 @@ class RHRequestsEventRequestProcess(RHRequestsEventRequestDetailsBase):
 
 
 class RHRequestsEventRequestWithdraw(EventOrRequestManagerMixin, RHRequestsEventRequestBase):
-    """Withdraw a request"""
+    """Withdraw a request."""
 
     def _check_access(self):
         EventOrRequestManagerMixin._check_access(self)

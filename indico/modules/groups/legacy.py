@@ -23,7 +23,7 @@ class GroupWrapper(Fossilizable):
 
     @property
     def group(self):
-        """Returns the underlying GroupProxy
+        """Return the underlying GroupProxy.
 
         :rtype: indico.modules.groups.core.GroupProxy
         """

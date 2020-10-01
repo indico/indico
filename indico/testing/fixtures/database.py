@@ -25,7 +25,7 @@ from indico.web.flask.app import configure_db
 
 @pytest.fixture(scope='session')
 def postgresql():
-    """Provides a clean temporary PostgreSQL server/database.
+    """Provide a clean temporary PostgreSQL server/database.
 
     If the environment variable `INDICO_TEST_DATABASE_URI` is set, this fixture
     will do nothing and simply return the connection string from that variable
@@ -79,7 +79,7 @@ def postgresql():
 
 @pytest.fixture(scope='session')
 def database(app, postgresql):
-    """Creates a test database which is destroyed afterwards
+    """Create a test database which is destroyed afterwards.
 
     Used only internally, if you need to access the database use `db` instead to ensure
     your modifications are not persistent!
@@ -99,7 +99,7 @@ def database(app, postgresql):
 
 @pytest.fixture
 def db(database, monkeypatch):
-    """Provides database access and ensures changes do not persist"""
+    """Provide database access and ensure changes do not persist."""
     # Prevent database/session modifications
     monkeypatch.setattr(database.session, 'commit', database.session.flush)
     monkeypatch.setattr(database.session, 'remove', lambda: None)
@@ -120,7 +120,7 @@ def db(database, monkeypatch):
 @pytest.fixture
 @pytest.mark.usefixtures('db')
 def count_queries():
-    """Provides a query counter.
+    """Provide a query counter.
 
     Usage::
 

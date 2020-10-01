@@ -14,7 +14,7 @@ from indico.modules.events.registration.util import create_personal_data_fields
 
 @pytest.fixture
 def dummy_regform(db, dummy_event):
-    """Create a dummy registration form for the dummy event"""
+    """Create a dummy registration form for the dummy event."""
     regform = RegistrationForm(event=dummy_event, title='Registration Form', currency='USD')
     create_personal_data_fields(regform)
 
@@ -28,7 +28,7 @@ def dummy_regform(db, dummy_event):
 
 @pytest.fixture
 def dummy_reg(db, dummy_event, dummy_regform, dummy_user):
-    """Create a dummy registration for the dummy event"""
+    """Create a dummy registration for the dummy event."""
     reg = Registration(
         registration_form_id=dummy_regform.id,
         first_name="Guinea",

@@ -17,7 +17,7 @@ from indico.web.forms.widgets import JinjaWidget
 
 
 class FileField(Field):
-    """A dropzone field"""
+    """A dropzone field."""
 
     widget = JinjaWidget('forms/dropzone_widget.html', editable=False)
 

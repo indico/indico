@@ -293,7 +293,7 @@ class RHMoveCategory(RHMoveCategoryBase):
 
 
 class RHDeleteSubcategories(RHManageCategoryBase):
-    """Bulk-delete subcategories"""
+    """Bulk-delete subcategories."""
 
     def _process_args(self):
         RHManageCategoryBase._process_args(self)
@@ -346,7 +346,7 @@ class RHSortSubcategories(RHManageCategoryBase):
 
 
 class RHManageCategorySelectedEventsBase(RHManageCategoryBase):
-    """Base RH to manage selected events in a category"""
+    """Base RH to manage selected events in a category."""
 
     def _process_args(self):
         RHManageCategoryBase._process_args(self)
@@ -359,7 +359,7 @@ class RHManageCategorySelectedEventsBase(RHManageCategoryBase):
 
 
 class RHDeleteEvents(RHManageCategorySelectedEventsBase):
-    """Delete multiple events"""
+    """Delete multiple events."""
 
     def _process(self):
         is_submitted = 'confirmed' in request.form
@@ -425,7 +425,7 @@ class RHMoveEvents(RHManageCategorySelectedEventsBase):
 
 
 class RHCategoryRoles(RHManageCategoryBase):
-    """Category role management"""
+    """Category role management."""
 
     def _process(self):
         return WPCategoryManagement.render_template('management/roles.html', self.category, 'roles',
@@ -433,7 +433,7 @@ class RHCategoryRoles(RHManageCategoryBase):
 
 
 class RHAddCategoryRole(RHManageCategoryBase):
-    """Add a new category role"""
+    """Add a new category role."""
 
     def _process(self):
         form = CategoryRoleForm(category=self.category, color=self._get_color())
@@ -452,7 +452,7 @@ class RHAddCategoryRole(RHManageCategoryBase):
 
 
 class RHManageCategoryRole(RHManageCategoryBase):
-    """Base class to manage a specific category role"""
+    """Base class to manage a specific category role."""
 
     normalize_url_spec = {
         'locators': {
@@ -466,7 +466,7 @@ class RHManageCategoryRole(RHManageCategoryBase):
 
 
 class RHEditCategoryRole(RHManageCategoryRole):
-    """Edit a category role"""
+    """Edit a category role."""
 
     def _process(self):
         form = CategoryRoleForm(obj=self.role, category=self.category)
@@ -479,7 +479,7 @@ class RHEditCategoryRole(RHManageCategoryRole):
 
 
 class RHDeleteCategoryRole(RHManageCategoryRole):
-    """Delete a category role"""
+    """Delete a category role."""
 
     def _process(self):
         db.session.delete(self.role)
@@ -488,7 +488,7 @@ class RHDeleteCategoryRole(RHManageCategoryRole):
 
 
 class RHRemoveCategoryRoleMember(RHManageCategoryRole):
-    """Remove a user from a category role"""
+    """Remove a user from a category role."""
 
     normalize_url_spec = dict(RHManageCategoryRole.normalize_url_spec, preserved_args={'user_id'})
 
@@ -504,7 +504,7 @@ class RHRemoveCategoryRoleMember(RHManageCategoryRole):
 
 
 class RHAddCategoryRoleMembers(RHManageCategoryRole):
-    """Add users to a category role"""
+    """Add users to a category role."""
 
     def _process(self):
         for data in request.json['users']:
@@ -516,6 +516,6 @@ class RHAddCategoryRoleMembers(RHManageCategoryRole):
 
 
 class RHCategoryRoleMembersImportCSV(ImportRoleMembersMixin, RHManageCategoryRole):
-    """Add users to a category role from CSV"""
+    """Add users to a category role from CSV."""
 
     logger = logger

@@ -49,7 +49,7 @@ def _fix_role_principals(principals, get_event):
 
 @cli.command()
 def fix_event_role_acls():
-    """Fixes ACLs referencing event roles from other events.
+    """Fix ACLs referencing event roles from other events.
 
     This happened due to a bug prior to 2.2.3 when cloning an event
     which had event roles in its ACL.

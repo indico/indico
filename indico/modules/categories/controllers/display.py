@@ -206,7 +206,7 @@ class RHSubcatInfo(RHDisplayCategoryBase):
 
 
 class RHDisplayCategoryEventsBase(RHDisplayCategoryBase):
-    """Base class for display pages displaying an event list"""
+    """Base class for display pages displaying an event list."""
 
     _category_query_options = (joinedload('children').load_only('id', 'title', 'protection_mode'),
                                undefer('attachment_count'), undefer('has_events'))
@@ -257,7 +257,7 @@ class RHDisplayCategoryEventsBase(RHDisplayCategoryBase):
 
 
 class RHDisplayCategory(RHDisplayCategoryEventsBase):
-    """Show the contents of a category (events/subcategories)"""
+    """Show the contents of a category (events/subcategories)."""
 
     def _process(self):
         # Current events, which are always shown by default are events of this month and of the previous month.
@@ -334,7 +334,7 @@ class RHDisplayCategory(RHDisplayCategoryEventsBase):
 
 
 class RHEventList(RHDisplayCategoryEventsBase):
-    """Return the HTML for the event list before/after a specific month"""
+    """Return the HTML for the event list before/after a specific month."""
 
     def _parse_year_month(self, string):
         try:
@@ -369,7 +369,9 @@ class RHEventList(RHDisplayCategoryEventsBase):
 
 
 class RHShowEventsInCategoryBase(RHDisplayCategoryBase):
-    """Set whether the events in a category are automatically displayed or not"""
+    """
+    Set whether the events in a category are automatically displayed or not.
+    """
 
     session_field = ''
 
@@ -389,13 +391,17 @@ class RHShowEventsInCategoryBase(RHDisplayCategoryBase):
 
 
 class RHShowFutureEventsInCategory(RHShowEventsInCategoryBase):
-    """Set whether the past events in a category are automatically displayed or not"""
+    """
+    Set whether the past events in a category are automatically displayed or not.
+    """
 
     session_field = 'fetch_future_events_in'
 
 
 class RHShowPastEventsInCategory(RHShowEventsInCategoryBase):
-    """Set whether the past events in a category are automatically displayed or not"""
+    """
+    Set whether the past events in a category are automatically displayed or not.
+    """
 
     session_field = 'fetch_past_events_in'
 
@@ -432,7 +438,7 @@ class RHXMLExportCategoryInfo(RH):
 
 
 class RHCategoryOverview(RHDisplayCategoryBase):
-    """Display the events for a particular day, week or month"""
+    """Display the events for a particular day, week or month."""
 
     def _get_timetable(self):
         return get_category_timetable([self.category.id], self.start_dt, self.end_dt,

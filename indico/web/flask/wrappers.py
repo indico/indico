@@ -172,9 +172,11 @@ class IndicoBlueprint(Blueprint):
 
     @contextmanager
     def add_prefixed_rules(self, prefix, default_prefix=''):
-        """Creates prefixed rules in addition to the normal ones.
+        """Create prefixed rules in addition to the normal ones.
+
         When specifying a default_prefix, too, the normally "unprefixed" rules
-        are prefixed with it."""
+        are prefixed with it.
+        """
         assert self.__prefix is None and not self.__default_prefix
         self.__prefix = prefix
         self.__default_prefix = default_prefix

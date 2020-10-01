@@ -15,9 +15,9 @@ def group_list(data, key=None, sort_by=None, sort_reverse=False):
 
 
 def committing_iterator(iterable, n=100):
-    """Iterates over *iterable* and commits every *n* items.
+    """Iterate over *iterable* and commits every *n* items.
 
-    It also issues a commit after the iterator has been exhausted.
+    Also issue a commit after the iterator has been exhausted.
 
     :param iterable: An iterable object
     :param n: Number of items to commit after
@@ -32,7 +32,7 @@ def committing_iterator(iterable, n=100):
 
 
 def grouper(iterable, n, fillvalue=None, skip_missing=False):
-    """Collect data into fixed-length chunks or blocks
+    """Collect data into fixed-length chunks or blocks.
 
     :param iterable: an iterable object
     :param n: number of items per chunk
@@ -76,7 +76,7 @@ def materialize_iterable(type_=list):
 
 def window(seq, n=2):
     """
-    Return a sliding window (of width n) over data from the iterable
+    Return a sliding window (of width n) over data from the iterable.
 
         s -> (s0,s1,...s[n-1]), (s1,s2,...,sn), ...
     """

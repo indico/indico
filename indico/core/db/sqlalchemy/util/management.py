@@ -64,14 +64,14 @@ DEFAULT_BADGE_DATA = {
 
 
 def get_all_tables(db):
-    """Returns a dict containing all tables grouped by schema"""
+    """Return a dict containing all tables grouped by schema."""
     inspector = Inspector.from_engine(db.engine)
     schemas = sorted(set(inspector.get_schema_names()) - {'information_schema'})
     return dict(zip(schemas, (inspector.get_table_names(schema=schema) for schema in schemas)))
 
 
 def delete_all_tables(db):
-    """Drops all tables in the database"""
+    """Drop all tables in the database."""
     conn = db.engine.connect()
     transaction = conn.begin()
     inspector = Inspector.from_engine(db.engine)
@@ -106,7 +106,7 @@ def delete_all_tables(db):
 
 
 def create_all_tables(db, verbose=False, add_initial_data=True):
-    """Create all tables and required initial objects"""
+    """Create all tables and required initial objects."""
     from indico.modules.categories import Category
     from indico.modules.designer import TemplateType
     from indico.modules.designer.models.templates import DesignerTemplate

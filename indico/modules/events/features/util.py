@@ -19,12 +19,12 @@ from indico.util.signals import named_objects_from_signal
 
 
 def get_feature_definitions():
-    """Gets a dict containing all feature definitions"""
+    """Get a dict containing all feature definitions."""
     return named_objects_from_signal(signals.event.get_feature_definitions.send(), plugin_attr='plugin')
 
 
 def get_feature_definition(name):
-    """Gets a feature definition"""
+    """Get a feature definition."""
     try:
         return get_feature_definitions()[name]
     except KeyError:
@@ -32,7 +32,7 @@ def get_feature_definition(name):
 
 
 def get_enabled_features(event, only_explicit=False):
-    """Returns a set of enabled feature names for an event"""
+    """Return a set of enabled feature names for an event."""
     enabled_features = features_event_settings.get(event, 'enabled')
     if enabled_features is not None:
         return set(enabled_features)
@@ -43,7 +43,7 @@ def get_enabled_features(event, only_explicit=False):
 
 
 def set_feature_enabled(event, name, state):
-    """Enables/disables a feature for an event
+    """Enable/disable a feature for an event.
 
     :param event: The event.
     :param name: The name of the feature.
@@ -88,7 +88,7 @@ def get_disallowed_features(event):
 
 
 def is_feature_enabled(event, name):
-    """Checks if a feature is enabled for an event.
+    """Check if a feature is enabled for an event.
 
     :param event: The event (or event ID) to check.
     :param name: The name of the feature.
@@ -104,7 +104,7 @@ def is_feature_enabled(event, name):
 
 
 def require_feature(event, name):
-    """Raises a NotFound error if a feature is not enabled
+    """Raise a NotFound error if a feature is not enabled.
 
     :param event: The event (or event ID) to check.
     :param name: The name of the feature.

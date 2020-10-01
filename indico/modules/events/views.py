@@ -130,7 +130,7 @@ class WPEventBase(WPDecorated):
 
 
 class WPSimpleEventDisplayBase(MathjaxMixin, WPEventBase):
-    """Base class for displaying something on a lecture/meeting page"""
+    """Base class for displaying something on a lecture/meeting page."""
 
     def __init__(self, rh, event_, **kwargs):
         self.event = event_

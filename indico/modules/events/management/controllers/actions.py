@@ -39,7 +39,7 @@ class RHDeleteEvent(RHManageEventBase):
 
 
 class RHChangeEventType(RHManageEventBase):
-    """Change the type of an event"""
+    """Change the type of an event."""
 
     def _process(self):
         type_ = EventType[request.form['type']]
@@ -79,7 +79,7 @@ class RHUnlockEvent(RHManageEventBase):
 
 
 class RHMoveEvent(RHManageEventBase):
-    """Move event to a different category"""
+    """Move event to a different category."""
 
     def _process_args(self):
         RHManageEventBase._process_args(self)

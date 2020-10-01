@@ -15,11 +15,11 @@ from indico.modules.events.sessions.models.sessions import Session
 
 
 class RHManageSessionsBase(RHManageEventBase):
-    """Base RH for all session management RHs"""
+    """Base RH for all session management RHs."""
 
 
 class RHManageSessionBase(RHManageSessionsBase):
-    """Base RH for management of a single session"""
+    """Base RH for management of a single session."""
 
     normalize_url_spec = {
         'locators': {
@@ -37,7 +37,7 @@ class RHManageSessionBase(RHManageSessionsBase):
 
 
 class RHManageSessionsActionsBase(RHManageSessionsBase):
-    """Base class for classes performing actions on sessions"""
+    """Base class for classes performing actions on sessions."""
 
     def _process_args(self):
         RHManageSessionsBase._process_args(self)
