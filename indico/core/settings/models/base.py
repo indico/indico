@@ -25,7 +25,7 @@ def _coerce_value(value):
 
 
 class SettingsBase(object):
-    """Base class for any kind of setting tables"""
+    """Base class for any kind of setting tables."""
 
     id = db.Column(
         db.Integer,
@@ -86,7 +86,7 @@ class SettingsBase(object):
 
 
 class JSONSettingsBase(SettingsBase):
-    """Base class for setting tables with a JSON value"""
+    """Base class for setting tables with a JSON value."""
 
     __tablename__ = 'settings'
 
@@ -143,7 +143,7 @@ class JSONSettingsBase(SettingsBase):
 
 
 class PrincipalSettingsBase(PrincipalMixin, SettingsBase):
-    """Base class for principal setting tables"""
+    """Base class for principal setting tables."""
 
     __tablename__ = 'settings_principals'
     # Additional columns used to identitfy a setting (e.g. user/event id)

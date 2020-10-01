@@ -221,7 +221,7 @@ class Survey(db.Model):
 
     @locator.token
     def locator(self):
-        """A locator that adds the UUID if the survey is private"""
+        """A locator that adds the UUID if the survey is private."""
         token = self.uuid if self.private else None
         return dict(self.locator, token=token)
 
@@ -243,7 +243,7 @@ class Survey(db.Model):
 
     @property
     def start_notification_recipients(self):
-        """Returns all recipients of the notifications.
+        """Return all recipients of the notifications.
 
         This includes both explicit recipients and, if enabled,
         participants of the event.

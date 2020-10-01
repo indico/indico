@@ -46,7 +46,7 @@ CONTRIB_ROLE_MAP = {
 
 
 class RHPapersListBase(RHJudgingAreaBase):
-    """Base class for assignment/judging paper lists"""
+    """Base class for assignment/judging paper lists."""
 
     @cached_property
     def list_generator(self):
@@ -57,7 +57,7 @@ class RHPapersListBase(RHJudgingAreaBase):
 
 
 class RHPapersList(RHPapersListBase):
-    """Display the paper list for assignment/judging"""
+    """Display the paper list for assignment/judging."""
 
     @cached_property
     def view_class(self):
@@ -72,7 +72,7 @@ class RHPapersList(RHPapersListBase):
 
 
 class RHCustomizePapersList(RHPapersListBase):
-    """Filter options and columns to display for the paper list"""
+    """Filter options and columns to display for the paper list."""
 
     ALLOW_LOCKED = True
 
@@ -90,7 +90,7 @@ class RHCustomizePapersList(RHPapersListBase):
 
 
 class RHPapersActionBase(RHPapersListBase):
-    """Base class for actions on selected papers"""
+    """Base class for actions on selected papers."""
 
     def _get_contrib_query_options(self):
         return ()
@@ -105,7 +105,9 @@ class RHPapersActionBase(RHPapersListBase):
 
 
 class RHDownloadPapers(ZipGeneratorMixin, RHPapersActionBase):
-    """Generate a ZIP file with paper files for a given list of contributions"""
+    """
+    Generate a ZIP file with paper files for a given list of contributions.
+    """
 
     ALLOW_LOCKED = True
 
@@ -126,7 +128,7 @@ class RHDownloadPapers(ZipGeneratorMixin, RHPapersActionBase):
 
 
 class RHJudgePapers(RHPapersActionBase):
-    """Bulk judgment of papers"""
+    """Bulk judgment of papers."""
 
     def _process(self):
         form = BulkPaperJudgmentForm(event=self.event, judgment=request.form.get('judgment'),
@@ -153,7 +155,7 @@ class RHJudgePapers(RHPapersActionBase):
 
 
 class RHAssignPapersBase(RHPapersActionBase):
-    """Base class for assigning/unassigning paper reviewing roles"""
+    """Base class for assigning/unassigning paper reviewing roles."""
 
     def _get_contrib_query_options(self):
         return [selectinload('person_links')]
@@ -204,7 +206,7 @@ class RHAssignPapersBase(RHPapersActionBase):
 
 
 class RHAssignPapers(RHAssignPapersBase):
-    """Render the user list to assign paper reviewing roles"""
+    """Render the user list to assign paper reviewing roles."""
 
     def _process(self):
         if self.users:
@@ -214,7 +216,7 @@ class RHAssignPapers(RHAssignPapersBase):
 
 
 class RHUnassignPapers(RHAssignPapersBase):
-    """Render the user list to unassign paper reviewing roles"""
+    """Render the user list to unassign paper reviewing roles."""
 
     def _process(self):
         if self.users:

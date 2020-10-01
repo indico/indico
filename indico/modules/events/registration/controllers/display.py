@@ -71,7 +71,7 @@ class RHRegistrationFormBase(RegistrationFormMixin, RHRegistrationFormDisplayBas
 
 
 class RHRegistrationFormRegistrationBase(RHRegistrationFormBase):
-    """Base for RHs handling individual registrations"""
+    """Base for RHs handling individual registrations."""
 
     REGISTRATION_REQUIRED = True
 
@@ -89,7 +89,7 @@ class RHRegistrationFormRegistrationBase(RHRegistrationFormBase):
 
 
 class RHRegistrationFormList(RHRegistrationFormDisplayBase):
-    """List of all registration forms in the event"""
+    """List of all registration forms in the event."""
 
     ALLOW_PROTECTED_EVENT = True
 
@@ -105,7 +105,7 @@ class RHRegistrationFormList(RHRegistrationFormDisplayBase):
 
 
 class RHParticipantList(RHRegistrationFormDisplayBase):
-    """List of all public registrations"""
+    """List of all public registrations."""
 
     view_class = WPDisplayRegistrationParticipantList
 
@@ -221,7 +221,7 @@ class RHParticipantList(RHRegistrationFormDisplayBase):
 
 
 class InvitationMixin:
-    """Mixin for RHs that accept an invitation token"""
+    """Mixin for RHs that accept an invitation token."""
 
     def _process_args(self):
         self.invitation = None
@@ -240,7 +240,7 @@ class InvitationMixin:
 
 
 class RHRegistrationFormCheckEmail(RHRegistrationFormBase):
-    """Checks how an email will affect the registration"""
+    """Check how an email will affect the registration."""
 
     ALLOW_PROTECTED_EVENT = True
 
@@ -257,7 +257,7 @@ class RHRegistrationFormCheckEmail(RHRegistrationFormBase):
 
 
 class RHRegistrationForm(InvitationMixin, RHRegistrationFormRegistrationBase):
-    """Display a registration form and registrations, and process submissions"""
+    """Display a registration form and registrations, and process submissions."""
 
     REGISTRATION_REQUIRED = False
     ALLOW_PROTECTED_EVENT = True
@@ -317,7 +317,7 @@ class RHRegistrationForm(InvitationMixin, RHRegistrationFormRegistrationBase):
 
 
 class RHRegistrationDisplayEdit(RegistrationEditMixin, RHRegistrationFormRegistrationBase):
-    """Submit a registration form"""
+    """Submit a registration form."""
 
     template_file = 'display/registration_modify.html'
     management = False
@@ -347,7 +347,7 @@ class RHRegistrationDisplayEdit(RegistrationEditMixin, RHRegistrationFormRegistr
 
 
 class RHRegistrationWithdraw(RHRegistrationFormRegistrationBase):
-    """Withdraw a registration"""
+    """Withdraw a registration."""
 
     def _check_access(self):
         RHRegistrationFormRegistrationBase._check_access(self)
@@ -361,7 +361,7 @@ class RHRegistrationWithdraw(RHRegistrationFormRegistrationBase):
 
 
 class RHRegistrationFormDeclineInvitation(InvitationMixin, RHRegistrationFormBase):
-    """Decline an invitation to register"""
+    """Decline an invitation to register."""
 
     ALLOW_PROTECTED_EVENT = True
 
@@ -377,7 +377,7 @@ class RHRegistrationFormDeclineInvitation(InvitationMixin, RHRegistrationFormBas
 
 
 class RHTicketDownload(RHRegistrationFormRegistrationBase):
-    """Generate ticket for a given registration"""
+    """Generate ticket for a given registration."""
 
     def _check_access(self):
         RHRegistrationFormRegistrationBase._check_access(self)

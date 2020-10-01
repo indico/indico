@@ -226,8 +226,7 @@ def unescape_latex_entities(text):
 
 
 def latex_render_error(message):
-    """
-    Generate nice error box in LaTeX document.
+    """Generate nice error box in LaTeX document.
 
     :param message: The error message
     :returns: LaTeX code for error box
@@ -239,8 +238,7 @@ def latex_render_error(message):
 
 
 def latex_render_image(src, alt, tmpdir, strict=False):
-    """
-    Generate LaTeX code that includes an arbitrary image from a URL.
+    """Generate LaTeX code that includes an arbitrary image from a URL.
 
     This involves fetching the image from a web server and figuring out its
     MIME type. A temporary file will be created, which is not immediately
@@ -337,7 +335,7 @@ class LaTeXExtension(markdown.Extension):
 
 
 class NonEncodedAutoMailPattern(markdown.inlinepatterns.Pattern):
-    """Reimplementation of AutoMailPattern to avoid URL-encoded links"""
+    """Reimplementation of AutoMailPattern to avoid URL-encoded links."""
 
     def handleMatch(self, m):
         el = markdown.util.etree.Element('a')
@@ -357,8 +355,10 @@ class LaTeXTreeProcessor(markdown.treeprocessors.Treeprocessor):
         self.configs = configs
 
     def run(self, doc):
-        """Walk the dom converting relevant nodes to text nodes with relevant
-        content."""
+        """
+        Walk the dom converting relevant nodes to text nodes with relevant
+        content.
+        """
         latex_text = self.tolatex(doc)
         doc.clear()
         doc.text = latex_text
@@ -452,7 +452,8 @@ class UnescapeHtmlTextPostProcessor(markdown.postprocessors.Postprocessor):
 class MathTextPostProcessor(markdown.postprocessors.Postprocessor):
 
     def run(self, instr):
-        """Convert all math sections in {text} whether latex, asciimathml or
+        """
+        Convert all math sections in {text} whether latex, asciimathml or
         latexmathml formatted to latex.
 
         This assumes you are using $$ as your mathematics delimiter (*not* the

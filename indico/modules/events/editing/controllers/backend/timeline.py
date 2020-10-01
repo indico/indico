@@ -310,7 +310,7 @@ class RHUndoReview(RHContributionEditableRevisionBase):
 
 
 class RHCreateRevisionComment(RHContributionEditableRevisionBase):
-    """Create new revision comment"""
+    """Create new revision comment."""
 
     SERVICE_ALLOWED = True
 
@@ -371,7 +371,7 @@ class RHEditRevisionComment(RHContributionEditableRevisionBase):
 
 
 class RHExportRevisionFiles(RHContributionEditableRevisionBase):
-    """Export revision files as a ZIP archive"""
+    """Export revision files as a ZIP archive."""
 
     def _check_revision_access(self):
         return self.editable.can_see_timeline(session.user)
@@ -393,7 +393,7 @@ class RHExportRevisionFiles(RHContributionEditableRevisionBase):
 
 
 class RHDownloadRevisionFile(RHContributionEditableRevisionBase):
-    """Download a revision file"""
+    """Download a revision file."""
 
     SERVICE_ALLOWED = True
 

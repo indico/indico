@@ -464,7 +464,7 @@ class RHUserEmailsSetPrimary(RHUserBase):
 
 
 class RHAdmins(RHAdminBase):
-    """Show Indico administrators"""
+    """Show Indico administrators."""
 
     def _process(self):
         admins = set(User.query
@@ -489,7 +489,7 @@ class RHAdmins(RHAdminBase):
 
 
 class RHUsersAdmin(RHAdminBase):
-    """Admin users overview"""
+    """Admin users overview."""
 
     def _process(self):
         form = SearchForm(obj=FormDefaults(exact=True))
@@ -541,7 +541,7 @@ class RHUsersAdminSettings(RHAdminBase):
 
 
 class RHUsersAdminCreate(RHAdminBase):
-    """Create user (admin)"""
+    """Create user (admin)."""
 
     def _process(self):
         form = AdminAccountRegistrationForm()
@@ -594,7 +594,7 @@ def _get_merge_problems(source, target):
 
 
 class RHUsersAdminMerge(RHAdminBase):
-    """Merge users (admin)"""
+    """Merge users (admin)."""
 
     def _process(self):
         form = MergeForm()
@@ -627,7 +627,7 @@ class RHUsersAdminMergeCheck(RHAdminBase):
 
 
 class RHRegistrationRequestList(RHAdminBase):
-    """List all registration requests"""
+    """List all registration requests."""
 
     def _process(self):
         requests = RegistrationRequest.query.order_by(RegistrationRequest.email).all()
@@ -635,7 +635,7 @@ class RHRegistrationRequestList(RHAdminBase):
 
 
 class RHRegistrationRequestBase(RHAdminBase):
-    """Base class to process a registration request"""
+    """Base class to process a registration request."""
 
     def _process_args(self):
         RHAdminBase._process_args(self)
@@ -643,7 +643,7 @@ class RHRegistrationRequestBase(RHAdminBase):
 
 
 class RHAcceptRegistrationRequest(RHRegistrationRequestBase):
-    """Accept a registration request"""
+    """Accept a registration request."""
 
     def _process(self):
         user, identity = register_user(self.request.email, self.request.extra_emails, self.request.user_data,
@@ -655,7 +655,7 @@ class RHAcceptRegistrationRequest(RHRegistrationRequestBase):
 
 
 class RHRejectRegistrationRequest(RHRegistrationRequestBase):
-    """Reject a registration request"""
+    """Reject a registration request."""
 
     def _process(self):
         db.session.delete(self.request)
@@ -675,7 +675,7 @@ search_result_schema = UserSearchResultSchema()
 
 
 class RHUserSearch(RHProtected):
-    """Search for users based on given criteria"""
+    """Search for users based on given criteria."""
 
     def _serialize_pending_user(self, entry):
         first_name = entry.data.get('first_name') or ''

@@ -65,7 +65,7 @@ class BadHeaderError(ValueError):
 # Copied from Python 3.2+ standard library, with the following modification:
 # * Uses hostname from indico's BASE_URL as the default domain
 def make_msgid(idstring=None, domain=None):
-    """Returns a string suitable for RFC 2822 compliant Message-ID, e.g:
+    """Return a string suitable for RFC 2822 compliant Message-ID, e.g:
 
     <142480216486.20800.16526388040877946887@nightshade.la.mastaler.com>
 
@@ -104,7 +104,7 @@ ADDRESS_HEADERS = {
 
 
 def forbid_multi_line_headers(name, val, encoding):
-    """Forbids multi-line headers, to prevent header injection."""
+    """Forbid multi-line headers, to prevent header injection."""
     val = force_text(val)
     if '\n' in val or '\r' in val:
         raise BadHeaderError("Header values can't contain newlines (got %r for header %r)" % (val, name))
@@ -122,8 +122,7 @@ def forbid_multi_line_headers(name, val, encoding):
 
 
 def split_addr(addr, encoding):
-    """
-    Split the address into local part and domain, properly encoded.
+    """Split the address into local part and domain, properly encoded.
 
     When non-ascii characters are present in the local part, it must be
     MIME-word encoded. The domain name must be idna-encoded if it contains
@@ -146,9 +145,7 @@ def split_addr(addr, encoding):
 
 
 def sanitize_address(addr, encoding):
-    """
-    Format a pair of (name, address) or an email address string.
-    """
+    """Format a pair of (name, address) or an email address string."""
     if not isinstance(addr, tuple):
         addr = parseaddr(force_text(addr))
     nm, addr = addr
@@ -168,6 +165,7 @@ def sanitize_address(addr, encoding):
 class MIMEMixin:
     def as_string(self, unixfrom=False, linesep='\n'):
         """Return the entire formatted message as a string.
+
         Optional `unixfrom' when True, means include the Unix From_ envelope
         header.
 
@@ -221,9 +219,7 @@ class SafeMIMEMultipart(MIMEMixin, MIMEMultipart):
 
 
 class EmailMessage(object):
-    """
-    A container for email information.
-    """
+    """A container for email information."""
     content_subtype = 'plain'
     mixed_subtype = 'mixed'
     encoding = 'utf-8'
@@ -312,7 +308,7 @@ class EmailMessage(object):
 
     def recipients(self):
         """
-        Returns a list of all recipients of the email (includes direct
+        Return a list of all recipients of the email (includes direct
         addressees as well as Cc and Bcc entries).
         """
         return [email for email in (self.to + self.cc + self.bcc) if email]
@@ -327,7 +323,7 @@ class EmailMessage(object):
 
     def attach(self, filename=None, content=None, mimetype=None):
         """
-        Attaches a file with the given filename and content. The filename can
+        Attach a file with the given filename and content. The filename can
         be omitted and the mimetype is guessed, if not provided.
 
         If the first parameter is a MIMEBase subclass it is inserted directly
@@ -363,8 +359,7 @@ class EmailMessage(object):
             self.attachments.append((filename, content, mimetype))
 
     def attach_file(self, path, mimetype=None):
-        """
-        Attaches a file from the filesystem.
+        """Attach a file from the filesystem.
 
         The mimetype will be set to the DEFAULT_ATTACHMENT_MIME_TYPE if it is
         not specified and cannot be guessed.
@@ -397,7 +392,7 @@ class EmailMessage(object):
 
     def _create_mime_attachment(self, content, mimetype):
         """
-        Converts the content, mimetype pair into a MIME attachment object.
+        Convert the content, mimetype pair into a MIME attachment object.
 
         If the mimetype is message/rfc822, content may be an
         email.Message or EmailMessage object, as well as a str.
@@ -426,7 +421,7 @@ class EmailMessage(object):
 
     def _create_attachment(self, filename, content, mimetype=None):
         """
-        Converts the filename, content, mimetype triple into a MIME attachment
+        Convert the filename, content, mimetype triple into a MIME attachment
         object.
         """
         attachment = self._create_mime_attachment(content, mimetype)

@@ -15,7 +15,7 @@ from indico.modules.events.registration.models.registrations import Registration
 
 
 class RegistrationFormFieldBase(object):
-    """Base class for a registration form field definition"""
+    """Base class for a registration form field definition."""
 
     #: unique name of the field type
     name = None
@@ -39,7 +39,7 @@ class RegistrationFormFieldBase(object):
 
     @property
     def validators(self):
-        """Returns a list of validators for this field"""
+        """Return a list of validators for this field."""
         return None
 
     @property
@@ -47,7 +47,7 @@ class RegistrationFormFieldBase(object):
         return None
 
     def calculate_price(self, reg_data, versioned_data):
-        """Calculates the price of the field
+        """Calculate the price of the field.
 
         :param reg_data: The user data for the field
         :param versioned_data: The versioned field data to use
@@ -56,7 +56,7 @@ class RegistrationFormFieldBase(object):
 
     def create_sql_filter(self, data_list):
         """
-        Creates a SQL criterion to check whether the field's value is
+        Create a SQL criterion to check whether the field's value is
         in `data_list`.  The function is expected to return an
         operation on ``Registrationdata.data``.
         """
@@ -94,7 +94,7 @@ class RegistrationFormFieldBase(object):
 
     @classmethod
     def process_field_data(cls, data, old_data=None, old_versioned_data=None):
-        """Processes the settings of the field.
+        """Process the settings of the field.
 
         :param data: The field data from the client
         :param old_data: The old unversioned field data (if available)
@@ -118,7 +118,7 @@ class RegistrationFormFieldBase(object):
         return self.unprocess_field_data(self.form_item.versioned_data, self.form_item.data)
 
     def get_friendly_data(self, registration_data, for_humans=False, for_search=False):
-        """Return the data contained in the field
+        """Return the data contained in the field.
 
         If for_humans is True, return a human-readable string representation.
         If for_search is True, return a string suitable for comparison in search.
@@ -132,7 +132,7 @@ class RegistrationFormFieldBase(object):
         return self.get_friendly_data(data)
 
     def get_places_used(self):
-        """Returns the number of used places for the field"""
+        """Return the number of used places for the field."""
         return 0
 
 

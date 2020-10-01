@@ -105,7 +105,7 @@ class RHReportErrorAPI(RH):
 
 
 class RHSettings(RHAdminBase):
-    """General settings"""
+    """General settings."""
 
     def _get_cephalopod_data(self):
         if not cephalopod_settings.get('joined'):
@@ -140,7 +140,7 @@ class RHSettings(RHAdminBase):
 
 
 class RHChangeTimezone(RH):
-    """Update the session/user timezone"""
+    """Update the session/user timezone."""
 
     def _process(self):
         mode = request.form['tz_mode']
@@ -163,7 +163,7 @@ class RHChangeTimezone(RH):
 
 
 class RHChangeLanguage(RH):
-    """Update the session/user language"""
+    """Update the session/user language."""
 
     def _process(self):
         language = request.form['lang']
@@ -176,7 +176,7 @@ class RHChangeLanguage(RH):
 
 
 class RHVersionCheck(RHAdminBase):
-    """Check the installed indico version against pypi"""
+    """Check the installed indico version against pypi."""
 
     def _check_version(self, distribution, current_version=None):
         try:

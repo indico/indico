@@ -134,7 +134,7 @@ def _log_acl_changes(sender, obj, principal, entry, is_new, old_data, quiet, **k
 @signals.app_created.connect
 def _handle_legacy_ids(app, **kwargs):
     """
-    Handles the redirect from broken legacy event ids such as a12345
+    Handle the redirect from broken legacy event ids such as a12345
     or 0123 which cannot be converted to an integer without an error
     or losing relevant information (0123 and 123 may be different
     events).

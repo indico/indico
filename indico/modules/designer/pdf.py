@@ -74,7 +74,7 @@ class DesignerPDFBase(object):
                        **tpl_data)
 
     def _remove_transparency(self, fd):
-        """Remove transparency from an image and replace it with white"""
+        """Remove transparency from an image and replace it with white."""
         img = Image.open(fd)
         # alpha-channel PNG: replace the transparent areas with plain white
         if img.mode == 'RGBA':

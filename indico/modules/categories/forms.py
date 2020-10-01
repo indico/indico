@@ -122,7 +122,7 @@ class CategoryProtectionForm(IndicoForm):
 
 
 class CreateCategoryForm(IndicoForm):
-    """Form to create a new Category"""
+    """Form to create a new Category."""
 
     title = StringField(_("Title"), [DataRequired()])
     description = IndicoMarkdownField(_("Description"))

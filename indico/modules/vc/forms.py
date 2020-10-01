@@ -40,7 +40,7 @@ class VCRoomField(HiddenField):
 
 
 class LinkingWidget(JinjaWidget):
-    """Renders a composite radio/select field"""
+    """Render a composite radio/select field."""
 
     def __init__(self, **context):
         super(LinkingWidget, self).__init__('forms/linking_widget.html', single_line=True, **context)

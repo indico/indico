@@ -17,7 +17,7 @@ from indico.web.rh import RHProtected
 
 
 class RHRoomBookingBase(RHProtected):
-    """Base class for room booking RHs"""
+    """Base class for room booking RHs."""
 
     def _check_access(self):
         if not config.ENABLE_ROOMBOOKING:

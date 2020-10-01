@@ -53,12 +53,12 @@ def terminal_size():
 
 
 def clear_line():
-    """Clears the current line in the terminal"""
+    """Clear the current line in the terminal."""
     print('\r', ' ' * terminal_size()[0], '\r', end='', sep='')
 
 
 def verbose_iterator(iterable, total, get_id, get_title, print_every=10):
-    """Iterates large iterables verbosely
+    """Iterate large iterables verbosely.
 
     :param iterable: An iterable
     :param total: The number of items in `iterable`
@@ -96,9 +96,9 @@ def _cformat_sub(m):
 
 
 def cformat(string):
-    """Replaces %{color} and %{color,bgcolor} with ansi colors.
+    """Replace %{color} and %{color,bgcolor} with ansi colors.
 
-    Bold foreground can be achieved by suffixing the color with a '!'
+    Bold foreground can be achieved by suffixing the color with a '!'.
     """
     reset = colored(u'')
     string = string.replace(u'%{reset}', reset)

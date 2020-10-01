@@ -15,7 +15,7 @@ from indico.util.string import return_ascii
 
 
 class Paper(ProposalMixin):
-    """Proxy class to facilitate access to all paper-related properties"""
+    """Proxy class to facilitate access to all paper-related properties."""
 
     proxied_attr = 'contribution'
 

@@ -41,13 +41,13 @@ class ManagementPermission(object):
 
 @memoize_request
 def get_available_permissions(type_):
-    """Gets a dict containing all permissions for a given object type"""
+    """Get a dict containing all permissions for a given object type."""
     return named_objects_from_signal(signals.acl.get_management_permissions.send(type_))
 
 
 def check_permissions(type_):
     """
-    Retrieves the permissions for an object type and ensures they are
+    Retrieve the permissions for an object type and ensure they are
     defined properly.
 
     This function should be executed from a function connected to the
@@ -62,7 +62,10 @@ def check_permissions(type_):
 
 
 def get_permissions_info(_type):
-    """Retrieve the permissions that can be set in the protection page and related information
+    """
+    Retrieve the permissions that can be set in the protection page
+    and related information.
+
     :param _type: The type of the permissions retrieved (e.g. Event, Category)
     :return: A tuple containing a dict with the available permissions and a dict with the permissions tree
     """
@@ -163,7 +166,10 @@ def get_unified_permissions(principal, all_permissions=False):
 
 
 def get_split_permissions(permissions):
-    """Split a list of permissions into a `has_full_access, has_read_access, list_with_others` tuple."""
+    """
+    Split a list of permissions into a `has_full_access, has_read_access,
+    list_with_others` tuple.
+    """
     full_access_permission = FULL_ACCESS_PERMISSION in permissions
     read_access_permission = READ_ACCESS_PERMISSION in permissions
     other_permissions = permissions - {FULL_ACCESS_PERMISSION, READ_ACCESS_PERMISSION}
@@ -204,7 +210,8 @@ def update_permissions(obj, form):
 
 
 def update_principals_permissions(obj, current, new):
-    """Handle the updates of permissions and creations/deletions of acl principals.
+    """
+    Handle the updates of permissions and creations/deletions of acl principals.
 
     :param obj: The object to update. Must have ``acl_entries``
     :param current: A dict mapping principals to a set with its current permissions

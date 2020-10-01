@@ -21,7 +21,7 @@ from indico.web.http_api.metadata.serializer import Serializer
 
 
 class vRecur(ical.vRecur):
-    """Fix vRecur so the frequency comes first"""
+    """Fix vRecur so the frequency comes first."""
     def ical(self):
         # SequenceTypes
         result = ['FREQ=%s' % self.types['FREQ'](self['FREQ']).ical()]

@@ -31,7 +31,7 @@ from indico.web.flask.stats import request_stats_request_started
 
 
 class IndicoCelery(Celery):
-    """Celery sweetened with some Indico/Flask-related sugar
+    """Celery sweetened with some Indico/Flask-related sugar.
 
     The following extra params are available on the `task` decorator:
 
@@ -100,7 +100,7 @@ class IndicoCelery(Celery):
         return decorator
 
     def _patch_task(self):
-        """Patches the `task` decorator to run tasks inside the indico environment"""
+        """Patch the `task` decorator to run tasks inside the indico environment."""
         class IndicoTask(self.Task):
             abstract = True
 
@@ -151,7 +151,7 @@ class IndicoCeleryLogging(Logging):
 
 
 class IndicoPersistentScheduler(PersistentScheduler):
-    """Celery scheduler that allows indico.conf to override specific entries"""
+    """Celery scheduler that allows indico.conf to override specific entries."""
 
     def setup_schedule(self):
         deleted = set()

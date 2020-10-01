@@ -20,7 +20,7 @@ from indico.util.string import return_ascii
 
 
 class Identity(db.Model):
-    """Identities of Indico users"""
+    """Identities of Indico users."""
     __tablename__ = 'identities'
     __table_args__ = (db.UniqueConstraint('provider', 'identifier'),
                       {'schema': 'users'})
@@ -93,11 +93,11 @@ class Identity(db.Model):
 
     @property
     def safe_last_login_dt(self):
-        """last_login_dt that is safe for sorting (no None values)"""
+        """last_login_dt that is safe for sorting (no None values)."""
         return self.last_login_dt or as_utc(datetime(1970, 1, 1))
 
     def register_login(self, ip):
-        """Updates the last login information"""
+        """Update the last login information."""
         self.last_login_dt = now_utc()
         self.last_login_ip = ip
 

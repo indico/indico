@@ -13,7 +13,7 @@ from indico.web.fields import get_field_definitions
 
 
 def get_field_types():
-    """Gets a dict containing all field types"""
+    """Get a dict containing all field types."""
     return get_field_definitions(SurveyField)
 
 

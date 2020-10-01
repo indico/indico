@@ -19,7 +19,7 @@ from indico.web.util import jsonify_data
 
 
 class RHManageRegFormSectionBase(RHManageRegFormBase):
-    """Base class for a specific registration form section"""
+    """Base class for a specific registration form section."""
 
     normalize_url_spec = {
         'locators': {
@@ -33,7 +33,7 @@ class RHManageRegFormSectionBase(RHManageRegFormBase):
 
 
 class RHRegistrationFormAddSection(RHManageRegFormBase):
-    """Add a section to the registration form"""
+    """Add a section to the registration form."""
 
     def _process(self):
         section = RegistrationFormSection(registration_form=self.regform)
@@ -47,7 +47,7 @@ class RHRegistrationFormAddSection(RHManageRegFormBase):
 
 
 class RHRegistrationFormModifySection(RHManageRegFormSectionBase):
-    """Delete/modify a section"""
+    """Delete/modify a section."""
 
     def _process_DELETE(self):
         if self.section.type == RegistrationFormItemType.section_pd:
@@ -69,7 +69,7 @@ class RHRegistrationFormModifySection(RHManageRegFormSectionBase):
 
 
 class RHRegistrationFormToggleSection(RHManageRegFormSectionBase):
-    """Enable/disable a section"""
+    """Enable/disable a section."""
 
     def _process_POST(self):
         enabled = request.args.get('enable') == 'true'
@@ -86,7 +86,7 @@ class RHRegistrationFormToggleSection(RHManageRegFormSectionBase):
 
 
 class RHRegistrationFormMoveSection(RHManageRegFormSectionBase):
-    """Move a section within the registration form"""
+    """Move a section within the registration form."""
 
     def _process(self):
         new_position = request.json['endPos'] + 1

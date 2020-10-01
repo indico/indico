@@ -66,7 +66,7 @@ def _render_registration_details(registration):
 
 
 class RHRegistrationsListManage(RHManageRegFormBase):
-    """List all registrations of a specific registration form of an event"""
+    """List all registrations of a specific registration form of an event."""
 
     def _process(self):
         if self.list_generator.static_link_used:
@@ -81,7 +81,7 @@ class RHRegistrationsListManage(RHManageRegFormBase):
 
 
 class RHRegistrationsListCustomize(RHManageRegFormBase):
-    """Filter options and columns to display for a registrations list of an event"""
+    """Filter options and columns to display for a registrations list of an event."""
 
     ALLOW_LOCKED = True
 
@@ -100,7 +100,7 @@ class RHRegistrationsListCustomize(RHManageRegFormBase):
 
 
 class RHRegistrationListStaticURL(RHManageRegFormBase):
-    """Generate a static URL for the configuration of the registrations list"""
+    """Generate a static URL for the configuration of the registrations list."""
 
     ALLOW_LOCKED = True
 
@@ -109,7 +109,7 @@ class RHRegistrationListStaticURL(RHManageRegFormBase):
 
 
 class RHRegistrationDetails(RHManageRegistrationBase):
-    """Displays information about a registration"""
+    """Display information about a registration."""
 
     def _process(self):
         registration_details_html = _render_registration_details(self.registration)
@@ -119,7 +119,7 @@ class RHRegistrationDetails(RHManageRegistrationBase):
 
 
 class RHRegistrationDownloadAttachment(RHManageRegFormsBase):
-    """Download a file attached to a registration"""
+    """Download a file attached to a registration."""
 
     normalize_url_spec = {
         'locators': {
@@ -159,7 +159,7 @@ class RHRegistrationEdit(RegistrationEditMixin, RHManageRegistrationBase):
 
 
 class RHRegistrationsActionBase(RHManageRegFormBase):
-    """Base class for classes performing actions on registrations"""
+    """Base class for classes performing actions on registrations."""
 
     registration_query_options = ()
 
@@ -175,7 +175,7 @@ class RHRegistrationsActionBase(RHManageRegFormBase):
 
 
 class RHRegistrationEmailRegistrantsPreview(RHRegistrationsActionBase):
-    """Previews the email that will be sent to registrants"""
+    """Preview the email that will be sent to registrants."""
 
     def _process(self):
         if not self.registrations:
@@ -193,7 +193,7 @@ class RHRegistrationEmailRegistrantsPreview(RHRegistrationsActionBase):
 
 
 class RHRegistrationEmailRegistrants(RHRegistrationsActionBase):
-    """Send email to selected registrants"""
+    """Send email to selected registrants."""
 
     def _send_emails(self, form):
         for registration in self.registrations:
@@ -233,7 +233,7 @@ class RHRegistrationEmailRegistrants(RHRegistrationsActionBase):
 
 
 class RHRegistrationDelete(RHRegistrationsActionBase):
-    """Delete selected registrations"""
+    """Delete selected registrations."""
 
     def _process(self):
         for registration in self.registrations:
@@ -250,7 +250,7 @@ class RHRegistrationDelete(RHRegistrationsActionBase):
 
 
 class RHRegistrationCreate(RHManageRegFormBase):
-    """Create new registration (management area)"""
+    """Create new registration (management area)."""
 
     def _get_user_data(self):
         user_id = request.args.get('user')
@@ -286,7 +286,7 @@ class RHRegistrationCreate(RHManageRegFormBase):
 
 
 class RHRegistrationCreateMultiple(RHManageRegFormBase):
-    """Create multiple registrations for Indico users (management area)"""
+    """Create multiple registrations for Indico users (management area)."""
 
     def _register_user(self, user, notify):
         # Fill only the personal data fields, custom fields are left empty.
@@ -309,7 +309,7 @@ class RHRegistrationCreateMultiple(RHManageRegFormBase):
 
 
 class RHRegistrationsExportBase(RHRegistrationsActionBase):
-    """Base class for all registration list export RHs"""
+    """Base class for all registration list export RHs."""
 
     ALLOW_LOCKED = True
     registration_query_options = (subqueryload('data'),)
@@ -320,7 +320,7 @@ class RHRegistrationsExportBase(RHRegistrationsActionBase):
 
 
 class RHRegistrationsExportPDFTable(RHRegistrationsExportBase):
-    """Export registration list to a PDF in table style"""
+    """Export registration list to a PDF in table style."""
 
     def _process(self):
         pdf = RegistrantsListToPDF(self.event, reglist=self.registrations, display=self.export_config['regform_items'],
@@ -336,7 +336,7 @@ class RHRegistrationsExportPDFTable(RHRegistrationsExportBase):
 
 
 class RHRegistrationsExportPDFBook(RHRegistrationsExportBase):
-    """Export registration list to a PDF in book style"""
+    """Export registration list to a PDF in book style."""
 
     def _process(self):
         static_item_ids, item_ids = self.list_generator.get_item_ids()
@@ -345,7 +345,7 @@ class RHRegistrationsExportPDFBook(RHRegistrationsExportBase):
 
 
 class RHRegistrationsExportCSV(RHRegistrationsExportBase):
-    """Export registration list to a CSV file"""
+    """Export registration list to a CSV file."""
 
     def _process(self):
         headers, rows = generate_spreadsheet_from_registrations(self.registrations, self.export_config['regform_items'],
@@ -354,7 +354,7 @@ class RHRegistrationsExportCSV(RHRegistrationsExportBase):
 
 
 class RHRegistrationsExportExcel(RHRegistrationsExportBase):
-    """Export registration list to an XLSX file"""
+    """Export registration list to an XLSX file."""
 
     def _process(self):
         headers, rows = generate_spreadsheet_from_registrations(self.registrations, self.export_config['regform_items'],
@@ -427,7 +427,7 @@ class RHRegistrationsPrintBadges(RHRegistrationsActionBase):
 
 
 class RHRegistrationsConfigBadges(RHRegistrationsActionBase):
-    """Print badges for the selected registrations"""
+    """Print badges for the selected registrations."""
 
     ALLOW_LOCKED = True
     TICKET_BADGES = False
@@ -511,7 +511,7 @@ class RHRegistrationsConfigBadges(RHRegistrationsActionBase):
 
 
 class RHRegistrationsConfigTickets(RHRegistrationsConfigBadges):
-    """Print tickets for selected registrations"""
+    """Print tickets for selected registrations."""
 
     TICKET_BADGES = True
 
@@ -524,7 +524,7 @@ class RHRegistrationsConfigTickets(RHRegistrationsConfigBadges):
 
 
 class RHRegistrationTogglePayment(RHManageRegistrationBase):
-    """Modify the payment status of a registration"""
+    """Modify the payment status of a registration."""
 
     def _process(self):
         pay = request.form.get('pay') == '1'
@@ -555,7 +555,7 @@ def _modify_registration_status(registration, approve):
 
 
 class RHRegistrationApprove(RHManageRegistrationBase):
-    """Accept a registration"""
+    """Accept a registration."""
 
     def _process(self):
         _modify_registration_status(self.registration, approve=True)
@@ -563,7 +563,7 @@ class RHRegistrationApprove(RHManageRegistrationBase):
 
 
 class RHRegistrationReject(RHManageRegistrationBase):
-    """Reject a registration"""
+    """Reject a registration."""
 
     def _process(self):
         _modify_registration_status(self.registration, approve=False)
@@ -571,7 +571,7 @@ class RHRegistrationReject(RHManageRegistrationBase):
 
 
 class RHRegistrationReset(RHManageRegistrationBase):
-    """Reset a registration back to a non-approved status"""
+    """Reset a registration back to a non-approved status."""
 
     def _process(self):
         if self.registration.has_conflict():
@@ -604,7 +604,7 @@ class RHRegistrationManageWithdraw(RHManageRegistrationBase):
 
 
 class RHRegistrationCheckIn(RHManageRegistrationBase):
-    """Set checked in state of a registration"""
+    """Set checked in state of a registration."""
 
     def _process_PUT(self):
         self.registration.checked_in = True
@@ -618,7 +618,7 @@ class RHRegistrationCheckIn(RHManageRegistrationBase):
 
 
 class RHRegistrationBulkCheckIn(RHRegistrationsActionBase):
-    """Bulk apply check-in/not checked-in state to registrations"""
+    """Bulk apply check-in/not checked-in state to registrations."""
 
     def _process(self):
         check_in = request.form['flag'] == '1'
@@ -632,7 +632,7 @@ class RHRegistrationBulkCheckIn(RHRegistrationsActionBase):
 
 
 class RHRegistrationsModifyStatus(RHRegistrationsActionBase):
-    """Accept/Reject selected registrations"""
+    """Accept/Reject selected registrations."""
 
     def _process(self):
         approve = request.form['flag'] == '1'
@@ -643,7 +643,7 @@ class RHRegistrationsModifyStatus(RHRegistrationsActionBase):
 
 
 class RHRegistrationsExportAttachments(RHRegistrationsExportBase, ZipGeneratorMixin):
-    """Export registration attachments in a zip file"""
+    """Export registration attachments in a zip file."""
 
     def _prepare_folder_structure(self, attachment):
         registration = attachment.registration

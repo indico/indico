@@ -49,7 +49,7 @@ class AgreementPersonInfo(object):
 
 
 class AgreementDefinitionBase(object):
-    """Base class for agreement definitions"""
+    """Base class for agreement definitions."""
 
     #: unique name of the agreement definition
     name = None
@@ -82,12 +82,12 @@ class AgreementDefinitionBase(object):
 
     @classmethod
     def can_access_api(cls, user, event):
-        """Checks if a user can list the agreements for an event"""
+        """Check if a user can list the agreements for an event."""
         return event.can_manage(user)
 
     @classmethod
     def extend_api_data(cls, event, person, agreement, data):  # pragma: no cover
-        """Extends the data returned in the HTTP API
+        """Extend the data returned in the HTTP API.
 
         :param event: the event
         :param person: the :class:`AgreementPersonInfo`
@@ -98,7 +98,9 @@ class AgreementDefinitionBase(object):
 
     @classmethod
     def get_email_body_template(cls, event, **kwargs):
-        """Returns the template of the email body for this agreement definition"""
+        """
+        Return the template of the email body for this agreement definition.
+        """
         template_name = cls.email_body_template_name or 'emails/agreement_default_body.html'
         template_path = get_overridable_template_name(template_name, cls.plugin, 'events/agreements/')
         return get_template_module(template_path, event=event)
@@ -106,7 +108,9 @@ class AgreementDefinitionBase(object):
     @classmethod
     @memoize_request
     def get_people(cls, event):
-        """Returns a dictionary of :class:`AgreementPersonInfo` required to sign agreements"""
+        """
+        Return a dictionary of :class:`AgreementPersonInfo` required to sign agreements.
+        """
         people = cls.iter_people(event)
         if people is None:
             return {}
@@ -114,14 +118,16 @@ class AgreementDefinitionBase(object):
 
     @classmethod
     def get_people_not_notified(cls, event):
-        """Returns a dictionary of :class:`AgreementPersonInfo` yet to be notified"""
+        """
+        Return a dictionary of :class:`AgreementPersonInfo` yet to be notified.
+        """
         people = cls.get_people(event)
         sent_agreements = {a.identifier for a in event.agreements.filter_by(type=cls.name)}
         return {k: v for k, v in people.items() if v.identifier not in sent_agreements}
 
     @classmethod
     def get_stats_for_signed_agreements(cls, event):
-        """Returns a digest of signed agreements on an event
+        """Return a digest of signed agreements on an event.
 
         :param event: the event
         :return: (everybody_signed, num_accepted, num_rejected)
@@ -136,12 +142,12 @@ class AgreementDefinitionBase(object):
 
     @classmethod
     def is_active(cls, event):
-        """Checks if the agreement type is active for a given event"""
+        """Check if the agreement type is active for a given event."""
         return bool(cls.get_people(event))
 
     @classmethod
     def is_agreement_orphan(cls, event, agreement):
-        """Checks if the agreement no longer has a corresponding person info record"""
+        """Check if the agreement no longer has a corresponding person info record."""
         return agreement.identifier not in cls.get_people(event)
 
     @classmethod
@@ -152,7 +158,7 @@ class AgreementDefinitionBase(object):
 
     @classmethod
     def render_data(cls, event, data):  # pragma: no cover
-        """Returns extra data to display in the agreement list
+        """Return extra data to display in the agreement list.
 
         If you want a column to be rendered as HTML, use a :class:`~markupsafe.Markup`
         object instead of a plain string.
@@ -165,20 +171,20 @@ class AgreementDefinitionBase(object):
 
     @classmethod
     def handle_accepted(cls, agreement):  # pragma: no cover
-        """Handles logic on agreement accepted"""
+        """Handle logic on agreement accepted."""
         pass
 
     @classmethod
     def handle_rejected(cls, agreement):  # pragma: no cover
-        """Handles logic on agreement rejected"""
+        """Handle logic on agreement rejected."""
         pass
 
     @classmethod
     def handle_reset(cls, agreement):  # pragma: no cover
-        """Handles logic on agreement reset"""
+        """Handle logic on agreement reset."""
         pass
 
     @classmethod
     def iter_people(cls, event):  # pragma: no cover
-        """Yields :class:`AgreementPersonInfo` required to sign agreements"""
+        """Yield :class:`AgreementPersonInfo` required to sign agreements."""
         raise NotImplementedError

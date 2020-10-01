@@ -38,7 +38,7 @@ def _render_invitation_list(regform):
 
 
 class RHRegistrationFormInvitations(RHManageRegFormBase):
-    """Overview of all registration invitations"""
+    """Overview of all registration invitations."""
 
     def _process(self):
         invitations = _query_invitation_list(self.regform)
@@ -47,7 +47,7 @@ class RHRegistrationFormInvitations(RHManageRegFormBase):
 
 
 class RHRegistrationFormInvite(RHManageRegFormBase):
-    """Invite someone to register"""
+    """Invite someone to register."""
 
     def _create_invitation(self, user, skip_moderation, email_from, email_subject, email_body):
         invitation = RegistrationInvitation(
@@ -94,7 +94,7 @@ class RHRegistrationFormInvitationBase(RHManageRegFormBase):
 
 
 class RHRegistrationFormDeleteInvitation(RHRegistrationFormInvitationBase):
-    """Delete a registration invitation"""
+    """Delete a registration invitation."""
 
     def _process(self):
         db.session.delete(self.invitation)

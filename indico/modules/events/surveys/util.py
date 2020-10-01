@@ -21,7 +21,7 @@ from indico.web.forms.base import IndicoForm
 
 
 def make_survey_form(survey):
-    """Creates a WTForm from survey questions.
+    """Create a WTForm from survey questions.
 
     Each question will use a field named ``question_ID``.
 
@@ -41,14 +41,14 @@ def make_survey_form(survey):
 
 
 def save_submitted_survey_to_session(submission):
-    """Save submission of a survey to session for further checks"""
+    """Save submission of a survey to session for further checks."""
     session.setdefault('submitted_surveys', {})[submission.survey.id] = submission.id
     session.modified = True
 
 
 @memoize_request
 def was_survey_submitted(survey):
-    """Check whether the current user has submitted a survey"""
+    """Check whether the current user has submitted a survey."""
     from indico.modules.events.surveys.models.surveys import Survey
     query = (Survey.query.with_parent(survey.event)
              .filter(Survey.submissions.any(db.and_(SurveySubmission.is_submitted,
@@ -63,7 +63,7 @@ def was_survey_submitted(survey):
 
 
 def is_submission_in_progress(survey):
-    """Check whether the current user has a survey submission in progress"""
+    """Check whether the current user has a survey submission in progress."""
     from indico.modules.events.surveys.models.surveys import Survey
     if session.user:
         query = (Survey.query.with_parent(survey.event)
@@ -76,7 +76,7 @@ def is_submission_in_progress(survey):
 
 
 def generate_spreadsheet_from_survey(survey, submission_ids):
-    """Generates spreadsheet data from a given survey.
+    """Generate spreadsheet data from a given survey.
 
     :param survey: `Survey` for which the user wants to export submissions
     :param submission_ids: The list of submissions to include in the file
@@ -116,7 +116,7 @@ def _filter_submissions(survey, submission_ids):
 
 
 def get_events_with_submitted_surveys(user, dt=None):
-    """Gets the IDs of events where the user submitted a survey.
+    """Get the IDs of events where the user submitted a survey.
 
     :param user: A `User`
     :param dt: Only include events taking place on/after that date

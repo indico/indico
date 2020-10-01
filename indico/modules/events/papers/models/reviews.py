@@ -38,7 +38,7 @@ class PaperTypeProxy(ProposalGroupProxy):
 
 
 class PaperJudgmentProxy(object):
-    """Represents a timeline item for the non final judgments"""
+    """A timeline item for the non final judgments."""
 
     timeline_item_type = 'judgment'
 
@@ -55,7 +55,7 @@ class PaperJudgmentProxy(object):
 
 
 class PaperCommentVisibility(RichIntEnum):
-    """Most to least restrictive visibility for paper comments"""
+    """Most to least restrictive visibility for paper comments."""
     __titles__ = [None,
                   _("Visible only to judges"),
                   _("Visible to reviewers and judges"),
@@ -68,7 +68,7 @@ class PaperCommentVisibility(RichIntEnum):
 
 
 class PaperReview(ProposalReviewMixin, RenderModeMixin, db.Model):
-    """Represents a paper review, emitted by a layout or content reviewer"""
+    """A paper review, emitted by a layout or content reviewer."""
 
     possible_render_modes = {RenderMode.markdown}
     default_render_mode = RenderMode.markdown

@@ -15,7 +15,7 @@ from indico.util.string import format_repr, return_ascii
 class SessionBlockPersonLink(PersonLinkBase):
     """Association between EventPerson and SessionBlock.
 
-    Also known as a 'session convener'
+    Also known as a 'session convener'.
     """
 
     __tablename__ = 'session_block_person_links'

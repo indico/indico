@@ -405,7 +405,7 @@ class RHLegacyTimetableFitBlock(RHManageTimetableBase):
 
 
 class RHLegacyTimetableMoveEntry(RHManageTimetableEntryBase):
-    """Moves a TimetableEntry into a Session or top-level timetable"""
+    """Move a TimetableEntry into a Session or top-level timetable."""
 
     def _process_GET(self):
         current_day = dateutil.parser.parse(request.args.get('day')).date()
@@ -483,7 +483,7 @@ class RHLegacyTimetableSwapEntries(RHManageTimetableEntryBase):
 
 
 class RHLegacyTimetableEditEntryDateTime(RHManageTimetableEntryBase):
-    """Changes the start_dt of a `TimetableEntry`"""
+    """Change the start_dt of a `TimetableEntry`."""
 
     @property
     def session_management_level(self):

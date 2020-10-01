@@ -61,7 +61,7 @@ class LocalGroup(db.Model):
 
     @property
     def proxy(self):
-        """Returns a GroupProxy wrapping this group"""
+        """Return a GroupProxy wrapping this group."""
         from indico.modules.groups import GroupProxy
         return GroupProxy(self.id, _group=self)
 

@@ -73,7 +73,7 @@ def _safe_lower(s):
 @click.option('--email', '-e', help='Email address of the user')
 @click.option('--affiliation', '-a', help='Affiliation of the user')
 def search(substring, include_deleted, include_pending, include_blocked, include_external, include_system, **criteria):
-    """Searches users matching some criteria"""
+    """Search users matching some criteria."""
     assert set(criteria.viewkeys()) == {'first_name', 'last_name', 'email', 'affiliation'}
     criteria = {k: v for k, v in criteria.viewitems() if v is not None}
     res = search_users(exact=(not substring), include_deleted=include_deleted, include_pending=include_pending,
@@ -111,7 +111,7 @@ def search(substring, include_deleted, include_pending, include_blocked, include
 @cli.command()
 @click.option('--admin/--no-admin', '-a/', 'grant_admin', is_flag=True, help='Grant admin rights')
 def create(grant_admin):
-    """Creates a new user"""
+    """Create a new user."""
     user_type = 'user' if not grant_admin else 'admin'
     while True:
         email = prompt_email()
@@ -149,7 +149,7 @@ def create(grant_admin):
 @cli.command()
 @click.argument('user_id', type=int)
 def grant_admin(user_id):
-    """Grants administration rights to a given user"""
+    """Grant administration rights to a given user."""
     user = User.get(user_id)
     if user is None:
         print(cformat("%{red}This user does not exist"))
@@ -167,7 +167,7 @@ def grant_admin(user_id):
 @cli.command()
 @click.argument('user_id', type=int)
 def revoke_admin(user_id):
-    """Revokes administration rights from a given user"""
+    """Revoke administration rights from a given user."""
     user = User.get(user_id)
     if user is None:
         print(cformat("%{red}This user does not exist"))
@@ -185,7 +185,7 @@ def revoke_admin(user_id):
 @cli.command()
 @click.argument('user_id', type=int)
 def block(user_id):
-    """Blocks a given user"""
+    """Block a given user."""
     user = User.get(user_id)
     if user is None:
         print(cformat("%{red}This user does not exist"))
@@ -203,7 +203,7 @@ def block(user_id):
 @cli.command()
 @click.argument('user_id', type=int)
 def unblock(user_id):
-    """Unblocks a given user"""
+    """Unblock a given user."""
     user = User.get(user_id)
     if user is None:
         print(cformat("%{red}This user does not exist"))

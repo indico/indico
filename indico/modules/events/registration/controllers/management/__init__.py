@@ -18,13 +18,13 @@ from indico.modules.events.registration.models.registrations import Registration
 
 
 class RHManageRegFormsBase(RHManageEventBase):
-    """Base class for all registration management RHs"""
+    """Base class for all registration management RHs."""
 
     PERMISSION = 'registration'
 
 
 class RHManageRegFormBase(RegistrationFormMixin, RHManageRegFormsBase):
-    """Base class for a specific registration form"""
+    """Base class for a specific registration form."""
 
     def _process_args(self):
         RHManageRegFormsBase._process_args(self)
@@ -33,7 +33,7 @@ class RHManageRegFormBase(RegistrationFormMixin, RHManageRegFormsBase):
 
 
 class RHManageRegistrationBase(RHManageRegFormBase):
-    """Base class for a specific registration"""
+    """Base class for a specific registration."""
 
     normalize_url_spec = {
         'locators': {

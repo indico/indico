@@ -89,8 +89,7 @@ def _render_template_list(target, event=None):
 
 
 class TemplateDesignerMixin:
-    """
-    Basic class for all template designer mixins.
+    """Basic class for all template designer mixins.
 
     It resolves the target object type from the blueprint URL.
     """
@@ -109,8 +108,7 @@ class TemplateDesignerMixin:
 
 
 class SpecificTemplateMixin(TemplateDesignerMixin):
-    """
-    Mixin that accepts a target template passed in the URL.
+    """Mixin that accepts a target template passed in the URL.
 
     The target category/event will be the owner of that template.
     """

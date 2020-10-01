@@ -39,7 +39,7 @@ class RHCategoryBase(RH):
 
 
 class RHDisplayCategoryBase(RHCategoryBase):
-    """Base class for category display pages"""
+    """Base class for category display pages."""
 
     def _check_access(self):
         if not self.category.can_access(session.user):

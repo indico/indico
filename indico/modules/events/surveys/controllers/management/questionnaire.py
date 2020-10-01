@@ -33,7 +33,7 @@ from indico.web.util import jsonify_data, jsonify_form, jsonify_template
 
 
 class RHManageSurveyQuestionnaire(RHManageSurveyBase):
-    """Manage the questionnaire of a survey (question overview page)"""
+    """Manage the questionnaire of a survey (question overview page)."""
 
     def _process(self):
         field_types = get_field_types()
@@ -43,7 +43,7 @@ class RHManageSurveyQuestionnaire(RHManageSurveyBase):
 
 
 class RHExportSurveyQuestionnaire(RHManageSurveyBase):
-    """Export the questionnaire to JSON format"""
+    """Export the questionnaire to JSON format."""
 
     def _process(self):
         sections = [section.to_dict() for section in self.survey.sections]
@@ -53,7 +53,7 @@ class RHExportSurveyQuestionnaire(RHManageSurveyBase):
 
 
 class RHImportSurveyQuestionnaire(RHManageSurveyBase):
-    """Import a questionnaire in JSON format"""
+    """Import a questionnaire in JSON format."""
 
     def _remove_false_values(self, data):
         # The forms consider a missing key as False (and a False value as True)
@@ -119,7 +119,7 @@ class RHImportSurveyQuestionnaire(RHManageSurveyBase):
 
 
 class RHManageSurveySectionBase(RHManageSurveysBase):
-    """Base class for RHs that deal with a specific survey section"""
+    """Base class for RHs that deal with a specific survey section."""
 
     normalize_url_spec = {
         'locators': {
@@ -136,7 +136,7 @@ class RHManageSurveySectionBase(RHManageSurveysBase):
 
 
 class RHManageSurveyTextBase(RHManageSurveysBase):
-    """Base class for RHs that deal with a specific survey text item"""
+    """Base class for RHs that deal with a specific survey text item."""
 
     normalize_url_spec = {
         'locators': {
@@ -152,7 +152,7 @@ class RHManageSurveyTextBase(RHManageSurveysBase):
 
 
 class RHManageSurveyQuestionBase(RHManageSurveysBase):
-    """Base class for RHs that deal with a specific survey question"""
+    """Base class for RHs that deal with a specific survey question."""
 
     normalize_url_spec = {
         'locators': {
@@ -169,7 +169,7 @@ class RHManageSurveyQuestionBase(RHManageSurveysBase):
 
 
 class RHAddSurveySection(RHManageSurveyBase):
-    """Add a new section to a survey"""
+    """Add a new section to a survey."""
 
     def _process(self):
         form = SectionForm()
@@ -185,7 +185,7 @@ class RHAddSurveySection(RHManageSurveyBase):
 
 
 class RHEditSurveySection(RHManageSurveySectionBase):
-    """Edit a survey section"""
+    """Edit a survey section."""
 
     def _process(self):
         form = SectionForm(obj=FormDefaults(self.section))
@@ -204,7 +204,7 @@ class RHEditSurveySection(RHManageSurveySectionBase):
 
 
 class RHDeleteSurveySection(RHManageSurveySectionBase):
-    """Delete a survey section and all its questions"""
+    """Delete a survey section and all its questions."""
 
     def _process(self):
         db.session.delete(self.section)
@@ -219,7 +219,7 @@ class RHDeleteSurveySection(RHManageSurveySectionBase):
 
 
 class RHAddSurveyText(RHManageSurveySectionBase):
-    """Add a new text item to a survey"""
+    """Add a new text item to a survey."""
 
     def _process(self):
         form = TextForm()
@@ -231,7 +231,7 @@ class RHAddSurveyText(RHManageSurveySectionBase):
 
 
 class RHEditSurveyText(RHManageSurveyTextBase):
-    """Edit a survey text item"""
+    """Edit a survey text item."""
 
     def _process(self):
         form = TextForm(obj=FormDefaults(self.text))
@@ -245,7 +245,7 @@ class RHEditSurveyText(RHManageSurveyTextBase):
 
 
 class RHDeleteSurveyText(RHManageSurveyTextBase):
-    """Delete a survey text item"""
+    """Delete a survey text item."""
 
     def _process(self):
         db.session.delete(self.text)
@@ -256,7 +256,7 @@ class RHDeleteSurveyText(RHManageSurveyTextBase):
 
 
 class RHAddSurveyQuestion(RHManageSurveySectionBase):
-    """Add a new question to a survey"""
+    """Add a new question to a survey."""
 
     def _process(self):
         try:
@@ -285,7 +285,7 @@ class RHAddSurveyQuestion(RHManageSurveySectionBase):
 
 
 class RHEditSurveyQuestion(RHManageSurveyQuestionBase):
-    """Edit a survey question"""
+    """Edit a survey question."""
 
     def _process(self):
         form = self.question.field.create_config_form(obj=FormDefaults(self.question, **self.question.field_data))
@@ -300,7 +300,7 @@ class RHEditSurveyQuestion(RHManageSurveyQuestionBase):
 
 
 class RHDeleteSurveyQuestion(RHManageSurveyQuestionBase):
-    """Delete a survey question"""
+    """Delete a survey question."""
 
     def _process(self):
         db.session.delete(self.question)
@@ -311,7 +311,7 @@ class RHDeleteSurveyQuestion(RHManageSurveyQuestionBase):
 
 
 class RHSortSurveyItems(RHManageSurveyBase):
-    """Sort survey items/sections and/or move items them between sections"""
+    """Sort survey items/sections and/or move items them between sections."""
 
     def _sort_sections(self):
         sections = {section.id: section for section in self.survey.sections}

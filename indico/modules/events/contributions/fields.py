@@ -17,7 +17,7 @@ from indico.web.forms.widgets import JinjaWidget
 
 
 class ContributionPersonLinkListField(PersonLinkListFieldBase):
-    """A field to configure a list of contribution persons"""
+    """A field to configure a list of contribution persons."""
 
     person_link_cls = ContributionPersonLink
     linked_object_attr = 'contrib'
@@ -57,7 +57,7 @@ class ContributionPersonLinkListField(PersonLinkListFieldBase):
 
 
 class SubContributionPersonLinkListField(ContributionPersonLinkListField):
-    """A field to configure a list of subcontribution persons"""
+    """A field to configure a list of subcontribution persons."""
 
     person_link_cls = SubContributionPersonLink
     linked_object_attr = 'subcontrib'

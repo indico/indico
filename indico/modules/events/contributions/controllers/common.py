@@ -13,7 +13,7 @@ from indico.modules.events.contributions import contribution_settings
 
 
 class ContributionListMixin:
-    """Display list of contributions"""
+    """Display list of contributions."""
 
     view_class = None
     template = None

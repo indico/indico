@@ -39,7 +39,7 @@ def email_sender(fn):
 
 
 def send_email(email, event=None, module=None, user=None, log_metadata=None):
-    """Sends an email created by :func:`make_email`.
+    """Send an email created by :func:`make_email`.
 
     When called while inside a RH, the email will be queued and only
     sent or passed on to celery once the database commit succeeded.
@@ -122,7 +122,7 @@ def flush_email_queue():
 
 def make_email(to_list=None, cc_list=None, bcc_list=None, from_address=None, reply_address=None, attachments=None,
                subject=None, body=None, template=None, html=False):
-    """Creates an email.
+    """Create an email.
 
     The preferred way to specify the email content is using the
     `template` argument. To do so, use :func:`.get_template_module` on

@@ -33,7 +33,7 @@ RENDER_MODE_WRAPPER_MAP = {
 
 
 class RenderModeMixin(object):
-    """Mixin to add a  plaintext/html/markdown-enabled column."""
+    """Mixin to add a plaintext/html/markdown-enabled column."""
 
     possible_render_modes = {RenderMode.plain_text}
     default_render_mode = RenderMode.plain_text

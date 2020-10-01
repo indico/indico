@@ -70,29 +70,29 @@ def _render(template, raises=None):
 
 
 def test_ensure_unicode_simple_vars():
-    """Test simple variables"""
+    """Test simple variables."""
     _render('{{ val }}')
 
 
 def test_ensure_unicode_func_args():
-    """Test function arguments (no automated unicode conversion!)"""
+    """Test function arguments (no automated unicode conversion!)."""
     _render('{{ func(val | ensure_unicode) }}')
     _render('{{ func(val) }}', UnicodeDecodeError)
 
 
 def test_ensure_unicode_filter_vars():
-    """Test variables with filters"""
+    """Test variables with filters."""
     _render('{{ val | ensure_unicode }}')  # Redundant but needs to work nonetheless
     _render('{{ val | safe }}')
 
 
 def test_ensure_unicode_inline_if():
-    """Test variables with inline if"""
+    """Test variables with inline if."""
     _render('x {{ val if true else val }} x {{ val if false else val }} x')
     _render('x {{ val|safe if true else val|safe }} x {{ val|safe if false else val|safe }} x')
 
 
 def test_ensure_unicode_trans():
-    """Test trans tag which need explicit unicode conversion"""
+    """Test trans tag which need explicit unicode conversion."""
     _render('{% trans x=val | ensure_unicode %}{{ x }}}{% endtrans %}')
     _render('{% trans x=val %}{{ x }}}{% endtrans %}', UnicodeDecodeError)

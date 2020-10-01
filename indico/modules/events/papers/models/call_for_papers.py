@@ -17,7 +17,7 @@ from indico.util.string import MarkdownText, return_ascii
 
 
 class CallForPapers(object):
-    """Proxy class to facilitate access to the call for papers settings"""
+    """Proxy class to facilitate access to the call for papers settings."""
 
     def __init__(self, event):
         self.event = event

@@ -33,7 +33,7 @@ BADGE_SETTING_CONVERTERS = {
 
 
 class RegistrationSettingsProxy(EventSettingsProxy):
-    """Store per-event registration settings"""
+    """Store per-event registration settings."""
 
     def get_participant_list_columns(self, event, form=None):
         if form is None:

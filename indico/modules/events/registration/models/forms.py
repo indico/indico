@@ -39,7 +39,7 @@ class ModificationMode(RichIntEnum):
 
 
 class RegistrationForm(db.Model):
-    """A registration form for an event"""
+    """A registration form for an event."""
 
     __tablename__ = 'forms'
     principal_type = PrincipalType.registration_form
@@ -401,7 +401,7 @@ class RegistrationForm(db.Model):
         return '<RegistrationForm({}, {}, {})>'.format(self.id, self.event_id, self.title)
 
     def is_modification_allowed(self, registration):
-        """Checks whether a registration may be modified"""
+        """Check whether a registration may be modified."""
         if not registration.is_active:
             return False
         elif self.modification_mode == ModificationMode.allowed_always:
@@ -416,7 +416,7 @@ class RegistrationForm(db.Model):
 
     @memoize_request
     def get_registration(self, user=None, uuid=None, email=None):
-        """Retrieves registrations for this registration form by user or uuid"""
+        """Retrieve registrations for this registration form by user or uuid."""
         if (bool(user) + bool(uuid) + bool(email)) != 1:
             raise ValueError("Exactly one of `user`, `uuid` and `email` must be specified")
         if user:
@@ -434,7 +434,7 @@ class RegistrationForm(db.Model):
         return format_currency(self.base_price, self.currency, locale=session.lang or 'en_GB')
 
     def get_personal_data_field_id(self, personal_data_type):
-        """Returns the field id corresponding to the personal data field with the given name."""
+        """Return the field id corresponding to the personal data field with the given name."""
         for field in self.active_fields:
             if (isinstance(field, RegistrationFormPersonalDataField) and
                     field.personal_data_type == personal_data_type):

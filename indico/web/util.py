@@ -20,7 +20,7 @@ from indico.web.flask.templating import get_template_module
 
 
 def inject_js(js):
-    """Injects JavaScript into the current page.
+    """Inject JavaScript into the current page.
 
     :param js: Code wrapped in a ``<script>`` tag.
     """
@@ -40,9 +40,9 @@ def _pop_injected_js():
 def jsonify_form(form, fields=None, submit=None, back=None, back_url=None, back_button=True, disabled_until_change=True,
                  disabled_fields=(), form_header_kwargs=None, skip_labels=False, save_reminder=False,
                  footer_align_right=False, disable_if_locked=True, message=None):
-    """Returns a json response containing a rendered WTForm.
+    """Return a json response containing a rendered WTForm.
 
-    This ia shortcut to the ``simple_form`` jinja macro to avoid
+    This is shortcut to the ``simple_form`` jinja macro to avoid
     adding new templates that do nothing besides importing and
     calling this macro.
 
@@ -82,7 +82,7 @@ def jsonify_form(form, fields=None, submit=None, back=None, back_url=None, back_
 
 
 def jsonify_template(template, _render_func=render_template, _success=None, **context):
-    """Returns a json response containing a rendered template"""
+    """Return a json response containing a rendered template."""
     html = _render_func(template, **context)
     jsonify_kw = {}
     if _success is not None:
@@ -91,7 +91,7 @@ def jsonify_template(template, _render_func=render_template, _success=None, **co
 
 
 def jsonify_data(flash=True, **json_data):
-    """Returns a json response with some default fields.
+    """Return a json response with some default fields.
 
     This behaves similar to :func:`~flask.jsonify`, but includes
     ``success=True`` and flashed messages by default.
@@ -136,7 +136,7 @@ def _format_request_data(data, hide_passwords=False):
 
 
 def get_request_info(hide_passwords=True):
-    """Gets various information about the current HTTP request.
+    """Get various information about the current HTTP request.
 
     This is especially useful for logging purposes where you want
     as many information as possible.

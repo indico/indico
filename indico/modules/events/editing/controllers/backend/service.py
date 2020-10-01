@@ -102,7 +102,7 @@ class RHDisconnectService(RHEditingManagementBase):
 
 
 class RHServiceStatus(RHEditingManagementBase):
-    """Get the status of the currently connected service"""
+    """Get the status of the currently connected service."""
 
     def _process(self):
         if not editing_settings.get(self.event, 'service_url'):

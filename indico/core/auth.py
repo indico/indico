@@ -33,7 +33,7 @@ class IndicoMultipass(Multipass):
 
     @property
     def synced_fields(self):
-        """The keys to be synchronized
+        """The keys to be synchronized.
 
         This is the set of keys to be synced to user data.
         The ``email`` can never be synchronized.

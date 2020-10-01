@@ -68,7 +68,7 @@ class _EventSettingProperty(EventSettingProperty):
 
 class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionManagersMixin, AttachedItemsMixin,
             AttachedNotesMixin, PersonLinkDataMixin, db.Model):
-    """An Indico event
+    """An Indico event.
 
     This model contains the most basic information related to an event.
 
@@ -468,7 +468,7 @@ class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionMan
 
     @property
     def event(self):
-        """Convenience property so all event entities have it"""
+        """Convenience property so all event entities have it."""
         return self
 
     @property
@@ -594,7 +594,7 @@ class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionMan
 
     @property
     def display_tzinfo(self):
-        """The tzinfo of the event as preferred by the current user"""
+        """The tzinfo of the event as preferred by the current user."""
         return get_display_tz(self, as_timezone=True)
 
     @property
@@ -617,7 +617,7 @@ class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionMan
     @property
     @contextmanager
     def logging_disabled(self):
-        """Temporarily disables event logging
+        """Temporarily disable event logging.
 
         This is useful when performing actions e.g. during event
         creation or at other times where adding entries to the event
@@ -631,7 +631,7 @@ class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionMan
 
     @hybrid_method
     def happens_between(self, from_dt=None, to_dt=None):
-        """Check whether the event takes place within two dates"""
+        """Check whether the event takes place within two dates."""
         if from_dt is not None and to_dt is not None:
             # any event that takes place during the specified range
             return overlaps((self.start_dt, self.end_dt), (from_dt, to_dt), inclusive=True)
@@ -660,7 +660,7 @@ class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionMan
 
     @hybrid_method
     def starts_between(self, from_dt=None, to_dt=None):
-        """Check whether the event starts within two dates"""
+        """Check whether the event starts within two dates."""
         if from_dt is not None and to_dt is not None:
             return from_dt <= self.start_dt <= to_dt
         elif from_dt is not None:
@@ -683,7 +683,7 @@ class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionMan
 
     @hybrid_method
     def ends_after(self, dt):
-        """Check whether the event ends on/after the specified date"""
+        """Check whether the event ends on/after the specified date."""
         return self.end_dt >= dt if dt is not None else True
 
     @ends_after.expression
@@ -695,7 +695,7 @@ class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionMan
         return self.end_dt - self.start_dt
 
     def can_lock(self, user):
-        """Check whether the user can lock/unlock the event"""
+        """Check whether the user can lock/unlock the event."""
         return user and (user.is_admin or user == self.creator or self.category.can_manage(user))
 
     def can_display(self, user):
@@ -731,7 +731,7 @@ class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionMan
         return rv
 
     def get_verbose_title(self, show_speakers=False, show_series_pos=False):
-        """Get the event title with some additional information
+        """Get the event title with some additional information.
 
         :param show_speakers: Whether to prefix the title with the
                               speakers of the event.
@@ -754,21 +754,21 @@ class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionMan
         return Markup(render_template('events/label.html', label=label, message=self.label_message, size=size))
 
     def get_non_inheriting_objects(self):
-        """Get a set of child objects that do not inherit protection"""
+        """Get a set of child objects that do not inherit protection."""
         return get_non_inheriting_objects(self)
 
     def get_contribution(self, id_):
-        """Get a contribution of the event"""
+        """Get a contribution of the event."""
         return get_related_object(self, 'contributions', {'id': id_})
 
     def get_sorted_tracks(self):
-        """Return tracks and track groups in the correct order"""
+        """Return tracks and track groups in the correct order."""
         track_groups = self.track_groups
         tracks = [track for track in self.tracks if not track.track_group]
         return sorted(tracks + track_groups, key=attrgetter('position'))
 
     def get_session(self, id_=None, friendly_id=None):
-        """Get a session of the event"""
+        """Get a session of the event."""
         if friendly_id is None and id_ is not None:
             criteria = {'id': id_}
         elif id_ is None and friendly_id is not None:
@@ -778,7 +778,7 @@ class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionMan
         return get_related_object(self, 'sessions', criteria)
 
     def get_session_block(self, id_, scheduled_only=False):
-        """Get a session block of the event"""
+        """Get a session block of the event."""
         from indico.modules.events.sessions.models.blocks import SessionBlock
         query = SessionBlock.query.filter(SessionBlock.id == id_,
                                           SessionBlock.session.has(event=self, is_deleted=False))
@@ -837,7 +837,7 @@ class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionMan
 
     @memoize_request
     def has_feature(self, feature):
-        """Check if a feature is enabled for the event"""
+        """Check if a feature is enabled for the event."""
         from indico.modules.events.features.util import is_feature_enabled
         return is_feature_enabled(self, feature)
 
@@ -881,7 +881,7 @@ class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionMan
         return next((v for v in self.contribution_fields if v.id == field_id), '')
 
     def move_start_dt(self, start_dt):
-        """Set event start_dt and adjust its timetable entries"""
+        """Set event start_dt and adjust its timetable entries."""
         diff = start_dt - self.start_dt
         for entry in self.timetable_entries.filter(TimetableEntry.parent_id.is_(None)):
             new_dt = entry.start_dt + diff

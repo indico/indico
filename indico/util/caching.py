@@ -41,7 +41,7 @@ def memoize(obj):
 
 
 def memoize_request(f):
-    """Memoize a function during the current request"""
+    """Memoize a function during the current request."""
     @wraps(f)
     def memoizer(*args, **kwargs):
         if not has_request_context() or current_app.config['TESTING'] or current_app.config.get('REPL'):
@@ -62,7 +62,7 @@ def memoize_request(f):
 
 
 def memoize_redis(ttl):
-    """Memoize a function in redis
+    """Memoize a function in redis.
 
     The cached value can be cleared by calling the method
     ``clear_cached()`` of the decorated function with the same

@@ -55,7 +55,9 @@ class PosterPDF(DesignerPDFBase):
             self._draw_item(canvas, item, tpl_data, text, config.margin_horizontal, config.margin_vertical)
 
     def _draw_poster(self, canvas, registration, pos_x, pos_y):
-        """Draw a badge for a given registration, at position pos_x, pos_y (top-left corner).
+        """
+        Draw a badge for a given registration, at position pos_x,
+        pos_y (top-left corner).
         """
         config = self.config
         tpl_data = self.tpl_data

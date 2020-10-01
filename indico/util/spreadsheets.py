@@ -61,7 +61,7 @@ def _prepare_csv_data(data, _linebreak_re=re.compile(r'(\r?\n)+'), _dangerous_ch
 
 
 def generate_csv(headers, rows):
-    """Generates a CSV file from a list of headers and rows.
+    """Generate a CSV file from a list of headers and rows.
 
     While CSV cells may contain multiline data, we replace linebreaks
     with spaces in case someone wants to use it in Excel which does
@@ -97,7 +97,7 @@ def _prepare_excel_data(data, tz=None):
 
 
 def generate_xlsx(headers, rows, tz=None):
-    """Generates an XLSX file from a list of headers and rows.
+    """Generate an XLSX file from a list of headers and rows.
 
     :param headers: a list of cell captions
     :param rows: a list of dicts mapping captions to values
@@ -122,7 +122,7 @@ def generate_xlsx(headers, rows, tz=None):
 
 
 def send_csv(filename, headers, rows):
-    """Sends a CSV file to the client
+    """Send a CSV file to the client.
 
     :param filename: The name of the CSV file
     :param headers: a list of cell captions
@@ -134,7 +134,7 @@ def send_csv(filename, headers, rows):
 
 
 def send_xlsx(filename, headers, rows, tz=None):
-    """Sends an XLSX file to the client
+    """Send an XLSX file to the client.
 
     :param filename: The name of the CSV file
     :param headers: a list of cell captions

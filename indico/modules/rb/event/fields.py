@@ -38,14 +38,18 @@ class LinkedObjectField(Field):
 
 
 class ContributionField(LinkedObjectField):
-    """A selectize-based field to select a contribution that has no reservation yet."""
+    """
+    A selectize-based field to select a contribution that has no reservation yet.
+    """
     def __init__(self, *args, **kwargs):
         kwargs.setdefault('render_kw', {}).setdefault('placeholder', _('Enter contribution title or #id'))
         super(ContributionField, self).__init__(*args, **kwargs)
 
 
 class SessionBlockField(LinkedObjectField):
-    """A selectize-based field to select a session block that has no reservation yet."""
+    """
+    A selectize-based field to select a session block that has no reservation yet.
+    """
     def __init__(self, *args, **kwargs):
         kwargs.setdefault('render_kw', {}).setdefault('placeholder', _('Enter session block title'))
         super(SessionBlockField, self).__init__(*args, **kwargs)

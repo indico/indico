@@ -25,7 +25,7 @@ class SessionManagementLevel(Enum):
 
 
 class RHManageTimetableBase(RHManageEventBase):
-    """Base class for all timetable management RHs"""
+    """Base class for all timetable management RHs."""
 
     session_management_level = SessionManagementLevel.none
 

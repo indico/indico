@@ -38,7 +38,7 @@ from indico.web.util import jsonify_data, jsonify_form, jsonify_template
 
 
 class RHManageRegistrationForms(RHManageRegFormsBase):
-    """List all registrations forms for an event"""
+    """List all registrations forms for an event."""
 
     def _process(self):
         regforms = (RegistrationForm.query
@@ -49,7 +49,7 @@ class RHManageRegistrationForms(RHManageRegFormsBase):
 
 
 class RHManageRegistrationFormsDisplay(RHManageRegFormsBase):
-    """Customize the display of registrations on the public page"""
+    """Customize the display of registrations on the public page."""
 
     def _process(self):
         regforms = sorted(self.event.registration_forms, key=lambda f: f.title.lower())
@@ -104,7 +104,10 @@ class RHManageRegistrationFormsDisplay(RHManageRegFormsBase):
 
 
 class RHManageRegistrationFormDisplay(RHManageRegFormBase):
-    """Choose the columns to be shown on the participant list for a particular form"""
+    """
+    Choose the columns to be shown on the participant list for
+    a particular form.
+    """
 
     def _process(self):
         form = ParticipantsDisplayFormColumnsForm()
@@ -129,7 +132,7 @@ class RHManageRegistrationFormDisplay(RHManageRegFormBase):
 
 
 class RHManageParticipants(RHManageRegFormsBase):
-    """Show and enable the dummy registration form for participants"""
+    """Show and enable the dummy registration form for participants."""
 
     def _process_POST(self):
         regform = self.event.participation_regform
@@ -155,7 +158,7 @@ class RHManageParticipants(RHManageRegFormsBase):
 
 
 class RHRegistrationFormCreate(RHManageRegFormsBase):
-    """Creates a new registration form"""
+    """Create a new registration form."""
 
     def _process(self):
         form = RegistrationFormForm(event=self.event,
@@ -176,14 +179,14 @@ class RHRegistrationFormCreate(RHManageRegFormsBase):
 
 
 class RHRegistrationFormManage(RHManageRegFormBase):
-    """Specific registration form management"""
+    """Specific registration form management."""
 
     def _process(self):
         return WPManageRegistration.render_template('management/regform.html', self.event, regform=self.regform)
 
 
 class RHRegistrationFormEdit(RHManageRegFormBase):
-    """Edit a registration form"""
+    """Edit a registration form."""
 
     def _get_form_defaults(self):
         return FormDefaults(self.regform, limit_registrations=self.regform.registration_limit is not None)
@@ -201,7 +204,7 @@ class RHRegistrationFormEdit(RHManageRegFormBase):
 
 
 class RHRegistrationFormDelete(RHManageRegFormBase):
-    """Delete a registration form"""
+    """Delete a registration form."""
 
     def _process(self):
         self.regform.is_deleted = True
@@ -212,7 +215,7 @@ class RHRegistrationFormDelete(RHManageRegFormBase):
 
 
 class RHRegistrationFormOpen(RHManageRegFormBase):
-    """Opens registration for a registration form"""
+    """Open registration for a registration form."""
 
     def _process(self):
         old_dts = (self.regform.start_dt, self.regform.end_dt)
@@ -233,7 +236,7 @@ class RHRegistrationFormOpen(RHManageRegFormBase):
 
 
 class RHRegistrationFormClose(RHManageRegFormBase):
-    """Closes registrations for a registration form"""
+    """Close registrations for a registration form."""
 
     def _process(self):
         self.regform.end_dt = now_utc()
@@ -247,7 +250,7 @@ class RHRegistrationFormClose(RHManageRegFormBase):
 
 
 class RHRegistrationFormSchedule(RHManageRegFormBase):
-    """Schedules registrations for a registration form"""
+    """Schedule registrations for a registration form."""
 
     def _process(self):
         form = RegistrationFormScheduleForm(obj=FormDefaults(self.regform), regform=self.regform)
@@ -262,7 +265,7 @@ class RHRegistrationFormSchedule(RHManageRegFormBase):
 
 
 class RHRegistrationFormModify(RHManageRegFormBase):
-    """Modify the form of a registration form"""
+    """Modify the form of a registration form."""
 
     def _process(self):
         return WPManageRegistration.render_template('management/regform_modify.html', self.event,
@@ -271,7 +274,7 @@ class RHRegistrationFormModify(RHManageRegFormBase):
 
 
 class RHRegistrationFormStats(RHManageRegFormBase):
-    """Display registration form stats page"""
+    """Display registration form stats page."""
 
     def _process(self):
         regform_stats = [OverviewStats(self.regform)]
@@ -281,7 +284,7 @@ class RHRegistrationFormStats(RHManageRegFormBase):
 
 
 class RHManageRegistrationManagers(RHManageRegFormsBase):
-    """Modify event managers with registration role"""
+    """Modify event managers with registration role."""
 
     def _process(self):
         reg_managers = {p.principal for p in self.event.acl_entries

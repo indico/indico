@@ -57,7 +57,7 @@ class EventMessageMode(RichIntEnum):
 
 
 class Category(SearchableTitleMixin, DescriptionMixin, ProtectionManagersMixin, AttachedItemsMixin, db.Model):
-    """An Indico category"""
+    """An Indico category."""
 
     __tablename__ = 'categories'
     disallowed_protection_modes = frozenset()
@@ -248,7 +248,7 @@ class Category(SearchableTitleMixin, DescriptionMixin, ProtectionManagersMixin, 
 
     @classmethod
     def get_root(cls):
-        """Get the root category"""
+        """Get the root category."""
         return cls.query.filter(cls.is_root).one()
 
     @property
@@ -289,7 +289,7 @@ class Category(SearchableTitleMixin, DescriptionMixin, ProtectionManagersMixin, 
 
     @property
     def display_tzinfo(self):
-        """The tzinfo of the category or the one specified by the user"""
+        """The tzinfo of the category or the one specified by the user."""
         return get_display_tz(self, as_timezone=True)
 
     def can_create_events(self, user):
@@ -459,7 +459,10 @@ class Category(SearchableTitleMixin, DescriptionMixin, ProtectionManagersMixin, 
 
     @property
     def own_visibility_horizon(self):
-        """Get the highest category this one would like to be visible from (configured visibility)."""
+        """
+        Get the highest category this one would like to be visible
+        from (configured visibility).
+        """
         if self.visibility is None:
             return Category.get_root()
         else:
@@ -467,7 +470,10 @@ class Category(SearchableTitleMixin, DescriptionMixin, ProtectionManagersMixin, 
 
     @property
     def real_visibility_horizon(self):
-        """Get the highest category this one is actually visible from (as limited by categories above)."""
+        """
+        Get the highest category this one is actually visible
+        from (as limited by categories above).
+        """
         horizon_id, final_visibility = self.visibility_horizon_query.one()
         if final_visibility is not None and final_visibility < 0:
             return None  # Category is invisible

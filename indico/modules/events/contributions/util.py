@@ -42,8 +42,9 @@ from indico.web.util import jsonify_data
 
 
 def get_events_with_linked_contributions(user, dt=None):
-    """Returns a dict with keys representing event_id and the values containing
-    data about the user rights for contributions within the event
+    """
+    Return a dict with keys representing event_id and the values containing
+    data about the user rights for contributions within the event.
 
     :param user: A `User`
     :param dt: Only include events taking place on/after that date
@@ -88,7 +89,7 @@ def get_events_with_linked_contributions(user, dt=None):
 
 
 def serialize_contribution_person_link(person_link, is_submitter=None):
-    """Serialize ContributionPersonLink to JSON-like object"""
+    """Serialize ContributionPersonLink to JSON-like object."""
     data = serialize_person_link(person_link)
     data['isSpeaker'] = person_link.is_speaker
     if not isinstance(person_link, SubContributionPersonLink):
@@ -130,8 +131,10 @@ def sort_contribs(contribs, sort_by):
 
 
 def generate_spreadsheet_from_contributions(contributions):
-    """Return a tuple consisting of spreadsheet columns and respective
-    contribution values"""
+    """
+    Return a tuple consisting of spreadsheet columns and respective
+    contribution values.
+    """
 
     has_board_number = any(c.board_number for c in contributions)
     has_authors = any(pl.author_type != AuthorType.none for c in contributions for pl in c.person_links)
@@ -174,7 +177,7 @@ def generate_spreadsheet_from_contributions(contributions):
 
 
 def make_contribution_form(event):
-    """Extends the contribution WTForm to add the extra fields.
+    """Extend the contribution WTForm to add the extra fields.
 
     Each extra field will use a field named ``custom_ID``.
 
@@ -207,7 +210,7 @@ def _query_contributions_with_user_as_submitter(event, user):
 
 
 def get_contributions_with_user_as_submitter(event, user):
-    """Get a list of contributions in which the `user` has submission rights"""
+    """Get a list of contributions in which the `user` has submission rights."""
     return (_query_contributions_with_user_as_submitter(event, user)
             .options(joinedload('acl_entries'))
             .order_by(db.func.lower(Contribution.title))

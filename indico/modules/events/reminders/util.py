@@ -12,7 +12,7 @@ from indico.web.flask.templating import get_template_module
 
 
 def make_reminder_email(event, with_agenda, with_description, note):
-    """Returns the template module for the reminder email.
+    """Return the template module for the reminder email.
 
     :param event: The event
     :param with_agenda: If the event's agenda should be included

@@ -24,7 +24,7 @@ from indico.web.flask.util import url_for
 
 
 class RHSurveyResults(RHManageSurveyBase):
-    """Displays summarized results of the survey"""
+    """Display summarized results of the survey."""
 
     def _process_args(self):
         RHManageSurveysBase._process_args(self)
@@ -39,7 +39,7 @@ class RHSurveyResults(RHManageSurveyBase):
 
 
 class RHExportSubmissionsBase(RHManageSurveyBase):
-    """Export submissions from the survey"""
+    """Export submissions from the survey."""
 
     CSRF_ENABLED = False
     ALLOW_LOCKED = True
@@ -59,14 +59,14 @@ class RHExportSubmissionsBase(RHManageSurveyBase):
 
 
 class RHExportSubmissionsCSV(RHExportSubmissionsBase):
-    """Export submissions as CSV"""
+    """Export submissions as CSV."""
 
     def _export(self, filename, headers, rows):
         return send_csv(filename + '.csv', headers, rows)
 
 
 class RHExportSubmissionsExcel(RHExportSubmissionsBase):
-    """Export submissions as XLSX"""
+    """Export submissions as XLSX."""
 
     def _export(self, filename, headers, rows):
         return send_xlsx(filename + '.xlsx', headers, rows, tz=self.event.tzinfo)
@@ -91,7 +91,7 @@ class RHSurveySubmissionBase(RHManageSurveysBase):
 
 
 class RHDeleteSubmissions(RHManageSurveyBase):
-    """Remove submissions from the survey"""
+    """Remove submissions from the survey."""
 
     def _process(self):
         submission_ids = set(map(int, request.form.getlist('submission_ids')))
@@ -107,7 +107,7 @@ class RHDeleteSubmissions(RHManageSurveyBase):
 
 
 class RHDisplaySubmission(RHSurveySubmissionBase):
-    """Display a single submission-page"""
+    """Display a single submission-page."""
 
     def _process(self):
         answers = {answer.question_id: answer for answer in self.submission.answers}

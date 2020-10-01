@@ -31,7 +31,7 @@ from indico.web.util import jsonify_data
 
 
 class RHManageTimetable(RHManageTimetableBase):
-    """Display timetable management page"""
+    """Display timetable management page."""
 
     session_management_level = SessionManagementLevel.coordinate
 
@@ -63,7 +63,7 @@ class RHManageSessionTimetable(RHManageTimetableBase):
 
 
 class RHTimetableREST(RHManageTimetableEntryBase):
-    """RESTful timetable actions"""
+    """RESTful timetable actions."""
 
     def _get_contribution_updates(self, data):
         updates = {'parent': None}
@@ -89,7 +89,7 @@ class RHTimetableREST(RHManageTimetableEntryBase):
         return updates
 
     def _process_POST(self):
-        """Create new timetable entry"""
+        """Create new timetable entry."""
         data = request.json
         required_keys = {'start_dt'}
         allowed_keys = {'start_dt', 'contribution_id', 'session_block_id', 'force'}
@@ -107,7 +107,7 @@ class RHTimetableREST(RHManageTimetableEntryBase):
         return jsonify(start_dt=entry.start_dt.isoformat(), id=entry.id)
 
     def _process_PATCH(self):
-        """Update a timetable entry"""
+        """Update a timetable entry."""
         data = request.json
         # TODO: support breaks
         if set(data.viewkeys()) > {'start_dt'}:
@@ -121,7 +121,7 @@ class RHTimetableREST(RHManageTimetableEntryBase):
         return jsonify()
 
     def _process_DELETE(self):
-        """Delete a timetable entry"""
+        """Delete a timetable entry."""
         if self.entry.type == TimetableEntryType.SESSION_BLOCK:
             delete_session_block(self.entry.session_block)
         elif self.event.type != 'conference' and self.entry.type == TimetableEntryType.CONTRIBUTION:
@@ -173,7 +173,7 @@ class RHBreakREST(RHManageTimetableBase):
 
 
 class RHCloneContribution(RHManageTimetableBase):
-    """Clone a contribution and schedule it at the same position"""
+    """Clone a contribution and schedule it at the same position."""
 
     def _process_args(self):
         RHManageTimetableBase._process_args(self)

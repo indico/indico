@@ -11,7 +11,7 @@ from enum import Enum
 
 
 class IndicoEnum(Enum):
-    """Enhanced Enum
+    """Enhanced Enum.
 
     You can use SomeEnum.get('some_name') like you could with a dict.
     """

@@ -35,7 +35,10 @@ from indico.web.util import jsonify_template
 
 
 def _get_persons(event, condition):
-    """Queries event persons linked to contributions in the event, filtered using the condition provided."""
+    """
+    Query event persons linked to contributions in the event,
+    filtered using the condition provided.
+    """
     return (event.persons.filter(EventPerson.contribution_links.any(
             db.and_(condition,
                     ContributionPersonLink.contribution.has(~Contribution.is_deleted))))
@@ -80,7 +83,7 @@ class RHDisplayProtectionBase(RHDisplayEventBase):
 
 
 class RHMyContributions(RHDisplayProtectionBase):
-    """Display list of current user contributions"""
+    """Display list of current user contributions."""
 
     MENU_ENTRY_NAME = 'my_contributions'
 
@@ -96,7 +99,7 @@ class RHMyContributions(RHDisplayProtectionBase):
 
 
 class RHContributionList(RHDisplayProtectionBase):
-    """Display list of event contributions"""
+    """Display list of event contributions."""
 
     MENU_ENTRY_NAME = 'contributions'
     view_class = WPContributions
@@ -112,7 +115,7 @@ class RHContributionList(RHDisplayProtectionBase):
 
 
 class RHContributionDisplay(RHContributionDisplayBase):
-    """Display page with contribution details """
+    """Display page with contribution details."""
 
     view_class = WPContributions
 
@@ -157,7 +160,7 @@ class RHSpeakerList(RHDisplayProtectionBase):
 
 
 class RHContributionAuthor(RHContributionDisplayBase):
-    """Display info about an author"""
+    """Display info about an author."""
 
     normalize_url_spec = {
         'locators': {
@@ -206,7 +209,7 @@ class RHContributionsExportToPDF(RHContributionList):
 
 
 class RHContributionExportToICAL(RHContributionDisplayBase):
-    """Export contribution to ICS"""
+    """Export contribution to ICS."""
 
     def _process(self):
         if not self.contrib.is_scheduled:
@@ -215,7 +218,7 @@ class RHContributionExportToICAL(RHContributionDisplayBase):
 
 
 class RHContributionListFilter(RHContributionList):
-    """Display dialog with filters"""
+    """Display dialog with filters."""
 
     def _process(self):
         return RH._process(self)
@@ -231,7 +234,7 @@ class RHContributionListFilter(RHContributionList):
 
 
 class RHContributionListDisplayStaticURL(RHContributionList):
-    """Generate static URL for the current set of filters"""
+    """Generate static URL for the current set of filters."""
 
     def _process(self):
         return jsonify(url=self.list_generator.generate_static_url())

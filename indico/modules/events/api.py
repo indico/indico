@@ -149,7 +149,7 @@ class CategoryEventHook(HTTPAPIHook):
 
 
 class SerializerBase(object):
-    """Common methods for different serializers"""
+    """Common methods for different serializers."""
 
     def _serialize_access_list(self, obj):
         data = {'users': [], 'groups': []}
@@ -170,7 +170,7 @@ class SerializerBase(object):
             }
 
     def _serialize_person(self, person, person_type, can_manage=False):
-        """Serialize an event associated person"""
+        """Serialize an event associated person."""
 
         if person:
             data = {
@@ -342,7 +342,7 @@ class SerializerBase(object):
 
     @staticmethod
     def serialize_reference(reference):
-        """Return the data for a reference"""
+        """Return the data for a reference."""
         return {
             'type': reference.reference_type.name,
             'value': reference.value,
@@ -696,7 +696,7 @@ class SessionFetcher(SessionContribFetcher, SerializerBase):
         return self._build_sessions_api_data(sessions)
 
     def _build_sessions_api_data(self, sessions):
-        """Returns an aggregated list of session blocks given the sessions."""
+        """Return an aggregated list of session blocks given the sessions."""
 
         session_blocks = []
         for session_ in sessions:

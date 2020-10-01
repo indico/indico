@@ -239,8 +239,7 @@ def judge_abstract(abstract, abstract_data, judgment, judge, contrib_session=Non
 
 
 def _merge_person_links(target_abstract, source_abstract):
-    """
-    Merge `person_links` of different abstracts.
+    """Merge `person_links` of different abstracts.
 
     Add to `target_abstract` new `AbstractPersonLink`s whose `EventPerson`
     exists in the `source_abstract` but is not yet in the `target_abstract`.

@@ -99,7 +99,7 @@ class MeetingSessionBlockForm(IndicoForm):
 
 
 class SessionTypeForm(IndicoForm):
-    """Form to create or edit a SessionType"""
+    """Form to create or edit a SessionType."""
 
     name = StringField(_("Name"), [DataRequired()])
     is_poster = BooleanField(_("Poster"), widget=SwitchWidget(),

@@ -321,7 +321,7 @@ def serialize_event_info(event):
 
 
 def serialize_session(sess):
-    """Return data for a single session"""
+    """Return data for a single session."""
     data = {
         '_type': 'Session',
         'address': sess.address,

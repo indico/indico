@@ -106,7 +106,7 @@ def _which(program):
 @click.option('-r', '--reverse', help='Reverse - return instead the SQL to go from target to base', is_flag=True)
 def main(dbname, verbose, reverse):
     """
-    Compares the structure of the database against what's created from the
+    Compare the structure of the database against what's created from the
     models during `indico db prepare`.
 
     By default the current database is assumed to be named `indico`, but it

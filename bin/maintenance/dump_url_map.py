@@ -39,7 +39,8 @@ def get_rules(plugins):
 @click.option('-p', '--plugin', 'plugins', multiple=True, help='Include URLs from the specified plugins')
 def main(force, output, plugins):
     """
-    Dumps the URL routing map to JSON for use by the `babel-flask-url` babel plugin.
+    Dump the URL routing map to JSON for use by the `babel-flask-url`
+    babel plugin.
     """
     try:
         with open(output) as f:

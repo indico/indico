@@ -131,7 +131,7 @@ class TransactionStatusTransition(object):
 
 
 class PaymentTransaction(db.Model):
-    """Payment transactions"""
+    """Payment transactions."""
     __tablename__ = 'payment_transactions'
     __table_args__ = (db.CheckConstraint('amount > 0', 'positive_amount'),
                       {'schema': 'events'})
@@ -209,7 +209,7 @@ class PaymentTransaction(db.Model):
         return format_repr(self, 'id', 'registration_id', 'provider', 'amount', 'currency', 'timestamp', status=status)
 
     def render_details(self):
-        """Renders the transaction details"""
+        """Render the transaction details."""
         if self.is_manual:
             return render_template('events/payment/transaction_details_manual.html', transaction=self)
         plugin = self.plugin

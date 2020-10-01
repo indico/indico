@@ -27,7 +27,7 @@ from indico.web.flask.util import url_for
 
 
 class _DataWrapper(object):
-    """Wrapper for the return value of generated_data properties"""
+    """Wrapper for the return value of generated_data properties."""
     def __init__(self, data):
         self.data = data
 
@@ -37,7 +37,7 @@ class _DataWrapper(object):
 
 
 class generated_data(property):
-    """property decorator for generated data in forms"""
+    """Property decorator for generated data in forms."""
 
     def __get__(self, obj, objtype=None):
         if obj is None:
@@ -154,7 +154,7 @@ class IndicoForm(FlaskForm):
         """
 
     def populate_obj(self, obj, fields=None, skip=None, existing_only=False):
-        """Populates the given object with form data.
+        """Populate the given object with form data.
 
         If `fields` is set, only fields from that list are populated.
         If `skip` is set, fields in that list are skipped.
@@ -208,7 +208,7 @@ class IndicoForm(FlaskForm):
 
     @property
     def generated_data(self):
-        """Returns a dict containing all generated data"""
+        """Return a dict containing all generated data."""
         cls = type(self)
         return {field: getattr(self, field).data
                 for field in dir(cls)
@@ -216,7 +216,7 @@ class IndicoForm(FlaskForm):
 
     @property
     def data(self):
-        """Extends form.data with generated data from properties"""
+        """Extend form.data with generated data from properties."""
         data = {k: v
                 for k, v in super(IndicoForm, self).data.iteritems()
                 if k != self.meta.csrf_field_name and not k.startswith('ext__')}
@@ -244,7 +244,7 @@ class FormDefaults(object):
         self.__defaults = defaults
 
     def __valid_attr(self, name):
-        """Checks if an attr may be retrieved from the object"""
+        """Check if an attr may be retrieved from the object."""
         if self.__obj is None:
             return False
         if self.__obj_attrs is not None and name not in self.__obj_attrs:

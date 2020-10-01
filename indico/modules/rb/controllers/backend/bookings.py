@@ -261,7 +261,7 @@ class RHDeleteBooking(RHBookingBase):
 
 
 class RHLinkedObjectData(RHRoomBookingBase):
-    """Fetch data from event, contribution or session block"""
+    """Fetch data from event, contribution or session block."""
 
     def _process_args(self):
         type_ = LinkType[request.view_args['type']]

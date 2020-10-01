@@ -33,7 +33,7 @@ class AgreementState(RichIntEnum):
 
 
 class Agreement(db.Model):
-    """Agreements between a person and Indico"""
+    """Agreements between a person and Indico."""
     __tablename__ = 'agreements'
     __table_args__ = (db.UniqueConstraint('event_id', 'type', 'identifier'),
                       {'schema': 'events'})

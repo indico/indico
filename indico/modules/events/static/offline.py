@@ -53,9 +53,9 @@ from indico.web.rh import RH
 def create_static_site(rh, event):
     """Create a static (offline) version of an Indico event.
 
-       :param rh: Request handler object
-       :param event: Event in question
-       :return: Path to the resulting ZIP file
+    :param rh: Request handler object
+    :param event: Event in question
+    :return: Path to the resulting ZIP file
     """
     try:
         g.static_site = True

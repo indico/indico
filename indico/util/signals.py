@@ -11,7 +11,7 @@ from types import GeneratorType
 
 def values_from_signal(signal_response, single_value=False, skip_none=True, as_list=False,
                        multi_value_types=GeneratorType, return_plugins=False):
-    """Combines the results from both single-value and multi-value signals.
+    """Combine the results from both single-value and multi-value signals.
 
     The signal needs to return either a single object (which is not a
     generator) or a generator (usually by returning its values using
@@ -50,7 +50,7 @@ def values_from_signal(signal_response, single_value=False, skip_none=True, as_l
 
 
 def named_objects_from_signal(signal_response, name_attr='name', plugin_attr=None):
-    """Returns a dict of objects based on an unique attribute on each object.
+    """Return a dict of objects based on an unique attribute on each object.
 
     The signal needs to return either a single object (which is not a
     generator) or a generator (usually by returning its values using

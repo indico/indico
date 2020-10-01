@@ -16,7 +16,7 @@ from indico.modules.events.contributions.models.contributions import Contributio
 
 @pytest.fixture
 def create_contribution(db):
-    """Returns a a callable that lets you create a contribution"""
+    """Return a callable that lets you create a contribution."""
 
     def _create_contribution(event, title, duration):
         entry = Contribution(event=event, title=title, duration=duration)

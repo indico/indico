@@ -58,7 +58,7 @@ def _render_session_list(event):
 
 
 class RHSessionsList(RHManageSessionsBase):
-    """Display list of all sessions within the event"""
+    """Display list of all sessions within the event,"""
 
     def _process(self):
         selected_entry = request.args.get('selected')
@@ -69,7 +69,7 @@ class RHSessionsList(RHManageSessionsBase):
 
 
 class RHCreateSession(RHManageSessionsBase):
-    """Create a session in the event"""
+    """Create a session in the event."""
 
     def _get_response(self, new_session):
         sessions = [{'id': s.id, 'title': s.title, 'colors': s.colors} for s in self.event.sessions]
@@ -90,7 +90,7 @@ class RHCreateSession(RHManageSessionsBase):
 
 
 class RHModifySession(RHManageSessionBase):
-    """Modify a session"""
+    """Modify a session."""
 
     def _process(self):
         form = SessionForm(obj=self.session, event=self.event)
@@ -101,7 +101,7 @@ class RHModifySession(RHManageSessionBase):
 
 
 class RHDeleteSessions(RHManageSessionsActionsBase):
-    """Remove multiple sessions"""
+    """Remove multiple sessions."""
 
     def _process(self):
         for sess in self.sessions:
@@ -114,7 +114,7 @@ class RHManageSessionsExportBase(RHManageSessionsActionsBase):
 
 
 class RHExportSessionsCSV(RHManageSessionsExportBase):
-    """Export list of sessions to a CSV"""
+    """Export list of sessions to a CSV."""
 
     def _process(self):
         headers, rows = generate_spreadsheet_from_sessions(self.sessions)
@@ -122,7 +122,7 @@ class RHExportSessionsCSV(RHManageSessionsExportBase):
 
 
 class RHExportSessionsExcel(RHManageSessionsExportBase):
-    """Export list of sessions to a XLSX"""
+    """Export list of sessions to a XLSX."""
 
     def _process(self):
         headers, rows = generate_spreadsheet_from_sessions(self.sessions)
@@ -130,7 +130,7 @@ class RHExportSessionsExcel(RHManageSessionsExportBase):
 
 
 class RHExportSessionsPDF(RHManageSessionsExportBase):
-    """Export list of sessions to a PDF"""
+    """Export list of sessions to a PDF."""
 
     def _process(self):
         pdf_file = generate_pdf_from_sessions(self.sessions)
@@ -138,7 +138,7 @@ class RHExportSessionsPDF(RHManageSessionsExportBase):
 
 
 class RHSessionREST(RHManageSessionBase):
-    """Perform update or removal of a session"""
+    """Perform update or removal of a session."""
 
     def _process_DELETE(self):
         delete_session(self.session)
@@ -173,7 +173,7 @@ class RHSessionREST(RHManageSessionBase):
 
 
 class RHSessionPersonList(RHContributionPersonListMixin, RHManageSessionsActionsBase):
-    """List of persons in the session's contributions"""
+    """List of persons in the session's contributions."""
 
     template = 'events/sessions/management/session_person_list.html'
     ALLOW_LOCKED = True
@@ -185,7 +185,7 @@ class RHSessionPersonList(RHContributionPersonListMixin, RHManageSessionsActions
 
 
 class RHSessionProtection(RHManageSessionBase):
-    """Manage session protection"""
+    """Manage session protection."""
 
     def _process(self):
         form = SessionProtectionForm(obj=FormDefaults(**self._get_defaults()), session=self.session,
@@ -204,14 +204,14 @@ class RHSessionProtection(RHManageSessionBase):
 
 
 class RHSessionACL(RHManageSessionBase):
-    """Display the ACL of the session"""
+    """Display the ACL of the session."""
 
     def _process(self):
         return render_acl(self.session)
 
 
 class RHSessionACLMessage(RHManageSessionBase):
-    """Render the inheriting ACL message"""
+    """Render the inheriting ACL message."""
 
     def _process(self):
         mode = ProtectionMode[request.args['mode']]
@@ -220,7 +220,7 @@ class RHSessionACLMessage(RHManageSessionBase):
 
 
 class RHManageSessionBlock(RHManageSessionBase):
-    """Manage a block of a session"""
+    """Manage a block of a session."""
 
     normalize_url_spec = {
         'locators': {
@@ -258,7 +258,7 @@ class RHSessionBlocks(RHManageSessionBase):
 
 
 class RHManageSessionTypes(RHManageSessionsBase):
-    """Dialog to manage the session types of an event"""
+    """Dialog to manage the session types of an event."""
 
     def _process(self):
         return jsonify_template('events/sessions/management/types_dialog.html', event=self.event,
@@ -266,7 +266,7 @@ class RHManageSessionTypes(RHManageSessionsBase):
 
 
 class RHManageSessionTypeBase(RHManageSessionsBase):
-    """Manage a session type of an event"""
+    """Manage a session type of an event."""
 
     normalize_url_spec = {
         'locators': {
@@ -280,7 +280,7 @@ class RHManageSessionTypeBase(RHManageSessionsBase):
 
 
 class RHEditSessionType(RHManageSessionTypeBase):
-    """Dialog to edit a SessionType"""
+    """Dialog to edit a SessionType."""
 
     def _process(self):
         form = SessionTypeForm(event=self.event, obj=self.session_type)
@@ -295,7 +295,7 @@ class RHEditSessionType(RHManageSessionTypeBase):
 
 
 class RHCreateSessionType(RHManageSessionsBase):
-    """Dialog to add a SessionType"""
+    """Dialog to add a SessionType."""
 
     def _process(self):
         form = SessionTypeForm(event=self.event)
@@ -313,7 +313,7 @@ class RHCreateSessionType(RHManageSessionsBase):
 
 
 class RHDeleteSessionType(RHManageSessionTypeBase):
-    """Dialog to delete a SessionType"""
+    """Dialog to delete a SessionType."""
 
     def _process(self):
         db.session.delete(self.session_type)

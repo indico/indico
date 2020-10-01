@@ -12,7 +12,7 @@ from indico.util.string import format_repr, return_ascii
 
 
 class LegacySessionMapping(db.Model):
-    """Legacy session id mapping
+    """Legacy session id mapping.
 
     Legacy sessions had ids unique only within their event.
     Additionally, some very old sessions had non-numeric IDs.
@@ -65,7 +65,7 @@ class LegacySessionMapping(db.Model):
 
 
 class LegacySessionBlockMapping(db.Model):
-    """Legacy session block id mapping
+    """Legacy session block id mapping.
 
     Legacy sessions blocks had ids unique only within their session.
     """

@@ -20,13 +20,16 @@ def _get_request_manager_emails(req):
 
 
 def _get_notification_reply_email(req):
-    """Get the e-mail address that should be the `Reply-To:` of user notifications."""
+    """
+    Get the e-mail address that should be the `Reply-To:` of
+    user notifications.
+    """
     with plugin_context(req.definition.plugin):
         return req.definition.get_notification_reply_email()
 
 
 def _get_template_module(name, req, **context):
-    """Get template module for a request email notification template
+    """Get template module for a request email notification template.
 
     :param name: template name
     :param req: :class:`Request` instance
@@ -37,7 +40,7 @@ def _get_template_module(name, req, **context):
 
 
 def notify_request_managers(req, template, **context):
-    """Notifies request managers about something
+    """Notify request managers about something.
 
     :param req: the :class:`Request`
     :param template: the template for the notification
@@ -56,7 +59,7 @@ def notify_request_managers(req, template, **context):
 
 
 def notify_event_managers(req, template, **context):
-    """Notifies event managers about something
+    """Notify event managers about something.
 
     :param req: the :class:`Request`
     :param template: the template for the notification
@@ -73,7 +76,7 @@ def notify_event_managers(req, template, **context):
 
 @email_sender
 def notify_new_modified_request(req, new):
-    """Notifies event managers and request managers about a new/modified request
+    """Notify event managers and request managers about a new/modified request.
 
     :param req: the :class:`Request`
     :param new: True if it's a new request
@@ -84,7 +87,7 @@ def notify_new_modified_request(req, new):
 
 @email_sender
 def notify_withdrawn_request(req, email_event_managers):
-    """Notifies event managers and request managers about a withdrawn request
+    """Notify event managers and request managers about a withdrawn request.
 
     :param req: the :class:`Request`
     :param email_event_managers: if event managers should be notified
@@ -96,7 +99,7 @@ def notify_withdrawn_request(req, email_event_managers):
 
 @email_sender
 def notify_accepted_request(req):
-    """Notifies event managers and request managers about a accepted request
+    """Notify event managers and request managers about a accepted request.
 
     :param req: the :class:`Request`
     """
@@ -106,7 +109,7 @@ def notify_accepted_request(req):
 
 @email_sender
 def notify_rejected_request(req):
-    """Notifies event managers and request managers about a rejected request
+    """Notify event managers and request managers about a rejected request.
 
     :param req: the :class:`Request`
     """

@@ -54,7 +54,7 @@ def _make_check(type_, allow_emails, allow_networks, allow_event_roles, allow_ca
 
 
 def serialize_email_principal(email):
-    """Serialize email principal to a simple dict"""
+    """Serialize email principal to a simple dict."""
     return {
         '_type': 'Email',
         'email': email.email,
@@ -83,7 +83,7 @@ class IEmailPrincipalFossil(IFossil):
 
 
 class EmailPrincipal(Fossilizable):
-    """Wrapper for email principals
+    """Wrapper for email principals.
 
     :param email: The email address.
     """
@@ -488,7 +488,7 @@ class PrincipalMixin(object):
         return set()
 
     def merge_privs(self, other):
-        """Merges the privileges of another principal
+        """Merge the privileges of another principal.
 
         :param other: Another principal object.
         """
@@ -499,7 +499,7 @@ class PrincipalMixin(object):
 
     @classmethod
     def merge_users(cls, target, source, relationship_attr):
-        """Merges two users in the ACL.
+        """Merge two users in the ACL.
 
         :param target: The target user of the merge.
         :param source: The user that is being merged into `target`.
@@ -523,8 +523,9 @@ class PrincipalMixin(object):
     @classmethod
     def replace_email_with_user(cls, user, relationship_attr):
         """
-        Replaces all email-based entries matching the user's email
+        Replace all email-based entries matching the user's email
         addresses with user-based entries.
+
         If the user is already in the ACL, the two entries are merged.
 
         :param user: A User object.
@@ -606,7 +607,7 @@ class PrincipalPermissionsMixin(PrincipalMixin):
 
     @hybrid_method
     def has_management_permission(self, permission=None, explicit=False):
-        """Checks whether a principal has a certain management permission.
+        """Check whether a principal has a certain management permission.
 
         The check always succeeds if the user is a full manager; in
         that case the list of permissions is ignored.

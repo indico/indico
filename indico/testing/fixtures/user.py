@@ -14,7 +14,7 @@ from indico.modules.users import User
 
 @pytest.fixture
 def create_user(db):
-    """Returns a callable which lets you create dummy users"""
+    """Return a callable which lets you create dummy users."""
     def _create_user(id_, first_name=u'Guinea', last_name=u'Pig', rb_admin=False, admin=False, email=None, groups=None,
                      legacy=False):
         user = User.get(id_)
@@ -39,13 +39,13 @@ def create_user(db):
 
 @pytest.fixture
 def dummy_user(create_user):
-    """Creates a mocked user"""
+    """Create a mocked user."""
     return create_user(1337, legacy=False)
 
 
 @pytest.fixture
 def create_group(db):
-    """Returns a callable which lets you create dummy groups"""
+    """Return a callable which lets you create dummy groups."""
     def _create_group(id_):
         group = LocalGroup()
         group.id = id_
@@ -59,5 +59,5 @@ def create_group(db):
 
 @pytest.fixture
 def dummy_group(create_group):
-    """Creates a mocked dummy group"""
+    """Create a mocked dummy group."""
     return create_group(1337)

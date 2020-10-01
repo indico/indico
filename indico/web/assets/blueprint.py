@@ -51,8 +51,8 @@ def root(filename):
 
 @assets_blueprint.route('/js-vars/global.js')
 def js_vars_global():
-    """
-    Provides a JS file with global definitions (all users)
+    """Provide a JS file with global definitions (all users).
+
     Useful for server-wide config options, URLs, etc...
     """
     cache_file = os.path.join(config.CACHE_DIR, 'assets_global_{}_{}.js'.format(indico.__version__, config.hash))
@@ -67,8 +67,8 @@ def js_vars_global():
 
 @assets_blueprint.route('/js-vars/user.js')
 def js_vars_user():
-    """
-    Provides a JS file with user-specific definitions
+    """Provide a JS file with user-specific definitions.
+
     Useful for favorites, settings etc.
     """
     return Response(generate_user_file(), mimetype='application/javascript')
@@ -85,7 +85,7 @@ def i18n_locale_react(locale_name):
 
 
 def _get_i18n_locale(locale_name, react=False):
-    """Retrieve a locale in a Jed-compatible format"""
+    """Retrieve a locale in a Jed-compatible format."""
 
     react_suffix = '-react' if react else ''
     cache_file = os.path.join(config.CACHE_DIR, 'assets_i18n_{}{}_{}_{}.js'.format(

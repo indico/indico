@@ -81,7 +81,7 @@ class RH(object):
     # Methods =============================================================
 
     def validate_json(self, schema, json=None):
-        """Validates the request's JSON payload using a JSON schema.
+        """Validate the request's JSON payload using a JSON schema.
 
         :param schema: The JSON schema used for validation.
         :param json: The JSON object (defaults to ``request.json``)
@@ -99,7 +99,7 @@ class RH(object):
         return session.csrf_token if session.csrf_protected else ''
 
     def normalize_url(self):
-        """Performs URL normalization.
+        """Perform URL normalization.
 
         This uses the :attr:`normalize_url_spec` to check if the URL
         params are what they should be and redirects or fails depending
@@ -301,7 +301,7 @@ class RH(object):
 
 
 class RHSimple(RH):
-    """A simple RH that calls a function to build the response
+    """A simple RH that calls a function to build the response.
 
     The preferred way to use this class is by using the
     `RHSimple.wrap_function` decorator.

@@ -26,7 +26,7 @@ from indico.web.util import jsonify_data, jsonify_form, jsonify_template
 
 
 class RHCallForAbstracts(RHAbstractsBase):
-    """Show the main CFA page"""
+    """Show the main CFA page."""
 
     def _process(self):
         abstracts = get_user_abstracts(self.event, session.user) if session.user else []
@@ -35,7 +35,7 @@ class RHCallForAbstracts(RHAbstractsBase):
 
 
 class RHMyAbstractsExportPDF(RHAbstractsBase):
-    """Export the list of the user's abstracts as PDF"""
+    """Export the list of the user's abstracts as PDF."""
 
     def _check_access(self):
         if not session.user:

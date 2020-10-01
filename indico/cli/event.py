@@ -32,7 +32,7 @@ def cli():
               help="The user which will be shown on the log as having restored the event (default: no user).")
 @click.option('-m', '--message', 'message', metavar="MESSAGE", help="An additional message for the log")
 def restore(event_id, user_id, message):
-    """Restores a deleted event."""
+    """Restore a deleted event."""
     event = Event.get(event_id)
     user = User.get(user_id) if user_id else None
     if event is None:
@@ -52,7 +52,7 @@ def restore(event_id, user_id, message):
 @click.argument('event_id', type=int)
 @click.argument('target_file', type=click.File('wb'))
 def export(event_id, target_file):
-    """Exports all data associated with an event.
+    """Export all data associated with an event.
 
     This exports the whole event as an archive which can be imported
     on another other Indico instance.  Importing an event is only
@@ -79,7 +79,7 @@ def export(event_id, target_file):
 @click.option('-c', '--category', 'category_id', type=int, default=0, metavar='ID',
               help='ID of the target category. Defaults to the root category.')
 def import_(source_file, create_users, force, verbose, yes, category_id):
-    """Imports an event exported from another Indico instance."""
+    """Import an event exported from another Indico instance."""
     click.echo('Importing event...')
     event = import_event(source_file, category_id, create_users=create_users, verbose=verbose, force=force)
     if event is None:

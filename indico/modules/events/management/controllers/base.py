@@ -38,7 +38,7 @@ class ManageEventMixin(object):
 
 
 class RHManageEventBase(RHEventBase, ManageEventMixin):
-    """Base class for event management RHs"""
+    """Base class for event management RHs."""
 
     DENY_FRAMES = True
 
@@ -47,7 +47,9 @@ class RHManageEventBase(RHEventBase, ManageEventMixin):
 
 
 class RHContributionPersonListMixin:
-    """List of persons somehow related to contributions (co-authors, speakers...)"""
+    """
+    List of persons somehow related to contributions (co-authors, speakers...).
+    """
 
     @property
     def _membership_filter(self):

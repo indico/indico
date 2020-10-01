@@ -10,7 +10,10 @@ from docutils.statemachine import string2lines
 
 
 class ExecDirective(Directive):
-    """Execute the specified python code and insert the output into the document"""
+    """
+    Execute the specified python code and insert the output into the document.
+    """
+
     has_content = True
 
     def run(self):

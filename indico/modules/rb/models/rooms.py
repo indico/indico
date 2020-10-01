@@ -399,14 +399,14 @@ class Room(ProtectionManagersMixin, db.Model, Serializer):
 
     @classmethod
     def find_all(cls, *args, **kwargs):
-        """Retrieves rooms, sorted by location and full name"""
+        """Retrieve rooms, sorted by location and full name."""
         rooms = super(Room, cls).find_all(*args, **kwargs)
         rooms.sort(key=lambda r: natural_sort_key(r.location_name + r.full_name))
         return rooms
 
     @classmethod
     def find_with_attribute(cls, attribute):
-        """Search rooms which have a specific attribute"""
+        """Search rooms which have a specific attribute."""
         return (Room.query
                 .with_entities(Room, RoomAttributeAssociation.value)
                 .join(Room.attributes, RoomAttributeAssociation.attribute)
@@ -447,7 +447,7 @@ class Room(ProtectionManagersMixin, db.Model, Serializer):
     @staticmethod
     def filter_available(start_dt, end_dt, repetition, include_blockings=True, include_pre_bookings=True,
                          include_pending_blockings=False):
-        """Returns a SQLAlchemy filter criterion ensuring that the room is available during the given time."""
+        """Return a SQLAlchemy filter criterion ensuring that the room is available during the given time."""
         # Check availability against reservation occurrences
         dummy_occurrences = ReservationOccurrence.create_series(start_dt, end_dt, repetition)
         overlap_criteria = ReservationOccurrence.filter_overlap(dummy_occurrences)

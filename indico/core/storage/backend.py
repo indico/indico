@@ -24,7 +24,7 @@ from indico.web.flask.util import send_file
 
 
 def get_storage(backend_name):
-    """Returns an FS object for the given backend.
+    """Return an FS object for the given backend.
 
     The backend must be defined in the STORAGE_BACKENDS dict in the
     indico config.  Once a backend has been used it is assumed to
@@ -51,15 +51,15 @@ def get_storage_backends():
 
 
 class StorageError(Exception):
-    """Exception used when a storage operation fails for any reason"""
+    """Exception used when a storage operation fails for any reason."""
 
 
 class StorageReadOnlyError(StorageError):
-    """Exception used when trying to write to a read-only storage"""
+    """Exception used when trying to write to a read-only storage."""
 
 
 class Storage(object):
-    """Base class for storage backends
+    """Base class for storage backends.
 
     To create a new storage backend, subclass this class and register
     it using the `get_storage_backends` signal.
@@ -79,6 +79,7 @@ class Storage(object):
                  key-value pairs: ``key=value,key2=value2,..``
 
     """
+
     #: unique name of the storage backend
     name = None
     #: plugin containing this backend - assigned automatically
@@ -90,11 +91,11 @@ class Storage(object):
         pass
 
     def _parse_data(self, data):
-        """Util to parse a key=value data string to a dict"""
+        """Util to parse a key=value data string to a dict."""
         return dict((x.strip() for x in item.split('=', 1)) for item in data.split(',')) if data else {}
 
     def _ensure_fileobj(self, fileobj):
-        """Ensures that fileobj is a file-like object and not a string"""
+        """Ensure that fileobj is a file-like object and not a string."""
         return BytesIO(fileobj) if not hasattr(fileobj, 'read') else fileobj
 
     def _copy_file(self, source, target, chunk_size=1024*1024):
@@ -112,7 +113,7 @@ class Storage(object):
         return checksum.hexdigest().decode('ascii')
 
     def open(self, file_id):  # pragma: no cover
-        """Opens a file in the storage for reading.
+        """Open a file in the storage for reading.
 
         This returns a file-like object which contains the content of
         the file.
@@ -123,7 +124,7 @@ class Storage(object):
 
     @contextmanager
     def get_local_path(self, file_id):
-        """Returns a local path for the file.
+        """Return a local path for the file.
 
         While this path MAY point to the permanent location of the
         stored file, it MUST NOT be used for anything but read
@@ -139,7 +140,7 @@ class Storage(object):
                 yield tmpfile.name
 
     def save(self, name, content_type, filename, fileobj):  # pragma: no cover
-        """Creates a new file in the storage.
+        """Create a new file in the storage.
 
         This returns a a string identifier which can be used later to
         retrieve the file from the storage.
@@ -168,21 +169,21 @@ class Storage(object):
         raise NotImplementedError
 
     def delete(self, file_id):  # pragma: no cover
-        """Deletes a file from the storage.
+        """Delete a file from the storage.
 
         :param file_id: The ID of the file within the storage backend.
         """
         raise NotImplementedError
 
     def getsize(self, file_id):  # pragma: no cover
-        """Gets the size in bytes of a file
+        """Get the size in bytes of a file.
 
         :param file_id: The ID of the file within the storage backend.
         """
         raise NotImplementedError
 
     def send_file(self, file_id, content_type, filename, inline=True):  # pragma: no cover
-        """Sends the file to the client.
+        """Send the file to the client.
 
         This returns a flask response that will eventually result in
         the user being offered to download the file (or view it in the
@@ -207,7 +208,7 @@ class Storage(object):
 
 
 class ReadOnlyStorageMixin(object):
-    """Mixin that makes write operations fail with an error"""
+    """Mixin that makes write operations fail with an error."""
 
     def save(self, name, content_type, filename, fileobj):
         raise StorageReadOnlyError('Cannot write to read-only storage')

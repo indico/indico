@@ -19,7 +19,7 @@ from indico.web.flask.util import url_for
 
 
 def save_identity_info(identity_info, user):
-    """Saves information from IdentityInfo in the session"""
+    """Save information from IdentityInfo in the session."""
     trusted_email = identity_info.provider.settings.get('trusted_email', False)
     session['login_identity_info'] = {
         'provider': identity_info.provider.name,
@@ -34,7 +34,7 @@ def save_identity_info(identity_info, user):
 
 
 def load_identity_info():
-    """Retrieves identity information from the session"""
+    """Retrieve identity information from the session."""
     try:
         info = session['login_identity_info'].copy()
     except KeyError:
@@ -48,7 +48,7 @@ def load_identity_info():
 
 def register_user(email, extra_emails, user_data, identity_data, settings, from_moderation=False):
     """
-    Create a user based on the registration data provided during te
+    Create a user based on the registration data provided during the
     user registration process (via `RHRegister` and `RegistrationHandler`).
 
     This method is not meant to be used for generic user creation, the
@@ -62,7 +62,7 @@ def register_user(email, extra_emails, user_data, identity_data, settings, from_
 
 
 def impersonate_user(user):
-    """Impersonate another user as an admin"""
+    """Impersonate another user as an admin."""
     from indico.modules.auth import login_user, logger
 
     current_user = session.user
@@ -79,7 +79,7 @@ def impersonate_user(user):
 
 
 def undo_impersonate_user():
-    """Undo an admin impersonation login and revert to the old user"""
+    """Undo an admin impersonation login and revert to the old user."""
     from indico.modules.auth import logger
     from indico.modules.users import User
 
@@ -95,7 +95,7 @@ def undo_impersonate_user():
 
 
 def redirect_to_login(next_url=None, reason=None):
-    """Redirects to the login page.
+    """Redirect to the login page.
 
     :param next_url: URL to be redirected upon successful login. If not
                      specified, it will be set to ``request.relative_url``.

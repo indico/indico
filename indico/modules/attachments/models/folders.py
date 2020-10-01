@@ -118,7 +118,7 @@ class AttachmentFolder(LinkMixin, ProtectionMixin, db.Model):
 
     @classmethod
     def get_or_create_default(cls, linked_object):
-        """Gets the default folder for the given object or creates it."""
+        """Get the default folder for the given object or creates it."""
         folder = cls.find_first(is_default=True, object=linked_object)
         if folder is None:
             folder = cls(is_default=True, object=linked_object)
@@ -126,7 +126,7 @@ class AttachmentFolder(LinkMixin, ProtectionMixin, db.Model):
 
     @classmethod
     def get_or_create(cls, linked_object, title=None):
-        """Gets a folder for the given object or creates it.
+        """Get a folder for the given object or create it.
 
         If no folder title is specified, the default folder will be
         used.  It is the caller's responsibility to add the folder
@@ -144,7 +144,7 @@ class AttachmentFolder(LinkMixin, ProtectionMixin, db.Model):
         return dict(self.object.locator, folder_id=self.id)
 
     def can_access(self, user, *args, **kwargs):
-        """Checks if the user is allowed to access the folder.
+        """Check if the user is allowed to access the folder.
 
         This is the case if the user has access the folder or if the
         user can manage attachments for the linked object.
@@ -153,7 +153,7 @@ class AttachmentFolder(LinkMixin, ProtectionMixin, db.Model):
                 can_manage_attachments(self.object, user))
 
     def can_view(self, user):
-        """Checks if the user can see the folder.
+        """Check if the user can see the folder.
 
         This does not mean the user can actually access its contents.
         It just determines if it is visible to him or not.
@@ -166,7 +166,7 @@ class AttachmentFolder(LinkMixin, ProtectionMixin, db.Model):
 
     @classmethod
     def get_for_linked_object(cls, linked_object, preload_event=False):
-        """Gets the attachments for the given object.
+        """Get the attachments for the given object.
 
         This only returns attachments that haven't been deleted.
 

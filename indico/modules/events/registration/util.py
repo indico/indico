@@ -51,7 +51,7 @@ from indico.web.forms.widgets import SwitchWidget
 
 
 def get_title_uuid(regform, title):
-    """Convert a string title to its UUID value
+    """Convert a string title to its UUID value.
 
     If the title does not exist in the title PD field, it will be
     ignored and returned as ``None``.
@@ -95,7 +95,7 @@ def get_event_section_data(regform, management=False, registration=None):
 
 
 def check_registration_email(regform, email, registration=None, management=False):
-    """Checks whether an email address is suitable for registration.
+    """Check whether an email address is suitable for registration.
 
     :param regform: The registration form
     :param email: The email address
@@ -144,7 +144,7 @@ def check_registration_email(regform, email, registration=None, management=False
 
 
 def make_registration_form(regform, management=False, registration=None):
-    """Creates a WTForm based on registration form fields"""
+    """Create a WTForm based on registration form fields."""
 
     class RegistrationFormWTF(IndicoForm):
         if management:
@@ -169,7 +169,7 @@ def make_registration_form(regform, management=False, registration=None):
 
 
 def create_personal_data_fields(regform):
-    """Creates the special section/fields for personal data."""
+    """Create the special section/fields for personal data."""
     section = next((s for s in regform.sections if s.type == RegistrationFormItemType.section_pd), None)
     if section is None:
         section = RegistrationFormPersonalDataSection(registration_form=regform, title='Personal Data')
@@ -192,7 +192,7 @@ def create_personal_data_fields(regform):
 
 
 def url_rule_to_angular(endpoint):
-    """Converts a flask-style rule to angular style"""
+    """Convert a flask-style rule to angular style."""
     mapping = {
         'reg_form_id': 'confFormId',
         'section_id': 'sectionId',
@@ -298,7 +298,7 @@ def modify_registration(registration, data, management=False, notify_user=True):
 
 
 def generate_spreadsheet_from_registrations(registrations, regform_items, static_items):
-    """Generates a spreadsheet data from a given registration list.
+    """Generate a spreadsheet data from a given registration list.
 
     :param registrations: The list of registrations to include in the file
     :param regform_items: The registration form items to be used as columns
@@ -382,7 +382,7 @@ def get_published_registrations(event):
 
 
 def get_events_registered(user, dt=None):
-    """Gets the IDs of events where the user is registered.
+    """Get the IDs of events where the user is registered.
 
     :param user: A `User`
     :param dt: Only include events taking place on/after that date
@@ -537,7 +537,7 @@ def get_ticket_attachments(registration):
 
 
 def update_regform_item_positions(regform):
-    """Update positions when deleting/disabling an item in order to prevent gaps"""
+    """Update positions when deleting/disabling an item in order to prevent gaps."""
     section_positions = itertools.count(1)
     disabled_section_positions = itertools.count(1000)
     for section in sorted(regform.sections, key=attrgetter('position')):
@@ -600,7 +600,7 @@ def get_registered_event_persons(event):
 
 
 def serialize_registration_form(regform):
-    """Serialize registration form to JSON-like object"""
+    """Serialize registration form to JSON-like object."""
     return {
         'id': regform.id,
         'name': regform.title,

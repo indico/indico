@@ -319,7 +319,7 @@ class Reservation(Serializer, db.Model):
 
     @classmethod
     def create_from_data(cls, room, data, user, prebook=None, ignore_admin=False):
-        """Creates a new reservation.
+        """Create a new reservation.
 
         :param room: The Room that's being booked.
         :param data: A dict containing the booking data, usually from a :class:`NewBookingConfirmForm` instance
@@ -565,7 +565,7 @@ class Reservation(Serializer, db.Model):
         return self.created_by_user == user
 
     def modify(self, data, user):
-        """Modifies an existing reservation.
+        """Modify an existing reservation.
 
         :param data: A dict containing the booking data, usually from a :class:`ModifyBookingForm` instance
         :param user: The :class:`.User` who modifies the booking.

@@ -51,7 +51,7 @@ class LocationMixin(object):
 
     @classmethod
     def register_location_events(cls):
-        """Registers sqlalchemy events needed by this mixin.
+        """Register sqlalchemy events needed by this mixin.
 
         Call this method after the definition of a model which uses
         this mixin class.
@@ -235,7 +235,7 @@ class LocationMixin(object):
 
     @property
     def has_location_info(self):
-        """Whether the object has basic location information set"""
+        """Whether the object has basic location information set."""
         return bool(self.venue_name or self.room_name)
 
     @property

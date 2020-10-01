@@ -32,7 +32,7 @@ HUMANIZED_UNIT_MAP = {
 
 
 def validate_with_message(fn, reason):
-    """Create a validation function with a custom error message"""
+    """Create a validation function with a custom error message."""
 
     def validate(args):
         if not fn(args):
@@ -303,9 +303,9 @@ class PrincipalPermissionList(Field):
 class HumanizedDate(Field):
     """Marshmallow field for human-written dates used in REST APIs.
 
-       This field allows for simple time deltas, e.g.: ``1d`` = "1 day`, ``1w`` = "1 week",
-       ``-2M`` = "2 months ago";
-       Simple ISO dates are also accepted (``YYYY-MM-DD``).
+    This field allows for simple time deltas, e.g.: ``1d`` = "1 day`, ``1w`` = "1 week",
+    ``-2M`` = "2 months ago";
+    Simple ISO dates are also accepted (``YYYY-MM-DD``).
     """
 
     def _serialize(self, value, attr, obj):
@@ -326,7 +326,7 @@ class HumanizedDate(Field):
 
 
 class FilesField(ModelList):
-    """Marshmallow field for a list of previously-uploaded files"""
+    """Marshmallow field for a list of previously-uploaded files."""
 
     default_error_messages = dict(ModelList.default_error_messages, **{
         'claimed': 'File has already been claimed',
@@ -345,7 +345,7 @@ class FilesField(ModelList):
 
 
 class FileField(ModelField):
-    """Marshmallow field for one previously-uploaded file"""
+    """Marshmallow field for one previously-uploaded file."""
 
     default_error_messages = dict(ModelList.default_error_messages, **{
         'claimed': 'File has already been claimed',

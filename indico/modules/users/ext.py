@@ -9,7 +9,7 @@ from __future__ import unicode_literals
 
 
 class ExtraUserPreferences(object):
-    """Defines additional user preferences
+    """Define additional user preferences.
 
     To use this class, subclass it and override `defaults`,
     `fields` and `save` to implement your custom logic.
@@ -39,7 +39,7 @@ class ExtraUserPreferences(object):
     # to be called/used when implementing custom settings.
 
     def extend_defaults(self, defaults):
-        """Adds values to the FormDefaults."""
+        """Add values to the FormDefaults."""
         for key, value in self.load().iteritems():
             key = self._prefix + key
             if hasattr(defaults, key):
@@ -58,7 +58,7 @@ class ExtraUserPreferences(object):
         self.save(local_data)
 
     def extend_form(self, form_class):
-        """Create a subclass of the form containing the extra field"""
+        """Create a subclass of the form containing the extra field."""
         form_class = type(b'ExtendedUserPreferencesForm', (form_class,), {})
         for name, field in self.fields.iteritems():
             name = self._prefix + name

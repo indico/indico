@@ -175,12 +175,12 @@ def _confirm(message, default=False, abort=False, help=None):
 
 @click.group()
 def cli():
-    """This script helps with the initial steps of installing Indico"""
+    """This script helps with the initial steps of installing Indico."""
 
 
 @cli.command()
 def list_plugins():
-    """Lists the available indico plugins."""
+    """List the available Indico plugins."""
     import_all_models()
     table_data = [['Name', 'Title']]
     for ep in sorted(iter_entry_points('indico.plugins'), key=attrgetter('name')):
@@ -193,7 +193,7 @@ def list_plugins():
 @cli.command()
 @click.argument('target_dir')
 def create_symlinks(target_dir):
-    """Creates useful symlinks to run Indico from a webserver.
+    """Create useful symlinks to run Indico from a webserver.
 
     This lets you use static paths for the WSGI file and the htdocs
     folder so you do not need to update your webserver config when
@@ -207,7 +207,7 @@ def create_symlinks(target_dir):
 @cli.command()
 @click.argument('target_dir')
 def create_logging_config(target_dir):
-    """Creates the default logging config file for Indico.
+    """Create the default logging config file for Indico.
 
     If a file already exists it is left untouched. This command is
     usually only used when doing a fresh indico installation when
@@ -220,7 +220,7 @@ def create_logging_config(target_dir):
 @cli.command()
 @click.option('--dev', is_flag=True)
 def wizard(dev):
-    """Runs a setup wizard to configure Indico from scratch."""
+    """Run a setup wizard to configure Indico from scratch."""
     SetupWizard().run(dev=dev)
 
 

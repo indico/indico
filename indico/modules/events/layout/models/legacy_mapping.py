@@ -12,7 +12,7 @@ from indico.util.string import format_repr, return_ascii
 
 
 class LegacyImageMapping(db.Model):
-    """Legacy image id mapping
+    """Legacy image id mapping.
 
     Legacy images had event-unique numeric ids. Using this
     mapping we can resolve old ones to their new id.
@@ -58,7 +58,7 @@ class LegacyImageMapping(db.Model):
 
 
 class LegacyPageMapping(db.Model):
-    """Legacy page id mapping
+    """Legacy page id mapping.
 
     Legacy pages had event-unique numeric ids. Using this
     mapping we can resolve old ones to their new id.

@@ -24,8 +24,7 @@ from indico.util.emails.message import sanitize_address
 
 
 class BaseEmailBackend(object):
-    """
-    Base class for email backend implementations.
+    """Base class for email backend implementations.
 
     Subclasses must at least overwrite send_messages().
 
@@ -36,6 +35,7 @@ class BaseEmailBackend(object):
             # do something with connection
             pass
     """
+
     def __init__(self, fail_silently=False, **kwargs):
         self.fail_silently = fail_silently
 
@@ -74,16 +74,15 @@ class BaseEmailBackend(object):
 
     def send_messages(self, email_messages):
         """
-        Sends one or more EmailMessage objects and returns the number of email
+        Send one or more EmailMessage objects and return the number of email
         messages sent.
         """
         raise NotImplementedError('subclasses of BaseEmailBackend must override send_messages() method')
 
 
 class EmailBackend(BaseEmailBackend):
-    """
-    A wrapper that manages the SMTP network connection.
-    """
+    """A wrapper that manages the SMTP network connection."""
+
     def __init__(self, host=None, port=None, username=None, password=None,
                  use_tls=None, fail_silently=False, use_ssl=False, timeout=None,
                  ssl_keyfile=None, ssl_certfile=None,
@@ -111,10 +110,10 @@ class EmailBackend(BaseEmailBackend):
         return smtplib.SMTP_SSL if self.use_ssl else smtplib.SMTP
 
     def open(self):
-        """
-        Ensure an open connection to the email server. Return whether or not a
-        new connection was required (True or False) or None if an exception
-        passed silently.
+        """Ensure an open connection to the email server.
+
+        Return whether or not a new connection was required
+        (True or False) or None if an exception passed silently.
         """
         if self.connection:
             # Nothing to do if the connection is already open.
@@ -143,7 +142,7 @@ class EmailBackend(BaseEmailBackend):
                 raise
 
     def close(self):
-        """Closes the connection to the email server."""
+        """Close the connection to the email server."""
         if self.connection is None:
             return
         try:
@@ -163,7 +162,7 @@ class EmailBackend(BaseEmailBackend):
 
     def send_messages(self, email_messages):
         """
-        Sends one or more EmailMessage objects and returns the number of email
+        Send one or more EmailMessage objects and returns the number of email
         messages sent.
         """
         if not email_messages:

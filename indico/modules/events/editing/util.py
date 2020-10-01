@@ -5,6 +5,7 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
+
 def get_editors(event, editable_type):
     """Get all users who are editors in the event.
 

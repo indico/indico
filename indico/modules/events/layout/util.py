@@ -41,7 +41,7 @@ def get_menu_entries_from_signal():
 
 
 def build_menu_entry_name(name, plugin=None):
-    """ Builds the proper name for a menu entry.
+    """Build the proper name for a menu entry.
 
     Given a menu entry's name and optionally a plugin, returns the
     correct name of the menu entry.
@@ -58,7 +58,7 @@ def build_menu_entry_name(name, plugin=None):
 
 
 class MenuEntryData(object):
-    """Container to transmit menu entry-related data via signals
+    """Container to transmit menu entry-related data via signals.
 
     The data contained is transmitted via the `sidemenu` signal and used
     to build the side menu of an event.
@@ -128,7 +128,7 @@ class MenuEntryData(object):
 
 
 def _get_split_signal_entries():
-    """Get the top-level and child menu entry data"""
+    """Get the top-level and child menu entry data."""
     signal_entries = get_menu_entries_from_signal()
     top_data = OrderedDict((name, data)
                            for name, data in sorted(signal_entries.iteritems(),
@@ -152,19 +152,19 @@ def _get_menu_cache_data(event):
 
 
 def _menu_needs_recheck(event):
-    """Check whether the menu needs to be checked for missing items"""
+    """Check whether the menu needs to be checked for missing items."""
     cache_key, cache_version = _get_menu_cache_data(event)
     return _cache.get(cache_key) != cache_version
 
 
 def _set_menu_checked(event):
-    """Mark the menu as up to date"""
+    """Mark the menu as up to date."""
     cache_key, cache_version = _get_menu_cache_data(event)
     _cache.set(cache_key, cache_version)
 
 
 def _save_menu_entries(entries):
-    """Save new menu entries using a separate SA session"""
+    """Save new menu entries using a separate SA session."""
     with db.tmp_session() as sess:
         sess.add_all(entries)
         try:
@@ -183,7 +183,7 @@ def _save_menu_entries(entries):
 
 
 def _rebuild_menu(event):
-    """Create all menu entries in the database"""
+    """Create all menu entries in the database."""
     top_data, child_data = _get_split_signal_entries()
     pos_gen = count()
     entries = [_build_menu_entry(event, True, data, next(pos_gen), children=child_data.get(data.name))
@@ -192,7 +192,7 @@ def _rebuild_menu(event):
 
 
 def _check_menu(event):
-    """Create missing menu items in the database"""
+    """Create missing menu items in the database."""
     top_data, child_data = _get_split_signal_entries()
 
     query = (MenuEntry.query
@@ -305,7 +305,7 @@ def get_menu_entry_by_name(name, event):
 
 
 def is_menu_entry_enabled(entry_name, event):
-    """Check whether the MenuEntry is enabled"""
+    """Check whether the MenuEntry is enabled."""
     return get_menu_entry_by_name(entry_name, event).is_enabled
 
 
@@ -328,7 +328,7 @@ def _build_css_url(theme):
 
 
 def get_css_url(event, force_theme=None, for_preview=False):
-    """Builds the URL of a CSS resource.
+    """Build the URL of a CSS resource.
 
     :param event: The `Event` to get the CSS url for
     :param force_theme: The ID of the theme to override the custom CSS resource

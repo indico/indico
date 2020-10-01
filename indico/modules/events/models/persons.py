@@ -195,7 +195,7 @@ class EventPerson(PersonMixin, db.Model):
 
     @classmethod
     def for_user(cls, user, event=None, is_untrusted=False):
-        """Return EventPerson for a matching User in Event creating if needed"""
+        """Return EventPerson for a matching User in Event creating if needed."""
         person = event.persons.filter_by(user=user).first() if event else None
         return person or cls.create_from_user(user, event, is_untrusted=is_untrusted)
 
@@ -219,7 +219,7 @@ class EventPerson(PersonMixin, db.Model):
     @classmethod
     def link_user_by_email(cls, user):
         """
-        Links all email-based persons matching the user's
+        Link all email-based persons matching the user's
         email addresses with the user.
 
         :param user: A User object.
@@ -301,7 +301,7 @@ class EventPerson(PersonMixin, db.Model):
         db.session.flush()
 
     def has_role(self, role, obj):
-        """Whether the person has a role in the ACL list of a given object"""
+        """Whether the person has a role in the ACL list of a given object."""
         principals = [x for x in obj.acl_entries if x.has_management_permission(role, explicit=True)]
         return any(x
                    for x in principals

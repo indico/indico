@@ -57,7 +57,7 @@ class RHPaperTimeline(RHPaperBase):
 
 
 class RHDownloadPaperFile(RHPaperBase):
-    """Download a paper file"""
+    """Download a paper file."""
 
     normalize_url_spec = {
         'locators': {
@@ -90,7 +90,7 @@ class RHReviewingArea(RHPapersBase):
 
 
 class RHCallForPapers(RHPapersBase):
-    """Show the main CFP page"""
+    """Show the main CFP page."""
 
     def _check_access(self):
         if not session.user:
@@ -112,7 +112,7 @@ class RHCallForPapers(RHPapersBase):
 
 
 class RHSelectContribution(RHCallForPapers):
-    """Select a contribution for which the user wants to submit a paper"""
+    """Select a contribution for which the user wants to submit a paper."""
 
     def _process(self):
         return jsonify_template('events/papers/display/select_contribution.html', contributions=self.contribs)

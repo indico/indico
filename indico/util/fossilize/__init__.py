@@ -30,16 +30,13 @@ import zope.interface
 _fossil_cache = threading.local()
 
 def fossilizes(*classList):
-    """
-    Simple wrapper around 'implements'
-    """
+    """Simple wrapper around 'implements'."""
     zope.interface.declarations._implements("fossilizes",
                                             classList,
                                             zope.interface.classImplements)
 
 def addFossil(klazz, fossils):
-    """
-    Declares fossils for a class
+    """Declare fossils for a class.
 
     :param klazz: a class object
     :type klass: class object
@@ -53,34 +50,29 @@ def addFossil(klazz, fossils):
 
 
 def clearCache():
-    """
-    Shortcut for Fossilizable.clearCache()
-    """
+    """Shortcut for Fossilizable.clearCache()"""
     Fossilizable.clearCache()
 
 
 class NonFossilizableException(Exception):
-    """
-    Object is not fossilizable (doesn't implement Fossilizable)
-    """
+    """Object is not fossilizable (doesn't implement Fossilizable)."""
 
 
 class InvalidFossilException(Exception):
     """
     The fossil name doesn't follow the convention I(\w+)Fossil
-    or has an invalid method name and did not declare a .name tag for it
+    or has an invalid method name and did not declare a .name tag for it.
     """
 
 
 class IFossil(zope.interface.Interface):
-    """
-    Fossil base interface. All fossil classes should derive from this one.
+    """Fossil base interface.
+
+    All fossil classes should derive from this one.
     """
 
 class Fossilizable(object):
-    """
-    Base class for all the objects that can be fossilized
-    """
+    """Base class for all the objects that can be fossilized."""
 
     __fossilNameRE = re.compile('^I(\w+)Fossil$')
     __methodNameRE = re.compile('^get(\w+)|(has\w+)|(is\w+)$')
@@ -108,9 +100,8 @@ class Fossilizable(object):
 
     @classmethod
     def __extractFossilName(cls, name):
-        """
-        Extracts the fossil name from a I(.*)Fossil
-        class name.
+        """Extract the fossil name from a I(.*)Fossil class name.
+
         IMyObjectBasicFossil -> myObjectBasic
         """
 
@@ -131,8 +122,7 @@ class Fossilizable(object):
 
     @classmethod
     def __obtainInterface(cls, obj, interfaceArg):
-        """
-        Obtains the appropriate interface for this object.
+        """Obtain the appropriate interface for this object.
 
         :param interfaceArg: the target fossile type
         :type interfaceArg: IFossil, NoneType, or dict
@@ -143,7 +133,7 @@ class Fossilizable(object):
         * If a dict, we will use the objects class, class name, or full class name
         as key.
 
-        Also verifies that the interface obtained through these 3 methods is
+        Also verify that the interface obtained through these 3 methods is
         effectively provided by the object.
         """
 
@@ -184,9 +174,7 @@ class Fossilizable(object):
 
     @classmethod
     def clearCache(cls):
-        """
-        Clears the fossil attribute cache
-        """
+        """Clear the fossil attribute cache."""
         _fossil_cache.methodName = {}
         _fossil_cache.fossilName = {}
         _fossil_cache.fossilInterface = {}
@@ -197,9 +185,8 @@ class Fossilizable(object):
 
     @classmethod
     def fossilizeIterable(cls, target, interface, useAttrCache=False, filterBy=None, **kwargs):
-        """
-        Fossilizes an object, be it a 'direct' fossilizable
-        object, or an iterable (dict, list, set);
+        """Fossilize an object, be it a 'direct' fossilizable
+        object, or an iterable (dict, list, set).
         """
         if isinstance(target, Fossilizable):
             return target.fossilize(interface, useAttrCache, **kwargs)
@@ -248,7 +235,7 @@ class Fossilizable(object):
     @classmethod
     def fossilize_obj(cls, obj, interfaceArg=None, useAttrCache=False, mapClassType=None, **kwargs):
         """
-        Fossilizes the object, using the fossil provided by `interface`.
+        Fossilize the object, using the fossil provided by `interface`.
 
         :param interfaceArg: the target fossile type
         :type interfaceArg: IFossil, NoneType, or dict

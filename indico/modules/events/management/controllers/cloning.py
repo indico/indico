@@ -80,7 +80,7 @@ class CloneCalculator(object):
         return args
 
     def calculate(self, formdata):
-        """Calculate dates of cloned events
+        """Calculate dates of cloned events.
 
         :return: a ``(dates, last_day_of_month)`` tuple
         """

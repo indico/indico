@@ -34,7 +34,7 @@ from indico.web.util import jsonify_data, jsonify_form, jsonify_template
 
 
 class RHAbstractListBase(RHManageAbstractsBase):
-    """Base class for all RHs using the abstract list generator"""
+    """Base class for all RHs using the abstract list generator."""
 
     def _process_args(self):
         RHManageAbstractsBase._process_args(self)
@@ -42,7 +42,7 @@ class RHAbstractListBase(RHManageAbstractsBase):
 
 
 class RHManageAbstractsActionsBase(RHAbstractListBase):
-    """Base class for RHs performing actions on selected abstracts"""
+    """Base class for RHs performing actions on selected abstracts."""
 
     _abstract_query_options = ()
 
@@ -60,7 +60,7 @@ class RHManageAbstractsActionsBase(RHAbstractListBase):
 
 
 class RHBulkAbstractJudgment(RHManageAbstractsActionsBase):
-    """Perform bulk judgment operations on selected abstracts"""
+    """Perform bulk judgment operations on selected abstracts."""
 
     def _process(self):
         form = BulkAbstractJudgmentForm(event=self.event, abstract_id=[a.id for a in self.abstracts],
@@ -100,7 +100,7 @@ class RHAbstractListCustomize(CustomizeAbstractListMixin, RHAbstractListBase):
 
 
 class RHAbstractListStaticURL(RHAbstractListBase):
-    """Generate a static URL for the configuration of the abstract list"""
+    """Generate a static URL for the configuration of the abstract list."""
 
     ALLOW_LOCKED = True
 
@@ -169,7 +169,7 @@ class RHDeleteAbstracts(RHManageAbstractsActionsBase):
 
 
 class RHAbstractPersonList(RHManageAbstractsActionsBase):
-    """List of persons somehow related to abstracts (co-authors, speakers...)"""
+    """List of persons somehow related to abstracts (co-authors, speakers...)."""
 
     ALLOW_LOCKED = True
 

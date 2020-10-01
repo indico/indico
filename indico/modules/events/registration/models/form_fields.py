@@ -18,7 +18,7 @@ from indico.util.string import camelize_keys, return_ascii
 
 
 class RegistrationFormFieldData(db.Model):
-    """Description of a registration form field"""
+    """Description of a registration form field."""
 
     __tablename__ = 'form_field_data'
     __table_args__ = {'schema': 'event_registration'}
@@ -51,7 +51,7 @@ class RegistrationFormFieldData(db.Model):
 
 
 class RegistrationFormField(RegistrationFormItem):
-    """A registration form field"""
+    """A registration form field."""
 
     __mapper_args__ = {
         'polymorphic_identity': RegistrationFormItemType.field

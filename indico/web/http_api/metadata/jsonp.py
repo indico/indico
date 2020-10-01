@@ -9,9 +9,7 @@ from indico.web.http_api.metadata.json import JSONSerializer
 
 
 class JSONPSerializer(JSONSerializer):
-    """
-    Just adds prefix
-    """
+    """Add prefix."""
 
     _mime = 'application/javascript'
 

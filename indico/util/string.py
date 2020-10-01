@@ -109,7 +109,7 @@ def fix_broken_string(text, as_unicode=False):
 
 
 def to_unicode(text):
-    """Converts a string to unicode if it isn't already unicode."""
+    """Convert a string to unicode if it isn't already unicode."""
     return fix_broken_string(text, as_unicode=True) if isinstance(text, str) else unicode(text)
 
 
@@ -137,7 +137,7 @@ def strict_unicode(value):
 
 
 def slugify(*args, **kwargs):
-    """Joins a series of strings into a URL slug.
+    """Join a series of strings into a URL slug.
 
     - normalizes unicode to proper ascii repesentations
     - removes non-alphanumeric characters
@@ -169,7 +169,8 @@ def return_ascii(f):
     """Decorator to normalize all unicode characters.
 
     This is useful for __repr__ methods which **MUST** return a plain string to
-    avoid encoding to utf8 or ascii all the time."""
+    avoid encoding to utf8 or ascii all the time.
+    """
     @functools.wraps(f)
     def wrapper(*args, **kwargs):
         return unicode_to_ascii(f(*args, **kwargs))
@@ -206,14 +207,15 @@ def strip_tags(text):
 
 
 def render_markdown(text, escape_latex_math=True, md=None, **kwargs):
-    """ Mako markdown to HTML filter
-        :param text: Markdown source to convert to HTML
-        :param escape_latex_math: Whether math expression should be left untouched or a function that will be called
-                                  to replace math-mode segments.
-        :param md: An alternative markdown processor (can be used
-                   to generate e.g. a different format)
-        :param kwargs: Extra arguments to pass on to the markdown
-                       processor
+    """Mako markdown to HTML filter.
+
+    :param text: Markdown source to convert to HTML
+    :param escape_latex_math: Whether math expression should be left untouched or a function that will be called
+                              to replace math-mode segments.
+    :param md: An alternative markdown processor (can be used
+               to generate e.g. a different format)
+    :param kwargs: Extra arguments to pass on to the markdown
+                   processor
     """
     if escape_latex_math:
         math_segments = []
@@ -240,7 +242,7 @@ def render_markdown(text, escape_latex_math=True, md=None, **kwargs):
 
 
 def sanitize_for_platypus(text):
-    """Sanitize HTML to be used in platypus"""
+    """Sanitize HTML to be used in platypus."""
     tags = ['b', 'br', 'em', 'font', 'i', 'img', 'strike', 'strong', 'sub', 'sup', 'u', 'span', 'div', 'p']
     attrs = {
         'font': ['size', 'face', 'color'],
@@ -319,9 +321,7 @@ def strip_control_chars(text):
 
 
 def html_color_to_rgb(hexcolor):
-    """
-    convert #RRGGBB to an (R, G, B) tuple
-    """
+    """Convert #RRGGBB to an (R, G, B) tuple."""
 
     if not hexcolor.startswith('#'):
         raise ValueError("Invalid color string '{}' (should start with '#')".format(hexcolor))
@@ -338,7 +338,7 @@ def html_color_to_rgb(hexcolor):
 
 
 def strip_whitespace(s):
-    """Removes trailing/leading whitespace if a string was passed.
+    """Remove trailing/leading whitespace if a string was passed.
 
     This utility is useful in cases where you might get None or
     non-string values such as WTForms filters.
@@ -349,7 +349,7 @@ def strip_whitespace(s):
 
 
 def make_unique_token(is_unique):
-    """Create a unique UUID4-based token
+    """Create a unique UUID4-based token.
 
     :param is_unique: a callable invoked with the token which should
                       return a boolean indicating if the token is actually
@@ -374,7 +374,7 @@ def encode_utf8(f):
 
 
 def is_legacy_id(id_):
-    """Checks if an ID is a broken legacy ID.
+    """Check if an ID is a broken legacy ID.
 
     These IDs are not compatible with new code since they are not
     numeric or have a leading zero, resulting in different objects
@@ -384,7 +384,7 @@ def is_legacy_id(id_):
 
 
 def text_to_repr(text, html=False, max_length=50):
-    """Converts text to a suitable string for a repr
+    """Convert text to a suitable string for a repr.
 
     :param text: A string which might contain html and/or linebreaks
     :param html: If True, HTML tags are stripped.
@@ -409,7 +409,7 @@ def alpha_enum(value):
 
 
 def format_repr(obj, *args, **kwargs):
-    """Creates a pretty repr string from object attributes
+    """Create a pretty repr string from object attributes.
 
     :param obj: The object to show the repr for.
     :param args: The names of arguments to include in the repr.
@@ -465,14 +465,14 @@ def format_repr(obj, *args, **kwargs):
 
 
 def snakify(name):
-    """Converts a camelCased name to snake_case"""
+    """Convert a camelCased name to snake_case."""
     # from http://stackoverflow.com/a/1176023/298479
     name = re.sub(r'(.)([A-Z][a-z]+)', r'\1_\2', name)
     return re.sub(r'([a-z0-9])([A-Z])', r'\1_\2', name).lower()
 
 
 def camelize(name):
-    """Converts a snake_cased name to camelCase."""
+    """Convert a snake_cased name to camelCase."""
     parts = name.split('_')
     underscore = ''
     if name.startswith('_'):
@@ -490,17 +490,17 @@ def _convert_keys(value, convert_func):
 
 
 def camelize_keys(dict_):
-    """Convert the keys of a dict to camelCase"""
+    """Convert the keys of a dict to camelCase."""
     return _convert_keys(dict_, camelize)
 
 
 def snakify_keys(dict_):
-    """Convert the keys of a dict to snake_case"""
+    """Convert the keys of a dict to snake_case."""
     return _convert_keys(dict_, snakify)
 
 
 def crc32(data):
-    """Calculates a CRC32 checksum.
+    """Calculate a CRC32 checksum.
 
     When a unicode object is passed, it is encoded as UTF-8.
     """
@@ -510,7 +510,7 @@ def crc32(data):
 
 
 def normalize_phone_number(value):
-    """Normalize phone number so it doesn't contain invalid characters
+    """Normalize phone number so it doesn't contain invalid characters.
 
     This removes all characters besides a leading +, digits and x as
     described here: http://stackoverflow.com/a/123681/298479
@@ -520,7 +520,7 @@ def normalize_phone_number(value):
 
 def format_full_name(first_name, last_name, title=None, last_name_first=True, last_name_upper=True,
                      abbrev_first_name=True, show_title=False):
-    """Returns the user's name in the specified notation.
+    """Return the user's name in the specified notation.
 
     Note: Do not use positional arguments (except for the names/title)
     when calling this method.  Always use keyword arguments!
@@ -600,7 +600,7 @@ def inject_unicode_debug(s, level=1):
 
 
 class RichMarkup(Markup):
-    """unicode/Markup subclass that detects preformatted text
+    """Unicode/Markup subclass that detects preformatted text.
 
     Note that HTML in this string will NOT be escaped when displaying
     it in a jinja template.
@@ -635,14 +635,14 @@ class RichMarkup(Markup):
 
 
 class MarkdownText(Markup):
-    """unicode/Markup class that renders markdown."""
+    """Unicode/Markup class that renders markdown."""
 
     def __html__(self):
         return render_markdown(unicode(self), extensions=('nl2br', 'tables'))
 
 
 class PlainText(Markup):
-    """unicode/Markup class that renders plain text."""
+    """Unicode/Markup class that renders plain text."""
 
     def __html__(self):
         return u'<div class="preformatted">{}</div>'.format(escape(unicode(self)))

@@ -60,7 +60,7 @@ class IndicoBaseQuery(BaseQuery):
 
 
 class IndicoModel(Model):
-    """Indico DB model"""
+    """Indico DB model."""
 
     #: Whether relationship preloading is allowed.  If disabled,
     #: the on-load event that populates relationship from the preload
@@ -169,7 +169,7 @@ class IndicoModel(Model):
                 set_committed_value(target, rel, value)
 
     def assign_id(self):
-        """Immediately assigns an ID to the object.
+        """Immediately assign an ID to the object.
 
         This only works if the table has exactly one serial column.
         It also "wastes" the ID if the new object is not actually
@@ -196,7 +196,7 @@ class IndicoModel(Model):
         setattr(self, attr_name, id_)
 
     def populate_from_dict(self, data, keys=None, skip=None, track_changes=True):
-        """Populates the object with values in a dictionary
+        """Populate the object with values in a dictionary.
 
         :param data: a dict containing values to populate the object.
         :param keys: If set, only keys from that list are populated.
@@ -227,7 +227,7 @@ class IndicoModel(Model):
         return changed if track_changes else None
 
     def populate_from_attrs(self, obj, attrs):
-        """Populates the object from another object's attributes
+        """Populate the object from another object's attributes.
 
         :param obj: an object
         :param attrs: a set containing the attributes to copy
@@ -248,7 +248,7 @@ def _mappers_configured():
 
 
 def import_all_models(package_name='indico'):
-    """Utility that imports all modules in indico/**/models/
+    """Utility that imports all modules in indico/**/models/.
 
     :param package_name: Package name to scan for models. If unset,
                          the top-level package containing this file
@@ -270,7 +270,7 @@ def import_all_models(package_name='indico'):
 
 
 def attrs_changed(obj, *attrs):
-    """Checks if the given fields have been changed since the last flush
+    """Check if the given fields have been changed since the last flush.
 
     :param obj: SQLAlchemy-mapped object
     :param attrs: attribute names
@@ -279,8 +279,10 @@ def attrs_changed(obj, *attrs):
 
 
 def get_default_values(model):
-    """Returns a dict containing all static default values of a model.
+    """Return a dict containing all static default values of a model.
+
     This only takes `default` into account, not `server_default`.
+
     :param model: A SQLAlchemy model
     """
     return {attr.key: attr.columns[0].default.arg
@@ -290,7 +292,7 @@ def get_default_values(model):
 
 def get_simple_column_attrs(model):
     """
-    Returns a set containing all "simple" column attributes, i.e.
+    Return a set containing all "simple" column attributes, i.e.
     attributes which map to a table column and are neither primary
     key nor foreign key.
 
@@ -308,7 +310,7 @@ def get_simple_column_attrs(model):
 
 
 def auto_table_args(cls, **extra_kwargs):
-    """Merges SQLAlchemy ``__table_args__`` values.
+    """Merge SQLAlchemy ``__table_args__`` values.
 
     This is useful when using mixins to compose model classes if the
     mixins need to define custom ``__table_args__``. Since defining
@@ -361,7 +363,7 @@ def _get_backref_name(relationship):
 
 
 def populate_one_to_one_backrefs(model, *relationships):
-    """Populates the backref of a one-to-one relationship on load
+    """Populate the backref of a one-to-one relationship on load.
 
     See this post in the SQLAlchemy docs on why it's useful/necessary:
     http://docs.sqlalchemy.org/en/latest/orm/loading_relationships.html#creating-custom-load-rules

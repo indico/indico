@@ -24,7 +24,7 @@ from indico.util.string import return_ascii
 
 
 class GroupProxy(object):
-    """Provides a generic interface for both local and multipass groups.
+    """Provide a generic interface for both local and multipass groups.
 
     Creating an instance of this class actually creates either a
     ``LocalGroupProxy`` or a ``MultipassGroupProxy``, but they expose
@@ -45,7 +45,7 @@ class GroupProxy(object):
     principal_order = 3
 
     def __new__(cls, name_or_id, provider=None, _group=None):
-        """Creates the correct GroupProxy for the group type"""
+        """Create the correct GroupProxy for the group type."""
         if provider is None or provider == 'indico':
             obj = object.__new__(_LocalGroupProxy)
             obj.id = int(name_or_id)
@@ -74,12 +74,12 @@ class GroupProxy(object):
 
     @cached_property
     def group(self):
-        """The underlying group object"""
+        """The underlying group object."""
         raise NotImplementedError
 
     @cached_property
     def as_principal(self):
-        """The serializable principal identifier of this group"""
+        """The serializable principal identifier of this group."""
         raise NotImplementedError
 
     @property
@@ -89,7 +89,7 @@ class GroupProxy(object):
 
     @cached_property
     def as_legacy_group(self):
-        """The legacy-style group wrapper"""
+        """The legacy-style group wrapper."""
         # TODO: remove once groups are gone from ZODB
         raise NotImplementedError
 
@@ -98,19 +98,19 @@ class GroupProxy(object):
         return self.as_legacy_group
 
     def has_member(self, user):
-        """Checks if the user is a member of the group.
+        """Check if the user is a member of the group.
 
         This can also be accessed using the ``in`` operator.
         """
         raise NotImplementedError
 
     def get_members(self):
-        """Gets the list of users who are members of the group"""
+        """Get the list of users who are members of the group."""
         raise NotImplementedError
 
     @classmethod
     def search(cls, name, exact=False, providers=None):
-        """Searches for groups
+        """Search for groups.
 
         :param name: The group name to search for.
         :param exact: If only exact matches should be found (much faster)
@@ -207,7 +207,7 @@ class _MultipassGroupProxy(GroupProxy):
 
     @cached_property
     def group(self):
-        """The underlying :class:`~flask_multipass.Group`"""
+        """The underlying :class:`~flask_multipass.Group`."""
         try:
             return multipass.get_group(self.provider, self.name)
         except MultipassException as e:

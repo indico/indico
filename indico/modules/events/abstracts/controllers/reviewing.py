@@ -34,7 +34,9 @@ from indico.web.util import _pop_injected_js, jsonify_data, jsonify_template
 
 
 class RHListOtherAbstracts(RHAbstractsBase):
-    """AJAX endpoint that lists all abstracts in the event (dict representation)."""
+    """
+    AJAX endpoint that lists all abstracts in the event (dict representation).
+    """
 
     ALLOW_LOCKED = True
 
@@ -109,7 +111,7 @@ class RHWithdrawAbstract(RHAbstractBase):
 
 
 class RHDisplayAbstractListBase(RHAbstractsBase):
-    """Base class for all abstract list operations"""
+    """Base class for all abstract list operations."""
 
     normalize_url_spec = {
         'locators': {
@@ -128,7 +130,7 @@ class RHDisplayAbstractListBase(RHAbstractsBase):
 
 
 class RHSubmitAbstractReview(RHAbstractBase):
-    """Review an abstract in a specific track"""
+    """Review an abstract in a specific track."""
 
     normalize_url_spec = {
         'locators': {
@@ -252,7 +254,7 @@ class RHDisplayAbstractListCustomize(CustomizeAbstractListMixin, RHDisplayAbstra
 
 
 class RHDisplayAbstractsActionsBase(RHDisplayAbstractListBase):
-    """Base class for classes performing actions on abstract"""
+    """Base class for classes performing actions on abstract."""
 
     def _process_args(self):
         RHDisplayAbstractListBase._process_args(self)

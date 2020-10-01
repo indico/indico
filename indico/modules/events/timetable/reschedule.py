@@ -39,7 +39,7 @@ class RescheduleMode(unicode, RichEnum):
 
 class Rescheduler(object):
     """
-    Compacts the the schedule of an event day by either adjusting
+    Compact the the schedule of an event day by either adjusting
     start times or durations of timetable entries.
 
     :param event: The event of which the timetable entries should
@@ -74,7 +74,7 @@ class Rescheduler(object):
         self.gap = gap
 
     def run(self):
-        """Perform the rescheduling"""
+        """Perform the rescheduling."""
         if self.fit_blocks:
             self._fit_blocks()
         if self.mode == RescheduleMode.time:

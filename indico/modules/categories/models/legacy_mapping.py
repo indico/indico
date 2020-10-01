@@ -12,7 +12,7 @@ from indico.util.string import return_ascii
 
 
 class LegacyCategoryMapping(db.Model):
-    """Legacy category ID mapping
+    """Legacy category ID mapping.
 
     Legacy categories have non-numeric IDs which are not supported by
     any new code. This mapping maps them to proper integer IDs to

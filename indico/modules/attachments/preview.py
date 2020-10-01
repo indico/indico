@@ -17,25 +17,27 @@ from indico.util.string import fix_broken_string
 
 
 class Previewer(object):
-    """Base class for file previewers
+    """Base class for file previewers.
 
     To create a new file prewiewer, subclass this class and register it using
     the `get_file_previewers` signal.
     """
+
     ALLOWED_CONTENT_TYPE = None
     TEMPLATES_DIR = 'attachments/previewers/'
     TEMPATE = None
 
     @classmethod
     def can_preview(cls, attachment_file):
-        """Checks if the content type of the file matches the allowed content
+        """
+        Check if the content type of the file matches the allowed content
         type of files that the previewer can be used for.
         """
         return cls.ALLOWED_CONTENT_TYPE.search(attachment_file.content_type) is not None
 
     @classmethod
     def generate_content(cls, attachment):
-        """Generates the HTML output of the file preview"""
+        """Generate the HTML output of the file preview."""
         return render_template(cls.TEMPLATES_DIR + cls.TEMPLATE, attachment=attachment)
 
 
@@ -76,7 +78,8 @@ class TextPreviewer(Previewer):
 
 
 def get_file_previewer(attachment_file):
-    """Returns a file previewer for the given attachment file based on the
+    """
+    Return a file previewer for the given attachment file based on the
     file's content type.
     """
     for previewer in get_file_previewers():

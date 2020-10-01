@@ -38,11 +38,11 @@ def _render_track_list(event):
 
 
 class RHManageTracksBase(RHManageEventBase):
-    """Base class for all track management RHs"""
+    """Base class for all track management RHs."""
 
 
 class RHManageTrackBase(RHManageTracksBase):
-    """Base class for track management RHs related to a specific track"""
+    """Base class for track management RHs related to a specific track."""
 
     normalize_url_spec = {
         'locators': {

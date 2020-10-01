@@ -45,7 +45,7 @@ def cli(ctx, plugin=None, all_plugins=False):
 
 @cli.command()
 def prepare():
-    """Initializes a new database (creates tables, sets alembic rev to HEAD)"""
+    """Initialize a new database (creates tables, sets alembic rev to HEAD)."""
     return prepare_db()
 
 
@@ -58,7 +58,7 @@ def _stamp(plugin=None, revision=None):
 
 @cli.command()
 def reset_alembic():
-    """Resets the alembic state carried over from 1.9.x
+    """Reset the alembic state carried over from 1.9.x.
 
     Only run this command right after upgrading from a 1.9.x version
     so the references to old alembic revisions (which were removed in

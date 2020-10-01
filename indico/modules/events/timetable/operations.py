@@ -133,7 +133,7 @@ def fit_session_block_entry(entry, log=True):
 
 
 def move_timetable_entry(entry, parent=None, day=None):
-    """Move the `entry` to another session or top-level timetable
+    """Move the `entry` to another session or top-level timetable.
 
     :param entry: `TimetableEntry` to be moved
     :param parent: If specified then the entry will be set as a child
@@ -171,7 +171,7 @@ def move_timetable_entry(entry, parent=None, day=None):
 
 
 def update_timetable_entry_object(entry, data):
-    """Update the `object` of a timetable entry according to its type"""
+    """Update the `object` of a timetable entry according to its type."""
     from indico.modules.events.contributions.operations import update_contribution
     obj = entry.object
     if entry.type == TimetableEntryType.CONTRIBUTION:
@@ -184,7 +184,7 @@ def update_timetable_entry_object(entry, data):
 
 
 def swap_timetable_entry(entry, direction, session_=None):
-    """Swap entry with closest gap or non-parallel sibling"""
+    """Swap entry with closest gap or non-parallel sibling."""
     in_session = session_ is not None
     sibling = get_sibling_entry(entry, direction=direction, in_session=in_session)
     if not sibling:

@@ -13,8 +13,7 @@ from indico.core.db import db
 
 
 def get_attached_folders(linked_object, include_empty=True, include_hidden=True, preload_event=False):
-    """
-    Return a list of all the folders linked to an object.
+    """Return a list of all the folders linked to an object.
 
     :param linked_object: The object whose attachments are to be returned
     :param include_empty: Whether to return empty folders as well.
@@ -64,7 +63,7 @@ def get_attached_items(linked_object, include_empty=True, include_hidden=True, p
 
 def get_nested_attached_items(obj):
     """
-    Returns a structured representation of all attachments linked to an object
+    Return a structured representation of all attachments linked to an object
     and all its nested objects.
 
     :param obj: A :class:`Event`, :class:`Session`, :class:`Contribution`
@@ -88,7 +87,7 @@ def get_nested_attached_items(obj):
 
 
 def can_manage_attachments(obj, user):
-    """Checks if a user can manage attachments for the object"""
+    """Check if a user can manage attachments for the object."""
     if not user:
         return False
     if obj.can_manage(user):

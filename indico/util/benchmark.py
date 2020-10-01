@@ -14,7 +14,7 @@ from indico.util.console import cformat
 
 
 class Benchmark(object):
-    """Simple benchmark class
+    """Simple benchmark class.
 
     Can be used manually or as a contextmanager:
 

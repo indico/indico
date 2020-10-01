@@ -165,7 +165,7 @@ def _clean(webpack_build_config, plugin_dir=None):
 @cli.command('indico', short_help='Builds assets of Indico.')
 @_common_build_options()
 def build_indico(dev, clean, watch, url_root):
-    """Run webpack to build assets"""
+    """Run webpack to build assets."""
     clean = clean or (clean is None and not dev)
     webpack_build_config_file = 'webpack-build-config.json'
     webpack_build_config = _get_webpack_build_config(url_root)
@@ -219,7 +219,7 @@ def _chdir(path):
                 callback=_validate_plugin_dir)
 @_common_build_options()
 def build_plugin(plugin_dir, dev, clean, watch, url_root):
-    """Run webpack to build plugin assets"""
+    """Run webpack to build plugin assets."""
     clean = clean or (clean is None and not dev)
     webpack_build_config_file = os.path.join(plugin_dir, 'webpack-build-config.json')
     webpack_build_config = _get_plugin_webpack_build_config(plugin_dir, url_root)
@@ -261,7 +261,7 @@ def build_plugin(plugin_dir, dev, clean, watch, url_root):
 @_common_build_options(allow_watch=False)
 @click.pass_context
 def build_all_plugins(ctx, plugins_dir, dev, clean, url_root):
-    """Run webpack to build plugin assets"""
+    """Run webpack to build plugin assets."""
     plugins = sorted(d for d in os.listdir(plugins_dir) if _is_plugin_dir(os.path.join(plugins_dir, d)))
     for plugin in plugins:
         step('plugin: {}', plugin)

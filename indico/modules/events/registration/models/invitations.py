@@ -27,7 +27,7 @@ class InvitationState(RichIntEnum):
 
 
 class RegistrationInvitation(db.Model):
-    """An invitation for someone to register"""
+    """An invitation for someone to register."""
     __tablename__ = 'invitations'
     __table_args__ = (db.CheckConstraint("(state = {state}) OR (registration_id IS NULL)"
                                          .format(state=InvitationState.accepted), name='registration_state'),
@@ -117,7 +117,7 @@ class RegistrationInvitation(db.Model):
     def locator(self):
         """A locator suitable for 'display' pages.
 
-        Instead of the numeric ID it uses the UUID
+        Instead of the numeric ID it uses the UUID.
         """
         assert self.uuid is not None
         return dict(self.registration_form.locator, invitation=self.uuid)

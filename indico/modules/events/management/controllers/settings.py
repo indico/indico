@@ -36,7 +36,7 @@ from indico.web.util import jsonify_data, jsonify_form, jsonify_template
 
 
 class RHEventSettings(RHManageEventBase):
-    """Event settings dashboard"""
+    """Event settings dashboard."""
 
     def _check_access(self):
         if not session.user:

@@ -21,7 +21,7 @@ from indico.util.string import format_repr, return_ascii
 
 
 class EventReminder(db.Model):
-    """Email reminders for events"""
+    """Email reminders for events."""
     __tablename__ = 'reminders'
     __table_args__ = (db.Index(None, 'scheduled_dt', postgresql_where=db.text('not is_sent')),
                       {'schema': 'events'})
@@ -130,7 +130,7 @@ class EventReminder(db.Model):
 
     @property
     def all_recipients(self):
-        """Returns all recipients of the notifications.
+        """Return all recipients of the notifications.
 
         This includes both explicit recipients and, if enabled,
         participants of the event.
@@ -143,7 +143,7 @@ class EventReminder(db.Model):
 
     @hybrid_property
     def is_relative(self):
-        """Returns if the reminder is relative to the event time"""
+        """Return if the reminder is relative to the event time."""
         return self.event_start_delta is not None
 
     @is_relative.expression
@@ -155,7 +155,7 @@ class EventReminder(db.Model):
         return not self.is_sent and self.scheduled_dt <= now_utc()
 
     def send(self):
-        """Sends the reminder to its recipients."""
+        """Send the reminder to its recipients."""
         self.is_sent = True
         recipients = self.all_recipients
         if not recipients:

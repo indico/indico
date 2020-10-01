@@ -29,7 +29,7 @@ from indico.web.util import jsonify_data, jsonify_form
 
 
 class RHBOASettings(RHManageAbstractsBase):
-    """Configure book of abstracts"""
+    """Configure book of abstracts."""
 
     def _process(self):
         form = BOASettingsForm(obj=FormDefaults(**boa_settings.get_all(self.event)))
@@ -80,7 +80,7 @@ class RHCustomBOA(RHManageAbstractsBase):
 
 
 class RHExportBOA(RHAbstractsBase):
-    """Export the book of abstracts"""
+    """Export the book of abstracts."""
 
     def _check_access(self):
         RHAbstractsBase._check_access(self)
@@ -99,7 +99,7 @@ class RHExportBOA(RHAbstractsBase):
 
 
 class RHExportBOATeX(RHManageAbstractsBase):
-    """Export a zip file with the book of abstracts in TeX format"""
+    """Export a zip file with the book of abstracts in TeX format."""
 
     def _process(self):
         return send_file('book-of-abstracts.zip', create_boa_tex(self.event), 'application/zip', inline=False)

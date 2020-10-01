@@ -27,7 +27,7 @@ from indico.web.util import jsonify_data, jsonify_form, jsonify_template
 
 
 class RHPaymentAdminSettings(RHAdminBase):
-    """Payment settings in server admin area"""
+    """Payment settings in server admin area."""
 
     def _process(self):
         form = AdminSettingsForm(obj=FormDefaults(**payment_settings.get_all()))
@@ -40,23 +40,23 @@ class RHPaymentAdminSettings(RHAdminBase):
 
 
 class RHPaymentAdminPluginSettings(RHPluginDetails):
-    """Payment plugin settings in server admin area"""
+    """Payment plugin settings in server admin area."""
     back_button_endpoint = 'payment.admin_settings'
 
 
 class RHPaymentManagementBase(RHManageEventBase):
-    """Base RH for event management pages"""
+    """Base RH for event management pages."""
 
     EVENT_FEATURE = 'payment'
 
 
 class RHPaymentBase(RHRegistrationFormRegistrationBase):
-    """Base RH for non-management payment pages"""
+    """Base RH for non-management payment pages."""
     EVENT_FEATURE = 'payment'
 
 
 class RHPaymentSettings(RHPaymentManagementBase):
-    """Display payment settings"""
+    """Display payment settings."""
 
     def _process(self):
         methods = get_payment_plugins()
@@ -68,7 +68,7 @@ class RHPaymentSettings(RHPaymentManagementBase):
 
 
 class RHPaymentSettingsEdit(RHPaymentManagementBase):
-    """Edit payment settings"""
+    """Edit payment settings."""
 
     def _process(self):
         current_event_settings = payment_event_settings.get_all(self.event)
@@ -82,7 +82,7 @@ class RHPaymentSettingsEdit(RHPaymentManagementBase):
 
 
 class RHPaymentPluginEdit(RHPaymentManagementBase):
-    """Configure a payment plugin for an event"""
+    """Configure a payment plugin for an event."""
 
     def _process_args(self):
         RHPaymentManagementBase._process_args(self)
@@ -124,7 +124,7 @@ class RHPaymentPluginEdit(RHPaymentManagementBase):
 
 
 class RHPaymentCheckout(RHPaymentBase):
-    """Display payment checkout page"""
+    """Display payment checkout page."""
 
     def _process(self):
         if self.registration.state != RegistrationState.unpaid:
@@ -140,7 +140,7 @@ class RHPaymentCheckout(RHPaymentBase):
 
 
 class RHPaymentForm(RHPaymentBase):
-    """Load the form for the selected payment plugin"""
+    """Load the form for the selected payment plugin."""
 
     def _process_args(self):
         RHPaymentBase._process_args(self)

@@ -86,7 +86,7 @@ class RHEventVCRoomMixin:
 
 
 class RHVCManageEvent(RHVCManageEventBase):
-    """Lists the available videoconference rooms"""
+    """List the available videoconference rooms."""
 
     def _process(self):
         room_event_assocs = VCRoomEventAssociation.find_for_event(self.event, include_hidden=True,
@@ -97,7 +97,10 @@ class RHVCManageEvent(RHVCManageEventBase):
 
 
 class RHVCManageEventSelectService(RHVCManageEventBase):
-    """List available videoconference plugins to create a new videoconference room"""
+    """
+    List available videoconference plugins to create a new
+    videoconference room.
+    """
 
     def _process(self):
         action = request.args.get('vc_room_action', '.manage_vc_rooms_create')
@@ -116,7 +119,7 @@ class RHVCManageEventCreateBase(RHVCManageEventBase):
 
 
 class RHVCManageEventCreate(RHVCManageEventCreateBase):
-    """Loads the form for the selected VC plugin"""
+    """Load the form for the selected VC plugin."""
 
     def _process(self):
         if not self.plugin.can_manage_vc_rooms(session.user, self.event):
@@ -172,7 +175,7 @@ class RHVCSystemEventBase(RHEventVCRoomMixin, RHVCManageEventBase):
 
 
 class RHVCManageEventModify(RHVCSystemEventBase):
-    """Modifies an existing VC room"""
+    """Modify an existing VC room."""
 
     def _process(self):
         if not self.plugin.can_manage_vc_rooms(session.user, self.event):
@@ -224,7 +227,7 @@ class RHVCManageEventModify(RHVCSystemEventBase):
 
 
 class RHVCManageEventRefresh(RHVCSystemEventBase):
-    """Refreshes an existing VC room, fetching information from the VC system"""
+    """Refresh an existing VC room, fetching information from the VC system."""
 
     def _process(self):
         if not self.plugin.can_manage_vc_rooms(session.user, self.event):
@@ -248,7 +251,7 @@ class RHVCManageEventRefresh(RHVCSystemEventBase):
 
 
 class RHVCManageEventRemove(RHVCSystemEventBase):
-    """Removes an existing VC room"""
+    """Remove an existing VC room."""
 
     def _process(self):
         if not self.plugin.can_manage_vc_rooms(session.user, self.event):
@@ -264,7 +267,7 @@ class RHVCManageEventRemove(RHVCSystemEventBase):
 
 
 class RHVCEventPage(RHDisplayEventBase):
-    """Lists the VC rooms in an event page"""
+    """List the VC rooms in an event page."""
 
     def _process(self):
         event_vc_rooms = VCRoomEventAssociation.find_for_event(self.event).all()
@@ -279,7 +282,7 @@ class RHVCEventPage(RHDisplayEventBase):
 
 
 class RHVCManageAttach(RHVCManageEventCreateBase):
-    """Attaches a room to the event"""
+    """Attach a room to the event."""
 
     def _process(self):
         defaults = FormDefaults(self.plugin.get_vc_room_attach_form_defaults(self.event))
@@ -306,7 +309,7 @@ class RHVCManageAttach(RHVCManageEventCreateBase):
 
 
 class RHVCManageSearch(RHVCManageEventCreateBase):
-    """Searches for a room based on its name"""
+    """Search for a room based on its name."""
 
     def _process_args(self):
         RHVCManageEventCreateBase._process_args(self)
@@ -336,7 +339,7 @@ class RHVCManageSearch(RHVCManageEventCreateBase):
 
 
 class RHVCRoomList(RHProtected):
-    """Provides a list of videoconference rooms"""
+    """Provide a list of videoconference rooms."""
 
     def _check_access(self):
         RHProtected._check_access(self)

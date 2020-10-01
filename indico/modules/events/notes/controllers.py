@@ -26,7 +26,7 @@ from indico.web.util import jsonify_template
 
 
 class RHNoteBase(RHProtected):
-    """Base handler for notes attached to an object inside an event"""
+    """Base handler for notes attached to an object inside an event."""
 
     def _process_args(self):
         self.object_type, self.event, self.object = get_object_from_args()
@@ -35,7 +35,7 @@ class RHNoteBase(RHProtected):
 
 
 class RHManageNoteBase(RHNoteBase):
-    """Base handler for managing notes attached to an object inside an event"""
+    """Base handler for managing notes attached to an object inside an event."""
 
     def _check_access(self):
         RHNoteBase._check_access(self)
@@ -45,7 +45,7 @@ class RHManageNoteBase(RHNoteBase):
 
 
 class RHEditNote(RHManageNoteBase):
-    """Create/edit a note attached to an object inside an event"""
+    """Create/edit a note attached to an object inside an event."""
 
     def _get_defaults(self, note=None, source=None):
         if source:
@@ -92,7 +92,7 @@ class RHEditNote(RHManageNoteBase):
 
 
 class RHCompileNotes(RHEditNote):
-    """Handle note edits a note attached to an object inside an event"""
+    """Handle note edits a note attached to an object inside an event."""
 
     def _process(self):
         source = render_template('events/notes/compiled_notes.html', notes=get_scheduled_notes(self.event))
@@ -101,7 +101,7 @@ class RHCompileNotes(RHEditNote):
 
 
 class RHDeleteNote(RHManageNoteBase):
-    """Handles deletion of a note attached to an object inside an event"""
+    """Handle deletion of a note attached to an object inside an event."""
 
     def _process(self):
         note = EventNote.get_for_linked_object(self.object, preload_event=False)
@@ -115,7 +115,7 @@ class RHDeleteNote(RHManageNoteBase):
 
 
 class RHViewNote(RHNoteBase):
-    """Handles display of a note attached to an object inside an event"""
+    """Handle display of a note attached to an object inside an event."""
 
     def _check_access(self):
         if not self.object.can_access(session.user):

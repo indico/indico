@@ -29,7 +29,7 @@ class RHRemindersBase(RHManageEventBase):
 
 
 class RHSpecificReminderBase(RHRemindersBase):
-    """Base class for pages related to a specific reminder"""
+    """Base class for pages related to a specific reminder."""
 
     normalize_url_spec = {
         'locators': {
@@ -43,7 +43,7 @@ class RHSpecificReminderBase(RHRemindersBase):
 
 
 class RHListReminders(RHRemindersBase):
-    """Shows the list of event reminders"""
+    """Show the list of event reminders."""
 
     def _process(self):
         reminders = EventReminder.query.with_parent(self.event).order_by(EventReminder.scheduled_dt.desc()).all()
@@ -51,7 +51,7 @@ class RHListReminders(RHRemindersBase):
 
 
 class RHDeleteReminder(RHSpecificReminderBase):
-    """Deletes a reminder"""
+    """Delete a reminder."""
 
     def _process(self):
         if self.reminder.is_sent:
@@ -65,14 +65,14 @@ class RHDeleteReminder(RHSpecificReminderBase):
 
 
 def _send_reminder(reminder):
-    """Send reminder immediately"""
+    """Send reminder immediately."""
     reminder.send()
     logger.info('Reminder sent by %s: %s', session.user, reminder)
     flash(_('The reminder has been sent.'), 'success')
 
 
 class RHEditReminder(RHSpecificReminderBase):
-    """Modifies an existing reminder"""
+    """Modify an existing reminder."""
 
     def _get_defaults(self):
         reminder = self.reminder
@@ -105,7 +105,7 @@ class RHEditReminder(RHSpecificReminderBase):
 
 
 class RHAddReminder(RHRemindersBase):
-    """Adds a new reminder"""
+    """Add a new reminder."""
 
     def _process(self):
         form = ReminderForm(event=self.event, schedule_type='relative')
@@ -126,7 +126,7 @@ class RHAddReminder(RHRemindersBase):
 
 
 class RHPreviewReminder(RHRemindersBase):
-    """Previews the email for a reminder"""
+    """Preview the email for a reminder."""
 
     def _process(self):
         include_summary = request.form.get('include_summary') == '1'

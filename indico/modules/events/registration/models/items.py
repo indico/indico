@@ -43,7 +43,9 @@ class RegistrationFormItemType(int, IndicoEnum):
 
 # We are not using a RichIntEnum since one of the instances is named "title".
 class PersonalDataType(int, IndicoEnum):
-    """Description of the personal data items that exist on every registration form"""
+    """
+    Description of the personal data items that exist on every registration form.
+    """
 
     __titles__ = [None, 'Email Address', 'First Name', 'Last Name', 'Affiliation', 'Title', 'Address',
                   'Phone Number', 'Country', 'Position']
@@ -138,7 +140,7 @@ class PersonalDataType(int, IndicoEnum):
 
 
 class RegistrationFormItem(db.Model):
-    """Generic registration form item"""
+    """Generic registration form item."""
 
     __tablename__ = 'form_items'
     __table_args__ = (
@@ -309,7 +311,7 @@ class RegistrationFormItem(db.Model):
 
     @property
     def view_data(self):
-        """Returns object with data that Angular can understand"""
+        """Return object with data that Angular can understand."""
         return dict(id=self.id, description=self.description, position=self.position)
 
     @hybrid_property
@@ -349,7 +351,7 @@ class RegistrationFormItem(db.Model):
 
 
 class RegistrationFormSection(RegistrationFormItem):
-    """Registration form section that can contain fields and text"""
+    """Registration form section that can contain fields and text."""
 
     __mapper_args__ = {
         'polymorphic_identity': RegistrationFormItemType.section
@@ -396,7 +398,7 @@ class RegistrationFormPersonalDataSection(RegistrationFormSection):
 
 
 class RegistrationFormText(RegistrationFormItem):
-    """Text to be displayed in registration form sections"""
+    """Text to be displayed in registration form sections."""
 
     __mapper_args__ = {
         'polymorphic_identity': RegistrationFormItemType.text

@@ -42,7 +42,7 @@ def build_note_legacy_api_data(note):
 
 
 def get_scheduled_notes(event):
-    """Gets all notes of scheduled items inside an event"""
+    """Get all notes of scheduled items inside an event."""
     def _sort_note_by(note):
         obj = note.object
         if hasattr(obj, 'start_dt'):
@@ -73,7 +73,7 @@ def get_scheduled_notes(event):
 
 
 def can_edit_note(obj, user):
-    """Checks if a user can edit the object's note"""
+    """Check if a user can edit the object's note."""
     if not user:
         return False
     if obj.can_manage(user):

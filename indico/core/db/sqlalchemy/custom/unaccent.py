@@ -41,7 +41,7 @@ def create_unaccent_function(conn):
 
 
 def define_unaccented_lowercase_index(column):
-    """Defines an index that uses the indico_unaccent function.
+    """Define an index that uses the indico_unaccent function.
 
     Since this is usually used for searching, the column's value is
     also converted to lowercase before being unaccented. To make proper

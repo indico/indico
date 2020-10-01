@@ -72,11 +72,14 @@ class AbstractListGeneratorBase(ListGeneratorBase):
         return [{'id': id_, 'caption': self.static_items[id_]['title']} for id_ in self.static_items if id_ in ids]
 
     def get_all_contribution_fields(self):
-        """Return the list of contribution fields for the event"""
+        """Return the list of contribution fields for the event."""
         return self.event.contribution_fields if self.show_contribution_fields else []
 
     def _get_sorted_contribution_fields(self, item_ids):
-        """Return the contribution fields ordered by their position in the abstract form."""
+        """
+        Return the contribution fields ordered by their position in
+        the abstract form.
+        """
 
         if not item_ids or not self.show_contribution_fields:
             return []
@@ -209,7 +212,10 @@ class AbstractListGeneratorBase(ListGeneratorBase):
 
 
 class AbstractListGeneratorManagement(AbstractListGeneratorBase):
-    """Listing and filtering actions in the abstract list in the management view"""
+    """
+    Listing and filtering actions in the abstract list in the
+    management view.
+    """
 
     list_link_type = 'abstract_management'
     endpoint = '.manage_abstract_list'
@@ -226,7 +232,9 @@ class AbstractListGeneratorManagement(AbstractListGeneratorBase):
 
 
 class AbstractListGeneratorDisplay(AbstractListGeneratorBase):
-    """Listing and filtering actions in the abstract list in the display view"""
+    """
+    Listing and filtering actions in the abstract list in the display view.
+    """
 
     list_link_type = 'abstract_display'
     endpoint = '.display_reviewable_track_abstracts'

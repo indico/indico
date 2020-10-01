@@ -45,7 +45,7 @@ class SubmissionRightsType(RichEnum):
 
 
 class BOALinkFormat(RichEnum):
-    """LaTeX book of abstracts link format setting
+    """LaTeX book of abstracts link format setting.
 
     value is a 2-tuple of strings:
     first is the hyperref option to use

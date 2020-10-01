@@ -83,7 +83,7 @@ class BulkPaperJudgmentForm(IndicoForm):
 
 
 class PaperReviewingSettingsForm(IndicoForm):
-    """Settings form for paper reviewing"""
+    """Settings form for paper reviewing."""
 
     RATING_FIELDS = ('scale_lower', 'scale_upper')
 

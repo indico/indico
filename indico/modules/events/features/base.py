@@ -53,22 +53,22 @@ class EventFeature(object):
 
     @classmethod
     def is_default_for_event(cls, event):  # pragma: no cover
-        """Checks if the feature should be enabled by default"""
+        """Check if the feature should be enabled by default."""
         return False
 
     @classmethod
     def is_allowed_for_event(cls, event):  # pragma: no cover
-        """Check if the feature can be enabled in an event"""
+        """Check if the feature can be enabled in an event."""
         return True
 
     @classmethod
     def enabled(cls, event, cloning):  # pragma: no cover
-        """Called when the feature is enabled for an event"""
+        """Called when the feature is enabled for an event."""
         pass
 
     @classmethod
     def disabled(cls, event):  # pragma: no cover
-        """Called when the feature is disabled for an event"""
+        """Called when the feature is disabled for an event."""
         pass
 
     @cached_classproperty

@@ -250,9 +250,7 @@ class AvatarUserWrapper(Fossilizable):
 
 
 class AvatarProvisionalWrapper(Fossilizable):
-    """
-    Wraps provisional data for users that are not in the DB yet
-    """
+    """Wrap provisional data for users that are not in the DB yet."""
 
     fossilizes(IAvatarFossil, IAvatarMinimalFossil)
 

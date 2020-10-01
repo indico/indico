@@ -24,7 +24,7 @@ html_comment_re = re.compile(r'<!--.*?-->', re.MULTILINE)
 
 
 class ConcatWidget(object):
-    """Renders a list of fields as a simple string joined by an optional separator."""
+    """Render a list of fields as a simple string joined by an optional separator."""
     def __init__(self, separator='', prefix_label=True):
         self.separator = separator
         self.prefix_label = prefix_label
@@ -40,7 +40,7 @@ class ConcatWidget(object):
 
 
 class HiddenInputs(HiddenInput):
-    """Renders hidden inputs for list elements"""
+    """Render hidden inputs for list elements."""
     item_widget = HiddenInput()
 
     def __call__(self, field, **kwargs):
@@ -49,7 +49,7 @@ class HiddenInputs(HiddenInput):
 
 
 class HiddenCheckbox(CheckboxInput, HiddenInput):
-    """Renders an invisible checkbox.
+    """Render an invisible checkbox.
 
     This widget also inherits from HiddenInput to avoid creating
     a form row when rendering the form containing it.
@@ -61,7 +61,7 @@ class HiddenCheckbox(CheckboxInput, HiddenInput):
 
 
 class JinjaWidget(object):
-    """Renders a field using a custom Jinja template
+    """Render a field using a custom Jinja template
 
     :param template: The template to render
     :param plugin: The plugin or plugin name containing the template
@@ -103,7 +103,7 @@ class JinjaWidget(object):
 
 
 class PasswordWidget(JinjaWidget):
-    """Renders a password input"""
+    """Render a password input."""
 
     def __init__(self):
         super(PasswordWidget, self).__init__('forms/password_widget.html', single_line=True)
@@ -113,7 +113,7 @@ class PasswordWidget(JinjaWidget):
 
 
 class CKEditorWidget(JinjaWidget):
-    """Renders a CKEditor WYSIWYG editor
+    """Render a CKEditor WYSIWYG editor.
 
     :param simple: Use a simpler version with less options.
     :param images: Whether to allow images in simple mode.
@@ -124,7 +124,7 @@ class CKEditorWidget(JinjaWidget):
 
 
 class SwitchWidget(JinjaWidget):
-    """Renders a switch widget
+    """Render a switch widget.
 
     :param confirm_enable: Text to prompt when enabling the switch
     :param confirm_disable: Text to prompt when disabling the switch
@@ -144,7 +144,7 @@ class SwitchWidget(JinjaWidget):
 
 
 class SyncedInputWidget(JinjaWidget):
-    """Renders a text input with a sync button when needed."""
+    """Render a text input with a sync button when needed."""
 
     def __init__(self, textarea=False):
         super(SyncedInputWidget, self).__init__('forms/synced_input_widget.html', single_line=not textarea)
@@ -160,7 +160,7 @@ class SyncedInputWidget(JinjaWidget):
 
 
 class SelectizeWidget(JinjaWidget):
-    """Renders a selectize-based widget
+    """Render a selectize-based widget.
 
     :param search_url: The URL used to retrieve items.
     :param search_method: The method used to retrieve items.
@@ -216,7 +216,7 @@ class SelectizeWidget(JinjaWidget):
 
 
 class TypeaheadWidget(JinjaWidget):
-    """Renders a text field enhanced with jquery-typeahead
+    """Render a text field enhanced with jquery-typeahead.
 
     :param search_url: The URL used to retrieve AJAX-based suggestions.
     :param min_trigger_length: Number of characters needed to start
@@ -241,7 +241,7 @@ class TypeaheadWidget(JinjaWidget):
 
 
 class LocationWidget(JinjaWidget):
-    """Renders a collection of fields to represent location"""
+    """Render a collection of fields to represent location."""
 
     def __init__(self):
         super(LocationWidget, self).__init__('forms/location_widget.html', single_line=True)
@@ -283,7 +283,7 @@ class LocationWidget(JinjaWidget):
 
 
 class ColorPickerWidget(JinjaWidget):
-    """Renders a colorpicker input field"""
+    """Render a colorpicker input field."""
 
     def __init__(self, show_field=True):
         super(ColorPickerWidget, self).__init__('forms/color_picker_widget.html', single_line=True,

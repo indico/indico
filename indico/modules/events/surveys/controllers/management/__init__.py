@@ -14,7 +14,7 @@ from indico.modules.events.surveys.models.surveys import Survey
 
 
 class RHManageSurveysBase(RHManageEventBase):
-    """Base class for all survey management RHs"""
+    """Base class for all survey management RHs."""
 
     PERMISSION = 'surveys'
 

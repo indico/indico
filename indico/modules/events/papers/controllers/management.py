@@ -41,7 +41,7 @@ def _render_paper_dashboard(event, view_class=None):
 
 
 class RHPapersDashboard(RHManagePapersBase):
-    """Dashboard of the papers module"""
+    """Dashboard of the papers module."""
 
     # Allow access even if the feature is disabled
     EVENT_FEATURE = None
@@ -54,7 +54,7 @@ class RHPapersDashboard(RHManagePapersBase):
 
 
 class RHManagePaperTeams(RHManagePapersBase):
-    """Modify managers of the papers module"""
+    """Modify managers of the papers module."""
 
     def _process(self):
         cfp = self.event.cfp
@@ -87,7 +87,7 @@ class RHManagePaperTeams(RHManagePapersBase):
 
 
 class RHSwitchReviewingType(RHManagePapersBase):
-    """Enable/disable the paper reviewing types"""
+    """Enable/disable the paper reviewing types."""
 
     def _process_PUT(self):
         set_reviewing_state(self.event, PaperReviewType[request.view_args['reviewing_type']], True)
@@ -99,7 +99,7 @@ class RHSwitchReviewingType(RHManagePapersBase):
 
 
 class RHManageCompetences(RHManagePapersBase):
-    """Manage the competences of the call for papers ACLs"""
+    """Manage the competences of the call for papers ACLs."""
 
     def _process(self):
         form_class = make_competences_form(self.event)
@@ -122,7 +122,7 @@ class RHManageCompetences(RHManagePapersBase):
 
 
 class RHContactStaff(RHManagePapersBase):
-    """Send emails to reviewing staff"""
+    """Send emails to reviewing staff."""
 
     def _process(self):
         paper_persons_dict = {}
@@ -156,7 +156,7 @@ class RHScheduleCFP(RHManagePapersBase):
 
 
 class RHOpenCFP(RHManagePapersBase):
-    """Open the call for papers"""
+    """Open the call for papers."""
 
     def _process(self):
         open_cfp(self.event)
@@ -165,7 +165,7 @@ class RHOpenCFP(RHManagePapersBase):
 
 
 class RHCloseCFP(RHManagePapersBase):
-    """Close the call for papers"""
+    """Close the call for papers."""
 
     def _process(self):
         close_cfp(self.event)

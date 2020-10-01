@@ -163,7 +163,7 @@ class Session(DescriptionMixin, ColorMixin, ProtectionManagersMixin, LocationMix
 
     @property
     def session(self):
-        """Convenience property so all event entities have it"""
+        """Convenience property so all event entities have it."""
         return self
 
     @property
@@ -206,7 +206,7 @@ class Session(DescriptionMixin, ColorMixin, ProtectionManagersMixin, LocationMix
         return dict(self.event.locator, session_id=self.id)
 
     def get_non_inheriting_objects(self):
-        """Get a set of child objects that do not inherit protection"""
+        """Get a set of child objects that do not inherit protection."""
         return get_non_inheriting_objects(self)
 
     @return_ascii

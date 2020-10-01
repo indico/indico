@@ -34,7 +34,10 @@ from indico.web.flask.templating import get_template_module
 
 
 def build_default_email_template(event, tpl_type):
-    """Build a default e-mail template based on a notification type provided by the user."""
+    """
+    Build a default e-mail template based on a notification type
+    provided by the user.
+    """
     email = get_template_module('events/abstracts/emails/default_{}_notification.txt'.format(tpl_type))
     tpl = AbstractEmailTemplate(body=email.get_body(),
                                 extra_cc_emails=[],
@@ -47,7 +50,7 @@ def build_default_email_template(event, tpl_type):
 
 
 def generate_spreadsheet_from_abstracts(abstracts, static_item_ids, dynamic_items):
-    """Generates a spreadsheet data from a given abstract list.
+    """Generate a spreadsheet data from a given abstract list.
 
     :param abstracts: The list of abstracts to include in the file
     :param static_item_ids: The abstract properties to be used as columns
@@ -168,7 +171,7 @@ def create_mock_abstract(event):
 
 
 def make_abstract_form(event, user, notification_option=False, management=False, invited=False):
-    """Extends the abstract WTForm to add the extra fields.
+    """Extend the abstract WTForm to add the extra fields.
 
     Each extra field will use a field named ``custom_ID``.
 
@@ -208,7 +211,7 @@ def make_abstract_form(event, user, notification_option=False, management=False,
 
 
 def get_user_abstracts(event, user):
-    """Get the list of abstracts where the user is a reviewer/convener"""
+    """Get the list of abstracts where the user is a reviewer/convener."""
     return (Abstract.query.with_parent(event)
             .options(joinedload('reviews'),
                      joinedload('person_links'))
@@ -230,7 +233,7 @@ def get_visible_reviewed_for_tracks(abstract, user):
 
 
 def get_user_tracks(event, user):
-    """Get the list of tracks where the user is a reviewer/convener"""
+    """Get the list of tracks where the user is a reviewer/convener."""
     tracks = Track.query.with_parent(event).order_by(Track.title).all()
     if (event.can_manage(user, permission='review_all_abstracts', explicit_permission=True) or
             event.can_manage(user, permission='convene_all_abstracts', explicit_permission=True)):
@@ -277,7 +280,7 @@ def get_track_reviewer_abstract_counts(event, user):
 
 
 def create_boa(event):
-    """Create the book of abstracts if necessary
+    """Create the book of abstracts if necessary.
 
     :return: The path to the PDF file
     """
@@ -307,7 +310,7 @@ def create_boa_tex(event):
 
 
 def clear_boa_cache(event):
-    """Delete the cached book of abstract"""
+    """Delete the cached book of abstract."""
     path = boa_settings.get(event, 'cache_path')
     if path:
         try:

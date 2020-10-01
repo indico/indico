@@ -15,7 +15,7 @@ from indico.web.flask.util import url_for
 
 
 class ProposalGroupProxy(object):
-    """Represents the object that the proposals can be grouped by.
+    """The object that the proposals can be grouped by.
 
     It provides all necessary methods for building the URLs, displaying the
     grouping information, etc.
@@ -60,7 +60,8 @@ class ProposalGroupProxy(object):
 
 
 class ProposalRevisionMixin(object):
-    """ Properties and methods of a proposal revision."""
+    """Properties and methods of a proposal revision."""
+
     #: The attribute  of the revision used to fetch the proposal object.
     proposal_attr = None
     #: Whether the reviewing process supports multiple revisions per proposal.
@@ -101,9 +102,11 @@ class ProposalRevisionMixin(object):
 
 
 class ProposalMixin(object):
-    """Classes that represent a proposal object should extend this class (ex:
+    """
+    Classes that represent a proposal object should extend this class (ex:
     Abstract, Paper).
     """
+
     #: A unique identifier to handle rendering differences between proposal
     #: types
     proposal_type = None
@@ -171,11 +174,12 @@ class ProposalCommentMixin(object):
 
 
 class ProposalReviewMixin(object):
-    """Mixin for proposal reviews
+    """Mixin for proposal reviews.
 
     Classes that represent a review of a proposal should extend this class
     (ex: AbstractReview, PaperReview).
     """
+
     #: A unique identifier to handle rendering differences between timeline
     #: items
     timeline_item_type = 'review'

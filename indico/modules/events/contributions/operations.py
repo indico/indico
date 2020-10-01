@@ -26,7 +26,7 @@ from indico.modules.events.util import set_custom_fields
 
 
 def _ensure_consistency(contrib):
-    """Unschedule contribution if not consistent with timetable
+    """Unschedule contribution if not consistent with timetable.
 
     A contribution that has no session assigned, may not be scheduled
     inside a session.  A contribution that has a session assigned may
@@ -72,7 +72,7 @@ def create_contribution(event, contrib_data, custom_fields_data=None, session_bl
 
 @no_autoflush
 def update_contribution(contrib, contrib_data, custom_fields_data=None):
-    """Update a contribution
+    """Update a contribution.
 
     :param contrib: The `Contribution` to update
     :param contrib_data: A dict containing the data to update

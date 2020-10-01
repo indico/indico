@@ -177,7 +177,9 @@ class PaperAssignmentListGenerator(PaperListGeneratorBase):
 
 
 class PaperJudgingAreaListGeneratorDisplay(PaperListGeneratorBase):
-    """Listing and filtering actions in paper judging area list in the display view"""
+    """
+    Listing and filtering actions in paper judging area list in the display view.
+    """
 
     endpoint = '.papers_list'
     list_link_type = 'paper_judging_display'

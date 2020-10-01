@@ -299,7 +299,7 @@ class VCRoomEventAssociation(db.Model):
 
     @classmethod
     def find_for_event(cls, event, include_hidden=False, include_deleted=False, only_linked_to_event=False, **kwargs):
-        """Returns a Query that retrieves the videoconference rooms for an event
+        """Return a Query that retrieves the videoconference rooms for an event.
 
         :param event: an indico Event
         :param only_linked_to_event: only retrieve the vc rooms linked to the whole event
@@ -319,11 +319,11 @@ class VCRoomEventAssociation(db.Model):
     @classmethod
     @memoize_request
     def get_linked_for_event(cls, event):
-        """Get a dict mapping link objects to event vc rooms"""
+        """Get a dict mapping link objects to event vc rooms."""
         return {vcr.link_object: vcr for vcr in cls.find_for_event(event)}
 
     def delete(self, user, delete_all=False):
-        """Deletes a VC room from an event
+        """Delete a VC room from an event.
 
         If the room is not used anywhere else, the room itself is also deleted.
 

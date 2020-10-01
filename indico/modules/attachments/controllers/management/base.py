@@ -61,7 +61,7 @@ def _get_folders_protection_info(linked_object):
 
 
 class ManageAttachmentsMixin:
-    """Shows the attachment management page"""
+    """Show the attachment management page."""
     wp = None
 
     def _process(self):
@@ -76,7 +76,7 @@ class ManageAttachmentsMixin:
 
 
 class AddAttachmentFilesMixin:
-    """Upload file attachments"""
+    """Upload file attachments."""
 
     def _process(self):
         form = AddAttachmentFilesForm(linked_object=self.object)
@@ -105,7 +105,7 @@ class AddAttachmentFilesMixin:
 
 
 class AddAttachmentLinkMixin:
-    """Add link attachment"""
+    """Add link attachment."""
 
     def _process(self):
         form = AddAttachmentLinkForm(linked_object=self.object)
@@ -119,7 +119,7 @@ class AddAttachmentLinkMixin:
 
 
 class EditAttachmentMixin(SpecificAttachmentMixin):
-    """Edit an attachment"""
+    """Edit an attachment."""
 
     def _process(self):
         defaults = FormDefaults(self.attachment, protected=self.attachment.is_self_protected, skip_attrs={'file'})
@@ -158,7 +158,7 @@ class EditAttachmentMixin(SpecificAttachmentMixin):
 
 
 class CreateFolderMixin:
-    """Create a new empty folder"""
+    """Create a new empty folder."""
 
     def _process(self):
         form = AttachmentFolderForm(obj=FormDefaults(is_always_visible=True), linked_object=self.object)
@@ -177,7 +177,7 @@ class CreateFolderMixin:
 
 
 class EditFolderMixin(SpecificFolderMixin):
-    """Edit a folder"""
+    """Edit a folder."""
 
     def _process(self):
         defaults = FormDefaults(self.folder, protected=self.folder.is_self_protected)
@@ -197,7 +197,7 @@ class EditFolderMixin(SpecificFolderMixin):
 
 
 class DeleteFolderMixin(SpecificFolderMixin):
-    """Delete a folder"""
+    """Delete a folder."""
 
     def _process(self):
         self.folder.is_deleted = True
@@ -208,7 +208,7 @@ class DeleteFolderMixin(SpecificFolderMixin):
 
 
 class DeleteAttachmentMixin(SpecificAttachmentMixin):
-    """Delete an attachment"""
+    """Delete an attachment."""
 
     def _process(self):
         self.attachment.is_deleted = True

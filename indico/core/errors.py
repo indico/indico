@@ -16,7 +16,7 @@ from indico.util.string import to_unicode
 
 
 def get_error_description(exception):
-    """Gets a user-friendy description for an exception
+    """Get a user-friendy description for an exception.
 
     This overrides some HTTPException messages to be more suitable
     for end-users.

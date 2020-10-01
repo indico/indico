@@ -34,7 +34,7 @@ class EventLogKind(int, IndicoEnum):
 
 
 class EventLogEntry(db.Model):
-    """Log entries for events"""
+    """Log entries for events."""
     __tablename__ = 'logs'
     __table_args__ = (db.Index(None, 'meta', postgresql_using='gin'),
                       {'schema': 'events'})
@@ -132,7 +132,7 @@ class EventLogEntry(db.Model):
         return get_log_renderers().get(self.type)
 
     def render(self):
-        """Renders the log entry to be displayed.
+        """Render the log entry to be displayed.
 
         If the renderer is not available anymore, e.g. because of a
         disabled plugin, ``None`` is returned.

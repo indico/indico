@@ -60,7 +60,7 @@ class ProtectionMixin(object):
 
     @classmethod
     def register_protection_events(cls):
-        """Registers sqlalchemy events needed by this mixin.
+        """Register sqlalchemy events needed by this mixin.
 
         Call this method after the definition of a model which uses
         this mixin class.
@@ -120,7 +120,7 @@ class ProtectionMixin(object):
 
     @hybrid_property
     def is_self_protected(self):
-        """Checks whether the object itself is protected.
+        """Check whether the object itself is protected.
 
         If you also care about inherited protection from a parent,
         use `is_protected` instead.
@@ -132,7 +132,7 @@ class ProtectionMixin(object):
     @property
     def is_protected(self):
         """
-        Checks whether ths object is protected, either by itself or
+        Check whether this object is protected, either by itself or
         by inheriting from a protected object.
         """
         if self.disable_protection_mode:
@@ -151,7 +151,7 @@ class ProtectionMixin(object):
 
     @property
     def protection_parent(self):
-        """The parent object to consult for ProtectionMode.inheriting"""
+        """The parent object to consult for ProtectionMode.inheriting."""
         raise NotImplementedError
 
     def _check_can_access_override(self, user, allow_admin, authorized=None):
@@ -169,7 +169,7 @@ class ProtectionMixin(object):
 
     @memoize_request
     def can_access(self, user, allow_admin=True):
-        """Checks if the user can access the object.
+        """Check if the user can access the object.
 
         :param user: The :class:`.User` to check. May be None if the
                      user is not logged in.
@@ -264,7 +264,7 @@ class ProtectionMixin(object):
         return '{}-{}'.format(cls.__name__, '-'.join(map(unicode, pks)))
 
     def update_principal(self, principal, read_access=None, quiet=False):
-        """Updates access privileges for the given principal.
+        """Update access privileges for the given principal.
 
         :param principal: A `User`, `GroupProxy` or `EmailPrincipal` instance.
         :param read_access: If the principal should have explicit read
@@ -300,7 +300,7 @@ class ProtectionMixin(object):
         return entry
 
     def remove_principal(self, principal, quiet=False):
-        """Revokes all access privileges for the given principal.
+        """Revoke all access privileges for the given principal.
 
         This method doesn't do anything if the user is not in the
         object's ACL.
@@ -327,7 +327,7 @@ class ProtectionMixin(object):
 class ProtectionManagersMixin(ProtectionMixin):
     @property
     def all_manager_emails(self):
-        """Return the emails of all managers"""
+        """Return the emails of all managers."""
         # We ignore email principals here. They never signed up in indico anyway...
         return {p.principal.email
                 for p in self.acl_entries
@@ -335,7 +335,7 @@ class ProtectionManagersMixin(ProtectionMixin):
 
     @memoize_request
     def can_manage(self, user, permission=None, allow_admin=True, check_parent=True, explicit_permission=False):
-        """Checks if the user can manage the object.
+        """Check if the user can manage the object.
 
         :param user: The :class:`.User` to check. May be None if the
                      user is not logged in.
@@ -408,7 +408,7 @@ class ProtectionManagersMixin(ProtectionMixin):
 
     def update_principal(self, principal, read_access=None, full_access=None, permissions=None, add_permissions=None,
                          del_permissions=None, quiet=False):
-        """Updates access privileges for the given principal.
+        """Update access privileges for the given principal.
 
         If the principal is not in the ACL, it will be added if
         necessary.  If the changes remove all its privileges, it
@@ -515,7 +515,7 @@ class ProtectionManagersMixin(ProtectionMixin):
 
 
 def _get_acl_data(obj, principal):
-    """Helper function to get the necessary data for ACL modifications
+    """Helper function to get the necessary data for ACL modifications.
 
     :param obj: A `ProtectionMixin` instance
     :param principal: A User or GroupProxy uinstance
@@ -528,7 +528,7 @@ def _get_acl_data(obj, principal):
 
 
 def _resolve_principal(principal):
-    """Helper function to convert an email principal to a user if possible
+    """Helper function to convert an email principal to a user if possible.
 
     :param principal: A `User`, `GroupProxy` or `EmailPrincipal` instance.
     """

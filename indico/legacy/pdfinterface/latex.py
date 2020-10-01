@@ -93,7 +93,7 @@ class LaTeXRuntimeException(Exception):
 
 
 class LatexEscapeExtension(Extension):
-    """Ensures all strings in Jinja are latex-escaped"""
+    """Ensure all strings in Jinja are latex-escaped."""
 
     def filter_stream(self, stream):
         in_trans = False
@@ -134,7 +134,7 @@ def _latex_escape(s, ignore_braces=False):
 
 
 class LatexRunner(object):
-    """Handles the PDF generation from a chosen LaTeX template"""
+    """Handle the PDF generation from a chosen LaTeX template."""
 
     def __init__(self, source_dir, has_toc=False):
         self.source_dir = source_dir

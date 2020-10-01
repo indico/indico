@@ -43,7 +43,7 @@ _cache = GenericCache('Rooms')
 
 @memoize_request
 def rb_check_user_access(user):
-    """Checks if the user has access to the room booking system"""
+    """Check if the user has access to the room booking system."""
     from indico.modules.rb import rb_settings
     if rb_is_admin(user):
         return True
@@ -54,7 +54,7 @@ def rb_check_user_access(user):
 
 @memoize_request
 def rb_is_admin(user):
-    """Checks if the user is a room booking admin"""
+    """Check if the user is a room booking admin."""
     from indico.modules.rb import rb_settings
     if user.is_admin:
         return True
@@ -260,8 +260,7 @@ def _find_latest_entry_end_dt(event, day):
 
 
 def get_booking_params_for_event(event):
-    """
-    Get a set of RB interface parameters suitable for this event.
+    """Get a set of RB interface parameters suitable for this event.
 
     These parameters can then be used to construct a URL that will lead to a
     pre-filled search that matches the start/end times for a given day.

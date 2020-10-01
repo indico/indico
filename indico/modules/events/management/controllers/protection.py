@@ -40,7 +40,7 @@ from indico.web.util import jsonify_template
 
 
 class RHShowNonInheriting(RHManageEventBase):
-    """Show a list of non-inheriting child objects"""
+    """Show a list of non-inheriting child objects."""
 
     def _process_args(self):
         RHManageEventBase._process_args(self)
@@ -54,14 +54,14 @@ class RHShowNonInheriting(RHManageEventBase):
 
 
 class RHEventACL(RHManageEventBase):
-    """Display the inherited ACL of the event"""
+    """Display the inherited ACL of the event."""
 
     def _process(self):
         return render_acl(self.event)
 
 
 class RHEventACLMessage(RHManageEventBase):
-    """Render the inheriting ACL message"""
+    """Render the inheriting ACL message."""
 
     def _process(self):
         mode = ProtectionMode[request.args['mode']]
@@ -70,7 +70,7 @@ class RHEventACLMessage(RHManageEventBase):
 
 
 class RHEventProtection(RHManageEventBase):
-    """Show event protection"""
+    """Show event protection."""
 
     def _process(self):
         form = EventProtectionForm(obj=FormDefaults(**self._get_defaults()), event=self.event)

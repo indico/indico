@@ -14,7 +14,7 @@ from wtforms.fields.core import UnboundField
 
 
 def get_form_field_names(form_class):
-    """Returns the list of field names of a WTForm
+    """Return the list of field names of a WTForm.
 
     :param form_class: A `Form` subclass
     """

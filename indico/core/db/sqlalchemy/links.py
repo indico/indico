@@ -95,7 +95,7 @@ class LinkMixin(object):
 
     @classmethod
     def register_link_events(cls):
-        """Registers sqlalchemy events needed by this mixin.
+        """Register sqlalchemy events needed by this mixin.
 
         Call this method after the definition of a model which uses
         this mixin class.
@@ -345,7 +345,7 @@ class LinkMixin(object):
 
     @property
     def link_repr(self):
-        """A kwargs-style string suitable for the object's repr"""
+        """A kwargs-style string suitable for the object's repr."""
         info = [('link_type', self.link_type.name if self.link_type is not None else 'None')]
         info.extend((key, getattr(self, key)) for key in _all_columns if getattr(self, key) is not None)
         return ', '.join('{}={}'.format(key, value) for key, value in info)
@@ -353,7 +353,7 @@ class LinkMixin(object):
     @property
     def link_event_log_data(self):
         """
-        Returns a dict containing information about the linked object
+        Return a dict containing information about the linked object
         suitable for the event log.
 
         It does not return any information for an object linked to a

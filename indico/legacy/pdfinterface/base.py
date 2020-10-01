@@ -145,8 +145,10 @@ def int_to_roman(value):
 
 class Paragraph(platypus.Paragraph):
     """
-    add a part attribute for drawing the name of the current part on the laterPages function
+    Add a part attribute for drawing the name of the current part
+    on the laterPages function.
     """
+
     def __init__(self, text, style, part="", bulletText=None, frags=None, caseSensitive=1):
         platypus.Paragraph.__init__(self, to_unicode(text), style, bulletText, frags, caseSensitive)
         self._part = part
@@ -158,11 +160,12 @@ class Paragraph(platypus.Paragraph):
         return self._part
 
 class SimpleParagraph(platypus.Flowable):
-    """  Simple and fast paragraph.
+    """Simple and fast paragraph.
 
     WARNING! This paragraph cannot break the line and doesn't have almost any formatting methods.
              It's used only to increase PDF performance in places where normal paragraph is not needed.
     """
+
     def __init__(self, text, fontSize = 10, indent = 0, spaceAfter = 2):
         platypus.Flowable.__init__(self)
         self.text = text
@@ -180,10 +183,11 @@ class SimpleParagraph(platypus.Flowable):
         self.canv.drawString(self.indent, self.spaceAfter, self.text)
 
 class TableOfContentsEntry(Paragraph):
+    """Class used to create table of contents entry with its number.
+
+    Much faster than table of table of contents from platypus lib
     """
-        Class used to create table of contents entry with its number.
-        Much faster than table of table of contents from platypus lib
-    """
+
     def __init__(self, text, pageNumber, style, part="", bulletText=None, frags=None, caseSensitive=1):
         Paragraph.__init__(self, to_unicode(text), style, part, bulletText, frags, caseSensitive)
         self._part = part
@@ -191,7 +195,7 @@ class TableOfContentsEntry(Paragraph):
 
     def _drawDots(self):
         """
-        Draws row of dots from the end of the abstract title to the page number.
+        Draw row of dots from the end of the abstract title to the page number.
         """
         try:
             freeSpace = int(self.blPara.lines[-1][0])
@@ -390,20 +394,21 @@ class PDFBase:
         setTTFonts()
 
     def firstPage(self, c, doc):
-        """set the first page of the document
-        This function is call by doc.build method for the first page
+        """Set the first page of the document.
+
+        This function is called by doc.build method for the first page.
         """
         pass
 
     def laterPages(self, c, doc):
-        """set the layout of the page after the first
-        This function is call by doc.build method one each page after the first
+        """Set the layout of the page after the first.
+
+        This function is called by doc.build method one each page after the first.
         """
         pass
 
     def getBody(self, story=None):
-        """add the content to the story
-        """
+        """Add the content to the story."""
         pass
 
     def getPDFBin(self):
@@ -479,7 +484,7 @@ class PDFBase:
 
 
 def _doNothing(canvas, doc):
-    "Dummy callback for onPage"
+    "Dummy callback for onPage."
     pass
 
 
@@ -587,10 +592,7 @@ class DocTemplateWithTOC(SimpleDocTemplate):
 
 
 class PDFWithTOC(PDFBase):
-    """
-    create a PDF with a Table of Contents
-
-    """
+    """Create a PDF with a Table of Contents."""
 
     def __init__(self, story=None, pagesize='A4', fontsize='normal', firstPageNumber=1, include_toc=True):
         self._fontsize = fontsize
@@ -613,9 +615,9 @@ class PDFWithTOC(PDFBase):
         setTTFonts()
 
     def _processTOCPage(self):
-        """ Generates page with table of contents.
+        """Generates page with table of contents.
 
-        Not used, because table of contents is generated automatically inside DocTemplateWithTOC class
+        Not used, because table of contents is generated automatically inside DocTemplateWithTOC class.
         """
         style1 = ParagraphStyle({})
         style1.fontName = "Times-Bold"
@@ -630,7 +632,7 @@ class PDFWithTOC(PDFBase):
         self._story.append(PageBreak())
 
     def getBody(self, story=None):
-        """add the content to the story
+        """Add the content to the story.
         When you want to put a paragraph p in the toc, add it to the self._indexedFlowable as this:
             self._indexedFlowable[p] = {"text":"my title", "level":1}
         """

@@ -32,7 +32,7 @@ class _EnumFieldMixin(object):
 
 
 class IndicoEnumSelectField(_EnumFieldMixin, SelectFieldBase):
-    """Select field backed by a :class:`RichEnum`"""
+    """Select field backed by a :class:`RichEnum`."""
 
     widget = Select()
 
@@ -64,7 +64,7 @@ class IndicoEnumRadioField(IndicoEnumSelectField):
 
 
 class HiddenEnumField(_EnumFieldMixin, HiddenField):
-    """Hidden field that only accepts values from an Enum"""
+    """Hidden field that only accepts values from an Enum."""
 
     def __init__(self, label=None, validators=None, enum=None, only=None, skip=None, none=None, **kwargs):
         super(HiddenEnumField, self).__init__(label, validators, **kwargs)

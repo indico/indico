@@ -23,7 +23,7 @@ attachment_access_override_warning = _('Do you really want to grant everyone wit
 
 
 class IPNetworkGroupForm(IndicoForm):
-    """Form to create or edit an IPNetworkGroup"""
+    """Form to create or edit an IPNetworkGroup."""
 
     name = StringField(_("Name"), [DataRequired()])
     description = TextAreaField(_("Description"))

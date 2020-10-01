@@ -15,7 +15,7 @@ from indico.modules.oauth.models.tokens import OAuthToken
 
 @pytest.fixture
 def create_application(db):
-    """Returns a callable which lets you create applications"""
+    """Return a callable which lets you create applications."""
 
     def _create_application(name, **params):
         params.setdefault('client_id', unicode(uuid4()))
@@ -32,7 +32,7 @@ def create_application(db):
 
 @pytest.fixture
 def create_token(db, dummy_application, dummy_user):
-    """Returns a callable which lets you create tokens"""
+    """Return a callable which lets you create tokens."""
 
     def _create_tokens(**params):
         params.setdefault('access_token', unicode(uuid4()))
@@ -49,11 +49,11 @@ def create_token(db, dummy_application, dummy_user):
 
 @pytest.fixture
 def dummy_application(create_application):
-    """Gives you a dummy application"""
+    """Return a dummy application."""
     return create_application(name='dummy')
 
 
 @pytest.fixture
 def dummy_token(create_token):
-    """Returns a dummy token"""
+    """Return a dummy token."""
     return create_token()

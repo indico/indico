@@ -9,7 +9,7 @@ from __future__ import unicode_literals
 
 
 def serialize_event_role(role, legacy=True):
-    """Serialize role to JSON-like object"""
+    """Serialize role to JSON-like object."""
     if legacy:
         return {
             'id': role.id,
