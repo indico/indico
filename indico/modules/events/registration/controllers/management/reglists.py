@@ -586,6 +586,7 @@ class RHRegistrationReset(RHManageRegistrationBase):
             notify_registration_state_update(self.registration)
         else:
             raise BadRequest(_('The registration cannot be reset in its current state.'))
+        self.registration.checked_in = False
         logger.info('Registration %r was reset by %r', self.registration, session.user)
         return jsonify_data(html=_render_registration_details(self.registration))
 
@@ -607,6 +608,8 @@ class RHRegistrationCheckIn(RHManageRegistrationBase):
     """Set checked in state of a registration."""
 
     def _process_PUT(self):
+        if self.registration.state not in (RegistrationState.complete, RegistrationState.unpaid):
+            raise BadRequest(_('This registration cannot be marked as checked-in'))
         self.registration.checked_in = True
         signals.event.registration_checkin_updated.send(self.registration)
         return jsonify_data(html=_render_registration_details(self.registration))
@@ -624,6 +627,8 @@ class RHRegistrationBulkCheckIn(RHRegistrationsActionBase):
         check_in = request.form['flag'] == '1'
         msg = 'checked-in' if check_in else 'not checked-in'
         for registration in self.registrations:
+            if registration.state not in (RegistrationState.complete, RegistrationState.unpaid):
+                continue
             registration.checked_in = check_in
             signals.event.registration_checkin_updated.send(registration)
             logger.info('Registration %s marked as %s by %s', registration, msg, session.user)

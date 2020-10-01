@@ -22,6 +22,8 @@ Bugfixes
   such deadline has been set (:pr:`4650`)
 - Fix layout problem when minutes contain overly large embedded images (:issue:`4653`,
   :pr:`4654`)
+- Prevent pending registrations from being marked as checked-in (:pr:`4646`, thanks
+  :user:`omegak`)
 
 Internal Changes
 ^^^^^^^^^^^^^^^^
