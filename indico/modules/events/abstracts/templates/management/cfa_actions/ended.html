@@ -11,7 +11,7 @@
     {% trans date=cfa.end_dt|format_date(timezone=tz), time=cfa.end_dt|format_time(timezone=tz) -%}
         Closed on <strong>{{ date }}</strong> at <strong>{{ time }}</strong> ({{ tz }})
     {%- endtrans %}
-    {% if not cfa.modification_ended %}
+    {% if cfa.modification_end_dt and not cfa.modification_ended %}
         <br>
         {% trans date=cfa.modification_end_dt|format_date(timezone=tz), time=cfa.modification_end_dt|format_time(timezone=tz) -%}
             Modifications possible until <strong>{{ date }}</strong> at <strong>{{ time }}</strong>
