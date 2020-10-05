@@ -5,16 +5,17 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
+import PropTypes from 'prop-types';
 import React from 'react';
 import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
-import PropTypes from 'prop-types';
 import {Icon, Label, Menu, Message, Popup} from 'semantic-ui-react';
 
 import {Translate, Param} from 'indico/react/i18n';
 import {Responsive} from 'indico/react/util';
 
 import {actions as bookRoomActions} from '../../modules/bookRoom';
+
 import * as selectors from './selectors';
 
 import './BookRoom.module.scss';

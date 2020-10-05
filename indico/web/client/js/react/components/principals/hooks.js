@@ -5,15 +5,16 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-import permissionInfoURL from 'indico-url:rb.permission_types';
 import principalsURL from 'indico-url:core.principals';
-import eventPrincipalsURL from 'indico-url:event_management.api_principals';
-import eventRolesURL from 'indico-url:event_management.api_event_roles';
 import eventCategoryRolesURL from 'indico-url:event_management.api_category_roles';
+import eventRolesURL from 'indico-url:event_management.api_event_roles';
+import eventPrincipalsURL from 'indico-url:event_management.api_principals';
 import registrationFormsURL from 'indico-url:event_registration.api_registration_forms';
+import permissionInfoURL from 'indico-url:rb.permission_types';
 
 import _ from 'lodash';
 import {useState, useEffect} from 'react';
+
 import {useIndicoAxios} from 'indico/react/hooks';
 
 import {PermissionManager} from './util';

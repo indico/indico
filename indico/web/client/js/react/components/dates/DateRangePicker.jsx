@@ -8,6 +8,7 @@
 import 'react-dates/initialize';
 import {useState} from 'react';
 import {DateRangePicker as ReactDatesRangePicker} from 'react-dates';
+
 import {responsiveReactDates} from './util';
 
 import 'react-dates/lib/css/_datepicker.css';

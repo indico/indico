@@ -11,8 +11,8 @@ import {Checkbox, Icon} from 'semantic-ui-react';
 
 import {Translate} from 'indico/react/i18n';
 
-import {selectors as userSelectors} from '../../../common/user';
 import {FilterFormComponent} from '../../../common/filters';
+import {selectors as userSelectors} from '../../../common/user';
 import * as roomsSelectors from '../selectors';
 
 import './ShowOnlyForm.module.scss';

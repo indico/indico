@@ -5,10 +5,11 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-import React from 'react';
 import PropTypes from 'prop-types';
+import React from 'react';
 import {Form as FinalForm} from 'react-final-form';
 import {Button, Form, Header, Icon, Modal, Message} from 'semantic-ui-react';
+
 import {
   FinalCheckbox,
   FinalField,
@@ -17,6 +18,7 @@ import {
   unsortedArraysEqual,
 } from 'indico/react/forms';
 import {Param, Translate} from 'indico/react/i18n';
+
 import ExtensionList from './ExtensionList';
 
 export default function FileTypeModal({onClose, onSubmit, fileType, header}) {

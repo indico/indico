@@ -6,10 +6,11 @@
 // LICENSE file for more details.
 import menuEntriesURL from 'indico-url:event_editing.api_menu_entries';
 
+import PropTypes from 'prop-types';
 import React from 'react';
 import {useParams} from 'react-router-dom';
-import PropTypes from 'prop-types';
 import {Header} from 'semantic-ui-react';
+
 import {useIndicoAxios} from 'indico/react/hooks';
 import {useNumericParam} from 'indico/react/util/routing';
 

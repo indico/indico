@@ -5,24 +5,26 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-import qs from 'qs';
-import React from 'react';
-import PropTypes from 'prop-types';
-import {Dropdown, Icon, Label} from 'semantic-ui-react';
-
-import userDashboard from 'indico-url:users.user_dashboard';
-import userPreferences from 'indico-url:users.user_preferences';
 import authLogout from 'indico-url:auth.logout';
 import adminDashboard from 'indico-url:core.admin_dashboard';
 import changeLanguage from 'indico-url:core.change_lang';
+import userDashboard from 'indico-url:users.user_dashboard';
+import userPreferences from 'indico-url:users.user_preferences';
 
+import PropTypes from 'prop-types';
+import qs from 'qs';
+import React from 'react';
+import {Dropdown, Icon, Label} from 'semantic-ui-react';
+
+import {impersonateUser} from 'indico/modules/core/impersonation';
 import {Translate} from 'indico/react/i18n';
 import {indicoAxios, handleAxiosError} from 'indico/utils/axios';
-import {impersonateUser} from 'indico/modules/core/impersonation';
+
+import {useFavoriteUsers} from '../hooks';
+
 import {UserSearch} from './principals/Search';
 
 import './UserMenu.module.scss';
-import {useFavoriteUsers} from '../hooks';
 
 async function postAndReload(selectedLanguage) {
   try {

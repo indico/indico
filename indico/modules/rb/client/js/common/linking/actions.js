@@ -9,6 +9,7 @@ import getLinkedObjectDataURL from 'indico-url:rb.linked_object_data';
 
 import _ from 'lodash';
 import qs from 'qs';
+
 import {indicoAxios, handleAxiosError} from 'indico/utils/axios';
 import {camelizeKeys} from 'indico/utils/case';
 

@@ -6,14 +6,15 @@
 // LICENSE file for more details.
 
 import moment from 'moment';
-import React from 'react';
 import PropTypes from 'prop-types';
+import React from 'react';
+import {START_DATE} from 'react-dates/constants';
+import {Field, FormSpy} from 'react-final-form';
+import Overridable from 'react-overridable';
 import {connect} from 'react-redux';
 import {Form, Message, Segment} from 'semantic-ui-react';
-import {Field, FormSpy} from 'react-final-form';
-import {START_DATE} from 'react-dates/constants';
-import Overridable from 'react-overridable';
 
+import {FinalSingleDatePicker, FinalDatePeriod, FinalPrincipal} from 'indico/react/components';
 import {
   FieldCondition,
   FinalDropdown,
@@ -24,12 +25,12 @@ import {
   validators as v,
 } from 'indico/react/forms';
 import {FavoritesProvider} from 'indico/react/hooks';
-import {FinalSingleDatePicker, FinalDatePeriod, FinalPrincipal} from 'indico/react/components';
-import {serializeDate} from 'indico/utils/date';
 import {PluralTranslate, Translate} from 'indico/react/i18n';
+import {serializeDate} from 'indico/utils/date';
+
 import {FinalTimeRangePicker} from '../../components/TimeRangePicker';
-import {selectors as userSelectors} from '../user';
 import {sanitizeRecurrence} from '../../util';
+import {selectors as userSelectors} from '../user';
 
 import './BookingEditForm.module.scss';
 

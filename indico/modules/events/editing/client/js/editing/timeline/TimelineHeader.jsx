@@ -9,16 +9,17 @@ import contributionDisplayURL from 'indico-url:contributions.display_contributio
 import assignMyselfURL from 'indico-url:event_editing.api_assign_editable_self';
 import unassignEditorURL from 'indico-url:event_editing.api_unassign_editable';
 
+import PropTypes from 'prop-types';
 import React from 'react';
 import {useDispatch, useSelector} from 'react-redux';
-import PropTypes from 'prop-types';
-
 import {Message, Icon} from 'semantic-ui-react';
-import {Param, Translate} from 'indico/react/i18n';
+
 import {MathJax} from 'indico/react/components';
+import {Param, Translate} from 'indico/react/i18n';
 import {indicoAxios, handleAxiosError} from 'indico/utils/axios';
-import {getDetails} from './selectors';
+
 import {loadTimeline} from './actions';
+import {getDetails} from './selectors';
 
 export default function TimelineHeader({children, contribution, state, submitter, eventId}) {
   const {

@@ -6,17 +6,17 @@
 // LICENSE file for more details.
 
 import moment from 'moment';
+import PropTypes from 'prop-types';
 import React, {useState} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
-import PropTypes from 'prop-types';
 import {Button, Confirm} from 'semantic-ui-react';
 
 import UserAvatar from 'indico/modules/events/reviewing/components/UserAvatar';
 import {Param, Translate} from 'indico/react/i18n';
 import {serializeDate} from 'indico/utils/date';
 
-import CommentForm from './CommentForm';
 import {deleteRevisionComment, modifyRevisionComment} from './actions';
+import CommentForm from './CommentForm';
 import {getLastRevision} from './selectors';
 
 const INDICO_BOT_USER = {

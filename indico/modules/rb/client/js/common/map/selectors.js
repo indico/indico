@@ -6,7 +6,9 @@
 // LICENSE file for more details.
 
 import {createSelector} from 'reselect';
+
 import {RequestState} from 'indico/utils/redux';
+
 import {selectors as configSelectors} from '../config';
 
 const isFetching = ({map}) => map.request === RequestState.STARTED;

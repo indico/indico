@@ -6,8 +6,9 @@
 // LICENSE file for more details.
 
 import React from 'react';
-import BookingDetailsPreloader from './BookingDetailsPreloader';
+
 import BookingDetailsModal from './BookingDetailsModal';
+import BookingDetailsPreloader from './BookingDetailsPreloader';
 
 export default {
   /* eslint-disable react/display-name */

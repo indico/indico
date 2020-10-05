@@ -6,8 +6,8 @@
 // LICENSE file for more details.
 
 import moment from 'moment';
-import React from 'react';
 import PropTypes from 'prop-types';
+import React from 'react';
 
 import {IButton, Modal} from 'indico/react/components';
 import {Translate} from 'indico/react/i18n';

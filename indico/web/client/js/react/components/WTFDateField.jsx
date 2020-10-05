@@ -6,9 +6,10 @@
 // LICENSE file for more details.
 
 import 'react-dates/initialize';
+import moment from 'moment';
 import PropTypes from 'prop-types';
 import React, {useEffect, useMemo, useRef, useState, useCallback} from 'react';
-import moment from 'moment';
+
 import {SingleDatePicker} from 'indico/react/components';
 import {Translate} from 'indico/react/i18n';
 import {toMoment} from 'indico/utils/date';

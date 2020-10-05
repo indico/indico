@@ -6,21 +6,21 @@
 // LICENSE file for more details.
 
 import _ from 'lodash';
-import ReactDOM from 'react-dom';
 import React from 'react';
-import {Provider} from 'react-redux';
+import ReactDOM from 'react-dom';
 import {OverridableContext} from 'react-overridable';
+import {Provider} from 'react-redux';
 
 import setupUserMenu from 'indico/react/containers/UserMenu';
 
-import App from './components/App';
-import createRBStore from './store';
-import {history} from './history';
 import {init} from './actions';
 import {actions as configActions, selectors as configSelectors} from './common/config';
-import {selectors as userSelectors, actions as userActions} from './common/user';
-import {actions as roomsActions} from './common/rooms';
 import {actions as linkingActions} from './common/linking';
+import {actions as roomsActions} from './common/rooms';
+import {selectors as userSelectors, actions as userActions} from './common/user';
+import App from './components/App';
+import {history} from './history';
+import createRBStore from './store';
 
 import 'indico-sui-theme/semantic.css';
 import '../styles/main.scss';

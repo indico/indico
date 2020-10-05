@@ -5,10 +5,10 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-import fetchUserInfoURL from 'indico-url:rb.user_info';
 import favoriteRoomsURL from 'indico-url:rb.favorite_rooms';
 import roomPermissionsURL from 'indico-url:rb.room_permissions';
 import roomsPermissionsURL from 'indico-url:rb.rooms_permissions';
+import fetchUserInfoURL from 'indico-url:rb.user_info';
 
 import {indicoAxios, handleAxiosError} from 'indico/utils/axios';
 import {setMomentLocale} from 'indico/utils/date';

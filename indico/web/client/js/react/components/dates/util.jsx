@@ -6,8 +6,8 @@
 // LICENSE file for more details.
 
 import React from 'react';
-
 import {VERTICAL_ORIENTATION, HORIZONTAL_ORIENTATION} from 'react-dates/constants';
+
 import {Responsive} from 'indico/react/util';
 
 /**

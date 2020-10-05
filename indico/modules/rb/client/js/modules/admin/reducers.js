@@ -6,9 +6,12 @@
 // LICENSE file for more details.
 
 import {combineReducers} from 'redux';
-import {requestReducer} from 'indico/utils/redux';
+
 import {camelizeKeys} from 'indico/utils/case';
+import {requestReducer} from 'indico/utils/redux';
+
 import {filterReducerFactory} from '../../common/filters';
+
 import * as adminActions from './actions';
 
 export const initialFilterStateFactory = () => ({

@@ -7,7 +7,9 @@
 
 import _ from 'lodash';
 import {createSelector} from 'reselect';
+
 import {RequestState} from 'indico/utils/redux';
+
 import {isUserAdminOverrideEnabled} from '../../common/user/selectors';
 
 const _getAllBlockings = ({blockings}) => blockings.blockings;

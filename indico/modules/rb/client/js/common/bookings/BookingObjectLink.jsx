@@ -5,10 +5,12 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-import React from 'react';
 import PropTypes from 'prop-types';
+import React from 'react';
 import {Message, Icon, Segment} from 'semantic-ui-react';
+
 import {Translate} from 'indico/react/i18n';
+
 import {linkDataShape} from '../linking';
 
 import './BookingObjectLink.module.scss';

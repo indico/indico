@@ -6,20 +6,23 @@
 // LICENSE file for more details.
 
 import _ from 'lodash';
-import React from 'react';
-import {bindActionCreators} from 'redux';
 import PropTypes from 'prop-types';
+import React from 'react';
 import {connect} from 'react-redux';
+import {bindActionCreators} from 'redux';
 import {Dimmer, Icon, Loader, Modal, Popup} from 'semantic-ui-react';
+
 import {Translate} from 'indico/react/i18n';
-import {serializeDate} from 'indico/utils/date';
 import {Responsive} from 'indico/react/util';
-import * as selectors from './selectors';
+import {serializeDate} from 'indico/utils/date';
+
+import {actions as bookingsActions} from '../../common/bookings';
+import {DateNavigator, TimelineLegend} from '../../common/timeline';
+import {getOccurrenceTypes, transformToLegendLabels} from '../../util';
+
 import * as unavailableRoomsActions from './actions';
 import {BookingTimelineComponent} from './BookingTimeline';
-import {DateNavigator, TimelineLegend} from '../../common/timeline';
-import {actions as bookingsActions} from '../../common/bookings';
-import {getOccurrenceTypes, transformToLegendLabels} from '../../util';
+import * as selectors from './selectors';
 
 class UnavailableRoomsModal extends React.Component {
   static propTypes = {

@@ -6,8 +6,8 @@
 // LICENSE file for more details.
 
 import _ from 'lodash';
-import React from 'react';
 import PropTypes from 'prop-types';
+import React from 'react';
 import {Item, Placeholder} from 'semantic-ui-react';
 
 export default function ItemPlaceholder() {

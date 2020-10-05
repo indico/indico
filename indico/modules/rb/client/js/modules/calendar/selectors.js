@@ -7,7 +7,9 @@
 
 import _ from 'lodash';
 import {createSelector} from 'reselect';
+
 import {RequestState} from 'indico/utils/redux';
+
 import {selectors as roomsSelectors} from '../../common/rooms';
 import {selectors as userSelectors} from '../../common/user';
 

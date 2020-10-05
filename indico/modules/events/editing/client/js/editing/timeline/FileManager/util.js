@@ -6,10 +6,12 @@
 // LICENSE file for more details.
 
 import _ from 'lodash';
-import React from 'react';
 import PropTypes from 'prop-types';
+import React from 'react';
+
 import {indicoAxios, handleAxiosError} from 'indico/utils/axios';
 import {snakifyKeys} from 'indico/utils/case';
+
 import * as actions from './actions';
 import {getFiles} from './selectors';
 

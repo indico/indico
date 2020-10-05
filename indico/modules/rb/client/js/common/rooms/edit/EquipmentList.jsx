@@ -5,12 +5,14 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-import React from 'react';
-import PropTypes from 'prop-types';
-import {connect} from 'react-redux';
 import _ from 'lodash';
+import PropTypes from 'prop-types';
+import React from 'react';
+import {connect} from 'react-redux';
 import {Dropdown, Icon, List} from 'semantic-ui-react';
+
 import {Translate} from 'indico/react/i18n';
+
 import * as roomsSelectors from '../selectors';
 
 import './EquipmentList.module.scss';

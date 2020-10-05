@@ -6,13 +6,13 @@
 // LICENSE file for more details.
 
 import _ from 'lodash';
-import React, {useEffect} from 'react';
 import PropTypes from 'prop-types';
-import {bindActionCreators} from 'redux';
-import {connect} from 'react-redux';
+import React, {useEffect} from 'react';
 import {Form as FinalForm} from 'react-final-form';
+import {connect} from 'react-redux';
+import {bindActionCreators} from 'redux';
 import {Form, Header, Message, Placeholder} from 'semantic-ui-react';
-import {PluralTranslate, Translate} from 'indico/react/i18n';
+
 import {FinalPrincipalList} from 'indico/react/components';
 import {
   getChangedValues,
@@ -25,9 +25,11 @@ import {
   validators as v,
 } from 'indico/react/forms';
 import {useFavoriteUsers} from 'indico/react/hooks';
+import {PluralTranslate, Translate} from 'indico/react/i18n';
+
 import * as adminActions from './actions';
-import * as adminSelectors from './selectors';
 import CategoryList from './CategoryList';
+import * as adminSelectors from './selectors';
 
 import './SettingsPage.module.scss';
 

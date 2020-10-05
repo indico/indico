@@ -5,13 +5,14 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-import favoriteUsersURL from 'indico-url:users.favorites_api';
 import principalsURL from 'indico-url:core.principals';
+import favoriteUsersURL from 'indico-url:users.favorites_api';
 
-import _ from 'lodash';
-import {useEffect, useRef, useState} from 'react';
-import PropTypes from 'prop-types';
 import useAxios from '@use-hooks/axios';
+import _ from 'lodash';
+import PropTypes from 'prop-types';
+import {useEffect, useRef, useState} from 'react';
+
 import {handleAxiosError, indicoAxios} from '../utils/axios';
 import {camelizeKeys} from '../utils/case';
 

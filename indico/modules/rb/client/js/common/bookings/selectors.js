@@ -8,7 +8,9 @@
 import _ from 'lodash';
 import moment from 'moment';
 import {createSelector} from 'reselect';
+
 import {RequestState} from 'indico/utils/redux';
+
 import {selectors as roomsSelectors} from '../rooms';
 import {isUserAdminOverrideEnabled} from '../user/selectors';
 

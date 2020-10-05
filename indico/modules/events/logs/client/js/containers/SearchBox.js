@@ -7,8 +7,9 @@
 
 import debounce from 'lodash/debounce';
 import {connect} from 'react-redux';
-import SearchBox from '../components/SearchBox';
+
 import {setKeyword, fetchLogEntries, setPage} from '../actions';
+import SearchBox from '../components/SearchBox';
 
 const mapDispatchToProps = dispatch => ({
   setKeyword: debounce(keyword => {

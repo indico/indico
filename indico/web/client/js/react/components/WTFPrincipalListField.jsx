@@ -5,8 +5,9 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-import React, {useCallback, useEffect, useMemo, useState} from 'react';
 import PropTypes from 'prop-types';
+import React, {useCallback, useEffect, useMemo, useState} from 'react';
+
 import {PrincipalListField} from 'indico/react/components/principals';
 import {useFavoriteUsers} from 'indico/react/hooks';
 

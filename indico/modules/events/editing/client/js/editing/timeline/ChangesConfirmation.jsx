@@ -6,11 +6,13 @@
 // LICENSE file for more details.
 
 import React from 'react';
-import {useDispatch, useSelector} from 'react-redux';
 import {Field, Form as FinalForm} from 'react-final-form';
+import {useDispatch, useSelector} from 'react-redux';
 import {Divider, Form, Message} from 'semantic-ui-react';
+
 import {FinalSubmitButton, FinalTextArea} from 'indico/react/forms';
 import {Translate} from 'indico/react/i18n';
+
 import {confirmEditableChanges} from './actions';
 import {getLastRevision} from './selectors';
 

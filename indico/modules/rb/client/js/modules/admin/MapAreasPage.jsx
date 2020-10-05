@@ -5,22 +5,22 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-import _ from 'lodash';
-import React from 'react';
-import PropTypes from 'prop-types';
-import {bindActionCreators} from 'redux';
-import {connect} from 'react-redux';
-import {Form as FinalForm} from 'react-final-form';
 import Leaflet from 'leaflet';
+import _ from 'lodash';
+import PropTypes from 'prop-types';
+import React from 'react';
+import {Form as FinalForm} from 'react-final-form';
 import {FeatureGroup, Map, Rectangle, TileLayer, Tooltip, ZoomControl} from 'react-leaflet';
 import {EditControl} from 'react-leaflet-draw';
+import {connect} from 'react-redux';
+import {bindActionCreators} from 'redux';
 import {Button, Form, Header, Modal} from 'semantic-ui-react';
 
 import {FinalCheckbox, FinalInput, FinalSubmitButton} from 'indico/react/forms';
 import {Translate} from 'indico/react/i18n';
 
-import {selectors as mapSelectors, actions as mapActions} from '../../common/map';
 import {selectors as configSelectors} from '../../common/config';
+import {selectors as mapSelectors, actions as mapActions} from '../../common/map';
 
 import 'leaflet/dist/leaflet.css';
 import 'leaflet-draw/dist/leaflet.draw.css';

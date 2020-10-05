@@ -5,11 +5,12 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-import React from 'react';
-import {bindActionCreators} from 'redux';
-import {connect} from 'react-redux';
 import PropTypes from 'prop-types';
+import React from 'react';
+import {connect} from 'react-redux';
+import {bindActionCreators} from 'redux';
 import {Dimmer, Loader} from 'semantic-ui-react';
+
 import * as blockingsActions from './actions';
 import * as blockingsSelectors from './selectors';
 

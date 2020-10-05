@@ -5,13 +5,14 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-import React from 'react';
 import PropTypes from 'prop-types';
-import {bindActionCreators} from 'redux';
+import React from 'react';
 import {connect} from 'react-redux';
+import {bindActionCreators} from 'redux';
 import {Dimmer, Loader} from 'semantic-ui-react';
 
 import {Preloader} from 'indico/react/util';
+
 import * as bookingsActions from './actions';
 import * as bookingsSelectors from './selectors';
 

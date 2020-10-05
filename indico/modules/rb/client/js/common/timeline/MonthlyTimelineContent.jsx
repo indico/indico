@@ -7,8 +7,10 @@
 
 import _ from 'lodash';
 import React from 'react';
-import {toMoment} from 'indico/utils/date';
+
 import {toClasses} from 'indico/react/util';
+import {toMoment} from 'indico/utils/date';
+
 import WeeklyTimelineContent from './DailyTimelineContent';
 
 /* eslint-disable no-unused-vars */

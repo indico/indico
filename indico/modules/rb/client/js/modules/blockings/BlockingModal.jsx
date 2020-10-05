@@ -6,18 +6,21 @@
 // LICENSE file for more details.
 
 import _ from 'lodash';
-import React from 'react';
-import {bindActionCreators} from 'redux';
-import {connect} from 'react-redux';
 import PropTypes from 'prop-types';
-import {Button, Confirm, Form, Grid, Message, Icon, Modal, Popup} from 'semantic-ui-react';
+import React from 'react';
 import {Form as FinalForm} from 'react-final-form';
-import {Param, Translate} from 'indico/react/i18n';
-import {FinalTextArea} from 'indico/react/forms';
+import {connect} from 'react-redux';
+import {bindActionCreators} from 'redux';
+import {Button, Confirm, Form, Grid, Message, Icon, Modal, Popup} from 'semantic-ui-react';
+
 import {FinalDatePeriod, FinalPrincipalList} from 'indico/react/components';
+import {FinalTextArea} from 'indico/react/forms';
 import {FavoritesProvider} from 'indico/react/hooks';
-import FinalRoomSelector from '../../components/RoomSelector';
+import {Param, Translate} from 'indico/react/i18n';
+
 import {selectors as userSelectors} from '../../common/user';
+import FinalRoomSelector from '../../components/RoomSelector';
+
 import * as blockingsActions from './actions';
 
 import './BlockingModal.module.scss';

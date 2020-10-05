@@ -8,6 +8,7 @@
 import deleteFileURL from 'indico-url:files.delete_file';
 
 import _ from 'lodash';
+
 import {handleAxiosError, indicoAxios} from 'indico/utils/axios';
 
 export async function uploadFile(url, file, onUploadProgress) {

@@ -5,8 +5,8 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-import React, {useEffect, useRef} from 'react';
 import PropTypes from 'prop-types';
+import React, {useEffect, useRef} from 'react';
 
 export default function MathJax({children}) {
   const wrapperRef = useRef(null);

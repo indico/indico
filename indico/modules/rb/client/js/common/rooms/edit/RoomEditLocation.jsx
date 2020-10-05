@@ -5,11 +5,12 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
+import PropTypes from 'prop-types';
 import React from 'react';
 import {Form, Header, Tab} from 'semantic-ui-react';
-import PropTypes from 'prop-types';
-import {Translate} from 'indico/react/i18n';
+
 import {FinalInput, parsers as p, validators as v} from 'indico/react/forms';
+import {Translate} from 'indico/react/i18n';
 
 export default function RoomEditLocation({active}) {
   return (

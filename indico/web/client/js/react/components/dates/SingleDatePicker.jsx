@@ -10,8 +10,10 @@ import _ from 'lodash';
 import PropTypes from 'prop-types';
 import React from 'react';
 import {SingleDatePicker as ReactDatesSinglePicker} from 'react-dates';
-import {serializeDate, toMoment} from 'indico/utils/date';
+
 import {FinalField} from 'indico/react/forms';
+import {serializeDate, toMoment} from 'indico/utils/date';
+
 import {responsiveReactDates} from './util';
 
 import 'react-dates/lib/css/_datepicker.css';

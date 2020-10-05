@@ -5,19 +5,20 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-import tagsURL from 'indico-url:event_editing.api_tags';
 import createTagURL from 'indico-url:event_editing.api_create_tag';
 import editTagURL from 'indico-url:event_editing.api_edit_tag';
+import tagsURL from 'indico-url:event_editing.api_tags';
 
-import React, {useReducer} from 'react';
 import PropTypes from 'prop-types';
+import React, {useReducer} from 'react';
 import {Button, Icon, Label, Loader, Message, Segment, Popup} from 'semantic-ui-react';
 
-import {Param, Translate} from 'indico/react/i18n';
 import {RequestConfirm} from 'indico/react/components';
 import {getChangedValues, handleSubmitError} from 'indico/react/forms';
 import {useIndicoAxios} from 'indico/react/hooks';
+import {Param, Translate} from 'indico/react/i18n';
 import {handleAxiosError, indicoAxios} from 'indico/utils/axios';
+
 import TagModal from './TagModal';
 
 import './TagManager.module.scss';

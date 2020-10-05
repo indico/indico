@@ -11,13 +11,16 @@ import searchRoomsURL from 'indico-url:rb.search_rooms';
 
 import _ from 'lodash';
 import moment from 'moment';
+
 import {indicoAxios, handleAxiosError} from 'indico/utils/axios';
 import {ajaxAction} from 'indico/utils/redux';
-import {preProcessParameters} from '../../util';
+
 import {ajaxRules as roomSearchAjaxRules} from '../../common/roomSearch';
-import {ajax as ajaxRules} from './serializers';
-import {getRoomFilters, getCalendarFilters} from './selectors';
 import {selectors as userSelectors} from '../../common/user';
+import {preProcessParameters} from '../../util';
+
+import {getRoomFilters, getCalendarFilters} from './selectors';
+import {ajax as ajaxRules} from './serializers';
 
 export const CHANGE_VIEW = 'calendar/CHANGE_VIEW';
 export const SET_DATE = 'calendar/SET_DATE';

@@ -7,6 +7,7 @@
 
 import _ from 'lodash';
 import {combineReducers} from 'redux';
+
 import * as actions from './actions';
 
 /**

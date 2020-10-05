@@ -7,24 +7,26 @@
 
 import bookingEditTimelineURL from 'indico-url:rb.booking_edit_calendars';
 
-import React from 'react';
 import PropTypes from 'prop-types';
-import {bindActionCreators} from 'redux';
-import {connect} from 'react-redux';
+import React from 'react';
 import {Form as FinalForm} from 'react-final-form';
+import {connect} from 'react-redux';
+import {bindActionCreators} from 'redux';
 import {Button, Checkbox, Grid, Icon, Message, Modal, Segment} from 'semantic-ui-react';
 
+import {Param, Plural, PluralTranslate, Singular, Translate} from 'indico/react/i18n';
 import {indicoAxios, handleAxiosError} from 'indico/utils/axios';
 import {camelizeKeys} from 'indico/utils/case';
-import {Param, Plural, PluralTranslate, Singular, Translate} from 'indico/react/i18n';
 import {serializeDate, serializeTime} from 'indico/utils/date';
+
+import RoomBasicDetails from '../../components/RoomBasicDetails';
+import {getRecurrenceInfo, preProcessParameters, serializeRecurrenceInfo} from '../../util';
 import {ajax as ajaxFilterRules} from '../roomSearch/serializers';
 import {selectors as userSelectors} from '../user';
-import {getRecurrenceInfo, preProcessParameters, serializeRecurrenceInfo} from '../../util';
-import RoomBasicDetails from '../../components/RoomBasicDetails';
-import BookingEditForm from './BookingEditForm';
-import BookingEditCalendar from './BookingEditCalendar';
+
 import * as bookingsActions from './actions';
+import BookingEditCalendar from './BookingEditCalendar';
+import BookingEditForm from './BookingEditForm';
 import * as bookingsSelectors from './selectors';
 
 import './BookingEdit.module.scss';

@@ -5,9 +5,10 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-import React from 'react';
 import PropTypes from 'prop-types';
+import React from 'react';
 import {Dropdown} from 'semantic-ui-react';
+
 import {FinalField, unsortedArraysEqual} from 'indico/react/forms';
 import {Translate} from 'indico/react/i18n';
 

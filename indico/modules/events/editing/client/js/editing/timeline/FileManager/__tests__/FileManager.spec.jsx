@@ -6,15 +6,14 @@
 // LICENSE file for more details.
 
 import {shallow, mount} from 'enzyme';
-import {act} from 'react-dom/test-utils';
-
 import mockAxios from 'jest-mock-axios';
 import React from 'react';
+import {act} from 'react-dom/test-utils';
 
 import * as axiosUtils from 'indico/utils/axios';
 
-import * as actions from '../actions';
 import FileManager, {Dropzone} from '..';
+import * as actions from '../actions';
 
 expect.extend({
   toContainFile(received, file) {

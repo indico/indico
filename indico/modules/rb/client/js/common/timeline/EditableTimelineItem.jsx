@@ -8,6 +8,7 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import {Popup} from 'semantic-ui-react';
+
 import {Translate} from 'indico/react/i18n';
 
 import TimelineItem from './TimelineItem';

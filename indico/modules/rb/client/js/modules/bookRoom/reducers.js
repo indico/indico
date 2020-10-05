@@ -9,10 +9,12 @@ import {combineReducers} from 'redux';
 
 import {camelizeKeys} from 'indico/utils/case';
 import {requestReducer} from 'indico/utils/redux';
-import * as actions from './actions';
+
 import * as globalActions from '../../actions';
 import {roomSearchReducerFactory} from '../../common/roomSearch/reducers';
 import {initialDatePickerState} from '../../common/timeline/reducers';
+
+import * as actions from './actions';
 
 export const initialTimelineState = {
   availability: [],

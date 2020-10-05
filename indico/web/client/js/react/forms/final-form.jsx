@@ -5,12 +5,14 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-import _ from 'lodash';
-import React from 'react';
-import PropTypes from 'prop-types';
-import {Field} from 'react-final-form';
 import {FORM_ERROR} from 'final-form';
+import _ from 'lodash';
+import PropTypes from 'prop-types';
+import React from 'react';
+import {Field} from 'react-final-form';
+
 import {handleAxiosError} from '../../utils/axios';
+
 import {handleSubmissionError} from './errors';
 
 export function getChangedValues(data, form) {

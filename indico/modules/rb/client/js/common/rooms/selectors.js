@@ -9,8 +9,9 @@ import _ from 'lodash';
 import {createSelector} from 'reselect';
 
 import {RequestState} from 'indico/utils/redux';
-import {getAllUserRoomPermissions, isUserRBAdmin} from '../user/selectors';
+
 import {canManagersEditRooms} from '../config/selectors';
+import {getAllUserRoomPermissions, isUserRBAdmin} from '../user/selectors';
 
 export const hasLoadedEquipmentTypes = ({rooms}) =>
   rooms.requests.equipmentTypes.state === RequestState.SUCCESS ||

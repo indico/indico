@@ -5,12 +5,13 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-import React from 'react';
 import PropTypes from 'prop-types';
+import React from 'react';
 import {Icon} from 'semantic-ui-react';
-import {Responsive} from 'indico/react/util';
 
 import {Translate} from 'indico/react/i18n';
+import {Responsive} from 'indico/react/util';
+
 import MenuItem from './MenuItem';
 
 import './Menu.module.scss';

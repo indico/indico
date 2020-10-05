@@ -8,11 +8,12 @@
 import _ from 'lodash';
 import {createQueryStringReducer, validator as v} from 'redux-router-querystring';
 
-import {history} from '../../history';
-import {initialFilterStateFactory} from './reducers';
 import * as actions from '../../actions';
-import {boolStateField} from '../../util';
 import {actions as filtersActions} from '../../common/filters';
+import {history} from '../../history';
+import {boolStateField} from '../../util';
+
+import {initialFilterStateFactory} from './reducers';
 
 const rules = {
   my_rooms: {

@@ -7,6 +7,7 @@
 
 import React from 'react';
 import {Popup} from 'semantic-ui-react';
+
 import {useResponsive} from 'indico/react/util';
 
 export default function ResponsivePopup(props) {

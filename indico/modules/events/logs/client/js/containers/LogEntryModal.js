@@ -7,8 +7,8 @@
 
 import {connect} from 'react-redux';
 
-import LogEntryModal from '../components/LogEntryModal';
 import {setDetailedView, showRelatedEntries, viewNextEntry, viewPrevEntry} from '../actions';
+import LogEntryModal from '../components/LogEntryModal';
 
 const mapStateToProps = ({logs}) => ({
   currentViewIndex: logs.currentViewIndex,

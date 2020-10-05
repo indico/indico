@@ -6,25 +6,27 @@
 // LICENSE file for more details.
 
 import checkServiceURL from 'indico-url:event_editing.api_check_service_url';
-import checkServiceStatusURL from 'indico-url:event_editing.api_service_status';
 import connectServiceURL from 'indico-url:event_editing.api_service_connect';
 import disconnectServiceURL from 'indico-url:event_editing.api_service_disconnect';
+import checkServiceStatusURL from 'indico-url:event_editing.api_service_status';
 
-import React, {useState} from 'react';
-import PropTypes from 'prop-types';
 import {FORM_ERROR} from 'final-form';
+import PropTypes from 'prop-types';
+import React, {useState} from 'react';
 import {Form as FinalForm} from 'react-final-form';
 import {Confirm, Modal, Button, Form, Loader, Message} from 'semantic-ui-react';
-import {Translate, Param} from 'indico/react/i18n';
+
 import {
   FinalSubmitButton,
   FinalInput,
   handleSubmitError,
   validators as v,
 } from 'indico/react/forms';
-import {indicoAxios, handleAxiosError} from 'indico/utils/axios';
 import {useIndicoAxios} from 'indico/react/hooks';
+import {Translate, Param} from 'indico/react/i18n';
+import {indicoAxios, handleAxiosError} from 'indico/utils/axios';
 import {makeAsyncDebounce} from 'indico/utils/debounce';
+
 import Section from './Section';
 
 const debounce = makeAsyncDebounce(250);

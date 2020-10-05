@@ -7,8 +7,8 @@
 
 import React from 'react';
 
-import BlockingPreloader from './BlockingPreloader';
 import BlockingModal from './BlockingModal';
+import BlockingPreloader from './BlockingPreloader';
 
 export default {
   /* eslint-disable react/display-name */

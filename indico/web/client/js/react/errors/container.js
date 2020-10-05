@@ -7,8 +7,8 @@
 
 import {connect} from 'react-redux';
 
-import ErrorDialog from './component';
 import {clearError, showReportForm} from './actions';
+import ErrorDialog from './component';
 
 const mapStateToProps = ({errors: {errorList, formVisible}}) => ({
   errorData: errorList[0],

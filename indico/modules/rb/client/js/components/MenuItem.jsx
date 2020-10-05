@@ -5,10 +5,11 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
+import PropTypes from 'prop-types';
 import React from 'react';
 import {connect} from 'react-redux';
-import PropTypes from 'prop-types';
 import {Link, Route} from 'react-router-dom';
+
 import * as globalActions from '../actions';
 
 import './MenuItem.module.scss';

@@ -6,27 +6,29 @@
 // LICENSE file for more details.
 /* global ajaxDialog:false */
 
+import enableEditingURL from 'indico-url:event_editing.api_editing_enabled';
+import selfAssignURL from 'indico-url:event_editing.api_self_assign_enabled';
+import enableSubmissionURL from 'indico-url:event_editing.api_submission_enabled';
+import contactEditingTeamURL from 'indico-url:event_editing.contact_team';
 import dashboardURL from 'indico-url:event_editing.dashboard';
 import manageEditableTypeListURL from 'indico-url:event_editing.manage_editable_type_list';
 import manageFileTypesURL from 'indico-url:event_editing.manage_file_types';
 import manageReviewConditionsURL from 'indico-url:event_editing.manage_review_conditions';
-import selfAssignURL from 'indico-url:event_editing.api_self_assign_enabled';
-import enableSubmissionURL from 'indico-url:event_editing.api_submission_enabled';
-import enableEditingURL from 'indico-url:event_editing.api_editing_enabled';
-import contactEditingTeamURL from 'indico-url:event_editing.contact_team';
 
 import React, {useState} from 'react';
 import {useParams, Link} from 'react-router-dom';
 import {Checkbox, Loader} from 'semantic-ui-react';
 
-import {Translate} from 'indico/react/i18n';
 import {ManagementPageSubTitle, ManagementPageBackButton} from 'indico/react/components';
-import {useNumericParam} from 'indico/react/util/routing';
 import {useTogglableValue} from 'indico/react/hooks';
+import {Translate} from 'indico/react/i18n';
+import {useNumericParam} from 'indico/react/util/routing';
+
 import {EditableTypeTitles, GetNextEditableTitles} from '../../models';
 import Section from '../Section';
-import TeamManager from './TeamManager';
+
 import NextEditable from './NextEditable';
+import TeamManager from './TeamManager';
 
 import './EditableTypeDashboard.module.scss';
 

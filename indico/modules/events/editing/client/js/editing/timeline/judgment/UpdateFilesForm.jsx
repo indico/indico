@@ -8,20 +8,21 @@
 import uploadURL from 'indico-url:event_editing.api_upload';
 
 import _ from 'lodash';
-import React, {useState} from 'react';
-import {useDispatch, useSelector} from 'react-redux';
 import PropTypes from 'prop-types';
+import React, {useState} from 'react';
 import {Field, Form as FinalForm} from 'react-final-form';
+import {useDispatch, useSelector} from 'react-redux';
 import {Form, Dropdown, Button, Message} from 'semantic-ui-react';
 
 import {FinalSubmitButton, FinalTextArea} from 'indico/react/forms';
 import {Translate, Param, Plural, PluralTranslate, Singular} from 'indico/react/i18n';
 
-import {reviewEditable} from '../actions';
-import * as selectors from '../selectors';
 import {EditingReviewAction} from '../../../models';
+import {reviewEditable} from '../actions';
 import {FinalFileManager} from '../FileManager';
 import {getFilesFromRevision} from '../FileManager/util';
+import * as selectors from '../selectors';
+
 import FinalTagInput from './TagInput';
 
 import './JudgmentBox.module.scss';

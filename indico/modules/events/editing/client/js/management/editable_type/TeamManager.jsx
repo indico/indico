@@ -8,11 +8,11 @@
 import principalsURL from 'indico-url:event_editing.api_editable_type_principals';
 
 import _ from 'lodash';
-import React from 'react';
 import PropTypes from 'prop-types';
+import React from 'react';
 import {Form as FinalForm} from 'react-final-form';
 import {Button, Form, Loader, Message, Modal} from 'semantic-ui-react';
-import {Translate} from 'indico/react/i18n';
+
 import {FinalPrincipalList} from 'indico/react/components';
 import {
   getChangedValues,
@@ -20,9 +20,10 @@ import {
   FinalSubmitButton,
   FinalUnloadPrompt,
 } from 'indico/react/forms';
-import {indicoAxios} from 'indico/utils/axios';
 import {useFavoriteUsers, useIndicoAxios} from 'indico/react/hooks';
+import {Translate} from 'indico/react/i18n';
 import {useNumericParam} from 'indico/react/util/routing';
+import {indicoAxios} from 'indico/utils/axios';
 
 export default function TeamManager({editableType, onClose}) {
   const eventId = useNumericParam('confId');

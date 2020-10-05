@@ -13,10 +13,12 @@ import {Header, Icon, List, Message, Popup} from 'semantic-ui-react';
 
 import {Translate} from 'indico/react/i18n';
 import {serializeDate} from 'indico/utils/date';
+
+import {getOccurrenceTypes, transformToLegendLabels} from '../../util';
 import {DailyTimelineContent, TimelineLegend} from '../timeline';
+
 import OccurrencesCounter from './OccurrencesCounter';
 import * as bookingsSelectors from './selectors';
-import {getOccurrenceTypes, transformToLegendLabels} from '../../util';
 
 import './BookingEditCalendar.module.scss';
 

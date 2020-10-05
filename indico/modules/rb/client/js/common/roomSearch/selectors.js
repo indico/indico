@@ -6,7 +6,9 @@
 // LICENSE file for more details.
 
 import {createSelector} from 'reselect';
+
 import {RequestState} from 'indico/utils/redux';
+
 import {selectors as roomsSelectors} from '../rooms';
 
 export function roomSearchSelectorFactory(namespace) {

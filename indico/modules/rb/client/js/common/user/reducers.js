@@ -8,6 +8,7 @@
 import {combineReducers} from 'redux';
 
 import {requestReducer} from 'indico/utils/redux';
+
 import * as actions from './actions';
 
 const initialUserInfoState = {

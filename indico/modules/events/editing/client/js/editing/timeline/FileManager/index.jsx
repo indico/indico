@@ -5,17 +5,24 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-import _ from 'lodash';
-import React, {useCallback, useReducer, useContext, useRef, useMemo, useEffect} from 'react';
-import globToRegExp from 'glob-to-regexp';
-import PropTypes from 'prop-types';
 import {fromEvent} from 'file-selector';
+import globToRegExp from 'glob-to-regexp';
+import _ from 'lodash';
+import PropTypes from 'prop-types';
+import React, {useCallback, useReducer, useContext, useRef, useMemo, useEffect} from 'react';
 import {useDropzone} from 'react-dropzone';
 import {Field} from 'react-final-form';
 import {Dropdown, Icon, Message, Popup} from 'semantic-ui-react';
+
 import {TooltipIfTruncated} from 'indico/react/components';
 import {uploadFile, deleteFile} from 'indico/react/components/files/util';
 import {Param, Translate} from 'indico/react/i18n';
+
+import * as actions from './actions';
+import FileList from './FileList';
+import reducer from './reducer';
+import {getFiles, getUploadedFileUUIDs, getValidationError, isUploading} from './selectors';
+import Uploads from './Uploads';
 import {
   FileManagerContext,
   filePropTypes,
@@ -26,11 +33,6 @@ import {
   mapFileTypes,
   getFileToDelete,
 } from './util';
-import FileList from './FileList';
-import Uploads from './Uploads';
-import reducer from './reducer';
-import * as actions from './actions';
-import {getFiles, getUploadedFileUUIDs, getValidationError, isUploading} from './selectors';
 
 import './FileManager.module.scss';
 

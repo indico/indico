@@ -6,18 +6,20 @@
 // LICENSE file for more details.
 
 import _ from 'lodash';
+import PropTypes from 'prop-types';
 import React from 'react';
 import {connect} from 'react-redux';
-import PropTypes from 'prop-types';
 import {Button, Checkbox, Dimmer, Dropdown, Loader, Popup, Sticky} from 'semantic-ui-react';
+
 import {Translate} from 'indico/react/i18n';
 
-import {getAreaBounds, getMapBounds, getRoomListBounds, checkRoomsInBounds} from './util';
+import {actions as filtersActions} from '../filters';
+
+import * as mapActions from './actions';
 import RoomBookingMap from './RoomBookingMap';
 import RoomBookingMapControl from './RoomBookingMapControl';
-import {actions as filtersActions} from '../filters';
-import * as mapActions from './actions';
 import * as mapSelectors from './selectors';
+import {getAreaBounds, getMapBounds, getRoomListBounds, checkRoomsInBounds} from './util';
 
 import './MapController.module.scss';
 

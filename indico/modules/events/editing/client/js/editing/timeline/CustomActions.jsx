@@ -5,12 +5,14 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
+import PropTypes from 'prop-types';
 import React, {useState} from 'react';
 import {useDispatch} from 'react-redux';
-import PropTypes from 'prop-types';
 import {Button, Confirm, Divider} from 'semantic-ui-react';
+
 import {Translate} from 'indico/react/i18n';
 import {indicoAxios, handleAxiosError} from 'indico/utils/axios';
+
 import {loadTimeline} from './actions';
 
 import './CustomActions.module.scss';

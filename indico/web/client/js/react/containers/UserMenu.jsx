@@ -8,6 +8,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import {Provider, connect} from 'react-redux';
+
 import UserMenu from '../components/UserMenu';
 
 export default function setupUserMenu(element, store, userInfoSelectors, configSelectors) {

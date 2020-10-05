@@ -6,8 +6,8 @@
 // LICENSE file for more details.
 
 import 'react-dates/initialize';
-import React from 'react';
 import PropTypes from 'prop-types';
+import React from 'react';
 import {DayPickerSingleDateController as DayPicker} from 'react-dates';
 
 import 'react-dates/lib/css/_datepicker.css';

@@ -7,13 +7,15 @@
 
 import PropTypes from 'prop-types';
 import React from 'react';
+import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
 import {Header, List, Popup, Label} from 'semantic-ui-react';
-import {connect} from 'react-redux';
-import {toMoment} from 'indico/utils/date';
+
 import {Translate} from 'indico/react/i18n';
-import SpriteImage from '../../components/SpriteImage';
+import {toMoment} from 'indico/utils/date';
+
 import {actions as bookingActions} from '../../common/bookings';
+import SpriteImage from '../../components/SpriteImage';
 
 import './UpcomingBookings.module.scss';
 

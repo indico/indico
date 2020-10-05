@@ -7,6 +7,7 @@
 
 import _ from 'lodash';
 import {createSelector} from 'reselect';
+
 import {PluralTranslate} from 'indico/react/i18n';
 
 export const getFiles = state => {

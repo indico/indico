@@ -5,12 +5,13 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-import React from 'react';
-import {bindActionCreators} from 'redux';
-import {connect} from 'react-redux';
 import PropTypes from 'prop-types';
+import React from 'react';
 import Overridable from 'react-overridable';
+import {connect} from 'react-redux';
+import {bindActionCreators} from 'redux';
 import {Loader, Statistic} from 'semantic-ui-react';
+
 import {Translate} from 'indico/react/i18n';
 
 import * as landingActions from './actions';

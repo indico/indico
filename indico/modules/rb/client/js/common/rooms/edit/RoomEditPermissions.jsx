@@ -5,13 +5,14 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-import React from 'react';
-import {Form, Header, Tab} from 'semantic-ui-react';
 import _ from 'lodash';
 import PropTypes from 'prop-types';
+import React from 'react';
+import {Form, Header, Tab} from 'semantic-ui-react';
+
 import {ACLField} from 'indico/react/components';
-import {Translate} from 'indico/react/i18n';
 import {FinalField, FinalRadio, parsers as p} from 'indico/react/forms';
+import {Translate} from 'indico/react/i18n';
 
 export default function RoomEditPermissions({
   active,

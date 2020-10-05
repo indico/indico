@@ -6,14 +6,16 @@
 // LICENSE file for more details.
 
 import _ from 'lodash';
-import React from 'react';
 import PropTypes from 'prop-types';
+import React from 'react';
 import {Message} from 'semantic-ui-react';
+
 import {Translate} from 'indico/react/i18n';
 import {dayRange, serializeDate, toMoment} from 'indico/utils/date';
+
 import DailyTimelineContent from './DailyTimelineContent';
-import WeeklyTimelineContent from './WeeklyTimelineContent';
 import MonthlyTimelineContent from './MonthlyTimelineContent';
+import WeeklyTimelineContent from './WeeklyTimelineContent';
 
 import './Timeline.module.scss';
 

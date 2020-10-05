@@ -10,12 +10,13 @@ import moment from 'moment';
 import {createQueryStringReducer, validator as v} from 'redux-router-querystring';
 
 import * as actions from '../../actions';
-import {history} from '../../history';
-import {initialState} from './reducers';
-import {defaultStateField, boolStateField} from '../../util';
 import {actions as filtersActions} from '../../common/filters';
 import {rules as roomSearchQueryStringRules} from '../../common/roomSearch/queryString';
+import {history} from '../../history';
+import {defaultStateField, boolStateField} from '../../util';
+
 import * as calendarActions from './actions';
+import {initialState} from './reducers';
 
 const rules = {
   ...roomSearchQueryStringRules,

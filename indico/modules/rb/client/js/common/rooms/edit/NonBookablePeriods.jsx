@@ -5,14 +5,15 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-import React from 'react';
 import moment from 'moment';
 import PropTypes from 'prop-types';
-import shortid from 'shortid';
-import {Icon, Button} from 'semantic-ui-react';
+import React from 'react';
 import {ANCHOR_RIGHT} from 'react-dates/constants';
-import {Translate} from 'indico/react/i18n';
+import {Icon, Button} from 'semantic-ui-react';
+import shortid from 'shortid';
+
 import {DateRangePicker} from 'indico/react/components';
+import {Translate} from 'indico/react/i18n';
 import {serializeDate} from 'indico/utils/date';
 
 export default class NonBookablePeriods extends React.Component {

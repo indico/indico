@@ -6,11 +6,12 @@
 // LICENSE file for more details.
 
 import 'react-dates/initialize';
-import TimePicker from 'rc-time-picker';
-import PropTypes from 'prop-types';
-import React, {useEffect, useMemo, useRef, useState, useCallback} from 'react';
-import moment from 'moment';
 import _ from 'lodash';
+import moment from 'moment';
+import PropTypes from 'prop-types';
+import TimePicker from 'rc-time-picker';
+import React, {useEffect, useMemo, useRef, useState, useCallback} from 'react';
+
 import {SingleDatePicker} from 'indico/react/components';
 import {Translate} from 'indico/react/i18n';
 import {toMoment} from 'indico/utils/date';

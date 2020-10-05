@@ -7,6 +7,7 @@
 
 import _ from 'lodash';
 import PropTypes from 'prop-types';
+
 import {Translate} from 'indico/react/i18n';
 
 /**

@@ -6,8 +6,8 @@
 // LICENSE file for more details.
 
 import _ from 'lodash';
-import React from 'react';
 import PropTypes from 'prop-types';
+import React from 'react';
 import {Icon, Popup, Progress, Segment} from 'semantic-ui-react';
 
 import {Translate} from 'indico/react/i18n';

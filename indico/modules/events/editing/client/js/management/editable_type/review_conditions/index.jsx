@@ -9,12 +9,15 @@ import fileTypesURL from 'indico-url:event_editing.api_file_types';
 
 import React from 'react';
 import {useParams} from 'react-router-dom';
-import {useNumericParam} from 'indico/react/util/routing';
-import {Translate} from 'indico/react/i18n';
+
 import {useIndicoAxios} from 'indico/react/hooks';
+import {Translate} from 'indico/react/i18n';
+import {useNumericParam} from 'indico/react/util/routing';
+
 import EditableTypeSubPageNav from '../EditableTypeSubPageNav';
-import ReviewConditionsManager from './ReviewConditionsManager';
+
 import ReviewConditionsContext from './context';
+import ReviewConditionsManager from './ReviewConditionsManager';
 
 export default function ReviewConditionManagement() {
   const eventId = useNumericParam('confId');

@@ -5,13 +5,15 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-import React from 'react';
-import PropTypes from 'prop-types';
 import moment from 'moment';
-import shortid from 'shortid';
+import PropTypes from 'prop-types';
+import React from 'react';
 import {Button, Icon} from 'semantic-ui-react';
+import shortid from 'shortid';
+
 import {Translate} from 'indico/react/i18n';
 import {serializeTime} from 'indico/utils/date';
+
 import TimeRangePicker from '../../../components/TimeRangePicker';
 
 import './DailyAvailability.module.scss';

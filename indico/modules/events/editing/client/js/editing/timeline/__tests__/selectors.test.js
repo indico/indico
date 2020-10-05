@@ -6,6 +6,7 @@
 // LICENSE file for more details.
 
 import {FinalRevisionState, InitialRevisionState} from 'indico/modules/events/editing/models';
+
 import {processRevisions} from '../selectors';
 
 describe('timeline selectors', () => {

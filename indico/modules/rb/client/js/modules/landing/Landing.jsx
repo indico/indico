@@ -6,24 +6,26 @@
 // LICENSE file for more details.
 
 import moment from 'moment';
-import React from 'react';
-import {connect} from 'react-redux';
 import PropTypes from 'prop-types';
+import React from 'react';
 import Overridable from 'react-overridable';
+import {connect} from 'react-redux';
 import {Card, Checkbox, Form, Grid} from 'semantic-ui-react';
-import {Translate} from 'indico/react/i18n';
+
 import {Carousel} from 'indico/react/components';
+import {Translate} from 'indico/react/i18n';
 import {Responsive} from 'indico/react/util';
 import {toMoment} from 'indico/utils/date';
 
 import {actions as filtersActions} from '../../common/filters';
-import BookingBootstrapForm from '../../components/BookingBootstrapForm';
-import LandingStatistics from './LandingStatistics';
-import UpcomingBookings from './UpcomingBookings';
 import {selectors as userSelectors} from '../../common/user';
+import BookingBootstrapForm from '../../components/BookingBootstrapForm';
 import {selectors as bookRoomSelectors} from '../bookRoom';
+
 import * as landingActions from './actions';
+import LandingStatistics from './LandingStatistics';
 import * as landingSelectors from './selectors';
+import UpcomingBookings from './UpcomingBookings';
 
 import './Landing.module.scss';
 

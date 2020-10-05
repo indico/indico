@@ -6,7 +6,6 @@
 // LICENSE file for more details.
 
 import React from 'react';
-
 import {Icon, Input} from 'semantic-ui-react';
 
 import {Translate} from 'indico/react/i18n';

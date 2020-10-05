@@ -6,15 +6,17 @@
 // LICENSE file for more details.
 
 import {combineReducers} from 'redux';
+
 import {camelizeKeys} from 'indico/utils/case';
 import {requestReducer} from 'indico/utils/redux';
 
+import {actions as adminActions} from '../../modules/admin';
+import * as bookRoomActions from '../../modules/bookRoom/actions';
+import {sanitizeRecurrence} from '../../util';
 import {filterReducerFactory} from '../filters';
 import {mapSearchReducerFactory} from '../map';
+
 import {roomSearchActionsFactory} from './actions';
-import * as bookRoomActions from '../../modules/bookRoom/actions';
-import {actions as adminActions} from '../../modules/admin';
-import {sanitizeRecurrence} from '../../util';
 
 export function processRoomFilters(filters, param) {
   if (param === 'recurrence') {

@@ -5,10 +5,11 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-import React from 'react';
 import PropTypes from 'prop-types';
+import React from 'react';
 import {connect} from 'react-redux';
 import {Button} from 'semantic-ui-react';
+
 import BookingDetails from './BookingDetails';
 import BookingEdit from './BookingEdit';
 import * as bookingsSelectors from './selectors';

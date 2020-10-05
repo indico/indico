@@ -7,8 +7,8 @@
 
 import signURL from 'indico-url:core.sign_url';
 
-import React, {useState} from 'react';
 import PropTypes from 'prop-types';
+import React, {useState} from 'react';
 import {Button, Dropdown, Icon, Input, Label, Grid, Popup, Header} from 'semantic-ui-react';
 
 import {Translate} from 'indico/react/i18n';

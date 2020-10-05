@@ -7,19 +7,21 @@
 
 import _ from 'lodash';
 import moment from 'moment';
-import React from 'react';
 import PropTypes from 'prop-types';
-import {bindActionCreators} from 'redux';
+import React from 'react';
 import {connect} from 'react-redux';
-import {Card, Divider, Header, Icon, Label, Message, Popup} from 'semantic-ui-react';
+import {bindActionCreators} from 'redux';
 import LazyScroll from 'redux-lazy-scroll';
+import {Card, Divider, Header, Icon, Label, Message, Popup} from 'semantic-ui-react';
 
 import {TooltipIfTruncated} from 'indico/react/components';
 import {Param, Translate} from 'indico/react/i18n';
+
 import {actions as bookingsActions} from '../../common/bookings';
 import CardPlaceholder from '../../components/CardPlaceholder';
-import * as calendarSelectors from './selectors';
+
 import * as calendarActions from './actions';
+import * as calendarSelectors from './selectors';
 
 import './CalendarListView.module.scss';
 

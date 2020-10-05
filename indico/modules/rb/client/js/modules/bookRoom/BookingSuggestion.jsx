@@ -5,9 +5,10 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-import React from 'react';
 import PropTypes from 'prop-types';
+import React from 'react';
 import {Grid, Icon, Label, Message, Popup} from 'semantic-ui-react';
+
 import {PluralTranslate, Translate, Singular, Param, Plural} from 'indico/react/i18n';
 import {Slot, IndicoPropTypes} from 'indico/react/util';
 

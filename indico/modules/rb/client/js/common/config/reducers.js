@@ -9,8 +9,10 @@ import {combineReducers} from 'redux';
 
 import {camelizeKeys} from 'indico/utils/case';
 import {requestReducer} from 'indico/utils/redux';
-import * as configActions from './actions';
+
 import {actions as adminActions} from '../../modules/admin';
+
+import * as configActions from './actions';
 
 export const initialState = {
   roomsSpriteToken: '',

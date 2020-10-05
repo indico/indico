@@ -6,8 +6,9 @@
 // LICENSE file for more details.
 
 import {connect} from 'react-redux';
-import LogEntryList from '../components/LogEntryList';
+
 import {setPage, fetchLogEntries, setDetailedView} from '../actions';
+import LogEntryList from '../components/LogEntryList';
 
 const mapStateToProps = ({logs}) => ({
   entries: logs.entries,

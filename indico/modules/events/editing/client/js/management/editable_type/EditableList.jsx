@@ -5,35 +5,38 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-import editableTypeURL from 'indico-url:event_editing.manage_editable_type';
-import editorsURL from 'indico-url:event_editing.api_editable_type_editors';
-import editableListURL from 'indico-url:event_editing.api_editable_list';
-import editablesArchiveURL from 'indico-url:event_editing.api_prepare_editables_archive';
 import assignEditorURL from 'indico-url:event_editing.api_assign_editor';
 import assignSelfEditorURL from 'indico-url:event_editing.api_assign_myself';
-import unassignEditorURL from 'indico-url:event_editing.api_unassign_editor';
+import editableListURL from 'indico-url:event_editing.api_editable_list';
+import editorsURL from 'indico-url:event_editing.api_editable_type_editors';
 import canAssignSelfURL from 'indico-url:event_editing.api_editor_self_assign_allowed';
+import editablesArchiveURL from 'indico-url:event_editing.api_prepare_editables_archive';
+import unassignEditorURL from 'indico-url:event_editing.api_unassign_editor';
+import editableTypeURL from 'indico-url:event_editing.manage_editable_type';
 
-import React, {useState, useMemo} from 'react';
-import PropTypes from 'prop-types';
-import {useParams, Link} from 'react-router-dom';
-import {Button, Icon, Input, Loader, Checkbox, Message, Dropdown} from 'semantic-ui-react';
-import {Column, Table, SortDirection, WindowScroller} from 'react-virtualized';
 import _ from 'lodash';
+import PropTypes from 'prop-types';
+import React, {useState, useMemo} from 'react';
+import {useParams, Link} from 'react-router-dom';
+import {Column, Table, SortDirection, WindowScroller} from 'react-virtualized';
+import {Button, Icon, Input, Loader, Checkbox, Message, Dropdown} from 'semantic-ui-react';
+
 import {
   TooltipIfTruncated,
   ManagementPageSubTitle,
   ManagementPageBackButton,
 } from 'indico/react/components';
-import {useNumericParam} from 'indico/react/util/routing';
-import {Translate} from 'indico/react/i18n';
 import {useIndicoAxios} from 'indico/react/hooks';
+import {Translate} from 'indico/react/i18n';
+import {useNumericParam} from 'indico/react/util/routing';
 import {indicoAxios, handleAxiosError} from 'indico/utils/axios';
 import {camelizeKeys} from 'indico/utils/case';
 import Palette from 'indico/utils/palette';
+
+import StateIndicator from '../../editing/timeline/StateIndicator';
 import {userPropTypes} from '../../editing/timeline/util';
 import {EditableType, GetNextEditableTitles} from '../../models';
-import StateIndicator from '../../editing/timeline/StateIndicator';
+
 import NextEditable from './NextEditable';
 
 import './EditableList.module.scss';

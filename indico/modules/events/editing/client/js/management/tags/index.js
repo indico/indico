@@ -8,9 +8,11 @@
 import dashboardURL from 'indico-url:event_editing.dashboard';
 
 import React from 'react';
+
 import {ManagementPageBackButton, ManagementPageSubTitle} from 'indico/react/components';
 import {Translate} from 'indico/react/i18n';
 import {useNumericParam} from 'indico/react/util/routing';
+
 import TagManager from './TagManager';
 
 export default function EditingTagManagement() {

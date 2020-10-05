@@ -7,10 +7,12 @@
 
 import roomImageURL from 'indico-url:rb.room_photo';
 
-import React from 'react';
 import PropTypes from 'prop-types';
+import React from 'react';
 import {Dimmer, Grid, Header, Icon, Image, Loader, Modal, Popup} from 'semantic-ui-react';
+
 import {Param, Plural, PluralTranslate, Singular, Translate} from 'indico/react/i18n';
+
 import {formatLatLon} from '../common/map/util';
 
 import RoomFeatureEntry from './RoomFeatureEntry';

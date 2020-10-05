@@ -5,21 +5,23 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-import uploadURL from 'indico-url:event_editing.api_upload';
 import createSubmitterRevisionURL from 'indico-url:event_editing.api_create_submitter_revision';
+import uploadURL from 'indico-url:event_editing.api_upload';
 
 import _ from 'lodash';
 import React from 'react';
-import {useSelector, useDispatch} from 'react-redux';
 import {Form as FinalForm} from 'react-final-form';
+import {useSelector, useDispatch} from 'react-redux';
 import {Form} from 'semantic-ui-react';
-import {Translate} from 'indico/react/i18n';
-import {FinalSubmitButton} from 'indico/react/forms';
+
 import UserAvatar from 'indico/modules/events/reviewing/components/UserAvatar';
+import {FinalSubmitButton} from 'indico/react/forms';
+import {Translate} from 'indico/react/i18n';
+
+import {createRevision} from './actions';
 import {FinalFileManager} from './FileManager';
 import {getFilesFromRevision} from './FileManager/util';
 import * as selectors from './selectors';
-import {createRevision} from './actions';
 
 export default function SubmitRevision() {
   const {eventId, contributionId, editableType} = useSelector(selectors.getStaticData);

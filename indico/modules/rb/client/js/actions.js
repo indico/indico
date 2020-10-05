@@ -5,8 +5,9 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-import qs from 'qs';
 import {push} from 'connected-react-router';
+import qs from 'qs';
+
 import {history} from './history';
 
 // Page state

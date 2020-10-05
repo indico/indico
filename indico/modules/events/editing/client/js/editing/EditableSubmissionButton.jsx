@@ -5,26 +5,26 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-import editableURL from 'indico-url:event_editing.editable';
+import apiUploadExistingURL from 'indico-url:event_editing.api_add_paper_file';
 import submitRevisionURL from 'indico-url:event_editing.api_create_editable';
 import apiUploadURL from 'indico-url:event_editing.api_upload';
-import apiUploadExistingURL from 'indico-url:event_editing.api_add_paper_file';
+import editableURL from 'indico-url:event_editing.editable';
 
 import _ from 'lodash';
-import React, {useState} from 'react';
 import PropTypes from 'prop-types';
-import {Button, Dropdown, Form, Modal} from 'semantic-ui-react';
+import React, {useState} from 'react';
 import {Form as FinalForm} from 'react-final-form';
+import {Button, Dropdown, Form, Modal} from 'semantic-ui-react';
 
-import {indicoAxios} from 'indico/utils/axios';
 import {FinalSubmitButton, handleSubmitError} from 'indico/react/forms';
 import {Translate} from 'indico/react/i18n';
+import {indicoAxios} from 'indico/utils/axios';
 
-import {fileTypePropTypes, uploadablePropTypes} from './timeline/FileManager/util';
-import {FinalFileManager} from './timeline/FileManager';
-
-import {getFileTypes} from './timeline/selectors';
 import {EditableTypeTitles} from '../models';
+
+import {FinalFileManager} from './timeline/FileManager';
+import {fileTypePropTypes, uploadablePropTypes} from './timeline/FileManager/util';
+import {getFileTypes} from './timeline/selectors';
 
 export default function EditableSubmissionButton({
   eventId,

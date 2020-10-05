@@ -6,8 +6,9 @@
 // LICENSE file for more details.
 
 import {connect} from 'react-redux';
-import Filter from '../components/Filter';
+
 import {setFilter, fetchLogEntries, setPage} from '../actions';
+import Filter from '../components/Filter';
 
 const mapStateToProps = ({logs}) => ({
   filters: logs.filters,

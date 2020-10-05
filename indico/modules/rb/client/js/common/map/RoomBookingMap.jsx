@@ -8,10 +8,12 @@
 import _ from 'lodash';
 import PropTypes from 'prop-types';
 import React from 'react';
-import {connect} from 'react-redux';
 import {Map, TileLayer} from 'react-leaflet';
 import Overridable from 'react-overridable';
+import {connect} from 'react-redux';
+
 import {selectors as configSelectors} from '../config';
+
 import MapMarkers from './MapMarkers';
 
 import 'leaflet/dist/leaflet.css';

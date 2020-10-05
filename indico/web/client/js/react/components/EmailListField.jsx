@@ -6,10 +6,12 @@
 // LICENSE file for more details.
 
 import _ from 'lodash';
-import React, {useState} from 'react';
 import PropTypes from 'prop-types';
+import React, {useState} from 'react';
 import {Dropdown} from 'semantic-ui-react';
+
 import {Translate} from 'indico/react/i18n';
+
 import {FinalField} from '../forms';
 
 const isValid = value => /^\S+@\S+\.\S+$/.test(value);

@@ -9,9 +9,11 @@ import {combineReducers} from 'redux';
 
 import {camelizeKeys} from 'indico/utils/case';
 import {requestReducer} from 'indico/utils/redux';
-import * as roomsActions from './actions';
-import * as bookingActions from '../bookings/actions';
+
 import * as bookRoomActions from '../../modules/bookRoom/actions';
+import * as bookingActions from '../bookings/actions';
+
+import * as roomsActions from './actions';
 
 function filterAvailability(roomAvailability, bookingId) {
   return roomAvailability.map(availability => {

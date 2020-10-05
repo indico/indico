@@ -5,20 +5,23 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-import fileTypesURL from 'indico-url:event_editing.api_file_types';
 import createFileTypeURL from 'indico-url:event_editing.api_add_file_type';
 import editFileTypeURL from 'indico-url:event_editing.api_edit_file_type';
+import fileTypesURL from 'indico-url:event_editing.api_file_types';
 
-import React, {useReducer} from 'react';
 import PropTypes from 'prop-types';
+import React, {useReducer} from 'react';
 import {Button, Icon, Loader, Message, Segment, Popup, Label} from 'semantic-ui-react';
+
 import {RequestConfirm, TooltipIfTruncated} from 'indico/react/components';
-import {Param, Translate} from 'indico/react/i18n';
 import {getChangedValues, handleSubmitError} from 'indico/react/forms';
 import {useIndicoAxios} from 'indico/react/hooks';
+import {Param, Translate} from 'indico/react/i18n';
 import {handleAxiosError, indicoAxios} from 'indico/utils/axios';
-import FileTypeModal from './FileTypeModal';
+
 import {EditableType} from '../../../models';
+
+import FileTypeModal from './FileTypeModal';
 
 import './FileTypeManager.module.scss';
 

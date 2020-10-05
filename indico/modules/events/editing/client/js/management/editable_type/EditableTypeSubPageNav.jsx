@@ -7,17 +7,18 @@
 
 import editableTypeURL from 'indico-url:event_editing.manage_editable_type';
 
-import React from 'react';
 import PropTypes from 'prop-types';
+import React from 'react';
 import {useParams} from 'react-router-dom';
 
-import {useNumericParam} from 'indico/react/util/routing';
 import {
   ManagementPageBackButton,
   ManagementPageTitle,
   ManagementPageSubTitle,
 } from 'indico/react/components';
 import {Translate} from 'indico/react/i18n';
+import {useNumericParam} from 'indico/react/util/routing';
+
 import {EditableTypeTitles} from '../../models';
 
 export default function EditableTypeSubPageNav({title}) {

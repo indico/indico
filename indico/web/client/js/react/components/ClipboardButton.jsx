@@ -5,11 +5,12 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-import React, {useState} from 'react';
 import PropTypes from 'prop-types';
+import React, {useState} from 'react';
 import {Popup, Button} from 'semantic-ui-react';
-import {Translate} from 'indico/react/i18n';
+
 import {useTimeout} from 'indico/react/hooks';
+import {Translate} from 'indico/react/i18n';
 
 export default function ClipboardButton({text, successText}) {
   const [copied, setCopied] = useState(false);

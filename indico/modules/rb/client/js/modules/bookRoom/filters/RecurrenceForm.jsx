@@ -5,9 +5,9 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
+import PropTypes from 'prop-types';
 import React from 'react';
 import {Form, Input, Radio, Select} from 'semantic-ui-react';
-import PropTypes from 'prop-types';
 
 import {PluralTranslate, Translate} from 'indico/react/i18n';
 

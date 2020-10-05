@@ -6,9 +6,11 @@
 // LICENSE file for more details.
 
 import {push} from 'connected-react-router';
-import {toMoment} from 'indico/utils/date';
-import {Translate} from 'indico/react/i18n';
+
 import showReactErrorDialog from 'indico/react/errors';
+import {Translate} from 'indico/react/i18n';
+import {toMoment} from 'indico/utils/date';
+
 import {resetPageState} from '../../actions';
 
 /**

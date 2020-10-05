@@ -8,13 +8,15 @@
 import moment from 'moment';
 import PropTypes from 'prop-types';
 import React from 'react';
+import Overridable from 'react-overridable';
 import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
-import Overridable from 'react-overridable';
 import {List, Popup} from 'semantic-ui-react';
+
+import {ResponsivePopup} from 'indico/react/components';
 import {Translate, Param} from 'indico/react/i18n';
 import {fullyOverlaps, serializeTime} from 'indico/utils/date';
-import {ResponsivePopup} from 'indico/react/components';
+
 import {openModal} from '../../actions';
 
 import './TimelineItem.module.scss';

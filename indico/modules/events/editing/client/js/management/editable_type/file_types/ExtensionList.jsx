@@ -6,9 +6,10 @@
 // LICENSE file for more details.
 
 import _ from 'lodash';
-import React from 'react';
 import PropTypes from 'prop-types';
+import React from 'react';
 import {Dropdown} from 'semantic-ui-react';
+
 import {Translate} from 'indico/react/i18n';
 
 export default function ExtensionList({value, disabled, onChange, onFocus, onBlur}) {

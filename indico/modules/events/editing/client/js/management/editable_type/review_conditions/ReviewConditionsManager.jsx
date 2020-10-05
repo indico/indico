@@ -16,8 +16,8 @@ import {Translate} from 'indico/react/i18n';
 import {indicoAxios} from 'indico/utils/axios';
 
 import ConditionInfo from './ConditionInfo';
-import ReviewConditionForm from './ReviewConditionForm';
 import ReviewConditionsContext from './context';
+import ReviewConditionForm from './ReviewConditionForm';
 
 import './ReviewConditionsManager.module.scss';
 

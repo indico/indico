@@ -12,14 +12,16 @@ import {combineReducers} from 'redux';
 import {camelizeKeys} from 'indico/utils/case';
 import {serializeDate, serializeTime} from 'indico/utils/date';
 import {requestReducer} from 'indico/utils/redux';
-import {actions as bookRoomActions} from '../../modules/bookRoom';
+
 import * as actions from '../../actions';
-import * as calendarActions from './actions';
 import {actions as bookingActions} from '../../common/bookings';
 import {filterReducerFactory} from '../../common/filters';
 import {initialRoomFilterStateFactory, processRoomFilters} from '../../common/roomSearch/reducers';
 import {initialDatePickerState} from '../../common/timeline/reducers';
+import {actions as bookRoomActions} from '../../modules/bookRoom';
 import {actions as adminActions} from '../admin';
+
+import * as calendarActions from './actions';
 
 const datePickerState = () => ({...initialDatePickerState, selectedDate: serializeDate(moment())});
 

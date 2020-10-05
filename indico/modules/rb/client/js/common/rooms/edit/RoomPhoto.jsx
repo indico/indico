@@ -7,13 +7,15 @@
 
 import roomPhotoURL from 'indico-url:rb.admin_room_photo';
 
-import React, {useCallback, useState, useEffect, useRef} from 'react';
-import {connect} from 'react-redux';
 import PropTypes from 'prop-types';
+import React, {useCallback, useState, useEffect, useRef} from 'react';
 import Dropzone from 'react-dropzone';
+import {connect} from 'react-redux';
 import {Button, Dimmer, Image, Popup, Loader} from 'semantic-ui-react';
-import {indicoAxios, handleAxiosError} from 'indico/utils/axios';
+
 import {Translate} from 'indico/react/i18n';
+import {indicoAxios, handleAxiosError} from 'indico/utils/axios';
+
 import {actions as configActions} from '../../config';
 
 import './RoomPhoto.module.scss';

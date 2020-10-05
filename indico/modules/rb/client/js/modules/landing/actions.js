@@ -5,8 +5,9 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-import fetchStatsURL from 'indico-url:rb.stats';
 import fetchUpcomingBookingsURL from 'indico-url:rb.my_bookings';
+import fetchStatsURL from 'indico-url:rb.stats';
+
 import {indicoAxios} from 'indico/utils/axios';
 import {ajaxAction} from 'indico/utils/redux';
 

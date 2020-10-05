@@ -6,10 +6,10 @@
 // LICENSE file for more details.
 
 import _ from 'lodash';
-import React from 'react';
 import PropTypes from 'prop-types';
-import {useDispatch, useSelector} from 'react-redux';
+import React from 'react';
 import {Form as FinalForm} from 'react-final-form';
+import {useDispatch, useSelector} from 'react-redux';
 import {Form} from 'semantic-ui-react';
 
 import {FinalSubmitButton, FinalTextArea} from 'indico/react/forms';
@@ -18,6 +18,7 @@ import {Translate} from 'indico/react/i18n';
 import {EditingReviewAction} from '../../../models';
 import {reviewEditable} from '../actions';
 import {getLastRevision, getNonSystemTags} from '../selectors';
+
 import FinalTagInput from './TagInput';
 
 export default function RequestChangesForm({setLoading, onSuccess}) {

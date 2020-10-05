@@ -5,8 +5,8 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-import React from 'react';
 import PropTypes from 'prop-types';
+import React from 'react';
 import {Label, Popup} from 'semantic-ui-react';
 
 import {Translate} from 'indico/react/i18n';

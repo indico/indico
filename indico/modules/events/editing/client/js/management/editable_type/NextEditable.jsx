@@ -5,21 +5,23 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-import editableListURL from 'indico-url:event_editing.api_filter_editables_by_filetypes';
 import assignMyselfURL from 'indico-url:event_editing.api_assign_editable_self';
 import fileTypesURL from 'indico-url:event_editing.api_file_types';
+import editableListURL from 'indico-url:event_editing.api_filter_editables_by_filetypes';
 
 import _ from 'lodash';
+import PropTypes from 'prop-types';
 import React, {useState, useEffect} from 'react';
 import {useHistory} from 'react-router-dom';
-import PropTypes from 'prop-types';
 import {Button, Loader, Modal, Table, Checkbox, Dimmer} from 'semantic-ui-react';
-import {camelizeKeys} from 'indico/utils/case';
+
+import {useIndicoAxios} from 'indico/react/hooks';
 import {Translate} from 'indico/react/i18n';
 import {indicoAxios, handleAxiosError} from 'indico/utils/axios';
-import {useIndicoAxios} from 'indico/react/hooks';
-import {EditableType, GetNextEditableTitles} from '../../models';
+import {camelizeKeys} from 'indico/utils/case';
+
 import {fileTypePropTypes} from '../../editing/timeline/FileManager/util';
+import {EditableType, GetNextEditableTitles} from '../../models';
 
 import './NextEditable.module.scss';
 

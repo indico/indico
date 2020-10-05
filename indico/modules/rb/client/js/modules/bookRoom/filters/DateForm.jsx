@@ -6,10 +6,12 @@
 // LICENSE file for more details.
 
 import moment from 'moment';
-import React from 'react';
 import PropTypes from 'prop-types';
+import React from 'react';
+
 import {CalendarSingleDatePicker, CalendarRangeDatePicker} from 'indico/react/components';
 import {serializeDate, toMoment} from 'indico/utils/date';
+
 import {FilterFormComponent} from '../../../common/filters';
 
 export default class DateForm extends FilterFormComponent {

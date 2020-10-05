@@ -10,9 +10,10 @@ import {useDispatch, useSelector} from 'react-redux';
 
 import {Param, Translate} from 'indico/react/i18n';
 
-import LogEntryList from '../containers/LogEntryList';
-import Toolbar from './Toolbar';
 import {clearMetadataQuery} from '../actions';
+import LogEntryList from '../containers/LogEntryList';
+
+import Toolbar from './Toolbar';
 
 function MetadataQueryMessage() {
   const dispatch = useDispatch();

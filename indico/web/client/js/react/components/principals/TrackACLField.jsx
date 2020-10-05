@@ -5,12 +5,12 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-import React, {useState} from 'react';
 import PropTypes from 'prop-types';
+import React, {useState} from 'react';
 
 import {ACLField} from 'indico/react/components';
-import {useFavoriteUsers} from 'indico/react/hooks';
 import {PermissionManager} from 'indico/react/components/principals/util';
+import {useFavoriteUsers} from 'indico/react/hooks';
 
 export default function TrackACLField({
   value,

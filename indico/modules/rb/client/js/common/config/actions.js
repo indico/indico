@@ -6,6 +6,7 @@
 // LICENSE file for more details.
 
 import fetchConfigURL from 'indico-url:rb.config';
+
 import {indicoAxios} from 'indico/utils/axios';
 import {ajaxAction} from 'indico/utils/redux';
 

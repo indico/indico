@@ -5,16 +5,18 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-import React from 'react';
 import PropTypes from 'prop-types';
-import {bindActionCreators} from 'redux';
+import React from 'react';
 import {connect} from 'react-redux';
+import {bindActionCreators} from 'redux';
 import {Icon, List, Popup} from 'semantic-ui-react';
+
 import {FinalDropdown, FinalInput} from 'indico/react/forms';
 import {Param, Plural, PluralTranslate, Singular, Translate} from 'indico/react/i18n';
+
 import * as adminActions from './actions';
-import * as adminSelectors from './selectors';
 import EditableList from './EditableList';
+import * as adminSelectors from './selectors';
 
 import './EditableList.module.scss';
 

@@ -6,11 +6,13 @@
 // LICENSE file for more details.
 
 import {combineReducers} from 'redux';
+
 import {camelizeKeys} from 'indico/utils/case';
 import {requestReducer} from 'indico/utils/redux';
 
-import * as landingActions from './actions';
 import {actions as adminActions} from '../admin';
+
+import * as landingActions from './actions';
 
 export default combineReducers({
   stats: combineReducers({

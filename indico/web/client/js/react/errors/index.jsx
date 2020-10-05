@@ -11,9 +11,10 @@ import {Provider} from 'react-redux';
 
 // eslint-disable-next-line import/no-cycle
 import createReduxStore from 'indico/utils/redux';
+
 import {addError, showReportForm} from './actions';
-import reducer from './reducers';
 import ErrorDialog from './container';
+import reducer from './reducers';
 
 let store;
 export default function showReactErrorDialog(error, instantReport = false) {

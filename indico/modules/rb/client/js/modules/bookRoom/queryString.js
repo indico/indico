@@ -7,14 +7,15 @@
 
 import _ from 'lodash';
 import {createQueryStringReducer, validator as v} from 'redux-router-querystring';
-import {boolStateField, defaultStateField} from '../../util';
 
 import * as globalActions from '../../actions';
-import * as actions from './actions';
-import {history} from '../../history';
-import {initialTimelineState} from './reducers';
 import {actions as filtersActions} from '../../common/filters';
 import {rules as queryFilterRules} from '../../common/roomSearch/queryString';
+import {history} from '../../history';
+import {boolStateField, defaultStateField} from '../../util';
+
+import * as actions from './actions';
+import {initialTimelineState} from './reducers';
 
 export const rules = {
   timeline: {

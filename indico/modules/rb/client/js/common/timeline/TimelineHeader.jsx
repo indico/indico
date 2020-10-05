@@ -5,12 +5,15 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-import React from 'react';
 import PropTypes from 'prop-types';
+import React from 'react';
+
 import {useResponsive} from 'indico/react/util';
-import TimelineLegend from './TimelineLegend';
+
 import {legendLabelShape} from '../../props';
+
 import DateNavigator from './DateNavigator';
+import TimelineLegend from './TimelineLegend';
 
 export default function TimelineHeader({
   datePicker,

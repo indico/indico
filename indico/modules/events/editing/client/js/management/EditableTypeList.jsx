@@ -9,15 +9,17 @@ import enabledEditableTypesURL from 'indico-url:event_editing.api_enabled_editab
 import manageEditableTypeURL from 'indico-url:event_editing.manage_editable_type';
 import manageEditableTypeListURL from 'indico-url:event_editing.manage_editable_type_list';
 
-import React, {useState} from 'react';
 import PropTypes from 'prop-types';
-import {Button, Checkbox, Form, Loader, Popup} from 'semantic-ui-react';
-import {Link} from 'react-router-dom';
+import React, {useState} from 'react';
 import {Form as FinalForm} from 'react-final-form';
-import {Translate} from 'indico/react/i18n';
-import {useIndicoAxios} from 'indico/react/hooks';
+import {Link} from 'react-router-dom';
+import {Button, Checkbox, Form, Loader, Popup} from 'semantic-ui-react';
+
 import {FinalCheckbox, FinalSubmitButton, handleSubmitError} from 'indico/react/forms';
+import {useIndicoAxios} from 'indico/react/hooks';
+import {Translate} from 'indico/react/i18n';
 import {indicoAxios} from 'indico/utils/axios';
+
 import {editableTypeOrder, EditableTypeTitles} from '../models';
 
 import './EditableTypeList.module.scss';

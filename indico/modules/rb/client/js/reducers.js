@@ -7,18 +7,18 @@
 
 import {connectRouter} from 'connected-react-router';
 
+import {reducer as bookingReducer} from './common/bookings';
 import {reducer as configReducer} from './common/config';
+import {reducer as linkingReducer} from './common/linking';
 import {reducer as mapReducer} from './common/map';
 import {reducer as roomsReducer} from './common/rooms';
-import {reducer as bookRoomReducer} from './modules/bookRoom';
 import {reducer as userReducer} from './common/user';
+import {reducer as adminReducer} from './modules/admin';
 import {reducer as blockingsReducer} from './modules/blockings';
+import {reducer as bookRoomReducer} from './modules/bookRoom';
 import {reducer as calendarReducer} from './modules/calendar';
 import {reducer as landingReducer} from './modules/landing';
 import {reducer as roomListReducer} from './modules/roomList';
-import {reducer as bookingReducer} from './common/bookings';
-import {reducer as adminReducer} from './modules/admin';
-import {reducer as linkingReducer} from './common/linking';
 
 export default history => ({
   router: connectRouter(history),

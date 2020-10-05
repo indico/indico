@@ -5,9 +5,10 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-import TimePicker from 'rc-time-picker';
 import PropTypes from 'prop-types';
+import TimePicker from 'rc-time-picker';
 import React, {useEffect, useMemo, useRef, useState, useCallback} from 'react';
+
 import {toMoment} from 'indico/utils/date';
 
 export default function WTFTimeField({timeId, uses24HourFormat, required, disabled}) {

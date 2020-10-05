@@ -6,10 +6,10 @@
 // LICENSE file for more details.
 
 import _ from 'lodash';
-import React, {useRef} from 'react';
 import PropTypes from 'prop-types';
-import {Dropdown, Portal} from 'semantic-ui-react';
+import React, {useRef} from 'react';
 import {Manager, Popper} from 'react-popper';
+import {Dropdown, Portal} from 'semantic-ui-react';
 
 import './PopoverDropdownMenu.module.scss';
 

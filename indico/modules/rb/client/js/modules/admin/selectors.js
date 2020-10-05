@@ -7,6 +7,7 @@
 
 import _ from 'lodash';
 import {createSelector} from 'reselect';
+
 import {RequestState} from 'indico/utils/redux';
 
 const makeSorter = attr => (a, b) => a[attr].localeCompare(b[attr]);

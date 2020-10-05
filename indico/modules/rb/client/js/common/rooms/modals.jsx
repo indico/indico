@@ -7,8 +7,8 @@
 
 import React from 'react';
 
-import RoomDetailsPreloader from './RoomDetailsPreloader';
 import RoomDetailsModal from './RoomDetailsModal';
+import RoomDetailsPreloader from './RoomDetailsPreloader';
 
 export default {
   /* eslint-disable react/display-name */

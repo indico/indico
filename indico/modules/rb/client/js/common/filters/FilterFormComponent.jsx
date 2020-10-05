@@ -7,8 +7,8 @@
 
 /* eslint "react/no-unused-prop-types": "off" */
 
-import React from 'react';
 import PropTypes from 'prop-types';
+import React from 'react';
 
 export default class FilterFormComponent extends React.Component {
   static propTypes = {

@@ -6,16 +6,18 @@
 // LICENSE file for more details.
 
 import _ from 'lodash';
+import moment from 'moment';
 import React from 'react';
 import {connect} from 'react-redux';
-import moment from 'moment';
 
 import {toMoment} from 'indico/utils/date';
-import * as bookRoomSelectors from './selectors';
-import BookRoomModal from './BookRoomModal';
-import BookFromListModal from './BookFromListModal';
-import UnavailableRoomsModal from './UnavailableRoomsModal';
+
 import {RoomDetailsPreloader} from '../../common/rooms';
+
+import BookFromListModal from './BookFromListModal';
+import BookRoomModal from './BookRoomModal';
+import * as bookRoomSelectors from './selectors';
+import UnavailableRoomsModal from './UnavailableRoomsModal';
 
 const BookingDataProvider = connect(state => ({
   bookRoomFilters: bookRoomSelectors.getFilters(state),

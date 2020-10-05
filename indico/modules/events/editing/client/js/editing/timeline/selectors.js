@@ -9,6 +9,7 @@ import _ from 'lodash';
 import {createSelector} from 'reselect';
 
 import {Translate} from 'indico/react/i18n';
+
 import {InitialRevisionState, FinalRevisionState} from '../../models';
 
 function shouldCreateNewRevision({initialState, finalState}) {

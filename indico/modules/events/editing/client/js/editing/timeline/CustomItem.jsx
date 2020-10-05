@@ -6,16 +6,16 @@
 // LICENSE file for more details.
 
 import moment from 'moment';
+import PropTypes from 'prop-types';
 import React from 'react';
 import {useSelector} from 'react-redux';
-import PropTypes from 'prop-types';
 
 import UserAvatar from 'indico/modules/events/reviewing/components/UserAvatar';
 import {serializeDate} from 'indico/utils/date';
 
+import ResetReview from './ResetReview';
 import * as selectors from './selectors';
 import StateIndicator from './StateIndicator';
-import ResetReview from './ResetReview';
 
 export default function CustomItem({header, user, createdDt, html, revisionId, state}) {
   const lastRevertableRevisionId = useSelector(selectors.getLastRevertableRevisionId);

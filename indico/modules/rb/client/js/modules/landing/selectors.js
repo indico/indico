@@ -6,6 +6,7 @@
 // LICENSE file for more details.
 
 import {createSelector} from 'reselect';
+
 import {selectors as roomSelectors} from '../../common/rooms';
 
 export const getStatistics = ({landing}) => landing.stats.data;

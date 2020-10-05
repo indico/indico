@@ -5,23 +5,23 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-import React, {useEffect, useState} from 'react';
-import {useSelector} from 'react-redux';
 import moment from 'moment';
 import PropTypes from 'prop-types';
+import React, {useEffect, useState} from 'react';
+import {useSelector} from 'react-redux';
 
 import UserAvatar from 'indico/modules/events/reviewing/components/UserAvatar';
 import {Param, Translate} from 'indico/react/i18n';
 import {serializeDate} from 'indico/utils/date';
 
 import ChangesConfirmation from './ChangesConfirmation';
-import RevisionLog from './RevisionLog';
-import ReviewForm from './ReviewForm';
-import {blockPropTypes} from './util';
-import * as selectors from './selectors';
-import FileDisplay from './FileDisplay';
-import StateIndicator from './StateIndicator';
 import CustomActions from './CustomActions';
+import FileDisplay from './FileDisplay';
+import ReviewForm from './ReviewForm';
+import RevisionLog from './RevisionLog';
+import * as selectors from './selectors';
+import StateIndicator from './StateIndicator';
+import {blockPropTypes} from './util';
 
 import './TimelineItem.module.scss';
 

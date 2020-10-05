@@ -11,11 +11,13 @@ import editableTypeListURL from 'indico-url:event_editing.editable_type_list';
 import React from 'react';
 import ReactDOM from 'react-dom';
 import {BrowserRouter as Router, Route, Switch} from 'react-router-dom';
+
 import {routerPathFromFlask} from 'indico/react/util/routing';
+
+import {EditableList} from '../management/editable_type';
 
 import EditingView from './page_layout';
 import ReduxTimeline from './ReduxTimeline';
-import {EditableList} from '../management/editable_type';
 
 document.addEventListener('DOMContentLoaded', async () => {
   const editingElement = document.querySelector('#editing-view');

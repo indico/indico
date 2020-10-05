@@ -7,18 +7,19 @@
 
 import editReviewConditionURL from 'indico-url:event_editing.api_edit_review_condition';
 
-import React, {useState, useContext} from 'react';
 import PropTypes from 'prop-types';
+import React, {useState, useContext} from 'react';
 import {Icon, Label} from 'semantic-ui-react';
 
 import {RequestConfirm, TooltipIfTruncated} from 'indico/react/components';
-import {Translate} from 'indico/react/i18n';
 import {handleSubmitError} from 'indico/react/forms';
+import {Translate} from 'indico/react/i18n';
 import {handleAxiosError, indicoAxios} from 'indico/utils/axios';
 
-import ReviewConditionForm from './ReviewConditionForm';
 import {EditableType} from '../../../models';
+
 import ReviewConditionsContext from './context';
+import ReviewConditionForm from './ReviewConditionForm';
 
 import './ConditionInfo.module.scss';
 

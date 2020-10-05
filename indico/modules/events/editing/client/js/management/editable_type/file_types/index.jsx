@@ -7,9 +7,12 @@
 
 import React from 'react';
 import {useParams} from 'react-router-dom';
-import {useNumericParam} from 'indico/react/util/routing';
+
 import {Translate} from 'indico/react/i18n';
+import {useNumericParam} from 'indico/react/util/routing';
+
 import EditableTypeSubPageNav from '../EditableTypeSubPageNav';
+
 import FileTypeManager from './FileTypeManager';
 
 export default function FileTypeManagement() {

@@ -6,8 +6,10 @@
 // LICENSE file for more details.
 
 import {combineReducers} from 'redux';
+
 import {camelizeKeys} from 'indico/utils/case';
 import {requestReducer} from 'indico/utils/redux';
+
 import * as bookingsActions from './actions';
 
 export default combineReducers({

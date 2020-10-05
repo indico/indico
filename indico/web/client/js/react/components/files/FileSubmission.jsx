@@ -5,8 +5,8 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-import React, {useCallback, useState} from 'react';
 import PropTypes from 'prop-types';
+import React, {useCallback, useState} from 'react';
 import {useDropzone} from 'react-dropzone';
 
 import {FileArea} from './FileArea';

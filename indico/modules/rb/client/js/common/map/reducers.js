@@ -6,9 +6,12 @@
 // LICENSE file for more details.
 
 import {combineReducers} from 'redux';
+
 import {requestReducer} from 'indico/utils/redux';
-import * as mapActions from './actions';
+
 import * as globalActions from '../../actions';
+
+import * as mapActions from './actions';
 import {getAreaBounds} from './util';
 
 const initialUiState = {

@@ -5,13 +5,14 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
+import Leaflet from 'leaflet';
 import _ from 'lodash';
 import PropTypes from 'prop-types';
 import React from 'react';
-import {connect} from 'react-redux';
 import {Marker, Tooltip} from 'react-leaflet';
-import Leaflet from 'leaflet';
 import MarkerClusterGroup from 'react-leaflet-markercluster';
+import {connect} from 'react-redux';
+
 import * as mapSelectors from './selectors';
 
 function groupIconCreateFunction(cluster) {

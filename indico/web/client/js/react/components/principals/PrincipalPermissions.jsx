@@ -6,8 +6,8 @@
 // LICENSE file for more details.
 
 import _ from 'lodash';
-import React, {useState} from 'react';
 import PropTypes from 'prop-types';
+import React, {useState} from 'react';
 import {Button, Dropdown, Icon, Label, Popup} from 'semantic-ui-react';
 
 import {PopoverDropdownMenu} from 'indico/react/components';

@@ -9,11 +9,11 @@ import bookingLinkURL from 'indico-url:rb.booking_link';
 
 import _ from 'lodash';
 import moment from 'moment';
-import React from 'react';
 import PropTypes from 'prop-types';
+import React from 'react';
 import {Form as FinalForm} from 'react-final-form';
-import {bindActionCreators} from 'redux';
 import {connect} from 'react-redux';
+import {bindActionCreators} from 'redux';
 import {
   Button,
   Confirm,
@@ -28,25 +28,27 @@ import {
   Popup,
 } from 'semantic-ui-react';
 
-import {toMoment, serializeDate} from 'indico/utils/date';
-import {Param, Plural, PluralTranslate, Singular, Translate} from 'indico/react/i18n';
-import {FinalCheckbox, FinalTextArea} from 'indico/react/forms';
-import {Responsive} from 'indico/react/util';
 import {ClipboardButton} from 'indico/react/components';
-import {DailyTimelineContent, TimelineLegend} from '../timeline';
+import {FinalCheckbox, FinalTextArea} from 'indico/react/forms';
+import {Param, Plural, PluralTranslate, Singular, Translate} from 'indico/react/i18n';
+import {Responsive} from 'indico/react/util';
+import {toMoment, serializeDate} from 'indico/utils/date';
+
+import {openModal} from '../../actions';
+import RoomBasicDetails from '../../components/RoomBasicDetails';
+import RoomKeyLocation from '../../components/RoomKeyLocation';
+import TimeInformation from '../../components/TimeInformation';
 import {
   getRecurrenceInfo,
   PopupParam,
   getOccurrenceTypes,
   transformToLegendLabels,
 } from '../../util';
-import RoomBasicDetails from '../../components/RoomBasicDetails';
-import RoomKeyLocation from '../../components/RoomKeyLocation';
-import TimeInformation from '../../components/TimeInformation';
-import {openModal} from '../../actions';
+import {DailyTimelineContent, TimelineLegend} from '../timeline';
+
+import * as bookingsActions from './actions';
 import LazyBookingObjectLink from './LazyBookingObjectLink';
 import * as bookingsSelectors from './selectors';
-import * as bookingsActions from './actions';
 
 import './BookingDetails.module.scss';
 

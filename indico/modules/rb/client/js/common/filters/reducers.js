@@ -6,6 +6,7 @@
 // LICENSE file for more details.
 
 import * as globalActions from '../../actions';
+
 import * as filtersActions from './actions';
 
 export function filterReducerFactory(namespace, initialState, postprocess = x => x) {

@@ -7,8 +7,8 @@
 
 import roomsSpriteURL from 'indico-url:rb.sprite';
 
-import React from 'react';
 import PropTypes from 'prop-types';
+import React from 'react';
 import {connect} from 'react-redux';
 
 import * as configSelectors from '../common/config/selectors';

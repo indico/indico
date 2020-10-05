@@ -6,11 +6,13 @@
 // LICENSE file for more details.
 
 import moment from 'moment';
-import React from 'react';
 import PropTypes from 'prop-types';
+import React from 'react';
 import {Card} from 'semantic-ui-react';
+
 import {TooltipIfTruncated} from 'indico/react/components';
 import {Translate, Param, PluralTranslate} from 'indico/react/i18n';
+
 import SpriteImage from '../../components/SpriteImage';
 
 import './BlockingCard.module.scss';

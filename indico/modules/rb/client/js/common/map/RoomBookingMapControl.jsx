@@ -5,11 +5,11 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
+import Leaflet from 'leaflet';
 import PropTypes from 'prop-types';
 import React from 'react';
 import ReactDOM from 'react-dom';
 import {MapControl, withLeaflet} from 'react-leaflet';
-import Leaflet from 'leaflet';
 
 class RoomBookingMapControl extends MapControl {
   static propTypes = {

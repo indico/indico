@@ -6,9 +6,10 @@
 // LICENSE file for more details.
 
 import _ from 'lodash';
+import PropTypes from 'prop-types';
 import React from 'react';
 import {Button, Icon, Popup} from 'semantic-ui-react';
-import PropTypes from 'prop-types';
+
 import {Translate} from 'indico/react/i18n';
 
 import './FilterDropdown.module.scss';

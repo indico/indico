@@ -7,15 +7,16 @@
 
 import resetReviewsURL from 'indico-url:event_editing.api_undo_review';
 
+import PropTypes from 'prop-types';
 import React, {useState} from 'react';
 import {useSelector, useDispatch} from 'react-redux';
-import PropTypes from 'prop-types';
 import {Icon, Popup} from 'semantic-ui-react';
+
 import {RequestConfirm} from 'indico/react/components';
 import {Translate} from 'indico/react/i18n';
 
-import * as selectors from './selectors';
 import {resetReviews} from './actions';
+import * as selectors from './selectors';
 
 import './ResetReviews.module.scss';
 

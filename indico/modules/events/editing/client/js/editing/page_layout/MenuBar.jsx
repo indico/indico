@@ -5,17 +5,19 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-import displayURL from 'indico-url:events.display';
 import contribDisplayURL from 'indico-url:contributions.display_contribution';
-import manageEditableTypeURL from 'indico-url:event_editing.manage_editable_type';
 import editableTypeListURL from 'indico-url:event_editing.editable_type_list';
+import manageEditableTypeURL from 'indico-url:event_editing.manage_editable_type';
+import displayURL from 'indico-url:events.display';
 
+import PropTypes from 'prop-types';
 import React from 'react';
 import {Link} from 'react-router-dom';
-import PropTypes from 'prop-types';
 import {Header, Icon, Menu} from 'semantic-ui-react';
+
 import {Translate} from 'indico/react/i18n';
 import Palette from 'indico/utils/palette';
+
 import {EditableType, EditableEditingTitles} from '../../models';
 
 import './MenuBar.module.scss';

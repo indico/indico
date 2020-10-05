@@ -6,10 +6,10 @@
 // LICENSE file for more details.
 
 import _ from 'lodash';
-
-import React from 'react';
 import PropTypes from 'prop-types';
+import React from 'react';
 import {Accordion, Form, Icon} from 'semantic-ui-react';
+
 import {Translate} from 'indico/react/i18n';
 
 import {FilterFormComponent} from '../../../common/filters';

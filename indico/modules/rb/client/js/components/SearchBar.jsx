@@ -5,12 +5,13 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-import {connect} from 'react-redux';
-import {bindActionCreators} from 'redux';
 import PropTypes from 'prop-types';
 import React from 'react';
-import {Icon, Input} from 'semantic-ui-react';
 import {DebounceInput} from 'react-debounce-input';
+import {connect} from 'react-redux';
+import {bindActionCreators} from 'redux';
+import {Icon, Input} from 'semantic-ui-react';
+
 import {actions as filtersActions} from '../common/filters';
 
 import './SearchBar.module.scss';

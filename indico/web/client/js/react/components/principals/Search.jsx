@@ -5,13 +5,16 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
+import groupSearchURL from 'indico-url:groups.group_search';
 import userSearchURL from 'indico-url:users.user_search';
 import userSearchInfoURL from 'indico-url:users.user_search_info';
-import groupSearchURL from 'indico-url:groups.group_search';
 
+import {FORM_ERROR} from 'final-form';
 import _ from 'lodash';
-import React, {useContext, useState} from 'react';
 import PropTypes from 'prop-types';
+import React, {useContext, useState} from 'react';
+import {Form as FinalForm} from 'react-final-form';
+import Overridable from 'react-overridable';
 import {
   Button,
   Divider,
@@ -24,14 +27,13 @@ import {
   Modal,
   Popup,
 } from 'semantic-ui-react';
-import {FORM_ERROR} from 'final-form';
-import {Form as FinalForm} from 'react-final-form';
-import Overridable from 'react-overridable';
+
 import {FinalCheckbox, FinalInput, handleSubmitError} from 'indico/react/forms';
-import {Translate, PluralTranslate, Singular, Plural, Param} from 'indico/react/i18n';
 import {useIndicoAxios} from 'indico/react/hooks';
+import {Translate, PluralTranslate, Singular, Plural, Param} from 'indico/react/i18n';
 import {indicoAxios} from 'indico/utils/axios';
 import {camelizeKeys} from 'indico/utils/case';
+
 import {PrincipalType} from './util';
 
 import './items.module.scss';

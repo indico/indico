@@ -10,6 +10,7 @@ import React from 'react';
 import {Label, Segment, List} from 'semantic-ui-react';
 
 import {Translate} from 'indico/react/i18n';
+
 import {legendLabelShape} from '../../props';
 
 import './TimelineLegend.module.scss';

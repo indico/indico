@@ -7,12 +7,13 @@
 
 import _ from 'lodash';
 import moment from 'moment';
-import React from 'react';
 import PropTypes from 'prop-types';
+import React from 'react';
 import {Dropdown} from 'semantic-ui-react';
+
+import {FinalField} from 'indico/react/forms';
 import {Translate} from 'indico/react/i18n';
 import {serializeTime, toMoment} from 'indico/utils/date';
-import {FinalField} from 'indico/react/forms';
 
 import './TimeRangePicker.module.scss';
 

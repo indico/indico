@@ -8,13 +8,16 @@
 import _ from 'lodash';
 import PropTypes from 'prop-types';
 import React from 'react';
-import {bindActionCreators} from 'redux';
 import {connect} from 'react-redux';
+import {bindActionCreators} from 'redux';
 import {Message} from 'semantic-ui-react';
+
 import {Translate} from 'indico/react/i18n';
-import {ElasticTimeline} from '../../common/timeline';
+
 import {actions as roomsActions} from '../../common/rooms';
+import {ElasticTimeline} from '../../common/timeline';
 import {selectors as userSelectors} from '../../common/user';
+
 import * as bookRoomActions from './actions';
 import * as bookRoomSelectors from './selectors';
 

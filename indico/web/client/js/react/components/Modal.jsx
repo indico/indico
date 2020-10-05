@@ -5,9 +5,9 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
+import PropTypes from 'prop-types';
 import React from 'react';
 import ReactModal from 'react-modal';
-import PropTypes from 'prop-types';
 
 import {Slot, toClasses} from 'indico/react/util';
 

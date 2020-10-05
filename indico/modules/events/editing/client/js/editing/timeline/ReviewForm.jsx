@@ -5,21 +5,22 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
+import PropTypes from 'prop-types';
 import React, {useState} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
-import PropTypes from 'prop-types';
 import {Dropdown} from 'semantic-ui-react';
 
 import UserAvatar from 'indico/modules/events/reviewing/components/UserAvatar';
 import {Translate} from 'indico/react/i18n';
 
+import {EditingReviewAction} from '../../models';
+
+import {createRevisionComment} from './actions';
+import CommentForm from './CommentForm';
 import JudgmentBox from './judgment/JudgmentBox';
 import JudgmentDropdownItems from './judgment/JudgmentDropdownItems';
-import CommentForm from './CommentForm';
-import {blockPropTypes} from './util';
-import {createRevisionComment} from './actions';
-import {EditingReviewAction} from '../../models';
 import {getLastRevision, canJudgeLastRevision} from './selectors';
+import {blockPropTypes} from './util';
 
 import './ReviewForm.module.scss';
 
