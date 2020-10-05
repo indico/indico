@@ -247,19 +247,31 @@ $(document).ready(function() {
   showFormErrors();
 
   // Show form creation dialog if hash is present in the URL
-  var match = location.hash.match(/^#create-event:(lecture|meeting|conference)(?::(\d+))?$/);
+  var match = location.hash.match(/^#create-event:(lecture|meeting|conference)(?::(\d*))(?::(\b[0-9a-f]{8}\b-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-\b[0-9a-f]{12}\b))?$/);
   if (match) {
     var eventType = match[1];
     var categoryId = match[2];
+    var eventUUID = match[3];
+    console.log("eventType: ", eventType)
+    console.log("categoryId: ", categoryId)
+    console.log("eventUUID: ", eventUUID)
     var title = {
       lecture: $T.gettext('Create new lecture'),
       meeting: $T.gettext('Create new meeting'),
       conference: $T.gettext('Create new conference'),
     }[eventType];
-    var url =
-      match[2] !== undefined
-        ? build_url(Indico.Urls.EventCreation, {event_type: eventType, category_id: categoryId})
-        : build_url(Indico.Urls.EventCreation, {event_type: eventType});
+    var url;
+    if (match[2] !== "") {
+      url = build_url(Indico.Urls.EventCreation, {event_type: eventType, category_id: categoryId});
+    } else if (match[3] !== "") {
+      url = build_url(Indico.Urls.EventCreation, {event_type: eventType, event_uuid: eventUUID});
+    } else {
+      url = build_url(Indico.Urls.EventCreation, {event_type: eventType});
+    }
+
+    console.log("match[2]: ", match[2]);
+    console.log("match[3]: ", match[3]);
+    console.log("url is: ", url);
     ajaxDialog({
       url: url,
       title: title,

@@ -15,6 +15,7 @@ from werkzeug.utils import cached_property
 
 from indico.core.config import config
 from indico.core.db.sqlalchemy.util.models import get_simple_column_attrs
+from indico.legacy.common.cache import GenericCache
 from indico.modules.categories import Category
 from indico.modules.events.forms import EventCreationForm, LectureCreationForm
 from indico.modules.events.models.events import EventType
@@ -28,12 +29,13 @@ from indico.util.date_time import now_utc
 from indico.util.iterables import materialize_iterable
 from indico.web.flask.util import url_for
 from indico.web.forms.base import FormDefaults
-from indico.web.rh import RHProtected
+from indico.web.rh import RH, RHProtected
 from indico.web.util import jsonify_data, jsonify_template, url_for_index
 
 
 class RHCreateEvent(RHProtected):
     """Create a new event."""
+    _cache = GenericCache('event-preparation')
 
     def _process_args(self):
         self.event_type = EventType[request.view_args['event_type']]
@@ -55,16 +57,27 @@ class RHCreateEvent(RHProtected):
         if category is not None:
             tzinfo = timezone(category.timezone)
 
-        # try to find good dates/times
-        now = now_utc(exact=False)
-        start_dt = now + relativedelta(hours=1, minute=0)
-        if start_dt.astimezone(tzinfo).time() > time(18):
-            start_dt = tzinfo.localize(datetime.combine(now.date() + relativedelta(days=1), time(9)))
-        end_dt = start_dt + relativedelta(hours=2)
+        title = None
+        try:
+            cached_data = self._cache.get(request.args['event_uuid'])
+            title = cached_data['title']
+            start_dt = datetime.strptime(cached_data['start_dt'], "%Y-%m-%d %H:%M:%S")
+            start_dt = tzinfo.localize(start_dt)
+            print("start_dt uuid: ", start_dt)
+            end_dt = start_dt + relativedelta(minutes=int(cached_data['duration']))
+        except:
+            # try to find good dates/times
+            now = now_utc(exact=False)
+            start_dt = now + relativedelta(hours=1, minute=0)
+            print("start_dt: ", start_dt)
+            if start_dt.astimezone(tzinfo).time() > time(18):
+                start_dt = tzinfo.localize(datetime.combine(now.date() + relativedelta(days=1), time(9)))
+            end_dt = start_dt + relativedelta(hours=2)
 
         # XXX: Do not provide a default value for protection_mode. It is selected via JavaScript code
         # once a category has been selected.
-        return FormDefaults(category=category,
+        return FormDefaults(title=title,
+                            category=category,
                             timezone=tzinfo.zone, start_dt=start_dt, end_dt=end_dt,
                             occurrences=[(start_dt, end_dt - start_dt)],
                             location_data={'inheriting': False},
@@ -100,6 +113,7 @@ class RHCreateEvent(RHProtected):
                                           start_dt=start_dt, end_dt=end_dt))
 
     def _process(self):
+
         if not request.is_xhr:
             return redirect(url_for_index(_anchor=f'create-event:{self.event_type.name}'))
         form_cls = LectureCreationForm if self.event_type == EventType.lecture else EventCreationForm
@@ -120,4 +134,45 @@ class RHCreateEvent(RHProtected):
         return jsonify_template('events/forms/event_creation_form.html', form=form, fields=form._field_order,
                                 event_type=self.event_type.name, single_category=self.single_category,
                                 check_room_availability=check_room_availability,
+                                rb_excluded_categories=rb_excluded_categories)
+
+class RHCreateEventUUID(RH):
+    """Create a new event from UUID."""
+    def _get_form_defaults(self):
+        category = None
+        tzinfo = timezone(config.DEFAULT_TIMEZONE)
+        if category is not None:
+            tzinfo = timezone(category.timezone)
+
+        # try to find good dates/times
+        now = now_utc(exact=False)
+        start_dt = now + relativedelta(hours=1, minute=0)
+        if start_dt.astimezone(tzinfo).time() > time(18):
+            start_dt = tzinfo.localize(datetime.combine(now.date() + relativedelta(days=1), time(9)))
+        end_dt = start_dt + relativedelta(hours=2)
+
+        # XXX: Do not provide a default value for protection_mode. It is selected via JavaScript code
+        # once a category has been selected.
+        return FormDefaults(category=category,
+                            timezone=tzinfo.zone, start_dt=start_dt, end_dt=end_dt,
+                            occurrences=[(start_dt, end_dt - start_dt)],
+                            location_data={'inheriting': False},
+                            create_booking=False)
+
+    def _process(self):
+        return redirect(url_for_index(_anchor='create-event:meeting:uuid'))
+
+        # if not request.is_xhr:
+        #     return redirect(url_for_index(_anchor='create-event:{}'.format('Meeting')))
+        form_cls = EventCreationForm
+        form = form_cls(obj=self._get_form_defaults(), prefix='event-creation-')
+        # if form.validate_on_submit():
+        #     event = self._create_event(form.data)
+        #     notify_event_creation(event)
+        #     return jsonify_data(flash=False, redirect=url_for('event_management.settings', event))
+        rb_excluded_categories = [c.id for c in rb_settings.get('excluded_categories')]
+        # return jsonify_template('events/forms/event_creation_form.html', form=form)
+        return render_template('events/forms/event_creation_form.html', form=form, fields=form._field_order,
+                                event_type='Meeting', single_category=True,
+                                check_room_availability=False,
                                 rb_excluded_categories=rb_excluded_categories)
