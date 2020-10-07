@@ -65,6 +65,10 @@ li > table + .note-area-wrapper {
       color: $black;
     }
 
+    img {
+      max-width: 100%;
+    }
+
     > :first-child {
       margin-top: 0;
     }
