@@ -10,6 +10,7 @@
   @include border-all($color: $pastel-gray, $width: 2px);
   background: $pastel-gray;
   display: table;
+  table-layout: fixed;
   width: 100%;
 
   &::before {
