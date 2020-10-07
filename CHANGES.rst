@@ -27,6 +27,7 @@ Internal Changes
 - Add ``registration_form_wtform_created`` signal and send form data in
   ``registration_created`` and ``registration_updated`` signals (:pr:`4642`,
   thanks :user:`omegak`)
+- Add ``logged_in`` signal
 
 
 Version 2.3

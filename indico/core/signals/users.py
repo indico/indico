@@ -21,6 +21,13 @@ by an administrator manually) or was created immediately on registration;
 the identity associated with the registration is passed in the `identity` kwarg.
 """)
 
+logged_in = _signals.signal('logged-in', """
+Called when a user logs in. The *sender* is the User who logged in. Depending
+on whether this was a regular login or an admin impersonating the user, either
+the *identity* kwarg is set to the `Identity` used by the user to log in or the
+*admin_impersonation* kwarg is ``True``.
+""")
+
 registration_requested = _signals.signal('registration-requested', """
 Called when a user requests to register a new indico account, i.e. if
 moderation is enabled.  The *sender* is the registration request.

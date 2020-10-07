@@ -100,6 +100,7 @@ def login_user(user, identity=None, admin_impersonation=False):
         else:
             session.pop('login_identity', None)
         user.synchronize_data()
+    signals.users.logged_in.send(user, identity=identity, admin_impersonation=admin_impersonation)
 
 
 @signals.menu.items.connect_via('user-profile-sidemenu')
