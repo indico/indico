@@ -61,21 +61,23 @@ export default function MenuBar({eventId, menuItems, editableType, contribId}) {
         {EditableEditingTitles[editableType]}
       </Header>
       <EditableListMenu eventId={eventId} editableType={editableType} />
-      <Menu vertical>
-        <Menu.Item header>
-          <span styleName="capitalized" style={{color: Palette.black}}>
-            <Translate>other modules</Translate>
-          </span>
-        </Menu.Item>
-        {menuItems.map(item => (
-          <Menu.Item key={item.name} name={item.name} as="a" href={item.url}>
-            <span style={{color: Palette.blue}}>
-              {item.icon && <Icon name={item.icon.replace('icon-', '')} />}
-              {item.title}
+      {!!menuItems.length && (
+        <Menu vertical>
+          <Menu.Item header>
+            <span styleName="capitalized" style={{color: Palette.black}}>
+              <Translate>other modules</Translate>
             </span>
           </Menu.Item>
-        ))}
-      </Menu>
+          {menuItems.map(item => (
+            <Menu.Item key={item.name} name={item.name} as="a" href={item.url}>
+              <span style={{color: Palette.blue}}>
+                {item.icon && <Icon name={item.icon.replace('icon-', '')} />}
+                {item.title}
+              </span>
+            </Menu.Item>
+          ))}
+        </Menu>
+      )}
       <Menu vertical>
         <Menu.Item header>
           <span styleName="capitalized" style={{color: Palette.black}}>
