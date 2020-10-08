@@ -20,6 +20,8 @@ Bugfixes
   contributions or timetable entries
 - Do not show incorrect modification deadline in abstract management area if no
   such deadline has been set (:pr:`4650`)
+- Fix layout problem when minutes contain overly large embedded images (:issue:`4653`,
+  :pr:`4654`)
 
 Internal Changes
 ^^^^^^^^^^^^^^^^
