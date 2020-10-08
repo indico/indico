@@ -104,7 +104,7 @@ class EditingRevisionFileSchema(mm.ModelSchema):
     external_download_url = fields.String()
 
 
-class EditingRevisionUnclaimedFileSchema(EditingRevisionFileSchema):
+class EditingRevisionSignedFileSchema(EditingRevisionFileSchema):
     class Meta(EditingRevisionFileSchema.Meta):
         fields = ('uuid', 'filename', 'size', 'content_type', 'file_type', 'signed_download_url')
 
@@ -161,8 +161,8 @@ class EditingRevisionSchema(mm.ModelSchema):
         return data
 
 
-class EditingRevisionUnclaimedSchema(EditingRevisionSchema):
-    files = fields.List(fields.Nested(EditingRevisionUnclaimedFileSchema))
+class EditingRevisionSignedSchema(EditingRevisionSchema):
+    files = fields.List(fields.Nested(EditingRevisionSignedFileSchema))
 
 
 class EditableSchema(mm.ModelSchema):
