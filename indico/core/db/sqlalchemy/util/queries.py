@@ -13,7 +13,7 @@ from sqlalchemy import func, inspect, over
 from sqlalchemy.sql import update
 
 
-TS_REGEX = re.compile(r'([@<>!()&|:\'])')
+TS_REGEX = re.compile(r'([@<>!()&|:\'\\])')
 
 
 def limit_groups(query, model, partition_by, order_by, limit=None, offset=0):
