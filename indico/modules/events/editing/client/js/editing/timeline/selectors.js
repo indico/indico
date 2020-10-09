@@ -39,13 +39,13 @@ export function processRevisions(revisions) {
   const newRevisions = [];
   let numberOfRevisions = 1;
   let items = [];
-  let currRevision = null;
+  let currBlockIdx = -1;
 
   for (const [index, _revision] of revisions.entries()) {
     const revision = {..._revision};
     const {initialState, finalState} = revision;
-    if (!currRevision) {
-      currRevision = revision;
+    if (currBlockIdx === -1) {
+      currBlockIdx = index;
       items = [...revision.comments];
     }
 
@@ -125,12 +125,14 @@ export function processRevisions(revisions) {
     }
 
     if (shouldCreateNewRevision(revision) || index === revisions.length - 1) {
+      // From here on, a new revision block will be created
       newRevisions.push({
-        ..._.omit(currRevision, 'comments'),
+        ..._.omit(revisions[currBlockIdx], 'comments'),
         number: numberOfRevisions++,
+        customActions: revision.customActions, // Use the actions from the latest revision in the block
         items,
       });
-      currRevision = null;
+      currBlockIdx = -1;
     }
   }
 
