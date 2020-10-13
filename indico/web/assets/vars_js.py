@@ -87,7 +87,7 @@ def generate_global_file():
     } for auth in multipass.identity_providers.itervalues() if auth.supports_search]
 
     indico_vars = {
-        'Debug': config.DEBUG,
+        'ExperimentalEditingService': config.EXPERIMENTAL_EDITING_SERVICE,
         'Urls': {
             'Base': config.BASE_URL,
             'BasePath': url_parse(config.BASE_URL).path.rstrip('/'),
