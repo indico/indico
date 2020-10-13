@@ -45,7 +45,7 @@
             </div>
             <div class="social-site">
                 <a href="https://www.google.com/calendar/event?{{ google_calendar_params|urlencode }}" target="_blank">
-                    <img src="//www.google.com/calendar/images/ext/gc_button1.gif" alt="" border="0">
+                    <img src="{{ url_for('assets.image', filename='google_calendar.gif') }}" alt="" border="0">
                 </a>
             </div>
         </div>
