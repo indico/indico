@@ -134,12 +134,13 @@ def service_get_status(event):
     return {'status': resp.json(), 'error': None}
 
 
-def service_handle_new_editable(editable):
+def service_handle_new_editable(editable, user):
     revision = editable.revisions[-1]
     data = {
         'editable': EditableBasicSchema().dump(editable),
         'revision': EditingRevisionSignedSchema().dump(revision),
-        'endpoints': _get_revision_endpoints(revision)
+        'endpoints': _get_revision_endpoints(revision),
+        'user': ServiceUserSchema(context={'editable': editable}).dump(user),
     }
     try:
         path = '/event/{}/editable/{}/{}'.format(
@@ -154,12 +155,13 @@ def service_handle_new_editable(editable):
         raise ServiceRequestFailed(exc)
 
 
-def service_handle_review_editable(editable, action, parent_revision, revision=None):
+def service_handle_review_editable(editable, user, action, parent_revision, revision=None):
     new_revision = revision or parent_revision
     data = {
         'action': action.name,
         'revision': EditingRevisionSignedSchema().dump(new_revision),
-        'endpoints': _get_revision_endpoints(new_revision)
+        'endpoints': _get_revision_endpoints(new_revision),
+        'user': ServiceUserSchema(context={'editable': editable}).dump(user),
     }
     try:
         path = '/event/{}/editable/{}/{}/{}'.format(

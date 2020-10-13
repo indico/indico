@@ -184,7 +184,7 @@ class RHCreateEditable(RHContributionEditableBase):
         editable = create_new_editable(self.contrib, self.editable_type, session.user, args['files'], initial_state)
         if service_url:
             try:
-                service_handle_new_editable(editable)
+                service_handle_new_editable(editable, session.user)
             except ServiceRequestFailed:
                 raise ServiceUnavailable(_('Submission failed, please try again later.'))
 
@@ -212,7 +212,7 @@ class RHReviewEditable(RHContributionEditableRevisionBase):
         publish = True
         if service_url:
             try:
-                resp = service_handle_review_editable(self.editable, action, self.revision, new_revision)
+                resp = service_handle_review_editable(self.editable, session.user, action, self.revision, new_revision)
                 publish = resp.get('publish', True)
             except ServiceRequestFailed:
                 raise ServiceUnavailable(_('Failed processing review, please try again later.'))
@@ -239,7 +239,7 @@ class RHConfirmEditableChanges(RHContributionEditableRevisionBase):
         publish = True
         if service_url:
             try:
-                resp = service_handle_review_editable(self.editable, action, self.revision)
+                resp = service_handle_review_editable(self.editable, session.user, action, self.revision)
                 publish = resp.get('publish', True)
             except ServiceRequestFailed:
                 raise ServiceUnavailable(_('Failed processing review, please try again later.'))
@@ -291,7 +291,7 @@ class RHCreateSubmitterRevision(RHContributionEditableRevisionBase):
 
         if service_url:
             try:
-                service_handle_review_editable(self.editable, EditingReviewAction.update,
+                service_handle_review_editable(self.editable, session.user, EditingReviewAction.update,
                                                self.revision, new_revision)
             except ServiceRequestFailed:
                 raise ServiceUnavailable(_('Failed processing review, please try again later.'))
