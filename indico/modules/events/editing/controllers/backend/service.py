@@ -43,7 +43,7 @@ class RHConnectService(RHEditingManagementBase):
         'url': fields.URL(schemes={'http', 'https'}, required=True),
     })
     def _process(self, url):
-        if not config.DEBUG:
+        if not config.EXPERIMENTAL_EDITING_SERVICE:
             raise ServiceUnavailable('This functionality is not available yet')
         if editing_settings.get(self.event, 'service_url'):
             raise BadRequest('Service URL already set')

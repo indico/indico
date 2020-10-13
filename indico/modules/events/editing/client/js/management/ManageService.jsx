@@ -155,6 +155,12 @@ export default function ManageService({eventId}) {
             <>
               <Modal.Header content={Translate.string('Connect to editing workflow service')} />
               <Modal.Content>
+                <Message warning>
+                  {/* This message is not translated because it will be removed soon-ish. */}
+                  This feature is still <strong>experimental</strong>. Especially if you are not the
+                  administrator of this Indico instance be aware that even minor Indico upgrades may
+                  contain backwards-incompatible changes to the API between Indico and the service.
+                </Message>
                 <Form id="connect-service-form" onSubmit={fprops.handleSubmit}>
                   <FinalInput
                     name="url"

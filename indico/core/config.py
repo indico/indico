@@ -49,6 +49,7 @@ DEFAULTS = {
     'DEFAULT_TIMEZONE': 'UTC',
     'DISABLE_CELERY_CHECK': None,
     'ENABLE_ROOMBOOKING': False,
+    'EXPERIMENTAL_EDITING_SERVICE': False,
     'EXTERNAL_REGISTRATION_URL': None,
     'FLOWER_URL': None,
     'HELP_URL': 'https://learn.getindico.io',

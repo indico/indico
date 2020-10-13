@@ -512,6 +512,20 @@ Emails
     Default: ``None``
 
 
+Experimental Features
+----------------------
+
+.. data:: EXPERIMENTAL_EDITING_SERVICE
+
+    If enabled, event managers can connect the Editing module of their
+    events to an external microservice extending the normal Editing workflow.
+    As long as this is considered experimental, there are no guarantees
+    on backwards compatibility even in minor Indico version bumps. Please
+    check the `reference implementation`_ for details/changes.
+
+    Default: ``False``
+
+
 LaTeX
 -----
 
@@ -821,3 +835,4 @@ System
 .. _Flower: https://flower.readthedocs.io/en/latest/
 .. _TeXLive: https://www.tug.org/texlive/
 .. _Flask-Multipass: https://flask-multipass.readthedocs.io
+.. _reference implementation: https://github.com/indico/openreferee
