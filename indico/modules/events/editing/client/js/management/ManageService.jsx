@@ -206,7 +206,7 @@ export default function ManageService({eventId}) {
                       setServiceURLInfo(resp.data.info);
                     }}
                   />
-                  {serviceURLInfo && (
+                  {serviceURLInfo ? (
                     <Message info>
                       <Translate>
                         Your editing workflow will be managed by{' '}
@@ -219,6 +219,27 @@ export default function ManageService({eventId}) {
                         Please note that connecting to this service may immediately update your
                         editing settings and create e.g. new tags and file types. Only connect if
                         you intend to use this workflow in your event!
+                      </Translate>
+                    </Message>
+                  ) : (
+                    <Message info>
+                      <Translate>
+                        If you are a developer looking to implement a custom workflow, head over to
+                        the{' '}
+                        <Param
+                          name="link"
+                          wrapper={
+                            <a
+                              href="https://github.com/indico/openreferee/"
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              style={{fontWeight: 'bold'}}
+                            />
+                          }
+                        >
+                          reference implementation of the OpenReferee spec on GitHub
+                        </Param>
+                        .
                       </Translate>
                     </Message>
                   )}
