@@ -20,10 +20,9 @@ from indico.modules.events.editing.models.revisions import FinalRevisionState
 from indico.modules.events.editing.operations import create_revision_comment, publish_editable_revision
 from indico.modules.events.editing.schemas import (EditableBasicSchema, EditingRevisionSignedSchema,
                                                    ServiceActionResultSchema, ServiceActionSchema,
-                                                   ServiceReviewEditableSchema)
+                                                   ServiceReviewEditableSchema, ServiceUserSchema)
 from indico.modules.events.editing.settings import editing_settings
 from indico.modules.users import User
-from indico.modules.users.schemas import UserSchema
 from indico.util.caching import memoize_redis
 from indico.util.i18n import _
 from indico.web.flask.util import url_for
@@ -192,9 +191,7 @@ def service_handle_review_editable(editable, action, parent_revision, revision=N
 def service_get_custom_actions(editable, revision, user):
     data = {
         'revision': EditingRevisionSignedSchema().dump(revision),
-        'user': UserSchema(only=('id', 'full_name', 'email')).dump(user),
-        'user_is_submitter': editable.can_perform_submitter_actions(user),
-        'user_is_editor': editable.can_perform_editor_actions(user),
+        'user': ServiceUserSchema(context={'editable': editable}).dump(user),
     }
 
     path = '/event/{}/editable/{}/{}/{}/actions'.format(
@@ -216,9 +213,7 @@ def service_handle_custom_action(editable, revision, user, action):
     data = {
         'revision': EditingRevisionSignedSchema().dump(revision),
         'action': action,
-        'user': UserSchema(only=('id', 'full_name', 'email')).dump(user),
-        'user_is_submitter': editable.can_perform_submitter_actions(user),
-        'user_is_editor': editable.can_perform_editor_actions(user),
+        'user': ServiceUserSchema(context={'editable': editable}).dump(user),
     }
     try:
         path = '/event/{}/editable/{}/{}/{}/action'.format(

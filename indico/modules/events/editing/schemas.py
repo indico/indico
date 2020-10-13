@@ -15,6 +15,7 @@ from marshmallow_enum import EnumField
 from sqlalchemy import func
 
 from indico.core.marshmallow import mm
+from indico.modules.categories.models.roles import CategoryRole
 from indico.modules.events.contributions.models.contributions import Contribution
 from indico.modules.events.contributions.schemas import ContributionSchema
 from indico.modules.events.editing.models.comments import EditingRevisionComment
@@ -24,6 +25,7 @@ from indico.modules.events.editing.models.review_conditions import EditingReview
 from indico.modules.events.editing.models.revision_files import EditingRevisionFile
 from indico.modules.events.editing.models.revisions import EditingRevision, InitialRevisionState
 from indico.modules.events.editing.models.tags import EditingTag
+from indico.modules.events.util import get_all_user_roles
 from indico.modules.users import User
 from indico.util.caching import memoize_request
 from indico.util.i18n import _
@@ -381,6 +383,32 @@ class EditableTypePrincipalsSchema(mm.Schema):
 class ReviewCommentSchema(mm.Schema):
     text = fields.String(required=True)
     internal = fields.Boolean(missing=False)
+
+
+class RoleSchema(mm.Schema):
+    name = fields.String()
+    code = fields.String()
+    source = fields.Method('_get_source')
+
+    def _get_source(self, role):
+        return 'category' if isinstance(role, CategoryRole) else 'event'
+
+
+class ServiceUserSchema(mm.ModelSchema):
+    class Meta:
+        model = User
+        fields = ('id', 'full_name', 'email', 'roles', 'manager', 'submitter', 'editor')
+
+    roles = fields.Method('_get_roles')
+    manager = fields.Function(lambda user, ctx: ctx['editable'].event.can_manage(user, 'editing_manager'))
+    submitter = fields.Function(lambda user, ctx: ctx['editable'].can_perform_submitter_actions(user))
+    editor = fields.Function(lambda user, ctx: ctx['editable'].can_perform_editor_actions(user))
+
+    def _get_roles(self, user):
+        event = self.context['editable'].event
+        event_roles, category_roles = get_all_user_roles(event, user)
+        roles = RoleSchema(many=True).dump(event_roles | category_roles)
+        return sorted(roles, key=lambda r: (r['source'], r['code']))
 
 
 class ServiceReviewEditableSchema(mm.Schema):

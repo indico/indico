@@ -30,6 +30,7 @@ from indico.core.config import config
 from indico.core.errors import NoReportError, UserValueError
 from indico.core.permissions import FULL_ACCESS_PERMISSION, READ_ACCESS_PERMISSION
 from indico.modules.api import api_settings
+from indico.modules.categories.models.roles import CategoryRole
 from indico.modules.events import Event
 from indico.modules.events.contributions.models.contributions import Contribution
 from indico.modules.events.contributions.models.subcontributions import SubContribution
@@ -37,12 +38,15 @@ from indico.modules.events.layout import theme_settings
 from indico.modules.events.models.events import EventType
 from indico.modules.events.models.persons import EventPerson
 from indico.modules.events.models.principals import EventPrincipal
+from indico.modules.events.models.roles import EventRole
 from indico.modules.events.models.static_list_links import StaticListLink
 from indico.modules.events.registration.models.forms import RegistrationForm
 from indico.modules.events.sessions.models.sessions import Session
 from indico.modules.events.timetable.models.breaks import Break
 from indico.modules.events.timetable.models.entries import TimetableEntry
 from indico.modules.networks import IPNetworkGroup
+from indico.modules.users import User
+from indico.util.caching import memoize_request
 from indico.util.fs import chmod_umask, secure_filename
 from indico.util.i18n import _
 from indico.util.string import strip_tags
@@ -690,3 +694,17 @@ class ZipGeneratorMixin(object):
     def _prepare_folder_structure(self, item):
         file_name = secure_filename('{}_{}'.format(unicode(item.id), item.filename), item.filename)
         return os.path.join(*self._adjust_path_length([file_name]))
+
+
+@memoize_request
+def get_all_user_roles(event, user):
+    event_roles = set(
+        EventRole.query.with_parent(event)
+        .filter(EventRole.members.any(User.id == user.id))
+    )
+    category_roles = set(
+        CategoryRole.query
+        .join(event.category.chain_query.subquery())
+        .filter(CategoryRole.members.any(User.id == user.id))
+    )
+    return event_roles, category_roles
