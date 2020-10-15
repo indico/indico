@@ -19,7 +19,7 @@ export default function TimelineContent({blocks, itemComponent: Component}) {
             </div>
           </div>
         )}
-        <Component block={block} />
+        <Component block={block} index={index} />
       </React.Fragment>
     );
   });

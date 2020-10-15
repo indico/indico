@@ -10,133 +10,45 @@ import {createSelector} from 'reselect';
 
 import {Translate} from 'indico/react/i18n';
 
-import {InitialRevisionState, FinalRevisionState} from '../../models';
+import {FinalRevisionState, InitialRevisionState} from '../../models';
 
-function shouldCreateNewRevision({initialState, finalState}) {
-  return (
-    initialState.name === InitialRevisionState.needs_submitter_confirmation ||
-    (initialState.name === InitialRevisionState.ready_for_review &&
-      ![
-        FinalRevisionState.accepted,
-        FinalRevisionState.rejected,
-        FinalRevisionState.replaced,
-      ].includes(finalState.name))
-  );
-}
-
-function createNewCustomItemFromRevision(revision, updates) {
-  return {
-    id: `custom-item-${revision.id}-${revision.createdDt}-${updates.state}`,
-    createdDt: revision.createdDt,
-    user: revision.submitter,
-    custom: true,
-    revisionId: revision.id,
-    ...updates,
-  };
-}
+import {revisionStates} from './util';
 
 export function processRevisions(revisions) {
-  const newRevisions = [];
-  let numberOfRevisions = 1;
-  let items = [];
-  let currBlockIdx = -1;
-
-  for (const [index, _revision] of revisions.entries()) {
-    const revision = {..._revision};
-    const {initialState, finalState} = revision;
-    if (currBlockIdx === -1) {
-      currBlockIdx = index;
-      items = [...revision.comments];
+  return revisions.map((revision, idx) => {
+    const items = [...revision.comments];
+    const comment = commentFromState(revision);
+    if (comment) {
+      items.push(comment);
     }
-
-    if (initialState.name === InitialRevisionState.needs_submitter_confirmation) {
-      const prevRevision = revisions[index - 1];
-      revision.header = Translate.string(
-        '{editorName} (editor) has made some changes to the paper',
-        {editorName: prevRevision && prevRevision.editor ? prevRevision.editor.fullName : ''}
-      );
-    }
-
-    if (finalState.name === FinalRevisionState.replaced) {
-      const updatedRevision = revisions[index + 1];
-
-      items.push(
-        createNewCustomItemFromRevision(updatedRevision, {
-          header: Translate.string('Revision has been replaced'),
-          state: FinalRevisionState.replaced,
-          html: revision.commentHtml,
-        })
-      );
-
-      items = [...items, ...updatedRevision.comments];
-    } else if (finalState.name === FinalRevisionState.accepted) {
-      let header;
-      if (
-        revision.editor !== null &&
-        initialState.name === InitialRevisionState.needs_submitter_confirmation
-      ) {
-        header = Translate.string('Editor has accepted after making some changes');
-      } else if (initialState.name === InitialRevisionState.needs_submitter_confirmation) {
-        header = Translate.string('Submitter has accepted proposed changes');
-      } else {
-        header = Translate.string('Revision has been accepted');
-      }
-
-      items.push(
-        createNewCustomItemFromRevision(revision, {
-          state: 'accepted',
-          html: revision.commentHtml,
-          header,
-        })
-      );
-    } else if (finalState.name === FinalRevisionState.rejected) {
-      items.push(
-        createNewCustomItemFromRevision(revision, {
-          header: Translate.string('Revision has been rejected'),
-          state: 'rejected',
-          html: revision.commentHtml,
-        })
-      );
-    } else if (finalState.name === FinalRevisionState.needs_submitter_changes) {
-      let header;
-      if (initialState.name === InitialRevisionState.needs_submitter_confirmation) {
-        header = Translate.string('Submitter rejected proposed changes');
-      } else {
-        header = Translate.string('Submitter has been asked to make some changes');
-      }
-
-      items.push(
-        createNewCustomItemFromRevision(revision, {
-          user: revisions[0].submitter,
-          state: 'needs_submitter_changes',
-          html: revision.commentHtml,
-          header,
-        })
-      );
-    } else if (finalState.name === FinalRevisionState.needs_submitter_confirmation) {
-      items.push(
-        createNewCustomItemFromRevision(revision, {
-          user: revisions[0].submitter,
-          header: Translate.string('Editor made some changes'),
-          state: 'needs_submitter_confirmation',
-          html: revision.commentHtml,
-        })
-      );
-    }
-
-    if (shouldCreateNewRevision(revision) || index === revisions.length - 1) {
-      // From here on, a new revision block will be created
-      newRevisions.push({
-        ..._.omit(revisions[currBlockIdx], 'comments'),
-        number: numberOfRevisions++,
-        customActions: revision.customActions, // Use the actions from the latest revision in the block
-        items,
+    let header = revision.header;
+    if (revision.initialState.name === InitialRevisionState.needs_submitter_confirmation) {
+      header = Translate.string('{editorName} (editor) has made some changes to the paper', {
+        editorName: idx > 0 ? revisions[idx - 1].editor.fullName : '',
       });
-      currBlockIdx = -1;
     }
-  }
+    return {
+      ...revision,
+      header,
+      items,
+    };
+  });
+}
 
-  return newRevisions;
+export function commentFromState(revision) {
+  const {initialState, finalState, id, createdDt, user, submitter} = revision;
+  const headerStates = revisionStates[initialState.name] || revisionStates['any'];
+  const header =
+    typeof headerStates === 'function' ? headerStates(revision) : headerStates[finalState.name];
+  return {
+    id: `custom-item-${id}-${createdDt}-${finalState}`,
+    revisionId: id,
+    header,
+    createdDt,
+    finalState,
+    user: user || submitter,
+    custom: true,
+  };
 }
 
 export const getDetails = state => (state.timeline ? state.timeline.details : null);
@@ -146,7 +58,9 @@ export const isInitialEditableDetailsLoading = state =>
 export const isTimelineOutdated = createSelector(
   getDetails,
   getNewDetails,
-  (details, newDetails) => newDetails !== null && !_.isEqual(details, newDetails)
+  (details, newDetails) => {
+    return newDetails !== null && !_.isEqual(details, newDetails);
+  }
 );
 export const getTimelineBlocks = state => state.timeline.timelineBlocks;
 export const getLastTimelineBlock = createSelector(

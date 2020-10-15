@@ -25,7 +25,7 @@ import {blockPropTypes} from './util';
 
 import './TimelineItem.module.scss';
 
-export default function TimelineItem({block}) {
+export default function TimelineItem({block, index}) {
   const {submitter, createdDt} = block;
   const lastBlock = useSelector(selectors.getLastTimelineBlock);
   const needsSubmitterConfirmation = useSelector(selectors.needsSubmitterConfirmation);
@@ -62,7 +62,7 @@ export default function TimelineItem({block}) {
                 ) : (
                   <Translate>
                     <Param name="submitterName" value={submitter.fullName} wrapper={<strong />} />{' '}
-                    submitted revision <Param name="revisionNumber" value={`#${block.number}`} />
+                    submitted revision <Param name="revisionNumber" value={`#${index + 1}`} />
                   </Translate>
                 )}{' '}
                 <time dateTime={serializeDate(createdDt, moment.HTML5_FMT.DATETIME_LOCAL)}>
@@ -118,4 +118,5 @@ export default function TimelineItem({block}) {
 
 TimelineItem.propTypes = {
   block: PropTypes.shape(blockPropTypes).isRequired,
+  index: PropTypes.number.isRequired,
 };
