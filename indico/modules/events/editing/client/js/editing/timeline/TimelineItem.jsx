@@ -106,7 +106,7 @@ export default function TimelineItem({block, index}) {
         </div>
       </div>
       {visible && (
-        <RevisionLog items={block.items} separator={isLastBlock}>
+        <RevisionLog items={block.items} state={block.finalState.name} separator={isLastBlock}>
           {isLastBlock && !['accepted', 'rejected'].includes(editableState.name) && canComment && (
             <ReviewForm block={block} />
           )}

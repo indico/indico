@@ -47,26 +47,37 @@ const statePropTypes = {
   title: PropTypes.string,
 };
 
+// Type that represents a revision comment block
+// (a simplified-ish version of the revision blocks below)
 export const blockItemPropTypes = {
   id: PropTypes.oneOfType([PropTypes.number, PropTypes.string]).isRequired,
+  revisionId: PropTypes.number.isRequired,
   createdDt: PropTypes.string.isRequired,
   modifiedDt: PropTypes.string,
+  canModify: PropTypes.bool,
   user: PropTypes.shape(userPropTypes),
+  header: PropTypes.string,
   text: PropTypes.string,
   html: PropTypes.string,
   internal: PropTypes.bool,
   system: PropTypes.bool,
+  custom: PropTypes.bool,
+  modifyCommentURL: PropTypes.string,
 };
 
+// Type that represents a revision block (with files)
 export const blockPropTypes = {
   id: PropTypes.number.isRequired,
-  files: PropTypes.arrayOf(PropTypes.shape(filePropTypes)).isRequired,
   submitter: PropTypes.shape(userPropTypes).isRequired,
   editor: PropTypes.shape(userPropTypes),
   createdDt: PropTypes.string.isRequired,
-  items: PropTypes.arrayOf(PropTypes.shape(blockItemPropTypes)).isRequired,
   initialState: PropTypes.shape(statePropTypes).isRequired,
   finalState: PropTypes.shape(statePropTypes).isRequired,
   comment: PropTypes.string.isRequired,
   commentHtml: PropTypes.string.isRequired,
+  files: PropTypes.arrayOf(PropTypes.shape(filePropTypes)).isRequired,
+  items: PropTypes.arrayOf(PropTypes.shape(blockItemPropTypes)).isRequired,
+  customActions: PropTypes.array.isRequired,
+  customActionURL: PropTypes.string,
+  downloadFilesURL: PropTypes.string,
 };

@@ -16,8 +16,9 @@ import {serializeDate} from 'indico/utils/date';
 import ResetReview from './ResetReview';
 import * as selectors from './selectors';
 import StateIndicator from './StateIndicator';
+import {blockItemPropTypes} from './util';
 
-export default function CustomItem({header, user, createdDt, html, revisionId, state}) {
+export default function CustomItem({item: {header, user, createdDt, html, revisionId}, state}) {
   const lastRevertableRevisionId = useSelector(selectors.getLastRevertableRevisionId);
 
   return (
@@ -50,18 +51,10 @@ export default function CustomItem({header, user, createdDt, html, revisionId, s
 }
 
 CustomItem.propTypes = {
-  createdDt: PropTypes.string.isRequired,
-  html: PropTypes.string,
+  item: PropTypes.shape(blockItemPropTypes).isRequired,
   state: PropTypes.string,
-  header: PropTypes.string.isRequired,
-  user: PropTypes.shape({
-    fullName: PropTypes.string.isRequired,
-    avatarBgColor: PropTypes.string.isRequired,
-  }).isRequired,
-  revisionId: PropTypes.number.isRequired,
 };
 
 CustomItem.defaultProps = {
-  html: null,
   state: null,
 };

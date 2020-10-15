@@ -6,11 +6,11 @@
 // LICENSE file for more details.
 
 import moment from 'moment';
-import PropTypes from 'prop-types';
 import React, {useState} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
 import {Button, Confirm} from 'semantic-ui-react';
 
+import {blockItemPropTypes} from 'indico/modules/events/editing/editing/timeline/util';
 import UserAvatar from 'indico/modules/events/reviewing/components/UserAvatar';
 import {Param, Translate} from 'indico/react/i18n';
 import {serializeDate} from 'indico/utils/date';
@@ -146,25 +146,4 @@ export default function Comment({
   );
 }
 
-Comment.propTypes = {
-  revisionId: PropTypes.number.isRequired,
-  createdDt: PropTypes.string.isRequired,
-  html: PropTypes.string.isRequired,
-  text: PropTypes.string.isRequired,
-  canModify: PropTypes.bool.isRequired,
-  modifyCommentURL: PropTypes.string.isRequired,
-  user: PropTypes.shape({
-    fullName: PropTypes.string.isRequired,
-    avatarBgColor: PropTypes.string.isRequired,
-  }),
-  modifiedDt: PropTypes.string,
-  internal: PropTypes.bool,
-  system: PropTypes.bool,
-};
-
-Comment.defaultProps = {
-  user: null,
-  modifiedDt: null,
-  internal: false,
-  system: false,
-};
+Comment.propTypes = blockItemPropTypes;

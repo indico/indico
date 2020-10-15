@@ -35,17 +35,16 @@ export function processRevisions(revisions) {
   });
 }
 
-export function commentFromState(revision) {
-  const {initialState, finalState, id, createdDt, user, submitter} = revision;
+export function commentFromState(revision, user) {
+  const {initialState, finalState, id, createdDt, submitter} = revision;
   const headerStates = revisionStates[initialState.name] || revisionStates['any'];
   const header =
     typeof headerStates === 'function' ? headerStates(revision) : headerStates[finalState.name];
   return {
-    id: `custom-item-${id}-${createdDt}-${finalState}`,
+    id: `custom-item-${id}-${createdDt}-${finalState.name}`,
     revisionId: id,
     header,
     createdDt,
-    finalState,
     user: user || submitter,
     custom: true,
   };
