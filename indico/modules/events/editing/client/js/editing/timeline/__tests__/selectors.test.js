@@ -117,6 +117,9 @@ describe('timeline selectors', () => {
     const revisions = [
       {
         id: 1,
+        submitter: {
+          fullName: 'author',
+        },
         comments: [
           {
             id: 1,
@@ -135,6 +138,9 @@ describe('timeline selectors', () => {
       },
       {
         id: 2,
+        submitter: {
+          fullName: 'someone_else',
+        },
         comments: [
           {
             id: 1,
@@ -166,6 +172,7 @@ describe('timeline selectors', () => {
       expect.objectContaining({text: 'first comment'}),
       expect.objectContaining({
         header: revisionStates.any[FinalRevisionState.replaced],
+        user: result[1].submitter,
       }),
     ]);
     expect(result[1].id).toBe(2);
@@ -174,6 +181,7 @@ describe('timeline selectors', () => {
       expect.objectContaining({text: 'done'}),
       expect.objectContaining({
         header: revisionStates.any[FinalRevisionState.needs_submitter_changes],
+        user: result[1].submitter,
       }),
     ]);
   });

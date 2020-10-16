@@ -16,13 +16,14 @@ import {getRevisionTransition} from './util';
 // with a label referring to its previous state transition
 export function processRevisions(revisions) {
   let revisionState;
-  return revisions.map(revision => {
+  return revisions.map((revision, idx) => {
     const items = [...revision.comments];
     const header = revisionState;
     revisionState = getRevisionTransition(revision);
     // Generate the comment header
     if (revisionState) {
-      items.push(commentFromState(revision, revisionState));
+      const author = revisions[Math.min(idx + 1, revisions.length - 1)].submitter;
+      items.push(commentFromState(revision, revisionState, author));
     }
     return {
       ...revision,
