@@ -8,42 +8,37 @@
 import _ from 'lodash';
 import {createSelector} from 'reselect';
 
-import {Translate} from 'indico/react/i18n';
-
 import {FinalRevisionState, InitialRevisionState} from '../../models';
 
-import {revisionStates} from './util';
+import {getRevisionTransition} from './util';
 
+// This method defines each revision as a block
+// with a label referring to its previous state transition
 export function processRevisions(revisions) {
-  return revisions.map((revision, idx) => {
+  let revisionState;
+  return revisions.map(revision => {
     const items = [...revision.comments];
-    const comment = commentFromState(revision);
-    if (comment) {
-      items.push(comment);
-    }
-    let header = revision.header;
-    if (revision.initialState.name === InitialRevisionState.needs_submitter_confirmation) {
-      header = Translate.string('{editorName} (editor) has made some changes to the paper', {
-        editorName: idx > 0 ? revisions[idx - 1].editor.fullName : '',
-      });
+    const header = revisionState;
+    revisionState = getRevisionTransition(revision);
+    // Generate the comment header
+    if (revisionState) {
+      items.push(commentFromState(revision, revisionState));
     }
     return {
       ...revision,
-      header,
+      // use the previous state transition as current block header
+      header: header || revision.header,
       items,
     };
   });
 }
 
-export function commentFromState(revision, user) {
-  const {initialState, finalState, id, createdDt, submitter} = revision;
-  const headerStates = revisionStates[initialState.name] || revisionStates['any'];
-  const header =
-    typeof headerStates === 'function' ? headerStates(revision) : headerStates[finalState.name];
+export function commentFromState(revision, state, user) {
+  const {finalState, id, createdDt, submitter} = revision;
   return {
     id: `custom-item-${id}-${createdDt}-${finalState.name}`,
     revisionId: id,
-    header,
+    header: state,
     createdDt,
     user: user || submitter,
     custom: true,

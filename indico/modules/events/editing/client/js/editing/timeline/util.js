@@ -12,16 +12,18 @@ import {Translate} from 'indico/react/i18n';
 
 import {filePropTypes} from './FileManager/util';
 
+// The top-down order defines a description for each state transition in a revision
+// [initialState, finalState] -> value | method -> value
 export const revisionStates = {
-  [InitialRevisionState.needs_submitter_confirmation]: revision => {
-    if (revision.finalState.name === FinalRevisionState.accepted) {
+  [InitialRevisionState.needs_submitter_confirmation]: {
+    [FinalRevisionState.accepted]: revision => {
       return revision.editor !== null
         ? Translate.string('Editor has accepted after making some changes')
         : Translate.string('Submitter has accepted proposed changes');
-    }
-    if (revision.finalState.name === FinalRevisionState.needs_submitter_changes) {
-      return Translate.string('Submitter rejected proposed changes');
-    }
+    },
+    [FinalRevisionState.needs_submitter_changes]: Translate.string(
+      'Submitter rejected proposed changes'
+    ),
   },
   any: {
     [FinalRevisionState.replaced]: Translate.string('Revision has been replaced'),
@@ -30,9 +32,18 @@ export const revisionStates = {
     [FinalRevisionState.needs_submitter_changes]: Translate.string(
       'Submitter has been asked to make some changes'
     ),
-    [FinalRevisionState.needs_submitter_confirmation]: Translate.string('Editor made some changes'),
+    [FinalRevisionState.needs_submitter_confirmation]: revision =>
+      Translate.string('{editorName} (editor) has made some changes to the paper', {
+        editorName: revision.editor ? revision.editor.fullName : '',
+      }),
   },
 };
+
+export function getRevisionTransition(revision) {
+  const headerStates = revisionStates[revision.initialState.name] || revisionStates['any'];
+  const header = headerStates[revision.finalState.name];
+  return typeof header === 'function' ? header(revision) : header;
+}
 
 export const userPropTypes = {
   identifier: PropTypes.string.isRequired,
