@@ -83,7 +83,7 @@ class RHOAuthAdmin(RHAdminBase):
 class RHOAuthAdminApplicationBase(RHAdminBase):
     """Base class for single OAuth application RHs."""
     def _process_args(self):
-        self.application = OAuthApplication.get(request.view_args['id'])
+        self.application = OAuthApplication.get_or_404(request.view_args['id'])
 
 
 class RHOAuthAdminApplication(RHOAuthAdminApplicationBase):
