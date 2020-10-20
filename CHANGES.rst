@@ -37,6 +37,7 @@ Bugfixes
   :pr:`4654`)
 - Prevent pending registrations from being marked as checked-in (:pr:`4646`, thanks
   :user:`omegak`)
+- Fix OAuth access to HTTP API (:pr:`4663`)
 
 Internal Changes
 ^^^^^^^^^^^^^^^^

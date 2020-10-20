@@ -132,10 +132,14 @@ def handler(prefix, path):
     if not request.headers.get('Authorization', '').lower().startswith('basic '):
         try:
             oauth_valid, oauth_request = oauth.verify_request([scope])
-            if not oauth_valid and oauth_request and oauth_request.error_message != 'Bearer token not found.':
-                raise BadRequest('OAuth error: {}'.format(oauth_request.error_message))
-            elif g.get('received_oauth_token') and oauth_request.error_message == 'Bearer token not found.':
-                raise BadRequest('OAuth error: Invalid token')
+            if not oauth_valid:
+                if oauth_request.error_message == 'Bearer token not found.':
+                    # if there's no valid token, we only fail if a token was present at all
+                    # because there are other means to access the API
+                    if g.get('received_oauth_token'):
+                        raise BadRequest('OAuth error: Invalid token')
+                else:
+                    raise BadRequest('OAuth error: {}'.format(oauth_request.error_message))
         except ValueError:
             # XXX: Dirty hack to workaround a bug in flask-oauthlib that causes it
             #      not to properly urlencode request query strings
