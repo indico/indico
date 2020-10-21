@@ -16,13 +16,13 @@ import {getRevisionTransition} from './util';
 // with a label referring to its previous state transition
 export function processRevisions(revisions) {
   let revisionState;
-  return revisions.map((revision, idx) => {
+  return revisions.map(revision => {
     const items = [...revision.comments];
     const header = revisionState;
     revisionState = getRevisionTransition(revision);
     // Generate the comment header
     if (revisionState) {
-      const author = revisions[Math.min(idx + 1, revisions.length - 1)].submitter;
+      const author = revision.editor || revision.submitter;
       items.push(commentFromState(revision, revisionState, author));
     }
     return {
@@ -43,6 +43,7 @@ export function commentFromState(revision, state, user) {
     createdDt,
     user: user || submitter,
     custom: true,
+    html: revision.commentHtml,
   };
 }
 
@@ -53,9 +54,7 @@ export const isInitialEditableDetailsLoading = state =>
 export const isTimelineOutdated = createSelector(
   getDetails,
   getNewDetails,
-  (details, newDetails) => {
-    return newDetails !== null && !_.isEqual(details, newDetails);
-  }
+  (details, newDetails) => newDetails !== null && !_.isEqual(details, newDetails)
 );
 export const getTimelineBlocks = state => state.timeline.timelineBlocks;
 export const getLastTimelineBlock = createSelector(

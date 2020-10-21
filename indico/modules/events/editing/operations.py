@@ -171,6 +171,7 @@ def replace_revision(revision, user, comment, files, tags, initial_state=None):
     revision.comment = comment
     revision.tags = tags
     revision.final_state = FinalRevisionState.replaced
+    revision.editor = user
     new_revision = EditingRevision(submitter=user,
                                    initial_state=(initial_state or revision.initial_state),
                                    files=_make_editable_files(revision.editable, files))

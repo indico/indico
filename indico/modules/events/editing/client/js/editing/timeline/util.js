@@ -34,7 +34,7 @@ export const revisionStates = {
     ),
     [FinalRevisionState.needs_submitter_confirmation]: revision =>
       Translate.string('{editorName} (editor) has made some changes to the paper', {
-        editorName: revision.editor ? revision.editor.fullName : '',
+        editorName: revision.editor?.fullName || '',
       }),
   },
 };
