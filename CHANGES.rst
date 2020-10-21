@@ -7,6 +7,19 @@ Version 2.3.1
 
 *Unreleased*
 
+Security fixes
+^^^^^^^^^^^^^^
+- Fix potential data leakage between OAuth-authenticated and unauthenticated HTTP API requests
+  for the same resource (:pr:`4663`)
+
+.. note::
+
+    Due to OAuth access to the HTTP API having been broken until this version, we do not
+    believe this was actually exploitable on any Indico instance. In addition, only Indico
+    administrators can create OAuth applications, so regardless of the bug there is no risk
+    for any instance which does not have OAuth applications with the ``read:legacy_api``
+    scope.
+
 Improvements
 ^^^^^^^^^^^^
 

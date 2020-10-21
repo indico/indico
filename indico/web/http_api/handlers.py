@@ -166,6 +166,7 @@ def handler(prefix, path):
                 used_session = None
 
         if apiKey or oauth_valid or not used_session:
+            auth_token = None
             if not oauth_valid:
                 # Validate the API key (and its signature)
                 ak, enforceOnlyPublic = checkAK(apiKey, signature, timestamp, path, query)
@@ -174,29 +175,41 @@ def handler(prefix, path):
                 # Create an access wrapper for the API key's user
                 user = ak.user if ak and not onlyPublic else None
             else:  # Access Token (OAuth)
-                at = load_token(oauth_request.access_token.access_token)
-                user = at.user if at and not onlyPublic else None
+                auth_token = load_token(oauth_request.access_token.access_token)
+                user = auth_token.user if auth_token and not onlyPublic else None
             # Get rid of API key in cache key if we did not impersonate a user
             if ak and user is None:
                 cacheKey = normalizeQuery(path, query,
                                           remove=('_', 'ak', 'apiKey', 'signature', 'timestamp', 'nc', 'nocache',
-                                                  'oa', 'onlyauthed'))
+                                                  'oa', 'onlyauthed', 'access_token'))
             else:
                 cacheKey = normalizeQuery(path, query,
-                                          remove=('_', 'signature', 'timestamp', 'nc', 'nocache', 'oa', 'onlyauthed'))
+                                          remove=('_', 'signature', 'timestamp', 'nc', 'nocache', 'oa', 'onlyauthed',
+                                                  'access_token'))
                 if signature:
                     # in case the request was signed, store the result under a different key
                     cacheKey = 'signed_' + cacheKey
+                if auth_token:
+                    # if oauth was used, we also make the cache key unique
+                    cacheKey = 'oauth-{}_{}'.format(auth_token.id, cacheKey)
         else:
             # We authenticated using a session cookie.
+            # XXX: This is not used anymore within indico and should be removed whenever we rewrite
+            # the code here.
             token = request.headers.get('X-CSRF-Token', get_query_parameter(queryParams, ['csrftoken']))
             if used_session.csrf_protected and used_session.csrf_token != token:
                 raise HTTPAPIError('Invalid CSRF token', 403)
             user = used_session.user if not onlyPublic else None
-            userPrefix = 'user-{}_'.format(used_session.user.id)
-            cacheKey = userPrefix + normalizeQuery(path, query,
-                                                   remove=('_', 'nc', 'nocache', 'ca', 'cookieauth', 'oa', 'onlyauthed',
-                                                           'csrftoken'))
+            cacheKey = normalizeQuery(path, query,
+                                      remove=('_', 'nc', 'nocache', 'ca', 'cookieauth', 'oa', 'onlyauthed',
+                                              'csrftoken'))
+
+        if user is not None:
+            # We *always* prefix the cache key with the user ID so we never get an overlap between
+            # authenticated and unauthenticated requests
+            cacheKey = 'user-{}_{}'.format(user.id, cacheKey)
+        else:
+            cacheKey = 'public_{}'.format(cacheKey)
 
         # Bail out if the user requires authentication but is not authenticated
         if onlyAuthed and not user:
