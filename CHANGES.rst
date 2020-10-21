@@ -38,6 +38,8 @@ Bugfixes
 - Prevent pending registrations from being marked as checked-in (:pr:`4646`, thanks
   :user:`omegak`)
 - Fix OAuth access to HTTP API (:pr:`4663`)
+- Fix ICS export of events with draft timetable and contribution detail level
+  (:pr:`4666`)
 
 Internal Changes
 ^^^^^^^^^^^^^^^^

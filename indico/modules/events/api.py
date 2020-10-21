@@ -595,23 +595,25 @@ class CategoryEventFetcher(IteratedDataFetcher, SerializerBase):
             data['allowed'] = self._serialize_access_list(event)
 
         allow_details = contribution_settings.get(event, 'published') or can_manage
-        if self._detail_level in {'contributions', 'subcontributions'} and allow_details:
+        if self._detail_level in {'contributions', 'subcontributions'}:
             data['contributions'] = []
-            for contribution in event.contributions:
-                include_subcontribs = self._detail_level == 'subcontributions'
-                serialized_contrib = self._serialize_contribution(contribution, include_subcontribs)
-                data['contributions'].append(serialized_contrib)
-        elif self._detail_level == 'sessions' and allow_details:
-            # Contributions without a session
-            data['contributions'] = []
-            for contribution in event.contributions:
-                if not contribution.session:
-                    serialized_contrib = self._serialize_contribution(contribution)
+            if allow_details:
+                for contribution in event.contributions:
+                    include_subcontribs = self._detail_level == 'subcontributions'
+                    serialized_contrib = self._serialize_contribution(contribution, include_subcontribs)
                     data['contributions'].append(serialized_contrib)
-
+        elif self._detail_level == 'sessions':
+            data['contributions'] = []
             data['sessions'] = []
-            for session_ in event.sessions:
-                data['sessions'].extend(self._build_session_api_data(session_))
+            if allow_details:
+                # Contributions without a session
+                for contribution in event.contributions:
+                    if not contribution.session:
+                        serialized_contrib = self._serialize_contribution(contribution)
+                        data['contributions'].append(serialized_contrib)
+
+                for session_ in event.sessions:
+                    data['sessions'].extend(self._build_session_api_data(session_))
         if self._occurrences:
             data['occurrences'] = fossilize(self._calculate_occurrences(event, self._fromDT, self._toDT,
                                             pytz.timezone(config.DEFAULT_TIMEZONE)),
