@@ -71,6 +71,14 @@
   .infogrid {
     @extend %font-family-modern-body;
     margin-bottom: 1em;
+
+    li p {
+      margin-bottom: 0;
+    }
+
+    ul {
+      margin-bottom: 0.8em;
+    }
   }
 
   .item-attachments .i-button {
