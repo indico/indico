@@ -65,6 +65,14 @@ li > table + .note-area-wrapper {
       color: $black;
     }
 
+    li p {
+      margin-bottom: 0;
+    }
+
+    ul {
+      margin-bottom: 0.8em;
+    }
+
     img {
       max-width: 100%;
     }
