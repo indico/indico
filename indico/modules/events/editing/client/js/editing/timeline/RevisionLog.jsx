@@ -8,6 +8,8 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 
+import {FinalRevisionState} from '../../models';
+
 import CommentItem from './CommentItem';
 import CustomItem from './CustomItem';
 import {blockItemPropTypes} from './util';
@@ -39,7 +41,7 @@ export default function RevisionLog({items, state, children, separator}) {
 
 RevisionLog.propTypes = {
   items: PropTypes.arrayOf(PropTypes.shape(blockItemPropTypes)).isRequired,
-  state: PropTypes.string,
+  state: PropTypes.oneOf(Object.values(FinalRevisionState)),
   children: PropTypes.node,
   separator: PropTypes.bool,
 };
