@@ -9,6 +9,8 @@ import {createSelector} from 'reselect';
 
 import {RequestState} from 'indico/utils/redux';
 
+import {PaperState} from './models';
+
 export const isFetchingInitialPaperDetails = state =>
   state.paper.requests.details.state === RequestState.STARTED && !state.paper.details;
 export const isPaperStateResetInProgress = state =>
@@ -38,6 +40,12 @@ export const canReviewPaper = createSelector(
   getPaperDetails,
   getPaperEvent,
   ({isInFinalState, canReview}, {isLocked}) => !isLocked && !isInFinalState && canReview
+);
+export const canSubmitNewRevision = createSelector(
+  getPaperDetails,
+  getPaperEvent,
+  ({canSubmitProceedings, canManage, state: {name: stateName}}, {isLocked}) =>
+    !isLocked && stateName === PaperState.to_be_corrected && (canManage || canSubmitProceedings)
 );
 export const canCommentPaper = createSelector(
   getPaperDetails,

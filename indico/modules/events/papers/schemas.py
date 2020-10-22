@@ -191,6 +191,7 @@ class PaperSchema(mm.Schema):
     revisions = List(Nested(PaperRevisionSchema))
     last_revision = Nested(PaperRevisionSchema)
     state = Nested(PaperRevisionStateSchema)
+    can_manage = Function(lambda paper, ctx: paper.cfp.is_manager(ctx.get('user')))
     can_judge = Function(lambda paper, ctx: paper.can_judge(ctx.get('user')))
     can_comment = Function(lambda paper, ctx: paper.can_comment(ctx.get('user'), check_state=True))
     can_review = Function(lambda paper, ctx: paper.can_review(ctx.get('user')))

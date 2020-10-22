@@ -16,7 +16,7 @@ import UserAvatar from 'indico/modules/events/reviewing/components/UserAvatar';
 import {Param, Translate} from 'indico/react/i18n';
 import {serializeDate} from 'indico/utils/date';
 
-import {canCommentPaper, canReviewPaper, getPaperDetails} from '../selectors';
+import {canCommentPaper, canReviewPaper, canSubmitNewRevision, getPaperDetails} from '../selectors';
 
 import PaperReviewForm from './PaperReviewForm';
 import RevisionJudgment from './RevisionJudgment';
@@ -28,6 +28,7 @@ export default function TimelineItem({block}) {
   const submitterName = submitter.isSystem ? Translate.string('A user') : submitter.fullName;
   const canComment = useSelector(canCommentPaper);
   const canReview = useSelector(canReviewPaper);
+  const canSubmitRevision = useSelector(canSubmitNewRevision);
   const paper = useSelector(getPaperDetails);
   const [visible, setVisible] = useState(isLastRevision);
 
@@ -92,7 +93,7 @@ export default function TimelineItem({block}) {
                 <div className="i-timeline-connect-down to-separator" />
               </div>
               <div className="i-timeline-separator" />
-              <SubmitRevision />
+              {canSubmitRevision && <SubmitRevision />}
               {paper.isInFinalState && <RevisionJudgment revision={block} />}
             </>
           )}

@@ -109,7 +109,7 @@ class RHSubmitNewRevision(RHPaperBase):
     def _check_paper_protection(self):
         if not RHPaperBase._check_paper_protection(self):
             return False
-        if not self.contribution.can_submit_proceedings(session.user):
+        if not self.contribution.can_submit_proceedings(session.user) and not self.event.cfp.is_manager(session.user):
             return False
         return self.contribution.paper.state == PaperRevisionState.to_be_corrected
 

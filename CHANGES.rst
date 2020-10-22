@@ -40,6 +40,8 @@ Bugfixes
 - Fix OAuth access to HTTP API (:pr:`4663`)
 - Fix ICS export of events with draft timetable and contribution detail level
   (:pr:`4666`)
+- Fix paper revision submission field being displayed for judges/reviewers (:pr:`4667`)
+- Fix managers not being able to submit paper revisions on behalf of the user (:pr:`4667`)
 
 Internal Changes
 ^^^^^^^^^^^^^^^^
