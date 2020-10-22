@@ -126,6 +126,8 @@ jobs:
              indico/modules/rb/
              indico/modules/events/logs/
              indico/modules/events/editing/
+             indico/modules/events/client/js/reviewing/
+             indico/modules/events/papers/client/js/
              indico/web/client/js/react/
              indico/modules/users/
 
