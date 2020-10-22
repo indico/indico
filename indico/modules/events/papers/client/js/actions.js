@@ -5,12 +5,12 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
+import commentActionsURL from 'indico-url:papers.api_comment_actions';
+import createCommentURL from 'indico-url:papers.api_create_comment';
+import createReviewURL from 'indico-url:papers.api_create_review';
+import judgePaperURL from 'indico-url:papers.api_judge_paper';
 import paperInfoURL from 'indico-url:papers.api_paper_details';
 import resetPaperStateURL from 'indico-url:papers.api_reset_paper_state';
-import createCommentURL from 'indico-url:papers.api_create_comment';
-import commentActionsURL from 'indico-url:papers.api_comment_actions';
-import judgePaperURL from 'indico-url:papers.api_judge_paper';
-import createReviewURL from 'indico-url:papers.api_create_review';
 import updateReviewURL from 'indico-url:papers.api_update_review';
 
 import {indicoAxios} from 'indico/utils/axios';

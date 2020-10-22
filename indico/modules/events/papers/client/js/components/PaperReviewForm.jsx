@@ -13,10 +13,11 @@ import UserAvatar from 'indico/modules/events/reviewing/components/UserAvatar';
 import {unsortedArraysEqual} from 'indico/react/forms';
 import {Translate} from 'indico/react/i18n';
 
-import CommentForm from './CommentForm';
-import GroupReviewForm from './GroupReviewForm';
 import {createComment as createCommentAction, createReview, updateReview} from '../actions';
 import {canCommentPaper, canReviewPaper, getPaperDetails, getCurrentUser} from '../selectors';
+
+import CommentForm from './CommentForm';
+import GroupReviewForm from './GroupReviewForm';
 
 import './PaperReviewForm.module.scss';
 

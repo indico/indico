@@ -6,8 +6,8 @@
 // LICENSE file for more details.
 
 import React, {useCallback} from 'react';
-import {useDispatch, useSelector} from 'react-redux';
 import {Form as FinalForm} from 'react-final-form';
+import {useDispatch, useSelector} from 'react-redux';
 import {Form} from 'semantic-ui-react';
 
 import UserAvatar from 'indico/modules/events/reviewing/components/UserAvatar';

@@ -17,8 +17,8 @@ import {Translate} from 'indico/react/i18n';
 import {indicoAxios, handleAxiosError} from 'indico/utils/axios';
 
 import {fetchPaperDetails} from '../actions';
-import {getCurrentUser, getPaperDetails} from '../selectors';
 import {PaperState} from '../models';
+import {getCurrentUser, getPaperDetails} from '../selectors';
 
 export default function SubmitRevision() {
   const {

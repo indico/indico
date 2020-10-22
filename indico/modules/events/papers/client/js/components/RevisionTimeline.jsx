@@ -5,11 +5,11 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-import React from 'react';
 import PropTypes from 'prop-types';
+import React from 'react';
 
-import RevisionJudgment from './RevisionJudgment';
 import RevisionComment from './RevisionComment';
+import RevisionJudgment from './RevisionJudgment';
 import RevisionReview from './RevisionReview';
 
 function renderTimelineItem(item, revision) {

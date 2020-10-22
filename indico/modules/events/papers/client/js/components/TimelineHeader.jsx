@@ -7,11 +7,11 @@
 
 import contributionDisplayURL from 'indico-url:contributions.display_contribution';
 
-import React from 'react';
 import PropTypes from 'prop-types';
+import React from 'react';
 
-import {Param, Translate} from 'indico/react/i18n';
 import {MathJax} from 'indico/react/components';
+import {Param, Translate} from 'indico/react/i18n';
 
 export default function TimelineHeader({children, contribution, state, submitter, eventId}) {
   return (

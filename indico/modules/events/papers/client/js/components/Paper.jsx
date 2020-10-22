@@ -5,30 +5,33 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-import React, {useEffect} from 'react';
+import editableDetailsURL from 'indico-url:event_editing.api_editable';
+import fileTypesURL from 'indico-url:event_editing.api_file_types';
+import editableURL from 'indico-url:event_editing.editable';
+
 import PropTypes from 'prop-types';
+import React, {useEffect} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
 import {Icon, Loader, Step} from 'semantic-ui-react';
 
-import fileTypesURL from 'indico-url:event_editing.api_file_types';
-import editableDetailsURL from 'indico-url:event_editing.api_editable';
-import editableURL from 'indico-url:event_editing.editable';
-import TimelineContent from 'indico/modules/events/reviewing/components/TimelineContent';
-import {useIndicoAxios} from 'indico/react/hooks';
 import EditableSubmissionButton from 'indico/modules/events/editing/editing/EditableSubmissionButton';
-import {EditableType} from 'indico/modules/events/editing/models';
-import {Translate, Param} from 'indico/react/i18n';
 import {
   fileTypePropTypes,
   uploadablePropTypes,
 } from 'indico/modules/events/editing/editing/timeline/FileManager/util';
-import TimelineHeader from './TimelineHeader';
+import {EditableType} from 'indico/modules/events/editing/models';
+import TimelineContent from 'indico/modules/events/reviewing/components/TimelineContent';
+import {useIndicoAxios} from 'indico/react/hooks';
+import {Translate, Param} from 'indico/react/i18n';
+
 import {fetchPaperDetails} from '../actions';
-import {getPaperDetails, isFetchingInitialPaperDetails} from '../selectors';
-import PaperDecisionForm from './PaperDecisionForm';
-import PaperContent from './PaperContent';
-import TimelineItem from './TimelineItem';
 import {PaperState} from '../models';
+import {getPaperDetails, isFetchingInitialPaperDetails} from '../selectors';
+
+import PaperContent from './PaperContent';
+import PaperDecisionForm from './PaperDecisionForm';
+import TimelineHeader from './TimelineHeader';
+import TimelineItem from './TimelineItem';
 
 export default function Paper({eventId, contributionId}) {
   const dispatch = useDispatch();

@@ -12,8 +12,6 @@ import 'indico/modules/events/reviews';
 import setupReactPaperTimeline from './setup';
 
 (function(global) {
-  'use strict';
-
   global.setupPaperAssignmentList = function setupPaperAssignmentList() {
     const filterConfig = {
       itemHandle: 'tr',

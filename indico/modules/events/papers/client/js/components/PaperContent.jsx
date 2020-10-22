@@ -11,6 +11,7 @@ import {useSelector} from 'react-redux';
 import {Translate} from 'indico/react/i18n';
 
 import {getPaperDetails} from '../selectors';
+
 import PaperFiles from './PaperFiles';
 import PaperMetadata from './PaperMetadata';
 

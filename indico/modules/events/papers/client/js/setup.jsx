@@ -11,8 +11,8 @@ import {Provider} from 'react-redux';
 
 import createReduxStore from 'indico/utils/redux';
 
-import paperReducers from './reducers';
 import Paper from './components/Paper';
+import paperReducers from './reducers';
 
 export default () => {
   const rootElement = document.querySelector('.paper-timeline');
