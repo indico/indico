@@ -7,8 +7,7 @@
 
 import {FinalRevisionState, InitialRevisionState} from 'indico/modules/events/editing/models';
 
-import {processRevisions} from '../selectors';
-import {revisionStates} from '../util';
+import {processRevisions, revisionStates} from '../util';
 
 describe('timeline selectors', () => {
   it('should describe each revision transition', () => {

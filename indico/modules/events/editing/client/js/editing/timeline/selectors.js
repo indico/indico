@@ -10,43 +10,6 @@ import {createSelector} from 'reselect';
 
 import {FinalRevisionState, InitialRevisionState} from '../../models';
 
-import {getRevisionTransition} from './util';
-
-// This method defines each revision as a block
-// with a label referring to its previous state transition
-export function processRevisions(revisions) {
-  let revisionState;
-  return revisions.map(revision => {
-    const items = [...revision.comments];
-    const header = revisionState;
-    revisionState = getRevisionTransition(revision);
-    // Generate the comment header
-    if (revisionState) {
-      const author = revision.editor || revision.submitter;
-      items.push(commentFromState(revision, revisionState, author));
-    }
-    return {
-      ...revision,
-      // use the previous state transition as current block header
-      header: header || revision.header,
-      items,
-    };
-  });
-}
-
-export function commentFromState(revision, state, user) {
-  const {finalState, id, createdDt, submitter} = revision;
-  return {
-    id: `custom-item-${id}-${createdDt}-${finalState.name}`,
-    revisionId: id,
-    header: state,
-    createdDt,
-    user: user || submitter,
-    custom: true,
-    html: revision.commentHtml,
-  };
-}
-
 export const getDetails = state => (state.timeline ? state.timeline.details : null);
 export const getNewDetails = state => (state.timeline ? state.timeline.newDetails : null);
 export const isInitialEditableDetailsLoading = state =>

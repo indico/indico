@@ -12,6 +12,41 @@ import {Translate} from 'indico/react/i18n';
 
 import {filePropTypes} from './FileManager/util';
 
+// This method defines each revision as a block
+// with a label referring to its previous state transition
+export function processRevisions(revisions) {
+  let revisionState;
+  return revisions.map(revision => {
+    const items = [...revision.comments];
+    const header = revisionState;
+    revisionState = getRevisionTransition(revision);
+    // Generate the comment header
+    if (revisionState) {
+      const author = revision.editor || revision.submitter;
+      items.push(commentFromState(revision, revisionState, author));
+    }
+    return {
+      ...revision,
+      // use the previous state transition as current block header
+      header: header || revision.header,
+      items,
+    };
+  });
+}
+
+export function commentFromState(revision, state, user) {
+  const {finalState, id, createdDt, submitter} = revision;
+  return {
+    id: `custom-item-${id}-${createdDt}-${finalState.name}`,
+    revisionId: id,
+    header: state,
+    createdDt,
+    user: user || submitter,
+    custom: true,
+    html: revision.commentHtml,
+  };
+}
+
 // The top-down order defines a description for each state transition in a revision
 // [initialState, finalState] -> value | method -> value
 export const revisionStates = {

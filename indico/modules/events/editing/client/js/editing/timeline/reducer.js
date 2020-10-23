@@ -8,7 +8,7 @@
 import {camelizeKeys} from 'indico/utils/case';
 
 import {SET_LOADING, SET_DETAILS, SET_NEW_DETAILS} from './actions';
-import {processRevisions} from './selectors';
+import {processRevisions} from './util';
 
 export const initialState = {
   details: null,
