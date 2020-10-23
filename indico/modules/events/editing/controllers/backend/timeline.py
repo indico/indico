@@ -117,12 +117,6 @@ class RHEditable(RHContributionEditableBase):
         if not editing_settings.get(self.event, 'service_url'):
             return []
 
-        if (
-            not self.editable.can_perform_submitter_actions(session.user) and
-            not self.editable.can_perform_editor_actions(session.user)
-        ):
-            return []
-
         try:
             return service_get_custom_actions(self.editable, self.editable.revisions[-1], session.user)
         except ServiceRequestFailed:
@@ -143,11 +137,8 @@ class RHTriggerExtraRevisionAction(RHContributionEditableRevisionBase):
         if not editing_settings.get(self.event, 'service_url'):
             return False
         # It's up to the editing service to decide who can do what, so we
-        # just require the user to have more than just read access
-        return (
-            self.editable.can_perform_submitter_actions(session.user) or
-            self.editable.can_perform_editor_actions(session.user)
-        )
+        # just require the user to have editable access
+        return self.editable.can_see_timeline(session.user)
 
     @use_kwargs({
         'action': fields.String(required=True)
