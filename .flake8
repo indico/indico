@@ -19,6 +19,7 @@ exclude =
     indico.egg-info
     node_modules
     .*/
+    indico.conf
     # TODO: remove the next two entries and use extend-exclude once flake8 3.8.0 is out
     .git
     __pycache__
