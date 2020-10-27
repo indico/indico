@@ -25,6 +25,8 @@ Improvements
 
 - Generate material packages in a background task to avoid timeouts or using excessive
   amounts of disk space in case of people submitting several times (:pr:`4630`)
+- Add new :data:`EXPERIMENTAL_EDITING_SERVICE` setting to enable extending an event's Editing
+  workflow through an `OpenReferee server <https://github.com/indico/openreferee/>`_ (:pr:`4659`)
 
 Bugfixes
 ^^^^^^^^
