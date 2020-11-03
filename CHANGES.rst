@@ -7,6 +7,11 @@ Version 2.3.2
 
 *Unreleased*
 
+Improvements
+^^^^^^^^^^^^
+
+- Disable title field by default in new registration forms (:issue:`4688`, :pr:`4692`)
+
 Bugfixes
 ^^^^^^^^
 

@@ -70,16 +70,6 @@ class PersonalDataType(int, IndicoEnum):
                       'places_limit': 0,
                       'is_enabled': True}
         return [
-            (cls.title, {
-                'title': cls.title.get_title(),
-                'input_type': 'single_choice',
-                'data': {
-                    'item_type': 'dropdown',
-                    'with_extra_slots': False,
-                    'choices': [dict(title_item, id=unicode(uuid4()), caption=orig_string(t.title))
-                                for t in UserTitle if t]
-                }
-            }),
             (cls.first_name, {
                 'title': cls.first_name.get_title(),
                 'input_type': 'text'
@@ -120,6 +110,18 @@ class PersonalDataType(int, IndicoEnum):
                 'input_type': 'text',
                 'is_enabled': False,
                 'position': 1003
+            }),
+            (cls.title, {
+                'title': cls.title.get_title(),
+                'input_type': 'single_choice',
+                'is_enabled': False,
+                'position': 1004,
+                'data': {
+                    'item_type': 'dropdown',
+                    'with_extra_slots': False,
+                    'choices': [dict(title_item, id=unicode(uuid4()), caption=orig_string(t.title))
+                                for t in UserTitle if t]
+                }
             }),
         ]
 
