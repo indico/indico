@@ -44,7 +44,7 @@ class EmailEventPersonsForm(IndicoForm):
 
 
 class EventPersonForm(IndicoForm):
-    title = IndicoEnumSelectField(_('Title'), enum=UserTitle)
+    title = IndicoEnumSelectField(_('Title'), enum=UserTitle, sorted=True)
     first_name = StringField(_('First name'), [DataRequired()])
     last_name = StringField(_('Family name'), [DataRequired()])
     affiliation = StringField(_('Affiliation'))

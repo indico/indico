@@ -38,13 +38,14 @@ from indico.web.flask.util import url_for
 
 
 class UserTitle(RichIntEnum):
-    __titles__ = ('', _('Mr'), _('Ms'), _('Mrs'), _('Dr'), _('Prof.'))
+    __titles__ = ('', _('Mr'), _('Ms'), _('Mrs'), _('Dr'), _('Prof.'), _('Mx'))
     none = 0
     mr = 1
     ms = 2
     mrs = 3
     dr = 4
     prof = 5
+    mx = 6
 
 
 class NameFormat(RichIntEnum):
