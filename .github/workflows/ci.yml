@@ -97,7 +97,7 @@ jobs:
       # END common steps
 
       - name: Check import sorting
-        run: isort -rc --diff --check-only indico/
+        run: isort --diff --check-only indico/
 
       - name: Check backref comments
         if: success() || failure()
