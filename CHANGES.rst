@@ -2,6 +2,29 @@ Changelog
 =========
 
 
+Version 3.0
+-----------
+
+*Unreleased*
+
+Major Features
+^^^^^^^^^^^^^^
+
+- TODO
+
+Improvements
+^^^^^^^^^^^^
+
+- TODO
+
+Internal Changes
+^^^^^^^^^^^^^^^^
+
+- Require Python 3.9 - older Python versions (especially Python 2.7) are **no longer supported**
+
+
+----
+
 Version 2.3.2
 -------------
 
