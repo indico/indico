@@ -20,10 +20,8 @@ from click import wrap_text
 from flask.helpers import get_root_path
 from pkg_resources import iter_entry_points
 from prompt_toolkit import prompt
-from prompt_toolkit.contrib.completers import PathCompleter, WordCompleter
-from prompt_toolkit.layout.lexers import SimpleLexer
-from prompt_toolkit.styles import style_from_dict
-from prompt_toolkit.token import Token
+from prompt_toolkit.completion import PathCompleter, WordCompleter
+from prompt_toolkit.styles import Style
 from pytz import all_timezones, common_timezones
 from redis import RedisError, StrictRedis
 from sqlalchemy import create_engine
@@ -81,25 +79,25 @@ def _get_dirs(target_dir):
     return get_root_path('indico'), os.path.abspath(target_dir)
 
 
-PROMPT_TOOLKIT_STYLE = style_from_dict({
-    Token.HELP: '#aaaaaa',
-    Token.PROMPT: '#5f87ff',
-    Token.DEFAULT: '#dfafff',
-    Token.BRACKET: '#ffffff',
-    Token.COLON: '#ffffff',
-    Token.INPUT: '#aaffaa',
+PROMPT_TOOLKIT_STYLE = Style.from_dict({
+    'help': '#aaaaaa',
+    'prompt': '#5f87ff',
+    'default': '#dfafff',
+    'bracket': '#ffffff',
+    'colon': '#ffffff',
+    '': '#aaffaa',  # user input
 })
 
 
 def _prompt(message, default='', path=False, list_=None, required=True, validate=None, allow_invalid=False,
             password=False, help=None):
-    def _get_prompt_tokens(cli):
+    def _get_prompt_tokens():
         rv = [
-            (Token.PROMPT, message),
-            (Token.COLON, ': '),
+            ('class:prompt', message),
+            ('class:colon', ': '),
         ]
         if first and help:
-            rv.insert(0, (Token.HELP, wrap_text(help) + '\n'))
+            rv.insert(0, ('class:help', wrap_text(help) + '\n'))
         return rv
 
     completer = None
@@ -114,8 +112,8 @@ def _prompt(message, default='', path=False, list_=None, required=True, validate
     first = True
     while True:
         try:
-            rv = prompt(get_prompt_tokens=_get_prompt_tokens, default=default, is_password=password,
-                        completer=completer, lexer=SimpleLexer(Token.INPUT), style=PROMPT_TOOLKIT_STYLE)
+            rv = prompt(_get_prompt_tokens(), default=default, is_password=password,
+                        completer=completer, style=PROMPT_TOOLKIT_STYLE)
         except (EOFError, KeyboardInterrupt):
             sys.exit(1)
         # pasting a multiline string works even with multiline disabled :(
@@ -136,22 +134,22 @@ def _prompt(message, default='', path=False, list_=None, required=True, validate
 
 
 def _confirm(message, default=False, abort=False, help=None):
-    def _get_prompt_tokens(cli):
+    def _get_prompt_tokens():
         rv = [
-            (Token.PROMPT, message),
-            (Token.BRACKET, ' ['),
-            (Token.DEFAULT, 'Y/n' if default else 'y/N'),
-            (Token.BRACKET, ']'),
-            (Token.COLON, ': '),
+            ('class:prompt', message),
+            ('class:bracket', ' ['),
+            ('class:default', 'Y/n' if default else 'y/N'),
+            ('class:bracket', ']'),
+            ('class:colon', ': '),
         ]
         if first and help:
-            rv.insert(0, (Token.HELP, wrap_text(help) + '\n'))
+            rv.insert(0, ('class:help', wrap_text(help) + '\n'))
         return rv
 
     first = True
     while True:
         try:
-            rv = prompt(get_prompt_tokens=_get_prompt_tokens, lexer=SimpleLexer(Token.INPUT),
+            rv = prompt(_get_prompt_tokens(),
                         completer=WordCompleter(['yes', 'no'], ignore_case=True, sentence=True),
                         style=PROMPT_TOOLKIT_STYLE)
         except (EOFError, KeyboardInterrupt):
