@@ -10,12 +10,10 @@ from __future__ import unicode_literals
 import csv
 import re
 from datetime import datetime
-from functools import partial
-from io import BytesIO
+from io import BytesIO, StringIO
 
 import six
 from markupsafe import Markup
-from six.moves import map
 from speaklater import is_lazy_string
 from xlsxwriter import Workbook
 
@@ -36,13 +34,10 @@ def unique_col(name, id_):
     return name, id_
 
 
-def _prepare_header(header, as_unicode=True):
+def _prepare_header(header):
     if isinstance(header, tuple):
         header = header[0]
-    return header if as_unicode else header.encode('utf-8')
-
-
-_prepare_header_utf8 = partial(_prepare_header, as_unicode=False)
+    return header
 
 
 def _prepare_csv_data(data, _linebreak_re=re.compile(r'(\r?\n)+'), _dangerous_chars_re=re.compile(r'^[=+@-]+')):
@@ -58,8 +53,7 @@ def _prepare_csv_data(data, _linebreak_re=re.compile(r'(\r?\n)+'), _dangerous_ch
     # https://www.owasp.org/index.php/CSV_Injection
     # quoting the cell's value does NOT mitigate this, so we need to strip
     # those characters from the beginning...
-    data = _dangerous_chars_re.sub('', data)
-    return data.encode('utf-8')
+    return _dangerous_chars_re.sub('', data)
 
 
 def generate_csv(headers, rows):
@@ -73,17 +67,16 @@ def generate_csv(headers, rows):
     :param rows: a list of dicts mapping captions to values
     :return: an `io.BytesIO` containing the CSV data
     """
-    buf = BytesIO()
-    buf.write(b'\xef\xbb\xbf')
-    writer = csv.writer(buf)
-    writer.writerow(list(map(_prepare_header_utf8, headers)))
+    csvbuf = StringIO()
+    writer = csv.writer(csvbuf)
+    writer.writerow(map(_prepare_header, headers))
     header_positions = {name: i for i, name in enumerate(headers)}
     assert all(len(row) == len(headers) for row in rows)
     for row in rows:
         row = sorted(list(row.items()), key=lambda x: header_positions[x[0]])
         writer.writerow([_prepare_csv_data(v) for k, v in row])
-    buf.seek(0)
-    return buf
+    csvbuf.seek(0)
+    return BytesIO(csvbuf.read().encode('utf-8-sig'))
 
 
 def _prepare_excel_data(data, tz=None):
