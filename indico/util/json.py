@@ -7,10 +7,10 @@
 
 from __future__ import absolute_import
 
+from collections import UserDict
 from datetime import date, datetime
 
 from speaklater import _LazyString
-from UserDict import UserDict
 
 
 try:
