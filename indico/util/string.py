@@ -99,20 +99,10 @@ def remove_accents(text, reencode=True):
         return result
 
 
-def fix_broken_string(text, as_unicode=False):
-    try:
-        text = text.decode('utf-8')
-    except UnicodeDecodeError:
-        try:
-            text = text.decode('latin1')
-        except UnicodeDecodeError:
-            text = six.text_type(text, 'utf-8', errors='replace')
-    return text if as_unicode else text.encode('utf-8')
-
-
 def to_unicode(text):
     """Convert a string to unicode if it isn't already unicode."""
-    return fix_broken_string(text, as_unicode=True) if isinstance(text, str) else six.text_type(text)
+    # TODO get rid of this function altogether
+    return six.text_type(text)
 
 
 def remove_non_alpha(text):
@@ -273,7 +263,6 @@ def validate_email(email):
     This checks both if it looks valid and if it has valid
     MX (or A/AAAA) records.
     """
-    email = to_unicode(email)
     try:
         email_validator.validate_email(email)
     except email_validator.EmailNotValidError:

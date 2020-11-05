@@ -13,7 +13,6 @@ from flask import render_template, session
 
 from indico.core import signals
 from indico.util.signals import values_from_signal
-from indico.util.string import fix_broken_string
 
 
 class Previewer(object):
@@ -74,7 +73,7 @@ class TextPreviewer(Previewer):
     def generate_content(cls, attachment):
         with attachment.file.open() as f:
             return render_template(cls.TEMPLATES_DIR + 'text_preview.html', attachment=attachment,
-                                   text=fix_broken_string(f.read(), as_unicode=True))
+                                   text=f.read().decode())
 
 
 def get_file_previewer(attachment_file):
