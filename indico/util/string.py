@@ -26,7 +26,7 @@ import bleach
 import email_validator
 import markdown
 import six
-import translitcodec  # noqa: F401 (this is NOT unused. it needs to be imported to register the codec)
+import translitcodec
 from html2text import HTML2Text
 from jinja2.filters import do_striptags
 from lxml import etree, html
@@ -110,10 +110,7 @@ def remove_non_alpha(text):
 
 
 def unicode_to_ascii(text):
-    if not isinstance(text, six.text_type):
-        text = to_unicode(text)
-    text = text.encode('translit/long')
-    return text.encode('ascii', 'ignore')
+    return translitcodec.long_encode(text)[0].encode('ascii', 'ignore').decode().strip()
 
 
 def strict_unicode(value):
@@ -144,15 +141,15 @@ def slugify(*args, **kwargs):
     maxlen = kwargs.get('maxlen')
     fallback = kwargs.get('fallback', '')
 
-    value = u'-'.join(to_unicode(val) for val in args)
-    value = value.encode('translit/long')
-    value = re.sub(r'[^\w\s-]', u'', value).strip()
+    value = '-'.join(to_unicode(val) for val in args)
+    value = translitcodec.long_encode(value)[0]
+    value = re.sub(r'[^\w\s-]', '', value, flags=re.ASCII).strip()
 
     if lower:
         value = value.lower()
-    value = re.sub(r'[-\s]+', u'-', value)
+    value = re.sub(r'[-\s]+', '-', value)
     if maxlen:
-        value = value[0:maxlen].rstrip(u'-')
+        value = value[0:maxlen].rstrip('-')
 
     return value or fallback
 
