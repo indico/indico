@@ -15,6 +15,7 @@ from indico.core.errors import UserValueError
 from indico.modules.events.roles.forms import ImportMembersCSVForm
 from indico.modules.users import User
 from indico.util.i18n import _, ngettext
+from indico.util.spreadsheets import csv_text_io_wrapper
 from indico.util.string import to_unicode, validate_email
 from indico.web.flask.templating import get_template_module
 from indico.web.util import jsonify_data, jsonify_template
@@ -26,9 +27,10 @@ class ImportRoleMembersMixin(object):
     logger = None
 
     def import_members_from_csv(self, f):
-        reader = csv.reader(f.read().decode().splitlines())
-        emails = set()
+        with csv_text_io_wrapper(f) as ftxt:
+            reader = csv.reader(ftxt.read().splitlines())
 
+        emails = set()
         for num_row, row in enumerate(reader, 1):
             if len(row) != 1:
                 raise UserValueError(_('Row {}: malformed CSV data').format(num_row))

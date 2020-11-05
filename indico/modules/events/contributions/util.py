@@ -35,6 +35,7 @@ from indico.modules.events.persons.util import get_event_person
 from indico.modules.events.util import serialize_person_link, track_time_changes
 from indico.util.date_time import format_human_timedelta
 from indico.util.i18n import _
+from indico.util.spreadsheets import csv_text_io_wrapper
 from indico.util.string import to_unicode, validate_email
 from indico.web.flask.templating import get_template_module
 from indico.web.flask.util import send_file, url_for
@@ -245,9 +246,10 @@ def get_contribution_ical_file(contrib):
 
 def import_contributions_from_csv(event, f):
     """Import timetable contributions from a CSV file into an event."""
-    reader = csv.reader(f.read().decode().splitlines())
-    contrib_data = []
+    with csv_text_io_wrapper(f) as ftxt:
+        reader = csv.reader(ftxt.read().splitlines())
 
+    contrib_data = []
     for num_row, row in enumerate(reader, 1):
         try:
             start_dt, duration, title, first_name, last_name, affiliation, email = \

@@ -9,8 +9,9 @@ from __future__ import unicode_literals
 
 import csv
 import re
+from contextlib import contextmanager
 from datetime import datetime
-from io import BytesIO, StringIO
+from io import BytesIO, TextIOWrapper
 
 import six
 from markupsafe import Markup
@@ -56,6 +57,16 @@ def _prepare_csv_data(data, _linebreak_re=re.compile(r'(\r?\n)+'), _dangerous_ch
     return _dangerous_chars_re.sub('', data)
 
 
+@contextmanager
+def csv_text_io_wrapper(buf):
+    """IO wrapper to use the csv reader/writer on a byte stream."""
+    w = TextIOWrapper(buf, encoding='utf-8-sig', newline='')
+    try:
+        yield w
+    finally:
+        w.detach()
+
+
 def generate_csv(headers, rows):
     """Generate a CSV file from a list of headers and rows.
 
@@ -67,16 +78,17 @@ def generate_csv(headers, rows):
     :param rows: a list of dicts mapping captions to values
     :return: an `io.BytesIO` containing the CSV data
     """
-    csvbuf = StringIO()
-    writer = csv.writer(csvbuf)
-    writer.writerow(map(_prepare_header, headers))
-    header_positions = {name: i for i, name in enumerate(headers)}
-    assert all(len(row) == len(headers) for row in rows)
-    for row in rows:
-        row = sorted(list(row.items()), key=lambda x: header_positions[x[0]])
-        writer.writerow([_prepare_csv_data(v) for k, v in row])
-    csvbuf.seek(0)
-    return BytesIO(csvbuf.read().encode('utf-8-sig'))
+    buf = BytesIO()
+    with csv_text_io_wrapper(buf) as csvbuf:
+        writer = csv.writer(csvbuf)
+        writer.writerow(map(_prepare_header, headers))
+        header_positions = {name: i for i, name in enumerate(headers)}
+        assert all(len(row) == len(headers) for row in rows)
+        for row in rows:
+            row = sorted(list(row.items()), key=lambda x: header_positions[x[0]])
+            writer.writerow([_prepare_csv_data(v) for k, v in row])
+    buf.seek(0)
+    return buf
 
 
 def _prepare_excel_data(data, tz=None):

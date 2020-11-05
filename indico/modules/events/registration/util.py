@@ -45,7 +45,7 @@ from indico.modules.events.registration.notifications import (notify_registratio
 from indico.modules.users.util import get_user_by_email
 from indico.util.date_time import format_date
 from indico.util.i18n import _
-from indico.util.spreadsheets import unique_col
+from indico.util.spreadsheets import csv_text_io_wrapper, unique_col
 from indico.util.string import to_unicode, validate_email, validate_email_verbose
 from indico.web.forms.base import IndicoForm
 from indico.web.forms.widgets import SwitchWidget
@@ -554,7 +554,8 @@ def update_regform_item_positions(regform):
 
 def import_registrations_from_csv(regform, fileobj, skip_moderation=True, notify_users=False):
     """Import event registrants from a CSV file into a form."""
-    reader = csv.reader(fileobj.read().decode().splitlines())
+    with csv_text_io_wrapper(fileobj) as ftxt:
+        reader = csv.reader(ftxt.read().splitlines())
     query = db.session.query(Registration.email).with_parent(regform).filter(Registration.is_active)
     registered_emails = {email for (email,) in query}
     used_emails = set()
