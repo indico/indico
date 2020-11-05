@@ -194,7 +194,7 @@ class IndicoTranslations(Translations):
         return ngettext(msgid1, msgid2, n)
 
 
-IndicoTranslations().install(six.text_type=True)
+IndicoTranslations().install()
 
 
 def _remove_locale_script(locale):

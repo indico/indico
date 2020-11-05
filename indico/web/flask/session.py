@@ -7,10 +7,10 @@
 
 from __future__ import absolute_import, unicode_literals
 
+import pickle
 import uuid
 from datetime import datetime, timedelta
 
-import six.moves.cPickle
 from flask import flash, request
 from flask.sessions import SessionInterface, SessionMixin
 from markupsafe import Markup
@@ -134,7 +134,7 @@ class IndicoSession(BaseSession):
 
 class IndicoSessionInterface(SessionInterface):
     pickle_based = True
-    serializer = cPickle
+    serializer = pickle
     session_class = IndicoSession
     temporary_session_lifetime = timedelta(days=7)
 
