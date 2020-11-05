@@ -16,6 +16,7 @@ import functools
 import re
 import string
 import unicodedata
+import warnings
 from enum import Enum
 from itertools import chain
 from operator import attrgetter
@@ -101,7 +102,10 @@ def remove_accents(text, reencode=True):
 def to_unicode(text):
     """Convert a string to unicode if it isn't already unicode."""
     # TODO get rid of this function altogether
-    return six.text_type(text)
+    if isinstance(text, bytes):
+        warnings.warn('to_unicode() with bytes arg is deprecated', DeprecationWarning, stacklevel=2)
+        return text.decode()
+    return str(text)
 
 
 def remove_non_alpha(text):
@@ -162,12 +166,7 @@ def truncate(text, max_size, ellipsis='...'):
 
 def strip_tags(text):
     """Strip HTML tags and replace adjacent whitespace by one space."""
-    encode = False
-    if isinstance(text, str):
-        encode = True
-        text = text.decode('utf-8')
-    text = do_striptags(text)
-    return text.encode('utf-8') if encode else text
+    return do_striptags(text)
 
 
 def render_markdown(text, escape_latex_math=True, md=None, **kwargs):

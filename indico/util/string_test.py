@@ -22,16 +22,11 @@ def test_seems_html():
     assert not seems_html('a < b > c')
 
 
-@pytest.mark.parametrize(('input', 'output'), (
-    (b'foo', u'foo'),            # ascii
-    (u'foo', u'foo'),            # unicode
-    (b'm\xc3\xb6p', u'm\xf6p'),  # utf8
-    (b'm\xf6p', u'm\xf6p'),      # latin1
-    (b'm\xc3\xb6p m\xf6p',       # mixed...
-     u'm\xc3\xb6p m\xf6p'),      # ...decoded as latin1
-))
-def test_to_unicode(input, output):
-    assert to_unicode(input) == output
+def test_to_unicode():
+    assert to_unicode(123) == '123'
+    assert to_unicode(None) == 'None'
+    with pytest.deprecated_call():
+        assert to_unicode(b'foo') == 'foo'
 
 
 def test_make_unique_token(monkeypatch):
@@ -50,9 +45,9 @@ def test_make_unique_token(monkeypatch):
 
 
 @pytest.mark.parametrize(('input', 'output'), (
-    (b'this is a    test',    'this-is-a-test'),
-    (u'this is \xe4    test', 'this-is-ae-test'),
-    (u'12345!xxx   ',         '12345xxx'),
+    ('this is a    test',    'this-is-a-test'),
+    ('this is \xe4    test', 'this-is-ae-test'),
+    ('12345!xxx   ',         '12345xxx'),
 ))
 def test_slugify(input, output):
     assert slugify(input) == output
@@ -64,7 +59,7 @@ def test_slugify_maxlen():
 
 def test_slugify_args():
     assert slugify('foo', 123, 'bar') == 'foo-123-bar'
-    assert slugify(u'm\xf6p'.encode('utf-8'), 123, u'b\xe4r') == 'moep-123-baer'
+    assert slugify('m\xf6p', 123, u'b\xe4r') == 'moep-123-baer'
 
 
 @pytest.mark.parametrize(('input', 'lower', 'output'), (
@@ -77,13 +72,8 @@ def test_slugify_lower(input, lower, output):
     assert slugify(input, lower=lower) == output
 
 
-@pytest.mark.parametrize(('input', 'output'), (
-    (b'foo <strong>bar</strong>', b'foo bar'),
-    (u'foo <strong>bar</strong>', u'foo bar'),
-))
-def test_strip_tags(input, output):
-    assert strip_tags(input) == output
-    assert isinstance(input, type(output))
+def test_strip_tags():
+    assert strip_tags('foo <strong>bar</strong>') == 'foo bar'
 
 
 @pytest.mark.parametrize(('input', 'html', 'max_length', 'output'), (
@@ -166,8 +156,8 @@ def test_snakify_keys():
 
 
 def test_crc32():
-    assert crc32(u'm\xf6p') == 2575016153
-    assert crc32(u'm\xf6p'.encode('utf-8')) == 2575016153
+    assert crc32('m\xf6p') == 2575016153
+    assert crc32('m\xf6p'.encode('utf-8')) == 2575016153
     assert crc32(b'') == 0
     assert crc32(b'hello world\0\1\2\3\4') == 140159631
 
