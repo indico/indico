@@ -27,7 +27,7 @@ from indico.web.forms.widgets import SwitchWidget
 
 
 def make_competences_form(event):
-    form_class = type(b'PaperCompetencesForm', (IndicoForm,), {})
+    form_class = type('PaperCompetencesForm', (IndicoForm,), {})
     for entry in event.cfp.assignees:
         name = 'competences_{}'.format(entry.id)
         field = IndicoTagListField('Competences')

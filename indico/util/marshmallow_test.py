@@ -19,7 +19,7 @@ from indico.util.marshmallow import NaiveDateTime
 def test_NaiveDateTime_serialize():
     now = datetime.now()
     utc_now = pytz.utc.localize(datetime.utcnow())
-    obj = type(b'Test', (object,), {
+    obj = type('Test', (object,), {
         b'naive': now,
         b'aware': utc_now,
     })

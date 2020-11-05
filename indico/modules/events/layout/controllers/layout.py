@@ -48,7 +48,7 @@ def _make_theme_settings_form(event, theme):
         settings = theme_settings.themes[theme]['user_settings']
     except KeyError:
         return None
-    form_class = type(b'ThemeSettingsForm', (IndicoForm,), {})
+    form_class = type('ThemeSettingsForm', (IndicoForm,), {})
     for name, field_data in six.iteritems(settings):
         field_type = field_data['type']
         field_class = getattr(indico_fields, field_type, None) or getattr(wtforms_fields, field_type, None)

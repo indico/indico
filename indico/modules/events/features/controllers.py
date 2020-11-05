@@ -33,7 +33,7 @@ class RHFeatures(RHFeaturesBase):
     """Show the list of available event features."""
 
     def _make_form(self):
-        form_class = type(b'FeaturesForm', (IndicoForm,), {})
+        form_class = type('FeaturesForm', (IndicoForm,), {})
         disallowed = get_disallowed_features(self.event)
         for name, feature in sorted(six.iteritems(get_feature_definitions()), key=lambda x: x[1].friendly_name):
             if name in disallowed:

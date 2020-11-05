@@ -28,7 +28,7 @@ def make_survey_form(survey):
     :param survey: The `Survey` for which to create the form.
     :return: An `IndicoForm` subclass.
     """
-    form_class = type(b'SurveyForm', (IndicoForm,), {})
+    form_class = type('SurveyForm', (IndicoForm,), {})
 
     for question in survey.questions:
         field_impl = question.field

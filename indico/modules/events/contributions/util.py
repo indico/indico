@@ -187,7 +187,7 @@ def make_contribution_form(event):
     """
     from indico.modules.events.contributions.forms import ContributionForm
 
-    form_class = type(b'_ContributionForm', (ContributionForm,), {})
+    form_class = type('_ContributionForm', (ContributionForm,), {})
     for custom_field in event.contribution_fields:
         field_impl = custom_field.mgmt_field
         if field_impl is None:

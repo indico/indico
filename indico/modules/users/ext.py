@@ -61,7 +61,7 @@ class ExtraUserPreferences(object):
 
     def extend_form(self, form_class):
         """Create a subclass of the form containing the extra field."""
-        form_class = type(b'ExtendedUserPreferencesForm', (form_class,), {})
+        form_class = type('ExtendedUserPreferencesForm', (form_class,), {})
         for name, field in six.iteritems(self.fields):
             name = self._prefix + name
             if hasattr(form_class, name):

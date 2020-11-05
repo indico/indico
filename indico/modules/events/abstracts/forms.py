@@ -52,7 +52,7 @@ def make_review_form(event):
     :param event: The `Event` for which to create the abstract form.
     :return: An `AbstractForm` subclass.
     """
-    form_class = type(b'_AbstractReviewForm', (AbstractReviewForm,), {})
+    form_class = type('_AbstractReviewForm', (AbstractReviewForm,), {})
     for question in event.abstract_review_questions:
         name = 'question_{}'.format(question.id)
         setattr(form_class, name, question.field.create_wtf_field())

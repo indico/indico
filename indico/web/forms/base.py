@@ -62,7 +62,7 @@ class IndicoFormMeta(FormMeta):
         if not extra_fields:
             return super(IndicoFormMeta, cls).__call__(*args, **kwargs)
         kwargs['__extended'] = True
-        ext_cls = type(b'_Extended' + cls.__name__, (cls,), {})
+        ext_cls = type('_Extended' + cls.__name__, (cls,), {})
         for name, field in extra_fields:
             name = 'ext__' + name
             if hasattr(ext_cls, name):

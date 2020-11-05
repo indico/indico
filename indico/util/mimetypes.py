@@ -83,4 +83,4 @@ def register_custom_mimetypes():
     mapping but useful, e.g. because indico has special handling for
     files with that type.
     """
-    mimetypes.add_type(b'text/markdown', b'.md')
+    mimetypes.add_type('text/markdown', b'.md')

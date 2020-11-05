@@ -68,7 +68,7 @@ def _after_commit(*args, **kwargs):
 class IndicoSQLAlchemy(SQLAlchemy):
     def __init__(self, *args, **kwargs):
         super(IndicoSQLAlchemy, self).__init__(*args, **kwargs)
-        self.m = type(b'_Models', (object,), {})
+        self.m = type('_Models', (object,), {})
 
     def create_session(self, *args, **kwargs):
         session = super(IndicoSQLAlchemy, self).create_session(*args, **kwargs)

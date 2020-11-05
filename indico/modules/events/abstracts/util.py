@@ -199,7 +199,7 @@ def make_abstract_form(event, user, notification_option=False, management=False,
         mixins.append(SendNotificationsMixin)
     if invited:
         mixins.append(InvitedAbstractMixin)
-    form_class = type(b'_AbstractForm', tuple(mixins) + (AbstractForm,), {})
+    form_class = type('_AbstractForm', tuple(mixins) + (AbstractForm,), {})
     for custom_field in event.contribution_fields:
         field_impl = custom_field.mgmt_field if management else custom_field.field
         if field_impl is None:

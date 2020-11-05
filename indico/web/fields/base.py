@@ -79,7 +79,7 @@ class BaseField(object):
     def create_config_form(cls, *args, **kwargs):
         """Create the WTForm to configure this field."""
         bases = (cls.config_form_base, cls.config_form) if cls.config_form is not None else (cls.config_form_base,)
-        form_cls = type(b'_FieldConfigForm', bases, {})
+        form_cls = type('_FieldConfigForm', bases, {})
         form = form_cls(*args, **kwargs)
         form._common_fields = cls.common_settings
         return form
