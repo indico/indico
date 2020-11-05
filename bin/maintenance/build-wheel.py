@@ -112,7 +112,7 @@ def git_is_clean_indico():
             ['git', 'diff', '--stat', '--color=always', '--staged'] + toplevel,
             ['git', 'clean', '-dn', '-e', '__pycache__'] + toplevel]
     for cmd in cmds:
-        rv = subprocess.check_output(cmd, stderr=subprocess.STDOUT)
+        rv = subprocess.check_output(cmd, stderr=subprocess.STDOUT, text=True)
         if rv:
             return False, rv
     return True, None
@@ -141,7 +141,8 @@ def _get_included_files(package_masks):
 
 def _get_ignored_package_files_indico():
     files = set(_get_included_files(('indico', 'indico.*')))
-    output = subprocess.check_output(['git', 'ls-files', '--others', '--ignored', '--exclude-standard', 'indico/'])
+    output = subprocess.check_output(['git', 'ls-files', '--others', '--ignored', '--exclude-standard', 'indico/'],
+                                     text=True)
     ignored = {line for line in output.splitlines()}
     dist_path = 'indico/web/static/dist/'
     i18n_re = re.compile(r'^indico/translations/[a-zA-Z_]+/LC_MESSAGES/(?:messages\.mo|messages-react\.json)')
@@ -164,14 +165,14 @@ def git_is_clean_plugin():
         # plugins we don't have any package data to include anyway...
         cmds.append(['git', 'clean', '-dn', '-e', '__pycache__'] + toplevel)
     for cmd in cmds:
-        rv = subprocess.check_output(cmd, stderr=subprocess.STDOUT)
+        rv = subprocess.check_output(cmd, stderr=subprocess.STDOUT, text=True)
         if rv:
             return False, rv
     if not toplevel:
         # If we have just a single pyfile we don't need to check for ignored files
         return True, None
     rv = subprocess.check_output(['git', 'ls-files', '--others', '--ignored', '--exclude-standard'] + toplevel,
-                                 stderr=subprocess.STDOUT)
+                                 stderr=subprocess.STDOUT, text=True)
     garbage_re = re.compile(r'(\.(py[co]|mo)$)|(/__pycache__/)|(^({})/static/dist/)'.format('|'.join(toplevel)))
     garbage = [x for x in rv.splitlines() if not garbage_re.search(x)]
     if garbage:
@@ -203,10 +204,10 @@ def _patch_version(add_version_suffix, file_name, search, replace):
     if not add_version_suffix:
         yield
         return
-    rev = subprocess.check_output(['git', 'rev-parse', '--short', 'HEAD']).strip()
+    rev = subprocess.check_output(['git', 'rev-parse', '--short', 'HEAD'], text=True).strip()
     suffix = '+{}.{}'.format(datetime.now().strftime('%Y%m%d%H%M'), rev)
     info('adding version suffix: ' + suffix, unimportant=True)
-    with open(file_name, 'rb+') as f:
+    with open(file_name, 'r+') as f:
         old_content = f.read()
         f.seek(0)
         f.truncate()

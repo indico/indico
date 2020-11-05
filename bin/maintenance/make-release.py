@@ -14,7 +14,6 @@ import sys
 import click
 from babel.dates import format_date
 from packaging.version import Version
-from six.moves import map
 
 
 def fail(message, *args, **kwargs):
@@ -51,8 +50,7 @@ def _bump_version(version):
     try:
         parts = list(map(int, version.split('.')))
     except ValueError:
-        fail('cannot bump version with non-numeric parts; did you forget --no-bump?')
-        sys.exit(1)
+        fail('cannot bump version with non-numeric parts')
     if len(parts) == 2:
         parts.append(0)
     parts[-1] += 1
@@ -60,7 +58,7 @@ def _bump_version(version):
 
 
 def _get_current_version():
-    with open('indico/__init__.py', 'rb') as f:
+    with open('indico/__init__.py', 'r') as f:
         content = f.read()
     match = re.search(r"^__version__ = '([^']+)'$", content, re.MULTILINE)
     return match.group(1)
@@ -68,17 +66,17 @@ def _get_current_version():
 
 def _set_version(version, dry_run=False):
     step('Setting version to {}', version, dry_run=dry_run)
-    with open('indico/__init__.py', 'rb') as f:
+    with open('indico/__init__.py', 'r') as f:
         orig = content = f.read()
     content = re.sub(r"^__version__ = '([^']+)'$", "__version__ = '{}'".format(version), content, flags=re.MULTILINE)
     assert content != orig
     if not dry_run:
-        with open('indico/__init__.py', 'wb') as f:
+        with open('indico/__init__.py', 'w') as f:
             f.write(content)
 
 
 def _set_changelog_date(new_version, dry_run=False):
-    with open('CHANGES.rst', 'rb') as f:
+    with open('CHANGES.rst', 'r') as f:
         orig = content = f.read()
     version_line = 'Version {}'.format(new_version)
     underline = '-' * len(version_line)
@@ -92,7 +90,7 @@ def _set_changelog_date(new_version, dry_run=False):
     if content == orig:
         fail('Could not update changelog - is there an entry for {}?', new_version)
     if not dry_run:
-        with open('CHANGES.rst', 'wb') as f:
+        with open('CHANGES.rst', 'w') as f:
             f.write(content)
 
 

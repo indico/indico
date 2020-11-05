@@ -63,28 +63,28 @@ HEADERS = {
 #               header. (See the `HEADER` above)
 SUPPORTED_FILES = {
     'py': {
-        'regex': re.compile(br'((^#|[\r\n]#).*)*'),
-        'format': {'comment_start': b'#', 'comment_middle': b'#', 'comment_end': b''}},
+        'regex': re.compile(r'((^#|[\r\n]#).*)*'),
+        'format': {'comment_start': '#', 'comment_middle': '#', 'comment_end': ''}},
     'wsgi': {
-        'regex': re.compile(br'((^#|[\r\n]#).*)*'),
-        'format': {'comment_start': b'#', 'comment_middle': b'#', 'comment_end': b''}},
+        'regex': re.compile(r'((^#|[\r\n]#).*)*'),
+        'format': {'comment_start': '#', 'comment_middle': '#', 'comment_end': ''}},
     'js': {
-        'regex': re.compile(br'/\*(.|[\r\n])*?\*/|((^//|[\r\n]//).*)*'),
-        'format': {'comment_start': b'//', 'comment_middle': b'//', 'comment_end': b''}},
+        'regex': re.compile(r'/\*(.|[\r\n])*?\*/|((^//|[\r\n]//).*)*'),
+        'format': {'comment_start': '//', 'comment_middle': '//', 'comment_end': ''}},
     'jsx': {
-        'regex': re.compile(br'/\*(.|[\r\n])*?\*/|((^//|[\r\n]//).*)*'),
-        'format': {'comment_start': b'//', 'comment_middle': b'//', 'comment_end': b''}},
+        'regex': re.compile(r'/\*(.|[\r\n])*?\*/|((^//|[\r\n]//).*)*'),
+        'format': {'comment_start': '//', 'comment_middle': '//', 'comment_end': ''}},
     'css': {
-        'regex': re.compile(br'/\*(.|[\r\n])*?\*/'),
-        'format': {'comment_start': b'/*', 'comment_middle': b' *', 'comment_end': b' */'}},
+        'regex': re.compile(r'/\*(.|[\r\n])*?\*/'),
+        'format': {'comment_start': '/*', 'comment_middle': ' *', 'comment_end': ' */'}},
     'scss': {
-        'regex': re.compile(br'/\*(.|[\r\n])*?\*/|((^//|[\r\n]//).*)*'),
-        'format': {'comment_start': b'//', 'comment_middle': b'//', 'comment_end': b''}},
+        'regex': re.compile(r'/\*(.|[\r\n])*?\*/|((^//|[\r\n]//).*)*'),
+        'format': {'comment_start': '//', 'comment_middle': '//', 'comment_end': ''}},
 }
 
 
 # The substring which must be part of a comment block in order for the comment to be updated by the header.
-SUBSTRING = b'This file is part of'
+SUBSTRING = 'This file is part of'
 
 
 USAGE = """
@@ -104,17 +104,17 @@ specified is not supported) nothing will be updated.
 
 def gen_header(project, data, end_year):
     data['end_year'] = end_year
-    return '\n'.join(line.rstrip() for line in HEADERS[project].format(**data).strip().splitlines()).encode('ascii')
+    return '\n'.join(line.rstrip() for line in HEADERS[project].format(**data).strip().splitlines())
 
 
 def _update_header(project, file_path, year, substring, regex, data, ci):
     found = False
-    with open(file_path, 'rb') as file_read:
+    with open(file_path, 'r') as file_read:
         content = orig_content = file_read.read()
         if not content.strip():
             return False
         shebang_line = None
-        if content.startswith(b'#!/'):
+        if content.startswith('#!/'):
             shebang_line, content = content.split('\n', 1)
         for match in regex.finditer(content):
             if substring in match.group():
@@ -126,7 +126,7 @@ def _update_header(project, file_path, year, substring, regex, data, ci):
         msg = 'Incorrect header in {}' if ci else cformat('%{green!}Updating header of %{blue!}{}')
         print(msg.format(os.path.relpath(file_path)))
         if not ci:
-            with open(file_path, 'wb') as file_write:
+            with open(file_path, 'w') as file_write:
                 file_write.write(content)
         return True
     elif not found:
@@ -192,7 +192,7 @@ def main(ctx, ci, project, year, path):
             print(cformat("Updating headers to the year %{yellow!}{year}%{reset} for all "
                           "git-tracked files...").format(year=year))
         try:
-            for filepath in subprocess.check_output(['git', 'ls-files']).splitlines():
+            for filepath in subprocess.check_output(['git', 'ls-files'], text=True).splitlines():
                 filepath = os.path.abspath(filepath)
                 if not blacklisted(os.getcwd(), os.path.dirname(filepath)):
                     if update_header(project, filepath, year, ci):
@@ -201,12 +201,12 @@ def main(ctx, ci, project, year, path):
             raise click.UsageError(cformat('%{red!}You must be within a git repository to run this script.'))
 
     if not error:
-        print(cformat('%{green}\u2705 All headers are up to date').encode('utf-8'))
+        print(cformat('%{green}\u2705 All headers are up to date'))
     elif ci:
-        print(cformat('%{red}\u274C Some headers need to be updated or added').encode('utf-8'))
+        print(cformat('%{red}\u274C Some headers need to be updated or added'))
         sys.exit(1)
     else:
-        print(cformat('%{yellow}\U0001F504 Some headers have been updated (or are missing)').encode('utf-8'))
+        print(cformat('%{yellow}\U0001F504 Some headers have been updated (or are missing)'))
 
 
 if __name__ == '__main__':
