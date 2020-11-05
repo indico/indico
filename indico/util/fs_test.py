@@ -11,17 +11,17 @@ from indico.util.fs import secure_client_filename, secure_filename
 
 
 @pytest.mark.parametrize(('filename', 'expected'), (
-    (u'', u'file'),
-    (None, u'file'),
-    (u'.', u'_'),
-    (u'..', u'__'),
-    (u'../', u'.._'),
-    (u'foo.txt', u'foo.txt'),
-    (u'../../../etc/passwd', u'.._.._.._etc_passwd'),
-    (u'm\xf6p.txt', u'm\xf6p.txt'),
-    (u'/m\xf6p.txt', u'_m\xf6p.txt'),
-    (ur'c:\test.txt', u'c_test.txt'),
-    (r'spacy   \filename', u'spacy _filename'),
+    ('', 'file'),
+    (None, 'file'),
+    ('.', '_'),
+    ('..', '__'),
+    ('../', '.._'),
+    ('foo.txt', 'foo.txt'),
+    ('../../../etc/passwd', '.._.._.._etc_passwd'),
+    ('m\xf6p.txt', 'm\xf6p.txt'),
+    ('/m\xf6p.txt', '_m\xf6p.txt'),
+    (r'c:\test.txt', 'c_test.txt'),
+    (r'spacy   \filename', 'spacy _filename'),
 ))
 def test_secure_client_filename(filename, expected):
     assert secure_client_filename(filename) == expected
@@ -32,9 +32,9 @@ def test_secure_client_filename(filename, expected):
     (None, 'fallback'),
     ('foo.txt', 'foo.txt'),
     ('../../../etc/passwd', 'etc_passwd'),
-    (u'm\xf6p.txt', 'moep.txt'),
-    (u'm\xf6p.txt'.encode('utf-8'), 'moep.txt'),
-    (u'/m\xf6p.txt', 'moep.txt'),
+    ('m\xf6p.txt', 'moep.txt'),
+    ('m\xf6p.txt'.encode('utf-8'), 'moep.txt'),
+    ('/m\xf6p.txt', 'moep.txt'),
     (r'spacy   \filename', 'spacy_filename'),
 ))
 def test_secure_filename(filename, expected):
