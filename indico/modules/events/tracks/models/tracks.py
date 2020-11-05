@@ -20,8 +20,8 @@ def get_next_position(context):
     event_id = context.current_parameters['event_id']
     track_max_position = db.session.query(db.func.max(Track.position)).filter_by(event_id=event_id).scalar()
     track_group_max_position = db.session.query(db.func.max(TrackGroup.position)).filter_by(event_id=event_id).scalar()
-    pos = max(track_max_position, track_group_max_position)
-    return (pos or 0) + 1
+    pos = max(track_max_position or 0, track_group_max_position or 0)
+    return pos + 1
 
 
 class Track(DescriptionMixin, ProtectionManagersMixin, db.Model):
