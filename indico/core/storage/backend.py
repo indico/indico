@@ -8,13 +8,11 @@
 from __future__ import unicode_literals
 
 import os
-import sys
 from contextlib import contextmanager
 from hashlib import md5
 from io import BytesIO
 from tempfile import NamedTemporaryFile
 
-import six
 from werkzeug.security import safe_join
 
 from indico.core import signals
@@ -234,7 +232,7 @@ class FileSystemStorage(Storage):
         try:
             return open(self._resolve_path(file_id), 'rb')
         except Exception as e:
-            six.reraise(StorageError('Could not open "{}": {}'.format(file_id, e)), None, sys.exc_info()[2])
+            raise StorageError('Could not open "{}": {}'.format(file_id, e)) from e
 
     @contextmanager
     def get_local_path(self, file_id):
@@ -253,25 +251,25 @@ class FileSystemStorage(Storage):
                 checksum = self._copy_file(fileobj, f)
             return name, checksum
         except Exception as e:
-            six.reraise(StorageError('Could not save "{}": {}'.format(name, e)), None, sys.exc_info()[2])
+            raise StorageError('Could not save "{}": {}'.format(name, e)) from e
 
     def delete(self, file_id):
         try:
             os.remove(self._resolve_path(file_id))
         except Exception as e:
-            six.reraise(StorageError('Could not delete "{}": {}'.format(file_id, e)), None, sys.exc_info()[2])
+            raise StorageError('Could not delete "{}": {}'.format(file_id, e)) from e
 
     def getsize(self, file_id):
         try:
             return os.path.getsize(self._resolve_path(file_id))
         except Exception as e:
-            six.reraise(StorageError('Could not get size of "{}": {}'.format(file_id, e)), None, sys.exc_info()[2])
+            raise StorageError('Could not get size of "{}": {}'.format(file_id, e)) from e
 
     def send_file(self, file_id, content_type, filename, inline=True):
         try:
             return send_file(filename, self._resolve_path(file_id).encode('utf-8'), content_type, inline=inline)
         except Exception as e:
-            six.reraise(StorageError('Could not send "{}": {}'.format(file_id, e)), None, sys.exc_info()[2])
+            raise StorageError('Could not send "{}": {}'.format(file_id, e)) from e
 
     def __repr__(self):
         return '<FileSystemStorage: {}>'.format(self.path)

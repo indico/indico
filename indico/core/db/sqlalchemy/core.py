@@ -56,7 +56,7 @@ def handle_sqlalchemy_database_error():
         msg += ': {}'.format(exc.orig.diag.message_detail)
     if exc.orig.diag.message_hint:
         msg += ' ({})'.format(exc.orig.diag.message_hint)
-    six.reraise(ConstraintViolated(msg, exc.orig), None, tb)  # raise with original traceback
+    raise ConstraintViolated(msg, exc.orig) from exc
 
 
 def _after_commit(*args, **kwargs):
