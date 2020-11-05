@@ -22,6 +22,7 @@ from indico.modules.users import User
 from indico.modules.users.legacy import AvatarUserWrapper
 from indico.util.event import uniqueId
 from indico.web.flask.util import url_for
+import six
 
 
 def get_map_url(item):
@@ -115,7 +116,7 @@ class outputGenerator(object):
         out.writeXML(xml)
 
     def _generate_category_path(self, event, out):
-        path = [unicode(c.id) for c in event.category.chain_query.options(load_only('id'))]
+        path = [six.text_type(c.id) for c in event.category.chain_query.options(load_only('id'))]
         out.openTag("datafield", [["tag", "650"], ["ind1", " "], ["ind2", "7"]])
         out.writeTag("subfield", ":".join(path), [["code", "a"]])
         out.closeTag("datafield")
@@ -350,7 +351,7 @@ class outputGenerator(object):
             users[user].append('Author')
         for user in sList:
             users[user].append('Speaker')
-        for user, roles in users.iteritems():
+        for user, roles in six.iteritems(users):
             tag = '100' if user in contrib.primary_authors else '700'
             out.openTag('datafield', [['tag', tag], ['ind1', ' '], ['ind2', ' ']])
             out.writeTag('subfield', u'{} {}'.format(user.last_name, user.first_name), [['code', 'a']])

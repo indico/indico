@@ -26,6 +26,9 @@ from indico.util.i18n import _, get_current_locale
 from indico.web.forms.fields import JSONField
 from indico.web.forms.validators import DateRange, DateTimeRange, LinkedDate, LinkedDateTime
 from indico.web.forms.widgets import JinjaWidget
+import six
+from six.moves import map
+from six.moves import range
 
 
 class TimeDeltaField(Field):
@@ -65,7 +68,7 @@ class TimeDeltaField(Field):
         if self.data is None:
             return None
         seconds = int(self.data.total_seconds())
-        for unit, magnitude in self.magnitudes.iteritems():
+        for unit, magnitude in six.iteritems(self.magnitudes):
             if not seconds % magnitude:
                 return unit
         return 'seconds'
@@ -333,7 +336,7 @@ class OccurrencesField(JSONField):
 
         self.data = []
         super(OccurrencesField, self).process_formdata(valuelist)
-        self.data = map(_deserialize, self.data)
+        self.data = list(map(_deserialize, self.data))
 
     def _value(self):
         def _serialize(occ):
@@ -345,7 +348,7 @@ class OccurrencesField(JSONField):
                     'time': dt.time().isoformat()[:-3],  # hh:mm only
                     'duration': int(occ[1].total_seconds() // 60)}
 
-        return json.dumps(map(_serialize, self.data))
+        return json.dumps(list(map(_serialize, self.data)))
 
     @property
     def timezone_field(self):
@@ -388,7 +391,7 @@ class IndicoWeekDayRepetitionField(Field):
     def __init__(self, *args, **kwargs):
         locale = get_current_locale()
         self.day_number_options = self.WEEK_DAY_NUMBER_CHOICES
-        self.week_day_options = [(n, locale.weekday(n, short=False)) for n in xrange(7)]
+        self.week_day_options = [(n, locale.weekday(n, short=False)) for n in range(7)]
         self.day_number_missing = False
         self.week_day_missing = False
         super(IndicoWeekDayRepetitionField, self).__init__(*args, **kwargs)

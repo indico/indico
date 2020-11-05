@@ -27,6 +27,7 @@ from markupsafe import Markup
 from indico.core import signals
 from indico.util.signals import values_from_signal
 from indico.util.string import natural_sort_key, render_markdown
+import six
 
 
 indentation_re = re.compile(r'^ +', re.MULTILINE)
@@ -60,7 +61,7 @@ def natsort(environment, value, reverse=False, case_sensitive=False, attribute=N
     """
     if not case_sensitive:
         def sort_func(item):
-            if isinstance(item, basestring):
+            if isinstance(item, six.string_types):
                 item = item.lower()
             return natural_sort_key(item)
     else:
@@ -161,9 +162,9 @@ def register_template_hook(name, receiver, priority=50, markup=True, plugin=None
         return markup, priority, receiver(**kw)
 
     if plugin is None:
-        signals.plugin.template_hook.connect(_func, sender=unicode(name), weak=False)
+        signals.plugin.template_hook.connect(_func, sender=six.text_type(name), weak=False)
     else:
-        plugin.connect(signals.plugin.template_hook, _func, sender=unicode(name))
+        plugin.connect(signals.plugin.template_hook, _func, sender=six.text_type(name))
 
 
 def template_hook(name, priority=50, markup=True):
@@ -187,7 +188,7 @@ def call_template_hook(*name, **kwargs):
     name = name[0]
     as_list = kwargs.pop('as_list', False)
     values = []
-    for is_markup, priority, value in values_from_signal(signals.plugin.template_hook.send(unicode(name), **kwargs),
+    for is_markup, priority, value in values_from_signal(signals.plugin.template_hook.send(six.text_type(name), **kwargs),
                                                          single_value=True, as_list=as_list):
         if value:
             if is_markup:

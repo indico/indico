@@ -48,6 +48,7 @@ from indico.util.string import strip_tags
 from indico.web.assets.vars_js import generate_global_file, generate_i18n_file, generate_user_file
 from indico.web.flask.util import url_for
 from indico.web.rh import RH
+import six
 
 
 def create_static_site(rh, event):
@@ -240,7 +241,7 @@ class StaticConferenceCreator(StaticEventCreator):
             RHTimetable: WPStaticTimetable,
             RHDisplayTracks: WPStaticConferenceProgram
         }
-        for rh_cls, wp in rhs.viewitems():
+        for rh_cls, wp in six.viewitems(rhs):
             rh = rh_cls()
             rh.view_class = wp
             if rh_cls is RHTimetable:
@@ -312,7 +313,7 @@ class StaticConferenceCreator(StaticEventCreator):
         self._add_page(html, 'event_pages.page_display', page)
 
     def _get_url(self, uh_or_endpoint, target, **params):
-        if isinstance(uh_or_endpoint, basestring):
+        if isinstance(uh_or_endpoint, six.string_types):
             return url_for(uh_or_endpoint, target, **params)
         else:
             return str(uh_or_endpoint.getStaticURL(target, **params))

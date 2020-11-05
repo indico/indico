@@ -15,6 +15,7 @@ from indico.modules.events.logs.models.entries import EventLogEntry, EventLogRea
 from indico.modules.events.logs.util import serialize_log_entry
 from indico.modules.events.logs.views import WPEventLogs
 from indico.modules.events.management.controllers import RHManageEventBase
+import six
 
 
 LOG_PAGE_SIZE = 15
@@ -27,7 +28,7 @@ def _contains(field, text):
 
 def _get_metadata_query():
     return {k[len('meta.'):]: int(v) if v.isdigit() else v
-            for k, v in request.args.iteritems()
+            for k, v in six.iteritems(request.args)
             if k.startswith('meta.')}
 
 

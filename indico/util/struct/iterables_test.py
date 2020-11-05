@@ -6,11 +6,12 @@
 # LICENSE file for more details.
 
 from indico.util.struct.iterables import grouper
+from six.moves import range
 
 
 def test_grouper():
     assert list(grouper([], 3)) == []
-    assert list(grouper(xrange(6), 3)) == [(0, 1, 2), (3, 4, 5)]
-    assert list(grouper(xrange(7), 3)) == [(0, 1, 2), (3, 4, 5), (6, None, None)]
-    assert list(grouper(xrange(7), 3, fillvalue='x')) == [(0, 1, 2), (3, 4, 5), (6, 'x', 'x')]
-    assert list(grouper(xrange(7), 3, skip_missing=True)) == [(0, 1, 2), (3, 4, 5), (6,)]
+    assert list(grouper(range(6), 3)) == [(0, 1, 2), (3, 4, 5)]
+    assert list(grouper(range(7), 3)) == [(0, 1, 2), (3, 4, 5), (6, None, None)]
+    assert list(grouper(range(7), 3, fillvalue='x')) == [(0, 1, 2), (3, 4, 5), (6, 'x', 'x')]
+    assert list(grouper(range(7), 3, skip_missing=True)) == [(0, 1, 2), (3, 4, 5), (6,)]

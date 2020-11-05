@@ -25,6 +25,7 @@ from indico.modules.events.util import get_event_from_url
 from indico.util.i18n import _
 from indico.web.flask.util import url_for
 from indico.web.util import jsonify_data, jsonify_template
+import six
 
 
 REPEAT_FORM_MAP = {
@@ -45,7 +46,7 @@ RRULE_FREQ_MAP = OrderedDict([
 
 
 def relativedelta_to_rrule_interval(rdelta):
-    for unit, freq in RRULE_FREQ_MAP.viewitems():
+    for unit, freq in six.viewitems(RRULE_FREQ_MAP):
         value = getattr(rdelta, unit)
         if value:
             return freq, value
@@ -88,7 +89,7 @@ class CloneCalculator(object):
         if form.validate():
             return self._calculate(form)
         else:
-            raise ValueError([(unicode(getattr(form, k).label.text), v) for k, v in form.errors.viewitems()])
+            raise ValueError([(six.text_type(getattr(form, k).label.text), v) for k, v in six.viewitems(form.errors)])
 
 
 class PatternCloneCalculator(CloneCalculator):

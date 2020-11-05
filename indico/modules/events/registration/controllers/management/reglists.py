@@ -54,6 +54,7 @@ from indico.util.spreadsheets import send_csv, send_xlsx
 from indico.web.flask.templating import get_template_module
 from indico.web.flask.util import send_file, url_for
 from indico.web.util import jsonify_data, jsonify_template
+import six
 
 
 badge_cache = GenericCache('badge-printing')
@@ -444,7 +445,7 @@ class RHRegistrationsConfigBadges(RHRegistrationsActionBase):
         'A8': (5.2, 7.4),
     }
 
-    format_map_landscape = {name: (h, w) for name, (w, h) in format_map_portrait.iteritems()}
+    format_map_landscape = {name: (h, w) for name, (w, h) in six.iteritems(format_map_portrait)}
 
     def _process_args(self):
         RHManageRegFormBase._process_args(self)
@@ -459,7 +460,7 @@ class RHRegistrationsConfigBadges(RHRegistrationsActionBase):
     def _get_format(self, tpl):
         from indico.modules.designer.pdf import PIXELS_CM
         format_map = self.format_map_landscape if tpl.data['width'] > tpl.data['height'] else self.format_map_portrait
-        return next((frm for frm, frm_size in format_map.iteritems()
+        return next((frm for frm, frm_size in six.iteritems(format_map)
                      if (frm_size[0] == float(tpl.data['width']) / PIXELS_CM and
                          frm_size[1] == float(tpl.data['height']) / PIXELS_CM)), 'custom')
 
@@ -501,7 +502,7 @@ class RHRegistrationsConfigBadges(RHRegistrationsActionBase):
                 event_badge_settings.set_multi(self.event, data)
             data['registration_ids'] = [x.id for x in registrations]
 
-            key = unicode(uuid.uuid4())
+            key = six.text_type(uuid.uuid4())
             badge_cache.set(key, data, time=1800)
             download_url = url_for('.registrations_print_badges', self.regform, template_id=template_id, uuid=key)
             return jsonify_data(flash=False, redirect=download_url, redirect_no_loading=True)
@@ -517,7 +518,7 @@ class RHRegistrationsConfigTickets(RHRegistrationsConfigBadges):
 
     @property
     def _default_template_id(self):
-        return unicode(self.regform.ticket_template_id) if self.regform.ticket_template_id else None
+        return six.text_type(self.regform.ticket_template_id) if self.regform.ticket_template_id else None
 
     def _filter_registrations(self, registrations):
         return [r for r in registrations if not r.is_ticket_blocked]
@@ -654,13 +655,13 @@ class RHRegistrationsExportAttachments(RHRegistrationsExportBase, ZipGeneratorMi
         registration = attachment.registration
         regform_title = secure_filename(attachment.registration.registration_form.title, 'registration_form')
         registrant_name = secure_filename("{}_{}".format(registration.get_full_name(),
-                                          unicode(registration.friendly_id)), registration.friendly_id)
+                                          six.text_type(registration.friendly_id)), registration.friendly_id)
         file_name = secure_filename("{}_{}_{}".format(attachment.field_data.field.title, attachment.field_data.field_id,
                                                       attachment.filename), attachment.filename)
         return os.path.join(*self._adjust_path_length([regform_title, registrant_name, file_name]))
 
     def _iter_items(self, attachments):
-        for reg_attachments in attachments.itervalues():
+        for reg_attachments in six.itervalues(attachments):
             for reg_attachment in reg_attachments:
                 yield reg_attachment
 

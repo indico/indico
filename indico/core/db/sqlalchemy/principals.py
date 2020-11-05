@@ -19,6 +19,7 @@ from indico.util.decorators import classproperty, strict_classproperty
 from indico.util.fossilize import Fossilizable, IFossil, fossilizes
 from indico.util.string import format_repr, return_ascii
 from indico.util.struct.enum import IndicoEnum
+import six
 
 
 class PrincipalType(int, IndicoEnum):
@@ -600,7 +601,7 @@ class PrincipalPermissionsMixin(PrincipalMixin):
     @classproperty
     @classmethod
     def principal_for_obj(cls):
-        if isinstance(cls.principal_for, basestring):
+        if isinstance(cls.principal_for, six.string_types):
             return db.Model._decl_class_registry[cls.principal_for]
         else:
             return cls.principal_for
@@ -623,7 +624,7 @@ class PrincipalPermissionsMixin(PrincipalMixin):
             return self.full_access
         elif not explicit and self.full_access:
             return True
-        valid_permissions = get_available_permissions(self.principal_for_obj).viewkeys()
+        valid_permissions = six.viewkeys(get_available_permissions(self.principal_for_obj))
         current_permissions = set(self.permissions) & valid_permissions
         if permission == 'ANY':
             return bool(current_permissions)
@@ -637,7 +638,7 @@ class PrincipalPermissionsMixin(PrincipalMixin):
             if explicit:
                 raise ValueError('permission must be specified if explicit=True')
             return cls.full_access
-        valid_permissions = get_available_permissions(cls.principal_for_obj).viewkeys()
+        valid_permissions = six.viewkeys(get_available_permissions(cls.principal_for_obj))
         if permission == 'ANY':
             crit = (cls.permissions.op('&&')(db.func.cast(valid_permissions, ARRAY(db.String))))
         else:

@@ -40,6 +40,7 @@ from indico.web.forms.colors import get_colors
 from indico.web.forms.fields.principals import serialize_principal
 from indico.web.forms.util import get_form_field_names
 from indico.web.util import jsonify_data, jsonify_form, jsonify_template
+import six
 
 
 def _get_session_list_args(event):
@@ -236,8 +237,8 @@ class RHManageSessionBlock(RHManageSessionBase):
         form = MeetingSessionBlockForm(obj=FormDefaults(**self._get_form_defaults()), event=self.event,
                                        session_block=self.session_block)
         if form.validate_on_submit():
-            session_data = {k[8:]: v for k, v in form.data.iteritems() if k in form.session_fields}
-            block_data = {k[6:]: v for k, v in form.data.iteritems() if k in form.block_fields}
+            session_data = {k[8:]: v for k, v in six.iteritems(form.data) if k in form.session_fields}
+            block_data = {k[6:]: v for k, v in six.iteritems(form.data) if k in form.block_fields}
             update_session(self.session, session_data)
             update_session_block(self.session_block, block_data)
             return jsonify_data(flash=False)

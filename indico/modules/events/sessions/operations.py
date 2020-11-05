@@ -18,6 +18,7 @@ from indico.modules.events.sessions import COORDINATOR_PRIV_SETTINGS, COORDINATO
 from indico.modules.events.sessions.models.blocks import SessionBlock
 from indico.modules.events.sessions.models.sessions import Session
 from indico.util.i18n import orig_string
+import six
 
 
 def create_session(event, data):
@@ -127,7 +128,7 @@ def delete_session_block(session_block):
 
 def update_session_coordinator_privs(event, data):
     changes = {}
-    for priv, enabled in data.iteritems():
+    for priv, enabled in six.iteritems(data):
         setting = COORDINATOR_PRIV_SETTINGS[priv]
         if session_settings.get(event, setting) == enabled:
             continue
@@ -136,6 +137,6 @@ def update_session_coordinator_privs(event, data):
     db.session.flush()
     logger.info('Session coordinator privs of event %r updated with %r by %r', event, data, session.user)
     if changes:
-        log_fields = {priv: orig_string(title) for priv, title in COORDINATOR_PRIV_TITLES.iteritems()}
+        log_fields = {priv: orig_string(title) for priv, title in six.iteritems(COORDINATOR_PRIV_TITLES)}
         event.log(EventLogRealm.management, EventLogKind.change, 'Sessions', 'Coordinator privileges updated',
                   session.user, data={'Changes': make_diff_log(changes, log_fields)})

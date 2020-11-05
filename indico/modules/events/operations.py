@@ -23,6 +23,8 @@ from indico.modules.events.logs.util import make_diff_log
 from indico.modules.events.models.events import EventType
 from indico.modules.events.models.labels import EventLabel
 from indico.modules.events.models.references import ReferenceType
+import six
+from six.moves import map
 
 
 def create_reference_type(data):
@@ -126,7 +128,7 @@ def create_event(category, event_type, data, add_creator_as_manager=True, featur
 
 
 def update_event(event, update_timetable=False, **data):
-    assert set(data.viewkeys()) <= {'title', 'description', 'url_shortcut', 'location_data', 'keywords',
+    assert set(six.viewkeys(data)) <= {'title', 'description', 'url_shortcut', 'location_data', 'keywords',
                                     'person_link_data', 'start_dt', 'end_dt', 'timezone', 'keywords', 'references',
                                     'organizer_info', 'additional_info', 'contact_title', 'contact_emails',
                                     'contact_phones', 'start_dt_override', 'end_dt_override', 'label', 'label_message',
@@ -214,11 +216,11 @@ def _log_event_update(event, changes, visible_person_link_changes=False):
         'keywords': 'Keywords',
         'references': {
             'title': 'External IDs',
-            'convert': lambda changes: [map(_format_ref, refs) for refs in changes]
+            'convert': lambda changes: [list(map(_format_ref, refs)) for refs in changes]
         },
         'person_links': {
             'title': 'Speakers' if event.type_ == EventType.lecture else 'Chairpersons',
-            'convert': lambda changes: [map(_format_person, persons) for persons in changes]
+            'convert': lambda changes: [list(map(_format_person, persons)) for persons in changes]
         },
         'start_dt': 'Start date',
         'end_dt': 'End date',
@@ -243,10 +245,10 @@ def _log_event_update(event, changes, visible_person_link_changes=False):
         # anyway and allow other code to act on them?
         changes.pop('person_links', None)
     if changes:
-        if set(changes.viewkeys()) <= {'timezone', 'start_dt', 'end_dt', 'start_dt_override', 'end_dt_override'}:
+        if set(six.viewkeys(changes)) <= {'timezone', 'start_dt', 'end_dt', 'start_dt_override', 'end_dt_override'}:
             what = 'Dates'
         elif len(changes) == 1:
-            what = log_fields[changes.keys()[0]]
+            what = log_fields[list(changes.keys())[0]]
             if isinstance(what, dict):
                 what = what['title']
         else:
@@ -284,7 +286,7 @@ def _split_location_changes(changes):
         changes['address'] = (location_changes[0]['address'], location_changes[1]['address'])
     venue_room_changes = (_get_venue_room_name(location_changes[0]), _get_venue_room_name(location_changes[1]))
     if venue_room_changes[0] != venue_room_changes[1]:
-        changes['venue_room'] = map(_format_location, venue_room_changes)
+        changes['venue_room'] = list(map(_format_location, venue_room_changes))
 
 
 def _format_person(data):
@@ -292,7 +294,7 @@ def _format_person(data):
 
 
 def update_event_protection(event, data):
-    assert set(data.viewkeys()) <= {'protection_mode', 'own_no_access_contact', 'access_key',
+    assert set(six.viewkeys(data)) <= {'protection_mode', 'own_no_access_contact', 'access_key',
                                     'visibility', 'public_regform_access'}
     changes = event.populate_from_dict(data)
     db.session.flush()
@@ -368,7 +370,7 @@ def sort_reviewing_questions(questions, new_positions):
     for index, new_position in enumerate(new_positions, 0):
         questions_by_id[new_position].position = index
         del questions_by_id[new_position]
-    for index, field in enumerate(sorted(questions_by_id.values(), key=attrgetter('position')), len(new_positions)):
+    for index, field in enumerate(sorted(list(questions_by_id.values()), key=attrgetter('position')), len(new_positions)):
         field.position = index
     db.session.flush()
     logger.info("Reviewing questions of %r reordered by %r", questions[0].event, session.user)

@@ -5,8 +5,10 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from itertools import izip_longest
+
 from types import GeneratorType
+import six
+from six.moves import zip_longest
 
 
 def values_from_signal(signal_response, single_value=False, skip_none=True, as_list=False,
@@ -39,7 +41,7 @@ def values_from_signal(signal_response, single_value=False, skip_none=True, as_l
         if not single_value and isinstance(value, multi_value_types):
             value_list = list(value)
             if value_list:
-                values.extend(izip_longest([plugin], value_list, fillvalue=plugin))
+                values.extend(zip_longest([plugin], value_list, fillvalue=plugin))
         else:
             values.append((plugin, value))
     if skip_none:
@@ -69,7 +71,7 @@ def named_objects_from_signal(signal_response, name_attr='name', plugin_attr=Non
     mapping = {getattr(cls, name_attr): cls for _, cls in objects}
     # check for two different objects having the same name, e.g. because of
     # two plugins using a too generic name for their object
-    conflicting = {cls for _, cls in objects} - set(mapping.viewvalues())
+    conflicting = {cls for _, cls in objects} - set(six.viewvalues(mapping))
     if conflicting:
         names = ', '.join(sorted(getattr(x, name_attr) for x in conflicting))
         raise RuntimeError('Non-unique object names: {}'.format(names))

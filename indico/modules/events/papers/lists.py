@@ -21,6 +21,8 @@ from indico.modules.events.util import ListGeneratorBase
 from indico.modules.users import User
 from indico.util.i18n import _
 from indico.web.flask.templating import get_template_module
+import six
+from six.moves import map
 
 
 class PaperListGeneratorBase(ListGeneratorBase):
@@ -39,11 +41,11 @@ class PaperListGeneratorBase(ListGeneratorBase):
         type_empty = {None: _('No type')}
         state_choices = OrderedDict((state.value, state.title) for state in PaperRevisionState)
         unassigned_choices = OrderedDict((role.value, role.title) for role in PaperReviewingRole)
-        track_choices = OrderedDict((unicode(t.id), t.title) for t in sorted(self.event.tracks,
+        track_choices = OrderedDict((six.text_type(t.id), t.title) for t in sorted(self.event.tracks,
                                                                              key=attrgetter('title')))
-        session_choices = OrderedDict((unicode(s.id), s.title) for s in sorted(self.event.sessions,
+        session_choices = OrderedDict((six.text_type(s.id), s.title) for s in sorted(self.event.sessions,
                                                                                key=attrgetter('title')))
-        type_choices = OrderedDict((unicode(t.id), t.name) for t in sorted(self.event.contribution_types,
+        type_choices = OrderedDict((six.text_type(t.id), t.name) for t in sorted(self.event.contribution_types,
                                                                            key=attrgetter('name')))
 
         if not event.cfp.content_reviewing_enabled:
@@ -53,13 +55,13 @@ class PaperListGeneratorBase(ListGeneratorBase):
 
         self.static_items = OrderedDict([
             ('state', {'title': _('State'),
-                       'filter_choices': OrderedDict(state_not_submitted.items() + state_choices.items())}),
+                       'filter_choices': OrderedDict(list(state_not_submitted.items()) + list(state_choices.items()))}),
             ('track', {'title': _('Track'),
-                       'filter_choices': OrderedDict(track_empty.items() + track_choices.items())}),
+                       'filter_choices': OrderedDict(list(track_empty.items()) + list(track_choices.items()))}),
             ('session', {'title': _('Session'),
-                         'filter_choices': OrderedDict(session_empty.items() + session_choices.items())}),
+                         'filter_choices': OrderedDict(list(session_empty.items()) + list(session_choices.items()))}),
             ('type', {'title': _('Type'),
-                      'filter_choices': OrderedDict(type_empty.items() + type_choices.items())}),
+                      'filter_choices': OrderedDict(list(type_empty.items()) + list(type_choices.items()))}),
             ('unassigned', {'title': _('Unassigned'), 'filter_choices': unassigned_choices}),
         ])
         self.list_config = self._get_config()
@@ -103,7 +105,7 @@ class PaperListGeneratorBase(ListGeneratorBase):
                 PaperReviewingRole.content_reviewer.value: Contribution.paper_content_reviewers,
                 PaperReviewingRole.layout_reviewer.value: Contribution.paper_layout_reviewers,
             }
-            filtered_roles = map(PaperReviewingRole, map(int, filters['items']['unassigned']))
+            filtered_roles = list(map(PaperReviewingRole, list(map(int, filters['items']['unassigned']))))
             unassigned_criteria = [~role_map[role.value].any() for role in filtered_roles
                                    if (role == PaperReviewingRole.judge or
                                        self.event.cfp.get_reviewing_state(role.review_type))]
@@ -113,7 +115,7 @@ class PaperListGeneratorBase(ListGeneratorBase):
         filter_cols = {'track': Contribution.track_id,
                        'session': Contribution.session_id,
                        'type': Contribution.type_id}
-        for key, column in filter_cols.iteritems():
+        for key, column in six.iteritems(filter_cols):
             ids = set(filters['items'].get(key, ()))
             if not ids:
                 continue

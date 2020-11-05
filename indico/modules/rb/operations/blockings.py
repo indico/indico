@@ -23,6 +23,7 @@ from indico.modules.rb.models.rooms import Room
 from indico.modules.rb.notifications.blockings import notify_request
 from indico.modules.rb.operations.rooms import get_managed_room_ids
 from indico.util.struct.iterables import group_list
+import six
 
 
 def get_room_blockings(timeframe=None, created_by=None, in_rooms_owned_by=None):
@@ -122,7 +123,7 @@ def _approve_or_request_rooms(blocking, blocked_rooms=None):
         else:
             # TODO: notify all managers of a room?
             rooms_by_owner[blocked_room.room.owner].append(blocked_room)
-    for owner, rooms in rooms_by_owner.iteritems():
+    for owner, rooms in six.iteritems(rooms_by_owner):
         notify_request(owner, blocking, rooms)
 
 

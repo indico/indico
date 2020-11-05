@@ -44,6 +44,7 @@ from indico.util.spreadsheets import send_csv, send_xlsx
 from indico.web.args import use_args, use_kwargs
 from indico.web.flask.util import url_for
 from indico.web.util import ExpectedError
+import six
 
 
 NUM_SUGGESTIONS = 5
@@ -72,7 +73,7 @@ class RHTimeline(RHRoomBookingBase):
         date_range, availability = get_rooms_availability(rooms, **kwargs)
         date_range = [dt.isoformat() for dt in date_range]
 
-        for data in availability.viewvalues():
+        for data in six.viewvalues(availability):
             # add additional helpful attributes
             data.update({
                 'num_days_available': len(date_range) - len(data['conflicts']),
@@ -84,7 +85,7 @@ class RHTimeline(RHRoomBookingBase):
             availability = serialized[self.room.id]
         else:
             # keep order of original room id list
-            availability = sorted(serialized.items(), key=lambda x: room_ids.index(x[0]))
+            availability = sorted(list(serialized.items()), key=lambda x: room_ids.index(x[0]))
         return jsonify(availability=availability, date_range=date_range)
 
 
@@ -103,7 +104,7 @@ class RHCalendar(RHRoomBookingBase):
             end_date = start_date
         calendar = get_room_calendar(start_date, end_date, room_ids, booked_for_user=booked_for_user,
                                      include_inactive=show_inactive, text=text)
-        return jsonify(serialize_availability(calendar).values())
+        return jsonify(list(serialize_availability(calendar).values()))
 
 
 class RHActiveBookings(RHRoomBookingBase):
@@ -176,7 +177,7 @@ class RHCreateBooking(RHRoomBookingBase):
             db.session.flush()
         except NoReportError as e:
             db.session.rollback()
-            raise ExpectedError(unicode(e))
+            raise ExpectedError(six.text_type(e))
 
         serialized_occurrences = serialize_occurrences(group_by_occurrence_date(resv.occurrences.all()))
         if self.prebook:
@@ -318,7 +319,7 @@ class RHUpdateBooking(RHBookingBase):
         today = date.today()
         calendar = get_room_calendar(args['start_dt'] or today, args['end_dt'] or today, [args['room_id']])
         return jsonify(booking=dict(serialize_booking_details(self.booking), **additional_booking_attrs),
-                       room_calendar=serialize_availability(calendar).values())
+                       room_calendar=list(serialize_availability(calendar).values()))
 
 
 class RHMyUpcomingBookings(RHRoomBookingBase):
@@ -397,7 +398,7 @@ class RHBookingExport(RHRoomBookingBase):
                                                 'start_dt', datetime.combine(start_date, time()),
                                                 'end_dt', datetime.combine(end_date, time.max)))).all()
 
-        token = unicode(uuid.uuid4())
+        token = six.text_type(uuid.uuid4())
         headers, rows = generate_spreadsheet_from_occurrences(occurrences)
         _export_cache.set(token, {'headers': headers, 'rows': rows}, time=1800)
         download_url = url_for('rb.export_bookings_file', format=format, token=token)

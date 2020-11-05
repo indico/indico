@@ -16,6 +16,7 @@ from markupsafe import Markup, escape
 from indico.core import signals
 from indico.util.decorators import classproperty
 from indico.util.signals import named_objects_from_signal
+import six
 
 
 class Placeholder(object):
@@ -189,7 +190,7 @@ def replace_placeholders(context, text, escape_html=True, **kwargs):
     :param escape_html: whether HTML escaping should be done
     :param kwargs: arguments specific to the context
     """
-    for placeholder in get_placeholders(context, **kwargs).viewvalues():
+    for placeholder in six.viewvalues(get_placeholders(context, **kwargs)):
         text = placeholder.replace(text, escape_html=escape_html, **kwargs)
     return text
 
@@ -203,7 +204,7 @@ def get_empty_placeholders(context, text, **kwargs):
     """
     return set(
         placeholder.friendly_name
-        for placeholder in get_placeholders(context, **kwargs).viewvalues()
+        for placeholder in six.viewvalues(get_placeholders(context, **kwargs))
         if placeholder.is_in(text, **kwargs) and placeholder.is_empty(text, **kwargs)
     )
 
@@ -215,7 +216,7 @@ def get_missing_placeholders(context, text, **kwargs):
     :param text: the text to check
     :param kwargs: arguments specific to the context
     """
-    placeholders = {p for p in get_placeholders(context, **kwargs).itervalues() if p.required}
+    placeholders = {p for p in six.itervalues(get_placeholders(context, **kwargs)) if p.required}
     return {p.friendly_name for p in placeholders if not p.is_in(text, **kwargs)}
 
 
@@ -225,6 +226,6 @@ def render_placeholder_info(context, **kwargs):
     :param context: the context where the placeholders are used
     :param kwargs: arguments specific to the context
     """
-    placeholders = sorted(get_placeholders(context, **kwargs).values(), key=attrgetter('name'))
+    placeholders = sorted(list(get_placeholders(context, **kwargs).values()), key=attrgetter('name'))
     return Markup(render_template('placeholder_info.html', placeholder_kwargs=kwargs, placeholders=placeholders,
                                   ParametrizedPlaceholder=ParametrizedPlaceholder))

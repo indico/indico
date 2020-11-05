@@ -16,6 +16,7 @@ from sqlalchemy import inspect
 from werkzeug.utils import cached_property
 
 from indico.core.db import db
+import six
 
 
 class SettingConverter(object):
@@ -92,7 +93,7 @@ class ModelConverter(SettingConverter):
 
     @cached_property
     def model(self):
-        model = getattr(db.m, self._model) if isinstance(self._model, basestring) else self._model
+        model = getattr(db.m, self._model) if isinstance(self._model, six.string_types) else self._model
         assert len(inspect(model).primary_key) == 1
         return model
 
@@ -125,7 +126,7 @@ class ModelListConverter(SettingConverter):
 
     @cached_property
     def model(self):
-        if isinstance(self._model, basestring):
+        if isinstance(self._model, six.string_types):
             return getattr(db.m, self._model)
         return self._model
 
@@ -150,7 +151,7 @@ class ModelListConverter(SettingConverter):
 class OrderedDictConverter(SettingConverter):
     @staticmethod
     def from_python(value):
-        return value.items()
+        return list(value.items())
 
     @staticmethod
     def to_python(value):

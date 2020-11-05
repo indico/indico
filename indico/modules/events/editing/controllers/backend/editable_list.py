@@ -30,6 +30,7 @@ from indico.util.i18n import _
 from indico.util.marshmallow import Principal
 from indico.web.args import use_kwargs
 from indico.web.flask.util import url_for
+import six
 
 
 archive_cache = GenericCache('editables-archive')
@@ -52,7 +53,7 @@ class RHEditableList(RHEditableTypeEditorBase):
 
 class RHPrepareEditablesArchive(RHEditablesBase):
     def _process(self):
-        key = unicode(uuid.uuid4())
+        key = six.text_type(uuid.uuid4())
         data = [editable.id for editable in self.editables]
         archive_cache.set(key, data, time=1800)
         download_url = url_for('.download_archive', self.event, type=self.editable_type.name, uuid=key)
@@ -61,7 +62,7 @@ class RHPrepareEditablesArchive(RHEditablesBase):
 
 class RHDownloadArchive(RHEditableTypeManagementBase):
     def _process(self):
-        editable_ids = archive_cache.get(unicode(request.view_args['uuid']), [])
+        editable_ids = archive_cache.get(six.text_type(request.view_args['uuid']), [])
         editables = Editable.query.filter(Editable.id.in_(editable_ids)).all()
         return generate_editables_zip(editables)
 

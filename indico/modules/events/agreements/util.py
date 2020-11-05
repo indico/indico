@@ -12,6 +12,7 @@ from indico.core.db import db
 from indico.modules.events.agreements.models.agreements import Agreement
 from indico.modules.events.agreements.notifications import notify_agreement_new
 from indico.util.signals import named_objects_from_signal
+import six
 
 
 def get_agreement_definitions():
@@ -29,7 +30,7 @@ def send_new_agreements(event, name, people, email_body, cc_addresses, from_addr
     :param from_address: Email address of the sender
     """
     agreements = []
-    for person in people.itervalues():
+    for person in six.itervalues(people):
         agreement = Agreement.create_from_data(event=event, type_=name, person=person)
         db.session.add(agreement)
         agreements.append(agreement)

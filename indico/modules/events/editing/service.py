@@ -26,6 +26,8 @@ from indico.modules.users import User
 from indico.util.caching import memoize_redis
 from indico.util.i18n import _
 from indico.web.flask.util import url_for
+from six.moves import map
+import six
 
 
 class ServiceRequestFailed(Exception):
@@ -37,7 +39,7 @@ class ServiceRequestFailed(Exception):
             except (ValueError, KeyError):
                 # not json or not error field
                 error = None
-        super(ServiceRequestFailed, self).__init__(error or unicode(exc))
+        super(ServiceRequestFailed, self).__init__(error or six.text_type(exc))
 
 
 @memoize_redis(30)
@@ -51,7 +53,7 @@ def check_service_url(url):
     except requests.ConnectionError as exc:
         return {'info': None, 'error': _('Connection failed')}
     except requests.RequestException as exc:
-        return {'info': None, 'error': unicode(ServiceRequestFailed(exc))}
+        return {'info': None, 'error': six.text_type(ServiceRequestFailed(exc))}
     if not all(x in info for x in ('name', 'version')):
         return {'error': _('Invalid response')}
     return {'error': None, 'info': info}
@@ -130,7 +132,7 @@ def service_get_status(event):
     except requests.ConnectionError as exc:
         return {'status': None, 'error': _('Connection failed')}
     except requests.RequestException as exc:
-        return {'status': None, 'error': unicode(ServiceRequestFailed(exc))}
+        return {'status': None, 'error': six.text_type(ServiceRequestFailed(exc))}
     return {'status': resp.json(), 'error': None}
 
 
@@ -179,7 +181,7 @@ def service_handle_review_editable(editable, user, action, parent_revision, revi
             parent_revision.comment = resp['comment']
         if 'tags' in resp:
             parent_revision.tags = {tag for tag in editable.event.editing_tags
-                                    if tag.id in map(int, resp['tags'])}
+                                    if tag.id in list(map(int, resp['tags']))}
         for comment in resp.get('comments', []):
             create_revision_comment(new_revision, User.get_system_user(), comment['text'], internal=comment['internal'])
 
@@ -238,7 +240,7 @@ def service_handle_custom_action(editable, revision, user, action):
         elif publish is False:
             revision.editable.published_revision = None
     if 'tags' in resp:
-        revision.tags = {tag for tag in editable.event.editing_tags if tag.id in map(int, resp['tags'])}
+        revision.tags = {tag for tag in editable.event.editing_tags if tag.id in list(map(int, resp['tags']))}
     for comment in resp.get('comments', []):
         create_revision_comment(revision, User.get_system_user(), comment['text'], internal=comment['internal'])
     db.session.flush()

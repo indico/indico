@@ -31,6 +31,7 @@ from indico.modules.events.tracks.models.tracks import Track
 from indico.util.i18n import _
 from indico.web.flask.templating import get_template_module
 from indico.web.util import _pop_injected_js, jsonify_data, jsonify_template
+from six.moves import map
 
 
 class RHListOtherAbstracts(RHAbstractsBase):
@@ -258,7 +259,7 @@ class RHDisplayAbstractsActionsBase(RHDisplayAbstractListBase):
 
     def _process_args(self):
         RHDisplayAbstractListBase._process_args(self)
-        ids = map(int, request.form.getlist('abstract_id'))
+        ids = list(map(int, request.form.getlist('abstract_id')))
         self.abstracts = Abstract.query.with_parent(self.track, 'abstracts_reviewed').filter(Abstract.id.in_(ids)).all()
 
 

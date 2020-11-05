@@ -13,12 +13,13 @@ from indico.core.plugins import plugin_engine
 from indico.modules.events import Event
 from indico.modules.events.sessions.models.blocks import SessionBlock
 from indico.util.i18n import _
+import six
 
 
 def get_vc_plugins():
     """Return a dict containing the available videoconference plugins."""
     from indico.modules.vc import VCPluginMixin
-    return {p.service_name: p for p in plugin_engine.get_active_plugins().itervalues() if isinstance(p, VCPluginMixin)}
+    return {p.service_name: p for p in six.itervalues(plugin_engine.get_active_plugins()) if isinstance(p, VCPluginMixin)}
 
 
 def resolve_title(obj):
@@ -35,7 +36,7 @@ def get_linked_to_description(obj):
 
 def get_managed_vc_plugins(user):
     """Return the plugins the user can manage."""
-    return [p for p in get_vc_plugins().itervalues() if p.can_manage_vc(user)]
+    return [p for p in six.itervalues(get_vc_plugins()) if p.can_manage_vc(user)]
 
 
 def find_event_vc_rooms(from_dt=None, to_dt=None, distinct=False):

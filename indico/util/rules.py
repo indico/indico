@@ -10,6 +10,7 @@ from __future__ import unicode_literals
 from indico.core import signals
 from indico.util.decorators import classproperty
 from indico.util.signals import named_objects_from_signal
+import six
 
 
 class Condition(object):
@@ -64,7 +65,7 @@ class Condition(object):
 
     @classmethod
     def _clean_values(cls, values, **kwargs):
-        return list(cls.get_available_values(**kwargs).viewkeys() & set(values))
+        return list(six.viewkeys(cls.get_available_values(**kwargs)) & set(values))
 
     @classmethod
     def check(cls, values, **kwargs):
@@ -100,7 +101,7 @@ def check_rule(context, rule, **kwargs):
     :param rule: the rule to check
     :param kwargs: arguments specific to the context
     """
-    for name, condition in get_conditions(context, **kwargs).iteritems():
+    for name, condition in six.iteritems(get_conditions(context, **kwargs)):
         if not condition.is_used(rule):
             if condition.required:
                 return False
@@ -122,5 +123,5 @@ def get_missing_conditions(context, rule, **kwargs):
     :param rule: the rule to check
     :param kwargs: arguments specific to the context
     """
-    rules = {condition for condition in get_conditions(context, **kwargs).itervalues() if condition.required}
+    rules = {condition for condition in six.itervalues(get_conditions(context, **kwargs)) if condition.required}
     return {condition.friendly_name for condition in rules if not condition.is_used(rule)}

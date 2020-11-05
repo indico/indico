@@ -124,7 +124,7 @@ class InvitationForm(IndicoForm):
     def __init__(self, *args, **kwargs):
         event = kwargs.pop('event')
         super(InvitationForm, self).__init__(*args, **kwargs)
-        self.from_address.choices = event.get_allowed_sender_emails().items()
+        self.from_address.choices = list(event.get_allowed_sender_emails().items())
         self.body.description = render_placeholder_info('survey-link-email', event=None, survey=None)
 
     def is_submitted(self):

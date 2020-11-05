@@ -25,6 +25,7 @@ from indico.core.config import config
 from indico.util.caching import memoize
 from indico.util.locators import get_locator
 from indico.web.util import jsonify_data
+import six
 
 
 def discover_blueprints():
@@ -115,7 +116,7 @@ def make_compat_redirect_func(blueprint, endpoint, view_func=None, view_args_con
         # This is necessary since passing a list for an URL path argument breaks things.
         view_args.update((k, v[0] if len(v) == 1 else v) for k, v in request.args.iterlists())
         if view_args_conv is not None:
-            for oldkey, newkey in view_args_conv.iteritems():
+            for oldkey, newkey in six.iteritems(view_args_conv):
                 value = view_args.pop(oldkey, None)
                 if newkey is not None:
                     view_args[newkey] = value
@@ -145,12 +146,12 @@ def url_for(endpoint, *targets, **values):
         for target in targets:
             if target:  # don't fail on None or mako's Undefined
                 locator.update(get_locator(target))
-        intersection = set(locator.iterkeys()) & set(values.iterkeys())
+        intersection = set(six.iterkeys(locator)) & set(six.iterkeys(values))
         if intersection:
             raise ValueError('url_for kwargs collide with locator: %s' % ', '.join(intersection))
         values.update(locator)
 
-    for key, value in values.iteritems():
+    for key, value in six.iteritems(values):
         # Avoid =True and =False in the URL
         if isinstance(value, bool):
             values[key] = int(value)
@@ -203,7 +204,7 @@ def url_rule_to_js(endpoint):
                     } for is_dynamic, data in rule._trace
                 ],
                 'converters': dict((key, type(converter).__name__)
-                                   for key, converter in rule._converters.iteritems()
+                                   for key, converter in six.iteritems(rule._converters)
                                    if not isinstance(converter, UnicodeConverter))
             } for rule in current_app.url_map.iter_rules(endpoint)
         ]
@@ -350,7 +351,7 @@ class XAccelMiddleware(object):
 
     def __init__(self, app, mapping):
         self.app = app
-        self.mapping = [(str(k), str(v)) for k, v in mapping.iteritems()]
+        self.mapping = [(str(k), str(v)) for k, v in six.iteritems(mapping)]
 
     def __call__(self, environ, start_response):
         def _start_response(status, headers, exc_info=None):

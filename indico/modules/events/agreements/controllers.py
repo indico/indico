@@ -29,6 +29,7 @@ from indico.util.i18n import _
 from indico.web.flask.util import send_file, url_for
 from indico.web.forms.base import FormDefaults
 from indico.web.views import WPJinjaMixin
+import six
 
 
 class RHAgreementManagerBase(RHManageEventBase):
@@ -88,7 +89,7 @@ class RHAgreementManager(RHAgreementManagerBase):
     """Agreements types page (admin)."""
 
     def _process(self):
-        definitions = get_agreement_definitions().values()
+        definitions = list(get_agreement_definitions().values())
         return WPAgreementManager.render_template('agreement_types.html', self.event, definitions=definitions)
 
 
@@ -152,7 +153,7 @@ class RHAgreementManagerDetailsSend(RHAgreementManagerDetailsEmailBase):
 
     def _get_people(self):
         identifiers = set(request.form.getlist('references'))
-        return {k: v for k, v in self.definition.get_people_not_notified(self.event).iteritems()
+        return {k: v for k, v in six.iteritems(self.definition.get_people_not_notified(self.event))
                 if v.email and v.identifier in identifiers}
 
     def _success_handler(self, form):
@@ -184,7 +185,7 @@ class RHAgreementManagerDetailsSendAll(RHAgreementManagerDetailsSend):
     dialog_template = 'events/agreements/dialogs/agreement_email_form_send_all.html'
 
     def _get_people(self):
-        return {k: v for k, v in self.definition.get_people_not_notified(self.event).iteritems() if v.email}
+        return {k: v for k, v in six.iteritems(self.definition.get_people_not_notified(self.event)) if v.email}
 
 
 class RHAgreementManagerDetailsRemindAll(RHAgreementManagerDetailsRemind):

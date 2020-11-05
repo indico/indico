@@ -35,6 +35,7 @@ from indico.util.i18n import _
 from indico.util.serializer import Serializer
 from indico.util.string import format_repr, natural_sort_key, return_ascii
 from indico.web.flask.util import url_for
+from six.moves import zip
 
 
 _cache = GenericCache('Rooms')

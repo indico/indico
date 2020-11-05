@@ -16,6 +16,7 @@ from indico.core.db import db
 from indico.modules.events import Event
 from indico.modules.events.features import features_event_settings
 from indico.util.signals import named_objects_from_signal
+import six
 
 
 def get_feature_definitions():
@@ -39,7 +40,7 @@ def get_enabled_features(event, only_explicit=False):
     elif only_explicit:
         return set()
     else:
-        return {name for name, feature in get_feature_definitions().iteritems() if feature.is_default_for_event(event)}
+        return {name for name, feature in six.iteritems(get_feature_definitions()) if feature.is_default_for_event(event)}
 
 
 def set_feature_enabled(event, name, state):
@@ -81,7 +82,7 @@ def get_disallowed_features(event):
     for an event.
     """
     disallowed = {feature
-                  for feature in get_feature_definitions().itervalues()
+                  for feature in six.itervalues(get_feature_definitions())
                   if not feature.is_allowed_for_event(event)}
     indirectly_disallowed = set(chain.from_iterable(feature.required_by_deep for feature in disallowed))
     return indirectly_disallowed | {f.name for f in disallowed}
@@ -98,7 +99,7 @@ def is_feature_enabled(event, name):
     if enabled_features is not None:
         return feature.name in enabled_features
     else:
-        if isinstance(event, (basestring, int, long)):
+        if isinstance(event, (six.string_types, int, int)):
             event = Event.get(event)
         return event and feature.is_default_for_event(event)
 
@@ -115,6 +116,6 @@ def require_feature(event, name):
 
 
 def format_feature_names(names):
-    return ', '.join(sorted(unicode(f.friendly_name)
-                            for f in get_feature_definitions().itervalues()
+    return ', '.join(sorted(six.text_type(f.friendly_name)
+                            for f in six.itervalues(get_feature_definitions())
                             if f.name in names))

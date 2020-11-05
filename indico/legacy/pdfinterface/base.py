@@ -29,6 +29,7 @@ from reportlab.platypus.frames import Frame
 from indico.legacy.common.utils import isStringHTML
 from indico.util.i18n import _
 from indico.util.string import sanitize_for_platypus, to_unicode
+from six.moves import range
 
 
 ratio = math.sqrt(math.sqrt(2.0))

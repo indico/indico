@@ -20,6 +20,7 @@ from indico.modules.rb.models.rooms import Room
 from indico.modules.rb.util import TempReservationConcurrentOccurrence, TempReservationOccurrence, rb_is_admin
 from indico.util.date_time import get_overlap
 from indico.util.struct.iterables import group_list
+import six
 
 
 def get_rooms_conflicts(rooms, start_dt, end_dt, repeat_frequency, repeat_interval, blocked_rooms,
@@ -46,23 +47,23 @@ def get_rooms_conflicts(rooms, start_dt, end_dt, repeat_frequency, repeat_interv
         query = query.filter(ReservationOccurrence.start_dt > datetime.now())
 
     overlapping_occurrences = group_list(query, key=lambda obj: obj.reservation.room.id)
-    for room_id, occurrences in overlapping_occurrences.iteritems():
+    for room_id, occurrences in six.iteritems(overlapping_occurrences):
         conflicts = get_room_bookings_conflicts(candidates, occurrences, skip_conflicts_with)
         rooms_conflicts[room_id], rooms_pre_conflicts[room_id], rooms_conflicting_candidates[room_id] = conflicts
-    for room_id, occurrences in blocked_rooms.iteritems():
+    for room_id, occurrences in six.iteritems(blocked_rooms):
         conflicts, conflicting_candidates = get_room_blockings_conflicts(room_id, candidates, occurrences)
         rooms_conflicts[room_id] |= conflicts
         rooms_conflicting_candidates[room_id] |= conflicting_candidates
 
     if not (allow_admin and rb_is_admin(session.user)):
-        for room_id, occurrences in nonbookable_periods.iteritems():
+        for room_id, occurrences in six.iteritems(nonbookable_periods):
             room = Room.get_or_404(room_id)
             if not room.can_override(session.user, allow_admin=allow_admin):
                 conflicts, conflicting_candidates = get_room_nonbookable_periods_conflicts(candidates, occurrences)
                 rooms_conflicts[room_id] |= conflicts
                 rooms_conflicting_candidates[room_id] |= conflicting_candidates
 
-        for room_id, occurrences in unbookable_hours.iteritems():
+        for room_id, occurrences in six.iteritems(unbookable_hours):
             room = Room.get_or_404(room_id)
             if not room.can_override(session.user, allow_admin=allow_admin):
                 conflicts, conflicting_candidates = get_room_unbookable_hours_conflicts(candidates, occurrences)

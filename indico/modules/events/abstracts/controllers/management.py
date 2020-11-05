@@ -39,6 +39,7 @@ from indico.util.user import principal_from_identifier
 from indico.web.flask.util import url_for
 from indico.web.forms.base import FormDefaults
 from indico.web.util import jsonify_data, jsonify_form, jsonify_template
+from six.moves import map
 
 
 class RHAbstractsDashboard(RHManageAbstractsBase):
@@ -263,6 +264,6 @@ class RHDeleteAbstractReviewingQuestion(RHReviewingQuestionBase):
 
 class RHSortReviewingQuestions(RHManageAbstractsBase):
     def _process(self):
-        question_ids = map(int, request.form.getlist('field_ids'))
+        question_ids = list(map(int, request.form.getlist('field_ids')))
         sort_reviewing_questions(self.event.abstract_review_questions, question_ids)
         return jsonify_data(flash=False)

@@ -31,6 +31,8 @@ from indico.modules.events.util import set_custom_fields
 from indico.util.date_time import now_utc
 from indico.util.fs import secure_client_filename
 from indico.util.i18n import orig_string
+import six
+from six.moves import map
 
 
 def _update_tracks(abstract, tracks, only_reviewed_for=False):
@@ -96,7 +98,7 @@ def create_abstract(event, abstract_data, custom_fields_data=None, send_notifica
                     is_invited=False):
     abstract = Abstract(event=event, submitter=submitter or session.user)
     if is_invited:
-        abstract.uuid = unicode(uuid4())
+        abstract.uuid = six.text_type(uuid4())
         abstract.state = AbstractState.invited
     tracks = abstract_data.pop('submitted_for_tracks', None)
     attachments = abstract_data.pop('attachments', None)
@@ -152,7 +154,7 @@ def update_abstract(abstract, abstract_data, custom_fields_data=None):
             'convert': lambda change: [t.name if t else None for t in change]
         }
     }
-    for field_name, change in changes.iteritems():
+    for field_name, change in six.iteritems(changes):
         # we skip skip None -> '' changes (editing an abstract that
         # did not have a value for a new field yet without filling
         # it out)
@@ -164,7 +166,7 @@ def update_abstract(abstract, abstract_data, custom_fields_data=None):
         log_fields[field_name] = {
             'title': field.title,
             'type': field_impl.log_type,
-            'convert': lambda change, field_impl=field_impl: map(field_impl.get_friendly_value, change)
+            'convert': lambda change, field_impl=field_impl: list(map(field_impl.get_friendly_value, change))
         }
     abstract.log(EventLogRealm.reviewing, EventLogKind.change, 'Abstracts',
                  'Abstract {} modified'.format(abstract.verbose_title), session.user,

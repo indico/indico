@@ -62,6 +62,8 @@ from indico.web.flask.util import send_file, url_for
 from indico.web.forms.base import FormDefaults
 from indico.web.forms.fields.principals import serialize_principal
 from indico.web.util import jsonify_data, jsonify_form, jsonify_template
+import six
+from six.moves import map
 
 
 export_list_cache = GenericCache('export-list')
@@ -249,7 +251,7 @@ class RHContributionREST(RHManageContributionBase):
     def _process_PATCH(self):
         data = request.json
         updates = {}
-        if set(data.viewkeys()) > {'session_id', 'track_id'}:
+        if set(six.viewkeys(data)) > {'session_id', 'track_id'}:
             raise BadRequest
         if 'session_id' in data:
             updates.update(self._get_contribution_session_updates(data['session_id']))
@@ -379,7 +381,7 @@ class RHDeleteSubContributions(RHManageSubContributionsActionsBase):
 
 class RHSortSubContributions(RHManageContributionBase):
     def _process(self):
-        subcontrib_ids = map(int, request.form.getlist('subcontrib_ids'))
+        subcontrib_ids = list(map(int, request.form.getlist('subcontrib_ids')))
         subcontribs = {s.id: s for s in self.contrib.subcontributions}
         for position, subcontrib_id in enumerate(subcontrib_ids, 1):
             if subcontrib_id in subcontribs:
@@ -478,11 +480,11 @@ class RHContributionExportTexConfig(RHManageContributionsExportActionsBase):
 
     def _process(self):
         form = ContributionExportTeXForm(contribs=self.contribs)
-        form.format.choices = [(k, v[0]) for k, v in get_boa_export_formats().viewitems()]
+        form.format.choices = [(k, v[0]) for k, v in six.viewitems(get_boa_export_formats())]
         if form.validate_on_submit():
             data = form.data
             data.pop('submitted', None)
-            key = unicode(uuid.uuid4())
+            key = six.text_type(uuid.uuid4())
             export_list_cache.set(key, data, time=1800)
             download_url = url_for('.contributions_tex_export_book', self.event, uuid=key)
             return jsonify_data(flash=False, redirect=download_url, redirect_no_loading=True)
@@ -624,7 +626,7 @@ class RHManageContributionFields(RHManageContributionsBase):
 
     def _process(self):
         custom_fields = self.event.contribution_fields.order_by(ContributionField.position)
-        custom_field_types = sorted(get_contrib_field_types().values(), key=attrgetter('friendly_name'))
+        custom_field_types = sorted(list(get_contrib_field_types().values()), key=attrgetter('friendly_name'))
         return jsonify_template('events/contributions/management/fields_dialog.html', event=self.event,
                                 custom_fields=custom_fields, custom_field_types=custom_field_types)
 
@@ -634,11 +636,11 @@ class RHSortContributionFields(RHManageContributionsBase):
 
     def _process(self):
         field_by_id = {field.id: field for field in self.event.contribution_fields}
-        field_ids = map(int, request.form.getlist('field_ids'))
+        field_ids = list(map(int, request.form.getlist('field_ids')))
         for index, field_id in enumerate(field_ids, 0):
             field_by_id[field_id].position = index
             del field_by_id[field_id]
-        for index, field in enumerate(sorted(field_by_id.values(), key=attrgetter('position')), len(field_ids)):
+        for index, field in enumerate(sorted(list(field_by_id.values()), key=attrgetter('position')), len(field_ids)):
             field.position = index
         db.session.flush()
         self.event.log(EventLogRealm.management, EventLogKind.change, 'Contributions',

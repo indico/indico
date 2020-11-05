@@ -17,6 +17,7 @@ from indico.core.db import db
 from indico.core.db.sqlalchemy import PyIPNetwork
 from indico.core.db.sqlalchemy.principals import PrincipalType
 from indico.util.string import format_repr, return_ascii
+import six
 
 
 class IPNetworkGroup(db.Model):
@@ -90,7 +91,7 @@ class IPNetworkGroup(db.Model):
             return False
         if session.user != user:
             return False
-        return self.contains_ip(unicode(request.remote_addr))
+        return self.contains_ip(six.text_type(request.remote_addr))
 
     def contains_ip(self, ip):
         ip = ip_address(ip)

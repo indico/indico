@@ -17,6 +17,8 @@ from indico.util.i18n import _
 from indico.util.string import sanitize_email, validate_email
 from indico.web.forms.fields.util import is_preprocessed_formdata
 from indico.web.forms.widgets import HiddenInputs, JinjaWidget, PasswordWidget
+from six.moves import map
+import six
 
 
 class IndicoSelectMultipleCheckboxField(SelectMultipleField):
@@ -105,7 +107,7 @@ class TextListField(TextAreaField):
 class EmailListField(TextListField):
     def process_formdata(self, valuelist):
         super(EmailListField, self).process_formdata(valuelist)
-        self.data = map(sanitize_email, self.data)
+        self.data = list(map(sanitize_email, self.data))
 
     def _validate_item(self, line):
         if not validate_email(line):
@@ -132,7 +134,7 @@ class IndicoStaticTextField(Field):
         super(IndicoStaticTextField, self).__init__(*args, **kwargs)
 
     def process_data(self, data):
-        self.text_value = self.data = unicode(data)
+        self.text_value = self.data = six.text_type(data)
 
     def _value(self):
         return self.text_value
@@ -142,7 +144,7 @@ class IndicoEmailRecipientsField(Field):
     widget = JinjaWidget('forms/email_recipients_widget.html', single_kwargs=True)
 
     def process_data(self, data):
-        self.data = sorted(data, key=unicode.lower)
+        self.data = sorted(data, key=six.text_type.lower)
         self.text_value = ', '.join(data)
         self.count = len(data)
 

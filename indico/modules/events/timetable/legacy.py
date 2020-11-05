@@ -19,6 +19,8 @@ from indico.modules.events.models.events import EventType
 from indico.modules.events.timetable.models.entries import TimetableEntry, TimetableEntryType
 from indico.util.date_time import iterdays
 from indico.web.flask.util import url_for
+from six.moves import map
+import six
 
 
 class TimetableSerializer(object):
@@ -160,11 +162,11 @@ class TimetableSerializer(object):
                      'description': contribution.description,
                      'duration': contribution.duration.seconds / 60,
                      'pdf': url_for('contributions.export_pdf', entry.contribution),
-                     'presenters': map(self._get_person_data,
+                     'presenters': list(map(self._get_person_data,
                                        sorted([p for p in contribution.person_links if p.is_speaker],
                                               key=lambda x: (x.author_type != AuthorType.primary,
                                                              x.author_type != AuthorType.secondary,
-                                                             x.display_order_key))),
+                                                             x.display_order_key)))),
                      'sessionCode': block.session.code if block else None,
                      'sessionId': block.session_id if block else None,
                      'sessionSlotId': block.id if block else None,
@@ -172,7 +174,7 @@ class TimetableSerializer(object):
                      'title': contribution.title,
                      'url': url_for('contributions.display_contribution', contribution),
                      'friendlyId': contribution.friendly_id,
-                     'references': map(SerializerBase.serialize_reference, contribution.references),
+                     'references': list(map(SerializerBase.serialize_reference, contribution.references)),
                      'board_number': contribution.board_number})
         return data
 
@@ -208,12 +210,12 @@ class TimetableSerializer(object):
                     '_type': 'AttachmentFolder',
                     '_fossil': 'folder',
                     'title': folder.title,
-                    'attachments': map(serialize_attachment, folder.attachments)}
+                    'attachments': list(map(serialize_attachment, folder.attachments))}
 
         data = {'files': [], 'folders': []}
         items = obj.attached_items
-        data['files'] = map(serialize_attachment, items.get('files', []))
-        data['folders'] = map(serialize_folder, items.get('folders', []))
+        data['files'] = list(map(serialize_attachment, items.get('files', [])))
+        data['folders'] = list(map(serialize_folder, items.get('folders', [])))
         if not data['files'] and not data['folders']:
             data['files'] = None
         return data
@@ -312,7 +314,7 @@ def serialize_entry_update(entry, session_=None):
 
 def serialize_event_info(event):
     return {'_type': 'Conference',
-            'id': unicode(event.id),
+            'id': six.text_type(event.id),
             'title': event.title,
             'startDate': event.start_dt_local,
             'endDate': event.end_dt_local,

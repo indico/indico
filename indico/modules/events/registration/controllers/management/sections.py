@@ -16,6 +16,8 @@ from indico.modules.events.registration.controllers.management import RHManageRe
 from indico.modules.events.registration.models.items import RegistrationFormItemType, RegistrationFormSection
 from indico.modules.events.registration.util import update_regform_item_positions
 from indico.web.util import jsonify_data
+import six
+from six.moves import filter
 
 
 class RHManageRegFormSectionBase(RHManageRegFormBase):
@@ -59,9 +61,9 @@ class RHRegistrationFormModifySection(RHManageRegFormSectionBase):
 
     def _process_PATCH(self):
         changes = request.json['changes']
-        if set(changes.viewkeys()) > {'title', 'description'}:
+        if set(six.viewkeys(changes)) > {'title', 'description'}:
             raise BadRequest
-        for field, value in changes.iteritems():
+        for field, value in six.iteritems(changes):
             setattr(self.section, field, value)
         db.session.flush()
         logger.info('Section %s modified by %s: %s', self.section, session.user, changes)
@@ -103,8 +105,8 @@ class RHRegistrationFormMoveSection(RHManageRegFormSectionBase):
                 return (old_position < section.position <= new_position and section.id != self.section.id
                         and not section.is_deleted and section.is_enabled)
             start_enum = self.section.position
-        to_update = filter(fn, RegistrationFormSection.find(registration_form=self.regform, is_deleted=False)
-                                                      .order_by(RegistrationFormSection.position).all())
+        to_update = list(filter(fn, RegistrationFormSection.find(registration_form=self.regform, is_deleted=False)
+                                                      .order_by(RegistrationFormSection.position).all()))
         self.section.position = new_position
         for pos, section in enumerate(to_update, start_enum):
             section.position = pos

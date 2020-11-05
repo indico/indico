@@ -7,6 +7,7 @@ Create Date: 2018-10-25 11:48:39.958768
 
 import sqlalchemy as sa
 from alembic import context, op
+import six
 
 
 # revision identifiers, used by Alembic.
@@ -58,7 +59,7 @@ def downgrade():
     if default_location_id is None:
         if conn.execute('SELECT COUNT(*) FROM roombooking.locations').scalar():
             raise Exception('Please set a default location')
-    default_location = unicode(default_location_id) if default_location_id is not None else None
+    default_location = six.text_type(default_location_id) if default_location_id is not None else None
     op.add_column('room_attributes', sa.Column('location_id', sa.Integer(), nullable=False,
                                                server_default=default_location),
                   schema='roombooking')

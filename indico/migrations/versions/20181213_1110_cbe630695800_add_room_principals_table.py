@@ -17,6 +17,7 @@ from indico.core.auth import multipass
 from indico.core.db.sqlalchemy import PyIntEnum
 from indico.core.db.sqlalchemy.principals import PrincipalType
 from indico.core.db.sqlalchemy.protection import ProtectionMode
+import six
 
 
 # revision identifiers, used by Alembic.
@@ -161,9 +162,9 @@ def _downgrade_permissions():
                 continue
             if row.type == PrincipalType.local_group and not default_group_provider:
                 if row.full_access:
-                    _set_attribute_value(conn, room_id, manager_group_attr_id, unicode(row.local_group_id))
+                    _set_attribute_value(conn, room_id, manager_group_attr_id, six.text_type(row.local_group_id))
                 if 'book' in row.permissions or 'prebook' in row.permissions:
-                    _set_attribute_value(conn, room_id, booking_group_attr_id, unicode(row.local_group_id))
+                    _set_attribute_value(conn, room_id, booking_group_attr_id, six.text_type(row.local_group_id))
             elif (row.type == PrincipalType.multipass_group and default_group_provider and
                     row.mp_group_provider == default_group_provider.name):
                 if row.full_access:
@@ -212,7 +213,7 @@ def upgrade():
                     postgresql_where=sa.text('type = 3'))
     op.add_column('rooms', sa.Column('protection_mode',
                                      PyIntEnum(ProtectionMode, exclude_values={ProtectionMode.inheriting}),
-                                     nullable=False, server_default=unicode(ProtectionMode.protected.value)),
+                                     nullable=False, server_default=six.text_type(ProtectionMode.protected.value)),
                   schema='roombooking')
     _upgrade_permissions()
     op.alter_column('rooms', 'protection_mode', server_default=None, schema='roombooking')

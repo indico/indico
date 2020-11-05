@@ -34,6 +34,7 @@ from indico.web.forms.fields.principals import PrincipalListField
 from indico.web.forms.fields.simple import HiddenFieldList, IndicoEmailRecipientsField
 from indico.web.forms.validators import HiddenUnless, IndicoEmail, LinkedDateTime
 from indico.web.forms.widgets import CKEditorWidget, SwitchWidget
+import six
 
 
 def _check_if_payment_required(form, field):
@@ -140,7 +141,7 @@ class InvitationFormBase(IndicoForm):
         super(InvitationFormBase, self).__init__(*args, **kwargs)
         if not self.regform.moderation_enabled:
             del self.skip_moderation
-        self.email_from.choices = event.get_allowed_sender_emails().items()
+        self.email_from.choices = list(event.get_allowed_sender_emails().items())
         self.email_body.description = render_placeholder_info('registration-invitation-email', invitation=None)
 
     def validate_email_body(self, field):
@@ -220,7 +221,7 @@ class EmailRegistrantsForm(IndicoForm):
         self.regform = kwargs.pop('regform')
         event = self.regform.event
         super(EmailRegistrantsForm, self).__init__(*args, **kwargs)
-        self.from_address.choices = event.get_allowed_sender_emails().items()
+        self.from_address.choices = list(event.get_allowed_sender_emails().items())
         self.body.description = render_placeholder_info('registration-email', regform=self.regform, registration=None)
 
     def validate_body(self, field):
@@ -380,7 +381,7 @@ class BadgeSettingsForm(IndicoForm):
         signals.event.filter_selectable_badges.send(type(self), badge_templates=badge_templates)
         tickets = kwargs.pop('tickets')
         super(BadgeSettingsForm, self).__init__(**kwargs)
-        self.template.choices = sorted(((unicode(tpl.id), tpl.title)
+        self.template.choices = sorted(((six.text_type(tpl.id), tpl.title)
                                         for tpl in badge_templates
                                         if tpl.is_ticket == tickets),
                                        key=itemgetter(1))

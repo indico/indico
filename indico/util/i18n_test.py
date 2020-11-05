@@ -18,6 +18,7 @@ from werkzeug.datastructures import LanguageAccept
 
 from indico.core.plugins import IndicoPlugin, plugin_engine
 from indico.util.i18n import _, babel, gettext_context, make_bound_gettext, ngettext, session_language, ungettext
+import six
 
 
 DICTIONARIES = {
@@ -70,8 +71,8 @@ def test_straight_translation():
     a = _(u'Fetch the cow')
     b = _(u'The wheels')
 
-    assert isinstance(a, unicode)
-    assert isinstance(b, unicode)
+    assert isinstance(a, six.text_type)
+    assert isinstance(b, six.text_type)
 
 
 @pytest.mark.usefixtures('mock_translations')
@@ -86,8 +87,8 @@ def test_lazy_translation(monkeypatch):
 
     session.lang = 'fr_MP'
 
-    assert unicode(a) == u'Fetchez la vache'
-    assert unicode(b) == u'Les wheels'
+    assert six.text_type(a) == u'Fetchez la vache'
+    assert six.text_type(b) == u'Les wheels'
 
 
 @pytest.mark.usefixtures('mock_translations')
@@ -158,8 +159,8 @@ def test_translation_plugins(app, tmpdir):
 
     assert _(u'This is not a string') == french_core_str
     assert gettext_context(u"This is not a string") == french_core_str
-    assert isinstance(gettext_context(b"This is not a string"), unicode)
-    assert isinstance(gettext_context(u"This is not a string"), unicode)
+    assert isinstance(gettext_context(b"This is not a string"), six.text_type)
+    assert isinstance(gettext_context(u"This is not a string"), six.text_type)
     assert gettext_plugin(u"This is not a string") == french_plugin_str
 
     with plugin.plugin_context():

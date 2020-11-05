@@ -22,6 +22,7 @@ from indico.web.forms.base import FormDefaults, IndicoForm
 from indico.web.forms.widgets import SwitchWidget
 from indico.web.menu import render_sidemenu
 from indico.web.util import jsonify_data
+import six
 
 
 class RHFeaturesBase(RHManageEventBase):
@@ -34,7 +35,7 @@ class RHFeatures(RHFeaturesBase):
     def _make_form(self):
         form_class = type(b'FeaturesForm', (IndicoForm,), {})
         disallowed = get_disallowed_features(self.event)
-        for name, feature in sorted(get_feature_definitions().iteritems(), key=lambda x: x[1].friendly_name):
+        for name, feature in sorted(six.iteritems(get_feature_definitions()), key=lambda x: x[1].friendly_name):
             if name in disallowed:
                 continue
             field = BooleanField(feature.friendly_name, widget=SwitchWidget(), description=feature.description)

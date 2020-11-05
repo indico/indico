@@ -19,6 +19,7 @@ from indico.modules.events.requests.util import is_request_manager
 from indico.modules.events.requests.views import WPRequestsEventManagement
 from indico.util.i18n import _
 from indico.web.flask.util import url_for
+import six
 
 
 class EventOrRequestManagerMixin:
@@ -45,8 +46,8 @@ class RHRequestsEventRequests(EventOrRequestManagerMixin, RHManageEventBase):
             raise NotFound
         requests = Request.find_latest_for_event(self.event)
         if self.protection_overridden:
-            definitions = {name: def_ for name, def_ in definitions.iteritems() if def_.can_be_managed(session.user)}
-            requests = {name: req for name, req in requests.iteritems()
+            definitions = {name: def_ for name, def_ in six.iteritems(definitions) if def_.can_be_managed(session.user)}
+            requests = {name: req for name, req in six.iteritems(requests)
                         if req.definition and req.definition.can_be_managed(session.user)}
         return WPRequestsEventManagement.render_template('events/requests/event_requests.html', self.event,
                                                          definitions=definitions, requests=requests)

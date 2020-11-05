@@ -32,6 +32,7 @@ from indico.web.flask.util import url_for
 from indico.web.forms.base import FormDefaults
 from indico.web.rh import RHProtected
 from indico.web.util import jsonify_data, jsonify_template, url_for_index
+import six
 
 
 class RHCreateEvent(RHProtected):
@@ -83,7 +84,7 @@ class RHCreateEvent(RHProtected):
             # Copy person link data since we would otherwise end up
             # adding the EventPersons of the first event in all other
             # events of the series.
-            for link, submitter in link_data.iteritems():
+            for link, submitter in six.iteritems(link_data):
                 link_copy = EventPersonLink(**{col: getattr(link, col)
                                                for col in get_simple_column_attrs(EventPersonLink)})
                 link_copy.person = EventPerson(**{col: getattr(link.person, col)

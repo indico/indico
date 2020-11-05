@@ -13,6 +13,7 @@ from flask import g
 
 import indico.modules.events.contributions.models.contributions as contrib_module
 from indico.modules.events.contributions.models.contributions import Contribution
+from six.moves import range
 
 
 class Incrementer(object):
@@ -41,7 +42,7 @@ def test_contrib_friendly_id(monkeypatch, dummy_event, create_contribution):
 
     # pre-allocate 8 friendly ids
     Contribution.allocate_friendly_ids(dummy_event, 8)
-    assert g.friendly_ids[Contribution][dummy_event.id] == range(3, 11)
+    assert g.friendly_ids[Contribution][dummy_event.id] == list(range(3, 11))
     assert counter == 10
 
     for fid in g.friendly_ids[Contribution][dummy_event.id][:]:

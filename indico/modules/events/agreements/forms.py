@@ -35,7 +35,7 @@ class AgreementEmailForm(IndicoForm):
         self._definition = kwargs.pop('definition')
         event = kwargs.pop('event')
         super(AgreementEmailForm, self).__init__(*args, **kwargs)
-        self.from_address.choices = event.get_allowed_sender_emails().items()
+        self.from_address.choices = list(event.get_allowed_sender_emails().items())
         self.body.description = render_placeholder_info('agreement-email', definition=self._definition, agreement=None)
 
     def validate_body(self, field):

@@ -26,6 +26,7 @@ from indico.modules.users.util import serialize_user
 from indico.util.user import principal_from_identifier
 from indico.web.forms.fields import JSONField
 from indico.web.forms.widgets import JinjaWidget
+from six.moves import map
 
 
 def serialize_principal(principal):
@@ -156,7 +157,7 @@ class PermissionsField(JSONField):
     def __init__(self, *args, **kwargs):
         self.object_type = kwargs.pop('object_type')
         super(PermissionsField, self).__init__(*args, **kwargs)
-        self.ip_networks = map(serialize_ip_network_group, IPNetworkGroup.query.filter_by(hidden=False))
+        self.ip_networks = list(map(serialize_ip_network_group, IPNetworkGroup.query.filter_by(hidden=False)))
 
     @property
     def event(self):

@@ -16,6 +16,7 @@ import click
 from click._compat import should_strip_ansi
 from migra import Migration
 from sqlalchemy import create_engine
+from six.moves import map
 
 
 click.disable_unicode_literals_warning = True
@@ -45,7 +46,7 @@ def _subprocess_check_output(*popenargs, **kwargs):
 
 
 def _checked_call(verbose, args, return_output=False, env=None, stdin_data=None):
-    cmd = ' '.join([os.path.basename(args[0])] + map(pipes.quote, args[1:]))
+    cmd = ' '.join([os.path.basename(args[0])] + list(map(pipes.quote, args[1:])))
     if verbose:
         click.echo(click.style('** {}'.format(cmd), fg='blue', bold=True), err=True)
     kwargs = {}

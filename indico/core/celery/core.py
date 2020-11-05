@@ -28,6 +28,8 @@ from indico.util.console import cformat
 from indico.util.fossilize import clearCache
 from indico.util.string import return_ascii
 from indico.web.flask.stats import request_stats_request_started
+import six
+from six.moves import map
 
 
 class IndicoCelery(Celery):
@@ -124,7 +126,7 @@ class IndicoCelery(Celery):
                 args = _CelerySAWrapper.unwrap_args(args)
                 kwargs = _CelerySAWrapper.unwrap_kwargs(kwargs)
                 plugin = getattr(s, 'plugin', s.request.get('indico_plugin'))
-                if isinstance(plugin, basestring):
+                if isinstance(plugin, six.string_types):
                     plugin_name = plugin
                     plugin = plugin_engine.get_plugin(plugin)
                     if plugin is None:
@@ -155,7 +157,7 @@ class IndicoPersistentScheduler(PersistentScheduler):
 
     def setup_schedule(self):
         deleted = set()
-        for task_name, entry in config.SCHEDULED_TASK_OVERRIDE.iteritems():
+        for task_name, entry in six.iteritems(config.SCHEDULED_TASK_OVERRIDE):
             if task_name not in self.app.conf['beat_schedule']:
                 self.logger.error('Invalid entry in ScheduledTaskOverride: %s', task_name)
                 continue
@@ -176,7 +178,7 @@ class IndicoPersistentScheduler(PersistentScheduler):
 
     def _print_schedule(self, deleted):
         table_data = [['Name', 'Schedule']]
-        for entry in sorted(self.app.conf['beat_schedule'].itervalues(), key=itemgetter('task')):
+        for entry in sorted(six.itervalues(self.app.conf['beat_schedule']), key=itemgetter('task')):
             table_data.append([cformat('%{yellow!}{}%{reset}').format(entry['task']),
                                cformat('%{green}{!r}%{reset}').format(entry['schedule'])])
         for task_name in sorted(deleted):
@@ -218,7 +220,7 @@ class _CelerySAWrapper(object):
 
     @classmethod
     def wrap_kwargs(cls, kwargs):
-        return {k: cls(v) if isinstance(v, db.Model) else v for k, v in kwargs.iteritems()}
+        return {k: cls(v) if isinstance(v, db.Model) else v for k, v in six.iteritems(kwargs)}
 
     @classmethod
     def unwrap_args(cls, args):
@@ -226,4 +228,4 @@ class _CelerySAWrapper(object):
 
     @classmethod
     def unwrap_kwargs(cls, kwargs):
-        return {k: v.object if isinstance(v, cls) else v for k, v in kwargs.iteritems()}
+        return {k: v.object if isinstance(v, cls) else v for k, v in six.iteritems(kwargs)}

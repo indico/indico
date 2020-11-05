@@ -21,6 +21,7 @@ from indico.web.forms.base import IndicoForm
 from indico.web.forms.fields import EditableFileField, FileField, IndicoEnumSelectField
 from indico.web.forms.validators import HiddenUnless, UsedIf
 from indico.web.forms.widgets import CKEditorWidget, ColorPickerWidget, SwitchWidget
+import six
 
 
 THEMES = [('', _('No theme selected')),
@@ -30,12 +31,12 @@ THEMES = [('', _('No theme selected')),
 
 
 def _get_timetable_theme_choices(event):
-    it = ((tid, data['title']) for tid, data in theme_settings.get_themes_for(event.type).viewitems())
+    it = ((tid, data['title']) for tid, data in six.viewitems(theme_settings.get_themes_for(event.type)))
     return sorted(it, key=lambda x: x[1].lower())
 
 
 def _get_conference_theme_choices():
-    plugin_themes = [(k, v[1]) for k, v in get_plugin_conference_themes().iteritems()]
+    plugin_themes = [(k, v[1]) for k, v in six.iteritems(get_plugin_conference_themes())]
     return THEMES + sorted(plugin_themes, key=lambda x: x[1].lower())
 
 
@@ -60,7 +61,7 @@ class LoggedLayoutForm(IndicoForm):
 
     @property
     def log_fields_metadata(self):
-        return {k: self.build_field_metadata(v) for k, v in self._fields.iteritems()}
+        return {k: self.build_field_metadata(v) for k, v in six.iteritems(self._fields)}
 
 
 class ConferenceLayoutForm(LoggedLayoutForm):

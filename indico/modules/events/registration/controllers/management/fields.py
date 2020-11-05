@@ -17,6 +17,7 @@ from indico.modules.events.registration.models.form_fields import RegistrationFo
 from indico.modules.events.registration.models.items import RegistrationFormItemType, RegistrationFormText
 from indico.modules.events.registration.util import update_regform_item_positions
 from indico.util.string import snakify_keys
+from six.moves import filter
 
 
 def _fill_form_field_with_data(field, field_data, set_data=True):
@@ -104,7 +105,7 @@ class RHRegistrationFormMoveField(RHManageRegFormFieldBase):
                 return (old_position < field.position <= new_position and field.id != self.field.id and
                         not field.is_deleted and field.is_enabled)
             start_enum = self.field.position
-        to_update = filter(fn, self.section.children)
+        to_update = list(filter(fn, self.section.children))
         self.field.position = new_position
         for pos, field in enumerate(to_update, start_enum):
             field.position = pos

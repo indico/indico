@@ -19,6 +19,8 @@ from xlsxwriter import Workbook
 
 from indico.util.date_time import format_datetime
 from indico.web.flask.util import send_file
+from six.moves import map
+import six
 
 
 def unique_col(name, id_):
@@ -47,12 +49,12 @@ def _prepare_csv_data(data, _linebreak_re=re.compile(r'(\r?\n)+'), _dangerous_ch
     if isinstance(data, (list, tuple)):
         data = '; '.join(data)
     elif isinstance(data, set):
-        data = '; '.join(sorted(data, key=unicode.lower))
+        data = '; '.join(sorted(data, key=six.text_type.lower))
     elif isinstance(data, bool):
         data = 'Yes' if data else 'No'
     elif data is None:
         data = ''
-    data = _linebreak_re.sub('    ', unicode(data))
+    data = _linebreak_re.sub('    ', six.text_type(data))
     # https://www.owasp.org/index.php/CSV_Injection
     # quoting the cell's value does NOT mitigate this, so we need to strip
     # those characters from the beginning...
@@ -74,11 +76,11 @@ def generate_csv(headers, rows):
     buf = BytesIO()
     buf.write(b'\xef\xbb\xbf')
     writer = csv.writer(buf)
-    writer.writerow(map(_prepare_header_utf8, headers))
+    writer.writerow(list(map(_prepare_header_utf8, headers)))
     header_positions = {name: i for i, name in enumerate(headers)}
     assert all(len(row) == len(headers) for row in rows)
     for row in rows:
-        row = sorted(row.items(), key=lambda x: header_positions[x[0]])
+        row = sorted(list(row.items()), key=lambda x: header_positions[x[0]])
         writer.writerow([_prepare_csv_data(v) for k, v in row])
     buf.seek(0)
     return buf
@@ -88,9 +90,9 @@ def _prepare_excel_data(data, tz=None):
     if isinstance(data, (list, tuple)):
         data = '; '.join(data)
     elif isinstance(data, set):
-        data = '; '.join(sorted(data, key=unicode.lower))
+        data = '; '.join(sorted(data, key=six.text_type.lower))
     elif is_lazy_string(data) or isinstance(data, Markup):
-        data = unicode(data)
+        data = six.text_type(data)
     elif isinstance(data, datetime):
         data = format_datetime(data, timezone=tz).decode('utf-8')
     return data
@@ -108,7 +110,7 @@ def generate_xlsx(headers, rows, tz=None):
     buf = BytesIO()
     header_positions = {name: i for i, name in enumerate(headers)}
     # convert row dicts to lists
-    rows = [[x[1] for x in sorted(row.items(), key=lambda x: header_positions[x[0]])] for row in rows]
+    rows = [[x[1] for x in sorted(list(row.items()), key=lambda x: header_positions[x[0]])] for row in rows]
     assert all(len(row) == len(headers) for row in rows)
     with Workbook(buf, workbook_options) as workbook:
         bold = workbook.add_format({'bold': True})

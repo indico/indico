@@ -20,6 +20,7 @@ from indico.core.config import config
 from indico.core.db import db
 from indico.core.plugins import plugin_engine
 from indico.web.flask.stats import get_request_stats
+import six
 
 
 def _prettify_sql(statement):
@@ -35,7 +36,7 @@ def _interesting_tb_item(item, paths):
 
 
 def _get_sql_line():
-    paths = [current_app.root_path] + [p.root_path for p in plugin_engine.get_active_plugins().itervalues()]
+    paths = [current_app.root_path] + [p.root_path for p in six.itervalues(plugin_engine.get_active_plugins())]
     stack = [item for item in reversed(traceback.extract_stack()) if _interesting_tb_item(item, paths)]
     for i, item in enumerate(stack):
         return {'file': item[0],
@@ -46,7 +47,7 @@ def _get_sql_line():
 
 def _fix_param(param):
     if hasattr(param, 'iteritems'):
-        return {k: _fix_param(v) for k, v in param.iteritems()}
+        return {k: _fix_param(v) for k, v in six.iteritems(param)}
     return '<binary>' if param.__class__.__name__ == 'Binary' else param
 
 
@@ -85,7 +86,7 @@ def apply_db_loggers(app, force=False):
             ).rstrip()
         # psycopg2._psycopg.Binary objects are extremely weird and don't work in isinstance checks
         if hasattr(parameters, 'iteritems'):
-            parameters = {k: _fix_param(v) for k, v in parameters.iteritems()}
+            parameters = {k: _fix_param(v) for k, v in six.iteritems(parameters)}
         else:
             parameters = tuple(_fix_param(v) for v in parameters)
         logger.debug(log_msg,

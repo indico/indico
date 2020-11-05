@@ -38,6 +38,7 @@ from indico.util.serializer import Serializer
 from indico.util.string import format_repr, return_ascii, to_unicode
 from indico.util.struct.enum import IndicoEnum
 from indico.web.flask.util import url_for
+import six
 
 
 class ConflictingOccurrences(Exception):
@@ -393,12 +394,12 @@ class Reservation(Serializer, db.Model):
         if 'occurrences' in args:
             occurrence_data = OrderedMultiDict(db.session.query(ReservationOccurrence.reservation_id,
                                                                 ReservationOccurrence)
-                                               .filter(ReservationOccurrence.reservation_id.in_(result.iterkeys()))
+                                               .filter(ReservationOccurrence.reservation_id.in_(six.iterkeys(result)))
                                                .order_by(ReservationOccurrence.start_dt))
-            for id_, data in result.iteritems():
+            for id_, data in six.iteritems(result):
                 data['occurrences'] = occurrence_data.getlist(id_)
 
-        return result.values()
+        return list(result.values())
 
     @staticmethod
     def find_overlapping_with(room, occurrences, skip_reservation_id=None):
@@ -526,7 +527,7 @@ class Reservation(Serializer, db.Model):
 
         # Check for conflicts with other occurrences
         conflicting_occurrences = self.get_conflicting_occurrences()
-        for occurrence, conflicts in conflicting_occurrences.iteritems():
+        for occurrence, conflicts in six.iteritems(conflicting_occurrences):
             if not occurrence.is_valid:
                 continue
             if conflicts['confirmed']:
@@ -602,7 +603,7 @@ class Reservation(Serializer, db.Model):
                 continue
             old = getattr(self, field)
             new = data[field]
-            converter = unicode
+            converter = six.text_type
             if old != new:
                 # Booked for user updates the (redundant) name
                 if field == 'booked_for_user':
@@ -635,7 +636,7 @@ class Reservation(Serializer, db.Model):
 
         # Create a verbose log entry for the modification
         log = ['Booking modified']
-        for field, change in changes.iteritems():
+        for field, change in six.iteritems(changes):
             field_title = field_names.get(field, field)
             converter = change['converter']
             old = to_unicode(converter(change['old']))
@@ -668,7 +669,7 @@ class Reservation(Serializer, db.Model):
                         setattr(occurrence, col, getattr(old_occurrence, col))
             # Don't cause new notifications for the entire booking in case of daily repetition
             if self.repeat_frequency == RepeatFrequency.DAY and all(occ.notification_sent
-                                                                    for occ in old_occurrences.itervalues()):
+                                                                    for occ in six.itervalues(old_occurrences)):
                 for occurrence in self.occurrences:
                     occurrence.notification_sent = True
 

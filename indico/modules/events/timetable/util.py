@@ -30,6 +30,7 @@ from indico.util.i18n import _
 from indico.util.string import to_unicode
 from indico.web.flask.templating import get_template_module
 from indico.web.forms.colors import get_colors
+import six
 
 
 def _query_events(categ_ids, day_start, day_end):
@@ -195,7 +196,7 @@ def get_category_timetable(categ_ids, start_dt, end_dt, detail_level='event', tz
                     else:
                         ongoing_events.append(e)
             else:
-                for start_d, start_dts in items[e.id].viewitems():
+                for start_d, start_dts in six.viewitems(items[e.id]):
                     scheduled_events[start_d].append((start_dts[0], e))
         else:
             events.append(e)
@@ -315,7 +316,7 @@ def get_timetable_offline_pdf_generator(event):
 
 def get_time_changes_notifications(changes, tzinfo, entry=None):
     notifications = []
-    for obj, change in changes.iteritems():
+    for obj, change in six.iteritems(changes):
         if entry:
             if entry.object == obj:
                 continue

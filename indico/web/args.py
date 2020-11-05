@@ -14,6 +14,8 @@ from webargs.compat import Mapping
 from webargs.flaskparser import FlaskParser
 
 from indico.util.string import strip_whitespace
+import six
+from six.moves import map
 
 
 class IndicoFlaskParser(FlaskParser):
@@ -23,10 +25,10 @@ class IndicoFlaskParser(FlaskParser):
 
     def parse_arg(self, name, field, req, locations=None):
         rv = super(IndicoFlaskParser, self).parse_arg(name, field, req, locations=locations)
-        if isinstance(rv, basestring):
+        if isinstance(rv, six.string_types):
             return rv.strip()
         elif isinstance(rv, (list, set)):
-            return type(rv)(map(strip_whitespace, rv))
+            return type(rv)(list(map(strip_whitespace, rv)))
         return rv
 
 

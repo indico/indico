@@ -26,6 +26,7 @@ from indico.util.locators import locator_property
 from indico.util.string import return_ascii
 from indico.util.struct.enum import IndicoEnum
 from indico.web.flask.templating import get_template_module
+import six
 
 
 class SurveyState(IndicoEnum):
@@ -63,7 +64,7 @@ class Survey(db.Model):
         UUID,
         unique=True,
         nullable=False,
-        default=lambda: unicode(uuid4())
+        default=lambda: six.text_type(uuid4())
     )
     # An introduction text for users of the survey
     introduction = db.Column(

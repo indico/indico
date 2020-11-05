@@ -55,6 +55,7 @@ from indico.web.forms.jinja_helpers import is_single_line_field, iter_form_field
 from indico.web.menu import render_sidemenu
 from indico.web.util import url_for_index
 from indico.web.views import render_session_bar
+import six
 
 
 def configure_app(app, set_path=False):
@@ -131,7 +132,7 @@ def configure_multipass_local(app):
     app.config['MULTIPASS_AUTH_PROVIDERS'] = dict(app.config['MULTIPASS_AUTH_PROVIDERS'], indico={
         'type': IndicoAuthProvider,
         'title': 'Indico',
-        'default': not any(p.get('default') for p in app.config['MULTIPASS_AUTH_PROVIDERS'].itervalues())
+        'default': not any(p.get('default') for p in six.itervalues(app.config['MULTIPASS_AUTH_PROVIDERS']))
     })
     app.config['MULTIPASS_IDENTITY_PROVIDERS'] = dict(app.config['MULTIPASS_IDENTITY_PROVIDERS'], indico={
         'type': IndicoIdentityProvider,
@@ -152,7 +153,7 @@ def configure_webpack(app):
 def configure_xsendfile(app, method):
     if not method:
         return
-    elif isinstance(method, basestring):
+    elif isinstance(method, six.string_types):
         args = None
     else:
         method, args = method
@@ -198,7 +199,7 @@ def setup_jinja(app):
     app.add_template_global(url_for_index)
     app.add_template_global(url_for_login)
     app.add_template_global(url_for_logout)
-    app.add_template_global(lambda: unicode(uuid.uuid4()), 'uuid')
+    app.add_template_global(lambda: six.text_type(uuid.uuid4()), 'uuid')
     app.add_template_global(icon_from_mimetype)
     app.add_template_global(render_sidemenu)
     app.add_template_global(slugify)

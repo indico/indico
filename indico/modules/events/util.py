@@ -54,6 +54,8 @@ from indico.util.user import principal_from_fossil
 from indico.web.flask.templating import get_template_module
 from indico.web.flask.util import send_file, url_for
 from indico.web.forms.colors import get_colors
+import six
+from six.moves import map
 
 
 def check_event_locked(rh, event, force=False):
@@ -317,7 +319,7 @@ class ListGeneratorBase(object):
                  partitioning.
         """
         if separator_type == 'dynamic':
-            dynamic_item_ids = [item_id for item_id in item_ids if not isinstance(item_id, basestring)]
+            dynamic_item_ids = [item_id for item_id in item_ids if not isinstance(item_id, six.string_types)]
             return dynamic_item_ids, [item_id for item_id in item_ids if item_id not in dynamic_item_ids]
         elif separator_type == 'static':
             static_item_ids = [item_id for item_id in item_ids if item_id in self.static_items]
@@ -345,11 +347,11 @@ class ListGeneratorBase(object):
                 return [x if x != 'None' else None for x in request.form.getlist('field_{}'.format(item_id))]
 
         filters = deepcopy(self.default_list_config['filters'])
-        for item_id, item in self.static_items.iteritems():
+        for item_id, item in six.iteritems(self.static_items):
             options = get_selected_options(item_id, item)
             if options:
                 filters['items'][item_id] = options
-        for item_id, item in self.extra_filters.iteritems():
+        for item_id, item in six.iteritems(self.extra_filters):
             options = get_selected_options(item_id, item)
             if options:
                 filters['extra'][item_id] = options
@@ -475,7 +477,7 @@ def track_time_changes(auto_extend=False, user=None):
                     raise UserValueError(_("Your action requires modification of session block boundaries, but you are "
                                            "not authorized to manage the session block."))
         old_times = g.pop('old_times')
-        for obj, info in old_times.iteritems():
+        for obj, info in six.iteritems(old_times):
             if isinstance(obj, TimetableEntry):
                 obj = obj.object
             if obj.start_dt != info['start_dt']:
@@ -484,7 +486,7 @@ def track_time_changes(auto_extend=False, user=None):
                 changes[obj]['duration'] = (info['duration'], obj.duration)
             if obj.end_dt != info['end_dt']:
                 changes[obj]['end_dt'] = (info['end_dt'], obj.end_dt)
-        for obj, obj_changes in changes.iteritems():
+        for obj, obj_changes in six.iteritems(changes):
             entry = None if isinstance(obj, Event) else obj.timetable_entry
             signals.event.times_changed.send(type(obj), entry=entry, obj=obj, changes=obj_changes)
 
@@ -572,7 +574,7 @@ def serialize_event_for_json_ld(event, full=False):
     if full and event.description:
         data['description'] = strip_tags(event.description)
     if full and event.person_links:
-        data['performer'] = map(serialize_person_for_json_ld, event.person_links)
+        data['performer'] = list(map(serialize_person_for_json_ld, event.person_links))
     if full and event.has_logo:
         data['image'] = event.external_logo_url
     return data
@@ -591,14 +593,14 @@ def serialize_person_for_json_ld(person):
 
 def get_field_values(form_data):
     """Split the form fields between custom and static."""
-    fields = {x: form_data[x] for x in form_data.iterkeys() if not x.startswith('custom_')}
-    custom_fields = {x: form_data[x] for x in form_data.iterkeys() if x.startswith('custom_')}
+    fields = {x: form_data[x] for x in six.iterkeys(form_data) if not x.startswith('custom_')}
+    custom_fields = {x: form_data[x] for x in six.iterkeys(form_data) if x.startswith('custom_')}
     return fields, custom_fields
 
 
 def set_custom_fields(obj, custom_fields_data):
     changes = {}
-    for custom_field_name, custom_field_value in custom_fields_data.iteritems():
+    for custom_field_name, custom_field_value in six.iteritems(custom_fields_data):
         custom_field_id = int(custom_field_name[7:])  # Remove the 'custom_' part
         old_value = obj.set_custom_field(custom_field_id, custom_field_value)
         if old_value != custom_field_value:
@@ -692,7 +694,7 @@ class ZipGeneratorMixin(object):
         return send_file(zip_file_name, temp_file.name, 'application/zip', inline=False)
 
     def _prepare_folder_structure(self, item):
-        file_name = secure_filename('{}_{}'.format(unicode(item.id), item.filename), item.filename)
+        file_name = secure_filename('{}_{}'.format(six.text_type(item.id), item.filename), item.filename)
         return os.path.join(*self._adjust_path_length([file_name]))
 
 

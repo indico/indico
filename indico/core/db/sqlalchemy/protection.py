@@ -27,6 +27,8 @@ from indico.util.signals import values_from_signal
 from indico.util.struct.enum import RichIntEnum
 from indico.util.user import iter_acl
 from indico.web.util import jsonify_template
+import six
+from six.moves import map
 
 
 class ProtectionMode(RichIntEnum):
@@ -261,7 +263,7 @@ class ProtectionMixin(object):
     @property
     def _access_key_session_key(self):
         cls, pks = inspect(self).identity_key[:2]
-        return '{}-{}'.format(cls.__name__, '-'.join(map(unicode, pks)))
+        return '{}-{}'.format(cls.__name__, '-'.join(map(six.text_type, pks)))
 
     def update_principal(self, principal, read_access=None, quiet=False):
         """Update access privileges for the given principal.
@@ -458,7 +460,7 @@ class ProtectionManagersMixin(ProtectionMixin):
                 new_permissions |= add_permissions
             if del_permissions:
                 new_permissions -= del_permissions
-        invalid_permissions = new_permissions - get_available_permissions(type(self)).viewkeys()
+        invalid_permissions = new_permissions - six.viewkeys(get_available_permissions(type(self)))
         if invalid_permissions:
             raise ValueError('Invalid permissions: {}'.format(', '.join(invalid_permissions)))
         entry.permissions = sorted(new_permissions)

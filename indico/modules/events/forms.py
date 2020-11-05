@@ -29,6 +29,7 @@ from indico.web.forms.fields import (IndicoDateTimeField, IndicoEnumRadioField, 
                                      IndicoTimezoneSelectField, JSONField, OccurrencesField)
 from indico.web.forms.validators import LinkedDateTime
 from indico.web.forms.widgets import CKEditorWidget
+from six.moves import zip
 
 
 class ReferenceTypeForm(IndicoForm):
@@ -56,7 +57,7 @@ class ReferenceTypeForm(IndicoForm):
 
 class EventLabelForm(IndicoForm):
     title = StringField(_('Title'), [DataRequired()])
-    color = SelectField(_('Color'), [DataRequired()], choices=zip(get_sui_colors(), get_sui_colors()))
+    color = SelectField(_('Color'), [DataRequired()], choices=list(zip(get_sui_colors(), get_sui_colors())))
 
     def __init__(self, *args, **kwargs):
         self.event_label = kwargs.pop('event_label', None)

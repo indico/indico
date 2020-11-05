@@ -33,6 +33,8 @@ from indico.modules.events.registration.views import (WPDisplayRegistrationFormC
 from indico.util.fs import secure_filename
 from indico.util.i18n import _
 from indico.web.flask.util import send_file, url_for
+import six
+from six.moves import map
 
 
 class RHRegistrationFormDisplayBase(RHDisplayEventBase):
@@ -203,7 +205,7 @@ class RHParticipantList(RHRegistrationFormDisplayBase):
                     continue
                 tables.append(self._participant_list_table(regform))
             # There might be forms that have not been sorted by the user yet
-            tables += map(self._participant_list_table, regforms_dict.viewvalues())
+            tables += list(map(self._participant_list_table, six.viewvalues(regforms_dict)))
 
         published = (RegistrationForm.query.with_parent(self.event)
                      .filter(RegistrationForm.publish_registrations_enabled)

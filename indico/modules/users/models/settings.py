@@ -14,6 +14,7 @@ from indico.core.settings import SettingsProxyBase
 from indico.core.settings.models.base import JSONSettingsBase
 from indico.core.settings.util import get_all_settings, get_setting
 from indico.util.string import return_ascii
+import six
 
 
 class UserSetting(JSONSettingsBase, db.Model):
@@ -117,7 +118,7 @@ class UserSettingsProxy(SettingsProxyBase):
         """
         for name in items:
             self._check_name(name)
-        items = {k: self._convert_from_python(k, v) for k, v in items.iteritems()}
+        items = {k: self._convert_from_python(k, v) for k, v in six.iteritems(items)}
         UserSetting.set_multi(self.module, items, **user)
         self._flush_cache()
 

@@ -6,7 +6,7 @@
 # LICENSE file for more details.
 
 from datetime import date, datetime, time
-from itertools import izip
+
 
 import pytest
 from dateutil.relativedelta import relativedelta
@@ -15,6 +15,7 @@ from indico.core.errors import IndicoError
 from indico.modules.rb.models.reservation_occurrences import ReservationOccurrence, ReservationOccurrenceState
 from indico.modules.rb.models.reservations import RepeatFrequency
 from indico.testing.util import extract_emails
+from six.moves import zip
 
 
 pytest_plugins = 'indico.modules.rb.testing.fixtures'
@@ -74,7 +75,7 @@ def test_create_series_for_reservation(dummy_reservation):
     occurrences = ReservationOccurrence.iter_create_occurrences(start=dummy_reservation.start_dt,
                                                                 end=dummy_reservation.end_dt,
                                                                 repetition=dummy_reservation.repetition)
-    for occ1, occ2 in izip(dummy_reservation.occurrences, occurrences):
+    for occ1, occ2 in zip(dummy_reservation.occurrences, occurrences):
         assert occ1.start_dt == occ2.start_dt
         assert occ1.end_dt == occ2.end_dt
         assert occ1.is_cancelled == dummy_reservation.is_cancelled
@@ -83,7 +84,7 @@ def test_create_series_for_reservation(dummy_reservation):
 
 
 def test_create_series(creation_params):
-    for occ1, occ2 in izip(list(ReservationOccurrence.iter_create_occurrences(**creation_params)),
+    for occ1, occ2 in zip(list(ReservationOccurrence.iter_create_occurrences(**creation_params)),
                            ReservationOccurrence.create_series(**creation_params)):
         assert occ1.start_dt == occ2.start_dt
         assert occ1.end_dt == occ2.end_dt

@@ -15,6 +15,8 @@ from indico.modules.events.surveys.fields.base import SurveyField
 from indico.util.i18n import _
 from indico.util.string import alpha_enum
 from indico.web.fields.choices import MultiSelectField, SingleChoiceField
+import six
+from six.moves import range
 
 
 class _AddUUIDMixin(object):
@@ -24,7 +26,7 @@ class _AddUUIDMixin(object):
         data = deepcopy(data)
         if 'options' in data:
             for option in data['options']:
-                option['id'] = unicode(uuid.uuid4())
+                option['id'] = six.text_type(uuid.uuid4())
         return data
 
 
@@ -39,7 +41,7 @@ class SurveySingleChoiceField(_AddUUIDMixin, SingleChoiceField, SurveyField):
             no_option = {'id': None, 'option': _("No selection")}
             options.append(no_option)
         return {'total': total,
-                'labels': [alpha_enum(val).upper() for val in xrange(len(options))],
+                'labels': [alpha_enum(val).upper() for val in range(len(options))],
                 'absolute': OrderedDict((opt['option'], counter[opt['id']]) for opt in options),
                 'relative': OrderedDict((opt['option'], counter[opt['id']] / total) for opt in options)}
 
@@ -52,6 +54,6 @@ class SurveyMultiSelectField(_AddUUIDMixin, MultiSelectField, SurveyField):
         total = sum(counter.values())
         options = self.object.field_data['options']
         return {'total': total,
-                'labels': [alpha_enum(val).upper() for val in xrange(len(options))],
+                'labels': [alpha_enum(val).upper() for val in range(len(options))],
                 'absolute': OrderedDict((opt['option'], counter[opt['id']]) for opt in options),
                 'relative': OrderedDict((opt['option'], counter[opt['id']] / total if total else 0) for opt in options)}

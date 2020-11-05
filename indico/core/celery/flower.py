@@ -10,7 +10,7 @@ from __future__ import absolute_import, unicode_literals
 import functools
 import json
 import os
-from urllib import urlencode
+from six.moves.urllib.parse import urlencode
 
 from flower.urls import settings
 from flower.views import BaseHandler

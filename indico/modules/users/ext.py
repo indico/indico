@@ -6,6 +6,7 @@
 # LICENSE file for more details.
 
 from __future__ import unicode_literals
+import six
 
 
 class ExtraUserPreferences(object):
@@ -40,7 +41,7 @@ class ExtraUserPreferences(object):
 
     def extend_defaults(self, defaults):
         """Add values to the FormDefaults."""
-        for key, value in self.load().iteritems():
+        for key, value in six.iteritems(self.load()):
             key = self._prefix + key
             if hasattr(defaults, key):
                 raise RuntimeError('Preference collision: {}'.format(key))
@@ -60,7 +61,7 @@ class ExtraUserPreferences(object):
     def extend_form(self, form_class):
         """Create a subclass of the form containing the extra field."""
         form_class = type(b'ExtendedUserPreferencesForm', (form_class,), {})
-        for name, field in self.fields.iteritems():
+        for name, field in six.iteritems(self.fields):
             name = self._prefix + name
             if hasattr(form_class, name):
                 raise RuntimeError('Preference collision: {}'.format(name))

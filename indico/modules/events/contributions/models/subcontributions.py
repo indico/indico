@@ -144,7 +144,7 @@ class SubContribution(DescriptionMixin, AttachedItemsMixin, AttachedNotesMixin, 
 
     @speakers.setter
     def speakers(self, value):
-        self.person_links = value.keys()
+        self.person_links = list(value.keys())
 
     @property
     def location_parent(self):

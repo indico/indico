@@ -12,6 +12,7 @@ from operator import itemgetter
 
 from indico.util.i18n import _
 from indico.web.forms.fields import MultiStringField
+import six
 
 
 class MultiIPNetworkField(MultiStringField):
@@ -30,7 +31,7 @@ class MultiIPNetworkField(MultiStringField):
         if self.data is None:
             return []
         elif self._data_converted:
-            data = [{self.field_name: unicode(network)} for network in self.data or []]
+            data = [{self.field_name: six.text_type(network)} for network in self.data or []]
             return sorted(data, key=itemgetter(self.field_name))
         else:
             return self.data
@@ -46,7 +47,7 @@ class MultiIPNetworkField(MultiStringField):
             # convert ipv6-style ipv4 to regular ipv4
             # the ipaddress library doesn't deal with such IPs properly!
             network = network[7:]
-        return unicode(network)
+        return six.text_type(network)
 
     def process_formdata(self, valuelist):
         self._data_converted = False

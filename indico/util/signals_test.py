@@ -9,6 +9,7 @@ import pytest
 from mock import MagicMock
 
 from indico.util.signals import named_objects_from_signal, values_from_signal
+from six.moves import zip
 
 
 def _make_signal_response(objects):
@@ -63,7 +64,7 @@ def test_values_from_signal_multi_value_types():
 def test_values_from_signal_return_plugins():
     vals = ('a', 'b', 'c')
     signal_response = _make_signal_response(vals) + [(MagicMock(indico_plugin='foo'), 'd')]
-    assert values_from_signal(signal_response, return_plugins=True) == set(zip([None] * 3, vals) + [('foo', 'd')])
+    assert values_from_signal(signal_response, return_plugins=True) == set(list(zip([None] * 3, vals)) + [('foo', 'd')])
     assert values_from_signal(signal_response) == set(vals + ('d',))
 
 

@@ -10,7 +10,7 @@ from __future__ import unicode_literals
 from datetime import date, datetime, time, timedelta
 from functools import partial
 from io import BytesIO
-from itertools import chain, groupby, imap
+from itertools import chain, groupby
 from operator import attrgetter, itemgetter
 from time import mktime
 
@@ -47,6 +47,7 @@ from indico.web.flask.templating import get_template_module
 from indico.web.flask.util import send_file, url_for
 from indico.web.rh import RH
 from indico.web.util import jsonify_data
+from six.moves import map
 
 
 CALENDAR_COLOR_PALETTE = [
@@ -59,7 +60,7 @@ CALENDAR_COLOR_PALETTE = [
 
 
 def _flat_map(func, list_):
-    return chain.from_iterable(imap(func, list_))
+    return chain.from_iterable(map(func, list_))
 
 
 class RHCategoryIcon(RHDisplayCategoryBase):
@@ -482,7 +483,7 @@ class RHCategoryOverview(RHDisplayCategoryBase):
         tzinfo = self.category.display_tzinfo
 
         # Breaks, contributions and sessions grouped by start_dt. Each EventProxy will return the relevant ones only
-        timetable_objects = sorted(chain(*info[event.id].values()), key=attrgetter('timetable_entry.start_dt'))
+        timetable_objects = sorted(chain(*list(info[event.id].values())), key=attrgetter('timetable_entry.start_dt'))
         timetable_objects_by_date = {x[0]: list(x[1]) for x
                                      in groupby(timetable_objects, key=lambda x: x.start_dt.astimezone(tzinfo).date())}
 

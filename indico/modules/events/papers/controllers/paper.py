@@ -30,6 +30,8 @@ from indico.util.fs import secure_filename
 from indico.util.i18n import _, ngettext
 from indico.web.flask.util import url_for
 from indico.web.util import jsonify_data, jsonify_form, jsonify_template
+import six
+from six.moves import map
 
 
 CFP_ROLE_MAP = {
@@ -97,7 +99,7 @@ class RHPapersActionBase(RHPapersListBase):
 
     def _process_args(self):
         RHPapersListBase._process_args(self)
-        ids = map(int, request.form.getlist('contribution_id'))
+        ids = list(map(int, request.form.getlist('contribution_id')))
         self.contributions = (self.list_generator._build_query()
                               .filter(Contribution.id.in_(ids))
                               .options(*self._get_contrib_query_options())
@@ -163,7 +165,7 @@ class RHAssignPapersBase(RHPapersActionBase):
     def _process_args(self):
         RHPapersActionBase._process_args(self)
         self.role = PaperReviewingRole[request.view_args['role']]
-        user_ids = map(int, request.form.getlist('user_id'))
+        user_ids = list(map(int, request.form.getlist('user_id')))
         self.users = {u for u in CFP_ROLE_MAP[self.role](self.event.cfp) if u.id in user_ids}
 
     def _check_access(self):
@@ -199,7 +201,7 @@ class RHAssignPapersBase(RHPapersActionBase):
         conflicts = self._get_conflicts(users)
         user_competences = self.event.cfp.user_competences
         competences = {'competences_{}'.format(user_id): competences.competences
-                       for user_id, competences in user_competences.iteritems()}
+                       for user_id, competences in six.iteritems(user_competences)}
         return jsonify_template('events/papers/assign_role.html', event=self.event, role=self.role.name,
                                 action=action, users=users, competences=competences,
                                 contribs=self.contributions, conflicts=conflicts)

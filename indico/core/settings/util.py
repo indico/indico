@@ -8,22 +8,23 @@
 from __future__ import unicode_literals
 
 from copy import copy
+import six
 
 
 _not_in_db = object()
 
 
 def _get_cache_key(proxy, name, kwargs):
-    return type(proxy), proxy.module, name, frozenset(kwargs.viewitems())
+    return type(proxy), proxy.module, name, frozenset(six.viewitems(kwargs))
 
 
 def _preload_settings(cls, proxy, cache, **kwargs):
     settings = cls.get_all(proxy.module, **kwargs)
-    for name, value in settings.iteritems():
+    for name, value in six.iteritems(settings):
         cache_key = _get_cache_key(proxy, name, kwargs)
         cache[cache_key] = value
     # cache missing entries as not in db
-    for name in proxy.defaults.viewkeys() - settings.viewkeys():
+    for name in six.viewkeys(proxy.defaults) - six.viewkeys(settings):
         cache_key = _get_cache_key(proxy, name, kwargs)
         cache[cache_key] = _not_in_db
     return settings
@@ -35,12 +36,12 @@ def get_all_settings(cls, acl_cls, proxy, no_defaults, **kwargs):
         rv = cls.get_all(proxy.module, **kwargs)
         if acl_cls and proxy.acl_names:
             rv.update(acl_cls.get_all_acls(proxy.module, **kwargs))
-        return {k: proxy._convert_to_python(k, v) for k, v in rv.iteritems()}
+        return {k: proxy._convert_to_python(k, v) for k, v in six.iteritems(rv)}
     settings = dict(proxy.defaults)
     if acl_cls and proxy.acl_names:
         settings.update({name: set() for name in proxy.acl_names})
     settings.update({k: proxy._convert_to_python(k, v)
-                     for k, v in cls.get_all(proxy.module, **kwargs).iteritems()
+                     for k, v in six.iteritems(cls.get_all(proxy.module, **kwargs))
                      if not proxy.strict or k in proxy.defaults})
     if acl_cls and proxy.acl_names:
         settings.update(acl_cls.get_all_acls(proxy.module, **kwargs))

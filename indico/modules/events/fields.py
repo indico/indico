@@ -26,6 +26,7 @@ from indico.util.i18n import _, orig_string
 from indico.web.forms.fields import MultipleItemsField
 from indico.web.forms.fields.principals import PrincipalListField
 from indico.web.forms.widgets import JinjaWidget
+import six
 
 
 class ReferencesField(MultipleItemsField):
@@ -35,7 +36,7 @@ class ReferencesField(MultipleItemsField):
         self.reference_class = kwargs.pop('reference_class')
         self.fields = [{'id': 'type', 'caption': _("Type"), 'type': 'select', 'required': True},
                        {'id': 'value', 'caption': _("Value"), 'type': 'text', 'required': True}]
-        self.choices = {'type': {unicode(r.id): r.name for r in ReferenceType.find_all()}}
+        self.choices = {'type': {six.text_type(r.id): r.name for r in ReferenceType.find_all()}}
         super(ReferencesField, self).__init__(*args, uuid_field='id', uuid_field_opaque=True, **kwargs)
 
     def process_formdata(self, valuelist):
@@ -68,7 +69,7 @@ class ReferencesField(MultipleItemsField):
         if not self.data:
             return []
         else:
-            return [{'id': r.id, 'type': unicode(r.reference_type_id), 'value': r.value} for r in self.data]
+            return [{'id': r.id, 'type': six.text_type(r.reference_type_id), 'value': r.value} for r in self.data]
 
 
 class EventPersonListField(PrincipalListField):
@@ -207,7 +208,7 @@ class IndicoThemeSelectField(SelectField):
         event_type = kwargs.pop('event_type').name
         super(IndicoThemeSelectField, self).__init__(*args, **kwargs)
         self.choices = sorted([(tid, theme['title'])
-                               for tid, theme in theme_settings.get_themes_for(event_type).viewitems()],
+                               for tid, theme in six.viewitems(theme_settings.get_themes_for(event_type))],
                               key=lambda x: x[1].lower())
         if allow_default:
             self.choices.insert(0, ('', _('Category default')))

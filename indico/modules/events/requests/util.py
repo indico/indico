@@ -9,6 +9,7 @@ from __future__ import unicode_literals
 
 from indico.core import signals
 from indico.util.signals import named_objects_from_signal
+import six
 
 
 def get_request_definitions():
@@ -20,4 +21,4 @@ def is_request_manager(user):
     """Check if the user manages any request types."""
     if not user:
         return False
-    return any(def_.can_be_managed(user) for def_ in get_request_definitions().itervalues())
+    return any(def_.can_be_managed(user) for def_ in six.itervalues(get_request_definitions()))

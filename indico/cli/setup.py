@@ -33,6 +33,7 @@ from werkzeug.urls import url_parse
 from indico.core.db.sqlalchemy.util.models import import_all_models
 from indico.util.console import cformat
 from indico.util.string import validate_email
+import six
 
 
 click.disable_unicode_literals_warning = True
@@ -365,7 +366,7 @@ class SetupWizard(object):
                 engine.connect().close()
             except OperationalError as exc:
                 if not silent:
-                    _warn('Invalid database URI: ' + unicode(exc.orig).strip())
+                    _warn('Invalid database URI: ' + six.text_type(exc.orig).strip())
                 return False
             else:
                 return True
@@ -387,7 +388,7 @@ class SetupWizard(object):
             try:
                 client.ping()
             except RedisError as exc:
-                _warn('Invalid redis URI: ' + unicode(exc))
+                _warn('Invalid redis URI: ' + six.text_type(exc))
                 return False
             else:
                 return True
@@ -452,7 +453,7 @@ class SetupWizard(object):
                                 help=('Indico needs an SMTP server to send emails.' if first else None))
             if smtp_host != default_smtp_host:
                 default_smtp_port = _get_default_smtp(smtp_host)[1]
-            smtp_port = int(_prompt('SMTP port', default=unicode(default_smtp_port or 25)))
+            smtp_port = int(_prompt('SMTP port', default=six.text_type(default_smtp_port or 25)))
             smtp_user = _prompt('SMTP username', default=smtp_user, required=False,
                                 help=('If your SMTP server requires authentication, '
                                       'enter the username now.' if first else None))
@@ -467,7 +468,7 @@ class SetupWizard(object):
                     smtp.login(smtp_user, smtp_password)
                 smtp.quit()
             except Exception as exc:
-                _warn('SMTP connection failed: ' + unicode(exc))
+                _warn('SMTP connection failed: ' + six.text_type(exc))
                 if not click.confirm('Keep these settings anyway?'):
                     default_smtp_host = smtp_host
                     default_smtp_port = smtp_port
@@ -496,7 +497,7 @@ class SetupWizard(object):
             # as e.g. https://stackoverflow.com/a/12523283/298479 suggests
             # since this is ambiguous and we rather have the user type their
             # timezone if we don't have a very likely match.
-            return next((unicode(tz) for tz in candidates if tz in common_timezones), '')
+            return next((six.text_type(tz) for tz in candidates if tz in common_timezones), '')
 
         self.default_locale = _prompt('Default locale', default='en_GB', list_=_get_all_locales(),
                                       help='Specify the default language/locale used by Indico.')
@@ -553,7 +554,7 @@ class SetupWizard(object):
             b'TEMP_DIR = {!r}'.format(os.path.join(self.data_root_path, 'tmp').encode('utf-8')),
             b'LOG_DIR = {!r}'.format(os.path.join(self.data_root_path, 'log').encode('utf-8')),
             b'STORAGE_BACKENDS = {!r}'.format({k.encode('utf-8'): v.encode('utf-8')
-                                              for k, v in storage_backends.iteritems()}),
+                                              for k, v in six.iteritems(storage_backends)}),
             b"ATTACHMENT_STORAGE = 'default'",
             b'ROUTE_OLD_URLS = True' if self.old_archive_dir else None,
             b'',

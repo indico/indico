@@ -17,6 +17,7 @@ from datetime import datetime
 from werkzeug.utils import secure_filename as _secure_filename
 
 from indico.util.string import to_unicode, unicode_to_ascii
+import six
 
 
 _control_char_re = re.compile(r'[\x00-\x1f]+')
@@ -184,4 +185,4 @@ def get_file_checksum(fileobj, chunk_size=1024*1024, algorithm=hashlib.md5):
         if not chunk:
             break
         checksum.update(chunk)
-    return unicode(checksum.hexdigest())
+    return six.text_type(checksum.hexdigest())

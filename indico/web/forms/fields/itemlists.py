@@ -15,6 +15,7 @@ from wtforms import HiddenField
 
 from indico.web.forms.fields.util import is_preprocessed_formdata
 from indico.web.forms.widgets import JinjaWidget
+import six
 
 
 class MultiStringField(HiddenField):
@@ -50,7 +51,7 @@ class MultiStringField(HiddenField):
             if self.uuid_field:
                 for item in self.data:
                     if self.uuid_field not in item:
-                        item[self.uuid_field] = unicode(uuid.uuid4())
+                        item[self.uuid_field] = six.text_type(uuid.uuid4())
 
     def pre_validate(self, form):
         try:
@@ -132,7 +133,7 @@ class MultipleItemsField(HiddenField):
             if self.uuid_field and not self.uuid_field_opaque:
                 for item in self.data:
                     if self.uuid_field not in item:
-                        item[self.uuid_field] = unicode(uuid.uuid4())
+                        item[self.uuid_field] = six.text_type(uuid.uuid4())
 
     def pre_validate(self, form):
         unique_used = set()
@@ -145,7 +146,7 @@ class MultipleItemsField(HiddenField):
             if self.uuid_field:
                 item_keys.discard(self.uuid_field)
             if item_keys != {x['id'] for x in self.fields}:
-                raise ValueError('Invalid item (bad keys): {}'.format(escape(', '.join(item.viewkeys()))))
+                raise ValueError('Invalid item (bad keys): {}'.format(escape(', '.join(six.viewkeys(item)))))
             if self.unique_field:
                 if item[self.unique_field] in unique_used:
                     raise ValueError('{} must be unique'.format(self.field_names[self.unique_field]))
@@ -156,7 +157,7 @@ class MultipleItemsField(HiddenField):
                 # raises ValueError if uuid is invalid
                 uuid.UUID(item[self.uuid_field], version=4)
                 uuid_used.add(item[self.uuid_field])
-            for key, fn in coercions.viewitems():
+            for key, fn in six.viewitems(coercions):
                 try:
                     self.data[i][key] = fn(self.data[i][key])
                 except ValueError:
@@ -169,7 +170,7 @@ class MultipleItemsField(HiddenField):
     @property
     def _field_spec(self):
         # Field data for the widget; skip non-json-serializable data
-        return [{k: v for k, v in field.iteritems() if k != 'coerce'}
+        return [{k: v for k, v in six.iteritems(field) if k != 'coerce'}
                 for field in self.fields]
 
 
@@ -208,9 +209,9 @@ class OverrideMultipleItemsField(HiddenField):
                 # e.g. a row removed from field_data that had a value before
                 del self.data[key]
                 continue
-            if set(values.viewkeys()) > self.edit_fields:
+            if set(six.viewkeys(values)) > self.edit_fields:
                 # e.g. a field that was editable before
-                self.data[key] = {k: v for k, v in values.iteritems() if k in self.edit_fields}
+                self.data[key] = {k: v for k, v in six.iteritems(values) if k in self.edit_fields}
         # Remove anything empty
         for key, values in self.data.items():
             for field, value in values.items():

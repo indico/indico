@@ -16,6 +16,7 @@ from wtforms.validators import EqualTo, Length, Regexp, StopValidation, Validati
 from indico.util.date_time import as_utc, format_date, format_datetime, format_human_timedelta, format_time, now_utc
 from indico.util.i18n import _, ngettext
 from indico.util.string import is_valid_mail
+import six
 
 
 class UsedIf(object):
@@ -89,7 +90,7 @@ class Exclusive(object):
         if field.data is None:
             return
         if any(form[f].data is not None for f in self.fields):
-            field_names = sorted(unicode(form[f].label.text) for f in self.fields)
+            field_names = sorted(six.text_type(form[f].label.text) for f in self.fields)
             msg = ngettext(u'This field is mutually exclusive with another field: {}',
                            u'This field is mutually exclusive with other fields: {}',
                            len(field_names))

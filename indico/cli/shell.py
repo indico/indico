@@ -31,6 +31,7 @@ from indico.util.console import cformat
 from indico.util.date_time import now_utc, server_to_utc
 from indico.util.fossilize import clearCache
 from indico.web.flask.stats import request_stats_request_started
+from six.moves import zip
 
 
 def _add_to_context(namespace, info, element, name=None, doc=None, color='green'):
@@ -68,7 +69,7 @@ def _add_to_context_smart(namespace, info, objects, get_name=attrgetter('__name_
 
     items = [(_get_module(obj), get_name(obj), obj) for obj in objects]
     for module, items in itertools.groupby(sorted(items, key=itemgetter(0, 1)), key=itemgetter(0)):
-        names, elements = zip(*((x[1], x[2]) for x in items))
+        names, elements = list(zip(*((x[1], x[2]) for x in items)))
         _add_to_context_multi(namespace, info, elements, names, doc=module, color=color)
 
 
@@ -89,7 +90,7 @@ def _make_shell_context():
                          color='yellow')
     # Models
     info.append(cformat('*** %{magenta!}Models%{reset} ***'))
-    models = [cls for name, cls in sorted(db.Model._decl_class_registry.items(), key=itemgetter(0))
+    models = [cls for name, cls in sorted(list(db.Model._decl_class_registry.items()), key=itemgetter(0))
               if hasattr(cls, '__table__')]
     add_to_context_smart(models)
     # Tasks
@@ -98,7 +99,7 @@ def _make_shell_context():
     add_to_context_smart(tasks, get_name=lambda x: x.name.replace('.', '_'), color='blue!')
     # Plugins
     info.append(cformat('*** %{magenta!}Plugins%{reset} ***'))
-    plugins = [type(plugin) for plugin in sorted(plugin_engine.get_active_plugins().values(),
+    plugins = [type(plugin) for plugin in sorted(list(plugin_engine.get_active_plugins().values()),
                                                  key=attrgetter('name'))]
     add_to_context_multi(plugins, color='yellow!')
     # Utils

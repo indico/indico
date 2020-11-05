@@ -24,6 +24,7 @@ from werkzeug.utils import cached_property
 
 from indico.core.config import config
 from indico.util.caching import memoize_request
+import six
 
 
 LOCALE_ALIASES = dict(LOCALE_ALIASES, en='en_GB')
@@ -58,7 +59,7 @@ def gettext_unicode(*args, **kwargs):
     plugin_name = kwargs.pop('plugin_name', None)
     force_unicode = kwargs.pop('force_unicode', False)
 
-    if not isinstance(args[0], unicode):
+    if not isinstance(args[0], six.text_type):
         args = [(text.decode('utf-8') if isinstance(text, str) else text) for text in args]
         using_unicode = force_unicode
     else:
@@ -193,7 +194,7 @@ class IndicoTranslations(Translations):
         return ngettext(msgid1, msgid2, n)
 
 
-IndicoTranslations().install(unicode=True)
+IndicoTranslations().install(six.text_type=True)
 
 
 def _remove_locale_script(locale):

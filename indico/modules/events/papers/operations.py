@@ -36,6 +36,7 @@ from indico.modules.users import User
 from indico.util.date_time import now_utc
 from indico.util.fs import secure_client_filename
 from indico.util.i18n import orig_string
+import six
 
 
 def set_reviewing_state(event, reviewing_type, enable):
@@ -54,7 +55,7 @@ def _unassign_removed(event, changes):
         PaperReviewingRole.layout_reviewer: Contribution.paper_layout_reviewers,
     }
     changed_contribs = set()
-    for role, role_changes in changes.iteritems():
+    for role, role_changes in six.iteritems(changes):
         removed = role_changes['removed']
         if not removed:
             continue

@@ -21,6 +21,8 @@ from indico.modules.rb.models.rooms import Room
 from indico.modules.users import User
 from indico.testing.util import bool_matrix
 from indico.util.date_time import get_day_end, get_day_start
+import six
+from six.moves import map
 
 
 pytest_plugins = 'indico.modules.rb.testing.fixtures'
@@ -163,7 +165,7 @@ def test_find_all(create_location, create_room):
         (1, dict(location=loc2, building=u'999', floor=u'2', number=u'3'))
     ]
     rooms = [(pos, create_room(**params)) for pos, params in data]
-    sorted_rooms = map(itemgetter(1), sorted(rooms, key=itemgetter(0)))
+    sorted_rooms = list(map(itemgetter(1), sorted(rooms, key=itemgetter(0))))
     assert sorted_rooms == Room.find_all()
 
 
@@ -194,8 +196,8 @@ def test_get_with_data(db, create_room, create_equipment_type, only_active):
         'no_eq': {'room': create_room(), 'equipment': []},
         'all_eq': {'room': create_room(), 'equipment': [eq]}
     }
-    room_types = {room_data['room']: type_ for type_, room_data in rooms.iteritems()}
-    for room in rooms.itervalues():
+    room_types = {room_data['room']: type_ for type_, room_data in six.iteritems(rooms)}
+    for room in six.itervalues(rooms):
         room['room'].available_equipment = room['equipment']
     db.session.flush()
     results = list(Room.get_with_data(only_active=only_active))

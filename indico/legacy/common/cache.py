@@ -5,12 +5,13 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-import cPickle as pickle
+import six.moves.cPickle as pickle
 import datetime
 import hashlib
 import os
 import time
-from itertools import izip
+from six.moves import map
+
 
 import redis
 from flask import g
@@ -20,6 +21,8 @@ from indico.core.logger import Logger
 from indico.legacy.common.utils import OSSpecific
 from indico.util.fs import silentremove
 from indico.util.string import truncate
+import six
+from six.moves import zip
 
 
 # To cache `None` we need to actually store something else since memcached
@@ -50,7 +53,7 @@ class CacheClient(object):
     """
 
     def set_multi(self, mapping, ttl=0):
-        for key, val in mapping.iteritems():
+        for key, val in six.iteritems(mapping):
             self.set(key, val, ttl)
 
     def get_multi(self, keys):
@@ -108,7 +111,7 @@ class RedisCacheClient(CacheClient):
 
     def set_multi(self, mapping, ttl=0):
         try:
-            self._client.mset(dict((k, pickle.dumps(v)) for k, v in mapping.iteritems()))
+            self._client.mset(dict((k, pickle.dumps(v)) for k, v in six.iteritems(mapping)))
             if ttl:
                 for key in mapping:
                     self._client.expire(key, ttl)
@@ -117,7 +120,7 @@ class RedisCacheClient(CacheClient):
 
     def get_multi(self, keys):
         try:
-            return dict(zip(keys, map(self._unpickle, self._client.mget(keys))))
+            return dict(zip(keys, list(map(self._unpickle, self._client.mget(keys)))))
         except redis.RedisError:
             Logger.get('cache.redis').exception('get_multi(%r) failed', keys)
 
@@ -292,7 +295,7 @@ class GenericCache(object):
         return hashlib.sha256(key).hexdigest()
 
     def _makeKey(self, key):
-        if not isinstance(key, basestring):
+        if not isinstance(key, six.string_types):
             # In case we get something not a string (number, list, whatever)
             key = repr(key)
         # Hashlib doesn't allow unicode so let's ensure it's not!
@@ -319,7 +322,7 @@ class GenericCache(object):
     def set_multi(self, mapping, time=0):
         self._connect()
         time = self._processTime(time)
-        mapping = dict(((self._makeKey(key), _NoneValue.replace(val)) for key, val in mapping.iteritems()))
+        mapping = dict(((self._makeKey(key), _NoneValue.replace(val)) for key, val in six.iteritems(mapping)))
         self._client.set_multi(mapping, time)
 
     def get(self, key, default=None):
@@ -332,7 +335,7 @@ class GenericCache(object):
 
     def get_multi(self, keys, default=None, asdict=True):
         self._connect()
-        real_keys = map(self._makeKey, keys)
+        real_keys = list(map(self._makeKey, keys))
         data = self._client.get_multi(real_keys)
         # Add missing keys
         for real_key in real_keys:
@@ -341,7 +344,7 @@ class GenericCache(object):
         # Get data in the same order as our keys
         sorted_data = (default if data[rk] is None else _NoneValue.restore(data[rk]) for rk in real_keys)
         if asdict:
-            return dict(izip(keys, sorted_data))
+            return dict(zip(keys, sorted_data))
         else:
             return list(sorted_data)
 
@@ -352,5 +355,5 @@ class GenericCache(object):
 
     def delete_multi(self, keys):
         self._connect()
-        keys = map(self._makeKey, keys)
+        keys = list(map(self._makeKey, keys))
         self._client.delete_multi(keys)

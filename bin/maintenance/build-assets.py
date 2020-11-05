@@ -18,6 +18,7 @@ from contextlib import contextmanager
 import click
 import yaml
 from setuptools import find_packages
+import six
 
 
 def fail(message, *args, **kwargs):
@@ -55,7 +56,7 @@ def _get_webpack_build_config(url_root='/'):
             'distURL': os.path.join(url_root, 'dist/')
         },
         'themes': {key: {'stylesheet': theme['stylesheet'], 'print_stylesheet': theme.get('print_stylesheet')}
-                   for key, theme in themes['definitions'].viewitems()
+                   for key, theme in six.viewitems(themes['definitions'])
                    if set(theme) & {'stylesheet', 'print_stylesheet'}}
     }
 
@@ -86,10 +87,10 @@ def _parse_plugin_theme_yaml(plugin_yaml):
         core_data = f.read()
     core_data = re.sub(r'^(\S+:)$', r'__core_\1', core_data, flags=re.MULTILINE)
     settings = {k: v
-                for k, v in yaml.safe_load(core_data + '\n' + plugin_yaml).viewitems()
+                for k, v in six.viewitems(yaml.safe_load(core_data + '\n' + plugin_yaml))
                 if not k.startswith('__core_')}
     return {name: {'stylesheet': theme['stylesheet'], 'print_stylesheet': theme.get('print_stylesheet')}
-            for name, theme in settings.get('definitions', {}).viewitems()
+            for name, theme in six.viewitems(settings.get('definitions', {}))
             if set(theme) & {'stylesheet', 'print_stylesheet'}}
 
 

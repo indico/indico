@@ -48,6 +48,8 @@ from indico.web.forms.fields import (IndicoDateField, IndicoDateTimeField, Indic
 from indico.web.forms.fields.principals import PermissionsField
 from indico.web.forms.validators import HiddenUnless, LinkedDateTime
 from indico.web.forms.widgets import CKEditorWidget, SwitchWidget
+import six
+from six.moves import filter
 
 
 CLONE_REPEAT_CHOICES = (
@@ -287,7 +289,7 @@ class EventProtectionForm(IndicoForm):
 
     @classmethod
     def _create_coordinator_priv_fields(cls):
-        for name, title in sorted(COORDINATOR_PRIV_TITLES.iteritems(), key=itemgetter(1)):
+        for name, title in sorted(six.iteritems(COORDINATOR_PRIV_TITLES), key=itemgetter(1)):
             setattr(cls, name, BooleanField(title, widget=SwitchWidget(), description=COORDINATOR_PRIV_DESCS[name]))
             cls.priv_fields.add(name)
 
@@ -305,7 +307,7 @@ class PosterPrintingForm(IndicoForm):
         all_templates = set(event.designer_templates) | get_inherited_templates(event)
         poster_templates = [tpl for tpl in all_templates if tpl.type.name == 'poster']
         super(PosterPrintingForm, self).__init__(**kwargs)
-        self.template.choices = sorted(((unicode(tpl.id), tpl.title) for tpl in poster_templates), key=itemgetter(1))
+        self.template.choices = sorted(((six.text_type(tpl.id), tpl.title) for tpl in poster_templates), key=itemgetter(1))
 
 
 class CloneRepeatabilityForm(IndicoForm):
@@ -317,7 +319,7 @@ class CloneContentsForm(CloneRepeatabilityForm):
 
     def __init__(self, event, set_defaults=False, **kwargs):
         options = EventCloner.get_cloners(event)
-        visible_options = filter(attrgetter('is_visible'), options)
+        visible_options = list(filter(attrgetter('is_visible'), options))
         default_selected_items = kwargs.get('selected_items', [option.name for option in options if option.is_default])
 
         if set_defaults:

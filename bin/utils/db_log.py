@@ -7,14 +7,14 @@
 
 from __future__ import print_function, unicode_literals
 
-import cPickle
+import six.moves.cPickle
 import fcntl
 import logging.handlers
 import os
 import pprint
 import re
 import signal
-import SocketServer
+import six.moves.socketserver
 import struct
 import termios
 import textwrap
@@ -33,7 +33,7 @@ ignored_line_re = re.compile(r'^(?:(?P<frame>\d+):)?(?P<file>.+?)(?::(?P<line>\d
 output_lock = Lock()
 
 
-class LogRecordStreamHandler(SocketServer.StreamRequestHandler):
+class LogRecordStreamHandler(six.moves.socketserver.StreamRequestHandler):
     def handle(self):
         while True:
             chunk = self.connection.recv(4)
@@ -43,7 +43,7 @@ class LogRecordStreamHandler(SocketServer.StreamRequestHandler):
             chunk = self.connection.recv(size)
             while len(chunk) < size:
                 chunk = chunk + self.connection.recv(size - len(chunk))
-            obj = cPickle.loads(chunk)
+            obj = six.moves.cPickle.loads(chunk)
             self.handle_log(obj)
 
     def _check_ignored_sources(self, source):
@@ -121,11 +121,11 @@ class LogRecordStreamHandler(SocketServer.StreamRequestHandler):
                 print_linesep()
 
 
-class LogRecordSocketReceiver(SocketServer.ThreadingTCPServer):
+class LogRecordSocketReceiver(six.moves.socketserver.ThreadingTCPServer):
     allow_reuse_address = True
 
     def __init__(self, host, port, traceback_frames, ignore_selects, ignored_sources, ignored_request_paths):
-        SocketServer.ThreadingTCPServer.__init__(self, (host, port), LogRecordStreamHandler)
+        six.moves.socketserver.ThreadingTCPServer.__init__(self, (host, port), LogRecordStreamHandler)
         self.timeout = 1
         self.traceback_frames = traceback_frames
         self.ignore_selects = ignore_selects

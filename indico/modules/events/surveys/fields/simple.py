@@ -12,6 +12,7 @@ from collections import Counter, OrderedDict
 from indico.modules.events.surveys.fields.base import SurveyField
 from indico.util.i18n import _
 from indico.web.fields.simple import BoolField, NumberField, TextField
+import six
 
 
 class SurveyTextField(TextField, SurveyField):
@@ -32,8 +33,8 @@ class SurveyNumberField(NumberField, SurveyField):
         results = {'total': sum(counter.elements()),
                    'max': max(counter.elements()),
                    'min': min(counter.elements()),
-                   'absolute': OrderedDict(sorted(counter.iteritems())),
-                   'relative': OrderedDict((k, v / total_answers) for k, v in sorted(counter.iteritems()))}
+                   'absolute': OrderedDict(sorted(six.iteritems(counter))),
+                   'relative': OrderedDict((k, v / total_answers) for k, v in sorted(six.iteritems(counter)))}
         results['average'] = results['total'] / len(list(counter.elements()))
         return results
 

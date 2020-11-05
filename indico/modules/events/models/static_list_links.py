@@ -16,6 +16,7 @@ from indico.core.db import db
 from indico.core.db.sqlalchemy import UTCDateTime
 from indico.util.date_time import now_utc
 from indico.util.string import format_repr, return_ascii
+import six
 
 
 class StaticListLink(db.Model):
@@ -47,7 +48,7 @@ class StaticListLink(db.Model):
         index=True,
         unique=True,
         nullable=False,
-        default=lambda: unicode(uuid4())
+        default=lambda: six.text_type(uuid4())
     )
     created_dt = db.Column(
         UTCDateTime,

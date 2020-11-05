@@ -19,6 +19,7 @@ from indico.core.db.sqlalchemy import PyIntEnum
 from indico.util.decorators import strict_classproperty
 from indico.util.i18n import _
 from indico.util.struct.enum import RichIntEnum
+import six
 
 
 class LinkType(RichIntEnum):
@@ -46,7 +47,7 @@ _columns_for_types = {
 
 
 def _make_checks(allowed_link_types):
-    available_columns = set(chain.from_iterable(cols for type_, cols in _columns_for_types.iteritems()
+    available_columns = set(chain.from_iterable(cols for type_, cols in six.iteritems(_columns_for_types)
                                                 if type_ in allowed_link_types))
     yield db.CheckConstraint('(event_id IS NULL) = (link_type = {})'.format(LinkType.category), 'valid_event_id')
     for link_type in allowed_link_types:
@@ -89,7 +90,7 @@ class LinkMixin(object):
     def __auto_table_args(cls):
         args = tuple(_make_checks(cls.allowed_link_types))
         if cls.unique_links:
-            extra_criteria = [cls.unique_links] if isinstance(cls.unique_links, basestring) else None
+            extra_criteria = [cls.unique_links] if isinstance(cls.unique_links, six.string_types) else None
             args = args + tuple(_make_uniques(cls.allowed_link_types, extra_criteria))
         return args
 
@@ -123,11 +124,11 @@ class LinkMixin(object):
                 assert event is not None
                 target.event = event
 
-        for rel, fn in event_mapping.iteritems():
+        for rel, fn in six.iteritems(event_mapping):
             if rel is not None:
                 listen(rel, 'set', partial(_set_event_obj, fn))
 
-        for rel, link_type in type_mapping.iteritems():
+        for rel, link_type in six.iteritems(type_mapping):
             if rel is not None:
                 listen(rel, 'set', partial(_set_link_type, link_type))
 

@@ -79,13 +79,15 @@ import uuid
 from io import BytesIO
 from mimetypes import guess_extension
 from tempfile import NamedTemporaryFile
-from urlparse import urlparse
+from six.moves.urllib.parse import urlparse
 
 import markdown
 import requests
 from lxml.html import html5parser
 from PIL import Image
 from requests.exceptions import ConnectionError, InvalidURL
+import six
+from six.moves import map
 
 
 __version__ = '2.1'
@@ -96,7 +98,7 @@ start_double_quote_re = re.compile(r'''(^|\s|'|`)"''')
 end_double_quote_re = re.compile(r'"(,|\.|\s|$)')
 
 Image.init()
-IMAGE_FORMAT_EXTENSIONS = {format: ext for (ext, format) in Image.EXTENSION.viewitems()}
+IMAGE_FORMAT_EXTENSIONS = {format: ext for (ext, format) in six.viewitems(Image.EXTENSION)}
 
 safe_mathmode_commands = {
     'above', 'abovewithdelims', 'acute', 'aleph', 'alpha', 'amalg', 'And', 'angle', 'approx', 'arccos', 'arcsin',
@@ -176,7 +178,7 @@ def latex_escape(text, ignore_math=True, ignore_braces=False):
     def substitute(x):
         return chars[x.group()]
 
-    math_placeholder = '[*LaTeXmath-{}*]'.format(unicode(uuid.uuid4()))
+    math_placeholder = '[*LaTeXmath-{}*]'.format(six.text_type(uuid.uuid4()))
 
     def math_replace(m):
         math_segments.append(m.group(0))
@@ -191,7 +193,7 @@ def latex_escape(text, ignore_math=True, ignore_braces=False):
 
     if ignore_math:
         # Sanitize math-mode segments and put them back in place
-        math_segments = map(sanitize_mathmode, math_segments)
+        math_segments = list(map(sanitize_mathmode, math_segments))
         res = re.sub(re.escape(math_placeholder), lambda _: "\\protect " + math_segments.pop(0), res)
 
     return res

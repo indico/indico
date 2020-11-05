@@ -35,6 +35,7 @@ from indico.util.i18n import _
 from indico.web.flask.util import url_for
 from indico.web.forms.base import FormDefaults
 from indico.web.util import jsonify_data, jsonify_form, jsonify_template
+import six
 
 
 class RHManageRegistrationForms(RHManageRegFormsBase):
@@ -71,7 +72,7 @@ class RHManageRegistrationFormsDisplay(RHManageRegFormsBase):
             if column_name in available_columns:
                 enabled_columns.append({'id': column_name, 'title': available_columns[column_name]})
                 del available_columns[column_name]
-        for column_name, column_title in available_columns.iteritems():
+        for column_name, column_title in six.iteritems(available_columns):
             disabled_columns.append({'id': column_name, 'title': column_title})
         disabled_columns.sort(key=itemgetter('title'))
 
@@ -88,7 +89,7 @@ class RHManageRegistrationFormsDisplay(RHManageRegFormsBase):
             if regform.publish_registrations_enabled:
                 enabled_forms.append(regform)
                 del available_forms[form_id]
-        for form_id, regform in available_forms.iteritems():
+        for form_id, regform in six.iteritems(available_forms):
             # There might be forms with publication enabled that haven't been sorted by the user yet.
             if regform.publish_registrations_enabled:
                 enabled_forms.append(regform)
@@ -126,7 +127,7 @@ class RHManageRegistrationFormDisplay(RHManageRegFormBase):
             enabled_fields.append(field)
             del available_fields[field_id]
 
-        disabled_fields = available_fields.values()
+        disabled_fields = list(available_fields.values())
         return jsonify_template('events/registration/management/regform_display_form_columns.html', form=form,
                                 enabled_columns=enabled_fields, disabled_columns=disabled_fields)
 

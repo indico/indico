@@ -14,6 +14,7 @@ import dateutil.parser
 from indico.modules.rb import rb_settings
 from indico.modules.rb.models.reservations import RepeatFrequency
 from indico.modules.rb.tasks import roombooking_end_notifications, roombooking_occurrences
+import six
 
 
 pytest_plugins = 'indico.modules.rb.testing.fixtures'
@@ -188,8 +189,8 @@ finishing_reservations = [
 
 def test_roombooking_notifications(mocker, create_user, create_room, create_reservation, freeze_time):
     rb_settings.set_multi(settings)
-    user_map = {key: create_user(id_, **data) for id_, (key, data) in enumerate(users.iteritems(), 1)}
-    room_map = {key: create_room(**data) for key, data in rooms.iteritems()}
+    user_map = {key: create_user(id_, **data) for id_, (key, data) in enumerate(six.iteritems(users), 1)}
+    room_map = {key: create_room(**data) for key, data in six.iteritems(rooms)}
 
     notification_map = defaultdict(dict)
     end_notification_map = defaultdict(dict)

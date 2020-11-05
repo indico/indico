@@ -19,6 +19,8 @@ from indico.util.fs import secure_filename
 from indico.util.signing import secure_serializer
 from indico.util.string import format_repr, return_ascii, strict_unicode
 from indico.web.flask.util import url_for
+from six.moves import map
+import six
 
 
 class File(StoredFileMixin, db.Model):
@@ -34,7 +36,7 @@ class File(StoredFileMixin, db.Model):
         index=True,
         unique=True,
         nullable=False,
-        default=lambda: unicode(uuid4())
+        default=lambda: six.text_type(uuid4())
     )
     #: Whether the file has been associated with something.
     #: Unclaimed files may be deleted automatically after a while.

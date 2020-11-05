@@ -8,8 +8,9 @@
 from __future__ import absolute_import
 
 from flask import current_app, render_template
+import six
 
 
 class MathjaxMixin(object):
     def _get_head_content(self):
-        return render_template('mathjax_config.html') + unicode(current_app.manifest['mathjax.js'])
+        return render_template('mathjax_config.html') + six.text_type(current_app.manifest['mathjax.js'])

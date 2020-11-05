@@ -34,6 +34,7 @@ from indico.modules.events import event_management_object_url_prefixes, event_ob
 from indico.util.caching import memoize
 from indico.web.flask.util import make_compat_redirect_func, make_view_func
 from indico.web.flask.wrappers import IndicoBlueprint
+import six
 
 
 _bp = IndicoBlueprint('attachments', __name__, template_folder='templates', virtual_template_folder='attachments')
@@ -51,7 +52,7 @@ def _dispatch(event_rh, category_rh):
 
 
 # Management
-items = itertools.chain(event_management_object_url_prefixes.iteritems(), [('category', ['/manage'])])
+items = itertools.chain(six.iteritems(event_management_object_url_prefixes), [('category', ['/manage'])])
 for object_type, prefixes in items:
     for prefix in prefixes:
         if object_type == 'category':
@@ -87,7 +88,7 @@ for object_type, prefixes in items:
                          methods=('DELETE',), defaults={'object_type': object_type})
 
 # Display/download
-items = itertools.chain(event_object_url_prefixes.iteritems(), [('category', [''])])
+items = itertools.chain(six.iteritems(event_object_url_prefixes), [('category', [''])])
 for object_type, prefixes in items:
     for prefix in prefixes:
         if object_type == 'category':
@@ -146,7 +147,7 @@ for rule in compat_folder_rules:
     _compat_bp.add_url_rule(rule, 'folder', compat_folder)
 for rule in compat_attachment_rules:
     _compat_bp.add_url_rule(rule, 'attachment', compat_attachment)
-for object_type, prefixes in old_obj_prefix_rules.iteritems():
+for object_type, prefixes in six.iteritems(old_obj_prefix_rules):
     for prefix in prefixes:
         # we rely on url normalization to redirect to the proper URL for the object
         _compat_bp.add_url_rule(prefix + '/attachments/<int:folder_id>/<int:attachment_id>/<filename>',

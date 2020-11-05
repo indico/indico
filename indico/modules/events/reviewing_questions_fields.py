@@ -15,6 +15,8 @@ from indico.util.i18n import _
 from indico.web.fields.base import BaseField, FieldConfigForm
 from indico.web.fields.simple import BoolField, TextField
 from indico.web.forms.widgets import SwitchWidget
+import six
+from six.moves import range
 
 
 class AbstractRatingReviewingQuestionConfigForm(FieldConfigForm):
@@ -36,7 +38,7 @@ class AbstractRatingReviewingQuestion(BaseField):
     @property
     def wtf_field_kwargs(self):
         range_ = self.object.event.cfa.rating_range
-        choices = [(n, unicode(n)) for n in range(range_[0], range_[1] + 1)]
+        choices = [(n, six.text_type(n)) for n in range(range_[0], range_[1] + 1)]
         return {'coerce': int, 'choices': choices, 'rating_range': range_, 'question': self.object}
 
 
@@ -50,7 +52,7 @@ class PaperRatingReviewingQuestion(BaseField):
     @property
     def wtf_field_kwargs(self):
         range_ = self.object.event.cfp.rating_range
-        choices = [(n, unicode(n)) for n in range(range_[0], range_[1] + 1)]
+        choices = [(n, six.text_type(n)) for n in range(range_[0], range_[1] + 1)]
         return {'coerce': int, 'choices': choices, 'rating_range': range_, 'question': self.object}
 
 

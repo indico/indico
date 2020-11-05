@@ -19,6 +19,7 @@ from indico.modules.admin import RHAdminBase
 from indico.util.i18n import _
 from indico.web.flask.util import redirect_or_jsonify, url_for
 from indico.web.forms.base import FormDefaults
+import six
 
 
 class RHPluginsBase(RHAdminBase):
@@ -27,7 +28,7 @@ class RHPluginsBase(RHAdminBase):
 
 class RHPlugins(RHPluginsBase):
     def _process(self):
-        plugins = [p for p in plugin_engine.get_active_plugins().viewvalues()]
+        plugins = [p for p in six.viewvalues(plugin_engine.get_active_plugins())]
         categories = defaultdict(list)
         other = []
         for plugin in plugins:

@@ -24,6 +24,8 @@ from indico.core.db.sqlalchemy.migration import PluginScriptDirectory, migrate, 
 from indico.core.db.sqlalchemy.util.management import get_all_tables
 from indico.core.plugins import plugin_engine
 from indico.util.console import cformat
+import six
+from six.moves import input
 
 
 @cli_group()
@@ -94,7 +96,7 @@ def reset_alembic():
                         'livesync': 'aa0dbc6c14aa',
                         'outlook': '6093a83228a7',
                         'vc_vidyo': '6019621fea50'}
-    for plugin, revision in plugin_revisions.iteritems():
+    for plugin, revision in six.iteritems(plugin_revisions):
         if plugin not in plugins:
             continue
         print('[{}] Stamping to new revision'.format(plugin))
@@ -115,7 +117,7 @@ def _safe_downgrade(*args, **kwargs):
         skip_confirm = False
         print(cformat('%{yellow!}***%{reset} '
                       "%{red!}Debug mode is NOT ACTIVE, so make sure you are on the right machine!"))
-    if not skip_confirm and raw_input(cformat('%{yellow!}***%{reset} '
+    if not skip_confirm and input(cformat('%{yellow!}***%{reset} '
                                               'To confirm this, enter %{yellow!}YES%{reset}: ')) != 'YES':
         print(cformat('%{green}Aborted%{reset}'))
         sys.exit(1)
@@ -131,7 +133,7 @@ def _call_with_plugins(*args, **kwargs):
     if plugin:
         plugins = {plugin_engine.get_plugin(plugin)}
     elif all_plugins:
-        plugins = set(plugin_engine.get_active_plugins().viewvalues())
+        plugins = set(six.viewvalues(plugin_engine.get_active_plugins()))
     else:
         plugins = None
 
@@ -150,7 +152,7 @@ def _call_with_plugins(*args, **kwargs):
 
 
 def _setup_cli():
-    for command in flask_migrate_cli.commands.itervalues():
+    for command in six.itervalues(flask_migrate_cli.commands):
         if command.name == 'init':
             continue
         command.callback = partial(with_appcontext(_call_with_plugins), _func=command.callback)

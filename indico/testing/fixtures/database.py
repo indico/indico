@@ -21,6 +21,7 @@ from indico.core.db import db as db_
 from indico.core.db.sqlalchemy.util.management import create_all_tables, delete_all_tables
 from indico.util.process import silent_check_call
 from indico.web.flask.app import configure_db
+from six.moves import map
 
 
 @pytest.fixture(scope='session')
@@ -43,7 +44,7 @@ def postgresql():
         version_output = subprocess.check_output(['initdb', '--version'])
     except Exception as e:
         pytest.skip('Could not retrieve PostgreSQL version: {}'.format(e))
-    pg_version = map(int, re.match(r'initdb \(PostgreSQL\) ((?:\d+\.?)+)', version_output).group(1).split('.'))
+    pg_version = list(map(int, re.match(r'initdb \(PostgreSQL\) ((?:\d+\.?)+)', version_output).group(1).split('.')))
     if pg_version[0] < 9 or (pg_version[0] == 9 and pg_version[1] < 6):
         pytest.skip('PostgreSQL version is too old: {}'.format(version_output))
 

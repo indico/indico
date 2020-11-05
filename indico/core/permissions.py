@@ -11,6 +11,7 @@ from indico.core import signals
 from indico.util.caching import memoize_request
 from indico.util.i18n import _
 from indico.util.signals import named_objects_from_signal
+import six
 
 
 FULL_ACCESS_PERMISSION = '_full_access'
@@ -57,7 +58,7 @@ def check_permissions(type_):
     permissions = get_available_permissions(type_)
     if not all(x.islower() for x in permissions):
         raise RuntimeError('Management permissions must be all-lowercase')
-    if len(list(x for x in permissions.viewvalues() if x.default)) > 1:
+    if len(list(x for x in six.viewvalues(permissions) if x.default)) > 1:
         raise RuntimeError('Only one permission can be the default')
 
 
@@ -95,7 +96,7 @@ def get_permissions_info(_type):
         }
     }
 
-    selectable_permissions = {k: v for k, v in get_available_permissions(_type).viewitems() if v.user_selectable}
+    selectable_permissions = {k: v for k, v in six.viewitems(get_available_permissions(_type)) if v.user_selectable}
     special_permissions = {
         FULL_ACCESS_PERMISSION: {
             'title': _('Manage'),
@@ -118,7 +119,7 @@ def get_permissions_info(_type):
             'description': special_permissions[FULL_ACCESS_PERMISSION]['description'],
             'children': {
                 perm.name: {'title': perm.friendly_name, 'description': perm.description}
-                for name, perm in selectable_permissions.viewitems()
+                for name, perm in six.viewitems(selectable_permissions)
             }
         },
         READ_ACCESS_PERMISSION: {
@@ -132,8 +133,8 @@ def get_permissions_info(_type):
         'description': v.description,
         'default': v.default,
         'color': v.color,
-    } for k, v in selectable_permissions.viewitems()}, **special_permissions)
-    default = next((k for k, v in available_permissions.viewitems() if v['default']), None)
+    } for k, v in six.viewitems(selectable_permissions)}, **special_permissions)
+    default = next((k for k, v in six.viewitems(available_permissions) if v['default']), None)
 
     return available_permissions, permissions_tree, default
 
@@ -193,7 +194,7 @@ def update_permissions(obj, form):
 
     current_principal_permissions = {p.principal: get_principal_permissions(p, type(obj))
                                      for p in obj.acl_entries}
-    current_principal_permissions = {k: v for k, v in current_principal_permissions.iteritems() if v}
+    current_principal_permissions = {k: v for k, v in six.iteritems(current_principal_permissions) if v}
     new_principal_permissions = {
         principal_from_fossil(
             fossil,
@@ -217,9 +218,9 @@ def update_principals_permissions(obj, current, new):
     :param current: A dict mapping principals to a set with its current permissions
     :param new: A dict mapping principals to a set with its new permissions
     """
-    user_selectable_permissions = {v.name for k, v in get_available_permissions(type(obj)).viewitems()
+    user_selectable_permissions = {v.name for k, v in six.viewitems(get_available_permissions(type(obj)))
                                    if v.user_selectable}
-    for principal, permissions in current.viewitems():
+    for principal, permissions in six.viewitems(current):
         if principal not in new:
             permissions_kwargs = {
                 'full_access': False,

@@ -32,6 +32,7 @@ from indico.web.flask.util import url_for
 from indico.web.forms.base import FormDefaults
 from indico.web.rh import RHProtected
 from indico.web.util import _pop_injected_js, jsonify_data, jsonify_template
+import six
 
 
 def process_vc_room_association(plugin, event, vc_room, form, event_vc_room=None, allow_same_room=False):
@@ -93,7 +94,7 @@ class RHVCManageEvent(RHVCManageEventBase):
                                                                   include_deleted=True).all()
         event_vc_rooms = [event_vc_room for event_vc_room in room_event_assocs if event_vc_room.vc_room.plugin]
         return WPVCManageEvent.render_template('manage_event.html', self.event,
-                                               event_vc_rooms=event_vc_rooms, plugins=get_vc_plugins().values())
+                                               event_vc_rooms=event_vc_rooms, plugins=list(get_vc_plugins().values()))
 
 
 class RHVCManageEventSelectService(RHVCManageEventBase):
@@ -106,7 +107,7 @@ class RHVCManageEventSelectService(RHVCManageEventBase):
         action = request.args.get('vc_room_action', '.manage_vc_rooms_create')
         attach = request.args.get('attach', '')
         return jsonify_template('vc/manage_event_select.html', event=self.event, vc_room_action=action,
-                                plugins=get_vc_plugins().values(), attach=attach)
+                                plugins=list(get_vc_plugins().values()), attach=attach)
 
 
 class RHVCManageEventCreateBase(RHVCManageEventBase):
@@ -358,6 +359,6 @@ class RHVCRoomList(RHProtected):
                                  key=lambda r: r.event.start_dt.date(),
                                  sort_by=lambda r: r.event.start_dt,
                                  sort_reverse=reverse)
-            results = OrderedDict(sorted(results.viewitems(), key=itemgetter(0), reverse=reverse))
+            results = OrderedDict(sorted(six.viewitems(results), key=itemgetter(0), reverse=reverse))
         return WPVCService.render_template('vc_room_list.html', form=form, results=results,
                                            action=url_for('.vc_room_list'))

@@ -6,7 +6,8 @@
 # LICENSE file for more details.
 
 from functools import wraps
-from itertools import groupby, islice, izip_longest
+from itertools import groupby, islice
+from six.moves import zip_longest
 
 
 def group_list(data, key=None, sort_by=None, sort_reverse=False):
@@ -43,12 +44,12 @@ def grouper(iterable, n, fillvalue=None, skip_missing=False):
     # Taken from https://docs.python.org/2/library/itertools.html#recipes
     args = [iter(iterable)] * n
     if not skip_missing:
-        return izip_longest(fillvalue=fillvalue, *args)
+        return zip_longest(fillvalue=fillvalue, *args)
     else:
         # skips the missing items in the last tuple instead of padding it
         fillvalue = object()
         return (tuple(x for x in chunk if x is not fillvalue)
-                for chunk in izip_longest(fillvalue=fillvalue, *args))
+                for chunk in zip_longest(fillvalue=fillvalue, *args))
 
 
 def materialize_iterable(type_=list):

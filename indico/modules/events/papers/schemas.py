@@ -28,6 +28,7 @@ from indico.modules.users.schemas import UserSchema
 from indico.util.i18n import orig_string
 from indico.util.mimetypes import icon_from_mimetype
 from indico.web.flask.util import url_for
+import six
 
 
 class CallForPapersSchema(mm.Schema):
@@ -123,7 +124,7 @@ class PaperRevisionSchema(mm.ModelSchema):
             data[name] = [review_type_schema.dump(item.instance) for item in data[name]]
 
         reviews = {}
-        for key, value in data['reviews'].viewitems():
+        for key, value in six.viewitems(data['reviews']):
             reviews[orig_string(key.instance.title)] = paper_review_schema.dump(value)
         data['reviews'] = reviews
         return data

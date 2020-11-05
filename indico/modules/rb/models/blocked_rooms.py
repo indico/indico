@@ -17,6 +17,7 @@ from indico.modules.rb.models.reservations import Reservation
 from indico.modules.rb.notifications.blockings import notify_request_response
 from indico.util.string import return_ascii
 from indico.util.struct.enum import RichIntEnum
+from six.moves import map
 
 
 class BlockedRoomState(RichIntEnum):
@@ -102,7 +103,7 @@ class BlockedRoom(db.Model):
             ReservationOccurrence.start_dt >= start_dt,
             ReservationOccurrence.end_dt <= end_dt,
             ReservationOccurrence.is_valid,
-            ~ReservationOccurrence.reservation_id.in_(map(attrgetter('id'), reservations)) if reservations else True,
+            ~ReservationOccurrence.reservation_id.in_(list(map(attrgetter('id'), reservations))) if reservations else True,
             *reservation_criteria,
             _join=Reservation
         )

@@ -9,6 +9,7 @@ from functools import wraps
 from inspect import getcallargs
 
 from flask import current_app, g, has_request_context
+import six
 
 
 _notset = object()
@@ -18,7 +19,7 @@ def make_hashable(obj):
     if isinstance(obj, list):
         return tuple(obj)
     elif isinstance(obj, dict):
-        return frozenset((k, make_hashable(v)) for k, v in obj.iteritems())
+        return frozenset((k, make_hashable(v)) for k, v in six.iteritems(obj))
     elif hasattr(obj, 'getId') and obj.getId.__self__ is not None:
         # getId of AvatarUserWrapper would access a cached property, we can't have that here
         id_ = obj.getId() if obj.__class__.__name__ != 'AvatarUserWrapper' else obj.id

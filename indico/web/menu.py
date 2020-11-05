@@ -13,6 +13,7 @@ from markupsafe import Markup
 from indico.core import signals
 from indico.util.signals import named_objects_from_signal
 from indico.util.string import format_repr, return_ascii
+import six
 
 
 class _MenuSectionBase(object):
@@ -143,11 +144,11 @@ def build_menu_structure(menu_id, active_item=None, **kwargs):
     top_level = set()
     sections = {}
 
-    for id_, section in named_objects_from_signal(signals.menu.sections.send(menu_id, **kwargs)).iteritems():
+    for id_, section in six.iteritems(named_objects_from_signal(signals.menu.sections.send(menu_id, **kwargs))):
         sections[id_] = section
         top_level.add(section)
 
-    for id_, item in named_objects_from_signal(signals.menu.items.send(menu_id, **kwargs)).iteritems():
+    for id_, item in six.iteritems(named_objects_from_signal(signals.menu.items.send(menu_id, **kwargs))):
         if id_ == active_item:
             item.active = True
         if item.section is None:

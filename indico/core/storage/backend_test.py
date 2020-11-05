@@ -14,6 +14,7 @@ import pytest
 
 from indico.core.storage import (FileSystemStorage, ReadOnlyFileSystemStorage, Storage, StorageError,
                                  StorageReadOnlyError)
+import six
 
 
 @pytest.fixture
@@ -41,23 +42,23 @@ def test_parse_data(data, expected):
 def test_fs_errors(fs_storage):
     with pytest.raises(StorageError) as exc_info:
         fs_storage.open('xxx')
-    assert 'Could not open' in unicode(exc_info.value)
+    assert 'Could not open' in six.text_type(exc_info.value)
     with pytest.raises(StorageError) as exc_info:
         fs_storage.send_file('xxx', 'unused/unused', 'unused')
-    assert 'Could not send' in unicode(exc_info.value)
+    assert 'Could not send' in six.text_type(exc_info.value)
     with pytest.raises(StorageError) as exc_info:
         fs_storage.delete('xxx')
-    assert 'Could not delete' in unicode(exc_info.value)
+    assert 'Could not delete' in six.text_type(exc_info.value)
     with pytest.raises(StorageError) as exc_info:
         fs_storage.getsize('xxx')
-    assert 'Could not get size' in unicode(exc_info.value)
+    assert 'Could not get size' in six.text_type(exc_info.value)
     with pytest.raises(StorageError) as exc_info:
         fs_storage.open('../xxx')
-    assert 'Invalid path' in unicode(exc_info.value)
+    assert 'Invalid path' in six.text_type(exc_info.value)
     os.mkdir(fs_storage._resolve_path('secret'), 0o000)
     with pytest.raises(StorageError) as exc_info:
         fs_storage.save('secret/test.txt', 'unused/unused', 'unused', b'hello test')
-    assert 'Could not save' in unicode(exc_info.value)
+    assert 'Could not save' in six.text_type(exc_info.value)
     os.rmdir(fs_storage._resolve_path('secret'))
 
 
@@ -75,7 +76,7 @@ def test_fs_overwrite(fs_storage):
     f, __ = fs_storage.save('test.txt', 'unused/unused', 'unused', b'hello test')
     with pytest.raises(StorageError) as exc_info:
         fs_storage.save('test.txt', 'unused/unused', 'unused', b'hello fail')
-    assert 'already exists' in unicode(exc_info.value)
+    assert 'already exists' in six.text_type(exc_info.value)
     with fs_storage.open(f) as fd:
         assert fd.read() == b'hello test'
 
@@ -85,11 +86,11 @@ def test_fs_dir(fs_storage):
     # Cannot open directory
     with pytest.raises(StorageError) as exc_info:
         fs_storage.open('foo')
-    assert 'Could not open' in unicode(exc_info.value)
+    assert 'Could not open' in six.text_type(exc_info.value)
     # Cannot create file colliding with the directory
     with pytest.raises(StorageError) as exc_info:
         fs_storage.save('foo', 'unused/unused', 'unused', b'hello test')
-    assert 'Could not save' in unicode(exc_info.value)
+    assert 'Could not save' in six.text_type(exc_info.value)
 
 
 def test_fs_operations(fs_storage):

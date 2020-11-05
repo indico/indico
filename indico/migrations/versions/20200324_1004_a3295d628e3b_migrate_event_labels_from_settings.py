@@ -10,6 +10,7 @@ from collections import defaultdict
 from uuid import uuid4
 
 from alembic import context, op
+import six
 
 
 # revision identifiers, used by Alembic.
@@ -60,7 +61,7 @@ def downgrade():
     mapping = {}
     res = conn.execute("SELECT id, title, color FROM events.labels")
     for label_id, title, color in res:
-        uuid = unicode(uuid4())
+        uuid = six.text_type(uuid4())
         conn.execute("INSERT INTO indico.settings (module, name, value) VALUES ('event_labels', %s, %s)",
                      (uuid, json.dumps({'id': uuid, 'title': title, 'color': color})))
         mapping[label_id] = uuid

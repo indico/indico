@@ -49,9 +49,8 @@ class ReminderForm(IndicoForm):
         self.event = kwargs.pop('event')
         self.timezone = self.event.timezone
         super(ReminderForm, self).__init__(*args, **kwargs)
-        self.reply_to_address.choices = (self.event
-                                         .get_allowed_sender_emails(extra=self.reply_to_address.object_data)
-                                         .items())
+        self.reply_to_address.choices = (list(self.event
+                                         .get_allowed_sender_emails(extra=self.reply_to_address.object_data).items()))
         if self.event.type_ == EventType.lecture:
             del self.include_summary
 

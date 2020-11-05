@@ -17,6 +17,8 @@ from markupsafe import Markup
 from indico.core import signals
 from indico.util.i18n import orig_string
 from indico.util.signals import named_objects_from_signal
+import six
+from six.moves import map
 
 
 def get_log_renderers():
@@ -35,12 +37,12 @@ def make_diff_log(changes, fields):
             old and new value
     """
     data = {'_diff': True}
-    for key, field_data in fields.iteritems():
+    for key, field_data in six.iteritems(fields):
         try:
             change = changes[key]
         except KeyError:
             continue
-        if isinstance(field_data, basestring):
+        if isinstance(field_data, six.string_types):
             field_data = {'title': field_data}
         title = field_data['title']
         convert = field_data.get('convert')
@@ -61,13 +63,13 @@ def make_diff_log(changes, fields):
             change = [orig_string(getattr(x, 'title', x.name))
                       if x is not None else default
                       for x in change]
-        elif all(isinstance(x, (int, long, float)) for x in change):
+        elif all(isinstance(x, (int, int, float)) for x in change):
             type_ = 'number'
         elif all(isinstance(x, (list, tuple)) for x in change):
             type_ = 'list'
         elif all(isinstance(x, set) for x in change):
             type_ = 'list'
-            change = map(sorted, change)
+            change = list(map(sorted, change))
         elif all(isinstance(x, bool) for x in change):
             type_ = 'bool'
         elif all(isinstance(x, datetime) for x in change):
@@ -75,7 +77,7 @@ def make_diff_log(changes, fields):
             change = [x.isoformat() for x in change]
         else:
             type_ = 'text'
-            change = map(unicode, map(orig_string, change))
+            change = list(map(six.text_type, list(map(orig_string, change))))
         data[title] = list(change) + [type_]
     return data
 
@@ -148,15 +150,15 @@ def _diff_list(a, b):
             output += seqm.a[a0:a1]
         elif opcode == 'insert':
             inserted = seqm.b[b0:b1]
-            output += map(Markup('<ins>{}</ins>').format, inserted)
+            output += list(map(Markup('<ins>{}</ins>').format, inserted))
         elif opcode == 'delete':
             deleted = seqm.a[a0:a1]
-            output += map(Markup('<del>{}</del>').format, deleted)
+            output += list(map(Markup('<del>{}</del>').format, deleted))
         elif opcode == 'replace':
             deleted = seqm.a[a0:a1]
             inserted = seqm.b[b0:b1]
-            output += map(Markup('<del>{}</del>').format, deleted)
-            output += map(Markup('<ins>{}</ins>').format, inserted)
+            output += list(map(Markup('<del>{}</del>').format, deleted))
+            output += list(map(Markup('<ins>{}</ins>').format, inserted))
         else:
             raise RuntimeError('unexpected opcode: ' + opcode)
     return Markup(', ').join(output)

@@ -14,6 +14,7 @@ from collections import defaultdict
 import pytz
 
 from indico.modules.rb.models.reservation_occurrences import ReservationOccurrence
+import six
 
 
 class Conversion(object):
@@ -21,7 +22,7 @@ class Conversion(object):
     def datetime(cls, dt, tz=None, convert=False):
         if dt:
             if tz:
-                if isinstance(tz, basestring):
+                if isinstance(tz, six.string_types):
                     tz = pytz.timezone(tz)
                 date = dt.astimezone(tz)
             else:

@@ -14,6 +14,7 @@ import sys
 import click
 from babel.dates import format_date
 from packaging.version import Version
+from six.moves import map
 
 
 def fail(message, *args, **kwargs):
@@ -48,7 +49,7 @@ def run(cmd, title, shell=False):
 
 def _bump_version(version):
     try:
-        parts = map(int, version.split('.'))
+        parts = list(map(int, version.split('.')))
     except ValueError:
         fail('cannot bump version with non-numeric parts; did you forget --no-bump?')
         sys.exit(1)

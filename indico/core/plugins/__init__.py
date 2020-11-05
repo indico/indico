@@ -34,9 +34,10 @@ from indico.web.flask.util import url_for, url_rule_to_js
 from indico.web.flask.wrappers import IndicoBlueprint, IndicoBlueprintSetupState
 from indico.web.menu import SideMenuItem
 from indico.web.views import WPJinjaMixin
+import six
 
 
-class PluginCategory(unicode, IndicoEnum):
+class PluginCategory(six.text_type, IndicoEnum):
     search = _('Search')
     synchronization = _('Synchronization')
     payment = _('Payment')

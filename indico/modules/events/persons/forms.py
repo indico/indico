@@ -35,7 +35,7 @@ class EmailEventPersonsForm(IndicoForm):
         register_link = kwargs.pop('register_link')
         event = kwargs.pop('event')
         super(EmailEventPersonsForm, self).__init__(*args, **kwargs)
-        self.from_address.choices = event.get_allowed_sender_emails().items()
+        self.from_address.choices = list(event.get_allowed_sender_emails().items())
         self.body.description = render_placeholder_info('event-persons-email', event=None, person=None,
                                                         register_link=register_link)
 

@@ -24,6 +24,7 @@ from indico.util.i18n import _
 from indico.web.flask.util import url_for
 from indico.web.forms.base import FormDefaults
 from indico.web.util import jsonify_data, jsonify_form, jsonify_template
+import six
 
 
 class RHPaymentAdminSettings(RHAdminBase):
@@ -36,7 +37,7 @@ class RHPaymentAdminSettings(RHAdminBase):
             flash(_('Settings saved'), 'success')
             return redirect(url_for('.admin_settings'))
         return WPPaymentAdmin.render_template('admin_settings.html', 'payment',
-                                              form=form, plugins=get_payment_plugins().values())
+                                              form=form, plugins=list(get_payment_plugins().values()))
 
 
 class RHPaymentAdminPluginSettings(RHPluginDetails):
@@ -60,11 +61,11 @@ class RHPaymentSettings(RHPaymentManagementBase):
 
     def _process(self):
         methods = get_payment_plugins()
-        enabled_methods = [method for method in methods.itervalues()
+        enabled_methods = [method for method in six.itervalues(methods)
                            if method.event_settings.get(self.event, 'enabled')]
         return WPPaymentEventManagement.render_template('management/payments.html', self.event,
                                                         settings=payment_event_settings.get_all(self.event),
-                                                        methods=methods.items(), enabled_methods=enabled_methods)
+                                                        methods=list(methods.items()), enabled_methods=enabled_methods)
 
 
 class RHPaymentSettingsEdit(RHPaymentManagementBase):
@@ -104,7 +105,7 @@ class RHPaymentPluginEdit(RHPaymentManagementBase):
         can_modify = bool(session.user) and self.plugin.can_be_modified(session.user, self.event)
         plugin_settings = self.plugin.settings.get_all()
         plugin_event_settings = self.plugin.event_settings.get_all(self.event)
-        defaults = FormDefaults({k: v for k, v in plugin_event_settings.iteritems() if v is not None},
+        defaults = FormDefaults({k: v for k, v in six.iteritems(plugin_event_settings) if v is not None},
                                 **plugin_settings)
         form = self.plugin.event_settings_form(prefix='payment-', obj=defaults, plugin_settings=plugin_settings)
         if can_modify and form.validate_on_submit():
@@ -131,12 +132,12 @@ class RHPaymentCheckout(RHPaymentBase):
             flash(_("The registration doesn't need to be paid"), 'error')
             return redirect(url_for('event_registration.display_regform', self.registration.locator.registrant))
         plugins = get_active_payment_plugins(self.event)
-        valid_plugins = {k: v for k, v in plugins.iteritems() if v.supports_currency(self.registration.currency)}
-        force_plugin = valid_plugins.items()[0] if len(valid_plugins) == 1 else None  # only one plugin available
+        valid_plugins = {k: v for k, v in six.iteritems(plugins) if v.supports_currency(self.registration.currency)}
+        force_plugin = list(valid_plugins.items())[0] if len(valid_plugins) == 1 else None  # only one plugin available
         return WPPaymentEvent.render_template('event_checkout.html', self.event,
                                               registration=self.registration,
                                               regform=self.registration.registration_form,
-                                              plugins=valid_plugins.items(), force_plugin=force_plugin)
+                                              plugins=list(valid_plugins.items()), force_plugin=force_plugin)
 
 
 class RHPaymentForm(RHPaymentBase):

@@ -20,6 +20,8 @@ from indico.core.db.sqlalchemy.util.management import create_all_tables, get_all
 from indico.core.db.sqlalchemy.util.queries import has_extension
 from indico.core.plugins import plugin_engine
 from indico.util.console import cformat
+import six
+from six.moves import map
 
 
 migrate = Migrate(db=db)
@@ -97,7 +99,7 @@ def prepare_db(empty=False, root_path=None, verbose=True):
         alembic.command.ScriptDirectory = PluginScriptDirectory
         plugin_msg = cformat("%{cyan}Setting the alembic version of the %{cyan!}{}%{reset}%{cyan} "
                              "plugin to HEAD%{reset}")
-        for plugin in plugin_engine.get_active_plugins().itervalues():
+        for plugin in six.itervalues(plugin_engine.get_active_plugins()):
             if not os.path.exists(plugin.alembic_versions_path):
                 continue
             if verbose:
@@ -108,7 +110,7 @@ def prepare_db(empty=False, root_path=None, verbose=True):
         tables = get_all_tables(db)
 
     tables['public'] = [t for t in tables['public'] if not t.startswith('alembic_version')]
-    if any(tables.viewvalues()):
+    if any(six.viewvalues(tables)):
         if verbose:
             print(cformat('%{red}Your database is not empty!'))
             print(cformat('%{yellow}If you just added a new table/model, create an alembic revision instead!'))

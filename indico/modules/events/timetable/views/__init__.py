@@ -23,6 +23,7 @@ from indico.modules.events.util import get_theme
 from indico.modules.events.views import WPConferenceDisplayBase
 from indico.util.signals import values_from_signal
 from indico.web.flask.templating import register_template_hook, template_hook
+import six
 
 
 register_template_hook('week-meeting-body', inject_week_timetable)
@@ -94,7 +95,7 @@ def inject_meeting_body(event, **kwargs):
                 (detail_level not in ('contribution', 'all') or show_session != 'all')):
             continue
         elif (entry.type == TimetableEntryType.SESSION_BLOCK and show_session != 'all' and
-                unicode(entry.object.session.friendly_id) != show_session):
+                six.text_type(entry.object.session.friendly_id) != show_session):
             continue
 
         if entry.type == TimetableEntryType.BREAK:

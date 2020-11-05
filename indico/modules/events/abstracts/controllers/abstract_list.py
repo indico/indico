@@ -31,6 +31,7 @@ from indico.modules.events.util import get_field_values
 from indico.modules.users.models.users import User
 from indico.util.i18n import _, ngettext
 from indico.web.util import jsonify_data, jsonify_form, jsonify_template
+from six.moves import map
 
 
 class RHAbstractListBase(RHManageAbstractsBase):
@@ -55,7 +56,7 @@ class RHManageAbstractsActionsBase(RHAbstractListBase):
 
     def _process_args(self):
         RHAbstractListBase._process_args(self)
-        ids = map(int, request.form.getlist('abstract_id'))
+        ids = list(map(int, request.form.getlist('abstract_id')))
         self.abstracts = self._abstract_query.filter(Abstract.id.in_(ids)).all()
 
 

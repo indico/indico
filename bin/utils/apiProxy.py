@@ -12,7 +12,7 @@ import hmac
 import optparse
 import sys
 import time
-import urllib
+import six.moves.urllib.request, six.moves.urllib.parse, six.moves.urllib.error
 from contextlib import closing
 
 import requests
@@ -24,7 +24,7 @@ app = Flask(__name__)
 
 
 def build_indico_request(path, params, api_key=None, secret_key=None, only_public=False):
-    items = params.items() if hasattr(params, 'items') else list(params)
+    items = list(params.items()) if hasattr(params, 'items') else list(params)
     if api_key:
         items.append(('apikey', api_key))
     if only_public:
@@ -32,7 +32,7 @@ def build_indico_request(path, params, api_key=None, secret_key=None, only_publi
     if secret_key:
         items.append(('timestamp', str(int(time.time()))))
         items = sorted(items, key=lambda x: x[0].lower())
-        url = '%s?%s' % (path, urllib.urlencode(items))
+        url = '%s?%s' % (path, six.moves.urllib.parse.urlencode(items))
         signature = hmac.new(secret_key, url, hashlib.sha1).hexdigest()
         items.append(('signature', signature))
     return items

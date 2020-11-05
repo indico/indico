@@ -31,6 +31,8 @@ from indico.util.i18n import _
 from indico.web.flask.util import url_for
 from indico.web.forms.fields import JSONField
 from indico.web.forms.widgets import JinjaWidget, SelectizeWidget
+import six
+from six.moves import map
 
 
 def _serialize_user(user):
@@ -42,8 +44,8 @@ def _serialize_user(user):
 
 def _get_users_in_roles(data):
     user_ids = {user_id
-                for user_roles in data.viewvalues()
-                for users in user_roles.viewvalues()
+                for user_roles in six.viewvalues(data)
+                for users in six.viewvalues(user_roles)
                 for user_id in users}
     if not user_ids:
         return []
@@ -74,7 +76,7 @@ class EmailRuleListField(JSONField):
             c.name: {
                 'title': c.description,
                 'labelText': c.label_text,
-                'options': list(c.get_available_values(event=self.event).viewitems()),
+                'options': list(six.viewitems(c.get_available_values(event=self.event))),
                 'compatibleWith': c.compatible_with,
                 'required': c.required
             } for c in self.accepted_condition_types
@@ -84,7 +86,7 @@ class EmailRuleListField(JSONField):
         super(EmailRuleListField, self).pre_validate(form)
         if not all(self.data):
             raise ValueError(_('Rules may not be empty'))
-        if any('*' in crit for rule in self.data for crit in rule.itervalues()):
+        if any('*' in crit for rule in self.data for crit in six.itervalues(rule)):
             # '*' (any) rules should never be included in the JSON, and having
             # such an entry would result in the rule never passing.
             raise ValueError('Unexpected "*" criterion')

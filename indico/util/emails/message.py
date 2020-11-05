@@ -27,6 +27,8 @@ from speaklater import is_lazy_string
 from werkzeug.urls import url_parse
 
 from indico.util.string import to_unicode
+import six
+from six.moves import map
 
 
 def force_text(val):
@@ -236,25 +238,25 @@ class EmailMessage(object):
         necessary encoding conversions.
         """
         if to:
-            if isinstance(to, basestring):
+            if isinstance(to, six.string_types):
                 raise TypeError('"to" argument must be a list or tuple')
             self.to = list(to)
         else:
             self.to = []
         if cc:
-            if isinstance(cc, basestring):
+            if isinstance(cc, six.string_types):
                 raise TypeError('"cc" argument must be a list or tuple')
             self.cc = list(cc)
         else:
             self.cc = []
         if bcc:
-            if isinstance(bcc, basestring):
+            if isinstance(bcc, six.string_types):
                 raise TypeError('"bcc" argument must be a list or tuple')
             self.bcc = list(bcc)
         else:
             self.bcc = []
         if reply_to:
-            if isinstance(reply_to, basestring):
+            if isinstance(reply_to, six.string_types):
                 raise TypeError('"reply_to" argument must be a list or tuple')
             self.reply_to = list(reply_to)
         else:

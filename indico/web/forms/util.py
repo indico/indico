@@ -67,4 +67,4 @@ def inject_validators(form, field_name, validators, early=False):
     if form._unbound_fields is not None:
         unbound_fields = OrderedDict(form._unbound_fields)
         unbound_fields[field_name] = unbound
-        form._unbound_fields = unbound_fields.items()
+        form._unbound_fields = list(unbound_fields.items())

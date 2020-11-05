@@ -13,6 +13,7 @@ from indico.modules.events.management.settings import program_codes_settings
 from indico.util.date_time import format_datetime
 from indico.util.i18n import _
 from indico.util.placeholders import ParametrizedPlaceholder, Placeholder, get_empty_placeholders, replace_placeholders
+import six
 
 
 def generate_program_codes(event, object_type, objects):
@@ -58,13 +59,13 @@ class ContributionIDPlaceholder(ParametrizedPlaceholder):
     @classmethod
     def render(cls, param, contribution):
         if param is None:
-            return unicode(contribution.friendly_id)
+            return six.text_type(contribution.friendly_id)
         try:
             padding = max(1, min(int(param), 10))
         except ValueError:
-            return unicode(contribution.friendly_id)
+            return six.text_type(contribution.friendly_id)
         else:
-            return unicode(contribution.friendly_id).zfill(padding)
+            return six.text_type(contribution.friendly_id).zfill(padding)
 
 
 class ContributionSessionCodePlaceholder(Placeholder):
@@ -139,7 +140,7 @@ class SubContributionIDPlaceholder(Placeholder):
 
     @classmethod
     def render(cls, subcontribution):
-        return unicode(subcontribution.friendly_id)
+        return six.text_type(subcontribution.friendly_id)
 
 
 class SubContributionContributionCodePlaceholder(Placeholder):
@@ -157,7 +158,7 @@ class SessionIDPlaceholder(Placeholder):
 
     @classmethod
     def render(cls, session):
-        return unicode(session.friendly_id)
+        return six.text_type(session.friendly_id)
 
 
 class SessionSessionTypeCodePlaceholder(Placeholder):

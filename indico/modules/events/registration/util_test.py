@@ -137,7 +137,7 @@ def test_get_event_regforms_no_registration(dummy_event, dummy_user, dummy_regfo
     regforms, registrations = get_event_regforms_registrations(dummy_event, dummy_user, include_scheduled)
 
     assert (dummy_regform in regforms) == expected_regform_flag
-    assert registrations.values() == [None]
+    assert list(registrations.values()) == [None]
 
 
 @pytest.mark.parametrize(('start_dt', 'end_dt', 'include_scheduled'), (
@@ -159,7 +159,7 @@ def test_get_event_regforms_registration(dummy_event, dummy_user, dummy_regform,
 
     regforms, registrations = get_event_regforms_registrations(dummy_event, dummy_user, include_scheduled=False)
 
-    assert registrations.values()[0].user == dummy_user
+    assert list(registrations.values())[0].user == dummy_user
     assert dummy_regform in regforms
 
 

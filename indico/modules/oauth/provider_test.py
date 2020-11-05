@@ -17,6 +17,7 @@ from sqlalchemy.orm.exc import NoResultFound
 from indico.modules.oauth.models.applications import OAuthApplication
 from indico.modules.oauth.models.tokens import OAuthGrant
 from indico.modules.oauth.provider import DisabledClientIdError, load_client, load_token, save_grant, save_token
+import six
 
 
 pytest_plugins = 'indico.modules.oauth.testing.fixtures'
@@ -24,7 +25,7 @@ pytest_plugins = 'indico.modules.oauth.testing.fixtures'
 
 @pytest.fixture
 def token_data():
-    return {'access_token': unicode(uuid4()),
+    return {'access_token': six.text_type(uuid4()),
             'expires_in': 3600,
             'refresh_token': '',
             'scope': 'api'}
@@ -68,7 +69,7 @@ def test_save_grant(mocker, freeze_time):
     request = MagicMock()
     request.scopes = 'api'
     request.redirect_uri = 'http://localhost:5000'
-    client_id = unicode(uuid4())
+    client_id = six.text_type(uuid4())
     code = {'code': 'foobar'}
     expires = datetime.utcnow() + timedelta(seconds=120)
     grant = save_grant(client_id, code, request)
@@ -152,7 +153,7 @@ def test_save_token_invalid_grant(dummy_request, token_data, grant_type):
 
 
 def test_save_token_no_application(dummy_application, dummy_request, token_data):
-    dummy_request.client.client_id = unicode(uuid4())
+    dummy_request.client.client_id = six.text_type(uuid4())
     assert not OAuthApplication.find(client_id=dummy_request.client.client_id).count()
     with pytest.raises(NoResultFound):
         save_token(token_data, dummy_request)

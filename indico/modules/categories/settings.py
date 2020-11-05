@@ -13,6 +13,7 @@ from indico.core.settings import SettingsProxyBase
 from indico.core.settings.util import get_all_settings, get_setting
 from indico.modules.categories import Category
 from indico.modules.categories.models.settings import CategorySetting
+import six
 
 
 def _category_or_id(f):
@@ -74,7 +75,7 @@ class CategorySettingsProxy(SettingsProxyBase):
         :param category: Category (or its ID)
         :param items: Dict containing the new settings
         """
-        items = {k: self._convert_from_python(k, v) for k, v in items.iteritems()}
+        items = {k: self._convert_from_python(k, v) for k, v in six.iteritems(items)}
         CategorySetting.set_multi(self.module, items, category_id=category)
         self._flush_cache()
 

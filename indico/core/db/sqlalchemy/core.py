@@ -24,6 +24,7 @@ from indico.core import signals
 from indico.core.db.sqlalchemy.custom.natsort import create_natsort_function
 from indico.core.db.sqlalchemy.custom.unaccent import create_unaccent_function
 from indico.core.db.sqlalchemy.util.models import IndicoBaseQuery, IndicoModel
+import six
 
 
 class ConstraintViolated(Exception):
@@ -55,7 +56,7 @@ def handle_sqlalchemy_database_error():
         msg += ': {}'.format(exc.orig.diag.message_detail)
     if exc.orig.diag.message_hint:
         msg += ' ({})'.format(exc.orig.diag.message_hint)
-    raise ConstraintViolated(msg, exc.orig), None, tb  # raise with original traceback
+    six.reraise(ConstraintViolated(msg, exc.orig), None, tb)  # raise with original traceback
 
 
 def _after_commit(*args, **kwargs):
@@ -133,7 +134,7 @@ def _before_create(target, connection, **kw):
     for schema in schemas:
         if not _schema_exists(connection, schema):
             CreateSchema(schema).execute(connection)
-            signals.db_schema_created.send(unicode(schema), connection=connection)
+            signals.db_schema_created.send(six.text_type(schema), connection=connection)
     # Create our custom functions
     create_unaccent_function(connection)
     create_natsort_function(connection)
@@ -156,7 +157,7 @@ def _mapper_configured(mapper, class_):
 
 
 def _column_names(constraint, table):
-    return '_'.join((c if isinstance(c, basestring) else c.name) for c in constraint.columns)
+    return '_'.join((c if isinstance(c, six.string_types) else c.name) for c in constraint.columns)
 
 
 def _unique_index(constraint, table):

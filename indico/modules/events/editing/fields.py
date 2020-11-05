@@ -18,6 +18,7 @@ from indico.modules.events.editing.models.editable import Editable
 from indico.modules.events.editing.models.file_types import EditingFileType
 from indico.modules.events.editing.models.tags import EditingTag
 from indico.util.marshmallow import FilesField, ModelField, ModelList
+import six
 
 
 class EditingFilesField(Dict):
@@ -35,13 +36,13 @@ class EditingFilesField(Dict):
         required_types = {ft for ft in self.editing_file_types_query if ft.required}
 
         # ensure all required file types have files
-        required_missing = required_types - {ft for ft, files in value.viewitems() if files}
+        required_missing = required_types - {ft for ft, files in six.viewitems(value) if files}
         if required_missing:
             raise ValidationError('Required file types missing: {}'
                                   .format(', '.join(ft.name for ft in required_missing)))
 
         seen = set()
-        for file_type, files in value.viewitems():
+        for file_type, files in six.viewitems(value):
             # ensure single-file types don't have too many files
             if not file_type.allow_multiple_files and len(files) > 1:
                 raise ValidationError('File type "{}" allows only one file'.format(file_type.name))
@@ -67,7 +68,7 @@ class EditingFilesField(Dict):
             duplicates = set(files) & seen
             if duplicates:
                 raise ValidationError('Files found in multiple types: {}'
-                                      .format(', '.join(unicode(f.uuid) for f in duplicates)))
+                                      .format(', '.join(six.text_type(f.uuid) for f in duplicates)))
 
             seen |= set(files)
 

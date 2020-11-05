@@ -14,8 +14,8 @@ import hmac
 import posixpath
 import re
 import time
-import urllib
-from urlparse import parse_qs
+import six.moves.urllib.request, six.moves.urllib.parse, six.moves.urllib.error
+from six.moves.urllib.parse import parse_qs
 from uuid import UUID
 
 from flask import current_app, g, request, session
@@ -35,6 +35,7 @@ from indico.web.http_api.fossils import IHTTPAPIExportResultFossil
 from indico.web.http_api.metadata.serializer import Serializer
 from indico.web.http_api.responses import HTTPAPIError, HTTPAPIResult
 from indico.web.http_api.util import get_query_parameter
+import six
 
 
 # Remove the extension at the end or before the querystring
@@ -50,16 +51,16 @@ def normalizeQuery(path, query, remove=('signature',), separate=False):
     qparams = parse_qs(query)
     sorted_params = []
 
-    for key, values in sorted(qparams.items(), key=lambda x: x[0].lower()):
+    for key, values in sorted(list(qparams.items()), key=lambda x: x[0].lower()):
         key = key.lower()
         if key not in remove:
             for v in sorted(values):
                 sorted_params.append((key, v))
 
     if separate:
-        return path, sorted_params and urllib.urlencode(sorted_params)
+        return path, sorted_params and six.moves.urllib.parse.urlencode(sorted_params)
     elif sorted_params:
-        return '%s?%s' % (path, urllib.urlencode(sorted_params))
+        return '%s?%s' % (path, six.moves.urllib.parse.urlencode(sorted_params))
     else:
         return path
 
@@ -108,7 +109,7 @@ def handler(prefix, path):
     if request.method == 'POST':
         # Convert POST data to a query string
         queryParams = [(key, [x.encode('utf-8') for x in values]) for key, values in request.form.iterlists()]
-        query = urllib.urlencode(queryParams, doseq=1)
+        query = six.moves.urllib.parse.urlencode(queryParams, doseq=1)
         # we only need/keep multiple values so we can properly validate the signature.
         # the legacy code below expects a dict with just the first value.
         # if you write a new api endpoint that needs multiple values get them from
@@ -116,7 +117,7 @@ def handler(prefix, path):
         queryParams = {key: values[0] for key, values in queryParams}
     else:
         # Parse the actual query string
-        queryParams = dict((key, value.encode('utf-8')) for key, value in request.args.iteritems())
+        queryParams = dict((key, value.encode('utf-8')) for key, value in six.iteritems(request.args))
         query = request.query_string
 
     apiKey = get_query_parameter(queryParams, ['ak', 'apikey'], None)
@@ -255,7 +256,7 @@ def handler(prefix, path):
         if ak and error is None:
             # Commit only if there was an API key and no error
             norm_path, norm_query = normalizeQuery(path, query, remove=('signature', 'timestamp'), separate=True)
-            uri = to_unicode('?'.join(filter(None, (norm_path, norm_query))))
+            uri = to_unicode('?'.join([_f for _f in (norm_path, norm_query) if _f]))
             ak.register_used(request.remote_addr, uri, not onlyPublic)
             db.session.commit()
         else:

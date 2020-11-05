@@ -22,6 +22,7 @@ from babel.messages.pofile import read_po
 from flask.helpers import get_root_path
 
 from indico.util.console import cformat
+from six.moves import zip
 
 
 @click.group()

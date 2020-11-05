@@ -35,6 +35,7 @@ from indico.util.locators import locator_property
 from indico.util.string import format_full_name, format_repr, return_ascii
 from indico.util.struct.enum import RichIntEnum
 from indico.web.flask.util import url_for
+import six
 
 
 class UserTitle(RichIntEnum):
@@ -262,7 +263,7 @@ class User(PersonMixin, db.Model):
     signing_secret = db.Column(
         UUID,
         nullable=False,
-        default=lambda: unicode(uuid4())
+        default=lambda: six.text_type(uuid4())
     )
     #: the user profile picture
     picture = db.deferred(db.Column(
@@ -619,7 +620,7 @@ class User(PersonMixin, db.Model):
         db.session.flush()
 
     def reset_signing_secret(self):
-        self.signing_secret = unicode(uuid4())
+        self.signing_secret = six.text_type(uuid4())
 
     def synchronize_data(self, refresh=False):
         """Synchronize the fields of the user from the sync identity.

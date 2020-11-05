@@ -36,6 +36,8 @@ from indico.web.flask.util import url_for
 from indico.web.forms.base import FormDefaults, IndicoForm
 from indico.web.rh import RH
 from indico.web.util import url_for_index
+import six
+from six.moves import zip
 
 
 def _get_provider(name, external):
@@ -94,7 +96,7 @@ class RHLogin(RH):
             active_provider = multipass.default_local_auth_provider
             form = active_provider.login_form() if active_provider else None
 
-        providers = multipass.auth_providers.values()
+        providers = list(multipass.auth_providers.values())
         return render_template('auth/login_page.html', form=form, providers=providers, active_provider=active_provider,
                                login_reason=login_reason)
 
@@ -161,7 +163,7 @@ class RHLinkAccount(RH):
 
         if self.must_choose_email:
             form = SelectEmailForm()
-            form.email.choices = zip(self.emails, self.emails)
+            form.email.choices = list(zip(self.emails, self.emails))
         else:
             form = IndicoForm()
 
@@ -282,7 +284,7 @@ class RHRegister(RH):
     def _prepare_registration_data(self, form, handler):
         email = form.email.data
         extra_emails = handler.get_all_emails(form) - {email}
-        user_data = {k: v for k, v in form.data.viewitems() if k in {'first_name', 'last_name', 'affiliation',
+        user_data = {k: v for k, v in six.viewitems(form.data) if k in {'first_name', 'last_name', 'affiliation',
                                                                      'address', 'phone'}}
         user_data.update(handler.get_extra_user_data(form))
         identity_data = handler.get_identity_data(form)
@@ -346,7 +348,7 @@ class RHAccounts(RHUserBase):
             elif isinstance(form, EditLocalIdentityForm):
                 self._handle_edit_local_account(form)
             return redirect(url_for('auth.accounts'))
-        provider_titles = {name: provider.title for name, provider in multipass.identity_providers.iteritems()}
+        provider_titles = {name: provider.title for name, provider in six.iteritems(multipass.identity_providers)}
         return WPAuthUser.render_template('accounts.html', 'accounts',
                                           form=form, user=self.user, provider_titles=provider_titles)
 
@@ -451,12 +453,12 @@ class MultipassRegistrationHandler(RegistrationHandler):
             if field in form and not self.identity_info['data'].get(field):
                 delattr(form, field)
         emails = self.identity_info['data'].getlist('email')
-        form.email.choices = zip(emails, emails)
+        form.email.choices = list(zip(emails, emails))
         return form
 
     def form(self, **kwargs):
         if self.from_sync_provider:
-            synced_values = {k: v or '' for k, v in self.identity_info['data'].iteritems()}
+            synced_values = {k: v or '' for k, v in six.iteritems(self.identity_info['data'])}
             return MultipassRegistrationForm(synced_fields=multipass.synced_fields, synced_values=synced_values,
                                              **kwargs)
         else:

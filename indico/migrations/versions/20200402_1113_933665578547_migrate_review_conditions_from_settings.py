@@ -12,6 +12,7 @@ from uuid import uuid4
 from alembic import context, op
 
 from indico.modules.events.editing.models.editable import EditableType
+import six
 
 
 # revision identifiers, used by Alembic.
@@ -61,7 +62,7 @@ def downgrade():
                 "SELECT file_type_id FROM event_editing.review_condition_file_types WHERE review_condition_id = %s",
                 (id,),
             )
-            value = [unicode(uuid4()), [f[0] for f in file_types.fetchall()]]
+            value = [six.text_type(uuid4()), [f[0] for f in file_types.fetchall()]]
             review_conditions[event_id].append(value)
         for key, value in review_conditions.items():
             conn.execute(

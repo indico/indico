@@ -10,6 +10,7 @@ from __future__ import unicode_literals
 from flask import session
 
 from indico.core.db import db
+from six.moves import map
 
 
 def get_attached_folders(linked_object, include_empty=True, include_hidden=True, preload_event=False):
@@ -78,7 +79,7 @@ def get_nested_attached_items(obj):
     elif isinstance(obj, db.m.Contribution):
         nested_objects = obj.subcontributions
     if nested_objects:
-        children = filter(None, map(get_nested_attached_items, nested_objects))
+        children = [_f for _f in map(get_nested_attached_items, nested_objects) if _f]
         if children:
             attachments['children'] = children
     if attachments:

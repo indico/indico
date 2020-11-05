@@ -19,6 +19,8 @@ from indico.modules.groups import GroupProxy
 from indico.modules.users.legacy import search_avatars
 from indico.util.fossilize import fossilize
 from indico.util.string import sanitize_email, to_unicode
+import six
+from six.moves import map
 
 
 class SearchBase(LoggedOnlyService):
@@ -51,12 +53,12 @@ class SearchUsers(SearchBase):
                       EventPerson.last_name: self._surName,
                       EventPerson.email: self._email,
                       EventPerson.affiliation: self._organisation}
-            criteria = [unaccent_match(col, val, exact=self._exactMatch) for col, val in fields.iteritems()]
+            criteria = [unaccent_match(col, val, exact=self._exactMatch) for col, val in six.iteritems(fields)]
             event_persons = self._event.persons.filter(*criteria).all()
         fossilized_users = fossilize(sorted(users, key=lambda av: (av.getStraightFullName(), av.getEmail())))
-        fossilized_event_persons = map(serialize_event_person, event_persons)
+        fossilized_event_persons = list(map(serialize_event_person, event_persons))
         unique_users = {to_unicode(user['email']): user for user in chain(fossilized_users, fossilized_event_persons)}
-        return sorted(unique_users.values(), key=lambda x: (to_unicode(x['name']).lower(), to_unicode(x['email'])))
+        return sorted(list(unique_users.values()), key=lambda x: (to_unicode(x['name']).lower(), to_unicode(x['email'])))
 
 
 class SearchGroups(SearchBase):

@@ -11,6 +11,7 @@ from indico.modules.events.abstracts.models.abstracts import AbstractState
 from indico.util.i18n import _, orig_string
 from indico.util.placeholders import Placeholder
 from indico.web.flask.util import url_for
+import six
 
 
 __all__ = ('EventTitlePlaceholder', 'EventURLPlaceholder', 'AbstractIDPlaceholder', 'AbstractTitlePlaceholder',
@@ -47,7 +48,7 @@ class AbstractIDPlaceholder(Placeholder):
 
     @classmethod
     def render(cls, abstract):
-        return unicode(abstract.friendly_id)
+        return six.text_type(abstract.friendly_id)
 
 
 class AbstractTitlePlaceholder(Placeholder):
@@ -190,7 +191,7 @@ class TargetAbstractIDPlaceholder(Placeholder):
     @classmethod
     def render(cls, abstract):
         target = abstract.merged_into or abstract.duplicate_of
-        return unicode(target.friendly_id) if target else ''
+        return six.text_type(target.friendly_id) if target else ''
 
 
 class TargetAbstractTitlePlaceholder(Placeholder):

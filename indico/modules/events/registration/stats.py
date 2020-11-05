@@ -13,6 +13,7 @@ from itertools import chain, groupby
 from indico.modules.events.registration.models.registrations import RegistrationData
 from indico.util.date_time import now_utc
 from indico.util.i18n import _
+import six
 
 
 class StatsBase(object):
@@ -150,10 +151,10 @@ class FieldStats(object):
             choices['billed'][k] = self._build_regitems_data(k, list(regitems))
         for k, regitems in groupby((regitem for regitem in regitems if not regitem.price), key=self._build_key):
             choices['not_billed'][k] = self._build_regitems_data(k, list(regitems))
-        for item in self._choices.itervalues():
+        for item in six.itervalues(self._choices):
             key = 'billed' if item['price'] else 'not_billed'
             choices[key].setdefault(self._build_key(item), self._build_choice_data(item))
-        for key, choice in chain(choices['billed'].iteritems(), choices['not_billed'].iteritems()):
+        for key, choice in chain(six.iteritems(choices['billed']), six.iteritems(choices['not_billed'])):
             data[key[:2]].append(choice)
         return data, bool(choices['billed'])
 
@@ -166,7 +167,7 @@ class FieldStats(object):
         """
         table = defaultdict(list)
         table['head'] = self._get_table_head()
-        for (name, id), data_items in sorted(self._data.iteritems()):
+        for (name, id), data_items in sorted(six.iteritems(self._data)):
             total_regs = sum(detail.regs for detail in data_items)
             table['rows'].append(('single-row' if len(data_items) == 1 else 'header-row',
                                  self._get_main_row_cells(data_items, name, total_regs) +
@@ -313,7 +314,7 @@ class OverviewStats(StatsBase):
         if not countries:
             return [], 0
         # Sort by highest number of people per country then alphabetically per countries' name
-        countries = sorted(((val, name) for name, val in countries.iteritems()),
+        countries = sorted(((val, name) for name, val in six.iteritems(countries)),
                            key=lambda x: (-x[0], x[1]), reverse=True)
         return countries[-15:], len(countries)
 
@@ -327,7 +328,7 @@ class OverviewStats(StatsBase):
 class AccommodationStats(FieldStats, StatsBase):
     def __init__(self, field):
         super(AccommodationStats, self).__init__(title=_("Accommodation"), subtitle=field.title, field=field)
-        self.has_capacity = any(detail.capacity for acco_details in self._data.itervalues()
+        self.has_capacity = any(detail.capacity for acco_details in six.itervalues(self._data)
                                 for detail in acco_details if detail.capacity)
 
     def _get_occupancy(self, acco_details):

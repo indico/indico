@@ -39,6 +39,7 @@ from indico.util.date_time import iterdays, overlaps, server_to_utc
 from indico.util.i18n import _
 from indico.util.string import natural_sort_key
 from indico.util.struct.iterables import group_list
+import six
 
 
 def group_blockings(blocked_rooms, dates):
@@ -510,12 +511,12 @@ def get_booking_edit_calendar_data(booking, booking_changes):
     room_availability['cancellations'] = {}
     room_availability['rejections'] = {}
     others = defaultdict(list)
-    for k, v in chain(room_availability['bookings'].iteritems(), room_availability['pre_bookings'].iteritems()):
+    for k, v in chain(six.iteritems(room_availability['bookings']), six.iteritems(room_availability['pre_bookings'])):
         others[k].extend(v)
-    other_bookings = {dt: filter(lambda x: x.reservation.id != booking.id, other) for dt, other in others.iteritems()}
+    other_bookings = {dt: [x for x in other if x.reservation.id != booking.id] for dt, other in six.iteritems(others)}
     candidates = room_availability['candidates']
 
-    for dt, dt_candidates in candidates.iteritems():
+    for dt, dt_candidates in six.iteritems(candidates):
         if dt in cancelled_dates:
             candidates[dt] = []
             room_availability['cancellations'].update({dt: dt_candidates})

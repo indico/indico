@@ -41,6 +41,7 @@ from indico.web.forms.fields.principals import PrincipalListField
 from indico.web.forms.util import inject_validators
 from indico.web.forms.validators import HiddenUnless, LinkedDateTime, SoftLength, UsedIf, WordCount
 from indico.web.forms.widgets import JinjaWidget, SwitchWidget
+import six
 
 
 def make_review_form(event):
@@ -332,8 +333,8 @@ class AbstractReviewForm(IndicoForm):
     @property
     def split_data(self):
         data = self.data
-        return {'questions_data': {k: v for k, v in data.iteritems() if k.startswith('question_')},
-                'review_data': {k: v for k, v in data.iteritems() if not k.startswith('question_')}}
+        return {'questions_data': {k: v for k, v in six.iteritems(data) if k.startswith('question_')},
+                'review_data': {k: v for k, v in six.iteritems(data) if not k.startswith('question_')}}
 
     @property
     def has_questions(self):
@@ -422,7 +423,7 @@ class EditEmailTemplateRuleForm(IndicoForm):
         self.rules.event = self.event
 
     def validate_rules(self, field):
-        dedup_data = {tuple((k, tuple(v)) for k, v in r.viewitems()) for r in field.data}
+        dedup_data = {tuple((k, tuple(v)) for k, v in six.viewitems(r)) for r in field.data}
         if len(field.data) != len(dedup_data):
             raise ValidationError(_("There is a duplicate rule"))
 
@@ -441,9 +442,8 @@ class EditEmailTemplateTextForm(IndicoForm):
     def __init__(self, *args, **kwargs):
         self.event = kwargs.pop('event')
         super(EditEmailTemplateTextForm, self).__init__(*args, **kwargs)
-        self.reply_to_address.choices = (self.event
-                                         .get_allowed_sender_emails(extra=self.reply_to_address.object_data)
-                                         .items())
+        self.reply_to_address.choices = (list(self.event
+                                         .get_allowed_sender_emails(extra=self.reply_to_address.object_data).items()))
         self.body.description = render_placeholder_info('abstract-notification-email', event=self.event)
 
 

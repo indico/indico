@@ -26,6 +26,7 @@ from indico.util.caching import make_hashable
 from indico.util.fs import resolve_link
 from indico.util.packaging import package_is_editable
 from indico.util.string import crc32, snakify
+import six
 
 
 DEFAULTS = {
@@ -144,9 +145,9 @@ def _parse_config(path):
     locals_ = {}
     with codecs.open(path, encoding='utf-8') as config_file:
         # XXX: unicode_literals is inherited from this file
-        exec compile(config_file.read(), path, 'exec') in globals_, locals_
-    return {unicode(k if k.isupper() else _convert_key(k)): v
-            for k, v in locals_.iteritems()
+        exec(compile(config_file.read(), path, 'exec'), globals_, locals_)
+    return {six.text_type(k if k.isupper() else _convert_key(k)): v
+            for k, v in six.iteritems(locals_)
             if k[0] != '_'}
 
 
@@ -175,7 +176,7 @@ def _sanitize_data(data, allow_internal=False):
         allowed |= set(INTERNAL_DEFAULTS)
     for key in set(data) - allowed:
         warnings.warn('Ignoring unknown config key {}'.format(key))
-    return {k: v for k, v in data.iteritems() if k in allowed}
+    return {k: v for k, v in six.iteritems(data) if k in allowed}
 
 
 def load_config(only_defaults=False, override=None):

@@ -23,6 +23,7 @@ from flask import current_app, has_request_context, request, session
 from indico.core.config import config
 from indico.util.i18n import set_best_lang
 from indico.web.util import get_request_info
+import six
 
 
 try:
@@ -46,7 +47,7 @@ class AddRequestIDFilter(object):
 
 class AddUserIDFilter(object):
     def filter(self, record):
-        record.user_id = unicode(session.user.id) if has_request_context() and session and session.user else '-'
+        record.user_id = six.text_type(session.user.id) if has_request_context() and session and session.user else '-'
         return True
 
 
@@ -119,7 +120,7 @@ class Logger(object):
         data.setdefault('filters', {})
         data['filters']['_add_request_id'] = {'()': AddRequestIDFilter}
         data['filters']['_add_user_id'] = {'()': AddUserIDFilter}
-        for handler in data['handlers'].itervalues():
+        for handler in six.itervalues(data['handlers']):
             handler.setdefault('filters', [])
             handler['filters'].insert(0, '_add_request_id')
             handler['filters'].insert(1, '_add_user_id')
@@ -139,7 +140,7 @@ class Logger(object):
                            if handler['class'] == 'indico.core.logger.FormattedSubjectSMTPHandler' else
                            'Unexpected Exception occurred at {}')
                 handler.setdefault('subject', subject.format(config.WORKER_NAME))
-        for formatter in data['formatters'].itervalues():
+        for formatter in six.itervalues(data['formatters']):
             # Make adding request info to log entries less ugly
             if formatter.pop('append_request_info', False):
                 assert '()' not in formatter

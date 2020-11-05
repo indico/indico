@@ -23,6 +23,7 @@ from indico.modules.events.registration.util import get_registered_event_persons
 from indico.modules.events.util import ListGeneratorBase
 from indico.util.i18n import _
 from indico.web.flask.templating import get_template_module
+import six
 
 
 class ContributionListGenerator(ListGeneratorBase):
@@ -39,19 +40,19 @@ class ContributionListGenerator(ListGeneratorBase):
         session_empty = {None: _('No session')}
         track_empty = {None: _('No track')}
         type_empty = {None: _('No type')}
-        session_choices = OrderedDict((unicode(s.id), s.title) for s in sorted(self.event.sessions,
+        session_choices = OrderedDict((six.text_type(s.id), s.title) for s in sorted(self.event.sessions,
                                                                                key=attrgetter('title')))
-        track_choices = OrderedDict((unicode(t.id), t.title) for t in sorted(self.event.tracks,
+        track_choices = OrderedDict((six.text_type(t.id), t.title) for t in sorted(self.event.tracks,
                                                                              key=attrgetter('title')))
-        type_choices = OrderedDict((unicode(t.id), t.name) for t in sorted(self.event.contribution_types,
+        type_choices = OrderedDict((six.text_type(t.id), t.name) for t in sorted(self.event.contribution_types,
                                                                            key=attrgetter('name')))
         self.static_items = OrderedDict([
             ('session', {'title': _('Session'),
-                         'filter_choices': OrderedDict(session_empty.items() + session_choices.items())}),
+                         'filter_choices': OrderedDict(list(session_empty.items()) + list(session_choices.items()))}),
             ('track', {'title': _('Track'),
-                       'filter_choices': OrderedDict(track_empty.items() + track_choices.items())}),
+                       'filter_choices': OrderedDict(list(track_empty.items()) + list(track_choices.items()))}),
             ('type', {'title': _('Type'),
-                      'filter_choices': OrderedDict(type_empty.items() + type_choices.items())}),
+                      'filter_choices': OrderedDict(list(type_empty.items()) + list(type_choices.items()))}),
             ('status', {'title': _('Status'), 'filter_choices': {'scheduled': _('Scheduled'),
                                                                  'unscheduled': _('Not scheduled')}}),
             ('speakers', {'title': _('Speakers'), 'filter_choices': {'registered': _('Registered'),
@@ -111,7 +112,7 @@ class ContributionListGenerator(ListGeneratorBase):
         filter_cols = {'session': Contribution.session_id,
                        'track': Contribution.track_id,
                        'type': Contribution.type_id}
-        for key, column in filter_cols.iteritems():
+        for key, column in six.iteritems(filter_cols):
             ids = set(filters['items'].get(key, ()))
             if not ids:
                 continue

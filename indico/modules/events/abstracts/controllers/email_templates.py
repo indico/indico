@@ -20,6 +20,7 @@ from indico.modules.events.abstracts.notifications import get_abstract_notificat
 from indico.modules.events.abstracts.util import build_default_email_template, create_mock_abstract
 from indico.web.flask.templating import get_template_module
 from indico.web.util import jsonify_data, jsonify_template
+import six
 
 
 class RHEmailTemplateList(RHManageAbstractsBase):
@@ -106,7 +107,7 @@ class RHEmailTemplateREST(RHEditEmailTemplateBase):
         if request.json is None:
             raise BadRequest('Expected JSON payload')
 
-        invalid_fields = request.json.viewkeys() - {'stop_on_match'}
+        invalid_fields = six.viewkeys(request.json) - {'stop_on_match'}
         if invalid_fields:
             raise BadRequest("Invalid fields: {}".format(', '.join(invalid_fields)))
 

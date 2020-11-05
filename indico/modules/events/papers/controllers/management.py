@@ -31,6 +31,8 @@ from indico.modules.users.models.users import User
 from indico.util.i18n import _, ngettext
 from indico.web.forms.base import FormDefaults
 from indico.web.util import jsonify_data, jsonify_form, jsonify_template
+import six
+from six.moves import map
 
 
 def _render_paper_dashboard(event, view_class=None):
@@ -105,13 +107,13 @@ class RHManageCompetences(RHManagePapersBase):
         form_class = make_competences_form(self.event)
         user_competences = self.event.cfp.user_competences
         defaults = {'competences_{}'.format(user_id): competences.competences
-                    for user_id, competences in user_competences.iteritems()}
+                    for user_id, competences in six.iteritems(user_competences)}
         form = form_class(obj=FormDefaults(defaults))
         if form.validate_on_submit():
             key_prefix = 'competences_'
-            form_data = {int(key[len(key_prefix):]): value for key, value in form.data.iteritems()}
+            form_data = {int(key[len(key_prefix):]): value for key, value in six.iteritems(form.data)}
             users = {u.id: u for u in User.query.filter(User.id.in_(form_data), ~User.is_deleted)}
-            for user_id, competences in form_data.iteritems():
+            for user_id, competences in six.iteritems(form_data):
                 if user_id in user_competences:
                     update_competences(user_competences[user_id], competences)
                 elif competences:
@@ -289,7 +291,7 @@ class RHDeleteReviewingQuestion(RHManageQuestionBase):
 
 class RHSortReviewingQuestions(RHReviewingQuestionsActionsBase):
     def _process(self):
-        question_ids = map(int, request.form.getlist('field_ids'))
+        question_ids = list(map(int, request.form.getlist('field_ids')))
         if self.review_type == 'layout':
             questions = self.event.cfp.layout_review_questions
         else:

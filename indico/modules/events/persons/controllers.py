@@ -37,6 +37,7 @@ from indico.web.flask.templating import get_template_module
 from indico.web.flask.util import jsonify_data, url_for
 from indico.web.forms.base import FormDefaults
 from indico.web.util import jsonify_form
+import six
 
 
 BUILTIN_ROLES = {'chairperson': {'name': 'Chairperson', 'code': 'CHR', 'color': 'f7b076',
@@ -154,8 +155,8 @@ class RHPersonsBase(RHManageEventBase):
             for role in event_user_roles[event_person.user]:
                 event_user_roles_data['custom_{}'.format(role.id)] = {'name': role.name, 'code': role.code,
                                                                       'css': role.css}
-            event_user_roles_data = OrderedDict(sorted(event_user_roles_data.items(), key=lambda t: t[1]['code']))
-            data['roles'] = OrderedDict(data['roles'].items() + event_user_roles_data.items())
+            event_user_roles_data = OrderedDict(sorted(list(event_user_roles_data.items()), key=lambda t: t[1]['code']))
+            data['roles'] = OrderedDict(list(data['roles'].items()) + list(event_user_roles_data.items()))
 
             event_person_users.add(event_person.user)
 
@@ -163,7 +164,7 @@ class RHPersonsBase(RHManageEventBase):
                                                    'person': [],
                                                    'has_event_person': False,
                                                    'id_field_name': 'user_id'})
-        for user, roles in event_user_roles.viewitems():
+        for user, roles in six.viewitems(event_user_roles):
             if user in event_person_users:
                 continue
             for role in roles:
@@ -171,10 +172,10 @@ class RHPersonsBase(RHManageEventBase):
                 user_metadata['person'] = user
                 user_metadata['roles']['custom_{}'.format(role.id)] = {'name': role.name, 'code': role.code,
                                                                        'css': role.css}
-            user_metadata['roles'] = OrderedDict(sorted(user_metadata['roles'].items(), key=lambda x: x[1]['code']))
+            user_metadata['roles'] = OrderedDict(sorted(list(user_metadata['roles'].items()), key=lambda x: x[1]['code']))
 
         # Some EventPersons will have no roles since they were connected to deleted things
-        persons = {email: data for email, data in persons.viewitems() if any(data['roles'].viewvalues())}
+        persons = {email: data for email, data in six.viewitems(persons) if any(six.viewvalues(data['roles']))}
         persons = dict(persons, **internal_role_users)
         return persons
 
@@ -197,7 +198,7 @@ class RHPersonsList(RHPersonsBase):
                                    .join(Session).options(joinedload('session').joinedload('acl_entries')))
 
         persons = self.get_persons()
-        person_list = sorted(persons.viewvalues(), key=lambda x: x['person'].display_full_name.lower())
+        person_list = sorted(six.viewvalues(persons), key=lambda x: x['person'].display_full_name.lower())
 
         num_no_account = 0
         for principal in itertools.chain(event_principal_query, contrib_principal_query, session_principal_query):

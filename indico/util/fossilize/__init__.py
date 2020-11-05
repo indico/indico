@@ -21,10 +21,12 @@ import inspect
 import logging
 import re
 import threading
-from itertools import ifilter
+
 from types import NoneType
 
 import zope.interface
+import six
+from six.moves import filter
 
 
 _fossil_cache = threading.local()
@@ -196,13 +198,13 @@ class Fossilizable(object):
                 return target
             elif ttype is dict:
                 container = {}
-                for key, value in target.iteritems():
+                for key, value in six.iteritems(target):
                     container[key] = fossilize(value, interface, useAttrCache,
                                                **kwargs)
                 return container
             elif hasattr(target, '__iter__'):
                 if filterBy:
-                    iterator = ifilter(filterBy, target)
+                    iterator = filter(filterBy, target)
                 else:
                     iterator = iter(target)
                 # we turn sets and tuples into lists since JSON does not
@@ -214,11 +216,11 @@ class Fossilizable(object):
             # the iterable the object is wrapping. This behaviour is included in
             # order to let objects like legacy PersistentLists to be fossilized
             elif hasattr(target, '__dict__') and len(target.__dict__) == 1 and \
-                     hasattr(target.__dict__.values()[0], '__iter__'):
+                     hasattr(list(target.__dict__.values())[0], '__iter__'):
                 return list(fossilize(elem,
                                       interface,
                                       useAttrCache,
-                                      **kwargs) for elem in target.__dict__.values()[0])
+                                      **kwargs) for elem in list(target.__dict__.values())[0])
             elif cls.__obtainInterface(target, interface):
                 return cls.fossilize_obj(target, interface, useAttrCache, **kwargs)
 

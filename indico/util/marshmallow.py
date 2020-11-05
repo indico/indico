@@ -21,6 +21,8 @@ from indico.core.permissions import get_unified_permissions
 from indico.util.date_time import now_utc
 from indico.util.i18n import _
 from indico.util.user import principal_from_identifier
+from six.moves import map
+import six
 
 
 HUMANIZED_DATE_RE = re.compile(r'^(?:(?P<number>-?\d+)(?P<unit>[dwM]))|(?P<iso_date>\d{4}-\d{2}-\d{2})$')
@@ -121,7 +123,7 @@ class ModelField(Field):
         if column:
             self.column = getattr(model, column)
             # Custom column -> most likely a string value
-            self.column_type = column_type or unicode
+            self.column_type = column_type or six.text_type
         else:
             pks = inspect(model).primary_key
             assert len(pks) == 1
@@ -167,7 +169,7 @@ class ModelList(Field):
         if column:
             self.column = getattr(model, column)
             # Custom column -> most likely a string value
-            self.column_type = column_type or unicode
+            self.column_type = column_type or six.text_type
         else:
             pks = inspect(model).primary_key
             assert len(pks) == 1
@@ -183,7 +185,7 @@ class ModelList(Field):
         if not value:
             return self.collection_class()
         try:
-            value = map(self.column_type, value)
+            value = list(map(self.column_type, value))
         except (TypeError, ValueError):
             self.fail('type')
         requested = set(value)
@@ -215,7 +217,7 @@ class Principal(Field):
                                              allow_groups=self.allow_groups,
                                              allow_external_users=self.allow_external_users)
         except ValueError as exc:
-            raise ValidationError(unicode(exc))
+            raise ValidationError(six.text_type(exc))
 
 
 class PrincipalList(Field):
@@ -249,7 +251,7 @@ class PrincipalList(Field):
                                                  event_id=event_id)
                        for identifier in value)
         except ValueError as exc:
-            raise ValidationError(unicode(exc))
+            raise ValidationError(six.text_type(exc))
 
 
 class PrincipalDict(PrincipalList):
@@ -271,7 +273,7 @@ class PrincipalDict(PrincipalList):
                                                           soft_fail=True)
                     for identifier in value}
         except ValueError as exc:
-            raise ValidationError(unicode(exc))
+            raise ValidationError(six.text_type(exc))
 
 
 class PrincipalPermissionList(Field):
@@ -297,7 +299,7 @@ class PrincipalPermissionList(Field):
                 for identifier, permissions in value
             }
         except ValueError as exc:
-            raise ValidationError(unicode(exc))
+            raise ValidationError(six.text_type(exc))
 
 
 class HumanizedDate(Field):

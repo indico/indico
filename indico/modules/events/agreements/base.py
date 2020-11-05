@@ -18,6 +18,7 @@ from indico.util.decorators import cached_classproperty, classproperty
 from indico.util.i18n import _
 from indico.util.string import return_ascii
 from indico.web.flask.templating import get_overridable_template_name, get_template_module
+import six
 
 
 class AgreementPersonInfo(object):
@@ -43,7 +44,7 @@ class AgreementPersonInfo(object):
     def identifier(self):
         data_string = None
         if self.data:
-            data_string = '-'.join('{}={}'.format(k, make_hashable(v)) for k, v in sorted(self.data.viewitems()))
+            data_string = '-'.join('{}={}'.format(k, make_hashable(v)) for k, v in sorted(six.viewitems(self.data)))
         identifier = '{}:{}'.format(self.email, data_string or None)
         return sha1(identifier).hexdigest()
 
@@ -133,7 +134,7 @@ class AgreementDefinitionBase(object):
         :return: (everybody_signed, num_accepted, num_rejected)
         """
         people = cls.get_people(event)
-        identifiers = [p.identifier for p in people.itervalues()]
+        identifiers = [p.identifier for p in six.itervalues(people)]
         query = event.agreements.filter(Agreement.type == cls.name, Agreement.identifier.in_(identifiers))
         num_accepted = query.filter(Agreement.accepted).count()
         num_rejected = query.filter(Agreement.rejected).count()

@@ -21,6 +21,7 @@ from indico.util.decorators import strict_classproperty
 from indico.util.i18n import orig_string
 from indico.util.string import camelize_keys, format_repr, return_ascii
 from indico.util.struct.enum import IndicoEnum
+import six
 
 
 def _get_next_position(context):
@@ -119,7 +120,7 @@ class PersonalDataType(int, IndicoEnum):
                 'data': {
                     'item_type': 'dropdown',
                     'with_extra_slots': False,
-                    'choices': [dict(title_item, id=unicode(uuid4()), caption=orig_string(t.title))
+                    'choices': [dict(title_item, id=six.text_type(uuid4()), caption=orig_string(t.title))
                                 for t in UserTitle if t]
                 }
             }),

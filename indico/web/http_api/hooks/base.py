@@ -10,7 +10,7 @@ Base export interface
 """
 
 import re
-import urllib
+import six.moves.urllib.request, six.moves.urllib.parse, six.moves.urllib.error
 from datetime import datetime, time, timedelta
 from types import GeneratorType
 
@@ -54,7 +54,7 @@ class HTTPAPIHook(object):
     @classmethod
     def parseRequest(cls, path, queryParams):
         """Parse a request path and return a hook and the requested data type."""
-        path = urllib.unquote(path)
+        path = six.moves.urllib.parse.unquote(path)
         hooks = cls.HOOK_LIST
         for expCls in hooks:
             Logger.get('HTTPAPIHook.parseRequest').debug(expCls)

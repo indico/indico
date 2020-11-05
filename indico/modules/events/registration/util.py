@@ -48,6 +48,7 @@ from indico.util.spreadsheets import unique_col
 from indico.util.string import to_unicode, validate_email, validate_email_verbose
 from indico.web.forms.base import IndicoForm
 from indico.web.forms.widgets import SwitchWidget
+import six
 
 
 def get_title_uuid(regform, title):
@@ -65,7 +66,7 @@ def get_title_uuid(regform, title):
     if title_field is None:  # should never happen
         return None
     valid_choices = {x['id'] for x in title_field.current_data.versioned_data['choices']}
-    uuid = next((k for k, v in title_field.data['captions'].iteritems() if v == title), None)
+    uuid = next((k for k, v in six.iteritems(title_field.data['captions']) if v == title), None)
     return {uuid: 1} if uuid in valid_choices else None
 
 
@@ -184,7 +185,7 @@ def create_personal_data_fields(regform):
                                                   is_required=pd_type.is_required)
         if not data.get('is_enabled', True):
             field.position = data['position']
-        for key, value in data.iteritems():
+        for key, value in six.iteritems(data):
             setattr(field, key, value)
         field.data, versioned_data = field.field_impl.process_field_data(data.pop('data', {}))
         field.current_data = RegistrationFormFieldData(versioned_data=versioned_data)
@@ -222,7 +223,7 @@ def create_registration(regform, data, invitation=None, management=False, notify
             value = data.get(form_item.html_field_name)
         data_entry = RegistrationData()
         registration.data.append(data_entry)
-        for attr, value in form_item.field_impl.process_form_data(registration, value).iteritems():
+        for attr, value in six.iteritems(form_item.field_impl.process_form_data(registration, value)):
             setattr(data_entry, attr, value)
         if form_item.type == RegistrationFormItemType.field_pd and form_item.personal_data_type.column:
             setattr(registration, form_item.personal_data_type.column, value)
@@ -273,7 +274,7 @@ def modify_registration(registration, data, management=False, notify_user=True):
 
         attrs = field_impl.process_form_data(registration, value, data_by_field[form_item.id],
                                              billable_items_locked=billable_items_locked)
-        for key, val in attrs.iteritems():
+        for key, val in six.iteritems(attrs):
             setattr(data_by_field[form_item.id], key, val)
         if form_item.type == RegistrationFormItemType.field_pd and form_item.personal_data_type.column:
             key = form_item.personal_data_type.column
@@ -321,7 +322,7 @@ def generate_spreadsheet_from_registrations(registrations, regform_items, static
         if item.input_type == 'accommodation':
             field_names.append(unique_col('{} ({})'.format(item.title, 'Arrival'), item.id))
             field_names.append(unique_col('{} ({})'.format(item.title, 'Departure'), item.id))
-    field_names.extend(title for name, (title, fn) in special_item_mapping.iteritems() if name in static_items)
+    field_names.extend(title for name, (title, fn) in six.iteritems(special_item_mapping) if name in static_items)
     rows = []
     for registration in registrations:
         data = registration.data_by_field
@@ -341,7 +342,7 @@ def generate_spreadsheet_from_registrations(registrations, regform_items, static
                 registration_dict[key] = format_date(departure_date) if departure_date else ''
             else:
                 registration_dict[key] = data[item.id].friendly_data if item.id in data else ''
-        for name, (title, fn) in special_item_mapping.iteritems():
+        for name, (title, fn) in six.iteritems(special_item_mapping):
             if name not in static_items:
                 continue
             value = fn(registration)
@@ -455,7 +456,7 @@ def generate_ticket_qr_code(registration):
     qr_data = {
         "registrant_id": registration.id,
         "checkin_secret": registration.ticket_uuid,
-        "event_id": unicode(registration.event.id),
+        "event_id": six.text_type(registration.event.id),
         "server_url": config.BASE_URL,
         "version": 1
     }

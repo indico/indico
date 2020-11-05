@@ -21,6 +21,7 @@ from indico.modules.events.surveys.views import WPManageSurvey, WPSurveyResults
 from indico.util.i18n import _
 from indico.util.spreadsheets import send_csv, send_xlsx
 from indico.web.flask.util import url_for
+from six.moves import map
 
 
 class RHSurveyResults(RHManageSurveyBase):

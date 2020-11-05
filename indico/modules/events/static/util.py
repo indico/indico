@@ -10,7 +10,7 @@ from __future__ import unicode_literals
 import base64
 import mimetypes
 import re
-import urlparse
+import six.moves.urllib.parse
 from contextlib import contextmanager
 
 import requests
@@ -23,6 +23,7 @@ from werkzeug.urls import url_parse
 from indico.core.config import config
 from indico.modules.events.layout.models.images import ImageFile
 from indico.web.flask.util import endpoint_for_url
+import six
 
 
 _css_url_pattern = r"""url\((['"]?)({}|https?:)?([^)'"]+)\1\)"""
@@ -62,7 +63,7 @@ def _rewrite_event_asset_url(event, url):
 
     Only assets contained within the event will be taken into account
     """
-    scheme, netloc, path, qs, anchor = urlparse.urlsplit(url)
+    scheme, netloc, path, qs, anchor = six.moves.urllib.parse.urlsplit(url)
     netloc = netloc or current_app.config['SERVER_NAME']
     scheme = scheme or 'https'
 
@@ -79,14 +80,14 @@ def _rewrite_event_asset_url(event, url):
                     return 'images/{}-{}'.format(image_file.id, image_file.filename), image_file
     # if the URL is not internal or just not an image,
     # we embed the contents using a data URI
-    data_uri = _create_data_uri(urlparse.urlunsplit((scheme, netloc, path, qs, '')), urlparse.urlsplit(path)[-1])
+    data_uri = _create_data_uri(six.moves.urllib.parse.urlunsplit((scheme, netloc, path, qs, '')), six.moves.urllib.parse.urlsplit(path)[-1])
     return data_uri, None
 
 
 def _remove_anchor(url):
     """Remove the anchor from a URL."""
-    scheme, netloc, path, qs, anchor = urlparse.urlsplit(url)
-    return urlparse.urlunsplit((scheme, netloc, path, qs, ''))
+    scheme, netloc, path, qs, anchor = six.moves.urllib.parse.urlsplit(url)
+    return six.moves.urllib.parse.urlunsplit((scheme, netloc, path, qs, ''))
 
 
 def rewrite_css_urls(event, css):
@@ -162,7 +163,7 @@ class RewrittenManifest(Manifest):
     def __init__(self, manifest):
         super(RewrittenManifest, self).__init__()
         self._entries = {k: JinjaManifestEntry(entry.name, self._rewrite_paths(entry._paths))
-                         for k, entry in manifest._entries.viewitems()}
+                         for k, entry in six.viewitems(manifest._entries)}
         self.used_assets = set()
 
     def _rewrite_paths(self, paths):
@@ -180,7 +181,7 @@ def collect_static_files():
     g.used_url_for_assets = set()
     used_assets = set()
     yield used_assets
-    for manifest in g.custom_manifests.viewvalues():
+    for manifest in six.viewvalues(g.custom_manifests):
         used_assets |= {p for k in manifest.used_assets for p in manifest[k]._paths}
     used_assets |= {rewrite_static_url(url) for url in g.used_url_for_assets}
     del g.custom_manifests

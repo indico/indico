@@ -10,6 +10,7 @@ from __future__ import unicode_literals
 from indico.core.db import db
 from indico.modules.events.contributions.models.fields import ContributionFieldValueBase
 from indico.util.string import format_repr, return_ascii, text_to_repr
+import six
 
 
 class AbstractFieldValue(ContributionFieldValueBase):
@@ -32,5 +33,5 @@ class AbstractFieldValue(ContributionFieldValueBase):
 
     @return_ascii
     def __repr__(self):
-        text = text_to_repr(self.data) if isinstance(self.data, unicode) else self.data
+        text = text_to_repr(self.data) if isinstance(self.data, six.text_type) else self.data
         return format_repr(self, 'abstract_id', 'contribution_field_id', _text=text)

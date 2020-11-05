@@ -12,6 +12,7 @@ from sqlalchemy.ext.hybrid import hybrid_property
 from indico.util.caching import memoize_request
 from indico.util.locators import locator_property
 from indico.web.flask.util import url_for
+import six
 
 
 class ProposalGroupProxy(object):
@@ -93,7 +94,7 @@ class ProposalRevisionMixin(object):
     def get_reviewer_render_data(self, user):
         groups = self.get_reviewed_for_groups(user, include_reviewed=True)
         reviews = {x.group: x for x in self.get_reviews(user=user)}
-        reviewed_groups = {x.group for x in reviews.itervalues()}
+        reviewed_groups = {x.group for x in six.itervalues(reviews)}
         missing_groups = groups - reviewed_groups
         return {'groups': groups,
                 'missing_groups': missing_groups,

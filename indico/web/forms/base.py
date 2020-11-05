@@ -24,6 +24,7 @@ from indico.util.i18n import _
 from indico.util.signals import values_from_signal
 from indico.util.string import return_ascii, strip_whitespace
 from indico.web.flask.util import url_for
+import six
 
 
 class _DataWrapper(object):
@@ -86,9 +87,7 @@ class IndicoFormCSRF(CSRF):
         raise ValidationError(_('Invalid CSRF token'))
 
 
-class IndicoForm(FlaskForm):
-    __metaclass__ = IndicoFormMeta
-
+class IndicoForm(six.with_metaclass(IndicoFormMeta, FlaskForm)):
     class Meta:
         csrf = True
         csrf_class = IndicoFormCSRF
@@ -130,7 +129,7 @@ class IndicoForm(FlaskForm):
         field_id = request.args.get('__wtf_ajax')
         if not field_id:
             return False
-        field = next((f for f in self._fields.itervalues() if f.id == field_id and isinstance(f, AjaxFieldMixin)), None)
+        field = next((f for f in six.itervalues(self._fields) if f.id == field_id and isinstance(f, AjaxFieldMixin)), None)
         if not field:
             return False
         rv = field.process_ajax()
@@ -176,13 +175,13 @@ class IndicoForm(FlaskForm):
             return True
 
         # Populate data from actual fields
-        for name, field in self._fields.iteritems():
+        for name, field in six.iteritems(self._fields):
             if not _included(name):
                 continue
             field.populate_obj(obj, name)
 
         # Populate generated data
-        for name, value in self.generated_data.iteritems():
+        for name, value in six.iteritems(self.generated_data):
             if not _included(name):
                 continue
             setattr(obj, name, value)
@@ -196,7 +195,7 @@ class IndicoForm(FlaskForm):
     def error_list(self):
         """A list containing all errors, prefixed with the field's label.'"""
         all_errors = []
-        for field_name, errors in self.errors.iteritems():
+        for field_name, errors in six.iteritems(self.errors):
             for error in errors:
                 if isinstance(error, dict) and isinstance(self[field_name], FieldList):
                     for field in self[field_name].entries:
@@ -218,7 +217,7 @@ class IndicoForm(FlaskForm):
     def data(self):
         """Extend form.data with generated data from properties."""
         data = {k: v
-                for k, v in super(IndicoForm, self).data.iteritems()
+                for k, v in six.iteritems(super(IndicoForm, self).data)
                 if k != self.meta.csrf_field_name and not k.startswith('ext__')}
         data.update(self.generated_data)
         return data

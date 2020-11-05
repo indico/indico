@@ -20,6 +20,7 @@ from indico.modules.events.registration.util import url_rule_to_angular
 from indico.modules.users.util import serialize_user
 from indico.util.i18n import po_to_json
 from indico.web.flask.util import url_for, url_rule_to_js
+import six
 
 
 def get_locale_data(path, name, domain, react=False):
@@ -48,7 +49,7 @@ def generate_i18n_file(locale_name, react=False):
         i18n_data = {'indico': {'': {'domain': 'indico',
                                      'lang': locale_name}}}
 
-    for pid, plugin in plugin_engine.get_active_plugins().iteritems():
+    for pid, plugin in six.iteritems(plugin_engine.get_active_plugins()):
         data = {}
         if plugin.translation_path:
             data = get_locale_data(plugin.translation_path, locale_name, pid, react=react)
@@ -84,7 +85,7 @@ def generate_global_file():
         'name': auth.name,
         'title': auth.title,
         'supports_groups': auth.supports_groups
-    } for auth in multipass.identity_providers.itervalues() if auth.supports_search]
+    } for auth in six.itervalues(multipass.identity_providers) if auth.supports_search]
 
     indico_vars = {
         'ExperimentalEditingService': config.EXPERIMENTAL_EDITING_SERVICE,

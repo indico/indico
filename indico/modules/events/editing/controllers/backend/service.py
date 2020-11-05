@@ -23,6 +23,7 @@ from indico.modules.events.editing.service import (ServiceRequestFailed, check_s
 from indico.modules.events.editing.settings import editing_settings
 from indico.util.i18n import _
 from indico.web.args import use_kwargs
+import six
 
 
 class RHCheckServiceURL(RHEditingManagementBase):
@@ -55,7 +56,7 @@ class RHConnectService(RHEditingManagementBase):
             editing_settings.set(self.event, 'service_event_identifier', make_event_identifier(self.event))
         editing_settings.set_multi(self.event, {
             'service_url': url,
-            'service_token': unicode(uuid4()),
+            'service_token': six.text_type(uuid4()),
         })
         # we need to commit the token so the service can already use it when processing
         # the enabled event in case it wants to set up tags etc

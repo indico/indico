@@ -34,6 +34,7 @@ from indico.util.date_time import format_date, format_datetime, format_human_tim
 from indico.util.i18n import _, ngettext
 from indico.util.string import (format_full_name, html_color_to_rgb, natural_sort_key, render_markdown,
                                 sanitize_for_platypus, strip_tags, to_unicode, truncate)
+import six
 
 
 # Change reportlab default pdf font Helvetica to indico ttf font,
@@ -51,7 +52,7 @@ def _get_sans_style_sheet():
     }
 
     styles = getSampleStyleSheet()
-    for name, style in styles.byName.iteritems():
+    for name, style in six.iteritems(styles.byName):
         if hasattr(style, 'fontName'):
             style.fontName = _font_map.get(style.fontName, style.fontName)
         if hasattr(style, 'bulletFontName'):
@@ -365,7 +366,7 @@ class TimeTablePlain(PDFWithTOC):
             caption = u'<font face="Times-Bold"><b>{}</b></font>'.format(caption)
 
         color_cell = ""
-        caption = u'<font size="{}">{}</font>'.format(unicode(modifiedFontSize(10, self._fontsize)), caption)
+        caption = u'<font size="{}">{}</font>'.format(six.text_type(modifiedFontSize(10, self._fontsize)), caption)
         lt.append([self._fontify(caption.encode('utf-8'), 10)])
 
         if self._useColors():
@@ -377,7 +378,7 @@ class TimeTablePlain(PDFWithTOC):
                 speaker_content = speaker_title + u', '.join(speaker_list)
                 speaker_content = u'<font name="Times-Italic"><i>{}</i></font>'.format(speaker_content)
                 lt.append([self._fontify(speaker_content, 9)])
-            caption = escape(unicode(contrib.description))
+            caption = escape(six.text_type(contrib.description))
             lt.append([self._fontify(caption, 9)])
             caption_and_speakers = Table(lt, colWidths=None, style=self._tsSpk)
             if color_cell:
@@ -411,7 +412,7 @@ class TimeTablePlain(PDFWithTOC):
             lt.append([Paragraph(caption, self._styles["subContrib"])])
             if self._ttPDFFormat.showContribAbstract():
                 caption = '<font size="{}">{}</font>'.format(str(modifiedFontSize(9, self._fontsize)),
-                                                             escape(unicode(subc.description)))
+                                                             escape(six.text_type(subc.description)))
                 lt.append([Paragraph(caption, self._styles["subContrib"])])
 
             speaker_list = [[Paragraph(escape(self._get_speaker_name(spk)), self._styles["table_body"])]
@@ -453,7 +454,7 @@ class TimeTablePlain(PDFWithTOC):
                 speaker_text = speaker_word + ', '.join(speaker_list)
                 speaker_text = u'<font face="Times-Italic"><i>{}</i></font>'.format(speaker_text)
                 lt.append([self._fontify(speaker_text, 10)])
-            caption_text = escape(unicode(contrib.description))
+            caption_text = escape(six.text_type(contrib.description))
             lt.append([self._fontify(caption_text, 9)])
             caption_and_speakers = Table(lt, colWidths=None, style=self._tsSpk)
             if self._useColors():
@@ -484,7 +485,7 @@ class TimeTablePlain(PDFWithTOC):
             lt.append([Paragraph(caption_text, self._styles["subContrib"])])
             if self._ttPDFFormat.showContribAbstract():
                 caption_text = u'<font size="{}">{}</font>'.format(str(modifiedFontSize(9, self._fontsize)),
-                                                                   escape(unicode(subc.description)))
+                                                                   escape(six.text_type(subc.description)))
                 lt.append([Paragraph(caption_text, self._styles["subContrib"])])
             speaker_list = [[Paragraph(escape(self._get_speaker_name(spk)), self._styles["table_body"])]
                             for spk in subc.speakers]
@@ -584,7 +585,7 @@ class TimeTablePlain(PDFWithTOC):
 
                 # add session description
                 if self._showSessionDescription and sess_block.session.description:
-                    text = u'<i>{}</i>'.format(escape(unicode(sess_block.session.description)))
+                    text = u'<i>{}</i>'.format(escape(six.text_type(sess_block.session.description)))
                     res.append(Paragraph(text, self._styles["session_description"]))
 
                 p2 = Paragraph(conv.encode('utf-8'), self._styles["conveners"])
@@ -688,7 +689,7 @@ class TimeTablePlain(PDFWithTOC):
                 p2 = Paragraph(speakers.encode('utf-8'), self._styles["conveners"])
                 res.append(p2)
                 if self._ttPDFFormat.showContribAbstract():
-                    p3 = Paragraph(escape(unicode(contrib.description)), self._styles["contrib_description"])
+                    p3 = Paragraph(escape(six.text_type(contrib.description)), self._styles["contrib_description"])
                     res.append(p3)
                 if entry == entries[-1]:  # if it is the last one, we do the page break and remove the previous one.
                     if self._ttPDFFormat.showNewPagePerSession():
@@ -953,10 +954,10 @@ class RegistrantToPDF(PDFBase):
             story.append(Spacer(inch, space*cm, registration.full_name))
 
         def _print_row(caption, value):
-            if isinstance(caption, unicode) or is_lazy_string(caption):
-                caption = unicode(caption).encode('utf-8')
-            if isinstance(value, unicode) or is_lazy_string(value):
-                value = unicode(value).encode('utf-8')
+            if isinstance(caption, six.text_type) or is_lazy_string(caption):
+                caption = six.text_type(caption).encode('utf-8')
+            if isinstance(value, six.text_type) or is_lazy_string(value):
+                value = six.text_type(value).encode('utf-8')
             text = '<b>{field_name}</b>: {field_value}'.format(field_name=caption, field_value=value)
             _append_text_to_story(text)
 
@@ -1192,7 +1193,7 @@ class RegistrantsListToPDF(PDFBase):
                     else:
                         lp.append(Paragraph('', text_format))
                 else:
-                    if isinstance(friendly_data, unicode):
+                    if isinstance(friendly_data, six.text_type):
                         friendly_data = friendly_data.encode('utf-8')
                     lp.append(Paragraph(str(friendly_data), text_format))
             if 'reg_date' in self.static_items:

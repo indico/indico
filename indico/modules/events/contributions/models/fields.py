@@ -16,6 +16,7 @@ from indico.util.i18n import _
 from indico.util.locators import locator_property
 from indico.util.string import format_repr, return_ascii, text_to_repr
 from indico.util.struct.enum import RichIntEnum
+import six
 
 
 def _get_next_position(context):
@@ -198,5 +199,5 @@ class ContributionFieldValue(ContributionFieldValueBase):
 
     @return_ascii
     def __repr__(self):
-        text = text_to_repr(self.data) if isinstance(self.data, unicode) else self.data
+        text = text_to_repr(self.data) if isinstance(self.data, six.text_type) else self.data
         return format_repr(self, 'contribution_id', 'contribution_field_id', _text=text)

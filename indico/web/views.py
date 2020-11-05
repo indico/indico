@@ -9,7 +9,7 @@ from __future__ import absolute_import, unicode_literals
 
 import itertools
 import posixpath
-from urlparse import urlparse
+from six.moves.urllib.parse import urlparse
 
 from flask import current_app, g, render_template, request, session
 from markupsafe import Markup
@@ -27,6 +27,8 @@ from indico.web.flask.templating import get_template_module
 from indico.web.flask.util import url_for
 from indico.web.menu import build_menu_structure
 from indico.web.util import jsonify_template
+import six
+from six.moves import map
 
 
 def _get_timezone_display(local_tz, timezone, force=False):
@@ -140,7 +142,7 @@ class WPJinjaMixin(object):
     def _prefix_template(cls, template):
         if cls.template_prefix and cls.template_prefix[-1] != '/':
             raise ValueError('template_prefix needs to end with a slash')
-        if isinstance(template, basestring):
+        if isinstance(template, six.string_types):
             return cls.template_prefix + template
         else:
             templates = []
@@ -258,8 +260,8 @@ class WPBase(WPBundleMixin):
                                               multi_value_types=list)
         custom_js = list(current_app.manifest['__custom.js'])
         custom_css = list(current_app.manifest['__custom.css'])
-        css_files = map(self._fix_path, self.get_extra_css_files() + custom_css)
-        js_files = map(self._fix_path, custom_js)
+        css_files = list(map(self._fix_path, self.get_extra_css_files() + custom_css))
+        js_files = list(map(self._fix_path, custom_js))
 
         body = to_unicode(self._display(params))
         bundles = itertools.chain((current_app.manifest[x] for x in self._resolve_bundles()
@@ -274,7 +276,7 @@ class WPBase(WPBundleMixin):
                                site_name=core_settings.get('site_title'),
                                social=social_settings.get_all(),
                                page_metadata=self.page_metadata,
-                               page_title=' - '.join(unicode(x) for x in title_parts if x),
+                               page_title=' - '.join(six.text_type(x) for x in title_parts if x),
                                head_content=to_unicode(self._get_head_content()),
                                body=body)
 
@@ -315,8 +317,8 @@ class WPNewBase(WPBundleMixin, WPJinjaMixin):
                                               multi_value_types=list)
         custom_js = list(current_app.manifest['__custom.js'])
         custom_css = list(current_app.manifest['__custom.css'])
-        css_files = map(cls._fix_path, custom_css)
-        js_files = map(cls._fix_path, custom_js)
+        css_files = list(map(cls._fix_path, custom_css))
+        js_files = list(map(cls._fix_path, custom_js))
 
         bundles = itertools.chain((current_app.manifest[x] for x in cls._resolve_bundles()
                                    if x in current_app.manifest._entries),
@@ -330,7 +332,7 @@ class WPNewBase(WPBundleMixin, WPJinjaMixin):
                                bundles=bundles, print_bundles=print_bundles,
                                site_name=core_settings.get('site_title'),
                                social=social_settings.get_all(),
-                               page_title=' - '.join(unicode(x) for x in title_parts if x),
+                               page_title=' - '.join(six.text_type(x) for x in title_parts if x),
                                **params)
 
 

@@ -22,6 +22,7 @@ from indico.modules.users.models.users import PersonMixin, UserTitle
 from indico.util.decorators import strict_classproperty
 from indico.util.locators import locator_property
 from indico.util.string import format_repr, return_ascii
+import six
 
 
 class PersonLinkDataMixin(object):
@@ -33,13 +34,13 @@ class PersonLinkDataMixin(object):
     @no_autoflush
     def person_link_data(self, value):
         # Revoke submission rights for removed persons
-        for person_link in set(self.person_links) - value.viewkeys():
+        for person_link in set(self.person_links) - six.viewkeys(value):
             principal = person_link.person.principal
             if principal:
                 self.update_principal(principal, del_permissions={'submit'})
         # Update person links
-        self.person_links = value.keys()
-        for person_link, is_submitter in value.iteritems():
+        self.person_links = list(value.keys())
+        for person_link, is_submitter in six.iteritems(value):
             person = person_link.person
             principal = person.principal
             if not principal:

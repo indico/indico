@@ -24,6 +24,7 @@ from flask import has_request_context, session
 from indico.core.config import config
 from indico.util.i18n import _, get_current_locale, ngettext, parse_locale
 from indico.util.string import inject_unicode_debug
+import six
 
 
 class relativedelta(_relativedelta):
@@ -119,7 +120,7 @@ def format_date(d, format='medium', locale=None, timezone=None, as_unicode=False
     if not locale:
         locale = get_current_locale()
     if timezone and isinstance(d, datetime) and d.tzinfo:
-        d = d.astimezone(pytz.timezone(timezone) if isinstance(timezone, basestring) else timezone)
+        d = d.astimezone(pytz.timezone(timezone) if isinstance(timezone, six.string_types) else timezone)
 
     rv = _format_date(d, format=format, locale=locale)
     if as_unicode:
@@ -139,7 +140,7 @@ def format_time(t, format='short', locale=None, timezone=None, server_tz=False, 
         timezone = session.tzinfo
     elif server_tz:
         timezone = config.DEFAULT_TIMEZONE
-    if isinstance(timezone, basestring):
+    if isinstance(timezone, six.string_types):
         timezone = get_timezone(timezone)
     rv = _format_time(t, format=format, locale=locale, tzinfo=timezone)
     if as_unicode:
@@ -190,25 +191,25 @@ def format_human_timedelta(delta, granularity='seconds', narrow=False):
     values['days'], values['seconds'] = divmod(values['seconds'], 86400)
     values['hours'], values['seconds'] = divmod(values['seconds'], 3600)
     values['minutes'], values['seconds'] = divmod(values['seconds'], 60)
-    for key, value in values.iteritems():
+    for key, value in six.iteritems(values):
         values[key] = int(value)
     # keep all fields covered by the granularity, and if that results in
     # no non-zero fields, include otherwise excluded ones
     used_fields = set(field_order[:field_order.index(granularity) + 1])
     available_fields = [x for x in field_order if x not in used_fields]
-    used_fields -= {k for k, v in values.iteritems() if not v}
+    used_fields -= {k for k, v in six.iteritems(values) if not v}
     while not sum(values[x] for x in used_fields) and available_fields:
         used_fields.add(available_fields.pop(0))
     for key in available_fields:
         values[key] = 0
-    nonzero = OrderedDict((k, v) for k, v in values.iteritems() if v)
+    nonzero = OrderedDict((k, v) for k, v in six.iteritems(values) if v)
     if not nonzero:
         return long_names[granularity](0)
     elif len(nonzero) == 1:
-        key, value = nonzero.items()[0]
+        key, value = list(nonzero.items())[0]
         return long_names[key](value)
     else:
-        parts = [short_names[key](value) for key, value in nonzero.iteritems()]
+        parts = [short_names[key](value) for key, value in six.iteritems(nonzero)]
         return u' '.join(parts)
 
 
@@ -388,7 +389,7 @@ def strftime_all_years(dt, fmt):
     if dt.year >= 1900:
         return dt.strftime(fmt)
     else:
-        return dt.replace(year=1900).strftime(fmt.replace('%Y', '%%Y')).replace('%Y', unicode(dt.year))
+        return dt.replace(year=1900).strftime(fmt.replace('%Y', '%%Y')).replace('%Y', six.text_type(dt.year))
 
 
 def get_display_tz(obj=None, as_timezone=False):

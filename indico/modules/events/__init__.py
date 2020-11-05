@@ -23,6 +23,7 @@ from indico.util.string import is_legacy_id
 from indico.web.flask.templating import template_hook
 from indico.web.flask.util import url_for
 from indico.web.menu import SideMenuItem, TopMenuItem, TopMenuSection
+import six
 
 
 __all__ = ('Event', 'logger', 'event_management_object_url_prefixes', 'event_object_url_prefixes')
@@ -87,7 +88,7 @@ def _log_acl_changes(sender, obj, principal, entry, is_new, old_data, quiet, **k
 
     def _format_permissions(permissions):
         permissions = set(permissions)
-        return ', '.join(sorted(orig_string(p.friendly_name) for p in available_permissions.itervalues()
+        return ', '.join(sorted(orig_string(p.friendly_name) for p in six.itervalues(available_permissions)
                                 if p.name in permissions))
 
     data = {}
@@ -166,7 +167,7 @@ def _handle_legacy_ids(app, **kwargs):
         if mapping is None:
             raise NotFound('Legacy event {} does not exist'.format(event_id))
 
-        request.view_args[key] = unicode(mapping.event_id)
+        request.view_args[key] = six.text_type(mapping.event_id)
         return redirect(url_for(request.endpoint, **dict(request.args.to_dict(), **request.view_args)), 301)
 
 

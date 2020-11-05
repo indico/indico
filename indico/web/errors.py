@@ -19,6 +19,7 @@ from indico.core.errors import NoReportError
 from indico.legacy.common.cache import GenericCache
 from indico.web.util import get_request_info
 from indico.web.views import WPError
+import six
 
 
 def render_error(exc, title, message, code, standalone=False):
@@ -51,7 +52,7 @@ def _save_error(exc, title, message):
         return
     if not _is_error_reportable(exc):
         return
-    g.saved_error_uuid = uuid = unicode(uuid4())
+    g.saved_error_uuid = uuid = six.text_type(uuid4())
     # XXX: keep this outside - it must be called before `get_request_info()`
     # as that function may mess up `sys.exc_info()` in case accessing user
     # details fails
@@ -73,7 +74,7 @@ def _is_error_reporting_opted_out(code):
     if not header:
         return
     codes = header.split(',')
-    return unicode(code) in codes
+    return six.text_type(code) in codes
 
 
 def _is_error_reportable(exc):

@@ -22,6 +22,7 @@ from indico.util.fs import secure_filename
 from indico.util.spreadsheets import send_csv, send_xlsx
 from indico.web.flask.util import send_file
 from indico.web.util import jsonify_data, jsonify_template
+import six
 
 
 class DisplayAbstractListMixin:
@@ -103,9 +104,9 @@ class AbstractsDownloadAttachmentsMixin(ZipGeneratorMixin):
     """Generate a ZIP file with attachment files for a given list of abstracts."""
 
     def _prepare_folder_structure(self, item):
-        abstract_title = secure_filename('{}_{}'.format(unicode(item.abstract.friendly_id), item.abstract.title),
+        abstract_title = secure_filename('{}_{}'.format(six.text_type(item.abstract.friendly_id), item.abstract.title),
                                          'abstract')
-        file_name = secure_filename('{}_{}'.format(unicode(item.id), item.filename), item.filename)
+        file_name = secure_filename('{}_{}'.format(six.text_type(item.id), item.filename), item.filename)
         return os.path.join(*self._adjust_path_length([abstract_title, file_name]))
 
     def _iter_items(self, abstracts):

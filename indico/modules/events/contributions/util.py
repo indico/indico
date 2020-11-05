@@ -39,6 +39,7 @@ from indico.web.flask.templating import get_template_module
 from indico.web.flask.util import send_file, url_for
 from indico.web.http_api.metadata.serializer import Serializer
 from indico.web.util import jsonify_data
+import six
 
 
 def get_events_with_linked_contributions(user, dt=None):
@@ -123,7 +124,7 @@ def sort_contribs(contribs, sort_by):
         key_func = attrgetter('friendly_id')
     elif sort_by == BOASortField.title:
         key_func = attrgetter('title')
-    elif isinstance(sort_by, (str, unicode)) and sort_by:
+    elif isinstance(sort_by, (str, six.text_type)) and sort_by:
         key_func = attrgetter(mapping.get(sort_by) or sort_by)
     else:
         key_func = attrgetter('title')
@@ -297,7 +298,7 @@ def import_contributions_from_csv(event, f):
             contribution = create_contribution(event, contrib_fields, extend_parent=True)
 
         contributions.append(contribution)
-        for key, val in changes[event].viewitems():
+        for key, val in six.viewitems(changes[event]):
             all_changes[key].append(val)
 
         email = speaker_data['email']

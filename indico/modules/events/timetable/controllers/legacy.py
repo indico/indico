@@ -47,6 +47,7 @@ from indico.util.i18n import _
 from indico.util.string import handle_legacy_description
 from indico.web.forms.base import FormDefaults
 from indico.web.util import jsonify_data, jsonify_form, jsonify_template
+import six
 
 
 class RHLegacyTimetableAddEntryBase(RHManageTimetableBase):
@@ -308,9 +309,9 @@ class RHLegacyTimetableScheduleContribution(RHManageTimetableBase):
         data = request.json
         required_keys = {'contribution_ids', 'day'}
         allowed_keys = required_keys | {'session_block_id'}
-        if set(data.viewkeys()) > allowed_keys:
+        if set(six.viewkeys(data)) > allowed_keys:
             raise BadRequest('Invalid keys found')
-        elif required_keys > set(data.viewkeys()):
+        elif required_keys > set(six.viewkeys(data)):
             raise BadRequest('Required keys missing')
         entries = []
         day = dateutil.parser.parse(data['day']).date()

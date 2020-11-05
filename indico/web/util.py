@@ -17,6 +17,7 @@ from werkzeug.urls import url_decode, url_encode, url_parse, url_unparse
 
 from indico.util.i18n import _
 from indico.web.flask.templating import get_template_module
+import six
 
 
 def inject_js(js):
@@ -124,7 +125,7 @@ class ExpectedError(ImATeapot):
 
 def _format_request_data(data, hide_passwords=False):
     if not hasattr(data, 'iterlists'):
-        data = ((k, [v]) for k, v in data.iteritems())
+        data = ((k, [v]) for k, v in six.iteritems(data))
     else:
         data = data.iterlists()
     rv = {}
@@ -166,7 +167,7 @@ def get_request_info(hide_passwords=True):
         'rh': g.rh.__class__.__name__ if 'rh' in g else None,
         'user': user_info,
         'ip': request.remote_addr,
-        'user_agent': unicode(request.user_agent),
+        'user_agent': six.text_type(request.user_agent),
         'referrer': request.referrer,
         'data': {
             'url': _format_request_data(request.view_args) if request.view_args is not None else None,

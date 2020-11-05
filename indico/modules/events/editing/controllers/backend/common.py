@@ -46,7 +46,7 @@ class RHMenuEntries(RHEditingBase):
 
     def _process(self):
         menu_entries = named_objects_from_signal(signals.menu.items.send('event-editing-sidemenu', event=self.event))
-        return EditingMenuItemSchema(many=True).jsonify(menu_entries.values())
+        return EditingMenuItemSchema(many=True).jsonify(list(menu_entries.values()))
 
 
 class RHEditableCheckSelfAssign(RHEditableTypeEditorBase):

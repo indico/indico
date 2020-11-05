@@ -32,6 +32,8 @@ from lxml import etree, html
 from markupsafe import Markup, escape
 from speaklater import _LazyString, is_lazy_string
 from sqlalchemy import ForeignKeyConstraint, inspect
+import six
+from six.moves import range
 
 
 # basic list of tags, used for markdown content
@@ -75,20 +77,20 @@ LATEX_MATH_PLACEHOLDER = u"\uE000"
 
 
 def encode_if_unicode(s):
-    if isinstance(s, _LazyString) and isinstance(s.value, unicode):
-        s = unicode(s)
-    return s.encode('utf-8') if isinstance(s, unicode) else s
+    if isinstance(s, _LazyString) and isinstance(s.value, six.text_type):
+        s = six.text_type(s)
+    return s.encode('utf-8') if isinstance(s, six.text_type) else s
 
 
 def safe_upper(text):
-    if isinstance(text, unicode):
+    if isinstance(text, six.text_type):
         return text.upper()
     else:
         return text.decode('utf-8').upper().encode('utf-8')
 
 
 def remove_accents(text, reencode=True):
-    if not isinstance(text, unicode):
+    if not isinstance(text, six.text_type):
         text = text.decode('utf-8')
     result = u''.join((c for c in unicodedata.normalize('NFD', text) if unicodedata.category(c) != 'Mn'))
     if reencode:
@@ -104,13 +106,13 @@ def fix_broken_string(text, as_unicode=False):
         try:
             text = text.decode('latin1')
         except UnicodeDecodeError:
-            text = unicode(text, 'utf-8', errors='replace')
+            text = six.text_type(text, 'utf-8', errors='replace')
     return text if as_unicode else text.encode('utf-8')
 
 
 def to_unicode(text):
     """Convert a string to unicode if it isn't already unicode."""
-    return fix_broken_string(text, as_unicode=True) if isinstance(text, str) else unicode(text)
+    return fix_broken_string(text, as_unicode=True) if isinstance(text, str) else six.text_type(text)
 
 
 def remove_non_alpha(text):
@@ -118,7 +120,7 @@ def remove_non_alpha(text):
 
 
 def unicode_to_ascii(text):
-    if not isinstance(text, unicode):
+    if not isinstance(text, six.text_type):
         text = to_unicode(text)
     text = text.encode('translit/long')
     return text.encode('ascii', 'ignore')
@@ -133,7 +135,7 @@ def strict_unicode(value):
     """
     if value is None:
         raise TypeError('strict_unicode does not accept `None`')
-    return unicode(value)
+    return six.text_type(value)
 
 
 def slugify(*args, **kwargs):
@@ -343,7 +345,7 @@ def strip_whitespace(s):
     This utility is useful in cases where you might get None or
     non-string values such as WTForms filters.
     """
-    if isinstance(s, basestring):
+    if isinstance(s, six.string_types):
         s = s.strip()
     return s
 
@@ -354,9 +356,9 @@ def make_unique_token(is_unique):
     :param is_unique: a callable invoked with the token which should
                       return a boolean indicating if the token is actually
     """
-    token = unicode(uuid4())
+    token = six.text_type(uuid4())
     while not is_unique(token):
-        token = unicode(uuid4())
+        token = six.text_type(uuid4())
     return token
 
 
@@ -368,7 +370,7 @@ def encode_utf8(f):
             return ''
         if is_lazy_string(rv):
             rv = rv.value
-        return rv.encode('utf-8') if isinstance(rv, unicode) else str(rv)
+        return rv.encode('utf-8') if isinstance(rv, six.text_type) else str(rv)
 
     return _wrapper
 
@@ -380,7 +382,7 @@ def is_legacy_id(id_):
     numeric or have a leading zero, resulting in different objects
     with the same numeric id.
     """
-    return not isinstance(id_, (int, long)) and (not id_.isdigit() or str(int(id_)) != id_)
+    return not isinstance(id_, six.integer_types) and (not id_.isdigit() or str(int(id_)) != id_)
 
 
 def text_to_repr(text, html=False, max_length=50):
@@ -405,7 +407,7 @@ def text_to_repr(text, html=False, max_length=50):
 def alpha_enum(value):
     """Convert integer to ordinal letter code (a, b, c, ... z, aa, bb, ...)."""
     max_len = len(string.ascii_lowercase)
-    return unicode(string.ascii_lowercase[value % max_len] * (value / max_len + 1))
+    return six.text_type(string.ascii_lowercase[value % max_len] * (value / max_len + 1))
 
 
 def format_repr(obj, *args, **kwargs):
@@ -446,7 +448,7 @@ def format_repr(obj, *args, **kwargs):
                                     for t in inspect(cls).tables
                                     for c in t.constraints
                                     if isinstance(c, ForeignKeyConstraint))) if hasattr(cls, '__table__') else set()
-    formatted_args = [unicode(_format_value(getattr(obj, arg)))
+    formatted_args = [six.text_type(_format_value(getattr(obj, arg)))
                       if arg not in fkeys
                       else u'{}={}'.format(arg, _format_value(getattr(obj, arg)))
                       for arg in args]
@@ -486,7 +488,7 @@ def _convert_keys(value, convert_func):
         return type(value)(_convert_keys(x, convert_func) for x in value)
     elif not isinstance(value, dict):
         return value
-    return {convert_func(k): _convert_keys(v, convert_func) for k, v in value.iteritems()}
+    return {convert_func(k): _convert_keys(v, convert_func) for k, v in six.iteritems(value)}
 
 
 def camelize_keys(dict_):
@@ -504,7 +506,7 @@ def crc32(data):
 
     When a unicode object is passed, it is encoded as UTF-8.
     """
-    if isinstance(data, unicode):
+    if isinstance(data, six.text_type):
         data = data.encode('utf-8')
     return binascii.crc32(data) & 0xffffffff
 
@@ -620,7 +622,7 @@ class RichMarkup(Markup):
     def __html__(self):
         # XXX: ensure we have no harmful HTML - there are certain malicious values that
         # are not caught by the legacy sanitizer that runs at submission time
-        string = RichMarkup(sanitize_html(unicode(self)), preformatted=self._preformatted)
+        string = RichMarkup(sanitize_html(six.text_type(self)), preformatted=self._preformatted)
         if string._preformatted:
             return u'<div class="preformatted">{}</div>'.format(string)
         else:
@@ -630,7 +632,7 @@ class RichMarkup(Markup):
         return {slot: getattr(self, slot) for slot in self.__slots__ if hasattr(self, slot)}
 
     def __setstate__(self, state):
-        for slot, value in state.iteritems():
+        for slot, value in six.iteritems(state):
             setattr(self, slot, value)
 
 
@@ -638,14 +640,14 @@ class MarkdownText(Markup):
     """Unicode/Markup class that renders markdown."""
 
     def __html__(self):
-        return render_markdown(unicode(self), extensions=('nl2br', 'tables'))
+        return render_markdown(six.text_type(self), extensions=('nl2br', 'tables'))
 
 
 class PlainText(Markup):
     """Unicode/Markup class that renders plain text."""
 
     def __html__(self):
-        return u'<div class="preformatted">{}</div>'.format(escape(unicode(self)))
+        return u'<div class="preformatted">{}</div>'.format(escape(six.text_type(self)))
 
 
 def handle_legacy_description(field, obj, get_render_mode=attrgetter('render_mode'),

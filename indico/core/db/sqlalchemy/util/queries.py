@@ -11,6 +11,8 @@ import re
 
 from sqlalchemy import func, inspect, over
 from sqlalchemy.sql import update
+import six
+from six.moves import filter
 
 
 TS_REGEX = re.compile(r'([@<>!()&|:\'\\])')
@@ -116,16 +118,16 @@ def get_related_object(obj, relationship, criteria):
              such object could be found.
     """
     def _compare(a, b):
-        if isinstance(a, basestring) and a.isdigit():
+        if isinstance(a, six.string_types) and a.isdigit():
             a = int(a)
-        if isinstance(b, basestring) and b.isdigit():
+        if isinstance(b, six.string_types) and b.isdigit():
             b = int(b)
         return a == b
 
     # if the relationship is loaded evaluate the criteria in python
     if relationship not in inspect(obj).unloaded:
         return next((x for x in getattr(obj, relationship)
-                     if all(_compare(getattr(x, k), v) for k, v in criteria.iteritems())),
+                     if all(_compare(getattr(x, k), v) for k, v in six.iteritems(criteria))),
                     None)
     # otherwise query that specific object
     cls = getattr(type(obj), relationship).prop.mapper.class_
@@ -151,7 +153,7 @@ def get_n_matching(query, n, predicate):
         _offset[0] += limit
         return rv
 
-    results = filter(predicate, _get())
+    results = list(filter(predicate, _get()))
     while len(results) < n:
         objects = _get()
         if not objects:

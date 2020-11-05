@@ -40,6 +40,7 @@ from indico.util.event import truncate_path
 from indico.util.fs import secure_filename
 from indico.util.i18n import _
 from indico.util.string import crc32, remove_accents
+import six
 
 
 # colors for user-specific avatar bubbles
@@ -77,7 +78,7 @@ def get_related_categories(user, detailed=True):
             'managed': categ in managed,
             'path': truncate_path(categ.chain_titles[:-1], chars=50)
         }
-    return OrderedDict(sorted(res.items(), key=itemgetter(0)))
+    return OrderedDict(sorted(list(res.items()), key=itemgetter(0)))
 
 
 def get_suggested_categories(user):
@@ -133,17 +134,17 @@ def get_linked_events(user, dt, limit=None, load_also=()):
         links.setdefault(event_id, set()).add('conference_manager')
     for event_id in get_events_created_by(user, dt):
         links.setdefault(event_id, set()).add('conference_creator')
-    for event_id, principal_roles in get_events_with_linked_sessions(user, dt).iteritems():
+    for event_id, principal_roles in six.iteritems(get_events_with_linked_sessions(user, dt)):
         links.setdefault(event_id, set()).update(principal_roles)
-    for event_id, principal_roles in get_events_with_linked_contributions(user, dt).iteritems():
+    for event_id, principal_roles in six.iteritems(get_events_with_linked_contributions(user, dt)):
         links.setdefault(event_id, set()).update(principal_roles)
-    for event_id, role in get_events_with_linked_event_persons(user, dt).iteritems():
+    for event_id, role in six.iteritems(get_events_with_linked_event_persons(user, dt)):
         links.setdefault(event_id, set()).add(role)
-    for event_id, roles in get_events_with_abstract_reviewer_convener(user, dt).iteritems():
+    for event_id, roles in six.iteritems(get_events_with_abstract_reviewer_convener(user, dt)):
         links.setdefault(event_id, set()).update(roles)
-    for event_id, roles in get_events_with_abstract_persons(user, dt).iteritems():
+    for event_id, roles in six.iteritems(get_events_with_abstract_persons(user, dt)):
         links.setdefault(event_id, set()).update(roles)
-    for event_id, roles in get_events_with_paper_roles(user, dt).iteritems():
+    for event_id, roles in six.iteritems(get_events_with_paper_roles(user, dt)):
         links.setdefault(event_id, set()).update(roles)
 
     if not links:
@@ -214,7 +215,7 @@ def build_user_search_query(criteria, exact=False, include_deleted=False, includ
             raise ValueError("'name' is not compatible with (first|last)_name")
         query = query.filter(_build_name_search(name.replace(',', '').split()))
 
-    for k, v in criteria.iteritems():
+    for k, v in six.iteritems(criteria):
         query = query.filter(unaccent_match(getattr(User, k), v, exact))
 
     # wrap as subquery so we can apply order regardless of distinct-by-id
@@ -256,7 +257,7 @@ def search_users(exact=False, include_deleted=False, include_pending=False, incl
              objects for existing users.
     """
 
-    criteria = {key: value.strip() for key, value in criteria.iteritems() if value.strip()}
+    criteria = {key: value.strip() for key, value in six.iteritems(criteria) if value.strip()}
 
     if not criteria:
         return set()
@@ -290,7 +291,7 @@ def search_users(exact=False, include_deleted=False, include_pending=False, incl
                 found_emails[ident.data['email'].lower()] = ident
                 found_identities[(ident.provider, ident.identifier)] = ident
 
-    return set(found_emails.viewvalues()) | system_user
+    return set(six.viewvalues(found_emails)) | system_user
 
 
 def get_user_by_email(email, create_pending=False):
@@ -387,9 +388,9 @@ def get_color_for_username(username):
 def get_gravatar_for_user(user, identicon, size=256, lastmod=None):
     gravatar_url = 'https://www.gravatar.com/avatar/{}'.format(hashlib.md5(user.email.lower()).hexdigest())
     if identicon:
-        params = {'d': 'identicon', 's': unicode(size), 'forcedefault': 'y'}
+        params = {'d': 'identicon', 's': six.text_type(size), 'forcedefault': 'y'}
     else:
-        params = {'d': 'mp', 's': unicode(size)}
+        params = {'d': 'mp', 's': six.text_type(size)}
     headers = {'If-Modified-Since': lastmod} if lastmod is not None else {}
     resp = requests.get(gravatar_url, params=params, headers=headers)
     if resp.status_code == 304:

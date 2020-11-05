@@ -19,6 +19,7 @@ from indico.modules.events.registration.models.registrations import Registration
 from indico.modules.events.util import ListGeneratorBase
 from indico.util.i18n import _
 from indico.web.flask.templating import get_template_module
+import six
 
 
 class RegistrationListGenerator(ListGeneratorBase):
@@ -91,7 +92,7 @@ class RegistrationListGenerator(ListGeneratorBase):
         result = []
         personal_data_field_ids = {x.personal_data_type: x.id for x in self.regform.form_items if x.is_field}
         for item_id in ids:
-            if isinstance(item_id, basestring):
+            if isinstance(item_id, six.string_types):
                 personal_data_type = PersonalDataType.get(item_id)
                 if personal_data_type:
                     item_id = personal_data_field_ids[personal_data_type]
@@ -137,13 +138,13 @@ class RegistrationListGenerator(ListGeneratorBase):
         field_types = {str(f.id): f.field_impl for f in self.regform.form_items
                        if f.is_field and not f.is_deleted and (f.parent_id is None or not f.parent.is_deleted)}
         field_filters = {field_id: data_list
-                         for field_id, data_list in filters['fields'].iteritems()
+                         for field_id, data_list in six.iteritems(filters['fields'])
                          if field_id in field_types}
         if not field_filters and not filters['items']:
             return query
         criteria = [db.and_(RegistrationFormFieldData.field_id == field_id,
                             field_types[field_id].create_sql_filter(data_list))
-                    for field_id, data_list in field_filters.iteritems()]
+                    for field_id, data_list in six.iteritems(field_filters)]
         items_criteria = []
         if 'checked_in' in filters['items']:
             checked_in_values = filters['items']['checked_in']

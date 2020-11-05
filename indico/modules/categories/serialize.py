@@ -8,7 +8,8 @@
 from __future__ import unicode_literals
 
 from io import BytesIO
-from itertools import ifilter
+import six
+
 
 import icalendar as ical
 from feedgen.feed import FeedGenerator
@@ -23,6 +24,7 @@ from indico.modules.categories import Category
 from indico.modules.events import Event
 from indico.util.date_time import now_utc
 from indico.util.string import sanitize_html
+from six.moves import filter
 
 
 def serialize_categories_ical(category_ids, user, event_filter=True, event_filter_fn=None, update_query=None):
@@ -56,7 +58,7 @@ def serialize_categories_ical(category_ids, user, event_filter=True, event_filte
         query = update_query(query)
     it = iter(query)
     if event_filter_fn:
-        it = ifilter(event_filter_fn, it)
+        it = filter(event_filter_fn, it)
     events = list(it)
     # make sure the parent categories are in sqlalchemy's identity cache.
     # this avoids query spam from `protection_parent` lookups
@@ -90,9 +92,9 @@ def serialize_categories_ical(category_ids, user, event_filter=True, event_filte
             description.append(u'Speakers: {}'.format(u', '.join(speakers)))
 
         if event.description:
-            desc_text = unicode(event.description) or u'<p/>'  # get rid of RichMarkup
+            desc_text = six.text_type(event.description) or u'<p/>'  # get rid of RichMarkup
             try:
-                description.append(unicode(html.fromstring(desc_text).text_content()))
+                description.append(six.text_type(html.fromstring(desc_text).text_content()))
             except ParserError:
                 # this happens e.g. if desc_text contains only a html comment
                 pass
@@ -131,7 +133,7 @@ def serialize_category_atom(category, url, user, event_filter):
         entry = feed.add_entry(order='append')
         entry.id(event.external_url)
         entry.title(event.title)
-        entry.summary(sanitize_html(unicode(event.description)) or None, type='html')
+        entry.summary(sanitize_html(six.text_type(event.description)) or None, type='html')
         entry.link(href=event.external_url)
         entry.updated(event.start_dt)
     return BytesIO(feed.atom_str(pretty=True))

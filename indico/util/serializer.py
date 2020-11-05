@@ -9,6 +9,7 @@ from enum import Enum
 
 from indico.core.errors import IndicoError
 from indico.core.logger import Logger
+import six
 
 
 class Serializer(object):
@@ -34,7 +35,7 @@ class Serializer(object):
                     v = [e.to_serializable() for e in v]
                 elif isinstance(v, dict):
                     v = dict((k, vv.to_serializable() if isinstance(vv, Serializer) else vv)
-                             for k, vv in v.iteritems())
+                             for k, vv in six.iteritems(v))
                 elif isinstance(v, Enum):
                     v = v.name
                 if type(v) in converters:

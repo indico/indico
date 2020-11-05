@@ -7,6 +7,7 @@
 import pytest
 
 from indico.util.caching import memoize_request
+from six.moves import range
 
 
 @pytest.fixture

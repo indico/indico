@@ -14,6 +14,7 @@ from collections import defaultdict
 from datetime import date
 
 import click
+import six
 click.disable_unicode_literals_warning = True
 
 
@@ -128,7 +129,7 @@ def main(indico_dir, name, module_dir, event, models, blueprint, templates, cont
         if not os.path.exists(models_dir):
             os.mkdir(models_dir)
             touch(os.path.join(models_dir, '__init__.py'))
-        for module_name, class_names in model_classes.iteritems():
+        for module_name, class_names in six.iteritems(model_classes):
             model_path = os.path.join(models_dir, '{}.py'.format(module_name))
             if os.path.exists(model_path):
                 raise click.exceptions.UsageError('Cannot create model in {} (file already exists)'.format(module_name))

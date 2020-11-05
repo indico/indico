@@ -31,7 +31,7 @@ def notify_cancellation(occurrence):
     if not occurrence.is_cancelled:
         raise ValueError('Occurrence is not cancelled')
     notification = ReservationOccurrenceNotification(occurrence)
-    return filter(None, [
+    return [_f for _f in [
         notification.compose_email_to_user(
             subject='Booking cancelled on',
             template_name='occurrence_cancellation_email_to_user'
@@ -40,7 +40,7 @@ def notify_cancellation(occurrence):
             subject='Booking cancelled on',
             template_name='occurrence_cancellation_email_to_manager'
         ),
-    ])
+    ] if _f]
 
 
 @email_sender
@@ -48,7 +48,7 @@ def notify_rejection(occurrence):
     if not occurrence.is_rejected:
         raise ValueError('Occurrence is not rejected')
     notification = ReservationOccurrenceNotification(occurrence)
-    return filter(None, [
+    return [_f for _f in [
         notification.compose_email_to_user(
             subject='Booking rejected on',
             template_name='occurrence_rejection_email_to_user'
@@ -57,7 +57,7 @@ def notify_rejection(occurrence):
             subject='Booking rejected on',
             template_name='occurrence_rejection_email_to_manager'
         )
-    ])
+    ] if _f]
 
 
 @email_sender

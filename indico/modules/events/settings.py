@@ -22,6 +22,7 @@ from indico.modules.events.models.settings import EventSetting, EventSettingPrin
 from indico.util.caching import memoize
 from indico.util.signals import values_from_signal
 from indico.util.user import iter_acl
+import six
 
 
 def event_or_id(f):
@@ -154,7 +155,7 @@ class EventSettingsProxy(SettingsProxyBase):
         :param event: Event (or its ID)
         :param items: Dict containing the new settings
         """
-        items = {k: self._convert_from_python(k, v) for k, v in items.iteritems()}
+        items = {k: self._convert_from_python(k, v) for k, v in six.iteritems(items)}
         self._split_call(items,
                          lambda x: EventSetting.set_multi(self.module, x, event_id=event),
                          lambda x: EventSettingPrincipal.set_acl_multi(self.module, x, event_id=event))
@@ -204,7 +205,7 @@ class ThemeSettingsProxy(object):
             with open(path) as f:
                 data = f.read()
             settings = {k: v
-                        for k, v in yaml.safe_load(core_data + '\n' + data).viewitems()
+                        for k, v in six.viewitems(yaml.safe_load(core_data + '\n' + data))
                         if not k.startswith('__core_')}
             # We assume there's no more than one theme plugin that provides defaults.
             # If that's not the case the last one "wins". We could reject this but it
@@ -215,7 +216,7 @@ class ThemeSettingsProxy(object):
             # to avoid using definition names that are likely to cause collisions.
             # Either way, if someone does this on purpose chances are good they want
             # to override a default style so let them do so...
-            for name, definition in settings.get('definitions', {}).viewitems():
+            for name, definition in six.viewitems(settings.get('definitions', {})):
                 definition['plugin'] = plugin
                 definition.setdefault('user_visible', False)
                 core_settings['definitions'][name] = definition
@@ -233,7 +234,7 @@ class ThemeSettingsProxy(object):
 
     @memoize
     def get_themes_for(self, event_type):
-        return {theme_id: theme_data for theme_id, theme_data in self.themes.viewitems()
+        return {theme_id: theme_data for theme_id, theme_data in six.viewitems(self.themes)
                 if event_type in theme_data['event_types']}
 
 

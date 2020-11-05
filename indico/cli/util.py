@@ -14,6 +14,7 @@ import click
 from flask.cli import AppGroup, FlaskGroup, ScriptInfo
 from flask_pluginengine import wrap_in_plugin_context
 from werkzeug.utils import cached_property
+import six
 
 
 # XXX: Do not import any indico modules in here!
@@ -47,7 +48,7 @@ class IndicoFlaskGroup(FlaskGroup):
 
     def _wrap_in_plugin_context(self, plugin, cmd):
         cmd.callback = wrap_in_plugin_context(plugin, cmd.callback)
-        for subcmd in getattr(cmd, 'commands', {}).viewvalues():
+        for subcmd in six.viewvalues(getattr(cmd, 'commands', {})):
             self._wrap_in_plugin_context(plugin, subcmd)
 
     def _get_indico_plugin_commands(self, ctx):
@@ -59,12 +60,12 @@ class IndicoFlaskGroup(FlaskGroup):
             ctx.ensure_object(ScriptInfo).load_app()
             cmds = named_objects_from_signal(signals.plugin.cli.send(), plugin_attr='_indico_plugin')
             rv = {}
-            for name, cmd in cmds.viewitems():
+            for name, cmd in six.viewitems(cmds):
                 if cmd._indico_plugin:
                     self._wrap_in_plugin_context(cmd._indico_plugin, cmd)
                 rv[name] = cmd
         except Exception as exc:
-            if 'No indico config found' not in unicode(exc):
+            if 'No indico config found' not in six.text_type(exc):
                 click.echo(click.style('Loading plugin commands failed:', fg='red', bold=True))
                 click.echo(click.style(traceback.format_exc(), fg='red'))
             rv = {}

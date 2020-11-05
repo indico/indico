@@ -26,6 +26,7 @@ from indico.util.mathjax import MathjaxMixin
 from indico.util.string import strip_tags, to_unicode, truncate
 from indico.web.flask.util import url_for
 from indico.web.views import WPDecorated, WPJinjaMixin
+import six
 
 
 def _get_print_url(event, theme=None, theme_override=False):
@@ -53,7 +54,7 @@ def render_event_header(event, conference_layout=False, theme=None, theme_overri
     print_url = _get_print_url(event, theme, theme_override) if not conference_layout else None
     show_nav_bar = event.type_ != EventType.conference or layout_settings.get(event, 'show_nav_bar')
     themes = {tid: {'name': data['title'], 'user_visible': data.get('user_visible')}
-              for tid, data in theme_settings.get_themes_for(event.type_.name).viewitems()}
+              for tid, data in six.viewitems(theme_settings.get_themes_for(event.type_.name))}
     return render_template('events/header.html',
                            event=event, print_url=print_url, show_nav_bar=show_nav_bar, themes=themes, theme=theme)
 

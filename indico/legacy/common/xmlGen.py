@@ -11,6 +11,7 @@ from xml.sax import saxutils
 
 from indico.legacy.common.utils import encodeUnicode
 from indico.util.string import encode_if_unicode
+from six.moves import range
 
 
 class XMLGen:

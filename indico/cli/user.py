@@ -19,6 +19,7 @@ from indico.modules.users.operations import create_user
 from indico.modules.users.util import search_users
 from indico.util.console import cformat, prompt_email, prompt_pass
 from indico.util.string import to_unicode
+import six
 
 
 click.disable_unicode_literals_warning = True
@@ -74,8 +75,8 @@ def _safe_lower(s):
 @click.option('--affiliation', '-a', help='Affiliation of the user')
 def search(substring, include_deleted, include_pending, include_blocked, include_external, include_system, **criteria):
     """Search users matching some criteria."""
-    assert set(criteria.viewkeys()) == {'first_name', 'last_name', 'email', 'affiliation'}
-    criteria = {k: v for k, v in criteria.viewitems() if v is not None}
+    assert set(six.viewkeys(criteria)) == {'first_name', 'last_name', 'email', 'affiliation'}
+    criteria = {k: v for k, v in six.viewitems(criteria) if v is not None}
     res = search_users(exact=(not substring), include_deleted=include_deleted, include_pending=include_pending,
                        include_blocked=include_blocked, external=include_external,
                        allow_system_user=include_system, **criteria)
@@ -92,7 +93,7 @@ def search(substring, include_deleted, include_pending, include_blocked, include
     if users:
         table_data = [['ID', 'First Name', 'Last Name', 'Email', 'Affiliation']]
         for user in users:
-            table_data.append([unicode(user.id), user.first_name, user.last_name, user.email, user.affiliation])
+            table_data.append([six.text_type(user.id), user.first_name, user.last_name, user.email, user.affiliation])
         table = AsciiTable(table_data, cformat('%{white!}Users%{reset}'))
         table.justify_columns[0] = 'right'
         print(table.table)

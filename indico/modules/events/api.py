@@ -43,6 +43,8 @@ from indico.web.http_api.fossils import IPeriodFossil
 from indico.web.http_api.hooks.base import HTTPAPIHook, IteratedDataFetcher
 from indico.web.http_api.responses import HTTPAPIError
 from indico.web.http_api.util import get_query_parameter
+from six.moves import map
+import six
 
 
 utc = pytz.timezone('UTC')
@@ -82,7 +84,7 @@ class EventTimeTableHook(HTTPAPIHook):
         return TimetableSerializer(event, management=False, user=user).serialize_timetable()
 
     def export_timetable(self, user):
-        events = Event.find_all(Event.id.in_(map(int, self._idList)), ~Event.is_deleted)
+        events = Event.find_all(Event.id.in_(list(map(int, self._idList))), ~Event.is_deleted)
         return {event.id: self._serialize_timetable(event, user) for event in events}
 
 
@@ -179,7 +181,7 @@ class SerializerBase(object):
                 'first_name': person.first_name,
                 'last_name': person.last_name,
                 'fullName': person.get_full_name(last_name_upper=False, abbrev_first_name=False),
-                'id': unicode(person.id),
+                'id': six.text_type(person.id),
                 'affiliation': person.affiliation,
                 'emailHash': md5(person.email.encode('utf-8')).hexdigest() if person.email else None
             }
@@ -241,7 +243,7 @@ class SerializerBase(object):
             '_fossil': 'sessionMinimal',
             'numSlots': len(session_.blocks),
             'id': (session_.legacy_mapping.legacy_session_id
-                   if session_.legacy_mapping else unicode(session_.friendly_id)),
+                   if session_.legacy_mapping else six.text_type(session_.friendly_id)),
             'db_id': session_.id,
             'friendly_id': session_.friendly_id,
             'room': session_.get_room_name(full=False)
@@ -274,7 +276,7 @@ class SerializerBase(object):
     def _build_event_api_data_base(self, event):
         return {
             '_type': 'Conference',
-            'id': unicode(event.id),
+            'id': six.text_type(event.id),
             'title': event.title,
             'description': event.description,
             'startDate': self._serialize_date(event.start_dt),
@@ -284,7 +286,7 @@ class SerializerBase(object):
             'location': event.venue_name,
             'address': event.address,
             'type': event.type_.legacy_name,
-            'references': map(self.serialize_reference, event.references)
+            'references': list(map(self.serialize_reference, event.references))
         }
 
     def _build_session_event_api_data(self, event):
@@ -315,7 +317,7 @@ class SerializerBase(object):
             'description': '',  # Session blocks don't have a description
             'title': block.full_title,
             'url': url_for('sessions.display_session', block.session, _external=True),
-            'contributions': map(self._serialize_contribution, block.contributions),
+            'contributions': list(map(self._serialize_contribution, block.contributions)),
             'note': build_note_api_data(block.note),
             'session': serialized_session,
             'room': block.get_room_name(full=False),
@@ -356,7 +358,7 @@ class SerializerBase(object):
             '_type': 'Contribution',
             '_fossil': self.fossils_mapping['contribution'].get(self._detail_level),
             'id': (contrib.legacy_mapping.legacy_contribution_id
-                   if contrib.legacy_mapping else unicode(contrib.friendly_id)),
+                   if contrib.legacy_mapping else six.text_type(contrib.friendly_id)),
             'db_id': contrib.id,
             'friendly_id': contrib.friendly_id,
             'title': contrib.title,
@@ -381,11 +383,11 @@ class SerializerBase(object):
             'keywords': contrib.keywords,
             'track': contrib.track.title if contrib.track else None,
             'session': contrib.session.title if contrib.session else None,
-            'references': map(self.serialize_reference, contrib.references),
+            'references': list(map(self.serialize_reference, contrib.references)),
             'board_number': contrib.board_number
         }
         if include_subcontribs:
-            data['subContributions'] = map(self._serialize_subcontribution, contrib.subcontributions)
+            data['subContributions'] = list(map(self._serialize_subcontribution, contrib.subcontributions))
         if can_manage:
             data['allowed'] = self._serialize_access_list(contrib)
         return data
@@ -396,7 +398,7 @@ class SerializerBase(object):
             '_type': 'SubContribution',
             '_fossil': 'subContributionMetadata',
             'id': (subcontrib.legacy_mapping.legacy_subcontribution_id
-                   if subcontrib.legacy_mapping else unicode(subcontrib.friendly_id)),
+                   if subcontrib.legacy_mapping else six.text_type(subcontrib.friendly_id)),
             'db_id': subcontrib.id,
             'friendly_id': subcontrib.friendly_id,
             'title': subcontrib.title,
@@ -406,7 +408,7 @@ class SerializerBase(object):
             'folders': build_folders_api_data(subcontrib),
             'speakers': self._serialize_persons(subcontrib.speakers, person_type='SubContribParticipation',
                                                 can_manage=can_manage),
-            'references': map(self.serialize_reference, subcontrib.references)
+            'references': list(map(self.serialize_reference, subcontrib.references))
         }
         return data
 
@@ -453,7 +455,7 @@ class CategoryEventFetcher(IteratedDataFetcher, SerializerBase):
 
     def category(self, idlist, format):
         try:
-            idlist = map(int, idlist)
+            idlist = list(map(int, idlist))
         except ValueError:
             raise HTTPAPIError('Category IDs must be numeric', 400)
         if format == 'ics':
@@ -526,7 +528,7 @@ class CategoryEventFetcher(IteratedDataFetcher, SerializerBase):
         return query
 
     def serialize_events(self, events):
-        return map(self._build_event_api_data, events)
+        return list(map(self._build_event_api_data, events))
 
     def _serialize_category_path(self, category):
         visibility = {'id': None, 'name': 'Everywhere'}
@@ -571,7 +573,7 @@ class CategoryEventFetcher(IteratedDataFetcher, SerializerBase):
             'roomMapURL': event.room.map_url if event.room else None,
             'folders': build_folders_api_data(event),
             'chairs': self._serialize_persons(event.person_links, person_type='ConferenceChair', can_manage=can_manage),
-            'material': build_material_legacy_api_data(event) + filter(None, [build_note_legacy_api_data(event.note)]),
+            'material': build_material_legacy_api_data(event) + [_f for _f in [build_note_legacy_api_data(event.note)] if _f],
             'keywords': event.keywords,
         })
 

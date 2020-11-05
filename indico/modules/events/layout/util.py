@@ -26,6 +26,7 @@ from indico.util.caching import memoize_request
 from indico.util.signals import named_objects_from_signal, values_from_signal
 from indico.util.string import crc32, return_ascii
 from indico.web.flask.util import url_for
+import six
 
 
 _cache = GenericCache('updated-menus')
@@ -131,21 +132,21 @@ def _get_split_signal_entries():
     """Get the top-level and child menu entry data."""
     signal_entries = get_menu_entries_from_signal()
     top_data = OrderedDict((name, data)
-                           for name, data in sorted(signal_entries.iteritems(),
+                           for name, data in sorted(six.iteritems(signal_entries),
                                                     key=lambda name_data: _menu_entry_key(name_data[1]))
                            if not data.parent)
     child_data = defaultdict(list)
-    for name, data in signal_entries.iteritems():
+    for name, data in six.iteritems(signal_entries):
         if data.parent is not None:
             child_data[data.parent].append(data)
-    for parent, entries in child_data.iteritems():
+    for parent, entries in six.iteritems(child_data):
         entries.sort(key=_menu_entry_key)
     return top_data, child_data
 
 
 def _get_menu_cache_data(event):
     from indico.core.plugins import plugin_engine
-    cache_key = unicode(event.id)
+    cache_key = six.text_type(event.id)
     plugin_hash = crc32(','.join(sorted(plugin_engine.get_active_plugins())))
     cache_version = '{}:{}'.format(indico.__version__, plugin_hash)
     return cache_key, cache_version
@@ -175,7 +176,7 @@ def _save_menu_entries(entries):
             # If the IntegrityError involves that index, we assume it's just the
             # race condition and ignore it.
             sess.rollback()
-            if 'ix_uq_menu_entries_event_id_name' not in unicode(e.message):
+            if 'ix_uq_menu_entries_event_id_name' not in six.text_type(e.message):
                 raise
             return False
         else:
@@ -187,7 +188,7 @@ def _rebuild_menu(event):
     top_data, child_data = _get_split_signal_entries()
     pos_gen = count()
     entries = [_build_menu_entry(event, True, data, next(pos_gen), children=child_data.get(data.name))
-               for name, data in top_data.iteritems()]
+               for name, data in six.iteritems(top_data)]
     return _save_menu_entries(entries)
 
 
@@ -202,22 +203,22 @@ def _check_menu(event):
                       joinedload('children').load_only('id', 'parent_id', 'name', 'position')))
 
     existing = {entry.name: entry for entry in query}
-    pos_gen = count(start=(max(x.position for x in existing.itervalues() if not x.parent) + 1))
+    pos_gen = count(start=(max(x.position for x in six.itervalues(existing) if not x.parent) + 1))
     entries = []
     top_created = set()
-    for name, data in top_data.iteritems():
+    for name, data in six.iteritems(top_data):
         if name in existing:
             continue
         entries.append(_build_menu_entry(event, True, data, next(pos_gen), child_data.get(name)))
         top_created.add(name)
 
     child_pos_gens = {}
-    for name, entry in existing.iteritems():
+    for name, entry in six.iteritems(existing):
         if entry.parent is not None:
             continue
         child_pos_gens[name] = count(start=(max(x.position for x in entry.children) + 1 if entry.children else 0))
 
-    for parent_name, data_list in child_data.iteritems():
+    for parent_name, data_list in six.iteritems(child_data):
         if parent_name in top_created:
             # adding a missing parent element also adds its children
             continue
@@ -266,7 +267,7 @@ def _build_transient_menu(event):
     top_data, child_data = _get_split_signal_entries()
     pos_gen = count()
     return [_build_menu_entry(event, False, data, next(pos_gen), children=child_data.get(data.name))
-            for name, data in top_data.iteritems()
+            for name, data in six.iteritems(top_data)
             if data.parent is None]
 
 

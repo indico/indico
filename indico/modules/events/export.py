@@ -42,6 +42,7 @@ from indico.modules.users.util import get_user_by_email
 from indico.util.console import cformat
 from indico.util.date_time import now_utc
 from indico.util.string import strict_unicode
+import six
 
 
 _notset = object()
@@ -85,7 +86,7 @@ def _make_globals(**extra):
     Build a globals dict for the exec/eval environment that contains
     all the models and whatever extra data is needed.
     """
-    globals_ = {name: cls for name, cls in db.Model._decl_class_registry.iteritems()
+    globals_ = {name: cls for name, cls in six.iteritems(db.Model._decl_class_registry)
                 if hasattr(cls, '__table__')}
     globals_.update(extra)
     return globals_
@@ -95,8 +96,8 @@ def _exec_custom(code, **extra):
     """Execute a custom code snippet and return all non-underscored values."""
     globals_ = _make_globals(**extra)
     locals_ = {}
-    exec code in globals_, locals_
-    return {unicode(k): v for k, v in locals_.iteritems() if k[0] != '_'}
+    exec(code, globals_, locals_)
+    return {six.text_type(k): v for k, v in six.iteritems(locals_) if k[0] != '_'}
 
 
 def _resolve_col(col):
@@ -105,7 +106,7 @@ def _resolve_col(col):
     :param col: A string containing a Python expression, a model
                 attribute or a Column instance.
     """
-    attr = eval(col, _make_globals()) if isinstance(col, basestring) else col
+    attr = eval(col, _make_globals()) if isinstance(col, six.string_types) else col
     if isinstance(attr, db.Column):
         return attr
     assert len(attr.prop.columns) == 1
@@ -122,14 +123,14 @@ def _get_single_fk(col):
 
 def _get_pk(table):
     """Get the single column that is the table's PK."""
-    pks = inspect(table).primary_key.columns.values()
+    pks = list(inspect(table).primary_key.columns.values())
     assert len(pks) == 1
     return pks[0]
 
 
 def _has_single_pk(table):
     """Check if the table has a single PK."""
-    return len(inspect(table).primary_key.columns.values()) == 1
+    return len(list(inspect(table).primary_key.columns.values())) == 1
 
 
 def _get_inserted_pk(result):
@@ -151,7 +152,7 @@ class EventExporter(object):
         self.users = {}
 
     def _add_file(self, name, size, data):
-        if isinstance(data, basestring):
+        if isinstance(data, six.string_types):
             data = BytesIO(data)
         info = tarfile.TarInfo(name)
         info.size = size
@@ -188,7 +189,7 @@ class EventExporter(object):
         with open(os.path.join(current_app.root_path, 'modules', 'events', 'export.yaml')) as f:
             spec = yaml.safe_load(f)
 
-        return {_model_to_table(k): _process_tablespec(_model_to_table(k), v) for k, v in spec['export'].iteritems()}
+        return {_model_to_table(k): _process_tablespec(_model_to_table(k), v) for k, v in six.iteritems(spec['export'])}
 
     def _get_reverse_fk_map(self):
         """Build a mapping between columns and incoming FKs."""
@@ -198,7 +199,7 @@ class EventExporter(object):
                          'events.legacy_session_id_map', 'events.legacy_page_id_map', 'categories.legacy_id_map',
                          'events.legacy_id_map', 'attachments.legacy_folder_id_map'}
         fk_targets = defaultdict(set)
-        for name, table in db.metadata.tables.iteritems():
+        for name, table in six.iteritems(db.metadata.tables):
             if name in legacy_tables:
                 continue
             for column in table.columns:
@@ -207,7 +208,7 @@ class EventExporter(object):
         return dict(fk_targets)
 
     def _get_uuid(self):
-        uuid = unicode(uuid4())
+        uuid = six.text_type(uuid4())
         if uuid in self.used_uuids:
             # VERY unlikely but just in case...
             return self._get_uuid()
@@ -321,7 +322,7 @@ class EventExporter(object):
             if spec['skipif'] and eval(spec['skipif'], _make_globals(ROW=row)):
                 continue
             rowdict = row._asdict()
-            pk = tuple(v for k, v in rowdict.viewitems() if table.c[k].primary_key)
+            pk = tuple(v for k, v in six.viewitems(rowdict) if table.c[k].primary_key)
             if (table.fullname, pk) in self.seen_rows:
                 if spec['allow_duplicates']:
                     continue
@@ -329,8 +330,8 @@ class EventExporter(object):
                     raise Exception('Trying to serialize already-serialized row')
             self.seen_rows.add((table.fullname, pk))
             data = {}
-            for col, value in rowdict.viewitems():
-                col = unicode(col)  # col names are `quoted_name` objects
+            for col, value in six.viewitems(rowdict):
+                col = six.text_type(col)  # col names are `quoted_name` objects
                 col_fullname = '{}.{}'.format(table.fullname, col)
                 col_custom = spec['cols'].get(col, _notset)
                 colspec = table.c[col]
@@ -365,13 +366,13 @@ class EventExporter(object):
             self._process_file(data)
             # export objects referenced in outgoing FKs before the row
             # itself as the FK column might not be nullable
-            for col, fk in spec['fks_out'].iteritems():
+            for col, fk in six.iteritems(spec['fks_out']):
                 value = rowdict[col]
                 for x in self._serialize_objects(fk.table, value == fk):
                     yield x
             yield table.fullname, data
             # serialize objects referencing the current row, but don't export them yet
-            for col, fks in spec['fks'].iteritems():
+            for col, fks in six.iteritems(spec['fks']):
                 value = rowdict[col]
                 cascaded += [x for fk in fks for x in self._serialize_objects(fk.table, value == fk)]
         # we only add incoming fks after being done with all objects in case one
@@ -410,17 +411,17 @@ class EventImporter(object):
             spec = yaml.safe_load(f)
 
         spec = spec['import']
-        spec['defaults'] = {_model_to_table(k): v for k, v in spec.get('defaults', {}).iteritems()}
-        spec['custom'] = {_model_to_table(k): v for k, v in spec.get('custom', {}).iteritems()}
-        spec['missing_users'] = {_resolve_col_name(k): v for k, v in spec.get('missing_users', {}).iteritems()}
-        spec['verbose'] = {_model_to_table(k): _process_format(v) for k, v in spec.get('verbose', {}).iteritems()}
+        spec['defaults'] = {_model_to_table(k): v for k, v in six.iteritems(spec.get('defaults', {}))}
+        spec['custom'] = {_model_to_table(k): v for k, v in six.iteritems(spec.get('custom', {}))}
+        spec['missing_users'] = {_resolve_col_name(k): v for k, v in six.iteritems(spec.get('missing_users', {}))}
+        spec['verbose'] = {_model_to_table(k): _process_format(v) for k, v in six.iteritems(spec.get('verbose', {}))}
         return spec
 
     def _load_users(self, data):
         if not data['users']:
             return
         missing = {}
-        for uuid, userdata in data['users'].iteritems():
+        for uuid, userdata in six.iteritems(data['users']):
             if userdata is None:
                 self.user_map[uuid] = self.system_user_id
                 continue
@@ -435,7 +436,7 @@ class EventImporter(object):
         if missing:
             click.secho('The following users from the import data could not be mapped to existing users:', fg='yellow')
             table_data = [['First Name', 'Last Name', 'Email', 'Affiliation']]
-            for userdata in sorted(missing.itervalues(), key=itemgetter('first_name', 'last_name', 'email')):
+            for userdata in sorted(six.itervalues(missing), key=itemgetter('first_name', 'last_name', 'email')):
                 table_data.append([userdata['first_name'], userdata['last_name'], userdata['email'],
                                    userdata['affiliation']])
             table = AsciiTable(table_data)
@@ -453,7 +454,7 @@ class EventImporter(object):
                 create_users = self.create_users
             if create_users:
                 click.secho('Creating missing users', fg='magenta')
-                for uuid, userdata in missing.iteritems():
+                for uuid, userdata in six.iteritems(missing):
                     user = User(first_name=userdata['first_name'],
                                 last_name=userdata['last_name'],
                                 email=userdata['email'],
@@ -489,7 +490,7 @@ class EventImporter(object):
             # of circular dependencies where one of the IDs is not available
             # when the row is inserted).
             click.secho('BUG: Not all deferred idrefs have been consumed', fg='red')
-            for uuid, values in self.deferred_idrefs.iteritems():
+            for uuid, values in six.iteritems(self.deferred_idrefs):
                 click.secho('{}:'.format(uuid), fg='yellow', bold=True)
                 for table, col, pk_value in values:
                     click.secho('  - {}.{} ({})'.format(table.fullname, col, pk_value), fg='yellow')
@@ -607,7 +608,7 @@ class EventImporter(object):
             # the exported data may contain only one event
             assert self.event_id is None
             insert_values['category_id'] = self.category_id
-        for col, value in data.iteritems():
+        for col, value in six.iteritems(data):
             if isinstance(value, tuple):
                 if value[0] == 'idref_set':
                     assert set_idref is None
@@ -624,7 +625,7 @@ class EventImporter(object):
                 def _resolve_id_ref(value):
                     return self._convert_value(colspec, value)
                 rv = _exec_custom(import_custom[col], VALUE=value, RESOLVE_ID_REF=_resolve_id_ref)
-                assert rv.keys() == [col]
+                assert list(rv.keys()) == [col]
                 insert_values[col] = rv[col]
                 continue
             try:
@@ -662,7 +663,7 @@ class EventImporter(object):
                 insert_values[pk_name] = pk_value = db.session.query(stmt).scalar()
                 insert_values.update(self._process_file(pk_value, file_data))
             else:
-                insert_values.update(self._process_file(unicode(uuid4()), file_data))
+                insert_values.update(self._process_file(six.text_type(uuid4()), file_data))
         if self.verbose and table.fullname in self.spec['verbose']:
             fmt = self.spec['verbose'][table.fullname]
             click.echo(fmt.format(**insert_values))
@@ -673,7 +674,7 @@ class EventImporter(object):
             self._set_idref(set_idref, _get_inserted_pk(res))
         if is_event:
             self.event_id = _get_inserted_pk(res)
-        for col, uuid in deferred_idrefs.iteritems():
+        for col, uuid in six.iteritems(deferred_idrefs):
             # store all the data needed to resolve a deferred ID reference
             # later once the ID is available
             self.deferred_idrefs[uuid].add((table, col, _get_inserted_pk(res)))

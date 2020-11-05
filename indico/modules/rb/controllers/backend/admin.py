@@ -43,6 +43,7 @@ from indico.util.i18n import _
 from indico.web.args import use_args, use_kwargs, use_rh_kwargs
 from indico.web.flask.util import send_file
 from indico.web.util import ExpectedError
+import six
 
 
 class RHRoomBookingAdminBase(RHRoomBookingBase):
@@ -389,7 +390,7 @@ class RHRoomPhoto(RHRoomAdminBase):
         image_bytes.seek(0)
         self.room.photo = Photo(data=image_bytes.read())
         token = build_rooms_spritesheet()
-        return jsonify(rooms_sprite_token=unicode(token))
+        return jsonify(rooms_sprite_token=six.text_type(token))
 
 
 class RHRooms(RHRoomBookingAdminBase):

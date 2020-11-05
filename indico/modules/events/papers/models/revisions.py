@@ -20,6 +20,8 @@ from indico.util.i18n import _
 from indico.util.locators import locator_property
 from indico.util.string import format_repr, return_ascii
 from indico.util.struct.enum import RichIntEnum
+import six
+from six.moves import map
 
 
 class PaperRevisionState(RichIntEnum):
@@ -200,7 +202,7 @@ class PaperRevision(ProposalRevisionMixin, RenderModeMixin, db.Model):
     def has_user_reviewed(self, user, review_type=None):
         from indico.modules.events.papers.models.reviews import PaperReviewType
         if review_type:
-            if isinstance(review_type, basestring):
+            if isinstance(review_type, six.string_types):
                 review_type = PaperReviewType[review_type]
             return any(review.user == user and review.type == review_type for review in self.reviews)
         else:

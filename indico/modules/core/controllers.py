@@ -42,6 +42,8 @@ from indico.web.flask.util import url_for
 from indico.web.forms.base import FormDefaults
 from indico.web.rh import RH, RHProtected
 from indico.web.util import signed_url_for
+import six
+from six.moves import map
 
 
 class RHContact(RH):
@@ -77,9 +79,9 @@ class RHReportErrorAPI(RH):
         # strip password and query string from the DSN, and all auth data from the POST target
         dsn = re.sub(r':[^@/]+(?=@)', '', config.SENTRY_DSN)
         url = url_parse(dsn)
-        dsn = unicode(url.replace(query=None))
+        dsn = six.text_type(url.replace(query=None))
         verify = url.decode_query().get('ca_certs', True)
-        url = unicode(url.replace(path='/api/embed/error-page/', netloc=url._split_netloc()[1], query=None))
+        url = six.text_type(url.replace(path='/api/embed/error-page/', netloc=url._split_netloc()[1], query=None))
         user_data = self.error_data['request_info']['user'] or {'name': 'Anonymous', 'email': config.NO_REPLY_EMAIL}
         try:
             rv = requests.post(url,
@@ -201,8 +203,8 @@ class RHVersionCheck(RHAdminBase):
             # if we are stable, get the latest stable version
             versions = [v for v in map(Version, data['releases']) if not v.is_prerelease]
             latest_version = max(versions) if versions else None
-        return {'current_version': unicode(current_version),
-                'latest_version': unicode(latest_version) if latest_version else None,
+        return {'current_version': six.text_type(current_version),
+                'latest_version': six.text_type(latest_version) if latest_version else None,
                 'outdated': (current_version < latest_version) if latest_version else False}
 
     def _process(self):
@@ -257,7 +259,7 @@ class PrincipalsMixin(object):
 
     def _process(self):
         return jsonify({identifier: self._serialize_principal(identifier, principal)
-                        for identifier, principal in self.values.viewitems()})
+                        for identifier, principal in six.viewitems(self.values)})
 
 
 class RHPrincipals(PrincipalsMixin, RHProtected):
@@ -282,9 +284,9 @@ class RHSignURL(RHProtected):
             raise BadRequest
         # filter out non-standard args
         url_params = request.json.get('url_params', {})
-        url_params = {k: v for k, v in url_params.viewitems() if not k.startswith('_')}
+        url_params = {k: v for k, v in six.viewitems(url_params) if not k.startswith('_')}
         query_params = request.json.get('query_params', {})
-        query_params = {k: v for k, v in query_params.viewitems() if not k.startswith('_')}
+        query_params = {k: v for k, v in six.viewitems(query_params) if not k.startswith('_')}
         url = signed_url_for(session.user, endpoint, url_params=url_params, _external=True, **query_params)
         Logger.get('url_signing').info("%s signed URL for endpoint '%s' (%s)", session.user, endpoint, url)
         return jsonify(url=url)

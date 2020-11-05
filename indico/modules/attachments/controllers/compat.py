@@ -16,6 +16,7 @@ from indico.modules.events import LegacyEventMapping
 from indico.util.string import is_legacy_id
 from indico.web.flask.util import url_for
 from indico.web.rh import RH, RHSimple
+import six
 
 
 def _clean_args(kwargs):
@@ -50,7 +51,7 @@ def compat_folder_old():
                'contribId': 'contrib_id',
                'subContId': 'subcontrib_id',
                'materialId': 'material_id'}
-    kwargs = {mapping[k]: v for k, v in request.args.iteritems() if k in mapping}
+    kwargs = {mapping[k]: v for k, v in six.iteritems(request.args) if k in mapping}
     return compat_folder(**kwargs)
 
 

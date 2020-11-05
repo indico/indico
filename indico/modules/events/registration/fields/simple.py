@@ -24,6 +24,7 @@ from indico.util.i18n import L_, _
 from indico.util.string import normalize_phone_number
 from indico.web.forms.fields import IndicoRadioField
 from indico.web.forms.validators import IndicoEmail
+import six
 
 
 class TextField(RegistrationFormFieldBase):
@@ -88,7 +89,7 @@ class CheckboxField(RegistrationFormBillableField):
 
     @property
     def filter_choices(self):
-        return {unicode(val).lower(): caption for val, caption in self.friendly_data_mapping.iteritems()
+        return {six.text_type(val).lower(): caption for val, caption in six.iteritems(self.friendly_data_mapping)
                 if val is not None}
 
     @property
@@ -149,7 +150,7 @@ class BooleanField(RegistrationFormBillableField):
 
     @property
     def filter_choices(self):
-        return {unicode(val).lower(): caption for val, caption in self.friendly_data_mapping.iteritems()
+        return {six.text_type(val).lower(): caption for val, caption in six.iteritems(self.friendly_data_mapping)
                 if val is not None}
 
     @property
@@ -204,11 +205,11 @@ class CountryField(RegistrationFormFieldBase):
 
     @property
     def wtf_field_kwargs(self):
-        return {'choices': sorted(get_countries().iteritems(), key=itemgetter(1))}
+        return {'choices': sorted(six.iteritems(get_countries()), key=itemgetter(1))}
 
     @classmethod
     def unprocess_field_data(cls, versioned_data, unversioned_data):
-        choices = sorted(({'caption': v, 'countryKey': k} for k, v in get_countries().iteritems()),
+        choices = sorted(({'caption': v, 'countryKey': k} for k, v in six.iteritems(get_countries())),
                          key=itemgetter('caption'))
         return {'choices': choices}
 

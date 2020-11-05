@@ -23,6 +23,7 @@ from indico.util.caching import memoize_request
 from indico.util.date_time import now_utc
 from indico.util.string import return_ascii
 from indico.util.struct.enum import IndicoEnum
+import six
 
 
 class VCRoomLinkType(int, IndicoEnum):
@@ -39,7 +40,7 @@ _columns_for_types = {
 
 
 def _make_checks():
-    available_columns = set(chain.from_iterable(cols for type_, cols in _columns_for_types.iteritems()))
+    available_columns = set(chain.from_iterable(cols for type_, cols in six.iteritems(_columns_for_types)))
     for link_type in VCRoomLinkType:
         required_cols = available_columns & _columns_for_types[link_type]
         forbidden_cols = available_columns - required_cols
@@ -256,11 +257,11 @@ class VCRoomEventAssociation(db.Model):
                 assert event is not None
                 target.event = event
 
-        for rel, fn in event_mapping.iteritems():
+        for rel, fn in six.iteritems(event_mapping):
             if rel is not None:
                 listen(rel, 'set', partial(_set_event_obj, fn))
 
-        for rel, link_type in type_mapping.iteritems():
+        for rel, link_type in six.iteritems(type_mapping):
             if rel is not None:
                 listen(rel, 'set', partial(_set_link_type, link_type))
 

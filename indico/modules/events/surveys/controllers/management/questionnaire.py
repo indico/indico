@@ -30,6 +30,8 @@ from indico.util.i18n import _
 from indico.web.flask.templating import get_template_module
 from indico.web.forms.base import FormDefaults
 from indico.web.util import jsonify_data, jsonify_form, jsonify_template
+import six
+from six.moves import map
 
 
 class RHManageSurveyQuestionnaire(RHManageSurveyBase):
@@ -74,7 +76,7 @@ class RHImportSurveyQuestionnaire(RHManageSurveyBase):
 
     def _import_section(self, data):
         self._remove_false_values(data)
-        form = SectionForm(formdata=MultiDict(data.items()), csrf_enabled=False)
+        form = SectionForm(formdata=MultiDict(list(data.items())), csrf_enabled=False)
         if form.validate():
             section = add_survey_section(self.survey, form.data)
             for item in data['content']:
@@ -85,18 +87,18 @@ class RHImportSurveyQuestionnaire(RHManageSurveyBase):
     def _import_section_item(self, section, data):
         self._remove_false_values(data)
         if data['type'] == 'text':
-            form = TextForm(formdata=MultiDict(data.items()), csrf_enabled=False)
+            form = TextForm(formdata=MultiDict(list(data.items())), csrf_enabled=False)
             if form.validate():
                 add_survey_text(section, form.data)
             else:
                 raise ValueError('Invalid text item')
         elif data['type'] == 'question':
-            for key, value in data['field_data'].iteritems():
+            for key, value in six.iteritems(data['field_data']):
                 if value is not None:
                     data[key] = value
             field_cls = get_field_types()[data['field_type']]
             data = field_cls.process_imported_data(data)
-            form = field_cls.create_config_form(formdata=MultiDict(data.items()), csrf_enabled=False)
+            form = field_cls.create_config_form(formdata=MultiDict(list(data.items())), csrf_enabled=False)
             if not form.validate():
                 raise ValueError('Invalid question: {}'.format('\n'.join(form.error_list)))
             add_survey_question(section, field_cls, form.data)
@@ -315,7 +317,7 @@ class RHSortSurveyItems(RHManageSurveyBase):
 
     def _sort_sections(self):
         sections = {section.id: section for section in self.survey.sections}
-        section_ids = map(int, request.form.getlist('section_ids'))
+        section_ids = list(map(int, request.form.getlist('section_ids')))
         for position, section_id in enumerate(section_ids, 1):
             sections[section_id].position = position
         logger.info('Sections in %s reordered by %s', self.survey, session.user)
@@ -324,7 +326,7 @@ class RHSortSurveyItems(RHManageSurveyBase):
         section = SurveySection.find_one(survey=self.survey, id=request.form['section_id'],
                                          _eager=SurveySection.children)
         section_items = {x.id: x for x in section.children}
-        item_ids = map(int, request.form.getlist('item_ids'))
+        item_ids = list(map(int, request.form.getlist('item_ids')))
         changed_section = None
         for position, item_id in enumerate(item_ids, 1):
             try:

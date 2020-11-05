@@ -18,6 +18,7 @@ from indico.modules.events.registration.models.registrations import Registration
 from indico.modules.events.registration.util import build_registration_api_data, build_registrations_api_data
 from indico.modules.oauth import oauth
 from indico.web.rh import RH
+import six
 
 
 class RHAPIRegistrant(RH):
@@ -45,7 +46,7 @@ class RHAPIRegistrant(RH):
         if request.json is None:
             raise BadRequest('Expected JSON payload')
 
-        invalid_fields = request.json.viewkeys() - {'checked_in'}
+        invalid_fields = six.viewkeys(request.json) - {'checked_in'}
         if invalid_fields:
             raise BadRequest("Invalid fields: {}".format(', '.join(invalid_fields)))
 

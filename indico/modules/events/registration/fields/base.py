@@ -12,6 +12,7 @@ from copy import deepcopy
 from wtforms.validators import DataRequired, Optional
 
 from indico.modules.events.registration.models.registrations import RegistrationData
+import six
 
 
 class RegistrationFormFieldBase(object):
@@ -105,8 +106,8 @@ class RegistrationFormFieldBase(object):
         data = dict(data)
         if 'places_limit' in data:
             data['places_limit'] = int(data['places_limit']) if data['places_limit'] else 0
-        versioned_data = {k: v for k, v in data.iteritems() if k in cls.versioned_data_fields}
-        unversioned_data = {k: v for k, v in data.iteritems() if k not in cls.versioned_data_fields}
+        versioned_data = {k: v for k, v in six.iteritems(data) if k in cls.versioned_data_fields}
+        unversioned_data = {k: v for k, v in six.iteritems(data) if k not in cls.versioned_data_fields}
         return unversioned_data, versioned_data
 
     @classmethod

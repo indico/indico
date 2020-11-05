@@ -19,6 +19,8 @@ from indico.modules.oauth import logger
 from indico.util.i18n import _
 from indico.util.string import return_ascii
 from indico.util.struct.enum import IndicoEnum
+from six.moves import map
+import six
 
 
 SCOPES = {'read:user': _("User information (read only)"),
@@ -93,13 +95,13 @@ class OAuthApplication(db.Model):
         UUID,
         unique=True,
         nullable=False,
-        default=lambda: unicode(uuid4())
+        default=lambda: six.text_type(uuid4())
     )
     #: the OAuth client_secret
     client_secret = db.Column(
         UUID,
         nullable=False,
-        default=lambda: unicode(uuid4())
+        default=lambda: six.text_type(uuid4())
     )
     #: the OAuth default scopes the application may request access to
     default_scopes = db.Column(
@@ -151,7 +153,7 @@ class OAuthApplication(db.Model):
         return '<OAuthApplication({}, {}, {})>'.format(self.id, self.name, self.client_id)
 
     def reset_client_secret(self):
-        self.client_secret = unicode(uuid4())
+        self.client_secret = six.text_type(uuid4())
         logger.info("Client secret for %s has been reset.", self)
 
     def validate_redirect_uri(self, redirect_uri):

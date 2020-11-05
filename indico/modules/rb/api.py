@@ -28,6 +28,8 @@ from indico.web.http_api import HTTPAPIHook
 from indico.web.http_api.metadata import ical
 from indico.web.http_api.responses import HTTPAPIError
 from indico.web.http_api.util import get_query_parameter
+import six
+from six.moves import map
 
 
 class RoomBookingHookBase(HTTPAPIHook):
@@ -58,7 +60,7 @@ class RoomHook(RoomBookingHookBase):
     def _getParams(self):
         super(RoomHook, self)._getParams()
         self._location = self._pathParams['location']
-        self._ids = map(int, self._pathParams['idlist'].split('-'))
+        self._ids = list(map(int, self._pathParams['idlist'].split('-')))
         if self._detail not in {'rooms', 'reservations'}:
             raise HTTPAPIError('Invalid detail level: %s' % self._detail, 400)
 
@@ -185,7 +187,7 @@ class BookRoomHook(HTTPAPIHook):
             'from': self._fromDT,
             'to': self._toDT
         }
-        missing = [key for key, val in self._params.iteritems() if not val]
+        missing = [key for key, val in six.iteritems(self._params) if not val]
         if missing:
             raise HTTPAPIError('Required params missing: {}'.format(', '.join(missing)))
         self._room = Room.get(self._params['room_id'])
@@ -243,7 +245,7 @@ def _export_reservations(hook, limit_per_room, include_rooms, extra_filters=None
         filters.append(cast(Reservation.start_dt, Time) >= hook._fromDT.time())
     filters += _get_reservation_state_filter(hook._queryParams)
     occurs = [datetime.strptime(x, '%Y-%m-%d').date()
-              for x in filter(None, get_query_parameter(hook._queryParams, ['occurs'], '').split(','))]
+              for x in [_f for _f in get_query_parameter(hook._queryParams, ['occurs'], '').split(',') if _f]]
     data = []
     if hook._occurrences:
         data.append('occurrences')

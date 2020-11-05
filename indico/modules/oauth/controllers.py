@@ -55,8 +55,8 @@ class RHOAuthAuthorize(RHProtected):
             return True
         new_scopes = requested_scopes - authorized_scopes
         return render_template('oauth/authorize.html', application=self.application,
-                               authorized_scopes=filter(None, [SCOPES.get(s) for s in authorized_scopes]),
-                               new_scopes=filter(None, [SCOPES.get(s) for s in new_scopes]))
+                               authorized_scopes=[_f for _f in [SCOPES.get(s) for s in authorized_scopes] if _f],
+                               new_scopes=[_f for _f in [SCOPES.get(s) for s in new_scopes] if _f])
 
 
 class RHOAuthErrors(RHProtected):

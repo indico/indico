@@ -33,6 +33,7 @@ from indico.util.i18n import _
 from indico.util.locators import locator_property
 from indico.util.string import MarkdownText, format_repr, return_ascii, text_to_repr
 from indico.util.struct.enum import IndicoEnum, RichIntEnum
+import six
 
 
 class AbstractState(RichIntEnum):
@@ -438,15 +439,15 @@ class Abstract(ProposalMixin, ProposalRevisionMixin, DescriptionMixin, CustomFie
             return AbstractReviewingState.not_started
         track_states = {x: self.get_track_reviewing_state(x) for x in self.reviewed_for_tracks}
         positiveish_states = {AbstractReviewingState.positive, AbstractReviewingState.conflicting}
-        if any(x == AbstractReviewingState.not_started for x in track_states.itervalues()):
+        if any(x == AbstractReviewingState.not_started for x in six.itervalues(track_states)):
             return AbstractReviewingState.in_progress
-        elif all(x == AbstractReviewingState.negative for x in track_states.itervalues()):
+        elif all(x == AbstractReviewingState.negative for x in six.itervalues(track_states)):
             return AbstractReviewingState.negative
-        elif all(x in positiveish_states for x in track_states.itervalues()):
+        elif all(x in positiveish_states for x in six.itervalues(track_states)):
             if len(self.reviewed_for_tracks) > 1:
                 # Accepted for more than one track
                 return AbstractReviewingState.conflicting
-            elif any(x == AbstractReviewingState.conflicting for x in track_states.itervalues()):
+            elif any(x == AbstractReviewingState.conflicting for x in six.itervalues(track_states)):
                 # The only accepted track is in conflicting state
                 return AbstractReviewingState.conflicting
             else:

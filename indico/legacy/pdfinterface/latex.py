@@ -38,6 +38,7 @@ from indico.util.fs import chmod_umask
 from indico.util.i18n import _, ngettext
 from indico.util.string import render_markdown
 from indico.web.flask.templating import EnsureUnicodeExtension
+import six
 
 
 class PDFLaTeXBase(object):
@@ -121,12 +122,12 @@ class LatexEscapeExtension(Extension):
             yield token
 
 
-class RawLatex(unicode):
+class RawLatex(six.text_type):
     pass
 
 
 def _latex_escape(s, ignore_braces=False):
-    if not isinstance(s, basestring) or isinstance(s, RawLatex):
+    if not isinstance(s, six.string_types) or isinstance(s, RawLatex):
         return s
     if isinstance(s, str):
         s = s.decode('utf-8')
@@ -327,7 +328,7 @@ class ConfManagerAbstractToPDF(AbstractToPDF):
     @staticmethod
     def _get_track_reviewing_states(abstract):
         def _format_review_action(review):
-            action = unicode(review.proposed_action.title)
+            action = six.text_type(review.proposed_action.title)
             if review.proposed_action == AbstractAction.accept and review.proposed_contribution_type:
                 return u'{}: {}'.format(action, review.proposed_contribution_type.name)
             else:
@@ -356,7 +357,7 @@ class ConfManagerAbstractToPDF(AbstractToPDF):
                 no_track_actions = proposed_actions - {AbstractAction.change_tracks}
                 other_info = []
                 if no_track_actions:
-                    other_info.append(u', '.join(unicode(a.title) for a in no_track_actions))
+                    other_info.append(u', '.join(six.text_type(a.title) for a in no_track_actions))
                 if other_tracks:
                     other_info.append(_(u"Proposed for other tracks: {}").format(u', '.join(other_tracks)))
                 if other_info:

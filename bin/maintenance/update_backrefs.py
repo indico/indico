@@ -17,6 +17,7 @@ from sqlalchemy import inspect
 from indico.core.db import db
 from indico.core.db.sqlalchemy.util.models import import_all_models
 from indico.util.console import cformat
+import six
 
 
 click.disable_unicode_literals_warning = True
@@ -24,14 +25,14 @@ click.disable_unicode_literals_warning = True
 
 def _find_backrefs():
     backrefs = defaultdict(list)
-    for cls in db.Model._decl_class_registry.itervalues():
+    for cls in six.itervalues(db.Model._decl_class_registry):
         if not hasattr(cls, '__table__'):
             continue
         mapper = inspect(cls)
         for rel in mapper.relationships:
             if rel.backref is None:
                 continue
-            backref_name = rel.backref if isinstance(rel.backref, basestring) else rel.backref[0]
+            backref_name = rel.backref if isinstance(rel.backref, six.string_types) else rel.backref[0]
             if cls != rel.class_attribute.class_:
                 # skip relationships defined on a parent class
                 continue
@@ -54,7 +55,7 @@ def _write_backrefs(rels, new_source):
 def main(ci):
     import_all_models()
     has_missing = has_updates = False
-    for cls, rels in sorted(_find_backrefs().iteritems(), key=lambda x: x[0].__name__):
+    for cls, rels in sorted(six.iteritems(_find_backrefs()), key=lambda x: x[0].__name__):
         path = _get_source_file(cls)
         with open(path, 'r') as f:
             source = [line.rstrip('\n') for line in f]

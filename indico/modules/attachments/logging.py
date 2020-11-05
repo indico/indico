@@ -15,6 +15,7 @@ from indico.core import signals
 from indico.core.db.sqlalchemy.links import LinkType
 from indico.modules.attachments.models.attachments import AttachmentType
 from indico.modules.events.logs import EventLogKind, EventLogRealm
+import six
 
 
 def connect_log_signals():
@@ -49,7 +50,7 @@ def _get_folder_data(folder, for_attachment=False):
 
 def _get_attachment_data(attachment):
     data = _get_folder_data(attachment.folder, True)
-    data['Type'] = unicode(attachment.type.title)
+    data['Type'] = six.text_type(attachment.type.title)
     data['Title'] = attachment.title
     if attachment.type == AttachmentType.link:
         data['URL'] = attachment.link_url

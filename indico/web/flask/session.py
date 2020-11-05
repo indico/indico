@@ -7,7 +7,7 @@
 
 from __future__ import absolute_import, unicode_literals
 
-import cPickle
+import six.moves.cPickle
 import uuid
 from datetime import datetime, timedelta
 

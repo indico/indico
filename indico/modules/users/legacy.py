@@ -15,6 +15,7 @@ from indico.util.caching import memoize_request
 from indico.util.fossilize import Fossilizable, fossilizes
 from indico.util.locators import locator_property
 from indico.util.string import encode_utf8, return_ascii, to_unicode
+import six
 
 
 AVATAR_FIELD_MAP = {
@@ -317,7 +318,7 @@ class AvatarProvisionalWrapper(Fossilizable):
 def search_avatars(criteria, exact=False, search_externals=False):
     from indico.modules.users.util import search_users
 
-    if not any(criteria.viewvalues()):
+    if not any(six.viewvalues(criteria)):
         return []
 
     def _process_identities(obj):
@@ -328,6 +329,6 @@ def search_avatars(criteria, exact=False, search_externals=False):
             return obj.as_avatar
 
     results = search_users(exact=exact, external=search_externals,
-                           **{AVATAR_FIELD_MAP[k]: v for (k, v) in criteria.iteritems() if v})
+                           **{AVATAR_FIELD_MAP[k]: v for (k, v) in six.iteritems(criteria) if v})
 
     return [_process_identities(obj) for obj in results]

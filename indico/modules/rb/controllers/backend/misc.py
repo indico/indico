@@ -31,6 +31,7 @@ from indico.util.caching import memoize_redis
 from indico.util.i18n import get_all_locales
 from indico.util.string import sanitize_html
 from indico.web.flask.util import send_file, url_for
+import six
 
 
 class RHConfig(RHRoomBookingBase):
@@ -43,7 +44,7 @@ class RHConfig(RHRoomBookingBase):
             tos_html = None
         if privacy_policy_url:
             privacy_policy_html = None
-        return jsonify(rooms_sprite_token=unicode(_cache.get('rooms-sprite-token', '')),
+        return jsonify(rooms_sprite_token=six.text_type(_cache.get('rooms-sprite-token', '')),
                        languages=get_all_locales(),
                        tileserver_url=rb_settings.get('tileserver_url'),
                        grace_period=rb_settings.get('grace_period'),

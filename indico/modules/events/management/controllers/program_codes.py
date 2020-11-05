@@ -26,6 +26,8 @@ from indico.util.i18n import _
 from indico.util.placeholders import render_placeholder_info
 from indico.web.forms.base import FormDefaults
 from indico.web.util import jsonify_data, jsonify_form, jsonify_template
+import six
+from six.moves import map
 
 
 class RHProgramCodes(RHManageEventBase):
@@ -69,7 +71,7 @@ class RHAssignProgramCodesBase(RHManageEventBase):
     def _get_update_log_data(self, updates):
         changes = {}
         fields = {}
-        for obj, change in updates.viewitems():
+        for obj, change in six.viewitems(updates):
             title = getattr(obj, 'full_title', obj.title)
             friendly_id = getattr(obj, 'friendly_id', None)
             if friendly_id is not None:
@@ -107,7 +109,7 @@ class RHAssignProgramCodesSessions(RHAssignProgramCodesBase):
     hidden_post_field = 'session_id'
 
     def _get_objects(self):
-        ids = map(int, request.form.getlist('session_id'))
+        ids = list(map(int, request.form.getlist('session_id')))
         return (Session.query
                 .with_parent(self.event)
                 .filter(Session.id.in_(ids) if ids else True)
@@ -135,7 +137,7 @@ class RHAssignProgramCodesContributions(RHAssignProgramCodesBase):
     hidden_post_field = 'contribution_id'
 
     def _get_objects(self):
-        ids = map(int, request.form.getlist('contribution_id'))
+        ids = list(map(int, request.form.getlist('contribution_id')))
         return (Contribution.query
                 .with_parent(self.event)
                 .filter(Contribution.id.in_(ids) if ids else True)

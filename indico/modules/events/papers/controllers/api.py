@@ -25,6 +25,7 @@ from indico.modules.events.papers.util import is_type_reviewing_possible
 from indico.util.i18n import _
 from indico.util.marshmallow import max_words, not_empty
 from indico.web.args import parser, use_kwargs
+import six
 
 
 class RHPaperDetails(RHPaperBase):
@@ -152,8 +153,8 @@ def _parse_review_args(event, review_type):
         args_schema['question_{}'.format(question.id)] = field_cls(**attrs)
 
     data = parser.parse(args_schema)
-    questions_data = {k: v for k, v in data.iteritems() if k.startswith('question_')}
-    review_data = {k: v for k, v in data.iteritems() if not k.startswith('question_')}
+    questions_data = {k: v for k, v in six.iteritems(data) if k.startswith('question_')}
+    review_data = {k: v for k, v in six.iteritems(data) if not k.startswith('question_')}
     return questions_data, review_data
 
 

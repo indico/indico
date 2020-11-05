@@ -32,6 +32,7 @@ from indico.util.date_time import now_utc
 from indico.util.fs import secure_filename
 from indico.util.i18n import _, orig_string
 from indico.web.flask.util import send_file
+import six
 
 
 FILE_TYPE_ATTRS = ('name', 'extensions', 'allow_multiple_files', 'required', 'publishable', 'filename_template')
@@ -69,7 +70,7 @@ def _make_editable_files(editable, files):
         return []
     editable_files = [
         EditingRevisionFile(file=file, file_type=file_type)
-        for file_type, file_list in files.viewitems()
+        for file_type, file_list in six.viewitems(files)
         for file in file_list
     ]
     for ef in editable_files:

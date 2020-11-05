@@ -16,6 +16,8 @@ from indico.modules.events.abstracts.settings import abstracts_reviewing_setting
 from indico.modules.events.cloning import EventCloner
 from indico.modules.events.models.events import EventType
 from indico.util.i18n import _
+import six
+from six.moves import map
 
 
 class AbstractSettingsCloner(EventCloner):
@@ -33,8 +35,8 @@ class AbstractSettingsCloner(EventCloner):
     @no_autoflush
     def run(self, new_event, cloners, shared_data, event_exists=False):
         self._contrib_type_id_map = {old.id: new.id
-                                     for old, new in shared_data['contribution_types']['contrib_type_map'].iteritems()}
-        self._track_id_map = {old.id: new.id for old, new in shared_data['tracks']['track_map'].iteritems()}
+                                     for old, new in six.iteritems(shared_data['contribution_types']['contrib_type_map'])}
+        self._track_id_map = {old.id: new.id for old, new in six.iteritems(shared_data['tracks']['track_map'])}
         self._clone_settings(new_event)
         self._clone_email_templates(new_event)
         self._clone_review_questions(new_event)
@@ -57,7 +59,7 @@ class AbstractSettingsCloner(EventCloner):
         for old_tpl in self.old_event.abstract_email_templates:
             tpl = AbstractEmailTemplate()
             tpl.populate_from_attrs(old_tpl, attrs)
-            tpl.rules = filter(None, map(self._clone_email_template_rule, old_tpl.rules))
+            tpl.rules = [_f for _f in map(self._clone_email_template_rule, old_tpl.rules) if _f]
             new_event.abstract_email_templates.append(tpl)
 
     def _clone_email_template_rule(self, old_rule):

@@ -17,23 +17,24 @@ from indico.modules.events.models.events import Event
 from indico.modules.events.registration.models.forms import RegistrationForm
 from indico.util.date_time import now_utc
 from indico.util.placeholders import get_placeholders
+import six
 
 
 def get_placeholder_options():
     return {name: placeholder
-            for name, placeholder in get_placeholders('designer-fields').viewitems()
+            for name, placeholder in six.viewitems(get_placeholders('designer-fields'))
             if not placeholder.admin_only or session.user.is_admin}
 
 
 def get_nested_placeholder_options():
-    groups = {group_id: {'title': group_title, 'options': {}} for group_id, group_title in GROUP_TITLES.viewitems()}
-    for name, placeholder in get_placeholder_options().viewitems():
-        groups[placeholder.group]['options'][name] = unicode(placeholder.description)
+    groups = {group_id: {'title': group_title, 'options': {}} for group_id, group_title in six.viewitems(GROUP_TITLES)}
+    for name, placeholder in six.viewitems(get_placeholder_options()):
+        groups[placeholder.group]['options'][name] = six.text_type(placeholder.description)
     return groups
 
 
 def get_image_placeholder_types():
-    return [name for name, placeholder in get_placeholder_options().viewitems() if placeholder.is_image]
+    return [name for name, placeholder in six.viewitems(get_placeholder_options()) if placeholder.is_image]
 
 
 def get_all_templates(obj):

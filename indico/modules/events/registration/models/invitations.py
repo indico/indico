@@ -17,6 +17,7 @@ from indico.util.i18n import L_
 from indico.util.locators import locator_property
 from indico.util.string import format_repr, return_ascii
 from indico.util.struct.enum import RichIntEnum
+import six
 
 
 class InvitationState(RichIntEnum):
@@ -45,7 +46,7 @@ class RegistrationInvitation(db.Model):
         index=True,
         unique=True,
         nullable=False,
-        default=lambda: unicode(uuid4())
+        default=lambda: six.text_type(uuid4())
     )
     #: The ID of the registration form
     registration_form_id = db.Column(

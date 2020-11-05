@@ -34,6 +34,8 @@ from indico.util.i18n import _
 from indico.util.string import natural_sort_key, to_unicode
 from indico.web.forms.base import FormDefaults
 from indico.web.util import jsonify_data
+from six.moves import filter
+import six
 
 
 def _get_start_dt(obj):
@@ -127,9 +129,9 @@ class AttachmentPackageGeneratorMixin(ZipGeneratorMixin):
             start_dt = _get_start_dt(attachment.folder.object)
             if start_dt is None:
                 return None
-            return unicode(start_dt.date()) in dates
+            return six.text_type(start_dt.date()) in dates
 
-        return filter(_check_date, self._build_base_query())
+        return list(filter(_check_date, self._build_base_query()))
 
     def _iter_items(self, attachments):
         for attachment in attachments:
@@ -143,13 +145,13 @@ class AttachmentPackageGeneratorMixin(ZipGeneratorMixin):
             segments.append('Unscheduled')
         segments.extend(self._get_base_path(attachment))
         if not attachment.folder.is_default:
-            segments.append(secure_filename(attachment.folder.title, unicode(attachment.folder.id)))
+            segments.append(secure_filename(attachment.folder.title, six.text_type(attachment.folder.id)))
         segments.append(attachment.file.filename)
-        path = os.path.join(*self._adjust_path_length(filter(None, segments)))
+        path = os.path.join(*self._adjust_path_length([_f for _f in segments if _f]))
         while path in self.used_filenames:
             # prepend the id if there's a path collision
             segments[-1] = '{}-{}'.format(attachment.id, segments[-1])
-            path = os.path.join(*self._adjust_path_length(filter(None, segments)))
+            path = os.path.join(*self._adjust_path_length([_f for _f in segments if _f]))
         return path
 
     def _get_base_path(self, attachment):
@@ -166,9 +168,9 @@ class AttachmentPackageGeneratorMixin(ZipGeneratorMixin):
                     paths.append(secure_filename('{}_{}'.format(to_unicode(time), obj.title), ''))
             else:
                 if isinstance(obj, SubContribution):
-                    paths.append(secure_filename('{}_{}'.format(obj.position, obj.title), unicode(obj.id)))
+                    paths.append(secure_filename('{}_{}'.format(obj.position, obj.title), six.text_type(obj.id)))
                 else:
-                    paths.append(secure_filename(obj.title, unicode(obj.id)))
+                    paths.append(secure_filename(obj.title, six.text_type(obj.id)))
             obj = _get_obj_parent(obj)
 
         linked_obj_start_date = _get_start_dt(linked_object)
@@ -217,7 +219,7 @@ class AttachmentPackageMixin(AttachmentPackageGeneratorMixin):
             del filter_types['contributions']
             del form.contributions
 
-        form.filter_type.choices = filter_types.items()
+        form.filter_type.choices = list(filter_types.items())
         return form
 
     def _load_session_data(self):

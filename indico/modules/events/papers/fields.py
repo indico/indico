@@ -13,6 +13,7 @@ from indico.modules.events.papers.settings import RoleConverter
 from indico.modules.events.papers.settings import paper_reviewing_settings as settings
 from indico.web.forms.fields import JSONField
 from indico.web.forms.widgets import JinjaWidget
+import six
 
 
 class PaperEmailSettingsField(JSONField):
@@ -27,7 +28,7 @@ class PaperEmailSettingsField(JSONField):
         if valuelist:
             self.data = json.loads(valuelist[0])
             data = {}
-            for key, value in self.data.iteritems():
+            for key, value in six.iteritems(self.data):
                 data[key] = RoleConverter.to_python(value) if isinstance(value, list) else value
             self.data = data
 

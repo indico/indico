@@ -26,6 +26,8 @@ from indico.web.forms.fields import IndicoEnumSelectField, PrincipalField, Princ
 from indico.web.forms.util import inject_validators
 from indico.web.forms.validators import HiddenUnless, used_if_not_synced
 from indico.web.forms.widgets import SwitchWidget, SyncedInputWidget
+import six
+from six.moves import zip
 
 
 class UserDetailsForm(SyncedInputsMixin, IndicoForm):
@@ -68,9 +70,9 @@ class UserPreferencesForm(IndicoForm):
         super(UserPreferencesForm, self).__init__(*args, **kwargs)
 
         locales = [(code, '{} ({})'.format(name, territory) if territory else name)
-                   for code, (name, territory) in get_all_locales().iteritems()]
+                   for code, (name, territory) in six.iteritems(get_all_locales())]
         self.lang.choices = sorted(locales, key=itemgetter(1))
-        self.timezone.choices = zip(common_timezones, common_timezones)
+        self.timezone.choices = list(zip(common_timezones, common_timezones))
         if self.timezone.object_data and self.timezone.object_data not in common_timezones_set:
             self.timezone.choices.append((self.timezone.object_data, self.timezone.object_data))
 

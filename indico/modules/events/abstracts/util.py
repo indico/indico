@@ -31,6 +31,7 @@ from indico.modules.events.tracks.models.principals import TrackPrincipal
 from indico.modules.events.tracks.models.tracks import Track
 from indico.util.spreadsheets import unique_col
 from indico.web.flask.templating import get_template_module
+import six
 
 
 def build_default_email_template(event, tpl_type):
@@ -74,7 +75,7 @@ def generate_spreadsheet_from_abstracts(abstracts, static_item_ids, dynamic_item
         ('modified_dt', ('Modification date', lambda x: x.modified_dt if x.modified_dt else ''))
     ])
     field_names.extend(unique_col(item.title, item.id) for item in dynamic_items)
-    field_names.extend(title for name, (title, fn) in static_item_mapping.iteritems() if name in static_item_ids)
+    field_names.extend(title for name, (title, fn) in six.iteritems(static_item_mapping) if name in static_item_ids)
     rows = []
     for abstract in abstracts:
         data = abstract.data_by_field
@@ -85,7 +86,7 @@ def generate_spreadsheet_from_abstracts(abstracts, static_item_ids, dynamic_item
         for item in dynamic_items:
             key = unique_col(item.title, item.id)
             abstract_dict[key] = data[item.id].friendly_data if item.id in data else ''
-        for name, (title, fn) in static_item_mapping.iteritems():
+        for name, (title, fn) in six.iteritems(static_item_mapping):
             if name not in static_item_ids:
                 continue
             value = fn(abstract)

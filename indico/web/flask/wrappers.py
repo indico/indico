@@ -27,6 +27,7 @@ from indico.util.json import IndicoJSONEncoder
 from indico.web.flask.session import IndicoSessionInterface
 from indico.web.flask.templating import CustomizationLoader
 from indico.web.flask.util import make_view_func
+import six
 
 
 AUTH_BEARER_RE = re.compile(r'^Bearer (.+)$')
@@ -65,7 +66,7 @@ class IndicoRequest(Request):
 
     def __repr__(self):
         rv = super(IndicoRequest, self).__repr__()
-        if isinstance(rv, unicode):
+        if isinstance(rv, six.text_type):
             rv = rv.encode('utf-8')
         return rv
 

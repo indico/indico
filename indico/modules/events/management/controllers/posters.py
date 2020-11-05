@@ -20,6 +20,7 @@ from indico.modules.events.posters import PosterPDF
 from indico.util.i18n import _
 from indico.web.flask.util import send_file, url_for
 from indico.web.util import jsonify_data, jsonify_form
+import six
 
 
 poster_cache = GenericCache('poster-printing')
@@ -38,7 +39,7 @@ class RHPosterPrintSettings(RHManageEventBase):
         if form.validate_on_submit():
             data = dict(form.data)
             template_id = data.pop('template')
-            key = unicode(uuid.uuid4())
+            key = six.text_type(uuid.uuid4())
             poster_cache.set(key, data, time=1800)
             download_url = url_for('.print_poster', self.event, template_id=template_id, uuid=key)
             return jsonify_data(flash=False, redirect=download_url, redirect_no_loading=True)

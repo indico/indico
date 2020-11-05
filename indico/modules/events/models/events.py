@@ -48,6 +48,8 @@ from indico.util.i18n import _
 from indico.util.string import format_repr, return_ascii, text_to_repr, to_unicode
 from indico.util.struct.enum import RichIntEnum
 from indico.web.flask.util import url_for
+import six
+from six.moves import range
 
 
 class EventType(RichIntEnum):
@@ -741,7 +743,7 @@ class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionMan
         """
         title = self.title
         if show_speakers and self.person_links:
-            speakers = ', '.join(sorted([pl.full_name for pl in self.person_links], key=unicode.lower))
+            speakers = ', '.join(sorted([pl.full_name for pl in self.person_links], key=six.text_type.lower))
             title = '{}, "{}"'.format(speakers, title)
         if show_series_pos and self.series and self.series.show_sequence_in_title:
             title = '{} ({}/{})'.format(title, self.series_pos, self.series_count)
@@ -830,10 +832,10 @@ class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionMan
             emails.setdefault(extra, extra)
         # Sanitize and format emails
         emails = {to_unicode(email.strip().lower()): '{} <{}>'.format(to_unicode(name), to_unicode(email))
-                  for email, name in emails.iteritems()
+                  for email, name in six.iteritems(emails)
                   if email and email.strip()}
         own_email = session.user.email if has_request_context() and session.user else None
-        return OrderedDict(sorted(emails.items(), key=lambda x: (x[0] != own_email, x[1].lower())))
+        return OrderedDict(sorted(list(emails.items()), key=lambda x: (x[0] != own_email, x[1].lower())))
 
     @memoize_request
     def has_feature(self, feature):
@@ -895,7 +897,7 @@ class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionMan
             start_dt = start_dt.astimezone(tzinfo)
             end_dt = end_dt.astimezone(tzinfo)
         duration = (end_dt.replace(hour=23, minute=59) - start_dt.replace(hour=0, minute=0)).days
-        for offset in xrange(duration + 1):
+        for offset in range(duration + 1):
             day = (start_dt + timedelta(days=offset)).date()
             if day <= end_dt.date():
                 yield day

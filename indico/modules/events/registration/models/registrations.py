@@ -36,6 +36,7 @@ from indico.util.locators import locator_property
 from indico.util.signals import values_from_signal
 from indico.util.string import format_full_name, format_repr, return_ascii, strict_unicode
 from indico.util.struct.enum import RichIntEnum
+import six
 
 
 class RegistrationState(RichIntEnum):
@@ -80,7 +81,7 @@ class Registration(db.Model):
         index=True,
         unique=True,
         nullable=False,
-        default=lambda: unicode(uuid4())
+        default=lambda: six.text_type(uuid4())
     )
     #: The human-friendly ID for the object
     friendly_id = db.Column(
@@ -172,7 +173,7 @@ class Registration(db.Model):
         index=True,
         unique=True,
         nullable=False,
-        default=lambda: unicode(uuid4())
+        default=lambda: six.text_type(uuid4())
     )
     #: Whether the person has checked in. Setting this also sets or clears
     #: `checked_in_dt`.
@@ -373,7 +374,7 @@ class Registration(db.Model):
                     summary[section][field] = field_summary[field]
 
         def _fill_from_registration():
-            for field, data in field_summary.iteritems():
+            for field, data in six.iteritems(field_summary):
                 section = field.parent
                 summary.setdefault(section, OrderedDict())
                 if field not in summary[section]:

@@ -12,6 +12,7 @@ from werkzeug.exceptions import Forbidden
 
 from indico.modules.events.management.controllers import RHManageEventBase
 from indico.modules.events.sessions.models.sessions import Session
+from six.moves import map
 
 
 class RHManageSessionsBase(RHManageEventBase):

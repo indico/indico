@@ -17,6 +17,7 @@ from indico.util.i18n import _
 from indico.util.string import format_repr, return_ascii, slugify, text_to_repr
 from indico.util.struct.enum import RichIntEnum
 from indico.web.flask.util import url_for
+import six
 
 
 def _get_next_position(context):
@@ -66,7 +67,7 @@ class MenuEntryMixin(object):
             return None
         elif self.is_internal_link:
             data = self.default_data
-            if data.static_site and isinstance(data.static_site, basestring) and g.get('static_site'):
+            if data.static_site and isinstance(data.static_site, six.string_types) and g.get('static_site'):
                 return data.static_site
             kwargs = dict(data.url_kwargs)
             if self.name == 'timetable':

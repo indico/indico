@@ -15,6 +15,7 @@ from wtforms.validators import DataRequired, Optional
 from indico.util.i18n import _
 from indico.web.forms.base import IndicoForm
 from indico.web.forms.widgets import SwitchWidget
+import six
 
 
 class FieldConfigForm(IndicoForm):
@@ -105,7 +106,7 @@ class BaseField(object):
             setattr(self.object, field, data[field])
         self.object.field_type = self.name
         self.object.field_data = {name: value
-                                  for name, value in data.iteritems()
+                                  for name, value in six.iteritems(data)
                                   if name not in self.common_settings and name != 'csrf_token'}
 
     def get_friendly_value(self, value):

@@ -21,6 +21,7 @@ from indico.util.date_time import format_date
 from indico.util.i18n import _
 from indico.util.string import to_unicode
 from indico.web.flask.util import url_for
+from six.moves import map
 
 
 def group_by_month(events, now, tzinfo):
@@ -35,7 +36,7 @@ def group_by_month(events, now, tzinfo):
         return start_dt.year, start_dt.month
 
     months = groupby(events, key=_key)
-    return map(_format_tuple, months)
+    return list(map(_format_tuple, months))
 
 
 def make_format_event_date_func(category):
@@ -124,7 +125,7 @@ def get_category_view_params(category, now):
               'show_past_events': show_past_events,
               'past_threshold': past_threshold.strftime(threshold_format),
               'has_hidden_events': has_hidden_events,
-              'json_ld': map(serialize_event_for_json_ld, json_ld_events),
+              'json_ld': list(map(serialize_event_for_json_ld, json_ld_events)),
               'atom_feed_url': url_for('.export_atom', category),
               'atom_feed_title': _('Events of "{}"').format(category.title)}
     params.update(get_base_ical_parameters(session.user, 'category',
