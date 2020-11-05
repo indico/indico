@@ -14,7 +14,7 @@ from werkzeug.datastructures import ImmutableDict
 from indico.core.db import db
 from indico.modules.events.registration.fields import get_field_types
 from indico.modules.events.registration.models.items import RegistrationFormItem, RegistrationFormItemType
-from indico.util.string import camelize_keys, return_ascii
+from indico.util.string import camelize_keys
 
 
 class RegistrationFormFieldData(db.Model):
@@ -45,7 +45,6 @@ class RegistrationFormFieldData(db.Model):
     # - field (RegistrationFormItem.data_versions)
     # - registration_data (RegistrationData.field_data)
 
-    @return_ascii
     def __repr__(self):
         return '<RegistrationFormFieldData({}, {})>'.format(self.id, self.field_id)
 

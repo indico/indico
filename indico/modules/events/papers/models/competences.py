@@ -10,7 +10,7 @@ from __future__ import unicode_literals
 from sqlalchemy import ARRAY
 
 from indico.core.db import db
-from indico.util.string import format_repr, return_ascii
+from indico.util.string import format_repr
 
 
 class PaperCompetence(db.Model):
@@ -58,7 +58,6 @@ class PaperCompetence(db.Model):
         )
     )
 
-    @return_ascii
     def __repr__(self):
         return format_repr(self, 'id', 'user_id', 'event_id', _text=', '.join(self.competences))
 

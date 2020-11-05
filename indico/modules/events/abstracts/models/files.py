@@ -13,7 +13,7 @@ from indico.core.config import config
 from indico.core.db import db
 from indico.core.storage import StoredFileMixin
 from indico.util.fs import secure_filename
-from indico.util.string import format_repr, return_ascii, strict_unicode, text_to_repr
+from indico.util.string import format_repr, strict_unicode, text_to_repr
 
 
 class AbstractFile(StoredFileMixin, db.Model):
@@ -56,6 +56,5 @@ class AbstractFile(StoredFileMixin, db.Model):
         path = posixpath.join(*(path_segments + [filename]))
         return config.ATTACHMENT_STORAGE, path
 
-    @return_ascii
     def __repr__(self):
         return format_repr(self, 'id', 'abstract_id', content_type=None, _text=text_to_repr(self.filename))

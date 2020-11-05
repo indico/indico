@@ -13,7 +13,6 @@ from indico.core.db import db
 from indico.core.db.sqlalchemy.util.models import auto_table_args
 from indico.core.settings.models.base import JSONSettingsBase
 from indico.util.decorators import strict_classproperty
-from indico.util.string import return_ascii
 
 
 class CategorySetting(JSONSettingsBase, db.Model):
@@ -45,6 +44,5 @@ class CategorySetting(JSONSettingsBase, db.Model):
         )
     )
 
-    @return_ascii
     def __repr__(self):
         return '<CategorySetting({}, {}, {}, {!r})>'.format(self.category_id, self.module, self.name, self.value)

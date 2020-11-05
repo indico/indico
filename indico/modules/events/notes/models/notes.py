@@ -21,7 +21,7 @@ from indico.core.db.sqlalchemy.links import LinkMixin, LinkType
 from indico.core.db.sqlalchemy.util.models import auto_table_args
 from indico.util.date_time import now_utc
 from indico.util.locators import locator_property
-from indico.util.string import render_markdown, return_ascii, text_to_repr
+from indico.util.string import render_markdown, text_to_repr
 
 
 class EventNote(LinkMixin, db.Model):
@@ -146,7 +146,6 @@ class EventNote(LinkMixin, db.Model):
         self.current_revision = EventNoteRevision(render_mode=render_mode, source=source, user=user)
         return self.current_revision
 
-    @return_ascii
     def __repr__(self):
         return '<EventNote({}, current_revision={}{}, {})>'.format(
             self.id,
@@ -214,7 +213,6 @@ class EventNoteRevision(db.Model):
     # relationship backrefs:
     # - note (EventNote.revisions)
 
-    @return_ascii
     def __repr__(self):
         render_mode = self.render_mode.name if self.render_mode is not None else None
         source = text_to_repr(self.source, html=True)

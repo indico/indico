@@ -16,7 +16,7 @@ from indico.core.db import db
 from indico.core.db.sqlalchemy.locations import LocationMixin
 from indico.core.db.sqlalchemy.util.models import auto_table_args
 from indico.util.locators import locator_property
-from indico.util.string import format_repr, return_ascii
+from indico.util.string import format_repr
 
 
 class SessionBlock(LocationMixin, db.Model):
@@ -132,7 +132,6 @@ class SessionBlock(LocationMixin, db.Model):
     def end_dt(self):
         return self.timetable_entry.start_dt + self.duration if self.timetable_entry else None
 
-    @return_ascii
     def __repr__(self):
         return format_repr(self, 'id', _text=self.title or None)
 

@@ -16,7 +16,7 @@ from indico.core.db import db
 from indico.core.db.sqlalchemy import PyIntEnum
 from indico.util.i18n import L_
 from indico.util.locators import locator_property
-from indico.util.string import format_repr, return_ascii
+from indico.util.string import format_repr
 from indico.util.struct.enum import RichIntEnum
 
 
@@ -123,7 +123,6 @@ class RegistrationInvitation(db.Model):
         assert self.uuid is not None
         return dict(self.registration_form.locator, invitation=self.uuid)
 
-    @return_ascii
     def __repr__(self):
         full_name = '{} {}'.format(self.first_name, self.last_name)
         return format_repr(self, 'id', 'registration_form_id', 'email', 'state', _text=full_name)

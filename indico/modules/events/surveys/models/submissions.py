@@ -12,7 +12,6 @@ from sqlalchemy.dialects.postgresql import JSONB
 from indico.core.db import db
 from indico.core.db.sqlalchemy import UTCDateTime
 from indico.core.db.sqlalchemy.util.queries import increment_and_get
-from indico.util.string import return_ascii
 
 
 def _get_next_friendly_id(context):
@@ -107,7 +106,6 @@ class SurveySubmission(db.Model):
     def locator(self):
         return dict(self.survey.locator, submission_id=self.id)
 
-    @return_ascii
     def __repr__(self):
         return '<SurveySubmission({}, {}, {})>'.format(self.id, self.survey_id, self.user_id)
 
@@ -152,7 +150,6 @@ class SurveyAnswer(db.Model):
     def is_empty(self):
         return self.question.field.is_value_empty(self)
 
-    @return_ascii
     def __repr__(self):
         return '<SurveyAnswer({}, {}): {}>'.format(self.submission_id, self.question_id, self.data)
 

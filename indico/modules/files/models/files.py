@@ -19,7 +19,7 @@ from indico.core.db import db
 from indico.core.storage import StoredFileMixin
 from indico.util.fs import secure_filename
 from indico.util.signing import secure_serializer
-from indico.util.string import format_repr, return_ascii, strict_unicode
+from indico.util.string import format_repr, strict_unicode
 from indico.web.flask.util import url_for
 
 
@@ -82,6 +82,5 @@ class File(StoredFileMixin, db.Model):
         return url_for('files.download_file', uuid=self.uuid,
                        token=secure_serializer.dumps(self.uuid.hex, salt='file-download'), _external=True)
 
-    @return_ascii
     def __repr__(self):
         return format_repr(self, 'id', 'uuid', 'content_type', _text=self.filename)

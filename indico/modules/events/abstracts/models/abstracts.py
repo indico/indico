@@ -32,7 +32,7 @@ from indico.modules.events.models.reviews import ProposalMixin, ProposalRevision
 from indico.util.date_time import now_utc
 from indico.util.i18n import _
 from indico.util.locators import locator_property
-from indico.util.string import MarkdownText, format_repr, return_ascii, text_to_repr
+from indico.util.string import MarkdownText, format_repr, text_to_repr
 from indico.util.struct.enum import IndicoEnum, RichIntEnum
 
 
@@ -498,7 +498,6 @@ class Abstract(ProposalMixin, ProposalRevisionMixin, DescriptionMixin, CustomFie
     def modification_ended(self):
         return self.event.cfa.modification_ended
 
-    @return_ascii
     def __repr__(self):
         return format_repr(self, 'id', 'event_id', is_deleted=False, _text=text_to_repr(self.title))
 

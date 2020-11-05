@@ -11,7 +11,7 @@ from indico.core.db.sqlalchemy import db
 from indico.core.db.sqlalchemy.descriptions import DescriptionMixin, RenderMode
 from indico.modules.events.tracks.models.tracks import get_next_position
 from indico.util.locators import locator_property
-from indico.util.string import format_repr, return_ascii, text_to_repr
+from indico.util.string import format_repr, text_to_repr
 
 
 class TrackGroup(DescriptionMixin, db.Model):
@@ -60,6 +60,5 @@ class TrackGroup(DescriptionMixin, db.Model):
     def locator(self):
         return dict(self.event.locator, track_group_id=self.id)
 
-    @return_ascii
     def __repr__(self):
         return format_repr(self, 'id', _text=text_to_repr(self.title))

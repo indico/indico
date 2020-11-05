@@ -13,7 +13,7 @@ from indico.core.db import db
 from indico.core.db.sqlalchemy.principals import PrincipalPermissionsMixin
 from indico.core.db.sqlalchemy.util.models import auto_table_args
 from indico.util.decorators import strict_classproperty
-from indico.util.string import format_repr, return_ascii
+from indico.util.string import format_repr
 
 
 class RoomPrincipal(PrincipalPermissionsMixin, db.Model):
@@ -46,6 +46,5 @@ class RoomPrincipal(PrincipalPermissionsMixin, db.Model):
     # relationship backrefs:
     # - room (Room.acl_entries)
 
-    @return_ascii
     def __repr__(self):
         return format_repr(self, 'id', 'room_id', 'principal', read_access=False, full_access=False, permissions=[])

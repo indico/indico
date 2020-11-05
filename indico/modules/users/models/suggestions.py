@@ -8,7 +8,7 @@
 from __future__ import unicode_literals
 
 from indico.core.db import db
-from indico.util.string import format_repr, return_ascii
+from indico.util.string import format_repr
 
 
 class SuggestedCategory(db.Model):
@@ -53,7 +53,6 @@ class SuggestedCategory(db.Model):
     # relationship backrefs:
     # - user (User.suggested_categories)
 
-    @return_ascii
     def __repr__(self):
         return format_repr(self, 'user_id', 'category_id', 'score', is_ignored=False)
 

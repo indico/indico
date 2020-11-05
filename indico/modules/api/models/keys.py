@@ -15,7 +15,6 @@ from sqlalchemy.dialects.postgresql import INET, UUID
 from indico.core.db import db
 from indico.core.db.sqlalchemy import UTCDateTime
 from indico.util.date_time import now_utc
-from indico.util.string import return_ascii
 
 
 class APIKey(db.Model):
@@ -106,7 +105,6 @@ class APIKey(db.Model):
         lazy=False
     )
 
-    @return_ascii
     def __repr__(self):
         return '<APIKey({}, {}, {})>'.format(self.token, self.user_id, self.last_used_dt or 'never')
 

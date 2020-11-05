@@ -16,7 +16,6 @@ from flask import g, has_request_context
 
 from indico.core.settings.models.settings import Setting, SettingPrincipal
 from indico.core.settings.util import get_all_settings, get_setting, get_setting_acl
-from indico.util.string import return_ascii
 
 
 class ACLProxyBase(object):
@@ -70,7 +69,6 @@ class SettingsProxyBase(object):
         if acls and converters and acls & six.viewkeys(converters):
             raise ValueError('acl settings cannot have custom converters')
 
-    @return_ascii
     def __repr__(self):
         if self._bound_args:
             return '<{}({}, {})>'.format(type(self).__name__, self.module, self._bound_args)

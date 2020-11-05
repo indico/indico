@@ -10,7 +10,7 @@ from __future__ import unicode_literals
 from indico.core.db import db
 from indico.util.fs import secure_filename
 from indico.util.locators import locator_property
-from indico.util.string import format_repr, return_ascii
+from indico.util.string import format_repr
 from indico.web.flask.util import url_for
 
 
@@ -61,7 +61,6 @@ class EditingRevisionFile(db.Model):
         )
     )
 
-    @return_ascii
     def __repr__(self):
         return format_repr(self, 'revision_id', 'file_id')
 

@@ -11,7 +11,7 @@ from indico.core.db.sqlalchemy import PyIntEnum, db
 from indico.modules.events.contributions.models.persons import AuthorType
 from indico.modules.events.models.persons import PersonLinkBase
 from indico.util.locators import locator_property
-from indico.util.string import format_repr, return_ascii
+from indico.util.string import format_repr
 
 
 class AbstractPersonLink(PersonLinkBase):
@@ -47,7 +47,6 @@ class AbstractPersonLink(PersonLinkBase):
     def locator(self):
         return dict(self.abstract.locator, person_id=self.id)
 
-    @return_ascii
     def __repr__(self):
         return format_repr(self, 'id', 'person_id', 'abstract_id', is_speaker=False, author_type=None,
                            _text=self.full_name)

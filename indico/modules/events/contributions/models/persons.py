@@ -10,7 +10,7 @@ from __future__ import unicode_literals
 from indico.core.db.sqlalchemy import PyIntEnum, db
 from indico.modules.events.models.persons import PersonLinkBase
 from indico.util.locators import locator_property
-from indico.util.string import format_repr, return_ascii
+from indico.util.string import format_repr
 from indico.util.struct.enum import IndicoEnum
 
 
@@ -72,7 +72,6 @@ class ContributionPersonLink(PersonLinkBase):
     def locator(self):
         return dict(self.contribution.locator, person_id=self.id)
 
-    @return_ascii
     def __repr__(self):
         return format_repr(self, 'id', 'person_id', 'contribution_id', is_speaker=False, author_type=AuthorType.none,
                            _text=self.full_name)
@@ -103,6 +102,5 @@ class SubContributionPersonLink(PersonLinkBase):
     # relationship backrefs:
     # - subcontribution (SubContribution.person_links)
 
-    @return_ascii
     def __repr__(self):
         return format_repr(self, 'id', 'person_id', 'subcontribution_id', _text=self.full_name)

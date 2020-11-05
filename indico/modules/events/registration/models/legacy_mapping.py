@@ -8,7 +8,7 @@
 from __future__ import unicode_literals
 
 from indico.core.db import db
-from indico.util.string import format_repr, return_ascii
+from indico.util.string import format_repr
 
 
 class LegacyRegistrationMapping(db.Model):
@@ -54,6 +54,5 @@ class LegacyRegistrationMapping(db.Model):
         )
     )
 
-    @return_ascii
     def __repr__(self):
         return format_repr(self, 'event_id', 'legacy_registrant_id', 'legacy_registrant_key', 'registration_id')

@@ -21,7 +21,7 @@ from indico.core.db.sqlalchemy.util.models import populate_one_to_one_backrefs
 from indico.util.date_time import overlaps
 from indico.util.i18n import _
 from indico.util.locators import locator_property
-from indico.util.string import format_repr, return_ascii
+from indico.util.string import format_repr
 from indico.util.struct.enum import RichIntEnum
 
 
@@ -256,7 +256,6 @@ class TimetableEntry(db.Model):
     def locator(self):
         return dict(self.event.locator, entry_id=self.id)
 
-    @return_ascii
     def __repr__(self):
         return format_repr(self, 'id', 'type', 'start_dt', 'end_dt', _repr=self.object)
 

@@ -12,7 +12,7 @@ from indico.core.db.sqlalchemy import UTCDateTime
 from indico.core.db.sqlalchemy.descriptions import RenderMode, RenderModeMixin
 from indico.util.date_time import now_utc
 from indico.util.locators import locator_property
-from indico.util.string import format_repr, return_ascii, text_to_repr
+from indico.util.string import format_repr, text_to_repr
 
 
 class EditingRevisionComment(RenderModeMixin, db.Model):
@@ -93,7 +93,6 @@ class EditingRevisionComment(RenderModeMixin, db.Model):
         )
     )
 
-    @return_ascii
     def __repr__(self):
         return format_repr(self, 'id', 'revision_id', 'user_id', internal=False, _text=text_to_repr(self.text))
 

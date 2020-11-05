@@ -12,7 +12,6 @@ from sqlalchemy.ext.declarative import declared_attr
 from indico.core.db import db
 from indico.core.db.sqlalchemy.principals import PrincipalMixin
 from indico.core.db.sqlalchemy.util.models import auto_table_args
-from indico.util.string import return_ascii
 
 
 class BlockingPrincipal(PrincipalMixin, db.Model):
@@ -37,7 +36,6 @@ class BlockingPrincipal(PrincipalMixin, db.Model):
     # relationship backrefs:
     # - blocking (Blocking._allowed)
 
-    @return_ascii
     def __repr__(self):
         return '<BlockingPrincipal({}, {}, {})>'.format(
             self.id,

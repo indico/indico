@@ -15,7 +15,6 @@ from indico.core.db import db
 from indico.core.settings import SettingsProxyBase
 from indico.core.settings.models.base import JSONSettingsBase
 from indico.core.settings.util import get_all_settings, get_setting
-from indico.util.string import return_ascii
 
 
 class UserSetting(JSONSettingsBase, db.Model):
@@ -44,7 +43,6 @@ class UserSetting(JSONSettingsBase, db.Model):
         )
     )
 
-    @return_ascii
     def __repr__(self):
         return '<UserSetting({}, {}, {}, {!r})>'.format(self.user_id, self.module, self.name, self.value)
 

@@ -21,7 +21,7 @@ from indico.modules.events.papers.models.reviews import PaperJudgmentProxy, Pape
 from indico.util.date_time import now_utc
 from indico.util.i18n import _
 from indico.util.locators import locator_property
-from indico.util.string import format_repr, return_ascii
+from indico.util.string import format_repr
 from indico.util.struct.enum import RichIntEnum
 
 
@@ -138,7 +138,6 @@ class PaperRevision(ProposalRevisionMixin, RenderModeMixin, db.Model):
             kwargs.setdefault('_contribution', paper.contribution)
         super(PaperRevision, self).__init__(*args, **kwargs)
 
-    @return_ascii
     def __repr__(self):
         return format_repr(self, 'id', '_contribution_id', state=None)
 

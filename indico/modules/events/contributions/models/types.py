@@ -11,7 +11,7 @@ from sqlalchemy.ext.declarative import declared_attr
 
 from indico.core.db import db
 from indico.util.locators import locator_property
-from indico.util.string import format_repr, return_ascii
+from indico.util.string import format_repr
 
 
 class ContributionType(db.Model):
@@ -64,7 +64,6 @@ class ContributionType(db.Model):
     # - contributions (Contribution.type)
     # - proposed_abstracts (Abstract.submitted_contrib_type)
 
-    @return_ascii
     def __repr__(self):
         return format_repr(self, 'id', _text=self.name)
 

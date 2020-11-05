@@ -13,7 +13,7 @@ from indico.modules.events.models.reviews import ProposalGroupProxy, ProposalRev
 from indico.util.date_time import now_utc
 from indico.util.i18n import _
 from indico.util.locators import locator_property
-from indico.util.string import format_repr, return_ascii
+from indico.util.string import format_repr
 from indico.util.struct.enum import RichIntEnum
 
 
@@ -49,7 +49,6 @@ class PaperJudgmentProxy(object):
     def created_dt(self):
         return self.paper.judgment_dt
 
-    @return_ascii
     def __repr__(self):
         return '<PaperJudgmentProxy: {}>'.format(self.paper)
 
@@ -149,7 +148,6 @@ class PaperReview(ProposalReviewMixin, RenderModeMixin, db.Model):
     def locator(self):
         return dict(self.revision.locator, review_id=self.id)
 
-    @return_ascii
     def __repr__(self):
         return format_repr(self, 'id', 'type', 'revision_id', 'user_id', proposed_action=None)
 

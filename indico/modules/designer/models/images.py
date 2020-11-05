@@ -12,7 +12,7 @@ import posixpath
 from indico.core.config import config
 from indico.core.db import db
 from indico.core.storage import StoredFileMixin
-from indico.util.string import return_ascii, strict_unicode
+from indico.util.string import strict_unicode
 from indico.web.flask.util import url_for
 
 
@@ -62,7 +62,6 @@ class DesignerImageFile(StoredFileMixin, db.Model):
         path = posixpath.join(*(path_segments + [filename]))
         return config.ATTACHMENT_STORAGE, path
 
-    @return_ascii
     def __repr__(self):
         return '<DesignerImageFile({}, {}, {}, {})>'.format(
             self.id,

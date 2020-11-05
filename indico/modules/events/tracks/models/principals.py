@@ -13,7 +13,7 @@ from indico.core.db import db
 from indico.core.db.sqlalchemy.principals import PrincipalPermissionsMixin
 from indico.core.db.sqlalchemy.util.models import auto_table_args
 from indico.util.decorators import strict_classproperty
-from indico.util.string import format_repr, return_ascii
+from indico.util.string import format_repr
 
 
 class TrackPrincipal(PrincipalPermissionsMixin, db.Model):
@@ -50,6 +50,5 @@ class TrackPrincipal(PrincipalPermissionsMixin, db.Model):
     # relationship backrefs:
     # - track (Track.acl_entries)
 
-    @return_ascii
     def __repr__(self):
         return format_repr(self, 'id', 'track_id', 'principal', permissions=[])

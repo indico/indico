@@ -17,7 +17,6 @@ from indico.core.db.sqlalchemy import PyIntEnum
 from indico.modules.rb.models.reservation_occurrences import ReservationOccurrence
 from indico.modules.rb.models.reservations import Reservation
 from indico.modules.rb.notifications.blockings import notify_request_response
-from indico.util.string import return_ascii
 from indico.util.struct.enum import RichIntEnum
 
 
@@ -127,7 +126,6 @@ class BlockedRoom(db.Model):
             # This is the case if it's a new blocking for a room managed by the creator
             notify_request_response(self)
 
-    @return_ascii
     def __repr__(self):
         return '<BlockedRoom({0}, {1}, {2})>'.format(
             self.blocking_id,

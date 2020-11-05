@@ -16,7 +16,7 @@ from indico.core.db import db
 from indico.core.db.sqlalchemy import PyIntEnum
 from indico.util.i18n import _
 from indico.util.locators import locator_property
-from indico.util.string import format_repr, return_ascii
+from indico.util.string import format_repr
 from indico.util.struct.enum import RichIntEnum
 from indico.web.flask.util import url_for
 
@@ -100,7 +100,6 @@ class Editable(db.Model):
     # relationship backrefs:
     # - revisions (EditingRevision.editable)
 
-    @return_ascii
     def __repr__(self):
         return format_repr(self, 'id', 'contribution_id', 'type')
 

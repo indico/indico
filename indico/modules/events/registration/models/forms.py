@@ -27,7 +27,6 @@ from indico.modules.events.registration.models.registrations import Registration
 from indico.util.caching import memoize_request
 from indico.util.date_time import now_utc
 from indico.util.i18n import L_
-from indico.util.string import return_ascii
 from indico.util.struct.enum import RichIntEnum
 
 
@@ -396,7 +395,6 @@ class RegistrationForm(db.Model):
         contact_email = self.event.contact_emails[0] if self.event.contact_emails else None
         return self.notification_sender_address or contact_email
 
-    @return_ascii
     def __repr__(self):
         return '<RegistrationForm({}, {}, {})>'.format(self.id, self.event_id, self.title)
 

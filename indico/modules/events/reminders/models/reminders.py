@@ -17,7 +17,7 @@ from indico.modules.events.registration.models.registrations import Registration
 from indico.modules.events.reminders import logger
 from indico.modules.events.reminders.util import make_reminder_email
 from indico.util.date_time import now_utc
-from indico.util.string import format_repr, return_ascii
+from indico.util.string import format_repr
 
 
 class EventReminder(db.Model):
@@ -165,6 +165,5 @@ class EventReminder(db.Model):
         email = make_email(bcc_list=recipients, from_address=self.reply_to_address, template=email_tpl)
         send_email(email, self.event, 'Reminder', self.creator)
 
-    @return_ascii
     def __repr__(self):
         return format_repr(self, 'id', 'event_id', 'scheduled_dt', is_sent=False)

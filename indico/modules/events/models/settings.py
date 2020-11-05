@@ -13,7 +13,6 @@ from indico.core.db import db
 from indico.core.db.sqlalchemy.util.models import auto_table_args
 from indico.core.settings.models.base import JSONSettingsBase, PrincipalSettingsBase
 from indico.util.decorators import strict_classproperty
-from indico.util.string import return_ascii
 
 
 class EventSettingsMixin(object):
@@ -59,7 +58,6 @@ class EventSetting(JSONSettingsBase, EventSettingsMixin, db.Model):
     def __table_args__(cls):
         return auto_table_args(cls)
 
-    @return_ascii
     def __repr__(self):
         return '<EventSetting({}, {}, {}, {!r})>'.format(self.event_id, self.module, self.name, self.value)
 
@@ -75,6 +73,5 @@ class EventSettingPrincipal(PrincipalSettingsBase, EventSettingsMixin, db.Model)
     def __table_args__(cls):
         return auto_table_args(cls)
 
-    @return_ascii
     def __repr__(self):
         return '<EventSettingPrincipal({}, {}, {}, {!r})>'.format(self.event_id, self.module, self.name, self.principal)

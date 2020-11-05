@@ -16,7 +16,7 @@ from indico.modules.users import User, logger
 from indico.util.caching import memoize_request
 from indico.util.fossilize import Fossilizable
 from indico.util.locators import locator_property
-from indico.util.string import encode_utf8, return_ascii, to_unicode
+from indico.util.string import encode_utf8, to_unicode
 
 
 AVATAR_FIELD_MAP = {
@@ -239,7 +239,6 @@ class AvatarUserWrapper(Fossilizable):
     def __hash__(self):
         return hash(str(self.id))
 
-    @return_ascii
     def __repr__(self):
         if self.user is None:
             return u'<AvatarUserWrapper {}: user does not exist>'.format(self.id)
@@ -306,7 +305,6 @@ class AvatarProvisionalWrapper(Fossilizable):
     def getAddress(self):
         return u''
 
-    @return_ascii
     def __repr__(self):
         return u'<AvatarProvisionalWrapper {}: {} ({first_name} {last_name})>'.format(
             self.identity_info.provider.name,

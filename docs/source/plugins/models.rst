@@ -26,7 +26,6 @@ Plugins must describe its database model the in the *models* folder if needed::
             backref=db.backref('example_foo', cascade='all, delete-orphan', lazy='dynamic'),
         )
 
-        @return_ascii
         def __repr__(self):
             return u'<Foo({}, {}, {})>'.format(self.id, self.bar, self.location)
 

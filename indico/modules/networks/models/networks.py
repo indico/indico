@@ -17,7 +17,7 @@ from sqlalchemy.ext.declarative import declared_attr
 from indico.core.db import db
 from indico.core.db.sqlalchemy import PyIPNetwork
 from indico.core.db.sqlalchemy.principals import PrincipalType
-from indico.util.string import format_repr, return_ascii
+from indico.util.string import format_repr
 
 
 class IPNetworkGroup(db.Model):
@@ -78,7 +78,6 @@ class IPNetworkGroup(db.Model):
     # - in_category_acls (CategoryPrincipal.ip_network_group)
     # - in_event_acls (EventPrincipal.ip_network_group)
 
-    @return_ascii
     def __repr__(self):
         return format_repr(self, 'id', 'name', hidden=False, attachment_access_override=False)
 
@@ -121,6 +120,5 @@ class IPNetwork(db.Model):
     # relationship backrefs:
     # - group (IPNetworkGroup._networks)
 
-    @return_ascii
     def __repr__(self):
         return format_repr(self, 'group_id', 'network')

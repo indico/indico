@@ -11,7 +11,6 @@ from indico.core.db.sqlalchemy.descriptions import RENDER_MODE_WRAPPER_MAP
 from indico.modules.events.abstracts.settings import abstracts_reviewing_settings, abstracts_settings
 from indico.modules.events.settings import EventSettingProperty
 from indico.util.date_time import now_utc
-from indico.util.string import return_ascii
 
 
 class CallForAbstracts(object):
@@ -20,7 +19,6 @@ class CallForAbstracts(object):
     def __init__(self, event):
         self.event = event
 
-    @return_ascii
     def __repr__(self):
         return '<CallForAbstracts({}, start_dt={}, end_dt={})>'.format(self.event.id, self.start_dt, self.end_dt)
 

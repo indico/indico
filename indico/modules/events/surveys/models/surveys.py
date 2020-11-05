@@ -24,7 +24,6 @@ from indico.modules.events.registration.models.registrations import Registration
 from indico.modules.events.surveys import logger
 from indico.util.date_time import now_utc
 from indico.util.locators import locator_property
-from indico.util.string import return_ascii
 from indico.util.struct.enum import IndicoEnum
 from indico.web.flask.templating import get_template_module
 
@@ -279,7 +278,6 @@ class Survey(db.Model):
     def is_visible(cls):
         return ~cls.is_deleted & cls.questions.any() & cls.has_started
 
-    @return_ascii
     def __repr__(self):
         return '<Survey({}, {}): {}>'.format(self.id, self.event_id, self.title)
 

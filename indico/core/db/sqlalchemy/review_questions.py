@@ -12,7 +12,7 @@ from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.ext.hybrid import hybrid_property
 
 from indico.core.db import db
-from indico.util.string import format_repr, return_ascii
+from indico.util.string import format_repr
 
 
 def _get_next_position(cls):
@@ -120,7 +120,6 @@ class ReviewQuestionMixin(object):
             )
         )
 
-    @return_ascii
     def __repr__(self):
         return format_repr(self, 'id', 'event_id', no_score=False, is_deleted=False, _text=self.title)
 

@@ -35,7 +35,7 @@ from indico.util.fs import secure_filename
 from indico.util.i18n import L_
 from indico.util.locators import locator_property
 from indico.util.signals import values_from_signal
-from indico.util.string import format_full_name, format_repr, return_ascii, strict_unicode
+from indico.util.string import format_full_name, format_repr, strict_unicode
 from indico.util.struct.enum import RichIntEnum
 
 
@@ -400,7 +400,6 @@ class Registration(db.Model):
     def order_by_name(cls):
         return db.func.lower(cls.last_name), db.func.lower(cls.first_name), cls.friendly_id
 
-    @return_ascii
     def __repr__(self):
         return format_repr(self, 'id', 'registration_form_id', 'email', 'state',
                            user_id=None, is_deleted=False, _text=self.full_name)
@@ -646,7 +645,6 @@ class RegistrationData(StoredFileMixin, db.Model):
     file = property(fset=_set_file)
     del _set_file
 
-    @return_ascii
     def __repr__(self):
         return '<RegistrationData({}, {}): {}>'.format(self.registration_id, self.field_data_id, self.data)
 

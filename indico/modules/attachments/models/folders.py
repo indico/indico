@@ -24,7 +24,6 @@ from indico.modules.attachments.models.principals import AttachmentFolderPrincip
 from indico.modules.attachments.util import can_manage_attachments
 from indico.util.decorators import strict_classproperty
 from indico.util.locators import locator_property
-from indico.util.string import return_ascii
 
 
 class AttachmentFolder(LinkMixin, ProtectionMixin, db.Model):
@@ -207,7 +206,6 @@ class AttachmentFolder(LinkMixin, ProtectionMixin, db.Model):
 
             return g.event_attachments[event].get(linked_object, [])
 
-    @return_ascii
     def __repr__(self):
         return '<AttachmentFolder({}, {}{}{}{}, {}, {})>'.format(
             self.id,

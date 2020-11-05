@@ -10,7 +10,7 @@ from __future__ import unicode_literals
 from indico.core.db import db
 from indico.core.db.sqlalchemy.principals import PrincipalType
 from indico.util.locators import locator_property
-from indico.util.string import format_repr, return_ascii
+from indico.util.string import format_repr
 
 
 class CategoryRole(db.Model):
@@ -81,7 +81,6 @@ class CategoryRole(db.Model):
     def __contains__(self, user):
         return user is not None and self in user.category_roles
 
-    @return_ascii
     def __repr__(self):
         return format_repr(self, 'id', 'code', _text=self.name)
 

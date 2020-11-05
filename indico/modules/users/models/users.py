@@ -33,7 +33,7 @@ from indico.modules.users.models.emails import UserEmail
 from indico.modules.users.models.favorites import favorite_category_table, favorite_user_table
 from indico.util.i18n import _
 from indico.util.locators import locator_property
-from indico.util.string import format_full_name, format_repr, return_ascii
+from indico.util.string import format_full_name, format_repr
 from indico.util.struct.enum import RichIntEnum
 from indico.web.flask.util import url_for
 
@@ -555,7 +555,6 @@ class User(PersonMixin, db.Model):
         """Convenience method for `user in user_or_group`."""
         return self == user
 
-    @return_ascii
     def __repr__(self):
         return format_repr(self, 'id', 'email', is_deleted=False, is_pending=False, _text=self.full_name)
 

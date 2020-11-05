@@ -20,7 +20,7 @@ from indico.core.db.sqlalchemy import PyIntEnum
 from indico.modules.users.models.users import UserTitle
 from indico.util.decorators import strict_classproperty
 from indico.util.i18n import orig_string
-from indico.util.string import camelize_keys, format_repr, return_ascii
+from indico.util.string import camelize_keys, format_repr
 from indico.util.struct.enum import IndicoEnum
 
 
@@ -347,7 +347,6 @@ class RegistrationFormItem(db.Model):
                    .exists())
         return cls.is_enabled & ~cls.is_deleted & ((cls.parent_id == None) | query)  # noqa
 
-    @return_ascii
     def __repr__(self):
         return format_repr(self, 'id', 'registration_form_id', is_enabled=True, is_deleted=False, is_manager_only=False,
                            _text=self.title)

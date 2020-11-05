@@ -20,7 +20,6 @@ from indico.legacy.common.cache import GenericCache
 from indico.modules.auth import Identity
 from indico.modules.groups.models.groups import LocalGroup
 from indico.util.caching import memoize_request
-from indico.util.string import return_ascii
 
 
 class GroupProxy(object):
@@ -182,7 +181,6 @@ class _LocalGroupProxy(GroupProxy):
     def __hash__(self):
         return hash(self.id)
 
-    @return_ascii
     def __repr__(self):
         if not self.group:
             return '<LocalGroupProxy({} [missing])>'.format(self.id)
@@ -278,6 +276,5 @@ class _MultipassGroupProxy(GroupProxy):
     def __hash__(self):
         return hash(self.name) ^ hash(self.provider)
 
-    @return_ascii
     def __repr__(self):
         return '<MultipassGroupProxy({}, {})>'.format(self.provider, self.name)

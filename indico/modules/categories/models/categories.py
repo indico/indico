@@ -29,7 +29,7 @@ from indico.util.date_time import get_display_tz
 from indico.util.decorators import strict_classproperty
 from indico.util.i18n import _
 from indico.util.locators import locator_property
-from indico.util.string import MarkdownText, format_repr, return_ascii, text_to_repr
+from indico.util.string import MarkdownText, format_repr, text_to_repr
 from indico.util.struct.enum import RichIntEnum
 from indico.web.flask.util import url_for
 
@@ -234,7 +234,6 @@ class Category(SearchableTitleMixin, DescriptionMixin, ProtectionManagersMixin, 
     def event_message(cls):
         return cls._event_message
 
-    @return_ascii
     def __repr__(self):
         return format_repr(self, 'id', is_deleted=False, _text=text_to_repr(self.title, max_length=75))
 

@@ -20,7 +20,6 @@ from werkzeug.security import safe_join
 from indico.core import signals
 from indico.core.config import config
 from indico.util.signals import named_objects_from_signal
-from indico.util.string import return_ascii
 from indico.web.flask.util import send_file
 
 
@@ -274,7 +273,6 @@ class FileSystemStorage(Storage):
         except Exception as e:
             six.reraise(StorageError('Could not send "{}": {}'.format(file_id, e)), None, sys.exc_info()[2])
 
-    @return_ascii
     def __repr__(self):
         return '<FileSystemStorage: {}>'.format(self.path)
 
@@ -282,7 +280,6 @@ class FileSystemStorage(Storage):
 class ReadOnlyFileSystemStorage(ReadOnlyStorageMixin, FileSystemStorage):
     name = 'fs-readonly'
 
-    @return_ascii
     def __repr__(self):
         return '<ReadOnlyFileSystemStorage: {}>'.format(self.path)
 

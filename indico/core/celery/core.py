@@ -28,7 +28,6 @@ from indico.core.notifications import flush_email_queue, init_email_queue
 from indico.core.plugins import plugin_engine
 from indico.util.console import cformat
 from indico.util.fossilize import clearCache
-from indico.util.string import return_ascii
 from indico.web.flask.stats import request_stats_request_started
 
 
@@ -209,7 +208,6 @@ class _CelerySAWrapper(object):
             raise ValueError('Object not in DB: {}'.format(self))
         return obj
 
-    @return_ascii
     def __repr__(self):
         model, args = self.identity_key[:2]
         return '<{}: {}>'.format(model.__name__, ','.join(map(repr, args)))

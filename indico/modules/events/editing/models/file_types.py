@@ -13,7 +13,7 @@ from sqlalchemy.ext.declarative import declared_attr
 from indico.core.db import db
 from indico.core.db.sqlalchemy import PyIntEnum
 from indico.modules.events.editing.models.editable import EditableType
-from indico.util.string import format_repr, return_ascii
+from indico.util.string import format_repr
 
 
 class EditingFileType(db.Model):
@@ -88,7 +88,6 @@ class EditingFileType(db.Model):
     # - files (EditingRevisionFile.file_type)
     # - review_conditions (EditingReviewCondition.file_types)
 
-    @return_ascii
     def __repr__(self):
         return format_repr(self, 'id', 'event_id', 'extensions', allow_multiple_files=False, required=False,
                            publishable=False, filename_template=None, _text=self.name)

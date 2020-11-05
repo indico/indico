@@ -12,7 +12,7 @@ from werkzeug.datastructures import MultiDict
 
 from indico.core.db import db
 from indico.util.locators import locator_property
-from indico.util.string import format_repr, return_ascii
+from indico.util.string import format_repr
 
 
 class RegistrationRequest(db.Model):
@@ -81,6 +81,5 @@ class RegistrationRequest(db.Model):
             identity_data['data'] = dict(identity_data['data'].lists())
         self._identity_data = identity_data
 
-    @return_ascii
     def __repr__(self):
         return format_repr(self, 'id', 'email')

@@ -25,7 +25,7 @@ from indico.modules.events.management.util import get_non_inheriting_objects
 from indico.modules.events.timetable.models.entries import TimetableEntry, TimetableEntryType
 from indico.util.caching import memoize_request
 from indico.util.locators import locator_property
-from indico.util.string import format_repr, return_ascii
+from indico.util.string import format_repr
 
 
 def _get_next_friendly_id(context):
@@ -209,7 +209,6 @@ class Session(DescriptionMixin, ColorMixin, ProtectionManagersMixin, LocationMix
         """Get a set of child objects that do not inherit protection."""
         return get_non_inheriting_objects(self)
 
-    @return_ascii
     def __repr__(self):
         return format_repr(self, 'id', is_deleted=False, _text=self.title)
 

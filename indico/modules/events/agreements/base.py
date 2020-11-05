@@ -17,7 +17,6 @@ from indico.modules.events.settings import EventSettingsProxy
 from indico.util.caching import make_hashable, memoize_request
 from indico.util.decorators import cached_classproperty, classproperty
 from indico.util.i18n import _
-from indico.util.string import return_ascii
 from indico.web.flask.templating import get_overridable_template_name, get_template_module
 
 
@@ -36,7 +35,6 @@ class AgreementPersonInfo(object):
         self.user = user
         self.data = data
 
-    @return_ascii
     def __repr__(self):
         return '<AgreementPersonInfo({}, {}, {})>'.format(self.name, self.email, self.identifier)
 

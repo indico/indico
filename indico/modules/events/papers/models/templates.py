@@ -14,7 +14,7 @@ from indico.core.db import db
 from indico.core.storage.models import StoredFileMixin
 from indico.util.fs import secure_filename
 from indico.util.locators import locator_property
-from indico.util.string import format_repr, return_ascii, strict_unicode
+from indico.util.string import format_repr, strict_unicode
 
 
 class PaperTemplate(StoredFileMixin, db.Model):
@@ -54,7 +54,6 @@ class PaperTemplate(StoredFileMixin, db.Model):
         )
     )
 
-    @return_ascii
     def __repr__(self):
         return format_repr(self, 'id', 'event_id', 'filename', content_type=None)
 

@@ -8,7 +8,7 @@
 from sqlalchemy.dialects.postgresql import JSONB
 
 from indico.core.db import db
-from indico.util.string import format_repr, return_ascii
+from indico.util.string import format_repr
 
 
 class RoomAttributeAssociation(db.Model):
@@ -44,7 +44,6 @@ class RoomAttributeAssociation(db.Model):
     # relationship backrefs:
     # - room (Room.attributes)
 
-    @return_ascii
     def __repr__(self):
         return u'<RoomAttributeAssociation({0}, {1}, {2})>'.format(self.room_id, self.attribute.name, self.value)
 
@@ -76,6 +75,5 @@ class RoomAttribute(db.Model):
     # relationship backrefs:
     # - room_associations (RoomAttributeAssociation.attribute)
 
-    @return_ascii
     def __repr__(self):
         return format_repr(self, 'id', 'name')

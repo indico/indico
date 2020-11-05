@@ -10,7 +10,7 @@ from __future__ import unicode_literals
 from indico.core.db import db
 from indico.core.db.sqlalchemy import PyIntEnum
 from indico.modules.events.editing.models.editable import EditableType
-from indico.util.string import format_repr, return_ascii
+from indico.util.string import format_repr
 
 
 class EditingReviewCondition(db.Model):
@@ -56,7 +56,6 @@ class EditingReviewCondition(db.Model):
     # relationship backrefs:
     # - file_types (EditingFileType.review_conditions)
 
-    @return_ascii
     def __repr__(self):
         return format_repr(self, 'id', 'event_id')
 

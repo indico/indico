@@ -32,7 +32,7 @@ from indico.modules.events.papers.models.papers import Paper
 from indico.modules.events.papers.models.revisions import PaperRevision, PaperRevisionState
 from indico.modules.events.sessions.util import session_coordinator_priv_enabled
 from indico.util.locators import locator_property
-from indico.util.string import format_repr, return_ascii
+from indico.util.string import format_repr
 
 
 def _get_next_friendly_id(context):
@@ -529,7 +529,6 @@ class Contribution(DescriptionMixin, ProtectionManagersMixin, LocationMixin, Att
     def is_paper_reviewer(self, user):
         return user in self.paper_content_reviewers or user in self.paper_layout_reviewers
 
-    @return_ascii
     def __repr__(self):
         return format_repr(self, 'id', is_deleted=False, _text=self.title)
 

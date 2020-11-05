@@ -22,7 +22,7 @@ from indico.core.db.sqlalchemy.util.session import no_autoflush
 from indico.modules.users.models.users import PersonMixin, UserTitle
 from indico.util.decorators import strict_classproperty
 from indico.util.locators import locator_property
-from indico.util.string import format_repr, return_ascii
+from indico.util.string import format_repr
 
 
 class PersonLinkDataMixin(object):
@@ -176,7 +176,6 @@ class EventPerson(PersonMixin, db.Model):
     def locator(self):
         return dict(self.event.locator, person_id=self.id)
 
-    @return_ascii
     def __repr__(self):
         return format_repr(self, 'id', is_untrusted=False, _text=self.full_name)
 
@@ -473,7 +472,6 @@ class EventPersonLink(PersonLinkBase):
             raise Exception("No event to check submission rights against")
         return self.person.has_role('submit', self.event)
 
-    @return_ascii
     def __repr__(self):
         return format_repr(self, 'id', 'person_id', 'event_id', _text=self.full_name)
 

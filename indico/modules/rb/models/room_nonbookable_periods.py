@@ -8,7 +8,6 @@
 from sqlalchemy.ext.hybrid import hybrid_method
 
 from indico.core.db import db
-from indico.util.string import return_ascii
 
 
 class NonBookablePeriod(db.Model):
@@ -35,7 +34,6 @@ class NonBookablePeriod(db.Model):
     # relationship backrefs:
     # - room (Room.nonbookable_periods)
 
-    @return_ascii
     def __repr__(self):
         return u'<NonBookablePeriod({0}, {1}, {2})>'.format(
             self.room_id,

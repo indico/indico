@@ -19,7 +19,7 @@ from indico.core.db.sqlalchemy.util.models import get_simple_column_attrs
 from indico.core.permissions import get_available_permissions
 from indico.util.decorators import classproperty, strict_classproperty
 from indico.util.fossilize import Fossilizable, IFossil
-from indico.util.string import format_repr, return_ascii
+from indico.util.string import format_repr
 from indico.util.struct.enum import IndicoEnum
 
 
@@ -134,7 +134,6 @@ class EmailPrincipal(Fossilizable):
             return False
         return self.email in user.all_emails
 
-    @return_ascii
     def __repr__(self):
         return format_repr(self, 'email')
 

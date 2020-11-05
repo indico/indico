@@ -11,7 +11,7 @@ from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.ext.declarative import declared_attr
 
 from indico.core.db import db
-from indico.util.string import format_repr, return_ascii
+from indico.util.string import format_repr
 
 
 class ReviewRatingMixin(object):
@@ -74,6 +74,5 @@ class ReviewRatingMixin(object):
             )
         )
 
-    @return_ascii
     def __repr__(self):
         return format_repr(self, 'id', 'review_id', 'question_id')

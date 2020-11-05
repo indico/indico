@@ -11,7 +11,7 @@ from sqlalchemy.dialects.postgresql import ARRAY, JSONB
 
 from indico.core.db.sqlalchemy import UTCDateTime, db
 from indico.util.date_time import now_utc
-from indico.util.string import format_repr, return_ascii
+from indico.util.string import format_repr
 
 
 class AbstractEmailLogEntry(db.Model):
@@ -89,7 +89,6 @@ class AbstractEmailLogEntry(db.Model):
         )
     )
 
-    @return_ascii
     def __repr__(self):
         return format_repr(self, 'id', 'abstract_id', _text=self.subject)
 

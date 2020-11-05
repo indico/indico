@@ -10,7 +10,7 @@ from __future__ import unicode_literals
 from sqlalchemy.ext.declarative import declared_attr
 
 from indico.core.db import db
-from indico.util.string import format_repr, return_ascii
+from indico.util.string import format_repr
 
 
 class EditingTag(db.Model):
@@ -68,7 +68,6 @@ class EditingTag(db.Model):
         """Properly formatted title, including tag code."""
         return '{}: {}'.format(self.code, self.title)
 
-    @return_ascii
     def __repr__(self):
         return format_repr(self, 'id', 'event_id', system=False, _text=self.title)
 

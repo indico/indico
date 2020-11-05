@@ -23,7 +23,7 @@ from indico.core import signals
 from indico.core.auth import multipass
 from indico.util.i18n import _
 from indico.util.signals import values_from_signal
-from indico.util.string import return_ascii, strip_whitespace
+from indico.util.string import strip_whitespace
 from indico.web.flask.util import url_for
 
 
@@ -32,7 +32,6 @@ class _DataWrapper(object):
     def __init__(self, data):
         self.data = data
 
-    @return_ascii
     def __repr__(self):
         return '<DataWrapper({!r})>'.format(self.data)
 

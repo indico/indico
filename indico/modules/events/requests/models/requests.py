@@ -15,7 +15,6 @@ from indico.core.db.sqlalchemy.util.queries import limit_groups
 from indico.modules.events.requests import get_request_definitions
 from indico.util.date_time import now_utc
 from indico.util.i18n import _
-from indico.util.string import return_ascii
 from indico.util.struct.enum import RichIntEnum
 
 
@@ -140,7 +139,6 @@ class Request(db.Model):
     def locator(self):
         return {'confId': self.event_id, 'type': self.type}
 
-    @return_ascii
     def __repr__(self):
         state = self.state.name if self.state is not None else None
         return '<Request({}, {}, {}, {})>'.format(self.id, self.event_id, self.type, state)

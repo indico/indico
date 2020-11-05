@@ -11,7 +11,6 @@ from indico.core.settings import AttributeProxyProperty
 from indico.modules.events.models.reviews import ProposalMixin
 from indico.modules.events.papers.models.revisions import PaperRevisionState
 from indico.util.locators import locator_property
-from indico.util.string import return_ascii
 
 
 class Paper(ProposalMixin):
@@ -27,7 +26,6 @@ class Paper(ProposalMixin):
     def __init__(self, contribution):
         self.contribution = contribution
 
-    @return_ascii
     def __repr__(self):
         state = self.state.name if self.last_revision else None
         return '<Paper(contribution_id={}, state={})>'.format(self.contribution.id, state)

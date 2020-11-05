@@ -36,7 +36,7 @@ from indico.modules.rb.util import get_prebooking_collisions, rb_is_admin
 from indico.util.date_time import format_date, format_time, now_utc
 from indico.util.i18n import _
 from indico.util.serializer import Serializer
-from indico.util.string import format_repr, return_ascii, to_unicode
+from indico.util.string import format_repr, to_unicode
 from indico.util.struct.enum import IndicoEnum
 from indico.web.flask.util import url_for
 
@@ -314,7 +314,6 @@ class Reservation(Serializer, db.Model):
     def event(self):
         return self.link.event if self.link else None
 
-    @return_ascii
     def __repr__(self):
         return format_repr(self, 'id', 'room_id', 'start_dt', 'end_dt', 'state', _text=self.booking_reason)
 

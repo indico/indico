@@ -16,7 +16,7 @@ from sqlalchemy.dialects.postgresql import UUID as pg_UUID
 from indico.core.db import db
 from indico.core.db.sqlalchemy import UTCDateTime
 from indico.util.date_time import now_utc
-from indico.util.string import format_repr, return_ascii
+from indico.util.string import format_repr
 
 
 class StaticListLink(db.Model):
@@ -118,6 +118,5 @@ class StaticListLink(db.Model):
         db.session.flush()
         return static_list_link
 
-    @return_ascii
     def __repr__(self):
         return format_repr(self, 'id', 'uuid')

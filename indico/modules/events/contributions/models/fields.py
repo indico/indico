@@ -15,7 +15,7 @@ from indico.core.db import db
 from indico.core.db.sqlalchemy import PyIntEnum
 from indico.util.i18n import _
 from indico.util.locators import locator_property
-from indico.util.string import format_repr, return_ascii, text_to_repr
+from indico.util.string import format_repr, text_to_repr
 from indico.util.struct.enum import RichIntEnum
 
 
@@ -136,7 +136,6 @@ class ContributionField(db.Model):
     def filter_choices(self):
         return {x['id']: x['option'] for x in self.field_data.get('options', {})}
 
-    @return_ascii
     def __repr__(self):
         return format_repr(self, 'id', 'field_type', is_required=False, is_active=True, _text=self.title)
 
@@ -197,7 +196,6 @@ class ContributionFieldValue(ContributionFieldValueBase):
     # relationship backrefs:
     # - contribution (Contribution.field_values)
 
-    @return_ascii
     def __repr__(self):
         text = text_to_repr(self.data) if isinstance(self.data, six.text_type) else self.data
         return format_repr(self, 'contribution_id', 'contribution_field_id', _text=text)

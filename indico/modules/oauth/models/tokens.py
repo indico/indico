@@ -14,7 +14,6 @@ from sqlalchemy.dialects.postgresql import ARRAY, UUID
 from indico.core.db import db
 from indico.core.db.sqlalchemy import UTCDateTime
 from indico.legacy.common.cache import GenericCache
-from indico.util.string import return_ascii
 
 
 class OAuthToken(db.Model):
@@ -101,7 +100,6 @@ class OAuthToken(db.Model):
     def type(self):
         return 'bearer'
 
-    @return_ascii
     def __repr__(self):  # pragma: no cover
         return '<OAuthToken({}, {}, {})>'.format(self.id, self.application, self.user)
 

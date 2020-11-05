@@ -25,7 +25,7 @@ from indico.modules.attachments.util import can_manage_attachments
 from indico.util.date_time import now_utc
 from indico.util.fs import secure_filename
 from indico.util.i18n import _
-from indico.util.string import return_ascii, strict_unicode
+from indico.util.string import strict_unicode
 from indico.util.struct.enum import RichIntEnum
 from indico.web.flask.util import url_for
 
@@ -104,7 +104,6 @@ class AttachmentFile(StoredFileMixin, db.Model):
         path = posixpath.join(*(path_segments + [filename]))
         return config.ATTACHMENT_STORAGE, path
 
-    @return_ascii
     def __repr__(self):
         return '<AttachmentFile({}, {}, {}, {})>'.format(
             self.id,
@@ -256,7 +255,6 @@ class Attachment(ProtectionMixin, VersionedResourceMixin, db.Model):
         return (super(Attachment, self).can_access(user, *args, **kwargs) or
                 can_manage_attachments(self.folder.object, user))
 
-    @return_ascii
     def __repr__(self):
         return '<Attachment({}, {}, {}{}, {}, {})>'.format(
             self.id,

@@ -22,7 +22,6 @@ from indico.core.logger import Logger
 from indico.modules.vc.notifications import notify_deleted
 from indico.util.caching import memoize_request
 from indico.util.date_time import now_utc
-from indico.util.string import return_ascii
 from indico.util.struct.enum import IndicoEnum
 
 
@@ -126,7 +125,6 @@ class VCRoom(db.Model):
     def locator(self):
         return {'vc_room_id': self.id, 'service': self.type}
 
-    @return_ascii
     def __repr__(self):
         return '<VCRoom({}, {}, {})>'.format(self.id, self.name, self.type)
 
@@ -294,7 +292,6 @@ class VCRoomEventAssociation(db.Model):
     def link_object(cls):
         return _LinkObjectComparator(cls)
 
-    @return_ascii
     def __repr__(self):
         return '<VCRoomEventAssociation({}, {})>'.format(self.event_id, self.vc_room)
 

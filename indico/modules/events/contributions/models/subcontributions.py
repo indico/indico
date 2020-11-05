@@ -13,7 +13,7 @@ from indico.core.db.sqlalchemy.descriptions import DescriptionMixin, RenderMode
 from indico.core.db.sqlalchemy.notes import AttachedNotesMixin
 from indico.core.db.sqlalchemy.util.queries import increment_and_get
 from indico.util.locators import locator_property
-from indico.util.string import format_repr, return_ascii
+from indico.util.string import format_repr
 
 
 def _get_next_friendly_id(context):
@@ -156,7 +156,6 @@ class SubContribution(DescriptionMixin, AttachedItemsMixin, AttachedNotesMixin, 
     def get_manager_list(self, recursive=False, include_groups=True):
         return self.contribution.get_manager_list(recursive=recursive, include_groups=include_groups)
 
-    @return_ascii
     def __repr__(self):
         return format_repr(self, 'id', is_deleted=False, _text=self.title)
 

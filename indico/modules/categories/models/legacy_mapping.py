@@ -8,7 +8,6 @@
 from __future__ import unicode_literals
 
 from indico.core.db import db
-from indico.util.string import return_ascii
 
 
 class LegacyCategoryMapping(db.Model):
@@ -45,6 +44,5 @@ class LegacyCategoryMapping(db.Model):
         )
     )
 
-    @return_ascii
     def __repr__(self):
         return '<LegacyCategoryMapping({}, {})>'.format(self.legacy_category_id, self.category_id)

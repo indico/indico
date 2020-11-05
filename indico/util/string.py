@@ -154,18 +154,6 @@ def slugify(*args, **kwargs):
     return value or fallback
 
 
-def return_ascii(f):
-    """Decorator to normalize all unicode characters.
-
-    This is useful for __repr__ methods which **MUST** return a plain string to
-    avoid encoding to utf8 or ascii all the time.
-    """
-    @functools.wraps(f)
-    def wrapper(*args, **kwargs):
-        return unicode_to_ascii(f(*args, **kwargs))
-    return wrapper
-
-
 def truncate(text, max_size, ellipsis='...', encoding='utf-8'):
     """
     Truncate text, taking unicode chars into account

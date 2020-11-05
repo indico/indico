@@ -13,7 +13,7 @@ from markupsafe import Markup
 
 from indico.core import signals
 from indico.util.signals import named_objects_from_signal
-from indico.util.string import format_repr, return_ascii
+from indico.util.string import format_repr
 
 
 class _MenuSectionBase(object):
@@ -56,7 +56,6 @@ class SideMenuSection(_MenuSectionBase):
     def active(self):
         return self._active or any(item.active for item in self._items)
 
-    @return_ascii
     def __repr__(self):
         return format_repr(self, 'name', 'title', active=False)
 
@@ -86,7 +85,6 @@ class SideMenuItem(object):
         self.weight = weight
         self.icon = ('icon-' + icon) if icon else None
 
-    @return_ascii
     def __repr__(self):
         return format_repr(self, 'name', 'title', 'url', active=False, disabled=False)
 
@@ -99,7 +97,6 @@ class TopMenuSection(_MenuSectionBase):
     :param weight: the "weight" (higher means it shows up first)
     """
 
-    @return_ascii
     def __repr__(self):
         return format_repr(self, 'name', 'title')
 
@@ -123,7 +120,6 @@ class TopMenuItem(object):
         self.section = section
         self.weight = weight
 
-    @return_ascii
     def __repr__(self):
         return format_repr(self, 'name', 'title', 'url')
 

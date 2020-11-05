@@ -8,7 +8,7 @@
 from __future__ import unicode_literals
 
 from indico.core.db import db
-from indico.util.string import format_repr, return_ascii
+from indico.util.string import format_repr
 
 
 class EventSeries(db.Model):
@@ -40,6 +40,5 @@ class EventSeries(db.Model):
     # relationship backrefs:
     # - events (Event.series)
 
-    @return_ascii
     def __repr__(self):
         return format_repr(self, 'id')

@@ -19,7 +19,6 @@ from indico.core.db import db
 from indico.core.db.sqlalchemy import PyIntEnum
 from indico.modules.oauth import logger
 from indico.util.i18n import _
-from indico.util.string import return_ascii
 from indico.util.struct.enum import IndicoEnum
 
 
@@ -148,7 +147,6 @@ class OAuthApplication(db.Model):
     def locator(self):
         return {'id': self.id}
 
-    @return_ascii
     def __repr__(self):  # pragma: no cover
         return '<OAuthApplication({}, {}, {})>'.format(self.id, self.name, self.client_id)
 

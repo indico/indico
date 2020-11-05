@@ -34,7 +34,7 @@ from indico.modules.rb.models.room_nonbookable_periods import NonBookablePeriod
 from indico.modules.rb.util import rb_is_admin
 from indico.util.i18n import _
 from indico.util.serializer import Serializer
-from indico.util.string import format_repr, natural_sort_key, return_ascii
+from indico.util.string import format_repr, natural_sort_key
 from indico.web.flask.util import url_for
 
 
@@ -349,7 +349,6 @@ class Room(ProtectionManagersMixin, db.Model, Serializer):
         sprite_mapping = _cache.get('rooms-sprite-mapping')
         return sprite_mapping.get(self.id, 0) if sprite_mapping else 0  # placeholder at position 0
 
-    @return_ascii
     def __repr__(self):
         return format_repr(self, 'id', 'full_name', is_deleted=False)
 

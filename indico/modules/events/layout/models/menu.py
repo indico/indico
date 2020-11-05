@@ -15,7 +15,7 @@ from werkzeug.utils import cached_property
 from indico.core.db import db
 from indico.core.db.sqlalchemy import PyIntEnum
 from indico.util.i18n import _
-from indico.util.string import format_repr, return_ascii, slugify, text_to_repr
+from indico.util.string import format_repr, slugify, text_to_repr
 from indico.util.struct.enum import RichIntEnum
 from indico.web.flask.util import url_for
 
@@ -161,7 +161,6 @@ class MenuEntryMixin(object):
     def locator(self):
         return dict(self.event_ref.locator, menu_entry_id=self.id)
 
-    @return_ascii
     def __repr__(self):
         return '<{}({}, {}, {}, position={})>'.format(
             type(self).__name__,
@@ -438,6 +437,5 @@ class EventPage(db.Model):
     def is_default(self):
         return self.menu_entry.event.default_page_id == self.id
 
-    @return_ascii
     def __repr__(self):
         return format_repr(self, 'id', _text=text_to_repr(self.html, html=True))

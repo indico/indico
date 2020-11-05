@@ -8,7 +8,7 @@
 from __future__ import unicode_literals
 
 from indico.core.db import db
-from indico.util.string import format_repr, return_ascii
+from indico.util.string import format_repr
 
 
 class RoomFeature(db.Model):
@@ -38,6 +38,5 @@ class RoomFeature(db.Model):
     # relationship backrefs:
     # - equipment_types (EquipmentType.features)
 
-    @return_ascii
     def __repr__(self):
         return format_repr(self, 'id', 'name', _text=self.title)

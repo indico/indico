@@ -15,7 +15,7 @@ from indico.core.db.sqlalchemy.custom.utcdatetime import UTCDateTime
 from indico.modules.rb.models.blocking_principals import BlockingPrincipal
 from indico.modules.rb.util import rb_is_admin
 from indico.util.date_time import now_utc
-from indico.util.string import format_repr, return_ascii
+from indico.util.string import format_repr
 from indico.util.user import iter_acl
 from indico.web.flask.util import url_for
 
@@ -117,6 +117,5 @@ class Blocking(db.Model):
     def external_details_url(self):
         return url_for('rb.blocking_link', blocking_id=self.id, _external=True)
 
-    @return_ascii
     def __repr__(self):
         return format_repr(self, 'id', 'start_date', 'end_date', _text=self.reason)

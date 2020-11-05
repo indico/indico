@@ -15,7 +15,7 @@ from indico.core.db.sqlalchemy import PyIntEnum, UTCDateTime
 from indico.core.storage import StoredFileMixin
 from indico.util.date_time import now_utc
 from indico.util.i18n import _
-from indico.util.string import format_repr, return_ascii, strict_unicode
+from indico.util.string import format_repr, strict_unicode
 from indico.util.struct.enum import RichIntEnum
 
 
@@ -100,6 +100,5 @@ class StaticSite(StoredFileMixin, db.Model):
         path = posixpath.join(*(path_segments + [filename]))
         return config.STATIC_SITE_STORAGE, path
 
-    @return_ascii
     def __repr__(self):
         return format_repr(self, 'id', 'event_id', 'state')

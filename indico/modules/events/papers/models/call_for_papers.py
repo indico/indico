@@ -13,7 +13,7 @@ from indico.modules.events.papers.settings import PaperReviewingRole, paper_revi
 from indico.modules.events.settings import EventSettingProperty
 from indico.util.caching import memoize_request
 from indico.util.date_time import now_utc
-from indico.util.string import MarkdownText, return_ascii
+from indico.util.string import MarkdownText
 
 
 class CallForPapers(object):
@@ -22,7 +22,6 @@ class CallForPapers(object):
     def __init__(self, event):
         self.event = event
 
-    @return_ascii
     def __repr__(self):
         return '<CallForPapers({}, start_dt={}, end_dt={})>'.format(self.event.id, self.start_dt, self.end_dt)
 

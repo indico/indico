@@ -25,7 +25,7 @@ from indico.modules.rb.util import rb_is_admin
 from indico.util import date_time
 from indico.util.date_time import format_date
 from indico.util.serializer import Serializer
-from indico.util.string import format_repr, return_ascii
+from indico.util.string import format_repr
 from indico.util.struct.enum import IndicoEnum
 from indico.web.flask.util import url_for
 
@@ -118,7 +118,6 @@ class ReservationOccurrence(db.Model, Serializer):
             _external=True,
         )
 
-    @return_ascii
     def __repr__(self):
         return format_repr(self, 'reservation_id', 'start_dt', 'end_dt', 'state')
 

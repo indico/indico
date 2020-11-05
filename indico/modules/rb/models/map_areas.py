@@ -8,7 +8,7 @@
 from __future__ import unicode_literals
 
 from indico.core.db import db
-from indico.util.string import format_repr, return_ascii
+from indico.util.string import format_repr
 
 
 class MapArea(db.Model):
@@ -46,6 +46,5 @@ class MapArea(db.Model):
         nullable=False
     )
 
-    @return_ascii
     def __repr__(self):
         return format_repr(self, 'id', 'name', is_default=False)

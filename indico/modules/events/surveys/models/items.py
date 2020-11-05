@@ -14,7 +14,7 @@ from indico.core.db import db
 from indico.core.db.sqlalchemy import PyIntEnum
 from indico.core.db.sqlalchemy.descriptions import DescriptionMixin, RenderMode
 from indico.modules.events.surveys.fields import get_field_types
-from indico.util.string import return_ascii, text_to_repr
+from indico.util.string import text_to_repr
 from indico.util.struct.enum import IndicoEnum
 
 
@@ -175,7 +175,6 @@ class SurveyQuestion(SurveyItem):
         if self.field:
             return self.field.get_summary(**kwargs)
 
-    @return_ascii
     def __repr__(self):
         return '<SurveyQuestion({}, {}, {}, {})>'.format(self.id, self.survey_id, self.field_type, self.title)
 
@@ -206,7 +205,6 @@ class SurveySection(SurveyItem):
     def locator(self):
         return dict(self.survey.locator, section_id=self.id)
 
-    @return_ascii
     def __repr__(self):
         return '<SurveySection({}, {}, {})>'.format(self.id, self.survey_id, self.title)
 
@@ -229,7 +227,6 @@ class SurveyText(SurveyItem):
     def locator(self):
         return dict(self.survey.locator, section_id=self.parent_id, text_id=self.id)
 
-    @return_ascii
     def __repr__(self):
         desc = text_to_repr(self.description)
         return '<SurveyText({}, {}): "{}")>'.format(self.id, self.survey_id, desc)

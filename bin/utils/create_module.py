@@ -101,7 +101,6 @@ def write_model(f, class_name, event):
                 primary_key=True
             )
 
-            @return_ascii
             def __repr__(self):
                 return format_repr(self, 'id')
     """).lstrip().format(cls=class_name, table=table_name, schema=schema))
@@ -138,7 +137,7 @@ def main(indico_dir, name, module_dir, event, models, blueprint, templates, cont
             with open(model_path, 'w') as f:
                 write_header(f)
                 write(f, 'from indico.core.db import db')
-                write(f, 'from indico.util.string import format_repr, return_ascii')
+                write(f, 'from indico.util.string import format_repr')
                 for class_name in class_names:
                     write_model(f, class_name, event)
     if blueprint:

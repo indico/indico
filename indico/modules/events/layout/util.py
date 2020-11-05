@@ -25,7 +25,7 @@ from indico.modules.events.layout import layout_settings
 from indico.modules.events.layout.models.menu import MenuEntry, MenuEntryType, TransientMenuEntry
 from indico.util.caching import memoize_request
 from indico.util.signals import named_objects_from_signal, values_from_signal
-from indico.util.string import crc32, return_ascii
+from indico.util.string import crc32
 from indico.web.flask.util import url_for
 
 
@@ -120,7 +120,6 @@ class MenuEntryData(object):
     def visible(self, event):
         return self._visible(event) if self._visible else True
 
-    @return_ascii
     def __repr__(self):
         parent = ''
         if self.parent:

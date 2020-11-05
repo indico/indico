@@ -15,7 +15,7 @@ from indico.core.db.sqlalchemy import PyIntEnum
 from indico.modules.designer import DEFAULT_CONFIG, TemplateType
 from indico.util.locators import locator_property
 from indico.util.placeholders import get_placeholders
-from indico.util.string import format_repr, return_ascii
+from indico.util.string import format_repr
 
 
 TEMPLATE_DEFAULTS = {
@@ -151,7 +151,6 @@ class DesignerTemplate(db.Model):
         else:
             return False
 
-    @return_ascii
     def __repr__(self):
         return format_repr(self, 'id', 'event_id', 'category_id', _text=self.title)
 

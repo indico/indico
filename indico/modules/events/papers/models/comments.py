@@ -15,7 +15,7 @@ from indico.core.db.sqlalchemy.review_comments import ReviewCommentMixin
 from indico.modules.events.models.reviews import ProposalCommentMixin
 from indico.modules.events.papers.models.reviews import PaperCommentVisibility
 from indico.util.locators import locator_property
-from indico.util.string import format_repr, return_ascii, text_to_repr
+from indico.util.string import format_repr, text_to_repr
 
 
 class PaperReviewComment(ProposalCommentMixin, ReviewCommentMixin, db.Model):
@@ -59,7 +59,6 @@ class PaperReviewComment(ProposalCommentMixin, ReviewCommentMixin, db.Model):
     def locator(self):
         return dict(self.paper_revision.locator, comment_id=self.id)
 
-    @return_ascii
     def __repr__(self):
         return format_repr(self, 'id', 'revision_id', is_deleted=False, _text=text_to_repr(self.text))
 

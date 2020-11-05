@@ -13,7 +13,7 @@ from indico.core.config import config
 from indico.core.db import db
 from indico.core.storage import StoredFileMixin
 from indico.util.fs import secure_filename
-from indico.util.string import return_ascii, strict_unicode
+from indico.util.string import strict_unicode
 
 
 class ImageFile(StoredFileMixin, db.Model):
@@ -60,7 +60,6 @@ class ImageFile(StoredFileMixin, db.Model):
         path = posixpath.join(*(path_segments + [filename]))
         return config.ATTACHMENT_STORAGE, path
 
-    @return_ascii
     def __repr__(self):
         return '<ImageFile({}, {}, {}, {})>'.format(
             self.id,

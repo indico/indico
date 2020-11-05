@@ -13,7 +13,6 @@ from indico.core.db import db
 from indico.core.db.sqlalchemy import PyIntEnum, UTCDateTime
 from indico.util.date_time import now_utc
 from indico.util.i18n import _
-from indico.util.string import return_ascii
 from indico.util.struct.enum import IndicoEnum, RichIntEnum
 
 
@@ -140,7 +139,6 @@ class EventLogEntry(db.Model):
         renderer = self.renderer
         return renderer.render_entry(self) if renderer else None
 
-    @return_ascii
     def __repr__(self):
         realm = self.realm.name if self.realm is not None else None
         return '<EventLogEntry({}, {}, {}, {}, {}): {}>'.format(self.id, self.event_id, self.logged_dt, realm,

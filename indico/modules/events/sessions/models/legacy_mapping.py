@@ -8,7 +8,7 @@
 from __future__ import unicode_literals
 
 from indico.core.db import db
-from indico.util.string import format_repr, return_ascii
+from indico.util.string import format_repr
 
 
 class LegacySessionMapping(db.Model):
@@ -59,7 +59,6 @@ class LegacySessionMapping(db.Model):
         )
     )
 
-    @return_ascii
     def __repr__(self):
         return format_repr(self, 'event_id', 'legacy_session_id', 'session_id')
 
@@ -114,6 +113,5 @@ class LegacySessionBlockMapping(db.Model):
         )
     )
 
-    @return_ascii
     def __repr__(self):
         return format_repr(self, 'event_id', 'legacy_session_id', 'legacy_session_block_id', 'session_block_id')

@@ -15,7 +15,7 @@ from indico.core.db.sqlalchemy import PyIntEnum
 from indico.core.db.sqlalchemy.custom.utcdatetime import UTCDateTime
 from indico.core.logger import Logger
 from indico.util.date_time import now_utc
-from indico.util.string import format_repr, return_ascii
+from indico.util.string import format_repr
 from indico.util.struct.enum import IndicoEnum
 
 
@@ -202,7 +202,6 @@ class PaymentTransaction(db.Model):
     def is_manual(self):
         return self.provider == '_manual'
 
-    @return_ascii
     def __repr__(self):
         # in case of a new object we might not have the default status set
         status = TransactionStatus(self.status).name if self.status is not None else None
