@@ -74,7 +74,7 @@ class IndicoModelConverter(ModelConverter):
             if _is_column_property(prop):
                 del fields[prop.key]
 
-        for key, field in fields.items():
+        for key, field in list(fields.items()):
             new_key = _get_from_mro('marshmallow_aliases', key)
             if new_key:
                 del fields[key]

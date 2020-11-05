@@ -213,8 +213,8 @@ class OverrideMultipleItemsField(HiddenField):
                 # e.g. a field that was editable before
                 self.data[key] = {k: v for k, v in six.iteritems(values) if k in self.edit_fields}
         # Remove anything empty
-        for key, values in self.data.items():
-            for field, value in values.items():
+        for key, values in list(self.data.items()):
+            for field, value in list(values.items()):
                 if not value:
                     del values[field]
             if not self.data[key]:
