@@ -20,7 +20,8 @@ def make_hashable(obj):
         return tuple(obj)
     elif isinstance(obj, dict):
         return frozenset((k, make_hashable(v)) for k, v in six.iteritems(obj))
-    elif hasattr(obj, 'getId') and obj.getId.__self__ is not None:
+    elif hasattr(obj, 'getId') and getattr(obj.getId, '__self__', None) is not None:
+        # TODO: remove this once getId is gone everywhere
         # getId of AvatarUserWrapper would access a cached property, we can't have that here
         id_ = obj.getId() if obj.__class__.__name__ != 'AvatarUserWrapper' else obj.id
         return obj.__class__.__name__, id_

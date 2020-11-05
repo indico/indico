@@ -58,19 +58,12 @@ def test_memoize_request_legacy_class():
     def fn(a):
         calls.append(a)
 
-    class Old():
+    class Cls:
         def getId(self):
             return 1
 
-    class New(object):
-        def getId(self):
-            return 1
-
-    old_instance = Old()
-    new_instance = New()
+    instance = Cls()
     for i in range(2):
-        fn(Old)
-        fn(old_instance)
-        fn(New)
-        fn(new_instance)
-    assert calls == [Old, old_instance, New, new_instance]
+        fn(Cls)
+        fn(instance)
+    assert calls == [Cls, instance]
