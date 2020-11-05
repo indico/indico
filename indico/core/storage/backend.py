@@ -108,7 +108,7 @@ class Storage(object):
                 break
             target.write(chunk)
             checksum.update(chunk)
-        return checksum.hexdigest().decode('ascii')
+        return checksum.hexdigest()
 
     def open(self, file_id):  # pragma: no cover
         """Open a file in the storage for reading.
@@ -267,7 +267,7 @@ class FileSystemStorage(Storage):
 
     def send_file(self, file_id, content_type, filename, inline=True):
         try:
-            return send_file(filename, self._resolve_path(file_id).encode('utf-8'), content_type, inline=inline)
+            return send_file(filename, self._resolve_path(file_id), content_type, inline=inline)
         except Exception as e:
             raise StorageError('Could not send "{}": {}'.format(file_id, e)) from e
 

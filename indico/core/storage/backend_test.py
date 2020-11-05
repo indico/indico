@@ -126,7 +126,7 @@ def test_fs_send_file(fs_storage):
     response = fs_storage.send_file(f1, 'text/plain', 'filename.txt')
     assert 'text/plain' in response.headers['Content-type']
     assert 'filename.txt' in response.headers['Content-disposition']
-    assert ''.join(response.response) == 'hello world'
+    assert b''.join(response.response) == b'hello world'
 
 
 @pytest.mark.usefixtures('request_context')
