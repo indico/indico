@@ -272,7 +272,7 @@ class SetupWizard(object):
             sys.exit(1)
 
     def _check_venv(self):
-        if not hasattr(sys, 'real_prefix'):
+        if sys.prefix == sys.base_prefix:
             _warn('It looks like you are not using a virtualenv. This is unsupported and strongly discouraged.')
             _prompt_abort()
 
