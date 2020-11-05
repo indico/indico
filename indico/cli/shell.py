@@ -95,7 +95,8 @@ def _make_shell_context():
     add_to_context_smart(models)
     # Tasks
     info.append(cformat('*** %{magenta!}Tasks%{reset} ***'))
-    tasks = [task for task in sorted(celery.tasks.values()) if not task.name.startswith('celery.')]
+    tasks = [task for task in sorted(celery.tasks.values(), key=attrgetter('name'))
+             if not task.name.startswith('celery.')]
     add_to_context_smart(tasks, get_name=lambda x: x.name.replace('.', '_'), color='blue!')
     # Plugins
     info.append(cformat('*** %{magenta!}Plugins%{reset} ***'))
