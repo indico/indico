@@ -26,7 +26,7 @@ class ImportRoleMembersMixin(object):
     logger = None
 
     def import_members_from_csv(self, f):
-        reader = csv.reader(f.read().splitlines())
+        reader = csv.reader(f.read().decode().splitlines())
         emails = set()
 
         for num_row, row in enumerate(reader, 1):

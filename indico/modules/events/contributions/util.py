@@ -245,7 +245,7 @@ def get_contribution_ical_file(contrib):
 
 def import_contributions_from_csv(event, f):
     """Import timetable contributions from a CSV file into an event."""
-    reader = csv.reader(f.read().splitlines())
+    reader = csv.reader(f.read().decode().splitlines())
     contrib_data = []
 
     for num_row, row in enumerate(reader, 1):
