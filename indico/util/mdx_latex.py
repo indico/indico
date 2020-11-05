@@ -372,9 +372,8 @@ class LaTeXTreeProcessor(markdown.treeprocessors.Treeprocessor):
         if ournode.text:
             subcontent += escape_latex_entities(ournode.text)
 
-        if ournode.getchildren():
-            for child in ournode.getchildren():
-                subcontent += self.tolatex(child)
+        for child in ournode:
+            subcontent += self.tolatex(child)
 
         if ournode.tag == 'h1':
             buffer += '\n\n\\section{%s}\n' % subcontent
