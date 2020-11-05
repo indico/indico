@@ -8,7 +8,7 @@ certifi
 click==7.1.2
 colorclass==2.2.0
 contextlib2==0.6.0.post1
-email-validator==1.1.1
+email-validator==1.1.2
 feedgen==0.9.0
 Flask-BabelEx==0.9.4
 Flask-Caching==1.7.2
