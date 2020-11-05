@@ -33,7 +33,6 @@ def test_secure_client_filename(filename, expected):
     ('foo.txt', 'foo.txt'),
     ('../../../etc/passwd', 'etc_passwd'),
     ('m\xf6p.txt', 'moep.txt'),
-    ('m\xf6p.txt'.encode('utf-8'), 'moep.txt'),
     ('/m\xf6p.txt', 'moep.txt'),
     (r'spacy   \filename', 'spacy_filename'),
 ))
