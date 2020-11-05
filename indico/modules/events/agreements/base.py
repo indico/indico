@@ -44,7 +44,7 @@ class AgreementPersonInfo(object):
         if self.data:
             data_string = '-'.join('{}={}'.format(k, make_hashable(v)) for k, v in sorted(six.viewitems(self.data)))
         identifier = '{}:{}'.format(self.email, data_string or None)
-        return sha1(identifier).hexdigest()
+        return sha1(identifier.encode()).hexdigest()
 
 
 class AgreementDefinitionBase(object):
