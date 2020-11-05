@@ -91,7 +91,8 @@ class PyIntEnum(TypeDecorator, SchemaType):
 def _type_before_parent_attach(type_, col):
     @listens_for(col, 'after_parent_attach')
     def _col_after_parent_attach(col, table):
-        e = CheckConstraint(type_coerce(col, type_).in_(x.value for x in type_.enum if x not in type_.exclude_values),
+        int_col = type_coerce(col, SmallInteger)
+        e = CheckConstraint(int_col.in_(x.value for x in type_.enum if x not in type_.exclude_values),
                             'valid_enum_{}'.format(col.name))
         e.info['alembic_dont_render'] = True
         assert e.table is table
