@@ -18,16 +18,16 @@ def test_underline():
     assert underline('foobar', '=') == 'foobar\n======'
 
 
-def test_markdown():
+@pytest.mark.parametrize(('md', 'html'), (
     # basic markdown
-    assert markdown('**hi**') == u'<p><strong>hi</strong></p>'
+    ('**hi**', '<p><strong>hi</strong></p>'),
     # nl2br extension
-    assert markdown('hello\nworld') == u'<p>hello<br>\nworld</p>'
+    ('hello\nworld', '<p>hello<br>\nworld</p>'),
     # unicode
-    val = u'm\xf6p'
-    utfval = val.encode('utf-8')
-    assert markdown(utfval) == u'<p>{}</p>'.format(val)
-    assert markdown(val) == u'<p>{}</p>'.format(val)
+    ('m\xf6p', '<p>m\xf6p</p>'),
+))
+def test_markdown(md, html):
+    assert markdown(md) == html
 
 
 def test_dedent():
