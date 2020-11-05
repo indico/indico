@@ -444,6 +444,4 @@ class AccommodationField(RegistrationFormBillableItemsField):
                    'arrival': 'arrival_date',
                    'departure': 'departure_date'}
         rv = self.get_friendly_data(data).get(mapping[key], '')
-        if isinstance(rv, date):
-            rv = format_date(rv).decode('utf-8')
-        return rv
+        return format_date(rv) if isinstance(rv, date) else rv

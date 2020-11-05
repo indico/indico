@@ -94,7 +94,7 @@ def _prepare_excel_data(data, tz=None):
     elif is_lazy_string(data) or isinstance(data, Markup):
         data = six.text_type(data)
     elif isinstance(data, datetime):
-        data = format_datetime(data, timezone=tz).decode('utf-8')
+        data = format_datetime(data, timezone=tz)
     return data
 
 

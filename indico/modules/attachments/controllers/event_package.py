@@ -241,7 +241,7 @@ class AttachmentPackageMixin(AttachmentPackageGeneratorMixin):
 
     def _iter_event_days(self):
         for day in self.event.iter_days():
-            yield day.isoformat(), format_date(day, 'short').decode('utf-8')
+            yield day.isoformat(), format_date(day, 'short')
 
 
 class RHPackageEventAttachmentsStatus(RHDisplayEventBase):
