@@ -82,10 +82,11 @@ if __name__ == '__main__':
         packages=find_packages(include=('indico', 'indico.*',)),
         include_package_data=True,
         install_requires=get_requirements(),
+        python_requires='~=3.9',
         classifiers=[
             'Environment :: Web Environment',
             'License :: OSI Approved :: MIT License',
-            'Programming Language :: Python :: 2.7',
+            'Programming Language :: Python :: 3.9',
         ],
         entry_points={
             'console_scripts': {'indico = indico.cli.core:cli'},
