@@ -13,6 +13,7 @@ import shutil
 import socket
 import sys
 from operator import attrgetter
+from pathlib import Path
 from smtplib import SMTP
 
 import click
@@ -481,7 +482,8 @@ class SetupWizard(object):
     def _prompt_defaults(self):
         def _get_all_locales():
             # get all directories in indico/translations
-            return os.walk(os.path.join(get_root_path('indico'), 'translations')).next()[1]
+            root = Path(get_root_path('indico')) / 'translations'
+            return [ent.name for ent in root.iterdir() if ent.is_dir()]
 
         def _get_system_timezone():
             candidates = []
