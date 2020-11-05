@@ -193,7 +193,7 @@ def signed_url_for(user, blueprint, url_params=None, *args, **kwargs):
     # this is the URL which is to be signed
     url = '{}?{}'.format(base_url, qs) if qs else base_url
 
-    signer = Signer(user.signing_secret, salt='url-signing')
+    signer = Signer(user.signing_secret.encode(), salt='url-signing')
     qs = url_encode(dict(kwargs, token=signer.get_signature(url)))
     full_base_url = url_for(blueprint, *args, _external=_external, **(url_params or {}))
 
@@ -217,5 +217,5 @@ def is_signed_url_valid(user, url):
         url_encode(sorted(params.items()), sort=True),
         parsed.fragment
     ))
-    signer = Signer(user.signing_secret, salt='url-signing')
-    return signer.verify_signature(url, signature)
+    signer = Signer(user.signing_secret.encode(), salt='url-signing')
+    return signer.verify_signature(url.encode(), signature.encode())
