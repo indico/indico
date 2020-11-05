@@ -21,7 +21,6 @@ import inspect
 import logging
 import re
 import threading
-from types import NoneType
 
 import six
 import zope.interface
@@ -193,7 +192,7 @@ class Fossilizable(object):
             return target.fossilize(interface, useAttrCache, **kwargs)
         else:
             ttype = type(target)
-            if ttype in [int, str, float, bool, NoneType]:
+            if ttype in [int, str, float, bool, type(None)]:
                 return target
             elif ttype is dict:
                 container = {}
