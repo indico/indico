@@ -285,7 +285,6 @@ class SetupWizard(object):
                 # we want to go up a level since the data dir should not be
                 # created inside the source directory
                 default_root = os.path.dirname(default_root)
-            default_root = default_root.decode(sys.getfilesystemencoding())
         else:
             default_root = '/opt/indico'
         self.root_path = _prompt('Indico root path', default=default_root, path=True,
@@ -540,44 +539,44 @@ class SetupWizard(object):
             create_config_link = False
 
         config_data = [
-            b'# General settings',
-            b'SQLALCHEMY_DATABASE_URI = {!r}'.format(self.db_uri.encode('utf-8')),
-            b'SECRET_KEY = {!r}'.format(os.urandom(32)),
-            b'BASE_URL = {!r}'.format(self.indico_url.encode('utf-8')),
-            b'CELERY_BROKER = {!r}'.format(self.redis_uri_celery.encode('utf-8')),
-            b'REDIS_CACHE_URL = {!r}'.format(self.redis_uri_cache.encode('utf-8')),
-            b"CACHE_BACKEND = 'redis'",
-            b'DEFAULT_TIMEZONE = {!r}'.format(self.default_timezone.encode('utf-8')),
-            b'DEFAULT_LOCALE = {!r}'.format(self.default_locale.encode('utf-8')),
-            b'ENABLE_ROOMBOOKING = {!r}'.format(self.rb_active),
-            b'CACHE_DIR = {!r}'.format(os.path.join(self.data_root_path, 'cache').encode('utf-8')),
-            b'TEMP_DIR = {!r}'.format(os.path.join(self.data_root_path, 'tmp').encode('utf-8')),
-            b'LOG_DIR = {!r}'.format(os.path.join(self.data_root_path, 'log').encode('utf-8')),
-            b'STORAGE_BACKENDS = {!r}'.format({k.encode('utf-8'): v.encode('utf-8')
+            '# General settings',
+            'SQLALCHEMY_DATABASE_URI = {!r}'.format(self.db_uri),
+            'SECRET_KEY = {!r}'.format(os.urandom(32)),
+            'BASE_URL = {!r}'.format(self.indico_url),
+            'CELERY_BROKER = {!r}'.format(self.redis_uri_celery),
+            'REDIS_CACHE_URL = {!r}'.format(self.redis_uri_cache),
+            "CACHE_BACKEND = 'redis'",
+            'DEFAULT_TIMEZONE = {!r}'.format(self.default_timezone),
+            'DEFAULT_LOCALE = {!r}'.format(self.default_locale),
+            'ENABLE_ROOMBOOKING = {!r}'.format(self.rb_active),
+            'CACHE_DIR = {!r}'.format(os.path.join(self.data_root_path, 'cache')),
+            'TEMP_DIR = {!r}'.format(os.path.join(self.data_root_path, 'tmp')),
+            'LOG_DIR = {!r}'.format(os.path.join(self.data_root_path, 'log')),
+            'STORAGE_BACKENDS = {!r}'.format({k: v
                                               for k, v in six.iteritems(storage_backends)}),
-            b"ATTACHMENT_STORAGE = 'default'",
-            b'ROUTE_OLD_URLS = True' if self.old_archive_dir else None,
-            b'',
-            b'# Email settings',
-            b'SMTP_SERVER = {!r}'.format((self.smtp_host.encode('utf-8'), self.smtp_port)),
-            b'SMTP_USE_TLS = {!r}'.format(bool(self.smtp_user and self.smtp_password)),
-            b'SMTP_LOGIN = {!r}'.format(self.smtp_user.encode('utf-8')),
-            b'SMTP_PASSWORD = {!r}'.format(self.smtp_password.encode('utf-8')),
-            b'SUPPORT_EMAIL = {!r}'.format(self.admin_email.encode('utf-8')),
-            b'PUBLIC_SUPPORT_EMAIL = {!r}'.format(self.contact_email.encode('utf-8')),
-            b'NO_REPLY_EMAIL = {!r}'.format(self.noreply_email.encode('utf-8'))
+            "ATTACHMENT_STORAGE = 'default'",
+            'ROUTE_OLD_URLS = True' if self.old_archive_dir else None,
+            '',
+            '# Email settings',
+            'SMTP_SERVER = {!r}'.format((self.smtp_host, self.smtp_port)),
+            'SMTP_USE_TLS = {!r}'.format(bool(self.smtp_user and self.smtp_password)),
+            'SMTP_LOGIN = {!r}'.format(self.smtp_user),
+            'SMTP_PASSWORD = {!r}'.format(self.smtp_password),
+            'SUPPORT_EMAIL = {!r}'.format(self.admin_email),
+            'PUBLIC_SUPPORT_EMAIL = {!r}'.format(self.contact_email),
+            'NO_REPLY_EMAIL = {!r}'.format(self.noreply_email)
         ]
 
         if dev:
             config_data += [
-                b'',
-                b'# Development options',
-                b'DB_LOG = True',
-                b'DEBUG = True',
-                b'SMTP_USE_CELERY = False'
+                '',
+                '# Development options',
+                'DB_LOG = True',
+                'DEBUG = True',
+                'SMTP_USE_CELERY = False'
             ]
 
-        config = b'\n'.join(x for x in config_data if x is not None)
+        config = '\n'.join(x for x in config_data if x is not None)
 
         if dev:
             if not os.path.exists(self.data_root_path):
@@ -589,8 +588,8 @@ class SetupWizard(object):
             os.mkdir(path)
 
         _echo(cformat('%{magenta}Creating %{magenta!}{}%{reset}%{magenta}').format(self.config_path))
-        with open(self.config_path, 'wb') as f:
-            f.write(config + b'\n')
+        with open(self.config_path, 'w') as f:
+            f.write(config + '\n')
 
         package_root = get_root_path('indico')
         _copy(os.path.normpath(os.path.join(package_root, 'logging.yaml.sample')),
