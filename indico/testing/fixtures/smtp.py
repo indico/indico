@@ -18,6 +18,6 @@ def smtp(disallow_emails, smtpserver, app):
     old_config = app.config['INDICO']
     app.config['INDICO'] = dict(app.config['INDICO'])  # make it mutable
     app.config['INDICO']['SMTP_SERVER'] = smtpserver.addr
-    disallow_emails.add(smtpserver.addr)  # whitelist our smtp server
+    disallow_emails.add(smtpserver.addr[:2])  # whitelist our smtp server
     yield smtpserver
     app.config['INDICO'] = old_config
