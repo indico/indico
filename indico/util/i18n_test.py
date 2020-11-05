@@ -159,7 +159,6 @@ def test_translation_plugins(app, tmpdir):
 
     assert _(u'This is not a string') == french_core_str
     assert gettext_context(u"This is not a string") == french_core_str
-    assert isinstance(gettext_context(b"This is not a string"), six.text_type)
     assert isinstance(gettext_context(u"This is not a string"), six.text_type)
     assert gettext_plugin(u"This is not a string") == french_plugin_str
 

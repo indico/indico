@@ -147,7 +147,7 @@ class IndicoLocale(Locale):
 
     def weekday(self, daynum, short=True):
         """Return the week day given the index."""
-        return self.days['format']['abbreviated' if short else 'wide'][daynum].encode('utf-8')
+        return self.days['format']['abbreviated' if short else 'wide'][daynum]
 
     @cached_property
     def time_formats(self):
