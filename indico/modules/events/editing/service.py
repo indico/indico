@@ -50,7 +50,7 @@ def check_service_url(url):
         if resp.status_code != 200:
             raise requests.HTTPError('Unexpected status code: {}'.format(resp.status_code), response=resp)
         info = resp.json()
-    except requests.ConnectionError as exc:
+    except requests.ConnectionError:
         return {'info': None, 'error': _('Connection failed')}
     except requests.RequestException as exc:
         return {'info': None, 'error': six.text_type(ServiceRequestFailed(exc))}
@@ -129,7 +129,7 @@ def service_get_status(event):
         resp = requests.get(_build_url(event, '/event/{}'.format(_get_event_identifier(event))),
                             headers=_get_headers(event))
         resp.raise_for_status()
-    except requests.ConnectionError as exc:
+    except requests.ConnectionError:
         return {'status': None, 'error': _('Connection failed')}
     except requests.RequestException as exc:
         return {'status': None, 'error': six.text_type(ServiceRequestFailed(exc))}
