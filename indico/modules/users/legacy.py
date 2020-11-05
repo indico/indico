@@ -7,13 +7,14 @@
 
 import six
 from flask_multipass import IdentityInfo
+from zope.interface.declarations import implementer
 
 from indico.legacy.common.cache import GenericCache
 from indico.legacy.fossils.user import IAvatarFossil, IAvatarMinimalFossil
 from indico.modules.auth import Identity
 from indico.modules.users import User, logger
 from indico.util.caching import memoize_request
-from indico.util.fossilize import Fossilizable, fossilizes
+from indico.util.fossilize import Fossilizable
 from indico.util.locators import locator_property
 from indico.util.string import encode_utf8, return_ascii, to_unicode
 
@@ -26,10 +27,9 @@ AVATAR_FIELD_MAP = {
 }
 
 
+@implementer(IAvatarFossil, IAvatarMinimalFossil)
 class AvatarUserWrapper(Fossilizable):
     """Avatar-like wrapper class that holds a DB-stored user."""
-
-    fossilizes(IAvatarFossil, IAvatarMinimalFossil)
 
     def __init__(self, user_id):
         self.id = str(user_id)
@@ -250,10 +250,9 @@ class AvatarUserWrapper(Fossilizable):
             return u'<AvatarUserWrapper {}: {} ({})>'.format(self.id, self.user.full_name, self.user.email)
 
 
+@implementer(IAvatarFossil, IAvatarMinimalFossil)
 class AvatarProvisionalWrapper(Fossilizable):
     """Wrap provisional data for users that are not in the DB yet."""
-
-    fossilizes(IAvatarFossil, IAvatarMinimalFossil)
 
     def __init__(self, identity_info):
         self.identity_info = identity_info

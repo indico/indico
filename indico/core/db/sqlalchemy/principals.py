@@ -12,12 +12,13 @@ from sqlalchemy.dialects.postgresql import ARRAY
 from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.ext.hybrid import Comparator, hybrid_method, hybrid_property
 from sqlalchemy.orm import joinedload, noload
+from zope.interface.declarations import implementer
 
 from indico.core.db.sqlalchemy import PyIntEnum, db
 from indico.core.db.sqlalchemy.util.models import get_simple_column_attrs
 from indico.core.permissions import get_available_permissions
 from indico.util.decorators import classproperty, strict_classproperty
-from indico.util.fossilize import Fossilizable, IFossil, fossilizes
+from indico.util.fossilize import Fossilizable, IFossil
 from indico.util.string import format_repr, return_ascii
 from indico.util.struct.enum import IndicoEnum
 
@@ -83,6 +84,7 @@ class IEmailPrincipalFossil(IFossil):
     getName.produce = lambda x: x.name
 
 
+@implementer(IEmailPrincipalFossil)
 class EmailPrincipal(Fossilizable):
     """Wrapper for email principals.
 
@@ -97,7 +99,6 @@ class EmailPrincipal(Fossilizable):
     is_category_role = False
     is_registration_form = False
     principal_order = 0
-    fossilizes(IEmailPrincipalFossil)
 
     def __init__(self, email):
         self.email = email.lower()

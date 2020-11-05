@@ -7,16 +7,17 @@
 
 from __future__ import unicode_literals
 
+from zope.interface.declarations import implementer
+
 from indico.legacy.fossils.user import IGroupFossil
 from indico.modules.groups import GroupProxy
-from indico.util.fossilize import Fossilizable, fossilizes
+from indico.util.fossilize import Fossilizable
 from indico.util.string import encode_utf8, return_ascii, to_unicode
 
 
+@implementer(IGroupFossil)
 class GroupWrapper(Fossilizable):
     """Group-like wrapper class that holds a DB-stored (or remote) group."""
-
-    fossilizes(IGroupFossil)
 
     def __init__(self, group_id):
         self.id = to_unicode(group_id).encode('utf-8')

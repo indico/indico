@@ -7,14 +7,15 @@
 
 import time
 
+from zope.interface.declarations import implementer
+
 from indico.core.config import config
-from indico.util.fossilize import Fossilizable, fossilizes
+from indico.util.fossilize import Fossilizable
 from indico.web.http_api.fossils import IHTTPAPIErrorFossil, IHTTPAPIResultFossil
 
 
+@implementer(IHTTPAPIErrorFossil)
 class HTTPAPIError(Exception, Fossilizable):
-    fossilizes(IHTTPAPIErrorFossil)
-
     def __init__(self, message, code=None):
         self.message = message
         self.code = code
@@ -26,9 +27,8 @@ class HTTPAPIError(Exception, Fossilizable):
         return self.code
 
 
+@implementer(IHTTPAPIResultFossil)
 class HTTPAPIResult(Fossilizable):
-    fossilizes(IHTTPAPIResultFossil)
-
     def __init__(self, results, path='', query='', ts=None, complete=True, extra=None):
         if ts is None:
             ts = int(time.time())

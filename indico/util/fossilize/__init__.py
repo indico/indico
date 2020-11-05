@@ -29,25 +29,6 @@ from six.moves import filter
 
 _fossil_cache = threading.local()
 
-def fossilizes(*classList):
-    """Simple wrapper around 'implements'."""
-    zope.interface.declarations._implements("fossilizes",
-                                            classList,
-                                            zope.interface.classImplements)
-
-def addFossil(klazz, fossils):
-    """Declare fossils for a class.
-
-    :param klazz: a class object
-    :type klass: class object
-    :param fossils: a fossil class (or a list of fossil classes)
-    """
-    if not isinstance(fossils, list):
-        fossils = [fossils]
-
-    for fossil in fossils:
-        zope.interface.classImplements(klazz, fossil)
-
 
 def clearCache():
     """Shortcut for Fossilizable.clearCache()"""
