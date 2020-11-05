@@ -152,8 +152,10 @@ class EventExporter(object):
         self.users = {}
 
     def _add_file(self, name, size, data):
-        if isinstance(data, six.string_types):
+        if isinstance(data, bytes):
             data = BytesIO(data)
+        elif isinstance(data, str):
+            data = BytesIO(data.encode())
         info = tarfile.TarInfo(name)
         info.size = size
         self.archive.addfile(info, data)

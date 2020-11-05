@@ -42,7 +42,7 @@ def reproducible_uuids(monkeypatch):
 
 @pytest.fixture
 def static_indico_version(monkeypatch):
-    monkeypatch.setattr('indico.__version__', b'1.3.3.7')
+    monkeypatch.setattr('indico.__version__', '1.3.3.7')
 
 
 @pytest.mark.usefixtures('reproducible_uuids', 'static_indico_version')
@@ -67,7 +67,7 @@ def test_event_export(db, dummy_event, monkeypatch):
     # check composition of tarfile and data.yaml content
     with tarfile.open(fileobj=f) as tarf:
         assert tarf.getnames() == ['data.yaml']
-        assert tarf.extractfile('data.yaml').read() == data_yaml_content
+        assert tarf.extractfile('data.yaml').read().decode() == data_yaml_content
 
 
 @pytest.mark.usefixtures('reproducible_uuids')
@@ -109,7 +109,7 @@ def test_event_attachment_export(db, dummy_event, dummy_attachment):
         assert file_['md5'] == '5eb63bbbe01eeed093cb22bb8f5acdc3'
         # check that the file itself was included (and verify content)
         assert tarf.getnames() == ['00000000-0000-4000-8000-000000000013', 'data.yaml']
-        assert tarf.extractfile('00000000-0000-4000-8000-000000000013').read() == 'hello world'
+        assert tarf.extractfile('00000000-0000-4000-8000-000000000013').read() == b'hello world'
 
 
 @pytest.mark.usefixtures('static_indico_version')
@@ -148,4 +148,4 @@ def test_event_import(db, dummy_user):
     attachment = folder.attachments[0]
     assert attachment.title == 'dummy_attachment'
     # Check that the actual file is accessible
-    assert attachment.file.open().read() == 'hello world'
+    assert attachment.file.open().read() == b'hello world'
