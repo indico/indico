@@ -45,6 +45,8 @@ def _add_to_context(namespace, info, element, name=None, doc=None, color='green'
 
 
 def _add_to_context_multi(namespace, info, elements, names=None, doc=None, color='green'):
+    if not elements:
+        return
     if not names:
         names = [x.__name__ for x in elements]
     for name, element in zip(names, elements):
@@ -99,10 +101,11 @@ def _make_shell_context():
              if not task.name.startswith('celery.')]
     add_to_context_smart(tasks, get_name=lambda x: x.name.replace('.', '_'), color='blue!')
     # Plugins
-    info.append(cformat('*** %{magenta!}Plugins%{reset} ***'))
     plugins = [type(plugin) for plugin in sorted(list(plugin_engine.get_active_plugins().values()),
                                                  key=attrgetter('name'))]
-    add_to_context_multi(plugins, color='yellow!')
+    if plugins:
+        info.append(cformat('*** %{magenta!}Plugins%{reset} ***'))
+        add_to_context_multi(plugins, color='yellow!')
     # Utils
     info.append(cformat('*** %{magenta!}Misc%{reset} ***'))
     add_to_context(celery, 'celery', doc='celery app', color='blue!')
