@@ -19,9 +19,9 @@ from indico.util.marshmallow import NaiveDateTime
 def test_NaiveDateTime_serialize():
     now = datetime.now()
     utc_now = pytz.utc.localize(datetime.utcnow())
-    obj = type('Test', (object,), {
-        b'naive': now,
-        b'aware': utc_now,
+    obj = type('Test', (), {
+        'naive': now,
+        'aware': utc_now,
     })
     field = NaiveDateTime()
     assert field.serialize('naive', obj) == now.isoformat()
