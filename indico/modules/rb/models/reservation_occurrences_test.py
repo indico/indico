@@ -99,7 +99,6 @@ def test_iter_create_occurrences(creation_params):
 
 def test_iter_start_time_invalid():
     invalid_frequency = -1
-    assert invalid_frequency not in RepeatFrequency
     with pytest.raises(IndicoError):
         ReservationOccurrence.iter_start_time(start=date.today(), end=date.today(), repetition=(invalid_frequency, 0))
 
