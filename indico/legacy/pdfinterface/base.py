@@ -11,6 +11,7 @@ import cgi
 import math
 import os
 import xml.sax.saxutils as saxutils
+from io import BytesIO
 
 import pkg_resources
 from PIL import Image as PILImage
@@ -570,11 +571,10 @@ class DocTemplateWithTOC(SimpleDocTemplate):
         self.mergePDFs(self.filename, contentFile)
 
     def mergePDFs(self, pdf1, pdf2):
-        import cStringIO
         from pyPdf import PdfFileReader, PdfFileWriter
-        outputStream = cStringIO.StringIO()
-        pdf1Stream = cStringIO.StringIO()
-        pdf2Stream = cStringIO.StringIO()
+        outputStream = BytesIO()
+        pdf1Stream = BytesIO()
+        pdf2Stream = BytesIO()
         pdf1Stream.write(pdf1.getData())
         pdf2Stream.write(pdf2.getData())
         output = PdfFileWriter()
