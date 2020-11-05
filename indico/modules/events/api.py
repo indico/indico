@@ -12,7 +12,9 @@ from hashlib import md5
 from operator import attrgetter
 
 import pytz
+import six
 from flask import request
+from six.moves import map
 from sqlalchemy import Date, cast
 from sqlalchemy.orm import joinedload, subqueryload, undefer
 from werkzeug.exceptions import ServiceUnavailable
@@ -43,8 +45,6 @@ from indico.web.http_api.fossils import IPeriodFossil
 from indico.web.http_api.hooks.base import HTTPAPIHook, IteratedDataFetcher
 from indico.web.http_api.responses import HTTPAPIError
 from indico.web.http_api.util import get_query_parameter
-from six.moves import map
-import six
 
 
 utc = pytz.timezone('UTC')

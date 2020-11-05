@@ -11,6 +11,7 @@ from datetime import time as dt_time
 from datetime import timedelta
 
 import pytz
+import six
 from babel.dates import format_date as _format_date
 from babel.dates import format_datetime as _format_datetime
 from babel.dates import format_time as _format_time
@@ -24,7 +25,6 @@ from flask import has_request_context, session
 from indico.core.config import config
 from indico.util.i18n import _, get_current_locale, ngettext, parse_locale
 from indico.util.string import inject_unicode_debug
-import six
 
 
 class relativedelta(_relativedelta):

@@ -11,6 +11,7 @@ import errno
 import json
 import os
 
+import six
 from flask import g, session
 from flask_babelex import Domain
 from flask_pluginengine import (Plugin, PluginBlueprintMixin, PluginBlueprintSetupStateMixin, PluginEngine,
@@ -34,7 +35,6 @@ from indico.web.flask.util import url_for, url_rule_to_js
 from indico.web.flask.wrappers import IndicoBlueprint, IndicoBlueprintSetupState
 from indico.web.menu import SideMenuItem
 from indico.web.views import WPJinjaMixin
-import six
 
 
 class PluginCategory(six.text_type, IndicoEnum):

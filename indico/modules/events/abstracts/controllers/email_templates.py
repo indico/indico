@@ -7,6 +7,7 @@
 
 from __future__ import unicode_literals
 
+import six
 from flask import request
 from werkzeug.exceptions import BadRequest
 
@@ -20,7 +21,6 @@ from indico.modules.events.abstracts.notifications import get_abstract_notificat
 from indico.modules.events.abstracts.util import build_default_email_template, create_mock_abstract
 from indico.web.flask.templating import get_template_module
 from indico.web.util import jsonify_data, jsonify_template
-import six
 
 
 class RHEmailTemplateList(RHManageAbstractsBase):

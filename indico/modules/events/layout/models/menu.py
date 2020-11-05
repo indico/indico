@@ -7,6 +7,7 @@
 
 from __future__ import unicode_literals
 
+import six
 from flask import g, session
 from sqlalchemy.orm import joinedload
 from werkzeug.utils import cached_property
@@ -17,7 +18,6 @@ from indico.util.i18n import _
 from indico.util.string import format_repr, return_ascii, slugify, text_to_repr
 from indico.util.struct.enum import RichIntEnum
 from indico.web.flask.util import url_for
-import six
 
 
 def _get_next_position(context):
@@ -71,7 +71,7 @@ class MenuEntryMixin(object):
                 return data.static_site
             kwargs = dict(data.url_kwargs)
             if self.name == 'timetable':
-                from indico.modules.events. layout import layout_settings
+                from indico.modules.events.layout import layout_settings
                 if layout_settings.get(self.event_ref, 'timetable_by_room'):
                     kwargs['layout'] = 'room'
                 if layout_settings.get(self.event_ref, 'timetable_detailed'):

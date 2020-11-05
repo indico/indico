@@ -25,15 +25,15 @@ from uuid import uuid4
 import bleach
 import email_validator
 import markdown
+import six
 import translitcodec  # noqa: F401 (this is NOT unused. it needs to be imported to register the codec)
 from html2text import HTML2Text
 from jinja2.filters import do_striptags
 from lxml import etree, html
 from markupsafe import Markup, escape
+from six.moves import range
 from speaklater import _LazyString, is_lazy_string
 from sqlalchemy import ForeignKeyConstraint, inspect
-import six
-from six.moves import range
 
 
 # basic list of tags, used for markdown content

@@ -14,10 +14,10 @@ import re
 import time
 from datetime import datetime
 
+import six
 from werkzeug.utils import secure_filename as _secure_filename
 
 from indico.util.string import to_unicode, unicode_to_ascii
-import six
 
 
 _control_char_re = re.compile(r'[\x00-\x1f]+')

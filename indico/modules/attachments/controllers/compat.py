@@ -7,6 +7,7 @@
 
 from __future__ import unicode_literals
 
+import six
 from flask import current_app, redirect, request
 from werkzeug.exceptions import NotFound
 
@@ -16,7 +17,6 @@ from indico.modules.events import LegacyEventMapping
 from indico.util.string import is_legacy_id
 from indico.web.flask.util import url_for
 from indico.web.rh import RH, RHSimple
-import six
 
 
 def _clean_args(kwargs):

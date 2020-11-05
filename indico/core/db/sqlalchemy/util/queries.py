@@ -9,10 +9,10 @@ from __future__ import unicode_literals
 
 import re
 
-from sqlalchemy import func, inspect, over
-from sqlalchemy.sql import update
 import six
 from six.moves import filter
+from sqlalchemy import func, inspect, over
+from sqlalchemy.sql import update
 
 
 TS_REGEX = re.compile(r'([@<>!()&|:\'\\])')

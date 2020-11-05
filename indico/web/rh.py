@@ -15,6 +15,7 @@ import time
 from functools import partial, wraps
 
 import jsonschema
+import six
 from flask import current_app, g, redirect, request, session
 from sqlalchemy.exc import DatabaseError
 from sqlalchemy.orm.exc import NoResultFound
@@ -34,7 +35,6 @@ from indico.util.locators import get_locator
 from indico.util.signals import values_from_signal
 from indico.web.flask.util import url_for
 from indico.web.util import is_signed_url_valid
-import six
 
 
 HTTP_VERBS = {'GET', 'PATCH', 'POST', 'PUT', 'DELETE'}

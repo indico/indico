@@ -8,6 +8,7 @@
 from __future__ import unicode_literals
 
 from flask import jsonify, request, session
+from six.moves import filter
 from werkzeug.exceptions import BadRequest
 
 from indico.core.db import db
@@ -17,7 +18,6 @@ from indico.modules.events.registration.models.form_fields import RegistrationFo
 from indico.modules.events.registration.models.items import RegistrationFormItemType, RegistrationFormText
 from indico.modules.events.registration.util import update_regform_item_positions
 from indico.util.string import snakify_keys
-from six.moves import filter
 
 
 def _fill_form_field_with_data(field, field_data, set_data=True):

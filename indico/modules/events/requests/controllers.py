@@ -7,6 +7,7 @@
 
 from __future__ import unicode_literals
 
+import six
 from flask import flash, redirect, request, session
 from werkzeug.exceptions import BadRequest, Forbidden, NotFound
 
@@ -19,7 +20,6 @@ from indico.modules.events.requests.util import is_request_manager
 from indico.modules.events.requests.views import WPRequestsEventManagement
 from indico.util.i18n import _
 from indico.web.flask.util import url_for
-import six
 
 
 class EventOrRequestManagerMixin:

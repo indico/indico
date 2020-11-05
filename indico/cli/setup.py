@@ -16,6 +16,7 @@ from operator import attrgetter
 from smtplib import SMTP
 
 import click
+import six
 from click import wrap_text
 from flask.helpers import get_root_path
 from pkg_resources import iter_entry_points
@@ -33,7 +34,6 @@ from werkzeug.urls import url_parse
 from indico.core.db.sqlalchemy.util.models import import_all_models
 from indico.util.console import cformat
 from indico.util.string import validate_email
-import six
 
 
 click.disable_unicode_literals_warning = True

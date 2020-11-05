@@ -13,6 +13,7 @@ from collections import OrderedDict
 from decimal import Decimal
 from uuid import uuid4
 
+import six
 from babel.numbers import format_currency
 from flask import has_request_context, request, session
 from sqlalchemy.dialects.postgresql import JSONB, UUID
@@ -36,7 +37,6 @@ from indico.util.locators import locator_property
 from indico.util.signals import values_from_signal
 from indico.util.string import format_full_name, format_repr, return_ascii, strict_unicode
 from indico.util.struct.enum import RichIntEnum
-import six
 
 
 class RegistrationState(RichIntEnum):

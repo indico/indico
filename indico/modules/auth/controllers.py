@@ -7,9 +7,11 @@
 
 from __future__ import unicode_literals
 
+import six
 from flask import flash, jsonify, redirect, render_template, request, session
 from itsdangerous import BadData, BadSignature
 from markupsafe import Markup
+from six.moves import zip
 from webargs import fields
 from werkzeug.exceptions import BadRequest, Forbidden, NotFound
 
@@ -36,8 +38,6 @@ from indico.web.flask.util import url_for
 from indico.web.forms.base import FormDefaults, IndicoForm
 from indico.web.rh import RH
 from indico.web.util import url_for_index
-import six
-from six.moves import zip
 
 
 def _get_provider(name, external):

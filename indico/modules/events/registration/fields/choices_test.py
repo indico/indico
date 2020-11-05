@@ -10,11 +10,11 @@ from __future__ import unicode_literals
 from copy import deepcopy
 
 import pytest
+import six
 
 from indico.modules.events.registration.fields.choices import _hashable_choice
 from indico.modules.events.registration.models.form_fields import RegistrationFormField
 from indico.modules.events.registration.models.registrations import RegistrationData
-import six
 
 
 def _id(n):

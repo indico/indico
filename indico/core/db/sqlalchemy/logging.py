@@ -12,6 +12,7 @@ import pprint
 import time
 import traceback
 
+import six
 from flask import appcontext_tearing_down, current_app, g, has_request_context, request, request_tearing_down
 from sqlalchemy.engine import Engine
 from sqlalchemy.event import listens_for
@@ -20,7 +21,6 @@ from indico.core.config import config
 from indico.core.db import db
 from indico.core.plugins import plugin_engine
 from indico.web.flask.stats import get_request_stats
-import six
 
 
 def _prettify_sql(statement):

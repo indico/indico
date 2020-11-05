@@ -17,13 +17,13 @@ from email.mime.text import MIMEText
 from email.utils import formatdate
 from pprint import pformat
 
+import six
 import yaml
 from flask import current_app, has_request_context, request, session
 
 from indico.core.config import config
 from indico.util.i18n import set_best_lang
 from indico.web.util import get_request_info
-import six
 
 
 try:

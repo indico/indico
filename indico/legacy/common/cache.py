@@ -5,24 +5,22 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-import six.moves.cPickle as pickle
 import datetime
 import hashlib
 import os
 import time
-from six.moves import map
-
 
 import redis
+import six
+import six.moves.cPickle as pickle
 from flask import g
+from six.moves import map, zip
 
 from indico.core.config import config
 from indico.core.logger import Logger
 from indico.legacy.common.utils import OSSpecific
 from indico.util.fs import silentremove
 from indico.util.string import truncate
-import six
-from six.moves import zip
 
 
 # To cache `None` we need to actually store something else since memcached

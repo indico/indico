@@ -7,10 +7,11 @@
 
 from __future__ import unicode_literals
 
+import six
+
 from indico.core.db import db
 from indico.modules.events.contributions.models.fields import ContributionFieldValueBase
 from indico.util.string import format_repr, return_ascii, text_to_repr
-import six
 
 
 class AbstractFieldValue(ContributionFieldValueBase):

@@ -9,6 +9,7 @@ from __future__ import unicode_literals
 
 from collections import OrderedDict
 
+import six
 from flask import request
 from sqlalchemy.orm import joinedload
 
@@ -19,7 +20,6 @@ from indico.modules.events.registration.models.registrations import Registration
 from indico.modules.events.util import ListGeneratorBase
 from indico.util.i18n import _
 from indico.web.flask.templating import get_template_module
-import six
 
 
 class RegistrationListGenerator(ListGeneratorBase):

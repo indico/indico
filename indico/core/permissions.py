@@ -7,11 +7,12 @@
 
 from __future__ import unicode_literals
 
+import six
+
 from indico.core import signals
 from indico.util.caching import memoize_request
 from indico.util.i18n import _
 from indico.util.signals import named_objects_from_signal
-import six
 
 
 FULL_ACCESS_PERMISSION = '_full_access'
@@ -70,12 +71,12 @@ def get_permissions_info(_type):
     :param _type: The type of the permissions retrieved (e.g. Event, Category)
     :return: A tuple containing a dict with the available permissions and a dict with the permissions tree
     """
-    from indico.modules.events import Event
     from indico.modules.categories import Category
+    from indico.modules.events import Event
     from indico.modules.events.contributions import Contribution
     from indico.modules.events.sessions import Session
-    from indico.modules.rb.models.rooms import Room
     from indico.modules.events.tracks import Track
+    from indico.modules.rb.models.rooms import Room
 
     description_mapping = {
         FULL_ACCESS_PERMISSION: {
@@ -179,9 +180,9 @@ def get_split_permissions(permissions):
 
 def update_permissions(obj, form):
     """Update the permissions of an object, based on the corresponding WTForm."""
-    from indico.util.user import principal_from_fossil
     from indico.modules.categories import Category
     from indico.modules.events import Event
+    from indico.util.user import principal_from_fossil
 
     event = category = None
     if isinstance(obj, Category):

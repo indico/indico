@@ -8,8 +8,8 @@
 from functools import wraps
 from inspect import getcallargs
 
-from flask import current_app, g, has_request_context
 import six
+from flask import current_app, g, has_request_context
 
 
 _notset = object()

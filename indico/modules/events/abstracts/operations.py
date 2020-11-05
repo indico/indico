@@ -12,7 +12,9 @@ from collections import defaultdict
 from operator import attrgetter
 from uuid import uuid4
 
+import six
 from flask import session
+from six.moves import map
 
 from indico.core import signals
 from indico.core.db import db
@@ -31,8 +33,6 @@ from indico.modules.events.util import set_custom_fields
 from indico.util.date_time import now_utc
 from indico.util.fs import secure_client_filename
 from indico.util.i18n import orig_string
-import six
-from six.moves import map
 
 
 def _update_tracks(abstract, tracks, only_reviewed_for=False):

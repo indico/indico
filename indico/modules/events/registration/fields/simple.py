@@ -12,6 +12,7 @@ from collections import OrderedDict
 from datetime import datetime
 from operator import itemgetter
 
+import six
 import wtforms
 from werkzeug.datastructures import FileStorage
 from wtforms.validators import InputRequired, NumberRange, ValidationError
@@ -24,7 +25,6 @@ from indico.util.i18n import L_, _
 from indico.util.string import normalize_phone_number
 from indico.web.forms.fields import IndicoRadioField
 from indico.web.forms.validators import IndicoEmail
-import six
 
 
 class TextField(RegistrationFormFieldBase):

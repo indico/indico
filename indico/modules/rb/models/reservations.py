@@ -10,6 +10,7 @@ from __future__ import unicode_literals
 from collections import OrderedDict, defaultdict
 from datetime import datetime
 
+import six
 from sqlalchemy import Date, Time
 from sqlalchemy.event import listens_for
 from sqlalchemy.ext.declarative import declared_attr
@@ -38,7 +39,6 @@ from indico.util.serializer import Serializer
 from indico.util.string import format_repr, return_ascii, to_unicode
 from indico.util.struct.enum import IndicoEnum
 from indico.web.flask.util import url_for
-import six
 
 
 class ConflictingOccurrences(Exception):

@@ -7,6 +7,7 @@
 
 
 from types import GeneratorType
+
 import six
 from six.moves import zip_longest
 

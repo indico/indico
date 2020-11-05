@@ -9,7 +9,9 @@ from __future__ import unicode_literals
 
 from operator import attrgetter
 
+import six
 from flask import request, session
+from six.moves import map
 from sqlalchemy.orm import joinedload
 from wtforms.ext.sqlalchemy.fields import QuerySelectField
 
@@ -31,8 +33,6 @@ from indico.util.i18n import _
 from indico.web.flask.util import url_for
 from indico.web.forms.fields import JSONField
 from indico.web.forms.widgets import JinjaWidget, SelectizeWidget
-import six
-from six.moves import map
 
 
 def _serialize_user(user):

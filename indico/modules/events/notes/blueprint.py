@@ -7,10 +7,11 @@
 
 from __future__ import unicode_literals
 
+import six
+
 from indico.modules.events import event_object_url_prefixes
 from indico.modules.events.notes.controllers import RHCompileNotes, RHDeleteNote, RHEditNote, RHViewNote
 from indico.web.flask.wrappers import IndicoBlueprint
-import six
 
 
 _bp = IndicoBlueprint('event_notes', __name__, template_folder='templates', virtual_template_folder='events/notes',

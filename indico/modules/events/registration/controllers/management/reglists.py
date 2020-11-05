@@ -11,6 +11,7 @@ import os
 import uuid
 from io import BytesIO
 
+import six
 from flask import flash, jsonify, redirect, render_template, request, session
 from sqlalchemy.orm import joinedload, subqueryload
 from werkzeug.exceptions import BadRequest, Forbidden, NotFound
@@ -54,7 +55,6 @@ from indico.util.spreadsheets import send_csv, send_xlsx
 from indico.web.flask.templating import get_template_module
 from indico.web.flask.util import send_file, url_for
 from indico.web.util import jsonify_data, jsonify_template
-import six
 
 
 badge_cache = GenericCache('badge-printing')

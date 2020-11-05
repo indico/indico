@@ -19,6 +19,7 @@ from uuid import uuid4
 
 import click
 import dateutil.parser
+import six
 import yaml
 from flask import current_app
 from sqlalchemy import inspect
@@ -42,7 +43,6 @@ from indico.modules.users.util import get_user_by_email
 from indico.util.console import cformat
 from indico.util.date_time import now_utc
 from indico.util.string import strict_unicode
-import six
 
 
 _notset = object()

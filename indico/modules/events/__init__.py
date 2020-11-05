@@ -7,6 +7,7 @@
 
 from __future__ import unicode_literals
 
+import six
 from flask import flash, redirect, render_template, request, session
 from werkzeug.exceptions import BadRequest, NotFound
 
@@ -23,7 +24,6 @@ from indico.util.string import is_legacy_id
 from indico.web.flask.templating import template_hook
 from indico.web.flask.util import url_for
 from indico.web.menu import SideMenuItem, TopMenuItem, TopMenuSection
-import six
 
 
 __all__ = ('Event', 'logger', 'event_management_object_url_prefixes', 'event_object_url_prefixes')

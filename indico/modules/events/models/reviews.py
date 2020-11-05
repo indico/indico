@@ -7,12 +7,12 @@
 
 from __future__ import unicode_literals
 
+import six
 from sqlalchemy.ext.hybrid import hybrid_property
 
 from indico.util.caching import memoize_request
 from indico.util.locators import locator_property
 from indico.web.flask.util import url_for
-import six
 
 
 class ProposalGroupProxy(object):

@@ -9,7 +9,9 @@ from __future__ import unicode_literals
 
 import json
 
+import six
 from flask import flash, jsonify, request, session
+from six.moves import map
 from sqlalchemy.orm import joinedload
 from sqlalchemy.orm.exc import NoResultFound
 from werkzeug.datastructures import MultiDict
@@ -30,8 +32,6 @@ from indico.util.i18n import _
 from indico.web.flask.templating import get_template_module
 from indico.web.forms.base import FormDefaults
 from indico.web.util import jsonify_data, jsonify_form, jsonify_template
-import six
-from six.moves import map
 
 
 class RHManageSurveyQuestionnaire(RHManageSurveyBase):

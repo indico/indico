@@ -9,7 +9,9 @@ from datetime import datetime
 
 import icalendar
 import pytz
+import six
 from babel.dates import get_timezone
+from six.moves import map
 from sqlalchemy import Date, Time, or_
 from sqlalchemy.sql import cast
 from werkzeug.datastructures import MultiDict, OrderedMultiDict
@@ -28,8 +30,6 @@ from indico.web.http_api import HTTPAPIHook
 from indico.web.http_api.metadata import ical
 from indico.web.http_api.responses import HTTPAPIError
 from indico.web.http_api.util import get_query_parameter
-import six
-from six.moves import map
 
 
 class RoomBookingHookBase(HTTPAPIHook):

@@ -7,6 +7,7 @@
 
 from __future__ import unicode_literals
 
+import six
 from markupsafe import escape
 from marshmallow import post_dump
 from marshmallow.fields import Boolean, Decimal, Field, Function, Integer, List, Method, Nested, String
@@ -28,7 +29,6 @@ from indico.modules.users.schemas import UserSchema
 from indico.util.i18n import orig_string
 from indico.util.mimetypes import icon_from_mimetype
 from indico.web.flask.util import url_for
-import six
 
 
 class CallForPapersSchema(mm.Schema):

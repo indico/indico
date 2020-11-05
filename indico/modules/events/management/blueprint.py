@@ -7,11 +7,12 @@
 
 from __future__ import unicode_literals
 
+import six
+
 from indico.modules.events import event_management_object_url_prefixes
 from indico.modules.events.management.controllers import actions, cloning, posters, program_codes, protection, settings
 from indico.web.flask.util import make_compat_redirect_func
 from indico.web.flask.wrappers import IndicoBlueprint
-import six
 
 
 _bp = IndicoBlueprint('event_management', __name__, template_folder='templates',

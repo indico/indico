@@ -9,6 +9,7 @@ from __future__ import unicode_literals
 
 from datetime import datetime, timedelta
 
+import six
 from flask import session
 from pytz import utc
 from werkzeug.exceptions import BadRequest
@@ -24,7 +25,6 @@ from indico.util.date_time import format_date, format_human_timedelta
 from indico.util.i18n import _
 from indico.util.struct.enum import RichEnum
 from indico.util.struct.iterables import materialize_iterable, window
-import six
 
 
 class RescheduleMode(six.text_type, RichEnum):

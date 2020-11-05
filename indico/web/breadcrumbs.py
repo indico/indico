@@ -7,12 +7,12 @@
 
 from __future__ import absolute_import, unicode_literals
 
+import six
 from flask import render_template
 
 from indico.util.i18n import _
 from indico.web.flask.util import url_for
 from indico.web.util import url_for_index
-import six
 
 
 def render_breadcrumbs(*titles, **kwargs):

@@ -10,6 +10,7 @@ from __future__ import unicode_literals
 from collections import defaultdict
 from operator import attrgetter
 
+import six
 from flask import render_template, session
 from pytz import utc
 from sqlalchemy import Date, cast
@@ -30,7 +31,6 @@ from indico.util.i18n import _
 from indico.util.string import to_unicode
 from indico.web.flask.templating import get_template_module
 from indico.web.forms.colors import get_colors
-import six
 
 
 def _query_events(categ_ids, day_start, day_end):
@@ -308,7 +308,7 @@ def shift_following_entries(entry, shift, session_=None):
 
 
 def get_timetable_offline_pdf_generator(event):
-    from indico.legacy.pdfinterface.conference import TimeTablePlain, TimetablePDFFormat
+    from indico.legacy.pdfinterface.conference import TimetablePDFFormat, TimeTablePlain
     pdf_format = TimetablePDFFormat()
     return TimeTablePlain(event, session.user, sortingCrit=None, ttPDFFormat=pdf_format, pagesize='A4',
                           fontsize='normal')

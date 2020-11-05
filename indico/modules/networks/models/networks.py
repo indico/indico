@@ -9,6 +9,7 @@ from __future__ import unicode_literals
 
 from ipaddress import ip_address
 
+import six
 from flask import has_request_context, request, session
 from sqlalchemy.ext.associationproxy import association_proxy
 from sqlalchemy.ext.declarative import declared_attr
@@ -17,7 +18,6 @@ from indico.core.db import db
 from indico.core.db.sqlalchemy import PyIPNetwork
 from indico.core.db.sqlalchemy.principals import PrincipalType
 from indico.util.string import format_repr, return_ascii
-import six
 
 
 class IPNetworkGroup(db.Model):

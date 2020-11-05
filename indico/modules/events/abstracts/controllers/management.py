@@ -10,6 +10,7 @@ from __future__ import unicode_literals
 from operator import itemgetter
 
 from flask import flash, redirect, request, session
+from six.moves import map
 from sqlalchemy.orm import subqueryload
 from werkzeug.exceptions import NotFound
 
@@ -39,7 +40,6 @@ from indico.util.user import principal_from_identifier
 from indico.web.flask.util import url_for
 from indico.web.forms.base import FormDefaults
 from indico.web.util import jsonify_data, jsonify_form, jsonify_template
-from six.moves import map
 
 
 class RHAbstractsDashboard(RHManageAbstractsBase):

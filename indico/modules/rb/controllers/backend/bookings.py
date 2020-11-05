@@ -11,6 +11,7 @@ import uuid
 from datetime import date, datetime, time
 
 import dateutil
+import six
 from flask import jsonify, request, session
 from marshmallow import fields, validate
 from marshmallow_enum import EnumField
@@ -44,7 +45,6 @@ from indico.util.spreadsheets import send_csv, send_xlsx
 from indico.web.args import use_args, use_kwargs
 from indico.web.flask.util import url_for
 from indico.web.util import ExpectedError
-import six
 
 
 NUM_SUGGESTIONS = 5

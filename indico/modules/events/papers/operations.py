@@ -10,6 +10,7 @@ from __future__ import unicode_literals
 import mimetypes
 from operator import attrgetter
 
+import six
 from flask import session
 
 from indico.core.db import db
@@ -36,7 +37,6 @@ from indico.modules.users import User
 from indico.util.date_time import now_utc
 from indico.util.fs import secure_client_filename
 from indico.util.i18n import orig_string
-import six
 
 
 def set_reviewing_state(event, reviewing_type, enable):

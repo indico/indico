@@ -10,12 +10,12 @@ from __future__ import unicode_literals
 from collections import defaultdict
 
 from flask import g
+from six.moves import map
 from sqlalchemy.orm import joinedload
 
 from indico.modules.attachments.models.attachments import AttachmentType
 from indico.modules.attachments.models.folders import AttachmentFolder
 from indico.modules.attachments.util import get_attached_folders, get_event
-from six.moves import map
 
 
 def build_material_legacy_api_data(linked_object):

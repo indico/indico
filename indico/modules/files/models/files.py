@@ -10,6 +10,8 @@ from __future__ import unicode_literals
 import posixpath
 from uuid import uuid4
 
+import six
+from six.moves import map
 from sqlalchemy.dialects.postgresql import JSONB, UUID
 
 from indico.core.config import config
@@ -19,8 +21,6 @@ from indico.util.fs import secure_filename
 from indico.util.signing import secure_serializer
 from indico.util.string import format_repr, return_ascii, strict_unicode
 from indico.web.flask.util import url_for
-from six.moves import map
-import six
 
 
 class File(StoredFileMixin, db.Model):

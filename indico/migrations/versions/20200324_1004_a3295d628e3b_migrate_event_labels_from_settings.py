@@ -9,8 +9,8 @@ import json
 from collections import defaultdict
 from uuid import uuid4
 
-from alembic import context, op
 import six
+from alembic import context, op
 
 
 # revision identifiers, used by Alembic.

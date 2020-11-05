@@ -9,7 +9,9 @@ from __future__ import unicode_literals
 
 from operator import itemgetter
 
+import six
 from pytz import common_timezones, common_timezones_set
+from six.moves import zip
 from wtforms.fields.core import BooleanField, SelectField, StringField
 from wtforms.fields.html5 import EmailField
 from wtforms.fields.simple import TextAreaField
@@ -26,8 +28,6 @@ from indico.web.forms.fields import IndicoEnumSelectField, PrincipalField, Princ
 from indico.web.forms.util import inject_validators
 from indico.web.forms.validators import HiddenUnless, used_if_not_synced
 from indico.web.forms.widgets import SwitchWidget, SyncedInputWidget
-import six
-from six.moves import zip
 
 
 class UserDetailsForm(SyncedInputsMixin, IndicoForm):

@@ -10,6 +10,7 @@ from __future__ import unicode_literals
 import os
 from operator import attrgetter
 
+import six
 from flask import redirect
 from werkzeug.exceptions import NotFound
 
@@ -22,7 +23,6 @@ from indico.util.fs import secure_filename
 from indico.util.spreadsheets import send_csv, send_xlsx
 from indico.web.flask.util import send_file
 from indico.web.util import jsonify_data, jsonify_template
-import six
 
 
 class DisplayAbstractListMixin:

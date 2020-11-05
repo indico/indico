@@ -147,8 +147,8 @@ def _extend_editing_menu(sender, event, **kwargs):
 @signals.event.sidemenu.connect
 def _extend_event_menu(sender, **kwargs):
     from indico.modules.events.abstracts.util import has_user_tracks
-    from indico.modules.events.layout.util import MenuEntryData
     from indico.modules.events.contributions import contribution_settings
+    from indico.modules.events.layout.util import MenuEntryData
 
     def _boa_visible(event):
         return (event.has_feature('abstracts') and contribution_settings.get(event, 'published')

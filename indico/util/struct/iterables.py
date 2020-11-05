@@ -7,6 +7,7 @@
 
 from functools import wraps
 from itertools import groupby, islice
+
 from six.moves import zip_longest
 
 

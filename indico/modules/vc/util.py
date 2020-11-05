@@ -7,13 +7,13 @@
 
 from __future__ import unicode_literals
 
+import six
 from sqlalchemy.orm import contains_eager
 
 from indico.core.plugins import plugin_engine
 from indico.modules.events import Event
 from indico.modules.events.sessions.models.blocks import SessionBlock
 from indico.util.i18n import _
-import six
 
 
 def get_vc_plugins():

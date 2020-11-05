@@ -20,9 +20,9 @@ import click
 from babel.messages import frontend
 from babel.messages.pofile import read_po
 from flask.helpers import get_root_path
+from six.moves import zip
 
 from indico.util.console import cformat
-from six.moves import zip
 
 
 @click.group()

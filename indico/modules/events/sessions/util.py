@@ -187,7 +187,7 @@ def get_session_ical_file(sess):
 
 
 def get_session_timetable_pdf(sess, **kwargs):
-    from indico.legacy.pdfinterface.conference import TimeTablePlain, TimetablePDFFormat
+    from indico.legacy.pdfinterface.conference import TimetablePDFFormat, TimeTablePlain
     pdf_format = TimetablePDFFormat(params={'coverPage': False})
     return TimeTablePlain(sess.event, session.user, showSessions=[sess.id], showDays=[],
                           sortingCrit=None, ttPDFFormat=pdf_format, pagesize='A4', fontsize='normal',

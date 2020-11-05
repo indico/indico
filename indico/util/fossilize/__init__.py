@@ -21,11 +21,10 @@ import inspect
 import logging
 import re
 import threading
-
 from types import NoneType
 
-import zope.interface
 import six
+import zope.interface
 from six.moves import filter
 
 

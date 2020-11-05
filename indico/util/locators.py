@@ -8,7 +8,6 @@
 from __future__ import unicode_literals
 
 from UserDict import IterableUserDict, UserDict
-
 from werkzeug.utils import cached_property
 
 

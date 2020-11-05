@@ -7,9 +7,10 @@
 
 from __future__ import unicode_literals
 
+import six
+
 from indico.modules.events.features.util import get_feature_definitions
 from indico.util.decorators import cached_classproperty
-import six
 
 
 class EventFeature(object):

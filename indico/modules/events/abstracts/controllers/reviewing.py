@@ -8,6 +8,7 @@
 from __future__ import unicode_literals
 
 from flask import flash, jsonify, request, session
+from six.moves import map
 from sqlalchemy.orm import joinedload, subqueryload
 from werkzeug.exceptions import Forbidden
 
@@ -31,7 +32,6 @@ from indico.modules.events.tracks.models.tracks import Track
 from indico.util.i18n import _
 from indico.web.flask.templating import get_template_module
 from indico.web.util import _pop_injected_js, jsonify_data, jsonify_template
-from six.moves import map
 
 
 class RHListOtherAbstracts(RHAbstractsBase):

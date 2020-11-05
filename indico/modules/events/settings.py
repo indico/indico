@@ -11,6 +11,7 @@ import os
 import re
 from functools import wraps
 
+import six
 import yaml
 from flask.helpers import get_root_path
 
@@ -22,7 +23,6 @@ from indico.modules.events.models.settings import EventSetting, EventSettingPrin
 from indico.util.caching import memoize
 from indico.util.signals import values_from_signal
 from indico.util.user import iter_acl
-import six
 
 
 def event_or_id(f):

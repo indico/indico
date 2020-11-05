@@ -12,11 +12,11 @@ from datetime import timedelta
 
 import dateutil.parser
 import pytz
+import six
 from sqlalchemy import inspect
 from werkzeug.utils import cached_property
 
 from indico.core.db import db
-import six
 
 
 class SettingConverter(object):

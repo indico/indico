@@ -8,6 +8,7 @@
 import os
 
 import pytest
+import six
 from babel.messages import Catalog
 from babel.messages.mofile import write_mo
 from babel.support import Translations
@@ -18,7 +19,6 @@ from werkzeug.datastructures import LanguageAccept
 
 from indico.core.plugins import IndicoPlugin, plugin_engine
 from indico.util.i18n import _, babel, gettext_context, make_bound_gettext, ngettext, session_language, ungettext
-import six
 
 
 DICTIONARIES = {

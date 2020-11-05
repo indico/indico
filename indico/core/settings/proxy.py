@@ -11,12 +11,12 @@ from collections import defaultdict
 from functools import partial, update_wrapper
 from operator import attrgetter
 
+import six
 from flask import g, has_request_context
 
 from indico.core.settings.models.settings import Setting, SettingPrincipal
 from indico.core.settings.util import get_all_settings, get_setting, get_setting_acl
 from indico.util.string import return_ascii
-import six
 
 
 class ACLProxyBase(object):

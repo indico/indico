@@ -10,6 +10,7 @@ from __future__ import absolute_import, unicode_literals
 import json
 from operator import attrgetter
 
+from six.moves import map
 from wtforms import HiddenField
 
 from indico.core.db.sqlalchemy.principals import PrincipalType, serialize_email_principal
@@ -26,7 +27,6 @@ from indico.modules.users.util import serialize_user
 from indico.util.user import principal_from_identifier
 from indico.web.forms.fields import JSONField
 from indico.web.forms.widgets import JinjaWidget
-from six.moves import map
 
 
 def serialize_principal(principal):
@@ -175,8 +175,8 @@ class PermissionsField(JSONField):
 
     @property
     def category_roles(self):
-        from indico.modules.categories.util import serialize_category_role
         from indico.modules.categories.models.roles import CategoryRole
+        from indico.modules.categories.util import serialize_category_role
         category_roles = CategoryRole.get_category_roles(self.category)
         return [serialize_category_role(role, legacy=True) for role in category_roles]
 

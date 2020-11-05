@@ -9,6 +9,7 @@ from __future__ import unicode_literals
 
 from hashlib import sha1
 
+import six
 from flask import render_template
 
 from indico.modules.events.agreements.models.agreements import Agreement
@@ -18,7 +19,6 @@ from indico.util.decorators import cached_classproperty, classproperty
 from indico.util.i18n import _
 from indico.util.string import return_ascii
 from indico.web.flask.templating import get_overridable_template_name, get_template_module
-import six
 
 
 class AgreementPersonInfo(object):

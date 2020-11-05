@@ -10,10 +10,11 @@ from __future__ import division, unicode_literals
 from collections import defaultdict, namedtuple
 from itertools import chain, groupby
 
+import six
+
 from indico.modules.events.registration.models.registrations import RegistrationData
 from indico.util.date_time import now_utc
 from indico.util.i18n import _
-import six
 
 
 class StatsBase(object):

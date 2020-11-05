@@ -11,7 +11,9 @@ from collections import defaultdict
 from hashlib import md5
 from itertools import chain
 
+import six
 from flask import has_request_context, session
+from six.moves import map
 from sqlalchemy.orm import defaultload
 
 from indico.modules.events.contributions.models.persons import AuthorType
@@ -19,8 +21,6 @@ from indico.modules.events.models.events import EventType
 from indico.modules.events.timetable.models.entries import TimetableEntry, TimetableEntryType
 from indico.util.date_time import iterdays
 from indico.web.flask.util import url_for
-from six.moves import map
-import six
 
 
 class TimetableSerializer(object):

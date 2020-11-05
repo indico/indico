@@ -9,6 +9,9 @@ from __future__ import unicode_literals
 
 from itertools import chain
 
+import six
+from six.moves import map
+
 from indico.core.db.sqlalchemy.custom.unaccent import unaccent_match
 from indico.legacy.fossils.user import IGroupFossil
 from indico.legacy.services.implementation.base import LoggedOnlyService
@@ -19,8 +22,6 @@ from indico.modules.groups import GroupProxy
 from indico.modules.users.legacy import search_avatars
 from indico.util.fossilize import fossilize
 from indico.util.string import sanitize_email, to_unicode
-import six
-from six.moves import map
 
 
 class SearchBase(LoggedOnlyService):

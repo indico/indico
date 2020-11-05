@@ -9,7 +9,9 @@ from __future__ import unicode_literals
 
 from operator import attrgetter
 
+import six
 from flask import session
+from six.moves import map
 
 from indico.core import signals
 from indico.core.db import db
@@ -23,8 +25,6 @@ from indico.modules.events.logs.util import make_diff_log
 from indico.modules.events.models.events import EventType
 from indico.modules.events.models.labels import EventLabel
 from indico.modules.events.models.references import ReferenceType
-import six
-from six.moves import map
 
 
 def create_reference_type(data):

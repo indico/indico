@@ -7,11 +7,11 @@
 
 from __future__ import unicode_literals
 
+import six
 from flask import current_app, request
 from flask_multipass import InvalidCredentials, Multipass, NoSuchUser
 
 from indico.core.logger import Logger
-import six
 
 
 logger = Logger.get('auth')

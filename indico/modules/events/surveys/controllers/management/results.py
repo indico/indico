@@ -8,6 +8,7 @@
 from __future__ import unicode_literals
 
 from flask import flash, jsonify, redirect, request
+from six.moves import map
 from sqlalchemy.orm import defaultload, joinedload
 
 from indico.modules.events.logs import EventLogKind, EventLogRealm
@@ -21,7 +22,6 @@ from indico.modules.events.surveys.views import WPManageSurvey, WPSurveyResults
 from indico.util.i18n import _
 from indico.util.spreadsheets import send_csv, send_xlsx
 from indico.web.flask.util import url_for
-from six.moves import map
 
 
 class RHSurveyResults(RHManageSurveyBase):

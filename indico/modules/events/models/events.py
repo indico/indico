@@ -13,8 +13,10 @@ from datetime import timedelta
 from operator import attrgetter
 
 import pytz
+import six
 from flask import has_request_context, render_template, session
 from markupsafe import Markup
+from six.moves import range
 from sqlalchemy import DDL, orm
 from sqlalchemy.dialects.postgresql import ARRAY, JSONB
 from sqlalchemy.event import listens_for
@@ -48,8 +50,6 @@ from indico.util.i18n import _
 from indico.util.string import format_repr, return_ascii, text_to_repr, to_unicode
 from indico.util.struct.enum import RichIntEnum
 from indico.web.flask.util import url_for
-import six
-from six.moves import range
 
 
 class EventType(RichIntEnum):
@@ -907,7 +907,7 @@ class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionMan
         db.m.Session.preload_acl_entries(self)
 
     def move(self, category):
-        from indico.modules.events import EventLogRealm, EventLogKind
+        from indico.modules.events import EventLogKind, EventLogRealm
         old_category = self.category
         self.category = category
         sep = ' \N{RIGHT-POINTING DOUBLE ANGLE QUOTATION MARK} '
@@ -919,7 +919,7 @@ class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionMan
                  data={'From': old_path, 'To': new_path})
 
     def delete(self, reason, user=None):
-        from indico.modules.events import logger, EventLogRealm, EventLogKind
+        from indico.modules.events import EventLogKind, EventLogRealm, logger
         self.is_deleted = True
         signals.event.deleted.send(self, user=user)
         db.session.flush()

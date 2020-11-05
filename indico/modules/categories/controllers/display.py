@@ -18,6 +18,7 @@ import dateutil
 from dateutil.relativedelta import relativedelta
 from flask import Response, flash, jsonify, redirect, request, session
 from pytz import utc
+from six.moves import map
 from sqlalchemy.orm import joinedload, load_only, subqueryload, undefer, undefer_group
 from werkzeug.exceptions import BadRequest, NotFound
 
@@ -47,7 +48,6 @@ from indico.web.flask.templating import get_template_module
 from indico.web.flask.util import send_file, url_for
 from indico.web.rh import RH
 from indico.web.util import jsonify_data
-from six.moves import map
 
 
 CALENDAR_COLOR_PALETTE = [

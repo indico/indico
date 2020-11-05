@@ -7,6 +7,7 @@
 
 from __future__ import unicode_literals
 
+import six
 from flask import jsonify, request, session
 from sqlalchemy.orm import subqueryload, undefer
 from werkzeug.exceptions import BadRequest
@@ -40,7 +41,6 @@ from indico.web.forms.colors import get_colors
 from indico.web.forms.fields.principals import serialize_principal
 from indico.web.forms.util import get_form_field_names
 from indico.web.util import jsonify_data, jsonify_form, jsonify_template
-import six
 
 
 def _get_session_list_args(event):

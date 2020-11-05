@@ -8,9 +8,9 @@
 import operator
 import re
 from itertools import product
+
 import six
-from six.moves import map
-from six.moves import zip
+from six.moves import map, zip
 
 
 def bool_matrix(template, mask=None, expect=None):

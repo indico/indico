@@ -12,7 +12,9 @@ from collections import defaultdict
 from itertools import chain
 from operator import attrgetter
 
+import six
 from flask import flash, request, session
+from six.moves import map
 from sqlalchemy.orm import selectinload
 from werkzeug.exceptions import Forbidden
 from werkzeug.utils import cached_property
@@ -30,8 +32,6 @@ from indico.util.fs import secure_filename
 from indico.util.i18n import _, ngettext
 from indico.web.flask.util import url_for
 from indico.web.util import jsonify_data, jsonify_form, jsonify_template
-import six
-from six.moves import map
 
 
 CFP_ROLE_MAP = {

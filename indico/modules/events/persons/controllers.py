@@ -10,6 +10,7 @@ from __future__ import unicode_literals
 import itertools
 from collections import OrderedDict, defaultdict
 
+import six
 from flask import flash, redirect, request, session
 from sqlalchemy.orm import contains_eager, joinedload
 
@@ -37,7 +38,6 @@ from indico.web.flask.templating import get_template_module
 from indico.web.flask.util import jsonify_data, url_for
 from indico.web.forms.base import FormDefaults
 from indico.web.util import jsonify_form
-import six
 
 
 BUILTIN_ROLES = {'chairperson': {'name': 'Chairperson', 'code': 'CHR', 'color': 'f7b076',

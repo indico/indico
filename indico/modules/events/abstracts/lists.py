@@ -10,6 +10,7 @@ from __future__ import unicode_literals
 from collections import OrderedDict
 from operator import attrgetter
 
+import six
 from flask import flash, request, session
 from sqlalchemy.orm import joinedload, subqueryload
 
@@ -22,7 +23,6 @@ from indico.modules.events.tracks.models.tracks import Track
 from indico.modules.events.util import ListGeneratorBase
 from indico.util.i18n import _
 from indico.web.flask.templating import get_template_module
-import six
 
 
 class AbstractListGeneratorBase(ListGeneratorBase):

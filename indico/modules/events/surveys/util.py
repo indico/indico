@@ -123,6 +123,7 @@ def get_events_with_submitted_surveys(user, dt=None):
     :return: A set of event ids
     """
     from indico.modules.events.surveys.models.surveys import Survey
+
     # Survey submissions are not stored in links anymore, so we need to get them directly
     query = (user.survey_submissions
              .options(load_only('survey_id'))

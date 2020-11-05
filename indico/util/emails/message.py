@@ -11,7 +11,6 @@ import mimetypes
 import os
 import random
 import time
-from cStringIO import StringIO
 from email import charset as Charset
 from email import encoders as Encoders
 from email import generator, message_from_string
@@ -23,12 +22,13 @@ from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from email.utils import formataddr, formatdate, getaddresses, parseaddr
 
+import six
+from cStringIO import StringIO
+from six.moves import map
 from speaklater import is_lazy_string
 from werkzeug.urls import url_parse
 
 from indico.util.string import to_unicode
-import six
-from six.moves import map
 
 
 def force_text(val):

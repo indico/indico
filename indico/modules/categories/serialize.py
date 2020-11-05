@@ -8,14 +8,14 @@
 from __future__ import unicode_literals
 
 from io import BytesIO
-import six
-
 
 import icalendar as ical
+import six
 from feedgen.feed import FeedGenerator
 from flask import session
 from lxml import html
 from lxml.etree import ParserError
+from six.moves import filter
 from sqlalchemy.orm import joinedload, load_only, subqueryload, undefer
 from werkzeug.urls import url_parse
 
@@ -24,7 +24,6 @@ from indico.modules.categories import Category
 from indico.modules.events import Event
 from indico.util.date_time import now_utc
 from indico.util.string import sanitize_html
-from six.moves import filter
 
 
 def serialize_categories_ical(category_ids, user, event_filter=True, event_filter_fn=None, update_query=None):

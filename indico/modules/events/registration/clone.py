@@ -7,6 +7,8 @@
 
 from __future__ import unicode_literals
 
+import six
+
 from indico.core import signals
 from indico.core.db import db
 from indico.core.db.sqlalchemy.util.models import get_simple_column_attrs
@@ -19,7 +21,6 @@ from indico.modules.events.registration.models.forms import RegistrationForm
 from indico.modules.events.registration.models.items import RegistrationFormItem, RegistrationFormSection
 from indico.modules.events.registration.models.registrations import Registration, RegistrationData
 from indico.util.i18n import _
-import six
 
 
 class RegistrationFormCloner(EventCloner):

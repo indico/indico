@@ -9,6 +9,7 @@ from __future__ import unicode_literals
 
 from copy import deepcopy
 
+from six.moves import zip
 from sqlalchemy.orm import joinedload, subqueryload, undefer
 
 from indico.core.db import db
@@ -25,7 +26,6 @@ from indico.modules.events.contributions.models.subcontributions import SubContr
 from indico.modules.events.contributions.models.types import ContributionType
 from indico.modules.events.timetable.operations import schedule_contribution
 from indico.util.i18n import _
-from six.moves import zip
 
 
 class ContributionTypeCloner(EventCloner):

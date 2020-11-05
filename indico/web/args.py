@@ -7,15 +7,15 @@
 
 from __future__ import absolute_import, unicode_literals
 
+import six
 from flask import g
 from marshmallow import Schema
+from six.moves import map
 from webargs import dict2schema
 from webargs.compat import Mapping
 from webargs.flaskparser import FlaskParser
 
 from indico.util.string import strip_whitespace
-import six
-from six.moves import map
 
 
 class IndicoFlaskParser(FlaskParser):

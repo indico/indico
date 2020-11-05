@@ -9,6 +9,7 @@ from datetime import datetime, timedelta
 from uuid import uuid4
 
 import pytest
+import six
 from flask import session
 from mock import MagicMock
 from oauthlib.oauth2 import InvalidClientIdError
@@ -17,7 +18,6 @@ from sqlalchemy.orm.exc import NoResultFound
 from indico.modules.oauth.models.applications import OAuthApplication
 from indico.modules.oauth.models.tokens import OAuthGrant
 from indico.modules.oauth.provider import DisabledClientIdError, load_client, load_token, save_grant, save_token
-import six
 
 
 pytest_plugins = 'indico.modules.oauth.testing.fixtures'

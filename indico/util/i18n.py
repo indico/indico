@@ -12,6 +12,7 @@ import traceback
 import warnings
 from contextlib import contextmanager
 
+import six
 from babel import negotiate_locale
 from babel.core import LOCALE_ALIASES, Locale
 from babel.messages.pofile import read_po
@@ -24,7 +25,6 @@ from werkzeug.utils import cached_property
 
 from indico.core.config import config
 from indico.util.caching import memoize_request
-import six
 
 
 LOCALE_ALIASES = dict(LOCALE_ALIASES, en='en_GB')

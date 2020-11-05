@@ -11,9 +11,11 @@ import re
 from datetime import datetime, timedelta
 from operator import attrgetter, itemgetter
 
+import six
 from flask import request, session
 from markupsafe import escape
 from pytz import timezone
+from six.moves import filter
 from werkzeug.datastructures import ImmutableMultiDict
 from wtforms import BooleanField, FloatField, SelectField, StringField, TextAreaField
 from wtforms.ext.sqlalchemy.fields import QuerySelectField
@@ -48,8 +50,6 @@ from indico.web.forms.fields import (IndicoDateField, IndicoDateTimeField, Indic
 from indico.web.forms.fields.principals import PermissionsField
 from indico.web.forms.validators import HiddenUnless, LinkedDateTime
 from indico.web.forms.widgets import CKEditorWidget, SwitchWidget
-import six
-from six.moves import filter
 
 
 CLONE_REPEAT_CHOICES = (

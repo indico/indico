@@ -12,6 +12,7 @@ from copy import deepcopy
 from datetime import date, datetime
 from uuid import uuid4
 
+import six
 from sqlalchemy.dialects.postgresql import ARRAY
 from wtforms.validators import ValidationError
 
@@ -24,7 +25,6 @@ from indico.util.date_time import format_date, iterdays
 from indico.util.i18n import _
 from indico.util.string import camelize_keys, snakify_keys
 from indico.web.forms.fields import JSONField
-import six
 
 
 def get_field_merged_options(field, registration_data):

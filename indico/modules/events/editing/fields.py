@@ -10,6 +10,7 @@ from __future__ import unicode_literals
 import fnmatch
 import os
 
+import six
 from marshmallow import ValidationError
 from marshmallow.fields import Dict
 
@@ -18,7 +19,6 @@ from indico.modules.events.editing.models.editable import Editable
 from indico.modules.events.editing.models.file_types import EditingFileType
 from indico.modules.events.editing.models.tags import EditingTag
 from indico.util.marshmallow import FilesField, ModelField, ModelList
-import six
 
 
 class EditingFilesField(Dict):

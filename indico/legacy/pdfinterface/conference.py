@@ -12,6 +12,7 @@ from copy import deepcopy
 from datetime import timedelta
 from operator import attrgetter
 
+import six
 from reportlab.lib import colors
 from reportlab.lib.enums import TA_CENTER, TA_JUSTIFY, TA_LEFT, TA_RIGHT
 from reportlab.lib.pagesizes import A4, landscape
@@ -34,7 +35,6 @@ from indico.util.date_time import format_date, format_datetime, format_human_tim
 from indico.util.i18n import _, ngettext
 from indico.util.string import (format_full_name, html_color_to_rgb, natural_sort_key, render_markdown,
                                 sanitize_for_platypus, strip_tags, to_unicode, truncate)
-import six
 
 
 # Change reportlab default pdf font Helvetica to indico ttf font,

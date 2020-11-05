@@ -11,6 +11,7 @@ from collections import defaultdict
 from itertools import chain
 from operator import attrgetter
 
+import six
 from sqlalchemy import inspect
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.ext.declarative import declared_attr
@@ -33,7 +34,6 @@ from indico.util.i18n import _
 from indico.util.locators import locator_property
 from indico.util.string import MarkdownText, format_repr, return_ascii, text_to_repr
 from indico.util.struct.enum import IndicoEnum, RichIntEnum
-import six
 
 
 class AbstractState(RichIntEnum):

@@ -11,6 +11,7 @@ from collections import defaultdict
 from operator import attrgetter
 
 from flask import flash, jsonify, request, session
+from six.moves import map
 from sqlalchemy.orm import joinedload, subqueryload
 
 from indico.core.db import db
@@ -31,7 +32,6 @@ from indico.modules.events.util import get_field_values
 from indico.modules.users.models.users import User
 from indico.util.i18n import _, ngettext
 from indico.web.util import jsonify_data, jsonify_form, jsonify_template
-from six.moves import map
 
 
 class RHAbstractListBase(RHManageAbstractsBase):

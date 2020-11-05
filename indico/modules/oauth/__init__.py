@@ -11,6 +11,7 @@ import os
 from datetime import timedelta
 from uuid import uuid4
 
+import six
 from flask import session
 from flask_oauthlib.provider import OAuth2Provider
 
@@ -19,7 +20,6 @@ from indico.core.logger import Logger
 from indico.util.i18n import _
 from indico.web.flask.util import url_for
 from indico.web.menu import SideMenuItem
-import six
 
 
 class IndicoOAuth2Provider(OAuth2Provider):

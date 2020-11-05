@@ -8,9 +8,9 @@
 from __future__ import unicode_literals
 
 from flask import session
+from six.moves import map
 
 from indico.core.db import db
-from six.moves import map
 
 
 def get_attached_folders(linked_object, include_empty=True, include_hidden=True, preload_event=False):

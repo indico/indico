@@ -9,6 +9,7 @@ from __future__ import unicode_literals
 
 from uuid import uuid4
 
+import six
 from flask import jsonify
 from webargs import fields
 from webargs.flaskparser import abort
@@ -23,7 +24,6 @@ from indico.modules.events.editing.service import (ServiceRequestFailed, check_s
 from indico.modules.events.editing.settings import editing_settings
 from indico.util.i18n import _
 from indico.web.args import use_kwargs
-import six
 
 
 class RHCheckServiceURL(RHEditingManagementBase):

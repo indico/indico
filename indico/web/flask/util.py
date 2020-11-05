@@ -13,6 +13,7 @@ import re
 import unicodedata
 from importlib import import_module
 
+import six
 from flask import Blueprint, current_app, g, redirect, request
 from flask import send_file as _send_file
 from flask import url_for as _url_for
@@ -25,7 +26,6 @@ from indico.core.config import config
 from indico.util.caching import memoize
 from indico.util.locators import get_locator
 from indico.web.util import jsonify_data
-import six
 
 
 def discover_blueprints():

@@ -7,20 +7,20 @@
 
 from __future__ import print_function, unicode_literals
 
-import six.moves.cPickle
 import fcntl
 import logging.handlers
 import os
 import pprint
 import re
 import signal
-import six.moves.socketserver
 import struct
 import termios
 import textwrap
 from threading import Lock
 
 import click
+import six.moves.cPickle
+import six.moves.socketserver
 import sqlparse
 from pygments import highlight
 from pygments.formatters.terminal256 import Terminal256Formatter

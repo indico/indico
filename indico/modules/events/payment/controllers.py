@@ -7,6 +7,7 @@
 
 from __future__ import unicode_literals
 
+import six
 from flask import flash, jsonify, redirect, request, session
 from werkzeug.exceptions import BadRequest, NotFound
 
@@ -24,7 +25,6 @@ from indico.util.i18n import _
 from indico.web.flask.util import url_for
 from indico.web.forms.base import FormDefaults
 from indico.web.util import jsonify_data, jsonify_form, jsonify_template
-import six
 
 
 class RHPaymentAdminSettings(RHAdminBase):

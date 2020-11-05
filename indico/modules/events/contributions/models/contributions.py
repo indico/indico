@@ -8,6 +8,7 @@
 from __future__ import unicode_literals
 
 from flask import g
+from six.moves import range
 from sqlalchemy import DDL
 from sqlalchemy.dialects.postgresql import ARRAY
 from sqlalchemy.event import listens_for
@@ -32,7 +33,6 @@ from indico.modules.events.papers.models.revisions import PaperRevision, PaperRe
 from indico.modules.events.sessions.util import session_coordinator_priv_enabled
 from indico.util.locators import locator_property
 from indico.util.string import format_repr, return_ascii
-from six.moves import range
 
 
 def _get_next_friendly_id(context):

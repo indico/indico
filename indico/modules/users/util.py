@@ -15,6 +15,7 @@ from io import BytesIO
 from operator import itemgetter
 
 import requests
+import six
 from flask import session
 from PIL import Image
 from sqlalchemy.orm import contains_eager, joinedload, load_only, undefer
@@ -40,7 +41,6 @@ from indico.util.event import truncate_path
 from indico.util.fs import secure_filename
 from indico.util.i18n import _
 from indico.util.string import crc32, remove_accents
-import six
 
 
 # colors for user-specific avatar bubbles
@@ -115,14 +115,14 @@ def get_linked_events(user, dt, limit=None, load_also=()):
     :param dt: Only include events taking place on/after that date
     :param limit: Max number of events
     """
-    from indico.modules.events.abstracts.util import (get_events_with_abstract_reviewer_convener,
-                                                      get_events_with_abstract_persons)
+    from indico.modules.events.abstracts.util import (get_events_with_abstract_persons,
+                                                      get_events_with_abstract_reviewer_convener)
     from indico.modules.events.contributions.util import get_events_with_linked_contributions
     from indico.modules.events.papers.util import get_events_with_paper_roles
     from indico.modules.events.registration.util import get_events_registered
     from indico.modules.events.sessions.util import get_events_with_linked_sessions
     from indico.modules.events.surveys.util import get_events_with_submitted_surveys
-    from indico.modules.events.util import (get_events_managed_by, get_events_created_by,
+    from indico.modules.events.util import (get_events_created_by, get_events_managed_by,
                                             get_events_with_linked_event_persons)
 
     links = OrderedDict()

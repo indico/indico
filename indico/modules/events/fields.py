@@ -9,6 +9,7 @@ from __future__ import unicode_literals
 
 import json
 
+import six
 from sqlalchemy import inspect
 from wtforms import RadioField, SelectField
 
@@ -26,7 +27,6 @@ from indico.util.i18n import _, orig_string
 from indico.web.forms.fields import MultipleItemsField
 from indico.web.forms.fields.principals import PrincipalListField
 from indico.web.forms.widgets import JinjaWidget
-import six
 
 
 class ReferencesField(MultipleItemsField):

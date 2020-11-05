@@ -6,9 +6,9 @@
 # LICENSE file for more details.
 
 import pytest
+import six
 
 from indico.modules.users import User
-import six
 
 
 pytest_plugins = 'indico.modules.rb.testing.fixtures'

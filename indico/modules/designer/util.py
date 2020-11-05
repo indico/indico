@@ -7,6 +7,7 @@
 
 from __future__ import unicode_literals
 
+import six
 from flask import session
 from sqlalchemy.orm import joinedload
 
@@ -17,7 +18,6 @@ from indico.modules.events.models.events import Event
 from indico.modules.events.registration.models.forms import RegistrationForm
 from indico.util.date_time import now_utc
 from indico.util.placeholders import get_placeholders
-import six
 
 
 def get_placeholder_options():

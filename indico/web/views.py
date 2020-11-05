@@ -9,11 +9,13 @@ from __future__ import absolute_import, unicode_literals
 
 import itertools
 import posixpath
-from six.moves.urllib.parse import urlparse
 
+import six
 from flask import current_app, g, render_template, request, session
 from markupsafe import Markup
 from pytz import common_timezones, common_timezones_set
+from six.moves import map
+from six.moves.urllib.parse import urlparse
 
 from indico.core import signals
 from indico.core.config import config
@@ -27,8 +29,6 @@ from indico.web.flask.templating import get_template_module
 from indico.web.flask.util import url_for
 from indico.web.menu import build_menu_structure
 from indico.web.util import jsonify_template
-import six
-from six.moves import map
 
 
 def _get_timezone_display(local_tz, timezone, force=False):

@@ -10,6 +10,7 @@ from __future__ import unicode_literals
 from collections import OrderedDict
 from datetime import datetime, timedelta
 
+import six
 from dateutil import rrule
 from flask import flash, jsonify, request, session
 from werkzeug.exceptions import BadRequest
@@ -25,7 +26,6 @@ from indico.modules.events.util import get_event_from_url
 from indico.util.i18n import _
 from indico.web.flask.util import url_for
 from indico.web.util import jsonify_data, jsonify_template
-import six
 
 
 REPEAT_FORM_MAP = {

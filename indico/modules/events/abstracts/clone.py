@@ -7,6 +7,9 @@
 
 from __future__ import unicode_literals
 
+import six
+from six.moves import map
+
 from indico.core.db import db
 from indico.core.db.sqlalchemy.util.models import get_simple_column_attrs
 from indico.core.db.sqlalchemy.util.session import no_autoflush
@@ -16,8 +19,6 @@ from indico.modules.events.abstracts.settings import abstracts_reviewing_setting
 from indico.modules.events.cloning import EventCloner
 from indico.modules.events.models.events import EventType
 from indico.util.i18n import _
-import six
-from six.moves import map
 
 
 class AbstractSettingsCloner(EventCloner):

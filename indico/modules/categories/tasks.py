@@ -9,6 +9,7 @@ from __future__ import unicode_literals
 
 from datetime import timedelta
 
+import six
 from celery.schedules import crontab
 
 from indico.core.celery import celery
@@ -20,7 +21,6 @@ from indico.modules.users.models.suggestions import SuggestedCategory
 from indico.modules.users.util import get_related_categories
 from indico.util.date_time import now_utc
 from indico.util.suggestions import get_category_scores
-import six
 
 
 # Minimum score for a category to be suggested

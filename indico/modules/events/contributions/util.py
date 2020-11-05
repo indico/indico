@@ -14,6 +14,7 @@ from io import BytesIO
 from operator import attrgetter
 
 import dateutil.parser
+import six
 from flask import session
 from sqlalchemy.orm import contains_eager, joinedload, load_only, noload
 
@@ -39,7 +40,6 @@ from indico.web.flask.templating import get_template_module
 from indico.web.flask.util import send_file, url_for
 from indico.web.http_api.metadata.serializer import Serializer
 from indico.web.util import jsonify_data
-import six
 
 
 def get_events_with_linked_contributions(user, dt=None):

@@ -19,8 +19,8 @@ def get_field_types():
 
 @signals.get_fields.connect_via(SurveyField)
 def _get_fields(sender, **kwargs):
-    from .simple import SurveyTextField, SurveyNumberField, SurveyBoolField
-    from .choices import SurveySingleChoiceField, SurveyMultiSelectField
+    from .choices import SurveyMultiSelectField, SurveySingleChoiceField
+    from .simple import SurveyBoolField, SurveyNumberField, SurveyTextField
     yield SurveyTextField
     yield SurveyNumberField
     yield SurveyBoolField

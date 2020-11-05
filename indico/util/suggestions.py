@@ -10,6 +10,7 @@ from __future__ import division, print_function, unicode_literals
 from collections import defaultdict
 from datetime import date, timedelta
 
+import six
 from sqlalchemy.orm import joinedload, load_only
 
 from indico.modules.events import Event
@@ -19,7 +20,6 @@ from indico.modules.events.registration.util import get_events_registered
 from indico.modules.events.surveys.util import get_events_with_submitted_surveys
 from indico.util.date_time import now_utc, utc_to_server
 from indico.util.struct.iterables import window
-import six
 
 
 def _get_blocks(events, attended):

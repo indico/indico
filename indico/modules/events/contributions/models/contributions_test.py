@@ -10,10 +10,10 @@ from __future__ import unicode_literals
 from datetime import timedelta
 
 from flask import g
+from six.moves import range
 
 import indico.modules.events.contributions.models.contributions as contrib_module
 from indico.modules.events.contributions.models.contributions import Contribution
-from six.moves import range
 
 
 class Incrementer(object):

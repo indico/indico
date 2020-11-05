@@ -11,11 +11,13 @@ import logging
 import os
 from operator import itemgetter
 
+import six
 from celery import Celery
 from celery.app.log import Logging
 from celery.beat import PersistentScheduler
 from contextlib2 import ExitStack
 from flask_pluginengine import current_plugin, plugin_context
+from six.moves import map
 from sqlalchemy import inspect
 from terminaltables import AsciiTable
 
@@ -28,8 +30,6 @@ from indico.util.console import cformat
 from indico.util.fossilize import clearCache
 from indico.util.string import return_ascii
 from indico.web.flask.stats import request_stats_request_started
-import six
-from six.moves import map
 
 
 class IndicoCelery(Celery):

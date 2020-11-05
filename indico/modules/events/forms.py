@@ -10,6 +10,7 @@ from __future__ import unicode_literals
 from datetime import time
 
 from flask import session
+from six.moves import zip
 from wtforms.fields import StringField, TextAreaField
 from wtforms.fields.core import SelectField
 from wtforms.fields.html5 import URLField
@@ -29,7 +30,6 @@ from indico.web.forms.fields import (IndicoDateTimeField, IndicoEnumRadioField, 
                                      IndicoTimezoneSelectField, JSONField, OccurrencesField)
 from indico.web.forms.validators import LinkedDateTime
 from indico.web.forms.widgets import CKEditorWidget
-from six.moves import zip
 
 
 class ReferenceTypeForm(IndicoForm):

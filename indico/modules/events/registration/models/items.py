@@ -9,6 +9,7 @@ from __future__ import unicode_literals
 
 from uuid import uuid4
 
+import six
 from sqlalchemy import literal
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.ext.hybrid import hybrid_property
@@ -21,7 +22,6 @@ from indico.util.decorators import strict_classproperty
 from indico.util.i18n import orig_string
 from indico.util.string import camelize_keys, format_repr, return_ascii
 from indico.util.struct.enum import IndicoEnum
-import six
 
 
 def _get_next_position(context):

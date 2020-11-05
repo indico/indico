@@ -19,7 +19,9 @@ from mimetypes import guess_extension
 from tempfile import NamedTemporaryFile
 from zipfile import ZipFile
 
+import six
 from flask import current_app, flash, g, redirect, request, session
+from six.moves import map
 from sqlalchemy import inspect
 from sqlalchemy.orm import load_only, noload
 from werkzeug.exceptions import BadRequest, Forbidden
@@ -54,8 +56,6 @@ from indico.util.user import principal_from_fossil
 from indico.web.flask.templating import get_template_module
 from indico.web.flask.util import send_file, url_for
 from indico.web.forms.colors import get_colors
-import six
-from six.moves import map
 
 
 def check_event_locked(rh, event, force=False):

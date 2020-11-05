@@ -13,6 +13,7 @@ import posixpath
 import re
 from operator import itemgetter
 
+import six
 from dateutil.relativedelta import relativedelta
 from flask import current_app
 from flask_pluginengine.util import get_state
@@ -27,7 +28,6 @@ from markupsafe import Markup
 from indico.core import signals
 from indico.util.signals import values_from_signal
 from indico.util.string import natural_sort_key, render_markdown
-import six
 
 
 indentation_re = re.compile(r'^ +', re.MULTILINE)

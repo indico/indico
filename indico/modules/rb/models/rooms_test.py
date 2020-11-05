@@ -9,6 +9,8 @@ from datetime import date, datetime, time, timedelta
 from operator import itemgetter
 
 import pytest
+import six
+from six.moves import map
 
 from indico.core.db.sqlalchemy.protection import ProtectionMode
 from indico.core.errors import IndicoError
@@ -21,8 +23,6 @@ from indico.modules.rb.models.rooms import Room
 from indico.modules.users import User
 from indico.testing.util import bool_matrix
 from indico.util.date_time import get_day_end, get_day_start
-import six
-from six.moves import map
 
 
 pytest_plugins = 'indico.modules.rb.testing.fixtures'

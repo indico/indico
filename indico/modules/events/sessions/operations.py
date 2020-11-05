@@ -7,6 +7,7 @@
 
 from __future__ import unicode_literals
 
+import six
 from flask import session
 
 from indico.core import signals
@@ -18,7 +19,6 @@ from indico.modules.events.sessions import COORDINATOR_PRIV_SETTINGS, COORDINATO
 from indico.modules.events.sessions.models.blocks import SessionBlock
 from indico.modules.events.sessions.models.sessions import Session
 from indico.util.i18n import orig_string
-import six
 
 
 def create_session(event, data):

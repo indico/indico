@@ -11,8 +11,10 @@ import os
 from copy import copy
 from importlib import import_module
 
+import six
 from flask import g
 from flask_sqlalchemy import BaseQuery, Model, Pagination
+from six.moves import map
 from sqlalchemy import Column, inspect, orm
 from sqlalchemy.event import listen, listens_for
 from sqlalchemy.ext.hybrid import hybrid_property
@@ -21,8 +23,6 @@ from sqlalchemy.orm.attributes import get_history, set_committed_value
 from sqlalchemy.orm.exc import NoResultFound
 
 from indico.util.packaging import get_package_root_path
-import six
-from six.moves import map
 
 
 class IndicoBaseQuery(BaseQuery):

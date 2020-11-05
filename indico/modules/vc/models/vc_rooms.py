@@ -10,6 +10,7 @@ from __future__ import unicode_literals
 from functools import partial
 from itertools import chain
 
+import six
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.event import listen
 from sqlalchemy.ext.hybrid import Comparator, hybrid_property
@@ -23,7 +24,6 @@ from indico.util.caching import memoize_request
 from indico.util.date_time import now_utc
 from indico.util.string import return_ascii
 from indico.util.struct.enum import IndicoEnum
-import six
 
 
 class VCRoomLinkType(int, IndicoEnum):

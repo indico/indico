@@ -11,6 +11,7 @@ import posixpath
 from itertools import groupby
 from operator import attrgetter
 
+import six
 from flask import render_template, request, session
 from sqlalchemy.orm import joinedload
 
@@ -23,7 +24,6 @@ from indico.modules.events.util import get_theme
 from indico.modules.events.views import WPConferenceDisplayBase
 from indico.util.signals import values_from_signal
 from indico.web.flask.templating import register_template_hook, template_hook
-import six
 
 
 register_template_hook('week-meeting-body', inject_week_timetable)

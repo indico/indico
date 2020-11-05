@@ -5,6 +5,7 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
+import six
 from flask import render_template
 from sqlalchemy import and_
 from sqlalchemy.orm import load_only
@@ -15,7 +16,6 @@ from indico.modules.users import User, UserSetting
 from indico.util.date_time import format_datetime
 from indico.util.string import to_unicode
 from indico.web.flask.templating import get_template_module
-import six
 
 
 def get_manager_emails(room):

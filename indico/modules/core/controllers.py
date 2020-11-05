@@ -10,10 +10,12 @@ from __future__ import unicode_literals
 import re
 
 import requests
+import six
 from flask import flash, jsonify, redirect, request, session
 from packaging.version import Version
 from pkg_resources import DistributionNotFound, get_distribution
 from pytz import common_timezones_set
+from six.moves import map
 from webargs import fields
 from werkzeug.exceptions import BadRequest, NotFound, ServiceUnavailable
 from werkzeug.urls import url_join, url_parse
@@ -42,8 +44,6 @@ from indico.web.flask.util import url_for
 from indico.web.forms.base import FormDefaults
 from indico.web.rh import RH, RHProtected
 from indico.web.util import signed_url_for
-import six
-from six.moves import map
 
 
 class RHContact(RH):

@@ -9,6 +9,7 @@ from __future__ import unicode_literals
 
 from operator import attrgetter, itemgetter
 
+import six
 from flask import flash, redirect, session
 from sqlalchemy.orm import undefer
 
@@ -35,7 +36,6 @@ from indico.util.i18n import _
 from indico.web.flask.util import url_for
 from indico.web.forms.base import FormDefaults
 from indico.web.util import jsonify_data, jsonify_form, jsonify_template
-import six
 
 
 class RHManageRegistrationForms(RHManageRegFormsBase):

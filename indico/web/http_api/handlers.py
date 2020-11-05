@@ -14,11 +14,14 @@ import hmac
 import posixpath
 import re
 import time
-import six.moves.urllib.request, six.moves.urllib.parse, six.moves.urllib.error
-from six.moves.urllib.parse import parse_qs
 from uuid import UUID
 
+import six
+import six.moves.urllib.error
+import six.moves.urllib.parse
+import six.moves.urllib.request
 from flask import current_app, g, request, session
+from six.moves.urllib.parse import parse_qs
 from werkzeug.exceptions import BadRequest, NotFound
 
 from indico.core.db import db
@@ -35,7 +38,6 @@ from indico.web.http_api.fossils import IHTTPAPIExportResultFossil
 from indico.web.http_api.metadata.serializer import Serializer
 from indico.web.http_api.responses import HTTPAPIError, HTTPAPIResult
 from indico.web.http_api.util import get_query_parameter
-import six
 
 
 # Remove the extension at the end or before the querystring

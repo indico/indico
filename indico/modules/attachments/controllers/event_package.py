@@ -10,9 +10,11 @@ from __future__ import unicode_literals
 import os
 from collections import OrderedDict
 
+import six
 from celery.exceptions import TimeoutError
 from flask import flash, jsonify, request, session
 from markupsafe import escape
+from six.moves import filter
 from sqlalchemy import Date, cast
 
 from indico.core.celery import AsyncResult
@@ -34,8 +36,6 @@ from indico.util.i18n import _
 from indico.util.string import natural_sort_key, to_unicode
 from indico.web.forms.base import FormDefaults
 from indico.web.util import jsonify_data
-from six.moves import filter
-import six
 
 
 def _get_start_dt(obj):

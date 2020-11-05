@@ -11,6 +11,7 @@ import sys
 from contextlib import contextmanager
 from functools import partial
 
+import six
 from flask import g
 from flask_sqlalchemy import SQLAlchemy
 from flask_sqlalchemy.model import BindMetaMixin
@@ -24,7 +25,6 @@ from indico.core import signals
 from indico.core.db.sqlalchemy.custom.natsort import create_natsort_function
 from indico.core.db.sqlalchemy.custom.unaccent import create_unaccent_function
 from indico.core.db.sqlalchemy.util.models import IndicoBaseQuery, IndicoModel
-import six
 
 
 class ConstraintViolated(Exception):

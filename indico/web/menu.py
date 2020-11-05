@@ -7,13 +7,13 @@
 
 from __future__ import absolute_import, unicode_literals
 
+import six
 from flask import render_template
 from markupsafe import Markup
 
 from indico.core import signals
 from indico.util.signals import named_objects_from_signal
 from indico.util.string import format_repr, return_ascii
-import six
 
 
 class _MenuSectionBase(object):

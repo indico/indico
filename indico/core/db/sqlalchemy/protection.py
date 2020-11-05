@@ -9,7 +9,9 @@ from __future__ import unicode_literals
 
 import itertools
 
+import six
 from flask import has_request_context, session
+from six.moves import map
 from sqlalchemy import inspect
 from sqlalchemy.event import listens_for
 from sqlalchemy.ext.declarative import declared_attr
@@ -27,8 +29,6 @@ from indico.util.signals import values_from_signal
 from indico.util.struct.enum import RichIntEnum
 from indico.util.user import iter_acl
 from indico.web.util import jsonify_template
-import six
-from six.moves import map
 
 
 class ProtectionMode(RichIntEnum):

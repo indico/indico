@@ -9,6 +9,7 @@ from __future__ import unicode_literals
 
 from itertools import chain
 
+import six
 from werkzeug.exceptions import NotFound
 
 from indico.core import signals
@@ -16,7 +17,6 @@ from indico.core.db import db
 from indico.modules.events import Event
 from indico.modules.events.features import features_event_settings
 from indico.util.signals import named_objects_from_signal
-import six
 
 
 def get_feature_definitions():

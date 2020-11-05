@@ -9,6 +9,7 @@ from __future__ import unicode_literals
 
 from operator import attrgetter
 
+import six
 from sqlalchemy.event import listens_for
 from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.ext.hybrid import hybrid_property
@@ -22,7 +23,6 @@ from indico.modules.users.models.users import PersonMixin, UserTitle
 from indico.util.decorators import strict_classproperty
 from indico.util.locators import locator_property
 from indico.util.string import format_repr, return_ascii
-import six
 
 
 class PersonLinkDataMixin(object):

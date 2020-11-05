@@ -12,6 +12,7 @@ import itertools
 from collections import OrderedDict
 from operator import attrgetter
 
+import six
 from flask import current_app, json, session
 from qrcode import QRCode, constants
 from sqlalchemy import and_, or_
@@ -48,7 +49,6 @@ from indico.util.spreadsheets import unique_col
 from indico.util.string import to_unicode, validate_email, validate_email_verbose
 from indico.web.forms.base import IndicoForm
 from indico.web.forms.widgets import SwitchWidget
-import six
 
 
 def get_title_uuid(regform, title):

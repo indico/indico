@@ -12,6 +12,7 @@ import re
 from contextlib import contextmanager
 from uuid import uuid4
 
+import six
 from flask import Blueprint, Flask, g, request
 from flask.blueprints import BlueprintSetupState
 from flask.helpers import locked_cached_property
@@ -27,7 +28,6 @@ from indico.util.json import IndicoJSONEncoder
 from indico.web.flask.session import IndicoSessionInterface
 from indico.web.flask.templating import CustomizationLoader
 from indico.web.flask.util import make_view_func
-import six
 
 
 AUTH_BEARER_RE = re.compile(r'^Bearer (.+)$')
@@ -92,6 +92,7 @@ class IndicoFlask(PluginFlaskMixin, Flask):
 
     def add_url_rule(self, rule, endpoint=None, view_func=None, **options):
         from indico.web.rh import RHSimple
+
         # Endpoints from Flask-Multipass need to be wrapped in the RH
         # logic to get the autocommit logic and error handling for code
         # running inside the identity handler.

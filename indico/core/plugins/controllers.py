@@ -10,6 +10,7 @@ from __future__ import unicode_literals
 from collections import OrderedDict, defaultdict
 from operator import attrgetter
 
+import six
 from flask import flash, request
 from werkzeug.exceptions import NotFound
 
@@ -19,7 +20,6 @@ from indico.modules.admin import RHAdminBase
 from indico.util.i18n import _
 from indico.web.flask.util import redirect_or_jsonify, url_for
 from indico.web.forms.base import FormDefaults
-import six
 
 
 class RHPluginsBase(RHAdminBase):

@@ -12,6 +12,7 @@ from datetime import date, datetime, time
 from itertools import chain, groupby
 from operator import attrgetter, itemgetter
 
+import six
 from flask import flash, session
 from pytz import timezone
 from sqlalchemy.orm import contains_eager, joinedload
@@ -39,7 +40,6 @@ from indico.util.date_time import iterdays, overlaps, server_to_utc
 from indico.util.i18n import _
 from indico.util.string import natural_sort_key
 from indico.util.struct.iterables import group_list
-import six
 
 
 def group_blockings(blocked_rooms, dates):

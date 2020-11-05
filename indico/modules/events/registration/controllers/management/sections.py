@@ -7,7 +7,9 @@
 
 from __future__ import unicode_literals
 
+import six
 from flask import jsonify, request, session
+from six.moves import filter
 from werkzeug.exceptions import BadRequest
 
 from indico.core.db import db
@@ -16,8 +18,6 @@ from indico.modules.events.registration.controllers.management import RHManageRe
 from indico.modules.events.registration.models.items import RegistrationFormItemType, RegistrationFormSection
 from indico.modules.events.registration.util import update_regform_item_positions
 from indico.web.util import jsonify_data
-import six
-from six.moves import filter
 
 
 class RHManageRegFormSectionBase(RHManageRegFormBase):

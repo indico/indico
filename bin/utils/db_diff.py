@@ -15,8 +15,8 @@ import sys
 import click
 from click._compat import should_strip_ansi
 from migra import Migration
-from sqlalchemy import create_engine
 from six.moves import map
+from sqlalchemy import create_engine
 
 
 click.disable_unicode_literals_warning = True

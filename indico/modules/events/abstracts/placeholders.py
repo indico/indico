@@ -7,11 +7,12 @@
 
 from __future__ import unicode_literals
 
+import six
+
 from indico.modules.events.abstracts.models.abstracts import AbstractState
 from indico.util.i18n import _, orig_string
 from indico.util.placeholders import Placeholder
 from indico.web.flask.util import url_for
-import six
 
 
 __all__ = ('EventTitlePlaceholder', 'EventURLPlaceholder', 'AbstractIDPlaceholder', 'AbstractTitlePlaceholder',

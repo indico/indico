@@ -9,6 +9,7 @@ from __future__ import unicode_literals
 
 from uuid import uuid4
 
+import six
 from sqlalchemy.dialects.postgresql import UUID
 
 from indico.core.db import db
@@ -17,7 +18,6 @@ from indico.util.i18n import L_
 from indico.util.locators import locator_property
 from indico.util.string import format_repr, return_ascii
 from indico.util.struct.enum import RichIntEnum
-import six
 
 
 class InvitationState(RichIntEnum):

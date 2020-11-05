@@ -7,12 +7,13 @@
 
 from __future__ import unicode_literals
 
+import six
+from six.moves import map
+
 from indico.core.settings.converters import EnumConverter
 from indico.modules.designer import PageOrientation, PageSize
 from indico.modules.events.registration.models.items import PersonalDataType
 from indico.modules.events.settings import EventSettingsProxy
-from six.moves import map
-import six
 
 
 DEFAULT_BADGE_SETTINGS = {

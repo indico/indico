@@ -9,7 +9,9 @@ from __future__ import absolute_import, unicode_literals
 
 import json
 
+import six
 from markupsafe import escape
+from six.moves import map
 from wtforms.fields import Field, HiddenField, PasswordField, RadioField, SelectMultipleField, TextAreaField
 from wtforms.widgets import CheckboxInput
 
@@ -17,8 +19,6 @@ from indico.util.i18n import _
 from indico.util.string import sanitize_email, validate_email
 from indico.web.forms.fields.util import is_preprocessed_formdata
 from indico.web.forms.widgets import HiddenInputs, JinjaWidget, PasswordWidget
-from six.moves import map
-import six
 
 
 class IndicoSelectMultipleCheckboxField(SelectMultipleField):

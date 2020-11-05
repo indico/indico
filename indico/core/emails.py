@@ -7,12 +7,12 @@
 
 from __future__ import absolute_import, unicode_literals
 
-import six.moves.cPickle
 import os
 import tempfile
 from datetime import date
 
 import click
+import six.moves.cPickle
 from celery.exceptions import MaxRetriesExceededError, Retry
 from sqlalchemy.orm.attributes import flag_modified
 

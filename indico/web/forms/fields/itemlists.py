@@ -10,12 +10,12 @@ from __future__ import absolute_import, unicode_literals
 import json
 import uuid
 
+import six
 from markupsafe import escape
 from wtforms import HiddenField
 
 from indico.web.forms.fields.util import is_preprocessed_formdata
 from indico.web.forms.widgets import JinjaWidget
-import six
 
 
 class MultiStringField(HiddenField):

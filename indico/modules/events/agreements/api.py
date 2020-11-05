@@ -10,11 +10,12 @@ from __future__ import unicode_literals
 from itertools import islice
 from operator import attrgetter
 
+import six
+
 from indico.modules.events import Event
 from indico.modules.events.agreements.util import get_agreement_definitions
 from indico.web.http_api import HTTPAPIHook
 from indico.web.http_api.responses import HTTPAPIError
-import six
 
 
 @HTTPAPIHook.register

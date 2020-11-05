@@ -8,10 +8,10 @@
 from uuid import uuid4
 
 import pytest
+import six
 
 from indico.modules.oauth.models.applications import OAuthApplication
 from indico.modules.oauth.models.tokens import OAuthToken
-import six
 
 
 @pytest.fixture

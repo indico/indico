@@ -10,7 +10,9 @@ from __future__ import unicode_literals
 import uuid
 from operator import attrgetter
 
+import six
 from flask import flash, jsonify, redirect, request, session
+from six.moves import map
 from sqlalchemy.orm import undefer
 from werkzeug.exceptions import BadRequest, Forbidden, NotFound
 
@@ -62,8 +64,6 @@ from indico.web.flask.util import send_file, url_for
 from indico.web.forms.base import FormDefaults
 from indico.web.forms.fields.principals import serialize_principal
 from indico.web.util import jsonify_data, jsonify_form, jsonify_template
-import six
-from six.moves import map
 
 
 export_list_cache = GenericCache('export-list')

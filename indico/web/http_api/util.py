@@ -8,7 +8,10 @@
 import hashlib
 import hmac
 import time
-import six.moves.urllib.request, six.moves.urllib.parse, six.moves.urllib.error
+
+import six.moves.urllib.error
+import six.moves.urllib.parse
+import six.moves.urllib.request
 
 from indico.core.config import config
 from indico.modules.api import APIMode, api_settings

@@ -7,6 +7,7 @@
 
 from __future__ import unicode_literals
 
+import six
 from flask import request, session
 from marshmallow_enum import EnumField
 from webargs import fields, validate
@@ -25,7 +26,6 @@ from indico.modules.events.papers.util import is_type_reviewing_possible
 from indico.util.i18n import _
 from indico.util.marshmallow import max_words, not_empty
 from indico.web.args import parser, use_kwargs
-import six
 
 
 class RHPaperDetails(RHPaperBase):

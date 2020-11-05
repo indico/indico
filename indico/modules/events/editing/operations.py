@@ -11,6 +11,7 @@ import os
 from io import BytesIO
 from zipfile import ZipFile
 
+import six
 from flask import session
 from werkzeug.exceptions import BadRequest
 
@@ -32,7 +33,6 @@ from indico.util.date_time import now_utc
 from indico.util.fs import secure_filename
 from indico.util.i18n import _, orig_string
 from indico.web.flask.util import send_file
-import six
 
 
 FILE_TYPE_ATTRS = ('name', 'extensions', 'allow_multiple_files', 'required', 'publishable', 'filename_template')

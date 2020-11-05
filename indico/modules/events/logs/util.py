@@ -12,13 +12,13 @@ from datetime import datetime
 from difflib import SequenceMatcher
 from enum import Enum
 
+import six
 from markupsafe import Markup
+from six.moves import map
 
 from indico.core import signals
 from indico.util.i18n import orig_string
 from indico.util.signals import named_objects_from_signal
-import six
-from six.moves import map
 
 
 def get_log_renderers():

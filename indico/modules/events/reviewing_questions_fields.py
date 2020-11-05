@@ -7,6 +7,8 @@
 
 from __future__ import unicode_literals
 
+import six
+from six.moves import range
 from wtforms.fields import BooleanField
 from wtforms.validators import InputRequired
 
@@ -15,8 +17,6 @@ from indico.util.i18n import _
 from indico.web.fields.base import BaseField, FieldConfigForm
 from indico.web.fields.simple import BoolField, TextField
 from indico.web.forms.widgets import SwitchWidget
-import six
-from six.moves import range
 
 
 class AbstractRatingReviewingQuestionConfigForm(FieldConfigForm):

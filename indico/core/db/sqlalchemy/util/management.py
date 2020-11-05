@@ -7,14 +7,14 @@
 
 from __future__ import print_function, unicode_literals
 
+import six
+from six.moves import zip
 from sqlalchemy import ForeignKeyConstraint, MetaData, Table
 from sqlalchemy.engine.reflection import Inspector
 from sqlalchemy.sql.ddl import DropConstraint, DropSchema, DropTable
 
 from indico.core.db.sqlalchemy.protection import ProtectionMode
 from indico.util.console import cformat
-import six
-from six.moves import zip
 
 
 DEFAULT_TICKET_DATA = {

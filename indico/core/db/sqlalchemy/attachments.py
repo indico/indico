@@ -7,12 +7,12 @@
 
 from __future__ import unicode_literals
 
+import six
 from sqlalchemy import orm
 from sqlalchemy.event import listens_for
 
 from indico.core.db import db
 from indico.util.caching import memoize_request
-import six
 
 
 class AttachedItemsMixin(object):

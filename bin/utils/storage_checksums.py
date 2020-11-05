@@ -8,6 +8,7 @@
 from operator import itemgetter
 
 import click
+import six
 from sqlalchemy import inspect
 from sqlalchemy.orm import lazyload, load_only
 from sqlalchemy.sql.elements import Tuple
@@ -18,7 +19,6 @@ from indico.modules.events.static.models.static import StaticSite, StaticSiteSta
 from indico.util.console import cformat
 from indico.util.fs import get_file_checksum
 from indico.web.flask.app import make_app
-import six
 
 
 SPECIAL_FILTERS = {

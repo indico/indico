@@ -9,6 +9,7 @@ from __future__ import unicode_literals
 
 from io import BytesIO
 
+import six
 from flask import jsonify, request, session
 from marshmallow import missing
 from PIL import Image
@@ -43,7 +44,6 @@ from indico.util.i18n import _
 from indico.web.args import use_args, use_kwargs, use_rh_kwargs
 from indico.web.flask.util import send_file
 from indico.web.util import ExpectedError
-import six
 
 
 class RHRoomBookingAdminBase(RHRoomBookingBase):

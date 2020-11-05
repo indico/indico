@@ -9,13 +9,13 @@ from __future__ import unicode_literals
 
 from functools import wraps
 
+import six
 from jinja2.filters import do_filesizeformat
 
 from indico.core import signals
 from indico.core.db.sqlalchemy.links import LinkType
 from indico.modules.attachments.models.attachments import AttachmentType
 from indico.modules.events.logs import EventLogKind, EventLogRealm
-import six
 
 
 def connect_log_signals():

@@ -7,6 +7,7 @@
 
 from __future__ import unicode_literals
 
+import six
 from flask import jsonify, request
 
 from indico.core.db import db
@@ -15,7 +16,6 @@ from indico.modules.events.logs.models.entries import EventLogEntry, EventLogRea
 from indico.modules.events.logs.util import serialize_log_entry
 from indico.modules.events.logs.views import WPEventLogs
 from indico.modules.events.management.controllers import RHManageEventBase
-import six
 
 
 LOG_PAGE_SIZE = 15

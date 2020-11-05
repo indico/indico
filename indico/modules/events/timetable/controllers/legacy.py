@@ -12,6 +12,7 @@ from datetime import timedelta
 from operator import attrgetter
 
 import dateutil.parser
+import six
 from flask import flash, jsonify, request, session
 from pytz import utc
 from werkzeug.exceptions import BadRequest, Forbidden, NotFound
@@ -47,7 +48,6 @@ from indico.util.i18n import _
 from indico.util.string import handle_legacy_description
 from indico.web.forms.base import FormDefaults
 from indico.web.util import jsonify_data, jsonify_form, jsonify_template
-import six
 
 
 class RHLegacyTimetableAddEntryBase(RHManageTimetableBase):

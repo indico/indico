@@ -9,6 +9,7 @@ from __future__ import unicode_literals
 
 from datetime import datetime, time
 
+import six
 from dateutil.relativedelta import relativedelta
 from flask import flash, redirect, render_template, request, session
 from markupsafe import Markup
@@ -32,7 +33,6 @@ from indico.web.flask.util import url_for
 from indico.web.forms.base import FormDefaults
 from indico.web.rh import RHProtected
 from indico.web.util import jsonify_data, jsonify_template, url_for_index
-import six
 
 
 class RHCreateEvent(RHProtected):

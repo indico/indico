@@ -31,11 +31,11 @@ def iter_acl(acl):
 def principal_from_fossil(fossil, allow_pending=False, allow_groups=True, allow_missing_groups=False,
                           allow_emails=False, allow_networks=False, allow_registration_forms=False,
                           existing_data=None, event=None, category=None):
-    from indico.modules.networks.models.networks import IPNetworkGroup
-    from indico.modules.events.models.roles import EventRole
     from indico.modules.categories.models.roles import CategoryRole
+    from indico.modules.events.models.roles import EventRole
     from indico.modules.events.registration.models.forms import RegistrationForm
     from indico.modules.groups import GroupProxy
+    from indico.modules.networks.models.networks import IPNetworkGroup
     from indico.modules.users import User
 
     if event and category is None:
@@ -123,9 +123,9 @@ def principal_from_fossil(fossil, allow_pending=False, allow_groups=True, allow_
 def principal_from_identifier(identifier, allow_groups=False, allow_external_users=False, allow_event_roles=False,
                               allow_category_roles=False, allow_registration_forms=False, allow_emails=False,
                               event_id=None, soft_fail=False):
+    from indico.modules.categories.models.roles import CategoryRole
     from indico.modules.events.models.events import Event
     from indico.modules.events.models.roles import EventRole
-    from indico.modules.categories.models.roles import CategoryRole
     from indico.modules.events.registration.models.forms import RegistrationForm
     from indico.modules.groups import GroupProxy
     from indico.modules.users import User

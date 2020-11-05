@@ -10,7 +10,9 @@ from __future__ import unicode_literals
 from operator import attrgetter
 from uuid import UUID
 
+import six
 from flask import flash, jsonify, redirect, request, session
+from six.moves import map
 from sqlalchemy.orm import contains_eager, subqueryload
 from werkzeug.exceptions import Forbidden, NotFound
 
@@ -33,8 +35,6 @@ from indico.modules.events.registration.views import (WPDisplayRegistrationFormC
 from indico.util.fs import secure_filename
 from indico.util.i18n import _
 from indico.web.flask.util import send_file, url_for
-import six
-from six.moves import map
 
 
 class RHRegistrationFormDisplayBase(RHDisplayEventBase):

@@ -10,6 +10,7 @@ from __future__ import unicode_literals
 import os
 from io import BytesIO
 
+import six
 from flask import flash, jsonify, redirect, request, session
 from PIL import Image
 from werkzeug.exceptions import NotFound
@@ -36,7 +37,6 @@ from indico.web.flask.util import send_file, url_for
 from indico.web.forms import fields as indico_fields
 from indico.web.forms.base import FormDefaults, IndicoForm
 from indico.web.util import _pop_injected_js, jsonify_data
-import six
 
 
 class RHLayoutBase(RHManageEventBase):

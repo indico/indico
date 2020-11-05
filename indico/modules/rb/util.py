@@ -14,6 +14,7 @@ from io import BytesIO
 from operator import attrgetter
 
 import pytz
+import six
 from flask import current_app
 from PIL import Image
 from sqlalchemy import Date, cast
@@ -33,7 +34,6 @@ from indico.util.caching import memoize_request
 from indico.util.date_time import now_utc, server_to_utc
 from indico.util.string import crc32
 from indico.util.struct.iterables import group_list
-import six
 
 
 ROOM_PHOTO_DIMENSIONS = (290, 170)
@@ -112,27 +112,27 @@ def group_by_occurrence_date(occurrences, sort_by=None):
 
 
 def serialize_occurrences(data):
-    from indico.modules.rb.schemas import (reservation_occurrences_schema)
+    from indico.modules.rb.schemas import reservation_occurrences_schema
     return {dt.isoformat(): reservation_occurrences_schema.dump(data) for dt, data in six.iteritems(data)}
 
 
 def serialize_blockings(data):
-    from indico.modules.rb.schemas import (simple_blockings_schema)
+    from indico.modules.rb.schemas import simple_blockings_schema
     return {dt.isoformat(): simple_blockings_schema.dump(data) for dt, data in six.iteritems(data)}
 
 
 def serialize_nonbookable_periods(data):
-    from indico.modules.rb.schemas import (nonbookable_periods_schema)
+    from indico.modules.rb.schemas import nonbookable_periods_schema
     return {dt.isoformat(): nonbookable_periods_schema.dump(data) for dt, data in six.iteritems(data)}
 
 
 def serialize_unbookable_hours(data):
-    from indico.modules.rb.schemas import (bookable_hours_schema)
+    from indico.modules.rb.schemas import bookable_hours_schema
     return [bookable_hours_schema.dump(d) for d in data]
 
 
 def serialize_concurrent_pre_bookings(data):
-    from indico.modules.rb.schemas import (concurrent_pre_bookings_schema)
+    from indico.modules.rb.schemas import concurrent_pre_bookings_schema
     return {dt.isoformat(): concurrent_pre_bookings_schema.dump(data) for dt, data in six.iteritems(data)}
 
 

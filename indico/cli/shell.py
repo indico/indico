@@ -19,6 +19,7 @@ import click
 import sqlalchemy.orm
 from contextlib2 import ExitStack
 from flask import current_app
+from six.moves import zip
 
 import indico
 from indico.core import signals
@@ -31,7 +32,6 @@ from indico.util.console import cformat
 from indico.util.date_time import now_utc, server_to_utc
 from indico.util.fossilize import clearCache
 from indico.web.flask.stats import request_stats_request_started
-from six.moves import zip
 
 
 def _add_to_context(namespace, info, element, name=None, doc=None, color='green'):

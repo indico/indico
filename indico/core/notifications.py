@@ -12,14 +12,14 @@ import time
 from functools import wraps
 from types import GeneratorType
 
+import six
 from flask import g
+from six.moves import map
 
 from indico.core.config import config
 from indico.core.db import db
 from indico.core.logger import Logger
 from indico.util.string import to_unicode, truncate
-import six
-from six.moves import map
 
 
 logger = Logger.get('emails')

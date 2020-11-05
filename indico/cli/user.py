@@ -8,6 +8,7 @@
 from __future__ import print_function, unicode_literals
 
 import click
+import six
 from flask_multipass import IdentityInfo
 from terminaltables import AsciiTable
 
@@ -19,7 +20,6 @@ from indico.modules.users.operations import create_user
 from indico.modules.users.util import search_users
 from indico.util.console import cformat, prompt_email, prompt_pass
 from indico.util.string import to_unicode
-import six
 
 
 click.disable_unicode_literals_warning = True

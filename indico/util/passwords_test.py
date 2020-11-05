@@ -8,9 +8,9 @@
 from hashlib import md5 as _md5
 
 import pytest
+import six
 
 from indico.util.passwords import BCryptPassword, PasswordProperty
-import six
 
 
 def md5(s):

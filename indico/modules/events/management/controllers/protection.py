@@ -9,6 +9,7 @@ from __future__ import unicode_literals
 
 from operator import attrgetter
 
+import six
 from flask import flash, jsonify, redirect, request
 from werkzeug.exceptions import NotFound
 
@@ -37,7 +38,6 @@ from indico.web.forms.base import FormDefaults
 from indico.web.forms.fields.principals import PermissionsField, serialize_principal
 from indico.web.rh import RH
 from indico.web.util import jsonify_template
-import six
 
 
 class RHShowNonInheriting(RHManageEventBase):

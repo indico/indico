@@ -7,10 +7,10 @@
 
 from __future__ import absolute_import, unicode_literals
 
-import six.moves.cPickle
 import uuid
 from datetime import datetime, timedelta
 
+import six.moves.cPickle
 from flask import flash, request
 from flask.sessions import SessionInterface, SessionMixin
 from markupsafe import Markup

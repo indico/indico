@@ -11,18 +11,18 @@ import os
 import re
 from uuid import UUID
 
+import six
 from dateutil import parser, relativedelta
 from marshmallow import ValidationError
 from marshmallow.fields import DateTime, Field
 from marshmallow.utils import from_iso_datetime
+from six.moves import map
 from sqlalchemy import inspect
 
 from indico.core.permissions import get_unified_permissions
 from indico.util.date_time import now_utc
 from indico.util.i18n import _
 from indico.util.user import principal_from_identifier
-from six.moves import map
-import six
 
 
 HUMANIZED_DATE_RE = re.compile(r'^(?:(?P<number>-?\d+)(?P<unit>[dwM]))|(?P<iso_date>\d{4}-\d{2}-\d{2})$')

@@ -9,6 +9,7 @@ from __future__ import print_function, unicode_literals
 
 import posixpath
 
+import six
 from flask import current_app, render_template, request
 from sqlalchemy.orm import load_only
 from werkzeug.utils import cached_property
@@ -26,7 +27,6 @@ from indico.util.mathjax import MathjaxMixin
 from indico.util.string import strip_tags, to_unicode, truncate
 from indico.web.flask.util import url_for
 from indico.web.views import WPDecorated, WPJinjaMixin
-import six
 
 
 def _get_print_url(event, theme=None, theme_override=False):

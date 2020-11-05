@@ -8,8 +8,8 @@
 import ipaddress
 import socket
 
-from werkzeug.urls import url_parse
 import six
+from werkzeug.urls import url_parse
 
 
 def is_private_url(url):

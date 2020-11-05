@@ -7,7 +7,9 @@
 
 from __future__ import unicode_literals
 
+import six
 from flask import flash, request, session
+from six.moves import map
 
 from indico.core.db import db
 from indico.modules.events import EventLogKind, EventLogRealm
@@ -26,8 +28,6 @@ from indico.util.i18n import _
 from indico.util.placeholders import render_placeholder_info
 from indico.web.forms.base import FormDefaults
 from indico.web.util import jsonify_data, jsonify_form, jsonify_template
-import six
-from six.moves import map
 
 
 class RHProgramCodes(RHManageEventBase):

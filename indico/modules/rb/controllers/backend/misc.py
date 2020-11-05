@@ -10,6 +10,7 @@ from __future__ import unicode_literals
 from datetime import date, datetime, time, timedelta
 from io import BytesIO
 
+import six
 from flask import jsonify, redirect, request, session
 from sqlalchemy.orm import joinedload
 
@@ -31,7 +32,6 @@ from indico.util.caching import memoize_redis
 from indico.util.i18n import get_all_locales
 from indico.util.string import sanitize_html
 from indico.web.flask.util import send_file, url_for
-import six
 
 
 class RHConfig(RHRoomBookingBase):

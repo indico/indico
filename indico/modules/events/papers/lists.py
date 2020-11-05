@@ -10,7 +10,9 @@ from __future__ import unicode_literals
 from collections import OrderedDict
 from operator import attrgetter
 
+import six
 from flask import request
+from six.moves import map
 from sqlalchemy.orm import subqueryload, undefer
 
 from indico.core.db import db
@@ -21,8 +23,6 @@ from indico.modules.events.util import ListGeneratorBase
 from indico.modules.users import User
 from indico.util.i18n import _
 from indico.web.flask.templating import get_template_module
-import six
-from six.moves import map
 
 
 class PaperListGeneratorBase(ListGeneratorBase):

@@ -11,6 +11,7 @@ from collections import OrderedDict
 from datetime import timedelta
 from operator import attrgetter
 
+import six
 from flask import flash, request, session
 from sqlalchemy.orm import joinedload, subqueryload
 
@@ -23,7 +24,6 @@ from indico.modules.events.registration.util import get_registered_event_persons
 from indico.modules.events.util import ListGeneratorBase
 from indico.util.i18n import _
 from indico.web.flask.templating import get_template_module
-import six
 
 
 class ContributionListGenerator(ListGeneratorBase):

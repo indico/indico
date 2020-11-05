@@ -7,6 +7,7 @@
 
 from __future__ import unicode_literals
 
+import six
 from wtforms.fields import BooleanField, SelectField, TextAreaField
 from wtforms.fields.html5 import URLField
 from wtforms.fields.simple import StringField
@@ -21,7 +22,6 @@ from indico.web.forms.base import IndicoForm
 from indico.web.forms.fields import EditableFileField, FileField, IndicoEnumSelectField
 from indico.web.forms.validators import HiddenUnless, UsedIf
 from indico.web.forms.widgets import CKEditorWidget, ColorPickerWidget, SwitchWidget
-import six
 
 
 THEMES = [('', _('No theme selected')),

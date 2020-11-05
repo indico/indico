@@ -7,12 +7,13 @@
 
 from __future__ import unicode_literals
 
+import six
+
 from indico.core import signals
 from indico.core.db import db
 from indico.modules.events.agreements.models.agreements import Agreement
 from indico.modules.events.agreements.notifications import notify_agreement_new
 from indico.util.signals import named_objects_from_signal
-import six
 
 
 def get_agreement_definitions():

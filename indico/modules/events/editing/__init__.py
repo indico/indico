@@ -36,8 +36,8 @@ class EditingFeature(EventFeature):
 
     @classmethod
     def enabled(cls, event, cloning):
-        from indico.modules.events.editing.models.file_types import EditingFileType
         from indico.modules.events.editing.models.editable import EditableType
+        from indico.modules.events.editing.models.file_types import EditingFileType
         types_with_filetypes = {type_ for type_, in db.session.query(EditingFileType.type).with_parent(event)}
         types_without_filetypes = set(EditableType) - types_with_filetypes
         for type_ in types_without_filetypes:

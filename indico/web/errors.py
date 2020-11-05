@@ -10,6 +10,7 @@ from __future__ import absolute_import, unicode_literals
 import traceback
 from uuid import uuid4
 
+import six
 from flask import g, jsonify, render_template, request, session
 from itsdangerous import BadData
 from sqlalchemy.exc import OperationalError
@@ -19,7 +20,6 @@ from indico.core.errors import NoReportError
 from indico.legacy.common.cache import GenericCache
 from indico.web.util import get_request_info
 from indico.web.views import WPError
-import six
 
 
 def render_error(exc, title, message, code, standalone=False):

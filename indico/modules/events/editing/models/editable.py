@@ -239,7 +239,7 @@ class Editable(db.Model):
 
 @listens_for(orm.mapper, 'after_configured', once=True)
 def _mappers_configured():
-    from .revisions import EditingRevision, InitialRevisionState, FinalRevisionState
+    from .revisions import EditingRevision, FinalRevisionState, InitialRevisionState
 
     # Editable.state -- the state of the editable itself
     cases = db.cast(db.case({

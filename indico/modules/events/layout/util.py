@@ -10,6 +10,7 @@ from __future__ import unicode_literals
 from collections import OrderedDict, defaultdict
 from itertools import chain, count
 
+import six
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import joinedload, load_only
 from werkzeug.urls import url_parse
@@ -26,7 +27,6 @@ from indico.util.caching import memoize_request
 from indico.util.signals import named_objects_from_signal, values_from_signal
 from indico.util.string import crc32, return_ascii
 from indico.web.flask.util import url_for
-import six
 
 
 _cache = GenericCache('updated-menus')

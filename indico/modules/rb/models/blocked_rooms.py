@@ -10,6 +10,8 @@ from __future__ import unicode_literals
 from datetime import datetime, time
 from operator import attrgetter
 
+from six.moves import map
+
 from indico.core.db import db
 from indico.core.db.sqlalchemy import PyIntEnum
 from indico.modules.rb.models.reservation_occurrences import ReservationOccurrence
@@ -17,7 +19,6 @@ from indico.modules.rb.models.reservations import Reservation
 from indico.modules.rb.notifications.blockings import notify_request_response
 from indico.util.string import return_ascii
 from indico.util.struct.enum import RichIntEnum
-from six.moves import map
 
 
 class BlockedRoomState(RichIntEnum):

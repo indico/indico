@@ -13,14 +13,14 @@ from datetime import datetime
 from functools import partial
 from io import BytesIO
 
+import six
 from markupsafe import Markup
+from six.moves import map
 from speaklater import is_lazy_string
 from xlsxwriter import Workbook
 
 from indico.util.date_time import format_datetime
 from indico.web.flask.util import send_file
-from six.moves import map
-import six
 
 
 def unique_col(name, id_):

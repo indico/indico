@@ -8,6 +8,7 @@
 from __future__ import unicode_literals
 
 import dateutil.parser
+import six
 from flask import jsonify, request, session
 from werkzeug.exceptions import BadRequest, Forbidden, NotFound
 
@@ -28,7 +29,6 @@ from indico.modules.events.timetable.views import WPManageTimetable
 from indico.modules.events.util import track_time_changes
 from indico.web.forms.colors import get_colors
 from indico.web.util import jsonify_data
-import six
 
 
 class RHManageTimetable(RHManageTimetableBase):

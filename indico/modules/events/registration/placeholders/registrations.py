@@ -7,13 +7,13 @@
 
 from __future__ import unicode_literals
 
+import six
 from markupsafe import Markup
 
 from indico.modules.events.registration.models.items import PersonalDataType
 from indico.util.i18n import _
 from indico.util.placeholders import ParametrizedPlaceholder, Placeholder
 from indico.web.flask.util import url_for
-import six
 
 
 class FirstNamePlaceholder(Placeholder):

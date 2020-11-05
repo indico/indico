@@ -55,7 +55,7 @@ def _extend_event_management_menu(sender, event, **kwargs):
 
 @template_hook('conference-home-info')
 def _inject_regform_announcement(event, **kwargs):
-    from indico.modules.events.registration.util import get_registrations_with_tickets, get_event_regforms
+    from indico.modules.events.registration.util import get_event_regforms, get_registrations_with_tickets
     if event.has_feature('registration'):
         all_regforms = get_event_regforms(event, session.user)
         user_registrations = sum(regform[1] for regform in all_regforms)
@@ -144,8 +144,9 @@ def _get_event_management_url(event, **kwargs):
 
 @signals.get_placeholders.connect_via('registration-invitation-email')
 def _get_invitation_placeholders(sender, invitation, **kwargs):
-    from indico.modules.events.registration.placeholders.invitations import (FirstNamePlaceholder, LastNamePlaceholder,
-                                                                             InvitationLinkPlaceholder)
+    from indico.modules.events.registration.placeholders.invitations import (FirstNamePlaceholder,
+                                                                             InvitationLinkPlaceholder,
+                                                                             LastNamePlaceholder)
     yield FirstNamePlaceholder
     yield LastNamePlaceholder
     yield InvitationLinkPlaceholder
@@ -153,10 +154,10 @@ def _get_invitation_placeholders(sender, invitation, **kwargs):
 
 @signals.get_placeholders.connect_via('registration-email')
 def _get_registration_placeholders(sender, regform, registration, **kwargs):
-    from indico.modules.events.registration.placeholders.registrations import (IDPlaceholder, LastNamePlaceholder,
-                                                                               FirstNamePlaceholder, LinkPlaceholder,
-                                                                               EventTitlePlaceholder,
-                                                                               EventLinkPlaceholder, FieldPlaceholder)
+    from indico.modules.events.registration.placeholders.registrations import (EventLinkPlaceholder,
+                                                                               EventTitlePlaceholder, FieldPlaceholder,
+                                                                               FirstNamePlaceholder, IDPlaceholder,
+                                                                               LastNamePlaceholder, LinkPlaceholder)
     yield FirstNamePlaceholder
     yield LastNamePlaceholder
     yield EventTitlePlaceholder
@@ -178,7 +179,7 @@ def _get_management_permissions(sender, **kwargs):
 
 @signals.event_management.get_cloners.connect
 def _get_registration_cloners(sender, **kwargs):
-    from indico.modules.events.registration.clone import RegistrationFormCloner, RegistrationCloner
+    from indico.modules.events.registration.clone import RegistrationCloner, RegistrationFormCloner
     yield RegistrationFormCloner
     yield RegistrationCloner
 

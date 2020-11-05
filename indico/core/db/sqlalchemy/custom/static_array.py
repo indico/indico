@@ -13,7 +13,6 @@ StaticArray class and functions that SQLAlchemy can process instead of non hasha
 """
 
 from cStringIO import StringIO
-
 from sqlalchemy import String, types
 from sqlalchemy.dialects.postgresql import ARRAY
 from sqlalchemy.dialects.postgresql.base import PGDialect

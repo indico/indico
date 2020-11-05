@@ -9,9 +9,9 @@ from __future__ import unicode_literals
 
 import ipaddress
 
+import six
 from sqlalchemy import TypeDecorator
 from sqlalchemy.dialects.postgresql import CIDR
-import six
 
 
 class _AlwaysSortableMixin(object):

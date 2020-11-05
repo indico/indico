@@ -13,6 +13,7 @@ import re
 from tempfile import NamedTemporaryFile
 from zipfile import ZipFile
 
+import six
 from flask import g, request, session
 from flask.helpers import get_root_path
 from werkzeug.utils import secure_filename
@@ -48,7 +49,6 @@ from indico.util.string import strip_tags
 from indico.web.assets.vars_js import generate_global_file, generate_i18n_file, generate_user_file
 from indico.web.flask.util import url_for
 from indico.web.rh import RH
-import six
 
 
 def create_static_site(rh, event):

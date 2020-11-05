@@ -12,6 +12,7 @@ from enum import Enum
 from operator import attrgetter
 from uuid import uuid4
 
+import six
 from flask import flash, g, has_request_context, session
 from flask_multipass import IdentityRetrievalFailed
 from sqlalchemy.dialects.postgresql import JSONB, UUID
@@ -35,7 +36,6 @@ from indico.util.locators import locator_property
 from indico.util.string import format_full_name, format_repr, return_ascii
 from indico.util.struct.enum import RichIntEnum
 from indico.web.flask.util import url_for
-import six
 
 
 class UserTitle(RichIntEnum):

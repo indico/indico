@@ -7,6 +7,7 @@
 
 from __future__ import unicode_literals
 
+import six
 from flask import flash, request, session
 from werkzeug.exceptions import Forbidden
 from wtforms.fields import BooleanField
@@ -22,7 +23,6 @@ from indico.web.forms.base import FormDefaults, IndicoForm
 from indico.web.forms.widgets import SwitchWidget
 from indico.web.menu import render_sidemenu
 from indico.web.util import jsonify_data
-import six
 
 
 class RHFeaturesBase(RHManageEventBase):

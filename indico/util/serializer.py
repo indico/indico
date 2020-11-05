@@ -7,9 +7,10 @@
 
 from enum import Enum
 
+import six
+
 from indico.core.errors import IndicoError
 from indico.core.logger import Logger
-import six
 
 
 class Serializer(object):

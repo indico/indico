@@ -7,9 +7,9 @@
 
 import pytest
 from mock import MagicMock
+from six.moves import zip
 
 from indico.util.signals import named_objects_from_signal, values_from_signal
-from six.moves import zip
 
 
 def _make_signal_response(objects):

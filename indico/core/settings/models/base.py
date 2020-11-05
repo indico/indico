@@ -10,13 +10,13 @@ from __future__ import unicode_literals
 from collections import defaultdict
 from enum import Enum
 
+import six
 from flask import g, has_request_context
 from sqlalchemy.dialects.postgresql import JSONB
 
 from indico.core.db import db
 from indico.core.db.sqlalchemy.principals import PrincipalMixin, PrincipalType
 from indico.util.decorators import strict_classproperty
-import six
 
 
 def _coerce_value(value):

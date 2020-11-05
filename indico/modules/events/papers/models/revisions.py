@@ -10,6 +10,9 @@ from __future__ import unicode_literals
 from itertools import chain
 from operator import attrgetter
 
+import six
+from six.moves import map
+
 from indico.core.db import db
 from indico.core.db.sqlalchemy import PyIntEnum, UTCDateTime
 from indico.core.db.sqlalchemy.descriptions import RenderMode, RenderModeMixin
@@ -20,8 +23,6 @@ from indico.util.i18n import _
 from indico.util.locators import locator_property
 from indico.util.string import format_repr, return_ascii
 from indico.util.struct.enum import RichIntEnum
-import six
-from six.moves import map
 
 
 class PaperRevisionState(RichIntEnum):

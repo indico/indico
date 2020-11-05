@@ -11,12 +11,13 @@ import uuid
 from collections import Counter, OrderedDict
 from copy import deepcopy
 
+import six
+from six.moves import range
+
 from indico.modules.events.surveys.fields.base import SurveyField
 from indico.util.i18n import _
 from indico.util.string import alpha_enum
 from indico.web.fields.choices import MultiSelectField, SingleChoiceField
-import six
-from six.moves import range
 
 
 class _AddUUIDMixin(object):

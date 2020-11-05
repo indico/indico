@@ -63,7 +63,7 @@ def register_user(email, extra_emails, user_data, identity_data, settings, from_
 
 def impersonate_user(user):
     """Impersonate another user as an admin."""
-    from indico.modules.auth import login_user, logger
+    from indico.modules.auth import logger, login_user
 
     current_user = session.user
     # We don't overwrite a previous entry - the original (admin) user should be kept there

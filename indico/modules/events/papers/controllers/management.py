@@ -7,7 +7,9 @@
 
 from __future__ import unicode_literals
 
+import six
 from flask import flash, render_template, request, session
+from six.moves import map
 from werkzeug.exceptions import NotFound
 
 from indico.modules.events.contributions import Contribution
@@ -31,8 +33,6 @@ from indico.modules.users.models.users import User
 from indico.util.i18n import _, ngettext
 from indico.web.forms.base import FormDefaults
 from indico.web.util import jsonify_data, jsonify_form, jsonify_template
-import six
-from six.moves import map
 
 
 def _render_paper_dashboard(event, view_class=None):

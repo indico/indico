@@ -9,13 +9,13 @@ import re
 from datetime import datetime
 
 import dateutil.parser
+import six
 from lxml import etree
 from pytz import timezone, utc
 
 from indico.core.logger import Logger
 from indico.util.string import to_unicode
 from indico.web.http_api.metadata.serializer import Serializer
-import six
 
 
 def _deserialize_date(date_dict):

@@ -9,11 +9,12 @@ from __future__ import unicode_literals
 
 from datetime import datetime
 
+import six
+from six.moves import range
+
 from indico.modules.rb.models.room_bookable_hours import BookableHours
 from indico.modules.rb.models.room_nonbookable_periods import NonBookablePeriod
 from indico.util.struct.iterables import group_list
-import six
-from six.moves import range
 
 
 def get_rooms_unbookable_hours(rooms):

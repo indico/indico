@@ -9,6 +9,7 @@ from __future__ import unicode_literals
 
 from operator import attrgetter
 
+import six
 from flask import flash, jsonify, redirect, request
 from sqlalchemy.orm import joinedload
 from webargs import fields
@@ -30,7 +31,6 @@ from indico.web.flask.templating import get_template_module
 from indico.web.flask.util import url_for
 from indico.web.forms.base import FormDefaults
 from indico.web.rh import RHProtected
-import six
 
 
 class RHGroups(RHAdminBase):

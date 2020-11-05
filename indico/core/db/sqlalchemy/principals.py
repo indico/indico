@@ -7,6 +7,7 @@
 
 from __future__ import unicode_literals
 
+import six
 from sqlalchemy.dialects.postgresql import ARRAY
 from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.ext.hybrid import Comparator, hybrid_method, hybrid_property
@@ -19,7 +20,6 @@ from indico.util.decorators import classproperty, strict_classproperty
 from indico.util.fossilize import Fossilizable, IFossil, fossilizes
 from indico.util.string import format_repr, return_ascii
 from indico.util.struct.enum import IndicoEnum
-import six
 
 
 class PrincipalType(int, IndicoEnum):

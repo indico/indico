@@ -39,7 +39,7 @@ def _check_feature_definitions(app, **kwargs):
 
 @signals.event.created.connect
 def _event_created(event, cloning, **kwargs):
-    from indico.modules.events.features.util import get_feature_definitions, get_enabled_features
+    from indico.modules.events.features.util import get_enabled_features, get_feature_definitions
     feature_definitions = get_feature_definitions()
     for feature in get_enabled_features(event):
         feature_definitions[feature].enabled(event, cloning)
@@ -47,8 +47,8 @@ def _event_created(event, cloning, **kwargs):
 
 @signals.event.type_changed.connect
 def _event_type_changed(event, **kwargs):
-    from indico.modules.events.features.util import (get_enabled_features, get_disallowed_features, set_feature_enabled,
-                                                     format_feature_names)
+    from indico.modules.events.features.util import (format_feature_names, get_disallowed_features,
+                                                     get_enabled_features, set_feature_enabled)
     conflicting = get_enabled_features(event, only_explicit=True) & get_disallowed_features(event)
     if conflicting:
         for feature in conflicting:

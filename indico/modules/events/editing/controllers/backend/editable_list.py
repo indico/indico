@@ -9,6 +9,7 @@ from __future__ import unicode_literals
 
 import uuid
 
+import six
 from flask import jsonify, request, session
 from marshmallow import fields
 from sqlalchemy.orm import joinedload
@@ -30,7 +31,6 @@ from indico.util.i18n import _
 from indico.util.marshmallow import Principal
 from indico.web.args import use_kwargs
 from indico.web.flask.util import url_for
-import six
 
 
 archive_cache = GenericCache('editables-archive')

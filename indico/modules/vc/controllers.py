@@ -10,6 +10,7 @@ from __future__ import unicode_literals
 from collections import OrderedDict, defaultdict
 from operator import itemgetter
 
+import six
 from flask import flash, jsonify, redirect, request, session
 from sqlalchemy import func, inspect
 from sqlalchemy.orm import joinedload, lazyload
@@ -32,7 +33,6 @@ from indico.web.flask.util import url_for
 from indico.web.forms.base import FormDefaults
 from indico.web.rh import RHProtected
 from indico.web.util import _pop_injected_js, jsonify_data, jsonify_template
-import six
 
 
 def process_vc_room_association(plugin, event, vc_room, form, event_vc_room=None, allow_same_room=False):

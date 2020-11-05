@@ -13,8 +13,10 @@ from datetime import time, timedelta
 
 import dateutil.parser
 import pytz
+import six
 from flask import session
 from markupsafe import escape
+from six.moves import map, range
 from wtforms import Field, SelectField
 from wtforms.ext.dateutil.fields import DateField, DateTimeField
 from wtforms.fields import TimeField
@@ -26,9 +28,6 @@ from indico.util.i18n import _, get_current_locale
 from indico.web.forms.fields import JSONField
 from indico.web.forms.validators import DateRange, DateTimeRange, LinkedDate, LinkedDateTime
 from indico.web.forms.widgets import JinjaWidget
-import six
-from six.moves import map
-from six.moves import range
 
 
 class TimeDeltaField(Field):

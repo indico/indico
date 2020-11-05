@@ -10,6 +10,7 @@ from __future__ import unicode_literals
 from datetime import time
 from itertools import groupby
 
+import six
 from flask import request, session
 from wtforms.ext.sqlalchemy.fields import QuerySelectField
 from wtforms.fields import BooleanField, HiddenField, IntegerField, SelectField, StringField, TextAreaField
@@ -41,7 +42,6 @@ from indico.web.forms.fields.principals import PrincipalListField
 from indico.web.forms.util import inject_validators
 from indico.web.forms.validators import HiddenUnless, LinkedDateTime, SoftLength, UsedIf, WordCount
 from indico.web.forms.widgets import JinjaWidget, SwitchWidget
-import six
 
 
 def make_review_form(event):

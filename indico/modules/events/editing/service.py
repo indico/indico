@@ -8,7 +8,9 @@
 from __future__ import unicode_literals
 
 import requests
+import six
 from marshmallow import ValidationError
+from six.moves import map
 from werkzeug.urls import url_parse
 
 import indico
@@ -26,8 +28,6 @@ from indico.modules.users import User
 from indico.util.caching import memoize_redis
 from indico.util.i18n import _
 from indico.web.flask.util import url_for
-from six.moves import map
-import six
 
 
 class ServiceRequestFailed(Exception):

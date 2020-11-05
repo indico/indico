@@ -10,11 +10,13 @@ Base export interface
 """
 
 import re
-import six.moves.urllib.request, six.moves.urllib.parse, six.moves.urllib.error
 from datetime import datetime, time, timedelta
 from types import GeneratorType
 
 import pytz
+import six.moves.urllib.error
+import six.moves.urllib.parse
+import six.moves.urllib.request
 from flask import current_app, request
 
 from indico.core.config import config

@@ -7,6 +7,7 @@
 
 from __future__ import unicode_literals
 
+import six
 from flask import has_request_context, request, session
 
 from indico.core import signals
@@ -16,7 +17,6 @@ from indico.modules.networks.models.networks import IPNetworkGroup
 from indico.util.i18n import _
 from indico.web.flask.util import url_for
 from indico.web.menu import SideMenuItem
-import six
 
 
 logger = Logger.get('networks')

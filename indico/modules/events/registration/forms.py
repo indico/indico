@@ -11,6 +11,7 @@ from datetime import time
 from operator import itemgetter
 
 import jsonschema
+import six
 from flask import request
 from wtforms.fields import BooleanField, FloatField, HiddenField, IntegerField, SelectField, StringField, TextAreaField
 from wtforms.fields.html5 import DecimalField, EmailField
@@ -34,7 +35,6 @@ from indico.web.forms.fields.principals import PrincipalListField
 from indico.web.forms.fields.simple import HiddenFieldList, IndicoEmailRecipientsField
 from indico.web.forms.validators import HiddenUnless, IndicoEmail, LinkedDateTime
 from indico.web.forms.widgets import CKEditorWidget, SwitchWidget
-import six
 
 
 def _check_if_payment_required(form, field):

@@ -7,9 +7,10 @@
 
 from __future__ import unicode_literals
 
+import six
+
 from indico.core import signals
 from indico.util.signals import named_objects_from_signal
-import six
 
 
 def get_request_definitions():

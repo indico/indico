@@ -7,15 +7,14 @@
 
 from datetime import date, datetime, time
 
-
 import pytest
 from dateutil.relativedelta import relativedelta
+from six.moves import zip
 
 from indico.core.errors import IndicoError
 from indico.modules.rb.models.reservation_occurrences import ReservationOccurrence, ReservationOccurrenceState
 from indico.modules.rb.models.reservations import RepeatFrequency
 from indico.testing.util import extract_emails
-from six.moves import zip
 
 
 pytest_plugins = 'indico.modules.rb.testing.fixtures'

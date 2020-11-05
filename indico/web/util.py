@@ -9,6 +9,7 @@ from __future__ import absolute_import, unicode_literals
 
 from datetime import datetime
 
+import six
 from flask import g, has_request_context, jsonify, render_template, request, session
 from itsdangerous import Signer
 from markupsafe import Markup
@@ -17,7 +18,6 @@ from werkzeug.urls import url_decode, url_encode, url_parse, url_unparse
 
 from indico.util.i18n import _
 from indico.web.flask.templating import get_template_module
-import six
 
 
 def inject_js(js):

@@ -235,7 +235,7 @@ class TimetableEntry(db.Model):
 
     @property
     def siblings(self):
-        from indico.modules.events.timetable.util import get_top_level_entries, get_nested_entries
+        from indico.modules.events.timetable.util import get_nested_entries, get_top_level_entries
         tzinfo = self.event.tzinfo
         day = self.start_dt.astimezone(tzinfo).date()
         siblings = (get_nested_entries(self.event)[self.parent_id]

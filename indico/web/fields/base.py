@@ -9,13 +9,13 @@ from __future__ import unicode_literals
 
 from copy import deepcopy
 
+import six
 from wtforms.fields import BooleanField, StringField, TextAreaField
 from wtforms.validators import DataRequired, Optional
 
 from indico.util.i18n import _
 from indico.web.forms.base import IndicoForm
 from indico.web.forms.widgets import SwitchWidget
-import six
 
 
 class FieldConfigForm(IndicoForm):

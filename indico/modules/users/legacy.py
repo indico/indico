@@ -5,6 +5,7 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
+import six
 from flask_multipass import IdentityInfo
 
 from indico.legacy.common.cache import GenericCache
@@ -15,7 +16,6 @@ from indico.util.caching import memoize_request
 from indico.util.fossilize import Fossilizable, fossilizes
 from indico.util.locators import locator_property
 from indico.util.string import encode_utf8, return_ascii, to_unicode
-import six
 
 
 AVATAR_FIELD_MAP = {

@@ -12,6 +12,7 @@ import os
 import shutil
 from collections import OrderedDict, defaultdict, namedtuple
 
+import six
 from sqlalchemy.orm import joinedload, load_only, noload
 
 from indico.core.config import config
@@ -31,7 +32,6 @@ from indico.modules.events.tracks.models.principals import TrackPrincipal
 from indico.modules.events.tracks.models.tracks import Track
 from indico.util.spreadsheets import unique_col
 from indico.web.flask.templating import get_template_module
-import six
 
 
 def build_default_email_template(event, tpl_type):
@@ -185,8 +185,8 @@ def make_abstract_form(event, user, notification_option=False, management=False,
     :param invited: Whether the form is used to create an invited abstract
     :return: An `AbstractForm` subclass.
     """
-    from indico.modules.events.abstracts.forms import (AbstractForm, MultiTrackMixin, SingleTrackMixin, NoTrackMixin,
-                                                       SendNotificationsMixin)
+    from indico.modules.events.abstracts.forms import (AbstractForm, MultiTrackMixin, NoTrackMixin,
+                                                       SendNotificationsMixin, SingleTrackMixin)
 
     mixins = []
     if not event.tracks:

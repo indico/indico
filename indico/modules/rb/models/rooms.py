@@ -8,6 +8,7 @@
 import warnings
 from datetime import date, time
 
+from six.moves import zip
 from sqlalchemy import and_, or_
 from sqlalchemy.dialects.postgresql import ARRAY
 from sqlalchemy.ext.hybrid import hybrid_property
@@ -35,7 +36,6 @@ from indico.util.i18n import _
 from indico.util.serializer import Serializer
 from indico.util.string import format_repr, natural_sort_key, return_ascii
 from indico.web.flask.util import url_for
-from six.moves import zip
 
 
 _cache = GenericCache('Rooms')

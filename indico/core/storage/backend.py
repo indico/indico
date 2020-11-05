@@ -14,6 +14,7 @@ from hashlib import md5
 from io import BytesIO
 from tempfile import NamedTemporaryFile
 
+import six
 from werkzeug.security import safe_join
 
 from indico.core import signals
@@ -21,7 +22,6 @@ from indico.core.config import config
 from indico.util.signals import named_objects_from_signal
 from indico.util.string import return_ascii
 from indico.web.flask.util import send_file
-import six
 
 
 def get_storage(backend_name):

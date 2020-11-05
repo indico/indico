@@ -11,17 +11,16 @@ import re
 from collections import namedtuple
 from itertools import product
 
+import six
 from reportlab.lib.units import cm
 from reportlab.lib.utils import ImageReader
+from six.moves import range, zip
 from werkzeug.exceptions import BadRequest
 
 from indico.modules.designer.pdf import DesignerPDFBase
 from indico.modules.events.registration.settings import DEFAULT_BADGE_SETTINGS
 from indico.util.i18n import _
 from indico.util.placeholders import get_placeholders
-import six
-from six.moves import zip
-from six.moves import range
 
 
 FONT_SIZE_RE = re.compile(r'(\d+)(pt)?')

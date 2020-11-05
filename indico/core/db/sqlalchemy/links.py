@@ -10,6 +10,7 @@ from __future__ import unicode_literals
 from functools import partial
 from itertools import chain
 
+import six
 from sqlalchemy.event import listen
 from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.ext.hybrid import Comparator, hybrid_property
@@ -19,7 +20,6 @@ from indico.core.db.sqlalchemy import PyIntEnum
 from indico.util.decorators import strict_classproperty
 from indico.util.i18n import _
 from indico.util.struct.enum import RichIntEnum
-import six
 
 
 class LinkType(RichIntEnum):

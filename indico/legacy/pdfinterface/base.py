@@ -25,11 +25,11 @@ from reportlab.pdfbase.ttfonts import TTFont
 from reportlab.pdfgen.canvas import Canvas
 from reportlab.platypus import PageTemplate, SimpleDocTemplate
 from reportlab.platypus.frames import Frame
+from six.moves import range
 
 from indico.legacy.common.utils import isStringHTML
 from indico.util.i18n import _
 from indico.util.string import sanitize_for_platypus, to_unicode
-from six.moves import range
 
 
 ratio = math.sqrt(math.sqrt(2.0))
@@ -570,8 +570,8 @@ class DocTemplateWithTOC(SimpleDocTemplate):
         self.mergePDFs(self.filename, contentFile)
 
     def mergePDFs(self, pdf1, pdf2):
-        from pyPdf import PdfFileWriter, PdfFileReader
         import cStringIO
+        from pyPdf import PdfFileReader, PdfFileWriter
         outputStream = cStringIO.StringIO()
         pdf1Stream = cStringIO.StringIO()
         pdf2Stream = cStringIO.StringIO()

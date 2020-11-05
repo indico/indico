@@ -10,10 +10,11 @@ from __future__ import unicode_literals
 import base64
 import mimetypes
 import re
-import six.moves.urllib.parse
 from contextlib import contextmanager
 
 import requests
+import six
+import six.moves.urllib.parse
 from flask import current_app, g, request
 from flask_webpackext import current_webpack
 from flask_webpackext.manifest import JinjaManifestEntry
@@ -23,7 +24,6 @@ from werkzeug.urls import url_parse
 from indico.core.config import config
 from indico.modules.events.layout.models.images import ImageFile
 from indico.web.flask.util import endpoint_for_url
-import six
 
 
 _css_url_pattern = r"""url\((['"]?)({}|https?:)?([^)'"]+)\1\)"""

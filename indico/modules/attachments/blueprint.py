@@ -9,6 +9,8 @@ from __future__ import unicode_literals
 
 import itertools
 
+import six
+
 from indico.modules.attachments.controllers.compat import (RHCompatAttachmentNew, compat_attachment, compat_folder,
                                                            compat_folder_old)
 from indico.modules.attachments.controllers.display.category import RHDownloadCategoryAttachment
@@ -34,7 +36,6 @@ from indico.modules.events import event_management_object_url_prefixes, event_ob
 from indico.util.caching import memoize
 from indico.web.flask.util import make_compat_redirect_func, make_view_func
 from indico.web.flask.wrappers import IndicoBlueprint
-import six
 
 
 _bp = IndicoBlueprint('attachments', __name__, template_folder='templates', virtual_template_folder='attachments')

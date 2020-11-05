@@ -9,6 +9,8 @@ from __future__ import unicode_literals
 
 from uuid import uuid4
 
+import six
+from six.moves import map
 from sqlalchemy.dialects.postgresql import ARRAY, UUID
 from sqlalchemy.ext.declarative import declared_attr
 from werkzeug.urls import url_parse
@@ -19,8 +21,6 @@ from indico.modules.oauth import logger
 from indico.util.i18n import _
 from indico.util.string import return_ascii
 from indico.util.struct.enum import IndicoEnum
-from six.moves import map
-import six
 
 
 SCOPES = {'read:user': _("User information (read only)"),

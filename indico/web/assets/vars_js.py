@@ -9,6 +9,7 @@ from __future__ import unicode_literals
 
 import os
 
+import six
 from flask import current_app, json, render_template, session
 from werkzeug.urls import url_parse
 
@@ -20,7 +21,6 @@ from indico.modules.events.registration.util import url_rule_to_angular
 from indico.modules.users.util import serialize_user
 from indico.util.i18n import po_to_json
 from indico.web.flask.util import url_for, url_rule_to_js
-import six
 
 
 def get_locale_data(path, name, domain, react=False):

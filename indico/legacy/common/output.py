@@ -11,6 +11,7 @@ import string
 from collections import defaultdict
 from datetime import datetime
 
+import six
 from sqlalchemy.orm import joinedload, load_only
 
 from indico.legacy.common.xmlGen import XMLGen
@@ -22,7 +23,6 @@ from indico.modules.users import User
 from indico.modules.users.legacy import AvatarUserWrapper
 from indico.util.event import uniqueId
 from indico.web.flask.util import url_for
-import six
 
 
 def get_map_url(item):

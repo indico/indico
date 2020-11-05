@@ -10,11 +10,11 @@ from datetime import datetime
 from itertools import chain
 
 import dateutil.parser
+import six
 
 from indico.modules.rb import rb_settings
 from indico.modules.rb.models.reservations import RepeatFrequency
 from indico.modules.rb.tasks import roombooking_end_notifications, roombooking_occurrences
-import six
 
 
 pytest_plugins = 'indico.modules.rb.testing.fixtures'

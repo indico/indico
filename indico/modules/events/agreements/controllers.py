@@ -10,6 +10,7 @@ from __future__ import unicode_literals
 import mimetypes
 from io import BytesIO
 
+import six
 from flask import flash, jsonify, redirect, request, session
 from werkzeug.exceptions import Forbidden, NotFound
 
@@ -29,7 +30,6 @@ from indico.util.i18n import _
 from indico.web.flask.util import send_file, url_for
 from indico.web.forms.base import FormDefaults
 from indico.web.views import WPJinjaMixin
-import six
 
 
 class RHAgreementManagerBase(RHManageEventBase):

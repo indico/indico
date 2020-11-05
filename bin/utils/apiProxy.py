@@ -12,10 +12,12 @@ import hmac
 import optparse
 import sys
 import time
-import six.moves.urllib.request, six.moves.urllib.parse, six.moves.urllib.error
 from contextlib import closing
 
 import requests
+import six.moves.urllib.error
+import six.moves.urllib.parse
+import six.moves.urllib.request
 from flask import Flask, Response, abort, request
 from werkzeug.datastructures import MultiDict
 

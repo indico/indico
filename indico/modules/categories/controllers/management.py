@@ -13,6 +13,7 @@ from io import BytesIO
 
 from flask import flash, redirect, request, session
 from PIL import Image
+from six.moves import map
 from sqlalchemy.orm import joinedload, load_only, undefer_group
 from werkzeug.exceptions import BadRequest, Forbidden
 
@@ -42,7 +43,6 @@ from indico.web.forms.base import FormDefaults
 from indico.web.forms.colors import get_role_colors
 from indico.web.forms.fields.principals import serialize_principal
 from indico.web.util import jsonify_data, jsonify_form, jsonify_template, url_for_index
-from six.moves import map
 
 
 CATEGORY_ICON_DIMENSIONS = (16, 16)

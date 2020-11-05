@@ -9,10 +9,10 @@ import json
 from collections import defaultdict
 from uuid import uuid4
 
+import six
 from alembic import context, op
 
 from indico.modules.events.editing.models.editable import EditableType
-import six
 
 
 # revision identifiers, used by Alembic.

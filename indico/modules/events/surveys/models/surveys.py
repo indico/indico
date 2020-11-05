@@ -9,6 +9,7 @@ from __future__ import unicode_literals
 
 from uuid import uuid4
 
+import six
 from sqlalchemy import inspect
 from sqlalchemy.dialects.postgresql import ARRAY, UUID
 from sqlalchemy.event import listens_for
@@ -26,7 +27,6 @@ from indico.util.locators import locator_property
 from indico.util.string import return_ascii
 from indico.util.struct.enum import IndicoEnum
 from indico.web.flask.templating import get_template_module
-import six
 
 
 class SurveyState(IndicoEnum):

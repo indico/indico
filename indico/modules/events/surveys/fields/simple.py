@@ -9,10 +9,11 @@ from __future__ import division, unicode_literals
 
 from collections import Counter, OrderedDict
 
+import six
+
 from indico.modules.events.surveys.fields.base import SurveyField
 from indico.util.i18n import _
 from indico.web.fields.simple import BoolField, NumberField, TextField
-import six
 
 
 class SurveyTextField(TextField, SurveyField):

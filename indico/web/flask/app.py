@@ -10,6 +10,7 @@ from __future__ import absolute_import, unicode_literals
 import os
 import uuid
 
+import six
 from babel.numbers import format_currency, get_currency_name
 from flask import _app_ctx_stack, request
 from flask.helpers import get_root_path
@@ -55,7 +56,6 @@ from indico.web.forms.jinja_helpers import is_single_line_field, iter_form_field
 from indico.web.menu import render_sidemenu
 from indico.web.util import url_for_index
 from indico.web.views import render_session_bar
-import six
 
 
 def configure_app(app, set_path=False):

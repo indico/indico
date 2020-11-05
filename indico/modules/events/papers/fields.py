@@ -9,11 +9,12 @@ from __future__ import unicode_literals
 
 import json
 
+import six
+
 from indico.modules.events.papers.settings import RoleConverter
 from indico.modules.events.papers.settings import paper_reviewing_settings as settings
 from indico.web.forms.fields import JSONField
 from indico.web.forms.widgets import JinjaWidget
-import six
 
 
 class PaperEmailSettingsField(JSONField):
