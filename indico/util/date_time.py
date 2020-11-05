@@ -24,7 +24,6 @@ from flask import has_request_context, session
 
 from indico.core.config import config
 from indico.util.i18n import _, get_current_locale, ngettext, parse_locale
-from indico.util.string import inject_unicode_debug
 
 
 class relativedelta(_relativedelta):
@@ -94,46 +93,34 @@ def utc_to_server(dt):
     return dt.astimezone(server_tz)
 
 
-def format_datetime(dt, format='medium', locale=None, timezone=None, as_unicode=False):
+def format_datetime(dt, format='medium', locale=None, timezone=None):
     """Basically a wrapper around Babel's own format_datetime."""
-    inject_unicode = True
     if format == 'code':
         format = 'dd/MM/yyyy HH:mm'
-        inject_unicode = False
     if not locale:
         locale = get_current_locale()
     if not timezone and dt.tzinfo:
         timezone = session.tzinfo
 
-    rv = _format_datetime(dt, format=format, locale=locale, tzinfo=timezone)
-    if as_unicode:
-        return rv
-    return inject_unicode_debug(rv, 2).encode('utf-8') if inject_unicode else rv.encode('utf-8')
+    return _format_datetime(dt, format=format, locale=locale, tzinfo=timezone)
 
 
-def format_date(d, format='medium', locale=None, timezone=None, as_unicode=False):
+def format_date(d, format='medium', locale=None, timezone=None):
     """Basically a wrapper around Babel's own format_date."""
-    inject_unicode = True
     if format == 'code':
         format = 'dd/MM/yyyy'
-        inject_unicode = False
     if not locale:
         locale = get_current_locale()
     if timezone and isinstance(d, datetime) and d.tzinfo:
         d = d.astimezone(pytz.timezone(timezone) if isinstance(timezone, six.string_types) else timezone)
 
-    rv = _format_date(d, format=format, locale=locale)
-    if as_unicode:
-        return rv
-    return inject_unicode_debug(rv, 2).encode('utf-8') if inject_unicode else rv.encode('utf-8')
+    return _format_date(d, format=format, locale=locale)
 
 
-def format_time(t, format='short', locale=None, timezone=None, server_tz=False, as_unicode=False):
+def format_time(t, format='short', locale=None, timezone=None, server_tz=False):
     """Basically a wrapper around Babel's own format_time."""
-    inject_unicode = True
     if format == 'code':
         format = 'HH:mm'
-        inject_unicode = False
     if not locale:
         locale = get_current_locale()
     if not timezone and t.tzinfo:
@@ -142,21 +129,15 @@ def format_time(t, format='short', locale=None, timezone=None, server_tz=False, 
         timezone = config.DEFAULT_TIMEZONE
     if isinstance(timezone, six.string_types):
         timezone = get_timezone(timezone)
-    rv = _format_time(t, format=format, locale=locale, tzinfo=timezone)
-    if as_unicode:
-        return rv
-    return inject_unicode_debug(rv, 2).encode('utf-8') if inject_unicode else rv.encode('utf-8')
+    return _format_time(t, format=format, locale=locale, tzinfo=timezone)
 
 
-def format_timedelta(td, format='short', threshold=0.85, locale=None, as_unicode=False):
+def format_timedelta(td, format='short', threshold=0.85, locale=None):
     """Basically a wrapper around Babel's own format_timedelta."""
     if not locale:
         locale = get_current_locale()
 
-    rv = _format_timedelta(td, format=format, locale=locale, threshold=threshold)
-    if as_unicode:
-        return rv
-    return inject_unicode_debug(rv, 2).encode('utf-8')
+    return _format_timedelta(td, format=format, locale=locale, threshold=threshold)
 
 
 def format_human_timedelta(delta, granularity='seconds', narrow=False):
@@ -213,7 +194,7 @@ def format_human_timedelta(delta, granularity='seconds', narrow=False):
         return u' '.join(parts)
 
 
-def format_human_date(dt, format='medium', locale=None, as_unicode=False):
+def format_human_date(dt, format='medium', locale=None):
     """
     Return the date in a human-like format for yesterday, today and tomorrow.
 
@@ -232,7 +213,7 @@ def format_human_date(dt, format='medium', locale=None, as_unicode=False):
     elif dt == today + oneday:
         return _("tomorrow")
     else:
-        return format_date(dt, format, locale=locale, as_unicode=as_unicode)
+        return format_date(dt, format, locale=locale)
 
 
 def _format_pretty_datetime(dt, locale, tzinfo, formats):
@@ -298,8 +279,7 @@ def format_pretty_datetime(dt, locale=None, tzinfo=None):
 def format_number(number, locale=None):
     if not locale:
         locale = get_current_locale()
-    rv = _format_number(number, locale=locale)
-    return inject_unicode_debug(rv, 2).encode('utf-8')
+    return _format_number(number, locale=locale)
 
 
 def timedelta_split(delta):

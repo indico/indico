@@ -106,8 +106,7 @@ class DatePlaceholder(Placeholder):
             raise TypeError('render() got unexpected kwargs: {}'.format(kwargs))
         if not arg.start_dt:
             return ''
-        formatted = format_datetime(arg.start_dt, cls.date_format, locale='en_GB', timezone=arg.event.tzinfo,
-                                    as_unicode=True)
+        formatted = format_datetime(arg.start_dt, cls.date_format, locale='en_GB', timezone=arg.event.tzinfo)
         return cls.transform(formatted) if cls.transform else formatted
 
 
