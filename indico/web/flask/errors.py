@@ -19,7 +19,6 @@ from indico.core.errors import IndicoError, get_error_description
 from indico.core.logger import Logger, sentry_log_exception
 from indico.modules.auth.util import redirect_to_login
 from indico.util.i18n import _
-from indico.util.string import to_unicode
 from indico.web.errors import render_error
 from indico.web.flask.wrappers import IndicoBlueprint
 from indico.web.util import ExpectedError
@@ -61,7 +60,7 @@ def handle_unprocessableentity(exc):
 def handle_badrequestkeyerror(exc):
     if current_app.debug:
         raise
-    msg = _('Required argument missing: {}').format(to_unicode(exc.message))
+    msg = _('Required argument missing: {}').format(str(exc))
     return render_error(exc, exc.name, msg, exc.code)
 
 
@@ -81,12 +80,12 @@ def handle_http_exception(exc):
 
 @errors_bp.app_errorhandler(BadData)
 def handle_baddata(exc):
-    return render_error(exc, _('Invalid or expired token'), to_unicode(exc.message), 400)
+    return render_error(exc, _('Invalid or expired token'), str(exc), 400)
 
 
 @errors_bp.app_errorhandler(IndicoError)
 def handle_indico_exception(exc):
-    return render_error(exc, _('Something went wrong'), to_unicode(exc.message), getattr(exc, 'http_status_code', 500))
+    return render_error(exc, _('Something went wrong'), str(exc), getattr(exc, 'http_status_code', 500))
 
 
 @errors_bp.app_errorhandler(DatabaseError)
@@ -96,11 +95,11 @@ def handle_databaseerror(exc):
 
 @errors_bp.app_errorhandler(Exception)
 def handle_exception(exc, message=None):
-    Logger.get('flask').exception(to_unicode(exc.message) or 'Uncaught Exception')
+    Logger.get('flask').exception(str(exc) or 'Uncaught Exception')
     if not current_app.debug or request.is_xhr or request.is_json:
         sentry_log_exception()
         if message is None:
-            message = '{}: {}'.format(type(exc).__name__, to_unicode(exc.message))
+            message = '{}: {}'.format(type(exc).__name__, str(exc))
         if os.environ.get('INDICO_DEV_SERVER') == '1':
             # If we are in the dev server, we always want to see a traceback on the
             # console, even if this was an API request.

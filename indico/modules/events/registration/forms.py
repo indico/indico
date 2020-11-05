@@ -289,7 +289,7 @@ class ParticipantsDisplayForm(IndicoForm):
         try:
             jsonschema.validate(field.data, schema)
         except jsonschema.ValidationError as exc:
-            raise ValidationError(exc.message)
+            raise ValidationError(str(exc))
 
 
 class ParticipantsDisplayFormColumnsForm(IndicoForm):
@@ -312,7 +312,7 @@ class ParticipantsDisplayFormColumnsForm(IndicoForm):
         try:
             jsonschema.validate(field.data, schema)
         except jsonschema.ValidationError as exc:
-            raise ValidationError(exc.message)
+            raise ValidationError(str(exc))
 
 
 class RegistrationManagersForm(IndicoForm):

@@ -139,7 +139,7 @@ class RHSaveSurveyAnswers(RHSubmitSurveyBase):
             raise Forbidden
 
     def _process(self):
-        pending_answers = {k: v for k, v in request.form.iterlists() if k.startswith('question_')}
+        pending_answers = {k: v for k, v in request.form.lists() if k.startswith('question_')}
         if not self.submission:
             self.submission = SurveySubmission(survey=self.survey, user=session.user)
         self.submission.pending_answers = pending_answers

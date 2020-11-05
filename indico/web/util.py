@@ -124,10 +124,10 @@ class ExpectedError(ImATeapot):
 
 
 def _format_request_data(data, hide_passwords=False):
-    if not hasattr(data, 'iterlists'):
+    if not hasattr(data, 'lists'):
         data = ((k, [v]) for k, v in six.iteritems(data))
     else:
-        data = data.iterlists()
+        data = data.lists()
     rv = {}
     for key, values in data:
         if hide_passwords and 'password' in key:

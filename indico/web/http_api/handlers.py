@@ -110,7 +110,7 @@ def handler(prefix, path):
     logger = Logger.get('httpapi')
     if request.method == 'POST':
         # Convert POST data to a query string
-        queryParams = [(key, [x.encode('utf-8') for x in values]) for key, values in request.form.iterlists()]
+        queryParams = [(key, [x.encode('utf-8') for x in values]) for key, values in request.form.lists()]
         query = six.moves.urllib.parse.urlencode(queryParams, doseq=1)
         # we only need/keep multiple values so we can properly validate the signature.
         # the legacy code below expects a dict with just the first value.

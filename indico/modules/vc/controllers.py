@@ -151,7 +151,7 @@ class RHVCManageEventCreate(RHVCManageEventCreateBase):
                 if err.field is None:
                     raise
                 field = getattr(form, err.field)
-                field.errors.append(err.message)
+                field.errors.append(str(err))
                 db.session.rollback()  # otherwise the incomplete vc room would be added to the db!
             else:
                 db.session.add(vc_room)
@@ -204,13 +204,13 @@ class RHVCManageEventModify(RHVCSystemEventBase):
             except VCRoomNotFoundError as err:
                 Logger.get('modules.vc').warning("VC room %r not found. Setting it as deleted.", self.vc_room)
                 self.vc_room.status = VCRoomStatus.deleted
-                flash(err.message, 'error')
+                flash(str(err), 'error')
                 return jsonify_data(flash=False)
             except VCRoomError as err:
                 if err.field is None:
                     raise
                 field = getattr(form, err.field)
-                field.errors.append(err.message)
+                field.errors.append(str(err))
                 db.session.rollback()
             else:
                 # TODO
@@ -243,7 +243,7 @@ class RHVCManageEventRefresh(RHVCSystemEventBase):
         except VCRoomNotFoundError as err:
             Logger.get('modules.vc').warning("VC room %r not found. Setting it as deleted.", self.vc_room)
             self.vc_room.status = VCRoomStatus.deleted
-            flash(err.message, 'error')
+            flash(str(err), 'error')
             return redirect(url_for('.manage_vc_rooms', self.event))
 
         flash(_("{plugin_name} room '{room.name}' refreshed").format(

@@ -136,8 +136,8 @@ class RHClonePreview(RHManageEventBase):
             dates, last_day_of_month = clone_calculator.calculate(request.form)
             if len(dates) > 100:
                 raise ValueError(_("You can clone maximum of 100 times at once"))
-        except ValueError as e:
-            return jsonify(error={'message': e.message})
+        except ValueError as exc:
+            return jsonify(error={'message': str(exc)})
         return jsonify_data(count=len(dates), dates=dates, last_day_of_month=last_day_of_month, flash=False)
 
 
@@ -263,6 +263,6 @@ class RHImportEventDetails(RHManageEventBase):
         form = ImportSourceEventForm()
         try:
             event = _get_import_source_from_url(self.event, form.source_event_url.data)
-        except ValueError as e:
-            return jsonify(error={'message': e.message})
+        except ValueError as exc:
+            return jsonify(error={'message': str(exc)})
         return jsonify_data(event=schema.dump(event))

@@ -12,7 +12,6 @@ Module containing the Indico exception class hierarchy
 from werkzeug.exceptions import BadRequest, Forbidden, HTTPException, NotFound
 
 from indico.util.i18n import _
-from indico.util.string import to_unicode
 
 
 def get_error_description(exception):
@@ -24,7 +23,7 @@ def get_error_description(exception):
     try:
         description = exception.description
     except AttributeError:
-        return to_unicode(exception.message)
+        return str(exception)
     if isinstance(exception, Forbidden) and description == Forbidden.description:
         return _(u"You are not allowed to access this page.")
     elif isinstance(exception, NotFound) and description == NotFound.description:
@@ -32,7 +31,7 @@ def get_error_description(exception):
     elif isinstance(exception, BadRequest) and description == BadRequest.description:
         return _(u"The request was invalid or contained invalid arguments.")
     else:
-        return to_unicode(description)
+        return str(description)
 
 
 class IndicoError(Exception):

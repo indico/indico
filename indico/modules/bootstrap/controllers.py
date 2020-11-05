@@ -90,13 +90,13 @@ class RHBootstrap(RH):
             try:
                 register_instance(contact_name, contact_email)
             except (HTTPError, ValueError) as err:
-                message = get_template_module('bootstrap/flash_messages.html').community_error(err=err)
+                message = get_template_module('bootstrap/flash_messages.html').community_error(err=str(err))
                 category = 'error'
             except Timeout:
                 message = get_template_module('bootstrap/flash_messages.html').community_timeout()
                 category = 'error'
             except RequestException as exc:
-                message = get_template_module('bootstrap/flash_messages.html').community_exception(exc=exc)
+                message = get_template_module('bootstrap/flash_messages.html').community_exception(err=str(exc))
                 category = 'error'
             else:
                 message = get_template_module('bootstrap/flash_messages.html').community_success()

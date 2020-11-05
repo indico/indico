@@ -92,8 +92,8 @@ class RH(object):
             json = request.json
         try:
             jsonschema.validate(json, schema)
-        except jsonschema.ValidationError as e:
-            raise BadRequest('Invalid JSON payload: {}'.format(e.message))
+        except jsonschema.ValidationError as exc:
+            raise BadRequest(f'Invalid JSON payload: {exc}')
 
     @property
     def csrf_token(self):

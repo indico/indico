@@ -114,7 +114,7 @@ def make_compat_redirect_func(blueprint, endpoint, view_func=None, view_args_con
             return view_func(**view_args)
         # Ugly hack to get non-list arguments unless they are used multiple times.
         # This is necessary since passing a list for an URL path argument breaks things.
-        view_args.update((k, v[0] if len(v) == 1 else v) for k, v in request.args.iterlists())
+        view_args.update((k, v[0] if len(v) == 1 else v) for k, v in request.args.lists())
         if view_args_conv is not None:
             for oldkey, newkey in six.iteritems(view_args_conv):
                 value = view_args.pop(oldkey, None)

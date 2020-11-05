@@ -286,11 +286,11 @@ def latex_render_image(src, alt, tmpdir, strict=False):
                     raise ImageURLException("Cannot read image data. Maybe not an image file?")
             with NamedTemporaryFile(prefix='indico-latex-', suffix=extension, dir=tmpdir, delete=False) as tempfile:
                 tempfile.write(resp.content)
-    except ImageURLException as e:
+    except ImageURLException as exc:
         if strict:
             raise
         else:
-            return latex_render_error("Could not include image: {}".format(e.message)), None
+            return latex_render_error(f'Could not include image: {exc}'), None
 
     # Using graphicx and ajustbox package for *max width*
     return (textwrap.dedent(r"""

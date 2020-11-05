@@ -169,13 +169,13 @@ def _save_menu_entries(entries):
         sess.add_all(entries)
         try:
             sess.commit()
-        except IntegrityError as e:
+        except IntegrityError as exc:
             # If there are two parallel requests trying to insert a new menu
             # item one of them will fail with an error due to the unique index.
             # If the IntegrityError involves that index, we assume it's just the
             # race condition and ignore it.
             sess.rollback()
-            if 'ix_uq_menu_entries_event_id_name' not in six.text_type(e.message):
+            if 'ix_uq_menu_entries_event_id_name' not in str(exc):
                 raise
             return False
         else:
