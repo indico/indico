@@ -5,17 +5,9 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-import warnings
-
 from indico.util.mimetypes import register_custom_mimetypes
 
 
 __version__ = '3.0-dev'
 
 register_custom_mimetypes()
-
-# TODO: remove in 3.0
-warnings.filterwarnings('ignore', message='Python 2 is no longer supported by the Python core team.',
-                        module='authlib')
-warnings.filterwarnings('ignore', message='Python 2 is no longer supported by the Python core team.',
-                        module='cryptography')
