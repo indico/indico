@@ -48,8 +48,8 @@ from indico.util.signals import values_from_signal
 from indico.util.string import RichMarkup, alpha_enum, crc32, html_to_plaintext, sanitize_html, slugify
 from indico.web.flask.errors import errors_bp
 from indico.web.flask.stats import get_request_stats, setup_request_stats
-from indico.web.flask.templating import (EnsureUnicodeExtension, call_template_hook, decodeprincipal, dedent, groupby,
-                                         instanceof, markdown, natsort, plusdelta, subclassof, underline)
+from indico.web.flask.templating import (call_template_hook, decodeprincipal, dedent, groupby, instanceof, markdown,
+                                         natsort, plusdelta, subclassof, underline)
 from indico.web.flask.util import ListConverter, XAccelMiddleware, discover_blueprints, url_for, url_rule_to_js
 from indico.web.flask.wrappers import IndicoFlask
 from indico.web.forms.jinja_helpers import is_single_line_field, iter_form_fields, render_field
@@ -180,9 +180,6 @@ def _get_indico_version():
 
 def setup_jinja(app):
     app.jinja_env.policies['ext.i18n.trimmed'] = True
-    # Unicode hack
-    app.jinja_env.add_extension(EnsureUnicodeExtension)
-    app.add_template_filter(EnsureUnicodeExtension.ensure_unicode)
     # Useful (Python) builtins
     app.add_template_global(dict)
     # Global functions
@@ -213,12 +210,12 @@ def setup_jinja(app):
     # Useful constants
     app.add_template_global('^([0-9]|0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]$', name='time_regex_hhmm')  # for input[type=time]
     # Filters (indico functions returning UTF8)
-    app.add_template_filter(EnsureUnicodeExtension.wrap_func(date_time_util.format_date))
-    app.add_template_filter(EnsureUnicodeExtension.wrap_func(date_time_util.format_time))
-    app.add_template_filter(EnsureUnicodeExtension.wrap_func(date_time_util.format_datetime))
-    app.add_template_filter(EnsureUnicodeExtension.wrap_func(date_time_util.format_human_date))
-    app.add_template_filter(EnsureUnicodeExtension.wrap_func(date_time_util.format_timedelta))
-    app.add_template_filter(EnsureUnicodeExtension.wrap_func(date_time_util.format_number))
+    app.add_template_filter(date_time_util.format_date)
+    app.add_template_filter(date_time_util.format_time)
+    app.add_template_filter(date_time_util.format_datetime)
+    app.add_template_filter(date_time_util.format_human_date)
+    app.add_template_filter(date_time_util.format_timedelta)
+    app.add_template_filter(date_time_util.format_number)
     # Filters (new ones returning unicode)
     app.add_template_filter(date_time_util.format_human_timedelta)
     app.add_template_filter(date_time_util.format_pretty_date)

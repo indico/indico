@@ -38,7 +38,6 @@ from indico.util.date_time import format_date, format_human_timedelta, format_ti
 from indico.util.fs import chmod_umask
 from indico.util.i18n import _, ngettext
 from indico.util.string import render_markdown
-from indico.web.flask.templating import EnsureUnicodeExtension
 
 
 class PDFLaTeXBase(object):
@@ -179,8 +178,8 @@ class LatexRunner(object):
                           block_start_string=r'\JINJA{', block_end_string='}',
                           variable_start_string=r'\VAR{', variable_end_string='}',
                           comment_start_string=r'\#{', comment_end_string='}')
-        env.filters['format_date'] = EnsureUnicodeExtension.wrap_func(format_date)
-        env.filters['format_time'] = EnsureUnicodeExtension.wrap_func(format_time)
+        env.filters['format_date'] = format_date
+        env.filters['format_time'] = format_time
         env.filters['format_duration'] = lambda delta: format_human_timedelta(delta, 'minutes')
         env.filters['latex'] = _latex_escape
         env.filters['rawlatex'] = RawLatex

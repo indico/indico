@@ -185,7 +185,7 @@
                                                 used <strong>{{ n }} times</strong>
                                             {%- endtrans -%}
                                             {%- if old_key.last_used_dt -%}
-                                                , {% trans date=old_key.last_used_dt|format_datetime('short')|ensure_unicode -%}
+                                                , {% trans date=old_key.last_used_dt|format_datetime('short') -%}
                                                     last used on {{ date }}
                                                 {%- endtrans %}
                                             {%- endif -%}
