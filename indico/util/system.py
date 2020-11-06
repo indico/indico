@@ -12,7 +12,7 @@ import distro
 
 
 def get_os():
-    if distro_info := f'{distro.id()} {distro.version()}'.strip():
+    if distro_info := f'{distro.name()} {distro.version()}'.strip():
         return distro_info
     # fallback for non-linux/bsd systems (ie mac os)
     return f'{platform.system()} {platform.release()}'.strip()
