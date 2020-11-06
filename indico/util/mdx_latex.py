@@ -78,13 +78,13 @@ import uuid
 from io import BytesIO
 from mimetypes import guess_extension
 from tempfile import NamedTemporaryFile
+from urllib.parse import urlparse
 
 import markdown
 import requests
 from lxml.html import html5parser
 from PIL import Image
 from requests.exceptions import ConnectionError, InvalidURL
-from six.moves.urllib.parse import urlparse
 
 
 __version__ = '2.1'

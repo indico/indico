@@ -8,10 +8,10 @@
 import datetime
 import hashlib
 import os
+import pickle
 import time
 
 import redis
-import six.moves.cPickle as pickle
 from flask import g
 
 from indico.core.config import config

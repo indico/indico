@@ -12,11 +12,9 @@ import optparse
 import sys
 import time
 from contextlib import closing
+from urllib.parse import urlencode
 
 import requests
-import six.moves.urllib.error
-import six.moves.urllib.parse
-import six.moves.urllib.request
 from flask import Flask, Response, abort, request
 from werkzeug.datastructures import MultiDict
 
@@ -33,7 +31,7 @@ def build_indico_request(path, params, api_key=None, secret_key=None, only_publi
     if secret_key:
         items.append(('timestamp', str(int(time.time()))))
         items = sorted(items, key=lambda x: x[0].lower())
-        url = '{}?{}'.format(path, six.moves.urllib.parse.urlencode(items))
+        url = '{}?{}'.format(path, urlencode(items))
         signature = hmac.new(secret_key.encode(), url.encode(), hashlib.sha1).hexdigest()
         items.append(('signature', signature))
     return items

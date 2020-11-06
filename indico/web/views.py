@@ -8,11 +8,11 @@
 
 import itertools
 import posixpath
+from urllib.parse import urlparse
 
 from flask import current_app, g, render_template, request, session
 from markupsafe import Markup
 from pytz import common_timezones, common_timezones_set
-from six.moves.urllib.parse import urlparse
 
 from indico.core import signals
 from indico.core.config import config

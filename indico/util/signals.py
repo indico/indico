@@ -6,9 +6,8 @@
 # LICENSE file for more details.
 
 
+from itertools import zip_longest
 from types import GeneratorType
-
-from six.moves import zip_longest
 
 
 def values_from_signal(signal_response, single_value=False, skip_none=True, as_list=False,

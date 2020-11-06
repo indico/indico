@@ -8,10 +8,7 @@
 import hashlib
 import hmac
 import time
-
-import six.moves.urllib.error
-import six.moves.urllib.parse
-import six.moves.urllib.request
+from urllib.parse import urlencode
 
 from indico.core.config import config
 from indico.modules.api import APIMode, api_settings
@@ -38,12 +35,12 @@ def build_indico_request(path, params, api_key=None, secret_key=None, persistent
         if not persistent:
             items.append(('timestamp', str(int(time.time()))))
         items = sorted(items, key=lambda x: x[0].lower())
-        url = '{}?{}'.format(path, six.moves.urllib.parse.urlencode(items))
+        url = '{}?{}'.format(path, urlencode(items))
         signature = hmac.new(secret_key.encode(), url.encode(), hashlib.sha1).hexdigest()
         items.append(('signature', signature))
     if not items:
         return path
-    return '{}?{}'.format(path, six.moves.urllib.parse.urlencode(items))
+    return '{}?{}'.format(path, urlencode(items))
 
 
 def generate_public_auth_request(apiKey, path, params=None):

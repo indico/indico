@@ -9,17 +9,17 @@
 import fcntl
 import logging.handlers
 import os
+import pickle
 import pprint
 import re
 import signal
 import struct
 import termios
 import textwrap
+from socketserver import StreamRequestHandler, ThreadingTCPServer
 from threading import Lock
 
 import click
-import six.moves.cPickle
-import six.moves.socketserver
 import sqlparse
 from pygments import highlight
 from pygments.formatters.terminal256 import Terminal256Formatter
@@ -32,7 +32,7 @@ ignored_line_re = re.compile(r'^(?:(?P<frame>\d+):)?(?P<file>.+?)(?::(?P<line>\d
 output_lock = Lock()
 
 
-class LogRecordStreamHandler(six.moves.socketserver.StreamRequestHandler):
+class LogRecordStreamHandler(StreamRequestHandler):
     def handle(self):
         while True:
             chunk = self.connection.recv(4)
@@ -42,7 +42,7 @@ class LogRecordStreamHandler(six.moves.socketserver.StreamRequestHandler):
             chunk = self.connection.recv(size)
             while len(chunk) < size:
                 chunk = chunk + self.connection.recv(size - len(chunk))
-            obj = six.moves.cPickle.loads(chunk)
+            obj = pickle.loads(chunk)
             self.handle_log(obj)
 
     def _check_ignored_sources(self, source):
@@ -120,11 +120,11 @@ class LogRecordStreamHandler(six.moves.socketserver.StreamRequestHandler):
                 print_linesep()
 
 
-class LogRecordSocketReceiver(six.moves.socketserver.ThreadingTCPServer):
+class LogRecordSocketReceiver(ThreadingTCPServer):
     allow_reuse_address = True
 
     def __init__(self, host, port, traceback_frames, ignore_selects, ignored_sources, ignored_request_paths):
-        six.moves.socketserver.ThreadingTCPServer.__init__(self, (host, port), LogRecordStreamHandler)
+        ThreadingTCPServer.__init__(self, (host, port), LogRecordStreamHandler)
         self.timeout = 1
         self.traceback_frames = traceback_frames
         self.ignore_selects = ignore_selects

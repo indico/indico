@@ -14,14 +14,10 @@ import hmac
 import posixpath
 import re
 import time
+from urllib.parse import parse_qs, urlencode
 from uuid import UUID
 
-import six
-import six.moves.urllib.error
-import six.moves.urllib.parse
-import six.moves.urllib.request
 from flask import current_app, g, request, session
-from six.moves.urllib.parse import parse_qs
 from werkzeug.exceptions import BadRequest, NotFound
 
 from indico.core.db import db
@@ -60,9 +56,9 @@ def normalizeQuery(path, query, remove=('signature',), separate=False):
                 sorted_params.append((key, v))
 
     if separate:
-        return path, sorted_params and six.moves.urllib.parse.urlencode(sorted_params)
+        return path, sorted_params and urlencode(sorted_params)
     elif sorted_params:
-        return '{}?{}'.format(path, six.moves.urllib.parse.urlencode(sorted_params))
+        return '{}?{}'.format(path, urlencode(sorted_params))
     else:
         return path
 
@@ -111,7 +107,7 @@ def handler(prefix, path):
     if request.method == 'POST':
         # Convert POST data to a query string
         queryParams = list(request.form.lists())
-        query = six.moves.urllib.parse.urlencode(queryParams, doseq=1)
+        query = urlencode(queryParams, doseq=1)
         # we only need/keep multiple values so we can properly validate the signature.
         # the legacy code below expects a dict with just the first value.
         # if you write a new api endpoint that needs multiple values get them from

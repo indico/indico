@@ -6,9 +6,7 @@
 # LICENSE file for more details.
 
 from functools import wraps
-from itertools import groupby, islice
-
-from six.moves import zip_longest
+from itertools import groupby, islice, zip_longest
 
 
 def group_list(data, key=None, sort_by=None, sort_reverse=False):

@@ -9,10 +9,10 @@
 import functools
 import json
 import os
+from urllib.parse import urlencode
 
 from flower.urls import settings
 from flower.views import BaseHandler
-from six.moves.urllib.parse import urlencode
 from tornado.auth import AuthError, OAuth2Mixin, _auth_return_future
 from tornado.httpclient import AsyncHTTPClient, HTTPClient, HTTPRequest
 from tornado.options import options

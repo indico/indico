@@ -12,11 +12,9 @@ Base export interface
 import re
 from datetime import datetime, time, timedelta
 from types import GeneratorType
+from urllib.parse import unquote
 
 import pytz
-import six.moves.urllib.error
-import six.moves.urllib.parse
-import six.moves.urllib.request
 from flask import current_app, request
 
 from indico.core.config import config
@@ -56,7 +54,7 @@ class HTTPAPIHook:
     @classmethod
     def parseRequest(cls, path, queryParams):
         """Parse a request path and return a hook and the requested data type."""
-        path = six.moves.urllib.parse.unquote(path)
+        path = unquote(path)
         hooks = cls.HOOK_LIST
         for expCls in hooks:
             Logger.get('HTTPAPIHook.parseRequest').debug(expCls)

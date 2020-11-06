@@ -10,10 +10,9 @@ import base64
 import mimetypes
 import re
 from contextlib import contextmanager
+from urllib.parse import urlsplit, urlunsplit
 
 import requests
-import six
-import six.moves.urllib.parse
 from flask import current_app, g, request
 from flask_webpackext import current_webpack
 from flask_webpackext.manifest import JinjaManifestEntry
@@ -62,7 +61,7 @@ def _rewrite_event_asset_url(event, url):
 
     Only assets contained within the event will be taken into account
     """
-    scheme, netloc, path, qs, anchor = six.moves.urllib.parse.urlsplit(url)
+    scheme, netloc, path, qs, anchor = urlsplit(url)
     netloc = netloc or current_app.config['SERVER_NAME']
     scheme = scheme or 'https'
 
@@ -79,14 +78,14 @@ def _rewrite_event_asset_url(event, url):
                     return f'images/{image_file.id}-{image_file.filename}', image_file
     # if the URL is not internal or just not an image,
     # we embed the contents using a data URI
-    data_uri = _create_data_uri(six.moves.urllib.parse.urlunsplit((scheme, netloc, path, qs, '')), six.moves.urllib.parse.urlsplit(path)[-1])
+    data_uri = _create_data_uri(urlunsplit((scheme, netloc, path, qs, '')), urlsplit(path)[-1])
     return data_uri, None
 
 
 def _remove_anchor(url):
     """Remove the anchor from a URL."""
-    scheme, netloc, path, qs, anchor = six.moves.urllib.parse.urlsplit(url)
-    return six.moves.urllib.parse.urlunsplit((scheme, netloc, path, qs, ''))
+    scheme, netloc, path, qs, anchor = urlsplit(url)
+    return urlunsplit((scheme, netloc, path, qs, ''))
 
 
 def rewrite_css_urls(event, css):
