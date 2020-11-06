@@ -365,7 +365,7 @@ class ProtectionManagersMixin(ProtectionMixin):
         if permission is not None and permission != 'ANY' and permission not in get_available_permissions(type(self)):
             raise ValueError("permission '{}' is not valid for '{}' objects".format(permission, type(self).__name__))
 
-        if user is None:
+        if user is None or user.is_system:
             # An unauthorized user is never allowed to perform management operations.
             # Not even signals may override this since management code generally
             # expects session.user to be not None.
