@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-
 import pytz
 from sqlalchemy import DDL, orm
 from sqlalchemy.dialects.postgresql import ARRAY, JSONB, array

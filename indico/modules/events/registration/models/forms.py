@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-
 from uuid import UUID
 
 from babel.numbers import format_currency

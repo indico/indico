@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-
 from indico.modules.events.notes.models.notes import EventNote
 from indico.modules.events.notes.util import can_edit_note
 from indico.util.caching import memoize_request

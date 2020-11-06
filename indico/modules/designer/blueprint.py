@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-
 from indico.modules.designer.controllers import (RHAddCategoryTemplate, RHAddEventTemplate, RHCloneCategoryTemplate,
                                                  RHCloneEventTemplate, RHDeleteDesignerTemplate,
                                                  RHDownloadTemplateImage, RHEditDesignerTemplate, RHGetTemplateData,

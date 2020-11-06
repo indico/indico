@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-
 from indico.modules.events.timetable.controllers.display import (RHTimetable, RHTimetableEntryInfo,
                                                                  RHTimetableExportDefaultPDF, RHTimetableExportPDF)
 from indico.modules.events.timetable.controllers.legacy import (RHLegacyTimetableAddBreak,

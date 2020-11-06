@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-
 import json
 from collections import OrderedDict
 from datetime import time, timedelta

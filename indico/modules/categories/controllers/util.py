@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-
 from datetime import date
 from itertools import groupby
 from operator import attrgetter

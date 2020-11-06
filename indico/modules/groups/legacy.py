@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-
 from zope.interface.declarations import implementer
 
 from indico.legacy.fossils.user import IGroupFossil

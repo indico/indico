@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-
 from datetime import datetime
 
 from flask import g, has_request_context, jsonify, render_template, request, session

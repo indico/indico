@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-
 from markupsafe import escape
 from marshmallow import post_dump
 from marshmallow.fields import Boolean, Decimal, Field, Function, Integer, List, Method, Nested, String

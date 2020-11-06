@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-
 import pytest
 
 from indico.modules.events.persons.util import create_event_person, get_event_person, get_event_person_for_user

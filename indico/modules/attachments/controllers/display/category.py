@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-
 from indico.modules.attachments.controllers.display.base import DownloadAttachmentMixin
 from indico.modules.categories.controllers.base import RHDisplayCategoryBase
 

@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-
 from flask import current_app, redirect
 
 from indico.modules.events.sessions.models.legacy_mapping import LegacySessionMapping

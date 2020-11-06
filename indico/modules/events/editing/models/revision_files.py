@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-
 from indico.core.db import db
 from indico.util.fs import secure_filename
 from indico.util.locators import locator_property

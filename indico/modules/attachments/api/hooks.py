@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-
 from indico.modules.attachments.api.util import build_folders_api_data
 from indico.modules.events import Event
 from indico.modules.events.contributions.models.contributions import Contribution

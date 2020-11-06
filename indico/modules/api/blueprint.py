@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-
 from flask import request
 
 from indico.legacy.services.interface.rpc.json import process as jsonrpc_handler

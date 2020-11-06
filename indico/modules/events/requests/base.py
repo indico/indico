@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-
 from flask_pluginengine import plugin_context
 from wtforms.fields import SubmitField, TextAreaField
 

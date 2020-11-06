@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-
 from indico.modules.events.fields import PersonLinkListFieldBase
 from indico.modules.events.sessions.models.persons import SessionBlockPersonLink
 from indico.modules.events.util import serialize_person_link

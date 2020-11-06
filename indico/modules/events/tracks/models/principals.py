@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-
 from sqlalchemy.ext.declarative import declared_attr
 
 from indico.core.db import db

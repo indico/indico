@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-
 from collections import namedtuple
 from io import BytesIO
 from operator import attrgetter, itemgetter

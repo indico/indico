@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-
 import requests
 from marshmallow import ValidationError
 from werkzeug.urls import url_parse

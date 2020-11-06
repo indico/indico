@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-
 from indico.core.db.sqlalchemy import db
 from indico.core.db.sqlalchemy.review_questions import ReviewQuestionMixin
 from indico.modules.events.reviewing_questions_fields import get_reviewing_field_types

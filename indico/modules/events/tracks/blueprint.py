@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-
 from indico.modules.events.tracks.controllers import (RHCreateTrack, RHCreateTrackGroup, RHDeleteTrack,
                                                       RHDeleteTrackGroup, RHDisplayTracks, RHEditProgram, RHEditTrack,
                                                       RHEditTrackGroup, RHManageTracks, RHSortTracks, RHTracksPDF)

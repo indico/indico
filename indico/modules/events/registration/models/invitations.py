@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-
 from uuid import uuid4
 
 from sqlalchemy.dialects.postgresql import UUID

@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-
 from flask import session
 
 from indico.core.notifications import make_email, send_email

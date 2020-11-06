@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-
 from indico.modules.rb.controllers import RHRoomBookingBase
 from indico.modules.rb.views import WPRoomBookingBase
 

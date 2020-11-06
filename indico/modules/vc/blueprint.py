@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-
 from indico.modules.vc.controllers import (RHVCEventPage, RHVCManageAttach, RHVCManageEvent, RHVCManageEventCreate,
                                            RHVCManageEventModify, RHVCManageEventRefresh, RHVCManageEventRemove,
                                            RHVCManageEventSelectService, RHVCManageSearch, RHVCRoomList)

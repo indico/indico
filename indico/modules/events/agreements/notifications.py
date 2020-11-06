@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-
 from flask_pluginengine import current_plugin
 
 from indico.core.notifications import email_sender, make_email

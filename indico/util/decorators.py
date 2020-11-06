@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-
 class classproperty(property):
     def __get__(self, obj, type=None):
         return self.fget.__get__(None, type)()

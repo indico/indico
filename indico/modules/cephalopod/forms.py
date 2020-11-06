@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-
 from wtforms import BooleanField, StringField
 from wtforms.fields.html5 import EmailField
 from wtforms.validators import DataRequired, Email

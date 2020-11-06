@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-
 from indico.modules.events.surveys.controllers.display import RHSaveSurveyAnswers, RHSubmitSurvey, RHSurveyList
 from indico.modules.events.surveys.controllers.management.questionnaire import (RHAddSurveyQuestion, RHAddSurveySection,
                                                                                 RHAddSurveyText, RHDeleteSurveyQuestion,

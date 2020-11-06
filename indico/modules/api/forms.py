@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-
 from wtforms.fields.core import BooleanField
 from wtforms.fields.html5 import IntegerField
 from wtforms.validators import NumberRange

@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-
 from marshmallow_enum import EnumField
 from webargs import fields
 

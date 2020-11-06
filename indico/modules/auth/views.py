@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-
 from indico.modules.users.views import WPUser
 from indico.web.views import WPDecorated, WPJinjaMixin
 

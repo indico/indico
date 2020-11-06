@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-
 from indico.core.db.sqlalchemy import PyIntEnum, db
 from indico.modules.events.contributions.models.persons import AuthorType
 from indico.modules.events.models.persons import PersonLinkBase

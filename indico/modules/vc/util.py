@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-
 from sqlalchemy.orm import contains_eager
 
 from indico.core.plugins import plugin_engine

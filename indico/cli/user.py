@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-
 import click
 from flask_multipass import IdentityInfo
 from terminaltables import AsciiTable

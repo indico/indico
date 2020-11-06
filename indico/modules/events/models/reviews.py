@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-
 from sqlalchemy.ext.hybrid import hybrid_property
 
 from indico.util.caching import memoize_request

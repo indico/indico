@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-
 from ipaddress import ip_address
 
 from flask import has_request_context, request, session

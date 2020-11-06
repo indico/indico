@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.event import listens_for
 from werkzeug.datastructures import ImmutableDict

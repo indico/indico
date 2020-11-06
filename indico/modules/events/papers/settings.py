@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-
 from indico.core.settings.converters import DatetimeConverter, SettingConverter
 from indico.modules.events.papers.models.reviews import PaperReviewType
 from indico.modules.events.settings import EventSettingsProxy

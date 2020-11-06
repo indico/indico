@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-
 from itertools import count
 
 from flask import flash, jsonify, request, session

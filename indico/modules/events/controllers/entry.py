@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-
 from flask import redirect, request, url_for
 from werkzeug.exceptions import NotFound
 

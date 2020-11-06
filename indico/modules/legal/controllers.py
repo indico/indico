@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-
 from flask import redirect
 
 from indico.modules.admin import RHAdminBase

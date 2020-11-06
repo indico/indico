@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-
 from indico.modules.admin.views import WPAdmin
 from indico.util.i18n import _
 from indico.web.views import WPDecorated, WPJinjaMixin

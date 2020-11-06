@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-
 from indico.modules.events.models.events import EventType
 from indico.web.flask.templating import get_template_module
 

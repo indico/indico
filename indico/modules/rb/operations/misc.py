@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-
 from datetime import datetime
 
 from indico.modules.rb.models.room_bookable_hours import BookableHours

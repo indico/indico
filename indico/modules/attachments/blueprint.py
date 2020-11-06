@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-
 import itertools
 
 from indico.modules.attachments.controllers.compat import (RHCompatAttachmentNew, compat_attachment, compat_folder,

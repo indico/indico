@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-
 from operator import itemgetter
 
 from pytz import common_timezones, common_timezones_set

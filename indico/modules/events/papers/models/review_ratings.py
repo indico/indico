@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-
 from indico.core.db.sqlalchemy import db
 from indico.core.db.sqlalchemy.review_ratings import ReviewRatingMixin
 from indico.modules.events.papers.models.review_questions import PaperReviewQuestion

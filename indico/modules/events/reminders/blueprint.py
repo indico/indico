@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-
 from indico.modules.events.reminders.controllers import (RHAddReminder, RHDeleteReminder, RHEditReminder,
                                                          RHListReminders, RHPreviewReminder)
 from indico.web.flask.wrappers import IndicoBlueprint

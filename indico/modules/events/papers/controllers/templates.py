@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-
 from flask import flash, request
 
 from indico.modules.events.papers.controllers.base import RHManagePapersBase, RHPapersBase

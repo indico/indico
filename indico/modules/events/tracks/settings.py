@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-
 from indico.core.db.sqlalchemy.descriptions import RenderMode
 from indico.core.settings.converters import EnumConverter
 from indico.modules.events.settings import EventSettingsProxy

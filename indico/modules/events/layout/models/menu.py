@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-
 from flask import g, session
 from sqlalchemy.orm import joinedload
 from werkzeug.utils import cached_property

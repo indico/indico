@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-
 from indico.modules.events.models.persons import EventPerson
 from indico.modules.users import User
 from indico.modules.users.models.users import UserTitle

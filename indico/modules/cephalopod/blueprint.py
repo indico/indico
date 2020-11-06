@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-
 from indico.modules.cephalopod.controllers import RHCephalopod, RHCephalopodSync, RHSystemInfo
 from indico.web.flask.wrappers import IndicoBlueprint
 

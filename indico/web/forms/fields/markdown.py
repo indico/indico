@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-
 from wtforms import TextAreaField
 
 from indico.util.i18n import _

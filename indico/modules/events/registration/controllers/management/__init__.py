@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-
 from flask import request
 from sqlalchemy.orm import contains_eager, defaultload
 

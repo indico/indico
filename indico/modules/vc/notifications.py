@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-
 from indico.core.notifications import make_email, send_email
 from indico.modules.vc.util import get_linked_to_description
 from indico.web.flask.templating import get_overridable_template_name, get_template_module

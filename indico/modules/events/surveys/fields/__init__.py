@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-
 from indico.core import signals
 from indico.modules.events.surveys.fields.base import SurveyField
 from indico.web.fields import get_field_definitions

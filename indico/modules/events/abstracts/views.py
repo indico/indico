@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-
 from flask import render_template, session
 
 from indico.modules.events.abstracts.util import filter_field_values, get_visible_reviewed_for_tracks

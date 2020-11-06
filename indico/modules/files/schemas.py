@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-
 from indico.core.marshmallow import mm
 from indico.modules.files.models.files import File
 

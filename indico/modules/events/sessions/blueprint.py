@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-
 from functools import partial
 
 from indico.modules.events.sessions.controllers.compat import compat_session

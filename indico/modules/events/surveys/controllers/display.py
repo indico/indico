@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-
 from flask import flash, redirect, request, session
 from sqlalchemy.orm import joinedload
 from werkzeug.datastructures import MultiDict

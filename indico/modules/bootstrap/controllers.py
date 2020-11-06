@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-
 from platform import python_version
 
 from flask import flash, redirect, render_template, request, session

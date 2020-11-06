@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-
 from indico.core.plugins.controllers import RHPluginDetails, RHPlugins
 from indico.web.flask.wrappers import IndicoBlueprint
 

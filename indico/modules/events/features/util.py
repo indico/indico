@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-
 from itertools import chain
 
 from werkzeug.exceptions import NotFound

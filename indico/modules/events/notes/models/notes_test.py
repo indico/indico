@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-
 import pytest
 from sqlalchemy import inspect
 from sqlalchemy.exc import IntegrityError

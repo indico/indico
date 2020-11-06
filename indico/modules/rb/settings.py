@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-
 from indico.core.settings.converters import EnumConverter, ModelListConverter
 from indico.modules.users import UserSettingsProxy
 from indico.util.i18n import _

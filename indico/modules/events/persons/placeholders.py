@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-
 from markupsafe import Markup
 
 from indico.modules.auth.util import url_for_register

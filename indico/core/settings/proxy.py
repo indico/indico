@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-
 from collections import defaultdict
 from functools import partial, update_wrapper
 from operator import attrgetter

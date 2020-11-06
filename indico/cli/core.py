@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-
 import click
 from flask.cli import AppGroup, pass_script_info
 

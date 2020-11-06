@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-
 from indico.modules.news.controllers import (RHCreateNews, RHDeleteNews, RHEditNews, RHManageNews, RHNews, RHNewsItem,
                                              RHNewsSettings)
 from indico.web.flask.wrappers import IndicoBlueprint

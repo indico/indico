@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-
 from markupsafe import Markup
 
 from indico.modules.events.registration.models.items import PersonalDataType

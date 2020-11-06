@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-
 from collections import OrderedDict, defaultdict
 from datetime import timedelta
 from itertools import takewhile

@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-
 from indico.core.settings import AttributeProxyProperty
 from indico.modules.events.models.reviews import ProposalMixin
 from indico.modules.events.papers.models.revisions import PaperRevisionState

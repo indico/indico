@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-
 import pytest
 
 from indico.web.flask.util import endpoint_for_url
