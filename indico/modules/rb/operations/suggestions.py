@@ -8,6 +8,7 @@
 from __future__ import unicode_literals
 
 from datetime import datetime, timedelta
+from functools import cmp_to_key
 
 from indico.modules.rb import rb_settings
 from indico.modules.rb.models.blocked_rooms import BlockedRoomState
@@ -161,7 +162,9 @@ def get_duration_suggestion(occurrences, from_, to):
 
 def sort_suggestions(suggestions):
     def cmp_fn(a, b):
+        a = a['suggestions']
+        b = b['suggestions']
         a_time, a_duration = abs(a.get('time', 0)), a.get('duration', 0)
         b_time, b_duration = abs(b.get('time', 0)), b.get('duration', 0)
         return int(a_time + a_duration * 0.2) - int(b_time + b_duration * 0.2)
-    return sorted(suggestions, cmp=cmp_fn, key=lambda item: item['suggestions'])
+    return sorted(suggestions, key=cmp_to_key(cmp_fn))
