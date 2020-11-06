@@ -59,7 +59,7 @@ def js_vars_global():
 
     if config.DEBUG or not os.path.exists(cache_file):
         data = generate_global_file()
-        with open(cache_file, 'wb') as f:
+        with open(cache_file, 'w') as f:
             f.write(data)
 
     return send_file('global.js', cache_file, mimetype='application/javascript', conditional=True)
@@ -93,7 +93,7 @@ def _get_i18n_locale(locale_name, react=False):
 
     if config.DEBUG or not os.path.exists(cache_file):
         i18n_data = generate_i18n_file(locale_name, react=react)
-        with open(cache_file, 'wb') as f:
+        with open(cache_file, 'w') as f:
             f.write("window.{} = {};".format('REACT_TRANSLATIONS' if react else 'TRANSLATIONS', i18n_data))
 
     return send_file('{}{}.js'.format(locale_name, react_suffix), cache_file, mimetype='application/javascript',
