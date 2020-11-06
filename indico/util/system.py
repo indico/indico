@@ -9,10 +9,11 @@ from __future__ import unicode_literals
 
 import platform
 
+import distro
+
 
 def get_os():
-    system_name = platform.system()
-    if system_name == 'Linux':
-        return '{} {} {}'.format(system_name, platform.linux_distribution()[0], platform.linux_distribution()[1])
-    else:
-        return '{} {}'.format(system_name, platform.release()).rstrip()
+    if distro_info := f'{distro.id()} {distro.version()}'.strip():
+        return distro_info
+    # fallback for non-linux/bsd systems (ie mac os)
+    return f'{platform.system()} {platform.release()}'.strip()
