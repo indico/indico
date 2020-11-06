@@ -9,7 +9,6 @@
 from collections import defaultdict
 from datetime import date, timedelta
 
-import six
 from sqlalchemy.orm import joinedload, load_only
 
 from indico.modules.events import Event

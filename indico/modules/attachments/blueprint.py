@@ -8,8 +8,6 @@
 
 import itertools
 
-import six
-
 from indico.modules.attachments.controllers.compat import (RHCompatAttachmentNew, compat_attachment, compat_folder,
                                                            compat_folder_old)
 from indico.modules.attachments.controllers.display.category import RHDownloadCategoryAttachment

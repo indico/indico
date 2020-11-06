@@ -9,7 +9,6 @@
 import os
 from operator import attrgetter
 
-import six
 from flask import redirect
 from werkzeug.exceptions import NotFound
 

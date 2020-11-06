@@ -11,7 +11,6 @@ import itertools
 from collections import OrderedDict
 from operator import attrgetter
 
-import six
 from flask import current_app, json, session
 from qrcode import QRCode, constants
 from sqlalchemy import and_, or_

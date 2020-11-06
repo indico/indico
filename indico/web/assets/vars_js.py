@@ -8,7 +8,6 @@
 
 import os
 
-import six
 from flask import current_app, json, render_template, session
 from werkzeug.urls import url_parse
 

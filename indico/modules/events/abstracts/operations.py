@@ -11,7 +11,6 @@ from collections import defaultdict
 from operator import attrgetter
 from uuid import uuid4
 
-import six
 from flask import session
 
 from indico.core import signals

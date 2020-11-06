@@ -8,7 +8,6 @@
 
 from uuid import uuid4
 
-import six
 from sqlalchemy import literal
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.ext.hybrid import hybrid_property

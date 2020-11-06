@@ -9,7 +9,6 @@
 from collections import OrderedDict
 from datetime import datetime, timedelta
 
-import six
 from dateutil import rrule
 from flask import flash, jsonify, request, session
 from werkzeug.exceptions import BadRequest

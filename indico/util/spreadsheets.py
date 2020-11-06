@@ -12,7 +12,6 @@ from contextlib import contextmanager
 from datetime import datetime
 from io import BytesIO, TextIOWrapper
 
-import six
 from markupsafe import Markup
 from speaklater import is_lazy_string
 from xlsxwriter import Workbook

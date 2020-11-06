@@ -9,7 +9,6 @@
 import posixpath
 from uuid import uuid4
 
-import six
 from sqlalchemy.dialects.postgresql import JSONB, UUID
 
 from indico.core.config import config

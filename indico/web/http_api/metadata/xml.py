@@ -9,7 +9,6 @@ import re
 from datetime import datetime
 
 import dateutil.parser
-import six
 from lxml import etree
 from pytz import timezone, utc
 

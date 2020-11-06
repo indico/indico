@@ -9,7 +9,6 @@
 from collections import OrderedDict, defaultdict
 from operator import attrgetter
 
-import six
 from flask import flash, request
 from werkzeug.exceptions import NotFound
 

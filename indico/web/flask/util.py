@@ -12,7 +12,6 @@ import re
 import unicodedata
 from importlib import import_module
 
-import six
 from flask import Blueprint, current_app, g, redirect, request
 from flask import send_file as _send_file
 from flask import url_for as _url_for

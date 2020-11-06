@@ -11,7 +11,6 @@ import os
 import time
 
 import redis
-import six
 import six.moves.cPickle as pickle
 from flask import g
 

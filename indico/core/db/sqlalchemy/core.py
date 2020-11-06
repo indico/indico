@@ -10,7 +10,6 @@ import sys
 from contextlib import contextmanager
 from functools import partial
 
-import six
 from flask import g
 from flask_sqlalchemy import SQLAlchemy
 from flask_sqlalchemy.model import BindMetaMixin

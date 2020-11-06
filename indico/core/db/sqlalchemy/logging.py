@@ -11,7 +11,6 @@ import pprint
 import time
 import traceback
 
-import six
 from flask import appcontext_tearing_down, current_app, g, has_request_context, request, request_tearing_down
 from sqlalchemy.engine import Engine
 from sqlalchemy.event import listens_for

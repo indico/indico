@@ -8,7 +8,6 @@
 
 from datetime import timedelta
 
-import six
 from celery.schedules import crontab
 
 from indico.core.celery import celery

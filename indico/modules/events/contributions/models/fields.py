@@ -6,7 +6,6 @@
 # LICENSE file for more details.
 
 
-import six
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.ext.declarative import declared_attr
 

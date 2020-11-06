@@ -6,7 +6,6 @@
 # LICENSE file for more details.
 
 
-import six
 from flask import request
 from werkzeug.exceptions import BadRequest
 

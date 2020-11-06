@@ -9,7 +9,6 @@
 from collections import OrderedDict
 from operator import attrgetter
 
-import six
 from flask import flash, request, session
 from sqlalchemy.orm import joinedload, subqueryload
 

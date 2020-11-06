@@ -10,7 +10,6 @@ import os
 from io import BytesIO
 
 import pytest
-import six
 
 from indico.core.storage import (FileSystemStorage, ReadOnlyFileSystemStorage, Storage, StorageError,
                                  StorageReadOnlyError)

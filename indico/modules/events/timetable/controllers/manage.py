@@ -7,7 +7,6 @@
 
 
 import dateutil.parser
-import six
 from flask import jsonify, request, session
 from werkzeug.exceptions import BadRequest, Forbidden, NotFound
 

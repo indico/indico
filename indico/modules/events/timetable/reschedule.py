@@ -8,7 +8,6 @@
 
 from datetime import datetime, timedelta
 
-import six
 from flask import session
 from pytz import utc
 from werkzeug.exceptions import BadRequest

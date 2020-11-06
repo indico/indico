@@ -8,7 +8,6 @@
 
 from uuid import uuid4
 
-import six
 from flask import jsonify
 from webargs import fields
 from webargs.flaskparser import abort

@@ -8,7 +8,6 @@
 
 from hashlib import sha1
 
-import six
 from flask import render_template
 
 from indico.modules.events.agreements.models.agreements import Agreement
@@ -92,7 +91,6 @@ class AgreementDefinitionBase:
         :param agreement: the :class:`Agreement` if available
         :param data: a dict containing the default data for the agreement
         """
-        pass
 
     @classmethod
     def get_email_body_template(cls, event, **kwargs):
@@ -170,17 +168,14 @@ class AgreementDefinitionBase:
     @classmethod
     def handle_accepted(cls, agreement):  # pragma: no cover
         """Handle logic on agreement accepted."""
-        pass
 
     @classmethod
     def handle_rejected(cls, agreement):  # pragma: no cover
         """Handle logic on agreement rejected."""
-        pass
 
     @classmethod
     def handle_reset(cls, agreement):  # pragma: no cover
         """Handle logic on agreement reset."""
-        pass
 
     @classmethod
     def iter_people(cls, event):  # pragma: no cover

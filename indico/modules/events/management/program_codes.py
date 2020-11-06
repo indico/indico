@@ -8,8 +8,6 @@
 
 from collections import OrderedDict
 
-import six
-
 from indico.modules.events.management.settings import program_codes_settings
 from indico.util.date_time import format_datetime
 from indico.util.i18n import _

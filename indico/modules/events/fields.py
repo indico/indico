@@ -8,7 +8,6 @@
 
 import json
 
-import six
 from sqlalchemy import inspect
 from wtforms import RadioField, SelectField
 

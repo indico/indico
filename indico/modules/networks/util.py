@@ -5,8 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-
-
 def serialize_ip_network_group(group):
     """Serialize group to JSON-like object."""
     return {

@@ -8,7 +8,6 @@
 import os
 
 import pytest
-import six
 from babel.messages import Catalog
 from babel.messages.mofile import write_mo
 from babel.support import Translations

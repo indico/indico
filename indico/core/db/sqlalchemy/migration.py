@@ -9,7 +9,6 @@
 import os
 
 import alembic.command
-import six
 from alembic.script import ScriptDirectory
 from flask import current_app
 from flask_migrate import Migrate, stamp

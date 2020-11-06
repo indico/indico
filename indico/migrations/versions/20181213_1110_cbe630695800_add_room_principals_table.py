@@ -8,7 +8,6 @@ Create Date: 2018-12-13 11:10:12.684382
 
 import json
 
-import six
 import sqlalchemy as sa
 from alembic import context, op
 from sqlalchemy.dialects import postgresql

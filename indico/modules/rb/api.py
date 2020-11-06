@@ -9,7 +9,6 @@ from datetime import datetime
 
 import icalendar
 import pytz
-import six
 from babel.dates import get_timezone
 from sqlalchemy import Date, Time, or_
 from sqlalchemy.sql import cast

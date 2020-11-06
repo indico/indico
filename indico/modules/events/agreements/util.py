@@ -5,9 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-
-import six
-
 from indico.core import signals
 from indico.core.db import db
 from indico.modules.events.agreements.models.agreements import Agreement

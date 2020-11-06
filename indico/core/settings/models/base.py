@@ -9,7 +9,6 @@
 from collections import defaultdict
 from enum import Enum
 
-import six
 from flask import g, has_request_context
 from sqlalchemy.dialects.postgresql import JSONB
 

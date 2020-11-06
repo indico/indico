@@ -10,8 +10,6 @@ import uuid
 from collections import Counter, OrderedDict
 from copy import deepcopy
 
-import six
-
 from indico.modules.events.surveys.fields.base import SurveyField
 from indico.util.i18n import _
 from indico.util.string import alpha_enum

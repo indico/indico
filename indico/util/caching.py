@@ -8,7 +8,6 @@
 from functools import wraps
 from inspect import getcallargs
 
-import six
 from flask import current_app, g, has_request_context
 
 

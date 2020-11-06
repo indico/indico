@@ -9,7 +9,6 @@
 import mimetypes
 from io import BytesIO
 
-import six
 from flask import flash, jsonify, redirect, request, session
 from werkzeug.exceptions import Forbidden, NotFound
 

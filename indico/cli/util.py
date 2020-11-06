@@ -10,7 +10,6 @@ import traceback
 from importlib import import_module
 
 import click
-import six
 from flask.cli import AppGroup, FlaskGroup, ScriptInfo
 from flask_pluginengine import wrap_in_plugin_context
 from werkzeug.utils import cached_property

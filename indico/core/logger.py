@@ -16,7 +16,6 @@ from email.mime.text import MIMEText
 from email.utils import formatdate
 from pprint import pformat
 
-import six
 import yaml
 from flask import current_app, has_request_context, request, session
 

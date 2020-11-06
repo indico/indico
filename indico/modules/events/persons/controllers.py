@@ -9,7 +9,6 @@
 import itertools
 from collections import OrderedDict, defaultdict
 
-import six
 from flask import flash, redirect, request, session
 from sqlalchemy.orm import contains_eager, joinedload
 

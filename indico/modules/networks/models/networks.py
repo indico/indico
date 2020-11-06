@@ -8,7 +8,6 @@
 
 from ipaddress import ip_address
 
-import six
 from flask import has_request_context, request, session
 from sqlalchemy.ext.associationproxy import association_proxy
 from sqlalchemy.ext.declarative import declared_attr

@@ -8,7 +8,6 @@
 
 from collections import OrderedDict
 
-import six
 from flask import request
 from sqlalchemy.orm import joinedload
 

@@ -14,7 +14,6 @@ import time
 from functools import partial, wraps
 
 import jsonschema
-import six
 from flask import current_app, g, redirect, request, session
 from sqlalchemy.exc import DatabaseError
 from sqlalchemy.orm.exc import NoResultFound

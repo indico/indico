@@ -8,7 +8,6 @@
 
 from uuid import uuid4
 
-import six
 from sqlalchemy.dialects.postgresql import INET, UUID
 
 from indico.core.db import db

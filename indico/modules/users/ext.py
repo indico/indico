@@ -6,9 +6,6 @@
 # LICENSE file for more details.
 
 
-import six
-
-
 class ExtraUserPreferences:
     """Define additional user preferences.
 

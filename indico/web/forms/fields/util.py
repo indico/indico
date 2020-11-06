@@ -5,8 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-
-
 def is_preprocessed_formdata(valuelist):
     if len(valuelist) != 1:
         return False

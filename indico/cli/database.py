@@ -12,7 +12,6 @@ from functools import partial
 
 import alembic.command
 import click
-import six
 from flask import current_app
 from flask.cli import with_appcontext
 from flask_migrate.cli import db as flask_migrate_cli

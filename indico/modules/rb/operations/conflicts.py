@@ -10,7 +10,6 @@ from collections import defaultdict
 from datetime import datetime
 from itertools import combinations
 
-import six
 from flask import session
 from sqlalchemy.orm import contains_eager
 

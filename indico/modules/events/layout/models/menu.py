@@ -6,7 +6,6 @@
 # LICENSE file for more details.
 
 
-import six
 from flask import g, session
 from sqlalchemy.orm import joinedload
 from werkzeug.utils import cached_property

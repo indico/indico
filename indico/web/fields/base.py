@@ -8,7 +8,6 @@
 
 from copy import deepcopy
 
-import six
 from wtforms.fields import BooleanField, StringField, TextAreaField
 from wtforms.validators import DataRequired, Optional
 

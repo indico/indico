@@ -6,7 +6,6 @@
 # LICENSE file for more details.
 
 
-import six
 from flask import has_request_context, request, session
 
 from indico.core import signals

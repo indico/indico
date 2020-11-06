@@ -9,7 +9,6 @@
 import re
 
 import requests
-import six
 from flask import flash, jsonify, redirect, request, session
 from packaging.version import Version
 from pkg_resources import DistributionNotFound, get_distribution

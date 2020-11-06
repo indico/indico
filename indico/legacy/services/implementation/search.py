@@ -8,8 +8,6 @@
 
 from itertools import chain
 
-import six
-
 from indico.core.db.sqlalchemy.custom.unaccent import unaccent_match
 from indico.legacy.fossils.user import IGroupFossil
 from indico.legacy.services.implementation.base import LoggedOnlyService

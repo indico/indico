@@ -12,7 +12,6 @@ from copy import deepcopy
 from datetime import timedelta
 from operator import attrgetter
 
-import six
 from reportlab.lib import colors
 from reportlab.lib.enums import TA_CENTER, TA_JUSTIFY, TA_LEFT, TA_RIGHT
 from reportlab.lib.pagesizes import A4, landscape

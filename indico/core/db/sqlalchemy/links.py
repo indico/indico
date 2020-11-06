@@ -9,7 +9,6 @@
 from functools import partial
 from itertools import chain
 
-import six
 from sqlalchemy.event import listen
 from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.ext.hybrid import Comparator, hybrid_property

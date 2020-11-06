@@ -6,7 +6,6 @@
 # LICENSE file for more details.
 
 
-import six
 from sqlalchemy import orm
 from sqlalchemy.event import listens_for
 

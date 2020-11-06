@@ -12,7 +12,6 @@ from collections import OrderedDict
 from decimal import Decimal
 from uuid import uuid4
 
-import six
 from babel.numbers import format_currency
 from flask import has_request_context, request, session
 from sqlalchemy.dialects.postgresql import JSONB, UUID

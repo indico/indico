@@ -13,7 +13,6 @@ from io import BytesIO
 from operator import attrgetter
 
 import dateutil.parser
-import six
 from flask import session
 from sqlalchemy.orm import contains_eager, joinedload, load_only, noload
 

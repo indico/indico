@@ -6,7 +6,6 @@
 # LICENSE file for more details.
 
 
-import six
 from flask import current_app, request
 from flask_multipass import InvalidCredentials, Multipass, NoSuchUser
 

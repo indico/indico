@@ -10,7 +10,6 @@ import os
 from io import BytesIO
 from zipfile import ZipFile
 
-import six
 from flask import session
 from werkzeug.exceptions import BadRequest
 

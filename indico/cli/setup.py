@@ -16,7 +16,6 @@ from pathlib import Path
 from smtplib import SMTP
 
 import click
-import six
 from click import wrap_text
 from flask.helpers import get_root_path
 from pkg_resources import iter_entry_points

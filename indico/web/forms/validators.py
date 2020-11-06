@@ -9,7 +9,6 @@
 import re
 from datetime import date, timedelta
 
-import six
 from wtforms.validators import EqualTo, Length, Regexp, StopValidation, ValidationError
 
 from indico.util.date_time import as_utc, format_date, format_datetime, format_human_timedelta, format_time, now_utc

@@ -5,9 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-
-import six
-
 from indico.modules.events.abstracts.models.abstracts import AbstractState
 from indico.util.i18n import _, orig_string
 from indico.util.placeholders import Placeholder

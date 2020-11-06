@@ -8,8 +8,6 @@
 
 from datetime import datetime
 
-import six
-
 from indico.modules.rb.models.room_bookable_hours import BookableHours
 from indico.modules.rb.models.room_nonbookable_periods import NonBookablePeriod
 from indico.util.struct.iterables import group_list

@@ -11,7 +11,6 @@ import os
 import shutil
 from collections import OrderedDict, defaultdict, namedtuple
 
-import six
 from sqlalchemy.orm import joinedload, load_only, noload
 
 from indico.core.config import config

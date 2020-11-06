@@ -6,7 +6,6 @@
 # LICENSE file for more details.
 
 
-import six
 from flask import jsonify, request, session
 from sqlalchemy.orm import subqueryload, undefer
 from werkzeug.exceptions import BadRequest

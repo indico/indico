@@ -8,8 +8,6 @@
 
 import json
 
-import six
-
 from indico.modules.events.papers.settings import RoleConverter
 from indico.modules.events.papers.settings import paper_reviewing_settings as settings
 from indico.web.forms.fields import JSONField

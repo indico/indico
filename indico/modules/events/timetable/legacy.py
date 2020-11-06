@@ -10,7 +10,6 @@ from collections import defaultdict
 from hashlib import md5
 from itertools import chain
 
-import six
 from flask import has_request_context, session
 from sqlalchemy.orm import defaultload
 

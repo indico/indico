@@ -399,18 +399,15 @@ class PDFBase:
 
         This function is called by doc.build method for the first page.
         """
-        pass
 
     def laterPages(self, c, doc):
         """Set the layout of the page after the first.
 
         This function is called by doc.build method one each page after the first.
         """
-        pass
 
     def getBody(self, story=None):
         """Add the content to the story."""
-        pass
 
     def getPDFBin(self):
         #build the pdf in the fileDummy
@@ -486,7 +483,6 @@ class PDFBase:
 
 def _doNothing(canvas, doc):
     "Dummy callback for onPage."
-    pass
 
 
 class DocTemplateWithTOC(SimpleDocTemplate):
@@ -638,7 +634,6 @@ class PDFWithTOC(PDFBase):
         """
         if not story:
             story = self._story
-        pass
 
     def getPDFBin(self):
         self.getBody()

@@ -6,7 +6,6 @@
 # LICENSE file for more details.
 
 
-import six
 from sqlalchemy.orm import contains_eager
 
 from indico.core.plugins import plugin_engine

@@ -9,8 +9,6 @@
 from collections import OrderedDict
 from operator import attrgetter
 
-import six
-
 from indico.core import signals
 from indico.util.caching import memoize_request
 from indico.util.decorators import cached_classproperty

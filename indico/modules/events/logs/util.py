@@ -11,7 +11,6 @@ from datetime import datetime
 from difflib import SequenceMatcher
 from enum import Enum
 
-import six
 from markupsafe import Markup
 
 from indico.core import signals

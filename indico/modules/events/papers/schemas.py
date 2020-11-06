@@ -6,7 +6,6 @@
 # LICENSE file for more details.
 
 
-import six
 from markupsafe import escape
 from marshmallow import post_dump
 from marshmallow.fields import Boolean, Decimal, Field, Function, Integer, List, Method, Nested, String

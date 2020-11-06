@@ -9,7 +9,6 @@
 from functools import partial
 from itertools import chain
 
-import six
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.event import listen
 from sqlalchemy.ext.hybrid import Comparator, hybrid_property

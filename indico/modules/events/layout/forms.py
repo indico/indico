@@ -6,7 +6,6 @@
 # LICENSE file for more details.
 
 
-import six
 from wtforms.fields import BooleanField, SelectField, TextAreaField
 from wtforms.fields.html5 import URLField
 from wtforms.fields.simple import StringField

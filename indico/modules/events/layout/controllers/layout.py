@@ -9,7 +9,6 @@
 import os
 from io import BytesIO
 
-import six
 from flask import flash, jsonify, redirect, request, session
 from PIL import Image
 from werkzeug.exceptions import NotFound

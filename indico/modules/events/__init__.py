@@ -6,7 +6,6 @@
 # LICENSE file for more details.
 
 
-import six
 from flask import flash, redirect, render_template, request, session
 from werkzeug.exceptions import BadRequest, NotFound
 

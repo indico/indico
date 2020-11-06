@@ -10,7 +10,6 @@ import os
 from copy import copy
 from importlib import import_module
 
-import six
 from flask import g
 from flask_sqlalchemy import BaseQuery, Model, Pagination
 from sqlalchemy import Column, inspect, orm

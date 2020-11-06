@@ -8,7 +8,6 @@
 
 import json
 
-import six
 from flask import flash, jsonify, request, session
 from sqlalchemy.orm import joinedload
 from sqlalchemy.orm.exc import NoResultFound

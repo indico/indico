@@ -13,7 +13,6 @@ import re
 from tempfile import NamedTemporaryFile
 from zipfile import ZipFile
 
-import six
 from flask import g, request, session
 from flask.helpers import get_root_path
 from werkzeug.utils import secure_filename

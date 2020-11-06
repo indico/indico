@@ -9,7 +9,6 @@
 import mimetypes
 from operator import attrgetter
 
-import six
 from flask import session
 
 from indico.core.db import db

@@ -15,7 +15,6 @@ import warnings
 from datetime import timedelta
 
 import pytz
-import six
 from celery.schedules import crontab
 from flask import current_app, g
 from flask.helpers import get_root_path

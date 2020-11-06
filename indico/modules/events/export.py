@@ -18,7 +18,6 @@ from uuid import uuid4
 
 import click
 import dateutil.parser
-import six
 import yaml
 from flask import current_app
 from sqlalchemy import inspect

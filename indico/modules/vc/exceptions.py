@@ -5,8 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-
-
 class VCRoomError(Exception):
     def __init__(self, message, field=None):
         super().__init__(message)

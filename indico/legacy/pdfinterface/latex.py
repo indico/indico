@@ -16,7 +16,6 @@ from zipfile import ZipFile
 
 import markdown
 import pkg_resources
-import six
 from flask import session
 from flask.helpers import get_root_path
 from jinja2 import Environment, FileSystemLoader, StrictUndefined

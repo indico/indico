@@ -11,7 +11,6 @@ from collections import OrderedDict
 from datetime import datetime
 from operator import itemgetter
 
-import six
 import wtforms
 from werkzeug.datastructures import FileStorage
 from wtforms.validators import InputRequired, NumberRange, ValidationError

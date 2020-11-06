@@ -12,7 +12,6 @@ import traceback
 import warnings
 from contextlib import contextmanager
 
-import six
 from babel import negotiate_locale
 from babel.core import LOCALE_ALIASES, Locale
 from babel.messages.pofile import read_po

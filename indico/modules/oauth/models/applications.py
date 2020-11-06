@@ -8,7 +8,6 @@
 
 from uuid import uuid4
 
-import six
 from sqlalchemy.dialects.postgresql import ARRAY, UUID
 from sqlalchemy.ext.declarative import declared_attr
 from werkzeug.urls import url_parse

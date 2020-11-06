@@ -10,7 +10,6 @@ from datetime import datetime
 from itertools import chain
 
 import dateutil.parser
-import six
 
 from indico.modules.rb import rb_settings
 from indico.modules.rb.models.reservations import RepeatFrequency

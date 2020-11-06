@@ -8,7 +8,6 @@
 
 from io import BytesIO
 
-import six
 from flask import jsonify, request, session
 from marshmallow import missing
 from PIL import Image

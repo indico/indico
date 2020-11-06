@@ -8,7 +8,6 @@
 
 import posixpath
 
-import six
 from flask import current_app, render_template, request
 from sqlalchemy.orm import load_only
 from werkzeug.utils import cached_property

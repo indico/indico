@@ -24,7 +24,6 @@ from uuid import uuid4
 import bleach
 import email_validator
 import markdown
-import six
 import translitcodec
 from html2text import HTML2Text
 from jinja2.filters import do_striptags

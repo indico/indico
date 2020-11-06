@@ -7,7 +7,6 @@
 
 
 import click
-import six
 from flask_multipass import IdentityInfo
 from terminaltables import AsciiTable
 

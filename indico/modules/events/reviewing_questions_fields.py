@@ -6,7 +6,6 @@
 # LICENSE file for more details.
 
 
-import six
 from wtforms.fields import BooleanField
 from wtforms.validators import InputRequired
 

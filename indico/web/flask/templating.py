@@ -11,7 +11,6 @@ import posixpath
 import re
 from operator import itemgetter
 
-import six
 from dateutil.relativedelta import relativedelta
 from flask import current_app
 from flask_pluginengine.util import get_state

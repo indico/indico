@@ -7,7 +7,6 @@
 
 
 import requests
-import six
 from marshmallow import ValidationError
 from werkzeug.urls import url_parse
 

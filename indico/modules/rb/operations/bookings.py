@@ -11,7 +11,6 @@ from datetime import date, datetime, time
 from itertools import chain, groupby
 from operator import attrgetter, itemgetter
 
-import six
 from flask import flash, session
 from pytz import timezone
 from sqlalchemy.orm import contains_eager, joinedload

@@ -8,7 +8,6 @@
 
 from operator import itemgetter
 
-import six
 from pytz import common_timezones, common_timezones_set
 from wtforms.fields.core import BooleanField, SelectField, StringField
 from wtforms.fields.html5 import EmailField

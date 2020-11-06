@@ -9,8 +9,6 @@ import operator
 import re
 from itertools import product
 
-import six
-
 
 def bool_matrix(template, mask=None, expect=None):
     """Create a boolean matrix suitable for parametrized tests.

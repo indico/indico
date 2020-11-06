@@ -10,7 +10,6 @@ from datetime import time
 from operator import itemgetter
 
 import jsonschema
-import six
 from flask import request
 from wtforms.fields import BooleanField, FloatField, HiddenField, IntegerField, SelectField, StringField, TextAreaField
 from wtforms.fields.html5 import DecimalField, EmailField

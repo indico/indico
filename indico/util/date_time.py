@@ -11,7 +11,6 @@ from datetime import time as dt_time
 from datetime import timedelta
 
 import pytz
-import six
 from babel.dates import format_date as _format_date
 from babel.dates import format_datetime as _format_datetime
 from babel.dates import format_time as _format_time

@@ -12,7 +12,6 @@ from datetime import timedelta
 from operator import attrgetter
 
 import pytz
-import six
 from flask import has_request_context, render_template, session
 from markupsafe import Markup
 from sqlalchemy import DDL, orm

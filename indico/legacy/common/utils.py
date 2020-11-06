@@ -7,8 +7,6 @@
 
 import os
 
-import six
-
 
 # fcntl is only available for POSIX systems
 if os.name == 'posix':
@@ -57,7 +55,6 @@ class OSSpecific:
     @classmethod
     def _lockFileOthers(cls, f, lockType):
         """Win32/others file locking could be implemented here."""
-        pass
 
     @classmethod
     def lockFile(cls, f, lockType):

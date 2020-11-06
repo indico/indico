@@ -18,7 +18,6 @@ from mimetypes import guess_extension
 from tempfile import NamedTemporaryFile
 from zipfile import ZipFile
 
-import six
 from flask import current_app, flash, g, redirect, request, session
 from sqlalchemy import inspect
 from sqlalchemy.orm import load_only, noload

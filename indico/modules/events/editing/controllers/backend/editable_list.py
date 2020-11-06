@@ -8,7 +8,6 @@
 
 import uuid
 
-import six
 from flask import jsonify, request, session
 from marshmallow import fields
 from sqlalchemy.orm import joinedload

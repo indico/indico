@@ -12,7 +12,6 @@ from hashlib import md5
 from operator import attrgetter
 
 import pytz
-import six
 from flask import request
 from sqlalchemy import Date, cast
 from sqlalchemy.orm import joinedload, subqueryload, undefer

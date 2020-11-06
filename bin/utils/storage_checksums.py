@@ -8,7 +8,6 @@
 from operator import itemgetter
 
 import click
-import six
 from sqlalchemy import inspect
 from sqlalchemy.orm import lazyload, load_only
 from sqlalchemy.sql.elements import Tuple

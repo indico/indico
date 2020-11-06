@@ -10,7 +10,6 @@ from collections import defaultdict
 from itertools import chain
 from operator import attrgetter
 
-import six
 from sqlalchemy import inspect
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.ext.declarative import declared_attr

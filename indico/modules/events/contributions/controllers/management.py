@@ -9,7 +9,6 @@
 import uuid
 from operator import attrgetter
 
-import six
 from flask import flash, jsonify, redirect, request, session
 from sqlalchemy.orm import undefer
 from werkzeug.exceptions import BadRequest, Forbidden, NotFound

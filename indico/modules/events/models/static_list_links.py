@@ -8,7 +8,6 @@
 
 from uuid import UUID, uuid4
 
-import six
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.dialects.postgresql import UUID as pg_UUID
 

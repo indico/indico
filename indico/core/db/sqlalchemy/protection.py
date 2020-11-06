@@ -8,7 +8,6 @@
 
 import itertools
 
-import six
 from flask import has_request_context, session
 from sqlalchemy import inspect
 from sqlalchemy.event import listens_for

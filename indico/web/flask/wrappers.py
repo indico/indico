@@ -11,7 +11,6 @@ import re
 from contextlib import contextmanager
 from uuid import uuid4
 
-import six
 from flask import Blueprint, Flask, g, request
 from flask.blueprints import BlueprintSetupState
 from flask.helpers import locked_cached_property

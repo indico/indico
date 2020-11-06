@@ -9,7 +9,6 @@
 from datetime import date, datetime, time, timedelta
 from io import BytesIO
 
-import six
 from flask import jsonify, redirect, request, session
 from sqlalchemy.orm import joinedload
 

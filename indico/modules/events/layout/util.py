@@ -9,7 +9,6 @@
 from collections import OrderedDict, defaultdict
 from itertools import chain, count
 
-import six
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import joinedload, load_only
 from werkzeug.urls import url_parse

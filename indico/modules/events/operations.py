@@ -8,7 +8,6 @@
 
 from operator import attrgetter
 
-import six
 from flask import session
 
 from indico.core import signals

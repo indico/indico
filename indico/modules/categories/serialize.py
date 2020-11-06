@@ -9,7 +9,6 @@
 from io import BytesIO
 
 import icalendar as ical
-import six
 from feedgen.feed import FeedGenerator
 from flask import session
 from lxml import html

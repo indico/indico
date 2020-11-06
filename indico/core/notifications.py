@@ -11,7 +11,6 @@ import time
 from functools import wraps
 from types import GeneratorType
 
-import six
 from flask import g
 
 from indico.core.config import config

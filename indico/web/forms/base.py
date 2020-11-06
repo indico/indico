@@ -8,7 +8,6 @@
 
 import weakref
 
-import six
 from flask import flash, g, request, session
 from flask_wtf import FlaskForm
 from wtforms import ValidationError

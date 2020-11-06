@@ -6,7 +6,6 @@
 # LICENSE file for more details.
 
 
-import six
 from flask import render_template
 
 from indico.util.i18n import _

@@ -8,8 +8,6 @@
 
 from functools import wraps
 
-import six
-
 from indico.core.settings import SettingsProxyBase
 from indico.core.settings.util import get_all_settings, get_setting
 from indico.modules.categories import Category

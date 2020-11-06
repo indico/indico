@@ -11,7 +11,6 @@ import string
 from collections import defaultdict
 from datetime import datetime
 
-import six
 from sqlalchemy.orm import joinedload, load_only
 
 from indico.legacy.common.xmlGen import XMLGen

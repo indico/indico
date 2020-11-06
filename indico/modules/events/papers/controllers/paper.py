@@ -11,7 +11,6 @@ from collections import defaultdict
 from itertools import chain
 from operator import attrgetter
 
-import six
 from flask import flash, request, session
 from sqlalchemy.orm import selectinload
 from werkzeug.exceptions import Forbidden

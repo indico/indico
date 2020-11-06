@@ -11,7 +11,6 @@ from copy import deepcopy
 from datetime import date, datetime
 from uuid import uuid4
 
-import six
 from sqlalchemy.dialects.postgresql import ARRAY
 from wtforms.validators import ValidationError
 

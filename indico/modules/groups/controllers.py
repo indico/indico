@@ -8,7 +8,6 @@
 
 from operator import attrgetter
 
-import six
 from flask import flash, jsonify, redirect, request
 from sqlalchemy.orm import joinedload
 from webargs import fields

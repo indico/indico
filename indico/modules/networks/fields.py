@@ -9,8 +9,6 @@
 from ipaddress import ip_network
 from operator import itemgetter
 
-import six
-
 from indico.util.i18n import _
 from indico.web.forms.fields import MultiStringField
 

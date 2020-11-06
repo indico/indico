@@ -8,7 +8,6 @@
 
 from functools import wraps
 
-import six
 from jinja2.filters import do_filesizeformat
 
 from indico.core import signals

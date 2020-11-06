@@ -10,7 +10,6 @@ import posixpath
 from itertools import groupby
 from operator import attrgetter
 
-import six
 from flask import render_template, request, session
 from sqlalchemy.orm import joinedload
 

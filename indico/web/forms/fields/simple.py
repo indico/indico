@@ -8,7 +8,6 @@
 
 import json
 
-import six
 from markupsafe import escape
 from wtforms.fields import Field, HiddenField, PasswordField, RadioField, SelectMultipleField, TextAreaField
 from wtforms.widgets import CheckboxInput

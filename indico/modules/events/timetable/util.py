@@ -9,7 +9,6 @@
 from collections import defaultdict
 from operator import attrgetter
 
-import six
 from flask import render_template, session
 from pytz import utc
 from sqlalchemy import Date, cast

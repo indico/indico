@@ -9,7 +9,6 @@
 import fnmatch
 import os
 
-import six
 from marshmallow import ValidationError
 from marshmallow.fields import Dict
 

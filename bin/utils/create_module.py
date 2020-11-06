@@ -13,7 +13,6 @@ from collections import defaultdict
 from datetime import date
 
 import click
-import six
 
 
 click.disable_unicode_literals_warning = True

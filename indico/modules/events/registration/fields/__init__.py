@@ -5,8 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-
-
 def get_field_types():
     """Get a dict with all registration field types."""
     from .choices import AccommodationField, MultiChoiceField, SingleChoiceField

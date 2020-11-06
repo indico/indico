@@ -6,7 +6,6 @@
 # LICENSE file for more details.
 
 
-import six
 from flask import flash, request, session
 from werkzeug.exceptions import Forbidden
 from wtforms.fields import BooleanField

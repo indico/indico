@@ -8,7 +8,6 @@
 
 from operator import attrgetter, itemgetter
 
-import six
 from flask import flash, redirect, session
 from sqlalchemy.orm import undefer
 

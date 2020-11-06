@@ -8,7 +8,6 @@
 
 from datetime import datetime, time
 
-import six
 from dateutil.relativedelta import relativedelta
 from flask import flash, redirect, render_template, request, session
 from markupsafe import Markup

@@ -8,7 +8,6 @@
 
 from datetime import datetime
 
-import six
 from flask import g, has_request_context, jsonify, render_template, request, session
 from itsdangerous import Signer
 from markupsafe import Markup

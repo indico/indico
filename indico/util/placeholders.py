@@ -9,7 +9,6 @@
 import re
 from operator import attrgetter
 
-import six
 from flask import render_template
 from markupsafe import Markup, escape
 

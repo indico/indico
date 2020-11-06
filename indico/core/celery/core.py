@@ -10,7 +10,6 @@ import logging
 import os
 from operator import itemgetter
 
-import six
 from celery import Celery
 from celery.app.log import Logging
 from celery.beat import PersistentScheduler

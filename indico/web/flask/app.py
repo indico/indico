@@ -9,7 +9,6 @@
 import os
 import uuid
 
-import six
 from babel.numbers import format_currency, get_currency_name
 from flask import _app_ctx_stack, request
 from flask.helpers import get_root_path

@@ -8,7 +8,6 @@
 
 from operator import attrgetter
 
-import six
 from flask import request, session
 from sqlalchemy.orm import joinedload
 from wtforms.ext.sqlalchemy.fields import QuerySelectField

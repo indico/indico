@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-import six
 from flask_multipass import IdentityInfo
 from zope.interface.declarations import implementer
 

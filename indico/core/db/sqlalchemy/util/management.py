@@ -6,7 +6,6 @@
 # LICENSE file for more details.
 
 
-import six
 from sqlalchemy import ForeignKeyConstraint, MetaData, Table
 from sqlalchemy.engine.reflection import Inspector
 from sqlalchemy.sql.ddl import DropConstraint, DropSchema, DropTable

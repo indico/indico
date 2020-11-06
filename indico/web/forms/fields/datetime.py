@@ -12,7 +12,6 @@ from datetime import time, timedelta
 
 import dateutil.parser
 import pytz
-import six
 from flask import session
 from markupsafe import escape
 from wtforms import Field, SelectField

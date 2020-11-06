@@ -22,7 +22,6 @@ from email.mime.text import MIMEText
 from email.utils import formataddr, formatdate, getaddresses, parseaddr
 from io import StringIO
 
-import six
 from speaklater import is_lazy_string
 from werkzeug.urls import url_parse
 

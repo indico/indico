@@ -8,7 +8,6 @@
 
 import re
 
-import six
 from sqlalchemy import func, inspect, over
 from sqlalchemy.sql import update
 

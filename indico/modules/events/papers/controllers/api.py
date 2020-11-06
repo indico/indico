@@ -6,7 +6,6 @@
 # LICENSE file for more details.
 
 
-import six
 from flask import request, session
 from marshmallow_enum import EnumField
 from webargs import fields, validate

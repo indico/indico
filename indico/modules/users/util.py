@@ -14,7 +14,6 @@ from io import BytesIO
 from operator import itemgetter
 
 import requests
-import six
 from flask import session
 from PIL import Image
 from sqlalchemy.orm import contains_eager, joinedload, load_only, undefer

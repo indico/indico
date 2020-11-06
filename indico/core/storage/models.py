@@ -16,8 +16,6 @@ rudimentary version control. Inheriting classes will be responsible for
 specifying, among others, which storage backend to use.
 """
 
-
-
 from sqlalchemy.event import listen
 from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.orm import column_property

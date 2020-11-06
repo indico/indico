@@ -9,7 +9,6 @@
 import json
 import uuid
 
-import six
 from markupsafe import escape
 from wtforms import HiddenField
 

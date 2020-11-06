@@ -10,7 +10,6 @@ import re
 from datetime import datetime, timedelta
 from operator import attrgetter, itemgetter
 
-import six
 from flask import request, session
 from markupsafe import escape
 from pytz import timezone

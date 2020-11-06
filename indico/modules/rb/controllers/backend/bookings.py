@@ -10,7 +10,6 @@ import uuid
 from datetime import date, datetime, time
 
 import dateutil
-import six
 from flask import jsonify, request, session
 from marshmallow import fields, validate
 from marshmallow_enum import EnumField

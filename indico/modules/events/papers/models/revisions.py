@@ -9,8 +9,6 @@
 from itertools import chain
 from operator import attrgetter
 
-import six
-
 from indico.core.db import db
 from indico.core.db.sqlalchemy import PyIntEnum, UTCDateTime
 from indico.core.db.sqlalchemy.descriptions import RenderMode, RenderModeMixin

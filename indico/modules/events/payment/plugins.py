@@ -112,7 +112,6 @@ class PaymentPluginMixin:
         :param data: a dict containing event, registration, amount, currency,
                      settings and event_settings
         """
-        pass
 
     def render_payment_form(self, registration):
         """Return the payment form shown to the user.

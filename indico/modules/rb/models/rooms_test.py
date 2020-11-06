@@ -9,7 +9,6 @@ from datetime import date, datetime, time, timedelta
 from operator import itemgetter
 
 import pytest
-import six
 
 from indico.core.db.sqlalchemy.protection import ProtectionMode
 from indico.core.errors import IndicoError

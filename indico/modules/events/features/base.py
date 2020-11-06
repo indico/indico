@@ -5,9 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-
-import six
-
 from indico.modules.events.features.util import get_feature_definitions
 from indico.util.decorators import cached_classproperty
 
@@ -65,12 +62,10 @@ class EventFeature:
     @classmethod
     def enabled(cls, event, cloning):  # pragma: no cover
         """Called when the feature is enabled for an event."""
-        pass
 
     @classmethod
     def disabled(cls, event):  # pragma: no cover
         """Called when the feature is disabled for an event."""
-        pass
 
     @cached_classproperty
     @classmethod

@@ -9,7 +9,6 @@
 from collections import OrderedDict, defaultdict
 from operator import itemgetter
 
-import six
 from flask import flash, jsonify, redirect, request, session
 from sqlalchemy import func, inspect
 from sqlalchemy.orm import joinedload, lazyload

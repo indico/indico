@@ -8,7 +8,6 @@
 import ipaddress
 import socket
 
-import six
 from werkzeug.urls import url_parse
 
 

@@ -81,7 +81,6 @@ from tempfile import NamedTemporaryFile
 
 import markdown
 import requests
-import six
 from lxml.html import html5parser
 from PIL import Image
 from requests.exceptions import ConnectionError, InvalidURL

@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-import six
 from flask import render_template
 from sqlalchemy import and_
 from sqlalchemy.orm import load_only

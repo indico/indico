@@ -9,7 +9,6 @@
 import itertools
 import posixpath
 
-import six
 from flask import current_app, g, render_template, request, session
 from markupsafe import Markup
 from pytz import common_timezones, common_timezones_set

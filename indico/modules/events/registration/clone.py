@@ -5,9 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-
-import six
-
 from indico.core import signals
 from indico.core.db import db
 from indico.core.db.sqlalchemy.util.models import get_simple_column_attrs

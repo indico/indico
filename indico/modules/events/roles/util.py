@@ -5,8 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-
-
 def serialize_event_role(role, legacy=True):
     """Serialize role to JSON-like object."""
     if legacy:

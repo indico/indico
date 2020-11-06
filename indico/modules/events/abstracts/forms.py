@@ -9,7 +9,6 @@
 from datetime import time
 from itertools import groupby
 
-import six
 from flask import request, session
 from wtforms.ext.sqlalchemy.fields import QuerySelectField
 from wtforms.fields import BooleanField, HiddenField, IntegerField, SelectField, StringField, TextAreaField

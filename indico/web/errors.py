@@ -9,7 +9,6 @@
 import traceback
 from uuid import uuid4
 
-import six
 from flask import g, jsonify, render_template, request, session
 from itsdangerous import BadData
 from sqlalchemy.exc import OperationalError

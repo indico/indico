@@ -10,7 +10,6 @@ from collections import namedtuple
 from io import BytesIO
 from operator import attrgetter, itemgetter
 
-import six
 from dateutil.relativedelta import relativedelta
 from flask import flash, jsonify, redirect, render_template, request, session
 from markupsafe import Markup, escape

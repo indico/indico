@@ -22,7 +22,6 @@ import logging
 import re
 import threading
 
-import six
 import zope.interface
 
 
@@ -160,8 +159,6 @@ class Fossilizable:
         _fossil_cache.fossilInterface = {}
         _fossil_cache.fossilAttrs = {}  # Attribute Cache for Fossils with
                                         # fields that are repeated
-
-
 
     @classmethod
     def fossilizeIterable(cls, target, interface, useAttrCache=False, filterBy=None, **kwargs):

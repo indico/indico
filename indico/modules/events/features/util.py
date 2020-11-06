@@ -8,7 +8,6 @@
 
 from itertools import chain
 
-import six
 from werkzeug.exceptions import NotFound
 
 from indico.core import signals

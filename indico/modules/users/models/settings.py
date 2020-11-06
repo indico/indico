@@ -8,8 +8,6 @@
 
 from functools import wraps
 
-import six
-
 from indico.core.db import db
 from indico.core.settings import SettingsProxyBase
 from indico.core.settings.models.base import JSONSettingsBase

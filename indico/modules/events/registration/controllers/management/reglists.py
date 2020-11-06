@@ -10,7 +10,6 @@ import os
 import uuid
 from io import BytesIO
 
-import six
 from flask import flash, jsonify, redirect, render_template, request, session
 from sqlalchemy.orm import joinedload, subqueryload
 from werkzeug.exceptions import BadRequest, Forbidden, NotFound

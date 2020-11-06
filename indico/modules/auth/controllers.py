@@ -6,7 +6,6 @@
 # LICENSE file for more details.
 
 
-import six
 from flask import flash, jsonify, redirect, render_template, request, session
 from itsdangerous import BadData, BadSignature
 from markupsafe import Markup

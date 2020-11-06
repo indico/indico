@@ -10,7 +10,6 @@ from collections import defaultdict
 from datetime import date
 from operator import attrgetter
 
-import six
 from flask import session
 from sqlalchemy.orm import contains_eager, selectinload
 

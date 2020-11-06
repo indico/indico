@@ -8,7 +8,6 @@
 
 from uuid import uuid4
 
-import six
 from sqlalchemy import inspect
 from sqlalchemy.dialects.postgresql import ARRAY, UUID
 from sqlalchemy.event import listens_for

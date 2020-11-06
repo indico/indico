@@ -10,7 +10,6 @@ import errno
 import json
 import os
 
-import six
 from flask import g, session
 from flask_babelex import Domain
 from flask_pluginengine import (Plugin, PluginBlueprintMixin, PluginBlueprintSetupStateMixin, PluginEngine,
@@ -136,7 +135,6 @@ class IndicoPlugin(Plugin):
         A single blueprint can be returned directly, for multiple blueprint you need
         to yield them or return an iterable.
         """
-        pass
 
     def get_vars_js(self):
         """Return a dictionary with variables to be added to vars.js file."""

@@ -10,7 +10,6 @@ import os
 import re
 from functools import wraps
 
-import six
 import yaml
 from flask.helpers import get_root_path
 

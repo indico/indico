@@ -11,7 +11,6 @@ from collections import defaultdict
 from operator import itemgetter
 
 import click
-import six
 from sqlalchemy import inspect
 
 from indico.core.db import db

@@ -10,7 +10,6 @@ from collections import OrderedDict, defaultdict
 from datetime import timedelta
 from itertools import takewhile
 
-import six
 from flask import render_template, request
 from pytz import timezone
 

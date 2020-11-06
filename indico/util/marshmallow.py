@@ -10,7 +10,6 @@ import os
 import re
 from uuid import UUID
 
-import six
 from dateutil import parser, relativedelta
 from marshmallow import ValidationError
 from marshmallow.fields import DateTime, Field

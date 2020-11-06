@@ -8,7 +8,6 @@
 
 from copy import deepcopy
 
-import six
 from wtforms.validators import DataRequired, Optional
 
 from indico.modules.events.registration.models.registrations import RegistrationData

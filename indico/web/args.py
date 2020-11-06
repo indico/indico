@@ -6,7 +6,6 @@
 # LICENSE file for more details.
 
 
-import six
 from flask import g
 from marshmallow import Schema
 from webargs import dict2schema

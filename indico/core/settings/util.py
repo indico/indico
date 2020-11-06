@@ -8,8 +8,6 @@
 
 from copy import copy
 
-import six
-
 
 _not_in_db = object()
 

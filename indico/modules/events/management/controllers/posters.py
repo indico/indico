@@ -8,7 +8,6 @@
 
 import uuid
 
-import six
 from flask import request
 from werkzeug.exceptions import Forbidden, NotFound
 

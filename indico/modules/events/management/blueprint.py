@@ -5,9 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-
-import six
-
 from indico.modules.events import event_management_object_url_prefixes
 from indico.modules.events.management.controllers import actions, cloning, posters, program_codes, protection, settings
 from indico.web.flask.util import make_compat_redirect_func

@@ -16,7 +16,6 @@ import sys
 from contextlib import contextmanager
 
 import click
-import six
 import yaml
 from setuptools import find_packages
 

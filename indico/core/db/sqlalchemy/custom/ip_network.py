@@ -8,7 +8,6 @@
 
 import ipaddress
 
-import six
 from sqlalchemy import TypeDecorator
 from sqlalchemy.dialects.postgresql import CIDR
 

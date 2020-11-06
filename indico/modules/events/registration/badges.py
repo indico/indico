@@ -10,7 +10,6 @@ import re
 from collections import namedtuple
 from itertools import product
 
-import six
 from reportlab.lib.units import cm
 from reportlab.lib.utils import ImageReader
 from werkzeug.exceptions import BadRequest

@@ -7,7 +7,6 @@
 
 
 import smtplib
-import socket
 import ssl
 import threading
 
@@ -54,11 +53,9 @@ class BaseEmailBackend:
 
         The default implementation does nothing.
         """
-        pass
 
     def close(self):
         """Close a network connection."""
-        pass
 
     def __enter__(self):
         try:

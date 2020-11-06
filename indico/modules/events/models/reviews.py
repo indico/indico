@@ -6,7 +6,6 @@
 # LICENSE file for more details.
 
 
-import six
 from sqlalchemy.ext.hybrid import hybrid_property
 
 from indico.util.caching import memoize_request

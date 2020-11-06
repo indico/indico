@@ -6,7 +6,6 @@
 # LICENSE file for more details.
 
 
-import six
 from markupsafe import Markup
 
 from indico.modules.events.registration.models.items import PersonalDataType

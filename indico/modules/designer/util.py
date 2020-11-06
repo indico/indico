@@ -6,7 +6,6 @@
 # LICENSE file for more details.
 
 
-import six
 from flask import session
 from sqlalchemy.orm import joinedload
 

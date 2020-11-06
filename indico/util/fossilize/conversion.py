@@ -12,7 +12,6 @@ Conversion functions for fossils
 from collections import defaultdict
 
 import pytz
-import six
 
 from indico.modules.rb.models.reservation_occurrences import ReservationOccurrence
 

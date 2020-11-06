@@ -11,7 +11,6 @@ from datetime import timedelta
 from operator import attrgetter
 
 import dateutil.parser
-import six
 from flask import flash, jsonify, request, session
 from pytz import utc
 from werkzeug.exceptions import BadRequest, Forbidden, NotFound

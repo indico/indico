@@ -9,7 +9,6 @@
 import os
 from collections import OrderedDict
 
-import six
 from celery.exceptions import TimeoutError
 from flask import flash, jsonify, request, session
 from markupsafe import escape

@@ -8,7 +8,6 @@
 
 from operator import attrgetter
 
-import six
 from sqlalchemy.event import listens_for
 from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.ext.hybrid import hybrid_property

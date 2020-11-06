@@ -13,7 +13,6 @@ from io import BytesIO
 from operator import attrgetter
 
 import pytz
-import six
 from flask import current_app
 from PIL import Image
 from sqlalchemy import Date, cast

@@ -11,7 +11,6 @@ from enum import Enum
 from operator import attrgetter
 from uuid import uuid4
 
-import six
 from flask import flash, g, has_request_context, session
 from flask_multipass import IdentityRetrievalFailed
 from sqlalchemy.dialects.postgresql import JSONB, UUID
