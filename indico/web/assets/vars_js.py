@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import unicode_literals
 
 import os
 
@@ -49,7 +48,7 @@ def generate_i18n_file(locale_name, react=False):
         i18n_data = {'indico': {'': {'domain': 'indico',
                                      'lang': locale_name}}}
 
-    for pid, plugin in six.iteritems(plugin_engine.get_active_plugins()):
+    for pid, plugin in plugin_engine.get_active_plugins().items():
         data = {}
         if plugin.translation_path:
             data = get_locale_data(plugin.translation_path, locale_name, pid, react=react)
@@ -85,7 +84,7 @@ def generate_global_file():
         'name': auth.name,
         'title': auth.title,
         'supports_groups': auth.supports_groups
-    } for auth in six.itervalues(multipass.identity_providers) if auth.supports_search]
+    } for auth in multipass.identity_providers.values() if auth.supports_search]
 
     indico_vars = {
         'ExperimentalEditingService': config.EXPERIMENTAL_EDITING_SERVICE,

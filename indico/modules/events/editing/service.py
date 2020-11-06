@@ -5,12 +5,10 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import unicode_literals
 
 import requests
 import six
 from marshmallow import ValidationError
-from six.moves import map
 from werkzeug.urls import url_parse
 
 import indico
@@ -39,7 +37,7 @@ class ServiceRequestFailed(Exception):
             except (ValueError, KeyError):
                 # not json or not error field
                 error = None
-        super(ServiceRequestFailed, self).__init__(error or six.text_type(exc))
+        super().__init__(error or str(exc))
 
 
 @memoize_redis(30)
@@ -48,12 +46,12 @@ def check_service_url(url):
         resp = requests.get(url + '/info', allow_redirects=False)
         resp.raise_for_status()
         if resp.status_code != 200:
-            raise requests.HTTPError('Unexpected status code: {}'.format(resp.status_code), response=resp)
+            raise requests.HTTPError(f'Unexpected status code: {resp.status_code}', response=resp)
         info = resp.json()
     except requests.ConnectionError:
         return {'info': None, 'error': _('Connection failed')}
     except requests.RequestException as exc:
-        return {'info': None, 'error': six.text_type(ServiceRequestFailed(exc))}
+        return {'info': None, 'error': str(ServiceRequestFailed(exc))}
     if not all(x in info for x in ('name', 'version')):
         return {'error': _('Invalid response')}
     return {'error': None, 'info': info}
@@ -65,7 +63,7 @@ def _build_url(event, path):
 
 def _get_headers(event, include_token=True):
     headers = {'Accept': 'application/json',
-               'User-Agent': 'Indico/{}'.format(indico.__version__)}
+               'User-Agent': f'Indico/{indico.__version__}'}
     if include_token:
         headers['Authorization'] = 'Bearer {}'.format(editing_settings.get(event, 'service_token'))
     return headers
@@ -79,7 +77,7 @@ def _log_service_error(exc, msg):
         except ValueError:
             pass
     if payload is not None:
-        logger.exception('{}: %s'.format(msg), payload)
+        logger.exception(f'{msg}: %s', payload)
     else:
         logger.exception(msg)
 
@@ -132,7 +130,7 @@ def service_get_status(event):
     except requests.ConnectionError:
         return {'status': None, 'error': _('Connection failed')}
     except requests.RequestException as exc:
-        return {'status': None, 'error': six.text_type(ServiceRequestFailed(exc))}
+        return {'status': None, 'error': str(ServiceRequestFailed(exc))}
     return {'status': resp.json(), 'error': None}
 
 

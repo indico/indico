@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import unicode_literals
 
 import six
 
@@ -19,7 +18,7 @@ FULL_ACCESS_PERMISSION = '_full_access'
 READ_ACCESS_PERMISSION = '_read_access'
 
 
-class ManagementPermission(object):
+class ManagementPermission:
     """Base class for management permissions.
 
     To create a new permission, subclass this class and register
@@ -59,7 +58,7 @@ def check_permissions(type_):
     permissions = get_available_permissions(type_)
     if not all(x.islower() for x in permissions):
         raise RuntimeError('Management permissions must be all-lowercase')
-    if len(list(x for x in six.viewvalues(permissions) if x.default)) > 1:
+    if len(list(x for x in permissions.values() if x.default)) > 1:
         raise RuntimeError('Only one permission can be the default')
 
 
@@ -97,7 +96,7 @@ def get_permissions_info(_type):
         }
     }
 
-    selectable_permissions = {k: v for k, v in six.viewitems(get_available_permissions(_type)) if v.user_selectable}
+    selectable_permissions = {k: v for k, v in get_available_permissions(_type).items() if v.user_selectable}
     special_permissions = {
         FULL_ACCESS_PERMISSION: {
             'title': _('Manage'),
@@ -120,7 +119,7 @@ def get_permissions_info(_type):
             'description': special_permissions[FULL_ACCESS_PERMISSION]['description'],
             'children': {
                 perm.name: {'title': perm.friendly_name, 'description': perm.description}
-                for name, perm in six.viewitems(selectable_permissions)
+                for name, perm in selectable_permissions.items()
             }
         },
         READ_ACCESS_PERMISSION: {
@@ -130,12 +129,12 @@ def get_permissions_info(_type):
     }
     available_permissions = dict({k: {
         'title': v.friendly_name,
-        'css_class': 'permission-{}-{}'.format(_type.__name__.lower(), v.name),
+        'css_class': f'permission-{_type.__name__.lower()}-{v.name}',
         'description': v.description,
         'default': v.default,
         'color': v.color,
-    } for k, v in six.viewitems(selectable_permissions)}, **special_permissions)
-    default = next((k for k, v in six.viewitems(available_permissions) if v['default']), None)
+    } for k, v in selectable_permissions.items()}, **special_permissions)
+    default = next((k for k, v in available_permissions.items() if v['default']), None)
 
     return available_permissions, permissions_tree, default
 
@@ -195,7 +194,7 @@ def update_permissions(obj, form):
 
     current_principal_permissions = {p.principal: get_principal_permissions(p, type(obj))
                                      for p in obj.acl_entries}
-    current_principal_permissions = {k: v for k, v in six.iteritems(current_principal_permissions) if v}
+    current_principal_permissions = {k: v for k, v in current_principal_permissions.items() if v}
     new_principal_permissions = {
         principal_from_fossil(
             fossil,
@@ -219,9 +218,9 @@ def update_principals_permissions(obj, current, new):
     :param current: A dict mapping principals to a set with its current permissions
     :param new: A dict mapping principals to a set with its new permissions
     """
-    user_selectable_permissions = {v.name for k, v in six.viewitems(get_available_permissions(type(obj)))
+    user_selectable_permissions = {v.name for k, v in get_available_permissions(type(obj)).items()
                                    if v.user_selectable}
-    for principal, permissions in six.viewitems(current):
+    for principal, permissions in current.items():
         if principal not in new:
             permissions_kwargs = {
                 'full_access': False,

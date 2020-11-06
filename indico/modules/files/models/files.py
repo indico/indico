@@ -5,13 +5,11 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import unicode_literals
 
 import posixpath
 from uuid import uuid4
 
 import six
-from six.moves import map
 from sqlalchemy.dialects.postgresql import JSONB, UUID
 
 from indico.core.config import config
@@ -36,7 +34,7 @@ class File(StoredFileMixin, db.Model):
         index=True,
         unique=True,
         nullable=False,
-        default=lambda: six.text_type(uuid4())
+        default=lambda: str(uuid4())
     )
     #: Whether the file has been associated with something.
     #: Unclaimed files may be deleted automatically after a while.
@@ -74,7 +72,7 @@ class File(StoredFileMixin, db.Model):
 
     def save(self, context, data):
         self.__context = context
-        super(File, self).save(data)
+        super().save(data)
         del self.__context
 
     @property

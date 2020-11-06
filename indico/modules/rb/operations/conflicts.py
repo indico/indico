@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import unicode_literals
 
 from collections import defaultdict
 from datetime import datetime
@@ -47,23 +46,23 @@ def get_rooms_conflicts(rooms, start_dt, end_dt, repeat_frequency, repeat_interv
         query = query.filter(ReservationOccurrence.start_dt > datetime.now())
 
     overlapping_occurrences = group_list(query, key=lambda obj: obj.reservation.room.id)
-    for room_id, occurrences in six.iteritems(overlapping_occurrences):
+    for room_id, occurrences in overlapping_occurrences.items():
         conflicts = get_room_bookings_conflicts(candidates, occurrences, skip_conflicts_with)
         rooms_conflicts[room_id], rooms_pre_conflicts[room_id], rooms_conflicting_candidates[room_id] = conflicts
-    for room_id, occurrences in six.iteritems(blocked_rooms):
+    for room_id, occurrences in blocked_rooms.items():
         conflicts, conflicting_candidates = get_room_blockings_conflicts(room_id, candidates, occurrences)
         rooms_conflicts[room_id] |= conflicts
         rooms_conflicting_candidates[room_id] |= conflicting_candidates
 
     if not (allow_admin and rb_is_admin(session.user)):
-        for room_id, occurrences in six.iteritems(nonbookable_periods):
+        for room_id, occurrences in nonbookable_periods.items():
             room = Room.get_or_404(room_id)
             if not room.can_override(session.user, allow_admin=allow_admin):
                 conflicts, conflicting_candidates = get_room_nonbookable_periods_conflicts(candidates, occurrences)
                 rooms_conflicts[room_id] |= conflicts
                 rooms_conflicting_candidates[room_id] |= conflicting_candidates
 
-        for room_id, occurrences in six.iteritems(unbookable_hours):
+        for room_id, occurrences in unbookable_hours.items():
             room = Room.get_or_404(room_id)
             if not room.can_override(session.user, allow_admin=allow_admin):
                 conflicts, conflicting_candidates = get_room_unbookable_hours_conflicts(candidates, occurrences)

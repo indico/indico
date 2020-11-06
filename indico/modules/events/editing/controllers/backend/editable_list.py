@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import unicode_literals
 
 import uuid
 
@@ -53,7 +52,7 @@ class RHEditableList(RHEditableTypeEditorBase):
 
 class RHPrepareEditablesArchive(RHEditablesBase):
     def _process(self):
-        key = six.text_type(uuid.uuid4())
+        key = str(uuid.uuid4())
         data = [editable.id for editable in self.editables]
         archive_cache.set(key, data, time=1800)
         download_url = url_for('.download_archive', self.event, type=self.editable_type.name, uuid=key)
@@ -62,7 +61,7 @@ class RHPrepareEditablesArchive(RHEditablesBase):
 
 class RHDownloadArchive(RHEditableTypeManagementBase):
     def _process(self):
-        editable_ids = archive_cache.get(six.text_type(request.view_args['uuid']), [])
+        editable_ids = archive_cache.get(str(request.view_args['uuid']), [])
         editables = Editable.query.filter(Editable.id.in_(editable_ids)).all()
         return generate_editables_zip(editables)
 

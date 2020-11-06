@@ -18,7 +18,7 @@ def md5(s):
     return hashlib.md5(s).hexdigest()
 
 
-class Foo(object):
+class Foo:
     def __init__(self, password=None):
         if password is not None:
             self.password = password

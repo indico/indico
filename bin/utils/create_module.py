@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import unicode_literals
 
 import os
 import re
@@ -79,8 +78,6 @@ def write_header(f):
         # modify it under the terms of the MIT License; see the
         # LICENSE file for more details.
 
-        from __future__ import unicode_literals
-
     """).lstrip().format(year=date.today().year))
 
 
@@ -130,10 +127,10 @@ def main(indico_dir, name, module_dir, event, models, blueprint, templates, cont
         if not os.path.exists(models_dir):
             os.mkdir(models_dir)
             touch(os.path.join(models_dir, '__init__.py'))
-        for module_name, class_names in six.iteritems(model_classes):
-            model_path = os.path.join(models_dir, '{}.py'.format(module_name))
+        for module_name, class_names in model_classes.items():
+            model_path = os.path.join(models_dir, f'{module_name}.py')
             if os.path.exists(model_path):
-                raise click.exceptions.UsageError('Cannot create model in {} (file already exists)'.format(module_name))
+                raise click.exceptions.UsageError(f'Cannot create model in {module_name} (file already exists)')
             with open(model_path, 'w') as f:
                 write_header(f)
                 write(f, 'from indico.core.db import db')
@@ -141,7 +138,7 @@ def main(indico_dir, name, module_dir, event, models, blueprint, templates, cont
                 for class_name in class_names:
                     write_model(f, class_name, event)
     if blueprint:
-        blueprint_name = 'event_{}'.format(name) if event else name
+        blueprint_name = f'event_{name}' if event else name
         blueprint_path = os.path.join(module_dir, 'blueprint.py')
         if os.path.exists(blueprint_path):
             raise click.exceptions.UsageError('Cannot create blueprint (file already exists)')
@@ -150,11 +147,11 @@ def main(indico_dir, name, module_dir, event, models, blueprint, templates, cont
             write(f, 'from indico.web.flask.wrappers import IndicoBlueprint')
             write(f)
             if templates:
-                virtual_template_folder = 'events/{}'.format(name) if event else name
+                virtual_template_folder = f'events/{name}' if event else name
                 write(f, "_bp = IndicoBlueprint('{}', __name__, template_folder='templates',\n\
                       virtual_template_folder='{}')".format(blueprint_name, virtual_template_folder))
             else:
-                write(f, "_bp = IndicoBlueprint('{}', __name__)".format(blueprint_name))
+                write(f, f"_bp = IndicoBlueprint('{blueprint_name}', __name__)")
             write(f)
     if templates:
         templates_dir = os.path.join(module_dir, 'templates')

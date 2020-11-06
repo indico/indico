@@ -32,7 +32,7 @@ class vRecur(ical.vRecur):
             if not type(vals) in ical.prop.SequenceTypes:
                 vals = [vals]
             vals = ','.join([typ(val).ical() for val in vals])
-            result.append('%s=%s' % (key, vals))
+            result.append(f'{key}={vals}')
         return ';'.join(result)
 
 
@@ -90,7 +90,7 @@ def serialize_contribs(cal, fossil, now):
     else:
         for sfossil in fossil['contributions']:
             if sfossil['startDate']:
-                sfossil['id'] = "%s-%s" % (fossil['id'], sfossil['id'])
+                sfossil['id'] = "{}-{}".format(fossil['id'], sfossil['id'])
                 serialize_event(cal, sfossil, now, id_prefix="indico-contribution")
 
 
@@ -104,7 +104,7 @@ def serialize_sessions(cal, fossil, now):
     else:
         for sfossil in fossil['sessions']:
             if sfossil['startDate']:
-                serialize_session(cal, sfossil, now, fid="%s-%s" % (fossil['id'], sfossil['id']))
+                serialize_session(cal, sfossil, now, fid="{}-{}".format(fossil['id'], sfossil['id']))
 
 
 def serialize_session(cal, fossil, now, fid=None):

@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import unicode_literals
 
 from datetime import timedelta
 from operator import attrgetter
@@ -147,7 +146,7 @@ class Session(DescriptionMixin, ColorMixin, ProtectionManagersMixin, LocationMix
         # an extra query to check whether there is an object associated
         # when assigning a new one (e.g. during cloning)
         kwargs.setdefault('note', None)
-        super(Session, self).__init__(**kwargs)
+        super().__init__(**kwargs)
 
     @classmethod
     def preload_acl_entries(cls, event):

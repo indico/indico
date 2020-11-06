@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import unicode_literals
 
 from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.ext.hybrid import hybrid_property
@@ -32,7 +31,7 @@ RENDER_MODE_WRAPPER_MAP = {
 }
 
 
-class RenderModeMixin(object):
+class RenderModeMixin:
     """Mixin to add a plaintext/html/markdown-enabled column."""
 
     possible_render_modes = {RenderMode.plain_text}

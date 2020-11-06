@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import unicode_literals
 
 from collections import OrderedDict
 
@@ -35,7 +34,7 @@ def generate_program_codes(event, object_type, objects):
         context = 'program-codes-session-block'
         template_setting = 'session_block_template'
     else:
-        raise ValueError('Invalid object type: {}'.format(object_type))
+        raise ValueError(f'Invalid object type: {object_type}')
 
     template = program_codes_settings.get(event, template_setting)
     return OrderedDict(
@@ -60,13 +59,13 @@ class ContributionIDPlaceholder(ParametrizedPlaceholder):
     @classmethod
     def render(cls, param, contribution):
         if param is None:
-            return six.text_type(contribution.friendly_id)
+            return str(contribution.friendly_id)
         try:
             padding = max(1, min(int(param), 10))
         except ValueError:
-            return six.text_type(contribution.friendly_id)
+            return str(contribution.friendly_id)
         else:
-            return six.text_type(contribution.friendly_id).zfill(padding)
+            return str(contribution.friendly_id).zfill(padding)
 
 
 class ContributionSessionCodePlaceholder(Placeholder):
@@ -103,7 +102,7 @@ class DatePlaceholder(Placeholder):
     def render(cls, **kwargs):
         arg = kwargs.pop(cls.render_kwarg)
         if kwargs:
-            raise TypeError('render() got unexpected kwargs: {}'.format(kwargs))
+            raise TypeError(f'render() got unexpected kwargs: {kwargs}')
         if not arg.start_dt:
             return ''
         formatted = format_datetime(arg.start_dt, cls.date_format, locale='en_GB', timezone=arg.event.tzinfo)
@@ -140,7 +139,7 @@ class SubContributionIDPlaceholder(Placeholder):
 
     @classmethod
     def render(cls, subcontribution):
-        return six.text_type(subcontribution.friendly_id)
+        return str(subcontribution.friendly_id)
 
 
 class SubContributionContributionCodePlaceholder(Placeholder):
@@ -158,7 +157,7 @@ class SessionIDPlaceholder(Placeholder):
 
     @classmethod
     def render(cls, session):
-        return six.text_type(session.friendly_id)
+        return str(session.friendly_id)
 
 
 class SessionSessionTypeCodePlaceholder(Placeholder):

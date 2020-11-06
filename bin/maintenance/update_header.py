@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import print_function, unicode_literals
 
 import os
 import re
@@ -109,7 +108,7 @@ def gen_header(project, data, end_year):
 
 def _update_header(project, file_path, year, substring, regex, data, ci):
     found = False
-    with open(file_path, 'r') as file_read:
+    with open(file_path) as file_read:
         content = orig_content = file_read.read()
         if not content.strip():
             return False

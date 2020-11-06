@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import unicode_literals
 
 from operator import attrgetter
 
@@ -35,7 +34,7 @@ def make_survey_form(survey):
         if field_impl is None:
             # field definition is not available anymore
             continue
-        name = 'question_{}'.format(question.id)
+        name = f'question_{question.id}'
         setattr(form_class, name, field_impl.create_wtf_field())
     return form_class
 
@@ -104,7 +103,7 @@ def generate_spreadsheet_from_survey(survey, submission_ids):
 
 def _format_title(question):
     if question.parent.title:
-        return '{}: {}'.format(question.parent.title, question.title)
+        return f'{question.parent.title}: {question.title}'
     else:
         return question.title
 

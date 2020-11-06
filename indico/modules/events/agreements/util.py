@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import unicode_literals
 
 import six
 
@@ -31,7 +30,7 @@ def send_new_agreements(event, name, people, email_body, cc_addresses, from_addr
     :param from_address: Email address of the sender
     """
     agreements = []
-    for person in six.itervalues(people):
+    for person in people.values():
         agreement = Agreement.create_from_data(event=event, type_=name, person=person)
         db.session.add(agreement)
         agreements.append(agreement)

@@ -49,11 +49,11 @@ def query_chunked(model, chunk_size):
 
 def main():
     models = {model: make_query(model).count() for model in StoredFileMixin.__subclasses__()}
-    models = {model: total for model, total in six.iteritems(models) if total}
+    models = {model: total for model, total in models.items() if total}
     labels = {model: cformat('Processing %{blue!}{}%{reset} (%{cyan}{}%{reset} rows)').format(model.__name__, total)
-              for model, total in six.iteritems(models)}
-    max_length = max(len(x) for x in six.itervalues(labels))
-    labels = {model: label.ljust(max_length) for model, label in six.iteritems(labels)}
+              for model, total in models.items()}
+    max_length = max(len(x) for x in labels.values())
+    labels = {model: label.ljust(max_length) for model, label in labels.items()}
     for model, total in sorted(list(models.items()), key=itemgetter(1)):
         with click.progressbar(query_chunked(model, 100), length=total, label=labels[model],
                                show_percent=True, show_pos=True) as objects:

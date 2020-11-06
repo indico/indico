@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import unicode_literals
 
 import errno
 import hashlib
@@ -135,7 +134,7 @@ def cleanup_dir(path, min_age, dry_run=False, exclude=None):
     """
     min_mtime = int(time.mktime((datetime.now() - min_age).timetuple()))
     if not path or path == '/':
-        raise ValueError('Invalid path for cleanup: {}'.format(path))
+        raise ValueError(f'Invalid path for cleanup: {path}')
     deleted = set()
     for root, dirs, files in os.walk(path):
         relroot = os.path.relpath(root, path)
@@ -185,4 +184,4 @@ def get_file_checksum(fileobj, chunk_size=1024*1024, algorithm=hashlib.md5):
         if not chunk:
             break
         checksum.update(chunk)
-    return six.text_type(checksum.hexdigest())
+    return str(checksum.hexdigest())

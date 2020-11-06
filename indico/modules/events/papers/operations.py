@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import unicode_literals
 
 import mimetypes
 from operator import attrgetter
@@ -55,7 +54,7 @@ def _unassign_removed(event, changes):
         PaperReviewingRole.layout_reviewer: Contribution.paper_layout_reviewers,
     }
     changed_contribs = set()
-    for role, role_changes in six.iteritems(changes):
+    for role, role_changes in changes.items():
         removed = role_changes['removed']
         if not removed:
             continue
@@ -104,7 +103,7 @@ def create_competences(event, user, competences):
     PaperCompetence(event=event, user=user, competences=competences)
     logger.info("Competences for user %r for event %r created by %r", user, event, session.user)
     event.log(EventLogRealm.reviewing, EventLogKind.positive, 'Papers',
-              "Added competences of {}".format(user.full_name), session.user,
+              f"Added competences of {user.full_name}", session.user,
               data={'Competences': ', '.join(competences)})
 
 
@@ -113,7 +112,7 @@ def update_competences(user_competences, competences):
     user_competences.competences = competences
     logger.info("Competences for user %r in event %r updated by %r", user_competences.user, event, session.user)
     event.log(EventLogRealm.reviewing, EventLogKind.positive, 'Papers',
-              "Updated competences for user {}".format(user_competences.user.full_name), session.user,
+              f"Updated competences for user {user_competences.user.full_name}", session.user,
               data={'Competences': ', '.join(competences)})
 
 
@@ -185,7 +184,7 @@ def reset_paper_state(paper):
     notify_paper_judgment(paper, reset=True)
     logger.info('Paper %r state reset by %r', paper, session.user)
     paper.event.log(EventLogRealm.reviewing, EventLogKind.change, 'Papers',
-                    'Judgment {} reset'.format(paper.verbose_title), session.user)
+                    f'Judgment {paper.verbose_title} reset', session.user)
 
 
 def _store_paper_template_file(template, file):
@@ -238,7 +237,7 @@ def update_reviewing_roles(event, users, contributions, role, assign):
             else:
                 role_group.discard(user)
 
-    contrib_ids = ['#{}'.format(c.friendly_id) for c in sorted(contributions, key=attrgetter('friendly_id'))]
+    contrib_ids = [f'#{c.friendly_id}' for c in sorted(contributions, key=attrgetter('friendly_id'))]
     log_data = {'Users': ', '.join(sorted(person.full_name for person in users)),
                 'Contributions': ', '.join(contrib_ids)}
     roles_to_notify = paper_reviewing_settings.get(event, 'notify_on_assigned_contrib')
@@ -260,7 +259,7 @@ def create_review(paper, review_type, user, review_data, questions_data):
     review.populate_from_dict(review_data)
     log_data = {}
     for question in paper.event.cfp.get_questions_for_review_type(review_type.instance):
-        value = questions_data['question_{}'.format(question.id)]
+        value = questions_data[f'question_{question.id}']
         review.ratings.append(PaperReviewRating(question=question, value=value))
         log_data[question.title] = question.field.get_friendly_value(value)
     db.session.flush()
@@ -272,7 +271,7 @@ def create_review(paper, review_type, user, review_data, questions_data):
         'Comment': review.comment
     })
     paper.event.log(EventLogRealm.reviewing, EventLogKind.positive, 'Papers',
-                    'Paper for contribution {} reviewed'.format(paper.contribution.verbose_title),
+                    f'Paper for contribution {paper.contribution.verbose_title} reviewed',
                     user, data=log_data)
     return review
 
@@ -284,7 +283,7 @@ def update_review(review, review_data, questions_data):
     review.modified_dt = now_utc()
     log_fields = {}
     for question in event.cfp.get_questions_for_review_type(review.type):
-        field_name = 'question_{}'.format(question.id)
+        field_name = f'question_{question.id}'
         rating = question.get_review_rating(review, allow_create=True)
         old_value = rating.value
         rating.value = questions_data[field_name]
@@ -304,7 +303,7 @@ def update_review(review, review_data, questions_data):
         'comment': 'Comment'
     })
     event.log(EventLogRealm.reviewing, EventLogKind.change, 'Papers',
-              'Review for paper {} modified'.format(paper.verbose_title),
+              f'Review for paper {paper.verbose_title} modified',
               session.user, data={'Changes': make_diff_log(changes, log_fields)})
 
 
@@ -325,7 +324,7 @@ def create_comment(paper, text, visibility, user):
         notify_comment(receiver, paper, text, user)
     logger.info("Paper %r received a comment from %r", paper, session.user)
     paper.event.log(EventLogRealm.reviewing, EventLogKind.positive, 'Papers',
-                    'Paper {} received a comment'.format(paper.verbose_title),
+                    f'Paper {paper.verbose_title} received a comment',
                     session.user)
 
 
@@ -342,7 +341,7 @@ def update_comment(comment, text=None, visibility=None):
     logger.info("Paper comment %r modified by %r", comment, session.user)
     paper = comment.paper_revision.paper
     paper.event.log(EventLogRealm.reviewing, EventLogKind.change, 'Papers',
-                    'Comment on paper {} modified'.format(paper.verbose_title), session.user,
+                    f'Comment on paper {paper.verbose_title} modified', session.user,
                     data={'Changes': make_diff_log(changes, {'text': 'Text', 'visibility': 'Visibility'})})
 
 
@@ -352,15 +351,15 @@ def delete_comment(comment):
     logger.info("Paper comment %r deleted by %r", comment, session.user)
     paper = comment.paper_revision.paper
     paper.event.log(EventLogRealm.reviewing, EventLogKind.negative, 'Papers',
-                    'Comment on paper {} removed'.format(paper.verbose_title), session.user)
+                    f'Comment on paper {paper.verbose_title} removed', session.user)
 
 
 def set_deadline(event, role, deadline, enforce=True):
     paper_reviewing_settings.set_multi(event, {
-        '{}_deadline'.format(role.name): deadline,
-        'enforce_{}_deadline'.format(role.name): enforce
+        f'{role.name}_deadline': deadline,
+        f'enforce_{role.name}_deadline': enforce
     })
     log_data = {'Enforced': enforce, 'Deadline': deadline.isoformat() if deadline else 'None'}
     logger.info('Paper reviewing deadline (%s) set in %r by %r', role.name, event, session.user)
     event.log(EventLogRealm.reviewing, EventLogKind.change, 'Papers',
-              "Paper reviewing deadline ({}) set".format(role.title), session.user, data=log_data)
+              f"Paper reviewing deadline ({role.title}) set", session.user, data=log_data)

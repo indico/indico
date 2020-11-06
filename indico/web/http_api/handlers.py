@@ -62,7 +62,7 @@ def normalizeQuery(path, query, remove=('signature',), separate=False):
     if separate:
         return path, sorted_params and six.moves.urllib.parse.urlencode(sorted_params)
     elif sorted_params:
-        return '%s?%s' % (path, six.moves.urllib.parse.urlencode(sorted_params))
+        return '{}?{}'.format(path, six.moves.urllib.parse.urlencode(sorted_params))
     else:
         return path
 
@@ -142,7 +142,7 @@ def handler(prefix, path):
                     if g.get('received_oauth_token'):
                         raise BadRequest('OAuth error: Invalid token')
                 else:
-                    raise BadRequest('OAuth error: {}'.format(oauth_request.error_message))
+                    raise BadRequest(f'OAuth error: {oauth_request.error_message}')
         except ValueError:
             # XXX: Dirty hack to workaround a bug in flask-oauthlib that causes it
             #      not to properly urlencode request query strings
@@ -198,7 +198,7 @@ def handler(prefix, path):
                     cacheKey = 'signed_' + cacheKey
                 if auth_token:
                     # if oauth was used, we also make the cache key unique
-                    cacheKey = 'oauth-{}_{}'.format(auth_token.id, cacheKey)
+                    cacheKey = f'oauth-{auth_token.id}_{cacheKey}'
         else:
             # We authenticated using a session cookie.
             # XXX: This is not used anymore within indico and should be removed whenever we rewrite
@@ -214,9 +214,9 @@ def handler(prefix, path):
         if user is not None:
             # We *always* prefix the cache key with the user ID so we never get an overlap between
             # authenticated and unauthenticated requests
-            cacheKey = 'user-{}_{}'.format(user.id, cacheKey)
+            cacheKey = f'user-{user.id}_{cacheKey}'
         else:
-            cacheKey = 'public_{}'.format(cacheKey)
+            cacheKey = f'public_{cacheKey}'
 
         # Bail out if the user requires authentication but is not authenticated
         if onlyAuthed and not user:

@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import unicode_literals
 
 import posixpath
 
@@ -64,7 +63,7 @@ class PaperFile(StoredFileMixin, db.Model):
         paper = kwargs.pop('paper', None)
         if paper:
             kwargs.setdefault('_contribution', paper.contribution)
-        super(PaperFile, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
     def __repr__(self):
         return format_repr(self, 'id', '_contribution_id', content_type=None, _text=text_to_repr(self.filename))

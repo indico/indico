@@ -5,13 +5,11 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import unicode_literals
 
 from operator import attrgetter
 
 import six
 from flask import session
-from six.moves import map
 
 from indico.core import signals
 from indico.core.db import db
@@ -120,7 +118,7 @@ def create_event(category, event_type, data, add_creator_as_manager=True, featur
                 logger.info('Booking %r created for event %r', booking, event)
                 log_data = {'Room': booking.room.full_name,
                             'Date': booking.start_dt.strftime('%d/%m/%Y'),
-                            'Times': '%s - %s' % (booking.start_dt.strftime('%H:%M'), booking.end_dt.strftime('%H:%M'))}
+                            'Times': '{} - {}'.format(booking.start_dt.strftime('%H:%M'), booking.end_dt.strftime('%H:%M'))}
                 event.log(EventLogRealm.event, EventLogKind.positive, 'Event', 'Room booked for the event',
                           session.user, data=log_data)
                 db.session.flush()
@@ -128,7 +126,7 @@ def create_event(category, event_type, data, add_creator_as_manager=True, featur
 
 
 def update_event(event, update_timetable=False, **data):
-    assert set(six.viewkeys(data)) <= {'title', 'description', 'url_shortcut', 'location_data', 'keywords',
+    assert set(data.keys()) <= {'title', 'description', 'url_shortcut', 'location_data', 'keywords',
                                     'person_link_data', 'start_dt', 'end_dt', 'timezone', 'keywords', 'references',
                                     'organizer_info', 'additional_info', 'contact_title', 'contact_emails',
                                     'contact_phones', 'start_dt_override', 'end_dt_override', 'label', 'label_message',
@@ -245,7 +243,7 @@ def _log_event_update(event, changes, visible_person_link_changes=False):
         # anyway and allow other code to act on them?
         changes.pop('person_links', None)
     if changes:
-        if set(six.viewkeys(changes)) <= {'timezone', 'start_dt', 'end_dt', 'start_dt_override', 'end_dt_override'}:
+        if set(changes.keys()) <= {'timezone', 'start_dt', 'end_dt', 'start_dt_override', 'end_dt_override'}:
             what = 'Dates'
         elif len(changes) == 1:
             what = log_fields[list(changes.keys())[0]]
@@ -253,12 +251,12 @@ def _log_event_update(event, changes, visible_person_link_changes=False):
                 what = what['title']
         else:
             what = 'Data'
-        event.log(EventLogRealm.management, EventLogKind.change, 'Event', '{} updated'.format(what), session.user,
+        event.log(EventLogRealm.management, EventLogKind.change, 'Event', f'{what} updated', session.user,
                   data={'Changes': make_diff_log(changes, log_fields)})
 
 
 def _format_ref(ref):
-    return '{}:{}'.format(ref.reference_type.name, ref.value)
+    return f'{ref.reference_type.name}:{ref.value}'
 
 
 def _get_venue_room_name(data):
@@ -271,7 +269,7 @@ def _format_location(data):
     venue_name = data[0]
     room_name = data[1]
     if venue_name and room_name:
-        return '{}: {}'.format(venue_name, room_name)
+        return f'{venue_name}: {room_name}'
     elif venue_name or room_name:
         return venue_name or room_name
     else:
@@ -290,11 +288,11 @@ def _split_location_changes(changes):
 
 
 def _format_person(data):
-    return '{} <{}>'.format(data.full_name, data.email) if data.email else data.full_name
+    return f'{data.full_name} <{data.email}>' if data.email else data.full_name
 
 
 def update_event_protection(event, data):
-    assert set(six.viewkeys(data)) <= {'protection_mode', 'own_no_access_contact', 'access_key',
+    assert set(data.keys()) <= {'protection_mode', 'own_no_access_contact', 'access_key',
                                     'visibility', 'public_regform_access'}
     changes = event.populate_from_dict(data)
     db.session.flush()
@@ -321,7 +319,7 @@ def update_event_type(event, type_):
         return
     event.type_ = type_
     logger.info('Event %r type changed to %s by %r', event, type_.name, session.user)
-    event.log(EventLogRealm.event, EventLogKind.change, 'Event', 'Type changed to {}'.format(type_.title), session.user)
+    event.log(EventLogRealm.event, EventLogKind.change, 'Event', f'Type changed to {type_.title}', session.user)
 
 
 def lock_event(event):

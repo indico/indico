@@ -14,7 +14,6 @@ from operator import attrgetter
 import pytz
 import six
 from flask import request
-from six.moves import map
 from sqlalchemy import Date, cast
 from sqlalchemy.orm import joinedload, subqueryload, undefer
 from werkzeug.exceptions import ServiceUnavailable
@@ -52,7 +51,7 @@ MAX_DATETIME = utc.localize(datetime(2099, 12, 31, 23, 59, 0))
 MIN_DATETIME = utc.localize(datetime(2000, 1, 1))
 
 
-class Period(object):
+class Period:
     def __init__(self, startDT, endDT):
         self.startDT = startDT
         self.endDT = endDT
@@ -75,7 +74,7 @@ class EventTimeTableHook(HTTPAPIHook):
     VALID_FORMATS = ('json', 'jsonp', 'xml')
 
     def _getParams(self):
-        super(EventTimeTableHook, self)._getParams()
+        super()._getParams()
         self._idList = self._pathParams['idlist'].split('-')
 
     def _serialize_timetable(self, event, user):
@@ -95,7 +94,7 @@ class EventSearchHook(HTTPAPIHook):
     DEFAULT_DETAIL = 'events'
 
     def _getParams(self):
-        super(EventSearchHook, self)._getParams()
+        super()._getParams()
         search = self._pathParams['search_term']
         self._query = search
 
@@ -117,7 +116,7 @@ class CategoryEventHook(HTTPAPIHook):
     }
 
     def _getParams(self):
-        super(CategoryEventHook, self)._getParams()
+        super()._getParams()
         self._idList = self._pathParams['idlist'].split('-')
         self._wantFavorites = False
         if 'favorites' in self._idList:
@@ -142,7 +141,7 @@ class CategoryEventHook(HTTPAPIHook):
 
     def export_categ_extra(self, user, resultList):
         expInt = CategoryEventFetcher(user, self)
-        ids = set((event['categoryId'] for event in resultList))
+        ids = {event['categoryId'] for event in resultList}
         return expInt.category_extra(ids)
 
     def export_event(self, user):
@@ -150,7 +149,7 @@ class CategoryEventHook(HTTPAPIHook):
         return expInt.event(self._idList)
 
 
-class SerializerBase(object):
+class SerializerBase:
     """Common methods for different serializers."""
 
     def _serialize_access_list(self, obj):
@@ -181,7 +180,7 @@ class SerializerBase(object):
                 'first_name': person.first_name,
                 'last_name': person.last_name,
                 'fullName': person.get_full_name(last_name_upper=False, abbrev_first_name=False),
-                'id': six.text_type(person.id),
+                'id': str(person.id),
                 'affiliation': person.affiliation,
                 'emailHash': md5(person.email.encode('utf-8')).hexdigest() if person.email else None
             }
@@ -230,8 +229,8 @@ class SerializerBase(object):
             '_type': 'Session',
             'sessionConveners': [self._serialize_convener(c, can_manage) for c in session_.conveners],
             'title': session_.title,
-            'color': '#{}'.format(session_.colors.background),
-            'textColor': '#{}'.format(session_.colors.text),
+            'color': f'#{session_.colors.background}',
+            'textColor': f'#{session_.colors.text}',
             'description': session_.description,
             'material': build_material_legacy_api_data(session_),
             'isPoster': session_.is_poster,
@@ -243,7 +242,7 @@ class SerializerBase(object):
             '_fossil': 'sessionMinimal',
             'numSlots': len(session_.blocks),
             'id': (session_.legacy_mapping.legacy_session_id
-                   if session_.legacy_mapping else six.text_type(session_.friendly_id)),
+                   if session_.legacy_mapping else str(session_.friendly_id)),
             'db_id': session_.id,
             'friendly_id': session_.friendly_id,
             'room': session_.get_room_name(full=False)
@@ -276,7 +275,7 @@ class SerializerBase(object):
     def _build_event_api_data_base(self, event):
         return {
             '_type': 'Conference',
-            'id': six.text_type(event.id),
+            'id': str(event.id),
             'title': event.title,
             'description': event.description,
             'startDate': self._serialize_date(event.start_dt),
@@ -358,7 +357,7 @@ class SerializerBase(object):
             '_type': 'Contribution',
             '_fossil': self.fossils_mapping['contribution'].get(self._detail_level),
             'id': (contrib.legacy_mapping.legacy_contribution_id
-                   if contrib.legacy_mapping else six.text_type(contrib.friendly_id)),
+                   if contrib.legacy_mapping else str(contrib.friendly_id)),
             'db_id': contrib.id,
             'friendly_id': contrib.friendly_id,
             'title': contrib.title,
@@ -398,7 +397,7 @@ class SerializerBase(object):
             '_type': 'SubContribution',
             '_fossil': 'subContributionMetadata',
             'id': (subcontrib.legacy_mapping.legacy_subcontribution_id
-                   if subcontrib.legacy_mapping else six.text_type(subcontrib.friendly_id)),
+                   if subcontrib.legacy_mapping else str(subcontrib.friendly_id)),
             'db_id': subcontrib.id,
             'friendly_id': subcontrib.friendly_id,
             'title': subcontrib.title,
@@ -415,7 +414,7 @@ class SerializerBase(object):
 
 class CategoryEventFetcher(IteratedDataFetcher, SerializerBase):
     def __init__(self, user, hook):
-        super(CategoryEventFetcher, self).__init__(user, hook)
+        super().__init__(user, hook)
         self._eventType = hook._eventType
         self._occurrences = hook._occurrences
         self._location = hook._location
@@ -423,7 +422,7 @@ class CategoryEventFetcher(IteratedDataFetcher, SerializerBase):
         self.user = user
         self._detail_level = get_query_parameter(request.args.to_dict(), ['d', 'detail'], 'events')
         if self._detail_level not in ('events', 'contributions', 'subcontributions', 'sessions'):
-            raise HTTPAPIError('Invalid detail level: {}'.format(self._detail_level), 400)
+            raise HTTPAPIError(f'Invalid detail level: {self._detail_level}', 400)
 
     def _calculate_occurrences(self, event, from_dt, to_dt, tz):
         start_dt = max(from_dt, event.start_dt) if from_dt else event.start_dt
@@ -643,7 +642,7 @@ class SessionContribHook(EventBaseHook):
     }
 
     def _getParams(self):
-        super(SessionContribHook, self)._getParams()
+        super()._getParams()
         self._idList = self._pathParams['idlist'].split('-')
         self._eventId = self._pathParams['event']
 
@@ -658,7 +657,7 @@ class SessionContribHook(EventBaseHook):
 
 class SessionContribFetcher(IteratedDataFetcher):
     def __init__(self, user, hook):
-        super(SessionContribFetcher, self).__init__(user, hook)
+        super().__init__(user, hook)
         self._eventId = hook._eventId
 
 
@@ -678,7 +677,7 @@ class SessionHook(SessionContribHook):
 
 class SessionFetcher(SessionContribFetcher, SerializerBase):
     def __init__(self, user, hook):
-        super(SessionFetcher, self).__init__(user, hook)
+        super().__init__(user, hook)
         self.user = user
 
     def session(self, idlist):

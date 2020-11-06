@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import unicode_literals
 
 from hashlib import sha1
 
@@ -20,7 +19,7 @@ from indico.util.i18n import _
 from indico.web.flask.templating import get_overridable_template_name, get_template_module
 
 
-class AgreementPersonInfo(object):
+class AgreementPersonInfo:
     def __init__(self, name=None, email=None, user=None, data=None):
         if user:
             if not name:
@@ -36,18 +35,18 @@ class AgreementPersonInfo(object):
         self.data = data
 
     def __repr__(self):
-        return '<AgreementPersonInfo({}, {}, {})>'.format(self.name, self.email, self.identifier)
+        return f'<AgreementPersonInfo({self.name}, {self.email}, {self.identifier})>'
 
     @property
     def identifier(self):
         data_string = None
         if self.data:
-            data_string = '-'.join('{}={}'.format(k, make_hashable(v)) for k, v in sorted(six.viewitems(self.data)))
+            data_string = '-'.join('{}={}'.format(k, make_hashable(v)) for k, v in sorted(self.data.items()))
         identifier = '{}:{}'.format(self.email, data_string or None)
         return sha1(identifier.encode()).hexdigest()
 
 
-class AgreementDefinitionBase(object):
+class AgreementDefinitionBase:
     """Base class for agreement definitions."""
 
     #: unique name of the agreement definition
@@ -77,7 +76,7 @@ class AgreementDefinitionBase(object):
     @cached_classproperty
     @classmethod
     def event_settings(cls):
-        return EventSettingsProxy('agreement_{}'.format(cls.name), cls.default_event_settings)
+        return EventSettingsProxy(f'agreement_{cls.name}', cls.default_event_settings)
 
     @classmethod
     def can_access_api(cls, user, event):
@@ -132,7 +131,7 @@ class AgreementDefinitionBase(object):
         :return: (everybody_signed, num_accepted, num_rejected)
         """
         people = cls.get_people(event)
-        identifiers = [p.identifier for p in six.itervalues(people)]
+        identifiers = [p.identifier for p in people.values()]
         query = event.agreements.filter(Agreement.type == cls.name, Agreement.identifier.in_(identifiers))
         num_accepted = query.filter(Agreement.accepted).count()
         num_rejected = query.filter(Agreement.rejected).count()

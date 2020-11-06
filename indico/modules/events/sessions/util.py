@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import unicode_literals
 
 from collections import defaultdict
 from io import BytesIO
@@ -71,7 +70,7 @@ class SessionListToPDF(PDFBase):
         rows = []
         row_values = []
         for col in [_('ID'), _('Type'), _('Title'), _('Code'), _('Description')]:
-            row_values.append(Paragraph('<b>{}</b>'.format(col), text_style))
+            row_values.append(Paragraph(f'<b>{col}</b>', text_style))
         rows.append(row_values)
 
         for sess in self.sessions:

@@ -24,7 +24,6 @@ import threading
 
 import six
 import zope.interface
-from six.moves import filter
 
 
 _fossil_cache = threading.local()
@@ -40,7 +39,7 @@ class NonFossilizableException(Exception):
 
 
 class InvalidFossilException(Exception):
-    """
+    r"""
     The fossil name doesn't follow the convention I(\w+)Fossil
     or has an invalid method name and did not declare a .name tag for it.
     """
@@ -52,11 +51,11 @@ class IFossil(zope.interface.Interface):
     All fossil classes should derive from this one.
     """
 
-class Fossilizable(object):
+class Fossilizable:
     """Base class for all the objects that can be fossilized."""
 
-    __fossilNameRE = re.compile('^I(\w+)Fossil$')
-    __methodNameRE = re.compile('^get(\w+)|(has\w+)|(is\w+)$')
+    __fossilNameRE = re.compile(r'^I(\w+)Fossil$')
+    __methodNameRE = re.compile(r'^get(\w+)|(has\w+)|(is\w+)$')
 
     @classmethod
     def __extractName(cls, name):
@@ -93,7 +92,7 @@ class Fossilizable(object):
             if fossilNameMatch is None:
                 raise InvalidFossilException("Invalid fossil name: %s."
                                              " A fossil name should follow the"
-                                             " pattern: I(\w+)Fossil." % name)
+                                             r" pattern: I(\w+)Fossil." % name)
             else:
                 fossilName = fossilNameMatch.group(1)[0].lower() + \
                 fossilNameMatch.group(1)[1:]
@@ -177,7 +176,7 @@ class Fossilizable(object):
                 return target
             elif ttype is dict:
                 container = {}
-                for key, value in six.iteritems(target):
+                for key, value in target.items():
                     container[key] = fossilize(value, interface, useAttrCache,
                                                **kwargs)
                 return container
@@ -309,9 +308,9 @@ class Fossilizable(object):
             if 'convert' in tags:
                 convertFunction = method.getTaggedValue('convert')
                 converterArgNames = inspect.getargspec(convertFunction)[0]
-                converterArgs = dict((name, kwargs[name])
+                converterArgs = {name: kwargs[name]
                                      for name in converterArgNames
-                                     if name in kwargs)
+                                     if name in kwargs}
                 if '_obj' in converterArgNames:
                     converterArgs['_obj'] = obj
                 try:

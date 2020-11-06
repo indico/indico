@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import unicode_literals
 
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.ext.declarative import declared_attr
@@ -14,7 +13,7 @@ from indico.core.db import db
 from indico.util.string import format_repr
 
 
-class ReviewRatingMixin(object):
+class ReviewRatingMixin:
     question_class = None
     review_class = None
 
@@ -29,7 +28,7 @@ class ReviewRatingMixin(object):
     def question_id(cls):
         return db.Column(
             db.Integer,
-            db.ForeignKey('{}.id'.format(cls.question_class.__table__.fullname)),
+            db.ForeignKey(f'{cls.question_class.__table__.fullname}.id'),
             index=True,
             nullable=False
         )
@@ -38,7 +37,7 @@ class ReviewRatingMixin(object):
     def review_id(cls):
         return db.Column(
             db.Integer,
-            db.ForeignKey('{}.id'.format(cls.review_class.__table__.fullname)),
+            db.ForeignKey(f'{cls.review_class.__table__.fullname}.id'),
             index=True,
             nullable=False
         )

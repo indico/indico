@@ -5,10 +5,8 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import print_function, unicode_literals
 
 import six
-from six.moves import zip
 from sqlalchemy import ForeignKeyConstraint, MetaData, Table
 from sqlalchemy.engine.reflection import Inspector
 from sqlalchemy.sql.ddl import DropConstraint, DropSchema, DropTable
@@ -82,7 +80,7 @@ def delete_all_tables(db):
     all_schema_tables = get_all_tables(db)
     tables = []
     all_fkeys = []
-    for schema, schema_tables in six.iteritems(all_schema_tables):
+    for schema, schema_tables in all_schema_tables.items():
         for table_name in schema_tables:
             fkeys = [ForeignKeyConstraint((), (), name=fk['name'])
                      for fk in inspector.get_foreign_keys(table_name, schema=schema)

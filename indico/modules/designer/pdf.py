@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import unicode_literals
 
 import re
 from collections import namedtuple
@@ -54,7 +53,7 @@ def _extract_font_size(text):
     return int(FONT_SIZE_RE.match(text).group(1))
 
 
-class DesignerPDFBase(object):
+class DesignerPDFBase:
     def __init__(self, template, config):
         self.config = self._build_config(config)
         self.template = template

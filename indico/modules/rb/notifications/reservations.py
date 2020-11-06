@@ -31,7 +31,7 @@ def get_manager_emails(room):
     # skip people who don't want emails for the room
     room_blacklist_filter = and_(
         UserSetting.name == 'email_blacklist',
-        UserSetting.value.contains(six.text_type(room.id))
+        UserSetting.value.contains(str(room.id))
     )
     query = (User.query
              .join(UserSetting)
@@ -43,13 +43,13 @@ def get_manager_emails(room):
     return emails
 
 
-class ReservationNotification(object):
+class ReservationNotification:
     def __init__(self, reservation):
         self.reservation = reservation
         self.start_dt = format_datetime(reservation.start_dt)
 
     def _get_email_subject(self, **mail_params):
-        return u'{prefix}[{room}] {subject} ({date}) {suffix}'.format(
+        return '{prefix}[{room}] {subject} ({date}) {suffix}'.format(
             prefix=to_unicode(mail_params.get('subject_prefix', '')),
             room=self.reservation.room.full_name,
             subject=to_unicode(mail_params.get('subject', '')),

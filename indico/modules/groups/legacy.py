@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import unicode_literals
 
 from zope.interface.declarations import implementer
 
@@ -40,7 +39,7 @@ class GroupWrapper(Fossilizable):
         return ''
 
     def __repr__(self):
-        return u'<{} {}: {}>'.format(type(self).__name__, self.id, self.group)
+        return '<{} {}: {}>'.format(type(self).__name__, self.id, self.group)
 
 
 class LocalGroupWrapper(GroupWrapper):
@@ -57,7 +56,7 @@ class LDAPGroupWrapper(GroupWrapper):
     groupType = 'LDAP'
 
     def __init__(self, group_id, provider_name):
-        super(LDAPGroupWrapper, self).__init__(group_id)
+        super().__init__(group_id)
         self.provider_name = provider_name
 
     @property

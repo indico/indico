@@ -5,10 +5,8 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import unicode_literals
 
 from flask import flash, jsonify, redirect, request
-from six.moves import map
 from sqlalchemy.orm import defaultload, joinedload
 
 from indico.modules.events.logs import EventLogKind, EventLogRealm
@@ -52,7 +50,7 @@ class RHExportSubmissionsBase(RHManageSurveyBase):
 
         submission_ids = set(map(int, request.form.getlist('submission_ids')))
         headers, rows = generate_spreadsheet_from_survey(self.survey, submission_ids)
-        filename = 'submissions-{}'.format(self.survey.id)
+        filename = f'submissions-{self.survey.id}'
         return self._export(filename, headers, rows)
 
     def _export(self, filename, headers, rows):
@@ -101,7 +99,7 @@ class RHDeleteSubmissions(RHManageSurveyBase):
                 self.survey.submissions.remove(submission)
                 logger.info('Submission %s deleted from survey %s', submission, self.survey)
                 self.event.log(EventLogRealm.management, EventLogKind.negative, 'Surveys',
-                               'Submission removed from survey "{}"'.format(self.survey.title),
+                               f'Submission removed from survey "{self.survey.title}"',
                                data={'Submitter': submission.user.full_name
                                      if not submission.is_anonymous else 'Anonymous'})
         return jsonify(success=True)

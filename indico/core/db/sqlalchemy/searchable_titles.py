@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import unicode_literals
 
 from sqlalchemy.ext.declarative import declared_attr
 
@@ -14,7 +13,7 @@ from indico.core.db.sqlalchemy.util.queries import escape_like, preprocess_ts_st
 from indico.util.decorators import strict_classproperty
 
 
-class SearchableTitleMixin(object):
+class SearchableTitleMixin:
     """Mixin to add a fulltext-searchable title column."""
 
     #: Whether the title column may not be empty
@@ -24,7 +23,7 @@ class SearchableTitleMixin(object):
     @classmethod
     def __auto_table_args(cls):
         args = [
-            db.Index('ix_{}_title_fts'.format(cls.__tablename__), db.func.to_tsvector('simple', cls.title),
+            db.Index(f'ix_{cls.__tablename__}_title_fts', db.func.to_tsvector('simple', cls.title),
                      postgresql_using='gin')
         ]
         if cls.title_required:

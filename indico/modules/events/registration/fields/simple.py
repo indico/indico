@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import unicode_literals
 
 import mimetypes
 from collections import OrderedDict
@@ -85,11 +84,11 @@ class CheckboxField(RegistrationFormBillableField):
 
     @property
     def view_data(self):
-        return dict(super(CheckboxField, self).view_data, places_used=self.get_places_used())
+        return dict(super().view_data, places_used=self.get_places_used())
 
     @property
     def filter_choices(self):
-        return {six.text_type(val).lower(): caption for val, caption in six.iteritems(self.friendly_data_mapping)
+        return {str(val).lower(): caption for val, caption in self.friendly_data_mapping.items()
                 if val is not None}
 
     @property
@@ -118,7 +117,7 @@ class DateField(RegistrationFormFieldBase):
         if value:
             date_format = self.form_item.data['date_format']
             value = datetime.strptime(value, date_format).isoformat()
-        return super(DateField, self).process_form_data(registration, value, old_data, billable_items_locked)
+        return super().process_form_data(registration, value, old_data, billable_items_locked)
 
     def get_friendly_data(self, registration_data, for_humans=False, for_search=False):
         date_string = registration_data.data
@@ -132,7 +131,7 @@ class DateField(RegistrationFormFieldBase):
     @property
     def view_data(self):
         has_time = ' ' in self.form_item.data['date_format']
-        return dict(super(DateField, self).view_data, has_time=has_time)
+        return dict(super().view_data, has_time=has_time)
 
 
 class BooleanField(RegistrationFormBillableField):
@@ -150,12 +149,12 @@ class BooleanField(RegistrationFormBillableField):
 
     @property
     def filter_choices(self):
-        return {six.text_type(val).lower(): caption for val, caption in six.iteritems(self.friendly_data_mapping)
+        return {str(val).lower(): caption for val, caption in self.friendly_data_mapping.items()
                 if val is not None}
 
     @property
     def view_data(self):
-        return dict(super(BooleanField, self).view_data, places_used=self.get_places_used())
+        return dict(super().view_data, places_used=self.get_places_used())
 
     @property
     def validators(self):
@@ -205,11 +204,11 @@ class CountryField(RegistrationFormFieldBase):
 
     @property
     def wtf_field_kwargs(self):
-        return {'choices': sorted(six.iteritems(get_countries()), key=itemgetter(1))}
+        return {'choices': sorted(get_countries().items(), key=itemgetter(1))}
 
     @classmethod
     def unprocess_field_data(cls, versioned_data, unversioned_data):
-        choices = sorted(({'caption': v, 'countryKey': k} for k, v in six.iteritems(get_countries())),
+        choices = sorted(({'caption': v, 'countryKey': k} for k, v in get_countries().items()),
                          key=itemgetter('caption'))
         return {'choices': choices}
 

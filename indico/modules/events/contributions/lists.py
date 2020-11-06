@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import unicode_literals
 
 from collections import OrderedDict
 from datetime import timedelta
@@ -34,17 +33,17 @@ class ContributionListGenerator(ListGeneratorBase):
     check_access = False
 
     def __init__(self, event):
-        super(ContributionListGenerator, self).__init__(event)
+        super().__init__(event)
         self.default_list_config = {'filters': {'items': {}}}
 
         session_empty = {None: _('No session')}
         track_empty = {None: _('No track')}
         type_empty = {None: _('No type')}
-        session_choices = OrderedDict((six.text_type(s.id), s.title) for s in sorted(self.event.sessions,
+        session_choices = OrderedDict((str(s.id), s.title) for s in sorted(self.event.sessions,
                                                                                key=attrgetter('title')))
-        track_choices = OrderedDict((six.text_type(t.id), t.title) for t in sorted(self.event.tracks,
+        track_choices = OrderedDict((str(t.id), t.title) for t in sorted(self.event.tracks,
                                                                              key=attrgetter('title')))
-        type_choices = OrderedDict((six.text_type(t.id), t.name) for t in sorted(self.event.contribution_types,
+        type_choices = OrderedDict((str(t.id), t.name) for t in sorted(self.event.contribution_types,
                                                                            key=attrgetter('name')))
         self.static_items = OrderedDict([
             ('session', {'title': _('Session'),
@@ -112,7 +111,7 @@ class ContributionListGenerator(ListGeneratorBase):
         filter_cols = {'session': Contribution.session_id,
                        'track': Contribution.track_id,
                        'type': Contribution.type_id}
-        for key, column in six.iteritems(filter_cols):
+        for key, column in filter_cols.items():
             ids = set(filters['items'].get(key, ()))
             if not ids:
                 continue

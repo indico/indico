@@ -28,7 +28,7 @@ class FileHook(EventBaseHook):
     NO_CACHE = True
 
     def _getParams(self):
-        super(FileHook, self)._getParams()
+        super()._getParams()
 
         self._attachment = Attachment.get(int(self._pathParams['res']))
 

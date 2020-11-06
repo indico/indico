@@ -35,7 +35,7 @@ class BookableHours(db.Model):
     # - room (Room.bookable_hours)
 
     def __repr__(self):
-        return u'<BookableHours({0}, {1}, {2})>'.format(
+        return '<BookableHours({}, {}, {})>'.format(
             self.room_id,
             self.start_time,
             self.end_time

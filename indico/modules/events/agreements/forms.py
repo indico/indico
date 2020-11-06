@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import unicode_literals
 
 from wtforms.fields import BooleanField, FileField, SelectField, TextAreaField
 from wtforms.fields.html5 import EmailField
@@ -34,7 +33,7 @@ class AgreementEmailForm(IndicoForm):
     def __init__(self, *args, **kwargs):
         self._definition = kwargs.pop('definition')
         event = kwargs.pop('event')
-        super(AgreementEmailForm, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self.from_address.choices = list(event.get_allowed_sender_emails().items())
         self.body.description = render_placeholder_info('agreement-email', definition=self._definition, agreement=None)
 

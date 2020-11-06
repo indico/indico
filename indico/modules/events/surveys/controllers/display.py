@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import unicode_literals
 
 from flask import flash, redirect, request, session
 from sqlalchemy.orm import joinedload
@@ -127,7 +126,7 @@ class RHSubmitSurvey(RHSubmitSurveyBase):
             self.submission = SurveySubmission(survey=survey, user=session.user)
         self.submission.is_anonymous = survey.anonymous
         for question in survey.questions:
-            answer = SurveyAnswer(question=question, data=getattr(form, 'question_{}'.format(question.id)).data)
+            answer = SurveyAnswer(question=question, data=getattr(form, f'question_{question.id}').data)
             self.submission.answers.append(answer)
         return self.submission
 

@@ -19,7 +19,7 @@ def create_application(db):
     """Return a callable which lets you create applications."""
 
     def _create_application(name, **params):
-        params.setdefault('client_id', six.text_type(uuid4()))
+        params.setdefault('client_id', str(uuid4()))
         params.setdefault('default_scopes', 'read:user')
         params.setdefault('redirect_uris', 'http://localhost:10500')
         params.setdefault('is_trusted', True)
@@ -36,7 +36,7 @@ def create_token(db, dummy_application, dummy_user):
     """Return a callable which lets you create tokens."""
 
     def _create_tokens(**params):
-        params.setdefault('access_token', six.text_type(uuid4()))
+        params.setdefault('access_token', str(uuid4()))
         params.setdefault('user', dummy_user)
         params.setdefault('application', dummy_application)
         params.setdefault('scopes', ['read:api', 'write:api'])

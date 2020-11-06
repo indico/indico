@@ -5,12 +5,11 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import unicode_literals
 
 from lxml import etree
 
 
-class XMLCategorySerializer(object):
+class XMLCategorySerializer:
     def __init__(self, category):
         self.category = category
 

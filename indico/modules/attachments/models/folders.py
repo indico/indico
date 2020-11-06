@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import unicode_literals
 
 from collections import defaultdict
 
@@ -37,7 +36,7 @@ class AttachmentFolder(LinkMixin, ProtectionMixin, db.Model):
     @strict_classproperty
     @staticmethod
     def __auto_table_args():
-        default_inheriting = 'not (is_default and protection_mode != {})'.format(ProtectionMode.inheriting.value)
+        default_inheriting = f'not (is_default and protection_mode != {ProtectionMode.inheriting.value})'
         return (db.CheckConstraint(default_inheriting, 'default_inheriting'),
                 db.CheckConstraint('is_default = (title IS NULL)', 'default_or_title'),
                 db.CheckConstraint('not (is_default and is_deleted)', 'default_not_deleted'),
@@ -148,7 +147,7 @@ class AttachmentFolder(LinkMixin, ProtectionMixin, db.Model):
         This is the case if the user has access the folder or if the
         user can manage attachments for the linked object.
         """
-        return (super(AttachmentFolder, self).can_access(user, *args, **kwargs) or
+        return (super().can_access(user, *args, **kwargs) or
                 can_manage_attachments(self.object, user))
 
     def can_view(self, user):
@@ -161,7 +160,7 @@ class AttachmentFolder(LinkMixin, ProtectionMixin, db.Model):
             return False
         if not self.object.can_access(user):
             return False
-        return self.is_always_visible or super(AttachmentFolder, self).can_access(user)
+        return self.is_always_visible or super().can_access(user)
 
     @classmethod
     def get_for_linked_object(cls, linked_object, preload_event=False):

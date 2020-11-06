@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import unicode_literals
 
 from datetime import datetime, timedelta
 
@@ -27,7 +26,7 @@ from indico.util.struct.enum import RichEnum
 from indico.util.struct.iterables import materialize_iterable, window
 
 
-class RescheduleMode(six.text_type, RichEnum):
+class RescheduleMode(str, RichEnum):
     __titles__ = {'none': 'Fit blocks', 'time': 'Start times', 'duration': 'Durations'}
     none = 'none'  # no action, just fit blocks..
     time = 'time'
@@ -38,7 +37,7 @@ class RescheduleMode(six.text_type, RichEnum):
         return RichEnum.title.fget(self)
 
 
-class Rescheduler(object):
+class Rescheduler:
     """
     Compact the the schedule of an event day by either adjusting
     start times or durations of timetable entries.

@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import unicode_literals
 
 from indico.core.db import db
 from indico.core.db.sqlalchemy import UTCDateTime
@@ -51,7 +50,7 @@ class NewsItem(db.Model):
 
     @property
     def anchor(self):
-        return 'news-{}'.format(self.id)
+        return f'news-{self.id}'
 
     @property
     def url(self):

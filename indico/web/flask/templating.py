@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import unicode_literals
 
 import itertools
 import posixpath
@@ -31,7 +30,7 @@ indentation_re = re.compile(r'^ +', re.MULTILINE)
 
 
 def underline(s, sep='-'):
-    return '{0}\n{1}'.format(s, sep * len(s))
+    return '{}\n{}'.format(s, sep * len(s))
 
 
 def markdown(value):
@@ -58,7 +57,7 @@ def natsort(environment, value, reverse=False, case_sensitive=False, attribute=N
     """
     if not case_sensitive:
         def sort_func(item):
-            if isinstance(item, six.string_types):
+            if isinstance(item, str):
                 item = item.lower()
             return natural_sort_key(item)
     else:
@@ -123,7 +122,7 @@ def get_overridable_template_name(name, plugin, core_prefix='', plugin_prefix=''
     if plugin is None:
         return core_tpl
     else:
-        return ['{}:{}{}'.format(plugin.name, plugin_prefix, name), core_tpl]
+        return [f'{plugin.name}:{plugin_prefix}{name}', core_tpl]
 
 
 def get_template_module(template_name_or_list, **context):
@@ -159,9 +158,9 @@ def register_template_hook(name, receiver, priority=50, markup=True, plugin=None
         return markup, priority, receiver(**kw)
 
     if plugin is None:
-        signals.plugin.template_hook.connect(_func, sender=six.text_type(name), weak=False)
+        signals.plugin.template_hook.connect(_func, sender=str(name), weak=False)
     else:
-        plugin.connect(signals.plugin.template_hook, _func, sender=six.text_type(name))
+        plugin.connect(signals.plugin.template_hook, _func, sender=str(name))
 
 
 def template_hook(name, priority=50, markup=True):
@@ -185,7 +184,7 @@ def call_template_hook(*name, **kwargs):
     name = name[0]
     as_list = kwargs.pop('as_list', False)
     values = []
-    for is_markup, priority, value in values_from_signal(signals.plugin.template_hook.send(six.text_type(name), **kwargs),
+    for is_markup, priority, value in values_from_signal(signals.plugin.template_hook.send(str(name), **kwargs),
                                                          single_value=True, as_list=as_list):
         if value:
             if is_markup:
@@ -236,7 +235,7 @@ class CustomizationLoader(BaseLoader):
 
     @internalcode
     def load(self, environment, name, globals=None):
-        tpl = super(CustomizationLoader, self).load(environment, name, globals)
+        tpl = super().load(environment, name, globals)
         if ':' not in name:
             return tpl
         # This is almost exactly what PluginPrefixLoader.load() does, but we have
@@ -248,6 +247,6 @@ class CustomizationLoader(BaseLoader):
         plugin = get_state(current_app).plugin_engine.get_plugin(plugin_name)
         if plugin is None:
             # that should never happen
-            raise RuntimeError('Plugin template {} has no plugin'.format(name))
+            raise RuntimeError(f'Plugin template {name} has no plugin')
         tpl.plugin = plugin
         return tpl

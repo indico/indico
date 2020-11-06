@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import unicode_literals
 
 from flask import request, session
 from werkzeug.exceptions import NotFound, Unauthorized
@@ -22,7 +21,7 @@ from indico.web.args import parser
 from indico.web.rh import RequireUserMixin
 
 
-class TokenAccessMixin(object):
+class TokenAccessMixin:
     SERVICE_ALLOWED = False
     is_service_call = False
 
@@ -43,7 +42,7 @@ class TokenAccessMixin(object):
     def _check_csrf(self):
         # check CSRF if there is no bearer token or there's a session cookie
         if session.user or not request.bearer_token:
-            super(TokenAccessMixin, self)._check_csrf()
+            super()._check_csrf()
 
 
 class RHEditingBase(TokenAccessMixin, RequireUserMixin, RHDisplayEventBase):
@@ -65,7 +64,7 @@ class RHEditingManagementBase(TokenAccessMixin, RHManageEventBase):
 
     def _check_access(self):
         if not TokenAccessMixin._token_can_access(self):
-            super(RHEditingManagementBase, self)._check_access()
+            super()._check_access()
 
 
 class RHEditableTypeManagementBase(RHEditingManagementBase):

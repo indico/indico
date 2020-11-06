@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import absolute_import, unicode_literals
 
 import itertools
 import posixpath
@@ -14,7 +13,6 @@ import six
 from flask import current_app, g, render_template, request, session
 from markupsafe import Markup
 from pytz import common_timezones, common_timezones_set
-from six.moves import map
 from six.moves.urllib.parse import urlparse
 
 from indico.core import signals
@@ -86,7 +84,7 @@ def render_session_bar(protected_object=None, local_tz=None, force_local_tz=Fals
     return Markup(rv)
 
 
-class WPJinjaMixin(object):
+class WPJinjaMixin:
     """Mixin for WPs backed by Jinja templates.
 
     This allows you to use a single WP class and its layout, CSS,
@@ -142,7 +140,7 @@ class WPJinjaMixin(object):
     def _prefix_template(cls, template):
         if cls.template_prefix and cls.template_prefix[-1] != '/':
             raise ValueError('template_prefix needs to end with a slash')
-        if isinstance(template, six.string_types):
+        if isinstance(template, str):
             return cls.template_prefix + template
         else:
             templates = []
@@ -160,7 +158,7 @@ class WPJinjaMixin(object):
         return self.render_template_func(template, **params)
 
 
-class WPBundleMixin(object):
+class WPBundleMixin:
     bundles = ('exports.js',)
     print_bundles = tuple()
 
@@ -186,7 +184,7 @@ class WPBundleMixin(object):
 
             for bundle in attr:
                 if config.DEBUG and bundle in seen_bundles:
-                    raise Exception("Duplicate bundle found in {}: '{}'".format(class_.__name__, bundle))
+                    raise Exception(f"Duplicate bundle found in {class_.__name__}: '{bundle}'")
                 seen_bundles.add(bundle)
                 yield bundle
 
@@ -276,7 +274,7 @@ class WPBase(WPBundleMixin):
                                site_name=core_settings.get('site_title'),
                                social=social_settings.get_all(),
                                page_metadata=self.page_metadata,
-                               page_title=' - '.join(six.text_type(x) for x in title_parts if x),
+                               page_title=' - '.join(str(x) for x in title_parts if x),
                                head_content=to_unicode(self._get_head_content()),
                                body=body)
 
@@ -332,7 +330,7 @@ class WPNewBase(WPBundleMixin, WPJinjaMixin):
                                bundles=bundles, print_bundles=print_bundles,
                                site_name=core_settings.get('site_title'),
                                social=social_settings.get_all(),
-                               page_title=' - '.join(six.text_type(x) for x in title_parts if x),
+                               page_title=' - '.join(str(x) for x in title_parts if x),
                                **params)
 
 

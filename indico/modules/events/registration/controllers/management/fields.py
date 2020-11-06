@@ -5,10 +5,8 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import unicode_literals
 
 from flask import jsonify, request, session
-from six.moves import filter
 from werkzeug.exceptions import BadRequest
 
 from indico.core.db import db

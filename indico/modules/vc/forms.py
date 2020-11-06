@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import unicode_literals
 
 from datetime import date, timedelta
 from operator import attrgetter
@@ -43,13 +42,13 @@ class LinkingWidget(JinjaWidget):
     """Render a composite radio/select field."""
 
     def __init__(self, **context):
-        super(LinkingWidget, self).__init__('forms/linking_widget.html', single_line=True, **context)
+        super().__init__('forms/linking_widget.html', single_line=True, **context)
 
     def __call__(self, field, **kwargs):
         form = field.get_form()
         has_error = {subfield.data: (subfield.data in form.conditional_fields and form[subfield.data].errors)
                      for subfield in field}
-        return super(LinkingWidget, self).__call__(field, form=form, has_error=has_error, **kwargs)
+        return super().__call__(field, form=form, has_error=has_error, **kwargs)
 
 
 class VCPluginSettingsFormBase(IndicoForm):
@@ -82,7 +81,7 @@ class VCRoomLinkFormBase(IndicoForm):
 
     def __init__(self, *args, **kwargs):
         self.event = kwargs.pop('event')
-        super(VCRoomLinkFormBase, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         contrib_choices = [(contrib.id, contrib.title) for contrib in
                            sorted(self.event.contributions, key=attrgetter('title'))]
         blocks = SessionBlock.find(SessionBlock.session.has((Session.event == self.event) & ~Session.is_deleted))
@@ -98,7 +97,7 @@ class VCRoomAttachFormBase(VCRoomLinkFormBase):
                       "Indico will suggest existing rooms."))
 
     def __init__(self, *args, **kwargs):
-        super(VCRoomAttachFormBase, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self.room.widget.search_url = url_for('.manage_vc_rooms_search', self.event, service=kwargs.pop('service'))
 
 
@@ -116,7 +115,7 @@ class VCRoomFormBase(VCRoomLinkFormBase):
                 raise ValidationError(_("There is already a room with this name"))
 
     def __init__(self, *args, **kwargs):
-        super(VCRoomFormBase, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self.vc_room = kwargs.pop('vc_room')
         self.service_name = current_plugin.service_name
 

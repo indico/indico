@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import unicode_literals
 
 import textwrap
 
@@ -67,8 +66,8 @@ class PyIntEnum(TypeDecorator, SchemaType):
         return self.enum(value)
 
     def alembic_render_type(self, autogen_context, toplevel_code):
-        name = '_{}'.format(self.enum.__name__)
-        members = '\n'.join('    {} = {!r}'.format(x.name, x.value) for x in self.enum)
+        name = f'_{self.enum.__name__}'
+        members = '\n'.join(f'    {x.name} = {x.value!r}' for x in self.enum)
         enum_tpl = textwrap.dedent("""
             class {name}(int, Enum):
             {members}
@@ -78,7 +77,7 @@ class PyIntEnum(TypeDecorator, SchemaType):
         autogen_context.imports.add('from indico.core.db.sqlalchemy import PyIntEnum')
         if self.exclude_values:
             return '{}({}, exclude_values={{{}}})'.format(type(self).__name__, name, ', '.join(
-                '{}.{}'.format(name, x.name) for x in sorted(self.exclude_values)
+                f'{name}.{x.name}' for x in sorted(self.exclude_values)
             ))
         else:
             return '{}({})'.format(type(self).__name__, name)
@@ -93,6 +92,6 @@ def _type_before_parent_attach(type_, col):
     def _col_after_parent_attach(col, table):
         int_col = type_coerce(col, SmallInteger)
         e = CheckConstraint(int_col.in_(x.value for x in type_.enum if x not in type_.exclude_values),
-                            'valid_enum_{}'.format(col.name))
+                            f'valid_enum_{col.name}')
         e.info['alembic_dont_render'] = True
         assert e.table is table

@@ -44,7 +44,7 @@ class ReservationEditLog(db.Model):
     # - reservation (Reservation.edit_logs)
 
     def __repr__(self):
-        return u'<ReservationEditLog({0}, {1}, {2}, {3})>'.format(
+        return '<ReservationEditLog({}, {}, {}, {})>'.format(
             self.user_name,
             self.reservation_id,
             self.timestamp,

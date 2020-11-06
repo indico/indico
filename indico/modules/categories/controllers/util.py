@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import unicode_literals
 
 from datetime import date
 from itertools import groupby
@@ -13,7 +12,6 @@ from operator import attrgetter
 
 from dateutil.relativedelta import relativedelta
 from flask import session
-from six.moves import map
 
 from indico.core.db import db
 from indico.modules.events.models.events import Event
@@ -129,5 +127,5 @@ def get_category_view_params(category, now):
               'atom_feed_url': url_for('.export_atom', category),
               'atom_feed_title': _('Events of "{}"').format(category.title)}
     params.update(get_base_ical_parameters(session.user, 'category',
-                                           '/export/categ/{0}.ics'.format(category.id), {'from': '-31d'}))
+                                           f'/export/categ/{category.id}.ics', {'from': '-31d'}))
     return params

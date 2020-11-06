@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import unicode_literals
 
 import os
 from collections import defaultdict
@@ -14,7 +13,6 @@ from operator import attrgetter
 
 import six
 from flask import flash, request, session
-from six.moves import map
 from sqlalchemy.orm import selectinload
 from werkzeug.exceptions import Forbidden
 from werkzeug.utils import cached_property
@@ -116,14 +114,13 @@ class RHDownloadPapers(ZipGeneratorMixin, RHPapersActionBase):
     def _prepare_folder_structure(self, item):
         paper_title = secure_filename('{}_{}'.format(item.paper.contribution.friendly_id,
                                                      item.paper.contribution.title), 'paper')
-        file_name = secure_filename('{}_{}'.format(item.id, item.filename), 'paper')
+        file_name = secure_filename(f'{item.id}_{item.filename}', 'paper')
         return os.path.join(*self._adjust_path_length([paper_title, file_name]))
 
     def _iter_items(self, contributions):
         contributions_with_paper = [c for c in self.contributions if c.paper]
         for contrib in contributions_with_paper:
-            for f in contrib.paper.last_revision.files:
-                yield f
+            yield from contrib.paper.last_revision.files
 
     def _process(self):
         return self._generate_zip_file(self.contributions, name_prefix='paper-files', name_suffix=self.event.id)
@@ -200,8 +197,8 @@ class RHAssignPapersBase(RHPapersActionBase):
     def _render_form(self, users, action):
         conflicts = self._get_conflicts(users)
         user_competences = self.event.cfp.user_competences
-        competences = {'competences_{}'.format(user_id): competences.competences
-                       for user_id, competences in six.iteritems(user_competences)}
+        competences = {f'competences_{user_id}': competences.competences
+                       for user_id, competences in user_competences.items()}
         return jsonify_template('events/papers/assign_role.html', event=self.event, role=self.role.name,
                                 action=action, users=users, competences=competences,
                                 contribs=self.contributions, conflicts=conflicts)

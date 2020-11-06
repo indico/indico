@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import division, print_function, unicode_literals
 
 from collections import defaultdict
 from datetime import date, timedelta
@@ -62,7 +61,7 @@ def _get_category_score(user, categ, attended_events, debug=False):
     # Favorite categories get a higher base score
     score = int(categ in user.favorite_categories)
     if debug:
-        print('{0:+.3f} - initial'.format(score))
+        print(f'{score:+.3f} - initial')
     # Attendance percentage goes to the score directly. If the attendance is high chances are good that the user
     # is either very interested in whatever goes on in the category or it's something he has to attend regularily.
     total = _query_categ_events(categ, first_event_date, last_event_date).count()
@@ -70,7 +69,7 @@ def _get_category_score(user, categ, attended_events, debug=False):
         attended_block_event_count = sum(1 for e in attended_events if e.start_dt >= first_event_date)
         score += attended_block_event_count / total
     if debug:
-        print('{0:+.3f} - attendance'.format(score))
+        print(f'{score:+.3f} - attendance')
     # If there are lots/few unattended events after the last attended one we also update the score with that
     total_after = _query_categ_events(categ, last_event_date + timedelta(days=1), None).count()
     if total_after < total * 0.05:
@@ -78,7 +77,7 @@ def _get_category_score(user, categ, attended_events, debug=False):
     elif total_after > total * 0.25:
         score -= 0.5
     if debug:
-        print('{0:+.3f} - unattended new events'.format(score))
+        print(f'{score:+.3f} - unattended new events')
     # Lower the score based on how long ago the last attended event was if there are no future events
     # We start applying this modifier only if the event has been more than 40 days in the past to avoid
     # it from happening in case of monthly events that are not created early enough.
@@ -86,7 +85,7 @@ def _get_category_score(user, categ, attended_events, debug=False):
     if days_since_last_event > 40:
         score -= 0.025 * days_since_last_event
     if debug:
-        print('{0:+.3f} - days since last event'.format(score))
+        print(f'{score:+.3f} - days since last event')
     # For events in the future however we raise the score
     now_local = utc_to_server(now_utc())
     attending_future = (_query_categ_events(categ, now_local, last_event_date)
@@ -95,11 +94,11 @@ def _get_category_score(user, categ, attended_events, debug=False):
     if attending_future:
         score += 0.25 * len(attending_future)
         if debug:
-            print('{0:+.3f} - future event count'.format(score))
+            print(f'{score:+.3f} - future event count')
         days_to_future_event = (attending_future[0].start_dt.date() - date.today()).days
         score += max(0.1, -(max(0, days_to_future_event - 2) / 4) ** (1 / 3) + 2.5)
         if debug:
-            print('{0:+.3f} - days to next future event'.format(score))
+            print(f'{score:+.3f} - days to next future event')
     return score
 
 
@@ -107,10 +106,10 @@ def get_category_scores(user, debug=False):
     # XXX: check if we can add some more roles such as 'contributor' to assume attendance
     event_ids = set()
     event_ids.update(id_
-                     for id_, roles in six.iteritems(get_events_with_abstract_persons(user))
+                     for id_, roles in get_events_with_abstract_persons(user).items()
                      if 'abstract_submitter' in roles)
     event_ids.update(id_
-                     for id_, roles in six.iteritems(get_events_with_linked_contributions(user))
+                     for id_, roles in get_events_with_linked_contributions(user).items()
                      if 'contribution_submission' in roles)
     event_ids |= get_events_registered(user)
     event_ids |= get_events_with_submitted_surveys(user)
@@ -124,5 +123,5 @@ def get_category_scores(user, debug=False):
     categ_events = defaultdict(list)
     for event in attended:
         categ_events[event.category].append(event)
-    return dict((categ, _get_category_score(user, categ, events, debug))
-                for categ, events in six.iteritems(categ_events))
+    return {categ: _get_category_score(user, categ, events, debug)
+                for categ, events in categ_events.items()}

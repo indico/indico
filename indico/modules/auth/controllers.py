@@ -5,13 +5,11 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import unicode_literals
 
 import six
 from flask import flash, jsonify, redirect, render_template, request, session
 from itsdangerous import BadData, BadSignature
 from markupsafe import Markup
-from six.moves import zip
 from webargs import fields
 from werkzeug.exceptions import BadRequest, Forbidden, NotFound
 
@@ -284,7 +282,7 @@ class RHRegister(RH):
     def _prepare_registration_data(self, form, handler):
         email = form.email.data
         extra_emails = handler.get_all_emails(form) - {email}
-        user_data = {k: v for k, v in six.viewitems(form.data) if k in {'first_name', 'last_name', 'affiliation',
+        user_data = {k: v for k, v in form.data.items() if k in {'first_name', 'last_name', 'affiliation',
                                                                      'address', 'phone'}}
         user_data.update(handler.get_extra_user_data(form))
         identity_data = handler.get_identity_data(form)
@@ -348,7 +346,7 @@ class RHAccounts(RHUserBase):
             elif isinstance(form, EditLocalIdentityForm):
                 self._handle_edit_local_account(form)
             return redirect(url_for('auth.accounts'))
-        provider_titles = {name: provider.title for name, provider in six.iteritems(multipass.identity_providers)}
+        provider_titles = {name: provider.title for name, provider in multipass.identity_providers.items()}
         return WPAuthUser.render_template('accounts.html', 'accounts',
                                           form=form, user=self.user, provider_titles=provider_titles)
 
@@ -377,7 +375,7 @@ class RHRemoveAccount(RHUserBase):
         return redirect(url_for('.accounts'))
 
 
-class RegistrationHandler(object):
+class RegistrationHandler:
     form = None
 
     def __init__(self, rh):
@@ -447,7 +445,7 @@ class MultipassRegistrationHandler(RegistrationHandler):
         return FormDefaults(self.identity_info['data'])
 
     def create_form(self):
-        form = super(MultipassRegistrationHandler, self).create_form()
+        form = super().create_form()
         # We only want the phone/address fields if the provider gave us data for it
         for field in {'address', 'phone'}:
             if field in form and not self.identity_info['data'].get(field):
@@ -458,7 +456,7 @@ class MultipassRegistrationHandler(RegistrationHandler):
 
     def form(self, **kwargs):
         if self.from_sync_provider:
-            synced_values = {k: v or '' for k, v in six.iteritems(self.identity_info['data'])}
+            synced_values = {k: v or '' for k, v in self.identity_info['data'].items()}
             return MultipassRegistrationForm(synced_fields=multipass.synced_fields, synced_values=synced_values,
                                              **kwargs)
         else:
@@ -473,7 +471,7 @@ class MultipassRegistrationHandler(RegistrationHandler):
         return self.identity_info['moderated']
 
     def get_all_emails(self, form):
-        emails = super(MultipassRegistrationHandler, self).get_all_emails(form)
+        emails = super().get_all_emails(form)
         return emails | set(self.identity_info['data'].getlist('email'))
 
     def get_identity_data(self, form):
@@ -482,7 +480,7 @@ class MultipassRegistrationHandler(RegistrationHandler):
                 'data': self.identity_info['data'], 'multipass_data': self.identity_info['multipass_data']}
 
     def get_extra_user_data(self, form):
-        data = super(MultipassRegistrationHandler, self).get_extra_user_data(form)
+        data = super().get_extra_user_data(form)
         if self.from_sync_provider:
             data['synced_fields'] = form.synced_fields | {field for field in multipass.synced_fields
                                                           if field not in form}
@@ -512,7 +510,7 @@ class LocalRegistrationHandler(RegistrationHandler):
         return config.LOCAL_MODERATION
 
     def get_all_emails(self, form):
-        emails = super(LocalRegistrationHandler, self).get_all_emails(form)
+        emails = super().get_all_emails(form)
         if not self.must_verify_email:
             emails.add(session['register_verified_email'])
         return emails
@@ -534,7 +532,7 @@ class LocalRegistrationHandler(RegistrationHandler):
         return FormDefaults(**data)
 
     def create_form(self):
-        form = super(LocalRegistrationHandler, self).create_form()
+        form = super().create_form()
         if not self.must_verify_email:
             form.email.data = session['register_verified_email']
         return form

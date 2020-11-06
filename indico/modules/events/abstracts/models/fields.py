@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import unicode_literals
 
 import six
 
@@ -33,5 +32,5 @@ class AbstractFieldValue(ContributionFieldValueBase):
     # - abstract (Abstract.field_values)
 
     def __repr__(self):
-        text = text_to_repr(self.data) if isinstance(self.data, six.text_type) else self.data
+        text = text_to_repr(self.data) if isinstance(self.data, str) else self.data
         return format_repr(self, 'abstract_id', 'contribution_field_id', _text=text)

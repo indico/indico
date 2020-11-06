@@ -5,14 +5,13 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import unicode_literals
 
 from indico.modules.events.notes.models.notes import EventNote
 from indico.modules.events.notes.util import can_edit_note
 from indico.util.caching import memoize_request
 
 
-class AttachedNotesMixin(object):
+class AttachedNotesMixin:
     """
     Allow for easy retrieval of structured information about
     items attached to the object.

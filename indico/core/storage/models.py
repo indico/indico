@@ -17,7 +17,6 @@ specifying, among others, which storage backend to use.
 """
 
 
-from __future__ import unicode_literals
 
 from sqlalchemy.event import listen
 from sqlalchemy.ext.declarative import declared_attr
@@ -29,7 +28,7 @@ from indico.core.storage.backend import get_storage
 from indico.util.date_time import now_utc
 
 
-class VersionedResourceMixin(object):
+class VersionedResourceMixin:
 
     # Class that will inherit from StoredFileMixin
     stored_file_class = None
@@ -90,7 +89,7 @@ class VersionedResourceMixin(object):
         )
 
 
-class StoredFileMixin(object):
+class StoredFileMixin:
     #: Name of attribute (backref) that will be made to point
     #: to the versioned resource (leave as ``None`` if you
     #: don't want versioning)

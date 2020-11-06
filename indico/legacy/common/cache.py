@@ -14,7 +14,6 @@ import redis
 import six
 import six.moves.cPickle as pickle
 from flask import g
-from six.moves import map, zip
 
 from indico.core.config import config
 from indico.core.logger import Logger
@@ -25,7 +24,7 @@ from indico.util.string import truncate
 
 # To cache `None` we need to actually store something else since memcached
 # does not distinguish between a None value and a cache miss...
-class _NoneValue(object):
+class _NoneValue:
     @classmethod
     def replace(cls, value):
         """Replace `None` with a `_NoneValue`."""
@@ -37,7 +36,7 @@ class _NoneValue(object):
         return None if isinstance(value, cls) else value
 
 
-class CacheClient(object):
+class CacheClient:
     """
     This is an abstract class. A cache client provide a simple API to
     get/set/delete cache entries.
@@ -51,7 +50,7 @@ class CacheClient(object):
     """
 
     def set_multi(self, mapping, ttl=0):
-        for key, val in six.iteritems(mapping):
+        for key, val in mapping.items():
             self.set(key, val, ttl)
 
     def get_multi(self, keys):
@@ -109,7 +108,7 @@ class RedisCacheClient(CacheClient):
 
     def set_multi(self, mapping, ttl=0):
         try:
-            self._client.mset(dict((k, pickle.dumps(v)) for k, v in six.iteritems(mapping)))
+            self._client.mset({k: pickle.dumps(v) for k, v in mapping.items()})
             if ttl:
                 for key in mapping:
                     self._client.expire(key, ttl)
@@ -188,7 +187,7 @@ class FileCacheClient(CacheClient):
             finally:
                 OSSpecific.lockFile(f, 'LOCK_UN')
                 f.close()
-        except (IOError, OSError):
+        except OSError:
             Logger.get('cache.files').exception('Error setting value in cache')
             return 0
         return 1
@@ -209,7 +208,7 @@ class FileCacheClient(CacheClient):
                 f.close()
             if expiry and time.time() > expiry:
                 return None
-        except (IOError, OSError):
+        except OSError:
             Logger.get('cache.files').exception('Error getting cached value')
             return None
         except (EOFError, pickle.UnpicklingError):
@@ -247,7 +246,7 @@ class MemcachedCacheClient(CacheClient):
         return self._client.delete(key)
 
 
-class GenericCache(object):
+class GenericCache:
     """A simple cache interface that supports various backends.
 
     The backends are accessed through the CacheClient interface.
@@ -293,12 +292,12 @@ class GenericCache(object):
         return hashlib.sha256(key).hexdigest()
 
     def _makeKey(self, key):
-        if not isinstance(key, six.string_types):
+        if not isinstance(key, str):
             # In case we get something not a string (number, list, whatever)
             key = repr(key)
         # Hashlib doesn't allow unicode so let's ensure it's not!
         key = key.encode('utf-8')
-        return '%s%s.%s' % (getattr(self._client, 'key_prefix', ''), self._namespace, self._hashKey(key))
+        return '{}{}.{}'.format(getattr(self._client, 'key_prefix', ''), self._namespace, self._hashKey(key))
 
     def _processTime(self, ts):
         if isinstance(ts, datetime.timedelta):
@@ -320,7 +319,7 @@ class GenericCache(object):
     def set_multi(self, mapping, time=0):
         self._connect()
         time = self._processTime(time)
-        mapping = dict(((self._makeKey(key), _NoneValue.replace(val)) for key, val in six.iteritems(mapping)))
+        mapping = {self._makeKey(key): _NoneValue.replace(val) for key, val in mapping.items()}
         self._client.set_multi(mapping, time)
 
     def get(self, key, default=None):

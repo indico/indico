@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import unicode_literals
 
 import re
 
@@ -15,7 +14,7 @@ from indico.core import signals
 from indico.util.signals import values_from_signal
 
 
-class Previewer(object):
+class Previewer:
     """Base class for file previewers.
 
     To create a new file prewiewer, subclass this class and register it using
@@ -51,7 +50,7 @@ class PDFPreviewer(Previewer):
 
     @classmethod
     def can_preview(cls, attachment_file):
-        if not super(PDFPreviewer, cls).can_preview(attachment_file) or not session.user:
+        if not super().can_preview(attachment_file) or not session.user:
             return False
         return session.user.settings.get('use_previewer_pdf', False)
 

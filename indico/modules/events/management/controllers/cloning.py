@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import unicode_literals
 
 from collections import OrderedDict
 from datetime import datetime, timedelta
@@ -46,7 +45,7 @@ RRULE_FREQ_MAP = OrderedDict([
 
 
 def relativedelta_to_rrule_interval(rdelta):
-    for unit, freq in six.viewitems(RRULE_FREQ_MAP):
+    for unit, freq in RRULE_FREQ_MAP.items():
         value = getattr(rdelta, unit)
         if value:
             return freq, value
@@ -62,7 +61,7 @@ def get_clone_calculator(repeatability, event):
         raise BadRequest
 
 
-class CloneCalculator(object):
+class CloneCalculator:
     def __init__(self, event):
         self.event = event
 
@@ -89,7 +88,7 @@ class CloneCalculator(object):
         if form.validate():
             return self._calculate(form)
         else:
-            raise ValueError([(six.text_type(getattr(form, k).label.text), v) for k, v in six.viewitems(form.errors)])
+            raise ValueError([(str(getattr(form, k).label.text), v) for k, v in form.errors.items()])
 
 
 class PatternCloneCalculator(CloneCalculator):

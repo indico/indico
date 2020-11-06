@@ -5,12 +5,10 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import unicode_literals
 
 from datetime import time
 
 from flask import session
-from six.moves import zip
 from wtforms.fields import StringField, TextAreaField
 from wtforms.fields.core import SelectField
 from wtforms.fields.html5 import URLField
@@ -41,7 +39,7 @@ class ReferenceTypeForm(IndicoForm):
 
     def __init__(self, *args, **kwargs):
         self.reference_type = kwargs.pop('reference_type', None)
-        super(ReferenceTypeForm, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
     def validate_name(self, field):
         query = ReferenceType.find(db.func.lower(ReferenceType.name) == field.data.lower())
@@ -61,7 +59,7 @@ class EventLabelForm(IndicoForm):
 
     def __init__(self, *args, **kwargs):
         self.event_label = kwargs.pop('event_label', None)
-        super(EventLabelForm, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
     def validate_title(self, field):
         query = EventLabel.query.filter(db.func.lower(EventLabel.title) == field.data.lower())

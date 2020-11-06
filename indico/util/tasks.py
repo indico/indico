@@ -13,7 +13,6 @@ anything from `indico.modules`, your task most likely does not belong
 in here but in your module instead.
 """
 
-from __future__ import unicode_literals
 
 from datetime import timedelta
 

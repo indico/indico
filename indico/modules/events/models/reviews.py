@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import unicode_literals
 
 import six
 from sqlalchemy.ext.hybrid import hybrid_property
@@ -15,7 +14,7 @@ from indico.util.locators import locator_property
 from indico.web.flask.util import url_for
 
 
-class ProposalGroupProxy(object):
+class ProposalGroupProxy:
     """The object that the proposals can be grouped by.
 
     It provides all necessary methods for building the URLs, displaying the
@@ -57,10 +56,10 @@ class ProposalGroupProxy(object):
         return self.instance.locator
 
     def __repr__(self):
-        return '<ProposalGroupProxy: {}>'.format(self.instance)
+        return f'<ProposalGroupProxy: {self.instance}>'
 
 
-class ProposalRevisionMixin(object):
+class ProposalRevisionMixin:
     """Properties and methods of a proposal revision."""
 
     #: The attribute  of the revision used to fetch the proposal object.
@@ -94,7 +93,7 @@ class ProposalRevisionMixin(object):
     def get_reviewer_render_data(self, user):
         groups = self.get_reviewed_for_groups(user, include_reviewed=True)
         reviews = {x.group: x for x in self.get_reviews(user=user)}
-        reviewed_groups = {x.group for x in six.itervalues(reviews)}
+        reviewed_groups = {x.group for x in reviews.values()}
         missing_groups = groups - reviewed_groups
         return {'groups': groups,
                 'missing_groups': missing_groups,
@@ -102,7 +101,7 @@ class ProposalRevisionMixin(object):
                 'reviews': reviews}
 
 
-class ProposalMixin(object):
+class ProposalMixin:
     """
     Classes that represent a proposal object should extend this class (ex:
     Abstract, Paper).
@@ -167,14 +166,14 @@ class ProposalMixin(object):
         return url_for(self.create_judgment_endpoint, self)
 
 
-class ProposalCommentMixin(object):
+class ProposalCommentMixin:
     timeline_item_type = 'comment'
 
     def can_edit(self, user):
         raise NotImplementedError
 
 
-class ProposalReviewMixin(object):
+class ProposalReviewMixin:
     """Mixin for proposal reviews.
 
     Classes that represent a review of a proposal should extend this class

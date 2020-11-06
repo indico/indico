@@ -5,12 +5,10 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import unicode_literals
 
 from datetime import datetime
 
 import six
-from six.moves import range
 
 from indico.modules.rb.models.room_bookable_hours import BookableHours
 from indico.modules.rb.models.room_nonbookable_periods import NonBookablePeriod
@@ -22,7 +20,7 @@ def get_rooms_unbookable_hours(rooms):
     query = BookableHours.query.filter(BookableHours.room_id.in_(room_ids))
     rooms_hours = group_list(query, key=lambda obj: obj.room_id)
     inverted_rooms_hours = {}
-    for room_id, hours in six.iteritems(rooms_hours):
+    for room_id, hours in rooms_hours.items():
         hours.sort(key=lambda x: x.start_time)
         inverted_hours = []
         first = BookableHours(start_time=datetime.strptime('00:00', '%H:%M').time(), end_time=hours[0].start_time)

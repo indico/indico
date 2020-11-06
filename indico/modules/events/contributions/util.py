@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import unicode_literals
 
 import csv
 from collections import defaultdict
@@ -125,7 +124,7 @@ def sort_contribs(contribs, sort_by):
         key_func = attrgetter('friendly_id')
     elif sort_by == BOASortField.title:
         key_func = attrgetter('title')
-    elif isinstance(sort_by, (str, six.text_type)) and sort_by:
+    elif isinstance(sort_by, str) and sort_by:
         key_func = attrgetter(mapping.get(sort_by) or sort_by)
     else:
         key_func = attrgetter('title')
@@ -194,7 +193,7 @@ def make_contribution_form(event):
         if field_impl is None:
             # field definition is not available anymore
             continue
-        name = 'custom_{}'.format(custom_field.id)
+        name = f'custom_{custom_field.id}'
         setattr(form_class, name, field_impl.create_wtf_field())
     return form_class
 
@@ -300,7 +299,7 @@ def import_contributions_from_csv(event, f):
             contribution = create_contribution(event, contrib_fields, extend_parent=True)
 
         contributions.append(contribution)
-        for key, val in six.viewitems(changes[event]):
+        for key, val in changes[event].items():
             all_changes[key].append(val)
 
         email = speaker_data['email']

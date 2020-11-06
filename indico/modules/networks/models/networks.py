@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import unicode_literals
 
 from ipaddress import ip_address
 
@@ -90,7 +89,7 @@ class IPNetworkGroup(db.Model):
             return False
         if session.user != user:
             return False
-        return self.contains_ip(six.text_type(request.remote_addr))
+        return self.contains_ip(str(request.remote_addr))
 
     def contains_ip(self, ip):
         ip = ip_address(ip)

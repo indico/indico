@@ -28,7 +28,7 @@ def monkeypatch_methods(monkeypatch):
             if method.__self__ is None:
                 # For unbound methods we need to copy the underlying function
                 method = method.__func__
-            monkeypatch.setattr('{}.{}'.format(target, name), method)
+            monkeypatch.setattr(f'{target}.{name}', method)
 
     return _monkeypatch_methods
 

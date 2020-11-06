@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import unicode_literals
 
 import os
 import tarfile
@@ -24,7 +23,7 @@ from indico.modules.events.sessions import Session
 from indico.util.date_time import as_utc
 
 
-class _MockUUID(object):
+class _MockUUID:
     def __init__(self):
         self.counter = 0
 
@@ -61,7 +60,7 @@ def test_event_export(db, dummy_event, monkeypatch):
     export_event(dummy_event, f)
     f.seek(0)
 
-    with open(os.path.join(os.path.dirname(__file__), 'export_test_1.yaml'), 'r') as ref_file:
+    with open(os.path.join(os.path.dirname(__file__), 'export_test_1.yaml')) as ref_file:
         data_yaml_content = ref_file.read()
 
     # check composition of tarfile and data.yaml content
@@ -94,9 +93,9 @@ def test_event_attachment_export(db, dummy_event, dummy_attachment):
         event_uid = objs[0][1]['id'][1]
 
         # check that the exported metadata contains all the right objects
-        assert [obj[0] for obj in objs] == [u'events.events', u'events.sessions', u'events.contributions',
-                                            u'events.contributions', u'attachments.folders', u'attachments.attachments',
-                                            u'attachments.files']
+        assert [obj[0] for obj in objs] == ['events.events', 'events.sessions', 'events.contributions',
+                                            'events.contributions', 'attachments.folders', 'attachments.attachments',
+                                            'attachments.files']
         # check that the attached file's metadata is included
         assert objs[5][1]['title'] == 'dummy_attachment'
         assert objs[5][1]['folder_id'] is not None
@@ -114,7 +113,7 @@ def test_event_attachment_export(db, dummy_event, dummy_attachment):
 
 @pytest.mark.usefixtures('static_indico_version')
 def test_event_import(db, dummy_user):
-    with open(os.path.join(os.path.dirname(__file__), 'export_test_2.yaml'), 'r') as ref_file:
+    with open(os.path.join(os.path.dirname(__file__), 'export_test_2.yaml')) as ref_file:
         data_yaml_content = ref_file.read()
 
     data_yaml = BytesIO(data_yaml_content.encode('utf-8'))

@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import unicode_literals
 
 from functools import partial
 
@@ -239,7 +238,7 @@ def _render_revision(attr, target, value, *unused):
     elif render_mode == RenderMode.markdown:
         target.html = render_markdown(source, extensions=('nl2br',))
     else:  # pragma: no cover
-        raise ValueError('Invalid render mode: {}'.format(render_mode))
+        raise ValueError(f'Invalid render mode: {render_mode}')
 
 
 listen(EventNoteRevision.render_mode, 'set', partial(_render_revision, 'render_mode'))

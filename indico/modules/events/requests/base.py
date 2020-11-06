@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import unicode_literals
 
 from flask_pluginengine import plugin_context
 from wtforms.fields import SubmitField, TextAreaField
@@ -25,7 +24,7 @@ class RequestFormBase(IndicoForm):
     def __init__(self, *args, **kwargs):
         self.event = kwargs.pop('event')
         self.request = kwargs.pop('request')
-        super(RequestFormBase, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
 
 class RequestManagerForm(IndicoForm):
@@ -38,7 +37,7 @@ class RequestManagerForm(IndicoForm):
     action_reject = SubmitField(_('Reject'))
 
 
-class RequestDefinitionBase(object):
+class RequestDefinitionBase:
     """A service request which can be sent by event managers."""
 
     #: the plugin containing this request definition - assigned automatically

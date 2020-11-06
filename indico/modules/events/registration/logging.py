@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import unicode_literals
 
 from flask import session
 
@@ -23,7 +22,7 @@ def connect_log_signals():
 def log_registration_check_in(registration, **kwargs):
     """Log a registration check-in action to the event log."""
     if registration.checked_in:
-        log_text = '"{}" has been checked in'.format(registration.full_name)
+        log_text = f'"{registration.full_name}" has been checked in'
     else:
         log_text = '"{}" check-in has been reset'
     registration.log(EventLogRealm.participants, EventLogKind.change, 'Registration',

@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import unicode_literals
 
 import csv
 
@@ -21,7 +20,7 @@ from indico.web.flask.templating import get_template_module
 from indico.web.util import jsonify_data, jsonify_template
 
 
-class ImportRoleMembersMixin(object):
+class ImportRoleMembersMixin:
     """Import members from a CSV file into a role."""
 
     logger = None
@@ -56,12 +55,12 @@ class ImportRoleMembersMixin(object):
             if form.remove_existing.data:
                 deleted_members = self.role.members - users
                 for member in deleted_members:
-                    self.logger.info('User {} removed from role {} by {}'.format(member, self.role, session.user))
+                    self.logger.info(f'User {member} removed from role {self.role} by {session.user}')
                 self.role.members = users
             else:
                 self.role.members |= users
             for user in new_members:
-                self.logger.info('User {} added to role {} by {}'.format(user, self.role, session.user))
+                self.logger.info(f'User {user} added to role {self.role} by {session.user}')
             flash(ngettext("{} member has been imported.",
                            "{} members have been imported.",
                            len(users)).format(len(users)), 'success')

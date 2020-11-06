@@ -5,14 +5,12 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import unicode_literals
 
 from collections import OrderedDict
 from operator import attrgetter
 
 import six
 from flask import request
-from six.moves import map
 from sqlalchemy.orm import subqueryload, undefer
 
 from indico.core.db import db
@@ -29,7 +27,7 @@ class PaperListGeneratorBase(ListGeneratorBase):
     """Listing and filtering actions in a paper list."""
 
     def __init__(self, event):
-        super(PaperListGeneratorBase, self).__init__(event)
+        super().__init__(event)
         self.default_list_config = {
             'items': ('state',),
             'filters': {'items': {}}
@@ -41,11 +39,11 @@ class PaperListGeneratorBase(ListGeneratorBase):
         type_empty = {None: _('No type')}
         state_choices = OrderedDict((state.value, state.title) for state in PaperRevisionState)
         unassigned_choices = OrderedDict((role.value, role.title) for role in PaperReviewingRole)
-        track_choices = OrderedDict((six.text_type(t.id), t.title) for t in sorted(self.event.tracks,
+        track_choices = OrderedDict((str(t.id), t.title) for t in sorted(self.event.tracks,
                                                                              key=attrgetter('title')))
-        session_choices = OrderedDict((six.text_type(s.id), s.title) for s in sorted(self.event.sessions,
+        session_choices = OrderedDict((str(s.id), s.title) for s in sorted(self.event.sessions,
                                                                                key=attrgetter('title')))
-        type_choices = OrderedDict((six.text_type(t.id), t.name) for t in sorted(self.event.contribution_types,
+        type_choices = OrderedDict((str(t.id), t.name) for t in sorted(self.event.contribution_types,
                                                                            key=attrgetter('name')))
 
         if not event.cfp.content_reviewing_enabled:
@@ -115,7 +113,7 @@ class PaperListGeneratorBase(ListGeneratorBase):
         filter_cols = {'track': Contribution.track_id,
                        'session': Contribution.session_id,
                        'type': Contribution.type_id}
-        for key, column in six.iteritems(filter_cols):
+        for key, column in filter_cols.items():
             ids = set(filters['items'].get(key, ()))
             if not ids:
                 continue
@@ -166,14 +164,14 @@ class PaperAssignmentListGenerator(PaperListGeneratorBase):
     list_link_type = 'paper_asssignment_management'
 
     def __init__(self, event):
-        super(PaperAssignmentListGenerator, self).__init__(event)
+        super().__init__(event)
         self.default_list_config = {
             'items': ('state',),
             'filters': {'items': {}}
         }
 
     def get_list_kwargs(self):
-        kwargs = super(PaperAssignmentListGenerator, self).get_list_kwargs()
+        kwargs = super().get_list_kwargs()
         kwargs['management'] = True
         return kwargs
 
@@ -187,7 +185,7 @@ class PaperJudgingAreaListGeneratorDisplay(PaperListGeneratorBase):
     list_link_type = 'paper_judging_display'
 
     def __init__(self, event, user):
-        super(PaperJudgingAreaListGeneratorDisplay, self).__init__(event)
+        super().__init__(event)
         self.user = user
         self.default_list_config = {
             'items': ('state',),
@@ -198,10 +196,10 @@ class PaperJudgingAreaListGeneratorDisplay(PaperListGeneratorBase):
         self.static_items['unassigned']['filter_choices'] = OrderedDict(sorted(judging_unassigned_choices.items()))
 
     def _build_query(self):
-        query = super(PaperJudgingAreaListGeneratorDisplay, self)._build_query()
+        query = super()._build_query()
         return query.filter(Contribution.paper_judges.any(User.id == self.user.id))
 
     def get_list_kwargs(self):
-        kwargs = super(PaperJudgingAreaListGeneratorDisplay, self).get_list_kwargs()
+        kwargs = super().get_list_kwargs()
         kwargs['management'] = False
         return kwargs

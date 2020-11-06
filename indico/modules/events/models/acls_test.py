@@ -6,9 +6,9 @@
 # LICENSE file for more details.
 
 from functools import partial
+from unittest.mock import MagicMock
 
 import pytest
-from mock import MagicMock
 
 from indico.core import signals
 from indico.core.db.sqlalchemy.principals import EmailPrincipal, PrincipalType

@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import unicode_literals
 
 import json
 import os
@@ -20,7 +19,6 @@ import click
 from babel.messages import frontend
 from babel.messages.pofile import read_po
 from flask.helpers import get_root_path
-from six.moves import zip
 
 from indico.util.console import cformat
 

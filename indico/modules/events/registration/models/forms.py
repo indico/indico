@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import unicode_literals
 
 from uuid import UUID
 
@@ -310,7 +309,7 @@ class RegistrationForm(db.Model):
 
     @property
     def identifier(self):
-        return 'RegistrationForm:{}'.format(self.id)
+        return f'RegistrationForm:{self.id}'
 
     @hybrid_property
     def has_ended(self):
@@ -396,7 +395,7 @@ class RegistrationForm(db.Model):
         return self.notification_sender_address or contact_email
 
     def __repr__(self):
-        return '<RegistrationForm({}, {}, {})>'.format(self.id, self.event_id, self.title)
+        return f'<RegistrationForm({self.id}, {self.event_id}, {self.title})>'
 
     def is_modification_allowed(self, registration):
         """Check whether a registration may be modified."""

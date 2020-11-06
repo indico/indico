@@ -22,8 +22,8 @@ class strict_classproperty(classproperty):
     """
     def __get__(self, obj, type=None):
         if obj is not None:
-            raise AttributeError('Attribute is not available on instances of {}'.format(type.__name__))
-        return super(strict_classproperty, self).__get__(obj, type)
+            raise AttributeError(f'Attribute is not available on instances of {type.__name__}')
+        return super().__get__(obj, type)
 
 
 class cached_classproperty(property):

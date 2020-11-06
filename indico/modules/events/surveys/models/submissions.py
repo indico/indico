@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import unicode_literals
 
 from sqlalchemy.dialects.postgresql import JSONB
 
@@ -107,7 +106,7 @@ class SurveySubmission(db.Model):
         return dict(self.survey.locator, submission_id=self.id)
 
     def __repr__(self):
-        return '<SurveySubmission({}, {}, {})>'.format(self.id, self.survey_id, self.user_id)
+        return f'<SurveySubmission({self.id}, {self.survey_id}, {self.user_id})>'
 
 
 class SurveyAnswer(db.Model):
@@ -151,7 +150,7 @@ class SurveyAnswer(db.Model):
         return self.question.field.is_value_empty(self)
 
     def __repr__(self):
-        return '<SurveyAnswer({}, {}): {}>'.format(self.submission_id, self.question_id, self.data)
+        return f'<SurveyAnswer({self.submission_id}, {self.question_id}): {self.data}>'
 
     @property
     def answer_data(self):

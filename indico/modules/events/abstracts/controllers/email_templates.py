@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import unicode_literals
 
 import six
 from flask import request
@@ -107,7 +106,7 @@ class RHEmailTemplateREST(RHEditEmailTemplateBase):
         if request.json is None:
             raise BadRequest('Expected JSON payload')
 
-        invalid_fields = six.viewkeys(request.json) - {'stop_on_match'}
+        invalid_fields = request.json.keys() - {'stop_on_match'}
         if invalid_fields:
             raise BadRequest("Invalid fields: {}".format(', '.join(invalid_fields)))
 

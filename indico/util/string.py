@@ -9,7 +9,6 @@
 String manipulation functions
 """
 
-from __future__ import absolute_import
 
 import binascii
 import functools
@@ -31,7 +30,6 @@ from html2text import HTML2Text
 from jinja2.filters import do_striptags
 from lxml import etree, html
 from markupsafe import Markup, escape
-from six.moves import range
 from speaklater import _LazyString, is_lazy_string
 from sqlalchemy import ForeignKeyConstraint, inspect
 
@@ -73,26 +71,26 @@ BLEACH_ALLOWED_STYLES_HTML = [
 ]
 
 
-LATEX_MATH_PLACEHOLDER = u"\uE000"
+LATEX_MATH_PLACEHOLDER = "\uE000"
 
 
 def encode_if_unicode(s):
-    if isinstance(s, _LazyString) and isinstance(s.value, six.text_type):
-        s = six.text_type(s)
-    return s.encode('utf-8') if isinstance(s, six.text_type) else s
+    if isinstance(s, _LazyString) and isinstance(s.value, str):
+        s = str(s)
+    return s.encode('utf-8') if isinstance(s, str) else s
 
 
 def safe_upper(text):
-    if isinstance(text, six.text_type):
+    if isinstance(text, str):
         return text.upper()
     else:
         return text.decode('utf-8').upper().encode('utf-8')
 
 
 def remove_accents(text, reencode=True):
-    if not isinstance(text, six.text_type):
+    if not isinstance(text, str):
         text = text.decode('utf-8')
-    result = u''.join((c for c in unicodedata.normalize('NFD', text) if unicodedata.category(c) != 'Mn'))
+    result = ''.join(c for c in unicodedata.normalize('NFD', text) if unicodedata.category(c) != 'Mn')
     if reencode:
         return result.encode('utf-8')
     else:
@@ -125,7 +123,7 @@ def strict_unicode(value):
     """
     if value is None:
         raise TypeError('strict_unicode does not accept `None`')
-    return six.text_type(value)
+    return str(value)
 
 
 def slugify(*args, **kwargs):
@@ -286,12 +284,12 @@ def html_color_to_rgb(hexcolor):
     """Convert #RRGGBB to an (R, G, B) tuple."""
 
     if not hexcolor.startswith('#'):
-        raise ValueError("Invalid color string '{}' (should start with '#')".format(hexcolor))
+        raise ValueError(f"Invalid color string '{hexcolor}' (should start with '#')")
 
     hexcolor = hexcolor[1:]
 
     if len(hexcolor) not in {3, 6}:
-        raise ValueError("'#{}'' is not in #RRGGBB or #RGB format".format(hexcolor))
+        raise ValueError(f"'#{hexcolor}'' is not in #RRGGBB or #RGB format")
 
     if len(hexcolor) == 3:
         hexcolor = ''.join(c * 2 for c in hexcolor)
@@ -305,7 +303,7 @@ def strip_whitespace(s):
     This utility is useful in cases where you might get None or
     non-string values such as WTForms filters.
     """
-    if isinstance(s, six.string_types):
+    if isinstance(s, str):
         s = s.strip()
     return s
 
@@ -316,9 +314,9 @@ def make_unique_token(is_unique):
     :param is_unique: a callable invoked with the token which should
                       return a boolean indicating if the token is actually
     """
-    token = six.text_type(uuid4())
+    token = str(uuid4())
     while not is_unique(token):
-        token = six.text_type(uuid4())
+        token = str(uuid4())
     return token
 
 
@@ -330,7 +328,7 @@ def encode_utf8(f):
             return ''
         if is_lazy_string(rv):
             rv = rv.value
-        return rv.encode('utf-8') if isinstance(rv, six.text_type) else str(rv)
+        return rv.encode('utf-8') if isinstance(rv, str) else str(rv)
 
     return _wrapper
 
@@ -342,7 +340,7 @@ def is_legacy_id(id_):
     numeric or have a leading zero, resulting in different objects
     with the same numeric id.
     """
-    return not isinstance(id_, six.integer_types) and (not id_.isdigit() or str(int(id_)) != id_)
+    return not isinstance(id_, int) and (not id_.isdigit() or str(int(id_)) != id_)
 
 
 def text_to_repr(text, html=False, max_length=50):
@@ -355,19 +353,19 @@ def text_to_repr(text, html=False, max_length=50):
     :return: A string that contains no linebreaks or HTML tags.
     """
     if text is None:
-        text = u''
+        text = ''
     if html:
         text = bleach.clean(text, tags=[], strip=True)
-    text = re.sub(r'\s+', u' ', text)
+    text = re.sub(r'\s+', ' ', text)
     if max_length is not None and len(text) > max_length:
-        text = text[:max_length] + u'...'
+        text = text[:max_length] + '...'
     return text.strip()
 
 
 def alpha_enum(value):
     """Convert integer to ordinal letter code (a, b, c, ... z, aa, bb, ...)."""
     max_len = len(string.ascii_lowercase)
-    return six.text_type(string.ascii_lowercase[value % max_len] * (value / max_len + 1))
+    return str(string.ascii_lowercase[value % max_len] * (value / max_len + 1))
 
 
 def format_repr(obj, *args, **kwargs):
@@ -408,22 +406,22 @@ def format_repr(obj, *args, **kwargs):
                                     for t in inspect(cls).tables
                                     for c in t.constraints
                                     if isinstance(c, ForeignKeyConstraint))) if hasattr(cls, '__table__') else set()
-    formatted_args = [six.text_type(_format_value(getattr(obj, arg)))
+    formatted_args = [str(_format_value(getattr(obj, arg)))
                       if arg not in fkeys
-                      else u'{}={}'.format(arg, _format_value(getattr(obj, arg)))
+                      else '{}={}'.format(arg, _format_value(getattr(obj, arg)))
                       for arg in args]
     for name, default_value in sorted(kwargs.items()):
         value = getattr(obj, name)
         if value != default_value:
-            formatted_args.append(u'{}={}'.format(name, _format_value(value)))
+            formatted_args.append('{}={}'.format(name, _format_value(value)))
     if text_arg is not None:
-        return u'<{}({}): "{}">'.format(obj_name, u', '.join(formatted_args), text_arg)
+        return '<{}({}): "{}">'.format(obj_name, ', '.join(formatted_args), text_arg)
     elif raw_text_arg is not None:
-        return u'<{}({}): {}>'.format(obj_name, u', '.join(formatted_args), raw_text_arg)
+        return '<{}({}): {}>'.format(obj_name, ', '.join(formatted_args), raw_text_arg)
     elif repr_arg is not None:
-        return u'<{}({}): {!r}>'.format(obj_name, u', '.join(formatted_args), repr_arg)
+        return '<{}({}): {!r}>'.format(obj_name, ', '.join(formatted_args), repr_arg)
     else:
-        return u'<{}({})>'.format(obj_name, u', '.join(formatted_args))
+        return '<{}({})>'.format(obj_name, ', '.join(formatted_args))
 
 
 def snakify(name):
@@ -448,7 +446,7 @@ def _convert_keys(value, convert_func):
         return type(value)(_convert_keys(x, convert_func) for x in value)
     elif not isinstance(value, dict):
         return value
-    return {convert_func(k): _convert_keys(v, convert_func) for k, v in six.iteritems(value)}
+    return {convert_func(k): _convert_keys(v, convert_func) for k, v in value.items()}
 
 
 def camelize_keys(dict_):
@@ -466,7 +464,7 @@ def crc32(data):
 
     When a unicode object is passed, it is encoded as UTF-8.
     """
-    if isinstance(data, six.text_type):
+    if isinstance(data, str):
         data = data.encode('utf-8')
     return binascii.crc32(data) & 0xffffffff
 
@@ -502,10 +500,10 @@ def format_full_name(first_name, last_name, title=None, last_name_first=True, la
     if not first_name:
         full_name = last_name
     else:
-        first_name = u'{}.'.format(first_name[0].upper()) if abbrev_first_name else first_name
-        full_name = u'{}, {}'.format(last_name, first_name) if last_name_first else u'{} {}'.format(first_name,
+        first_name = '{}.'.format(first_name[0].upper()) if abbrev_first_name else first_name
+        full_name = f'{last_name}, {first_name}' if last_name_first else '{} {}'.format(first_name,
                                                                                                     last_name)
-    return full_name if not show_title or not title else u'{} {}'.format(title, full_name)
+    return full_name if not show_title or not title else f'{title} {full_name}'
 
 
 def sanitize_email(email, require_valid=False):
@@ -536,11 +534,11 @@ class RichMarkup(Markup):
 
     __slots__ = ('_preformatted',)
 
-    def __new__(cls, content=u'', preformatted=None):
+    def __new__(cls, content='', preformatted=None):
         obj = Markup.__new__(cls, content)
         if preformatted is None:
             tmp = content.lower()
-            obj._preformatted = not any(tag in tmp for tag in (u'<p>', u'<p ', u'<br', u'<li>'))
+            obj._preformatted = not any(tag in tmp for tag in ('<p>', '<p ', '<br', '<li>'))
         else:
             obj._preformatted = preformatted
         return obj
@@ -548,9 +546,9 @@ class RichMarkup(Markup):
     def __html__(self):
         # XXX: ensure we have no harmful HTML - there are certain malicious values that
         # are not caught by the legacy sanitizer that runs at submission time
-        string = RichMarkup(sanitize_html(six.text_type(self)), preformatted=self._preformatted)
+        string = RichMarkup(sanitize_html(str(self)), preformatted=self._preformatted)
         if string._preformatted:
-            return u'<div class="preformatted">{}</div>'.format(string)
+            return f'<div class="preformatted">{string}</div>'
         else:
             return string
 
@@ -558,7 +556,7 @@ class RichMarkup(Markup):
         return {slot: getattr(self, slot) for slot in self.__slots__ if hasattr(self, slot)}
 
     def __setstate__(self, state):
-        for slot, value in six.iteritems(state):
+        for slot, value in state.items():
             setattr(self, slot, value)
 
 
@@ -566,14 +564,14 @@ class MarkdownText(Markup):
     """Unicode/Markup class that renders markdown."""
 
     def __html__(self):
-        return render_markdown(six.text_type(self), extensions=('nl2br', 'tables'))
+        return render_markdown(str(self), extensions=('nl2br', 'tables'))
 
 
 class PlainText(Markup):
     """Unicode/Markup class that renders plain text."""
 
     def __html__(self):
-        return u'<div class="preformatted">{}</div>'.format(escape(six.text_type(self)))
+        return '<div class="preformatted">{}</div>'.format(escape(str(self)))
 
 
 def handle_legacy_description(field, obj, get_render_mode=attrgetter('render_mode'),
@@ -589,10 +587,10 @@ def handle_legacy_description(field, obj, get_render_mode=attrgetter('render_mod
     from indico.core.db.sqlalchemy.descriptions import RenderMode
     from indico.util.i18n import _
     if get_render_mode(obj) == RenderMode.html:
-        field.warning = _(u"This text has been automatically converted from HTML to Markdown. "
-                          u"Please double-check that it's properly displayed.")
+        field.warning = _("This text has been automatically converted from HTML to Markdown. "
+                          "Please double-check that it's properly displayed.")
         ht = HTML2Text(bodywidth=0)
         desc = get_value(obj)
         if RichMarkup(desc)._preformatted:
-            desc = desc.replace(u'\n', u'<br>\n')
+            desc = desc.replace('\n', '<br>\n')
         field.data = ht.handle(desc)

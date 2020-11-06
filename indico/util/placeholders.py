@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import unicode_literals
 
 import re
 from operator import attrgetter
@@ -19,7 +18,7 @@ from indico.util.decorators import classproperty
 from indico.util.signals import named_objects_from_signal
 
 
-class Placeholder(object):
+class Placeholder:
     """Base class for placeholders.
 
     Placeholders allow you to insert data in texts provided by users
@@ -190,7 +189,7 @@ def replace_placeholders(context, text, escape_html=True, **kwargs):
     :param escape_html: whether HTML escaping should be done
     :param kwargs: arguments specific to the context
     """
-    for placeholder in six.viewvalues(get_placeholders(context, **kwargs)):
+    for placeholder in get_placeholders(context, **kwargs).values():
         text = placeholder.replace(text, escape_html=escape_html, **kwargs)
     return text
 
@@ -202,11 +201,11 @@ def get_empty_placeholders(context, text, **kwargs):
     :param text: the text containing some placeholders
     :param kwargs: arguments specific to the context
     """
-    return set(
+    return {
         placeholder.friendly_name
-        for placeholder in six.viewvalues(get_placeholders(context, **kwargs))
+        for placeholder in get_placeholders(context, **kwargs).values()
         if placeholder.is_in(text, **kwargs) and placeholder.is_empty(text, **kwargs)
-    )
+    }
 
 
 def get_missing_placeholders(context, text, **kwargs):
@@ -216,7 +215,7 @@ def get_missing_placeholders(context, text, **kwargs):
     :param text: the text to check
     :param kwargs: arguments specific to the context
     """
-    placeholders = {p for p in six.itervalues(get_placeholders(context, **kwargs)) if p.required}
+    placeholders = {p for p in get_placeholders(context, **kwargs).values() if p.required}
     return {p.friendly_name for p in placeholders if not p.is_in(text, **kwargs)}
 
 

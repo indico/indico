@@ -34,7 +34,7 @@ from indico.web.http_api.responses import HTTPAPIError
 from indico.web.http_api.util import get_query_parameter
 
 
-class HTTPAPIHook(object):
+class HTTPAPIHook:
     """This class is the hook between the query (path+params) and the generator of the results (fossil).
        It is also in charge of checking the parameters and the access rights.
     """
@@ -197,7 +197,7 @@ class HTTPAPIHook(object):
         return resultList, extra, complete, self.SERIALIZER_TYPE_MAP
 
 
-class DataFetcher(object):
+class DataFetcher:
     _deltas = {'yesterday': timedelta(-1),
                'tomorrow': timedelta(1)}
 
@@ -273,7 +273,7 @@ class DataFetcher(object):
 
 class IteratedDataFetcher(DataFetcher):
     def __init__(self, user, hook):
-        super(IteratedDataFetcher, self).__init__(user, hook)
+        super().__init__(user, hook)
         self._tz = hook._tz
         self._offset = hook._offset
         self._limit = hook._limit

@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import unicode_literals
 
 from datetime import date, datetime, time, timedelta
 from functools import partial
@@ -18,7 +17,6 @@ import dateutil
 from dateutil.relativedelta import relativedelta
 from flask import Response, flash, jsonify, redirect, request, session
 from pytz import utc
-from six.moves import map
 from sqlalchemy.orm import joinedload, load_only, subqueryload, undefer, undefer_group
 from werkzeug.exceptions import BadRequest, NotFound
 
@@ -495,7 +493,7 @@ class RHCategoryOverview(RHDisplayCategoryBase):
         return [_EventProxy(event, day, tzinfo, timetable_objects_by_date.get(day.date(), [])) for day in event_days]
 
 
-class _EventProxy(object):
+class _EventProxy:
     def __init__(self, event, date, tzinfo, timetable_objects):
         start_dt = datetime.combine(date, event.start_dt.astimezone(tzinfo).timetz())
         assert date >= event.start_dt

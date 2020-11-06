@@ -70,7 +70,6 @@ Version 2.1: (August 2013)
   * Update math delimiters
 """
 
-from __future__ import absolute_import
 
 import os
 import re
@@ -86,7 +85,6 @@ import six
 from lxml.html import html5parser
 from PIL import Image
 from requests.exceptions import ConnectionError, InvalidURL
-from six.moves import map
 from six.moves.urllib.parse import urlparse
 
 
@@ -98,7 +96,7 @@ start_double_quote_re = re.compile(r'''(^|\s|'|`)"''')
 end_double_quote_re = re.compile(r'"(,|\.|\s|$)')
 
 Image.init()
-IMAGE_FORMAT_EXTENSIONS = {format: ext for (ext, format) in six.viewitems(Image.EXTENSION)}
+IMAGE_FORMAT_EXTENSIONS = {format: ext for (ext, format) in Image.EXTENSION.items()}
 
 safe_mathmode_commands = {
     'above', 'abovewithdelims', 'acute', 'aleph', 'alpha', 'amalg', 'And', 'angle', 'approx', 'arccos', 'arcsin',
@@ -178,7 +176,7 @@ def latex_escape(text, ignore_math=True, ignore_braces=False):
     def substitute(x):
         return chars[x.group()]
 
-    math_placeholder = '[*LaTeXmath-{}*]'.format(six.text_type(uuid.uuid4()))
+    math_placeholder = '[*LaTeXmath-{}*]'.format(str(uuid.uuid4()))
 
     def math_replace(m):
         math_segments.append(m.group(0))
@@ -256,20 +254,20 @@ def latex_render_image(src, alt, tmpdir, strict=False):
     """
     try:
         if urlparse(src).scheme not in ('http', 'https'):
-            raise ImageURLException("URL scheme not supported: {}".format(src))
+            raise ImageURLException(f"URL scheme not supported: {src}")
         else:
             try:
                 resp = requests.get(src, verify=False, timeout=5)
             except InvalidURL:
-                raise ImageURLException("Cannot understand URL '{}'".format(src))
+                raise ImageURLException(f"Cannot understand URL '{src}'")
             except (requests.Timeout, ConnectionError):
-                raise ImageURLException("Problem downloading image ({})".format(src))
+                raise ImageURLException(f"Problem downloading image ({src})")
             except requests.TooManyRedirects:
-                raise ImageURLException("Too many redirects downloading image ({})".format(src))
+                raise ImageURLException(f"Too many redirects downloading image ({src})")
             extension = None
 
             if resp.status_code != 200:
-                raise ImageURLException("[{}] Error fetching image".format(resp.status_code))
+                raise ImageURLException(f"[{resp.status_code}] Error fetching image")
 
             if resp.headers.get('content-type'):
                 extension = guess_extension(resp.headers['content-type'])
@@ -282,7 +280,7 @@ def latex_render_image(src, alt, tmpdir, strict=False):
                     image = Image.open(BytesIO(resp.content))
                     # Worst case scenario, assume it's PNG
                     extension = IMAGE_FORMAT_EXTENSIONS.get(image.format, '.png')
-                except IOError:
+                except OSError:
                     raise ImageURLException("Cannot read image data. Maybe not an image file?")
             with NamedTemporaryFile(prefix='indico-latex-', suffix=extension, dir=tmpdir, delete=False) as tempfile:
                 tempfile.write(resp.content)
@@ -432,7 +430,7 @@ class LaTeXTreeProcessor(markdown.treeprocessors.Treeprocessor):
             buffer += latex_render_image(ournode.get('src'), ournode.get('alt'), tmpdir=self.configs.get('tmpdir'))[0]
         elif ournode.tag == 'a':
             # this one gets escaped in convert_link_to_latex
-            buffer += '<a href=\"%s\">%s</a>' % (ournode.get('href'), subcontent)
+            buffer += '<a href=\"{}\">{}</a>'.format(ournode.get('href'), subcontent)
         else:
             buffer = subcontent
 
@@ -470,7 +468,7 @@ class MathTextPostProcessor(markdown.postprocessors.Postprocessor):
 
         def repl_2(matchobj):
             text = unescape_latex_entities(matchobj.group(1))
-            return '$%s$%s' % (text, matchobj.group(2))
+            return '${}${}'.format(text, matchobj.group(2))
 
         # $$ ..... $$
         pat = re.compile(r'^\$\$([^$]*)\$\$\s*$', re.MULTILINE)
@@ -499,4 +497,4 @@ class LinkTextPostProcessor(markdown.postprocessors.Postprocessor):
 
 def convert_link_to_latex(instr):
     dom = html5parser.fragment_fromstring(instr)
-    return u'\\href{%s}{%s}' % (latex_escape(dom.get('href'), ignore_math=True), dom.text)
+    return '\\href{%s}{%s}' % (latex_escape(dom.get('href'), ignore_math=True), dom.text)

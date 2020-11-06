@@ -5,14 +5,12 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import unicode_literals
 
 from operator import attrgetter
 from uuid import UUID
 
 import six
 from flask import flash, jsonify, redirect, request, session
-from six.moves import map
 from sqlalchemy.orm import contains_eager, subqueryload
 from werkzeug.exceptions import Forbidden, NotFound
 
@@ -205,7 +203,7 @@ class RHParticipantList(RHRegistrationFormDisplayBase):
                     continue
                 tables.append(self._participant_list_table(regform))
             # There might be forms that have not been sorted by the user yet
-            tables += list(map(self._participant_list_table, six.viewvalues(regforms_dict)))
+            tables += list(map(self._participant_list_table, regforms_dict.values()))
 
         published = (RegistrationForm.query.with_parent(self.event)
                      .filter(RegistrationForm.publish_registrations_enabled)
@@ -394,5 +392,5 @@ class RHTicketDownload(RHRegistrationFormRegistrationBase):
             raise Forbidden
 
     def _process(self):
-        filename = secure_filename('{}-Ticket.pdf'.format(self.event.title), 'ticket.pdf')
+        filename = secure_filename(f'{self.event.title}-Ticket.pdf', 'ticket.pdf')
         return send_file(filename, generate_ticket(self.registration), 'application/pdf')

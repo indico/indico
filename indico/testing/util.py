@@ -10,7 +10,6 @@ import re
 from itertools import product
 
 import six
-from six.moves import map, zip
 
 
 def bool_matrix(template, mask=None, expect=None):
@@ -129,7 +128,7 @@ def extract_emails(smtp, required=True, count=None, one=False, regex=False, **kw
     compare = re.search if regex else operator.eq
     found = []
     for mail in smtp.outbox:
-        for header, value in six.iteritems(kwargs):
+        for header, value in kwargs.items():
             if not compare(value, mail[header]):
                 break
         else:  # everything matched
@@ -164,7 +163,7 @@ def extract_logs(caplog, required=True, count=None, one=False, regex=False, **kw
     compare = re.search if regex else operator.eq
     found = []
     for record in caplog.handler.records:
-        for key, value in six.iteritems(kwargs):
+        for key, value in kwargs.items():
             if not compare(value, getattr(record, key)):
                 break
         else:  # everything matched

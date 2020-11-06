@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import unicode_literals
 
 import re
 from datetime import date, timedelta
@@ -18,7 +17,7 @@ from indico.util.i18n import _, ngettext
 from indico.util.string import is_valid_mail
 
 
-class UsedIf(object):
+class UsedIf:
     """Make a WTF field "used" if a given condition evaluates to True.
 
     If the field is not used, validation stops.
@@ -39,7 +38,7 @@ class UsedIf(object):
             raise StopValidation()
 
 
-class HiddenUnless(object):
+class HiddenUnless:
     """Hide and disable a field unless another field has a certain value.
 
     :param field: The name of the other field to check
@@ -76,7 +75,7 @@ class HiddenUnless(object):
             raise StopValidation()
 
 
-class Exclusive(object):
+class Exclusive:
     """Make a WTF field mutually exclusive with other fields.
 
     If any of the given fields have a value, the validated field may not have one.
@@ -89,19 +88,19 @@ class Exclusive(object):
         if field.data is None:
             return
         if any(form[f].data is not None for f in self.fields):
-            field_names = sorted(six.text_type(form[f].label.text) for f in self.fields)
-            msg = ngettext(u'This field is mutually exclusive with another field: {}',
-                           u'This field is mutually exclusive with other fields: {}',
+            field_names = sorted(str(form[f].label.text) for f in self.fields)
+            msg = ngettext('This field is mutually exclusive with another field: {}',
+                           'This field is mutually exclusive with other fields: {}',
                            len(field_names))
-            raise ValidationError(msg.format(u', '.join(field_names)))
+            raise ValidationError(msg.format(', '.join(field_names)))
 
 
 class ConfirmPassword(EqualTo):
     def __init__(self, fieldname):
-        super(ConfirmPassword, self).__init__(fieldname, message=_('The passwords do not match.'))
+        super().__init__(fieldname, message=_('The passwords do not match.'))
 
 
-class IndicoEmail(object):
+class IndicoEmail:
     """Validate one or more email addresses."""
 
     def __init__(self, multi=False):
@@ -109,11 +108,11 @@ class IndicoEmail(object):
 
     def __call__(self, form, field):
         if field.data and not is_valid_mail(field.data, self.multi):
-            msg = _(u'Invalid email address list') if self.multi else _(u'Invalid email address')
+            msg = _('Invalid email address list') if self.multi else _('Invalid email address')
             raise ValidationError(msg)
 
 
-class DateRange(object):
+class DateRange:
     """Validate that a date is within the specified boundaries."""
 
     field_flags = ('date_range',)
@@ -160,7 +159,7 @@ class DateRange(object):
         return latest
 
 
-class DateTimeRange(object):
+class DateTimeRange:
     """Validate that a datetime is within the specified boundaries."""
 
     field_flags = ('datetime_range',)
@@ -209,7 +208,7 @@ class DateTimeRange(object):
         return as_utc(latest) if latest else latest
 
 
-class LinkedDate(object):
+class LinkedDate:
     """Validate that a date field happens before or/and after another.
 
     If both ``not_before`` and ``not_after`` are set to ``True``, both fields have to
@@ -242,7 +241,7 @@ class LinkedDate(object):
             raise ValidationError(_("{} can't be equal to {}").format(field.label, linked_field.label))
 
 
-class LinkedDateTime(object):
+class LinkedDateTime:
     """Validate that a datetime field happens before or/and after another.
 
     If both ``not_before`` and ``not_after`` are set to ``True``, both fields have to
@@ -291,10 +290,10 @@ class UsedIfChecked(UsedIf):
         def _condition(form, field):
             return form._fields.get(field_name).data
 
-        super(UsedIfChecked, self).__init__(_condition)
+        super().__init__(_condition)
 
 
-class MaxDuration(object):
+class MaxDuration:
     """Validate if TimeDeltaField value doesn't exceed `max_duration`."""
 
     def __init__(self, max_duration=None, **kwargs):
@@ -307,7 +306,7 @@ class MaxDuration(object):
             raise ValidationError(_('Duration cannot exceed {}').format(format_human_timedelta(self.max_duration)))
 
 
-class TimeRange(object):
+class TimeRange:
     """Validate the time lies within boundaries."""
 
     def __init__(self, earliest=None, latest=None):
@@ -330,7 +329,7 @@ class TimeRange(object):
         raise ValidationError(message.format(earliest=_format_time(self.earliest), latest=_format_time(self.latest)))
 
 
-class WordCount(object):
+class WordCount:
     """Validate the word count of a string.
 
     :param min: The minimum number of words in the string.  If not
@@ -368,7 +367,7 @@ class IndicoRegexp(Regexp):
 
     def __init__(self, *args, **kwargs):
         self.client_side = kwargs.pop('client_side', True)
-        super(IndicoRegexp, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
 
 class SoftLength(Length):

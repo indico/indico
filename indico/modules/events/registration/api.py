@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import unicode_literals
 
 import six
 from flask import jsonify, request
@@ -46,7 +45,7 @@ class RHAPIRegistrant(RH):
         if request.json is None:
             raise BadRequest('Expected JSON payload')
 
-        invalid_fields = six.viewkeys(request.json) - {'checked_in'}
+        invalid_fields = request.json.keys() - {'checked_in'}
         if invalid_fields:
             raise BadRequest("Invalid fields: {}".format(', '.join(invalid_fields)))
 

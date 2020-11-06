@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import unicode_literals
 
 from indico.modules.events.editing.controllers import frontend
 from indico.modules.events.editing.controllers.backend import common, editable_list, management, service, timeline

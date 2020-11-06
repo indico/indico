@@ -38,12 +38,12 @@ def build_indico_request(path, params, api_key=None, secret_key=None, persistent
         if not persistent:
             items.append(('timestamp', str(int(time.time()))))
         items = sorted(items, key=lambda x: x[0].lower())
-        url = '%s?%s' % (path, six.moves.urllib.parse.urlencode(items))
+        url = '{}?{}'.format(path, six.moves.urllib.parse.urlencode(items))
         signature = hmac.new(secret_key.encode(), url.encode(), hashlib.sha1).hexdigest()
         items.append(('signature', signature))
     if not items:
         return path
-    return '%s?%s' % (path, six.moves.urllib.parse.urlencode(items))
+    return '{}?{}'.format(path, six.moves.urllib.parse.urlencode(items))
 
 
 def generate_public_auth_request(apiKey, path, params=None):

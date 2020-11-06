@@ -72,8 +72,8 @@ def named_objects_from_signal(signal_response, name_attr='name', plugin_attr=Non
     mapping = {getattr(cls, name_attr): cls for _, cls in objects}
     # check for two different objects having the same name, e.g. because of
     # two plugins using a too generic name for their object
-    conflicting = {cls for _, cls in objects} - set(six.viewvalues(mapping))
+    conflicting = {cls for _, cls in objects} - set(mapping.values())
     if conflicting:
         names = ', '.join(sorted(getattr(x, name_attr) for x in conflicting))
-        raise RuntimeError('Non-unique object names: {}'.format(names))
+        raise RuntimeError(f'Non-unique object names: {names}')
     return mapping

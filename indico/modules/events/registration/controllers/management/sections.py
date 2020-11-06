@@ -5,11 +5,9 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import unicode_literals
 
 import six
 from flask import jsonify, request, session
-from six.moves import filter
 from werkzeug.exceptions import BadRequest
 
 from indico.core.db import db
@@ -61,9 +59,9 @@ class RHRegistrationFormModifySection(RHManageRegFormSectionBase):
 
     def _process_PATCH(self):
         changes = request.json['changes']
-        if set(six.viewkeys(changes)) > {'title', 'description'}:
+        if set(changes.keys()) > {'title', 'description'}:
             raise BadRequest
-        for field, value in six.iteritems(changes):
+        for field, value in changes.items():
             setattr(self.section, field, value)
         db.session.flush()
         logger.info('Section %s modified by %s: %s', self.section, session.user, changes)

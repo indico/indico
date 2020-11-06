@@ -45,7 +45,7 @@ class RoomAttributeAssociation(db.Model):
     # - room (Room.attributes)
 
     def __repr__(self):
-        return u'<RoomAttributeAssociation({0}, {1}, {2})>'.format(self.room_id, self.attribute.name, self.value)
+        return f'<RoomAttributeAssociation({self.room_id}, {self.attribute.name}, {self.value})>'
 
 
 class RoomAttribute(db.Model):

@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import unicode_literals
 
 import pytest
 
@@ -17,7 +16,7 @@ def create_category(db):
     """Return a callable which lets you create dummy events."""
 
     def _create_category(id_=None, **kwargs):
-        kwargs.setdefault('title', u'cat#{}'.format(id_) if id_ is not None else u'dummy')
+        kwargs.setdefault('title', f'cat#{id_}' if id_ is not None else 'dummy')
         kwargs.setdefault('timezone', 'UTC')
         if 'parent' not in kwargs:
             kwargs['parent'] = Category.get_root()

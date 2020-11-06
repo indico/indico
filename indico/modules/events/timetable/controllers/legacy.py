@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import unicode_literals
 
 from collections import Counter
 from datetime import timedelta
@@ -309,9 +308,9 @@ class RHLegacyTimetableScheduleContribution(RHManageTimetableBase):
         data = request.json
         required_keys = {'contribution_ids', 'day'}
         allowed_keys = required_keys | {'session_block_id'}
-        if set(six.viewkeys(data)) > allowed_keys:
+        if set(data.keys()) > allowed_keys:
             raise BadRequest('Invalid keys found')
-        elif required_keys > set(six.viewkeys(data)):
+        elif required_keys > set(data.keys()):
             raise BadRequest('Required keys missing')
         entries = []
         day = dateutil.parser.parse(data['day']).date()

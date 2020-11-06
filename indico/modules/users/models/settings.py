@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import unicode_literals
 
 from functools import wraps
 
@@ -44,7 +43,7 @@ class UserSetting(JSONSettingsBase, db.Model):
     )
 
     def __repr__(self):
-        return '<UserSetting({}, {}, {}, {!r})>'.format(self.user_id, self.module, self.name, self.value)
+        return f'<UserSetting({self.user_id}, {self.module}, {self.name}, {self.value!r})>'
 
 
 def user_or_id(f):
@@ -117,7 +116,7 @@ class UserSettingsProxy(SettingsProxyBase):
         """
         for name in items:
             self._check_name(name)
-        items = {k: self._convert_from_python(k, v) for k, v in six.iteritems(items)}
+        items = {k: self._convert_from_python(k, v) for k, v in items.items()}
         UserSetting.set_multi(self.module, items, **user)
         self._flush_cache()
 

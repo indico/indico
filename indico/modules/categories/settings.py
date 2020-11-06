@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import unicode_literals
 
 from functools import wraps
 
@@ -76,7 +75,7 @@ class CategorySettingsProxy(SettingsProxyBase):
         :param category: Category (or its ID)
         :param items: Dict containing the new settings
         """
-        items = {k: self._convert_from_python(k, v) for k, v in six.iteritems(items)}
+        items = {k: self._convert_from_python(k, v) for k, v in items.items()}
         CategorySetting.set_multi(self.module, items, category_id=category)
         self._flush_cache()
 

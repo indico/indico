@@ -15,7 +15,7 @@ from indico.modules.users import User
 @pytest.fixture
 def create_user(db):
     """Return a callable which lets you create dummy users."""
-    def _create_user(id_, first_name=u'Guinea', last_name=u'Pig', rb_admin=False, admin=False, email=None, groups=None,
+    def _create_user(id_, first_name='Guinea', last_name='Pig', rb_admin=False, admin=False, email=None, groups=None,
                      legacy=False):
         user = User.get(id_)
         if user:
@@ -24,7 +24,7 @@ def create_user(db):
         user.id = id_
         user.first_name = first_name
         user.last_name = last_name
-        user.email = email or u'{}@example.com'.format(id_)
+        user.email = email or f'{id_}@example.com'
         user.is_admin = admin
         user.local_groups = {g.group for g in (groups or ())}
         db.session.add(user)
@@ -49,7 +49,7 @@ def create_group(db):
     def _create_group(id_):
         group = LocalGroup()
         group.id = id_
-        group.name = u'dummy-{}'.format(id_)
+        group.name = f'dummy-{id_}'
         db.session.add(group)
         db.session.flush()
         return group.proxy

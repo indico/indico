@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import unicode_literals
 
 from indico.core.db import db
 from indico.core.db.sqlalchemy.principals import EmailPrincipal
@@ -53,7 +52,7 @@ def principal_from_fossil(fossil, allow_pending=False, allow_groups=True, allow_
         elif allow_pending:
             data = GenericCache('pending_identities').get(id_)
             if not data:
-                raise ValueError("Cannot find user '{}' in cache".format(id_))
+                raise ValueError(f"Cannot find user '{id_}' in cache")
 
             data = {k: '' if v is None else v for k, v in data.items()}
             email = data['email'].lower()
@@ -72,52 +71,52 @@ def principal_from_fossil(fossil, allow_pending=False, allow_groups=True, allow_
                 db.session.add(user)
                 db.session.flush()
         else:
-            raise ValueError("Id '{}' is not a number and allow_pending=False".format(id_))
+            raise ValueError(f"Id '{id_}' is not a number and allow_pending=False")
         if user is None:
-            raise ValueError('User does not exist: {}'.format(id_))
+            raise ValueError(f'User does not exist: {id_}')
         return user
     elif allow_emails and type_ == 'Email':
         return EmailPrincipal(id_)
     elif allow_networks and type_ == 'IPNetworkGroup':
         group = IPNetworkGroup.get(int(id_))
         if group is None or (group.hidden and group not in existing_data):
-            raise ValueError('IP network group does not exist: {}'.format(id_))
+            raise ValueError(f'IP network group does not exist: {id_}')
         return group
     elif allow_groups and type_ in {'LocalGroupWrapper', 'LocalGroup'}:
         group = GroupProxy(int(id_))
         if group.group is None:
-            raise ValueError('Local group does not exist: {}'.format(id_))
+            raise ValueError(f'Local group does not exist: {id_}')
         return group
     elif allow_groups and type_ in {'LDAPGroupWrapper', 'MultipassGroup'}:
         provider = fossil['provider']
         group = GroupProxy(id_, provider)
         if group.group is None and not allow_missing_groups:
-            raise ValueError('Multipass group does not exist: {}:{}'.format(provider, id_))
+            raise ValueError(f'Multipass group does not exist: {provider}:{id_}')
         return group
     elif category and type_ == 'CategoryRole':
         role = CategoryRole.get_category_role_by_id(category, id_)
         role_name = fossil.get('name')
         if role is None:
-            raise ValueError('Category role "{}" is not available in "{}"'.format(role_name, category.title))
+            raise ValueError(f'Category role "{role_name}" is not available in "{category.title}"')
         return role
     elif event and type_ == 'EventRole':
         role = EventRole.get(id_)
         role_name = fossil.get('name')
         if role is None:
-            raise ValueError('Event role "{}" does not exist'.format(role_name))
+            raise ValueError(f'Event role "{role_name}" does not exist')
         if role.event != event:
-            raise ValueError('Event role "{}" does not belong to "{}"'.format(role_name, event.title))
+            raise ValueError(f'Event role "{role_name}" does not belong to "{event.title}"')
         return role
     elif allow_registration_forms and type_ == 'RegistrationForm':
         registration_form = RegistrationForm.get(id_)
         reg_form_name = fossil.get('title')
         if registration_form is None:
-            raise ValueError('Registration form "{}" does not exist'.format(reg_form_name))
+            raise ValueError(f'Registration form "{reg_form_name}" does not exist')
         if registration_form.event != event:
-            raise ValueError('Registration form "{}" does not belong to "{}"'.format(reg_form_name, event.title))
+            raise ValueError(f'Registration form "{reg_form_name}" does not belong to "{event.title}"')
         return registration_form
     else:
-        raise ValueError('Unexpected fossil type: {}'.format(type_))
+        raise ValueError(f'Unexpected fossil type: {type_}')
 
 
 def principal_from_identifier(identifier, allow_groups=False, allow_external_users=False, allow_event_roles=False,
@@ -141,7 +140,7 @@ def principal_from_identifier(identifier, allow_groups=False, allow_external_use
             raise ValueError('Invalid data')
         user = User.get(user_id, is_deleted=(None if soft_fail else False))
         if user is None:
-            raise ValueError('Invalid user: {}'.format(user_id))
+            raise ValueError(f'Invalid user: {user_id}')
         return user
     elif type_ == 'ExternalUser':
         if not allow_external_users:
@@ -178,7 +177,7 @@ def principal_from_identifier(identifier, allow_groups=False, allow_external_use
             # multipass group
             group = GroupProxy(name, provider)
         if not soft_fail and group.group is None:
-            raise ValueError('Invalid group: {}'.format(data))
+            raise ValueError(f'Invalid group: {data}')
         return group
     elif type_ == 'EventRole':
         if not allow_event_roles:
@@ -189,14 +188,14 @@ def principal_from_identifier(identifier, allow_groups=False, allow_external_use
             raise ValueError('Invalid data')
         event_role = EventRole.get(event_role_id)
         if event_role is None or event_role.event_id != event_id:
-            raise ValueError('Invalid event role: {}'.format(event_role_id))
+            raise ValueError(f'Invalid event role: {event_role_id}')
         return event_role
     elif type_ == 'CategoryRole':
         if not allow_category_roles:
             raise ValueError('Category roles are not allowed')
         event = Event.get(event_id)
         if event is None:
-            raise ValueError('Invalid event id: {}'.format(event_id))
+            raise ValueError(f'Invalid event id: {event_id}')
         try:
             category_role_id = int(data)
         except ValueError:
@@ -206,7 +205,7 @@ def principal_from_identifier(identifier, allow_groups=False, allow_external_use
         else:
             category_role = CategoryRole.get_category_role_by_id(event.category, category_role_id)
         if category_role is None:
-            raise ValueError('Invalid category role: {}'.format(category_role_id))
+            raise ValueError(f'Invalid category role: {category_role_id}')
         return category_role
     elif type_ == 'RegistrationForm':
         if not allow_registration_forms:
@@ -219,7 +218,7 @@ def principal_from_identifier(identifier, allow_groups=False, allow_external_use
 
         registration_form = RegistrationForm.get(reg_form_id, is_deleted=(None if soft_fail else False))
         if registration_form is None or registration_form.event_id != event_id:
-            raise ValueError('Invalid registration form: {}'.format(reg_form_id))
+            raise ValueError(f'Invalid registration form: {reg_form_id}')
         return registration_form
     elif type_ == 'Email':
         if not allow_emails:

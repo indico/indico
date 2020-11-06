@@ -5,12 +5,11 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import unicode_literals
 
 import bcrypt
 
 
-class BCryptPassword(object):
+class BCryptPassword:
     def __init__(self, hash_):
         self.hash = str(hash_)
 
@@ -29,14 +28,14 @@ class BCryptPassword(object):
         return hash(self.hash)
 
     def __repr__(self):
-        return '<BCryptPassword({})>'.format(self.hash)
+        return f'<BCryptPassword({self.hash})>'
 
     @staticmethod
     def hash(value):
         return bcrypt.hashpw(value.encode(), bcrypt.gensalt())
 
 
-class PasswordProperty(object):
+class PasswordProperty:
     """Define a hashed password property.
 
     When reading this property, it will return an object which will

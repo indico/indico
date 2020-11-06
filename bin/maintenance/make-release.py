@@ -43,7 +43,7 @@ def run(cmd, title, shell=False):
     try:
         subprocess.check_output(cmd, stderr=subprocess.STDOUT, shell=shell)
     except subprocess.CalledProcessError as exc:
-        fail('{} failed'.format(title), verbose_msg=exc.output)
+        fail(f'{title} failed', verbose_msg=exc.output)
 
 
 def _bump_version(version):
@@ -58,7 +58,7 @@ def _bump_version(version):
 
 
 def _get_current_version():
-    with open('indico/__init__.py', 'r') as f:
+    with open('indico/__init__.py') as f:
         content = f.read()
     match = re.search(r"^__version__ = '([^']+)'$", content, re.MULTILINE)
     return match.group(1)
@@ -66,9 +66,9 @@ def _get_current_version():
 
 def _set_version(version, dry_run=False):
     step('Setting version to {}', version, dry_run=dry_run)
-    with open('indico/__init__.py', 'r') as f:
+    with open('indico/__init__.py') as f:
         orig = content = f.read()
-    content = re.sub(r"^__version__ = '([^']+)'$", "__version__ = '{}'".format(version), content, flags=re.MULTILINE)
+    content = re.sub(r"^__version__ = '([^']+)'$", f"__version__ = '{version}'", content, flags=re.MULTILINE)
     assert content != orig
     if not dry_run:
         with open('indico/__init__.py', 'w') as f:
@@ -76,14 +76,14 @@ def _set_version(version, dry_run=False):
 
 
 def _set_changelog_date(new_version, dry_run=False):
-    with open('CHANGES.rst', 'r') as f:
+    with open('CHANGES.rst') as f:
         orig = content = f.read()
-    version_line = 'Version {}'.format(new_version)
+    version_line = f'Version {new_version}'
     underline = '-' * len(version_line)
     unreleased = re.escape('Unreleased')
     release_date = format_date(format='MMMM dd, YYYY', locale='en')
     content = re.sub(r'(?<={}\n{}\n\n\*){}(?=\*\n)'.format(re.escape(version_line), underline, unreleased),
-                     'Released on {}'.format(release_date),
+                     f'Released on {release_date}',
                      content,
                      flags=re.DOTALL)
     step('Setting release date to {}', release_date, dry_run=dry_run)
@@ -177,14 +177,14 @@ def cli(version, dry_run, sign, no_assets, no_changelog):
     if not no_changelog:
         _set_changelog_date(new_version, dry_run=dry_run)
     _set_version(new_version, dry_run=dry_run)
-    release_msg = 'Release {}'.format(new_version)
+    release_msg = f'Release {new_version}'
     _git_commit(release_msg, ['CHANGES.rst', 'indico/__init__.py'], dry_run=dry_run)
     _git_tag(new_version, release_msg, sign=sign, dry_run=dry_run)
     prompt = 'Build release wheel before bumping version?' if next_version else 'Build release wheel now?'
     if click.confirm(click.style(prompt, fg='blue', bold=True), default=True):
         _build_wheel(no_assets, dry_run=dry_run)
     if next_version:
-        next_message = 'Bump version to {}'.format(next_version)
+        next_message = f'Bump version to {next_version}'
         _set_version(next_version, dry_run=dry_run)
         _git_commit(next_message, ['indico/__init__.py'], dry_run=dry_run)
 

@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import unicode_literals
 
 import hashlib
 import os
@@ -134,17 +133,17 @@ def get_linked_events(user, dt, limit=None, load_also=()):
         links.setdefault(event_id, set()).add('conference_manager')
     for event_id in get_events_created_by(user, dt):
         links.setdefault(event_id, set()).add('conference_creator')
-    for event_id, principal_roles in six.iteritems(get_events_with_linked_sessions(user, dt)):
+    for event_id, principal_roles in get_events_with_linked_sessions(user, dt).items():
         links.setdefault(event_id, set()).update(principal_roles)
-    for event_id, principal_roles in six.iteritems(get_events_with_linked_contributions(user, dt)):
+    for event_id, principal_roles in get_events_with_linked_contributions(user, dt).items():
         links.setdefault(event_id, set()).update(principal_roles)
-    for event_id, role in six.iteritems(get_events_with_linked_event_persons(user, dt)):
+    for event_id, role in get_events_with_linked_event_persons(user, dt).items():
         links.setdefault(event_id, set()).add(role)
-    for event_id, roles in six.iteritems(get_events_with_abstract_reviewer_convener(user, dt)):
+    for event_id, roles in get_events_with_abstract_reviewer_convener(user, dt).items():
         links.setdefault(event_id, set()).update(roles)
-    for event_id, roles in six.iteritems(get_events_with_abstract_persons(user, dt)):
+    for event_id, roles in get_events_with_abstract_persons(user, dt).items():
         links.setdefault(event_id, set()).update(roles)
-    for event_id, roles in six.iteritems(get_events_with_paper_roles(user, dt)):
+    for event_id, roles in get_events_with_paper_roles(user, dt).items():
         links.setdefault(event_id, set()).update(roles)
 
     if not links:
@@ -215,7 +214,7 @@ def build_user_search_query(criteria, exact=False, include_deleted=False, includ
             raise ValueError("'name' is not compatible with (first|last)_name")
         query = query.filter(_build_name_search(name.replace(',', '').split()))
 
-    for k, v in six.iteritems(criteria):
+    for k, v in criteria.items():
         query = query.filter(unaccent_match(getattr(User, k), v, exact))
 
     # wrap as subquery so we can apply order regardless of distinct-by-id
@@ -257,7 +256,7 @@ def search_users(exact=False, include_deleted=False, include_pending=False, incl
              objects for existing users.
     """
 
-    criteria = {key: value.strip() for key, value in six.iteritems(criteria) if value.strip()}
+    criteria = {key: value.strip() for key, value in criteria.items() if value.strip()}
 
     if not criteria:
         return set()
@@ -291,7 +290,7 @@ def search_users(exact=False, include_deleted=False, include_pending=False, incl
                 found_emails[ident.data['email'].lower()] = ident
                 found_identities[(ident.provider, ident.identifier)] = ident
 
-    return set(six.viewvalues(found_emails)) | system_user
+    return set(found_emails.values()) | system_user
 
 
 def get_user_by_email(email, create_pending=False):
@@ -336,10 +335,10 @@ def merge_users(source, target, force=False):
     """
 
     if source.is_deleted and not force:
-        raise ValueError('Source user {} has been deleted. Merge aborted.'.format(source))
+        raise ValueError(f'Source user {source} has been deleted. Merge aborted.')
 
     if target.is_deleted:
-        raise ValueError('Target user {} has been deleted. Merge aborted.'.format(target))
+        raise ValueError(f'Target user {target} has been deleted. Merge aborted.')
 
     # Move emails to the target user
     primary_source_email = source.email
@@ -388,9 +387,9 @@ def get_color_for_username(username):
 def get_gravatar_for_user(user, identicon, size=256, lastmod=None):
     gravatar_url = 'https://www.gravatar.com/avatar/{}'.format(hashlib.md5(user.email.lower().encode()).hexdigest())
     if identicon:
-        params = {'d': 'identicon', 's': six.text_type(size), 'forcedefault': 'y'}
+        params = {'d': 'identicon', 's': str(size), 'forcedefault': 'y'}
     else:
-        params = {'d': 'mp', 's': six.text_type(size)}
+        params = {'d': 'mp', 's': str(size)}
     headers = {'If-Modified-Since': lastmod} if lastmod is not None else {}
     resp = requests.get(gravatar_url, params=params, headers=headers)
     if resp.status_code == 304:

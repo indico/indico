@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import absolute_import, unicode_literals
 
 import os
 import re
@@ -48,7 +47,7 @@ class IndicoRequest(Request):
 
     @cached_property
     def remote_addr(self):
-        ip = super(IndicoRequest, self).remote_addr
+        ip = super().remote_addr
         if ip is not None and ip.startswith('::ffff:'):
             # convert ipv6-style ipv4 to the regular ipv4 notation
             ip = ip[7:]
@@ -65,8 +64,8 @@ class IndicoRequest(Request):
         return m.group(1) if m else None
 
     def __repr__(self):
-        rv = super(IndicoRequest, self).__repr__()
-        if isinstance(rv, six.text_type):
+        rv = super().__repr__()
+        if isinstance(rv, str):
             rv = rv.encode('utf-8')
         return rv
 
@@ -78,13 +77,13 @@ class IndicoFlask(PluginFlaskMixin, Flask):
 
     @property
     def session_cookie_name(self):
-        name = super(IndicoFlask, self).session_cookie_name
+        name = super().session_cookie_name
         if not request.is_secure:
             name += '_http'
         return name
 
     def create_global_jinja_loader(self):
-        default_loader = super(IndicoFlask, self).create_global_jinja_loader()
+        default_loader = super().create_global_jinja_loader()
         # use an empty list if there's no global customization dir so we can
         # add directories of plugins later once they are available
         customization_dir = os.path.join(config.CUSTOMIZATION_DIR, 'templates') if config.CUSTOMIZATION_DIR else []
@@ -98,7 +97,7 @@ class IndicoFlask(PluginFlaskMixin, Flask):
         # running inside the identity handler.
         if endpoint is not None and endpoint.startswith('_flaskmultipass'):
             view_func = RHSimple.wrap_function(view_func)
-        return super(IndicoFlask, self).add_url_rule(rule, endpoint=endpoint, view_func=view_func, **options)
+        return super().add_url_rule(rule, endpoint=endpoint, view_func=view_func, **options)
 
     @property
     def has_static_folder(self):
@@ -122,9 +121,9 @@ class IndicoBlueprintSetupState(BlueprintSetupState):
     def add_url_rule(self, rule, endpoint=None, view_func=None, **options):
         if rule.startswith('!/'):
             with self._unprefixed():
-                super(IndicoBlueprintSetupState, self).add_url_rule(rule[1:], endpoint, view_func, **options)
+                super().add_url_rule(rule[1:], endpoint, view_func, **options)
         else:
-            super(IndicoBlueprintSetupState, self).add_url_rule(rule, endpoint, view_func, **options)
+            super().add_url_rule(rule, endpoint, view_func, **options)
 
 
 class IndicoBlueprint(Blueprint):
@@ -145,7 +144,7 @@ class IndicoBlueprint(Blueprint):
         self.__default_prefix = ''
         self.__virtual_template_folder = kwargs.pop('virtual_template_folder', None)
         event_feature = kwargs.pop('event_feature', None)
-        super(IndicoBlueprint, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
         if event_feature:
             @self.before_request
@@ -168,9 +167,9 @@ class IndicoBlueprint(Blueprint):
         if view_func is not None:
             # We might have a RH class here - convert it to a callable suitable as a view func.
             view_func = make_view_func(view_func)
-        super(IndicoBlueprint, self).add_url_rule(self.__default_prefix + rule, endpoint, view_func, **options)
+        super().add_url_rule(self.__default_prefix + rule, endpoint, view_func, **options)
         if self.__prefix:
-            super(IndicoBlueprint, self).add_url_rule(self.__prefix + rule, endpoint, view_func, **options)
+            super().add_url_rule(self.__prefix + rule, endpoint, view_func, **options)
 
     @contextmanager
     def add_prefixed_rules(self, prefix, default_prefix=''):
@@ -197,11 +196,11 @@ class IndicoFileSystemLoader(FileSystemLoader):
     """
 
     def __init__(self, searchpath, encoding='utf-8', virtual_path=None):
-        super(IndicoFileSystemLoader, self).__init__(searchpath, encoding)
+        super().__init__(searchpath, encoding)
         self.virtual_path = virtual_path
 
     def list_templates(self):
-        templates = super(IndicoFileSystemLoader, self).list_templates()
+        templates = super().list_templates()
         if self.virtual_path:
             templates = [os.path.join(self.virtual_path, t) for t in templates]
         return templates
@@ -211,4 +210,4 @@ class IndicoFileSystemLoader(FileSystemLoader):
             if not template.startswith(self.virtual_path):
                 raise TemplateNotFound(template)
             template = template[len(self.virtual_path):]
-        return super(IndicoFileSystemLoader, self).get_source(environment, template)
+        return super().get_source(environment, template)

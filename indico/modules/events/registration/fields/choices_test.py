@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import unicode_literals
 
 from copy import deepcopy
 
@@ -19,7 +18,7 @@ from indico.modules.events.registration.models.registrations import Registration
 
 def _id(n):
     assert 0 <= n < 10
-    return '{}0000000-0000-0000-0000-000000000000'.format(n)
+    return f'{n}0000000-0000-0000-0000-000000000000'
 
 
 @pytest.fixture
@@ -38,7 +37,7 @@ def multi_choice_field():
 def _update_data(data, changes):
     data = dict(deepcopy(data))
     refs = {x['id']: x for x in data['choices']}
-    for id_, item_changes in six.iteritems(changes):
+    for id_, item_changes in changes.items():
         if id_ not in refs:
             entry = {'id': id_, 'places_limit': 0, 'is_billable': False, 'price': 0}
             entry.update(item_changes)

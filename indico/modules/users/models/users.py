@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import unicode_literals
 
 import itertools
 from enum import Enum
@@ -69,7 +68,7 @@ class ProfilePictureSource(int, Enum):
     custom = 3
 
 
-class PersonMixin(object):
+class PersonMixin:
     """Add convenience properties and methods to person classes.
 
     Assumes the following attributes exist:
@@ -159,7 +158,7 @@ def format_display_full_name(user, obj):
     elif name_format in (NameFormat.f_last, NameFormat.f_last_upper):
         return obj.get_full_name(last_name_first=False, last_name_upper=upper, abbrev_first_name=True)
     else:
-        raise ValueError('Invalid name format: {}'.format(name_format))
+        raise ValueError(f'Invalid name format: {name_format}')
 
 
 class User(PersonMixin, db.Model):
@@ -263,7 +262,7 @@ class User(PersonMixin, db.Model):
     signing_secret = db.Column(
         UUID,
         nullable=False,
-        default=lambda: six.text_type(uuid4())
+        default=lambda: str(uuid4())
     )
     #: the user profile picture
     picture = db.deferred(db.Column(
@@ -454,7 +453,7 @@ class User(PersonMixin, db.Model):
 
     @property
     def identifier(self):
-        return 'User:{}'.format(self.id)
+        return f'User:{self.id}'
 
     @property
     def as_avatar(self):
@@ -475,7 +474,7 @@ class User(PersonMixin, db.Model):
 
     @property
     def avatar_css(self):
-        return 'background-color: {};'.format(self.avatar_bg_color)
+        return f'background-color: {self.avatar_bg_color};'
 
     @property
     def external_identities(self):
@@ -603,7 +602,7 @@ class User(PersonMixin, db.Model):
 
     def get_full_name(self, *args, **kwargs):
         kwargs['_show_empty_names'] = True
-        return super(User, self).get_full_name(*args, **kwargs)
+        return super().get_full_name(*args, **kwargs)
 
     def make_email_primary(self, email):
         """Promote a secondary email address to the primary email address.
@@ -619,7 +618,7 @@ class User(PersonMixin, db.Model):
         db.session.flush()
 
     def reset_signing_secret(self):
-        self.signing_secret = six.text_type(uuid4())
+        self.signing_secret = str(uuid4())
 
     def synchronize_data(self, refresh=False):
         """Synchronize the fields of the user from the sync identity.

@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import unicode_literals
 
 import six
 from flask import current_app, request
@@ -21,7 +20,7 @@ class IndicoMultipass(Multipass):
     @property
     def default_local_auth_provider(self):
         """The default form-based auth provider."""
-        return next((p for p in six.itervalues(self.auth_providers) if not p.is_external and p.settings.get('default')),
+        return next((p for p in self.auth_providers.values() if not p.is_external and p.settings.get('default')),
                     None)
 
     @property
@@ -30,7 +29,7 @@ class IndicoMultipass(Multipass):
 
         This is the identity provider used to sync user data.
         """
-        return next((p for p in six.itervalues(self.identity_providers) if p.settings.get('synced_fields')), None)
+        return next((p for p in self.identity_providers.values() if p.settings.get('synced_fields')), None)
 
     @property
     def synced_fields(self):
@@ -48,13 +47,13 @@ class IndicoMultipass(Multipass):
         return synced_fields
 
     def init_app(self, app):
-        super(IndicoMultipass, self).init_app(app)
+        super().init_app(app)
         with app.app_context():
             self._check_default_provider()
 
     def _check_default_provider(self):
         # Ensure that there is maximum one sync provider
-        sync_providers = [p for p in six.itervalues(self.identity_providers) if p.settings.get('synced_fields')]
+        sync_providers = [p for p in self.identity_providers.values() if p.settings.get('synced_fields')]
         if len(sync_providers) > 1:
             raise ValueError('There can only be one sync provider.')
         # Ensure that there is exactly one form-based default auth provider
@@ -85,7 +84,7 @@ class IndicoMultipass(Multipass):
                 fn = logger.debug
             fn('Authentication via %s failed: %s (%r)', exc.provider.name if exc.provider else None, exc_str,
                exc.details)
-        return super(IndicoMultipass, self).handle_auth_error(exc, redirect_to_login=redirect_to_login)
+        return super().handle_auth_error(exc, redirect_to_login=redirect_to_login)
 
 
 multipass = IndicoMultipass()

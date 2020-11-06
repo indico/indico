@@ -13,7 +13,7 @@ from indico.core.errors import IndicoError
 from indico.core.logger import Logger
 
 
-class Serializer(object):
+class Serializer:
     __public__ = []
 
     def to_serializable(self, attr='__public__', converters=None):
@@ -35,15 +35,15 @@ class Serializer(object):
                 elif isinstance(v, list):
                     v = [e.to_serializable() for e in v]
                 elif isinstance(v, dict):
-                    v = dict((k, vv.to_serializable() if isinstance(vv, Serializer) else vv)
-                             for k, vv in six.iteritems(v))
+                    v = {k: vv.to_serializable() if isinstance(vv, Serializer) else vv
+                             for k, vv in v.items()}
                 elif isinstance(v, Enum):
                     v = v.name
                 if type(v) in converters:
                     v = converters[type(v)](v)
                 serializable[name] = v
             except Exception:
-                msg = 'Could not retrieve {}.{}.'.format(self.__class__.__name__, k)
-                Logger.get('Serializer{}'.format(self.__class__.__name__)).exception(msg)
+                msg = f'Could not retrieve {self.__class__.__name__}.{k}.'
+                Logger.get(f'Serializer{self.__class__.__name__}').exception(msg)
                 raise IndicoError(msg)
         return serializable

@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import unicode_literals
 
 import six
 from markupsafe import Markup
@@ -102,5 +101,5 @@ class FieldPlaceholder(ParametrizedPlaceholder):
             if field.personal_data_type in own_placeholder_types:
                 continue
             for key, description in field.field_impl.iter_placeholder_info():
-                name = six.text_type(field.id) if key is None else '{}:{}'.format(field.id, key)
+                name = str(field.id) if key is None else f'{field.id}:{key}'
                 yield name, description

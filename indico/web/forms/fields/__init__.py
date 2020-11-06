@@ -9,7 +9,6 @@
 # skipping just a single import is not enough as it does not prevent
 # isort from moving imports before the skipped line
 
-from __future__ import absolute_import, unicode_literals
 
 # XXX: keep `simple` on top; other modules may need fields from there (especially JSONField)
 from .simple import (EmailListField, HiddenFieldList, IndicoEmailRecipientsField, IndicoPasswordField, IndicoRadioField,

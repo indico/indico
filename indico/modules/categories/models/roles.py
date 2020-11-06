@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import unicode_literals
 
 from indico.core.db import db
 from indico.core.db.sqlalchemy.principals import PrincipalType
@@ -90,7 +89,7 @@ class CategoryRole(db.Model):
 
     @property
     def identifier(self):
-        return 'CategoryRole:{}'.format(self.id)
+        return f'CategoryRole:{self.id}'
 
     @property
     def css(self):

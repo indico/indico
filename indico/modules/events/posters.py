@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import division, unicode_literals
 
 from collections import namedtuple
 
@@ -23,7 +22,7 @@ ConfigData = namedtuple('ConfigData', ['margin_horizontal', 'margin_vertical', '
 class PosterPDF(DesignerPDFBase):
 
     def __init__(self, template, config, event):
-        super(PosterPDF, self).__init__(template, config)
+        super().__init__(template, config)
         self.event = event
 
     def _build_config(self, config_data):

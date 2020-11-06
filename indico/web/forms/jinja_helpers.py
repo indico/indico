@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import unicode_literals
 
 import json
 
@@ -112,5 +111,4 @@ def iter_form_fields(form, fields=None, skip=None, hidden_fields=False):
         field_iter = (field for field in field_iter if field.short_name not in skip)
     if hidden_fields is not None:
         field_iter = (field for field in field_iter if isinstance(field.widget, HiddenInput) == hidden_fields)
-    for field in field_iter:
-        yield field
+    yield from field_iter

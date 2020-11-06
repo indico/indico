@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import unicode_literals
 
 from indico.modules.events.models.persons import EventPerson
 from indico.modules.users import User
@@ -57,4 +56,4 @@ def get_event_person(event, data, create_untrusted_persons=False, allow_external
     elif person_type == 'PersonLink':
         return event.persons.filter_by(id=data['personId']).one()
     else:
-        raise ValueError("Unknown person type '{}'".format(person_type))
+        raise ValueError(f"Unknown person type '{person_type}'")

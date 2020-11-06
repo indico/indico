@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import unicode_literals
 
 from operator import attrgetter
 
@@ -39,7 +38,7 @@ class RHGroups(RHAdminBase):
     def _process(self):
         query = LocalGroup.query.options(joinedload(LocalGroup.members)).order_by(db.func.lower(LocalGroup.name))
         groups = [g.proxy for g in query]
-        providers = [p for p in six.itervalues(multipass.identity_providers) if p.supports_groups]
+        providers = [p for p in multipass.identity_providers.values() if p.supports_groups]
         form = SearchForm(obj=FormDefaults(exact=True))
         groups_enabled = True
         if not providers and not config.LOCAL_GROUPS:
@@ -57,7 +56,7 @@ class RHGroups(RHAdminBase):
             search_providers = None if not providers or not form.provider.data else {form.provider.data}
             search_results = GroupProxy.search(form.name.data, exact=form.exact.data, providers=search_providers)
             search_results.sort(key=attrgetter('provider', 'name'))
-        provider_titles = {p.name: p.title for p in six.itervalues(multipass.identity_providers)}
+        provider_titles = {p.name: p.title for p in multipass.identity_providers.values()}
         provider_titles[None] = _('Local')
         return WPGroupsAdmin.render_template('groups.html', groups=groups, providers=providers, form=form,
                                              search_results=search_results, provider_titles=provider_titles,

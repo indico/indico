@@ -23,18 +23,18 @@ from indico.util.i18n import _, babel, gettext_context, make_bound_gettext, nget
 
 DICTIONARIES = {
     'fr_FR': {
-        'This is not a string': u"Ceci n'est pas une cha\u00cene"
+        'This is not a string': "Ceci n'est pas une cha\u00cene"
     },
 
     'fr_MP': {
-        'Fetch the cow': u'Fetchez la vache',
-        'The wheels': u'Les wheels',
-        ('{} cow', 0): u'{} vache',
-        ('{} cow', 1): u'{} vaches',
+        'Fetch the cow': 'Fetchez la vache',
+        'The wheels': 'Les wheels',
+        ('{} cow', 0): '{} vache',
+        ('{} cow', 1): '{} vaches',
     },
 
     'en_PI': {
-        'I need a drink.': u"I be needin' a bottle of rhum!"
+        'I need a drink.': "I be needin' a bottle of rhum!"
     }
 }
 
@@ -46,7 +46,7 @@ class MockTranslations(Translations):
     """
 
     def __init__(self):
-        super(MockTranslations, self).__init__()
+        super().__init__()
         self._catalog = DICTIONARIES[babel.locale_selector_func()]
 
 
@@ -68,18 +68,18 @@ def mock_translations(monkeypatch, request_context):
 def test_straight_translation():
     session.lang = 'fr_MP'  # 'Monty Python' French
 
-    a = _(u'Fetch the cow')
-    b = _(u'The wheels')
+    a = _('Fetch the cow')
+    b = _('The wheels')
 
-    assert isinstance(a, six.text_type)
-    assert isinstance(b, six.text_type)
+    assert isinstance(a, str)
+    assert isinstance(b, str)
 
 
 @pytest.mark.usefixtures('mock_translations')
 def test_lazy_translation(monkeypatch):
     monkeypatch.setattr('indico.util.i18n.has_request_context', lambda: False)
-    a = _(u'Fetch the cow')
-    b = _(u'The wheels')
+    a = _('Fetch the cow')
+    b = _('The wheels')
     monkeypatch.setattr('indico.util.i18n.has_request_context', lambda: True)
 
     assert isinstance(a, _LazyString)
@@ -87,23 +87,23 @@ def test_lazy_translation(monkeypatch):
 
     session.lang = 'fr_MP'
 
-    assert six.text_type(a) == u'Fetchez la vache'
-    assert six.text_type(b) == u'Les wheels'
+    assert str(a) == 'Fetchez la vache'
+    assert str(b) == 'Les wheels'
 
 
 @pytest.mark.usefixtures('mock_translations')
 def test_ngettext():
     session.lang = 'fr_MP'
 
-    assert ngettext(u'{} cow', u'{} cows', 1).format(1) == u'1 vache'
-    assert ungettext(u'{} cow', u'{} cows', 42).format(42) == u'42 vaches'
+    assert ngettext('{} cow', '{} cows', 1).format(1) == '1 vache'
+    assert ungettext('{} cow', '{} cows', 42).format(42) == '42 vaches'
 
 
 @pytest.mark.usefixtures('mock_translations')
 def test_translate_bytes():
     session.lang = 'fr_MP'
 
-    assert _(u'Fetch the cow') == u'Fetchez la vache'
+    assert _('Fetch the cow') == 'Fetchez la vache'
     assert _('The wheels') == 'Les wheels'
 
 
@@ -112,7 +112,7 @@ def test_context_manager():
     session.lang = 'fr_MP'
     with session_language('en_PI'):
         assert session.lang == 'en_PI'
-        assert _(u'I need a drink.') == u"I be needin' a bottle of rhum!"
+        assert _('I need a drink.') == "I be needin' a bottle of rhum!"
 
     assert session.lang == 'fr_MP'
 
@@ -157,12 +157,12 @@ def test_translation_plugins(app, tmpdir):
 
     gettext_plugin = make_bound_gettext('dummy')
 
-    assert _(u'This is not a string') == french_core_str
-    assert gettext_context(u"This is not a string") == french_core_str
-    assert isinstance(gettext_context(u"This is not a string"), six.text_type)
-    assert gettext_plugin(u"This is not a string") == french_plugin_str
+    assert _('This is not a string') == french_core_str
+    assert gettext_context("This is not a string") == french_core_str
+    assert isinstance(gettext_context("This is not a string"), str)
+    assert gettext_plugin("This is not a string") == french_plugin_str
 
     with plugin.plugin_context():
-        assert _(u'This is not a string') == french_core_str
-        assert gettext_context(u"This is not a string") == french_plugin_str
-        assert gettext_plugin(u"This is not a string") == french_plugin_str
+        assert _('This is not a string') == french_core_str
+        assert gettext_context("This is not a string") == french_plugin_str
+        assert gettext_plugin("This is not a string") == french_plugin_str

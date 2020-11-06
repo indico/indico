@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import unicode_literals
 
 from sqlalchemy.event import listens_for
 from sqlalchemy.ext.declarative import declared_attr
@@ -14,7 +13,7 @@ from indico.core.db import db
 from indico.util.decorators import strict_classproperty
 
 
-class LocationMixin(object):
+class LocationMixin:
     """Mixin to store location information in a model.
 
     A location in this context can be either a reference to a room in

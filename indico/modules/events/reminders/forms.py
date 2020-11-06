@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import unicode_literals
 
 from wtforms.fields import BooleanField, SelectField, TextAreaField
 from wtforms.validators import DataRequired, ValidationError
@@ -48,7 +47,7 @@ class ReminderForm(IndicoForm):
     def __init__(self, *args, **kwargs):
         self.event = kwargs.pop('event')
         self.timezone = self.event.timezone
-        super(ReminderForm, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self.reply_to_address.choices = (list(self.event
                                          .get_allowed_sender_emails(extra=self.reply_to_address.object_data).items()))
         if self.event.type_ == EventType.lecture:

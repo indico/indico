@@ -16,10 +16,10 @@ from indico.modules.events.views import WPConferenceDisplay, WPSimpleEventDispla
 
 class WPStaticEventBase:
     def _get_header(self):
-        return u""
+        return ""
 
     def _get_footer(self):
-        return u""
+        return ""
 
 
 class WPStaticSimpleEventDisplay(WPStaticEventBase, WPSimpleEventDisplay):

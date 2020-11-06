@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import unicode_literals
 
 import json
 
@@ -29,7 +28,7 @@ class PaperEmailSettingsField(JSONField):
         if valuelist:
             self.data = json.loads(valuelist[0])
             data = {}
-            for key, value in six.iteritems(self.data):
+            for key, value in self.data.items():
                 data[key] = RoleConverter.to_python(value) if isinstance(value, list) else value
             self.data = data
 

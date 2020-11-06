@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import unicode_literals
 
 from wtforms.fields import BooleanField, StringField, TextAreaField
 from wtforms.validators import DataRequired, Optional
@@ -47,7 +46,7 @@ class ContribField(BaseField):
     common_settings = ('title', 'description', 'is_required', 'is_active', 'visibility', 'is_user_editable')
 
     def __init__(self, obj, management=True):
-        super(ContribField, self).__init__(obj)
+        super().__init__(obj)
         self.management = management
 
     @property

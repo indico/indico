@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import unicode_literals
 
 from copy import deepcopy
 
@@ -15,7 +14,7 @@ from wtforms.validators import DataRequired, Optional
 from indico.modules.events.registration.models.registrations import RegistrationData
 
 
-class RegistrationFormFieldBase(object):
+class RegistrationFormFieldBase:
     """Base class for a registration form field definition."""
 
     #: unique name of the field type
@@ -106,8 +105,8 @@ class RegistrationFormFieldBase(object):
         data = dict(data)
         if 'places_limit' in data:
             data['places_limit'] = int(data['places_limit']) if data['places_limit'] else 0
-        versioned_data = {k: v for k, v in six.iteritems(data) if k in cls.versioned_data_fields}
-        unversioned_data = {k: v for k, v in six.iteritems(data) if k not in cls.versioned_data_fields}
+        versioned_data = {k: v for k, v in data.items() if k in cls.versioned_data_fields}
+        unversioned_data = {k: v for k, v in data.items() if k not in cls.versioned_data_fields}
         return unversioned_data, versioned_data
 
     @classmethod
@@ -127,7 +126,7 @@ class RegistrationFormFieldBase(object):
         return registration_data.data
 
     def iter_placeholder_info(self):
-        yield None, 'Value of "{}" ({})'.format(self.form_item.title, self.form_item.parent.title)
+        yield None, f'Value of "{self.form_item.title}" ({self.form_item.parent.title})'
 
     def render_placeholder(self, data, key=None):
         return self.get_friendly_data(data)
@@ -143,7 +142,7 @@ class RegistrationFormBillableField(RegistrationFormFieldBase):
         data = deepcopy(data)
         data.setdefault('is_billable', False)
         data['price'] = float(data['price']) if data.get('price') else 0
-        return super(RegistrationFormBillableField, cls).process_field_data(data, old_data, old_versioned_data)
+        return super().process_field_data(data, old_data, old_versioned_data)
 
     def calculate_price(self, reg_data, versioned_data):
         return versioned_data.get('price', 0) if versioned_data.get('is_billable') else 0
@@ -153,13 +152,13 @@ class RegistrationFormBillableField(RegistrationFormFieldBase):
             new_data_version = self.form_item.current_data
         if billable_items_locked and old_data.price != self.calculate_price(value, new_data_version.versioned_data):
             return {}
-        return super(RegistrationFormBillableField, self).process_form_data(registration, value, old_data)
+        return super().process_form_data(registration, value, old_data)
 
 
 class RegistrationFormBillableItemsField(RegistrationFormBillableField):
     @classmethod
     def process_field_data(cls, data, old_data=None, old_versioned_data=None):
-        unversioned_data, versioned_data = super(RegistrationFormBillableItemsField, cls).process_field_data(
+        unversioned_data, versioned_data = super().process_field_data(
             data, old_data, old_versioned_data)
         # we don't have field-level billing data here
         del versioned_data['is_billable']

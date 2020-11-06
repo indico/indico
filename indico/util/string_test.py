@@ -59,14 +59,14 @@ def test_slugify_maxlen():
 
 def test_slugify_args():
     assert slugify('foo', 123, 'bar') == 'foo-123-bar'
-    assert slugify('m\xf6p', 123, u'b\xe4r') == 'moep-123-baer'
+    assert slugify('m\xf6p', 123, 'b\xe4r') == 'moep-123-baer'
 
 
 @pytest.mark.parametrize(('input', 'lower', 'output'), (
     ('Test', True, 'test'),
     ('Test', False, 'Test'),
-    (u'm\xd6p', False, 'mOep'),
-    (u'm\xd6p', True, 'moep')
+    ('m\xd6p', False, 'mOep'),
+    ('m\xd6p', True, 'moep')
 ))
 def test_slugify_lower(input, lower, output):
     assert slugify(input, lower=lower) == output
@@ -97,11 +97,11 @@ def test_text_to_repr(input, html, max_length, output):
     (('id',), {'flag1': True, 'flag0': False}, '<Foo(1)>'),
     (('id',), {'flag1': False, 'flag0': False}, '<Foo(1, flag1=True)>'),
     (('id',), {'flag1': False, 'flag0': True}, '<Foo(1, flag0=False, flag1=True)>'),
-    (('id',), {'flag1': False, 'flag0': True, '_text': u'moo'}, '<Foo(1, flag0=False, flag1=True): "moo">')
+    (('id',), {'flag1': False, 'flag0': True, '_text': 'moo'}, '<Foo(1, flag0=False, flag1=True): "moo">')
 
 ))
 def test_format_repr(args, kwargs, output):
-    class Foo(object):
+    class Foo:
         def __init__(self, **kwargs):
             self.__dict__.update(kwargs)
 
@@ -157,7 +157,7 @@ def test_snakify_keys():
 
 def test_crc32():
     assert crc32('m\xf6p') == 2575016153
-    assert crc32('m\xf6p'.encode('utf-8')) == 2575016153
+    assert crc32('m\xf6p'.encode()) == 2575016153
     assert crc32(b'') == 0
     assert crc32(b'hello world\0\1\2\3\4') == 140159631
 
@@ -192,7 +192,7 @@ def test_sanitize_email(input, output):
     ('Simple text', 'Simple text'),
     ('<h1>Some html</h1>', 'Some html'),
     ('foo &amp; bar <a href="test">xxx</a> 1<2 <test>', 'foo & bar xxx 1<2 '),
-    (u'<strong>m\xf6p</strong> test', u'm\xf6p test')
+    ('<strong>m\xf6p</strong> test', 'm\xf6p test')
 ))
 def test_html_to_plaintext(input, output):
     assert html_to_plaintext(input) == output

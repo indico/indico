@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import unicode_literals
 
 from collections import OrderedDict
 from contextlib import contextmanager
@@ -16,7 +15,6 @@ import pytz
 import six
 from flask import has_request_context, render_template, session
 from markupsafe import Markup
-from six.moves import range
 from sqlalchemy import DDL, orm
 from sqlalchemy.dialects.postgresql import ARRAY, JSONB
 from sqlalchemy.event import listens_for
@@ -743,10 +741,10 @@ class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionMan
         """
         title = self.title
         if show_speakers and self.person_links:
-            speakers = ', '.join(sorted([pl.full_name for pl in self.person_links], key=six.text_type.lower))
-            title = '{}, "{}"'.format(speakers, title)
+            speakers = ', '.join(sorted([pl.full_name for pl in self.person_links], key=str.lower))
+            title = f'{speakers}, "{title}"'
         if show_series_pos and self.series and self.series.show_sequence_in_title:
-            title = '{} ({}/{})'.format(title, self.series_pos, self.series_count)
+            title = f'{title} ({self.series_pos}/{self.series_count})'
         return title
 
     def get_label_markup(self, size=''):
@@ -832,7 +830,7 @@ class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionMan
             emails.setdefault(extra, extra)
         # Sanitize and format emails
         emails = {to_unicode(email.strip().lower()): '{} <{}>'.format(to_unicode(name), to_unicode(email))
-                  for email, name in six.iteritems(emails)
+                  for email, name in emails.items()
                   if email and email.strip()}
         own_email = session.user.email if has_request_context() and session.user else None
         return OrderedDict(sorted(list(emails.items()), key=lambda x: (x[0] != own_email, x[1].lower())))

@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import unicode_literals
 
 from datetime import time
 from itertools import groupby
@@ -54,7 +53,7 @@ def make_review_form(event):
     """
     form_class = type('_AbstractReviewForm', (AbstractReviewForm,), {})
     for question in event.abstract_review_questions:
-        name = 'question_{}'.format(question.id)
+        name = f'question_{question.id}'
         setattr(form_class, name, question.field.create_wtf_field())
     return form_class
 
@@ -69,13 +68,13 @@ def build_review_form(abstract=None, track=None, review=None):
     review_for_track = reviews_for_track[0] if reviews_for_track else None
 
     if review_for_track:
-        answers = {'question_{}'.format(rating.question.id): rating.value
+        answers = {f'question_{rating.question.id}': rating.value
                    for rating in review_for_track.ratings}
         defaults = FormDefaults(obj=review_for_track, **answers)
     else:
         defaults = FormDefaults()
 
-    return review_form_class(prefix='track-{}'.format(track.id), obj=defaults, abstract=abstract,
+    return review_form_class(prefix=f'track-{track.id}', obj=defaults, abstract=abstract,
                              edit=review is not None)
 
 
@@ -142,7 +141,7 @@ class AbstractSubmissionSettingsForm(IndicoForm):
 
     def __init__(self, *args, **kwargs):
         self.event = kwargs.pop('event')
-        super(AbstractSubmissionSettingsForm, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
     def validate_contrib_type_required(self, field):
         if field.data and not self.event.contribution_types.count():
@@ -177,7 +176,7 @@ class AbstractReviewingSettingsForm(IndicoForm):
     def __init__(self, *args, **kwargs):
         self.event = kwargs.pop('event')
         self.has_ratings = kwargs.pop('has_ratings', False)
-        super(AbstractReviewingSettingsForm, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         if self.has_ratings:
             self.scale_upper.warning = _("Some reviewers have already submitted ratings so the scale cannot be changed "
                                          "anymore.")
@@ -194,7 +193,7 @@ class AbstractReviewingSettingsForm(IndicoForm):
 
     @property
     def data(self):
-        data = super(AbstractReviewingSettingsForm, self).data
+        data = super().data
         if self.has_ratings:
             for key in self.RATING_FIELDS:
                 del data[key]
@@ -235,7 +234,7 @@ class AbstractJudgmentFormBase(IndicoForm):
     send_notifications = BooleanField(_("Send notifications to submitter"), default=True)
 
     def __init__(self, *args, **kwargs):
-        super(AbstractJudgmentFormBase, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self.session.query = Session.query.with_parent(self.event).order_by(Session.title)
         if not self.session.query.count():
             del self.session
@@ -277,7 +276,7 @@ class AbstractJudgmentForm(AbstractJudgmentFormBase):
             kwargs.setdefault('accepted_contrib_type', candidate_contrib_types[0])
         elif not abstract.reviews:
             kwargs.setdefault('accepted_contrib_type', abstract.submitted_contrib_type)
-        super(AbstractJudgmentForm, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self.duplicate_of.excluded_abstract_ids = {abstract.id}
         self.merged_into.excluded_abstract_ids = {abstract.id}
 
@@ -308,7 +307,7 @@ class AbstractReviewForm(IndicoForm):
 
     def __init__(self, edit=False, *args, **kwargs):
         abstract = kwargs.pop('abstract')
-        super(AbstractReviewForm, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self.event = abstract.event
         if not edit:
             self.proposed_action.none = _("Propose an action...")
@@ -333,8 +332,8 @@ class AbstractReviewForm(IndicoForm):
     @property
     def split_data(self):
         data = self.data
-        return {'questions_data': {k: v for k, v in six.iteritems(data) if k.startswith('question_')},
-                'review_data': {k: v for k, v in six.iteritems(data) if not k.startswith('question_')}}
+        return {'questions_data': {k: v for k, v in data.items() if k.startswith('question_')},
+                'review_data': {k: v for k, v in data.items() if not k.startswith('question_')}}
 
     @property
     def has_questions(self):
@@ -354,7 +353,7 @@ class BulkAbstractJudgmentForm(AbstractJudgmentFormBase):
 
     def __init__(self, *args, **kwargs):
         self.event = kwargs.pop('event')
-        super(BulkAbstractJudgmentForm, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         if self.accepted_track:
             self.accepted_track.description = _("The abstracts will be accepted in this track")
         if self.accepted_contrib_type:
@@ -384,7 +383,7 @@ class BulkAbstractJudgmentForm(AbstractJudgmentFormBase):
                 delattr(self, field.name)
 
     def is_submitted(self):
-        return super(BulkAbstractJudgmentForm, self).is_submitted() and 'submitted' in request.form
+        return super().is_submitted() and 'submitted' in request.form
 
     @classmethod
     def _add_contrib_type_hidden_unless(cls):
@@ -406,7 +405,7 @@ class AbstractReviewingRolesForm(IndicoForm):
 
     def __init__(self, *args, **kwargs):
         self.event = kwargs.pop('event')
-        super(AbstractReviewingRolesForm, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self.roles.event = self.event
         self.roles.tracks = self.event.tracks
 
@@ -419,11 +418,11 @@ class EditEmailTemplateRuleForm(IndicoForm):
 
     def __init__(self, *args, **kwargs):
         self.event = kwargs.pop('event')
-        super(EditEmailTemplateRuleForm, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self.rules.event = self.event
 
     def validate_rules(self, field):
-        dedup_data = {tuple((k, tuple(v)) for k, v in six.viewitems(r)) for r in field.data}
+        dedup_data = {tuple((k, tuple(v)) for k, v in r.items()) for r in field.data}
         if len(field.data) != len(dedup_data):
             raise ValidationError(_("There is a duplicate rule"))
 
@@ -441,7 +440,7 @@ class EditEmailTemplateTextForm(IndicoForm):
 
     def __init__(self, *args, **kwargs):
         self.event = kwargs.pop('event')
-        super(EditEmailTemplateTextForm, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self.reply_to_address.choices = (list(self.event
                                          .get_allowed_sender_emails(extra=self.reply_to_address.object_data).items()))
         self.body.description = render_placeholder_info('abstract-notification-email', event=self.event)
@@ -482,7 +481,7 @@ class AbstractForm(IndicoForm):
             inject_validators(self, 'person_links', [DataRequired()])
         if abstracts_settings.get(self.event, 'contrib_type_required'):
             inject_validators(self, 'submitted_contrib_type', [DataRequired()])
-        super(AbstractForm, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         if management:
             self.submitted_contrib_type.query = (self.event.contribution_types
                                                  .order_by(db.func.lower(ContributionType.name)))
@@ -517,10 +516,10 @@ class AbstractForm(IndicoForm):
         return validators
 
 
-class NoTrackMixin(object):
+class NoTrackMixin:
     def __init__(self, *args, **kwargs):
         self.track_field_disabled = True
-        super(NoTrackMixin, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
 
 class _SingleChoiceQuerySelectMultipleField(IndicoQuerySelectMultipleField):
@@ -530,8 +529,7 @@ class _SingleChoiceQuerySelectMultipleField(IndicoQuerySelectMultipleField):
 
     def iter_choices(self):
         yield ('__None', self.blank_text, self.data is None)
-        for choice in super(_SingleChoiceQuerySelectMultipleField, self).iter_choices():
-            yield choice
+        yield from super().iter_choices()
 
     def process_formdata(self, valuelist):
         # remove "no value" indicator. QuerySelectMultipleField validation
@@ -540,7 +538,7 @@ class _SingleChoiceQuerySelectMultipleField(IndicoQuerySelectMultipleField):
         valuelist = list(set(valuelist) - {'__None'})
         if len(valuelist) > 1:
             raise ValueError('Received more than one value')
-        super(_SingleChoiceQuerySelectMultipleField, self).process_formdata(valuelist)
+        super().process_formdata(valuelist)
 
 
 class _SingleChoiceQuerySelectMultipleFieldGrouped(_SingleChoiceQuerySelectMultipleField):
@@ -548,7 +546,7 @@ class _SingleChoiceQuerySelectMultipleFieldGrouped(_SingleChoiceQuerySelectMulti
 
     def __init__(self, *args, **kwargs):
         self.get_group = kwargs.pop('get_group', lambda x: x)
-        super(_SingleChoiceQuerySelectMultipleFieldGrouped, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
     def get_grouped_choices(self):
         return groupby(list(self.iter_choices()), key=lambda x: x[3:])  # group by (group, group label)
@@ -560,7 +558,7 @@ class _SingleChoiceQuerySelectMultipleFieldGrouped(_SingleChoiceQuerySelectMulti
                    self.get_label(self.get_group(obj)) if self.get_group(obj) else None)
 
 
-class SingleTrackMixin(object):
+class SingleTrackMixin:
     submitted_for_tracks = _SingleChoiceQuerySelectMultipleFieldGrouped(_("Track"), get_label='title',
                                                                         collection_class=set,
                                                                         get_group=lambda obj: obj.track_group)
@@ -571,7 +569,7 @@ class SingleTrackMixin(object):
                                      kwargs['abstract'].edit_track_mode != EditTrackMode.both)
         if abstracts_settings.get(event, 'tracks_required') and not self.track_field_disabled:
             inject_validators(self, 'submitted_for_tracks', [DataRequired()])
-        super(SingleTrackMixin, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         if not abstracts_settings.get(event, 'tracks_required'):
             self.submitted_for_tracks.blank_text = _('No track selected')
         self.submitted_for_tracks.query = Track.query.with_parent(event).order_by(Track.position)
@@ -582,7 +580,7 @@ class _MultiChoiceQuerySelectMultipleFieldGrouped(IndicoQuerySelectMultipleField
 
     def __init__(self, *args, **kwargs):
         self.get_group = kwargs.pop('get_group', lambda x: x)
-        super(_MultiChoiceQuerySelectMultipleFieldGrouped, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
     def get_grouped_choices(self):
         return groupby(list(self.iter_choices()), key=lambda x: x[3:])  # group by (group, group label)
@@ -593,7 +591,7 @@ class _MultiChoiceQuerySelectMultipleFieldGrouped(IndicoQuerySelectMultipleField
                    self.get_label(self.get_group(obj)) if self.get_group(obj) else None)
 
 
-class MultiTrackMixin(object):
+class MultiTrackMixin:
     submitted_for_tracks = _MultiChoiceQuerySelectMultipleFieldGrouped(_("Tracks"), get_label='title',
                                                                        collection_class=set,
                                                                        get_group=lambda obj: obj.track_group)
@@ -604,15 +602,15 @@ class MultiTrackMixin(object):
                                      kwargs['abstract'].edit_track_mode != EditTrackMode.both)
         if abstracts_settings.get(event, 'tracks_required') and not self.track_field_disabled:
             inject_validators(self, 'submitted_for_tracks', [DataRequired()])
-        super(MultiTrackMixin, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self.submitted_for_tracks.query = Track.query.with_parent(event).order_by(Track.position)
 
 
-class SendNotificationsMixin(object):
+class SendNotificationsMixin:
     send_notifications = BooleanField(_("Send email notifications"), default=True)
 
 
-class InvitedAbstractMixin(object):
+class InvitedAbstractMixin:
     users_with_no_account = IndicoRadioField(_('Type of user'), [DataRequired()], default='existing',
                                              choices=(('existing', _('Existing user')),
                                                       ('new', _('New user'))))
@@ -627,7 +625,7 @@ class InvitedAbstractMixin(object):
 
     def __init__(self, *args, **kwargs):
         self.event = kwargs['event']
-        super(InvitedAbstractMixin, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
     def validate_email(self, field):
         if get_user_by_email(field.data):
@@ -639,7 +637,7 @@ class InvitedAbstractMixin(object):
             raise ValidationError(_('You have to create an "Invited" abstract notification template in order to '
                                     'be able to create invited abstracts.'))
         else:
-            return super(InvitedAbstractMixin, self).validate()
+            return super().validate()
 
 
 class AbstractsScheduleForm(IndicoForm):
@@ -654,7 +652,7 @@ class AbstractsScheduleForm(IndicoForm):
 
     def __init__(self, *args, **kwargs):
         self.event = kwargs.pop('event')
-        super(AbstractsScheduleForm, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
 
 class AbstractCommentForm(IndicoForm):
@@ -667,7 +665,7 @@ class AbstractCommentForm(IndicoForm):
         comment = kwargs.get('obj')
         user = comment.user if comment else kwargs.pop('user')
         abstract = kwargs.pop('abstract')
-        super(AbstractCommentForm, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         if not abstract.event.cfa.allow_contributors_in_comments:
             self.visibility.skip.add(AbstractCommentVisibility.contributors)
         if not abstract.can_judge(user) and not abstract.can_convene(user):
@@ -683,5 +681,5 @@ class AbstractReviewedForTracksForm(IndicoForm):
 
     def __init__(self, *args, **kwargs):
         event = kwargs.pop('event')
-        super(AbstractReviewedForTracksForm, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self.reviewed_for_tracks.query = Track.query.with_parent(event).order_by(Track.position)

@@ -5,10 +5,10 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import unicode_literals
+
+from unittest.mock import MagicMock
 
 import pytest
-from mock import MagicMock
 
 from indico.web.flask.templating import dedent, get_overridable_template_name, markdown, underline
 
@@ -53,4 +53,4 @@ def test_get_overridable_template_name(core_prefix, plugin_prefix):
     tpl = get_overridable_template_name(name, None, core_prefix=core_prefix, plugin_prefix=plugin_prefix)
     assert tpl == core_prefix + name
     tpl = get_overridable_template_name(name, plugin, core_prefix=core_prefix, plugin_prefix=plugin_prefix)
-    assert tpl == ['{}:{}{}'.format(plugin.name, plugin_prefix, name), core_prefix + name]
+    assert tpl == [f'{plugin.name}:{plugin_prefix}{name}', core_prefix + name]

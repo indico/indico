@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import unicode_literals
 
 from sqlalchemy.ext.declarative import declared_attr
 
@@ -55,7 +54,7 @@ class LocalGroup(db.Model):
     # - in_track_acls (TrackPrincipal.local_group)
 
     def __repr__(self):
-        return '<LocalGroup({}, {})>'.format(self.id, self.name)
+        return f'<LocalGroup({self.id}, {self.name})>'
 
     @property
     def proxy(self):

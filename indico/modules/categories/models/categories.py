@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import unicode_literals
 
 import pytz
 from sqlalchemy import DDL, orm
@@ -74,7 +73,7 @@ class Category(SearchableTitleMixin, DescriptionMixin, ProtectionManagersMixin, 
                 db.CheckConstraint("(logo IS NULL) = (logo_metadata::text = 'null')", 'valid_logo'),
                 db.CheckConstraint("(parent_id IS NULL) = (id = 0)", 'valid_parent'),
                 db.CheckConstraint("(id != 0) OR NOT is_deleted", 'root_not_deleted'),
-                db.CheckConstraint("(id != 0) OR (protection_mode != {})".format(ProtectionMode.inheriting),
+                db.CheckConstraint(f"(id != 0) OR (protection_mode != {ProtectionMode.inheriting})",
                                    'root_not_inheriting'),
                 db.CheckConstraint('visibility IS NULL OR visibility > 0', 'valid_visibility'),
                 {'schema': 'categories'})

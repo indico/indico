@@ -5,10 +5,8 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import unicode_literals
 
 import six
-from six.moves import map
 
 from indico.core.settings.converters import EnumConverter
 from indico.modules.designer import PageOrientation, PageSize
@@ -45,7 +43,7 @@ class RegistrationSettingsProxy(EventSettingsProxy):
         else:
             try:
                 # The int values are automatically converted to unicode when saved as JSON
-                form_columns = self.get(event, 'participant_list_form_columns')[six.text_type(form.id)]
+                form_columns = self.get(event, 'participant_list_form_columns')[str(form.id)]
                 return list(map(int, form_columns))
             except (ValueError, KeyError):
                 # No settings for this form, default to the ones for the merged form
@@ -64,9 +62,9 @@ class RegistrationSettingsProxy(EventSettingsProxy):
                 # The int values are automatically converted to unicode when saved
                 # as JSON. Do it explicitely so that it keeps working if the
                 # behavior changes and makes sense with the code above.
-                form_columns[six.text_type(form.id)] = columns
+                form_columns[str(form.id)] = columns
             else:
-                form_columns.pop(six.text_type(form.id), None)
+                form_columns.pop(str(form.id), None)
             self.set(event, 'participant_list_form_columns', form_columns)
 
     def get_participant_list_form_ids(self, event):

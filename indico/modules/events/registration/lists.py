@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import unicode_literals
 
 from collections import OrderedDict
 
@@ -29,7 +28,7 @@ class RegistrationListGenerator(ListGeneratorBase):
     list_link_type = 'registration'
 
     def __init__(self, regform):
-        super(RegistrationListGenerator, self).__init__(regform.event, entry_parent=regform)
+        super().__init__(regform.event, entry_parent=regform)
         self.regform = regform
         self.default_list_config = {
             'items': ('title', 'email', 'affiliation', 'reg_date', 'state'),
@@ -92,7 +91,7 @@ class RegistrationListGenerator(ListGeneratorBase):
         result = []
         personal_data_field_ids = {x.personal_data_type: x.id for x in self.regform.form_items if x.is_field}
         for item_id in ids:
-            if isinstance(item_id, six.string_types):
+            if isinstance(item_id, str):
                 personal_data_type = PersonalDataType.get(item_id)
                 if personal_data_type:
                     item_id = personal_data_field_ids[personal_data_type]
@@ -117,10 +116,10 @@ class RegistrationListGenerator(ListGeneratorBase):
                 .all())
 
     def _get_filters_from_request(self):
-        filters = super(RegistrationListGenerator, self)._get_filters_from_request()
+        filters = super()._get_filters_from_request()
         for field in self.regform.form_items:
             if field.is_field and field.input_type in {'single_choice', 'multi_choice', 'country', 'bool', 'checkbox'}:
-                options = request.form.getlist('field_{}'.format(field.id))
+                options = request.form.getlist(f'field_{field.id}')
                 if options:
                     filters['fields'][str(field.id)] = options
         return filters
@@ -138,13 +137,13 @@ class RegistrationListGenerator(ListGeneratorBase):
         field_types = {str(f.id): f.field_impl for f in self.regform.form_items
                        if f.is_field and not f.is_deleted and (f.parent_id is None or not f.parent.is_deleted)}
         field_filters = {field_id: data_list
-                         for field_id, data_list in six.iteritems(filters['fields'])
+                         for field_id, data_list in filters['fields'].items()
                          if field_id in field_types}
         if not field_filters and not filters['items']:
             return query
         criteria = [db.and_(RegistrationFormFieldData.field_id == field_id,
                             field_types[field_id].create_sql_filter(data_list))
-                    for field_id, data_list in six.iteritems(field_filters)]
+                    for field_id, data_list in field_filters.items()]
         items_criteria = []
         if 'checked_in' in filters['items']:
             checked_in_values = filters['items']['checked_in']

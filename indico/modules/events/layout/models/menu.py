@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import unicode_literals
 
 import six
 from flask import g, session
@@ -37,10 +36,10 @@ class MenuEntryType(RichIntEnum):
     page = 5
 
 
-class MenuEntryMixin(object):
+class MenuEntryMixin:
     def __init__(self, **kwargs):
         event = kwargs.pop('event', kwargs.get('event'))
-        super(MenuEntryMixin, self).__init__(**kwargs)
+        super().__init__(**kwargs)
         # XXX: not calling this `event` since this one should NOT use
         # the relationship to avoid mixing data from different DB sessions
         # when updating/populating the menu (which happens in a separate
@@ -67,7 +66,7 @@ class MenuEntryMixin(object):
             return None
         elif self.is_internal_link:
             data = self.default_data
-            if data.static_site and isinstance(data.static_site, six.string_types) and g.get('static_site'):
+            if data.static_site and isinstance(data.static_site, str) and g.get('static_site'):
                 return data.static_site
             kwargs = dict(data.url_kwargs)
             if self.name == 'timetable':
@@ -173,7 +172,7 @@ class MenuEntryMixin(object):
 
 class TransientMenuEntry(MenuEntryMixin):
     def __init__(self, event, is_enabled, name, position, children):
-        super(TransientMenuEntry, self).__init__(event=event)
+        super().__init__(event=event)
         self.is_enabled = is_enabled
         self.title = None
         self.name = name

@@ -9,8 +9,6 @@
 
 from xml.sax import saxutils
 
-from six.moves import range
-
 from indico.legacy.common.utils import encodeUnicode
 from indico.util.string import encode_if_unicode
 

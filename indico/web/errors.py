@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import absolute_import, unicode_literals
 
 import traceback
 from uuid import uuid4
@@ -52,7 +51,7 @@ def _save_error(exc, title, message):
         return
     if not _is_error_reportable(exc):
         return
-    g.saved_error_uuid = uuid = six.text_type(uuid4())
+    g.saved_error_uuid = uuid = str(uuid4())
     # XXX: keep this outside - it must be called before `get_request_info()`
     # as that function may mess up `sys.exc_info()` in case accessing user
     # details fails
@@ -74,7 +73,7 @@ def _is_error_reporting_opted_out(code):
     if not header:
         return
     codes = header.split(',')
-    return six.text_type(code) in codes
+    return str(code) in codes
 
 
 def _is_error_reportable(exc):

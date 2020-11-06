@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import unicode_literals
 
 import six
 from flask import request, session
@@ -149,12 +148,12 @@ def _parse_review_args(event, review_type):
         elif question.field_type == 'bool':
             field_cls = fields.Bool
         else:
-            raise Exception('Invalid question field type: {}'.format(question.field_type))
-        args_schema['question_{}'.format(question.id)] = field_cls(**attrs)
+            raise Exception(f'Invalid question field type: {question.field_type}')
+        args_schema[f'question_{question.id}'] = field_cls(**attrs)
 
     data = parser.parse(args_schema)
-    questions_data = {k: v for k, v in six.iteritems(data) if k.startswith('question_')}
-    review_data = {k: v for k, v in six.iteritems(data) if not k.startswith('question_')}
+    questions_data = {k: v for k, v in data.items() if k.startswith('question_')}
+    review_data = {k: v for k, v in data.items() if not k.startswith('question_')}
     return questions_data, review_data
 
 

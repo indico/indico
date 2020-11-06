@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import unicode_literals
 
 from functools import wraps
 
@@ -50,7 +49,7 @@ def _get_folder_data(folder, for_attachment=False):
 
 def _get_attachment_data(attachment):
     data = _get_folder_data(attachment.folder, True)
-    data['Type'] = six.text_type(attachment.type.title)
+    data['Type'] = str(attachment.type.title)
     data['Title'] = attachment.title
     if attachment.type == AttachmentType.link:
         data['URL'] = attachment.link_url
@@ -68,37 +67,37 @@ def _log(event, kind, msg, user, data):
 @_ignore_non_loggable
 def _log_folder_created(folder, user, **kwargs):
     event = folder.object.event
-    _log(event, EventLogKind.positive, 'Created folder "{}"'.format(folder.title), user, _get_folder_data(folder))
+    _log(event, EventLogKind.positive, f'Created folder "{folder.title}"', user, _get_folder_data(folder))
 
 
 @_ignore_non_loggable
 def _log_folder_deleted(folder, user, **kwargs):
     event = folder.object.event
-    _log(event, EventLogKind.negative, 'Deleted folder "{}"'.format(folder.title), user, _get_folder_data(folder))
+    _log(event, EventLogKind.negative, f'Deleted folder "{folder.title}"', user, _get_folder_data(folder))
 
 
 @_ignore_non_loggable
 def _log_folder_updated(folder, user, **kwargs):
     event = folder.object.event
-    _log(event, EventLogKind.change, 'Updated folder "{}"'.format(folder.title), user, _get_folder_data(folder))
+    _log(event, EventLogKind.change, f'Updated folder "{folder.title}"', user, _get_folder_data(folder))
 
 
 @_ignore_non_loggable
 def _log_attachment_created(attachment, user, **kwargs):
     event = attachment.folder.object.event
-    _log(event, EventLogKind.positive, 'Added material "{}"'.format(attachment.title), user,
+    _log(event, EventLogKind.positive, f'Added material "{attachment.title}"', user,
          _get_attachment_data(attachment))
 
 
 @_ignore_non_loggable
 def _log_attachment_deleted(attachment, user, **kwargs):
     event = attachment.folder.object.event
-    _log(event, EventLogKind.negative, 'Deleted material "{}"'.format(attachment.title), user,
+    _log(event, EventLogKind.negative, f'Deleted material "{attachment.title}"', user,
          _get_attachment_data(attachment))
 
 
 @_ignore_non_loggable
 def _log_attachment_updated(attachment, user, **kwargs):
     event = attachment.folder.object.event
-    _log(event, EventLogKind.change, 'Updated material "{}"'.format(attachment.title), user,
+    _log(event, EventLogKind.change, f'Updated material "{attachment.title}"', user,
          _get_attachment_data(attachment))

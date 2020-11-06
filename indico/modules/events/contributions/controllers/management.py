@@ -5,14 +5,12 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import unicode_literals
 
 import uuid
 from operator import attrgetter
 
 import six
 from flask import flash, jsonify, redirect, request, session
-from six.moves import map
 from sqlalchemy.orm import undefer
 from werkzeug.exceptions import BadRequest, Forbidden, NotFound
 
@@ -195,7 +193,7 @@ class RHCreateContribution(RHManageContributionsBase):
 class RHEditContribution(RHManageContributionBase):
     def _process(self):
         contrib_form_class = make_contribution_form(self.event)
-        custom_field_values = {'custom_{}'.format(x.contribution_field_id): x.data for x in self.contrib.field_values}
+        custom_field_values = {f'custom_{x.contribution_field_id}': x.data for x in self.contrib.field_values}
         parent_session_block = (self.contrib.timetable_entry.parent.session_block
                                 if (self.contrib.timetable_entry and self.contrib.timetable_entry.parent) else None)
         form = contrib_form_class(obj=FormDefaults(self.contrib, start_date=self.contrib.start_dt,
@@ -251,7 +249,7 @@ class RHContributionREST(RHManageContributionBase):
     def _process_PATCH(self):
         data = request.json
         updates = {}
-        if set(six.viewkeys(data)) > {'session_id', 'track_id'}:
+        if set(data.keys()) > {'session_id', 'track_id'}:
             raise BadRequest
         if 'session_id' in data:
             updates.update(self._get_contribution_session_updates(data['session_id']))
@@ -480,11 +478,11 @@ class RHContributionExportTexConfig(RHManageContributionsExportActionsBase):
 
     def _process(self):
         form = ContributionExportTeXForm(contribs=self.contribs)
-        form.format.choices = [(k, v[0]) for k, v in six.viewitems(get_boa_export_formats())]
+        form.format.choices = [(k, v[0]) for k, v in get_boa_export_formats().items()]
         if form.validate_on_submit():
             data = form.data
             data.pop('submitted', None)
-            key = six.text_type(uuid.uuid4())
+            key = str(uuid.uuid4())
             export_list_cache.set(key, data, time=1800)
             download_url = url_for('.contributions_tex_export_book', self.event, uuid=key)
             return jsonify_data(flash=False, redirect=download_url, redirect_no_loading=True)
@@ -589,7 +587,7 @@ class RHEditContributionType(RHManageContributionTypeBase):
             form.populate_obj(self.contrib_type)
             db.session.flush()
             self.event.log(EventLogRealm.management, EventLogKind.change, 'Contributions',
-                           'Updated type: {}'.format(old_name), session.user)
+                           f'Updated type: {old_name}', session.user)
             return contribution_type_row(self.contrib_type)
         return jsonify_form(form)
 
@@ -605,7 +603,7 @@ class RHCreateContributionType(RHManageContributionsBase):
             self.event.contribution_types.append(contrib_type)
             db.session.flush()
             self.event.log(EventLogRealm.management, EventLogKind.positive, 'Contributions',
-                           'Added type: {}'.format(contrib_type.name), session.user)
+                           f'Added type: {contrib_type.name}', session.user)
             return contribution_type_row(contrib_type)
         return jsonify_form(form)
 
@@ -617,7 +615,7 @@ class RHDeleteContributionType(RHManageContributionTypeBase):
         db.session.delete(self.contrib_type)
         db.session.flush()
         self.event.log(EventLogRealm.management, EventLogKind.negative, 'Contributions',
-                       'Deleted type: {}'.format(self.contrib_type.name), session.user)
+                       f'Deleted type: {self.contrib_type.name}', session.user)
         return jsonify_data(flash=False)
 
 
@@ -668,7 +666,7 @@ class RHCreateContributionField(RHManageContributionsBase):
             self.event.contribution_fields.append(contrib_field)
             db.session.flush()
             self.event.log(EventLogRealm.management, EventLogKind.positive, 'Contributions',
-                           'Added field: {}'.format(contrib_field.title), session.user)
+                           f'Added field: {contrib_field.title}', session.user)
 
             return jsonify_data(flash=False)
         return jsonify_template('events/contributions/forms/contribution_field_form.html', form=form)
@@ -699,7 +697,7 @@ class RHEditContributionField(RHManageContributionFieldBase):
             self.contrib_field.mgmt_field.update_object(form.data)
             db.session.flush()
             self.event.log(EventLogRealm.management, EventLogKind.change, 'Contributions',
-                           'Modified field: {}'.format(old_title), session.user)
+                           f'Modified field: {old_title}', session.user)
             return jsonify_data(flash=False)
         return jsonify_template('events/contributions/forms/contribution_field_form.html', form=form)
 
@@ -711,7 +709,7 @@ class RHDeleteContributionField(RHManageContributionFieldBase):
         db.session.delete(self.contrib_field)
         db.session.flush()
         self.event.log(EventLogRealm.management, EventLogKind.negative, 'Contributions',
-                       'Deleted field: {}'.format(self.contrib_field.title), session.user)
+                       f'Deleted field: {self.contrib_field.title}', session.user)
 
 
 class RHManageDescriptionField(RHManageContributionsBase):

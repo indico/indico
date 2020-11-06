@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import unicode_literals
 
 import errno
 import json
@@ -37,7 +36,7 @@ from indico.web.menu import SideMenuItem
 from indico.web.views import WPJinjaMixin
 
 
-class PluginCategory(six.text_type, IndicoEnum):
+class PluginCategory(str, IndicoEnum):
     search = _('Search')
     synchronization = _('Synchronization')
     payment = _('Payment')
@@ -162,7 +161,7 @@ class IndicoPlugin(Plugin):
         try:
             loader = IndicoManifestLoader(custom=False)
             return loader.load(os.path.join(self.root_path, 'static', 'dist', 'manifest.json'))
-        except IOError as exc:
+        except OSError as exc:
             if exc.errno != errno.ENOENT:
                 raise
             return None
@@ -222,7 +221,7 @@ class IndicoPlugin(Plugin):
     @classproperty
     @classmethod
     def logger(cls):
-        return Logger.get('plugin.{}'.format(cls.name))
+        return Logger.get(f'plugin.{cls.name}')
 
     @cached_classproperty
     @classmethod
@@ -232,7 +231,7 @@ class IndicoPlugin(Plugin):
             raise RuntimeError('Plugin has not been loaded yet')
         instance = cls.instance
         with instance.plugin_context():  # in case the default settings come from a property
-            return SettingsProxy('plugin_{}'.format(cls.name), instance.default_settings, cls.strict_settings,
+            return SettingsProxy(f'plugin_{cls.name}', instance.default_settings, cls.strict_settings,
                                  acls=cls.acl_settings, converters=cls.settings_converters)
 
     @cached_classproperty
@@ -243,7 +242,7 @@ class IndicoPlugin(Plugin):
             raise RuntimeError('Plugin has not been loaded yet')
         instance = cls.instance
         with instance.plugin_context():  # in case the default settings come from a property
-            return EventSettingsProxy('plugin_{}'.format(cls.name), instance.default_event_settings,
+            return EventSettingsProxy(f'plugin_{cls.name}', instance.default_event_settings,
                                       cls.strict_settings, acls=cls.acl_event_settings,
                                       converters=cls.event_settings_converters)
 
@@ -255,27 +254,27 @@ class IndicoPlugin(Plugin):
             raise RuntimeError('Plugin has not been loaded yet')
         instance = cls.instance
         with instance.plugin_context():  # in case the default settings come from a property
-            return UserSettingsProxy('plugin_{}'.format(cls.name), instance.default_user_settings,
+            return UserSettingsProxy(f'plugin_{cls.name}', instance.default_user_settings,
                                      cls.strict_settings, converters=cls.user_settings_converters)
 
 
 def plugin_url_rule_to_js(endpoint):
     """Like :func:`~indico.web.flask.util.url_rule_to_js` but prepending plugin name prefix to the endpoint"""
     if '.' in endpoint[1:]:  # 'foo' or '.foo' should not get the prefix
-        endpoint = 'plugin_{}'.format(endpoint)
+        endpoint = f'plugin_{endpoint}'
     return url_rule_to_js(endpoint)
 
 
 def url_for_plugin(endpoint, *targets, **values):
     """Like :func:`~indico.web.flask.util.url_for` but prepending ``'plugin_'`` to the blueprint name."""
     if '.' in endpoint[1:]:  # 'foo' or '.foo' should not get the prefix
-        endpoint = 'plugin_{}'.format(endpoint)
+        endpoint = f'plugin_{endpoint}'
     return url_for(endpoint, *targets, **values)
 
 
 def get_plugin_template_module(template_name, **context):
     """Like :func:`~indico.web.flask.templating.get_template_module`, but using plugin templates"""
-    template_name = '{}:{}'.format(current_plugin.name, template_name)
+    template_name = f'{current_plugin.name}:{template_name}'
     return get_template_module(template_name, **context)
 
 
@@ -287,9 +286,9 @@ class IndicoPluginBlueprintSetupState(PluginBlueprintSetupStateMixin, IndicoBlue
     def add_url_rule(self, rule, endpoint=None, view_func=None, **options):
         if rule.startswith('/static'):
             with self._unprefixed():
-                super(IndicoPluginBlueprintSetupState, self).add_url_rule(rule, endpoint, view_func, **options)
+                super().add_url_rule(rule, endpoint, view_func, **options)
         else:
-            super(IndicoPluginBlueprintSetupState, self).add_url_rule(rule, endpoint, view_func, **options)
+            super().add_url_rule(rule, endpoint, view_func, **options)
 
 
 class IndicoPluginBlueprint(PluginBlueprintMixin, IndicoBlueprint):

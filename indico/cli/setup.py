@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import unicode_literals
 
 import os
 import re
@@ -224,7 +223,7 @@ def wizard(dev):
     SetupWizard().run(dev=dev)
 
 
-class SetupWizard(object):
+class SetupWizard:
     def __init__(self):
         self._missing_dirs = set()
         self.root_path = None
@@ -299,7 +298,7 @@ class SetupWizard(object):
         if not sys.prefix.startswith(self.root_path + '/'):
             _warn('It is recommended to have the virtualenv inside the root directory, e.g. {}/.venv'
                   .format(self.root_path))
-            _warn('The virtualenv is currently located in {}'.format(sys.prefix))
+            _warn(f'The virtualenv is currently located in {sys.prefix}')
             _prompt_abort()
         self.data_root_path = os.path.join(self.root_path, 'data') if dev else self.root_path
 
@@ -351,7 +350,7 @@ class SetupWizard(object):
                 return False
             return True
 
-        default_url = ('http://127.0.0.1:8000' if dev else 'https://{}'.format(socket.getfqdn()))
+        default_url = ('http://127.0.0.1:8000' if dev else f'https://{socket.getfqdn()}')
         url = _prompt('Indico URL', validate=_check_url, allow_invalid=True,
                       default=default_url,
                       help='Indico needs to know the URL through which it is accessible. '
@@ -366,7 +365,7 @@ class SetupWizard(object):
                 engine.connect().close()
             except OperationalError as exc:
                 if not silent:
-                    _warn('Invalid database URI: ' + six.text_type(exc.orig).strip())
+                    _warn('Invalid database URI: ' + str(exc.orig).strip())
                 return False
             else:
                 return True
@@ -388,7 +387,7 @@ class SetupWizard(object):
             try:
                 client.ping()
             except RedisError as exc:
-                _warn('Invalid redis URI: ' + six.text_type(exc))
+                _warn('Invalid redis URI: ' + str(exc))
                 return False
             else:
                 return True
@@ -453,7 +452,7 @@ class SetupWizard(object):
                                 help=('Indico needs an SMTP server to send emails.' if first else None))
             if smtp_host != default_smtp_host:
                 default_smtp_port = _get_default_smtp(smtp_host)[1]
-            smtp_port = int(_prompt('SMTP port', default=six.text_type(default_smtp_port or 25)))
+            smtp_port = int(_prompt('SMTP port', default=str(default_smtp_port or 25)))
             smtp_user = _prompt('SMTP username', default=smtp_user, required=False,
                                 help=('If your SMTP server requires authentication, '
                                       'enter the username now.' if first else None))
@@ -468,7 +467,7 @@ class SetupWizard(object):
                     smtp.login(smtp_user, smtp_password)
                 smtp.quit()
             except Exception as exc:
-                _warn('SMTP connection failed: ' + six.text_type(exc))
+                _warn('SMTP connection failed: ' + str(exc))
                 if not click.confirm('Keep these settings anyway?'):
                     default_smtp_host = smtp_host
                     default_smtp_port = smtp_port
@@ -498,7 +497,7 @@ class SetupWizard(object):
             # as e.g. https://stackoverflow.com/a/12523283/298479 suggests
             # since this is ambiguous and we rather have the user type their
             # timezone if we don't have a very likely match.
-            return next((six.text_type(tz) for tz in candidates if tz in common_timezones), '')
+            return next((str(tz) for tz in candidates if tz in common_timezones), '')
 
         self.default_locale = _prompt('Default locale', default='en_GB', list_=_get_all_locales(),
                                       help='Specify the default language/locale used by Indico.')
@@ -542,31 +541,31 @@ class SetupWizard(object):
 
         config_data = [
             '# General settings',
-            'SQLALCHEMY_DATABASE_URI = {!r}'.format(self.db_uri),
+            f'SQLALCHEMY_DATABASE_URI = {self.db_uri!r}',
             'SECRET_KEY = {!r}'.format(os.urandom(32)),
-            'BASE_URL = {!r}'.format(self.indico_url),
-            'CELERY_BROKER = {!r}'.format(self.redis_uri_celery),
-            'REDIS_CACHE_URL = {!r}'.format(self.redis_uri_cache),
+            f'BASE_URL = {self.indico_url!r}',
+            f'CELERY_BROKER = {self.redis_uri_celery!r}',
+            f'REDIS_CACHE_URL = {self.redis_uri_cache!r}',
             "CACHE_BACKEND = 'redis'",
-            'DEFAULT_TIMEZONE = {!r}'.format(self.default_timezone),
-            'DEFAULT_LOCALE = {!r}'.format(self.default_locale),
-            'ENABLE_ROOMBOOKING = {!r}'.format(self.rb_active),
+            f'DEFAULT_TIMEZONE = {self.default_timezone!r}',
+            f'DEFAULT_LOCALE = {self.default_locale!r}',
+            f'ENABLE_ROOMBOOKING = {self.rb_active!r}',
             'CACHE_DIR = {!r}'.format(os.path.join(self.data_root_path, 'cache')),
             'TEMP_DIR = {!r}'.format(os.path.join(self.data_root_path, 'tmp')),
             'LOG_DIR = {!r}'.format(os.path.join(self.data_root_path, 'log')),
             'STORAGE_BACKENDS = {!r}'.format({k: v
-                                              for k, v in six.iteritems(storage_backends)}),
+                                              for k, v in storage_backends.items()}),
             "ATTACHMENT_STORAGE = 'default'",
             'ROUTE_OLD_URLS = True' if self.old_archive_dir else None,
             '',
             '# Email settings',
             'SMTP_SERVER = {!r}'.format((self.smtp_host, self.smtp_port)),
             'SMTP_USE_TLS = {!r}'.format(bool(self.smtp_user and self.smtp_password)),
-            'SMTP_LOGIN = {!r}'.format(self.smtp_user),
-            'SMTP_PASSWORD = {!r}'.format(self.smtp_password),
-            'SUPPORT_EMAIL = {!r}'.format(self.admin_email),
-            'PUBLIC_SUPPORT_EMAIL = {!r}'.format(self.contact_email),
-            'NO_REPLY_EMAIL = {!r}'.format(self.noreply_email)
+            f'SMTP_LOGIN = {self.smtp_user!r}',
+            f'SMTP_PASSWORD = {self.smtp_password!r}',
+            f'SUPPORT_EMAIL = {self.admin_email!r}',
+            f'PUBLIC_SUPPORT_EMAIL = {self.contact_email!r}',
+            f'NO_REPLY_EMAIL = {self.noreply_email!r}'
         ]
 
         if dev:

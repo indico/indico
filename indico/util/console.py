@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import absolute_import, division, print_function
 
 import fcntl
 import re
@@ -22,19 +21,19 @@ from termcolor import colored
 from indico.util.string import to_unicode, validate_email
 
 
-def prompt_email(prompt=u'Email', default=None, confirm=False):
+def prompt_email(prompt='Email', default=None, confirm=False):
     conv = convert_type(None)
 
     def _proc_email(val):
         val = conv(val).strip()
         if not validate_email(val):
-            raise click.UsageError(u'invalid email')
+            raise click.UsageError('invalid email')
         return val
 
     return click.prompt(prompt, default=default, confirmation_prompt=confirm, value_proc=_proc_email)
 
 
-def prompt_pass(prompt=u'Password', min_length=8, confirm=True):
+def prompt_pass(prompt='Password', min_length=8, confirm=True):
     while True:
         password = click.prompt(prompt, hide_input=True, confirmation_prompt=confirm).strip()
         # Empty, just prompt again
@@ -42,7 +41,7 @@ def prompt_pass(prompt=u'Password', min_length=8, confirm=True):
             continue
         # Too short, tell the user about the fact
         if min_length and len(password) < min_length:
-            click.echo(u"Password is too short (must be at least {} chars)".format(min_length))
+            click.echo(f"Password is too short (must be at least {min_length} chars)")
             continue
         return password
 
@@ -90,9 +89,9 @@ def verbose_iterator(iterable, total, get_id, get_title, print_every=10):
 
 
 def _cformat_sub(m):
-    bg = u'on_{}'.format(m.group('bg')) if m.group('bg') else None
+    bg = 'on_{}'.format(m.group('bg')) if m.group('bg') else None
     attrs = ['bold'] if m.group('fg_bold') else None
-    return colored(u'', m.group('fg'), bg, attrs=attrs)[:-4]
+    return colored('', m.group('fg'), bg, attrs=attrs)[:-4]
 
 
 def cformat(string):
@@ -100,8 +99,8 @@ def cformat(string):
 
     Bold foreground can be achieved by suffixing the color with a '!'.
     """
-    reset = colored(u'')
-    string = string.replace(u'%{reset}', reset)
+    reset = colored('')
+    string = string.replace('%{reset}', reset)
     string = re.sub(r'%\{(?P<fg>[a-z]+)(?P<fg_bold>!?)(?:,(?P<bg>[a-z]+))?}', _cformat_sub, string)
     if not string.endswith(reset):
         string += reset

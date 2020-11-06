@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import unicode_literals
 
 from contextlib import contextmanager
 
@@ -20,7 +19,7 @@ from indico.util.struct.iterables import materialize_iterable
 from indico.web.flask.util import url_for
 
 
-class _ProtectedObjectWrapper(object):
+class _ProtectedObjectWrapper:
     def __init__(self, obj):
         self.object = obj
 
@@ -67,7 +66,7 @@ class _ProtectedObjectWrapper(object):
             raise TypeError('Unexpected object of type {}: {}'.format(type(self.object).__name__, self.object))
 
     def __repr__(self):
-        return '<_ProtectedObjectWrapper({})>'.format(self.object)
+        return f'<_ProtectedObjectWrapper({self.object})>'
 
 
 @materialize_iterable(set)

@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import unicode_literals
 
 import os
 from copy import copy
@@ -14,7 +13,6 @@ from importlib import import_module
 import six
 from flask import g
 from flask_sqlalchemy import BaseQuery, Model, Pagination
-from six.moves import map
 from sqlalchemy import Column, inspect, orm
 from sqlalchemy.event import listen, listens_for
 from sqlalchemy.ext.hybrid import hybrid_property
@@ -75,7 +73,7 @@ class IndicoModel(Model):
         special_field_names = ('join', 'eager')
         special_fields = {}
         for key in special_field_names:
-            value = kwargs.pop('_{}'.format(key), ())
+            value = kwargs.pop(f'_{key}', ())
             if not isinstance(value, (list, tuple)):
                 value = (value,)
             special_fields[key] = value
@@ -166,7 +164,7 @@ class IndicoModel(Model):
         cache = g.get('relationship_cache', {}).get(type(target))
         if not cache:
             return
-        for rel, value in six.iteritems(cache['data'].get(target, {})):
+        for rel, value in cache['data'].get(target, {}).items():
             if rel not in target.__dict__:
                 set_committed_value(target, rel, value)
 
@@ -209,13 +207,13 @@ class IndicoModel(Model):
         """
         cls = type(self)
         changed = {}
-        for key, value in six.iteritems(data):
+        for key, value in data.items():
             if keys and key not in keys:
                 continue
             if skip and key in skip:
                 continue
             if not hasattr(cls, key):
-                raise ValueError("{} has no attribute '{}'".format(cls.__name__, key))
+                raise ValueError(f"{cls.__name__} has no attribute '{key}'")
             if not track_changes:
                 setattr(self, key, value)
                 continue
@@ -237,14 +235,14 @@ class IndicoModel(Model):
         cls = type(self)
         for attr in attrs:
             if not hasattr(cls, attr):
-                raise ValueError("{} has no attribute '{}'".format(cls.__name__, attr))
+                raise ValueError(f"{cls.__name__} has no attribute '{attr}'")
             setattr(self, attr, getattr(obj, attr))
 
 
 @listens_for(orm.mapper, 'after_configured', once=True)
 def _mappers_configured():
     from indico.core.db import db
-    for model in six.itervalues(db.Model._decl_class_registry):
+    for model in db.Model._decl_class_registry.values():
         if hasattr(model, '__table__') and model.allow_relationship_preloading:
             listen(model, 'load', model._populate_preloaded_relationships)
 
@@ -350,7 +348,7 @@ def auto_table_args(cls, **extra_kwargs):
             else:
                 posargs.extend(value)
         else:  # pragma: no cover
-            raise ValueError('Unexpected tableargs: {}'.format(value))
+            raise ValueError(f'Unexpected tableargs: {value}')
     kwargs.update(extra_kwargs)
     if posargs and kwargs:
         return tuple(posargs) + (kwargs,)
@@ -361,7 +359,7 @@ def auto_table_args(cls, **extra_kwargs):
 
 
 def _get_backref_name(relationship):
-    return relationship.backref if isinstance(relationship.backref, six.string_types) else relationship.backref[0]
+    return relationship.backref if isinstance(relationship.backref, str) else relationship.backref[0]
 
 
 def populate_one_to_one_backrefs(model, *relationships):
@@ -381,7 +379,7 @@ def populate_one_to_one_backrefs(model, *relationships):
 
         @listens_for(model, 'load')
         def _populate_backrefs(target, context):
-            for name, backref in six.iteritems(mappings):
+            for name, backref in mappings.items():
                 # __dict__ to avoid triggering lazy-loaded relationships
                 if target.__dict__.get(name) is not None:
                     set_committed_value(getattr(target, name), backref, target)

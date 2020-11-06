@@ -5,10 +5,8 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import unicode_literals
 
 from flask import g
-from six.moves import range
 from sqlalchemy import DDL
 from sqlalchemy.dialects.postgresql import ARRAY
 from sqlalchemy.event import listens_for
@@ -50,7 +48,7 @@ def _get_next_friendly_id(context):
     return increment_and_get(Event._last_friendly_contribution_id, Event.id == event_id)
 
 
-class CustomFieldsMixin(object):
+class CustomFieldsMixin:
     """Methods to process custom field data."""
 
     def get_field_value(self, field_id, raw=False):
@@ -411,7 +409,7 @@ class Contribution(DescriptionMixin, ProtectionManagersMixin, LocationMixin, Att
         # when assigning a new one (e.g. during cloning)
         kwargs.setdefault('note', None)
         kwargs.setdefault('timetable_entry', None)
-        super(Contribution, self).__init__(**kwargs)
+        super().__init__(**kwargs)
 
     @classmethod
     def preload_acl_entries(cls, event):
@@ -490,7 +488,7 @@ class Contribution(DescriptionMixin, ProtectionManagersMixin, LocationMixin, Att
 
     @property
     def verbose_title(self):
-        return '#{} ({})'.format(self.friendly_id, self.title)
+        return f'#{self.friendly_id} ({self.title})'
 
     @property
     def paper(self):
@@ -533,7 +531,7 @@ class Contribution(DescriptionMixin, ProtectionManagersMixin, LocationMixin, Att
         return format_repr(self, 'id', is_deleted=False, _text=self.title)
 
     def can_manage(self, user, permission=None, allow_admin=True, check_parent=True, explicit_permission=False):
-        if super(Contribution, self).can_manage(user, permission, allow_admin=allow_admin, check_parent=check_parent,
+        if super().can_manage(user, permission, allow_admin=allow_admin, check_parent=check_parent,
                                                 explicit_permission=explicit_permission):
             return True
         if (check_parent and self.session_id is not None and

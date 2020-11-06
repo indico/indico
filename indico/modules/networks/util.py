@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import unicode_literals
 
 
 def serialize_ip_network_group(group):
@@ -13,6 +12,6 @@ def serialize_ip_network_group(group):
     return {
         'id': group.id,
         'name': group.name,
-        'identifier': 'IPNetworkGroup:{}'.format(group.id),
+        'identifier': f'IPNetworkGroup:{group.id}',
         '_type': 'IPNetworkGroup'
     }

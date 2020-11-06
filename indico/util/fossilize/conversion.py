@@ -17,12 +17,12 @@ import six
 from indico.modules.rb.models.reservation_occurrences import ReservationOccurrence
 
 
-class Conversion(object):
+class Conversion:
     @classmethod
     def datetime(cls, dt, tz=None, convert=False):
         if dt:
             if tz:
-                if isinstance(tz, six.string_types):
+                if isinstance(tz, str):
                     tz = pytz.timezone(tz)
                 date = dt.astimezone(tz)
             else:

@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import unicode_literals
 
 import os
 from io import BytesIO
@@ -46,7 +45,7 @@ class InvalidEditableState(BadRequest):
     """
 
     def __init__(self):
-        super(InvalidEditableState, self).__init__(_('The requested action is not possible on this revision'))
+        super().__init__(_('The requested action is not possible on this revision'))
 
 
 def ensure_latest_revision(revision):
@@ -70,7 +69,7 @@ def _make_editable_files(editable, files):
         return []
     editable_files = [
         EditingRevisionFile(file=file, file_type=file_type)
-        for file_type, file_list in six.viewitems(files)
+        for file_type, file_list in files.items()
         for file in file_list
     ]
     for ef in editable_files:
@@ -366,17 +365,17 @@ def _compose_filepath(editable, revision_file):
     file_obj = revision_file.file
     contrib = editable.contribution
     editable_type = editable.type.name
-    code = 'Editable-{}'.format(contrib.friendly_id)
+    code = f'Editable-{contrib.friendly_id}'
 
     if contrib.code:
-        code += '-{}'.format(contrib.code)
+        code += f'-{contrib.code}'
 
-    filepath = os.path.join(secure_filename('{}-{}'.format(contrib.title, contrib.id),
-                                            'contribution-{}'.format(contrib.id)),
+    filepath = os.path.join(secure_filename(f'{contrib.title}-{contrib.id}',
+                                            f'contribution-{contrib.id}'),
                             editable_type, code, revision_file.file_type.name)
     filename, ext = os.path.splitext(file_obj.filename)
     filename = secure_filename(file_obj.filename,
-                               'revision-file-{}-{}{}'.format(revision_file.revision_id, file_obj.id, ext))
+                               f'revision-file-{revision_file.revision_id}-{file_obj.id}{ext}')
     return os.path.join(filepath, filename)
 
 

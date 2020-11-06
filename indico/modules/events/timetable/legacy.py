@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import unicode_literals
 
 from collections import defaultdict
 from hashlib import md5
@@ -13,7 +12,6 @@ from itertools import chain
 
 import six
 from flask import has_request_context, session
-from six.moves import map
 from sqlalchemy.orm import defaultload
 
 from indico.modules.events.contributions.models.persons import AuthorType
@@ -23,7 +21,7 @@ from indico.util.date_time import iterdays
 from indico.web.flask.util import url_for
 
 
-class TimetableSerializer(object):
+class TimetableSerializer:
     def __init__(self, event, management=False, user=None):
         self.management = management
         self.user = user if user is not None or not has_request_context() else session.user
@@ -56,7 +54,7 @@ class TimetableSerializer(object):
             data = self.serialize_timetable_entry(entry, load_children=False)
             key = self._get_entry_key(entry)
             if entry.parent:
-                parent_code = 's{}'.format(entry.parent_id)
+                parent_code = f's{entry.parent_id}'
                 timetable[date_str][parent_code]['entries'][key] = data
             else:
                 if (entry.type == TimetableEntryType.SESSION_BLOCK and
@@ -249,11 +247,11 @@ class TimetableSerializer(object):
 
     def _get_entry_key(self, entry):
         if entry.type == TimetableEntryType.SESSION_BLOCK:
-            return 's{}'.format(entry.id)
+            return f's{entry.id}'
         elif entry.type == TimetableEntryType.CONTRIBUTION:
-            return 'c{}'.format(entry.id)
+            return f'c{entry.id}'
         elif entry.type == TimetableEntryType.BREAK:
-            return 'b{}'.format(entry.id)
+            return f'b{entry.id}'
         else:
             raise ValueError()
 
@@ -314,7 +312,7 @@ def serialize_entry_update(entry, session_=None):
 
 def serialize_event_info(event):
     return {'_type': 'Conference',
-            'id': six.text_type(event.id),
+            'id': str(event.id),
             'title': event.title,
             'startDate': event.start_dt_local,
             'endDate': event.end_dt_local,

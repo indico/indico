@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import unicode_literals
 
 from uuid import uuid4
 
@@ -33,13 +32,13 @@ class APIKey(db.Model):
         UUID,
         nullable=False,
         unique=True,
-        default=lambda: six.text_type(uuid4())
+        default=lambda: str(uuid4())
     )
     #: secret key used for signed requests
     secret = db.Column(
         UUID,
         nullable=False,
-        default=lambda: six.text_type(uuid4())
+        default=lambda: str(uuid4())
     )
     #: ID of the user associated with the key
     user_id = db.Column(

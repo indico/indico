@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import unicode_literals
 
 from collections import OrderedDict, defaultdict
 from operator import itemgetter
@@ -296,7 +295,7 @@ class RHVCManageAttach(RHVCManageEventCreateBase):
                 flash(_("You are not allowed to attach {plugin_name} rooms to this event.").format(
                     plugin_name=self.plugin.friendly_name), 'error')
             elif not self.plugin.can_manage_vc_room(session.user, vc_room):
-                flash(_("You are not authorized to attach the room '{room.name}'".format(room=vc_room)), 'error')
+                flash(_(f"You are not authorized to attach the room '{vc_room.name}'"), 'error')
             else:
                 event_vc_room = process_vc_room_association(self.plugin, self.event, vc_room, form)
                 if event_vc_room:
@@ -359,6 +358,6 @@ class RHVCRoomList(RHProtected):
                                  key=lambda r: r.event.start_dt.date(),
                                  sort_by=lambda r: r.event.start_dt,
                                  sort_reverse=reverse)
-            results = OrderedDict(sorted(six.viewitems(results), key=itemgetter(0), reverse=reverse))
+            results = OrderedDict(sorted(results.items(), key=itemgetter(0), reverse=reverse))
         return WPVCService.render_template('vc_room_list.html', form=form, results=results,
                                            action=url_for('.vc_room_list'))

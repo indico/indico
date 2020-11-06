@@ -55,7 +55,7 @@ def js_vars_global():
 
     Useful for server-wide config options, URLs, etc...
     """
-    cache_file = os.path.join(config.CACHE_DIR, 'assets_global_{}_{}.js'.format(indico.__version__, config.hash))
+    cache_file = os.path.join(config.CACHE_DIR, f'assets_global_{indico.__version__}_{config.hash}.js')
 
     if config.DEBUG or not os.path.exists(cache_file):
         data = generate_global_file()
@@ -96,7 +96,7 @@ def _get_i18n_locale(locale_name, react=False):
         with open(cache_file, 'w') as f:
             f.write("window.{} = {};".format('REACT_TRANSLATIONS' if react else 'TRANSLATIONS', i18n_data))
 
-    return send_file('{}{}.js'.format(locale_name, react_suffix), cache_file, mimetype='application/javascript',
+    return send_file(f'{locale_name}{react_suffix}.js', cache_file, mimetype='application/javascript',
                      conditional=True)
 
 

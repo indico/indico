@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import unicode_literals
 
 import ast
 import json
@@ -18,7 +17,7 @@ from setuptools import find_packages, setup
 
 
 def read_requirements_file(fname):
-    with open(fname, 'r') as f:
+    with open(fname) as f:
         return [dep.strip() for dep in f.readlines() if not (dep.startswith('-') or '://' in dep)]
 
 

@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import unicode_literals
 
 import shutil
 from collections import defaultdict
@@ -133,7 +132,7 @@ class SpecificTemplateMixin(TemplateDesignerMixin):
         self.template = DesignerTemplate.get_or_404(request.view_args['template_id'])
 
 
-class BacksideTemplateProtectionMixin(object):
+class BacksideTemplateProtectionMixin:
     def _check_access(self):
         self._require_user()
         # Category templates can be used as backsides - we can't require management
@@ -178,7 +177,7 @@ class CloneTemplateMixin(TargetFromURLMixin):
         self.template = DesignerTemplate.get_or_404(request.view_args['template_id'])
 
     def _process(self):
-        title = "{} (copy)".format(self.template.title)
+        title = f"{self.template.title} (copy)"
         new_template = DesignerTemplate(title=title, type=self.template.type, data=self.template.data,
                                         **self.target_dict)
 
@@ -318,7 +317,7 @@ class RHUploadBackgroundImage(RHModifyDesignerTemplateBase):
         data.seek(0)
         try:
             image_type = Image.open(data).format.lower()
-        except IOError:
+        except OSError:
             # Invalid image data
             return jsonify(error="Invalid image data!")
         data.seek(0)

@@ -5,13 +5,11 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import unicode_literals
 
 from operator import itemgetter
 
 import six
 from pytz import common_timezones, common_timezones_set
-from six.moves import zip
 from wtforms.fields.core import BooleanField, SelectField, StringField
 from wtforms.fields.html5 import EmailField
 from wtforms.fields.simple import TextAreaField
@@ -67,10 +65,10 @@ class UserPreferencesForm(IndicoForm):
         description=_('The previewer is used by default for image and text files, but not for PDF files.'))
 
     def __init__(self, *args, **kwargs):
-        super(UserPreferencesForm, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
-        locales = [(code, '{} ({})'.format(name, territory) if territory else name)
-                   for code, (name, territory) in six.iteritems(get_all_locales())]
+        locales = [(code, f'{name} ({territory})' if territory else name)
+                   for code, (name, territory) in get_all_locales().items()]
         self.lang.choices = sorted(locales, key=itemgetter(1))
         self.timezone.choices = list(zip(common_timezones, common_timezones))
         if self.timezone.object_data and self.timezone.object_data not in common_timezones_set:
@@ -118,7 +116,7 @@ class AdminAccountRegistrationForm(LocalRegistrationForm):
         if config.LOCAL_IDENTITIES:
             for field in ('username', 'password', 'confirm_password'):
                 inject_validators(self, field, [HiddenUnless('create_identity')], early=True)
-        super(AdminAccountRegistrationForm, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         del self.comment
         if not config.LOCAL_IDENTITIES:
             del self.username

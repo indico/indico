@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import unicode_literals
 
 import six
 from flask import flash, redirect, request, session
@@ -46,8 +45,8 @@ class RHRequestsEventRequests(EventOrRequestManagerMixin, RHManageEventBase):
             raise NotFound
         requests = Request.find_latest_for_event(self.event)
         if self.protection_overridden:
-            definitions = {name: def_ for name, def_ in six.iteritems(definitions) if def_.can_be_managed(session.user)}
-            requests = {name: req for name, req in six.iteritems(requests)
+            definitions = {name: def_ for name, def_ in definitions.items() if def_.can_be_managed(session.user)}
+            requests = {name: req for name, req in requests.items()
                         if req.definition and req.definition.can_be_managed(session.user)}
         return WPRequestsEventManagement.render_template('events/requests/event_requests.html', self.event,
                                                          definitions=definitions, requests=requests)

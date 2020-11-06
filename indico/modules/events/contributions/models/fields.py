@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import unicode_literals
 
 import six
 from sqlalchemy.dialects.postgresql import JSONB
@@ -158,7 +157,7 @@ class ContributionFieldValueBase(db.Model):
     def contribution_field_id(cls):
         return db.Column(
             db.Integer,
-            db.ForeignKey('events.contribution_fields.id', name='fk_{}_contribution_field'.format(cls.__tablename__)),
+            db.ForeignKey('events.contribution_fields.id', name=f'fk_{cls.__tablename__}_contribution_field'),
             primary_key=True,
             index=True
         )
@@ -197,5 +196,5 @@ class ContributionFieldValue(ContributionFieldValueBase):
     # - contribution (Contribution.field_values)
 
     def __repr__(self):
-        text = text_to_repr(self.data) if isinstance(self.data, six.text_type) else self.data
+        text = text_to_repr(self.data) if isinstance(self.data, str) else self.data
         return format_repr(self, 'contribution_id', 'contribution_field_id', _text=text)

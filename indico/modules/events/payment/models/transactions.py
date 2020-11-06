@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import unicode_literals
 
 from flask import render_template
 from sqlalchemy.dialects.postgresql import JSONB
@@ -59,7 +58,7 @@ class TransactionStatus(int, IndicoEnum):
     rejected = 5
 
 
-class TransactionStatusTransition(object):
+class TransactionStatusTransition:
 
     initial_statuses = [TransactionStatus.cancelled, TransactionStatus.failed, TransactionStatus.rejected]
 
@@ -73,7 +72,7 @@ class TransactionStatusTransition(object):
         elif transaction.status == TransactionStatus.pending:
             return cls._next_from_pending(action, manual)
         else:
-            raise InvalidTransactionStatus("Invalid transaction status code '{}'".format(transaction.status))
+            raise InvalidTransactionStatus(f"Invalid transaction status code '{transaction.status}'")
 
     @staticmethod
     def _next_from_initial(action, manual=False):
@@ -213,7 +212,7 @@ class PaymentTransaction(db.Model):
             return render_template('events/payment/transaction_details_manual.html', transaction=self)
         plugin = self.plugin
         if plugin is None:
-            return '[plugin not loaded: {}]'.format(self.provider)
+            return f'[plugin not loaded: {self.provider}]'
         with plugin.plugin_context():
             return plugin.render_transaction_details(self)
 

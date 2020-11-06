@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from six.moves import range
 
 from indico.util.struct.iterables import grouper
 

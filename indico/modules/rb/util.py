@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import unicode_literals
 
 import os
 from collections import namedtuple
@@ -113,17 +112,17 @@ def group_by_occurrence_date(occurrences, sort_by=None):
 
 def serialize_occurrences(data):
     from indico.modules.rb.schemas import reservation_occurrences_schema
-    return {dt.isoformat(): reservation_occurrences_schema.dump(data) for dt, data in six.iteritems(data)}
+    return {dt.isoformat(): reservation_occurrences_schema.dump(data) for dt, data in data.items()}
 
 
 def serialize_blockings(data):
     from indico.modules.rb.schemas import simple_blockings_schema
-    return {dt.isoformat(): simple_blockings_schema.dump(data) for dt, data in six.iteritems(data)}
+    return {dt.isoformat(): simple_blockings_schema.dump(data) for dt, data in data.items()}
 
 
 def serialize_nonbookable_periods(data):
     from indico.modules.rb.schemas import nonbookable_periods_schema
-    return {dt.isoformat(): nonbookable_periods_schema.dump(data) for dt, data in six.iteritems(data)}
+    return {dt.isoformat(): nonbookable_periods_schema.dump(data) for dt, data in data.items()}
 
 
 def serialize_unbookable_hours(data):
@@ -133,7 +132,7 @@ def serialize_unbookable_hours(data):
 
 def serialize_concurrent_pre_bookings(data):
     from indico.modules.rb.schemas import concurrent_pre_bookings_schema
-    return {dt.isoformat(): concurrent_pre_bookings_schema.dump(data) for dt, data in six.iteritems(data)}
+    return {dt.isoformat(): concurrent_pre_bookings_schema.dump(data) for dt, data in data.items()}
 
 
 def get_linked_object(type_, id_):
@@ -185,7 +184,7 @@ def serialize_booking_details(booking):
                                unbookable_hours={}, nonbookable_periods={}, overridable_blockings={})
     booking_details['occurrences'] = occurrences_by_type
     booking_details['date_range'] = [dt.isoformat() for dt in date_range]
-    for dt, [occ] in six.iteritems(occurrences):
+    for dt, [occ] in occurrences.items():
         serialized_occ = reservation_occurrences_schema_with_permissions.dump([occ])
         if occ.is_cancelled:
             occurrences_by_type['cancellations'][dt.isoformat()] = serialized_occ
@@ -217,7 +216,7 @@ def serialize_booking_details(booking):
 
 
 def serialize_availability(availability):
-    for data in six.viewvalues(availability):
+    for data in availability.values():
         data['blockings'] = serialize_blockings(data.get('blockings', {}))
         data['overridable_blockings'] = serialize_blockings(data.get('overridable_blockings', {}))
         data['nonbookable_periods'] = serialize_nonbookable_periods(data.get('nonbookable_periods', {}))
@@ -272,14 +271,14 @@ def get_booking_params_for_event(event):
     params = {
         'link_type': 'event',
         'link_id': event.id,
-        'text': '#{}'.format(event.room.id) if event.room else None,
+        'text': f'#{event.room.id}' if event.room else None,
     }
     all_times = {day: (_find_first_entry_start_dt(event, day), _find_latest_entry_end_dt(event, day))
                  for day in event.iter_days(tzinfo=event.tzinfo)}
     # if the timetable is empty on a given day, use (start_dt, end_dt) of the event
     all_times = [((day, (event.start_dt_local, event.end_dt_local)) if times[0] is None else (day, times))
-                 for day, times in six.viewitems(all_times)]
-    same_times = len(set(times for (_, times) in all_times)) == 1
+                 for day, times in all_times.items()]
+    same_times = len({times for (_, times) in all_times}) == 1
 
     if is_single_day or same_times:
         params['sd'] = event.start_dt_local.date().isoformat()

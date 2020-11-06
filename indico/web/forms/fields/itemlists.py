@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import absolute_import, unicode_literals
 
 import json
 import uuid
@@ -41,7 +40,7 @@ class MultiStringField(HiddenField):
         self.uuid_field = kwargs.pop('uuid_field', None)
         if self.flat and self.uuid_field:
             raise ValueError('`uuid_field` and `flat` are mutually exclusive')
-        super(MultiStringField, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
     def process_formdata(self, valuelist):
         if is_preprocessed_formdata(valuelist):
@@ -51,7 +50,7 @@ class MultiStringField(HiddenField):
             if self.uuid_field:
                 for item in self.data:
                     if self.uuid_field not in item:
-                        item[self.uuid_field] = six.text_type(uuid.uuid4())
+                        item[self.uuid_field] = str(uuid.uuid4())
 
     def pre_validate(self, form):
         try:
@@ -121,7 +120,7 @@ class MultipleItemsField(HiddenField):
             assert self.uuid_field != self.unique_field
             assert self.uuid_field not in self.fields
         self.field_names = {item['id']: item['caption'] for item in self.fields}
-        super(MultipleItemsField, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
     def process_formdata(self, valuelist):
         if is_preprocessed_formdata(valuelist):
@@ -133,7 +132,7 @@ class MultipleItemsField(HiddenField):
             if self.uuid_field and not self.uuid_field_opaque:
                 for item in self.data:
                     if self.uuid_field not in item:
-                        item[self.uuid_field] = six.text_type(uuid.uuid4())
+                        item[self.uuid_field] = str(uuid.uuid4())
 
     def pre_validate(self, form):
         unique_used = set()
@@ -146,7 +145,7 @@ class MultipleItemsField(HiddenField):
             if self.uuid_field:
                 item_keys.discard(self.uuid_field)
             if item_keys != {x['id'] for x in self.fields}:
-                raise ValueError('Invalid item (bad keys): {}'.format(escape(', '.join(six.viewkeys(item)))))
+                raise ValueError('Invalid item (bad keys): {}'.format(escape(', '.join(item.keys()))))
             if self.unique_field:
                 if item[self.unique_field] in unique_used:
                     raise ValueError('{} must be unique'.format(self.field_names[self.unique_field]))
@@ -157,11 +156,11 @@ class MultipleItemsField(HiddenField):
                 # raises ValueError if uuid is invalid
                 uuid.UUID(item[self.uuid_field], version=4)
                 uuid_used.add(item[self.uuid_field])
-            for key, fn in six.viewitems(coercions):
+            for key, fn in coercions.items():
                 try:
                     self.data[i][key] = fn(self.data[i][key])
                 except ValueError:
-                    raise ValueError(u"Invalid value for field '{}': {}".format(self.field_names[key],
+                    raise ValueError("Invalid value for field '{}': {}".format(self.field_names[key],
                                                                                 escape(item[key])))
 
     def _value(self):
@@ -170,7 +169,7 @@ class MultipleItemsField(HiddenField):
     @property
     def _field_spec(self):
         # Field data for the widget; skip non-json-serializable data
-        return [{k: v for k, v in six.iteritems(field) if k != 'coerce'}
+        return [{k: v for k, v in field.items() if k != 'coerce'}
                 for field in self.fields]
 
 
@@ -194,7 +193,7 @@ class OverrideMultipleItemsField(HiddenField):
         self.field_data = kwargs.pop('field_data', None)  # usually set after creating the form instance
         self.unique_field = kwargs.pop('unique_field')
         self.edit_fields = set(kwargs.pop('edit_fields'))
-        super(OverrideMultipleItemsField, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
     def process_formdata(self, valuelist):
         if is_preprocessed_formdata(valuelist):
@@ -209,9 +208,9 @@ class OverrideMultipleItemsField(HiddenField):
                 # e.g. a row removed from field_data that had a value before
                 del self.data[key]
                 continue
-            if set(six.viewkeys(values)) > self.edit_fields:
+            if set(values.keys()) > self.edit_fields:
                 # e.g. a field that was editable before
-                self.data[key] = {k: v for k, v in six.iteritems(values) if k in self.edit_fields}
+                self.data[key] = {k: v for k, v in values.items() if k in self.edit_fields}
         # Remove anything empty
         for key, values in list(self.data.items()):
             for field, value in list(values.items()):

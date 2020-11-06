@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import unicode_literals
 
 import csv
 import re
@@ -45,12 +44,12 @@ def _prepare_csv_data(data, _linebreak_re=re.compile(r'(\r?\n)+'), _dangerous_ch
     if isinstance(data, (list, tuple)):
         data = '; '.join(data)
     elif isinstance(data, set):
-        data = '; '.join(sorted(data, key=six.text_type.lower))
+        data = '; '.join(sorted(data, key=str.lower))
     elif isinstance(data, bool):
         data = 'Yes' if data else 'No'
     elif data is None:
         data = ''
-    data = _linebreak_re.sub('    ', six.text_type(data))
+    data = _linebreak_re.sub('    ', str(data))
     # https://www.owasp.org/index.php/CSV_Injection
     # quoting the cell's value does NOT mitigate this, so we need to strip
     # those characters from the beginning...
@@ -95,9 +94,9 @@ def _prepare_excel_data(data, tz=None):
     if isinstance(data, (list, tuple)):
         data = '; '.join(data)
     elif isinstance(data, set):
-        data = '; '.join(sorted(data, key=six.text_type.lower))
+        data = '; '.join(sorted(data, key=str.lower))
     elif is_lazy_string(data) or isinstance(data, Markup):
-        data = six.text_type(data)
+        data = str(data)
     elif isinstance(data, datetime):
         data = format_datetime(data, timezone=tz)
     return data

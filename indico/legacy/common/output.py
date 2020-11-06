@@ -29,7 +29,7 @@ def get_map_url(item):
     return item.room.map_url if item.room else None
 
 
-class outputGenerator(object):
+class outputGenerator:
     def __init__(self, user, XG=None):
         self.__user = user
         if XG is not None:
@@ -116,7 +116,7 @@ class outputGenerator(object):
         out.writeXML(xml)
 
     def _generate_category_path(self, event, out):
-        path = [six.text_type(c.id) for c in event.category.chain_query.options(load_only('id'))]
+        path = [str(c.id) for c in event.category.chain_query.options(load_only('id'))]
         out.openTag("datafield", [["tag", "650"], ["ind1", " "], ["ind2", "7"]])
         out.writeTag("subfield", ":".join(path), [["code", "a"]])
         out.closeTag("datafield")
@@ -351,10 +351,10 @@ class outputGenerator(object):
             users[user].append('Author')
         for user in sList:
             users[user].append('Speaker')
-        for user, roles in six.iteritems(users):
+        for user, roles in users.items():
             tag = '100' if user in contrib.primary_authors else '700'
             out.openTag('datafield', [['tag', tag], ['ind1', ' '], ['ind2', ' ']])
-            out.writeTag('subfield', u'{} {}'.format(user.last_name, user.first_name), [['code', 'a']])
+            out.writeTag('subfield', f'{user.last_name} {user.first_name}', [['code', 'a']])
             for role in roles:
                 out.writeTag('subfield', role, [['code', 'e']])
             out.writeTag('subfield', user.affiliation, [['code', 'u']])
@@ -459,11 +459,11 @@ class outputGenerator(object):
 
     def _attachment_unique_id(self, attachment, add_prefix=True):
         if attachment.legacy_mapping:
-            unique_id = 'm{}.{}'.format(attachment.legacy_mapping.material_id, attachment.legacy_mapping.resource_id)
+            unique_id = f'm{attachment.legacy_mapping.material_id}.{attachment.legacy_mapping.resource_id}'
         else:
-            unique_id = 'a{}'.format(attachment.id)
+            unique_id = f'a{attachment.id}'
         unique_id = '{}{}'.format(uniqueId(attachment.folder.object), unique_id)
-        return 'INDICO.{}'.format(unique_id) if add_prefix else unique_id
+        return f'INDICO.{unique_id}' if add_prefix else unique_id
 
     def _attachment_access_list(self, attachment):
         linked_object = attachment.folder.object
@@ -509,7 +509,7 @@ class outputGenerator(object):
             out = self._XMLGen
         out.openTag('datafield', [['tag', '856'], ['ind1', '4'], ['ind2', ' ']])
         out.writeTag('subfield', url_for('event_notes.view', note, _external=True), [['code', 'u']])
-        out.writeTag('subfield', u'{} - Minutes'.format(note.object.title), [['code', 'y']])
+        out.writeTag('subfield', f'{note.object.title} - Minutes', [['code', 'y']])
         out.writeTag('subfield', 'INDICO.{}'.format(uniqueId(note)), [['code', '3']])
         out.writeTag('subfield', 'resource', [['code', 'x']])
         out.closeTag('datafield')

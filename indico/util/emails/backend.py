@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import unicode_literals
 
 import smtplib
 import socket
@@ -23,7 +22,7 @@ from indico.util.emails.message import sanitize_address
 # and their contributors.
 
 
-class BaseEmailBackend(object):
+class BaseEmailBackend:
     """Base class for email backend implementations.
 
     Subclasses must at least overwrite send_messages().
@@ -88,7 +87,7 @@ class EmailBackend(BaseEmailBackend):
                  ssl_keyfile=None, ssl_certfile=None,
                  **kwargs):
         from indico.core.config import config
-        super(EmailBackend, self).__init__(fail_silently=fail_silently)
+        super().__init__(fail_silently=fail_silently)
         self.host = host or config.SMTP_SERVER[0]
         self.port = port or config.SMTP_SERVER[1]
         self.username = config.SMTP_LOGIN if username is None else username
@@ -137,7 +136,7 @@ class EmailBackend(BaseEmailBackend):
             if self.username and self.password:
                 self.connection.login(str(self.username), str(self.password))
             return True
-        except (smtplib.SMTPException, socket.error):
+        except (smtplib.SMTPException, OSError):
             if not self.fail_silently:
                 raise
 

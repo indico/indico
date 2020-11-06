@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import unicode_literals
 
 from datetime import datetime
 
@@ -101,10 +100,10 @@ class OAuthToken(db.Model):
         return 'bearer'
 
     def __repr__(self):  # pragma: no cover
-        return '<OAuthToken({}, {}, {})>'.format(self.id, self.application, self.user)
+        return f'<OAuthToken({self.id}, {self.application}, {self.user})>'
 
 
-class OAuthGrant(object):
+class OAuthGrant:
     """OAuth grant token."""
 
     #: cache entry to store grant tokens
@@ -133,7 +132,7 @@ class OAuthGrant(object):
 
     @classmethod
     def make_key(cls, client_id, code):
-        return '{}:{}'.format(client_id, code)
+        return f'{client_id}:{code}'
 
     def delete(self):
         self._cache.delete(self.key)

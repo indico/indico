@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import unicode_literals
 
 from functools import partial
 from itertools import chain
@@ -47,28 +46,28 @@ _columns_for_types = {
 
 
 def _make_checks(allowed_link_types):
-    available_columns = set(chain.from_iterable(cols for type_, cols in six.iteritems(_columns_for_types)
+    available_columns = set(chain.from_iterable(cols for type_, cols in _columns_for_types.items()
                                                 if type_ in allowed_link_types))
-    yield db.CheckConstraint('(event_id IS NULL) = (link_type = {})'.format(LinkType.category), 'valid_event_id')
+    yield db.CheckConstraint(f'(event_id IS NULL) = (link_type = {LinkType.category})', 'valid_event_id')
     for link_type in allowed_link_types:
         required_cols = available_columns & _columns_for_types[link_type]
         forbidden_cols = available_columns - required_cols
-        criteria = ['{} IS NULL'.format(col) for col in sorted(forbidden_cols)]
-        criteria += ['{} IS NOT NULL'.format(col) for col in sorted(required_cols)]
+        criteria = [f'{col} IS NULL' for col in sorted(forbidden_cols)]
+        criteria += [f'{col} IS NOT NULL' for col in sorted(required_cols)]
         condition = 'link_type != {} OR ({})'.format(link_type, ' AND '.join(criteria))
-        yield db.CheckConstraint(condition, 'valid_{}_link'.format(link_type.name))
+        yield db.CheckConstraint(condition, f'valid_{link_type.name}_link')
 
 
 def _make_uniques(allowed_link_types, extra_criteria=None):
     for link_type in allowed_link_types:
-        where = ['link_type = {}'.format(link_type.value)]
+        where = [f'link_type = {link_type.value}']
         if extra_criteria is not None:
             where += list(extra_criteria)
         yield db.Index(None, *_columns_for_types[link_type], unique=True,
                        postgresql_where=db.text(' AND '.join(where)))
 
 
-class LinkMixin(object):
+class LinkMixin:
     #: The link types that are supported.  Can be overridden in the
     #: model using the mixin.  Affects the table structure, so any
     #: changes to it should go along with a migration step!
@@ -90,7 +89,7 @@ class LinkMixin(object):
     def __auto_table_args(cls):
         args = tuple(_make_checks(cls.allowed_link_types))
         if cls.unique_links:
-            extra_criteria = [cls.unique_links] if isinstance(cls.unique_links, six.string_types) else None
+            extra_criteria = [cls.unique_links] if isinstance(cls.unique_links, str) else None
             args = args + tuple(_make_uniques(cls.allowed_link_types, extra_criteria))
         return args
 
@@ -124,11 +123,11 @@ class LinkMixin(object):
                 assert event is not None
                 target.event = event
 
-        for rel, fn in six.iteritems(event_mapping):
+        for rel, fn in event_mapping.items():
             if rel is not None:
                 listen(rel, 'set', partial(_set_event_obj, fn))
 
-        for rel, link_type in six.iteritems(type_mapping):
+        for rel, link_type in type_mapping.items():
             if rel is not None:
                 listen(rel, 'set', partial(_set_link_type, link_type))
 
@@ -338,7 +337,7 @@ class LinkMixin(object):
         elif isinstance(obj, db.m.SubContribution):
             self.subcontribution = obj
         else:
-            raise TypeError('Unexpected object: {}'.format(obj))
+            raise TypeError(f'Unexpected object: {obj}')
 
     @object.comparator
     def object(cls):
@@ -349,7 +348,7 @@ class LinkMixin(object):
         """A kwargs-style string suitable for the object's repr."""
         info = [('link_type', self.link_type.name if self.link_type is not None else 'None')]
         info.extend((key, getattr(self, key)) for key in _all_columns if getattr(self, key) is not None)
-        return ', '.join('{}={}'.format(key, value) for key, value in info)
+        return ', '.join(f'{key}={value}' for key, value in info)
 
     @property
     def link_event_log_data(self):

@@ -11,7 +11,6 @@ import icalendar
 import pytz
 import six
 from babel.dates import get_timezone
-from six.moves import map
 from sqlalchemy import Date, Time, or_
 from sqlalchemy.sql import cast
 from werkzeug.datastructures import MultiDict, OrderedMultiDict
@@ -36,7 +35,7 @@ class RoomBookingHookBase(HTTPAPIHook):
     GUEST_ALLOWED = False
 
     def _getParams(self):
-        super(RoomBookingHookBase, self)._getParams()
+        super()._getParams()
         self._fromDT = utc_to_server(self._fromDT.astimezone(pytz.utc)).replace(tzinfo=None) if self._fromDT else None
         self._toDT = utc_to_server(self._toDT.astimezone(pytz.utc)).replace(tzinfo=None) if self._toDT else None
         self._occurrences = _yesno(get_query_parameter(self._queryParams, ['occ', 'occurrences'], 'no'))
@@ -58,7 +57,7 @@ class RoomHook(RoomBookingHookBase):
     VALID_FORMATS = ('json', 'jsonp', 'xml')
 
     def _getParams(self):
-        super(RoomHook, self)._getParams()
+        super()._getParams()
         self._location = self._pathParams['location']
         self._ids = list(map(int, self._pathParams['idlist'].split('-')))
         if self._detail not in {'rooms', 'reservations'}:
@@ -96,7 +95,7 @@ class RoomNameHook(RoomBookingHookBase):
     VALID_FORMATS = ('json', 'jsonp', 'xml')
 
     def _getParams(self):
-        super(RoomNameHook, self)._getParams()
+        super()._getParams()
         self._location = self._pathParams['location']
         self._room_name = self._pathParams['room_name']
 
@@ -109,7 +108,7 @@ class RoomNameHook(RoomBookingHookBase):
         if loc is None:
             return
 
-        search_str = '%{}%'.format(self._room_name)
+        search_str = f'%{self._room_name}%'
         rooms_data = Room.get_with_data(
             filters=[
                 Room.location_id == loc.id,
@@ -137,7 +136,7 @@ class ReservationHook(RoomBookingHookBase):
         return {'ical_serializer': _ical_serialize_reservation}
 
     def _getParams(self):
-        super(ReservationHook, self)._getParams()
+        super()._getParams()
         self._locations = self._pathParams['loclist'].split('-')
 
     def export_reservation(self, user):
@@ -160,7 +159,7 @@ class BookRoomHook(HTTPAPIHook):
     HTTP_POST = True
 
     def _getParams(self):
-        super(BookRoomHook, self)._getParams()
+        super()._getParams()
         self._fromDT = utc_to_server(self._fromDT.astimezone(pytz.utc)).replace(tzinfo=None) if self._fromDT else None
         self._toDT = utc_to_server(self._toDT.astimezone(pytz.utc)).replace(tzinfo=None) if self._toDT else None
         if not self._fromDT or not self._toDT or self._fromDT.date() != self._toDT.date():
@@ -187,7 +186,7 @@ class BookRoomHook(HTTPAPIHook):
             'from': self._fromDT,
             'to': self._toDT
         }
-        missing = [key for key, val in six.iteritems(self._params) if not val]
+        missing = [key for key, val in self._params.items() if not val]
         if missing:
             raise HTTPAPIError('Required params missing: {}'.format(', '.join(missing)))
         self._room = Room.get(self._params['room_id'])
@@ -218,7 +217,7 @@ class BookRoomHook(HTTPAPIHook):
         except ConflictingOccurrences:
             raise HTTPAPIError('Failed to create the booking due to conflicts with other bookings')
         except IndicoError as e:
-            raise HTTPAPIError('Failed to create the booking: {}'.format(e))
+            raise HTTPAPIError(f'Failed to create the booking: {e}')
         db.session.add(reservation)
         db.session.flush()
         return {'reservationID': reservation.id}
@@ -332,7 +331,7 @@ def _ical_serialize_reservation(cal, data, now):
     event.add('dtend', end_dt_utc)
     event.add('url', data['bookingUrl'])
     event.add('summary', data['reason'])
-    event.add('location', u'{}: {}'.format(data['location'], data['room']['fullName']))
+    event.add('location', '{}: {}'.format(data['location'], data['room']['fullName']))
     event.add('description', data['reason'].decode('utf-8') + '\n\n' + data['bookingUrl'])
     if data['repeat_frequency'] != RepeatFrequency.NEVER:
         event.add('rrule', _ical_serialize_repeatability(data))

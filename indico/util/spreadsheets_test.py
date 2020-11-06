@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import unicode_literals
 
 import textwrap
 
@@ -52,4 +51,4 @@ def test_generate_csv_malicious(value, expected):
     headers = ['foo', 'bar']
     rows = [{'foo': value, 'bar': ''}]
     csv = generate_csv(headers, rows).read().decode('utf-8-sig').strip().splitlines()
-    assert csv == ['foo,bar', '{},'.format(expected)]
+    assert csv == ['foo,bar', f'{expected},']

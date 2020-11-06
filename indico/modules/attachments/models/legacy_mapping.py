@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import unicode_literals
 
 from sqlalchemy.ext.declarative import declared_attr
 
@@ -13,7 +12,7 @@ from indico.core.db import db
 from indico.core.db.sqlalchemy.util.models import auto_table_args
 
 
-class _LegacyLinkMixin(object):
+class _LegacyLinkMixin:
     events_backref_name = None
 
     @declared_attr
@@ -62,7 +61,7 @@ class _LegacyLinkMixin(object):
         """A kwargs-style string suitable for the object's repr."""
         _all_columns = {'event_id', 'contribution_id', 'subcontribution_id', 'session_id'}
         info = [(key, getattr(self, key)) for key in _all_columns if getattr(self, key) is not None]
-        return ', '.join('{}={}'.format(key, value) for key, value in info)
+        return ', '.join(f'{key}={value}' for key, value in info)
 
 
 class LegacyAttachmentFolderMapping(_LegacyLinkMixin, db.Model):

@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import unicode_literals
 
 import six
 
@@ -14,7 +13,7 @@ from indico.util.decorators import classproperty
 from indico.util.signals import named_objects_from_signal
 
 
-class Condition(object):
+class Condition:
     """Base class for conditions.
 
     `Condition`s allow you to define criteria to match on and then evaluate
@@ -66,7 +65,7 @@ class Condition(object):
 
     @classmethod
     def _clean_values(cls, values, **kwargs):
-        return list(six.viewkeys(cls.get_available_values(**kwargs)) & set(values))
+        return list(cls.get_available_values(**kwargs).keys() & set(values))
 
     @classmethod
     def check(cls, values, **kwargs):
@@ -102,7 +101,7 @@ def check_rule(context, rule, **kwargs):
     :param rule: the rule to check
     :param kwargs: arguments specific to the context
     """
-    for name, condition in six.iteritems(get_conditions(context, **kwargs)):
+    for name, condition in get_conditions(context, **kwargs).items():
         if not condition.is_used(rule):
             if condition.required:
                 return False
@@ -124,5 +123,5 @@ def get_missing_conditions(context, rule, **kwargs):
     :param rule: the rule to check
     :param kwargs: arguments specific to the context
     """
-    rules = {condition for condition in six.itervalues(get_conditions(context, **kwargs)) if condition.required}
+    rules = {condition for condition in get_conditions(context, **kwargs).values() if condition.required}
     return {condition.friendly_name for condition in rules if not condition.is_used(rule)}

@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import absolute_import, unicode_literals
 
 from flask import render_template
 from markupsafe import Markup
@@ -28,7 +27,7 @@ class IndicoProtectionField(IndicoEnumRadioField):
         self.can_inherit_protection = self.protected_object.protection_parent is not None
         if not self.can_inherit_protection:
             kwargs['skip'] = {ProtectionMode.inheriting}
-        super(IndicoProtectionField, self).__init__(*args, enum=ProtectionMode, **kwargs)
+        super().__init__(*args, enum=ProtectionMode, **kwargs)
 
     def render_protection_message(self):
         protected_object = self.get_form().protected_object

@@ -5,12 +5,11 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import unicode_literals
 
 import six
 
 
-class ExtraUserPreferences(object):
+class ExtraUserPreferences:
     """Define additional user preferences.
 
     To use this class, subclass it and override `defaults`,
@@ -42,10 +41,10 @@ class ExtraUserPreferences(object):
 
     def extend_defaults(self, defaults):
         """Add values to the FormDefaults."""
-        for key, value in six.iteritems(self.load()):
+        for key, value in self.load().items():
             key = self._prefix + key
             if hasattr(defaults, key):
-                raise RuntimeError('Preference collision: {}'.format(key))
+                raise RuntimeError(f'Preference collision: {key}')
             defaults[key] = value
 
     def process_form_data(self, data):
@@ -62,9 +61,9 @@ class ExtraUserPreferences(object):
     def extend_form(self, form_class):
         """Create a subclass of the form containing the extra field."""
         form_class = type('ExtendedUserPreferencesForm', (form_class,), {})
-        for name, field in six.iteritems(self.fields):
+        for name, field in self.fields.items():
             name = self._prefix + name
             if hasattr(form_class, name):
-                raise RuntimeError('Preference collision: {}'.format(name))
+                raise RuntimeError(f'Preference collision: {name}')
             setattr(form_class, name, field)
         return form_class

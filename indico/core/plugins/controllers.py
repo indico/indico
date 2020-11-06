@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import unicode_literals
 
 from collections import OrderedDict, defaultdict
 from operator import attrgetter
@@ -28,7 +27,7 @@ class RHPluginsBase(RHAdminBase):
 
 class RHPlugins(RHPluginsBase):
     def _process(self):
-        plugins = [p for p in six.viewvalues(plugin_engine.get_active_plugins())]
+        plugins = [p for p in plugin_engine.get_active_plugins().values()]
         categories = defaultdict(list)
         other = []
         for plugin in plugins:

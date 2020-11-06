@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import unicode_literals
 
 import six
 from flask import session
@@ -22,19 +21,19 @@ from indico.util.placeholders import get_placeholders
 
 def get_placeholder_options():
     return {name: placeholder
-            for name, placeholder in six.viewitems(get_placeholders('designer-fields'))
+            for name, placeholder in get_placeholders('designer-fields').items()
             if not placeholder.admin_only or session.user.is_admin}
 
 
 def get_nested_placeholder_options():
-    groups = {group_id: {'title': group_title, 'options': {}} for group_id, group_title in six.viewitems(GROUP_TITLES)}
-    for name, placeholder in six.viewitems(get_placeholder_options()):
-        groups[placeholder.group]['options'][name] = six.text_type(placeholder.description)
+    groups = {group_id: {'title': group_title, 'options': {}} for group_id, group_title in GROUP_TITLES.items()}
+    for name, placeholder in get_placeholder_options().items():
+        groups[placeholder.group]['options'][name] = str(placeholder.description)
     return groups
 
 
 def get_image_placeholder_types():
-    return [name for name, placeholder in six.viewitems(get_placeholder_options()) if placeholder.is_image]
+    return [name for name, placeholder in get_placeholder_options().items() if placeholder.is_image]
 
 
 def get_all_templates(obj):

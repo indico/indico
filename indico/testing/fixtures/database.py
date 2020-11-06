@@ -14,7 +14,6 @@ import tempfile
 from contextlib import contextmanager
 
 import pytest
-from six.moves import map
 from sqlalchemy import event
 from sqlalchemy.engine import Engine
 
@@ -43,14 +42,14 @@ def postgresql():
     try:
         version_output = subprocess.check_output(['initdb', '--version'])
     except Exception as e:
-        pytest.skip('Could not retrieve PostgreSQL version: {}'.format(e))
+        pytest.skip(f'Could not retrieve PostgreSQL version: {e}')
     pg_version = list(map(int, re.match(r'initdb \(PostgreSQL\) ((?:\d+\.?)+)', version_output).group(1).split('.')))
     if pg_version[0] < 9 or (pg_version[0] == 9 and pg_version[1] < 6):
-        pytest.skip('PostgreSQL version is too old: {}'.format(version_output))
+        pytest.skip(f'PostgreSQL version is too old: {version_output}')
 
     # Prepare server instance and a test database
     temp_dir = tempfile.mkdtemp(prefix='indicotestpg.')
-    postgres_args = '-h "" -k "{}"'.format(temp_dir)
+    postgres_args = f'-h "" -k "{temp_dir}"'
     try:
         silent_check_call(['initdb', '--encoding', 'UTF8', temp_dir])
         silent_check_call(['pg_ctl', '-D', temp_dir, '-w', '-o', postgres_args, 'start'])
@@ -59,9 +58,9 @@ def postgresql():
         silent_check_call(['psql', '-h', temp_dir, db_name, '-c', 'CREATE EXTENSION pg_trgm;'])
     except Exception as e:
         shutil.rmtree(temp_dir)
-        pytest.skip('Could not init/start PostgreSQL: {}'.format(e))
+        pytest.skip(f'Could not init/start PostgreSQL: {e}')
 
-    yield 'postgresql:///{}?host={}'.format(db_name, temp_dir)
+    yield f'postgresql:///{db_name}?host={temp_dir}'
 
     try:
         silent_check_call(['pg_ctl', '-D', temp_dir, '-m', 'immediate', 'stop'])
@@ -71,9 +70,9 @@ def postgresql():
             with open(os.path.join(temp_dir, 'postmaster.pid')) as f:
                 pid = int(f.readline().strip())
                 os.kill(pid, signal.SIGKILL)
-            pytest.skip('Could not stop postgresql; killed it instead: {}'.format(e))
+            pytest.skip(f'Could not stop postgresql; killed it instead: {e}')
         except Exception as e:
-            pytest.skip('Could not stop/kill postgresql: {}'.format(e))
+            pytest.skip(f'Could not stop/kill postgresql: {e}')
     finally:
         shutil.rmtree(temp_dir)
 

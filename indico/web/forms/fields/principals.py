@@ -5,12 +5,10 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import absolute_import, unicode_literals
 
 import json
 from operator import attrgetter
 
-from six.moves import map
 from wtforms import HiddenField
 
 from indico.core.db.sqlalchemy.principals import PrincipalType, serialize_email_principal
@@ -46,7 +44,7 @@ def serialize_principal(principal):
     elif principal.is_group:
         return serialize_group(principal)
     else:
-        raise ValueError('Invalid principal: {} ({})'.format(principal, principal.principal_type))
+        raise ValueError(f'Invalid principal: {principal} ({principal.principal_type})')
 
 
 class PrincipalListField(HiddenField):
@@ -80,7 +78,7 @@ class PrincipalListField(HiddenField):
         self.allow_registration_forms = kwargs.pop('allow_registration_forms', False)
         self.allow_emails = kwargs.pop('allow_emails', False)
         self._event = kwargs.pop('event')(kwargs['_form']) if 'event' in kwargs else None
-        super(PrincipalListField, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
     def _convert_principal(self, principal):
         event_id = self._event.id if self._event else None
@@ -112,7 +110,7 @@ class AccessControlListField(PrincipalListField):
         self.default_text = kwargs.pop('default_text')
         # Hardcoded value of the protected field for legacy compatibility
         self.protected_field_id = 'protected'
-        super(AccessControlListField, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
 
 class PrincipalField(HiddenField):
@@ -129,7 +127,7 @@ class PrincipalField(HiddenField):
 
     def __init__(self, *args, **kwargs):
         self.allow_external_users = kwargs.pop('allow_external_users', False)
-        super(PrincipalField, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
     def process_formdata(self, valuelist):
         if valuelist:
@@ -156,7 +154,7 @@ class PermissionsField(JSONField):
 
     def __init__(self, *args, **kwargs):
         self.object_type = kwargs.pop('object_type')
-        super(PermissionsField, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self.ip_networks = list(map(serialize_ip_network_group, IPNetworkGroup.query.filter_by(hidden=False)))
 
     @property

@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import unicode_literals
 
 import itertools
 from collections import OrderedDict, defaultdict
@@ -153,7 +152,7 @@ class RHPersonsBase(RHManageEventBase):
 
             event_user_roles_data = {}
             for role in event_user_roles[event_person.user]:
-                event_user_roles_data['custom_{}'.format(role.id)] = {'name': role.name, 'code': role.code,
+                event_user_roles_data[f'custom_{role.id}'] = {'name': role.name, 'code': role.code,
                                                                       'css': role.css}
             event_user_roles_data = OrderedDict(sorted(list(event_user_roles_data.items()), key=lambda t: t[1]['code']))
             data['roles'] = OrderedDict(list(data['roles'].items()) + list(event_user_roles_data.items()))
@@ -164,18 +163,18 @@ class RHPersonsBase(RHManageEventBase):
                                                    'person': [],
                                                    'has_event_person': False,
                                                    'id_field_name': 'user_id'})
-        for user, roles in six.viewitems(event_user_roles):
+        for user, roles in event_user_roles.items():
             if user in event_person_users:
                 continue
             for role in roles:
                 user_metadata = internal_role_users[user.email]
                 user_metadata['person'] = user
-                user_metadata['roles']['custom_{}'.format(role.id)] = {'name': role.name, 'code': role.code,
+                user_metadata['roles'][f'custom_{role.id}'] = {'name': role.name, 'code': role.code,
                                                                        'css': role.css}
             user_metadata['roles'] = OrderedDict(sorted(list(user_metadata['roles'].items()), key=lambda x: x[1]['code']))
 
         # Some EventPersons will have no roles since they were connected to deleted things
-        persons = {email: data for email, data in six.viewitems(persons) if any(six.viewvalues(data['roles']))}
+        persons = {email: data for email, data in persons.items() if any(data['roles'].values())}
         persons = dict(persons, **internal_role_users)
         return persons
 
@@ -198,7 +197,7 @@ class RHPersonsList(RHPersonsBase):
                                    .join(Session).options(joinedload('session').joinedload('acl_entries')))
 
         persons = self.get_persons()
-        person_list = sorted(six.viewvalues(persons), key=lambda x: x['person'].display_full_name.lower())
+        person_list = sorted(persons.values(), key=lambda x: x['person'].display_full_name.lower())
 
         num_no_account = 0
         for principal in itertools.chain(event_principal_query, contrib_principal_query, session_principal_query):
@@ -207,7 +206,7 @@ class RHPersonsList(RHPersonsBase):
             if not persons[principal.email].get('no_account'):
                 persons[principal.email]['roles']['no_account'] = True
                 num_no_account += 1
-        custom_roles = {'custom_{}'.format(r.id): {'name': r.name, 'code': r.code, 'color': r.color}
+        custom_roles = {f'custom_{r.id}': {'name': r.name, 'code': r.code, 'color': r.color}
                         for r in self.event.roles}
         return WPManagePersons.render_template('management/person_list.html', self.event, persons=person_list,
                                                num_no_account=num_no_account, builtin_roles=BUILTIN_ROLES,

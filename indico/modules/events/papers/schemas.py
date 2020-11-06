@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import unicode_literals
 
 import six
 from markupsafe import escape
@@ -124,7 +123,7 @@ class PaperRevisionSchema(mm.ModelSchema):
             data[name] = [review_type_schema.dump(item.instance) for item in data[name]]
 
         reviews = {}
-        for key, value in six.viewitems(data['reviews']):
+        for key, value in data['reviews'].items():
             reviews[orig_string(key.instance.title)] = paper_review_schema.dump(value)
         data['reviews'] = reviews
         return data

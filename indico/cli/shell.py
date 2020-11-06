@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import unicode_literals
 
 import datetime
 import itertools
@@ -19,7 +18,6 @@ import click
 import sqlalchemy.orm
 from contextlib2 import ExitStack
 from flask import current_app
-from six.moves import zip
 
 import indico
 from indico.core import signals

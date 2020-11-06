@@ -5,14 +5,12 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import division, unicode_literals
 
 import uuid
 from collections import Counter, OrderedDict
 from copy import deepcopy
 
 import six
-from six.moves import range
 
 from indico.modules.events.surveys.fields.base import SurveyField
 from indico.util.i18n import _
@@ -20,14 +18,14 @@ from indico.util.string import alpha_enum
 from indico.web.fields.choices import MultiSelectField, SingleChoiceField
 
 
-class _AddUUIDMixin(object):
+class _AddUUIDMixin:
     @staticmethod
     def process_imported_data(data):
         """Generate the options' IDs."""
         data = deepcopy(data)
         if 'options' in data:
             for option in data['options']:
-                option['id'] = six.text_type(uuid.uuid4())
+                option['id'] = str(uuid.uuid4())
         return data
 
 

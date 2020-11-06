@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import division, unicode_literals
 
 from collections import Counter, OrderedDict
 
@@ -34,8 +33,8 @@ class SurveyNumberField(NumberField, SurveyField):
         results = {'total': sum(counter.elements()),
                    'max': max(counter.elements()),
                    'min': min(counter.elements()),
-                   'absolute': OrderedDict(sorted(six.iteritems(counter))),
-                   'relative': OrderedDict((k, v / total_answers) for k, v in sorted(six.iteritems(counter)))}
+                   'absolute': OrderedDict(sorted(counter.items())),
+                   'relative': OrderedDict((k, v / total_answers) for k, v in sorted(counter.items()))}
         results['average'] = results['total'] / len(list(counter.elements()))
         return results
 

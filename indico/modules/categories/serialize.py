@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import unicode_literals
 
 from io import BytesIO
 
@@ -15,7 +14,6 @@ from feedgen.feed import FeedGenerator
 from flask import session
 from lxml import html
 from lxml.etree import ParserError
-from six.moves import filter
 from sqlalchemy.orm import joinedload, load_only, subqueryload, undefer
 from werkzeug.urls import url_parse
 
@@ -73,11 +71,11 @@ def serialize_categories_ical(category_ids, user, event_filter=True, event_filte
     for event in events:
         if not event.can_access(user):
             continue
-        location = ('{} ({})'.format(event.room_name, event.venue_name)
+        location = (f'{event.room_name} ({event.venue_name})'
                     if event.venue_name and event.room_name
                     else (event.venue_name or event.room_name))
         cal_event = ical.Event()
-        cal_event.add('uid', u'indico-event-{}@{}'.format(event.id, url_parse(config.BASE_URL).host))
+        cal_event.add('uid', 'indico-event-{}@{}'.format(event.id, url_parse(config.BASE_URL).host))
         cal_event.add('dtstamp', now)
         cal_event.add('dtstart', event.start_dt)
         cal_event.add('dtend', event.end_dt)
@@ -86,19 +84,19 @@ def serialize_categories_ical(category_ids, user, event_filter=True, event_filte
         cal_event.add('location', location)
         description = []
         if event.person_links:
-            speakers = [u'{} ({})'.format(x.full_name, x.affiliation) if x.affiliation else x.full_name
+            speakers = [f'{x.full_name} ({x.affiliation})' if x.affiliation else x.full_name
                         for x in event.person_links]
-            description.append(u'Speakers: {}'.format(u', '.join(speakers)))
+            description.append('Speakers: {}'.format(', '.join(speakers)))
 
         if event.description:
-            desc_text = six.text_type(event.description) or u'<p/>'  # get rid of RichMarkup
+            desc_text = str(event.description) or '<p/>'  # get rid of RichMarkup
             try:
-                description.append(six.text_type(html.fromstring(desc_text).text_content()))
+                description.append(str(html.fromstring(desc_text).text_content()))
             except ParserError:
                 # this happens e.g. if desc_text contains only a html comment
                 pass
         description.append(event.external_url)
-        cal_event.add('description', u'\n'.join(description))
+        cal_event.add('description', '\n'.join(description))
         cal.add_component(cal_event)
     return BytesIO(cal.to_ical())
 
@@ -125,14 +123,14 @@ def serialize_category_atom(category, url, user, event_filter):
 
     feed = FeedGenerator()
     feed.id(url)
-    feed.title('Indico Feed [{}]'.format(category.title))
+    feed.title(f'Indico Feed [{category.title}]')
     feed.link(href=url, rel='self')
 
     for event in events:
         entry = feed.add_entry(order='append')
         entry.id(event.external_url)
         entry.title(event.title)
-        entry.summary(sanitize_html(six.text_type(event.description)) or None, type='html')
+        entry.summary(sanitize_html(str(event.description)) or None, type='html')
         entry.link(href=event.external_url)
         entry.updated(event.start_dt)
     return BytesIO(feed.atom_str(pretty=True))

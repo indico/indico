@@ -5,12 +5,10 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import unicode_literals
 
 from collections import defaultdict
 
 from flask import g
-from six.moves import map
 from sqlalchemy.orm import joinedload
 
 from indico.modules.attachments.models.attachments import AttachmentType

@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import unicode_literals
 
 from wtforms.fields import BooleanField, StringField, TextAreaField
 from wtforms.validators import DataRequired
@@ -37,7 +36,7 @@ class IPNetworkGroupForm(IndicoForm):
 
     def __init__(self, *args, **kwargs):
         self._network_group_id = kwargs['obj'].id if 'obj' in kwargs else None
-        super(IPNetworkGroupForm, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
     def validate_name(self, field):
         query = IPNetworkGroup.find(db.func.lower(IPNetworkGroup.name) == field.data.lower())

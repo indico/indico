@@ -241,12 +241,12 @@ class AvatarUserWrapper(Fossilizable):
 
     def __repr__(self):
         if self.user is None:
-            return u'<AvatarUserWrapper {}: user does not exist>'.format(self.id)
+            return f'<AvatarUserWrapper {self.id}: user does not exist>'
         elif self._original_user.merged_into_user:
-            return u'<AvatarUserWrapper {}: {} ({}) [{}]>'.format(
+            return '<AvatarUserWrapper {}: {} ({}) [{}]>'.format(
                 self.id, self._original_user.full_name, self._original_user.email, self.user.id)
         else:
-            return u'<AvatarUserWrapper {}: {} ({})>'.format(self.id, self.user.full_name, self.user.email)
+            return f'<AvatarUserWrapper {self.id}: {self.user.full_name} ({self.user.email})>'
 
 
 @implementer(IAvatarFossil, IAvatarMinimalFossil)
@@ -258,7 +258,7 @@ class AvatarProvisionalWrapper(Fossilizable):
         self.data = identity_info.data
 
     def getId(self):
-        return u"{}:{}".format(self.identity_info.provider.name, self.identity_info.identifier)
+        return f"{self.identity_info.provider.name}:{self.identity_info.identifier}"
 
     id = property(getId)
 
@@ -282,7 +282,7 @@ class AvatarProvisionalWrapper(Fossilizable):
         last_name = to_unicode(self.data.get('last_name', ''))
         if upper:
             last_name = last_name.upper()
-        return u'{} {}'.format(to_unicode(self.data.get('first_name', '')), last_name)
+        return '{} {}'.format(to_unicode(self.data.get('first_name', '')), last_name)
 
     def getTitle(self):
         return ''
@@ -303,10 +303,10 @@ class AvatarProvisionalWrapper(Fossilizable):
         return None
 
     def getAddress(self):
-        return u''
+        return ''
 
     def __repr__(self):
-        return u'<AvatarProvisionalWrapper {}: {} ({first_name} {last_name})>'.format(
+        return '<AvatarProvisionalWrapper {}: {} ({first_name} {last_name})>'.format(
             self.identity_info.provider.name,
             self.identity_info.identifier,
             **self.data.to_dict())
@@ -315,17 +315,17 @@ class AvatarProvisionalWrapper(Fossilizable):
 def search_avatars(criteria, exact=False, search_externals=False):
     from indico.modules.users.util import search_users
 
-    if not any(six.viewvalues(criteria)):
+    if not any(criteria.values()):
         return []
 
     def _process_identities(obj):
         if isinstance(obj, IdentityInfo):
-            GenericCache('pending_identities').set('{}:{}'.format(obj.provider.name, obj.identifier), obj.data)
+            GenericCache('pending_identities').set(f'{obj.provider.name}:{obj.identifier}', obj.data)
             return AvatarProvisionalWrapper(obj)
         else:
             return obj.as_avatar
 
     results = search_users(exact=exact, external=search_externals,
-                           **{AVATAR_FIELD_MAP[k]: v for (k, v) in six.iteritems(criteria) if v})
+                           **{AVATAR_FIELD_MAP[k]: v for (k, v) in criteria.items() if v})
 
     return [_process_identities(obj) for obj in results]

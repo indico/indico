@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import absolute_import
 
 import sys
 from contextlib import contextmanager
@@ -30,7 +29,7 @@ from indico.core.db.sqlalchemy.util.models import IndicoBaseQuery, IndicoModel
 class ConstraintViolated(Exception):
     """Indicate that a constraint trigger was violated."""
     def __init__(self, message, orig):
-        super(ConstraintViolated, self).__init__(message)
+        super().__init__(message)
         self.orig = orig
 
 
@@ -53,9 +52,9 @@ def handle_sqlalchemy_database_error():
         raise
     msg = exc.orig.diag.message_primary
     if exc.orig.diag.message_detail:
-        msg += ': {}'.format(exc.orig.diag.message_detail)
+        msg += f': {exc.orig.diag.message_detail}'
     if exc.orig.diag.message_hint:
-        msg += ' ({})'.format(exc.orig.diag.message_hint)
+        msg += f' ({exc.orig.diag.message_hint})'
     raise ConstraintViolated(msg, exc.orig) from exc
 
 
@@ -67,11 +66,11 @@ def _after_commit(*args, **kwargs):
 
 class IndicoSQLAlchemy(SQLAlchemy):
     def __init__(self, *args, **kwargs):
-        super(IndicoSQLAlchemy, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self.m = type('_Models', (object,), {})
 
     def create_session(self, *args, **kwargs):
-        session = super(IndicoSQLAlchemy, self).create_session(*args, **kwargs)
+        session = super().create_session(*args, **kwargs)
         listen(session, 'after_commit', _after_commit)
         return session
 
@@ -134,7 +133,7 @@ def _before_create(target, connection, **kw):
     for schema in schemas:
         if not _schema_exists(connection, schema):
             CreateSchema(schema).execute(connection)
-            signals.db_schema_created.send(six.text_type(schema), connection=connection)
+            signals.db_schema_created.send(str(schema), connection=connection)
     # Create our custom functions
     create_unaccent_function(connection)
     create_natsort_function(connection)
@@ -157,7 +156,7 @@ def _mapper_configured(mapper, class_):
 
 
 def _column_names(constraint, table):
-    return '_'.join((c if isinstance(c, six.string_types) else c.name) for c in constraint.columns)
+    return '_'.join((c if isinstance(c, str) else c.name) for c in constraint.columns)
 
 
 def _unique_index(constraint, table):

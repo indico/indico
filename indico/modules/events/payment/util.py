@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import unicode_literals
 
 import re
 
@@ -23,13 +22,13 @@ remove_prefix_re = re.compile('^payment_')
 
 def get_payment_plugins():
     """Return a dict containing the available payment plugins."""
-    return {remove_prefix_re.sub('', p.name): p for p in six.itervalues(plugin_engine.get_active_plugins())
+    return {remove_prefix_re.sub('', p.name): p for p in plugin_engine.get_active_plugins().values()
             if isinstance(p, PaymentPluginMixin)}
 
 
 def get_active_payment_plugins(event):
     """Return a dict containing the active payment plugins of an event."""
-    return {name: plugin for name, plugin in six.iteritems(get_payment_plugins())
+    return {name: plugin for name, plugin in get_payment_plugins().items()
             if plugin.event_settings.get(event, 'enabled')}
 
 

@@ -10,7 +10,6 @@ from operator import itemgetter
 
 import pytest
 import six
-from six.moves import map
 
 from indico.core.db.sqlalchemy.protection import ProtectionMode
 from indico.core.errors import IndicoError
@@ -45,12 +44,12 @@ def test_has_photo(db, dummy_room):
 
 
 @pytest.mark.parametrize(('building', 'floor', 'number', 'verbose_name', 'expected_name'), (
-    (u'1', u'2', u'3', None,      u'1/2-3'),
-    (u'1', u'2', u'X', None,      u'1/2-X'),
-    (u'1', u'X', u'3', None,      u'1/X-3'),
-    (u'X', u'2', u'3', None,      u'X/2-3'),
-    (u'1', u'2', u'3', u'Test',   u'1/2-3 - Test'),
-    (u'1', u'2', u'3', u'm\xf6p', u'1/2-3 - m\xf6p')
+    ('1', '2', '3', None,      '1/2-3'),
+    ('1', '2', 'X', None,      '1/2-X'),
+    ('1', 'X', '3', None,      '1/X-3'),
+    ('X', '2', '3', None,      'X/2-3'),
+    ('1', '2', '3', 'Test',   '1/2-3 - Test'),
+    ('1', '2', '3', 'm\xf6p', '1/2-3 - m\xf6p')
 ))
 def test_full_name(create_room, building, floor, number, verbose_name, expected_name):
     room = create_room(building=building, floor=floor, number=number, verbose_name=verbose_name)
@@ -59,8 +58,8 @@ def test_full_name(create_room, building, floor, number, verbose_name, expected_
 
 @pytest.mark.parametrize(('name',), (
     (None,),
-    (u'1/2-3',),
-    (u'Test',)
+    ('1/2-3',),
+    ('Test',)
 ))
 def test_name_stays_same(create_room, name):
     room = create_room(verbose_name=name)
@@ -90,67 +89,67 @@ def test_owner_after_change(dummy_room, dummy_user):
 
 
 @pytest.mark.parametrize(('name', 'expected'), (
-    (u'foo', True),
-    (u'bar', True),
-    (u'xxx', False),  # existent
-    (u'yyy', False),  # not existent
+    ('foo', True),
+    ('bar', True),
+    ('xxx', False),  # existent
+    ('yyy', False),  # not existent
 ))
 def test_has_equipment(create_equipment_type, dummy_room, name, expected):
-    dummy_room.available_equipment.append(create_equipment_type(u'foo'))
-    dummy_room.available_equipment.append(create_equipment_type(u'bar'))
-    create_equipment_type(u'xxx')
+    dummy_room.available_equipment.append(create_equipment_type('foo'))
+    dummy_room.available_equipment.append(create_equipment_type('bar'))
+    create_equipment_type('xxx')
     assert dummy_room.has_equipment(name) == expected
 
 
 def test_get_attribute_by_name(create_room_attribute, dummy_room):
-    attr = create_room_attribute(u'foo')
-    assert dummy_room.get_attribute_by_name(u'foo') is None
-    dummy_room.set_attribute_value(u'foo', u'bar')
-    assert dummy_room.get_attribute_by_name(u'foo').attribute == attr
+    attr = create_room_attribute('foo')
+    assert dummy_room.get_attribute_by_name('foo') is None
+    dummy_room.set_attribute_value('foo', 'bar')
+    assert dummy_room.get_attribute_by_name('foo').attribute == attr
 
 
 def test_has_attribute(create_room_attribute, dummy_room):
-    create_room_attribute(u'foo')
-    assert not dummy_room.has_attribute(u'foo')
-    dummy_room.set_attribute_value(u'foo', u'bar')
-    assert dummy_room.has_attribute(u'foo')
+    create_room_attribute('foo')
+    assert not dummy_room.has_attribute('foo')
+    dummy_room.set_attribute_value('foo', 'bar')
+    assert dummy_room.has_attribute('foo')
 
 
 @pytest.mark.parametrize(('value', 'expected'), (
-    (u'',        _notset),
+    ('',        _notset),
     (None,       _notset),
     (0,          _notset),
     ([],         _notset),
-    (u'foo',     u'foo'),
+    ('foo',     'foo'),
     (123,        123),
     (True,       True),
     (['a', 'b'], ['a', 'b']),
 ))
 def test_get_attribute_value(create_room_attribute, dummy_room, value, expected):
-    assert dummy_room.get_attribute_value(u'foo', _notset) is _notset
-    create_room_attribute(u'foo')
-    assert dummy_room.get_attribute_value(u'foo', _notset) is _notset
-    dummy_room.set_attribute_value(u'foo', value)
-    assert dummy_room.get_attribute_value(u'foo', _notset) == expected
+    assert dummy_room.get_attribute_value('foo', _notset) is _notset
+    create_room_attribute('foo')
+    assert dummy_room.get_attribute_value('foo', _notset) is _notset
+    dummy_room.set_attribute_value('foo', value)
+    assert dummy_room.get_attribute_value('foo', _notset) == expected
 
 
 def test_set_attribute_value(create_room_attribute, dummy_room):
     # setting an attribute that doesn't exist fails
     with pytest.raises(ValueError):
-        dummy_room.set_attribute_value(u'foo', u'something')
-    create_room_attribute(u'foo')
+        dummy_room.set_attribute_value('foo', 'something')
+    create_room_attribute('foo')
     # the value can be cleared even if it is not set
-    dummy_room.set_attribute_value(u'foo', None)
-    assert dummy_room.get_attribute_value(u'foo', _notset) is _notset
+    dummy_room.set_attribute_value('foo', None)
+    assert dummy_room.get_attribute_value('foo', _notset) is _notset
     # set it to some value
-    dummy_room.set_attribute_value(u'foo', u'test')
-    assert dummy_room.get_attribute_value(u'foo') == u'test'
+    dummy_room.set_attribute_value('foo', 'test')
+    assert dummy_room.get_attribute_value('foo') == 'test'
     # set to some other value while we have an existing association entry
-    dummy_room.set_attribute_value(u'foo', u'something')
-    assert dummy_room.get_attribute_value(u'foo') == u'something'
+    dummy_room.set_attribute_value('foo', 'something')
+    assert dummy_room.get_attribute_value('foo') == 'something'
     # clear it
-    dummy_room.set_attribute_value(u'foo', None)
-    assert dummy_room.get_attribute_value(u'foo', _notset) is _notset
+    dummy_room.set_attribute_value('foo', None)
+    assert dummy_room.get_attribute_value('foo', _notset) is _notset
 
 
 def test_find_all(create_location, create_room):
@@ -158,11 +157,11 @@ def test_find_all(create_location, create_room):
     loc1 = create_location('Z')
     loc2 = create_location('A')
     data = [
-        (2, dict(location=loc1, building=u'1',   floor=u'2', number=u'3')),
-        (3, dict(location=loc1, building=u'2',   floor=u'2', number=u'3')),
-        (5, dict(location=loc1, building=u'100', floor=u'2', number=u'3')),
-        (4, dict(location=loc1, building=u'10',  floor=u'2', number=u'3')),
-        (1, dict(location=loc2, building=u'999', floor=u'2', number=u'3'))
+        (2, dict(location=loc1, building='1',   floor='2', number='3')),
+        (3, dict(location=loc1, building='2',   floor='2', number='3')),
+        (5, dict(location=loc1, building='100', floor='2', number='3')),
+        (4, dict(location=loc1, building='10',  floor='2', number='3')),
+        (1, dict(location=loc2, building='999', floor='2', number='3'))
     ]
     rooms = [(pos, create_room(**params)) for pos, params in data]
     sorted_rooms = list(map(itemgetter(1), sorted(rooms, key=itemgetter(0))))
@@ -171,15 +170,15 @@ def test_find_all(create_location, create_room):
 
 def test_find_with_attribute(dummy_room, create_room, create_room_attribute):
     assert Room.find_all() == [dummy_room]  # one room without the attribute
-    assert not Room.find_with_attribute(u'foo')
-    create_room_attribute(u'foo')
-    assert not Room.find_with_attribute(u'foo')
+    assert not Room.find_with_attribute('foo')
+    create_room_attribute('foo')
+    assert not Room.find_with_attribute('foo')
     expected = set()
     for room in [create_room(), create_room()]:
-        value = u'bar-{}'.format(room.id)
-        room.set_attribute_value(u'foo', value)
+        value = f'bar-{room.id}'
+        room.set_attribute_value('foo', value)
         expected.add((room, value))
-    assert set(Room.find_with_attribute(u'foo')) == expected
+    assert set(Room.find_with_attribute('foo')) == expected
 
 
 def test_get_with_data_errors():
@@ -189,15 +188,15 @@ def test_get_with_data_errors():
 
 @pytest.mark.parametrize('only_active', (True, False))
 def test_get_with_data(db, create_room, create_equipment_type, only_active):
-    eq = create_equipment_type(u'eq')
+    eq = create_equipment_type('eq')
 
     rooms = {
         'inactive': {'room': create_room(is_deleted=True), 'equipment': []},
         'no_eq': {'room': create_room(), 'equipment': []},
         'all_eq': {'room': create_room(), 'equipment': [eq]}
     }
-    room_types = {room_data['room']: type_ for type_, room_data in six.iteritems(rooms)}
-    for room in six.itervalues(rooms):
+    room_types = {room_data['room']: type_ for type_, room_data in rooms.items()}
+    for room in rooms.values():
         room['room'].available_equipment = room['equipment']
     db.session.flush()
     results = list(Room.get_with_data(only_active=only_active))

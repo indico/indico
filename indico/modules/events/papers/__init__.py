@@ -11,7 +11,6 @@ The "inputs" of this module are the conference papers, which will be uploaded
 by the corresponding authors/submitters.
 """
 
-from __future__ import unicode_literals
 
 from flask import session
 

@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import unicode_literals
 
 from indico.core.db.sqlalchemy.util.session import no_autoflush
 from indico.modules.events.contributions.models.persons import (AuthorType, ContributionPersonLink,
@@ -31,7 +30,7 @@ class ContributionPersonLinkListField(PersonLinkListFieldBase):
         self.default_author_type = kwargs.pop('default_author_type', AuthorType.none)
         self.default_is_submitter = kwargs.pop('default_is_submitter', True)
         self.default_is_speaker = True
-        super(ContributionPersonLinkListField, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
     def _convert_data(self, data):
         return {self._get_person_link(x): x.pop('isSubmitter', self.default_is_submitter) for x in data}
@@ -40,14 +39,14 @@ class ContributionPersonLinkListField(PersonLinkListFieldBase):
     def _get_person_link(self, data):
         extra_data = {'author_type': data.pop('authorType', self.default_author_type),
                       'is_speaker': data.pop('isSpeaker', self.default_is_speaker)}
-        return super(ContributionPersonLinkListField, self)._get_person_link(data, extra_data)
+        return super()._get_person_link(data, extra_data)
 
     def _serialize_person_link(self, principal, extra_data=None):
         is_submitter = self.data[principal] if self.get_form().is_submitted() else None
         return serialize_contribution_person_link(principal, is_submitter=is_submitter)
 
     def pre_validate(self, form):
-        super(ContributionPersonLinkListField, self).pre_validate(form)
+        super().pre_validate(form)
         for person_link in self.data:
             if not self.allow_authors and person_link.author_type != AuthorType.none:
                 if not self.object_data or person_link not in self.object_data:

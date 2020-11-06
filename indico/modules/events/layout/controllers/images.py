@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import unicode_literals
 
 import shutil
 from io import BytesIO
@@ -53,7 +52,7 @@ class RHImageUpload(RHManageImagesBase):
             data.seek(0)
             try:
                 image_type = Image.open(data).format.lower()
-            except IOError:
+            except OSError:
                 # Invalid image data
                 continue
             data.seek(0)

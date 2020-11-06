@@ -17,7 +17,7 @@ depends_on = None
 
 def upgrade():
     permissions = "ARRAY['paper_editing', 'slides_editing', 'poster_editing']"
-    condition = 'type NOT IN (2, 3) OR (NOT (permissions::text[] && {}))'.format(permissions)
+    condition = f'type NOT IN (2, 3) OR (NOT (permissions::text[] && {permissions}))'
     op.create_check_constraint('disallow_group_editor_permissions', 'principals', condition, schema='events')
 
 

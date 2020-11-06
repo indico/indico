@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import unicode_literals
 
 import csv
 import itertools
@@ -66,7 +65,7 @@ def get_title_uuid(regform, title):
     if title_field is None:  # should never happen
         return None
     valid_choices = {x['id'] for x in title_field.current_data.versioned_data['choices']}
-    uuid = next((k for k, v in six.iteritems(title_field.data['captions']) if v == title), None)
+    uuid = next((k for k, v in title_field.data['captions'].items() if v == title), None)
     return {uuid: 1} if uuid in valid_choices else None
 
 
@@ -185,7 +184,7 @@ def create_personal_data_fields(regform):
                                                   is_required=pd_type.is_required)
         if not data.get('is_enabled', True):
             field.position = data['position']
-        for key, value in six.iteritems(data):
+        for key, value in data.items():
             setattr(field, key, value)
         field.data, versioned_data = field.field_impl.process_field_data(data.pop('data', {}))
         field.current_data = RegistrationFormFieldData(versioned_data=versioned_data)
@@ -223,7 +222,7 @@ def create_registration(regform, data, invitation=None, management=False, notify
             value = data.get(form_item.html_field_name)
         data_entry = RegistrationData()
         registration.data.append(data_entry)
-        for attr, value in six.iteritems(form_item.field_impl.process_form_data(registration, value)):
+        for attr, value in form_item.field_impl.process_form_data(registration, value).items():
             setattr(data_entry, attr, value)
         if form_item.type == RegistrationFormItemType.field_pd and form_item.personal_data_type.column:
             setattr(registration, form_item.personal_data_type.column, value)
@@ -243,7 +242,7 @@ def create_registration(regform, data, invitation=None, management=False, notify
     logger.info('New registration %s by %s', registration, user)
     registration.log(EventLogRealm.management if management else EventLogRealm.participants,
                      EventLogKind.positive, 'Registration',
-                     'New registration: {}'.format(registration.full_name), user, data={'Email': registration.email})
+                     f'New registration: {registration.full_name}', user, data={'Email': registration.email})
     return registration
 
 
@@ -274,7 +273,7 @@ def modify_registration(registration, data, management=False, notify_user=True):
 
         attrs = field_impl.process_form_data(registration, value, data_by_field[form_item.id],
                                              billable_items_locked=billable_items_locked)
-        for key, val in six.iteritems(attrs):
+        for key, val in attrs.items():
             setattr(data_by_field[form_item.id], key, val)
         if form_item.type == RegistrationFormItemType.field_pd and form_item.personal_data_type.column:
             key = form_item.personal_data_type.column
@@ -294,7 +293,7 @@ def modify_registration(registration, data, management=False, notify_user=True):
     logger.info('Registration %s modified by %s', registration, session.user)
     registration.log(EventLogRealm.management if management else EventLogRealm.participants,
                      EventLogKind.change, 'Registration',
-                     'Registration modified: {}'.format(registration.full_name),
+                     f'Registration modified: {registration.full_name}',
                      session.user, data={'Email': registration.email})
 
 
@@ -322,13 +321,13 @@ def generate_spreadsheet_from_registrations(registrations, regform_items, static
         if item.input_type == 'accommodation':
             field_names.append(unique_col('{} ({})'.format(item.title, 'Arrival'), item.id))
             field_names.append(unique_col('{} ({})'.format(item.title, 'Departure'), item.id))
-    field_names.extend(title for name, (title, fn) in six.iteritems(special_item_mapping) if name in static_items)
+    field_names.extend(title for name, (title, fn) in special_item_mapping.items() if name in static_items)
     rows = []
     for registration in registrations:
         data = registration.data_by_field
         registration_dict = {
             'ID': registration.friendly_id,
-            'Name': "{} {}".format(registration.first_name, registration.last_name)
+            'Name': f"{registration.first_name} {registration.last_name}"
         }
         for item in regform_items:
             key = unique_col(item.title, item.id)
@@ -342,7 +341,7 @@ def generate_spreadsheet_from_registrations(registrations, regform_items, static
                 registration_dict[key] = format_date(departure_date) if departure_date else ''
             else:
                 registration_dict[key] = data[item.id].friendly_data if item.id in data else ''
-        for name, (title, fn) in six.iteritems(special_item_mapping):
+        for name, (title, fn) in special_item_mapping.items():
             if name not in static_items:
                 continue
             value = fn(registration)
@@ -456,7 +455,7 @@ def generate_ticket_qr_code(registration):
     qr_data = {
         "registrant_id": registration.id,
         "checkin_secret": registration.ticket_uuid,
-        "event_id": six.text_type(registration.event.id),
+        "event_id": str(registration.event.id),
         "server_url": config.BASE_URL,
         "version": 1
     }
@@ -606,6 +605,6 @@ def serialize_registration_form(regform):
     return {
         'id': regform.id,
         'name': regform.title,
-        'identifier': 'RegistrationForm:{}'.format(regform.id),
+        'identifier': f'RegistrationForm:{regform.id}',
         '_type': 'RegistrationForm'
     }

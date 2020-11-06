@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import absolute_import, unicode_literals
 
 from datetime import datetime
 
@@ -119,13 +118,13 @@ class ExpectedError(ImATeapot):
     :param data: Any additional data to return
     """
     def __init__(self, message, **data):
-        super(ExpectedError, self).__init__(message or 'Something went wrong')
+        super().__init__(message or 'Something went wrong')
         self.data = dict(data, message=message)
 
 
 def _format_request_data(data, hide_passwords=False):
     if not hasattr(data, 'lists'):
-        data = ((k, [v]) for k, v in six.iteritems(data))
+        data = ((k, [v]) for k, v in data.items())
     else:
         data = data.lists()
     rv = {}
@@ -157,7 +156,7 @@ def get_request_info(hide_passwords=True):
             'email': session.user.email
         } if session.user else None
     except Exception as exc:
-        user_info = 'ERROR: {}'.format(exc)
+        user_info = f'ERROR: {exc}'
     return {
         'id': request.id,
         'time': datetime.now().isoformat(),
@@ -167,7 +166,7 @@ def get_request_info(hide_passwords=True):
         'rh': g.rh.__class__.__name__ if 'rh' in g else None,
         'user': user_info,
         'ip': request.remote_addr,
-        'user_agent': six.text_type(request.user_agent),
+        'user_agent': str(request.user_agent),
         'referrer': request.referrer,
         'data': {
             'url': _format_request_data(request.view_args) if request.view_args is not None else None,
@@ -191,14 +190,14 @@ def signed_url_for(user, blueprint, url_params=None, *args, **kwargs):
     base_url = url_for(blueprint, *args, **(url_params or {}))
     qs = url_encode(sorted(kwargs.items()))
     # this is the URL which is to be signed
-    url = '{}?{}'.format(base_url, qs) if qs else base_url
+    url = f'{base_url}?{qs}' if qs else base_url
 
     signer = Signer(user.signing_secret.encode(), salt='url-signing')
     qs = url_encode(dict(kwargs, token=signer.get_signature(url)))
     full_base_url = url_for(blueprint, *args, _external=_external, **(url_params or {}))
 
     # this is the final URL including the signature ('token' parameter)
-    return '{}?{}'.format(full_base_url, qs) if qs else base_url
+    return f'{full_base_url}?{qs}' if qs else base_url
 
 
 def is_signed_url_valid(user, url):

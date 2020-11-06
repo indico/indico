@@ -35,7 +35,7 @@ def create_location(db):
 @pytest.fixture
 def dummy_location(db, create_location):
     """Give you a dummy default location."""
-    loc = create_location(u'Test')
+    loc = create_location('Test')
     db.session.flush()
     return loc
 
@@ -48,7 +48,7 @@ def create_reservation(db, dummy_room, dummy_user):
         params.setdefault('end_dt', date.today() + relativedelta(hour=17, minute=30))
         params.setdefault('repeat_frequency', RepeatFrequency.NEVER)
         params.setdefault('repeat_interval', int(params['repeat_frequency'] != RepeatFrequency.NEVER))
-        params.setdefault('booking_reason', u'Testing')
+        params.setdefault('booking_reason', 'Testing')
         params.setdefault('room', dummy_room)
         params.setdefault('booked_for_user', dummy_user)
         params.setdefault('created_by_user', dummy_user)
@@ -94,9 +94,9 @@ def dummy_occurrence(create_occurrence):
 def create_room(db, dummy_location, dummy_user):
     """Return a callable which lets you create rooms."""
     def _create_room(**params):
-        params.setdefault('building', u'1')
-        params.setdefault('floor', u'2')
-        params.setdefault('number', u'3')
+        params.setdefault('building', '1')
+        params.setdefault('floor', '2')
+        params.setdefault('number', '3')
         params.setdefault('owner', dummy_user)
         params.setdefault('location', dummy_location)
         params.setdefault('verbose_name', None)
@@ -148,7 +148,7 @@ def create_blocking(db, dummy_room, dummy_user):
         state = params.pop('state', BlockedRoom.State.pending)
         params.setdefault('start_date', date.today())
         params.setdefault('end_date', date.today())
-        params.setdefault('reason', u'Blocked')
+        params.setdefault('reason', 'Blocked')
         params.setdefault('created_by_user', dummy_user)
         blocking = Blocking(**params)
         if room is not None:

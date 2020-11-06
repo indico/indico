@@ -16,4 +16,4 @@ class JSONPSerializer(JSONSerializer):
     def _execute(self, results):
         return "// fetched from Indico\n%s(%s);" % \
                (self._query_params.get('jsonp', 'read'),
-                super(JSONPSerializer, self)._execute(results))
+                super()._execute(results))

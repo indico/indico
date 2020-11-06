@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import unicode_literals
 
 import six
 from flask import has_request_context, request, session
@@ -34,6 +33,6 @@ def _can_access(cls, obj, user, authorized, **kwargs):
     # Grant full access to attachments/folders to certain networks
     if not has_request_context() or not request.remote_addr or authorized is not None:
         return
-    ip = six.text_type(request.remote_addr)
+    ip = str(request.remote_addr)
     if any(net.contains_ip(ip) for net in IPNetworkGroup.query.filter_by(attachment_access_override=True)):
         return True

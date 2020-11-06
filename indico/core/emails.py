@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import absolute_import, unicode_literals
 
 import os
 import tempfile
@@ -106,7 +105,7 @@ def update_email_log_state(log_entry, failed=False):
 
 
 def store_failed_email(email, log_entry=None):
-    prefix = 'failed-email-{}-'.format(date.today().isoformat())
+    prefix = f'failed-email-{date.today().isoformat()}-'
     fd, name = tempfile.mkstemp(prefix=prefix, dir=config.TEMP_DIR)
     with os.fdopen(fd, 'wb') as f:
         six.moves.cPickle.dump((email, log_entry.id if log_entry else None), f)

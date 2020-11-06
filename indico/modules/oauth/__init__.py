@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import unicode_literals
 
 import os
 from datetime import timedelta
@@ -26,8 +25,8 @@ class IndicoOAuth2Provider(OAuth2Provider):
     def init_app(self, app):
         app.config.setdefault('OAUTH2_PROVIDER_ERROR_ENDPOINT', 'oauth.oauth_errors')
         app.config.setdefault('OAUTH2_PROVIDER_TOKEN_EXPIRES_IN', int(timedelta(days=3650).total_seconds()))
-        app.config.setdefault('OAUTH2_PROVIDER_TOKEN_GENERATOR', lambda req: six.text_type(uuid4()))
-        super(IndicoOAuth2Provider, self).init_app(app)
+        app.config.setdefault('OAUTH2_PROVIDER_TOKEN_GENERATOR', lambda req: str(uuid4()))
+        super().init_app(app)
 
 
 oauth = IndicoOAuth2Provider()

@@ -5,12 +5,9 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import unicode_literals
 
 from datetime import datetime, time
 from operator import attrgetter
-
-from six.moves import map
 
 from indico.core.db import db
 from indico.core.db.sqlalchemy import PyIntEnum
@@ -108,7 +105,7 @@ class BlockedRoom(db.Model):
             _join=Reservation
         )
 
-        reason = 'Conflict with blocking {}: {}'.format(self.blocking.id, self.blocking.reason)
+        reason = f'Conflict with blocking {self.blocking.id}: {self.blocking.reason}'
 
         for reservation in reservations:
             if self.blocking.can_override(reservation.created_by_user, room=reservation.room):
@@ -127,7 +124,7 @@ class BlockedRoom(db.Model):
             notify_request_response(self)
 
     def __repr__(self):
-        return '<BlockedRoom({0}, {1}, {2})>'.format(
+        return '<BlockedRoom({}, {}, {})>'.format(
             self.blocking_id,
             self.room_id,
             self.state_name

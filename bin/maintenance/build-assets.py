@@ -56,7 +56,7 @@ def _get_webpack_build_config(url_root='/'):
             'distURL': os.path.join(url_root, 'dist/')
         },
         'themes': {key: {'stylesheet': theme['stylesheet'], 'print_stylesheet': theme.get('print_stylesheet')}
-                   for key, theme in six.viewitems(themes['definitions'])
+                   for key, theme in themes['definitions'].items()
                    if set(theme) & {'stylesheet', 'print_stylesheet'}}
     }
 
@@ -65,7 +65,7 @@ def _get_plugin_bundle_config(plugin_dir):
     try:
         with open(os.path.join(plugin_dir, 'webpack-bundles.json')) as f:
             return json.load(f)
-    except IOError as e:
+    except OSError as e:
         if e.errno == errno.ENOENT:
             return {}
         raise
@@ -75,7 +75,7 @@ def _get_plugin_build_deps(plugin_dir):
     try:
         with open(os.path.join(plugin_dir, 'required-build-plugins.json')) as f:
             return json.load(f)
-    except IOError as e:
+    except OSError as e:
         if e.errno == errno.ENOENT:
             return []
         raise
@@ -87,10 +87,10 @@ def _parse_plugin_theme_yaml(plugin_yaml):
         core_data = f.read()
     core_data = re.sub(r'^(\S+:)$', r'__core_\1', core_data, flags=re.MULTILINE)
     settings = {k: v
-                for k, v in six.viewitems(yaml.safe_load(core_data + '\n' + plugin_yaml))
+                for k, v in yaml.safe_load(core_data + '\n' + plugin_yaml).items()
                 if not k.startswith('__core_')}
     return {name: {'stylesheet': theme['stylesheet'], 'print_stylesheet': theme.get('print_stylesheet')}
-            for name, theme in six.viewitems(settings.get('definitions', {}))
+            for name, theme in settings.get('definitions', {}).items()
             if set(theme) & {'stylesheet', 'print_stylesheet'}}
 
 
@@ -189,10 +189,10 @@ def build_indico(dev, clean, watch, url_root):
 
 def _validate_plugin_dir(ctx, param, value):
     if not os.path.exists(os.path.join(value, 'setup.py')):
-        raise click.BadParameter('no setup.py found in {}'.format(value))
+        raise click.BadParameter(f'no setup.py found in {value}')
     if (not os.path.exists(os.path.join(value, 'webpack.config.js')) and
             not os.path.exists(os.path.join(value, 'webpack-bundles.json'))):
-        raise click.BadParameter('no webpack.config.js or webpack-bundles.json found in {}'.format(value))
+        raise click.BadParameter(f'no webpack.config.js or webpack-bundles.json found in {value}')
     return value
 
 

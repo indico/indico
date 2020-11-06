@@ -5,13 +5,11 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import unicode_literals
 
 from collections import defaultdict
 from operator import attrgetter
 
 from flask import flash, jsonify, request, session
-from six.moves import map
 from sqlalchemy.orm import joinedload, subqueryload
 
 from indico.core.db import db
@@ -92,7 +90,7 @@ class RHAbstractList(DisplayAbstractListMixin, RHAbstractListBase):
     def _render_template(self, **kwargs):
         kwargs['track_session_map'] = {track.id: track.default_session_id for track in self.event.tracks}
         can_create = can_create_invited_abstracts(self.event)
-        return super(RHAbstractList, self)._render_template(can_create_invited_abstracts=can_create, **kwargs)
+        return super()._render_template(can_create_invited_abstracts=can_create, **kwargs)
 
 
 class RHAbstractListCustomize(CustomizeAbstractListMixin, RHAbstractListBase):

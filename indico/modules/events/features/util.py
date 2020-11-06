@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import unicode_literals
 
 from itertools import chain
 
@@ -29,7 +28,7 @@ def get_feature_definition(name):
     try:
         return get_feature_definitions()[name]
     except KeyError:
-        raise RuntimeError('Feature does not exist: {}'.format(name))
+        raise RuntimeError(f'Feature does not exist: {name}')
 
 
 def get_enabled_features(event, only_explicit=False):
@@ -40,7 +39,7 @@ def get_enabled_features(event, only_explicit=False):
     elif only_explicit:
         return set()
     else:
-        return {name for name, feature in six.iteritems(get_feature_definitions()) if feature.is_default_for_event(event)}
+        return {name for name, feature in get_feature_definitions().items() if feature.is_default_for_event(event)}
 
 
 def set_feature_enabled(event, name, state):
@@ -82,7 +81,7 @@ def get_disallowed_features(event):
     for an event.
     """
     disallowed = {feature
-                  for feature in six.itervalues(get_feature_definitions())
+                  for feature in get_feature_definitions().values()
                   if not feature.is_allowed_for_event(event)}
     indirectly_disallowed = set(chain.from_iterable(feature.required_by_deep for feature in disallowed))
     return indirectly_disallowed | {f.name for f in disallowed}
@@ -99,7 +98,7 @@ def is_feature_enabled(event, name):
     if enabled_features is not None:
         return feature.name in enabled_features
     else:
-        if isinstance(event, (six.string_types, int, int)):
+        if isinstance(event, (str, int)):
             event = Event.get(event)
         return event and feature.is_default_for_event(event)
 
@@ -112,10 +111,10 @@ def require_feature(event, name):
     """
     if not is_feature_enabled(event, name):
         feature = get_feature_definition(name)
-        raise NotFound("The '{}' feature is not enabled for this event.".format(feature.friendly_name))
+        raise NotFound(f"The '{feature.friendly_name}' feature is not enabled for this event.")
 
 
 def format_feature_names(names):
-    return ', '.join(sorted(six.text_type(f.friendly_name)
-                            for f in six.itervalues(get_feature_definitions())
+    return ', '.join(sorted(str(f.friendly_name)
+                            for f in get_feature_definitions().values()
                             if f.name in names))

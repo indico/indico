@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import unicode_literals
 
 import six
 from flask import flash, request, session
@@ -35,7 +34,7 @@ class RHFeatures(RHFeaturesBase):
     def _make_form(self):
         form_class = type('FeaturesForm', (IndicoForm,), {})
         disallowed = get_disallowed_features(self.event)
-        for name, feature in sorted(six.iteritems(get_feature_definitions()), key=lambda x: x[1].friendly_name):
+        for name, feature in sorted(get_feature_definitions().items(), key=lambda x: x[1].friendly_name):
             if name in disallowed:
                 continue
             field = BooleanField(feature.friendly_name, widget=SwitchWidget(), description=feature.description)
@@ -69,7 +68,7 @@ class RHSwitchFeature(RHFeaturesBase):
                   .format(features=format_feature_names(changed)), 'success')
             logger.info("Feature '%s' for event %s enabled by %s", feature.name, self.event, session.user)
             self.event.log(EventLogRealm.management, EventLogKind.positive, 'Features',
-                           'Enabled {}'.format(feature.friendly_name), session.user)
+                           f'Enabled {feature.friendly_name}', session.user)
         return jsonify_data(enabled=True, event_menu=self.render_event_menu(), changed=list(changed))
 
     def _process_DELETE(self):
@@ -83,5 +82,5 @@ class RHSwitchFeature(RHFeaturesBase):
                   .format(features=format_feature_names(changed)), 'warning')
             logger.info("Feature '%s' for event %s disabled by %s", feature.name, self.event, session.user)
             self.event.log(EventLogRealm.management, EventLogKind.negative, 'Features',
-                           'Disabled {}'.format(feature.friendly_name), session.user)
+                           f'Disabled {feature.friendly_name}', session.user)
         return jsonify_data(enabled=False, event_menu=self.render_event_menu(), changed=list(changed))

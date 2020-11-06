@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import unicode_literals
 
 from collections import namedtuple
 from io import BytesIO
@@ -134,13 +133,13 @@ class RHUserDashboard(RHUserBase):
         categories = get_related_categories(self.user)
         categories_events = []
         if categories:
-            category_ids = {c['categ'].id for c in six.itervalues(categories)}
+            category_ids = {c['categ'].id for c in categories.values()}
             categories_events = get_events_in_categories(category_ids, self.user)
         from_dt = now_utc(False) - relativedelta(weeks=1, hour=0, minute=0, second=0)
         linked_events = [(event, {'management': bool(roles & self.management_roles),
                                   'reviewing': bool(roles & self.reviewer_roles),
                                   'attendance': bool(roles & self.attendance_roles)})
-                         for event, roles in six.iteritems(get_linked_events(self.user, from_dt, 10))]
+                         for event, roles in get_linked_events(self.user, from_dt, 10).items()]
         return WPUserDashboard.render_template('dashboard.html', 'dashboard',
                                                user=self.user,
                                                categories=categories,
@@ -159,7 +158,7 @@ class RHExportDashboardICS(RHTokenProtected):
         categories = get_related_categories(self.user)
         categories_events = []
         if categories:
-            category_ids = {c['categ'].id for c in six.itervalues(categories)}
+            category_ids = {c['categ'].id for c in categories.values()}
             categories_events = get_events_in_categories(category_ids, self.user, limit=limit)
 
         linked_events = get_linked_events(
@@ -265,7 +264,7 @@ class RHSaveProfilePicture(RHUserBase):
             f = request.files['picture']
             try:
                 pic = Image.open(f)
-            except IOError:
+            except OSError:
                 raise UserValueError(_('You cannot upload this file as profile picture.'))
             if pic.format.lower() not in {'jpeg', 'png', 'gif', 'webp'}:
                 raise UserValueError(_('The file has an invalid format ({format}).').format(format=pic.format))
@@ -322,7 +321,7 @@ class RHUserFavorites(RHUserBase):
 class RHUserFavoritesUsersAdd(RHUserBase):
     def _process(self):
         users = [User.get(int(id_)) for id_ in request.form.getlist('user_id')]
-        self.user.favorite_users |= set([_f for _f in users if _f])
+        self.user.favorite_users |= {_f for _f in users if _f}
         tpl = get_template_module('users/_favorites.html')
         return jsonify(success=True, users=[serialize_user(user) for user in users],
                        html=tpl.favorite_users_list(self.user))
@@ -505,7 +504,7 @@ class RHUsersAdmin(RHAdminBase):
             include_deleted = form_data.pop('include_deleted')
             include_pending = form_data.pop('include_pending')
             external = form_data.pop('external')
-            form_data = {k: v for (k, v) in six.iteritems(form_data) if v and v.strip()}
+            form_data = {k: v for (k, v) in form_data.items() if v and v.strip()}
             matches = search_users(exact=exact, include_deleted=include_deleted, include_pending=include_pending,
                                    include_blocked=True, external=external, allow_system_user=True, **form_data)
             for entry in matches:
@@ -681,10 +680,10 @@ class RHUserSearch(RHProtected):
     def _serialize_pending_user(self, entry):
         first_name = entry.data.get('first_name') or ''
         last_name = entry.data.get('last_name') or ''
-        full_name = '{} {}'.format(first_name, last_name).strip() or 'Unknown'
+        full_name = f'{first_name} {last_name}'.strip() or 'Unknown'
         affiliation = entry.data.get('affiliation') or ''
         email = entry.data['email'].lower()
-        ext_id = '{}:{}'.format(entry.provider.name, entry.identifier)
+        ext_id = f'{entry.provider.name}:{entry.identifier}'
         # detailed data to put in redis to create a pending user if needed
         self.externals[ext_id] = {
             'first_name': first_name,
@@ -698,7 +697,7 @@ class RHUserSearch(RHProtected):
         return {
             '_ext_id': ext_id,
             'id': None,
-            'identifier': 'ExternalUser:{}'.format(ext_id),
+            'identifier': f'ExternalUser:{ext_id}',
             'email': email,
             'affiliation': affiliation,
             'full_name': full_name,
@@ -726,7 +725,7 @@ class RHUserSearch(RHProtected):
         'external': fields.Bool(missing=False),
         'favorites_first': fields.Bool(missing=False)
     }, validate=validate_with_message(
-        lambda args: six.viewkeys(args) & {'first_name', 'last_name', 'email', 'affiliation'},
+        lambda args: args.keys() & {'first_name', 'last_name', 'email', 'affiliation'},
         'No criteria provided'
     ))
     def _process(self, exact, external, favorites_first, **criteria):
@@ -744,7 +743,7 @@ class RHUserSearch(RHProtected):
 
 class RHUserSearchInfo(RHProtected):
     def _process(self):
-        external_users_available = any(auth.supports_search for auth in six.itervalues(multipass.identity_providers))
+        external_users_available = any(auth.supports_search for auth in multipass.identity_providers.values())
         return jsonify(external_users_available=external_users_available)
 
 

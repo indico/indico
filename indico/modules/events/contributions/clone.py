@@ -5,11 +5,9 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import unicode_literals
 
 from copy import deepcopy
 
-from six.moves import zip
 from sqlalchemy.orm import joinedload, subqueryload, undefer
 
 from indico.core.db import db

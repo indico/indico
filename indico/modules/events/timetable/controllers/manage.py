@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import unicode_literals
 
 import dateutil.parser
 import six
@@ -94,9 +93,9 @@ class RHTimetableREST(RHManageTimetableEntryBase):
         data = request.json
         required_keys = {'start_dt'}
         allowed_keys = {'start_dt', 'contribution_id', 'session_block_id', 'force'}
-        if set(six.viewkeys(data)) > allowed_keys:
+        if set(data.keys()) > allowed_keys:
             raise BadRequest('Invalid keys found')
-        elif required_keys > set(six.viewkeys(data)):
+        elif required_keys > set(data.keys()):
             raise BadRequest('Required keys missing')
         updates = {'start_dt': dateutil.parser.parse(data['start_dt'])}
         if 'contribution_id' in data:
@@ -111,7 +110,7 @@ class RHTimetableREST(RHManageTimetableEntryBase):
         """Update a timetable entry."""
         data = request.json
         # TODO: support breaks
-        if set(six.viewkeys(data)) > {'start_dt'}:
+        if set(data.keys()) > {'start_dt'}:
             raise BadRequest('Invalid keys found')
         updates = {}
         if 'start_dt' in data:
@@ -164,7 +163,7 @@ class RHBreakREST(RHManageTimetableBase):
 
     def _process_PATCH(self):
         data = request.json
-        if set(six.viewkeys(data)) > {'colors'}:
+        if set(data.keys()) > {'colors'}:
             raise BadRequest
         if 'colors' in data:
             colors = ColorTuple(**data['colors'])

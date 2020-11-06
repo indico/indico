@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import unicode_literals
 
 from flask import redirect, request
 
@@ -34,7 +33,7 @@ from indico.web.flask.wrappers import IndicoBlueprint
 
 
 def _redirect_event_creation(category_id, event_type):
-    anchor = 'create-event:{}:{}'.format(event_type, category_id)
+    anchor = f'create-event:{event_type}:{category_id}'
     return redirect(url_for('.display', category_id=category_id, _anchor=anchor))
 
 

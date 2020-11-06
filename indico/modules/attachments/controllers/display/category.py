@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import unicode_literals
 
 from indico.modules.attachments.controllers.display.base import DownloadAttachmentMixin
 from indico.modules.categories.controllers.base import RHDisplayCategoryBase

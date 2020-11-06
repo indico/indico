@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import unicode_literals
 
 from flask import jsonify, request, session
 from sqlalchemy.orm import joinedload, load_only
@@ -121,7 +120,7 @@ class RHContributionDisplay(RHContributionDisplayBase):
 
     def _process(self):
         ical_params = get_base_ical_parameters(session.user, 'contributions',
-                                               '/export/event/{0}.ics'.format(self.event.id))
+                                               f'/export/event/{self.event.id}.ics')
         contrib = (Contribution.query
                    .filter_by(id=self.contrib.id)
                    .options(joinedload('type'),

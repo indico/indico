@@ -83,7 +83,7 @@ def test_grant_get(mocker):
 def test_grant_make_key():
     client_id = str(uuid4())
     code = 'foobar'
-    key = '{}:{}'.format(client_id, code)
+    key = f'{client_id}:{code}'
     assert OAuthGrant.make_key(client_id, code) == key
 
 

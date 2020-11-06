@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import unicode_literals
 
 from wtforms.fields import BooleanField, SelectField, StringField
 from wtforms.validators import DataRequired, ValidationError
@@ -29,7 +28,7 @@ class EditGroupForm(IndicoForm):
 
     def __init__(self, *args, **kwargs):
         self.group = kwargs.pop('group', None)
-        super(EditGroupForm, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
     def validate_name(self, field):
         query = LocalGroup.find(db.func.lower(LocalGroup.name) == field.data.lower())

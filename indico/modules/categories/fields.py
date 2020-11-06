@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import unicode_literals
 
 import json
 
@@ -34,7 +33,7 @@ class CategoryField(HiddenField):
         self.allow_events = kwargs.pop('allow_events', True)
         self.allow_subcats = kwargs.pop('allow_subcats', True)
         self.require_event_creation_rights = kwargs.pop('require_event_creation_rights', False)
-        super(CategoryField, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
     def pre_validate(self, form):
         if self.data:

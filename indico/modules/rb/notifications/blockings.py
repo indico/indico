@@ -30,7 +30,7 @@ def notify_request_response(blocked_room):
     """
     to = blocked_room.blocking.created_by_user.email
     verb = blocked_room.State(blocked_room.state).title.upper()
-    subject = 'Room blocking {}'.format(verb)
+    subject = f'Room blocking {verb}'
     body = render_template('rb/emails/blockings/state_email_to_user.txt',
                            blocking=blocked_room.blocking, blocked_room=blocked_room, verb=verb)
     return make_email(to, subject=subject, body=body)

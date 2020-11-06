@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import unicode_literals
 
 from datetime import time
 from operator import itemgetter
@@ -99,11 +98,11 @@ class RegistrationFormForm(IndicoForm):
 
     def __init__(self, *args, **kwargs):
         self.event = kwargs.pop('event')
-        super(RegistrationFormForm, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self._set_currencies()
         self.notification_sender_address.description = _('Email address set as the sender of all '
                                                          'notifications sent to users. If empty, '
-                                                         'then {0} is used.'.format(config.NO_REPLY_EMAIL))
+                                                         'then {} is used.'.format(config.NO_REPLY_EMAIL))
 
     def _set_currencies(self):
         currencies = [(c['code'], '{0[code]} ({0[name]})'.format(c)) for c in payment_settings.get('currencies')]
@@ -123,7 +122,7 @@ class RegistrationFormScheduleForm(IndicoForm):
     def __init__(self, *args, **kwargs):
         regform = kwargs.pop('regform')
         self.timezone = regform.event.timezone
-        super(RegistrationFormScheduleForm, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
 
 class InvitationFormBase(IndicoForm):
@@ -138,7 +137,7 @@ class InvitationFormBase(IndicoForm):
     def __init__(self, *args, **kwargs):
         self.regform = kwargs.pop('regform')
         event = self.regform.event
-        super(InvitationFormBase, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         if not self.regform.moderation_enabled:
             del self.skip_moderation
         self.email_from.choices = list(event.get_allowed_sender_emails().items())
@@ -220,7 +219,7 @@ class EmailRegistrantsForm(IndicoForm):
     def __init__(self, *args, **kwargs):
         self.regform = kwargs.pop('regform')
         event = self.regform.event
-        super(EmailRegistrantsForm, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self.from_address.choices = list(event.get_allowed_sender_emails().items())
         self.body.description = render_placeholder_info('registration-email', regform=self.regform, registration=None)
 
@@ -230,7 +229,7 @@ class EmailRegistrantsForm(IndicoForm):
             raise ValidationError(_('Missing placeholders: {}').format(', '.join(missing)))
 
     def is_submitted(self):
-        return super(EmailRegistrantsForm, self).is_submitted() and 'submitted' in request.form
+        return super().is_submitted() and 'submitted' in request.form
 
 
 class TicketsForm(IndicoForm):
@@ -257,7 +256,7 @@ class TicketsForm(IndicoForm):
 
     def __init__(self, *args, **kwargs):
         event = kwargs.pop('event')
-        super(TicketsForm, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         default_tpl = get_default_ticket_on_category(event.category)
         all_templates = set(event.designer_templates) | get_inherited_templates(event)
         badge_templates = [(tpl.id, tpl.title) for tpl in all_templates
@@ -327,7 +326,7 @@ class RegistrationManagersForm(IndicoForm):
 
     def __init__(self, *args, **kwargs):
         self.event = kwargs.pop('event')
-        super(RegistrationManagersForm, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
 
 class CreateMultipleRegistrationsForm(IndicoForm):
@@ -344,7 +343,7 @@ class CreateMultipleRegistrationsForm(IndicoForm):
     def __init__(self, *args, **kwargs):
         self._regform = kwargs.pop('regform')
         open_add_user_dialog = kwargs.pop('open_add_user_dialog', False)
-        super(CreateMultipleRegistrationsForm, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self.user_principals.open_immediately = open_add_user_dialog
 
     def validate_user_principals(self, field):
@@ -380,14 +379,14 @@ class BadgeSettingsForm(IndicoForm):
         badge_templates = [tpl for tpl in all_templates if tpl.type.name == 'badge']
         signals.event.filter_selectable_badges.send(type(self), badge_templates=badge_templates)
         tickets = kwargs.pop('tickets')
-        super(BadgeSettingsForm, self).__init__(**kwargs)
-        self.template.choices = sorted(((six.text_type(tpl.id), tpl.title)
+        super().__init__(**kwargs)
+        self.template.choices = sorted(((str(tpl.id), tpl.title)
                                         for tpl in badge_templates
                                         if tpl.is_ticket == tickets),
                                        key=itemgetter(1))
 
     def is_submitted(self):
-        return super(BadgeSettingsForm, self).is_submitted() and 'submitted' in request.form
+        return super().is_submitted() and 'submitted' in request.form
 
 
 class ImportRegistrationsForm(IndicoForm):
@@ -399,6 +398,6 @@ class ImportRegistrationsForm(IndicoForm):
 
     def __init__(self, *args, **kwargs):
         self.regform = kwargs.pop('regform')
-        super(ImportRegistrationsForm, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         if not self.regform.moderation_enabled:
             del self.skip_moderation

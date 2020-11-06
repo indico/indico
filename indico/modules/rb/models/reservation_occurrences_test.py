@@ -9,7 +9,6 @@ from datetime import date, datetime, time
 
 import pytest
 from dateutil.relativedelta import relativedelta
-from six.moves import zip
 
 from indico.core.errors import IndicoError
 from indico.modules.rb.models.reservation_occurrences import ReservationOccurrence, ReservationOccurrenceState

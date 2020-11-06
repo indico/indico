@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import absolute_import, unicode_literals
 
 import six
 from flask import render_template
@@ -16,7 +15,7 @@ from indico.util.signals import named_objects_from_signal
 from indico.util.string import format_repr
 
 
-class _MenuSectionBase(object):
+class _MenuSectionBase:
     is_section = True
 
     def __init__(self, name, title, weight=-1):
@@ -48,7 +47,7 @@ class SideMenuSection(_MenuSectionBase):
     """
 
     def __init__(self, name, title, weight=-1, active=False, icon=None):
-        super(SideMenuSection, self).__init__(name, title, weight)
+        super().__init__(name, title, weight)
         self._active = active
         self.icon = 'icon-' + icon if icon else None
 
@@ -60,7 +59,7 @@ class SideMenuSection(_MenuSectionBase):
         return format_repr(self, 'name', 'title', active=False)
 
 
-class SideMenuItem(object):
+class SideMenuItem:
     """Define a side menu item.
 
     :param name: the unique name (within the menu) of the item
@@ -101,7 +100,7 @@ class TopMenuSection(_MenuSectionBase):
         return format_repr(self, 'name', 'title')
 
 
-class TopMenuItem(object):
+class TopMenuItem:
     """Define a top menu item.
 
     :param name: the unique name (within the menu) of the item
@@ -140,11 +139,11 @@ def build_menu_structure(menu_id, active_item=None, **kwargs):
     top_level = set()
     sections = {}
 
-    for id_, section in six.iteritems(named_objects_from_signal(signals.menu.sections.send(menu_id, **kwargs))):
+    for id_, section in named_objects_from_signal(signals.menu.sections.send(menu_id, **kwargs)).items():
         sections[id_] = section
         top_level.add(section)
 
-    for id_, item in six.iteritems(named_objects_from_signal(signals.menu.items.send(menu_id, **kwargs))):
+    for id_, item in named_objects_from_signal(signals.menu.items.send(menu_id, **kwargs)).items():
         if id_ == active_item:
             item.active = True
         if item.section is None:

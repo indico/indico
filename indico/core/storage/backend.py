@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import unicode_literals
 
 import os
 from contextlib import contextmanager
@@ -35,12 +34,12 @@ def get_storage(backend_name):
     try:
         definition = config.STORAGE_BACKENDS[backend_name]
     except KeyError:
-        raise RuntimeError('Storage backend does not exist: {}'.format(backend_name))
+        raise RuntimeError(f'Storage backend does not exist: {backend_name}')
     name, data = definition.split(':', 1)
     try:
         backend = get_storage_backends()[name]
     except KeyError:
-        raise RuntimeError('Storage backend {} has invalid type {}'.format(backend_name, name))
+        raise RuntimeError(f'Storage backend {backend_name} has invalid type {name}')
     return backend(data)
 
 
@@ -56,7 +55,7 @@ class StorageReadOnlyError(StorageError):
     """Exception used when trying to write to a read-only storage."""
 
 
-class Storage(object):
+class Storage:
     """Base class for storage backends.
 
     To create a new storage backend, subclass this class and register
@@ -205,7 +204,7 @@ class Storage(object):
         return '<{}()>'.format(type(self).__name__)
 
 
-class ReadOnlyStorageMixin(object):
+class ReadOnlyStorageMixin:
     """Mixin that makes write operations fail with an error."""
 
     def save(self, name, content_type, filename, fileobj):
@@ -225,14 +224,14 @@ class FileSystemStorage(Storage):
     def _resolve_path(self, path):
         full_path = safe_join(self.path, path)
         if full_path is None:
-            raise ValueError('Invalid path: {}'.format(path))
+            raise ValueError(f'Invalid path: {path}')
         return full_path
 
     def open(self, file_id):
         try:
             return open(self._resolve_path(file_id), 'rb')
         except Exception as e:
-            raise StorageError('Could not open "{}": {}'.format(file_id, e)) from e
+            raise StorageError(f'Could not open "{file_id}": {e}') from e
 
     @contextmanager
     def get_local_path(self, file_id):
@@ -251,35 +250,35 @@ class FileSystemStorage(Storage):
                 checksum = self._copy_file(fileobj, f)
             return name, checksum
         except Exception as e:
-            raise StorageError('Could not save "{}": {}'.format(name, e)) from e
+            raise StorageError(f'Could not save "{name}": {e}') from e
 
     def delete(self, file_id):
         try:
             os.remove(self._resolve_path(file_id))
         except Exception as e:
-            raise StorageError('Could not delete "{}": {}'.format(file_id, e)) from e
+            raise StorageError(f'Could not delete "{file_id}": {e}') from e
 
     def getsize(self, file_id):
         try:
             return os.path.getsize(self._resolve_path(file_id))
         except Exception as e:
-            raise StorageError('Could not get size of "{}": {}'.format(file_id, e)) from e
+            raise StorageError(f'Could not get size of "{file_id}": {e}') from e
 
     def send_file(self, file_id, content_type, filename, inline=True):
         try:
             return send_file(filename, self._resolve_path(file_id), content_type, inline=inline)
         except Exception as e:
-            raise StorageError('Could not send "{}": {}'.format(file_id, e)) from e
+            raise StorageError(f'Could not send "{file_id}": {e}') from e
 
     def __repr__(self):
-        return '<FileSystemStorage: {}>'.format(self.path)
+        return f'<FileSystemStorage: {self.path}>'
 
 
 class ReadOnlyFileSystemStorage(ReadOnlyStorageMixin, FileSystemStorage):
     name = 'fs-readonly'
 
     def __repr__(self):
-        return '<ReadOnlyFileSystemStorage: {}>'.format(self.path)
+        return f'<ReadOnlyFileSystemStorage: {self.path}>'
 
 
 @signals.get_storage_backends.connect

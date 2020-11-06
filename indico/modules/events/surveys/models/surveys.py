@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import unicode_literals
 
 from uuid import uuid4
 
@@ -63,7 +62,7 @@ class Survey(db.Model):
         UUID,
         unique=True,
         nullable=False,
-        default=lambda: six.text_type(uuid4())
+        default=lambda: str(uuid4())
     )
     # An introduction text for users of the survey
     introduction = db.Column(
@@ -279,7 +278,7 @@ class Survey(db.Model):
         return ~cls.is_deleted & cls.questions.any() & cls.has_started
 
     def __repr__(self):
-        return '<Survey({}, {}): {}>'.format(self.id, self.event_id, self.title)
+        return f'<Survey({self.id}, {self.event_id}): {self.title}>'
 
     def can_submit(self, user):
         return self.is_active and (not self.require_user or user)

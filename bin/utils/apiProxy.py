@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import print_function
 
 import hashlib
 import hmac
@@ -34,7 +33,7 @@ def build_indico_request(path, params, api_key=None, secret_key=None, only_publi
     if secret_key:
         items.append(('timestamp', str(int(time.time()))))
         items = sorted(items, key=lambda x: x[0].lower())
-        url = '%s?%s' % (path, six.moves.urllib.parse.urlencode(items))
+        url = '{}?{}'.format(path, six.moves.urllib.parse.urlencode(items))
         signature = hmac.new(secret_key.encode(), url.encode(), hashlib.sha1).hexdigest()
         items.append(('signature', signature))
     return items

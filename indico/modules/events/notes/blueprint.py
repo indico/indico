@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import unicode_literals
 
 import six
 
@@ -20,7 +19,7 @@ _bp = IndicoBlueprint('event_notes', __name__, template_folder='templates', virt
 _bp.add_url_rule('/note/compile', 'compile', RHCompileNotes, methods=('GET', 'POST'), defaults={'object_type': 'event'})
 
 
-for object_type, prefixes in six.iteritems(event_object_url_prefixes):
+for object_type, prefixes in event_object_url_prefixes.items():
     for prefix in prefixes:
         _bp.add_url_rule(prefix + '/note/', 'view', RHViewNote, defaults={'object_type': object_type})
         _bp.add_url_rule(prefix + '/note/edit', 'edit', RHEditNote, methods=('GET', 'POST'),

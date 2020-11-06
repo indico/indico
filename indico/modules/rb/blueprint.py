@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import unicode_literals
 
 import json
 
@@ -131,12 +130,12 @@ _bp.add_url_rule('!/event/<confId>/manage/rooms/linking/session-blocks', 'event_
 # Deep/quick links
 @_bp.route('/room/<int:room_id>')
 def room_link(room_id):
-    return redirect(url_for('rb.roombooking', modal='room-details:{}'.format(room_id)))
+    return redirect(url_for('rb.roombooking', modal=f'room-details:{room_id}'))
 
 
 @_bp.route('/booking/<int:booking_id>')
 def booking_link(booking_id):
-    return redirect(url_for('rb.roombooking', modal='booking-details:{}'.format(booking_id)))
+    return redirect(url_for('rb.roombooking', modal=f'booking-details:{booking_id}'))
 
 
 @_bp.route('/booking/<int:booking_id>/cancel/<date>')
@@ -152,7 +151,7 @@ def my_bookings_link():
 
 @_bp.route('/blocking/<int:blocking_id>')
 def blocking_link(blocking_id):
-    return redirect(url_for('rb.roombooking', path='blockings', modal='blocking-details:{}'.format(blocking_id)))
+    return redirect(url_for('rb.roombooking', path='blockings', modal=f'blocking-details:{blocking_id}'))
 
 
 _compat_bp = IndicoBlueprint('compat_rb', __name__, url_prefix='/rooms')

@@ -26,7 +26,6 @@ from reportlab.pdfbase.ttfonts import TTFont
 from reportlab.pdfgen.canvas import Canvas
 from reportlab.platypus import PageTemplate, SimpleDocTemplate
 from reportlab.platypus.frames import Frame
-from six.moves import range
 
 from indico.legacy.common.utils import isStringHTML
 from indico.util.i18n import _
@@ -478,7 +477,7 @@ class PDFBase:
                 # draw horizontally centered, with recalculated width and height
                 c.drawImage(imagePath, self._PAGE_WIDTH/2.0 - width/2, startHeight, width, height, mask="auto")
                 return startHeight
-            except IOError:
+            except OSError:
                 if drawTitle:
                     self._drawWrappedString(c, escape(self.event.title.encode('utf-8')),
                                             height=self._PAGE_HEIGHT - inch)

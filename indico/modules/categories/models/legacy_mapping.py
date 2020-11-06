@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import unicode_literals
 
 from indico.core.db import db
 
@@ -45,4 +44,4 @@ class LegacyCategoryMapping(db.Model):
     )
 
     def __repr__(self):
-        return '<LegacyCategoryMapping({}, {})>'.format(self.legacy_category_id, self.category_id)
+        return f'<LegacyCategoryMapping({self.legacy_category_id}, {self.category_id})>'

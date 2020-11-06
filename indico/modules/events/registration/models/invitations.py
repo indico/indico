@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import unicode_literals
 
 from uuid import uuid4
 
@@ -46,7 +45,7 @@ class RegistrationInvitation(db.Model):
         index=True,
         unique=True,
         nullable=False,
-        default=lambda: six.text_type(uuid4())
+        default=lambda: str(uuid4())
     )
     #: The ID of the registration form
     registration_form_id = db.Column(
@@ -124,5 +123,5 @@ class RegistrationInvitation(db.Model):
         return dict(self.registration_form.locator, invitation=self.uuid)
 
     def __repr__(self):
-        full_name = '{} {}'.format(self.first_name, self.last_name)
+        full_name = f'{self.first_name} {self.last_name}'
         return format_repr(self, 'id', 'registration_form_id', 'email', 'state', _text=full_name)

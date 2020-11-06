@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import unicode_literals
 
 from collections import OrderedDict
 from datetime import date, timedelta
@@ -218,12 +217,12 @@ def serialize_category_role(role, legacy=True):
             'code': role.code,
             'color': role.color,
             'category': role.category.title,
-            'identifier': 'CategoryRole:{}'.format(role.id),
+            'identifier': f'CategoryRole:{role.id}',
             '_type': 'CategoryRole'
         }
     else:
         return {
             'id': role.id,
             'name': role.name,
-            'identifier': 'CategoryRole:{}'.format(role.id),
+            'identifier': f'CategoryRole:{role.id}',
         }

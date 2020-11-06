@@ -58,7 +58,7 @@ def gettext_unicode(*args, **kwargs):
     plugin_name = kwargs.pop('plugin_name', None)
     force_unicode = kwargs.pop('force_unicode', False)
 
-    if not isinstance(args[0], six.text_type):
+    if not isinstance(args[0], str):
         args = [(text.decode('utf-8') if isinstance(text, str) else text) for text in args]
         using_unicode = force_unicode
     else:
@@ -97,7 +97,7 @@ def smart_func(func_name, plugin_name=None, force_unicode=False):
             # otherwise, defer translation to eval time
             return lazy_gettext(*args, plugin_name=plugin_name)
     if plugin_name is _use_context:
-        _wrap.__name__ = '<smart {}>'.format(func_name)
+        _wrap.__name__ = f'<smart {func_name}>'
     else:
         _wrap.__name__ = '<smart {} bound to {}>'.format(func_name, plugin_name or 'indico')
     return _wrap
@@ -135,7 +135,7 @@ class NullDomain(Domain):
     """A `Domain` that doesn't contain any translations."""
 
     def __init__(self):
-        super(NullDomain, self).__init__()
+        super().__init__()
         self.null = NullTranslations()
 
     def get_translations(self):
@@ -151,7 +151,7 @@ class IndicoLocale(Locale):
 
     @cached_property
     def time_formats(self):
-        formats = super(IndicoLocale, self).time_formats
+        formats = super().time_formats
         for k, v in formats.items():
             v.format = v.format.replace(':%(ss)s', '')
         return formats
@@ -299,8 +299,7 @@ def extract_node(node, keywords, commentTags, options, parents=[None]):
             yield (node.lineno, '', line.split('\n'), ['old style recursive strings'])
     else:
         for cnode in ast.iter_child_nodes(node):
-            for rslt in extract_node(cnode, keywords, commentTags, options, parents=(parents + [node])):
-                yield rslt
+            yield from extract_node(cnode, keywords, commentTags, options, parents=(parents + [node]))
 
 
 def po_to_json(po_file, locale=None, domain=None):

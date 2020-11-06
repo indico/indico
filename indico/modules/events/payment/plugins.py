@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import unicode_literals
 
 import re
 
@@ -38,17 +37,17 @@ class PaymentEventSettingsFormBase(IndicoForm):
     def __init__(self, *args, **kwargs):
         # Provide the plugin settings in case a plugin needs them for more complex form fields.
         self._plugin_settings = kwargs.pop('plugin_settings')
-        super(PaymentEventSettingsFormBase, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
 
-class PaymentPluginMixin(object):
+class PaymentPluginMixin:
     settings_form = PaymentPluginSettingsFormBase
     event_settings_form = PaymentEventSettingsFormBase
     #: Set containing all valid currencies. Set to `None` to allow all.
     valid_currencies = None
 
     def init(self):
-        super(PaymentPluginMixin, self).init()
+        super().init()
         if not self.name.startswith('payment_'):
             raise Exception('Payment plugins must be named payment_*')
         self.connect(signals.event_management.management_url, self.get_event_management_url)
@@ -140,6 +139,6 @@ class PaymentPluginMixin(object):
         :param transaction: the :class:`PaymentTransaction`
         """
         # Try using the template in the plugin first in case it extends the default one
-        return render_template(['{}:transaction_details.html'.format(transaction.plugin.name),
+        return render_template([f'{transaction.plugin.name}:transaction_details.html',
                                 'events/payment/transaction_details.html'],
                                plugin=transaction.plugin, transaction=transaction)

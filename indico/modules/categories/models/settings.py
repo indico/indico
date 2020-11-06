@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import unicode_literals
 
 from sqlalchemy.ext.declarative import declared_attr
 
@@ -45,4 +44,4 @@ class CategorySetting(JSONSettingsBase, db.Model):
     )
 
     def __repr__(self):
-        return '<CategorySetting({}, {}, {}, {!r})>'.format(self.category_id, self.module, self.name, self.value)
+        return f'<CategorySetting({self.category_id}, {self.module}, {self.name}, {self.value!r})>'

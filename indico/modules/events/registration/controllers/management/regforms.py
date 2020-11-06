@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import unicode_literals
 
 from operator import attrgetter, itemgetter
 
@@ -72,7 +71,7 @@ class RHManageRegistrationFormsDisplay(RHManageRegFormsBase):
             if column_name in available_columns:
                 enabled_columns.append({'id': column_name, 'title': available_columns[column_name]})
                 del available_columns[column_name]
-        for column_name, column_title in six.iteritems(available_columns):
+        for column_name, column_title in available_columns.items():
             disabled_columns.append({'id': column_name, 'title': column_title})
         disabled_columns.sort(key=itemgetter('title'))
 
@@ -89,7 +88,7 @@ class RHManageRegistrationFormsDisplay(RHManageRegFormsBase):
             if regform.publish_registrations_enabled:
                 enabled_forms.append(regform)
                 del available_forms[form_id]
-        for form_id, regform in six.iteritems(available_forms):
+        for form_id, regform in available_forms.items():
             # There might be forms with publication enabled that haven't been sorted by the user yet.
             if regform.publish_registrations_enabled:
                 enabled_forms.append(regform)
@@ -146,7 +145,7 @@ class RHManageParticipants(RHManageRegFormsBase):
             db.session.flush()
             signals.event.registration_form_created.send(regform)
             self.event.log(EventLogRealm.management, EventLogKind.positive, 'Registration',
-                           'Registration form "{}" has been created'.format(regform.title), session.user)
+                           f'Registration form "{regform.title}" has been created', session.user)
         return redirect(url_for('event_registration.manage_regform', regform))
 
     def _process_GET(self):
@@ -173,7 +172,7 @@ class RHRegistrationFormCreate(RHManageRegFormsBase):
             signals.event.registration_form_created.send(regform)
             flash(_('Registration form has been successfully created'), 'success')
             self.event.log(EventLogRealm.management, EventLogKind.positive, 'Registration',
-                           'Registration form "{}" has been created'.format(regform.title), session.user)
+                           f'Registration form "{regform.title}" has been created', session.user)
             return redirect(url_for('.manage_regform', regform))
         return WPManageRegistration.render_template('management/regform_edit.html', self.event,
                                                     form=form, regform=None)
@@ -229,9 +228,9 @@ class RHRegistrationFormOpen(RHManageRegFormBase):
         new_dts = (self.regform.start_dt, self.regform.end_dt)
         if new_dts != old_dts:
             if not old_dts[1]:
-                log_text = 'Registration form "{}" was opened'.format(self.regform.title)
+                log_text = f'Registration form "{self.regform.title}" was opened'
             else:
-                log_text = 'Registration form "{}" was reopened'.format(self.regform.title)
+                log_text = f'Registration form "{self.regform.title}" was reopened'
             self.event.log(EventLogRealm.event, EventLogKind.change, 'Registration', log_text, session.user)
         return redirect(url_for('.manage_regform', self.regform))
 
@@ -245,7 +244,7 @@ class RHRegistrationFormClose(RHManageRegFormBase):
             self.regform.start_dt = self.regform.end_dt
         flash(_("Registrations for {} are now closed").format(self.regform.title), 'success')
         logger.info("Registrations for %s closed by %s", self.regform, session.user)
-        log_text = 'Registration form "{}" was closed'.format(self.regform.title)
+        log_text = f'Registration form "{self.regform.title}" was closed'
         self.event.log(EventLogRealm.event, EventLogKind.change, 'Registration', log_text, session.user)
         return redirect(url_for('.manage_regform', self.regform))
 

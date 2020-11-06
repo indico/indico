@@ -25,4 +25,4 @@ class Photo(db.Model):
     # - room (Room.photo)
 
     def __repr__(self):
-        return u'<Photo({0})>'.format(self.id)
+        return f'<Photo({self.id})>'

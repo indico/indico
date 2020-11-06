@@ -35,7 +35,7 @@ class NonBookablePeriod(db.Model):
     # - room (Room.nonbookable_periods)
 
     def __repr__(self):
-        return u'<NonBookablePeriod({0}, {1}, {2})>'.format(
+        return '<NonBookablePeriod({}, {}, {})>'.format(
             self.room_id,
             self.start_dt,
             self.end_dt

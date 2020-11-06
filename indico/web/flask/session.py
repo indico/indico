@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import absolute_import, unicode_literals
 
 import pickle
 import uuid
@@ -95,7 +94,7 @@ class IndicoSession(BaseSession):
         if lang == territory:
             return lang
         else:
-            return '{}-{}'.format(lang, territory)
+            return f'{lang}-{territory}'
 
     @cached_property
     def csrf_token(self):

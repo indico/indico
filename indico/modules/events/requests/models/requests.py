@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import unicode_literals
 
 from sqlalchemy.dialects.postgresql import JSONB
 
@@ -141,7 +140,7 @@ class Request(db.Model):
 
     def __repr__(self):
         state = self.state.name if self.state is not None else None
-        return '<Request({}, {}, {}, {})>'.format(self.id, self.event_id, self.type, state)
+        return f'<Request({self.id}, {self.event_id}, {self.type}, {state})>'
 
     @classmethod
     def find_latest_for_event(cls, event, type_=None):

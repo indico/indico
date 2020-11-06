@@ -6,7 +6,7 @@
 # LICENSE file for more details.
 
 
-class Serializer(object):
+class Serializer:
 
     schemaless = True
     encapsulate = True

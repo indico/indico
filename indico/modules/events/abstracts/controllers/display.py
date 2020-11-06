@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import unicode_literals
 
 from flask import flash, request, session
 from werkzeug.exceptions import Forbidden, NotFound
@@ -90,7 +89,7 @@ class RHSubmitInvitedAbstract(RHAbstractBase):
     def _create_form(self):
         form_user = session.user or self.abstract.submitter
         abstract_form_cls = make_abstract_form(self.event, form_user)
-        custom_field_values = {'custom_{}'.format(x.contribution_field_id): x.data for x in self.abstract.field_values}
+        custom_field_values = {f'custom_{x.contribution_field_id}': x.data for x in self.abstract.field_values}
         form_defaults = FormDefaults(self.abstract, **custom_field_values)
         return abstract_form_cls(obj=form_defaults, event=self.event, abstract=self.abstract)
 

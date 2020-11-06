@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import absolute_import, unicode_literals
 
 import six
 from flask import render_template
@@ -34,7 +33,7 @@ def render_breadcrumbs(*titles, **kwargs):
     assert bool(titles) + bool(event) + bool(category) == 1
     if not category and not event:
         items = [(_('Home'), url_for_index())]
-        items += [(x, None) if isinstance(x, six.string_types) else x for x in titles]
+        items += [(x, None) if isinstance(x, str) else x for x in titles]
     else:
         items = []
         if event:

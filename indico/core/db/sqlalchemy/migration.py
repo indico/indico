@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import print_function, unicode_literals
 
 import os
 
@@ -15,7 +14,6 @@ from alembic.script import ScriptDirectory
 from flask import current_app
 from flask_migrate import Migrate, stamp
 from flask_pluginengine import current_plugin
-from six.moves import map
 
 from indico.core.db import db
 from indico.core.db.sqlalchemy.util.management import create_all_tables, get_all_tables
@@ -37,14 +35,14 @@ class PluginScriptDirectory(ScriptDirectory):
     versions = None
 
     def __init__(self, *args, **kwargs):
-        super(PluginScriptDirectory, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self.dir = PluginScriptDirectory.dir
         # use __dict__ since it's a memoized property
         self.__dict__['_version_locations'] = [current_plugin.alembic_versions_path]
 
     @classmethod
     def from_config(cls, config):
-        instance = super(PluginScriptDirectory, cls).from_config(config)
+        instance = super().from_config(config)
         instance.dir = PluginScriptDirectory.dir
         instance.__dict__['_version_locations'] = [current_plugin.alembic_versions_path]
         return instance
@@ -99,7 +97,7 @@ def prepare_db(empty=False, root_path=None, verbose=True):
         alembic.command.ScriptDirectory = PluginScriptDirectory
         plugin_msg = cformat("%{cyan}Setting the alembic version of the %{cyan!}{}%{reset}%{cyan} "
                              "plugin to HEAD%{reset}")
-        for plugin in six.itervalues(plugin_engine.get_active_plugins()):
+        for plugin in plugin_engine.get_active_plugins().values():
             if not os.path.exists(plugin.alembic_versions_path):
                 continue
             if verbose:
@@ -110,7 +108,7 @@ def prepare_db(empty=False, root_path=None, verbose=True):
         tables = get_all_tables(db)
 
     tables['public'] = [t for t in tables['public'] if not t.startswith('alembic_version')]
-    if any(six.viewvalues(tables)):
+    if any(tables.values()):
         if verbose:
             print(cformat('%{red}Your database is not empty!'))
             print(cformat('%{yellow}If you just added a new table/model, create an alembic revision instead!'))

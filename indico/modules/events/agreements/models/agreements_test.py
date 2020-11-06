@@ -5,9 +5,10 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
+from unittest.mock import MagicMock
+
 import pytest
 from freezegun import freeze_time
-from mock import MagicMock
 from werkzeug.exceptions import ServiceUnavailable
 
 from indico.modules.events.agreements.models.agreements import Agreement, AgreementState

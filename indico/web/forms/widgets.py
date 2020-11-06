@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import unicode_literals
 
 import re
 
@@ -23,7 +22,7 @@ from indico.web.util import inject_js
 html_comment_re = re.compile(r'<!--.*?-->', re.MULTILINE)
 
 
-class ConcatWidget(object):
+class ConcatWidget:
     """Render a list of fields as a simple string joined by an optional separator."""
     def __init__(self, separator='', prefix_label=True):
         self.separator = separator
@@ -57,10 +56,10 @@ class HiddenCheckbox(CheckboxInput, HiddenInput):
 
     def __call__(self, field, **kwargs):
         kwargs['style'] = 'display: none;'
-        return super(HiddenCheckbox, self).__call__(field, **kwargs)
+        return super().__call__(field, **kwargs)
 
 
-class JinjaWidget(object):
+class JinjaWidget:
     """Render a field using a custom Jinja template
 
     :param template: The template to render
@@ -85,7 +84,7 @@ class JinjaWidget(object):
             plugin = self.plugin
             if hasattr(plugin, 'name'):
                 plugin = plugin.name
-            template = '{}:{}'.format(plugin, self.template)
+            template = f'{plugin}:{self.template}'
         else:
             template = self.template
         if self.single_kwargs:
@@ -106,10 +105,10 @@ class PasswordWidget(JinjaWidget):
     """Render a password input."""
 
     def __init__(self):
-        super(PasswordWidget, self).__init__('forms/password_widget.html', single_line=True)
+        super().__init__('forms/password_widget.html', single_line=True)
 
     def __call__(self, field, **kwargs):
-        return super(PasswordWidget, self).__call__(field, input_args=kwargs)
+        return super().__call__(field, input_args=kwargs)
 
 
 class CKEditorWidget(JinjaWidget):
@@ -120,7 +119,7 @@ class CKEditorWidget(JinjaWidget):
     :param height: The height of the editor.
     """
     def __init__(self, simple=False, images=False, height=475):
-        super(CKEditorWidget, self).__init__('forms/ckeditor_widget.html', simple=simple, images=images, height=height)
+        super().__init__('forms/ckeditor_widget.html', simple=simple, images=images, height=height)
 
 
 class SwitchWidget(JinjaWidget):
@@ -131,7 +130,7 @@ class SwitchWidget(JinjaWidget):
     """
 
     def __init__(self, confirm_enable=None, confirm_disable=None):
-        super(SwitchWidget, self).__init__('forms/switch_widget.html')
+        super().__init__('forms/switch_widget.html')
         self.confirm_enable = confirm_enable
         self.confirm_disable = confirm_disable
 
@@ -139,7 +138,7 @@ class SwitchWidget(JinjaWidget):
         kwargs.update({
             'checked': getattr(field, 'checked', field.data)
         })
-        return super(SwitchWidget, self).__call__(field, kwargs=kwargs, confirm_enable=self.confirm_enable,
+        return super().__call__(field, kwargs=kwargs, confirm_enable=self.confirm_enable,
                                                   confirm_disable=self.confirm_disable)
 
 
@@ -147,14 +146,14 @@ class SyncedInputWidget(JinjaWidget):
     """Render a text input with a sync button when needed."""
 
     def __init__(self, textarea=False):
-        super(SyncedInputWidget, self).__init__('forms/synced_input_widget.html', single_line=not textarea)
+        super().__init__('forms/synced_input_widget.html', single_line=not textarea)
         self.textarea = textarea
         self.default_widget = TextArea() if textarea else TextInput()
 
     def __call__(self, field, **kwargs):
         # Render a sync button for fields which can be synced, if the identity provider provides a value for the field.
         if field.short_name in multipass.synced_fields and field.synced_value is not None:
-            return super(SyncedInputWidget, self).__call__(field, textarea=self.textarea, kwargs=kwargs)
+            return super().__call__(field, textarea=self.textarea, kwargs=kwargs)
         else:
             return self.default_widget(field, **kwargs)
 
@@ -189,7 +188,7 @@ class SelectizeWidget(JinjaWidget):
         self.value_field = value_field
         self.label_field = label_field
         self.search_field = search_field
-        super(SelectizeWidget, self).__init__('forms/selectize_widget.html', inline_js=inline_js)
+        super().__init__('forms/selectize_widget.html', inline_js=inline_js)
 
     def __call__(self, field, **kwargs):
         choices = ([{'name': getattr(field.data, self.search_field), 'id': field.data.id}]
@@ -207,7 +206,7 @@ class SelectizeWidget(JinjaWidget):
         }
 
         options.update(kwargs.pop('options', {}))
-        return super(SelectizeWidget, self).__call__(field, options=options,
+        return super().__call__(field, options=options,
                                                      search_url=getattr(field, 'search_url', self.search_url),
                                                      search_method=self.search_method,
                                                      search_payload=getattr(field, 'search_payload', None),
@@ -226,7 +225,7 @@ class TypeaheadWidget(JinjaWidget):
     """
 
     def __init__(self, search_url=None, min_trigger_length=1, typeahead_options=None):
-        super(TypeaheadWidget, self).__init__('forms/typeahead_widget.html')
+        super().__init__('forms/typeahead_widget.html')
         self.search_url = search_url
         self.min_trigger_length = min_trigger_length
         self.typeahead_options = typeahead_options
@@ -236,7 +235,7 @@ class TypeaheadWidget(JinjaWidget):
         if self.typeahead_options:
             options.update(self.typeahead_options)
         options.update(kwargs.pop('options', {}))
-        return super(TypeaheadWidget, self).__call__(field, options=options, min_trigger_length=self.min_trigger_length,
+        return super().__call__(field, options=options, min_trigger_length=self.min_trigger_length,
                                                      search_url=self.search_url, choices=getattr(field, 'choices', []))
 
 
@@ -244,7 +243,7 @@ class LocationWidget(JinjaWidget):
     """Render a collection of fields to represent location."""
 
     def __init__(self):
-        super(LocationWidget, self).__init__('forms/location_widget.html', single_line=True)
+        super().__init__('forms/location_widget.html', single_line=True)
 
     def __call__(self, field, **kwargs):
         rooms = {'data': []}
@@ -257,7 +256,7 @@ class LocationWidget(JinjaWidget):
         parent = (self._get_parent_info(field.object_data['source'], field.object_data['inheriting'])
                   if field.object_data and field.object_data.get('source') and field.allow_location_inheritance
                   else ('', ''))
-        return super(LocationWidget, self).__call__(field, rooms=rooms, venues=venues, parent=parent,
+        return super().__call__(field, rooms=rooms, venues=venues, parent=parent,
                                                     source=field.object_data.get('source'), venue_map=venue_map,
                                                     init_inheritance=field.object_data.get('inheriting'))
 
@@ -286,8 +285,8 @@ class ColorPickerWidget(JinjaWidget):
     """Render a colorpicker input field."""
 
     def __init__(self, show_field=True):
-        super(ColorPickerWidget, self).__init__('forms/color_picker_widget.html', single_line=True,
+        super().__init__('forms/color_picker_widget.html', single_line=True,
                                                 show_field=show_field)
 
     def __call__(self, field, **kwargs):
-        return super(ColorPickerWidget, self).__call__(field, input_args=kwargs)
+        return super().__call__(field, input_args=kwargs)

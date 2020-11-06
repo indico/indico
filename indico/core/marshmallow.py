@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import absolute_import, unicode_literals
 
 from inspect import getmro
 
@@ -39,7 +38,7 @@ class IndicoModelConverter(ModelConverter):
     })
 
     def _get_field_kwargs_for_property(self, prop):
-        kwargs = super(IndicoModelConverter, self)._get_field_kwargs_for_property(prop)
+        kwargs = super()._get_field_kwargs_for_property(prop)
         if isinstance(prop, ColumnProperty) and hasattr(prop.columns[0].type, 'marshmallow_get_field_kwargs'):
             kwargs.update(prop.columns[0].type.marshmallow_get_field_kwargs())
         return kwargs
@@ -48,7 +47,7 @@ class IndicoModelConverter(ModelConverter):
         if _is_column_property(column):
             # column_property isn't support and fails later, so we always exclude those
             return True
-        return super(IndicoModelConverter, self)._should_exclude_field(column, fields=fields, exclude=exclude)
+        return super()._should_exclude_field(column, fields=fields, exclude=exclude)
 
     def fields_for_model(self, model, *args, **kwargs):
         # Look up aliases on all classes in the inheritance chain of
@@ -65,7 +64,7 @@ class IndicoModelConverter(ModelConverter):
         # generate all fields from the models and leave it up to mm itself to
         # exclude fields we don't care about
         kwargs['fields'] = ()
-        fields = super(IndicoModelConverter, self).fields_for_model(model, *args, **kwargs)
+        fields = super().fields_for_model(model, *args, **kwargs)
 
         # remove column_property leftovers so they don't break things when using
         # the schema without restricting the list of fields (it would still include
@@ -105,7 +104,7 @@ class IndicoSchema(mm.Schema):
 
 class _IndicoModelSchemaOpts(SchemaOpts):
     def __init__(self, meta, **kwargs):
-        super(_IndicoModelSchemaOpts, self).__init__(meta, **kwargs)
+        super().__init__(meta, **kwargs)
         self.model_converter = getattr(meta, 'model_converter', IndicoModelConverter)
 
 

@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import unicode_literals
 
 from flask import flash, redirect, request, session
 from werkzeug.exceptions import BadRequest, Forbidden
@@ -174,11 +173,11 @@ class RHAPIBuildURLs(RH):
             event = self.object.event
             urls = generate_public_auth_request(api_key, url_format.format(event.id, 'session', self.object.id))
         elif isinstance(self.object, Category):
-            urls = generate_public_auth_request(api_key, '/export/categ/{0}.ics'.format(self.object.id),
+            urls = generate_public_auth_request(api_key, f'/export/categ/{self.object.id}.ics',
                                                 {'from': '-31d'})
         elif isinstance(self.object, Event):
-            urls = generate_public_auth_request(api_key, '/export/event/{0}.ics'.format(self.object.id))
-            event_urls = generate_public_auth_request(api_key, '/export/event/{0}.ics'.format(self.object.id),
+            urls = generate_public_auth_request(api_key, f'/export/event/{self.object.id}.ics')
+            event_urls = generate_public_auth_request(api_key, f'/export/event/{self.object.id}.ics',
                                                       {'detail': 'contribution'})
             urls['publicRequestDetailedURL'] = event_urls['publicRequestURL']
             urls['authRequestDetailedURL'] = event_urls['authRequestURL']

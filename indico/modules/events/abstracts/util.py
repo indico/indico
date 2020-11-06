@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import unicode_literals
 
 import errno
 import os
@@ -39,7 +38,7 @@ def build_default_email_template(event, tpl_type):
     Build a default e-mail template based on a notification type
     provided by the user.
     """
-    email = get_template_module('events/abstracts/emails/default_{}_notification.txt'.format(tpl_type))
+    email = get_template_module(f'events/abstracts/emails/default_{tpl_type}_notification.txt')
     tpl = AbstractEmailTemplate(body=email.get_body(),
                                 extra_cc_emails=[],
                                 reply_to_address=event.contact_emails[0] if event.contact_emails else '',
@@ -75,7 +74,7 @@ def generate_spreadsheet_from_abstracts(abstracts, static_item_ids, dynamic_item
         ('modified_dt', ('Modification date', lambda x: x.modified_dt if x.modified_dt else ''))
     ])
     field_names.extend(unique_col(item.title, item.id) for item in dynamic_items)
-    field_names.extend(title for name, (title, fn) in six.iteritems(static_item_mapping) if name in static_item_ids)
+    field_names.extend(title for name, (title, fn) in static_item_mapping.items() if name in static_item_ids)
     rows = []
     for abstract in abstracts:
         data = abstract.data_by_field
@@ -86,7 +85,7 @@ def generate_spreadsheet_from_abstracts(abstracts, static_item_ids, dynamic_item
         for item in dynamic_items:
             key = unique_col(item.title, item.id)
             abstract_dict[key] = data[item.id].friendly_data if item.id in data else ''
-        for name, (title, fn) in six.iteritems(static_item_mapping):
+        for name, (title, fn) in static_item_mapping.items():
             if name not in static_item_ids:
                 continue
             value = fn(abstract)
@@ -112,7 +111,7 @@ def create_mock_abstract(event):
 
     class _MockLocator(dict):
         def __init__(self, locator, **sublocators):
-            super(_MockLocator, self).__init__(locator)
+            super().__init__(locator)
             self._sublocators = sublocators
 
         def __getattr__(self, attr):
@@ -206,7 +205,7 @@ def make_abstract_form(event, user, notification_option=False, management=False,
             # field definition is not available anymore
             continue
         if custom_field.is_user_editable or event.can_manage(user):
-            name = 'custom_{}'.format(custom_field.id)
+            name = f'custom_{custom_field.id}'
             setattr(form_class, name, field_impl.create_wtf_field())
     return form_class
 
@@ -294,7 +293,7 @@ def create_boa(event):
             return path
     pdf = AbstractBook(event)
     tmp_path = pdf.generate()
-    filename = 'boa-{}.pdf'.format(event.id)
+    filename = f'boa-{event.id}.pdf'
     full_path = os.path.join(config.CACHE_DIR, filename)
     shutil.move(tmp_path, full_path)
     boa_settings.set(event, 'cache_path', filename)

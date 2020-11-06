@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import unicode_literals
 
 from indico.core.db import db
 
@@ -45,4 +44,4 @@ class LegacyEventMapping(db.Model):
     )
 
     def __repr__(self):
-        return '<LegacyEventMapping({}, {})>'.format(self.legacy_event_id, self.event_id)
+        return f'<LegacyEventMapping({self.legacy_event_id}, {self.event_id})>'

@@ -5,14 +5,13 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import unicode_literals
 
 from flask import render_template
 
 from indico.modules.events.logs.util import render_changes
 
 
-class EventLogRendererBase(object):
+class EventLogRendererBase:
     """Base class for event log renderers."""
 
     #: unique name of the log renderer (matches EventLogEntry.type)
@@ -30,7 +29,7 @@ class EventLogRendererBase(object):
 
         :param entry: A :class:`.EventLogEntry`
         """
-        template = '{}:{}'.format(cls.plugin.name, cls.template_name) if cls.plugin is not None else cls.template_name
+        template = f'{cls.plugin.name}:{cls.template_name}' if cls.plugin is not None else cls.template_name
         return render_template(template, entry=entry, data=cls.get_data(entry), **cls.template_kwargs)
 
     @classmethod

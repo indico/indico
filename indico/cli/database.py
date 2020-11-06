@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import print_function, unicode_literals
 
 import os
 import sys
@@ -17,7 +16,6 @@ import six
 from flask import current_app
 from flask.cli import with_appcontext
 from flask_migrate.cli import db as flask_migrate_cli
-from six.moves import input
 
 import indico
 from indico.cli.core import cli_group
@@ -52,10 +50,10 @@ def prepare():
 
 
 def _stamp(plugin=None, revision=None):
-    table = 'alembic_version' if not plugin else 'alembic_version_plugin_{}'.format(plugin)
-    db.session.execute('DELETE FROM {}'.format(table))
+    table = 'alembic_version' if not plugin else f'alembic_version_plugin_{plugin}'
+    db.session.execute(f'DELETE FROM {table}')
     if revision:
-        db.session.execute('INSERT INTO {} VALUES (:revision)'.format(table), {'revision': revision})
+        db.session.execute(f'INSERT INTO {table} VALUES (:revision)', {'revision': revision})
 
 
 @cli.command()
@@ -90,16 +88,16 @@ def reset_alembic():
         # All revisions were just data migrations -> get rid of them
         if plugin not in plugins:
             continue
-        print('[{}] Deleting revision table'.format(plugin))
-        db.session.execute('DROP TABLE alembic_version_plugin_{}'.format(plugin))
+        print(f'[{plugin}] Deleting revision table')
+        db.session.execute(f'DROP TABLE alembic_version_plugin_{plugin}')
     plugin_revisions = {'chat': '3888761f35f7',
                         'livesync': 'aa0dbc6c14aa',
                         'outlook': '6093a83228a7',
                         'vc_vidyo': '6019621fea50'}
-    for plugin, revision in six.iteritems(plugin_revisions):
+    for plugin, revision in plugin_revisions.items():
         if plugin not in plugins:
             continue
-        print('[{}] Stamping to new revision'.format(plugin))
+        print(f'[{plugin}] Stamping to new revision')
         _stamp(plugin, revision)
     db.session.commit()
 
@@ -133,7 +131,7 @@ def _call_with_plugins(*args, **kwargs):
     if plugin:
         plugins = {plugin_engine.get_plugin(plugin)}
     elif all_plugins:
-        plugins = set(six.viewvalues(plugin_engine.get_active_plugins()))
+        plugins = set(plugin_engine.get_active_plugins().values())
     else:
         plugins = None
 
@@ -152,7 +150,7 @@ def _call_with_plugins(*args, **kwargs):
 
 
 def _setup_cli():
-    for command in six.itervalues(flask_migrate_cli.commands):
+    for command in flask_migrate_cli.commands.values():
         if command.name == 'init':
             continue
         command.callback = partial(with_appcontext(_call_with_plugins), _func=command.callback)

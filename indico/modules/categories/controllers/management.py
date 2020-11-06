@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import unicode_literals
 
 import os
 import random
@@ -13,7 +12,6 @@ from io import BytesIO
 
 from flask import flash, redirect, request, session
 from PIL import Image
-from six.moves import map
 from sqlalchemy.orm import joinedload, load_only, undefer_group
 from werkzeug.exceptions import BadRequest, Forbidden
 
@@ -134,7 +132,7 @@ class RHCategoryImageUploadBase(RHManageCategoryBase):
         f = request.files[self.IMAGE_TYPE]
         try:
             img = Image.open(f)
-        except IOError:
+        except OSError:
             flash(_('You cannot upload this file as an icon/logo.'), 'error')
             return jsonify_data(content=None)
         if img.format.lower() not in {'jpeg', 'png', 'gif'}:
@@ -157,13 +155,13 @@ class RHCategoryImageUploadBase(RHManageCategoryBase):
         }
         self._set_image(content, metadata)
         flash(self.SAVED_FLASH_MSG, 'success')
-        logger.info("New {} '%s' uploaded by %s (%s)".format(self.IMAGE_TYPE), f.filename, session.user, self.category)
+        logger.info(f"New {self.IMAGE_TYPE} '%s' uploaded by %s (%s)", f.filename, session.user, self.category)
         return jsonify_data(content=get_image_data(self.IMAGE_TYPE, self.category))
 
     def _process_DELETE(self):
         self._set_image(None, None)
         flash(self.DELETED_FLASH_MSG, 'success')
-        logger.info("{} of %s deleted by %s".format(self.IMAGE_TYPE.title()), self.category, session.user)
+        logger.info(f"{self.IMAGE_TYPE.title()} of %s deleted by %s", self.category, session.user)
         return jsonify_data(content=None)
 
 
@@ -307,7 +305,7 @@ class RHDeleteSubcategories(RHManageCategoryBase):
         if 'confirmed' in request.form:
             for subcategory in self.subcategories:
                 if not subcategory.is_empty:
-                    raise BadRequest('Category "{}" is not empty'.format(subcategory.title))
+                    raise BadRequest(f'Category "{subcategory.title}" is not empty')
                 delete_category(subcategory)
             return jsonify_data(flash=False, is_empty=self.category.is_empty)
         return jsonify_template('categories/management/delete_categories.html', categories=self.subcategories,

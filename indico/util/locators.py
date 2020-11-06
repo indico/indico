@@ -5,14 +5,13 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import unicode_literals
 
 from collections import UserDict
 
 from werkzeug.utils import cached_property
 
 
-class locator_property(object):
+class locator_property:
     """Define a smart locator property.
 
     This behaves pretty much like a normal read-only property and the
@@ -77,10 +76,10 @@ def get_locator(obj):
     elif hasattr(obj, 'locator'):
         return obj.locator
     else:
-        raise TypeError('{} does not contain a locator'.format(obj))
+        raise TypeError(f'{obj} does not contain a locator')
 
 
-class _LocatorDict(UserDict, object):
+class _LocatorDict(UserDict):
     def __init__(self, locator, obj):
         # call to super constructor is omitted on purpose
         self._locator = locator

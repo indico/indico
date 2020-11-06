@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import unicode_literals
 
 import json
 
@@ -36,11 +35,11 @@ class ReferencesField(MultipleItemsField):
         self.reference_class = kwargs.pop('reference_class')
         self.fields = [{'id': 'type', 'caption': _("Type"), 'type': 'select', 'required': True},
                        {'id': 'value', 'caption': _("Value"), 'type': 'text', 'required': True}]
-        self.choices = {'type': {six.text_type(r.id): r.name for r in ReferenceType.find_all()}}
-        super(ReferencesField, self).__init__(*args, uuid_field='id', uuid_field_opaque=True, **kwargs)
+        self.choices = {'type': {str(r.id): r.name for r in ReferenceType.find_all()}}
+        super().__init__(*args, uuid_field='id', uuid_field_opaque=True, **kwargs)
 
     def process_formdata(self, valuelist):
-        super(ReferencesField, self).process_formdata(valuelist)
+        super().process_formdata(valuelist)
         if valuelist:
             existing = {x.id: x for x in self.object_data or ()}
             data = []
@@ -60,16 +59,16 @@ class ReferencesField(MultipleItemsField):
             self.data = data
 
     def pre_validate(self, form):
-        super(ReferencesField, self).pre_validate(form)
+        super().pre_validate(form)
         for reference in self.serialized_data:
             if reference['type'] not in self.choices['type']:
-                raise ValueError(u'Invalid type choice: {}'.format(reference['type']))
+                raise ValueError('Invalid type choice: {}'.format(reference['type']))
 
     def _value(self):
         if not self.data:
             return []
         else:
-            return [{'id': r.id, 'type': six.text_type(r.reference_type_id), 'value': r.value} for r in self.data]
+            return [{'id': r.id, 'type': str(r.reference_type_id), 'value': r.value} for r in self.data]
 
 
 class EventPersonListField(PrincipalListField):
@@ -84,7 +83,7 @@ class EventPersonListField(PrincipalListField):
 
     def __init__(self, *args, **kwargs):
         self.event_person_conversions = {}
-        super(EventPersonListField, self).__init__(*args, allow_groups=False, allow_external_users=True, **kwargs)
+        super().__init__(*args, allow_groups=False, allow_external_users=True, **kwargs)
 
     @property
     def event(self):
@@ -102,7 +101,7 @@ class EventPersonListField(PrincipalListField):
             if isinstance(principal, dict):
                 return principal
         if not isinstance(principal, EventPerson):
-            return super(EventPersonListField, self)._serialize_principal(principal)
+            return super()._serialize_principal(principal)
         return serialize_event_person(principal)
 
     def process_formdata(self, valuelist):
@@ -126,7 +125,7 @@ class PersonLinkListFieldBase(EventPersonListField):
     widget = None
 
     def __init__(self, *args, **kwargs):
-        super(PersonLinkListFieldBase, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self.object = getattr(kwargs['_form'], self.linked_object_attr, None)
 
     @no_autoflush
@@ -159,9 +158,9 @@ class PersonLinkListFieldBase(EventPersonListField):
 
     def _serialize_principal(self, principal):
         if not isinstance(principal, PersonLinkBase):
-            return super(PersonLinkListFieldBase, self)._serialize_principal(principal)
+            return super()._serialize_principal(principal)
         if principal.id is None:
-            return super(PersonLinkListFieldBase, self)._serialize_principal(principal.person)
+            return super()._serialize_principal(principal.person)
         else:
             return self._serialize_person_link(principal)
 
@@ -182,7 +181,7 @@ class EventPersonLinkListField(PersonLinkListFieldBase):
     def __init__(self, *args, **kwargs):
         self.allow_submitters = True
         self.default_is_submitter = kwargs.pop('default_is_submitter', True)
-        super(EventPersonLinkListField, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
     def _convert_data(self, data):
         return {self._get_person_link(x): x.pop('isSubmitter', self.default_is_submitter) for x in data}
@@ -194,7 +193,7 @@ class EventPersonLinkListField(PersonLinkListFieldBase):
         return data
 
     def pre_validate(self, form):
-        super(EventPersonLinkListField, self).pre_validate(form)
+        super().pre_validate(form)
         persons = set()
         for person_link in self.data:
             if person_link.person in persons:
@@ -206,9 +205,9 @@ class IndicoThemeSelectField(SelectField):
     def __init__(self, *args, **kwargs):
         allow_default = kwargs.pop('allow_default', False)
         event_type = kwargs.pop('event_type').name
-        super(IndicoThemeSelectField, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self.choices = sorted([(tid, theme['title'])
-                               for tid, theme in six.viewitems(theme_settings.get_themes_for(event_type))],
+                               for tid, theme in theme_settings.get_themes_for(event_type).items()],
                               key=lambda x: x[1].lower())
         if allow_default:
             self.choices.insert(0, ('', _('Category default')))
@@ -221,4 +220,4 @@ class RatingReviewField(RadioField):
     def __init__(self, *args, **kwargs):
         self.question = kwargs.pop('question')
         self.rating_range = kwargs.pop('rating_range')
-        super(RatingReviewField, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)

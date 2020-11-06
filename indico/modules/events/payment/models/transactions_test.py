@@ -5,8 +5,9 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
+from unittest.mock import MagicMock
+
 import pytest
-from mock import MagicMock
 
 from indico.modules.events.payment.models.transactions import (DoublePaymentTransaction, IgnoredTransactionAction,
                                                                InvalidManualTransactionAction, InvalidTransactionAction,

@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import unicode_literals
 
 from collections import OrderedDict, defaultdict
 from datetime import date, datetime, time
@@ -106,7 +105,7 @@ def get_rooms_availability(rooms, start_dt, end_dt, repeat_frequency, repeat_int
                            admin_override_enabled=False, skip_past_conflicts=False):
     availability = OrderedDict()
     candidates = ReservationOccurrence.create_series(start_dt, end_dt, (repeat_frequency, repeat_interval))
-    date_range = sorted(set(cand.start_dt.date() for cand in candidates))
+    date_range = sorted({cand.start_dt.date() for cand in candidates})
     occurrences = get_existing_rooms_occurrences(rooms, start_dt.replace(hour=0, minute=0),
                                                  end_dt.replace(hour=23, minute=59), repeat_frequency, repeat_interval)
     blocked_rooms = get_rooms_blockings(rooms, start_dt.date(), end_dt.date())
@@ -176,8 +175,8 @@ def _bookings_query(filters, noload_room=False):
 
     text = filters.get('text')
     room_ids = filters.get('room_ids')
-    booking_criteria = [Reservation.booking_reason.ilike('%{}%'.format(text)),
-                        Reservation.booked_for_name.ilike('%{}%'.format(text))]
+    booking_criteria = [Reservation.booking_reason.ilike(f'%{text}%'),
+                        Reservation.booked_for_name.ilike(f'%{text}%')]
     if room_ids and text:
         query = query.filter(db.or_(Room.id.in_(room_ids), *booking_criteria))
     elif room_ids:
@@ -291,7 +290,7 @@ def get_room_details_availability(room, start_dt, end_dt):
 
 
 def get_booking_occurrences(booking):
-    date_range = sorted(set(cand.start_dt.date() for cand in booking.occurrences))
+    date_range = sorted({cand.start_dt.date() for cand in booking.occurrences})
     occurrences = group_by_occurrence_date(booking.occurrences)
     return date_range, occurrences
 
@@ -328,7 +327,7 @@ def create_booking_for_event(room_id, event):
         default_timezone = timezone(config.DEFAULT_TIMEZONE)
         start_dt = event.start_dt.astimezone(default_timezone).replace(tzinfo=None)
         end_dt = event.end_dt.astimezone(default_timezone).replace(tzinfo=None)
-        booking_reason = "Event '{}'".format(event.title)
+        booking_reason = f"Event '{event.title}'"
         data = dict(start_dt=start_dt, end_dt=end_dt, booked_for_user=event.creator, booking_reason=booking_reason,
                     repeat_frequency=RepeatFrequency.NEVER, event_id=event.id)
         booking = Reservation.create_from_data(room, data, session.user, ignore_admin=True)
@@ -433,11 +432,11 @@ def split_booking(booking, new_booking_data):
 
     booking.edit_logs.append(ReservationEditLog(user_name=session.user.full_name, info=[
         'Split into a new booking',
-        'booking_link:{}'.format(resv.id)
+        f'booking_link:{resv.id}'
     ]))
     resv.edit_logs.append(ReservationEditLog(user_name=session.user.full_name, info=[
         'Split from another booking',
-        'booking_link:{}'.format(booking.id)
+        f'booking_link:{booking.id}'
     ]))
     return resv
 
@@ -511,12 +510,12 @@ def get_booking_edit_calendar_data(booking, booking_changes):
     room_availability['cancellations'] = {}
     room_availability['rejections'] = {}
     others = defaultdict(list)
-    for k, v in chain(six.iteritems(room_availability['bookings']), six.iteritems(room_availability['pre_bookings'])):
+    for k, v in chain(room_availability['bookings'].items(), room_availability['pre_bookings'].items()):
         others[k].extend(v)
-    other_bookings = {dt: [x for x in other if x.reservation.id != booking.id] for dt, other in six.iteritems(others)}
+    other_bookings = {dt: [x for x in other if x.reservation.id != booking.id] for dt, other in others.items()}
     candidates = room_availability['candidates']
 
-    for dt, dt_candidates in six.iteritems(candidates):
+    for dt, dt_candidates in candidates.items():
         if dt in cancelled_dates:
             candidates[dt] = []
             room_availability['cancellations'].update({dt: dt_candidates})

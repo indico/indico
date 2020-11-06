@@ -52,7 +52,7 @@ def test_get_full_name(last_name_first, last_name_upper, abbrev_first_name, expe
     user.title = UserTitle.mr
     titled_name = user.get_full_name(last_name_first=last_name_first, last_name_upper=last_name_upper,
                                      abbrev_first_name=abbrev_first_name, show_title=True)
-    assert titled_name == 'Mr {}'.format(expected)
+    assert titled_name == f'Mr {expected}'
 
 
 @pytest.mark.parametrize(('first_name', 'last_name'), (

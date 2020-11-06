@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import unicode_literals
 
 import six
 
@@ -66,7 +65,7 @@ _bp.add_url_rule('/program-codes/assign/subcontributions', 'assign_program_codes
                  program_codes.RHAssignProgramCodesSubContributions, methods=('GET', 'POST'))
 
 
-for object_type, prefixes in six.iteritems(event_management_object_url_prefixes):
+for object_type, prefixes in event_management_object_url_prefixes.items():
     if object_type == 'subcontribution':
         continue
     for prefix in prefixes:

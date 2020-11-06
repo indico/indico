@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import unicode_literals
 
 from operator import attrgetter
 
@@ -25,7 +24,7 @@ from indico.util.locators import locator_property
 from indico.util.string import format_repr
 
 
-class PersonLinkDataMixin(object):
+class PersonLinkDataMixin:
     @property
     def person_link_data(self):
         return {x: x.is_submitter for x in self.person_links}
@@ -34,13 +33,13 @@ class PersonLinkDataMixin(object):
     @no_autoflush
     def person_link_data(self, value):
         # Revoke submission rights for removed persons
-        for person_link in set(self.person_links) - six.viewkeys(value):
+        for person_link in set(self.person_links) - value.keys():
             principal = person_link.person.principal
             if principal:
                 self.update_principal(principal, del_permissions={'submit'})
         # Update person links
         self.person_links = list(value.keys())
-        for person_link, is_submitter in six.iteritems(value):
+        for person_link, is_submitter in value.items():
             person = person_link.person
             principal = person.principal
             if not principal:
@@ -49,7 +48,7 @@ class PersonLinkDataMixin(object):
             self.update_principal(principal, **action)
 
 
-class AuthorsSpeakersMixin(object):
+class AuthorsSpeakersMixin:
     AUTHORS_SPEAKERS_DISPLAY_ORDER_ATTR = 'display_order_key'
 
     @property
@@ -441,7 +440,7 @@ class PersonLinkBase(PersonMixin, db.Model):
     def __init__(self, *args, **kwargs):
         # Needed in order to ensure `person` is set before the overridable attrs
         self.person = kwargs.pop('person', None)
-        super(PersonLinkBase, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
 
 class EventPersonLink(PersonLinkBase):

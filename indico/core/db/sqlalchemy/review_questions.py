@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import unicode_literals
 
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.ext.declarative import declared_attr
@@ -23,7 +22,7 @@ def _get_next_position(cls):
     return __get_next_position
 
 
-class ReviewQuestionMixin(object):
+class ReviewQuestionMixin:
     #: name of backref from event to questions
     event_backref_name = None
 

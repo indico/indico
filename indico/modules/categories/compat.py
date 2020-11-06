@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import unicode_literals
 
 import re
 
@@ -23,7 +22,7 @@ def compat_category(legacy_category_id, path=None):
         abort(404)
     mapping = LegacyCategoryMapping.find_first(legacy_category_id=legacy_category_id)
     if mapping is None:
-        raise NotFound('Legacy category {} does not exist'.format(legacy_category_id))
+        raise NotFound(f'Legacy category {legacy_category_id} does not exist')
     view_args = request.view_args.copy()
     view_args['legacy_category_id'] = mapping.category_id
     # To create the same URL with the proper ID we take advantage of the

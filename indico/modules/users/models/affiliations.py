@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import unicode_literals
 
 from indico.core.db import db
 from indico.core.db.sqlalchemy.custom.unaccent import define_unaccented_lowercase_index
@@ -39,7 +38,7 @@ class UserAffiliation(db.Model):
     # - user (User._affiliation)
 
     def __repr__(self):
-        return '<UserAffiliation({}, {}, {})>'.format(self.id, self.name, self.user)
+        return f'<UserAffiliation({self.id}, {self.name}, {self.user})>'
 
 
 define_unaccented_lowercase_index(UserAffiliation.name)

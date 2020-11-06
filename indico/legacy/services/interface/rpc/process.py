@@ -34,7 +34,7 @@ def _lookup_handler(method):
         if 'endpointMap' in dir(endpoint):
             endpoint = endpoint.endpointMap.get(endpointName, None)
             if not endpoint:
-                raise BadRequest('Unknown endpoint: {}'.format(endpointName))
+                raise BadRequest(f'Unknown endpoint: {endpointName}')
         else:
             raise BadRequest('Unsupported method')
     return handler
@@ -44,8 +44,8 @@ def _process_request(method, params):
     handler = _lookup_handler(method)
 
     if session.csrf_protected and session.csrf_token != request.headers.get('X-CSRF-Token'):
-        msg = _(u"It looks like there was a problem with your current session. Please use your browser's back "
-                u"button, reload the page and try again.")
+        msg = _("It looks like there was a problem with your current session. Please use your browser's back "
+                "button, reload the page and try again.")
         raise BadRequest(msg)
 
     if hasattr(handler, 'process'):

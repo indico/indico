@@ -5,12 +5,10 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import unicode_literals
 
 import re
 
 import six
-from six.moves import filter
 from sqlalchemy import func, inspect, over
 from sqlalchemy.sql import update
 
@@ -62,7 +60,7 @@ def escape_like(value):
 
 def preprocess_ts_string(text, prefix=True):
     atoms = [TS_REGEX.sub(r'\\\1', atom.strip()) for atom in text.split()]
-    return ' & '.join('{}:*'.format(atom) if prefix else atom for atom in atoms)
+    return ' & '.join(f'{atom}:*' if prefix else atom for atom in atoms)
 
 
 def has_extension(conn, name):
@@ -118,16 +116,16 @@ def get_related_object(obj, relationship, criteria):
              such object could be found.
     """
     def _compare(a, b):
-        if isinstance(a, six.string_types) and a.isdigit():
+        if isinstance(a, str) and a.isdigit():
             a = int(a)
-        if isinstance(b, six.string_types) and b.isdigit():
+        if isinstance(b, str) and b.isdigit():
             b = int(b)
         return a == b
 
     # if the relationship is loaded evaluate the criteria in python
     if relationship not in inspect(obj).unloaded:
         return next((x for x in getattr(obj, relationship)
-                     if all(_compare(getattr(x, k), v) for k, v in six.iteritems(criteria))),
+                     if all(_compare(getattr(x, k), v) for k, v in criteria.items())),
                     None)
     # otherwise query that specific object
     cls = getattr(type(obj), relationship).prop.mapper.class_

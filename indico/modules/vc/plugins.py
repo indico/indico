@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import unicode_literals
 
 import re
 
@@ -25,7 +24,7 @@ from indico.web.forms.base import FormDefaults
 PREFIX_RE = re.compile('^vc_')
 
 
-class VCPluginMixin(object):
+class VCPluginMixin:
     settings_form = VCPluginSettingsFormBase
     default_settings = {'notification_emails': []}
     acl_settings = {'acl', 'managers'}
@@ -37,7 +36,7 @@ class VCPluginMixin(object):
     friendly_name = None
 
     def init(self):
-        super(VCPluginMixin, self).init()
+        super().init()
         if not self.name.startswith('vc_'):
             raise Exception('Videoconference plugins must be named vc_*')
         self.connect(signals.users.merged, self._merge_users)
@@ -99,7 +98,7 @@ class VCPluginMixin(object):
         :param event: the event with the current VC room attached to it
         :param kwargs: arguments passed to the template
         """
-        return render_plugin_template('{}:info_box.html'.format(self.name), plugin=self, event_vc_room=event_vc_room,
+        return render_plugin_template(f'{self.name}:info_box.html', plugin=self, event_vc_room=event_vc_room,
                                       event=event, vc_room=vc_room, settings=self.settings, **kwargs)
 
     def render_manage_event_info_box(self, vc_room, event_vc_room, event, **kwargs):
@@ -112,7 +111,7 @@ class VCPluginMixin(object):
         :param event: the event with the current VC room attached to it
         :param kwargs: arguments passed to the template
         """
-        return render_plugin_template('{}:manage_event_info_box.html'.format(self.name), plugin=self,
+        return render_plugin_template(f'{self.name}:manage_event_info_box.html', plugin=self,
                                       event_vc_room=event_vc_room, event=event, vc_room=vc_room,
                                       settings=self.settings, **kwargs)
 

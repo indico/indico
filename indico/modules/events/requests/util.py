@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import unicode_literals
 
 import six
 
@@ -22,4 +21,4 @@ def is_request_manager(user):
     """Check if the user manages any request types."""
     if not user:
         return False
-    return any(def_.can_be_managed(user) for def_ in six.itervalues(get_request_definitions()))
+    return any(def_.can_be_managed(user) for def_ in get_request_definitions().values())

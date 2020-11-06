@@ -51,7 +51,7 @@ def run(cmd, title, shell=False):
     try:
         subprocess.check_output(cmd, stderr=subprocess.STDOUT, shell=shell)
     except subprocess.CalledProcessError as exc:
-        fail('{} failed'.format(title), verbose_msg=exc.output)
+        fail(f'{title} failed', verbose_msg=exc.output)
 
 
 def build_assets():
@@ -123,8 +123,7 @@ def _iter_package_modules(package_masks):
         path = '/'.join(package.split('.'))
         if not os.path.exists(os.path.join(path, '__init__.py')):
             continue
-        for f in glob(os.path.join(path, '*.py')):
-            yield f
+        yield from glob(os.path.join(path, '*.py'))
 
 
 def _get_included_files(package_masks):
@@ -264,7 +263,7 @@ def build_indico(obj, assets, add_version_suffix, ignore_unclean):
 
 def _validate_plugin_dir(ctx, param, value):
     if not os.path.exists(os.path.join(value, 'setup.py')):
-        raise click.BadParameter('no setup.py found in {}'.format(value))
+        raise click.BadParameter(f'no setup.py found in {value}')
     return value
 
 

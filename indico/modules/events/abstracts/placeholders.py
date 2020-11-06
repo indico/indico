@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import unicode_literals
 
 import six
 
@@ -49,7 +48,7 @@ class AbstractIDPlaceholder(Placeholder):
 
     @classmethod
     def render(cls, abstract):
-        return six.text_type(abstract.friendly_id)
+        return str(abstract.friendly_id)
 
 
 class AbstractTitlePlaceholder(Placeholder):
@@ -192,7 +191,7 @@ class TargetAbstractIDPlaceholder(Placeholder):
     @classmethod
     def render(cls, abstract):
         target = abstract.merged_into or abstract.duplicate_of
-        return six.text_type(target.friendly_id) if target else ''
+        return str(target.friendly_id) if target else ''
 
 
 class TargetAbstractTitlePlaceholder(Placeholder):

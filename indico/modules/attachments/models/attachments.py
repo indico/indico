@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import unicode_literals
 
 import posixpath
 
@@ -117,7 +116,7 @@ class Attachment(ProtectionMixin, VersionedResourceMixin, db.Model):
     __tablename__ = 'attachments'
     __table_args__ = (
         # links: url but no file
-        db.CheckConstraint('type != {} OR (link_url IS NOT NULL AND file_id IS NULL)'.format(AttachmentType.link.value),
+        db.CheckConstraint(f'type != {AttachmentType.link.value} OR (link_url IS NOT NULL AND file_id IS NULL)',
                            'valid_link'),
         # we can't require the file_id to be NOT NULL for files because of the circular relationship...
         # but we can ensure that we never have both a file_id AND a link_url...for
@@ -252,7 +251,7 @@ class Attachment(ProtectionMixin, VersionedResourceMixin, db.Model):
         This is the case if the user has access to see the attachment
         or if the user can manage attachments for the linked object.
         """
-        return (super(Attachment, self).can_access(user, *args, **kwargs) or
+        return (super().can_access(user, *args, **kwargs) or
                 can_manage_attachments(self.folder.object, user))
 
     def __repr__(self):
@@ -277,11 +276,11 @@ def _offline_download_url(attachment):
         if isinstance(attachment.folder.object, db.m.Event):
             path = ""
         elif isinstance(attachment.folder.object, db.m.Session):
-            path = "{}-session".format(attachment.folder.session.friendly_id)
+            path = f"{attachment.folder.session.friendly_id}-session"
         elif isinstance(attachment.folder.object, db.m.Contribution):
-            path = "{}-contribution".format(attachment.folder.contribution.friendly_id)
+            path = f"{attachment.folder.contribution.friendly_id}-contribution"
         elif isinstance(attachment.folder.object, db.m.SubContribution):
-            path = "{}-subcontribution".format(attachment.folder.subcontribution.friendly_id)
+            path = f"{attachment.folder.subcontribution.friendly_id}-subcontribution"
         else:
             return ''
         return posixpath.join("material", path, str(attachment.id) + "-" + attachment.file.filename)

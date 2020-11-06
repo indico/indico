@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import print_function, unicode_literals
 
 import logging
 import os
@@ -17,7 +16,6 @@ from celery.app.log import Logging
 from celery.beat import PersistentScheduler
 from contextlib2 import ExitStack
 from flask_pluginengine import current_plugin, plugin_context
-from six.moves import map
 from sqlalchemy import inspect
 from terminaltables import AsciiTable
 
@@ -46,7 +44,7 @@ class IndicoCelery(Celery):
 
     def __init__(self, *args, **kwargs):
         kwargs.setdefault('log', IndicoCeleryLogging)
-        super(IndicoCelery, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self.flask_app = None
         self._patch_task()
 
@@ -114,7 +112,7 @@ class IndicoCelery(Celery):
                 if current_plugin:
                     options['headers'] = options.get('headers') or {}  # None in a retry
                     options['headers']['indico_plugin'] = current_plugin.name
-                return super(IndicoTask, s).apply_async(args=args, kwargs=kwargs, task_id=task_id, producer=producer,
+                return super().apply_async(args=args, kwargs=kwargs, task_id=task_id, producer=producer,
                                                         link=link, link_error=link_error, shadow=shadow, **options)
 
             def __call__(s, *args, **kwargs):
@@ -125,7 +123,7 @@ class IndicoCelery(Celery):
                 args = _CelerySAWrapper.unwrap_args(args)
                 kwargs = _CelerySAWrapper.unwrap_kwargs(kwargs)
                 plugin = getattr(s, 'plugin', s.request.get('indico_plugin'))
-                if isinstance(plugin, six.string_types):
+                if isinstance(plugin, str):
                     plugin_name = plugin
                     plugin = plugin_engine.get_plugin(plugin)
                     if plugin is None:
@@ -136,7 +134,7 @@ class IndicoCelery(Celery):
                 with stack:
                     request_stats_request_started()
                     init_email_queue()
-                    rv = super(IndicoTask, s).__call__(*args, **kwargs)
+                    rv = super().__call__(*args, **kwargs)
                     flush_email_queue()
                     return rv
 
@@ -148,7 +146,7 @@ class IndicoCeleryLogging(Logging):
         # don't let celery mess with the root logger
         if logger is logging.getLogger():
             return
-        super(IndicoCeleryLogging, self)._configure_logger(logger, *args, **kwargs)
+        super()._configure_logger(logger, *args, **kwargs)
 
 
 class IndicoPersistentScheduler(PersistentScheduler):
@@ -156,7 +154,7 @@ class IndicoPersistentScheduler(PersistentScheduler):
 
     def setup_schedule(self):
         deleted = set()
-        for task_name, entry in six.iteritems(config.SCHEDULED_TASK_OVERRIDE):
+        for task_name, entry in config.SCHEDULED_TASK_OVERRIDE.items():
             if task_name not in self.app.conf['beat_schedule']:
                 self.logger.error('Invalid entry in ScheduledTaskOverride: %s', task_name)
                 continue
@@ -168,7 +166,7 @@ class IndicoPersistentScheduler(PersistentScheduler):
                 self.app.conf['beat_schedule'][task_name].update(entry)
             else:
                 self.app.conf['beat_schedule'][task_name]['schedule'] = entry
-        super(IndicoPersistentScheduler, self).setup_schedule()
+        super().setup_schedule()
         if not self.app.conf['worker_redirect_stdouts']:
             # print the schedule unless we are in production where
             # this output would get redirected to a logger which is
@@ -177,7 +175,7 @@ class IndicoPersistentScheduler(PersistentScheduler):
 
     def _print_schedule(self, deleted):
         table_data = [['Name', 'Schedule']]
-        for entry in sorted(six.itervalues(self.app.conf['beat_schedule']), key=itemgetter('task')):
+        for entry in sorted(self.app.conf['beat_schedule'].values(), key=itemgetter('task')):
             table_data.append([cformat('%{yellow!}{}%{reset}').format(entry['task']),
                                cformat('%{green}{!r}%{reset}').format(entry['schedule'])])
         for task_name in sorted(deleted):
@@ -186,7 +184,7 @@ class IndicoPersistentScheduler(PersistentScheduler):
         print(AsciiTable(table_data, cformat('%{white!}Periodic Tasks%{reset}')).table)
 
 
-class _CelerySAWrapper(object):
+class _CelerySAWrapper:
     """Wrapper to safely pass SQLAlchemy objects to tasks.
 
     This is achieved by passing only the model name and its PK values
@@ -205,7 +203,7 @@ class _CelerySAWrapper(object):
     def object(self):
         obj = self.identity_key[0].get(self.identity_key[1])
         if obj is None:
-            raise ValueError('Object not in DB: {}'.format(self))
+            raise ValueError(f'Object not in DB: {self}')
         return obj
 
     def __repr__(self):
@@ -218,7 +216,7 @@ class _CelerySAWrapper(object):
 
     @classmethod
     def wrap_kwargs(cls, kwargs):
-        return {k: cls(v) if isinstance(v, db.Model) else v for k, v in six.iteritems(kwargs)}
+        return {k: cls(v) if isinstance(v, db.Model) else v for k, v in kwargs.items()}
 
     @classmethod
     def unwrap_args(cls, args):
@@ -226,4 +224,4 @@ class _CelerySAWrapper(object):
 
     @classmethod
     def unwrap_kwargs(cls, kwargs):
-        return {k: v.object if isinstance(v, cls) else v for k, v in six.iteritems(kwargs)}
+        return {k: v.object if isinstance(v, cls) else v for k, v in kwargs.items()}

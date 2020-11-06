@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import unicode_literals
 
 import re
 from datetime import datetime, timedelta
@@ -15,7 +14,6 @@ import six
 from flask import request, session
 from markupsafe import escape
 from pytz import timezone
-from six.moves import filter
 from werkzeug.datastructures import ImmutableMultiDict
 from wtforms import BooleanField, FloatField, SelectField, StringField, TextAreaField
 from wtforms.ext.sqlalchemy.fields import QuerySelectField
@@ -66,9 +64,9 @@ class EventDataForm(IndicoForm):
 
     def __init__(self, *args, **kwargs):
         self.event = kwargs.pop('event')
-        super(EventDataForm, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         # TODO: Add a custom widget showing the prefix right before the field
-        prefix = '{}/e/'.format(config.BASE_URL)
+        prefix = f'{config.BASE_URL}/e/'
         self.url_shortcut.description = _('<strong>{}SHORTCUT</strong> - the URL shortcut must be unique within '
                                           'this Indico instance and is not case sensitive.').format(prefix)
 
@@ -118,7 +116,7 @@ class EventDatesForm(IndicoForm):
 
     def __init__(self, *args, **kwargs):
         self.event = kwargs.pop('event')
-        super(EventDatesForm, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         # timetable synchronization
         self.check_timetable_boundaries = (self.event.type_ != EventType.lecture)
         if self.check_timetable_boundaries:
@@ -174,7 +172,7 @@ class EventLocationForm(IndicoForm):
 
     def __init__(self, *args, **kwargs):
         event = kwargs['event']
-        super(EventLocationForm, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         if event.room:
             self.own_map_url.render_kw = {'placeholder': event.room.map_url}
 
@@ -184,7 +182,7 @@ class EventPersonsForm(IndicoForm):
 
     def __init__(self, *args, **kwargs):
         self.event = kwargs.pop('event')
-        super(EventPersonsForm, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         if self.event.type_ == EventType.lecture:
             self.person_link_data.label.text = _('Speakers')
 
@@ -203,7 +201,7 @@ class EventContactInfoForm(IndicoForm):
 
     def __init__(self, *args, **kwargs):
         self.event = kwargs.pop('event')
-        super(EventContactInfoForm, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         if self.event.type_ != EventType.lecture:
             del self.organizer_info
         if self.event.type_ != EventType.conference:
@@ -225,7 +223,7 @@ class EventClassificationForm(IndicoForm):
 
     def __init__(self, *args, **kwargs):
         event = kwargs.pop('event')
-        super(EventClassificationForm, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         if event.type_ != EventType.meeting or not ReferenceType.query.has_rows():
             del self.references
         self.label.query = EventLabel.query.order_by(db.func.lower(EventLabel.title))
@@ -262,7 +260,7 @@ class EventProtectionForm(IndicoForm):
 
     def __init__(self, *args, **kwargs):
         self.protected_object = self.event = kwargs.pop('event')
-        super(EventProtectionForm, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self._init_visibility(self.event)
 
     def _get_event_own_visibility_horizon(self, event):
@@ -289,7 +287,7 @@ class EventProtectionForm(IndicoForm):
 
     @classmethod
     def _create_coordinator_priv_fields(cls):
-        for name, title in sorted(six.iteritems(COORDINATOR_PRIV_TITLES), key=itemgetter(1)):
+        for name, title in sorted(COORDINATOR_PRIV_TITLES.items(), key=itemgetter(1)):
             setattr(cls, name, BooleanField(title, widget=SwitchWidget(), description=COORDINATOR_PRIV_DESCS[name]))
             cls.priv_fields.add(name)
 
@@ -306,8 +304,8 @@ class PosterPrintingForm(IndicoForm):
     def __init__(self, event, **kwargs):
         all_templates = set(event.designer_templates) | get_inherited_templates(event)
         poster_templates = [tpl for tpl in all_templates if tpl.type.name == 'poster']
-        super(PosterPrintingForm, self).__init__(**kwargs)
-        self.template.choices = sorted(((six.text_type(tpl.id), tpl.title) for tpl in poster_templates), key=itemgetter(1))
+        super().__init__(**kwargs)
+        self.template.choices = sorted(((str(tpl.id), tpl.title) for tpl in poster_templates), key=itemgetter(1))
 
 
 class CloneRepeatabilityForm(IndicoForm):
@@ -332,7 +330,7 @@ class CloneContentsForm(CloneRepeatabilityForm):
             }
             kwargs['formdata'] = ImmutableMultiDict(form_params)
 
-        super(CloneContentsForm, self).__init__(**kwargs)
+        super().__init__(**kwargs)
         self.selected_items.choices = [(option.name, option.friendly_name) for option in visible_options]
         self.selected_items.disabled_choices = [option.name for option in visible_options if not option.is_available]
 
@@ -366,7 +364,7 @@ class CloneRepeatFormBase(CloneCategorySelectForm):
 
     def __init__(self, event, **kwargs):
         kwargs['start_dt'] = self._calc_start_dt(event)
-        super(CloneRepeatFormBase, self).__init__(event, **kwargs)
+        super().__init__(event, **kwargs)
 
 
 class CloneRepeatOnceForm(CloneRepeatFormBase):
@@ -385,7 +383,7 @@ class CloneRepeatUntilFormBase(CloneRepeatOnceForm):
 
     def __init__(self, event, **kwargs):
         kwargs.setdefault('until_dt', (self._calc_start_dt(event) + timedelta(days=14)).date())
-        super(CloneRepeatUntilFormBase, self).__init__(event, **kwargs)
+        super().__init__(event, **kwargs)
 
 
 class CloneRepeatIntervalForm(CloneRepeatUntilFormBase):
@@ -431,7 +429,7 @@ class ImportContentsForm(ImportSourceEventForm):
             }
             kwargs['formdata'] = ImmutableMultiDict(form_params)
 
-        super(ImportContentsForm, self).__init__(**kwargs)
+        super().__init__(**kwargs)
         self.selected_items.choices = [(option.name, option.friendly_name) for option in visible_options]
         # We disable all cloners that are not available, handle only cloning to new events,
         # have conflicts with target_event or any of their dependencies has conflicts with target_event

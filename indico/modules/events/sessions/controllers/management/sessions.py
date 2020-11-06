@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import unicode_literals
 
 import six
 from flask import jsonify, request, session
@@ -237,8 +236,8 @@ class RHManageSessionBlock(RHManageSessionBase):
         form = MeetingSessionBlockForm(obj=FormDefaults(**self._get_form_defaults()), event=self.event,
                                        session_block=self.session_block)
         if form.validate_on_submit():
-            session_data = {k[8:]: v for k, v in six.iteritems(form.data) if k in form.session_fields}
-            block_data = {k[6:]: v for k, v in six.iteritems(form.data) if k in form.block_fields}
+            session_data = {k[8:]: v for k, v in form.data.items() if k in form.session_fields}
+            block_data = {k[6:]: v for k, v in form.data.items() if k in form.block_fields}
             update_session(self.session, session_data)
             update_session_block(self.session_block, block_data)
             return jsonify_data(flash=False)
@@ -290,7 +289,7 @@ class RHEditSessionType(RHManageSessionTypeBase):
             form.populate_obj(self.session_type)
             db.session.flush()
             self.event.log(EventLogRealm.management, EventLogKind.change, 'Sessions',
-                           'Updated type: {}'.format(old_name), session.user)
+                           f'Updated type: {old_name}', session.user)
             return jsonify_data(html_row=render_session_type_row(self.session_type), flash=False)
         return jsonify_form(form)
 
@@ -306,7 +305,7 @@ class RHCreateSessionType(RHManageSessionsBase):
             self.event.session_types.append(session_type)
             db.session.flush()
             self.event.log(EventLogRealm.management, EventLogKind.positive, 'Sessions',
-                           'Added type: {}'.format(session_type.name), session.user)
+                           f'Added type: {session_type.name}', session.user)
             types = [{'id': t.id, 'title': t.name} for t in self.event.session_types]
             return jsonify_data(types=types, new_type_id=session_type.id,
                                 html_row=render_session_type_row(session_type))
@@ -320,5 +319,5 @@ class RHDeleteSessionType(RHManageSessionTypeBase):
         db.session.delete(self.session_type)
         db.session.flush()
         self.event.log(EventLogRealm.management, EventLogKind.negative, 'Sessions',
-                       'Deleted type: {}'.format(self.session_type.name), session.user)
+                       f'Deleted type: {self.session_type.name}', session.user)
         return jsonify_data(flash=False)

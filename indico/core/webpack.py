@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import unicode_literals
 
 import os
 
@@ -21,7 +20,7 @@ class IndicoManifestLoader(JinjaManifestLoader):
 
     def __init__(self, *args, **kwargs):
         self.custom = kwargs.pop('custom', True)
-        super(IndicoManifestLoader, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
     def load(self, filepath):
         key = (filepath, os.path.getmtime(filepath))

@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import unicode_literals
 
 from copy import deepcopy
 
@@ -25,7 +24,7 @@ class FieldConfigForm(IndicoForm):
                                description=_("Whether the user has to fill out the field"))
 
 
-class BaseField(object):
+class BaseField:
     """Base class for a custom field.
 
     To create a new field, subclass this class and register
@@ -106,7 +105,7 @@ class BaseField(object):
             setattr(self.object, field, data[field])
         self.object.field_type = self.name
         self.object.field_data = {name: value
-                                  for name, value in six.iteritems(data)
+                                  for name, value in data.items()
                                   if name not in self.common_settings and name != 'csrf_token'}
 
     def get_friendly_value(self, value):

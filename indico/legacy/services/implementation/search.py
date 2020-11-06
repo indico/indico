@@ -5,12 +5,10 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import unicode_literals
 
 from itertools import chain
 
 import six
-from six.moves import map
 
 from indico.core.db.sqlalchemy.custom.unaccent import unaccent_match
 from indico.legacy.fossils.user import IGroupFossil
@@ -54,7 +52,7 @@ class SearchUsers(SearchBase):
                       EventPerson.last_name: self._surName,
                       EventPerson.email: self._email,
                       EventPerson.affiliation: self._organisation}
-            criteria = [unaccent_match(col, val, exact=self._exactMatch) for col, val in six.iteritems(fields)]
+            criteria = [unaccent_match(col, val, exact=self._exactMatch) for col, val in fields.items()]
             event_persons = self._event.persons.filter(*criteria).all()
         fossilized_users = fossilize(sorted(users, key=lambda av: (av.getStraightFullName(), av.getEmail())))
         fossilized_event_persons = list(map(serialize_event_person, event_persons))

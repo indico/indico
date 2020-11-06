@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import unicode_literals
 
 from datetime import datetime, time
 
@@ -84,7 +83,7 @@ class RHCreateEvent(RHProtected):
             # Copy person link data since we would otherwise end up
             # adding the EventPersons of the first event in all other
             # events of the series.
-            for link, submitter in six.iteritems(link_data):
+            for link, submitter in link_data.items():
                 link_copy = EventPersonLink(**{col: getattr(link, col)
                                                for col in get_simple_column_attrs(EventPersonLink)})
                 link_copy.person = EventPerson(**{col: getattr(link.person, col)
@@ -104,7 +103,7 @@ class RHCreateEvent(RHProtected):
 
     def _process(self):
         if not request.is_xhr:
-            return redirect(url_for_index(_anchor='create-event:{}'.format(self.event_type.name)))
+            return redirect(url_for_index(_anchor=f'create-event:{self.event_type.name}'))
         form_cls = LectureCreationForm if self.event_type == EventType.lecture else EventCreationForm
         form = form_cls(obj=self._get_form_defaults(), prefix='event-creation-')
         if form.validate_on_submit():

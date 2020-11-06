@@ -35,7 +35,7 @@ class IAvatarMinimalFossil(IFossil):
 
     def getIdentifier(self):
         pass
-    getIdentifier.produce = lambda x: 'User:{}'.format(x.id)
+    getIdentifier.produce = lambda x: f'User:{x.id}'
 
     def getStraightFullName(self):
         """ Avatar full name, the one usually displayed """

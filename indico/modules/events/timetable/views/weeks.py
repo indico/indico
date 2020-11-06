@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import unicode_literals
 
 from collections import OrderedDict, defaultdict
 from datetime import timedelta
@@ -74,7 +73,7 @@ def inject_week_timetable(event, days, tz_name, tpl='events/timetable/display/_w
 
             # We've got a dict with a {slot: [entry, entry, ...]} mapping (for a single day)
             # We'll run over it and make some additional calculations
-            day_tmp_sorted = sorted(six.viewitems(day_tmp))
+            day_tmp_sorted = sorted(day_tmp.items())
             day_entries = OrderedDict()
             for n, (slot, slot_entries) in enumerate(day_tmp_sorted):
                 tmp_slot_entries = []

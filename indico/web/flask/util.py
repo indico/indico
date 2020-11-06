@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import absolute_import, unicode_literals
 
 import inspect
 import os
@@ -116,12 +115,12 @@ def make_compat_redirect_func(blueprint, endpoint, view_func=None, view_args_con
         # This is necessary since passing a list for an URL path argument breaks things.
         view_args.update((k, v[0] if len(v) == 1 else v) for k, v in request.args.lists())
         if view_args_conv is not None:
-            for oldkey, newkey in six.iteritems(view_args_conv):
+            for oldkey, newkey in view_args_conv.items():
                 value = view_args.pop(oldkey, None)
                 if newkey is not None:
                     view_args[newkey] = value
         try:
-            target = _url_for('%s.%s' % (getattr(blueprint, 'name', blueprint), endpoint), **view_args)
+            target = _url_for('{}.{}'.format(getattr(blueprint, 'name', blueprint), endpoint), **view_args)
         except (BuildError, ValueError):
             raise NotFound
         return redirect(target, 302 if current_app.debug else 301)
@@ -146,12 +145,12 @@ def url_for(endpoint, *targets, **values):
         for target in targets:
             if target:  # don't fail on None or mako's Undefined
                 locator.update(get_locator(target))
-        intersection = set(six.iterkeys(locator)) & set(six.iterkeys(values))
+        intersection = set(locator.keys()) & set(values.keys())
         if intersection:
             raise ValueError('url_for kwargs collide with locator: %s' % ', '.join(intersection))
         values.update(locator)
 
-    for key, value in six.iteritems(values):
+    for key, value in values.items():
         # Avoid =True and =False in the URL
         if isinstance(value, bool):
             values[key] = int(value)
@@ -203,9 +202,9 @@ def url_rule_to_js(endpoint):
                         'data': data
                     } for is_dynamic, data in rule._trace
                 ],
-                'converters': dict((key, type(converter).__name__)
-                                   for key, converter in six.iteritems(rule._converters)
-                                   if not isinstance(converter, UnicodeConverter))
+                'converters': {key: type(converter).__name__
+                                   for key, converter in rule._converters.items()
+                                   if not isinstance(converter, UnicodeConverter)}
             } for rule in current_app.url_map.iter_rules(endpoint)
         ]
     }
@@ -282,7 +281,7 @@ def send_file(name, path_or_fd, mimetype, last_modified=None, no_cache=True, inl
     try:
         rv = _send_file(path_or_fd, mimetype=mimetype, as_attachment=not inline, attachment_filename=name,
                         conditional=conditional, last_modified=last_modified, **kwargs)
-    except IOError:
+    except OSError:
         if not current_app.debug:
             raise
         raise NotFound('File not found: %s' % path_or_fd)
@@ -338,10 +337,10 @@ class ListConverter(BaseConverter):
     def to_url(self, value):
         if isinstance(value, (list, tuple, set)):
             value = '-'.join(value)
-        return super(ListConverter, self).to_url(value)
+        return super().to_url(value)
 
 
-class XAccelMiddleware(object):
+class XAccelMiddleware:
     """A WSGI Middleware that converts X-Sendfile headers to X-Accel-Redirect
     headers if possible.
 
@@ -351,7 +350,7 @@ class XAccelMiddleware(object):
 
     def __init__(self, app, mapping):
         self.app = app
-        self.mapping = [(str(k), str(v)) for k, v in six.iteritems(mapping)]
+        self.mapping = [(str(k), str(v)) for k, v in mapping.items()]
 
     def __call__(self, environ, start_response):
         def _start_response(status, headers, exc_info=None):
@@ -365,7 +364,7 @@ class XAccelMiddleware(object):
             if xsf_path:
                 uri = self.make_x_accel_header(xsf_path)
                 if not uri:
-                    raise ValueError('Could not map {} to a URI'.format(xsf_path))
+                    raise ValueError(f'Could not map {xsf_path} to a URI')
                 new_headers.append((b'X-Accel-Redirect', uri))
             return start_response(status, new_headers, exc_info)
 

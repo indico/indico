@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import unicode_literals
 
 from collections import defaultdict
 
@@ -22,7 +21,7 @@ from indico.util.i18n import _
 from indico.web.util import jsonify_template
 
 
-class ManageEventMixin(object):
+class ManageEventMixin:
     ALLOW_LOCKED = False
     PERMISSION = None
 

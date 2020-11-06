@@ -45,7 +45,7 @@ def main(force, output, plugins):
     try:
         with open(output) as f:
             data = json.load(f)
-    except IOError:
+    except OSError:
         data = {}
     version = get_map_version()
     if not force and data.get('version') == version:

@@ -63,7 +63,7 @@ def now_utc(exact=True):
 def as_utc(dt):
     """Return the given naive datetime with tzinfo=UTC."""
     if dt.tzinfo and dt.tzinfo != pytz.utc:
-        raise ValueError("{} already contains non-UTC tzinfo data".format(dt))
+        raise ValueError(f"{dt} already contains non-UTC tzinfo data")
     return pytz.utc.localize(dt) if dt.tzinfo is None else dt
 
 
@@ -112,7 +112,7 @@ def format_date(d, format='medium', locale=None, timezone=None):
     if not locale:
         locale = get_current_locale()
     if timezone and isinstance(d, datetime) and d.tzinfo:
-        d = d.astimezone(pytz.timezone(timezone) if isinstance(timezone, six.string_types) else timezone)
+        d = d.astimezone(pytz.timezone(timezone) if isinstance(timezone, str) else timezone)
 
     return _format_date(d, format=format, locale=locale)
 
@@ -127,7 +127,7 @@ def format_time(t, format='short', locale=None, timezone=None, server_tz=False):
         timezone = session.tzinfo
     elif server_tz:
         timezone = config.DEFAULT_TIMEZONE
-    if isinstance(timezone, six.string_types):
+    if isinstance(timezone, str):
         timezone = get_timezone(timezone)
     return _format_time(t, format=format, locale=locale, tzinfo=timezone)
 
@@ -154,16 +154,16 @@ def format_human_timedelta(delta, granularity='seconds', narrow=False):
     """
     field_order = ('days', 'hours', 'minutes', 'seconds')
     long_names = {
-        'seconds': lambda n: ngettext(u'{0} second', u'{0} seconds', n).format(n),
-        'minutes': lambda n: ngettext(u'{0} minute', u'{0} minutes', n).format(n),
-        'hours': lambda n: ngettext(u'{0} hour', u'{0} hours', n).format(n),
-        'days': lambda n: ngettext(u'{0} day', u'{0} days', n).format(n),
+        'seconds': lambda n: ngettext('{0} second', '{0} seconds', n).format(n),
+        'minutes': lambda n: ngettext('{0} minute', '{0} minutes', n).format(n),
+        'hours': lambda n: ngettext('{0} hour', '{0} hours', n).format(n),
+        'days': lambda n: ngettext('{0} day', '{0} days', n).format(n),
     }
     short_names = {
-        'seconds': lambda n: ngettext(u'{0}s', u'{0}s', n).format(n),
-        'minutes': lambda n: ngettext(u'{0}m', u'{0}m', n).format(n),
-        'hours': lambda n: ngettext(u'{0}h', u'{0}h', n).format(n),
-        'days': lambda n: ngettext(u'{0}d', u'{0}d', n).format(n),
+        'seconds': lambda n: ngettext('{0}s', '{0}s', n).format(n),
+        'minutes': lambda n: ngettext('{0}m', '{0}m', n).format(n),
+        'hours': lambda n: ngettext('{0}h', '{0}h', n).format(n),
+        'days': lambda n: ngettext('{0}d', '{0}d', n).format(n),
     }
     if narrow:
         long_names = short_names
@@ -172,26 +172,26 @@ def format_human_timedelta(delta, granularity='seconds', narrow=False):
     values['days'], values['seconds'] = divmod(values['seconds'], 86400)
     values['hours'], values['seconds'] = divmod(values['seconds'], 3600)
     values['minutes'], values['seconds'] = divmod(values['seconds'], 60)
-    for key, value in six.iteritems(values):
+    for key, value in values.items():
         values[key] = int(value)
     # keep all fields covered by the granularity, and if that results in
     # no non-zero fields, include otherwise excluded ones
     used_fields = set(field_order[:field_order.index(granularity) + 1])
     available_fields = [x for x in field_order if x not in used_fields]
-    used_fields -= {k for k, v in six.iteritems(values) if not v}
+    used_fields -= {k for k, v in values.items() if not v}
     while not sum(values[x] for x in used_fields) and available_fields:
         used_fields.add(available_fields.pop(0))
     for key in available_fields:
         values[key] = 0
-    nonzero = OrderedDict((k, v) for k, v in six.iteritems(values) if v)
+    nonzero = OrderedDict((k, v) for k, v in values.items() if v)
     if not nonzero:
         return long_names[granularity](0)
     elif len(nonzero) == 1:
         key, value = list(nonzero.items())[0]
         return long_names[key](value)
     else:
-        parts = [short_names[key](value) for key, value in six.iteritems(nonzero)]
-        return u' '.join(parts)
+        parts = [short_names[key](value) for key, value in nonzero.items()]
+        return ' '.join(parts)
 
 
 def format_human_date(dt, format='medium', locale=None):
@@ -247,12 +247,12 @@ def format_pretty_date(dt, locale=None, tzinfo=None):
     if not isinstance(dt, datetime):
         dt = datetime.combine(dt, dt_time())
     return _format_pretty_datetime(dt, locale, tzinfo, {
-        'last_day': _(u"'Yesterday'"),
-        'same_day': _(u"'Today'"),
-        'next_day': _(u"'Tomorrow'"),
-        'last_week': _(u"'Last' EEEE"),
-        'next_week': _(u"EEEE"),
-        'other': _(u"{date_fmt}")
+        'last_day': _("'Yesterday'"),
+        'same_day': _("'Today'"),
+        'next_day': _("'Tomorrow'"),
+        'last_week': _("'Last' EEEE"),
+        'next_week': _("EEEE"),
+        'other': _("{date_fmt}")
     })
 
 
@@ -267,12 +267,12 @@ def format_pretty_datetime(dt, locale=None, tzinfo=None):
     """
 
     return _format_pretty_datetime(dt, locale, tzinfo, {
-        'last_day': _(u"'Yesterday' 'at' {time_fmt}"),
-        'same_day': _(u"'Today' 'at' {time_fmt}"),
-        'next_day': _(u"'Tomorrow' 'at' {time_fmt}"),
-        'last_week': _(u"'Last' EEEE 'at' {time_fmt}"),
-        'next_week': _(u"EEEE 'at' {time_fmt}"),
-        'other': _(u"{date_fmt} 'at' {time_fmt}")
+        'last_day': _("'Yesterday' 'at' {time_fmt}"),
+        'same_day': _("'Today' 'at' {time_fmt}"),
+        'next_day': _("'Tomorrow' 'at' {time_fmt}"),
+        'last_week': _("'Last' EEEE 'at' {time_fmt}"),
+        'next_week': _("EEEE 'at' {time_fmt}"),
+        'other': _("{date_fmt} 'at' {time_fmt}")
     })
 
 
@@ -369,7 +369,7 @@ def strftime_all_years(dt, fmt):
     if dt.year >= 1900:
         return dt.strftime(fmt)
     else:
-        return dt.replace(year=1900).strftime(fmt.replace('%Y', '%%Y')).replace('%Y', six.text_type(dt.year))
+        return dt.replace(year=1900).strftime(fmt.replace('%Y', '%%Y')).replace('%Y', str(dt.year))
 
 
 def get_display_tz(obj=None, as_timezone=False):

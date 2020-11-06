@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import division, unicode_literals
 
 from collections import defaultdict
 from itertools import chain
@@ -110,7 +109,7 @@ class Abstract(ProposalMixin, ProposalRevisionMixin, DescriptionMixin, CustomFie
                                             .format(AbstractState.accepted, AbstractState.rejected,
                                                     AbstractState.merged, AbstractState.duplicate),
                                             name='judgment_dt_if_judged'),
-                         db.CheckConstraint('(state != {}) OR (uuid IS NOT NULL)'.format(AbstractState.invited),
+                         db.CheckConstraint(f'(state != {AbstractState.invited}) OR (uuid IS NOT NULL)',
                                             name='uuid_if_invited'),
                          {'schema': 'event_abstracts'})
 
@@ -439,15 +438,15 @@ class Abstract(ProposalMixin, ProposalRevisionMixin, DescriptionMixin, CustomFie
             return AbstractReviewingState.not_started
         track_states = {x: self.get_track_reviewing_state(x) for x in self.reviewed_for_tracks}
         positiveish_states = {AbstractReviewingState.positive, AbstractReviewingState.conflicting}
-        if any(x == AbstractReviewingState.not_started for x in six.itervalues(track_states)):
+        if any(x == AbstractReviewingState.not_started for x in track_states.values()):
             return AbstractReviewingState.in_progress
-        elif all(x == AbstractReviewingState.negative for x in six.itervalues(track_states)):
+        elif all(x == AbstractReviewingState.negative for x in track_states.values()):
             return AbstractReviewingState.negative
-        elif all(x in positiveish_states for x in six.itervalues(track_states)):
+        elif all(x in positiveish_states for x in track_states.values()):
             if len(self.reviewed_for_tracks) > 1:
                 # Accepted for more than one track
                 return AbstractReviewingState.conflicting
-            elif any(x == AbstractReviewingState.conflicting for x in six.itervalues(track_states)):
+            elif any(x == AbstractReviewingState.conflicting for x in track_states.values()):
                 # The only accepted track is in conflicting state
                 return AbstractReviewingState.conflicting
             else:
@@ -488,7 +487,7 @@ class Abstract(ProposalMixin, ProposalRevisionMixin, DescriptionMixin, CustomFie
 
     @property
     def verbose_title(self):
-        return '#{} ({})'.format(self.friendly_id, self.title)
+        return f'#{self.friendly_id} ({self.title})'
 
     @property
     def is_in_final_state(self):

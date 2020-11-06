@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import unicode_literals
 
 import six
 from sqlalchemy import orm
@@ -15,7 +14,7 @@ from indico.core.db import db
 from indico.util.caching import memoize_request
 
 
-class AttachedItemsMixin(object):
+class AttachedItemsMixin:
     """
     Allow for easy retrieval of structured information about
     items attached to the object.
@@ -61,6 +60,6 @@ def _make_attachment_count_column_property(cls):
 def _mappers_configured():
     # We need to create the column property here since we cannot import
     # Attachment/AttachmentFolder while the models are being defined
-    for model in six.itervalues(db.Model._decl_class_registry):
+    for model in db.Model._decl_class_registry.values():
         if hasattr(model, '__table__') and issubclass(model, AttachedItemsMixin):
             _make_attachment_count_column_property(model)

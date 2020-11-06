@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import unicode_literals
 
 from flask import session
 from werkzeug.exceptions import Forbidden, NotFound
@@ -20,7 +19,7 @@ class RHEditingDashboard(RHEditingManagementBase):
 
     def _process(self):
         template = 'editing.html' if self.event.has_feature('editing') else 'disabled.html'
-        return WPEditing.render_template('management/{}'.format(template), self.event)
+        return WPEditing.render_template(f'management/{template}', self.event)
 
 
 class RHEditableTimeline(RHContributionEditableBase):

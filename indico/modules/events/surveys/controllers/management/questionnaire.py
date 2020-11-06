@@ -5,13 +5,11 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import unicode_literals
 
 import json
 
 import six
 from flask import flash, jsonify, request, session
-from six.moves import map
 from sqlalchemy.orm import joinedload
 from sqlalchemy.orm.exc import NoResultFound
 from werkzeug.datastructures import MultiDict
@@ -93,7 +91,7 @@ class RHImportSurveyQuestionnaire(RHManageSurveyBase):
             else:
                 raise ValueError('Invalid text item')
         elif data['type'] == 'question':
-            for key, value in six.iteritems(data['field_data']):
+            for key, value in data['field_data'].items():
                 if value is not None:
                     data[key] = value
             field_cls = get_field_types()[data['field_type']]

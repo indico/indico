@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import absolute_import, unicode_literals
 
 import ast
 import codecs
@@ -146,8 +145,8 @@ def _parse_config(path):
     with codecs.open(path, encoding='utf-8') as config_file:
         # XXX: unicode_literals is inherited from this file
         exec(compile(config_file.read(), path, 'exec'), globals_, locals_)
-    return {six.text_type(k if k.isupper() else _convert_key(k)): v
-            for k, v in six.iteritems(locals_)
+    return {str(k if k.isupper() else _convert_key(k)): v
+            for k, v in locals_.items()
             if k[0] != '_'}
 
 
@@ -175,8 +174,8 @@ def _sanitize_data(data, allow_internal=False):
     if allow_internal:
         allowed |= set(INTERNAL_DEFAULTS)
     for key in set(data) - allowed:
-        warnings.warn('Ignoring unknown config key {}'.format(key))
-    return {k: v for k, v in six.iteritems(data) if k in allowed}
+        warnings.warn(f'Ignoring unknown config key {key}')
+    return {k: v for k, v in data.items() if k in allowed}
 
 
 def load_config(only_defaults=False, override=None):
@@ -210,7 +209,7 @@ def load_config(only_defaults=False, override=None):
     return ImmutableDict(data)
 
 
-class IndicoConfig(object):
+class IndicoConfig:
     """Wrapper for the Indico configuration.
 
     It exposes all config keys as read-only attributes.
@@ -257,7 +256,7 @@ class IndicoConfig(object):
 
     @property
     def IMAGES_BASE_URL(self):
-        return 'static/images' if g.get('static_site') else url_parse('{}/images'.format(self.BASE_URL)).path
+        return 'static/images' if g.get('static_site') else url_parse(f'{self.BASE_URL}/images').path
 
     @property
     def LATEX_ENABLED(self):

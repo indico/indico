@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import print_function
 
 import time
 from math import isinf
@@ -13,7 +12,7 @@ from math import isinf
 from indico.util.console import cformat
 
 
-class Benchmark(object):
+class Benchmark:
     """Simple benchmark class.
 
     Can be used manually or as a contextmanager:
@@ -53,7 +52,7 @@ class Benchmark(object):
         duration = float(self)
         if isinf(duration):
             return str(duration)
-        return '{:.05f}'.format(duration)
+        return f'{duration:.05f}'
 
     __repr__ = __str__
 

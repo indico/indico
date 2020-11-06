@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import unicode_literals
 
 from sqlalchemy.ext.declarative import declared_attr
 
@@ -42,7 +41,7 @@ class AttachmentFolderPrincipal(PrincipalMixin, db.Model):
     # - folder (AttachmentFolder.acl_entries)
 
     def __repr__(self):
-        return '<AttachmentFolderPrincipal({}, {}, {})>'.format(self.id, self.folder_id, self.principal)
+        return f'<AttachmentFolderPrincipal({self.id}, {self.folder_id}, {self.principal})>'
 
 
 class AttachmentPrincipal(PrincipalMixin, db.Model):
@@ -73,4 +72,4 @@ class AttachmentPrincipal(PrincipalMixin, db.Model):
     # - attachment (Attachment.acl_entries)
 
     def __repr__(self):
-        return '<AttachmentPrincipal({}, {}, {})>'.format(self.id, self.attachment_id, self.principal)
+        return f'<AttachmentPrincipal({self.id}, {self.attachment_id}, {self.principal})>'

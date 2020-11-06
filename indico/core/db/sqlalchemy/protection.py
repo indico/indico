@@ -5,13 +5,11 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import unicode_literals
 
 import itertools
 
 import six
 from flask import has_request_context, session
-from six.moves import map
 from sqlalchemy import inspect
 from sqlalchemy.event import listens_for
 from sqlalchemy.ext.declarative import declared_attr
@@ -38,7 +36,7 @@ class ProtectionMode(RichIntEnum):
     protected = 2
 
 
-class ProtectionMixin(object):
+class ProtectionMixin:
     #: Whether the object protection mode is disabled
     disable_protection_mode = False
     #: The protection modes that are not allowed.  Can be overridden
@@ -149,7 +147,7 @@ class ProtectionMixin(object):
         if self.disable_protection_mode:
             return 'protection_mode=disabled'
         protection_mode = self.protection_mode.name if self.protection_mode is not None else None
-        return 'protection_mode={}'.format(protection_mode)
+        return f'protection_mode={protection_mode}'
 
     @property
     def protection_parent(self):
@@ -219,7 +217,7 @@ class ProtectionMixin(object):
                     # This should be the case for the top-level object,
                     # i.e. the root category, which shouldn't allow
                     # ProtectionMode.inheriting as it makes no sense.
-                    raise TypeError('protection_parent of {} is None'.format(self))
+                    raise TypeError(f'protection_parent of {self} is None')
                 elif hasattr(parent, 'can_access'):
                     rv = parent.can_access(user, allow_admin=allow_admin)
                 else:
@@ -228,7 +226,7 @@ class ProtectionMixin(object):
         else:
             # should never happen, but since this is a sensitive area
             # we better fail loudly if we have garbage
-            raise ValueError('Invalid protection mode: {}'.format(self.protection_mode))
+            raise ValueError(f'Invalid protection mode: {self.protection_mode}')
 
         override = self._check_can_access_override(user, allow_admin=allow_admin, authorized=rv)
         return override if override is not None else rv
@@ -263,7 +261,7 @@ class ProtectionMixin(object):
     @property
     def _access_key_session_key(self):
         cls, pks = inspect(self).identity_key[:2]
-        return '{}-{}'.format(cls.__name__, '-'.join(map(six.text_type, pks)))
+        return '{}-{}'.format(cls.__name__, '-'.join(map(str, pks)))
 
     def update_principal(self, principal, read_access=None, quiet=False):
         """Update access privileges for the given principal.
@@ -460,7 +458,7 @@ class ProtectionManagersMixin(ProtectionMixin):
                 new_permissions |= add_permissions
             if del_permissions:
                 new_permissions -= del_permissions
-        invalid_permissions = new_permissions - six.viewkeys(get_available_permissions(type(self)))
+        invalid_permissions = new_permissions - get_available_permissions(type(self)).keys()
         if invalid_permissions:
             raise ValueError('Invalid permissions: {}'.format(', '.join(invalid_permissions)))
         entry.permissions = sorted(new_permissions)

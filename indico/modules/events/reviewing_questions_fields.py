@@ -5,10 +5,8 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import unicode_literals
 
 import six
-from six.moves import range
 from wtforms.fields import BooleanField
 from wtforms.validators import InputRequired
 
@@ -38,7 +36,7 @@ class AbstractRatingReviewingQuestion(BaseField):
     @property
     def wtf_field_kwargs(self):
         range_ = self.object.event.cfa.rating_range
-        choices = [(n, six.text_type(n)) for n in range(range_[0], range_[1] + 1)]
+        choices = [(n, str(n)) for n in range(range_[0], range_[1] + 1)]
         return {'coerce': int, 'choices': choices, 'rating_range': range_, 'question': self.object}
 
 
@@ -52,7 +50,7 @@ class PaperRatingReviewingQuestion(BaseField):
     @property
     def wtf_field_kwargs(self):
         range_ = self.object.event.cfp.rating_range
-        choices = [(n, six.text_type(n)) for n in range(range_[0], range_[1] + 1)]
+        choices = [(n, str(n)) for n in range(range_[0], range_[1] + 1)]
         return {'coerce': int, 'choices': choices, 'rating_range': range_, 'question': self.object}
 
 

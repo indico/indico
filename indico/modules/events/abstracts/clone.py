@@ -5,10 +5,8 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import unicode_literals
 
 import six
-from six.moves import map
 
 from indico.core.db import db
 from indico.core.db.sqlalchemy.util.models import get_simple_column_attrs
@@ -36,8 +34,8 @@ class AbstractSettingsCloner(EventCloner):
     @no_autoflush
     def run(self, new_event, cloners, shared_data, event_exists=False):
         self._contrib_type_id_map = {old.id: new.id
-                                     for old, new in six.iteritems(shared_data['contribution_types']['contrib_type_map'])}
-        self._track_id_map = {old.id: new.id for old, new in six.iteritems(shared_data['tracks']['track_map'])}
+                                     for old, new in shared_data['contribution_types']['contrib_type_map'].items()}
+        self._track_id_map = {old.id: new.id for old, new in shared_data['tracks']['track_map'].items()}
         self._clone_settings(new_event)
         self._clone_email_templates(new_event)
         self._clone_review_questions(new_event)

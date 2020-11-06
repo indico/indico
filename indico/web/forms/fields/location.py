@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import absolute_import, unicode_literals
 
 from sqlalchemy.orm import joinedload
 
@@ -27,12 +26,12 @@ class IndicoLocationField(JSONField):
                           .options(joinedload('rooms'))
                           .order_by(db.func.lower(Location.name))
                           .all())
-        super(IndicoLocationField, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
     def process_formdata(self, valuelist):
         from indico.modules.rb.models.locations import Location
         from indico.modules.rb.models.rooms import Room
-        super(IndicoLocationField, self).process_formdata(valuelist)
+        super().process_formdata(valuelist)
         self.data['room'] = Room.get(int(self.data['room_id'])) if self.data.get('room_id') else None
         self.data['venue'] = (Location.get(int(self.data['venue_id']), is_deleted=False)
                               if self.data.get('venue_id')

@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import unicode_literals
 
 import mimetypes
 from uuid import UUID
@@ -23,7 +22,7 @@ from indico.web.args import use_kwargs
 from indico.web.rh import RHProtected
 
 
-class UploadFileMixin(object):
+class UploadFileMixin:
     """Mixin for RHs using the generic file upload system.
 
     An RH using this mixin needs to override the ``get_file_context`` method

@@ -5,18 +5,16 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import unicode_literals
 
 from datetime import timedelta
 
 from flask import g
-from six.moves import range
 
 import indico.modules.events.contributions.models.contributions as contrib_module
 from indico.modules.events.contributions.models.contributions import Contribution
 
 
-class Incrementer(object):
+class Incrementer:
     def __init__(self):
         self.counter = 0
 
@@ -46,7 +44,7 @@ def test_contrib_friendly_id(monkeypatch, dummy_event, create_contribution):
     assert counter == 10
 
     for fid in g.friendly_ids[Contribution][dummy_event.id][:]:
-        contrib = create_contribution(dummy_event, 'Contribution {}'.format(fid), timedelta(minutes=30))
+        contrib = create_contribution(dummy_event, f'Contribution {fid}', timedelta(minutes=30))
         assert contrib.friendly_id == fid
 
     # increment_and_get doesn't get called because the ids

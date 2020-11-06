@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import unicode_literals
 
 import six
 from flask import jsonify, request
@@ -28,7 +27,7 @@ def _contains(field, text):
 
 def _get_metadata_query():
     return {k[len('meta.'):]: int(v) if v.isdigit() else v
-            for k, v in six.iteritems(request.args)
+            for k, v in request.args.items()
             if k.startswith('meta.')}
 
 

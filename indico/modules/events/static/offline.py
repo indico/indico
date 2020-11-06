@@ -72,7 +72,7 @@ def _normalize_path(path):
     return secure_filename(strip_tags(path))
 
 
-class StaticEventCreator(object):
+class StaticEventCreator:
     """Define process which generates a static (offline) version of an Indico event."""
 
     def __init__(self, rh, event):
@@ -80,7 +80,7 @@ class StaticEventCreator(object):
         self.event = event
         self._display_tz = self.event.display_tzinfo.zone
         self._zip_file = None
-        self._content_dir = _normalize_path(u'OfflineWebsite-{}'.format(event.title))
+        self._content_dir = _normalize_path(f'OfflineWebsite-{event.title}')
         self._web_dir = os.path.join(get_root_path('indico'), 'web')
         self._static_dir = os.path.join(self._web_dir, 'static')
 
@@ -121,8 +121,8 @@ class StaticEventCreator(object):
     def _write_generated_js(self):
         global_js = generate_global_file().encode('utf-8')
         user_js = generate_user_file().encode('utf-8')
-        i18n_js = u"window.TRANSLATIONS = {};".format(generate_i18n_file(session.lang)).encode('utf-8')
-        react_i18n_js = u"window.REACT_TRANSLATIONS = {};".format(
+        i18n_js = "window.TRANSLATIONS = {};".format(generate_i18n_file(session.lang)).encode('utf-8')
+        react_i18n_js = "window.REACT_TRANSLATIONS = {};".format(
             generate_i18n_file(session.lang, react=True)).encode('utf-8')
         gen_path = os.path.join(self._content_dir, 'assets')
         self._zip_file.writestr(os.path.join(gen_path, 'js-vars', 'global.js'), global_js)
@@ -207,7 +207,7 @@ class StaticEventCreator(object):
                     continue
                 if attachment.type == AttachmentType.file:
                     dst_path = posixpath.join(self._content_dir, "material", type_,
-                                              "{}-{}".format(attachment.id, attachment.file.filename))
+                                              f"{attachment.id}-{attachment.file.filename}")
                     with attachment.file.get_local_path() as file_path:
                         self._copy_file(dst_path, file_path)
 
@@ -225,7 +225,7 @@ class StaticEventCreator(object):
 
 class StaticConferenceCreator(StaticEventCreator):
     def __init__(self, rh, event):
-        super(StaticConferenceCreator, self).__init__(rh, event)
+        super().__init__(rh, event)
         # Menu entries we want to include in the offline version.
         # Those which are backed by a WP class get their name from that class;
         # the others are simply hardcoded.
@@ -241,7 +241,7 @@ class StaticConferenceCreator(StaticEventCreator):
             RHTimetable: WPStaticTimetable,
             RHDisplayTracks: WPStaticConferenceProgram
         }
-        for rh_cls, wp in six.viewitems(rhs):
+        for rh_cls, wp in rhs.items():
             rh = rh_cls()
             rh.view_class = wp
             if rh_cls is RHTimetable:
@@ -256,7 +256,7 @@ class StaticConferenceCreator(StaticEventCreator):
             for image_file in used_images:
                 with image_file.open() as f:
                     self._zip_file.writestr(os.path.join(self._content_dir,
-                                                         'images/{}-{}'.format(image_file.id, image_file.filename)),
+                                                         f'images/{image_file.id}-{image_file.filename}'),
                                             f.read())
         if self.event.has_logo:
             self._zip_file.writestr(os.path.join(self._content_dir, 'logo.png'), self.event.logo)
@@ -313,7 +313,7 @@ class StaticConferenceCreator(StaticEventCreator):
         self._add_page(html, 'event_pages.page_display', page)
 
     def _get_url(self, uh_or_endpoint, target, **params):
-        if isinstance(uh_or_endpoint, six.string_types):
+        if isinstance(uh_or_endpoint, str):
             return url_for(uh_or_endpoint, target, **params)
         else:
             return str(uh_or_endpoint.getStaticURL(target, **params))

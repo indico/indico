@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import unicode_literals
 
 from sqlalchemy.ext.declarative import declared_attr
 
@@ -15,7 +14,7 @@ from indico.core.settings.models.base import JSONSettingsBase, PrincipalSettings
 from indico.util.decorators import strict_classproperty
 
 
-class CoreSettingsMixin(object):
+class CoreSettingsMixin:
     @strict_classproperty
     @staticmethod
     def __auto_table_args():
@@ -34,7 +33,7 @@ class Setting(JSONSettingsBase, CoreSettingsMixin, db.Model):
         return auto_table_args(cls)
 
     def __repr__(self):
-        return '<Setting({}, {}, {!r})>'.format(self.module, self.name, self.value)
+        return f'<Setting({self.module}, {self.name}, {self.value!r})>'
 
 
 class SettingPrincipal(PrincipalSettingsBase, CoreSettingsMixin, db.Model):
@@ -45,4 +44,4 @@ class SettingPrincipal(PrincipalSettingsBase, CoreSettingsMixin, db.Model):
         return auto_table_args(cls)
 
     def __repr__(self):
-        return '<SettingPrincipal({}, {}, {!r})>'.format(self.module, self.name, self.principal)
+        return f'<SettingPrincipal({self.module}, {self.name}, {self.principal!r})>'

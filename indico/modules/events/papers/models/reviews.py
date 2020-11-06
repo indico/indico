@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import division, unicode_literals
 
 from indico.core.db.sqlalchemy import PyIntEnum, UTCDateTime, db
 from indico.core.db.sqlalchemy.descriptions import RenderMode, RenderModeMixin
@@ -37,7 +36,7 @@ class PaperTypeProxy(ProposalGroupProxy):
         return {'review_type': self.instance.name}
 
 
-class PaperJudgmentProxy(object):
+class PaperJudgmentProxy:
     """A timeline item for the non final judgments."""
 
     timeline_item_type = 'judgment'
@@ -50,7 +49,7 @@ class PaperJudgmentProxy(object):
         return self.paper.judgment_dt
 
     def __repr__(self):
-        return '<PaperJudgmentProxy: {}>'.format(self.paper)
+        return f'<PaperJudgmentProxy: {self.paper}>'
 
 
 class PaperCommentVisibility(RichIntEnum):

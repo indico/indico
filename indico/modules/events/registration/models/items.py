@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import unicode_literals
 
 from uuid import uuid4
 
@@ -120,7 +119,7 @@ class PersonalDataType(int, IndicoEnum):
                 'data': {
                     'item_type': 'dropdown',
                     'with_extra_slots': False,
-                    'choices': [dict(title_item, id=six.text_type(uuid4()), caption=orig_string(t.title))
+                    'choices': [dict(title_item, id=str(uuid4()), caption=orig_string(t.title))
                                 for t in UserTitle if t]
                 }
             }),
@@ -150,7 +149,7 @@ class RegistrationFormItem(db.Model):
         db.CheckConstraint("(input_type IS NULL) = (type NOT IN ({t.field}, {t.field_pd}))"
                            .format(t=RegistrationFormItemType),
                            name='valid_input'),
-        db.CheckConstraint("NOT is_manager_only OR type = {type}".format(type=RegistrationFormItemType.section),
+        db.CheckConstraint(f"NOT is_manager_only OR type = {RegistrationFormItemType.section}",
                            name='valid_manager_only'),
         db.CheckConstraint("(type IN ({t.section}, {t.section_pd})) = (parent_id IS NULL)"
                            .format(t=RegistrationFormItemType),
@@ -161,7 +160,7 @@ class RegistrationFormItem(db.Model):
         db.CheckConstraint("NOT is_deleted OR (type NOT IN ({t.section_pd}, {t.field_pd}))"
                            .format(t=RegistrationFormItemType),
                            name='pd_not_deleted'),
-        db.CheckConstraint("is_enabled OR type != {type}".format(type=RegistrationFormItemType.section_pd),
+        db.CheckConstraint(f"is_enabled OR type != {RegistrationFormItemType.section_pd}",
                            name='pd_section_enabled'),
         db.CheckConstraint("is_enabled OR type != {type} OR personal_data_type NOT IN "
                            "({pt.email}, {pt.first_name}, {pt.last_name})"
@@ -175,9 +174,9 @@ class RegistrationFormItem(db.Model):
                            .format(t=RegistrationFormItemType),
                            name='current_data_id_only_field'),
         db.Index('ix_uq_form_items_pd_section', 'registration_form_id', unique=True,
-                 postgresql_where=db.text('type = {type}'.format(type=RegistrationFormItemType.section_pd))),
+                 postgresql_where=db.text(f'type = {RegistrationFormItemType.section_pd}')),
         db.Index('ix_uq_form_items_pd_field', 'registration_form_id', 'personal_data_type', unique=True,
-                 postgresql_where=db.text('type = {type}'.format(type=RegistrationFormItemType.field_pd))),
+                 postgresql_where=db.text(f'type = {RegistrationFormItemType.field_pd}')),
         {'schema': 'event_registration'}
     )
     __mapper_args__ = {
@@ -373,7 +372,7 @@ class RegistrationFormSection(RegistrationFormItem):
 
     @property
     def own_data(self):
-        field_data = dict(super(RegistrationFormSection, self).view_data,
+        field_data = dict(super().view_data,
                           enabled=self.is_enabled,
                           title=self.title,
                           is_manager_only=self.is_manager_only,
@@ -394,7 +393,7 @@ class RegistrationFormPersonalDataSection(RegistrationFormSection):
 
     @property
     def view_data(self):
-        field_data = dict(super(RegistrationFormPersonalDataSection, self).view_data, is_personal_data=True)
+        field_data = dict(super().view_data, is_personal_data=True)
         del field_data['isPersonalData']
         return camelize_keys(field_data)
 
@@ -412,6 +411,6 @@ class RegistrationFormText(RegistrationFormItem):
 
     @property
     def view_data(self):
-        field_data = dict(super(RegistrationFormText, self).view_data, is_enabled=self.is_enabled, input_type='label',
+        field_data = dict(super().view_data, is_enabled=self.is_enabled, input_type='label',
                           title=self.title)
         return camelize_keys(field_data)

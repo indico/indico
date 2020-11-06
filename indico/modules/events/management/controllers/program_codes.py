@@ -5,11 +5,9 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import unicode_literals
 
 import six
 from flask import flash, request, session
-from six.moves import map
 
 from indico.core.db import db
 from indico.modules.events import EventLogKind, EventLogRealm
@@ -71,12 +69,12 @@ class RHAssignProgramCodesBase(RHManageEventBase):
     def _get_update_log_data(self, updates):
         changes = {}
         fields = {}
-        for obj, change in six.viewitems(updates):
+        for obj, change in updates.items():
             title = getattr(obj, 'full_title', obj.title)
             friendly_id = getattr(obj, 'friendly_id', None)
             if friendly_id is not None:
-                title = '#{}: {}'.format(friendly_id, title)
-            key = 'obj_{}'.format(obj.id)
+                title = f'#{friendly_id}: {title}'
+            key = f'obj_{obj.id}'
             fields[key] = {'type': 'string', 'title': title}
             changes[key] = change
         return {'Changes': make_diff_log(changes, fields)}
@@ -85,7 +83,7 @@ class RHAssignProgramCodesBase(RHManageEventBase):
         if 'assign' in request.form:
             updates = {}
             for obj in self.objects:
-                code = request.form['code_{}'.format(obj.id)].strip()
+                code = request.form[f'code_{obj.id}'].strip()
                 if code != obj.code:
                     updates[obj] = (obj.code, code)
                     obj.code = code

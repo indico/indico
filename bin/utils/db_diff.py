@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import unicode_literals
 
 import os
 import pipes
@@ -15,7 +14,6 @@ import sys
 import click
 from click._compat import should_strip_ansi
 from migra import Migration
-from six.moves import map
 from sqlalchemy import create_engine
 
 
@@ -48,17 +46,17 @@ def _subprocess_check_output(*popenargs, **kwargs):
 def _checked_call(verbose, args, return_output=False, env=None, stdin_data=None):
     cmd = ' '.join([os.path.basename(args[0])] + list(map(pipes.quote, args[1:])))
     if verbose:
-        click.echo(click.style('** {}'.format(cmd), fg='blue', bold=True), err=True)
+        click.echo(click.style(f'** {cmd}', fg='blue', bold=True), err=True)
     kwargs = {}
     if env:
         kwargs['env'] = dict(os.environ, **env)
     try:
         rv = _subprocess_check_output(args, stderr=subprocess.STDOUT, stdin_data=stdin_data, **kwargs).strip()
     except OSError as exc:
-        click.echo(click.style('!! {} failed: {}'.format(cmd, exc), fg='red', bold=True), err=True)
+        click.echo(click.style(f'!! {cmd} failed: {exc}', fg='red', bold=True), err=True)
         sys.exit(1)
     except subprocess.CalledProcessError as exc:
-        click.echo(click.style('!! {} failed:'.format(cmd), fg='red', bold=True), err=True)
+        click.echo(click.style(f'!! {cmd} failed:', fg='red', bold=True), err=True)
         click.echo(click.style(_indent(exc.output.strip()), fg='yellow', bold=True), err=True)
         sys.exit(1)
     else:

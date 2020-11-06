@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import unicode_literals
 
 import six
 from flask import current_app, redirect, request
@@ -51,7 +50,7 @@ def compat_folder_old():
                'contribId': 'contrib_id',
                'subContId': 'subcontrib_id',
                'materialId': 'material_id'}
-    kwargs = {mapping[k]: v for k, v in six.iteritems(request.args) if k in mapping}
+    kwargs = {mapping[k]: v for k, v in request.args.items() if k in mapping}
     return compat_folder(**kwargs)
 
 

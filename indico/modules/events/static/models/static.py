@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import unicode_literals
 
 import posixpath
 
@@ -96,7 +95,7 @@ class StaticSite(StoredFileMixin, db.Model):
     def _build_storage_path(self):
         path_segments = ['event', strict_unicode(self.event.id), 'static']
         self.assign_id()
-        filename = '{}-{}'.format(self.id, self.filename)
+        filename = f'{self.id}-{self.filename}'
         path = posixpath.join(*(path_segments + [filename]))
         return config.STATIC_SITE_STORAGE, path
 

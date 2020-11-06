@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import unicode_literals
 
 import logging
 import logging.config
@@ -38,22 +37,22 @@ else:
     has_sentry = True
 
 
-class AddRequestIDFilter(object):
+class AddRequestIDFilter:
     def filter(self, record):
         # Add our request ID if available
         record.request_id = request.id if has_request_context() else '0' * 16
         return True
 
 
-class AddUserIDFilter(object):
+class AddUserIDFilter:
     def filter(self, record):
-        record.user_id = six.text_type(session.user.id) if has_request_context() and session and session.user else '-'
+        record.user_id = str(session.user.id) if has_request_context() and session and session.user else '-'
         return True
 
 
 class RequestInfoFormatter(logging.Formatter):
     def format(self, record):
-        rv = super(RequestInfoFormatter, self).format(record)
+        rv = super().format(record)
         info = get_request_info()
         if info:
             rv += '\n\n' + pformat(info)
@@ -100,7 +99,7 @@ class BlacklistFilter(logging.Filter):
         return not any(x.filter(record) for x in self.filters)
 
 
-class Logger(object):
+class Logger:
     @classmethod
     def init(cls, app):
         path = config.LOGGING_CONFIG_PATH
@@ -120,7 +119,7 @@ class Logger(object):
         data.setdefault('filters', {})
         data['filters']['_add_request_id'] = {'()': AddRequestIDFilter}
         data['filters']['_add_user_id'] = {'()': AddUserIDFilter}
-        for handler in six.itervalues(data['handlers']):
+        for handler in data['handlers'].values():
             handler.setdefault('filters', [])
             handler['filters'].insert(0, '_add_request_id')
             handler['filters'].insert(1, '_add_user_id')
@@ -134,13 +133,13 @@ class Logger(object):
                     handler['secure'] = () if config.SMTP_USE_TLS else None  # yuck, empty tuple == STARTTLS
                     if config.SMTP_LOGIN and config.SMTP_PASSWORD:
                         handler['credentials'] = (config.SMTP_LOGIN, config.SMTP_PASSWORD)
-                handler.setdefault('fromaddr', 'logger@{}'.format(config.WORKER_NAME))
+                handler.setdefault('fromaddr', f'logger@{config.WORKER_NAME}')
                 handler.setdefault('toaddrs', [config.SUPPORT_EMAIL])
                 subject = ('Unexpected Exception occurred at {}: %(message)s'
                            if handler['class'] == 'indico.core.logger.FormattedSubjectSMTPHandler' else
                            'Unexpected Exception occurred at {}')
                 handler.setdefault('subject', subject.format(config.WORKER_NAME))
-        for formatter in six.itervalues(data['formatters']):
+        for formatter in data['formatters'].values():
             # Make adding request info to log entries less ugly
             if formatter.pop('append_request_info', False):
                 assert '()' not in formatter
@@ -182,7 +181,7 @@ class IndicoSentry(Sentry):
                 'name': session.user.full_name}
 
     def before_request(self, *args, **kwargs):
-        super(IndicoSentry, self).before_request()
+        super().before_request()
         if not has_request_context():
             return
         self.client.extra_context({'Endpoint': str(request.url_rule.endpoint) if request.url_rule else None,

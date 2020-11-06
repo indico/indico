@@ -5,12 +5,10 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import unicode_literals
 
 from uuid import uuid4
 
 import six
-from six.moves import map
 from sqlalchemy.dialects.postgresql import ARRAY, UUID
 from sqlalchemy.ext.declarative import declared_attr
 from werkzeug.urls import url_parse
@@ -70,7 +68,7 @@ class OAuthApplication(db.Model):
     def __table_args__(cls):
         return (db.Index('ix_uq_applications_name_lower', db.func.lower(cls.name), unique=True),
                 db.Index(None, cls.system_app_type, unique=True,
-                         postgresql_where=db.text('system_app_type != {}'.format(SystemAppType.none.value))),
+                         postgresql_where=db.text(f'system_app_type != {SystemAppType.none.value}')),
                 {'schema': 'oauth'})
 
     #: the unique id of the application
@@ -94,13 +92,13 @@ class OAuthApplication(db.Model):
         UUID,
         unique=True,
         nullable=False,
-        default=lambda: six.text_type(uuid4())
+        default=lambda: str(uuid4())
     )
     #: the OAuth client_secret
     client_secret = db.Column(
         UUID,
         nullable=False,
-        default=lambda: six.text_type(uuid4())
+        default=lambda: str(uuid4())
     )
     #: the OAuth default scopes the application may request access to
     default_scopes = db.Column(
@@ -148,10 +146,10 @@ class OAuthApplication(db.Model):
         return {'id': self.id}
 
     def __repr__(self):  # pragma: no cover
-        return '<OAuthApplication({}, {}, {})>'.format(self.id, self.name, self.client_id)
+        return f'<OAuthApplication({self.id}, {self.name}, {self.client_id})>'
 
     def reset_client_secret(self):
-        self.client_secret = six.text_type(uuid4())
+        self.client_secret = str(uuid4())
         logger.info("Client secret for %s has been reset.", self)
 
     def validate_redirect_uri(self, redirect_uri):

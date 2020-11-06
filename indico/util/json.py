@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import absolute_import
 
 from collections import UserDict
 from datetime import date, datetime
@@ -27,7 +26,7 @@ class IndicoJSONEncoder(_json.JSONEncoder):
     def __init__(self, *args, **kwargs):
         if kwargs.get('separators') is None:
             kwargs['separators'] = (',', ':')
-        super(IndicoJSONEncoder, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
     def default(self, o):
         if isinstance(o, _LazyString):

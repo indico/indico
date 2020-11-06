@@ -5,7 +5,7 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from mock import MagicMock
+from unittest.mock import MagicMock
 
 from indico.modules.groups import GroupProxy
 from indico.modules.networks.models.networks import IPNetworkGroup

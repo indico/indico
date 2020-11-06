@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import unicode_literals
 
 from indico.core.db import db
 from indico.core.db.sqlalchemy.attachments import AttachedItemsMixin
@@ -114,7 +113,7 @@ class SubContribution(DescriptionMixin, AttachedItemsMixin, AttachedNotesMixin, 
         # an extra query to check whether there is an object associated
         # when assigning a new one (e.g. during cloning)
         kwargs.setdefault('note', None)
-        super(SubContribution, self).__init__(**kwargs)
+        super().__init__(**kwargs)
 
     @property
     def event(self):

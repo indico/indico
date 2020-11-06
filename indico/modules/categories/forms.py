@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import unicode_literals
 
 from functools import partial
 
@@ -97,7 +96,7 @@ class CategoryProtectionForm(IndicoForm):
 
     def __init__(self, *args, **kwargs):
         self.protected_object = self.category = kwargs.pop('category')
-        super(CategoryProtectionForm, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self._init_visibility()
 
     def _init_visibility(self):
@@ -140,7 +139,7 @@ class SplitCategoryForm(IndicoForm):
     submitted = HiddenField()
 
     def __init__(self, *args, **kwargs):
-        super(SplitCategoryForm, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         if self.all_selected.data:
             self.event_id.data = []
             self.first_category.label.text = _('Category name')
@@ -148,7 +147,7 @@ class SplitCategoryForm(IndicoForm):
             del self.second_category
 
     def is_submitted(self):
-        return super(SplitCategoryForm, self).is_submitted() and 'submitted' in request.form
+        return super().is_submitted() and 'submitted' in request.form
 
 
 class UpcomingEventsForm(IndicoForm):
@@ -196,7 +195,7 @@ class CategoryRoleForm(IndicoForm):
     def __init__(self, *args, **kwargs):
         self.role = kwargs.get('obj')
         self.category = kwargs.pop('category')
-        super(CategoryRoleForm, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
     def validate_code(self, field):
         query = CategoryRole.query.with_parent(self.category).filter_by(code=field.data)

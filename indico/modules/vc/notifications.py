@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import unicode_literals
 
 from indico.core.notifications import make_email, send_email
 from indico.modules.vc.util import get_linked_to_description

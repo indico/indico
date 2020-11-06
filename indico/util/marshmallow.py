@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import absolute_import, unicode_literals
 
 import os
 import re
@@ -16,7 +15,6 @@ from dateutil import parser, relativedelta
 from marshmallow import ValidationError
 from marshmallow.fields import DateTime, Field
 from marshmallow.utils import from_iso_datetime
-from six.moves import map
 from sqlalchemy import inspect
 
 from indico.core.permissions import get_unified_permissions
@@ -116,14 +114,14 @@ class ModelField(Field):
         if column:
             self.column = getattr(model, column)
             # Custom column -> most likely a string value
-            self.column_type = column_type or six.text_type
+            self.column_type = column_type or str
         else:
             pks = inspect(model).primary_key
             assert len(pks) == 1
             self.column = pks[0]
             # Default PK -> most likely an ID
             self.column_type = column_type or int
-        super(ModelField, self).__init__(**kwargs)
+        super().__init__(**kwargs)
 
     def _serialize(self, value, attr, obj):
         return getattr(value, self.column.key) if value is not None else None
@@ -162,14 +160,14 @@ class ModelList(Field):
         if column:
             self.column = getattr(model, column)
             # Custom column -> most likely a string value
-            self.column_type = column_type or six.text_type
+            self.column_type = column_type or str
         else:
             pks = inspect(model).primary_key
             assert len(pks) == 1
             self.column = pks[0]
             # Default PK -> most likely an ID
             self.column_type = column_type or int
-        super(ModelList, self).__init__(**kwargs)
+        super().__init__(**kwargs)
 
     def _serialize(self, value, attr, obj):
         return [getattr(x, self.column.key) for x in value]
@@ -197,7 +195,7 @@ class Principal(Field):
     def __init__(self, allow_groups=False, allow_external_users=False, **kwargs):
         self.allow_groups = allow_groups
         self.allow_external_users = allow_external_users
-        super(Principal, self).__init__(**kwargs)
+        super().__init__(**kwargs)
 
     def _serialize(self, value, attr, obj):
         return value.identifier if value is not None else None
@@ -210,7 +208,7 @@ class Principal(Field):
                                              allow_groups=self.allow_groups,
                                              allow_external_users=self.allow_external_users)
         except ValueError as exc:
-            raise ValidationError(six.text_type(exc))
+            raise ValidationError(str(exc))
 
 
 class PrincipalList(Field):
@@ -224,7 +222,7 @@ class PrincipalList(Field):
         self.allow_category_roles = allow_category_roles
         self.allow_registration_forms = allow_registration_forms
         self.allow_emails = allow_emails
-        super(PrincipalList, self).__init__(**kwargs)
+        super().__init__(**kwargs)
 
     def _serialize(self, value, attr, obj):
         return [x.identifier for x in value]
@@ -234,7 +232,7 @@ class PrincipalList(Field):
         if self.allow_event_roles or self.allow_category_roles:
             event_id = self.context['event'].id
         try:
-            return set(principal_from_identifier(identifier,
+            return {principal_from_identifier(identifier,
                                                  allow_groups=self.allow_groups,
                                                  allow_external_users=self.allow_external_users,
                                                  allow_event_roles=self.allow_event_roles,
@@ -242,9 +240,9 @@ class PrincipalList(Field):
                                                  allow_registration_forms=self.allow_registration_forms,
                                                  allow_emails=self.allow_emails,
                                                  event_id=event_id)
-                       for identifier in value)
+                       for identifier in value}
         except ValueError as exc:
-            raise ValidationError(six.text_type(exc))
+            raise ValidationError(str(exc))
 
 
 class PrincipalDict(PrincipalList):
@@ -266,7 +264,7 @@ class PrincipalDict(PrincipalList):
                                                           soft_fail=True)
                     for identifier in value}
         except ValueError as exc:
-            raise ValidationError(six.text_type(exc))
+            raise ValidationError(str(exc))
 
 
 class PrincipalPermissionList(Field):
@@ -279,7 +277,7 @@ class PrincipalPermissionList(Field):
     def __init__(self, principal_class, all_permissions=False, **kwargs):
         self.principal_class = principal_class
         self.all_permissions = all_permissions
-        super(PrincipalPermissionList, self).__init__(**kwargs)
+        super().__init__(**kwargs)
 
     def _serialize(self, value, attr, obj):
         return [(entry.principal.identifier, sorted(get_unified_permissions(entry, self.all_permissions)))
@@ -292,7 +290,7 @@ class PrincipalPermissionList(Field):
                 for identifier, permissions in value
             }
         except ValueError as exc:
-            raise ValidationError(six.text_type(exc))
+            raise ValidationError(str(exc))
 
 
 class HumanizedDate(Field):
@@ -330,10 +328,10 @@ class FilesField(ModelList):
     def __init__(self, allow_claimed=False, **kwargs):
         from indico.modules.files.models.files import File
         self.allow_claimed = allow_claimed
-        super(FilesField, self).__init__(model=File, column='uuid', column_type=UUID, **kwargs)
+        super().__init__(model=File, column='uuid', column_type=UUID, **kwargs)
 
     def _deserialize(self, value, attr, data):
-        rv = super(FilesField, self)._deserialize(value, attr, data)
+        rv = super()._deserialize(value, attr, data)
         if not self.allow_claimed and any(f.claimed for f in rv):
             self.fail('claimed')
         return rv
@@ -349,10 +347,10 @@ class FileField(ModelField):
     def __init__(self, allow_claimed=False, **kwargs):
         from indico.modules.files.models.files import File
         self.allow_claimed = allow_claimed
-        super(FileField, self).__init__(model=File, column='uuid', column_type=UUID, **kwargs)
+        super().__init__(model=File, column='uuid', column_type=UUID, **kwargs)
 
     def _deserialize(self, value, attr, data):
-        rv = super(FileField, self)._deserialize(value, attr, data)
+        rv = super()._deserialize(value, attr, data)
         if not self.allow_claimed and rv is not None and rv.claimed:
             self.fail('claimed')
         return rv

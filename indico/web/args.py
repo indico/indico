@@ -5,12 +5,10 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import absolute_import, unicode_literals
 
 import six
 from flask import g
 from marshmallow import Schema
-from six.moves import map
 from webargs import dict2schema
 from webargs.compat import Mapping
 from webargs.flaskparser import FlaskParser
@@ -24,8 +22,8 @@ class IndicoFlaskParser(FlaskParser):
     """
 
     def parse_arg(self, name, field, req, locations=None):
-        rv = super(IndicoFlaskParser, self).parse_arg(name, field, req, locations=locations)
-        if isinstance(rv, six.string_types):
+        rv = super().parse_arg(name, field, req, locations=locations)
+        if isinstance(rv, str):
             return rv.strip()
         elif isinstance(rv, (list, set)):
             return type(rv)(list(map(strip_whitespace, rv)))

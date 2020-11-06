@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import unicode_literals
 
 from uuid import uuid4
 
@@ -56,7 +55,7 @@ class RHConnectService(RHEditingManagementBase):
             editing_settings.set(self.event, 'service_event_identifier', make_event_identifier(self.event))
         editing_settings.set_multi(self.event, {
             'service_url': url,
-            'service_token': six.text_type(uuid4()),
+            'service_token': str(uuid4()),
         })
         # we need to commit the token so the service can already use it when processing
         # the enabled event in case it wants to set up tags etc

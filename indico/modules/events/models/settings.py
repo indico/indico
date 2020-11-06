@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import unicode_literals
 
 from sqlalchemy.ext.declarative import declared_attr
 
@@ -15,7 +14,7 @@ from indico.core.settings.models.base import JSONSettingsBase, PrincipalSettings
 from indico.util.decorators import strict_classproperty
 
 
-class EventSettingsMixin(object):
+class EventSettingsMixin:
     settings_backref_name = None
 
     @strict_classproperty
@@ -59,7 +58,7 @@ class EventSetting(JSONSettingsBase, EventSettingsMixin, db.Model):
         return auto_table_args(cls)
 
     def __repr__(self):
-        return '<EventSetting({}, {}, {}, {!r})>'.format(self.event_id, self.module, self.name, self.value)
+        return f'<EventSetting({self.event_id}, {self.module}, {self.name}, {self.value!r})>'
 
 
 class EventSettingPrincipal(PrincipalSettingsBase, EventSettingsMixin, db.Model):
@@ -74,4 +73,4 @@ class EventSettingPrincipal(PrincipalSettingsBase, EventSettingsMixin, db.Model)
         return auto_table_args(cls)
 
     def __repr__(self):
-        return '<EventSettingPrincipal({}, {}, {}, {!r})>'.format(self.event_id, self.module, self.name, self.principal)
+        return f'<EventSettingPrincipal({self.event_id}, {self.module}, {self.name}, {self.principal!r})>'

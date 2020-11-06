@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import absolute_import, unicode_literals
 
 import cProfile
 import inspect
@@ -41,7 +40,7 @@ HTTP_VERBS = {'GET', 'PATCH', 'POST', 'PUT', 'DELETE'}
 logger = Logger.get('rh')
 
 
-class RH(object):
+class RH:
     CSRF_ENABLED = True  # require a csrf_token when accessing the RH with anything but GET
     EVENT_FEATURE = None  # require a certain event feature when accessing the RH. See `EventFeature` for details
     DENY_FRAMES = False  # whether to send an X-Frame-Options:DENY header
@@ -122,7 +121,7 @@ class RH(object):
             if cls is not None:
                 raise Exception('Normalization rule of {} in {} is overwritten by base RH. Put mixins with class-level '
                                 'attributes on the left of the base class'.format(cls, self.__class__))
-        if not self.normalize_url_spec or not any(six.itervalues(self.normalize_url_spec)):
+        if not self.normalize_url_spec or not any(self.normalize_url_spec.values()):
             return
         spec = {
             'args': self.normalize_url_spec.get('args', {}),
@@ -131,9 +130,9 @@ class RH(object):
             'endpoint': self.normalize_url_spec.get('endpoint', None)
         }
         # Initialize the new view args with preserved arguments (since those would be lost otherwise)
-        new_view_args = {k: v for k, v in six.iteritems(request.view_args) if k in spec['preserved_args']}
+        new_view_args = {k: v for k, v in request.view_args.items() if k in spec['preserved_args']}
         # Retrieve the expected values for all simple arguments (if they are currently present)
-        for key, getter in six.iteritems(spec['args']):
+        for key, getter in spec['args'].items():
             if key in request.view_args:
                 new_view_args[key] = getter(self)
         # Retrieve the expected values from locators
@@ -143,7 +142,7 @@ class RH(object):
             if value is None:
                 raise NotFound('The URL contains invalid data. Please go to the previous page and refresh it.')
             locator_args = get_locator(value)
-            reused_keys = set(locator_args) & six.viewkeys(prev_locator_args)
+            reused_keys = set(locator_args) & prev_locator_args.keys()
             if any(locator_args[k] != prev_locator_args[k] for k in reused_keys):
                 raise NotFound('The URL contains invalid data. Please go to the previous page and refresh it.')
             new_view_args.update(locator_args)
@@ -156,10 +155,10 @@ class RH(object):
         def _convert(v):
             # some legacy code has numeric ids in the locator data, but still takes
             # string ids in the url rule (usually for confId)
-            return six.text_type(v) if isinstance(v, six.integer_types) else v
+            return str(v) if isinstance(v, int) else v
 
-        provided = {k: _convert(v) for k, v in six.iteritems(request.view_args) if k not in defaults}
-        new_view_args = {k: _convert(v) for k, v in six.iteritems(new_view_args) if v is not None}
+        provided = {k: _convert(v) for k, v in request.view_args.items() if k not in defaults}
+        new_view_args = {k: _convert(v) for k, v in new_view_args.items() if v is not None}
         if new_view_args != provided:
             if request.method in {'GET', 'HEAD'}:
                 endpoint = spec['endpoint'] or request.endpoint
@@ -202,7 +201,7 @@ class RH(object):
         token = request.headers.get('X-CSRF-Token') or request.form.get('csrf_token')
         if token is None:
             # Might be a WTForm with a prefix. In that case the field name is '<prefix>-csrf_token'
-            token = next((v for k, v in six.iteritems(request.form) if k.endswith('-csrf_token')), None)
+            token = next((v for k, v in request.form.items() if k.endswith('-csrf_token')), None)
         if self.CSRF_ENABLED and request.method != 'GET' and token != session.csrf_token:
             msg = _("It looks like there was a problem with your current session. Please use your browser's back "
                     "button, reload the page and try again.")
@@ -338,7 +337,7 @@ class RHProtected(RH):
         self._require_user()
 
 
-class RequireUserMixin(object):
+class RequireUserMixin:
     def _check_access(self):
         if session.user is None:
             raise Forbidden

@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import unicode_literals
 
 import six
 from flask import flash, jsonify, redirect, request, session
@@ -61,7 +60,7 @@ class RHPaymentSettings(RHPaymentManagementBase):
 
     def _process(self):
         methods = get_payment_plugins()
-        enabled_methods = [method for method in six.itervalues(methods)
+        enabled_methods = [method for method in methods.values()
                            if method.event_settings.get(self.event, 'enabled')]
         return WPPaymentEventManagement.render_template('management/payments.html', self.event,
                                                         settings=payment_event_settings.get_all(self.event),
@@ -105,7 +104,7 @@ class RHPaymentPluginEdit(RHPaymentManagementBase):
         can_modify = bool(session.user) and self.plugin.can_be_modified(session.user, self.event)
         plugin_settings = self.plugin.settings.get_all()
         plugin_event_settings = self.plugin.event_settings.get_all(self.event)
-        defaults = FormDefaults({k: v for k, v in six.iteritems(plugin_event_settings) if v is not None},
+        defaults = FormDefaults({k: v for k, v in plugin_event_settings.items() if v is not None},
                                 **plugin_settings)
         form = self.plugin.event_settings_form(prefix='payment-', obj=defaults, plugin_settings=plugin_settings)
         if can_modify and form.validate_on_submit():
@@ -132,7 +131,7 @@ class RHPaymentCheckout(RHPaymentBase):
             flash(_("The registration doesn't need to be paid"), 'error')
             return redirect(url_for('event_registration.display_regform', self.registration.locator.registrant))
         plugins = get_active_payment_plugins(self.event)
-        valid_plugins = {k: v for k, v in six.iteritems(plugins) if v.supports_currency(self.registration.currency)}
+        valid_plugins = {k: v for k, v in plugins.items() if v.supports_currency(self.registration.currency)}
         force_plugin = list(valid_plugins.items())[0] if len(valid_plugins) == 1 else None  # only one plugin available
         return WPPaymentEvent.render_template('event_checkout.html', self.event,
                                               registration=self.registration,

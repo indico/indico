@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import unicode_literals
 
 import uuid
 
@@ -39,7 +38,7 @@ class RHPosterPrintSettings(RHManageEventBase):
         if form.validate_on_submit():
             data = dict(form.data)
             template_id = data.pop('template')
-            key = six.text_type(uuid.uuid4())
+            key = str(uuid.uuid4())
             poster_cache.set(key, data, time=1800)
             download_url = url_for('.print_poster', self.event, template_id=template_id, uuid=key)
             return jsonify_data(flash=False, redirect=download_url, redirect_no_loading=True)
@@ -66,4 +65,4 @@ class RHPrintEventPoster(RHManageEventBase):
             raise NotFound
 
         pdf = PosterPDF(self.template, config_params, self.event)
-        return send_file('Poster-{}.pdf'.format(self.event.id), pdf.get_pdf(), 'application/pdf')
+        return send_file(f'Poster-{self.event.id}.pdf', pdf.get_pdf(), 'application/pdf')

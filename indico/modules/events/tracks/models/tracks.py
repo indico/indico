@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import unicode_literals
 
 from indico.core.db.sqlalchemy import db
 from indico.core.db.sqlalchemy.descriptions import DescriptionMixin, RenderMode
@@ -117,19 +116,19 @@ class Track(DescriptionMixin, ProtectionManagersMixin, db.Model):
 
     @property
     def full_title(self):
-        return '{} - {}'.format(self.code, self.title) if self.code else self.title
+        return f'{self.code} - {self.title}' if self.code else self.title
 
     @property
     def title_with_group(self):
-        return '{}: {}'.format(self.track_group.title, self.title) if self.track_group else self.title
+        return f'{self.track_group.title}: {self.title}' if self.track_group else self.title
 
     @property
     def short_title_with_group(self):
-        return '{}: {}'.format(self.track_group.title, self.short_title) if self.track_group else self.short_title
+        return f'{self.track_group.title}: {self.short_title}' if self.track_group else self.short_title
 
     @property
     def full_title_with_group(self):
-        return '{}: {}'.format(self.track_group.title, self.full_title) if self.track_group else self.full_title
+        return f'{self.track_group.title}: {self.full_title}' if self.track_group else self.full_title
 
     @locator_property
     def locator(self):

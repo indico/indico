@@ -5,10 +5,8 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import unicode_literals
 
 from flask import flash, jsonify, request, session
-from six.moves import map
 from sqlalchemy.orm import joinedload, subqueryload
 from werkzeug.exceptions import Forbidden
 
@@ -63,7 +61,7 @@ class RHListOtherAbstracts(RHAbstractsBase):
             query = query.filter(Abstract.id.notin_(self.excluded_ids))
 
         result = [{'id': abstract.id, 'friendly_id': abstract.friendly_id, 'title': abstract.title,
-                   'full_title': '#{}: {}'.format(abstract.friendly_id, abstract.title)}
+                   'full_title': f'#{abstract.friendly_id}: {abstract.title}'}
                   for abstract in query
                   if abstract.can_access(session.user)]
         return jsonify(result)
@@ -215,7 +213,7 @@ class RHAbstractCommentBase(RHAbstractBase):
 class RHEditAbstractComment(RHAbstractCommentBase):
     def _process(self):
         form = AbstractCommentForm(obj=self.comment, abstract=self.abstract, user=session.user,
-                                   prefix='edit-comment-{}-'.format(self.comment.id))
+                                   prefix=f'edit-comment-{self.comment.id}-')
         if form.validate_on_submit():
             update_abstract_comment(self.comment, form.data)
             return jsonify_data(flash=False, html=render_abstract_page(self.abstract, management=self.management))

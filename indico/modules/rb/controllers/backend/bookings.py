@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import unicode_literals
 
 import uuid
 from datetime import date, datetime, time
@@ -73,7 +72,7 @@ class RHTimeline(RHRoomBookingBase):
         date_range, availability = get_rooms_availability(rooms, **kwargs)
         date_range = [dt.isoformat() for dt in date_range]
 
-        for data in six.viewvalues(availability):
+        for data in availability.values():
             # add additional helpful attributes
             data.update({
                 'num_days_available': len(date_range) - len(data['conflicts']),
@@ -177,7 +176,7 @@ class RHCreateBooking(RHRoomBookingBase):
             db.session.flush()
         except NoReportError as e:
             db.session.rollback()
-            raise ExpectedError(six.text_type(e))
+            raise ExpectedError(str(e))
 
         serialized_occurrences = serialize_occurrences(group_by_occurrence_date(resv.occurrences.all()))
         if self.prebook:
@@ -398,7 +397,7 @@ class RHBookingExport(RHRoomBookingBase):
                                                 'start_dt', datetime.combine(start_date, time()),
                                                 'end_dt', datetime.combine(end_date, time.max)))).all()
 
-        token = six.text_type(uuid.uuid4())
+        token = str(uuid.uuid4())
         headers, rows = generate_spreadsheet_from_occurrences(occurrences)
         _export_cache.set(token, {'headers': headers, 'rows': rows}, time=1800)
         download_url = url_for('rb.export_bookings_file', format=format, token=token)

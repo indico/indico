@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import unicode_literals
 
 from collections import defaultdict
 from operator import attrgetter
@@ -196,7 +195,7 @@ def get_category_timetable(categ_ids, start_dt, end_dt, detail_level='event', tz
                     else:
                         ongoing_events.append(e)
             else:
-                for start_d, start_dts in six.viewitems(items[e.id]):
+                for start_d, start_dts in items[e.id].items():
                     scheduled_events[start_d].append((start_dts[0], e))
         else:
             events.append(e)
@@ -316,7 +315,7 @@ def get_timetable_offline_pdf_generator(event):
 
 def get_time_changes_notifications(changes, tzinfo, entry=None):
     notifications = []
-    for obj, change in six.iteritems(changes):
+    for obj, change in changes.items():
         if entry:
             if entry.object == obj:
                 continue

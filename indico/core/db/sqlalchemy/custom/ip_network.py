@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import unicode_literals
 
 import ipaddress
 
@@ -14,12 +13,12 @@ from sqlalchemy import TypeDecorator
 from sqlalchemy.dialects.postgresql import CIDR
 
 
-class _AlwaysSortableMixin(object):
+class _AlwaysSortableMixin:
     def __lt__(self, other):
         if self._version != other._version:
             return self._version < other._version
         else:
-            return super(_AlwaysSortableMixin, self).__lt__(other)
+            return super().__lt__(other)
 
 
 class IPv4Network(_AlwaysSortableMixin, ipaddress.IPv4Network):
@@ -33,7 +32,7 @@ class IPv6Network(_AlwaysSortableMixin, ipaddress.IPv6Network):
 def _ip_network(address, strict=True):
     # based on `ipaddress.ip_network` but returns always-sortable classes
     # since sqlalchemy needs to be able to sort all values of a type
-    address = six.text_type(address)
+    address = str(address)
     try:
         return IPv4Network(address, strict)
     except (ipaddress.AddressValueError, ipaddress.NetmaskValueError):
@@ -53,7 +52,7 @@ class PyIPNetwork(TypeDecorator):
     impl = CIDR
 
     def process_bind_param(self, value, dialect):
-        return six.text_type(_ip_network(value)) if value is not None else None
+        return str(_ip_network(value)) if value is not None else None
 
     def process_result_value(self, value, dialect):
         return _ip_network(value) if value is not None else None

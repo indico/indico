@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import unicode_literals
 
 from datetime import date, datetime, time, timedelta
 from io import BytesIO
@@ -44,7 +43,7 @@ class RHConfig(RHRoomBookingBase):
             tos_html = None
         if privacy_policy_url:
             privacy_policy_html = None
-        return jsonify(rooms_sprite_token=six.text_type(_cache.get('rooms-sprite-token', '')),
+        return jsonify(rooms_sprite_token=str(_cache.get('rooms-sprite-token', '')),
                        languages=get_all_locales(),
                        tileserver_url=rb_settings.get('tileserver_url'),
                        grace_period=rb_settings.get('grace_period'),

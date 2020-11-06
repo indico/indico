@@ -5,9 +5,9 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
+from unittest.mock import MagicMock
+
 import pytest
-from mock import MagicMock
-from six.moves import zip
 
 from indico.util.signals import named_objects_from_signal, values_from_signal
 
@@ -17,8 +17,7 @@ def _make_signal_response(objects):
 
 
 def _make_gen(*values):
-    for value in values:
-        yield value
+    yield from values
 
 
 @pytest.mark.parametrize(('retvals', 'expected'), (

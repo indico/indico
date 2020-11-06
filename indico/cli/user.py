@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import print_function, unicode_literals
 
 import click
 import six
@@ -42,11 +41,11 @@ def _print_user_info(user):
         flags.append('%{cyan}pending%{reset}')
     print()
     print('User info:')
-    print("  ID: {}".format(user.id))
-    print("  First name: {}".format(user.first_name))
-    print("  Family name: {}".format(user.last_name))
-    print("  Email: {}".format(user.email))
-    print("  Affiliation: {}".format(user.affiliation))
+    print(f"  ID: {user.id}")
+    print(f"  First name: {user.first_name}")
+    print(f"  Family name: {user.last_name}")
+    print(f"  Email: {user.email}")
+    print(f"  Affiliation: {user.affiliation}")
     if flags:
         print(cformat("  Flags: {}".format(', '.join(flags))))
     print()
@@ -75,8 +74,8 @@ def _safe_lower(s):
 @click.option('--affiliation', '-a', help='Affiliation of the user')
 def search(substring, include_deleted, include_pending, include_blocked, include_external, include_system, **criteria):
     """Search users matching some criteria."""
-    assert set(six.viewkeys(criteria)) == {'first_name', 'last_name', 'email', 'affiliation'}
-    criteria = {k: v for k, v in six.viewitems(criteria) if v is not None}
+    assert set(criteria.keys()) == {'first_name', 'last_name', 'email', 'affiliation'}
+    criteria = {k: v for k, v in criteria.items() if v is not None}
     res = search_users(exact=(not substring), include_deleted=include_deleted, include_pending=include_pending,
                        include_blocked=include_blocked, external=include_external,
                        allow_system_user=include_system, **criteria)
@@ -93,7 +92,7 @@ def search(substring, include_deleted, include_pending, include_blocked, include
     if users:
         table_data = [['ID', 'First Name', 'Last Name', 'Email', 'Affiliation']]
         for user in users:
-            table_data.append([six.text_type(user.id), user.first_name, user.last_name, user.email, user.affiliation])
+            table_data.append([str(user.id), user.first_name, user.last_name, user.email, user.affiliation])
         table = AsciiTable(table_data, cformat('%{white!}Users%{reset}'))
         table.justify_columns[0] = 'right'
         print(table.table)

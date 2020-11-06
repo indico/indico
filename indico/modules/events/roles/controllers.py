@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import unicode_literals
 
 import random
 
@@ -62,7 +61,7 @@ class RHAddEventRole(RHManageEventBase):
             db.session.flush()
             logger.info('Event role %r created by %r', role, session.user)
             self.event.log(EventLogRealm.management, EventLogKind.positive, 'Roles',
-                           'Added role: "{}"'.format(role.name), session.user)
+                           f'Added role: "{role.name}"', session.user)
             return jsonify_data(html=_render_roles(self.event), role=serialize_event_role(role))
         return jsonify_form(form)
 
@@ -96,7 +95,7 @@ class RHEditEventRole(RHManageEventRole):
             db.session.flush()
             logger.info('Event role %r updated by %r', self.role, session.user)
             self.event.log(EventLogRealm.management, EventLogKind.change, 'Roles',
-                           'Updated role: "{}"'.format(self.role.name), session.user)
+                           f'Updated role: "{self.role.name}"', session.user)
             return jsonify_data(html=_render_role(self.role))
         return jsonify_form(form)
 
@@ -108,7 +107,7 @@ class RHDeleteEventRole(RHManageEventRole):
         db.session.delete(self.role)
         logger.info('Event role %r deleted by %r', self.role, session.user)
         self.event.log(EventLogRealm.management, EventLogKind.negative, 'Roles',
-                       'Deleted role: "{}"'.format(self.role.name), session.user)
+                       f'Deleted role: "{self.role.name}"', session.user)
         return jsonify_data(html=_render_roles(self.event))
 
 
@@ -126,7 +125,7 @@ class RHRemoveEventRoleMember(RHManageEventRole):
             self.role.members.remove(self.user)
             logger.info('User %r removed from role %r by %r', self.user, self.role, session.user)
             self.event.log(EventLogRealm.management, EventLogKind.negative, 'Roles',
-                           'Removed user from role "{}"'.format(self.role.name), session.user,
+                           f'Removed user from role "{self.role.name}"', session.user,
                            data={'Name': self.user.full_name,
                                  'Email': self.user.email})
         return jsonify_data(html=_render_role(self.role, collapsed=False))
@@ -142,7 +141,7 @@ class RHAddEventRoleMembers(RHManageEventRole):
                 self.role.members.add(user)
                 logger.info('User %r added to role %r by %r', user, self.role, session.user)
                 self.event.log(EventLogRealm.management, EventLogKind.positive, 'Roles',
-                               'Added user to role "{}"'.format(self.role.name), session.user,
+                               f'Added user to role "{self.role.name}"', session.user,
                                data={'Name': user.full_name,
                                      'Email': user.email})
         return jsonify_data(html=_render_role(self.role, collapsed=False))

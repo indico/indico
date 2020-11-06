@@ -31,15 +31,15 @@ def test_managed_rooms(monkeypatch, bulk_possible, create_user, create_room, dum
         'c': {'verbose_name': 'Green room', 'owner': 'y'}
     }
 
-    user_map = {key: create_user(id_, **data) for id_, (key, data) in enumerate(six.iteritems(users), 1)}
+    user_map = {key: create_user(id_, **data) for id_, (key, data) in enumerate(users.items(), 1)}
     room_map = {}
-    for id_, (key, data) in enumerate(six.iteritems(rooms), 1):
+    for id_, (key, data) in enumerate(rooms.items(), 1):
         data['id'] = id_
         data['owner'] = user_map[data['owner']]
         room_map[key] = create_room(**data)
 
     room_map['a'].update_principal(user_map['y'], full_access=True)
 
-    for key, user in six.iteritems(user_map):
+    for key, user in user_map.items():
         room_ids = [room.id for room in room_map.values() if (room.owner == user_map[key] or room.can_manage(user))]
         assert get_managed_room_ids(user) == set(room_ids)

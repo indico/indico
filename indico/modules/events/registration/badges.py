@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import division, unicode_literals
 
 import re
 from collections import namedtuple
@@ -14,7 +13,6 @@ from itertools import product
 import six
 from reportlab.lib.units import cm
 from reportlab.lib.utils import ImageReader
-from six.moves import range, zip
 from werkzeug.exceptions import BadRequest
 
 from indico.modules.designer.pdf import DesignerPDFBase
@@ -33,7 +31,7 @@ def _get_font_size(text):
 
 class RegistrantsListToBadgesPDF(DesignerPDFBase):
     def __init__(self, template, config, event, registrations):
-        super(RegistrantsListToBadgesPDF, self).__init__(template, config)
+        super().__init__(template, config)
         self.registrations = registrations
 
     def _build_config(self, config_data):
@@ -86,7 +84,7 @@ class RegistrantsListToBadgesPDF(DesignerPDFBase):
         placeholders = get_placeholders('designer-fields')
 
         # Print images first
-        image_placeholders = {name for name, placeholder in six.viewitems(placeholders) if placeholder.is_image}
+        image_placeholders = {name for name, placeholder in placeholders.items() if placeholder.is_image}
         items = sorted(tpl_data.items, key=lambda item: item['type'] not in image_placeholders)
 
         for item in items:

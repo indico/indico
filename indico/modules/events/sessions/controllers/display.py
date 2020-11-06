@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import unicode_literals
 
 from io import BytesIO
 
@@ -53,7 +52,7 @@ class RHDisplaySession(RHDisplaySessionBase):
 
     def _process(self):
         ical_params = get_base_ical_parameters(session.user, 'sessions',
-                                               '/export/event/{0}/session/{1}.ics'.format(self.event.id,
+                                               '/export/event/{}/session/{}.ics'.format(self.event.id,
                                                                                           self.session.id))
         contributions_strategy = subqueryload('contributions')
         contributions_strategy.joinedload('track')

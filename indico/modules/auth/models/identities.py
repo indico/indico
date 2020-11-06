@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import unicode_literals
 
 from datetime import datetime
 
@@ -101,4 +100,4 @@ class Identity(db.Model):
         self.last_login_ip = ip
 
     def __repr__(self):
-        return '<Identity({}, {}, {}, {})>'.format(self.id, self.user_id, self.provider, self.identifier)
+        return f'<Identity({self.id}, {self.user_id}, {self.provider}, {self.identifier})>'

@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import unicode_literals
 
 from wtforms.ext.sqlalchemy.fields import QuerySelectField
 from wtforms.fields import BooleanField, TextAreaField
@@ -41,7 +40,7 @@ class AttachmentFormBase(IndicoForm):
     def __init__(self, *args, **kwargs):
         linked_object = kwargs.pop('linked_object')
         self.event = getattr(linked_object, 'event', None)  # not present in categories
-        super(AttachmentFormBase, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self.folder.query = (AttachmentFolder
                              .find(object=linked_object, is_default=False, is_deleted=False)
                              .order_by(db.func.lower(AttachmentFolder.title)))
@@ -75,7 +74,7 @@ class EditAttachmentFileForm(EditAttachmentFormBase):
                              description=_("Already uploaded file. Replace it by adding a new file."))
 
 
-class AttachmentLinkFormMixin(object):
+class AttachmentLinkFormMixin:
     title = StringField(_("Title"), [DataRequired()])
     link_url = URLField(_("URL"), [DataRequired()])
 
@@ -115,13 +114,13 @@ class AttachmentFolderForm(IndicoForm):
     def __init__(self, *args, **kwargs):
         self.linked_object = kwargs.pop('linked_object')
         self.event = getattr(self.linked_object, 'event', None)  # not present in categories
-        super(AttachmentFolderForm, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self.title.choices = self._get_title_suggestions()
 
     def _get_title_suggestions(self):
         query = db.session.query(AttachmentFolder.title).filter_by(is_deleted=False, is_default=False,
                                                                    object=self.linked_object)
-        existing = set(x[0] for x in query)
+        existing = {x[0] for x in query}
         suggestions = set(get_default_folder_names()) - existing
         if self.title.data:
             suggestions.add(self.title.data)

@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 import pytest
-from six.moves import range
 
 from indico.util.caching import memoize_request
 

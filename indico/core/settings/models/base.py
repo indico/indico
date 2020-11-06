@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import unicode_literals
 
 from collections import defaultdict
 from enum import Enum
@@ -25,7 +24,7 @@ def _coerce_value(value):
     return value
 
 
-class SettingsBase(object):
+class SettingsBase:
     """Base class for any kind of setting tables."""
 
     id = db.Column(
@@ -68,7 +67,7 @@ class SettingsBase(object):
         if not has_request_context():
             # disable the cache by always returning an empty one
             return defaultdict(dict), False
-        key = (cls, frozenset(six.viewitems(kwargs)))
+        key = (cls, frozenset(kwargs.items()))
         try:
             return g.global_settings_cache[key], True
         except AttributeError:
@@ -134,10 +133,10 @@ class JSONSettingsBase(SettingsBase):
     @classmethod
     def set_multi(cls, module, items, **kwargs):
         existing = cls.get_all_settings(module, **kwargs)
-        for name in six.viewkeys(items) - six.viewkeys(existing):
+        for name in items.keys() - existing.keys():
             setting = cls(module=module, name=name, value=_coerce_value(items[name]), **kwargs)
             db.session.add(setting)
-        for name in six.viewkeys(items) & six.viewkeys(existing):
+        for name in items.keys() & existing.keys():
             existing[name].value = _coerce_value(items[name])
         db.session.flush()
         cls._clear_cache()
@@ -179,7 +178,7 @@ class PrincipalSettingsBase(PrincipalMixin, SettingsBase):
 
     @classmethod
     def set_acl_multi(cls, module, items, **kwargs):
-        for name, acl in six.iteritems(items):
+        for name, acl in items.items():
             cls.set_acl(module, name, acl, **kwargs)
 
     @classmethod

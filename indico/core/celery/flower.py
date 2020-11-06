@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import absolute_import, unicode_literals
 
 import functools
 import json
@@ -51,7 +50,7 @@ class FlowerAuthHandler(BaseHandler, OAuth2Mixin):
     @asynchronous
     def _on_access_token(self, future, response):
         if response.error:
-            future.set_exception(AuthError('OAuth authentication error: {}'.format(response)))
+            future.set_exception(AuthError(f'OAuth authentication error: {response}'))
             return
         future.set_result(json.loads(response.body))
 
@@ -65,8 +64,8 @@ class FlowerAuthHandler(BaseHandler, OAuth2Mixin):
         except KeyError:
             return 'http{}://{}{}{}'.format('s' if 'ssl_options' in settings else '',
                                             options.address or 'localhost',
-                                            ':{}'.format(options.port) if not options.unix_socket else '',
-                                            '/{}'.format(options.url_prefix) if options.url_prefix else '')
+                                            f':{options.port}' if not options.unix_socket else '',
+                                            f'/{options.url_prefix}' if options.url_prefix else '')
 
     @asynchronous
     def get(self):

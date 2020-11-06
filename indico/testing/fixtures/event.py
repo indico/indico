@@ -23,7 +23,7 @@ def create_event(dummy_user, dummy_category, db):
         # the first time, which would require no_autoflush blocks in some cases
         now = now_utc(exact=False)
         kwargs.setdefault('type_', EventType.meeting)
-        kwargs.setdefault('title', u'dummy#{}'.format(id_) if id_ is not None else u'dummy')
+        kwargs.setdefault('title', f'dummy#{id_}' if id_ is not None else 'dummy')
         kwargs.setdefault('start_dt', now)
         kwargs.setdefault('end_dt', now + timedelta(hours=1))
         kwargs.setdefault('timezone', 'UTC')

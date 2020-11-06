@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import unicode_literals
 
 from flask import jsonify, request, session
 
@@ -32,7 +31,7 @@ class UserInfoHook(HTTPAPIHook):
     VALID_FORMATS = ('json', 'jsonp', 'xml')
 
     def _getParams(self):
-        super(UserInfoHook, self)._getParams()
+        super()._getParams()
         self._user_id = self._pathParams['user_id']
 
     def export_user(self, user):

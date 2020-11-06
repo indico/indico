@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import unicode_literals
 
 import os
 from io import BytesIO
@@ -372,15 +371,15 @@ class RHExportRevisionFiles(RHContributionEditableRevisionBase):
         with ZipFile(buf, 'w', allowZip64=True) as zip_handler:
             for revision_file in self.revision.files:
                 file = revision_file.file
-                filename = secure_filename(file.filename, 'file-{}'.format(file.id))
+                filename = secure_filename(file.filename, f'file-{file.id}')
                 file_type = revision_file.file_type
-                folder_name = secure_filename(file_type.name, 'file-type-{}'.format(file_type.id))
+                folder_name = secure_filename(file_type.name, f'file-type-{file_type.id}')
 
                 with file.storage.get_local_path(file.storage_file_id) as filepath:
                     zip_handler.write(filepath, os.path.join(folder_name, filename))
 
         buf.seek(0)
-        return send_file('revision-{}.zip'.format(self.revision.id), buf, 'application/zip', inline=False)
+        return send_file(f'revision-{self.revision.id}.zip', buf, 'application/zip', inline=False)
 
 
 class RHDownloadRevisionFile(RHContributionEditableRevisionBase):

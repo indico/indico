@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import unicode_literals
 
 from uuid import UUID, uuid4
 
@@ -48,7 +47,7 @@ class StaticListLink(db.Model):
         index=True,
         unique=True,
         nullable=False,
-        default=lambda: six.text_type(uuid4())
+        default=lambda: str(uuid4())
     )
     created_dt = db.Column(
         UTCDateTime,

@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import unicode_literals
 
 from datetime import time
 
@@ -59,7 +58,7 @@ class SurveyForm(IndicoForm):
 
     def __init__(self, *args, **kwargs):
         self.event = kwargs.pop('event')
-        super(SurveyForm, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
     def validate_title(self, field):
         query = (Survey.query.with_parent(self.event)
@@ -88,7 +87,7 @@ class ScheduleSurveyForm(IndicoForm):
         survey = kwargs.pop('survey')
         self.allow_reschedule_start = kwargs.pop('allow_reschedule_start')
         self.timezone = survey.event.timezone
-        super(ScheduleSurveyForm, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         if not survey.start_notification_sent or not self.allow_reschedule_start:
             del self.resend_start_notification
 
@@ -123,12 +122,12 @@ class InvitationForm(IndicoForm):
 
     def __init__(self, *args, **kwargs):
         event = kwargs.pop('event')
-        super(InvitationForm, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self.from_address.choices = list(event.get_allowed_sender_emails().items())
         self.body.description = render_placeholder_info('survey-link-email', event=None, survey=None)
 
     def is_submitted(self):
-        return super(InvitationForm, self).is_submitted() and 'submitted' in request.form
+        return super().is_submitted() and 'submitted' in request.form
 
     def validate_body(self, field):
         missing = get_missing_placeholders('survey-link-email', field.data, event=None, survey=None)

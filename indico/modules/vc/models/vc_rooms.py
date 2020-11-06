@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import unicode_literals
 
 from functools import partial
 from itertools import chain
@@ -39,14 +38,14 @@ _columns_for_types = {
 
 
 def _make_checks():
-    available_columns = set(chain.from_iterable(cols for type_, cols in six.iteritems(_columns_for_types)))
+    available_columns = set(chain.from_iterable(cols for type_, cols in _columns_for_types.items()))
     for link_type in VCRoomLinkType:
         required_cols = available_columns & _columns_for_types[link_type]
         forbidden_cols = available_columns - required_cols
-        criteria = ['{} IS NULL'.format(col) for col in sorted(forbidden_cols)]
-        criteria += ['{} IS NOT NULL'.format(col) for col in sorted(required_cols)]
+        criteria = [f'{col} IS NULL' for col in sorted(forbidden_cols)]
+        criteria += [f'{col} IS NOT NULL' for col in sorted(required_cols)]
         condition = 'link_type != {} OR ({})'.format(link_type, ' AND '.join(criteria))
-        yield db.CheckConstraint(condition, 'valid_{}_link'.format(link_type.name))
+        yield db.CheckConstraint(condition, f'valid_{link_type.name}_link')
 
 
 class VCRoomStatus(int, IndicoEnum):
@@ -126,7 +125,7 @@ class VCRoom(db.Model):
         return {'vc_room_id': self.id, 'service': self.type}
 
     def __repr__(self):
-        return '<VCRoom({}, {}, {})>'.format(self.id, self.name, self.type)
+        return f'<VCRoom({self.id}, {self.name}, {self.type})>'
 
 
 class VCRoomEventAssociation(db.Model):
@@ -255,11 +254,11 @@ class VCRoomEventAssociation(db.Model):
                 assert event is not None
                 target.event = event
 
-        for rel, fn in six.iteritems(event_mapping):
+        for rel, fn in event_mapping.items():
             if rel is not None:
                 listen(rel, 'set', partial(_set_event_obj, fn))
 
-        for rel, link_type in six.iteritems(type_mapping):
+        for rel, link_type in type_mapping.items():
             if rel is not None:
                 listen(rel, 'set', partial(_set_link_type, link_type))
 
@@ -286,14 +285,14 @@ class VCRoomEventAssociation(db.Model):
         elif isinstance(obj, db.m.SessionBlock):
             self.linked_block = obj
         else:
-            raise TypeError('Unexpected object: {}'.format(obj))
+            raise TypeError(f'Unexpected object: {obj}')
 
     @link_object.comparator
     def link_object(cls):
         return _LinkObjectComparator(cls)
 
     def __repr__(self):
-        return '<VCRoomEventAssociation({}, {})>'.format(self.event_id, self.vc_room)
+        return f'<VCRoomEventAssociation({self.event_id}, {self.vc_room})>'
 
     @classmethod
     def find_for_event(cls, event, include_hidden=False, include_deleted=False, only_linked_to_event=False, **kwargs):
@@ -343,7 +342,7 @@ class VCRoomEventAssociation(db.Model):
             vc_room.events.remove(self)
         db.session.flush()
         if not vc_room.events:
-            Logger.get('modules.vc').info("Deleting VC room {}".format(vc_room))
+            Logger.get('modules.vc').info(f"Deleting VC room {vc_room}")
             if vc_room.status != VCRoomStatus.deleted:
                 vc_room.plugin.delete_room(vc_room, self.event)
                 notify_deleted(vc_room.plugin, vc_room, self, self.event, user)

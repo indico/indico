@@ -13,17 +13,17 @@ from indico.web.flask.templating import get_template_module
 
 class ReservationOccurrenceNotification(ReservationNotification):
     def __init__(self, occurrence):
-        super(ReservationOccurrenceNotification, self).__init__(occurrence.reservation)
+        super().__init__(occurrence.reservation)
         self.occurrence = occurrence
         self.start_dt = format_datetime(occurrence.start_dt)
 
     def _get_email_subject(self, **mail_params):
         mail_params = dict(mail_params, **{'subject_suffix': '(SINGLE OCCURRENCE)'})
-        return super(ReservationOccurrenceNotification, self)._get_email_subject(**mail_params)
+        return super()._get_email_subject(**mail_params)
 
     def _make_body(self, mail_params, **body_params):
         body_params['occurrence'] = self.occurrence
-        return super(ReservationOccurrenceNotification, self)._make_body(mail_params, **body_params)
+        return super()._make_body(mail_params, **body_params)
 
 
 @email_sender

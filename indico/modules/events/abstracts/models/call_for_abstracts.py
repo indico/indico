@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import unicode_literals
 
 from indico.core.db.sqlalchemy.descriptions import RENDER_MODE_WRAPPER_MAP
 from indico.modules.events.abstracts.settings import abstracts_reviewing_settings, abstracts_settings
@@ -13,14 +12,14 @@ from indico.modules.events.settings import EventSettingProperty
 from indico.util.date_time import now_utc
 
 
-class CallForAbstracts(object):
+class CallForAbstracts:
     """Proxy class to facilitate access to the call for abstracts settings."""
 
     def __init__(self, event):
         self.event = event
 
     def __repr__(self):
-        return '<CallForAbstracts({}, start_dt={}, end_dt={})>'.format(self.event.id, self.start_dt, self.end_dt)
+        return f'<CallForAbstracts({self.event.id}, start_dt={self.start_dt}, end_dt={self.end_dt})>'
 
     start_dt = EventSettingProperty(abstracts_settings, 'start_dt')
     end_dt = EventSettingProperty(abstracts_settings, 'end_dt')

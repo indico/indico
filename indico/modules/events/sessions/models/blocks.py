@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import unicode_literals
 
 from sqlalchemy import DDL
 from sqlalchemy.event import listens_for
@@ -86,7 +85,7 @@ class SessionBlock(LocationMixin, db.Model):
         # an extra query to check whether there is an object associated
         # when assigning a new one (e.g. during cloning)
         kwargs.setdefault('timetable_entry', None)
-        super(SessionBlock, self).__init__(**kwargs)
+        super().__init__(**kwargs)
 
     @property
     def event(self):
@@ -113,7 +112,7 @@ class SessionBlock(LocationMixin, db.Model):
 
     @property
     def full_title(self):
-        return '{}: {}'.format(self.session.title, self.title) if self.title else self.session.title
+        return f'{self.session.title}: {self.title}' if self.title else self.session.title
 
     def can_manage(self, user, allow_admin=True):
         return self.session.can_manage_blocks(user, allow_admin=allow_admin)

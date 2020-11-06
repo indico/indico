@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import unicode_literals
 
 import re
 import time
@@ -14,7 +13,6 @@ from types import GeneratorType
 
 import six
 from flask import g
-from six.moves import map
 
 from indico.core.config import config
 from indico.core.db import db
@@ -163,10 +161,10 @@ def make_email(to_list=None, cc_list=None, bcc_list=None, from_address=None, rep
         cc_list = set()
     if bcc_list is None:
         bcc_list = set()
-    to_list = {to_list} if isinstance(to_list, six.string_types) else to_list
-    cc_list = {cc_list} if isinstance(cc_list, six.string_types) else cc_list
-    bcc_list = {bcc_list} if isinstance(bcc_list, six.string_types) else bcc_list
-    reply_address = {reply_address} if isinstance(reply_address, six.string_types) else (reply_address or set())
+    to_list = {to_list} if isinstance(to_list, str) else to_list
+    cc_list = {cc_list} if isinstance(cc_list, str) else cc_list
+    bcc_list = {bcc_list} if isinstance(bcc_list, str) else bcc_list
+    reply_address = {reply_address} if isinstance(reply_address, str) else (reply_address or set())
     return {
         'to': set(map(to_unicode, to_list)),
         'cc': set(map(to_unicode, cc_list)),

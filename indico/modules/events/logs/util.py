@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import unicode_literals
 
 import re
 from datetime import datetime
@@ -14,7 +13,6 @@ from enum import Enum
 
 import six
 from markupsafe import Markup
-from six.moves import map
 
 from indico.core import signals
 from indico.util.i18n import orig_string
@@ -37,12 +35,12 @@ def make_diff_log(changes, fields):
             old and new value
     """
     data = {'_diff': True}
-    for key, field_data in six.iteritems(fields):
+    for key, field_data in fields.items():
         try:
             change = changes[key]
         except KeyError:
             continue
-        if isinstance(field_data, six.string_types):
+        if isinstance(field_data, str):
             field_data = {'title': field_data}
         title = field_data['title']
         convert = field_data.get('convert')
@@ -63,7 +61,7 @@ def make_diff_log(changes, fields):
             change = [orig_string(getattr(x, 'title', x.name))
                       if x is not None else default
                       for x in change]
-        elif all(isinstance(x, (int, int, float)) for x in change):
+        elif all(isinstance(x, (int, float)) for x in change):
             type_ = 'number'
         elif all(isinstance(x, (list, tuple)) for x in change):
             type_ = 'list'
@@ -77,7 +75,7 @@ def make_diff_log(changes, fields):
             change = [x.isoformat() for x in change]
         else:
             type_ = 'text'
-            change = list(map(six.text_type, list(map(orig_string, change))))
+            change = list(map(str, list(map(orig_string, change))))
         data[title] = list(change) + [type_]
     return data
 
@@ -102,7 +100,7 @@ def render_changes(a, b, type_):
     elif type_ == 'text':
         return _diff_text(a or '', b or '')
     else:
-        raise NotImplementedError('Unexpected diff type: {}'.format(type_))
+        raise NotImplementedError(f'Unexpected diff type: {type_}')
 
 
 def _clean(strings, _linebreak_re=re.compile(r'\A(\n*)(.*?)(\n*)\Z', re.DOTALL)):

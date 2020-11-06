@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import unicode_literals
 
 from sqlalchemy.ext.declarative import declared_attr
 
@@ -114,7 +113,7 @@ class ReferenceModelBase(db.Model):
         scheme = self.reference_type.scheme
         if not scheme:
             return None
-        return '{}:{}'.format(scheme, self.value)
+        return f'{scheme}:{self.value}'
 
 
 class EventReference(ReferenceModelBase):

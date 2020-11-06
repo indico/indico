@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import absolute_import, unicode_literals
 
 import os
 import uuid
@@ -132,7 +131,7 @@ def configure_multipass_local(app):
     app.config['MULTIPASS_AUTH_PROVIDERS'] = dict(app.config['MULTIPASS_AUTH_PROVIDERS'], indico={
         'type': IndicoAuthProvider,
         'title': 'Indico',
-        'default': not any(p.get('default') for p in six.itervalues(app.config['MULTIPASS_AUTH_PROVIDERS']))
+        'default': not any(p.get('default') for p in app.config['MULTIPASS_AUTH_PROVIDERS'].values())
     })
     app.config['MULTIPASS_IDENTITY_PROVIDERS'] = dict(app.config['MULTIPASS_IDENTITY_PROVIDERS'], indico={
         'type': IndicoIdentityProvider,
@@ -153,7 +152,7 @@ def configure_webpack(app):
 def configure_xsendfile(app, method):
     if not method:
         return
-    elif isinstance(method, six.string_types):
+    elif isinstance(method, str):
         args = None
     else:
         method, args = method
@@ -196,7 +195,7 @@ def setup_jinja(app):
     app.add_template_global(url_for_index)
     app.add_template_global(url_for_login)
     app.add_template_global(url_for_logout)
-    app.add_template_global(lambda: six.text_type(uuid.uuid4()), 'uuid')
+    app.add_template_global(lambda: str(uuid.uuid4()), 'uuid')
     app.add_template_global(icon_from_mimetype)
     app.add_template_global(render_sidemenu)
     app.add_template_global(slugify)
@@ -299,11 +298,11 @@ def add_blueprints(app):
 def add_plugin_blueprints(app):
     blueprint_names = set()
     for plugin, blueprint in values_from_signal(signals.plugin.get_blueprints.send(app), return_plugins=True):
-        expected_names = {'plugin_{}'.format(plugin.name), 'plugin_compat_{}'.format(plugin.name)}
+        expected_names = {f'plugin_{plugin.name}', f'plugin_compat_{plugin.name}'}
         if blueprint.name not in expected_names:
-            raise Exception("Blueprint '{}' does not match plugin name '{}'".format(blueprint.name, plugin.name))
+            raise Exception(f"Blueprint '{blueprint.name}' does not match plugin name '{plugin.name}'")
         if blueprint.name in blueprint_names:
-            raise Exception("Blueprint '{}' defined by multiple plugins".format(blueprint.name))
+            raise Exception(f"Blueprint '{blueprint.name}' defined by multiple plugins")
         if not config.ROUTE_OLD_URLS and blueprint.name.startswith('plugin_compat_'):
             continue
         blueprint_names.add(blueprint.name)

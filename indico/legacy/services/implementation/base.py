@@ -11,7 +11,7 @@ from werkzeug.exceptions import Forbidden
 from indico.core.logger import sentry_set_tags
 
 
-class ServiceBase(object):
+class ServiceBase:
     """
     The ServiceBase class is the basic class for services.
     """

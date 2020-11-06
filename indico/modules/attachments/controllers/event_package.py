@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import unicode_literals
 
 import os
 from collections import OrderedDict
@@ -14,7 +13,6 @@ import six
 from celery.exceptions import TimeoutError
 from flask import flash, jsonify, request, session
 from markupsafe import escape
-from six.moves import filter
 from sqlalchemy import Date, cast
 
 from indico.core.celery import AsyncResult
@@ -129,7 +127,7 @@ class AttachmentPackageGeneratorMixin(ZipGeneratorMixin):
             start_dt = _get_start_dt(attachment.folder.object)
             if start_dt is None:
                 return None
-            return six.text_type(start_dt.date()) in dates
+            return str(start_dt.date()) in dates
 
         return list(filter(_check_date, self._build_base_query()))
 
@@ -145,7 +143,7 @@ class AttachmentPackageGeneratorMixin(ZipGeneratorMixin):
             segments.append('Unscheduled')
         segments.extend(self._get_base_path(attachment))
         if not attachment.folder.is_default:
-            segments.append(secure_filename(attachment.folder.title, six.text_type(attachment.folder.id)))
+            segments.append(secure_filename(attachment.folder.title, str(attachment.folder.id)))
         segments.append(attachment.file.filename)
         path = os.path.join(*self._adjust_path_length([_f for _f in segments if _f]))
         while path in self.used_filenames:
@@ -162,15 +160,15 @@ class AttachmentPackageGeneratorMixin(ZipGeneratorMixin):
             start_date = _get_start_dt(obj)
             if start_date is not None:
                 if isinstance(obj, SubContribution):
-                    paths.append(secure_filename('{}_{}'.format(obj.position, obj.title), ''))
+                    paths.append(secure_filename(f'{obj.position}_{obj.title}', ''))
                 else:
                     time = format_time(start_date, format='HHmm', timezone=self.event.timezone)
                     paths.append(secure_filename('{}_{}'.format(to_unicode(time), obj.title), ''))
             else:
                 if isinstance(obj, SubContribution):
-                    paths.append(secure_filename('{}_{}'.format(obj.position, obj.title), six.text_type(obj.id)))
+                    paths.append(secure_filename(f'{obj.position}_{obj.title}', str(obj.id)))
                 else:
-                    paths.append(secure_filename(obj.title, six.text_type(obj.id)))
+                    paths.append(secure_filename(obj.title, str(obj.id)))
             obj = _get_obj_parent(obj)
 
         linked_obj_start_date = _get_start_dt(linked_object)

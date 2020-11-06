@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import unicode_literals
 
 from warnings import warn
 
@@ -22,7 +21,7 @@ from indico.modules.groups.models.groups import LocalGroup
 from indico.util.caching import memoize_request
 
 
-class GroupProxy(object):
+class GroupProxy:
     """Provide a generic interface for both local and multipass groups.
 
     Creating an instance of this class actually creates either a
@@ -145,7 +144,7 @@ class _LocalGroupProxy(GroupProxy):
 
     @property
     def name(self):
-        return self.group.name if self.group else '({})'.format(self.id)
+        return self.group.name if self.group else f'({self.id})'
 
     @cached_property
     def group(self):
@@ -183,9 +182,9 @@ class _LocalGroupProxy(GroupProxy):
 
     def __repr__(self):
         if not self.group:
-            return '<LocalGroupProxy({} [missing])>'.format(self.id)
+            return f'<LocalGroupProxy({self.id} [missing])>'
         else:
-            return '<LocalGroupProxy({}, {})>'.format(self.id, self.group.name)
+            return f'<LocalGroupProxy({self.id}, {self.group.name})>'
 
 
 class _MultipassGroupProxy(GroupProxy):
@@ -209,7 +208,7 @@ class _MultipassGroupProxy(GroupProxy):
         try:
             return multipass.get_group(self.provider, self.name)
         except MultipassException as e:
-            warn('Could not retrieve group {}:{}: {}'.format(self.provider, self.name, e))
+            warn(f'Could not retrieve group {self.provider}:{self.name}: {e}')
             return None
 
     @cached_property
@@ -232,12 +231,12 @@ class _MultipassGroupProxy(GroupProxy):
         if not user:
             return False
         cache = GenericCache('group-membership')
-        key = '{}:{}:{}'.format(self.provider, self.name, user.id)
+        key = f'{self.provider}:{self.name}:{user.id}'
         rv = cache.get(key)
         if rv is not None:
             return rv
         elif self.group is None:
-            warn('Tried to check if {} is in invalid group {}'.format(user, self))
+            warn(f'Tried to check if {user} is in invalid group {self}')
             rv = False
         else:
             rv = any(x[1] in self.group for x in user.iter_identifiers(check_providers=True, providers={self.provider}))
@@ -248,7 +247,7 @@ class _MultipassGroupProxy(GroupProxy):
     def get_members(self):
         from indico.modules.users.models.users import User
         if self.group is None:
-            warn('Tried to get members for invalid group {}'.format(self))
+            warn(f'Tried to get members for invalid group {self}')
             return set()
         # We actually care about Users, not identities here!
         emails = set()
@@ -277,4 +276,4 @@ class _MultipassGroupProxy(GroupProxy):
         return hash(self.name) ^ hash(self.provider)
 
     def __repr__(self):
-        return '<MultipassGroupProxy({}, {})>'.format(self.provider, self.name)
+        return f'<MultipassGroupProxy({self.provider}, {self.name})>'

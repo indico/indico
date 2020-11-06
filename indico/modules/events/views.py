@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import print_function, unicode_literals
 
 import posixpath
 
@@ -54,7 +53,7 @@ def render_event_header(event, conference_layout=False, theme=None, theme_overri
     print_url = _get_print_url(event, theme, theme_override) if not conference_layout else None
     show_nav_bar = event.type_ != EventType.conference or layout_settings.get(event, 'show_nav_bar')
     themes = {tid: {'name': data['title'], 'user_visible': data.get('user_visible')}
-              for tid, data in six.viewitems(theme_settings.get_themes_for(event.type_.name))}
+              for tid, data in theme_settings.get_themes_for(event.type_.name).items()}
     return render_template('events/header.html',
                            event=event, print_url=print_url, show_nav_bar=show_nav_bar, themes=themes, theme=theme)
 
@@ -62,7 +61,7 @@ def render_event_header(event, conference_layout=False, theme=None, theme_overri
 def render_event_footer(event, dark=False):
     location = event.venue_name
     if event.room_name:
-        location = '{} ({})'.format(event.room_name, location)
+        location = f'{event.room_name} ({location})'
     description = '{}\n\n{}'.format(truncate(event.description, 1000), event.short_external_url).strip()
     google_calendar_params = {
         'action': 'TEMPLATE',
@@ -95,7 +94,7 @@ class WPEventBase(WPDecorated):
 
     @property
     def page_metadata(self):
-        metadata = super(WPEventBase, self).page_metadata
+        metadata = super().page_metadata
         return {
             'og': dict(metadata['og'], **{
                 'title': self.event.title,
@@ -163,8 +162,8 @@ class WPSimpleEventDisplay(WPSimpleEventDisplayBase):
         else:
             manifest = current_app.manifest
         return {
-            'screen': (manifest['themes_{}.css'.format(self.theme_file_name)],),
-            'print': ((manifest['themes_{}.print.css'.format(self.theme_file_name)],)
+            'screen': (manifest[f'themes_{self.theme_file_name}.css'],),
+            'print': ((manifest[f'themes_{self.theme_file_name}.print.css'],)
                       if print_stylesheet else ())
         }
 
@@ -240,7 +239,7 @@ class WPConferenceDisplayBase(WPJinjaMixin, MathjaxMixin, WPEventBase):
             'menu': menu_entries_for_event(self.event),
             'active_menu_item': self.sidemenu_option,
             'bg_color_css': 'background: #{0}; border-color: #{0};'.format(bg_color) if bg_color else '',
-            'text_color_css': 'color: #{};'.format(text_color) if text_color else '',
+            'text_color_css': f'color: #{text_color};' if text_color else '',
             'announcement': announcement
         }
 

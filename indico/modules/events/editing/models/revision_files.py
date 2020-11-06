@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import unicode_literals
 
 from indico.core.db import db
 from indico.util.fs import secure_filename
@@ -67,7 +66,7 @@ class EditingRevisionFile(db.Model):
     @locator_property
     def locator(self):
         return dict(self.revision.locator, file_id=self.file_id,
-                    filename=secure_filename(self.file.filename, 'file-{}'.format(self.file_id)))
+                    filename=secure_filename(self.file.filename, f'file-{self.file_id}'))
 
     @property
     def download_url(self):

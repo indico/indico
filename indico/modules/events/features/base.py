@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import unicode_literals
 
 import six
 
@@ -13,7 +12,7 @@ from indico.modules.events.features.util import get_feature_definitions
 from indico.util.decorators import cached_classproperty
 
 
-class EventFeature(object):
+class EventFeature:
     """Base class for event features.
 
     To create a new feature, subclass this class and register
@@ -98,4 +97,4 @@ class EventFeature(object):
         this feature.
         """
         # This is not very efficient, but it runs exactly one on a not-very-large set
-        return {feature.name for feature in six.itervalues(get_feature_definitions()) if cls.name in feature.requires_deep}
+        return {feature.name for feature in get_feature_definitions().values() if cls.name in feature.requires_deep}

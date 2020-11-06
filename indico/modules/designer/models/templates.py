@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import unicode_literals
 
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.ext.hybrid import Comparator, hybrid_property
@@ -127,7 +126,7 @@ class DesignerTemplate(db.Model):
             }
             size = DEFAULT_CONFIG[tpl_type]['tpl_size']
             data.update({'width': size[0], 'height': size[1]})
-        super(DesignerTemplate, self).__init__(data=data, **kwargs)
+        super().__init__(data=data, **kwargs)
 
     @hybrid_property
     def owner(self):

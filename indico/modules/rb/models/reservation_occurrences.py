@@ -147,17 +147,17 @@ class ReservationOccurrence(db.Model, Serializer):
 
         elif repeat_frequency == RepeatFrequency.DAY:
             if repeat_interval != 1:
-                raise IndicoError(u'Unsupported interval')
+                raise IndicoError('Unsupported interval')
             return rrule.rrule(rrule.DAILY, dtstart=start, until=end)
 
         elif repeat_frequency == RepeatFrequency.WEEK:
             if repeat_interval <= 0:
-                raise IndicoError(u'Unsupported interval')
+                raise IndicoError('Unsupported interval')
             return rrule.rrule(rrule.WEEKLY, dtstart=start, until=end, interval=repeat_interval)
 
         elif repeat_frequency == RepeatFrequency.MONTH:
             if repeat_interval == 0:
-                raise IndicoError(u'Unsupported interval')
+                raise IndicoError('Unsupported interval')
             position = int(ceil(start.day / 7.0))
             if position == 5:
                 # The fifth weekday of the month will always be the last one
@@ -165,7 +165,7 @@ class ReservationOccurrence(db.Model, Serializer):
             return rrule.rrule(rrule.MONTHLY, dtstart=start, until=end, byweekday=start.weekday(),
                                bysetpos=position, interval=repeat_interval)
 
-        raise IndicoError(u'Unexpected frequency {}'.format(repeat_frequency))
+        raise IndicoError(f'Unexpected frequency {repeat_frequency}')
 
     @staticmethod
     def filter_overlap(occurrences):
@@ -211,9 +211,9 @@ class ReservationOccurrence(db.Model, Serializer):
         self.rejection_reason = reason or None
         signals.rb.booking_occurrence_state_changed.send(self)
         if not silent:
-            log = [u'Day cancelled: {}'.format(format_date(self.date))]
+            log = ['Day cancelled: {}'.format(format_date(self.date))]
             if reason:
-                log.append(u'Reason: {}'.format(reason))
+                log.append(f'Reason: {reason}')
             self.reservation.add_edit_log(ReservationEditLog(user_name=user.full_name, info=log))
             from indico.modules.rb.notifications.reservation_occurrences import notify_cancellation
             notify_cancellation(self)
@@ -224,8 +224,8 @@ class ReservationOccurrence(db.Model, Serializer):
         self.rejection_reason = reason or None
         signals.rb.booking_occurrence_state_changed.send(self)
         if not silent:
-            log = [u'Day rejected: {}'.format(format_date(self.date)),
-                   u'Reason: {}'.format(reason)]
+            log = ['Day rejected: {}'.format(format_date(self.date)),
+                   f'Reason: {reason}']
             self.reservation.add_edit_log(ReservationEditLog(user_name=user.full_name, info=log))
             from indico.modules.rb.notifications.reservation_occurrences import notify_rejection
             notify_rejection(self)

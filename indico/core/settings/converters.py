@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import unicode_literals
 
 from collections import OrderedDict
 from datetime import timedelta
@@ -19,7 +18,7 @@ from werkzeug.utils import cached_property
 from indico.core.db import db
 
 
-class SettingConverter(object):
+class SettingConverter:
     """
     Implement a custom conversion between Python types and
     JSON-serializable types.
@@ -93,7 +92,7 @@ class ModelConverter(SettingConverter):
 
     @cached_property
     def model(self):
-        model = getattr(db.m, self._model) if isinstance(self._model, six.string_types) else self._model
+        model = getattr(db.m, self._model) if isinstance(self._model, str) else self._model
         assert len(inspect(model).primary_key) == 1
         return model
 
@@ -126,7 +125,7 @@ class ModelListConverter(SettingConverter):
 
     @cached_property
     def model(self):
-        if isinstance(self._model, six.string_types):
+        if isinstance(self._model, str):
             return getattr(db.m, self._model)
         return self._model
 

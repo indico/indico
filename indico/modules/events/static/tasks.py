@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import unicode_literals
 
 from datetime import timedelta
 
@@ -37,7 +36,7 @@ def build_static_site(static_site):
         zip_file_path = create_static_site(rh, static_site.event)
         static_site.state = StaticSiteState.success
         static_site.content_type = 'application/zip'
-        static_site.filename = 'offline_site_{}.zip'.format(static_site.event.id)
+        static_site.filename = f'offline_site_{static_site.event.id}.zip'
         with open(zip_file_path, 'rb') as f:
             static_site.save(f)
         db.session.commit()

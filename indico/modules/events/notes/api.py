@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import unicode_literals
 
 from indico.modules.events import Event
 from indico.modules.events.contributions.models.contributions import Contribution
@@ -27,7 +26,7 @@ class NoteExportHook(HTTPAPIHook):
     VALID_FORMATS = ('json', 'jsonp', 'xml')
 
     def _getParams(self):
-        super(NoteExportHook, self)._getParams()
+        super()._getParams()
         event = self._obj = Event.get(self._pathParams['event_id'], is_deleted=False)
         if event is None:
             raise HTTPAPIError('No such event', 404)

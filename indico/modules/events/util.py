@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import unicode_literals
 
 import json
 import os
@@ -21,7 +20,6 @@ from zipfile import ZipFile
 
 import six
 from flask import current_app, flash, g, redirect, request, session
-from six.moves import map
 from sqlalchemy import inspect
 from sqlalchemy.orm import load_only, noload
 from werkzeug.exceptions import BadRequest, Forbidden
@@ -95,7 +93,7 @@ def get_object_from_args(args=None):
                                    SubContribution.contribution.has(event=event, id=args['contrib_id'],
                                                                     is_deleted=False)).first()
     else:
-        raise ValueError('Unexpected object type: {}'.format(object_type))
+        raise ValueError(f'Unexpected object type: {object_type}')
     if obj is not None:
         return object_type, event, obj
     else:
@@ -259,7 +257,7 @@ def update_object_principals(obj, new_principals, read_access=False, full_access
     return {'added': added, 'removed': removed}
 
 
-class ListGeneratorBase(object):
+class ListGeneratorBase:
     """Base class for classes performing actions on Indico object lists.
 
     :param event: The associated `Event`
@@ -292,7 +290,7 @@ class ListGeneratorBase(object):
         This ID will be used as a key to set the list's configuration to the
         session.
         """
-        return '{}_config_{}'.format(self.list_link_type, self.entry_parent.id)
+        return f'{self.list_link_type}_config_{self.entry_parent.id}'
 
     def _get_config(self):
         """Load the list's configuration from the DB and return it."""
@@ -319,7 +317,7 @@ class ListGeneratorBase(object):
                  partitioning.
         """
         if separator_type == 'dynamic':
-            dynamic_item_ids = [item_id for item_id in item_ids if not isinstance(item_id, six.string_types)]
+            dynamic_item_ids = [item_id for item_id in item_ids if not isinstance(item_id, str)]
             return dynamic_item_ids, [item_id for item_id in item_ids if item_id not in dynamic_item_ids]
         elif separator_type == 'static':
             static_item_ids = [item_id for item_id in item_ids if item_id in self.static_items]
@@ -344,14 +342,14 @@ class ListGeneratorBase(object):
         """Get the new filters after the filter form is submitted."""
         def get_selected_options(item_id, item):
             if item.get('filter_choices') or item.get('type') == 'bool':
-                return [x if x != 'None' else None for x in request.form.getlist('field_{}'.format(item_id))]
+                return [x if x != 'None' else None for x in request.form.getlist(f'field_{item_id}')]
 
         filters = deepcopy(self.default_list_config['filters'])
-        for item_id, item in six.iteritems(self.static_items):
+        for item_id, item in self.static_items.items():
             options = get_selected_options(item_id, item)
             if options:
                 filters['items'][item_id] = options
-        for item_id, item in six.iteritems(self.extra_filters):
+        for item_id, item in self.extra_filters.items():
             options = get_selected_options(item_id, item)
             if options:
                 filters['extra'][item_id] = options
@@ -477,7 +475,7 @@ def track_time_changes(auto_extend=False, user=None):
                     raise UserValueError(_("Your action requires modification of session block boundaries, but you are "
                                            "not authorized to manage the session block."))
         old_times = g.pop('old_times')
-        for obj, info in six.iteritems(old_times):
+        for obj, info in old_times.items():
             if isinstance(obj, TimetableEntry):
                 obj = obj.object
             if obj.start_dt != info['start_dt']:
@@ -486,7 +484,7 @@ def track_time_changes(auto_extend=False, user=None):
                 changes[obj]['duration'] = (info['duration'], obj.duration)
             if obj.end_dt != info['end_dt']:
                 changes[obj]['end_dt'] = (info['end_dt'], obj.end_dt)
-        for obj, obj_changes in six.iteritems(changes):
+        for obj, obj_changes in changes.items():
             entry = None if isinstance(obj, Event) else obj.timetable_entry
             signals.event.times_changed.send(type(obj), entry=entry, obj=obj, changes=obj_changes)
 
@@ -504,7 +502,7 @@ def register_time_change(entry):
     try:
         old_times = g.old_times
     except AttributeError:
-        msg = 'Time change of {} was not tracked'.format(entry)
+        msg = f'Time change of {entry} was not tracked'
         if current_app.config.get('REPL'):
             warnings.warn(msg + ' (exception converted to a warning since you are using the REPL)', stacklevel=2)
             return
@@ -531,7 +529,7 @@ def register_event_time_change(event):
     try:
         old_times = g.old_times
     except AttributeError:
-        msg = 'Time change of {} was not tracked'.format(event)
+        msg = f'Time change of {event} was not tracked'
         if current_app.config.get('REPL'):
             warnings.warn(msg + ' (exception converted to a warning since you are using the REPL)', stacklevel=2)
             return
@@ -593,14 +591,14 @@ def serialize_person_for_json_ld(person):
 
 def get_field_values(form_data):
     """Split the form fields between custom and static."""
-    fields = {x: form_data[x] for x in six.iterkeys(form_data) if not x.startswith('custom_')}
-    custom_fields = {x: form_data[x] for x in six.iterkeys(form_data) if x.startswith('custom_')}
+    fields = {x: form_data[x] for x in form_data.keys() if not x.startswith('custom_')}
+    custom_fields = {x: form_data[x] for x in form_data.keys() if x.startswith('custom_')}
     return fields, custom_fields
 
 
 def set_custom_fields(obj, custom_fields_data):
     changes = {}
-    for custom_field_name, custom_field_value in six.iteritems(custom_fields_data):
+    for custom_field_name, custom_field_value in custom_fields_data.items():
         custom_field_id = int(custom_field_name[7:])  # Remove the 'custom_' part
         old_value = obj.set_custom_field(custom_field_id, custom_field_value)
         if old_value != custom_field_value:
@@ -639,7 +637,7 @@ def get_event_from_url(url):
     return event
 
 
-class ZipGeneratorMixin(object):
+class ZipGeneratorMixin:
     """Mixin for RHs that generate zip with files."""
 
     def _adjust_path_length(self, segments):
@@ -664,8 +662,7 @@ class ZipGeneratorMixin(object):
         return reversed(result)
 
     def _iter_items(self, files_holder):
-        for f in files_holder:
-            yield f
+        yield from files_holder
 
     def _generate_zip_file(self, files_holder, name_prefix='material', name_suffix=None, return_file=False):
         """Generate a zip file containing the files passed.
@@ -686,7 +683,7 @@ class ZipGeneratorMixin(object):
                 with item.get_local_path() as filepath:
                     zip_handler.write(filepath.encode('utf-8'), name)
 
-        zip_file_name = '{}-{}.zip'.format(name_prefix, name_suffix) if name_suffix else '{}.zip'.format(name_prefix)
+        zip_file_name = f'{name_prefix}-{name_suffix}.zip' if name_suffix else f'{name_prefix}.zip'
         chmod_umask(temp_file.name)
         if return_file:
             return temp_file
@@ -694,7 +691,7 @@ class ZipGeneratorMixin(object):
         return send_file(zip_file_name, temp_file.name, 'application/zip', inline=False)
 
     def _prepare_folder_structure(self, item):
-        file_name = secure_filename('{}_{}'.format(six.text_type(item.id), item.filename), item.filename)
+        file_name = secure_filename('{}_{}'.format(str(item.id), item.filename), item.filename)
         return os.path.join(*self._adjust_path_length([file_name]))
 
 

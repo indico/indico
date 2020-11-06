@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import unicode_literals
 
 from collections import defaultdict
 from functools import partial, update_wrapper
@@ -18,7 +17,7 @@ from indico.core.settings.models.settings import Setting, SettingPrincipal
 from indico.core.settings.util import get_all_settings, get_setting, get_setting_acl
 
 
-class ACLProxyBase(object):
+class ACLProxyBase:
     """Base Proxy class for ACL settings."""
 
     def __init__(self, proxy):
@@ -36,7 +35,7 @@ class ACLProxyBase(object):
         self.proxy._flush_cache()
 
 
-class SettingsProxyBase(object):
+class SettingsProxyBase:
     """Base proxy class to access settings for a certain module.
 
     :param module: the module to use
@@ -64,9 +63,9 @@ class SettingsProxyBase(object):
             raise ValueError('cannot use strict mode with no defaults')
         if acls and not self.acl_proxy_class:
             raise ValueError('this proxy does not support acl settings')
-        if acls and self.acl_names & six.viewkeys(self.defaults):
+        if acls and self.acl_names & self.defaults.keys():
             raise ValueError('acl settings cannot have a default value')
-        if acls and converters and acls & six.viewkeys(converters):
+        if acls and converters and acls & converters.keys():
             raise ValueError('acl settings cannot have custom converters')
 
     def __repr__(self):
@@ -102,7 +101,7 @@ class SettingsProxyBase(object):
         strict = self.strict or acl  # acl settings always use strict mode
         collection = self.acl_names if acl else self.defaults
         if strict and name not in collection:
-            raise ValueError('invalid setting: {}.{}'.format(self.module, name))
+            raise ValueError(f'invalid setting: {self.module}.{name}')
 
     def _split_names(self, names):
         # Returns a ``(regular_names, acl_names)`` tuple
@@ -252,7 +251,7 @@ class SettingsProxy(SettingsProxyBase):
 
         :param items: Dict containing the new settings
         """
-        items = {k: self._convert_from_python(k, v) for k, v in six.iteritems(items)}
+        items = {k: self._convert_from_python(k, v) for k, v in items.items()}
         self._split_call(items,
                          lambda x: Setting.set_multi(self.module, x),
                          lambda x: SettingPrincipal.set_acl_multi(self.module, x))
@@ -275,7 +274,7 @@ class SettingsProxy(SettingsProxyBase):
         self._flush_cache()
 
 
-class SettingProperty(object):
+class SettingProperty:
     """Expose a SettingsProxy value as a property.
 
     Override `attr` in a subclass for settings proxies that are tied
@@ -317,7 +316,7 @@ class SettingProperty(object):
         self.proxy.delete(*self._make_args(obj, self.name))
 
 
-class AttributeProxyProperty(object):
+class AttributeProxyProperty:
     def __init__(self, attr):
         self.attr = attr
 
@@ -333,7 +332,7 @@ class AttributeProxyProperty(object):
         delattr(getattr(obj, obj.proxied_attr), self.attr)
 
 
-class PrefixSettingsProxy(object):
+class PrefixSettingsProxy:
     """A SettingsProxy that exposes settings with prefixes.
 
     This allows for simple form handling when a single form contains
@@ -370,8 +369,8 @@ class PrefixSettingsProxy(object):
 
     def get_all(self, no_defaults=False, arg=None):
         rv = {}
-        for prefix, proxy in six.iteritems(self.mapping):
-            for key, value in six.iteritems(self._call(proxy.get_all, arg, no_defaults=no_defaults)):
+        for prefix, proxy in self.mapping.items():
+            for key, value in self._call(proxy.get_all, arg, no_defaults=no_defaults).items():
                 rv[prefix + self.sep + key] = value
         return rv
 
@@ -385,10 +384,10 @@ class PrefixSettingsProxy(object):
 
     def set_multi(self, items, arg=None):
         by_proxy = defaultdict(dict)
-        for name, value in six.iteritems(items):
+        for name, value in items.items():
             proxy, local_name = self._resolve_prefix(name)
             by_proxy[proxy][local_name] = value
-        for proxy, local_items in six.iteritems(by_proxy):
+        for proxy, local_items in by_proxy.items():
             self._call(proxy.set_multi, arg, local_items)
 
     def delete(self, *names, **kwargs):
@@ -398,9 +397,9 @@ class PrefixSettingsProxy(object):
         for name in names:
             proxy, local_name = self._resolve_prefix(name)
             by_proxy[proxy].append(local_name)
-        for proxy, local_names in six.iteritems(by_proxy):
+        for proxy, local_names in by_proxy.items():
             self._call(proxy.delete, arg, *local_names)
 
     def delete_all(self, arg=None):
-        for proxy in six.itervalues(self.mapping):
+        for proxy in self.mapping.values():
             self._call(proxy.delete_all, arg)

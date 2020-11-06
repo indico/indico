@@ -31,8 +31,8 @@ logging.config.fileConfig(config.config_file_name)
 config.set_main_option('sqlalchemy.url', current_app.config.get('SQLALCHEMY_DATABASE_URI'))
 target_metadata = current_app.extensions['migrate'].db.metadata
 
-plugin_schema = 'plugin_{}'.format(current_plugin.name)
-version_table = 'alembic_version_plugin_{}'.format(current_plugin.name)
+plugin_schema = f'plugin_{current_plugin.name}'
+version_table = f'alembic_version_plugin_{current_plugin.name}'
 
 
 def _include_symbol(tablename, schema):

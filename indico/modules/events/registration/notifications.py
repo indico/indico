@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import unicode_literals
 
 from flask import session
 
@@ -39,7 +38,7 @@ def _notify_registration(registration, template, to_managers=False):
             registration.state == RegistrationState.complete):
         attachments = get_ticket_attachments(registration)
 
-    template = get_template_module('events/registration/emails/{}'.format(template), registration=registration)
+    template = get_template_module(f'events/registration/emails/{template}', registration=registration)
     to_list = registration.email if not to_managers else registration.registration_form.manager_notification_recipients
     from_address = registration.registration_form.sender_address if not to_managers else None
     mail = make_email(to_list=to_list, template=template, html=True, from_address=from_address, attachments=attachments)

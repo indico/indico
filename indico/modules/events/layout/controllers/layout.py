@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import unicode_literals
 
 import os
 from io import BytesIO
@@ -49,18 +48,18 @@ def _make_theme_settings_form(event, theme):
     except KeyError:
         return None
     form_class = type('ThemeSettingsForm', (IndicoForm,), {})
-    for name, field_data in six.iteritems(settings):
+    for name, field_data in settings.items():
         field_type = field_data['type']
         field_class = getattr(indico_fields, field_type, None) or getattr(wtforms_fields, field_type, None)
         if not field_class:
-            raise Exception('Invalid field type: {}'.format(field_type))
+            raise Exception(f'Invalid field type: {field_type}')
         label = field_data['caption']
         description = field_data.get('description')
         validators = [DataRequired()] if field_data.get('required') else []
         field = field_class(label, validators, description=description, **field_data.get('kwargs', {}))
         setattr(form_class, name, field)
 
-    defaults = {name: field_data.get('defaults') for name, field_data in six.iteritems(settings)}
+    defaults = {name: field_data.get('defaults') for name, field_data in settings.items()}
     if theme == event.theme:
         defaults.update(layout_settings.get(event, 'timetable_theme_settings'))
 
@@ -91,7 +90,7 @@ class RHLayoutEdit(RHLayoutBase):
         ret = self._process_request()
         new_values = layout_settings.get_all(self.event)
         # Skip `timetable_theme_settings` as they are dynamically generated from themes.yaml
-        changes = {k: (old_values[k], v) for k, v in six.iteritems(new_values)
+        changes = {k: (old_values[k], v) for k, v in new_values.items()
                    if old_values[k] != v and k != 'timetable_theme_settings'}
         if changes:
             form_cls = ConferenceLayoutForm if self.event.type_ == EventType.conference else LectureMeetingLayoutForm
@@ -131,7 +130,7 @@ class RHLayoutEdit(RHLayoutBase):
                 layout_settings.set(self.event, 'timetable_theme_settings', tt_theme_settings_form.data)
             else:
                 layout_settings.delete(self.event, 'timetable_theme_settings')
-            data = {six.text_type(key): value for key, value in six.iteritems(form.data) if key in layout_settings.defaults}
+            data = {str(key): value for key, value in form.data.items() if key in layout_settings.defaults}
             layout_settings.set_multi(self.event, data)
             if form.theme.data == '_custom':
                 layout_settings.set(self.event, 'use_custom_css', True)
@@ -152,7 +151,7 @@ class RHLayoutLogoUpload(RHLayoutBase):
         f = request.files['logo']
         try:
             img = Image.open(f)
-        except IOError:
+        except OSError:
             flash(_('You cannot upload this file as a logo.'), 'error')
             return jsonify_data(content=None)
         if img.format.lower() not in {'jpeg', 'png', 'gif'}:

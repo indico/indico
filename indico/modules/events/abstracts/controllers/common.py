@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import unicode_literals
 
 import os
 from operator import attrgetter
@@ -104,15 +103,14 @@ class AbstractsDownloadAttachmentsMixin(ZipGeneratorMixin):
     """Generate a ZIP file with attachment files for a given list of abstracts."""
 
     def _prepare_folder_structure(self, item):
-        abstract_title = secure_filename('{}_{}'.format(six.text_type(item.abstract.friendly_id), item.abstract.title),
+        abstract_title = secure_filename('{}_{}'.format(str(item.abstract.friendly_id), item.abstract.title),
                                          'abstract')
-        file_name = secure_filename('{}_{}'.format(six.text_type(item.id), item.filename), item.filename)
+        file_name = secure_filename('{}_{}'.format(str(item.id), item.filename), item.filename)
         return os.path.join(*self._adjust_path_length([abstract_title, file_name]))
 
     def _iter_items(self, abstracts):
         for abstract in abstracts:
-            for f in abstract.files:
-                yield f
+            yield from abstract.files
 
     def _process(self):
         return self._generate_zip_file(self.abstracts, name_prefix='abstract-attachments',

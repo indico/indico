@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import unicode_literals
 
 from collections import defaultdict
 from datetime import date
@@ -123,7 +122,7 @@ def _approve_or_request_rooms(blocking, blocked_rooms=None):
         else:
             # TODO: notify all managers of a room?
             rooms_by_owner[blocked_room.room.owner].append(blocked_room)
-    for owner, rooms in six.iteritems(rooms_by_owner):
+    for owner, rooms in rooms_by_owner.items():
         notify_request(owner, blocking, rooms)
 
 

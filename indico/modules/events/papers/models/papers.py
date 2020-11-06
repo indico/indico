@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import unicode_literals
 
 from indico.core.settings import AttributeProxyProperty
 from indico.modules.events.models.reviews import ProposalMixin
@@ -28,7 +27,7 @@ class Paper(ProposalMixin):
 
     def __repr__(self):
         state = self.state.name if self.last_revision else None
-        return '<Paper(contribution_id={}, state={})>'.format(self.contribution.id, state)
+        return f'<Paper(contribution_id={self.contribution.id}, state={state})>'
 
     @locator_property
     def locator(self):

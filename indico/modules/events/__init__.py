@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import unicode_literals
 
 import six
 from flask import flash, redirect, render_template, request, session
@@ -88,7 +87,7 @@ def _log_acl_changes(sender, obj, principal, entry, is_new, old_data, quiet, **k
 
     def _format_permissions(permissions):
         permissions = set(permissions)
-        return ', '.join(sorted(orig_string(p.friendly_name) for p in six.itervalues(available_permissions)
+        return ', '.join(sorted(orig_string(p.friendly_name) for p in available_permissions.values()
                                 if p.name in permissions))
 
     data = {}
@@ -99,7 +98,7 @@ def _log_acl_changes(sender, obj, principal, entry, is_new, old_data, quiet, **k
     elif principal.principal_type == PrincipalType.local_group:
         data['Group'] = principal.name
     elif principal.principal_type == PrincipalType.multipass_group:
-        data['Group'] = '{} ({})'.format(principal.name, principal.provider_title)
+        data['Group'] = f'{principal.name} ({principal.provider_title})'
     elif principal.principal_type == PrincipalType.network:
         data['IP Network'] = principal.name
     elif principal.principal_type == PrincipalType.registration_form:
@@ -165,9 +164,9 @@ def _handle_legacy_ids(app, **kwargs):
 
         mapping = LegacyEventMapping.find_first(legacy_event_id=event_id)
         if mapping is None:
-            raise NotFound('Legacy event {} does not exist'.format(event_id))
+            raise NotFound(f'Legacy event {event_id} does not exist')
 
-        request.view_args[key] = six.text_type(mapping.event_id)
+        request.view_args[key] = str(mapping.event_id)
         return redirect(url_for(request.endpoint, **dict(request.args.to_dict(), **request.view_args)), 301)
 
 
@@ -252,4 +251,4 @@ def _render_event_ical_export(event, **kwargs):
     from indico.modules.events.util import get_base_ical_parameters
     return render_template('events/display/event_ical_export.html', item=event,
                            ics_url=url_for('events.export_event_ical', event),
-                           **get_base_ical_parameters(session.user, 'events', '/export/event/{0}.ics'.format(event.id)))
+                           **get_base_ical_parameters(session.user, 'events', f'/export/event/{event.id}.ics'))

@@ -5,13 +5,11 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import absolute_import, unicode_literals
 
 import json
 
 import six
 from markupsafe import escape
-from six.moves import map
 from wtforms.fields import Field, HiddenField, PasswordField, RadioField, SelectMultipleField, TextAreaField
 from wtforms.widgets import CheckboxInput
 
@@ -28,7 +26,7 @@ class IndicoSelectMultipleCheckboxField(SelectMultipleField):
 
 class IndicoSelectMultipleCheckboxBooleanField(IndicoSelectMultipleCheckboxField):
     def process_formdata(self, valuelist):
-        super(IndicoSelectMultipleCheckboxBooleanField, self).process_formdata(valuelist)
+        super().process_formdata(valuelist)
         values = set(self.data)
         self.data = {x[0]: x[0] in values for x in self.choices}
 
@@ -43,7 +41,7 @@ class IndicoRadioField(RadioField):
 
     def __init__(self, *args, **kwargs):
         self.option_orientation = kwargs.pop('orientation', 'vertical')
-        super(IndicoRadioField, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
 
 class JSONField(HiddenField):
@@ -61,7 +59,7 @@ class JSONField(HiddenField):
 
     def populate_obj(self, obj, name):
         if self.CAN_POPULATE:
-            super(JSONField, self).populate_obj(obj, name)
+            super().populate_obj(obj, name)
 
 
 class HiddenFieldList(HiddenField):
@@ -106,7 +104,7 @@ class TextListField(TextAreaField):
 
 class EmailListField(TextListField):
     def process_formdata(self, valuelist):
-        super(EmailListField, self).process_formdata(valuelist)
+        super().process_formdata(valuelist)
         self.data = list(map(sanitize_email, self.data))
 
     def _validate_item(self, line):
@@ -121,7 +119,7 @@ class IndicoPasswordField(PasswordField):
 
     def __init__(self, *args, **kwargs):
         self.toggle = kwargs.pop('toggle', False)
-        super(IndicoPasswordField, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
 
 class IndicoStaticTextField(Field):
@@ -131,10 +129,10 @@ class IndicoStaticTextField(Field):
 
     def __init__(self, *args, **kwargs):
         self.text_value = kwargs.pop('text', '')
-        super(IndicoStaticTextField, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
     def process_data(self, data):
-        self.text_value = self.data = six.text_type(data)
+        self.text_value = self.data = str(data)
 
     def _value(self):
         return self.text_value
@@ -144,7 +142,7 @@ class IndicoEmailRecipientsField(Field):
     widget = JinjaWidget('forms/email_recipients_widget.html', single_kwargs=True)
 
     def process_data(self, data):
-        self.data = sorted(data, key=six.text_type.lower)
+        self.data = sorted(data, key=str.lower)
         self.text_value = ', '.join(data)
         self.count = len(data)
 

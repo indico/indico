@@ -8,7 +8,6 @@
 import warnings
 from datetime import date, time
 
-from six.moves import zip
 from sqlalchemy import and_, or_
 from sqlalchemy.dialects.postgresql import ARRAY
 from sqlalchemy.ext.hybrid import hybrid_property
@@ -330,9 +329,9 @@ class Room(ProtectionManagersMixin, db.Model, Serializer):
     @hybrid_property
     def full_name(self):
         if self.verbose_name:
-            return u'{} - {}'.format(self.generate_name(), self.verbose_name)
+            return f'{self.generate_name()} - {self.verbose_name}'
         else:
-            return u'{}'.format(self.generate_name())
+            return f'{self.generate_name()}'
 
     @full_name.expression
     def full_name(cls):
@@ -380,7 +379,7 @@ class Room(ProtectionManagersMixin, db.Model, Serializer):
         elif value:
             attr = RoomAttribute.query.filter_by(name=name).first()
             if not attr:
-                raise ValueError("Attribute {} does not exist".format(name))
+                raise ValueError(f"Attribute {name} does not exist")
             attr_assoc = RoomAttributeAssociation()
             attr_assoc.value = value
             attr_assoc.attribute = attr
@@ -390,7 +389,7 @@ class Room(ProtectionManagersMixin, db.Model, Serializer):
     def generate_name(self):
         if self.location is None:
             warnings.warn('Room has no location; using default name format')
-            return '{}/{}-{}'.format(self.building, self.floor, self.number)
+            return f'{self.building}/{self.floor}-{self.number}'
         return self.location.room_name_format.format(
             building=self.building,
             floor=self.floor,
@@ -400,7 +399,7 @@ class Room(ProtectionManagersMixin, db.Model, Serializer):
     @classmethod
     def find_all(cls, *args, **kwargs):
         """Retrieve rooms, sorted by location and full name."""
-        rooms = super(Room, cls).find_all(*args, **kwargs)
+        rooms = super().find_all(*args, **kwargs)
         rooms.sort(key=lambda r: natural_sort_key(r.location_name + r.full_name))
         return rooms
 
@@ -421,7 +420,7 @@ class Room(ProtectionManagersMixin, db.Model, Serializer):
         filters = kwargs.pop('filters', None)
         order = kwargs.pop('order', [Location.name, Room.building, Room.floor, Room.number, Room.verbose_name])
         if kwargs:
-            raise ValueError('Unexpected kwargs: {}'.format(kwargs))
+            raise ValueError(f'Unexpected kwargs: {kwargs}')
 
         query = Room.query
         entities = [Room]
@@ -591,7 +590,7 @@ class Room(ProtectionManagersMixin, db.Model, Serializer):
     def can_manage(self, user, permission=None, allow_admin=True, check_parent=True, explicit_permission=False):
         if user and user == self.owner and (permission is None or not explicit_permission):
             return True
-        return super(Room, self).can_manage(user, permission=permission, allow_admin=allow_admin,
+        return super().can_manage(user, permission=permission, allow_admin=allow_admin,
                                             check_parent=check_parent, explicit_permission=explicit_permission)
 
     def can_book(self, user, allow_admin=True):
@@ -646,7 +645,7 @@ class Room(ProtectionManagersMixin, db.Model, Serializer):
         if quiet or ok:
             return ok
         else:
-            msg = _(u'You cannot book this room more than {} days in advance')
+            msg = _('You cannot book this room more than {} days in advance')
             raise NoReportError(msg.format(self.max_advance_days))
 
     def check_bookable_hours(self, start_time, end_time, user=None, quiet=False):
@@ -660,7 +659,7 @@ class Room(ProtectionManagersMixin, db.Model, Serializer):
                 return True
         if quiet:
             return False
-        raise NoReportError(u'Room cannot be booked at this time')
+        raise NoReportError('Room cannot be booked at this time')
 
 
 Room.register_protection_events()

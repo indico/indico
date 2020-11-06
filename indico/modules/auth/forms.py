@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import unicode_literals
 
 from wtforms.fields import PasswordField, SelectField, StringField, TextAreaField
 from wtforms.fields.html5 import EmailField
@@ -52,7 +51,7 @@ class EditLocalIdentityForm(IndicoForm):
 
     def __init__(self, *args, **kwargs):
         self.identity = kwargs.pop('identity', None)
-        super(EditLocalIdentityForm, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
     def validate_password(self, field):
         if field.data != self.identity.password:
@@ -102,7 +101,7 @@ class LocalRegistrationForm(RegistrationForm):
 
     @property
     def data(self):
-        data = super(LocalRegistrationForm, self).data
+        data = super().data
         data.pop('confirm_password', None)
         return data
 

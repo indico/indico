@@ -61,7 +61,7 @@ def downgrade():
     mapping = {}
     res = conn.execute("SELECT id, title, color FROM events.labels")
     for label_id, title, color in res:
-        uuid = six.text_type(uuid4())
+        uuid = str(uuid4())
         conn.execute("INSERT INTO indico.settings (module, name, value) VALUES ('event_labels', %s, %s)",
                      (uuid, json.dumps({'id': uuid, 'title': title, 'color': color})))
         mapping[label_id] = uuid

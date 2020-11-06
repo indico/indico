@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import absolute_import, unicode_literals
 
 import json
 from collections import OrderedDict
@@ -16,7 +15,6 @@ import pytz
 import six
 from flask import session
 from markupsafe import escape
-from six.moves import map, range
 from wtforms import Field, SelectField
 from wtforms.ext.dateutil.fields import DateField, DateTimeField
 from wtforms.fields import TimeField
@@ -59,7 +57,7 @@ class TimeDeltaField(Field):
 
     def __init__(self, *args, **kwargs):
         self.units = kwargs.pop('units', ('hours', 'days'))
-        super(TimeDeltaField, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
     @property
     def best_unit(self):
@@ -67,7 +65,7 @@ class TimeDeltaField(Field):
         if self.data is None:
             return None
         seconds = int(self.data.total_seconds())
-        for unit, magnitude in six.iteritems(self.magnitudes):
+        for unit, magnitude in self.magnitudes.items():
             if not seconds % magnitude:
                 return unit
         return 'seconds'
@@ -139,7 +137,7 @@ class RelativeDeltaField(Field):
 
     def __init__(self, *args, **kwargs):
         self.units = kwargs.pop('units', ('hours', 'days'))
-        super(RelativeDeltaField, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
     @property
     def split_data(self):
@@ -187,7 +185,7 @@ class IndicoDateField(DateField):
 
     def __init__(self, *args, **kwargs):
         self.allow_clear = kwargs.pop('allow_clear', None)
-        super(IndicoDateField, self).__init__(*args, parse_kwargs={'dayfirst': True},
+        super().__init__(*args, parse_kwargs={'dayfirst': True},
                                               display_format='%d/%m/%Y', **kwargs)
         if self.allow_clear is None:
             self.allow_clear = not self.flags.required
@@ -236,7 +234,7 @@ class IndicoDateTimeField(DateTimeField):
         self.date_missing = False
         self.time_missing = False
         self.allow_clear = kwargs.pop('allow_clear', None)
-        super(IndicoDateTimeField, self).__init__(*args, parse_kwargs={'dayfirst': True}, **kwargs)
+        super().__init__(*args, parse_kwargs={'dayfirst': True}, **kwargs)
         if self.allow_clear is None:
             self.allow_clear = not self.flags.required
 
@@ -257,7 +255,7 @@ class IndicoDateTimeField(DateTimeField):
                 self.time_missing = True
         if valuelist:
             valuelist = [' '.join(valuelist).strip()]
-        super(IndicoDateTimeField, self).process_formdata(valuelist)
+        super().process_formdata(valuelist)
         if self.data and not self.data.tzinfo:
             self.data = localize_as_utc(self.data, self.timezone)
 
@@ -321,7 +319,7 @@ class OccurrencesField(JSONField):
     def __init__(self, *args, **kwargs):
         self._timezone = kwargs.pop('timezone', None)
         kwargs.setdefault('default', [])
-        super(OccurrencesField, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
     def process_formdata(self, valuelist):
         def _deserialize(occ):
@@ -334,7 +332,7 @@ class OccurrencesField(JSONField):
             return localize_as_utc(dt, self.timezone), timedelta(minutes=occ['duration'])
 
         self.data = []
-        super(OccurrencesField, self).process_formdata(valuelist)
+        super().process_formdata(valuelist)
         self.data = list(map(_deserialize, self.data))
 
     def _value(self):
@@ -364,12 +362,12 @@ class OccurrencesField(JSONField):
 
 class IndicoTimezoneSelectField(SelectField):
     def __init__(self, *args, **kwargs):
-        super(IndicoTimezoneSelectField, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self.choices = [(v, v) for v in pytz.common_timezones]
         self.default = config.DEFAULT_TIMEZONE
 
     def process_data(self, value):
-        super(IndicoTimezoneSelectField, self).process_data(value)
+        super().process_data(value)
         if self.data is not None and self.data not in pytz.common_timezones_set:
             self.choices.append((self.data, self.data))
 
@@ -393,7 +391,7 @@ class IndicoWeekDayRepetitionField(Field):
         self.week_day_options = [(n, locale.weekday(n, short=False)) for n in range(7)]
         self.day_number_missing = False
         self.week_day_missing = False
-        super(IndicoWeekDayRepetitionField, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
     def process_formdata(self, valuelist):
         self.data = ()

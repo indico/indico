@@ -25,7 +25,7 @@ class StaticArray(types.TypeDecorator):
     impl = types.TypeEngine
 
     def __init__(self):
-        super(StaticArray, self).__init__()
+        super().__init__()
         self.__supported = {PGDialect: ARRAY}
 
     def load_dialect_impl(self, dialect):

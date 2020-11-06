@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import unicode_literals
 
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.event import listens_for
@@ -46,7 +45,7 @@ class RegistrationFormFieldData(db.Model):
     # - registration_data (RegistrationData.field_data)
 
     def __repr__(self):
-        return '<RegistrationFormFieldData({}, {})>'.format(self.id, self.field_id)
+        return f'<RegistrationFormFieldData({self.id}, {self.field_id})>'
 
 
 class RegistrationFormField(RegistrationFormItem):
@@ -87,13 +86,13 @@ class RegistrationFormField(RegistrationFormItem):
         base_dict = dict(self.versioned_data, **self.data)
         base_dict.update(is_enabled=self.is_enabled, title=self.title, is_required=self.is_required,
                          input_type=self.input_type, html_name=self.html_field_name,
-                         **super(RegistrationFormField, self).view_data)
+                         **super().view_data)
         base_dict.update(self.field_impl.view_data)
         return camelize_keys(base_dict)
 
     @property
     def html_field_name(self):
-        return 'field_{}'.format(self.id)
+        return f'field_{self.id}'
 
     def get_friendly_data(self, registration_data, **kwargs):
         return self.field_impl.get_friendly_data(registration_data, **kwargs)
@@ -109,7 +108,7 @@ class RegistrationFormPersonalDataField(RegistrationFormField):
 
     @property
     def view_data(self):
-        data = dict(super(RegistrationFormPersonalDataField, self).view_data,
+        data = dict(super().view_data,
                     field_is_required=self.personal_data_type.is_required,
                     field_is_personal_data=True)
         return camelize_keys(data)

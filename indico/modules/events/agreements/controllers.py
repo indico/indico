@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import unicode_literals
 
 import mimetypes
 from io import BytesIO
@@ -101,7 +100,7 @@ class RHAgreementManagerDetails(RHAgreementManagerBase):
         definition_name = request.view_args['definition']
         self.definition = get_agreement_definitions().get(definition_name)
         if self.definition is None:
-            raise NotFound("Agreement type '{}' does not exist".format(definition_name))
+            raise NotFound(f"Agreement type '{definition_name}' does not exist")
         if not self.definition.is_active(self.event):
             flash(_("The '{}' agreement is not used in this event.").format(self.definition.title), 'error')
             return redirect(url_for('.event_agreements', self.event))
@@ -153,7 +152,7 @@ class RHAgreementManagerDetailsSend(RHAgreementManagerDetailsEmailBase):
 
     def _get_people(self):
         identifiers = set(request.form.getlist('references'))
-        return {k: v for k, v in six.iteritems(self.definition.get_people_not_notified(self.event))
+        return {k: v for k, v in self.definition.get_people_not_notified(self.event).items()
                 if v.email and v.identifier in identifiers}
 
     def _success_handler(self, form):
@@ -185,7 +184,7 @@ class RHAgreementManagerDetailsSendAll(RHAgreementManagerDetailsSend):
     dialog_template = 'events/agreements/dialogs/agreement_email_form_send_all.html'
 
     def _get_people(self):
-        return {k: v for k, v in six.iteritems(self.definition.get_people_not_notified(self.event)) if v.email}
+        return {k: v for k, v in self.definition.get_people_not_notified(self.event).items() if v.email}
 
 
 class RHAgreementManagerDetailsRemindAll(RHAgreementManagerDetailsRemind):
@@ -248,7 +247,7 @@ class RHAgreementManagerDetailsSubmitAnswer(RHAgreementManagerDetails):
                 agreement.attachment = form.document.data.read()
             else:
                 agreement.reject(from_ip=request.remote_addr, on_behalf=True)
-            flash(_("Agreement answered on behalf of {0}".format(agreement.person_name)), 'success')
+            flash(_(f"Agreement answered on behalf of {agreement.person_name}"), 'success')
             return jsonify(success=True)
         return WPJinjaMixin.render_template('events/agreements/dialogs/agreement_submit_answer_form.html', form=form,
                                             event=self.event, agreement=agreement)

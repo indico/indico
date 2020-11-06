@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import unicode_literals
 
 from collections import OrderedDict, defaultdict
 from datetime import datetime
@@ -52,7 +51,7 @@ class RepeatFrequency(int, IndicoEnum):
     MONTH = 3
 
 
-class RepeatMapping(object):
+class RepeatMapping:
     mapping = {
         (RepeatFrequency.NEVER, 0): ('Single reservation',            None, 'none'),  # noqa: E241
         (RepeatFrequency.DAY,   1): ('Repeat daily',                  0,    'daily'),  # noqa: E241
@@ -71,9 +70,9 @@ class RepeatMapping(object):
         elif repeat_frequency == RepeatFrequency.DAY:
             return 'daily booking'
         elif repeat_frequency == RepeatFrequency.WEEK:
-            return 'weekly' if repeat_interval == 1 else 'every {} weeks'.format(repeat_interval)
+            return 'weekly' if repeat_interval == 1 else f'every {repeat_interval} weeks'
         elif repeat_frequency == RepeatFrequency.MONTH:
-            return 'monthly' if repeat_interval == 1 else 'every {} months'.format(repeat_interval)
+            return 'monthly' if repeat_interval == 1 else f'every {repeat_interval} months'
 
     @classmethod
     def get_short_name(cls, repeat_frequency, repeat_interval):
@@ -366,7 +365,7 @@ class Reservation(Serializer, db.Model):
         limit_per_room = kwargs.pop('limit_per_room', False)
         occurs_on = kwargs.pop('occurs_on')
         if kwargs:
-            raise ValueError('Unexpected kwargs: {}'.format(kwargs))
+            raise ValueError(f'Unexpected kwargs: {kwargs}')
 
         query = Reservation.query.options(joinedload(Reservation.room))
         if filters:
@@ -393,9 +392,9 @@ class Reservation(Serializer, db.Model):
         if 'occurrences' in args:
             occurrence_data = OrderedMultiDict(db.session.query(ReservationOccurrence.reservation_id,
                                                                 ReservationOccurrence)
-                                               .filter(ReservationOccurrence.reservation_id.in_(six.iterkeys(result)))
+                                               .filter(ReservationOccurrence.reservation_id.in_(result.keys()))
                                                .order_by(ReservationOccurrence.start_dt))
-            for id_, data in six.iteritems(result):
+            for id_, data in result.items():
                 data['occurrences'] = occurrence_data.getlist(id_)
 
         return list(result.values())
@@ -411,7 +410,7 @@ class Reservation(Serializer, db.Model):
     def accept(self, user, reason=None):
         self.state = ReservationState.accepted
         if reason:
-            log_msg = 'Reservation accepted: {}'.format(reason)
+            log_msg = f'Reservation accepted: {reason}'
         else:
             log_msg = 'Reservation accepted'
         self.add_edit_log(ReservationEditLog(user_name=user.full_name, info=[log_msg]))
@@ -437,7 +436,7 @@ class Reservation(Serializer, db.Model):
         signals.rb.booking_state_changed.send(self)
         if not silent:
             notify_cancellation(self)
-            log_msg = 'Reservation cancelled: {}'.format(reason) if reason else 'Reservation cancelled'
+            log_msg = f'Reservation cancelled: {reason}' if reason else 'Reservation cancelled'
             self.add_edit_log(ReservationEditLog(user_name=user.full_name, info=[log_msg]))
 
     def reject(self, user, reason, silent=False):
@@ -450,7 +449,7 @@ class Reservation(Serializer, db.Model):
         signals.rb.booking_state_changed.send(self)
         if not silent:
             notify_rejection(self)
-            log_msg = 'Reservation rejected: {}'.format(reason)
+            log_msg = f'Reservation rejected: {reason}'
             self.add_edit_log(ReservationEditLog(user_name=user.full_name, info=[log_msg]))
 
     def add_edit_log(self, edit_log):
@@ -526,7 +525,7 @@ class Reservation(Serializer, db.Model):
 
         # Check for conflicts with other occurrences
         conflicting_occurrences = self.get_conflicting_occurrences()
-        for occurrence, conflicts in six.iteritems(conflicting_occurrences):
+        for occurrence, conflicts in conflicting_occurrences.items():
             if not occurrence.is_valid:
                 continue
             if conflicts['confirmed']:
@@ -581,13 +580,13 @@ class Reservation(Serializer, db.Model):
         repetition_fields = {'repeat_frequency', 'repeat_interval'}
         # pretty names for logging
         field_names = {
-            'start_dt/date': u"start date",
-            'end_dt/date': u"end date",
-            'start_dt/time': u"start time",
-            'end_dt/time': u"end time",
-            'repetition': u"booking type",
-            'booked_for_user': u"'Booked for' user",
-            'booking_reason': u"booking reason",
+            'start_dt/date': "start date",
+            'end_dt/date': "end date",
+            'start_dt/time': "start time",
+            'end_dt/time': "end time",
+            'repetition': "booking type",
+            'booked_for_user': "'Booked for' user",
+            'booking_reason': "booking reason",
         }
 
         self.room.check_advance_days(data['end_dt'].date(), user)
@@ -602,7 +601,7 @@ class Reservation(Serializer, db.Model):
                 continue
             old = getattr(self, field)
             new = data[field]
-            converter = six.text_type
+            converter = str
             if old != new:
                 # Booked for user updates the (redundant) name
                 if field == 'booked_for_user':
@@ -635,17 +634,17 @@ class Reservation(Serializer, db.Model):
 
         # Create a verbose log entry for the modification
         log = ['Booking modified']
-        for field, change in six.iteritems(changes):
+        for field, change in changes.items():
             field_title = field_names.get(field, field)
             converter = change['converter']
             old = to_unicode(converter(change['old']))
             new = to_unicode(converter(change['new']))
             if not old:
-                log.append(u"The {} was set to '{}'".format(field_title, new))
+                log.append(f"The {field_title} was set to '{new}'")
             elif not new:
-                log.append(u"The {} was cleared".format(field_title))
+                log.append(f"The {field_title} was cleared")
             else:
-                log.append(u"The {} was changed from '{}' to '{}'".format(field_title, old, new))
+                log.append(f"The {field_title} was changed from '{old}' to '{new}'")
 
         self.edit_logs.append(ReservationEditLog(user_name=user.full_name, info=log))
 
@@ -668,7 +667,7 @@ class Reservation(Serializer, db.Model):
                         setattr(occurrence, col, getattr(old_occurrence, col))
             # Don't cause new notifications for the entire booking in case of daily repetition
             if self.repeat_frequency == RepeatFrequency.DAY and all(occ.notification_sent
-                                                                    for occ in six.itervalues(old_occurrences)):
+                                                                    for occ in old_occurrences.values()):
                 for occurrence in self.occurrences:
                     occurrence.notification_sent = True
 

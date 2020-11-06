@@ -39,7 +39,7 @@ def test_can_create_events_no_user(dummy_category):
 
 def test_effective_protection_mode(db):
     def _cat(id_, protection_mode=ProtectionMode.inheriting, children=None):
-        return Category(id=id_, title='cat-{}'.format(id_), protection_mode=protection_mode, children=children or [])
+        return Category(id=id_, title=f'cat-{id_}', protection_mode=protection_mode, children=children or [])
     root = Category.get_root()
     root.protection_mode = ProtectionMode.protected
     root.children = [

@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import unicode_literals
 
 from operator import attrgetter
 
@@ -75,7 +74,7 @@ def create_timetable_entry(event, data, parent=None, extend_parent=False):
     signals.event.timetable_entry_created.send(entry)
     logger.info('Timetable entry %s created by %s', entry, user)
     entry.event.log(EventLogRealm.management, EventLogKind.positive, 'Timetable',
-                    "Entry for {} '{}' created".format(object_type, object_title), user,
+                    f"Entry for {object_type} '{object_title}' created", user,
                     data={'Time': format_datetime(entry.start_dt, timezone=event.tzinfo)})
     if extend_parent:
         entry.extend_parent()
@@ -101,7 +100,7 @@ def update_timetable_entry(entry, data):
         signals.event.timetable_entry_updated.send(entry, changes=changes)
         logger.info('Timetable entry %s updated by %s', entry, session.user)
         entry.event.log(EventLogRealm.management, EventLogKind.change, 'Timetable',
-                        "Entry for {} '{}' modified".format(object_type, object_title), session.user,
+                        f"Entry for {object_type} '{object_title}' modified", session.user,
                         data={'Time': format_datetime(entry.start_dt)})
 
 
@@ -113,7 +112,7 @@ def delete_timetable_entry(entry, log=True):
     if log:
         logger.info('Timetable entry %s deleted by %s', entry, session.user)
         entry.event.log(EventLogRealm.management, EventLogKind.negative, 'Timetable',
-                        "Entry for {} '{}' deleted".format(object_type, object_title), session.user,
+                        f"Entry for {object_type} '{object_title}' deleted", session.user,
                         data={'Time': format_datetime(entry.start_dt)})
 
 

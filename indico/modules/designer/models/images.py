@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import unicode_literals
 
 import posixpath
 
@@ -58,7 +57,7 @@ class DesignerImageFile(StoredFileMixin, db.Model):
     def _build_storage_path(self):
         path_segments = ['designer_templates', strict_unicode(self.template.id), 'images']
         self.assign_id()
-        filename = '{}-{}'.format(self.id, self.filename)
+        filename = f'{self.id}-{self.filename}'
         path = posixpath.join(*(path_segments + [filename]))
         return config.ATTACHMENT_STORAGE, path
 

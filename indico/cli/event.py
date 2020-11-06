@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import unicode_literals
 
 import sys
 
@@ -42,10 +41,10 @@ def restore(event_id, user_id, message):
         click.secho('This event is not deleted', fg='yellow')
         sys.exit(1)
     event.is_deleted = False
-    text = 'Event restored: {}'.format(message) if message else 'Event restored'
+    text = f'Event restored: {message}' if message else 'Event restored'
     event.log(EventLogRealm.event, EventLogKind.positive, 'Event', text, user=user)
     db.session.commit()
-    click.secho('Event undeleted: "{}"'.format(event.title), fg='green')
+    click.secho(f'Event undeleted: "{event.title}"', fg='green')
 
 
 @cli.command()

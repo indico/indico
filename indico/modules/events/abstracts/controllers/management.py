@@ -5,12 +5,10 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import unicode_literals
 
 from operator import itemgetter
 
 from flask import flash, redirect, request, session
-from six.moves import map
 from sqlalchemy.orm import subqueryload
 from werkzeug.exceptions import NotFound
 
