@@ -21,7 +21,7 @@
 {% endblock %}
 
 {% block table_body %}
-    {% for user, person_roles in event_persons.iteritems() -%}
+    {% for user, person_roles in event_persons.items() -%}
         {% set is_judge = person_roles.judge %}
         {% set is_content_reviewer = person_roles.content_reviewer %}
         {% set is_layout_reviewer = person_roles.layout_reviewer %}

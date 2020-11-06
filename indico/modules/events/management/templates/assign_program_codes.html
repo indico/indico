@@ -85,7 +85,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                    {% for object, (code, unused) in codes.viewitems() %}
+                    {% for object, (code, unused) in codes.items() %}
                         {{ render_row(object, code, unused, object_type) }}
                     {% endfor %}
                 </tbody>

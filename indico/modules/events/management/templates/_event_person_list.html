@@ -22,7 +22,7 @@
 {% endblock %}
 
 {% block table_body %}
-    {% for event_person, person_roles in event_persons.iteritems() -%}
+    {% for event_person, person_roles in event_persons.items() -%}
         {% set is_speaker = person_roles.speaker %}
         {% set is_registered = not person_roles.not_registered %}
         <tr class="i-table" data-person-roles="{{ person_roles | tojson | forceescape }}">

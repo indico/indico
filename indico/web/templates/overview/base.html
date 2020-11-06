@@ -35,7 +35,7 @@
                 {% else %}
                     {% block result_list %}
                         <table>
-                            {% for key, items in results.iteritems() %}
+                            {% for key, items in results.items() %}
                                 <tr class="result-group-title">
                                     <td colspan="100%">
                                         {{ result_group_title(key) if result_group_title is defined else key }}

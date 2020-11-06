@@ -1,7 +1,7 @@
 {% extends 'events/logs/entry_base.html' %}
 
 {% macro render_diff(data) %}
-    {% for key, values in data.iteritems() if key != '_diff' %}
+    {% for key, values in data.items() if key != '_diff' %}
         {{ render_row(key, compare(*values), 'diff preformatted') }}
     {% endfor %}
 {% endmacro %}

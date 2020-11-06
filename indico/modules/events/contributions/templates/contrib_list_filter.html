@@ -11,7 +11,7 @@
             <div class="i-label filter">
                 <a class="icon-filter" data-toggle="dropdown"></a>
                 <ul class="i-dropdown" style="display: none">
-                    {% for value, caption in item.filter_choices.iteritems() %}
+                    {% for value, caption in item.filter_choices.items() %}
                         <li>
                             <input type="checkbox" name="field_{{ item_id }}" value="{{ value }}"
                                    id="field-{{ item_id }}-option-{{ value }}"
@@ -54,7 +54,7 @@
 <form class="list-filter" method="POST">
     <h3>{% trans %}Available filtering options{% endtrans %}</h3>
     <div class="flexrow f-wrap">
-        {% for item_id, item in static_items.iteritems() %}
+        {% for item_id, item in static_items.items() %}
             {{ _render_column_selector(item_id, item) }}
         {% endfor %}
     </div>

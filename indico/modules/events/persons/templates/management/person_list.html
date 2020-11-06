@@ -159,7 +159,7 @@
                                 </li>
                             {% endif %}
                         {% endif %}
-                        {% for role_id, role_data in custom_roles.iteritems() %}
+                        {% for role_id, role_data in custom_roles.items() %}
                             <li class="enabled">
                                 <input type="checkbox" id="filter-{{ role_id }}" data-filter="{{ role_id }}" checked>
                                 <i class="icon-checkmark"></i>

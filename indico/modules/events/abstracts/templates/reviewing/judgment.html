@@ -108,7 +108,7 @@
                         <div class="group-review-summary__details">
                             <div id="question-list-{{ track.id }}" class="details-content weak-hidden">
                                 <div class="details-content-inner review-questions">
-                                    {% for question, score in ratings[track.id].iteritems() %}
+                                    {% for question, score in ratings[track.id].items() %}
                                         <div class="details-content-row flexrow f-a-center">
                                             <div>
                                                 <span class="question-index">{{ loop.index }}</span>

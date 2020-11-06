@@ -127,7 +127,7 @@
                                 </span>
                             </li>
                         {% else %}
-                            {% for category in categories.itervalues() %}
+                            {% for category in categories.values() %}
                                 {{ user_category(category.categ, category.path, category.managed) }}
                             {% endfor %}
                         {% endif %}

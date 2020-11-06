@@ -210,7 +210,7 @@
                         {{ day | format_date(format='full', timezone=timezone) }}
                     </div>
                     {% set hidden_count = [] %}
-                    {% for start_time, slot_entries in day_entries.viewitems() %}
+                    {% for start_time, slot_entries in day_entries.items() %}
                         {% set start_time_minutes = (start_time.strftime('%-H')|int*60 + start_time.strftime('%-M')|int) %}
                         {% set next_entry = day_entries.keys()[loop.index] %}
                         {% if next_entry %}

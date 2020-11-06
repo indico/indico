@@ -128,7 +128,7 @@ class IndicoForm(six.with_metaclass(IndicoFormMeta, FlaskForm)):
         field_id = request.args.get('__wtf_ajax')
         if not field_id:
             return False
-        field = next((f for f in six.itervalues(self._fields) if f.id == field_id and isinstance(f, AjaxFieldMixin)), None)
+        field = next((f for f in self._fields.values() if f.id == field_id and isinstance(f, AjaxFieldMixin)), None)
         if not field:
             return False
         rv = field.process_ajax()
@@ -236,7 +236,7 @@ class FormDefaults(object):
 
     def __init__(self, obj=None, attrs=None, skip_attrs=None, **defaults):
         self.__obj = obj
-        self.__use_items = hasattr(obj, 'iteritems') and hasattr(obj, 'get')  # smells like a dict
+        self.__use_items = hasattr(obj, 'items') and hasattr(obj, 'get')  # smells like a dict
         self.__obj_attrs = attrs
         self.__obj_attrs_skip = skip_attrs
         self.__defaults = defaults

@@ -5,7 +5,7 @@
 {% endblock %}
 
 {% block content %}
-    {% for category, plugins in categorized_plugins.iteritems() %}
+    {% for category, plugins in categorized_plugins.items() %}
         <div class="i-plugins-list">
             <h2>{{ category }}</h2>
             <div class="i-badges-list">
