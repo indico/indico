@@ -532,7 +532,7 @@ class Contribution(DescriptionMixin, ProtectionManagersMixin, LocationMixin, Att
 
     def can_manage(self, user, permission=None, allow_admin=True, check_parent=True, explicit_permission=False):
         if super().can_manage(user, permission, allow_admin=allow_admin, check_parent=check_parent,
-                                                explicit_permission=explicit_permission):
+                              explicit_permission=explicit_permission):
             return True
         if (check_parent and self.session_id is not None and
                 self.session.can_manage(user, 'coordinate', allow_admin=allow_admin,

@@ -281,8 +281,8 @@ class RHRegister(RH):
     def _prepare_registration_data(self, form, handler):
         email = form.email.data
         extra_emails = handler.get_all_emails(form) - {email}
-        user_data = {k: v for k, v in form.data.items() if k in {'first_name', 'last_name', 'affiliation',
-                                                                     'address', 'phone'}}
+        user_data = {k: v for k, v in form.data.items()
+                     if k in {'first_name', 'last_name', 'affiliation', 'address', 'phone'}}
         user_data.update(handler.get_extra_user_data(form))
         identity_data = handler.get_identity_data(form)
         settings = {

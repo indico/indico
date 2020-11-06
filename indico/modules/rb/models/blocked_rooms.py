@@ -100,7 +100,7 @@ class BlockedRoom(db.Model):
             ReservationOccurrence.start_dt >= start_dt,
             ReservationOccurrence.end_dt <= end_dt,
             ReservationOccurrence.is_valid,
-            ~ReservationOccurrence.reservation_id.in_(list(map(attrgetter('id'), reservations))) if reservations else True,
+            ~ReservationOccurrence.reservation_id.in_(map(attrgetter('id'), reservations)) if reservations else True,
             *reservation_criteria,
             _join=Reservation
         )

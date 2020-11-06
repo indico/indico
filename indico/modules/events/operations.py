@@ -117,7 +117,8 @@ def create_event(category, event_type, data, add_creator_as_manager=True, featur
                 logger.info('Booking %r created for event %r', booking, event)
                 log_data = {'Room': booking.room.full_name,
                             'Date': booking.start_dt.strftime('%d/%m/%Y'),
-                            'Times': '{} - {}'.format(booking.start_dt.strftime('%H:%M'), booking.end_dt.strftime('%H:%M'))}
+                            'Times': '{} - {}'.format(booking.start_dt.strftime('%H:%M'),
+                                                      booking.end_dt.strftime('%H:%M'))}
                 event.log(EventLogRealm.event, EventLogKind.positive, 'Event', 'Room booked for the event',
                           session.user, data=log_data)
                 db.session.flush()
@@ -126,10 +127,10 @@ def create_event(category, event_type, data, add_creator_as_manager=True, featur
 
 def update_event(event, update_timetable=False, **data):
     assert set(data.keys()) <= {'title', 'description', 'url_shortcut', 'location_data', 'keywords',
-                                    'person_link_data', 'start_dt', 'end_dt', 'timezone', 'keywords', 'references',
-                                    'organizer_info', 'additional_info', 'contact_title', 'contact_emails',
-                                    'contact_phones', 'start_dt_override', 'end_dt_override', 'label', 'label_message',
-                                    'own_map_url'}
+                                'person_link_data', 'start_dt', 'end_dt', 'timezone', 'keywords', 'references',
+                                'organizer_info', 'additional_info', 'contact_title', 'contact_emails',
+                                'contact_phones', 'start_dt_override', 'end_dt_override', 'label', 'label_message',
+                                'own_map_url'}
     old_person_links = event.person_links[:]
     changes = {}
     if (update_timetable or event.type == EventType.lecture) and 'start_dt' in data:
@@ -292,7 +293,7 @@ def _format_person(data):
 
 def update_event_protection(event, data):
     assert set(data.keys()) <= {'protection_mode', 'own_no_access_contact', 'access_key',
-                                    'visibility', 'public_regform_access'}
+                                'visibility', 'public_regform_access'}
     changes = event.populate_from_dict(data)
     db.session.flush()
     signals.event.updated.send(event, changes=changes)
@@ -367,7 +368,7 @@ def sort_reviewing_questions(questions, new_positions):
     for index, new_position in enumerate(new_positions, 0):
         questions_by_id[new_position].position = index
         del questions_by_id[new_position]
-    for index, field in enumerate(sorted(list(questions_by_id.values()), key=attrgetter('position')), len(new_positions)):
+    for index, field in enumerate(sorted(questions_by_id.values(), key=attrgetter('position')), len(new_positions)):
         field.position = index
     db.session.flush()
     logger.info("Reviewing questions of %r reordered by %r", questions[0].event, session.user)

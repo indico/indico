@@ -122,5 +122,4 @@ def get_category_scores(user, debug=False):
     categ_events = defaultdict(list)
     for event in attended:
         categ_events[event.category].append(event)
-    return {categ: _get_category_score(user, categ, events, debug)
-                for categ, events in categ_events.items()}
+    return {categ: _get_category_score(user, categ, events, debug) for categ, events in categ_events.items()}

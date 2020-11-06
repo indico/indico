@@ -590,8 +590,8 @@ class Room(ProtectionManagersMixin, db.Model, Serializer):
     def can_manage(self, user, permission=None, allow_admin=True, check_parent=True, explicit_permission=False):
         if user and user == self.owner and (permission is None or not explicit_permission):
             return True
-        return super().can_manage(user, permission=permission, allow_admin=allow_admin,
-                                            check_parent=check_parent, explicit_permission=explicit_permission)
+        return super().can_manage(user, permission=permission, allow_admin=allow_admin, check_parent=check_parent,
+                                  explicit_permission=explicit_permission)
 
     def can_book(self, user, allow_admin=True):
         # XXX: When changing the logic in here, make sure to update get_permissions_for_user as well!

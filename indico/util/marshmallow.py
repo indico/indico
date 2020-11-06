@@ -232,14 +232,14 @@ class PrincipalList(Field):
             event_id = self.context['event'].id
         try:
             return {principal_from_identifier(identifier,
-                                                 allow_groups=self.allow_groups,
-                                                 allow_external_users=self.allow_external_users,
-                                                 allow_event_roles=self.allow_event_roles,
-                                                 allow_category_roles=self.allow_category_roles,
-                                                 allow_registration_forms=self.allow_registration_forms,
-                                                 allow_emails=self.allow_emails,
-                                                 event_id=event_id)
-                       for identifier in value}
+                                              allow_groups=self.allow_groups,
+                                              allow_external_users=self.allow_external_users,
+                                              allow_event_roles=self.allow_event_roles,
+                                              allow_category_roles=self.allow_category_roles,
+                                              allow_registration_forms=self.allow_registration_forms,
+                                              allow_emails=self.allow_emails,
+                                              event_id=event_id)
+                    for identifier in value}
         except ValueError as exc:
             raise ValidationError(str(exc))
 

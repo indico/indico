@@ -160,7 +160,7 @@ class MultipleItemsField(HiddenField):
                     self.data[i][key] = fn(self.data[i][key])
                 except ValueError:
                     raise ValueError("Invalid value for field '{}': {}".format(self.field_names[key],
-                                                                                escape(item[key])))
+                                                                               escape(item[key])))
 
     def _value(self):
         return self.data or []

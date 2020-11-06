@@ -83,7 +83,7 @@ def test_create_series_for_reservation(dummy_reservation):
 
 def test_create_series(creation_params):
     for occ1, occ2 in zip(list(ReservationOccurrence.iter_create_occurrences(**creation_params)),
-                           ReservationOccurrence.create_series(**creation_params)):
+                          ReservationOccurrence.create_series(**creation_params)):
         assert occ1.start_dt == occ2.start_dt
         assert occ1.end_dt == occ2.end_dt
 

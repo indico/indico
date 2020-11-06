@@ -558,6 +558,9 @@ class CategoryEventFetcher(IteratedDataFetcher, SerializerBase):
     def _build_event_api_data(self, event):
         can_manage = self.user is not None and event.can_manage(self.user)
         data = self._build_event_api_data_base(event)
+        material_data = build_material_legacy_api_data(event)
+        if legacy_note_material := build_note_legacy_api_data(event.note):
+            material_data.append(legacy_note_material)
         data.update({
             '_fossil': self.fossils_mapping['event'].get(self._detail_level),
             'categoryId': event.category_id,
@@ -571,7 +574,7 @@ class CategoryEventFetcher(IteratedDataFetcher, SerializerBase):
             'roomMapURL': event.room.map_url if event.room else None,
             'folders': build_folders_api_data(event),
             'chairs': self._serialize_persons(event.person_links, person_type='ConferenceChair', can_manage=can_manage),
-            'material': build_material_legacy_api_data(event) + [_f for _f in [build_note_legacy_api_data(event.note)] if _f],
+            'material': material_data,
             'keywords': event.keywords,
         })
 

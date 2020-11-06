@@ -112,7 +112,7 @@ class IndicoCelery(Celery):
                     options['headers'] = options.get('headers') or {}  # None in a retry
                     options['headers']['indico_plugin'] = current_plugin.name
                 return super().apply_async(args=args, kwargs=kwargs, task_id=task_id, producer=producer,
-                                                        link=link, link_error=link_error, shadow=shadow, **options)
+                                           link=link, link_error=link_error, shadow=shadow, **options)
 
             def __call__(s, *args, **kwargs):
                 stack = ExitStack()

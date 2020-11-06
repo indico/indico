@@ -139,7 +139,7 @@ class SwitchWidget(JinjaWidget):
             'checked': getattr(field, 'checked', field.data)
         })
         return super().__call__(field, kwargs=kwargs, confirm_enable=self.confirm_enable,
-                                                  confirm_disable=self.confirm_disable)
+                                confirm_disable=self.confirm_disable)
 
 
 class SyncedInputWidget(JinjaWidget):
@@ -207,11 +207,11 @@ class SelectizeWidget(JinjaWidget):
 
         options.update(kwargs.pop('options', {}))
         return super().__call__(field, options=options,
-                                                     search_url=getattr(field, 'search_url', self.search_url),
-                                                     search_method=self.search_method,
-                                                     search_payload=getattr(field, 'search_payload', None),
-                                                     min_trigger_length=self.min_trigger_length, preload=self.preload,
-                                                     allow_by_id=self.allow_by_id, input_args=kwargs)
+                                search_url=getattr(field, 'search_url', self.search_url),
+                                search_method=self.search_method,
+                                search_payload=getattr(field, 'search_payload', None),
+                                min_trigger_length=self.min_trigger_length, preload=self.preload,
+                                allow_by_id=self.allow_by_id, input_args=kwargs)
 
 
 class TypeaheadWidget(JinjaWidget):
@@ -236,7 +236,7 @@ class TypeaheadWidget(JinjaWidget):
             options.update(self.typeahead_options)
         options.update(kwargs.pop('options', {}))
         return super().__call__(field, options=options, min_trigger_length=self.min_trigger_length,
-                                                     search_url=self.search_url, choices=getattr(field, 'choices', []))
+                                search_url=self.search_url, choices=getattr(field, 'choices', []))
 
 
 class LocationWidget(JinjaWidget):
@@ -257,8 +257,8 @@ class LocationWidget(JinjaWidget):
                   if field.object_data and field.object_data.get('source') and field.allow_location_inheritance
                   else ('', ''))
         return super().__call__(field, rooms=rooms, venues=venues, parent=parent,
-                                                    source=field.object_data.get('source'), venue_map=venue_map,
-                                                    init_inheritance=field.object_data.get('inheriting'))
+                                source=field.object_data.get('source'), venue_map=venue_map,
+                                init_inheritance=field.object_data.get('inheriting'))
 
     def _get_parent_info(self, obj, inheriting):
         parent = obj.location_parent if not inheriting else obj
@@ -285,8 +285,7 @@ class ColorPickerWidget(JinjaWidget):
     """Render a colorpicker input field."""
 
     def __init__(self, show_field=True):
-        super().__init__('forms/color_picker_widget.html', single_line=True,
-                                                show_field=show_field)
+        super().__init__('forms/color_picker_widget.html', single_line=True, show_field=show_field)
 
     def __call__(self, field, **kwargs):
         return super().__call__(field, input_args=kwargs)

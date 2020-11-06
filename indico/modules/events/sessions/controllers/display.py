@@ -52,8 +52,7 @@ class RHDisplaySession(RHDisplaySessionBase):
 
     def _process(self):
         ical_params = get_base_ical_parameters(session.user, 'sessions',
-                                               '/export/event/{}/session/{}.ics'.format(self.event.id,
-                                                                                          self.session.id))
+                                               f'/export/event/{self.event.id}/session/{self.session.id}.ics')
         contributions_strategy = subqueryload('contributions')
         contributions_strategy.joinedload('track')
         _contrib_tte_strategy = contributions_strategy.joinedload('timetable_entry')

@@ -102,8 +102,9 @@ class RHRegistrationFormMoveSection(RHManageRegFormSectionBase):
                 return (old_position < section.position <= new_position and section.id != self.section.id
                         and not section.is_deleted and section.is_enabled)
             start_enum = self.section.position
-        to_update = list(filter(fn, RegistrationFormSection.find(registration_form=self.regform, is_deleted=False)
-                                                      .order_by(RegistrationFormSection.position).all()))
+        to_update = list(filter(fn,
+                                RegistrationFormSection.find(registration_form=self.regform, is_deleted=False)
+                                .order_by(RegistrationFormSection.position).all()))
         self.section.position = new_position
         for pos, section in enumerate(to_update, start_enum):
             section.position = pos

@@ -37,24 +37,23 @@ class AbstractListGeneratorBase(ListGeneratorBase):
         }
         track_empty = {None: _('No track')}
         type_empty = {None: _('No type')}
-        track_choices = OrderedDict((str(t.id), t.title) for t in sorted(self.event.tracks,
-                                                                             key=attrgetter('title')))
+        track_choices = OrderedDict((str(t.id), t.title) for t in sorted(self.event.tracks, key=attrgetter('title')))
         type_choices = OrderedDict((str(t.id), t.name) for t in sorted(self.event.contribution_types,
-                                                                           key=attrgetter('name')))
+                                                                       key=attrgetter('name')))
         self.static_items = OrderedDict([
             ('state', {'title': _('State'), 'filter_choices': {state.value: state.title for state in AbstractState}}),
             ('submitter', {'title': _('Submitter')}),
             ('authors', {'title': _('Primary authors')}),
             ('accepted_track', {'title': _('Accepted track'),
-                                'filter_choices': OrderedDict(list(track_empty.items()) + list(track_choices.items()))}),
+                                'filter_choices': OrderedDict(track_empty.items() | track_choices.items())}),
             ('submitted_for_tracks', {'title': _('Submitted for tracks'),
-                                      'filter_choices': OrderedDict(list(track_empty.items()) + list(track_choices.items()))}),
+                                      'filter_choices': OrderedDict(track_empty.items() | track_choices.items())}),
             ('reviewed_for_tracks', {'title': _('Reviewed for tracks'),
-                                     'filter_choices': OrderedDict(list(track_empty.items()) + list(track_choices.items()))}),
+                                     'filter_choices': OrderedDict(track_empty.items() | track_choices.items())}),
             ('accepted_contrib_type', {'title': _('Accepted type'),
-                                       'filter_choices': OrderedDict(list(type_empty.items()) + list(type_choices.items()))}),
+                                       'filter_choices': OrderedDict(type_empty.items() | type_choices.items())}),
             ('submitted_contrib_type', {'title': _('Submitted type'),
-                                        'filter_choices': OrderedDict(list(type_empty.items()) + list(type_choices.items()))}),
+                                        'filter_choices': OrderedDict(type_empty.items() | type_choices.items())}),
             ('score', {'title': _('Score')}),
             ('submitted_dt', {'title': _('Submission date')}),
             ('modified_dt', {'title': _('Modification date')})

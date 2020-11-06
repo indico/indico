@@ -39,18 +39,17 @@ class ContributionListGenerator(ListGeneratorBase):
         track_empty = {None: _('No track')}
         type_empty = {None: _('No type')}
         session_choices = OrderedDict((str(s.id), s.title) for s in sorted(self.event.sessions,
-                                                                               key=attrgetter('title')))
-        track_choices = OrderedDict((str(t.id), t.title) for t in sorted(self.event.tracks,
-                                                                             key=attrgetter('title')))
+                                                                           key=attrgetter('title')))
+        track_choices = OrderedDict((str(t.id), t.title) for t in sorted(self.event.tracks, key=attrgetter('title')))
         type_choices = OrderedDict((str(t.id), t.name) for t in sorted(self.event.contribution_types,
-                                                                           key=attrgetter('name')))
+                                                                       key=attrgetter('name')))
         self.static_items = OrderedDict([
             ('session', {'title': _('Session'),
-                         'filter_choices': OrderedDict(list(session_empty.items()) + list(session_choices.items()))}),
+                         'filter_choices': OrderedDict(session_empty | session_choices)}),
             ('track', {'title': _('Track'),
-                       'filter_choices': OrderedDict(list(track_empty.items()) + list(track_choices.items()))}),
+                       'filter_choices': OrderedDict(track_empty | track_choices)}),
             ('type', {'title': _('Type'),
-                      'filter_choices': OrderedDict(list(type_empty.items()) + list(type_choices.items()))}),
+                      'filter_choices': OrderedDict(type_empty | type_choices)}),
             ('status', {'title': _('Status'), 'filter_choices': {'scheduled': _('Scheduled'),
                                                                  'unscheduled': _('Not scheduled')}}),
             ('speakers', {'title': _('Speakers'), 'filter_choices': {'registered': _('Registered'),

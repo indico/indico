@@ -184,8 +184,7 @@ class IndicoDateField(DateField):
 
     def __init__(self, *args, **kwargs):
         self.allow_clear = kwargs.pop('allow_clear', None)
-        super().__init__(*args, parse_kwargs={'dayfirst': True},
-                                              display_format='%d/%m/%Y', **kwargs)
+        super().__init__(*args, parse_kwargs={'dayfirst': True}, display_format='%d/%m/%Y', **kwargs)
         if self.allow_clear is None:
             self.allow_clear = not self.flags.required
 

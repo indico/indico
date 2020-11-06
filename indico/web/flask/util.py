@@ -202,8 +202,8 @@ def url_rule_to_js(endpoint):
                     } for is_dynamic, data in rule._trace
                 ],
                 'converters': {key: type(converter).__name__
-                                   for key, converter in rule._converters.items()
-                                   if not isinstance(converter, UnicodeConverter)}
+                               for key, converter in rule._converters.items()
+                               if not isinstance(converter, UnicodeConverter)}
             } for rule in current_app.url_map.iter_rules(endpoint)
         ]
     }

@@ -500,8 +500,7 @@ def format_full_name(first_name, last_name, title=None, last_name_first=True, la
         full_name = last_name
     else:
         first_name = '{}.'.format(first_name[0].upper()) if abbrev_first_name else first_name
-        full_name = f'{last_name}, {first_name}' if last_name_first else '{} {}'.format(first_name,
-                                                                                                    last_name)
+        full_name = f'{last_name}, {first_name}' if last_name_first else f'{first_name} {last_name}'
     return full_name if not show_title or not title else f'{title} {full_name}'
 
 

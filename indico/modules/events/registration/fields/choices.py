@@ -108,8 +108,7 @@ class ChoiceBaseField(RegistrationFormBillableItemsField):
 
     @classmethod
     def process_field_data(cls, data, old_data=None, old_versioned_data=None):
-        unversioned_data, versioned_data = super().process_field_data(data, old_data,
-                                                                                          old_versioned_data)
+        unversioned_data, versioned_data = super().process_field_data(data, old_data, old_versioned_data)
         items = [x for x in versioned_data['choices'] if not x.get('remove')]
         captions = dict(old_data['captions']) if old_data is not None else {}
         if cls.has_default_item:
@@ -183,8 +182,7 @@ class SingleChoiceField(ChoiceBaseField):
         # always store no-option as empty dict
         if value is None:
             value = {}
-        return super().process_form_data(registration, value, old_data, billable_items_locked,
-                                                                new_data_version)
+        return super().process_form_data(registration, value, old_data, billable_items_locked, new_data_version)
 
 
 def _hashable_choice(choice):
@@ -268,7 +266,7 @@ class MultiChoiceField(ChoiceBaseField):
 
         if not billable_items_locked:
             processed_data = super().process_form_data(registration, value, old_data, False,
-                                                                             return_value.get('field_data'))
+                                                       return_value.get('field_data'))
             return {key: return_value.get(key, value) for key, value in processed_data.items()}
         # XXX: This code still relies on the client sending data for the disabled fields.
         # This is pretty ugly but especially in case of non-billable extra slots it makes
@@ -290,7 +288,7 @@ class MultiChoiceField(ChoiceBaseField):
             # for now we simply ignore field changes in this case (since the old/new price
             # check in the base method will fail)
             processed_data = super().process_form_data(registration, value, old_data, True,
-                                                                             return_value.get('field_data'))
+                                                       return_value.get('field_data'))
             return {key: return_value.get(key, value) for key, value in processed_data.items()}
 
 
@@ -309,8 +307,7 @@ class AccommodationField(RegistrationFormBillableItemsField):
 
     @classmethod
     def process_field_data(cls, data, old_data=None, old_versioned_data=None):
-        unversioned_data, versioned_data = super().process_field_data(data, old_data,
-                                                                                             old_versioned_data)
+        unversioned_data, versioned_data = super().process_field_data(data, old_data, old_versioned_data)
         items = [x for x in versioned_data['choices'] if not x.get('remove')]
         captions = dict(old_data['captions']) if old_data is not None else {}
         for item in items:
@@ -416,8 +413,7 @@ class AccommodationField(RegistrationFormBillableItemsField):
             if not is_no_accommodation:
                 data.update({'arrival_date': value['arrivalDate'],
                              'departure_date': value['departureDate']})
-        return super().process_form_data(registration, data, old_data, billable_items_locked,
-                                                                 new_data_version)
+        return super().process_form_data(registration, data, old_data, billable_items_locked, new_data_version)
 
     def get_places_used(self):
         places_used = Counter()

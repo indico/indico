@@ -107,8 +107,8 @@ class DataItem(namedtuple('DataItem', ['regs', 'attendance', 'capacity', 'billab
         :param unpaid_amount: float -- amount not already paid by
                               registrants
         """
-        return super().__new__(cls, regs, attendance, capacity, billable, cancelled, price, fixed_price,
-                                            paid, paid_amount, unpaid, unpaid_amount)
+        return super().__new__(cls, regs, attendance, capacity, billable, cancelled, price, fixed_price, paid,
+                               paid_amount, unpaid, unpaid_amount)
 
 
 class FieldStats:

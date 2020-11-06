@@ -151,10 +151,9 @@ class RHPersonsBase(RHManageEventBase):
 
             event_user_roles_data = {}
             for role in event_user_roles[event_person.user]:
-                event_user_roles_data[f'custom_{role.id}'] = {'name': role.name, 'code': role.code,
-                                                                      'css': role.css}
+                event_user_roles_data[f'custom_{role.id}'] = {'name': role.name, 'code': role.code, 'css': role.css}
             event_user_roles_data = OrderedDict(sorted(list(event_user_roles_data.items()), key=lambda t: t[1]['code']))
-            data['roles'] = OrderedDict(list(data['roles'].items()) + list(event_user_roles_data.items()))
+            data['roles'] = OrderedDict(data['roles'] | event_user_roles_data)
 
             event_person_users.add(event_person.user)
 
@@ -168,9 +167,8 @@ class RHPersonsBase(RHManageEventBase):
             for role in roles:
                 user_metadata = internal_role_users[user.email]
                 user_metadata['person'] = user
-                user_metadata['roles'][f'custom_{role.id}'] = {'name': role.name, 'code': role.code,
-                                                                       'css': role.css}
-            user_metadata['roles'] = OrderedDict(sorted(list(user_metadata['roles'].items()), key=lambda x: x[1]['code']))
+                user_metadata['roles'][f'custom_{role.id}'] = {'name': role.name, 'code': role.code, 'css': role.css}
+            user_metadata['roles'] = OrderedDict(sorted(user_metadata['roles'].items(), key=lambda x: x[1]['code']))
 
         # Some EventPersons will have no roles since they were connected to deleted things
         persons = {email: data for email, data in persons.items() if any(data['roles'].values())}

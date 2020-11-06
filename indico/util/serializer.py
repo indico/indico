@@ -33,8 +33,7 @@ class Serializer:
                 elif isinstance(v, list):
                     v = [e.to_serializable() for e in v]
                 elif isinstance(v, dict):
-                    v = {k: vv.to_serializable() if isinstance(vv, Serializer) else vv
-                             for k, vv in v.items()}
+                    v = {k: vv.to_serializable() if isinstance(vv, Serializer) else vv for k, vv in v.items()}
                 elif isinstance(v, Enum):
                     v = v.name
                 if type(v) in converters:

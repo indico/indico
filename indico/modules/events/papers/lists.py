@@ -38,12 +38,11 @@ class PaperListGeneratorBase(ListGeneratorBase):
         type_empty = {None: _('No type')}
         state_choices = OrderedDict((state.value, state.title) for state in PaperRevisionState)
         unassigned_choices = OrderedDict((role.value, role.title) for role in PaperReviewingRole)
-        track_choices = OrderedDict((str(t.id), t.title) for t in sorted(self.event.tracks,
-                                                                             key=attrgetter('title')))
+        track_choices = OrderedDict((str(t.id), t.title) for t in sorted(self.event.tracks, key=attrgetter('title')))
         session_choices = OrderedDict((str(s.id), s.title) for s in sorted(self.event.sessions,
-                                                                               key=attrgetter('title')))
+                                                                           key=attrgetter('title')))
         type_choices = OrderedDict((str(t.id), t.name) for t in sorted(self.event.contribution_types,
-                                                                           key=attrgetter('name')))
+                                                                       key=attrgetter('name')))
 
         if not event.cfp.content_reviewing_enabled:
             del unassigned_choices[PaperReviewingRole.content_reviewer.value]
@@ -51,14 +50,10 @@ class PaperListGeneratorBase(ListGeneratorBase):
             del unassigned_choices[PaperReviewingRole.layout_reviewer.value]
 
         self.static_items = OrderedDict([
-            ('state', {'title': _('State'),
-                       'filter_choices': OrderedDict(list(state_not_submitted.items()) + list(state_choices.items()))}),
-            ('track', {'title': _('Track'),
-                       'filter_choices': OrderedDict(list(track_empty.items()) + list(track_choices.items()))}),
-            ('session', {'title': _('Session'),
-                         'filter_choices': OrderedDict(list(session_empty.items()) + list(session_choices.items()))}),
-            ('type', {'title': _('Type'),
-                      'filter_choices': OrderedDict(list(type_empty.items()) + list(type_choices.items()))}),
+            ('state', {'title': _('State'), 'filter_choices': OrderedDict(state_not_submitted | state_choices)}),
+            ('track', {'title': _('Track'), 'filter_choices': OrderedDict(track_empty | track_choices)}),
+            ('session', {'title': _('Session'), 'filter_choices': OrderedDict(session_empty | session_choices)}),
+            ('type', {'title': _('Type'), 'filter_choices': OrderedDict(type_empty | type_choices)}),
             ('unassigned', {'title': _('Unassigned'), 'filter_choices': unassigned_choices}),
         ])
         self.list_config = self._get_config()
