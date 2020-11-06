@@ -42,12 +42,12 @@ jobs:
 
       - name: Install system dependencies
         if: steps.cache-pip.outputs.cache-hit != 'true'
-        run: sudo apt-get install libpq-dev python-virtualenv
+        run: sudo apt-get install libpq-dev
 
       - name: Install python dependencies
         if: steps.cache-pip.outputs.cache-hit != 'true'
         run: |
-          virtualenv -p /usr/bin/python3.9 .venv
+          python3.9 -m venv .venv
           source .venv/bin/activate
           pip install -U pip setuptools
           pip install -r requirements.dev.txt
