@@ -5,24 +5,25 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-
 import os
 import pickle
 import tempfile
 from datetime import date
+from email.utils import make_msgid
 
 import click
 from celery.exceptions import MaxRetriesExceededError, Retry
 from sqlalchemy.orm.attributes import flag_modified
+from werkzeug.urls import url_parse
 
 from indico.core.celery import celery
 from indico.core.config import config
 from indico.core.db import db
 from indico.core.logger import Logger
 from indico.util.date_time import now_utc
-from indico.util.emails.backend import EmailBackend
-from indico.util.emails.message import EmailMessage
 from indico.util.string import truncate
+from indico.vendor.django_mail import get_connection
+from indico.vendor.django_mail.message import EmailMessage
 
 
 logger = Logger.get('emails')
@@ -80,7 +81,7 @@ def do_send_email(email, log_entry=None, _from_task=False):
     :param _from_task: Indicates that this function is called from
                        the celery task responsible for sending emails.
     """
-    with EmailBackend(timeout=config.SMTP_TIMEOUT) as conn:
+    with get_connection() as conn:
         msg = EmailMessage(subject=email['subject'], body=email['body'], from_email=email['from'],
                            to=email['to'], cc=email['cc'], bcc=email['bcc'], reply_to=email['reply_to'],
                            attachments=email['attachments'], connection=conn)
@@ -88,6 +89,7 @@ def do_send_email(email, log_entry=None, _from_task=False):
             msg.extra_headers['To'] = 'Undisclosed-recipients:;'
         if email['html']:
             msg.content_subtype = 'html'
+        msg.extra_headers['message-id'] = make_msgid(domain=url_parse(config.BASE_URL).host)
         msg.send()
     if not _from_task:
         logger.info('Sent email "%s"', truncate(email['subject'], 100))

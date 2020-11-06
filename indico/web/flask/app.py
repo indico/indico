@@ -91,6 +91,7 @@ def configure_app(app, set_path=False):
     if config.USE_PROXY:
         app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_proto=1, x_host=1)
     configure_webpack(app)
+    configure_emails(app, config)
 
 
 def configure_cache(app, config):
@@ -146,6 +147,18 @@ def configure_webpack(app):
     app.config['WEBPACKEXT_PROJECT'] = project
     app.config['WEBPACKEXT_MANIFEST_LOADER'] = IndicoManifestLoader
     app.config['WEBPACKEXT_MANIFEST_PATH'] = os.path.join('dist', 'manifest.json')
+
+
+def configure_emails(app, config):
+    # TODO: use more straightforward mapping between EMAIL_* app settings and indico.conf settings
+    app.config['EMAIL_BACKEND'] = 'indico.vendor.django_mail.backends.smtp.EmailBackend'
+    app.config['EMAIL_HOST'] = config.SMTP_SERVER[0]
+    app.config['EMAIL_PORT'] = config.SMTP_SERVER[1]
+    app.config['EMAIL_HOST_USER'] = config.SMTP_LOGIN
+    app.config['EMAIL_HOST_PASSWORD'] = config.SMTP_PASSWORD
+    app.config['EMAIL_USE_TLS'] = config.SMTP_USE_TLS
+    app.config['EMAIL_USE_SSL'] = False
+    app.config['EMAIL_TIMEOUT'] = config.SMTP_TIMEOUT
 
 
 def configure_xsendfile(app, method):
