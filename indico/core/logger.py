@@ -9,10 +9,7 @@ import logging
 import logging.config
 import logging.handlers
 import os
-import smtplib
 import warnings
-from email.mime.text import MIMEText
-from email.utils import formatdate
 from pprint import pformat
 
 import yaml
@@ -60,33 +57,6 @@ class RequestInfoFormatter(logging.Formatter):
 class FormattedSubjectSMTPHandler(logging.handlers.SMTPHandler):
     def getSubject(self, record):
         return self.subject % record.__dict__
-
-    def emit(self, record):
-        # This is the same as the original SMTPHandler's method, but
-        # using MIMEText instead of string operations (which are not
-        # compatible with unicode)
-        try:
-            port = self.mailport
-            if not port:
-                port = smtplib.SMTP_PORT
-            smtp = smtplib.SMTP(self.mailhost, port, timeout=self._timeout)
-            msg = MIMEText(self.format(record), 'plain', 'utf-8')
-            msg['From'] = self.fromaddr
-            msg['To'] = ', '.join(self.toaddrs)
-            msg['Subject'] = self.getSubject(record)
-            msg['Date'] = formatdate()
-            if self.username:
-                if self.secure is not None:
-                    smtp.ehlo()
-                    smtp.starttls(*self.secure)
-                    smtp.ehlo()
-                smtp.login(self.username, self.password)
-            smtp.sendmail(self.fromaddr, self.toaddrs, msg.as_string())
-            smtp.quit()
-        except (KeyboardInterrupt, SystemExit):
-            raise
-        except Exception:
-            self.handleError(record)
 
 
 class BlacklistFilter(logging.Filter):
