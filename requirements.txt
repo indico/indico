@@ -46,7 +46,7 @@ pojson==0.7
 prompt-toolkit<4.0.0,>=3.0.8
 psycopg2==2.8.6
 pycountry==19.8.18
-pyPdf==1.13
+PyPDF2==1.26.0
 pytest-cov==2.10.1
 pytest-localserver==0.5.0
 pytest-mock==2.0.0

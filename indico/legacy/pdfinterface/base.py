@@ -264,20 +264,6 @@ class Preformatted(platypus.Preformatted):
         return self._part
 
 
-class FileDummy:
-    def __init__(self):
-        self._data = ""
-        self.name = "fileDummy"
-
-    def write(self, data):
-        self._data += data
-
-    def getData(self):
-        return self._data
-
-    def close(self):
-        pass
-
 class CanvasA0(Canvas):
     def __init__(self,filename,
                  pagesize=None,
@@ -368,7 +354,7 @@ class PDFBase:
             #create a new document
             #As the constructor of SimpleDocTemplate can take only a filename or a file object,
             #to keep the PDF data not in a file, we use a dummy file object which save the data in a string
-            self._fileDummy = FileDummy()
+            self._fileDummy = BytesIO()
             if printLandscape:
                 self._doc = SimpleDocTemplate(self._fileDummy, pagesize=landscape(PDFSizes().PDFpagesizes[pagesize]))
             else:
@@ -414,7 +400,7 @@ class PDFBase:
         self.getBody()
         self._doc.build(self._story, onFirstPage=self.firstPage, onLaterPages=self.laterPages)
         #return the data from the fileDummy
-        return self._fileDummy.getData()
+        return self._fileDummy.getvalue()
 
     def _drawWrappedString(self, c, text, font='Times-Bold', size=30, color=(0, 0, 0), align="center", width=None,
                            height=None, measurement=cm, lineSpacing=1, maximumWidth=None):
@@ -465,8 +451,7 @@ class PDFBase:
                 startHeight = self._PAGE_HEIGHT
 
                 if drawTitle:
-                    startHeight = self._drawWrappedString(c, escape(self.event.title.encode('utf-8')),
-                                                          height=self._PAGE_HEIGHT - inch)
+                    startHeight = self._drawWrappedString(c, escape(self.event.title), height=self._PAGE_HEIGHT - inch)
 
                 # lower edge of the image
                 startHeight = startHeight - inch / 2 - height
@@ -476,8 +461,7 @@ class PDFBase:
                 return startHeight
             except OSError:
                 if drawTitle:
-                    self._drawWrappedString(c, escape(self.event.title.encode('utf-8')),
-                                            height=self._PAGE_HEIGHT - inch)
+                    self._drawWrappedString(c, escape(self.event.title), height=self._PAGE_HEIGHT - inch)
         return 0
 
 
@@ -554,7 +538,7 @@ class DocTemplateWithTOC(SimpleDocTemplate):
         SimpleDocTemplate.multiBuild(self, story, maxPasses, canvasmaker=canvasMaker)
         self._prepareTOC()
         contentFile = self.filename
-        self.filename = FileDummy()
+        self.filename = BytesIO()
         self.pageTemplates = []
         self.addPageTemplates([PageTemplate(id='First',frames=frameT, onPage=onFirstPage,pagesize=self.pagesize)])
         if onFirstPage is _doNothing and hasattr(self,'onFirstPage'):
@@ -566,22 +550,19 @@ class DocTemplateWithTOC(SimpleDocTemplate):
         self.mergePDFs(self.filename, contentFile)
 
     def mergePDFs(self, pdf1, pdf2):
-        from pyPdf import PdfFileReader, PdfFileWriter
-        outputStream = BytesIO()
-        pdf1Stream = BytesIO()
-        pdf2Stream = BytesIO()
-        pdf1Stream.write(pdf1.getData())
-        pdf2Stream.write(pdf2.getData())
+        from PyPDF2 import PdfFileReader, PdfFileWriter
         output = PdfFileWriter()
-        background_pages = PdfFileReader(pdf1Stream)
-        foreground_pages = PdfFileReader(pdf2Stream)
+        background_pages = PdfFileReader(pdf1)
+        foreground_pages = PdfFileReader(pdf2)
         for page in background_pages.pages:
             output.addPage(page)
         for page in foreground_pages.pages:
             output.addPage(page)
-        output.write(outputStream)
-        pdf2._data = outputStream.getvalue()
-        outputStream.close()
+        outputbuf = BytesIO()
+        output.write(outputbuf)
+        pdf2.seek(0)
+        pdf2.truncate()
+        pdf2.write(outputbuf.getvalue())
 
     def getCurrentPart(self):
         return self._part
@@ -599,7 +580,7 @@ class PDFWithTOC(PDFBase):
             self._story.append(Spacer(inch, 0*cm))
 
         self._indexedFlowable = {}
-        self._fileDummy = FileDummy()
+        self._fileDummy = BytesIO()
 
         self._doc = DocTemplateWithTOC(self._indexedFlowable, self._fileDummy, firstPageNumber=firstPageNumber,
                                        pagesize=PDFSizes().PDFpagesizes[pagesize],
@@ -638,4 +619,4 @@ class PDFWithTOC(PDFBase):
     def getPDFBin(self):
         self.getBody()
         self._doc.multiBuild(self._story, onFirstPage=self.firstPage, onLaterPages=self.laterPages)
-        return self._fileDummy.getData()
+        return self._fileDummy.getvalue()
