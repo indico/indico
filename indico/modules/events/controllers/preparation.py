@@ -5,38 +5,42 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import unicode_literals
 
 from uuid import uuid4
 
-from flask import jsonify, request
+from flask import jsonify
+from pytz import timezone
 from webargs import fields
 
 from indico.legacy.common.cache import GenericCache
+from indico.util.marshmallow import NaiveDateTime
 from indico.web.args import use_kwargs
 from indico.web.rh import RH
+from indico.web.util import url_for_index
 
 
 class RHPrepareEvent(RH):
     """Prepare a new event, store it using GenericCache util, and create a UUID."""
 
     CSRF_ENABLED = False
-    _cache = GenericCache('event-preparation')
 
     @use_kwargs({
-        'title': fields.String(missing=""),
-        'start_dt': fields.String(missing=""),
+        'title': fields.String(required=True),
+        'start_dt': NaiveDateTime(required=True),
+        'tz': fields.String(),
         'duration': fields.Integer(),
     })
-    def _process(self, title, start_dt, duration):
-        event_key = unicode(uuid4())
-        self._cache.set(
+    def _process(self, title, start_dt, tz, duration):
+        event_key = str(uuid4())
+        cache = GenericCache('event-preparation')
+        start_dt = timezone(tz).localize(start_dt)
+        cache.set(
             event_key,
             {
-                "title": title,
-                "start_dt": start_dt,
-                "duration": duration,
-                },
-            90
+                'title': title,
+                'start_dt': start_dt,
+                'duration': duration,
+            },
+            3600
         )
-        return jsonify(url="{}#create-event:meeting::{}".format(request.url_root, event_key))
+        return jsonify(url=url_for_index(_external=True, _anchor=f'create-event:meeting::{event_key}'))
