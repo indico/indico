@@ -70,8 +70,17 @@ class TextPreviewer(Previewer):
     @classmethod
     def generate_content(cls, attachment):
         with attachment.file.open() as f:
-            return render_template(cls.TEMPLATES_DIR + 'text_preview.html', attachment=attachment,
-                                   text=f.read().decode())
+            content = f.read()
+            try:
+                text = content.decode()  # utf-8
+            except UnicodeDecodeError:
+                try:
+                    text = content.decode('latin1')
+                except UnicodeDecodeError:
+                    # not sure if there's anything where latin1 decoding fails, but just in
+                    # case we decode such a file as utf-8 and replace anything that's invalid
+                    text = content.decode(errors='replace')
+            return render_template(cls.TEMPLATES_DIR + 'text_preview.html', attachment=attachment, text=text)
 
 
 def get_file_previewer(attachment_file):
