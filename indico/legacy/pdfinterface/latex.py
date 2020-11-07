@@ -72,7 +72,7 @@ class PDFLaTeXBase:
                     if f.startswith('.') or f.endswith(('.py', '.pyc', '.pyo')):
                         continue
                     file_path = os.path.join(dirpath, f)
-                    archive_name = os.path.relpath(file_path, self.source_dir).encode('utf-8')
+                    archive_name = os.path.relpath(file_path, self.source_dir)
                     zip_handler.write(os.path.abspath(file_path), archive_name)
         buf.seek(0)
         return buf
@@ -125,8 +125,6 @@ class RawLatex(str):
 def _latex_escape(s, ignore_braces=False):
     if not isinstance(s, str) or isinstance(s, RawLatex):
         return s
-    if isinstance(s, str):
-        s = s.decode('utf-8')
     return RawLatex(mdx_latex.latex_escape(s, ignore_braces=ignore_braces))
 
 
