@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from collections import OrderedDict
 from operator import attrgetter
 
 from flask import flash, request, session
@@ -36,27 +35,21 @@ class AbstractListGeneratorBase(ListGeneratorBase):
         }
         track_empty = {None: _('No track')}
         type_empty = {None: _('No type')}
-        track_choices = OrderedDict((str(t.id), t.title) for t in sorted(self.event.tracks, key=attrgetter('title')))
-        type_choices = OrderedDict((str(t.id), t.name) for t in sorted(self.event.contribution_types,
-                                                                       key=attrgetter('name')))
-        self.static_items = OrderedDict([
-            ('state', {'title': _('State'), 'filter_choices': {state.value: state.title for state in AbstractState}}),
-            ('submitter', {'title': _('Submitter')}),
-            ('authors', {'title': _('Primary authors')}),
-            ('accepted_track', {'title': _('Accepted track'),
-                                'filter_choices': OrderedDict(track_empty.items() | track_choices.items())}),
-            ('submitted_for_tracks', {'title': _('Submitted for tracks'),
-                                      'filter_choices': OrderedDict(track_empty.items() | track_choices.items())}),
-            ('reviewed_for_tracks', {'title': _('Reviewed for tracks'),
-                                     'filter_choices': OrderedDict(track_empty.items() | track_choices.items())}),
-            ('accepted_contrib_type', {'title': _('Accepted type'),
-                                       'filter_choices': OrderedDict(type_empty.items() | type_choices.items())}),
-            ('submitted_contrib_type', {'title': _('Submitted type'),
-                                        'filter_choices': OrderedDict(type_empty.items() | type_choices.items())}),
-            ('score', {'title': _('Score')}),
-            ('submitted_dt', {'title': _('Submission date')}),
-            ('modified_dt', {'title': _('Modification date')})
-        ])
+        track_choices = {str(t.id): t.title for t in sorted(self.event.tracks, key=attrgetter('title'))}
+        type_choices = {str(t.id): t.name for t in sorted(self.event.contribution_types, key=attrgetter('name'))}
+        self.static_items = {
+            'state': {'title': _('State'), 'filter_choices': {state.value: state.title for state in AbstractState}},
+            'submitter': {'title': _('Submitter')},
+            'authors': {'title': _('Primary authors')},
+            'accepted_track': {'title': _('Accepted track'), 'filter_choices': track_empty | track_choices},
+            'submitted_for_tracks': {'title': _('Submitted for tracks'), 'filter_choices': track_empty | track_choices},
+            'reviewed_for_tracks': {'title': _('Reviewed for tracks'), 'filter_choices': track_empty | track_choices},
+            'accepted_contrib_type': {'title': _('Accepted type'), 'filter_choices': type_empty | type_choices},
+            'submitted_contrib_type': {'title': _('Submitted type'), 'filter_choices': type_empty | type_choices},
+            'score': {'title': _('Score')},
+            'submitted_dt': {'title': _('Submission date')},
+            'modified_dt': {'title': _('Modification date')}
+        }
         self.extra_filters = {}
         self.list_config = self._get_config()
 
@@ -222,10 +215,10 @@ class AbstractListGeneratorManagement(AbstractListGeneratorBase):
         self.default_list_config['items'] = ('submitted_contrib_type', 'accepted_contrib_type', 'state')
         if event.tracks:
             self.default_list_config['items'] += ('submitted_for_tracks', 'reviewed_for_tracks', 'accepted_track')
-        self.extra_filters = OrderedDict([
-            ('multiple_tracks', {'title': _('Proposed for multiple tracks'), 'type': 'bool'}),
-            ('comments', {'title': _('Must have comments'), 'type': 'bool'})
-        ])
+        self.extra_filters = {
+            'multiple_tracks': {'title': _('Proposed for multiple tracks'), 'type': 'bool'},
+            'comments': {'title': _('Must have comments'), 'type': 'bool'}
+        }
 
 
 class AbstractListGeneratorDisplay(AbstractListGeneratorBase):
@@ -244,9 +237,7 @@ class AbstractListGeneratorDisplay(AbstractListGeneratorBase):
         items = {'submitted_contrib_type', 'submitter', 'accepted_contrib_type', 'state'}
         if self.track.can_convene(session.user):
             items.add('score')
-        self.static_items = OrderedDict((key, value)
-                                        for key, value in self.static_items.items()
-                                        if key in items)
+        self.static_items = {key: value for key, value in self.static_items.items() if key in items}
 
     def _build_query(self):
         return (super()._build_query()
