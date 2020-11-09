@@ -75,10 +75,10 @@ class SessionListToPDF(PDFBase):
         for sess in self.sessions:
             rows.append([
                 Paragraph(sess.friendly_id, text_style),
-                Paragraph(sess.type.name.encode('utf-8') if sess.type else '', text_style),
-                Paragraph(sess.title.encode('utf-8'), text_style),
-                Paragraph(sess.code.encode('utf-8'), text_style),
-                Paragraph(sess.description.encode('utf-8'), text_style)
+                Paragraph(sess.type.name if sess.type else '', text_style),
+                Paragraph(sess.title, text_style),
+                Paragraph(sess.code, text_style),
+                Paragraph(sess.description, text_style)
             ])
 
         col_widths = (None,) * 5

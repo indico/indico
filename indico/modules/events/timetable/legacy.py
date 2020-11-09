@@ -273,7 +273,7 @@ class TimetableSerializer:
         data = {'firstName': person_link.first_name,
                 'familyName': person_link.last_name,
                 'affiliation': person_link.affiliation,
-                'emailHash': md5(person.email.encode('utf-8')).hexdigest() if person.email else None,
+                'emailHash': md5(person.email.encode()).hexdigest() if person.email else None,
                 'name': person_link.get_full_name(last_name_first=False, last_name_upper=False,
                                                   abbrev_first_name=False, show_title=True),
                 'displayOrderKey': person_link.display_order_key}

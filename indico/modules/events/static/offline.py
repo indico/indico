@@ -91,7 +91,7 @@ class StaticEventCreator:
 
         with collect_static_files() as used_assets:
             # create the home page html
-            html = self._create_home().encode('utf-8')
+            html = self._create_home()
 
             # Mathjax plugins can only be known in runtime
             self._copy_folder(os.path.join(self._content_dir, 'static', 'dist', 'js', 'mathjax'),
@@ -118,11 +118,10 @@ class StaticEventCreator:
         return temp_file.name
 
     def _write_generated_js(self):
-        global_js = generate_global_file().encode('utf-8')
-        user_js = generate_user_file().encode('utf-8')
-        i18n_js = "window.TRANSLATIONS = {};".format(generate_i18n_file(session.lang)).encode('utf-8')
-        react_i18n_js = "window.REACT_TRANSLATIONS = {};".format(
-            generate_i18n_file(session.lang, react=True)).encode('utf-8')
+        global_js = generate_global_file()
+        user_js = generate_user_file()
+        i18n_js = "window.TRANSLATIONS = {};".format(generate_i18n_file(session.lang))
+        react_i18n_js = "window.REACT_TRANSLATIONS = {};".format(generate_i18n_file(session.lang, react=True))
         gen_path = os.path.join(self._content_dir, 'assets')
         self._zip_file.writestr(os.path.join(gen_path, 'js-vars', 'global.js'), global_js)
         self._zip_file.writestr(os.path.join(gen_path, 'js-vars', 'user.js'), user_js)
@@ -320,7 +319,7 @@ class StaticConferenceCreator(StaticEventCreator):
     def _add_page(self, html, uh_or_endpoint, target=None, **params):
         url = self._get_url(uh_or_endpoint, target, **params)
         fname = os.path.join(self._content_dir, url)
-        self._zip_file.writestr(fname, html.encode('utf-8'))
+        self._zip_file.writestr(fname, html)
 
     def _add_from_rh(self, rh_class, view_class, params, url_for_target):
         rh = rh_class()

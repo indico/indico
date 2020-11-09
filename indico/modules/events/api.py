@@ -181,7 +181,7 @@ class SerializerBase:
                 'fullName': person.get_full_name(last_name_upper=False, abbrev_first_name=False),
                 'id': str(person.id),
                 'affiliation': person.affiliation,
-                'emailHash': md5(person.email.encode('utf-8')).hexdigest() if person.email else None
+                'emailHash': md5(person.email.encode()).hexdigest() if person.email else None
             }
             if isinstance(person, PersonLinkBase):
                 data['db_id'] = person.id
@@ -212,7 +212,7 @@ class SerializerBase:
             'id': convener.person_id,
             'db_id': convener.id,
             'person_id': convener.person_id,
-            'emailHash': md5(convener.person.email.encode('utf-8')).hexdigest() if convener.person.email else None
+            'emailHash': md5(convener.person.email.encode()).hexdigest() if convener.person.email else None
         }
         if can_manage:
             data['address'] = convener.address,

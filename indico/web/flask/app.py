@@ -341,6 +341,7 @@ def inject_current_url(response):
         # In case of URLs containing utter garbage (usually a 404
         # anyway) they may not be latin1-compatible so let's not
         # add the header at all in this case instead of failing later
+        # XXX: apparently this is still the case in Python3
         url.encode('latin1')
     except UnicodeEncodeError:
         return response

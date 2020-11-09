@@ -344,7 +344,7 @@ class WPDecorated(WPBase):
     def _apply_decoration(self, body):
         breadcrumbs = self._get_breadcrumbs()
         return '<div class="header">{}</div>\n<div class="main">{}<div>{}</div></div>\n{}'.format(
-            self._get_header(), breadcrumbs, to_unicode(body), self._get_footer())
+            self._get_header(), breadcrumbs, body, self._get_footer())
 
     def _display(self, params):
         params = dict(params, **self._kwargs)

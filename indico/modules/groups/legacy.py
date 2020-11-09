@@ -10,7 +10,6 @@ from zope.interface.declarations import implementer
 from indico.legacy.fossils.user import IGroupFossil
 from indico.modules.groups import GroupProxy
 from indico.util.fossilize import Fossilizable
-from indico.util.string import encode_utf8, to_unicode
 
 
 @implementer(IGroupFossil)
@@ -18,7 +17,7 @@ class GroupWrapper(Fossilizable):
     """Group-like wrapper class that holds a DB-stored (or remote) group."""
 
     def __init__(self, group_id):
-        self.id = to_unicode(group_id).encode('utf-8')
+        self.id = str(group_id)
 
     @property
     def group(self):
@@ -45,7 +44,6 @@ class LocalGroupWrapper(GroupWrapper):
     is_local = True
     groupType = 'Default'
 
-    @encode_utf8
     def getName(self):
         return GroupProxy(self.id).name
 
@@ -62,6 +60,5 @@ class LDAPGroupWrapper(GroupWrapper):
     def provider(self):
         return self.provider_name
 
-    @encode_utf8
     def getName(self):
         return self.id

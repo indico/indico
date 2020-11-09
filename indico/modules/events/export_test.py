@@ -115,7 +115,7 @@ def test_event_import(db, dummy_user):
     with open(os.path.join(os.path.dirname(__file__), 'export_test_2.yaml')) as ref_file:
         data_yaml_content = ref_file.read()
 
-    data_yaml = BytesIO(data_yaml_content.encode('utf-8'))
+    data_yaml = BytesIO(data_yaml_content.encode())
     tar_buffer = BytesIO()
 
     # User should be matched by e-mail

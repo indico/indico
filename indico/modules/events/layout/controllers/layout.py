@@ -257,5 +257,5 @@ class RHLayoutCSSDisplay(RHDisplayEventBase):
     def _process(self):
         if not self.event.has_stylesheet:
             raise NotFound
-        data = BytesIO(self.event.stylesheet.encode('utf-8'))
+        data = BytesIO(self.event.stylesheet.encode())
         return send_file(self.event.stylesheet_metadata['filename'], data, mimetype='text/css', conditional=True)

@@ -15,7 +15,7 @@ from indico.modules.users import User, logger
 from indico.util.caching import memoize_request
 from indico.util.fossilize import Fossilizable
 from indico.util.locators import locator_property
-from indico.util.string import encode_utf8, to_unicode
+from indico.util.string import to_unicode
 
 
 AVATAR_FIELD_MAP = {
@@ -94,7 +94,6 @@ class AvatarUserWrapper(Fossilizable):
     def setName(self, name, reindex=False):
         self.user.first_name = to_unicode(name)
 
-    @encode_utf8
     def getName(self):
         return self.user.first_name if self.user else ''
 
@@ -103,20 +102,17 @@ class AvatarUserWrapper(Fossilizable):
     def setSurName(self, surname, reindex=False):
         self.user.last_name = to_unicode(surname)
 
-    @encode_utf8
     def getSurName(self):
         return self.user.last_name if self.user else ''
 
     getFamilyName = getSurName
 
-    @encode_utf8
     def getFullName(self):
         if not self.user:
             return ''
         return self.user.get_full_name(last_name_first=True, last_name_upper=True,
                                        abbrev_first_name=False, show_title=False)
 
-    @encode_utf8
     def getStraightFullName(self, upper=True):
         if not self.user:
             return ''
@@ -125,14 +121,12 @@ class AvatarUserWrapper(Fossilizable):
 
     getDirectFullNameNoTitle = getStraightFullName
 
-    @encode_utf8
     def getAbrName(self):
         if not self.user:
             return ''
         return self.user.get_full_name(last_name_first=True, last_name_upper=False,
                                        abbrev_first_name=True, show_title=False)
 
-    @encode_utf8
     def getStraightAbrName(self):
         if not self.user:
             return ''
@@ -142,7 +136,6 @@ class AvatarUserWrapper(Fossilizable):
     def setOrganisation(self, affiliation, reindex=False):
         self.user.affiliation = to_unicode(affiliation)
 
-    @encode_utf8
     def getOrganisation(self):
         return self.user.affiliation if self.user else ''
 
@@ -151,14 +144,12 @@ class AvatarUserWrapper(Fossilizable):
     def setTitle(self, title):
         self.user.title = to_unicode(title)
 
-    @encode_utf8
     def getTitle(self):
         return self.user.title if self.user else ''
 
     def setTimezone(self, tz):
         self.user.settings.set('timezone', to_unicode(tz))
 
-    @encode_utf8
     def getAddress(self):
         return self.user.address if self.user else ''
 
@@ -170,7 +161,6 @@ class AvatarUserWrapper(Fossilizable):
         user = self.user
         return set(user.all_emails) if user else set()
 
-    @encode_utf8
     def getEmail(self):
         return self.user.email if self.user else ''
 
@@ -185,7 +175,6 @@ class AvatarUserWrapper(Fossilizable):
             return False
         return email.lower() in user.all_emails
 
-    @encode_utf8
     def getTelephone(self):
         return self.user.phone if self.user else ''
 
@@ -261,22 +250,18 @@ class AvatarProvisionalWrapper(Fossilizable):
 
     id = property(getId)
 
-    @encode_utf8
     def getEmail(self):
         return self.data['email']
 
     def getEmails(self):
         return [self.data['email']]
 
-    @encode_utf8
     def getFirstName(self):
         return self.data.get('first_name', '')
 
-    @encode_utf8
     def getFamilyName(self):
         return self.data.get('last_name', '')
 
-    @encode_utf8
     def getStraightFullName(self, upper=False):
         last_name = to_unicode(self.data.get('last_name', ''))
         if upper:
@@ -286,13 +271,11 @@ class AvatarProvisionalWrapper(Fossilizable):
     def getTitle(self):
         return ''
 
-    @encode_utf8
     def getTelephone(self):
         return self.data.get('phone', '')
 
     getPhone = getTelephone
 
-    @encode_utf8
     def getOrganisation(self):
         return self.data.get('affiliation', '')
 

@@ -288,14 +288,13 @@ class GenericCache:
     def _hashKey(self, key):
         if hasattr(self._client, 'hash_key'):
             return self._client.hash_key(key)
-        return hashlib.sha256(key).hexdigest()
+        return hashlib.sha256(key.encode()).hexdigest()
 
     def _makeKey(self, key):
         if not isinstance(key, str):
             # In case we get something not a string (number, list, whatever)
             key = repr(key)
         # Hashlib doesn't allow unicode so let's ensure it's not!
-        key = key.encode('utf-8')
         return '{}{}.{}'.format(getattr(self._client, 'key_prefix', ''), self._namespace, self._hashKey(key))
 
     def _processTime(self, ts):

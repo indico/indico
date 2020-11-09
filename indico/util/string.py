@@ -11,7 +11,6 @@ String manipulation functions
 
 
 import binascii
-import functools
 import re
 import string
 import unicodedata
@@ -29,7 +28,6 @@ from html2text import HTML2Text
 from jinja2.filters import do_striptags
 from lxml import etree, html
 from markupsafe import Markup, escape
-from speaklater import is_lazy_string
 from sqlalchemy import ForeignKeyConstraint, inspect
 
 
@@ -298,19 +296,6 @@ def make_unique_token(is_unique):
     while not is_unique(token):
         token = str(uuid4())
     return token
-
-
-def encode_utf8(f):
-    @functools.wraps(f)
-    def _wrapper(*args, **kwargs):
-        rv = f(*args, **kwargs)
-        if not rv:
-            return ''
-        if is_lazy_string(rv):
-            rv = rv.value
-        return rv.encode('utf-8') if isinstance(rv, str) else str(rv)
-
-    return _wrapper
 
 
 def is_legacy_id(id_):

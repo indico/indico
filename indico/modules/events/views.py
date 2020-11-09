@@ -203,16 +203,15 @@ class WPSimpleEventDisplay(WPSimpleEventDisplayBase):
                if (plugin and tpl_name[0] == ':')
                else posixpath.join('events/display', tpl_name))
 
-        rv = render_template(tpl,
-                             event=self.event,
-                             category=self.event.category.title,
-                             timezone=self.event.display_tzinfo,
-                             theme_settings=self.theme.get('settings', {}),
-                             theme_user_settings=layout_settings.get(self.event, 'timetable_theme_settings'),
-                             files=files,
-                             folders=folders,
-                             lectures=lectures)
-        return rv.encode('utf-8')
+        return render_template(tpl,
+                               event=self.event,
+                               category=self.event.category.title,
+                               timezone=self.event.display_tzinfo,
+                               theme_settings=self.theme.get('settings', {}),
+                               theme_user_settings=layout_settings.get(self.event, 'timetable_theme_settings'),
+                               files=files,
+                               folders=folders,
+                               lectures=lectures)
 
 
 class WPConferenceDisplayBase(WPJinjaMixin, MathjaxMixin, WPEventBase):
@@ -282,7 +281,7 @@ class WPConferenceDisplayBase(WPJinjaMixin, MathjaxMixin, WPEventBase):
                                             event=self.event, form=css_override_form,
                                             download_url=self._kwargs['css_url_override'])
             body = override_html + body
-        return WPEventBase._apply_decoration(self, to_unicode(body))
+        return WPEventBase._apply_decoration(self, body)
 
 
 class WPConferenceDisplay(WPConferenceDisplayBase):

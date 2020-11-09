@@ -16,7 +16,6 @@ from werkzeug.urls import url_parse
 
 from indico.core.config import config
 from indico.util.date_time import now_utc
-from indico.util.string import to_unicode
 from indico.web.http_api.metadata.serializer import Serializer
 
 
@@ -54,17 +53,14 @@ def serialize_event(cal, fossil, now, id_prefix="indico-event"):
     event.add('dtstart', _deserialize_date(fossil['startDate']))
     event.add('dtend', _deserialize_date(fossil['endDate']))
     event.add('url', fossil['url'])
-    event.add('summary', to_unicode(fossil['title']))
+    event.add('summary', fossil['title'])
     loc = fossil['location'] or ''
-    if loc:
-        loc = to_unicode(loc)
     if fossil['roomFullname']:
-        loc += ' ' + to_unicode(fossil['roomFullname'])
+        loc += ' ' + fossil['roomFullname']
     event.add('location', loc)
     description = ''
     if fossil.get('speakers'):
-        speakers = ('{} ({})'.format(speaker['fullName'].encode('utf-8'),
-                                     speaker['affiliation'].encode('utf-8')) for speaker in fossil['speakers'])
+        speakers = ['{} ({})'.format(speaker['fullName'], speaker['affiliation']) for speaker in fossil['speakers']]
         description += 'Speakers: {}\n'.format(', '.join(speakers))
 
     if fossil['description']:
@@ -72,12 +68,10 @@ def serialize_event(cal, fossil, now, id_prefix="indico-event"):
         if not desc_text:
             desc_text = '<p/>'
         try:
-            description += '{}\n\n{}'.format(to_unicode(html.fromstring(to_unicode(desc_text))
-                                                        .text_content()).encode('utf-8'),
-                                             fossil['url'].encode('utf-8'))
+            description += '{}\n\n{}'.format(html.fromstring(desc_text).text_content(), fossil['url'])
         except ParserError:
             # this happens e.g. if desc_text contains only a html comment
-            description += fossil['url'].encode('utf-8')
+            description += fossil['url']
     else:
         description += fossil['url']
     event.add('description', description)

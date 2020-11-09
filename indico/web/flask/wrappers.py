@@ -28,7 +28,6 @@ from indico.web.flask.util import make_view_func
 
 
 AUTH_BEARER_RE = re.compile(r'^Bearer (.+)$')
-_notset = object()
 
 
 class IndicoRequest(Request):
@@ -60,12 +59,6 @@ class IndicoRequest(Request):
 
         m = AUTH_BEARER_RE.match(auth_header)
         return m.group(1) if m else None
-
-    def __repr__(self):
-        rv = super().__repr__()
-        if isinstance(rv, str):
-            rv = rv.encode('utf-8')
-        return rv
 
 
 class IndicoFlask(PluginFlaskMixin, Flask):

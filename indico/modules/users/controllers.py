@@ -214,7 +214,7 @@ class RHProfilePicturePreview(RHUserBase):
         if source == ProfilePictureSource.standard:
             first_name = self.user.first_name[0].upper() if self.user.first_name else ''
             avatar = render_template('users/avatar.svg', bg_color=self.user.avatar_bg_color, text=first_name)
-            return send_file('avatar.svg', BytesIO(avatar.encode('utf-8')), mimetype='image/svg+xml',
+            return send_file('avatar.svg', BytesIO(avatar.encode()), mimetype='image/svg+xml',
                              no_cache=True, inline=True, safe=False)
         elif source == ProfilePictureSource.custom:
             metadata = self.user.picture_metadata
@@ -234,7 +234,7 @@ class RHProfilePictureDisplay(RHUserBase):
         if self.user.picture_source == ProfilePictureSource.standard:
             first_name = self.user.first_name[0].upper() if self.user.first_name else ''
             avatar = render_template('users/avatar.svg', bg_color=self.user.avatar_bg_color, text=first_name)
-            return send_file('avatar.svg', BytesIO(avatar.encode('utf-8')), mimetype='image/svg+xml',
+            return send_file('avatar.svg', BytesIO(avatar.encode()), mimetype='image/svg+xml',
                              no_cache=False, inline=True, safe=False, cache_timeout=(86400*7))
 
         metadata = self.user.picture_metadata

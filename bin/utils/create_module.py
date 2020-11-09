@@ -63,12 +63,12 @@ def touch(path):
 
 def write(f, text=''):
     if text:
-        f.write(text.encode('ascii'))
-    f.write(b'\n')
+        f.write(text)
+    f.write('\n')
 
 
 def write_header(f):
-    f.write(textwrap.dedent(b"""
+    f.write(textwrap.dedent("""
         # This file is part of Indico.
         # Copyright (C) 2002 - {year} CERN
         #
@@ -84,8 +84,8 @@ def write_model(f, class_name, event):
     table_name = _snakify(class_name) + 's'
     if event and table_name.startswith('event_'):
         table_name = table_name[6:]
-    f.write(b'\n\n')
-    f.write(textwrap.dedent(b"""
+    f.write('\n\n')
+    f.write(textwrap.dedent("""
         class {cls}(db.Model):
             __tablename__ = '{table}'
             __table_args__ = {{'schema': '{schema}'}}

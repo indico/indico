@@ -679,7 +679,7 @@ class ZipGeneratorMixin:
                 name = self._prepare_folder_structure(item)
                 self.used_filenames.add(name)
                 with item.get_local_path() as filepath:
-                    zip_handler.write(filepath.encode('utf-8'), name)
+                    zip_handler.write(filepath, name)
 
         zip_file_name = f'{name_prefix}-{name_suffix}.zip' if name_suffix else f'{name_prefix}.zip'
         chmod_umask(temp_file.name)
