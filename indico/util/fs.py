@@ -14,7 +14,7 @@ from datetime import datetime
 
 from werkzeug.utils import secure_filename as _secure_filename
 
-from indico.util.string import unicode_to_ascii
+from indico.util.string import str_to_ascii
 
 
 _control_char_re = re.compile(r'[\x00-\x1f]+')
@@ -47,7 +47,7 @@ def secure_filename(filename, fallback):
     """
     if not filename:
         return fallback
-    return _secure_filename(unicode_to_ascii(filename)) or fallback
+    return _secure_filename(str_to_ascii(filename)) or fallback
 
 
 def secure_client_filename(filename, fallback='file'):

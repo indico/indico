@@ -39,7 +39,7 @@ from indico.modules.users import User
 from indico.modules.users.util import get_user_by_email
 from indico.util.console import cformat
 from indico.util.date_time import now_utc
-from indico.util.string import strict_unicode
+from indico.util.string import strict_str
 
 
 _notset = object()
@@ -568,7 +568,7 @@ class EventImporter:
         # we use a generic path to store all imported files since we
         # are on the table level here and thus cannot use relationships
         # and the orignal models' logic to construct paths
-        path_segments = ['event', strict_unicode(self.event_id), 'imported']
+        path_segments = ['event', strict_str(self.event_id), 'imported']
         filename = f'{id_}-{filename}'
         path = posixpath.join(*(path_segments + [filename]))
         return path

@@ -11,7 +11,7 @@ from indico.core.config import config
 from indico.core.db import db
 from indico.core.storage import StoredFileMixin
 from indico.util.fs import secure_filename
-from indico.util.string import format_repr, strict_unicode, text_to_repr
+from indico.util.string import format_repr, strict_str, text_to_repr
 
 
 class AbstractFile(StoredFileMixin, db.Model):
@@ -47,8 +47,8 @@ class AbstractFile(StoredFileMixin, db.Model):
 
     def _build_storage_path(self):
         self.abstract.assign_id()
-        path_segments = ['event', strict_unicode(self.abstract.event.id),
-                         'abstracts', strict_unicode(self.abstract.id)]
+        path_segments = ['event', strict_str(self.abstract.event.id),
+                         'abstracts', strict_str(self.abstract.id)]
         self.assign_id()
         filename = '{}-{}'.format(self.id, secure_filename(self.filename, 'file'))
         path = posixpath.join(*(path_segments + [filename]))

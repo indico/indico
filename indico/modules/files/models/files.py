@@ -15,7 +15,7 @@ from indico.core.db import db
 from indico.core.storage import StoredFileMixin
 from indico.util.fs import secure_filename
 from indico.util.signing import secure_serializer
-from indico.util.string import format_repr, strict_unicode
+from indico.util.string import format_repr, strict_str
 from indico.web.flask.util import url_for
 
 
@@ -62,7 +62,7 @@ class File(StoredFileMixin, db.Model):
         self.claimed = True
 
     def _build_storage_path(self):
-        path_segments = list(map(strict_unicode, self.__context))
+        path_segments = list(map(strict_str, self.__context))
         self.assign_id()
         filename = '{}-{}'.format(self.id, secure_filename(self.filename, 'file'))
         path = posixpath.join(*(path_segments + [filename]))

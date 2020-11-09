@@ -10,7 +10,7 @@ import posixpath
 from indico.core.config import config
 from indico.core.db import db
 from indico.core.storage import StoredFileMixin
-from indico.util.string import strict_unicode
+from indico.util.string import strict_str
 from indico.web.flask.util import url_for
 
 
@@ -54,7 +54,7 @@ class DesignerImageFile(StoredFileMixin, db.Model):
         return dict(self.template.locator, image_id=self.id, filename=self.filename)
 
     def _build_storage_path(self):
-        path_segments = ['designer_templates', strict_unicode(self.template.id), 'images']
+        path_segments = ['designer_templates', strict_str(self.template.id), 'images']
         self.assign_id()
         filename = f'{self.id}-{self.filename}'
         path = posixpath.join(*(path_segments + [filename]))

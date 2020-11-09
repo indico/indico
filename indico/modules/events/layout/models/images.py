@@ -11,7 +11,7 @@ from indico.core.config import config
 from indico.core.db import db
 from indico.core.storage import StoredFileMixin
 from indico.util.fs import secure_filename
-from indico.util.string import strict_unicode
+from indico.util.string import strict_str
 
 
 class ImageFile(StoredFileMixin, db.Model):
@@ -52,7 +52,7 @@ class ImageFile(StoredFileMixin, db.Model):
         return dict(self.event.locator, image_id=self.id, filename=self.filename)
 
     def _build_storage_path(self):
-        path_segments = ['event', strict_unicode(self.event.id), 'images']
+        path_segments = ['event', strict_str(self.event.id), 'images']
         self.assign_id()
         filename = '{}-{}'.format(self.id, secure_filename(self.filename, 'file'))
         path = posixpath.join(*(path_segments + [filename]))

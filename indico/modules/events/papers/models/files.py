@@ -12,7 +12,7 @@ from indico.core.db import db
 from indico.core.storage.models import StoredFileMixin
 from indico.util.fs import secure_filename
 from indico.util.locators import locator_property
-from indico.util.string import format_repr, strict_unicode, text_to_repr
+from indico.util.string import format_repr, strict_str, text_to_repr
 
 
 class PaperFile(StoredFileMixin, db.Model):
@@ -81,8 +81,8 @@ class PaperFile(StoredFileMixin, db.Model):
 
     def _build_storage_path(self):
         self.assign_id()
-        path_segments = ['event', strict_unicode(self._contribution.event.id), 'papers',
-                         '{}_{}'.format(self.id, strict_unicode(self._contribution.id))]
+        path_segments = ['event', strict_str(self._contribution.event.id), 'papers',
+                         '{}_{}'.format(self.id, strict_str(self._contribution.id))]
         filename = secure_filename(self.filename, 'paper')
         path = posixpath.join(*(path_segments + [filename]))
         return config.ATTACHMENT_STORAGE, path

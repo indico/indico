@@ -78,11 +78,11 @@ def remove_non_alpha(text):
     return ''.join(c for c in text if c.isalnum())
 
 
-def unicode_to_ascii(text):
+def str_to_ascii(text):
     return translitcodec.long_encode(text)[0].encode('ascii', 'ignore').decode().strip()
 
 
-def strict_unicode(value):
+def strict_str(value):
     """Convert a value to unicode or fails if it is None.
 
     Useful when converting e.g. IDs to path segments.  Usually they
@@ -90,14 +90,14 @@ def strict_unicode(value):
     up with a literal ``None`` in the path).
     """
     if value is None:
-        raise TypeError('strict_unicode does not accept `None`')
+        raise TypeError('strict_str does not accept `None`')
     return str(value)
 
 
 def slugify(*args, **kwargs):
     """Join a series of strings into a URL slug.
 
-    - normalizes unicode to proper ascii repesentations
+    - normalizes strings to proper ascii repesentations
     - removes non-alphanumeric characters
     - replaces whitespace with dashes
 
@@ -124,7 +124,7 @@ def slugify(*args, **kwargs):
 
 
 def truncate(text, max_size, ellipsis='...'):
-    """Truncate text, taking unicode chars into account."""
+    """Truncate text if it's too long."""
     if len(text) > max_size:
         text = text[:max_size] + ellipsis
     return text
@@ -415,7 +415,7 @@ def snakify_keys(dict_):
 def crc32(data):
     """Calculate a CRC32 checksum.
 
-    When a unicode object is passed, it is encoded as UTF-8.
+    When a str is passed, it is encoded as UTF-8.
     """
     if isinstance(data, str):
         data = data.encode('utf-8')
