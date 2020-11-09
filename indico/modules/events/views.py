@@ -21,7 +21,7 @@ from indico.modules.events.models.events import EventType
 from indico.modules.events.util import serialize_event_for_json_ld
 from indico.util.date_time import format_date
 from indico.util.mathjax import MathjaxMixin
-from indico.util.string import strip_tags, to_unicode, truncate
+from indico.util.string import strip_tags, truncate
 from indico.web.flask.util import url_for
 from indico.web.views import WPDecorated, WPJinjaMixin
 
@@ -111,13 +111,13 @@ class WPEventBase(WPDecorated):
         WPDecorated.__init__(self, rh, **kwargs)
         start_dt_local = event_.start_dt_display.astimezone(event_.display_tzinfo)
         end_dt_local = event_.end_dt_display.astimezone(event_.display_tzinfo)
-        dates = ' ({})'.format(to_unicode(format_date(start_dt_local, format='long')))
+        dates = ' ({})'.format(format_date(start_dt_local, format='long'))
         if start_dt_local.date() != end_dt_local.date():
             if start_dt_local.year == end_dt_local.year and start_dt_local.month == end_dt_local.month:
-                dates = ' ({}-{})'.format(start_dt_local.day, to_unicode(format_date(end_dt_local, format='long')))
+                dates = ' ({}-{})'.format(start_dt_local.day, format_date(end_dt_local, format='long'))
             else:
-                dates = ' ({} - {})'.format(to_unicode(format_date(start_dt_local, format='long')),
-                                            to_unicode(format_date(end_dt_local, format='long')))
+                dates = ' ({} - {})'.format(format_date(start_dt_local, format='long'),
+                                            format_date(end_dt_local, format='long'))
         self.title = '{} {}'.format(strip_tags(self.event.title), dates)
         page_title = kwargs.get('page_title')
         if page_title:

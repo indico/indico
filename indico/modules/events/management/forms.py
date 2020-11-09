@@ -36,7 +36,7 @@ from indico.modules.events.timetable.util import get_top_level_entries
 from indico.modules.events.util import check_permissions
 from indico.util.date_time import format_datetime, format_human_timedelta, now_utc, relativedelta
 from indico.util.i18n import _
-from indico.util.string import to_unicode, validate_email
+from indico.util.string import validate_email
 from indico.web.flask.util import url_for
 from indico.web.forms.base import IndicoForm
 from indico.web.forms.fields import (IndicoDateField, IndicoDateTimeField, IndicoEnumSelectField, IndicoLocationField,
@@ -161,7 +161,7 @@ class EventDatesForm(IndicoForm):
             max_end_dt = max(self.toplevel_timetable_entries, key=attrgetter('end_dt')).end_dt
             if field.data < max_end_dt:
                 raise ValidationError(_("The event cannot end before its last timetable entry, which is at {}.")
-                                      .format(to_unicode(format_datetime(max_end_dt, timezone=self.event.tzinfo))))
+                                      .format(format_datetime(max_end_dt, timezone=self.event.tzinfo)))
 
 
 class EventLocationForm(IndicoForm):

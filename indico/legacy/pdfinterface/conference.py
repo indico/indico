@@ -32,7 +32,7 @@ from indico.modules.events.tracks.settings import track_settings
 from indico.util.date_time import format_date, format_datetime, format_human_timedelta, format_time, now_utc
 from indico.util.i18n import _, ngettext
 from indico.util.string import (format_full_name, html_color_to_rgb, natural_sort_key, render_markdown,
-                                sanitize_for_platypus, strip_tags, to_unicode, truncate)
+                                sanitize_for_platypus, strip_tags, truncate)
 
 
 # Change reportlab default pdf font Helvetica to indico ttf font,
@@ -562,14 +562,15 @@ class TimeTablePlain(PDFWithTOC):
                 res.append(Paragraph('', self._styles["session_title"]))
 
                 if self._ttPDFFormat.showDateCloseToSessions():
-                    start_dt = to_unicode(format_datetime(sess_block.timetable_entry.start_dt, timezone=self._tz))
+                    start_dt = format_datetime(sess_block.timetable_entry.start_dt, timezone=self._tz)
                 else:
-                    start_dt = to_unicode(format_time(sess_block.timetable_entry.start_dt, timezone=self._tz))
+                    start_dt = format_time(sess_block.timetable_entry.start_dt, timezone=self._tz)
 
                 sess_caption = '<font face="Times-Bold">{}</font>'.format(escape(session_caption))
                 text = '<u>{}</u>{} ({}-{})'.format(
                     sess_caption, room, start_dt,
-                    to_unicode(format_time(sess_block.timetable_entry.end_dt, timezone=self._tz)))
+                    format_time(sess_block.timetable_entry.end_dt, timezone=self._tz)
+                )
 
                 p1 = Paragraph(text, self._styles["session_title"])
                 if self._useColors():
@@ -677,8 +678,8 @@ class TimeTablePlain(PDFWithTOC):
                     speakers = f'<font face="Times-Bold"><b>- {speaker_word}: {speakers}</b></font>'
 
                 text = '<u>{}</u>{} ({}-{})'.format(escape(contrib.title), room,
-                                                     to_unicode(format_time(entry.start_dt, timezone=self._tz)),
-                                                     to_unicode(format_time(entry.end_dt, timezone=self._tz)))
+                                                    format_time(entry.start_dt, timezone=self._tz),
+                                                    format_time(entry.end_dt, timezone=self._tz))
                 p1 = Paragraph(text, self._styles["session_title"])
                 res.append(p1)
                 if self._ttPDFFormat.showTitleSessionTOC():
@@ -701,8 +702,8 @@ class TimeTablePlain(PDFWithTOC):
                     room = ' - {}'.format(escape(break_.room_name))
 
                 text = '<u>{}</u>{} ({}-{})'.format(escape(break_.title), room,
-                                                     to_unicode(format_time(break_entry.start_dt, timezone=self._tz)),
-                                                     to_unicode(format_time(break_entry.end_dt, timezone=self._tz)))
+                                                    format_time(break_entry.start_dt, timezone=self._tz),
+                                                    format_time(break_entry.end_dt, timezone=self._tz))
 
                 p1 = Paragraph(text, self._styles["session_title"])
                 res.append(p1)
@@ -832,8 +833,8 @@ class SimplifiedTimeTablePlain(PDFBase):
                 room_time = escape(session_slot.room_name) if session_slot.room_name else ''
                 room_time = ('<font face="Times-Bold"><b> {}:</b></font> {}({}-{})'
                              .format(_("Time and Place"), room_time,
-                                     to_unicode(format_time(entry.start_dt, timezone=self._tz)),
-                                     to_unicode(format_time(entry.end_dt, timezone=self._tz))))
+                                     format_time(entry.start_dt, timezone=self._tz),
+                                     format_time(entry.end_dt, timezone=self._tz)))
                 res.append(Paragraph(room_time, self._styles["normal"]))
                 conveners = [c.full_name for c in session_slot.person_links]
                 if conveners:
@@ -853,8 +854,8 @@ class SimplifiedTimeTablePlain(PDFBase):
                 room_time = escape(contrib.room_name) if contrib.room_name else ''
                 room_time = ('<font face="Times-Bold"><b> {}:</b></font> {}({}-{})'
                              .format(_("Time and Place"), room_time,
-                                     to_unicode(format_date(entry.start_dt, timezone=self._tz)),
-                                     to_unicode(format_date(entry.end_dt, timezone=self._tz))))
+                                     format_date(entry.start_dt, timezone=self._tz),
+                                     format_date(entry.end_dt, timezone=self._tz)))
                 res.append(Paragraph(room_time, self._styles["normal"]))
                 spks = [s.full_name for s in contrib.speakers]
                 if spks:
@@ -870,8 +871,8 @@ class SimplifiedTimeTablePlain(PDFBase):
                 room_time = escape(break_.room_name) if break_.room_name else ''
                 room_time = ('<font face="Times-Bold"><b> {}:</b></font> {}({}-{})'
                              .format(_("Time and Place"), room_time,
-                                     to_unicode(format_date(entry.start_dt, timezone=self._tz)),
-                                     to_unicode(format_date(entry.end_dt, timezone=self._tz))))
+                                     format_date(entry.start_dt, timezone=self._tz),
+                                     format_date(entry.end_dt, timezone=self._tz)))
                 res.append(Paragraph(room_time, self._styles["normal"]))
                 res.append(Spacer(1, 0.2 * inch))
         res.append(PageBreak())
@@ -895,8 +896,8 @@ class SimplifiedTimeTablePlain(PDFBase):
                 continue
             text = '{} - {}-{}'.format(
                 escape(self.event.title),
-                escape(to_unicode(format_date(self.event.start_dt, timezone=self._tz))),
-                escape(to_unicode(format_date(self.event.end_dt, timezone=self._tz)))
+                escape(format_date(self.event.start_dt, timezone=self._tz)),
+                escape(format_date(self.event.end_dt, timezone=self._tz))
             )
             if self.event.venue_name:
                 text = '{}, {}.'.format(text, escape(self.event.venue_name))

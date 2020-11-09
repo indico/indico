@@ -17,7 +17,6 @@ from indico.modules.events.models.events import Event
 from indico.modules.events.util import get_base_ical_parameters, serialize_event_for_json_ld
 from indico.util.date_time import format_date
 from indico.util.i18n import _
-from indico.util.string import to_unicode
 from indico.web.flask.util import url_for
 
 
@@ -43,13 +42,13 @@ def make_format_event_date_func(category):
         start_dt = event.start_dt.astimezone(tzinfo)
         end_dt = event.end_dt.astimezone(tzinfo)
         if start_dt.year != end_dt.year:
-            return '{} - {}'.format(to_unicode(format_date(start_dt, timezone=tzinfo)),
-                                    to_unicode(format_date(end_dt, timezone=tzinfo)))
+            return '{} - {}'.format(format_date(start_dt, timezone=tzinfo),
+                                    format_date(end_dt, timezone=tzinfo))
         elif (start_dt.month != end_dt.month) or (start_dt.day != end_dt.day):
-            return '{} - {}'.format(to_unicode(format_date(start_dt, day_month, timezone=tzinfo)),
-                                    to_unicode(format_date(end_dt, day_month, timezone=tzinfo)))
+            return '{} - {}'.format(format_date(start_dt, day_month, timezone=tzinfo),
+                                    format_date(end_dt, day_month, timezone=tzinfo))
         else:
-            return to_unicode(format_date(start_dt, day_month, timezone=tzinfo))
+            return format_date(start_dt, day_month, timezone=tzinfo)
 
     return fn
 

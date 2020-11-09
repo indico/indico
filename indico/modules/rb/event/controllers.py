@@ -19,7 +19,6 @@ from indico.modules.rb.models.reservations import Reservation, ReservationLink
 from indico.modules.rb.util import get_booking_params_for_event
 from indico.modules.rb.views import WPEventBookingList
 from indico.util.date_time import format_datetime, now_utc
-from indico.util.string import to_unicode
 
 
 def _contrib_query(event):
@@ -101,6 +100,6 @@ class RHListLinkableSessionBlocks(RHManageEventBase):
                    'title': session_block.full_title,
                    'full_title': '#{}: {} ({})'.format(
                        session_block.session.friendly_id, session_block.full_title,
-                       to_unicode(format_datetime(session_block.timetable_entry.start_dt)))}
+                       format_datetime(session_block.timetable_entry.start_dt))}
                   for session_block in query]
         return jsonify(result)
