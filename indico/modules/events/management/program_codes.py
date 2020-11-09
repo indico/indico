@@ -42,9 +42,9 @@ def generate_program_codes(event, object_type, objects):
 
 
 def _make_date_placeholder(class_name, name, render_kwarg, date_format, description, transform=None):
-    dct = {b'name': name, b'description': description, b'render_kwarg': render_kwarg, b'date_format': date_format,
-           b'transform': staticmethod(transform) if transform else None}
-    return type(str(class_name), (DatePlaceholder,), dct)
+    dct = {'name': name, 'description': description, 'render_kwarg': render_kwarg, 'date_format': date_format,
+           'transform': staticmethod(transform) if transform else None}
+    return type(class_name, (DatePlaceholder,), dct)
 
 
 class ContributionIDPlaceholder(ParametrizedPlaceholder):
