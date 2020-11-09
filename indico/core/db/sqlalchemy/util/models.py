@@ -149,7 +149,7 @@ class IndicoModel(Model):
         missing_relationships = set(relationships) - cache['relationships']
         if not missing_relationships:
             return
-        query = query.options(*list(map(strategy, missing_relationships)))
+        query = query.options(*map(strategy, missing_relationships))
         data_cache = cache['data']
         for obj in query:
             obj_cache = data_cache.setdefault(obj, {})

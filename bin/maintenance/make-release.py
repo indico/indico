@@ -48,7 +48,7 @@ def run(cmd, title, shell=False):
 
 def _bump_version(version):
     try:
-        parts = list(map(int, version.split('.')))
+        parts = [int(v) for v in version.split('.')]
     except ValueError:
         fail('cannot bump version with non-numeric parts')
     if len(parts) == 2:

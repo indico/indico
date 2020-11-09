@@ -313,7 +313,7 @@ class RHSortSurveyItems(RHManageSurveyBase):
 
     def _sort_sections(self):
         sections = {section.id: section for section in self.survey.sections}
-        section_ids = list(map(int, request.form.getlist('section_ids')))
+        section_ids = request.form.getlist('section_ids', type=int)
         for position, section_id in enumerate(section_ids, 1):
             sections[section_id].position = position
         logger.info('Sections in %s reordered by %s', self.survey, session.user)
@@ -322,7 +322,7 @@ class RHSortSurveyItems(RHManageSurveyBase):
         section = SurveySection.find_one(survey=self.survey, id=request.form['section_id'],
                                          _eager=SurveySection.children)
         section_items = {x.id: x for x in section.children}
-        item_ids = list(map(int, request.form.getlist('item_ids')))
+        item_ids = request.form.getlist('item_ids', type=int)
         changed_section = None
         for position, item_id in enumerate(item_ids, 1):
             try:

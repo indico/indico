@@ -377,7 +377,7 @@ class RHDeleteSubContributions(RHManageSubContributionsActionsBase):
 
 class RHSortSubContributions(RHManageContributionBase):
     def _process(self):
-        subcontrib_ids = list(map(int, request.form.getlist('subcontrib_ids')))
+        subcontrib_ids = request.form.getlist('subcontrib_ids', type=int)
         subcontribs = {s.id: s for s in self.contrib.subcontributions}
         for position, subcontrib_id in enumerate(subcontrib_ids, 1):
             if subcontrib_id in subcontribs:
@@ -632,7 +632,7 @@ class RHSortContributionFields(RHManageContributionsBase):
 
     def _process(self):
         field_by_id = {field.id: field for field in self.event.contribution_fields}
-        field_ids = list(map(int, request.form.getlist('field_ids')))
+        field_ids = request.form.getlist('field_ids', type=int)
         for index, field_id in enumerate(field_ids, 0):
             field_by_id[field_id].position = index
             del field_by_id[field_id]

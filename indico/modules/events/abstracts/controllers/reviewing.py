@@ -256,7 +256,7 @@ class RHDisplayAbstractsActionsBase(RHDisplayAbstractListBase):
 
     def _process_args(self):
         RHDisplayAbstractListBase._process_args(self)
-        ids = list(map(int, request.form.getlist('abstract_id')))
+        ids = request.form.getlist('abstract_id', type=int)
         self.abstracts = Abstract.query.with_parent(self.track, 'abstracts_reviewed').filter(Abstract.id.in_(ids)).all()
 
 

@@ -176,8 +176,8 @@ def service_handle_review_editable(editable, user, action, parent_revision, revi
         if 'comment' in resp:
             parent_revision.comment = resp['comment']
         if 'tags' in resp:
-            parent_revision.tags = {tag for tag in editable.event.editing_tags
-                                    if tag.id in list(map(int, resp['tags']))}
+            resp_tag_ids = set(map(int, resp['tags']))
+            parent_revision.tags = {tag for tag in editable.event.editing_tags if tag.id in resp_tag_ids}
         for comment in resp.get('comments', []):
             create_revision_comment(new_revision, User.get_system_user(), comment['text'], internal=comment['internal'])
 
@@ -236,7 +236,8 @@ def service_handle_custom_action(editable, revision, user, action):
         elif publish is False:
             revision.editable.published_revision = None
     if 'tags' in resp:
-        revision.tags = {tag for tag in editable.event.editing_tags if tag.id in list(map(int, resp['tags']))}
+        resp_tag_ids = set(map(int, resp['tags']))
+        revision.tags = {tag for tag in editable.event.editing_tags if tag.id in resp_tag_ids}
     for comment in resp.get('comments', []):
         create_revision_comment(revision, User.get_system_user(), comment['text'], internal=comment['internal'])
     db.session.flush()

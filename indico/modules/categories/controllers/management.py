@@ -297,7 +297,7 @@ class RHDeleteSubcategories(RHManageCategoryBase):
         RHManageCategoryBase._process_args(self)
         self.subcategories = (Category.query
                               .with_parent(self.category)
-                              .filter(Category.id.in_(list(map(int, request.form.getlist('category_id')))))
+                              .filter(Category.id.in_(map(int, request.form.getlist('category_id'))))
                               .all())
 
     def _process(self):
@@ -316,7 +316,7 @@ class RHMoveSubcategories(RHMoveCategoryBase):
 
     def _process_args(self):
         RHMoveCategoryBase._process_args(self)
-        subcategory_ids = list(map(int, request.values.getlist('category_id')))
+        subcategory_ids = request.values.getlist('category_id', type=int)
         self.subcategories = (Category.query.with_parent(self.category)
                               .filter(Category.id.in_(subcategory_ids))
                               .order_by(Category.title)
@@ -352,7 +352,7 @@ class RHManageCategorySelectedEventsBase(RHManageCategoryBase):
                  .with_parent(self.category)
                  .order_by(Event.start_dt.desc()))
         if request.form.get('all_selected') != '1':
-            query = query.filter(Event.id.in_(list(map(int, request.form.getlist('event_id')))))
+            query = query.filter(Event.id.in_(map(int, request.form.getlist('event_id'))))
         self.events = query.all()
 
 

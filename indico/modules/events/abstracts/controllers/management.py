@@ -261,6 +261,6 @@ class RHDeleteAbstractReviewingQuestion(RHReviewingQuestionBase):
 
 class RHSortReviewingQuestions(RHManageAbstractsBase):
     def _process(self):
-        question_ids = list(map(int, request.form.getlist('field_ids')))
+        question_ids = request.form.getlist('field_ids', type=int)
         sort_reviewing_questions(self.event.abstract_review_questions, question_ids)
         return jsonify_data(flash=False)

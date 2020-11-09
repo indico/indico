@@ -95,7 +95,7 @@ class RHPapersActionBase(RHPapersListBase):
 
     def _process_args(self):
         RHPapersListBase._process_args(self)
-        ids = list(map(int, request.form.getlist('contribution_id')))
+        ids = request.form.getlist('contribution_id', type=int)
         self.contributions = (self.list_generator._build_query()
                               .filter(Contribution.id.in_(ids))
                               .options(*self._get_contrib_query_options())
@@ -160,7 +160,7 @@ class RHAssignPapersBase(RHPapersActionBase):
     def _process_args(self):
         RHPapersActionBase._process_args(self)
         self.role = PaperReviewingRole[request.view_args['role']]
-        user_ids = list(map(int, request.form.getlist('user_id')))
+        user_ids = request.form.getlist('user_id', type=int)
         self.users = {u for u in CFP_ROLE_MAP[self.role](self.event.cfp) if u.id in user_ids}
 
     def _check_access(self):

@@ -24,7 +24,7 @@ class IndicoFlaskParser(FlaskParser):
         if isinstance(rv, str):
             return rv.strip()
         elif isinstance(rv, (list, set)):
-            return type(rv)(list(map(strip_whitespace, rv)))
+            return type(rv)(map(strip_whitespace, rv))
         return rv
 
 

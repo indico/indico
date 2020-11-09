@@ -287,7 +287,7 @@ class RHDeleteReviewingQuestion(RHManageQuestionBase):
 
 class RHSortReviewingQuestions(RHReviewingQuestionsActionsBase):
     def _process(self):
-        question_ids = list(map(int, request.form.getlist('field_ids')))
+        question_ids = request.form.getlist('field_ids', type=int)
         if self.review_type == 'layout':
             questions = self.event.cfp.layout_review_questions
         else:

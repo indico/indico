@@ -116,7 +116,7 @@ class RedisCacheClient(CacheClient):
 
     def get_multi(self, keys):
         try:
-            return dict(zip(keys, list(map(self._unpickle, self._client.mget(keys)))))
+            return dict(zip(keys, map(self._unpickle, self._client.mget(keys))))
         except redis.RedisError:
             Logger.get('cache.redis').exception('get_multi(%r) failed', keys)
 

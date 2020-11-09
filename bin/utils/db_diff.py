@@ -6,7 +6,7 @@
 # LICENSE file for more details.
 
 import os
-import pipes
+import shlex
 import subprocess
 import sys
 
@@ -43,7 +43,7 @@ def _subprocess_check_output(*popenargs, **kwargs):
 
 
 def _checked_call(verbose, args, return_output=False, env=None, stdin_data=None):
-    cmd = ' '.join([os.path.basename(args[0])] + list(map(pipes.quote, args[1:])))
+    cmd = ' '.join([os.path.basename(args[0]), shlex.join(args[1:])])
     if verbose:
         click.echo(click.style(f'** {cmd}', fg='blue', bold=True), err=True)
     kwargs = {}

@@ -81,7 +81,7 @@ class EventTimeTableHook(HTTPAPIHook):
         return TimetableSerializer(event, management=False, user=user).serialize_timetable()
 
     def export_timetable(self, user):
-        events = Event.find_all(Event.id.in_(list(map(int, self._idList))), ~Event.is_deleted)
+        events = Event.find_all(Event.id.in_(map(int, self._idList)), ~Event.is_deleted)
         return {event.id: self._serialize_timetable(event, user) for event in events}
 
 

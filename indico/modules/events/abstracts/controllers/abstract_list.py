@@ -53,7 +53,7 @@ class RHManageAbstractsActionsBase(RHAbstractListBase):
 
     def _process_args(self):
         RHAbstractListBase._process_args(self)
-        ids = list(map(int, request.form.getlist('abstract_id')))
+        ids = request.form.getlist('abstract_id', type=int)
         self.abstracts = self._abstract_query.filter(Abstract.id.in_(ids)).all()
 
 

@@ -105,7 +105,7 @@ class RHAssignProgramCodesSessions(RHAssignProgramCodesBase):
     hidden_post_field = 'session_id'
 
     def _get_objects(self):
-        ids = list(map(int, request.form.getlist('session_id')))
+        ids = request.form.getlist('session_id', type=int)
         return (Session.query
                 .with_parent(self.event)
                 .filter(Session.id.in_(ids) if ids else True)
@@ -133,7 +133,7 @@ class RHAssignProgramCodesContributions(RHAssignProgramCodesBase):
     hidden_post_field = 'contribution_id'
 
     def _get_objects(self):
-        ids = list(map(int, request.form.getlist('contribution_id')))
+        ids = request.form.getlist('contribution_id', type=int)
         return (Contribution.query
                 .with_parent(self.event)
                 .filter(Contribution.id.in_(ids) if ids else True)

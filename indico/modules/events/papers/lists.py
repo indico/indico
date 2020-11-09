@@ -96,7 +96,7 @@ class PaperListGeneratorBase(ListGeneratorBase):
                 PaperReviewingRole.content_reviewer.value: Contribution.paper_content_reviewers,
                 PaperReviewingRole.layout_reviewer.value: Contribution.paper_layout_reviewers,
             }
-            filtered_roles = list(map(PaperReviewingRole, list(map(int, filters['items']['unassigned']))))
+            filtered_roles = list(map(PaperReviewingRole, map(int, filters['items']['unassigned'])))
             unassigned_criteria = [~role_map[role.value].any() for role in filtered_roles
                                    if (role == PaperReviewingRole.judge or
                                        self.event.cfp.get_reviewing_state(role.review_type))]

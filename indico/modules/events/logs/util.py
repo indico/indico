@@ -73,7 +73,7 @@ def make_diff_log(changes, fields):
             change = [x.isoformat() for x in change]
         else:
             type_ = 'text'
-            change = list(map(str, list(map(orig_string, change))))
+            change = list(map(str, map(orig_string, change)))
         data[title] = list(change) + [type_]
     return data
 
