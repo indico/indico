@@ -40,7 +40,7 @@ def postgresql():
 
     # Ensure we have initdb and a recent enough postgres version
     try:
-        version_output = subprocess.check_output(['initdb', '--version'])
+        version_output = subprocess.check_output(['initdb', '--version'], text=True)
     except Exception as e:
         pytest.skip(f'Could not retrieve PostgreSQL version: {e}')
     pg_version = list(map(int, re.match(r'initdb \(PostgreSQL\) ((?:\d+\.?)+)', version_output).group(1).split('.')))
