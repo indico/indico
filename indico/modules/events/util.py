@@ -672,7 +672,7 @@ class ZipGeneratorMixin:
         :param return_file: Return the temp file instead of a response
         """
 
-        temp_file = NamedTemporaryFile(suffix='indico.tmp', dir=config.TEMP_DIR)
+        temp_file = NamedTemporaryFile(suffix='.zip', dir=config.TEMP_DIR, delete=(not return_file))
         with ZipFile(temp_file.name, 'w', allowZip64=True) as zip_handler:
             self.used_filenames = set()
             for item in self._iter_items(files_holder):
@@ -685,7 +685,6 @@ class ZipGeneratorMixin:
         chmod_umask(temp_file.name)
         if return_file:
             return temp_file
-        temp_file.delete = False
         return send_file(zip_file_name, temp_file.name, 'application/zip', inline=False)
 
     def _prepare_folder_structure(self, item):

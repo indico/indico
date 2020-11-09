@@ -85,7 +85,8 @@ class StaticEventCreator:
 
     def create(self):
         """Trigger the creation of a ZIP file containing the site."""
-        temp_file = NamedTemporaryFile(suffix='indico.tmp', dir=config.TEMP_DIR)
+        temp_file = NamedTemporaryFile(prefix=f'static-{self.event.id}-', suffix='.zip', dir=config.TEMP_DIR,
+                                       delete=False)
         self._zip_file = ZipFile(temp_file.name, 'w', allowZip64=True)
 
         with collect_static_files() as used_assets:
@@ -112,7 +113,6 @@ class StaticEventCreator:
         if config.CUSTOMIZATION_DIR:
             self._copy_customization_files(used_assets)
 
-        temp_file.delete = False
         chmod_umask(temp_file.name)
         self._zip_file.close()
         return temp_file.name
