@@ -28,7 +28,7 @@ from indico.modules.events.models.events import EventType
 from indico.modules.events.views import WPConferenceDisplay
 from indico.util.fs import secure_filename
 from indico.util.i18n import _
-from indico.util.string import crc32, to_unicode
+from indico.util.string import crc32
 from indico.web.flask.templating import get_template_module
 from indico.web.flask.util import send_file, url_for
 from indico.web.forms import fields as indico_fields
@@ -187,7 +187,7 @@ class RHLayoutLogoDelete(RHLayoutBase):
 class RHLayoutCSSUpload(RHLayoutBase):
     def _process(self):
         f = request.files['css_file']
-        self.event.stylesheet = to_unicode(f.read()).strip()
+        self.event.stylesheet = str(f.read()).strip()
         self.event.stylesheet_metadata = {
             'hash': crc32(self.event.stylesheet),
             'size': len(self.event.stylesheet),

@@ -13,7 +13,6 @@ from lxml import etree
 from pytz import timezone, utc
 
 from indico.core.logger import Logger
-from indico.util.string import to_unicode
 from indico.web.http_api.metadata.serializer import Serializer
 
 
@@ -39,11 +38,10 @@ class XMLSerializer(Serializer):
             return value.isoformat()
         elif isinstance(value, (int, float, bool)):
             return str(value)
+        elif isinstance(value, str):
+            # Get rid of control chars breaking XML conversion
+            return _control_char_re.sub('', value)
         else:
-            value = to_unicode(value) if isinstance(value, str) else value
-            if isinstance(value, str):
-                # Get rid of control chars breaking XML conversion
-                value = _control_char_re.sub('', value)
             return value
 
     def _xmlForFossil(self, fossil, doc=None):

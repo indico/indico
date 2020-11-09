@@ -15,7 +15,6 @@ from indico.modules.users import User, logger
 from indico.util.caching import memoize_request
 from indico.util.fossilize import Fossilizable
 from indico.util.locators import locator_property
-from indico.util.string import to_unicode
 
 
 AVATAR_FIELD_MAP = {
@@ -91,16 +90,10 @@ class AvatarUserWrapper(Fossilizable):
         # The user has been blocked or deleted (due to merge)
         return not self.user or self.user.is_blocked or self.user.is_deleted
 
-    def setName(self, name, reindex=False):
-        self.user.first_name = to_unicode(name)
-
     def getName(self):
         return self.user.first_name if self.user else ''
 
     getFirstName = getName
-
-    def setSurName(self, surname, reindex=False):
-        self.user.last_name = to_unicode(surname)
 
     def getSurName(self):
         return self.user.last_name if self.user else ''
@@ -133,28 +126,16 @@ class AvatarUserWrapper(Fossilizable):
         return self.user.get_full_name(last_name_first=False, last_name_upper=False,
                                        abbrev_first_name=True, show_title=False)
 
-    def setOrganisation(self, affiliation, reindex=False):
-        self.user.affiliation = to_unicode(affiliation)
-
     def getOrganisation(self):
         return self.user.affiliation if self.user else ''
 
     getAffiliation = getOrganisation
 
-    def setTitle(self, title):
-        self.user.title = to_unicode(title)
-
     def getTitle(self):
         return self.user.title if self.user else ''
 
-    def setTimezone(self, tz):
-        self.user.settings.set('timezone', to_unicode(tz))
-
     def getAddress(self):
         return self.user.address if self.user else ''
-
-    def setAddress(self, address):
-        self.user.address = to_unicode(address)
 
     def getEmails(self):
         # avoid 'stale association proxy'
@@ -165,9 +146,6 @@ class AvatarUserWrapper(Fossilizable):
         return self.user.email if self.user else ''
 
     email = property(getEmail)
-
-    def setEmail(self, email, reindex=False):
-        self.user.email = to_unicode(email)
 
     def hasEmail(self, email):
         user = self.user  # avoid 'stale association proxy'
@@ -184,11 +162,6 @@ class AvatarUserWrapper(Fossilizable):
         return ''
 
     getPhone = getTelephone
-
-    def setTelephone(self, phone):
-        self.user.phone = to_unicode(phone)
-
-    setPhone = setTelephone
 
     def canUserModify(self, avatar):
         if not self.user:
@@ -263,10 +236,10 @@ class AvatarProvisionalWrapper(Fossilizable):
         return self.data.get('last_name', '')
 
     def getStraightFullName(self, upper=False):
-        last_name = to_unicode(self.data.get('last_name', ''))
+        last_name = self.data.get('last_name', '')
         if upper:
             last_name = last_name.upper()
-        return '{} {}'.format(to_unicode(self.data.get('first_name', '')), last_name)
+        return '{} {}'.format(self.data.get('first_name', ''), last_name)
 
     def getTitle(self):
         return ''

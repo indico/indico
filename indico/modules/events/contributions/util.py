@@ -33,7 +33,7 @@ from indico.modules.events.util import serialize_person_link, track_time_changes
 from indico.util.date_time import format_human_timedelta
 from indico.util.i18n import _
 from indico.util.spreadsheets import csv_text_io_wrapper
-from indico.util.string import to_unicode, validate_email
+from indico.util.string import validate_email
 from indico.web.flask.templating import get_template_module
 from indico.web.flask.util import send_file, url_for
 from indico.web.http_api.metadata.serializer import Serializer
@@ -249,8 +249,7 @@ def import_contributions_from_csv(event, f):
     contrib_data = []
     for num_row, row in enumerate(reader, 1):
         try:
-            start_dt, duration, title, first_name, last_name, affiliation, email = \
-                [to_unicode(value).strip() for value in row]
+            start_dt, duration, title, first_name, last_name, affiliation, email = [value.strip() for value in row]
             email = email.lower()
         except ValueError:
             raise UserValueError(_('Row {}: malformed CSV data - please check that the number of columns is correct')

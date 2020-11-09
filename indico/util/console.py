@@ -17,7 +17,7 @@ from click.types import convert_type
 from colorclass import Color
 from termcolor import colored
 
-from indico.util.string import to_unicode, validate_email
+from indico.util.string import validate_email
 
 
 def prompt_email(prompt='Email', default=None, confirm=False):
@@ -74,7 +74,7 @@ def verbose_iterator(iterable, total, get_id, get_title, print_every=10):
             remaining_seconds = int((time.time() - start_time) / i * (total - i))
             remaining = '{:02}:{:02}'.format(remaining_seconds // 60, remaining_seconds % 60)
             id_ = get_id(item)
-            title = to_unicode(get_title(item).replace('\n', ' '))
+            title = get_title(item).replace('\n', ' ')
             text = fmt.format(i, total, (i / total * 100.0), remaining, id_, title)
             print('\r', ' ' * term_width, end='', sep='')
             # terminal width + ansi control code length - trailing reset code (4)

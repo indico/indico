@@ -43,7 +43,7 @@ from indico.modules.users.util import get_user_by_email
 from indico.util.date_time import format_date
 from indico.util.i18n import _
 from indico.util.spreadsheets import csv_text_io_wrapper, unique_col
-from indico.util.string import to_unicode, validate_email, validate_email_verbose
+from indico.util.string import validate_email, validate_email_verbose
 from indico.web.forms.base import IndicoForm
 from indico.web.forms.widgets import SwitchWidget
 
@@ -559,7 +559,7 @@ def import_registrations_from_csv(regform, fileobj, skip_moderation=True, notify
     todo = []
     for row_num, row in enumerate(reader, 1):
         try:
-            first_name, last_name, affiliation, position, phone, email = [to_unicode(value).strip() for value in row]
+            first_name, last_name, affiliation, position, phone, email = [value.strip() for value in row]
             email = email.lower()
         except ValueError:
             raise UserValueError(_('Row {}: malformed CSV data - please check that the number of columns is correct')

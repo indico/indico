@@ -29,7 +29,7 @@ from reportlab.platypus.frames import Frame
 
 from indico.legacy.common.utils import isStringHTML
 from indico.util.i18n import _
-from indico.util.string import sanitize_for_platypus, to_unicode
+from indico.util.string import sanitize_for_platypus
 
 
 ratio = math.sqrt(math.sqrt(2.0))
@@ -151,7 +151,7 @@ class Paragraph(platypus.Paragraph):
     """
 
     def __init__(self, text, style, part="", bulletText=None, frags=None, caseSensitive=1):
-        platypus.Paragraph.__init__(self, to_unicode(text), style, bulletText, frags, caseSensitive)
+        platypus.Paragraph.__init__(self, str(text), style, bulletText, frags, caseSensitive)
         self._part = part
 
     def setPart(self, part):
@@ -190,7 +190,7 @@ class TableOfContentsEntry(Paragraph):
     """
 
     def __init__(self, text, pageNumber, style, part="", bulletText=None, frags=None, caseSensitive=1):
-        Paragraph.__init__(self, to_unicode(text), style, part, bulletText, frags, caseSensitive)
+        Paragraph.__init__(self, str(text), style, part, bulletText, frags, caseSensitive)
         self._part = part
         self._pageNumber = pageNumber
 

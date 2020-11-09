@@ -14,7 +14,7 @@ from indico.modules.events.roles.forms import ImportMembersCSVForm
 from indico.modules.users import User
 from indico.util.i18n import _, ngettext
 from indico.util.spreadsheets import csv_text_io_wrapper
-from indico.util.string import to_unicode, validate_email
+from indico.util.string import validate_email
 from indico.web.flask.templating import get_template_module
 from indico.web.util import jsonify_data, jsonify_template
 
@@ -32,7 +32,7 @@ class ImportRoleMembersMixin:
         for num_row, row in enumerate(reader, 1):
             if len(row) != 1:
                 raise UserValueError(_('Row {}: malformed CSV data').format(num_row))
-            email = to_unicode(row[0]).strip().lower()
+            email = row[0].strip().lower()
 
             if email and not validate_email(email):
                 raise UserValueError(_('Row {row}: invalid email address: {email}').format(row=num_row, email=email))

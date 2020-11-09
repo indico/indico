@@ -28,7 +28,6 @@ from indico.modules.api.models.keys import APIKey
 from indico.modules.oauth import oauth
 from indico.modules.oauth.provider import load_token
 from indico.util.fossilize import clearCache, fossilize
-from indico.util.string import to_unicode
 from indico.web.http_api import HTTPAPIHook
 from indico.web.http_api.fossils import IHTTPAPIExportResultFossil
 from indico.web.http_api.metadata.serializer import Serializer
@@ -254,7 +253,7 @@ def handler(prefix, path):
         if ak and error is None:
             # Commit only if there was an API key and no error
             norm_path, norm_query = normalizeQuery(path, query, remove=('signature', 'timestamp'), separate=True)
-            uri = to_unicode('?'.join([_f for _f in (norm_path, norm_query) if _f]))
+            uri = '?'.join([_f for _f in (norm_path, norm_query) if _f])
             ak.register_used(request.remote_addr, uri, not onlyPublic)
             db.session.commit()
         else:

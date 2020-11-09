@@ -22,7 +22,6 @@ from indico.modules.core.settings import core_settings
 from indico.modules.users import User
 from indico.util.i18n import _, get_all_locales
 from indico.util.network import is_private_url
-from indico.util.string import to_unicode
 from indico.util.system import get_os
 from indico.web.flask.templating import get_template_module
 from indico.web.flask.util import url_for
@@ -54,10 +53,10 @@ class RHBootstrap(RH):
 
         # Creating new user
         user = User()
-        user.first_name = to_unicode(setup_form.first_name.data)
-        user.last_name = to_unicode(setup_form.last_name.data)
-        user.affiliation = to_unicode(setup_form.affiliation.data)
-        user.email = to_unicode(setup_form.email.data)
+        user.first_name = setup_form.first_name.data
+        user.last_name = setup_form.last_name.data
+        user.affiliation = setup_form.affiliation.data
+        user.email = setup_form.email.data
         user.is_admin = True
 
         identity = Identity(provider='indico', identifier=setup_form.username.data, password=setup_form.password.data)

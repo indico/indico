@@ -10,8 +10,6 @@ from sqlalchemy.event import listens_for
 from sqlalchemy.sql import func
 from sqlalchemy.sql.elements import conv
 
-from indico.util.string import to_unicode
-
 
 # if you wonder why search_path is set and the two-argument `unaccent` function is used,
 # see this post on stackoverflow: http://stackoverflow.com/a/11007216/298479
@@ -64,7 +62,7 @@ def define_unaccented_lowercase_index(column):
 
 def unaccent_match(column, value, exact):
     from indico.core.db import db
-    value = to_unicode(value).replace('%', r'\%').replace('_', r'\_').lower()
+    value = value.replace('%', r'\%').replace('_', r'\_').lower()
     if not exact:
         value = f'%{value}%'
     # we always use LIKE, even for an exact match. when using the pg_trgm indexes this is

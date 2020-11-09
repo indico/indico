@@ -37,7 +37,6 @@ from indico.util.date_time import iterdays
 from indico.util.fossilize import fossilize
 from indico.util.fossilize.conversion import Conversion
 from indico.util.signals import values_from_signal
-from indico.util.string import to_unicode
 from indico.web.flask.util import send_file, url_for
 from indico.web.http_api.fossils import IPeriodFossil
 from indico.web.http_api.hooks.base import HTTPAPIHook, IteratedDataFetcher
@@ -730,8 +729,7 @@ class EventSearchFetcher(IteratedDataFetcher):
     def event(self, query):
         def _iterate_objs(query_string):
             query = (Event.query
-                     .filter(Event.title_matches(to_unicode(query_string)),
-                             ~Event.is_deleted)
+                     .filter(Event.title_matches(query_string), ~Event.is_deleted)
                      .options(undefer('effective_protection_mode')))
             sort_dir = db.desc if self._descending else db.asc
             if self._orderBy == 'start':

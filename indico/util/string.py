@@ -14,7 +14,6 @@ import binascii
 import re
 import string
 import unicodedata
-import warnings
 from enum import Enum
 from itertools import chain
 from operator import attrgetter
@@ -75,15 +74,6 @@ def remove_accents(text):
     return ''.join(c for c in unicodedata.normalize('NFD', text) if unicodedata.category(c) != 'Mn')
 
 
-def to_unicode(text):
-    """Convert a string to unicode if it isn't already unicode."""
-    # TODO get rid of this function altogether
-    if isinstance(text, bytes):
-        warnings.warn('to_unicode() with bytes arg is deprecated', DeprecationWarning, stacklevel=2)
-        return text.decode()
-    return str(text)
-
-
 def remove_non_alpha(text):
     return ''.join(c for c in text if c.isalnum())
 
@@ -120,7 +110,7 @@ def slugify(*args, **kwargs):
     maxlen = kwargs.get('maxlen')
     fallback = kwargs.get('fallback', '')
 
-    value = '-'.join(to_unicode(val) for val in args)
+    value = '-'.join(str(val) for val in args)
     value = translitcodec.long_encode(value)[0]
     value = re.sub(r'[^\w\s-]', '', value, flags=re.ASCII).strip()
 
@@ -166,7 +156,7 @@ def render_markdown(text, escape_latex_math=True, md=None, **kwargs):
             math_segments.append(segment)
             return LATEX_MATH_PLACEHOLDER
 
-        text = re.sub(r'\$[^\$]+\$|\$\$(^\$)\$\$', _math_replace, to_unicode(text))
+        text = re.sub(r'\$[^\$]+\$|\$\$(^\$)\$\$', _math_replace, text)
 
     if md is None:
         result = bleach.clean(markdown.markdown(text, **kwargs), tags=BLEACH_ALLOWED_TAGS,
@@ -228,9 +218,8 @@ def validate_email_verbose(email):
              ``'undeliverable'`` depending on whether the email address has
              syntax errors or dns validation failed.
     """
-    email = to_unicode(email)
     try:
-        email_validator.validate_email(to_unicode(email))
+        email_validator.validate_email(email)
     except email_validator.EmailUndeliverableError:
         return 'undeliverable'
     except email_validator.EmailNotValidError:
@@ -241,7 +230,6 @@ def validate_email_verbose(email):
 
 def validate_emails(emails):
     """Validate a space/semicolon/comma-separated list of email addresses."""
-    emails = to_unicode(emails)
     emails = re.split(r'[\s;,]+', emails)
     return all(validate_email(email) for email in emails if email)
 

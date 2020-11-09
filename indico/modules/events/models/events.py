@@ -43,7 +43,7 @@ from indico.util.caching import memoize_request
 from indico.util.date_time import get_display_tz, now_utc, overlaps
 from indico.util.decorators import strict_classproperty
 from indico.util.i18n import _
-from indico.util.string import format_repr, text_to_repr, to_unicode
+from indico.util.string import format_repr, text_to_repr
 from indico.util.struct.enum import RichIntEnum
 from indico.web.flask.util import url_for
 
@@ -827,7 +827,7 @@ class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionMan
         if extra:
             emails.setdefault(extra, extra)
         # Sanitize and format emails
-        emails = {to_unicode(email.strip().lower()): '{} <{}>'.format(to_unicode(name), to_unicode(email))
+        emails = {email.strip().lower(): f'{name} <{email}>'
                   for email, name in emails.items()
                   if email and email.strip()}
         own_email = session.user.email if has_request_context() and session.user else None

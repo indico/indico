@@ -15,7 +15,7 @@ from flask import g
 from indico.core.config import config
 from indico.core.db import db
 from indico.core.logger import Logger
-from indico.util.string import to_unicode, truncate
+from indico.util.string import truncate
 
 
 logger = Logger.get('emails')
@@ -75,7 +75,7 @@ def _log_email(email, event, module, user, meta=None):
         'state': 'pending',
         'sent_dt': None,
     }
-    return event.log(EventLogRealm.emails, EventLogKind.other, to_unicode(module or 'Unknown'), log_data['subject'],
+    return event.log(EventLogRealm.emails, EventLogKind.other, module or 'Unknown', log_data['subject'],
                      user, type_='email', data=log_data, meta=meta)
 
 
@@ -164,13 +164,13 @@ def make_email(to_list=None, cc_list=None, bcc_list=None, from_address=None, rep
     bcc_list = {bcc_list} if isinstance(bcc_list, str) else bcc_list
     reply_address = {reply_address} if isinstance(reply_address, str) else (reply_address or set())
     return {
-        'to': set(map(to_unicode, to_list)),
-        'cc': set(map(to_unicode, cc_list)),
-        'bcc': set(map(to_unicode, bcc_list)),
-        'from': to_unicode(from_address or config.NO_REPLY_EMAIL),
-        'reply_to': set(map(to_unicode, reply_address)),
+        'to': set(to_list),
+        'cc': set(cc_list),
+        'bcc': set(bcc_list),
+        'from': from_address or config.NO_REPLY_EMAIL,
+        'reply_to': set(reply_address),
         'attachments': attachments or [],
-        'subject': to_unicode(subject).strip(),
-        'body': to_unicode(body).strip(),
+        'subject': subject.strip(),
+        'body': body.strip(),
         'html': html,
     }

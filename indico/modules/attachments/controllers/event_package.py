@@ -29,7 +29,7 @@ from indico.modules.events.util import ZipGeneratorMixin
 from indico.util.date_time import format_date, format_time
 from indico.util.fs import secure_filename
 from indico.util.i18n import _
-from indico.util.string import natural_sort_key, to_unicode
+from indico.util.string import natural_sort_key
 from indico.web.forms.base import FormDefaults
 from indico.web.util import jsonify_data
 
@@ -161,7 +161,7 @@ class AttachmentPackageGeneratorMixin(ZipGeneratorMixin):
                     paths.append(secure_filename(f'{obj.position}_{obj.title}', ''))
                 else:
                     time = format_time(start_date, format='HHmm', timezone=self.event.timezone)
-                    paths.append(secure_filename('{}_{}'.format(to_unicode(time), obj.title), ''))
+                    paths.append(secure_filename(f'{time}_{obj.title}', ''))
             else:
                 if isinstance(obj, SubContribution):
                     paths.append(secure_filename(f'{obj.position}_{obj.title}', str(obj.id)))

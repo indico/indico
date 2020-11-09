@@ -16,7 +16,6 @@ from indico.modules.users import User
 from indico.modules.users.operations import create_user
 from indico.modules.users.util import search_users
 from indico.util.console import cformat, prompt_email, prompt_pass
-from indico.util.string import to_unicode
 
 
 click.disable_unicode_literals_warning = True
@@ -133,8 +132,7 @@ def create(grant_admin):
         return
 
     identity = Identity(provider='indico', identifier=username, password=password)
-    user = create_user(email, {'first_name': to_unicode(first_name), 'last_name': to_unicode(last_name),
-                               'affiliation': to_unicode(affiliation)}, identity)
+    user = create_user(email, {'first_name': first_name, 'last_name': last_name, 'affiliation': affiliation}, identity)
     user.is_admin = grant_admin
     _print_user_info(user)
 

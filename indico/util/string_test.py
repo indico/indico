@@ -12,7 +12,7 @@ import pytest
 
 from indico.util.string import (camelize, camelize_keys, crc32, format_repr, html_to_plaintext, make_unique_token,
                                 normalize_phone_number, render_markdown, sanitize_email, seems_html, slugify, snakify,
-                                snakify_keys, strip_tags, text_to_repr, to_unicode)
+                                snakify_keys, strip_tags, text_to_repr)
 
 
 def test_seems_html():
@@ -20,13 +20,6 @@ def test_seems_html():
     assert seems_html('a <b> c')
     assert not seems_html('test')
     assert not seems_html('a < b > c')
-
-
-def test_to_unicode():
-    assert to_unicode(123) == '123'
-    assert to_unicode(None) == 'None'
-    with pytest.deprecated_call():
-        assert to_unicode(b'foo') == 'foo'
 
 
 def test_make_unique_token(monkeypatch):

@@ -20,7 +20,6 @@ from indico.modules.legal import legal_settings
 from indico.util.decorators import classproperty
 from indico.util.i18n import _, get_all_locales
 from indico.util.signals import values_from_signal
-from indico.util.string import to_unicode
 from indico.web.flask.templating import get_template_module
 from indico.web.flask.util import url_for
 from indico.web.menu import build_menu_structure
@@ -259,7 +258,7 @@ class WPBase(WPBundleMixin):
         css_files = list(map(self._fix_path, self.get_extra_css_files() + custom_css))
         js_files = list(map(self._fix_path, custom_js))
 
-        body = to_unicode(self._display(params))
+        body = self._display(params)
         bundles = itertools.chain((current_app.manifest[x] for x in self._resolve_bundles()
                                    if x in current_app.manifest._entries),
                                   self.additional_bundles['screen'], injected_bundles)
@@ -273,7 +272,7 @@ class WPBase(WPBundleMixin):
                                social=social_settings.get_all(),
                                page_metadata=self.page_metadata,
                                page_title=' - '.join(str(x) for x in title_parts if x),
-                               head_content=to_unicode(self._get_head_content()),
+                               head_content=self._get_head_content(),
                                body=body)
 
 

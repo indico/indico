@@ -12,7 +12,6 @@ from indico.core.config import config
 from indico.modules.auth import Identity
 from indico.modules.users.operations import create_user
 from indico.util.signing import secure_serializer
-from indico.util.string import to_unicode
 from indico.web.flask.util import url_for
 
 
@@ -102,7 +101,7 @@ def redirect_to_login(next_url=None, reason=None):
     if not next_url:
         next_url = request.relative_url
     if reason:
-        session['login_reason'] = to_unicode(reason)
+        session['login_reason'] = reason
     return redirect(url_for_login(next_url))
 
 

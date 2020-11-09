@@ -13,7 +13,6 @@ from indico.core.notifications import email_sender, make_email
 from indico.modules.rb.settings import RoomEmailMode, rb_user_settings
 from indico.modules.users import User, UserSetting
 from indico.util.date_time import format_datetime
-from indico.util.string import to_unicode
 from indico.web.flask.templating import get_template_module
 
 
@@ -49,11 +48,11 @@ class ReservationNotification:
 
     def _get_email_subject(self, **mail_params):
         return '{prefix}[{room}] {subject} ({date}) {suffix}'.format(
-            prefix=to_unicode(mail_params.get('subject_prefix', '')),
+            prefix=mail_params.get('subject_prefix', ''),
             room=self.reservation.room.full_name,
-            subject=to_unicode(mail_params.get('subject', '')),
-            date=to_unicode(self.start_dt),
-            suffix=to_unicode(mail_params.get('subject_suffix', ''))
+            subject=mail_params.get('subject', ''),
+            date=self.start_dt,
+            suffix=mail_params.get('subject_suffix', '')
         ).strip()
 
     def _make_body(self, mail_params, **body_params):
