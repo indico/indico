@@ -29,7 +29,7 @@ from html2text import HTML2Text
 from jinja2.filters import do_striptags
 from lxml import etree, html
 from markupsafe import Markup, escape
-from speaklater import _LazyString, is_lazy_string
+from speaklater import is_lazy_string
 from sqlalchemy import ForeignKeyConstraint, inspect
 
 
@@ -73,27 +73,8 @@ BLEACH_ALLOWED_STYLES_HTML = [
 LATEX_MATH_PLACEHOLDER = "\uE000"
 
 
-def encode_if_unicode(s):
-    if isinstance(s, _LazyString) and isinstance(s.value, str):
-        s = str(s)
-    return s.encode('utf-8') if isinstance(s, str) else s
-
-
-def safe_upper(text):
-    if isinstance(text, str):
-        return text.upper()
-    else:
-        return text.decode('utf-8').upper().encode('utf-8')
-
-
-def remove_accents(text, reencode=True):
-    if not isinstance(text, str):
-        text = text.decode('utf-8')
-    result = ''.join(c for c in unicodedata.normalize('NFD', text) if unicodedata.category(c) != 'Mn')
-    if reencode:
-        return result.encode('utf-8')
-    else:
-        return result
+def remove_accents(text):
+    return ''.join(c for c in unicodedata.normalize('NFD', text) if unicodedata.category(c) != 'Mn')
 
 
 def to_unicode(text):

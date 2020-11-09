@@ -85,11 +85,12 @@ class RHEventMarcXML(RHDisplayEventBase):
         xmlgen = XMLGen()
         xmlgen.initXml()
         outgen = outputGenerator(session.user, xmlgen)
-        xmlgen.openTag(b'marc:record', [
-            [b'xmlns:marc', b'http://www.loc.gov/MARC21/slim'],
-            [b'xmlns:xsi', b'http://www.w3.org/2001/XMLSchema-instance'],
-            [b'xsi:schemaLocation',
-             b'http://www.loc.gov/MARC21/slim http://www.loc.gov/standards/marcxml/schema/MARC21slim.xsd']])
+        xmlgen.openTag('marc:record', [
+            ['xmlns:marc', 'http://www.loc.gov/MARC21/slim'],
+            ['xmlns:xsi', 'http://www.w3.org/2001/XMLSchema-instance'],
+            ['xsi:schemaLocation',
+             'http://www.loc.gov/MARC21/slim http://www.loc.gov/standards/marcxml/schema/MARC21slim.xsd']
+        ])
         outgen.confToXMLMarc21(self.event)
-        xmlgen.closeTag(b'marc:record')
-        return send_file(f'event-{self.event.id}.marc.xml', BytesIO(xmlgen.getXml()), 'application/xml')
+        xmlgen.closeTag('marc:record')
+        return send_file(f'event-{self.event.id}.marc.xml', BytesIO(xmlgen.getXml().encode()), 'application/xml')

@@ -55,19 +55,10 @@ def get_translation_domain(plugin_name=_use_context):
 def gettext_unicode(*args, **kwargs):
     func_name = kwargs.pop('func_name', 'ugettext')
     plugin_name = kwargs.pop('plugin_name', None)
-    force_unicode = kwargs.pop('force_unicode', False)
-
-    if not isinstance(args[0], str):
-        args = [(text.decode('utf-8') if isinstance(text, str) else text) for text in args]
-        using_unicode = force_unicode
-    else:
-        using_unicode = True
+    kwargs.pop('force_unicode', False)
 
     translations = get_translation_domain(plugin_name).get_translations()
-    res = getattr(translations, func_name)(*args, **kwargs)
-    if not using_unicode:
-        res = res.encode('utf-8')
-    return res
+    return getattr(translations, func_name)(*args, **kwargs)
 
 
 def lazy_gettext(string, plugin_name=None):
@@ -81,7 +72,7 @@ def orig_string(lazy_string):
     return lazy_string._args[0] if is_lazy_string(lazy_string) else lazy_string
 
 
-def smart_func(func_name, plugin_name=None, force_unicode=False):
+def smart_func(func_name, plugin_name=None):
     def _wrap(*args, **kwargs):
         """
         Returns either a translated string or a lazy-translatable object,
@@ -90,8 +81,7 @@ def smart_func(func_name, plugin_name=None, force_unicode=False):
 
         if has_request_context() or func_name != 'ugettext':
             # straight translation
-            return gettext_unicode(*args, func_name=func_name, plugin_name=plugin_name, force_unicode=force_unicode,
-                                   **kwargs)
+            return gettext_unicode(*args, func_name=func_name, plugin_name=plugin_name, **kwargs)
         else:
             # otherwise, defer translation to eval time
             return lazy_gettext(*args, plugin_name=plugin_name)
@@ -102,18 +92,18 @@ def smart_func(func_name, plugin_name=None, force_unicode=False):
     return _wrap
 
 
-def make_bound_gettext(plugin_name, force_unicode=False):
+def make_bound_gettext(plugin_name):
     """
     Create a smart gettext callable bound to the domain of the specified plugin.
     """
-    return smart_func('ugettext', plugin_name=plugin_name, force_unicode=force_unicode)
+    return smart_func('ugettext', plugin_name=plugin_name)
 
 
-def make_bound_ngettext(plugin_name, force_unicode=False):
+def make_bound_ngettext(plugin_name):
     """
     Create a smart ngettext callable bound to the domain of the specified plugin.
     """
-    return smart_func('ungettext', plugin_name=plugin_name, force_unicode=force_unicode)
+    return smart_func('ungettext', plugin_name=plugin_name)
 
 
 # Shortcuts
@@ -122,9 +112,8 @@ ungettext = ngettext = make_bound_ngettext(None)
 L_ = lazy_gettext
 
 # Plugin-context-sensitive gettext for templates
-# They always return unicode even when passed a bytestring
-gettext_context = make_bound_gettext(_use_context, force_unicode=True)
-ngettext_context = make_bound_ngettext(_use_context, force_unicode=True)
+gettext_context = make_bound_gettext(_use_context)
+ngettext_context = make_bound_ngettext(_use_context)
 
 # Just a marker for message extraction
 N_ = lambda text: text  # noqa

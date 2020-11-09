@@ -331,7 +331,7 @@ def _ical_serialize_reservation(cal, data, now):
     event.add('url', data['bookingUrl'])
     event.add('summary', data['reason'])
     event.add('location', '{}: {}'.format(data['location'], data['room']['fullName']))
-    event.add('description', data['reason'].decode('utf-8') + '\n\n' + data['bookingUrl'])
+    event.add('description', data['reason'] + '\n\n' + data['bookingUrl'])
     if data['repeat_frequency'] != RepeatFrequency.NEVER:
         event.add('rrule', _ical_serialize_repeatability(data))
     cal.add_component(event)

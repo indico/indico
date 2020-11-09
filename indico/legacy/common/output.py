@@ -7,7 +7,6 @@
 
 # flake8: noqa
 
-import string
 from collections import defaultdict
 from datetime import datetime
 
@@ -143,8 +142,10 @@ class outputGenerator:
 
         sd = event.start_dt
         ed = event.end_dt
-        out.writeTag("subfield","%d-%s-%sT%s:%s:00Z" %(sd.year, string.zfill(sd.month,2), string.zfill(sd.day,2), string.zfill(sd.hour,2), string.zfill(sd.minute,2)),[["code","9"]])
-        out.writeTag("subfield","%d-%s-%sT%s:%s:00Z" %(ed.year, string.zfill(ed.month,2), string.zfill(ed.day,2), string.zfill(ed.hour,2), string.zfill(ed.minute,2)),[["code","z"]])
+        out.writeTag("subfield","%04d-%02d-%02dT%02d:%02d:00Z" % (sd.year, sd.month, sd.day, sd.hour, sd.minute),
+                     [["code","9"]])
+        out.writeTag("subfield","%04d-%02d-%02dT%02d:%02d:00Z" % (ed.year, ed.month, ed.day, ed.hour, ed.minute),
+                     [["code","z"]])
 
         out.writeTag("subfield", uniqueId(event), [["code", "g"]])
         out.closeTag("datafield")
@@ -154,7 +155,8 @@ class outputGenerator:
         sd = event.start_dt
         if sd is not None:
             out.openTag("datafield",[["tag","518"],["ind1"," "],["ind2"," "]])
-            out.writeTag("subfield","%d-%s-%sT%s:%s:00Z" %(sd.year, string.zfill(sd.month,2), string.zfill(sd.day,2), string.zfill(sd.hour,2), string.zfill(sd.minute,2)),[["code","d"]])
+            out.writeTag("subfield","%04d-%02d-%02dT%02d:%02d:00Z" % (sd.year, sd.month, sd.day, sd.hour, sd.minute),
+                         [["code","d"]])
             out.closeTag("datafield")
 
         out.openTag("datafield",[["tag","520"],["ind1"," "],["ind2"," "]])

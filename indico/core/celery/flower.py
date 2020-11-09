@@ -93,7 +93,7 @@ class FlowerAuthHandler(BaseHandler, OAuth2Mixin):
                           headers={'Authorization': 'Bearer ' + access_token, 'User-agent': 'Tornado auth'},
                           validate_cert=False)
         response = HTTPClient().fetch(req)
-        payload = json.loads(response.body.decode('utf-8'))
+        payload = json.loads(response.body.decode())
         if not payload or not payload['admin']:
             raise HTTPError(403, 'Access denied')
         self.set_secure_cookie('user', 'Indico Admin')

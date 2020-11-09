@@ -379,11 +379,11 @@ class StaticConferenceCreator(StaticEventCreator):
             # Got legacy reportlab PDF generator instead of the LaTex-based one
             self._add_file(pdf.getPDFBin(), uh_or_endpoint, target)
         else:
-            with open(pdf.generate()) as f:
+            with open(pdf.generate(), 'rb') as f:
                 self._add_file(f, uh_or_endpoint, target)
 
     def _add_file(self, file_like_or_str, uh_or_endpoint, target):
-        if isinstance(file_like_or_str, str):
+        if isinstance(file_like_or_str, (str, bytes)):
             content = file_like_or_str
         else:
             content = file_like_or_str.read()

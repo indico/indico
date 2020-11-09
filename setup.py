@@ -27,8 +27,8 @@ def get_requirements():
 
 def get_version():
     _version_re = re.compile(r'__version__\s+=\s+(.*)')
-    with open('indico/__init__.py', 'rb') as f:
-        return str(ast.literal_eval(_version_re.search(f.read().decode('utf-8')).group(1)))
+    with open('indico/__init__.py') as f:
+        return str(ast.literal_eval(_version_re.search(f.read()).group(1)))
 
 
 class BuildWithTranslations(build):

@@ -30,8 +30,8 @@ sys.path.insert(0, os.path.abspath('.'))
 
 def _get_version():
     _version_re = re.compile(r'__version__\s+=\s+(.*)')
-    with open('../../indico/__init__.py', 'rb') as f:
-        version = str(ast.literal_eval(_version_re.search(f.read().decode('utf-8')).group(1)))
+    with open('../../indico/__init__.py', 'r') as f:
+        version = str(ast.literal_eval(_version_re.search(f.read()).group(1)))
     short_version = re.match(r'^(\d+(?:\.\d+)*).*?$', version).group(1)
     return short_version, version
 

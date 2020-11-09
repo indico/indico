@@ -23,7 +23,6 @@ from reportlab.rl_config import defaultPageSize
 from speaklater import is_lazy_string
 
 from indico.core.db import db
-from indico.legacy.common import utils
 from indico.legacy.pdfinterface.base import PageBreak, Paragraph, PDFBase, PDFWithTOC, Spacer, escape, modifiedFontSize
 from indico.modules.events.layout.util import get_menu_entry_by_name
 from indico.modules.events.registration.models.items import PersonalDataType
@@ -1063,9 +1062,7 @@ class RegistrantsListToBookPDF(PDFWithTOC):
         c.setFillColorRGB(0.5, 0.5, 0.5)
         confTitle = escape(truncate(self.event.title, 30))
         c.drawString(inch, self._PAGE_HEIGHT - 0.75 * inch, "%s / %s"%(confTitle, self._title))
-        title = doc.getCurrentPart()
-        if len(doc.getCurrentPart())>50:
-            title = utils.unicodeSlice(doc.getCurrentPart(), 0, 50) + "..."
+        title = truncate(doc.getCurrentPart(), 50)
         c.drawRightString(self._PAGE_WIDTH - inch, self._PAGE_HEIGHT - 0.75 * inch, "%s"%title)
         c.drawRightString(self._PAGE_WIDTH - inch, 0.75 * inch, " {} {} ".format(_("Page"), doc.page))
         c.drawString(inch,  0.75 * inch, now_utc().strftime("%A %d %B %Y"))

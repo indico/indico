@@ -9,22 +9,15 @@
 
 from xml.sax import saxutils
 
-from indico.legacy.common.utils import encodeUnicode
-from indico.util.string import encode_if_unicode
-
 
 class XMLGen:
 
     def __init__(self, init=True):
-        self.setSourceEncoding( "utf-8" )
         if init:
             self.initXml()
         else:
             self.xml=[]
         self.indent = 0
-
-    def setSourceEncoding( self, newEnc = "utf-8" ):
-        self._sourceEncoding = newEnc
 
     def initXml(self):
         self.xml=["""<?xml version="1.0" encoding="UTF-8"?>\n"""]
@@ -32,9 +25,8 @@ class XMLGen:
     def getXml(self):
         return "".join(self.xml)
 
-    def escapeString(self,text):
-        tmp = encodeUnicode(text, self._sourceEncoding)
-        return saxutils.escape( tmp )
+    def escapeString(self, text):
+        return saxutils.escape(text)
 
     def openTag(self, name, listAttrib=[], single=False):
         #open an XML tag
@@ -85,4 +77,4 @@ class XMLGen:
                 cm.append(" ")
             else:
                 cm.append(chr(c))
-        return str(encode_if_unicode(text)).translate("".join(cm))
+        return str(text).translate("".join(cm))
