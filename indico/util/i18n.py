@@ -115,9 +115,6 @@ L_ = lazy_gettext
 gettext_context = make_bound_gettext(_use_context)
 ngettext_context = make_bound_ngettext(_use_context)
 
-# Just a marker for message extraction
-N_ = lambda text: text  # noqa
-
 
 class NullDomain(Domain):
     """A `Domain` that doesn't contain any translations."""
