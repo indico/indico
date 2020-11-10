@@ -370,6 +370,9 @@ class ProtectionManagersMixin(ProtectionMixin):
             # Not even signals may override this since management code generally
             # expects session.user to be not None.
             return False
+        if user.is_system:
+            # A system user has no email and thus access checks (against groups) may fail
+            return False
 
         # Trigger signals for protection overrides
         rv = values_from_signal(signals.acl.can_manage.send(type(self), obj=self, user=user, permission=permission,
