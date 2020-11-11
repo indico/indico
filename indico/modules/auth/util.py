@@ -67,7 +67,7 @@ def impersonate_user(user):
     # XXX: Don't change this to setdefault - building `session_data` pops stuff from the session
     if 'login_as_orig_user' not in session:
         session['login_as_orig_user'] = {
-            'session_data': {k: session.pop(k) for k in session.keys() if k[0] != '_' or k in ('_timezone', '_lang')},
+            'session_data': {k: session.pop(k) for k in list(session) if k[0] != '_' or k in ('_timezone', '_lang')},
             'user_id': session.user.id,
             'user_name': session.user.get_full_name(last_name_first=False, last_name_upper=False)
         }
