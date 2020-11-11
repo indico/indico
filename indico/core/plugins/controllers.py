@@ -40,7 +40,7 @@ class RHPlugins(RHPluginsBase):
             categories[category].sort(key=attrgetter('configurable', 'title'))
         ordered_categories = OrderedDict(sorted(categories.items()))
         if other:
-            ordered_categories[PluginCategory.other] = other
+            ordered_categories[PluginCategory.other] = sorted(other, key=attrgetter('configurable', 'title'))
         return WPPlugins.render_template('index.html', categorized_plugins=ordered_categories)
 
 

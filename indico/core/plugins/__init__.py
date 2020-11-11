@@ -42,6 +42,9 @@ class PluginCategory(str, IndicoEnum):
     videoconference = _('Videoconference')
     other = _('Other')
 
+    def __str__(self):
+        return self.value
+
 
 class IndicoPlugin(Plugin):
     """Base class for an Indico plugin.
