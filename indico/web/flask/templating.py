@@ -8,7 +8,6 @@
 import itertools
 import posixpath
 import re
-from operator import itemgetter
 
 from dateutil.relativedelta import relativedelta
 from flask import current_app
@@ -188,7 +187,7 @@ def call_template_hook(*name, **kwargs):
             if is_markup:
                 value = Markup(value)
             values.append((priority, value))
-    values.sort(key=itemgetter(0))
+    values.sort()
     if as_list:
         return [x[1] for x in values]
     else:
