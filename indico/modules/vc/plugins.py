@@ -185,7 +185,7 @@ class VCPluginMixin(object):
         if event_vc_room.data is None:
             event_vc_room.data = {}
 
-    def update_data_vc_room(self, vc_room, data):
+    def update_data_vc_room(self, vc_room, data, is_new=False):
         if 'name' in data:
             vc_room.name = data.pop('name')
 

@@ -139,7 +139,7 @@ class RHVCManageEventCreate(RHVCManageEventCreateBase):
                 return jsonify_data(flash=False)
 
             with db.session.no_autoflush:
-                self.plugin.update_data_vc_room(vc_room, form.data)
+                self.plugin.update_data_vc_room(vc_room, form.data, is_new=True)
 
             try:
                 # avoid flushing the incomplete vc room to the database
