@@ -292,6 +292,8 @@ class RHCreateSubmitterRevision(RHContributionEditableRevisionBase):
 class RHUndoReview(RHContributionEditableRevisionBase):
     """Undo the last review/confirmation on an Editable."""
 
+    SERVICE_ALLOWED = True
+
     def _check_revision_access(self):
         return self.editable.can_perform_editor_actions(session.user)
 
