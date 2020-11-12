@@ -75,9 +75,9 @@ class RHReportErrorAPI(RH):
         # strip password and query string from the DSN, and all auth data from the POST target
         dsn = re.sub(r':[^@/]+(?=@)', '', config.SENTRY_DSN)
         url = url_parse(dsn)
-        dsn = str(url.replace(query=None))
+        dsn = str(url.replace(query=''))
         verify = url.decode_query().get('ca_certs', True)
-        url = str(url.replace(path='/api/embed/error-page/', netloc=url._split_netloc()[1], query=None))
+        url = str(url.replace(path='/api/embed/error-page/', netloc=url._split_netloc()[1], query=''))
         user_data = self.error_data['request_info']['user'] or {'name': 'Anonymous', 'email': config.NO_REPLY_EMAIL}
         try:
             rv = requests.post(url,
