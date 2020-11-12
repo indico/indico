@@ -19,6 +19,7 @@ onlyauthed  oa     Fail if the request is unauthenticated for any reason
                    when this is set to *yes*.
 cookieauth  ca     Use the Indico session cookie to authenticate instead of
                    an API key.
+nocache     nc     Disable caching of results when this is set to *yes*.
 limit       n      Return no more than the X results.
 offset      O      Skip the first X results.
 detail      d      Specify the detail level (values depend on the exported
