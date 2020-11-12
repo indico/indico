@@ -2,9 +2,13 @@ name: CI
 
 on:
   push:
-    branches: [master, actions]
+    branches:
+      - master
+      - 2.3-maintenance
   pull_request:
-    branches: [master, actions]
+    branches:
+      - master
+      - 2.3-maintenance
 
 jobs:
   setup:
