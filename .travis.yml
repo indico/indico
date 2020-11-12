@@ -7,7 +7,6 @@ git:
 branches:
   only:
     - 2.2-maintenance
-    - 2.3-maintenance
 addons:
   postgresql: '9.6'
 env:
