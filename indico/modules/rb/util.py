@@ -105,7 +105,10 @@ def remove_room_spritesheet_photo(room):
 
 
 def group_by_occurrence_date(occurrences, sort_by=None):
-    return group_list(occurrences, key=lambda obj: obj.start_dt.date(), sort_by=sort_by)
+    key = lambda obj: obj.start_dt.date()
+    if sort_by is None:
+        sort_by = key
+    return group_list(occurrences, key=key, sort_by=sort_by)
 
 
 def serialize_occurrences(data):

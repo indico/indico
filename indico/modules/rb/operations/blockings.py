@@ -56,7 +56,7 @@ def filter_blocked_rooms(blocked_rooms, overridable_only=False, nonoverridable_o
 
 
 def group_blocked_rooms(blocked_rooms):
-    return group_list(blocked_rooms, key=attrgetter('room_id'))
+    return group_list(blocked_rooms, key=attrgetter('room_id'), sort_by=attrgetter('room_id'))
 
 
 def get_blockings_with_rooms(start_date, end_date):
