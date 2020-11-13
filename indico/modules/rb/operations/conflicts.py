@@ -15,7 +15,7 @@ from flask import session
 from sqlalchemy.orm import contains_eager
 
 from indico.modules.rb.models.reservation_occurrences import ReservationOccurrence
-from indico.modules.rb.models.reservations import Reservation
+from indico.modules.rb.models.reservations import Reservation, ReservationState
 from indico.modules.rb.models.rooms import Room
 from indico.modules.rb.util import TempReservationConcurrentOccurrence, TempReservationOccurrence, rb_is_admin
 from indico.util.date_time import get_overlap
@@ -34,6 +34,7 @@ def get_rooms_conflicts(rooms, start_dt, end_dt, repeat_frequency, repeat_interv
     room_ids = [room.id for room in rooms]
     query = (ReservationOccurrence.query
              .filter(Reservation.room_id.in_(room_ids),
+                     ~Reservation.state.in_({ReservationState.cancelled, ReservationState.rejected}),
                      ReservationOccurrence.is_valid,
                      ReservationOccurrence.filter_overlap(candidates))
              .join(ReservationOccurrence.reservation)
