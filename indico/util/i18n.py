@@ -7,15 +7,12 @@
 
 import ast
 import re
-import textwrap
-import traceback
-import warnings
 from contextlib import contextmanager
 
 from babel import negotiate_locale
 from babel.core import LOCALE_ALIASES, Locale
 from babel.messages.pofile import read_po
-from babel.support import NullTranslations, Translations
+from babel.support import NullTranslations
 from flask import current_app, g, has_app_context, has_request_context, request, session
 from flask_babelex import Babel, Domain, get_domain
 from flask_pluginengine import current_plugin
@@ -140,44 +137,6 @@ class IndicoLocale(Locale):
         for k, v in formats.items():
             v.format = v.format.replace(':%(ss)s', '')
         return formats
-
-
-class IndicoTranslations(Translations):
-    """
-    Route translations through the 'smart' translators defined above.
-    """
-
-    def _check_stack(self):
-        stack = traceback.extract_stack()
-        # [..., the caller we are looking for, ugettext/ungettext, this function]
-        frame = stack[-3]
-        frame_msg = textwrap.dedent("""
-            File "{}", line {}, in {}
-              {}
-        """).strip().format(*frame)
-        msg = ('Using the gettext function (`_`) patched into the builtins is disallowed.\n'
-               'Please import it from `indico.util.i18n` instead.\n'
-               'The offending code was found in this location:\n{}').format(frame_msg)
-        if 'indico/legacy/' in frame[0]:
-            # legacy code gets off with a warning
-            warnings.warn(msg, RuntimeWarning)
-        else:
-            raise RuntimeError(msg)
-
-    def ugettext(self, message):
-        from indico.core.config import config
-        if config.DEBUG:
-            self._check_stack()
-        return gettext(message)
-
-    def ungettext(self, msgid1, msgid2, n):
-        from indico.core.config import config
-        if config.DEBUG:
-            self._check_stack()
-        return ngettext(msgid1, msgid2, n)
-
-
-IndicoTranslations().install()
 
 
 def _remove_locale_script(locale):
