@@ -30,6 +30,7 @@ Bugfixes
 - Fix missing filename pattern check when suggesting files from Paper Peer Reviewing to submit
   for Editing (:pr:`4715`)
 - Fix filename pattern check in Editing when a filename contains dots (:pr:`4715`)
+- Require explicit admin override (or being whitelisted) to override blockings (:pr:`4706`)
 
 Version 2.3.1
 -------------
