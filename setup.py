@@ -58,5 +58,4 @@ if __name__ == '__main__':
         cmdclass=cmdclass,
         install_requires=get_requirements('requirements.txt'),
         extras_require={'dev': get_requirements('requirements.dev.txt')},
-        python_requires=('~=3.9' if 'READTHEDOCS' not in os.environ else None),
     )
