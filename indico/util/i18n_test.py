@@ -17,7 +17,7 @@ from speaklater import _LazyString
 from werkzeug.datastructures import LanguageAccept
 
 from indico.core.plugins import IndicoPlugin, plugin_engine
-from indico.util.i18n import _, babel, gettext_context, make_bound_gettext, ngettext, session_language, ungettext
+from indico.util.i18n import _, babel, gettext_context, make_bound_gettext, ngettext, session_language
 
 
 DICTIONARIES = {
@@ -95,7 +95,7 @@ def test_ngettext():
     session.lang = 'fr_MP'
 
     assert ngettext('{} cow', '{} cows', 1).format(1) == '1 vache'
-    assert ungettext('{} cow', '{} cows', 42).format(42) == '42 vaches'
+    assert ngettext('{} cow', '{} cows', 42).format(42) == '42 vaches'
 
 
 @pytest.mark.usefixtures('mock_translations')

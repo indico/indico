@@ -49,10 +49,9 @@ def get_translation_domain(plugin_name=_use_context):
             return get_domain()
 
 
-def gettext_unicode(*args, **kwargs):
-    func_name = kwargs.pop('func_name', 'ugettext')
+def _indico_gettext(*args, **kwargs):
+    func_name = kwargs.pop('func_name', 'gettext')
     plugin_name = kwargs.pop('plugin_name', None)
-    kwargs.pop('force_unicode', False)
 
     translations = get_translation_domain(plugin_name).get_translations()
     return getattr(translations, func_name)(*args, **kwargs)
@@ -61,7 +60,7 @@ def gettext_unicode(*args, **kwargs):
 def lazy_gettext(string, plugin_name=None):
     if is_lazy_string(string):
         return string
-    return make_lazy_string(gettext_unicode, string, plugin_name=plugin_name)
+    return make_lazy_string(_indico_gettext, string, plugin_name=plugin_name)
 
 
 def orig_string(lazy_string):
@@ -76,9 +75,9 @@ def smart_func(func_name, plugin_name=None):
         depending on whether there is a session language or not (respectively)
         """
 
-        if has_request_context() or func_name != 'ugettext':
+        if has_request_context() or func_name != 'gettext':
             # straight translation
-            return gettext_unicode(*args, func_name=func_name, plugin_name=plugin_name, **kwargs)
+            return _indico_gettext(*args, func_name=func_name, plugin_name=plugin_name, **kwargs)
         else:
             # otherwise, defer translation to eval time
             return lazy_gettext(*args, plugin_name=plugin_name)
@@ -93,19 +92,19 @@ def make_bound_gettext(plugin_name):
     """
     Create a smart gettext callable bound to the domain of the specified plugin.
     """
-    return smart_func('ugettext', plugin_name=plugin_name)
+    return smart_func('gettext', plugin_name=plugin_name)
 
 
 def make_bound_ngettext(plugin_name):
     """
     Create a smart ngettext callable bound to the domain of the specified plugin.
     """
-    return smart_func('ungettext', plugin_name=plugin_name)
+    return smart_func('ngettext', plugin_name=plugin_name)
 
 
 # Shortcuts
-_ = ugettext = gettext = make_bound_gettext(None)
-ungettext = ngettext = make_bound_ngettext(None)
+_ = gettext = make_bound_gettext(None)
+ngettext = make_bound_ngettext(None)
 L_ = lazy_gettext
 
 # Plugin-context-sensitive gettext for templates
