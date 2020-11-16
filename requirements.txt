@@ -3,7 +3,7 @@ Babel==2.9.0
 bcrypt==3.2.0
 bleach==3.2.1
 blinker==1.4
-celery==4.4.7
+celery==5.0.2
 certifi
 click==7.1.2
 colorclass==2.2.0
@@ -32,7 +32,7 @@ ipython<8,>=7.19.0
 itsdangerous==1.1.0
 Jinja2==2.11.2
 jsonschema==3.2.0
-kombu>=4.6.10,<4.7
+kombu>=5.0.2,<5.1
 lxml[html5]==4.6.1
 Markdown==3.1.1
 MarkupSafe==1.1.1
