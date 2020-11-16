@@ -100,7 +100,7 @@ class PrincipalListField(HiddenField):
             return [x.identifier for x in self._get_data()]
 
     def _get_data(self):
-        return sorted(self.data) if self.data else []
+        return sorted(self.data, key=attrgetter('identifier')) if self.data else []
 
 
 class AccessControlListField(PrincipalListField):
