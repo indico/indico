@@ -6,8 +6,8 @@
 # LICENSE file for more details.
 
 import os
-import pkgutil
 import sys
+from importlib.util import find_spec
 
 import pkg_resources
 
@@ -29,8 +29,10 @@ def get_package_root_path(import_name):
     Returns ``None`` if the specified import name is invalid or
     points to a module instead of a package.
     """
-    loader = pkgutil.get_loader(import_name)
-    if loader is None or not loader.is_package(import_name):
+    spec = find_spec(import_name)
+    if spec is None or not spec.parent:
+        # no parent if it's not a package (PEP 451)
         return None
-    filepath = loader.get_filename(import_name)
-    return os.path.dirname(os.path.abspath(filepath))
+    paths = spec.submodule_search_locations
+    assert len(paths) == 1
+    return paths[0]
