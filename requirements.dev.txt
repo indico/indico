@@ -16,3 +16,4 @@ migra==1.0.1588932782
 schemainspect==0.1.1591162156
 transifex-client
 pywatchman
+pyupgrade
