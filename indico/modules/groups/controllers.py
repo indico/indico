@@ -53,7 +53,7 @@ class RHGroups(RHAdminBase):
         if groups_enabled and form.validate_on_submit():
             search_providers = None if not providers or not form.provider.data else {form.provider.data}
             search_results = GroupProxy.search(form.name.data, exact=form.exact.data, providers=search_providers)
-            search_results.sort(key=attrgetter('provider', 'name'))
+            search_results.sort(key=lambda x: (x.provider or '', x.name))
         provider_titles = {p.name: p.title for p in multipass.identity_providers.values()}
         provider_titles[None] = _('Local')
         return WPGroupsAdmin.render_template('groups.html', groups=groups, providers=providers, form=form,
