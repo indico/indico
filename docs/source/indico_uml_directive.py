@@ -26,7 +26,7 @@ class IndicoUMLDirective(UmlDirective):
         for n, l in enumerate(self.content, n + 1):
             content.append(l, source='diagram', offset=n)
         self.content = content
-        return super(IndicoUMLDirective, self).run()
+        return super().run()
 
     def _get_directive_name(self):
         return 'indico_uml'
