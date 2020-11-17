@@ -58,7 +58,9 @@ export default function TimelineItem({block, index}) {
             <div className="i-box-header flexrow">
               <div className="f-self-stretch">
                 {block.header ? (
-                  <strong>{block.header}</strong>
+                  <span>
+                    <strong>{block.header}</strong> {`#${index + 1}`}
+                  </span>
                 ) : (
                   <Translate>
                     <Param name="submitterName" value={submitter.fullName} wrapper={<strong />} />{' '}
