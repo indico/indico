@@ -60,6 +60,13 @@ class IndicoRequest(Request):
         m = AUTH_BEARER_RE.match(auth_header)
         return m.group(1) if m else None
 
+    @property
+    def is_xhr(self):
+        # XXX: avoid using this in new code; this header is non-standard and only set
+        # by default in jquery, but not by anything else. check if the request accepts
+        # json as an alternative.
+        return self.headers.get('X-Requested-With', '').lower() == 'xmlhttprequest'
+
 
 class IndicoFlask(PluginFlaskMixin, Flask):
     json_encoder = IndicoJSONEncoder
