@@ -24,25 +24,7 @@ def _indent(msg, level=4):
     return indentation + msg.replace('\n', '\n' + indentation)
 
 
-def _subprocess_check_output(*popenargs, **kwargs):
-    # copied from subprocess.check_output; added the ability to pass data ta stdin
-    if 'stdout' in kwargs:
-        raise ValueError('stdout argument not allowed, it will be overridden.')
-    stdin_data = kwargs.pop('stdin_data', None)
-    if stdin_data:
-        kwargs['stdin'] = subprocess.PIPE
-    process = subprocess.Popen(stdout=subprocess.PIPE, *popenargs, **kwargs)
-    output, unused_err = process.communicate(stdin_data)
-    retcode = process.poll()
-    if retcode:
-        cmd = kwargs.get('args')
-        if cmd is None:
-            cmd = popenargs[0]
-        raise subprocess.CalledProcessError(retcode, cmd, output=output)
-    return output
-
-
-def _checked_call(verbose, args, return_output=False, env=None, stdin_data=None):
+def _checked_call(verbose, args, return_output=False, env=None, input=''):
     cmd = ' '.join([os.path.basename(args[0]), shlex.join(args[1:])])
     if verbose:
         click.echo(click.style(f'** {cmd}', fg='blue', bold=True), err=True)
@@ -50,7 +32,7 @@ def _checked_call(verbose, args, return_output=False, env=None, stdin_data=None)
     if env:
         kwargs['env'] = dict(os.environ, **env)
     try:
-        rv = _subprocess_check_output(args, stderr=subprocess.STDOUT, stdin_data=stdin_data, **kwargs).strip()
+        rv = subprocess.check_output(args, stderr=subprocess.STDOUT, input=input, text=True, **kwargs).strip()
     except OSError as exc:
         click.echo(click.style(f'!! {cmd} failed: {exc}', fg='red', bold=True), err=True)
         sys.exit(1)
@@ -171,7 +153,7 @@ def main(dbname, verbose, reverse):
         click.echo(diff)
     else:
         pretty_diff = _checked_call(verbose, ['pygmentize', '-l', 'sql', '-f', 'terminal256',
-                                              '-O', 'style=native,bg=dark'], return_output=True, stdin_data=diff)
+                                              '-O', 'style=native,bg=dark'], return_output=True, input=diff)
         click.echo(pretty_diff)
 
 
