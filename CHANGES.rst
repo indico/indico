@@ -16,7 +16,8 @@ Improvements
 Bugfixes
 ^^^^^^^^
 
-- None so far :)
+- Only consider actual speakers in the "has registered speakers" contribution list filter
+  (:pr:`4712`, thanks :user:`bpedersen2`)
 
 Version 2.3.1
 -------------
