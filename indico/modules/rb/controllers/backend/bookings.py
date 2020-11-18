@@ -384,7 +384,7 @@ class RHBookingExport(RHRoomBookingBase):
         'room_ids': fields.List(fields.Int(), required=True),
         'start_date': fields.Date(required=True),
         'end_date': fields.Date(required=True),
-        'format': fields.Str(validate.OneOf({'csv', 'xlsx'}), required=True),
+        'format': fields.Str(validate=validate.OneOf({'csv', 'xlsx'}), required=True),
     })
     def _process(self, room_ids, start_date, end_date, format):
         occurrences = (ReservationOccurrence.query

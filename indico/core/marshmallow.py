@@ -8,11 +8,11 @@
 from inspect import getmro
 
 from flask_marshmallow import Marshmallow
-from flask_marshmallow.sqla import SchemaOpts
+from flask_marshmallow.sqla import SQLAlchemyAutoSchemaOpts
 from marshmallow import fields, post_dump, post_load, pre_load
 from marshmallow_enum import EnumField
 from marshmallow_sqlalchemy import ModelConverter
-from marshmallow_sqlalchemy import ModelSchema as MSQLAModelSchema
+from marshmallow_sqlalchemy import SQLAlchemyAutoSchema as MSQLASQLAlchemyAutoSchema
 from sqlalchemy.orm import ColumnProperty
 from sqlalchemy.sql.elements import Label
 from webargs.flaskparser import parser as webargs_flask_parser
@@ -84,7 +84,7 @@ class IndicoModelConverter(ModelConverter):
 
 class IndicoSchema(mm.Schema):
     @post_dump(pass_many=True, pass_original=True)
-    def _call_post_dump_signal(self, data, many, orig, **kwargs):
+    def _call_post_dump_signal(self, data, orig, *, many, **kwargs):
         data_list = data if many else [data]
         orig_list = orig if many else [orig]
         signals.plugin.schema_post_dump.send(type(self), data=data_list, orig=orig_list, many=many)
@@ -101,17 +101,19 @@ class IndicoSchema(mm.Schema):
         return data
 
 
-class _IndicoModelSchemaOpts(SchemaOpts):
+class _IndicoSQLAlchemyAutoSchemaOpts(SQLAlchemyAutoSchemaOpts):
     def __init__(self, meta, **kwargs):
         super().__init__(meta, **kwargs)
         self.model_converter = getattr(meta, 'model_converter', IndicoModelConverter)
+        self.include_relationships = getattr(meta, 'include_relationships', True)
 
 
-class IndicoModelSchema(MSQLAModelSchema, IndicoSchema):
-    OPTIONS_CLASS = _IndicoModelSchemaOpts
+class IndicoSQLAlchemyAutoSchema(MSQLASQLAlchemyAutoSchema, IndicoSchema):
+    OPTIONS_CLASS = _IndicoSQLAlchemyAutoSchemaOpts
 
 
 mm.Schema = IndicoSchema
-mm.ModelSchema = IndicoModelSchema
+mm.SQLAlchemyAutoSchema = IndicoSQLAlchemyAutoSchema
+mm.ModelSchema = mm.SQLAlchemyAutoSchema  # TODO update in files instead
 webargs_flask_parser.schema_class = IndicoSchema  # just in case someone uses the wrong import
 indico_webargs_flask_parser.schema_class = IndicoSchema

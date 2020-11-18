@@ -121,10 +121,10 @@ class ModelField(Field):
             self.column_type = column_type or int
         super().__init__(**kwargs)
 
-    def _serialize(self, value, attr, obj):
+    def _serialize(self, value, attr, obj, **kwargs):
         return getattr(value, self.column.key) if value is not None else None
 
-    def _deserialize(self, value, attr, data):
+    def _deserialize(self, value, attr, data, **kwargs):
         if value is None:
             return None
         try:
@@ -167,10 +167,10 @@ class ModelList(Field):
             self.column_type = column_type or int
         super().__init__(**kwargs)
 
-    def _serialize(self, value, attr, obj):
+    def _serialize(self, value, attr, obj, **kwargs):
         return [getattr(x, self.column.key) for x in value]
 
-    def _deserialize(self, value, attr, data):
+    def _deserialize(self, value, attr, data, **kwargs):
         if not value:
             return self.collection_class()
         try:
@@ -195,10 +195,10 @@ class Principal(Field):
         self.allow_external_users = allow_external_users
         super().__init__(**kwargs)
 
-    def _serialize(self, value, attr, obj):
+    def _serialize(self, value, attr, obj, **kwargs):
         return value.identifier if value is not None else None
 
-    def _deserialize(self, value, attr, data):
+    def _deserialize(self, value, attr, data, **kwargs):
         if value is None:
             return None
         try:
@@ -222,10 +222,10 @@ class PrincipalList(Field):
         self.allow_emails = allow_emails
         super().__init__(**kwargs)
 
-    def _serialize(self, value, attr, obj):
+    def _serialize(self, value, attr, obj, **kwargs):
         return [x.identifier for x in value]
 
-    def _deserialize(self, value, attr, data):
+    def _deserialize(self, value, attr, data, **kwargs):
         event_id = None
         if self.allow_event_roles or self.allow_category_roles:
             event_id = self.context['event'].id
@@ -246,7 +246,7 @@ class PrincipalList(Field):
 class PrincipalDict(PrincipalList):
     # We need to keep identifiers separately since for pending users we
     # can't get the correct one back from the user
-    def _deserialize(self, value, attr, data):
+    def _deserialize(self, value, attr, data, **kwargs):
         event_id = None
         if self.allow_event_roles or self.allow_category_roles:
             event_id = self.context['event'].id
@@ -277,11 +277,11 @@ class PrincipalPermissionList(Field):
         self.all_permissions = all_permissions
         super().__init__(**kwargs)
 
-    def _serialize(self, value, attr, obj):
+    def _serialize(self, value, attr, obj, **kwargs):
         return [(entry.principal.identifier, sorted(get_unified_permissions(entry, self.all_permissions)))
                 for entry in value]
 
-    def _deserialize(self, value, attr, data):
+    def _deserialize(self, value, attr, data, **kwargs):
         try:
             return {
                 principal_from_identifier(identifier, allow_groups=True): set(permissions)
@@ -299,10 +299,10 @@ class HumanizedDate(Field):
     Simple ISO dates are also accepted (``YYYY-MM-DD``).
     """
 
-    def _serialize(self, value, attr, obj):
+    def _serialize(self, value, attr, obj, **kwargs):
         raise NotImplementedError
 
-    def _deserialize(self, value, attr, obj):
+    def _deserialize(self, value, attr, data, **kwargs):
         m = HUMANIZED_DATE_RE.match(value)
         if not m:
             raise ValidationError("Can't parse humanized date!")
@@ -328,7 +328,7 @@ class FilesField(ModelList):
         self.allow_claimed = allow_claimed
         super().__init__(model=File, column='uuid', column_type=UUID, **kwargs)
 
-    def _deserialize(self, value, attr, data):
+    def _deserialize(self, value, attr, data, **kwargs):
         rv = super()._deserialize(value, attr, data)
         if not self.allow_claimed and any(f.claimed for f in rv):
             self.fail('claimed')
@@ -347,7 +347,7 @@ class FileField(ModelField):
         self.allow_claimed = allow_claimed
         super().__init__(model=File, column='uuid', column_type=UUID, **kwargs)
 
-    def _deserialize(self, value, attr, data):
+    def _deserialize(self, value, attr, data, **kwargs):
         rv = super()._deserialize(value, attr, data)
         if not self.allow_claimed and rv is not None and rv.claimed:
             self.fail('claimed')

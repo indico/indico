@@ -341,7 +341,7 @@ class CreateBookingSchema(mm.Schema):
     admin_override_enabled = fields.Bool(missing=False)
 
     @validates_schema(skip_on_field_errors=True)
-    def validate_dts(self, data):
+    def validate_dts(self, data, **kwargs):
         if data['start_dt'] >= data['end_dt']:
             raise ValidationError(_('Booking cannot end before it starts'))
 
@@ -384,7 +384,7 @@ class LocationArgs(mm.Schema):
     map_url_template = fields.URL(schemes={'http', 'https'}, allow_none=True, missing='')
 
     @validates('name')
-    def _check_name_unique(self, name):
+    def _check_name_unique(self, name, **kwargs):
         location = self.context['location']
         query = Location.query.filter(~Location.is_deleted, func.lower(Location.name) == name.lower())
         if location:
@@ -393,7 +393,7 @@ class LocationArgs(mm.Schema):
             raise ValidationError(_('Name must be unique'))
 
     @validates('room_name_format')
-    def _check_room_name_format_placeholders(self, room_name_format):
+    def _check_room_name_format_placeholders(self, room_name_format, **kwargs):
         missing = {x for x in ('{building}', '{floor}', '{number}') if x not in room_name_format}
         if missing:
             # validated client-side, no i18n needed
@@ -409,7 +409,7 @@ class FeatureArgs(mm.Schema):
     icon = fields.String(missing='')
 
     @validates('name')
-    def _check_name_unique(self, name):
+    def _check_name_unique(self, name, **kwargs):
         feature = self.context['feature']
         query = RoomFeature.query.filter(func.lower(RoomFeature.name) == name.lower())
         if feature:
@@ -426,7 +426,7 @@ class EquipmentTypeArgs(mm.Schema):
     features = ModelList(RoomFeature, missing=[])
 
     @validates('name')
-    def _check_name_unique(self, name):
+    def _check_name_unique(self, name, **kwargs):
         equipment_type = self.context['equipment_type']
         query = EquipmentType.query.filter(func.lower(EquipmentType.name) == name.lower())
         if equipment_type:
@@ -444,7 +444,7 @@ class RoomAttributeArgs(mm.Schema):
     hidden = fields.Bool(missing=False)
 
     @validates('name')
-    def _check_name_unique(self, name):
+    def _check_name_unique(self, name, **kwargs):
         attribute = self.context['attribute']
         query = RoomAttribute.query.filter(func.lower(RoomAttribute.name) == name.lower())
         if attribute:
@@ -471,7 +471,7 @@ class SettingsSchema(mm.Schema):
     grace_period = fields.Int(validate=validate.Range(min=0, max=24), allow_none=True)
 
     @validates('tileserver_url')
-    def _check_tileserver_url_placeholders(self, tileserver_url):
+    def _check_tileserver_url_placeholders(self, tileserver_url, **kwargs):
         if tileserver_url is None:
             return
         missing = {x for x in ('{x}', '{y}', '{z}') if x not in tileserver_url}

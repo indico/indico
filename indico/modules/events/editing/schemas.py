@@ -253,7 +253,7 @@ class ReviewEditableArgs(mm.Schema):
     comment = fields.String(missing='')
 
     @validates_schema(skip_on_field_errors=True)
-    def validate_everything(self, data):
+    def validate_everything(self, data, **kwargs):
         if data['action'] != EditingReviewAction.accept and not data['comment']:
             raise ValidationError('This field is required', 'comment')
 
@@ -273,7 +273,7 @@ class EditableTagArgs(mm.Schema):
     system = fields.Bool(missing=False)
 
     @validates('code')
-    def _check_for_unique_tag_code(self, code):
+    def _check_for_unique_tag_code(self, code, **kwargs):
         event = self.context['event']
         tag = self.context['tag']
         query = EditingTag.query.with_parent(event).filter(func.lower(EditingTag.code) == code.lower())
@@ -283,7 +283,7 @@ class EditableTagArgs(mm.Schema):
             raise ValidationError(_('Tag code must be unique'))
 
     @validates('system')
-    def _check_only_services_set_system_tags(self, value):
+    def _check_only_services_set_system_tags(self, value, **kwargs):
         if value and not self.context['is_service_call']:
             raise ValidationError('Only custom editing workflows can set system tags')
 
@@ -300,7 +300,7 @@ class EditableFileTypeArgs(mm.Schema):
     publishable = fields.Boolean()
 
     @validates('name')
-    def _check_for_unique_file_type_name(self, name):
+    def _check_for_unique_file_type_name(self, name, **kwargs):
         event = self.context['event']
         file_type = self.context['file_type']
         editable_type = self.context['editable_type']
@@ -313,18 +313,18 @@ class EditableFileTypeArgs(mm.Schema):
             raise ValidationError(_('Name must be unique'))
 
     @validates('filename_template')
-    def _check_for_correct_filename_template(self, template):
+    def _check_for_correct_filename_template(self, template, **kwargs):
         if template is not None and '.' in template:
             raise ValidationError(_('Filename template cannot include dots'))
 
     @validates('extensions')
-    def _check_for_correct_extensions_format(self, extensions):
+    def _check_for_correct_extensions_format(self, extensions, **kwargs):
         for extension in extensions:
             if re.match(r'^[*.]+', extension):
                 raise ValidationError(_('Extensions cannot have leading dots'))
 
     @validates('publishable')
-    def _check_if_can_unset_or_delete(self, publishable):
+    def _check_if_can_unset_or_delete(self, publishable, **kwargs):
         event = self.context['event']
         file_type = self.context['file_type']
         editable_type = self.context['editable_type']
@@ -346,7 +346,7 @@ class EditingReviewConditionArgs(mm.Schema):
     file_types = fields.List(fields.Int(), required=True, validate=not_empty)
 
     @validates('file_types')
-    def _validate_file_types(self, file_types):
+    def _validate_file_types(self, file_types, **kwargs):
         editable_type = self.context['editable_type']
         event = self.context['event']
         event_file_types = {ft.id for ft in event.editing_file_types}

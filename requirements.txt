@@ -13,7 +13,7 @@ email-validator==1.1.2
 feedgen==0.9.0
 Flask-BabelEx==0.9.4
 Flask-Caching==1.9.0
-flask-marshmallow==0.11.0
+flask-marshmallow==0.14.0
 Flask-Migrate==2.5.3
 Flask-Multipass>=0.3.1,<0.4-dev
 Flask-OAuthlib==0.9.6
@@ -37,8 +37,8 @@ lxml[html5]==4.6.1
 Markdown==3.3.3
 MarkupSafe==1.1.1
 marshmallow-enum==1.5.1
-marshmallow-sqlalchemy==0.18.0
-marshmallow==3.0.0rc5
+marshmallow-sqlalchemy==0.24.1
+marshmallow==3.9.1
 packaging>=20.4,<21
 Pillow==8.0.1
 pojson==0.7
