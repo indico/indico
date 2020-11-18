@@ -663,7 +663,7 @@ class RHRejectRegistrationRequest(RHRegistrationRequestBase):
         return jsonify_data()
 
 
-class UserSearchResultSchema(mm.ModelSchema):
+class UserSearchResultSchema(mm.SQLAlchemyAutoSchema):
     class Meta:
         model = User
         fields = ('id', 'identifier', 'email', 'affiliation', 'full_name')

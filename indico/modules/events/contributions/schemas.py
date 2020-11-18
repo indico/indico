@@ -14,13 +14,13 @@ from indico.modules.events.contributions.models.fields import ContributionFieldV
 from indico.modules.events.contributions.models.types import ContributionType
 
 
-class ContributionSchema(mm.ModelSchema):
+class ContributionSchema(mm.SQLAlchemyAutoSchema):
     class Meta:
         model = Contribution
         fields = ('id', 'title', 'friendly_id', 'code')
 
 
-class ContributionTypeSchema(mm.ModelSchema):
+class ContributionTypeSchema(mm.SQLAlchemyAutoSchema):
     class Meta:
         model = ContributionType
         fields = ('id', 'name', 'description')

@@ -11,7 +11,7 @@ from indico.core.marshmallow import mm
 from indico.modules.events.registration.models.forms import RegistrationForm
 
 
-class RegistrationFormPrincipalSchema(mm.ModelSchema):
+class RegistrationFormPrincipalSchema(mm.SQLAlchemyAutoSchema):
     class Meta:
         model = RegistrationForm
         fields = ('id', 'name', 'identifier')

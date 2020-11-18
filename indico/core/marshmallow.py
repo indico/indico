@@ -114,6 +114,5 @@ class IndicoSQLAlchemyAutoSchema(MSQLASQLAlchemyAutoSchema, IndicoSchema):
 
 mm.Schema = IndicoSchema
 mm.SQLAlchemyAutoSchema = IndicoSQLAlchemyAutoSchema
-mm.ModelSchema = mm.SQLAlchemyAutoSchema  # TODO update in files instead
 webargs_flask_parser.schema_class = IndicoSchema  # just in case someone uses the wrong import
 indico_webargs_flask_parser.schema_class = IndicoSchema

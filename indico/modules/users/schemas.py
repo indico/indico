@@ -11,7 +11,7 @@ from indico.core.marshmallow import mm
 from indico.modules.users import User
 
 
-class UserSchema(mm.ModelSchema):
+class UserSchema(mm.SQLAlchemyAutoSchema):
     identifier = Function(lambda user: user.identifier)
 
     class Meta:

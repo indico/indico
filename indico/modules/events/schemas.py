@@ -17,7 +17,7 @@ class EventPermissionsSchema(mm.Schema):
     acl_entries = PrincipalPermissionList(EventPrincipal, all_permissions=True)
 
 
-class EventDetailsSchema(mm.ModelSchema):
+class EventDetailsSchema(mm.SQLAlchemyAutoSchema):
     class Meta:
         model = Event
         fields = ('id', 'category_chain', 'title', 'start_dt', 'end_dt')

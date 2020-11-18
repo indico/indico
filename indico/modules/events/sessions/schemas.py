@@ -12,7 +12,7 @@ from indico.modules.events.sessions.models.blocks import SessionBlock
 from indico.modules.events.sessions.models.sessions import Session
 
 
-class SessionBlockSchema(mm.ModelSchema):
+class SessionBlockSchema(mm.SQLAlchemyAutoSchema):
     room_name_verbose = fields.Function(lambda obj: obj.get_room_name(full=False, verbose=True))
 
     class Meta:
@@ -20,7 +20,7 @@ class SessionBlockSchema(mm.ModelSchema):
         fields = ('id', 'title', 'code', 'start_dt', 'end_dt', 'duration', 'room_name', 'room_name_verbose')
 
 
-class BasicSessionSchema(mm.ModelSchema):
+class BasicSessionSchema(mm.SQLAlchemyAutoSchema):
     blocks = fields.Nested(SessionBlockSchema, many=True)
 
     class Meta:

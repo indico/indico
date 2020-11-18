@@ -40,7 +40,7 @@ from indico.util.marshmallow import (ModelList, NaiveDateTime, Principal, Princi
 from indico.util.string import natural_sort_key
 
 
-class RoomAttributeValuesSchema(mm.ModelSchema):
+class RoomAttributeValuesSchema(mm.SQLAlchemyAutoSchema):
     title = String(attribute='attribute.title')
     name = String(attribute='attribute.name')
 
@@ -49,13 +49,13 @@ class RoomAttributeValuesSchema(mm.ModelSchema):
         fields = ('value', 'title', 'name')
 
 
-class AttributesSchema(mm.ModelSchema):
+class AttributesSchema(mm.SQLAlchemyAutoSchema):
     class Meta:
         model = RoomAttribute
         fields = ('name', 'title', 'is_required', 'is_hidden')
 
 
-class RoomSchema(mm.ModelSchema):
+class RoomSchema(mm.SQLAlchemyAutoSchema):
     owner_name = String(attribute='owner.full_name')
 
     class Meta:
@@ -66,7 +66,7 @@ class RoomSchema(mm.ModelSchema):
                   'owner_name', 'available_equipment', 'has_photo', 'verbose_name', 'map_url', 'site')
 
 
-class AdminRoomSchema(mm.ModelSchema):
+class AdminRoomSchema(mm.SQLAlchemyAutoSchema):
     class Meta:
         modal = Room
         fields = ('id', 'location_id', 'name', 'full_name', 'sprite_position', 'owner_name', 'comments')
@@ -118,20 +118,20 @@ class RoomUpdateArgsSchema(mm.Schema):
     protection_mode = EnumField(ProtectionMode)
 
 
-class RoomEquipmentSchema(mm.ModelSchema):
+class RoomEquipmentSchema(mm.SQLAlchemyAutoSchema):
     class Meta:
         model = Room
         fields = ('available_equipment',)
 
 
-class MapAreaSchema(mm.ModelSchema):
+class MapAreaSchema(mm.SQLAlchemyAutoSchema):
     class Meta:
         model = MapArea
         fields = ('name', 'top_left_latitude', 'top_left_longitude', 'bottom_right_latitude', 'bottom_right_longitude',
                   'is_default', 'id')
 
 
-class ReservationSchema(mm.ModelSchema):
+class ReservationSchema(mm.SQLAlchemyAutoSchema):
     start_dt = NaiveDateTime()
     end_dt = NaiveDateTime()
 
@@ -162,7 +162,7 @@ class ReservationUserEventSchema(mm.Schema):
     end_dt = DateTime()
 
 
-class ReservationOccurrenceSchema(mm.ModelSchema):
+class ReservationOccurrenceSchema(mm.SQLAlchemyAutoSchema):
     reservation = Nested(ReservationSchema)
     state = EnumField(ReservationState)
     start_dt = NaiveDateTime()
@@ -208,7 +208,7 @@ class ReservationEditLogSchema(UserSchema):
         return data
 
 
-class ReservationLinkSchema(mm.ModelSchema):
+class ReservationLinkSchema(mm.SQLAlchemyAutoSchema):
     type = EnumField(LinkType, attribute='link_type')
     id = Function(lambda link: link.object.id)
 
@@ -217,7 +217,7 @@ class ReservationLinkSchema(mm.ModelSchema):
         fields = ('type', 'id')
 
 
-class ReservationDetailsSchema(mm.ModelSchema):
+class ReservationDetailsSchema(mm.SQLAlchemyAutoSchema):
     booked_for_user = Nested(UserSchema, only=('id', 'identifier', 'full_name', 'phone', 'email'))
     created_by_user = Nested(UserSchema, only=('id', 'identifier', 'full_name', 'email'))
     edit_logs = Nested(ReservationEditLogSchema, many=True)
@@ -249,7 +249,7 @@ class ReservationDetailsSchema(mm.ModelSchema):
         return {'user': user_permissions, 'admin': admin_permissions}
 
 
-class BlockedRoomSchema(mm.ModelSchema):
+class BlockedRoomSchema(mm.SQLAlchemyAutoSchema):
     room = Nested(RoomSchema, only=('id', 'name', 'sprite_position', 'full_name'))
     state = EnumField(BlockedRoomState)
 
@@ -264,7 +264,7 @@ class BlockedRoomSchema(mm.ModelSchema):
         return data
 
 
-class BlockingSchema(mm.ModelSchema):
+class BlockingSchema(mm.SQLAlchemyAutoSchema):
     blocked_rooms = Nested(BlockedRoomSchema, many=True)
     allowed = PrincipalList()
     permissions = Method('_get_permissions')
@@ -283,7 +283,7 @@ class BlockingSchema(mm.ModelSchema):
         return {'user': user_permissions, 'admin': admin_permissions}
 
 
-class NonBookablePeriodSchema(mm.ModelSchema):
+class NonBookablePeriodSchema(mm.SQLAlchemyAutoSchema):
     start_dt = NaiveDateTime()
     end_dt = NaiveDateTime()
 
@@ -292,13 +292,13 @@ class NonBookablePeriodSchema(mm.ModelSchema):
         fields = ('start_dt', 'end_dt')
 
 
-class BookableHoursSchema(mm.ModelSchema):
+class BookableHoursSchema(mm.SQLAlchemyAutoSchema):
     class Meta:
         model = BookableHours
         fields = ('start_time', 'end_time')
 
 
-class LocationsSchema(mm.ModelSchema):
+class LocationsSchema(mm.SQLAlchemyAutoSchema):
     rooms = Nested(RoomSchema, many=True, only=('id', 'name', 'full_name', 'sprite_position'))
 
     class Meta:
@@ -306,7 +306,7 @@ class LocationsSchema(mm.ModelSchema):
         fields = ('id', 'name', 'rooms')
 
 
-class AdminLocationsSchema(mm.ModelSchema):
+class AdminLocationsSchema(mm.SQLAlchemyAutoSchema):
     can_delete = Function(lambda loc: not loc.rooms)
 
     class Meta:
@@ -346,13 +346,13 @@ class CreateBookingSchema(mm.Schema):
             raise ValidationError(_('Booking cannot end before it starts'))
 
 
-class RoomFeatureSchema(mm.ModelSchema):
+class RoomFeatureSchema(mm.SQLAlchemyAutoSchema):
     class Meta:
         model = RoomFeature
         fields = ('id', 'name', 'title', 'icon')
 
 
-class EquipmentTypeSchema(mm.ModelSchema):
+class EquipmentTypeSchema(mm.SQLAlchemyAutoSchema):
     features = Nested(RoomFeatureSchema, many=True)
     used = Function(lambda eq, ctx: eq.id in ctx['used_ids'])
 
@@ -361,13 +361,13 @@ class EquipmentTypeSchema(mm.ModelSchema):
         fields = ('id', 'name', 'features', 'used')
 
 
-class AdminEquipmentTypeSchema(mm.ModelSchema):
+class AdminEquipmentTypeSchema(mm.SQLAlchemyAutoSchema):
     class Meta:
         model = EquipmentType
         fields = ('id', 'name', 'features')
 
 
-class RoomAttributeSchema(mm.ModelSchema):
+class RoomAttributeSchema(mm.SQLAlchemyAutoSchema):
     hidden = Boolean(attribute='is_hidden')
 
     class Meta:

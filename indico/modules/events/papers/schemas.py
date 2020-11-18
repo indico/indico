@@ -34,7 +34,7 @@ class CallForPapersSchema(mm.Schema):
     rating_range = List(Integer())
 
 
-class PaperEventSchema(mm.ModelSchema):
+class PaperEventSchema(mm.SQLAlchemyAutoSchema):
     cfp = Nested(CallForPapersSchema)
 
     class Meta:
@@ -42,7 +42,7 @@ class PaperEventSchema(mm.ModelSchema):
         fields = ('id', 'title', 'is_locked', 'cfp')
 
 
-class PaperFileSchema(mm.ModelSchema):
+class PaperFileSchema(mm.SQLAlchemyAutoSchema):
     icon = Function(lambda paper_file: icon_from_mimetype(paper_file.content_type))
     download_url = Function(lambda paper_file: url_for('papers.download_file', paper_file))
 
@@ -95,7 +95,7 @@ class PaperReviewTypeSchema(mm.Schema):
     value = Integer()
 
 
-class PaperRevisionSchema(mm.ModelSchema):
+class PaperRevisionSchema(mm.SQLAlchemyAutoSchema):
     submitter = Nested(UserSchema)
     judge = Nested(UserSchema)
     spotlight_file = Nested(PaperFileSchema)
@@ -127,13 +127,13 @@ class PaperRevisionSchema(mm.ModelSchema):
         return data
 
 
-class PaperReviewQuestionSchema(mm.ModelSchema):
+class PaperReviewQuestionSchema(mm.SQLAlchemyAutoSchema):
     class Meta:
         model = PaperReviewQuestion
         fields = ('id', 'type', 'field_type', 'title', 'position', 'description', 'is_required', 'field_data')
 
 
-class PaperRatingSchema(mm.ModelSchema):
+class PaperRatingSchema(mm.SQLAlchemyAutoSchema):
     question = Nested(PaperReviewQuestionSchema)
 
     class Meta:
@@ -147,7 +147,7 @@ class PaperRatingSchema(mm.ModelSchema):
         return data
 
 
-class PaperReviewSchema(mm.ModelSchema):
+class PaperReviewSchema(mm.SQLAlchemyAutoSchema):
     score = Decimal(places=2, as_string=True)
     user = Nested(UserSchema)
     visibility = Nested(PaperCommentVisibilitySchema)
@@ -168,7 +168,7 @@ class PaperReviewSchema(mm.ModelSchema):
         return review.can_edit(user, check_state=True) and is_type_reviewing_possible(cfp, review.type)
 
 
-class PaperReviewCommentSchema(mm.ModelSchema):
+class PaperReviewCommentSchema(mm.SQLAlchemyAutoSchema):
     user = Nested(UserSchema)
     visibility = Nested(PaperCommentVisibilitySchema)
     modified_by = Nested(UserSchema)

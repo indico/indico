@@ -9,7 +9,7 @@ from indico.core.marshmallow import mm
 from indico.modules.files.models.files import File
 
 
-class FileSchema(mm.ModelSchema):
+class FileSchema(mm.SQLAlchemyAutoSchema):
     class Meta:
         model = File
         fields = ('claimed', 'content_type', 'created_dt', 'filename', 'size', 'uuid')

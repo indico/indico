@@ -46,13 +46,13 @@ class EditableStateSchema(mm.Schema):
     css_class = fields.String()
 
 
-class EditingUserSchema(mm.ModelSchema):
+class EditingUserSchema(mm.SQLAlchemyAutoSchema):
     class Meta:
         model = User
         fields = ('id', 'avatar_bg_color', 'full_name', 'identifier')
 
 
-class EditingFileTypeSchema(mm.ModelSchema):
+class EditingFileTypeSchema(mm.SQLAlchemyAutoSchema):
     class Meta:
         model = EditingFileType
         fields = ('id', 'name', 'extensions', 'allow_multiple_files', 'required', 'publishable', 'is_used',
@@ -72,7 +72,7 @@ class EditingFileTypeSchema(mm.ModelSchema):
         return data
 
 
-class EditingTagSchema(mm.ModelSchema):
+class EditingTagSchema(mm.SQLAlchemyAutoSchema):
     class Meta:
         model = EditingTag
         fields = (
@@ -91,7 +91,7 @@ class EditingTagSchema(mm.ModelSchema):
         return data
 
 
-class EditingRevisionFileSchema(mm.ModelSchema):
+class EditingRevisionFileSchema(mm.SQLAlchemyAutoSchema):
     class Meta:
         model = EditingRevisionFile
         fields = ('uuid', 'filename', 'size', 'content_type', 'file_type', 'download_url', 'external_download_url')
@@ -111,7 +111,7 @@ class EditingRevisionSignedFileSchema(EditingRevisionFileSchema):
     signed_download_url = fields.String(attribute='file.signed_download_url')
 
 
-class EditingRevisionCommentSchema(mm.ModelSchema):
+class EditingRevisionCommentSchema(mm.SQLAlchemyAutoSchema):
     class Meta:
         model = EditingRevisionComment
         fields = ('id', 'user', 'created_dt', 'modified_dt', 'internal', 'system', 'text', 'html', 'can_modify',
@@ -124,7 +124,7 @@ class EditingRevisionCommentSchema(mm.ModelSchema):
     modify_comment_url = fields.Function(lambda comment: url_for('event_editing.api_edit_comment', comment))
 
 
-class EditingRevisionSchema(mm.ModelSchema):
+class EditingRevisionSchema(mm.SQLAlchemyAutoSchema):
     class Meta:
         model = EditingRevision
         fields = ('id', 'created_dt', 'submitter', 'editor', 'files', 'comment', 'comment_html', 'comments',
@@ -165,7 +165,7 @@ class EditingRevisionSignedSchema(EditingRevisionSchema):
     files = fields.List(fields.Nested(EditingRevisionSignedFileSchema))
 
 
-class EditableSchema(mm.ModelSchema):
+class EditableSchema(mm.SQLAlchemyAutoSchema):
     class Meta:
         model = Editable
         fields = ('id', 'type', 'editor', 'revisions', 'contribution', 'can_comment', 'review_conditions_valid',
@@ -191,7 +191,7 @@ class EditableSchema(mm.ModelSchema):
     state = fields.Nested(EditableStateSchema)
 
 
-class EditableBasicSchema(mm.ModelSchema):
+class EditableBasicSchema(mm.SQLAlchemyAutoSchema):
     class Meta:
         model = Editable
         fields = ('id', 'type', 'state', 'editor', 'timeline_url', 'revision_count')
@@ -201,7 +201,7 @@ class EditableBasicSchema(mm.ModelSchema):
     timeline_url = fields.String()
 
 
-class EditingEditableListSchema(mm.ModelSchema):
+class EditingEditableListSchema(mm.SQLAlchemyAutoSchema):
     class Meta:
         model = Contribution
         fields = ('id', 'friendly_id', 'title', 'code', 'editable')
@@ -216,7 +216,7 @@ class EditingEditableListSchema(mm.ModelSchema):
         return EditableBasicSchema().dump(editable)
 
 
-class FilteredEditableSchema(mm.ModelSchema):
+class FilteredEditableSchema(mm.SQLAlchemyAutoSchema):
     class Meta:
         model = Editable
         fields = ('contribution_id', 'contribution_title', 'contribution_code', 'contribution_friendly_id',
@@ -392,7 +392,7 @@ class RoleSchema(mm.Schema):
         return 'category' if isinstance(role, CategoryRole) else 'event'
 
 
-class ServiceUserSchema(mm.ModelSchema):
+class ServiceUserSchema(mm.SQLAlchemyAutoSchema):
     class Meta:
         model = User
         fields = ('id', 'full_name', 'email', 'roles', 'manager', 'submitter', 'editor')

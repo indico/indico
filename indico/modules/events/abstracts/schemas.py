@@ -22,7 +22,7 @@ from indico.modules.users.schemas import UserSchema
 _basic_abstract_fields = ('id', 'friendly_id', 'title')
 
 
-class AbstractCommentSchema(mm.ModelSchema):
+class AbstractCommentSchema(mm.SQLAlchemyAutoSchema):
     user = Nested(UserSchema)
     modified_by = Nested(UserSchema)
 
@@ -33,19 +33,19 @@ class AbstractCommentSchema(mm.ModelSchema):
                   'modified_dt', 'modified_by')
 
 
-class AbstractReviewQuestionSchema(mm.ModelSchema):
+class AbstractReviewQuestionSchema(mm.SQLAlchemyAutoSchema):
     class Meta:
         model = AbstractReviewQuestion
         fields = ('id', 'no_score', 'position', 'title')
 
 
-class AbstractReviewRatingSchema(mm.ModelSchema):
+class AbstractReviewRatingSchema(mm.SQLAlchemyAutoSchema):
     class Meta:
         model = AbstractReviewRating
         fields = ('question', 'value')
 
 
-class AbstractReviewSchema(mm.ModelSchema):
+class AbstractReviewSchema(mm.SQLAlchemyAutoSchema):
     track = Nested(track_schema_basic)
     user = Nested(UserSchema)
     proposed_related_abstract = Nested('AbstractSchema', only=_basic_abstract_fields)
@@ -60,14 +60,14 @@ class AbstractReviewSchema(mm.ModelSchema):
                   'ratings')
 
 
-class AbstractPersonLinkSchema(mm.ModelSchema):
+class AbstractPersonLinkSchema(mm.SQLAlchemyAutoSchema):
     class Meta:
         model = AbstractPersonLink
         fields = ('id', 'person_id', 'email', 'first_name', 'last_name', 'title', 'affiliation', 'address', 'phone',
                   'is_speaker', 'author_type')
 
 
-class AbstractSchema(mm.ModelSchema):
+class AbstractSchema(mm.SQLAlchemyAutoSchema):
     submitter = Nested(UserSchema)
     judge = Nested(UserSchema)
     modified_by = Nested(UserSchema)

@@ -11,7 +11,7 @@ from indico.modules.events.tracks.models.tracks import Track
 from indico.util.marshmallow import PrincipalPermissionList
 
 
-class TrackSchema(mm.ModelSchema):
+class TrackSchema(mm.SQLAlchemyAutoSchema):
     class Meta:
         model = Track
         fields = ('id', 'title', 'code', 'description')
