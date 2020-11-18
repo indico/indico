@@ -16,7 +16,8 @@ Improvements
 Bugfixes
 ^^^^^^^^
 
-- Correctly filter 'non-registered' speakers in the admin contribution list  (:pr:`4712`, thanks :user:`bpedersen2`)
+- Only considered actual speakers in the "has registered speakers" contribution list filter
+  (:pr:`4712`, thanks :user:`bpedersen2`)
 
 Version 2.3.1
 -------------
