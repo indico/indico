@@ -30,6 +30,11 @@
                 <a class="js-mathjax" href="{{ url_for('contributions.display_contribution', contrib) }}">
                     <span class="contrib-id">{{ contrib.friendly_id }}.</span>
                     {{ contrib.title }}
+                    {% if contrib.code -%}
+                        <span class="contrib-code" data-searchable="{{ contrib.code|lower }}">
+                            ({{ contrib.code }})
+                        </span>
+                    {%- endif %}
                 </a>
             </span>
         </div>
