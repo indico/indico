@@ -79,6 +79,7 @@ from io import BytesIO
 from mimetypes import guess_extension
 from tempfile import NamedTemporaryFile
 from urllib.parse import urlparse
+from xml.etree import ElementTree as etree
 
 import markdown
 import requests
@@ -326,8 +327,7 @@ class LaTeXExtension(markdown.Extension):
         md.postprocessors.register(link_pp, 'link', md.postprocessors._priority[-1].priority - 1)
 
         # Needed for LaTeX postprocessors not to choke on URL-encoded urls
-        md.inlinePatterns.register(NonEncodedAutoMailPattern(markdown.inlinepatterns.AUTOMAIL_RE, md), 'automail',
-                                   md.treeprocessors._priority[-1].priority - 1)
+        md.inlinePatterns.register(NonEncodedAutoMailPattern(markdown.inlinepatterns.AUTOMAIL_RE, md), 'automail', 110)
 
     def reset(self):
         pass
@@ -337,15 +337,11 @@ class NonEncodedAutoMailPattern(markdown.inlinepatterns.Pattern):
     """Reimplementation of AutoMailPattern to avoid URL-encoded links."""
 
     def handleMatch(self, m):
-        el = markdown.util.etree.Element('a')
+        el = etree.Element('a')
         email = self.unescape(m.group(2))
-        if email.startswith("mailto:"):
-            email = email[len("mailto:"):]
+        email.removeprefix('mailto:')
         el.text = markdown.util.AtomicString(''.join(email))
-        mailto = "mailto:" + email
-        mailto = "".join([markdown.util.AMP_SUBSTITUTE + '#%d;' %
-                          ord(letter) for letter in mailto])
-        el.set('href', latex_escape(mailto, ignore_math=False))
+        el.set('href', f'mailto:{email}')
         return el
 
 
@@ -429,7 +425,7 @@ class LaTeXTreeProcessor(markdown.treeprocessors.Treeprocessor):
             buffer += latex_render_image(ournode.get('src'), ournode.get('alt'), tmpdir=self.configs.get('tmpdir'))[0]
         elif ournode.tag == 'a':
             # this one gets escaped in convert_link_to_latex
-            buffer += '<a href=\"{}\">{}</a>'.format(ournode.get('href'), subcontent)
+            buffer += '<a href="{}">{}</a>'.format(ournode.get('href'), subcontent)
         else:
             buffer = subcontent
 

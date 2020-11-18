@@ -147,6 +147,7 @@ class LatexRunner:
             subprocess.check_call(
                 pdflatex_cmd,
                 stdout=log_file,
+                stderr=subprocess.STDOUT,
                 cwd=self.source_dir,
                 env=dict(os.environ, TEXMFCNF='{}:'.format(os.path.dirname(__file__)))
             )
