@@ -42,8 +42,10 @@ class ContextData(fields.String):
         return value + self.context[self.key]
 
 
-def make_decorated_func(decorator, schema, args, **decorator_kwargs):
-    @decorator(schema, req=MockRequest(args), **decorator_kwargs)
+def make_decorated_func(decorator, schema, req_or_args, **decorator_kwargs):
+    req = MockRequest(req_or_args) if not isinstance(req_or_args, MockRequest) else req_or_args
+
+    @decorator(schema, req=req, **decorator_kwargs)
     def fn(args=None, **kwargs):
         if decorator in (use_kwargs, use_rh_kwargs):
             assert args is None
@@ -55,17 +57,24 @@ def make_decorated_func(decorator, schema, args, **decorator_kwargs):
     return fn
 
 
-def test_stripping_whitespace():
-    args = ImmutableMultiDict({
-        'a': [' 1337 '],
-        'b': ['\ttest\n'],
+@pytest.mark.parametrize('location', ('query', 'form', 'json', 'json_or_form_or_query'))
+def test_stripping_whitespace(location):
+    args = {
+        'a': ' 1337 ',
+        'b': '\ttest\n',
         'c': ['  12 ', ' foo\t']
-    })
+    }
+    req = {
+        'query': MockRequest(ImmutableMultiDict(args)),
+        'form': MockRequest({}, form=ImmutableMultiDict(args)),
+        'json': MockRequest({}, json=args),
+        'json_or_form_or_query': MockRequest(ImmutableMultiDict(args))
+    }[location]
     fn = make_decorated_func(use_kwargs, {
         'a': fields.Integer(),
         'b': fields.String(),
         'c': fields.List(fields.String()),
-    }, args)
+    }, req, location=location)
     assert fn() == {'a': 1337, 'b': 'test', 'c': ['12', 'foo']}
 
 
