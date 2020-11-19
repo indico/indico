@@ -28,9 +28,7 @@ class UploadFileMixin:
     to specify how the file gets stored.
     """
 
-    @use_kwargs({
-        'file': fields.Field(location='files', required=True)
-    })
+    @use_kwargs({'file': fields.Field(required=True)}, location='files')
     def _process(self, file):
         if not self.validate_file(file):
             # XXX: we could include a nicer error message, but none of the upload

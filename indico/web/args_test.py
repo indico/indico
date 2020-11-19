@@ -22,6 +22,7 @@ class MockRequest:
         self.args = args
         self.form = form or {}
         self.json = json
+        self.is_json = json is not None
         self.view_args = view_args or {}
         self.cookies = cookies or {}
         self.headers = headers or {}
@@ -185,12 +186,12 @@ def test_unknown_locations():
         cookies={'c': '6', 'xxx': 'wtf'},
     )
 
-    @use_kwargs({'q': fields.String(location='query')}, req=req)
-    @use_kwargs({'f': fields.String(location='form')}, req=req)
-    @use_kwargs({'j': fields.String(location='json')}, req=req)
-    @use_kwargs({'v': fields.String(location='view_args')}, req=req)
-    @use_kwargs({'h': fields.String(location='headers')}, req=req)
-    @use_kwargs({'c': fields.String(location='cookies')}, req=req)
+    @use_kwargs({'q': fields.String()}, req=req, location='query')
+    @use_kwargs({'f': fields.String()}, req=req, location='form')
+    @use_kwargs({'j': fields.String()}, req=req, location='json')
+    @use_kwargs({'v': fields.String()}, req=req, location='view_args')
+    @use_kwargs({'h': fields.String()}, req=req, location='headers')
+    @use_kwargs({'c': fields.String()}, req=req, location='cookies')
     def fn(**kwargs):
         return kwargs
 

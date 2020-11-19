@@ -207,9 +207,7 @@ class RHProfilePicturePreview(RHUserBase):
     This always uses a fresh picture without any caching.
     """
 
-    @use_kwargs({
-        'source': EnumField(ProfilePictureSource, location='view_args')
-    })
+    @use_kwargs({'source': EnumField(ProfilePictureSource)}, location='view_args')
     def _process(self, source):
         if source == ProfilePictureSource.standard:
             first_name = self.user.first_name[0].upper() if self.user.first_name else ''

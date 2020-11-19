@@ -5,13 +5,25 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from flask import g
-from marshmallow import Schema
-from webargs import dict2schema
-from webargs.compat import Mapping
-from webargs.flaskparser import FlaskParser
+from collections.abc import Mapping
 
-from indico.util.string import strip_whitespace
+from flask import g
+from marshmallow import EXCLUDE, Schema
+from webargs.flaskparser import FlaskParser
+from webargs.multidictproxy import MultiDictProxy
+from werkzeug.datastructures import MultiDict
+
+
+def _strip_whitespace(value):
+    if isinstance(value, str):
+        value = value.strip()
+    elif isinstance(value, MultiDict):
+        return type(value)((k, _strip_whitespace(v)) for k, vals in value.lists() for v in vals)
+    elif isinstance(value, dict):
+        return {k: _strip_whitespace(v) for k, v in value.items()}
+    elif isinstance(value, (list, set)):
+        return type(value)(map(_strip_whitespace, value))
+    return value
 
 
 class IndicoFlaskParser(FlaskParser):
@@ -19,16 +31,42 @@ class IndicoFlaskParser(FlaskParser):
     A custom webargs flask parser that strips surrounding whitespace.
     """
 
-    def parse_arg(self, name, field, req, locations=None):
-        rv = super().parse_arg(name, field, req, locations=locations)
-        if isinstance(rv, str):
-            return rv.strip()
-        elif isinstance(rv, (list, set)):
-            return type(rv)(map(strip_whitespace, rv))
-        return rv
+    DEFAULT_LOCATION = 'json_or_form_or_query'
+
+    def load_querystring(self, req, schema):
+        return MultiDictProxy(_strip_whitespace(req.args), schema)
+
+    def load_form(self, req, schema):
+        return MultiDictProxy(_strip_whitespace(req.form), schema)
+
+    def load_json(self, req, schema):
+        return _strip_whitespace(super().load_json(req, schema))
 
 
 parser = IndicoFlaskParser()
+
+
+@parser.location_loader('json_or_form_or_query')
+def _load_json_form_query(request, schema):
+    data = request.args.copy()
+    data.update(request.form)
+    data.update(request.json if request.is_json else request.form)
+    return MultiDictProxy(_strip_whitespace(data), schema)
+
+
+@parser.error_handler
+def handle_error(error, req, schema, *, error_status_code, error_headers):
+    # since 6.0.0b7 errors are namespaced by their source. this is nice for APIs taking
+    # data from different locations to serve very specific errors, but in a typical web app
+    # where you usually have only one source and certainly not the same field name in different
+    # locations, it just makes handling errors in JS harder since we suddenly have to care if
+    # it's form data or json data.
+    # this gets even worse when using the `json_or_form_or_query` meta location where we don't
+    # have detailed location information anyway.
+    namespaced = error.messages  # mutating this below is safe
+    error.messages = namespaced.popitem()[1]
+    assert not namespaced  # we never expect to have more than one location
+    parser.handle_error(error, req, schema, error_status_code=error_status_code, error_headers=error_headers)
 
 
 def _split_kwargs(kwargs):
@@ -36,7 +74,7 @@ def _split_kwargs(kwargs):
     context = schema_kwargs.pop('context', {})
     webargs_kwargs = {
         a: schema_kwargs.pop(a)
-        for a in ('locations', 'as_kwargs', 'validate', 'error_status_code', 'error_headers', 'req')
+        for a in ('location', 'as_kwargs', 'validate', 'error_status_code', 'error_headers', 'req', 'unknown')
         if a in schema_kwargs
     }
     return schema_kwargs, context, webargs_kwargs
@@ -52,9 +90,10 @@ def use_args(schema_cls, **kwargs):
                    Schema constructor.
     """
     schema_kwargs, context, webargs_kwargs = _split_kwargs(kwargs)
+    webargs_kwargs.setdefault('unknown', EXCLUDE)
 
     if isinstance(schema_cls, Mapping):
-        schema_cls = dict2schema(schema_cls, parser.schema_class)
+        schema_cls = parser.schema_class.from_dict(schema_cls)
     elif isinstance(schema_cls, Schema):
         raise TypeError('Pass a schema or an argmap instead of a schema instance to use_args/use_kwargs')
 
@@ -84,9 +123,10 @@ def use_rh_args(schema_cls, **kwargs):
     """
 
     schema_kwargs, default_context, webargs_kwargs = _split_kwargs(kwargs)
+    webargs_kwargs.setdefault('unknown', EXCLUDE)
 
     if isinstance(schema_cls, Mapping):
-        schema_cls = dict2schema(schema_cls, parser.schema_class)
+        schema_cls = parser.schema_class.from_dict(schema_cls)
         rh_context_attrs = schema_kwargs.pop('rh_context')
     elif isinstance(schema_cls, Schema):
         raise TypeError('Pass a schema or an argmap instead of a schema instance to use_rh_args/use_rh_kwargs')

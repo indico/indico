@@ -111,9 +111,7 @@ class RHSubmitNewRevision(RHPaperBase):
             return False
         return self.contribution.paper.state == PaperRevisionState.to_be_corrected
 
-    @use_kwargs({
-        'files': fields.List(fields.Field(), location='files', required=True)
-    })
+    @use_kwargs({'files': fields.List(fields.Field(), required=True)}, location='files')
     def _process(self, files):
         create_paper_revision(self.paper, session.user, files)
         return '', 204
