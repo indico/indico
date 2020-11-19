@@ -102,7 +102,7 @@ export function Dropzone({
   });
 
   return (
-    <div {...getRootProps()} styleName="outer-dropzone">
+    <div {...getRootProps()}>
       <input {...getInputProps()} />
       <div styleName="dropzone" className={isDragActive ? 'active' : ''}>
         <Icon color="grey" size="big" name={showNewFileIcon ? 'plus circle' : 'exchange'} />
@@ -190,23 +190,25 @@ function FileType({
           ))}
         </div>
       )}
-      <Dropzone dropzoneRef={ref} fileType={fileType} files={files} uploadURL={uploadURL} />
-      {uploadableFiles && uploadableFiles.length > 0 && (
-        <Dropdown
-          className="primary"
-          style={{marginTop: '1em'}}
-          text={Translate.string('Use an existing file')}
-          options={uploadableFiles.map((uf, i) => ({
-            text: uf.filename,
-            value: i,
-            disabled: files.some(f => f.id === uf.id),
-          }))}
-          onChange={onChangeDropdown}
-          selectOnNavigation={false}
-          selectOnBlur={false}
-          value={null}
-        />
-      )}
+      <div styleName="outer-dropzone">
+        {uploadableFiles && uploadableFiles.length > 0 && (
+          <Dropdown
+            className="primary"
+            style={{marginBottom: '1em'}}
+            text={Translate.string('Use an existing file')}
+            options={uploadableFiles.map((uf, i) => ({
+              text: uf.filename,
+              value: i,
+              disabled: files.some(f => f.id === uf.id),
+            }))}
+            onChange={onChangeDropdown}
+            selectOnNavigation={false}
+            selectOnBlur={false}
+            value={null}
+          />
+        )}
+        <Dropzone dropzoneRef={ref} fileType={fileType} files={files} uploadURL={uploadURL} />
+      </div>
     </div>
   );
 }
