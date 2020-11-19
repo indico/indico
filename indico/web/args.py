@@ -36,7 +36,7 @@ def _split_kwargs(kwargs):
     context = schema_kwargs.pop('context', {})
     webargs_kwargs = {
         a: schema_kwargs.pop(a)
-        for a in ('locations', 'as_kwargs', 'validate', 'error_status_code', 'error_headers')
+        for a in ('locations', 'as_kwargs', 'validate', 'error_status_code', 'error_headers', 'req')
         if a in schema_kwargs
     }
     return schema_kwargs, context, webargs_kwargs
@@ -51,7 +51,7 @@ def use_args(schema_cls, **kwargs):
     :param kwargs: Any keyword arguments that are supported by ``use_args`` or the
                    Schema constructor.
     """
-    schema_kwargs, __, webargs_kwargs = _split_kwargs(kwargs)
+    schema_kwargs, context, webargs_kwargs = _split_kwargs(kwargs)
 
     if isinstance(schema_cls, Mapping):
         schema_cls = dict2schema(schema_cls, parser.schema_class)
@@ -59,7 +59,7 @@ def use_args(schema_cls, **kwargs):
         raise TypeError('Pass a schema or an argmap instead of a schema instance to use_args/use_kwargs')
 
     def factory(req):
-        return schema_cls(**schema_kwargs)
+        return schema_cls(**schema_kwargs, context=context)
 
     return parser.use_args(factory, **webargs_kwargs)
 
