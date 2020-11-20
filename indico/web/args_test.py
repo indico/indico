@@ -18,9 +18,9 @@ from indico.web.args import use_args, use_kwargs, use_rh_args, use_rh_kwargs
 
 
 class MockRequest:
-    def __init__(self, args, form=None, json=None, view_args=None, cookies=None, headers=None):
-        self.args = args
-        self.form = form or {}
+    def __init__(self, form=None, args=None, json=None, view_args=None, cookies=None, headers=None):
+        self.form = ImmutableMultiDict(form or {})
+        self.args = ImmutableMultiDict(args or {})
         self.json = json
         self.is_json = json is not None
         self.view_args = view_args or {}
@@ -42,8 +42,8 @@ class ContextData(fields.String):
         return value + self.context[self.key]
 
 
-def make_decorated_func(decorator, schema, req_or_args, **decorator_kwargs):
-    req = MockRequest(req_or_args) if not isinstance(req_or_args, MockRequest) else req_or_args
+def make_decorated_func(decorator, schema, req_or_form, **decorator_kwargs):
+    req = MockRequest(req_or_form) if not isinstance(req_or_form, MockRequest) else req_or_form
 
     @decorator(schema, req=req, **decorator_kwargs)
     def fn(args=None, **kwargs):
@@ -57,7 +57,7 @@ def make_decorated_func(decorator, schema, req_or_args, **decorator_kwargs):
     return fn
 
 
-@pytest.mark.parametrize('location', ('query', 'form', 'json', 'json_or_form_or_query'))
+@pytest.mark.parametrize('location', ('query', 'form', 'json', 'json_or_form'))
 def test_stripping_whitespace(location):
     args = {
         'a': ' 1337 ',
@@ -65,10 +65,10 @@ def test_stripping_whitespace(location):
         'c': ['  12 ', ' foo\t']
     }
     req = {
-        'query': MockRequest(ImmutableMultiDict(args)),
-        'form': MockRequest({}, form=ImmutableMultiDict(args)),
-        'json': MockRequest({}, json=args),
-        'json_or_form_or_query': MockRequest(ImmutableMultiDict(args))
+        'query': MockRequest(args=args),
+        'form': MockRequest(form=args),
+        'json': MockRequest(json=args),
+        'json_or_form': MockRequest(form=args)
     }[location]
     fn = make_decorated_func(use_kwargs, {
         'a': fields.Integer(),
@@ -76,6 +76,37 @@ def test_stripping_whitespace(location):
         'c': fields.List(fields.String()),
     }, req, location=location)
     assert fn() == {'a': 1337, 'b': 'test', 'c': ['12', 'foo']}
+
+
+@pytest.mark.parametrize('location', ('query', 'form', 'json'))
+def test_lists(location):
+    req = {
+        'query': MockRequest(args={'single': '123', 'multi': ['456', '789']}),
+        'form': MockRequest(form={'single': '123', 'multi': ['456', '789']}),
+        'json': MockRequest(json={'single': 123, 'multi': [456, 789]}),
+    }[location]
+    fn = make_decorated_func(use_kwargs, {
+        'single': fields.Integer(),
+        'multi': fields.List(fields.Integer()),
+    }, req, location=location)
+    assert fn() == {'single': 123, 'multi': [456, 789]}
+
+
+@pytest.mark.parametrize('location', ('query', 'form', 'json'))
+def test_meta_location(location):
+    req = {
+        'query': MockRequest(args={'single': '123', 'multi': ['456', '789']}),
+        'form': MockRequest(form={'single': '123', 'multi': ['456', '789']}),
+        'json': MockRequest(json={'single': 123, 'multi': [456, 789]}),
+    }[location]
+    fn = make_decorated_func(use_kwargs, {
+        'single': fields.Integer(),
+        'multi': fields.List(fields.Integer()),
+    }, req)
+    if location == 'query':
+        assert fn() == {}
+    else:
+        assert fn() == {'single': 123, 'multi': [456, 789]}
 
 
 @pytest.mark.parametrize('decorator', (use_kwargs, use_args))
@@ -187,16 +218,16 @@ def test_use_args_kwargs_rh_context_schema_no_kwarg(decorator):
 
 def test_unknown_locations():
     req = MockRequest(
-        args={'q': '1', 'xxx': 'wtf'},
-        form={'f': '2', 'xxx': 'wtf'},
+        form={'f': '1', 'xxx': 'wtf'},
+        args={'q': '2', 'xxx': 'wtf'},
         json={'j': '3', 'xxx': 'wtf'},
         view_args={'v': '4', 'xxx': 'wtf'},
         headers={'h': '5', 'xxx': 'wtf'},
         cookies={'c': '6', 'xxx': 'wtf'},
     )
 
-    @use_kwargs({'q': fields.String()}, req=req, location='query')
     @use_kwargs({'f': fields.String()}, req=req, location='form')
+    @use_kwargs({'q': fields.String()}, req=req, location='query')
     @use_kwargs({'j': fields.String()}, req=req, location='json')
     @use_kwargs({'v': fields.String()}, req=req, location='view_args')
     @use_kwargs({'h': fields.String()}, req=req, location='headers')
@@ -205,8 +236,8 @@ def test_unknown_locations():
         return kwargs
 
     assert fn() == {
-        'q': '1',
-        'f': '2',
+        'f': '1',
+        'q': '2',
         'j': '3',
         'v': '4',
         'h': '5',

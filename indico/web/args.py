@@ -31,7 +31,7 @@ class IndicoFlaskParser(FlaskParser):
     A custom webargs flask parser that strips surrounding whitespace.
     """
 
-    DEFAULT_LOCATION = 'json_or_form_or_query'
+    DEFAULT_LOCATION = 'json_or_form'
 
     def load_querystring(self, req, schema):
         return MultiDictProxy(_strip_whitespace(req.args), schema)
@@ -44,14 +44,6 @@ class IndicoFlaskParser(FlaskParser):
 
 
 parser = IndicoFlaskParser()
-
-
-@parser.location_loader('json_or_form_or_query')
-def _load_json_form_query(request, schema):
-    data = request.args.copy()
-    data.update(request.form)
-    data.update(request.json if request.is_json else request.form)
-    return MultiDictProxy(_strip_whitespace(data), schema)
 
 
 @parser.error_handler
