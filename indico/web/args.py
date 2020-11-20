@@ -34,10 +34,12 @@ class IndicoFlaskParser(FlaskParser):
     DEFAULT_LOCATION = 'json_or_form'
 
     def load_querystring(self, req, schema):
-        return MultiDictProxy(_strip_whitespace(req.args), schema)
+        # remove immutability since we may want to modify the data in `schema_pre_load`
+        return MultiDictProxy(_strip_whitespace(MultiDict(req.args)), schema)
 
     def load_form(self, req, schema):
-        return MultiDictProxy(_strip_whitespace(req.form), schema)
+        # remove immutability since we may want to modify the data in `schema_pre_load`
+        return MultiDictProxy(_strip_whitespace(MultiDict(req.form)), schema)
 
     def load_json(self, req, schema):
         return _strip_whitespace(super().load_json(req, schema))
