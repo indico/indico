@@ -43,7 +43,8 @@ def get_rooms_conflicts(rooms, start_dt, end_dt, repeat_frequency, repeat_interv
     if skip_past_conflicts:
         query = query.filter(ReservationOccurrence.start_dt > datetime.now())
 
-    overlapping_occurrences = group_list(query, key=lambda obj: obj.reservation.room.id)
+    overlapping_occurrences = group_list(query, key=lambda obj: obj.reservation.room.id,
+                                         sort_by=lambda obj: obj.reservation.room.id)
     for room_id, occurrences in overlapping_occurrences.items():
         conflicts = get_room_bookings_conflicts(candidates, occurrences, skip_conflicts_with)
         rooms_conflicts[room_id], rooms_pre_conflicts[room_id], rooms_conflicting_candidates[room_id] = conflicts
