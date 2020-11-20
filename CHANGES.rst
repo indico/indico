@@ -18,6 +18,8 @@ Bugfixes
 
 - Only consider actual speakers in the "has registered speakers" contribution list filter
   (:pr:`4712`, thanks :user:`bpedersen2`)
+- Correctly filter events in "Sync with your calendar" links (this fix only applies to newly
+  generated links) (:pr:`4717`)
 
 Version 2.3.1
 -------------
