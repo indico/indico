@@ -28,7 +28,7 @@ class RHCheckServiceURL(RHEditingManagementBase):
 
     @use_kwargs({
         'url': fields.URL(schemes={'http', 'https'}, required=True),
-    })
+    }, location='query')
     def _process(self, url):
         url = url.rstrip('/')
         return jsonify(check_service_url(url))

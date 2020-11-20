@@ -56,7 +56,7 @@ class RHSearchRooms(RHRoomBookingBase):
     @use_args(dict(search_room_args, **{
         'unavailable': fields.Bool(missing=False),
         'admin_override_enabled': fields.Bool(missing=False)
-    }))
+    }), location='query')
     def _process(self, args):
         filter_availability = all(x in args for x in ('start_dt', 'end_dt', 'repeat_frequency', 'repeat_interval'))
         only_unavailable = args.pop('unavailable')
@@ -183,7 +183,7 @@ class RHCheckRoomAvailable(RHRoomBase):
     @use_kwargs({
         'start_dt': NaiveDateTime(),
         'end_dt': NaiveDateTime(),
-    })
+    }, location='query')
     def _process(self, start_dt, end_dt):
         return jsonify(check_room_available(self.room, start_dt, end_dt))
 

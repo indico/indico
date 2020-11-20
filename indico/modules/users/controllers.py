@@ -151,7 +151,7 @@ class RHExportDashboardICS(RHTokenProtected):
         'from_': HumanizedDate(data_key='from', missing=lambda: now_utc(False) - relativedelta(weeks=1)),
         'include': fields.List(fields.Str(), missing={'linked', 'categories'}),
         'limit': fields.Integer(missing=100, validate=lambda v: 0 < v <= 500)
-    })
+    }, location='query')
     def _process(self, from_, include, limit):
         categories = get_related_categories(self.user)
         categories_events = []
@@ -616,7 +616,7 @@ class RHUsersAdminMergeCheck(RHAdminBase):
     @use_kwargs({
         'source': Principal(allow_external_users=True, required=True),
         'target': Principal(allow_external_users=True, required=True),
-    })
+    }, location='query')
     def _process(self, source, target):
         errors, warnings = _get_merge_problems(source, target)
         return jsonify(errors=errors, warnings=warnings, source=serialize_user(source), target=serialize_user(target))
@@ -723,7 +723,7 @@ class RHUserSearch(RHProtected):
     }, validate=validate_with_message(
         lambda args: args.keys() & {'first_name', 'last_name', 'email', 'affiliation'},
         'No criteria provided'
-    ))
+    ), location='query')
     def _process(self, exact, external, favorites_first, **criteria):
         matches = search_users(exact=exact, include_pending=True, external=external, **criteria)
         self.externals = {}

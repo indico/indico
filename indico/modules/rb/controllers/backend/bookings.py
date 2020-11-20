@@ -61,9 +61,11 @@ class RHTimeline(RHRoomBookingBase):
         'end_dt': fields.DateTime(required=True),
         'repeat_frequency': EnumField(RepeatFrequency, missing='NEVER'),
         'repeat_interval': fields.Int(missing=1),
-        'room_ids': fields.List(fields.Int(), missing=[]),
         'skip_conflicts_with': fields.List(fields.Int(), missing=None),
         'admin_override_enabled': fields.Bool(missing=False)
+    }, location='query')
+    @use_kwargs({
+        'room_ids': fields.List(fields.Int(), missing=[]),
     })
     def _process(self, room_ids, **kwargs):
         rooms = [self.room] if self.room else Room.query.filter(Room.id.in_(room_ids), ~Room.is_deleted).all()
@@ -88,12 +90,14 @@ class RHTimeline(RHRoomBookingBase):
 
 class RHCalendar(RHRoomBookingBase):
     @use_kwargs({
-        'start_date': fields.Date(missing=lambda: date.today().isoformat()),
+        'start_date': fields.Date(missing=lambda: date.today()),
         'end_date': fields.Date(missing=None),
         'my_bookings': fields.Bool(missing=False),
         'show_inactive': fields.Bool(missing=False),
-        'room_ids': fields.List(fields.Int(), missing=None),
         'text': fields.String(missing=None)
+    }, location='query')
+    @use_kwargs({
+        'room_ids': fields.List(fields.Int(), missing=None),
     })
     def _process(self, start_date, end_date, room_ids, my_bookings, show_inactive, text):
         booked_for_user = session.user if my_bookings else None
@@ -106,12 +110,14 @@ class RHCalendar(RHRoomBookingBase):
 
 class RHActiveBookings(RHRoomBookingBase):
     @use_kwargs({
-        'room_ids': fields.List(fields.Int(), missing=None),
         'start_dt': fields.DateTime(missing=None),
         'last_reservation_id': fields.Int(missing=None),
         'my_bookings': fields.Bool(missing=False),
         'limit': fields.Int(missing=40),
         'text': fields.String(missing=None)
+    }, location='query')
+    @use_kwargs({
+        'room_ids': fields.List(fields.Int(), missing=None),
     })
     def _process(self, room_ids, start_dt, last_reservation_id, my_bookings, limit, text):
         start_dt = start_dt or datetime.combine(date.today(), time(0, 0))
@@ -185,7 +191,7 @@ class RHCreateBooking(RHRoomBookingBase):
 
 
 class RHRoomSuggestions(RHRoomBookingBase):
-    @use_args(search_room_args)
+    @use_args(search_room_args, location='query')
     def _process(self, args):
         return jsonify(get_suggestions(args, limit=NUM_SUGGESTIONS))
 
@@ -278,7 +284,7 @@ class RHBookingEditCalendars(RHBookingBase):
         'end_dt': fields.DateTime(required=True),
         'repeat_frequency': EnumField(RepeatFrequency, missing='NEVER'),
         'repeat_interval': fields.Int(missing=1),
-    })
+    }, location='query')
     def _process(self, **kwargs):
         return jsonify(get_booking_edit_calendar_data(self.booking, kwargs))
 
@@ -342,7 +348,7 @@ class RHMatchingEvents(RHRoomBookingBase):
         'end_dt': fields.DateTime(),
         'repeat_frequency': EnumField(RepeatFrequency, missing='NEVER'),
         'repeat_interval': fields.Int(missing=1),
-    })
+    }, location='query')
     def _process(self, start_dt, end_dt, repeat_frequency, repeat_interval):
         events = get_matching_events(start_dt, end_dt, repeat_frequency, repeat_interval)
         return jsonify(reservation_user_event_schema.dump(events))
