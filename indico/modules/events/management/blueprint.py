@@ -32,7 +32,7 @@ _bp.add_url_rule('/lock', 'lock', actions.RHLockEvent, methods=('GET', 'POST'))
 _bp.add_url_rule('/unlock', 'unlock', actions.RHUnlockEvent, methods=('POST',))
 _bp.add_url_rule('/move', 'move', actions.RHMoveEvent, methods=('POST',))
 # Protection
-_bp.add_url_rule('/api/principals', 'api_principals', protection.RHEventPrincipals, methods=('GET', 'POST'))
+_bp.add_url_rule('/api/principals', 'api_principals', protection.RHEventPrincipals, methods=('POST',))
 _bp.add_url_rule('/api/event-roles', 'api_event_roles', protection.RHEventRolesJSON)
 _bp.add_url_rule('/api/category-roles', 'api_category_roles', protection.RHCategoryRolesJSON)
 _bp.add_url_rule('/protection', 'protection', protection.RHEventProtection, methods=('GET', 'POST'))
