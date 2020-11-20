@@ -12,6 +12,7 @@ Improvements
 
 - Disable title field by default in new registration forms (:issue:`4688`, :pr:`4692`)
 - Add gender-neutral "Mx" title (:issue:`4688`, :pr:`4692`)
+- Add contributions placeholder for emails (:pr:`4716`, thanks :user:`bpedersen2`)
 
 Bugfixes
 ^^^^^^^^
