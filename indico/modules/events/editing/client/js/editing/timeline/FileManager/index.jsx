@@ -91,7 +91,7 @@ export function Dropzone({
           // in that case only its type is available but not the name
           return true;
         }
-        const filename = file.name.slice(0, file.name.indexOf('.'));
+        const filename = file.name.slice(0, file.name.lastIndexOf('.'));
         if (!templateRe.test(filename)) {
           dispatch(actions.invalidTemplate(id, file.name));
           return false;

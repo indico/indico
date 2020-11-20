@@ -116,7 +116,11 @@ export function mapFileTypes(fileTypes, files, uploadableFiles = []) {
 function filesForFileType(files, fileType) {
   const templateRe = fileType.filenameTemplate && globToRegExp(fileType.filenameTemplate);
   return files
-    .filter(file => !fileType.filenameTemplate || templateRe.test(file.filename.split('.')[0]))
+    .filter(
+      file =>
+        !fileType.filenameTemplate ||
+        templateRe.test(file.filename.slice(0, file.filename.lastIndexOf('.')))
+    )
     .filter(
       file =>
         !fileType.extensions.length || fileType.extensions.includes(file.filename.split('.').pop())
