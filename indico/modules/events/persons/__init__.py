@@ -30,11 +30,13 @@ def _sidemenu_items(sender, event, **kwargs):
 def _get_placeholders(sender, person, event, register_link=False, **kwargs):
     from indico.modules.events.persons.placeholders import (FirstNamePlaceholder, LastNamePlaceholder, EmailPlaceholder,
                                                             EventTitlePlaceholder, EventLinkPlaceholder,
-                                                            RegisterLinkPlaceholder)
+                                                            RegisterLinkPlaceholder,
+                                                            EventContributionsPlaceholder)
     yield FirstNamePlaceholder
     yield LastNamePlaceholder
     yield EmailPlaceholder
     yield EventTitlePlaceholder
     yield EventLinkPlaceholder
+    yield EventContributionsPlaceholder
     if register_link:
         yield RegisterLinkPlaceholder

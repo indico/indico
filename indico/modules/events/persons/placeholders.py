@@ -10,8 +10,10 @@ from __future__ import unicode_literals
 from markupsafe import Markup
 
 from indico.modules.auth.util import url_for_register
+from indico.modules.events.contributions.util import get_contributions_for_person
 from indico.util.i18n import _
-from indico.util.placeholders import Placeholder
+from indico.util.placeholders import ParametrizedPlaceholder, Placeholder
+from indico.web.flask.templating import get_template_module
 
 
 # XXX: `person` may be either an `EventPerson` or a `User`
@@ -61,6 +63,26 @@ class EventLinkPlaceholder(Placeholder):
     def render(cls, person, event, **kwargs):
         return Markup('<a href="{url}" title="{title}">{url}</a>').format(url=event.short_external_url,
                                                                           title=event.title)
+
+
+class EventContributionsPlaceholder(ParametrizedPlaceholder):
+    name = 'event_contributions'
+    param_friendly_name = 'onlyspeakers'
+    param_required = False
+    param_restricted = True
+
+    @classmethod
+    def iter_param_info(cls, person, event, **kwargs):
+        yield None, _("The person's contributions")
+        yield 'onlyspeakers', _("The person's contributions where they are a speaker")
+
+    @classmethod
+    def render(cls, param, person, event, **kwargs):
+
+        tpl = get_template_module('events/persons/emails/_contributions.html')
+        return Markup(tpl.render_contributionlist(
+            get_contributions_for_person(event, person, param == 'onlyspeakers'),
+            event.timezone))
 
 
 class RegisterLinkPlaceholder(Placeholder):

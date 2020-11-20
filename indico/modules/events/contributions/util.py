@@ -221,6 +221,24 @@ def has_contributions_with_user_as_submitter(event, user):
     return _query_contributions_with_user_as_submitter(event, user).has_rows()
 
 
+def get_contributions_for_person(event, person, onlyspeakers=False):
+    """Get all contributions for an event person.
+
+    If ``onlyspeakers`` is true, then only contributions where the person is a
+    speaker are returned
+    """
+    if onlyspeakers:
+        cl_join = db.and_(ContributionPersonLink.is_speaker,
+                          ContributionPersonLink.person_id == person.id,
+                          ContributionPersonLink.contribution_id == Contribution.id)
+    else:
+        cl_join = db.and_(ContributionPersonLink.person_id == person.id,
+                          ContributionPersonLink.contribution_id == Contribution.id)
+
+    return (Contribution.query.with_parent(event)
+            .join(ContributionPersonLink, cl_join).all())
+
+
 def serialize_contribution_for_ical(contrib):
     return {
         '_fossil': 'contributionMetadata',
