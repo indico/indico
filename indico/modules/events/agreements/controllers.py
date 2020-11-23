@@ -245,7 +245,7 @@ class RHAgreementManagerDetailsSubmitAnswer(RHAgreementManagerDetails):
                 agreement.attachment = form.document.data.read()
             else:
                 agreement.reject(from_ip=request.remote_addr, on_behalf=True)
-            flash(_(f"Agreement answered on behalf of {agreement.person_name}"), 'success')
+            flash(_('Agreement answered on behalf of {0}').format(agreement.person_name), 'success')
             return jsonify(success=True)
         return WPJinjaMixin.render_template('events/agreements/dialogs/agreement_submit_answer_form.html', form=form,
                                             event=self.event, agreement=agreement)
