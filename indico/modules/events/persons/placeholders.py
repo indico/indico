@@ -65,24 +65,26 @@ class EventLinkPlaceholder(Placeholder):
                                                                           title=event.title)
 
 
-class EventContributionsPlaceholder(ParametrizedPlaceholder):
-    name = 'event_contributions'
-    param_friendly_name = 'onlyspeakers'
+class ContributionsPlaceholder(ParametrizedPlaceholder):
+    name = 'contributions'
+    param_friendly_name = 'speakers'
     param_required = False
     param_restricted = True
 
     @classmethod
     def iter_param_info(cls, person, event, **kwargs):
         yield None, _("The person's contributions")
-        yield 'onlyspeakers', _("The person's contributions where they are a speaker")
+        yield 'speakers', _("The person's contributions where they are a speaker")
 
     @classmethod
     def render(cls, param, person, event, **kwargs):
 
         tpl = get_template_module('events/persons/emails/_contributions.html')
-        return Markup(tpl.render_contributionlist(
-            get_contributions_for_person(event, person, param == 'onlyspeakers'),
-            event.timezone))
+        html = tpl.render_contribution_list(
+            get_contributions_for_person(event, person, only_speakers=(param == 'speakers')),
+            event.timezone
+        )
+        return Markup(html)
 
 
 class RegisterLinkPlaceholder(Placeholder):
