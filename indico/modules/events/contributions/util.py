@@ -29,6 +29,7 @@ from indico.modules.events.contributions.operations import create_contribution
 from indico.modules.events.models.events import Event
 from indico.modules.events.models.persons import EventPerson
 from indico.modules.events.persons.util import get_event_person
+from indico.modules.events.timetable.models.entries import TimetableEntry
 from indico.modules.events.util import serialize_person_link, track_time_changes
 from indico.util.date_time import format_human_timedelta
 from indico.util.i18n import _
@@ -218,6 +219,26 @@ def get_contributions_with_user_as_submitter(event, user):
 
 def has_contributions_with_user_as_submitter(event, user):
     return _query_contributions_with_user_as_submitter(event, user).has_rows()
+
+
+def get_contributions_for_person(event, person, only_speakers=False):
+    """Get all contributions for an event person.
+
+    If ``only_speakers`` is true, then only contributions where the person is a
+    speaker are returned
+    """
+    cl_join = db.and_(ContributionPersonLink.person_id == person.id,
+                      ContributionPersonLink.contribution_id == Contribution.id)
+
+    if only_speakers:
+        cl_join &= ContributionPersonLink.is_speaker
+
+    return (Contribution.query
+            .with_parent(event)
+            .join(ContributionPersonLink, cl_join)
+            .outerjoin(TimetableEntry)
+            .order_by(TimetableEntry.start_dt, db.func.lower(Contribution.title), Contribution.friendly_id)
+            .all())
 
 
 def serialize_contribution_for_ical(contrib):

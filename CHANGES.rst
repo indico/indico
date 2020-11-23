@@ -35,11 +35,15 @@ Improvements
 
 - Disable title field by default in new registration forms (:issue:`4688`, :pr:`4692`)
 - Add gender-neutral "Mx" title (:issue:`4688`, :pr:`4692`)
+- Add contributions placeholder for emails (:pr:`4716`, thanks :user:`bpedersen2`)
 
 Bugfixes
 ^^^^^^^^
 
-- None so far :)
+- Only consider actual speakers in the "has registered speakers" contribution list filter
+  (:pr:`4712`, thanks :user:`bpedersen2`)
+- Correctly filter events in "Sync with your calendar" links (this fix only applies to newly
+  generated links) (:pr:`4717`)
 
 Version 2.3.1
 -------------

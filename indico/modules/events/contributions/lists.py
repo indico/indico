@@ -87,6 +87,7 @@ class ContributionListGenerator(ListGeneratorBase):
             registration_join_criteria = db.and_(
                 Registration.event_id == Contribution.event_id,
                 Registration.is_active,
+                ContributionPersonLink.is_speaker,
                 (Registration.user_id == EventPerson.user_id) | (Registration.email == EventPerson.email)
             )
             contrib_query = (db.session.query(Contribution.id)

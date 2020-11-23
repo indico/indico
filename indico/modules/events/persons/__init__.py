@@ -26,13 +26,15 @@ def _sidemenu_items(sender, event, **kwargs):
 
 @signals.get_placeholders.connect_via('event-persons-email')
 def _get_placeholders(sender, person, event, register_link=False, **kwargs):
-    from indico.modules.events.persons.placeholders import (EmailPlaceholder, EventLinkPlaceholder,
-                                                            EventTitlePlaceholder, FirstNamePlaceholder,
-                                                            LastNamePlaceholder, RegisterLinkPlaceholder)
+    from indico.modules.events.persons.placeholders import (ContributionsPlaceholder, EmailPlaceholder,
+                                                            EventLinkPlaceholder, EventTitlePlaceholder,
+                                                            FirstNamePlaceholder, LastNamePlaceholder,
+                                                            RegisterLinkPlaceholder)
     yield FirstNamePlaceholder
     yield LastNamePlaceholder
     yield EmailPlaceholder
     yield EventTitlePlaceholder
     yield EventLinkPlaceholder
+    yield ContributionsPlaceholder
     if register_link:
         yield RegisterLinkPlaceholder
