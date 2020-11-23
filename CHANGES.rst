@@ -21,6 +21,8 @@ Bugfixes
   (:pr:`4712`, thanks :user:`bpedersen2`)
 - Correctly filter events in "Sync with your calendar" links (this fix only applies to newly
   generated links) (:pr:`4717`)
+- Correctly grant access to attachments inside public sessions/contribs even if the event
+  is more restricted (:pr:`4721`)
 
 Version 2.3.1
 -------------

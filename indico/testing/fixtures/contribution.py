@@ -18,8 +18,8 @@ from indico.modules.events.contributions.models.contributions import Contributio
 def create_contribution(db):
     """Return a callable that lets you create a contribution."""
 
-    def _create_contribution(event, title, duration):
-        entry = Contribution(event=event, title=title, duration=duration)
+    def _create_contribution(event, title, duration=timedelta(minutes=20), **kwargs):
+        entry = Contribution(event=event, title=title, duration=duration, **kwargs)
         db.session.add(entry)
         db.session.flush()
         return entry
@@ -29,4 +29,4 @@ def create_contribution(db):
 
 @pytest.fixture
 def dummy_contribution(create_contribution, dummy_event):
-    return create_contribution(dummy_event, "Dummy Contribution", timedelta(minutes=20))
+    return create_contribution(dummy_event, 'Dummy Contribution')

@@ -24,7 +24,7 @@ pytest_plugins = ('indico.testing.fixtures.app', 'indico.testing.fixtures.catego
                   'indico.testing.fixtures.contribution', 'indico.testing.fixtures.database',
                   'indico.testing.fixtures.disallow', 'indico.testing.fixtures.person', 'indico.testing.fixtures.user',
                   'indico.testing.fixtures.event', 'indico.testing.fixtures.smtp', 'indico.testing.fixtures.storage',
-                  'indico.testing.fixtures.util')
+                  'indico.testing.fixtures.util', 'indico.testing.fixtures.session')
 
 
 def pytest_configure(config):
