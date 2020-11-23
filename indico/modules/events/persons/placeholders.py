@@ -70,7 +70,6 @@ class EventLinkPlaceholder(Placeholder):
 
 class ContributionsPlaceholder(ParametrizedPlaceholder):
     name = 'contributions'
-    param_friendly_name = 'speakers'
     param_required = False
     param_restricted = True
 
