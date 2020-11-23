@@ -11,12 +11,15 @@ from markupsafe import Markup
 
 from indico.modules.auth.util import url_for_register
 from indico.modules.events.contributions.util import get_contributions_for_person
+from indico.modules.events.models.persons import EventPerson
+from indico.modules.users.models.users import User
 from indico.util.i18n import _
 from indico.util.placeholders import ParametrizedPlaceholder, Placeholder
 from indico.web.flask.templating import get_template_module
 
 
-# XXX: `person` may be either an `EventPerson` or a `User`
+# XXX: `person` may be either an `EventPerson` or a `User`; the latter happens
+# when emailing role members or people from peer reviewing teams)
 
 
 class FirstNamePlaceholder(Placeholder):
@@ -78,7 +81,10 @@ class ContributionsPlaceholder(ParametrizedPlaceholder):
 
     @classmethod
     def render(cls, param, person, event, **kwargs):
-
+        if isinstance(person, User):
+            person = EventPerson.query.with_parent(event).filter_by(user_id=person.id).first()
+            if person is None:
+                return ''
         tpl = get_template_module('events/persons/emails/_contributions.html')
         html = tpl.render_contribution_list(
             get_contributions_for_person(event, person, only_speakers=(param == 'speakers')),
