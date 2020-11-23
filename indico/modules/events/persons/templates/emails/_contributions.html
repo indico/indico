@@ -4,6 +4,8 @@
 <li><a href="{{ url_for('contributions.display_contribution', contribution) }}">{{ contribution.title }}</a>
 	{% if contribution.timetable_entry %}
         {{contribution.timetable_entry.start_dt | format_datetime(format='EEEE', timezone=timezone) }} {{contribution.timetable_entry.start_dt | format_datetime(format='medium', timezone=timezone) }} - {{contribution.timetable_entry.end_dt | format_datetime(format='HH:mm', timezone=timezone) }}
+	{%- else -%}
+	{% trans %}Not scheduled yet.{% trans %}
 	{%- endif -%}
 </li>
 {% endfor %}
