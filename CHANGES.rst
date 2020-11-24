@@ -23,6 +23,9 @@ Bugfixes
   generated links) (:pr:`4717`)
 - Correctly grant access to attachments inside public sessions/contribs even if the event
   is more restricted (:pr:`4721`)
+- Fix missing filename pattern check when suggesting files from Paper Peer Reviewing to submit
+  for Editing (:pr:`4715`)
+- Fix filename pattern check in Editing when a filename contains dots (:pr:`4715`)
 
 Version 2.3.1
 -------------
