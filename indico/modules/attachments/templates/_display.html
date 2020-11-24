@@ -14,10 +14,12 @@
                 <ul class="i-dropdown">
                     {%- for attachment in folder.attachments -%}
                         {% set previewable = (attachment.file and attachment.file.is_previewable and not g.static_site) or false %}
+                        {% set visible_link = attachment.type.name == 'link' and (not attachment.is_protected or attachment.can_access(session.user)) %}
                         <li>
                             <a data-previewable="{{ previewable | tojson }}"
                                data-attachment-id="{{ attachment.id }}"
-                               href="{{ attachment.download_url }}" target="_blank"
+                               href="{{ attachment.link_url if visible_link else attachment.download_url }}" target="_blank"
+                               rel="noopener noreferrer"
                                class="attachment {{ get_attachment_icon(attachment) }}
                                       {%- if attachment.is_self_protected %} is-protected{% endif %}
                                       {%- if previewable %} js-preview-dialog{% endif %}">
@@ -48,24 +50,4 @@
             {{ render_folder(folder) }}
         {%- endfor %}
     </div>
-{% endmacro %}
-
-
-{% macro render_attachments_button(files, folders) %}
-    <span class="attachments-tooltip-button"></span>
-    <ul class="material_list weak-hidden">
-        {% for attachment in files %}
-            <li><a href="{{ attachment.download_url }}">{{ attachment.title }}</a></li>
-        {% endfor %}
-        {% for folder in folders %}
-            <li>
-                <h3>{{ folder.title }}</h3>
-                <ul class="resource_list">
-                    {% for attachment in folder.attachments %}
-                        <li><a href="{{ attachment.download_url }}">{{ attachment.title }}</a></li>
-                    {% endfor %}
-                </ul>
-            </li>
-        {% endfor %}
-    </ul>
 {% endmacro %}
