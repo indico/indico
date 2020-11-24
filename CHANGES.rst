@@ -14,6 +14,8 @@ Improvements
 - Add gender-neutral "Mx" title (:issue:`4688`, :pr:`4692`)
 - Add contributions placeholder for emails (:pr:`4716`, thanks :user:`bpedersen2`)
 - Show program codes in contribution list (:pr:`4713`)
+- Display the target URL of link materials if the user can access them (:issue:`2599`,
+  :pr:`4718`)
 
 Bugfixes
 ^^^^^^^^
