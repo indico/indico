@@ -80,7 +80,7 @@ if __name__ == '__main__':
         packages=find_packages(include=('indico', 'indico.*',)),
         include_package_data=True,
         install_requires=get_requirements(),
-        python_requires='~=3.9',
+        python_requires=('~=3.9' if 'READTHEDOCS' not in os.environ else None),
         classifiers=[
             'Environment :: Web Environment',
             'License :: OSI Approved :: MIT License',
