@@ -57,7 +57,7 @@ export default function TimelineItem({block, index}) {
           >
             <div className="i-box-header flexrow">
               <div className="f-self-stretch" styleName="header">
-                <span styleName="item-index">#{index + 1}</span>
+                <span styleName="item-index">#{index + 1}</span>{' '}
                 <span>
                   {block.header ? (
                     <strong>{block.header}</strong>
@@ -67,7 +67,7 @@ export default function TimelineItem({block, index}) {
                       submitted a revision
                     </Translate>
                   )}
-                </span>
+                </span>{' '}
                 <time dateTime={serializeDate(createdDt, moment.HTML5_FMT.DATETIME_LOCAL)}>
                   {serializeDate(createdDt, 'LL')}
                 </time>
