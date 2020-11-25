@@ -16,6 +16,7 @@ Improvements
 - Show program codes in contribution list (:pr:`4713`)
 - Display the target URL of link materials if the user can access them (:issue:`2599`,
   :pr:`4718`)
+- Show the revision number for all revisions in the Editing timeline (:pr:`4708`)
 
 Bugfixes
 ^^^^^^^^
