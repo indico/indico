@@ -9,9 +9,11 @@ import {createHash} from 'crypto';
 import fs from 'fs';
 import path from 'path';
 
+import autoprefixer from 'autoprefixer';
 import chalk from 'chalk';
 import MiniCssExtractPlugin from 'mini-css-extract-plugin';
 import importOnce from 'node-sass-import-once';
+import postcssURL from 'postcss-url';
 import ProgressBarPlugin from 'progress-bar-webpack-plugin';
 import TerserPlugin from 'terser-webpack-plugin';
 import webpack from 'webpack';
@@ -202,13 +204,13 @@ export function webpackDefaults(env, config, bundles, isPlugin = false) {
         loader: 'postcss-loader',
         options: {
           sourceMap: true,
-          config: {
-            path: path.join(globalBuildConfig.rootPath, 'postcss.config.js'),
-            ctx: {
-              postCSSURLOptions: {
+          postcssOptions: {
+            plugins: [
+              autoprefixer,
+              postcssURL({
                 url: postCSSURLResolver,
-              },
-            },
+              }),
+            ],
           },
         },
       },
