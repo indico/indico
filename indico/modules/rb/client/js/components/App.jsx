@@ -150,11 +150,15 @@ class App extends React.Component {
             </div>
             <div styleName="rb-menu-bar-side-right">
               <SidebarTrigger
-                onClick={() => {
+                onClick={evt => {
                   document.body.classList.add('scrolling-disabled');
                   this.setState({
                     userActionsVisible: true,
                   });
+                  // XXX: for some reason react 17 immediately closes the sidebar again after
+                  // opening it, but stopping the click event from propagating avoids this, so it's
+                  // likely related to the changes in event handling
+                  evt.stopPropagation();
                 }}
                 active={userActionsVisible}
               />
