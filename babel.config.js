@@ -16,7 +16,7 @@ const plugins = [
   '@babel/plugin-proposal-class-properties',
   'lodash',
   [
-    'react-css-modules',
+    '@dr.pogodin/react-css-modules',
     {
       exclude: 'node_modules',
       context: 'indico/modules',
@@ -26,6 +26,7 @@ const plugins = [
         },
       },
       autoResolveMultipleImports: true,
+      generateScopedName: '[path]___[name]__[local]___[hash:base64:5]',
     },
   ],
   'macros',
