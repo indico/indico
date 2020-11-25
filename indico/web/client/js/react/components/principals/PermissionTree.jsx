@@ -38,14 +38,10 @@ const PermissionTree = ({tree, permissionMap, exclude, hide, disabled, onSelect}
                 trigger={triggerFactory(id, itemDisabled)}
                 content={description}
                 position="right center"
-                popperModifiers={{
-                  hide: {
-                    enabled: false,
-                  },
-                  preventOverflow: {
-                    enabled: false,
-                  },
-                }}
+                popperModifiers={[
+                  {name: 'hide', enabled: false},
+                  {name: 'preventOverflow', enabled: false},
+                ]}
                 inverted
               />
             </div>

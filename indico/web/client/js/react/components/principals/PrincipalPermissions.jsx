@@ -66,14 +66,10 @@ const PrincipalPermissions = ({
         <Popup
           key={permission}
           position="right center"
-          popperModifiers={{
-            hide: {
-              enabled: false,
-            },
-            preventOverflow: {
-              enabled: false,
-            },
-          }}
+          popperModifiers={[
+            {name: 'hide', enabled: false},
+            {name: 'preventOverflow', enabled: false},
+          ]}
           trigger={
             <Label as="div" size="tiny" color={permissionMap[permission].color}>
               {permissionMap[permission].title}

@@ -10,8 +10,9 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import Overridable from 'react-overridable';
 import {connect} from 'react-redux';
+import MediaQuery from 'react-responsive';
 import {Link, Redirect, Route, Switch} from 'react-router-dom';
-import {Dimmer, Header, Icon, Loader, Responsive, Segment, Sidebar} from 'semantic-ui-react';
+import {Dimmer, Header, Icon, Loader, Segment, Sidebar} from 'semantic-ui-react';
 
 import {Translate} from 'indico/react/i18n';
 import {ConditionalRoute} from 'indico/react/util';
@@ -136,9 +137,9 @@ class App extends React.Component {
               <h1>
                 <Link to="/" onClick={() => resetPageState('bookRoom')}>
                   <Icon name={iconName} />
-                  <Responsive as="span" minWidth={500}>
+                  <MediaQuery as="span" minWidth={500}>
                     {title}
-                  </Responsive>
+                  </MediaQuery>
                 </Link>
               </h1>
             </div>
