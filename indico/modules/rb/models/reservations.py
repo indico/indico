@@ -326,6 +326,7 @@ class Reservation(Serializer, db.Model):
         :param user: The :class:`.User` who creates the booking.
         :param prebook: Instead of determining the booking type from the user's
                         permissions, always use the given mode.
+        :param ignore_admin: Whether to ignore the user's admin status.
         """
 
         populate_fields = ('start_dt', 'end_dt', 'repeat_frequency', 'repeat_interval', 'room_id', 'booking_reason')
