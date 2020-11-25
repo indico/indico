@@ -10,13 +10,12 @@ import fs from 'fs';
 import path from 'path';
 
 import chalk from 'chalk';
-import webpack from 'webpack';
-
 import MiniCssExtractPlugin from 'mini-css-extract-plugin';
-import ManifestPlugin from 'webpack-manifest-plugin';
-import ProgressBarPlugin from 'progress-bar-webpack-plugin';
 import importOnce from 'node-sass-import-once';
+import ProgressBarPlugin from 'progress-bar-webpack-plugin';
 import TerserPlugin from 'terser-webpack-plugin';
+import webpack from 'webpack';
+import ManifestPlugin from 'webpack-manifest-plugin';
 
 class FixedMiniCssExtractPlugin extends MiniCssExtractPlugin {
   // This very awful workaround prevents a weird `<undefined>.pop()` in the plugin
