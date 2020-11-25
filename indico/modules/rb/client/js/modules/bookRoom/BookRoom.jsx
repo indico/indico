@@ -61,7 +61,6 @@ class BookRoom extends React.Component {
     isAdminOverrideEnabled: PropTypes.bool.isRequired,
     timelineAvailability: PropTypes.array.isRequired,
     actions: PropTypes.exact({
-      setFilterParameter: PropTypes.func.isRequired,
       clearTextFilter: PropTypes.func.isRequired,
       searchRooms: PropTypes.func.isRequired,
       fetchRoomSuggestions: PropTypes.func.isRequired,
@@ -478,8 +477,6 @@ const mapDispatchToProps = dispatch => ({
       clearTextFilter: () => filtersActions.setFilterParameter('bookRoom', 'text', null),
       fetchRoomSuggestions: bookRoomActions.fetchRoomSuggestions,
       resetRoomSuggestions: bookRoomActions.resetRoomSuggestions,
-      setFilterParameter: (param, value) =>
-        filtersActions.setFilterParameter('bookRoom', param, value),
       toggleTimelineView: bookRoomActions.toggleTimelineView,
       openRoomDetails: roomsActions.openRoomDetailsBook,
       openBookingForm: bookRoomActions.openBookingForm,

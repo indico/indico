@@ -36,6 +36,8 @@ class MapController extends React.Component {
     actions: PropTypes.exact({
       toggleMapSearch: PropTypes.func.isRequired,
       updateLocation: PropTypes.func.isRequired,
+      // XXX: this seemingly unused action may be used by plugins!
+      // eslint-disable-next-line react/no-unused-prop-types
       setFilterParameter: PropTypes.func.isRequired,
     }).isRequired,
   };
