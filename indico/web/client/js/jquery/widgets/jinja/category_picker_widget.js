@@ -5,9 +5,9 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-(function(global) {
-  'use strict';
+/* eslint-disable import/unambiguous */
 
+(function(global) {
   global.setupCategoryPickerWidget = function setupCategoryPickerWidget(options) {
     options = $.extend(
       true,
@@ -23,12 +23,12 @@
       options
     );
 
-    var $field = $('#' + options.fieldId);
-    var $categoryTitle = $('#category-title-' + options.fieldId);
-    var $dialogTrigger = $('#categorynav-button-' + options.fieldId);
-    var hiddenData = $field.val() ? JSON.parse($field.val()) : {};
-    var navigatorCategory = options.navigatorCategoryId;
-    var actionOn = {};
+    const $field = $(`#${options.fieldId}`);
+    const $categoryTitle = $(`#category-title-${options.fieldId}`);
+    const $dialogTrigger = $(`#categorynav-button-${options.fieldId}`);
+    let hiddenData = $field.val() ? JSON.parse($field.val()) : {};
+    let navigatorCategory = options.navigatorCategoryId;
+    const actionOn = {};
 
     if (options.requireEventCreationRights) {
       actionOn.categoriesWithoutEventCreationRights = {disabled: true};
@@ -49,7 +49,7 @@
       url: build_url(Indico.Urls.Categories.info, {category_id: navigatorCategory}),
       dataType: 'json',
       error: handleAjaxError,
-      success: function(data) {
+      success(data) {
         navigatorCategory = data;
       },
     });
@@ -59,10 +59,10 @@
       $('<div>').categorynavigator({
         category: navigatorCategory,
         openInDialog: true,
-        actionOn: actionOn,
-        onAction: function(category) {
-          var event = $.Event('indico:categorySelected');
-          var dfd = $.Deferred();
+        actionOn,
+        onAction(category) {
+          const event = $.Event('indico:categorySelected');
+          const dfd = $.Deferred();
           $categoryTitle.text(category.title);
           hiddenData = {id: category.id, title: category.title};
           navigatorCategory = category.id;
