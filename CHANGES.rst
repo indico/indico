@@ -31,6 +31,8 @@ Bugfixes
   for Editing (:pr:`4715`)
 - Fix filename pattern check in Editing when a filename contains dots (:pr:`4715`)
 - Require explicit admin override (or being whitelisted) to override blockings (:pr:`4706`)
+- Clone custom abstract/contribution fields when cloning abstract settings (:pr:`4724`,
+  thanks :user:`bpedersen2`)
 
 Version 2.3.1
 -------------
