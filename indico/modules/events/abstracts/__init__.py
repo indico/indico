@@ -13,6 +13,7 @@ from indico.core.logger import Logger
 from indico.core.permissions import ManagementPermission
 from indico.modules.events.abstracts.clone import AbstractSettingsCloner
 from indico.modules.events.abstracts.notifications import ContributionTypeCondition, StateCondition, TrackCondition
+from indico.modules.events.contributions.clone import ContributionFieldCloner
 from indico.modules.events.features.base import EventFeature
 from indico.modules.events.models.events import Event, EventType
 from indico.modules.events.timetable.models.breaks import Break
@@ -60,6 +61,7 @@ def _get_feature_definitions(sender, **kwargs):
 @signals.event_management.get_cloners.connect
 def _get_cloners(sender, **kwargs):
     yield AbstractSettingsCloner
+    yield ContributionFieldCloner
 
 
 @signals.users.merged.connect
