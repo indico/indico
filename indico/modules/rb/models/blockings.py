@@ -107,7 +107,7 @@ class Blocking(db.Model):
         if not explicit_only:
             if allow_admin and rb_is_admin(user):
                 return True
-            if room and room.can_manage(user):
+            if room and room.can_manage(user, allow_admin=allow_admin):
                 return True
         return any(user in principal for principal in iter_acl(self.allowed))
 

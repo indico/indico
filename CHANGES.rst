@@ -36,6 +36,10 @@ Improvements
 - Disable title field by default in new registration forms (:issue:`4688`, :pr:`4692`)
 - Add gender-neutral "Mx" title (:issue:`4688`, :pr:`4692`)
 - Add contributions placeholder for emails (:pr:`4716`, thanks :user:`bpedersen2`)
+- Show program codes in contribution list (:pr:`4713`)
+- Display the target URL of link materials if the user can access them (:issue:`2599`,
+  :pr:`4718`)
+- Show the revision number for all revisions in the Editing timeline (:pr:`4708`)
 
 Bugfixes
 ^^^^^^^^
@@ -44,6 +48,14 @@ Bugfixes
   (:pr:`4712`, thanks :user:`bpedersen2`)
 - Correctly filter events in "Sync with your calendar" links (this fix only applies to newly
   generated links) (:pr:`4717`)
+- Correctly grant access to attachments inside public sessions/contribs even if the event
+  is more restricted (:pr:`4721`)
+- Fix missing filename pattern check when suggesting files from Paper Peer Reviewing to submit
+  for Editing (:pr:`4715`)
+- Fix filename pattern check in Editing when a filename contains dots (:pr:`4715`)
+- Require explicit admin override (or being whitelisted) to override blockings (:pr:`4706`)
+- Clone custom abstract/contribution fields when cloning abstract settings (:pr:`4724`,
+  thanks :user:`bpedersen2`)
 
 Version 2.3.1
 -------------

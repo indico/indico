@@ -5,6 +5,7 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
+import globToRegExp from 'glob-to-regexp';
 import _ from 'lodash';
 import PropTypes from 'prop-types';
 import React from 'react';
@@ -108,11 +109,22 @@ export function mapFileTypes(fileTypes, files, uploadableFiles = []) {
     ...fileType,
     files: files.filter(file => file.fileType === fileType.id).map(f => ({...f, claimed: true})),
     invalidFiles: [],
-    uploadableFiles: uploadableFiles.filter(
+    uploadableFiles: filesForFileType(uploadableFiles, fileType),
+  }));
+}
+
+function filesForFileType(files, fileType) {
+  const templateRe = fileType.filenameTemplate && globToRegExp(fileType.filenameTemplate);
+  return files
+    .filter(
+      file =>
+        !fileType.filenameTemplate ||
+        templateRe.test(file.filename.slice(0, file.filename.lastIndexOf('.')))
+    )
+    .filter(
       file =>
         !fileType.extensions.length || fileType.extensions.includes(file.filename.split('.').pop())
-    ),
-  }));
+    );
 }
 
 export function getFilesFromRevision(fileTypes, revision) {

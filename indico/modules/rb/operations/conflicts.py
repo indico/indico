@@ -49,7 +49,8 @@ def get_rooms_conflicts(rooms, start_dt, end_dt, repeat_frequency, repeat_interv
         conflicts = get_room_bookings_conflicts(candidates, occurrences, skip_conflicts_with)
         rooms_conflicts[room_id], rooms_pre_conflicts[room_id], rooms_conflicting_candidates[room_id] = conflicts
     for room_id, occurrences in blocked_rooms.items():
-        conflicts, conflicting_candidates = get_room_blockings_conflicts(room_id, candidates, occurrences)
+        conflicts, conflicting_candidates = get_room_blockings_conflicts(room_id, candidates, occurrences,
+                                                                         allow_admin=allow_admin)
         rooms_conflicts[room_id] |= conflicts
         rooms_conflicting_candidates[room_id] |= conflicting_candidates
 
@@ -90,14 +91,14 @@ def get_room_bookings_conflicts(candidates, occurrences, skip_conflicts_with=fro
     return conflicts, pre_conflicts, conflicting_candidates
 
 
-def get_room_blockings_conflicts(room_id, candidates, occurrences):
+def get_room_blockings_conflicts(room_id, candidates, occurrences, allow_admin):
     conflicts = set()
     conflicting_candidates = set()
     for candidate in candidates:
         for occurrence in occurrences:
             blocking = occurrence.blocking
             if blocking.start_date <= candidate.start_dt.date() <= blocking.end_date:
-                if blocking.can_override(session.user, room=Room.get(room_id)):
+                if blocking.can_override(session.user, room=Room.get(room_id), allow_admin=allow_admin):
                     continue
                 conflicting_candidates.add(candidate)
                 obj = TempReservationOccurrence(candidate.start_dt, candidate.end_dt, None)

@@ -19,7 +19,7 @@ from indico.util.i18n import _
 class AbstractSettingsCloner(EventCloner):
     name = 'abstracts_settings'
     friendly_name = _('Call for Abstracts (settings, email templates, review questions)')
-    requires = {'contribution_types', 'tracks'}
+    requires = {'contribution_fields', 'contribution_types', 'tracks'}
 
     @property
     def is_visible(self):

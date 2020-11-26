@@ -58,15 +58,15 @@
     <span>{{ user_data.display_full_name }}</span>
     {%- if user_data.affiliation -%}
         <span class="affiliation">
-            ({#--#}
             <span class="text">
+                ({#--#}
                 {%- if italic_affiliation -%}
                     <em>{{ user_data.affiliation }}</em>
                 {%- else -%}
                     {{ user_data.affiliation }}
                 {%- endif -%}
+                {#--#}){#--#}
             </span>
-            {#--#}){#--#}
         </span>
     {%- endif -%}
 {%- endmacro %}
