@@ -31,12 +31,12 @@ def mock_bcrypt(mocker):
     def _hashpw(value, salt):
         assert isinstance(value, bytes), 'hashpw expects bytes'
         assert isinstance(salt, bytes), 'hashpw expects bytes'
-        return md5(value)
+        return md5(value).encode()
 
     bcrypt = mocker.patch('indico.util.passwords.bcrypt')
     bcrypt.gensalt.return_value = b'salt'
     bcrypt.hashpw.side_effect = _hashpw
-    bcrypt.checkpw = lambda pwd, pwdhash: md5(pwd) == pwdhash
+    bcrypt.checkpw = lambda pwd, pwdhash: md5(pwd).encode() == pwdhash
     return bcrypt
 
 
@@ -47,7 +47,7 @@ def test_passwordproperty_get_class(mock_bcrypt):
     mock_bcrypt.hashpw.assert_called_with(b'test', b'salt')
 
 
-@pytest.mark.parametrize('password', ('m\xf6p', 'foo'))
+@pytest.mark.parametrize('password', ('möp', 'foo'))
 def test_passwordproperty_set(mock_bcrypt, password):
     test = Foo()
     test.password = password
@@ -78,7 +78,7 @@ def test_passwordproperty_get():
     assert isinstance(test.password, BCryptPassword)
 
 
-@pytest.mark.parametrize('password', ('moep', 'm\xf6p'))
+@pytest.mark.parametrize('password', ('moep', 'möp'))
 @pytest.mark.usefixtures('mock_bcrypt')
 def test_bcryptpassword_check(password):
     password_hash = md5(password)

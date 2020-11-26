@@ -9,8 +9,10 @@ import bcrypt
 
 
 class BCryptPassword:
-    def __init__(self, hash_):
-        self.hash = str(hash_)
+    def __init__(self, pwhash):
+        if pwhash is not None and not isinstance(pwhash, str):
+            raise TypeError(f'pwhash must be str or None, not {type(pwhash)}')
+        self.hash = pwhash
 
     def __eq__(self, value):
         if not self.hash or not value:
@@ -18,7 +20,7 @@ class BCryptPassword:
             return False
         if not isinstance(value, str):
             raise TypeError(f'password must be str, not {type(value)}')
-        return bcrypt.checkpw(value.encode(), self.hash)
+        return bcrypt.checkpw(value.encode(), self.hash.encode())
 
     def __ne__(self, other):
         return not (self == other)
@@ -31,7 +33,7 @@ class BCryptPassword:
 
     @staticmethod
     def hash(value):
-        return bcrypt.hashpw(value.encode(), bcrypt.gensalt())
+        return bcrypt.hashpw(value.encode(), bcrypt.gensalt()).decode()
 
 
 class PasswordProperty:
