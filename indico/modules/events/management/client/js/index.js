@@ -21,7 +21,7 @@ import './badges';
     $('#event-action-move-to-category').on('click', function(evt) {
       evt.preventDefault();
 
-      var $this = $(this);
+      const $this = $(this);
       $('<div>').categorynavigator({
         openInDialog: true,
         actionOn: {
@@ -36,8 +36,8 @@ import './badges';
             ids: [$this.data('category-id')],
           },
         },
-        onAction: function(category) {
-          var msg = $T
+        onAction(category) {
+          const msg = $T
             .gettext(
               'You are about to move the event to the category "{0}". Are you sure you want to proceed?'
             )
@@ -48,7 +48,7 @@ import './badges';
               type: 'POST',
               data: {target_category_id: category.id},
               error: handleAjaxError,
-              success: function(data) {
+              success(data) {
                 if (data.success) {
                   location.reload();
                 }
@@ -74,7 +74,7 @@ import './badges';
       },
     });
 
-    var selectors = [
+    const selectors = [
       '#event-action-menu-actions button:not(.js-dropdown)',
       '#event-action-menu-actions a:not(.disabled)',
     ];
@@ -85,17 +85,17 @@ import './badges';
 
   function refreshPersonFilters() {
     $('#person-filters ul > li').removeClass('enabled');
-    var personRows = $('.js-event-person-list tr[data-person-roles]');
-    var filters = $('.js-event-person-list [data-filter]:checked')
+    const personRows = $('.js-event-person-list tr[data-person-roles]');
+    const filters = $('.js-event-person-list [data-filter]:checked')
       .map(function() {
-        var $this = $(this);
+        const $this = $(this);
         $this.closest('li').addClass('enabled');
         return $this.data('filter');
       })
       .get();
 
-    var visibleEntries = personRows.filter(function() {
-      var $this = $(this);
+    const visibleEntries = personRows.filter(function() {
+      const $this = $(this);
 
       return _.any(filters, function(filterName) {
         return $this.data('person-roles')[filterName];
@@ -108,7 +108,7 @@ import './badges';
   }
 
   function toggleResetBtn() {
-    var isInitialState =
+    const isInitialState =
       $('#person-filters [data-filter]:checked').length ===
       $('#person-filters [data-filter]:not(#filter-no-account)').length;
     $('.js-reset-role-filter').toggleClass('disabled', isInitialState);
@@ -117,7 +117,7 @@ import './badges';
   function initTooltip() {
     $('.js-show-regforms').qtip({
       content: {
-        text: function() {
+        text() {
           return $(this).data('title');
         },
       },
@@ -136,14 +136,14 @@ import './badges';
       options
     );
 
-    var filterConfig = {
+    const filterConfig = {
       itemHandle: 'tr',
       listItems: '#event-participants-list tbody tr:not(.hidden)',
       term: '#search-input',
       state: '#filtering-state',
       placeholder: '#filter-placeholder',
     };
-    var applySearchFilters = setupSearchBox(filterConfig);
+    const applySearchFilters = setupSearchBox(filterConfig);
 
     enableIfChecked(
       '.js-event-person-list',
@@ -158,7 +158,7 @@ import './badges';
     $('.js-event-person-list [data-filter]').on('click', refreshPersonFilters);
 
     $('.js-event-person-list td').on('mouseenter', function() {
-      var $this = $(this);
+      const $this = $(this);
       if (this.offsetWidth < this.scrollWidth && !$this.attr('title')) {
         $this.attr('title', $this.text());
       }
@@ -171,7 +171,7 @@ import './badges';
       sortList: [[1, 0]],
     });
 
-    var $roleLabels = $('.js-event-person-list .roles-column > span');
+    const $roleLabels = $('.js-event-person-list .roles-column > span');
     $roleLabels.qbubble({
       show: {
         event: 'mouseover',
@@ -186,19 +186,19 @@ import './badges';
         at: 'right center',
       },
       content: {
-        text: function() {
-          var $this = $(this);
-          var html = $('<div>');
-          var role = $('<strong>', {text: $(this).data('role-name')});
+        text() {
+          const $this = $(this);
+          const html = $('<div>');
+          const role = $('<strong>', {text: $(this).data('role-name')});
           html.append(role);
           if ($this.is('.js-count-label')) {
-            var list = $('<ul>', {class: 'qbubble-item-list'});
-            var items = _.values($this.data('items')).sort(function(a, b) {
+            const list = $('<ul>', {class: 'qbubble-item-list'});
+            const items = _.values($this.data('items')).sort(function(a, b) {
               return strnatcmp(a.title.toLowerCase(), b.title.toLowerCase());
             });
 
             $.each(items, function() {
-              var item = $('<li>');
+              const item = $('<li>');
               if (this.url) {
                 item.append($('<a>', {text: this.title, href: this.url}));
               } else {
@@ -216,7 +216,7 @@ import './badges';
 
     // Sets background color of custom role labels based on their font color
     $roleLabels.filter('.custom').each(function() {
-      var $this = $(this);
+      const $this = $(this);
       $this.css('background-color', $.Color($this.css('color')).alpha(0.1));
     });
 
@@ -240,17 +240,17 @@ import './badges';
 
     initTooltip();
 
-    var $personFilters = $('#person-filters');
+    const $personFilters = $('#person-filters');
     // Sets background color of role filter items based on their colored squared color
     $personFilters.find('li .colored-square').each(function() {
-      var $this = $(this);
+      const $this = $(this);
       $this.closest('li').css('background-color', $.Color($this.css('color')).alpha(0.1));
     });
 
     // Reset role filters
     $personFilters.find('.js-reset-role-filter').on('click', function() {
       $('.js-event-person-list [data-filter]').each(function() {
-        var $this = $(this);
+        const $this = $(this);
         $this.prop('checked', !$this.is('#filter-no-account'));
         $this.parent().toggleClass('enabled', !$this.is('#filter-no-account'));
       });
@@ -264,7 +264,7 @@ import './badges';
       evt.preventDefault();
     });
     $personFilters.find('li').on('click', function() {
-      var $checkbox = $(this).find('[data-filter]');
+      const $checkbox = $(this).find('[data-filter]');
       $checkbox.prop('checked', !$checkbox.prop('checked')).trigger('change');
       toggleResetBtn();
     });
@@ -274,11 +274,11 @@ import './badges';
 
   global.showUndoWarning = function showUndoWarning(message, feedbackMessage, actionCallback) {
     cornerMessage({
-      message: message,
+      message,
       progressMessage: $T.gettext('Undoing previous operation...'),
-      feedbackMessage: feedbackMessage,
+      feedbackMessage,
       actionLabel: $T.gettext('Undo'),
-      actionCallback: actionCallback,
+      actionCallback,
       duration: 10000,
       feedbackDuration: 4000,
       class: 'warning',
@@ -286,7 +286,7 @@ import './badges';
   };
 
   global.handleSelectedRowHighlight = function handleSelectedRowHighlight(trigger) {
-    var $obj = $('table.i-table input.select-row').on('change', function() {
+    const $obj = $('table.i-table input.select-row').on('change', function() {
       $(this)
         .closest('tr')
         .toggleClass('selected', this.checked);
@@ -307,7 +307,7 @@ import './badges';
       },
       options
     );
-    $('#' + options.themeFieldId).on('change', function() {
+    $(`#${options.themeFieldId}`).on('change', function() {
       $.ajax({
         url: options.formUrl,
         data: {
@@ -315,8 +315,8 @@ import './badges';
         },
         complete: IndicoUI.Dialogs.Util.progress(),
         error: handleAjaxError,
-        success: function(data) {
-          var lastField = $('#' + options.lastFieldId);
+        success(data) {
+          const lastField = $(`#${options.lastFieldId}`);
           lastField.nextAll(':not(.form-group-footer)').remove();
           if (data.html) {
             lastField.after(data.html);

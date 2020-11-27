@@ -6,19 +6,18 @@
 // LICENSE file for more details.
 
 /* global strnatcmp:false, paginatedSelectAll:false */
+/* eslint-disable import/unambiguous */
 
 (function(global) {
-  'use strict';
-
   // Category cache
-  var _categories = {};
+  const _categories = {};
 
   global.setupCategoryMoveButton = function setupCategoryMoveButton(parentCategoryId) {
     if (parentCategoryId) {
       _fetchSourceCategory(parentCategoryId);
     }
     $('.js-move-category').on('click', function() {
-      var $this = $(this);
+      const $this = $(this);
       _moveCategories(
         [$this.data('categoryId')],
         _categories[parentCategoryId],
@@ -29,16 +28,16 @@
 
   global.setupCategoryTable = function setupCategoryTable(categoryId) {
     _fetchSourceCategory(categoryId);
-    var $table = $('table.category-management');
-    var $tbody = $table.find('tbody');
-    var $bulkDeleteButton = $('.js-bulk-delete-category');
-    var $bulkMoveButton = $('.js-bulk-move-category');
-    var categoryRowSelector = 'tr[data-category-id]';
-    var checkboxSelector = 'input[name=category_id]';
+    const $table = $('table.category-management');
+    const $tbody = $table.find('tbody');
+    const $bulkDeleteButton = $('.js-bulk-delete-category');
+    const $bulkMoveButton = $('.js-bulk-move-category');
+    const categoryRowSelector = 'tr[data-category-id]';
+    const checkboxSelector = 'input[name=category_id]';
 
     $('.js-sort-categories').on('click', function() {
-      var sortOrder = $(this).data('sort-order');
-      var currentOrder = getSortedCategories();
+      const sortOrder = $(this).data('sort-order');
+      const currentOrder = getSortedCategories();
       function undo() {
         restoreCategoryOrder(currentOrder);
         return setOrderAjax(currentOrder);
@@ -55,7 +54,7 @@
     });
 
     $bulkMoveButton.on('click', function(evt) {
-      var $this = $(this);
+      const $this = $(this);
       evt.preventDefault();
       if ($this.hasClass('disabled')) {
         return;
@@ -64,18 +63,18 @@
     });
 
     $table.find('.js-move-category').on('click', function() {
-      var $this = $(this);
+      const $this = $(this);
       _moveCategories([$this.data('categoryId')], _categories[categoryId], $this.data('href'));
     });
 
     $table.find('.js-delete-category').on('indico:confirmed', function(evt) {
       evt.preventDefault();
-      var $this = $(this);
+      const $this = $(this);
       $.ajax({
         url: $this.data('href'),
         method: 'POST',
         error: handleAjaxError,
-        success: function(data) {
+        success(data) {
           $this.closest(categoryRowSelector).remove();
           updateCategoryDeleteButton(data.is_parent_empty);
         },
@@ -107,7 +106,7 @@
       handle: '.js-handle',
       items: '> tr',
       tolerance: 'pointer',
-      update: function() {
+      update() {
         setOrderAjax(getSortedCategories());
       },
     });
@@ -124,7 +123,7 @@
     function restoreCategoryOrder(order) {
       $.each(order, function(index, id) {
         $tbody
-          .find('[data-category-id=' + id + ']')
+          .find(`[data-category-id=${id}]`)
           .not('.js-move-category')
           .detach()
           .appendTo($tbody);
@@ -177,7 +176,7 @@
     }
 
     function getBulkDeleteButtonTooltipContent() {
-      var $checked = getSelectedRows();
+      const $checked = getSelectedRows();
       if ($checked.length) {
         if ($bulkDeleteButton.hasClass('disabled')) {
           return $T.gettext(
@@ -198,7 +197,7 @@
     }
 
     function bulkDeleteCategories() {
-      var $selectedRows = getSelectedRows();
+      const $selectedRows = getSelectedRows();
       ajaxDialog({
         url: $table.data('bulk-delete-url'),
         method: 'POST',
@@ -206,7 +205,7 @@
         data: {
           category_id: getSelectedCategories(),
         },
-        onClose: function(data) {
+        onClose(data) {
           if (data && data.success) {
             // Prevent other categories from being selected when someone reloads
             // the page after deleting a selected category.
@@ -219,7 +218,7 @@
     }
 
     function getBulkMoveButtonTooltipContent() {
-      var $checked = getSelectedRows();
+      const $checked = getSelectedRows();
       if ($checked.length) {
         return $T
           .ngettext(
@@ -236,7 +235,7 @@
     function getSelectedCategories() {
       return $table
         .find(categoryRowSelector)
-        .find(checkboxSelector + ':checked')
+        .find(`${checkboxSelector}:checked`)
         .map(function() {
           return this.value;
         })
@@ -244,7 +243,7 @@
     }
 
     function getSelectedRows() {
-      return $table.find(categoryRowSelector).has(checkboxSelector + ':checked');
+      return $table.find(categoryRowSelector).has(`${checkboxSelector}:checked`);
     }
   };
 
@@ -264,7 +263,7 @@
         return;
       }
 
-      var data = {};
+      const data = {};
       if (isEverythingSelected()) {
         data.all_selected = 1; // do NOT change this to true - the code on the server expects '1'
       } else {
@@ -286,12 +285,12 @@
       selectionMessageSelector: '#selection-message',
       totalRows: $('#event-management').data('total'),
       messages: {
-        allSelected: function(total) {
+        allSelected(total) {
           return $T
             .ngettext('*', 'All {0} events in this category are currently selected.')
             .format(total);
         },
-        pageSelected: function(selected, total) {
+        pageSelected(selected, total) {
           return $T
             .ngettext(
               'Only {0} out of {1} events is currently selected.',
@@ -310,13 +309,13 @@
       $.ajax({
         url: build_url(Indico.Urls.Categories.info, {category_id: categoryId}),
         dataType: 'json',
-        error: function(xhr) {
+        error(xhr) {
           // XXX: Re-enable error handling once we skip retrieving protected parents
           if (xhr.status && xhr.status !== 403) {
             handleAjaxError(xhr);
           }
         },
-        success: function(data) {
+        success(data) {
           _categories[categoryId] = data;
         },
       });
@@ -324,8 +323,8 @@
   }
 
   function _moveCategories(ids, source, endpoint) {
-    var sourceId = _.isObject(source) ? source.category.id : source;
-    var data = {category_id: ids};
+    const sourceId = _.isObject(source) ? source.category.id : source;
+    const data = {category_id: ids};
 
     $('<div>').categorynavigator({
       category: source,
@@ -344,7 +343,7 @@
         categoriesWithEvents: {disabled: true},
         categoriesDescendingFrom: {
           disabled: true,
-          ids: ids,
+          ids,
         },
         categories: {
           disabled: true,
@@ -358,7 +357,7 @@
               ),
             },
             {
-              ids: ids,
+              ids,
               message: $T.ngettext(
                 'This is the category you are trying to move',
                 'This is one of the categories you are trying to move',
@@ -368,13 +367,13 @@
           ],
         },
       },
-      onAction: function(category) {
+      onAction(category) {
         $.ajax({
           url: endpoint,
           type: 'POST',
           data: $.extend({target_category_id: category.id}, data),
           error: handleAjaxError,
-          success: function(data) {
+          success(data) {
             if (data.success) {
               location.reload();
             }
@@ -385,8 +384,8 @@
   }
 
   function _moveEvents(source, endpoint, data) {
-    var sourceId = _.isObject(source) ? source.category.id : source;
-    var eventCount = data
+    const sourceId = _.isObject(source) ? source.category.id : source;
+    const eventCount = data
       ? data.all_selected
         ? $('#event-management').data('total')
         : data.event_id.length
@@ -420,13 +419,13 @@
           ),
         },
       },
-      onAction: function(category) {
+      onAction(category) {
         $.ajax({
           url: endpoint,
           type: 'POST',
           data: $.extend({target_category_id: category.id}, data || {}),
           error: handleAjaxError,
-          success: function(data) {
+          success(data) {
             if (data.success) {
               location.reload();
             }
@@ -437,13 +436,13 @@
   }
 
   function setupRolesToggle() {
-    var $roles = $('#event-roles');
+    const $roles = $('#event-roles');
     $roles.on('click', '.toggle-members', function() {
-      var $row = $(this)
+      const $row = $(this)
         .closest('tr')
         .next('tr')
         .find('.slide');
-      $row.css('max-height', $row[0].scrollHeight + 'px');
+      $row.css('max-height', `${$row[0].scrollHeight}px`);
       $row.toggleClass('open close');
     });
 
@@ -451,7 +450,7 @@
       $(this)
         .find('.slide')
         .each(function() {
-          $(this).css('max-height', this.scrollHeight + 'px');
+          $(this).css('max-height', `${this.scrollHeight}px`);
         });
     });
   }
@@ -459,20 +458,20 @@
   function setupRolesButtons() {
     $('#event-roles').on('click', '.js-add-members', function(evt) {
       evt.stopPropagation();
-      var $this = $(this);
+      const $this = $(this);
       $('<div>')
         .principalfield({
           multiChoice: true,
-          onAdd: function(users) {
+          onAdd(users) {
             $.ajax({
               url: $this.data('href'),
               method: $this.data('method'),
-              data: JSON.stringify({users: users}),
+              data: JSON.stringify({users}),
               dataType: 'json',
               contentType: 'application/json',
               error: handleAjaxError,
               complete: IndicoUI.Dialogs.Util.progress(),
-              success: function(data) {
+              success(data) {
                 updateHtml($this.data('update'), data);
               },
             });
