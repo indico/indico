@@ -12,42 +12,12 @@ import sys
 from datetime import date
 
 import click
+import yaml
 
 from indico.util.console import cformat
 
 
 click.disable_unicode_literals_warning = True
-
-
-HEADERS = {
-    'indico': """
- {comment_start} This file is part of Indico.
-{comment_middle} Copyright (C) 2002 - {end_year} CERN
-{comment_middle}
-{comment_middle} Indico is free software; you can redistribute it and/or
-{comment_middle} modify it under the terms of the MIT License; see the
-{comment_middle} LICENSE file for more details.
-{comment_end}
-""",
-    'plugins': """
- {comment_start} This file is part of the Indico plugins.
-{comment_middle} Copyright (C) 2002 - {end_year} CERN
-{comment_middle}
-{comment_middle} The Indico plugins are free software; you can redistribute
-{comment_middle} them and/or modify them under the terms of the MIT License;
-{comment_middle} see the LICENSE file for more details.
-{comment_end}
-""",
-    'plugins-cern': """
- {comment_start} This file is part of the CERN Indico plugins.
-{comment_middle} Copyright (C) 2014 - {end_year} CERN
-{comment_middle}
-{comment_middle} The CERN Indico plugins are free software; you can redistribute
-{comment_middle} them and/or modify them under the terms of the MIT License; see
-{comment_middle} the LICENSE file for more details.
-{comment_end}
-""",
-}
 
 
 # Dictionary listing the files for which to change the header.
@@ -90,22 +60,61 @@ Updates all the headers in the supported files ({supported_files}).
 By default, all the files tracked by git in the current repository are updated
 to the current year.
 
-You need to specify which project it is (one of {projects}) to the correct
-headers are used.
-
 You can specify a year to update to as well as a file or directory.
 This will update all the supported files in the scope including those not tracked
 by git. If the directory does not contain any supported files (or if the file
 specified is not supported) nothing will be updated.
-""".format(supported_files=', '.join(SUPPORTED_FILES), projects=', '.join(HEADERS)).strip()
+""".format(supported_files=', '.join(SUPPORTED_FILES)).strip()
 
 
-def gen_header(project, data, end_year):
-    data['end_year'] = end_year
-    return '\n'.join(line.rstrip() for line in HEADERS[project].format(**data).strip().splitlines())
+def _walk_to_root(path):
+    """Yield directories starting from the given directory up to the root."""
+    # Based on code from python-dotenv (BSD-licensed):
+    # https://github.com/theskumar/python-dotenv/blob/e13d957b/src/dotenv/main.py#L245
+
+    if os.path.isfile(path):
+        path = os.path.dirname(path)
+
+    last_dir = None
+    current_dir = os.path.abspath(path)
+    while last_dir != current_dir:
+        yield current_dir
+        parent_dir = os.path.abspath(os.path.join(current_dir, os.path.pardir))
+        last_dir, current_dir = current_dir, parent_dir
 
 
-def _update_header(project, file_path, year, substring, regex, data, ci):
+def _get_config(path, end_year):
+    config = {}
+    for dirname in _walk_to_root(path):
+        check_path = os.path.join(dirname, 'copyright.yml')
+        if os.path.isfile(check_path):
+            with open(check_path) as f:
+                config.update((k, v) for k, v in yaml.safe_load(f.read()).items() if k not in config)
+            if config.pop('root', False):
+                break
+
+    if 'start_year' not in config:
+        click.echo('no valid copyright.yml files found: start_year missing')
+        sys.exit(1)
+    if 'name' not in config:
+        click.echo('no valid copyright.yml files found: name missing')
+        sys.exit(1)
+    if 'header' not in config:
+        click.echo('no valid copyright.yml files found: header missing')
+        sys.exit(1)
+    config['end_year'] = end_year
+    return config
+
+
+def gen_header(data):
+    if data['start_year'] == data['end_year']:
+        data['dates'] = data['start_year']
+    else:
+        data['dates'] = '{} - {}'.format(data['start_year'], data['end_year'])
+    return '\n'.join(line.rstrip() for line in data['header'].format(**data).strip().splitlines())
+
+
+def _update_header(file_path, config, substring, regex, data, ci):
     found = False
     with open(file_path) as file_read:
         content = orig_content = file_read.read()
@@ -117,7 +126,7 @@ def _update_header(project, file_path, year, substring, regex, data, ci):
         for match in regex.finditer(content):
             if substring in match.group():
                 found = True
-                content = content[:match.start()] + gen_header(project, data, year) + content[match.end():]
+                content = content[:match.start()] + gen_header(dict(data, **config)) + content[match.end():]
         if shebang_line:
             content = shebang_line + '\n' + content
     if content != orig_content:
@@ -133,13 +142,14 @@ def _update_header(project, file_path, year, substring, regex, data, ci):
         return True
 
 
-def update_header(project, file_path, year, ci):
+def update_header(file_path, year, ci):
+    config = _get_config(file_path, year)
     ext = file_path.rsplit('.', 1)[-1]
     if ext not in SUPPORTED_FILES or not os.path.isfile(file_path):
         return False
     if os.path.basename(file_path)[0] == '.':
         return False
-    return _update_header(project, file_path, year, SUBSTRING, SUPPORTED_FILES[ext]['regex'],
+    return _update_header(file_path, config, SUBSTRING, SUPPORTED_FILES[ext]['regex'],
                           SUPPORTED_FILES[ext]['format'], ci)
 
 
@@ -162,13 +172,8 @@ def blacklisted(root, path, _cache={}):
 @click.option('--year', '-y', type=click.IntRange(min=1000), default=date.today().year, metavar='YEAR',
               help='Indicate the target year')
 @click.option('--path', '-p', type=click.Path(exists=True), help='Restrict updates to a specific file or directory')
-@click.argument('project')
 @click.pass_context
-def main(ctx, ci, project, year, path):
-    if project not in HEADERS:
-        click.echo(ctx.get_help())
-        sys.exit(1)
-
+def main(ctx, ci, year, path):
     error = False
     if path and os.path.isdir(path):
         if not ci:
@@ -177,13 +182,13 @@ def main(ctx, ci, project, year, path):
         for root, _, filenames in os.walk(path):
             for filename in filenames:
                 if not blacklisted(path, root):
-                    if update_header(project, os.path.join(root, filename), year, ci):
+                    if update_header(os.path.join(root, filename), year, ci):
                         error = True
     elif path and os.path.isfile(path):
         if not ci:
             print(cformat("Updating headers to the year %{yellow!}{year}%{reset} for the file "
                           "%{yellow!}{file}%{reset}...").format(year=year, file=path))
-        if update_header(project, path, year, ci):
+        if update_header(path, year, ci):
             error = True
     else:
         if not ci:
@@ -193,7 +198,7 @@ def main(ctx, ci, project, year, path):
             for filepath in subprocess.check_output(['git', 'ls-files'], text=True).splitlines():
                 filepath = os.path.abspath(filepath)
                 if not blacklisted(os.getcwd(), os.path.dirname(filepath)):
-                    if update_header(project, filepath, year, ci):
+                    if update_header(filepath, year, ci):
                         error = True
         except subprocess.CalledProcessError:
             raise click.UsageError(cformat('%{red!}You must be within a git repository to run this script.'))
