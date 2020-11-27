@@ -252,10 +252,6 @@ class Category(SearchableTitleMixin, DescriptionMixin, ProtectionManagersMixin, 
     def url(self):
         return url_for('categories.display', self)
 
-    @property
-    def has_only_events(self):
-        return self.has_events and not self.children
-
     @hybrid_property
     def is_root(self):
         return self.parent_id is None

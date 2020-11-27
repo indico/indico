@@ -30,14 +30,6 @@ import Palette from '../../utils/palette';
       dialogSubtitle: null,
       // Disallow action on specific categories
       actionOn: {
-        categoriesWithSubcategories: {
-          disabled: false,
-          message: $T.gettext('Not possible for categories containing subcategories'),
-        },
-        categoriesWithEvents: {
-          disabled: false,
-          message: $T.gettext('Not possible for categories containing events'),
-        },
         categoriesWithoutEventCreationRights: {
           disabled: false,
           message: $T.gettext('Not possible for categories where you cannot create events'),
