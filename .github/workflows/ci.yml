@@ -107,7 +107,7 @@ jobs:
         if: success() || failure()
         run: |
           echo "::add-matcher::.github/matchers/headers-problem-matcher.json"
-          python bin/maintenance/update_header.py indico --ci
+          python bin/maintenance/update_header.py --ci
           echo "::remove-matcher owner=headers::"
 
       - name: Run flake8
