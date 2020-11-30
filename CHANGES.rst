@@ -5,7 +5,7 @@ Changelog
 Version 2.3.2
 -------------
 
-*Unreleased*
+*Released on November 30, 2020*
 
 Improvements
 ^^^^^^^^^^^^
