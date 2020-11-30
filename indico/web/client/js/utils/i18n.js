@@ -6,7 +6,7 @@
 // LICENSE file for more details.
 
 import Jed from 'jed';
-import _ from 'underscore';
+import _ from 'lodash';
 
 export const defaultI18n = new Jed({
   locale_data: global.TRANSLATIONS,
@@ -22,6 +22,6 @@ export const $T = _.bind(defaultI18n.gettext, defaultI18n);
 $T.domain = _.memoize(function(domain) {
   return new Jed({
     locale_data: global.TRANSLATIONS,
-    domain: domain,
+    domain,
   });
 });
