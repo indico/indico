@@ -248,7 +248,7 @@ class IndicoDateTimeField(DateTimeField):
         if any(valuelist):
             if not valuelist[0]:
                 self.date_missing = True
-            if not valuelist[1]:
+            if len(valuelist) < 2 or not valuelist[1]:
                 self.time_missing = True
         if valuelist:
             valuelist = [' '.join(valuelist).strip()]

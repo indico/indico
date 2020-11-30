@@ -25,10 +25,20 @@ Internal Changes
 
 ----
 
-Version 2.3.2
+Version 2.3.3
 -------------
 
 *Unreleased*
+
+Bugfixes
+^^^^^^^^
+
+- None so far :)
+
+Version 2.3.2
+-------------
+
+*Released on November 30, 2020*
 
 Improvements
 ^^^^^^^^^^^^
@@ -56,6 +66,7 @@ Bugfixes
 - Require explicit admin override (or being whitelisted) to override blockings (:pr:`4706`)
 - Clone custom abstract/contribution fields when cloning abstract settings (:pr:`4724`,
   thanks :user:`bpedersen2`)
+- Fix error when rescheduling a survey that already has submissions (:issue:`4730`)
 
 Version 2.3.1
 -------------
