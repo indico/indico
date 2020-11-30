@@ -24,6 +24,8 @@ Bugfixes
   attached but the corresponding plugin is no longer installed
 - Fix deleting events which have a videoconference room attached which has its VC plugin
   no longer installed
+- Do not auto-redirect to SSO when an MS office user agent is detected (:issue:`4720`,
+  :pr:`4731`)
 
 Internal Changes
 ^^^^^^^^^^^^^^^^
