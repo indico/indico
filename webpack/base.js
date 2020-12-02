@@ -17,7 +17,7 @@ import postcssURL from 'postcss-url';
 import ProgressBarPlugin from 'progress-bar-webpack-plugin';
 import TerserPlugin from 'terser-webpack-plugin';
 import webpack from 'webpack';
-import ManifestPlugin from 'webpack-manifest-plugin';
+import {WebpackManifestPlugin} from 'webpack-manifest-plugin';
 
 class FixedMiniCssExtractPlugin extends MiniCssExtractPlugin {
   // This very awful workaround prevents a weird `<undefined>.pop()` in the plugin
@@ -294,7 +294,7 @@ export function webpackDefaults(env, config, bundles, isPlugin = false) {
       ],
     },
     plugins: [
-      new ManifestPlugin({
+      new WebpackManifestPlugin({
         fileName: 'manifest.json',
         publicPath: config.build.distURL,
       }),
@@ -314,6 +314,8 @@ export function webpackDefaults(env, config, bundles, isPlugin = false) {
     ],
     resolve: {
       alias: [{name: 'indico', alias: path.join(indicoClientPath, 'js/')}],
+      // Webpack 5 does not include polyfills for node.js core modules by default
+      fallback: {path: require.resolve('path-browserify')},
       symlinks: false,
       extensions: ['.js', '.json', '.jsx'],
       modules: nodeModules,
