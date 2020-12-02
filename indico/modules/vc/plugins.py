@@ -209,9 +209,9 @@ class VCPluginMixin(object):
     def clone_room(self, old_event_vc_room, link_object):
         """Clone the room, returning a new :class:`VCRoomEventAssociation`.
 
-           :param old_event_vc_room: the original :class:`VCRoomEventAssociation`
-           :param link_object: the new object the association will be tied to
-           :return: the new :class:`VCRoomEventAssociation`
+        :param old_event_vc_room: the original :class:`VCRoomEventAssociation`
+        :param link_object: the new object the association will be tied to
+        :return: the new :class:`VCRoomEventAssociation`
         """
         return VCRoomEventAssociation(show=old_event_vc_room.show, data=old_event_vc_room.data,
                                       link_object=link_object)
