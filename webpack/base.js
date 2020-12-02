@@ -379,10 +379,6 @@ export function webpackDefaults(env, config, bundles, isPlugin = false) {
             /js\/mathjax(\/unpacked)?\/extensions\/a11y\/mathmaps\/.+\.js$/,
           ],
           extractComments: false,
-          // default options from webpack
-          cache: true,
-          parallel: true,
-          sourceMap: true,
         }),
       ],
     },
