@@ -54,7 +54,7 @@
                                 {% trans %}Last login date{% endtrans %}
                                 <div class="detail">
                                 {% if user.last_login_dt %}
-                                    {{ user.last_login_dt | format_datetime  }}
+                                    {{ user.last_login_dt | format_datetime }}
                                 {% else %}
                                     Never
                                 {% endif %}
