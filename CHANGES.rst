@@ -28,6 +28,12 @@ Bugfixes
 - Use correct/consistent field order for personal data fields in newly created
   registration forms
 
+Internal Changes
+^^^^^^^^^^^^^^^^
+
+- Add ``registration_form_section_can_access`` signal (:pr:`4734`, thanks
+  :user:`omegak`)
+
 
 Version 3.0.2
 -------------
