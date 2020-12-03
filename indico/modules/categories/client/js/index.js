@@ -5,18 +5,32 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
+import searchUrl from 'indico-url:search.search';
+
 import React from 'react';
 import ReactDOM from 'react-dom';
 
 import './display';
 import './base';
 
+import SearchBox from 'indico/modules/search/components/SearchBox';
 import {setMomentLocale} from 'indico/utils/date';
 
 import CategoryStatistics from './components/CategoryStatistics';
 import {LocaleContext} from './context.js';
 
 (function(global) {
+  document.addEventListener('DOMContentLoaded', () => {
+    const domContainer = document.querySelector('#search-box');
+    ReactDOM.render(
+      React.createElement(SearchBox, {
+        onSearch: keyword => {
+          window.location = searchUrl({q: keyword});
+        },
+      }),
+      domContainer
+    );
+  });
   global.setupCategoryStats = function setupCategoryStats() {
     document.addEventListener('DOMContentLoaded', async () => {
       const rootElement = document.querySelector('#category-stats-root');
