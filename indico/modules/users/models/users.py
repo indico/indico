@@ -502,7 +502,7 @@ class User(PersonMixin, db.Model):
         """The datetime when the user last logged in."""
         if not self.identities:
             return None
-        return max(self.identities, key=attrgetter('safe_last_login_dt'))
+        return max(self.identities, key=attrgetter('safe_last_login_dt')).last_login_dt
 
     @locator_property
     def locator(self):
