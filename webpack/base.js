@@ -19,25 +19,6 @@ import TerserPlugin from 'terser-webpack-plugin';
 import webpack from 'webpack';
 import {WebpackManifestPlugin} from 'webpack-manifest-plugin';
 
-class FixedMiniCssExtractPlugin extends MiniCssExtractPlugin {
-  // This very awful workaround prevents a weird `<undefined>.pop()` in the plugin
-  // that's caused by who-knows-what (NOT related to dynamic imports).
-  // See this github issue for details:
-  // https://github.com/webpack-contrib/mini-css-extract-plugin/issues/257
-  renderContentAsset(compilation, chunk, modules, requestShortener) {
-    const [chunkGroup] = chunk.groupsIterable;
-    let rv;
-    const getModuleIndex2 = chunkGroup.getModuleIndex2;
-    try {
-      chunkGroup.getModuleIndex2 = null;
-      rv = super.renderContentAsset(compilation, chunk, modules, requestShortener);
-    } finally {
-      chunkGroup.getModuleIndex2 = getModuleIndex2;
-    }
-    return rv;
-  }
-}
-
 function _resolveTheme(rootPath, indicoClientPath, filePath) {
   const indicoRelativePath = path.resolve(indicoClientPath, filePath);
 
@@ -180,7 +161,7 @@ export function webpackDefaults(env, config, bundles, isPlugin = false) {
   function buildSCSSLoader(cssLoaderOptions = {}) {
     return [
       {
-        loader: FixedMiniCssExtractPlugin.loader,
+        loader: MiniCssExtractPlugin.loader,
         options: {
           publicPath: config.build.distURL,
         },
@@ -267,7 +248,7 @@ export function webpackDefaults(env, config, bundles, isPlugin = false) {
               test: /\.css$/,
               use: [
                 {
-                  loader: FixedMiniCssExtractPlugin.loader,
+                  loader: MiniCssExtractPlugin.loader,
                 },
                 {
                   loader: 'css-loader',
@@ -300,7 +281,7 @@ export function webpackDefaults(env, config, bundles, isPlugin = false) {
       }),
       // Do not load moment locales (we'll load them explicitly)
       new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/),
-      new FixedMiniCssExtractPlugin({
+      new MiniCssExtractPlugin({
         filename: 'css/[name].[contenthash:8].css',
       }),
       new ProgressBarPlugin({
