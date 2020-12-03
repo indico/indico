@@ -216,6 +216,8 @@ class PrincipalsMixin:
                     'user_id': principal.id,
                     'invalid': principal.is_deleted,
                     'name': principal.display_full_name,
+                    'first_name': principal.first_name,
+                    'last_name': principal.last_name,
                     'detail': (f'{principal.email} ({principal.affiliation})'
                                if principal.affiliation else principal.email)}
         elif principal.principal_type == PrincipalType.local_group:

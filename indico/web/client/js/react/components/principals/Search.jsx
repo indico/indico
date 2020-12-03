@@ -6,6 +6,7 @@
 // LICENSE file for more details.
 
 import groupSearchURL from 'indico-url:groups.group_search';
+import eventPersonSearchURL from 'indico-url:persons.event_person_search';
 import userSearchURL from 'indico-url:users.user_search';
 import userSearchInfoURL from 'indico-url:users.user_search_info';
 
@@ -144,13 +145,21 @@ const searchFactory = config => {
     );
   };
 
-  const ResultItem = ({name, detail, added, favorite, onAdd}) => (
+  const ResultItem = ({name, detail, added, favorite, onAdd, existsInEvent}) => (
     <List.Item>
       <div styleName="item">
         <div styleName="icon">
           <Icon.Group size="large">
             <Icon name={resultIcon} />
-            {favorite && <Icon name="star" color="yellow" corner />}
+            {favorite && <Icon name="star" color="yellow" corner="bottom right" />}
+            {existsInEvent && (
+              <Popup
+                content={Translate.string('Person exists in event')}
+                trigger={<Icon name="ticket" styleName="event-person" corner="top right" />}
+                offset={[-15, 0]}
+                position="top left"
+              />
+            )}
           </Icon.Group>
         </div>
         <div styleName="content">
@@ -185,6 +194,7 @@ const searchFactory = config => {
               added={isAdded(r)}
               favorite={favorites && favoriteKey ? r[favoriteKey] in favorites : false}
               onAdd={() => onAdd(r)}
+              existsInEvent={r.existsInEvent}
             />
           ))}
         </List>
@@ -194,10 +204,10 @@ const searchFactory = config => {
       <Divider horizontal>{noResultsText}</Divider>
     );
 
-  const SearchContent = ({onAdd, isAdded, favorites, single}) => {
+  const SearchContent = ({onAdd, isAdded, favorites, single, withEventPersons, eventId}) => {
     const [result, setResult] = useState(null);
 
-    const handleSearch = data => runSearch(data, setResult);
+    const handleSearch = data => runSearch(data, setResult, withEventPersons, eventId);
     return (
       <>
         <SearchForm
@@ -231,6 +241,8 @@ const searchFactory = config => {
     alwaysConfirm,
     onOpen,
     onClose,
+    withEventPersons,
+    eventId,
   }) => {
     const [open, setOpen] = useState(false);
     const [staged, setStaged] = useState([]);
@@ -324,6 +336,8 @@ const searchFactory = config => {
             onAdd={handleAdd}
             isAdded={isAdded}
             single={single}
+            withEventPersons={withEventPersons}
+            eventId={eventId}
           />
         </Modal.Content>
         <Modal.Actions>
@@ -350,6 +364,8 @@ const searchFactory = config => {
     alwaysConfirm: PropTypes.bool,
     onOpen: PropTypes.func,
     onClose: PropTypes.func,
+    withEventPersons: PropTypes.bool,
+    eventId: PropTypes.number,
   };
 
   Search.defaultProps = {
@@ -360,6 +376,8 @@ const searchFactory = config => {
     alwaysConfirm: false,
     onOpen: () => {},
     onClose: () => {},
+    withEventPersons: false,
+    eventId: null,
   };
 
   const component = React.memo(Search);
@@ -389,12 +407,7 @@ const UserSearchFields = () => {
         label={Translate.string('Family name')}
       />
       <FinalInput name="first_name" noAutoComplete label={Translate.string('Given name')} />
-      <FinalInput
-        name="email"
-        type="email"
-        noAutoComplete
-        label={Translate.string('Email address')}
-      />
+      <FinalInput name="email" noAutoComplete label={Translate.string('Email address')} />
       <FinalInput name="affiliation" noAutoComplete label={Translate.string('Affiliation')} />
       {hasExternals && (
         <FinalCheckbox
@@ -420,7 +433,7 @@ const InnerUserSearch = searchFactory({
       return {[FORM_ERROR]: 'No criteria specified'};
     }
   },
-  runSearch: async (data, setResult) => {
+  runSearch: async (data, setResult, withEventPersons, eventId) => {
     setResult(null);
     const values = _.fromPairs(Object.entries(data).filter(([, val]) => !!val));
     values.favorites_first = true;
@@ -431,14 +444,56 @@ const InnerUserSearch = searchFactory({
       return handleSubmitError(error);
     }
     const resultData = camelizeKeys(response.data);
-    resultData.results = resultData.users.map(({identifier, id, fullName, email, affiliation}) => ({
-      identifier,
-      type: PrincipalType.user,
-      userId: id,
-      name: fullName,
-      detail: affiliation ? `${email} (${affiliation})` : email,
-    }));
+    resultData.results = resultData.users.map(
+      ({identifier, id, fullName, email, affiliation, firstName, lastName}) => ({
+        identifier,
+        type: PrincipalType.user,
+        userId: id,
+        name: fullName,
+        detail: affiliation ? `${email} (${affiliation})` : email,
+        firstName,
+        lastName,
+        existsInEvent: false,
+        email,
+        affiliation,
+      })
+    );
     delete resultData.users;
+    if (withEventPersons) {
+      let epResponse;
+      values.confId = eventId;
+      try {
+        epResponse = await indicoAxios.get(eventPersonSearchURL(values));
+      } catch (error) {
+        return handleSubmitError(error);
+      }
+      const epResultData = camelizeKeys(epResponse.data);
+      epResultData.results = epResultData.users.map(
+        ({identifier, id, fullName, email, affiliation, firstName, lastName, userIdentifier}) => ({
+          identifier,
+          type: PrincipalType.eventPerson,
+          userId: id,
+          name: fullName,
+          detail: affiliation ? `${email} (${affiliation})` : email,
+          firstName,
+          lastName,
+          existsInEvent: true,
+          userIdentifier,
+        })
+      );
+      epResultData.results.forEach(item => {
+        if (item.userIdentifier !== undefined) {
+          const index = resultData.results.findIndex(e => e.identifier === item.userIdentifier);
+          if (index >= 0) {
+            resultData.results[index].existsInEvent = true;
+          }
+        } else {
+          resultData.results.push(item);
+          resultData.total++;
+        }
+      });
+      resultData.results = resultData.results.slice(0, _.min(10, resultData.results.length));
+    }
     setResult(resultData);
   },
   tooManyText: Translate.string(
@@ -520,6 +575,7 @@ export const GroupSearch = searchFactory({
       name,
       type: provider ? PrincipalType.multipassGroup : PrincipalType.localGroup,
       detail: providerTitle || null,
+      provider,
     }));
     delete resultData.groups;
     setResult(resultData);

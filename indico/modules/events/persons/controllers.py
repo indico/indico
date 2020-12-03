@@ -8,21 +8,30 @@
 import itertools
 from collections import OrderedDict, defaultdict
 
-from flask import flash, redirect, request, session
+from flask import flash, jsonify, redirect, request, session
+from marshmallow import fields
+from sqlalchemy import and_, or_
 from sqlalchemy.orm import contains_eager, joinedload
+from webargs import validate
 
 from indico.core.db import db
+from indico.core.db.sqlalchemy.custom.unaccent import unaccent_match
 from indico.core.db.sqlalchemy.principals import PrincipalType
 from indico.core.notifications import make_email, send_email
 from indico.modules.events import EventLogKind, EventLogRealm
+from indico.modules.events.abstracts.models.abstracts import Abstract
+from indico.modules.events.abstracts.models.persons import AbstractPersonLink
 from indico.modules.events.contributions.models.contributions import Contribution
+from indico.modules.events.contributions.models.persons import ContributionPersonLink, SubContributionPersonLink
 from indico.modules.events.contributions.models.principals import ContributionPrincipal
+from indico.modules.events.contributions.models.subcontributions import SubContribution
 from indico.modules.events.management.controllers import RHManageEventBase
 from indico.modules.events.models.persons import EventPerson
 from indico.modules.events.models.principals import EventPrincipal
 from indico.modules.events.models.roles import EventRole
 from indico.modules.events.persons.forms import EmailEventPersonsForm, EventPersonForm
 from indico.modules.events.persons.operations import update_person
+from indico.modules.events.persons.schemas import EventPersonSchema
 from indico.modules.events.persons.views import WPManagePersons
 from indico.modules.events.registration.models.registrations import Registration
 from indico.modules.events.sessions.models.principals import SessionPrincipal
@@ -30,7 +39,9 @@ from indico.modules.events.sessions.models.sessions import Session
 from indico.modules.users import User
 from indico.util.date_time import now_utc
 from indico.util.i18n import _, ngettext
+from indico.util.marshmallow import validate_with_message
 from indico.util.placeholders import replace_placeholders
+from indico.web.args import use_kwargs
 from indico.web.flask.templating import get_template_module
 from indico.web.flask.util import jsonify_data, url_for
 from indico.web.forms.base import FormDefaults
@@ -347,3 +358,53 @@ class RHEditEventPerson(RHPersonsBase):
             tpl = get_template_module('events/persons/management/_person_list_row.html')
             return jsonify_data(html=tpl.render_person_row(person_data, bool(self.event.registration_forms)))
         return jsonify_form(form)
+
+
+class RHEventPersonSearch(RHPersonsBase):
+    def _search_event_persons(self, exact=False, **criteria):
+        criteria = {key: v for key, value in criteria.items() if (v := value.strip())}
+
+        if not criteria:
+            return []
+
+        query = EventPerson.query.distinct(EventPerson.id).filter(EventPerson.event_id == self.event.id)
+
+        query = query.filter(
+            or_(
+                EventPerson.abstract_links.any(AbstractPersonLink.abstract.has(~Abstract.is_deleted)),
+                EventPerson.contribution_links.any(ContributionPersonLink.contribution.has(~Contribution.is_deleted)),
+                EventPerson.event_links.any(),
+                EventPerson.subcontribution_links.any(
+                    SubContributionPersonLink.subcontribution.has(
+                        and_(~SubContribution.is_deleted, SubContribution.contribution.has(~Contribution.is_deleted))
+                    )
+                ),
+                EventPerson.session_block_links.any(),
+            )
+        )
+
+        for k, v in criteria.items():
+            query = query.filter(unaccent_match(getattr(EventPerson, k), v, exact))
+
+        # wrap as subquery so we can apply order regardless of distinct-by-id
+        query = query.from_self()
+        query = query.order_by(
+            db.func.lower(db.func.indico.indico_unaccent(EventPerson.first_name)),
+            db.func.lower(db.func.indico.indico_unaccent(EventPerson.last_name)),
+            EventPerson.id,
+        )
+        return query.limit(10).all(), query.count()
+
+    @use_kwargs({
+        'first_name': fields.Str(validate=validate.Length(min=1)),
+        'last_name': fields.Str(validate=validate.Length(min=1)),
+        'email': fields.Str(validate=lambda s: len(s) > 3),
+        'affiliation': fields.Str(validate=validate.Length(min=1)),
+        'exact': fields.Bool(missing=False),
+    }, validate=validate_with_message(
+        lambda args: args.keys() & {'first_name', 'last_name', 'email', 'affiliation'},
+        'No criteria provided'
+    ), location='query')
+    def _process(self, exact, **criteria):
+        matches, total = self._search_event_persons(exact=exact, **criteria)
+        return jsonify(users=EventPersonSchema().dump(matches, many=True), total=total)

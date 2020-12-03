@@ -5,12 +5,14 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-/* global ChooseUsersPopup:false */
-
 import impersonateURL from 'indico-url:auth.admin_impersonate';
 
+import React from 'react';
+import ReactDOM from 'react-dom';
+
+import {PersonLinkSearch} from 'indico/react/components/principals/PersonLinkSearch';
+import {Translate} from 'indico/react/i18n';
 import {indicoAxios, handleAxiosError} from 'indico/utils/axios';
-import {$T} from 'indico/utils/i18n';
 
 async function sendRequest(data) {
   try {
@@ -26,28 +28,11 @@ export function impersonateUser(id) {
   sendRequest({user_id: id});
 }
 
-function openUserChooser() {
-  function _userSelected(users) {
-    impersonateUser(users[0].id);
-  }
-
-  const dialog = new ChooseUsersPopup(
-    $T('Select user to impersonate'),
-    true,
-    null,
-    false,
-    true,
-    null,
-    true,
-    true,
-    false,
-    _userSelected,
-    null,
-    false
-  );
-
-  dialog.execute();
-}
+const searchTrigger = triggerProps => (
+  <a {...triggerProps}>
+    <Translate>Login as...</Translate>
+  </a>
+);
 
 document.addEventListener('DOMContentLoaded', () => {
   const undoLoginAs = document.querySelectorAll('.undo-login-as');
@@ -62,9 +47,17 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
   if (loginAs) {
-    loginAs.addEventListener('click', e => {
-      e.preventDefault();
-      openUserChooser();
-    });
+    ReactDOM.render(
+      <PersonLinkSearch
+        existing={[]}
+        onAddItems={e => impersonateUser(e.userId)}
+        disabled={false}
+        withExternalUsers={false}
+        triggerFactory={searchTrigger}
+        alwaysConfirm
+        single
+      />,
+      document.getElementById('login-as')
+    );
   }
 });

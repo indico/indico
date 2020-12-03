@@ -97,28 +97,6 @@
       self._update();
     },
 
-    choose: function choose() {
-      var self = this;
-      function handle(people) {
-        self.add(people);
-      }
-      var userChoosePopup = new ChooseUsersPopup(
-        $T('Choose person'),
-        true,
-        self.options.eventId,
-        self.options.enableGroupsTab,
-        self.options.showFavoriteUsers,
-        self.options.suggestedUsers,
-        !self.options.multiChoice,
-        true,
-        false,
-        handle,
-        null,
-        self.options.allowExternalUsers
-      );
-      userChoosePopup.execute();
-    },
-
     edit: function edit(personId) {
       var self = this;
       var person = _.findWhere(self.people, {id: personId});

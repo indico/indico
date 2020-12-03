@@ -5,6 +5,12 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
+@import 'base/palette';
+
 .search-buttons :global(.dropdown) {
   margin-left: 1em;
+}
+
+:global(.icon).event-person {
+  color: $blue;
 }

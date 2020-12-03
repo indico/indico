@@ -184,6 +184,10 @@ class EventPerson(PersonMixin, db.Model):
             return EmailPrincipal(self.email)
         return None
 
+    @property
+    def identifier(self):
+        return f'EventPerson:{self.id}'
+
     @classmethod
     def create_from_user(cls, user, event=None, is_untrusted=False):
         return EventPerson(user=user, event=event, first_name=user.first_name, last_name=user.last_name,

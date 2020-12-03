@@ -1,97 +1,14 @@
 {% extends 'users/base.html' %}
-{% from 'users/_favorites.html' import favorite_users_list %}
-{% from 'users/_category.html' import favorite_category %}
 
 {% block user_content %}
     <div class="layout-wrapper">
         <div class="row">
-            <div class="column col-50">
-                <div class="i-box just-group-list">
-                    <div class="i-box-header">
-                        <div class="i-box-title">
-                            {%- trans %}Favourite Users{% endtrans -%}
-                        </div>
-                    </div>
-                    <div class="i-box-content">
-                        {% if user.favorite_users %}
-                            <ul class="group-list no-content-before" id="favorite-users">
-                                {{ favorite_users_list(user) }}
-                            </ul>
-                        {% else %}
-                            <span class="empty">
-                                {% trans %}You have not marked any user as favourite.{% endtrans %}
-                            </span>
-                        {% endif %}
-                    </div>
-                </div>
-                <button class="ui primary button js-add-user" style="margin-top: 15px;">
-                    {% trans %}Add Indico user{% endtrans %}
-                </button>
-            </div>
-            <div class="column col-50">
-                <div class="i-box just-group-list">
-                    <div class="i-box-header">
-                        <div class="i-box-title">
-                            {%- trans %}Favourite Categories{% endtrans -%}
-                        </div>
-                    </div>
-                    <div class="i-box-content">
-                        {% if favorite_categories %}
-                            <ul class="group-list no-content-before">
-                                {% for category, truncated_path in favorite_categories %}
-                                    {{ favorite_category(category, truncated_path) }}
-                                {% endfor %}
-                            </ul>
-                        {% else %}
-                            <span class="empty">
-                                {% trans %}You have not marked any category as favourite.{% endtrans %}
-                            </span>
-                        {% endif %}
-                    </div>
-                </div>
-            </div>
+            <div id="user-favorites"></div>
         </div>
     </div>
     <script>
+        setupFavoriteSelection({{ (user.id if user != session.user else none) | tojson }});
         (function() {
-            $('#favorite-users').on('click', '.js-delete-user', function(e){
-                e.preventDefault();
-                var $this = $(this);
-                $.ajax({
-                    url: $this.data('href'),
-                    method: 'DELETE',
-                    error: handleAjaxError,
-                    success: function() {
-                        $this.closest('.js-user-row').fadeOut(function() {
-                            $(this).remove();
-                        });
-                    }
-                });
-            });
-
-            function addFavoriteUsers(list) {
-                $.ajax({
-                    url: {{ url_for('.user_favorites_users_add') | tojson }},
-                    method: 'POST',
-                    dataType: 'json',
-                    data: {
-                        user_id: _.pluck(list, 'id')
-                    },
-                    error: handleAjaxError,
-                    success: function(data) {
-                        $.each(list, function(i, user) {
-                            Indico.User.favorite_users[user.id] = user;
-                        });
-                        $('#favorite-users').html(data.html);
-                    }
-                });
-            }
-
-            $('.js-add-user').on('click', function(){
-                var chooseUsersPopup = new ChooseUsersPopup($T('Search Users'), true, null, false, false, null, false, false, false, addFavoriteUsers, null, false);
-                chooseUsersPopup.execute();
-            });
-
             $('.js-delete-category').on('click', function(e){
                 e.preventDefault();
                 var $this = $(this);

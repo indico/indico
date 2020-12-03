@@ -8,6 +8,7 @@
 from marshmallow.fields import Function
 
 from indico.core.marshmallow import mm
+from indico.modules.categories import Category
 from indico.modules.users import User
 
 
@@ -21,3 +22,9 @@ class UserSchema(mm.SQLAlchemyAutoSchema):
 
 
 user_schema = UserSchema()
+
+
+class BasicCategorySchema(mm.SQLAlchemyAutoSchema):
+    class Meta:
+        model = Category
+        fields = ('id', 'title', 'url', 'chain_titles')

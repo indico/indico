@@ -15,7 +15,7 @@ from markupsafe import Markup, escape
 from marshmallow import fields
 from marshmallow_enum import EnumField
 from PIL import Image
-from sqlalchemy.orm import joinedload, load_only, subqueryload, undefer
+from sqlalchemy.orm import joinedload, load_only, subqueryload
 from sqlalchemy.orm.exc import StaleDataError
 from webargs import validate
 from werkzeug.exceptions import BadRequest, Forbidden, NotFound
@@ -42,12 +42,12 @@ from indico.modules.users.forms import (AdminAccountRegistrationForm, AdminsForm
 from indico.modules.users.models.emails import UserEmail
 from indico.modules.users.models.users import ProfilePictureSource
 from indico.modules.users.operations import create_user
+from indico.modules.users.schemas import BasicCategorySchema
 from indico.modules.users.util import (get_gravatar_for_user, get_linked_events, get_related_categories,
                                        get_suggested_categories, merge_users, search_users, serialize_user,
                                        set_user_avatar)
-from indico.modules.users.views import WPUser, WPUserDashboard, WPUserProfilePic, WPUsersAdmin
+from indico.modules.users.views import WPUser, WPUserDashboard, WPUserFavorites, WPUserProfilePic, WPUsersAdmin
 from indico.util.date_time import now_utc
-from indico.util.event import truncate_path
 from indico.util.i18n import _
 from indico.util.images import square
 from indico.util.marshmallow import HumanizedDate, Principal, validate_with_message
@@ -306,40 +306,42 @@ class RHUserPreferences(RHUserBase):
 
 class RHUserFavorites(RHUserBase):
     def _process(self):
-        query = (Category.query
-                 .filter(Category.id.in_(c.id for c in self.user.favorite_categories))
-                 .options(undefer('chain_titles')))
-        categories = sorted([(cat, truncate_path(cat.chain_titles[:-1], chars=50)) for cat in query],
-                            key=lambda c: (c[0].title, c[1]))
-        return WPUser.render_template('favorites.html', 'favorites', user=self.user, favorite_categories=categories)
+        return WPUserFavorites.render_template('favorites.html', 'favorites', user=self.user)
 
 
-class RHUserFavoritesUsersAdd(RHUserBase):
-    def _process(self):
-        users = [User.get(int(id_)) for id_ in request.form.getlist('user_id')]
-        self.user.favorite_users |= {_f for _f in users if _f}
-        tpl = get_template_module('users/_favorites.html')
-        return jsonify(success=True, users=[serialize_user(user) for user in users],
-                       html=tpl.favorite_users_list(self.user))
+class RHUserFavoritesAPI(RHUserBase):
+    def _process_args(self):
+        RHUserBase._process_args(self)
+        self.fav_user = (
+            User.get_or_404(request.view_args['fav_user_id']) if 'fav_user_id' in request.view_args else None
+        )
 
+    def _process_GET(self):
+        return jsonify(sorted(u.id for u in self.user.favorite_users))
 
-class RHUserFavoritesUserRemove(RHUserBase):
-    def _process(self):
-        user = User.get(int(request.view_args['fav_user_id']))
-        self.user.favorite_users.discard(user)
-        try:
-            db.session.flush()
-        except StaleDataError:
-            # Deleted in another transaction
-            db.session.rollback()
-        return jsonify(success=True)
+    def _process_PUT(self):
+        self.user.favorite_users.add(self.fav_user)
+        return jsonify(self.user.id), 201
+
+    def _process_DELETE(self):
+        self.user.favorite_users.discard(self.fav_user)
+        return '', 204
 
 
 class RHUserFavoritesCategoryAPI(RHUserBase):
     def _process_args(self):
         RHUserBase._process_args(self)
-        self.category = Category.get_or_404(request.view_args['category_id'])
-        self.suggestion = self.user.suggested_categories.filter_by(category=self.category).first()
+        self.category = (
+            Category.get_or_404(request.view_args['category_id']) if 'category_id' in request.view_args else None
+        )
+        self.suggestion = (
+            self.user.suggested_categories.filter_by(category=self.category).first()
+            if 'category_id' in request.view_args
+            else None
+        )
+
+    def _process_GET(self):
+        return jsonify({d.id: BasicCategorySchema().dump(d) for d in self.user.favorite_categories})
 
     def _process_PUT(self):
         if self.category not in self.user.favorite_categories:
@@ -664,7 +666,7 @@ class RHRejectRegistrationRequest(RHRegistrationRequestBase):
 class UserSearchResultSchema(mm.SQLAlchemyAutoSchema):
     class Meta:
         model = User
-        fields = ('id', 'identifier', 'email', 'affiliation', 'full_name')
+        fields = ('id', 'identifier', 'email', 'affiliation', 'full_name', 'first_name', 'last_name')
 
 
 search_result_schema = UserSearchResultSchema()
@@ -697,6 +699,8 @@ class RHUserSearch(RHProtected):
             'email': email,
             'affiliation': affiliation,
             'full_name': full_name,
+            'first_name': first_name,
+            'last_name': last_name,
         }
 
     def _serialize_entry(self, entry):
@@ -715,7 +719,7 @@ class RHUserSearch(RHProtected):
     @use_kwargs({
         'first_name': fields.Str(validate=validate.Length(min=1)),
         'last_name': fields.Str(validate=validate.Length(min=1)),
-        'email': fields.Str(validate=lambda s: len(s) > 3 and '@' in s),
+        'email': fields.Str(validate=lambda s: len(s) > 3),
         'affiliation': fields.Str(validate=validate.Length(min=1)),
         'exact': fields.Bool(missing=False),
         'external': fields.Bool(missing=False),

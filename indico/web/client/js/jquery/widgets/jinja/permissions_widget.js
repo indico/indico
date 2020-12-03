@@ -5,9 +5,14 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-/* global ChooseUsersPopup:false */
+import React from 'react';
+import ReactDOM from 'react-dom';
 
+import {GroupSearch} from 'indico/react/components/principals/Search';
+import {PersonLinkSearch} from 'indico/react/components/principals/PersonLinkSearch';
+import {Translate} from 'indico/react/i18n';
 import Palette from 'indico/utils/palette';
+import {PrincipalType} from 'indico/react/components/principals/util';
 
 (function($) {
   const FULL_ACCESS_PERMISSIONS = '_full_access';
@@ -433,29 +438,6 @@ import Palette from 'indico/utils/palette';
         this._renderDuplicatesTooltip(this._findEntryIndex(principal));
       });
     },
-    _addUserGroup() {
-      const _addPrincipals = principals => {
-        // Grant read access by default
-        this._addItems(principals, [READ_ACCESS_PERMISSIONS]);
-      };
-
-      const dialog = new ChooseUsersPopup(
-        $T.gettext('Select a user or group to add'),
-        true,
-        null,
-        true,
-        true,
-        null,
-        false,
-        false,
-        false,
-        _addPrincipals,
-        null,
-        true
-      );
-
-      dialog.execute();
-    },
     _create() {
       this.$permissionsWidgetList = this.element.find('.permissions-widget-list');
       this.$dataField = this.element.find('input[type=hidden]');
@@ -479,9 +461,67 @@ import Palette from 'indico/utils/palette';
       });
 
       // Manage the addition to users/groups to the acl
-      $('.js-add-user-group').on('click', () => {
-        this._addUserGroup();
-      });
+      const userSearchTrigger = triggerProps => (
+        <a className="i-button" {...triggerProps}>
+          <Translate>User</Translate>
+        </a>
+      );
+
+      const groupSearchTrigger = triggerProps => (
+        <a className="i-button" {...triggerProps}>
+          <Translate>Group</Translate>
+        </a>
+      );
+
+      const existing = JSON.parse(this.element.find('input[name="permissions"]').val()).map(
+        e => e[0].identifier
+      );
+
+      ReactDOM.render(
+        <>
+          <PersonLinkSearch
+            existing={existing.filter(e => e.startsWith('User'))}
+            onAddItems={e => {
+              items = e.map(({identifier, userId, name, firstName, lastName}) => ({
+                identifier,
+                name,
+                id: userId,
+                familyName: lastName,
+                firstName,
+                _type: 'Avatar',
+              }));
+              this._addItems(items, [READ_ACCESS_PERMISSIONS]);
+            }}
+            withExternalUsers={false}
+            triggerFactory={userSearchTrigger}
+          />
+          <GroupSearch
+            existing={existing.filter(e => e.startsWith('Group'))}
+            onAddItems={e => {
+              items = e.map(({identifier, name, type, provider}) => {
+                let id;
+                if (type === PrincipalType.localGroup) {
+                  const splitIdentifier = identifier.split(':');
+                  id = splitIdentifier[splitIdentifier.length - 1];
+                } else {
+                  id = name;
+                }
+                return {
+                  identifier,
+                  name,
+                  provider,
+                  _type:
+                    type === PrincipalType.localGroup ? 'LocalGroupWrapper' : 'LDAPGroupWrapper',
+                  id,
+                };
+              });
+              this._addItems(items, [READ_ACCESS_PERMISSIONS]);
+            }}
+            triggerFactory={groupSearchTrigger}
+          />
+        </>,
+        document.getElementById('js-add-user-group')
+      );
 
       // Manage the creation of new roles
       $('.js-new-role').on('ajaxDialog:closed', (evt, data) => {

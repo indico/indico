@@ -49,6 +49,10 @@ class WPUserProfilePic(WPUser):
     bundles = ('module_users.profile_picture.js', 'module_users.profile_picture.css')
 
 
+class WPUserFavorites(WPUser):
+    bundles = ('module_users.favorites.js', 'module_users.favorites.css')
+
+
 class WPUsersAdmin(WPAdmin):
     template_prefix = 'users/'
     bundles = ('module_users.js',)

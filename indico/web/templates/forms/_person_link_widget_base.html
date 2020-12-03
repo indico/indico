@@ -35,10 +35,8 @@
                         {% trans %}Add myself{% endtrans %}
                     </span>
                 {% endif %}
-                <span id="add-existing-{{ field.id }}" class="i-button highlight {{ 'disabled' if field.disable_user_search }}"
-                      title="{{ msg }}">
-                    {% trans %}Search{% endtrans %}
-                </span>
+                <span id="principalField-{{ field.id }}"></span>
+                {#--#}
                 <span id="add-new-{{ field.id }}" class="i-button highlight"
                       title="{% trans %}Enter person information manually{% endtrans %}">
                     {% trans %}Enter manually{% endtrans %}

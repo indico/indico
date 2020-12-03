@@ -96,9 +96,6 @@ def generate_global_file():
             'ImagesBase': config.IMAGES_BASE_URL,
 
             'Login': url_for_login(),
-            'Favorites': url_for('users.user_favorites'),
-            'FavoriteUserAdd': url_for('users.user_favorites_users_add'),
-            'FavoriteUserRemove': url_rule_to_js('users.user_favorites_user_remove'),
 
             'AttachmentManager': url_rule_to_js('attachments.management'),
             'ManagementAttachmentInfoColumn': url_rule_to_js('attachments.management_info_column'),

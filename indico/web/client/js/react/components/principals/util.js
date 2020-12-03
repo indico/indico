@@ -101,6 +101,7 @@ export class PrincipalType {
   static categoryRole = 'category_role';
   static registrationForm = 'registration_form';
   static email = 'email';
+  static eventPerson = 'event_person';
   /* eslint-enable lines-between-class-members */
 
   static propType = PropTypes.oneOf([
@@ -111,6 +112,7 @@ export class PrincipalType {
     PrincipalType.categoryRole,
     PrincipalType.registrationForm,
     PrincipalType.email,
+    PrincipalType.eventPerson,
   ]);
 
   static getPendingText(type) {
@@ -121,6 +123,7 @@ export class PrincipalType {
       [PrincipalType.eventRole]: Translate.string('Unknown event role'),
       [PrincipalType.categoryRole]: Translate.string('Unknown category role'),
       [PrincipalType.registrationForm]: Translate.string('Unknown registration form'),
+      [PrincipalType.eventPerson]: Translate.string('Unknown event person'),
     }[type];
   }
 
@@ -149,6 +152,7 @@ export class PrincipalType {
       [PrincipalType.multipassGroup]: 'users',
       [PrincipalType.registrationForm]: 'id badge outline',
       [PrincipalType.email]: 'envelope outline',
+      [PrincipalType.eventPerson]: 'user',
       // event/category roles have no icon but their code
     }[type];
   }
@@ -162,6 +166,7 @@ export class PrincipalType {
       [PrincipalType.registrationForm]: 3,
       [PrincipalType.user]: 4,
       [PrincipalType.email]: 5,
+      [PrincipalType.eventPerson]: 6,
     }[type];
   }
 }
@@ -181,6 +186,8 @@ export function getTypeFromIdentifier(identifier) {
     return PrincipalType.registrationForm;
   } else if (identifier.startsWith('Email:')) {
     return PrincipalType.email;
+  } else if (identifier.startsWith('EventPerson:')) {
+    return PrincipalType.eventPerson;
   } else {
     throw new Error(`Identifier ${identifier} has unknown type`);
   }

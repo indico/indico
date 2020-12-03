@@ -61,14 +61,3 @@
         </a>
     {% endcall %}
 {% endmacro %}
-
-{% macro favorite_category(category, truncated_path) %}
-    {% call _category_item(category, truncated_path) %}
-        <a href="#"
-           data-href="{{ url_for('.user_favorites_category_api', category_id=category.id) }}"
-           title="{% trans %}Remove from favourites{% endtrans %}"
-           class="right js-delete-category">
-            <i class="close icon"></i>
-        </a>
-    {% endcall %}
-{% endmacro %}

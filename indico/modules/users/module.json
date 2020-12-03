@@ -2,6 +2,7 @@
     "name": "users",
     "partials": {
         "dashboard": "./dashboard.jsx",
-        "profile_picture": "./ProfilePicture.jsx"
+        "profile_picture": "./ProfilePicture.jsx",
+        "favorites": "./Favorites.jsx"
     }
 }

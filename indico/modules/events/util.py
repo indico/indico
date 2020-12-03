@@ -202,7 +202,8 @@ def serialize_person_link(person_link):
             'affiliation': person_link.affiliation,
             'phone': person_link.phone,
             'address': person_link.address,
-            'displayOrder': person_link.display_order}
+            'displayOrder': person_link.display_order,
+            'userId': person_link.person.user_id}
     if person_link.person.id is not None:
         # In case of a newly added person we only serialize the data again
         # if the form's validation failed and the field needs to be displayed

@@ -7,6 +7,14 @@
 
 /* global showFormErrors:false strnatcmp:false */
 
+import _ from 'lodash';
+import React from 'react';
+import ReactDOM from 'react-dom';
+
+import {Translate} from 'indico/react/i18n';
+
+import {PersonLinkSearch} from 'indico/react/components/principals/PersonLinkSearch';
+
 (function(global) {
   'use strict';
 
@@ -54,7 +62,6 @@
     var $otherList = $fieldDisplay.find('#other-list-' + options.fieldId);
     var $otherListTitle = $fieldDisplay.find('#other-list-title-' + options.fieldId);
     var $noOtherPlaceholder = $fieldDisplay.find('#no-other-placeholder-' + options.fieldId);
-    var $buttonAddExisting = $('#add-existing-' + options.fieldId);
     var $buttonAddNew = $('#add-new-' + options.fieldId);
     var $buttonAddMyself = $('#add-myself-' + options.fieldId);
     var $buttonAlphaOrder = $fieldDisplay.find('.alpha-order-switch');
@@ -373,12 +380,6 @@
       },
     });
 
-    if (!options.disableUserSearch) {
-      $buttonAddExisting.on('click', function() {
-        $field.principalfield('choose');
-      });
-    }
-
     $buttonAddNew.on('click', function() {
       $field.principalfield('enter');
     });
@@ -470,5 +471,41 @@
         }
       }
     });
+
+    const existing = _.map($fieldDisplay.find('.person-row'), function(e) {
+      return `User:${$(e).data('person').userId}`;
+    });
+
+    const searchTrigger = triggerProps => (
+      <span className="i-button highlight" type="button" {...triggerProps}>
+        <Translate>Search</Translate>
+      </span>
+    );
+
+    ReactDOM.render(
+      <PersonLinkSearch
+        existing={existing}
+        onAddItems={people => {
+          $field.principalfield(
+            'add',
+            people.map(({identifier, userId, name, firstName, lastName, email, affiliation}) => ({
+              identifier,
+              name,
+              id: userId,
+              familyName: lastName,
+              firstName,
+              email,
+              affiliation,
+            }))
+          );
+        }}
+        disabled={options.disableUserSearch}
+        withExternalUsers={options.allow.externalUsers}
+        triggerFactory={searchTrigger}
+        withEventPersons
+        eventId={options.eventId}
+      />,
+      document.getElementById(`principalField-${options.fieldId}`)
+    );
   };
 })(window);
