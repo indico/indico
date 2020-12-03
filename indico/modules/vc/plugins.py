@@ -128,6 +128,17 @@ class VCPluginMixin(object):
         name = get_overridable_template_name('management_buttons.html', self, core_prefix='vc/')
         return render_template(name, plugin=self, vc_room=vc_room, event_vc_room=event_vc_room, **kwargs)
 
+    def get_extra_delete_msg(self, vc_room, event_vc_room):
+        """
+        Return a custom message to show in the confirmation dialog
+        when deleting a VC room.
+
+        :param vc_room: the VC room object
+        :param event_vc_room: the association of an event and a VC room
+        :return: a string (may contain HTML) with the message to display
+        """
+        return ''
+
     def render_event_buttons(self, vc_room, event_vc_room, **kwargs):
         """
         Render a list of plugin specific buttons (eg: Join URL, etc)

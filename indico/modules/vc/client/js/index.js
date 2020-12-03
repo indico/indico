@@ -39,6 +39,7 @@ import {$T} from 'indico/utils/i18n';
         msg = `${$t('Do you really want to remove this videoconference room from the event?')} ${$t(
           'Since it is only used in this event, it will be deleted from the server, too!'
         )}`;
+        msg += $this.data('extraMsg');
         confirmPrompt(msg, title).then(function() {
           execute($this.data('href'));
         });
@@ -53,6 +54,7 @@ import {$T} from 'indico/utils/i18n';
             $this.data('numEvents')
           )
           .format($this.data('numEvents'));
+        msg += $this.data('extraMsg');
         choiceConfirmPrompt(msg, title, $t('Detach'), $t('Delete')).then(function(choice) {
           const url = build_url($this.data('href'), {delete_all: choice === 2 ? '1' : ''});
           execute(url);

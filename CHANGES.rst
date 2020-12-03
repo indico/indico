@@ -12,6 +12,12 @@ Bugfixes
 
 - None so far :)
 
+Internal Changes
+^^^^^^^^^^^^^^^^
+
+- Videoconference plugins may now display a custom message for the prompt when deleting
+  a videoconference room (:pr:`4733`)
+
 Version 2.3.2
 -------------
 
