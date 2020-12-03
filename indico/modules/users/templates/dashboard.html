@@ -49,6 +49,7 @@
                                 </div>
                             {% endif %}
                             {{ labels(user) }}
+                            {% block last_login_dt %} {% endblock %}
                         </div>
                         {% if user.affiliation %}
                             <div>
