@@ -49,7 +49,14 @@
                                 </div>
                             {% endif %}
                             {{ labels(user) }}
-                            {% block last_login_dt %} {% endblock %}
+                            {% block session_details %}
+                            <br>
+                            <div class="ui small label">
+                                Last Login Date
+                                {% set last_login_dt = user.local_identity.safe_last_login_dt %}
+                                <div class="detail">{{ last_login_dt | format_datetime  }}</div>
+                            </div>
+                            {% endblock %}
                         </div>
                         {% if user.affiliation %}
                             <div>
