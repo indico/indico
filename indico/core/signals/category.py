@@ -21,7 +21,7 @@ created = _signals.signal('created', """
 Called when a new category is created. The `sender` is the new category.
 """)
 
-updated = _signals.signal('created', """
+updated = _signals.signal('updated', """
 Called when a category is modified. The `sender` is the updated category.
 """)
 
