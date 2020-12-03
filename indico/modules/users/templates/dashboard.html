@@ -53,11 +53,11 @@
                             <div class="ui small label">
                                 {% trans %}Last login date{% endtrans %}
                                 <div class="detail">
-                                {% if user.last_login_dt %}
+                                    {% if user.last_login_dt %}
                                     {{ user.last_login_dt | format_datetime }}
-                                {% else %}
-                                    Never
-                                {% endif %}
+                                    {% else %}
+                                    {% trans %}Never{% endtrans %}
+                                    {% endif %}
                                 </div>
                             </div>
                         </div>
