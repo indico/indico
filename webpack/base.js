@@ -10,11 +10,9 @@ import fs from 'fs';
 import path from 'path';
 
 import autoprefixer from 'autoprefixer';
-import chalk from 'chalk';
 import MiniCssExtractPlugin from 'mini-css-extract-plugin';
 import importOnce from 'node-sass-import-once';
 import postcssURL from 'postcss-url';
-import ProgressBarPlugin from 'progress-bar-webpack-plugin';
 import TerserPlugin from 'terser-webpack-plugin';
 import webpack from 'webpack';
 import {WebpackManifestPlugin} from 'webpack-manifest-plugin';
@@ -261,7 +259,7 @@ export function webpackDefaults(env, config, bundles, isPlugin = false) {
               use: buildSCSSLoader({
                 modules: {
                   localIdentContext: path.resolve(globalBuildConfig.clientPath, '../../modules'),
-                  localIdentName: '[path]___[name]__[local]___[hash:base64:5]',
+                  localIdentName: '[path]___[name]__[local]___[contenthash:base64:5]',
                 },
                 importLoaders: 1,
               }),
@@ -284,14 +282,6 @@ export function webpackDefaults(env, config, bundles, isPlugin = false) {
       new MiniCssExtractPlugin({
         filename: 'css/[name].[contenthash:8].css',
       }),
-      new ProgressBarPlugin({
-        format:
-          // eslint-disable-next-line prefer-template
-          chalk.cyan('Code being sent to the moon and back \u{1f680} \u{1f311}') +
-          '  [:bar] ' +
-          chalk.green.bold(':percent') +
-          ' (:elapsed seconds)',
-      }),
     ],
     resolve: {
       alias: [{name: 'indico', alias: path.join(indicoClientPath, 'js/')}],
@@ -304,7 +294,7 @@ export function webpackDefaults(env, config, bundles, isPlugin = false) {
     resolveLoader: {
       modules: nodeModules,
     },
-    externals: (context, request, callback) => {
+    externals: ({context, request}, callback) => {
       // tell webpack to make certain packages use window.jQuery (and not load it again)
       if (/^jquery$/.test(request) && /(selectize|fullcalendar)/.test(context)) {
         return callback(null, 'jQuery');
@@ -328,7 +318,7 @@ export function webpackDefaults(env, config, bundles, isPlugin = false) {
           : {
               // 'common' chunk, which should include common dependencies
               common: {
-                name: 'common',
+                idHint: 'common',
                 chunks: chunk =>
                   chunk.canBeInitial() &&
                   // outdatedbrowser must be fully standalone since we can assume all other
@@ -341,13 +331,13 @@ export function webpackDefaults(env, config, bundles, isPlugin = false) {
               // react/redux and friends since they are pretty big
               react: {
                 test: /\/node_modules\/(react|redux|prop-types\/|lodash-es\/|fbjs\/)/,
-                name: 'react',
+                idHint: 'react',
                 chunks: 'initial',
                 priority: 10,
               },
               semanticui: {
                 test: /node_modules\/(semantic-ui|indico-sui-theme)/,
-                name: 'semantic-ui',
+                idHint: 'semantic-ui',
                 chunks: 'initial',
                 priority: 10,
               },
