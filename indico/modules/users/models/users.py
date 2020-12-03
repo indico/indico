@@ -497,6 +497,13 @@ class User(PersonMixin, db.Model):
         """The local identities of the user except the main one."""
         return self.local_identities - {self.local_identity}
 
+    @property
+    def last_login_dt(self):
+        """The datetime when the user last logged in."""
+        if not self.identities:
+            return None
+        return max(self.identities, key=attrgetter('safe_last_login_dt')).last_login_dt
+
     @locator_property
     def locator(self):
         return {'user_id': self.id}
