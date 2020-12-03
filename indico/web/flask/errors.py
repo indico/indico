@@ -32,7 +32,7 @@ errors_bp = IndicoBlueprint('errors', __name__)
 def handle_forbidden(exc):
     if exc.response:
         return exc
-    if session.user is None and not request.is_xhr and request.blueprint != 'auth':
+    if session.user is None and not request.is_xhr and not request.is_json and request.blueprint != 'auth':
         return redirect_to_login(reason=_('Please log in to access this page.'))
     return render_error(exc, _('Access Denied'), get_error_description(exc), exc.code)
 

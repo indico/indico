@@ -1,0 +1,18 @@
+{% macro render_contribution_list(contributions, timezone) -%}
+    <ul>
+        {% for contribution in contributions %}
+            <li>
+                <a href="{{ url_for('contributions.display_contribution', contribution, _external=true) }}">{{ contribution.title }}</a>
+                (
+                {%- if contribution.timetable_entry -%}
+                    {{ contribution.timetable_entry.start_dt | format_datetime(format='EEEE', timezone=timezone) }}
+                    {{ contribution.timetable_entry.start_dt | format_datetime(format='medium', timezone=timezone) }}
+                    - {{ contribution.timetable_entry.end_dt | format_datetime(format='HH:mm', timezone=timezone) }}
+                {%- else -%}
+                    Not scheduled yet
+                {%- endif -%}
+                )
+            </li>
+        {% endfor %}
+    </ul>
+{%- endmacro %}

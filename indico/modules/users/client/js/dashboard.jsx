@@ -19,11 +19,11 @@ document.addEventListener('DOMContentLoaded', () => {
       endpoint="users.export_dashboard_ics"
       urlParams={{user_id: userId}}
       options={[
-        {key: 'events', text: Translate.string('Events at hand'), queryParams: {linked: 'true'}},
+        {key: 'events', text: Translate.string('Events at hand'), queryParams: {include: 'linked'}},
         {
           key: 'categories',
           text: Translate.string('Categories'),
-          queryParams: {categories: 'true'},
+          queryParams: {include: 'categories'},
         },
         {key: 'everything', text: Translate.string('Everything'), queryParams: {}},
       ]}

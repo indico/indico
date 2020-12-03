@@ -483,6 +483,10 @@ class CategoryEventFetcher(IteratedDataFetcher, SerializerBase):
         }
 
     def event(self, idlist):
+        try:
+            idlist = map(int, idlist)
+        except ValueError:
+            raise HTTPAPIError('Event IDs must be numeric', 400)
         query = (Event.find(Event.id.in_(idlist),
                             ~Event.is_deleted,
                             Event.happens_between(self._fromDT, self._toDT))

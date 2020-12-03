@@ -326,6 +326,7 @@ class Reservation(Serializer, db.Model):
         :param user: The :class:`.User` who creates the booking.
         :param prebook: Instead of determining the booking type from the user's
                         permissions, always use the given mode.
+        :param ignore_admin: Whether to ignore the user's admin status.
         """
 
         populate_fields = ('start_dt', 'end_dt', 'repeat_frequency', 'repeat_interval', 'room_id', 'booking_reason')
@@ -349,7 +350,7 @@ class Reservation(Serializer, db.Model):
         reservation.booked_for_name = reservation.booked_for_user.full_name
         reservation.state = ReservationState.pending if prebook else ReservationState.accepted
         reservation.created_by_user = user
-        reservation.create_occurrences(True)
+        reservation.create_occurrences(True, allow_admin=(not ignore_admin))
         if not any(occ.is_valid for occ in reservation.occurrences):
             raise NoReportError(_('Reservation has no valid occurrences'))
         db.session.flush()
@@ -492,7 +493,7 @@ class Reservation(Serializer, db.Model):
             return False
         return allow_admin and rb_is_admin(user) and (self.is_cancelled or self.is_rejected)
 
-    def create_occurrences(self, skip_conflicts, user=None):
+    def create_occurrences(self, skip_conflicts, user=None, allow_admin=True):
         ReservationOccurrence.create_series_for_reservation(self)
         db.session.flush()
 
@@ -500,7 +501,8 @@ class Reservation(Serializer, db.Model):
             user = self.created_by_user
 
         # Check for conflicts with nonbookable periods
-        if not rb_is_admin(user) and not self.room.can_manage(user, permission='override'):
+        admin = allow_admin and rb_is_admin(user)
+        if not admin and not self.room.can_manage(user, permission='override'):
             nonbookable_periods = self.room.nonbookable_periods.filter(NonBookablePeriod.end_dt > self.start_dt)
             for occurrence in self.occurrences:
                 if not occurrence.is_valid:
@@ -516,7 +518,7 @@ class Reservation(Serializer, db.Model):
         blocked_rooms = self.room.get_blocked_rooms(*(occurrence.start_dt for occurrence in self.occurrences))
         for br in blocked_rooms:
             blocking = br.blocking
-            if blocking.can_override(user, room=self.room):
+            if blocking.can_override(user, room=self.room, allow_admin=allow_admin):
                 continue
             for occurrence in self.occurrences:
                 if occurrence.is_valid and blocking.is_active_at(occurrence.start_dt.date()):
@@ -549,6 +551,8 @@ class Reservation(Serializer, db.Model):
 
     def get_conflicting_occurrences(self):
         valid_occurrences = self.occurrences.filter(ReservationOccurrence.is_valid).all()
+        if not valid_occurrences:
+            raise NoReportError(_('Reservation has no valid occurrences'))
         colliding_occurrences = ReservationOccurrence.find_overlapping_with(self.room, valid_occurrences, self.id).all()
         conflicts = defaultdict(lambda: dict(confirmed=[], pending=[]))
         for occurrence in valid_occurrences:

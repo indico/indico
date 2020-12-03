@@ -6,9 +6,9 @@
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: indico 2.3.1-dev\n"
+"Project-Id-Version: indico 2.3.2-dev\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2020-10-27 11:37+0100\n"
+"POT-Creation-Date: 2020-11-23 11:16+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -2182,11 +2182,7 @@ msgstr ""
 msgid "If you believe you should have access, please contact {}"
 msgstr ""
 
-#: indico/modules/categories/controllers/display.py:323
-msgid "Events of \"{}\""
-msgstr ""
-
-#: indico/modules/categories/controllers/display.py:675
+#: indico/modules/categories/controllers/display.py:580
 msgid "There are no upcoming events for this category"
 msgstr ""
 
@@ -2301,6 +2297,10 @@ msgid "You have moved one event to the category \"{cat}\""
 msgid_plural "You have moved {count} events to the category \"{cat}\""
 msgstr[0] ""
 msgstr[1] ""
+
+#: indico/modules/categories/controllers/util.py:129
+msgid "Events of \"{}\""
+msgstr ""
 
 #: indico/modules/categories/models/categories.py:52
 msgid "Info"
@@ -4406,7 +4406,7 @@ msgstr ""
 msgid "as"
 msgstr ""
 
-#: indico/modules/events/abstracts/placeholders.py:28 indico/modules/events/persons/placeholders.py:49
+#: indico/modules/events/abstracts/placeholders.py:28 indico/modules/events/persons/placeholders.py:54
 #: indico/modules/events/registration/placeholders/registrations.py:38 indico/modules/events/surveys/placeholders.py:19
 msgid "The title of the event"
 msgstr ""
@@ -5023,7 +5023,7 @@ msgstr ""
 #: indico/modules/events/registration/templates/management/regform.html:23
 #: indico/modules/events/surveys/templates/management/survey.html:67
 #: indico/modules/events/templates/admin/_event_label_list.html:19
-#: indico/modules/events/templates/admin/_reference_type_list.html:19 indico/modules/vc/templates/manage_event.html:44
+#: indico/modules/events/templates/admin/_reference_type_list.html:19 indico/modules/vc/templates/manage_event.html:46
 msgid "Edit"
 msgstr ""
 
@@ -6324,36 +6324,36 @@ msgstr ""
 msgid "Not registered"
 msgstr ""
 
-#: indico/modules/events/contributions/lists.py:168
+#: indico/modules/events/contributions/lists.py:169
 msgid "The contribution '{}' is not displayed in the list due to the enabled filters"
 msgstr ""
 
-#: indico/modules/events/contributions/util.py:256 indico/modules/events/registration/util.py:566
+#: indico/modules/events/contributions/util.py:277 indico/modules/events/registration/util.py:566
 msgid "Row {}: malformed CSV data - please check that the number of columns is correct"
 msgstr ""
 
-#: indico/modules/events/contributions/util.py:261
+#: indico/modules/events/contributions/util.py:282
 msgid "Row {row}: can't parse date: \"{date}\""
 msgstr ""
 
-#: indico/modules/events/contributions/util.py:266
+#: indico/modules/events/contributions/util.py:287
 msgid "Row {row}: can't parse duration: {duration}"
 msgstr ""
 
-#: indico/modules/events/contributions/util.py:270
+#: indico/modules/events/contributions/util.py:291
 msgid "Row {}: contribution title is required"
 msgstr ""
 
-#: indico/modules/events/contributions/util.py:273 indico/util/roles.py:38
+#: indico/modules/events/contributions/util.py:294 indico/util/roles.py:38
 msgid "Row {row}: invalid email address: {email}"
 msgstr ""
 
 #: indico/modules/events/contributions/templates/management/contributions.html:110
-#: indico/modules/events/contributions/util.py:338 indico/modules/events/sessions/templates/management/session_list.html:96
+#: indico/modules/events/contributions/util.py:359 indico/modules/events/sessions/templates/management/session_list.html:96
 msgid "PDF"
 msgstr ""
 
-#: indico/modules/events/contributions/util.py:339
+#: indico/modules/events/contributions/util.py:360
 msgid "TeX archive"
 msgstr ""
 
@@ -7110,11 +7110,11 @@ msgstr ""
 msgid "Failed processing review, please try again later."
 msgstr ""
 
-#: indico/modules/events/editing/controllers/backend/timeline.py:415
+#: indico/modules/events/editing/controllers/backend/timeline.py:417
 msgid "You do not have the permission to unassign this user"
 msgstr ""
 
-#: indico/modules/events/editing/controllers/backend/timeline.py:426
+#: indico/modules/events/editing/controllers/backend/timeline.py:428
 msgid "You do not have the permission to assign yourself"
 msgstr ""
 
@@ -9567,25 +9567,33 @@ msgstr ""
 msgid "Send copy of each email to my mailbox"
 msgstr ""
 
-#: indico/modules/events/persons/placeholders.py:22 indico/modules/events/registration/placeholders/invitations.py:19
+#: indico/modules/events/persons/placeholders.py:27 indico/modules/events/registration/placeholders/invitations.py:19
 #: indico/modules/events/registration/placeholders/registrations.py:20
 msgid "First name of the person"
 msgstr ""
 
-#: indico/modules/events/persons/placeholders.py:31 indico/modules/events/registration/placeholders/invitations.py:28
+#: indico/modules/events/persons/placeholders.py:36 indico/modules/events/registration/placeholders/invitations.py:28
 #: indico/modules/events/registration/placeholders/registrations.py:29
 msgid "Last name of the person"
 msgstr ""
 
-#: indico/modules/events/persons/placeholders.py:40
+#: indico/modules/events/persons/placeholders.py:45
 msgid "Email of the person"
 msgstr ""
 
-#: indico/modules/events/persons/placeholders.py:58 indico/modules/events/registration/placeholders/registrations.py:47
+#: indico/modules/events/persons/placeholders.py:63 indico/modules/events/registration/placeholders/registrations.py:47
 msgid "Link to the event"
 msgstr ""
 
-#: indico/modules/events/persons/placeholders.py:68
+#: indico/modules/events/persons/placeholders.py:78
+msgid "The person's contributions"
+msgstr ""
+
+#: indico/modules/events/persons/placeholders.py:79
+msgid "The person's contributions where they are a speaker"
+msgstr ""
+
+#: indico/modules/events/persons/placeholders.py:97
 msgid "The link for the registration page"
 msgstr ""
 
@@ -14628,59 +14636,63 @@ msgstr ""
 msgid "Prof."
 msgstr ""
 
-#: indico/modules/users/models/users.py:51
+#: indico/modules/users/models/users.py:41
+msgid "Mx"
+msgstr ""
+
+#: indico/modules/users/models/users.py:52
 msgid "John Doe"
 msgstr ""
 
-#: indico/modules/users/models/users.py:51
+#: indico/modules/users/models/users.py:52
 msgid "Doe, John"
 msgstr ""
 
-#: indico/modules/users/models/users.py:51
+#: indico/modules/users/models/users.py:52
 msgid "Doe, J."
 msgstr ""
 
-#: indico/modules/users/models/users.py:51
+#: indico/modules/users/models/users.py:52
 msgid "J. Doe"
 msgstr ""
 
-#: indico/modules/users/models/users.py:52
+#: indico/modules/users/models/users.py:53
 msgid "John DOE"
 msgstr ""
 
-#: indico/modules/users/models/users.py:52
+#: indico/modules/users/models/users.py:53
 msgid "DOE, John"
 msgstr ""
 
-#: indico/modules/users/models/users.py:52
+#: indico/modules/users/models/users.py:53
 msgid "DOE, J."
 msgstr ""
 
-#: indico/modules/users/models/users.py:52
+#: indico/modules/users/models/users.py:53
 msgid "J. DOE"
 msgstr ""
 
-#: indico/modules/users/models/users.py:136
+#: indico/modules/users/models/users.py:137
 msgid "first name"
 msgstr ""
 
-#: indico/modules/users/models/users.py:137
+#: indico/modules/users/models/users.py:138
 msgid "family name"
 msgstr ""
 
-#: indico/modules/users/models/users.py:138
+#: indico/modules/users/models/users.py:139
 msgid "affiliation"
 msgstr ""
 
-#: indico/modules/users/models/users.py:139
+#: indico/modules/users/models/users.py:140
 msgid "address"
 msgstr ""
 
-#: indico/modules/users/models/users.py:140
+#: indico/modules/users/models/users.py:141
 msgid "phone number"
 msgstr ""
 
-#: indico/modules/users/models/users.py:643
+#: indico/modules/users/models/users.py:644
 msgid "Your {field_name} has been synchronised from '{old_value}' to '{new_value}'."
 msgstr ""
 
@@ -15047,49 +15059,49 @@ msgstr ""
 msgid "Current videoconference rooms"
 msgstr ""
 
-#: indico/modules/vc/templates/manage_event.html:39
+#: indico/modules/vc/templates/manage_event.html:41
 msgid "Check videoconference room status"
 msgstr ""
 
-#: indico/modules/vc/templates/manage_event.html:45
+#: indico/modules/vc/templates/manage_event.html:47
 msgid "Edit room"
 msgstr ""
 
-#: indico/modules/vc/templates/manage_event.html:53
+#: indico/modules/vc/templates/manage_event.html:55
 msgid "Detach"
 msgstr ""
 
-#: indico/modules/vc/templates/manage_event.html:73
+#: indico/modules/vc/templates/manage_event.html:75
 msgid "No videoconference rooms have been added yet."
 msgstr ""
 
-#: indico/modules/vc/templates/manage_event.html:81 indico/modules/vc/templates/manage_event.html:85
+#: indico/modules/vc/templates/manage_event.html:83 indico/modules/vc/templates/manage_event.html:87
 #, python-format
 msgid "Create %(plugin_name)s room"
 msgstr ""
 
-#: indico/modules/vc/templates/manage_event.html:90
+#: indico/modules/vc/templates/manage_event.html:92
 msgid "Create videoconference room"
 msgstr ""
 
-#: indico/modules/vc/templates/manage_event.html:93
+#: indico/modules/vc/templates/manage_event.html:95
 msgid "Create new room"
 msgstr ""
 
-#: indico/modules/vc/templates/manage_event.html:101
+#: indico/modules/vc/templates/manage_event.html:103
 #, python-format
 msgid "Attach %(plugin_name)s room"
 msgstr ""
 
-#: indico/modules/vc/templates/manage_event.html:104
+#: indico/modules/vc/templates/manage_event.html:106
 msgid "Attach videoconference room"
 msgstr ""
 
-#: indico/modules/vc/templates/manage_event.html:108
+#: indico/modules/vc/templates/manage_event.html:110
 msgid "Add existing room"
 msgstr ""
 
-#: indico/modules/vc/templates/manage_event.html:118
+#: indico/modules/vc/templates/manage_event.html:120
 msgid "There are no Videoconference plugins available."
 msgstr ""
 

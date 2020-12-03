@@ -200,7 +200,7 @@ export default function WTFDateTimeField({
         getPopupContainer={node => node}
       />
       <i className="timezone" id={`${timeId}-timezone`} title={currentTimezone} />
-      {(time || date) && allowClear && (
+      {(time || date) && allowClear && !disabled && (
         <span
           onClick={clearFields}
           className="clear-pickers"

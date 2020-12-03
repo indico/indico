@@ -213,8 +213,9 @@ def service_get_custom_actions(editable, revision, user):
 
 def service_handle_custom_action(editable, revision, user, action):
     data = {
-        'revision': EditingRevisionSignedSchema().dump(revision),
         'action': action,
+        'revision': EditingRevisionSignedSchema().dump(revision),
+        'endpoints': _get_revision_endpoints(revision),
         'user': ServiceUserSchema(context={'editable': editable}).dump(user),
     }
     try:
@@ -265,7 +266,8 @@ def _get_revision_endpoints(revision):
     return {
         'revisions': {
             'details': url_for('.api_editable', revision, _external=True),
-            'replace': url_for('.api_replace_revision', revision, _external=True)
+            'replace': url_for('.api_replace_revision', revision, _external=True),
+            'undo': url_for('.api_undo_review', revision, _external=True)
         },
         'file_upload': url_for('.api_upload', revision, _external=True)
     }

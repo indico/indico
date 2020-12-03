@@ -56,15 +56,18 @@ export default function TimelineItem({block, index}) {
             id={`block-info-${block.id}`}
           >
             <div className="i-box-header flexrow">
-              <div className="f-self-stretch">
-                {block.header ? (
-                  <strong>{block.header}</strong>
-                ) : (
-                  <Translate>
-                    <Param name="submitterName" value={submitter.fullName} wrapper={<strong />} />{' '}
-                    submitted revision <Param name="revisionNumber" value={`#${index + 1}`} />
-                  </Translate>
-                )}{' '}
+              <div className="f-self-stretch" styleName="header">
+                <span styleName="item-index">#{index + 1}</span>{' '}
+                <span>
+                  {block.header ? (
+                    <strong>{block.header}</strong>
+                  ) : (
+                    <Translate>
+                      <Param name="submitterName" value={submitter.fullName} wrapper={<strong />} />{' '}
+                      submitted a revision
+                    </Translate>
+                  )}
+                </span>{' '}
                 <time dateTime={serializeDate(createdDt, moment.HTML5_FMT.DATETIME_LOCAL)}>
                   {serializeDate(createdDt, 'LL')}
                 </time>
