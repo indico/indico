@@ -25,9 +25,6 @@ import './badges';
       $('<div>').categorynavigator({
         openInDialog: true,
         actionOn: {
-          categoriesWithSubcategories: {
-            disabled: true,
-          },
           categoriesWithoutEventCreationRights: {
             disabled: true,
           },

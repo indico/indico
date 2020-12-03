@@ -30,14 +30,6 @@ import Palette from '../../utils/palette';
       dialogSubtitle: null,
       // Disallow action on specific categories
       actionOn: {
-        categoriesWithSubcategories: {
-          disabled: false,
-          message: $T.gettext('Not possible for categories containing subcategories'),
-        },
-        categoriesWithEvents: {
-          disabled: false,
-          message: $T.gettext('Not possible for categories containing events'),
-        },
         categoriesWithoutEventCreationRights: {
           disabled: false,
           message: $T.gettext('Not possible for categories where you cannot create events'),
@@ -716,11 +708,6 @@ import Palette from '../../utils/palette';
         category,
         true
       );
-      const canActOnCategoriesWithEvents = self._canActOnCategoriesWithEvents(category, true);
-      const canActOnCategoriesWithSubcategories = self._canActOnCategoriesWithSubcategories(
-        category,
-        true
-      );
       const canActOnCategoriesWithoutEventCreationRights = self._canActOnCategoriesWithoutEventCreationRights(
         category,
         true
@@ -730,10 +717,6 @@ import Palette from '../../utils/palette';
         result = canActOnCategories;
       } else if (!canActOnCategoriesDescendingFrom.allowed) {
         result = canActOnCategoriesDescendingFrom;
-      } else if (!canActOnCategoriesWithEvents.allowed) {
-        result = canActOnCategoriesWithEvents;
-      } else if (!canActOnCategoriesWithSubcategories.allowed) {
-        result = canActOnCategoriesWithSubcategories;
       } else if (!canActOnCategoriesWithoutEventCreationRights.allowed) {
         result = canActOnCategoriesWithoutEventCreationRights;
       }
@@ -749,30 +732,6 @@ import Palette from '../../utils/palette';
       if (categoriesWithoutEventCreationRights.disabled && !category.can_create_events) {
         result.allowed = false;
         result.message = categoriesWithoutEventCreationRights.message;
-      }
-      return withMessage ? result : result.allowed;
-    },
-
-    _canActOnCategoriesWithSubcategories(category, withMessage) {
-      const self = this;
-      const result = {allowed: true, message: ''};
-      const hasSubcategories = !!category.deep_category_count;
-      const categoriesWithSubcategories = self.options.actionOn.categoriesWithSubcategories;
-      if (categoriesWithSubcategories.disabled && hasSubcategories) {
-        result.allowed = false;
-        result.message = categoriesWithSubcategories.message;
-      }
-      return withMessage ? result : result.allowed;
-    },
-
-    _canActOnCategoriesWithEvents(category, withMessage) {
-      const self = this;
-      const result = {allowed: true, message: ''};
-      const hasOnlyEvents = category.has_events && !category.deep_category_count;
-      const categoriesWithEvents = self.options.actionOn.categoriesWithEvents;
-      if (categoriesWithEvents.disabled && hasOnlyEvents) {
-        result.allowed = false;
-        result.message = categoriesWithEvents.message;
       }
       return withMessage ? result : result.allowed;
     },

@@ -340,7 +340,6 @@
         )
         .format(ids.length),
       actionOn: {
-        categoriesWithEvents: {disabled: true},
         categoriesDescendingFrom: {
           disabled: true,
           ids,
@@ -403,9 +402,6 @@
         eventCount
       ),
       actionOn: {
-        categoriesWithSubcategories: {
-          disabled: true,
-        },
         categoriesWithoutEventCreationRights: {
           disabled: true,
         },

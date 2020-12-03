@@ -15,10 +15,6 @@
         fieldId: null,
         navigatorCategoryId: null,
         requireEventCreationRights: false,
-        allow: {
-          events: true,
-          subcats: true,
-        },
       },
       options
     );
@@ -32,12 +28,6 @@
 
     if (options.requireEventCreationRights) {
       actionOn.categoriesWithoutEventCreationRights = {disabled: true};
-    }
-    if (!options.allow.events) {
-      actionOn.categoriesWithEvents = {disabled: true};
-    }
-    if (!options.allow.subcats) {
-      actionOn.categoriesWithSubcategories = {disabled: true};
     }
 
     if (hiddenData) {

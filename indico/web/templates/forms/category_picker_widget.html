@@ -19,10 +19,6 @@
             fieldId: {{ field.id | tojson }},
             navigatorCategoryId: {{ field.navigator_category_id | tojson }},
             requireEventCreationRights: {{ field.require_event_creation_rights | tojson }},
-            allow: {
-                events: {{ field.allow_events | tojson }},
-                subcats: {{ field.allow_subcats | tojson }}
-            }
         });
     </script>
 {% endblock %}
