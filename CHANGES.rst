@@ -17,6 +17,8 @@ Internal Changes
 
 - Videoconference plugins may now display a custom message for the prompt when deleting
   a videoconference room (:pr:`4733`)
+- Videoconference plugins may now override the behavior when cloning an event with
+  attached videoconference rooms (:pr:`4732`)
 
 Version 2.3.2
 -------------

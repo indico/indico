@@ -16,7 +16,7 @@ from indico.core import signals
 from indico.modules.events.contributions import Contribution
 from indico.modules.events.sessions.models.blocks import SessionBlock
 from indico.modules.vc.forms import VCPluginSettingsFormBase
-from indico.modules.vc.models.vc_rooms import VCRoomLinkType
+from indico.modules.vc.models.vc_rooms import VCRoomEventAssociation, VCRoomLinkType
 from indico.util.decorators import classproperty
 from indico.web.flask.templating import get_overridable_template_name
 from indico.web.forms.base import FormDefaults
@@ -205,6 +205,16 @@ class VCPluginMixin(object):
 
     def create_room(self, vc_room, event):
         raise NotImplementedError('Plugin must implement create_room()')
+
+    def clone_room(self, old_event_vc_room, link_object):
+        """Clone the room, returning a new :class:`VCRoomEventAssociation`.
+
+        :param old_event_vc_room: the original :class:`VCRoomEventAssociation`
+        :param link_object: the new object the association will be tied to
+        :return: the new :class:`VCRoomEventAssociation`
+        """
+        return VCRoomEventAssociation(show=old_event_vc_room.show, data=old_event_vc_room.data,
+                                      link_object=link_object)
 
     def can_manage_vc_rooms(self, user, event):
         """Check if a user can manage vc rooms on an event."""
