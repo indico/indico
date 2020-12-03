@@ -51,7 +51,7 @@
                             {{ labels(user) }}
                             <br>
                             <div class="ui small label">
-                                {% trans %}Last login date{% endtrans %}
+                                {% trans %}Last login{% endtrans %}
                                 <div class="detail">
                                     {% if user.last_login_dt %}
                                         {{ user.last_login_dt | format_datetime }}
