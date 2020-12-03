@@ -7,6 +7,11 @@ Version 2.3.3
 
 *Unreleased*
 
+Improvements
+^^^^^^^^^^^^
+
+- Show last login time in dashboard (:pr:`4735`, thanks :user:`vasantvohra`)
+
 Bugfixes
 ^^^^^^^^
 
