@@ -153,6 +153,9 @@ def unescape_html_entities(text):
 
 
 def latex_escape(text, ignore_math=True, ignore_braces=False):
+    if text is None:
+        return ''
+
     chars = {
         "#": r"\#",
         "$": r"\$",

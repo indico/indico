@@ -15,7 +15,7 @@ Improvements
 Bugfixes
 ^^^^^^^^
 
-- None so far :)
+- Fix error when converting malformed HTML links to LaTeX
 
 Internal Changes
 ^^^^^^^^^^^^^^^^
