@@ -44,8 +44,7 @@ _bp.add_url_rule('/event/create/<any(lecture,meeting,conference):event_type>', '
                  methods=('GET', 'POST'))
 
 # Preparation
-_bp.add_url_rule('/event/prepare', 'prepare', RHPrepareEvent,
-                 methods=('GET', 'POST'))
+_bp.add_url_rule('/event/prepare', 'prepare', RHPrepareEvent, methods=('POST',))
 
 # Main entry points supporting shortcut URLs
 # /e/ accepts slashes, /event/ doesn't - this is intended. We do not want to support slashes in the old namespace

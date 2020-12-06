@@ -73,6 +73,7 @@ class RHCreateEvent(RHProtected):
         if prepared_data:
             start_dt, end_dt, title = prepared_data
         else:
+            title = ''
             # try to find good dates/times
             now = now_utc(exact=False)
             start_dt = now + relativedelta(hours=1, minute=0)
