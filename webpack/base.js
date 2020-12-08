@@ -211,6 +211,7 @@ export function webpackDefaults(env, config, bundles, isPlugin = false) {
 
   return {
     devtool: 'source-map',
+    cache: true,
     context: config.build.clientPath,
     output: {
       path: config.build.distPath,
