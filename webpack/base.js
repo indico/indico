@@ -318,7 +318,7 @@ export function webpackDefaults(env, config, bundles, isPlugin = false) {
           : {
               // 'common' chunk, which should include common dependencies
               common: {
-                idHint: 'common',
+                name: 'common',
                 chunks: chunk =>
                   chunk.canBeInitial() &&
                   // outdatedbrowser must be fully standalone since we can assume all other
@@ -331,13 +331,13 @@ export function webpackDefaults(env, config, bundles, isPlugin = false) {
               // react/redux and friends since they are pretty big
               react: {
                 test: /\/node_modules\/(react|redux|prop-types\/|lodash-es\/|fbjs\/)/,
-                idHint: 'react',
+                name: 'react',
                 chunks: 'initial',
                 priority: 10,
               },
               semanticui: {
                 test: /node_modules\/(semantic-ui|indico-sui-theme)/,
-                idHint: 'semantic-ui',
+                name: 'semantic-ui',
                 chunks: 'initial',
                 priority: 10,
               },
