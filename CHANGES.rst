@@ -11,6 +11,8 @@ Improvements
 ^^^^^^^^^^^^
 
 - Show last login time in dashboard (:pr:`4735`, thanks :user:`vasantvohra`)
+- Allow Markdown in the "Message for complete registrations" option of a registration
+  form (:pr:`4741`)
 
 Bugfixes
 ^^^^^^^^
