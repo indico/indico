@@ -58,7 +58,7 @@
                             {%- elif registration.registration_form.modification_mode.name == 'allowed_until_payment' -%}
                                 title="{% trans %}Modifications are not allowed after payment{% endtrans %}"
                             {%- elif registration.registration_form.modification_mode.name == 'allowed_until_approved' -%}
-                                title="{% trans %}Modifications are not allowed after approval{% endtrans %}"
+                                title="{% trans %}Modifications are not allowed once approved{% endtrans %}"
                             {%- endif %}
                         {% endif %}>
                         {% trans %}Modify{% endtrans %}
