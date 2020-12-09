@@ -32,11 +32,11 @@ from indico.util.struct.enum import RichIntEnum
 
 
 class ModificationMode(RichIntEnum):
-    __titles__ = [None, L_('Until modification deadline'), L_('Until payment'), L_('Never')]
+    __titles__ = [None, L_('Until modification deadline'), L_('Until payment'), L_('Until Approved'), L_('Never')]
     allowed_always = 1
     allowed_until_payment = 2
-    not_allowed = 3
-
+    allowed_until_approved = 3
+    not_allowed = 4
 
 class RegistrationForm(db.Model):
     """A registration form for an event."""
@@ -406,6 +406,8 @@ class RegistrationForm(db.Model):
             return False
         elif self.modification_mode == ModificationMode.allowed_always:
             return True
+        elif self.modification_mode == ModificationMode.allowed_until_approved:
+            return not registration.state == RegistrationState.complete
         elif self.modification_mode == ModificationMode.allowed_until_payment:
             return not registration.is_paid
         else:
