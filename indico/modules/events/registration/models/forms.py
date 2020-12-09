@@ -32,7 +32,8 @@ from indico.util.struct.enum import RichIntEnum
 
 
 class ModificationMode(RichIntEnum):
-    __titles__ = [None, L_('Until modification deadline'), L_('Until payment'), L_('Never'), L_('Until approved')]
+    __titles__ = [None, L_('Until modification deadline'), L_('Until payment'), L_('Never'),
+                  L_('While pending approval')]
     allowed_always = 1
     allowed_until_payment = 2
     not_allowed = 3
