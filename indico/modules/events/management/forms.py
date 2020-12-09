@@ -56,17 +56,17 @@ CLONE_REPEAT_CHOICES = (
 
 
 class EventDataForm(IndicoForm):
-    prefix = f'{config.BASE_URL}/e/'
     title = StringField(_('Event title'), [DataRequired()])
     description = TextAreaField(_('Description'), widget=CKEditorWidget(simple=True, images=True, height=250))
-    url_shortcut = StringField(_('URL shortcut'), filters=[lambda x: (x or None)],
-                               widget=TextCompleteWidget(prefix=prefix))
+    url_shortcut = StringField(_('URL shortcut'), filters=[lambda x: (x or None)])
 
     def __init__(self, *args, **kwargs):
         self.event = kwargs.pop('event')
         super().__init__(*args, **kwargs)
+        prefix = f'{config.BASE_URL}/e/'
         self.url_shortcut.description = _('The URL shortcut must be unique within this Indico instance and '
-                                          'is not case sensitive.').format(self.prefix)
+                                          'is not case sensitive.').format(prefix)
+        self.url_shortcut.widget = TextCompleteWidget(prefix=prefix)
 
     def validate_url_shortcut(self, field):
         shortcut = field.data
