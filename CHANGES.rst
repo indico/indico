@@ -9,7 +9,8 @@ Version 2.3.3
 
 Improvements
 ^^^^^^^^^^^^
-- New option of Modification allowed 'Until approved' in Event's Registration settings (:pr:`4740`, thanks :user:`vasantvohra`)
+- Add a new "Until approved" option for a registration form's "Modification allowed"
+  setting (:pr:`4740`, thanks :user:`vasantvohra`)
 - Show last login time in dashboard (:pr:`4735`, thanks :user:`vasantvohra`)
 
 Bugfixes
