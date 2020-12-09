@@ -9,7 +9,7 @@ Version 2.3.3
 
 Improvements
 ^^^^^^^^^^^^
-
+- New option of Modification allowed until Approved in Regsitration settings (:pr:`4736`, thanks :user:`vasantvohra`)
 - Show last login time in dashboard (:pr:`4735`, thanks :user:`vasantvohra`)
 
 Bugfixes
