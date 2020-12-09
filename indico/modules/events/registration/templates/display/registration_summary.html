@@ -48,9 +48,7 @@
             {% endif %}
         </div>
         <div class="toolbar">
-            {% if registration.can_be_modified and
-            registration.registration_form.modification_mode.name != 'not_allowed' and
-            registration.is_active %}
+            {% if registration.can_be_modified and registration.registration_form.modification_mode.name != 'not_allowed' and registration.is_active %}
                 <div class="group">
                     <a href="{{ url_for('.edit_registration_display', registration.locator.registrant) }}"
                        class="i-button icon-edit {% if not registration.can_be_modified %}disabled{% endif %}"

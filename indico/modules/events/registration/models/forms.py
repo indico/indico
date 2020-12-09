@@ -38,6 +38,7 @@ class ModificationMode(RichIntEnum):
     allowed_until_approved = 3
     not_allowed = 4
 
+
 class RegistrationForm(db.Model):
     """A registration form for an event."""
 
