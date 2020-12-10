@@ -17,7 +17,7 @@ depends_on = None
 def upgrade():
     op.execute('''
         ALTER TABLE "event_registration"."forms" DROP CONSTRAINT "ck_forms_valid_enum_modification_mode";
-        ALTER TABLE "event_registration"."forms" ADD CONSTRAINT "ck_forms_valid_enum_modification_mode" CHECK ((modification_mode = ANY (ARRAY[0, 1, 2, 3, 4])));
+        ALTER TABLE "event_registration"."forms" ADD CONSTRAINT "ck_forms_valid_enum_modification_mode" CHECK ((modification_mode = ANY (ARRAY[1, 2, 3, 4])));
     ''')
 
 
