@@ -1,4 +1,4 @@
-"""modification_mode enum
+"""Add 'while pending' regform modification mode
 
 Revision ID: e4fb983dc64c
 Revises: 8d614ef75968
