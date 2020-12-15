@@ -17,8 +17,8 @@ class UserSchema(mm.SQLAlchemyAutoSchema):
 
     class Meta:
         model = User
-        fields = ('id', 'identifier', 'first_name', 'last_name', 'email', 'affiliation', 'avatar_bg_color', 'full_name',
-                  'phone')
+        fields = ('id', 'identifier', 'first_name', 'last_name', 'email', 'affiliation', 'full_name',
+                  'phone', 'avatar_url')
 
 
 user_schema = UserSchema()

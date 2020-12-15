@@ -60,8 +60,8 @@
 {% endmacro %}
 
 {% macro render_user_avatar(user) %}
-    <div class="i-timeline-item-label avatar-placeholder" style="{{ user.avatar_css }}">
-        {{- user.name[0] -}}
+    <div class="avatar-div">
+        <img src="{{ user.avatar_url }}" alt="" class="ui image circular profile-picture">
     </div>
 {% endmacro %}
 

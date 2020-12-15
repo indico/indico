@@ -21,7 +21,6 @@ import {getLastRevision} from './selectors';
 
 const INDICO_BOT_USER = {
   fullName: 'Indico Bot',
-  avatarBgColor: '#8f8f8f',
 };
 
 export default function Comment({

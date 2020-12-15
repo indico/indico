@@ -471,10 +471,6 @@ class User(PersonMixin, db.Model):
         return get_color_for_username(self.full_name)
 
     @property
-    def avatar_css(self):
-        return f'background-color: {self.avatar_bg_color};'
-
-    @property
     def external_identities(self):
         """The external identities of the user."""
         return {x for x in self.identities if x.provider != 'indico'}
@@ -544,7 +540,7 @@ class User(PersonMixin, db.Model):
         return self.picture_metadata is not None
 
     @property
-    def picture_url(self):
+    def avatar_url(self):
         slug = self.picture_metadata['hash'] if self.picture_metadata else 'default'
         return url_for('users.user_profile_picture_display', self, slug=slug)
 

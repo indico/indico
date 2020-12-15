@@ -8,6 +8,7 @@
 import moment from 'moment';
 import PropTypes from 'prop-types';
 import React from 'react';
+import {Image} from 'semantic-ui-react';
 
 import {Paginator, TooltipIfTruncated, MessageBox} from 'indico/react/components';
 import {Translate} from 'indico/react/i18n';
@@ -86,14 +87,8 @@ class LogEntry extends React.PureComponent {
           <span className="logged-time" title={moment(entry.time).format('DD/MM/YYYY HH:mm')}>
             <time dateTime={entry.time}>{moment(entry.time).fromNow()}</time>
           </span>
-          {entry.user.fullName ? (
-            <span
-              className="avatar-placeholder"
-              style={{backgroundColor: entry.user.avatarColor}}
-              title={entry.user.fullName}
-            >
-              {entry.user.fullName[0]}
-            </span>
+          {entry.user.avatarURL ? (
+            <Image avatar src={entry.user.avatarURL} className="user-picture" />
           ) : (
             ''
           )}

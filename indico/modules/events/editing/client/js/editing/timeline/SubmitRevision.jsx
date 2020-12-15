@@ -28,7 +28,10 @@ export default function SubmitRevision() {
   const fileTypes = useSelector(selectors.getFileTypes);
   const lastRevision = useSelector(selectors.getLastRevision);
   const dispatch = useDispatch();
-  const currentUser = {fullName: Indico.User.full_name, avatarBgColor: Indico.User.avatar_bg_color};
+  const currentUser = {
+    fullName: Indico.User.full_name,
+    avatarURL: Indico.User.avatar_url,
+  };
   const files = getFilesFromRevision(fileTypes, lastRevision);
 
   const submitRevision = async formData => {

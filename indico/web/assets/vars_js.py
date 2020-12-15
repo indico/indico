@@ -70,7 +70,7 @@ def generate_user_file(user=None):
             'email': user.email,
             'favorite_users': {u.id: serialize_user(u) for u in user.favorite_users},
             'language': session.lang,
-            'avatar_bg_color': user.avatar_bg_color,
+            'avatar_url': user.avatar_url,
             'is_admin': user.is_admin,
             'full_name': user.full_name
         }

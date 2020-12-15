@@ -14,7 +14,7 @@ import userPreferences from 'indico-url:users.user_preferences';
 import PropTypes from 'prop-types';
 import qs from 'qs';
 import React from 'react';
-import {Dropdown, Icon, Label} from 'semantic-ui-react';
+import {Dropdown, Icon, Image} from 'semantic-ui-react';
 
 import {impersonateUser} from 'indico/modules/core/impersonation';
 import {Translate} from 'indico/react/i18n';
@@ -23,8 +23,6 @@ import {indicoAxios, handleAxiosError} from 'indico/utils/axios';
 import {useFavoriteUsers} from '../hooks';
 
 import {UserSearch} from './principals/Search';
-
-import './UserMenu.module.scss';
 
 async function postAndReload(selectedLanguage) {
   try {
@@ -61,19 +59,8 @@ export default function UserMenu({userData, languages, hasLoadedConfig, hasLoade
     return '';
   }
 
-  const {firstName, lastName, email, language, isAdmin, avatarBgColor} = userData;
-  const avatar = (
-    <Label
-      circular
-      size="large"
-      style={{
-        backgroundColor: avatarBgColor,
-      }}
-      styleName="user-menu-avatar"
-    >
-      {firstName[0]}
-    </Label>
-  );
+  const {firstName, lastName, email, language, isAdmin, avatarURL} = userData;
+  const avatar = <Image avatar src={avatarURL} size="mini" />;
 
   const languageSelector = trigger => {
     return (
@@ -148,7 +135,7 @@ UserMenu.propTypes = {
     id: PropTypes.number,
     language: PropTypes.string,
     isAdmin: PropTypes.bool,
-    avatarBgColor: PropTypes.string,
+    avatarURL: PropTypes.string,
   }).isRequired,
   languages: PropTypes.object.isRequired,
   hasLoadedConfig: PropTypes.bool.isRequired,

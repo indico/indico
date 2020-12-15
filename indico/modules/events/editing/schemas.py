@@ -49,7 +49,7 @@ class EditableStateSchema(mm.Schema):
 class EditingUserSchema(mm.SQLAlchemyAutoSchema):
     class Meta:
         model = User
-        fields = ('id', 'avatar_bg_color', 'full_name', 'identifier')
+        fields = ('id', 'full_name', 'identifier', 'avatar_url')
 
 
 class EditingFileTypeSchema(mm.SQLAlchemyAutoSchema):

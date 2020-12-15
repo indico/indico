@@ -83,7 +83,7 @@ export function getRevisionTransition(revision) {
 export const userPropTypes = {
   identifier: PropTypes.string.isRequired,
   fullName: PropTypes.string.isRequired,
-  avatarBgColor: PropTypes.string.isRequired,
+  avatarURL: PropTypes.string.isRequired,
   id: PropTypes.number.isRequired,
 };
 
