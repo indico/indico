@@ -482,7 +482,7 @@ import {PrincipalType} from 'indico/react/components/principals/util';
           <PersonLinkSearch
             existing={existing.filter(e => e.startsWith('User'))}
             onAddItems={e => {
-              items = e.map(({identifier, userId, name, firstName, lastName}) => ({
+              const items = e.map(({identifier, userId, name, firstName, lastName}) => ({
                 identifier,
                 name,
                 id: userId,
@@ -498,7 +498,7 @@ import {PrincipalType} from 'indico/react/components/principals/util';
           <GroupSearch
             existing={existing.filter(e => e.startsWith('Group'))}
             onAddItems={e => {
-              items = e.map(({identifier, name, type, provider}) => {
+              const items = e.map(({identifier, name, type, provider}) => {
                 let id;
                 if (type === PrincipalType.localGroup) {
                   const splitIdentifier = identifier.split(':');
