@@ -6,22 +6,24 @@
 // LICENSE file for more details.
 
 import searchCategoriesURL from 'indico-url:search.search_categories';
-import searchEventsURL from 'indico-url:search.search_events';
 import searchContributionsURL from 'indico-url:search.search_contributions';
+import searchEventsURL from 'indico-url:search.search_events';
 import searchFilesURL from 'indico-url:search.search_files';
 
 import React, {useEffect, useReducer, useState} from 'react';
 import {Loader, Menu, Grid} from 'semantic-ui-react';
 import {useQueryParam, StringParam} from 'use-query-params';
+
 import {useIndicoAxios} from 'indico/react/hooks';
 import {Translate} from 'indico/react/i18n';
+
 import ResultList from './ResultList';
-import SearchBar from './SearchBar';
 import Category from './results/Category';
-import Event from './results/Event';
 import Contribution from './results/Contribution';
+import Event from './results/Event';
 import File from './results/File';
 import NoResults from './results/NoResults';
+import SearchBar from './SearchBar';
 import SideBar from './SideBar';
 
 const searchReducer = (state, action) => {
