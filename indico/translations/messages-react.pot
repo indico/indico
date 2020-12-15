@@ -1,6 +1,6 @@
 msgid ""
 msgstr ""
-"POT-Creation-Date: 2020-10-20 11:37+0100\n"
+"POT-Creation-Date: 2020-12-20 14:00+0100\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "MIME-Version: 1.0\n"
@@ -409,16 +409,16 @@ msgstr ""
 msgid "Use an existing file"
 msgstr ""
 
-#: indico/modules/events/editing/client/js/editing/timeline/FileManager/index.jsx:243
+#: indico/modules/events/editing/client/js/editing/timeline/FileManager/index.jsx:245
 msgid "Filename pattern: {pattern}"
 msgstr ""
 
-#: indico/modules/events/editing/client/js/editing/timeline/FileManager/index.jsx:343
+#: indico/modules/events/editing/client/js/editing/timeline/FileManager/index.jsx:345
 #: indico/web/client/js/react/components/files/SingleFileManager.jsx:177
 msgid "Upload in progress"
 msgstr ""
 
-#: indico/modules/events/editing/client/js/editing/timeline/FileManager/index.jsx:357
+#: indico/modules/events/editing/client/js/editing/timeline/FileManager/index.jsx:359
 msgid "No changes yet"
 msgstr ""
 
@@ -508,16 +508,16 @@ msgstr ""
 msgid "Since you are a manager you can edit anyway."
 msgstr ""
 
-#: indico/modules/events/editing/client/js/editing/timeline/TimelineItem.jsx:63
-msgid "{submitterName} submitted revision {revisionNumber}"
+#: indico/modules/events/editing/client/js/editing/timeline/TimelineItem.jsx:65
+msgid "{submitterName} submitted a revision"
 msgstr ""
 
-#: indico/modules/events/editing/client/js/editing/timeline/TimelineItem.jsx:76
+#: indico/modules/events/editing/client/js/editing/timeline/TimelineItem.jsx:79
 #: indico/modules/events/papers/client/js/components/TimelineItem.jsx:57
 msgid "Hide old revision"
 msgstr ""
 
-#: indico/modules/events/editing/client/js/editing/timeline/TimelineItem.jsx:78
+#: indico/modules/events/editing/client/js/editing/timeline/TimelineItem.jsx:81
 #: indico/modules/events/papers/client/js/components/TimelineItem.jsx:59
 msgid "Show old revision"
 msgstr ""
