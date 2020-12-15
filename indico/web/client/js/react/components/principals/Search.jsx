@@ -483,18 +483,19 @@ const InnerUserSearch = searchFactory({
           userIdentifier,
         })
       );
+      const epResults = [];
       epResultData.results.forEach(item => {
         if (item.userIdentifier !== undefined) {
           const index = resultData.results.findIndex(e => e.identifier === item.userIdentifier);
           if (index >= 0) {
             resultData.results[index].existsInEvent = true;
+            return;
           }
-        } else {
-          resultData.results.push(item);
-          resultData.total++;
         }
+        epResults.push(item);
       });
-      resultData.results = resultData.results.slice(0, _.min(10, resultData.results.length));
+      resultData.results = [...epResults, ...resultData.results];
+      resultData.total += epResults.length;
     }
     setResult(resultData);
   },
