@@ -502,7 +502,7 @@ import {PersonLinkSearch} from 'indico/react/components/principals/PersonLinkSea
         disabled={options.disableUserSearch}
         withExternalUsers={options.allow.externalUsers}
         triggerFactory={searchTrigger}
-        withEventPersons
+        withEventPersons={options.eventId !== null}
         eventId={options.eventId}
       />,
       document.getElementById(`principalField-${options.fieldId}`)
