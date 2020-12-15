@@ -478,6 +478,8 @@ const InnerUserSearch = searchFactory({
           firstName,
           lastName,
           existsInEvent: true,
+          email,
+          affiliation,
           userIdentifier,
         })
       );

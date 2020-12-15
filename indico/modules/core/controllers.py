@@ -218,6 +218,8 @@ class PrincipalsMixin:
                     'name': principal.display_full_name,
                     'first_name': principal.first_name,
                     'last_name': principal.last_name,
+                    'email': principal.email,
+                    'affiliation': principal.affiliation,
                     'detail': (f'{principal.email} ({principal.affiliation})'
                                if principal.affiliation else principal.email)}
         elif principal.principal_type == PrincipalType.local_group:

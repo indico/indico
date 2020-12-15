@@ -482,6 +482,17 @@ import {PersonLinkSearch} from 'indico/react/components/principals/PersonLinkSea
       </span>
     );
 
+    const getLegacyType = identifier => {
+      if (identifier.startsWith('User:')) {
+        return 'Avatar';
+      } else if (identifier.startsWith('EventPerson:')) {
+        return 'EventPerson';
+      } else {
+        // likely ExternalUser; we have no type - see the `get_event_person` python util
+        return null;
+      }
+    };
+
     ReactDOM.render(
       <PersonLinkSearch
         existing={existing}
@@ -496,6 +507,7 @@ import {PersonLinkSearch} from 'indico/react/components/principals/PersonLinkSea
               firstName,
               email,
               affiliation,
+              _type: getLegacyType(identifier),
             }))
           );
         }}
