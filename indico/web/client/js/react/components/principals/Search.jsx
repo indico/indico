@@ -449,6 +449,7 @@ const InnerUserSearch = searchFactory({
         identifier,
         type: PrincipalType.user,
         userId: id,
+        id,
         name: fullName,
         detail: affiliation ? `${email} (${affiliation})` : email,
         firstName,
@@ -472,7 +473,7 @@ const InnerUserSearch = searchFactory({
         ({identifier, id, fullName, email, affiliation, firstName, lastName, userIdentifier}) => ({
           identifier,
           type: PrincipalType.eventPerson,
-          userId: id,
+          id,
           name: fullName,
           detail: affiliation ? `${email} (${affiliation})` : email,
           firstName,

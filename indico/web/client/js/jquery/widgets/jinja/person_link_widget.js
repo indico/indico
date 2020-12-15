@@ -499,10 +499,10 @@ import {PersonLinkSearch} from 'indico/react/components/principals/PersonLinkSea
         onAddItems={people => {
           $field.principalfield(
             'add',
-            people.map(({identifier, userId, name, firstName, lastName, email, affiliation}) => ({
+            people.map(({identifier, id, name, firstName, lastName, email, affiliation}) => ({
               identifier,
               name,
-              id: userId,
+              id,
               familyName: lastName,
               firstName,
               email,
