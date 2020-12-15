@@ -30,7 +30,7 @@ import {
 } from 'semantic-ui-react';
 
 import {FinalCheckbox, FinalInput, handleSubmitError} from 'indico/react/forms';
-import {useIndicoAxios} from 'indico/react/hooks';
+import {useFavoriteUsers, useIndicoAxios} from 'indico/react/hooks';
 import {Translate, PluralTranslate, Singular, Plural, Param} from 'indico/react/i18n';
 import {indicoAxios} from 'indico/utils/axios';
 import {camelizeKeys} from 'indico/utils/case';
@@ -540,6 +540,14 @@ DefaultUserSearch.defaultProps = {
 };
 
 export const UserSearch = Overridable.component('UserSearch', DefaultUserSearch);
+
+/**
+ * Like UserSearch, but lazy-loads the favorite users on demand.
+ */
+export function LazyUserSearch(props) {
+  const [favorites, [, , loadFavorites]] = useFavoriteUsers(null, true);
+  return <UserSearch favorites={favorites} onOpen={loadFavorites} {...props} />;
+}
 
 export const GroupSearch = searchFactory({
   componentName: 'GroupSearch',

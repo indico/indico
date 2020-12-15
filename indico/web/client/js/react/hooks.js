@@ -16,12 +16,13 @@ import {useCallback, useEffect, useRef, useState} from 'react';
 import {handleAxiosError, indicoAxios} from '../utils/axios';
 import {camelizeKeys} from '../utils/case';
 
-export const useFavoriteUsers = userId => {
+export const useFavoriteUsers = (userId = null, lazy = false) => {
   // XXX: this state should ideally be global so if this hook is used more than
   // once on the same page we keep the favorites in sync and don't send multiple
   // requests to load the initial list
   const [favorites, setFavorites] = useState({});
   const [loading, setLoading] = useState(true);
+  const [shouldLoad, setShouldLoad] = useState(!lazy);
 
   const apiCall = useCallback(
     async (method, id = null, source = null) => {
@@ -30,7 +31,7 @@ export const useFavoriteUsers = userId => {
       if (id !== null) {
         args.fav_user_id = id;
       }
-      if (userId !== null && userId !== undefined) {
+      if (userId !== null) {
         args.user_id = userId;
       }
       try {
@@ -79,7 +80,13 @@ export const useFavoriteUsers = userId => {
     }
   };
 
+  const load = () => setShouldLoad(true);
+
   useEffect(() => {
+    if (!shouldLoad) {
+      return;
+    }
+
     const source = indicoAxios.CancelToken.source();
 
     (async () => {
@@ -95,9 +102,9 @@ export const useFavoriteUsers = userId => {
     return () => {
       source.cancel();
     };
-  }, [apiCall]);
+  }, [apiCall, shouldLoad]);
 
-  return [favorites, [add, del], loading];
+  return [favorites, [add, del, load], loading];
 };
 
 /**

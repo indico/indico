@@ -10,7 +10,7 @@ import impersonateURL from 'indico-url:auth.admin_impersonate';
 import React from 'react';
 import ReactDOM from 'react-dom';
 
-import {PersonLinkSearch} from 'indico/react/components/principals/PersonLinkSearch';
+import {LazyUserSearch} from 'indico/react/components/principals/Search';
 import {Translate} from 'indico/react/i18n';
 import {indicoAxios, handleAxiosError} from 'indico/utils/axios';
 
@@ -48,11 +48,9 @@ document.addEventListener('DOMContentLoaded', () => {
   }
   if (loginAs) {
     ReactDOM.render(
-      <PersonLinkSearch
+      <LazyUserSearch
         existing={[]}
         onAddItems={e => impersonateUser(e.userId)}
-        disabled={false}
-        withExternalUsers={false}
         triggerFactory={searchTrigger}
         alwaysConfirm
         single
