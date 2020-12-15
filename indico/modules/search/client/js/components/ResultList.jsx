@@ -5,11 +5,12 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
+import PropTypes from 'prop-types';
 import React from 'react';
 import {List, Placeholder, Segment} from 'semantic-ui-react';
-import PropTypes from 'prop-types';
-import './ResultList.module.scss';
+
 import SearchPagination from './SearchPagination';
+import './ResultList.module.scss';
 
 export default function ResultList({
   component: Component,

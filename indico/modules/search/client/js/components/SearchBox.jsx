@@ -5,9 +5,10 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-import React, {useState} from 'react';
 import PropTypes from 'prop-types';
+import React, {useState} from 'react';
 import {Form} from 'semantic-ui-react';
+
 import {Translate} from 'indico/react/i18n';
 
 export default function SearchBox({onSearch}) {
