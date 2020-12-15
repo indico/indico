@@ -14,7 +14,7 @@ import ReactDOM from 'react-dom';
 import {Button, Icon, List, Loader, Popup} from 'semantic-ui-react';
 
 import {TooltipIfTruncated} from 'indico/react/components';
-import {PersonLinkSearch} from 'indico/react/components/principals/PersonLinkSearch';
+import {UserSearch} from 'indico/react/components/principals/Search';
 import {useFavoriteUsers} from 'indico/react/hooks';
 import {Translate} from 'indico/react/i18n';
 import {indicoAxios, handleAxiosError} from 'indico/utils/axios';
@@ -179,12 +179,9 @@ function FavoriteUserManager({favoriteUsers, addFavoriteUser, deleteFavoriteUser
           )}
         </div>
       </div>
-      <PersonLinkSearch
+      <UserSearch
         existing={Object.values(favoriteUsers).map(u => u.identifier)}
         onAddItems={e => e.forEach(u => addFavoriteUser(u.userId))}
-        disabled={false}
-        withExternalUsers={false}
-        withFavorites={false}
         triggerFactory={searchTrigger}
       />
     </div>

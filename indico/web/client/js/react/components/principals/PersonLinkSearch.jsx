@@ -17,7 +17,6 @@ export const PersonLinkSearch = ({
   onAddItems,
   disabled,
   withExternalUsers,
-  withFavorites,
   withEventPersons,
   eventId,
   single,
@@ -29,7 +28,7 @@ export const PersonLinkSearch = ({
     <UserSearch
       existing={existing}
       onAddItems={onAddItems}
-      favorites={withFavorites ? favoriteUsers : null}
+      favorites={favoriteUsers}
       disabled={disabled}
       withExternalUsers={withExternalUsers}
       withEventPersons={withEventPersons}
@@ -46,7 +45,6 @@ PersonLinkSearch.propTypes = {
   existing: PropTypes.arrayOf(PropTypes.string).isRequired,
   disabled: PropTypes.bool,
   withExternalUsers: PropTypes.bool,
-  withFavorites: PropTypes.bool,
   withEventPersons: PropTypes.bool,
   eventId: PropTypes.number,
   single: PropTypes.bool,
@@ -56,7 +54,6 @@ PersonLinkSearch.propTypes = {
 PersonLinkSearch.defaultProps = {
   disabled: false,
   withExternalUsers: false,
-  withFavorites: true,
   withEventPersons: false,
   eventId: null,
   single: false,
