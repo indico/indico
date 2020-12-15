@@ -158,6 +158,7 @@ type(
 
       this.headerBlock = Html.div({className: 'timetableBlockWrapper'}, this.titleDiv);
       this.footerBlock = Html.div({className: 'timetableBlockWrapper', style: {marginTop: 'auto'}});
+      this.footerBlockVC = Html.div({className: 'timetableBlockWrapper', style: {marginTop: 'auto'}});
 
       this.div = Html.div(
         {className: 'entry-content', style: {width: '100%', height: '100%'}},
@@ -204,6 +205,11 @@ type(
           this.locationDiv.append(this.eventData.location);
         }
 
+        this.vcdiv = Html.div('timetableBlockVC');
+        if (this.eventData.vcrooms) {
+          this.vcdiv.setAttribute('data-qtip-oldtitle', ' ');
+          this.vcdiv.dom.innerHTML= this.eventData.vcrooms;
+        }
         // If it's a contribution add the speakers information
         if (self.eventData.presenters && self.eventData.presenters.length > 0) {
           var firstPresenter = self.eventData.presenters[0];
@@ -236,7 +242,9 @@ type(
           this.headerBlock.append(this.convenerDiv);
         }
         this.footerBlock.append(this.locationDiv);
+        this.footerBlockVC.append(this.vcdiv);
         this.footerBlock.append(this.timeDiv);
+        this.div.append(this.footerBlockVC);
         this.div.append(this.footerBlock);
       }
 

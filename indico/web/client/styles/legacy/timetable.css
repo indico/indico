@@ -162,7 +162,22 @@ div.timetableBlockTime {
   margin-right: 7px;
   padding-top: 4px;
   font-size: 11px;
+  order: 4;
+}
+
+div.timetableBlockVC {
+  margin-right: 7px;
+  padding-top: 4px;
+  font-size: 11px;
   order: 3;
+}
+
+div.timetableBlockVC .toolbar {
+  min-height: 1.5em !important;
+}
+
+div.timetableBlockVC .toolbar .i-button {
+  height: 1.5em;
 }
 
 div.timetableBlockTimeDiscreet {
