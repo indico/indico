@@ -114,7 +114,7 @@ li > table + .note-area-wrapper {
     }
 
     &.collapsed {
-      max-height: 4.75em;
+      max-height: 4.3em;
       overflow: hidden;
     }
 
@@ -147,31 +147,19 @@ li > table + .note-area-wrapper {
     @extend %font-family-title;
 
     padding: 0;
-    margin: 0;
+    margin: 0 0 0 -0.2em;
     list-style-type: none;
   }
 }
 
-.event-user {
+.ui.image.label.meeting-participant {
+  display: inline-block;
+  margin-bottom: 4px;
+  margin-left: 0.2em;
+
   &.checked-in {
-    @include border-all($pastel-green);
     background: lighten($pastel-green, 30%);
     color: darken($pastel-green, 20%);
-
-    &::before {
-      color: $pastel-green;
-    }
-  }
-
-  &.no-label {
-    background: none;
-    border: none;
-    color: $dark-gray;
-    padding: 0;
-
-    &::before {
-      color: $gray;
-    }
   }
 }
 

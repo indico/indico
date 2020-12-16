@@ -19,7 +19,6 @@ from sqlalchemy.orm import joinedload, load_only, subqueryload
 from sqlalchemy.orm.exc import StaleDataError
 from webargs import validate
 from werkzeug.exceptions import BadRequest, Forbidden, NotFound
-from werkzeug.http import parse_date
 
 from indico.core import signals
 from indico.core.auth import multipass
@@ -44,7 +43,7 @@ from indico.modules.users.models.users import ProfilePictureSource
 from indico.modules.users.operations import create_user
 from indico.modules.users.schemas import BasicCategorySchema
 from indico.modules.users.util import (get_gravatar_for_user, get_linked_events, get_related_categories,
-                                       get_suggested_categories, merge_users, search_users, serialize_user,
+                                       get_suggested_categories, merge_users, search_users, send_avatar, serialize_user,
                                        set_user_avatar)
 from indico.modules.users.views import WPUser, WPUserDashboard, WPUserFavorites, WPUserProfilePic, WPUsersAdmin
 from indico.util.date_time import now_utc
@@ -58,7 +57,7 @@ from indico.web.flask.templating import get_template_module
 from indico.web.flask.util import send_file, url_for
 from indico.web.forms.base import FormDefaults
 from indico.web.http_api.metadata import Serializer
-from indico.web.rh import RHProtected, RHTokenProtected
+from indico.web.rh import RH, RHProtected, RHTokenProtected
 from indico.web.util import jsonify_data, jsonify_form, jsonify_template
 
 
@@ -223,22 +222,14 @@ class RHProfilePicturePreview(RHUserBase):
             return send_file('avatar.png', BytesIO(gravatar), mimetype='image/png')
 
 
-class RHProfilePictureDisplay(RHUserBase):
+class RHProfilePictureDisplay(RH):
     """Display the user's profile picture."""
 
-    allow_system_user = True
+    def _process_args(self):
+        self.user = User.get_or_404(request.view_args['user_id'], is_deleted=False)
 
     def _process(self):
-        if self.user.picture_source == ProfilePictureSource.standard:
-            first_name = self.user.first_name[0].upper() if self.user.first_name else ''
-            avatar = render_template('users/avatar.svg', bg_color=self.user.avatar_bg_color, text=first_name)
-            return send_file('avatar.svg', BytesIO(avatar.encode()), mimetype='image/svg+xml',
-                             no_cache=False, inline=True, safe=False, cache_timeout=(86400*7))
-
-        metadata = self.user.picture_metadata
-        return send_file('avatar.png', BytesIO(self.user.picture), mimetype=metadata['content_type'],
-                         inline=True, conditional=True, last_modified=parse_date(metadata['lastmod']),
-                         cache_timeout=(86400*7))
+        return send_avatar(self.user)
 
 
 class RHSaveProfilePicture(RHUserBase):

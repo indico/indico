@@ -34,6 +34,7 @@ from indico.util.locators import locator_property
 from indico.util.signals import values_from_signal
 from indico.util.string import format_full_name, format_repr, strict_str
 from indico.util.struct.enum import RichIntEnum
+from indico.web.flask.util import url_for
 
 
 class RegistrationState(RichIntEnum):
@@ -320,6 +321,11 @@ class Registration(db.Model):
     def display_full_name(self):
         """Return the full name using the user's preferred name format."""
         return format_display_full_name(session.user, self)
+
+    @property
+    def avatar_url(self):
+        """Return the url of the user's avatar."""
+        return url_for('event_registration.registration_avatar', self)
 
     @property
     def is_ticket_blocked(self):

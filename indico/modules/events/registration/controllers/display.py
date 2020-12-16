@@ -28,6 +28,7 @@ from indico.modules.events.registration.util import (check_registration_email, c
 from indico.modules.events.registration.views import (WPDisplayRegistrationFormConference,
                                                       WPDisplayRegistrationFormSimpleEvent,
                                                       WPDisplayRegistrationParticipantList)
+from indico.modules.users.util import send_avatar, send_default_avatar
 from indico.util.fs import secure_filename
 from indico.util.i18n import _
 from indico.web.flask.util import send_file, url_for
@@ -392,3 +393,27 @@ class RHTicketDownload(RHRegistrationFormRegistrationBase):
     def _process(self):
         filename = secure_filename(f'{self.event.title}-Ticket.pdf', 'ticket.pdf')
         return send_file(filename, generate_ticket(self.registration), 'application/pdf')
+
+
+class RHRegistrationAvatar(RHDisplayEventBase):
+    """Display a standard avatar for a registration based on the full name."""
+
+    normalize_url_spec = {
+        'locators': {
+            lambda self: self.registration
+        }
+    }
+
+    def _process_args(self):
+        RHDisplayEventBase._process_args(self)
+        self.registration = (Registration.query
+                             .filter(Registration.id == request.view_args['registration_id'],
+                                     ~Registration.is_deleted,
+                                     ~RegistrationForm.is_deleted)
+                             .join(Registration.registration_form)
+                             .one())
+
+    def _process(self):
+        if self.registration.user:
+            return send_avatar(self.registration.user)
+        return send_default_avatar(self.registration.full_name)

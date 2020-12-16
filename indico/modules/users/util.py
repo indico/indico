@@ -13,11 +13,11 @@ from io import BytesIO
 from operator import itemgetter
 
 import requests
-from flask import session
+from flask import render_template, session
 from PIL import Image
 from sqlalchemy.orm import contains_eager, joinedload, load_only, undefer
 from sqlalchemy.sql.expression import nullslast
-from werkzeug.http import http_date
+from werkzeug.http import http_date, parse_date
 
 from indico.core import signals
 from indico.core.auth import multipass
@@ -33,11 +33,13 @@ from indico.modules.users.models.affiliations import UserAffiliation
 from indico.modules.users.models.emails import UserEmail
 from indico.modules.users.models.favorites import favorite_user_table
 from indico.modules.users.models.suggestions import SuggestedCategory
+from indico.modules.users.models.users import ProfilePictureSource
 from indico.util.date_time import now_utc
 from indico.util.event import truncate_path
 from indico.util.fs import secure_filename
 from indico.util.i18n import _
 from indico.util.string import crc32, remove_accents
+from indico.web.flask.util import send_file
 
 
 # colors for user-specific avatar bubbles
@@ -418,3 +420,19 @@ def set_user_avatar(user, avatar, filename, lastmod=None):
         'content_type': 'image/png',
         'lastmod': lastmod,
     }
+
+
+def send_default_avatar(name):
+    avatar = render_template('users/avatar.svg', bg_color=get_color_for_username(name), text=name[0].upper())
+    return send_file('avatar.svg', BytesIO(avatar.encode()), mimetype='image/svg+xml',
+                     no_cache=False, inline=True, safe=False, cache_timeout=(86400*7))
+
+
+def send_avatar(user):
+    if user.picture_source == ProfilePictureSource.standard:
+        return send_default_avatar(user.full_name)
+
+    metadata = user.picture_metadata
+    return send_file('avatar.png', BytesIO(user.picture), mimetype=metadata['content_type'],
+                     inline=True, conditional=True, last_modified=parse_date(metadata['lastmod']),
+                     cache_timeout=(86400*7))
