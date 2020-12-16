@@ -10,7 +10,8 @@ import searchContributionsURL from 'indico-url:search.search_contributions';
 import searchEventsURL from 'indico-url:search.search_events';
 import searchFilesURL from 'indico-url:search.search_files';
 
-import React, {useEffect, useReducer, useState} from 'react';
+import PropTypes from 'prop-types';
+import React, {useEffect, useReducer, useState, useMemo} from 'react';
 import {Loader, Menu, Grid} from 'semantic-ui-react';
 import {useQueryParam, StringParam} from 'use-query-params';
 
@@ -46,7 +47,7 @@ function useSearch(url, outerQuery) {
     dispatch({type: 'SET_QUERY', query: outerQuery});
   }, [outerQuery]);
 
-  const {data, loading} = useIndicoAxios({
+  const {data, error, loading} = useIndicoAxios({
     url,
     camelize: true,
     options: {params: {q: query, page}},
@@ -59,19 +60,22 @@ function useSearch(url, outerQuery) {
   };
 
   return [
-    {
-      page: data ? data.page : 1,
-      pages: data ? data.pages : 1,
-      total: data ? data.total : -1,
-      data: data ? data.results : [],
-      loading,
-    },
+    useMemo(
+      () => ({
+        page: data?.page || 1,
+        pages: data?.pages || 1,
+        total: data?.total || 0,
+        data: data?.results || [],
+        // ensure the initial state is loading, as the data is undefined
+        loading: (!data && !error) || loading,
+      }),
+      [data, error, loading]
+    ),
     setPage,
   ];
 }
 
-// eslint-disable-next-line react/prop-types
-function SearchTypeMenuItem({name, active, title, total, loading, onClick}) {
+function SearchTypeMenuItem({index, active, title, total, loading, onClick}) {
   let indicator = null;
   if (loading) {
     indicator = <Loader active inline size="tiny" />;
@@ -79,77 +83,56 @@ function SearchTypeMenuItem({name, active, title, total, loading, onClick}) {
     indicator = ` (${total})`;
   }
   return (
-    <Menu.Item name={name} active={active} onClick={onClick} disabled={loading || !total}>
+    <Menu.Item index={index} active={active} onClick={onClick} disabled={loading || !total}>
       {title}
       {indicator}
     </Menu.Item>
   );
 }
 
+SearchTypeMenuItem.propTypes = {
+  index: PropTypes.number.isRequired,
+  title: PropTypes.string.isRequired,
+  active: PropTypes.bool,
+  total: PropTypes.number,
+  loading: PropTypes.bool,
+  onClick: PropTypes.func,
+};
+
+SearchTypeMenuItem.defaultProps = {
+  total: 0,
+  active: false,
+  loading: false,
+  onClick: undefined,
+};
+
 export default function SearchApp() {
   const [query, setQuery] = useQueryParam('q', StringParam);
-  const [activeMenuItem, setActiveMenuItem] = useState('categories');
-  const handleClick = (e, {name}) => {
-    setActiveMenuItem(name);
+  const [activeMenuItem, setActiveMenuItem] = useState(0);
+  const handleClick = (e, {index}) => {
+    setActiveMenuItem(index);
   };
 
   const [categoryResults, setCategoryPage] = useSearch(searchCategoriesURL(), query);
   const [eventResults, setEventPage] = useSearch(searchEventsURL(), query);
   const [contributionResults, setContributionPage] = useSearch(searchContributionsURL(), query);
   const [fileResults, setFilePage] = useSearch(searchFilesURL(), query);
-  const [results, setResults] = useState('initial state');
-  const resultMap = {
-    categories: categoryResults,
-    events: eventResults,
-    contributions: contributionResults,
-    files: fileResults,
-  };
-  const resultTypes = ['categories', 'events', 'contributions', 'files'];
+  const searchMap = [
+    ['Categories', categoryResults, setCategoryPage, Category],
+    ['Events', eventResults, setEventPage, Event],
+    ['Contributions', contributionResults, setContributionPage, Contribution],
+    ['Materials', fileResults, setFilePage, File],
+  ];
+  // eslint-disable-next-line no-unused-vars
+  const [_, results, setPage, Component] = searchMap[activeMenuItem];
+  const isAnyLoading = searchMap.some(x => x[1].loading);
 
+  // On every search, the tab will be either the first loading or with results
+  const menuItem = searchMap.findIndex(x => x[1].loading || x[1].total > 0);
+  // TODO: we could make this initially uncontrolled, but if the user controls it, it no longer changes
   useEffect(() => {
-    if (resultMap[activeMenuItem].total !== 0) {
-      // don't switch if the currently active type has results
-      return;
-    }
-
-    const firstTypeWithResults = resultTypes.find(x => resultMap[x].total > 0);
-    if (firstTypeWithResults) {
-      setActiveMenuItem(firstTypeWithResults);
-      return;
-    }
-
-    const firstTypeStillSearching = resultTypes.find(x => resultMap[x].loading);
-    if (firstTypeStillSearching) {
-      setActiveMenuItem(firstTypeStillSearching);
-      return;
-    }
-  }, [
-    activeMenuItem,
-    categoryResults,
-    eventResults,
-    contributionResults,
-    fileResults,
-    resultMap,
-    resultTypes,
-  ]);
-
-  // handle the correct rendering of NoResults Placeholder
-  useEffect(() => {
-    if (Object.values(resultMap).some(x => x.total === -1)) {
-      setResults('initial state');
-      return;
-    }
-    // if (Object.values(resultMap).some(x => x.loading)) {
-    //   setResults('loading');
-    //   return;
-    // }
-    const firstTypeWithResults = resultTypes.find(x => resultMap[x].total !== 0);
-    if (firstTypeWithResults) {
-      setResults('loaded');
-      return;
-    }
-    setResults('empty');
-  }, [resultMap, resultTypes]);
+    setActiveMenuItem(Math.max(0, menuItem));
+  }, [menuItem]);
 
   const handleQuery = value => setQuery(value, 'pushIn');
 
@@ -163,82 +146,27 @@ export default function SearchApp() {
         {query && (
           <>
             <Menu pointing secondary>
-              <SearchTypeMenuItem
-                name="categories"
-                active={activeMenuItem === 'categories' && results !== 'empty'}
-                title={Translate.string('Categories')}
-                total={categoryResults.total}
-                loading={categoryResults.loading}
-                onClick={handleClick}
-              />
-              <SearchTypeMenuItem
-                name="events"
-                active={activeMenuItem === 'events' && results !== 'empty'}
-                title={Translate.string('Events')}
-                total={eventResults.total}
-                loading={eventResults.loading}
-                onClick={handleClick}
-              />
-              <SearchTypeMenuItem
-                name="contributions"
-                active={activeMenuItem === 'contributions' && results !== 'empty'}
-                title={Translate.string('Contributions')}
-                total={contributionResults.total}
-                loading={contributionResults.loading}
-                onClick={handleClick}
-              />
-              <SearchTypeMenuItem
-                name="files"
-                active={activeMenuItem === 'files' && results !== 'empty'}
-                title={Translate.string('Materials')}
-                total={fileResults.total}
-                loading={fileResults.loading}
-                onClick={handleClick}
-              />
+              {searchMap.map(([_label, _results], idx) => (
+                <SearchTypeMenuItem
+                  key={_label}
+                  index={idx}
+                  active={activeMenuItem === idx}
+                  title={Translate.string(_label)}
+                  total={_results.total}
+                  loading={_results.loading}
+                  onClick={handleClick}
+                />
+              ))}
             </Menu>
-            {results !== 'empty' ? (
-              <>
-                {activeMenuItem === 'categories' && (
-                  <ResultList
-                    component={Category}
-                    page={categoryResults.page}
-                    numPages={categoryResults.pages}
-                    data={categoryResults.data}
-                    onPageChange={setCategoryPage}
-                    loading={categoryResults.loading}
-                  />
-                )}
-                {activeMenuItem === 'events' && (
-                  <ResultList
-                    component={Event}
-                    page={eventResults.page}
-                    numPages={eventResults.pages}
-                    data={eventResults.data}
-                    onPageChange={setEventPage}
-                    loading={eventResults.loading}
-                  />
-                )}
-                {activeMenuItem === 'contributions' && (
-                  <ResultList
-                    component={Contribution}
-                    page={contributionResults.page}
-                    numPages={contributionResults.pages}
-                    data={contributionResults.data}
-                    onPageChange={setContributionPage}
-                    loading={contributionResults.loading}
-                  />
-                )}
-                {activeMenuItem === 'files' && (
-                  <ResultList
-                    component={File}
-                    page={fileResults.page}
-                    numPages={fileResults.pages}
-                    data={fileResults.data}
-                    onPageChange={setFilePage}
-                    loading={fileResults.loading}
-                  />
-                )}
-              </>
+            {results.total || isAnyLoading ? (
+              <ResultList
+                component={Component}
+                page={results.page}
+                numPages={results.pages}
+                data={results.data}
+                onPageChange={setPage}
+                loading={results.loading}
+              />
             ) : (
               <NoResults query={query} />
             )}
