@@ -22,6 +22,7 @@ Improvements
   form (:pr:`4741`)
 - Improve video conference linking dropdown for contributions/sessions (hide unscheduled,
   show start time) (:pr:`4753`)
+- Show vc room join buttons in the timetable(direct and in ballons)(:pr:`4746`, thanks :user:`bpedersen2`)
 
 Bugfixes
 ^^^^^^^^
