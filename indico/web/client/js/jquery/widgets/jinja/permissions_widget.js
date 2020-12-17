@@ -8,11 +8,11 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 
-import {GroupSearch} from 'indico/react/components/principals/Search';
-import {PersonLinkSearch} from 'indico/react/components/principals/PersonLinkSearch';
+import {GroupSearch, UserSearch} from 'indico/react/components/principals/Search';
 import {Translate} from 'indico/react/i18n';
 import Palette from 'indico/utils/palette';
 import {PrincipalType} from 'indico/react/components/principals/util';
+import {FavoritesProvider} from 'indico/react/hooks';
 
 (function($) {
   const FULL_ACCESS_PERMISSIONS = '_full_access';
@@ -478,48 +478,54 @@ import {PrincipalType} from 'indico/react/components/principals/util';
       );
 
       ReactDOM.render(
-        <>
-          <PersonLinkSearch
-            existing={existing.filter(e => e.startsWith('User'))}
-            onAddItems={e => {
-              const items = e.map(({identifier, userId, name, firstName, lastName}) => ({
-                identifier,
-                name,
-                id: userId,
-                familyName: lastName,
-                firstName,
-                _type: 'Avatar',
-              }));
-              this._addItems(items, [READ_ACCESS_PERMISSIONS]);
-            }}
-            withExternalUsers={false}
-            triggerFactory={userSearchTrigger}
-          />
-          <GroupSearch
-            existing={existing.filter(e => e.startsWith('Group'))}
-            onAddItems={e => {
-              const items = e.map(({identifier, name, type, provider}) => {
-                let id;
-                if (type === PrincipalType.localGroup) {
-                  const splitIdentifier = identifier.split(':');
-                  id = splitIdentifier[splitIdentifier.length - 1];
-                } else {
-                  id = name;
-                }
-                return {
-                  identifier,
-                  name,
-                  provider,
-                  _type:
-                    type === PrincipalType.localGroup ? 'LocalGroupWrapper' : 'LDAPGroupWrapper',
-                  id,
-                };
-              });
-              this._addItems(items, [READ_ACCESS_PERMISSIONS]);
-            }}
-            triggerFactory={groupSearchTrigger}
-          />
-        </>,
+        <FavoritesProvider>
+          {([favorites]) => (
+            <>
+              <UserSearch
+                favorites={favorites}
+                existing={existing.filter(e => e.startsWith('User'))}
+                onAddItems={e => {
+                  const items = e.map(({identifier, userId, name, firstName, lastName}) => ({
+                    identifier,
+                    name,
+                    id: userId,
+                    familyName: lastName,
+                    firstName,
+                    _type: 'Avatar',
+                  }));
+                  this._addItems(items, [READ_ACCESS_PERMISSIONS]);
+                }}
+                triggerFactory={userSearchTrigger}
+              />
+              <GroupSearch
+                existing={existing.filter(e => e.startsWith('Group'))}
+                onAddItems={e => {
+                  const items = e.map(({identifier, name, type, provider}) => {
+                    let id;
+                    if (type === PrincipalType.localGroup) {
+                      const splitIdentifier = identifier.split(':');
+                      id = splitIdentifier[splitIdentifier.length - 1];
+                    } else {
+                      id = name;
+                    }
+                    return {
+                      identifier,
+                      name,
+                      provider,
+                      _type:
+                        type === PrincipalType.localGroup
+                          ? 'LocalGroupWrapper'
+                          : 'LDAPGroupWrapper',
+                      id,
+                    };
+                  });
+                  this._addItems(items, [READ_ACCESS_PERMISSIONS]);
+                }}
+                triggerFactory={groupSearchTrigger}
+              />{' '}
+            </>
+          )}
+        </FavoritesProvider>,
         document.getElementById('js-add-user-group')
       );
 

@@ -13,7 +13,8 @@ import ReactDOM from 'react-dom';
 
 import {Translate} from 'indico/react/i18n';
 
-import {PersonLinkSearch} from 'indico/react/components/principals/PersonLinkSearch';
+import {UserSearch} from 'indico/react/components/principals/Search';
+import {FavoritesProvider} from 'indico/react/hooks';
 
 (function(global) {
   'use strict';
@@ -494,29 +495,34 @@ import {PersonLinkSearch} from 'indico/react/components/principals/PersonLinkSea
     };
 
     ReactDOM.render(
-      <PersonLinkSearch
-        existing={existing}
-        onAddItems={people => {
-          $field.principalfield(
-            'add',
-            people.map(({identifier, id, name, firstName, lastName, email, affiliation}) => ({
-              identifier,
-              name,
-              id,
-              familyName: lastName,
-              firstName,
-              email,
-              affiliation,
-              _type: getLegacyType(identifier),
-            }))
-          );
-        }}
-        disabled={options.disableUserSearch}
-        withExternalUsers={options.allow.externalUsers}
-        triggerFactory={searchTrigger}
-        withEventPersons={options.eventId !== null}
-        eventId={options.eventId}
-      />,
+      <FavoritesProvider>
+        {([favorites]) => (
+          <UserSearch
+            favorites={favorites}
+            existing={existing}
+            onAddItems={people => {
+              $field.principalfield(
+                'add',
+                people.map(({identifier, id, name, firstName, lastName, email, affiliation}) => ({
+                  identifier,
+                  name,
+                  id,
+                  familyName: lastName,
+                  firstName,
+                  email,
+                  affiliation,
+                  _type: getLegacyType(identifier),
+                }))
+              );
+            }}
+            disabled={options.disableUserSearch}
+            withExternalUsers={options.allow.externalUsers}
+            triggerFactory={searchTrigger}
+            withEventPersons={options.eventId !== null}
+            eventId={options.eventId}
+          />
+        )}
+      </FavoritesProvider>,
       document.getElementById(`principalField-${options.fieldId}`)
     );
   };
