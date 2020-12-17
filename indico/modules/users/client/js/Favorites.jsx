@@ -26,18 +26,9 @@ window.setupFavoriteSelection = function setupFavoriteSelection(userId) {
 };
 
 function FavoriteManager({userId}) {
-  const [favoriteUsers, [addFavoriteUser, deleteFavoriteUser], loading] = useFavoriteUsers(userId);
-
-  if (loading) {
-    return <Loader active />;
-  }
   return (
     <>
-      <FavoriteUserManager
-        favoriteUsers={favoriteUsers}
-        addFavoriteUser={addFavoriteUser}
-        deleteFavoriteUser={deleteFavoriteUser}
-      />
+      <FavoriteUserManager userId={userId} />
       <FavoriteCatManager userId={userId} />
     </>
   );
@@ -88,7 +79,7 @@ function FavoriteCatManager({userId}) {
         </div>
         <div className="i-box-content">
           {favoriteCats !== null && Object.keys(favoriteCats).length > 0 ? (
-            <List relaxed celled styleName="fav-list">
+            <List celled styleName="fav-list">
               {Object.values(favoriteCats).map(cat => (
                 <List.Item key={cat.id} styleName="fav-item">
                   <List.Content>
@@ -140,7 +131,9 @@ FavoriteCatManager.defaultProps = {
   userId: null,
 };
 
-function FavoriteUserManager({favoriteUsers, addFavoriteUser, deleteFavoriteUser}) {
+function FavoriteUserManager({userId}) {
+  const [favoriteUsers, [addFavoriteUser, deleteFavoriteUser], loading] = useFavoriteUsers(userId);
+
   const searchTrigger = triggerProps => (
     <Button {...triggerProps} styleName="submit-button">
       <Translate>Add Indico user</Translate>
@@ -155,27 +148,31 @@ function FavoriteUserManager({favoriteUsers, addFavoriteUser, deleteFavoriteUser
           </div>
         </div>
         <div className="i-box-content">
-          {favoriteUsers !== null && Object.keys(favoriteUsers).length > 0 ? (
-            <List relaxed celled styleName="fav-list">
-              {Object.values(_.orderBy(favoriteUsers, ['name'])).map(user => (
-                <List.Item key={user.identifier} styleName="fav-item">
-                  <div styleName="list-flex">
-                    <span>{user.name}</span>
-                    <Popup
-                      trigger={
-                        <Icon name="close" onClick={() => deleteFavoriteUser(user.userId)} link />
-                      }
-                      content={Translate.string('Remove from favourites')}
-                      position="bottom center"
-                    />
-                  </div>
-                </List.Item>
-              ))}
-            </List>
+          {!loading ? (
+            favoriteUsers !== null && Object.keys(favoriteUsers).length > 0 ? (
+              <List celled styleName="fav-list">
+                {Object.values(_.orderBy(favoriteUsers, ['name'])).map(user => (
+                  <List.Item key={user.identifier} styleName="fav-item">
+                    <div styleName="list-flex">
+                      <span>{user.name}</span>
+                      <Popup
+                        trigger={
+                          <Icon name="close" onClick={() => deleteFavoriteUser(user.userId)} link />
+                        }
+                        content={Translate.string('Remove from favourites')}
+                        position="bottom center"
+                      />
+                    </div>
+                  </List.Item>
+                ))}
+              </List>
+            ) : (
+              <div styleName="empty-favorites">
+                <Translate>You have not marked any user as favourite.</Translate>
+              </div>
+            )
           ) : (
-            <div styleName="empty-favorites">
-              <Translate>You have not marked any user as favourite.</Translate>
-            </div>
+            <Loader active inline styleName="fav-user-loader" />
           )}
         </div>
       </div>
@@ -189,7 +186,9 @@ function FavoriteUserManager({favoriteUsers, addFavoriteUser, deleteFavoriteUser
 }
 
 FavoriteUserManager.propTypes = {
-  favoriteUsers: PropTypes.objectOf(PropTypes.object).isRequired,
-  addFavoriteUser: PropTypes.func.isRequired,
-  deleteFavoriteUser: PropTypes.func.isRequired,
+  userId: PropTypes.number,
+};
+
+FavoriteUserManager.defaultProps = {
+  userId: null,
 };
