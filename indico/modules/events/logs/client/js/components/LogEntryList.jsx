@@ -88,7 +88,12 @@ class LogEntry extends React.PureComponent {
             <time dateTime={entry.time}>{moment(entry.time).fromNow()}</time>
           </span>
           {entry.user.avatarURL ? (
-            <Image avatar src={entry.user.avatarURL} className="user-picture" />
+            <Image
+              avatar
+              title={entry.user.fullName}
+              src={entry.user.avatarURL}
+              className="user-picture ui-qtip"
+            />
           ) : (
             ''
           )}
