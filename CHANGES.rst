@@ -7,6 +7,11 @@ Version 2.3.3
 
 *Unreleased*
 
+Internationalization
+^^^^^^^^^^^^^^^^^^^^
+
+- New translation: Ukrainian
+
 Improvements
 ^^^^^^^^^^^^
 

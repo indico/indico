@@ -92,7 +92,13 @@ class IndicoSession(BaseSession):
         parts = self.lang.lower().split('_')  # e.g. `en_GB` or `zh_Hans_CN`
         lang = parts[0]
         territory = parts[-1]
-        if lang == territory:
+        if lang == territory or lang == 'uk':
+            # TODO we should add some metadata that stores the canonical locale name and
+            # the name of the moment locale to avoid hacks like the one here. for example,
+            # fr_FR is handled somewhat nicely, but ukrainian (uk_UA) needs an explicit check
+            # since it's a single-country locale but locale and territory name are different..
+            # `setMomentLocale` in JS has the same problem, so any fix here should be applied
+            # over there as well.
             return lang
         else:
             return '{}-{}'.format(lang, territory)
