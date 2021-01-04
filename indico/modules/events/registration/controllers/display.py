@@ -9,7 +9,7 @@ from operator import attrgetter
 from uuid import UUID
 
 from flask import flash, jsonify, redirect, request, session
-from sqlalchemy.orm import contains_eager, subqueryload
+from sqlalchemy.orm import contains_eager, joinedload, lazyload, load_only, subqueryload
 from werkzeug.exceptions import Forbidden, NotFound
 
 from indico.modules.auth.util import redirect_to_login
@@ -411,6 +411,11 @@ class RHRegistrationAvatar(RHDisplayEventBase):
                                      ~Registration.is_deleted,
                                      ~RegistrationForm.is_deleted)
                              .join(Registration.registration_form)
+                             .options(load_only('id', 'registration_form_id', 'first_name', 'last_name'),
+                                      lazyload('*'),
+                                      joinedload('registration_form').load_only('id', 'event_id'),
+                                      joinedload('user').load_only('id', 'first_name', 'last_name', 'title',
+                                                                   'picture_source', 'picture_metadata', 'picture'))
                              .one())
 
     def _process(self):
