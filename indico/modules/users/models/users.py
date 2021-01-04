@@ -541,6 +541,8 @@ class User(PersonMixin, db.Model):
 
     @property
     def avatar_url(self):
+        if self.is_system:
+            return url_for('assets.image', filename='robot.svg')
         slug = self.picture_metadata['hash'] if self.picture_metadata else 'default'
         return url_for('users.user_profile_picture_display', self, slug=slug)
 
