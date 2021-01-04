@@ -15,7 +15,8 @@ Major Features
 Improvements
 ^^^^^^^^^^^^
 
-- TODO
+- Show the user's profile picture in many more places (:issue:`4625`, :pr:`4747`)
+- Use a more modern search dialog when searching for users (:issue:`4674`, :pr:`4743`)
 
 Internal Changes
 ^^^^^^^^^^^^^^^^
