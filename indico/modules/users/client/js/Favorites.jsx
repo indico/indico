@@ -44,6 +44,7 @@ FavoriteManager.defaultProps = {
 
 function FavoriteCatManager({userId}) {
   const [favoriteCats, setFavoriteCats] = useState(null);
+  const [loading, setLoading] = useState(true);
 
   const getFavoriteCats = useCallback(async () => {
     let res;
@@ -54,6 +55,7 @@ function FavoriteCatManager({userId}) {
       return;
     }
     setFavoriteCats(res.data);
+    setLoading(false);
   }, [userId]);
 
   useEffect(() => {
@@ -78,7 +80,9 @@ function FavoriteCatManager({userId}) {
           </div>
         </div>
         <div className="i-box-content">
-          {favoriteCats !== null && Object.keys(favoriteCats).length > 0 ? (
+          {loading ? (
+            <Loader active inline styleName="fav-loader" />
+          ) : favoriteCats !== null && Object.keys(favoriteCats).length > 0 ? (
             <List celled styleName="fav-list">
               {Object.values(favoriteCats).map(cat => (
                 <List.Item key={cat.id} styleName="fav-item">
@@ -148,31 +152,29 @@ function FavoriteUserManager({userId}) {
           </div>
         </div>
         <div className="i-box-content">
-          {!loading ? (
-            favoriteUsers !== null && Object.keys(favoriteUsers).length > 0 ? (
-              <List celled styleName="fav-list">
-                {Object.values(_.orderBy(favoriteUsers, ['name'])).map(user => (
-                  <List.Item key={user.identifier} styleName="fav-item">
-                    <div styleName="list-flex">
-                      <span>{user.name}</span>
-                      <Popup
-                        trigger={
-                          <Icon name="close" onClick={() => deleteFavoriteUser(user.userId)} link />
-                        }
-                        content={Translate.string('Remove from favourites')}
-                        position="bottom center"
-                      />
-                    </div>
-                  </List.Item>
-                ))}
-              </List>
-            ) : (
-              <div styleName="empty-favorites">
-                <Translate>You have not marked any user as favourite.</Translate>
-              </div>
-            )
+          {loading ? (
+            <Loader active inline styleName="fav-loader" />
+          ) : favoriteUsers !== null && Object.keys(favoriteUsers).length > 0 ? (
+            <List celled styleName="fav-list">
+              {Object.values(_.orderBy(favoriteUsers, ['name'])).map(user => (
+                <List.Item key={user.identifier} styleName="fav-item">
+                  <div styleName="list-flex">
+                    <span>{user.name}</span>
+                    <Popup
+                      trigger={
+                        <Icon name="close" onClick={() => deleteFavoriteUser(user.userId)} link />
+                      }
+                      content={Translate.string('Remove from favourites')}
+                      position="bottom center"
+                    />
+                  </div>
+                </List.Item>
+              ))}
+            </List>
           ) : (
-            <Loader active inline styleName="fav-user-loader" />
+            <div styleName="empty-favorites">
+              <Translate>You have not marked any user as favourite.</Translate>
+            </div>
           )}
         </div>
       </div>
