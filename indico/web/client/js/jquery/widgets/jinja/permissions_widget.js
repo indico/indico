@@ -460,7 +460,7 @@ import {FavoritesProvider} from 'indico/react/hooks';
         this._render();
       });
 
-      // Manage the addition to users/groups to the acl
+      // Manage adding users/groups to the acl
       const userSearchTrigger = triggerProps => (
         <a className="i-button" {...triggerProps}>
           <Translate>User</Translate>
@@ -522,7 +522,7 @@ import {FavoritesProvider} from 'indico/react/hooks';
                   this._addItems(items, [READ_ACCESS_PERMISSIONS]);
                 }}
                 triggerFactory={groupSearchTrigger}
-              />{' '}
+              />
             </>
           )}
         </FavoritesProvider>,
