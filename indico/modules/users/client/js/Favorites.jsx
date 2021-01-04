@@ -94,7 +94,7 @@ function FavoriteCatManager({userId}) {
                         </a>
                         <br />
                         <TooltipIfTruncated>
-                          <span styleName="category-path">
+                          <span styleName="detail">
                             {cat.chain_titles.slice(0, -1).join(' » ')}
                           </span>
                         </TooltipIfTruncated>
@@ -102,7 +102,7 @@ function FavoriteCatManager({userId}) {
                       <Popup
                         trigger={
                           <Icon
-                            styleName="delete-category"
+                            styleName="delete-button"
                             name="close"
                             onClick={() => deleteFavoriteCat(cat.id)}
                             link
@@ -159,10 +159,21 @@ function FavoriteUserManager({userId}) {
               {Object.values(_.orderBy(favoriteUsers, ['name'])).map(user => (
                 <List.Item key={user.identifier} styleName="fav-item">
                   <div styleName="list-flex">
-                    <span>{user.name}</span>
+                    <div>
+                      <span>{user.name}</span>
+                      <br />
+                      <TooltipIfTruncated>
+                        <span styleName="detail">{user.detail}</span>
+                      </TooltipIfTruncated>
+                    </div>
                     <Popup
                       trigger={
-                        <Icon name="close" onClick={() => deleteFavoriteUser(user.userId)} link />
+                        <Icon
+                          styleName="delete-button"
+                          name="close"
+                          onClick={() => deleteFavoriteUser(user.userId)}
+                          link
+                        />
                       }
                       content={Translate.string('Remove from favourites')}
                       position="bottom center"
