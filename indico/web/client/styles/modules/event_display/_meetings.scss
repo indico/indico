@@ -153,6 +153,10 @@ li > table + .note-area-wrapper {
 }
 
 .ui.image.label.meeting-participant {
+  @extend %font-family-modern-body;
+  font-weight: normal;
+  font-size: 0.95em;
+
   display: inline-block;
   margin-bottom: 4px;
   margin-left: 0.2em;
