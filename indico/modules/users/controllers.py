@@ -62,7 +62,7 @@ from indico.web.util import jsonify_data, jsonify_form, jsonify_template
 
 
 IDENTITY_ATTRIBUTES = {'first_name', 'last_name', 'email', 'affiliation', 'full_name'}
-UserEntry = namedtuple('UserEntry', IDENTITY_ATTRIBUTES | {'profile_url', 'user'})
+UserEntry = namedtuple('UserEntry', IDENTITY_ATTRIBUTES | {'profile_url', 'avatar_url', 'user'})
 
 
 def get_events_in_categories(category_ids, user, limit=10):
@@ -499,18 +499,26 @@ class RHUsersAdmin(RHAdminBase):
             for entry in matches:
                 if isinstance(entry, User):
                     search_results.append(UserEntry(
+                        avatar_url=entry.avatar_url,
                         profile_url=url_for('.user_profile', entry),
                         user=entry,
                         **{k: getattr(entry, k) for k in IDENTITY_ATTRIBUTES}
                     ))
                 else:
+                    if not entry.data['first_name'] and not entry.data['last_name']:
+                        full_name = '<no name>'
+                        initial = '?'
+                    else:
+                        full_name = f'{entry.data["first_name"]} {entry.data["last_name"]}'.strip()
+                        initial = full_name[0]
                     search_results.append(UserEntry(
+                        avatar_url=url_for('assets.avatar', name=initial),
                         profile_url=None,
                         user=None,
-                        full_name="{first_name} {last_name}".format(**entry.data.to_dict()),
+                        full_name=full_name,
                         **{k: entry.data.get(k) for k in (IDENTITY_ATTRIBUTES - {'full_name'})}
                     ))
-            search_results.sort(key=attrgetter('first_name', 'last_name'))
+            search_results.sort(key=attrgetter('full_name'))
 
         num_reg_requests = RegistrationRequest.query.count()
         return WPUsersAdmin.render_template('users_admin.html', 'users', form=form, search_results=search_results,
