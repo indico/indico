@@ -1,5 +1,5 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
@@ -14,7 +14,7 @@ from indico.core import signals
 from indico.modules.events.contributions import Contribution
 from indico.modules.events.sessions.models.blocks import SessionBlock
 from indico.modules.vc.forms import VCPluginSettingsFormBase
-from indico.modules.vc.models.vc_rooms import VCRoomLinkType
+from indico.modules.vc.models.vc_rooms import VCRoomEventAssociation, VCRoomLinkType
 from indico.util.decorators import classproperty
 from indico.web.flask.templating import get_overridable_template_name
 from indico.web.forms.base import FormDefaults
@@ -126,6 +126,17 @@ class VCPluginMixin:
         name = get_overridable_template_name('management_buttons.html', self, core_prefix='vc/')
         return render_template(name, plugin=self, vc_room=vc_room, event_vc_room=event_vc_room, **kwargs)
 
+    def get_extra_delete_msg(self, vc_room, event_vc_room):
+        """
+        Return a custom message to show in the confirmation dialog
+        when deleting a VC room.
+
+        :param vc_room: the VC room object
+        :param event_vc_room: the association of an event and a VC room
+        :return: a string (may contain HTML) with the message to display
+        """
+        return ''
+
     def render_event_buttons(self, vc_room, event_vc_room, **kwargs):
         """
         Render a list of plugin specific buttons (eg: Join URL, etc)
@@ -192,6 +203,16 @@ class VCPluginMixin:
 
     def create_room(self, vc_room, event):
         raise NotImplementedError('Plugin must implement create_room()')
+
+    def clone_room(self, old_event_vc_room, link_object):
+        """Clone the room, returning a new :class:`VCRoomEventAssociation`.
+
+        :param old_event_vc_room: the original :class:`VCRoomEventAssociation`
+        :param link_object: the new object the association will be tied to
+        :return: the new :class:`VCRoomEventAssociation`
+        """
+        return VCRoomEventAssociation(show=old_event_vc_room.show, data=old_event_vc_room.data,
+                                      link_object=link_object)
 
     def can_manage_vc_rooms(self, user, event):
         """Check if a user can manage vc rooms on an event."""

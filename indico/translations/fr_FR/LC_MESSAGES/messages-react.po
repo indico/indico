@@ -7,7 +7,7 @@
 # 
 msgid ""
 msgstr ""
-"POT-Creation-Date: 2020-10-20 11:37+0100\n"
+"POT-Creation-Date: 2020-12-20 14:00+0100\n"
 "Last-Translator: Thomas Baron <thomas.baron@cern.ch>, 2020\n"
 "Language-Team: French (France) (https://www.transifex.com/indico/teams/6478/fr_FR/)\n"
 "MIME-Version: 1.0\n"
@@ -432,16 +432,16 @@ msgstr "Ce fichier ne se conforme pas au modèle de nom de fichier {template}"
 msgid "Use an existing file"
 msgstr "Utiliser un fichier existant"
 
-#: indico/modules/events/editing/client/js/editing/timeline/FileManager/index.jsx:243
+#: indico/modules/events/editing/client/js/editing/timeline/FileManager/index.jsx:245
 msgid "Filename pattern: {pattern}"
 msgstr "Modèle de nom de fichier: {pattern}"
 
-#: indico/modules/events/editing/client/js/editing/timeline/FileManager/index.jsx:343
+#: indico/modules/events/editing/client/js/editing/timeline/FileManager/index.jsx:345
 #: indico/web/client/js/react/components/files/SingleFileManager.jsx:177
 msgid "Upload in progress"
 msgstr "Téléchargement en cours"
 
-#: indico/modules/events/editing/client/js/editing/timeline/FileManager/index.jsx:357
+#: indico/modules/events/editing/client/js/editing/timeline/FileManager/index.jsx:359
 msgid "No changes yet"
 msgstr "Aucun changement"
 
@@ -531,16 +531,16 @@ msgstr "La période d'édition n'a pas encore commencé."
 msgid "Since you are a manager you can edit anyway."
 msgstr "Comme vous êtes un administrateur vous pouvez quand même modifier."
 
-#: indico/modules/events/editing/client/js/editing/timeline/TimelineItem.jsx:63
-msgid "{submitterName} submitted revision {revisionNumber}"
-msgstr "{submitterName} a soumis la révision {revisionNumber}"
+#: indico/modules/events/editing/client/js/editing/timeline/TimelineItem.jsx:65
+msgid "{submitterName} submitted a revision"
+msgstr "{submitterName} a déposé une révision"
 
-#: indico/modules/events/editing/client/js/editing/timeline/TimelineItem.jsx:76
+#: indico/modules/events/editing/client/js/editing/timeline/TimelineItem.jsx:79
 #: indico/modules/events/papers/client/js/components/TimelineItem.jsx:57
 msgid "Hide old revision"
 msgstr "Cacher l'ancienne révision"
 
-#: indico/modules/events/editing/client/js/editing/timeline/TimelineItem.jsx:78
+#: indico/modules/events/editing/client/js/editing/timeline/TimelineItem.jsx:81
 #: indico/modules/events/papers/client/js/components/TimelineItem.jsx:59
 msgid "Show old revision"
 msgstr "Montrer l'ancienne révision"

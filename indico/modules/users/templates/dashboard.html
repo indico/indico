@@ -49,6 +49,17 @@
                                 </div>
                             {% endif %}
                             {{ labels(user) }}
+                            <br>
+                            <div class="ui small label">
+                                {% trans %}Last login{% endtrans %}
+                                <div class="detail">
+                                    {% if user.last_login_dt %}
+                                        {{ user.last_login_dt | format_datetime }}
+                                    {% else %}
+                                        {% trans %}Never{% endtrans %}
+                                    {% endif %}
+                                </div>
+                            </div>
                         </div>
                         {% if user.affiliation %}
                             <div>

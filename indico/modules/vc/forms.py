@@ -1,5 +1,5 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
@@ -93,7 +93,7 @@ class VCRoomAttachFormBase(VCRoomLinkFormBase):
     room = VCRoomField(
         _("Room to link"), [DataRequired()],
         description=_("Please start writing the name of the room you would like to attach. "
-                      "Indico will suggest existing rooms."))
+                      "Indico will suggest existing rooms. Only rooms created through Indico can be attached."))
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

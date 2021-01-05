@@ -1,5 +1,5 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
@@ -55,6 +55,7 @@ class VCCloner(EventCloner):
                 link_object = self._session_block_map[old_event_vc_room.link_object]
             if link_object is None:
                 continue
-            event_vc_room = VCRoomEventAssociation(show=old_event_vc_room.show, data=old_event_vc_room.data,
-                                                   link_object=link_object)
-            old_event_vc_room.vc_room.events.append(event_vc_room)
+            plugin = old_event_vc_room.vc_room.plugin
+            if not plugin:
+                continue
+            old_event_vc_room.vc_room.events.append(plugin.clone_room(old_event_vc_room, link_object))

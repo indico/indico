@@ -41,6 +41,8 @@
                 {% trans %}The modification period is over{% endtrans %}
             {%- elif registration.registration_form.modification_mode.name == 'allowed_until_payment' -%}
                 {% trans %}Modification is not allowed after payment.{% endtrans %}
+            {%- elif registration.registration_form.modification_mode.name == 'allowed_until_approved' -%}
+                {% trans %}Modification is not allowed once approved.{% endtrans %}
             {%- else -%}
                 {% trans %}The event organizer has disabled data modification.{% endtrans %}
             {%- endif %}

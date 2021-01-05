@@ -1,5 +1,5 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
@@ -490,6 +490,13 @@ class User(PersonMixin, db.Model):
     def secondary_local_identities(self):
         """The local identities of the user except the main one."""
         return self.local_identities - {self.local_identity}
+
+    @property
+    def last_login_dt(self):
+        """The datetime when the user last logged in."""
+        if not self.identities:
+            return None
+        return max(self.identities, key=attrgetter('safe_last_login_dt')).last_login_dt
 
     @locator_property
     def locator(self):

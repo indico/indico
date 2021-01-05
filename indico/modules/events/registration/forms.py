@@ -1,5 +1,5 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
@@ -81,12 +81,18 @@ class RegistrationFormForm(IndicoForm):
     currency = SelectField(_('Currency'), [DataRequired()], description=_('The currency for new registrations'))
     notification_sender_address = StringField(_('Notification sender address'), [IndicoEmail()],
                                               filters=[lambda x: (x or None)])
-    message_pending = TextAreaField(_("Message for pending registrations"),
-                                    description=_("Text included in emails sent to pending registrations"))
-    message_unpaid = TextAreaField(_("Message for unpaid registrations"),
-                                   description=_("Text included in emails sent to unpaid registrations"))
-    message_complete = TextAreaField(_("Message for complete registrations"),
-                                     description=_("Text included in emails sent to complete registrations"))
+    message_pending = TextAreaField(
+        _("Message for pending registrations"),
+        description=_("Text included in emails sent to pending registrations (Markdown syntax)")
+    )
+    message_unpaid = TextAreaField(
+        _("Message for unpaid registrations"),
+        description=_("Text included in emails sent to unpaid registrations (Markdown syntax)")
+    )
+    message_complete = TextAreaField(
+        _("Message for complete registrations"),
+        description=_("Text included in emails sent to complete registrations (Markdown syntax)")
+    )
     manager_notifications_enabled = BooleanField(_('Enabled'), widget=SwitchWidget(),
                                                  description=_("Enable notifications to managers about registrations"))
     manager_notification_recipients = EmailListField(_('List of recipients'),

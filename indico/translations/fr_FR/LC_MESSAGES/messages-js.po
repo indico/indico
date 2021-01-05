@@ -14,8 +14,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Indico\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2020-11-23 11:16+0100\n"
-"PO-Revision-Date: 2020-10-27 10:44+0000\n"
+"POT-Creation-Date: 2020-12-15 14:00+0100\n"
+"PO-Revision-Date: 2020-12-15 16:11+0000\n"
 "Last-Translator: Thomas Baron <thomas.baron@cern.ch>\n"
 "Language-Team: French (France) (http://www.transifex.com/indico/indico/language/fr_FR/)\n"
 "MIME-Version: 1.0\n"
@@ -580,11 +580,11 @@ msgstr "Ajouter un nouveau type"
 msgid "No type"
 msgstr "Aucun type"
 
-#: indico/modules/vc/client/js/index.js:82
+#: indico/modules/vc/client/js/index.js:83
 msgid ""
-"This room has been deleted and cannot be used. \n"
-"                         You can detach it from the event, however."
-msgstr "Cette salle a été supprimée et ne peut pas être utilisée.\nToutefois vous pouvez la détacher de cet événement."
+"This room has been deleted and cannot be used. You can detach it from the "
+"event, however."
+msgstr "Cette salle a été supprimée et ne peut pas être utilisée. Vous pouvez toutefois la détacher de l'événement."
 
 #: indico/modules/vc/client/js/index.js:112
 msgid "Click to toggle collapse status"

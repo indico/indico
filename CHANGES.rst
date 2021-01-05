@@ -31,10 +31,27 @@ Version 2.3.3
 
 *Unreleased*
 
+Improvements
+^^^^^^^^^^^^
+
+- Add a new "Until approved" option for a registration form's "Modification allowed"
+  setting (:pr:`4740`, thanks :user:`vasantvohra`)
+- Show last login time in dashboard (:pr:`4735`, thanks :user:`vasantvohra`)
+- Allow Markdown in the "Message for complete registrations" option of a registration
+  form (:pr:`4741`)
+
 Bugfixes
 ^^^^^^^^
 
-- None so far :)
+- Fix error when converting malformed HTML links to LaTeX
+
+Internal Changes
+^^^^^^^^^^^^^^^^
+
+- Videoconference plugins may now display a custom message for the prompt when deleting
+  a videoconference room (:pr:`4733`)
+- Videoconference plugins may now override the behavior when cloning an event with
+  attached videoconference rooms (:pr:`4732`)
 
 Version 2.3.2
 -------------

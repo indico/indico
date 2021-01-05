@@ -17,7 +17,7 @@ msgstr ""
 "Project-Id-Version: Indico\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
 "POT-Creation-Date: 2020-11-23 11:16+0100\n"
-"PO-Revision-Date: 2020-11-26 16:13+0000\n"
+"PO-Revision-Date: 2020-12-15 16:13+0000\n"
 "Last-Translator: Thomas Baron <thomas.baron@cern.ch>\n"
 "Language-Team: French (France) (http://www.transifex.com/indico/indico/language/fr_FR/)\n"
 "MIME-Version: 1.0\n"
@@ -10705,7 +10705,7 @@ msgstr "Message pour les inscriptions en attente"
 
 #: indico/modules/events/registration/forms.py:87
 msgid "Text included in emails sent to pending registrations"
-msgstr "Texte inclus dans les courriels envoyés aux inscrits en attente"
+msgstr "Texte ajouté aux courriels envoyés aux inscriptions en attente"
 
 #: indico/modules/events/registration/forms.py:88
 msgid "Message for unpaid registrations"
@@ -10713,7 +10713,7 @@ msgstr "Message pour les inscriptions non payées"
 
 #: indico/modules/events/registration/forms.py:89
 msgid "Text included in emails sent to unpaid registrations"
-msgstr "Texte inclus dans les courriels envoyés aux inscrits qu n'ont pas payé"
+msgstr "Texte ajouté aux courriels envoyés aux inscriptions impayées"
 
 #: indico/modules/events/registration/forms.py:90
 msgid "Message for complete registrations"
@@ -10721,7 +10721,7 @@ msgstr "Message pour les inscriptions complêtes"
 
 #: indico/modules/events/registration/forms.py:91
 msgid "Text included in emails sent to complete registrations"
-msgstr "Texte inclus dans les courriels envoyés aux inscrits quand leur inscription est complête"
+msgstr "Texte ajouté aux courriels envoyés aux inscriptions terminées"
 
 #: indico/modules/events/registration/forms.py:93
 msgid "Enable notifications to managers about registrations"
@@ -16048,7 +16048,7 @@ msgstr "Salle à attacher"
 msgid ""
 "Please start writing the name of the room you would like to attach. Indico "
 "will suggest existing rooms."
-msgstr "Veuillez commencer à écrire le nom de la salle que vous coulez attacher. Indico suggérera des salles existantes."
+msgstr "Veuillez commencer à écrire le nom de la salle que vous souhaitez attacher. Indico suggérera des salles existantes."
 
 #: indico/modules/vc/forms.py:109
 msgid "The name of the room."
