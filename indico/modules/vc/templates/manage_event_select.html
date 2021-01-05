@@ -7,7 +7,7 @@
         {% endif %}
     </p>
     <div class="i-badges-list-left i-badges-list-hover">
-        {%- for plugin in plugins %}
+        {%- for plugin in plugins|sort(attribute='title') %}
             {% set action=_("Attach") if attach == '1' else _("Create") %}
             <a href="#" class="js-vc-plugin i-badge i-badge-gray"
                data-href="{{ url_for(vc_room_action, event, service=plugin.service_name) }}"
