@@ -292,6 +292,7 @@ form {
       padding: 0.55em 1em;
       border-radius: 0.3rem 0 0 0.3rem;
       font-size: 0.95em;
+      font-weight: normal;
     }
 
     input {
@@ -299,6 +300,10 @@ form {
       border-top-left-radius: 0;
       border-bottom-left-radius: 0;
       border-left: transparent;
+    }
+
+    input:focus {
+      border-left: 1px solid $blue;
     }
   }
 }
