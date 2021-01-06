@@ -1,6 +1,6 @@
 msgid ""
 msgstr ""
-"POT-Creation-Date: 2020-12-20 14:00+0100\n"
+"POT-Creation-Date: 2021-01-21 09:43+0100\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "MIME-Version: 1.0\n"
@@ -1186,6 +1186,10 @@ msgstr ""
 msgid ""
 "Log entries are currently filtered by URL. {link}Click here{/link} to "
 "disable the filter."
+msgstr ""
+
+#: indico/modules/events/logs/client/js/components/Filter.jsx:26
+msgid "Show"
 msgstr ""
 
 #: indico/modules/events/logs/client/js/components/LogEntryList.jsx:39
