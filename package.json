@@ -46,6 +46,7 @@
     "moment": "^2.29.1",
     "pagedown": "^1.1.0",
     "pagedown-editor": "0.0.10",
+    "process": "^0.11.10",
     "prop-types": "^15.7.2",
     "qs": "^6.9.4",
     "qtip2": "github:indico/qTip2",

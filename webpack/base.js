@@ -283,6 +283,9 @@ export function webpackDefaults(env, config, bundles, isPlugin = false) {
       new MiniCssExtractPlugin({
         filename: 'css/[name].[contenthash:8].css',
       }),
+      new webpack.ProvidePlugin({
+        process: 'process/browser',
+      }),
     ],
     resolve: {
       alias: [{name: 'indico', alias: path.join(indicoClientPath, 'js/')}],
