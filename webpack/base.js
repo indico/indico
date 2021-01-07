@@ -10,33 +10,12 @@ import fs from 'fs';
 import path from 'path';
 
 import autoprefixer from 'autoprefixer';
-import chalk from 'chalk';
 import MiniCssExtractPlugin from 'mini-css-extract-plugin';
 import importOnce from 'node-sass-import-once';
 import postcssURL from 'postcss-url';
-import ProgressBarPlugin from 'progress-bar-webpack-plugin';
 import TerserPlugin from 'terser-webpack-plugin';
 import webpack from 'webpack';
-import ManifestPlugin from 'webpack-manifest-plugin';
-
-class FixedMiniCssExtractPlugin extends MiniCssExtractPlugin {
-  // This very awful workaround prevents a weird `<undefined>.pop()` in the plugin
-  // that's caused by who-knows-what (NOT related to dynamic imports).
-  // See this github issue for details:
-  // https://github.com/webpack-contrib/mini-css-extract-plugin/issues/257
-  renderContentAsset(compilation, chunk, modules, requestShortener) {
-    const [chunkGroup] = chunk.groupsIterable;
-    let rv;
-    const getModuleIndex2 = chunkGroup.getModuleIndex2;
-    try {
-      chunkGroup.getModuleIndex2 = null;
-      rv = super.renderContentAsset(compilation, chunk, modules, requestShortener);
-    } finally {
-      chunkGroup.getModuleIndex2 = getModuleIndex2;
-    }
-    return rv;
-  }
-}
+import {WebpackManifestPlugin} from 'webpack-manifest-plugin';
 
 function _resolveTheme(rootPath, indicoClientPath, filePath) {
   const indicoRelativePath = path.resolve(indicoClientPath, filePath);
@@ -180,7 +159,7 @@ export function webpackDefaults(env, config, bundles, isPlugin = false) {
   function buildSCSSLoader(cssLoaderOptions = {}) {
     return [
       {
-        loader: FixedMiniCssExtractPlugin.loader,
+        loader: MiniCssExtractPlugin.loader,
         options: {
           publicPath: config.build.distURL,
         },
@@ -232,6 +211,7 @@ export function webpackDefaults(env, config, bundles, isPlugin = false) {
 
   return {
     devtool: 'source-map',
+    cache: true,
     context: config.build.clientPath,
     output: {
       path: config.build.distPath,
@@ -267,7 +247,7 @@ export function webpackDefaults(env, config, bundles, isPlugin = false) {
               test: /\.css$/,
               use: [
                 {
-                  loader: FixedMiniCssExtractPlugin.loader,
+                  loader: MiniCssExtractPlugin.loader,
                 },
                 {
                   loader: 'css-loader',
@@ -280,7 +260,7 @@ export function webpackDefaults(env, config, bundles, isPlugin = false) {
               use: buildSCSSLoader({
                 modules: {
                   localIdentContext: path.resolve(globalBuildConfig.clientPath, '../../modules'),
-                  localIdentName: '[path]___[name]__[local]___[hash:base64:5]',
+                  localIdentName: '[path]___[name]__[local]___[contenthash:base64:5]',
                 },
                 importLoaders: 1,
               }),
@@ -294,26 +274,23 @@ export function webpackDefaults(env, config, bundles, isPlugin = false) {
       ],
     },
     plugins: [
-      new ManifestPlugin({
+      new WebpackManifestPlugin({
         fileName: 'manifest.json',
         publicPath: config.build.distURL,
       }),
       // Do not load moment locales (we'll load them explicitly)
       new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/),
-      new FixedMiniCssExtractPlugin({
+      new MiniCssExtractPlugin({
         filename: 'css/[name].[contenthash:8].css',
       }),
-      new ProgressBarPlugin({
-        format:
-          // eslint-disable-next-line prefer-template
-          chalk.cyan('Code being sent to the moon and back \u{1f680} \u{1f311}') +
-          '  [:bar] ' +
-          chalk.green.bold(':percent') +
-          ' (:elapsed seconds)',
+      new webpack.ProvidePlugin({
+        process: 'process/browser',
       }),
     ],
     resolve: {
       alias: [{name: 'indico', alias: path.join(indicoClientPath, 'js/')}],
+      // Webpack 5 does not include polyfills for node.js core modules by default
+      fallback: {path: require.resolve('path-browserify')},
       symlinks: false,
       extensions: ['.js', '.json', '.jsx'],
       modules: nodeModules,
@@ -321,7 +298,7 @@ export function webpackDefaults(env, config, bundles, isPlugin = false) {
     resolveLoader: {
       modules: nodeModules,
     },
-    externals: (context, request, callback) => {
+    externals: ({context, request}, callback) => {
       // tell webpack to make certain packages use window.jQuery (and not load it again)
       if (/^jquery$/.test(request) && /(selectize|fullcalendar)/.test(context)) {
         return callback(null, 'jQuery');
@@ -379,10 +356,6 @@ export function webpackDefaults(env, config, bundles, isPlugin = false) {
             /js\/mathjax(\/unpacked)?\/extensions\/a11y\/mathmaps\/.+\.js$/,
           ],
           extractComments: false,
-          // default options from webpack
-          cache: true,
-          parallel: true,
-          sourceMap: true,
         }),
       ],
     },

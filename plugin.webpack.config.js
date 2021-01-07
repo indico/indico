@@ -10,9 +10,10 @@
 
 const path = require('path');
 const process = require('process');
+
 const glob = require('glob');
-const {mergeWithCustomize, customizeArray} = require('webpack-merge');
 const _ = require('lodash');
+const {mergeWithCustomize, customizeArray} = require('webpack-merge');
 
 const config = require(path.join(process.env.INDICO_PLUGIN_ROOT, 'webpack-build-config'));
 const bundles = require(path.join(process.env.INDICO_PLUGIN_ROOT, 'webpack-bundles'));
@@ -66,9 +67,6 @@ module.exports = env => {
     },
     resolve: {
       alias: generateModuleAliases(),
-    },
-    output: {
-      jsonpFunction: 'pluginJsonp',
     },
     optimization: {
       splitChunks: {

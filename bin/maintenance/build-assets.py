@@ -130,7 +130,7 @@ def _get_plugin_webpack_build_config(plugin_dir, url_root='/'):
 
 
 def _get_webpack_args(dev, watch):
-    args = ['--mode', 'development' if dev else 'production']
+    args = ['--profile', '--progress', '--mode', 'development' if dev else 'production']
     if watch:
         args.append('--watch')
     return args

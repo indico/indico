@@ -6,11 +6,12 @@
 // LICENSE file for more details.
 
 import path from 'path';
-import glob from 'glob';
-import {customizeArray, mergeWithCustomize} from 'webpack-merge';
+
 import CopyWebpackPlugin from 'copy-webpack-plugin';
+import glob from 'glob';
 import {minify} from 'uglify-js';
 import webpack from 'webpack';
+import {customizeArray, mergeWithCustomize} from 'webpack-merge';
 
 import {
   getThemeEntryPoints,
@@ -149,9 +150,6 @@ export default env => {
     ],
     resolve: {
       alias: extraResolveAliases,
-    },
-    output: {
-      jsonpFunction: 'coreJsonp',
     },
   });
 };
