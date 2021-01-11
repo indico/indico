@@ -20,6 +20,8 @@ Improvements
 - Show last login time in dashboard (:pr:`4735`, thanks :user:`vasantvohra`)
 - Allow Markdown in the "Message for complete registrations" option of a registration
   form (:pr:`4741`)
+- Improve video conference linking dropdown for contributions/sessions (hide unscheduled,
+  show start time) (:pr:`4753`)
 
 Bugfixes
 ^^^^^^^^
