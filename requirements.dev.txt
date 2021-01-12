@@ -2,7 +2,7 @@ babel
 flake8
 flake8-colors
 flake8-quotes
-pojson>=0.4
+pojson>=0.7
 termcolor
 sphinx
 sphinx-autobuild
@@ -13,7 +13,7 @@ sqlparse
 isort
 flask_url_map_serializer
 migra==1.0.1605230943
-schemainspect==0.1.1603448192
+schemainspect==0.1.1607225519
 transifex-client
 pywatchman
 pyupgrade
