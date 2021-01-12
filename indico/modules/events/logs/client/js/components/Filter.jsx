@@ -8,6 +8,8 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 
+import {Translate} from 'indico/react/i18n';
+
 export default class Filter extends React.Component {
   static propTypes = {
     realms: PropTypes.object.isRequired,
@@ -20,7 +22,9 @@ export default class Filter extends React.Component {
     return (
       <div className="toolbar">
         <div className={`group i-selection ${realms.length <= 1 ? 'hidden' : ''}`}>
-          <span className="i-button label">Show</span>
+          <span className="i-button label">
+            <Translate>Show</Translate>
+          </span>
           {Object.keys(realms)
             .sort()
             .map(name => (

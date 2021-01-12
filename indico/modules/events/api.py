@@ -626,7 +626,9 @@ class CategoryEventFetcher(IteratedDataFetcher, SerializerBase):
                                             {Period: IPeriodFossil}, tz=self._tz, naiveTZ=config.DEFAULT_TIMEZONE)
         # check whether the plugins want to add/override any data
         for update in values_from_signal(
-                signals.event.metadata_postprocess.send('http-api', event=event, data=data), as_list=True):
+            signals.event.metadata_postprocess.send('http-api', event=event, data=data, user=self.user),
+            as_list=True
+        ):
             data.update(update)
         return data
 

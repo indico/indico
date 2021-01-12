@@ -31,6 +31,11 @@ Version 2.3.3
 
 *Unreleased*
 
+Internationalization
+^^^^^^^^^^^^^^^^^^^^
+
+- New translation: Ukrainian
+
 Improvements
 ^^^^^^^^^^^^
 
@@ -39,11 +44,14 @@ Improvements
 - Show last login time in dashboard (:pr:`4735`, thanks :user:`vasantvohra`)
 - Allow Markdown in the "Message for complete registrations" option of a registration
   form (:pr:`4741`)
+- Improve video conference linking dropdown for contributions/sessions (hide unscheduled,
+  show start time) (:pr:`4753`)
 
 Bugfixes
 ^^^^^^^^
 
 - Fix error when converting malformed HTML links to LaTeX
+- Hide inactive contribution/abstract fields in submit/edit forms (:pr:`4755`)
 
 Internal Changes
 ^^^^^^^^^^^^^^^^

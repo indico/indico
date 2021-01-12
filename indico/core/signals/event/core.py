@@ -85,7 +85,8 @@ so that plugins can add their own fields.
 
 The *sender* is a string parameter specifying the source of the metadata.
 The *event* kwarg contains the event object. The metadata is passed in
-the `data` kwarg.
+the `data` kwarg. The `user` kwarg contains the user for whom the data is
+generated.
 
 The signal should return a dict that will be used to update the
 original representation (fields to add or override).

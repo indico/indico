@@ -29,7 +29,9 @@ class RHExportEventICAL(RHDisplayEventBase):
 
         # check whether the plugins want to add/override any data
         for update in values_from_signal(
-                signals.event.metadata_postprocess.send('ical-export', event=self.event, data=data), as_list=True):
+            signals.event.metadata_postprocess.send('ical-export', event=self.event, data=data, user=session.user),
+            as_list=True
+        ):
             data.update(update)
 
         response = {'results': data}
