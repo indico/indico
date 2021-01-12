@@ -193,6 +193,8 @@ def make_contribution_form(event):
         if field_impl is None:
             # field definition is not available anymore
             continue
+        if not custom_field.is_active:
+            continue
         name = 'custom_{}'.format(custom_field.id)
         setattr(form_class, name, field_impl.create_wtf_field())
     return form_class
