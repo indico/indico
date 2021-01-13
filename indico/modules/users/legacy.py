@@ -5,10 +5,8 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from flask_multipass import IdentityInfo
 from zope.interface.declarations import implementer
 
-from indico.legacy.common.cache import GenericCache
 from indico.legacy.fossils.user import IAvatarFossil, IAvatarMinimalFossil
 from indico.modules.auth import Identity
 from indico.modules.users import User, logger
@@ -265,22 +263,3 @@ class AvatarProvisionalWrapper(Fossilizable):
             self.identity_info.provider.name,
             self.identity_info.identifier,
             **self.data.to_dict())
-
-
-def search_avatars(criteria, exact=False, search_externals=False):
-    from indico.modules.users.util import search_users
-
-    if not any(criteria.values()):
-        return []
-
-    def _process_identities(obj):
-        if isinstance(obj, IdentityInfo):
-            GenericCache('pending_identities').set(f'{obj.provider.name}:{obj.identifier}', obj.data)
-            return AvatarProvisionalWrapper(obj)
-        else:
-            return obj.as_avatar
-
-    results = search_users(exact=exact, external=search_externals,
-                           **{AVATAR_FIELD_MAP[k]: v for (k, v) in criteria.items() if v})
-
-    return [_process_identities(obj) for obj in results]

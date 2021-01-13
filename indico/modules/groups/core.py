@@ -84,16 +84,6 @@ class GroupProxy:
         provider, id_or_name = self.as_principal[1]
         return 'Group:{}:{}'.format(provider or '', id_or_name)
 
-    @cached_property
-    def as_legacy_group(self):
-        """The legacy-style group wrapper."""
-        # TODO: remove once groups are gone from ZODB
-        raise NotImplementedError
-
-    @property
-    def as_legacy(self):
-        return self.as_legacy_group
-
     def has_member(self, user):
         """Check if the user is a member of the group.
 
@@ -158,11 +148,6 @@ class _LocalGroupProxy(GroupProxy):
     def as_principal(self):
         return 'Group', (None, self.id)
 
-    @cached_property
-    def as_legacy_group(self):
-        from indico.modules.groups.legacy import LocalGroupWrapper
-        return LocalGroupWrapper(self.id)
-
     def has_member(self, user):
         if not config.LOCAL_GROUPS:
             return False
@@ -213,11 +198,6 @@ class _MultipassGroupProxy(GroupProxy):
     @cached_property
     def as_principal(self):
         return 'Group', (self.provider, self.name)
-
-    @cached_property
-    def as_legacy_group(self):
-        from indico.modules.groups.legacy import LDAPGroupWrapper
-        return LDAPGroupWrapper(self.name, self.provider)
 
     @property
     def provider_title(self):

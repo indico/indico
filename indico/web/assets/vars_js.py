@@ -89,7 +89,6 @@ def generate_global_file():
         'Urls': {
             'Base': config.BASE_URL,
             'BasePath': url_parse(config.BASE_URL).path.rstrip('/'),
-            'JsonRpcService': url_for('api.jsonrpc'),
             'ExportAPIBase': url_for('api.httpapi', prefix='export'),
             'APIBase': url_for('api.httpapi', prefix='api'),
 

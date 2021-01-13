@@ -9,10 +9,10 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 
 import {GroupSearch, UserSearch} from 'indico/react/components/principals/Search';
-import {Translate} from 'indico/react/i18n';
-import Palette from 'indico/utils/palette';
 import {PrincipalType} from 'indico/react/components/principals/util';
 import {FavoritesProvider} from 'indico/react/hooks';
+import {Translate} from 'indico/react/i18n';
+import Palette from 'indico/utils/palette';
 
 (function($) {
   const FULL_ACCESS_PERMISSIONS = '_full_access';
@@ -174,7 +174,7 @@ import {FavoritesProvider} from 'indico/react/hooks';
         return $('<button>', {
           type: 'button',
           class: 'i-button text-color borderless icon-only icon-edit disabled',
-          title: title,
+          title,
         });
       } else {
         return $('<button>', {
@@ -512,10 +512,7 @@ import {FavoritesProvider} from 'indico/react/hooks';
                       identifier,
                       name,
                       provider,
-                      _type:
-                        type === PrincipalType.localGroup
-                          ? 'LocalGroupWrapper'
-                          : 'LDAPGroupWrapper',
+                      _type: type === PrincipalType.localGroup ? 'LocalGroup' : 'MultipassGroup',
                       id,
                     };
                   });

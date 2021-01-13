@@ -16,7 +16,6 @@ from indico.legacy.common.xmlGen import XMLGen
 from indico.modules.attachments.models.attachments import Attachment, AttachmentType
 from indico.modules.attachments.models.folders import AttachmentFolder
 from indico.modules.groups import GroupProxy
-from indico.modules.groups.legacy import LDAPGroupWrapper
 from indico.modules.users import User
 from indico.modules.users.legacy import AvatarUserWrapper
 from indico.util.event import uniqueId
@@ -88,8 +87,6 @@ class outputGenerator:
                 for provider, identifier in user_obj.iter_identifiers():
                     if provider != 'indico':
                         allowed_logins.add(identifier)
-            elif isinstance(user_obj, LDAPGroupWrapper):
-                allowed_groups.append(user_obj.getId())
             elif isinstance(user_obj, GroupProxy) and not user_obj.is_local:
                 allowed_groups.append(user_obj.name)
 

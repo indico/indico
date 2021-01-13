@@ -81,12 +81,12 @@ def principal_from_fossil(fossil, allow_pending=False, allow_groups=True, allow_
         if group is None or (group.hidden and group not in existing_data):
             raise ValueError(f'IP network group does not exist: {id_}')
         return group
-    elif allow_groups and type_ in {'LocalGroupWrapper', 'LocalGroup'}:
+    elif allow_groups and type_ == 'LocalGroup':
         group = GroupProxy(int(id_))
         if group.group is None:
             raise ValueError(f'Local group does not exist: {id_}')
         return group
-    elif allow_groups and type_ in {'LDAPGroupWrapper', 'MultipassGroup'}:
+    elif allow_groups and type_ == 'MultipassGroup':
         provider = fossil['provider']
         group = GroupProxy(id_, provider)
         if group.group is None and not allow_missing_groups:

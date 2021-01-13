@@ -5,7 +5,7 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from flask import flash, request, session
+from flask import flash, session
 
 from indico.core import signals
 from indico.core.logger import Logger
@@ -51,9 +51,8 @@ def _event_type_changed(event, **kwargs):
     if conflicting:
         for feature in conflicting:
             set_feature_enabled(event, feature, False)
-        if request.endpoint != 'api.jsonrpc':
-            # XXX: we cannot flash a message in the legacy js ajax editor for the event type.
-            # remove this check once we don't use it anymore (on the general settings page)
-            flash(ngettext('Feature disabled: {features} (not available for this event type)',
-                           'Features disabled: {features} (not available for this event type)', len(conflicting))
-                  .format(features=format_feature_names(conflicting)), 'warning')
+        # XXX: we cannot flash a message in the legacy js ajax editor for the event type.
+        # remove this check once we don't use it anymore (on the general settings page)
+        flash(ngettext('Feature disabled: {features} (not available for this event type)',
+                       'Features disabled: {features} (not available for this event type)', len(conflicting))
+              .format(features=format_feature_names(conflicting)), 'warning')
