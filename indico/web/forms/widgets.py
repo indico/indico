@@ -294,7 +294,5 @@ class PrefixedTextWidget(JinjaWidget):
     """Render a TextInput with a prefix"""
 
     def __init__(self, prefix=None, show_field=True):
-        super().__init__('forms/prefixed_text_widget.html', single_line=True, show_field=show_field, prefix=prefix)
-
-    def __call__(self, field, **kwargs):
-        return super().__call__(field, input_args=kwargs)
+        super().__init__('forms/prefixed_text_widget.html', single_line=True, single_kwargs=True,
+                         show_field=show_field, prefix=prefix)
