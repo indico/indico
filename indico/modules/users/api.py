@@ -33,6 +33,8 @@ class UserInfoHook(HTTPAPIHook):
         self._user_id = self._pathParams['user_id']
 
     def export_user(self, user):
+        from indico.modules.users.schemas import UserSchema
+
         if not user:
             raise HTTPAPIError('You need to be logged in', 403)
         user = User.get(self._user_id, is_deleted=False)
@@ -40,4 +42,4 @@ class UserInfoHook(HTTPAPIHook):
             raise HTTPAPIError('Requested user not found', 404)
         if not user.can_be_modified(user):
             raise HTTPAPIError('You do not have access to that info', 403)
-        return [user.as_avatar.fossilize()]
+        return [UserSchema().dump(user)]
