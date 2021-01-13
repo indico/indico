@@ -130,9 +130,10 @@ class SplitCategoryForm(IndicoForm):
     first_category = StringField(_('Category name #1'), [DataRequired()],
                                  description=_('Selected events will be moved into a new sub-category with this '
                                                'title.'))
-    second_category = StringField(_('Category name #2'), [DataRequired()],
+    second_category = StringField(_('Category name #2'),
                                   description=_('Events that were not selected will be moved into a new sub-category '
-                                                'with this title.'))
+                                                'with this title. If omitted, those events will remain in the current '
+                                                'category.'))
     event_id = HiddenFieldList()
     all_selected = BooleanField(widget=HiddenCheckbox())
     submitted = HiddenField()

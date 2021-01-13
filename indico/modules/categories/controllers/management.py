@@ -388,9 +388,9 @@ class RHSplitCategory(RHManageCategorySelectedEventsBase):
         form = SplitCategoryForm(formdata=request.form)
         if form.validate_on_submit():
             self._move_events(self.sel_events, form.first_category.data)
-            if not form.all_selected.data:
+            if not form.all_selected.data and form.second_category.data:
                 self._move_events(self.cat_events - self.sel_events, form.second_category.data)
-            if form.all_selected.data:
+            if form.all_selected.data or not form.second_category.data:
                 flash(_('Your events have been moved to the category "{}"')
                       .format(form.first_category.data), 'success')
             else:
