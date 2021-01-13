@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from indico.core.db import db
 from indico.core.db.sqlalchemy.principals import EmailPrincipal
 from indico.legacy.common.cache import GenericCache
 
@@ -24,98 +23,6 @@ def iter_acl(acl):
     """
     return sorted(acl, key=lambda x: (getattr(x, 'principal', x).principal_order,
                                       not getattr(getattr(x, 'principal', x), 'is_local', None)))
-
-
-def principal_from_fossil(fossil, allow_pending=False, allow_groups=True, allow_missing_groups=False,
-                          allow_emails=False, allow_networks=False, allow_registration_forms=False,
-                          existing_data=None, event=None, category=None):
-    from indico.modules.categories.models.roles import CategoryRole
-    from indico.modules.events.models.roles import EventRole
-    from indico.modules.events.registration.models.forms import RegistrationForm
-    from indico.modules.groups import GroupProxy
-    from indico.modules.networks.models.networks import IPNetworkGroup
-    from indico.modules.users import User
-
-    if event and category is None:
-        category = event.category
-
-    if existing_data is None:
-        existing_data = set()
-
-    type_ = fossil['_type']
-    id_ = fossil['id']
-    if type_ == 'Avatar':
-        if isinstance(id_, int) or id_.isdigit():
-            # regular user
-            user = User.get(int(id_))
-        elif allow_pending:
-            data = GenericCache('pending_identities').get(id_)
-            if not data:
-                raise ValueError(f"Cannot find user '{id_}' in cache")
-
-            data = {k: '' if v is None else v for k, v in data.items()}
-            email = data['email'].lower()
-
-            # check if there is not already a (pending) user with that e-mail
-            # we need to check for non-pending users too since the search may
-            # show a user from external results even though the email belongs
-            # to an indico account in case some of the search criteria did not
-            # match the indico account
-            user = User.query.filter(User.all_emails == email, ~User.is_deleted).first()
-            if not user:
-                user = User(first_name=data.get('first_name') or '', last_name=data.get('last_name') or '',
-                            email=email,
-                            address=data.get('address', ''), phone=data.get('phone', ''),
-                            affiliation=data.get('affiliation', ''), is_pending=True)
-                db.session.add(user)
-                db.session.flush()
-        else:
-            raise ValueError(f"Id '{id_}' is not a number and allow_pending=False")
-        if user is None:
-            raise ValueError(f'User does not exist: {id_}')
-        return user
-    elif allow_emails and type_ == 'Email':
-        return EmailPrincipal(id_)
-    elif allow_networks and type_ == 'IPNetworkGroup':
-        group = IPNetworkGroup.get(int(id_))
-        if group is None or (group.hidden and group not in existing_data):
-            raise ValueError(f'IP network group does not exist: {id_}')
-        return group
-    elif allow_groups and type_ == 'LocalGroup':
-        group = GroupProxy(int(id_))
-        if group.group is None:
-            raise ValueError(f'Local group does not exist: {id_}')
-        return group
-    elif allow_groups and type_ == 'MultipassGroup':
-        provider = fossil['provider']
-        group = GroupProxy(id_, provider)
-        if group.group is None and not allow_missing_groups:
-            raise ValueError(f'Multipass group does not exist: {provider}:{id_}')
-        return group
-    elif category and type_ == 'CategoryRole':
-        role = CategoryRole.get_category_role_by_id(category, id_)
-        role_name = fossil.get('name')
-        if role is None:
-            raise ValueError(f'Category role "{role_name}" is not available in "{category.title}"')
-        return role
-    elif event and type_ == 'EventRole':
-        role = EventRole.get(id_)
-        role_name = fossil.get('name')
-        if role is None:
-            raise ValueError(f'Event role "{role_name}" does not exist')
-        if role.event != event:
-            raise ValueError(f'Event role "{role_name}" does not belong to "{event.title}"')
-        return role
-    elif allow_registration_forms and type_ == 'RegistrationForm':
-        registration_form = RegistrationForm.get(id_)
-        reg_form_name = fossil.get('title')
-        if registration_form is None:
-            raise ValueError(f'Registration form "{reg_form_name}" does not exist')
-        if registration_form.event != event:
-            raise ValueError(f'Registration form "{reg_form_name}" does not belong to "{event.title}"')
-        return registration_form
-    else:
-        raise ValueError(f'Unexpected fossil type: {type_}')
 
 
 def principal_from_identifier(identifier, allow_groups=False, allow_external_users=False, allow_event_roles=False,
