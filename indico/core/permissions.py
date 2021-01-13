@@ -178,29 +178,31 @@ def update_permissions(obj, form):
     """Update the permissions of an object, based on the corresponding WTForm."""
     from indico.modules.categories import Category
     from indico.modules.events import Event
-    from indico.util.user import principal_from_fossil
+    from indico.util.user import principal_from_identifier
 
-    event = category = None
+    event_id = category_id = None
     if isinstance(obj, Category):
-        category = obj
+        category_id = obj.id
     elif isinstance(obj, Event):
-        event = obj
+        event_id = obj.id
     else:
-        event = obj.event
-        category = event.category
+        event_id = obj.event.id
+        category_id = obj.event.category.id
 
     current_principal_permissions = {p.principal: get_principal_permissions(p, type(obj))
                                      for p in obj.acl_entries}
     current_principal_permissions = {k: v for k, v in current_principal_permissions.items() if v}
     new_principal_permissions = {
-        principal_from_fossil(
-            fossil,
-            allow_emails=True,
+        principal_from_identifier(
+            fossil['identifier'],
+            allow_groups=True,
             allow_networks=True,
-            allow_pending=True,
-            allow_registration_forms=True,
-            event=event,
-            category=category,
+            allow_emails=True,
+            allow_registration_forms=(event_id is not None),
+            allow_event_roles=(event_id is not None),
+            allow_category_roles=(event_id is not None or category_id is not None),
+            event_id=event_id,
+            category_id=category_id,
         ): set(permissions)
         for fossil, permissions in form.permissions.data
     }

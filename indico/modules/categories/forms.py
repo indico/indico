@@ -20,7 +20,7 @@ from indico.modules.events.fields import IndicoThemeSelectField
 from indico.modules.events.models.events import EventType
 from indico.modules.networks import IPNetworkGroup
 from indico.util.i18n import _
-from indico.util.user import principal_from_fossil
+from indico.util.user import principal_from_identifier
 from indico.web.forms.base import IndicoForm
 from indico.web.forms.colors import get_role_colors
 from indico.web.forms.fields import (EditableFileField, EmailListField, HiddenFieldList, IndicoEnumSelectField,
@@ -109,8 +109,11 @@ class CategoryProtectionForm(IndicoForm):
 
     def validate_permissions(self, field):
         for principal_fossil, permissions in field.data:
-            principal = principal_from_fossil(principal_fossil, allow_networks=True, allow_pending=True,
-                                              category=self.category)
+            principal = principal_from_identifier(principal_fossil['identifier'],
+                                                  allow_groups=True,
+                                                  allow_networks=True,
+                                                  allow_category_roles=True,
+                                                  category_id=self.category.id)
             if isinstance(principal, IPNetworkGroup) and set(permissions) - {READ_ACCESS_PERMISSION}:
                 msg = _('IP networks cannot have management permissions: {}').format(principal.name)
                 raise ValidationError(msg)

@@ -48,7 +48,7 @@ from indico.util.caching import memoize_request
 from indico.util.fs import chmod_umask, secure_filename
 from indico.util.i18n import _
 from indico.util.string import strip_tags
-from indico.util.user import principal_from_fossil
+from indico.util.user import principal_from_identifier
 from indico.web.flask.templating import get_template_module
 from indico.web.flask.util import send_file, url_for
 from indico.web.forms.colors import get_colors
@@ -605,16 +605,20 @@ def set_custom_fields(obj, custom_fields_data):
     return changes
 
 
-def check_permissions(event, field, allow_networks=False, allow_registration_forms=False):
+def check_permissions(event, field, allow_networks=False):
     for principal_fossil, permissions in field.data:
-        principal = principal_from_fossil(principal_fossil, allow_emails=True, allow_networks=allow_networks,
-                                          allow_pending=True, allow_registration_forms=allow_registration_forms,
-                                          event=event, category=event.category)
-        if allow_networks and isinstance(principal, IPNetworkGroup) and set(permissions) - {READ_ACCESS_PERMISSION}:
+        principal = principal_from_identifier(principal_fossil['identifier'],
+                                              allow_groups=True,
+                                              allow_category_roles=True,
+                                              allow_event_roles=True,
+                                              allow_emails=True,
+                                              allow_registration_forms=True,
+                                              allow_networks=allow_networks,
+                                              event_id=event.id)
+        if isinstance(principal, IPNetworkGroup) and set(permissions) - {READ_ACCESS_PERMISSION}:
             msg = _('IP networks cannot have management permissions: {}').format(principal.name)
             return msg
-        if (allow_registration_forms and isinstance(principal, RegistrationForm)
-                and set(permissions) - {READ_ACCESS_PERMISSION}):
+        if isinstance(principal, RegistrationForm) and set(permissions) - {READ_ACCESS_PERMISSION}:
             msg = _('Registrants cannot have management permissions: {}').format(principal.name)
             return msg
         if FULL_ACCESS_PERMISSION in permissions and len(permissions) != 1:

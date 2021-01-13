@@ -103,7 +103,7 @@ class ContributionProtectionForm(IndicoForm):
         super().__init__(*args, **kwargs)
 
     def validate_permissions(self, field):
-        except_msg = check_permissions(self.event, field, allow_registration_forms=True)
+        except_msg = check_permissions(self.event, field)
         if except_msg:
             raise ValidationError(except_msg)
 

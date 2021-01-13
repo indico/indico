@@ -279,7 +279,7 @@ class EventProtectionForm(IndicoForm):
                 real_horizon.title)
 
     def validate_permissions(self, field):
-        except_msg = check_permissions(self.event, field, allow_networks=True, allow_registration_forms=True)
+        except_msg = check_permissions(self.event, field, allow_networks=True)
         if except_msg:
             raise ValidationError(except_msg)
 

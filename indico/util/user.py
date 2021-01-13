@@ -120,18 +120,28 @@ def principal_from_fossil(fossil, allow_pending=False, allow_groups=True, allow_
 
 def principal_from_identifier(identifier, allow_groups=False, allow_external_users=False, allow_event_roles=False,
                               allow_category_roles=False, allow_registration_forms=False, allow_emails=False,
-                              event_id=None, soft_fail=False):
+                              allow_networks=False, event_id=None, category_id=None, soft_fail=False):
+    from indico.modules.categories.models.categories import Category
     from indico.modules.categories.models.roles import CategoryRole
     from indico.modules.events.models.events import Event
     from indico.modules.events.models.roles import EventRole
     from indico.modules.events.registration.models.forms import RegistrationForm
     from indico.modules.groups import GroupProxy
+    from indico.modules.networks.models.networks import IPNetworkGroup
     from indico.modules.users import User
+
+    if allow_category_roles and category_id is None and event_id is None:
+        raise ValueError('Cannot use category roles without a category/event context')
+    if allow_event_roles and event_id is None:
+        raise ValueError('Cannot use event roles without an event context')
+    if allow_registration_forms and event_id is None:
+        raise ValueError('Cannot use registration forms without an event context')
 
     try:
         type_, data = identifier.split(':', 1)
     except ValueError:
         raise ValueError('Invalid data')
+
     if type_ == 'User':
         try:
             user_id = int(data)
@@ -192,9 +202,16 @@ def principal_from_identifier(identifier, allow_groups=False, allow_external_use
     elif type_ == 'CategoryRole':
         if not allow_category_roles:
             raise ValueError('Category roles are not allowed')
-        event = Event.get(event_id)
-        if event is None:
-            raise ValueError(f'Invalid event id: {event_id}')
+        category = None
+        if category_id is not None:
+            category = Category.get(category_id)
+            if category is None:
+                raise ValueError(f'Invalid category id: {category_id}')
+        elif event_id is not None:
+            event = Event.get(event_id)
+            if event is None:
+                raise ValueError(f'Invalid event id: {event_id}')
+            category = event.category
         try:
             category_role_id = int(data)
         except ValueError:
@@ -202,7 +219,7 @@ def principal_from_identifier(identifier, allow_groups=False, allow_external_use
         if soft_fail:
             category_role = CategoryRole.get(category_role_id)
         else:
-            category_role = CategoryRole.get_category_role_by_id(event.category, category_role_id)
+            category_role = CategoryRole.get_category_role_by_id(category, category_role_id)
         if category_role is None:
             raise ValueError(f'Invalid category role: {category_role_id}')
         return category_role
@@ -223,5 +240,16 @@ def principal_from_identifier(identifier, allow_groups=False, allow_external_use
         if not allow_emails:
             raise ValueError('Emails are not allowed')
         return EmailPrincipal(data)
+    elif type_ == 'IPNetworkGroup':
+        if not allow_networks:
+            raise ValueError('Network groups are not allowed')
+        try:
+            netgroup_id = int(data)
+        except ValueError:
+            raise ValueError('Invalid data')
+        netgroup = IPNetworkGroup.get(netgroup_id)
+        if netgroup is None or (netgroup.hidden and not soft_fail):
+            raise ValueError(f'Invalid network group: {netgroup_id}')
+        return netgroup
     else:
         raise ValueError('Invalid data')

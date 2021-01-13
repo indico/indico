@@ -473,9 +473,7 @@ import Palette from 'indico/utils/palette';
         </a>
       );
 
-      const existing = JSON.parse(this.element.find('input[name="permissions"]').val()).map(
-        e => e[0].identifier
-      );
+      const existing = JSON.parse(this.$dataField.val()).map(e => e[0].identifier);
 
       ReactDOM.render(
         <FavoritesProvider>
