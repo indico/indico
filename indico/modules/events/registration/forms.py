@@ -17,6 +17,7 @@ from wtforms.widgets.html5 import NumberInput
 
 from indico.core import signals
 from indico.core.config import config
+from indico.core.db import db
 from indico.modules.designer import PageLayout, PageOrientation, PageSize, TemplateType
 from indico.modules.designer.util import get_default_ticket_on_category, get_inherited_templates
 from indico.modules.events.features.util import is_feature_enabled
@@ -338,7 +339,7 @@ class CreateMultipleRegistrationsForm(IndicoForm):
     Form to create multiple registrations of Indico users at the same time.
     """
 
-    user_principals = PrincipalListField(_("Indico users"), [DataRequired()])
+    user_principals = PrincipalListField(_("Indico users"), [DataRequired()], allow_external_users=True)
     notify_users = BooleanField(_("Send e-mail notifications"),
                                 default=True,
                                 description=_("Notify the users about the registration."),
@@ -352,8 +353,10 @@ class CreateMultipleRegistrationsForm(IndicoForm):
 
     def validate_user_principals(self, field):
         for user in field.data:
-            if user.registrations.filter_by(registration_form=self._regform, is_deleted=False).one_or_none():
+            if user in db.session and self._regform.get_registration(user=user):
                 raise ValidationError(_("A registration for {} already exists.").format(user.full_name))
+            elif self._regform.get_registration(email=user.email):
+                raise ValidationError(_("A registration for {} already exists.").format(user.email))
 
 
 class BadgeSettingsForm(IndicoForm):
