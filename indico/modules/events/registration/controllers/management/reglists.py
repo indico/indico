@@ -44,11 +44,12 @@ from indico.modules.events.registration.util import (create_registration, genera
                                                      import_registrations_from_csv, make_registration_form)
 from indico.modules.events.registration.views import WPManageRegistration
 from indico.modules.events.util import ZipGeneratorMixin
-from indico.modules.users import User
 from indico.util.fs import secure_filename
 from indico.util.i18n import _, ngettext
+from indico.util.marshmallow import Principal
 from indico.util.placeholders import replace_placeholders
 from indico.util.spreadsheets import send_csv, send_xlsx
+from indico.web.args import use_kwargs
 from indico.web.flask.templating import get_template_module
 from indico.web.flask.util import send_file, url_for
 from indico.web.util import jsonify_data, jsonify_template
@@ -250,18 +251,13 @@ class RHRegistrationDelete(RHRegistrationsActionBase):
 class RHRegistrationCreate(RHManageRegFormBase):
     """Create new registration (management area)."""
 
-    def _get_user_data(self):
-        user_id = request.args.get('user')
-        if user_id is None:
+    @use_kwargs({
+        'user': Principal(allow_external_users=True, missing=None),
+    }, location='query')
+    def _get_user_data(self, user):
+        if user is None:
             return {}
-        elif user_id.isdigit():
-            # existing indico user
-            user = User.find_first(id=user_id, is_deleted=False)
-            user_data = {t.name: getattr(user, t.name, None) if user else '' for t in PersonalDataType}
-        else:
-            # non-indico user
-            data = GenericCache('pending_identities').get(user_id, {})
-            user_data = {t.name: data.get(t.name) for t in PersonalDataType}
+        user_data = {t.name: getattr(user, t.name, None) for t in PersonalDataType}
         user_data['title'] = get_title_uuid(self.regform, user_data['title'])
         return user_data
 

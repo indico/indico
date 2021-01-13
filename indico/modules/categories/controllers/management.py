@@ -31,9 +31,10 @@ from indico.modules.rb.models.reservations import Reservation, ReservationLink
 from indico.modules.users import User
 from indico.util.fs import secure_filename
 from indico.util.i18n import _, ngettext
+from indico.util.marshmallow import PrincipalList
 from indico.util.roles import ImportRoleMembersMixin
 from indico.util.string import crc32
-from indico.util.user import principal_from_fossil
+from indico.web.args import use_kwargs
 from indico.web.flask.templating import get_template_module
 from indico.web.flask.util import url_for
 from indico.web.forms.base import FormDefaults
@@ -504,12 +505,13 @@ class RHRemoveCategoryRoleMember(RHManageCategoryRole):
 class RHAddCategoryRoleMembers(RHManageCategoryRole):
     """Add users to a category role."""
 
-    def _process(self):
-        for data in request.json['users']:
-            user = principal_from_fossil(data, allow_pending=True, allow_groups=False)
-            if user not in self.role.members:
-                self.role.members.add(user)
-                logger.info('User %r added to role %r by %r', user, self.role, session.user)
+    @use_kwargs({
+        'users': PrincipalList(required=True, allow_external_users=True),
+    })
+    def _process(self, users):
+        for user in users - self.role.members:
+            self.role.members.add(user)
+            logger.info('User %r added to role %r by %r', user, self.role, session.user)
         return jsonify_data(html=_render_role(self.role, collapsed=False))
 
 

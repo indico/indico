@@ -5,8 +5,13 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-/* global strnatcmp:false, paginatedSelectAll:false */
-/* eslint-disable import/unambiguous */
+/* global strnatcmp:false, paginatedSelectAll:false, handleAjaxError:false, cornerMessage:false,
+          enableIfChecked:false, build_url:false, ajaxDialog:false, updateHtml:false */
+
+import _ from 'lodash';
+
+import {showUserSearch} from 'indico/react/components/principals/imperative';
+import {$T} from 'indico/utils/i18n';
 
 (function(global) {
   // Category cache
@@ -248,6 +253,8 @@
   };
 
   global.setupCategoryEventList = function setupCategoryEventList(categoryId) {
+    let isEverythingSelected = false;
+
     _fetchSourceCategory(categoryId);
     enableIfChecked('#event-management', 'input[name=event_id]', '.js-enabled-if-checked');
 
@@ -278,7 +285,7 @@
       _moveEvents(_categories[categoryId], $(this).data('href'), data);
     });
 
-    var isEverythingSelected = paginatedSelectAll({
+    isEverythingSelected = paginatedSelectAll({
       containerSelector: '#event-management',
       checkboxSelector: 'input:checkbox[name=event_id]',
       allSelectedSelector: 'input:checkbox[name=all_selected]',
@@ -452,28 +459,24 @@
   }
 
   function setupRolesButtons() {
-    $('#event-roles').on('click', '.js-add-members', function(evt) {
+    $('#event-roles').on('click', '.js-add-members', async evt => {
       evt.stopPropagation();
-      const $this = $(this);
-      $('<div>')
-        .principalfield({
-          multiChoice: true,
-          onAdd(users) {
-            $.ajax({
-              url: $this.data('href'),
-              method: $this.data('method'),
-              data: JSON.stringify({users}),
-              dataType: 'json',
-              contentType: 'application/json',
-              error: handleAjaxError,
-              complete: IndicoUI.Dialogs.Util.progress(),
-              success(data) {
-                updateHtml($this.data('update'), data);
-              },
-            });
+      const $this = $(evt.target);
+      const users = await showUserSearch({withExternalUsers: true});
+      if (users.length) {
+        $.ajax({
+          url: $this.data('href'),
+          method: $this.data('method'),
+          data: JSON.stringify({users}),
+          dataType: 'json',
+          contentType: 'application/json',
+          error: handleAjaxError,
+          complete: IndicoUI.Dialogs.Util.progress(),
+          success(data) {
+            updateHtml($this.data('update'), data);
           },
-        })
-        .principalfield('choose');
+        });
+      }
     });
   }
 

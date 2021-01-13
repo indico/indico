@@ -237,6 +237,7 @@ const searchFactory = config => {
     onAddItems,
     favorites,
     triggerFactory,
+    defaultOpen,
     single,
     alwaysConfirm,
     onOpen,
@@ -244,7 +245,7 @@ const searchFactory = config => {
     withEventPersons,
     eventId,
   }) => {
-    const [open, setOpen] = useState(false);
+    const [open, setOpen] = useState(defaultOpen);
     const [staged, setStaged] = useState([]);
 
     const isAdded = ({identifier}) => {
@@ -280,17 +281,20 @@ const searchFactory = config => {
       onClose();
     };
 
-    const trigger = triggerFactory ? (
-      triggerFactory({disabled, onClick: handleOpenClick})
-    ) : (
-      <Button
-        as="div"
-        type="button"
-        content={buttonTitle}
-        disabled={disabled}
-        onClick={handleOpenClick}
-      />
-    );
+    let trigger = null;
+    if (!defaultOpen) {
+      trigger = triggerFactory ? (
+        triggerFactory({disabled, onClick: handleOpenClick})
+      ) : (
+        <Button
+          as="div"
+          type="button"
+          content={buttonTitle}
+          disabled={disabled}
+          onClick={handleOpenClick}
+        />
+      );
+    }
 
     const stopPropagation = evt => {
       // https://github.com/Semantic-Org/Semantic-UI-React/issues/3644
@@ -360,6 +364,7 @@ const searchFactory = config => {
     disabled: PropTypes.bool,
     favorites: PropTypes.object,
     triggerFactory: PropTypes.func,
+    defaultOpen: PropTypes.bool,
     single: PropTypes.bool,
     alwaysConfirm: PropTypes.bool,
     onOpen: PropTypes.func,
@@ -372,6 +377,7 @@ const searchFactory = config => {
     favorites: null,
     disabled: false,
     triggerFactory: null,
+    defaultOpen: false,
     single: false,
     alwaysConfirm: false,
     onOpen: () => {},

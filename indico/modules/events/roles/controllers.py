@@ -19,8 +19,9 @@ from indico.modules.events.roles.forms import EventRoleForm
 from indico.modules.events.roles.util import serialize_event_role
 from indico.modules.events.roles.views import WPEventRoles
 from indico.modules.users import User
+from indico.util.marshmallow import PrincipalList
 from indico.util.roles import ImportRoleMembersMixin
-from indico.util.user import principal_from_fossil
+from indico.web.args import use_kwargs
 from indico.web.flask.templating import get_template_module
 from indico.web.forms.colors import get_role_colors
 from indico.web.util import jsonify_data, jsonify_form
@@ -133,16 +134,16 @@ class RHRemoveEventRoleMember(RHManageEventRole):
 class RHAddEventRoleMembers(RHManageEventRole):
     """Add users to an event role."""
 
-    def _process(self):
-        for data in request.json['users']:
-            user = principal_from_fossil(data, allow_pending=True, allow_groups=False)
-            if user not in self.role.members:
-                self.role.members.add(user)
-                logger.info('User %r added to role %r by %r', user, self.role, session.user)
-                self.event.log(EventLogRealm.management, EventLogKind.positive, 'Roles',
-                               f'Added user to role "{self.role.name}"', session.user,
-                               data={'Name': user.full_name,
-                                     'Email': user.email})
+    @use_kwargs({
+        'users': PrincipalList(required=True, allow_external_users=True),
+    })
+    def _process(self, users):
+        for user in users - self.role.members:
+            self.role.members.add(user)
+            logger.info('User %r added to role %r by %r', user, self.role, session.user)
+            self.event.log(EventLogRealm.management, EventLogKind.positive, 'Roles',
+                           f'Added user to role "{self.role.name}"', session.user,
+                           data={'Name': user.full_name, 'Email': user.email})
         return jsonify_data(html=_render_role(self.role, collapsed=False))
 
 
