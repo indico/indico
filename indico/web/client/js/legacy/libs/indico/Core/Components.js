@@ -11,8 +11,6 @@ function imageFunctionGenerator(url) {
   };
 }
 
-var indicoSource = curry(jsonRpcValue, Indico.Urls.JsonRpcService);
-var indicoRequest = curry(jsonRpc, Indico.Urls.JsonRpcService);
 var imageSrc = imageFunctionGenerator(Indico.Urls.ImagesBase);
 
 function pixels(val) {

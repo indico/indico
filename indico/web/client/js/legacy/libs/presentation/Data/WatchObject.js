@@ -213,23 +213,6 @@ watchType.load = function(target, object) {
 };
 
 /**
- * Attaches watch getters created from the properties from the object to the target and returns the object.
- * @param {Object} target
- * @param {Array} properties
- * @param {WatchObject} [object]
- * @return {WatchObject}
- */
-function mixWatchGetters(target, properties, object) {
-  if (!exists(object)) {
-    object = new WatchObject();
-  }
-  iterate(properties, function(property) {
-    target[property] = object.getter(property);
-  });
-  return object;
-}
-
-/**
  * Attaches watch accessors created from the properties from the object to the target and returns the object.
  * @param {Object} target
  * @param {Array} properties
