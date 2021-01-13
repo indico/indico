@@ -4,6 +4,7 @@
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
+
 import pytest
 
 from indico.util.caching import memoize_request
@@ -45,24 +46,3 @@ def test_memoize_request_args():
     assert calls[0] == 3
     fn(a=2, b=2, foo='bar')
     assert calls[0] == 3
-
-
-@pytest.mark.usefixtures('request_context', 'not_testing')
-def test_memoize_request_legacy_class():
-    # Make sure we don't choke on classes in the argument list,
-    # e.g. when we have a classmethod on a legacy class
-    calls = []
-
-    @memoize_request
-    def fn(a):
-        calls.append(a)
-
-    class Cls:
-        def getId(self):
-            return 1
-
-    instance = Cls()
-    for i in range(2):
-        fn(Cls)
-        fn(instance)
-    assert calls == [Cls, instance]

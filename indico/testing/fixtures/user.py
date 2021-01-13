@@ -15,11 +15,10 @@ from indico.modules.users import User
 @pytest.fixture
 def create_user(db):
     """Return a callable which lets you create dummy users."""
-    def _create_user(id_, first_name='Guinea', last_name='Pig', rb_admin=False, admin=False, email=None, groups=None,
-                     legacy=False):
+    def _create_user(id_, first_name='Guinea', last_name='Pig', rb_admin=False, admin=False, email=None, groups=None):
         user = User.get(id_)
         if user:
-            return user.as_avatar if legacy else user
+            return user
         user = User()
         user.id = id_
         user.first_name = first_name
@@ -32,7 +31,7 @@ def create_user(db):
         if rb_admin:
             rb_settings.acls.add_principal('admin_principals', user)
         db.session.flush()
-        return user.as_avatar if legacy else user
+        return user
 
     return _create_user
 
@@ -40,7 +39,7 @@ def create_user(db):
 @pytest.fixture
 def dummy_user(create_user):
     """Create a mocked user."""
-    return create_user(1337, legacy=False)
+    return create_user(1337)
 
 
 @pytest.fixture

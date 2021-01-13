@@ -17,7 +17,6 @@ from indico.modules.attachments.models.attachments import Attachment, Attachment
 from indico.modules.attachments.models.folders import AttachmentFolder
 from indico.modules.groups import GroupProxy
 from indico.modules.users import User
-from indico.modules.users.legacy import AvatarUserWrapper
 from indico.util.event import uniqueId
 from indico.web.flask.util import url_for
 
@@ -75,14 +74,12 @@ class outputGenerator:
             acl = obj.get_access_list()
 
         # Populate two lists holding email/group strings instead of
-        # Avatar/Group objects
+        # User/Group objects
         allowed_logins = set()
         allowed_groups = []
 
         for user_obj in acl:
-            if isinstance(user_obj, (User, AvatarUserWrapper)):
-                if isinstance(user_obj, AvatarUserWrapper):
-                    user_obj = user_obj.user
+            if isinstance(user_obj, User):
                 # user names for all non-local accounts
                 for provider, identifier in user_obj.iter_identifiers():
                     if provider != 'indico':

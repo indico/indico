@@ -454,18 +454,6 @@ class User(PersonMixin, db.Model):
         return f'User:{self.id}'
 
     @property
-    def as_avatar(self):
-        # TODO: remove this after DB is free of Avatars
-        from indico.modules.users.legacy import AvatarUserWrapper
-        avatar = AvatarUserWrapper(self.id)
-
-        # avoid garbage collection
-        avatar.user
-        return avatar
-
-    as_legacy = as_avatar
-
-    @property
     def avatar_bg_color(self):
         from indico.modules.users.util import get_color_for_username
         return get_color_for_username(self.full_name)

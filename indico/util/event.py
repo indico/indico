@@ -26,8 +26,8 @@ def uniqueId(obj):
     elif isinstance(obj, db.m.EventNote):
         return '{}.n{}'.format(uniqueId(obj.object), obj.id)
     else:
-        # XXX: anything besides Conference/Event?! probably not..
-        return obj.getId() if hasattr(obj, 'getId') else obj.id
+        # XXX: anything besides Event?! probably not..
+        return obj.id
 
 
 def truncate_path(full_path, chars=30, skip_first=True):

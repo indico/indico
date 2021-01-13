@@ -9,13 +9,11 @@ from sqlalchemy.dialects.postgresql import ARRAY
 from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.ext.hybrid import Comparator, hybrid_method, hybrid_property
 from sqlalchemy.orm import joinedload, noload
-from zope.interface.declarations import implementer
 
 from indico.core.db.sqlalchemy import PyIntEnum, db
 from indico.core.db.sqlalchemy.util.models import get_simple_column_attrs
 from indico.core.permissions import get_available_permissions
 from indico.util.decorators import classproperty, strict_classproperty
-from indico.util.fossilize import Fossilizable, IFossil
 from indico.util.string import format_repr
 from indico.util.struct.enum import IndicoEnum
 
@@ -63,26 +61,7 @@ def serialize_email_principal(email):
     }
 
 
-class IEmailPrincipalFossil(IFossil):
-    def getId(self):
-        pass
-    getId.produce = lambda x: x.email
-
-    def getIdentifier(self):
-        pass
-    getIdentifier.produce = lambda x: f'Email:{x.email}'
-
-    def getEmail(self):
-        pass
-    getEmail.produce = lambda x: x.email
-
-    def getName(self):
-        pass
-    getName.produce = lambda x: x.name
-
-
-@implementer(IEmailPrincipalFossil)
-class EmailPrincipal(Fossilizable):
+class EmailPrincipal:
     """Wrapper for email principals.
 
     :param email: The email address.
@@ -103,10 +82,6 @@ class EmailPrincipal(Fossilizable):
     @property
     def name(self):
         return self.email
-
-    @property
-    def as_legacy(self):
-        return self
 
     @property
     def user(self):
