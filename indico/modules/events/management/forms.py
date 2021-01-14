@@ -317,9 +317,9 @@ class CloneContentsForm(CloneRepeatabilityForm):
                                                'be synchronized with their Indico user profiles.'))
 
     def __init__(self, event, set_defaults=False, **kwargs):
-        options = EventCloner.get_cloners(event)
-        visible_options = list(filter(attrgetter('is_visible'), options))
-        default_selected_items = kwargs.get('selected_items', [option.name for option in options if option.is_default])
+        visible_options = list(filter(attrgetter('is_visible'), EventCloner.get_cloners(event)))
+        default_selected_items = kwargs.get('selected_items', [option.name for option in visible_options
+                                                               if option.is_default and option.is_available])
 
         if set_defaults:
             default_category = kwargs['category']['id'] if 'category' in kwargs else None
