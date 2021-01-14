@@ -10,7 +10,7 @@ from io import BytesIO
 from zipfile import ZipFile
 
 from flask import jsonify, request, session
-from marshmallow import fields
+from marshmallow import EXCLUDE, fields
 from marshmallow_enum import EnumField
 from sqlalchemy.orm import joinedload
 from werkzeug.exceptions import Forbidden, NotFound, ServiceUnavailable
@@ -192,7 +192,7 @@ class RHReviewEditable(RHContributionEditableRevisionBase):
         if action in (EditingReviewAction.update, EditingReviewAction.update_accept):
             argmap['files'] = EditingFilesField(self.event, self.contrib, self.editable_type, allow_claimed_files=True,
                                                 required=True)
-        args = parser.parse(argmap)
+        args = parser.parse(argmap, unknown=EXCLUDE)
         service_url = editing_settings.get(self.event, 'service_url')
 
         new_revision = review_editable_revision(self.revision, session.user, action, comment, args['tags'],
@@ -256,7 +256,7 @@ class RHReplaceRevision(RHContributionEditableRevisionBase):
             'tags': EditingTagsField(self.event, allow_system_tags=self.is_service_call, missing=set()),
             'files': EditingFilesField(self.event, self.contrib, self.editable_type, allow_claimed_files=True,
                                        required=True)
-        })
+        }, unknown=EXCLUDE)
 
         user = User.get_system_user() if self.is_service_call else session.user
         replace_revision(self.revision, user, comment, args['files'], args['tags'], state)
