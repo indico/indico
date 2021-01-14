@@ -45,7 +45,7 @@ from indico.web.forms.fields import (IndicoDateField, IndicoDateTimeField, Indic
                                      IndicoWeekDayRepetitionField, MultiStringField, RelativeDeltaField)
 from indico.web.forms.fields.principals import PermissionsField
 from indico.web.forms.validators import HiddenUnless, LinkedDateTime
-from indico.web.forms.widgets import CKEditorWidget, SwitchWidget
+from indico.web.forms.widgets import CKEditorWidget, PrefixedTextWidget, SwitchWidget
 
 
 CLONE_REPEAT_CHOICES = (
@@ -63,10 +63,10 @@ class EventDataForm(IndicoForm):
     def __init__(self, *args, **kwargs):
         self.event = kwargs.pop('event')
         super().__init__(*args, **kwargs)
-        # TODO: Add a custom widget showing the prefix right before the field
         prefix = f'{config.BASE_URL}/e/'
-        self.url_shortcut.description = _('<strong>{}SHORTCUT</strong> - the URL shortcut must be unique within '
-                                          'this Indico instance and is not case sensitive.').format(prefix)
+        self.url_shortcut.description = _('The URL shortcut must be unique within this Indico instance and '
+                                          'is not case sensitive.').format(prefix)
+        self.url_shortcut.widget = PrefixedTextWidget(prefix=prefix)
 
     def validate_url_shortcut(self, field):
         shortcut = field.data

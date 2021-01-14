@@ -1,0 +1,9 @@
+{% extends 'forms/base_widget.html' %}
+
+{% block html %}
+    <div class="i-form-field-fixed-width labeled input">
+        <span class="label">{{ prefix }}</span>
+        <input id="{{ field.id }}" name="{{ field.name }}" value="{{ field._value() }}" type="text"
+                {{ input_args|html_params }}>
+    </div>
+{% endblock %}
