@@ -18,7 +18,7 @@ from sqlalchemy.dialects.postgresql import ARRAY, JSONB
 from sqlalchemy.event import listens_for
 from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.ext.hybrid import hybrid_method, hybrid_property
-from sqlalchemy.orm import column_property
+from sqlalchemy.orm import column_property, joinedload
 from sqlalchemy.orm.base import NEVER_SET, NO_VALUE
 from sqlalchemy.sql import select
 
@@ -36,7 +36,7 @@ from indico.core.db.sqlalchemy.util.queries import db_dates_overlap, get_related
 from indico.modules.categories import Category
 from indico.modules.events.logs import EventLogEntry
 from indico.modules.events.management.util import get_non_inheriting_objects
-from indico.modules.events.models.persons import PersonLinkDataMixin
+from indico.modules.events.models.persons import EventPerson, PersonLinkDataMixin
 from indico.modules.events.settings import EventSettingProperty, event_contact_settings, event_core_settings
 from indico.modules.events.timetable.models.entries import TimetableEntry
 from indico.util.caching import memoize_request
@@ -921,6 +921,14 @@ class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionMan
         db.session.flush()
         logger.info('Event %r deleted [%s]', self, reason)
         self.log(EventLogRealm.event, EventLogKind.negative, 'Event', 'Event deleted', user, data={'Reason': reason})
+
+    def refresh_event_persons(self, *, notify=True):
+        """Update the data for all EventPersons based on the linked Users.
+
+        :param notify: Whether to trigger the ``person_updated`` signal.
+        """
+        for person in self.persons.filter(EventPerson.user_id.isnot(None)).options(joinedload('user')):
+            person.sync_user(notify=notify)
 
     @property
     @memoize_request

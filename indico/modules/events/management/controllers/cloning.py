@@ -181,7 +181,8 @@ class RHCloneEvent(RHManageEventBase):
                 else:
                     clone_calculator = get_clone_calculator(form.repeatability.data, self.event)
                     dates = clone_calculator.calculate(request.form)[0]
-                clones = [clone_event(self.event, start_dt, set(form.selected_items.data), form.category.data)
+                clones = [clone_event(self.event, start_dt, set(form.selected_items.data), form.category.data,
+                                      form.refresh_users.data)
                           for start_dt in dates]
                 if len(clones) == 1:
                     flash(_('Welcome to your cloned event!'), 'success')

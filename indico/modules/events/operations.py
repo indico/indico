@@ -152,7 +152,7 @@ def update_event(event, update_timetable=False, **data):
     _log_event_update(event, changes, visible_person_link_changes=visible_person_link_changes)
 
 
-def clone_event(event, start_dt, cloners, category=None):
+def clone_event(event, start_dt, cloners, category=None, refresh_users=False):
     """Clone an event on a given date/time.
 
     Runs all required cloners.
@@ -160,6 +160,8 @@ def clone_event(event, start_dt, cloners, category=None):
     :param start_dt: The start datetime of the new event;
     :param cloners: A set containing the names of all enabled cloners;
     :param category: The `Category` the new event will be created in.
+    :aparam refresh_users: Whether `EventPerson` data should be updated from
+                           their linked `User` object
     """
     end_dt = start_dt + event.duration
     data = {
@@ -176,6 +178,8 @@ def clone_event(event, start_dt, cloners, category=None):
 
     # Run the modular cloning system
     EventCloner.run_cloners(event, new_event, cloners)
+    if refresh_users:
+        new_event.refresh_event_persons(notify=False)
     signals.event.cloned.send(event, new_event=new_event)
 
     # Grant access to the event creator -- must be done after modular cloners

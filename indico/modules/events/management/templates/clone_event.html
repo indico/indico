@@ -5,7 +5,7 @@
 {% macro invisible_field(field) -%}
     {% set field_value = field._value() if field._value else field.data %}
     {% set data = [field_value] if field_value is string else ([field_value|tojson] if field_value is mapping else field_value) %}
-    {% for value in data %}
+    {% for value in data if field.short_name != 'refresh_users' or field.data %}
         <input type="hidden" name="{{ field.name }}" value="{{ value | forceescape }}">
     {% endfor %}
 {%- endmacro %}

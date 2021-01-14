@@ -19,6 +19,8 @@ Improvements
   (:issue:`4679`, :pr:`4725`, :pr:`4757`)
 - Show the user's profile picture in many more places (:issue:`4625`, :pr:`4747`)
 - Use a more modern search dialog when searching for users (:issue:`4674`, :pr:`4743`)
+- Add an option to refresh event person data from the underlying user when cloning an
+  event (:issue:`4750`, :pr:`4760`)
 
 Internal Changes
 ^^^^^^^^^^^^^^^^

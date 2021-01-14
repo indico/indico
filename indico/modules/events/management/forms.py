@@ -312,6 +312,9 @@ class CloneRepeatabilityForm(IndicoForm):
 
 class CloneContentsForm(CloneRepeatabilityForm):
     selected_items = IndicoSelectMultipleCheckboxField(_('What to clone'))
+    refresh_users = BooleanField(_('Refresh user information'),
+                                 description=_('When checked, names and affiliations of users in the cloned event will '
+                                               'be synchronized with their Indico user profiles.'))
 
     def __init__(self, event, set_defaults=False, **kwargs):
         options = EventCloner.get_cloners(event)
@@ -323,6 +326,7 @@ class CloneContentsForm(CloneRepeatabilityForm):
             form_params = {
                 'repeatability': request.form.get('repeatability', kwargs.pop('repeatability', None)),
                 'selected_items': (request.form.getlist('selected_items') or default_selected_items),
+                'refresh_users': 'refresh_users' in request.form if 'selected_items' in request.form else True,
                 'category': request.form.get('category', default_category),
                 'csrf_token': request.form.get('csrf_token')
             }

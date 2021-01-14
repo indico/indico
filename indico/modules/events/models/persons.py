@@ -12,6 +12,7 @@ from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import mapper
 
+from indico.core import signals
 from indico.core.db.sqlalchemy import PyIntEnum, UTCDateTime, db
 from indico.core.db.sqlalchemy.principals import EmailPrincipal
 from indico.core.db.sqlalchemy.util.models import auto_table_args, override_attr
@@ -241,6 +242,23 @@ class EventPerson(PersonMixin, db.Model):
                 existing.merge_person_info(event_person)
                 db.session.delete(event_person)
         db.session.flush()
+
+    def sync_user(self, *, notify=True):
+        """Update all person data based on the current user data.
+
+        :param notify: Whether to trigger the ``person_updated`` signal.
+        """
+        if not self.user:
+            return
+        fields = ('first_name', 'last_name', 'email', 'affiliation', 'address', 'phone')
+        has_changes = False
+        for field in fields:
+            new = getattr(self.user, field)
+            if getattr(self, field) != new:
+                setattr(self, field, new)
+                has_changes = True
+        if notify and has_changes:
+            signals.event.person_updated.send(self)
 
     @no_autoflush
     def merge_person_info(self, other):
