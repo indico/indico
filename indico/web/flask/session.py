@@ -179,7 +179,12 @@ class IndicoSessionInterface(SessionInterface):
             return self.session_class(sid=self.generate_sid(), new=True)
         data = self.storage.get(sid)
         if data is not None:
-            return self.session_class(self.serializer.loads(data), sid=sid)
+            try:
+                return self.session_class(self.serializer.loads(data), sid=sid)
+            except TypeError:
+                # fall through to generating a new session; this likely happens when
+                # you have a session saved on Python 2
+                pass
         return self.session_class(sid=self.generate_sid(), new=True)
 
     def save_session(self, app, session, response):
