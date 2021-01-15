@@ -60,6 +60,9 @@ def _require_extensions(*names):
 def _require_pg_version(version):
     # convert version string such as '9.4.10' to `90410` which is the
     # format used by server_version_num
+    # FIXME: this will not work for versions >= 10, since the second segment there is the patch version
+    # but once we require a newer postgres, we can ditch the logic here and only use the major version
+    # since that will be the only relevant version number
     req_version = sum(segment * 10**(4 - 2*i) for i, segment in enumerate(map(int, version.split('.'))))
     cur_version = db.engine.execute("SELECT current_setting('server_version_num')::int").scalar()
     if cur_version >= req_version:

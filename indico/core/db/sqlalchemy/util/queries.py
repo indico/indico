@@ -69,7 +69,14 @@ def has_extension(conn, name):
 def get_postgres_version():
     from indico.core.db import db
     version = db.engine.execute("SELECT current_setting('server_version_num')::int").scalar()
-    return '{}.{}.{}'.format(version // 10000, version % 10000 // 100, version % 100)
+    major = version // 10000
+    minor = version % 10000 // 100
+    patch = version % 100
+    if major >= 10:
+        # https://www.postgresql-archive.org/PG-VERSION-NUM-formatted-incorrectly-td6002110.html
+        return f'{major}.{patch}'
+    else:
+        return f'{major}.{minor}.{patch}'
 
 
 def increment_and_get(col, filter_, n=1):
