@@ -7,6 +7,7 @@
 
 import fnmatch
 import re
+from collections import defaultdict
 from datetime import datetime
 from hashlib import md5
 from operator import attrgetter
@@ -32,8 +33,8 @@ from indico.modules.events.notes.util import build_note_api_data, build_note_leg
 from indico.modules.events.sessions.models.sessions import Session
 from indico.modules.events.timetable.legacy import TimetableSerializer
 from indico.modules.events.timetable.models.entries import TimetableEntry
+from indico.modules.rb.models.reservation_occurrences import ReservationOccurrence
 from indico.util.date_time import iterdays
-from indico.util.fossilize.conversion import Conversion
 from indico.util.signals import values_from_signal
 from indico.web.flask.util import send_file, url_for
 from indico.web.http_api.hooks.base import HTTPAPIHook, IteratedDataFetcher
@@ -277,13 +278,24 @@ class SerializerBase:
             'references': list(map(self.serialize_reference, event.references))
         }
 
+    def _serialize_reservations(self, reservations):
+        res = defaultdict(list)
+        for resv in reservations:
+            occurrences = (resv.occurrences
+                           .filter(ReservationOccurrence.is_valid)
+                           .options(ReservationOccurrence.NO_RESERVATION_USER_STRATEGY)
+                           .all())
+            res[resv.room.full_name] += [{'startDateTime': occ.start_dt, 'endDateTime': occ.end_dt}
+                                         for occ in occurrences]
+        return res
+
     def _build_session_event_api_data(self, event):
         data = self._build_event_api_data_base(event)
         data.update({
             '_fossil': 'conference',
             'adjustedStartDate': self._serialize_date(event.start_dt_local),
             'adjustedEndDate': self._serialize_date(event.end_dt_local),
-            'bookedRooms': Conversion.reservationsList(event.reservations),
+            'bookedRooms': self._serialize_reservations(event.reservations),
             'supportInfo': {
                 '_fossil': 'supportInfo',
                 'caption': event.contact_title,
