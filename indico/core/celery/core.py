@@ -23,7 +23,6 @@ from indico.core.db import db
 from indico.core.notifications import flush_email_queue, init_email_queue
 from indico.core.plugins import plugin_engine
 from indico.util.console import cformat
-from indico.util.fossilize import clearCache
 from indico.web.flask.stats import request_stats_request_started
 
 
@@ -128,7 +127,6 @@ class IndicoCelery(Celery):
                         stack.close()
                         raise ValueError('Plugin not active: ' + plugin_name)
                 stack.enter_context(plugin_context(plugin))
-                clearCache()
                 with stack:
                     request_stats_request_started()
                     init_email_queue()

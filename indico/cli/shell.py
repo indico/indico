@@ -27,7 +27,6 @@ from indico.core.plugins import plugin_engine
 from indico.modules.events import Event
 from indico.util.console import cformat
 from indico.util.date_time import now_utc, server_to_utc
-from indico.util.fossilize import clearCache
 from indico.web.flask.stats import request_stats_request_started
 
 
@@ -133,7 +132,6 @@ def shell_cmd(verbose, with_req_context):
         banner = '\n'.join(info + ['', banner])
     ctx = current_app.make_shell_context()
     ctx.update(context)
-    clearCache()
     stack = ExitStack()
     if with_req_context:
         stack.enter_context(current_app.test_request_context(base_url=config.BASE_URL))

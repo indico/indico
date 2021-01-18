@@ -26,7 +26,6 @@ from indico.core.db import db
 from indico.core.db.sqlalchemy.core import handle_sqlalchemy_database_error
 from indico.core.logger import Logger, sentry_set_tags
 from indico.core.notifications import flush_email_queue, init_email_queue
-from indico.util import fossilize
 from indico.util.i18n import _
 from indico.util.locators import get_locator
 from indico.util.signals import values_from_signal
@@ -267,7 +266,6 @@ class RH:
                     request.method, request.relative_url, request.remote_addr, os.getpid())
 
         try:
-            fossilize.clearCache()
             init_email_queue()
             self._check_csrf()
             res = self._do_process()

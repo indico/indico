@@ -7,6 +7,7 @@
 
 import fnmatch
 import re
+from collections import defaultdict
 from datetime import datetime
 from hashlib import md5
 from operator import attrgetter
@@ -18,7 +19,6 @@ from sqlalchemy.orm import joinedload, subqueryload, undefer
 from werkzeug.exceptions import ServiceUnavailable
 
 from indico.core import signals
-from indico.core.config import config
 from indico.core.db import db
 from indico.core.db.sqlalchemy.principals import PrincipalType
 from indico.core.db.sqlalchemy.protection import ProtectionMode
@@ -33,12 +33,10 @@ from indico.modules.events.notes.util import build_note_api_data, build_note_leg
 from indico.modules.events.sessions.models.sessions import Session
 from indico.modules.events.timetable.legacy import TimetableSerializer
 from indico.modules.events.timetable.models.entries import TimetableEntry
+from indico.modules.rb.models.reservation_occurrences import ReservationOccurrence
 from indico.util.date_time import iterdays
-from indico.util.fossilize import fossilize
-from indico.util.fossilize.conversion import Conversion
 from indico.util.signals import values_from_signal
 from indico.web.flask.util import send_file, url_for
-from indico.web.http_api.fossils import IPeriodFossil
 from indico.web.http_api.hooks.base import HTTPAPIHook, IteratedDataFetcher
 from indico.web.http_api.responses import HTTPAPIError
 from indico.web.http_api.util import get_query_parameter
@@ -47,12 +45,6 @@ from indico.web.http_api.util import get_query_parameter
 utc = pytz.timezone('UTC')
 MAX_DATETIME = utc.localize(datetime(2099, 12, 31, 23, 59, 0))
 MIN_DATETIME = utc.localize(datetime(2000, 1, 1))
-
-
-class Period:
-    def __init__(self, startDT, endDT):
-        self.startDT = startDT
-        self.endDT = endDT
 
 
 def find_event_day_bounds(obj, day):
@@ -286,13 +278,24 @@ class SerializerBase:
             'references': list(map(self.serialize_reference, event.references))
         }
 
+    def _serialize_reservations(self, reservations):
+        res = defaultdict(list)
+        for resv in reservations:
+            occurrences = (resv.occurrences
+                           .filter(ReservationOccurrence.is_valid)
+                           .options(ReservationOccurrence.NO_RESERVATION_USER_STRATEGY)
+                           .all())
+            res[resv.room.full_name] += [{'startDateTime': occ.start_dt, 'endDateTime': occ.end_dt}
+                                         for occ in occurrences]
+        return res
+
     def _build_session_event_api_data(self, event):
         data = self._build_event_api_data_base(event)
         data.update({
             '_fossil': 'conference',
             'adjustedStartDate': self._serialize_date(event.start_dt_local),
             'adjustedEndDate': self._serialize_date(event.end_dt_local),
-            'bookedRooms': Conversion.reservationsList(event.reservations),
+            'bookedRooms': self._serialize_reservations(event.reservations),
             'supportInfo': {
                 '_fossil': 'supportInfo',
                 'caption': event.contact_title,
@@ -422,13 +425,22 @@ class CategoryEventFetcher(IteratedDataFetcher, SerializerBase):
         if self._detail_level not in ('events', 'contributions', 'subcontributions', 'sessions'):
             raise HTTPAPIError(f'Invalid detail level: {self._detail_level}', 400)
 
-    def _calculate_occurrences(self, event, from_dt, to_dt, tz):
+    def _calculate_occurrences(self, event, from_dt, to_dt):
         start_dt = max(from_dt, event.start_dt) if from_dt else event.start_dt
         end_dt = min(to_dt, event.end_dt) if to_dt else event.end_dt
         for day in iterdays(start_dt, end_dt):
             first_start, last_end = find_event_day_bounds(event, day.date())
             if first_start is not None:
-                yield Period(first_start, last_end)
+                yield {'start_dt': first_start, 'end_dt': last_end}
+
+    def _serialize_event_occurrences(self, event, from_dt, to_dt):
+        return [
+            {'startDT': period['start_dt'].astimezone(self._tz),
+             'endDT': period['end_dt'].astimezone(self._tz),
+             '_type': 'Period',
+             '_fossil': 'period'}
+            for period in self._calculate_occurrences(event, from_dt, to_dt)
+        ]
 
     def _get_query_options(self, detail_level):
         acl_user_strategy = joinedload('acl_entries').joinedload('user')
@@ -621,9 +633,7 @@ class CategoryEventFetcher(IteratedDataFetcher, SerializerBase):
                 for session_ in event.sessions:
                     data['sessions'].extend(self._build_session_api_data(session_))
         if self._occurrences:
-            data['occurrences'] = fossilize(self._calculate_occurrences(event, self._fromDT, self._toDT,
-                                            pytz.timezone(config.DEFAULT_TIMEZONE)),
-                                            {Period: IPeriodFossil}, tz=self._tz, naiveTZ=config.DEFAULT_TIMEZONE)
+            data['occurrences'] = self._serialize_event_occurrences(event, self._fromDT, self._toDT)
         # check whether the plugins want to add/override any data
         for update in values_from_signal(
             signals.event.metadata_postprocess.send('http-api', event=event, data=data, user=self.user),
