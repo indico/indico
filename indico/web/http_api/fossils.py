@@ -10,7 +10,6 @@ Basic fossils for data export
 """
 
 from indico.util.fossilize import IFossil
-from indico.util.fossilize.conversion import Conversion
 
 
 class IHTTPAPIErrorFossil(IFossil):
@@ -41,13 +40,3 @@ class IHTTPAPIExportResultFossil(IHTTPAPIResultFossil):
 
     def getAdditionalInfo(self):
         pass
-
-
-class IPeriodFossil(IFossil):
-    def startDT(self):
-        pass
-    startDT.convert = Conversion.datetime
-
-    def endDT(self):
-        pass
-    endDT.convert = Conversion.datetime
