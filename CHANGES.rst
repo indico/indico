@@ -28,6 +28,7 @@ Bugfixes
 
 - Fix error when converting malformed HTML links to LaTeX
 - Hide inactive contribution/abstract fields in submit/edit forms (:pr:`4755`)
+- Fix adding registrants to a session ACL
 
 Internal Changes
 ^^^^^^^^^^^^^^^^

@@ -64,7 +64,7 @@ class SessionProtectionForm(IndicoForm):
         super(SessionProtectionForm, self).__init__(*args, **kwargs)
 
     def validate_permissions(self, field):
-        check_permissions(self.event, field)
+        check_permissions(self.event, field, allow_registration_forms=True)
 
 
 class SessionBlockForm(IndicoForm):
