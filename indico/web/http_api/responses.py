@@ -7,55 +7,49 @@
 
 import time
 
-from zope.interface.declarations import implementer
+from marshmallow import fields
+from marshmallow.decorators import post_dump
 
 from indico.core.config import config
-from indico.util.fossilize import Fossilizable
-from indico.web.http_api.fossils import IHTTPAPIErrorFossil, IHTTPAPIResultFossil
+from indico.core.marshmallow import mm
 
 
-@implementer(IHTTPAPIErrorFossil)
-class HTTPAPIError(Exception, Fossilizable):
+class HTTPAPIError(Exception):
     def __init__(self, message, code=None):
         self.message = message
         self.code = code
 
-    def getMessage(self):
-        return self.message
 
-    def getCode(self):
-        return self.code
-
-
-@implementer(IHTTPAPIResultFossil)
-class HTTPAPIResult(Fossilizable):
-    def __init__(self, results, path='', query='', ts=None, complete=True, extra=None):
+class HTTPAPIResult:
+    def __init__(self, results, path='', query='', ts=None, extra=None):
         if ts is None:
             ts = int(time.time())
-        self._results = results
-        self._path = path
-        self._query = query
-        self._ts = ts
-        self._complete = complete
-        self._extra = extra or {}
+        self.results = results
+        self.path = path
+        self.query = query
+        self.ts = ts
+        self.extra = extra or {}
 
-    def getTS(self):
-        return self._ts
-
-    def getURL(self):
+    @property
+    def url(self):
         prefix = config.BASE_URL
-        if self._query:
-            return prefix + self._path + '?' + self._query
-        return prefix + self._path
+        if self.query:
+            return f'{prefix}{self.path}?{self.query}'
+        return prefix + self.path
 
-    def getCount(self):
-        return len(self._results)
+    @property
+    def count(self):
+        return len(self.results)
 
-    def getResults(self):
-        return self._results
 
-    def getComplete(self):
-        return self._complete
+class HTTPAPIResultSchema(mm.Schema):
+    count = fields.Integer()
+    extra = fields.Raw(data_key='additionalInfo')
+    ts = fields.Integer()
+    url = fields.String()
+    results = fields.Raw()
 
-    def getAdditionalInfo(self):
-        return self._extra
+    @post_dump
+    def _add_type(self, data, **kwargs):
+        data['_type'] = 'HTTPAPIResult'
+        return data

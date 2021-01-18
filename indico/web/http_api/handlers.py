@@ -27,11 +27,9 @@ from indico.modules.api import APIMode, api_settings
 from indico.modules.api.models.keys import APIKey
 from indico.modules.oauth import oauth
 from indico.modules.oauth.provider import load_token
-from indico.util.fossilize import clearCache, fossilize
 from indico.web.http_api import HTTPAPIHook
-from indico.web.http_api.fossils import IHTTPAPIExportResultFossil
 from indico.web.http_api.metadata.serializer import Serializer
-from indico.web.http_api.responses import HTTPAPIError, HTTPAPIResult
+from indico.web.http_api.responses import HTTPAPIError, HTTPAPIResult, HTTPAPIResultSchema
 from indico.web.http_api.util import get_query_parameter
 
 
@@ -101,7 +99,6 @@ def checkAK(apiKey, signature, timestamp, path, query):
 
 def handler(prefix, path):
     path = posixpath.join('/', prefix, path)
-    clearCache()  # init fossil cache
     logger = Logger.get('httpapi')
     if request.method == 'POST':
         # Convert POST data to a query string
@@ -243,11 +240,10 @@ def handler(prefix, path):
                 cache.set(cacheKey, (result, extra, ts, complete, typeMap), ttl)
     except HTTPAPIError as e:
         error = e
-        if e.getCode():
-            status_code = e.getCode()
+        if e.code:
+            status_code = e.code
 
     if result is None and error is None:
-        # TODO: usage page
         raise NotFound
     else:
         if ak and error is None:
@@ -274,11 +270,9 @@ def handler(prefix, path):
                 # use JSON, since it is universal
                 serializer = Serializer.create('json')
 
-            result = fossilize(error)
-        else:
-            if serializer.encapsulate:
-                result = fossilize(HTTPAPIResult(result, path, query, ts, complete, extra), IHTTPAPIExportResultFossil)
-                del result['_fossil']
+            result = {'message': error.message}
+        elif serializer.encapsulate:
+            result = HTTPAPIResultSchema().dump(HTTPAPIResult(result, path, query, ts, extra))
 
         try:
             data = serializer(result)
