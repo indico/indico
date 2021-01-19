@@ -5,10 +5,10 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-import searchCategoriesURL from 'indico-url:search.search_categories';
-import searchContributionsURL from 'indico-url:search.search_contributions';
-import searchEventsURL from 'indico-url:search.search_events';
-import searchFilesURL from 'indico-url:search.search_files';
+import searchAttachmentURL from 'indico-url:search.api_search_attachment';
+import searchCategoryURL from 'indico-url:search.api_search_category';
+import searchContributionURL from 'indico-url:search.api_search_contribution';
+import searchEventURL from 'indico-url:search.api_search_event';
 
 import PropTypes from 'prop-types';
 import React, {useEffect, useReducer, useState, useMemo} from 'react';
@@ -113,10 +113,10 @@ export default function SearchApp() {
     setActiveMenuItem(index);
   };
 
-  const [categoryResults, setCategoryPage] = useSearch(searchCategoriesURL(), query);
-  const [eventResults, setEventPage] = useSearch(searchEventsURL(), query);
-  const [contributionResults, setContributionPage] = useSearch(searchContributionsURL(), query);
-  const [fileResults, setFilePage] = useSearch(searchFilesURL(), query);
+  const [categoryResults, setCategoryPage] = useSearch(searchCategoryURL(), query);
+  const [eventResults, setEventPage] = useSearch(searchEventURL(), query);
+  const [contributionResults, setContributionPage] = useSearch(searchContributionURL(), query);
+  const [fileResults, setFilePage] = useSearch(searchAttachmentURL(), query);
   const searchMap = [
     ['Categories', categoryResults, setCategoryPage, Category],
     ['Events', eventResults, setEventPage, Event],
