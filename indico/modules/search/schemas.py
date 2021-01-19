@@ -21,7 +21,7 @@ def _get_category_path(chain):
     ]
 
 
-class CategoryResultSchema(mm.ModelSchema):
+class CategorySchema(mm.ModelSchema):
     class Meta:
         model = Category
         fields = ('id', 'title', 'url', 'path')
@@ -29,7 +29,7 @@ class CategoryResultSchema(mm.ModelSchema):
     path = mm.Function(lambda cat: _get_category_path(cat.chain))
 
 
-class EventResultSchema(mm.ModelSchema):
+class EventSchema(mm.ModelSchema):
     class Meta:
         model = Event
         fields = ('id', 'title', 'url', 'type', 'start_dt', 'end_dt', 'category_path', 'speakers')
@@ -43,22 +43,35 @@ class PersonSchema(mm.Schema):
     name = mm.String()
 
 
-class ContributionResultSchema(mm.Schema):
+class BaseSchema(mm.Schema):
     id = mm.Int()
     title = mm.String()
     url = mm.String()
-    start_dt = mm.String()
-    eventURL = mm.String()
-    eventTitle = mm.String()
     persons = mm.Nested(PersonSchema, many=True)
 
 
-class FileResultSchema(mm.Schema):
-    id = mm.Int()
-    title = mm.String()
-    url = mm.String()
+class ContributionSchema(BaseSchema):
+    start_dt = mm.String()
+    eventURL = mm.String()
+    eventTitle = mm.String()
+
+
+class AttachmentSchema(BaseSchema):
     type = mm.String()
     contributionTitle = mm.String()
     date = mm.String()
     contribURL = mm.String()
-    persons = mm.Nested(PersonSchema, many=True)
+
+
+class ResultSchema(mm.Schema):
+    page = mm.Int(required=True)
+    pages = mm.Int(required=True)
+    total = mm.Int(required=True)
+
+
+class CategoryResultSchema(ResultSchema):
+    results = mm.Nested(CategorySchema, required=True, many=True, attribute='items')
+
+
+class EventResultSchema(ResultSchema):
+    results = mm.Nested(EventSchema, required=True, many=True, attribute='items')
