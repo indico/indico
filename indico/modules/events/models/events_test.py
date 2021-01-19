@@ -61,7 +61,7 @@ def test_modify_relationship_with_deleted(db, dummy_event):
     # this should hard-delete c but not touch cd since it's not in the relationship
     event.contributions = [c2]
     db.session.flush()
-    assert set(Contribution.find_all()) == {cd, c2}
+    assert set(Contribution.query) == {cd, c2}
 
 
 @pytest.mark.parametrize(('category_pm', 'event_pm', 'effective_pm'), (

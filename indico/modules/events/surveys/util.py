@@ -57,7 +57,7 @@ def was_survey_submitted(survey):
     submission_id = session.get('submitted_surveys', {}).get(survey.id)
     if submission_id is None:
         return False
-    return SurveySubmission.find(id=submission_id, is_submitted=True).has_rows()
+    return SurveySubmission.query.filter_by(id=submission_id, is_submitted=True).has_rows()
 
 
 def is_submission_in_progress(survey):
@@ -109,7 +109,10 @@ def _format_title(question):
 
 def _filter_submissions(survey, submission_ids):
     if submission_ids:
-        return SurveySubmission.find_all(SurveySubmission.id.in_(submission_ids), survey=survey)
+        return (SurveySubmission.query
+                .filter(SurveySubmission.id.in_(submission_ids),
+                        SurveySubmission.survey == survey)
+                .all())
     return [x for x in survey.submissions if x.is_submitted]
 
 

@@ -27,7 +27,7 @@ class RHManageNetworks(RHNetworkBase):
     """Management list for IPNetworks."""
 
     def _process(self):
-        network_groups = IPNetworkGroup.find().order_by(IPNetworkGroup.name).all()
+        network_groups = IPNetworkGroup.query.order_by(IPNetworkGroup.name).all()
         return WPNetworksAdmin.render_template('networks.html', 'ip_networks', network_groups=network_groups)
 
 

@@ -55,7 +55,7 @@ class RegistrationFormCloner(EventCloner):
         return bool(event.registration_forms)
 
     def _clone_form_items(self, old_form, new_form, clone_all_revisions):
-        old_sections = RegistrationFormSection.find(RegistrationFormSection.registration_form_id == old_form.id)
+        old_sections = RegistrationFormSection.query.filter(RegistrationFormSection.registration_form_id == old_form.id)
         items_attrs = get_simple_column_attrs(RegistrationFormSection)
         for old_section in old_sections:
             new_section = RegistrationFormSection(**{attr: getattr(old_section, attr) for attr in items_attrs})

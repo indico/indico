@@ -226,8 +226,8 @@ def create_registration(regform, data, invitation=None, management=False, notify
             setattr(registration, form_item.personal_data_type.column, value)
     if invitation is None:
         # Associate invitation based on email in case the user did not use the link
-        invitation = (RegistrationInvitation
-                      .find(email=data['email'], registration_id=None)
+        invitation = (RegistrationInvitation.query
+                      .filter_by(email=data['email'], registration_id=None)
                       .with_parent(regform)
                       .first())
     if invitation:

@@ -77,7 +77,7 @@ def get_object_from_args(args=None):
     if args is None:
         args = request.view_args
     object_type = args['object_type']
-    event = Event.find_first(id=args['confId'], is_deleted=False)
+    event = Event.query.filter_by(id=args['confId'], is_deleted=False).first()
     if event is None:
         obj = None
     elif object_type == 'event':
@@ -87,9 +87,11 @@ def get_object_from_args(args=None):
     elif object_type == 'contribution':
         obj = Contribution.query.with_parent(event).filter_by(id=args['contrib_id']).first()
     elif object_type == 'subcontribution':
-        obj = SubContribution.find(SubContribution.id == args['subcontrib_id'], ~SubContribution.is_deleted,
-                                   SubContribution.contribution.has(event=event, id=args['contrib_id'],
-                                                                    is_deleted=False)).first()
+        obj = (SubContribution.query
+               .filter(SubContribution.id == args['subcontrib_id'],
+                       ~SubContribution.is_deleted,
+                       SubContribution.contribution.has(event=event, id=args['contrib_id'], is_deleted=False))
+               .first())
     else:
         raise ValueError(f'Unexpected object type: {object_type}')
     if obj is not None:

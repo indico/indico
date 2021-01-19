@@ -63,8 +63,10 @@ def static_sites_cleanup(days=30):
 
     :param days: number of days after which to remove static sites
     """
-    expired_sites = StaticSite.find_all(StaticSite.requested_dt < (now_utc() - timedelta(days=days)),
-                                        StaticSite.state == StaticSiteState.success)
+    expired_sites = (StaticSite.query
+                     .filter(StaticSite.requested_dt < (now_utc() - timedelta(days=days)),
+                             StaticSite.state == StaticSiteState.success)
+                     .all())
     logger.info('Removing %d expired static sites from the past %d days', len(expired_sites), days)
     try:
         for site in expired_sites:

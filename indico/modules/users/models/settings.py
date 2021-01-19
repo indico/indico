@@ -68,7 +68,7 @@ class UserSettingsProxy(SettingsProxyBase):
     @property
     def query(self):
         """Return a query object filtering by the proxy's module."""
-        return UserSetting.find(module=self.module)
+        return UserSetting.query.filter_by(module=self.module)
 
     @user_or_id
     def get_all(self, user, no_defaults=False):

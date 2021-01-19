@@ -510,8 +510,8 @@ class PrincipalMixin:
         """
         assert cls.allow_emails
         updated = set()
-        query = (cls
-                 .find(cls.email.in_(user.all_emails))
+        query = (cls.query
+                 .filter(cls.email.in_(user.all_emails))
                  .options(noload('user'), noload('local_group'), joinedload(relationship_attr).load_only('id')))
         for entry in query:
             parent = getattr(entry, relationship_attr)

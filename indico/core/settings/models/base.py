@@ -50,13 +50,16 @@ class SettingsBase:
     def delete(cls, module, *names, **kwargs):
         if not names:
             return
-        cls.find(cls.name.in_(names), cls.module == module, **kwargs).delete(synchronize_session='fetch')
+        (cls.query
+         .filter(cls.name.in_(names), cls.module == module)
+         .filter_by(**kwargs)
+         .delete(synchronize_session='fetch'))
         db.session.flush()
         cls._clear_cache()
 
     @classmethod
     def delete_all(cls, module, **kwargs):
-        cls.find(module=module, **kwargs).delete()
+        cls.query.filter_by(module=module, **kwargs).delete()
         db.session.flush()
         cls._clear_cache()
 
@@ -95,11 +98,11 @@ class JSONSettingsBase(SettingsBase):
 
     @classmethod
     def get_setting(cls, module, name, **kwargs):
-        return cls.find_first(module=module, name=name, **kwargs)
+        return cls.query.filter_by(module=module, name=name, **kwargs).first()
 
     @classmethod
     def get_all_settings(cls, module, **kwargs):
-        return {s.name: s for s in cls.find(module=module, **kwargs)}
+        return {s.name: s for s in cls.query.filter_by(module=module, **kwargs)}
 
     @classmethod
     def get_all(cls, module, **kwargs):
@@ -107,7 +110,7 @@ class JSONSettingsBase(SettingsBase):
         if hit:
             return cache[module]
         else:
-            for s in cls.find(**kwargs):
+            for s in cls.query.filter_by(**kwargs):
                 cache[s.module][s.name] = s.value
             return cache[module]
 
@@ -155,13 +158,13 @@ class PrincipalSettingsBase(PrincipalMixin, SettingsBase):
     @classmethod
     def get_all_acls(cls, module, **kwargs):
         rv = defaultdict(set)
-        for setting in cls.find(module=module, **kwargs):
+        for setting in cls.query.filter_by(module=module, **kwargs):
             rv[setting.name].add(setting.principal)
         return rv
 
     @classmethod
     def get_acl(cls, module, name, raw=False, **kwargs):
-        return {x if raw else x.principal for x in cls.find(module=module, name=name, **kwargs)}
+        return {x if raw else x.principal for x in cls.query.filter_by(module=module, name=name, **kwargs)}
 
     @classmethod
     def set_acl(cls, module, name, acl, **kwargs):
@@ -195,7 +198,7 @@ class PrincipalSettingsBase(PrincipalMixin, SettingsBase):
     @classmethod
     def merge_users(cls, module, target, source):
         settings = [(setting.module, setting.name, {x: getattr(setting, x) for x in cls.extra_key_cols})
-                    for setting in cls.find(module=module, type=PrincipalType.user, user=source)]
+                    for setting in cls.query.filter_by(module=module, type=PrincipalType.user, user=source)]
         for module, name, extra in settings:
             cls.remove_principal(module, name, source, **extra)
             cls.add_principal(module, name, target, **extra)

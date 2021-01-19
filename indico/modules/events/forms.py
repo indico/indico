@@ -41,7 +41,7 @@ class ReferenceTypeForm(IndicoForm):
         super().__init__(*args, **kwargs)
 
     def validate_name(self, field):
-        query = ReferenceType.find(db.func.lower(ReferenceType.name) == field.data.lower())
+        query = ReferenceType.query.filter(db.func.lower(ReferenceType.name) == field.data.lower())
         if self.reference_type:
             query = query.filter(ReferenceType.id != self.reference_type.id)
         if query.count():

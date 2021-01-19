@@ -38,8 +38,8 @@ class IPNetworkGroupForm(IndicoForm):
         super().__init__(*args, **kwargs)
 
     def validate_name(self, field):
-        query = IPNetworkGroup.find(db.func.lower(IPNetworkGroup.name) == field.data.lower())
+        query = IPNetworkGroup.query.filter(db.func.lower(IPNetworkGroup.name) == field.data.lower())
         if self._network_group_id is not None:
             query = query.filter(IPNetworkGroup.id != self._network_group_id)
-        if query.first():
+        if query.has_rows():
             raise ValueError(_("An IP network with this name already exists."))

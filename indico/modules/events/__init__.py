@@ -160,7 +160,7 @@ def _handle_legacy_ids(app, **kwargs):
         if request.method != 'GET':
             raise BadRequest('Unexpected non-GET request with legacy event ID')
 
-        mapping = LegacyEventMapping.find_first(legacy_event_id=event_id)
+        mapping = LegacyEventMapping.query.filter_by(legacy_event_id=event_id).first()
         if mapping is None:
             raise NotFound(f'Legacy event {event_id} does not exist')
 

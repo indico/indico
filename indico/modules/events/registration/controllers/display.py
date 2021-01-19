@@ -233,7 +233,7 @@ class InvitationMixin:
         except ValueError:
             flash(_("Your invitation code is not valid."), 'warning')
             return
-        self.invitation = RegistrationInvitation.find(uuid=token).with_parent(self.regform).first()
+        self.invitation = RegistrationInvitation.query.filter_by(uuid=token).with_parent(self.regform).first()
         if self.invitation is None:
             flash(_("This invitation does not exist or has been withdrawn."), 'warning')
 

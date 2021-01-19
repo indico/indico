@@ -131,9 +131,9 @@ class FieldStats:
     def _get_registration_data(self, field):
         registration_ids = [r.id for r in field.registration_form.active_registrations]
         field_data_ids = [data.id for data in field.data_versions]
-        return RegistrationData.find_all(RegistrationData.registration_id.in_(registration_ids),
-                                         RegistrationData.field_data_id.in_(field_data_ids),
-                                         RegistrationData.data != {})
+        return RegistrationData.query.filter(RegistrationData.registration_id.in_(registration_ids),
+                                             RegistrationData.field_data_id.in_(field_data_ids),
+                                             RegistrationData.data != {}).all()
 
     def _build_data(self):
         """Build data from registration data and field choices.

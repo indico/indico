@@ -15,7 +15,7 @@ logger = Logger.get('events.notes')
 @signals.users.merged.connect
 def _merge_users(target, source, **kwargs):
     from indico.modules.events.notes.models.notes import EventNoteRevision
-    EventNoteRevision.find(user_id=source.id).update({EventNoteRevision.user_id: target.id})
+    EventNoteRevision.query.filter_by(user_id=source.id).update({EventNoteRevision.user_id: target.id})
 
 
 @signals.event_management.get_cloners.connect

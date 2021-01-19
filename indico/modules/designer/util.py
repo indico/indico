@@ -37,7 +37,7 @@ def get_image_placeholder_types():
 def get_all_templates(obj):
     """Get all templates usable by an event/category."""
     category = obj.category if isinstance(obj, Event) else obj
-    return set(DesignerTemplate.find_all(DesignerTemplate.category_id.in_(categ['id'] for categ in category.chain)))
+    return set(DesignerTemplate.query.filter(DesignerTemplate.category_id.in_(categ['id'] for categ in category.chain)))
 
 
 def get_inherited_templates(obj):

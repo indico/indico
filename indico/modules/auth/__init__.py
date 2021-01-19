@@ -108,7 +108,7 @@ def _extend_profile_sidemenu(sender, user, **kwargs):
 
 @signals.users.registered.connect
 def _delete_requests(user, **kwargs):
-    for req in RegistrationRequest.find(RegistrationRequest.email.in_(user.all_emails)):
+    for req in RegistrationRequest.query.filter(RegistrationRequest.email.in_(user.all_emails)):
         logger.info('Deleting registration request %r due to registration of %r', req, user)
         db.session.delete(req)
     db.session.flush()

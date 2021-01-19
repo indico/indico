@@ -128,10 +128,10 @@ class RHRegistrationDownloadAttachment(RHManageRegFormsBase):
 
     def _process_args(self):
         RHManageRegFormsBase._process_args(self)
-        self.field_data = (RegistrationData
-                           .find(RegistrationData.registration_id == request.view_args['registration_id'],
-                                 RegistrationData.field_data_id == request.view_args['field_data_id'],
-                                 RegistrationData.filename.isnot(None))
+        self.field_data = (RegistrationData.query
+                           .filter(RegistrationData.registration_id == request.view_args['registration_id'],
+                                   RegistrationData.field_data_id == request.view_args['field_data_id'],
+                                   RegistrationData.filename.isnot(None))
                            .options(joinedload('registration').joinedload('registration_form'))
                            .one())
 

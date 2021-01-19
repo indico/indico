@@ -40,8 +40,8 @@ class AttachmentFormBase(IndicoForm):
         linked_object = kwargs.pop('linked_object')
         self.event = getattr(linked_object, 'event', None)  # not present in categories
         super().__init__(*args, **kwargs)
-        self.folder.query = (AttachmentFolder
-                             .find(object=linked_object, is_default=False, is_deleted=False)
+        self.folder.query = (AttachmentFolder.query
+                             .filter_by(object=linked_object, is_default=False, is_deleted=False)
                              .order_by(db.func.lower(AttachmentFolder.title)))
 
     @generated_data

@@ -82,8 +82,8 @@ class RHSurveySubmissionBase(RHManageSurveysBase):
         survey_strategy = joinedload('survey')
         answers_strategy = defaultload('answers').joinedload('question')
         sections_strategy = joinedload('survey').defaultload('sections').joinedload('children')
-        self.submission = (SurveySubmission
-                           .find(id=request.view_args['submission_id'])
+        self.submission = (SurveySubmission.query
+                           .filter_by(id=request.view_args['submission_id'])
                            .options(answers_strategy, survey_strategy, sections_strategy)
                            .one())
 

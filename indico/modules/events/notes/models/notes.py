@@ -118,7 +118,7 @@ class EventNote(LinkMixin, db.Model):
         If there is an existing note for the object, it will be returned
         even.  Otherwise a new note is created.
         """
-        note = cls.find_first(object=linked_object)
+        note = cls.query.filter_by(object=linked_object).first()
         if note is None:
             note = cls(object=linked_object)
         return note

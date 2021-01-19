@@ -42,7 +42,7 @@ def _merge_users(target, source, **kwargs):
     ak_user = target.api_key
     ak_merged = source.api_key
     # Move all inactive keys to the new user
-    APIKey.find(user_id=source.id, is_active=False).update({'user_id': target.id})
+    APIKey.query.filter_by(user_id=source.id, is_active=False).update({'user_id': target.id})
     if ak_merged and not ak_user:
         ak_merged.user = target
     elif ak_user and ak_merged:

@@ -132,7 +132,7 @@ def test_title(db):
     user.title = UserTitle.prof
     assert user.title == UserTitle.prof.title
     assert is_lazy_string(user.title)
-    assert User.find_one(title=UserTitle.prof) == user
+    assert User.query.filter_by(title=UserTitle.prof).one() == user
 
 
 @pytest.mark.parametrize(('first_name', 'last_name'), (

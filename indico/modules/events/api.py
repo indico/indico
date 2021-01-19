@@ -73,7 +73,7 @@ class EventTimeTableHook(HTTPAPIHook):
         return TimetableSerializer(event, management=False, user=user).serialize_timetable()
 
     def export_timetable(self, user):
-        events = Event.find_all(Event.id.in_(map(int, self._idList)), ~Event.is_deleted)
+        events = Event.query.filter(Event.id.in_(map(int, self._idList)), ~Event.is_deleted).all()
         return {event.id: self._serialize_timetable(event, user) for event in events}
 
 
@@ -124,8 +124,8 @@ class CategoryEventHook(HTTPAPIHook):
         id_list = set(self._idList)
         if self._wantFavorites and user:
             id_list.update(str(c.id) for c in user.favorite_categories)
-        legacy_id_map = {m.legacy_category_id: m.category_id
-                         for m in LegacyCategoryMapping.find(LegacyCategoryMapping.legacy_category_id.in_(id_list))}
+        legacy_query = LegacyCategoryMapping.query.filter(LegacyCategoryMapping.legacy_category_id.in_(id_list))
+        legacy_id_map = {m.legacy_category_id: m.category_id for m in legacy_query}
         id_list = {str(legacy_id_map.get(id_, id_)) for id_ in id_list}
         return expInt.category(id_list, self._format)
 
@@ -486,7 +486,7 @@ class CategoryEventFetcher(IteratedDataFetcher, SerializerBase):
         if self._toDT is None:
             has_future_events = False
         else:
-            query = Event.find(Event.category_id.in_(ids), ~Event.is_deleted, Event.start_dt > self._toDT)
+            query = Event.query.filter(Event.category_id.in_(ids), ~Event.is_deleted, Event.start_dt > self._toDT)
             has_future_events = query.has_rows()
         return {
             'eventCategories': self._build_category_path_data(ids),
@@ -498,9 +498,10 @@ class CategoryEventFetcher(IteratedDataFetcher, SerializerBase):
             idlist = list(map(int, idlist))
         except ValueError:
             raise HTTPAPIError('Event IDs must be numeric', 400)
-        query = (Event.find(Event.id.in_(idlist),
-                            ~Event.is_deleted,
-                            Event.happens_between(self._fromDT, self._toDT))
+        query = (Event.query
+                 .filter(Event.id.in_(idlist),
+                         ~Event.is_deleted,
+                         Event.happens_between(self._fromDT, self._toDT))
                  .options(*self._get_query_options(self._detail_level)))
         query = self._update_query(query)
         return self.serialize_events(x for x in query if self._filter_event(x) and x.can_access(self.user))

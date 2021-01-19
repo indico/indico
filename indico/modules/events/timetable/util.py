@@ -55,9 +55,10 @@ def _query_blocks(event_ids, dates_overlap, detail_level='session'):
     else:
         options.append(contains_eager(SessionBlock.timetable_entry))
 
-    return (SessionBlock.find(~Session.is_deleted,
-                              Session.event_id.in_(event_ids),
-                              dates_overlap(TimetableEntry))
+    return (SessionBlock.query
+            .filter(~Session.is_deleted,
+                    Session.event_id.in_(event_ids),
+                    dates_overlap(TimetableEntry))
             .options(*options)
             .join(TimetableEntry)
             .join(Session))
@@ -168,7 +169,8 @@ def get_category_timetable(categ_ids, start_dt, end_dt, detail_level='event', tz
 
     # then, retrieve detailed information about the events
     event_ids = set(items)
-    query = (Event.find(Event.id.in_(event_ids))
+    query = (Event.query
+             .filter(Event.id.in_(event_ids))
              .options(subqueryload(Event.person_links).joinedload(EventPersonLink.person),
                       joinedload(Event.own_room).noload('owner'),
                       joinedload(Event.own_venue),
@@ -222,9 +224,10 @@ def get_category_timetable(categ_ids, start_dt, end_dt, detail_level='event', tz
                 result[b.session.event_id]['blocks'].append(b)
 
     if detail_level == 'contribution':
-        query = (Contribution.find(Contribution.event_id.in_(event_ids),
-                                   dates_overlap(TimetableEntry),
-                                   ~Contribution.is_deleted)
+        query = (Contribution.query
+                 .filter(Contribution.event_id.in_(event_ids),
+                         dates_overlap(TimetableEntry),
+                         ~Contribution.is_deleted)
                  .options(contains_eager(Contribution.timetable_entry),
                           joinedload(Contribution.person_links))
                  .join(TimetableEntry))
@@ -236,7 +239,8 @@ def get_category_timetable(categ_ids, start_dt, end_dt, detail_level='event', tz
             for c in query:
                 result[c.event_id]['contributions'].append(c)
 
-        query = (Break.find(TimetableEntry.event_id.in_(event_ids), dates_overlap(TimetableEntry))
+        query = (Break.query
+                 .filter(TimetableEntry.event_id.in_(event_ids), dates_overlap(TimetableEntry))
                  .options(contains_eager(Break.timetable_entry))
                  .join(TimetableEntry))
         if grouped:

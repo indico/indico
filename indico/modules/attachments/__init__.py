@@ -28,8 +28,8 @@ connect_log_signals()
 def _merge_users(target, source, **kwargs):
     from indico.modules.attachments.models.attachments import Attachment, AttachmentFile
     from indico.modules.attachments.models.principals import AttachmentFolderPrincipal, AttachmentPrincipal
-    Attachment.find(user_id=source.id).update({Attachment.user_id: target.id})
-    AttachmentFile.find(user_id=source.id).update({AttachmentFile.user_id: target.id})
+    Attachment.query.filter_by(user_id=source.id).update({Attachment.user_id: target.id})
+    AttachmentFile.query.filter_by(user_id=source.id).update({AttachmentFile.user_id: target.id})
     AttachmentPrincipal.merge_users(target, source, 'attachment')
     AttachmentFolderPrincipal.merge_users(target, source, 'folder')
 

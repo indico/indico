@@ -61,7 +61,7 @@ def overlapping_occurrences(create_occurrence):
 
 def test_date(dummy_occurrence):
     assert dummy_occurrence.date == date.today()
-    assert ReservationOccurrence.find_first(date=date.today()) == dummy_occurrence
+    assert ReservationOccurrence.query.filter_by(date=date.today()).first() == dummy_occurrence
 
 
 # ======================================================================================================================
@@ -202,7 +202,7 @@ def test_filter_overlap(create_occurrence, overlapping_combination_from_2am_to_4
     occ2 = ReservationOccurrence(start_dt=date.today() + relativedelta(hour=start_hour),
                                  end_dt=date.today() + relativedelta(hour=end_hour))
     overlap_filter = ReservationOccurrence.filter_overlap([occ2])
-    assert (occ1 in ReservationOccurrence.find_all(overlap_filter)) == expected
+    assert (occ1 in ReservationOccurrence.query.filter(overlap_filter).all()) == expected
 
 
 def test_find_overlapping_with_different_room(overlapping_occurrences, create_room):

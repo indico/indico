@@ -298,7 +298,7 @@ class VCRoomEventAssociation(db.Model):
 
         :param event: an indico Event
         :param only_linked_to_event: only retrieve the vc rooms linked to the whole event
-        :param kwargs: extra kwargs to pass to ``find()``
+        :param kwargs: extra kwargs to pass to ``filter_by()``
         """
         if only_linked_to_event:
             kwargs['link_type'] = int(VCRoomLinkType.event)

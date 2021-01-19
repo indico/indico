@@ -173,9 +173,11 @@ class RHContributionAuthor(RHContributionDisplayBase):
 
     def _process_args(self):
         RHContributionDisplayBase._process_args(self)
-        self.author = (ContributionPersonLink.find_one(ContributionPersonLink.author_type != AuthorType.none,
-                                                       id=request.view_args['person_id'],
-                                                       contribution=self.contrib))
+        self.author = (ContributionPersonLink.query
+                       .filter(ContributionPersonLink.author_type != AuthorType.none,
+                               ContributionPersonLink.id == request.view_args['person_id'],
+                               contribution=self.contrib)
+                       .one())
 
     def _process(self):
         author_contribs = (Contribution.query.with_parent(self.event)

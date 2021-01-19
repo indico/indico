@@ -30,7 +30,7 @@ class EditGroupForm(IndicoForm):
         super().__init__(*args, **kwargs)
 
     def validate_name(self, field):
-        query = LocalGroup.find(db.func.lower(LocalGroup.name) == field.data.lower())
+        query = LocalGroup.query.filter(db.func.lower(LocalGroup.name) == field.data.lower())
         if self.group:
             query = query.filter(LocalGroup.id != self.group.id)
         if query.count():

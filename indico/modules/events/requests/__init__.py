@@ -42,8 +42,8 @@ def _get_event_management_url(event, **kwargs):
 @signals.users.merged.connect
 def _merge_users(target, source, **kwargs):
     from indico.modules.events.requests.models.requests import Request
-    Request.find(created_by_id=source.id).update({Request.created_by_id: target.id})
-    Request.find(processed_by_id=source.id).update({Request.processed_by_id: target.id})
+    Request.query.filter_by(created_by_id=source.id).update({Request.created_by_id: target.id})
+    Request.query.filter_by(processed_by_id=source.id).update({Request.processed_by_id: target.id})
 
 
 @signals.event.deleted.connect

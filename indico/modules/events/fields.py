@@ -33,7 +33,7 @@ class ReferencesField(MultipleItemsField):
         self.reference_class = kwargs.pop('reference_class')
         self.fields = [{'id': 'type', 'caption': _("Type"), 'type': 'select', 'required': True},
                        {'id': 'value', 'caption': _("Value"), 'type': 'text', 'required': True}]
-        self.choices = {'type': {str(r.id): r.name for r in ReferenceType.find_all()}}
+        self.choices = {'type': {str(r.id): r.name for r in ReferenceType.query}}
         super().__init__(*args, uuid_field='id', uuid_field_opaque=True, **kwargs)
 
     def process_formdata(self, valuelist):
@@ -139,7 +139,7 @@ class PersonLinkListFieldBase(EventPersonListField):
         person_data.update(extra_data)
         person_link = None
         if self.object and inspect(person).persistent:
-            person_link = self.person_link_cls.find_first(person=person, object=self.object)
+            person_link = self.person_link_cls.query.filter_by(person=person, object=self.object).first()
         if not person_link:
             person_link = self.person_link_cls(person=person)
         person_link.populate_from_dict(person_data)

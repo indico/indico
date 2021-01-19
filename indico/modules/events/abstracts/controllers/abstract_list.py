@@ -178,7 +178,9 @@ class RHAbstractPersonList(RHManageAbstractsActionsBase):
 
     def _process(self):
         submitters = {abstract.submitter for abstract in self.abstracts}
-        abstract_persons = AbstractPersonLink.find_all(AbstractPersonLink.abstract.has(self._membership_filter))
+        abstract_persons = (AbstractPersonLink.query
+                            .filter(AbstractPersonLink.abstract.has(self._membership_filter))
+                            .all())
         abstract_persons_dict = defaultdict(lambda: {'speaker': False, 'submitter': False, 'primary_author': False,
                                                      'secondary_author': False})
         for abstract_person in abstract_persons:

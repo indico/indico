@@ -29,7 +29,7 @@ class CategorySettingsProxy(SettingsProxyBase):
     @property
     def query(self):
         """Return a query object filtering by the proxy's module."""
-        return CategorySetting.find(module=self.module)
+        return CategorySetting.query.filter_by(module=self.module)
 
     @_category_or_id
     def get_all(self, category, no_defaults=False):

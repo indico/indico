@@ -59,7 +59,7 @@ class RHTicketConfigQRCodeImage(RHManageRegFormBase):
             border=1
         )
 
-        checkin_app = OAuthApplication.find_one(system_app_type=SystemAppType.checkin)
+        checkin_app = OAuthApplication.query.filter_by(system_app_type=SystemAppType.checkin).one()
         qr_data = {
             "event_id": self.event.id,
             "title": self.event.title,

@@ -89,7 +89,9 @@ class VCRoomLinkFormBase(IndicoForm):
                            for contrib in sorted(self.event.contributions,
                                                  key=lambda c: (c.title, c.start_dt or as_utc(datetime(1970, 1, 1))))
                            if contrib.start_dt is not None]
-        blocks = SessionBlock.find(SessionBlock.session.has((Session.event == self.event) & ~Session.is_deleted))
+        blocks = (SessionBlock.query
+                  .filter(SessionBlock.session.has((Session.event == self.event) & ~Session.is_deleted))
+                  .all())
         block_choices = [(block.id, '{} ({})'.format(block.full_title,
                                                      format_datetime(block.start_dt, timezone=self.event.tzinfo)))
                          for block in sorted(blocks, key=attrgetter('full_title', 'start_dt'))]
@@ -116,8 +118,8 @@ class VCRoomFormBase(VCRoomLinkFormBase):
 
     def validate_name(self, field):
         if field.data:
-            room = VCRoom.find_first(VCRoom.name == field.data, VCRoom.status != VCRoomStatus.deleted,
-                                     VCRoom.type == self.service_name)
+            room = VCRoom.query.filter(VCRoom.name == field.data, VCRoom.status != VCRoomStatus.deleted,
+                                       VCRoom.type == self.service_name).first()
             if room and room != self.vc_room:
                 raise ValidationError(_("There is already a room with this name"))
 

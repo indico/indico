@@ -26,7 +26,7 @@ logger = Logger.get('events.survey')
 @signals.users.merged.connect
 def _merge_users(target, source, **kwargs):
     from indico.modules.events.surveys.models.submissions import SurveySubmission
-    SurveySubmission.find(user_id=source.id).update({SurveySubmission.user_id: target.id})
+    SurveySubmission.query.filter_by(user_id=source.id).update({SurveySubmission.user_id: target.id})
 
 
 @signals.menu.items.connect_via('event-management-sidemenu')

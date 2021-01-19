@@ -21,8 +21,8 @@ def compat_registration(event_id, path=None):
     except KeyError:
         pass
     else:
-        mapping = (LegacyRegistrationMapping
-                   .find(event_id=event_id, legacy_registrant_id=registrant_id, legacy_registrant_key=authkey)
+        mapping = (LegacyRegistrationMapping.query
+                   .filter_by(event_id=event_id, legacy_registrant_id=registrant_id, legacy_registrant_key=authkey)
                    .first())
         if mapping:
             url = url_for('event_registration.display_regform', mapping.registration.locator.registrant)

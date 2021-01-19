@@ -301,7 +301,7 @@ class RHDownloadTemplateImage(BacksideTemplateProtectionMixin, RHModifyDesignerT
 
     def _process_args(self):
         RHModifyDesignerTemplateBase._process_args(self)
-        self.image = DesignerImageFile.find_one(id=request.view_args['image_id'], template=self.template)
+        self.image = DesignerImageFile.query.filter_by(id=request.view_args['image_id'], template=self.template).first()
 
     def _process(self):
         return self.image.send()

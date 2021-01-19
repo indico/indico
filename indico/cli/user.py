@@ -124,7 +124,7 @@ def create(grant_admin):
     print()
     while True:
         username = click.prompt("Enter username").lower().strip()
-        if not Identity.find(provider='indico', identifier=username).count():
+        if not Identity.query.filter_by(provider='indico', identifier=username).has_rows():
             break
         print(cformat('%{red}Username already exists'))
     password = prompt_pass()

@@ -153,6 +153,6 @@ def test_save_token_invalid_grant(dummy_request, token_data, grant_type):
 
 def test_save_token_no_application(dummy_application, dummy_request, token_data):
     dummy_request.client.client_id = str(uuid4())
-    assert not OAuthApplication.find(client_id=dummy_request.client.client_id).count()
+    assert not OAuthApplication.query.filter_by(client_id=dummy_request.client.client_id).count()
     with pytest.raises(NoResultFound):
         save_token(token_data, dummy_request)

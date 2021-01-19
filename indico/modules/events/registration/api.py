@@ -29,7 +29,7 @@ class RHAPIRegistrant(RH):
             raise Forbidden()
 
     def _process_args(self):
-        self.event = Event.find(id=request.view_args['event_id'], is_deleted=False).first_or_404()
+        self.event = Event.query.filter_by(id=request.view_args['event_id'], is_deleted=False).first_or_404()
         self._registration = (self.event.registrations
                               .filter_by(id=request.view_args['registrant_id'],
                                          is_deleted=False)
@@ -65,7 +65,7 @@ class RHAPIRegistrants(RH):
             raise Forbidden()
 
     def _process_args(self):
-        self.event = Event.find(id=request.view_args['event_id'], is_deleted=False).first_or_404()
+        self.event = Event.query.filter_by(id=request.view_args['event_id'], is_deleted=False).first_or_404()
 
     def _process_GET(self):
         return jsonify(registrants=build_registrations_api_data(self.event))

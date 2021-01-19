@@ -173,9 +173,9 @@ class InvitationFormNew(InvitationFormBase):
                  'affiliation': self.affiliation.data}]
 
     def validate_email(self, field):
-        if RegistrationInvitation.find(email=field.data).with_parent(self.regform).count():
+        if RegistrationInvitation.query.filter_by(email=field.data).with_parent(self.regform).has_rows():
             raise ValidationError(_("There is already an invitation with this email address."))
-        if Registration.find(email=field.data, is_active=True).with_parent(self.regform).count():
+        if Registration.query.filter_by(email=field.data, is_active=True).with_parent(self.regform).has_rows():
             raise ValidationError(_("There is already a registration with this email address."))
 
 

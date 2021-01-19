@@ -41,10 +41,10 @@ class RHManageRegistrationBase(RHManageRegFormBase):
 
     def _process_args(self):
         RHManageRegFormBase._process_args(self)
-        self.registration = (Registration
-                             .find(Registration.id == request.view_args['registration_id'],
-                                   ~Registration.is_deleted,
-                                   ~RegistrationForm.is_deleted)
+        self.registration = (Registration.query
+                             .filter(Registration.id == request.view_args['registration_id'],
+                                     ~Registration.is_deleted,
+                                     ~RegistrationForm.is_deleted)
                              .join(Registration.registration_form)
                              .options(contains_eager(Registration.registration_form)
                                       .defaultload('form_items')

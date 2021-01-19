@@ -396,7 +396,7 @@ class RHUserEmailsVerify(RHUserBase):
         if not user or user != self.user:
             flash(_('This token is for a different Indico user. Please login with the correct account'), 'error')
             return False, None
-        existing = UserEmail.find_first(is_user_deleted=False, email=data['email'])
+        existing = UserEmail.query.filter_by(is_user_deleted=False, email=data['email']).first()
         if existing and not existing.user.is_pending:
             if existing.user == self.user:
                 flash(_('This email address is already attached to your account.'))
@@ -485,7 +485,7 @@ class RHUsersAdmin(RHAdminBase):
         form_data = form.data
         search_results = None
         num_of_users = User.query.count()
-        num_deleted_users = User.find(is_deleted=True).count()
+        num_deleted_users = User.query.filter_by(is_deleted=True).count()
 
         if form.validate_on_submit():
             search_results = []

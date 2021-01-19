@@ -44,7 +44,7 @@ def event_or_shorturl(confId, shorturl_namespace=False, force_overview=False):
                 # Old event namespace => 301-redirect to the new shorturl first to get Google etc. to update it
                 func = lambda: redirect(shorturl_event.short_url, 301)
         elif is_legacy_id(confId):
-            mapping = LegacyEventMapping.find_first(legacy_event_id=confId)
+            mapping = LegacyEventMapping.query.filter_by(legacy_event_id=confId).first()
             if mapping is not None:
                 url = url_for('events.display', confId=mapping.event_id)
                 func = lambda: redirect(url, 301)

@@ -35,7 +35,7 @@ class RHManageReferenceTypeBase(RHAdminBase):
 
     def _process_args(self):
         RHAdminBase._process_args(self)
-        self.reference_type = ReferenceType.find_one(id=request.view_args['reference_type_id'])
+        self.reference_type = ReferenceType.query.filter_by(id=request.view_args['reference_type_id']).one()
 
 
 class RHReferenceTypes(RHAdminBase):

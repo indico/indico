@@ -115,7 +115,7 @@ class GroupProxy:
             criterion = db.func.lower(LocalGroup.name).contains(name.lower())
         result = set()
         if (providers is None or 'indico' in providers) and config.LOCAL_GROUPS:
-            result |= {g.proxy for g in LocalGroup.find(criterion)}
+            result |= {g.proxy for g in LocalGroup.query.filter(criterion)}
         result |= {GroupProxy(g.name, g.provider.name, _group=g)
                    for g in multipass.search_groups(name, providers=providers, exact=exact)}
         return sorted(result, key=lambda x: x.name.lower())

@@ -33,7 +33,7 @@ from indico.modules.rb.models.room_nonbookable_periods import NonBookablePeriod
 from indico.modules.rb.util import rb_is_admin
 from indico.util.i18n import _
 from indico.util.serializer import Serializer
-from indico.util.string import format_repr, natural_sort_key
+from indico.util.string import format_repr
 from indico.web.flask.util import url_for
 
 
@@ -395,13 +395,6 @@ class Room(ProtectionManagersMixin, db.Model, Serializer):
             floor=self.floor,
             number=self.number
         )
-
-    @classmethod
-    def find_all(cls, *args, **kwargs):
-        """Retrieve rooms, sorted by location and full name."""
-        rooms = super().find_all(*args, **kwargs)
-        rooms.sort(key=lambda r: natural_sort_key(r.location_name + r.full_name))
-        return rooms
 
     @classmethod
     def find_with_attribute(cls, attribute):

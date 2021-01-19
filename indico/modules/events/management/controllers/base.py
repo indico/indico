@@ -54,12 +54,12 @@ class RHContributionPersonListMixin:
         raise NotImplementedError
 
     def _process(self):
-        contribution_persons = (ContributionPersonLink
-                                .find(ContributionPersonLink.contribution.has(self._membership_filter))
+        contribution_persons = (ContributionPersonLink.query
+                                .filter(ContributionPersonLink.contribution.has(self._membership_filter))
                                 .all())
-        contribution_persons.extend(SubContributionPersonLink
-                                    .find(SubContributionPersonLink.subcontribution
-                                          .has(SubContribution.contribution.has(self._membership_filter)))
+        contribution_persons.extend(SubContributionPersonLink.query
+                                    .filter(SubContributionPersonLink.subcontribution
+                                            .has(SubContribution.contribution.has(self._membership_filter)))
                                     .all())
 
         registered_persons = get_registered_event_persons(self.event)

@@ -34,7 +34,7 @@ class RHOAuthAuthorize(RHProtected):
             UUID(hex=request.args['client_id'])
         except ValueError:
             raise NoResultFound
-        self.application = OAuthApplication.find_one(client_id=request.args['client_id'])
+        self.application = OAuthApplication.query.filter_by(client_id=request.args['client_id']).one()
 
     @oauth.authorize_handler
     def _process(self, **kwargs):
@@ -74,7 +74,7 @@ class RHOAuthAdmin(RHAdminBase):
     """OAuth server administration settings."""
 
     def _process(self):
-        applications = OAuthApplication.find().order_by(db.func.lower(OAuthApplication.name)).all()
+        applications = OAuthApplication.query.order_by(db.func.lower(OAuthApplication.name)).all()
         return WPOAuthAdmin.render_template('apps.html', applications=applications)
 
 

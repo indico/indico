@@ -192,16 +192,19 @@ class RHPersonsList(RHPersonsBase):
                                  .filter(EventPrincipal.type == PrincipalType.email,
                                          EventPrincipal.has_management_permission('submit')))
 
-        contrib_principal_query = (ContributionPrincipal.find(Contribution.event == self.event,
-                                                              ContributionPrincipal.type == PrincipalType.email,
-                                                              ContributionPrincipal.has_management_permission('submit'))
+        contrib_principal_query = (ContributionPrincipal.query
+                                   .filter(Contribution.event == self.event,
+                                           ContributionPrincipal.type == PrincipalType.email,
+                                           ContributionPrincipal.has_management_permission('submit'))
                                    .join(Contribution)
                                    .options(contains_eager('contribution')))
 
-        session_principal_query = (SessionPrincipal.find(Session.event == self.event,
-                                                         SessionPrincipal.type == PrincipalType.email,
-                                                         SessionPrincipal.has_management_permission())
-                                   .join(Session).options(joinedload('session').joinedload('acl_entries')))
+        session_principal_query = (SessionPrincipal.query
+                                   .filter(Session.event == self.event,
+                                           SessionPrincipal.type == PrincipalType.email,
+                                           SessionPrincipal.has_management_permission())
+                                   .join(Session)
+                                   .options(joinedload('session').joinedload('acl_entries')))
 
         persons = self.get_persons()
         person_list = sorted(persons.values(), key=lambda x: x['person'].display_full_name.lower())

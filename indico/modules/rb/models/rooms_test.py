@@ -6,7 +6,6 @@
 # LICENSE file for more details.
 
 from datetime import date, datetime, time, timedelta
-from operator import itemgetter
 
 import pytest
 
@@ -31,8 +30,8 @@ _notset = object()
 def test_is_auto_confirm(create_room, need_confirmation):
     room = create_room(reservations_need_confirmation=need_confirmation)
     assert room.is_auto_confirm != need_confirmation
-    assert Room.find_first(is_auto_confirm=need_confirmation) is None
-    assert Room.find_first(is_auto_confirm=not need_confirmation) == room
+    assert Room.query.filter_by(is_auto_confirm=need_confirmation).first() is None
+    assert Room.query.filter_by(is_auto_confirm=not need_confirmation).first() == room
 
 
 def test_has_photo(db, dummy_room):
@@ -151,24 +150,8 @@ def test_set_attribute_value(create_room_attribute, dummy_room):
     assert dummy_room.get_attribute_value('foo', _notset) is _notset
 
 
-def test_find_all(create_location, create_room):
-    # Here we just test if we get the rooms in natural sort order
-    loc1 = create_location('Z')
-    loc2 = create_location('A')
-    data = [
-        (2, dict(location=loc1, building='1',   floor='2', number='3')),
-        (3, dict(location=loc1, building='2',   floor='2', number='3')),
-        (5, dict(location=loc1, building='100', floor='2', number='3')),
-        (4, dict(location=loc1, building='10',  floor='2', number='3')),
-        (1, dict(location=loc2, building='999', floor='2', number='3'))
-    ]
-    rooms = [(pos, create_room(**params)) for pos, params in data]
-    sorted_rooms = list(map(itemgetter(1), sorted(rooms, key=itemgetter(0))))
-    assert sorted_rooms == Room.find_all()
-
-
 def test_find_with_attribute(dummy_room, create_room, create_room_attribute):
-    assert Room.find_all() == [dummy_room]  # one room without the attribute
+    assert Room.query.all() == [dummy_room]  # one room without the attribute
     assert not Room.find_with_attribute('foo')
     create_room_attribute('foo')
     assert not Room.find_with_attribute('foo')
@@ -237,7 +220,7 @@ def test_filter_available(dummy_room, create_reservation, create_blocking,
                                                (RepeatFrequency.NEVER, 0), include_blockings=True,
                                                include_pre_bookings=include_pre_bookings,
                                                include_pending_blockings=include_pending_blockings)
-    assert set(Room.find_all(availabilty_filter)) == (set() if filtered else {dummy_room})
+    assert set(Room.query.filter(availabilty_filter)) == (set() if filtered else {dummy_room})
 
 
 @pytest.mark.parametrize(('is_admin', 'is_owner', 'max_advance_days', 'days_delta', 'success'), (

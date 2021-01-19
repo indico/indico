@@ -81,7 +81,7 @@ def checkAK(apiKey, signature, timestamp, path, query):
         UUID(hex=apiKey)
     except ValueError:
         raise HTTPAPIError('Malformed API key', 400)
-    ak = APIKey.find_first(token=apiKey, is_active=True)
+    ak = APIKey.query.filter_by(token=apiKey, is_active=True).first()
     if not ak:
         raise HTTPAPIError('Invalid API key', 403)
     if ak.is_blocked:

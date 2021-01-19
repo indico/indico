@@ -67,22 +67,6 @@ class IndicoModel(Model):
     query_class = IndicoBaseQuery
 
     @classmethod
-    def find(cls, *args, **kwargs):
-        return cls.query.filter_by(**kwargs).filter(*args)
-
-    @classmethod
-    def find_all(cls, *args, **kwargs):
-        return cls.find(*args, **kwargs).all()
-
-    @classmethod
-    def find_first(cls, *args, **kwargs):
-        return cls.find(*args, **kwargs).first()
-
-    @classmethod
-    def find_one(cls, *args, **kwargs):
-        return cls.find(*args, **kwargs).one()
-
-    @classmethod
     def get(cls, oid, is_deleted=None):
         """Get an object based on its primary key.
 

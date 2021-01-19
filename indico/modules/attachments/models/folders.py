@@ -116,7 +116,7 @@ class AttachmentFolder(LinkMixin, ProtectionMixin, db.Model):
     @classmethod
     def get_or_create_default(cls, linked_object):
         """Get the default folder for the given object or creates it."""
-        folder = cls.find_first(is_default=True, object=linked_object)
+        folder = cls.query.filter_by(is_default=True, object=linked_object).first()
         if folder is None:
             folder = cls(is_default=True, object=linked_object)
         return folder
@@ -133,7 +133,8 @@ class AttachmentFolder(LinkMixin, ProtectionMixin, db.Model):
         if title is None:
             return AttachmentFolder.get_or_create_default(linked_object)
         else:
-            folder = AttachmentFolder.find_first(object=linked_object, is_default=False, is_deleted=False, title=title)
+            folder = AttachmentFolder.query.filter_by(object=linked_object, is_default=False, is_deleted=False,
+                                                      title=title).first()
             return folder or AttachmentFolder(object=linked_object, title=title)
 
     @locator_property

@@ -28,7 +28,7 @@ def _extend_event_management_menu(sender, event, **kwargs):
 
 @signals.users.merged.connect
 def _merge_users(target, source, **kwargs):
-    EventLogEntry.find(user_id=source.id).update({EventLogEntry.user_id: target.id})
+    EventLogEntry.query.filter_by(user_id=source.id).update({EventLogEntry.user_id: target.id})
 
 
 @signals.event.get_log_renderers.connect

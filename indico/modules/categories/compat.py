@@ -19,7 +19,7 @@ from indico.web.rh import RHSimple
 def compat_category(legacy_category_id, path=None):
     if not re.match(r'^\d+l\d+$', legacy_category_id):
         abort(404)
-    mapping = LegacyCategoryMapping.find_first(legacy_category_id=legacy_category_id)
+    mapping = LegacyCategoryMapping.query.filter_by(legacy_category_id=legacy_category_id).first()
     if mapping is None:
         raise NotFound(f'Legacy category {legacy_category_id} does not exist')
     view_args = request.view_args.copy()

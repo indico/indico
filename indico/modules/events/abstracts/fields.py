@@ -51,7 +51,7 @@ def _get_users_in_roles(data):
 def _get_users(ids):
     if not ids:
         return set()
-    return set(User.find(User.id.in_(ids), ~User.is_deleted))
+    return set(User.query.filter(User.id.in_(ids), ~User.is_deleted))
 
 
 class EmailRuleListField(JSONField):

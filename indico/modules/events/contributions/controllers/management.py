@@ -93,7 +93,7 @@ class RHManageContributionBase(RHManageContributionsBase):
 
     def _process_args(self):
         RHManageContributionsBase._process_args(self)
-        self.contrib = Contribution.find_one(id=request.view_args['contrib_id'], is_deleted=False)
+        self.contrib = Contribution.query.filter_by(id=request.view_args['contrib_id'], is_deleted=False).one()
 
     def _check_access(self):
         if not self.contrib.can_manage(session.user):
@@ -731,7 +731,9 @@ class RHCreateReferenceMixin:
     def _process_args(self):
         self.reference_value = request.form['value']
         reference_type_name = request.form['type']
-        self.reference_type = ReferenceType.find_one(db.func.lower(ReferenceType.name) == reference_type_name.lower())
+        self.reference_type = (ReferenceType.query
+                               .filter(db.func.lower(ReferenceType.name) == reference_type_name.lower())
+                               .one())
 
     @staticmethod
     def jsonify_reference(reference):

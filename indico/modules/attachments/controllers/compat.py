@@ -20,7 +20,7 @@ def _clean_args(kwargs):
     if 'event_id' not in kwargs:
         raise NotFound
     if is_legacy_id(kwargs['event_id']):
-        mapping = LegacyEventMapping.find(legacy_event_id=kwargs['event_id']).first_or_404()
+        mapping = LegacyEventMapping.query.filter_by(legacy_event_id=kwargs['event_id']).first_or_404()
         kwargs['event_id'] = mapping.event_id
     if 'contrib_id' in kwargs:
         kwargs['contribution_id'] = kwargs.pop('contrib_id')
@@ -36,7 +36,7 @@ def _clean_args(kwargs):
 @RHSimple.wrap_function
 def compat_folder(**kwargs):
     _clean_args(kwargs)
-    folder = LegacyAttachmentFolderMapping.find(**kwargs).first_or_404().folder
+    folder = LegacyAttachmentFolderMapping.query.filter_by(**kwargs).first_or_404().folder
     if folder.is_deleted:
         raise NotFound
     return redirect(url_for('attachments.list_folder', folder), 302 if current_app.debug else 301)
@@ -62,7 +62,7 @@ def _redirect_to_note(**kwargs):
 @RHSimple.wrap_function
 def compat_attachment(**kwargs):
     _clean_args(kwargs)
-    mapping = LegacyAttachmentMapping.find_first(**kwargs)
+    mapping = LegacyAttachmentMapping.query.filter_by(**kwargs).first()
     if mapping is None:
         if kwargs['material_id'] == 'minutes' and kwargs['resource_id'] == 'minutes':
             return _redirect_to_note(**kwargs)

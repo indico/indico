@@ -71,8 +71,8 @@ class RegistrationListGenerator(ListGeneratorBase):
         result = []
         for item_id in ids:
             if item_id in self.personal_items:
-                field = RegistrationFormItem.find_one(registration_form=self.regform,
-                                                      personal_data_type=PersonalDataType[item_id])
+                field = RegistrationFormItem.query.filter_by(registration_form=self.regform,
+                                                             personal_data_type=PersonalDataType[item_id]).one()
                 result.append({
                     'id': field.id,
                     'caption': field.title
@@ -103,8 +103,8 @@ class RegistrationListGenerator(ListGeneratorBase):
 
         if not item_ids:
             return []
-        return (RegistrationFormItem
-                .find(~RegistrationFormItem.is_deleted, RegistrationFormItem.id.in_(item_ids))
+        return (RegistrationFormItem.query
+                .filter(~RegistrationFormItem.is_deleted, RegistrationFormItem.id.in_(item_ids))
                 .with_parent(self.regform)
                 .join(RegistrationFormItem.parent, aliased=True)
                 .filter(~RegistrationFormItem.is_deleted)  # parent deleted

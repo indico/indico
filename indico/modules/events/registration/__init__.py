@@ -112,11 +112,11 @@ def _associate_registrations(user, **kwargs):
     subquery = db.session.query(reg_alias).filter(reg_alias.user_id == user.id,
                                                   reg_alias.registration_form_id == Registration.registration_form_id,
                                                   ~reg_alias.is_deleted)
-    registrations = (Registration
-                     .find(Registration.user_id == None,  # noqa
-                           Registration.email.in_(user.all_emails),
-                           ~subquery.exists(),
-                           ~Registration.is_deleted)
+    registrations = (Registration.query
+                     .filter(Registration.user_id.is_(None),
+                             Registration.email.in_(user.all_emails),
+                             ~subquery.exists(),
+                             ~Registration.is_deleted)
                      .order_by(Registration.submitted_dt.desc())
                      .all())
     if not registrations:

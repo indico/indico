@@ -53,7 +53,7 @@ def _get_parent_info(parent):
 
 
 def _get_folders_protection_info(linked_object):
-    folders = AttachmentFolder.find(object=linked_object, is_deleted=False)
+    folders = AttachmentFolder.query.filter_by(object=linked_object, is_deleted=False)
     return {folder.id: folder.is_self_protected for folder in folders}
 
 

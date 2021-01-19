@@ -93,4 +93,4 @@ def _get_vc_cloner(sender, **kwargs):
 
 @signals.users.merged.connect
 def _merge_users(target, source, **kwargs):
-    VCRoom.find(created_by_id=source.id).update({VCRoom.created_by_id: target.id})
+    VCRoom.query.filter_by(created_by_id=source.id).update({VCRoom.created_by_id: target.id})
