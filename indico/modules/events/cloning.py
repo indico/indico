@@ -69,8 +69,8 @@ class EventCloner(object):
                       key=attrgetter('friendly_name'))
 
     @classmethod
-    def run_cloners(cls, old_event, new_event, cloners, event_exists=False):
-        all_cloners = OrderedDict((name, cloner_cls(old_event))
+    def run_cloners(cls, old_event, new_event, cloners, n_occurrence=0, event_exists=False):
+        all_cloners = OrderedDict((name, cloner_cls(old_event, n_occurrence))
                                   for name, cloner_cls in get_event_cloners().iteritems())
         if any(cloner.is_internal for name, cloner in all_cloners.iteritems() if name in cloners):
             raise Exception('An internal cloner was selected')
@@ -131,8 +131,9 @@ class EventCloner(object):
         # This is not very efficient, but it runs exactly once on a not-very-large set
         return {cloner.name for cloner in get_event_cloners().itervalues() if cls.name in cloner.requires_deep}
 
-    def __init__(self, old_event):
+    def __init__(self, old_event, n_occurrence=0):
         self.old_event = old_event
+        self.n_occurrence = n_occurrence
 
     def run(self, new_event, cloners, shared_data, event_exists=False):
         """Performs the cloning operation.

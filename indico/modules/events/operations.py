@@ -153,11 +153,12 @@ def update_event(event, update_timetable=False, **data):
     _log_event_update(event, changes, visible_person_link_changes=visible_person_link_changes)
 
 
-def clone_event(event, start_dt, cloners, category=None):
+def clone_event(event, n_occurrence, start_dt, cloners, category=None):
     """Clone an event on a given date/time.
 
     Runs all required cloners.
 
+    :param n_occurrence: The 1-indexed number of the occurrence, if this is a "recurring" clone, otherwise `0`
     :param start_dt: The start datetime of the new event;
     :param cloners: A set containing the names of all enabled cloners;
     :param category: The `Category` the new event will be created in.
@@ -176,7 +177,7 @@ def clone_event(event, start_dt, cloners, category=None):
                              add_creator_as_manager=False, cloning=True)
 
     # Run the modular cloning system
-    EventCloner.run_cloners(event, new_event, cloners)
+    EventCloner.run_cloners(event, new_event, cloners, n_occurrence)
     signals.event.cloned.send(event, new_event=new_event)
 
     # Grant access to the event creator -- must be done after modular cloners
