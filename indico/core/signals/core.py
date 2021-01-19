@@ -101,3 +101,8 @@ the type of notification.  The notification email that will be sent is passed in
 the ``email`` kwarg.  The additional kwargs passed to this signal depend on the
 context.
 """)
+
+# TODO write the docstring for this signal..
+get_search_providers = _signals.signal('get-search-providers', """
+Expected to return...
+""")
