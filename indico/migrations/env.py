@@ -26,11 +26,12 @@ config.set_main_option('sqlalchemy.url', current_app.config.get('SQLALCHEMY_DATA
 target_metadata = current_app.extensions['migrate'].db.metadata
 
 
-def _include_symbol(tablename, schema):
-    # We ignore plugin tables in migrations
-    if schema and schema.startswith('plugin_'):
+def _include_object(object_, name, type_, reflected, compare_to):
+    if type_ != 'table':
+        return True
+    if object_.schema and object_.schema.startswith('plugin_'):
         return False
-    return tablename != 'alembic_version' and not tablename.startswith('alembic_version_')
+    return name != 'alembic_version' and not name.startswith('alembic_version_')
 
 
 def _render_item(type_, obj, autogen_context):
@@ -55,7 +56,7 @@ def run_migrations_offline():
     """
     url = config.get_main_option('sqlalchemy.url')
     context.configure(url=url, target_metadata=target_metadata, include_schemas=True,
-                      version_table_schema='public', include_symbol=_include_symbol, render_item=_render_item,
+                      version_table_schema='public', include_object=_include_object, render_item=_render_item,
                       template_args={'toplevel_code': set()})
 
     with context.begin_transaction():
@@ -74,7 +75,7 @@ def run_migrations_online():
 
     connection = engine.connect()
     context.configure(connection=connection, target_metadata=target_metadata, include_schemas=True,
-                      version_table_schema='public', include_symbol=_include_symbol, render_item=_render_item,
+                      version_table_schema='public', include_object=_include_object, render_item=_render_item,
                       template_args={'toplevel_code': set()})
 
     try:

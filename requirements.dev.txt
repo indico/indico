@@ -12,8 +12,8 @@ pygments
 sqlparse
 isort
 flask_url_map_serializer
-migra==1.0.1605230943
-schemainspect==0.1.1607225519
+migra==1.0.1610499506
+schemainspect==0.1.1610933302
 transifex-client
 pywatchman
 pyupgrade

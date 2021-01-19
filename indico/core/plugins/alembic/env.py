@@ -35,9 +35,8 @@ plugin_schema = f'plugin_{current_plugin.name}'
 version_table = f'alembic_version_plugin_{current_plugin.name}'
 
 
-def _include_symbol(tablename, schema):
-    # We only include tables in this plugin's schema in migrations
-    return schema == plugin_schema
+def _include_object(object_, name, type_, reflected, compare_to):
+    return type_ != 'table' or object_.schema == plugin_schema
 
 
 def _render_item(type_, obj, autogen_context):
@@ -62,7 +61,7 @@ def run_migrations_offline():
     """
     url = config.get_main_option('sqlalchemy.url')
     context.configure(url=url, target_metadata=target_metadata, include_schemas=True,
-                      include_symbol=_include_symbol, render_item=_render_item, version_table=version_table,
+                      include_object=_include_object, render_item=_render_item, version_table=version_table,
                       version_table_schema='public', template_args={'toplevel_code': set()})
 
     with context.begin_transaction():
@@ -81,7 +80,7 @@ def run_migrations_online():
 
     connection = engine.connect()
     context.configure(connection=connection, target_metadata=target_metadata, include_schemas=True,
-                      include_symbol=_include_symbol, render_item=_render_item, version_table=version_table,
+                      include_object=_include_object, render_item=_render_item, version_table=version_table,
                       version_table_schema='public', template_args={'toplevel_code': set()})
 
     try:
