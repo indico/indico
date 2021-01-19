@@ -13,7 +13,7 @@ from operator import attrgetter
 from flask import current_app, json, session
 from qrcode import QRCode, constants
 from sqlalchemy import and_, or_
-from sqlalchemy.orm import joinedload, load_only, undefer
+from sqlalchemy.orm import contains_eager, joinedload, load_only, undefer
 from werkzeug.urls import url_parse
 from wtforms import BooleanField, ValidationError
 
@@ -366,13 +366,13 @@ def get_published_registrations(event):
     :param event: the `Event` to get registrations for
     :return: list of `Registration` objects
     """
-    return (Registration
-            .find(Registration.is_publishable,
-                  ~RegistrationForm.is_deleted,
-                  RegistrationForm.event_id == event.id,
-                  RegistrationForm.publish_registrations_enabled,
-                  _join=Registration.registration_form,
-                  _eager=Registration.registration_form)
+    return (Registration.query
+            .filter(Registration.is_publishable,
+                    ~RegistrationForm.is_deleted,
+                    RegistrationForm.event_id == event.id,
+                    RegistrationForm.publish_registrations_enabled)
+            .join(Registration.registration_form)
+            .options(contains_eager(Registration.registration_form))
             .order_by(db.func.lower(Registration.first_name),
                       db.func.lower(Registration.last_name),
                       Registration.friendly_id)

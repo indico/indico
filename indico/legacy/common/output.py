@@ -436,9 +436,13 @@ class outputGenerator:
     def materialToXMLMarc21(self, obj, out=None):
         if not out:
             out = self._XMLGen
-        for attachment in (Attachment.find(~AttachmentFolder.is_deleted, AttachmentFolder.object == obj,
-                                           is_deleted=False, _join=AttachmentFolder)
-                                     .options(joinedload(Attachment.legacy_mapping))):
+        query = (Attachment.query
+                 .filter(~AttachmentFolder.is_deleted,
+                         AttachmentFolder.object == obj,
+                         ~Attachment.is_deleted)
+                 .join(AttachmentFolder)
+                 .options(joinedload(Attachment.legacy_mapping)))
+        for attachment in query:
             if attachment.can_access(self.__user):
                 self.resourceToXMLMarc21(attachment, out)
                 self._generateAccessList(acl=self._attachment_access_list(attachment), out=out,

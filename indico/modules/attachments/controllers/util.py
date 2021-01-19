@@ -28,7 +28,7 @@ class SpecificAttachmentMixin:
     }
 
     def _process_args(self):
-        self.attachment = Attachment.find_one(id=request.view_args['attachment_id'], is_deleted=False)
+        self.attachment = Attachment.query.filter_by(id=request.view_args['attachment_id'], is_deleted=False).one()
         if self.attachment.folder.is_deleted:
             raise NotFound
 
@@ -44,4 +44,4 @@ class SpecificFolderMixin:
     }
 
     def _process_args(self):
-        self.folder = AttachmentFolder.find_one(id=request.view_args['folder_id'], is_deleted=False)
+        self.folder = AttachmentFolder.query.filter_by(id=request.view_args['folder_id'], is_deleted=False).one()

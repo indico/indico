@@ -44,11 +44,10 @@ def process_vc_room_association(plugin, event, vc_room, form, event_vc_room=None
         if event_vc_room.link_object is not None:
             # check whether there is a room-event association already present
             # for the given event, room and plugin
-            q = VCRoomEventAssociation.find(
-                VCRoomEventAssociation.event == event,
-                VCRoomEventAssociation.link_object == event_vc_room.link_object,
-                _join=VCRoom
-            )
+            q = (VCRoomEventAssociation.query
+                 .filter(VCRoomEventAssociation.event == event,
+                         VCRoomEventAssociation.link_object == event_vc_room.link_object)
+                 .join(VCRoom))
             if allow_same_room:
                 q = q.filter(VCRoom.id != vc_room.id)
             existing = {x.vc_room for x in q}

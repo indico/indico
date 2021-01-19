@@ -82,9 +82,10 @@ class AttachmentPackageGeneratorMixin(ZipGeneratorMixin):
         return [attachment for attachment in query if _get_start_dt(attachment.folder.object) is not None]
 
     def _build_base_query(self, added_since=None):
-        query = Attachment.find(Attachment.type == AttachmentType.file, ~AttachmentFolder.is_deleted,
-                                ~Attachment.is_deleted, AttachmentFolder.event == self.event,
-                                _join=AttachmentFolder)
+        query = (Attachment.query
+                 .filter(Attachment.type == AttachmentType.file, ~AttachmentFolder.is_deleted,
+                         ~Attachment.is_deleted, AttachmentFolder.event == self.event)
+                 .join(AttachmentFolder))
         if added_since is not None:
             query = query.join(Attachment.file).filter(cast(AttachmentFile.created_dt, Date) >= added_since)
         return query

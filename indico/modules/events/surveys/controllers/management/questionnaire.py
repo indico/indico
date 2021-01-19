@@ -8,7 +8,7 @@
 import json
 
 from flask import flash, jsonify, request, session
-from sqlalchemy.orm import joinedload
+from sqlalchemy.orm import contains_eager, joinedload
 from sqlalchemy.orm.exc import NoResultFound
 from werkzeug.datastructures import MultiDict
 from werkzeug.exceptions import NotFound
@@ -128,8 +128,12 @@ class RHManageSurveySectionBase(RHManageSurveysBase):
 
     def _process_args(self):
         RHManageSurveysBase._process_args(self)
-        self.section = SurveySection.find_one(SurveySection.id == request.view_args['section_id'], ~Survey.is_deleted,
-                                              _join=SurveySection.survey, _eager=SurveySection.survey)
+        self.section = (SurveySection.query
+                        .filter(SurveySection.id == request.view_args['section_id'],
+                                ~Survey.is_deleted)
+                        .join(SurveySection.survey)
+                        .options(contains_eager(SurveySection.survey))
+                        .one())
         self.survey = self.section.survey
 
 
@@ -144,8 +148,12 @@ class RHManageSurveyTextBase(RHManageSurveysBase):
 
     def _process_args(self):
         RHManageSurveysBase._process_args(self)
-        self.text = SurveyText.find_one(SurveyText.id == request.view_args['text_id'], ~Survey.is_deleted,
-                                        _join=SurveyText.survey, _eager=SurveyText.survey)
+        self.text = (SurveyText.query
+                     .filter(SurveyText.id == request.view_args['text_id'],
+                             ~Survey.is_deleted)
+                     .join(SurveyText.survey)
+                     .options(contains_eager(SurveyText.survey))
+                     .one())
         self.survey = self.text.survey
 
 
@@ -160,9 +168,12 @@ class RHManageSurveyQuestionBase(RHManageSurveysBase):
 
     def _process_args(self):
         RHManageSurveysBase._process_args(self)
-        self.question = SurveyQuestion.find_one(SurveyQuestion.id == request.view_args['question_id'],
-                                                ~Survey.is_deleted,
-                                                _join=SurveyQuestion.survey, _eager=SurveyQuestion.survey)
+        self.question = (SurveyQuestion.query
+                         .filter(SurveyQuestion.id == request.view_args['question_id'],
+                                 ~Survey.is_deleted)
+                         .join(SurveyQuestion.survey)
+                         .options(contains_eager(SurveyQuestion.survey))
+                         .one())
         self.survey = self.question.survey
 
 
@@ -319,8 +330,10 @@ class RHSortSurveyItems(RHManageSurveyBase):
         logger.info('Sections in %s reordered by %s', self.survey, session.user)
 
     def _sort_items(self):
-        section = SurveySection.find_one(survey=self.survey, id=request.form['section_id'],
-                                         _eager=SurveySection.children)
+        section = (SurveySection.query
+                   .filter_by(survey=self.survey, id=request.form['section_id'])
+                   .options(joinedload(SurveySection.children))
+                   .one())
         section_items = {x.id: x for x in section.children}
         item_ids = request.form.getlist('item_ids', type=int)
         changed_section = None
@@ -329,8 +342,12 @@ class RHSortSurveyItems(RHManageSurveyBase):
                 section_items[item_id].position = position
             except KeyError:
                 # item is not in section, was probably moved
-                item = SurveyItem.find_one(SurveyItem.survey == self.survey, SurveyItem.id == item_id,
-                                           SurveyItem.type != SurveyItemType.section, _eager=SurveyItem.parent)
+                item = (SurveyItem.query
+                        .filter(SurveyItem.survey == self.survey,
+                                SurveyItem.id == item_id,
+                                SurveyItem.type != SurveyItemType.section)
+                        .options(joinedload(SurveyItem.parent))
+                        .one())
                 changed_section = item.parent
                 item.position = position
                 item.parent = section
@@ -352,8 +369,8 @@ class RHSortSurveyItems(RHManageSurveyBase):
 
 def _render_questionnaire_preview(survey):
     # load the survey once again with all the necessary data
-    survey = (Survey
-              .find(id=survey.id)
+    survey = (Survey.query
+              .filter_by(id=survey.id)
               .options(joinedload(Survey.sections).joinedload(SurveySection.children))
               .one())
     tpl = get_template_module('events/surveys/management/_questionnaire_preview.html')

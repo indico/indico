@@ -400,11 +400,12 @@ class Reservation(Serializer, db.Model):
 
     @staticmethod
     def find_overlapping_with(room, occurrences, skip_reservation_id=None):
-        return Reservation.find(Reservation.room == room,
-                                Reservation.id != skip_reservation_id,
-                                ReservationOccurrence.is_valid,
-                                ReservationOccurrence.filter_overlap(occurrences),
-                                _join=ReservationOccurrence)
+        return (Reservation.query
+                .filter(Reservation.room == room,
+                        Reservation.id != skip_reservation_id,
+                        ReservationOccurrence.is_valid,
+                        ReservationOccurrence.filter_overlap(occurrences))
+                .join(ReservationOccurrence))
 
     def accept(self, user, reason=None):
         self.state = ReservationState.accepted

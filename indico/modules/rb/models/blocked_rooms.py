@@ -88,21 +88,20 @@ class BlockedRoom(db.Model):
         ]
 
         # Whole reservations to reject
-        reservations = Reservation.find_all(
+        reservations = Reservation.query.filter(
             Reservation.start_dt >= start_dt,
             Reservation.end_dt <= end_dt,
             *reservation_criteria
-        )
+        ).all()
 
         # Single occurrences to reject
-        occurrences = ReservationOccurrence.find_all(
+        occurrences = ReservationOccurrence.query.filter(
             ReservationOccurrence.start_dt >= start_dt,
             ReservationOccurrence.end_dt <= end_dt,
             ReservationOccurrence.is_valid,
             ~ReservationOccurrence.reservation_id.in_(map(attrgetter('id'), reservations)) if reservations else True,
             *reservation_criteria,
-            _join=Reservation
-        )
+        ).join(Reservation).all()
 
         reason = f'Conflict with blocking {self.blocking.id}: {self.blocking.reason}'
 

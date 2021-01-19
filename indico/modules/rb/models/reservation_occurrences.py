@@ -11,7 +11,7 @@ from math import ceil
 from dateutil import rrule
 from sqlalchemy import Date, or_
 from sqlalchemy.ext.hybrid import hybrid_property
-from sqlalchemy.orm import defaultload
+from sqlalchemy.orm import contains_eager, defaultload
 from sqlalchemy.sql import cast
 
 from indico.core import signals
@@ -178,13 +178,13 @@ class ReservationOccurrence(db.Model, Serializer):
     def find_overlapping_with(cls, room, occurrences, skip_reservation_id=None):
         from indico.modules.rb.models.reservations import Reservation
 
-        return (ReservationOccurrence
-                .find(Reservation.room == room,
-                      Reservation.id != skip_reservation_id,
-                      ReservationOccurrence.is_valid,
-                      ReservationOccurrence.filter_overlap(occurrences),
-                      _eager=ReservationOccurrence.reservation,
-                      _join=ReservationOccurrence.reservation)
+        return (ReservationOccurrence.query
+                .filter(Reservation.room == room,
+                        Reservation.id != skip_reservation_id,
+                        ReservationOccurrence.is_valid,
+                        ReservationOccurrence.filter_overlap(occurrences))
+                .join(ReservationOccurrence.reservation)
+                .options(contains_eager(ReservationOccurrence.reservation))
                 .options(cls.NO_RESERVATION_USER_STRATEGY))
 
     def can_reject(self, user, allow_admin=True):

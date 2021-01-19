@@ -17,9 +17,12 @@ from indico.util.date_time import now_utc
 
 @celery.periodic_task(name='event_reminders', run_every=crontab(minute='*/5'))
 def send_event_reminders():
-    reminders = EventReminder.find_all(~EventReminder.is_sent, ~Event.is_deleted,
-                                       EventReminder.scheduled_dt <= now_utc(),
-                                       _join=EventReminder.event)
+    reminders = (EventReminder.query
+                 .filter(~EventReminder.is_sent,
+                         ~Event.is_deleted,
+                         EventReminder.scheduled_dt <= now_utc())
+                 .join(EventReminder.event)
+                 .all())
     for reminder in reminders:
         logger.info('Sending event reminder: %s', reminder)
         reminder.send()

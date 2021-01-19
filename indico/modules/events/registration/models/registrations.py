@@ -233,8 +233,12 @@ class Registration(db.Model):
     def get_all_for_event(cls, event):
         """Retrieve all registrations in all registration forms of an event."""
         from indico.modules.events.registration.models.forms import RegistrationForm
-        return Registration.find_all(Registration.is_active, ~RegistrationForm.is_deleted,
-                                     RegistrationForm.event_id == event.id, _join=Registration.registration_form)
+        return (Registration.query
+                .filter(Registration.is_active,
+                        ~RegistrationForm.is_deleted,
+                        RegistrationForm.event_id == event.id)
+                .join(Registration.registration_form)
+                .all())
 
     @hybrid_property
     def is_active(self):

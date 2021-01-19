@@ -28,7 +28,7 @@ def load_client(client_id):
         UUID(hex=client_id)
     except ValueError:
         raise InvalidClientIdError
-    app = OAuthApplication.find_first(client_id=client_id)
+    app = OAuthApplication.query.filter_by(client_id=client_id).first()
     if not app.is_enabled:
         raise DisabledClientIdError
     return app
@@ -61,7 +61,7 @@ def load_token(access_token, refresh_token=None):
     except ValueError:
         # malformed oauth token
         return None
-    token = OAuthToken.find(access_token=access_token).options(db.joinedload(OAuthToken.application)).first()
+    token = OAuthToken.query.filter_by(access_token=access_token).options(db.joinedload(OAuthToken.application)).first()
     if not token or not token.application.is_enabled:
         return None
 
@@ -89,11 +89,13 @@ def save_token(token_data, request, *args, **kwargs):
     else:
         raise ValueError('Invalid grant_type')
     requested_scopes = set(token_data['scope'].split())
-    token = OAuthToken.find_first(OAuthApplication.client_id == request.client.client_id,
-                                  OAuthToken.user == user,
-                                  _join=OAuthApplication)
+    token = (OAuthToken.query
+             .filter(OAuthApplication.client_id == request.client.client_id,
+                     OAuthToken.user == user)
+             .join(OAuthApplication)
+             .first())
     if token is None:
-        application = OAuthApplication.find_one(client_id=request.client.client_id)
+        application = OAuthApplication.query.filter_by(client_id=request.client.client_id).one()
         token = OAuthToken(application=application, user=user)
         db.session.add(token)
         token.access_token = token_data['access_token']

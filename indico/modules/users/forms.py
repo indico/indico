@@ -77,7 +77,13 @@ class UserEmailsForm(IndicoForm):
     email = EmailField(_('Add new email address'), [DataRequired(), Email()], filters=[lambda x: x.lower() if x else x])
 
     def validate_email(self, field):
-        if UserEmail.find(~User.is_pending, is_user_deleted=False, email=field.data, _join=User).count():
+        conflict = (UserEmail.query
+                    .filter(~User.is_pending,
+                            ~UserEmail.is_user_deleted,
+                            UserEmail.email == field.data)
+                    .join(User)
+                    .has_rows())
+        if conflict:
             raise ValidationError(_('This email address is already in use.'))
 
 

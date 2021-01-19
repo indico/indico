@@ -14,7 +14,7 @@ from flask_sqlalchemy import BaseQuery, Model, Pagination
 from sqlalchemy import Column, inspect, orm
 from sqlalchemy.event import listen, listens_for
 from sqlalchemy.ext.hybrid import hybrid_property
-from sqlalchemy.orm import contains_eager, joinedload
+from sqlalchemy.orm import joinedload
 from sqlalchemy.orm.attributes import get_history, set_committed_value
 from sqlalchemy.orm.exc import NoResultFound
 
@@ -68,22 +68,7 @@ class IndicoModel(Model):
 
     @classmethod
     def find(cls, *args, **kwargs):
-        special_field_names = ('join', 'eager')
-        special_fields = {}
-        for key in special_field_names:
-            value = kwargs.pop(f'_{key}', ())
-            if not isinstance(value, (list, tuple)):
-                value = (value,)
-            special_fields[key] = value
-        joined_eager = set(special_fields['eager']) & set(special_fields['join'])
-        options = []
-        options += [joinedload(rel) for rel in special_fields['eager'] if rel not in joined_eager]
-        options += [contains_eager(rel) for rel in joined_eager]
-        return (cls.query
-                .filter_by(**kwargs)
-                .join(*special_fields['join'])
-                .filter(*args)
-                .options(*options))
+        return cls.query.filter_by(**kwargs).filter(*args)
 
     @classmethod
     def find_all(cls, *args, **kwargs):
