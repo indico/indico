@@ -7,18 +7,18 @@
 
 from __future__ import unicode_literals
 
-from indico.modules.search.controllers import (RHSearch, RHSearchCategories, RHSearchContributions, RHSearchEvents,
-                                               RHSearchFiles)
+from indico.modules.search.controllers import (RHAPISearchAttachment, RHAPISearchCategory, RHAPISearchContribution,
+                                               RHAPISearchEvent, RHSearchDisplay)
 from indico.web.flask.wrappers import IndicoBlueprint
 
 
 _bp = IndicoBlueprint('search', __name__, template_folder='templates', virtual_template_folder='search')
 
 # Frontend
-_bp.add_url_rule('/search/', 'search', RHSearch)
+_bp.add_url_rule('/search/', 'search', RHSearchDisplay)
 
 # Search APIs
-_bp.add_url_rule('/search/api/categories', 'search_categories', RHSearchCategories)
-_bp.add_url_rule('/search/api/events', 'search_events', RHSearchEvents)
-_bp.add_url_rule('/search/api/contributions', 'search_contributions', RHSearchContributions)
-_bp.add_url_rule('/search/api/files', 'search_files', RHSearchFiles)
+_bp.add_url_rule('/search/api/category', 'api_search_category', RHAPISearchCategory)
+_bp.add_url_rule('/search/api/event', 'api_search_event', RHAPISearchEvent)
+_bp.add_url_rule('/search/api/contribution', 'api_search_contribution', RHAPISearchContribution)
+_bp.add_url_rule('/search/api/attachment', 'api_search_attachment', RHAPISearchAttachment)
