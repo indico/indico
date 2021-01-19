@@ -56,6 +56,7 @@
                        href="{{ url_for('sessions.display_session', block.session,
                                         _anchor=block.start_dt.astimezone(block.event.tzinfo).strftime('%Y%m%d')) }}"></a>
                 {% endif %}
+		<div class="vcbuttons">{{ template_hook('vc-actions', event=block.event, item=block) }}</div>
             </div>
         </div>
         <div class="title">{{ block.session.title }}</div>

@@ -40,6 +40,7 @@
                 <a class="i-link icon-list" title="{% trans %}View contribution details{% endtrans %}"
                    href="{{ url_for('contributions.display_contribution', contrib) }}"></a>
             {% endif %}
+	    <div class="vcbuttons">{{ template_hook('vc-actions', event=contrib.event, item=contrib) }}</div>
         </div>
     </div>
     <div class="description" data-display-href="{{ url_for('contributions.display_contribution', contrib) }}">
