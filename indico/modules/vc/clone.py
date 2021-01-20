@@ -25,6 +25,10 @@ class VCCloner(EventCloner):
 
     @property
     def is_available(self):
+        if self.n_occurrence > 1:
+            # if we're not on the first occurrence, we shouldn't do this check,
+            # since there's the possibility all rooms are gone in the meantime
+            return True
         return self._has_content(self.old_event)
 
     def has_conflicts(self, target_event):
@@ -58,4 +62,7 @@ class VCCloner(EventCloner):
             plugin = old_event_vc_room.vc_room.plugin
             if not plugin:
                 continue
-            old_event_vc_room.vc_room.events.append(plugin.clone_room(old_event_vc_room, link_object))
+            clone = plugin.clone_room(old_event_vc_room, link_object)
+            if clone:
+                # the plugin may decide to not clone the room
+                old_event_vc_room.vc_room.events.append(clone)

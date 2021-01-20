@@ -11,9 +11,8 @@
             <div class="timetable-item-header flexrow">
                 <span class="timetable-title" data-anchor="{{ anchor }}">
                     {% if theme_settings.number_contributions %}
-                        {{- theme_context.num_contribution }}.
                         {%- set n_scontrib = theme_context.num_subcontribution -%}
-                        {{- 'abcdefghijklmnopqrstuvwxyz'[n_scontrib % 28 - 1] * (n_scontrib / 28 + 1)|int }}
+                        {{- 'abcdefghijklmnopqrstuvwxyz'[n_scontrib % 28 - 1] * (n_scontrib / 28 + 1)|int }})
                     {% endif %}
                     {{- subcontrib.title -}}
                 </span>
