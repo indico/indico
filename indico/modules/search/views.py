@@ -5,8 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import unicode_literals
-
 from indico.util.i18n import _
 from indico.web.breadcrumbs import render_breadcrumbs
 from indico.web.views import WPDecorated, WPJinjaMixin
