@@ -5,8 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import unicode_literals
-
 from indico.core.marshmallow import mm
 from indico.modules.categories import Category
 from indico.modules.events import Event
@@ -21,7 +19,7 @@ def _get_category_path(chain):
     ]
 
 
-class CategorySchema(mm.ModelSchema):
+class CategorySchema(mm.SQLAlchemyAutoSchema):
     class Meta:
         model = Category
         fields = ('id', 'title', 'url', 'path')
@@ -29,7 +27,7 @@ class CategorySchema(mm.ModelSchema):
     path = mm.Function(lambda cat: _get_category_path(cat.chain))
 
 
-class EventSchema(mm.ModelSchema):
+class EventSchema(mm.SQLAlchemyAutoSchema):
     class Meta:
         model = Event
         fields = ('id', 'title', 'url', 'type', 'start_dt', 'end_dt', 'category_path', 'speakers')
