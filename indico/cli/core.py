@@ -15,7 +15,6 @@ from flask.cli import AppGroup, pass_script_info
 from indico.cli.util import IndicoFlaskGroup, LazyGroup
 
 
-click.disable_unicode_literals_warning = True
 __all__ = ('cli_command', 'cli_group')
 
 

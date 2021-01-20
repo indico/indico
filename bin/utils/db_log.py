@@ -26,7 +26,6 @@ from pygments.lexers.agile import PythonLexer, PythonTracebackLexer
 from pygments.lexers.sql import SqlLexer
 
 
-click.disable_unicode_literals_warning = True
 ignored_line_re = re.compile(r'^(?:(?P<frame>\d+):)?(?P<file>.+?)(?::(?P<line>\d+))?$')
 output_lock = Lock()
 

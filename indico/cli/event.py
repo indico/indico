@@ -16,9 +16,6 @@ from indico.modules.events.export import export_event, import_event
 from indico.modules.users.models.users import User
 
 
-click.disable_unicode_literals_warning = True
-
-
 @cli_group()
 def cli():
     pass

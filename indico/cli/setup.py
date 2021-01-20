@@ -34,9 +34,6 @@ from indico.util.console import cformat
 from indico.util.string import validate_email
 
 
-click.disable_unicode_literals_warning = True
-
-
 def _echo(msg=''):
     click.echo(msg, err=True)
 

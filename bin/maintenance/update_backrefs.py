@@ -17,9 +17,6 @@ from indico.core.db.sqlalchemy.util.models import import_all_models
 from indico.util.console import cformat
 
 
-click.disable_unicode_literals_warning = True
-
-
 def _find_backrefs():
     backrefs = defaultdict(list)
     for cls in db.Model._decl_class_registry.values():

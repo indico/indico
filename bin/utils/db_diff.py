@@ -16,9 +16,6 @@ from migra import Migration
 from sqlalchemy import create_engine
 
 
-click.disable_unicode_literals_warning = True
-
-
 def _indent(msg, level=4):
     indentation = level * ' '
     return indentation + msg.replace('\n', '\n' + indentation)

@@ -18,9 +18,6 @@ from indico.modules.users.util import search_users
 from indico.util.console import cformat, prompt_email, prompt_pass
 
 
-click.disable_unicode_literals_warning = True
-
-
 @cli_group()
 def cli():
     pass

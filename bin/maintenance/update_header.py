@@ -17,9 +17,6 @@ import yaml
 from indico.util.console import cformat
 
 
-click.disable_unicode_literals_warning = True
-
-
 # Dictionary listing the files for which to change the header.
 # The key is the extension of the file (without the dot) and the value is another
 # dictionary containing two keys:

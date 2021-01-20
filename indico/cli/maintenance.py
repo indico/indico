@@ -21,9 +21,6 @@ from indico.modules.events.sessions import Session
 from indico.modules.events.sessions.models.principals import SessionPrincipal
 
 
-click.disable_unicode_literals_warning = True
-
-
 @cli_group()
 def cli():
     pass

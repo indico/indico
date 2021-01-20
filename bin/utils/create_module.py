@@ -14,9 +14,6 @@ from datetime import date
 import click
 
 
-click.disable_unicode_literals_warning = True
-
-
 def _validate_indico_dir(ctx, param, value):
     if not os.path.isdir(value):
         raise click.BadParameter('directory does not exist')
