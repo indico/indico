@@ -185,7 +185,7 @@ def patch_indico_version(add_version_suffix):
 
 
 def patch_plugin_version(add_version_suffix):
-    return _patch_version(add_version_suffix, 'setup.py', r"^(\s+)version='([^']+)'(,?)$", r"\1version='\2{}'\3")
+    return _patch_version(add_version_suffix, 'setup.cfg', r'^version = (.+)$', r'version = \1{}')
 
 
 @contextmanager
