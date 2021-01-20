@@ -15,7 +15,7 @@ class SearchTarget(int, IndicoEnum):
     attachment = 4
 
 
-class IndicoSearchProvider(object):
+class IndicoSearchProvider:
     RESULTS_PER_PAGE = 10
 
     @classmethod

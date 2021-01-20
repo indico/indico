@@ -5,8 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import division, unicode_literals
-
 from marshmallow import fields
 from sqlalchemy.orm import undefer
 
@@ -37,7 +35,7 @@ class RHAPISearch(RH):
     @use_kwargs({
         'page': fields.Int(missing=1),
         'q': fields.String(required=True),
-    })
+    }, location='query')
     def _process(self, page, q):
         search_provider = get_search_provider()
         if search_provider and self.USE_PROVIDER:
