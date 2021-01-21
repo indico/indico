@@ -22,7 +22,6 @@ Flask-SQLAlchemy==2.4.4
 flask-webpackext==1.0.2
 Flask-WTF==0.14.3
 Flask==1.1.2
-freezegun==1.0.0
 hiredis==1.1.0
 html2text==2020.1.16
 icalendar==4.0.7
@@ -41,15 +40,10 @@ marshmallow-sqlalchemy==0.24.1
 marshmallow==3.9.1
 packaging>=20.8,<21
 Pillow==8.1.0
-pojson==0.7
 prompt-toolkit<4.0.0,>=3.0.10
 psycopg2==2.8.6
 pycountry==20.7.3
 PyPDF2==1.26.0
-pytest-cov==2.11.0
-pytest-localserver==0.5.0
-pytest-mock==3.5.1
-pytest==6.2.1
 python-dateutil==2.8.1
 pytz
 pywebpack==1.1.0
