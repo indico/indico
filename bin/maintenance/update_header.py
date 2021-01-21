@@ -83,7 +83,7 @@ def _walk_to_root(path):
 def _get_config(path, end_year):
     config = {}
     for dirname in _walk_to_root(path):
-        check_path = os.path.join(dirname, 'copyright.yml')
+        check_path = os.path.join(dirname, 'headers.yml')
         if os.path.isfile(check_path):
             with open(check_path) as f:
                 config.update((k, v) for k, v in yaml.safe_load(f.read()).items() if k not in config)
@@ -91,13 +91,13 @@ def _get_config(path, end_year):
                 break
 
     if 'start_year' not in config:
-        click.echo('no valid copyright.yml files found: start_year missing')
+        click.echo('no valid headers.yml files found: start_year missing')
         sys.exit(1)
     if 'name' not in config:
-        click.echo('no valid copyright.yml files found: name missing')
+        click.echo('no valid headers.yml files found: name missing')
         sys.exit(1)
     if 'header' not in config:
-        click.echo('no valid copyright.yml files found: header missing')
+        click.echo('no valid headers.yml files found: header missing')
         sys.exit(1)
     config['end_year'] = end_year
     return config
