@@ -50,6 +50,7 @@ Improvements
   form (:pr:`4741`)
 - Improve video conference linking dropdown for contributions/sessions (hide unscheduled,
   show start time) (:pr:`4753`)
+- Show timetable filter button in conferences with a meeting-like timetable
 
 Bugfixes
 ^^^^^^^^
