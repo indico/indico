@@ -175,7 +175,8 @@
 
 
 {%- set dates = event.iter_days(tzinfo=event.tzinfo)|list -%}
-{%- set show_filter_button = event.type == 'meeting' and (dates|length > 1 or event.sessions) -%}
+{%- set show_filter_button = (event.type == 'meeting' or (event.type == 'conference' and theme))
+                             and (dates|length > 1 or event.sessions) -%}
 {%- set filters_active = show_filter_button and (request.args.get('showDate', 'all') != 'all' or
                                                  request.args.get('showSession', 'all') != 'all' or
                                                  request.args.get('detailLevel', 'contribution') != 'contribution') -%}
