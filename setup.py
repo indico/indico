@@ -18,8 +18,8 @@ def read_requirements_file(fname):
         return [dep.strip() for dep in f.readlines() if not (dep.startswith('-') or '://' in dep)]
 
 
-def get_requirements():
-    return read_requirements_file(os.path.join(os.path.dirname(__file__), 'requirements.txt'))
+def get_requirements(fname):
+    return read_requirements_file(os.path.join(os.path.dirname(__file__), fname))
 
 
 class BuildWithTranslations(build):
@@ -56,6 +56,7 @@ if os.environ.get('READTHEDOCS') != 'True':
 if __name__ == '__main__':
     setup(
         cmdclass=cmdclass,
-        install_requires=get_requirements(),
+        install_requires=get_requirements('requirements.txt'),
+        extras_require={'dev': get_requirements('requirements.dev.txt')},
         python_requires=('~=3.9' if 'READTHEDOCS' not in os.environ else None),
     )

@@ -146,8 +146,7 @@ Let's get into the Indico virtualenv::
     pip install -U pip setuptools wheel
 
     cd src
-    pip install -r requirements.dev.txt
-    pip install -e .
+    pip install -e '.[dev]'
     npm ci
 
 Then, follow the instructions given by the wizard::
