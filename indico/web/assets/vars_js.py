@@ -18,7 +18,7 @@ from indico.core.plugins import plugin_engine
 from indico.modules.auth.util import url_for_login
 from indico.modules.events.registration.util import url_rule_to_angular
 from indico.modules.users.util import serialize_user
-from indico.util.i18n import po_to_json
+from indico.util.i18n import get_all_locales, po_to_json
 from indico.web.flask.util import url_for, url_rule_to_js
 
 
@@ -41,6 +41,8 @@ def get_locale_data(path, name, domain, react=False):
 
 
 def generate_i18n_file(locale_name, react=False):
+    if locale_name not in get_all_locales():
+        return None
     root_path = os.path.join(current_app.root_path, 'translations')
     i18n_data = get_locale_data(root_path, locale_name, 'indico', react=react)
     if not i18n_data:
