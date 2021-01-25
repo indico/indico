@@ -2,6 +2,21 @@ Changelog
 =========
 
 
+Version 2.3.4
+-------------
+
+*Unreleased*
+
+Bugfixes
+^^^^^^^^
+
+- None so far :)
+
+Internal Changes
+^^^^^^^^^^^^^^^^
+
+- Also trigger the ``ical-export`` metadata signal when exporting events for a whole category
+
 Version 2.3.3
 -------------
 
