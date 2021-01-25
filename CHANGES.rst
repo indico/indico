@@ -30,10 +30,31 @@ Internal Changes
 
 ----
 
-Version 2.3.3
+Version 2.3.4
 -------------
 
 *Unreleased*
+
+Bugfixes
+^^^^^^^^
+
+- None so far :)
+
+Internal Changes
+^^^^^^^^^^^^^^^^
+
+- Also trigger the ``ical-export`` metadata signal when exporting events for a whole category
+
+Version 2.3.3
+-------------
+
+*Released on January 25, 2021*
+
+Security fixes
+^^^^^^^^^^^^^^
+- JSON locale data for invalid locales is no longer cached on disk; instead a 404 error is
+  triggered. This avoids creating small files in the cache folder for each invalid locale
+  that is requested. (:pr:`4766`)
 
 Internationalization
 ^^^^^^^^^^^^^^^^^^^^

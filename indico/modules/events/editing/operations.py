@@ -137,7 +137,7 @@ def review_editable_revision(revision, editor, action, comment, tags, files=None
         _ensure_publishable_files(new_revision)
         revision.editable.revisions.append(new_revision)
     db.session.flush()
-    notify_editor_judgment(revision, session.user)
+    notify_editor_judgment(revision, editor)
     logger.info('Revision %r reviewed by %s [%s]', revision, editor, action.name)
     return new_revision
 

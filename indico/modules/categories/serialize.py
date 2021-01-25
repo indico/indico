@@ -15,10 +15,12 @@ from lxml.etree import ParserError
 from sqlalchemy.orm import joinedload, load_only, subqueryload, undefer
 from werkzeug.urls import url_parse
 
+from indico.core import signals
 from indico.core.config import config
 from indico.modules.categories import Category
 from indico.modules.events import Event
 from indico.util.date_time import now_utc
+from indico.util.signals import values_from_signal
 from indico.util.string import sanitize_html
 
 
@@ -94,7 +96,13 @@ def serialize_categories_ical(category_ids, user, event_filter=True, event_filte
                 # this happens e.g. if desc_text contains only a html comment
                 pass
         description.append(event.external_url)
-        cal_event.add('description', '\n'.join(description))
+        data = {'description': '\n'.join(description)}
+        for update in values_from_signal(
+            signals.event.metadata_postprocess.send('ical-export', event=event, data=data, user=user),
+            as_list=True
+        ):
+            data.update(update)
+        cal_event.add('description', data['description'])
         cal.add_component(cal_event)
     return BytesIO(cal.to_ical())
 

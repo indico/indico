@@ -88,11 +88,17 @@ def _get_i18n_locale(locale_name, react=False):
     """Retrieve a locale in a Jed-compatible format."""
 
     react_suffix = '-react' if react else ''
-    cache_file = os.path.join(config.CACHE_DIR, 'assets_i18n_{}{}_{}_{}.js'.format(
-        locale_name, react_suffix, indico.__version__, config.hash))
+
+    try:
+        cache_file = os.path.join(config.CACHE_DIR, 'assets_i18n_{}{}_{}_{}.js'.format(
+            locale_name, react_suffix, indico.__version__, config.hash))
+    except UnicodeEncodeError:
+        raise NotFound
 
     if config.DEBUG or not os.path.exists(cache_file):
         i18n_data = generate_i18n_file(locale_name, react=react)
+        if i18n_data is None:
+            raise NotFound
         with open(cache_file, 'w') as f:
             f.write("window.{} = {};".format('REACT_TRANSLATIONS' if react else 'TRANSLATIONS', i18n_data))
 
