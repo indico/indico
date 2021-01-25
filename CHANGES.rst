@@ -5,7 +5,7 @@ Changelog
 Version 2.3.3
 -------------
 
-*Unreleased*
+*Released on January 25, 2021*
 
 Security fixes
 ^^^^^^^^^^^^^^

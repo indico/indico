@@ -10,7 +10,7 @@ import warnings
 from indico.util.mimetypes import register_custom_mimetypes
 
 
-__version__ = '2.3.3-dev'
+__version__ = '2.3.3'
 
 register_custom_mimetypes()
 
