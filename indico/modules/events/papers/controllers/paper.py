@@ -116,7 +116,7 @@ class RHDownloadPapers(ZipGeneratorMixin, RHPapersActionBase):
         return os.path.join(*self._adjust_path_length([paper_title, file_name]))
 
     def _iter_items(self, contributions):
-        contributions_with_paper = [c for c in self.contributions if c.paper]
+        contributions_with_paper = [c for c in contributions if c.paper]
         for contrib in contributions_with_paper:
             yield from contrib.paper.last_revision.files
 

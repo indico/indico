@@ -679,7 +679,7 @@ class ZipGeneratorMixin:
         :param return_file: Return the temp file instead of a response
         """
 
-        temp_file = NamedTemporaryFile(suffix='.zip', dir=config.TEMP_DIR, delete=(not return_file))
+        temp_file = NamedTemporaryFile(suffix='.zip', dir=config.TEMP_DIR, delete=False)
         with ZipFile(temp_file.name, 'w', allowZip64=True) as zip_handler:
             self.used_filenames = set()
             for item in self._iter_items(files_holder):
