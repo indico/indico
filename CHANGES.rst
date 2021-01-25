@@ -11,7 +11,7 @@ Security fixes
 ^^^^^^^^^^^^^^
 - JSON locale information data for invalid locales are no longer cached on disk; instead
   a 404 error is triggered for them. This avoids creating small files in the cache folder
-  for each invalid locale that is requested.
+  for each invalid locale that is requested. (:pr:`4766`)
 
 Internationalization
 ^^^^^^^^^^^^^^^^^^^^
