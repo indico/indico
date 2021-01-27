@@ -4,61 +4,91 @@
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
+from marshmallow import post_dump
 
+from indico.core.db.sqlalchemy.links import LinkType
 from indico.core.marshmallow import mm
+from indico.modules.attachments import Attachment
 from indico.modules.categories import Category
 from indico.modules.events import Event
+from indico.modules.events.contributions import Contribution
 from indico.web.flask.util import url_for
-
-
-def _get_category_path(chain):
-    chain = chain[1:-1]  # strip root/self
-    return [
-        dict(c, url=url_for('categories.display', category_id=c['id']))
-        for c in chain
-    ]
 
 
 class CategorySchema(mm.SQLAlchemyAutoSchema):
     class Meta:
         model = Category
+        fields = ('id', 'title', 'url')
+
+    url = mm.Function(lambda c: url_for('categories.display', category_id=c['id']))
+
+
+class DetailedCategorySchema(mm.SQLAlchemyAutoSchema):
+    class Meta:
         fields = ('id', 'title', 'url', 'path')
 
-    path = mm.Function(lambda cat: _get_category_path(cat.chain))
+    path = mm.List(mm.Nested(CategorySchema), attribute='chain')
 
-
-class EventSchema(mm.SQLAlchemyAutoSchema):
-    class Meta:
-        model = Event
-        fields = ('id', 'title', 'url', 'type', 'start_dt', 'end_dt', 'category_path', 'speakers')
-
-    category_path = mm.Function(lambda event: _get_category_path(event.detailed_category_chain))
+    @post_dump()
+    def update_path(self, c, **kwargs):
+        c['path'] = c['path'][:-1]
+        return c
 
 
 class PersonSchema(mm.Schema):
     id = mm.Int()
-    title = mm.String()
-    name = mm.String()
+    name = mm.Function(lambda e: e.title and f'{e.title} {e.name}' or e.name)
+    affiliation = mm.String()
 
 
-class BaseSchema(mm.Schema):
-    id = mm.Int()
-    title = mm.String()
-    url = mm.String()
-    persons = mm.Nested(PersonSchema, many=True)
+class LocationSchema(mm.Schema):
+    venue_name = mm.String()
+    room_name = mm.String()
+    address = mm.String()
 
 
-class ContributionSchema(BaseSchema):
-    start_dt = mm.String()
-    eventURL = mm.String()
-    eventTitle = mm.String()
+# TODO: Date formats
+class EventSchema(mm.SQLAlchemyAutoSchema):
+    class Meta:
+        model = Event
+        fields = ('id', 'title', 'description', 'url', 'type', 'keywords', 'category_path', 'chair_persons',
+                  'location', 'start_dt', 'end_dt')
+
+    location = mm.Function(lambda event: LocationSchema().dump(event))
+    chair_persons = mm.List(mm.Nested(PersonSchema), attribute='person_links')
+    category_path = mm.List(mm.Nested(CategorySchema), attribute='detailed_category_chain')
 
 
-class AttachmentSchema(BaseSchema):
-    type = mm.String()
-    contributionTitle = mm.String()
-    date = mm.String()
-    contribURL = mm.String()
+class AttachmentSchema(mm.SQLAlchemyAutoSchema):
+    class Meta:
+        model = Attachment
+        fields = ('type', 'title', 'url', 'filename', 'event_id', 'contribution_id', 'user', 'content', 'modified_dt')
+
+    filename = mm.String(attribute='file.filename')
+    event_id = mm.Int(attribute='folder.event.id')
+    contribution_id = mm.Method('_contribution_id')
+    subcontribution_id = mm.Method('_subcontribution_id')
+    user = mm.Nested(PersonSchema)
+    url = mm.String(attribute='download_url')
+    content = mm.String()
+
+    def _contribution_id(self, attachment):
+        return attachment.folder.contribution_id if attachment.folder.link_type == LinkType.contribution else None
+
+    def _subcontribution_id(self, attachment):
+        return attachment.folder.subcontribution_id \
+            if attachment.folder.link_type == LinkType.subcontribution else None
+
+
+class ContributionSchema(mm.SQLAlchemyAutoSchema):
+    class Meta:
+        model = Contribution
+        fields = ('id', 'type', 'event_id', 'title', 'description', 'location', 'persons', 'url', 'start_dt', 'end_dt')
+
+    type = mm.String(attribute='type.name')
+    location = mm.Function(lambda contrib: LocationSchema().dump(contrib))
+    persons = mm.List(mm.Nested(PersonSchema), attribute='person_links')
+    url = mm.Function(lambda contrib: url_for('contributions.display_contribution', contrib, _external=False))
 
 
 class ResultSchema(mm.Schema):
@@ -68,7 +98,7 @@ class ResultSchema(mm.Schema):
 
 
 class CategoryResultSchema(ResultSchema):
-    results = mm.Nested(CategorySchema, required=True, many=True, attribute='items')
+    results = mm.Nested(DetailedCategorySchema, required=True, many=True, attribute='items')
 
 
 class EventResultSchema(ResultSchema):
