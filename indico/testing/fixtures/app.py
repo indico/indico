@@ -10,6 +10,7 @@ import os
 import pytest
 
 from indico.web.flask.app import make_app
+from indico.web.flask.wrappers import IndicoFlask
 
 
 @pytest.fixture(scope='session')
@@ -42,3 +43,11 @@ def request_context(app_context):
     """Create a flask request context."""
     with app_context.test_request_context():
         yield
+
+
+@pytest.fixture
+def test_client(app, mocker):
+    """Create a flask request context."""
+    mocker.patch.object(IndicoFlask, 'manifest')
+    with app.test_client() as c:
+        yield c

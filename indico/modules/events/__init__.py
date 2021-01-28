@@ -5,6 +5,8 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
+import re
+
 from flask import flash, redirect, render_template, request, session
 from werkzeug.exceptions import BadRequest, NotFound
 
@@ -142,21 +144,20 @@ def _handle_legacy_ids(app, **kwargs):
     # Those endpoints handle legacy event ids on their own so we ignore them here.
     _non_standard_id_endpoints = {'events.shorturl', 'events.display', 'events.display_overview'}
 
+    # Match event ids which are either not purely numeric or have a leading zero without being exactly `0`
+    _legacy_event_id_re = re.compile(r'/event/((?=0[^/]|\d*[^\d/])[^/]*)')
+
     @app.before_request
     def _redirect_legacy_id():
-        if not request.view_args or request.endpoint in _non_standard_id_endpoints:
+        if request.endpoint in _non_standard_id_endpoints:
             return
 
-        key = event_id = None
-        if 'confId' in request.view_args:
-            key = 'confId'
-            event_id = request.view_args['confId']
-        elif 'event_id' in request.view_args:
-            key = 'event_id'
-            event_id = request.view_args['event_id']
-
-        if event_id is None or not is_legacy_id(event_id):
+        if not (match := _legacy_event_id_re.match(request.path)):
             return
+
+        event_id = match.group(1)
+        assert is_legacy_id(event_id)
+
         if request.method != 'GET':
             raise BadRequest('Unexpected non-GET request with legacy event ID')
 
@@ -164,8 +165,8 @@ def _handle_legacy_ids(app, **kwargs):
         if mapping is None:
             raise NotFound(f'Legacy event {event_id} does not exist')
 
-        request.view_args[key] = str(mapping.event_id)
-        return redirect(url_for(request.endpoint, **dict(request.args.to_dict(), **request.view_args)), 301)
+        new_url = _legacy_event_id_re.sub(f'/event/{mapping.event_id}', request.url, count=1)
+        return redirect(new_url, 302 if app.debug else 301)
 
 
 @signals.app_created.connect
