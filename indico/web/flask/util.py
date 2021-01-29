@@ -153,6 +153,7 @@ def url_for(endpoint, *targets, **values):
         if isinstance(value, bool):
             values[key] = int(value)
 
+    values.setdefault('_external', False)
     url = _url_for(endpoint, **values)
     if g.get('static_site') and 'custom_manifests' in g and not values.get('_external'):
         # for static sites we assume all relative urls need to be
