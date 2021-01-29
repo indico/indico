@@ -19,7 +19,7 @@ from indico.util.string import is_legacy_id
 
 def event_or_shorturl(confId, shorturl_namespace=False, force_overview=False):
     func = None
-    event_ = Event.get(int(confId)) if confId.isdigit() else None
+    event_ = Event.get(int(confId)) if confId.isdigit() and (confId[0] != '0' or confId == '0') else None
     if event_ and event_.is_deleted:
         raise NotFound(_('This event has been deleted.'))
     elif event_:
