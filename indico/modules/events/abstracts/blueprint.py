@@ -16,7 +16,7 @@ from indico.web.flask.util import make_compat_redirect_func
 from indico.web.flask.wrappers import IndicoBlueprint
 
 
-_bp = IndicoBlueprint('abstracts', __name__, url_prefix='/event/<confId>', template_folder='templates',
+_bp = IndicoBlueprint('abstracts', __name__, url_prefix='/event/<int:event_id>', template_folder='templates',
                       virtual_template_folder='events/abstracts')
 
 # Display pages (not related to any specific abstract)
@@ -169,7 +169,7 @@ def _add_management_flag(endpoint, values):
 
 
 # Legacy URLs - display
-_compat_bp = IndicoBlueprint('compat_abstracts', __name__, url_prefix='/event/<int:confId>')
+_compat_bp = IndicoBlueprint('compat_abstracts', __name__, url_prefix='/event/<int:event_id>')
 _compat_bp.add_url_rule('/call-for-abstracts/', 'cfa', make_compat_redirect_func(_bp, 'call_for_abstracts'))
 _compat_bp.add_url_rule('/call-for-abstracts/my-abstracts', 'mine',
                         make_compat_redirect_func(_bp, 'call_for_abstracts'))

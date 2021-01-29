@@ -11,7 +11,7 @@ from indico.modules.events.papers.controllers import api, display, management, p
 from indico.web.flask.wrappers import IndicoBlueprint
 
 
-_bp = IndicoBlueprint('papers', __name__, url_prefix='/event/<confId>', template_folder='templates',
+_bp = IndicoBlueprint('papers', __name__, url_prefix='/event/<int:event_id>', template_folder='templates',
                       virtual_template_folder='events/papers')
 
 # API
@@ -104,8 +104,3 @@ def _add_management_flag(endpoint, values):
         # XXX: using getattr because the conference menu builds the url from an
         # RH without the management attribute
         values['management'] = getattr(g.rh, 'management', False)
-
-
-# Legacy URLs
-_compat_bp = IndicoBlueprint('compat_papers', __name__, url_prefix='/event/<int:confId>')
-# TODO...

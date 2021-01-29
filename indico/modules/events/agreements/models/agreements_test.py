@@ -84,7 +84,7 @@ def test_locator():
     event_id = 9000
     agreement = Agreement(id=id_, event_id=event_id)
     assert agreement.locator == {'id': id_,
-                                 'confId': event_id}
+                                 'event_id': event_id}
 
 
 @pytest.mark.parametrize('person_with_user', (True, False))

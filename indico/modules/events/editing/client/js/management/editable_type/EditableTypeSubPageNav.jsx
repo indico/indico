@@ -22,7 +22,7 @@ import {useNumericParam} from 'indico/react/util/routing';
 import {EditableTypeTitles} from '../../models';
 
 export default function EditableTypeSubPageNav({title}) {
-  const eventId = useNumericParam('confId');
+  const eventId = useNumericParam('event_id');
   const {type} = useParams();
   return (
     <>
@@ -30,7 +30,7 @@ export default function EditableTypeSubPageNav({title}) {
         title={Translate.string('Editing ({type})', {type: EditableTypeTitles[type]})}
       />
       <ManagementPageSubTitle title={title} />
-      <ManagementPageBackButton url={editableTypeURL({confId: eventId, type})} />
+      <ManagementPageBackButton url={editableTypeURL({event_id: eventId, type})} />
     </>
   );
 }

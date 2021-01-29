@@ -151,7 +151,10 @@ class RH:
 
         def _convert(v):
             # some legacy code has numeric ids in the locator data, but still takes
-            # string ids in the url rule (usually for confId)
+            # string ids in the url rule (usually for `confId` which is now numeric and
+            # called `event_id`, but just in case there's any other code that also has
+            # this ugly string/int mix we'll leave this here - there is no harm in
+            # passing strings to `url_for` even for int segments)
             return str(v) if isinstance(v, int) else v
 
         provided = {k: _convert(v) for k, v in request.view_args.items() if k not in defaults}
@@ -206,7 +209,7 @@ class RH:
 
     def _check_event_feature(self):
         from indico.modules.events.features.util import require_feature
-        event_id = request.view_args.get('confId') or request.view_args.get('event_id')
+        event_id = request.view_args.get('event_id')
         if event_id is not None:
             require_feature(event_id, self.EVENT_FEATURE)
 

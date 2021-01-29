@@ -488,7 +488,7 @@ class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionMan
 
     @property
     def locator(self):
-        return {'confId': self.id}
+        return {'event_id': self.id}
 
     @property
     def logo_url(self):
@@ -571,12 +571,12 @@ class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionMan
     @property
     def short_url(self):
         id_ = self.url_shortcut or self.id
-        return url_for('events.shorturl', confId=id_)
+        return url_for('events.shorturl', event_id=id_)
 
     @property
     def short_external_url(self):
         id_ = self.url_shortcut or self.id
-        return url_for('events.shorturl', confId=id_, _external=True)
+        return url_for('events.shorturl', event_id=id_, _external=True)
 
     @property
     def map_url(self):

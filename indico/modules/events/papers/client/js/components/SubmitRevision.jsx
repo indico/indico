@@ -47,7 +47,7 @@ export default function SubmitRevision() {
 
     try {
       await indicoAxios.post(
-        submitRevisionURL({confId: eventId, contrib_id: contributionId}),
+        submitRevisionURL({event_id: eventId, contrib_id: contributionId}),
         formData,
         {headers}
       );

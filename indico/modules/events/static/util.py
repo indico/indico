@@ -71,7 +71,7 @@ def _rewrite_event_asset_url(event, url):
         endpoint_info = endpoint_for_url(path)
         if endpoint_info:
             endpoint, data = endpoint_info
-            if endpoint == 'event_images.image_display' and int(data['confId']) == event.id:
+            if endpoint == 'event_images.image_display' and data['event_id'] == event.id:
                 image_file = ImageFile.get(data['image_id'])
                 if image_file and image_file.event == event:
                     return f'images/{image_file.id}-{image_file.filename}', image_file

@@ -26,6 +26,8 @@ Internal Changes
 ^^^^^^^^^^^^^^^^
 
 - Require Python 3.9 - older Python versions (especially Python 2.7) are **no longer supported**
+- ``confId`` has been changed to ``event_id`` and the corresponding URL path segments
+  now enforce numeric data (and thus pass the id as a number instead of string)
 
 
 ----

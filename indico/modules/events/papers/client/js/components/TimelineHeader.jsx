@@ -39,7 +39,10 @@ export default function TimelineHeader({children, contribution, state, submitter
                   value={contribution.title}
                   wrapper={
                     <a
-                      href={contributionDisplayURL({contrib_id: contribution.id, confId: eventId})}
+                      href={contributionDisplayURL({
+                        event_id: eventId,
+                        contrib_id: contribution.id,
+                      })}
                     />
                   }
                 />

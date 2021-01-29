@@ -27,7 +27,7 @@ class TokenAccessMixin:
     def _token_can_access(self):
         # we need to "fish" the event here because at this point _check_params
         # hasn't run yet
-        event = Event.get_or_404(int(request.view_args['confId']), is_deleted=False)
+        event = Event.get_or_404(request.view_args['event_id'], is_deleted=False)
         if not self.SERVICE_ALLOWED or not request.bearer_token:
             return False
 

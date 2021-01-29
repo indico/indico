@@ -155,8 +155,8 @@ class RHAPIBuildURLs(RH):
             self.object = Contribution.get_or_404(data['contribId'])
         elif 'sessionId' in data:
             self.object = Session.get_or_404(data['sessionId'])
-        elif 'confId' in data:
-            self.object = Event.get_or_404(data['confId'])
+        elif 'eventId' in data:
+            self.object = Event.get_or_404(data['eventId'])
 
         if self.object is None:
             raise BadRequest

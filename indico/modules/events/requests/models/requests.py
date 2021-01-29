@@ -135,7 +135,7 @@ class Request(db.Model):
 
     @property
     def locator(self):
-        return {'confId': self.event_id, 'type': self.type}
+        return {'event_id': self.event_id, 'type': self.type}
 
     def __repr__(self):
         state = self.state.name if self.state is not None else None

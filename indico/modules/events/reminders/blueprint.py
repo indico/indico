@@ -11,7 +11,7 @@ from indico.web.flask.wrappers import IndicoBlueprint
 
 
 _bp = IndicoBlueprint('event_reminders', __name__, template_folder='templates',
-                      virtual_template_folder='events/reminders', url_prefix='/event/<confId>/manage/reminders')
+                      virtual_template_folder='events/reminders', url_prefix='/event/<int:event_id>/manage/reminders')
 
 _bp.add_url_rule('/', 'list', RHListReminders)
 _bp.add_url_rule('/add', 'add', RHAddReminder, methods=('GET', 'POST'))

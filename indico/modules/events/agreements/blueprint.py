@@ -18,7 +18,7 @@ from indico.web.flask.wrappers import IndicoBlueprint
 
 
 _bp = IndicoBlueprint('agreements', __name__, template_folder='templates', virtual_template_folder='events/agreements',
-                      url_prefix='/event/<confId>')
+                      url_prefix='/event/<int:event_id>')
 
 # Event management
 _bp.add_url_rule('/manage/agreements/', 'event_agreements', RHAgreementManager)

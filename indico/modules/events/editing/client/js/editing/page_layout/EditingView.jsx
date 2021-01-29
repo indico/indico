@@ -19,11 +19,11 @@ import MenuBar from './MenuBar';
 import './EditingView.module.scss';
 
 export default function EditingView({eventTitle, children}) {
-  const eventId = useNumericParam('confId');
+  const eventId = useNumericParam('event_id');
   const contribId = useNumericParam('contrib_id');
   const {type} = useParams();
   const {data, lastData} = useIndicoAxios({
-    url: menuEntriesURL({confId: eventId}),
+    url: menuEntriesURL({event_id: eventId}),
     trigger: eventId,
   });
 

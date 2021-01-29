@@ -29,7 +29,7 @@ export const useFetchPrincipals = (principalIds, eventId = null) => {
   const missingPrincipalIds = _.difference(principalIds, Object.keys(informationMap));
 
   const {data} = useIndicoAxios({
-    url: eventId === null ? principalsURL() : eventPrincipalsURL({confId: eventId}),
+    url: eventId === null ? principalsURL() : eventPrincipalsURL({event_id: eventId}),
     forceDispatchEffect: () => !!missingPrincipalIds.length,
     trigger: principalIds,
     camelize: true,
@@ -75,7 +75,7 @@ export const usePermissionInfo = () => {
 
 const _useFetchPrincipalList = (eventId, enabled, urlFunc, options = {}) => {
   const {data, loading} = useIndicoAxios({
-    url: urlFunc({confId: eventId}),
+    url: urlFunc({event_id: eventId}),
     trigger: enabled ? eventId : null,
     forceDispatchEffect: () => enabled && eventId !== null,
     camelize: true,

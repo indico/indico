@@ -11,7 +11,7 @@ from indico.web.flask.wrappers import IndicoBlueprint
 
 
 _bp = IndicoBlueprint('requests', __name__, template_folder='templates', virtual_template_folder='events/requests',
-                      url_prefix='/event/<confId>/manage/requests')
+                      url_prefix='/event/<int:event_id>/manage/requests')
 
 # Event management
 _bp.add_url_rule('/', 'event_requests', RHRequestsEventRequests)

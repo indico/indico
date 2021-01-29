@@ -25,7 +25,7 @@ export default function ReviewConditionsManager() {
   const {eventId, fileTypes, editableType} = useContext(ReviewConditionsContext);
   const [isAdding, setIsAdding] = useState(false);
   const {loading, reFetch, data: eventConditionsSetting, lastData} = useIndicoAxios({
-    url: reviewConditionsURL({confId: eventId, type: editableType}),
+    url: reviewConditionsURL({event_id: eventId, type: editableType}),
     trigger: eventId,
   });
 
@@ -43,7 +43,10 @@ export default function ReviewConditionsManager() {
   ]);
   const createNewCondition = async formData => {
     try {
-      await indicoAxios.post(reviewConditionsURL({confId: eventId, type: editableType}), formData);
+      await indicoAxios.post(
+        reviewConditionsURL({event_id: eventId, type: editableType}),
+        formData
+      );
       setIsAdding(false);
       reFetch();
     } catch (e) {

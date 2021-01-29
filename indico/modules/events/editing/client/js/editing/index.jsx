@@ -37,18 +37,18 @@ document.addEventListener('DOMContentLoaded', async () => {
     <Router>
       <Route
         path={[
-          routerPathFromFlask(timelineURL, ['confId', 'contrib_id', 'type']),
-          routerPathFromFlask(editableTypeListURL, ['confId', 'type']),
+          routerPathFromFlask(timelineURL, ['event_id', 'contrib_id', 'type']),
+          routerPathFromFlask(editableTypeListURL, ['event_id', 'type']),
         ]}
       >
         <EditingView eventTitle={eventTitle}>
           <Switch>
             <Route
               exact
-              path={routerPathFromFlask(timelineURL, ['confId', 'contrib_id', 'type'])}
+              path={routerPathFromFlask(timelineURL, ['event_id', 'contrib_id', 'type'])}
               component={ReduxTimeline}
             />
-            <Route exact path={routerPathFromFlask(editableTypeListURL, ['confId', 'type'])}>
+            <Route exact path={routerPathFromFlask(editableTypeListURL, ['event_id', 'type'])}>
               <EditableList management={false} />
             </Route>
           </Switch>

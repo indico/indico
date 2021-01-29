@@ -33,7 +33,7 @@ import TeamManager from './TeamManager';
 import './EditableTypeDashboard.module.scss';
 
 export default function EditableTypeDashboard() {
-  const eventId = useNumericParam('confId');
+  const eventId = useNumericParam('event_id');
   const {type} = useParams();
   const [editorManagerVisible, setEditorManagerVisible] = useState(false);
   const [selfAssignModalVisible, setSelfAssignModalVisible] = useState(false);
@@ -43,19 +43,19 @@ export default function EditableTypeDashboard() {
     toggleSelfAssign,
     selfAssignLoading,
     selfAssignSaving,
-  ] = useTogglableValue(selfAssignURL({confId: eventId, type}));
+  ] = useTogglableValue(selfAssignURL({event_id: eventId, type}));
 
   const [submissionEnabled, toggleSubmission, submissionLoading] = useTogglableValue(
-    enableSubmissionURL({confId: eventId, type})
+    enableSubmissionURL({event_id: eventId, type})
   );
 
   const [editingEnabled, toggleEditing, editingLoading] = useTogglableValue(
-    enableEditingURL({confId: eventId, type})
+    enableEditingURL({event_id: eventId, type})
   );
 
   const contactEditingTeam = () => {
     ajaxDialog({
-      url: contactEditingTeamURL({confId: eventId, type}),
+      url: contactEditingTeamURL({event_id: eventId, type}),
       title: Translate.string('Send emails to the editing team'),
     });
   };
@@ -69,7 +69,7 @@ export default function EditableTypeDashboard() {
   return (
     <>
       <ManagementPageSubTitle title={EditableTypeTitles[type]} />
-      <ManagementPageBackButton url={dashboardURL({confId: eventId})} />
+      <ManagementPageBackButton url={dashboardURL({event_id: eventId})} />
       {selfAssignLoading || submissionLoading || editingLoading ? (
         <Loader active />
       ) : (
@@ -110,7 +110,7 @@ export default function EditableTypeDashboard() {
             >
               <Link
                 className="i-button icon-settings"
-                to={manageFileTypesURL({confId: eventId, type})}
+                to={manageFileTypesURL({event_id: eventId, type})}
               >
                 <Translate>Configure</Translate>
               </Link>
@@ -122,7 +122,7 @@ export default function EditableTypeDashboard() {
             >
               <Link
                 className="i-button icon-settings"
-                to={manageReviewConditionsURL({confId: eventId, type})}
+                to={manageReviewConditionsURL({event_id: eventId, type})}
               >
                 <Translate>Configure</Translate>
               </Link>
@@ -156,7 +156,7 @@ export default function EditableTypeDashboard() {
               />
               <Link
                 className="i-button icon-settings"
-                to={manageEditableTypeListURL({confId: eventId, type})}
+                to={manageEditableTypeListURL({event_id: eventId, type})}
               >
                 <Translate>List</Translate>
               </Link>

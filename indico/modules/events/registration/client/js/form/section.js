@@ -11,7 +11,7 @@ ndRegForm.controller('SectionCtrl', function($scope, $rootScope, regFormFactory)
 
   var getRequestParams = function(section) {
     return {
-      confId: $rootScope.confId,
+      eventId: $rootScope.eventId,
       sectionId: section.id,
       confFormId: $rootScope.confFormId,
     };

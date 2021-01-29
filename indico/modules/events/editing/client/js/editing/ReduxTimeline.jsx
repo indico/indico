@@ -22,18 +22,18 @@ import Timeline from './timeline';
 import reducer from './timeline/reducer';
 
 export default function ReduxTimeline() {
-  const eventId = useNumericParam('confId');
+  const eventId = useNumericParam('event_id');
   const contributionId = useNumericParam('contrib_id');
   const {type: editableType} = useParams();
 
   const {data: fileTypes, loading: isLoadingFileTypes} = useIndicoAxios({
-    url: fileTypesURL({confId: eventId, type: editableType}),
+    url: fileTypesURL({event_id: eventId, type: editableType}),
     camelize: true,
     trigger: [eventId, editableType],
   });
 
   const {data: tags, loading: isLoadingTags} = useIndicoAxios({
-    url: tagsURL({confId: eventId}),
+    url: tagsURL({event_id: eventId}),
     camelize: true,
     trigger: [eventId],
   });
@@ -55,7 +55,7 @@ export default function ReduxTimeline() {
         fileTypes,
         tags,
         editableDetailsURL: editableDetailsURL({
-          confId: eventId,
+          event_id: eventId,
           contrib_id: contributionId,
           type: editableType,
         }),

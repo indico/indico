@@ -86,7 +86,7 @@ export default function UpdateFilesForm({setLoading}) {
               fileTypes={fileTypes}
               files={lastRevision.files}
               uploadURL={uploadURL({
-                confId: eventId,
+                event_id: eventId,
                 contrib_id: contributionId,
                 type: editableType,
               })}

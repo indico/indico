@@ -119,10 +119,10 @@ _bp.add_url_rule('/api/admin/rooms/<int:room_id>/photo', 'admin_room_photo', adm
 _bp.add_url_rule('/api/admin/map-areas', 'admin_map_areas', admin.RHMapAreas, methods=('POST', 'PATCH', 'DELETE'))
 
 # Event linking
-_bp.add_url_rule('!/event/<confId>/manage/rooms/', 'event_booking_list', event.RHEventBookingList)
-_bp.add_url_rule('!/event/<confId>/manage/rooms/linking/contributions', 'event_linkable_contributions',
+_bp.add_url_rule('!/event/<int:event_id>/manage/rooms/', 'event_booking_list', event.RHEventBookingList)
+_bp.add_url_rule('!/event/<int:event_id>/manage/rooms/linking/contributions', 'event_linkable_contributions',
                  event.RHListLinkableContributions)
-_bp.add_url_rule('!/event/<confId>/manage/rooms/linking/session-blocks', 'event_linkable_session_blocks',
+_bp.add_url_rule('!/event/<int:event_id>/manage/rooms/linking/session-blocks', 'event_linkable_session_blocks',
                  event.RHListLinkableSessionBlocks)
 
 

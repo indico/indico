@@ -132,7 +132,7 @@ def create_mock_abstract(event):
                                 track=track,
                                 session=session,
                                 type=contribution_type,
-                                locator={'confId': -314, 'contrib_id': 1234})
+                                locator={'event_id': -314, 'contrib_id': 1234})
 
     target_abstract = Abstract(friendly_id=315,
                                title="Broken Symmetry",
@@ -144,8 +144,8 @@ def create_mock_abstract(event):
                                contribution=contribution,
                                primary_authors=[englert, brout],
                                secondary_authors=[guralnik, hagen, kibble, higgs],
-                               locator=_MockLocator({'confId': -314, 'abstract_id': 1235},
-                                                    token={'confId': -314,
+                               locator=_MockLocator({'event_id': -314, 'abstract_id': 1235},
+                                                    token={'event_id': -314,
                                                            'uuid': '12345678-9abc-def0-1234-56789abcdef0'}),
                                judgment_comment='Vague but interesting!',
                                merged_into=None)
@@ -160,8 +160,8 @@ def create_mock_abstract(event):
                         contribution=contribution,
                         primary_authors=[englert, brout],
                         secondary_authors=[guralnik, hagen, kibble, higgs],
-                        locator=_MockLocator({'confId': -314, 'abstract_id': 1234},
-                                             token={'confId': -314, 'uuid': '12345678-9abc-def0-1234-56789abcdef0'}),
+                        locator=_MockLocator({'event_id': -314, 'abstract_id': 1234},
+                                             token={'event_id': -314, 'uuid': '12345678-9abc-def0-1234-56789abcdef0'}),
                         judgment_comment='Vague but interesting!',
                         merged_into=target_abstract)
 

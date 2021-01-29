@@ -16,10 +16,10 @@ import {useNumericParam} from 'indico/react/util/routing';
 import TagManager from './TagManager';
 
 export default function EditingTagManagement() {
-  const eventId = useNumericParam('confId');
+  const eventId = useNumericParam('event_id');
   return (
     <>
-      <ManagementPageBackButton url={dashboardURL({confId: eventId})} />
+      <ManagementPageBackButton url={dashboardURL({event_id: eventId})} />
       <ManagementPageSubTitle title={Translate.string('Tags')} />
       <TagManager eventId={eventId} />
     </>

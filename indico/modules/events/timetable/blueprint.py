@@ -30,7 +30,7 @@ from indico.web.flask.wrappers import IndicoBlueprint
 
 
 _bp = IndicoBlueprint('timetable', __name__, template_folder='templates', virtual_template_folder='events/timetable',
-                      url_prefix='/event/<confId>')
+                      url_prefix='/event/<int:event_id>')
 
 # Management
 _bp.add_url_rule('/manage/timetable/', 'management', RHManageTimetable)

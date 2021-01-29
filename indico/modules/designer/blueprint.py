@@ -40,7 +40,7 @@ for object_type in ('event', 'category'):
     if object_type == 'category':
         prefix = '/category/<int:category_id>'
     else:
-        prefix = '/event/<int:confId>'
+        prefix = '/event/<int:event_id>'
     prefix += '/manage/designer'
     _bp.add_url_rule(prefix + '/', 'template_list', _dispatch(RHListEventTemplates, RHListCategoryTemplates),
                      defaults={'object_type': object_type})

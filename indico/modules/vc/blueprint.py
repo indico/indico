@@ -19,29 +19,29 @@ _bp.add_url_rule('/service/videoconference', 'vc_room_list', RHVCRoomList)
 
 
 # Event management
-_bp.add_url_rule('/event/<confId>/manage/videoconference/', 'manage_vc_rooms', RHVCManageEvent)
-_bp.add_url_rule('/event/<confId>/manage/videoconference/select', 'manage_vc_rooms_select',
+_bp.add_url_rule('/event/<int:event_id>/manage/videoconference/', 'manage_vc_rooms', RHVCManageEvent)
+_bp.add_url_rule('/event/<int:event_id>/manage/videoconference/select', 'manage_vc_rooms_select',
                  RHVCManageEventSelectService, methods=('GET', 'POST'))
-_bp.add_url_rule('/event/<confId>/manage/videoconference/<service>/create', 'manage_vc_rooms_create',
+_bp.add_url_rule('/event/<int:event_id>/manage/videoconference/<service>/create', 'manage_vc_rooms_create',
                  RHVCManageEventCreate, methods=('GET', 'POST'))
-_bp.add_url_rule('/event/<confId>/manage/videoconference/<service>/<int:event_vc_room_id>/',
+_bp.add_url_rule('/event/<int:event_id>/manage/videoconference/<service>/<int:event_vc_room_id>/',
                  'manage_vc_rooms_modify', RHVCManageEventModify, methods=('GET', 'POST'))
-_bp.add_url_rule('/event/<confId>/manage/videoconference/<service>/<int:event_vc_room_id>/remove',
+_bp.add_url_rule('/event/<int:event_id>/manage/videoconference/<service>/<int:event_vc_room_id>/remove',
                  'manage_vc_rooms_remove', RHVCManageEventRemove, methods=('POST',))
-_bp.add_url_rule('/event/<confId>/manage/videoconference/<service>/<int:event_vc_room_id>/refresh',
+_bp.add_url_rule('/event/<int:event_id>/manage/videoconference/<service>/<int:event_vc_room_id>/refresh',
                  'manage_vc_rooms_refresh', RHVCManageEventRefresh, methods=('POST',))
-_bp.add_url_rule('/event/<confId>/manage/videoconference/<service>/attach/',
+_bp.add_url_rule('/event/<int:event_id>/manage/videoconference/<service>/attach/',
                  'manage_vc_rooms_search_form', RHVCManageAttach, methods=('GET', 'POST'))
-_bp.add_url_rule('/event/<confId>/manage/videoconference/<service>/search/',
+_bp.add_url_rule('/event/<int:event_id>/manage/videoconference/<service>/search/',
                  'manage_vc_rooms_search', RHVCManageSearch)
 
 # Event page
-_bp.add_url_rule('/event/<confId>/videoconference/', 'event_videoconference', RHVCEventPage)
+_bp.add_url_rule('/event/<int:event_id>/videoconference/', 'event_videoconference', RHVCEventPage)
 
 
 # Legacy URLs
 vc_compat_blueprint = _compat_bp = IndicoBlueprint('compat_vc', __name__)
-vc_compat_blueprint.add_url_rule('/event/<confId>/collaboration', 'collaboration',
+vc_compat_blueprint.add_url_rule('/event/<int:event_id>/collaboration', 'collaboration',
                                  make_compat_redirect_func(_bp, 'event_videoconference'))
 vc_compat_blueprint.add_url_rule('/collaborationDisplay.py', 'collaborationpy',
                                  make_compat_redirect_func(_bp, 'event_videoconference'))

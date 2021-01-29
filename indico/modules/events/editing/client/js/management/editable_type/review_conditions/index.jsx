@@ -20,11 +20,11 @@ import ReviewConditionsContext from './context';
 import ReviewConditionsManager from './ReviewConditionsManager';
 
 export default function ReviewConditionManagement() {
-  const eventId = useNumericParam('confId');
+  const eventId = useNumericParam('event_id');
   const {type} = useParams();
 
   const {data: fileTypes} = useIndicoAxios({
-    url: fileTypesURL({confId: eventId, type}),
+    url: fileTypesURL({event_id: eventId, type}),
     camelize: true,
     trigger: [eventId, type],
   });

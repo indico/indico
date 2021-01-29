@@ -32,32 +32,32 @@ export default function EditingManagement() {
       <Switch>
         <Route
           exact
-          path={routerPathFromFlask(dashboardURL, ['confId'])}
+          path={routerPathFromFlask(dashboardURL, ['event_id'])}
           component={EditingManagementDashboard}
         />
         <Route
           exact
-          path={routerPathFromFlask(manageTagsURL, ['confId'])}
+          path={routerPathFromFlask(manageTagsURL, ['event_id'])}
           component={EditingTagManagement}
         />
         <Route
           exact
-          path={routerPathFromFlask(editableTypeURL, ['confId', 'type'])}
+          path={routerPathFromFlask(editableTypeURL, ['event_id', 'type'])}
           component={EditableTypeDashboard}
         />
         <Route
           exact
-          path={routerPathFromFlask(manageFileTypesURL, ['confId', 'type'])}
+          path={routerPathFromFlask(manageFileTypesURL, ['event_id', 'type'])}
           component={FileTypeManagement}
         />
         <Route
           exact
-          path={routerPathFromFlask(manageReviewConditionsURL, ['confId', 'type'])}
+          path={routerPathFromFlask(manageReviewConditionsURL, ['event_id', 'type'])}
           component={ReviewConditionsManagement}
         />
         <Route
           exact
-          path={routerPathFromFlask(editableListURL, ['confId', 'type'])}
+          path={routerPathFromFlask(editableListURL, ['event_id', 'type'])}
           component={EditableList}
         />
       </Switch>

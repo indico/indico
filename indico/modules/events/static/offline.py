@@ -297,7 +297,7 @@ class StaticConferenceCreator(StaticEventCreator):
     def _get_builtin_page(self, entry):
         obj = self._menu_offline_items.get(entry.name)
         if isinstance(obj, RH):
-            request.view_args = {'confId': self.event.id}
+            request.view_args = {'event_id': self.event.id}
             with override_request_endpoint(obj.view_class.endpoint):
                 obj._process_args()
                 self._add_page(obj._process(), obj.view_class.endpoint, self.event)
@@ -332,7 +332,7 @@ class StaticConferenceCreator(StaticEventCreator):
 
     def _get_contrib(self, contrib):
         self._add_from_rh(RHContributionDisplay, WPStaticContributionDisplay,
-                          {'confId': self.event.id, 'contrib_id': contrib.id},
+                          {'event_id': self.event.id, 'contrib_id': contrib.id},
                           contrib)
         if config.LATEX_ENABLED:
             self._add_pdf(contrib, 'contributions.export_pdf', ContribToPDF, contrib=contrib)
@@ -347,12 +347,12 @@ class StaticConferenceCreator(StaticEventCreator):
 
     def _get_sub_contrib(self, subcontrib):
         self._add_from_rh(RHSubcontributionDisplay, WPStaticSubcontributionDisplay,
-                          {'confId': self.event.id, 'contrib_id': subcontrib.contribution.id,
+                          {'event_id': self.event.id, 'contrib_id': subcontrib.contribution.id,
                            'subcontrib_id': subcontrib.id}, subcontrib)
 
     def _get_author(self, contrib, author):
         rh = RHContributionAuthor()
-        params = {'confId': self.event.id, 'contrib_id': contrib.id, 'person_id': author.id}
+        params = {'event_id': self.event.id, 'contrib_id': contrib.id, 'person_id': author.id}
         request.view_args = params
         with override_request_endpoint('contributions.display_author'):
             rh._process_args()
@@ -361,7 +361,7 @@ class StaticConferenceCreator(StaticEventCreator):
 
     def _get_session(self, session):
         self._add_from_rh(RHDisplaySession, WPStaticSessionDisplay,
-                          {'confId': self.event.id, 'session_id': session.id}, session)
+                          {'event_id': self.event.id, 'session_id': session.id}, session)
 
         pdf = get_session_timetable_pdf(session, tz=self._display_tz)
         self._add_pdf(session, 'sessions.export_session_timetable', pdf)

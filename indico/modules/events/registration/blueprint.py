@@ -14,7 +14,7 @@ from indico.web.flask.util import make_compat_redirect_func
 from indico.web.flask.wrappers import IndicoBlueprint
 
 
-_bp = IndicoBlueprint('event_registration', __name__, url_prefix='/event/<confId>', template_folder='templates',
+_bp = IndicoBlueprint('event_registration', __name__, url_prefix='/event/<int:event_id>', template_folder='templates',
                       virtual_template_folder='events/registration', event_feature='registration')
 
 # Management
@@ -180,7 +180,7 @@ _bp.add_url_rule('/api/registration-forms', 'api_registration_forms', api.RHAPIR
 
 
 # Participants
-_bp_participation = IndicoBlueprint('event_participation', __name__, url_prefix='/event/<confId>',
+_bp_participation = IndicoBlueprint('event_participation', __name__, url_prefix='/event/<int:event_id>',
                                     template_folder='templates', virtual_template_folder='events/registration')
 _bp_participation.add_url_rule('/manage/participants/', 'manage', regforms.RHManageParticipants,
                                methods=('GET', 'POST'))
@@ -190,7 +190,6 @@ _bp_participation.add_url_rule('/manage/participants/', 'manage', regforms.RHMan
 _compat_bp = IndicoBlueprint('compat_event_registration', __name__, url_prefix='/event/<int:event_id>')
 _compat_bp.add_url_rule('/registration/', 'registration', compat_registration)
 _compat_bp.add_url_rule('/registration/<path:path>', 'registration', compat_registration)
-_compat_bp.add_url_rule('/registration/registrants', 'registrants',
-                        make_compat_redirect_func(_bp, 'participant_list', view_args_conv={'event_id': 'confId'}))
+_compat_bp.add_url_rule('/registration/registrants', 'registrants', make_compat_redirect_func(_bp, 'participant_list'))
 _compat_bp.add_url_rule('!/confRegistrantsDisplay.py/list', 'registrants_modpython',
                         make_compat_redirect_func(_bp, 'participant_list'))

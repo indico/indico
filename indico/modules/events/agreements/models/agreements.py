@@ -170,7 +170,7 @@ class Agreement(db.Model):
 
     @property
     def locator(self):
-        return {'confId': self.event_id,
+        return {'event_id': self.event_id,
                 'id': self.id}
 
     def __repr__(self):

@@ -13,7 +13,7 @@ ndRegForm.controller('FieldCtrl', function($scope, regFormFactory) {
 
   var getRequestParams = function(field) {
     return {
-      confId: $scope.confId,
+      eventId: $scope.eventId,
       sectionId: $scope.section.id,
       fieldId: field.id,
       confFormId: $scope.confFormId,

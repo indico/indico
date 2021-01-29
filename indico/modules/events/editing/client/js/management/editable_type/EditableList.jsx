@@ -42,21 +42,21 @@ import NextEditable from './NextEditable';
 import './EditableList.module.scss';
 
 export default function EditableList({management}) {
-  const eventId = useNumericParam('confId');
+  const eventId = useNumericParam('event_id');
   const {type} = useParams();
   const {data: contribList, loading: isLoadingContribList} = useIndicoAxios({
-    url: editableListURL({confId: eventId, type}),
+    url: editableListURL({event_id: eventId, type}),
     camelize: true,
     trigger: [eventId, type],
   });
   const {data: editors, loading: isLoadingEditors} = useIndicoAxios({
-    url: editorsURL({confId: eventId, type}),
+    url: editorsURL({event_id: eventId, type}),
     camelize: true,
     trigger: [eventId, type],
     forceDispatchEffect: () => management,
   });
   const {data: canAssignSelf, loading: isLoadingCanAssignSelf} = useIndicoAxios({
-    url: canAssignSelfURL({confId: eventId, type}),
+    url: canAssignSelfURL({event_id: eventId, type}),
     trigger: [eventId, type],
     forceDispatchEffect: () => !management,
   });
@@ -301,7 +301,7 @@ function EditableListDisplay({
   const checkedEditablesRequest = async (urlFunc, data = {}) => {
     let response;
     try {
-      response = await indicoAxios.post(urlFunc({confId: eventId, type: editableType}), {
+      response = await indicoAxios.post(urlFunc({event_id: eventId, type: editableType}), {
         editables: checked,
         ...data,
       });
@@ -347,7 +347,7 @@ function EditableListDisplay({
     <>
       {management && <ManagementPageSubTitle title={title} />}
       {management && (
-        <ManagementPageBackButton url={editableTypeURL({confId: eventId, type: editableType})} />
+        <ManagementPageBackButton url={editableTypeURL({event_id: eventId, type: editableType})} />
       )}
       <div styleName="editable-topbar">
         <div>

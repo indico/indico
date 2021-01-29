@@ -13,7 +13,7 @@ from indico.web.flask.wrappers import IndicoBlueprint
 
 _bp = IndicoBlueprint('event_management', __name__, template_folder='templates',
                       virtual_template_folder='events/management',
-                      url_prefix='/event/<confId>/manage')
+                      url_prefix='/event/<int:event_id>/manage')
 
 # Settings
 _bp.add_url_rule('/', 'settings', settings.RHEventSettings)
@@ -66,10 +66,10 @@ for object_type, prefixes in event_management_object_url_prefixes.items():
     if object_type == 'subcontribution':
         continue
     for prefix in prefixes:
-        prefix = '!/event/<confId>' + prefix
+        prefix = '!/event/<int:event_id>' + prefix
         _bp.add_url_rule(prefix + '/show-non-inheriting', 'show_non_inheriting', protection.RHShowNonInheriting,
                          defaults={'object_type': object_type})
 
 
-_compat_bp = IndicoBlueprint('compat_event_management', __name__, url_prefix='/event/<confId>/manage')
+_compat_bp = IndicoBlueprint('compat_event_management', __name__, url_prefix='/event/<int:event_id>/manage')
 _compat_bp.add_url_rule('/general/', 'settings', make_compat_redirect_func(_bp, 'settings'))

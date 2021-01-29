@@ -10,7 +10,7 @@ from indico.web.flask.wrappers import IndicoBlueprint
 
 
 _bp = IndicoBlueprint('event_logs', __name__, template_folder='templates', virtual_template_folder='events/logs',
-                      url_prefix='/event/<confId>/manage/logs')
+                      url_prefix='/event/<int:event_id>/manage/logs')
 
 _bp.add_url_rule('/', 'index', RHEventLogs)
 _bp.add_url_rule('/api/logs', 'logs', RHEventLogsJSON)

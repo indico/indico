@@ -18,7 +18,7 @@ from indico.web.rh import RH
 
 class RHEventBase(RH):
     def _process_args(self):
-        self.event = Event.get(int(request.view_args['confId']))
+        self.event = Event.get(request.view_args['event_id'])
         if self.event is None:
             raise NotFound(_('An event with this ID does not exist.'))
         elif self.event.is_deleted:

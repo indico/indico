@@ -7,17 +7,18 @@
 
 import publicationURL from 'indico-url:contributions.manage_publication';
 
-import React, {useState} from 'react';
 import PropTypes from 'prop-types';
+import React, {useState} from 'react';
 import {Header, Modal, Button, Checkbox, List} from 'semantic-ui-react';
-import {Translate} from 'indico/react/i18n';
+
 import {useTogglableValue} from 'indico/react/hooks';
+import {Translate} from 'indico/react/i18n';
 
 export default function PublicationSwitch({eventId}) {
   const [modalOpen, setModalOpen] = useState(false);
 
   const [published, togglePublished, loading, saving] = useTogglableValue(
-    publicationURL({confId: eventId})
+    publicationURL({event_id: eventId})
   );
 
   if (loading) {

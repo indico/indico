@@ -27,7 +27,7 @@ import './NextEditable.module.scss';
 
 export default function NextEditable({eventId, editableType, onClose, management}) {
   const {data: fileTypes, loading: isLoadingFileTypes} = useIndicoAxios({
-    url: fileTypesURL({confId: eventId, type: editableType}),
+    url: fileTypesURL({event_id: eventId, type: editableType}),
     camelize: true,
     trigger: [eventId, editableType],
   });
@@ -69,10 +69,13 @@ function NextEditableDisplay({eventId, editableType, onClose, fileTypes, managem
       setLoading(true);
       let response;
       try {
-        response = await indicoAxios.post(editableListURL({confId: eventId, type: editableType}), {
-          extensions: _.pickBy(filters, x => Array.isArray(x)),
-          has_files: _.pickBy(filters, x => !Array.isArray(x)),
-        });
+        response = await indicoAxios.post(
+          editableListURL({event_id: eventId, type: editableType}),
+          {
+            extensions: _.pickBy(filters, x => Array.isArray(x)),
+            has_files: _.pickBy(filters, x => !Array.isArray(x)),
+          }
+        );
       } catch (e) {
         handleAxiosError(e);
         setLoading(false);
@@ -112,7 +115,7 @@ function NextEditableDisplay({eventId, editableType, onClose, fileTypes, managem
     try {
       await indicoAxios.put(
         assignMyselfURL({
-          confId: eventId,
+          event_id: eventId,
           contrib_id: selectedEditable.contributionId,
           type: editableType,
         })

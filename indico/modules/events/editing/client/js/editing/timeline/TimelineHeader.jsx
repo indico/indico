@@ -36,7 +36,7 @@ export default function TimelineHeader({children, contribution, state, submitter
   const unassignEditor = async () => {
     try {
       await indicoAxios.delete(
-        unassignEditorURL({confId: eventId, contrib_id: contribution.id, type})
+        unassignEditorURL({event_id: eventId, contrib_id: contribution.id, type})
       );
     } catch (error) {
       return handleAxiosError(error);
@@ -46,7 +46,9 @@ export default function TimelineHeader({children, contribution, state, submitter
 
   const assignMyself = async () => {
     try {
-      await indicoAxios.put(assignMyselfURL({confId: eventId, contrib_id: contribution.id, type}));
+      await indicoAxios.put(
+        assignMyselfURL({event_id: eventId, contrib_id: contribution.id, type})
+      );
     } catch (error) {
       return handleAxiosError(error);
     }
@@ -84,7 +86,10 @@ export default function TimelineHeader({children, contribution, state, submitter
                   value={contribution.title}
                   wrapper={
                     <a
-                      href={contributionDisplayURL({contrib_id: contribution.id, confId: eventId})}
+                      href={contributionDisplayURL({
+                        event_id: eventId,
+                        contrib_id: contribution.id,
+                      })}
                     />
                   }
                 />

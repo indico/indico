@@ -38,13 +38,13 @@ export default function EditableSubmissionButton({
   const submitRevision = async formData => {
     try {
       await indicoAxios.put(
-        submitRevisionURL({confId: eventId, contrib_id: contributionId, type: currentType}),
+        submitRevisionURL({event_id: eventId, contrib_id: contributionId, type: currentType}),
         formData
       );
     } catch (e) {
       return handleSubmitError(e);
     }
-    location.href = editableURL({confId: eventId, contrib_id: contributionId, type: currentType});
+    location.href = editableURL({event_id: eventId, contrib_id: contributionId, type: currentType});
   };
   const editableTypes = Object.keys(fileTypes);
   const textByType = {
@@ -82,12 +82,12 @@ export default function EditableSubmissionButton({
                       },
                     })}
                     uploadURL={apiUploadURL({
-                      confId: eventId,
+                      event_id: eventId,
                       contrib_id: contributionId,
                       type: currentType,
                     })}
                     uploadExistingURL={apiUploadExistingURL({
-                      confId: eventId,
+                      event_id: eventId,
                       contrib_id: contributionId,
                       type: currentType,
                     })}

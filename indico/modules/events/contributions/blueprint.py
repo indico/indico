@@ -14,7 +14,7 @@ from indico.web.flask.wrappers import IndicoBlueprint
 
 
 _bp = IndicoBlueprint('contributions', __name__, template_folder='templates',
-                      virtual_template_folder='events/contributions', url_prefix='/event/<confId>')
+                      virtual_template_folder='events/contributions', url_prefix='/event/<int:event_id>')
 
 _bp.add_url_rule('/manage/contributions/', 'manage_contributions', management.RHContributions)
 _bp.add_url_rule('/manage/contributions/customize', 'customize_contrib_list',
@@ -138,7 +138,7 @@ _bp.add_url_rule('/contributions/<int:contrib_id>/subcontributions/<int:subcontr
                  display.RHSubcontributionDisplay)
 
 # Legacy URLs
-_compat_bp = IndicoBlueprint('compat_contributions', __name__, url_prefix='/event/<event_id>')
+_compat_bp = IndicoBlueprint('compat_contributions', __name__, url_prefix='/event/<int:event_id>')
 
 with _compat_bp.add_prefixed_rules('/session/<legacy_session_id>'):
     _compat_bp.add_url_rule('/contribution/<legacy_contribution_id>', 'contribution',
@@ -151,7 +151,7 @@ with _compat_bp.add_prefixed_rules('/session/<legacy_session_id>'):
                             'subcontribution', compat_subcontribution)
 
 _compat_bp.add_url_rule('/my-conference/contributions', 'my_contributions',
-                        make_compat_redirect_func(_bp, 'my_contributions', view_args_conv={'event_id': 'confId'}))
+                        make_compat_redirect_func(_bp, 'my_contributions'))
 
 _compat_bp.add_url_rule('!/contributionDisplay.py', 'contribution_modpython',
                         make_compat_redirect_func(_compat_bp, 'contribution',

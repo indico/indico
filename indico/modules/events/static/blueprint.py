@@ -10,7 +10,7 @@ from indico.web.flask.wrappers import IndicoBlueprint
 
 
 _bp = IndicoBlueprint('static_site', __name__, template_folder='templates', virtual_template_folder='events/static',
-                      url_prefix='/event/<confId>/manage/offline-copy')
+                      url_prefix='/event/<int:event_id>/manage/offline-copy')
 
 # Event management
 _bp.add_url_rule('/', 'list', RHStaticSiteList)

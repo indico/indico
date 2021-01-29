@@ -22,7 +22,7 @@ def test_RHRegistrationForm_can_register(db, dummy_regform, dummy_reg, dummy_use
     invitation = RegistrationInvitation(registration_form=dummy_regform, email='foo@bar.com', first_name='foo',
                                         last_name='bar', affiliation='test')
     db.session.flush()
-    request.view_args = {'reg_form_id': dummy_regform.id, 'confId': dummy_regform.event_id}
+    request.view_args = {'reg_form_id': dummy_regform.id, 'event_id': dummy_regform.event_id}
     request.args = {'invitation': invitation.uuid}
     rh = RHRegistrationForm()
     rh._process_args()

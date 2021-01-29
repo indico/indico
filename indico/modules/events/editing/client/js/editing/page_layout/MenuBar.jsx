@@ -23,7 +23,7 @@ import {EditableType, EditableEditingTitles} from '../../models';
 import './MenuBar.module.scss';
 
 function EditableListMenu({eventId, editableType}) {
-  if (location.pathname === editableTypeListURL({confId: eventId, type: editableType})) {
+  if (location.pathname === editableTypeListURL({event_id: eventId, type: editableType})) {
     return (
       <Menu vertical>
         <Menu.Item active>
@@ -34,7 +34,7 @@ function EditableListMenu({eventId, editableType}) {
   }
   return (
     <Menu vertical>
-      <Menu.Item as={Link} to={editableTypeListURL({confId: eventId, type: editableType})}>
+      <Menu.Item as={Link} to={editableTypeListURL({event_id: eventId, type: editableType})}>
         <span style={{color: Palette.blue}}>
           <Translate>Editable list</Translate>
         </span>
@@ -51,9 +51,9 @@ EditableListMenu.propTypes = {
 export default function MenuBar({eventId, menuItems, editableType, contribId}) {
   const displayViewURL =
     contribId === null
-      ? displayURL({confId: eventId})
-      : contribDisplayURL({confId: eventId, contrib_id: contribId});
-  const managementViewURL = manageEditableTypeURL({confId: eventId, type: editableType});
+      ? displayURL({event_id: eventId})
+      : contribDisplayURL({event_id: eventId, contrib_id: contribId});
+  const managementViewURL = manageEditableTypeURL({event_id: eventId, type: editableType});
 
   return (
     <div styleName="menu-bar">

@@ -38,7 +38,7 @@ export default function SubmitRevision() {
     const rv = await dispatch(
       createRevision(
         createSubmitterRevisionURL({
-          confId: eventId,
+          event_id: eventId,
           contrib_id: contributionId,
           type: editableType,
           revision_id: lastRevision.id,
@@ -73,7 +73,7 @@ export default function SubmitRevision() {
                     fileTypes={fileTypes}
                     files={lastRevision.files}
                     uploadURL={uploadURL({
-                      confId: eventId,
+                      event_id: eventId,
                       contrib_id: contributionId,
                       type: editableType,
                     })}

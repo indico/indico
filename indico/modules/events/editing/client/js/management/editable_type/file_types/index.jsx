@@ -16,7 +16,7 @@ import EditableTypeSubPageNav from '../EditableTypeSubPageNav';
 import FileTypeManager from './FileTypeManager';
 
 export default function FileTypeManagement() {
-  const eventId = useNumericParam('confId');
+  const eventId = useNumericParam('event_id');
   const {type} = useParams();
 
   return (

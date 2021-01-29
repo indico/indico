@@ -63,7 +63,7 @@ def dummy_abstract(db, dummy_event, dummy_user, create_dummy_person):
                         title="Broken Symmetry and the Mass of Gauge Vector Mesons",
                         event=dummy_event,
                         submitter=dummy_user,
-                        locator={'confId': -314, 'abstract_id': 1234},
+                        locator={'event_id': -314, 'abstract_id': 1234},
                         judgment_comment='Vague but interesting!')
 
     author1 = create_dummy_person(abstract, 'John', 'Doe', 'doe@example.com', 'ACME', UserTitle.mr, True,

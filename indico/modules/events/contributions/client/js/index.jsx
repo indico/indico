@@ -19,9 +19,10 @@ import ReactDOM from 'react-dom';
 
 import 'indico/modules/events/util/types_dialog';
 import EditableSubmissionButton from 'indico/modules/events/editing/editing/EditableSubmissionButton';
-import {$T} from 'indico/utils/i18n';
-import {camelizeKeys} from 'indico/utils/case';
 import {indicoAxios, handleAxiosError} from 'indico/utils/axios';
+import {camelizeKeys} from 'indico/utils/case';
+import {$T} from 'indico/utils/i18n';
+
 import PublicationSwitch from './PublicationSwitch';
 
 (function(global) {
@@ -37,9 +38,9 @@ import PublicationSwitch from './PublicationSwitch';
     try {
       [fileTypeResponses, paperInfoResponse] = await Promise.all([
         Promise.all(
-          availableTypes.map(type => indicoAxios.get(fileTypesURL({confId: eventId, type})))
+          availableTypes.map(type => indicoAxios.get(fileTypesURL({event_id: eventId, type})))
         ),
-        indicoAxios.get(paperInfoURL({confId: eventId, contrib_id: contributionId}), {
+        indicoAxios.get(paperInfoURL({event_id: eventId, contrib_id: contributionId}), {
           validateStatus: status => (status >= 200 && status < 300) || status === 404,
         }),
       ]);

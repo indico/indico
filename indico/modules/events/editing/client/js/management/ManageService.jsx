@@ -36,7 +36,7 @@ export default function ManageService({eventId}) {
   const [connectOpen, setConnectOpen] = useState(false);
   const [disconnectOpen, setDisconnectOpen] = useState(false);
   const {data, error, loading, reFetch} = useIndicoAxios({
-    url: checkServiceStatusURL({confId: eventId}),
+    url: checkServiceStatusURL({event_id: eventId}),
     trigger: eventId,
     camelize: true,
   });
@@ -92,7 +92,7 @@ export default function ManageService({eventId}) {
 
   const connect = async ({url}) => {
     try {
-      await indicoAxios.post(connectServiceURL({confId: eventId}), {url});
+      await indicoAxios.post(connectServiceURL({event_id: eventId}), {url});
     } catch (err) {
       return handleSubmitError(err);
     }
@@ -102,7 +102,7 @@ export default function ManageService({eventId}) {
 
   const disconnect = async () => {
     try {
-      await indicoAxios.post(disconnectServiceURL({confId: eventId}), {force: forceDisconnect});
+      await indicoAxios.post(disconnectServiceURL({event_id: eventId}), {force: forceDisconnect});
     } catch (err) {
       handleAxiosError(err);
       return;
@@ -185,7 +185,7 @@ export default function ManageService({eventId}) {
                         // this does send a request on each keypress, but in this particular case
                         // it's VERY likely that people paste a url, so it shouldn't be an issue
                         resp = await debounce(() =>
-                          indicoAxios.get(checkServiceURL({confId: eventId}), {
+                          indicoAxios.get(checkServiceURL({event_id: eventId}), {
                             params: {url: value},
                           })
                         );

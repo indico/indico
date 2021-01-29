@@ -27,7 +27,7 @@ export default function ConditionInfo({fileTypes, condId, editableType, onUpdate
   const [isEditing, setIsEditing] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const {eventId} = useContext(ReviewConditionsContext);
-  const url = editReviewConditionURL({confId: eventId, condition_id: condId, type: editableType});
+  const url = editReviewConditionURL({event_id: eventId, condition_id: condId, type: editableType});
 
   const deleteCondition = async () => {
     try {

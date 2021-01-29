@@ -55,7 +55,6 @@ def compat_folder_old():
 def _redirect_to_note(**kwargs):
     del kwargs['material_id']
     del kwargs['resource_id']
-    kwargs['confId'] = kwargs.pop('event_id')
     return redirect(url_for('event_notes.view', **kwargs), 302 if current_app.debug else 301)
 
 

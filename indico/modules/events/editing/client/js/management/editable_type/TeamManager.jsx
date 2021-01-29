@@ -26,18 +26,18 @@ import {useNumericParam} from 'indico/react/util/routing';
 import {indicoAxios} from 'indico/utils/axios';
 
 export default function TeamManager({editableType, onClose}) {
-  const eventId = useNumericParam('confId');
+  const eventId = useNumericParam('event_id');
   const favoriteUsersController = useFavoriteUsers();
 
   const {data: principals, loading: isLoadingPrincipals} = useIndicoAxios({
-    url: principalsURL({confId: eventId, type: editableType}),
+    url: principalsURL({event_id: eventId, type: editableType}),
     trigger: [eventId, editableType],
   });
 
   const handleSubmit = async (data, form) => {
     const changedValues = getChangedValues(data, form);
     try {
-      await indicoAxios.post(principalsURL({confId: eventId, type: editableType}), changedValues);
+      await indicoAxios.post(principalsURL({event_id: eventId, type: editableType}), changedValues);
     } catch (error) {
       return handleSubmitError(error);
     }

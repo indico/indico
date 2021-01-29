@@ -469,7 +469,7 @@ const InnerUserSearch = searchFactory({
     if (withEventPersons) {
       let epResponse;
       try {
-        epResponse = await indicoAxios.get(eventPersonSearchURL({...values, confId: eventId}));
+        epResponse = await indicoAxios.get(eventPersonSearchURL({...values, event_id: eventId}));
       } catch (error) {
         return handleSubmitError(error);
       }

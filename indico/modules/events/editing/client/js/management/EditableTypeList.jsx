@@ -31,7 +31,7 @@ export default function EditableTypeList({eventId}) {
     loading: isLoadingEnabledEditableTypes,
     reFetch,
   } = useIndicoAxios({
-    url: enabledEditableTypesURL({confId: eventId}),
+    url: enabledEditableTypesURL({event_id: eventId}),
     camelize: true,
     trigger: eventId,
   });
@@ -43,7 +43,7 @@ export default function EditableTypeList({eventId}) {
   }
 
   const handleSubmit = async formData => {
-    const url = enabledEditableTypesURL({confId: eventId});
+    const url = enabledEditableTypesURL({event_id: eventId});
     const enabledTypes = Object.keys(formData).filter(name => formData[name]);
     try {
       await indicoAxios.post(url, {editable_types: enabledTypes});
@@ -110,13 +110,13 @@ export default function EditableTypeList({eventId}) {
             <div className="toolbar">
               <Link
                 className="i-button icon-list"
-                to={manageEditableTypeListURL({confId: eventId, type})}
+                to={manageEditableTypeListURL({event_id: eventId, type})}
               >
                 <Translate>List</Translate>
               </Link>
               <Link
                 className="i-button icon-settings"
-                to={manageEditableTypeURL({confId: eventId, type})}
+                to={manageEditableTypeURL({event_id: eventId, type})}
               >
                 <Translate>Manage</Translate>
               </Link>

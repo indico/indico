@@ -89,7 +89,7 @@ class StaticSite(StoredFileMixin, db.Model):
 
     @property
     def locator(self):
-        return {'confId': self.event_id, 'id': self.id}
+        return {'event_id': self.event_id, 'id': self.id}
 
     def _build_storage_path(self):
         path_segments = ['event', strict_str(self.event.id), 'static']

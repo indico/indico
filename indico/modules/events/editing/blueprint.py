@@ -10,7 +10,7 @@ from indico.modules.events.editing.controllers.backend import common, editable_l
 from indico.web.flask.wrappers import IndicoBlueprint
 
 
-_bp = IndicoBlueprint('event_editing', __name__, url_prefix='/event/<confId>', template_folder='templates',
+_bp = IndicoBlueprint('event_editing', __name__, url_prefix='/event/<int:event_id>', template_folder='templates',
                       virtual_template_folder='events/editing')
 
 # Frontend (management)

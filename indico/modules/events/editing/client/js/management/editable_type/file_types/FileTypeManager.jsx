@@ -60,14 +60,14 @@ StatusIcon.propTypes = {
 export default function FileTypeManager({eventId, editableType}) {
   const [state, dispatch] = useReducer(fileTypesReducer, initialState);
   const {data, loading: isLoadingFileTypes, reFetch, lastData} = useIndicoAxios({
-    url: fileTypesURL({confId: eventId, type: editableType}),
+    url: fileTypesURL({event_id: eventId, type: editableType}),
     camelize: true,
     trigger: eventId,
   });
 
   const createFileType = async formData => {
     try {
-      await indicoAxios.post(createFileTypeURL({confId: eventId, type: editableType}), formData);
+      await indicoAxios.post(createFileTypeURL({event_id: eventId, type: editableType}), formData);
       reFetch();
     } catch (e) {
       return handleSubmitError(e);
@@ -75,7 +75,7 @@ export default function FileTypeManager({eventId, editableType}) {
   };
 
   const editFileType = async (fileTypeId, fileTypeData) => {
-    const url = editFileTypeURL({confId: eventId, file_type_id: fileTypeId, type: editableType});
+    const url = editFileTypeURL({event_id: eventId, file_type_id: fileTypeId, type: editableType});
 
     try {
       await indicoAxios.patch(url, fileTypeData);
@@ -86,7 +86,7 @@ export default function FileTypeManager({eventId, editableType}) {
   };
 
   const deleteFileType = async fileTypeId => {
-    const url = editFileTypeURL({confId: eventId, file_type_id: fileTypeId, type: editableType});
+    const url = editFileTypeURL({event_id: eventId, file_type_id: fileTypeId, type: editableType});
 
     try {
       await indicoAxios.delete(url);

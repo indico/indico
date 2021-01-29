@@ -8,6 +8,7 @@
 /* global handleFlashes:false, handleAjaxError:false */
 
 import packageStatusURL from 'indico-url:attachments.package_status';
+
 import {indicoAxios, handleAxiosError} from 'indico/utils/axios';
 import {$T} from 'indico/utils/i18n';
 
@@ -25,7 +26,7 @@ window.setupGeneratePackage = function setupGeneratePackage(eventId) {
   async function poll(taskId) {
     let res;
     try {
-      res = await indicoAxios.get(packageStatusURL({confId: eventId, task_id: taskId}));
+      res = await indicoAxios.get(packageStatusURL({event_id: eventId, task_id: taskId}));
     } catch (error) {
       handleAxiosError(error);
       closeLoader();

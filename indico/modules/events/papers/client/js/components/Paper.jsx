@@ -38,14 +38,14 @@ export default function Paper({eventId, contributionId}) {
   const paper = useSelector(getPaperDetails);
   const isInitialPaperDetailsLoading = useSelector(isFetchingInitialPaperDetails);
   const {data: fileTypes, loading: isFileTypesLoading} = useIndicoAxios({
-    url: fileTypesURL({confId: eventId, type: EditableType.paper}),
+    url: fileTypesURL({event_id: eventId, type: EditableType.paper}),
     trigger: eventId,
     unhandledErrors: [404], // if editing module is disabled
     camelize: true,
   });
   const {data: editable, loading: isEditableLoading} = useIndicoAxios({
     url: editableDetailsURL({
-      confId: eventId,
+      event_id: eventId,
       contrib_id: contributionId,
       type: EditableType.paper,
     }),
@@ -95,7 +95,7 @@ export default function Paper({eventId, contributionId}) {
           fileTypes={fileTypes}
           uploadableFiles={files}
           editableURL={editableURL({
-            confId: eventId,
+            event_id: eventId,
             contrib_id: contributionId,
             type: EditableType.paper,
           })}

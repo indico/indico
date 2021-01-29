@@ -30,7 +30,7 @@ export const DELETE_COMMENT_ERROR = 'papers/DELETE_COMMENT_ERROR';
 
 export function fetchPaperDetails(eventId, contributionId) {
   return ajaxAction(
-    () => indicoAxios.get(paperInfoURL({confId: eventId, contrib_id: contributionId})),
+    () => indicoAxios.get(paperInfoURL({event_id: eventId, contrib_id: contributionId})),
     FETCH_PAPER_DETAILS_REQUEST,
     FETCH_PAPER_DETAILS_SUCCESS,
     FETCH_PAPER_DETAILS_ERROR
@@ -39,7 +39,7 @@ export function fetchPaperDetails(eventId, contributionId) {
 
 export function resetPaperJudgment(eventId, contributionId) {
   return ajaxAction(
-    () => indicoAxios.delete(resetPaperStateURL({confId: eventId, contrib_id: contributionId})),
+    () => indicoAxios.delete(resetPaperStateURL({event_id: eventId, contrib_id: contributionId})),
     RESET_PAPER_JUDGMENT_REQUEST,
     [RESET_PAPER_JUDGMENT_SUCCESS, () => fetchPaperDetails(eventId, contributionId)],
     RESET_PAPER_JUDGMENT_ERROR
@@ -48,7 +48,7 @@ export function resetPaperJudgment(eventId, contributionId) {
 
 export function createComment(eventId, contributionId, commentData) {
   const params = {
-    confId: eventId,
+    event_id: eventId,
     contrib_id: contributionId,
   };
 
@@ -62,7 +62,7 @@ export function createComment(eventId, contributionId, commentData) {
 
 export function updateComment(eventId, contributionId, revisionId, commentId, commentData) {
   const params = {
-    confId: eventId,
+    event_id: eventId,
     contrib_id: contributionId,
     revision_id: revisionId,
     comment_id: commentId,
@@ -78,7 +78,7 @@ export function updateComment(eventId, contributionId, revisionId, commentId, co
 
 export function deleteComment(eventId, contributionId, revisionId, commentId) {
   const params = {
-    confId: eventId,
+    event_id: eventId,
     contrib_id: contributionId,
     revision_id: revisionId,
     comment_id: commentId,
@@ -95,7 +95,10 @@ export function deleteComment(eventId, contributionId, revisionId, commentId) {
 export function judgePaper(eventId, contributionId, judgmentData) {
   return submitFormAction(
     () =>
-      indicoAxios.post(judgePaperURL({confId: eventId, contrib_id: contributionId}), judgmentData),
+      indicoAxios.post(
+        judgePaperURL({event_id: eventId, contrib_id: contributionId}),
+        judgmentData
+      ),
     null,
     () => fetchPaperDetails(eventId, contributionId),
     null
@@ -106,7 +109,7 @@ export function createReview(eventId, contributionId, group, reviewData) {
   return submitFormAction(
     () =>
       indicoAxios.post(
-        createReviewURL({confId: eventId, contrib_id: contributionId, review_type: group}),
+        createReviewURL({event_id: eventId, contrib_id: contributionId, review_type: group}),
         reviewData
       ),
     null,
@@ -120,7 +123,7 @@ export function updateReview(eventId, contributionId, revisionId, reviewId, revi
     () =>
       indicoAxios.post(
         updateReviewURL({
-          confId: eventId,
+          event_id: eventId,
           contrib_id: contributionId,
           revision_id: revisionId,
           review_id: reviewId,

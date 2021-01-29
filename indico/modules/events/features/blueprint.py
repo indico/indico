@@ -10,7 +10,7 @@ from indico.web.flask.wrappers import IndicoBlueprint
 
 
 _bp = IndicoBlueprint('event_features', __name__, template_folder='templates',
-                      virtual_template_folder='events/features', url_prefix='/event/<confId>/manage/features')
+                      virtual_template_folder='events/features', url_prefix='/event/<int:event_id>/manage/features')
 
 _bp.add_url_rule('/', 'index', RHFeatures)
 _bp.add_url_rule('/<feature>', 'switch', RHSwitchFeature, methods=('PUT', 'DELETE'))

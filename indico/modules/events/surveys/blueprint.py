@@ -27,7 +27,7 @@ from indico.web.flask.wrappers import IndicoBlueprint
 
 
 _bp = IndicoBlueprint('surveys', __name__, template_folder='templates', virtual_template_folder='events/surveys',
-                      url_prefix='/event/<confId>', event_feature='surveys')
+                      url_prefix='/event/<int:event_id>', event_feature='surveys')
 
 # survey display/submission
 _bp.add_url_rule('/surveys/', 'display_survey_list', RHSurveyList)

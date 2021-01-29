@@ -10,12 +10,12 @@
     <span class="separator"></span>
 
     {% if rel.first is not none %}
-        <a class="i-button text-color subtle icon-first" href="{{ url_for('events.display', confId=rel.first) }}"
+        <a class="i-button text-color subtle icon-first" href="{{ url_for('events.display', event_id=rel.first) }}"
            title="{% trans %}Oldest event{% endtrans %}"></a>
     {% endif %}
 
     {% if rel.prev is not none %}
-        <a class="i-button text-color subtle icon-prev" href="{{ url_for('events.display', confId=rel.prev) }}"
+        <a class="i-button text-color subtle icon-prev" href="{{ url_for('events.display', event_id=rel.prev) }}"
            title="{% trans %}Older event{% endtrans %}"></a>
     {% endif %}
 
@@ -23,12 +23,12 @@
        title="{% trans %}Up to category{% endtrans %}"></a>
 
     {% if rel.next is not none %}
-        <a class="i-button text-color subtle icon-next" href="{{ url_for('events.display', confId=rel.next) }}"
+        <a class="i-button text-color subtle icon-next" href="{{ url_for('events.display', event_id=rel.next) }}"
            title="{% trans %}Newer event{% endtrans %}"></a>
     {% endif %}
 
     {% if rel.last is not none %}
-        <a class="i-button text-color subtle icon-last" href="{{ url_for('events.display', confId=rel.last) }}"
+        <a class="i-button text-color subtle icon-last" href="{{ url_for('events.display', event_id=rel.last) }}"
            title="{% trans %}Newest event{% endtrans %}"></a>
     {% endif %}
 

@@ -12,7 +12,7 @@ from indico.web.flask.wrappers import IndicoBlueprint
 
 
 _bp = IndicoBlueprint('event_roles', __name__, template_folder='templates', virtual_template_folder='events/roles',
-                      url_prefix='/event/<confId>/manage/roles')
+                      url_prefix='/event/<int:event_id>/manage/roles')
 
 _bp.add_url_rule('/', 'manage', RHEventRoles)
 _bp.add_url_rule('/create', 'add_role', RHAddEventRole, methods=('GET', 'POST'))

@@ -133,8 +133,8 @@ class IndicoBlueprint(Blueprint):
 
     :param event_feature: If set, this blueprint will raise `NotFound`
                           for all its endpoints unless the event referenced
-                          by the `confId` or `event_id` URL argument has
-                          the specified feature.
+                          by the `event_id` URL argument has the specified
+                          feature.
     """
 
     def __init__(self, *args, **kwargs):
@@ -148,7 +148,7 @@ class IndicoBlueprint(Blueprint):
             @self.before_request
             def _check_event_feature():
                 from indico.modules.events.features.util import require_feature
-                event_id = request.view_args.get('confId') or request.view_args.get('event_id')
+                event_id = request.view_args.get('event_id')
                 if event_id is not None:
                     require_feature(event_id, event_feature)
 

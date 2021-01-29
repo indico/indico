@@ -18,7 +18,7 @@ import ManageService from './ManageService';
 import Section from './Section';
 
 export default function EditingManagementDashboard() {
-  const eventId = useNumericParam('confId');
+  const eventId = useNumericParam('event_id');
   return (
     <>
       <div className="action-box">
@@ -27,7 +27,7 @@ export default function EditingManagementDashboard() {
           label={Translate.string('Tags')}
           description={Translate.string('Configure the tags that can be assigned to revisions')}
         >
-          <Link to={manageTagsURL({confId: eventId})} className="i-button icon-settings">
+          <Link to={manageTagsURL({event_id: eventId})} className="i-button icon-settings">
             <Translate>Configure</Translate>
           </Link>
         </Section>

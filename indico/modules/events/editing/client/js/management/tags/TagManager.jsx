@@ -46,14 +46,14 @@ function tagsReducer(state, action) {
 export default function TagManager({eventId}) {
   const [state, dispatch] = useReducer(tagsReducer, initialState);
   const {data, loading: isLoadingTags, reFetch, lastData} = useIndicoAxios({
-    url: tagsURL({confId: eventId}),
+    url: tagsURL({event_id: eventId}),
     camelize: true,
     trigger: eventId,
   });
 
   const createTag = async formData => {
     try {
-      await indicoAxios.post(createTagURL({confId: eventId}), formData);
+      await indicoAxios.post(createTagURL({event_id: eventId}), formData);
       reFetch();
     } catch (e) {
       return handleSubmitError(e);
@@ -61,7 +61,7 @@ export default function TagManager({eventId}) {
   };
 
   const editTag = async (tagId, tagData) => {
-    const url = editTagURL({confId: eventId, tag_id: tagId});
+    const url = editTagURL({event_id: eventId, tag_id: tagId});
 
     try {
       await indicoAxios.patch(url, tagData);
@@ -72,7 +72,7 @@ export default function TagManager({eventId}) {
   };
 
   const deleteTag = async tagId => {
-    const url = editTagURL({confId: eventId, tag_id: tagId});
+    const url = editTagURL({event_id: eventId, tag_id: tagId});
 
     try {
       await indicoAxios.delete(url);

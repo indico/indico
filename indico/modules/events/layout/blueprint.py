@@ -20,7 +20,7 @@ from indico.web.flask.wrappers import IndicoBlueprint
 
 
 _bp = IndicoBlueprint('event_layout', __name__, template_folder='templates',
-                      virtual_template_folder='events/layout', url_prefix='/event/<confId>/manage/layout')
+                      virtual_template_folder='events/layout', url_prefix='/event/<int:event_id>/manage/layout')
 
 _bp.add_url_rule('/', 'index', RHLayoutEdit, methods=('GET', 'POST'))
 _bp.add_url_rule('/timetable-theme-form', 'timetable_theme_form', RHLayoutTimetableThemeForm)
@@ -43,21 +43,21 @@ _bp.add_url_rule('/logo', 'delete_logo', RHLayoutLogoDelete, methods=('DELETE',)
 _bp.add_url_rule('/images/', 'images', RHImages)
 _bp.add_url_rule('/images/upload', 'images_upload', RHImageUpload, methods=('POST',))
 _bp.add_url_rule('/images/<int:image_id>-<filename>', 'image_delete', RHImageDelete, methods=('DELETE',))
-_bp.add_url_rule('!/event/<confId>/<slug>.css', 'css_display', RHLayoutCSSDisplay)
+_bp.add_url_rule('!/event/<int:event_id>/<slug>.css', 'css_display', RHLayoutCSSDisplay)
 
 
 _bp_images = IndicoBlueprint('event_images', __name__, template_folder='templates',
-                             virtual_template_folder='events/layout', url_prefix='/event/<confId>')
+                             virtual_template_folder='events/layout', url_prefix='/event/<int:event_id>')
 _bp_images.add_url_rule('/logo-<slug>.png', 'logo_display', RHLogoDisplay)
 _bp_images.add_url_rule('/images/<int:image_id>-<filename>', 'image_display', RHImageDisplay)
 
 
 _bp_pages = IndicoBlueprint('event_pages', __name__, template_folder='templates',
-                            virtual_template_folder='events/layout', url_prefix='/event/<confId>')
+                            virtual_template_folder='events/layout', url_prefix='/event/<int:event_id>')
 _bp_pages.add_url_rule('/page/<int:page_id>', 'page_display', RHPageDisplay)
 _bp_pages.add_url_rule('/page/<int:page_id>-<slug>', 'page_display', RHPageDisplay)
 
-_compat_bp = IndicoBlueprint('compat_layout', __name__, url_prefix='/event/<event_id>')
+_compat_bp = IndicoBlueprint('compat_layout', __name__, url_prefix='/event/<int:event_id>')
 _compat_bp.add_url_rule('!/internalPage.py', 'page_modpython',
                         make_compat_redirect_func(_compat_bp, 'page', view_args_conv={'confId': 'event_id',
                                                                                       'pageId': 'legacy_page_id'}))

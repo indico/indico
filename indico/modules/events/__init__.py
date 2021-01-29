@@ -29,7 +29,7 @@ __all__ = ('Event', 'logger', 'event_management_object_url_prefixes', 'event_obj
 logger = Logger.get('events')
 
 #: URL prefixes for the various event objects (public area)
-#: All prefixes are expected to be used inside the '/event/<confId>'
+#: All prefixes are expected to be used inside the '/event/<int:event_id>'
 #: url space.
 event_object_url_prefixes = {
     'event': [''],
@@ -39,7 +39,7 @@ event_object_url_prefixes = {
 }
 
 #: URL prefixes for the various event objects (management area)
-#: All prefixes are expected to be used inside the '/event/<confId>'
+#: All prefixes are expected to be used inside the '/event/<int:event_id>'
 #: url space.
 event_management_object_url_prefixes = {
     'event': ['/manage'],

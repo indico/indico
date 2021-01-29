@@ -77,7 +77,7 @@ def get_object_from_args(args=None):
     if args is None:
         args = request.view_args
     object_type = args['object_type']
-    event = Event.query.filter_by(id=args['confId'], is_deleted=False).first()
+    event = Event.get(args['event_id'], is_deleted=False)
     if event is None:
         obj = None
     elif object_type == 'event':

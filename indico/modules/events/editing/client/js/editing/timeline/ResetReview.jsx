@@ -36,7 +36,7 @@ export default function ResetReview({revisionId}) {
     await dispatch(
       resetReviews(
         resetReviewsURL({
-          confId: eventId,
+          event_id: eventId,
           contrib_id: contributionId,
           type: editableType,
           revision_id: revisionId,

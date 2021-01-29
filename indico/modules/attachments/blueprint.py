@@ -55,7 +55,7 @@ for object_type, prefixes in items:
         if object_type == 'category':
             prefix = '/category/<int:category_id>' + prefix
         else:
-            prefix = '/event/<int:confId>' + prefix
+            prefix = '/event/<int:event_id>' + prefix
         _bp.add_url_rule(prefix + '/attachments/', 'management',
                          _dispatch(RHManageEventAttachments, RHManageCategoryAttachments),
                          defaults={'object_type': object_type})
@@ -91,7 +91,7 @@ for object_type, prefixes in items:
         if object_type == 'category':
             prefix = '/category/<category_id>' + prefix
         else:
-            prefix = '/event/<confId>' + prefix
+            prefix = '/event/<int:event_id>' + prefix
         _bp.add_url_rule(prefix + '/attachments/<int:folder_id>/<int:attachment_id>/<filename>', 'download',
                          _dispatch(RHDownloadEventAttachment, RHDownloadCategoryAttachment),
                          defaults={'object_type': object_type})
@@ -104,16 +104,16 @@ for object_type, prefixes in items:
 
 
 # Package
-_bp.add_url_rule('/event/<confId>/attachments/package', 'package',
+_bp.add_url_rule('/event/<int:event_id>/attachments/package', 'package',
                  RHPackageEventAttachmentsDisplay, methods=('GET', 'POST'))
-_bp.add_url_rule('/event/<confId>/manage/attachments/package', 'package_management',
+_bp.add_url_rule('/event/<int:event_id>/manage/attachments/package', 'package_management',
                  RHPackageEventAttachmentsManagement, methods=('GET', 'POST'))
-_bp.add_url_rule('/event/<confId>/attachments/package/status/<task_id>', 'package_status',
+_bp.add_url_rule('/event/<int:event_id>/attachments/package/status/<task_id>', 'package_status',
                  RHPackageEventAttachmentsStatus)
 
 
 # Legacy redirects for the old URLs
-_compat_bp = IndicoBlueprint('compat_attachments', __name__, url_prefix='/event/<event_id>')
+_compat_bp = IndicoBlueprint('compat_attachments', __name__, url_prefix='/event/<int:event_id>')
 compat_folder_rules = [
     '/material/<material_id>/',
     '/session/<session_id>/contribution/<contrib_id>/material/<material_id>/',
@@ -134,11 +134,11 @@ compat_attachment_rules = [
     '/contribution/<contrib_id>/<subcontrib_id>/material/<material_id>/<resource_id>.<ext>'
 ]
 old_obj_prefix_rules = {
-    'session': ['!/event/<confId>/session/<sessionId>'],
-    'contribution': ['!/event/<confId>/session/<sessionId>/contribution/<contribId>',
-                     '!/event/<confId>/contribution/<contribId>'],
-    'subcontribution': ['!/event/<confId>/session/<sessionId>/contribution/<contribId>/<subContId>',
-                        '!/event/<confId>/contribution/<contribId>/<subContId>']
+    'session': ['!/event/<int:event_id>/session/<sessionId>'],
+    'contribution': ['!/event/<int:event_id>/session/<sessionId>/contribution/<contribId>',
+                     '!/event/<int:event_id>/contribution/<contribId>'],
+    'subcontribution': ['!/event/<int:event_id>/session/<sessionId>/contribution/<contribId>/<subContId>',
+                        '!/event/<int:event_id>/contribution/<contribId>/<subContId>']
 }
 for rule in compat_folder_rules:
     _compat_bp.add_url_rule(rule, 'folder', compat_folder)
