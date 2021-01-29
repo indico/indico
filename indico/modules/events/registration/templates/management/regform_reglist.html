@@ -161,8 +161,8 @@
                                 <a href="#" class="icon-close js-requires-selected-row disabled js-modify-status"
                                    data-href="{{ url_for('.registrations_modify_status', regform) }}"
                                    data-flag="0"
-                                   data-method="POST"
-                                   data-confirm="{% trans %}Do you really want to reject the selected registrations? This will trigger a notification email for each registrant.{% endtrans %}">
+                                   data-confirm="{% trans %}Do you really want to reject the selected registrations? This will trigger a notification email for each registrant.{% endtrans %}"
+                                   data-ajax-dialog>
                                     {%- trans %}Reject registrations{% endtrans -%}
                                 </a>
                             </li>

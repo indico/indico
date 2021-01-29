@@ -35,6 +35,7 @@ def log_registration_updated(registration, previous_state, **kwargs):
     if not previous_state:
         return
     previous_state_title = orig_string(previous_state.title)
+    data = {'Previous state': previous_state_title}
     if (previous_state == RegistrationState.pending
             and registration.state in (RegistrationState.complete, RegistrationState.unpaid)):
         log_text = 'Registration for "{}" has been approved'
@@ -48,6 +49,7 @@ def log_registration_updated(registration, previous_state, **kwargs):
     elif previous_state == RegistrationState.complete and registration.state == RegistrationState.unpaid:
         log_text = 'Registration for "{}" has been marked as not paid'
         kind = EventLogKind.negative
+        data["Reason"] = registration.rejection_reason if registration.rejection_reason else None
     elif registration.state == RegistrationState.withdrawn:
         log_text = 'Registration for "{}" has been withdrawn'
         kind = EventLogKind.negative
@@ -57,4 +59,4 @@ def log_registration_updated(registration, previous_state, **kwargs):
                                                                                    state_title)
         kind = EventLogKind.change
     registration.log(EventLogRealm.participants, kind, 'Registration', log_text.format(registration.full_name),
-                     session.user, data={'Previous state': previous_state_title})
+                     session.user, data=data)

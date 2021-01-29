@@ -36,7 +36,8 @@ from indico.modules.events.registration.controllers import RegistrationEditMixin
 from indico.modules.events.registration.controllers.management import (RHManageRegFormBase, RHManageRegFormsBase,
                                                                        RHManageRegistrationBase)
 from indico.modules.events.registration.forms import (BadgeSettingsForm, CreateMultipleRegistrationsForm,
-                                                      EmailRegistrantsForm, ImportRegistrationsForm)
+                                                      EmailRegistrantsForm, ImportRegistrationsForm,
+                                                      RejectRegistrantsForm)
 from indico.modules.events.registration.models.items import PersonalDataType, RegistrationFormItemType
 from indico.modules.events.registration.models.registrations import Registration, RegistrationData, RegistrationState
 from indico.modules.events.registration.notifications import notify_registration_state_update
@@ -53,7 +54,8 @@ from indico.util.placeholders import replace_placeholders
 from indico.util.spreadsheets import send_csv, send_xlsx
 from indico.web.flask.templating import get_template_module
 from indico.web.flask.util import send_file, url_for
-from indico.web.util import jsonify_data, jsonify_template
+from indico.web.forms.base import FormDefaults
+from indico.web.util import jsonify_data, jsonify_form, jsonify_template
 
 
 badge_cache = GenericCache('badge-printing')
@@ -545,6 +547,7 @@ def _modify_registration_status(registration, approve):
     if registration.state != RegistrationState.pending:
         return
     if approve:
+        registration.rejection_reason = None
         registration.update_state(approved=True)
     else:
         registration.update_state(rejected=True)
@@ -566,8 +569,12 @@ class RHRegistrationReject(RHManageRegistrationBase):
     """Reject a registration."""
 
     def _process(self):
-        _modify_registration_status(self.registration, approve=False)
-        return jsonify_data(html=_render_registration_details(self.registration))
+        form = RejectRegistrantsForm()
+        if form.validate_on_submit():
+            self.registration.rejection_reason = form.rejection_reason.data
+            _modify_registration_status(self.registration, approve=False)
+            return jsonify_data(html=_render_registration_details(self.registration))
+        return jsonify_form(form, submit='Reject')
 
 
 class RHRegistrationReset(RHManageRegistrationBase):
@@ -641,10 +648,22 @@ class RHRegistrationsModifyStatus(RHRegistrationsActionBase):
 
     def _process(self):
         approve = request.form['flag'] == '1'
-        for registration in self.registrations:
-            _modify_registration_status(registration, approve)
-        flash(_("The status of the selected registrations was updated successfully."), 'success')
-        return jsonify_data(**self.list_generator.render_list())
+        status = 'approved' if approve else 'rejected'
+        if approve:
+            for registration in self.registrations:
+                _modify_registration_status(registration, approve)
+            flash(_("The selected registrations was '{}' successfully.").format(status), 'success')
+            return jsonify_data(**self.list_generator.render_list())
+        else:
+            defaults = FormDefaults(flag=request.form['flag'], registration_id=request.form.get('registration_id'))
+            form = RejectRegistrantsForm(obj=defaults)
+            if form.validate_on_submit():
+                for registration in self.registrations:
+                    registration.rejection_reason = form.rejection_reason.data
+                    _modify_registration_status(registration, approve)
+                flash(_("The selected registrations was '{}' successfully.").format(status), 'success')
+                return jsonify_data(**self.list_generator.render_list())
+            return jsonify_form(form, submit='Reject')
 
 
 class RHRegistrationsExportAttachments(RHRegistrationsExportBase, ZipGeneratorMixin):

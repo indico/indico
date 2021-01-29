@@ -407,3 +407,14 @@ class ImportRegistrationsForm(IndicoForm):
         super(ImportRegistrationsForm, self).__init__(*args, **kwargs)
         if not self.regform.moderation_enabled:
             del self.skip_moderation
+
+
+class RejectRegistrantsForm(IndicoForm):
+
+    rejection_reason = TextAreaField(_('Reason'), description=_("Provide a reason for rejection of registration."))
+
+    notify_reason = BooleanField(_('Attach reason'), default=False, widget=SwitchWidget(),
+                                 description=_("Whether to attach reason with the reject notification"))
+
+    flag = HiddenField()
+    registration_id = HiddenFieldList()
