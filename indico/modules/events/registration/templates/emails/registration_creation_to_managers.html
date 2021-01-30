@@ -31,6 +31,13 @@
 {%- endmacro %}
 
 
+{% macro render_rejection_reason() %}
+    {% if registration.state.name == 'rejected' and registration.rejection_reason %}
+    	<br>The reason stated for rejection: "{{ registration.rejection_reason }}".<br>
+    {% endif %}
+{% endmacro %}
+
+
 {% macro render_text_pending() %}
     {% if registration.state.name == 'pending' %}
         Please note that it's waiting for manual approval by a manager.

@@ -1,6 +1,17 @@
 Changelog
 =========
 
+Version 2.3.4
+-------------
+
+Improvements
+^^^^^^^^^^^^
+
+- Store a reason for rejection of registration(s) if stated by the moderator
+  through a form in a dialog box, can be sent to users along with notification,
+  Add a new 'rejection_reason' placeholder for an email template.
+  (:pr:`4740`, thanks :user:`vasantvohra`)
+
 
 Version 2.3.4
 -------------

@@ -43,13 +43,13 @@ def log_registration_updated(registration, previous_state, **kwargs):
     elif previous_state == RegistrationState.pending and registration.state == RegistrationState.rejected:
         log_text = 'Registration for "{}" has been rejected'
         kind = EventLogKind.negative
+        data["Reason"] = registration.rejection_reason if registration.rejection_reason else None
     elif previous_state == RegistrationState.unpaid and registration.state == RegistrationState.complete:
         log_text = 'Registration for "{}" has been paid'
         kind = EventLogKind.positive
     elif previous_state == RegistrationState.complete and registration.state == RegistrationState.unpaid:
         log_text = 'Registration for "{}" has been marked as not paid'
         kind = EventLogKind.negative
-        data["Reason"] = registration.rejection_reason if registration.rejection_reason else None
     elif registration.state == RegistrationState.withdrawn:
         log_text = 'Registration for "{}" has been withdrawn'
         kind = EventLogKind.negative

@@ -72,6 +72,15 @@ class LinkPlaceholder(Placeholder):
         return Markup('<a href="{url}">{url}</a>').format(url=url)
 
 
+class RejectionReasonPlaceholder(Placeholder):
+    name = 'rejection_reason'
+    description = _("Reason stated while rejecting a participant by moderator")
+
+    @classmethod
+    def render(cls, regform, registration):
+        return registration.rejection_reason
+
+
 class FieldPlaceholder(ParametrizedPlaceholder):
     name = 'field'
     description = None

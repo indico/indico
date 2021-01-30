@@ -156,13 +156,15 @@ def _get_registration_placeholders(sender, regform, registration, **kwargs):
     from indico.modules.events.registration.placeholders.registrations import (IDPlaceholder, LastNamePlaceholder,
                                                                                FirstNamePlaceholder, LinkPlaceholder,
                                                                                EventTitlePlaceholder,
-                                                                               EventLinkPlaceholder, FieldPlaceholder)
+                                                                               EventLinkPlaceholder, FieldPlaceholder,
+                                                                               RejectionReasonPlaceholder)
     yield FirstNamePlaceholder
     yield LastNamePlaceholder
     yield EventTitlePlaceholder
     yield EventLinkPlaceholder
     yield IDPlaceholder
     yield LinkPlaceholder
+    yield RejectionReasonPlaceholder
     yield FieldPlaceholder
 
 

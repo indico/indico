@@ -8,9 +8,8 @@
 {% block registration_header_text -%}
     Your registration {{ render_registration_info() }}
     is now <strong>{{ registration.state.title|lower }}</strong>.
-    {% if notify_reason and registration.state == 3 and registration.rejection_reason %}
-    	<br>The reason stated for rejection as follows:<br>
-    		{{ registration.rejection_reason }}
+    {% if notify_reason %}
+    	{{ render_rejection_reason() }}
     {% endif %}
     {{ render_text_pending() }}
     {{ render_text_unpaid() }}
