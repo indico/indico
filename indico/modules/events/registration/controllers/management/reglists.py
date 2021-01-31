@@ -569,11 +569,12 @@ class RHRegistrationReject(RHManageRegistrationBase):
 
     def _process(self):
         form = RejectRegistrantsForm()
+        message = _("Rejecting this registration will trigger a notification email.")
         if form.validate_on_submit():
             self.registration.rejection_reason = form.rejection_reason.data
             _modify_registration_status(self.registration, approve=False)
             return jsonify_data(html=_render_registration_details(self.registration))
-        return jsonify_form(form, disabled_until_change=False, submit='Reject')
+        return jsonify_form(form, disabled_until_change=False, submit='Reject', message=message)
 
 
 class RHRegistrationReset(RHManageRegistrationBase):
@@ -651,19 +652,19 @@ class RHRegistrationsModifyStatus(RHRegistrationsActionBase):
         if approve:
             for registration in self.registrations:
                 _modify_registration_status(registration, approve)
-            flash(_("The status of the selected registrations was successfully '{}'.").format('approved'), 'success')
+            flash(_("The selected registrations was successfully '{}'.").format('approved'), 'success')
             return jsonify_data(**self.list_generator.render_list())
         else:
             form = RejectRegistrantsForm(obj=FormDefaults(flag=request.args.get('flag'),
                                                           registration_id=request.args.getlist('registration_id')))
+            message = _("Rejecting the selected registrations will trigger a notification email for each registrant.")
             if form.validate_on_submit():
                 for registration in self.registrations:
                     registration.rejection_reason = form.rejection_reason.data
                     _modify_registration_status(registration, approve)
-                flash(_("The status of the selected registrations was successfully '{}'.").format('rejected'),
-                      'success')
+                flash(_("The selected registrations was successfully '{}'.").format('rejected'), 'success')
                 return jsonify_data(**self.list_generator.render_list())
-            return jsonify_form(form, disabled_until_change=False, submit='Reject')
+            return jsonify_form(form, disabled_until_change=False, submit='Reject', message=message)
 
 
 class RHRegistrationsExportAttachments(RHRegistrationsExportBase, ZipGeneratorMixin):
