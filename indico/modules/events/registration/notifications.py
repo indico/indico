@@ -40,7 +40,7 @@ def _notify_registration(registration, template, to_managers=False):
         attachments = get_ticket_attachments(registration)
 
     template = get_template_module('events/registration/emails/{}'.format(template),
-                                   registration=registration, notify_reason=request.form.get('notify_reason') == 'y')
+                                   registration=registration, attach_reason=request.form.get('attach_reason') == 'y')
     to_list = registration.email if not to_managers else registration.registration_form.manager_notification_recipients
     from_address = registration.registration_form.sender_address if not to_managers else None
     mail = make_email(to_list=to_list, template=template, html=True, from_address=from_address, attachments=attachments)

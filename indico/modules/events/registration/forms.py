@@ -411,7 +411,7 @@ class ImportRegistrationsForm(IndicoForm):
 
 class RejectRegistrantsForm(IndicoForm):
     rejection_reason = TextAreaField(_('Reason'), description=_("Provide a reason for rejection of registration(s)."))
-    notify_reason = BooleanField(_('Attach reason'), [HiddenUnless('rejection_reason')], widget=SwitchWidget(),
+    attach_reason = BooleanField(_('Attach reason'), [HiddenUnless('rejection_reason')], widget=SwitchWidget(),
                                  description=_("Whether to attach reason with the reject notification"))
     flag = HiddenField()
     registration_id = HiddenFieldList()

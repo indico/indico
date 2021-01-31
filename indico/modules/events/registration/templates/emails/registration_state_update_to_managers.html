@@ -8,7 +8,7 @@
 {% block registration_header_text %}
     The registration {{ render_registration_info() }}
     is now <strong>{{ registration.state.title|lower }}</strong>.
-    {% if notify_reason %}
+    {% if attach_reason %}
     	{{ render_rejection_reason() }}
     {% endif %}
     {{ render_text_pending() }}

@@ -7,10 +7,11 @@ Version 2.3.4
 Improvements
 ^^^^^^^^^^^^
 
-- Store a reason for rejection of registration(s) if stated by the moderator
-  through a form in a dialog box, can be sent to users along with notification,
-  Add a new 'rejection_reason' placeholder for an email template.
-  (:pr:`4740`, thanks :user:`vasantvohra`)
+- When the moderator states the reason for the rejection of registrations in a form available in the popup window.
+  The reason is saved in the database as `registration.rejection_reason` and added to the event log.
+  A switch allows the reason to be attached to an email notification.
+  Also, add a new 'rejection_reason' placeholder/tag to use in email templates.
+  (:pr:`4769`, thanks :user:`vasantvohra`)
 
 
 Version 2.3.4
