@@ -150,8 +150,7 @@
                         <ul class="i-dropdown">
                             <li>
                                 <a href="#" class="icon-checkmark js-requires-selected-row disabled js-modify-status"
-                                   data-href="{{ url_for('.registrations_modify_status', regform) }}"
-                                   data-flag="1"
+                                   data-href="{{ url_for('.registrations_approve', regform) }}"
                                    data-method="POST"
                                    data-confirm="{% trans %}Do you really want to approve the selected registrations? This will trigger a notification email for each registrant.{% endtrans %}">
                                     {%- trans %}Approve registrations{% endtrans -%}
@@ -159,8 +158,7 @@
                             </li>
                             <li>
                                 <a href="#" class="icon-close js-requires-selected-row disabled"
-                                   data-href="{{ url_for('.registrations_modify_status', regform) }}"
-                                   data-flag="0"
+                                   data-href="{{ url_for('.registrations_reject', regform) }}"
                                    data-params-selector="#registration-list tr input[type=checkbox]:checked"
                                    data-title="{% trans %}Reject registrations{% endtrans %}"
                                    data-update="#registration-list"

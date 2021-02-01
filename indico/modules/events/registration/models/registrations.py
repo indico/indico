@@ -189,7 +189,8 @@ class Registration(db.Model):
     #: If given a reason for rejection
     rejection_reason = db.Column(
         db.String,
-        nullable=True
+        nullable=False,
+        default='',
     )
     #: The Event containing this registration
     event = db.relationship(

@@ -17,7 +17,7 @@ depends_on = None
 
 
 def upgrade():
-    op.add_column('registrations', sa.Column('rejection_reason', sa.String(), nullable=True),
+    op.add_column('registrations', sa.Column('rejection_reason', sa.String(), server_default='', nullable=False),
                   schema='event_registration')
 
 
