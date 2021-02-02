@@ -95,6 +95,7 @@ def configure_app(app, set_path=False):
 
 def configure_cache(app, config):
     app.config['CACHE_DEFAULT_TIMEOUT'] = 0
+    app.config['CACHE_KEY_PREFIX'] = f'indico_{_get_cache_version()}_'
     if app.config['TESTING']:
         app.config['CACHE_TYPE'] = 'simple'
     else:
@@ -178,6 +179,11 @@ def _get_indico_version():
     if version.is_prerelease:
         version_parts.append('pre')
     return 'v' + '-'.join(version_parts)
+
+
+def _get_cache_version():
+    version = Version(indico.__version__)
+    return f'v{version.major}.{version.minor}'
 
 
 def setup_jinja(app):
