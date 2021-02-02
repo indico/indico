@@ -31,7 +31,7 @@ indico-fonts==1.1
 ipaddress
 ipython<6,>=5.4.1
 itsdangerous==1.1.0
-Jinja2==2.11.2
+Jinja2==2.11.3
 jsonschema==3.2.0
 kombu>=4.6.10,<4.7
 lxml[html5]==4.5.2
