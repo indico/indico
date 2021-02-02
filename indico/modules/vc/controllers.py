@@ -267,12 +267,13 @@ class RHVCEventPage(RHDisplayEventBase):
     """List the VC rooms in an event page."""
 
     def _process(self):
-        event_vc_rooms = VCRoomEventAssociation.find_for_event(self.event).all()
+        event_vc_rooms = [event_vc_room
+                          for event_vc_room in VCRoomEventAssociation.find_for_event(self.event).all()
+                          if event_vc_room.vc_room.plugin]
         vc_plugins_available = bool(get_vc_plugins())
         linked_to = defaultdict(lambda: defaultdict(list))
         for event_vc_room in event_vc_rooms:
-            if event_vc_room.vc_room.plugin:
-                linked_to[event_vc_room.link_type.name][event_vc_room.link_object].append(event_vc_room)
+            linked_to[event_vc_room.link_type.name][event_vc_room.link_object].append(event_vc_room)
         return WPVCEventPage.render_template('event_vc.html', self.event,
                                              event_vc_rooms=event_vc_rooms, linked_to=linked_to,
                                              vc_plugins_available=vc_plugins_available)
