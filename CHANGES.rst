@@ -10,7 +10,8 @@ Version 2.3.4
 Bugfixes
 ^^^^^^^^
 
-- None so far :)
+- Fix the "Videoconference Rooms" page in conference events when there are any VC rooms
+  attached but the corresponding plugin is no longer installed.
 
 Internal Changes
 ^^^^^^^^^^^^^^^^
