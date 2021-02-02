@@ -29,7 +29,7 @@ idna==2.10
 indico-fonts==1.1
 ipython<8,>=7.19.0
 itsdangerous==1.1.0
-Jinja2==2.11.2
+Jinja2==2.11.3
 jsonschema==3.2.0
 kombu>=5.0.2,<5.1
 lxml[html5]==4.6.2
