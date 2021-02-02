@@ -541,7 +541,6 @@ class SetupWizard:
             f'BASE_URL = {self.indico_url!r}',
             f'CELERY_BROKER = {self.redis_uri_celery!r}',
             f'REDIS_CACHE_URL = {self.redis_uri_cache!r}',
-            "CACHE_BACKEND = 'redis'",
             f'DEFAULT_TIMEZONE = {self.default_timezone!r}',
             f'DEFAULT_LOCALE = {self.default_locale!r}',
             f'ENABLE_ROOMBOOKING = {self.rb_active!r}',

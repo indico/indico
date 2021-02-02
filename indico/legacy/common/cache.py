@@ -7,17 +7,13 @@
 
 import datetime
 import hashlib
-import os
 import pickle
-import time
 
 import redis
-from flask import g
+from flask import current_app, g
 
 from indico.core.config import config
 from indico.core.logger import Logger
-from indico.legacy.common.utils import OSSpecific
-from indico.util.fs import silentremove
 from indico.util.string import truncate
 
 
@@ -149,102 +145,6 @@ class RedisCacheClient(CacheClient):
             Logger.get('cache.redis').exception('delete(%r) failed', key)
 
 
-class FileCacheClient(CacheClient):
-    """File-based cache with a memcached-like API.
-
-    Contains only features needed by GenericCache.
-    """
-    def __init__(self, dir):
-        self._dir = os.path.join(dir, 'generic_cache')
-
-    def _getFilePath(self, key, mkdir=True):
-        # We assume keys have a 'namespace.hashedKey' format
-        parts = key.split('.', 1)
-        if len(parts) == 1:
-            namespace = '_'
-            filename = parts[0]
-        else:
-            namespace, filename = parts
-        dir = os.path.join(self._dir, namespace, filename[:4], filename[:8])
-        if mkdir and not os.path.exists(dir):
-            try:
-                os.makedirs(dir)
-            except OSError:
-                # Handle race condition
-                if not os.path.exists(dir):
-                    raise
-        return os.path.join(dir, filename)
-
-    def set(self, key, val, ttl=0):
-        try:
-            f = open(self._getFilePath(key), 'wb')
-            OSSpecific.lockFile(f, 'LOCK_EX')
-            try:
-                expiry = int(time.time()) + ttl if ttl else None
-                data = (expiry, val)
-                pickle.dump(data, f)
-            finally:
-                OSSpecific.lockFile(f, 'LOCK_UN')
-                f.close()
-        except OSError:
-            Logger.get('cache.files').exception('Error setting value in cache')
-            return 0
-        return 1
-
-    def get(self, key):
-        try:
-            path = self._getFilePath(key, False)
-            if not os.path.exists(path):
-                return None
-
-            f = open(path, 'rb')
-            OSSpecific.lockFile(f, 'LOCK_SH')
-            expiry = val = None
-            try:
-                expiry, val = pickle.load(f)
-            finally:
-                OSSpecific.lockFile(f, 'LOCK_UN')
-                f.close()
-            if expiry and time.time() > expiry:
-                return None
-        except OSError:
-            Logger.get('cache.files').exception('Error getting cached value')
-            return None
-        except (EOFError, pickle.UnpicklingError):
-            Logger.get('cache.files').exception('Cached information seems corrupted. Overwriting it.')
-            return None
-
-        return val
-
-    def delete(self, key):
-        path = self._getFilePath(key, False)
-        if os.path.exists(path):
-            silentremove(path)
-        return 1
-
-
-class MemcachedCacheClient(CacheClient):
-    """Memcached-based cache client."""
-
-    @staticmethod
-    def convert_ttl(ttl):
-        """Convert a ttl in seconds to a timestamp for use with memcached."""
-        return (int(time.time()) + ttl) if ttl else 0
-
-    def __init__(self, servers):
-        import memcache
-        self._client = memcache.Client(servers)
-
-    def set(self, key, val, ttl=0):
-        return self._client.set(key, val, self.convert_ttl(ttl))
-
-    def get(self, key):
-        return self._client.get(key)
-
-    def delete(self, key):
-        return self._client.delete(key)
-
-
 class GenericCache:
     """A simple cache interface that supports various backends.
 
@@ -273,13 +173,8 @@ class GenericCache:
             return
 
         # If not, create a new one
-        backend = config.CACHE_BACKEND
-        if backend == 'memcached':
-            self._client = MemcachedCacheClient(config.MEMCACHED_SERVERS)
-        elif backend == 'redis':
+        if not current_app.config['TESTING']:
             self._client = RedisCacheClient(config.REDIS_CACHE_URL)
-        elif backend == 'files':
-            self._client = FileCacheClient(config.CACHE_DIR)
         else:
             self._client = NullCacheClient()
 

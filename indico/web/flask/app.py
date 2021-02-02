@@ -94,20 +94,12 @@ def configure_app(app, set_path=False):
 
 
 def configure_cache(app, config):
-    # TODO: remove anything but redis in 3.0; nobody is using it and it
-    # has not been tested recently.
-    app.config['CACHE_DEFAULT_TIMEOUT'] = -1
+    app.config['CACHE_DEFAULT_TIMEOUT'] = 0
     if app.config['TESTING']:
         app.config['CACHE_TYPE'] = 'simple'
-    elif config.CACHE_BACKEND == 'redis':
+    else:
         app.config['CACHE_TYPE'] = 'redis'
         app.config['CACHE_REDIS_URL'] = config.REDIS_CACHE_URL
-    elif config.CACHE_BACKEND == 'memcached':
-        app.config['CACHE_TYPE'] = 'memcached'
-        app.config['CACHE_MEMCACHED_SERVERS'] = config.MEMCACHED_SERVERS
-    elif config.CACHE_BACKEND == 'files':
-        app.config['CACHE_TYPE'] = 'filesystem'
-        app.config['CACHE_DIR'] = os.path.join(config.CACHE_DIR, 'flask-cache')
 
 
 def configure_multipass(app, config):

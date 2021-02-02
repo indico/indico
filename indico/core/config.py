@@ -30,7 +30,6 @@ DEFAULTS = {
     'ATTACHMENT_STORAGE': 'default',
     'AUTH_PROVIDERS': {},
     'BASE_URL': None,
-    'CACHE_BACKEND': 'files',
     'CACHE_DIR': '/opt/indico/cache',
     'CATEGORY_CLEANUP': {},
     'CELERY_BROKER': None,

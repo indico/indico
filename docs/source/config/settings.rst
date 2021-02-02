@@ -104,33 +104,9 @@ Authentication
 Cache
 -----
 
-.. data:: CACHE_BACKEND
-
-    The backend used for caching. Valid backends are ``redis``,
-    ``files``, and ``memcached``.
-
-    To use the ``redis`` backend (recommended), you need to set
-    :data:`REDIS_CACHE_URL` to the URL of your Redis instance.
-
-    With the ``files`` backend, cache data is stored in :data:`CACHE_DIR`,
-    which always needs to be set, even when using a different cache
-    backend since Indico needs to cache some data on disk.
-
-    To use the ``memcached`` backend, you need to install the
-    ``python-memcached`` package from PyPI and set :data:`MEMCACHED_SERVERS`
-    to a list containing at least one memcached server.
-
-    .. note::
-
-        We only test Indico with the ``redis`` cache backend. While
-        the other backends should work, we make no guarantees as
-        they are not actively being used or tested.
-
-    Default: ``'files'``
-
 .. data:: REDIS_CACHE_URL
 
-    The URL of the redis server to use with the ``redis`` cache backend.
+    The URL of the redis server to use for caching.
 
     If the Redis server requires authentication, use a URL like this:
     ``redis://unused:password@127.0.0.1:6379/1``
