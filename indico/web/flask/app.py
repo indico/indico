@@ -97,9 +97,9 @@ def configure_cache(app, config):
     app.config['CACHE_DEFAULT_TIMEOUT'] = 0
     app.config['CACHE_KEY_PREFIX'] = f'indico_{_get_cache_version()}_'
     if app.config['TESTING']:
-        app.config['CACHE_TYPE'] = 'simple'
+        app.config['CACHE_TYPE'] = 'indico.core.cache.make_indico_simple_cache'
     else:
-        app.config['CACHE_TYPE'] = 'redis'
+        app.config['CACHE_TYPE'] = 'indico.core.cache.make_indico_redis_cache'
         app.config['CACHE_REDIS_URL'] = config.REDIS_CACHE_URL
 
 
