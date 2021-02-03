@@ -11,7 +11,9 @@ Bugfixes
 ^^^^^^^^
 
 - Fix the "Videoconference Rooms" page in conference events when there are any VC rooms
-  attached but the corresponding plugin is no longer installed.
+  attached but the corresponding plugin is no longer installed
+- Fix deleting events which have a videoconference room attached which has its VC plugin
+  no longer installed
 
 Internal Changes
 ^^^^^^^^^^^^^^^^
