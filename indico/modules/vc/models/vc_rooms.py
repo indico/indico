@@ -339,7 +339,7 @@ class VCRoomEventAssociation(db.Model):
             )
             vc_room.events.remove(self)
         db.session.flush()
-        if not vc_room.events:
+        if vc_room.plugin and not vc_room.events:
             Logger.get('modules.vc').info(f"Deleting VC room {vc_room}")
             if vc_room.status != VCRoomStatus.deleted:
                 vc_room.plugin.delete_room(vc_room, self.event)
