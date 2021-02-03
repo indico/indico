@@ -5,33 +5,32 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
+import moment from 'moment';
+import PropTypes from 'prop-types';
 import React from 'react';
 import {List, Icon} from 'semantic-ui-react';
-import PropTypes from 'prop-types';
 import './Event.module.scss';
-import moment from 'moment';
+
 import {toMoment, serializeDate} from 'indico/utils/date';
+
 import CategoryPath from './CategoryPath';
 
 /* if end date == start date only show start date */
-const renderDates = (startDt, endDt) => (
-  <>
-    {moment(startDt).isSame(moment(endDt), 'day') ? (
-      <List.Item styleName="med-priority">
-        <Icon name="calendar alternate outline" />
-        {serializeDate(toMoment(startDt), 'DD MMMM YYYY HH:mm')}
-      </List.Item>
-    ) : (
-      <List.Item styleName="med-priority">
-        <Icon name="calendar alternate outline" />
-        {`${serializeDate(toMoment(startDt), 'DD MMMM YYYY')} -
+const renderDates = (startDt, endDt) =>
+  moment(startDt).isSame(moment(endDt), 'day') ? (
+    <List.Item styleName="med-priority">
+      <Icon name="calendar alternate outline" />
+      {serializeDate(toMoment(startDt), 'DD MMMM YYYY HH:mm')}
+    </List.Item>
+  ) : (
+    <List.Item styleName="med-priority">
+      <Icon name="calendar alternate outline" />
+      {`${serializeDate(toMoment(startDt), 'DD MMMM YYYY')} -
          ${serializeDate(toMoment(endDt), 'DD MMMM YYYY')}`}
-      </List.Item>
-    )}
-  </>
-);
+    </List.Item>
+  );
 
-const Event = ({type, title, url, categoryPath, startDt, endDt, speakers}) => {
+const Event = ({type, title, url, categoryPath, startDt, endDt, chairPersons}) => {
   return (
     <div styleName="event">
       <List.Header>
@@ -39,9 +38,9 @@ const Event = ({type, title, url, categoryPath, startDt, endDt, speakers}) => {
       </List.Header>
       <List.Description styleName="description">
         {/* if it's a lecture print the list of speakers */}
-        {type === 'lecture' && speakers.length !== 0 && (
+        {type === 'lecture' && chairPersons.length !== 0 && (
           <List.Item styleName="high-priority">
-            {speakers.map(i => (
+            {chairPersons.map(i => (
               <div key={i.name}>
                 {i.title
                   ? `${i.title} ${i.name} (${i.affiliation})`
@@ -66,11 +65,11 @@ const Event = ({type, title, url, categoryPath, startDt, endDt, speakers}) => {
 };
 
 Event.defaultProps = {
-  speakers: [],
+  chairPersons: [],
 };
 
 const personShape = PropTypes.shape({
-  title: PropTypes.string.isRequired,
+  id: PropTypes.number,
   name: PropTypes.string.isRequired,
   affiliation: PropTypes.string.isRequired,
 });
@@ -88,7 +87,7 @@ Event.propTypes = {
       url: PropTypes.string.isRequired,
     })
   ).isRequired,
-  speakers: PropTypes.arrayOf(personShape),
+  chairPersons: PropTypes.arrayOf(personShape),
 };
 
 export default Event;
