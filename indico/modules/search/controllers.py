@@ -5,6 +5,7 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
+from flask import session
 from marshmallow import fields
 from sqlalchemy.orm import undefer
 
@@ -12,6 +13,7 @@ from indico.core.db import db
 from indico.core.db.sqlalchemy.protection import ProtectionMode
 from indico.modules.categories import Category
 from indico.modules.events import Event
+from indico.modules.groups import GroupProxy
 from indico.modules.search.base import IndicoSearchProvider, SearchTarget, get_search_provider
 from indico.modules.search.schemas import CategoryResultSchema, EventResultSchema
 from indico.modules.search.views import WPSearch
@@ -30,7 +32,7 @@ class RHAPISearch(RH):
     USE_PROVIDER = True
 
     def search(self, page, q):
-        return {'page': 0, 'pages': 0, 'total': 0, 'results': []}
+        return {'pages': 0, 'total': 0, 'results': []}
 
     @use_kwargs({
         'page': fields.Int(missing=1),
@@ -39,7 +41,13 @@ class RHAPISearch(RH):
     def _process(self, page, q):
         search_provider = get_search_provider()
         if search_provider and self.USE_PROVIDER:
-            results = search_provider.search(q, None, self.TARGET)
+            # TODO: memoize
+            access = [session.user.identifier] + [x.identifier for x in session.user.local_groups]
+            if session.user.can_get_all_multipass_groups:
+                access += [GroupProxy(x.name, x.provider.name).identifier
+                           for x in session.user.iter_all_multipass_groups()]
+            pages, total, results = search_provider().search(q, access, self.TARGET)
+            return {'pages': pages, 'total': total, 'results': results}
         else:
             results = self.search(page, q)
 
