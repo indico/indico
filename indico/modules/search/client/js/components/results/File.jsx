@@ -5,9 +5,10 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
+import PropTypes from 'prop-types';
 import React from 'react';
 import {List, Icon} from 'semantic-ui-react';
-import PropTypes from 'prop-types';
+
 import './File.module.scss';
 import {toMoment, serializeDate} from 'indico/utils/date';
 
@@ -31,30 +32,26 @@ const iconSelector = type => {
   }
 };
 
-const File = ({title, url, type, contributionTitle, date, contribURL, persons}) => (
+const File = ({title, url, type, /* contributionTitle, contribURL,*/ modifiedDt, user}) => (
   <div styleName="file">
     <List.Header>
       <Icon {...iconSelector(type)} />
       <a href={url}>{title}</a>
     </List.Header>
     <List.Description styleName="description">
-      <List.Item styleName="high-priority">
-        <Icon rotated="clockwise" name="level up alternate" />
-        <a href={contribURL}>{contributionTitle}</a>
-      </List.Item>
+      {/* <List.Item styleName="high-priority">*/}
+      {/*  <Icon rotated="clockwise" name="level up alternate" />*/}
+      {/*  <a href={contribURL}>{contributionTitle}</a>*/}
+      {/* </List.Item>*/}
       <List.Item>
-        {persons.length !== 0 && (
-          <ul styleName="high-priority">
-            {persons.length > 1 ? <Icon name="users" /> : <Icon name="user" />}
-            {persons.map(item => (
-              <li key={item.id}>{item.title ? `${item.title} ${item.name}` : `${item.name}`}</li>
-            ))}
-          </ul>
-        )}
+        <ul styleName="high-priority">
+          <Icon name="user" />
+          <li key={user.id}>{user.name}</li>
+        </ul>
       </List.Item>
       <List.Item styleName="med-priority">
         <Icon name="calendar alternate outline" />
-        {serializeDate(toMoment(date), 'DD MMMM YYYY HH:mm')}
+        {serializeDate(toMoment(modifiedDt), 'DD MMMM YYYY HH:mm')}
       </List.Item>
     </List.Description>
   </div>
@@ -64,15 +61,13 @@ File.propTypes = {
   title: PropTypes.string.isRequired,
   url: PropTypes.string.isRequired,
   type: PropTypes.string.isRequired,
-  contributionTitle: PropTypes.string.isRequired,
-  date: PropTypes.string.isRequired,
-  contribURL: PropTypes.string.isRequired,
-  persons: PropTypes.arrayOf(
-    PropTypes.shape({
-      id: PropTypes.number.isRequired,
-      title: PropTypes.string.isRequired,
-      name: PropTypes.string.isRequired,
-    })
-  ).isRequired,
+  // contributionTitle: PropTypes.string,
+  modifiedDt: PropTypes.string.isRequired,
+  // contribURL: PropTypes.string,
+  user: PropTypes.shape({
+    id: PropTypes.number.isRequired,
+    title: PropTypes.string.isRequired,
+    name: PropTypes.string.isRequired,
+  }).isRequired,
 };
 export default File;
