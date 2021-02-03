@@ -11,13 +11,16 @@ from flask_multipass import MultipassException
 from werkzeug.utils import cached_property
 
 from indico.core.auth import multipass
+from indico.core.cache import make_scoped_cache
 from indico.core.config import config
 from indico.core.db import db
 from indico.core.db.sqlalchemy.principals import PrincipalType
-from indico.legacy.common.cache import GenericCache
 from indico.modules.auth import Identity
 from indico.modules.groups.models.groups import LocalGroup
 from indico.util.caching import memoize_request
+
+
+group_membership_cache = make_scoped_cache('group-membership')
 
 
 class GroupProxy:
@@ -209,9 +212,8 @@ class _MultipassGroupProxy(GroupProxy):
     def has_member(self, user):
         if not user:
             return False
-        cache = GenericCache('group-membership')
         key = f'{self.provider}:{self.name}:{user.id}'
-        rv = cache.get(key)
+        rv = group_membership_cache.get(key)
         if rv is not None:
             return rv
         elif self.group is None:
@@ -219,7 +221,7 @@ class _MultipassGroupProxy(GroupProxy):
             rv = False
         else:
             rv = any(x[1] in self.group for x in user.iter_identifiers(check_providers=True, providers={self.provider}))
-        cache.set(key, rv, 1800)
+        group_membership_cache.set(key, rv, timeout=1800)
         return rv
 
     @memoize_request

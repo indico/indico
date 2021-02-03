@@ -13,10 +13,13 @@ from itsdangerous import BadData
 from sqlalchemy.exc import OperationalError
 from werkzeug.exceptions import Forbidden, HTTPException
 
+from indico.core.cache import make_scoped_cache
 from indico.core.errors import NoReportError
-from indico.legacy.common.cache import GenericCache
 from indico.web.util import get_request_info
 from indico.web.views import WPError
+
+
+error_cache = make_scoped_cache('errors')
 
 
 def render_error(exc, title, message, code, standalone=False):
@@ -39,7 +42,7 @@ def render_error(exc, title, message, code, standalone=False):
 
 
 def load_error_data(uuid):
-    return GenericCache('errors').get(uuid)
+    return error_cache.get(uuid)
 
 
 def _save_error(exc, title, message):
@@ -59,7 +62,7 @@ def _save_error(exc, title, message):
             'request_info': get_request_info(),
             'traceback': tb,
             'sentry_event_id': g.get('sentry_event_id')}
-    GenericCache('errors').set(uuid, data, 7200)
+    error_cache.set(uuid, data, timeout=7200)
 
 
 def _need_json_response():

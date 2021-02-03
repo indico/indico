@@ -20,7 +20,6 @@ from sqlalchemy.orm import joinedload
 from indico.core.config import config
 from indico.core.db import db
 from indico.core.db.sqlalchemy.links import LinkType
-from indico.legacy.common.cache import GenericCache
 from indico.modules.events import Event
 from indico.modules.events.contributions import Contribution
 from indico.modules.events.sessions import Session
@@ -36,7 +35,6 @@ from indico.util.struct.iterables import group_list
 ROOM_PHOTO_DIMENSIONS = (290, 170)
 TempReservationOccurrence = namedtuple('ReservationOccurrenceTmp', ('start_dt', 'end_dt', 'reservation'))
 TempReservationConcurrentOccurrence = namedtuple('ReservationOccurrenceTmp', ('start_dt', 'end_dt', 'reservations'))
-_cache = GenericCache('Rooms')
 
 
 @memoize_request
@@ -60,6 +58,7 @@ def rb_is_admin(user):
 
 
 def build_rooms_spritesheet():
+    from indico.modules.rb import rb_cache
     from indico.modules.rb.models.rooms import Room
     image_width, image_height = ROOM_PHOTO_DIMENSIONS
     rooms = Room.query.filter(Room.photo).options(joinedload('photo')).all()
@@ -83,9 +82,11 @@ def build_rooms_spritesheet():
     sprite.save(output, 'JPEG')
     value = output.getvalue()
     token = crc32(value)
-    _cache.set('rooms-sprite', value)
-    _cache.set('rooms-sprite-mapping', mapping)
-    _cache.set('rooms-sprite-token', token)
+    rb_cache.set_many({
+        'rooms-sprite': value,
+        'rooms-sprite-mapping': mapping,
+        'rooms-sprite-token': token,
+    })
     return token
 
 
@@ -97,11 +98,12 @@ def get_resized_room_photo(room):
 
 
 def remove_room_spritesheet_photo(room):
-    mapping = _cache.get('rooms-sprite-mapping')
+    from indico.modules.rb import rb_cache
+    mapping = rb_cache.get('rooms-sprite-mapping')
     if not mapping or room.id not in mapping:
         return
     del mapping[room.id]
-    _cache.set('rooms-sprite-mapping', mapping)
+    rb_cache.set('rooms-sprite-mapping', mapping)
 
 
 def group_by_occurrence_date(occurrences, sort_by=None):

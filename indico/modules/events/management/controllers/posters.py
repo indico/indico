@@ -10,7 +10,7 @@ import uuid
 from flask import request
 from werkzeug.exceptions import Forbidden, NotFound
 
-from indico.legacy.common.cache import GenericCache
+from indico.core.cache import make_scoped_cache
 from indico.modules.designer.models.templates import DesignerTemplate
 from indico.modules.events.management.controllers import RHManageEventBase
 from indico.modules.events.management.forms import PosterPrintingForm
@@ -20,7 +20,7 @@ from indico.web.flask.util import send_file, url_for
 from indico.web.util import jsonify_data, jsonify_form
 
 
-poster_cache = GenericCache('poster-printing')
+poster_cache = make_scoped_cache('poster-printing')
 
 
 class RHPosterPrintSettings(RHManageEventBase):
@@ -37,7 +37,7 @@ class RHPosterPrintSettings(RHManageEventBase):
             data = dict(form.data)
             template_id = data.pop('template')
             key = str(uuid.uuid4())
-            poster_cache.set(key, data, time=1800)
+            poster_cache.set(key, data, timeout=1800)
             download_url = url_for('.print_poster', self.event, template_id=template_id, uuid=key)
             return jsonify_data(flash=False, redirect=download_url, redirect_no_loading=True)
         return jsonify_form(form, disabled_until_change=False, back=_('Cancel'), submit=_('Download PDF'))

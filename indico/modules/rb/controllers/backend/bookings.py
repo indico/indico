@@ -15,11 +15,11 @@ from marshmallow_enum import EnumField
 from werkzeug.exceptions import Forbidden, NotFound
 
 from indico.core import signals
+from indico.core.cache import make_scoped_cache
 from indico.core.db import db
 from indico.core.db.sqlalchemy.links import LinkType
 from indico.core.db.sqlalchemy.util.queries import db_dates_overlap
 from indico.core.errors import NoReportError
-from indico.legacy.common.cache import GenericCache
 from indico.modules.rb import rb_settings
 from indico.modules.rb.controllers import RHRoomBookingBase
 from indico.modules.rb.controllers.backend.common import search_room_args
@@ -47,7 +47,7 @@ from indico.web.util import ExpectedError
 NUM_SUGGESTIONS = 5
 
 
-_export_cache = GenericCache('bookings-export')
+_export_cache = make_scoped_cache('bookings-export')
 
 
 class RHTimeline(RHRoomBookingBase):
@@ -405,7 +405,7 @@ class RHBookingExport(RHRoomBookingBase):
 
         token = str(uuid.uuid4())
         headers, rows = generate_spreadsheet_from_occurrences(occurrences)
-        _export_cache.set(token, {'headers': headers, 'rows': rows}, time=1800)
+        _export_cache.set(token, {'headers': headers, 'rows': rows}, timeout=1800)
         download_url = url_for('rb.export_bookings_file', format=format, token=token)
         return jsonify(url=download_url)
 

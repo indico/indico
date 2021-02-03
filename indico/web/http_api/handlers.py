@@ -20,9 +20,9 @@ from uuid import UUID
 from flask import current_app, g, request, session
 from werkzeug.exceptions import BadRequest, NotFound
 
+from indico.core.cache import make_scoped_cache
 from indico.core.db import db
 from indico.core.logger import Logger
-from indico.legacy.common.cache import GenericCache
 from indico.modules.api import APIMode, api_settings
 from indico.modules.api.models.keys import APIKey
 from indico.modules.oauth import oauth
@@ -35,6 +35,8 @@ from indico.web.http_api.util import get_query_parameter
 
 # Remove the extension at the end or before the querystring
 RE_REMOVE_EXTENSION = re.compile(r'\.(\w+)(?:$|(?=\?))')
+
+API_CACHE = make_scoped_cache('legacy-http-api')
 
 
 def normalizeQuery(path, query, remove=('signature',), separate=False):
@@ -215,10 +217,9 @@ def handler(prefix, path):
             raise HTTPAPIError('Not authenticated', 403)
 
         addToCache = not hook.NO_CACHE
-        cache = GenericCache('HTTPAPI')
         cacheKey = RE_REMOVE_EXTENSION.sub('', cacheKey)
         if not noCache:
-            obj = cache.get(cacheKey)
+            obj = API_CACHE.get(cacheKey)
             if obj is not None:
                 result, extra, ts, complete, typeMap = obj
                 addToCache = False
@@ -237,7 +238,7 @@ def handler(prefix, path):
         if result is not None and addToCache:
             ttl = api_settings.get('cache_ttl')
             if ttl > 0:
-                cache.set(cacheKey, (result, extra, ts, complete, typeMap), ttl)
+                API_CACHE.set(cacheKey, (result, extra, ts, complete, typeMap), ttl)
     except HTTPAPIError as e:
         error = e
         if e.code:

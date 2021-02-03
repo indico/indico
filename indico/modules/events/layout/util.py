@@ -14,10 +14,10 @@ from werkzeug.urls import url_parse
 
 import indico
 from indico.core import signals
+from indico.core.cache import make_scoped_cache
 from indico.core.config import config
 from indico.core.db import db
 from indico.core.plugins import url_for_plugin
-from indico.legacy.common.cache import GenericCache
 from indico.modules.events.layout import layout_settings
 from indico.modules.events.layout.models.menu import MenuEntry, MenuEntryType, TransientMenuEntry
 from indico.util.caching import memoize_request
@@ -26,7 +26,7 @@ from indico.util.string import crc32
 from indico.web.flask.util import url_for
 
 
-_cache = GenericCache('updated-menus')
+_cache = make_scoped_cache('updated-menus')
 
 
 def _menu_entry_key(entry_data):

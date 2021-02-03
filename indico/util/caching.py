@@ -69,8 +69,8 @@ def memoize_redis(ttl):
     :param ttl: How long the result should be cached.  May be a
                 timedelta or a number (seconds).
     """
-    from indico.legacy.common.cache import GenericCache
-    cache = GenericCache('memoize')
+    from indico.core.cache import make_scoped_cache
+    cache = make_scoped_cache('memoize')
 
     def decorator(f):
         def _get_key(args, kwargs):
@@ -92,7 +92,7 @@ def memoize_redis(ttl):
             value = cache.get(key, _notset)
             if value is _notset:
                 value = f(*args, **kwargs)
-                cache.set(key, value, ttl)
+                cache.set(key, value, timeout=ttl)
             return value
 
         memoizer.clear_cached = _clear_cached

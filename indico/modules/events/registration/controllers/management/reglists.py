@@ -14,11 +14,11 @@ from sqlalchemy.orm import joinedload, subqueryload
 from werkzeug.exceptions import BadRequest, Forbidden, NotFound
 
 from indico.core import signals
+from indico.core.cache import make_scoped_cache
 from indico.core.config import config
 from indico.core.db import db
 from indico.core.errors import NoReportError
 from indico.core.notifications import make_email, send_email
-from indico.legacy.common.cache import GenericCache
 from indico.legacy.pdfinterface.conference import RegistrantsListToBookPDF, RegistrantsListToPDF
 from indico.modules.designer import PageLayout, TemplateType
 from indico.modules.designer.models.templates import DesignerTemplate
@@ -55,7 +55,7 @@ from indico.web.flask.util import send_file, url_for
 from indico.web.util import jsonify_data, jsonify_template
 
 
-badge_cache = GenericCache('badge-printing')
+badge_cache = make_scoped_cache('badge-printing')
 
 
 def _render_registration_details(registration):
@@ -496,7 +496,7 @@ class RHRegistrationsConfigBadges(RHRegistrationsActionBase):
             data['registration_ids'] = [x.id for x in registrations]
 
             key = str(uuid.uuid4())
-            badge_cache.set(key, data, time=1800)
+            badge_cache.set(key, data, timeout=1800)
             download_url = url_for('.registrations_print_badges', self.regform, template_id=template_id, uuid=key)
             return jsonify_data(flash=False, redirect=download_url, redirect_no_loading=True)
         return jsonify_template('events/registration/management/print_badges.html', event=self.event,

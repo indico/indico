@@ -5,8 +5,8 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
+from indico.core.cache import make_scoped_cache
 from indico.core.db.sqlalchemy.principals import EmailPrincipal
-from indico.legacy.common.cache import GenericCache
 
 
 def iter_acl(acl):
@@ -61,7 +61,7 @@ def principal_from_identifier(identifier, allow_groups=False, allow_external_use
     elif type_ == 'ExternalUser':
         if not allow_external_users:
             raise ValueError('External users are not allowed')
-        cache = GenericCache('external-user')
+        cache = make_scoped_cache('external-user')
         external_user_data = cache.get(data)
         if not external_user_data:
             raise ValueError('Invalid data')

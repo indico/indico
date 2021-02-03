@@ -12,11 +12,11 @@ from flask import flash, jsonify, redirect, request, session
 from sqlalchemy.orm import undefer
 from werkzeug.exceptions import BadRequest, Forbidden, NotFound
 
+from indico.core.cache import make_scoped_cache
 from indico.core.config import config
 from indico.core.db import db
 from indico.core.db.sqlalchemy.protection import ProtectionMode, render_acl
 from indico.core.permissions import get_principal_permissions, update_permissions
-from indico.legacy.common.cache import GenericCache
 from indico.legacy.pdfinterface.latex import ContribsToPDF, ContributionBook
 from indico.modules.attachments.controllers.event_package import AttachmentPackageGeneratorMixin
 from indico.modules.events.abstracts.forms import AbstractContentSettingsForm
@@ -62,7 +62,7 @@ from indico.web.forms.fields.principals import serialize_principal
 from indico.web.util import jsonify_data, jsonify_form, jsonify_template
 
 
-export_list_cache = GenericCache('export-list')
+export_list_cache = make_scoped_cache('contrib-export-list')
 
 
 def _render_subcontribution_list(contrib):
@@ -481,7 +481,7 @@ class RHContributionExportTexConfig(RHManageContributionsExportActionsBase):
             data = form.data
             data.pop('submitted', None)
             key = str(uuid.uuid4())
-            export_list_cache.set(key, data, time=1800)
+            export_list_cache.set(key, data, timeout=1800)
             download_url = url_for('.contributions_tex_export_book', self.event, uuid=key)
             return jsonify_data(flash=False, redirect=download_url, redirect_no_loading=True)
 

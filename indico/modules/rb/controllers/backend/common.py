@@ -8,11 +8,7 @@
 from marshmallow_enum import EnumField
 from webargs import fields
 
-from indico.legacy.common.cache import GenericCache
 from indico.modules.rb.models.reservations import RepeatFrequency
-
-
-_cache = GenericCache('Rooms')
 
 
 search_room_args = {

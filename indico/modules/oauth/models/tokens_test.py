@@ -97,4 +97,4 @@ def test_grant_save(freeze_time, mocker, dummy_grant):
     freeze_time(datetime.utcnow())
     mocker.patch.object(OAuthGrant, '_cache')
     dummy_grant.save()
-    OAuthGrant._cache.set.assert_called_with(key=dummy_grant.key, val=dummy_grant, time=dummy_grant.ttl)
+    OAuthGrant._cache.set.assert_called_with(dummy_grant.key, dummy_grant, timeout=dummy_grant.ttl)

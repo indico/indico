@@ -22,12 +22,12 @@ from werkzeug.exceptions import BadRequest, Forbidden, NotFound
 
 from indico.core import signals
 from indico.core.auth import multipass
+from indico.core.cache import make_scoped_cache
 from indico.core.db import db
 from indico.core.db.sqlalchemy.util.queries import get_n_matching
 from indico.core.errors import UserValueError
 from indico.core.marshmallow import mm
 from indico.core.notifications import make_email, send_email
-from indico.legacy.common.cache import GenericCache
 from indico.modules.admin import RHAdminBase
 from indico.modules.auth import Identity
 from indico.modules.auth.models.registration_requests import RegistrationRequest
@@ -367,10 +367,10 @@ class RHUserSuggestionsRemove(RHUserBase):
 
 class RHUserEmails(RHUserBase):
     def _send_confirmation(self, email):
-        token_storage = GenericCache('confirm-email')
+        token_storage = make_scoped_cache('confirm-email')
         data = {'email': email, 'user_id': self.user.id}
         token = make_unique_token(lambda t: not token_storage.get(t))
-        token_storage.set(token, data, 24 * 3600)
+        token_storage.set(token, data, timeout=86400)
         send_email(make_email(email, template=get_template_module('users/emails/verify_email.txt',
                                                                   user=self.user, email=email, token=token)))
 
@@ -386,7 +386,7 @@ class RHUserEmails(RHUserBase):
 
 class RHUserEmailsVerify(RHUserBase):
     flash_user_status = False
-    token_storage = GenericCache('confirm-email')
+    token_storage = make_scoped_cache('confirm-email')
 
     def _validate(self, data):
         if not data:
@@ -709,11 +709,11 @@ class RHUserSearch(RHProtected):
             return self._serialize_pending_user(entry)
 
     def _process_pending_users(self, results):
-        cache = GenericCache('external-user')
+        cache = make_scoped_cache('external-user')
         for entry in results:
             ext_id = entry.pop('_ext_id', None)
             if ext_id is not None:
-                cache.set(ext_id, self.externals[ext_id], 86400)
+                cache.set(ext_id, self.externals[ext_id], timeout=86400)
 
     @use_kwargs({
         'first_name': fields.Str(validate=validate.Length(min=1)),

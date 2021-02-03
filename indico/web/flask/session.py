@@ -15,8 +15,8 @@ from markupsafe import Markup
 from werkzeug.datastructures import CallbackDict
 from werkzeug.utils import cached_property
 
+from indico.core.cache import make_scoped_cache
 from indico.core.config import config
-from indico.legacy.common.cache import GenericCache
 from indico.modules.users import User
 from indico.util.date_time import get_display_tz
 from indico.util.decorators import cached_writable_property
@@ -143,7 +143,7 @@ class IndicoSessionInterface(SessionInterface):
     temporary_session_lifetime = timedelta(days=7)
 
     def __init__(self):
-        self.storage = GenericCache('flask-session')
+        self.storage = make_scoped_cache('flask-session')
 
     def generate_sid(self):
         return str(uuid.uuid4())

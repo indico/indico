@@ -19,7 +19,6 @@ from indico.core.db.sqlalchemy.principals import PrincipalType
 from indico.core.db.sqlalchemy.protection import ProtectionManagersMixin, ProtectionMode
 from indico.core.db.sqlalchemy.util.queries import db_dates_overlap
 from indico.core.errors import NoReportError
-from indico.legacy.common.cache import GenericCache
 from indico.modules.rb.models.blocked_rooms import BlockedRoom
 from indico.modules.rb.models.blockings import Blocking
 from indico.modules.rb.models.equipment import EquipmentType, RoomEquipmentAssociation
@@ -35,9 +34,6 @@ from indico.util.i18n import _
 from indico.util.serializer import Serializer
 from indico.util.string import format_repr
 from indico.web.flask.util import url_for
-
-
-_cache = GenericCache('Rooms')
 
 
 class Room(ProtectionManagersMixin, db.Model, Serializer):
@@ -345,7 +341,8 @@ class Room(ProtectionManagersMixin, db.Model, Serializer):
 
     @property
     def sprite_position(self):
-        sprite_mapping = _cache.get('rooms-sprite-mapping')
+        from indico.modules.rb import rb_cache
+        sprite_mapping = rb_cache.get('rooms-sprite-mapping')
         return sprite_mapping.get(self.id, 0) if sprite_mapping else 0  # placeholder at position 0
 
     def __repr__(self):

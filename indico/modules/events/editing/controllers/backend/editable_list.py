@@ -13,8 +13,8 @@ from sqlalchemy.orm import joinedload
 from sqlalchemy.sql import and_, func, over
 from werkzeug.exceptions import Forbidden
 
+from indico.core.cache import make_scoped_cache
 from indico.core.db import db
-from indico.legacy.common.cache import GenericCache
 from indico.modules.events.contributions.models.contributions import Contribution
 from indico.modules.events.editing.controllers.base import (RHEditablesBase, RHEditableTypeEditorBase,
                                                             RHEditableTypeManagementBase)
@@ -30,7 +30,7 @@ from indico.web.args import use_kwargs
 from indico.web.flask.util import url_for
 
 
-archive_cache = GenericCache('editables-archive')
+archive_cache = make_scoped_cache('editables-archive')
 
 
 class RHEditableList(RHEditableTypeEditorBase):
@@ -52,7 +52,7 @@ class RHPrepareEditablesArchive(RHEditablesBase):
     def _process(self):
         key = str(uuid.uuid4())
         data = [editable.id for editable in self.editables]
-        archive_cache.set(key, data, time=1800)
+        archive_cache.set(key, data, timeout=1800)
         download_url = url_for('.download_archive', self.event, type=self.editable_type.name, uuid=key)
         return jsonify(download_url=download_url)
 

@@ -9,9 +9,9 @@ from datetime import datetime
 
 from sqlalchemy.dialects.postgresql import ARRAY, UUID
 
+from indico.core.cache import make_scoped_cache
 from indico.core.db import db
 from indico.core.db.sqlalchemy import UTCDateTime
-from indico.legacy.common.cache import GenericCache
 
 
 class OAuthToken(db.Model):
@@ -106,7 +106,7 @@ class OAuthGrant:
     """OAuth grant token."""
 
     #: cache entry to store grant tokens
-    _cache = GenericCache('oauth-grant-tokens')
+    _cache = make_scoped_cache('oauth-grant-tokens')
 
     def __init__(self, client_id, code, redirect_uri, user, scopes, expires):
         self.client_id = client_id
@@ -137,4 +137,4 @@ class OAuthGrant:
         self._cache.delete(self.key)
 
     def save(self):
-        self._cache.set(key=self.key, val=self, time=self.ttl)
+        self._cache.set(self.key, self, timeout=self.ttl)
