@@ -18,6 +18,5 @@ class SearchTarget(int, IndicoEnum):
 class IndicoSearchProvider:
     RESULTS_PER_PAGE = 10
 
-    @classmethod
-    def search(cls, query, access, object_type=SearchTarget.event, page=1):
+    def search(self, query, access, object_type=SearchTarget.event, page=1):
         raise NotImplementedError()
