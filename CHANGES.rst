@@ -7,6 +7,13 @@ Version 2.3.4
 
 *Unreleased*
 
+Improvements
+^^^^^^^^^^^^
+
+- Fail more gracefully is a user has an invalid locale set and fall back to the default
+  locale or English in case the default locale is invalid as well
+- Log an error if the configured default locale does not exist
+
 Bugfixes
 ^^^^^^^^
 
