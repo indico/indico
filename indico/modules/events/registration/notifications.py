@@ -27,7 +27,7 @@ def notify_invitation(invitation, email_subject, email_body, from_address):
     send_email(email, invitation.registration_form.event, 'Registration', user)
 
 
-def _notify_registration(registration, template, to_managers=False):
+def _notify_registration(registration, template, to_managers=False, attach_rejection_reason=False):
     from indico.modules.events.registration.util import get_ticket_attachments
     attachments = None
     regform = registration.registration_form
@@ -40,7 +40,7 @@ def _notify_registration(registration, template, to_managers=False):
         attachments = get_ticket_attachments(registration)
 
     template = get_template_module('events/registration/emails/{}'.format(template),
-                                   registration=registration, attach_reason=request.form.get('attach_reason') == 'y')
+                                   registration=registration, attach_rejection_reason=attach_rejection_reason)
     to_list = registration.email if not to_managers else registration.registration_form.manager_notification_recipients
     from_address = registration.registration_form.sender_address if not to_managers else None
     mail = make_email(to_list=to_list, template=template, html=True, from_address=from_address, attachments=attachments)
@@ -64,6 +64,9 @@ def notify_registration_modification(registration, notify_user=True):
 
 
 def notify_registration_state_update(registration):
-    _notify_registration(registration, 'registration_state_update_to_registrant.html')
+    attach_rejection_reason = request.form.get('attach_rejection_reason') == 'y'
+    _notify_registration(registration, 'registration_state_update_to_registrant.html',
+                         attach_rejection_reason=attach_rejection_reason)
     if registration.registration_form.manager_notifications_enabled:
-        _notify_registration(registration, 'registration_state_update_to_managers.html', to_managers=True)
+        _notify_registration(registration, 'registration_state_update_to_managers.html', to_managers=True,
+                             attach_rejection_reason=attach_rejection_reason)

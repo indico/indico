@@ -160,6 +160,7 @@
                                 <a href="#" class="icon-close js-requires-selected-row disabled"
                                    data-href="{{ url_for('.registrations_reject', regform) }}"
                                    data-params-selector="#registration-list tr input[type=checkbox]:checked"
+                                   data-method="POST"
                                    data-title="{% trans %}Reject registrations{% endtrans %}"
                                    data-update="#registration-list"
                                    data-ajax-dialog>

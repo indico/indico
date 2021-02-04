@@ -10,10 +10,8 @@ Version 2.3.4
 Improvements
 ^^^^^^^^^^^^
 
-- Add a new form to capture rejection reason for registration, store it in DB, and event log.
-  If enabled send the reason with notification email to registrant and event managers.
-  Add a new 'rejection_reason' placeholder to use in email templates.
-  (:pr:`4769`, thanks :user:`vasantvohra`)
+- Allow managers to specify a reason when rejecting registrants and add a new placeholder
+  for the rejection reason when emailing registrants (:pr:`4769`, thanks :user:`vasantvohra`)
 
 
 Version 2.3.4

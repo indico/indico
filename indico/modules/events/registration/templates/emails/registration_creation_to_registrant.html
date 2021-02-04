@@ -51,7 +51,7 @@
 
 {% macro render_rejection_reason() %}
     {% if registration.state.name == 'rejected' and registration.rejection_reason %}
-    	<br>The reason stated for rejection: "{{ registration.rejection_reason }}".<br>
+    	<br>Rejection reason: {{ registration.rejection_reason }}.<br>
     {% endif %}
 {% endmacro %}
 

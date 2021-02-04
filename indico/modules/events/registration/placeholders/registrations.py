@@ -74,7 +74,7 @@ class LinkPlaceholder(Placeholder):
 
 class RejectionReasonPlaceholder(Placeholder):
     name = 'rejection_reason'
-    description = _("Reason stated while rejecting a participant by moderator")
+    description = _("The reason why the registration was rejected")
 
     @classmethod
     def render(cls, regform, registration):
