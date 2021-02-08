@@ -19,9 +19,9 @@ from indico.modules.events.logs.models.entries import EventLogKind
 from indico.modules.events.timetable.models.entries import TimetableEntry, TimetableEntryType
 from indico.modules.events.timetable.operations import fit_session_block_entry
 from indico.util.date_time import format_date, format_human_timedelta
+from indico.util.enum import RichEnum
 from indico.util.i18n import _
-from indico.util.struct.enum import RichEnum
-from indico.util.struct.iterables import materialize_iterable, window
+from indico.util.iterables import materialize_iterable, window
 
 
 class RescheduleMode(str, RichEnum):

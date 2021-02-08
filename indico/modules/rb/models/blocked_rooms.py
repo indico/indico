@@ -13,7 +13,7 @@ from indico.core.db.sqlalchemy import PyIntEnum
 from indico.modules.rb.models.reservation_occurrences import ReservationOccurrence
 from indico.modules.rb.models.reservations import Reservation
 from indico.modules.rb.notifications.blockings import notify_request_response
-from indico.util.struct.enum import RichIntEnum
+from indico.util.enum import RichIntEnum
 
 
 class BlockedRoomState(RichIntEnum):

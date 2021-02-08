@@ -13,8 +13,8 @@ from indico.core.db.sqlalchemy import PyIntEnum
 from indico.core.db.sqlalchemy.custom.utcdatetime import UTCDateTime
 from indico.core.logger import Logger
 from indico.util.date_time import now_utc
+from indico.util.enum import IndicoEnum
 from indico.util.string import format_repr
-from indico.util.struct.enum import IndicoEnum
 
 
 class InvalidTransactionStatus(Exception):

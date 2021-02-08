@@ -10,8 +10,8 @@ from sqlalchemy.dialects.postgresql import JSON, JSONB
 from indico.core.db import db
 from indico.core.db.sqlalchemy import PyIntEnum, UTCDateTime
 from indico.util.date_time import now_utc
+from indico.util.enum import IndicoEnum, RichIntEnum
 from indico.util.i18n import _
-from indico.util.struct.enum import IndicoEnum, RichIntEnum
 
 
 class EventLogRealm(RichIntEnum):

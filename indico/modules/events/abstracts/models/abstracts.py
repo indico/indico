@@ -27,10 +27,10 @@ from indico.modules.events.contributions.models.persons import AuthorType
 from indico.modules.events.models.persons import AuthorsSpeakersMixin
 from indico.modules.events.models.reviews import ProposalMixin, ProposalRevisionMixin
 from indico.util.date_time import now_utc
+from indico.util.enum import IndicoEnum, RichIntEnum
 from indico.util.i18n import _
 from indico.util.locators import locator_property
 from indico.util.string import MarkdownText, format_repr, text_to_repr
-from indico.util.struct.enum import IndicoEnum, RichIntEnum
 
 
 class AbstractState(RichIntEnum):

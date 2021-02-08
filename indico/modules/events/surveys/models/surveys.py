@@ -20,8 +20,8 @@ from indico.core.notifications import make_email, send_email
 from indico.modules.events.registration.models.registrations import Registration
 from indico.modules.events.surveys import logger
 from indico.util.date_time import now_utc
+from indico.util.enum import IndicoEnum
 from indico.util.locators import locator_property
-from indico.util.struct.enum import IndicoEnum
 from indico.web.flask.templating import get_template_module
 
 

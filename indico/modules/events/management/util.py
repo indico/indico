@@ -14,7 +14,7 @@ from sqlalchemy.orm import joinedload
 from indico.core.db import db
 from indico.core.db.sqlalchemy.links import LinkType
 from indico.util.i18n import _, ngettext
-from indico.util.struct.iterables import materialize_iterable
+from indico.util.iterables import materialize_iterable
 from indico.web.flask.util import url_for
 
 

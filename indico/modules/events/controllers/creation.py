@@ -25,7 +25,7 @@ from indico.modules.events.operations import create_event
 from indico.modules.rb import rb_settings
 from indico.modules.rb.util import rb_check_user_access
 from indico.util.date_time import now_utc
-from indico.util.struct.iterables import materialize_iterable
+from indico.util.iterables import materialize_iterable
 from indico.web.flask.util import url_for
 from indico.web.forms.base import FormDefaults
 from indico.web.rh import RHProtected

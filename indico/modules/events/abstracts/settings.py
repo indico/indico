@@ -8,8 +8,8 @@
 from indico.core.db.sqlalchemy.descriptions import RenderMode
 from indico.core.settings.converters import DatetimeConverter, EnumConverter
 from indico.modules.events.settings import EventSettingsProxy
+from indico.util.enum import RichEnum
 from indico.util.i18n import _
-from indico.util.struct.enum import RichEnum
 
 
 class BOASortField(RichEnum):

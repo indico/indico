@@ -7,8 +7,8 @@
 
 from indico.core.settings.converters import EnumConverter, ModelListConverter
 from indico.modules.users import UserSettingsProxy
+from indico.util.enum import RichIntEnum
 from indico.util.i18n import _
-from indico.util.struct.enum import RichIntEnum
 
 
 class RoomEmailMode(RichIntEnum):

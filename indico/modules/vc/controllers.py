@@ -25,7 +25,7 @@ from indico.modules.vc.util import find_event_vc_rooms, get_managed_vc_plugins, 
 from indico.modules.vc.views import WPVCEventPage, WPVCManageEvent, WPVCService
 from indico.util.date_time import as_utc, get_day_end, get_day_start, now_utc
 from indico.util.i18n import _
-from indico.util.struct.iterables import group_list
+from indico.util.iterables import group_list
 from indico.web.flask.util import url_for
 from indico.web.forms.base import FormDefaults
 from indico.web.rh import RHProtected

@@ -28,10 +28,10 @@ from indico.core.db.sqlalchemy.util.models import get_default_values
 from indico.modules.users.models.affiliations import UserAffiliation
 from indico.modules.users.models.emails import UserEmail
 from indico.modules.users.models.favorites import favorite_category_table, favorite_user_table
+from indico.util.enum import RichIntEnum
 from indico.util.i18n import _
 from indico.util.locators import locator_property
 from indico.util.string import format_full_name, format_repr
-from indico.util.struct.enum import RichIntEnum
 from indico.web.flask.util import url_for
 
 

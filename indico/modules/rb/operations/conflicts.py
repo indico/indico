@@ -17,7 +17,7 @@ from indico.modules.rb.models.reservations import Reservation
 from indico.modules.rb.models.rooms import Room
 from indico.modules.rb.util import TempReservationConcurrentOccurrence, TempReservationOccurrence, rb_is_admin
 from indico.util.date_time import get_overlap
-from indico.util.struct.iterables import group_list
+from indico.util.iterables import group_list
 
 
 def get_rooms_conflicts(rooms, start_dt, end_dt, repeat_frequency, repeat_interval, blocked_rooms,

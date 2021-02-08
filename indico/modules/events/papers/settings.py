@@ -8,8 +8,8 @@
 from indico.core.settings.converters import DatetimeConverter, SettingConverter
 from indico.modules.events.papers.models.reviews import PaperReviewType
 from indico.modules.events.settings import EventSettingsProxy
+from indico.util.enum import RichIntEnum
 from indico.util.i18n import _
-from indico.util.struct.enum import RichIntEnum
 
 
 class PaperReviewingRole(RichIntEnum):

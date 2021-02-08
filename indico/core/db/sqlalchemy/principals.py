@@ -14,8 +14,8 @@ from indico.core.db.sqlalchemy import PyIntEnum, db
 from indico.core.db.sqlalchemy.util.models import get_simple_column_attrs
 from indico.core.permissions import get_available_permissions
 from indico.util.decorators import classproperty, strict_classproperty
+from indico.util.enum import IndicoEnum
 from indico.util.string import format_repr
-from indico.util.struct.enum import IndicoEnum
 
 
 class PrincipalType(int, IndicoEnum):

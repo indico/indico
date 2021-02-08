@@ -24,9 +24,9 @@ from indico.modules.rb.models.util import proxy_to_reservation_if_last_valid_occ
 from indico.modules.rb.util import rb_is_admin
 from indico.util import date_time
 from indico.util.date_time import format_date
+from indico.util.enum import IndicoEnum
 from indico.util.serializer import Serializer
 from indico.util.string import format_repr
-from indico.util.struct.enum import IndicoEnum
 from indico.web.flask.util import url_for
 
 

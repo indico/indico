@@ -20,7 +20,7 @@ from indico.modules.rb.models.blockings import Blocking
 from indico.modules.rb.models.rooms import Room
 from indico.modules.rb.notifications.blockings import notify_request
 from indico.modules.rb.operations.rooms import get_managed_room_ids
-from indico.util.struct.iterables import group_list
+from indico.util.iterables import group_list
 
 
 def get_room_blockings(timeframe=None, created_by=None, in_rooms_owned_by=None):

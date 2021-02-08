@@ -25,10 +25,10 @@ from indico.core.db.sqlalchemy.searchable_titles import SearchableTitleMixin
 from indico.core.db.sqlalchemy.util.models import auto_table_args
 from indico.util.date_time import get_display_tz
 from indico.util.decorators import strict_classproperty
+from indico.util.enum import RichIntEnum
 from indico.util.i18n import _
 from indico.util.locators import locator_property
 from indico.util.string import MarkdownText, format_repr, text_to_repr
-from indico.util.struct.enum import RichIntEnum
 from indico.web.flask.util import url_for
 
 

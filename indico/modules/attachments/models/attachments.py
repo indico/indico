@@ -21,10 +21,10 @@ from indico.modules.attachments.models.principals import AttachmentPrincipal
 from indico.modules.attachments.preview import get_file_previewer
 from indico.modules.attachments.util import can_manage_attachments
 from indico.util.date_time import now_utc
+from indico.util.enum import RichIntEnum
 from indico.util.fs import secure_filename
 from indico.util.i18n import _
 from indico.util.string import strict_str
-from indico.util.struct.enum import RichIntEnum
 from indico.web.flask.util import url_for
 
 

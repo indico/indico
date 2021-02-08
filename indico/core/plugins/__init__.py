@@ -25,8 +25,8 @@ from indico.modules.events.settings import EventSettingsProxy
 from indico.modules.events.static.util import RewrittenManifest
 from indico.modules.users import UserSettingsProxy
 from indico.util.decorators import cached_classproperty, classproperty
+from indico.util.enum import IndicoEnum
 from indico.util.i18n import NullDomain, _
-from indico.util.struct.enum import IndicoEnum
 from indico.web.flask.templating import get_template_module, register_template_hook
 from indico.web.flask.util import url_for, url_rule_to_js
 from indico.web.flask.wrappers import IndicoBlueprint, IndicoBlueprintSetupState

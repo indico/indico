@@ -19,7 +19,7 @@ from indico.core.logger import Logger
 from indico.modules.vc.notifications import notify_deleted
 from indico.util.caching import memoize_request
 from indico.util.date_time import now_utc
-from indico.util.struct.enum import IndicoEnum
+from indico.util.enum import IndicoEnum
 
 
 class VCRoomLinkType(int, IndicoEnum):

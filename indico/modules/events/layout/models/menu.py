@@ -11,9 +11,9 @@ from werkzeug.utils import cached_property
 
 from indico.core.db import db
 from indico.core.db.sqlalchemy import PyIntEnum
+from indico.util.enum import RichIntEnum
 from indico.util.i18n import _
 from indico.util.string import format_repr, slugify, text_to_repr
-from indico.util.struct.enum import RichIntEnum
 from indico.web.flask.util import url_for
 
 

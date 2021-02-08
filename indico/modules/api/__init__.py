@@ -11,8 +11,8 @@ from indico.core import signals
 from indico.core.db import db
 from indico.core.settings import SettingsProxy
 from indico.modules.api.models.keys import APIKey
+from indico.util.enum import IndicoEnum
 from indico.util.i18n import _
-from indico.util.struct.enum import IndicoEnum
 from indico.web.flask.util import url_for
 from indico.web.menu import SideMenuItem
 

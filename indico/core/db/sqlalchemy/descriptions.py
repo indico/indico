@@ -10,8 +10,8 @@ from sqlalchemy.ext.hybrid import hybrid_property
 
 from indico.core.db import db
 from indico.core.db.sqlalchemy import PyIntEnum
+from indico.util.enum import RichIntEnum
 from indico.util.string import MarkdownText, PlainText, RichMarkup
-from indico.util.struct.enum import RichIntEnum
 
 
 class RenderMode(RichIntEnum):

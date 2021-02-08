@@ -12,10 +12,10 @@ from sqlalchemy.sql import select
 
 from indico.core.db import db
 from indico.core.db.sqlalchemy import PyIntEnum
+from indico.util.enum import RichIntEnum
 from indico.util.i18n import _
 from indico.util.locators import locator_property
 from indico.util.string import format_repr
-from indico.util.struct.enum import RichIntEnum
 from indico.web.flask.util import url_for
 
 

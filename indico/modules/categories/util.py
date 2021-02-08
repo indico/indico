@@ -27,7 +27,7 @@ from indico.modules.events.timetable.models.entries import TimetableEntry, Timet
 from indico.util.caching import memoize_redis
 from indico.util.date_time import now_utc
 from indico.util.i18n import _, ngettext
-from indico.util.struct.iterables import materialize_iterable
+from indico.util.iterables import materialize_iterable
 
 
 def get_events_by_year(category_id=None):

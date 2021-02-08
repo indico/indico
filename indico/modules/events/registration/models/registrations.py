@@ -28,12 +28,12 @@ from indico.modules.events.payment.models.transactions import TransactionStatus
 from indico.modules.users.models.users import format_display_full_name
 from indico.util.date_time import now_utc
 from indico.util.decorators import classproperty
+from indico.util.enum import RichIntEnum
 from indico.util.fs import secure_filename
 from indico.util.i18n import L_
 from indico.util.locators import locator_property
 from indico.util.signals import values_from_signal
 from indico.util.string import format_full_name, format_repr, strict_str
-from indico.util.struct.enum import RichIntEnum
 from indico.web.flask.util import url_for
 
 

@@ -5,7 +5,7 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from indico.util.struct.iterables import grouper
+from indico.util.iterables import grouper
 
 
 def test_grouper():

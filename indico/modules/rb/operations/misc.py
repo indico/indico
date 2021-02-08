@@ -10,7 +10,7 @@ from operator import attrgetter
 
 from indico.modules.rb.models.room_bookable_hours import BookableHours
 from indico.modules.rb.models.room_nonbookable_periods import NonBookablePeriod
-from indico.util.struct.iterables import group_list
+from indico.util.iterables import group_list
 
 
 def get_rooms_unbookable_hours(rooms):

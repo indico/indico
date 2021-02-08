@@ -12,9 +12,9 @@ from indico.core.db import db
 from indico.core.db.sqlalchemy import PyIntEnum, UTCDateTime
 from indico.core.storage import StoredFileMixin
 from indico.util.date_time import now_utc
+from indico.util.enum import RichIntEnum
 from indico.util.i18n import _
 from indico.util.string import format_repr, strict_str
-from indico.util.struct.enum import RichIntEnum
 
 
 class StaticSiteState(RichIntEnum):

@@ -35,8 +35,8 @@ from indico.modules.rb.util import (group_by_occurrence_date, serialize_availabi
                                     serialize_unbookable_hours)
 from indico.util.date_time import iterdays, overlaps, server_to_utc
 from indico.util.i18n import _
+from indico.util.iterables import group_list
 from indico.util.string import natural_sort_key
-from indico.util.struct.iterables import group_list
 
 
 def group_blockings(blocked_rooms, dates):

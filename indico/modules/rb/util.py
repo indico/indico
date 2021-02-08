@@ -28,8 +28,8 @@ from indico.modules.events.timetable.models.entries import TimetableEntry
 from indico.modules.events.timetable.util import find_latest_entry_end_dt
 from indico.util.caching import memoize_request
 from indico.util.date_time import now_utc, server_to_utc
+from indico.util.iterables import group_list
 from indico.util.string import crc32
-from indico.util.struct.iterables import group_list
 
 
 ROOM_PHOTO_DIMENSIONS = (290, 170)

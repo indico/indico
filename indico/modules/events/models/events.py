@@ -42,9 +42,9 @@ from indico.modules.events.timetable.models.entries import TimetableEntry
 from indico.util.caching import memoize_request
 from indico.util.date_time import get_display_tz, now_utc, overlaps
 from indico.util.decorators import strict_classproperty
+from indico.util.enum import RichIntEnum
 from indico.util.i18n import _
 from indico.util.string import format_repr, text_to_repr
-from indico.util.struct.enum import RichIntEnum
 from indico.web.flask.util import url_for
 
 

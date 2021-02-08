@@ -20,9 +20,9 @@ from indico.core.db.sqlalchemy import PyIntEnum
 from indico.core.db.sqlalchemy.principals import EmailPrincipal, PrincipalType
 from indico.core.permissions import get_available_permissions
 from indico.util.caching import memoize_request
+from indico.util.enum import RichIntEnum
 from indico.util.i18n import _
 from indico.util.signals import values_from_signal
-from indico.util.struct.enum import RichIntEnum
 from indico.util.user import iter_acl
 from indico.web.util import jsonify_template
 

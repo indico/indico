@@ -31,10 +31,10 @@ from indico.modules.rb.notifications.reservations import (notify_cancellation, n
                                                           notify_modification, notify_rejection, notify_reset_approval)
 from indico.modules.rb.util import get_prebooking_collisions, rb_is_admin
 from indico.util.date_time import format_date, format_time, now_utc
+from indico.util.enum import IndicoEnum
 from indico.util.i18n import _
 from indico.util.serializer import Serializer
 from indico.util.string import format_repr
-from indico.util.struct.enum import IndicoEnum
 from indico.web.flask.util import url_for
 
 

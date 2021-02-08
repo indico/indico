@@ -10,10 +10,10 @@ from sqlalchemy.ext.declarative import declared_attr
 
 from indico.core.db import db
 from indico.core.db.sqlalchemy import PyIntEnum
+from indico.util.enum import RichIntEnum
 from indico.util.i18n import _
 from indico.util.locators import locator_property
 from indico.util.string import format_repr, text_to_repr
-from indico.util.struct.enum import RichIntEnum
 
 
 def _get_next_position(context):

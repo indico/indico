@@ -8,8 +8,8 @@
 from flask import session
 
 from indico.core import signals
+from indico.util.enum import RichIntEnum
 from indico.util.i18n import _
-from indico.util.struct.enum import RichIntEnum
 from indico.web.flask.util import url_for
 from indico.web.menu import SideMenuItem
 

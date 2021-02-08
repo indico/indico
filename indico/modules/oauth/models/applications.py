@@ -14,8 +14,8 @@ from werkzeug.urls import url_parse
 from indico.core.db import db
 from indico.core.db.sqlalchemy import PyIntEnum
 from indico.modules.oauth import logger
+from indico.util.enum import IndicoEnum
 from indico.util.i18n import _
-from indico.util.struct.enum import IndicoEnum
 
 
 SCOPES = {'read:user': _("User information (read only)"),

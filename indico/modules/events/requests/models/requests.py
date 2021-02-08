@@ -12,8 +12,8 @@ from indico.core.db.sqlalchemy import PyIntEnum, UTCDateTime
 from indico.core.db.sqlalchemy.util.queries import limit_groups
 from indico.modules.events.requests import get_request_definitions
 from indico.util.date_time import now_utc
+from indico.util.enum import RichIntEnum
 from indico.util.i18n import _
-from indico.util.struct.enum import RichIntEnum
 
 
 class RequestState(RichIntEnum):

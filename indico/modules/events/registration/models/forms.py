@@ -24,8 +24,8 @@ from indico.modules.events.registration.models.form_fields import RegistrationFo
 from indico.modules.events.registration.models.registrations import Registration, RegistrationState
 from indico.util.caching import memoize_request
 from indico.util.date_time import now_utc
+from indico.util.enum import RichIntEnum
 from indico.util.i18n import L_
-from indico.util.struct.enum import RichIntEnum
 
 
 class ModificationMode(RichIntEnum):

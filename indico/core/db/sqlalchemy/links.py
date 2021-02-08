@@ -15,8 +15,8 @@ from sqlalchemy.ext.hybrid import Comparator, hybrid_property
 from indico.core.db import db
 from indico.core.db.sqlalchemy import PyIntEnum
 from indico.util.decorators import strict_classproperty
+from indico.util.enum import RichIntEnum
 from indico.util.i18n import _
-from indico.util.struct.enum import RichIntEnum
 
 
 class LinkType(RichIntEnum):

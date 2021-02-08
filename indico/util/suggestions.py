@@ -16,7 +16,7 @@ from indico.modules.events.contributions.util import get_events_with_linked_cont
 from indico.modules.events.registration.util import get_events_registered
 from indico.modules.events.surveys.util import get_events_with_submitted_surveys
 from indico.util.date_time import now_utc, utc_to_server
-from indico.util.struct.iterables import window
+from indico.util.iterables import window
 
 
 def _get_blocks(events, attended):

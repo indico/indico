@@ -26,10 +26,10 @@ from indico.modules.events.editing.models.tags import EditingTag
 from indico.modules.events.util import get_all_user_roles
 from indico.modules.users import User
 from indico.util.caching import memoize_request
+from indico.util.enum import IndicoEnum
 from indico.util.i18n import _
 from indico.util.marshmallow import PrincipalList, not_empty
 from indico.util.string import natural_sort_key
-from indico.util.struct.enum import IndicoEnum
 from indico.web.flask.util import url_for
 from indico.web.forms.colors import get_sui_colors
 

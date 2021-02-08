@@ -12,8 +12,8 @@ from indico.core.db import db
 from indico.core.db.sqlalchemy import PyIntEnum
 from indico.core.db.sqlalchemy.descriptions import DescriptionMixin, RenderMode
 from indico.modules.events.surveys.fields import get_field_types
+from indico.util.enum import IndicoEnum
 from indico.util.string import text_to_repr
-from indico.util.struct.enum import IndicoEnum
 
 
 def _get_next_position(context):

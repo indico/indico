@@ -7,9 +7,9 @@
 
 from indico.core.db.sqlalchemy import PyIntEnum, db
 from indico.modules.events.models.persons import PersonLinkBase
+from indico.util.enum import IndicoEnum
 from indico.util.locators import locator_property
 from indico.util.string import format_repr
-from indico.util.struct.enum import IndicoEnum
 
 
 class AuthorType(int, IndicoEnum):
