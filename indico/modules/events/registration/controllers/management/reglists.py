@@ -542,7 +542,7 @@ class RHRegistrationTogglePayment(RHManageRegistrationBase):
         return jsonify_data(html=_render_registration_details(self.registration))
 
 
-def _modify_registration_status(registration, approve, rejection_reason=''):
+def _modify_registration_status(registration, approve, rejection_reason='', attach_rejection_reason=False):
     if registration.state != RegistrationState.pending:
         return
     if approve:
@@ -551,7 +551,7 @@ def _modify_registration_status(registration, approve, rejection_reason=''):
         registration.rejection_reason = rejection_reason
         registration.update_state(rejected=True)
     db.session.flush()
-    notify_registration_state_update(registration)
+    notify_registration_state_update(registration, attach_rejection_reason)
     status = 'approved' if approve else 'rejected'
     logger.info('Registration %s was %s by %s', registration, status, session.user)
 
@@ -571,7 +571,8 @@ class RHRegistrationReject(RHManageRegistrationBase):
         form = RejectRegistrantsForm()
         message = _("Rejecting this registration will trigger a notification email.")
         if form.validate_on_submit():
-            _modify_registration_status(self.registration, approve=False, rejection_reason=form.rejection_reason.data)
+            _modify_registration_status(self.registration, approve=False, rejection_reason=form.rejection_reason.data,
+                                        attach_rejection_reason=form.attach_rejection_reason.data)
             return jsonify_data(html=_render_registration_details(self.registration))
         return jsonify_form(form, disabled_until_change=False, submit=_('Reject'), message=message)
 
@@ -661,7 +662,8 @@ class RHRegistrationsReject(RHRegistrationsActionBase):
         message = _("Rejecting these registrations will trigger a notification email for each registrant.")
         if form.validate_on_submit():
             for registration in self.registrations:
-                _modify_registration_status(registration, approve=False, rejection_reason=form.rejection_reason.data)
+                _modify_registration_status(registration, approve=False, rejection_reason=form.rejection_reason.data,
+                                            attach_rejection_reason=form.attach_rejection_reason.data)
             flash(_("The selected registrations were successfully rejected."), 'success')
             return jsonify_data(**self.list_generator.render_list())
         return jsonify_form(form, disabled_until_change=False, submit=_('Reject'), message=message)

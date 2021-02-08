@@ -7,7 +7,7 @@
 
 from __future__ import unicode_literals
 
-from flask import request, session
+from flask import session
 
 from indico.core import signals
 from indico.core.notifications import make_email, send_email
@@ -63,8 +63,7 @@ def notify_registration_modification(registration, notify_user=True):
         _notify_registration(registration, 'registration_modification_to_managers.html', to_managers=True)
 
 
-def notify_registration_state_update(registration):
-    attach_rejection_reason = request.form.get('attach_rejection_reason') == 'y'
+def notify_registration_state_update(registration, attach_rejection_reason=False):
     _notify_registration(registration, 'registration_state_update_to_registrant.html',
                          attach_rejection_reason=attach_rejection_reason)
     if registration.registration_form.manager_notifications_enabled:
