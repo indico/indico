@@ -86,6 +86,10 @@
                                data-href="{{ url_for('.registrations_csv_export', regform) }}">CSV</a>
                         </li>
                         <li>
+                            <a href="#" class="icon-file-spreadsheet js-requires-selected-row disabled js-submit-list-form"
+                               data-href="{{ url_for('.registrations_csv_export_2', regform) }}">CSV(re-importable)</a>
+                        </li>
+                        <li>
                             <a href="#" class="icon-file-excel js-requires-selected-row disabled js-submit-list-form"
                                data-href="{{ url_for('.registrations_excel_export', regform) }}">XLSX (Excel)</a>
                         </li>

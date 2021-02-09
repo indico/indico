@@ -87,6 +87,8 @@ _bp.add_url_rule('/manage/registration/<int:reg_form_id>/registrations/book.pdf'
                  reglists.RHRegistrationsExportPDFBook, methods=('POST',))
 _bp.add_url_rule('/manage/registration/<int:reg_form_id>/registrations/registrations.csv', 'registrations_csv_export',
                  reglists.RHRegistrationsExportCSV, methods=('POST',))
+_bp.add_url_rule('/manage/registration/<int:reg_form_id>/registrations/registrations_i.csv',
+                 'registrations_csv_export_2', reglists.RHRegistrationsExportCSVForImport, methods=('POST',))
 _bp.add_url_rule('/manage/registration/<int:reg_form_id>/registrations/registrations.xlsx',
                  'registrations_excel_export', reglists.RHRegistrationsExportExcel, methods=('POST',))
 _bp.add_url_rule('/manage/registration/<int:reg_form_id>/registrations/modify-status', 'registrations_modify_status',

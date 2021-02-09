@@ -20,11 +20,48 @@ from indico.modules.events.registration.util import (create_registration, get_ev
 pytest_plugins = 'indico.modules.events.registration.testing.fixtures'
 
 
-def test_import_registrations(dummy_regform, dummy_user):
-    csv = b'\n'.join([b'John,Doe,ACME Inc.,Regional Manager,+1-202-555-0140,jdoe@example.com',
-                      b'Jane,Smith,ACME Inc.,CEO,,jane@example.com',
-                      b'Billy Bob,Doe,,,,1337@example.COM'])
-    registrations = import_registrations_from_csv(dummy_regform, BytesIO(csv))
+def _dummy_csv(csv_content, csv_header):
+    csv = b'\n'.join(csv_header + csv_content)
+    return BytesIO(csv.encode('utf-8'))
+
+
+@pytest.mark.parametrize(
+    'csv_header', [[
+        'first_name:Personal Data#First Name,'
+        'last_name:Personal Data#Last Name,'
+        'affiliation:Personal Data#Affiliation,'
+        'position:Personal Data#Position,'
+        'phone:Personal Data#Phone Number,'
+        'email:Personal Data#Email Address,'
+    ], [
+        'Personal Data#First Name,'
+        'Personal Data#Last Name,'
+        'Personal Data#Affiliation,'
+        'Personal Data#Position,'
+        'Personal Data#Phone Number,'
+        'Personal Data#Email Address,'
+    ], ['first_name,'
+        'last_name,'
+        'affiliation,'
+        'position,'
+        'phone,'
+        'email,']],
+    ids=["long form", "section/field", "html field name"])
+def test_import_registrations(dummy_regform, dummy_user, csv_header):
+
+    # current available fields
+    # [u'title:Personal Data#Title,first_name:Personal Data#First Name,
+    #  last_name:Personal Data#Last Name,email:Personal Data#Email Address,
+    #  affiliation:Personal Data#Affiliation,address:Personal Data#Address,
+    #  country:Personal Data#Country,phone:Personal Data#Phone Number,
+    #  position:Personal Data#Position']
+
+    csv_content = [
+        'John,Doe,ACME Inc.,Regional Manager,+1-202-555-0140,jdoe@example.com',
+        'Jane,Smith,ACME Inc.,CEO,,jane@example.com', u'Billy Bob,Doe,,,,1337@example.COM'
+    ]
+
+    registrations, skipped = import_registrations_from_csv(dummy_regform, _dummy_csv(csv_content, csv_header))
     assert len(registrations) == 3
 
     assert registrations[0].full_name == 'John Doe'
@@ -50,67 +87,8 @@ def test_import_registrations(dummy_regform, dummy_user):
     assert data['email'] == '1337@example.com'
     assert 'position' not in data
     assert 'phone' not in data
-
-
-def test_import_error(dummy_regform):
-    create_registration(dummy_regform, {
-        'email': 'boss@example.com',
-        'first_name': 'Big',
-        'last_name': 'Boss'
-    }, notify_user=False)
-
-    # missing column
-    csv = b'\n'.join([b'John,Doe,ACME Inc.,Regional Manager,+1-202-555-0140,jdoe@example.com',
-                      b'Buggy,Entry,ACME Inc.,CEO,'])
-
-    with pytest.raises(UserValueError) as e:
-        import_registrations_from_csv(dummy_regform, BytesIO(csv))
-    assert 'malformed' in str(e.value)
-    assert 'Row 2' in str(e.value)
-
-    # missing e-mail
-    csv = b'\n'.join([b'Bill,Doe,ACME Inc.,Regional Manager,+1-202-555-0140,bdoe@example.com',
-                      b'Buggy,Entry,ACME Inc.,CEO,,'])
-
-    with pytest.raises(UserValueError) as e:
-        import_registrations_from_csv(dummy_regform, BytesIO(csv))
-    assert 'missing e-mail' in str(e.value)
-    assert 'Row 2' in str(e.value)
-
-    # bad e-mail
-    csv = b'\n'.join([b'Bill,Doe,ACME Inc.,Regional Manager,+1-202-555-0140,bdoe@example.com',
-                      b'Buggy,Entry,ACME Inc.,CEO,,not-an-email'])
-
-    with pytest.raises(UserValueError) as e:
-        import_registrations_from_csv(dummy_regform, BytesIO(csv))
-    assert 'invalid e-mail' in str(e.value)
-    assert 'Row 2' in str(e.value)
-
-    # duplicate e-mail (csv)
-    csv = b'\n'.join([b'Bill,Doe,ACME Inc.,Regional Manager,+1-202-555-0140,bdoe@example.com',
-                      b'Bob,Doe,ACME Inc.,Boss,,bdoe@example.com'])
-
-    with pytest.raises(UserValueError) as e:
-        import_registrations_from_csv(dummy_regform, BytesIO(csv))
-    assert 'email address is not unique' in str(e.value)
-    assert 'Row 2' in str(e.value)
-
-    # duplicate e-mail (registration)
-    csv = b'\n'.join([b'Big,Boss,ACME Inc.,Supreme Leader,+1-202-555-1337,boss@example.com'])
-
-    with pytest.raises(UserValueError) as e:
-        import_registrations_from_csv(dummy_regform, BytesIO(csv))
-    assert 'a registration with this email already exists' in str(e.value)
-    assert 'Row 1' in str(e.value)
-
-    # missing first name
-    csv = b'\n'.join([b'Ray,Doe,ACME Inc.,Regional Manager,+1-202-555-0140,rdoe@example.com',
-                      b',Buggy,ACME Inc.,CEO,,buggy@example.com'])
-
-    with pytest.raises(UserValueError) as e:
-        import_registrations_from_csv(dummy_regform, BytesIO(csv))
-    assert 'missing first' in str(e.value)
-    assert 'Row 2' in str(e.value)
+    # the trailing comma in the headers creates an extra column
+    assert skipped == 1
 
 
 @pytest.mark.parametrize(('start_dt', 'end_dt', 'include_scheduled', 'expected_regform_flag'), (
@@ -194,3 +172,60 @@ def test_get_registered_event_persons(dummy_event, dummy_user, dummy_regform):
 
     registered_persons = get_registered_event_persons(dummy_event)
     assert registered_persons == {user_person, no_user_person}
+
+
+_csv_header_def = [
+    'first_name:Personal Data#First Name,'
+    'last_name:Personal Data#Last Name,'
+    'affiliation:Personal Data#Affiliation,'
+    'position:Personal Data#Position,'
+    'phone:Personal Data#Phone Number,'
+    'email:Personal Data#Email Address,'
+]
+_csv_header_no_mail = [
+    'first_name:Personal Data#First Name,'
+    'last_name:Personal Data#Last Name,'
+    'affiliation:Personal Data#Affiliation,'
+    'position:Personal Data#Position,'
+    'phone:Personal Data#Phone Number,'
+]
+
+
+@pytest.mark.parametrize(
+    'csv_content,csv_header,expected,row', [
+        ([b'John,Doe,ACME Inc.,Regional Manager,+1-202-555-0140,jdoe@example.com', b'Buggy,Entry,ACME Inc.,CEO,'],
+         _csv_header_no_mail, 'Missing required fields', 0),
+        ([b'John,Doe,ACME Inc.,Regional Manager,+1-202-555-0140,jdoe@example.com', b'Buggy,Entry,ACME Inc.,CEO,'],
+         _csv_header_def, 'missing e-mail', 2),
+        ([
+            b'Bill,Doe,ACME Inc.,Regional Manager,+1-202-555-0140,bdoe@example.com',
+            b'Buggy,Entry,ACME Inc.,CEO,,not-an-email'
+        ], _csv_header_def, 'invalid e-mail', 2),
+        ([
+            b'Bill,Doe,ACME Inc.,Regional Manager,+1-202-555-0140,bdoe@example.com',
+            b'Bob,Doe,ACME Inc.,Boss,,bdoe@example.com'
+        ], _csv_header_def, 'email address is not unique', 2),
+        ([b'Big,Boss,ACME Inc.,Supreme Leader,+1-202-555-1337,boss@example.com'], _csv_header_def,
+         'a registration with this email already exists', 1),
+        ([
+            b'Ray,Doe,ACME Inc.,Regional Manager,+1-202-555-0140,rdoe@example.com',
+            b',Buggy,ACME Inc.,CEO,,buggy@example.com'
+        ], _csv_header_def, 'missing first', 2),
+    ],
+    ids=[
+        'missing column', 'missing email', 'invalid email', 'duplicate email(csv)', 'duplicate email(registration)',
+        'missing first name'
+    ])
+def test_import_error(dummy_regform, csv_content, csv_header, expected, row):
+    create_registration(
+        dummy_regform, {'email': 'boss@example.com',
+                        'first_name': 'Big',
+                        'last_name': 'Boss'}, notify_user=False)
+
+    with pytest.raises(UserValueError) as e:
+        import_registrations_from_csv(dummy_regform, _dummy_csv(csv_content, csv_header))
+    assert expected in e.value.args[0]
+    if row != 0:
+        assert 'Row {}'.format(row) in e.value.args[0]
+    else:
+        assert 'Header:' in e.value.args[0]
