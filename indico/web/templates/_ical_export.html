@@ -8,6 +8,7 @@
 
     {% block extra_download %}{% endblock %}
 
+    {% block persistent_ui %}
     <div id="iCalSeparator{{ item.id }}" class="icalSeparator" style="display: none;"></div>
     <div id="exportICalDialogs" style="display: none;">
         <div id="agreementApiKey{{ item.id }}">
@@ -62,6 +63,7 @@
             {% block extra_info %}{% endblock %}
         </div>
     </div>
+    {% endblock %}
 </div>
 
 {% block javascript %}
