@@ -152,24 +152,20 @@ class RHExportDashboardICS(RHTokenProtected):
         'limit': fields.Integer(missing=100, validate=lambda v: 0 < v <= 500)
     }, location='query')
     def _process(self, from_, include, limit):
-        categories = get_related_categories(self.user)
-        categories_events = []
-        if categories:
-            category_ids = {c['categ'].id for c in categories.values()}
-            categories_events = get_events_in_categories(category_ids, self.user, limit=limit)
-
-        linked_events = get_linked_events(
-            self.user,
-            from_,
-            limit=limit,
-            load_also=('description', 'own_room_id', 'own_venue_id', 'own_room_name', 'own_venue_name')
-        )
-
         all_events = set()
+
         if 'linked' in include:
-            all_events |= set(linked_events)
-        if 'categories' in include:
-            all_events |= set(categories_events)
+            all_events |= set(get_linked_events(
+                self.user,
+                from_,
+                limit=limit,
+                load_also=('description', 'own_room_id', 'own_venue_id', 'own_room_name', 'own_venue_name')
+            ))
+
+        if 'categories' in include and (categories := get_related_categories(self.user)):
+            category_ids = {c['categ'].id for c in categories.values()}
+            all_events |= set(get_events_in_categories(category_ids, self.user, limit=limit))
+
         all_events = sorted(all_events, key=lambda e: (e.start_dt, e.id))[:limit]
 
         response = {'results': [serialize_event_for_ical(event, 'events') for event in all_events]}
