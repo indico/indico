@@ -183,6 +183,9 @@
                 This registration is {{ state }}
             {%- endtrans %}
         </div>
+        {% if registration.state.name == 'rejected' and registration.rejection_reason %}
+            {% trans reason=registration.rejection_reason %}Reason: {{ reason }}{% endtrans %}
+        {% endif %}
     </div>
     <div class="toolbar hide-if-locked">
         {% set action = _('Reset rejection') if registration.state.name == 'rejected' else _('Reset withdrawal') %}
