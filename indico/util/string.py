@@ -318,7 +318,7 @@ def text_to_repr(text, html=False, max_length=50):
 def alpha_enum(value):
     """Convert integer to ordinal letter code (a, b, c, ... z, aa, bb, ...)."""
     max_len = len(string.ascii_lowercase)
-    return str(string.ascii_lowercase[value % max_len] * (value / max_len + 1))
+    return str(string.ascii_lowercase[value % max_len] * (value // max_len + 1))
 
 
 def format_repr(obj, *args, **kwargs):

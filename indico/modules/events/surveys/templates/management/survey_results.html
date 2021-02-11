@@ -113,7 +113,7 @@
             <div class="axis-x-label">{% trans %}# of times chosen{% endtrans %}</div>
         {% endif %}
         <div class="survey-{{ chart_type }}-chart"
-            data-labels="{{ (summary.labels if short_labels else summary.absolute.keys())|tojson|forceescape }}"
+            data-labels="{{ (summary.labels if short_labels else summary.absolute|list)|tojson|forceescape }}"
             data-series-absolute="{{ summary.absolute.values() }}"
             data-series-relative="{{ summary.relative.values() }}"></div>
     </div>
