@@ -60,7 +60,7 @@ class DesignerPDFBase:
         self.backside_tpl_data = None
         if template.backside_template:
             self.backside_tpl_data = self._process_tpl_data(template.backside_template.data)
-        self.page_size = getattr(pagesizes, self.config.page_size.name)
+        self.page_size = self.config.page_size.size
         if self.config.page_orientation == PageOrientation.landscape:
             self.page_size = pagesizes.landscape(self.page_size)
         self.width, self.height = self.page_size

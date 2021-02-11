@@ -7,12 +7,13 @@
 
 import os
 
-from flask import Response, current_app, redirect, send_from_directory
+from flask import Response, current_app, redirect, request, send_from_directory
 from werkzeug.exceptions import NotFound
 
 import indico
 from indico.core.config import config
 from indico.core.plugins import plugin_engine
+from indico.util.i18n import get_all_locales
 from indico.web.assets.vars_js import generate_global_file, generate_i18n_file, generate_user_file
 from indico.web.flask.util import send_file, url_for
 from indico.web.flask.wrappers import IndicoBlueprint
@@ -87,8 +88,15 @@ def i18n_locale_react(locale_name):
 def _get_i18n_locale(locale_name, react=False):
     """Retrieve a locale in a Jed-compatible format."""
 
-    react_suffix = '-react' if react else ''
+    # Ensure we have a valid locale. en_GB is our source locale and thus always considered
+    # valid, even if it doesn't exist (dev setup where the user did not compile any locales)
+    # since otherwise we'd have no valid locales at all and get a redirect loop
+    all_locales = get_all_locales()
+    if locale_name not in all_locales and locale_name != 'en_GB':
+        fallback = config.DEFAULT_LOCALE if config.DEFAULT_LOCALE in all_locales else 'en_GB'
+        return redirect(url_for(request.endpoint, locale_name=fallback))
 
+    react_suffix = '-react' if react else ''
     try:
         cache_file = os.path.join(config.CACHE_DIR, 'assets_i18n_{}{}_{}_{}.js'.format(
             locale_name, react_suffix, indico.__version__, config.hash))

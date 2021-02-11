@@ -39,7 +39,7 @@ from indico.modules.auth.providers import IndicoAuthProvider, IndicoIdentityProv
 from indico.modules.auth.util import url_for_login, url_for_logout
 from indico.modules.oauth import oauth
 from indico.util import date_time as date_time_util
-from indico.util.i18n import _, babel, get_current_locale, gettext_context, ngettext_context
+from indico.util.i18n import _, babel, get_all_locales, get_current_locale, gettext_context, ngettext_context
 from indico.util.mimetypes import icon_from_mimetype
 from indico.util.signals import values_from_signal
 from indico.util.string import RichMarkup, alpha_enum, crc32, html_to_plaintext, sanitize_html, slugify
@@ -369,6 +369,8 @@ def make_app(set_path=False, testing=False, config_override=None):
         celery.init_app(app)
         cache.init_app(app)
         babel.init_app(app)
+        if config.DEFAULT_LOCALE not in get_all_locales():
+            Logger.get('i18n').error('Configured DEFAULT_LOCALE ({}) does not exist'.format(config.DEFAULT_LOCALE))
         multipass.init_app(app)
         oauth.init_app(app)
         webpack.init_app(app)

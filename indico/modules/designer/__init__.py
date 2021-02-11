@@ -6,6 +6,8 @@
 # LICENSE file for more details.
 
 from flask import session
+from reportlab.lib import pagesizes
+from reportlab.lib.units import mm
 
 from indico.core import signals
 from indico.util.enum import RichIntEnum
@@ -27,7 +29,20 @@ class PageOrientation(RichIntEnum):
 
 
 class PageSize(RichIntEnum):
-    __titles__ = [None, 'A0', 'A1', 'A2', 'A3', 'A4', 'A5', 'Letter', 'A6']
+    __titles__ = [None, 'A0', 'A1', 'A2', 'A3', 'A4', 'A5', 'Letter', 'A6', 'ID-1']
+    __page_sizes__ = {
+        'A0': pagesizes.A0,
+        'A1': pagesizes.A1,
+        'A2': pagesizes.A2,
+        'A3': pagesizes.A3,
+        'A4': pagesizes.A4,
+        'A5': pagesizes.A5,
+        'A6': pagesizes.A6,
+        'letter': pagesizes.LETTER,
+        # https://www.iso.org/standard/31432.html
+        'ID_1': (53.98*mm, 85.6*mm),
+    }
+
     A0 = 1
     A1 = 2
     A2 = 3
@@ -36,6 +51,11 @@ class PageSize(RichIntEnum):
     A5 = 6
     letter = 7
     A6 = 8
+    ID_1 = 9
+
+    @property
+    def size(self):
+        return self.__page_sizes__[self.name]
 
 
 class PageLayout(RichIntEnum):

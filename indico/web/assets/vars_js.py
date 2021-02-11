@@ -39,8 +39,10 @@ def get_locale_data(path, name, domain, react=False):
 
 
 def generate_i18n_file(locale_name, react=False):
-    if locale_name not in get_all_locales():
-        return None
+    all_locales = get_all_locales()
+    if locale_name not in all_locales:
+        locale_name = config.DEFAULT_LOCALE if config.DEFAULT_LOCALE in all_locales else 'en_GB'
+
     root_path = os.path.join(current_app.root_path, 'translations')
     i18n_data = get_locale_data(root_path, locale_name, 'indico', react=react)
     if not i18n_data:
