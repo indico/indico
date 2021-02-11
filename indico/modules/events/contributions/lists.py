@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from collections import OrderedDict
 from datetime import timedelta
 from operator import attrgetter
 
@@ -37,23 +36,21 @@ class ContributionListGenerator(ListGeneratorBase):
         session_empty = {None: _('No session')}
         track_empty = {None: _('No track')}
         type_empty = {None: _('No type')}
-        session_choices = OrderedDict((str(s.id), s.title) for s in sorted(self.event.sessions,
-                                                                           key=attrgetter('title')))
-        track_choices = OrderedDict((str(t.id), t.title) for t in sorted(self.event.tracks, key=attrgetter('title')))
-        type_choices = OrderedDict((str(t.id), t.name) for t in sorted(self.event.contribution_types,
-                                                                       key=attrgetter('name')))
-        self.static_items = OrderedDict([
-            ('session', {'title': _('Session'),
-                         'filter_choices': OrderedDict(session_empty | session_choices)}),
-            ('track', {'title': _('Track'),
-                       'filter_choices': OrderedDict(track_empty | track_choices)}),
-            ('type', {'title': _('Type'),
-                      'filter_choices': OrderedDict(type_empty | type_choices)}),
-            ('status', {'title': _('Status'), 'filter_choices': {'scheduled': _('Scheduled'),
-                                                                 'unscheduled': _('Not scheduled')}}),
-            ('speakers', {'title': _('Speakers'), 'filter_choices': {'registered': _('Registered'),
-                                                                     'not_registered': _('Not registered')}})
-        ])
+        session_choices = {str(s.id): s.title for s in sorted(self.event.sessions, key=attrgetter('title'))}
+        track_choices = {str(t.id): t.title for t in sorted(self.event.tracks, key=attrgetter('title'))}
+        type_choices = {str(t.id): t.name for t in sorted(self.event.contribution_types, key=attrgetter('name'))}
+        self.static_items = {
+            'session': {'title': _('Session'),
+                        'filter_choices': session_empty | session_choices},
+            'track': {'title': _('Track'),
+                      'filter_choices': track_empty | track_choices},
+            'type': {'title': _('Type'),
+                     'filter_choices': type_empty | type_choices},
+            'status': {'title': _('Status'), 'filter_choices': {'scheduled': _('Scheduled'),
+                                                                'unscheduled': _('Not scheduled')}},
+            'speakers': {'title': _('Speakers'), 'filter_choices': {'registered': _('Registered'),
+                                                                    'not_registered': _('Not registered')}},
+        }
 
         self.list_config = self._get_config()
 

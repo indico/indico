@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from collections import OrderedDict
 from datetime import datetime
 from datetime import time as dt_time
 from datetime import timedelta
@@ -166,7 +165,7 @@ def format_human_timedelta(delta, granularity='seconds', narrow=False):
     }
     if narrow:
         long_names = short_names
-    values = OrderedDict((key, 0) for key in field_order)
+    values = {key: 0 for key in field_order}
     values['seconds'] = delta.total_seconds()
     values['days'], values['seconds'] = divmod(values['seconds'], 86400)
     values['hours'], values['seconds'] = divmod(values['seconds'], 3600)
@@ -182,7 +181,7 @@ def format_human_timedelta(delta, granularity='seconds', narrow=False):
         used_fields.add(available_fields.pop(0))
     for key in available_fields:
         values[key] = 0
-    nonzero = OrderedDict((k, v) for k, v in values.items() if v)
+    nonzero = {k: v for k, v in values.items() if v}
     if not nonzero:
         return long_names[granularity](0)
     elif len(nonzero) == 1:

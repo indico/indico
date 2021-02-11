@@ -5,7 +5,7 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from collections import OrderedDict, defaultdict
+from collections import defaultdict
 from datetime import date, datetime, time
 from itertools import chain, groupby
 from operator import attrgetter, itemgetter
@@ -101,7 +101,7 @@ def get_existing_rooms_occurrences(rooms, start_dt, end_dt, repeat_frequency, re
 
 def get_rooms_availability(rooms, start_dt, end_dt, repeat_frequency, repeat_interval, skip_conflicts_with=None,
                            admin_override_enabled=False, skip_past_conflicts=False):
-    availability = OrderedDict()
+    availability = {}
     candidates = ReservationOccurrence.create_series(start_dt, end_dt, (repeat_frequency, repeat_interval))
     date_range = sorted({cand.start_dt.date() for cand in candidates})
     occurrences = get_existing_rooms_occurrences(rooms, start_dt.replace(hour=0, minute=0),
@@ -224,13 +224,13 @@ def get_room_calendar(start_date, end_date, room_ids, include_inactive=False, **
                                                                          explicit=True))
     dates = [d.date() for d in iterdays(start_dt, end_dt)]
 
-    calendar = OrderedDict((room.id, {
+    calendar = {room.id: {
         'room_id': room.id,
         'nonbookable_periods': group_nonbookable_periods(nonbookable_periods.get(room.id, []), dates),
         'unbookable_hours': unbookable_hours.get(room.id, []),
         'blockings': group_blockings(nonoverridable_blocked_rooms.get(room.id, []), dates),
         'overridable_blockings': group_blockings(overridable_blocked_rooms.get(room.id, []), dates),
-    }) for room in rooms)
+    } for room in rooms}
 
     for room_id, occurrences in occurrences_by_room:
         occurrences = list(occurrences)

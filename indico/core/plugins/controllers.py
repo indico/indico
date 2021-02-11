@@ -5,7 +5,7 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from collections import OrderedDict, defaultdict
+from collections import defaultdict
 from operator import attrgetter
 
 from flask import flash, request
@@ -38,7 +38,7 @@ class RHPlugins(RHPluginsBase):
         # listed in the front
         for category in categories:
             categories[category].sort(key=attrgetter('configurable', 'title'))
-        ordered_categories = OrderedDict(sorted(categories.items()))
+        ordered_categories = dict(sorted(categories.items()))
         if other:
             ordered_categories[PluginCategory.other] = sorted(other, key=attrgetter('configurable', 'title'))
         return WPPlugins.render_template('index.html', categorized_plugins=ordered_categories)

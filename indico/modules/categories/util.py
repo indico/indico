@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from collections import OrderedDict
 from datetime import date, timedelta
 
 from pytz import timezone
@@ -35,7 +34,7 @@ def get_events_by_year(category_id=None):
 
     :param category_id: The category ID to get statistics for. Events
                         from subcategories are also included.
-    :return: An `OrderedDict` mapping years to event counts.
+    :return: A dictionary mapping years to event counts.
     """
     category_filter = Event.category_chain_overlaps(category_id) if category_id else True
     query = (db.session
@@ -45,7 +44,7 @@ def get_events_by_year(category_id=None):
                      category_filter)
              .order_by('year')
              .group_by('year'))
-    return OrderedDict(query)
+    return dict(query)
 
 
 def get_contribs_by_year(category_id=None):
@@ -54,7 +53,7 @@ def get_contribs_by_year(category_id=None):
     :param category_id: The category ID to get statistics for.
                         Contributions from subcategories are also
                         included.
-    :return: An `OrderedDict` mapping years to contribution counts.
+    :return: A dictionary mapping years to contribution counts.
     """
     category_filter = Event.category_chain_overlaps(category_id) if category_id else True
     query = (db.session
@@ -66,7 +65,7 @@ def get_contribs_by_year(category_id=None):
                      category_filter)
              .order_by('year')
              .group_by('year'))
-    return OrderedDict(query)
+    return dict(query)
 
 
 def get_min_year(category_id=None):

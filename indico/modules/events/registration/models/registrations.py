@@ -7,7 +7,6 @@
 
 import posixpath
 import time
-from collections import OrderedDict
 from decimal import Decimal
 from uuid import uuid4
 
@@ -374,7 +373,7 @@ class Registration(db.Model):
             for section in self.registration_form.sections:
                 if not section.is_visible:
                     continue
-                summary[section] = OrderedDict()
+                summary[section] = {}
                 for field in section.fields:
                     if not field.is_visible:
                         continue
@@ -383,11 +382,11 @@ class Registration(db.Model):
         def _fill_from_registration():
             for field, data in field_summary.items():
                 section = field.parent
-                summary.setdefault(section, OrderedDict())
+                summary.setdefault(section, {})
                 if field not in summary[section]:
                     summary[section][field] = data
 
-        summary = OrderedDict()
+        summary = {}
         field_summary = {x.field_data.field: x for x in self.data}
         _fill_from_regform()
         _fill_from_registration()

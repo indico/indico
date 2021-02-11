@@ -6,7 +6,7 @@
 # LICENSE file for more details.
 
 import itertools
-from collections import OrderedDict, defaultdict
+from collections import defaultdict
 
 from flask import flash, jsonify, redirect, request, session
 from marshmallow import fields
@@ -94,7 +94,7 @@ class RHPersonsBase(RHManageEventBase):
         event_strategy.joinedload('person').joinedload('user')
 
         chairpersons = {link.person for link in self.event.person_links}
-        persons = defaultdict(lambda: {'roles': OrderedDict(),
+        persons = defaultdict(lambda: {'roles': {},
                                        'registrations': [],
                                        'has_event_person': True,
                                        'id_field_name': 'person_id'})
@@ -162,12 +162,12 @@ class RHPersonsBase(RHManageEventBase):
             event_user_roles_data = {}
             for role in event_user_roles[event_person.user]:
                 event_user_roles_data[f'custom_{role.id}'] = {'name': role.name, 'code': role.code, 'css': role.css}
-            event_user_roles_data = OrderedDict(sorted(list(event_user_roles_data.items()), key=lambda t: t[1]['code']))
-            data['roles'] = OrderedDict(data['roles'] | event_user_roles_data)
+            event_user_roles_data = dict(sorted(event_user_roles_data.items(), key=lambda t: t[1]['code']))
+            data['roles'] = data['roles'] | event_user_roles_data
 
             event_person_users.add(event_person.user)
 
-        internal_role_users = defaultdict(lambda: {'roles': OrderedDict(),
+        internal_role_users = defaultdict(lambda: {'roles': {},
                                                    'person': [],
                                                    'has_event_person': False,
                                                    'id_field_name': 'user_id'})
@@ -178,7 +178,7 @@ class RHPersonsBase(RHManageEventBase):
                 user_metadata = internal_role_users[user.email]
                 user_metadata['person'] = user
                 user_metadata['roles'][f'custom_{role.id}'] = {'name': role.name, 'code': role.code, 'css': role.css}
-            user_metadata['roles'] = OrderedDict(sorted(user_metadata['roles'].items(), key=lambda x: x[1]['code']))
+            user_metadata['roles'] = dict(sorted(user_metadata['roles'].items(), key=lambda x: x[1]['code']))
 
         # Some EventPersons will have no roles since they were connected to deleted things
         persons = {email: data for email, data in persons.items() if any(data['roles'].values())}

@@ -5,8 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from collections import OrderedDict
-
 from flask import request
 from sqlalchemy.orm import joinedload
 
@@ -32,31 +30,31 @@ class RegistrationListGenerator(ListGeneratorBase):
             'items': ('title', 'email', 'affiliation', 'reg_date', 'state'),
             'filters': {'fields': {}, 'items': {}}
         }
-        self.static_items = OrderedDict([
-            ('reg_date', {
+        self.static_items = {
+            'reg_date': {
                 'title': _('Registration Date'),
-            }),
-            ('price', {
+            },
+            'price': {
                 'title': _('Price'),
-            }),
-            ('state', {
+            },
+            'state': {
                 'title': _('State'),
                 'filter_choices': {str(state.value): state.title for state in RegistrationState}
-            }),
-            ('checked_in', {
+            },
+            'checked_in': {
                 'title': _('Checked in'),
                 'filter_choices': {
                     '0': _('No'),
                     '1': _('Yes')
                 }
-            }),
-            ('checked_in_date', {
+            },
+            'checked_in_date': {
                 'title': _('Check-in date'),
-            }),
-            ('payment_date', {
+            },
+            'payment_date': {
                 'title': _('Payment date'),
-            })
-        ])
+            },
+        }
         self.personal_items = ('title', 'first_name', 'last_name', 'email', 'position', 'affiliation', 'address',
                                'phone', 'country')
         self.list_config = self._get_config()

@@ -7,7 +7,6 @@
 
 import hashlib
 import os
-from collections import OrderedDict
 from datetime import datetime
 from io import BytesIO
 from operator import itemgetter
@@ -77,7 +76,7 @@ def get_related_categories(user, detailed=True):
             'managed': categ in managed,
             'path': truncate_path(categ.chain_titles[:-1], chars=50)
         }
-    return OrderedDict(sorted(list(res.items()), key=itemgetter(0)))
+    return dict(sorted(res.items(), key=itemgetter(0)))
 
 
 def get_suggested_categories(user):
@@ -124,7 +123,7 @@ def get_linked_events(user, dt, limit=None, load_also=()):
     from indico.modules.events.util import (get_events_created_by, get_events_managed_by,
                                             get_events_with_linked_event_persons)
 
-    links = OrderedDict()
+    links = {}
     for event_id in get_events_registered(user, dt):
         links.setdefault(event_id, set()).add('registration_registrant')
     for event_id in get_events_with_submitted_surveys(user, dt):
@@ -147,7 +146,7 @@ def get_linked_events(user, dt, limit=None, load_also=()):
         links.setdefault(event_id, set()).update(roles)
 
     if not links:
-        return OrderedDict()
+        return {}
 
     query = (Event.query
              .filter(~Event.is_deleted,
@@ -160,7 +159,7 @@ def get_linked_events(user, dt, limit=None, load_also=()):
              .order_by(Event.start_dt, Event.id))
     if limit is not None:
         query = query.limit(limit)
-    return OrderedDict((event, links[event.id]) for event in query)
+    return {event: links[event.id] for event in query}
 
 
 def serialize_user(user):

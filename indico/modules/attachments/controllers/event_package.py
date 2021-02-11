@@ -6,7 +6,6 @@
 # LICENSE file for more details.
 
 import os
-from collections import OrderedDict
 
 from celery.exceptions import TimeoutError
 from flask import flash, jsonify, request, session
@@ -200,11 +199,12 @@ class AttachmentPackageMixin(AttachmentPackageGeneratorMixin):
     def _prepare_form(self):
         form = AttachmentPackageForm(obj=FormDefaults(filter_type='all'))
         form.dates.choices = list(self._iter_event_days())
-        filter_types = OrderedDict()
-        filter_types['all'] = _('Everything')
-        filter_types['sessions'] = _('Specific sessions')
-        filter_types['contributions'] = _('Specific contributions')
-        filter_types['dates'] = _('Specific days')
+        filter_types = {
+            'all': _('Everything'),
+            'sessions': _('Specific sessions'),
+            'contributions': _('Specific contributions'),
+            'dates': _('Specific days'),
+        }
 
         form.sessions.choices = self._load_session_data()
         if not form.sessions.choices:

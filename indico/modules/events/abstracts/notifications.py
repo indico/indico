@@ -6,7 +6,6 @@
 # LICENSE file for more details.
 
 import itertools
-from collections import OrderedDict
 
 from flask import session
 
@@ -32,9 +31,9 @@ class EmailNotificationCondition(Condition):
     def get_available_values(cls, event=None, **kwargs):
         choices = cls._iter_available_values(event=event, **kwargs)
         if not cls.required:
-            return OrderedDict(itertools.chain([('*', cls.any_caption), ('', cls.none_caption)], choices))
+            return dict(itertools.chain([('*', cls.any_caption), ('', cls.none_caption)], choices))
         else:
-            return OrderedDict(choices)
+            return dict(choices)
 
     @classmethod
     def _iter_available_values(cls, event, **kwargs):

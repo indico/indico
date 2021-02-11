@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from collections import OrderedDict
 from datetime import datetime, timedelta
 
 from dateutil import rrule
@@ -31,15 +30,15 @@ REPEAT_FORM_MAP = {
     'pattern': CloneRepeatPatternForm
 }
 
-RRULE_FREQ_MAP = OrderedDict([
-    ('years', rrule.YEARLY),
-    ('months', rrule.MONTHLY),
-    ('weeks', rrule.WEEKLY),
-    ('days', rrule.DAILY),
-    ('hours', rrule.HOURLY),
-    ('minutes', rrule.MINUTELY),
-    ('seconds', rrule.SECONDLY)
-])
+RRULE_FREQ_MAP = {
+    'years': rrule.YEARLY,
+    'months': rrule.MONTHLY,
+    'weeks': rrule.WEEKLY,
+    'days': rrule.DAILY,
+    'hours': rrule.HOURLY,
+    'minutes': rrule.MINUTELY,
+    'seconds': rrule.SECONDLY,
+}
 
 
 def relativedelta_to_rrule_interval(rdelta):

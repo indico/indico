@@ -5,8 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from collections import OrderedDict
-
 from indico.modules.events.management.settings import program_codes_settings
 from indico.util.date_time import format_datetime
 from indico.util.i18n import _
@@ -34,11 +32,11 @@ def generate_program_codes(event, object_type, objects):
         raise ValueError(f'Invalid object type: {object_type}')
 
     template = program_codes_settings.get(event, template_setting)
-    return OrderedDict(
-        (obj, (replace_placeholders(context, template, escape_html=False, **{kwarg: obj}),
-               get_empty_placeholders(context, template, **{kwarg: obj})))
+    return {
+        obj: (replace_placeholders(context, template, escape_html=False, **{kwarg: obj}),
+              get_empty_placeholders(context, template, **{kwarg: obj}))
         for obj in objects
-    )
+    }
 
 
 def _make_date_placeholder(class_name, name, render_kwarg, date_format, description, transform=None):

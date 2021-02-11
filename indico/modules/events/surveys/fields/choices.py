@@ -6,7 +6,7 @@
 # LICENSE file for more details.
 
 import uuid
-from collections import Counter, OrderedDict
+from collections import Counter
 from copy import deepcopy
 
 from indico.modules.events.surveys.fields.base import SurveyField
@@ -38,8 +38,8 @@ class SurveySingleChoiceField(_AddUUIDMixin, SingleChoiceField, SurveyField):
             options.append(no_option)
         return {'total': total,
                 'labels': [alpha_enum(val).upper() for val in range(len(options))],
-                'absolute': OrderedDict((opt['option'], counter[opt['id']]) for opt in options),
-                'relative': OrderedDict((opt['option'], counter[opt['id']] / total) for opt in options)}
+                'absolute': {opt['option']: counter[opt['id']] for opt in options},
+                'relative': {opt['option']: counter[opt['id']] / total for opt in options}}
 
 
 class SurveyMultiSelectField(_AddUUIDMixin, MultiSelectField, SurveyField):
@@ -51,5 +51,5 @@ class SurveyMultiSelectField(_AddUUIDMixin, MultiSelectField, SurveyField):
         options = self.object.field_data['options']
         return {'total': total,
                 'labels': [alpha_enum(val).upper() for val in range(len(options))],
-                'absolute': OrderedDict((opt['option'], counter[opt['id']]) for opt in options),
-                'relative': OrderedDict((opt['option'], counter[opt['id']] / total if total else 0) for opt in options)}
+                'absolute': {opt['option']: counter[opt['id']] for opt in options},
+                'relative': {opt['option']: counter[opt['id']] / total if total else 0 for opt in options}}

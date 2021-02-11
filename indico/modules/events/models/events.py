@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from collections import OrderedDict
 from contextlib import contextmanager
 from datetime import timedelta
 from operator import attrgetter
@@ -802,7 +801,7 @@ class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionMan
                                chairpersons (or lecture speakers)
         :param extra: An email address that is always included, even
                       if it is not in any of the included lists.
-        :return: An OrderedDict mapping emails to pretty names
+        :return: A dictionary mapping emails to pretty names
         """
         emails = {}
         # Contact/Support
@@ -831,7 +830,7 @@ class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionMan
                   for email, name in emails.items()
                   if email and email.strip()}
         own_email = session.user.email if has_request_context() and session.user else None
-        return OrderedDict(sorted(list(emails.items()), key=lambda x: (x[0] != own_email, x[1].lower())))
+        return dict(sorted(list(emails.items()), key=lambda x: (x[0] != own_email, x[1].lower())))
 
     @memoize_request
     def has_feature(self, feature):

@@ -6,7 +6,6 @@
 # LICENSE file for more details.
 
 import json
-from collections import OrderedDict
 from datetime import time, timedelta
 
 import dateutil.parser
@@ -46,12 +45,12 @@ class TimeDeltaField(Field):
         'hours': 'Hours',
         'days': 'Days'
     }
-    magnitudes = OrderedDict([
-        ('days', 86400),
-        ('hours', 3600),
-        ('minutes', 60),
-        ('seconds', 1)
-    ])
+    magnitudes = {
+        'days': 86400,
+        'hours': 3600,
+        'minutes': 60,
+        'seconds': 1,
+    }
 
     def __init__(self, *args, **kwargs):
         self.units = kwargs.pop('units', ('hours', 'days'))
@@ -123,15 +122,15 @@ class RelativeDeltaField(Field):
         'months': 'Months',
         'years': 'Years'
     }
-    magnitudes = OrderedDict([
-        ('years', relativedelta(years=1)),
-        ('months', relativedelta(months=1)),
-        ('weeks', relativedelta(weeks=1)),
-        ('days', relativedelta(days=1)),
-        ('hours', relativedelta(hours=1)),
-        ('minutes', relativedelta(minutes=1)),
-        ('seconds', relativedelta(seconds=1))
-    ])
+    magnitudes = {
+        'years': relativedelta(years=1),
+        'months': relativedelta(months=1),
+        'weeks': relativedelta(weeks=1),
+        'days': relativedelta(days=1),
+        'hours': relativedelta(hours=1),
+        'minutes': relativedelta(minutes=1),
+        'seconds': relativedelta(seconds=1)
+    }
 
     def __init__(self, *args, **kwargs):
         self.units = kwargs.pop('units', ('hours', 'days'))

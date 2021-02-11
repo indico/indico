@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from collections import OrderedDict
 from datetime import timedelta
 
 import dateutil.parser
@@ -143,13 +142,3 @@ class ModelListConverter(SettingConverter):
         if not value:
             return []
         return self.collection_class(self.model.query.filter(self.column.in_(value)))
-
-
-class OrderedDictConverter(SettingConverter):
-    @staticmethod
-    def from_python(value):
-        return list(value.items())
-
-    @staticmethod
-    def to_python(value):
-        return OrderedDict(value)
