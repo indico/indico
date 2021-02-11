@@ -7,7 +7,6 @@
 
 import csv
 import itertools
-from collections import OrderedDict
 from operator import attrgetter
 
 from flask import current_app, json, session
@@ -303,17 +302,17 @@ def generate_spreadsheet_from_registrations(registrations, regform_items, static
     :param static_items: Registration form information as extra columns
     """
     field_names = ['ID', 'Name']
-    special_item_mapping = OrderedDict([
-        ('reg_date', ('Registration date', lambda x: x.submitted_dt)),
-        ('state', ('Registration state', lambda x: x.state.title)),
-        ('price', ('Price', lambda x: x.render_price())),
-        ('checked_in', ('Checked in', lambda x: x.checked_in)),
-        ('checked_in_date', ('Check-in date', lambda x: x.checked_in_dt if x.checked_in else '')),
-        ('payment_date', ('Payment date', lambda x: (x.transaction.timestamp
-                                                     if (x.transaction is not None and
-                                                         x.transaction.status == TransactionStatus.successful)
-                                                     else '')))
-    ])
+    special_item_mapping = {
+        'reg_date': ('Registration date', lambda x: x.submitted_dt),
+        'state': ('Registration state', lambda x: x.state.title),
+        'price': ('Price', lambda x: x.render_price()),
+        'checked_in': ('Checked in', lambda x: x.checked_in),
+        'checked_in_date': ('Check-in date', lambda x: x.checked_in_dt if x.checked_in else ''),
+        'payment_date': ('Payment date', lambda x: (x.transaction.timestamp
+                                                    if (x.transaction is not None and
+                                                        x.transaction.status == TransactionStatus.successful)
+                                                    else '')),
+    }
     for item in regform_items:
         field_names.append(unique_col(item.title, item.id))
         if item.input_type == 'accommodation':

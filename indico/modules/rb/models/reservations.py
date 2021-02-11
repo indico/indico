@@ -5,7 +5,7 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from collections import OrderedDict, defaultdict
+from collections import defaultdict
 from datetime import datetime
 
 from sqlalchemy import Date, Time
@@ -386,7 +386,7 @@ class Reservation(Serializer, db.Model):
             if offset:
                 query = query.offset(offset)
 
-        result = OrderedDict((r.id, {'reservation': r}) for r in query)
+        result = {r.id: {'reservation': r} for r in query}
 
         if 'occurrences' in args:
             occurrence_data = OrderedMultiDict(db.session.query(ReservationOccurrence.reservation_id,

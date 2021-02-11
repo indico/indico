@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from collections import OrderedDict
 from operator import attrgetter
 
 from indico.core import signals
@@ -68,8 +67,8 @@ class EventCloner:
 
     @classmethod
     def run_cloners(cls, old_event, new_event, cloners, n_occurrence=0, event_exists=False):
-        all_cloners = OrderedDict((name, cloner_cls(old_event, n_occurrence))
-                                  for name, cloner_cls in get_event_cloners().items())
+        all_cloners = {name: cloner_cls(old_event, n_occurrence)
+                       for name, cloner_cls in get_event_cloners().items()}
         if any(cloner.is_internal for name, cloner in all_cloners.items() if name in cloners):
             raise Exception('An internal cloner was selected')
 
@@ -88,7 +87,7 @@ class EventCloner:
                  for c in all_cloners.values()
                  if not c.is_available and c.always_available_dep and c.required_by_deep & cloners}
         cloners |= extra
-        active_cloners = OrderedDict((name, cloner) for name, cloner in all_cloners.items() if name in cloners)
+        active_cloners = {name: cloner for name, cloner in all_cloners.items() if name in cloners}
         if not all((c.is_internal or c.is_visible) and c.is_available
                    for c in active_cloners.values()
                    if c.name not in extra):
@@ -215,4 +214,4 @@ def get_event_cloners():
     order.
     """
     cloners = named_objects_from_signal(signals.event_management.get_cloners.send(), plugin_attr='plugin')
-    return OrderedDict(_resolve_dependencies(cloners))
+    return dict(_resolve_dependencies(cloners))

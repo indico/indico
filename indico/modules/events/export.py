@@ -9,7 +9,7 @@ import os
 import posixpath
 import re
 import tarfile
-from collections import OrderedDict, defaultdict
+from collections import defaultdict
 from datetime import date, datetime
 from io import BytesIO
 from operator import itemgetter
@@ -175,14 +175,14 @@ class EventExporter:
             tablespec.setdefault('skipif', None)
             tablespec.setdefault('order', None)
             tablespec.setdefault('allow_duplicates', False)
-            fks = OrderedDict()
+            fks = {}
             for fk_name in tablespec['fks']:
                 col = _resolve_col(fk_name)
                 fk = _get_single_fk(col)
                 fks.setdefault(fk.column.name, []).append(col)
             tablespec['fks'] = fks
-            tablespec['fks_out'] = OrderedDict((fk, _get_single_fk(db.metadata.tables[tablename].c[fk]).column)
-                                               for fk in tablespec['fks_out'])
+            tablespec['fks_out'] = {fk: _get_single_fk(db.metadata.tables[tablename].c[fk]).column
+                                    for fk in tablespec['fks_out']}
             return tablespec
 
         with open(os.path.join(current_app.root_path, 'modules', 'events', 'export.yaml')) as f:

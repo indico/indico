@@ -5,7 +5,7 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from collections import OrderedDict, defaultdict
+from collections import defaultdict
 from itertools import chain, count
 
 from sqlalchemy.exc import IntegrityError
@@ -127,10 +127,10 @@ class MenuEntryData:
 def _get_split_signal_entries():
     """Get the top-level and child menu entry data."""
     signal_entries = get_menu_entries_from_signal()
-    top_data = OrderedDict((name, data)
-                           for name, data in sorted(signal_entries.items(),
-                                                    key=lambda name_data: _menu_entry_key(name_data[1]))
-                           if not data.parent)
+    top_data = {name: data
+                for name, data in sorted(signal_entries.items(),
+                                         key=lambda name_data: _menu_entry_key(name_data[1]))
+                if not data.parent}
     child_data = defaultdict(list)
     for name, data in signal_entries.items():
         if data.parent is not None:

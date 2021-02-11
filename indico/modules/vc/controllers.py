@@ -5,7 +5,7 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from collections import OrderedDict, defaultdict
+from collections import defaultdict
 from operator import itemgetter
 
 from flask import flash, jsonify, redirect, request, session
@@ -356,6 +356,6 @@ class RHVCRoomList(RHProtected):
                                  key=lambda r: r.event.start_dt.date(),
                                  sort_by=lambda r: r.event.start_dt,
                                  sort_reverse=reverse)
-            results = OrderedDict(sorted(results.items(), key=itemgetter(0), reverse=reverse))
+            results = dict(sorted(results.items(), key=itemgetter(0), reverse=reverse))
         return WPVCService.render_template('vc_room_list.html', form=form, results=results,
                                            action=url_for('.vc_room_list'))

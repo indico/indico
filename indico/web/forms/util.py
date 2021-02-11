@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from collections import OrderedDict
 from copy import deepcopy
 
 from wtforms.fields.core import UnboundField
@@ -63,6 +62,6 @@ def inject_validators(form, field_name, validators, early=False):
         unbound.kwargs['validators'] = validators
     setattr(form, field_name, unbound)
     if form._unbound_fields is not None:
-        unbound_fields = OrderedDict(form._unbound_fields)
+        unbound_fields = dict(form._unbound_fields)
         unbound_fields[field_name] = unbound
         form._unbound_fields = list(unbound_fields.items())
