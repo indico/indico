@@ -224,13 +224,13 @@ def get_room_calendar(start_date, end_date, room_ids, include_inactive=False, **
                                                                          explicit=True))
     dates = [d.date() for d in iterdays(start_dt, end_dt)]
 
-    calendar = { room.id: {
+    calendar = {room.id: {
         'room_id': room.id,
         'nonbookable_periods': group_nonbookable_periods(nonbookable_periods.get(room.id, []), dates),
         'unbookable_hours': unbookable_hours.get(room.id, []),
         'blockings': group_blockings(nonoverridable_blocked_rooms.get(room.id, []), dates),
         'overridable_blockings': group_blockings(overridable_blocked_rooms.get(room.id, []), dates),
-    } for room in rooms }
+    } for room in rooms}
 
     for room_id, occurrences in occurrences_by_room:
         occurrences = list(occurrences)
