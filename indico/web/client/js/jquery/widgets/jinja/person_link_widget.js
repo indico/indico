@@ -436,22 +436,19 @@ import {FavoritesProvider} from 'indico/react/hooks';
         var hiddenData = JSON.parse($field.val());
         var hasError = false;
 
-        if (req.speaker && _.indexOf(_.pluck(hiddenData, 'isSpeaker'), true) === -1) {
+        if (req.speaker && !hiddenData.some(x => x.isSpeaker)) {
           hasError = true;
           $formField.data('error', $T.gettext('You must add at least one speaker'));
-        } else if (req.submitter && _.indexOf(_.pluck(hiddenData, 'isSubmitter'), true) === -1) {
+        } else if (req.submitter && !hiddenData.some(x => x.isSubmitter)) {
           hasError = true;
           $formField.data('error', $T.gettext('You must add at least one submitter'));
-        } else if (req.secondaryAuthor && _.indexOf(_.pluck(hiddenData, 'authorType'), 2) === -1) {
+        } else if (req.secondaryAuthor && !hiddenData.some(x => x.authorType === 2)) {
           hasError = true;
           $formField.data('error', $T.gettext('You must add at least one co-author'));
-        } else if (req.primaryAuthor && _.indexOf(_.pluck(hiddenData, 'authorType'), 1) === -1) {
+        } else if (req.primaryAuthor && !hiddenData.some(x => x.authorType === 1)) {
           hasError = true;
           $formField.data('error', $T.gettext('You must add at least one author'));
-        } else if (
-          !options.allow.speakers &&
-          _.indexOf(_.pluck(hiddenData, 'authorType'), 0) !== -1
-        ) {
+        } else if (!options.allow.speakers && hiddenData.some(x => x.authorType === 0)) {
           hasError = true;
           $formField.data(
             'error',
