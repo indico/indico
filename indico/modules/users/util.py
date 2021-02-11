@@ -76,7 +76,7 @@ def get_related_categories(user, detailed=True):
             'managed': categ in managed,
             'path': truncate_path(categ.chain_titles[:-1], chars=50)
         }
-    return dict(sorted(list(res.items()), key=itemgetter(0)))
+    return dict(sorted(res.items(), key=itemgetter(0)))
 
 
 def get_suggested_categories(user):

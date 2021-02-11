@@ -36,18 +36,16 @@ class ContributionListGenerator(ListGeneratorBase):
         session_empty = {None: _('No session')}
         track_empty = {None: _('No track')}
         type_empty = {None: _('No type')}
-        session_choices = {str(s.id): s.title for s in sorted(self.event.sessions,
-                                                              key=attrgetter('title'))}
+        session_choices = {str(s.id): s.title for s in sorted(self.event.sessions, key=attrgetter('title'))}
         track_choices = {str(t.id): t.title for t in sorted(self.event.tracks, key=attrgetter('title'))}
-        type_choices = {str(t.id): t.name for t in sorted(self.event.contribution_types,
-                                                          key=attrgetter('name'))}
+        type_choices = {str(t.id): t.name for t in sorted(self.event.contribution_types, key=attrgetter('name'))}
         self.static_items = {
             'session': {'title': _('Session'),
-                        'filter_choices': dict(session_empty | session_choices)},
+                        'filter_choices': session_empty | session_choices},
             'track': {'title': _('Track'),
-                      'filter_choices': dict(track_empty | track_choices)},
+                      'filter_choices': track_empty | track_choices},
             'type': {'title': _('Type'),
-                     'filter_choices': dict(type_empty | type_choices)},
+                     'filter_choices': type_empty | type_choices},
             'status': {'title': _('Status'), 'filter_choices': {'scheduled': _('Scheduled'),
                                                                 'unscheduled': _('Not scheduled')}},
             'speakers': {'title': _('Speakers'), 'filter_choices': {'registered': _('Registered'),

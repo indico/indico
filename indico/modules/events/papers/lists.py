@@ -37,10 +37,8 @@ class PaperListGeneratorBase(ListGeneratorBase):
         state_choices = {state.value: state.title for state in PaperRevisionState}
         unassigned_choices = {role.value: role.title for role in PaperReviewingRole}
         track_choices = {str(t.id): t.title for t in sorted(self.event.tracks, key=attrgetter('title'))}
-        session_choices = {str(s.id): s.title for s in sorted(self.event.sessions,
-                                                              key=attrgetter('title'))}
-        type_choices = {str(t.id): t.name for t in sorted(self.event.contribution_types,
-                                                          key=attrgetter('name'))}
+        session_choices = {str(s.id): s.title for s in sorted(self.event.sessions, key=attrgetter('title'))}
+        type_choices = {str(t.id): t.name for t in sorted(self.event.contribution_types, key=attrgetter('name'))}
 
         if not event.cfp.content_reviewing_enabled:
             del unassigned_choices[PaperReviewingRole.content_reviewer.value]
@@ -48,10 +46,10 @@ class PaperListGeneratorBase(ListGeneratorBase):
             del unassigned_choices[PaperReviewingRole.layout_reviewer.value]
 
         self.static_items = {
-            'state': {'title': _('State'), 'filter_choices': dict(state_not_submitted | state_choices)},
-            'track': {'title': _('Track'), 'filter_choices': dict(track_empty | track_choices)},
-            'session': {'title': _('Session'), 'filter_choices': dict(session_empty | session_choices)},
-            'type': {'title': _('Type'), 'filter_choices': dict(type_empty | type_choices)},
+            'state': {'title': _('State'), 'filter_choices': state_not_submitted | state_choices},
+            'track': {'title': _('Track'), 'filter_choices': track_empty | track_choices},
+            'session': {'title': _('Session'), 'filter_choices': session_empty | session_choices},
+            'type': {'title': _('Type'), 'filter_choices': type_empty | type_choices},
             'unassigned': {'title': _('Unassigned'), 'filter_choices': unassigned_choices},
         }
         self.list_config = self._get_config()
@@ -183,9 +181,11 @@ class PaperJudgingAreaListGeneratorDisplay(PaperListGeneratorBase):
             'items': ('state',),
             'filters': {'items': {}}
         }
-        judging_unassigned_choices = {role.value: role.title for role in PaperReviewingRole
-                                      if role is not PaperReviewingRole.judge}
-        self.static_items['unassigned']['filter_choices'] = judging_unassigned_choices
+        self.static_items['unassigned']['filter_choices'] = {
+            role.value: role.title
+            for role in sorted(PaperReviewingRole, key=attrgetter('title'))
+            if role is not PaperReviewingRole.judge
+        }
 
     def _build_query(self):
         query = super()._build_query()

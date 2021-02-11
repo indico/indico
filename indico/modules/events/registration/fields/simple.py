@@ -211,7 +211,7 @@ class CountryField(RegistrationFormFieldBase):
 
     @property
     def filter_choices(self):
-        return self.wtf_field_kwargs['choices']
+        return dict(self.wtf_field_kwargs['choices'])
 
     def get_friendly_data(self, registration_data, for_humans=False, for_search=False):
         if registration_data.data == 'None':

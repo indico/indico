@@ -162,8 +162,8 @@ class RHPersonsBase(RHManageEventBase):
             event_user_roles_data = {}
             for role in event_user_roles[event_person.user]:
                 event_user_roles_data[f'custom_{role.id}'] = {'name': role.name, 'code': role.code, 'css': role.css}
-            event_user_roles_data = dict(sorted(list(event_user_roles_data.items()), key=lambda t: t[1]['code']))
-            data['roles'] = dict(data['roles'] | event_user_roles_data)
+            event_user_roles_data = dict(sorted(event_user_roles_data.items(), key=lambda t: t[1]['code']))
+            data['roles'] = data['roles'] | event_user_roles_data
 
             event_person_users.add(event_person.user)
 
