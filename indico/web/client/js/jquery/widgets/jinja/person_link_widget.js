@@ -11,14 +11,12 @@ import _ from 'lodash';
 import React from 'react';
 import ReactDOM from 'react-dom';
 
-import {Translate} from 'indico/react/i18n';
-
 import {UserSearch} from 'indico/react/components/principals/Search';
 import {FavoritesProvider} from 'indico/react/hooks';
+import {Translate} from 'indico/react/i18n';
+import {$T} from 'indico/utils/i18n';
 
 (function(global) {
-  'use strict';
-
   global.setupPersonLinkWidget = function setupPersonLinkWidget(options) {
     options = $.extend(
       true,
@@ -53,30 +51,32 @@ import {FavoritesProvider} from 'indico/react/hooks';
       options
     );
 
-    var $field = $('#' + options.fieldId);
-    var $fieldDisplay = $('#people-list-' + options.fieldId);
-    var $authorList = $fieldDisplay.find('#author-list-' + options.fieldId);
-    var $noAuthorPlaceholder = $fieldDisplay.find('#no-author-placeholder-' + options.fieldId);
-    var $coauthorList = $fieldDisplay.find('#coauthor-list-' + options.fieldId);
-    var $coauthorListTitle = $fieldDisplay.find('#coauthor-list-title-' + options.fieldId);
-    var $noCoauthorPlaceholder = $fieldDisplay.find('#no-coauthor-placeholder-' + options.fieldId);
-    var $otherList = $fieldDisplay.find('#other-list-' + options.fieldId);
-    var $otherListTitle = $fieldDisplay.find('#other-list-title-' + options.fieldId);
-    var $noOtherPlaceholder = $fieldDisplay.find('#no-other-placeholder-' + options.fieldId);
-    var $buttonAddNew = $('#add-new-' + options.fieldId);
-    var $buttonAddMyself = $('#add-myself-' + options.fieldId);
-    var $buttonAlphaOrder = $fieldDisplay.find('.alpha-order-switch');
-    var $form = $field.closest('form');
-    var customOrder = !$buttonAlphaOrder.hasClass('active');
-    var maxNewPersonID = 0;
+    const $field = $(`#${options.fieldId}`);
+    const $fieldDisplay = $(`#people-list-${options.fieldId}`);
+    const $authorList = $fieldDisplay.find(`#author-list-${options.fieldId}`);
+    const $noAuthorPlaceholder = $fieldDisplay.find(`#no-author-placeholder-${options.fieldId}`);
+    const $coauthorList = $fieldDisplay.find(`#coauthor-list-${options.fieldId}`);
+    const $coauthorListTitle = $fieldDisplay.find(`#coauthor-list-title-${options.fieldId}`);
+    const $noCoauthorPlaceholder = $fieldDisplay.find(
+      `#no-coauthor-placeholder-${options.fieldId}`
+    );
+    const $otherList = $fieldDisplay.find(`#other-list-${options.fieldId}`);
+    const $otherListTitle = $fieldDisplay.find(`#other-list-title-${options.fieldId}`);
+    const $noOtherPlaceholder = $fieldDisplay.find(`#no-other-placeholder-${options.fieldId}`);
+    const $buttonAddNew = $(`#add-new-${options.fieldId}`);
+    const $buttonAddMyself = $(`#add-myself-${options.fieldId}`);
+    const $buttonAlphaOrder = $fieldDisplay.find('.alpha-order-switch');
+    const $form = $field.closest('form');
+    let customOrder = !$buttonAlphaOrder.hasClass('active');
+    let maxNewPersonID = 0;
 
     function setNewPersonID(person) {
-      person.id = 'new-' + maxNewPersonID;
+      person.id = `new-${maxNewPersonID}`;
       maxNewPersonID++;
     }
 
     function updatePersonOrder() {
-      var people = _.map($fieldDisplay.find('.person-row'), function(e) {
+      const people = _.map($fieldDisplay.find('.person-row'), function(e) {
         return $(e).data('person');
       });
       people.forEach(function(person, i) {
@@ -86,7 +86,7 @@ import {FavoritesProvider} from 'indico/react/hooks';
     }
 
     function setupList(entryType, $list, sortedPeople) {
-      var isSortable = options.sort === true;
+      const isSortable = options.sort === true;
 
       $list.empty();
 
@@ -101,9 +101,9 @@ import {FavoritesProvider} from 'indico/react/hooks';
           tolerance: 'pointer',
           forceHelperSize: true,
           forcePlaceholderSize: true,
-          helper: function(e, item) {
-            var originals = item.children();
-            var helper = item.clone();
+          helper(e, item) {
+            const originals = item.children();
+            const helper = item.clone();
             helper.children().each(function(i) {
               $(this).width(originals.eq(i).width());
             });
@@ -128,10 +128,10 @@ import {FavoritesProvider} from 'indico/react/hooks';
       $coauthorList.empty();
       $otherList.empty();
 
-      var sortedPeople = _.clone(people);
+      const sortedPeople = _.clone(people);
       sortedPeople.sort(function(person1, person2) {
-        var k1 = person1.displayOrder + ' ' + getName(person1);
-        var k2 = person2.displayOrder + ' ' + getName(person2);
+        const k1 = `${person1.displayOrder} ${getName(person1)}`;
+        const k2 = `${person2.displayOrder} ${getName(person2)}`;
         return strnatcmp(k1, k2);
       });
 
@@ -141,13 +141,13 @@ import {FavoritesProvider} from 'indico/react/hooks';
       });
 
       if (options.authorTypes) {
-        var sortedAuthors = _.filter(sortedPeople, function(person) {
+        const sortedAuthors = _.filter(sortedPeople, function(person) {
           return person.authorType === options.authorTypes.primary;
         });
-        var sortedCoAuthors = _.filter(sortedPeople, function(person) {
+        const sortedCoAuthors = _.filter(sortedPeople, function(person) {
           return person.authorType === options.authorTypes.secondary;
         });
-        var sortedOthers = _.filter(sortedPeople, function(person) {
+        const sortedOthers = _.filter(sortedPeople, function(person) {
           return (
             !options.authorTypes ||
             person.authorType === options.authorTypes.none ||
@@ -172,24 +172,24 @@ import {FavoritesProvider} from 'indico/react/hooks';
     }
 
     function renderPerson(person, $list, entryType, isSortable) {
-      var $speakerLabel = $('<span>')
+      const $speakerLabel = $('<span>')
         .addClass('i-label small speaker')
         .text($T.gettext('Speaker'));
-      var $personRow = $('<div>')
+      const $personRow = $('<div>')
         .addClass('person-row')
         .data('person', person);
-      var $personName = $('<div>')
+      const $personName = $('<div>')
         .addClass('name')
         .text(getName(person));
-      var $personRoles = $('<span>').addClass('person-roles');
-      var $personButtons = $('<span>').addClass('person-buttons');
-      var $buttonRemove = $('<a>')
+      const $personRoles = $('<span>').addClass('person-roles');
+      const $personButtons = $('<span>').addClass('person-buttons');
+      const $buttonRemove = $('<a>')
         .addClass('i-link danger icon-close')
         .attr('title', $T.gettext('Remove person'));
-      var $buttonEdit = $('<a>')
+      const $buttonEdit = $('<a>')
         .addClass('i-link icon-edit')
         .attr('title', $T.gettext('Edit information'));
-      var $buttonConfig = $('<a>')
+      const $buttonConfig = $('<a>')
         .addClass('i-link icon-settings')
         .attr('title', $T.gettext('Configure roles'));
 
@@ -204,7 +204,7 @@ import {FavoritesProvider} from 'indico/react/hooks';
       }
 
       if (options.allow.submitters) {
-        var $submitterLabel = $('<span>')
+        const $submitterLabel = $('<span>')
           .addClass('i-label small submitter')
           .text($T.gettext('Submitter'));
         $personRoles.append($submitterLabel.toggleClass('selected', person.isSubmitter));
@@ -250,15 +250,15 @@ import {FavoritesProvider} from 'indico/react/hooks';
     }
 
     function setupPersonConfig(person, $element, $personRow, $personRoles) {
-      var $buttons = $('<div>');
-      var $buttonsSeparator = $('<div>')
+      const $buttons = $('<div>');
+      const $buttonsSeparator = $('<div>')
         .addClass('titled-rule')
         .text($T.gettext('or'));
-      var $submitterLabel = $personRoles.find('.submitter');
-      var $speakerLabel = $personRoles.find('.speaker');
+      const $submitterLabel = $personRoles.find('.submitter');
+      const $speakerLabel = $personRoles.find('.speaker');
 
       function actionButton(moveText, $targetList, targetData) {
-        var $button = $('<div>')
+        const $button = $('<div>')
           .addClass('action-row')
           .text(moveText);
         return $button.on('click', function() {
@@ -292,7 +292,7 @@ import {FavoritesProvider} from 'indico/react/hooks';
                 isSpeaker: true,
               })
             );
-            var text = person.isSpeaker
+            const text = person.isSpeaker
               ? $T.gettext('Not a speaker anymore')
               : $T.gettext('Make a speaker');
 
@@ -322,7 +322,7 @@ import {FavoritesProvider} from 'indico/react/hooks';
       }
 
       if (options.allow.submitters) {
-        var $submitterButton = $('<div>').addClass('action-row');
+        const $submitterButton = $('<div>').addClass('action-row');
         $submitterButton.text(
           person.isSubmitter
             ? $T.gettext('Revoke submission rights')
@@ -351,11 +351,11 @@ import {FavoritesProvider} from 'indico/react/hooks';
           adjust: {x: 15},
         },
         events: {
-          show: function() {
+          show() {
             $element.addClass('active');
             $element.closest('.person-row').addClass('active');
           },
-          hide: function() {
+          hide() {
             $element.removeClass('active');
             $element.closest('.person-row').removeClass('active');
           },
@@ -370,10 +370,10 @@ import {FavoritesProvider} from 'indico/react/hooks';
       multiChoice: true,
       overwriteChoice: false,
       render: renderPeople,
-      onAdd: function(people) {
+      onAdd(people) {
         people.forEach(function(person) {
           if (person.authorType === undefined) {
-            var maxOrder = _.max(people, _.iteratee('displayOrder')).displayOrder || 0;
+            const maxOrder = _.max(people, _.iteratee('displayOrder')).displayOrder || 0;
             setPersonDefaults(person);
             person.displayOrder = customOrder ? maxOrder + 1 : 0;
           }
@@ -399,7 +399,7 @@ import {FavoritesProvider} from 'indico/react/hooks';
 
     $buttonAlphaOrder.qtip({content: getSortingMessage});
     $buttonAlphaOrder.on('click', function() {
-      var $list = $fieldDisplay.find('.person-list');
+      const $list = $fieldDisplay.find('.person-list');
       customOrder = !customOrder;
       $buttonAlphaOrder.toggleClass('active', !customOrder);
       if (customOrder) {
@@ -413,7 +413,7 @@ import {FavoritesProvider} from 'indico/react/hooks';
     });
 
     $form.on('submit', function(evt) {
-      var e = $.Event('ajaxForm:validateBeforeSubmit');
+      const e = $.Event('ajaxForm:validateBeforeSubmit');
       $(this).trigger(e);
       if (e.isDefaultPrevented()) {
         evt.preventDefault();
@@ -421,8 +421,8 @@ import {FavoritesProvider} from 'indico/react/hooks';
     });
 
     $field.closest('form').on('ajaxForm:validateBeforeSubmit', function(evt) {
-      var $this = $(this);
-      var req = options.require;
+      const $this = $(this);
+      const req = options.require;
 
       if (
         req.primaryAuthor ||
@@ -431,10 +431,10 @@ import {FavoritesProvider} from 'indico/react/hooks';
         req.speaker ||
         !options.allow.speakers
       ) {
-        var $formField = $field.closest('.form-field');
-        var $formGroup = $field.closest('.form-group');
-        var hiddenData = JSON.parse($field.val());
-        var hasError = false;
+        const $formField = $field.closest('.form-field');
+        const $formGroup = $field.closest('.form-group');
+        const hiddenData = JSON.parse($field.val());
+        let hasError = false;
 
         if (req.speaker && !hiddenData.some(x => x.isSpeaker)) {
           hasError = true;
