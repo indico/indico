@@ -5,6 +5,8 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
+from datetime import timedelta
+
 from flask_caching import Cache
 from flask_caching.backends.rediscache import RedisCache
 from flask_caching.backends.simplecache import SimpleCache
@@ -97,9 +99,13 @@ class ScopedCache:
         return self.cache.get(self._scoped(key), default=default)
 
     def set(self, key, value, timeout=None):
+        if isinstance(timeout, timedelta):
+            timeout = timeout.total_seconds()
         self.cache.set(self._scoped(key), value, timeout=timeout)
 
     def add(self, key, value, timeout=None):
+        if isinstance(timeout, timedelta):
+            timeout = timeout.total_seconds()
         self.cache.add(self._scoped(key), value, timeout=timeout)
 
     def delete(self, key):
@@ -120,6 +126,8 @@ class ScopedCache:
         return self.cache.get_many(*keys, default=default)
 
     def set_many(self, mapping, timeout=None):
+        if isinstance(timeout, timedelta):
+            timeout = timeout.total_seconds()
         mapping = {self._scoped(key): value for key, value in mapping.items()}
         self.cache.set_many(mapping, timeout=timeout)
 
@@ -147,12 +155,16 @@ class IndicoCache(Cache):
             return default
 
     def set(self, key, value, timeout=None):
+        if isinstance(timeout, timedelta):
+            timeout = timeout.total_seconds()
         try:
             super().set(key, value, timeout=timeout)
         except RedisError:
             _logger.exception('set(%r) failed', key)
 
     def add(self, key, value, timeout=None):
+        if isinstance(timeout, timedelta):
+            timeout = timeout.total_seconds()
         try:
             super().add(key, value, timeout=timeout)
         except RedisError:
@@ -185,6 +197,8 @@ class IndicoCache(Cache):
             return [default] * len(keys)
 
     def set_many(self, mapping, timeout=None):
+        if isinstance(timeout, timedelta):
+            timeout = timeout.total_seconds()
         try:
             super().set_many(mapping, timeout=timeout)
         except RedisError:

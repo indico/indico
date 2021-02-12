@@ -5,6 +5,10 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
+from datetime import datetime, timedelta
+
+import pytest
+
 from indico.core.cache import cache, make_scoped_cache
 
 
@@ -55,3 +59,19 @@ def test_scoped_cache():
     assert scoped.get_dict('a', 'b') == {'a': 'aa', 'b': 'bb'}
 
     assert cache.get_many('foo', 'foobar', 'a', 'b') == [1, 2, None, None]
+
+
+@pytest.mark.parametrize('scoped', (False, True))
+@pytest.mark.parametrize('timeout', (5, timedelta(seconds=5)))
+def test_expiry(freeze_time, scoped, timeout):
+    now = datetime.now()
+    freeze_time(now)
+    cache_obj = make_scoped_cache('test') if scoped else cache
+    cache_obj.set('a', 1, timeout=timeout)
+    cache_obj.add('b', 2, timeout=timeout)
+    cache_obj.set_many({'c': 3}, timeout=timeout)
+    assert cache_obj.get_many('a', 'b', 'c') == [1, 2, 3]
+    freeze_time(now + timedelta(seconds=4))
+    assert cache_obj.get_many('a', 'b', 'c') == [1, 2, 3]
+    freeze_time(now + timedelta(seconds=5))
+    assert cache_obj.get_many('a', 'b', 'c') == [None, None, None]
