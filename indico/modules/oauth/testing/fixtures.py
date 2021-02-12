@@ -19,8 +19,8 @@ def create_application(db):
 
     def _create_application(name, **params):
         params.setdefault('client_id', str(uuid4()))
-        params.setdefault('default_scopes', 'read:user')
-        params.setdefault('redirect_uris', 'http://localhost:10500')
+        params.setdefault('default_scopes', ['read:user'])
+        params.setdefault('redirect_uris', ['http://localhost:10500/'])
         params.setdefault('is_trusted', True)
         application = OAuthApplication(name=name, **params)
         db.session.add(application)
