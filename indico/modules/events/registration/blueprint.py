@@ -68,7 +68,7 @@ _bp.add_url_rule(
 _bp.add_url_rule('/manage/registration/<int:reg_form_id>/registrations/<int:registration_id>/approve',
                  'approve_registration', reglists.RHRegistrationApprove, methods=('POST',))
 _bp.add_url_rule('/manage/registration/<int:reg_form_id>/registrations/<int:registration_id>/reject',
-                 'reject_registration', reglists.RHRegistrationReject, methods=('POST',))
+                 'reject_registration', reglists.RHRegistrationReject, methods=('GET', 'POST'))
 _bp.add_url_rule('/manage/registration/<int:reg_form_id>/registrations/<int:registration_id>/reset',
                  'reset_registration', reglists.RHRegistrationReset, methods=('POST',))
 _bp.add_url_rule('/manage/registration/<int:reg_form_id>/registrations/<int:registration_id>/withdraw',
@@ -89,8 +89,10 @@ _bp.add_url_rule('/manage/registration/<int:reg_form_id>/registrations/registrat
                  reglists.RHRegistrationsExportCSV, methods=('POST',))
 _bp.add_url_rule('/manage/registration/<int:reg_form_id>/registrations/registrations.xlsx',
                  'registrations_excel_export', reglists.RHRegistrationsExportExcel, methods=('POST',))
-_bp.add_url_rule('/manage/registration/<int:reg_form_id>/registrations/modify-status', 'registrations_modify_status',
-                 reglists.RHRegistrationsModifyStatus, methods=('POST',))
+_bp.add_url_rule('/manage/registration/<int:reg_form_id>/registrations/approve', 'registrations_approve',
+                 reglists.RHRegistrationsApprove, methods=('POST',))
+_bp.add_url_rule('/manage/registration/<int:reg_form_id>/registrations/reject', 'registrations_reject',
+                 reglists.RHRegistrationsReject, methods=('POST',))
 _bp.add_url_rule('/manage/registration/<int:reg_form_id>/registrations/check-in', 'registrations_check_in',
                  reglists.RHRegistrationBulkCheckIn, methods=('POST',))
 _bp.add_url_rule('/manage/registration/<int:reg_form_id>/registrations/attachments', 'registrations_attachments_export',

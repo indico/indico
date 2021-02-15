@@ -34,7 +34,8 @@ from indico.modules.events.registration.controllers import RegistrationEditMixin
 from indico.modules.events.registration.controllers.management import (RHManageRegFormBase, RHManageRegFormsBase,
                                                                        RHManageRegistrationBase)
 from indico.modules.events.registration.forms import (BadgeSettingsForm, CreateMultipleRegistrationsForm,
-                                                      EmailRegistrantsForm, ImportRegistrationsForm)
+                                                      EmailRegistrantsForm, ImportRegistrationsForm,
+                                                      RejectRegistrantsForm)
 from indico.modules.events.registration.models.items import PersonalDataType, RegistrationFormItemType
 from indico.modules.events.registration.models.registrations import Registration, RegistrationData, RegistrationState
 from indico.modules.events.registration.notifications import notify_registration_state_update
@@ -52,7 +53,7 @@ from indico.util.spreadsheets import send_csv, send_xlsx
 from indico.web.args import use_kwargs
 from indico.web.flask.templating import get_template_module
 from indico.web.flask.util import send_file, url_for
-from indico.web.util import jsonify_data, jsonify_template
+from indico.web.util import jsonify_data, jsonify_form, jsonify_template
 
 
 badge_cache = make_scoped_cache('badge-printing')
@@ -535,15 +536,16 @@ class RHRegistrationTogglePayment(RHManageRegistrationBase):
         return jsonify_data(html=_render_registration_details(self.registration))
 
 
-def _modify_registration_status(registration, approve):
+def _modify_registration_status(registration, approve, rejection_reason='', attach_rejection_reason=False):
     if registration.state != RegistrationState.pending:
         return
     if approve:
         registration.update_state(approved=True)
     else:
+        registration.rejection_reason = rejection_reason
         registration.update_state(rejected=True)
     db.session.flush()
-    notify_registration_state_update(registration)
+    notify_registration_state_update(registration, attach_rejection_reason)
     status = 'approved' if approve else 'rejected'
     logger.info('Registration %s was %s by %s', registration, status, session.user)
 
@@ -560,8 +562,13 @@ class RHRegistrationReject(RHManageRegistrationBase):
     """Reject a registration."""
 
     def _process(self):
-        _modify_registration_status(self.registration, approve=False)
-        return jsonify_data(html=_render_registration_details(self.registration))
+        form = RejectRegistrantsForm()
+        message = _("Rejecting this registration will trigger a notification email.")
+        if form.validate_on_submit():
+            _modify_registration_status(self.registration, approve=False, rejection_reason=form.rejection_reason.data,
+                                        attach_rejection_reason=form.attach_rejection_reason.data)
+            return jsonify_data(html=_render_registration_details(self.registration))
+        return jsonify_form(form, disabled_until_change=False, submit=_('Reject'), message=message)
 
 
 class RHRegistrationReset(RHManageRegistrationBase):
@@ -574,6 +581,7 @@ class RHRegistrationReset(RHManageRegistrationBase):
         if self.registration.state in (RegistrationState.complete, RegistrationState.unpaid):
             self.registration.update_state(approved=False)
         elif self.registration.state == RegistrationState.rejected:
+            self.registration.rejection_reason = ''
             self.registration.update_state(rejected=False)
         elif self.registration.state == RegistrationState.withdrawn:
             self.registration.update_state(withdrawn=False)
@@ -630,15 +638,29 @@ class RHRegistrationBulkCheckIn(RHRegistrationsActionBase):
         return jsonify_data(**self.list_generator.render_list())
 
 
-class RHRegistrationsModifyStatus(RHRegistrationsActionBase):
-    """Accept/Reject selected registrations."""
+class RHRegistrationsApprove(RHRegistrationsActionBase):
+    """Accept selected registrations from registration list."""
 
     def _process(self):
-        approve = request.form['flag'] == '1'
         for registration in self.registrations:
-            _modify_registration_status(registration, approve)
-        flash(_("The status of the selected registrations was updated successfully."), 'success')
+            _modify_registration_status(registration, approve=True)
+        flash(_("The selected registrations were successfully approved."), 'success')
         return jsonify_data(**self.list_generator.render_list())
+
+
+class RHRegistrationsReject(RHRegistrationsActionBase):
+    """Reject selected registrations from registration list."""
+
+    def _process(self):
+        form = RejectRegistrantsForm(registration_id=[r.id for r in self.registrations])
+        message = _("Rejecting these registrations will trigger a notification email for each registrant.")
+        if form.validate_on_submit():
+            for registration in self.registrations:
+                _modify_registration_status(registration, approve=False, rejection_reason=form.rejection_reason.data,
+                                            attach_rejection_reason=form.attach_rejection_reason.data)
+            flash(_("The selected registrations were successfully rejected."), 'success')
+            return jsonify_data(**self.list_generator.render_list())
+        return jsonify_form(form, disabled_until_change=False, submit=_('Reject'), message=message)
 
 
 class RHRegistrationsExportAttachments(RHRegistrationsExportBase, ZipGeneratorMixin):

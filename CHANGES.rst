@@ -45,6 +45,8 @@ Improvements
   locale or English in case the default locale is invalid as well
 - Log an error if the configured default locale does not exist
 - Add ID-1 page size for badge printing (:pr:`4774`, thanks :user:`omegak`)
+- Allow managers to specify a reason when rejecting registrants and add a new placeholder
+  for the rejection reason when emailing registrants (:pr:`4769`, thanks :user:`vasantvohra`)
 
 Bugfixes
 ^^^^^^^^
