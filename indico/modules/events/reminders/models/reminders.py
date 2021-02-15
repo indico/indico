@@ -96,7 +96,7 @@ class EventReminder(db.Model):
     attach_ical = db.Column(
         db.Boolean,
         nullable=False,
-        default=False
+        default=True
     )
     #: The address to use as Reply-To in the notification email.
     reply_to_address = db.Column(
@@ -170,7 +170,7 @@ class EventReminder(db.Model):
         attachments = []
         if self.attach_ical:
             event_ical = event_to_ical(self.event)
-            attachments.append(('invite.ics', event_ical, 'text/calendar'))
+            attachments.append(('event.ics', event_ical, 'text/calendar'))
         email = make_email(
             bcc_list=recipients, from_address=self.reply_to_address, template=email_tpl, attachments=attachments
         )

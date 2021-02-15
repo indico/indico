@@ -39,7 +39,7 @@ def _notify_registration(registration, template, to_managers=False, attach_rejec
         attachments += get_ticket_attachments(registration)
     if (not to_managers and registration.registration_form.complete_registration_attach_ical):
         event_ical = event_to_ical(registration.event)
-        attachments.append(('invite.ics', event_ical, 'text/calendar'))
+        attachments.append(('event.ics', event_ical, 'text/calendar'))
 
     template = get_template_module(f'events/registration/emails/{template}', registration=registration,
                                    attach_rejection_reason=attach_rejection_reason)
