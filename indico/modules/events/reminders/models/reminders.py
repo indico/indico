@@ -14,6 +14,7 @@ from indico.core.notifications import make_email, send_email
 from indico.modules.events.registration.models.registrations import Registration
 from indico.modules.events.reminders import logger
 from indico.modules.events.reminders.util import make_reminder_email
+from indico.modules.events.serialize import event_to_ical
 from indico.util.date_time import now_utc
 from indico.util.string import format_repr
 
@@ -91,6 +92,12 @@ class EventReminder(db.Model):
         nullable=False,
         default=False
     )
+    #: If the notification should include the event's iCalendar file.
+    attach_ical = db.Column(
+        db.Boolean,
+        nullable=False,
+        default=False
+    )
     #: The address to use as Reply-To in the notification email.
     reply_to_address = db.Column(
         db.String,
@@ -160,7 +167,14 @@ class EventReminder(db.Model):
             logger.info('Notification %s has no recipients; not sending anything', self)
             return
         email_tpl = make_reminder_email(self.event, self.include_summary, self.include_description, self.message)
-        email = make_email(bcc_list=recipients, from_address=self.reply_to_address, template=email_tpl)
+        attachments = []
+        if self.attach_ical:
+            event_ical = event_to_ical(self.event)
+            attachments.append(('invite.ics', event_ical, 'text/calendar'))
+        email = make_email(
+            bcc_list=recipients, from_address=self.reply_to_address, template=email_tpl, attachments=attachments
+        )
+        logger.info(self.event.organizer_info)
         send_email(email, self.event, 'Reminder', self.creator)
 
     def __repr__(self):

@@ -42,6 +42,8 @@ class ReminderForm(IndicoForm):
                                    description=_("Includes a simple text version of the event's agenda in the email."))
     include_description = BooleanField(_('Include description'),
                                        description=_("Includes the event's description in the email."))
+    attach_ical = BooleanField(_('Attach iCalendar file'),
+                               description=_('Attach an iCalendar file to the event reminder.'))
 
     def __init__(self, *args, **kwargs):
         self.event = kwargs.pop('event')
