@@ -13,7 +13,7 @@ from sqlalchemy.orm import joinedload, load_only, subqueryload, undefer
 
 from indico.modules.categories import Category
 from indico.modules.events import Event
-from indico.modules.events.serialize import events_to_ical
+from indico.modules.events.ical import events_to_ical
 from indico.util.string import sanitize_html
 
 

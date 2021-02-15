@@ -11,10 +11,10 @@ from sqlalchemy.ext.hybrid import hybrid_property
 from indico.core.db import db
 from indico.core.db.sqlalchemy import UTCDateTime
 from indico.core.notifications import make_email, send_email
+from indico.modules.events.ical import event_to_ical
 from indico.modules.events.registration.models.registrations import Registration
 from indico.modules.events.reminders import logger
 from indico.modules.events.reminders.util import make_reminder_email
-from indico.modules.events.serialize import event_to_ical
 from indico.util.date_time import now_utc
 from indico.util.string import format_repr
 

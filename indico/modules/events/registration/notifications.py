@@ -9,8 +9,8 @@ from flask import session
 
 from indico.core import signals
 from indico.core.notifications import make_email, send_email
+from indico.modules.events.ical import event_to_ical
 from indico.modules.events.registration.models.registrations import RegistrationState
-from indico.modules.events.serialize import event_to_ical
 from indico.util.placeholders import replace_placeholders
 from indico.util.signals import values_from_signal
 from indico.web.flask.templating import get_template_module
@@ -37,7 +37,7 @@ def _notify_registration(registration, template, to_managers=False, attach_rejec
             not any(tickets_handled) and
             registration.state == RegistrationState.complete):
         attachments += get_ticket_attachments(registration)
-    if (not to_managers and registration.registration_form.complete_registration_attach_ical):
+    if not to_managers and registration.registration_form.attach_ical:
         event_ical = event_to_ical(registration.event)
         attachments.append(('event.ics', event_ical, 'text/calendar'))
 

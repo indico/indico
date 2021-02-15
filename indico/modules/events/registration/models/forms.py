@@ -192,7 +192,7 @@ class RegistrationForm(db.Model):
         default=''
     )
     #: If the completed registration email should include the event's iCalendar file.
-    complete_registration_attach_ical = db.Column(
+    attach_ical = db.Column(
         db.Boolean,
         nullable=False,
         default=False

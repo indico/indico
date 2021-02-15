@@ -17,7 +17,7 @@ from indico.util.signals import values_from_signal
 
 
 def event_to_ical(event, user=None):
-    """Serialize an event into an iCalendar.
+    """Serialize an event into an ical.
 
     :param event: The event to serialize
     :param user: The user who needs to be able to access the events
@@ -27,7 +27,7 @@ def event_to_ical(event, user=None):
 
 
 def events_to_ical(events, user=None):
-    """Serialize multiple events into an iCalendar.
+    """Serialize multiple events into an ical.
 
     :param events: A list of events to serialize
     :param user: The user who needs to be able to access the events

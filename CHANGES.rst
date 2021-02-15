@@ -22,7 +22,7 @@ Improvements
 - Add an option to refresh event person data from the underlying user when cloning an
   event (:issue:`4750`, :pr:`4760`)
 - Add options for attaching iCal files to complete registration and event reminder
-  emails (:issue:`1158`)
+  emails (:issue:`1158`, :pr:`4780`)
 
 Internal Changes
 ^^^^^^^^^^^^^^^^
