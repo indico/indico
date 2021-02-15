@@ -5,7 +5,7 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from flask import jsonify, session
+from flask import jsonify, request
 
 from indico.modules.oauth import oauth
 from indico.modules.users import User
@@ -13,11 +13,9 @@ from indico.web.http_api.hooks.base import HTTPAPIHook
 from indico.web.http_api.responses import HTTPAPIError
 
 
+@oauth.require_oauth('read:user')
 def fetch_authenticated_user():
-    valid, req = oauth.verify_request(['read:user'])
-    user = req.user if valid else session.user
-    if not user:
-        return jsonify()
+    user = request.oauth.user
     return jsonify(id=user.id, email=user.email, first_name=user.first_name, last_name=user.last_name,
                    admin=user.is_admin)
 
