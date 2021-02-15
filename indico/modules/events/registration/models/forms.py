@@ -191,6 +191,12 @@ class RegistrationForm(db.Model):
         nullable=False,
         default=''
     )
+    #: If the completed registration email should include the event's iCalendar file.
+    complete_registration_attach_ical = db.Column(
+        db.Boolean,
+        nullable=False,
+        default=False
+    )
     #: Whether the manager notifications for this event are enabled
     manager_notifications_enabled = db.Column(
         db.Boolean,
