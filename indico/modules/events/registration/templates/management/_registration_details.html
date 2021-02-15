@@ -105,10 +105,9 @@
         <div class="group">
             <a class="i-button danger"
                data-update="#registration-details"
-               data-method="POST"
                data-href="{{ url_for('.reject_registration', registration) }}"
-               data-confirm="{% trans %}Are you sure you want to reject this registration? This will trigger a notification email.{% endtrans %}"
-               data-title="{% trans %}Reject registration{% endtrans %}">
+               data-title="{% trans %}Reject registration{% endtrans %}"
+               data-ajax-dialog>
                 {%- trans %}Reject{% endtrans -%}
             </a>
         </div>
@@ -184,6 +183,9 @@
                 This registration is {{ state }}
             {%- endtrans %}
         </div>
+        {% if registration.state.name == 'rejected' and registration.rejection_reason %}
+            {% trans reason=registration.rejection_reason %}Reason: {{ reason }}{% endtrans %}
+        {% endif %}
     </div>
     <div class="toolbar hide-if-locked">
         {% set action = _('Reset rejection') if registration.state.name == 'rejected' else _('Reset withdrawal') %}

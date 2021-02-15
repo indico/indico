@@ -186,7 +186,12 @@ class Registration(db.Model):
         UTCDateTime,
         nullable=True
     )
-
+    #: If given a reason for rejection
+    rejection_reason = db.Column(
+        db.String,
+        nullable=False,
+        default='',
+    )
     #: The Event containing this registration
     event = db.relationship(
         'Event',
