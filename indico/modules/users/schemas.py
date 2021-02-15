@@ -21,9 +21,6 @@ class UserSchema(mm.SQLAlchemyAutoSchema):
                   'phone', 'avatar_url')
 
 
-user_schema = UserSchema()
-
-
 class BasicCategorySchema(mm.SQLAlchemyAutoSchema):
     class Meta:
         model = Category
