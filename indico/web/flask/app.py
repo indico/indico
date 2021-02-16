@@ -96,11 +96,8 @@ def configure_app(app, set_path=False):
 def configure_cache(app, config):
     app.config['CACHE_DEFAULT_TIMEOUT'] = 0
     app.config['CACHE_KEY_PREFIX'] = f'indico_{_get_cache_version()}_'
-    if app.config['TESTING']:
-        app.config['CACHE_TYPE'] = 'indico.core.cache.make_indico_simple_cache'
-    else:
-        app.config['CACHE_TYPE'] = 'indico.core.cache.make_indico_redis_cache'
-        app.config['CACHE_REDIS_URL'] = config.REDIS_CACHE_URL
+    app.config['CACHE_TYPE'] = 'indico.core.cache.make_indico_redis_cache'
+    app.config['CACHE_REDIS_URL'] = config.REDIS_CACHE_URL
 
 
 def configure_multipass(app, config):
@@ -370,7 +367,7 @@ def make_app(set_path=False, testing=False, config_override=None):
         cache.init_app(app)
         babel.init_app(app)
         if config.DEFAULT_LOCALE not in get_all_locales():
-            Logger.get('i18n').error('Configured DEFAULT_LOCALE ({}) does not exist'.format(config.DEFAULT_LOCALE))
+            Logger.get('i18n').error(f'Configured DEFAULT_LOCALE ({config.DEFAULT_LOCALE}) does not exist')
         multipass.init_app(app)
         oauth.init_app(app)
         webpack.init_app(app)

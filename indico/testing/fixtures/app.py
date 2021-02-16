@@ -14,13 +14,14 @@ from indico.web.flask.wrappers import IndicoFlask
 
 
 @pytest.fixture(scope='session')
-def app(request):
+def app(request, redis_proc):
     """Create the flask app."""
     config_override = {
         'BASE_URL': 'http://localhost',
         'SMTP_SERVER': ('localhost', 0),  # invalid port - just in case so we NEVER send emails!
         'TEMP_DIR': request.config.indico_temp_dir.strpath,
         'CACHE_DIR': request.config.indico_temp_dir.strpath,
+        'REDIS_CACHE_URL': f'redis://{redis_proc.host}:{redis_proc.port}/0',
         'STORAGE_BACKENDS': {'default': 'mem:'},
         'PLUGINS': request.config.indico_plugins,
         'ENABLE_ROOMBOOKING': True,

@@ -210,6 +210,9 @@ jobs:
         run: pip install -e .
       # END common steps
 
+      - name: Install redis
+        run: sudo apt-get install redis-server
+
       - name: Setup database
         run: |
           sudo apt-get install postgresql-client libpq-dev

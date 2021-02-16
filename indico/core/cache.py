@@ -9,7 +9,6 @@ from datetime import timedelta
 
 from flask_caching import Cache
 from flask_caching.backends.rediscache import RedisCache
-from flask_caching.backends.simplecache import SimpleCache
 from redis import RedisError
 
 from indico.core.config import config
@@ -36,18 +35,7 @@ class CachedNone:
             return value
 
 
-class IndicoCacheMixin:
-    def get(self, key, default=None):
-        return CachedNone.unwrap(super().get(key), default)
-
-    def get_many(self, *keys, default=None):
-        return [CachedNone.unwrap(val, default) for val in super().get_many(*keys)]
-
-    def get_dict(self, *keys, default=None):
-        return dict(zip(keys, self.get_many(*keys, default=default)))
-
-
-class IndicoRedisCache(IndicoCacheMixin, RedisCache):
+class IndicoRedisCache(RedisCache):
     """
     This is similar to the original RedisCache from Flask-Caching, but it
     allows specifying a default value when retrieving cache data and
@@ -60,23 +48,28 @@ class IndicoRedisCache(IndicoCacheMixin, RedisCache):
         # and `get_many`.
         return super().dump_object(CachedNone.wrap(value))
 
-
-class IndicoSimpleCache(IndicoCacheMixin, SimpleCache):
-    """
-    This is similar to the original SimpleCache from Flask-Caching, but it
-    allows specifying a default value when retrieving cache data and
-    distinguishing between a cached ``None`` value and a cache miss.
-    """
-
-    def set(self, key, value, timeout=None):
-        return super().set(key, CachedNone.wrap(value), timeout=timeout)
-
     def add(self, key, value, timeout=None):
-        return super().add(key, CachedNone.wrap(value), timeout=timeout)
+        # XXX: remove this once there's a release contining the fix from
+        # https://github.com/sh4nks/flask-caching/pull/218
+        timeout = self._normalize_timeout(timeout)
+        dump = self.dump_object(value)
+        created = self._write_client.setnx(
+            name=self._get_prefix() + key, value=dump
+        )
+        if created and timeout != -1:
+            self._write_client.expire(
+                name=self._get_prefix() + key, time=timeout
+            )
+        return created
 
+    def get(self, key, default=None):
+        return CachedNone.unwrap(super().get(key), default)
 
-def make_indico_simple_cache(app, config, args, kwargs):
-    return IndicoSimpleCache(*args, **kwargs)
+    def get_many(self, *keys, default=None):
+        return [CachedNone.unwrap(val, default) for val in super().get_many(*keys)]
+
+    def get_dict(self, *keys, default=None):
+        return dict(zip(keys, self.get_many(*keys, default=default)))
 
 
 def make_indico_redis_cache(app, config, args, kwargs):
