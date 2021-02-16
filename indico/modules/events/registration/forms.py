@@ -44,8 +44,8 @@ def _check_if_payment_required(form, field):
 
 class RegistrationFormForm(IndicoForm):
     _price_fields = ('currency', 'base_price')
-    _registrant_notification_fields = ('notification_sender_address',
-                                       'message_pending', 'message_unpaid', 'message_complete')
+    _registrant_notification_fields = ('notification_sender_address', 'message_pending', 'message_unpaid',
+                                       'message_complete', 'attach_ical')
     _manager_notification_fields = ('manager_notifications_enabled', 'manager_notification_recipients')
     _special_fields = _price_fields + _registrant_notification_fields + _manager_notification_fields
 
@@ -93,6 +93,11 @@ class RegistrationFormForm(IndicoForm):
     message_complete = TextAreaField(
         _("Message for complete registrations"),
         description=_("Text included in emails sent to complete registrations (Markdown syntax)")
+    )
+    attach_ical = BooleanField(
+        _('Attach iCalendar file'),
+        widget=SwitchWidget(),
+        description=_('Attach an iCalendar file to the mail sent once a registration is complete')
     )
     manager_notifications_enabled = BooleanField(_('Enabled'), widget=SwitchWidget(),
                                                  description=_("Enable notifications to managers about registrations"))

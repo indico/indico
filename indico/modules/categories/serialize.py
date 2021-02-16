@@ -7,20 +7,13 @@
 
 from io import BytesIO
 
-import icalendar as ical
 from feedgen.feed import FeedGenerator
 from flask import session
-from lxml import html
-from lxml.etree import ParserError
 from sqlalchemy.orm import joinedload, load_only, subqueryload, undefer
-from werkzeug.urls import url_parse
 
-from indico.core import signals
-from indico.core.config import config
 from indico.modules.categories import Category
 from indico.modules.events import Event
-from indico.util.date_time import now_utc
-from indico.util.signals import values_from_signal
+from indico.modules.events.ical import events_to_ical
 from indico.util.string import sanitize_html
 
 
@@ -63,48 +56,8 @@ def serialize_categories_ical(category_ids, user, event_filter=True, event_filte
                       .options(load_only('id', 'parent_id', 'protection_mode'),
                                joinedload('acl_entries'))
                       .all())
-    cal = ical.Calendar()
-    cal.add('version', '2.0')
-    cal.add('prodid', '-//CERN//INDICO//EN')
 
-    now = now_utc(False)
-    for event in events:
-        if not event.can_access(user):
-            continue
-        location = (f'{event.room_name} ({event.venue_name})'
-                    if event.venue_name and event.room_name
-                    else (event.venue_name or event.room_name))
-        cal_event = ical.Event()
-        cal_event.add('uid', 'indico-event-{}@{}'.format(event.id, url_parse(config.BASE_URL).host))
-        cal_event.add('dtstamp', now)
-        cal_event.add('dtstart', event.start_dt)
-        cal_event.add('dtend', event.end_dt)
-        cal_event.add('url', event.external_url)
-        cal_event.add('summary', event.title)
-        cal_event.add('location', location)
-        description = []
-        if event.person_links:
-            speakers = [f'{x.full_name} ({x.affiliation})' if x.affiliation else x.full_name
-                        for x in event.person_links]
-            description.append('Speakers: {}'.format(', '.join(speakers)))
-
-        if event.description:
-            desc_text = str(event.description) or '<p/>'  # get rid of RichMarkup
-            try:
-                description.append(str(html.fromstring(desc_text).text_content()))
-            except ParserError:
-                # this happens e.g. if desc_text contains only a html comment
-                pass
-        description.append(event.external_url)
-        data = {'description': '\n'.join(description)}
-        for update in values_from_signal(
-            signals.event.metadata_postprocess.send('ical-export', event=event, data=data, user=user),
-            as_list=True
-        ):
-            data.update(update)
-        cal_event.add('description', data['description'])
-        cal.add_component(cal_event)
-    return BytesIO(cal.to_ical())
+    return BytesIO(events_to_ical(events, user))
 
 
 def serialize_category_atom(category, url, user, event_filter):
