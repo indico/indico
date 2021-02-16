@@ -100,12 +100,12 @@ class ScopedCache:
 
     def set(self, key, value, timeout=None):
         if isinstance(timeout, timedelta):
-            timeout = timeout.total_seconds()
+            timeout = int(timeout.total_seconds())
         self.cache.set(self._scoped(key), value, timeout=timeout)
 
     def add(self, key, value, timeout=None):
         if isinstance(timeout, timedelta):
-            timeout = timeout.total_seconds()
+            timeout = int(timeout.total_seconds())
         self.cache.add(self._scoped(key), value, timeout=timeout)
 
     def delete(self, key):
@@ -127,7 +127,7 @@ class ScopedCache:
 
     def set_many(self, mapping, timeout=None):
         if isinstance(timeout, timedelta):
-            timeout = timeout.total_seconds()
+            timeout = int(timeout.total_seconds())
         mapping = {self._scoped(key): value for key, value in mapping.items()}
         self.cache.set_many(mapping, timeout=timeout)
 
@@ -156,7 +156,7 @@ class IndicoCache(Cache):
 
     def set(self, key, value, timeout=None):
         if isinstance(timeout, timedelta):
-            timeout = timeout.total_seconds()
+            timeout = int(timeout.total_seconds())
         try:
             super().set(key, value, timeout=timeout)
         except RedisError:
@@ -164,7 +164,7 @@ class IndicoCache(Cache):
 
     def add(self, key, value, timeout=None):
         if isinstance(timeout, timedelta):
-            timeout = timeout.total_seconds()
+            timeout = int(timeout.total_seconds())
         try:
             super().add(key, value, timeout=timeout)
         except RedisError:
@@ -198,7 +198,7 @@ class IndicoCache(Cache):
 
     def set_many(self, mapping, timeout=None):
         if isinstance(timeout, timedelta):
-            timeout = timeout.total_seconds()
+            timeout = int(timeout.total_seconds())
         try:
             super().set_many(mapping, timeout=timeout)
         except RedisError:
