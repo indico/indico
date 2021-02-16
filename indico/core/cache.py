@@ -12,6 +12,7 @@ from flask_caching.backends.rediscache import RedisCache
 from flask_caching.backends.simplecache import SimpleCache
 from redis import RedisError
 
+from indico.core.config import config
 from indico.core.logger import Logger
 
 
@@ -151,6 +152,8 @@ class IndicoCache(Cache):
         try:
             return super().get(key, default)
         except RedisError:
+            if config.DEBUG:
+                raise
             _logger.exception('get(%r) failed', key)
             return default
 
@@ -160,6 +163,8 @@ class IndicoCache(Cache):
         try:
             super().set(key, value, timeout=timeout)
         except RedisError:
+            if config.DEBUG:
+                raise
             _logger.exception('set(%r) failed', key)
 
     def add(self, key, value, timeout=None):
@@ -168,30 +173,40 @@ class IndicoCache(Cache):
         try:
             super().add(key, value, timeout=timeout)
         except RedisError:
+            if config.DEBUG:
+                raise
             _logger.exception('add(%r) failed', key)
 
     def delete(self, key):
         try:
             super().delete(key)
         except RedisError:
+            if config.DEBUG:
+                raise
             _logger.exception('delete(%r) failed', key)
 
     def delete_many(self, *keys):
         try:
             super().delete_many(*keys)
         except RedisError:
+            if config.DEBUG:
+                raise
             _logger.exception('delete_many(%s) failed', ', '.join(map(repr, keys)))
 
     def clear(self):
         try:
             super().clear()
         except RedisError:
+            if config.DEBUG:
+                raise
             _logger.exception('clear() failed')
 
     def get_many(self, *keys, default=None):
         try:
             return super().get_many(*keys, default=default)
         except RedisError:
+            if config.DEBUG:
+                raise
             logkeys = ', '.join(map(repr, keys))
             _logger.exception('get_many(%s) failed', logkeys)
             return [default] * len(keys)
@@ -202,12 +217,16 @@ class IndicoCache(Cache):
         try:
             super().set_many(mapping, timeout=timeout)
         except RedisError:
+            if config.DEBUG:
+                raise
             _logger.exception('set_many(%r) failed', mapping)
 
     def get_dict(self, *keys, default=None):
         try:
             return super().get_dict(*keys, default=default)
         except RedisError:
+            if config.DEBUG:
+                raise
             logkeys = ', '.join(map(repr, keys))
             _logger.exception('get_dict(%s) failed', logkeys)
             return dict(zip(keys, [default] * len(keys)))
