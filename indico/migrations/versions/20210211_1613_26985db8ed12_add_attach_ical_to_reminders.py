@@ -1,7 +1,7 @@
 """Add attach_ical to reminders
 
 Revision ID: 26985db8ed12
-Revises: e4fb983dc64c
+Revises: e787389ca868
 Create Date: 2021-02-11 16:13:25.061874
 """
 
@@ -11,7 +11,7 @@ from alembic import op
 
 # revision identifiers, used by Alembic.
 revision = '26985db8ed12'
-down_revision = 'e4fb983dc64c'
+down_revision = 'e787389ca868'
 branch_labels = None
 depends_on = None
 
