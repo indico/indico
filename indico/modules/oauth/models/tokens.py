@@ -5,16 +5,19 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from datetime import datetime
+from dataclasses import dataclass, field
+from datetime import datetime, timedelta
 
+from authlib.oauth2.rfc6749 import list_to_scope
+from authlib.oauth2.rfc6749.models import AuthorizationCodeMixin, TokenMixin
 from sqlalchemy.dialects.postgresql import ARRAY, UUID
 
-from indico.core.cache import make_scoped_cache
 from indico.core.db import db
 from indico.core.db.sqlalchemy import UTCDateTime
+from indico.util.date_time import now_utc
 
 
-class OAuthToken(db.Model):
+class OAuthToken(TokenMixin, db.Model):
     """OAuth tokens."""
 
     __tablename__ = 'tokens'
@@ -94,47 +97,48 @@ class OAuthToken(db.Model):
     def scopes(self, value):
         self._scopes = sorted(value)
 
-    @property
-    def type(self):
-        return 'bearer'
-
     def __repr__(self):  # pragma: no cover
         return f'<OAuthToken({self.id}, {self.application}, {self.user})>'
 
+    def check_client(self, client):
+        return self.application == client
 
-class OAuthGrant:
-    """OAuth grant token."""
+    def get_scope(self):
+        return list_to_scope(sorted(self.scopes))
 
-    #: cache entry to store grant tokens
-    _cache = make_scoped_cache('oauth-grant-tokens')
+    def get_expires_in(self):
+        return 0
 
-    def __init__(self, client_id, code, redirect_uri, user, scopes, expires):
-        self.client_id = client_id
-        self.code = code
-        self.redirect_uri = redirect_uri
-        self.user = user
-        self.scopes = scopes
-        self.expires = expires
+    def is_expired(self):
+        return False
 
-    @property
-    def key(self):
-        return self.make_key(self.client_id, self.code)
+    def is_revoked(self):
+        return self.user.is_blocked or self.user.is_deleted or not self.application.is_enabled
 
-    @property
-    def ttl(self):
-        return self.expires - datetime.utcnow()
 
-    @classmethod
-    def get(cls, client_id, code):
-        key = cls.make_key(client_id, code)
-        return cls._cache.get(key)
+@dataclass(frozen=True)
+class OAuth2AuthorizationCode(AuthorizationCodeMixin):
+    code: str
+    user_id: int
+    client_id: str
+    code_challenge: str
+    code_challenge_method: str
+    redirect_uri: str = ''
+    scope: str = ''
+    auth_time: datetime = field(default_factory=now_utc)
 
-    @classmethod
-    def make_key(cls, client_id, code):
-        return f'{client_id}:{code}'
+    def is_expired(self):
+        return now_utc() - self.auth_time > timedelta(minutes=5)
 
-    def delete(self):
-        self._cache.delete(self.key)
+    def get_redirect_uri(self):
+        return self.redirect_uri
 
-    def save(self):
-        self._cache.set(self.key, self, timeout=self.ttl)
+    def get_scope(self):
+        return self.scope
+
+    def get_auth_time(self):
+        return self.auth_time
+
+    def get_nonce(self):
+        # our grant types do not require nonces
+        raise NotImplementedError

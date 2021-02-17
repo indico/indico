@@ -7,6 +7,7 @@
 
 from uuid import uuid4
 
+from authlib.oauth2.rfc6749 import ClientMixin, list_to_scope, scope_to_list
 from sqlalchemy.dialects.postgresql import ARRAY, UUID
 from sqlalchemy.ext.declarative import declared_attr
 from werkzeug.urls import url_parse
@@ -57,7 +58,7 @@ class SystemAppType(int, IndicoEnum):
         return dict(self.__default_data__.get(self, {}), **self.enforced_data)
 
 
-class OAuthApplication(db.Model):
+class OAuthApplication(ClientMixin, db.Model):
     """OAuth applications registered in Indico."""
 
     __tablename__ = 'applications'
@@ -132,10 +133,6 @@ class OAuthApplication(db.Model):
     # - tokens (OAuthToken.application)
 
     @property
-    def client_type(self):
-        return 'public'
-
-    @property
     def default_redirect_uri(self):
         return self.redirect_uris[0] if self.redirect_uris else None
 
@@ -150,17 +147,55 @@ class OAuthApplication(db.Model):
         self.client_secret = str(uuid4())
         logger.info("Client secret for %s has been reset.", self)
 
-    def validate_redirect_uri(self, redirect_uri):
-        """Called by flask-oauthlib to validate the redirect_uri.
+    def get_client_id(self):
+        return self.client_id
+
+    def get_default_redirect_uri(self):
+        return self.default_redirect_uri
+
+    def get_allowed_scope(self, scope):
+        if not scope:
+            return ''
+        allowed = set(self.default_scopes)
+        scopes = set(scope_to_list(scope))
+        return list_to_scope(allowed & scopes)
+
+    def check_redirect_uri(self, redirect_uri):
+        """Called by authlib to validate the redirect_uri.
 
         Uses a logic similar to the one at GitHub, i.e. protocol and
         host/port must match exactly and if there is a path in the
         whitelisted URL, the path of the redirect_uri must start with
         that path.
         """
+        # TODO: maybe use a stricter implementation that does not use substrings?
         uri_data = url_parse(redirect_uri)
         for valid_uri_data in map(url_parse, self.redirect_uris):
             if (uri_data.scheme == valid_uri_data.scheme and uri_data.netloc == valid_uri_data.netloc and
                     uri_data.path.startswith(valid_uri_data.path)):
                 return True
         return False
+
+    def has_client_secret(self):
+        # Unused in authlib - https://github.com/lepture/authlib/issues/319
+        raise NotImplementedError()
+
+    def check_client_secret(self, client_secret):
+        return self.client_secret == client_secret
+
+    def check_endpoint_auth_method(self, method, endpoint):
+        if endpoint != 'token':
+            # authlib returns True in that case, but since we do not have any other endpoints
+            # I'd rather fail and implement other cases as needed instead of silently accepting
+            # everything
+            raise NotImplementedError
+        # TODO: add an option to configure whether to allow `none` auth used for semi-public
+        # clients using the authorization code grant with PKCE instead of a client secret
+        return method in ('client_secret_basic', 'client_secret_post', 'none')
+
+    def check_response_type(self, response_type):
+        # We no longer allow the implicit flow, so `code` is all we need
+        return response_type == 'code'
+
+    def check_grant_type(self, grant_type):
+        return grant_type == 'authorization_code'

@@ -6,11 +6,8 @@
 # LICENSE file for more details.
 
 import os
-from datetime import timedelta
-from uuid import uuid4
 
 from flask import session
-from flask_oauthlib.provider import OAuth2Provider
 
 from indico.core import signals
 from indico.core.logger import Logger
@@ -19,15 +16,6 @@ from indico.web.flask.util import url_for
 from indico.web.menu import SideMenuItem
 
 
-class IndicoOAuth2Provider(OAuth2Provider):
-    def init_app(self, app):
-        app.config.setdefault('OAUTH2_PROVIDER_ERROR_ENDPOINT', 'oauth.oauth_errors')
-        app.config.setdefault('OAUTH2_PROVIDER_TOKEN_EXPIRES_IN', int(timedelta(days=3650).total_seconds()))
-        app.config.setdefault('OAUTH2_PROVIDER_TOKEN_GENERATOR', lambda req: str(uuid4()))
-        super().init_app(app)
-
-
-oauth = IndicoOAuth2Provider()
 logger = Logger.get('oauth')
 
 

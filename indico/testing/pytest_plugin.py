@@ -16,6 +16,8 @@ import py
 
 # Ignore config file in case there is one
 os.environ['INDICO_CONFIG'] = os.devnull
+# Allow non-https contexts in authlib/oauth code
+os.environ['AUTHLIB_INSECURE_TRANSPORT'] = '1'
 
 pytest_plugins = ('indico.testing.fixtures.app', 'indico.testing.fixtures.cache', 'indico.testing.fixtures.category',
                   'indico.testing.fixtures.contribution', 'indico.testing.fixtures.database',

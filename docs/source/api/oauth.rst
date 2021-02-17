@@ -17,11 +17,3 @@ Models
 .. automodule:: indico.modules.oauth.models.tokens
     :members:
     :undoc-members:
-
-
-Utilities
-+++++++++
-
-.. automodule:: indico.modules.oauth.provider
-    :members:
-    :undoc-members:

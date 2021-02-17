@@ -5,6 +5,7 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
+from authlib.integrations.flask_oauth2 import current_token
 from flask import jsonify, request
 from sqlalchemy.orm import joinedload
 from werkzeug.exceptions import BadRequest, Forbidden
@@ -14,7 +15,7 @@ from indico.modules.events.controllers.base import RHProtectedEventBase
 from indico.modules.events.models.events import Event
 from indico.modules.events.registration.models.registrations import RegistrationState
 from indico.modules.events.registration.util import build_registration_api_data, build_registrations_api_data
-from indico.modules.oauth import oauth
+from indico.modules.oauth.oauth2 import require_oauth
 from indico.web.rh import RH
 
 
@@ -23,9 +24,9 @@ class RHAPIRegistrant(RH):
 
     CSRF_ENABLED = False
 
-    @oauth.require_oauth('registrants')
+    @require_oauth('registrants')
     def _check_access(self):
-        if not self.event.can_manage(request.oauth.user, permission='registration'):
+        if not self.event.can_manage(current_token.user, permission='registration'):
             raise Forbidden()
 
     def _process_args(self):
@@ -59,9 +60,9 @@ class RHAPIRegistrant(RH):
 class RHAPIRegistrants(RH):
     """RESTful registrants API."""
 
-    @oauth.require_oauth('registrants')
+    @require_oauth('registrants')
     def _check_access(self):
-        if not self.event.can_manage(request.oauth.user, permission='registration'):
+        if not self.event.can_manage(current_token.user, permission='registration'):
             raise Forbidden()
 
     def _process_args(self):

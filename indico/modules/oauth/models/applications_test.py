@@ -11,10 +11,6 @@ import pytest
 pytest_plugins = 'indico.modules.oauth.testing.fixtures'
 
 
-def test_client_type(dummy_application):
-    assert dummy_application.client_type == 'public'
-
-
 @pytest.mark.parametrize(('redirect_uris', 'expected'), (
     (None,       None),
     (['a'],      'a'),
@@ -47,6 +43,6 @@ def test_reset_client_secret(dummy_application):
     (['https://test.com/a/b'],                      'https://test.com/a',     False),
     (['https://test.com/a/b', 'https://test2.com'], 'https://test2.com',      True),
 ))
-def test_validate_redirect_uri(dummy_application, redirect_uris, to_validate, validates):
+def test_check_redirect_uri(dummy_application, redirect_uris, to_validate, validates):
     dummy_application.redirect_uris = redirect_uris
-    assert dummy_application.validate_redirect_uri(to_validate) == validates
+    assert dummy_application.check_redirect_uri(to_validate) == validates

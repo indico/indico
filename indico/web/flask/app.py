@@ -37,7 +37,7 @@ from indico.core.plugins import plugin_engine, url_for_plugin
 from indico.core.webpack import IndicoManifestLoader, webpack
 from indico.modules.auth.providers import IndicoAuthProvider, IndicoIdentityProvider
 from indico.modules.auth.util import url_for_login, url_for_logout
-from indico.modules.oauth import oauth
+from indico.modules.oauth.oauth2 import setup_oauth_provider
 from indico.util import date_time as date_time_util
 from indico.util.i18n import _, babel, get_all_locales, get_current_locale, gettext_context, ngettext_context
 from indico.util.mimetypes import icon_from_mimetype
@@ -375,7 +375,7 @@ def make_app(set_path=False, testing=False, config_override=None):
         if config.DEFAULT_LOCALE not in get_all_locales():
             Logger.get('i18n').error(f'Configured DEFAULT_LOCALE ({config.DEFAULT_LOCALE}) does not exist')
         multipass.init_app(app)
-        oauth.init_app(app)
+        setup_oauth_provider(app)
         webpack.init_app(app)
         setup_jinja(app)
         configure_db(app)

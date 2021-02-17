@@ -17,6 +17,7 @@ import time
 from urllib.parse import parse_qs, urlencode
 from uuid import UUID
 
+from authlib.oauth2 import OAuth2Error
 from flask import current_app, g, request, session
 from werkzeug.exceptions import BadRequest, NotFound
 
@@ -25,8 +26,7 @@ from indico.core.db import db
 from indico.core.logger import Logger
 from indico.modules.api import APIMode, api_settings
 from indico.modules.api.models.keys import APIKey
-from indico.modules.oauth import oauth
-from indico.modules.oauth.provider import load_token
+from indico.modules.oauth.oauth2 import require_oauth
 from indico.web.http_api import HTTPAPIHook
 from indico.web.http_api.metadata.serializer import Serializer
 from indico.web.http_api.responses import HTTPAPIError, HTTPAPIResult, HTTPAPIResultSchema
@@ -126,24 +126,12 @@ def handler(prefix, path):
     onlyAuthed = get_query_parameter(queryParams, ['oa', 'onlyauthed'], 'no') == 'yes'
     scope = 'read:legacy_api' if request.method == 'GET' else 'write:legacy_api'
 
-    if not request.headers.get('Authorization', '').lower().startswith('basic '):
+    oauth_token = None
+    if request.headers.get('Authorization', '').lower().startswith('bearer '):
         try:
-            oauth_valid, oauth_request = oauth.verify_request([scope])
-            if not oauth_valid:
-                if oauth_request.error_message == 'Bearer token not found.':
-                    # if there's no valid token, we only fail if a token was present at all
-                    # because there are other means to access the API
-                    if g.get('received_oauth_token'):
-                        raise BadRequest('OAuth error: Invalid token')
-                else:
-                    raise BadRequest(f'OAuth error: {oauth_request.error_message}')
-        except ValueError:
-            # XXX: Dirty hack to workaround a bug in flask-oauthlib that causes it
-            #      not to properly urlencode request query strings
-            #      Related issue (https://github.com/lepture/flask-oauthlib/issues/213)
-            oauth_valid = False
-    else:
-        oauth_valid = False
+            oauth_token = require_oauth.acquire_token([scope])
+        except OAuth2Error as exc:
+            raise BadRequest(f'OAuth error: {exc}')
 
     # Get our handler function and its argument and response type
     hook, dformat = HTTPAPIHook.parseRequest(path, queryParams)
@@ -166,9 +154,9 @@ def handler(prefix, path):
             if not used_session.user:  # ignore guest sessions
                 used_session = None
 
-        if apiKey or oauth_valid or not used_session:
+        if apiKey or oauth_token or not used_session:
             auth_token = None
-            if not oauth_valid:
+            if not oauth_token:
                 # Validate the API key (and its signature)
                 ak, enforceOnlyPublic = checkAK(apiKey, signature, timestamp, path, query)
                 if enforceOnlyPublic:
@@ -176,8 +164,7 @@ def handler(prefix, path):
                 # Create an access wrapper for the API key's user
                 user = ak.user if ak and not onlyPublic else None
             else:  # Access Token (OAuth)
-                auth_token = load_token(oauth_request.access_token.access_token)
-                user = auth_token.user if auth_token and not onlyPublic else None
+                user = oauth_token.user if not onlyPublic else None
             # Get rid of API key in cache key if we did not impersonate a user
             if ak and user is None:
                 cacheKey = normalizeQuery(path, query,

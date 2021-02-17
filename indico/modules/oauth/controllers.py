@@ -7,6 +7,8 @@
 
 from uuid import UUID
 
+from authlib.oauth2.base import OAuth2Error
+from authlib.oauth2.rfc6749 import scope_to_list
 from flask import flash, redirect, render_template, request, session
 from sqlalchemy.orm.exc import NoResultFound
 from werkzeug.exceptions import Forbidden
@@ -17,7 +19,7 @@ from indico.modules.oauth import logger
 from indico.modules.oauth.forms import ApplicationForm
 from indico.modules.oauth.models.applications import SCOPES, OAuthApplication
 from indico.modules.oauth.models.tokens import OAuthToken
-from indico.modules.oauth.provider import oauth
+from indico.modules.oauth.oauth2 import authorization
 from indico.modules.oauth.views import WPOAuthAdmin, WPOAuthUserProfile
 from indico.modules.users.controllers import RHUserBase
 from indico.util.i18n import _
@@ -36,21 +38,38 @@ class RHOAuthAuthorize(RHProtected):
             raise NoResultFound
         self.application = OAuthApplication.query.filter_by(client_id=request.args['client_id']).one()
 
-    @oauth.authorize_handler
-    def _process(self, **kwargs):
+    def _process(self):
+        rv = self._process_consent()
+        if rv is True:
+            return authorization.create_authorization_response(grant_user=session.user)
+        elif rv is False:
+            return authorization.create_authorization_response(grant_user=None)
+        else:
+            return rv
+
+    def _process_consent(self):
         if request.method == 'POST':
             if 'confirm' not in request.form:
                 return False
             logger.info('User %s authorized %s', session.user, self.application)
             return True
-        if self.application.is_trusted:
+        elif self.application.is_trusted:
             logger.info('User %s automatically authorized %s', session.user, self.application)
             return True
-        requested_scopes = set(kwargs['scopes'])
+
+        try:
+            grant = authorization.get_consent_grant(end_user=session.user)
+        except OAuth2Error as error:
+            # XXX do we need more/better error handling here?
+            return str(error)
+
+        # TODO: get the combined scopes of all tokens if we allow multiple tokens
         token = self.application.tokens.filter_by(user=session.user).first()
         authorized_scopes = token.scopes if token else set()
+        requested_scopes = set(scope_to_list(grant.request.scope)) if grant.request.scope else authorized_scopes
         if requested_scopes <= authorized_scopes:
             return True
+
         new_scopes = requested_scopes - authorized_scopes
         return render_template('oauth/authorize.html', application=self.application,
                                authorized_scopes=[_f for _f in [SCOPES.get(s) for s in authorized_scopes] if _f],
@@ -65,9 +84,8 @@ class RHOAuthErrors(RHProtected):
 class RHOAuthToken(RH):
     CSRF_ENABLED = False
 
-    @oauth.token_handler
-    def _process(self, **kwargs):
-        return None
+    def _process(self):
+        return authorization.create_token_response()
 
 
 class RHOAuthAdmin(RHAdminBase):
