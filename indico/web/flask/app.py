@@ -96,8 +96,14 @@ def configure_app(app, set_path=False):
 def configure_cache(app, config):
     app.config['CACHE_DEFAULT_TIMEOUT'] = 0
     app.config['CACHE_KEY_PREFIX'] = f'indico_{_get_cache_version()}_'
-    app.config['CACHE_TYPE'] = 'indico.core.cache.make_indico_redis_cache'
-    app.config['CACHE_REDIS_URL'] = config.REDIS_CACHE_URL
+    if config.REDIS_CACHE_URL is not None or not app.testing:
+        # We configure the redis cache if we have the URL, or if we are not in testing mode in
+        # order to fail properly if redis is not configured.
+        app.config['CACHE_TYPE'] = 'indico.core.cache.make_indico_redis_cache'
+        app.config['CACHE_REDIS_URL'] = config.REDIS_CACHE_URL
+    else:
+        app.config['CACHE_TYPE'] = 'null'
+        app.config['CACHE_NO_NULL_WARNING'] = True
 
 
 def configure_multipass(app, config):
