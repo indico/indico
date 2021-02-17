@@ -166,21 +166,23 @@ class RegistrationListGenerator(ListGeneratorBase):
             query = query.filter(subquery == len(field_filters))
         return query.filter(db.or_(*items_criteria))
 
-    def get_list_kwargs(self):
+    def get_list_kwargs(self, lazy=False):
         reg_list_config = self._get_config()
         registrations_query = self._build_query()
+        filtered_query = self._filter_list_entries(registrations_query, reg_list_config['filters'])
         total_entries = registrations_query.count()
-        registrations = self._filter_list_entries(registrations_query, reg_list_config['filters']).all()
+        total_filtered_entries = filtered_query.count()
         dynamic_item_ids, static_item_ids = self._split_item_ids(reg_list_config['items'], 'dynamic')
         static_columns = self._get_static_columns(static_item_ids)
         regform_items = self._get_sorted_regform_items(dynamic_item_ids)
+        registrations = filtered_query if lazy else filtered_query.all()
         return {
             'regform': self.regform,
             'registrations': registrations,
             'total_registrations': total_entries,
             'static_columns': static_columns,
             'dynamic_columns': regform_items,
-            'filtering_enabled': total_entries != len(registrations)
+            'filtering_enabled': total_entries != total_filtered_entries
         }
 
     def get_list_export_config(self):
