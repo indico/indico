@@ -6,6 +6,7 @@
 # LICENSE file for more details.
 
 import weakref
+from collections.abc import Mapping
 
 from flask import flash, g, request, session
 from flask_wtf import FlaskForm
@@ -233,7 +234,7 @@ class FormDefaults:
 
     def __init__(self, obj=None, attrs=None, skip_attrs=None, **defaults):
         self.__obj = obj
-        self.__use_items = hasattr(obj, 'items') and hasattr(obj, 'get')  # smells like a dict
+        self.__use_items = isinstance(obj, Mapping)
         self.__obj_attrs = attrs
         self.__obj_attrs_skip = skip_attrs
         self.__defaults = defaults

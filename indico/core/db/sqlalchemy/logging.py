@@ -9,6 +9,7 @@ import logging
 import pprint
 import time
 import traceback
+from collections.abc import Mapping
 
 from flask import appcontext_tearing_down, current_app, g, has_request_context, request, request_tearing_down
 from sqlalchemy.engine import Engine
@@ -47,7 +48,7 @@ def _get_sql_line():
 
 
 def _fix_param(param):
-    if hasattr(param, 'items'):
+    if isinstance(param, Mapping):
         return {k: _fix_param(v) for k, v in param.items()}
     return '<binary>' if param.__class__.__name__ == 'Binary' else param
 
