@@ -128,6 +128,8 @@ class ChoiceBaseField(RegistrationFormBillableItemsField):
 
     def get_places_used(self):
         places_used = Counter()
+        if not any(x.get('places_limit') for x in self.form_item.versioned_data['choices']):
+            return dict(places_used)
         for registration in self.form_item.registration_form.active_registrations:
             if self.form_item.id not in registration.data_by_field:
                 continue
@@ -416,6 +418,8 @@ class AccommodationField(RegistrationFormBillableItemsField):
 
     def get_places_used(self):
         places_used = Counter()
+        if not any(x.get('places_limit') for x in self.form_item.versioned_data['choices']):
+            return dict(places_used)
         for registration in self.form_item.registration_form.active_registrations:
             if self.form_item.id not in registration.data_by_field:
                 continue
