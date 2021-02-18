@@ -220,13 +220,13 @@ def test_introspection_wrong_app(create_application, dummy_token, test_client):
     assert resp.json == {'active': False}
 
 
-@pytest.mark.parametrize(('reason', 'status_code'), (
-    ('nouuid', 401),
-    ('invalid', 401),
-    ('appdisabled', 401),
-    ('badscope', 403)
+@pytest.mark.parametrize(('reason', 'status_code', 'error'), (
+    ('nouuid', 401, 'invalid_token'),
+    ('invalid', 401, 'invalid_token'),
+    ('appdisabled', 401, 'invalid_token'),
+    ('badscope', 403, 'insufficient_scope')
 ))
-def test_invalid_token(dummy_application, dummy_token, test_client, reason, status_code):
+def test_invalid_token(dummy_application, dummy_token, test_client, reason, status_code, error):
     token = dummy_token.access_token
     if reason == 'nouuid':
         token = 'garbage'
@@ -239,8 +239,8 @@ def test_invalid_token(dummy_application, dummy_token, test_client, reason, stat
         dummy_token._scopes.append('read:user')
 
     resp = test_client.get('/api/user/', headers={'Authorization': f'Bearer {token}'})
-    assert not resp.json
     assert resp.status_code == status_code
+    assert resp.json['error'] == error
 
 
 def test_metadata_endpoint(test_client):

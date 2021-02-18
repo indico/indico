@@ -14,8 +14,10 @@ from authlib.oauth2.rfc6749.util import list_to_scope
 from authlib.oauth2.rfc6750 import BearerTokenValidator
 from authlib.oauth2.rfc7636 import CodeChallenge
 from authlib.oauth2.rfc7662 import IntrospectionEndpoint
+from flask import jsonify
 from flask.ctx import after_this_request
 from sqlalchemy.orm import joinedload
+from werkzeug.exceptions import HTTPException
 
 from indico.core.cache import make_scoped_cache
 from indico.core.config import config
@@ -103,8 +105,24 @@ def _save_token(token_data, request):
         token_data['scope'] = list_to_scope(token.scopes)
 
 
+class IndicoAuthlibHTTPError(HTTPException):
+    def __init__(self, status_code, payload, headers):
+        super().__init__(payload['error_description'])
+        resp = jsonify(payload)
+        resp.headers.update(headers)
+        resp.status_code = status_code
+        self.response = resp
+
+
+class IndicoResourceProtector(ResourceProtector):
+    def raise_error_response(self, error):
+        payload = dict(error.get_body())
+        headers = error.get_headers()
+        raise IndicoAuthlibHTTPError(error.status_code, payload, headers)
+
+
 authorization = AuthorizationServer(query_client=_query_client, save_token=_save_token)
-require_oauth = ResourceProtector()
+require_oauth = IndicoResourceProtector()
 
 
 class IndicoBearerTokenValidator(BearerTokenValidator):
@@ -179,6 +197,7 @@ def setup_oauth_provider(app):
             'authorization_code': 0,
         }
     })
+    app.register_error_handler(IndicoAuthlibHTTPError, lambda exc: exc.get_response())
     authorization.init_app(app)
     authorization.register_grant(IndicoAuthorizationCodeGrant, [IndicoCodeChallenge(required=True)])
     authorization.register_endpoint(IndicoIntrospectionEndpoint)
