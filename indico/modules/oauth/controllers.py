@@ -9,23 +9,47 @@ from uuid import UUID
 
 from authlib.oauth2.base import OAuth2Error
 from authlib.oauth2.rfc6749 import scope_to_list
-from flask import flash, redirect, render_template, request, session
+from authlib.oauth2.rfc8414 import AuthorizationServerMetadata
+from flask import flash, jsonify, redirect, render_template, request, session
 from sqlalchemy.orm.exc import NoResultFound
 from werkzeug.exceptions import Forbidden
 
+from indico.core.config import config
 from indico.core.db import db
 from indico.modules.admin import RHAdminBase
 from indico.modules.oauth import logger
 from indico.modules.oauth.forms import ApplicationForm
 from indico.modules.oauth.models.applications import SCOPES, OAuthApplication
 from indico.modules.oauth.models.tokens import OAuthToken
-from indico.modules.oauth.oauth2 import authorization
+from indico.modules.oauth.oauth2 import (IndicoAuthorizationCodeGrant, IndicoCodeChallenge, IndicoIntrospectionEndpoint,
+                                         authorization)
 from indico.modules.oauth.views import WPOAuthAdmin, WPOAuthUserProfile
 from indico.modules.users.controllers import RHUserBase
 from indico.util.i18n import _
 from indico.web.flask.util import url_for
 from indico.web.forms.base import FormDefaults
 from indico.web.rh import RH, RHProtected
+
+
+class RHOAuthMetadata(RH):
+    """Return RFC8414 Authorization Server Metadata."""
+
+    def _process(self):
+        metadata = AuthorizationServerMetadata(
+            authorization_endpoint=url_for('.oauth_authorize', _external=True),
+            token_endpoint=url_for('.oauth_token', _external=True),
+            introspection_endpoint=url_for('.oauth_introspect', _external=True),
+            issuer=config.BASE_URL,
+            response_types_supported=['code'],
+            response_modes_supported=['query'],
+            grant_types_supported=['authorization_code'],
+            scopes_supported=list(SCOPES),
+            token_endpoint_auth_methods_supported=list(IndicoAuthorizationCodeGrant.TOKEN_ENDPOINT_AUTH_METHODS),
+            introspection_endpoint_auth_methods_supported=list(IndicoIntrospectionEndpoint.CLIENT_AUTH_METHODS),
+            code_challenge_methods_supported=list(IndicoCodeChallenge.SUPPORTED_CODE_CHALLENGE_METHOD),
+        )
+        metadata.validate()
+        return jsonify(metadata)
 
 
 class RHOAuthAuthorize(RHProtected):

@@ -12,6 +12,7 @@ from authlib.common.security import generate_token
 from authlib.oauth2.client import OAuth2Client
 from werkzeug.urls import url_parse
 
+from indico.modules.oauth.models.applications import SCOPES
 from indico.web.flask.util import url_for
 
 
@@ -240,3 +241,21 @@ def test_invalid_token(dummy_application, dummy_token, test_client, reason, stat
     resp = test_client.get('/api/user/', headers={'Authorization': f'Bearer {token}'})
     assert not resp.json
     assert resp.status_code == status_code
+
+
+def test_metadata_endpoint(test_client):
+    resp = test_client.get('/.well-known/oauth-authorization-server')
+    assert resp.status_code == 200
+    assert resp.json == {
+        'authorization_endpoint': 'http://localhost/oauth/authorize',
+        'code_challenge_methods_supported': ['S256'],
+        'grant_types_supported': ['authorization_code'],
+        'introspection_endpoint': 'http://localhost/oauth/introspect',
+        'introspection_endpoint_auth_methods_supported': ['client_secret_basic', 'client_secret_post'],
+        'issuer': 'http://localhost',
+        'response_modes_supported': ['query'],
+        'response_types_supported': ['code'],
+        'scopes_supported': list(SCOPES),
+        'token_endpoint': 'http://localhost/oauth/token',
+        'token_endpoint_auth_methods_supported': ['client_secret_basic',  'client_secret_post', 'none']
+    }
