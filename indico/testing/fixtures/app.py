@@ -8,6 +8,7 @@
 import os
 
 import pytest
+from flask_webpackext.ext import _FlaskWebpackExtState
 
 from indico.web.flask.app import make_app
 from indico.web.flask.wrappers import IndicoFlask
@@ -48,6 +49,7 @@ def request_context(app_context):
 @pytest.fixture
 def test_client(app, mocker):
     """Create a flask request context."""
+    mocker.patch.object(_FlaskWebpackExtState, 'manifest')
     mocker.patch.object(IndicoFlask, 'manifest')
     with app.test_client() as c:
         yield c
