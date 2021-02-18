@@ -109,7 +109,10 @@ class RHOAuthToken(RH):
     CSRF_ENABLED = False
 
     def _process(self):
-        return authorization.create_token_response()
+        resp = authorization.create_token_response()
+        resp.headers['Access-Control-Allow-Methods'] = 'POST'
+        resp.headers['Access-Control-Allow-Origin'] = '*'
+        return resp
 
 
 class RHOAuthIntrospect(RH):
