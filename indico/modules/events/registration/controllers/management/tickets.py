@@ -12,10 +12,10 @@ from flask import json, render_template
 
 from indico.core.config import config
 from indico.core.db import db
+from indico.core.oauth.models.applications import OAuthApplication, SystemAppType
 from indico.modules.designer import PageOrientation, PageSize
 from indico.modules.events.registration.controllers.management import RHManageRegFormBase
 from indico.modules.events.registration.forms import TicketsForm
-from indico.modules.oauth.models.applications import OAuthApplication, SystemAppType
 from indico.web.flask.util import send_file, url_for
 from indico.web.util import jsonify_data, jsonify_template
 

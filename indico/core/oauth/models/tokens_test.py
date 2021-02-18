@@ -5,7 +5,7 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-pytest_plugins = 'indico.modules.oauth.testing.fixtures'
+pytest_plugins = 'indico.core.oauth.testing.fixtures'
 
 
 def test_token_locator(dummy_token):

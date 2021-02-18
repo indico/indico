@@ -9,8 +9,8 @@ from uuid import uuid4
 
 import pytest
 
-from indico.modules.oauth.models.applications import OAuthApplication
-from indico.modules.oauth.models.tokens import OAuthToken
+from indico.core.oauth.models.applications import OAuthApplication
+from indico.core.oauth.models.tokens import OAuthToken
 
 
 @pytest.fixture

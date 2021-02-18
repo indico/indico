@@ -14,15 +14,8 @@ from werkzeug.urls import url_parse
 
 from indico.core.db import db
 from indico.core.db.sqlalchemy import PyIntEnum
-from indico.modules.oauth import logger
+from indico.core.oauth.logger import logger
 from indico.util.enum import IndicoEnum
-from indico.util.i18n import _
-
-
-SCOPES = {'read:user': _("User information (read only)"),
-          'read:legacy_api': _('Legacy API (read only)'),
-          'write:legacy_api': _('Legacy API (write only)'),
-          'registrants': _('Event registrants')}
 
 
 class SystemAppType(int, IndicoEnum):
@@ -184,7 +177,9 @@ class OAuthApplication(ClientMixin, db.Model):
         return self.client_secret == client_secret
 
     def check_endpoint_auth_method(self, method, endpoint):
-        from indico.modules.oauth.oauth2 import IndicoAuthorizationCodeGrant, IndicoIntrospectionEndpoint
+        from indico.core.oauth.endpoints import IndicoIntrospectionEndpoint
+        from indico.core.oauth.grants import IndicoAuthorizationCodeGrant
+
         if endpoint == 'token':
             # TODO: add an option to configure whether to allow `none` auth used for semi-public
             # clients using the authorization code grant with PKCE instead of a client secret

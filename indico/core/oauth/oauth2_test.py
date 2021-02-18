@@ -12,11 +12,11 @@ from authlib.common.security import generate_token
 from authlib.oauth2.client import OAuth2Client
 from werkzeug.urls import url_parse
 
-from indico.modules.oauth.models.applications import SCOPES
+from indico.core.oauth.scopes import SCOPES
 from indico.web.flask.util import url_for
 
 
-pytest_plugins = 'indico.modules.oauth.testing.fixtures'
+pytest_plugins = 'indico.core.oauth.testing.fixtures'
 
 
 class MockSession:

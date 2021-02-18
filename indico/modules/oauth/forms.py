@@ -13,7 +13,8 @@ from wtforms.fields import BooleanField, StringField, TextAreaField
 from wtforms.validators import DataRequired, ValidationError
 
 from indico.core.db import db
-from indico.modules.oauth.models.applications import SCOPES, OAuthApplication
+from indico.core.oauth.models.applications import OAuthApplication
+from indico.core.oauth.scopes import SCOPES
 from indico.util.i18n import _
 from indico.web.forms.base import IndicoForm
 from indico.web.forms.fields import IndicoSelectMultipleCheckboxField, TextListField

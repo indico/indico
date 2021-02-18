@@ -8,7 +8,7 @@
 import pytest
 
 
-pytest_plugins = 'indico.modules.oauth.testing.fixtures'
+pytest_plugins = 'indico.core.oauth.testing.fixtures'
 
 
 @pytest.mark.parametrize(('redirect_uris', 'expected'), (

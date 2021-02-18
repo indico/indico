@@ -24,9 +24,9 @@ from werkzeug.exceptions import BadRequest, NotFound
 from indico.core.cache import make_scoped_cache
 from indico.core.db import db
 from indico.core.logger import Logger
+from indico.core.oauth import require_oauth
 from indico.modules.api import APIMode, api_settings
 from indico.modules.api.models.keys import APIKey
-from indico.modules.oauth.oauth2 import require_oauth
 from indico.web.http_api import HTTPAPIHook
 from indico.web.http_api.metadata.serializer import Serializer
 from indico.web.http_api.responses import HTTPAPIError, HTTPAPIResult, HTTPAPIResultSchema

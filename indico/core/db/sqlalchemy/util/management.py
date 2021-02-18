@@ -105,10 +105,10 @@ def delete_all_tables(db):
 
 def create_all_tables(db, verbose=False, add_initial_data=True):
     """Create all tables and required initial objects."""
+    from indico.core.oauth.models.applications import OAuthApplication, SystemAppType
     from indico.modules.categories import Category
     from indico.modules.designer import TemplateType
     from indico.modules.designer.models.templates import DesignerTemplate
-    from indico.modules.oauth.models.applications import OAuthApplication, SystemAppType
     from indico.modules.users import User
     if verbose:
         print(cformat('%{green}Creating tables'))

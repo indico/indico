@@ -13,7 +13,7 @@ from celery.bin.celery import celery as celery_cmd
 
 from indico.core.celery.util import unlock_task
 from indico.core.config import config
-from indico.modules.oauth.models.applications import OAuthApplication, SystemAppType
+from indico.core.oauth.models.applications import OAuthApplication, SystemAppType
 from indico.util.console import cformat
 from indico.web.flask.util import url_for
 

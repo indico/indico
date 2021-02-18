@@ -13,13 +13,15 @@ from werkzeug.exceptions import Forbidden
 
 from indico.core.config import config
 from indico.core.db import db
+from indico.core.oauth.endpoints import IndicoIntrospectionEndpoint
+from indico.core.oauth.grants import IndicoAuthorizationCodeGrant, IndicoCodeChallenge
+from indico.core.oauth.logger import logger
+from indico.core.oauth.models.applications import OAuthApplication
+from indico.core.oauth.models.tokens import OAuthToken
+from indico.core.oauth.oauth2 import auth_server
+from indico.core.oauth.scopes import SCOPES
 from indico.modules.admin import RHAdminBase
-from indico.modules.oauth import logger
 from indico.modules.oauth.forms import ApplicationForm
-from indico.modules.oauth.models.applications import SCOPES, OAuthApplication
-from indico.modules.oauth.models.tokens import OAuthToken
-from indico.modules.oauth.oauth2 import (IndicoAuthorizationCodeGrant, IndicoCodeChallenge, IndicoIntrospectionEndpoint,
-                                         authorization)
 from indico.modules.oauth.views import WPOAuthAdmin, WPOAuthUserProfile
 from indico.modules.users.controllers import RHUserBase
 from indico.util.i18n import _
@@ -55,15 +57,15 @@ class RHOAuthAuthorize(RHProtected):
     def _process(self):
         rv = self._process_consent()
         if rv is True:
-            return authorization.create_authorization_response(grant_user=session.user)
+            return auth_server.create_authorization_response(grant_user=session.user)
         elif rv is False:
-            return authorization.create_authorization_response(grant_user=None)
+            return auth_server.create_authorization_response(grant_user=None)
         else:
             return rv
 
     def _process_consent(self):
         try:
-            grant = authorization.get_consent_grant(end_user=session.user)
+            grant = auth_server.get_consent_grant(end_user=session.user)
         except OAuth2Error as error:
             return render_template('oauth/authorize_errors.html', error=error.error)
 
@@ -95,7 +97,7 @@ class RHOAuthToken(RH):
     CSRF_ENABLED = False
 
     def _process(self):
-        resp = authorization.create_token_response()
+        resp = auth_server.create_token_response()
         resp.headers['Access-Control-Allow-Methods'] = 'POST'
         resp.headers['Access-Control-Allow-Origin'] = '*'
         return resp
@@ -105,7 +107,7 @@ class RHOAuthIntrospect(RH):
     CSRF_ENABLED = False
 
     def _process(self):
-        return authorization.create_endpoint_response('introspection')
+        return auth_server.create_endpoint_response('introspection')
 
 
 class RHOAuthAdmin(RHAdminBase):

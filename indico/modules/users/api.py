@@ -8,7 +8,7 @@
 from authlib.integrations.flask_oauth2 import current_token
 from flask import jsonify
 
-from indico.modules.oauth.oauth2 import require_oauth
+from indico.core.oauth import require_oauth
 from indico.modules.users import User
 from indico.web.http_api.hooks.base import HTTPAPIHook
 from indico.web.http_api.responses import HTTPAPIError

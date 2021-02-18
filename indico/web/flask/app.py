@@ -33,11 +33,11 @@ from indico.core.db.sqlalchemy.logging import apply_db_loggers
 from indico.core.db.sqlalchemy.util.models import import_all_models
 from indico.core.logger import Logger
 from indico.core.marshmallow import mm
+from indico.core.oauth.oauth2 import setup_oauth_provider
 from indico.core.plugins import plugin_engine, url_for_plugin
 from indico.core.webpack import IndicoManifestLoader, webpack
 from indico.modules.auth.providers import IndicoAuthProvider, IndicoIdentityProvider
 from indico.modules.auth.util import url_for_login, url_for_logout
-from indico.modules.oauth.oauth2 import setup_oauth_provider
 from indico.util import date_time as date_time_util
 from indico.util.i18n import _, babel, get_all_locales, get_current_locale, gettext_context, ngettext_context
 from indico.util.mimetypes import icon_from_mimetype
