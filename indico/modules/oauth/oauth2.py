@@ -162,6 +162,10 @@ class IndicoIntrospectionEndpoint(IntrospectionEndpoint):
         }
 
 
+class IndicoCodeChallenge(CodeChallenge):
+    SUPPORTED_CODE_CHALLENGE_METHOD = ('S256',)
+
+
 def setup_oauth_provider(app):
     app.config.update({
         'OAUTH2_SCOPES_SUPPORTED': list(SCOPES),
@@ -172,6 +176,6 @@ def setup_oauth_provider(app):
         }
     })
     authorization.init_app(app)
-    authorization.register_grant(IndicoAuthorizationCodeGrant, [CodeChallenge(required=True)])
+    authorization.register_grant(IndicoAuthorizationCodeGrant, [IndicoCodeChallenge(required=True)])
     authorization.register_endpoint(IndicoIntrospectionEndpoint)
     require_oauth.register_token_validator(IndicoBearerTokenValidator())
