@@ -9,9 +9,8 @@ from flask import request
 
 from indico.modules.oauth.controllers import (RHOAuthAdmin, RHOAuthAdminApplication, RHOAuthAdminApplicationDelete,
                                               RHOAuthAdminApplicationNew, RHOAuthAdminApplicationReset,
-                                              RHOAuthAdminApplicationRevoke, RHOAuthAuthorize, RHOAuthErrors,
-                                              RHOAuthIntrospect, RHOAuthMetadata, RHOAuthToken, RHOAuthUserProfile,
-                                              RHOAuthUserTokenRevoke)
+                                              RHOAuthAdminApplicationRevoke, RHOAuthAuthorize, RHOAuthIntrospect,
+                                              RHOAuthMetadata, RHOAuthToken, RHOAuthUserProfile, RHOAuthUserTokenRevoke)
 from indico.web.flask.wrappers import IndicoBlueprint
 
 
@@ -20,7 +19,6 @@ _bp = IndicoBlueprint('oauth', __name__, template_folder='templates', virtual_te
 # Application endpoints
 _bp.add_url_rule('/.well-known/oauth-authorization-server', 'oauth_metadata', RHOAuthMetadata)
 _bp.add_url_rule('/oauth/authorize', 'oauth_authorize', RHOAuthAuthorize, methods=('GET', 'POST'))
-_bp.add_url_rule('/oauth/errors', 'oauth_errors', RHOAuthErrors)
 _bp.add_url_rule('/oauth/token', 'oauth_token', RHOAuthToken, methods=('POST',))
 _bp.add_url_rule('/oauth/introspect', 'oauth_introspect', RHOAuthIntrospect, methods=('POST',))
 

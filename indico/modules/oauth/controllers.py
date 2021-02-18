@@ -91,11 +91,6 @@ class RHOAuthAuthorize(RHProtected):
                                new_scopes=[_f for _f in [SCOPES.get(s) for s in new_scopes] if _f])
 
 
-class RHOAuthErrors(RHProtected):
-    def _process(self, **kwargs):
-        return render_template('oauth/authorize_errors.html', error=request.args['error'])
-
-
 class RHOAuthToken(RH):
     CSRF_ENABLED = False
 
