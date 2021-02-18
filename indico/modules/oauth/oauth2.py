@@ -8,14 +8,17 @@
 import uuid
 
 from authlib.integrations.flask_oauth2 import AuthorizationServer, ResourceProtector
-from authlib.oauth2.rfc6749 import InvalidScopeError, grants, scope_to_list
+from authlib.oauth2.rfc6749 import InvalidScopeError, scope_to_list
+from authlib.oauth2.rfc6749.grants import AuthorizationCodeGrant
 from authlib.oauth2.rfc6749.util import list_to_scope
 from authlib.oauth2.rfc6750 import BearerTokenValidator
 from authlib.oauth2.rfc7636 import CodeChallenge
+from authlib.oauth2.rfc7662 import IntrospectionEndpoint
 from flask.ctx import after_this_request
 from sqlalchemy.orm import joinedload
 
 from indico.core.cache import make_scoped_cache
+from indico.core.config import config
 from indico.core.db import db
 from indico.modules.oauth import logger
 from indico.modules.oauth.models.applications import SCOPES, OAuthApplication
@@ -27,8 +30,8 @@ from indico.util.date_time import now_utc
 auth_code_store = make_scoped_cache('oauth-grant-tokens')
 
 
-class AuthorizationCodeGrant(grants.AuthorizationCodeGrant):
-    TOKEN_ENDPOINT_AUTH_METHODS = ['client_secret_basic', 'client_secret_post', 'none']
+class IndicoAuthorizationCodeGrant(AuthorizationCodeGrant):
+    TOKEN_ENDPOINT_AUTH_METHODS = ('client_secret_basic', 'client_secret_post', 'none')
 
     def save_authorization_code(self, code, request):
         code_challenge = request.data.get('code_challenge')
@@ -100,7 +103,7 @@ authorization = AuthorizationServer(query_client=_query_client, save_token=_save
 require_oauth = ResourceProtector()
 
 
-class _BearerTokenValidator(BearerTokenValidator):
+class IndicoBearerTokenValidator(BearerTokenValidator):
     def authenticate_token(self, token_string):
         try:
             uuid.UUID(hex=token_string)
@@ -131,6 +134,34 @@ class _BearerTokenValidator(BearerTokenValidator):
             return response
 
 
+class IndicoIntrospectionEndpoint(IntrospectionEndpoint):
+    SUPPORTED_TOKEN_TYPES = ('access_token',)
+    CLIENT_AUTH_METHODS = ('client_secret_basic', 'client_secret_post')
+
+    def check_permission(self, token, client, request):
+        return token.application == client
+
+    def query_token(self, token_string, token_type_hint):
+        try:
+            uuid.UUID(hex=token_string)
+        except ValueError:
+            return None
+        return (OAuthToken.query
+                .filter_by(access_token=token_string)
+                .options(joinedload('user'), joinedload('application'))
+                .first())
+
+    def introspect_token(self, token: OAuthToken):
+        return {
+            'active': True,
+            'client_id': token.application.client_id,
+            'token_type': 'Bearer',
+            'scope': token.get_scope(),
+            'sub': str(token.user.id),
+            'iss': config.BASE_URL
+        }
+
+
 def setup_oauth_provider(app):
     app.config.update({
         'OAUTH2_SCOPES_SUPPORTED': list(SCOPES),
@@ -141,5 +172,6 @@ def setup_oauth_provider(app):
         }
     })
     authorization.init_app(app)
-    authorization.register_grant(AuthorizationCodeGrant, [CodeChallenge(required=True)])
-    require_oauth.register_token_validator(_BearerTokenValidator())
+    authorization.register_grant(IndicoAuthorizationCodeGrant, [CodeChallenge(required=True)])
+    authorization.register_endpoint(IndicoIntrospectionEndpoint)
+    require_oauth.register_token_validator(IndicoBearerTokenValidator())

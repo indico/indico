@@ -184,14 +184,18 @@ class OAuthApplication(ClientMixin, db.Model):
         return self.client_secret == client_secret
 
     def check_endpoint_auth_method(self, method, endpoint):
-        if endpoint != 'token':
-            # authlib returns True in that case, but since we do not have any other endpoints
-            # I'd rather fail and implement other cases as needed instead of silently accepting
-            # everything
-            raise NotImplementedError
-        # TODO: add an option to configure whether to allow `none` auth used for semi-public
-        # clients using the authorization code grant with PKCE instead of a client secret
-        return method in ('client_secret_basic', 'client_secret_post', 'none')
+        from indico.modules.oauth.oauth2 import IndicoAuthorizationCodeGrant, IndicoIntrospectionEndpoint
+        if endpoint == 'token':
+            # TODO: add an option to configure whether to allow `none` auth used for semi-public
+            # clients using the authorization code grant with PKCE instead of a client secret
+            return method in IndicoAuthorizationCodeGrant.TOKEN_ENDPOINT_AUTH_METHODS
+        elif endpoint == 'introspection':
+            return method in IndicoIntrospectionEndpoint.CLIENT_AUTH_METHODS
+
+        # authlib returns True for unhandled cases, but since we do not have any other endpoints
+        # I'd rather fail and implement other cases as needed instead of silently accepting
+        # everything
+        raise NotImplementedError
 
     def check_response_type(self, response_type):
         # We no longer allow the implicit flow, so `code` is all we need

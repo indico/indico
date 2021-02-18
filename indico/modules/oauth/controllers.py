@@ -88,6 +88,13 @@ class RHOAuthToken(RH):
         return authorization.create_token_response()
 
 
+class RHOAuthIntrospect(RH):
+    CSRF_ENABLED = False
+
+    def _process(self):
+        return authorization.create_endpoint_response('introspection')
+
+
 class RHOAuthAdmin(RHAdminBase):
     """OAuth server administration settings."""
 

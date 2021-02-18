@@ -5,6 +5,8 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
+from base64 import b64encode
+
 import pytest
 from authlib.common.security import generate_token
 from authlib.oauth2.client import OAuth2Client
@@ -160,3 +162,81 @@ def test_oauth_scopes(create_application, test_client, dummy_user, db, app):
         resp = test_client_no_session.get(uri, data=data, headers=headers)
         assert resp.status_code == 200
         assert resp.json['id'] == dummy_user.id
+
+
+@pytest.mark.parametrize('endpoint_auth', ('client_secret_post', 'client_secret_basic'))
+def test_introspection(dummy_application, dummy_token, test_client, endpoint_auth):
+    data = {'token': dummy_token.access_token}
+    headers = {}
+    if endpoint_auth == 'client_secret_post':
+        data['client_id'] = dummy_application.client_id
+        data['client_secret'] = dummy_application.client_secret
+    elif endpoint_auth == 'client_secret_basic':
+        basic_auth = b64encode(f'{dummy_application.client_id}:{dummy_application.client_secret}'.encode()).decode()
+        headers['Authorization'] = f'Basic {basic_auth}'
+    resp = test_client.post('/oauth/introspect', data=data, headers=headers)
+    assert resp.json == {
+        'active': True,
+        'client_id': dummy_application.client_id,
+        'token_type': 'Bearer',
+        'scope': dummy_token.get_scope(),
+        'sub': str(dummy_token.user.id),
+        'iss': 'http://localhost'
+    }
+
+
+@pytest.mark.parametrize('reason', ('nouuid', 'invalid', 'appdisabled'))
+def test_introspection_inactive(dummy_application, dummy_token, test_client, reason):
+    token = dummy_token.access_token
+    if reason == 'nouuid':
+        token = 'garbage'
+    elif reason == 'invalid':
+        token = '00000000-0000-0000-0000-000000000000'
+    elif reason == 'appdisabled':
+        dummy_application.is_enabled = False
+
+    data = {
+        'token': token,
+        'client_id': dummy_application.client_id,
+        'client_secret': dummy_application.client_secret
+    }
+    resp = test_client.post('/oauth/introspect', data=data)
+    if reason == 'appdisabled':
+        assert resp.status_code == 400
+        assert resp.json == {'error': 'invalid_client'}
+    else:
+        assert resp.json == {'active': False}
+
+
+def test_introspection_wrong_app(create_application, dummy_token, test_client):
+    other_app = create_application(name='test')
+    data = {
+        'token': dummy_token.access_token,
+        'client_id': other_app.client_id,
+        'client_secret': other_app.client_secret
+    }
+    resp = test_client.post('/oauth/introspect', data=data)
+    assert resp.json == {'active': False}
+
+
+@pytest.mark.parametrize(('reason', 'status_code'), (
+    ('nouuid', 401),
+    ('invalid', 401),
+    ('appdisabled', 401),
+    ('badscope', 403)
+))
+def test_invalid_token(dummy_application, dummy_token, test_client, reason, status_code):
+    token = dummy_token.access_token
+    if reason == 'nouuid':
+        token = 'garbage'
+    elif reason == 'invalid':
+        token = '00000000-0000-0000-0000-000000000000'
+    elif reason == 'appdisabled':
+        dummy_application.is_enabled = False
+
+    if reason != 'badscope':
+        dummy_token._scopes.append('read:user')
+
+    resp = test_client.get('/api/user/', headers={'Authorization': f'Bearer {token}'})
+    assert not resp.json
+    assert resp.status_code == status_code
