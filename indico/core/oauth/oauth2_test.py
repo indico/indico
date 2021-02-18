@@ -220,6 +220,41 @@ def test_introspection_wrong_app(create_application, dummy_token, test_client):
     assert resp.json == {'active': False}
 
 
+@pytest.mark.parametrize('endpoint_auth', ('client_secret_post', 'client_secret_basic'))
+def test_revocation(db, dummy_application, dummy_token, test_client, endpoint_auth):
+    data = {'token': dummy_token.access_token}
+    headers = {}
+    if endpoint_auth == 'client_secret_post':
+        data['client_id'] = dummy_application.client_id
+        data['client_secret'] = dummy_application.client_secret
+    elif endpoint_auth == 'client_secret_basic':
+        basic_auth = b64encode(f'{dummy_application.client_id}:{dummy_application.client_secret}'.encode()).decode()
+        headers['Authorization'] = f'Basic {basic_auth}'
+    resp = test_client.post('/oauth/revoke', data=data, headers=headers)
+    assert resp.status_code == 200
+    assert resp.json == {}
+    assert dummy_token not in db.session
+    # make sure we can no longer use the token
+    resp = test_client.get('/api/user/', headers={'Authorization': f'Bearer {dummy_token.access_token}'})
+    assert resp.status_code == 401
+
+
+def test_revocation_wrong_app(db, create_application, dummy_token, test_client):
+    other_app = create_application(name='test')
+    data = {
+        'token': dummy_token.access_token,
+        'client_id': other_app.client_id,
+        'client_secret': other_app.client_secret
+    }
+    resp = test_client.post('/oauth/revoke', data=data)
+    assert resp.status_code == 200
+    assert resp.json == {}
+    assert dummy_token in db.session
+    # make sure we can still use the token
+    resp = test_client.get('/api/user/', headers={'Authorization': f'Bearer {dummy_token.access_token}'})
+    assert resp.status_code == 200
+
+
 @pytest.mark.parametrize(('reason', 'status_code', 'error'), (
     ('nouuid', 401, 'invalid_token'),
     ('invalid', 401, 'invalid_token'),
@@ -235,8 +270,8 @@ def test_invalid_token(dummy_application, dummy_token, test_client, reason, stat
     elif reason == 'appdisabled':
         dummy_application.is_enabled = False
 
-    if reason != 'badscope':
-        dummy_token._scopes.append('read:user')
+    if reason == 'badscope':
+        dummy_token._scopes.remove('read:user')
 
     resp = test_client.get('/api/user/', headers={'Authorization': f'Bearer {token}'})
     assert resp.status_code == status_code
@@ -255,6 +290,8 @@ def test_metadata_endpoint(test_client):
         'issuer': 'http://localhost',
         'response_modes_supported': ['query'],
         'response_types_supported': ['code'],
+        'revocation_endpoint': 'http://localhost/oauth/revoke',
+        'revocation_endpoint_auth_methods_supported': ['client_secret_basic', 'client_secret_post'],
         'scopes_supported': list(SCOPES),
         'token_endpoint': 'http://localhost/oauth/token',
         'token_endpoint_auth_methods_supported': ['client_secret_basic',  'client_secret_post', 'none']

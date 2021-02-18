@@ -177,7 +177,7 @@ class OAuthApplication(ClientMixin, db.Model):
         return self.client_secret == client_secret
 
     def check_endpoint_auth_method(self, method, endpoint):
-        from indico.core.oauth.endpoints import IndicoIntrospectionEndpoint
+        from indico.core.oauth.endpoints import IndicoIntrospectionEndpoint, IndicoRevocationEndpoint
         from indico.core.oauth.grants import IndicoAuthorizationCodeGrant
 
         if endpoint == 'token':
@@ -186,6 +186,8 @@ class OAuthApplication(ClientMixin, db.Model):
             return method in IndicoAuthorizationCodeGrant.TOKEN_ENDPOINT_AUTH_METHODS
         elif endpoint == 'introspection':
             return method in IndicoIntrospectionEndpoint.CLIENT_AUTH_METHODS
+        elif endpoint == 'revocation':
+            return method in IndicoRevocationEndpoint.CLIENT_AUTH_METHODS
 
         # authlib returns True for unhandled cases, but since we do not have any other endpoints
         # I'd rather fail and implement other cases as needed instead of silently accepting

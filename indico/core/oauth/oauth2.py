@@ -9,7 +9,7 @@ import uuid
 
 from authlib.integrations.flask_oauth2 import AuthorizationServer
 
-from indico.core.oauth.endpoints import IndicoIntrospectionEndpoint
+from indico.core.oauth.endpoints import IndicoIntrospectionEndpoint, IndicoRevocationEndpoint
 from indico.core.oauth.grants import IndicoAuthorizationCodeGrant, IndicoCodeChallenge
 from indico.core.oauth.protector import IndicoAuthlibHTTPError, IndicoBearerTokenValidator, IndicoResourceProtector
 from indico.core.oauth.scopes import SCOPES
@@ -33,4 +33,5 @@ def setup_oauth_provider(app):
     auth_server.init_app(app)
     auth_server.register_grant(IndicoAuthorizationCodeGrant, [IndicoCodeChallenge(required=True)])
     auth_server.register_endpoint(IndicoIntrospectionEndpoint)
+    auth_server.register_endpoint(IndicoRevocationEndpoint)
     require_oauth.register_token_validator(IndicoBearerTokenValidator())

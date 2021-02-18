@@ -13,7 +13,7 @@ from werkzeug.exceptions import Forbidden
 
 from indico.core.config import config
 from indico.core.db import db
-from indico.core.oauth.endpoints import IndicoIntrospectionEndpoint
+from indico.core.oauth.endpoints import IndicoIntrospectionEndpoint, IndicoRevocationEndpoint
 from indico.core.oauth.grants import IndicoAuthorizationCodeGrant, IndicoCodeChallenge
 from indico.core.oauth.logger import logger
 from indico.core.oauth.models.applications import OAuthApplication
@@ -38,6 +38,7 @@ class RHOAuthMetadata(RH):
             authorization_endpoint=url_for('.oauth_authorize', _external=True),
             token_endpoint=url_for('.oauth_token', _external=True),
             introspection_endpoint=url_for('.oauth_introspect', _external=True),
+            revocation_endpoint=url_for('.oauth_revoke', _external=True),
             issuer=config.BASE_URL,
             response_types_supported=['code'],
             response_modes_supported=['query'],
@@ -45,6 +46,7 @@ class RHOAuthMetadata(RH):
             scopes_supported=list(SCOPES),
             token_endpoint_auth_methods_supported=list(IndicoAuthorizationCodeGrant.TOKEN_ENDPOINT_AUTH_METHODS),
             introspection_endpoint_auth_methods_supported=list(IndicoIntrospectionEndpoint.CLIENT_AUTH_METHODS),
+            revocation_endpoint_auth_methods_supported=list(IndicoRevocationEndpoint.CLIENT_AUTH_METHODS),
             code_challenge_methods_supported=list(IndicoCodeChallenge.SUPPORTED_CODE_CHALLENGE_METHOD),
         )
         metadata.validate()
@@ -108,6 +110,13 @@ class RHOAuthIntrospect(RH):
 
     def _process(self):
         return auth_server.create_endpoint_response('introspection')
+
+
+class RHOAuthRevoke(RH):
+    CSRF_ENABLED = False
+
+    def _process(self):
+        return auth_server.create_endpoint_response('revocation')
 
 
 class RHOAuthAdmin(RHAdminBase):
