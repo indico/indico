@@ -9,7 +9,10 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 
 import './display';
+import './base';
+
 import {setMomentLocale} from 'indico/utils/date';
+
 import CategoryStatistics from './components/CategoryStatistics';
 import {LocaleContext} from './context.js';
 

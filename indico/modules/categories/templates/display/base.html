@@ -42,13 +42,7 @@
                         {% endif %}
                     {% endblock %}
                     {% block cat_export %}
-                        <a href="#"
-                           class="i-button icon-calendar arrow js-export-ical"
-                           title="{% trans %}Export to scheduling tool{% endtrans %}"
-                           data-id="{{ category.id }}"></a>
-                        {% with item=category, ics_url=url_for('categories.export_ical', category) -%}
-                            {% include 'categories/category_export_ical.html' %}
-                        {%- endwith %}
+                        <div id="category-calendar-link" class="calendar-ics-link" data-category-id="{{category.id}}"></div>
                     {% endblock %}
                     {% block cat_view_dropdown %}
                         <a class="i-button icon-eye arrow js-dropdown"
