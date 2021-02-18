@@ -15,7 +15,16 @@ import {Translate} from 'indico/react/i18n';
 import {indicoAxios, handleAxiosError} from 'indico/utils/axios';
 import {snakifyKeys} from 'indico/utils/case';
 
-export default function ICSCalendarLink({endpoint, params, options, ...restProps}) {
+import './ICSCalendarLink.module.scss';
+
+export default function ICSCalendarLink({
+  endpoint,
+  urlParams,
+  renderButton,
+  popupPosition,
+  options,
+  ...restProps
+}) {
   const [copied, setCopied] = useState(false);
   const [option, setOption] = useState(null);
   const [open, setOpen] = useState(false);
@@ -44,39 +53,62 @@ export default function ICSCalendarLink({endpoint, params, options, ...restProps
     }
   };
 
-  const trigger = (
-    <Dropdown
-      {...restProps}
-      icon={null}
-      trigger={
-        <Button icon size="small">
-          <Icon name="calendar alternate outline" />
-          <Icon name="caret down" />
-        </Button>
-      }
-      pointing="top right"
-    >
-      <Dropdown.Menu>
-        <Dropdown.Header>
-          <Translate>Synchronise with your calendar</Translate>
-        </Dropdown.Header>
-        <Dropdown.Divider />
-        {options.map(({key, text, extraParams}) => (
-          <Dropdown.Item
-            key={key}
-            text={text}
-            onClick={async () => {
-              setOption({
-                text,
-                url: await fetchURL(extraParams),
-              });
-              setOpen(true);
-            }}
-          />
-        ))}
-      </Dropdown.Menu>
-    </Dropdown>
-  );
+  const handleSetOption = async (text, queryParams) => {
+    setOption({
+      text,
+      url: await fetchURL(queryParams),
+    });
+    setOpen(true);
+  };
+
+  let trigger;
+
+  if (options.length > 1) {
+    trigger = (
+      <Dropdown
+        styleName="height-full"
+        icon={null}
+        trigger={
+          renderButton ? (
+            renderButton()
+          ) : (
+            <Button icon size="small">
+              <Icon name="calendar alternate outline" />
+              <Icon name="caret down" />
+            </Button>
+          )
+        }
+        pointing="top right"
+        {...restProps}
+      >
+        <Dropdown.Menu>
+          <Dropdown.Header>
+            <Translate>Synchronise with your calendar</Translate>
+          </Dropdown.Header>
+          <Dropdown.Divider />
+          {options.map(({key, text, queryParams}) => (
+            <Dropdown.Item
+              key={key}
+              text={text}
+              onClick={() => handleSetOption(text, queryParams)}
+            />
+          ))}
+        </Dropdown.Menu>
+      </Dropdown>
+    );
+  } else {
+    const {text, queryParams} = options[0];
+    trigger = renderButton ? (
+      renderButton({
+        onClick: () => handleSetOption(text, queryParams),
+      })
+    ) : (
+      <Button icon size="small" onClick={() => handleSetOption(text, queryParams)}>
+        <Icon name="calendar alternate outline" />
+        <Icon name="caret down" />
+      </Button>
+    );
+  }
 
   return (
     <Popup
@@ -129,7 +161,9 @@ export default function ICSCalendarLink({endpoint, params, options, ...restProps
 
 ICSCalendarLink.propTypes = {
   endpoint: PropTypes.string.isRequired,
-  params: PropTypes.objectOf(PropTypes.string),
+  urlParams: PropTypes.objectOf(PropTypes.string),
+  renderButton: PropTypes.func,
+  popupPosition: PropTypes.string,
   options: PropTypes.arrayOf(
     PropTypes.shape({
       key: PropTypes.string.isRequired,
@@ -140,6 +174,8 @@ ICSCalendarLink.propTypes = {
 };
 
 ICSCalendarLink.defaultProps = {
-  params: {},
+  urlParams: {},
+  renderButton: null,
+  popupPosition: 'left center',
   options: [],
 };
