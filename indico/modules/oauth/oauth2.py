@@ -72,6 +72,10 @@ class IndicoAuthorizationCodeGrant(AuthorizationCodeGrant):
 
 
 def _query_client(client_id):
+    try:
+        uuid.UUID(hex=client_id)
+    except ValueError:
+        return None
     return OAuthApplication.query.filter_by(client_id=client_id, is_enabled=True).first()
 
 

@@ -5,13 +5,10 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from uuid import UUID
-
 from authlib.oauth2.base import OAuth2Error
 from authlib.oauth2.rfc6749 import scope_to_list
 from authlib.oauth2.rfc8414 import AuthorizationServerMetadata
 from flask import flash, jsonify, redirect, render_template, request, session
-from sqlalchemy.orm.exc import NoResultFound
 from werkzeug.exceptions import Forbidden
 
 from indico.core.config import config
@@ -55,13 +52,6 @@ class RHOAuthMetadata(RH):
 class RHOAuthAuthorize(RHProtected):
     CSRF_ENABLED = False
 
-    def _process_args(self):
-        try:
-            UUID(hex=request.args['client_id'])
-        except ValueError:
-            raise NoResultFound
-        self.application = OAuthApplication.query.filter_by(client_id=request.args['client_id']).one()
-
     def _process(self):
         rv = self._process_consent()
         if rv is True:
@@ -72,30 +62,31 @@ class RHOAuthAuthorize(RHProtected):
             return rv
 
     def _process_consent(self):
-        if request.method == 'POST':
-            if 'confirm' not in request.form:
-                return False
-            logger.info('User %s authorized %s', session.user, self.application)
-            return True
-        elif self.application.is_trusted:
-            logger.info('User %s automatically authorized %s', session.user, self.application)
-            return True
-
         try:
             grant = authorization.get_consent_grant(end_user=session.user)
         except OAuth2Error as error:
-            # XXX do we need more/better error handling here?
-            return str(error)
+            return render_template('oauth/authorize_errors.html', error=error.error)
+
+        application = grant.client
+
+        if request.method == 'POST':
+            if 'confirm' not in request.form:
+                return False
+            logger.info('User %s authorized %s', session.user, application)
+            return True
+        elif application.is_trusted:
+            logger.info('User %s automatically authorized %s', session.user, application)
+            return True
 
         # TODO: get the combined scopes of all tokens if we allow multiple tokens
-        token = self.application.tokens.filter_by(user=session.user).first()
+        token = application.tokens.filter_by(user=session.user).first()
         authorized_scopes = token.scopes if token else set()
         requested_scopes = set(scope_to_list(grant.request.scope)) if grant.request.scope else authorized_scopes
         if requested_scopes <= authorized_scopes:
             return True
 
         new_scopes = requested_scopes - authorized_scopes
-        return render_template('oauth/authorize.html', application=self.application,
+        return render_template('oauth/authorize.html', application=application,
                                authorized_scopes=[_f for _f in [SCOPES.get(s) for s in authorized_scopes] if _f],
                                new_scopes=[_f for _f in [SCOPES.get(s) for s in new_scopes] if _f])
 
