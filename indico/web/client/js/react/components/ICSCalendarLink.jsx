@@ -113,7 +113,7 @@ export default function ICSCalendarLink({
   return (
     <Popup
       trigger={trigger}
-      position="left center"
+      position={popupPosition}
       open={open}
       popperDependencies={[copied]}
       on="click"
@@ -126,6 +126,7 @@ export default function ICSCalendarLink({
       wide
     >
       <Header
+        styleName="centered"
         content={Translate.string('Sync with your calendar')}
         subheader={option && <Label color="blue">{option.text}</Label>}
       />

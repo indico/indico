@@ -201,9 +201,7 @@
                     {{ _render_filters() }}
                 {% endif %}
 
-                <a class="i-button text-color subtle icon-calendar js-export-ical" id="exportIcal{{ event.id }}" data-id="{{ event.id }}"
-                   title="{% trans %}Export to iCal{% endtrans %}"></a>
-                {{ template_hook('event-ical-export', event=event) }}
+                <div id="event-calendar-link" class="calendar-ics-link" data-event-id="{{ event.id }}"></div>
 
                 {% if event.type == 'meeting' %}
                     <a class="i-button text-color subtle icon-file-pdf" title="{% trans %}Export to PDF{% endtrans %}"

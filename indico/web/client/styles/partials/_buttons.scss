@@ -382,6 +382,10 @@ a.arrow,
   vertical-align: baseline;
 }
 
+.i-button.height-full {
+  height: 100%;
+}
+
 /* Remove special border added in Firefox */
 button::-moz-focus-inner,
 input[type='button']::-moz-focus-inner,
