@@ -104,7 +104,7 @@ class OAuthToken(TokenMixin, db.Model):
         return self.application == client
 
     def get_scope(self):
-        return list_to_scope(sorted(self.scopes & set(self.application.default_scopes)))
+        return list_to_scope(sorted(self.scopes & set(self.application.allowed_scopes)))
 
     def get_expires_in(self):
         return 0

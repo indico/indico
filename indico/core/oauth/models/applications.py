@@ -24,10 +24,10 @@ class SystemAppType(int, IndicoEnum):
     flower = 2
 
     __enforced_data__ = {
-        checkin: {'default_scopes': {'registrants'},
+        checkin: {'allowed_scopes': {'registrants'},
                   'redirect_uris': ['http://localhost'],
                   'is_enabled': True},
-        flower: {'default_scopes': {'read:user'},
+        flower: {'allowed_scopes': {'read:user'},
                  'is_enabled': True}
     }
 
@@ -92,8 +92,8 @@ class OAuthApplication(ClientMixin, db.Model):
         nullable=False,
         default=lambda: str(uuid4())
     )
-    #: the OAuth default scopes the application may request access to
-    default_scopes = db.Column(
+    #: the OAuth scopes the application may request access to
+    allowed_scopes = db.Column(
         ARRAY(db.String),
         nullable=False
     )
@@ -149,7 +149,7 @@ class OAuthApplication(ClientMixin, db.Model):
     def get_allowed_scope(self, scope):
         if not scope:
             return ''
-        allowed = set(self.default_scopes)
+        allowed = set(self.allowed_scopes)
         scopes = set(scope_to_list(scope))
         return list_to_scope(allowed & scopes)
 

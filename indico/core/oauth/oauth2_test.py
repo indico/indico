@@ -109,7 +109,7 @@ def test_oauth_flows(create_application, test_client, dummy_user, db, app, trust
 
 
 def test_oauth_scopes(create_application, test_client, dummy_user, db, app):
-    oauth_app = create_application(name='test', is_trusted=False, default_scopes=['read:user', 'read:legacy_api'])
+    oauth_app = create_application(name='test', is_trusted=False, allowed_scopes=['read:user', 'read:legacy_api'])
     oauth_client = OAuth2Client(MockSession(test_client),
                                 oauth_app.client_id, oauth_app.client_secret,
                                 token_endpoint=url_for('oauth.oauth_token', _external=True),
@@ -274,7 +274,7 @@ def test_invalid_token(dummy_application, dummy_token, test_client, reason, stat
     if reason == 'badscope':
         dummy_token._scopes.remove('read:user')
     elif reason == 'badappscope':
-        dummy_application.default_scopes.remove('read:user')
+        dummy_application.allowed_scopes.remove('read:user')
 
     resp = test_client.get('/api/user/', headers={'Authorization': f'Bearer {token}'})
     assert resp.status_code == status_code
