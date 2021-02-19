@@ -7,6 +7,8 @@
 
 import 'indico/modules/events/util/types_dialog';
 
+import './session_display';
+
 (function(global) {
   'use strict';
 
