@@ -11,29 +11,32 @@
         <div class="i-box-content">
             <p>{% trans %}This is the list of applications you authorized to access your Indico data.{% endtrans %}</p>
             <ul class="group-list with-buttons">
-                {% if not tokens %}
+                {% if not authorizations %}
                     <li class="italic">
                         {%- trans %}No third party applications have been authorized.{% endtrans -%}
                     </li>
                 {% endif %}
-                {% for token in tokens|sort(attribute='application.name') %}
+                {% for auth, last_use in authorizations %}
                     <li class="flexrow f-a-center">
-                        <span class="list-item-title">{{ token.application.name }}</span>
+                        <span class="list-item-title"
+                              title="{% trans %}Authorized scopes:{% endtrans %} {{ auth.scopes|join(', ') }}">
+                            {{- auth.application.name -}}
+                        </span>
                         <span class="right">
                             <span class="list-item-info">
                                 <span class="label">{% trans %}Last used:{% endtrans %}</span>
                                 <span class="content">
-                                    {% if token.last_used_dt %}
-                                        {{ token.last_used_dt | format_datetime('short') }}
+                                    {% if last_use %}
+                                        {{ last_use | format_datetime('short') }}
                                     {% else %}
                                         {% trans %}Never{% endtrans %}
                                     {% endif %}
                                 </span>
                             </span>
                             <button class="ui negative small button"
-                                    data-href="{{ url_for('.user_token_revoke', token) }}"
+                                    data-href="{{ url_for('.user_app_revoke', auth.application) }}"
                                     data-method="POST"
-                                    data-confirm="{% trans app_name=token.application.name %}{{ app_name }} will no longer have access to your Indico data.<br>
+                                    data-confirm="{% trans app_name=auth.application.name %}{{ app_name }} will no longer have access to your Indico data.<br>
                                     Are you sure you want to revoke its access?{% endtrans %}">
                                 {%- trans %}Revoke{% endtrans -%}
                             </button>

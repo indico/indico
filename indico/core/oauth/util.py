@@ -7,13 +7,13 @@
 
 from uuid import UUID
 
-from authlib.oauth2.rfc6749 import scope_to_list
-from authlib.oauth2.rfc6749.util import list_to_scope
+from authlib.oauth2.rfc6749 import list_to_scope, scope_to_list
+from sqlalchemy.dialects.postgresql.array import ARRAY
 from sqlalchemy.orm import joinedload
 
 from indico.core.db import db
 from indico.core.oauth.logger import logger
-from indico.core.oauth.models.applications import OAuthApplication
+from indico.core.oauth.models.applications import OAuthApplication, OAuthApplicationUserLink
 from indico.core.oauth.models.tokens import OAuthToken
 
 
@@ -22,9 +22,11 @@ def query_token(token_string):
         UUID(hex=token_string)
     except ValueError:
         return None
+    # we always need the app link (which already loads the application) and the user
+    # since we need those to check if the token is still valid
     return (OAuthToken.query
             .filter_by(access_token=token_string)
-            .options(joinedload('user'), joinedload('application'))
+            .options(joinedload('app_user_link').joinedload('user'))
             .first())
 
 
@@ -38,23 +40,27 @@ def query_client(client_id):
 
 def save_token(token_data, request):
     requested_scopes = set(scope_to_list(token_data.get('scope', '')))
-    token = (OAuthToken.query
-             .filter(OAuthApplication.client_id == request.client.client_id,
-                     OAuthToken.user == request.user)
-             .join(OAuthApplication)
-             .first())
-    if token is None:
-        application = OAuthApplication.query.filter_by(client_id=request.client.client_id).one()
-        token = OAuthToken(application=application, user=request.user, access_token=token_data['access_token'],
-                           scopes=requested_scopes)
-        db.session.add(token)
-    elif requested_scopes - token.scopes:
-        logger.info('Added scopes to %s: %s', token, requested_scopes - token.scopes)
-        # use the new access_token when extending scopes
-        token.access_token = token_data['access_token']
-        token.scopes |= requested_scopes
-        token_data['scope'] = list_to_scope(token.scopes)
+    application = OAuthApplication.query.filter_by(client_id=request.client.client_id).one()
+    link = OAuthApplicationUserLink.query.with_parent(application).with_parent(request.user).first()
+
+    token = None
+    if link is None:
+        link = OAuthApplicationUserLink(application=application, user=request.user, scopes=requested_scopes)
     else:
-        # XXX is mutating the token data really a good idea? :/
+        if not requested_scopes:
+            # for already-authorized apps not specifying a scope uses all scopes the
+            # user previously granted to the app
+            requested_scopes = set(link.scopes)
+            token_data['scope'] = list_to_scope(requested_scopes)
+        new_scopes = requested_scopes - set(link.scopes)
+        if new_scopes:
+            logger.info('New scopes for %r: %s', link, new_scopes)
+            link.update_scopes(new_scopes)
+        else:
+            # we can reuse an existing token with the same scopes if there is one
+            token = link.tokens.filter_by(_scopes=db.cast(sorted(requested_scopes), ARRAY(db.String))).first()
+
+    if token is None:
+        link.tokens.append(OAuthToken(access_token=token_data['access_token'], scopes=requested_scopes))
+    else:
         token_data['access_token'] = token.access_token
-        token_data['scope'] = list_to_scope(token.scopes)

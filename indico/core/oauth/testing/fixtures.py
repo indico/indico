@@ -9,7 +9,7 @@ from uuid import uuid4
 
 import pytest
 
-from indico.core.oauth.models.applications import OAuthApplication
+from indico.core.oauth.models.applications import OAuthApplication, OAuthApplicationUserLink
 from indico.core.oauth.models.tokens import OAuthToken
 
 
@@ -19,7 +19,7 @@ def create_application(db):
 
     def _create_application(name, **params):
         params.setdefault('client_id', str(uuid4()))
-        params.setdefault('allowed_scopes', ['read:api', 'write:api', 'read:user'])
+        params.setdefault('allowed_scopes', ['read:legacy_api', 'write:legacy_api', 'read:user'])
         params.setdefault('redirect_uris', ['http://localhost:10500/'])
         params.setdefault('is_trusted', True)
         application = OAuthApplication(name=name, **params)
@@ -31,29 +31,25 @@ def create_application(db):
 
 
 @pytest.fixture
-def create_token(db, dummy_application, dummy_user):
-    """Return a callable which lets you create tokens."""
-
-    def _create_tokens(**params):
-        params.setdefault('access_token', str(uuid4()))
-        params.setdefault('user', dummy_user)
-        params.setdefault('application', dummy_application)
-        params.setdefault('scopes', ['read:api', 'read:user'])
-        token = OAuthToken(**params)
-        db.session.add(token)
-        db.session.flush()
-        return token
-
-    return _create_tokens
-
-
-@pytest.fixture
 def dummy_application(create_application):
     """Return a dummy application."""
     return create_application(name='dummy')
 
 
 @pytest.fixture
-def dummy_token(create_token):
-    """Return a dummy token."""
-    return create_token()
+def dummy_app_link(db, dummy_application, dummy_user):
+    """Return an app link for the dummy user."""
+    link = OAuthApplicationUserLink(application=dummy_application, user=dummy_user,
+                                    scopes=['read:legacy_api', 'read:user'])
+    db.session.add(link)
+    db.session.flush()
+    return link
+
+
+@pytest.fixture
+def dummy_token(db, dummy_app_link):
+    """Return a token for the dummy app/user."""
+    token = OAuthToken(access_token=str(uuid4()), app_user_link=dummy_app_link, scopes=['read:legacy_api', 'read:user'])
+    db.session.add(token)
+    db.session.flush()
+    return token

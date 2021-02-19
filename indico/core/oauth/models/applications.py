@@ -123,7 +123,7 @@ class OAuthApplication(ClientMixin, db.Model):
     )
 
     # relationship backrefs:
-    # - tokens (OAuthToken.application)
+    # - user_links (OAuthApplicationUserLink.application)
 
     @property
     def default_redirect_uri(self):
@@ -200,3 +200,61 @@ class OAuthApplication(ClientMixin, db.Model):
 
     def check_grant_type(self, grant_type):
         return grant_type == 'authorization_code'
+
+
+class OAuthApplicationUserLink(db.Model):
+    """The authorization link between an OAuth app and a user."""
+
+    __tablename__ = 'application_user_links'
+    __table_args__ = (db.UniqueConstraint('application_id', 'user_id'),
+                      {'schema': 'oauth'})
+
+    id = db.Column(
+        db.Integer,
+        primary_key=True
+    )
+    application_id = db.Column(
+        db.Integer,
+        db.ForeignKey('oauth.applications.id'),
+        nullable=False,
+        index=True
+    )
+    user_id = db.Column(
+        db.Integer,
+        db.ForeignKey('users.users.id'),
+        nullable=False,
+        index=True
+    )
+    scopes = db.Column(
+        ARRAY(db.String),
+        nullable=False,
+        default=[]
+    )
+
+    application = db.relationship(
+        'OAuthApplication',
+        lazy=False,
+        backref=db.backref(
+            'user_links',
+            lazy='dynamic',
+            cascade='all, delete-orphan'
+        )
+    )
+    user = db.relationship(
+        'User',
+        lazy=True,
+        backref=db.backref(
+            'oauth_app_links',
+            lazy='dynamic',
+            cascade='all, delete-orphan'
+        )
+    )
+
+    # relationship backrefs:
+    # - tokens (OAuthToken.app_user_link)
+
+    def __repr__(self):
+        return f'<OAuthApplicationUserLink({self.application_id}, {self.user_id}, {self.scopes})>'
+
+    def update_scopes(self, scopes: set):
+        self.scopes = sorted(set(self.scopes) | scopes)

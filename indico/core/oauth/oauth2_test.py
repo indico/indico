@@ -138,8 +138,8 @@ def test_oauth_scopes(create_application, test_client, dummy_user, db, app):
     db.session.expunge(dummy_user)
 
     # get a token and make sure it looks fine
-    token = oauth_client.fetch_token(authorization_response=target_url)
-    assert token == {'access_token': token['access_token'], 'token_type': 'Bearer', 'scope': 'read:legacy_api'}
+    token1 = oauth_client.fetch_token(authorization_response=target_url)
+    assert token1 == {'access_token': token1['access_token'], 'token_type': 'Bearer', 'scope': 'read:legacy_api'}
 
     # we cannot use a token with an invalid scope
     with app.test_client() as test_client_no_session:
@@ -147,17 +147,31 @@ def test_oauth_scopes(create_application, test_client, dummy_user, db, app):
         resp = test_client_no_session.get(uri, data=data, headers=headers)
         assert resp.status_code == 403
 
-    # XXX: we should probably add scopes instead of replacing them. when we change that in the oauth
-    # backend let's stop requesting the existing scope here but only ask for the new one. AFAIK most
-    # oauth providers in the wild do this already...
-    auth_url = oauth_client.create_authorization_url(auth_endpoint, scope='read:legacy_api read:user')[0]
+    # request a different scope
+    auth_url = oauth_client.create_authorization_url(auth_endpoint, scope='read:user')[0]
     authorized_resp = test_client.post(auth_url, data={'confirm': '1'})
     target_url = authorized_resp.headers['Location']
-    token = oauth_client.fetch_token(authorization_response=target_url)
-    assert set(token.pop('scope').split()) == {'read:legacy_api', 'read:user'}
-    assert token == {'access_token': token['access_token'], 'token_type': 'Bearer'}
+    token2 = oauth_client.fetch_token(authorization_response=target_url)
+    assert token2 == {'access_token': token2['access_token'], 'token_type': 'Bearer', 'scope': 'read:user'}
+    assert token2['access_token'] != token1['access_token']
 
-    # now that we authorized the proper scope, we can use our token
+    # this token is already able to access the endpoint
+    with app.test_client() as test_client_no_session:
+        uri, headers, data = oauth_client.token_auth.prepare('/api/user/', {}, '')
+        resp = test_client_no_session.get(uri, data=data, headers=headers)
+        assert resp.status_code == 200
+        assert resp.json['id'] == dummy_user.id
+
+    # no scope specified, so we should get a token with all authorized scopes
+    auth_url = oauth_client.create_authorization_url(auth_endpoint)[0]
+    authorized_resp = test_client.post(auth_url, data={'confirm': '1'})
+    target_url = authorized_resp.headers['Location']
+    token3 = oauth_client.fetch_token(authorization_response=target_url)
+    assert set(token3.pop('scope').split()) == {'read:legacy_api', 'read:user'}
+    assert token3 == {'access_token': token3['access_token'], 'token_type': 'Bearer'}
+    assert token3['access_token'] != token2['access_token']
+
+    # and of course that token also has access to the endpoint
     with app.test_client() as test_client_no_session:
         uri, headers, data = oauth_client.token_auth.prepare('/api/user/', {}, '')
         resp = test_client_no_session.get(uri, data=data, headers=headers)

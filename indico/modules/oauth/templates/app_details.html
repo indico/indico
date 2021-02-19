@@ -3,7 +3,7 @@
 {% from 'forms/_form.html' import form_header, form_rows, form_footer %}
 {% from 'message_box.html' import message_box %}
 
-{% set num_tokens = application.tokens.count() %}
+{% set num_users = application.user_links.count() %}
 
 
 {% block subtitle %}
@@ -21,9 +21,9 @@
                 <div class="group">
                     <button class="i-button"
                         data-href="{{ url_for('.app_revoke', application) }}" data-method="POST"
-                        data-confirm="{% trans %}Are you sure you want to revoke all {{ num_tokens }} user tokens?{% endtrans %}"
-                        {% if not num_tokens %}disabled{% endif %}>
-                        {%- trans %}Revoke user tokens{% endtrans -%}
+                        data-confirm="{% trans %}Are you sure you want to revoke all {{ num_users }} user authorizations?{% endtrans %}"
+                        {% if not num_users %}disabled{% endif %}>
+                        {%- trans %}Revoke user authorizations{% endtrans -%}
                     </button>
                     <button class="i-button"
                         data-href="{{ url_for('.app_reset', application) }}" data-method="POST"
@@ -47,7 +47,7 @@
                     {% trans %}Users:{% endtrans %}
                 </span>
                 <span class="content">
-                    {{ num_tokens }}
+                    {{ num_users }}
                 </span>
             </div>
         </div>

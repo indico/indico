@@ -9,6 +9,7 @@ from authlib.oauth2.base import OAuth2Error
 from authlib.oauth2.rfc6749 import scope_to_list
 from authlib.oauth2.rfc8414 import AuthorizationServerMetadata
 from flask import flash, jsonify, redirect, render_template, request, session
+from sqlalchemy.orm import contains_eager
 from werkzeug.exceptions import Forbidden
 
 from indico.core.config import config
@@ -16,7 +17,7 @@ from indico.core.db import db
 from indico.core.oauth.endpoints import IndicoIntrospectionEndpoint, IndicoRevocationEndpoint
 from indico.core.oauth.grants import IndicoAuthorizationCodeGrant, IndicoCodeChallenge
 from indico.core.oauth.logger import logger
-from indico.core.oauth.models.applications import OAuthApplication
+from indico.core.oauth.models.applications import OAuthApplication, OAuthApplicationUserLink
 from indico.core.oauth.models.tokens import OAuthToken
 from indico.core.oauth.oauth2 import auth_server
 from indico.core.oauth.scopes import SCOPES
@@ -82,9 +83,8 @@ class RHOAuthAuthorize(RHProtected):
             logger.info('User %s automatically authorized %s', session.user, application)
             return True
 
-        # TODO: get the combined scopes of all tokens if we allow multiple tokens
-        token = application.tokens.filter_by(user=session.user).first()
-        authorized_scopes = token.scopes if token else set()
+        link = application.user_links.filter_by(user=session.user).first()
+        authorized_scopes = set(link.scopes) if link else set()
         requested_scopes = set(scope_to_list(grant.request.scope)) if grant.request.scope else authorized_scopes
         if requested_scopes <= authorized_scopes:
             return True
@@ -193,9 +193,9 @@ class RHOAuthAdminApplicationRevoke(RHOAuthAdminApplicationBase):
     """Revoke all user tokens associated to the OAuth application."""
 
     def _process(self):
-        self.application.tokens.delete()
-        logger.info("All user tokens for %s revoked by %s", self.application, session.user)
-        flash(_("All user tokens for this application were revoked successfully"), 'success')
+        self.application.user_links.delete()
+        logger.info('Deauthorizing app %r for all users', self.application)
+        flash(_("App authorization revoked for all users."), 'success')
         return redirect(url_for('.app_details', self.application))
 
 
@@ -203,21 +203,31 @@ class RHOAuthUserProfile(RHUserBase):
     """OAuth overview (user)."""
 
     def _process(self):
-        tokens = self.user.oauth_tokens.all()
-        return WPOAuthUserProfile.render_template('user_profile.html', 'applications', user=self.user, tokens=tokens)
+        authorizations = (
+            db.session.query(OAuthApplicationUserLink, db.func.max(OAuthToken.last_used_dt))
+            .with_parent(session.user)
+            .join(OAuthToken, OAuthToken.app_user_link_id == OAuthApplicationUserLink.id)
+            .join(OAuthApplication)
+            .options(contains_eager('application'))
+            .group_by(OAuthApplication.id, OAuthApplicationUserLink.id)
+            .order_by(OAuthApplication.name)
+            .all()
+        )
+        return WPOAuthUserProfile.render_template('user_profile.html', 'applications', user=self.user,
+                                                  authorizations=authorizations)
 
 
-class RHOAuthUserTokenRevoke(RHUserBase):
-    """Revoke user token."""
+class RHOAuthUserAppRevoke(RHUserBase):
+    """Revoke an oauth application's access to a user."""
 
     def _process_args(self):
         RHUserBase._process_args(self)
-        self.token = OAuthToken.get(request.view_args['id'])
-        if self.user != self.token.user:
-            raise Forbidden("You can only revoke tokens associated with your user")
+        self.application = OAuthApplication.get_or_404(request.view_args['id'])
 
     def _process(self):
-        db.session.delete(self.token)
-        logger.info("Token of application %s for user %s was revoked.", self.token.application, self.token.user)
-        flash(_("Token for {} has been revoked successfully").format(self.token.application.name), 'success')
+        link = OAuthApplicationUserLink.query.with_parent(self.user).with_parent(self.application).first()
+        if link:
+            logger.info('Deauthorizing app %r for user %r (scopes: %r)', self.application, self.user, link.scopes)
+            db.session.delete(link)
+        flash(_("Access for '{}' has been successfully revoked.").format(self.application.name), 'success')
         return redirect(url_for('.user_profile'))

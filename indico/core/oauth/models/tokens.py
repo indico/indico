@@ -21,64 +21,50 @@ class OAuthToken(TokenMixin, db.Model):
     """OAuth tokens."""
 
     __tablename__ = 'tokens'
-    __table_args__ = (db.UniqueConstraint('application_id', 'user_id'),
+    __table_args__ = (db.UniqueConstraint('app_user_link_id', 'scopes'),
                       {'schema': 'oauth'})
 
-    #: the unique identifier of the token
     id = db.Column(
         db.Integer,
         primary_key=True
     )
-    #: the identifier of the linked application
-    application_id = db.Column(
-        db.Integer,
-        db.ForeignKey('oauth.applications.id'),
-        nullable=False
-    )
-    #: the identifier of the linked user
-    user_id = db.Column(
-        db.Integer,
-        db.ForeignKey('users.users.id'),
+    app_user_link_id = db.Column(
+        db.ForeignKey('oauth.application_user_links.id', ondelete='CASCADE'),
         nullable=False,
         index=True
     )
-    #: an unguessable unique string of characters
     access_token = db.Column(
         UUID,
         unique=True,
         nullable=False
     )
-    #: the list of scopes the linked application has access to
     _scopes = db.Column(
         'scopes',
         ARRAY(db.String)
     )
-    #: the last time the token was used by the application
     last_used_dt = db.Column(
         UTCDateTime,
         nullable=True
     )
 
-    #: application authorized by this token
-    application = db.relationship(
-        'OAuthApplication',
-        lazy=True,
+    app_user_link = db.relationship(
+        'OAuthApplicationUserLink',
+        lazy=False,
         backref=db.backref(
             'tokens',
             lazy='dynamic',
-            cascade='all, delete-orphan'
+            cascade='all, delete-orphan',
+            passive_deletes=True
         )
     )
-    #: the user who owns this token
-    user = db.relationship(
-        'User',
-        lazy=False,
-        backref=db.backref(
-            'oauth_tokens',
-            lazy='dynamic',
-            cascade='all, delete-orphan'
-        )
-    )
+
+    @property
+    def user(self):
+        return self.app_user_link.user
+
+    @property
+    def application(self):
+        return self.app_user_link.application
 
     @property
     def locator(self):
@@ -98,13 +84,15 @@ class OAuthToken(TokenMixin, db.Model):
         self._scopes = sorted(value)
 
     def __repr__(self):  # pragma: no cover
-        return f'<OAuthToken({self.id}, {self.application}, {self.user})>'
+        return f'<OAuthToken({self.id}, {self.app_user_link_id}, {self.scopes})>'
 
     def check_client(self, client):
         return self.application == client
 
     def get_scope(self):
-        return list_to_scope(sorted(self.scopes & set(self.application.allowed_scopes)))
+        # scopes are restricted by what's authorized for the particular user and what's whitelisted for the app
+        scopes = self.scopes & set(self.app_user_link.scopes) & set(self.application.allowed_scopes)
+        return list_to_scope(sorted(scopes))
 
     def get_expires_in(self):
         return 0
