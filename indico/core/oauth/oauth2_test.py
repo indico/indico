@@ -259,7 +259,8 @@ def test_revocation_wrong_app(db, create_application, dummy_token, test_client):
     ('nouuid', 401, 'invalid_token'),
     ('invalid', 401, 'invalid_token'),
     ('appdisabled', 401, 'invalid_token'),
-    ('badscope', 403, 'insufficient_scope')
+    ('badscope', 403, 'insufficient_scope'),
+    ('badappscope', 403, 'insufficient_scope')
 ))
 def test_invalid_token(dummy_application, dummy_token, test_client, reason, status_code, error):
     token = dummy_token.access_token
@@ -272,6 +273,8 @@ def test_invalid_token(dummy_application, dummy_token, test_client, reason, stat
 
     if reason == 'badscope':
         dummy_token._scopes.remove('read:user')
+    elif reason == 'badappscope':
+        dummy_application.default_scopes.remove('read:user')
 
     resp = test_client.get('/api/user/', headers={'Authorization': f'Bearer {token}'})
     assert resp.status_code == status_code

@@ -39,7 +39,9 @@ class ApplicationForm(IndicoForm):
                                                    "and host/port. If an entry contains a path, the redirect_uri's "
                                                    "path must start with this path."))
     default_scopes = IndicoSelectMultipleCheckboxField('Allowed scopes', [DataRequired()],
-                                                       choices=sorted(list(SCOPES.items()), key=itemgetter(1)))
+                                                       choices=sorted(SCOPES.items(), key=itemgetter(1)),
+                                                       description=_('Only scopes from this list may be requested by '
+                                                                     'the app.'))
     is_enabled = BooleanField(_("Enabled"), widget=SwitchWidget(),
                               description=_("If an application is not enabled, its OAuth tokens cannot be used and "
                                             "user cannot be prompted to authorize the application."))
