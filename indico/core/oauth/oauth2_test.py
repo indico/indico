@@ -108,6 +108,31 @@ def test_oauth_flows(create_application, test_client, dummy_user, db, app, trust
     assert test_client.get(auth_url).status_code == 302
 
 
+def test_no_implicit_flow(dummy_application, test_client, dummy_user):
+    oauth_client = OAuth2Client(None,
+                                dummy_application.client_id,
+                                None,
+                                scope='read:user',
+                                response_type='token',
+                                token_endpoint=url_for('oauth.oauth_token', _external=True),
+                                redirect_uri=dummy_application.default_redirect_uri)
+
+    auth_url = oauth_client.create_authorization_url(url_for('oauth.oauth_authorize', _external=True))[0]
+
+    with test_client.session_transaction() as sess:
+        sess.user = dummy_user
+
+    resp = test_client.get(auth_url)
+    assert b'unsupported_response_type' in resp.data
+
+
+def test_no_querystring_tokens(dummy_token, test_client):
+    resp = test_client.get('/api/user/', headers={'Authorization': f'Bearer {dummy_token.access_token}'})
+    assert resp.status_code == 200
+    resp = test_client.get(f'/api/user/?access_token={dummy_token.access_token}')
+    assert resp.status_code == 401
+
+
 def test_oauth_scopes(create_application, test_client, dummy_user, db, app):
     oauth_app = create_application(name='test', is_trusted=False, allowed_scopes=['read:user', 'read:legacy_api'])
     oauth_client = OAuth2Client(MockSession(test_client),
