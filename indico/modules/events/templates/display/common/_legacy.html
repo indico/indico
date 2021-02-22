@@ -9,8 +9,8 @@
                  start_time=event.start_dt|format_time(format='medium', timezone=timezone),
                  end_date=event.end_dt|format_date(format='full', timezone=timezone),
                  end_time=event.end_dt|format_time(format='medium', timezone=timezone) -%}
-            from <strong>{{start_date}} ({{start_time}})</strong>
-            to <strong>{{end_date}} ({{end_time}})</strong>
+            from <strong>{{ start_date }} ({{ start_time }})</strong>
+            to <strong>{{ end_date }} ({{ end_time }})</strong>
         {%- endtrans %}
     {% endif %}
 {% endmacro %}

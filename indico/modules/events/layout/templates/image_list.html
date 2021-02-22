@@ -14,7 +14,7 @@
                    title="{% trans %}Delete image{% endtrans %}"
                    data-href="{{ url_for('event_layout.image_delete', image) }}"
                    data-method="DELETE"
-                   data-confirm="{% trans filename=image.filename %}Are you sure you want to delete '{{filename}}'? {% endtrans %}">
+                   data-confirm="{% trans filename=image.filename %}Are you sure you want to delete '{{ filename }}'? {% endtrans %}">
                 </a>
             </span>
         </li>

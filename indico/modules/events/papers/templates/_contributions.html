@@ -96,7 +96,7 @@
     {% set state_mapping = {'submitted': '',
                             'rejected': 'danger',
                             'to_be_corrected': 'warning'} %}
-    <div class="action-box {{state_mapping[paper.last_revision.state.name]}}">
+    <div class="action-box {{ state_mapping[paper.last_revision.state.name] }}">
         <div class="section flexrow">
             <div class="icon icon-file"></div>
             <div class="text">

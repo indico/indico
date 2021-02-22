@@ -84,7 +84,7 @@
                                      classes="i-box titled disable-if-locked") %}
             <a class="icon-settings js-settings-dialog"
                data-href="{{ url_for('.manage_regform_display', event, form) }}"
-               data-title="{% trans title=form.title %}Customize columns for {{title}}{% endtrans %}"
+               data-title="{% trans title=form.title %}Customize columns for {{ title }}{% endtrans %}"
                title="{% trans %}Choose which columns of this form are displayed{% endtrans %}"
                data-qtip-position="right"></a>
         {% endcall %}

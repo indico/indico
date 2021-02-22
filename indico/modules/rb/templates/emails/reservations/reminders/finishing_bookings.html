@@ -34,7 +34,7 @@
 
 
 {% macro _render_finishing_reservation(reservation) -%}
-    Dates: {{_render_dates(reservation) }}<br>
+    Dates: {{ _render_dates(reservation) }}<br>
     Room: <strong>{{ reservation.room.full_name }}</strong><br>
     Reason of the booking: <strong>{{ reservation.booking_reason }}</strong><br>
 {%- endmacro %}
