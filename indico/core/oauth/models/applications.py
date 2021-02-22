@@ -26,6 +26,7 @@ class SystemAppType(int, IndicoEnum):
     __enforced_data__ = {
         checkin: {'allowed_scopes': {'registrants'},
                   'redirect_uris': ['http://localhost'],
+                  'allow_pkce_flow': True,
                   'is_enabled': True},
         flower: {'allowed_scopes': {'read:user'},
                  'is_enabled': True}
@@ -115,6 +116,12 @@ class OAuthApplication(ClientMixin, db.Model):
         nullable=False,
         default=False
     )
+    #: whether the application can use the PKCE flow without a client secret
+    allow_pkce_flow = db.Column(
+        db.Boolean,
+        nullable=False,
+        default=False
+    )
     #: the type of system app (if any). system apps cannot be deleted
     system_app_type = db.Column(
         PyIntEnum(SystemAppType),
@@ -177,8 +184,8 @@ class OAuthApplication(ClientMixin, db.Model):
         from indico.core.oauth.grants import IndicoAuthorizationCodeGrant
 
         if endpoint == 'token':
-            # TODO: add an option to configure whether to allow `none` auth used for semi-public
-            # clients using the authorization code grant with PKCE instead of a client secret
+            if method == 'none' and not self.allow_pkce_flow:
+                return False
             return method in IndicoAuthorizationCodeGrant.TOKEN_ENDPOINT_AUTH_METHODS
         elif endpoint == 'introspection':
             return method in IndicoIntrospectionEndpoint.CLIENT_AUTH_METHODS

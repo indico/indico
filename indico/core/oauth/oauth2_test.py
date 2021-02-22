@@ -51,7 +51,7 @@ class CallableJsonWrapper:
     ('client_secret_post', False),
     ('none', True),
 ))
-def test_oauth_flows(create_application, test_client, dummy_user, db, app, trusted, token_endpoint_auth_method, pkce):
+def test_oauth_flows(create_application, test_client, dummy_user, app, trusted, token_endpoint_auth_method, pkce):
     oauth_app = create_application(name='test', is_trusted=trusted)
     oauth_client = OAuth2Client(MockSession(test_client),
                                 oauth_app.client_id,
@@ -104,6 +104,36 @@ def test_oauth_flows(create_application, test_client, dummy_user, db, app, trust
     assert test_client.get(auth_url).status_code == 302
 
 
+@pytest.mark.parametrize('pkce_enabled', (False, True))
+def test_pkce_disabled(dummy_application, test_client, dummy_user, pkce_enabled):
+    dummy_application.allow_pkce_flow = pkce_enabled
+    oauth_client = OAuth2Client(MockSession(test_client),
+                                dummy_application.client_id, None,
+                                code_challenge_method='S256',
+                                token_endpoint=url_for('oauth.oauth_token', _external=True),
+                                redirect_uri=dummy_application.default_redirect_uri)
+
+    with test_client.session_transaction() as sess:
+        sess.user = dummy_user
+
+    code_verifier = generate_token(64)
+    auth_endpoint = url_for('oauth.oauth_authorize', _external=True)
+    auth_url = oauth_client.create_authorization_url(auth_endpoint, scope='read:legacy_api',
+                                                     code_verifier=code_verifier)[0]
+
+    authorized_resp = test_client.post(auth_url, data={'confirm': '1'})
+    assert authorized_resp.status_code == 302
+    target_url = authorized_resp.headers['Location']
+
+    if pkce_enabled:
+        token = oauth_client.fetch_token(authorization_response=target_url, code_verifier=code_verifier)
+        assert token.keys() == {'access_token', 'token_type', 'scope'}
+    else:
+        with pytest.raises(ValueError) as exc_info:
+            oauth_client.fetch_token(authorization_response=target_url, code_verifier=code_verifier)
+        assert 'invalid_client' in str(exc_info.value)
+
+
 def test_no_implicit_flow(dummy_application, test_client, dummy_user):
     oauth_client = OAuth2Client(None,
                                 dummy_application.client_id,
@@ -129,7 +159,7 @@ def test_no_querystring_tokens(dummy_token, test_client):
     assert resp.status_code == 401
 
 
-def test_oauth_scopes(create_application, test_client, dummy_user, db, app):
+def test_oauth_scopes(create_application, test_client, dummy_user, app):
     oauth_app = create_application(name='test', is_trusted=False, allowed_scopes=['read:user', 'read:legacy_api'])
     oauth_client = OAuth2Client(MockSession(test_client),
                                 oauth_app.client_id, oauth_app.client_secret,

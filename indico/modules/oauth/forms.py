@@ -45,6 +45,9 @@ class ApplicationForm(IndicoForm):
     is_enabled = BooleanField(_("Enabled"), widget=SwitchWidget(),
                               description=_("If an application is not enabled, its OAuth tokens cannot be used and "
                                             "user cannot be prompted to authorize the application."))
+    allow_pkce_flow = BooleanField(_('Allow PKCE flow'), widget=SwitchWidget(),
+                                   description=_('If enabled, the application can use the client-side PKCE flow which '
+                                                 'does not require the use of the Client Secret to get a token.'))
     is_trusted = BooleanField(_("Trusted"), widget=SwitchWidget(),
                               description=_("Trusted applications will be granted authorization automatically and "
                                             "no intermediate page will be displayed during the authorization process."))

@@ -21,7 +21,7 @@ def create_application(db):
         params.setdefault('client_id', str(uuid4()))
         params.setdefault('allowed_scopes', ['read:legacy_api', 'write:legacy_api', 'read:user'])
         params.setdefault('redirect_uris', ['http://localhost:10500/'])
-        params.setdefault('is_trusted', True)
+        params.setdefault('allow_pkce_flow', True)
         application = OAuthApplication(name=name, **params)
         db.session.add(application)
         db.session.flush()
