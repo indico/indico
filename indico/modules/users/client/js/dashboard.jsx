@@ -12,6 +12,7 @@ import {ICSCalendarLink} from 'indico/react/components';
 import {Translate} from 'indico/react/i18n';
 
 document.addEventListener('DOMContentLoaded', () => {
+  const userId = document.body.dataset.userId;
   ReactDOM.render(
     <ICSCalendarLink
       endpoint="users.export_dashboard_ics"

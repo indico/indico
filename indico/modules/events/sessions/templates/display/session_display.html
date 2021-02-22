@@ -59,15 +59,13 @@
                 {% if g.static_site %}
                     <a href="{{ url_for('sessions.export_ics', sess) }}" class="i-button icon-calendar"></a>
                 {% else %}
-                    <div id="session-calendar-link" class="calendar-ics-link"
-                         data-session-id="{{ sess.id }}" data-event-id="{{ sess.event_id }}"></div>
+                    <div id="session-calendar-link" data-session-id="{{ sess.id }}"
+                         data-event-id="{{ sess.event_id }}"></div>
                 {% endif %}
             {%- endif %}
         </div>
         {% if sess.start_dt -%}
-            {% with item=sess, ics_url=url_for('sessions.export_ics', sess) -%}
-                {% include 'events/sessions/display/session_ical_export.html' %}
-            {%- endwith %}
+            <div id="session-calendar-link" data-session-id="{{ sess.id }}" data-event-id="{{ sess.event_id }}"></div>
         {%- endif %}
     </div>
 {%- endblock %}

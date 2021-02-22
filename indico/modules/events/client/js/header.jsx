@@ -12,23 +12,29 @@ import {IButton, ICSCalendarLink} from 'indico/react/components';
 import {Translate} from 'indico/react/i18n';
 
 document.addEventListener('DOMContentLoaded', () => {
-  const userId = document.querySelector('body').dataset.userId;
-  const eventId = document.querySelector('#event-calendar-link').dataset.eventId;
+  const calendarContainer = document.querySelector('#event-calendar-link');
+
+  if (!calendarContainer) {
+    return;
+  }
+
+  const userId = document.body.dataset.userId;
+  const eventId = calendarContainer.dataset.eventId;
 
   ReactDOM.render(
     <ICSCalendarLink
       endpoint="events.export_event_ical"
       urlParams={{user_id: userId, event_id: eventId}}
-      renderButton={props => (
+      renderButton={onClick => (
         <IButton
           icon="calendar"
           classes={{'height-full': true, 'text-color': true, 'subtle': true}}
-          {...props}
+          onClick={onClick}
         />
       )}
       popupPosition="bottom right"
       options={[{key: 'event', text: Translate.string('Event'), queryParams: {}}]}
     />,
-    document.querySelector('#event-calendar-link')
+    calendarContainer
   );
 });

@@ -70,7 +70,7 @@ export default function ICSCalendarLink({
         icon={null}
         trigger={
           renderButton ? (
-            renderButton()
+            renderButton(() => {})
           ) : (
             <Button icon size="small">
               <Icon name="calendar alternate outline" />
@@ -99,9 +99,7 @@ export default function ICSCalendarLink({
   } else {
     const {text, queryParams} = options[0];
     trigger = renderButton ? (
-      renderButton({
-        onClick: () => handleSetOption(text, queryParams),
-      })
+      renderButton(() => handleSetOption(text, queryParams))
     ) : (
       <Button icon size="small" onClick={() => handleSetOption(text, queryParams)}>
         <Icon name="calendar alternate outline" />

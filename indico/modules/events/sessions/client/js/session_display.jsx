@@ -12,16 +12,22 @@ import {IButton, ICSCalendarLink} from 'indico/react/components';
 import {Translate} from 'indico/react/i18n';
 
 document.addEventListener('DOMContentLoaded', () => {
-  const userId = document.querySelector('body').dataset.userId;
-  const {eventId, sessionId} = document.querySelector('#session-calendar-link').dataset;
+  const calendarContainer = document.querySelector('#session-calendar-link');
+
+  if (!calendarContainer) {
+    return;
+  }
+
+  const userId = document.body.dataset.userId;
+  const {eventId, sessionId} = calendarContainer.dataset;
 
   ReactDOM.render(
     <ICSCalendarLink
       endpoint="sessions.export_ics"
       urlParams={{user_id: userId, event_id: eventId, session_id: sessionId}}
-      renderButton={props => <IButton icon="calendar" {...props} />}
+      renderButton={onClick => <IButton icon="calendar" onClick={onClick} />}
       options={[{key: 'session', text: Translate.string('Session'), queryParams: {}}]}
     />,
-    document.querySelector('#session-calendar-link')
+    calendarContainer
   );
 });
