@@ -232,6 +232,13 @@ def test_oauth_scopes(create_application, test_client, dummy_user, app):
         assert resp.status_code == 200
         assert resp.json['id'] == dummy_user.id
 
+    # reuse an existing scope - this should return the same token we had before
+    auth_url = oauth_client.create_authorization_url(auth_endpoint, scope='read:user')[0]
+    authorized_resp = test_client.post(auth_url, data={'confirm': '1'})
+    target_url = authorized_resp.headers['Location']
+    token4 = oauth_client.fetch_token(authorization_response=target_url)
+    assert token4 == token2
+
 
 @pytest.mark.parametrize('endpoint_auth', ('client_secret_post', 'client_secret_basic'))
 def test_introspection(dummy_application, dummy_token, test_client, endpoint_auth):
