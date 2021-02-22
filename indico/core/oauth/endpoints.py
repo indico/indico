@@ -44,6 +44,5 @@ class IndicoRevocationEndpoint(RevocationEndpoint):
         return query_token(token)
 
     def revoke_token(self, token, request):
-        # TODO: mark as revoked instead of deleting it
         db.session.delete(token)
         logger.info('Token %s was revoked', token)
