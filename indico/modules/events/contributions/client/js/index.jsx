@@ -19,11 +19,34 @@ import ReactDOM from 'react-dom';
 
 import 'indico/modules/events/util/types_dialog';
 import EditableSubmissionButton from 'indico/modules/events/editing/editing/EditableSubmissionButton';
+import {IButton, ICSCalendarLink} from 'indico/react/components';
+import {Translate} from 'indico/react/i18n';
 import {indicoAxios, handleAxiosError} from 'indico/utils/axios';
 import {camelizeKeys} from 'indico/utils/case';
 import {$T} from 'indico/utils/i18n';
 
 import PublicationSwitch from './PublicationSwitch';
+
+document.addEventListener('DOMContentLoaded', () => {
+  const calendarContainer = document.querySelector('#contribution-calendar-link');
+
+  if (!calendarContainer) {
+    return;
+  }
+
+  const userId = document.body.dataset.userId;
+  const {contributionId, eventId} = calendarContainer.dataset;
+
+  ReactDOM.render(
+    <ICSCalendarLink
+      endpoint="contributions.export_ics"
+      urlParams={{user_id: userId, event_id: eventId, contrib_id: contributionId}}
+      renderButton={onClick => <IButton icon="calendar" onClick={onClick} />}
+      options={[{key: 'contribution', text: Translate.string('Contribution'), queryParams: {}}]}
+    />,
+    calendarContainer
+  );
+});
 
 (function(global) {
   global.setupEditableSubmissionButton = async function setupEditableSubmissionButton() {
@@ -340,7 +363,7 @@ import PublicationSwitch from './PublicationSwitch';
       reloadManagementAttachmentInfoColumn(target.data('locator'), target.closest('td'));
       $(this).trigger('ajaxDialog:setData', [true]);
     });
-    $('#subcontribution-list').on('indico:htmlUpdated', function(evt) {
+    $('#subcontribution-list').on('indico:htmlUpdated', function() {
       $(this).trigger('ajaxDialog:setData', [true]);
     });
 
