@@ -5,6 +5,7 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
+import hashlib
 from uuid import UUID
 
 from authlib.oauth2.rfc6749 import list_to_scope, scope_to_list
@@ -17,15 +18,16 @@ from indico.core.oauth.models.applications import OAuthApplication, OAuthApplica
 from indico.core.oauth.models.tokens import OAuthToken
 
 
+# The maximum number of tokens to keep for any given app/user and scope combination
+MAX_TOKENS_PER_SCOPE = 50
+
+
 def query_token(token_string):
-    try:
-        UUID(hex=token_string)
-    except ValueError:
-        return None
+    token_hash = hashlib.sha256(token_string.encode()).hexdigest()
     # we always need the app link (which already loads the application) and the user
     # since we need those to check if the token is still valid
     return (OAuthToken.query
-            .filter_by(access_token=token_string)
+            .filter_by(access_token_hash=token_hash)
             .options(joinedload('app_user_link').joinedload('user'))
             .first())
 
@@ -43,7 +45,6 @@ def save_token(token_data, request):
     application = OAuthApplication.query.filter_by(client_id=request.client.client_id).one()
     link = OAuthApplicationUserLink.query.with_parent(application).with_parent(request.user).first()
 
-    token = None
     if link is None:
         link = OAuthApplicationUserLink(application=application, user=request.user, scopes=requested_scopes)
     else:
@@ -56,11 +57,14 @@ def save_token(token_data, request):
         if new_scopes:
             logger.info('New scopes for %r: %s', link, new_scopes)
             link.update_scopes(new_scopes)
-        else:
-            # we can reuse an existing token with the same scopes if there is one
-            token = link.tokens.filter_by(_scopes=db.cast(sorted(requested_scopes), ARRAY(db.String))).first()
 
-    if token is None:
-        link.tokens.append(OAuthToken(access_token=token_data['access_token'], scopes=requested_scopes))
-    else:
-        token_data['access_token'] = token.access_token
+    link.tokens.append(OAuthToken(access_token=token_data['access_token'], scopes=requested_scopes))
+
+    # get rid of old tokens if there are too many
+    q = (db.session.query(OAuthToken.id)
+         .with_parent(link)
+         .filter_by(_scopes=db.cast(sorted(requested_scopes), ARRAY(db.String)))
+         .order_by(OAuthToken.created_dt.desc())
+         .offset(MAX_TOKENS_PER_SCOPE)
+         .subquery())
+    OAuthToken.query.filter(OAuthToken.id.in_(q)).delete(synchronize_session='fetch')

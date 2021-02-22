@@ -5,14 +5,19 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
+import hashlib
 from base64 import b64encode
+from unittest.mock import MagicMock
 
 import pytest
 from authlib.common.security import generate_token
 from authlib.oauth2.client import OAuth2Client
+from sqlalchemy.dialects.postgresql.array import ARRAY
 from werkzeug.urls import url_parse
 
+from indico.core.oauth.models.tokens import OAuthToken
 from indico.core.oauth.scopes import SCOPES
+from indico.core.oauth.util import MAX_TOKENS_PER_SCOPE, save_token
 from indico.web.flask.util import url_for
 
 
@@ -153,9 +158,9 @@ def test_no_implicit_flow(dummy_application, test_client, dummy_user):
 
 
 def test_no_querystring_tokens(dummy_token, test_client):
-    resp = test_client.get('/api/user/', headers={'Authorization': f'Bearer {dummy_token.access_token}'})
+    resp = test_client.get('/api/user/', headers={'Authorization': f'Bearer {dummy_token._plaintext_token}'})
     assert resp.status_code == 200
-    resp = test_client.get(f'/api/user/?access_token={dummy_token.access_token}')
+    resp = test_client.get(f'/api/user/?access_token={dummy_token._plaintext_token}')
     assert resp.status_code == 401
 
 
@@ -189,6 +194,7 @@ def test_oauth_scopes(create_application, test_client, dummy_user, app):
     # get a token and make sure it looks fine
     token1 = oauth_client.fetch_token(authorization_response=target_url)
     assert token1 == {'access_token': token1['access_token'], 'token_type': 'Bearer', 'scope': 'read:legacy_api'}
+    assert len(token1['access_token']) == 42  # longer would be fine but we don't expect this to change
     app_link = oauth_app.user_links.one()
     assert app_link.user == dummy_user
     assert app_link.scopes == ['read:legacy_api']
@@ -232,17 +238,17 @@ def test_oauth_scopes(create_application, test_client, dummy_user, app):
         assert resp.status_code == 200
         assert resp.json['id'] == dummy_user.id
 
-    # reuse an existing scope - this should return the same token we had before
+    # reuse an existing scope
     auth_url = oauth_client.create_authorization_url(auth_endpoint, scope='read:user')[0]
     authorized_resp = test_client.post(auth_url, data={'confirm': '1'})
     target_url = authorized_resp.headers['Location']
     token4 = oauth_client.fetch_token(authorization_response=target_url)
-    assert token4 == token2
+    assert token4 != token2  # can't reuse the old token since it's only stored as a hash
 
 
 @pytest.mark.parametrize('endpoint_auth', ('client_secret_post', 'client_secret_basic'))
 def test_introspection(dummy_application, dummy_token, test_client, endpoint_auth):
-    data = {'token': dummy_token.access_token}
+    data = {'token': dummy_token._plaintext_token}
     headers = {}
     if endpoint_auth == 'client_secret_post':
         data['client_id'] = dummy_application.client_id
@@ -263,7 +269,7 @@ def test_introspection(dummy_application, dummy_token, test_client, endpoint_aut
 
 @pytest.mark.parametrize('reason', ('nouuid', 'invalid', 'appdisabled'))
 def test_introspection_inactive(dummy_application, dummy_token, test_client, reason):
-    token = dummy_token.access_token
+    token = dummy_token._plaintext_token
     if reason == 'nouuid':
         token = 'garbage'
     elif reason == 'invalid':
@@ -287,7 +293,7 @@ def test_introspection_inactive(dummy_application, dummy_token, test_client, rea
 def test_introspection_wrong_app(create_application, dummy_token, test_client):
     other_app = create_application(name='test')
     data = {
-        'token': dummy_token.access_token,
+        'token': dummy_token._plaintext_token,
         'client_id': other_app.client_id,
         'client_secret': other_app.client_secret
     }
@@ -297,7 +303,7 @@ def test_introspection_wrong_app(create_application, dummy_token, test_client):
 
 @pytest.mark.parametrize('endpoint_auth', ('client_secret_post', 'client_secret_basic'))
 def test_revocation(db, dummy_application, dummy_token, test_client, endpoint_auth):
-    data = {'token': dummy_token.access_token}
+    data = {'token': dummy_token._plaintext_token}
     headers = {}
     if endpoint_auth == 'client_secret_post':
         data['client_id'] = dummy_application.client_id
@@ -310,14 +316,14 @@ def test_revocation(db, dummy_application, dummy_token, test_client, endpoint_au
     assert resp.json == {}
     assert dummy_token not in db.session
     # make sure we can no longer use the token
-    resp = test_client.get('/api/user/', headers={'Authorization': f'Bearer {dummy_token.access_token}'})
+    resp = test_client.get('/api/user/', headers={'Authorization': f'Bearer {dummy_token._plaintext_token}'})
     assert resp.status_code == 401
 
 
 def test_revocation_wrong_app(db, create_application, dummy_token, test_client):
     other_app = create_application(name='test')
     data = {
-        'token': dummy_token.access_token,
+        'token': dummy_token._plaintext_token,
         'client_id': other_app.client_id,
         'client_secret': other_app.client_secret
     }
@@ -326,7 +332,7 @@ def test_revocation_wrong_app(db, create_application, dummy_token, test_client):
     assert resp.json == {}
     assert dummy_token in db.session
     # make sure we can still use the token
-    resp = test_client.get('/api/user/', headers={'Authorization': f'Bearer {dummy_token.access_token}'})
+    resp = test_client.get('/api/user/', headers={'Authorization': f'Bearer {dummy_token._plaintext_token}'})
     assert resp.status_code == 200
 
 
@@ -339,7 +345,7 @@ def test_revocation_wrong_app(db, create_application, dummy_token, test_client):
     ('badappscope', 403, 'insufficient_scope')
 ))
 def test_invalid_token(dummy_application, dummy_token, test_client, reason, status_code, error):
-    token = dummy_token.access_token
+    token = dummy_token._plaintext_token
     if reason == 'nouuid':
         token = 'garbage'
     elif reason == 'invalid':
@@ -377,3 +383,24 @@ def test_metadata_endpoint(test_client):
         'token_endpoint': 'http://localhost/oauth/token',
         'token_endpoint_auth_methods_supported': ['client_secret_basic',  'client_secret_post', 'none']
     }
+
+
+def test_delete_old_tokens(db, dummy_application, dummy_user):
+    request = MagicMock(client=dummy_application, user=dummy_user)
+
+    gen_hashes = {'foo': [], 'bar': []}
+    for scope in ('foo', 'bar'):
+        for i in range(MAX_TOKENS_PER_SCOPE + 2):
+            token_string = generate_token(69)
+            gen_hashes[scope].append(hashlib.sha256(token_string.encode()).hexdigest())
+            save_token({'scope': scope, 'access_token': token_string}, request)
+            num_tokens = OAuthToken.query.filter_by(_scopes=db.cast([scope], ARRAY(db.String))).count()
+            assert num_tokens == min(i + 1, MAX_TOKENS_PER_SCOPE)
+
+    # ensure we have the latest MAX_TOKENS_PER_SCOPE tokens in the DB
+    for scope in ('foo', 'bar'):
+        query = (db.session.query(OAuthToken.access_token_hash)
+                 .filter_by(_scopes=db.cast([scope], ARRAY(db.String)))
+                 .order_by(OAuthToken.created_dt))
+        db_hashes = [x.access_token_hash for x in query]
+        assert db_hashes == gen_hashes[scope][-MAX_TOKENS_PER_SCOPE:]

@@ -10,19 +10,19 @@ from datetime import datetime, timedelta
 
 from authlib.oauth2.rfc6749 import list_to_scope
 from authlib.oauth2.rfc6749.models import AuthorizationCodeMixin, TokenMixin
-from sqlalchemy.dialects.postgresql import ARRAY, UUID
+from sqlalchemy.dialects.postgresql import ARRAY
 
 from indico.core.db import db
 from indico.core.db.sqlalchemy import UTCDateTime
 from indico.util.date_time import now_utc
+from indico.util.passwords import TokenProperty
 
 
 class OAuthToken(TokenMixin, db.Model):
     """OAuth tokens."""
 
     __tablename__ = 'tokens'
-    __table_args__ = (db.UniqueConstraint('app_user_link_id', 'scopes'),
-                      {'schema': 'oauth'})
+    __table_args__ = {'schema': 'oauth'}
 
     id = db.Column(
         db.Integer,
@@ -33,19 +33,27 @@ class OAuthToken(TokenMixin, db.Model):
         nullable=False,
         index=True
     )
-    access_token = db.Column(
-        UUID,
+    access_token_hash = db.Column(
+        db.String,
         unique=True,
+        index=True,
         nullable=False
     )
     _scopes = db.Column(
         'scopes',
         ARRAY(db.String)
     )
+    created_dt = db.Column(
+        UTCDateTime,
+        nullable=False,
+        default=now_utc
+    )
     last_used_dt = db.Column(
         UTCDateTime,
         nullable=True
     )
+
+    access_token = TokenProperty('access_token_hash')
 
     app_user_link = db.relationship(
         'OAuthApplicationUserLink',

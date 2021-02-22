@@ -5,8 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-import uuid
-
 from authlib.integrations.flask_oauth2 import AuthorizationServer
 
 from indico.core.oauth.endpoints import IndicoIntrospectionEndpoint, IndicoRevocationEndpoint
@@ -23,8 +21,6 @@ require_oauth = IndicoResourceProtector()
 def setup_oauth_provider(app):
     app.config.update({
         'OAUTH2_SCOPES_SUPPORTED': list(SCOPES),
-        'OAUTH2_ACCESS_TOKEN_GENERATOR': lambda *args, **kw: str(uuid.uuid4()),
-        'OAUTH2_REFRESH_TOKEN_GENERATOR': True,
         'OAUTH2_TOKEN_EXPIRES_IN': {
             'authorization_code': 0,
         }
