@@ -89,10 +89,6 @@ def test_oauth_flows(create_application, test_client, dummy_user, db, app, trust
     assert f'state={state}' in target_url_parts.query
     assert target_url == f'{oauth_app.default_redirect_uri}?{target_url_parts.query}'
 
-    # for some weird reason there's a collision of two identical User objects in the SA session;
-    # probably this happens because the DB session is not fully reset between the test requests?
-    db.session.expunge(dummy_user)
-
     # get a token and make sure it looks fine
     token = oauth_client.fetch_token(authorization_response=target_url, code_verifier=code_verifier)
     assert token == {'access_token': token['access_token'], 'token_type': 'Bearer', 'scope': 'read:user'}
@@ -157,10 +153,6 @@ def test_oauth_scopes(create_application, test_client, dummy_user, db, app):
     authorized_resp = test_client.post(auth_url, data={'confirm': '1'})
     assert authorized_resp.status_code == 302
     target_url = authorized_resp.headers['Location']
-
-    # for some weird reason there's a collision of two identical User objects in the SA session;
-    # probably this happens because the DB session is not fully reset between the test requests?
-    db.session.expunge(dummy_user)
 
     # get a token and make sure it looks fine
     token1 = oauth_client.fetch_token(authorization_response=target_url)
