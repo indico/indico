@@ -19,6 +19,7 @@ from indico.core.oauth.models.applications import OAuthApplication, OAuthApplica
 from indico.core.oauth.models.tokens import OAuthToken
 from indico.core.oauth.scopes import SCOPES
 from indico.core.oauth.util import MAX_TOKENS_PER_SCOPE, save_token
+from indico.modules.users.util import merge_users
 from indico.web.flask.util import url_for
 
 
@@ -439,3 +440,50 @@ def test_delete_old_tokens(db, dummy_application, dummy_user):
                  .order_by(OAuthToken.created_dt))
         db_hashes = [x.access_token_hash for x in query]
         assert db_hashes == gen_hashes[scope][-MAX_TOKENS_PER_SCOPE:]
+
+
+def test_merge_users(create_user, dummy_user, dummy_application, dummy_token, create_application, test_client):
+    source_user = create_user(123)
+
+    # app on both users (already exists on dummy user via dummy token)
+    app_link = OAuthApplicationUserLink(application=dummy_application, user=source_user,
+                                        scopes=['read:user', 'write:legacy_api'])
+    token_string = generate_token()
+    OAuthToken(access_token=token_string, app_user_link=app_link, scopes=['read:user'])
+
+    # app only on source user
+    test_app = create_application(name='test')
+    app_link2 = OAuthApplicationUserLink(application=test_app, user=source_user, scopes=['read:user'])
+    token_string2 = generate_token()
+    OAuthToken(access_token=token_string2, app_user_link=app_link2, scopes=['read:user'])
+    OAuthToken(access_token=generate_token(), app_user_link=app_link2, scopes=['read:user'])
+    OAuthToken(access_token=generate_token(), app_user_link=app_link2, scopes=['read:user'])
+
+    resp = test_client.get('/api/user/', headers={'Authorization': f'Bearer {dummy_token._plaintext_token}'})
+    assert resp.status_code == 200
+    assert resp.json['id'] == dummy_user.id
+
+    for token in (token_string, token_string2):
+        resp = test_client.get('/api/user/', headers={'Authorization': f'Bearer {token}'})
+        assert resp.status_code == 200
+        assert resp.json['id'] == source_user.id
+
+    old_token_count = OAuthToken.query.count()
+    merge_users(source_user, dummy_user)
+
+    # source user should not have any leftover app links
+    assert not source_user.oauth_app_links.count()
+    # two app links on the target user
+    assert dummy_user.oauth_app_links.count() == 2
+    # dummy app has one token from each user
+    assert dummy_user.oauth_app_links.filter_by(application=dummy_application).one().tokens.count() == 2
+    # test app has 3 tokens coming from source user
+    assert dummy_user.oauth_app_links.filter_by(application=test_app).one().tokens.count() == 3
+    # the total number of tokens didn't change (we do not delete surplus tokens during merge anyway)
+    assert OAuthToken.query.count() == old_token_count
+
+    # all tokens point to the target user
+    for token in (dummy_token._plaintext_token, token_string, token_string2):
+        resp = test_client.get('/api/user/', headers={'Authorization': f'Bearer {token}'})
+        assert resp.status_code == 200
+        assert resp.json['id'] == dummy_user.id

@@ -8,6 +8,7 @@
 import os
 
 from indico.core import signals
+from indico.core.db import db
 
 from .logger import logger
 from .oauth2 import require_oauth
@@ -24,5 +25,15 @@ def _no_ssl_required_on_debug(app, **kwargs):
 
 @signals.users.merged.connect
 def _delete_merged_user_tokens(target, source, **kwargs):
-    source.oauth_tokens.delete()
-    logger.info('All tokens for the user %s were deleted.', source)
+    target_app_links = {link.application: link for link in target.oauth_app_links}
+    for source_link in source.oauth_app_links.all():
+        try:
+            target_link = target_app_links[source_link.application]
+        except KeyError:
+            logger.info('merge: reassigning %r to %r', source_link, target)
+            source_link.user = target
+        else:
+            logger.info('merge: merging %r into %r', source_link, target_link)
+            target_link.update_scopes(set(source_link.scopes))
+            target_link.tokens.extend(source_link.tokens)
+            db.session.delete(source_link)
