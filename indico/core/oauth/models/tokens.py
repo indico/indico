@@ -71,10 +71,6 @@ class OAuthToken(TokenMixin, db.Model):
         return {'id': self.id}
 
     @property
-    def expires(self):
-        return None
-
-    @property
     def scopes(self):
         """The set of scopes the linked application has access to."""
         return set(self._scopes)
