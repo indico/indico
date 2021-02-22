@@ -10,7 +10,14 @@ Version 3.0
 Major Features
 ^^^^^^^^^^^^^^
 
-- TODO
+- The OAuth provider module has been re-implemented based on a more modern
+  library (authlib). Support for the somewhat insecure *implicit flow* has been
+  removed in favor of the code-with-PKCE flow. Tokens are now stored more securely
+  as a hash instead of plaintext. For a given user/app/scope combination, only a
+  certain amount of tokens are stored; once the limit has been reached older tokens
+  will be discarded. The OAuth provider now exposes its metadata via a well-known
+  URI (RFC 8414) and also has endpoints to introspect or revoke a token. (:issue:`4685`,
+  :pr:`4798`)
 
 Improvements
 ^^^^^^^^^^^^
