@@ -141,6 +141,7 @@ def test_oauth_scopes(create_application, test_client, dummy_user, db, app):
 
     auth_endpoint = url_for('oauth.oauth_authorize', _external=True)
     auth_url = oauth_client.create_authorization_url(auth_endpoint, scope='read:legacy_api')[0]
+    assert not oauth_app.user_links.count()
 
     # get consent page
     resp = test_client.get(auth_url)
@@ -153,10 +154,14 @@ def test_oauth_scopes(create_application, test_client, dummy_user, db, app):
     authorized_resp = test_client.post(auth_url, data={'confirm': '1'})
     assert authorized_resp.status_code == 302
     target_url = authorized_resp.headers['Location']
+    assert not oauth_app.user_links.count()  # giving consent does not create the user/app link yet
 
     # get a token and make sure it looks fine
     token1 = oauth_client.fetch_token(authorization_response=target_url)
     assert token1 == {'access_token': token1['access_token'], 'token_type': 'Bearer', 'scope': 'read:legacy_api'}
+    app_link = oauth_app.user_links.one()
+    assert app_link.user == dummy_user
+    assert app_link.scopes == ['read:legacy_api']
 
     # we cannot use a token with an invalid scope
     with app.test_client() as test_client_no_session:
@@ -171,6 +176,7 @@ def test_oauth_scopes(create_application, test_client, dummy_user, db, app):
     token2 = oauth_client.fetch_token(authorization_response=target_url)
     assert token2 == {'access_token': token2['access_token'], 'token_type': 'Bearer', 'scope': 'read:user'}
     assert token2['access_token'] != token1['access_token']
+    assert app_link.scopes == ['read:legacy_api', 'read:user']
 
     # this token is already able to access the endpoint
     with app.test_client() as test_client_no_session:
@@ -187,6 +193,7 @@ def test_oauth_scopes(create_application, test_client, dummy_user, db, app):
     assert set(token3.pop('scope').split()) == {'read:legacy_api', 'read:user'}
     assert token3 == {'access_token': token3['access_token'], 'token_type': 'Bearer'}
     assert token3['access_token'] != token2['access_token']
+    assert app_link.scopes == ['read:legacy_api', 'read:user']
 
     # and of course that token also has access to the endpoint
     with app.test_client() as test_client_no_session:
@@ -291,6 +298,7 @@ def test_revocation_wrong_app(db, create_application, dummy_token, test_client):
     ('invalid', 401, 'invalid_token'),
     ('appdisabled', 401, 'invalid_token'),
     ('badscope', 403, 'insufficient_scope'),
+    ('badapplinkscope', 403, 'insufficient_scope'),
     ('badappscope', 403, 'insufficient_scope')
 ))
 def test_invalid_token(dummy_application, dummy_token, test_client, reason, status_code, error):
@@ -304,6 +312,8 @@ def test_invalid_token(dummy_application, dummy_token, test_client, reason, stat
 
     if reason == 'badscope':
         dummy_token._scopes.remove('read:user')
+    elif reason == 'badapplinkscope':
+        dummy_token.app_user_link.scopes.remove('read:user')
     elif reason == 'badappscope':
         dummy_application.allowed_scopes.remove('read:user')
 
