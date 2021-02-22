@@ -18,7 +18,7 @@ from indico.util.date_time import now_utc
 
 class IndicoAuthlibHTTPError(HTTPException):
     def __init__(self, status_code, payload, headers):
-        super().__init__(payload['error_description'])
+        super().__init__(payload.get('error_description') or payload['error'])
         resp = jsonify(payload)
         resp.headers.update(headers)
         resp.status_code = status_code
