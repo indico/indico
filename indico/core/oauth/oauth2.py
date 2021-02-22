@@ -6,10 +6,12 @@
 # LICENSE file for more details.
 
 from authlib.integrations.flask_oauth2 import AuthorizationServer
+from authlib.oauth2.rfc6749.grants import ImplicitGrant
 
 from indico.core.oauth.endpoints import IndicoIntrospectionEndpoint, IndicoRevocationEndpoint
 from indico.core.oauth.grants import IndicoAuthorizationCodeGrant, IndicoCodeChallenge
-from indico.core.oauth.protector import IndicoAuthlibHTTPError, IndicoBearerTokenValidator, IndicoResourceProtector
+from indico.core.oauth.protector import (IndicoAuthlibHTTPError, IndicoBearerTokenValidator,
+                                         IndicoLegacyQueryStringBearerTokenValidator, IndicoResourceProtector)
 from indico.core.oauth.scopes import SCOPES
 from indico.core.oauth.util import query_client, save_token
 
@@ -23,11 +25,14 @@ def setup_oauth_provider(app):
         'OAUTH2_SCOPES_SUPPORTED': list(SCOPES),
         'OAUTH2_TOKEN_EXPIRES_IN': {
             'authorization_code': 0,
+            'implicit': 0,
         }
     })
     app.register_error_handler(IndicoAuthlibHTTPError, lambda exc: exc.get_response())
     auth_server.init_app(app)
+    auth_server.register_grant(ImplicitGrant)
     auth_server.register_grant(IndicoAuthorizationCodeGrant, [IndicoCodeChallenge(required=True)])
     auth_server.register_endpoint(IndicoIntrospectionEndpoint)
     auth_server.register_endpoint(IndicoRevocationEndpoint)
     require_oauth.register_token_validator(IndicoBearerTokenValidator())
+    require_oauth.register_token_validator(IndicoLegacyQueryStringBearerTokenValidator())

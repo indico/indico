@@ -5,12 +5,14 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
+import flask
 from authlib.integrations.flask_oauth2 import ResourceProtector
 from authlib.oauth2.rfc6750.validator import BearerTokenValidator
 from flask import after_this_request, jsonify
 from werkzeug.exceptions import HTTPException
 
 from indico.core.db import db
+from indico.core.oauth.models.applications import SystemAppType
 from indico.core.oauth.models.tokens import OAuthToken
 from indico.core.oauth.util import query_token
 from indico.util.date_time import now_utc
@@ -30,6 +32,13 @@ class IndicoResourceProtector(ResourceProtector):
         payload = dict(error.get_body())
         headers = error.get_headers()
         raise IndicoAuthlibHTTPError(error.status_code, payload, headers)
+
+    def parse_request_authorization(self, request):
+        access_token_querystring = flask.request.args.get('access_token')
+        if access_token_querystring and not request.headers.get('Authorization', '').lower().startswith('bearer '):
+            validator = self.get_token_validator('legacy_qs')
+            return validator, access_token_querystring
+        return super().parse_request_authorization(request)
 
 
 class IndicoBearerTokenValidator(BearerTokenValidator):
@@ -54,3 +63,13 @@ class IndicoBearerTokenValidator(BearerTokenValidator):
                 sess.query(OAuthToken).filter_by(id=token_id).update({OAuthToken.last_used_dt: now_utc()})
                 sess.commit()
             return response
+
+
+class IndicoLegacyQueryStringBearerTokenValidator(IndicoBearerTokenValidator):
+    TOKEN_TYPE = 'legacy_qs'
+
+    def authenticate_token(self, token_string):
+        token = super().authenticate_token(token_string)
+        if token and token.application.system_app_type == SystemAppType.checkin:
+            # Only the checkin app is allowed to pass tokens insecurely via query string
+            return token
