@@ -169,10 +169,6 @@ class OAuthApplication(ClientMixin, db.Model):
                 return True
         return False
 
-    def has_client_secret(self):
-        # Unused in authlib - https://github.com/lepture/authlib/issues/319
-        raise NotImplementedError()
-
     def check_client_secret(self, client_secret):
         return self.client_secret == client_secret
 
