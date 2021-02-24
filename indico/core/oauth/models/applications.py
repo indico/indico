@@ -225,13 +225,13 @@ class OAuthApplicationUserLink(db.Model):
     )
     application_id = db.Column(
         db.Integer,
-        db.ForeignKey('oauth.applications.id'),
+        db.ForeignKey('oauth.applications.id', ondelete='CASCADE'),
         nullable=False,
         index=True
     )
     user_id = db.Column(
         db.Integer,
-        db.ForeignKey('users.users.id'),
+        db.ForeignKey('users.users.id', ondelete='CASCADE'),
         nullable=False,
         index=True
     )
@@ -247,7 +247,8 @@ class OAuthApplicationUserLink(db.Model):
         backref=db.backref(
             'user_links',
             lazy='dynamic',
-            cascade='all, delete-orphan'
+            cascade='all, delete-orphan',
+            passive_deletes=True
         )
     )
     user = db.relationship(
@@ -256,7 +257,8 @@ class OAuthApplicationUserLink(db.Model):
         backref=db.backref(
             'oauth_app_links',
             lazy='dynamic',
-            cascade='all, delete-orphan'
+            cascade='all, delete-orphan',
+            passive_deletes=True
         )
     )
 
