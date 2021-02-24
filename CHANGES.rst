@@ -38,6 +38,8 @@ Internal Changes
 - ``confId`` has been changed to ``event_id`` and the corresponding URL path segments
   now enforce numeric data (and thus pass the id as a number instead of string)
 - ``CACHE_BACKEND`` has been removed; Indico now always uses Redis for caching
+- The integration with flower (celery monitoring tool) has been removed as it was not widely used,
+  did not provide much benefit, and it is no longer compatible with the latest Celery version
 
 
 ----

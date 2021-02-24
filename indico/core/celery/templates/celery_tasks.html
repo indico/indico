@@ -1,5 +1,4 @@
 {% extends 'layout/admin_page.html' %}
-{% from 'message_box.html' import message_box %}
 
 {% block title %}
     {% trans %}Tasks{% endtrans %}
@@ -7,14 +6,6 @@
 
 {% block content %}
     <div class="tasks">
-        {%- if indico_config.FLOWER_URL -%}
-            {%- call message_box('info', fixed_width=true) -%}
-                {%- trans flower_url=indico_config.FLOWER_URL -%}
-                    Monitor Indico's Celery tasks with Flower
-                    <a class="bold" href="{{ flower_url }}" target="_blank">here</a>.
-                {%- endtrans -%}
-            {%- endcall %}
-        {%- endif -%}
         <h2>{% trans %}Periodic Tasks{% endtrans %}</h2>
         <table class="i-table-widget fixed-width">
             <thead>
