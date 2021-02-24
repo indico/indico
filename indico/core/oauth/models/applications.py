@@ -21,15 +21,12 @@ from indico.util.enum import IndicoEnum
 class SystemAppType(int, IndicoEnum):
     none = 0
     checkin = 1
-    flower = 2
 
     __enforced_data__ = {
         checkin: {'allowed_scopes': {'registrants'},
                   'redirect_uris': ['http://localhost'],
                   'allow_pkce_flow': True,
                   'is_enabled': True},
-        flower: {'allowed_scopes': {'read:user'},
-                 'is_enabled': True}
     }
 
     __default_data__ = {
@@ -37,10 +34,6 @@ class SystemAppType(int, IndicoEnum):
                   'name': 'Checkin App',
                   'description': 'The checkin app for mobile devices allows scanning ticket QR codes and '
                                  'checking-in event participants.'},
-        flower: {'is_trusted': True,
-                 'name': 'Flower',
-                 'description': 'Flower allows monitoring Celery tasks. If flower is installed, this app is used to '
-                                'restrict access to Indico administrators.'}
     }
 
     @property

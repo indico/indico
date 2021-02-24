@@ -783,32 +783,11 @@ System
 
     Default: ``socket.getfqdn()``
 
-.. data:: FLOWER_URL
-
-    The URL of the `Flower`_ instance monitoring your Celery workers.
-    If set, a link to it will be displayed in the admin area.
-
-    To use flower, install it using ``pip install flower``, then start
-    it using ``indico celery flower``. By default it will listen on the
-    same host as specified in :data:`BASE_URL` (plain HTTP) on port 5555.
-    Authentication is done using OAuth so only Indico administrators
-    can access flower.  You need to configure the allowed auth callback
-    URLs in the admin area; otherwise authentication will fail with an
-    OAuth error.
-
-    .. note::
-
-        The information displayed by Flower is usually not very useful.
-        Unless you are very curious it is usually not worth using it.
-
-    Default: ``None``
-
 
 .. _Flask-SQLAlchemy documentation: https://flask-sqlalchemy.readthedocs.io/en/stable/config/#configuration-keys
 .. _Sentry: https://sentry.io
 .. _Celery documentation on brokers: https://celery.readthedocs.io/en/stable/getting-started/brokers/index.html
 .. _Celery documentation on periodic tasks: https://celery.readthedocs.io/en/stable/userguide/periodic-tasks.html#available-fields
-.. _Flower: https://flower.readthedocs.io/en/latest/
 .. _TeXLive: https://www.tug.org/texlive/
 .. _Flask-Multipass: https://flask-multipass.readthedocs.io
 .. _reference implementation: https://github.com/indico/openreferee
