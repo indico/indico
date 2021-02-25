@@ -49,3 +49,8 @@ preferences for the user preference page. The *sender* is the user for whom the
 preferences page is being shown which might not be the currently logged-in
 user!
 """)
+
+primary_email_changed = _signals.signal('primary-email-changed', """
+Called when the primary address is changed. The *sender* is
+the user object and the `new` and `old` values are passed in the kwarg.
+""")
