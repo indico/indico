@@ -8,7 +8,7 @@
 import os
 import traceback
 
-from flask import current_app, jsonify, request, session
+from flask import current_app, g, jsonify, request, session
 from itsdangerous import BadData
 from sqlalchemy.exc import DatabaseError
 from werkzeug.exceptions import BadRequestKeyError, Forbidden, HTTPException, UnprocessableEntity
@@ -29,7 +29,8 @@ errors_bp = IndicoBlueprint('errors', __name__)
 def handle_forbidden(exc):
     if exc.response:
         return exc
-    if session.user is None and not request.is_xhr and not request.is_json and request.blueprint != 'auth':
+    if (session.user is None and not request.is_xhr and not request.is_json and request.blueprint != 'auth' and
+            not g.get('get_request_user_failed')):
         return redirect_to_login(reason=_('Please log in to access this page.'))
     return render_error(exc, _('Access Denied'), get_error_description(exc), exc.code)
 
