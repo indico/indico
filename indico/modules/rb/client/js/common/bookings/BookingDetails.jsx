@@ -77,6 +77,7 @@ class BookingDetails extends React.Component {
     occurrencesVisible: false,
     activeConfirmation: null,
     acceptanceFormVisible: false,
+    error: null,
     preBookingConflicts: {
       warningVisible: false,
       concurrentBookings: [],
@@ -390,29 +391,42 @@ class BookingDetails extends React.Component {
     );
   };
 
-  renderMessageAfterSplitting = newBookingId => {
-    if (newBookingId === undefined) {
-      return null;
+  renderMessages = (error, newBookingId) => {
+    const messages = [];
+    if (newBookingId) {
+      const {
+        actions: {openBookingDetails},
+      } = this.props;
+      const link = <a onClick={() => openBookingDetails(newBookingId)} />;
+      messages.push({
+        id: 'success-split',
+        color: 'green',
+        header: Translate.string('The booking has been successfully split'),
+        message: (
+          <Translate>
+            You can consult your new booking{' '}
+            <Param name="link" wrapper={link}>
+              here
+            </Param>
+            .
+          </Translate>
+        ),
+      });
     }
-
-    const {
-      actions: {openBookingDetails},
-    } = this.props;
-    const link = <a onClick={() => openBookingDetails(newBookingId)} />;
-    return (
-      <Message color="green">
-        <Message.Header>
-          <Translate>The booking has been successfully split.</Translate>
-        </Message.Header>
-        <Translate>
-          You can consult your new booking{' '}
-          <Param name="link" wrapper={link}>
-            here
-          </Param>
-          .
-        </Translate>
+    if (error) {
+      messages.push({
+        id: 'error',
+        color: 'red',
+        header: Translate.string('Operation failed'),
+        message: error.message,
+      });
+    }
+    return messages.map(({id, header, message, color}) => (
+      <Message key={id} color={color}>
+        <Message.Header>{header}</Message.Header>
+        {message}
       </Message>
-    );
+    ));
   };
 
   renderBookingStatus = () => {
@@ -529,19 +543,25 @@ class BookingDetails extends React.Component {
       actions: {changeBookingState},
     } = this.props;
     const {acceptanceFormVisible} = this.state;
-    this.setState({actionInProgress: action});
+    this.setState({actionInProgress: action, error: null});
     return changeBookingState(id, action, data).then(({error}) => {
-      if (error && error.message === 'prebooking_collision' && action === 'approve') {
-        if (acceptanceFormVisible) {
-          this.hideAcceptanceForm();
+      if (error) {
+        if (error.message === 'prebooking_collision' && action === 'approve') {
+          if (acceptanceFormVisible) {
+            this.hideAcceptanceForm();
+          }
+          this.setState({
+            preBookingConflicts: {
+              concurrentBookings: error.data,
+              acceptanceData: data,
+              warningVisible: true,
+            },
+          });
+        } else {
+          this.setState({
+            error,
+          });
         }
-        this.setState({
-          preBookingConflicts: {
-            concurrentBookings: error.data,
-            acceptanceData: data,
-            warningVisible: true,
-          },
-        });
       }
       this.setState({actionInProgress: null});
     });
@@ -783,7 +803,7 @@ class BookingDetails extends React.Component {
   };
 
   render() {
-    const {occurrencesVisible} = this.state;
+    const {error, occurrencesVisible} = this.state;
     const {
       onClose,
       editButton,
@@ -866,7 +886,7 @@ class BookingDetails extends React.Component {
                     <LazyBookingObjectLink type={_.camelCase(link.type)} id={link.id} />
                   )}
                   {this.renderBookingHistory(editLogs, createdDt, createdByUser)}
-                  {this.renderMessageAfterSplitting(newBookingId)}
+                  {this.renderMessages(error, newBookingId)}
                 </>
               </Grid.Column>
             </Grid>
