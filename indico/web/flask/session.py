@@ -21,6 +21,7 @@ from indico.modules.users import User
 from indico.util.date_time import get_display_tz
 from indico.util.decorators import cached_writable_property
 from indico.util.i18n import _, set_best_lang
+from indico.web.util import get_request_user
 
 
 class BaseSession(CallbackDict, SessionMixin):
@@ -46,8 +47,16 @@ class BaseSession(CallbackDict, SessionMixin):
 # - Always prefix the dict keys backing a property with an underscore (to prevent clashes with externally-set items)
 # - When you store something like the avatar that involves a DB lookup, use cached_writable_property
 class IndicoSession(BaseSession):
-    @cached_writable_property('_user')
+    @property
     def user(self):
+        return get_request_user()[0]
+
+    @user.setter
+    def user(self, user):
+        self._session_user = user
+
+    @cached_writable_property('_session_user_cache')
+    def _session_user(self):
         user_id = self.get('_user_id')
         user = User.get(user_id) if user_id is not None else None
         if user and user.is_deleted:
@@ -69,8 +78,8 @@ class IndicoSession(BaseSession):
                 flash(_('Your Indico profile has been blocked.'), 'error')
         return user
 
-    @user.setter
-    def user(self, user):
+    @_session_user.setter
+    def _session_user(self, user):
         if user is None:
             self.pop('_user_id', None)
         else:

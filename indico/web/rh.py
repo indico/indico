@@ -30,7 +30,7 @@ from indico.util.i18n import _
 from indico.util.locators import get_locator
 from indico.util.signals import values_from_signal
 from indico.web.flask.util import url_for
-from indico.web.util import is_signed_url_valid
+from indico.web.util import get_request_user, is_signed_url_valid
 
 
 HTTP_VERBS = {'GET', 'PATCH', 'POST', 'PUT', 'DELETE'}
@@ -198,6 +198,11 @@ class RH:
         return method()
 
     def _check_csrf(self):
+        if get_request_user()[1] in ('oauth', 'signed_url'):
+            # no csrf checks needed since both of these auth methods require secrets
+            # not available to a malicious site (and if they were, they wouldn't have
+            # to use CSRF to abuse them)
+            return
         token = request.headers.get('X-CSRF-Token') or request.form.get('csrf_token')
         if token is None:
             # Might be a WTForm with a prefix. In that case the field name is '<prefix>-csrf_token'
@@ -352,3 +357,32 @@ class RHTokenProtected(RH):
         token = request.args.get('token')
         if not token or not is_signed_url_valid(self.user, request.full_path):
             raise Forbidden
+
+
+def oauth_scope(scope):
+    """Specify a custom OAuth scope needed to access an RH.
+
+    By default RHs require one of the ``everything`` OAuth scopes to use
+    them when authenticating with an OAuth token. These scopes are meant
+    as wildcards for things that aren't official APIs though. Any RH that
+    expose actual APIs should use scopes related to what they do (within
+    reason of course).
+    """
+    # TODO: we should probably allow setting scopes for specific methods using
+    # a syntax like `@oauth_scope('foo', 'read:foo')` which would require `foo`
+    # or `read:foo` for GET requests and require `foo` for any other method
+    def decorator(rh):
+        rh._OAUTH_SCOPE = scope
+        return rh
+    return decorator
+
+
+def allow_signed_url(rh):
+    """Allow accessing this RH using persistent signed URLs.
+
+    By default RHs do not allow access using a persistent URL containing
+    a ``user_token``. By decorating a RH with this decorator, the RH will
+    allow requests authenticated using such a token.
+    """
+    rh._ALLOW_SIGNED_URL = True
+    return rh

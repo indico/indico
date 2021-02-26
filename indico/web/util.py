@@ -7,12 +7,14 @@
 
 from datetime import datetime
 
-from flask import g, has_request_context, jsonify, render_template, request, session
-from itsdangerous import Signer
+from authlib.oauth2 import OAuth2Error
+from flask import flash, g, has_request_context, jsonify, render_template, request, session
+from itsdangerous import BadData, Signer, URLSafeSerializer
 from markupsafe import Markup
-from werkzeug.exceptions import ImATeapot
+from werkzeug.exceptions import BadRequest, Forbidden, ImATeapot
 from werkzeug.urls import url_decode, url_encode, url_parse, url_unparse
 
+from indico.util.caching import memoize_request
 from indico.util.i18n import _
 from indico.web.flask.templating import get_template_module
 
@@ -216,3 +218,213 @@ def is_signed_url_valid(user, url):
     ))
     signer = Signer(user.signing_secret.encode(), salt='url-signing')
     return signer.verify_signature(url.encode(), signature.encode())
+
+
+def signed_url_for_user(user, endpoint, /, *args, **kwargs):
+    """Get a URL for an endpoint, which is signed using a user's signing secret.
+
+    The user id, path and query string are encoded within the signature.
+    """
+    from indico.web.flask.util import url_for
+
+    _external = kwargs.pop('_external', False)
+    url = url_for(endpoint, *args, **kwargs)
+
+    # we include the plain userid in the token so we can load the user's secret without
+    # having to decode the (potentialy unsafe) payload without having verified the signature.
+    # using signed urls for anything that's not GET is also very unlikely, but we include it
+    # just to make sure we don't accidentally sign some URL where POST is more powerful and
+    # has a body that's not covered by the signature. if we ever want to allow such a thing
+    # we could of course make the method configurable instead of hardcoding GET.
+    signature_data = (user.id, url, 'GET')
+    serializer = URLSafeSerializer(user.signing_secret.encode(), salt='user-url-signing')
+    user_token = f'{user.id}_{serializer.dumps(signature_data)}'
+
+    # this is the final URL including the signature ('user_token' parameter); it also
+    # takes the `_external` flag into account (which is omitted for the signature in
+    # order to never include the host in the signed part)
+    return url_for(endpoint, *args, **kwargs, _external=_external, user_token=user_token)
+
+
+def verify_signed_user_url(url, method):
+    """Verify a signed URL and extract the associated user.
+
+    :param url: the full relative URL of the request, including the query string
+    :param method: the HTTP method of the request
+
+    :return: the user associated with the signed link or `None` if no token was provided
+    :raise Forbidden: if a token is present but invalid
+    """
+    from indico.modules.users import User
+    parsed = url_parse(url)
+    params = url_decode(parsed.query)
+    try:
+        user_id, token = params.pop('user_token').split('_', 1)
+        user_id = int(user_id)
+    except KeyError:
+        return None
+    except ValueError:
+        raise BadRequest(_('The persistent link you used is invalid.'))
+
+    url = url_unparse((
+        '',
+        '',
+        parsed.path,
+        url_encode(sorted(params.items()), sort=True),
+        parsed.fragment
+    ))
+
+    user = User.get(user_id)
+    if not user:
+        raise BadRequest(_('The persistent link you used is invalid.'))
+
+    serializer = URLSafeSerializer(user.signing_secret.encode(), salt='user-url-signing')
+    try:
+        signed_user_id, signed_url, signed_method = serializer.loads(token)
+    except BadData:
+        # re-raise with a (slightly) less technical error message
+        raise BadRequest(_('The persistent link you used is invalid.'))
+
+    if signed_user_id != user.id or signed_url != url or method != signed_method:
+        raise BadRequest(_('The persistent link you used is invalid.'))
+
+    return user
+
+
+def get_oauth_user(scopes):
+    from indico.core.oauth import require_oauth
+    if not request.headers.get('Authorization', '').lower().startswith('bearer '):
+        return None
+    try:
+        oauth_token = require_oauth.acquire_token(scopes)
+    except OAuth2Error as exc:
+        raise BadRequest(f'OAuth error: {exc}')
+    return oauth_token.user
+
+
+def _lookup_request_user(allow_signed_url=False, oauth_scope_hint=None):
+    # explicitly-set user
+    # XXX we may not need this, and the legacy api won't need it either - but oauth
+    # APIs should probably use it!
+    try:
+        return g.current_user, g.current_user_source
+    except AttributeError:
+        pass
+
+    oauth_scopes = [oauth_scope_hint] if oauth_scope_hint else []
+    if request.method == 'GET':
+        oauth_scopes += ['read:everything', 'full:everything']
+    else:
+        oauth_scopes += ['full:everything']
+
+    signed_url_user = verify_signed_user_url(request.full_path, request.method)
+    oauth_user = get_oauth_user(oauth_scopes)
+    session_user = session._session_user
+
+    if oauth_user:
+        if signed_url_user:
+            raise BadRequest('OAuth tokens and signed URLs cannot be mixed')
+        if session_user:
+            raise BadRequest('OAuth tokens and session cookies cannot be mixed')
+
+    if signed_url_user and not allow_signed_url:
+        raise BadRequest('Signature auth is not allowed for this URL')
+
+    if signed_url_user:
+        return signed_url_user, 'signed_url'
+    elif oauth_user:
+        return oauth_user, 'oauth'
+    elif session_user:
+        return session_user, 'session'
+
+    return None, None
+
+
+def _request_likely_seen_by_user():
+    # TODO: exclude json requests as well
+    return not request.is_xhr and request.blueprint != 'assets'
+
+
+def _check_request_user(user, source):
+    if not user:
+        return None, None
+    elif user.is_deleted:
+        merged_into_user = user.merged_into_user
+        if source != 'session':
+            if merged_into_user:
+                raise Forbidden('User has been merged into another user')
+            else:
+                raise Forbidden('User has been deleted')
+        user = source = None
+        # If the user is deleted and the request is likely to be seen by
+        # the user, we forcefully log him out and inform him about it.
+        if _request_likely_seen_by_user():
+            session.clear()
+            if merged_into_user:
+                msg = _('Your profile has been merged into <strong>{}</strong>. Please log in using that profile.')
+                flash(Markup(msg).format(merged_into_user.full_name), 'warning')
+            else:
+                flash(_('Your profile has been deleted.'), 'error')
+    elif user.is_blocked:
+        if source != 'session':
+            raise Forbidden('User has been blocked')
+        user = source = None
+        if _request_likely_seen_by_user():
+            session.clear()
+            flash(_('Your profile has been blocked.'), 'error')
+
+    return user, source
+
+
+@memoize_request
+def get_request_user():
+    """Get the user associated with the current request.
+
+    This looks up the user using all ways of authentication that are
+    supported on the current endpoint. In most cases that's the user
+    from the active session (via a session cookie), but it may also be
+    set (or even overridden if there is a session as well) through other
+    means, such as:
+
+    - an OAuth token
+    - a signature for a persistent url
+    - an explicitly-set user (for legacy code that authenticates users
+      through other means such as the HTTPAPI)
+    """
+
+    if g.get('get_request_user_failed'):
+        # If getting the current user failed, we abort early in case something
+        # tries again since that code may be in logging or error handling, and
+        # we don't want that code to fail because of an invalid token in the URL
+        return None, None
+
+    rh = type(g.rh) if 'rh' in g else None
+    oauth_scope_hint = getattr(rh, '_OAUTH_SCOPE', None)
+    allow_signed_url = getattr(rh, '_ALLOW_SIGNED_URL', False)
+
+    try:
+        user, source = _lookup_request_user(allow_signed_url, oauth_scope_hint)
+        user, source = _check_request_user(user, source)
+    except Exception:
+        g.get_request_user_failed = True
+        raise
+
+    return user, source
+
+
+def override_request_user(user, source):
+    """Override the user associated with the request.
+
+    This is only meant for special usecases where the request should be
+    processed for a different user than the one which would be usually
+    used (regardless of where that one is coming from, usually it's the
+    session).
+
+    If the current user for the request has already been retrieved, setting
+    a different user through this function will fail.
+    """
+
+    if 'current_user' in g:
+        raise RuntimeError(f'Cannot set request user to {user}; already set to {g.current_user}')
+    g.current_user = user
+    g.current_user_source = source
