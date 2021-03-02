@@ -10,9 +10,10 @@ import re
 from contextlib import contextmanager
 from uuid import uuid4
 
-from flask import Blueprint, Flask, g, request
+from flask import Blueprint, Flask, current_app, g, request
 from flask.blueprints import BlueprintSetupState
 from flask.helpers import locked_cached_property
+from flask.testing import FlaskClient
 from flask.wrappers import Request
 from flask_pluginengine import PluginFlaskMixin
 from flask_webpackext import current_webpack
@@ -68,10 +69,19 @@ class IndicoRequest(Request):
         return self.headers.get('X-Requested-With', '').lower() == 'xmlhttprequest'
 
 
+class IndicoFlaskClient(FlaskClient):
+    def open(self, *args, **kwargs):
+        # our tests always push an app context, but we do not want to leak `g` between
+        # test client calls, so we always use a throwaway app context for the requests
+        with current_app.app_context():
+            return super().open(*args, **kwargs)
+
+
 class IndicoFlask(PluginFlaskMixin, Flask):
     json_encoder = IndicoJSONEncoder
     request_class = IndicoRequest
     session_interface = IndicoSessionInterface()
+    test_client_class = IndicoFlaskClient
 
     @property
     def session_cookie_name(self):

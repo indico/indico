@@ -47,9 +47,16 @@ def request_context(app_context):
 
 
 @pytest.fixture
-def test_client(app, mocker):
-    """Create a flask request context."""
+def make_test_client(app, mocker):
+    """Return a factory for test clients."""
     mocker.patch.object(_FlaskWebpackExtState, 'manifest')
     mocker.patch.object(IndicoFlask, 'manifest')
-    with app.test_client() as c:
+
+    return app.test_client
+
+
+@pytest.fixture
+def test_client(make_test_client):
+    """Create a flask test client."""
+    with make_test_client() as c:
         yield c
