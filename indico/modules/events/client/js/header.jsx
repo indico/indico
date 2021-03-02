@@ -18,13 +18,12 @@ document.addEventListener('DOMContentLoaded', () => {
     return;
   }
 
-  const userId = document.body.dataset.userId;
   const eventId = calendarContainer.dataset.eventId;
 
   ReactDOM.render(
     <ICSCalendarLink
       endpoint="events.export_event_ical"
-      urlParams={{user_id: userId, event_id: eventId}}
+      urlParams={{event_id: eventId}}
       renderButton={onClick => (
         <IButton
           icon="calendar"

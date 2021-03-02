@@ -18,13 +18,12 @@ document.addEventListener('DOMContentLoaded', () => {
     return;
   }
 
-  const userId = document.body.dataset.userId;
   const categoryId = calendarContainer.dataset.categoryId;
 
   ReactDOM.render(
     <ICSCalendarLink
       endpoint="categories.export_ical"
-      urlParams={{user_id: userId, category_id: categoryId}}
+      urlParams={{category_id: categoryId}}
       renderButton={onClick => <IButton icon="calendar" onClick={onClick} />}
       options={[{key: 'category', text: Translate.string('Category'), queryParams: {}}]}
     />,
