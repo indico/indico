@@ -103,6 +103,10 @@ def db(database, monkeypatch):
     # Prevent database/session modifications
     monkeypatch.setattr(database.session, 'commit', database.session.flush)
     monkeypatch.setattr(database.session, 'remove', lambda: None)
+    rollback = database.session.rollback
+    # disable rollback in case we use the test client where RHs do a rollback
+    # XXX maybe we should do nested transactions?
+    monkeypatch.setattr(database.session, 'rollback', lambda: None)
 
     @contextmanager
     def _tmp_session():
@@ -113,7 +117,7 @@ def db(database, monkeypatch):
 
     monkeypatch.setattr(database, 'tmp_session', _tmp_session, lambda: None)
     yield database
-    database.session.rollback()
+    rollback()
     database.session.remove()
 
 
