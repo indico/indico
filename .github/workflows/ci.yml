@@ -12,7 +12,7 @@ on:
 
 jobs:
   setup:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v2
 
@@ -61,7 +61,7 @@ jobs:
 
   lint:
     needs: setup
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     steps:
       # BEGIN common steps - edit all occurrences if needed!
       - uses: actions/checkout@v2
@@ -164,7 +164,7 @@ jobs:
 
   test-python:
     needs: setup
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
 
     services:
       postgres:
@@ -233,7 +233,7 @@ jobs:
   test-js:
     if: false # XXX: enzyme is not yet compatible with react 17 - https://github.com/enzymejs/enzyme/issues/2429
     needs: setup
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     steps:
       # BEGIN common steps - edit all occurrences if needed!
       - uses: actions/checkout@v2
