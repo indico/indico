@@ -5,6 +5,7 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
+import sys
 from datetime import datetime
 
 from authlib.oauth2 import OAuth2Error
@@ -398,6 +399,7 @@ def get_request_user():
         # we don't want that code to fail because of an invalid token in the URL
         return None, None
 
+    current_exc = sys.exc_info()[1]
     rh = type(g.rh) if 'rh' in g else None
     oauth_scope_hint = getattr(rh, '_OAUTH_SCOPE', None)
     allow_signed_url = getattr(rh, '_ALLOW_SIGNED_URL', False)
@@ -405,8 +407,19 @@ def get_request_user():
     try:
         user, source = _lookup_request_user(allow_signed_url, oauth_scope_hint)
         user, source = _check_request_user(user, source)
-    except Exception:
+    except Exception as exc:
         g.get_request_user_failed = True
+        if current_exc:
+            # If we got here while handling another exception, we silently ignore
+            # any failure related to authenticating the current user and pretend
+            # there is no user so we can continue handling the original exception.
+            # one case when this happens is passing a `user_token` arg to a page
+            # that 404s. of course the token is not valid there, but the 404 error
+            # is the more interesting one.
+            from indico.core.logger import Logger
+            Logger.get('auth').info('Discarding exception "%s" while authenticating request user during handling of '
+                                    'exception "%s"', exc, current_exc)
+            return None, None
         raise
 
     return user, source
