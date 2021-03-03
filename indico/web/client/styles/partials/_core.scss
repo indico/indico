@@ -123,7 +123,7 @@ img {
   border: 0;
 }
 
-label:not(.ui.checkbox),
-.label:not(.ui.checkbox) {
+.i-form label,
+.i-form .label {
   font-weight: bold;
 }
