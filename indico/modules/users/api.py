@@ -5,20 +5,22 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from authlib.integrations.flask_oauth2 import current_token
-from flask import jsonify
+from flask import jsonify, session
 
-from indico.core.oauth import require_oauth
 from indico.modules.users import User
 from indico.web.http_api.hooks.base import HTTPAPIHook
 from indico.web.http_api.responses import HTTPAPIError
+from indico.web.rh import RH, oauth_scope
 
 
-@require_oauth('read:user')
-def fetch_authenticated_user():
-    user = current_token.user
-    return jsonify(id=user.id, email=user.email, first_name=user.first_name, last_name=user.last_name,
-                   admin=user.is_admin)
+@oauth_scope('read:user')
+class RHUserAPI(RH):
+    def _process(self):
+        user = session.user
+        if not user:
+            return jsonify(None)
+        return jsonify(id=user.id, email=user.email, first_name=user.first_name, last_name=user.last_name,
+                       admin=user.is_admin)
 
 
 @HTTPAPIHook.register
