@@ -40,10 +40,6 @@ def events_to_ical(events, user=None):
     for event in events:
         cal_event = Event()
 
-        location = (f'{event.room_name} ({event.venue_name})'
-                    if event.venue_name and event.room_name
-                    else (event.venue_name or event.room_name))
-
         cal_event.add('uid', 'indico-event-{}@{}'.format(event.id, url_parse(config.BASE_URL).host))
 
         cal_event.add('dtstamp', now_utc(False))
@@ -51,7 +47,13 @@ def events_to_ical(events, user=None):
         cal_event.add('dtend', event.end_dt)
         cal_event.add('url', event.external_url)
         cal_event.add('summary', event.title)
-        cal_event.add('location', location)
+
+        location = (f'{event.room_name} ({event.venue_name})'
+                    if event.venue_name and event.room_name
+                    else (event.venue_name or event.room_name))
+
+        if location:
+            cal_event.add('location', location)
 
         description = []
         if event.person_links:
