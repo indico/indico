@@ -413,7 +413,7 @@ def _build_base_registration_info(registration):
         'registrant_id': str(registration.id),
         'checked_in': registration.checked_in,
         'checkin_secret': registration.ticket_uuid,
-        'full_name': '{} {}'.format(personal_data.get('title', ''), registration.full_name),
+        'full_name': '{} {}'.format(personal_data.get('title', ''), registration.full_name).strip(),
         'personal_data': personal_data
     }
 
