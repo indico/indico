@@ -13,19 +13,17 @@ import {Translate} from 'indico/react/i18n';
 import ICSCalendarLink from './ICSCalendarLink';
 
 document.addEventListener('DOMContentLoaded', () => {
-  const userId = document.querySelector('body').dataset.userId;
   ReactDOM.render(
     <ICSCalendarLink
       endpoint="users.export_dashboard_ics"
-      urlParams={{user_id: userId}}
       options={[
-        {key: 'events', text: Translate.string('Events at hand'), queryParams: {include: 'linked'}},
+        {key: 'events', text: Translate.string('Events at hand'), extraParams: {include: 'linked'}},
         {
           key: 'categories',
           text: Translate.string('Categories'),
-          queryParams: {include: 'categories'},
+          extraParams: {include: 'categories'},
         },
-        {key: 'everything', text: Translate.string('Everything'), queryParams: {}},
+        {key: 'everything', text: Translate.string('Everything'), extraParams: {}},
       ]}
     />,
     document.querySelector('#dashboard-calendar-link')

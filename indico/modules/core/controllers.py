@@ -39,7 +39,7 @@ from indico.web.flask.templating import get_template_module
 from indico.web.flask.util import url_for
 from indico.web.forms.base import FormDefaults
 from indico.web.rh import RH, RHProtected
-from indico.web.util import signed_url_for, signed_url_for_user
+from indico.web.util import signed_url_for_user
 
 
 class RHContact(RH):
@@ -282,18 +282,10 @@ class RHSignURL(RHProtected):
         endpoint = request.json.get('endpoint')
         if not endpoint:
             raise BadRequest
-        # filter out non-standard args
-        url_params = request.json.get('url_params', {})
-        url_params = {k: v for k, v in url_params.items() if not k.startswith('_')}
-        query_params = request.json.get('query_params', {})
-        query_params = {k: v for k, v in query_params.items() if not k.startswith('_')}
-        if 'user_id' in url_params:
-            # TODO: get rid of this
-            url = signed_url_for(session.user, endpoint, url_params=url_params, _external=True, **query_params)
-        else:
-            url = signed_url_for_user(session.user, endpoint, _external=True, **query_params)
-        # XXX should we really log the signed urls, token included?
-        Logger.get('url_signing').info("%s signed URL for endpoint '%s' (%s)", session.user, endpoint, url)
+        # filter out special args
+        params = {k: v for k, v in request.json.get('params', {}).items() if not k.startswith('_')}
+        url = signed_url_for_user(session.user, endpoint, _external=True, **params)
+        Logger.get('url_signing').info("%s signed URL for endpoint '%s' with params %r", session.user, endpoint, params)
         return jsonify(url=url)
 
 

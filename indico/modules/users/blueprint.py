@@ -9,8 +9,8 @@ from flask import request
 
 from indico.modules.users.api import fetch_authenticated_user
 from indico.modules.users.controllers import (RHAcceptRegistrationRequest, RHAdmins, RHExportDashboardICS,
-                                              RHPersonalData, RHProfilePictureDisplay, RHProfilePicturePage,
-                                              RHProfilePicturePreview, RHRegistrationRequestList,
+                                              RHExportDashboardICSLegacy, RHPersonalData, RHProfilePictureDisplay,
+                                              RHProfilePicturePage, RHProfilePicturePreview, RHRegistrationRequestList,
                                               RHRejectRegistrationRequest, RHSaveProfilePicture, RHUserBlock,
                                               RHUserDashboard, RHUserEmails, RHUserEmailsDelete, RHUserEmailsSetPrimary,
                                               RHUserEmailsVerify, RHUserFavorites, RHUserFavoritesAPI,
@@ -69,7 +69,8 @@ with _bp.add_prefixed_rules('/<int:user_id>'):
     _bp.add_url_rule('/emails/make-primary', 'user_emails_set_primary', RHUserEmailsSetPrimary, methods=('POST',))
     _bp.add_url_rule('/blocked', 'user_block', RHUserBlock, methods=('PUT', 'DELETE'))
 
-_bp.add_url_rule('/<int:user_id>/dashboard.ics', 'export_dashboard_ics', RHExportDashboardICS)
+_bp.add_url_rule('/dashboard.ics', 'export_dashboard_ics', RHExportDashboardICS)
+_bp.add_url_rule('/<int:user_id>/dashboard.ics', 'export_dashboard_ics_legacy', RHExportDashboardICSLegacy)
 
 # User search
 _bp.add_url_rule('/search/info', 'user_search_info', RHUserSearchInfo)

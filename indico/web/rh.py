@@ -30,7 +30,7 @@ from indico.util.i18n import _
 from indico.util.locators import get_locator
 from indico.util.signals import values_from_signal
 from indico.web.flask.util import url_for
-from indico.web.util import get_request_user, is_signed_url_valid
+from indico.web.util import get_request_user
 
 
 HTTP_VERBS = {'GET', 'PATCH', 'POST', 'PUT', 'DELETE'}
@@ -344,18 +344,6 @@ class RHProtected(RH):
 class RequireUserMixin:
     def _check_access(self):
         if session.user is None:
-            raise Forbidden
-
-
-class RHTokenProtected(RH):
-    """A request handler which is protected through a signature token parameter."""
-
-    def _process_args(self):
-        self.user = db.m.User.get_or_404(request.view_args['user_id'])
-
-    def _check_access(self):
-        token = request.args.get('token')
-        if not token or not is_signed_url_valid(self.user, request.full_path):
             raise Forbidden
 
 
