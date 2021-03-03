@@ -331,8 +331,7 @@ def _lookup_request_user(allow_signed_url=False, oauth_scope_hint=None):
 
 
 def _request_likely_seen_by_user():
-    # TODO: exclude json requests as well
-    return not request.is_xhr and request.blueprint != 'assets'
+    return not request.is_xhr and not request.is_json and request.blueprint != 'assets'
 
 
 def _check_request_user(user, source):

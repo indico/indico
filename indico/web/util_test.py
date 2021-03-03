@@ -210,15 +210,20 @@ def test_lookup_request_user_session_oauth(dummy_user, mocker):
 
 
 @pytest.mark.usefixtures('request_context')
-@pytest.mark.parametrize(('xhr', 'blueprint', 'expected'), (
-    (False, 'assets', False),
-    (True, 'assets', False),
-    (False, 'foo', True),
-    (True, 'foo', False),
+@pytest.mark.parametrize(('xhr', 'json', 'blueprint', 'expected'), (
+    (False, False, 'assets', False),
+    (True, False, 'assets', False),
+    (False, True, 'assets', False),
+    (True, True, 'assets', False),
+    (False, False, 'foo', True),
+    (True, False, 'foo', False),
+    (False, True, 'foo', False),
+    (True, True, 'foo', False),
 ))
-def test_request_likely_seen_by_user(mocker, xhr, blueprint, expected):
+def test_request_likely_seen_by_user(mocker, xhr, json, blueprint, expected):
     request = mocker.patch('indico.web.util.request')
     request.is_xhr = xhr
+    request.is_json = json
     request.blueprint = blueprint
     assert _request_likely_seen_by_user() == expected
 
