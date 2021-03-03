@@ -296,7 +296,7 @@ def get_oauth_user(scopes):
     try:
         oauth_token = require_oauth.acquire_token(scopes)
     except OAuth2Error as exc:
-        raise BadRequest(f'OAuth error: {exc}')
+        require_oauth.raise_error_response(exc)
     return oauth_token.user
 
 

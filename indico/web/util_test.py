@@ -6,10 +6,11 @@
 # LICENSE file for more details.
 
 import pytest
-from authlib.oauth2 import OAuth2Error
+from authlib.oauth2.rfc6750 import InsufficientScopeError
 from flask import session
 from werkzeug.exceptions import BadRequest, Forbidden
 
+from indico.core.oauth.protector import IndicoAuthlibHTTPError, IndicoResourceProtector
 from indico.web.flask.util import make_view_func
 from indico.web.rh import RH, allow_signed_url, oauth_scope
 from indico.web.util import (_check_request_user, _lookup_request_user, _request_likely_seen_by_user, get_oauth_user,
@@ -122,31 +123,31 @@ def test_verify_signed_user_url_invalid_user(dummy_user):
 def test_get_oauth_user_no_token(mocker, headers):
     request = mocker.patch('indico.web.util.request')
     request.headers = headers
-    require_oauth = mocker.patch('indico.core.oauth.require_oauth')
+    acquire_token = mocker.patch.object(IndicoResourceProtector, 'acquire_token')
     assert get_oauth_user('whatever') is None
-    require_oauth.acquire_token.assert_not_called()
+    acquire_token.assert_not_called()
 
 
 @pytest.mark.usefixtures('request_context')
 def test_get_oauth_user_oauth_error(mocker):
     request = mocker.patch('indico.web.util.request')
     request.headers = {'Authorization': 'Bearer foo'}
-    require_oauth = mocker.patch('indico.core.oauth.require_oauth')
-    require_oauth.acquire_token.side_effect = OAuth2Error('nope')
-    with pytest.raises(BadRequest) as exc_info:
+    acquire_token = mocker.patch.object(IndicoResourceProtector, 'acquire_token')
+    acquire_token.side_effect = InsufficientScopeError()
+    with pytest.raises(IndicoAuthlibHTTPError) as exc_info:
         get_oauth_user('whatever')
-    assert 'nope' in str(exc_info.value)
-    require_oauth.acquire_token.assert_called_with('whatever')
+    assert 'requires higher privileges than provided' in str(exc_info.value)
+    acquire_token.assert_called_with('whatever')
 
 
 @pytest.mark.usefixtures('request_context')
 def test_get_oauth_user_oauth(mocker, dummy_user):
     request = mocker.patch('indico.web.util.request')
     request.headers = {'Authorization': 'Bearer foo'}
-    require_oauth = mocker.patch('indico.core.oauth.require_oauth')
-    require_oauth.acquire_token.return_value.user = dummy_user
+    acquire_token = mocker.patch.object(IndicoResourceProtector, 'acquire_token')
+    acquire_token.return_value.user = dummy_user
     assert get_oauth_user('whatever') == dummy_user
-    require_oauth.acquire_token.assert_called_with('whatever')
+    acquire_token.assert_called_with('whatever')
 
 
 @pytest.mark.usefixtures('request_context')
@@ -402,15 +403,15 @@ def test_get_request_user_complete(dummy_user, app, test_client, dummy_token, cr
     # oauth - token with read:user scope
     oauth_headers = {'Authorization': f'Bearer {dummy_token._plaintext_token}'}
     resp = test_client.get('/test/default', headers=oauth_headers)
-    assert resp.status_code == 400
+    assert resp.status_code == 403
     assert b'insufficient_scope' in resp.data
 
     resp = test_client.post('/test/default', headers=oauth_headers)
-    assert resp.status_code == 400
+    assert resp.status_code == 403
     assert b'insufficient_scope' in resp.data
 
     resp = test_client.get('/test/signed', headers=oauth_headers)
-    assert resp.status_code == 400
+    assert resp.status_code == 403
     assert b'insufficient_scope' in resp.data
 
     resp = test_client.get('/test/scope', headers=oauth_headers)
@@ -432,7 +433,7 @@ def test_get_request_user_complete(dummy_user, app, test_client, dummy_token, cr
 
     # default post requires full:everything
     resp = test_client.post('/test/default', headers=oauth_headers)
-    assert resp.status_code == 400
+    assert resp.status_code == 403
     assert b'insufficient_scope' in resp.data
 
     resp = test_client.get('/test/signed', headers=oauth_headers)
