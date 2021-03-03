@@ -514,3 +514,39 @@ def test_get_request_user_complete(dummy_user, app, test_client, dummy_token, cr
     resp = test_client.get(signed_url_for_user(dummy_user, 'test_signed'))
     assert resp.status_code == 200
     assert resp.data == b'1337|signed_url'
+
+
+def test_get_request_user_nested_exceptions(mocker, app, test_client):
+    process_called = False
+
+    class RHFail(RH):
+        def _process(self):
+            nonlocal process_called
+            process_called = True
+            raise Exception('badaboom')
+
+    app.add_url_rule('/test/fail', 'test_fail', make_view_func(RHFail))
+
+    # page does not exist
+    resp = test_client.get('/test/this-does-not-exist?user_token=garbage')
+    assert resp.status_code == 404
+    assert b'Not Found' in resp.data
+
+    # existing page but invalid token, just making sure we never get into processing that
+    resp = test_client.get('/test/fail?user_token=garbage')
+    assert resp.status_code == 400
+    assert b'The persistent link you used is invalid' in resp.data
+
+    # random failure during authentication on an existing page
+    mocker.patch('indico.web.util._lookup_request_user', side_effect=Exception('kaboom'))
+    resp = test_client.get('/test/fail?user_token=garbage')
+    assert resp.status_code == 500
+    assert b'kaboom' in resp.data
+
+    # random failure during authentication on 404ing page
+    resp = test_client.get('/test/this-does-not-exist?user_token=garbage')
+    assert resp.status_code == 404
+    assert b'Not Found' in resp.data
+
+    # none of the requests should have ended up in the RH
+    assert not process_called
