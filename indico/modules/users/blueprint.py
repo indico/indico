@@ -54,7 +54,6 @@ with _bp.add_prefixed_rules('/<int:user_id>'):
     _bp.add_url_rule('/profile/picture', 'save_profile_picture', RHSaveProfilePicture, methods=('POST',))
     _bp.add_url_rule('/profile/picture/preview/<any(standard,gravatar,identicon,custom):source>',
                      'profile_picture_preview', RHProfilePicturePreview)
-    _bp.add_url_rule('/picture-<slug>', 'user_profile_picture_display', RHProfilePictureDisplay)
     _bp.add_url_rule('/preferences/', 'user_preferences', RHUserPreferences, methods=('GET', 'POST'))
     _bp.add_url_rule('/favorites/', 'user_favorites', RHUserFavorites)
     _bp.add_url_rule('/api/favorites/users', 'favorites_api', RHUserFavoritesAPI)
@@ -71,6 +70,7 @@ with _bp.add_prefixed_rules('/<int:user_id>'):
 
 _bp.add_url_rule('/dashboard.ics', 'export_dashboard_ics', RHExportDashboardICS)
 _bp.add_url_rule('/<int:user_id>/dashboard.ics', 'export_dashboard_ics_legacy', RHExportDashboardICSLegacy)
+_bp.add_url_rule('/<int:user_id>/picture-<slug>', 'user_profile_picture_display', RHProfilePictureDisplay)
 
 # User search
 _bp.add_url_rule('/search/info', 'user_search_info', RHUserSearchInfo)
