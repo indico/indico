@@ -7,7 +7,7 @@
 
 from flask import request
 
-from indico.modules.users.api import fetch_authenticated_user
+from indico.modules.users.api import RHUserAPI
 from indico.modules.users.controllers import (RHAcceptRegistrationRequest, RHAdmins, RHExportDashboardICS,
                                               RHExportDashboardICSLegacy, RHPersonalData, RHProfilePictureDisplay,
                                               RHProfilePicturePage, RHProfilePicturePreview, RHRegistrationRequestList,
@@ -77,7 +77,7 @@ _bp.add_url_rule('/search/info', 'user_search_info', RHUserSearchInfo)
 _bp.add_url_rule('/search/', 'user_search', RHUserSearch)
 
 # Users API
-_bp.add_url_rule('!/api/user/', 'authenticated_user', fetch_authenticated_user)
+_bp.add_url_rule('!/api/user/', 'authenticated_user', RHUserAPI)
 
 
 @_bp.url_defaults
