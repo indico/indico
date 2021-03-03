@@ -540,3 +540,42 @@ def test_get_request_user_nested_exceptions(mocker, app, test_client):
 
     # none of the requests should have ended up in the RH
     assert not process_called
+
+
+def test_get_request_user_oauth_querystring(db, dummy_user, app, test_client):
+    # TODO: remove this once indico-checkin no longer sends tokens in the query string!
+    from indico.core.oauth.models.applications import OAuthApplication, OAuthApplicationUserLink, SystemAppType
+    from indico.core.oauth.models.tokens import OAuthToken
+
+    @oauth_scope('registrants')
+    class RHTest(RH):
+        def _process(self):
+            user, source = get_request_user()
+            assert session.user == user
+            if not user:
+                return 'none'
+            return f'{user.id}|{source}'
+
+    app.add_url_rule('/test/registrants', 'test_registrants', make_view_func(RHTest), methods=('GET', 'POST'))
+
+    checkin_app = OAuthApplication.query.filter_by(system_app_type=SystemAppType.checkin).one()
+    app_link = OAuthApplicationUserLink(application=checkin_app, user=dummy_user, scopes=['registrants'])
+    token_string = 'x' * 40
+    OAuthToken(access_token=token_string, app_user_link=app_link, scopes=['registrants'])
+    db.session.flush()
+
+    resp = test_client.get('/test/registrants', headers={'Authorization': f'Bearer {token_string}'})
+    assert resp.status_code == 200
+    assert resp.data == b'1337|oauth'
+
+    resp = test_client.post('/test/registrants', headers={'Authorization': f'Bearer {token_string}'})
+    assert resp.status_code == 200
+    assert resp.data == b'1337|oauth'
+
+    resp = test_client.get(f'/test/registrants?access_token={token_string}')
+    assert resp.status_code == 200
+    assert resp.data == b'1337|oauth'
+
+    resp = test_client.post(f'/test/registrants?access_token={token_string}')
+    assert resp.status_code == 200
+    assert resp.data == b'1337|oauth'
