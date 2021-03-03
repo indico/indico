@@ -153,7 +153,7 @@ def test_get_oauth_user_oauth(mocker, dummy_user):
 @pytest.mark.usefixtures('request_context')
 def test_lookup_request_user_session(dummy_user):
     assert _lookup_request_user() == (None, None)
-    session.user = dummy_user
+    session.set_session_user(dummy_user)
     assert _lookup_request_user() == (dummy_user, 'session')
 
 
@@ -161,7 +161,7 @@ def test_lookup_request_user_session(dummy_user):
 def test_lookup_request_user_signed_url(create_user, dummy_user, mocker):
     assert _lookup_request_user(True) == (None, None)
     mocker.patch('indico.web.util.verify_signed_user_url').return_value = dummy_user
-    session.user = create_user(123)  # should be ignored
+    session.set_session_user(create_user(123))  # should be ignored
     assert _lookup_request_user(True) == (dummy_user, 'signed_url')
 
 
@@ -202,7 +202,7 @@ def test_lookup_request_user_signed_url_oauth(dummy_user, mocker):
 @pytest.mark.usefixtures('request_context')
 def test_lookup_request_user_session_oauth(dummy_user, mocker):
     assert _lookup_request_user() == (None, None)
-    session.user = dummy_user
+    session.set_session_user(dummy_user)
     mocker.patch('indico.web.util.get_oauth_user').return_value = dummy_user
     with pytest.raises(BadRequest) as exc_info:
         _lookup_request_user()
@@ -468,9 +468,9 @@ def test_get_request_user_complete(dummy_user, app, test_client, dummy_token, cr
     assert resp.status_code == 400
     assert b'OAuth tokens and signed URLs cannot be mixed' in resp.data
 
-    # request with a user being set in the actual session ( session cookies in the browser)
+    # request with a user being set in the actual session (session cookies in the browser)
     with test_client.session_transaction() as sess:
-        sess.user = create_user(123)
+        sess.set_session_user(create_user(123))
 
     assert test_client.get('/test/default').data == b'123|session'
     assert test_client.get('/test/signed').data == b'123|session'

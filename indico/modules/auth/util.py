@@ -87,7 +87,7 @@ def undo_impersonate_user():
         return
     user = User.get_or_404(entry['user_id'])
     logger.info('Admin %r stopped impersonating user %r', user, session.user)
-    session.user = user
+    session.set_session_user(user)
     session.update(entry['session_data'])
 
 

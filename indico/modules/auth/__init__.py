@@ -89,7 +89,7 @@ def login_user(user, identity=None, admin_impersonation=False):
         session.timezone = user.settings.get('timezone', config.DEFAULT_TIMEZONE)
     else:
         session.timezone = 'LOCAL'
-    session.user = user
+    session.set_session_user(user)
     session.lang = user.settings.get('lang')
     if not admin_impersonation:
         if identity:
