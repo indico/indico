@@ -5,12 +5,13 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
+import hashlib
 import sys
 from datetime import datetime
 
 from authlib.oauth2 import OAuth2Error
 from flask import flash, g, has_request_context, jsonify, render_template, request, session
-from itsdangerous import BadData, Signer, URLSafeSerializer
+from itsdangerous import Signer
 from markupsafe import Markup
 from werkzeug.exceptions import BadRequest, Forbidden, ImATeapot
 from werkzeug.urls import url_decode, url_encode, url_parse, url_unparse
@@ -206,8 +207,12 @@ def is_legacy_signed_url_valid(user, url):
         url_encode(sorted(params.items()), sort=True),
         parsed.fragment
     ))
-    signer = Signer(user.signing_secret.encode(), salt='url-signing')
-    return signer.verify_signature(url.encode(), signature.encode())
+    signer = Signer(user.signing_secret, salt='url-signing')
+    return signer.verify_signature(url.encode(), signature)
+
+
+def _get_user_url_signer(user):
+    return Signer(user.signing_secret, salt='user-url-signing', digest_method=hashlib.sha256)
 
 
 def signed_url_for_user(user, endpoint, /, *args, **kwargs):
@@ -220,15 +225,18 @@ def signed_url_for_user(user, endpoint, /, *args, **kwargs):
     _external = kwargs.pop('_external', False)
     url = url_for(endpoint, *args, **kwargs)
 
-    # we include the plain userid in the token so we can load the user's secret without
-    # having to decode the (potentialy unsafe) payload without having verified the signature.
-    # using signed urls for anything that's not GET is also very unlikely, but we include it
-    # just to make sure we don't accidentally sign some URL where POST is more powerful and
-    # has a body that's not covered by the signature. if we ever want to allow such a thing
-    # we could of course make the method configurable instead of hardcoding GET.
-    signature_data = (user.id, url, 'GET')
-    serializer = URLSafeSerializer(user.signing_secret.encode(), salt='user-url-signing')
-    user_token = f'{user.id}_{serializer.dumps(signature_data)}'
+    # we include the plain userid in the token so we know which signing secret to load.
+    # the signature itself is over the method, user id and URL, so tampering with that ID
+    # would not help.
+    # using signed urls for anything that's not GET is also very unlikely, but we include
+    # the method as well just to make sure we don't accidentally sign some URL where POST
+    # is more powerful and has a body that's not covered by the signature. if we ever want
+    # to allow such a thing we could of course make the method configurable instead of
+    # hardcoding GET.
+    signer = _get_user_url_signer(user)
+    signature_data = f'GET:{user.id}:{url}'
+    signature = signer.get_signature(signature_data).decode()
+    user_token = f'{user.id}_{signature}'
 
     # this is the final URL including the signature ('user_token' parameter); it also
     # takes the `_external` flag into account (which is omitted for the signature in
@@ -249,7 +257,7 @@ def verify_signed_user_url(url, method):
     parsed = url_parse(url)
     params = url_decode(parsed.query)
     try:
-        user_id, token = params.pop('user_token').split('_', 1)
+        user_id, signature = params.pop('user_token').split('_', 1)
         user_id = int(user_id)
     except KeyError:
         return None
@@ -268,14 +276,9 @@ def verify_signed_user_url(url, method):
     if not user:
         raise BadRequest(_('The persistent link you used is invalid.'))
 
-    serializer = URLSafeSerializer(user.signing_secret.encode(), salt='user-url-signing')
-    try:
-        signed_user_id, signed_url, signed_method = serializer.loads(token)
-    except BadData:
-        # re-raise with a (slightly) less technical error message
-        raise BadRequest(_('The persistent link you used is invalid.'))
-
-    if signed_user_id != user.id or signed_url != url or method != signed_method:
+    signer = _get_user_url_signer(user)
+    signature_data = f'{method}:{user.id}:{url}'
+    if not signer.verify_signature(signature_data.encode(), signature):
         raise BadRequest(_('The persistent link you used is invalid.'))
 
     return user

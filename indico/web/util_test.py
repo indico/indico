@@ -37,10 +37,12 @@ def test_is_legacy_signed_url_valid(dummy_user, url, valid):
 
 
 @pytest.mark.parametrize(('endpoint', 'kwargs', 'expected'), (
-    ('core.contact', {}, '/contact?user_token=1337_WzEzMzcsIi9jb250YWN0IiwiR0VUIl0.S9N3hl_vZdJCqiWueeiJCFaCGyk'),
-    ('core.contact', {'_external': True}, 'http://localhost/contact?user_token=1337_WzEzMzcsIi9jb250YWN0IiwiR0VUIl0.S9N3hl_vZdJCqiWueeiJCFaCGyk'),  # noqa: E501
-    ('core.contact', {'foo': 'bar'}, '/contact?foo=bar&user_token=1337_WzEzMzcsIi9jb250YWN0P2Zvbz1iYXIiLCJHRVQiXQ.u_CUMB7nI_W7oa7v-CDndBEGUHc'),  # noqa: E501
-    ('events.display', {'event_id': 123, 'a': 'b'}, '/event/123/?a=b&user_token=1337_WzEzMzcsIi9ldmVudC8xMjMvP2E9YiIsIkdFVCJd.ZeWu1aXxTQ9Xfbv1q3zUhUrqKUc'),  # noqa: E501
+    ('core.contact', {}, '/contact?user_token=1337_F6kvmhWXsecSPOCqxfvlTCjO0A_Lvp-46SqnI6-LL_4'),
+    ('core.contact', {'_external': True},
+     'http://localhost/contact?user_token=1337_F6kvmhWXsecSPOCqxfvlTCjO0A_Lvp-46SqnI6-LL_4'),
+    ('core.contact', {'foo': 'bar'}, '/contact?foo=bar&user_token=1337_4UAW4-UXy8TbQl_UjAGU3CYj7QQGy2ywybeuoiV5-os'),
+    ('events.display', {'event_id': 123, 'a': 'b'},
+     '/event/123/?a=b&user_token=1337_oBedsl3f2qDtfHShn7MS8F_Mz58GTtnvHoqP3WzVnBY'),
 ))
 def test_signed_url_for_user(dummy_user, endpoint, kwargs, expected):
     dummy_user.signing_secret = 'sixtynine'
@@ -56,12 +58,12 @@ def test_signed_url_for_user_sorted(dummy_user):
 
 
 @pytest.mark.parametrize('url', (
-    '/contact?user_token=1337_WzEzMzcsIi9jb250YWN0IiwiR0VUIl0.S9N3hl_vZdJCqiWueeiJCFaCGyk',
-    'http://localhost/contact?user_token=1337_WzEzMzcsIi9jb250YWN0IiwiR0VUIl0.S9N3hl_vZdJCqiWueeiJCFaCGyk',
-    'http://localhost:8080/contact?user_token=1337_WzEzMzcsIi9jb250YWN0IiwiR0VUIl0.S9N3hl_vZdJCqiWueeiJCFaCGyk',
-    'https://indico.host/contact?user_token=1337_WzEzMzcsIi9jb250YWN0IiwiR0VUIl0.S9N3hl_vZdJCqiWueeiJCFaCGyk',
-    '/contact?foo=bar&user_token=1337_WzEzMzcsIi9jb250YWN0P2Zvbz1iYXIiLCJHRVQiXQ.u_CUMB7nI_W7oa7v-CDndBEGUHc',
-    '/event/123/?a=b&user_token=1337_WzEzMzcsIi9ldmVudC8xMjMvP2E9YiIsIkdFVCJd.ZeWu1aXxTQ9Xfbv1q3zUhUrqKUc',
+    '/contact?user_token=1337_F6kvmhWXsecSPOCqxfvlTCjO0A_Lvp-46SqnI6-LL_4',
+    'http://localhost/contact?user_token=1337_F6kvmhWXsecSPOCqxfvlTCjO0A_Lvp-46SqnI6-LL_4',
+    'http://localhost:8080/contact?user_token=1337_F6kvmhWXsecSPOCqxfvlTCjO0A_Lvp-46SqnI6-LL_4',
+    'https://indico.host/contact?user_token=1337_F6kvmhWXsecSPOCqxfvlTCjO0A_Lvp-46SqnI6-LL_4',
+    '/contact?foo=bar&user_token=1337_4UAW4-UXy8TbQl_UjAGU3CYj7QQGy2ywybeuoiV5-os',
+    '/event/123/?a=b&user_token=1337_oBedsl3f2qDtfHShn7MS8F_Mz58GTtnvHoqP3WzVnBY',
 ))
 def test_verify_signed_user_url(dummy_user, url):
     # valid signature
@@ -96,10 +98,9 @@ def test_verify_signed_user_url_bad_userid():
 
 
 def test_verify_signed_user_url_wrong_userid(dummy_user, create_user):
-    # this test is a bit stupid, because the only way we can fail the
-    # `signed_user_id != user.id` check is if two users have the same
-    # signing_secret AND someone changing the user id at the beginning
-    # of the token
+    # this test is a bit stupid, because the only way we can fail this
+    # check is if two users have the same signing_secret AND someone
+    # changes the user id at the beginning of the token
     user = create_user(123)
     user.signing_secret = dummy_user.signing_secret
     url = signed_url_for_user(dummy_user, 'core.contact')
