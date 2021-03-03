@@ -301,14 +301,6 @@ def get_oauth_user(scopes):
 
 
 def _lookup_request_user(allow_signed_url=False, oauth_scope_hint=None):
-    # explicitly-set user
-    # XXX we may not need this, and the legacy api won't need it either - but oauth
-    # APIs should probably use it!
-    try:
-        return g.current_user, g.current_user_source
-    except AttributeError:
-        pass
-
     oauth_scopes = [oauth_scope_hint] if oauth_scope_hint else []
     if request.method == 'GET':
         oauth_scopes += ['read:everything', 'full:everything']
@@ -386,8 +378,6 @@ def get_request_user():
 
     - an OAuth token
     - a signature for a persistent url
-    - an explicitly-set user (for legacy code that authenticates users
-      through other means such as the HTTPAPI)
     """
 
     if g.get('get_request_user_failed'):
@@ -420,21 +410,3 @@ def get_request_user():
         raise
 
     return user, source
-
-
-def override_request_user(user, source):
-    """Override the user associated with the request.
-
-    This is only meant for special usecases where the request should be
-    processed for a different user than the one which would be usually
-    used (regardless of where that one is coming from, usually it's the
-    session).
-
-    If the current user for the request has already been retrieved, setting
-    a different user through this function will fail.
-    """
-
-    if 'current_user' in g:
-        raise RuntimeError(f'Cannot set request user to {user}; already set to {g.current_user}')
-    g.current_user = user
-    g.current_user_source = source

@@ -13,8 +13,7 @@ from werkzeug.exceptions import BadRequest, Forbidden
 from indico.web.flask.util import make_view_func
 from indico.web.rh import RH, allow_signed_url, oauth_scope
 from indico.web.util import (_check_request_user, _lookup_request_user, _request_likely_seen_by_user, get_oauth_user,
-                             get_request_user, is_legacy_signed_url_valid, override_request_user, signed_url_for_user,
-                             verify_signed_user_url)
+                             get_request_user, is_legacy_signed_url_valid, signed_url_for_user, verify_signed_user_url)
 
 
 pytest_plugins = 'indico.core.oauth.testing.fixtures'
@@ -155,25 +154,6 @@ def test_lookup_request_user_session(dummy_user):
     assert _lookup_request_user() == (None, None)
     session.user = dummy_user
     assert _lookup_request_user() == (dummy_user, 'session')
-
-
-@pytest.mark.usefixtures('request_context')
-def test_lookup_request_user_explicit(create_user, dummy_user):
-    assert _lookup_request_user() == (None, None)
-    session.user = create_user(123)  # should be ignored
-    override_request_user(dummy_user, 'test')
-    assert _lookup_request_user() == (dummy_user, 'test')
-
-    # ensure we cannot override twice, regardless if it's the same user or not
-    with pytest.raises(RuntimeError) as exc_info:
-        override_request_user(dummy_user, 'test')
-    assert 'Cannot set request user to' in str(exc_info.value)
-    assert _lookup_request_user() == (dummy_user, 'test')
-
-    with pytest.raises(RuntimeError) as exc_info:
-        override_request_user(session.user, 'test')
-    assert 'Cannot set request user to' in str(exc_info.value)
-    assert _lookup_request_user() == (dummy_user, 'test')
 
 
 @pytest.mark.usefixtures('request_context')
