@@ -57,8 +57,8 @@ from indico.web.flask.templating import get_template_module
 from indico.web.flask.util import send_file, url_for
 from indico.web.forms.base import FormDefaults
 from indico.web.http_api.metadata import Serializer
-from indico.web.rh import RH, RHProtected, RHTokenProtected
-from indico.web.util import jsonify_data, jsonify_form, jsonify_template
+from indico.web.rh import RH, RHProtected, allow_signed_url
+from indico.web.util import is_legacy_signed_url_valid, jsonify_data, jsonify_form, jsonify_template
 
 
 IDENTITY_ATTRIBUTES = {'first_name', 'last_name', 'email', 'affiliation', 'full_name'}
@@ -145,32 +145,51 @@ class RHUserDashboard(RHUserBase):
                                                linked_events=linked_events)
 
 
-class RHExportDashboardICS(RHTokenProtected):
+@allow_signed_url
+class RHExportDashboardICS(RHProtected):
+    def _get_user(self):
+        return session.user
+
     @use_kwargs({
         'from_': HumanizedDate(data_key='from', missing=lambda: now_utc(False) - relativedelta(weeks=1)),
         'include': fields.List(fields.Str(), missing={'linked', 'categories'}),
         'limit': fields.Integer(missing=100, validate=lambda v: 0 < v <= 500)
     }, location='query')
     def _process(self, from_, include, limit):
+        user = self._get_user()
         all_events = set()
 
         if 'linked' in include:
             all_events |= set(get_linked_events(
-                self.user,
+                user,
                 from_,
                 limit=limit,
                 load_also=('description', 'own_room_id', 'own_venue_id', 'own_room_name', 'own_venue_name')
             ))
 
-        if 'categories' in include and (categories := get_related_categories(self.user)):
+        if 'categories' in include and (categories := get_related_categories(user)):
             category_ids = {c['categ'].id for c in categories.values()}
-            all_events |= set(get_events_in_categories(category_ids, self.user, limit=limit))
+            all_events |= set(get_events_in_categories(category_ids, user, limit=limit))
 
         all_events = sorted(all_events, key=lambda e: (e.start_dt, e.id))[:limit]
 
         response = {'results': [serialize_event_for_ical(event, 'events') for event in all_events]}
         serializer = Serializer.create('ics')
         return send_file('event.ics', BytesIO(serializer(response)), 'text/calendar')
+
+
+class RHExportDashboardICSLegacy(RHExportDashboardICS):
+    def _get_user(self):
+        user = User.get_or_404(request.view_args['user_id'], is_deleted=False)
+        if not is_legacy_signed_url_valid(user, request.full_path):
+            raise BadRequest('Invalid signature')
+        if user.is_blocked:
+            raise BadRequest('User blocked')
+        return user
+
+    def _check_access(self):
+        # disable the usual RHProtected access check; `_get_user` does it all
+        pass
 
 
 class RHPersonalData(RHUserBase):

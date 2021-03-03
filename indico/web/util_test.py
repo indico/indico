@@ -13,39 +13,27 @@ from werkzeug.exceptions import BadRequest, Forbidden
 from indico.web.flask.util import make_view_func
 from indico.web.rh import RH, allow_signed_url, oauth_scope
 from indico.web.util import (_check_request_user, _lookup_request_user, _request_likely_seen_by_user, get_oauth_user,
-                             get_request_user, is_signed_url_valid, override_request_user, signed_url_for,
-                             signed_url_for_user, verify_signed_user_url)
+                             get_request_user, is_legacy_signed_url_valid, override_request_user, signed_url_for_user,
+                             verify_signed_user_url)
 
 
 pytest_plugins = 'indico.core.oauth.testing.fixtures'
 
 
-@pytest.mark.usefixtures('request_context')
-def test_signing_url(dummy_user):
+@pytest.mark.parametrize(('url', 'valid'), (
+    ('/user/70/dashboard/?token=6bO-FgjAvYPiZ8Uft5_DmOC4Oow', True),
+    ('/user/71/dashboard/?token=6bO-FgjAvYPiZ8Uft5_DmOC4Oow', False),
+    ('/user/71/dashboard/?q=roygbiv&token=YNgcXP02LpIYCWMAN80xXg6l6jM', True),
+    ('/user/71/dashboard/?q=roygbeef&token=YNgcXP02LpIYCWMAN80xXg6l6jM', False),
+    ('/user/71/dashboard/?q=roygbiv&token=ZNgcXP02LpIYCWMAN80xXg6l6jM', False),
+    ('/user/71/dashboard/?q=roygbiv', False),
+    ('http://localhost/user/70/dashboard/?token=6bO-FgjAvYPiZ8Uft5_DmOC4Oow', True),
+    ('http://localhost:8080/user/70/dashboard/?token=6bO-FgjAvYPiZ8Uft5_DmOC4Oow', True),
+    ('https://indico.host/user/70/dashboard/?token=6bO-FgjAvYPiZ8Uft5_DmOC4Oow', True),
+))
+def test_is_legacy_signed_url_valid(dummy_user, url, valid):
     dummy_user.signing_secret = 'sixtyten'
-    url = signed_url_for(dummy_user, 'users.user_dashboard', url_params={'user_id': '70'})
-    assert url == '/user/70/dashboard/?token=6bO-FgjAvYPiZ8Uft5_DmOC4Oow'
-    url = signed_url_for(dummy_user, 'users.user_dashboard', url_params={'user_id': '71'}, q='roygbiv')
-    assert url == '/user/71/dashboard/?q=roygbiv&token=YNgcXP02LpIYCWMAN80xXg6l6jM'
-
-
-@pytest.mark.usefixtures('request_context')
-def test_checking_signature(dummy_user):
-    dummy_user.signing_secret = 'sixtyten'
-    assert is_signed_url_valid(dummy_user, '/user/71/dashboard/?q=roygbiv&token=YNgcXP02LpIYCWMAN80xXg6l6jM')
-    assert not is_signed_url_valid(dummy_user, '/user/71/dashboard/?q=roygbeef&token=YNgcXP02LpIYCWMAN80xXg6l6jM')
-    assert not is_signed_url_valid(dummy_user, '/user/71/dashboard/?q=roygbiv&token=ZNgcXP02LpIYCWMAN80xXg6l6jM')
-    assert not is_signed_url_valid(dummy_user, '/user/71/dashboard/?q=roygbiv')
-
-
-@pytest.mark.usefixtures('request_context')
-def test_full_urls(dummy_user):
-    dummy_user.signing_secret = 'aquarius'
-    url = signed_url_for(dummy_user, 'users.user_dashboard', url_params={'user_id': '71'}, _external=True)
-    assert url == 'http://localhost/user/71/dashboard/?token=OsONJbxTpPzUYtSxgykZP7NZUHg'
-    assert is_signed_url_valid(dummy_user, url)
-    # the hostname part, etc... shouldn't be included in the signature
-    assert is_signed_url_valid(dummy_user, 'http://indico.test/user/71/dashboard/?token=OsONJbxTpPzUYtSxgykZP7NZUHg')
+    assert is_legacy_signed_url_valid(dummy_user, url) == valid
 
 
 @pytest.mark.parametrize(('endpoint', 'kwargs', 'expected'), (
@@ -70,7 +58,8 @@ def test_signed_url_for_user_sorted(dummy_user):
 @pytest.mark.parametrize('url', (
     '/contact?user_token=1337_WzEzMzcsIi9jb250YWN0IiwiR0VUIl0.S9N3hl_vZdJCqiWueeiJCFaCGyk',
     'http://localhost/contact?user_token=1337_WzEzMzcsIi9jb250YWN0IiwiR0VUIl0.S9N3hl_vZdJCqiWueeiJCFaCGyk',
-    'http://indico.host/contact?user_token=1337_WzEzMzcsIi9jb250YWN0IiwiR0VUIl0.S9N3hl_vZdJCqiWueeiJCFaCGyk',
+    'http://localhost:8080/contact?user_token=1337_WzEzMzcsIi9jb250YWN0IiwiR0VUIl0.S9N3hl_vZdJCqiWueeiJCFaCGyk',
+    'https://indico.host/contact?user_token=1337_WzEzMzcsIi9jb250YWN0IiwiR0VUIl0.S9N3hl_vZdJCqiWueeiJCFaCGyk',
     '/contact?foo=bar&user_token=1337_WzEzMzcsIi9jb250YWN0P2Zvbz1iYXIiLCJHRVQiXQ.u_CUMB7nI_W7oa7v-CDndBEGUHc',
     '/event/123/?a=b&user_token=1337_WzEzMzcsIi9ldmVudC8xMjMvP2E9YiIsIkdFVCJd.ZeWu1aXxTQ9Xfbv1q3zUhUrqKUc',
 ))

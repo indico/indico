@@ -15,7 +15,7 @@ import {Translate} from 'indico/react/i18n';
 import {indicoAxios, handleAxiosError} from 'indico/utils/axios';
 import {snakifyKeys} from 'indico/utils/case';
 
-export default function ICSCalendarLink({endpoint, urlParams, options, ...restProps}) {
+export default function ICSCalendarLink({endpoint, params, options, ...restProps}) {
   const [copied, setCopied] = useState(false);
   const [option, setOption] = useState(null);
   const [open, setOpen] = useState(false);
@@ -30,11 +30,14 @@ export default function ICSCalendarLink({endpoint, urlParams, options, ...restPr
     />
   );
 
-  const fetchURL = async queryParams => {
+  const fetchURL = async extraParams => {
     try {
       const {
         data: {url: signedURL},
-      } = await indicoAxios.post(signURL(), snakifyKeys({endpoint, urlParams, queryParams}));
+      } = await indicoAxios.post(
+        signURL(),
+        snakifyKeys({endpoint, params: {...params, ...extraParams}})
+      );
       return signedURL;
     } catch (error) {
       handleAxiosError(error);
@@ -58,14 +61,14 @@ export default function ICSCalendarLink({endpoint, urlParams, options, ...restPr
           <Translate>Synchronise with your calendar</Translate>
         </Dropdown.Header>
         <Dropdown.Divider />
-        {options.map(({key, text, queryParams}) => (
+        {options.map(({key, text, extraParams}) => (
           <Dropdown.Item
             key={key}
             text={text}
             onClick={async () => {
               setOption({
                 text,
-                url: await fetchURL(queryParams),
+                url: await fetchURL(extraParams),
               });
               setOpen(true);
             }}
@@ -126,17 +129,17 @@ export default function ICSCalendarLink({endpoint, urlParams, options, ...restPr
 
 ICSCalendarLink.propTypes = {
   endpoint: PropTypes.string.isRequired,
-  urlParams: PropTypes.objectOf(PropTypes.string),
+  params: PropTypes.objectOf(PropTypes.string),
   options: PropTypes.arrayOf(
     PropTypes.shape({
       key: PropTypes.string.isRequired,
       text: PropTypes.string.isRequired,
-      queryParams: PropTypes.objectOf(PropTypes.string),
+      extraParams: PropTypes.objectOf(PropTypes.string),
     })
   ),
 };
 
 ICSCalendarLink.defaultProps = {
-  urlParams: {},
+  params: {},
   options: [],
 };

@@ -184,25 +184,14 @@ def url_for_index(_external=False, _anchor=None):
     return url_for('categories.display', _external=_external, _anchor=_anchor)
 
 
-def signed_url_for(user, blueprint, url_params=None, *args, **kwargs):
-    """Get a URL from a blueprint, which is signed using a user's signing secret."""
-    from indico.web.flask.util import url_for
-    _external = kwargs.pop('_external', False)
-    base_url = url_for(blueprint, *args, **(url_params or {}))
-    qs = url_encode(sorted(kwargs.items()))
-    # this is the URL which is to be signed
-    url = f'{base_url}?{qs}' if qs else base_url
+def is_legacy_signed_url_valid(user, url):
+    """Check whether a legacy signed URL is valid for a user.
 
-    signer = Signer(user.signing_secret.encode(), salt='url-signing')
-    qs = url_encode(dict(kwargs, token=signer.get_signature(url)))
-    full_base_url = url_for(blueprint, *args, _external=_external, **(url_params or {}))
-
-    # this is the final URL including the signature ('token' parameter)
-    return f'{full_base_url}?{qs}' if qs else base_url
-
-
-def is_signed_url_valid(user, url):
-    """Check whether a signed URL is valid according to the user's signing secret."""
+    This util is deprecated and only exists because people may be actively
+    using URLs using the old style token. Any new code should use the new
+    :func:`signed_url_for_user` and :func:`verify_signed_user_url` utils
+    which encode the user id within the signature.
+    """
     parsed = url_parse(url)
     params = url_decode(parsed.query)
     try:
