@@ -31,13 +31,13 @@ def test_RHRegistrationForm_can_register(db, dummy_regform, dummy_reg, dummy_use
     assert not rh._can_register()  # not open
     dummy_regform.start_dt = now_utc(False)
     assert rh._can_register()
-    session.user = dummy_user  # registered in dummy_reg
+    session.set_session_user(dummy_user)  # registered in dummy_reg
     assert not rh._can_register()
     dummy_reg.state = RegistrationState.rejected
     assert not rh._can_register()  # being rejected does not allow registering again
     dummy_reg.state = RegistrationState.withdrawn
     assert not rh._can_register()  # being withdrawn does not allow registering again
-    session.user = create_user(123, email='user@example.com')
+    session.set_session_user(create_user(123, email='user@example.com'))
     assert rh._can_register()
     dummy_regform.registration_limit = 1
     assert rh._can_register()  # withdrawn/rejected do not count against limit

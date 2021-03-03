@@ -9,9 +9,8 @@ import pickle
 import uuid
 from datetime import datetime, timedelta
 
-from flask import flash, request
+from flask import current_app, request
 from flask.sessions import SessionInterface, SessionMixin
-from markupsafe import Markup
 from werkzeug.datastructures import CallbackDict
 from werkzeug.utils import cached_property
 
@@ -19,8 +18,7 @@ from indico.core.cache import make_scoped_cache
 from indico.core.config import config
 from indico.modules.users import User
 from indico.util.date_time import get_display_tz
-from indico.util.decorators import cached_writable_property
-from indico.util.i18n import _, set_best_lang
+from indico.util.i18n import set_best_lang
 from indico.web.util import get_request_user
 
 
@@ -51,40 +49,26 @@ class IndicoSession(BaseSession):
     def user(self):
         return get_request_user()[0]
 
-    @user.setter
-    def user(self, user):
-        self._session_user = user
+    def set_session_user(self, user):
+        """Set the user logged in via this session."""
+        if not current_app.testing:
+            # Sanity check since logging in via the session during a request authenticated
+            # via token/oauth never makes sense. Disabled during testing since we usually
+            # know what we're doing there.
+            current_user, source = get_request_user()
+            if current_user is not None and source != 'session':
+                raise Exception('Cannot set session user while authenticated using other means')
 
-    @cached_writable_property('_session_user_cache')
-    def _session_user(self):
-        user_id = self.get('_user_id')
-        user = User.get(user_id) if user_id is not None else None
-        if user and user.is_deleted:
-            merged_into_user = user.merged_into_user
-            user = None
-            # If the user is deleted and the request is likely to be seen by
-            # the user, we forcefully log him out and inform him about it.
-            if not request.is_xhr and request.blueprint != 'assets':
-                self.clear()
-                if merged_into_user:
-                    msg = _('Your profile has been merged into <strong>{}</strong>. Please log in using that profile.')
-                    flash(Markup(msg).format(merged_into_user.full_name), 'warning')
-                else:
-                    flash(_('Your profile has been deleted.'), 'error')
-        elif user and user.is_blocked:
-            user = None
-            if not request.is_xhr and request.blueprint != 'assets':
-                self.clear()
-                flash(_('Your Indico profile has been blocked.'), 'error')
-        return user
-
-    @_session_user.setter
-    def _session_user(self, user):
         if user is None:
             self.pop('_user_id', None)
         else:
             self['_user_id'] = user.id
         self._refresh_sid = True
+
+    def get_session_user(self):
+        """Get the user logged in via this session."""
+        user_id = self.get('_user_id')
+        return User.get(user_id) if user_id is not None else None
 
     @property
     def lang(self):

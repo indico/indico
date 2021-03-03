@@ -32,7 +32,7 @@ def test_event_protected_access(db, create_user, create_event):
     with pytest.raises(Forbidden):
         rh._check_access()
     user = create_user(1)
-    session.user = user
+    session.set_session_user(user)
     with pytest.raises(Forbidden):
         rh._check_access()
     rh.event.update_principal(user, read_access=True)
@@ -51,5 +51,5 @@ def test_event_key_access(create_user, create_event):
 
     user = create_user(1)
     rh.event.update_principal(user, read_access=True)
-    session.user = user
+    session.set_session_user(user)
     rh._check_access()

@@ -309,7 +309,7 @@ def _lookup_request_user(allow_signed_url=False, oauth_scope_hint=None):
 
     signed_url_user = verify_signed_user_url(request.full_path, request.method)
     oauth_user = get_oauth_user(oauth_scopes)
-    session_user = session._session_user
+    session_user = session.get_session_user()
 
     if oauth_user:
         if signed_url_user:

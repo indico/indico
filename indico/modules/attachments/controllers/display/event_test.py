@@ -33,7 +33,7 @@ def _make_attachment(user, obj):
 
 @pytest.fixture
 def attachment_access_test_env(request_context, dummy_user, dummy_event, dummy_session, create_contribution):
-    session.user = dummy_user
+    session.set_session_user(dummy_user)
     session_contrib = create_contribution(dummy_event, 'Session Contrib', session=dummy_session)
     standalone_contrib = create_contribution(dummy_event, 'Standalone Contrib')
     event_attachment = _make_attachment(dummy_user, dummy_event)

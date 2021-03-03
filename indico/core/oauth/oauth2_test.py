@@ -75,7 +75,7 @@ def test_oauth_flows(create_application, test_client, dummy_user, app, trusted, 
                                                             code_verifier=code_verifier)
 
     with test_client.session_transaction() as sess:
-        sess.user = dummy_user
+        sess.set_session_user(dummy_user)
 
     # get consent page
     resp = test_client.get(auth_url)
@@ -121,7 +121,7 @@ def test_pkce_disabled(dummy_application, test_client, dummy_user, pkce_enabled)
                                 redirect_uri=dummy_application.default_redirect_uri)
 
     with test_client.session_transaction() as sess:
-        sess.user = dummy_user
+        sess.set_session_user(dummy_user)
 
     code_verifier = generate_token(64)
     auth_endpoint = url_for('oauth.oauth_authorize', _external=True)
@@ -153,7 +153,7 @@ def test_no_implicit_flow(dummy_application, test_client, dummy_user):
     auth_url = oauth_client.create_authorization_url(url_for('oauth.oauth_authorize', _external=True))[0]
 
     with test_client.session_transaction() as sess:
-        sess.user = dummy_user
+        sess.set_session_user(dummy_user)
 
     resp = test_client.get(auth_url)
     assert b'unauthorized_client' in resp.data
@@ -179,7 +179,7 @@ def test_checkin_app_implicit_flow(test_client, dummy_user):
     auth_url = oauth_client.create_authorization_url(url_for('oauth.oauth_authorize', _external=True))[0]
 
     with test_client.session_transaction() as sess:
-        sess.user = dummy_user
+        sess.set_session_user(dummy_user)
 
     resp = test_client.get(auth_url)
     assert resp.status_code == 302
@@ -208,7 +208,7 @@ def test_oauth_scopes(create_application, test_client, dummy_user, app):
                                 redirect_uri=oauth_app.default_redirect_uri)
 
     with test_client.session_transaction() as sess:
-        sess.user = dummy_user
+        sess.set_session_user(dummy_user)
 
     auth_endpoint = url_for('oauth.oauth_authorize', _external=True)
     auth_url = oauth_client.create_authorization_url(auth_endpoint, scope='read:legacy_api')[0]
