@@ -31,8 +31,16 @@ document.addEventListener('DOMContentLoaded', () => {
           onClick={onClick}
         />
       )}
+      dropdownPosition="top left"
       popupPosition="bottom right"
-      options={[{key: 'event', text: Translate.string('Event'), extraParams: {}}]}
+      options={[
+        {key: 'event', text: Translate.string('Event'), extraParams: {}},
+        {
+          key: 'event',
+          text: Translate.string('Detailed timetable'),
+          extraParams: {detail: 'contributions'},
+        },
+      ]}
     />,
     calendarContainer
   );
