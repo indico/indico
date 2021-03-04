@@ -24,5 +24,3 @@ import './libs/indico/Core/Util.js';
 
 import './libs/indico/Legacy/Widgets.js';
 import './libs/indico/Legacy/Util.js';
-
-import './libs/indico/Common/Export.js';

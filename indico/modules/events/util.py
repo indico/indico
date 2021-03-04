@@ -27,7 +27,6 @@ from indico.core import signals
 from indico.core.config import config
 from indico.core.errors import NoReportError, UserValueError
 from indico.core.permissions import FULL_ACCESS_PERMISSION, READ_ACCESS_PERMISSION
-from indico.modules.api import api_settings
 from indico.modules.categories.models.roles import CategoryRole
 from indico.modules.events import Event
 from indico.modules.events.contributions.models.contributions import Contribution
@@ -49,7 +48,6 @@ from indico.util.fs import chmod_umask, secure_filename
 from indico.util.i18n import _
 from indico.util.string import strip_tags
 from indico.util.user import principal_from_identifier
-from indico.web.flask.templating import get_template_module
 from indico.web.flask.util import send_file, url_for
 from indico.web.forms.colors import get_colors
 
@@ -386,32 +384,6 @@ class ListGeneratorBase:
 
     def flash_info_message(self, obj):
         raise NotImplementedError
-
-
-def get_base_ical_parameters(user, detail, path, params=None):
-    """Return a dict of all parameters expected by iCal template."""
-
-    from indico.web.http_api.util import generate_public_auth_request
-
-    api_mode = api_settings.get('security_mode')
-    persistent_allowed = api_settings.get('allow_persistent')
-    api_key = user.api_key if user else None
-    persistent_user_enabled = api_key.is_persistent_allowed if api_key else None
-    tpl = get_template_module('api/_messages.html')
-    persistent_agreement = tpl.get_ical_persistent_msg()
-    top_urls = generate_public_auth_request(api_key, path, params)
-    urls = generate_public_auth_request(api_key, path, dict(params or {}, detail=detail))
-    request_urls = {
-        'publicRequestURL': top_urls['publicRequestURL'],
-        'authRequestURL': top_urls['authRequestURL'],
-        'publicRequestDetailedURL': urls['publicRequestURL'],
-        'authRequestDetailedURL': urls['authRequestURL']
-    }
-
-    return {'api_mode': api_mode, 'api_key': api_key, 'persistent_allowed': persistent_allowed,
-            'persistent_user_enabled': persistent_user_enabled, 'api_active': api_key is not None,
-            'api_key_user_agreement': tpl.get_ical_api_key_msg(), 'api_persistent_user_agreement': persistent_agreement,
-            'user_logged': user is not None, 'request_urls': request_urls}
 
 
 def create_event_logo_tmp_file(event, tmpdir=None):

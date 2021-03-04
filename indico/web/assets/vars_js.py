@@ -103,8 +103,6 @@ def generate_global_file():
             'AttachmentManager': url_rule_to_js('attachments.management'),
             'ManagementAttachmentInfoColumn': url_rule_to_js('attachments.management_info_column'),
 
-            'APIKeyCreate': url_for('api.key_create'),
-            'APIKeyTogglePersistent': url_for('api.key_toggle_persistent'),
             'FontSassBundle': current_app.manifest['fonts.css']._paths,
 
             'EventCreation': url_rule_to_js('events.create'),

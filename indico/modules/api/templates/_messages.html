@@ -15,27 +15,3 @@
         invalidate them, you have to create a new API key!
     {%- endtrans -%}
 {%- endmacro %}
-
-{% macro get_ical_api_key_msg() -%}
-    {%- trans -%}
-        In order to enable an iCal export link, your account needs to have an API key created.
-        This key enables other applications to access data from within Indico even when you are
-        neither using nor logged into the Indico system yourself with the link provided.
-        Once created, you can manage your key at any time by going to 'My Profile' and looking
-        under the tab entitled 'HTTP API'. Further information about HTTP API keys can be found
-        in the Indico documentation.
-    {%- endtrans -%}
-{%- endmacro %}
-
-
-{% macro get_ical_persistent_msg() -%}
-    {%- trans -%}
-        Additionally to having an API key associated with your account, exporting private event
-        information requires the usage of a persistent signature. This enables API URLs which do
-        not expire after a few minutes so while the setting is active, anyone in possession of the
-        link provided can access the information. Due to this, it is extremely important that you keep
-        these links private and for your use only. If you think someone else may have acquired access
-        to a link using this key in the future, you must immediately create a new key pair on the
-        'My Profile' page under the 'HTTP API' and update the iCalendar links afterwards.
-    {%- endtrans -%}
-{%- endmacro %}

@@ -7,8 +7,8 @@
 
 from flask import request
 
-from indico.modules.api.controllers import (RHAPIAdminKeys, RHAPIAdminSettings, RHAPIBlockKey, RHAPIBuildURLs,
-                                            RHAPICreateKey, RHAPIDeleteKey, RHAPITogglePersistent, RHAPIUserProfile)
+from indico.modules.api.controllers import (RHAPIAdminKeys, RHAPIAdminSettings, RHAPIBlockKey, RHAPICreateKey,
+                                            RHAPIDeleteKey, RHAPITogglePersistent, RHAPIUserProfile)
 from indico.web.flask.wrappers import IndicoBlueprint
 from indico.web.http_api.handlers import handler as api_handler
 
@@ -20,7 +20,6 @@ _bp.add_url_rule('/export/<path:path>', view_func=api_handler, endpoint='httpapi
 _bp.add_url_rule('/api/<path:path>', view_func=api_handler, endpoint='httpapi', defaults={'prefix': 'api'},
                  methods=('POST',))
 _bp.add_url_rule('/<any(api, export):prefix>', endpoint='httpapi', build_only=True)
-_bp.add_url_rule('/api/build-urls', 'build_urls', RHAPIBuildURLs, methods=('POST',))
 
 # Administration
 _bp.add_url_rule('/admin/api/', 'admin_settings', RHAPIAdminSettings, methods=('GET', 'POST'))

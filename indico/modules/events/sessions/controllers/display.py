@@ -15,7 +15,6 @@ from indico.modules.events.controllers.base import RHDisplayEventBase
 from indico.modules.events.sessions.models.sessions import Session
 from indico.modules.events.sessions.util import get_session_ical_file, get_session_timetable_pdf, get_sessions_for_user
 from indico.modules.events.sessions.views import WPDisplayMySessionsConference, WPDisplaySession
-from indico.modules.events.util import get_base_ical_parameters
 from indico.web.flask.util import send_file
 from indico.web.rh import allow_signed_url
 
@@ -51,8 +50,6 @@ class RHDisplaySession(RHDisplaySessionBase):
     view_class = WPDisplaySession
 
     def _process(self):
-        ical_params = get_base_ical_parameters(session.user, 'sessions',
-                                               f'/export/event/{self.event.id}/session/{self.session.id}.ics')
         contributions_strategy = subqueryload('contributions')
         contributions_strategy.joinedload('track')
         _contrib_tte_strategy = contributions_strategy.joinedload('timetable_entry')
@@ -69,7 +66,7 @@ class RHDisplaySession(RHDisplaySessionBase):
                 .options(contributions_strategy, blocks_strategy)
                 .one())
         return self.view_class.render_template('display/session_display.html', self.event,
-                                               sess=sess, page_title=sess.title, **ical_params)
+                                               sess=sess, page_title=sess.title)
 
 
 @allow_signed_url

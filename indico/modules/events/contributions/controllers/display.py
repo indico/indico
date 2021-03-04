@@ -25,7 +25,6 @@ from indico.modules.events.contributions.views import WPAuthorList, WPContributi
 from indico.modules.events.controllers.base import RHDisplayEventBase
 from indico.modules.events.layout.util import is_menu_entry_enabled
 from indico.modules.events.models.persons import EventPerson
-from indico.modules.events.util import get_base_ical_parameters
 from indico.util.i18n import _
 from indico.web.flask.util import jsonify_data, send_file
 from indico.web.rh import RH, allow_signed_url
@@ -118,8 +117,6 @@ class RHContributionDisplay(RHContributionDisplayBase):
     view_class = WPContributions
 
     def _process(self):
-        ical_params = get_base_ical_parameters(session.user, 'contributions',
-                                               f'/export/event/{self.event.id}.ics')
         contrib = (Contribution.query
                    .filter_by(id=self.contrib.id)
                    .options(joinedload('type'),
@@ -135,8 +132,7 @@ class RHContributionDisplay(RHContributionDisplayBase):
                                                show_author_link=_author_page_active(self.event),
                                                field_values=field_values,
                                                page_title=contrib.title,
-                                               published=contribution_settings.get(self.event, 'published'),
-                                               **ical_params)
+                                               published=contribution_settings.get(self.event, 'published'))
 
 
 class RHAuthorList(RHDisplayProtectionBase):

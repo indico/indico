@@ -240,12 +240,3 @@
 {% if event.type != 'conference' %}
     {%- include 'flashed_messages.html' -%}
 {% endif %}
-
-<script>
-    $(document).ready(function() {
-        $('.js-export-ical').on('click', function(evt) {
-            evt.preventDefault();
-            $(this).trigger('menu_select');
-        });
-    });
-</script>

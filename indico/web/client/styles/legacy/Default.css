@@ -830,55 +830,6 @@ body.cke_show_borders {
   z-index: 1000;
 }
 
-.icalExportPopup {
-  max-width: 400px;
-  padding: 15px 5px 0 5px;
-}
-
-.icalExportPopup .exportIcalHeader {
-  font-weight: bold;
-  font-size: 12px;
-  margin-bottom: 5px;
-}
-
-.icalExportPopup .iCalExportSection {
-  margin-bottom: 5px;
-  padding-bottom: 5px;
-}
-
-.icalExportPopup input[type='text'] {
-  width: 100%;
-  cursor: text;
-  color: #000;
-  font-size: 10.5px;
-}
-
-.icalExportPopup a {
-  font-size: 11px;
-}
-
-.icalExportPopup .icalSeparator {
-  margin-bottom: 5px;
-  border-bottom: 1px solid #ddd;
-}
-
-.icalExportPopup .agreement {
-  padding: 5px;
-  border-radius: 8px;
-  margin-bottom: 5px;
-  margin-top: 5px;
-  vertical-align: middle;
-  text-align: justify;
-  background: rgba(0, 0, 0, 0.15);
-}
-
-.icalExportPopup .note {
-  font-style: italic;
-  font-size: 11px;
-  text-align: right;
-  margin-bottom: 5px;
-}
-
 .settingsWidget {
   padding: 0 5px 5px;
   min-width: 250px;
