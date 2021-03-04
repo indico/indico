@@ -11,6 +11,7 @@ import pytest
 from speaklater import is_lazy_string
 from sqlalchemy.exc import IntegrityError
 
+from indico.core import signals
 from indico.modules.users import User
 from indico.modules.users.models.users import UserTitle
 
@@ -85,17 +86,28 @@ def test_emails(db):
 
 
 def test_make_email_primary(db):
-    user = User(first_name='Guinea', last_name='Pig', email='guinea@pig.com')
-    db.session.add(user)
-    db.session.flush()
-    with pytest.raises(ValueError):
+    signal_called = [False]
+
+    def _signal_fn(sender, old, new):
+        signal_called[0] = True
+        assert sender is user
+        assert old == 'guinea@pig.com'
+        assert new == 'tasty@pig.com'
+
+    with signals.users.primary_email_changed.connected_to(_signal_fn):
+        user = User(first_name='Guinea', last_name='Pig', email='guinea@pig.com')
+        db.session.add(user)
+        db.session.flush()
+        with pytest.raises(ValueError):
+            user.make_email_primary('tasty@pig.com')
+        user.secondary_emails = {'tasty@pig.com', 'little@pig.com'}
+        db.session.flush()
+        assert not signal_called[0]
         user.make_email_primary('tasty@pig.com')
-    user.secondary_emails = {'tasty@pig.com', 'little@pig.com'}
-    db.session.flush()
-    user.make_email_primary('tasty@pig.com')
-    db.session.expire(user)
-    assert user.email == 'tasty@pig.com'
-    assert user.secondary_emails == {'guinea@pig.com', 'little@pig.com'}
+        assert signal_called[0]
+        db.session.expire(user)
+        assert user.email == 'tasty@pig.com'
+        assert user.secondary_emails == {'guinea@pig.com', 'little@pig.com'}
 
 
 def test_deletion(db):
