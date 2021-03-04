@@ -622,12 +622,12 @@ class User(PersonMixin, db.Model):
         secondary = next((x for x in self._secondary_emails if x.email == email), None)
         if secondary is None:
             raise ValueError('email is not a secondary email address')
+        old = self.email
         self._primary_email.is_primary = False
         db.session.flush()
         secondary.is_primary = True
         db.session.flush()
-        kwargs = dict(old=self._primary_email.email, new=secondary.email)
-        signals.users.primary_email_changed.send(self, **kwargs)
+        signals.users.primary_email_changed.send(self, old=old, new=self.email)
 
     def reset_signing_secret(self):
         self.signing_secret = unicode(uuid4())
