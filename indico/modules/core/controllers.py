@@ -8,12 +8,14 @@
 import re
 
 import requests
-from flask import flash, jsonify, redirect, request, session
+from flask import current_app, flash, jsonify, redirect, request, session
 from packaging.version import Version
 from pkg_resources import DistributionNotFound, get_distribution
 from pytz import common_timezones_set
 from webargs import fields
-from werkzeug.exceptions import BadRequest, NotFound, ServiceUnavailable
+from webargs.flaskparser import abort
+from werkzeug.exceptions import NotFound, ServiceUnavailable
+from werkzeug.routing import BuildError
 from werkzeug.urls import url_join, url_parse
 
 import indico
@@ -31,7 +33,7 @@ from indico.modules.core.views import WPContact, WPSettings
 from indico.modules.legal import legal_settings
 from indico.modules.users.controllers import RHUserBase
 from indico.util.i18n import _, get_all_locales
-from indico.util.marshmallow import PrincipalDict
+from indico.util.marshmallow import PrincipalDict, validate_with_message
 from indico.util.string import sanitize_html
 from indico.web.args import use_kwargs
 from indico.web.errors import load_error_data
@@ -291,18 +293,26 @@ class RHSignURL(RH):
     authenticated or not.
     """
 
-    def _process(self):
-        endpoint = request.json.get('endpoint')
-        if not endpoint:
-            raise BadRequest
-        # filter out special args
-        params = {k: v for k, v in request.json.get('params', {}).items() if not k.startswith('_')}
-        if session.user:
-            url = signed_url_for_user(session.user, endpoint, _external=True, **params)
-            Logger.get('url_signing').info("%s signed URL for endpoint '%s' with params %r", session.user, endpoint,
-                                           params)
-        else:
-            url = url_for(endpoint, _external=True, **params)
+    @use_kwargs({
+        'endpoint': fields.String(required=True,
+                                  validate=validate_with_message(lambda ep: ep in current_app.view_functions,
+                                                                 'Invalid endpoint')),
+        'params': fields.Dict(keys=fields.String(), missing={},
+                              validate=validate_with_message(lambda params: not any(x.startswith('_') for x in params),
+                                                             'Params starting with an underscore are not allowed'))
+    })
+    def _process(self, endpoint, params):
+        try:
+            if session.user:
+                url = signed_url_for_user(session.user, endpoint, _external=True, **params)
+                Logger.get('url_signing').info("%s signed URL for endpoint '%s' with params %r", session.user, endpoint,
+                                               params)
+            else:
+                url = url_for(endpoint, _external=True, **params)
+        except BuildError as exc:
+            # if building fails for a valid endpoint we can be pretty sure that it's due to
+            # some required params missing
+            abort(422, messages={'params': [str(exc)]})
         return jsonify(url=url)
 
 
