@@ -7,6 +7,11 @@ Version 2.3.5
 
 *Unreleased*
 
+Internationalization
+^^^^^^^^^^^^^^^^^^^^
+
+- New translation: Polish
+
 Improvements
 ^^^^^^^^^^^^
 
