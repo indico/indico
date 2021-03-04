@@ -55,6 +55,17 @@ def events_to_ical(events, user=None):
         if location:
             cal_event.add('location', location)
 
+        if event.contact_title:
+            contact_info = f'{event.contact_title}'
+
+            if len(event.contact_emails):
+                contact_info += f'; {"; ".join(event.contact_emails)}'
+
+            if len(event.contact_phones):
+                contact_info += f'; {"; ".join(event.contact_phones)}'
+
+            cal_event.add('contact', contact_info)
+
         description = []
         if event.person_links:
             speakers = [f'{x.full_name} ({x.affiliation})' if x.affiliation else x.full_name
