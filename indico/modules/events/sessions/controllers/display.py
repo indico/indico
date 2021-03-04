@@ -17,6 +17,7 @@ from indico.modules.events.sessions.util import get_session_ical_file, get_sessi
 from indico.modules.events.sessions.views import WPDisplayMySessionsConference, WPDisplaySession
 from indico.modules.events.util import get_base_ical_parameters
 from indico.web.flask.util import send_file
+from indico.web.rh import allow_signed_url
 
 
 class RHDisplaySessionList(RHDisplayEventBase):
@@ -71,6 +72,7 @@ class RHDisplaySession(RHDisplaySessionBase):
                                                sess=sess, page_title=sess.title, **ical_params)
 
 
+@allow_signed_url
 class RHExportSessionToICAL(RHDisplaySessionBase):
     def _process(self):
         return send_file('session.ics', get_session_ical_file(self.session), 'text/calendar')

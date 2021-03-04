@@ -28,7 +28,7 @@ from indico.modules.events.models.persons import EventPerson
 from indico.modules.events.util import get_base_ical_parameters
 from indico.util.i18n import _
 from indico.web.flask.util import jsonify_data, send_file
-from indico.web.rh import RH
+from indico.web.rh import RH, allow_signed_url
 from indico.web.util import jsonify_template
 
 
@@ -208,6 +208,7 @@ class RHContributionsExportToPDF(RHContributionList):
         return send_file('contributions.pdf', pdf.generate(), 'application/pdf')
 
 
+@allow_signed_url
 class RHContributionExportToICAL(RHContributionDisplayBase):
     """Export contribution to ICS."""
 

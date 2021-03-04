@@ -23,9 +23,9 @@ document.addEventListener('DOMContentLoaded', () => {
   ReactDOM.render(
     <ICSCalendarLink
       endpoint="sessions.export_ics"
-      urlParams={{event_id: eventId, session_id: sessionId}}
+      params={{event_id: eventId, session_id: sessionId}}
       renderButton={onClick => <IButton icon="calendar" onClick={onClick} />}
-      options={[{key: 'session', text: Translate.string('Session'), queryParams: {}}]}
+      options={[{key: 'session', text: Translate.string('Session'), extraParams: {}}]}
     />,
     calendarContainer
   );

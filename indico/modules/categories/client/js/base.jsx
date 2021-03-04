@@ -23,9 +23,9 @@ document.addEventListener('DOMContentLoaded', () => {
   ReactDOM.render(
     <ICSCalendarLink
       endpoint="categories.export_ical"
-      urlParams={{category_id: categoryId}}
+      params={{category_id: categoryId}}
       renderButton={onClick => <IButton icon="calendar" onClick={onClick} />}
-      options={[{key: 'category', text: Translate.string('Category'), queryParams: {}}]}
+      options={[{key: 'category', text: Translate.string('Category'), extraParams: {}}]}
     />,
     calendarContainer
   );

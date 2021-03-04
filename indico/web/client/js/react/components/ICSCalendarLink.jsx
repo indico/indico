@@ -19,7 +19,7 @@ import './ICSCalendarLink.module.scss';
 
 export default function ICSCalendarLink({
   endpoint,
-  urlParams,
+  params,
   renderButton,
   popupPosition,
   options,
@@ -53,10 +53,10 @@ export default function ICSCalendarLink({
     }
   };
 
-  const handleSetOption = async (text, queryParams) => {
+  const handleSetOption = async (text, extraParams) => {
     setOption({
       text,
-      url: await fetchURL(queryParams),
+      url: await fetchURL(extraParams),
     });
     setOpen(true);
   };
@@ -86,22 +86,22 @@ export default function ICSCalendarLink({
             <Translate>Synchronise with your calendar</Translate>
           </Dropdown.Header>
           <Dropdown.Divider />
-          {options.map(({key, text, queryParams}) => (
+          {options.map(({key, text, extraParams}) => (
             <Dropdown.Item
               key={key}
               text={text}
-              onClick={() => handleSetOption(text, queryParams)}
+              onClick={() => handleSetOption(text, extraParams)}
             />
           ))}
         </Dropdown.Menu>
       </Dropdown>
     );
   } else {
-    const {text, queryParams} = options[0];
+    const {text, extraParams} = options[0];
     trigger = renderButton ? (
-      renderButton(() => handleSetOption(text, queryParams))
+      renderButton(() => handleSetOption(text, extraParams))
     ) : (
-      <Button icon size="small" onClick={() => handleSetOption(text, queryParams)}>
+      <Button icon size="small" onClick={() => handleSetOption(text, extraParams)}>
         <Icon name="calendar alternate outline" />
         <Icon name="caret down" />
       </Button>
@@ -160,7 +160,7 @@ export default function ICSCalendarLink({
 
 ICSCalendarLink.propTypes = {
   endpoint: PropTypes.string.isRequired,
-  urlParams: PropTypes.objectOf(PropTypes.string),
+  params: PropTypes.objectOf(PropTypes.string),
   renderButton: PropTypes.func,
   popupPosition: PropTypes.string,
   options: PropTypes.arrayOf(
@@ -173,7 +173,7 @@ ICSCalendarLink.propTypes = {
 };
 
 ICSCalendarLink.defaultProps = {
-  urlParams: {},
+  params: {},
   renderButton: null,
   popupPosition: 'left center',
   options: [],

@@ -39,9 +39,9 @@ document.addEventListener('DOMContentLoaded', () => {
   ReactDOM.render(
     <ICSCalendarLink
       endpoint="contributions.export_ics"
-      urlParams={{event_id: eventId, contrib_id: contributionId}}
+      params={{event_id: eventId, contrib_id: contributionId}}
       renderButton={onClick => <IButton icon="calendar" onClick={onClick} />}
-      options={[{key: 'contribution', text: Translate.string('Contribution'), queryParams: {}}]}
+      options={[{key: 'contribution', text: Translate.string('Contribution'), extraParams: {}}]}
     />,
     calendarContainer
   );
