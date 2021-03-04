@@ -52,5 +52,5 @@ user!
 
 primary_email_changed = _signals.signal('primary-email-changed', """
 Called when the primary address is changed. The *sender* is
-the user object and the `new` and `old` values are passed in the kwarg.
+the user object and the `new` and `old` values are passed as kwargs.
 """)
