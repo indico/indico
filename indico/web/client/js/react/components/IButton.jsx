@@ -20,7 +20,7 @@ export default class IButton extends React.PureComponent {
     highlight: PropTypes.bool,
     disabled: PropTypes.bool,
     icon: PropTypes.string,
-    dropDown: PropTypes.bool,
+    dropdown: PropTypes.bool,
   };
 
   static defaultProps = {
@@ -32,7 +32,7 @@ export default class IButton extends React.PureComponent {
     highlight: false,
     disabled: false,
     icon: '',
-    dropDown: false,
+    dropdown: false,
   };
 
   render() {
@@ -45,7 +45,7 @@ export default class IButton extends React.PureComponent {
       children,
       onClick,
       icon,
-      dropDown,
+      dropdown,
     } = this.props;
     const finalClasses = {...classes, 'i-button': true, disabled, highlight};
 
@@ -53,7 +53,7 @@ export default class IButton extends React.PureComponent {
       finalClasses[`icon-${icon}`] = true;
     }
 
-    if (dropDown) {
+    if (dropdown) {
       finalClasses['arrow'] = true;
     }
 
