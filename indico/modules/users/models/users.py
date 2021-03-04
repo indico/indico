@@ -12,7 +12,14 @@ from enum import Enum
 from operator import attrgetter
 from uuid import uuid4
 
+from flask import flash, g, has_request_context, session
 from flask_multipass import IdentityRetrievalFailed
+from sqlalchemy.dialects.postgresql import JSONB, UUID
+from sqlalchemy.event import listens_for
+from sqlalchemy.ext.associationproxy import association_proxy
+from sqlalchemy.ext.hybrid import hybrid_property
+from sqlalchemy.orm import object_session
+from werkzeug.utils import cached_property
 
 from indico.core import signals
 from indico.core.auth import multipass
@@ -29,14 +36,6 @@ from indico.util.locators import locator_property
 from indico.util.string import format_full_name, format_repr, return_ascii
 from indico.util.struct.enum import RichIntEnum
 from indico.web.flask.util import url_for
-
-from flask import flash, g, has_request_context, session
-from sqlalchemy.dialects.postgresql import JSONB, UUID
-from sqlalchemy.event import listens_for
-from sqlalchemy.ext.associationproxy import association_proxy
-from sqlalchemy.ext.hybrid import hybrid_property
-from sqlalchemy.orm import object_session
-from werkzeug.utils import cached_property
 
 
 class UserTitle(RichIntEnum):
