@@ -40,6 +40,8 @@ Internal Changes
 - ``CACHE_BACKEND`` has been removed; Indico now always uses Redis for caching
 - The integration with flower (celery monitoring tool) has been removed as it was not widely used,
   did not provide much benefit, and it is no longer compatible with the latest Celery version
+- ``session.user`` now returns the user related to the current request, regardless of whether
+  it's coming from OAuth, a signed url or the actual session (:pr:`4803`)
 
 
 ----
