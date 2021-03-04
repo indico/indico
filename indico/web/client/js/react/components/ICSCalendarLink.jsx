@@ -21,6 +21,7 @@ export default function ICSCalendarLink({
   endpoint,
   params,
   renderButton,
+  dropdownPosition,
   popupPosition,
   options,
   ...restProps
@@ -78,7 +79,7 @@ export default function ICSCalendarLink({
             </Button>
           )
         }
-        pointing="top right"
+        pointing={dropdownPosition}
         {...restProps}
       >
         <Dropdown.Menu>
@@ -162,6 +163,7 @@ ICSCalendarLink.propTypes = {
   endpoint: PropTypes.string.isRequired,
   params: PropTypes.objectOf(PropTypes.string),
   renderButton: PropTypes.func,
+  dropdownPosition: PropTypes.string,
   popupPosition: PropTypes.string,
   options: PropTypes.arrayOf(
     PropTypes.shape({
@@ -175,6 +177,7 @@ ICSCalendarLink.propTypes = {
 ICSCalendarLink.defaultProps = {
   params: {},
   renderButton: null,
+  dropdownPosition: 'top right',
   popupPosition: 'left center',
   options: [],
 };
