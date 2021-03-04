@@ -14,7 +14,7 @@ from flask import session
 
 from indico.core.db import db
 from indico.modules.events.models.events import Event
-from indico.modules.events.util import get_base_ical_parameters, serialize_event_for_json_ld
+from indico.modules.events.util import serialize_event_for_json_ld
 from indico.util.date_time import format_date
 from indico.util.i18n import _
 from indico.web.flask.util import url_for
@@ -108,22 +108,21 @@ def get_category_view_params(category, now):
     managers = sorted(category.get_manager_list(), key=attrgetter('principal_type.name', 'name'))
 
     threshold_format = '%Y-%m'
-    params = {'event_count': len(events),
-              'events_by_month': group_by_month(events, now, category.tzinfo),
-              'format_event_date': make_format_event_date_func(category),
-              'future_event_count': future_event_count,
-              'show_future_events': show_future_events,
-              'future_threshold': future_threshold.strftime(threshold_format),
-              'happening_now': make_happening_now_func(now),
-              'is_recent': make_is_recent_func(now),
-              'managers': managers,
-              'past_event_count': past_event_count,
-              'show_past_events': show_past_events,
-              'past_threshold': past_threshold.strftime(threshold_format),
-              'has_hidden_events': has_hidden_events,
-              'json_ld': list(map(serialize_event_for_json_ld, json_ld_events)),
-              'atom_feed_url': url_for('.export_atom', category),
-              'atom_feed_title': _('Events of "{}"').format(category.title)}
-    params.update(get_base_ical_parameters(session.user, 'category',
-                                           f'/export/categ/{category.id}.ics', {'from': '-31d'}))
-    return params
+    return {
+        'event_count': len(events),
+        'events_by_month': group_by_month(events, now, category.tzinfo),
+        'format_event_date': make_format_event_date_func(category),
+        'future_event_count': future_event_count,
+        'show_future_events': show_future_events,
+        'future_threshold': future_threshold.strftime(threshold_format),
+        'happening_now': make_happening_now_func(now),
+        'is_recent': make_is_recent_func(now),
+        'managers': managers,
+        'past_event_count': past_event_count,
+        'show_past_events': show_past_events,
+        'past_threshold': past_threshold.strftime(threshold_format),
+        'has_hidden_events': has_hidden_events,
+        'json_ld': list(map(serialize_event_for_json_ld, json_ld_events)),
+        'atom_feed_url': url_for('.export_atom', category),
+        'atom_feed_title': _('Events of "{}"').format(category.title)
+    }

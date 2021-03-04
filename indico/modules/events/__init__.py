@@ -7,7 +7,7 @@
 
 import re
 
-from flask import flash, redirect, render_template, request, session
+from flask import flash, redirect, request, session
 from werkzeug.exceptions import BadRequest, NotFound
 
 from indico.core import signals
@@ -20,7 +20,6 @@ from indico.modules.events.models.events import Event
 from indico.modules.events.models.legacy_mapping import LegacyEventMapping
 from indico.util.i18n import _, ngettext, orig_string
 from indico.util.string import is_legacy_id
-from indico.web.flask.templating import template_hook
 from indico.web.flask.util import url_for
 from indico.web.menu import SideMenuItem, TopMenuItem, TopMenuSection
 
@@ -243,11 +242,3 @@ def _event_cloned(old_event, new_event, **kwargs):
     new_event.contact_title = old_event.contact_title
     new_event.contact_emails = old_event.contact_emails
     new_event.contact_phones = old_event.contact_phones
-
-
-@template_hook('event-ical-export')
-def _render_event_ical_export(event, **kwargs):
-    from indico.modules.events.util import get_base_ical_parameters
-    return render_template('events/display/event_ical_export.html', item=event,
-                           ics_url=url_for('events.export_event_ical', event),
-                           **get_base_ical_parameters(session.user, 'events', f'/export/event/{event.id}.ics'))

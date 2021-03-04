@@ -44,3 +44,4 @@ export {default as WTFTimeField} from './WTFTimeField';
 export {default as WTFOccurrencesField} from './WTFOccurrencesField';
 export {default as WTFPrincipalListField} from './WTFPrincipalListField';
 export {default as WTFPrincipalField} from './WTFPrincipalField';
+export {default as ICSCalendarLink} from './ICSCalendarLink';

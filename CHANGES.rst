@@ -30,6 +30,9 @@ Improvements
   event (:issue:`4750`, :pr:`4760`)
 - Add options for attaching iCal files to complete registration and event reminder
   emails (:issue:`1158`, :pr:`4780`)
+- Use the new token-based URLs instead of API keys for persistent ical links and replace
+  the calendar link widgets in category, event, session and contribution views with the
+  more modern ones used in dashboard (:issue:`4776`, :pr:`4801`)
 
 Internal Changes
 ^^^^^^^^^^^^^^^^

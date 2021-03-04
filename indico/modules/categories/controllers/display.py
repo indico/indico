@@ -43,7 +43,7 @@ from indico.util.fs import secure_filename
 from indico.util.i18n import _
 from indico.web.flask.templating import get_template_module
 from indico.web.flask.util import send_file, url_for
-from indico.web.rh import RH
+from indico.web.rh import RH, allow_signed_url
 from indico.web.util import jsonify_data
 
 
@@ -309,6 +309,7 @@ class RHShowPastEventsInCategory(RHShowEventsInCategoryBase):
     session_field = 'fetch_past_events_in'
 
 
+@allow_signed_url
 class RHExportCategoryICAL(RHDisplayCategoryBase):
     def _process(self):
         filename = '{}-category.ics'.format(secure_filename(self.category.title, str(self.category.id)))

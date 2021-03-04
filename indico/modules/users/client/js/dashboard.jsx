@@ -8,9 +8,8 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 
+import {ICSCalendarLink} from 'indico/react/components';
 import {Translate} from 'indico/react/i18n';
-
-import ICSCalendarLink from './ICSCalendarLink';
 
 document.addEventListener('DOMContentLoaded', () => {
   ReactDOM.render(

@@ -88,7 +88,7 @@ class WPEventAdmin(WPAdmin):
 
 class WPEventBase(WPDecorated):
     ALLOW_JSON = False
-    bundles = ('module_events.display.js', 'module_events.contributions.js')
+    bundles = ('module_events.display.js', 'module_events.contributions.js', 'module_events.header.js')
 
     @property
     def page_metadata(self):
@@ -142,7 +142,12 @@ class WPSimpleEventDisplayBase(MathjaxMixin, WPEventBase):
 
 
 class WPSimpleEventDisplay(WPSimpleEventDisplayBase):
-    bundles = ('module_vc.js', 'module_vc.css', 'module_events.cloning.js', 'module_events.importing.js')
+    bundles = (
+        'module_vc.js',
+        'module_vc.css',
+        'module_events.cloning.js',
+        'module_events.importing.js',
+    )
 
     def __init__(self, rh, conf, theme_id, theme_override=False):
         WPSimpleEventDisplayBase.__init__(self, rh, conf)

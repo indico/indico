@@ -15,7 +15,17 @@ import {Translate} from 'indico/react/i18n';
 import {indicoAxios, handleAxiosError} from 'indico/utils/axios';
 import {snakifyKeys} from 'indico/utils/case';
 
-export default function ICSCalendarLink({endpoint, params, options, ...restProps}) {
+import './ICSCalendarLink.module.scss';
+
+export default function ICSCalendarLink({
+  endpoint,
+  params,
+  renderButton,
+  dropdownPosition,
+  popupPosition,
+  options,
+  ...restProps
+}) {
   const [copied, setCopied] = useState(false);
   const [option, setOption] = useState(null);
   const [open, setOpen] = useState(false);
@@ -44,44 +54,65 @@ export default function ICSCalendarLink({endpoint, params, options, ...restProps
     }
   };
 
-  const trigger = (
-    <Dropdown
-      {...restProps}
-      icon={null}
-      trigger={
-        <Button icon size="small">
-          <Icon name="calendar alternate outline" />
-          <Icon name="caret down" />
-        </Button>
-      }
-      pointing="top right"
-    >
-      <Dropdown.Menu>
-        <Dropdown.Header>
-          <Translate>Synchronise with your calendar</Translate>
-        </Dropdown.Header>
-        <Dropdown.Divider />
-        {options.map(({key, text, extraParams}) => (
-          <Dropdown.Item
-            key={key}
-            text={text}
-            onClick={async () => {
-              setOption({
-                text,
-                url: await fetchURL(extraParams),
-              });
-              setOpen(true);
-            }}
-          />
-        ))}
-      </Dropdown.Menu>
-    </Dropdown>
-  );
+  const handleSetOption = async (text, extraParams) => {
+    setOption({
+      text,
+      url: await fetchURL(extraParams),
+    });
+    setOpen(true);
+  };
+
+  let trigger;
+
+  if (options.length > 1) {
+    trigger = (
+      <Dropdown
+        styleName="height-full"
+        icon={null}
+        trigger={
+          renderButton ? (
+            renderButton(() => {})
+          ) : (
+            <Button icon size="small">
+              <Icon name="calendar alternate outline" />
+              <Icon name="caret down" />
+            </Button>
+          )
+        }
+        pointing={dropdownPosition}
+        {...restProps}
+      >
+        <Dropdown.Menu>
+          <Dropdown.Header>
+            <Translate>Synchronise with your calendar</Translate>
+          </Dropdown.Header>
+          <Dropdown.Divider />
+          {options.map(({key, text, extraParams}) => (
+            <Dropdown.Item
+              key={key}
+              text={text}
+              onClick={() => handleSetOption(text, extraParams)}
+            />
+          ))}
+        </Dropdown.Menu>
+      </Dropdown>
+    );
+  } else {
+    const {text, extraParams} = options[0];
+    trigger = renderButton ? (
+      renderButton(() => handleSetOption(text, extraParams))
+    ) : (
+      <Button icon size="small" onClick={() => handleSetOption(text, extraParams)}>
+        <Icon name="calendar alternate outline" />
+        <Icon name="caret down" />
+      </Button>
+    );
+  }
 
   return (
     <Popup
       trigger={trigger}
-      position="left center"
+      position={popupPosition}
       open={open}
       popperDependencies={[copied]}
       on="click"
@@ -94,6 +125,7 @@ export default function ICSCalendarLink({endpoint, params, options, ...restProps
       wide
     >
       <Header
+        styleName="centered"
         content={Translate.string('Sync with your calendar')}
         subheader={option && <Label color="blue">{option.text}</Label>}
       />
@@ -130,6 +162,9 @@ export default function ICSCalendarLink({endpoint, params, options, ...restProps
 ICSCalendarLink.propTypes = {
   endpoint: PropTypes.string.isRequired,
   params: PropTypes.objectOf(PropTypes.string),
+  renderButton: PropTypes.func,
+  dropdownPosition: PropTypes.string,
+  popupPosition: PropTypes.string,
   options: PropTypes.arrayOf(
     PropTypes.shape({
       key: PropTypes.string.isRequired,
@@ -141,5 +176,8 @@ ICSCalendarLink.propTypes = {
 
 ICSCalendarLink.defaultProps = {
   params: {},
+  renderButton: null,
+  dropdownPosition: 'top right',
+  popupPosition: 'left center',
   options: [],
 };

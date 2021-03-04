@@ -127,16 +127,9 @@
                 <a href="{{ url_for('contributions.export_ics', contribution) }}"
                    class="i-button icon-calendar"></a>
             {% else %}
-                <a id="exportIcal{{ contribution.id }}" href="#"
-                   class="i-button icon-calendar js-export-ical"
-                   data-id="{{ contribution.id }}"></a>
+                <div id="contribution-calendar-link" data-event-id="{{ contribution.event_id }}"
+                     data-contribution-id="{{ contribution.id }}"></div>
             {% endif %}
-        {%- endif %}
-
-        {% if contribution.timetable_entry -%}
-            {% with item=contribution, ics_url=url_for('contributions.export_ics', contribution) -%}
-                {% include 'events/contributions/display/contribution_ical_export.html' %}
-            {%- endwith %}
         {%- endif %}
     </div>
 {%- endblock %}

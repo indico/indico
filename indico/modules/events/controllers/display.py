@@ -20,8 +20,10 @@ from indico.modules.events.views import WPConferenceDisplay, WPSimpleEventDispla
 from indico.util.signals import values_from_signal
 from indico.web.flask.util import send_file, url_for
 from indico.web.http_api.metadata import Serializer
+from indico.web.rh import allow_signed_url
 
 
+@allow_signed_url
 class RHExportEventICAL(RHDisplayEventBase):
     def _process(self):
         detail_level = request.args.get('detail', 'events')
