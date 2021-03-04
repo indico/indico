@@ -626,7 +626,7 @@ class User(PersonMixin, db.Model):
         db.session.flush()
         secondary.is_primary = True
         db.session.flush()
-        signals.users.primary_email_changed.send(self, old=old, new=self.email)
+        signals.users.primary_email_changed.send(self, old=old, new=email)
 
     def reset_signing_secret(self):
         self.signing_secret = unicode(uuid4())
