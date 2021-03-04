@@ -277,15 +277,32 @@ class RHPrincipals(PrincipalsMixin, RHProtected):
         self.values = values
 
 
-class RHSignURL(RHProtected):
+class RHSignURL(RH):
+    """Create a persistent signed URL for a user.
+
+    This build a url and adds a signature that authenticates the user without
+    requiring them to have session cookies. It is meant for cases where the
+    user actively requests a persistent link to use outside their browser,
+    e.g. for a calendar feed.
+
+    When called without authentication, no token is added, so it just behaves
+    as the normal ``url_for`` in order to allow client-side code to be more
+    straightforward and always call this API regardless of whether the user is
+    authenticated or not.
+    """
+
     def _process(self):
         endpoint = request.json.get('endpoint')
         if not endpoint:
             raise BadRequest
         # filter out special args
         params = {k: v for k, v in request.json.get('params', {}).items() if not k.startswith('_')}
-        url = signed_url_for_user(session.user, endpoint, _external=True, **params)
-        Logger.get('url_signing').info("%s signed URL for endpoint '%s' with params %r", session.user, endpoint, params)
+        if session.user:
+            url = signed_url_for_user(session.user, endpoint, _external=True, **params)
+            Logger.get('url_signing').info("%s signed URL for endpoint '%s' with params %r", session.user, endpoint,
+                                           params)
+        else:
+            url = url_for(endpoint, _external=True, **params)
         return jsonify(url=url)
 
 
