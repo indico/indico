@@ -71,6 +71,7 @@ Internal Changes
 ^^^^^^^^^^^^^^^^
 
 - Also trigger the ``ical-export`` metadata signal when exporting events for a whole category
+- Add ``primary_email_changed`` signal (:pr:`4802`, thanks :user:`openprojects`)
 
 Version 2.3.3
 -------------

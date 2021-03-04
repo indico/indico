@@ -19,6 +19,7 @@ from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import object_session
 from werkzeug.utils import cached_property
 
+from indico.core import signals
 from indico.core.auth import multipass
 from indico.core.db import db
 from indico.core.db.sqlalchemy import PyIntEnum
@@ -603,10 +604,12 @@ class User(PersonMixin, db.Model):
         secondary = next((x for x in self._secondary_emails if x.email == email), None)
         if secondary is None:
             raise ValueError('email is not a secondary email address')
+        old = self.email
         self._primary_email.is_primary = False
         db.session.flush()
         secondary.is_primary = True
         db.session.flush()
+        signals.users.primary_email_changed.send(self, old=old, new=email)
 
     def reset_signing_secret(self):
         self.signing_secret = str(uuid4())
