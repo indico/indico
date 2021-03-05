@@ -21,7 +21,7 @@
         <div ng-app="nd" ng-controller="AppCtrl">
             {% block regform %}
                 <div nd-reg-form
-                     conf-id="{{ event.id }}"
+                     event-id="{{ event.id }}"
                      conf-sections="{{ sections | tojson | forceescape }}"
                      conf-currency="{{ registration.currency }}"
                      post-url="{{ request.url | tojson | forceescape }}"

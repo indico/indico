@@ -191,6 +191,7 @@ def create_personal_data_fields(regform):
 def url_rule_to_angular(endpoint):
     """Convert a flask-style rule to angular style."""
     mapping = {
+        'event_id': 'eventId',
         'reg_form_id': 'confFormId',
         'section_id': 'sectionId',
         'field_id': 'fieldId',
