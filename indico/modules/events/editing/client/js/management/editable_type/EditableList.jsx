@@ -298,13 +298,16 @@ function EditableListDisplay({
     }
   };
 
-  const checkedEditablesRequest = async (urlFunc, data = {}) => {
+  const checkedEditablesRequest = async (urlFunc, data = {}, urlData = {}) => {
     let response;
     try {
-      response = await indicoAxios.post(urlFunc({event_id: eventId, type: editableType}), {
-        editables: checked,
-        ...data,
-      });
+      response = await indicoAxios.post(
+        urlFunc({event_id: eventId, type: editableType, ...urlData}),
+        {
+          editables: checked,
+          ...data,
+        }
+      );
     } catch (error) {
       handleAxiosError(error);
       return null;
@@ -317,7 +320,15 @@ function EditableListDisplay({
 
   const downloadAllFiles = async () => {
     setActiveRequest('download');
-    const rv = await checkedEditablesRequest(editablesArchiveURL);
+    const rv = await checkedEditablesRequest(editablesArchiveURL, {}, {archive_type: 'archive'});
+    if (rv) {
+      location.href = rv.downloadURL;
+    }
+  };
+
+  const exportJSON = async () => {
+    setActiveRequest('json');
+    const rv = await checkedEditablesRequest(editablesArchiveURL, {}, {archive_type: 'json'});
     if (rv) {
       location.href = rv.downloadURL;
     }
@@ -400,12 +411,20 @@ function EditableListDisplay({
                   loading={activeRequest === 'unassign'}
                 />
               </Button.Group>{' '}
-              <Button
-                disabled={!hasCheckedContribs || !!activeRequest}
-                content={Translate.string('Download all files')}
-                onClick={downloadAllFiles}
-                loading={activeRequest === 'download'}
-              />
+              <Button.Group>
+                <Button
+                  disabled={!hasCheckedContribs || !!activeRequest}
+                  content={Translate.string('Download all files')}
+                  onClick={downloadAllFiles}
+                  loading={activeRequest === 'download'}
+                />
+                <Button
+                  disabled={!hasCheckedContribs || !!activeRequest}
+                  content={Translate.string('Export as JSON')}
+                  onClick={exportJSON}
+                  loading={activeRequest === 'json'}
+                />
+              </Button.Group>
             </>
           )}
         </div>

@@ -33,6 +33,7 @@ Improvements
 - Use the new token-based URLs instead of API keys for persistent ical links and replace
   the calendar link widgets in category, event, session and contribution views with the
   more modern ones used in dashboard (:issue:`4776`, :pr:`4801`)
+- Add an option to export editables to JSON (:issue:`4767`, :pr:`4810`)
 
 Internal Changes
 ^^^^^^^^^^^^^^^^

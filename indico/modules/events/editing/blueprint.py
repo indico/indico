@@ -71,10 +71,10 @@ _bp.add_url_rule('/editing/api/service/connect', 'api_service_connect', service.
 _bp.add_url_rule('/editing/api/service/disconnect', 'api_service_disconnect', service.RHDisconnectService,
                  methods=('POST',))
 _bp.add_url_rule('/editing/api/service/status', 'api_service_status', service.RHServiceStatus)
-_bp.add_url_rule('/editing/api/<any(paper,slides,poster):type>/editables/prepare-archive',
+_bp.add_url_rule('/editing/api/<any(paper,slides,poster):type>/editables/prepare-<any(archive,json):archive_type>',
                  'api_prepare_editables_archive', editable_list.RHPrepareEditablesArchive, methods=('POST',))
-_bp.add_url_rule('/editing/<any(paper,slides,poster):type>/editables/archive/<uuid:uuid>.zip', 'download_archive',
-                 editable_list.RHDownloadArchive)
+_bp.add_url_rule('/editing/<any(paper,slides,poster):type>/editables/<any(archive,json):archive_type>/<uuid:uuid>.zip',
+                 'download_archive', editable_list.RHDownloadArchive)
 _bp.add_url_rule('/editing/api/<any(paper,slides,poster):type>/editables/assign', 'api_assign_editor',
                  editable_list.RHAssignEditor, methods=('POST',))
 _bp.add_url_rule('/editing/api/<any(paper,slides,poster):type>/editables/assign/me', 'api_assign_myself',

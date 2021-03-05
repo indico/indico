@@ -191,6 +191,11 @@ class EditableSchema(mm.SQLAlchemyAutoSchema):
     state = fields.Nested(EditableStateSchema)
 
 
+class EditableDumpSchema(EditableSchema):
+    class Meta(EditableSchema.Meta):
+        fields = [f for f in EditableSchema.Meta.fields if not f.startswith('can_')]
+
+
 class EditableBasicSchema(mm.SQLAlchemyAutoSchema):
     class Meta:
         model = Editable

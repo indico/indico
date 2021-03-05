@@ -9,7 +9,7 @@ import os
 from io import BytesIO
 from zipfile import ZipFile
 
-from flask import session
+from flask import jsonify, session
 from werkzeug.exceptions import BadRequest
 
 from indico.core.db import db
@@ -24,7 +24,8 @@ from indico.modules.events.editing.models.revisions import EditingRevision, Fina
 from indico.modules.events.editing.models.tags import EditingTag
 from indico.modules.events.editing.notifications import (notify_comment, notify_editor_judgment,
                                                          notify_submitter_confirmation, notify_submitter_upload)
-from indico.modules.events.editing.schemas import EditingConfirmationAction, EditingReviewAction
+from indico.modules.events.editing.schemas import (EditableDumpSchema, EditingConfirmationAction, EditingFileTypeSchema,
+                                                   EditingReviewAction)
 from indico.modules.events.logs import EventLogKind, EventLogRealm
 from indico.util.date_time import now_utc
 from indico.util.fs import secure_filename
@@ -346,7 +347,7 @@ def unassign_editor(editable):
     db.session.flush()
 
 
-def generate_editables_zip(editables):
+def generate_editables_zip(event, editable_type, editables):
     buf = BytesIO()
     with ZipFile(buf, 'w', allowZip64=True) as zip_file:
         for editable in editables:
@@ -357,6 +358,15 @@ def generate_editables_zip(editables):
 
     buf.seek(0)
     return send_file('files.zip', buf, 'application/zip', inline=False)
+
+
+def generate_editables_json(event, editable_type, editables):
+    file_types = EditingFileType.query.with_parent(event).filter_by(type=editable_type).all()
+    file_types_dump = EditingFileTypeSchema(many=True).dump(file_types)
+    editables_dump = EditableDumpSchema(many=True).dump(editables)
+    response = jsonify(version=1, file_types=file_types_dump, editables=editables_dump)
+    response.headers['Content-Disposition'] = 'attachment; filename="editables.json"'
+    return response
 
 
 def _compose_filepath(editable, revision_file):

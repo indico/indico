@@ -9,7 +9,7 @@ import uuid
 
 from flask import jsonify, request, session
 from marshmallow import fields
-from sqlalchemy.orm import joinedload
+from sqlalchemy.orm import joinedload, selectinload
 from sqlalchemy.sql import and_, func, over
 from werkzeug.exceptions import Forbidden
 
@@ -21,7 +21,8 @@ from indico.modules.events.editing.controllers.base import (RHEditablesBase, RHE
 from indico.modules.events.editing.models.editable import Editable
 from indico.modules.events.editing.models.revision_files import EditingRevisionFile
 from indico.modules.events.editing.models.revisions import EditingRevision
-from indico.modules.events.editing.operations import assign_editor, generate_editables_zip, unassign_editor
+from indico.modules.events.editing.operations import (assign_editor, generate_editables_json, generate_editables_zip,
+                                                      unassign_editor)
 from indico.modules.events.editing.schemas import EditableBasicSchema, EditingEditableListSchema, FilteredEditableSchema
 from indico.modules.files.models.files import File
 from indico.util.i18n import _
@@ -53,15 +54,30 @@ class RHPrepareEditablesArchive(RHEditablesBase):
         key = str(uuid.uuid4())
         data = [editable.id for editable in self.editables]
         archive_cache.set(key, data, timeout=1800)
-        download_url = url_for('.download_archive', self.event, type=self.editable_type.name, uuid=key)
+        archive_type = request.view_args['archive_type']
+        download_url = url_for('.download_archive', self.event, type=self.editable_type.name,
+                               archive_type=archive_type, uuid=key)
         return jsonify(download_url=download_url)
 
 
 class RHDownloadArchive(RHEditableTypeManagementBase):
     def _process(self):
         editable_ids = archive_cache.get(str(request.view_args['uuid']), [])
-        editables = Editable.query.filter(Editable.id.in_(editable_ids)).all()
-        return generate_editables_zip(editables)
+        revisions_strategy = selectinload('revisions')
+        revisions_strategy.subqueryload('comments').joinedload('user')
+        revisions_strategy.subqueryload('files').joinedload('file_type')
+        revisions_strategy.subqueryload('tags')
+        revisions_strategy.joinedload('submitter')
+        revisions_strategy.joinedload('editor')
+        editables = (Editable.query
+                     .filter(Editable.id.in_(editable_ids))
+                     .options(joinedload('editor'), joinedload('contribution'), revisions_strategy)
+                     .all())
+        fn = {
+            'archive': generate_editables_zip,
+            'json': generate_editables_json,
+        }[request.view_args['archive_type']]
+        return fn(self.event, self.editable_type, editables)
 
 
 class RHAssignEditor(RHEditablesBase):
