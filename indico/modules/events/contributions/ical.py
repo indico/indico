@@ -6,6 +6,7 @@
 # LICENSE file for more details.
 
 from icalendar import Event
+from icalendar.cal import Calendar
 from lxml import html
 from lxml.etree import ParserError
 from werkzeug.urls import url_parse
@@ -52,3 +53,21 @@ def generate_contribution_component(contribution):
     cal_contribution.add('description', '\n'.join(description))
 
     return cal_contribution
+
+
+def contribution_to_ical(contribution):
+    """Serialize a contribution into an ical.
+
+    :param contribution: The contribution to serialize
+    """
+
+    calendar = Calendar()
+    calendar.add('version', '2.0')
+    calendar.add('prodid', '-//CERN//INDICO//EN')
+
+    cal_contribution = generate_contribution_component(contribution)
+    calendar.add_component(cal_contribution)
+
+    data = calendar.to_ical()
+
+    return data

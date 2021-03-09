@@ -5,6 +5,8 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
+from io import BytesIO
+
 from flask import jsonify, request, session
 from sqlalchemy.orm import joinedload, load_only
 from werkzeug.exceptions import Forbidden, NotFound
@@ -14,12 +16,12 @@ from indico.core.db import db
 from indico.legacy.pdfinterface.latex import ContribsToPDF, ContribToPDF
 from indico.modules.events.abstracts.util import filter_field_values
 from indico.modules.events.contributions import contribution_settings
+from indico.modules.events.contributions.ical import contribution_to_ical
 from indico.modules.events.contributions.lists import ContributionDisplayListGenerator
 from indico.modules.events.contributions.models.contributions import Contribution
 from indico.modules.events.contributions.models.persons import AuthorType, ContributionPersonLink
 from indico.modules.events.contributions.models.subcontributions import SubContribution
-from indico.modules.events.contributions.util import (get_contribution_ical_file,
-                                                      get_contributions_with_user_as_submitter,
+from indico.modules.events.contributions.util import (get_contributions_with_user_as_submitter,
                                                       has_contributions_with_user_as_submitter)
 from indico.modules.events.contributions.views import WPAuthorList, WPContributions, WPMyContributions, WPSpeakerList
 from indico.modules.events.controllers.base import RHDisplayEventBase
@@ -213,7 +215,7 @@ class RHContributionExportToICAL(RHContributionDisplayBase):
     def _process(self):
         if not self.contrib.is_scheduled:
             raise NotFound('This contribution is not scheduled')
-        return send_file('contribution.ics', get_contribution_ical_file(self.contrib), 'text/calendar')
+        return send_file('contribution.ics', BytesIO(contribution_to_ical(self.contrib)), 'text/calendar')
 
 
 class RHContributionListFilter(RHContributionList):
