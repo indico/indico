@@ -26,6 +26,7 @@ Bugfixes
   no longer installed
 - Do not auto-redirect to SSO when an MS office user agent is detected (:issue:`4720`,
   :pr:`4731`)
+- Allow Editing team to view editables of unpublished contributions (:issue:`4811`, :pr:`4812`)
 
 Internal Changes
 ^^^^^^^^^^^^^^^^
