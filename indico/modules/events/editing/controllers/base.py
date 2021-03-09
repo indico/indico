@@ -104,6 +104,11 @@ class RHContributionEditableBase(TokenAccessMixin, RequireUserMixin, RHContribut
             RequireUserMixin._check_access(self)
             RHContributionDisplayBase._check_access(self)
 
+    def _can_view_unpublished(self):
+        if super()._can_view_unpublished():
+            return True
+        return self.editable is not None and self.editable.can_see_timeline(session.user)
+
     def _process_args(self):
         RHContributionDisplayBase._process_args(self)
         self.editable_type = EditableType[request.view_args['type']]

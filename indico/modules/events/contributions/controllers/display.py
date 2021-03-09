@@ -54,13 +54,15 @@ class RHContributionDisplayBase(RHDisplayEventBase):
         }
     }
 
+    def _can_view_unpublished(self):
+        return self.event.can_manage(session.user) or self.contrib.is_user_associated(session.user)
+
     def _check_access(self):
         RHDisplayEventBase._check_access(self)
         if not self.contrib.can_access(session.user):
             raise Forbidden
         published = contribution_settings.get(self.event, 'published')
-        if (not published and not self.event.can_manage(session.user)
-                and not self.contrib.is_user_associated(session.user)):
+        if not published and not self._can_view_unpublished():
             raise NotFound(_("The contributions of this event have not been published yet."))
 
     def _process_args(self):
