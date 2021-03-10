@@ -10,12 +10,12 @@ import itertools
 import os
 import re
 import sys
+from contextlib import ExitStack
 from functools import partial
 from operator import attrgetter, itemgetter
 
 import click
 import sqlalchemy.orm
-from contextlib2 import ExitStack
 from flask import current_app
 
 import indico
