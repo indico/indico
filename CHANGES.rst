@@ -7,6 +7,12 @@ Version 2.3.4
 
 *Unreleased*
 
+Security fixes
+^^^^^^^^^^^^^^
+
+- Fix some open redirects which could help making harmful URLs look more trustworthy by linking
+  to Indico and having it redirect the user to a malicious site (:issue:`4814`, :pr:`4815`)
+
 Improvements
 ^^^^^^^^^^^^
 
@@ -41,6 +47,7 @@ Version 2.3.3
 
 Security fixes
 ^^^^^^^^^^^^^^
+
 - JSON locale data for invalid locales is no longer cached on disk; instead a 404 error is
   triggered. This avoids creating small files in the cache folder for each invalid locale
   that is requested. (:pr:`4766`)
