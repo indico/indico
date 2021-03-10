@@ -1,0 +1,9 @@
+{% set error_message = _('Invalid URL') %}
+
+{% set error_description -%}
+    {%- trans url=indico_config.BASE_URL -%}
+        This Indico instance can only be accessed via <a href="{{ url }}">{{ url }}</a>
+    {%- endtrans -%}
+{%- endset %}
+
+{% include 'standalone_error.html' %}
