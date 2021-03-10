@@ -31,3 +31,12 @@ While keeping it would not hurt, it's better to stay in sync with the SQLAlchemy
 When writing/changing models or alembic revisions, run `python bin/maintenance/update_backrefs.py` to keep comments
 about relationship backrefs in sync and `python bin/utils/db_diff.py` to compare the models against your current
 database both to ensure your alembic revision is correct and that your own database is up to date.
+
+
+## Updating Python dependencies
+We use [pip-tools](https://github.com/jazzband/pip-tools) to manage our requirements.txt files. To update the pinned
+dependencies, use `pip-compile -U` for regular dependencies and then `pip-compile -U requirements.dev.in` for dev
+dependencies. Afterwards, check the diff for the requirements.txt files and consult each package's changelog for
+important changes in case of direct dependencies that aren't just patch releases. Once that's done, you MUST install
+Indico with `pip install -e '.[dev]'` and ensure nothing is broken (depending on what changed, make sure to test affected
+parts manually).
