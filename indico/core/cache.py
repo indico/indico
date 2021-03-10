@@ -10,6 +10,7 @@ from datetime import timedelta
 from flask_caching import Cache
 from flask_caching.backends.rediscache import RedisCache
 from redis import RedisError
+from redis import from_url as redis_from_url
 
 from indico.core.config import config
 from indico.core.logger import Logger
@@ -71,14 +72,13 @@ class IndicoRedisCache(RedisCache):
     def get_dict(self, *keys, default=None):
         return dict(zip(keys, self.get_many(*keys, default=default)))
 
-
-def make_indico_redis_cache(app, config, args, kwargs):
-    from redis import from_url as redis_from_url
-    key_prefix = config.get('CACHE_KEY_PREFIX')
-    if key_prefix:
-        kwargs['key_prefix'] = key_prefix
-    kwargs['host'] = redis_from_url(config['CACHE_REDIS_URL'], socket_timeout=1)
-    return IndicoRedisCache(*args, **kwargs)
+    @classmethod
+    def factory(cls, app, config, args, kwargs):
+        key_prefix = config.get('CACHE_KEY_PREFIX')
+        if key_prefix:
+            kwargs['key_prefix'] = key_prefix
+        kwargs['host'] = redis_from_url(config['CACHE_REDIS_URL'], socket_timeout=1)
+        return IndicoRedisCache(*args, **kwargs)
 
 
 class ScopedCache:
