@@ -136,6 +136,10 @@ most cases.
       access_log            /opt/indico/log/nginx/access.log combined;
       error_log             /opt/indico/log/nginx/error.log;
 
+      if ($host != $server_name) {
+        rewrite ^/(.*) https://$server_name/$1 permanent;
+      }
+
       location /.xsf/indico/ {
         internal;
         alias /opt/indico/;
