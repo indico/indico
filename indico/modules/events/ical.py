@@ -12,6 +12,7 @@ from werkzeug.urls import url_parse
 
 from indico.core import signals
 from indico.core.config import config
+from indico.core.db.sqlalchemy.protection import ProtectionMode
 from indico.modules.events.contributions.ical import generate_contribution_component
 from indico.util.date_time import now_utc
 from indico.util.signals import values_from_signal
@@ -45,6 +46,10 @@ def generate_event_component(event, event_uid):
         if len(event.contact_phones):
             contact_info += f'; {"; ".join(event.contact_phones)}'
         cal_event.add('contact', contact_info)
+
+    # logo url will be added only if event is public
+    if event.effective_protection_mode == ProtectionMode.public and event.has_logo:
+        cal_event.add('image', f"{config.BASE_URL}{event.logo_url}", {'VALUE': 'URI'})
 
     description = []
     if event.person_links:
