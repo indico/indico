@@ -12,6 +12,7 @@ from wtforms.validators import EqualTo, Length, Regexp, StopValidation, Validati
 
 from indico.util.date_time import as_utc, format_date, format_datetime, format_human_timedelta, format_time, now_utc
 from indico.util.i18n import _, ngettext
+from indico.util.passwords import validate_secure_password
 from indico.util.string import is_valid_mail
 
 
@@ -377,3 +378,23 @@ class SoftLength(Length):
     whitespace which is in line with the behavior in all our forms
     where surrounding whitespace is stripped before validation.
     """
+
+
+class SecurePassword:
+    """Validate that a string is a secure password."""
+
+    # This is only defined here so the `_attrs_for_validators` util does
+    # not need to hard-code it.
+    MIN_LENGTH = 8
+
+    def __init__(self, context='wtforms-field', username_field=None):
+        self.context = context
+        self.username_field = username_field
+
+    def __call__(self, form, field):
+        username = ''
+        if self.username_field:
+            username = form[self.username_field].data or ''
+        password = field.data or ''
+        if error := validate_secure_password(self.context, password, username=username):
+            raise ValidationError(error)

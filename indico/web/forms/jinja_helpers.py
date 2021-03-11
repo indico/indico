@@ -14,7 +14,8 @@ from wtforms.widgets.core import HiddenInput, Input, Select, TextArea
 from indico.util.enum import RichEnum
 from indico.web.forms.fields import (IndicoEnumRadioField, IndicoQuerySelectMultipleCheckboxField,
                                      IndicoSelectMultipleCheckboxField)
-from indico.web.forms.validators import ConfirmPassword, HiddenUnless, IndicoRegexp, SoftLength, WordCount
+from indico.web.forms.validators import (ConfirmPassword, HiddenUnless, IndicoRegexp, SecurePassword, SoftLength,
+                                         WordCount)
 from indico.web.forms.widgets import SelectizeWidget, TypeaheadWidget
 
 
@@ -49,6 +50,8 @@ def _attrs_for_validators(field, validators):
                 attrs['minlength'] = validator.min
             if validator.max >= 0:
                 attrs['maxlength'] = validator.max
+        elif isinstance(validator, SecurePassword):
+            attrs['minlength'] = validator.MIN_LENGTH
         elif isinstance(validator, IndicoRegexp) and validator.client_side:
             attrs['pattern'] = validator.regex.pattern
         elif isinstance(validator, NumberRange):

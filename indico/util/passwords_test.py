@@ -9,7 +9,8 @@ import hashlib
 
 import pytest
 
-from indico.util.passwords import BCryptPassword, PasswordProperty
+from indico.core import signals
+from indico.util.passwords import BCryptPassword, PasswordProperty, validate_secure_password
 
 
 def md5(s):
@@ -107,3 +108,38 @@ def test_bcryptpassword_check_empty(password_hash, password):
     pw.hash = password_hash
     assert pw != 'xxx'
     assert pw != password
+
+
+@pytest.mark.parametrize(('password', 'username', 'expected'), (
+    ('this is a long password', '', None),
+    ('this is a long password', 'long', None),
+    ('this is long', 'this is', 'your username'),
+    ('correct horse battery staple', '', 'previous data breaches'),
+    ('badsignal', '', 'signalfail'),
+    ('short', '', '8 characters'),
+    ('pw for indico', '', 'word "indico"'),
+    ('INDICO password', '', 'word "indico"'),
+    ('1nd1c0 password', '', 'word "indico"'),
+))
+def test_validate_secure_password(monkeypatch, password, username, expected):
+    signal_called = False
+
+    def _mock_pwned(password, fast=False):
+        return password == 'correct horse battery staple'
+
+    def _signal_fn(sender, **kw):
+        nonlocal signal_called
+        signal_called = True
+        assert sender == 'test'
+        assert username == kw['username']
+        if kw['password'] == 'badsignal':
+            return 'signalfail'
+
+    monkeypatch.setattr('indico.util.passwords.check_password_pwned', _mock_pwned)
+    with signals.check_password_secure.connected_to(_signal_fn):
+        rv = validate_secure_password('test', password, username=username)
+    assert signal_called
+    if expected is None:
+        assert rv is None
+    else:
+        assert expected in rv

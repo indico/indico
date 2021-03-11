@@ -7,13 +7,13 @@
 
 from wtforms.fields import PasswordField, SelectField, StringField, TextAreaField
 from wtforms.fields.html5 import EmailField
-from wtforms.validators import DataRequired, Email, Length, Optional, ValidationError
+from wtforms.validators import DataRequired, Email, Optional, ValidationError
 
 from indico.modules.auth import Identity
 from indico.modules.users import User
 from indico.util.i18n import _
 from indico.web.forms.base import IndicoForm, SyncedInputsMixin
-from indico.web.forms.validators import ConfirmPassword, used_if_not_synced
+from indico.web.forms.validators import ConfirmPassword, SecurePassword, used_if_not_synced
 from indico.web.forms.widgets import SyncedInputWidget
 
 
@@ -38,14 +38,16 @@ class LocalLoginForm(IndicoForm):
 
 class AddLocalIdentityForm(IndicoForm):
     username = StringField(_('Username'), [DataRequired(), _check_existing_username], filters=[_tolower])
-    password = PasswordField(_('Password'), [DataRequired(), Length(min=5)])
+    password = PasswordField(_('Password'), [DataRequired(), SecurePassword('set-user-password',
+                                                                            username_field='username')])
     confirm_password = PasswordField(_('Confirm password'), [DataRequired(), ConfirmPassword('password')])
 
 
 class EditLocalIdentityForm(IndicoForm):
     username = StringField(_('Username'), [DataRequired()], filters=[_tolower])
     password = PasswordField(_('Current password'), [DataRequired()])
-    new_password = PasswordField(_('New password'), [Optional(), Length(min=5)])
+    new_password = PasswordField(_('New password'), [Optional(), SecurePassword('set-user-password',
+                                                                                username_field='username')])
     confirm_new_password = PasswordField(_('Confirm password'), [ConfirmPassword('new_password')])
 
     def __init__(self, *args, **kwargs):
@@ -93,7 +95,8 @@ class MultipassRegistrationForm(SyncedInputsMixin, IndicoForm):
 class LocalRegistrationForm(RegistrationForm):
     email = EmailField(_('Email address'), [Email(), _check_existing_email])
     username = StringField(_('Username'), [DataRequired(), _check_existing_username], filters=[_tolower])
-    password = PasswordField(_('Password'), [DataRequired(), Length(min=5)])
+    password = PasswordField(_('Password'), [DataRequired(), SecurePassword('set-user-password',
+                                                                            username_field='username')])
     confirm_password = PasswordField(_('Confirm password'), [DataRequired(), ConfirmPassword('password')])
     comment = TextAreaField(_('Comment'), description=_("You can provide additional information or a comment for the "
                                                         "administrators who will review your registration."))
@@ -127,5 +130,6 @@ class ResetPasswordEmailForm(IndicoForm):
 
 class ResetPasswordForm(IndicoForm):
     username = StringField(_('Username'))
-    password = PasswordField(_('New password'), [DataRequired(), Length(min=5)])
+    password = PasswordField(_('New password'), [DataRequired(), SecurePassword('set-user-password',
+                                                                                username_field='username')])
     confirm_password = PasswordField(_('Confirm password'), [DataRequired(), ConfirmPassword('password')])
