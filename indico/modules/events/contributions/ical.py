@@ -15,7 +15,7 @@ from indico.core.config import config
 from indico.util.date_time import now_utc
 
 
-def generate_contribution_component(contribution):
+def generate_contribution_component(contribution, event_uid):
     """Generates an Event icalendar component from an Indico Contribution.
 
     :param contribution: The Indico Contribution to use
@@ -31,6 +31,9 @@ def generate_contribution_component(contribution):
     cal_contribution.add('dtstart', contribution.start_dt)
     cal_contribution.add('dtend', contribution.end_dt)
     cal_contribution.add('summary', contribution.title)
+
+    if event_uid:
+        cal_contribution.add('related_to', event_uid)
 
     location = (f'{contribution.room_name} ({contribution.venue_name})'
                 if contribution.venue_name and contribution.room_name

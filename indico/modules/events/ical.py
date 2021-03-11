@@ -17,7 +17,7 @@ from indico.util.date_time import now_utc
 from indico.util.signals import values_from_signal
 
 
-def generate_event_component(event):
+def generate_event_component(event, event_uid):
     """Generates an Event icalendar component from an Indico Event.
 
     :param event: The Indico Event to use
@@ -25,7 +25,7 @@ def generate_event_component(event):
     """
 
     cal_event = Event()
-    cal_event.add('uid', 'indico-event-{}@{}'.format(event.id, url_parse(config.BASE_URL).host))
+    cal_event.add('uid', event_uid)
     cal_event.add('dtstamp', now_utc(False))
     cal_event.add('dtstart', event.start_dt)
     cal_event.add('dtend', event.end_dt)
@@ -86,11 +86,14 @@ def events_to_ical(events, user=None, detail_level='events'):
     calendar.add('prodid', '-//CERN//INDICO//EN')
 
     for event in events:
+        event_uid = 'indico-event-{}@{}'.format(event.id, url_parse(config.BASE_URL).host)
         if detail_level == 'events':
-            cal_event = generate_event_component(event)
+            cal_event = generate_event_component(event, event_uid)
             calendar.add_component(cal_event)
         elif detail_level == 'contributions':
-            contributions = [generate_contribution_component(contribution) for contribution in event.contributions]
+            contributions = [
+                generate_contribution_component(contribution, event_uid) for contribution in event.contributions
+            ]
             for contribution in contributions:
                 calendar.add_component(contribution)
 
