@@ -342,9 +342,12 @@ class RHAccounts(RHUserBase):
         self.user.local_identity.identifier = form.data['username']
         if form.data['new_password']:
             self.user.local_identity.password = form.data['new_password']
+            session.pop('insecure_password_error', None)
         flash(_("Your local account credentials have been updated successfully"), 'success')
 
     def _process(self):
+        insecure_login_password_error = session.get('insecure_password_error')
+
         form = self._create_form()
         if form.validate_on_submit():
             if isinstance(form, AddLocalIdentityForm):
@@ -354,7 +357,8 @@ class RHAccounts(RHUserBase):
             return redirect(url_for('auth.accounts'))
         provider_titles = {name: provider.title for name, provider in multipass.identity_providers.items()}
         return WPAuthUser.render_template('accounts.html', 'accounts',
-                                          form=form, user=self.user, provider_titles=provider_titles)
+                                          form=form, user=self.user, provider_titles=provider_titles,
+                                          insecure_login_password_error=insecure_login_password_error)
 
 
 class RHRemoveAccount(RHUserBase):

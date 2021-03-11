@@ -7,11 +7,13 @@
 
 from flask import redirect, request, session
 from flask_multipass import MultipassException
+from werkzeug.exceptions import Forbidden
 
 from indico.core import signals
 from indico.core.auth import multipass
 from indico.core.config import config
 from indico.core.db import db
+from indico.core.errors import NoReportError
 from indico.core.logger import Logger
 from indico.modules.auth.models.identities import Identity
 from indico.modules.auth.models.registration_requests import RegistrationRequest
@@ -112,3 +114,29 @@ def _delete_requests(user, **kwargs):
         logger.info('Deleting registration request %r due to registration of %r', req, user)
         db.session.delete(req)
     db.session.flush()
+
+
+@signals.app_created.connect
+def _handle_insecure_password_logins(app, **kwargs):
+    @app.before_request
+    def _redirect_if_insecure():
+        if not request.endpoint:
+            return
+
+        if (
+            request.blueprint == 'assets' or
+            request.endpoint.endswith('.static') or
+            request.endpoint in ('auth.logout', 'auth.accounts', 'core.contact', 'core.change_lang')
+        ):
+            return
+
+        if 'insecure_password_error' not in session:
+            return
+
+        if request.method != 'GET':
+            raise NoReportError.wrap_exc(Forbidden(_('You need to change your password')))
+
+        if request.is_xhr or request.is_json:
+            return
+
+        return redirect(url_for('auth.accounts'))

@@ -35,7 +35,9 @@ Improvements
   more modern ones used in dashboard (:issue:`4776`, :pr:`4801`)
 - Add an option to export editables to JSON (:issue:`4767`, :pr:`4810`)
 - Passwords are now checked against a list of breached passwords ("Have I Been Pwned")
-  in a secure and anonymous way that does not disclose any data (:pr:`4817`)
+  in a secure and anonymous way that does not disclose any data. If a user logs in with
+  an insecure password, they are forced to change it before they can continue using Indico
+  (:pr:`4817`)
 
 Internal Changes
 ^^^^^^^^^^^^^^^^
