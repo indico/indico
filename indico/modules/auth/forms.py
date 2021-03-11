@@ -39,16 +39,21 @@ class LocalLoginForm(IndicoForm):
 class AddLocalIdentityForm(IndicoForm):
     username = StringField(_('Username'), [DataRequired(), _check_existing_username], filters=[_tolower])
     password = PasswordField(_('Password'), [DataRequired(), SecurePassword('set-user-password',
-                                                                            username_field='username')])
-    confirm_password = PasswordField(_('Confirm password'), [DataRequired(), ConfirmPassword('password')])
+                                                                            username_field='username')],
+                             render_kw={'autocomplete': 'new-password'})
+    confirm_password = PasswordField(_('Confirm password'), [DataRequired(), ConfirmPassword('password')],
+                                     render_kw={'autocomplete': 'new-password'})
 
 
 class EditLocalIdentityForm(IndicoForm):
     username = StringField(_('Username'), [DataRequired()], filters=[_tolower])
-    password = PasswordField(_('Current password'), [DataRequired()])
+    password = PasswordField(_('Current password'), [DataRequired()],
+                             render_kw={'autocomplete': 'current-password'})
     new_password = PasswordField(_('New password'), [Optional(), SecurePassword('set-user-password',
-                                                                                username_field='username')])
-    confirm_new_password = PasswordField(_('Confirm password'), [ConfirmPassword('new_password')])
+                                                                                username_field='username')],
+                                 render_kw={'autocomplete': 'new-password'})
+    confirm_new_password = PasswordField(_('Confirm password'), [ConfirmPassword('new_password')],
+                                         render_kw={'autocomplete': 'new-password'})
 
     def __init__(self, *args, **kwargs):
         self.identity = kwargs.pop('identity', None)
@@ -96,8 +101,10 @@ class LocalRegistrationForm(RegistrationForm):
     email = EmailField(_('Email address'), [Email(), _check_existing_email])
     username = StringField(_('Username'), [DataRequired(), _check_existing_username], filters=[_tolower])
     password = PasswordField(_('Password'), [DataRequired(), SecurePassword('set-user-password',
-                                                                            username_field='username')])
-    confirm_password = PasswordField(_('Confirm password'), [DataRequired(), ConfirmPassword('password')])
+                                                                            username_field='username')],
+                             render_kw={'autocomplete': 'new-password'})
+    confirm_password = PasswordField(_('Confirm password'), [DataRequired(), ConfirmPassword('password')],
+                                     render_kw={'autocomplete': 'new-password'})
     comment = TextAreaField(_('Comment'), description=_("You can provide additional information or a comment for the "
                                                         "administrators who will review your registration."))
 
