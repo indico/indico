@@ -29,7 +29,7 @@ def app(request, redis_proc):
         'SECRET_KEY': os.urandom(16),
         'SMTP_USE_CELERY': False,
     }
-    return make_app(set_path=True, testing=True, config_override=config_override)
+    return make_app(testing=True, config_override=config_override)
 
 
 @pytest.fixture(autouse=True)

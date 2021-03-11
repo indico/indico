@@ -9,7 +9,7 @@ import os
 import uuid
 
 from babel.numbers import format_currency, get_currency_name
-from flask import _app_ctx_stack, request
+from flask import _app_ctx_stack, render_template, request
 from flask.helpers import get_root_path
 from flask_pluginengine import current_plugin, plugins_loaded
 from markupsafe import Markup
@@ -55,7 +55,7 @@ from indico.web.util import url_for_index
 from indico.web.views import render_session_bar
 
 
-def configure_app(app, set_path=False):
+def configure_app(app):
     config = IndicoConfig(app.config['INDICO'])  # needed since we don't have an app ctx yet
     app.config['DEBUG'] = config.DEBUG
     app.config['SECRET_KEY'] = config.SECRET_KEY
@@ -80,12 +80,11 @@ def configure_app(app, set_path=False):
     configure_multipass(app, config)
     app.config['PLUGINENGINE_NAMESPACE'] = 'indico.plugins'
     app.config['PLUGINENGINE_PLUGINS'] = config.PLUGINS
-    if set_path:
-        base = url_parse(config.BASE_URL)
-        app.config['PREFERRED_URL_SCHEME'] = base.scheme
-        app.config['SERVER_NAME'] = base.netloc
-        if base.path:
-            app.config['APPLICATION_ROOT'] = base.path
+    base = url_parse(config.BASE_URL)
+    app.config['PREFERRED_URL_SCHEME'] = base.scheme
+    app.config['SERVER_NAME'] = base.netloc
+    if base.path:
+        app.config['APPLICATION_ROOT'] = base.path
     configure_xsendfile(app, config.STATIC_FILE_METHOD)
     if config.USE_PROXY:
         app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_proto=1, x_host=1)
@@ -293,6 +292,7 @@ def extend_url_map(app):
 
 
 def add_handlers(app):
+    app.before_request(canonicalize_url)
     app.before_request(reject_nuls)
     app.after_request(inject_current_url)
     app.register_blueprint(errors_bp)
@@ -320,6 +320,13 @@ def add_plugin_blueprints(app):
         blueprint_names.add(blueprint.name)
         with plugin.plugin_context():
             app.register_blueprint(blueprint)
+
+
+def canonicalize_url():
+    url_root = request.url_root.rstrip('/')
+    if config.BASE_URL != url_root:
+        Logger.get('flask').info('Received request with invalid url root for %s', request.url)
+        return render_template('bad_url_error.html'), 404
 
 
 def reject_nuls():
@@ -350,13 +357,11 @@ def inject_current_url(response):
     return response
 
 
-def make_app(set_path=False, testing=False, config_override=None):
+def make_app(testing=False, config_override=None):
     # If you are reading this code and wonder how to access the app:
     # >>> from flask import current_app as app
     # This only works while inside an application context but you really shouldn't have any
     # reason to access it outside this method without being inside an application context.
-    # When set_path is enabled, SERVER_NAME and APPLICATION_ROOT are set according to BASE_URL
-    # so URLs can be generated without an app context, e.g. in the indico shell
 
     if _app_ctx_stack.top:
         Logger.get('flask').warn('make_app called within app context, using existing app')
@@ -364,7 +369,7 @@ def make_app(set_path=False, testing=False, config_override=None):
     app = IndicoFlask('indico', static_folder='web/static', static_url_path='/', template_folder='web/templates')
     app.config['TESTING'] = testing
     app.config['INDICO'] = load_config(only_defaults=testing, override=config_override)
-    configure_app(app, set_path)
+    configure_app(app)
 
     with app.app_context():
         if not testing:

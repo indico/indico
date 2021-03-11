@@ -50,10 +50,37 @@ Internal Changes
 
 ----
 
-Version 2.3.4
+Version 2.3.5
 -------------
 
 *Unreleased*
+
+Bugfixes
+^^^^^^^^
+
+- None so far :)
+
+Version 2.3.4
+-------------
+
+*Released on March 11, 2021*
+
+Security fixes
+^^^^^^^^^^^^^^
+
+- Fix some open redirects which could help making harmful URLs look more trustworthy by linking
+  to Indico and having it redirect the user to a malicious site (:issue:`4814`, :pr:`4815`)
+- The :data:`BASE_URL` is now always enforced and requests whose Host header does not match
+  are rejected. This prevents malicious actors from tricking Indico into sending e.g. a
+  password reset link to a user that points to a host controlled by the attacker instead of
+  the actual Indico host (:pr:`4815`)
+
+.. note::
+
+    If the webserver is already configured to enforce a canonical host name and redirects or
+    rejects such requests, this cannot be exploited. Additionally, exploiting this problem requires
+    user interaction: they would need to click on a password reset link which they never requested,
+    and which points to a domain that does not match the one where Indico is running.
 
 Improvements
 ^^^^^^^^^^^^
@@ -89,6 +116,7 @@ Version 2.3.3
 
 Security fixes
 ^^^^^^^^^^^^^^
+
 - JSON locale data for invalid locales is no longer cached on disk; instead a 404 error is
   triggered. This avoids creating small files in the cache folder for each invalid locale
   that is requested. (:pr:`4766`)

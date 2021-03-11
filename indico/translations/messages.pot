@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: indico 2.3.4-dev\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2021-02-15 18:13+0100\n"
+"POT-Creation-Date: 2021-03-10 21:51+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -15793,6 +15793,15 @@ msgstr ""
 
 #: indico/web/templates/_session_bar.html:230
 msgid "Login"
+msgstr ""
+
+#: indico/web/templates/bad_url_error.html:1
+msgid "Invalid URL"
+msgstr ""
+
+#: indico/web/templates/bad_url_error.html:4
+#, python-format
+msgid "This Indico instance can only be accessed via <a href=\"%(url)s\">%(url)s</a>"
 msgstr ""
 
 #: indico/web/templates/confirmation_dialog.html:7

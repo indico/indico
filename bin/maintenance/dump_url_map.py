@@ -27,9 +27,9 @@ def get_map_version():
 
 def get_rules(plugins):
     from indico.web.flask.app import make_app
-    app = make_app(set_path=True, testing=True, config_override={'BASE_URL': 'http://localhost/',
-                                                                 'SECRET_KEY': '*' * 16,
-                                                                 'PLUGINS': plugins})
+    app = make_app(testing=True, config_override={'BASE_URL': 'http://localhost/',
+                                                  'SECRET_KEY': '*' * 16,
+                                                  'PLUGINS': plugins})
     return dump_url_map(app.url_map)
 
 

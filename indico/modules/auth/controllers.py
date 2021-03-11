@@ -116,7 +116,10 @@ class RHLogout(RH):
     """Log the user out."""
 
     def _process(self):
-        return multipass.logout(request.args.get('next') or url_for_index(), clear_session=True)
+        next_url = request.args.get('next')
+        if not next_url or not multipass.validate_next_url(next_url):
+            next_url = url_for_index()
+        return multipass.logout(next_url, clear_session=True)
 
 
 def _send_confirmation(email, salt, endpoint, template, template_args=None, url_args=None, data=None):
@@ -497,8 +500,9 @@ class LocalRegistrationHandler(RegistrationHandler):
     form = LocalRegistrationForm
 
     def __init__(self, rh):
-        if 'next' in request.args:
-            session['register_next_url'] = request.args['next']
+        next_url = request.args.get('next')
+        if next_url and multipass.validate_next_url(next_url):
+            session['register_next_url'] = next_url
 
     @property
     def widget_attrs(self):

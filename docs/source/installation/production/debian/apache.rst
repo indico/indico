@@ -138,6 +138,10 @@ most cases.
         LogLevel error
         ServerSignature Off
 
+        <If "%{HTTP_HOST} != 'YOURHOSTNAME'">
+            Redirect 301 / https://YOURHOSTNAME/
+        </If>
+
         AliasMatch "^/(images|fonts)(.*)/(.+?)(__v[0-9a-f]+)?\.([^.]+)$" "/opt/indico/web/static/$1$2/$3.$5"
         AliasMatch "^/(css|dist|images|fonts)/(.*)$" "/opt/indico/web/static/$1/$2"
         Alias /robots.txt /opt/indico/web/static/robots.txt
