@@ -19,6 +19,14 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   const eventId = calendarContainer.dataset.eventId;
+  const options = [{key: 'event', text: Translate.string('Event'), extraParams: {}}];
+  if (parseInt(calendarContainer.dataset.eventContribs, 10) > 0) {
+    options.push({
+      key: 'contribution',
+      text: Translate.string('Detailed timetable'),
+      extraParams: {detail: 'contributions'},
+    });
+  }
 
   ReactDOM.render(
     <ICSCalendarLink
@@ -33,14 +41,7 @@ document.addEventListener('DOMContentLoaded', () => {
       )}
       dropdownPosition="top left"
       popupPosition="bottom right"
-      options={[
-        {key: 'event', text: Translate.string('Event'), extraParams: {}},
-        {
-          key: 'contributions',
-          text: Translate.string('Detailed timetable'),
-          extraParams: {detail: 'contributions'},
-        },
-      ]}
+      options={options}
     />,
     calendarContainer
   );
