@@ -34,6 +34,8 @@ Improvements
   the calendar link widgets in category, event, session and contribution views with the
   more modern ones used in dashboard (:issue:`4776`, :pr:`4801`)
 - Add an option to export editables to JSON (:issue:`4767`, :pr:`4810`)
+- Passwords are now checked against a list of breached passwords ("Have I Been Pwned")
+  in a secure and anonymous way that does not disclose any data (:pr:`4817`)
 
 Internal Changes
 ^^^^^^^^^^^^^^^^
@@ -46,6 +48,8 @@ Internal Changes
   did not provide much benefit, and it is no longer compatible with the latest Celery version
 - ``session.user`` now returns the user related to the current request, regardless of whether
   it's coming from OAuth, a signed url or the actual session (:pr:`4803`)
+- Add a new ``check_password_secure`` signal that can be used to implement additional password
+  security checks (:pr:`4817`)
 
 
 ----

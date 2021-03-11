@@ -86,3 +86,11 @@ db_schema_created = _signals.signal('db-schema-created', """
 Executed when a new database schema is created.  The *sender* is the
 name of the schema.
 """)
+
+check_password_secure = _signals.signal('check-password-secure', """
+Check whether a password is secure. The *sender* is a string indicating
+the context where the password check happens, the plaintext password is
+sent in the *password* kwarg. To fail the security check for a password,
+the signal handler should return a string describing why the password is
+not secure.
+""")
