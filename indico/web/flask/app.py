@@ -400,4 +400,5 @@ def make_app(testing=False, config_override=None):
         add_plugin_blueprints(app)
         # themes can be provided by plugins
         signals.app_created.send(app)
+        config.validate()
     return app

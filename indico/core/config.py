@@ -49,6 +49,7 @@ DEFAULTS = {
     'EXPERIMENTAL_EDITING_SERVICE': False,
     'EXTERNAL_REGISTRATION_URL': None,
     'HELP_URL': 'https://learn.getindico.io',
+    'FAILED_LOGIN_RATE_LIMIT': '5 per 15 minutes; 10 per day',
     'IDENTITY_PROVIDERS': {},
     'LOCAL_IDENTITIES': True,
     'LOCAL_MODERATION': False,
@@ -157,8 +158,6 @@ def _convert_key(name):
 
 
 def _postprocess_config(data):
-    if data['DEFAULT_TIMEZONE'] not in pytz.all_timezones_set:
-        raise ValueError('Invalid default timezone: {}'.format(data['DEFAULT_TIMEZONE']))
     data['BASE_URL'] = data['BASE_URL'].rstrip('/')
     data['STATIC_SITE_STORAGE'] = data['STATIC_SITE_STORAGE'] or data['ATTACHMENT_STORAGE']
     if data['DISABLE_CELERY_CHECK'] is None:
@@ -257,6 +256,12 @@ class IndicoConfig:
     @property
     def LATEX_ENABLED(self):
         return bool(self.XELATEX_PATH)
+
+    def validate(self):
+        from indico.core.auth import login_rate_limiter
+        login_rate_limiter._get_current_object()  # fail in case FAILED_LOGIN_RATE_LIMIT invalid
+        if self.DEFAULT_TIMEZONE not in pytz.all_timezones_set:
+            raise ValueError(f'Invalid default timezone: {self.DEFAULT_TIMEZONE}')
 
     def __getattr__(self, name):
         try:

@@ -5,13 +5,19 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
+import functools
+
 from flask import current_app, request
 from flask_multipass import InvalidCredentials, Multipass, NoSuchUser
+from werkzeug.local import LocalProxy
 
+from indico.core.config import config
+from indico.core.limiter import make_rate_limiter
 from indico.core.logger import Logger
 
 
 logger = Logger.get('auth')
+login_rate_limiter = LocalProxy(functools.cache(lambda: make_rate_limiter('login', config.FAILED_LOGIN_RATE_LIMIT)))
 
 
 class IndicoMultipass(Multipass):
@@ -73,6 +79,7 @@ class IndicoMultipass(Multipass):
 
     def handle_auth_error(self, exc, redirect_to_login=False):
         if isinstance(exc, (NoSuchUser, InvalidCredentials)):
+            login_rate_limiter.hit()
             logger.warning('Invalid credentials (ip=%s, provider=%s): %s',
                            request.remote_addr, exc.provider.name if exc.provider else None, exc)
         else:

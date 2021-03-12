@@ -12,7 +12,7 @@ from webargs import fields
 from werkzeug.exceptions import BadRequest, Forbidden, NotFound
 
 from indico.core import signals
-from indico.core.auth import multipass
+from indico.core.auth import login_rate_limiter, multipass
 from indico.core.config import config
 from indico.core.db import db
 from indico.core.notifications import make_email, send_email
@@ -85,21 +85,26 @@ class RHLogin(RH):
             return provider.initiate_external_login()
 
         # If we have a POST request we submitted a login form for a local provider
+        rate_limit_exceeded = False
         if request.method == 'POST':
             active_provider = provider = _get_provider(request.form['_provider'], False)
             form = provider.login_form()
-            if form.validate_on_submit():
+            rate_limit_exceeded = not login_rate_limiter.test()
+            if not rate_limit_exceeded and form.validate_on_submit():
                 response = multipass.handle_login_form(provider, form.data)
                 if response:
                     return response
+                # re-check since a failed login may have triggered the rate limit
+                rate_limit_exceeded = not login_rate_limiter.test()
         # Otherwise we show the form for the default provider
         else:
             active_provider = multipass.default_local_auth_provider
             form = active_provider.login_form() if active_provider else None
 
         providers = list(multipass.auth_providers.values())
+        retry_in = login_rate_limiter.get_reset_delay() if rate_limit_exceeded else None
         return render_template('auth/login_page.html', form=form, providers=providers, active_provider=active_provider,
-                               login_reason=login_reason)
+                               login_reason=login_reason, retry_in=retry_in)
 
 
 class RHLoginForm(RH):

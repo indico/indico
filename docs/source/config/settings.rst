@@ -65,6 +65,26 @@ Authentication
 
     Default: ``False``
 
+.. data:: FAILED_LOGIN_RATE_LIMIT
+
+    Applies a rate limit to failed login attempts due to an invalid username
+    or password. When specifying multiple rate limits separated with a semicolon,
+    they are checked in that specific order, which can allow for a short burst of
+    attempts (e.g. a legitimate user trying multiple passwords they commonly use)
+    and then slowing down more strongly (in case someone tries to brute-force more
+    than just a few passwords).
+
+    Rate limiting is applied by IP address and only failed logins count against the
+    rate limit. It also does not apply to login attempts using external login systems
+    (SSO) as failures there are rarely related to invalid credentials coming from the
+    user (these would be rejected on the SSO side, which should implement its own rate
+    limiting).
+
+    The default allows a burst of 15 attempts, and then only 5 attempts every 15
+    minutes for the next 24 hours.  Setting the rate limit to ``None`` disables it.
+
+    Default: ``'5 per 15 minutes; 10 per day'``
+
 .. data:: EXTERNAL_REGISTRATION_URL
 
     The URL to an external page where people can register an account that
