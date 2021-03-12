@@ -36,7 +36,7 @@ document.addEventListener('DOMContentLoaded', () => {
       options={[
         {key: 'event', text: Translate.string('Event'), extraParams: {}},
         {
-          key: 'event',
+          key: 'contributions',
           text: Translate.string('Detailed timetable'),
           extraParams: {detail: 'contributions'},
         },
