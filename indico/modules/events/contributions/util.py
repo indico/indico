@@ -8,7 +8,6 @@
 import csv
 from collections import defaultdict
 from datetime import timedelta
-from io import BytesIO
 from operator import attrgetter
 
 import dateutil.parser
@@ -37,7 +36,6 @@ from indico.util.spreadsheets import csv_text_io_wrapper
 from indico.util.string import validate_email
 from indico.web.flask.templating import get_template_module
 from indico.web.flask.util import send_file, url_for
-from indico.web.http_api.metadata.serializer import Serializer
 from indico.web.util import jsonify_data
 
 
@@ -256,12 +254,6 @@ def serialize_contribution_for_ical(contrib):
         'speakers': [serialize_person_link(x) for x in contrib.speakers],
         'description': contrib.description
     }
-
-
-def get_contribution_ical_file(contrib):
-    data = {'results': serialize_contribution_for_ical(contrib)}
-    serializer = Serializer.create('ics')
-    return BytesIO(serializer(data))
 
 
 def import_contributions_from_csv(event, f):

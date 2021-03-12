@@ -12,8 +12,9 @@ from sqlalchemy.orm import joinedload, subqueryload
 from werkzeug.exceptions import Forbidden
 
 from indico.modules.events.controllers.base import RHDisplayEventBase
+from indico.modules.events.sessions.ical import session_to_ical
 from indico.modules.events.sessions.models.sessions import Session
-from indico.modules.events.sessions.util import get_session_ical_file, get_session_timetable_pdf, get_sessions_for_user
+from indico.modules.events.sessions.util import get_session_timetable_pdf, get_sessions_for_user
 from indico.modules.events.sessions.views import WPDisplayMySessionsConference, WPDisplaySession
 from indico.web.flask.util import send_file
 from indico.web.rh import allow_signed_url
@@ -72,7 +73,10 @@ class RHDisplaySession(RHDisplaySessionBase):
 @allow_signed_url
 class RHExportSessionToICAL(RHDisplaySessionBase):
     def _process(self):
-        return send_file('session.ics', get_session_ical_file(self.session), 'text/calendar')
+        detail_level = request.args.get('detail', 'sessions')
+
+        return send_file('session.ics', BytesIO(session_to_ical(self.session, detail_level=detail_level)),
+                         'text/calendar')
 
 
 class RHExportSessionTimetableToPDF(RHDisplaySessionBase):

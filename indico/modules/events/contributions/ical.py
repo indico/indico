@@ -5,57 +5,30 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from icalendar import Event
 from icalendar.cal import Calendar
-from lxml import html
-from lxml.etree import ParserError
 from werkzeug.urls import url_parse
 
 from indico.core.config import config
-from indico.util.date_time import now_utc
+from indico.modules.events.ical import generate_basic_component
+from indico.web.flask.util import url_for
 
 
-def generate_contribution_component(contribution, event_uid):
+def generate_contribution_component(contribution, related_to_uid=None):
     """Generates an Event icalendar component from an Indico Contribution.
 
     :param contribution: The Indico Contribution to use
+    :param related_to_uid: Indico uid used in related_to field
     :returns: an icalendar Event
     """
 
-    cal_contribution = Event()
+    uid = 'indico-contribution-{}@{}'.format(contribution.id, url_parse(config.BASE_URL).host)
+    url = url_for('contributions.display_contribution', contribution, _external=True)
+    component = generate_basic_component(contribution, uid, url)
 
-    cal_contribution.add(
-        'uid', 'indico-contribution-{}@{}'.format(contribution.id, url_parse(config.BASE_URL).host)
-    )
-    cal_contribution.add('dtstamp', now_utc(False))
-    cal_contribution.add('dtstart', contribution.start_dt)
-    cal_contribution.add('dtend', contribution.end_dt)
-    cal_contribution.add('summary', contribution.title)
+    if related_to_uid:
+        component.add('related_to', related_to_uid)
 
-    if event_uid:
-        cal_contribution.add('related_to', event_uid)
-
-    location = (f'{contribution.room_name} ({contribution.venue_name})'
-                if contribution.venue_name and contribution.room_name
-                else (contribution.venue_name or contribution.room_name))
-    if location:
-        cal_contribution.add('location', location)
-
-    description = []
-    if contribution.person_links:
-        speakers = [f'{x.full_name} ({x.affiliation})' if x.affiliation else x.full_name
-                    for x in contribution.person_links]
-        description.append('Speakers: {}'.format(', '.join(speakers)))
-    if contribution.description:
-        desc_text = str(contribution.description) or '<p/>'  # get rid of RichMarkup
-        try:
-            description.append(str(html.fromstring(desc_text).text_content()))
-        except ParserError:
-            # this happens if desc_text only contains a html comment
-            pass
-    cal_contribution.add('description', '\n'.join(description))
-
-    return cal_contribution
+    return component
 
 
 def contribution_to_ical(contribution):
@@ -68,8 +41,9 @@ def contribution_to_ical(contribution):
     calendar.add('version', '2.0')
     calendar.add('prodid', '-//CERN//INDICO//EN')
 
-    cal_contribution = generate_contribution_component(contribution)
-    calendar.add_component(cal_contribution)
+    related_event_uid = 'indico-event-{}@{}'.format(contribution.event.id, url_parse(config.BASE_URL).host)
+    component = generate_contribution_component(contribution, related_event_uid)
+    calendar.add_component(component)
 
     data = calendar.to_ical()
 

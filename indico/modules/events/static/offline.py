@@ -32,13 +32,14 @@ from indico.modules.attachments.models.folders import AttachmentFolder
 from indico.modules.events.contributions.controllers.display import (RHAuthorList, RHContributionAuthor,
                                                                      RHContributionDisplay, RHContributionList,
                                                                      RHSpeakerList, RHSubcontributionDisplay)
-from indico.modules.events.contributions.util import get_contribution_ical_file
+from indico.modules.events.contributions.ical import contribution_to_ical
 from indico.modules.events.layout.models.menu import MenuEntryType
 from indico.modules.events.layout.util import menu_entries_for_event
 from indico.modules.events.models.events import EventType
 from indico.modules.events.registration.controllers.display import RHParticipantList
 from indico.modules.events.sessions.controllers.display import RHDisplaySession
-from indico.modules.events.sessions.util import get_session_ical_file, get_session_timetable_pdf
+from indico.modules.events.sessions.ical import session_to_ical
+from indico.modules.events.sessions.util import get_session_timetable_pdf
 from indico.modules.events.static.util import collect_static_files, override_request_endpoint, rewrite_css_urls
 from indico.modules.events.timetable.controllers.display import RHTimetable
 from indico.modules.events.timetable.util import get_timetable_offline_pdf_generator
@@ -343,7 +344,7 @@ class StaticConferenceCreator(StaticEventCreator):
             self._get_author(contrib, author)
 
         if contrib.timetable_entry:
-            self._add_file(get_contribution_ical_file(contrib), 'contributions.export_ics', contrib)
+            self._add_file(contribution_to_ical(contrib), 'contributions.export_ics', contrib)
 
     def _get_sub_contrib(self, subcontrib):
         self._add_from_rh(RHSubcontributionDisplay, WPStaticSubcontributionDisplay,
@@ -366,7 +367,7 @@ class StaticConferenceCreator(StaticEventCreator):
         pdf = get_session_timetable_pdf(session, tz=self._display_tz)
         self._add_pdf(session, 'sessions.export_session_timetable', pdf)
 
-        self._add_file(get_session_ical_file(session), 'sessions.export_ics', session)
+        self._add_file(session_to_ical(session), 'sessions.export_ics', session)
 
     def _add_pdf(self, target, uh_or_endpoint, generator_class_or_instance, **kwargs):
         if inspect.isclass(generator_class_or_instance):
