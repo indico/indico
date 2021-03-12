@@ -77,6 +77,8 @@ flask-babelex==0.9.4
     # via -r requirements.in
 flask-caching==1.10.0
     # via -r requirements.in
+flask-limiter==1.4
+    # via -r requirements.in
 flask-marshmallow==0.14.0
     # via -r requirements.in
 flask-migrate==2.7.0
@@ -98,6 +100,7 @@ flask==1.1.2
     #   -r requirements.in
     #   flask-babelex
     #   flask-caching
+    #   flask-limiter
     #   flask-marshmallow
     #   flask-migrate
     #   flask-multipass
@@ -140,6 +143,8 @@ jsonschema==3.2.0
     # via -r requirements.in
 kombu==5.0.2
     # via celery
+limits==1.5.1
+    # via flask-limiter
 lxml[html5]==4.6.2
     # via
     #   -r requirements.in
@@ -241,9 +246,11 @@ six==1.15.0
     #   bcrypt
     #   bleach
     #   click-repl
+    #   flask-limiter
     #   flask-marshmallow
     #   html5lib
     #   jsonschema
+    #   limits
     #   python-dateutil
     #   qrcode
 speaklater==1.3
