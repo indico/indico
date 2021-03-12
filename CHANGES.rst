@@ -38,6 +38,8 @@ Improvements
   in a secure and anonymous way that does not disclose any data. If a user logs in with
   an insecure password, they are forced to change it before they can continue using Indico
   (:pr:`4817`)
+- Failed login attempts now trigger rate limiting to prevent brute-force attacks
+  (:issue:`1550`, :pr:`4817`)
 
 Internal Changes
 ^^^^^^^^^^^^^^^^
