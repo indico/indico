@@ -13,6 +13,7 @@ email-validator
 feedgen
 flask-babelex
 flask-caching
+flask-limiter
 flask-marshmallow
 flask-migrate
 flask-multipass

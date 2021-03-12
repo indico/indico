@@ -31,6 +31,7 @@ from indico.core.config import IndicoConfig, config, load_config
 from indico.core.db.sqlalchemy import db
 from indico.core.db.sqlalchemy.logging import apply_db_loggers
 from indico.core.db.sqlalchemy.util.models import import_all_models
+from indico.core.limiter import limiter
 from indico.core.logger import Logger
 from indico.core.marshmallow import mm
 from indico.core.oauth.oauth2 import setup_oauth_provider
@@ -76,6 +77,7 @@ def configure_app(app):
     app.config['TRAP_BAD_REQUEST_ERRORS'] = config.DEBUG
     app.config['SESSION_COOKIE_NAME'] = 'indico_session'
     app.config['PERMANENT_SESSION_LIFETIME'] = config.SESSION_LIFETIME
+    app.config['RATELIMIT_STORAGE_URL'] = config.REDIS_CACHE_URL
     configure_cache(app, config)
     configure_multipass(app, config)
     app.config['PLUGINENGINE_NAMESPACE'] = 'indico.plugins'
@@ -385,6 +387,7 @@ def make_app(testing=False, config_override=None):
         setup_jinja(app)
         configure_db(app)
         mm.init_app(app)  # must be called after `configure_db`!
+        limiter.init_app(app)
         extend_url_map(app)
         add_handlers(app)
         setup_request_stats(app)
