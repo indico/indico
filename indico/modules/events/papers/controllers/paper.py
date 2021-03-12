@@ -10,8 +10,8 @@ from collections import defaultdict
 from itertools import chain
 from operator import attrgetter
 
-from flask import flash, request, session
-from sqlalchemy.orm import selectinload
+from flask import flash, jsonify, request, session
+from sqlalchemy.orm import selectinload, subqueryload
 from werkzeug.exceptions import Forbidden
 from werkzeug.utils import cached_property
 
@@ -21,6 +21,7 @@ from indico.modules.events.papers.forms import BulkPaperJudgmentForm
 from indico.modules.events.papers.lists import PaperAssignmentListGenerator, PaperJudgingAreaListGeneratorDisplay
 from indico.modules.events.papers.models.revisions import PaperRevisionState
 from indico.modules.events.papers.operations import judge_paper, update_reviewing_roles
+from indico.modules.events.papers.schemas import CallForPapersSchema, PaperDumpSchema
 from indico.modules.events.papers.settings import PaperReviewingRole
 from indico.modules.events.papers.views import WPDisplayJudgingArea, WPManagePapers
 from indico.modules.events.util import ZipGeneratorMixin
@@ -122,6 +123,37 @@ class RHDownloadPapers(ZipGeneratorMixin, RHPapersActionBase):
 
     def _process(self):
         return self._generate_zip_file(self.contributions, name_prefix='paper-files', name_suffix=self.event.id)
+
+
+class RHExportPapersJSON(RHPapersActionBase):
+    """Generate a JSON file with all the paper details."""
+
+    ALLOW_LOCKED = True
+
+    def _check_access(self):
+        RHPapersActionBase._check_access(self)
+        if not self.management:
+            raise Forbidden
+
+    def _get_contrib_query_options(self):
+        revisions_strategy = subqueryload('_paper_revisions')
+        revisions_strategy.subqueryload('comments').joinedload('user')
+        revisions_strategy.subqueryload('files')
+        reviews_strategy = revisions_strategy.subqueryload('reviews')
+        reviews_strategy.joinedload('user')
+        ratings_strategy = reviews_strategy.subqueryload('ratings')
+        ratings_strategy.joinedload('question')
+        revisions_strategy.joinedload('submitter')
+        revisions_strategy.joinedload('judge')
+        return (revisions_strategy,)
+
+    def _process(self):
+        papers = [c.paper for c in self.contributions if c.paper]
+        cfp_dump = CallForPapersSchema().dump(self.event.cfp)
+        papers_dump = PaperDumpSchema(many=True).dump(papers)
+        response = jsonify(version=1, papers=papers_dump, **cfp_dump)
+        response.headers['Content-Disposition'] = 'attachment; filename="papers.json"'
+        return response
 
 
 class RHJudgePapers(RHPapersActionBase):

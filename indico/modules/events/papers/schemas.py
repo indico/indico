@@ -168,6 +168,19 @@ class PaperReviewSchema(mm.SQLAlchemyAutoSchema):
         return review.can_edit(user, check_state=True) and is_type_reviewing_possible(cfp, review.type)
 
 
+class PaperReviewDumpSchema(PaperReviewSchema):
+    class Meta(PaperReviewSchema.Meta):
+        exclude = [f for f in PaperReviewSchema.Meta.fields if f.startswith('can_')]
+
+
+class PaperRevisionDumpSchema(PaperRevisionSchema):
+    class Meta(PaperRevisionSchema.Meta):
+        fields = PaperRevisionSchema.Meta.fields + ('reviews',)
+        exclude = ('reviewer_data',)
+
+    reviews = List(Nested(PaperReviewDumpSchema))
+
+
 class PaperReviewCommentSchema(mm.SQLAlchemyAutoSchema):
     user = Nested(UserSchema)
     visibility = Nested(PaperCommentVisibilitySchema)
@@ -201,6 +214,13 @@ class PaperSchema(mm.Schema):
         lambda paper, ctx: paper.event.has_feature('editing')
         and 'paper' in editing_settings.get(paper.event, 'editable_types')
     )
+
+
+class PaperDumpSchema(PaperSchema):
+    revisions = List(Nested(PaperRevisionDumpSchema))
+
+    class Meta(PaperSchema.Meta):
+        fields = ('is_in_final_state', 'contribution', 'revisions', 'state')
 
 
 paper_schema = PaperSchema()

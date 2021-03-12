@@ -94,6 +94,9 @@ for prefix, is_management in (('/manage/papers/assignment-list', True), ('/paper
                      paper.RHAssignPapers, methods=('POST',), defaults=defaults)
     _bp.add_url_rule(prefix + '/unassign/<any(judge,content_reviewer,layout_reviewer):role>', 'unassign_papers',
                      paper.RHUnassignPapers, methods=('POST',), defaults=defaults)
+    if is_management:
+        _bp.add_url_rule(prefix + '/export-json', 'export_json', paper.RHExportPapersJSON, methods=('POST',),
+                         defaults=defaults)
 
 
 @_bp.url_defaults
