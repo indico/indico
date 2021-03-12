@@ -18,9 +18,9 @@ document.addEventListener('DOMContentLoaded', () => {
     return;
   }
 
-  const eventId = calendarContainer.dataset.eventId;
+  const {eventId, eventContribCount} = calendarContainer.dataset.eventId;
   const options = [{key: 'event', text: Translate.string('Event'), extraParams: {}}];
-  if (parseInt(calendarContainer.dataset.eventContribs, 10) > 0) {
+  if (parseInt(eventContribCount, 10) > 0) {
     options.push({
       key: 'contribution',
       text: Translate.string('Detailed timetable'),

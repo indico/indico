@@ -18,14 +18,22 @@ document.addEventListener('DOMContentLoaded', () => {
     return;
   }
 
-  const {eventId, sessionId} = calendarContainer.dataset;
+  const {eventId, sessionId, sessionContribCount} = calendarContainer.dataset;
+  const options = [{key: 'session', text: Translate.string('Session'), extraParams: {}}];
+  if (parseInt(sessionContribCount, 10) > 0) {
+    options.push({
+      key: 'contribution',
+      text: Translate.string('Detailed timetable'),
+      extraParams: {detail: 'contributions'},
+    });
+  }
 
   ReactDOM.render(
     <ICSCalendarLink
       endpoint="sessions.export_ics"
       params={{event_id: eventId, session_id: sessionId}}
       renderButton={onClick => <IButton icon="calendar" onClick={onClick} />}
-      options={[{key: 'session', text: Translate.string('Session'), extraParams: {}}]}
+      options={options}
     />,
     calendarContainer
   );
