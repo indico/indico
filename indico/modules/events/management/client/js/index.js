@@ -107,7 +107,7 @@ import './badges';
   function toggleResetBtn() {
     const isInitialState =
       $('#person-filters [data-filter]:checked').length ===
-      $('#person-filters [data-filter]:not(#filter-no-account)').length;
+      $('#person-filters [data-filter]:not(#filter-no-account,#filter-no-registration)').length;
     $('.js-reset-role-filter').toggleClass('disabled', isInitialState);
   }
 
@@ -129,6 +129,7 @@ import './badges';
     options = $.extend(
       {
         hasNoAccountFilter: false,
+        hasNoRegistrationFilter: false,
       },
       options
     );
@@ -235,6 +236,27 @@ import './badges';
       });
     }
 
+    if (options.hasNoRegistrationFilter) {
+      $('.js-event-person-list [data-filter]:not(#filter-no-registration)').on(
+        'change',
+        function() {
+          $('#filter-no-registration').prop('checked', false);
+          refreshPersonFilters();
+          applySearchFilters();
+        }
+      );
+      $('#filter-no-registration').on('change', function() {
+        if (this.checked) {
+          $('.js-event-person-list [data-filter]:checked:not(#filter-no-registration)').prop(
+            'checked',
+            false
+          );
+        }
+        refreshPersonFilters();
+        applySearchFilters();
+      });
+    }
+
     initTooltip();
 
     const $personFilters = $('#person-filters');
@@ -248,8 +270,10 @@ import './badges';
     $personFilters.find('.js-reset-role-filter').on('click', function() {
       $('.js-event-person-list [data-filter]').each(function() {
         const $this = $(this);
-        $this.prop('checked', !$this.is('#filter-no-account'));
-        $this.parent().toggleClass('enabled', !$this.is('#filter-no-account'));
+        $this.prop('checked', !$this.is('#filter-no-account, #filter-no-registration'));
+        $this
+          .parent()
+          .toggleClass('enabled', !$this.is('#filter-no-account, #filter-no-registration'));
       });
       refreshPersonFilters();
       applySearchFilters();
