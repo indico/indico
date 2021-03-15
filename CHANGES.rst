@@ -40,6 +40,8 @@ Improvements
   (:pr:`4817`)
 - Failed login attempts now trigger rate limiting to prevent brute-force attacks
   (:issue:`1550`, :pr:`4817`)
+- Allow filtering the "Participant Roles" page by users who have not registered for the event
+  (:issue:`4763`, :pr:`4822`)
 
 Internal Changes
 ^^^^^^^^^^^^^^^^

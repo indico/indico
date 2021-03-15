@@ -169,6 +169,7 @@ class RHPersonsBase(RHManageEventBase):
 
         internal_role_users = defaultdict(lambda: {'roles': {},
                                                    'person': [],
+                                                   'registrations': [],
                                                    'has_event_person': False,
                                                    'id_field_name': 'user_id'})
         for user, roles in event_user_roles.items():
@@ -218,6 +219,9 @@ class RHPersonsList(RHPersonsBase):
                 num_no_account += 1
         custom_roles = {f'custom_{r.id}': {'name': r.name, 'code': r.code, 'color': r.color}
                         for r in self.event.roles}
+        for person_data in persons.values():
+            if not person_data['registrations']:
+                person_data['roles']['no_registration'] = True
         return WPManagePersons.render_template('management/person_list.html', self.event, persons=person_list,
                                                num_no_account=num_no_account, builtin_roles=BUILTIN_ROLES,
                                                custom_roles=custom_roles)
