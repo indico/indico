@@ -43,6 +43,12 @@ Improvements
 - Allow filtering the "Participant Roles" page by users who have not registered for the event
   (:issue:`4763`, :pr:`4822`)
 
+Bugfixes
+^^^^^^^^
+
+- Take registrations of users who are only members of a custom event role into account on the
+  "Participant Roles" page (:pr:`4822`)
+
 Internal Changes
 ^^^^^^^^^^^^^^^^
 
