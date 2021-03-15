@@ -132,6 +132,8 @@ class RHDeleteTrack(RHManageTrackBase):
 
 
 class RHDisplayTracks(RHDisplayEventBase):
+    view_class = WPDisplayTracks
+
     def _process(self):
         program = track_settings.get(self.event, 'program')
         render_mode = track_settings.get(self.event, 'program_render_mode')
@@ -141,7 +143,7 @@ class RHDisplayTracks(RHDisplayEventBase):
                   .all())
         track_groups = self.event.track_groups
         items = sorted(tracks + track_groups, key=attrgetter('position'))
-        return WPDisplayTracks.render_template('display.html', self.event, program=program, items=items)
+        return self.view_class.render_template('display.html', self.event, program=program, items=items)
 
 
 class RHTracksPDF(RHDisplayEventBase):
