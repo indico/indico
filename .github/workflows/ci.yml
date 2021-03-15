@@ -243,7 +243,6 @@ jobs:
 
 
   test-js:
-    if: false # XXX: enzyme is not yet compatible with react 17 - https://github.com/enzymejs/enzyme/issues/2429
     needs: setup
     runs-on: ubuntu-20.04
     steps:
@@ -278,8 +277,9 @@ jobs:
         run: pip install -e .
       # END common steps
 
-      - name: Run jest tests
-        run: npm test
+      # XXX: enzyme is not yet compatible with react 17 - https://github.com/enzymejs/enzyme/issues/2429
+      # - name: Run jest tests
+      #   run: npm test
 
       - name: Try building assets
         run: python bin/maintenance/build-assets.py indico --dev
