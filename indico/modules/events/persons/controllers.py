@@ -181,6 +181,13 @@ class RHPersonsBase(RHManageEventBase):
                 user_metadata['roles'][f'custom_{role.id}'] = {'name': role.name, 'code': role.code, 'css': role.css}
             user_metadata['roles'] = dict(sorted(user_metadata['roles'].items(), key=lambda x: x[1]['code']))
 
+        regs = (Registration.query
+                .with_parent(self.event)
+                .filter(Registration.user_id.in_(data['person'].id for data in internal_role_users.values()))
+                .all())
+        for reg in regs:
+            internal_role_users[reg.user.email]['registrations'].append(reg)
+
         # Some EventPersons will have no roles since they were connected to deleted things
         persons = {email: data for email, data in persons.items() if any(data['roles'].values())}
         persons = dict(persons, **internal_role_users)
