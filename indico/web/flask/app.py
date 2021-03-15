@@ -77,7 +77,7 @@ def configure_app(app):
     app.config['TRAP_BAD_REQUEST_ERRORS'] = config.DEBUG
     app.config['SESSION_COOKIE_NAME'] = 'indico_session'
     app.config['PERMANENT_SESSION_LIFETIME'] = config.SESSION_LIFETIME
-    app.config['RATELIMIT_STORAGE_URL'] = config.REDIS_CACHE_URL
+    app.config['RATELIMIT_STORAGE_URL'] = config.REDIS_CACHE_URL or 'memory://'
     configure_cache(app, config)
     configure_multipass(app, config)
     app.config['PLUGINENGINE_NAMESPACE'] = 'indico.plugins'
@@ -103,7 +103,7 @@ def configure_cache(app, config):
         app.config['CACHE_TYPE'] = 'indico.core.cache.IndicoRedisCache'
         app.config['CACHE_REDIS_URL'] = config.REDIS_CACHE_URL
     else:
-        app.config['CACHE_TYPE'] = 'null'
+        app.config['CACHE_TYPE'] = 'flask_caching.backends.nullcache.NullCache'
         app.config['CACHE_NO_NULL_WARNING'] = True
 
 
