@@ -18,11 +18,11 @@ document.addEventListener('DOMContentLoaded', () => {
     return;
   }
 
-  const {eventId, eventContribCount} = calendarContainer.dataset.eventId;
+  const {eventId, eventContribCount} = calendarContainer.dataset;
   const options = [{key: 'event', text: Translate.string('Event'), extraParams: {}}];
   if (parseInt(eventContribCount, 10) > 0) {
     options.push({
-      key: 'contribution',
+      key: 'contributions',
       text: Translate.string('Detailed timetable'),
       extraParams: {detail: 'contributions'},
     });

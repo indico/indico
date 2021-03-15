@@ -14,14 +14,9 @@ from indico.web.flask.util import url_for
 
 
 def generate_session_component(session, related_to_uid=None):
-    """Generates an Event icalendar component from an Indico Session.
+    """Generates an Event iCalendar component from an Indico Session."""
 
-    :param session: The Indico Session to use
-    :param related_to_uid: Indico uid used in related_to field
-    :returns: an icalendar Event
-    """
-
-    uid = 'indico-session-{}@{}'.format(session.id, url_parse(config.BASE_URL).host)
+    uid = f'indico-session-{session.id}@{url_parse(config.BASE_URL).host}'
     url = url_for('sessions.display_session', session, _external=True)
     component = generate_basic_component(session, uid, url)
 
@@ -31,28 +26,27 @@ def generate_session_component(session, related_to_uid=None):
     return component
 
 
-def session_to_ical(session, detail_level='sessions'):
-    """Serialize a contribution into an ical.
+def session_to_ical(session, detailed=False):
+    """Serialize a session into an iCal.
 
-    :param event: The contribution to serialize
+    :param session: The session to serialize
+    :param detailed: If True, iCal will include the session's contributions
     """
 
     calendar = Calendar()
     calendar.add('version', '2.0')
     calendar.add('prodid', '-//CERN//INDICO//EN')
 
-    related_event_uid = 'indico-event-{}@{}'.format(session.event.id, url_parse(config.BASE_URL).host)
+    related_event_uid = f'indico-event-{session.event.id}@{url_parse(config.BASE_URL).host}'
 
-    if detail_level == 'sessions':
+    if not detailed:
         component = generate_session_component(session, related_event_uid)
         calendar.add_component(component)
-    elif detail_level == 'contributions':
+    else:
         from indico.modules.events.contributions.ical import generate_contribution_component
         components = [generate_contribution_component(contribution, related_event_uid)
                       for contribution in session.contributions]
         for component in components:
             calendar.add_component(component)
 
-    data = calendar.to_ical()
-
-    return data
+    return calendar.to_ical()

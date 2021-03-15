@@ -24,8 +24,8 @@ from indico.web.rh import allow_signed_url
 @allow_signed_url
 class RHExportEventICAL(RHDisplayEventBase):
     def _process(self):
-        detail_level = request.args.get('detail', 'events')
-        event_ical = event_to_ical(self.event, session.user, detail_level)
+        detailed = request.args.get('detail', 'events') == 'contributions'
+        event_ical = event_to_ical(self.event, session.user, detailed)
         return send_file('event.ics', BytesIO(event_ical), 'text/calendar')
 
 

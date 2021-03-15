@@ -18,13 +18,13 @@ from indico.util.signals import values_from_signal
 
 
 def generate_basic_component(entity, uid=None, url=None):
-    """Generates an icalendar component with basic common properties.
+    """Generates an iCalendar component with basic common properties.
 
     :param entity: Event/session/contribution where properties come from
     :param uid: UID for the component
     :param url: URL for the component (defaults to `entity.external_url`)
 
-    :returns: icalendar event with basic properties
+    :returns: iCalendar event with basic properties
     """
 
     component = Event()
@@ -48,13 +48,7 @@ def generate_basic_component(entity, uid=None, url=None):
     if location:
         component.add('location', location)
 
-    # speakers are located in a different variable in contributions
-    speaker_list = None
-    if hasattr(entity, 'person_links'):
-        speaker_list = entity.person_links
-    elif hasattr(entity, 'speakers'):
-        speaker_list = entity.speakers
-
+    speaker_list = getattr(entity, 'person_links', [])
     description = []
     if speaker_list:
         speakers = [f'{x.full_name} ({x.affiliation})' if x.affiliation else x.full_name
@@ -67,20 +61,16 @@ def generate_basic_component(entity, uid=None, url=None):
         except ParserError:
             # this happens if desc_text only contains a html comment
             pass
-    component.add('description', '\n'.join(description))
+    if len(description):
+        component.add('description', '\n'.join(description))
 
     return component
 
 
 def generate_event_component(event):
-    """Generates an event icalendar component from an Indico event.
+    """Generates an event icalendar component from an Indico event."""
 
-    :param event: The Indico event to use
-
-    :returns: an icalendar Event
-    """
-
-    uid = 'indico-event-{}@{}'.format(event.id, url_parse(config.BASE_URL).host)
+    uid = f'indico-event-{event.id}@{url_parse(config.BASE_URL).host}'
     component = generate_basic_component(event, uid)
 
     # add contact title, phones and emails if present
@@ -99,23 +89,23 @@ def generate_event_component(event):
     return component
 
 
-def event_to_ical(event, user=None, detail_level='events'):
+def event_to_ical(event, user=None, detailed=False):
     """Serialize an event into an ical.
 
     :param event: The event to serialize
     :param user: The user who needs to be able to access the events
+    :param detailed: If True, iCal will include the event's contributions
     """
 
-    return events_to_ical([event], user, detail_level)
+    return events_to_ical([event], user, detailed)
 
 
-def events_to_ical(events, user=None, detail_level='events'):
+def events_to_ical(events, user=None, detailed=False):
     """Serialize multiple events into an ical.
 
     :param events: A list of events to serialize
     :param user: The user who needs to be able to access the events
-    :param detail_level: Determines the level of entities that will end up
-                         being exported. Either `events` or `contributions`.
+    :param detailed: If True, iCal will include the event's contributions
     """
 
     calendar = Calendar()
@@ -123,10 +113,10 @@ def events_to_ical(events, user=None, detail_level='events'):
     calendar.add('prodid', '-//CERN//INDICO//EN')
 
     for event in events:
-        if detail_level == 'events':
+        if not detailed:
             component = generate_event_component(event)
             calendar.add_component(component)
-        elif detail_level == 'contributions':
+        else:
             from indico.modules.events.contributions.ical import generate_contribution_component
             components = [
                 generate_contribution_component(contribution) for contribution in event.contributions
