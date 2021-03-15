@@ -49,6 +49,8 @@ Bugfixes
 
 - Take registrations of users who are only members of a custom event role into account on the
   "Participant Roles" page (:pr:`4822`)
+- iCalendar exports include more information and use new serializers
+  (:issue:`4785`, :issue:`4586`, :issue:`4587`, :pr:`4820`)
 
 Internal Changes
 ^^^^^^^^^^^^^^^^
