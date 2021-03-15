@@ -174,7 +174,7 @@ class RHContributionAuthor(RHContributionDisplayBase):
         self.author = (ContributionPersonLink.query
                        .filter(ContributionPersonLink.author_type != AuthorType.none,
                                ContributionPersonLink.id == request.view_args['person_id'],
-                               contribution=self.contrib)
+                               ContributionPersonLink.contribution == self.contrib)
                        .one())
 
     def _process(self):
