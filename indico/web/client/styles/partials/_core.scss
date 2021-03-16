@@ -124,6 +124,8 @@ img {
 }
 
 .i-form label,
-.i-form .label {
+.i-form .label,
+.i-button.label,
+.i-button.label:hover {
   font-weight: bold;
 }
