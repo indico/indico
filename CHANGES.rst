@@ -66,7 +66,7 @@ Version 2.3.5
 Bugfixes
 ^^^^^^^^
 
-- None so far :)
+- Do not show soft-deleted long-lasting events in category calendar (:pr:`4824`)
 
 Version 2.3.4
 -------------

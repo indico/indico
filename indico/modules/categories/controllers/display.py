@@ -541,6 +541,7 @@ class RHCategoryCalendarView(RHDisplayCategoryBase):
         events = self._get_event_data(query)
         ongoing_events = (Event.query
                           .filter(Event.is_visible_in(self.category.id),
+                                  ~Event.is_deleted,
                                   Event.start_dt < start,
                                   Event.end_dt > end)
                           .options(load_only('id', 'title', 'start_dt', 'end_dt', 'timezone'))
