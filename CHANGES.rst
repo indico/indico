@@ -43,14 +43,16 @@ Improvements
   (:issue:`1550`, :pr:`4817`)
 - Allow filtering the "Participant Roles" page by users who have not registered for the event
   (:issue:`4763`, :pr:`4822`)
+- iCalendar exports now include contact data, event logo URL and, when exporting
+  sessions/contributions, the UID of the related event. Also, only non-empty fields
+  are exported. (:issue:`4785`, :issue:`4586`, :issue:`4587`, :issue:`4791`,
+  :pr:`4820`)
 
 Bugfixes
 ^^^^^^^^
 
 - Take registrations of users who are only members of a custom event role into account on the
   "Participant Roles" page (:pr:`4822`)
-- iCalendar exports include more information and use new serializers
-  (:issue:`4785`, :issue:`4586`, :issue:`4587`, :pr:`4820`)
 
 Internal Changes
 ^^^^^^^^^^^^^^^^

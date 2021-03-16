@@ -5,7 +5,7 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from icalendar import Calendar, Event
+import icalendar
 from lxml import html
 from lxml.etree import ParserError
 from werkzeug.urls import url_parse
@@ -18,16 +18,15 @@ from indico.util.signals import values_from_signal
 
 
 def generate_basic_component(entity, uid=None, url=None):
-    """Generates an iCalendar component with basic common properties.
+    """Generate an iCalendar component with basic common properties.
 
     :param entity: Event/session/contribution where properties come from
     :param uid: UID for the component
     :param url: URL for the component (defaults to `entity.external_url`)
 
-    :returns: iCalendar event with basic properties
+    :return: iCalendar event with basic properties
     """
-
-    component = Event()
+    component = icalendar.Event()
 
     component.add('dtstamp', now_utc(False))
     component.add('dtstart', entity.start_dt)
@@ -61,7 +60,7 @@ def generate_basic_component(entity, uid=None, url=None):
         except ParserError:
             # this happens if desc_text only contains a html comment
             pass
-    if len(description):
+    if description:
         component.add('description', '\n'.join(description))
 
     return component
@@ -69,22 +68,18 @@ def generate_basic_component(entity, uid=None, url=None):
 
 def generate_event_component(event):
     """Generates an event icalendar component from an Indico event."""
-
     uid = f'indico-event-{event.id}@{url_parse(config.BASE_URL).host}'
     component = generate_basic_component(event, uid)
 
-    # add contact title, phones and emails if present
-    if event.contact_title:
-        contact_info = f'{event.contact_title}'
-        if len(event.contact_emails):
-            contact_info += f'; {"; ".join(event.contact_emails)}'
-        if len(event.contact_phones):
-            contact_info += f'; {"; ".join(event.contact_phones)}'
-        component.add('contact', contact_info)
+    # add contact title, phones and emails
+    contact_info = [event.contact_title]
+    contact_info += event.contact_emails
+    contact_info += event.contact_phones
+    component.add('contact', ';'.join(contact_info))
 
     # add logo url if event is public
     if event.effective_protection_mode == ProtectionMode.public and event.has_logo:
-        component.add('image', f"{config.BASE_URL}{event.logo_url}", {'VALUE': 'URI'})
+        component.add('image', event.external_logo_url, {'VALUE': 'URI'})
 
     return component
 
@@ -96,7 +91,6 @@ def event_to_ical(event, user=None, detailed=False):
     :param user: The user who needs to be able to access the events
     :param detailed: If True, iCal will include the event's contributions
     """
-
     return events_to_ical([event], user, detailed)
 
 
@@ -107,8 +101,7 @@ def events_to_ical(events, user=None, detailed=False):
     :param user: The user who needs to be able to access the events
     :param detailed: If True, iCal will include the event's contributions
     """
-
-    calendar = Calendar()
+    calendar = icalendar.Calendar()
     calendar.add('version', '2.0')
     calendar.add('prodid', '-//CERN//INDICO//EN')
 

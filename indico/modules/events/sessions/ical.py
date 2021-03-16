@@ -5,7 +5,7 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from icalendar.cal import Calendar
+import icalendar
 from werkzeug.urls import url_parse
 
 from indico.core.config import config
@@ -14,8 +14,7 @@ from indico.web.flask.util import url_for
 
 
 def generate_session_component(session, related_to_uid=None):
-    """Generates an Event iCalendar component from an Indico Session."""
-
+    """Generate an Event iCalendar component from an Indico Session."""
     uid = f'indico-session-{session.id}@{url_parse(config.BASE_URL).host}'
     url = url_for('sessions.display_session', session, _external=True)
     component = generate_basic_component(session, uid, url)
@@ -32,8 +31,7 @@ def session_to_ical(session, detailed=False):
     :param session: The session to serialize
     :param detailed: If True, iCal will include the session's contributions
     """
-
-    calendar = Calendar()
+    calendar = icalendar.Calendar()
     calendar.add('version', '2.0')
     calendar.add('prodid', '-//CERN//INDICO//EN')
 

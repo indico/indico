@@ -73,7 +73,7 @@ class RHDisplaySession(RHDisplaySessionBase):
 @allow_signed_url
 class RHExportSessionToICAL(RHDisplaySessionBase):
     def _process(self):
-        detailed = request.args.get('detail', 'sessions') == 'contributions'
+        detailed = request.args.get('detail') == 'contributions'
 
         return send_file('session.ics', BytesIO(session_to_ical(self.session, detailed)),
                          'text/calendar')

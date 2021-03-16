@@ -5,7 +5,7 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from icalendar.cal import Calendar
+import icalendar
 from werkzeug.urls import url_parse
 
 from indico.core.config import config
@@ -14,14 +14,13 @@ from indico.web.flask.util import url_for
 
 
 def generate_contribution_component(contribution, related_to_uid=None):
-    """Generates an Event icalendar component from an Indico Contribution.
+    """Generate an Event icalendar component from an Indico Contribution.
 
     :param contribution: The Indico Contribution to use
     :param related_to_uid: Indico uid used in related_to field
-    :returns: an icalendar Event
+    :return: an icalendar Event
     """
-
-    uid = 'indico-contribution-{}@{}'.format(contribution.id, url_parse(config.BASE_URL).host)
+    uid = f'indico-contribution-{contribution.id}@{url_parse(config.BASE_URL).host}'
     url = url_for('contributions.display_contribution', contribution, _external=True)
     component = generate_basic_component(contribution, uid, url)
 
@@ -36,15 +35,12 @@ def contribution_to_ical(contribution):
 
     :param contribution: The contribution to serialize
     """
-
-    calendar = Calendar()
+    calendar = icalendar.Calendar()
     calendar.add('version', '2.0')
     calendar.add('prodid', '-//CERN//INDICO//EN')
 
-    related_event_uid = 'indico-event-{}@{}'.format(contribution.event.id, url_parse(config.BASE_URL).host)
+    related_event_uid = 'indico-event-{contribution.event.id}@{url_parse(config.BASE_URL).host}'
     component = generate_contribution_component(contribution, related_event_uid)
     calendar.add_component(component)
 
-    data = calendar.to_ical()
-
-    return data
+    return calendar.to_ical()
