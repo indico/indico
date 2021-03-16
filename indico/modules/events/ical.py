@@ -66,8 +66,8 @@ def generate_basic_component(entity, uid=None, url=None):
     return component
 
 
-def generate_event_component(event):
-    """Generates an event icalendar component from an Indico event."""
+def generate_event_component(event, user=None):
+    """Generate an event icalendar component from an Indico event."""
     uid = f'indico-event-{event.id}@{url_parse(config.BASE_URL).host}'
     component = generate_basic_component(event, uid)
 
@@ -80,6 +80,15 @@ def generate_event_component(event):
     # add logo url if event is public
     if event.effective_protection_mode == ProtectionMode.public and event.has_logo:
         component.add('image', event.external_logo_url, {'VALUE': 'URI'})
+
+    # send description to plugins in case one wants to add anything to it
+    data = {'description': component.get('description', '')}
+    for update in values_from_signal(
+        signals.event.metadata_postprocess.send('ical-export', event=event, data=data, user=user),
+        as_list=True
+    ):
+        data.update(update)
+    component.add('description', data['description'])
 
     return component
 
@@ -107,7 +116,7 @@ def events_to_ical(events, user=None, detailed=False):
 
     for event in events:
         if not detailed:
-            component = generate_event_component(event)
+            component = generate_event_component(event, user)
             calendar.add_component(component)
         else:
             from indico.modules.events.contributions.ical import generate_contribution_component
@@ -117,13 +126,4 @@ def events_to_ical(events, user=None, detailed=False):
             for component in components:
                 calendar.add_component(component)
 
-    data = calendar.to_ical()
-
-    # check whether the plugins want to add/override any data
-    for update in values_from_signal(
-        signals.event.metadata_postprocess.send('ical-export', event=event, data=data, user=user),
-        as_list=True
-    ):
-        data.update(update)
-
-    return data
+    return calendar.to_ical()
