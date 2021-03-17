@@ -201,7 +201,8 @@
                     {{ _render_filters() }}
                 {% endif %}
 
-                <div id="event-calendar-link" data-event-id="{{ event.id }}"></div>
+                <div id="event-calendar-link" data-event-id="{{ event.id }}"
+                     data-event-contrib-count="{{ event.contributions|length }}"></div>
 
                 {% if event.type == 'meeting' %}
                     <a class="i-button text-color subtle icon-file-pdf" title="{% trans %}Export to PDF{% endtrans %}"
