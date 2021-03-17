@@ -256,7 +256,7 @@ Customization
         {% extends '~footer.html' %}
 
         {% block footer_logo %}
-            {%- set filename = 'cern_small_light.png' if dark else 'cern_small.png' -%}
+            {%- set filename = 'cern_small_light.png' if dark|default(false) else 'cern_small.png' -%}
             <a href="https://home.cern/" class="footer-logo">
                 <img src="{{ url_for('assets.custom', filename=filename) }}" alt="CERN">
             </a>

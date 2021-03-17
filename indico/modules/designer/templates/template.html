@@ -1,4 +1,4 @@
-{% extends 'categories/management/full_width_base.html' if category else 'events/management/full_width_base.html' %}
+{% extends 'categories/management/full_width_base.html' if category|default(none) else 'events/management/full_width_base.html' %}
 
 {% from 'message_box.html' import message_box %}
 

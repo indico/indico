@@ -19,7 +19,7 @@
     <span class="location-info">
         {#- -#}
         <span class="text">
-            {%- if item.venue_name and (not parent or parent.venue_name != item.venue_name) -%}
+            {%- if item.venue_name -%}
                 <strong>{{ item.venue_name }}</strong>
                 {%- if item.room_name  %}
                     ({{ item.get_room_name(full=false) }})

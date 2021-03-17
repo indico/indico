@@ -54,7 +54,7 @@
 
     <script type="text/javascript" src="{{ url_for('assets.js_vars_user') }}"></script>
 
-    {{ head_content|safe }}
+    {{ head_content|default('')|safe }}
 
     {% for url in css_files -%}
         <link rel="stylesheet" type="text/css" href="{{ url }}">

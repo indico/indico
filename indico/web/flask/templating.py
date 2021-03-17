@@ -11,11 +11,14 @@ import re
 
 from dateutil.relativedelta import relativedelta
 from flask import current_app
+from flask_pluginengine.templating import PluginEnvironment
 from flask_pluginengine.util import get_state
 from jinja2 import environmentfilter
+from jinja2.exceptions import UndefinedError
 from jinja2.filters import _GroupTuple, make_attrgetter
 from jinja2.loaders import BaseLoader, FileSystemLoader, TemplateNotFound, split_template_path
-from jinja2.utils import internalcode
+from jinja2.runtime import StrictUndefined, Undefined
+from jinja2.utils import internalcode, missing
 from markupsafe import Markup
 
 from indico.core import signals
@@ -247,3 +250,38 @@ class CustomizationLoader(BaseLoader):
             raise RuntimeError(f'Plugin template {name} has no plugin')
         tpl.plugin = plugin
         return tpl
+
+
+def _convert_undefined(new_cls, undefined):
+    return new_cls(
+        hint=undefined._undefined_hint,
+        obj=undefined._undefined_obj,
+        name=undefined._undefined_name,
+        exc=undefined._undefined_exception,
+    )
+
+
+class IndicoStrictUndefined(StrictUndefined):
+    def __new__(cls, hint=None, obj=missing, name=None, exc=UndefinedError):
+        # XXX should we just use `caller is undefined` in macros instead of this hack?
+        if hint == 'No caller defined' and name == 'caller':
+            return Undefined(hint, obj, name, exc)
+        return super().__new__(cls)
+
+
+class IndicoEnvironment(PluginEnvironment):
+    def getattr(self, obj, attribute):
+        rv = super().getattr(obj, attribute)
+        if isinstance(rv, StrictUndefined):
+            # we only care about top-level undefineds, so if getting an attribute returns
+            # undefined, we switch to the normal Undefined class
+            return _convert_undefined(Undefined, rv)
+        return rv
+
+    def getitem(self, obj, argument):
+        rv = super().getitem(obj, argument)
+        if isinstance(rv, StrictUndefined):
+            # we only care about top-level undefineds, so if getting an item returns
+            # undefined, we switch to the normal Undefined class
+            return _convert_undefined(Undefined, rv)
+        return rv

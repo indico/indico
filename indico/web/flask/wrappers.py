@@ -24,7 +24,7 @@ from werkzeug.utils import cached_property
 from indico.core.config import config
 from indico.util.json import IndicoJSONEncoder
 from indico.web.flask.session import IndicoSessionInterface
-from indico.web.flask.templating import CustomizationLoader
+from indico.web.flask.templating import CustomizationLoader, IndicoEnvironment, IndicoStrictUndefined
 from indico.web.flask.util import make_view_func
 
 
@@ -82,6 +82,8 @@ class IndicoFlask(PluginFlaskMixin, Flask):
     request_class = IndicoRequest
     session_interface = IndicoSessionInterface()
     test_client_class = IndicoFlaskClient
+    jinja_environment = IndicoEnvironment
+    jinja_options = dict(Flask.jinja_options, undefined=IndicoStrictUndefined)
 
     @property
     def session_cookie_name(self):

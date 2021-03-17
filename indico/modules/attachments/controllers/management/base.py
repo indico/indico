@@ -98,7 +98,8 @@ class AddAttachmentFilesMixin:
             return jsonify_data(attachment_list=_render_attachment_list(self.object))
         return jsonify_template('attachments/upload.html', form=form, action=url_for('.upload', self.object),
                                 protection_message=_render_protection_message(self.object),
-                                folders_protection_info=_get_folders_protection_info(self.object))
+                                folders_protection_info=_get_folders_protection_info(self.object),
+                                existing_attachment=None)
 
 
 class AddAttachmentLinkMixin:
