@@ -341,7 +341,11 @@ const searchFactory = config => {
             <>
               {' '}
               <Popup
-                trigger={<Label circular>{staged.length}</Label>}
+                trigger={
+                  <Label circular styleName="staged-label">
+                    {staged.length}
+                  </Label>
+                }
                 position="bottom left"
                 hoverable
               >
@@ -361,7 +365,7 @@ const searchFactory = config => {
           {single && alwaysConfirm && !!staged.length && (
             <>
               {' '}
-              <Label circular>
+              <Label circular styleName="staged-label">
                 {staged[0].name}
                 <Icon name="delete" onClick={() => handleRemove(staged[0])} />
               </Label>
