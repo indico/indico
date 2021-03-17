@@ -71,11 +71,10 @@ def generate_event_component(event, user=None):
     uid = f'indico-event-{event.id}@{url_parse(config.BASE_URL).host}'
     component = generate_basic_component(event, uid)
 
-    # add contact title, phones and emails
-    contact_info = [event.contact_title]
-    contact_info += event.contact_emails
-    contact_info += event.contact_phones
-    component.add('contact', ';'.join(contact_info))
+    # add contact information
+    contact_info = event.contact_emails + event.contact_phones
+    if contact_info:
+        component.add('contact', ';'.join(contact_info))
 
     # add logo url if event is public
     if event.effective_protection_mode == ProtectionMode.public and event.has_logo:
@@ -121,7 +120,9 @@ def events_to_ical(events, user=None, detailed=False):
         else:
             from indico.modules.events.contributions.ical import generate_contribution_component
             components = [
-                generate_contribution_component(contribution) for contribution in event.contributions
+                generate_contribution_component(contrib)
+                for contrib in event.contributions
+                if contrib.start_dt
             ]
             for component in components:
                 calendar.add_component(component)
