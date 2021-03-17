@@ -20,7 +20,7 @@ def generate_session_component(session, related_to_uid=None):
     component = generate_basic_component(session, uid, url)
 
     if related_to_uid:
-        component.add('related_to', related_to_uid)
+        component.add('related-to', related_to_uid)
 
     return component
 

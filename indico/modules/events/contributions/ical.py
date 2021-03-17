@@ -17,7 +17,7 @@ def generate_contribution_component(contribution, related_to_uid=None):
     """Generate an Event icalendar component from an Indico Contribution.
 
     :param contribution: The Indico Contribution to use
-    :param related_to_uid: Indico uid used in related_to field
+    :param related_to_uid: Indico uid used in RELATED-TO field
     :return: an icalendar Event
     """
     uid = f'indico-contribution-{contribution.id}@{url_parse(config.BASE_URL).host}'
@@ -25,7 +25,7 @@ def generate_contribution_component(contribution, related_to_uid=None):
     component = generate_basic_component(contribution, uid, url)
 
     if related_to_uid:
-        component.add('related_to', related_to_uid)
+        component.add('related-to', related_to_uid)
 
     return component
 
