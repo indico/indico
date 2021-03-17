@@ -340,10 +340,19 @@ const searchFactory = config => {
           {!single && !!staged.length && (
             <>
               {' '}
-              <Popup trigger={<Label circular>{staged.length}</Label>} position="bottom left">
+              <Popup
+                trigger={<Label circular>{staged.length}</Label>}
+                position="bottom left"
+                hoverable
+              >
                 <List>
                   {_.sortBy(staged, 'name').map(x => (
-                    <List.Item key={x.identifier}>{x.name}</List.Item>
+                    <List.Item key={x.identifier}>
+                      <div styleName="staged-list-item">
+                        {x.name}
+                        <Icon styleName="button" name="delete" onClick={() => handleRemove(x)} />
+                      </div>
+                    </List.Item>
                   ))}
                 </List>
               </Popup>
@@ -352,7 +361,10 @@ const searchFactory = config => {
           {single && alwaysConfirm && !!staged.length && (
             <>
               {' '}
-              <Label circular>{staged[0].name}</Label>
+              <Label circular>
+                {staged[0].name}
+                <Icon name="delete" onClick={() => handleRemove(staged[0])} />
+              </Label>
             </>
           )}
         </Modal.Header>

@@ -14,3 +14,12 @@
 :global(.icon).event-person {
   color: $blue;
 }
+
+.staged-list-item {
+  display: flex;
+  justify-content: space-between;
+
+  > :global(.icon) {
+    margin-left: 0.5em;
+  }
+}
