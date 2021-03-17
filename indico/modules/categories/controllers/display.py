@@ -14,7 +14,7 @@ from time import mktime
 
 import dateutil
 from dateutil.relativedelta import relativedelta
-from flask import Response, flash, jsonify, redirect, request, session
+from flask import flash, jsonify, redirect, request, session
 from pytz import utc
 from sqlalchemy.orm import joinedload, load_only, subqueryload, undefer, undefer_group
 from werkzeug.exceptions import BadRequest, NotFound
@@ -26,7 +26,6 @@ from indico.modules.categories.controllers.base import RHDisplayCategoryBase
 from indico.modules.categories.controllers.util import (get_category_view_params, group_by_month,
                                                         make_format_event_date_func, make_happening_now_func,
                                                         make_is_recent_func)
-from indico.modules.categories.legacy import XMLCategorySerializer
 from indico.modules.categories.models.categories import Category
 from indico.modules.categories.serialize import (serialize_categories_ical, serialize_category, serialize_category_atom,
                                                  serialize_category_chain)
@@ -326,19 +325,6 @@ class RHExportCategoryAtom(RHDisplayCategoryBase):
                                       session.user,
                                       Event.end_dt >= now_utc())
         return send_file(filename, buf, 'application/atom+xml')
-
-
-class RHXMLExportCategoryInfo(RH):
-    def _process_args(self):
-        try:
-            id_ = int(request.args['id'])
-        except ValueError:
-            raise BadRequest('Invalid Category ID')
-        self.category = Category.get_or_404(id_, is_deleted=False)
-
-    def _process(self):
-        category_xml_info = XMLCategorySerializer(self.category).serialize_category()
-        return Response(category_xml_info, mimetype='text/xml')
 
 
 class RHCategoryOverview(RHDisplayCategoryBase):

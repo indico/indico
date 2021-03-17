@@ -15,8 +15,7 @@ from indico.modules.categories.controllers.display import (RHCategoryCalendarVie
                                                            RHCategoryUpcomingEvent, RHDisplayCategory, RHEventList,
                                                            RHExportCategoryAtom, RHExportCategoryICAL,
                                                            RHReachableCategoriesInfo, RHShowFutureEventsInCategory,
-                                                           RHShowPastEventsInCategory, RHSubcatInfo,
-                                                           RHXMLExportCategoryInfo)
+                                                           RHShowPastEventsInCategory, RHSubcatInfo)
 from indico.modules.categories.controllers.management import (RHAddCategoryRole, RHAddCategoryRoleMembers,
                                                               RHCategoryRoleMembersImportCSV, RHCategoryRoles,
                                                               RHCreateCategory, RHDeleteCategory, RHDeleteCategoryRole,
@@ -92,9 +91,6 @@ _bp.add_url_rule('/upcoming', 'upcoming_event', RHCategoryUpcomingEvent)
 
 # Event creation - redirect to anchor page opening the dialog
 _bp.add_url_rule('/create/event/<any(lecture,meeting,conference):event_type>', view_func=_redirect_event_creation)
-
-# TODO: remember to refactor it at some point
-_bp.add_url_rule('!/xmlGateway.py/getCategoryInfo', 'category_xml_info', RHXMLExportCategoryInfo)
 
 # Short URLs
 _bp.add_url_rule('!/categ/<int:category_id>', view_func=redirect_view('.display'), strict_slashes=False)
