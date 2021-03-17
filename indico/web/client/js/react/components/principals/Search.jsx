@@ -58,14 +58,18 @@ const searchFactory = config => {
   } = config;
 
   /* eslint-disable react/prop-types */
-  const FavoriteItem = ({name, detail, added, onAdd}) => (
+  const FavoriteItem = ({name, detail, added, onAdd, onRemove}) => (
     <Dropdown.Item
       disabled={added}
       styleName="favorite"
       style={{pointerEvents: 'all'}}
       onClick={e => {
         e.stopPropagation();
-        onAdd();
+        if (added) {
+          onRemove();
+        } else {
+          onAdd();
+        }
       }}
     >
       <div styleName="item">
@@ -87,7 +91,7 @@ const searchFactory = config => {
     </Dropdown.Item>
   );
 
-  const SearchForm = ({onSearch, favorites, isAdded, onAdd, single}) => {
+  const SearchForm = ({onSearch, favorites, isAdded, onAdd, onRemove, single}) => {
     const initialFormValues = useContext(InitialFormValuesContext);
     const [dropdownOpen, setDropdownOpen] = useState(false);
     return (
@@ -133,6 +137,9 @@ const searchFactory = config => {
                             setDropdownOpen(false);
                           }
                         }}
+                        onRemove={() => {
+                          onRemove(x);
+                        }}
                       />
                     ))}
                   </Dropdown.Menu>
@@ -145,7 +152,7 @@ const searchFactory = config => {
     );
   };
 
-  const ResultItem = ({name, detail, added, favorite, onAdd, existsInEvent}) => (
+  const ResultItem = ({name, detail, added, favorite, onAdd, onRemove, existsInEvent}) => (
     <List.Item>
       <div styleName="item">
         <div styleName="icon">
@@ -172,7 +179,7 @@ const searchFactory = config => {
         </div>
         <div styleName="actions">
           {added ? (
-            <Icon name="checkmark" size="large" color="green" />
+            <Icon name="checkmark" size="large" color="green" onClick={onRemove} />
           ) : (
             <Icon styleName="button" name="add" size="large" onClick={onAdd} />
           )}
@@ -181,7 +188,7 @@ const searchFactory = config => {
     </List.Item>
   );
 
-  const SearchResults = ({results, total, onAdd, isAdded, favorites}) =>
+  const SearchResults = ({results, total, onAdd, onRemove, isAdded, favorites}) =>
     total !== 0 ? (
       <>
         <Divider horizontal>{getResultsText(total)}</Divider>
@@ -194,6 +201,7 @@ const searchFactory = config => {
               added={isAdded(r)}
               favorite={favorites && favoriteKey ? r[favoriteKey] in favorites : false}
               onAdd={() => onAdd(r)}
+              onRemove={() => onRemove(r)}
               existsInEvent={r.existsInEvent}
             />
           ))}
@@ -204,7 +212,15 @@ const searchFactory = config => {
       <Divider horizontal>{noResultsText}</Divider>
     );
 
-  const SearchContent = ({onAdd, isAdded, favorites, single, withEventPersons, eventId}) => {
+  const SearchContent = ({
+    onAdd,
+    onRemove,
+    isAdded,
+    favorites,
+    single,
+    withEventPersons,
+    eventId,
+  }) => {
     const [result, setResult] = useState(null);
 
     const handleSearch = data => runSearch(data, setResult, withEventPersons, eventId);
@@ -213,6 +229,7 @@ const searchFactory = config => {
         <SearchForm
           onSearch={handleSearch}
           onAdd={onAdd}
+          onRemove={onRemove}
           isAdded={isAdded}
           favorites={favorites}
           single={single}
@@ -223,6 +240,7 @@ const searchFactory = config => {
             total={result.total}
             favorites={favorites}
             onAdd={onAdd}
+            onRemove={onRemove}
             isAdded={isAdded}
           />
         )}
@@ -259,6 +277,10 @@ const searchFactory = config => {
       } else if (!isAdded(item)) {
         setStaged(prev => (single ? [item] : [...prev, item]));
       }
+    };
+
+    const handleRemove = item => {
+      setStaged(prev => prev.filter(it => it.identifier !== item.identifier));
     };
 
     const handleAddButtonClick = () => {
@@ -338,6 +360,7 @@ const searchFactory = config => {
           <SearchContent
             favorites={favorites}
             onAdd={handleAdd}
+            onRemove={handleRemove}
             isAdded={isAdded}
             single={single}
             withEventPersons={withEventPersons}
