@@ -68,12 +68,6 @@ class EmailPrincipal:
     """
 
     principal_type = PrincipalType.email
-    is_network = False
-    is_group = False
-    is_single_person = True
-    is_event_role = False
-    is_category_role = False
-    is_registration_form = False
     principal_order = 0
 
     def __init__(self, email):

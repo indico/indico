@@ -21,12 +21,6 @@ class IPNetworkGroup(db.Model):
     __tablename__ = 'ip_network_groups'
     principal_type = PrincipalType.network
     principal_order = 1
-    is_group = False
-    is_network = True
-    is_single_person = False
-    is_event_role = False
-    is_category_role = False
-    is_registration_form = False
 
     @declared_attr
     def __table_args__(cls):

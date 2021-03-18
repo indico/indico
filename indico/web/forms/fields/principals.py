@@ -40,7 +40,7 @@ def serialize_principal(principal):
         return serialize_category_role(principal)
     elif principal.principal_type == PrincipalType.registration_form:
         return serialize_registration_form(principal)
-    elif principal.is_group:
+    elif principal.principal_type in (PrincipalType.local_group, PrincipalType.multipass_group):
         return serialize_group(principal)
     else:
         raise ValueError(f'Invalid principal: {principal} ({principal.principal_type})')

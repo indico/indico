@@ -27,7 +27,7 @@
         </div>
         <ul id="manager-list">
             {% for manager in managers %}
-                <li class="{{ 'icon-user' if manager.is_single_person else 'icon-users' }}">
+                <li class="{{ 'icon-user' if manager.principal_type.name in ('user', 'email') else 'icon-users' }}">
                     {{ manager.name }}
                 </li>
             {% endfor %}

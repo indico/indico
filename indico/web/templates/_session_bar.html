@@ -2,7 +2,7 @@
     {% if not obj.is_protected %}
         {% set mode = 'public' %}
     {% else %}
-        {% set networks = obj.get_access_list()|selectattr('is_network')|map(attribute='name')|sort %}
+        {% set networks = obj.get_access_list()|selectattr('principal_type.name', 'equalto', 'network')|map(attribute='name')|sort %}
         {% set mode = 'network' if networks else 'restricted' %}
     {% endif %}
 

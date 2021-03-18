@@ -17,12 +17,6 @@ class CategoryRole(db.Model):
                       db.Index(None, 'category_id', 'code', unique=True),
                       {'schema': 'categories'})
 
-    is_group = False
-    is_event_role = False
-    is_registration_form = False
-    is_category_role = True
-    is_single_person = False
-    is_network = False
     principal_order = 2
     principal_type = PrincipalType.category_role
 

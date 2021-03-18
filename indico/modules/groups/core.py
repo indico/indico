@@ -35,13 +35,6 @@ class GroupProxy:
     :param provider: The provider of a multipass group
     """
 
-    # Useful when dealing with both users and groups in the same code
-    is_group = True
-    is_network = False
-    is_single_person = False
-    is_event_role = False
-    is_category_role = False
-    is_registration_form = False
     principal_order = 3
 
     def __new__(cls, name_or_id, provider=None, _group=None):

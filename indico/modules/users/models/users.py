@@ -163,13 +163,6 @@ def format_display_full_name(user, obj):
 class User(PersonMixin, db.Model):
     """Indico users."""
 
-    # Useful when dealing with both users and groups in the same code
-    is_group = False
-    is_single_person = True
-    is_event_role = False
-    is_category_role = False
-    is_registration_form = False
-    is_network = False
     principal_order = 0
     principal_type = PrincipalType.user
 

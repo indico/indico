@@ -42,12 +42,6 @@ class RegistrationForm(db.Model):
     __tablename__ = 'forms'
     principal_type = PrincipalType.registration_form
     principal_order = 2
-    is_group = False
-    is_network = False
-    is_single_person = False
-    is_event_role = False
-    is_category_role = False
-    is_registration_form = True
 
     __table_args__ = (db.Index('ix_uq_forms_participation', 'event_id', unique=True,
                                postgresql_where=db.text('is_participation AND NOT is_deleted')),
