@@ -7,7 +7,7 @@
 
 from __future__ import unicode_literals
 
-from flask import jsonify, request
+from flask import jsonify, request, session
 
 from indico.core import signals
 from indico.modules.events.editing.controllers.base import RHEditableTypeEditorBase, RHEditingBase
@@ -46,7 +46,16 @@ class RHMenuEntries(RHEditingBase):
 
     def _process(self):
         menu_entries = named_objects_from_signal(signals.menu.items.send('event-editing-sidemenu', event=self.event))
-        return EditingMenuItemSchema(many=True).jsonify(menu_entries.values())
+        is_editing_manager = self.event.can_manage(session.user, permission='editing_manager')
+        show_editable_list = {
+            et.name: (is_editing_manager or self.event.can_manage(session.user, et.editor_permission))
+            for et in EditableType
+        }
+        return jsonify(
+            items=EditingMenuItemSchema(many=True).dump(menu_entries.values()),
+            show_management_link=is_editing_manager,
+            show_editable_list=show_editable_list
+        )
 
 
 class RHEditableCheckSelfAssign(RHEditableTypeEditorBase):
