@@ -48,19 +48,22 @@ EditableListMenu.propTypes = {
   editableType: PropTypes.oneOf(Object.values(EditableType)).isRequired,
 };
 
-export default function MenuBar({eventId, menuItems, editableType, contribId}) {
+export default function MenuBar({eventId, menuData, editableType, contribId}) {
   const displayViewURL =
     contribId === null
       ? displayURL({event_id: eventId})
       : contribDisplayURL({event_id: eventId, contrib_id: contribId});
   const managementViewURL = manageEditableTypeURL({event_id: eventId, type: editableType});
+  const {items: menuItems, showManagementLink, showEditableList} = menuData;
 
   return (
     <div styleName="menu-bar">
       <Header as="h2" styleName="header">
         {EditableEditingTitles[editableType]}
       </Header>
-      <EditableListMenu eventId={eventId} editableType={editableType} />
+      {showEditableList[editableType] && (
+        <EditableListMenu eventId={eventId} editableType={editableType} />
+      )}
       {!!menuItems.length && (
         <Menu vertical>
           <Menu.Item header>
@@ -89,11 +92,13 @@ export default function MenuBar({eventId, menuItems, editableType, contribId}) {
             <Icon name="tv" /> <Translate>Display</Translate>
           </span>
         </Menu.Item>
-        <Menu.Item name="management" as="a" href={managementViewURL}>
-          <span style={{color: Palette.blue}}>
-            <Icon name="pencil" /> <Translate>Management</Translate>
-          </span>
-        </Menu.Item>
+        {showManagementLink && (
+          <Menu.Item name="management" as="a" href={managementViewURL}>
+            <span style={{color: Palette.blue}}>
+              <Icon name="pencil" /> <Translate>Management</Translate>
+            </span>
+          </Menu.Item>
+        )}
       </Menu>
     </div>
   );
@@ -109,7 +114,15 @@ const menuEntryPropTypes = {
 MenuBar.propTypes = {
   eventId: PropTypes.number.isRequired,
   contribId: PropTypes.number,
-  menuItems: PropTypes.arrayOf(PropTypes.shape(menuEntryPropTypes)).isRequired,
+  menuData: PropTypes.shape({
+    items: PropTypes.arrayOf(PropTypes.shape(menuEntryPropTypes)).isRequired,
+    showManagementLink: PropTypes.bool.isRequired,
+    showEditableList: PropTypes.shape({
+      paper: PropTypes.bool.isRequired,
+      slides: PropTypes.bool.isRequired,
+      poster: PropTypes.bool.isRequired,
+    }).isRequired,
+  }).isRequired,
   editableType: PropTypes.oneOf(Object.values(EditableType)).isRequired,
 };
 

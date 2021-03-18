@@ -25,16 +25,17 @@ export default function EditingView({eventTitle, children}) {
   const {data, lastData} = useIndicoAxios({
     url: menuEntriesURL({event_id: eventId}),
     trigger: eventId,
+    camelize: true,
   });
 
-  const menuItems = data || lastData;
-  if (!menuItems) {
+  const menuData = data || lastData;
+  if (!menuData) {
     return null;
   }
 
   return (
     <div styleName="editing-view">
-      <MenuBar eventId={eventId} menuItems={menuItems} editableType={type} contribId={contribId} />
+      <MenuBar eventId={eventId} menuData={menuData} editableType={type} contribId={contribId} />
       <div styleName="contents">
         <div styleName="timeline">
           <Header as="h2" styleName="header">
