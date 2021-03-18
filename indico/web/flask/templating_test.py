@@ -8,6 +8,8 @@
 from unittest.mock import MagicMock
 
 import pytest
+from flask import render_template_string
+from jinja2 import UndefinedError
 
 from indico.web.flask.templating import dedent, get_overridable_template_name, markdown, underline
 
@@ -53,3 +55,33 @@ def test_get_overridable_template_name(core_prefix, plugin_prefix):
     assert tpl == core_prefix + name
     tpl = get_overridable_template_name(name, plugin, core_prefix=core_prefix, plugin_prefix=plugin_prefix)
     assert tpl == [f'{plugin.name}:{plugin_prefix}{name}', core_prefix + name]
+
+
+@pytest.mark.parametrize('template', (
+    '{{ foo }}',
+    '{{ d.foo.bar }}',
+    '{{ d.foo["bar"] }}',
+    '{{ d.foo() }}',
+    '{{ d["foo"]["bar"] }}',
+    '{{ d["foo"].bar }}',
+    '{{ d["foo"]() }}',
+    '{{ d.foo + "x" }}',
+    '{{ d["foo"] + "x" }}',
+))
+def test_undefined_raising(template):
+    with pytest.raises(UndefinedError):
+        render_template_string(template, d={})
+
+
+@pytest.mark.parametrize('template', (
+    '{{ foo|default("ok") }}',
+    '{{ "ok" if not d.foo }}',
+    '{{ "ok" if not d.bar.b }}',
+    '{{ "ok" if not d["foo"] }}',
+    '{{ "fail" if d.foo == "bar" else "ok" }}',
+    '{{ "fail" if d["foo"] == "bar" else "ok" }}',
+    '{{ "ok" if d.foo != "bar" else "fail" }}',
+    '{{ "ok" if d["foo"] != "bar" else "fail" }}',
+))
+def test_undefined_silent(template):
+    assert render_template_string(template, d={'bar': {}}) == 'ok'
