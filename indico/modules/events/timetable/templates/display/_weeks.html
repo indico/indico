@@ -212,7 +212,7 @@
                     {% set hidden_count = [] %}
                     {% for start_time, slot_entries in day_entries.items() %}
                         {% set start_time_minutes = (start_time.strftime('%-H')|int*60 + start_time.strftime('%-M')|int) %}
-                        {% set next_entry = day_entries.keys()[loop.index] %}
+                        {% set next_entry = (day_entries.keys()|list)[loop.index] %}
                         {% if next_entry %}
                             {% set next_start_minutes = (next_entry.strftime('%-H')|int*60 + next_entry.strftime('%-M')|int)%}
                         {% else %}
