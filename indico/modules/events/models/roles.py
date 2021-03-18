@@ -20,7 +20,7 @@ class EventRole(db.Model):
     is_group = False
     is_event_role = True
     is_category_role = False
-    is_single_person = True
+    is_single_person = False
     is_network = False
     is_registration_form = False
     principal_order = 2

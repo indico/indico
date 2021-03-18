@@ -3,14 +3,21 @@
         <div class="i-box just-group-list">
             <div class="i-box-content">
                 <ul class="group-list">
-                    {% for user in acl | selectattr('is_single_person') | sort(attribute='name') %}
-                        <li class="icon-user">{{ user.name }}</li>
-                    {% endfor %}
-                    {% for group in acl | selectattr('is_group') | sort(attribute='name') %}
-                        <li class="icon-users">{{ group.name }}</li>
-                    {% endfor %}
-                    {% for network in acl | selectattr('is_network') | sort(attribute='name') %}
-                        <li class="icon-lan">{{ network.name }}</li>
+                    {% for item in acl|sort(attribute='name')|sort(attribute='principal_type') %}
+                        {% if item.principal_type.name in ['user', 'email'] %}
+                            <li class="icon-user">{{ item.name }}</li>
+                        {% elif item.principal_type.name in ['local_group', 'multipass_group'] %}
+                            <li class="icon-users">{{ item.name }}</li>
+                        {% elif item.principal_type.name == 'network' %}
+                            <li class="icon-lan">{{ item.name }}</li>
+                        {% elif item.principal_type.name in ['event_role', 'category_role'] %}
+                            <li class="icon-medal">{{ item.name }}</li>
+                        {% elif item.principal_type.name == 'registration_form' %}
+                            <li class="icon-ticket">{{ item.name }}</li>
+                        {% else %}
+                            {# just in case someone forgets to add a new principal type here... #}
+                            <li class="icon-users">{{ item.name }}</li>
+                        {% endif %}
                     {% endfor %}
                 </ul>
             </div>

@@ -314,6 +314,11 @@ class RegistrationForm(db.Model):
                 .has_rows())
 
     @property
+    def name(self):
+        # needed when sorting acl entries by name
+        return self.title
+
+    @property
     def identifier(self):
         return f'RegistrationForm:{self.id}'
 

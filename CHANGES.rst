@@ -55,6 +55,7 @@ Bugfixes
   "Participant Roles" page (:pr:`4822`)
 - Fail gracefully during registration import when two rows have different emails that belong
   to the same user (:pr:`4823`)
+- Restore the ability to see who's inheriting access from a parent object (:pr:`4833`)
 
 Internal Changes
 ^^^^^^^^^^^^^^^^

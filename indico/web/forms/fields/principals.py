@@ -105,8 +105,6 @@ class PrincipalListField(HiddenField):
 
 class AccessControlListField(PrincipalListField):
     def __init__(self, *args, **kwargs):
-        # The text of the link that changes the protection mode of the object to protected
-        self.default_text = kwargs.pop('default_text')
         # Hardcoded value of the protected field for legacy compatibility
         self.protected_field_id = 'protected'
         super().__init__(*args, **kwargs)

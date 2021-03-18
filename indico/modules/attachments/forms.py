@@ -33,7 +33,6 @@ class AttachmentFormBase(IndicoForm):
                                  allow_groups=True, allow_external_users=True, allow_event_roles=True,
                                  allow_category_roles=True, allow_registration_forms=True,
                                  event=lambda form: form.event,
-                                 default_text=_('Restrict access to this material'),
                                  description=_("The list of users and groups allowed to access the material"))
 
     def __init__(self, *args, **kwargs):
@@ -95,7 +94,6 @@ class AttachmentFolderForm(IndicoForm):
                                  allow_groups=True, allow_external_users=True, allow_event_roles=True,
                                  allow_category_roles=True, allow_registration_forms=True,
                                  event=lambda form: form.event,
-                                 default_text=_('Restrict access to this folder'),
                                  description=_("The list of users and groups allowed to access the folder"))
     is_always_visible = BooleanField(_("Always Visible"),
                                      [HiddenUnless('is_hidden', value=False)],
