@@ -16,7 +16,7 @@ from flask_pluginengine.util import get_state
 from jinja2 import environmentfilter
 from jinja2.filters import _GroupTuple, make_attrgetter
 from jinja2.loaders import BaseLoader, FileSystemLoader, TemplateNotFound, split_template_path
-from jinja2.runtime import StrictUndefined, Undefined
+from jinja2.runtime import StrictUndefined
 from jinja2.utils import internalcode
 from markupsafe import Markup
 
@@ -260,19 +260,38 @@ def _convert_undefined(new_cls, undefined):
     )
 
 
+class SemiStrictUndefined(StrictUndefined):
+    """Like `StrictUndefined` but allows truthiness checks.
+
+    This allows for code such as ``{% if foo.bar %}`` and comparisons which are
+    widely used and thus raising exceptions would be somewhat annoying. And unlike
+    undefined top-level variables undefined attributes/items are much more likely
+    to show up when testing things.
+    """
+
+    def __bool__(self):
+        return False
+
+    def __eq__(self, other):
+        return type(self) is type(other)
+
+    def __ne__(self, other):
+        return not self.__eq__(other)
+
+
 class IndicoEnvironment(PluginEnvironment):
     def getattr(self, obj, attribute):
         rv = super().getattr(obj, attribute)
         if isinstance(rv, StrictUndefined):
             # we only care about top-level undefineds, so if getting an attribute returns
-            # undefined, we switch to the normal Undefined class
-            return _convert_undefined(Undefined, rv)
+            # undefined, we switch to a less strict Undefined implementation
+            return _convert_undefined(SemiStrictUndefined, rv)
         return rv
 
     def getitem(self, obj, argument):
         rv = super().getitem(obj, argument)
         if isinstance(rv, StrictUndefined):
             # we only care about top-level undefineds, so if getting an item returns
-            # undefined, we switch to the normal Undefined class
-            return _convert_undefined(Undefined, rv)
+            # undefined, we switch to a less strict Undefined implementation
+            return _convert_undefined(SemiStrictUndefined, rv)
         return rv
