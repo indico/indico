@@ -18,13 +18,14 @@ from flask.wrappers import Request
 from flask_pluginengine import PluginFlaskMixin
 from flask_webpackext import current_webpack
 from jinja2 import FileSystemLoader, TemplateNotFound
+from jinja2.runtime import StrictUndefined
 from werkzeug.datastructures import ImmutableOrderedMultiDict
 from werkzeug.utils import cached_property
 
 from indico.core.config import config
 from indico.util.json import IndicoJSONEncoder
 from indico.web.flask.session import IndicoSessionInterface
-from indico.web.flask.templating import CustomizationLoader, IndicoEnvironment, IndicoStrictUndefined
+from indico.web.flask.templating import CustomizationLoader, IndicoEnvironment
 from indico.web.flask.util import make_view_func
 
 
@@ -83,7 +84,7 @@ class IndicoFlask(PluginFlaskMixin, Flask):
     session_interface = IndicoSessionInterface()
     test_client_class = IndicoFlaskClient
     jinja_environment = IndicoEnvironment
-    jinja_options = dict(Flask.jinja_options, undefined=IndicoStrictUndefined)
+    jinja_options = dict(Flask.jinja_options, undefined=StrictUndefined)
 
     @property
     def session_cookie_name(self):

@@ -14,11 +14,10 @@ from flask import current_app
 from flask_pluginengine.templating import PluginEnvironment
 from flask_pluginengine.util import get_state
 from jinja2 import environmentfilter
-from jinja2.exceptions import UndefinedError
 from jinja2.filters import _GroupTuple, make_attrgetter
 from jinja2.loaders import BaseLoader, FileSystemLoader, TemplateNotFound, split_template_path
 from jinja2.runtime import StrictUndefined, Undefined
-from jinja2.utils import internalcode, missing
+from jinja2.utils import internalcode
 from markupsafe import Markup
 
 from indico.core import signals
@@ -259,14 +258,6 @@ def _convert_undefined(new_cls, undefined):
         name=undefined._undefined_name,
         exc=undefined._undefined_exception,
     )
-
-
-class IndicoStrictUndefined(StrictUndefined):
-    def __new__(cls, hint=None, obj=missing, name=None, exc=UndefinedError):
-        # XXX should we just use `caller is undefined` in macros instead of this hack?
-        if hint == 'No caller defined' and name == 'caller':
-            return Undefined(hint, obj, name, exc)
-        return super().__new__(cls)
 
 
 class IndicoEnvironment(PluginEnvironment):
