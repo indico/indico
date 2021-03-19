@@ -53,6 +53,8 @@ Bugfixes
 
 - Take registrations of users who are only members of a custom event role into account on the
   "Participant Roles" page (:pr:`4822`)
+- Fail gracefully during registration import when two rows have different emails that belong
+  to the same user (:pr:`4823`)
 
 Internal Changes
 ^^^^^^^^^^^^^^^^

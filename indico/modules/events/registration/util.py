@@ -553,9 +553,14 @@ def import_registrations_from_csv(regform, fileobj, skip_moderation=True, notify
     """Import event registrants from a CSV file into a form."""
     with csv_text_io_wrapper(fileobj) as ftxt:
         reader = csv.reader(ftxt.read().splitlines())
-    query = db.session.query(Registration.email).with_parent(regform).filter(Registration.is_active)
-    registered_emails = {email for (email,) in query}
+    reg_data = (db.session.query(Registration.user_id, Registration.email)
+                .with_parent(regform)
+                .filter(Registration.is_active)
+                .all())
+    registered_user_ids = {rd.user_id for rd in reg_data if rd.user_id is not None}
+    registered_emails = {rd.email for rd in reg_data}
     used_emails = set()
+    email_row_map = {}
     todo = []
     for row_num, row in enumerate(reader, 1):
         try:
@@ -573,10 +578,20 @@ def import_registrations_from_csv(regform, fileobj, skip_moderation=True, notify
             raise UserValueError(_('Row {}: missing first or last name').format(row_num))
         if email in registered_emails:
             raise UserValueError(_('Row {}: a registration with this email already exists').format(row_num))
+
+        user = get_user_by_email(email)
+        if user and user.id in registered_user_ids:
+            raise UserValueError(_('Row {}: a registration for this user already exists').format(row_num))
         if email in used_emails:
             raise UserValueError(_('Row {}: email address is not unique').format(row_num))
+        if conflict_row_num := email_row_map.get(email):
+            raise UserValueError(_('Row {}: email address belongs to the same user as in row {}')
+                                 .format(row_num, conflict_row_num))
 
         used_emails.add(email)
+        if user:
+            email_row_map.update((e, row_num) for e in user.all_emails)
+
         todo.append({
             'email': email,
             'first_name': first_name.title(),

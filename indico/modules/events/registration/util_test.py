@@ -52,12 +52,23 @@ def test_import_registrations(dummy_regform, dummy_user):
     assert 'phone' not in data
 
 
-def test_import_error(dummy_regform):
+def test_import_error(dummy_regform, dummy_user, create_user):
+    dummy_user.secondary_emails.add('dummy@example.com')
+
     create_registration(dummy_regform, {
         'email': 'boss@example.com',
         'first_name': 'Big',
         'last_name': 'Boss'
     }, notify_user=False)
+
+    create_registration(dummy_regform, {
+        'email': '1337@example.com',
+        'first_name': 'Guinea',
+        'last_name': 'Pig'
+    }, notify_user=False)
+
+    user = create_user(123, email='test1@example.com')
+    user.secondary_emails.add('test2@example.com')
 
     # missing column
     csv = b'\n'.join([b'John,Doe,ACME Inc.,Regional Manager,+1-202-555-0140,jdoe@example.com',
@@ -101,6 +112,22 @@ def test_import_error(dummy_regform):
     with pytest.raises(UserValueError) as e:
         import_registrations_from_csv(dummy_regform, BytesIO(csv))
     assert 'a registration with this email already exists' in str(e.value)
+    assert 'Row 1' in str(e.value)
+
+    # duplicate user (csv)
+    csv = b'\n'.join([b'Big,Boss,ACME Inc.,Supreme Leader,+1-202-555-1337,test1@example.com',
+                      b'Little,Boss,ACME Inc.,Wannabe Leader,+1-202-555-1338,test2@EXAMPLE.com'])
+
+    with pytest.raises(UserValueError) as e:
+        import_registrations_from_csv(dummy_regform, BytesIO(csv))
+    assert 'Row 2: email address belongs to the same user as in row 1' in str(e.value)
+
+    # duplicate user (registration)
+    csv = b'\n'.join([b'Big,Boss,ACME Inc.,Supreme Leader,+1-202-555-1337,dummy@example.com'])
+
+    with pytest.raises(UserValueError) as e:
+        import_registrations_from_csv(dummy_regform, BytesIO(csv))
+    assert 'a registration for this user already exists' in str(e.value)
     assert 'Row 1' in str(e.value)
 
     # missing first name
