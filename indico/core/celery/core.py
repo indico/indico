@@ -61,6 +61,7 @@ class IndicoCelery(Celery):
         self.conf['result_serializer'] = 'pickle'
         self.conf['task_serializer'] = 'pickle'
         self.conf['accept_content'] = ['json', 'yaml', 'pickle']
+        self.conf['task_always_eager'] = app.config['TESTING']
         # Allow indico.conf to override settings
         self.conf.update(config.CELERY_CONFIG)
         assert self.flask_app is None or self.flask_app is app
