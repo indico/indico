@@ -47,6 +47,7 @@ Improvements
   sessions/contributions, the UID of the related event. Also, only non-empty fields
   are exported. (:issue:`4785`, :issue:`4586`, :issue:`4587`, :issue:`4791`,
   :pr:`4820`)
+- Allow adding groups/roles as "uthorizeda abstract submitters" (:pr:`4834`)
 
 Bugfixes
 ^^^^^^^^
