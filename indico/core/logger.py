@@ -16,7 +16,7 @@ import yaml
 from flask import has_request_context, request, session
 
 from indico.core.config import config
-from indico.web.util import get_request_info
+from indico.web.util import get_request_info, get_request_user
 
 
 class AddRequestIDFilter:
@@ -28,7 +28,8 @@ class AddRequestIDFilter:
 
 class AddUserIDFilter:
     def filter(self, record):
-        record.user_id = str(session.user.id) if has_request_context() and session and session.user else '-'
+        user = get_request_user()[0] if has_request_context() else None
+        record.user_id = str(session.user.id) if user else '-'
         return True
 
 
