@@ -80,21 +80,14 @@ def update_team_members(event, managers, judges, content_reviewers=None, layout_
                                                                                permission='paper_layout_reviewer')
     unassigned_contribs = _unassign_removed(event, updated)
     roles_to_notify = paper_reviewing_settings.get(event, 'notify_on_added_to_event')
-    if PaperReviewingRole.judge in roles_to_notify:
-        for judge in updated[PaperReviewingRole.judge]['added']:
-            notify_added_to_reviewing_team(judge, PaperReviewingRole.judge, event)
-        for judge in updated[PaperReviewingRole.judge]['removed']:
-            notify_removed_from_reviewing_team(judge, PaperReviewingRole.judge, event)
-    if PaperReviewingRole.content_reviewer in roles_to_notify:
-        for reviewer in updated[PaperReviewingRole.content_reviewer]['added']:
-            notify_added_to_reviewing_team(reviewer, PaperReviewingRole.content_reviewer, event)
-        for reviewer in updated[PaperReviewingRole.content_reviewer]['removed']:
-            notify_removed_from_reviewing_team(reviewer, PaperReviewingRole.content_reviewer, event)
-    if PaperReviewingRole.layout_reviewer in roles_to_notify:
-        for reviewer in updated[PaperReviewingRole.layout_reviewer]['added']:
-            notify_added_to_reviewing_team(reviewer, PaperReviewingRole.layout_reviewer, event)
-        for reviewer in updated[PaperReviewingRole.layout_reviewer]['removed']:
-            notify_removed_from_reviewing_team(reviewer, PaperReviewingRole.layout_reviewer, event)
+    for role, changes in updated.items():
+        if role not in roles_to_notify:
+            continue
+        for user in changes['added']:
+            notify_added_to_reviewing_team(user, role, event)
+        for user in changes['removed']:
+            notify_removed_from_reviewing_team(user, role, event)
+
     logger.info("Paper teams of %r updated by %r", event, session.user)
     return unassigned_contribs
 

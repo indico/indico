@@ -13,6 +13,8 @@ Bugfixes
 - Do not show soft-deleted long-lasting events in category calendar (:pr:`4824`)
 - Do not show management-related links in editing hybrid view unless the user has
   access to them (:pr:`4830`)
+- Fix error when assigning paper reviewer roles with notifications enabled and one
+  of the reviewing types disabled (:pr:`4838`)
 
 Version 2.3.4
 -------------
