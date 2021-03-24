@@ -13,6 +13,7 @@ import time
 from functools import partial, wraps
 
 import jsonschema
+import sentry_sdk
 from flask import current_app, g, redirect, request, session
 from sqlalchemy.exc import DatabaseError
 from sqlalchemy.orm.exc import NoResultFound
@@ -24,7 +25,7 @@ from indico.core import signals
 from indico.core.config import config
 from indico.core.db import db
 from indico.core.db.sqlalchemy.core import handle_sqlalchemy_database_error
-from indico.core.logger import Logger, sentry_set_tags
+from indico.core.logger import Logger
 from indico.core.notifications import flush_email_queue, init_email_queue
 from indico.util.i18n import _
 from indico.util.locators import get_locator
@@ -265,7 +266,7 @@ class RH:
 
         res = ''
         g.rh = self
-        sentry_set_tags({'rh': self.__class__.__name__})
+        sentry_sdk.set_tag('rh', type(self).__name__)
 
         if self.EVENT_FEATURE is not None:
             self._check_event_feature()

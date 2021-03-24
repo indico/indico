@@ -13,23 +13,10 @@ import warnings
 from pprint import pformat
 
 import yaml
-from flask import current_app, has_request_context, request, session
+from flask import has_request_context, request, session
 
 from indico.core.config import config
-from indico.util.i18n import set_best_lang
 from indico.web.util import get_request_info
-
-
-try:
-    from raven import setup_logging
-    from raven.contrib.celery import register_logger_signal, register_signal
-    from raven.contrib.flask import Sentry
-    from raven.handlers.logging import SentryHandler
-except ImportError:
-    Sentry = object  # so we can subclass
-    has_sentry = False
-else:
-    has_sentry = True
 
 
 class AddRequestIDFilter:
@@ -120,10 +107,6 @@ class Logger:
         if config.CUSTOMIZATION_DEBUG and config.CUSTOMIZATION_DIR:
             data['loggers'].setdefault('indico.customization', {})['level'] = 'DEBUG'
         logging.config.dictConfig(data)
-        if config.SENTRY_DSN:
-            if not has_sentry:
-                raise Exception('`raven` must be installed to use sentry logging')
-            init_sentry(app)
 
     @classmethod
     def get(cls, name=None):
@@ -138,71 +121,3 @@ class Logger:
         elif name != 'indico' and not name.startswith('indico.'):
             name = 'indico.' + name
         return logging.getLogger(name)
-
-
-class IndicoSentry(Sentry):
-    def get_user_info(self, request):
-        if not has_request_context() or not session.user:
-            return None
-        return {'id': session.user.id,
-                'email': session.user.email,
-                'name': session.user.full_name}
-
-    def before_request(self, *args, **kwargs):
-        super().before_request()
-        if not has_request_context():
-            return
-        self.client.extra_context({'Endpoint': str(request.url_rule.endpoint) if request.url_rule else None,
-                                   'Request ID': request.id})
-        self.client.tags_context({'locale': set_best_lang()})
-
-
-def init_sentry(app):
-    sentry = IndicoSentry(wrap_wsgi=False, register_signal=True, logging=False)
-    sentry.init_app(app)
-    # setup logging manually and exclude uncaught indico exceptions.
-    # these are logged manually in the flask error handler logic so
-    # we get the X-Sentry-ID header which is not populated in the
-    # logging handlers
-    handler = SentryHandler(sentry.client, level=getattr(logging, config.SENTRY_LOGGING_LEVEL))
-    handler.addFilter(BlacklistFilter({'indico.flask', 'celery.redirected'}))
-    setup_logging(handler)
-    # connect to the celery logger
-    register_logger_signal(sentry.client)
-    register_signal(sentry.client)
-
-
-def sentry_log_exception():
-    try:
-        sentry = current_app.extensions['sentry']
-    except KeyError:
-        return
-    sentry.captureException()
-
-
-def sentry_set_extra(data):
-    """
-    Set extra data to be logged in sentry if the current request
-    results in something to be sent to sentry.
-
-    :param data: A dict containing data.
-    """
-    try:
-        sentry = current_app.extensions['sentry']
-    except KeyError:
-        return
-    sentry.client.extra_context(data)
-
-
-def sentry_set_tags(data):
-    """
-    Set extra tag data to be logged in sentry if the current request
-    results in something to be sent to sentry.
-
-    :param data: A dict containing tag data.
-    """
-    try:
-        sentry = current_app.extensions['sentry']
-    except KeyError:
-        return
-    sentry.client.tags_context(data)

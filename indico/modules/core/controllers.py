@@ -5,8 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-import re
-
 import requests
 from flask import current_app, flash, jsonify, redirect, request, session
 from packaging.version import Version
@@ -24,6 +22,7 @@ from indico.core.db.sqlalchemy.principals import PrincipalType
 from indico.core.errors import NoReportError, UserValueError
 from indico.core.logger import Logger
 from indico.core.notifications import make_email, send_email
+from indico.core.sentry import submit_user_feedback
 from indico.core.settings import PrefixSettingsProxy
 from indico.modules.admin import RHAdminBase
 from indico.modules.cephalopod import cephalopod_settings
@@ -59,8 +58,8 @@ class RHReportErrorAPI(RH):
 
     def _save_report(self, email, comment):
         self._send_email(email, comment)
-        if config.SENTRY_DSN and self.error_data['sentry_event_id'] is not None:
-            self._send_sentry(email, comment)
+        if self.error_data['sentry_event_id'] is not None:
+            submit_user_feedback(self.error_data, email, comment)
 
     def _send_email(self, email, comment):
         # using reply-to for the user email would be nicer, but email clients
@@ -72,28 +71,6 @@ class RHReportErrorAPI(RH):
                                        error_data=self.error_data,
                                        server_name=url_parse(config.BASE_URL).netloc)
         send_email(make_email(config.SUPPORT_EMAIL, from_address=(email or config.NO_REPLY_EMAIL), template=template))
-
-    def _send_sentry(self, email, comment):
-        # strip password and query string from the DSN, and all auth data from the POST target
-        dsn = re.sub(r':[^@/]+(?=@)', '', config.SENTRY_DSN)
-        url = url_parse(dsn)
-        dsn = str(url.replace(query=''))
-        verify = url.decode_query().get('ca_certs', True)
-        url = str(url.replace(path='/api/embed/error-page/', netloc=url._split_netloc()[1], query=''))
-        user_data = self.error_data['request_info']['user'] or {'name': 'Anonymous', 'email': config.NO_REPLY_EMAIL}
-        try:
-            rv = requests.post(url,
-                               params={'dsn': dsn,
-                                       'eventId': self.error_data['sentry_event_id']},
-                               data={'name': user_data['name'],
-                                     'email': email or user_data['email'],
-                                     'comments': comment},
-                               headers={'Origin': config.BASE_URL},
-                               verify=verify)
-            rv.raise_for_status()
-        except Exception:
-            # don't bother users if this fails!
-            Logger.get('sentry').exception('Could not submit user feedback')
 
     @use_kwargs({
         'email': fields.Email(missing=None),

@@ -49,6 +49,7 @@ qrcode
 redis[hiredis]
 reportlab
 requests
+sentry-sdk[flask,celery,sqlalchemy,pure_eval]
 simplejson
 sqlalchemy
 termcolor

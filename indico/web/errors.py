@@ -8,6 +8,7 @@
 import traceback
 from uuid import uuid4
 
+import sentry_sdk
 from flask import g, jsonify, render_template, request, session
 from itsdangerous import BadData
 from sqlalchemy.exc import OperationalError
@@ -61,7 +62,7 @@ def _save_error(exc, title, message):
             'message': message,
             'request_info': get_request_info(),
             'traceback': tb,
-            'sentry_event_id': g.get('sentry_event_id')}
+            'sentry_event_id': sentry_sdk.last_event_id()}
     error_cache.set(uuid, data, timeout=7200)
 
 

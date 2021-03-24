@@ -36,6 +36,7 @@ from indico.core.logger import Logger
 from indico.core.marshmallow import mm
 from indico.core.oauth.oauth2 import setup_oauth_provider
 from indico.core.plugins import plugin_engine, url_for_plugin
+from indico.core.sentry import init_sentry
 from indico.core.webpack import IndicoManifestLoader, webpack
 from indico.modules.auth.providers import IndicoAuthProvider, IndicoIdentityProvider
 from indico.modules.auth.util import url_for_login, url_for_logout
@@ -62,11 +63,6 @@ def configure_app(app):
     app.config['SECRET_KEY'] = config.SECRET_KEY
     app.config['LOGGER_NAME'] = 'flask.app'
     app.config['LOGGER_HANDLER_POLICY'] = 'never'
-    if config.SENTRY_DSN:
-        app.config['SENTRY_CONFIG'] = {
-            'dsn': config.SENTRY_DSN,
-            'release': indico.__version__
-        }
     if not app.config['SECRET_KEY'] or len(app.config['SECRET_KEY']) < 16:
         raise ValueError('SECRET_KEY must be set to a random secret of at least 16 characters. '
                          'You can generate one using os.urandom(32) in Python shell.')
@@ -376,6 +372,7 @@ def make_app(testing=False, config_override=None):
     with app.app_context():
         if not testing:
             Logger.init(app)
+            init_sentry(app)
         celery.init_app(app)
         cache.init_app(app)
         babel.init_app(app)

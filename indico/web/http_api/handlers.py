@@ -17,6 +17,7 @@ import time
 from urllib.parse import parse_qs, urlencode
 from uuid import UUID
 
+import sentry_sdk
 from authlib.oauth2 import OAuth2Error
 from flask import current_app, g, request, session
 from werkzeug.exceptions import BadRequest, NotFound
@@ -196,6 +197,12 @@ def handler(prefix, path):
             # We *always* prefix the cache key with the user ID so we never get an overlap between
             # authenticated and unauthenticated requests
             cacheKey = f'user-{user.id}_{cacheKey}'
+            sentry_sdk.set_user({
+                'id': user.id,
+                'email': user.email,
+                'name': user.full_name,
+                'source': 'http_api'
+            })
         else:
             cacheKey = f'public_{cacheKey}'
 

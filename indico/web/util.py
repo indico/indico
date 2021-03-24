@@ -9,6 +9,7 @@ import hashlib
 import sys
 from datetime import datetime
 
+import sentry_sdk
 from authlib.oauth2 import OAuth2Error
 from flask import flash, g, has_request_context, jsonify, render_template, request, session
 from itsdangerous import Signer
@@ -407,5 +408,13 @@ def get_request_user():
                                     'exception "%s"', exc, current_exc)
             return None, None
         raise
+
+    if user:
+        sentry_sdk.set_user({
+            'id': user.id,
+            'email': user.email,
+            'name': user.full_name,
+            'source': source
+        })
 
     return user, source
