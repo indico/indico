@@ -5,9 +5,10 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-import React from 'react';
 import PropTypes from 'prop-types';
+import React from 'react';
 import {Message} from 'semantic-ui-react';
+
 import {Translate, Param} from 'indico/react/i18n';
 
 const NoResults = ({query}) => (
