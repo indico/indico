@@ -45,7 +45,7 @@ class HTTPAPIHook:
     DEFAULT_DETAIL = None  # abstract
     MAX_RECORDS = {}
     SERIALIZER_TYPE_MAP = {}  # maps fossil type names to friendly names (useful for plugins e.g. RoomCERN --> Room)
-    VALID_FORMATS = None  # None = all formats
+    VALID_FORMATS = None  # None = all formats except 'bin'
     GUEST_ALLOWED = True  # When False, it forces authentication
     COMMIT = False  # commit database changes
     HTTP_POST = False  # require (and allow) HTTP POST
@@ -67,6 +67,8 @@ class HTTPAPIHook:
                 if format not in DataFetcher.getAllowedFormats():
                     return None, None
                 elif expCls.VALID_FORMATS and format not in expCls.VALID_FORMATS:
+                    return None, None
+                elif expCls.VALID_FORMATS is None and format == 'bin':
                     return None, None
                 return expCls(queryParams, type, gd, format), format
         return None, None
