@@ -9,3 +9,15 @@
   float: right;
   margin-top: 8.25em;
 }
+
+.checkbox {
+  display: inline !important;
+
+  label {
+    display: inline !important;
+  }
+}
+
+.capitalize {
+  text-transform: capitalize !important;
+}
