@@ -7,10 +7,10 @@
 
 import math
 
-from flask import request, session
+from flask import session
 from marshmallow import INCLUDE, fields
+from marshmallow_enum import EnumField
 from sqlalchemy.orm import undefer
-from werkzeug.exceptions import BadRequest
 
 from indico.core.db import db
 from indico.core.db.sqlalchemy.protection import ProtectionMode
@@ -20,16 +20,16 @@ from indico.modules.groups import GroupProxy
 from indico.modules.search.base import IndicoSearchProvider, SearchTarget, get_search_provider
 from indico.modules.search.schemas import DetailedCategorySchema, EventSchema
 from indico.modules.search.views import WPSearch
-from indico.util.caching import memoize
+from indico.util.caching import memoize_request
 from indico.web.args import use_kwargs
 from indico.web.rh import RH
 
 
-@memoize
+@memoize_request
 def get_groups(user):
     access = [user.identifier] + [x.identifier for x in user.local_groups]
     if user.can_get_all_multipass_groups:
-        access += [GroupProxy(x.name, x.provider.name).identifier
+        access += [GroupProxy(x.name, x.provider.name, x).identifier
                    for x in user.iter_all_multipass_groups()]
     return access
 
@@ -44,17 +44,13 @@ class RHAPISearch(RH):
         'page': fields.Int(missing=1),
         'q': fields.String(required=True),
     }, location='query', unknown=INCLUDE)
-    def _process(self, page, q, **params):
-        target = SearchTarget.get(request.view_args['type'], SearchTarget.event)
-        if not target:
-            raise BadRequest('Invalid search target')
+    @use_kwargs({'type': EnumField(SearchTarget)}, location='view_args')
+    def _process(self, type, page, q, **params):
         search_provider = get_search_provider()
-        if not search_provider or target is SearchTarget.category:
+        if not search_provider or type == SearchTarget.category:
             search_provider = InternalSearch
-        access = []
-        if session.user:
-            access = get_groups(session.user)
-        total, results, aggs = search_provider().search(q, access, target, page, params)
+        access = get_groups(session.user) if session.user else []
+        total, results, aggs = search_provider().search(q, access, type, page, params)
         return {
             'pages': math.ceil(total / search_provider.RESULTS_PER_PAGE),
             'total': total,

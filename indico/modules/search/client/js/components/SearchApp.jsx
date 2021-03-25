@@ -8,9 +8,9 @@
 import searchURL from 'indico-url:search.api_search';
 
 import PropTypes from 'prop-types';
-import React, {useEffect, useState, useMemo, useCallback} from 'react';
+import React, {useCallback, useEffect, useMemo, useState} from 'react';
 import {useHistory} from 'react-router-dom';
-import {Loader, Menu, Grid} from 'semantic-ui-react';
+import {Grid, Loader, Menu} from 'semantic-ui-react';
 
 import {useIndicoAxios} from 'indico/react/hooks';
 import {Translate} from 'indico/react/i18n';
@@ -112,9 +112,7 @@ function useQueryParams() {
   );
 
   useEffect(() => {
-    history.listen(location => {
-      _setQuery(location.search);
-    });
+    return history.listen(location => _setQuery(location.search));
   }, [history, query, _setQuery]);
 
   return [queryObject, setQuery];
@@ -123,10 +121,6 @@ function useQueryParams() {
 export default function SearchApp() {
   const [query, setQuery] = useQueryParams();
   const [activeMenuItem, setActiveMenuItem] = useState(undefined);
-  const handleClick = (e, {index}) => {
-    setActiveMenuItem(index);
-  };
-
   const {q, ...filters} = query;
   const [categoryResults, setCategoryPage] = useSearch(searchURL({type: 'category'}), query);
   const [eventResults, setEventPage] = useSearch(searchURL({type: 'event'}), query);
@@ -148,10 +142,7 @@ export default function SearchApp() {
   const [_, results, setPage, Component] = searchMap[menuItem];
   const isAnyLoading = searchMap.some(x => x[1].loading);
 
-  const handleQuery = (value, type) => {
-    const _type = type || 'q';
-    setQuery(_type, value, _type === 'q');
-  };
+  const handleQuery = (value, type = 'q') => setQuery(type, value, type === 'q');
 
   return (
     <Grid padded>
@@ -172,7 +163,7 @@ export default function SearchApp() {
                   title={Translate.string(_label)}
                   total={_results.total}
                   loading={_results.loading}
-                  onClick={handleClick}
+                  onClick={(e, {index}) => setActiveMenuItem(index)}
                 />
               ))}
             </Menu>
