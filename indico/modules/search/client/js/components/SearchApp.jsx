@@ -5,15 +5,12 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-import searchAttachmentURL from 'indico-url:search.api_search_attachment';
-import searchCategoryURL from 'indico-url:search.api_search_category';
-import searchContributionURL from 'indico-url:search.api_search_contribution';
-import searchEventURL from 'indico-url:search.api_search_event';
+import searchURL from 'indico-url:search.api_search';
 
 import PropTypes from 'prop-types';
-import React, {useEffect, useReducer, useState, useMemo} from 'react';
+import React, {useEffect, useState, useMemo, useCallback} from 'react';
+import {useHistory} from 'react-router-dom';
 import {Loader, Menu, Grid} from 'semantic-ui-react';
-import {useQueryParam, StringParam} from 'use-query-params';
 
 import {useIndicoAxios} from 'indico/react/hooks';
 import {Translate} from 'indico/react/i18n';
@@ -27,49 +24,34 @@ import NoResults from './results/NoResults';
 import SearchBar from './SearchBar';
 import SideBar from './SideBar';
 
-const searchReducer = (state, action) => {
-  switch (action.type) {
-    case 'SET_QUERY':
-      return {...state, query: action.query, page: 1};
-    case 'SET_PAGE':
-      return {...state, page: action.page};
-    default:
-      throw new Error(`invalid action: ${action.type}`);
-  }
-};
+function useSearch(url, query) {
+  const [page, setPage] = useState(1);
 
-function useSearch(url, outerQuery) {
-  const [{query, page}, dispatch] = useReducer(searchReducer, {query: '', page: 1});
-  useEffect(() => {
-    // we have to dispatch an action that sets the query and resets the page.
-    // since the axios hook only monitors `query` the request won't be sent
-    // until the reducer ran and updated both query and page
-    dispatch({type: 'SET_QUERY', query: outerQuery});
-  }, [outerQuery]);
-
-  const {data, error, loading} = useIndicoAxios({
+  const {data, error, loading, lastData} = useIndicoAxios({
     url,
     camelize: true,
-    options: {params: {q: query, page}},
+    options: {params: {...query, page}},
     forceDispatchEffect: () => !!query,
     trigger: [url, query, page],
+    customHandler: undefined,
   });
 
-  const setPage = newPage => {
-    dispatch({type: 'SET_PAGE', page: newPage});
-  };
+  useEffect(() => {
+    setPage(1);
+  }, [query]);
 
   return [
     useMemo(
       () => ({
-        page: data?.page || 1,
+        page,
         pages: data?.pages || 1,
         total: data?.total || 0,
         data: data?.results || [],
+        aggregations: data?.aggregations || lastData?.aggregations || [],
         // ensure the initial state is loading, as the data is undefined
         loading: (!data && !error) || loading,
       }),
-      [data, error, loading]
+      [page, data, lastData, error, loading]
     ),
     setPage,
   ];
@@ -78,7 +60,7 @@ function useSearch(url, outerQuery) {
 function SearchTypeMenuItem({index, active, title, total, loading, onClick}) {
   let indicator = null;
   if (loading) {
-    indicator = <Loader active inline size="tiny" />;
+    indicator = <Loader active inline size="tiny" style={{zIndex: 'unset'}} />;
   } else if (total !== -1) {
     indicator = ` (${total})`;
   }
@@ -106,51 +88,87 @@ SearchTypeMenuItem.defaultProps = {
   onClick: undefined,
 };
 
+function useQueryParams() {
+  const [query, _setQuery] = useState(window.location.search);
+  const queryObject = useMemo(() => Object.fromEntries(new URLSearchParams(query)), [query]);
+  const history = useHistory();
+
+  const setQuery = useCallback(
+    (type, name, reset) => {
+      const params = new URLSearchParams(reset ? undefined : query);
+      if (name !== undefined) {
+        params.set(type, name);
+      } else {
+        params.delete(type);
+      }
+      const _query = params.toString();
+      history.push({
+        pathname: window.location.pathname,
+        search: `?${_query}`,
+      });
+      _setQuery(_query);
+    },
+    [history, query]
+  );
+
+  useEffect(() => {
+    history.listen(location => {
+      _setQuery(location.search);
+    });
+  }, [history, query, _setQuery]);
+
+  return [queryObject, setQuery];
+}
+
 export default function SearchApp() {
-  const [query, setQuery] = useQueryParam('q', StringParam);
-  const [activeMenuItem, setActiveMenuItem] = useState(0);
+  const [query, setQuery] = useQueryParams();
+  const [activeMenuItem, setActiveMenuItem] = useState(undefined);
   const handleClick = (e, {index}) => {
     setActiveMenuItem(index);
   };
 
-  const [categoryResults, setCategoryPage] = useSearch(searchCategoryURL(), query);
-  const [eventResults, setEventPage] = useSearch(searchEventURL(), query);
-  const [contributionResults, setContributionPage] = useSearch(searchContributionURL(), query);
-  const [fileResults, setFilePage] = useSearch(searchAttachmentURL(), query);
+  const {q, ...filters} = query;
+  const [categoryResults, setCategoryPage] = useSearch(searchURL({type: 'category'}), query);
+  const [eventResults, setEventPage] = useSearch(searchURL({type: 'event'}), query);
+  const [contributionResults, setContributionPage] = useSearch(
+    searchURL({type: 'contribution'}),
+    query
+  );
+  const [fileResults, setFilePage] = useSearch(searchURL({type: 'attachment'}), query);
   const searchMap = [
     ['Categories', categoryResults, setCategoryPage, Category],
     ['Events', eventResults, setEventPage, Event],
     ['Contributions', contributionResults, setContributionPage, Contribution],
     ['Materials', fileResults, setFilePage, File],
   ];
+  // Defaults to the first tab loading or with results
+  const menuItem =
+    activeMenuItem || Math.max(0, searchMap.findIndex(x => x[1].loading || x[1].total));
   // eslint-disable-next-line no-unused-vars
-  const [_, results, setPage, Component] = searchMap[activeMenuItem];
+  const [_, results, setPage, Component] = searchMap[menuItem];
   const isAnyLoading = searchMap.some(x => x[1].loading);
 
-  // On every search, the tab will be either the first loading or with results
-  const menuItem = searchMap.findIndex(x => x[1].loading || x[1].total > 0);
-  // TODO: we could make this initially uncontrolled, but if the user controls it, it no longer changes
-  useEffect(() => {
-    setActiveMenuItem(Math.max(0, menuItem));
-  }, [menuItem]);
-
-  const handleQuery = value => setQuery(value, 'pushIn');
+  const handleQuery = (value, type) => {
+    const _type = type || 'q';
+    setQuery(_type, value, _type === 'q');
+  };
 
   return (
-    <Grid>
-      <Grid.Column width={5}>
-        <SideBar filterType="Contributions" />
+    <Grid padded>
+      <Grid.Column width={2} />
+      <Grid.Column width={3}>
+        <SideBar query={filters} aggregations={results.aggregations} onChange={handleQuery} />
       </Grid.Column>
       <Grid.Column width={6}>
-        <SearchBar onSearch={handleQuery} searchTerm={query || ''} />
-        {query && (
+        <SearchBar onSearch={handleQuery} searchTerm={q || ''} />
+        {q && (
           <>
             <Menu pointing secondary>
               {searchMap.map(([_label, _results], idx) => (
                 <SearchTypeMenuItem
                   key={_label}
                   index={idx}
-                  active={activeMenuItem === idx}
+                  active={menuItem === idx}
                   title={Translate.string(_label)}
                   total={_results.total}
                   loading={_results.loading}
@@ -168,12 +186,11 @@ export default function SearchApp() {
                 loading={results.loading}
               />
             ) : (
-              <NoResults query={query} />
+              <NoResults query={q} />
             )}
           </>
         )}
       </Grid.Column>
-      <Grid.Column width={5} />
     </Grid>
   );
 }
