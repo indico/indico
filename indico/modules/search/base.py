@@ -1,6 +1,6 @@
 from indico.core import signals
+from indico.util.enum import IndicoEnum
 from indico.util.signals import values_from_signal
-from indico.util.struct.enum import IndicoEnum
 
 
 def get_search_provider():
