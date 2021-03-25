@@ -12,9 +12,8 @@ import {Table, Checkbox} from 'semantic-ui-react';
 import './SideBar.module.scss';
 
 export default function SideBar({query, aggregations, onChange}) {
-  const handleChange = (type, value) => {
-    onChange && onChange(type in query && query[type] === value ? undefined : value, type);
-  };
+  const handleChange = (type, value) =>
+    onChange && onChange(query[type] === value ? undefined : value, type);
 
   return (
     <div styleName="sidebar">
@@ -35,7 +34,7 @@ export default function SideBar({query, aggregations, onChange}) {
 }
 
 function AggregationList({name, title, items, query, onChange}) {
-  const _items = items
+  items = items
     .filter(b => b.key)
     .map(({key, fromAsString: from, toAsString: to, docCount: count}) => ({
       key: from || to ? `[${from || '*'} TO ${to || '*'}]` : key,
@@ -51,13 +50,13 @@ function AggregationList({name, title, items, query, onChange}) {
         </Table.Row>
       </Table.Header>
       <Table.Body>
-        {_items.map(({key, label, count}) => (
+        {items.map(({key, label, count}) => (
           <Table.Row key={key}>
             <Table.Cell>
               <Checkbox
                 styleName="checkbox"
                 label={`${label} (${count})`}
-                checked={name in query && query[name] === key}
+                checked={query[name] === key}
                 onChange={() => onChange(name, key)}
               />
             </Table.Cell>
