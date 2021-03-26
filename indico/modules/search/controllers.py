@@ -20,12 +20,12 @@ from indico.modules.groups import GroupProxy
 from indico.modules.search.base import IndicoSearchProvider, SearchTarget, get_search_provider
 from indico.modules.search.schemas import DetailedCategorySchema, EventSchema
 from indico.modules.search.views import WPSearch
-from indico.util.caching import memoize_request
+from indico.util.caching import memoize_redis
 from indico.web.args import use_kwargs
 from indico.web.rh import RH
 
 
-@memoize_request
+@memoize_redis(3600)
 def get_groups(user):
     access = [user.identifier] + [x.identifier for x in user.local_groups]
     if user.can_get_all_multipass_groups:
