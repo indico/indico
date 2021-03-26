@@ -19,10 +19,10 @@ export default function CategoryPath({path}) {
   }));
 
   return (
-    <>
+    <span styleName="category-path">
       <Icon name="sitemap" />
-      <Breadcrumb styleName="path" divider="»" sections={sections} />
-    </>
+      <Breadcrumb divider="»" sections={sections} />
+    </span>
   );
 }
 
