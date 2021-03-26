@@ -10,12 +10,12 @@ import React from 'react';
 import {List} from 'semantic-ui-react';
 
 import CategoryPath from './CategoryPath';
-import './Category.module.scss';
+import '../ResultList.module.scss';
 
 export default function Category({title, path, url}) {
   return (
-    <div styleName="category">
-      <List.Header>
+    <div styleName="item">
+      <List.Header styleName="header">
         <a href={url}>{title}</a>
       </List.Header>
       {path.length !== 0 && (
