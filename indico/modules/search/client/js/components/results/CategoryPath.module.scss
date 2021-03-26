@@ -7,15 +7,32 @@
 
 @import 'base/palette';
 
-.path:global(.ui.breadcrumb) {
-  :global(a.section),
-  :global(a.section:hover) {
+.category-path {
+  white-space: nowrap;
+
+  :global(.breadcrumb) {
+    display: inline-block;
     font-size: 13px;
+    line-height: 1.2;
     font-style: italic;
-    color: $dark-gray;
+    width: 100%;
+    padding-right: 3em;
+    /* Reverse ellipsis */
+    text-overflow: ellipsis;
+    overflow: hidden;
+    direction: rtl;
+    text-align: left;
   }
 
-  :global(.divider) {
-    color: $dark-gray;
+  :global(.breadcrumb .section),
+  :global(.breadcrumb .divider) {
+    display: inline;
+    direction: ltr;
+    color: inherit;
+  }
+
+  :global(.breadcrumb .section:hover) {
+    color: $dark-blue;
+    transition: ease-in 0.5s;
   }
 }

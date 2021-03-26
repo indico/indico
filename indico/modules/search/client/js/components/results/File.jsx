@@ -9,47 +9,44 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import {List, Icon} from 'semantic-ui-react';
 
-import './File.module.scss';
+import '../ResultList.module.scss';
 import {toMoment, serializeDate} from 'indico/utils/date';
 
-const iconSelector = type => {
-  const otherAttributes = {size: 'large'};
-  switch (type) {
-    case 'file-word':
-      return {color: 'blue', name: 'file word outline', ...otherAttributes};
-    case 'file-zip':
-      return {color: 'yellow', name: 'file archive outline', ...otherAttributes};
-    case 'file-presentation':
-      return {color: 'red', name: 'file powerpoint outline', ...otherAttributes};
-    case 'file-excel':
-      return {color: 'green', name: 'file excel outline', ...otherAttributes};
-    case 'file-pdf':
-      return {color: 'red', name: 'file pdf outline', ...otherAttributes};
-    case 'file-spreadsheet':
-      return {color: 'green', name: 'file excel outline', ...otherAttributes};
+const iconSelector = filename => {
+  switch (filename?.split('.').pop()) {
+    case 'doc':
+    case 'docx':
+      return {color: 'blue', name: 'file word outline'};
+    case 'zip':
+      return {color: 'yellow', name: 'file archive outline'};
+    case 'ppt':
+    case 'pptx':
+    case 'key':
+      return {color: 'red', name: 'file powerpoint outline'};
+    case 'xls':
+    case 'xlsx':
+      return {color: 'green', name: 'file excel outline'};
+    case 'pdf':
+      return {color: 'red', name: 'file pdf outline'};
     default:
-      return {name: 'file outline', ...otherAttributes};
+      return {name: 'file outline'};
   }
 };
 
-const File = ({title, url, type, /* contributionTitle, contribURL,*/ modifiedDt, user}) => (
-  <div styleName="file">
-    <List.Header>
-      <Icon {...iconSelector(type)} />
+const File = ({title, url, typeFormat: type, filename, modifiedDt, user}) => (
+  <div styleName="item">
+    <List.Header styleName="header">
+      <Icon size="large" {...(type === 'file' ? iconSelector(filename) : {name: 'linkify'})} />
       <a href={url}>{title}</a>
     </List.Header>
     <List.Description styleName="description">
-      {/* <List.Item styleName="high-priority">*/}
-      {/*  <Icon rotated="clockwise" name="level up alternate" />*/}
-      {/*  <a href={contribURL}>{contributionTitle}</a>*/}
-      {/* </List.Item>*/}
       <List.Item>
-        <ul styleName="high-priority">
+        <ul>
           <Icon name="user" />
-          <li key={user.id}>{user.name}</li>
+          <li>{user.name}</li>
         </ul>
       </List.Item>
-      <List.Item styleName="med-priority">
+      <List.Item>
         <Icon name="calendar alternate outline" />
         {serializeDate(toMoment(modifiedDt), 'DD MMMM YYYY HH:mm')}
       </List.Item>
@@ -60,14 +57,17 @@ const File = ({title, url, type, /* contributionTitle, contribURL,*/ modifiedDt,
 File.propTypes = {
   title: PropTypes.string.isRequired,
   url: PropTypes.string.isRequired,
-  type: PropTypes.string.isRequired,
-  // contributionTitle: PropTypes.string,
+  typeFormat: PropTypes.string.isRequired,
+  filename: PropTypes.string,
   modifiedDt: PropTypes.string.isRequired,
-  // contribURL: PropTypes.string,
   user: PropTypes.shape({
-    id: PropTypes.number.isRequired,
     title: PropTypes.string.isRequired,
     name: PropTypes.string.isRequired,
   }).isRequired,
 };
+
+File.defaultProps = {
+  filename: undefined,
+};
+
 export default File;
