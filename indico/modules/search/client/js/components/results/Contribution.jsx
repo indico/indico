@@ -11,22 +11,17 @@ import {List, Icon} from 'semantic-ui-react';
 
 import {toMoment, serializeDate} from 'indico/utils/date';
 
-import './Contribution.module.scss';
+import '../ResultList.module.scss';
 
-const Contribution = ({title, url, startDt, eventURL, eventTitle, persons}) => (
-  <div styleName="contribution">
-    <List.Header>
+const Contribution = ({title, url, startDt, persons}) => (
+  <div styleName="item">
+    <List.Header styleName="header">
       <a href={url}>{title}</a>
     </List.Header>
     <List.Description styleName="description">
-      <List.Item styleName="high-priority">
-        {/* change to something that reminds an event */}
-        <Icon name="calendar check outline" />
-        <a href={eventURL}>{eventTitle}</a>
-      </List.Item>
       <List.Item>
         {persons.length !== 0 && (
-          <ul styleName="high-priority">
+          <ul>
             {persons.length > 1 ? <Icon name="users" /> : <Icon name="user" />}
             {persons.map(person => (
               <li key={person.id}>
@@ -36,10 +31,12 @@ const Contribution = ({title, url, startDt, eventURL, eventTitle, persons}) => (
           </ul>
         )}
       </List.Item>
-      <List.Item styleName="med-priority">
-        <Icon name="calendar alternate outline" />
-        {serializeDate(toMoment(startDt), 'DD MMMM YYYY HH:mm')}
-      </List.Item>
+      {startDt && (
+        <List.Item>
+          <Icon name="calendar alternate outline" />
+          {serializeDate(toMoment(startDt), 'DD MMMM YYYY HH:mm')}
+        </List.Item>
+      )}
     </List.Description>
   </div>
 );
@@ -48,8 +45,6 @@ Contribution.propTypes = {
   title: PropTypes.string.isRequired,
   url: PropTypes.string.isRequired,
   startDt: PropTypes.string.isRequired,
-  eventURL: PropTypes.string.isRequired,
-  eventTitle: PropTypes.string.isRequired,
   persons: PropTypes.arrayOf(
     PropTypes.shape({
       id: PropTypes.number.isRequired,
