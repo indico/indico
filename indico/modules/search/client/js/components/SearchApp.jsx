@@ -19,6 +19,7 @@ import ResultList from './ResultList';
 import Category from './results/Category';
 import Contribution from './results/Contribution';
 import Event from './results/Event';
+import EventNote from './results/EventNote';
 import File from './results/File';
 import NoResults from './results/NoResults';
 import SearchBar from './SearchBar';
@@ -129,11 +130,13 @@ export default function SearchApp() {
     query
   );
   const [fileResults, setFilePage] = useSearch(searchURL({type: 'attachment'}), query);
+  const [noteResults, setNotePage] = useSearch(searchURL({type: 'event_note'}), query);
   const searchMap = [
     ['Categories', categoryResults, setCategoryPage, Category],
     ['Events', eventResults, setEventPage, Event],
     ['Contributions', contributionResults, setContributionPage, Contribution],
     ['Materials', fileResults, setFilePage, File],
+    ['Notes', noteResults, setNotePage, EventNote],
   ];
   // Defaults to the first tab loading or with results
   const menuItem =

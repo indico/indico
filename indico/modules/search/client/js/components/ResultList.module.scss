@@ -5,12 +5,43 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-.list {
-  a {
-    font-size: 18px;
+@import 'base/palette';
 
-    &:hover {
-      text-decoration: underline;
+.item {
+  padding: 1em 0;
+
+  .header {
+    font-size: 18px;
+  }
+
+  .description {
+    padding-top: 0.7em;
+    font-size: 13px;
+    font-style: italic;
+
+    :global(.item) {
+      padding: 0.1em 0;
     }
+  }
+
+  .description ul {
+    margin: 0;
+    padding: 0;
+  }
+
+  .description li {
+    display: inline;
+
+    &::after {
+      content: ', ';
+    }
+
+    &:last-child::after {
+      content: '';
+    }
+  }
+
+  em {
+    background-color: rgba(203, 109, 4, 0.3);
   }
 }
