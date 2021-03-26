@@ -10,9 +10,9 @@ import React from 'react';
 import {Pagination} from 'semantic-ui-react';
 import './SearchPagination.module.scss';
 
+// TODO: consider getting rid of such a simple wrapper
 export default function SearchPagination({activePage, numOfPages, onPageChange}) {
   const handlePageChange = (e, {activePage: active}) => {
-    e.preventDefault();
     onPageChange(active);
   };
 
@@ -23,10 +23,7 @@ export default function SearchPagination({activePage, numOfPages, onPageChange})
         onPageChange={handlePageChange}
         totalPages={numOfPages}
         boundaryRange={1}
-        ellipsisItem={null}
         siblingRange={2}
-        firstItem={null}
-        lastItem={null}
       />
     </div>
   );
