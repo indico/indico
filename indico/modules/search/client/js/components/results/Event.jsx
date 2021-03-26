@@ -9,7 +9,7 @@ import moment from 'moment';
 import PropTypes from 'prop-types';
 import React from 'react';
 import {List, Icon} from 'semantic-ui-react';
-import './Event.module.scss';
+import '../ResultList.module.scss';
 
 import {toMoment, serializeDate} from 'indico/utils/date';
 
@@ -18,28 +18,28 @@ import CategoryPath from './CategoryPath';
 /* if end date == start date only show start date */
 const renderDates = (startDt, endDt) =>
   moment(startDt).isSame(moment(endDt), 'day') ? (
-    <List.Item styleName="med-priority">
+    <List.Item>
       <Icon name="calendar alternate outline" />
       {serializeDate(toMoment(startDt), 'DD MMMM YYYY HH:mm')}
     </List.Item>
   ) : (
-    <List.Item styleName="med-priority">
+    <List.Item>
       <Icon name="calendar alternate outline" />
       {`${serializeDate(toMoment(startDt), 'DD MMMM YYYY')} -
          ${serializeDate(toMoment(endDt), 'DD MMMM YYYY')}`}
     </List.Item>
   );
 
-const Event = ({type, title, url, categoryPath, startDt, endDt, chairPersons}) => {
+const Event = ({typeFormat: type, title, url, categoryPath, startDt, endDt, chairPersons}) => {
   return (
-    <div styleName="event">
-      <List.Header>
+    <div styleName="item">
+      <List.Header styleName="header">
         <a href={url}>{title}</a>
       </List.Header>
       <List.Description styleName="description">
         {/* if it's a lecture print the list of speakers */}
         {type === 'lecture' && chairPersons.length !== 0 && (
-          <List.Item styleName="high-priority">
+          <List.Item>
             {chairPersons.map(i => (
               <div key={i.name}>
                 {i.title
@@ -54,7 +54,7 @@ const Event = ({type, title, url, categoryPath, startDt, endDt, chairPersons}) =
         {/* Render the path */}
         {categoryPath.length !== 0 && (
           <List.Item>
-            <List.Description styleName="low-priority">
+            <List.Description>
               <CategoryPath path={categoryPath} />
             </List.Description>
           </List.Item>
@@ -77,7 +77,7 @@ const personShape = PropTypes.shape({
 Event.propTypes = {
   title: PropTypes.string.isRequired,
   url: PropTypes.string.isRequired,
-  type: PropTypes.oneOf(['lecture', 'meeting', 'conference']).isRequired,
+  typeFormat: PropTypes.oneOf(['lecture', 'meeting', 'conference']).isRequired,
   startDt: PropTypes.string.isRequired,
   endDt: PropTypes.string.isRequired,
   categoryPath: PropTypes.arrayOf(
