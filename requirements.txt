@@ -65,7 +65,7 @@ click==7.1.2
     #   flask
 colorclass==2.2.0
     # via -r requirements.in
-cryptography==3.4.6
+cryptography==3.4.7
     # via authlib
 decorator==4.4.2
     # via ipython
@@ -154,7 +154,7 @@ kombu==5.0.2
     # via celery
 limits==1.5.1
     # via flask-limiter
-lxml[html5]==4.6.2
+lxml[html5]==4.6.3
     # via
     #   -r requirements.in
     #   feedgen
