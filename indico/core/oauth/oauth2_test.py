@@ -15,7 +15,7 @@ from authlib.oauth2.client import OAuth2Client
 from sqlalchemy.dialects.postgresql.array import ARRAY
 from werkzeug.urls import url_parse
 
-from indico.core.oauth.models.applications import OAuthApplication, OAuthApplicationUserLink, SystemAppType
+from indico.core.oauth.models.applications import OAuthApplicationUserLink
 from indico.core.oauth.models.tokens import OAuthToken
 from indico.core.oauth.scopes import SCOPES
 from indico.core.oauth.util import MAX_TOKENS_PER_SCOPE, save_token
@@ -156,7 +156,7 @@ def test_no_implicit_flow(dummy_application, test_client, dummy_user):
         sess.set_session_user(dummy_user)
 
     resp = test_client.get(auth_url)
-    assert b'unauthorized_client' in resp.data
+    assert b'unsupported_response_type' in resp.data
 
 
 def test_no_querystring_tokens(dummy_user, dummy_token, test_client):
@@ -166,40 +166,6 @@ def test_no_querystring_tokens(dummy_user, dummy_token, test_client):
     resp = test_client.get(f'/api/user/?access_token={dummy_token._plaintext_token}')
     assert resp.status_code == 200
     assert resp.json is None  # the API returns json `null` if not authenticated
-
-
-def test_checkin_app_implicit_flow(test_client, dummy_user):
-    checkin_app = OAuthApplication.query.filter_by(system_app_type=SystemAppType.checkin).one()
-    oauth_client = OAuth2Client(None,
-                                checkin_app.client_id,
-                                None,
-                                scope='read:user',
-                                response_type='token',
-                                token_endpoint=url_for('oauth.oauth_token', _external=True),
-                                redirect_uri=checkin_app.default_redirect_uri)
-
-    auth_url = oauth_client.create_authorization_url(url_for('oauth.oauth_authorize', _external=True))[0]
-
-    with test_client.session_transaction() as sess:
-        sess.set_session_user(dummy_user)
-
-    resp = test_client.get(auth_url)
-    assert resp.status_code == 302
-    assert '#' in resp.headers['Location']
-    assert 'access_token=' in resp.headers['Location']
-
-
-def test_checkin_app_querystring_tokens(db, test_client, dummy_user):
-    checkin_app = OAuthApplication.query.filter_by(system_app_type=SystemAppType.checkin).one()
-    checkin_app.allowed_scopes = ['read:user']
-    app_link = OAuthApplicationUserLink(application=checkin_app, user=dummy_user, scopes=['read:user'])
-    token_string = generate_token()
-    OAuthToken(access_token=token_string, app_user_link=app_link, scopes=['read:user'])
-    db.session.flush()
-    resp = test_client.get('/api/user/', headers={'Authorization': f'Bearer {token_string}'})
-    assert resp.status_code == 200
-    resp = test_client.get(f'/api/user/?access_token={token_string}')
-    assert resp.status_code == 200
 
 
 def test_oauth_scopes(create_application, test_client, dummy_user, app):
