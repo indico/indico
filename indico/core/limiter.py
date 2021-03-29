@@ -75,4 +75,4 @@ def _limiter_key():
     return request.remote_addr if has_request_context() else 'dummy.ip'
 
 
-limiter = Limiter(key_func=_limiter_key, strategy='moving-window')
+limiter = Limiter(key_func=_limiter_key, strategy='moving-window', auto_check=False)
