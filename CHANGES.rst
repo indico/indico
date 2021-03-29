@@ -50,6 +50,8 @@ Improvements
 - Allow adding groups/roles as "authorized abstract submitters" (:pr:`4834`)
 - Direct links to (sub-)contributions in meetings using the URLs usually meant for
   conferences now redirect to the meeting view page (:pr:`4847`)
+- New version of the event QR code that enables code-with-PKCE flow in the Check-in App
+  (:pr:`4844`)
 
 Bugfixes
 ^^^^^^^^
