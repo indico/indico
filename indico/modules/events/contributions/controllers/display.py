@@ -7,7 +7,7 @@
 
 from io import BytesIO
 
-from flask import jsonify, request, session
+from flask import jsonify, redirect, request, session
 from sqlalchemy.orm import joinedload, load_only
 from werkzeug.exceptions import Forbidden, NotFound
 
@@ -26,9 +26,10 @@ from indico.modules.events.contributions.util import (get_contributions_with_use
 from indico.modules.events.contributions.views import WPAuthorList, WPContributions, WPMyContributions, WPSpeakerList
 from indico.modules.events.controllers.base import RHDisplayEventBase
 from indico.modules.events.layout.util import is_menu_entry_enabled
+from indico.modules.events.models.events import EventType
 from indico.modules.events.models.persons import EventPerson
 from indico.util.i18n import _
-from indico.web.flask.util import jsonify_data, send_file
+from indico.web.flask.util import jsonify_data, send_file, url_for
 from indico.web.rh import RH, allow_signed_url
 from indico.web.util import jsonify_template
 
@@ -128,6 +129,8 @@ class RHContributionDisplay(RHContributionDisplayBase):
                             joinedload('subcontributions'),
                             joinedload('timetable_entry').lazyload('*'))
                    .one())
+        if self.event.type_ == EventType.meeting:
+            return redirect(url_for('events.display', self.event, _anchor=contrib.slug))
         can_manage = self.event.can_manage(session.user)
         owns_abstract = contrib.abstract.user_owns(session.user) if contrib.abstract else None
         field_values = filter_field_values(contrib.field_values, can_manage, owns_abstract)
@@ -263,5 +266,7 @@ class RHSubcontributionDisplay(RHDisplayEventBase):
         self.subcontrib = SubContribution.get_or_404(request.view_args['subcontrib_id'], is_deleted=False)
 
     def _process(self):
+        if self.event.type_ == EventType.meeting:
+            return redirect(url_for('events.display', self.event, _anchor=self.subcontrib.slug))
         return self.view_class.render_template('display/subcontribution_display.html', self.event,
                                                subcontrib=self.subcontrib)

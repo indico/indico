@@ -29,7 +29,7 @@ from indico.modules.events.papers.models.papers import Paper
 from indico.modules.events.papers.models.revisions import PaperRevision, PaperRevisionState
 from indico.modules.events.sessions.util import session_coordinator_priv_enabled
 from indico.util.locators import locator_property
-from indico.util.string import format_repr
+from indico.util.string import format_repr, slugify
 
 
 def _get_next_friendly_id(context):
@@ -522,6 +522,10 @@ class Contribution(DescriptionMixin, ProtectionManagersMixin, LocationMixin, Att
     @property
     def has_published_editables(self):
         return any(e.published_revision_id is not None for e in self.enabled_editables)
+
+    @property
+    def slug(self):
+        return slugify(self.friendly_id, self.title, maxlen=30)
 
     def is_paper_reviewer(self, user):
         return user in self.paper_content_reviewers or user in self.paper_layout_reviewers
