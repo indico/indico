@@ -159,11 +159,13 @@ def test_no_implicit_flow(dummy_application, test_client, dummy_user):
     assert b'unauthorized_client' in resp.data
 
 
-def test_no_querystring_tokens(dummy_token, test_client):
+def test_no_querystring_tokens(dummy_user, dummy_token, test_client):
     resp = test_client.get('/api/user/', headers={'Authorization': f'Bearer {dummy_token._plaintext_token}'})
     assert resp.status_code == 200
+    assert resp.json['id'] == dummy_user.id
     resp = test_client.get(f'/api/user/?access_token={dummy_token._plaintext_token}')
-    assert resp.status_code == 401
+    assert resp.status_code == 200
+    assert resp.json is None  # the API returns json `null` if not authenticated
 
 
 def test_checkin_app_implicit_flow(test_client, dummy_user):
