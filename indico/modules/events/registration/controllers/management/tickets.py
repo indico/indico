@@ -61,14 +61,14 @@ class RHTicketConfigQRCodeImage(RHManageRegFormBase):
 
         checkin_app = OAuthApplication.query.filter_by(system_app_type=SystemAppType.checkin).one()
         qr_data = {
-            "event_id": self.event.id,
-            "title": self.event.title,
-            "date": self.event.start_dt.isoformat(),
-            "version": 2,
-            "server": {
-                "base_url": config.BASE_URL,
-                "consumer_key": checkin_app.client_id,
-                "scope": "registrants",
+            'event_id': self.event.id,
+            'title': self.event.title,
+            'date': self.event.start_dt.isoformat(),
+            'version': 2,
+            'server': {
+                'base_url': config.BASE_URL,
+                'client_id': checkin_app.client_id,
+                'scope': 'registrants',
             }
         }
         json_qr_data = json.dumps(qr_data)
