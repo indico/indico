@@ -81,7 +81,7 @@
                                             {% endif %}
                                         </td>
                                     {% else %}
-                                        <td class="i-table">{{ data.get(item.id).friendly_data }}</td>
+                                        <td class="i-table">{{ data[item.id].friendly_data if item.id in data }}</td>
                                     {% endif %}
                                 {% endfor %}
                                 {% for item in dynamic_columns %}
