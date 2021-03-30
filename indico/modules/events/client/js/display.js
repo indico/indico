@@ -5,12 +5,17 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
+import {indicoAxios} from 'indico/utils/axios';
 import './util/list_generator';
 import './util/static_filters';
 import './util/social';
 import 'solid-comment';
 
 (function() {
+  function bindIndicoAxiosToWindow() {
+    window.indicoAxios = indicoAxios;
+  }
+
   function setupEventDisplay() {
     function openAjaxDialog($element) {
       ajaxDialog({
@@ -182,5 +187,6 @@ import 'solid-comment';
     });
 
     setupEventDisplay();
+    bindIndicoAxiosToWindow();
   });
 })();
