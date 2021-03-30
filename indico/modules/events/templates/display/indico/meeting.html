@@ -70,6 +70,61 @@
         </div>
     {% endblock %}
 
+    {% block comments %}
+        <main class="solid-comment">
+            <header class="sc-header">
+            <h2 class="sc-header__title">Comments</h2>
+            <aside class="sc-header__aside">
+                <label class="sc-header__oidc-label" for="solid-oidc-issuer">WebID</label>
+                <input class="sc-header__oidc-input" type="text" name="oidcIssuer" id="solid-oidc-issuer" placeholder="Your WebID" value="https://janschill.net">
+                <button class="sc-solid-button" id="sc-solid-button-login">
+                <img class="sc-solid-button__image" src="/images/solid-logo.svg" alt="The Solid Project logo.">
+                <span class="sc-solid-button__text">Log in</span>
+                </button>
+            </aside>
+            </header>
+            <main class="sc-main">
+            <section class="sc-section-form">
+                <form id="sc-comment-form" class="sc-comment-form" action="">
+                <label class="sc-comment-form__label" for="sc-comment-form__input">Your comment</label>
+                <textarea class="sc-comment-form__input" name="comment" id="sc-comment-form__input" cols="30" rows="2" required placeholder="Add to the discussion"></textarea>
+
+                <input class="sc-comment-form__submit" type="submit" value="Submit">
+                </form>
+            </section>
+            <section class="sc-section-comments"></section>
+            </main>
+        </main>
+        <script>
+            function pythonBooleanToJS(str) {
+                return str === 'True'
+            }
+
+            window.onload = () => {
+                const isEventProtected = pythonBooleanToJS('{{ event.is_protected }}');
+                const eventVisibility = isEventProtected ? "private" : "public";
+                const eventId = '{{ event.id }}'
+                const solidCommentId = `sc-development-indico-meeting-${eventVisibility}-${eventId}`;
+                const serverUrl = `http://127.0.0.1:8000/event/${eventId}/solid-comments`
+                const solidComment = new SolidComment({
+                    solidCommentId: solidCommentId,
+                    eventVisibility: eventVisibility,
+                    serverStorageEndpointUrl: serverUrl,
+                    comments: []
+                })
+
+                async function main() {
+                    await solidComment.initApp()
+                    solidComment.setAppClient(window.indicoAxios)
+                    await fetch(serverUrl)
+                        .then(response => response.json())
+                        .then(data => solidComment.setComments(data))
+                }
+                main()
+            }
+        </script>
+    {% endblock %}
+
     {% block footer %}
     {% endblock %}
 </div>
