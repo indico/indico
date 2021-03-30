@@ -112,7 +112,7 @@ class RegistrationFormForm(IndicoForm):
         self._set_currencies()
         self.notification_sender_address.description = _('Email address set as the sender of all '
                                                          'notifications sent to users. If empty, '
-                                                         'then {} is used.'.format(config.NO_REPLY_EMAIL))
+                                                         'then {email} is used.').format(email=config.NO_REPLY_EMAIL)
 
     def _set_currencies(self):
         currencies = [(c['code'], '{0[code]} ({0[name]})'.format(c)) for c in payment_settings.get('currencies')]
