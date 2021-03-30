@@ -48,6 +48,8 @@ Improvements
   are exported. (:issue:`4785`, :issue:`4586`, :issue:`4587`, :issue:`4791`,
   :pr:`4820`)
 - Allow adding groups/roles as "authorized abstract submitters" (:pr:`4834`)
+- Direct links to (sub-)contributions in meetings using the URLs usually meant for
+  conferences now redirect to the meeting view page (:pr:`4847`)
 
 Bugfixes
 ^^^^^^^^

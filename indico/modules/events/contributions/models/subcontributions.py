@@ -11,7 +11,7 @@ from indico.core.db.sqlalchemy.descriptions import DescriptionMixin, RenderMode
 from indico.core.db.sqlalchemy.notes import AttachedNotesMixin
 from indico.core.db.sqlalchemy.util.queries import increment_and_get
 from indico.util.locators import locator_property
-from indico.util.string import format_repr
+from indico.util.string import format_repr, slugify
 
 
 def _get_next_friendly_id(context):
@@ -143,6 +143,10 @@ class SubContribution(DescriptionMixin, AttachedItemsMixin, AttachedNotesMixin, 
     @speakers.setter
     def speakers(self, value):
         self.person_links = list(value.keys())
+
+    @property
+    def slug(self):
+        return slugify('sc', self.contribution.friendly_id, self.friendly_id, self.title, maxlen=30)
 
     @property
     def location_parent(self):
