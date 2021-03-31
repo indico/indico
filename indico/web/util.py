@@ -287,12 +287,7 @@ def verify_signed_user_url(url, method):
 
 def get_oauth_user(scopes):
     from indico.core.oauth import require_oauth
-    if (
-        not request.headers.get('Authorization', '').lower().startswith('bearer ') and
-        # TODO: remove the check below once indico-checkin no longer sends tokens in
-        # the query string!
-        'access_token' not in request.args
-    ):
+    if not request.headers.get('Authorization', '').lower().startswith('bearer '):
         return None
     try:
         oauth_token = require_oauth.acquire_token(scopes)

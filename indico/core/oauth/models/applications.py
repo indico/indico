@@ -191,13 +191,6 @@ class OAuthApplication(ClientMixin, db.Model):
         raise NotImplementedError
 
     def check_response_type(self, response_type):
-        if self.system_app_type == SystemAppType.checkin and response_type == 'token':
-            # TODO: remove this exception and the implicit grant registration once we
-            # have a checkin app on android+ios which can use the PKCE flow.
-            # This change is self-contained within a single commit; check and possibly
-            # revert it once the implicit flow is no longer needed.
-            return True
-
         # We no longer allow the implicit flow, so `code` is all we need
         return response_type == 'code'
 
