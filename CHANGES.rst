@@ -50,6 +50,8 @@ Improvements
 - Allow adding groups/roles as "authorized abstract submitters" (:pr:`4834`)
 - Direct links to (sub-)contributions in meetings using the URLs usually meant for
   conferences now redirect to the meeting view page (:pr:`4847`)
+- Use a more compact setup QR code for the mobile *Indico check-in* app; the latest version of
+  the app is now required. (:pr:`4844`)
 
 Bugfixes
 ^^^^^^^^

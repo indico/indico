@@ -16,7 +16,7 @@ from indico.core.oauth.models.applications import OAuthApplication, SystemAppTyp
 from indico.modules.designer import PageOrientation, PageSize
 from indico.modules.events.registration.controllers.management import RHManageRegFormBase
 from indico.modules.events.registration.forms import TicketsForm
-from indico.web.flask.util import send_file, url_for
+from indico.web.flask.util import send_file
 from indico.web.util import jsonify_data, jsonify_template
 
 
@@ -61,15 +61,14 @@ class RHTicketConfigQRCodeImage(RHManageRegFormBase):
 
         checkin_app = OAuthApplication.query.filter_by(system_app_type=SystemAppType.checkin).one()
         qr_data = {
-            "event_id": self.event.id,
-            "title": self.event.title,
-            "date": self.event.start_dt.isoformat(),
-            "version": 1,
-            "server": {
-                "base_url": config.BASE_URL,
-                "consumer_key": checkin_app.client_id,
-                "auth_url": url_for('oauth.oauth_authorize', _external=True),
-                "token_url": url_for('oauth.oauth_token', _external=True)
+            'event_id': self.event.id,
+            'title': self.event.title,
+            'date': self.event.start_dt.isoformat(),
+            'version': 2,
+            'server': {
+                'base_url': config.BASE_URL,
+                'client_id': checkin_app.client_id,
+                'scope': 'registrants',
             }
         }
         json_qr_data = json.dumps(qr_data)
