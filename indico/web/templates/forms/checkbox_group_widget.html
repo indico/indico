@@ -5,7 +5,7 @@
     {% set input_args = dict(input_args) %}
     {% set field_disabled = input_args.pop('disabled', false) %}
     {% for subfield in field %}
-        {% set disabled = field_disabled or subfield.data in field.disabled_choices %}
+        {% set disabled = field_disabled or subfield.data in field.disabled_choices|default([]) %}
         <div class="i-checkbox {{ 'checkbox-disabled' if disabled}}">
             {{ subfield(disabled=disabled, **input_args) }}
             {{ subfield.label }}
