@@ -27,7 +27,7 @@ export default function ICSCalendarLink({
   ...restProps
 }) {
   const [copied, setCopied] = useState(false);
-  const [option, setOption] = useState(null);
+  const [option, setOption] = useState({url: null, text: null});
   const [open, setOpen] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
 
@@ -56,11 +56,14 @@ export default function ICSCalendarLink({
   };
 
   const handleSetOption = async (text, extraParams) => {
-    setOpen(!open);
-    setOption({
-      text,
-      url: await fetchURL(extraParams),
-    });
+    if (open) {
+      setOpen(false);
+    } else {
+      setOption({text, url: null});
+      setOpen(true);
+      const url = await fetchURL(extraParams);
+      setOption({text, url});
+    }
   };
 
   let trigger;
@@ -134,7 +137,7 @@ export default function ICSCalendarLink({
       <Header
         styleName="export-header"
         content={Translate.string('Export')}
-        subheader={option && <Label color="blue">{option.text}</Label>}
+        subheader={<Label color="blue">{option.text}</Label>}
       />
       <Popup.Content>
         <strong styleName="export-option">Synchronise with your calendar</strong>
@@ -147,11 +150,11 @@ export default function ICSCalendarLink({
         <Input
           placeholder={Translate.string('Loading…')}
           readOnly
-          loading={!option}
+          loading={!option.url}
           size="mini"
           fluid
-          value={option ? option.url : ''}
-          action={option && navigator.clipboard && copyButton}
+          value={option.url || ''}
+          action={option.url && navigator.clipboard ? copyButton : null}
         />
         {copied && (
           <Grid centered>
@@ -174,7 +177,8 @@ export default function ICSCalendarLink({
             as="a"
             href={option ? option.url : ''}
             icon="download"
-            disabled={!option}
+            loading={!option.url}
+            disabled={!option.url}
           />
         </div>
       </Popup.Content>
