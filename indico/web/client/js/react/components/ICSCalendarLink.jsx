@@ -84,7 +84,7 @@ export default function ICSCalendarLink({
       >
         <Dropdown.Menu>
           <Dropdown.Header>
-            <Translate>Synchronise with your calendar</Translate>
+            <Translate>Export</Translate>
           </Dropdown.Header>
           <Dropdown.Divider />
           {options.map(({key, text, extraParams}) => (
@@ -125,11 +125,12 @@ export default function ICSCalendarLink({
       wide
     >
       <Header
-        styleName="centered"
-        content={Translate.string('Sync with your calendar')}
+        styleName="export-header"
+        content={Translate.string('Export')}
         subheader={option && <Label color="blue">{option.text}</Label>}
       />
       <Popup.Content>
+        <strong styleName="export-option">Synchronise with your calendar</strong>
         <p>
           <Translate>
             You may copy-paste the following URL into your scheduling application. Contents will be
@@ -154,6 +155,20 @@ export default function ICSCalendarLink({
             </Grid.Row>
           </Grid>
         )}
+        <strong styleName="export-option">Download</strong>
+        <div styleName="download-option">
+          <span>
+            <Translate>
+              Download an iCalendar file that you can use in calendaring applications.
+            </Translate>
+          </span>
+          <Button
+            styleName="download-button"
+            as="a"
+            href={option ? option.url : ''}
+            icon="download"
+          />
+        </div>
       </Popup.Content>
     </Popup>
   );
