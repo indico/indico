@@ -27,7 +27,7 @@ export default function ICSCalendarLink({
   ...restProps
 }) {
   const [copied, setCopied] = useState(false);
-  const [option, setOption] = useState({url: null, text: null});
+  const [option, setOption] = useState({url: null, text: null, source: null});
   const [open, setOpen] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
 
@@ -41,13 +41,14 @@ export default function ICSCalendarLink({
     />
   );
 
-  const fetchURL = async extraParams => {
+  const fetchURL = async (extraParams, source) => {
     try {
       const {
         data: {url: signedURL},
       } = await indicoAxios.post(
         signURL(),
-        snakifyKeys({endpoint, params: {...params, ...extraParams}})
+        snakifyKeys({endpoint, params: {...params, ...extraParams}}),
+        {cancelToken: source.token}
       );
       return signedURL;
     } catch (error) {
@@ -55,14 +56,22 @@ export default function ICSCalendarLink({
     }
   };
 
+  const handleClose = () => {
+    setOpen(false);
+    if (option.source) {
+      option.source.cancel();
+    }
+  };
+
   const handleSetOption = async (text, extraParams) => {
     if (open) {
-      setOpen(false);
+      handleClose();
     } else {
-      setOption({text, url: null});
+      const source = indicoAxios.CancelToken.source();
+      setOption({text, url: null, source});
       setOpen(true);
-      const url = await fetchURL(extraParams);
-      setOption({text, url});
+      const url = await fetchURL(extraParams, source);
+      setOption({text, url, source: null});
     }
   };
 
@@ -130,7 +139,7 @@ export default function ICSCalendarLink({
         setCopied(false);
       }}
       onClose={() => {
-        setOpen(false);
+        handleClose();
       }}
       wide
     >
