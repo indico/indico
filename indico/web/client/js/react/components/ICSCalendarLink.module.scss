@@ -5,6 +5,8 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
+@import 'base/palette';
+
 .height-full {
   height: 100%;
 }
@@ -23,8 +25,8 @@
 
 .export-option::before,
 .export-option::after {
-  box-shadow: 1px 1px 1px #f9f9f9;
-  background-color: #dfdfdf;
+  box-shadow: 1px 1px 1px $light-gray;
+  background-color: $pastel-gray;
   content: '';
   display: inline-block;
   height: 1px;

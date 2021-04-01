@@ -56,11 +56,11 @@ export default function ICSCalendarLink({
   };
 
   const handleSetOption = async (text, extraParams) => {
+    setOpen(!open);
     setOption({
       text,
       url: await fetchURL(extraParams),
     });
-    setOpen(!open);
   };
 
   let trigger;
@@ -174,6 +174,7 @@ export default function ICSCalendarLink({
             as="a"
             href={option ? option.url : ''}
             icon="download"
+            disabled={!option}
           />
         </div>
       </Popup.Content>
