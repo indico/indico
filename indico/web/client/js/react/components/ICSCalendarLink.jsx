@@ -29,6 +29,7 @@ export default function ICSCalendarLink({
   const [copied, setCopied] = useState(false);
   const [option, setOption] = useState(null);
   const [open, setOpen] = useState(false);
+  const [dropdownOpen, setDropdownOpen] = useState(false);
 
   const copyButton = (
     <Button
@@ -59,7 +60,7 @@ export default function ICSCalendarLink({
       text,
       url: await fetchURL(extraParams),
     });
-    setOpen(true);
+    setOpen(!open);
   };
 
   let trigger;
@@ -71,7 +72,7 @@ export default function ICSCalendarLink({
         icon={null}
         trigger={
           renderButton ? (
-            renderButton(() => {})
+            renderButton(() => {}, {open: dropdownOpen || open})
           ) : (
             <Button icon size="small">
               <Icon name="calendar alternate outline" />
@@ -80,6 +81,12 @@ export default function ICSCalendarLink({
           )
         }
         pointing={dropdownPosition}
+        onOpen={() => {
+          setDropdownOpen(true);
+        }}
+        onClose={() => {
+          setDropdownOpen(false);
+        }}
         {...restProps}
       >
         <Dropdown.Menu>
@@ -100,7 +107,7 @@ export default function ICSCalendarLink({
   } else {
     const {text, extraParams} = options[0];
     trigger = renderButton ? (
-      renderButton(() => handleSetOption(text, extraParams))
+      renderButton(() => handleSetOption(text, extraParams), {open})
     ) : (
       <Button icon size="small" onClick={() => handleSetOption(text, extraParams)}>
         <Icon name="calendar alternate outline" />
