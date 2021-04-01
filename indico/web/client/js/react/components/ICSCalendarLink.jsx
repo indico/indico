@@ -8,7 +8,7 @@
 import signURL from 'indico-url:core.sign_url';
 
 import PropTypes from 'prop-types';
-import React, {useState} from 'react';
+import React, {useReducer, useState} from 'react';
 import {Button, Dropdown, Icon, Input, Label, Grid, Popup, Header} from 'semantic-ui-react';
 
 import {Translate} from 'indico/react/i18n';
@@ -16,6 +16,26 @@ import {indicoAxios, handleAxiosError} from 'indico/utils/axios';
 import {snakifyKeys} from 'indico/utils/case';
 
 import './ICSCalendarLink.module.scss';
+
+const initialState = {
+  open: false,
+  url: null,
+  text: null,
+  source: null,
+};
+
+function popupReducer(state, action) {
+  switch (action.type) {
+    case 'CLOSE':
+      return {...state, url: null, open: false};
+    case 'OPEN':
+      return {...state, open: true, text: action.text, source: action.source};
+    case 'LOADED':
+      return {...state, url: action.url, source: null};
+    default:
+      return state;
+  }
+}
 
 export default function ICSCalendarLink({
   endpoint,
@@ -26,16 +46,15 @@ export default function ICSCalendarLink({
   options,
   ...restProps
 }) {
+  const [popupState, dispatch] = useReducer(popupReducer, initialState);
   const [copied, setCopied] = useState(false);
-  const [option, setOption] = useState({url: null, text: null, source: null});
-  const [open, setOpen] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
 
   const copyButton = (
     <Button
       icon="copy"
       onClick={async () => {
-        await navigator.clipboard.writeText(option.url);
+        await navigator.clipboard.writeText(popupState.url);
         setCopied(true);
       }}
     />
@@ -57,21 +76,20 @@ export default function ICSCalendarLink({
   };
 
   const handleClose = () => {
-    setOpen(false);
-    if (option.source) {
-      option.source.cancel();
+    if (popupState.source) {
+      popupState.source.cancel();
     }
+    dispatch({type: 'CLOSE'});
   };
 
   const handleSetOption = async (text, extraParams) => {
-    if (open) {
+    if (popupState.open) {
       handleClose();
     } else {
       const source = indicoAxios.CancelToken.source();
-      setOption({text, url: null, source});
-      setOpen(true);
+      dispatch({type: 'OPEN', text, source});
       const url = await fetchURL(extraParams, source);
-      setOption({text, url, source: null});
+      dispatch({type: 'LOADED', url});
     }
   };
 
@@ -84,7 +102,7 @@ export default function ICSCalendarLink({
         icon={null}
         trigger={
           renderButton ? (
-            renderButton(() => {}, {open: dropdownOpen || open})
+            renderButton(() => {}, {open: dropdownOpen || popupState.open})
           ) : (
             <Button icon size="small">
               <Icon name="calendar alternate outline" />
@@ -119,7 +137,7 @@ export default function ICSCalendarLink({
   } else {
     const {text, extraParams} = options[0];
     trigger = renderButton ? (
-      renderButton(() => handleSetOption(text, extraParams), {open})
+      renderButton(() => handleSetOption(text, extraParams), {open: popupState.open})
     ) : (
       <Button icon size="small" onClick={() => handleSetOption(text, extraParams)}>
         <Icon name="calendar alternate outline" />
@@ -132,7 +150,7 @@ export default function ICSCalendarLink({
     <Popup
       trigger={trigger}
       position={popupPosition}
-      open={open}
+      open={popupState.open}
       popperDependencies={[copied]}
       on="click"
       onOpen={() => {
@@ -146,7 +164,7 @@ export default function ICSCalendarLink({
       <Header
         styleName="export-header"
         content={Translate.string('Export')}
-        subheader={<Label color="blue">{option.text}</Label>}
+        subheader={<Label color="blue">{popupState.text}</Label>}
       />
       <Popup.Content>
         <strong styleName="export-option">Synchronise with your calendar</strong>
@@ -159,11 +177,11 @@ export default function ICSCalendarLink({
         <Input
           placeholder={Translate.string('Loading…')}
           readOnly
-          loading={!option.url}
+          loading={!popupState.url}
           size="mini"
           fluid
-          value={option.url || ''}
-          action={option.url && navigator.clipboard ? copyButton : null}
+          value={popupState.url || ''}
+          action={popupState.url && navigator.clipboard ? copyButton : null}
         />
         {copied && (
           <Grid centered>
@@ -184,10 +202,10 @@ export default function ICSCalendarLink({
           <Button
             styleName="download-button"
             as="a"
-            href={option ? option.url : ''}
+            href={popupState.url}
             icon="download"
-            loading={!option.url}
-            disabled={!option.url}
+            loading={!popupState.url}
+            disabled={!popupState.url}
           />
         </div>
       </Popup.Content>
