@@ -38,7 +38,7 @@ document.addEventListener('DOMContentLoaded', () => {
           dropdown
           classes={{'height-full': true, 'text-color': true, 'subtle': true, ...classes}}
           onClick={onClick}
-          title="Export"
+          title={Translate.string('Export')}
         />
       )}
       dropdownPosition="top left"
