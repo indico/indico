@@ -21,6 +21,10 @@ $i-button-spacing: 0.3rem;
   flex-shrink: 0;
   min-height: $toolbar-height;
 
+  &.fixed-height {
+    max-height: 1.75rem;
+  }
+
   &.space-before {
     margin-top: $toolbar-spacing;
   }

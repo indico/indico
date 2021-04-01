@@ -8,7 +8,7 @@
 import signURL from 'indico-url:core.sign_url';
 
 import PropTypes from 'prop-types';
-import React, {useState} from 'react';
+import React, {useReducer, useState} from 'react';
 import {Button, Dropdown, Icon, Input, Label, Grid, Popup, Header} from 'semantic-ui-react';
 
 import {Translate} from 'indico/react/i18n';
@@ -16,6 +16,26 @@ import {indicoAxios, handleAxiosError} from 'indico/utils/axios';
 import {snakifyKeys} from 'indico/utils/case';
 
 import './ICSCalendarLink.module.scss';
+
+const initialState = {
+  open: false,
+  url: null,
+  text: null,
+  source: null,
+};
+
+function popupReducer(state, action) {
+  switch (action.type) {
+    case 'CLOSE':
+      return {...state, url: null, open: false};
+    case 'OPEN':
+      return {...state, open: true, text: action.text, source: action.source};
+    case 'LOADED':
+      return {...state, url: action.url, source: null};
+    default:
+      return state;
+  }
+}
 
 export default function ICSCalendarLink({
   endpoint,
@@ -26,27 +46,28 @@ export default function ICSCalendarLink({
   options,
   ...restProps
 }) {
+  const [popupState, dispatch] = useReducer(popupReducer, initialState);
   const [copied, setCopied] = useState(false);
-  const [option, setOption] = useState(null);
-  const [open, setOpen] = useState(false);
+  const [dropdownOpen, setDropdownOpen] = useState(false);
 
   const copyButton = (
     <Button
       icon="copy"
       onClick={async () => {
-        await navigator.clipboard.writeText(option.url);
+        await navigator.clipboard.writeText(popupState.url);
         setCopied(true);
       }}
     />
   );
 
-  const fetchURL = async extraParams => {
+  const fetchURL = async (extraParams, source) => {
     try {
       const {
         data: {url: signedURL},
       } = await indicoAxios.post(
         signURL(),
-        snakifyKeys({endpoint, params: {...params, ...extraParams}})
+        snakifyKeys({endpoint, params: {...params, ...extraParams}}),
+        {cancelToken: source.token}
       );
       return signedURL;
     } catch (error) {
@@ -54,12 +75,22 @@ export default function ICSCalendarLink({
     }
   };
 
+  const handleClose = () => {
+    if (popupState.source) {
+      popupState.source.cancel();
+    }
+    dispatch({type: 'CLOSE'});
+  };
+
   const handleSetOption = async (text, extraParams) => {
-    setOption({
-      text,
-      url: await fetchURL(extraParams),
-    });
-    setOpen(true);
+    if (popupState.open) {
+      handleClose();
+    } else {
+      const source = indicoAxios.CancelToken.source();
+      dispatch({type: 'OPEN', text, source});
+      const url = await fetchURL(extraParams, source);
+      dispatch({type: 'LOADED', url});
+    }
   };
 
   let trigger;
@@ -71,7 +102,7 @@ export default function ICSCalendarLink({
         icon={null}
         trigger={
           renderButton ? (
-            renderButton(() => {})
+            renderButton(() => {}, {open: dropdownOpen || popupState.open})
           ) : (
             <Button icon size="small">
               <Icon name="calendar alternate outline" />
@@ -80,11 +111,17 @@ export default function ICSCalendarLink({
           )
         }
         pointing={dropdownPosition}
+        onOpen={() => {
+          setDropdownOpen(true);
+        }}
+        onClose={() => {
+          setDropdownOpen(false);
+        }}
         {...restProps}
       >
         <Dropdown.Menu>
           <Dropdown.Header>
-            <Translate>Synchronise with your calendar</Translate>
+            <Translate>Export</Translate>
           </Dropdown.Header>
           <Dropdown.Divider />
           {options.map(({key, text, extraParams}) => (
@@ -100,7 +137,7 @@ export default function ICSCalendarLink({
   } else {
     const {text, extraParams} = options[0];
     trigger = renderButton ? (
-      renderButton(() => handleSetOption(text, extraParams))
+      renderButton(() => handleSetOption(text, extraParams), {open: popupState.open})
     ) : (
       <Button icon size="small" onClick={() => handleSetOption(text, extraParams)}>
         <Icon name="calendar alternate outline" />
@@ -113,23 +150,24 @@ export default function ICSCalendarLink({
     <Popup
       trigger={trigger}
       position={popupPosition}
-      open={open}
+      open={popupState.open}
       popperDependencies={[copied]}
       on="click"
       onOpen={() => {
         setCopied(false);
       }}
       onClose={() => {
-        setOpen(false);
+        handleClose();
       }}
       wide
     >
       <Header
-        styleName="centered"
-        content={Translate.string('Sync with your calendar')}
-        subheader={option && <Label color="blue">{option.text}</Label>}
+        styleName="export-header"
+        content={Translate.string('Export')}
+        subheader={<Label color="blue">{popupState.text}</Label>}
       />
       <Popup.Content>
+        <strong styleName="export-option">Synchronise with your calendar</strong>
         <p>
           <Translate>
             You may copy-paste the following URL into your scheduling application. Contents will be
@@ -139,11 +177,11 @@ export default function ICSCalendarLink({
         <Input
           placeholder={Translate.string('Loading…')}
           readOnly
-          loading={!option}
+          loading={!popupState.url}
           size="mini"
           fluid
-          value={option ? option.url : ''}
-          action={option && navigator.clipboard && copyButton}
+          value={popupState.url || ''}
+          action={popupState.url && navigator.clipboard ? copyButton : null}
         />
         {copied && (
           <Grid centered>
@@ -154,6 +192,22 @@ export default function ICSCalendarLink({
             </Grid.Row>
           </Grid>
         )}
+        <strong styleName="export-option">Download</strong>
+        <div styleName="download-option">
+          <span>
+            <Translate>
+              Download an iCalendar file that you can use in calendaring applications.
+            </Translate>
+          </span>
+          <Button
+            styleName="download-button"
+            as="a"
+            href={popupState.url}
+            icon="download"
+            loading={!popupState.url}
+            disabled={!popupState.url}
+          />
+        </div>
       </Popup.Content>
     </Popup>
   );
