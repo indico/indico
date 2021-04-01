@@ -43,9 +43,11 @@
             {{ template_hook('category-management-after-banner-actions', category=category) }}
         </div>
     </div>
-    <script>
-        setupCategoryMoveButton({{ category.parent.id }});
-    </script>
+    {% if not category.is_root %}
+        <script>
+            setupCategoryMoveButton({{ category.parent.id }});
+        </script>
+    {% endif %}
 {% endblock %}
 
 {% block side_menu %}
