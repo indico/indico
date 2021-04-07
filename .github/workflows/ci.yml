@@ -4,10 +4,12 @@ on:
   push:
     branches:
       - master
+      - search
       - 2.3-maintenance
   pull_request:
     branches:
       - master
+      - search
       - 2.3-maintenance
 
 jobs:
