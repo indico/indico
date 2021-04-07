@@ -11,12 +11,14 @@ import struct
 import sys
 import termios
 import time
+from datetime import timedelta
 
 import click
 from click.types import convert_type
 from colorclass import Color
 from termcolor import colored
 
+from indico.util.date_time import format_human_timedelta
 from indico.util.string import validate_email
 
 
@@ -55,34 +57,47 @@ def clear_line():
     print('\r', ' ' * terminal_size()[0], '\r', end='', sep='')
 
 
-def verbose_iterator(iterable, total, get_id, get_title, print_every=10):
+def verbose_iterator(iterable, total, get_id, get_title=None, print_every=10, print_total_time=False):
     """Iterate large iterables verbosely.
 
     :param iterable: An iterable
     :param total: The number of items in `iterable`
     :param get_id: callable to retrieve the ID of an item
     :param get_title: callable to retrieve the title of an item
+    :param print_every: after which number of items to update the progress
+    :param print_total_time: whether to print the total time spent at the end
     """
     term_width = terminal_size()[0]
     start_time = time.time()
     fmt = cformat(
         '[%{cyan!}{:6}%{reset}/%{cyan}{}%{reset}  %{yellow!}{:.3f}%{reset}%  %{green!}{}%{reset}]  {:>8}  %{grey!}{}'
     )
+    end_fmt = cformat(
+        '[%{cyan!}{:6}%{reset}/%{cyan}{}%{reset}  %{yellow!}{:.3f}%{reset}%  %{green!}{}%{reset}]  '
+        'Total duration: %{green}{}'
+    )
+
+    def _print_text(text):
+        print('\r', ' ' * term_width, end='', sep='')
+        # terminal width + ansi control code length - trailing reset code (4)
+        print('\r', text[:term_width + len(text.value_colors) - len(text.value_no_colors) - 4], cformat('%{reset}'),
+              end='', sep='')
+        sys.stdout.flush()
 
     for i, item in enumerate(iterable, 1):
         if i % print_every == 0 or i == total:
             remaining_seconds = int((time.time() - start_time) / i * (total - i))
             remaining = '{:02}:{:02}'.format(remaining_seconds // 60, remaining_seconds % 60)
             id_ = get_id(item)
-            title = get_title(item).replace('\n', ' ')
+            title = get_title(item).replace('\n', ' ') if get_title else ''
             text = fmt.format(i, total, (i / total * 100.0), remaining, id_, title)
-            print('\r', ' ' * term_width, end='', sep='')
-            # terminal width + ansi control code length - trailing reset code (4)
-            print('\r', text[:term_width + len(text.value_colors) - len(text.value_no_colors) - 4], cformat('%{reset}'),
-                  end='', sep='')
-            sys.stdout.flush()
+            _print_text(text)
 
         yield item
+
+    if print_total_time:
+        total_duration = timedelta(seconds=(time.time() - start_time))
+        _print_text(end_fmt.format(i, total, (i / total * 100.0), '00:00', format_human_timedelta(total_duration)))
 
     print()
 
