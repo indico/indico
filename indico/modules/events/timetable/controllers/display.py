@@ -66,7 +66,6 @@ class RHTimetableEntryInfo(RHTimetableProtectionBase):
         self.entry = self.event.timetable_entries.filter_by(id=request.view_args['entry_id']).first_or_404()
 
     def _check_access(self):
-        RHTimetableProtectionBase._check_access(self)
         if not self.entry.can_view(session.user):
             raise Forbidden
 
