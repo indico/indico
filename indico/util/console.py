@@ -97,7 +97,7 @@ def verbose_iterator(iterable, total, get_id, get_title=None, print_every=10, pr
 
     if print_total_time:
         total_duration = timedelta(seconds=(time.time() - start_time))
-        _print_text(end_fmt.format(i, total, (i / total * 100.0), '00:00', format_human_timedelta(total_duration)))
+        _print_text(end_fmt.format(total, total, 100, '00:00', format_human_timedelta(total_duration)))
 
     print()
 
