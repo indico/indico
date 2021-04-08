@@ -295,7 +295,7 @@ export default class EditableTimelineItem extends React.Component {
               header={`${hintPosition.hours}:${hintPosition.minutes.toString().padStart(2, '0')}`}
               content={tip}
               position="top left"
-              offset={hintPosition.pixels}
+              offset={[hintPosition.pixels, 0]}
               context={canvasRef}
               size="mini"
               styleName="editable-timeline-time-popup"
