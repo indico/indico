@@ -59,31 +59,6 @@ def get_attached_items(linked_object, include_empty=True, include_hidden=True, p
     }
 
 
-def get_nested_attached_items(obj):
-    """
-    Return a structured representation of all attachments linked to an object
-    and all its nested objects.
-
-    :param obj: A :class:`Event`, :class:`Session`, :class:`Contribution`
-                or :class:`SubContribution` object.
-    """
-    attachments = get_attached_items(obj, include_empty=False, include_hidden=False)
-    nested_objects = []
-    if isinstance(obj, db.m.Event):
-        nested_objects = obj.sessions + obj.contributions
-    elif isinstance(obj, db.m.Session):
-        nested_objects = obj.contributions
-    elif isinstance(obj, db.m.Contribution):
-        nested_objects = obj.subcontributions
-    if nested_objects:
-        children = [_f for _f in map(get_nested_attached_items, nested_objects) if _f]
-        if children:
-            attachments['children'] = children
-    if attachments:
-        attachments['object'] = obj
-    return attachments
-
-
 def can_manage_attachments(obj, user):
     """Check if a user can manage attachments for the object."""
     if not user:
