@@ -284,7 +284,7 @@ traitlets==5.0.5
     # via ipython
 translitcodec==0.6.0
     # via -r requirements.in
-urllib3==1.26.3
+urllib3==1.26.4
     # via
     #   requests
     #   sentry-sdk

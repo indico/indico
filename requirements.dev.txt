@@ -213,7 +213,7 @@ tornado==6.1
     # via livereload
 transifex-client==0.14.2
     # via -r requirements.dev.in
-urllib3==1.26.3
+urllib3==1.26.4
     # via
     #   -c requirements.txt
     #   requests
