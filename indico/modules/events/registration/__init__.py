@@ -85,6 +85,8 @@ def _extend_event_menu(sender, **kwargs):
     def _visible_registration(event):
         if not event.has_feature('registration'):
             return False
+        if not event.can_access(session.user) and not (event.has_regform_in_acl and event.public_regform_access):
+            return False
         if any(form.is_scheduled for form in event.registration_forms):
             return True
         if not session.user:
