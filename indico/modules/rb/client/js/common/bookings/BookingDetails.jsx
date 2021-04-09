@@ -831,8 +831,8 @@ class BookingDetails extends React.Component {
     const showActionButtons = !isCancelled && !isRejected && (canCancel || canReject || showAccept);
     const activeBookings = _.omitBy(occurrences.bookings, value => _.isEmpty(value));
     const occurrenceCount = Object.keys(activeBookings).length;
-    const cancellableOccurrenceCount = Object.keys(activeBookings).filter(date =>
-      activeBookings[date].some(occurrence => occurrence.canCancel)
+    const cancellableOccurrenceCount = Object.values(activeBookings).filter(date =>
+      date.some(occurrence => occurrence.canCancel)
     ).length;
 
     return (
