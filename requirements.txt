@@ -4,11 +4,11 @@
 #
 #    pip-compile
 #
-alembic==1.5.6
+alembic==1.5.8
     # via
     #   -r requirements.in
     #   flask-migrate
-amqp==5.0.5
+amqp==5.0.6
     # via kombu
 asttokens==2.0.4
     # via sentry-sdk
@@ -24,7 +24,7 @@ backcall==0.2.0
     # via ipython
 bcrypt==3.2.0
     # via -r requirements.in
-billiard==3.6.3.0
+billiard==3.6.4.0
     # via celery
 bleach==3.3.0
     # via -r requirements.in
@@ -67,7 +67,7 @@ colorclass==2.2.0
     # via -r requirements.in
 cryptography==3.4.7
     # via authlib
-decorator==4.4.2
+decorator==5.0.6
     # via ipython
 distro==1.5.0
     # via -r requirements.in
@@ -83,7 +83,7 @@ feedgen==0.9.0
     # via -r requirements.in
 flask-babelex==0.9.4
     # via -r requirements.in
-flask-caching==1.10.0
+flask-caching==1.10.1
     # via -r requirements.in
 flask-limiter==1.4
     # via -r requirements.in
@@ -93,9 +93,9 @@ flask-migrate==2.7.0
     # via -r requirements.in
 flask-multipass==0.3.5
     # via -r requirements.in
-flask-pluginengine==0.3.1
+flask-pluginengine==0.4
     # via -r requirements.in
-flask-sqlalchemy==2.4.4
+flask-sqlalchemy==2.5.1
     # via
     #   -r requirements.in
     #   flask-migrate
@@ -117,7 +117,7 @@ flask==1.1.2
     #   flask-webpackext
     #   flask-wtf
     #   sentry-sdk
-hiredis==1.1.0
+hiredis==2.0.0
     # via redis
 html2text==2020.1.16
     # via -r requirements.in
@@ -133,7 +133,7 @@ indico-fonts==1.1
     # via -r requirements.in
 ipython-genutils==0.2.0
     # via traitlets
-ipython==7.21.0
+ipython==7.22.0
     # via -r requirements.in
 itsdangerous==1.1.0
     # via
@@ -185,17 +185,17 @@ packaging==20.9
     # via
     #   -r requirements.in
     #   bleach
-parso==0.8.1
+parso==0.8.2
     # via jedi
 pexpect==4.8.0
     # via ipython
 pickleshare==0.7.5
     # via ipython
-pillow==8.1.2
+pillow==8.2.0
     # via
     #   -r requirements.in
     #   reportlab
-prompt-toolkit==3.0.16
+prompt-toolkit==3.0.18
     # via
     #   -r requirements.in
     #   click-repl
@@ -204,7 +204,7 @@ psycopg2==2.8.6
     # via -r requirements.in
 ptyprocess==0.7.0
     # via pexpect
-pure-eval==0.1.1
+pure-eval==0.2.1
     # via sentry-sdk
 pycountry==20.7.3
     # via -r requirements.in
@@ -246,7 +246,7 @@ qrcode==6.1
     # via -r requirements.in
 redis[hiredis]==3.5.3
     # via -r requirements.in
-reportlab==3.5.64
+reportlab==3.5.66
     # via -r requirements.in
 requests==2.25.1
     # via -r requirements.in
@@ -269,7 +269,7 @@ six==1.15.0
     #   qrcode
 speaklater==1.3
     # via flask-babelex
-sqlalchemy==1.3.23
+sqlalchemy==1.3.24
     # via
     #   -r requirements.in
     #   alembic
@@ -308,7 +308,7 @@ wtforms[email,ipaddress]==2.3.3
     # via
     #   -r requirements.in
     #   flask-wtf
-xlsxwriter==1.3.7
+xlsxwriter==1.3.8
     # via -r requirements.in
 
 # The following packages are considered to be unsafe in a requirements file:

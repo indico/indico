@@ -51,11 +51,11 @@ reportlab
 requests
 sentry-sdk[flask,celery,sqlalchemy,pure_eval]
 simplejson
-sqlalchemy
+sqlalchemy<1.4  # 1.4 is a major release in SA, so needs more testing
 termcolor
 terminaltables
 translitcodec
-webargs
+webargs<8  # https://github.com/marshmallow-code/webargs/issues/580
 werkzeug
 wtforms[ipaddress,email]
 xlsxwriter
