@@ -135,10 +135,10 @@ export function fetchActiveBookings(limit, fetchRooms = true) {
 
     if (Object.keys(data).length) {
       const lastDt = Object.keys(data).reverse()[0];
-      body.start_dt = _.maxBy(data[lastDt], rv =>
+      params.start_dt = _.maxBy(data[lastDt], rv =>
         moment(rv.startDt, 'YYYY-MM-DD HH:mm').unix()
       ).startDt;
-      body.last_reservation_id = data[lastDt][data[lastDt].length - 1].reservation.id;
+      params.last_reservation_id = data[lastDt][data[lastDt].length - 1].reservation.id;
     }
 
     return await ajaxAction(
