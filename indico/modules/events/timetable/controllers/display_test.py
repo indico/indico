@@ -23,7 +23,7 @@ def test_timetable_entry_info_access(dummy_event, dummy_user, allowed, event_all
     rh.entry = MagicMock()
     rh.entry.can_view.return_value = allowed
     # event access should not matter for the RH access check as having access e.g.
-    # to a specific session lets users view the timetabel for that session
+    # to a specific session lets users view the timetable for that session
     assert dummy_event.can_access(dummy_user) == event_allowed
     if allowed:
         rh._check_access()
