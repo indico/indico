@@ -19,6 +19,8 @@ Bugfixes
   inside it (:pr:`4857`)
 - Fix viewing contributions if you cannot access the event but have explicit access to
   the contribution (:pr:`4860`)
+- Hide registration menu item if you cannot access the event and registrations are not
+  exempt from event access checks (:pr:`4860`)
 
 Version 2.3.4
 -------------
