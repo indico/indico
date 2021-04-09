@@ -17,6 +17,8 @@ Bugfixes
   of the reviewing types disabled (:pr:`4838`)
 - Fix viewing timetable entries if you cannot access the event but a specific session
   inside it (:pr:`4857`)
+- Fix viewing contributions if you cannot access the event but have explicit access to
+  the contribution (:pr:`4860`)
 
 Version 2.3.4
 -------------

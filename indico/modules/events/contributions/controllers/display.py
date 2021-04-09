@@ -61,8 +61,9 @@ class RHContributionDisplayBase(RHDisplayEventBase):
         return self.event.can_manage(session.user) or self.contrib.is_user_associated(session.user)
 
     def _check_access(self):
-        RHDisplayEventBase._check_access(self)
         if not self.contrib.can_access(session.user):
+            # perform event access check since it may send the user to the access key or registration page
+            RHDisplayEventBase._check_access(self)
             raise Forbidden
         published = contribution_settings.get(self.event, 'published')
         if not published and not self._can_view_unpublished():
@@ -251,8 +252,9 @@ class RHSubcontributionDisplay(RHDisplayEventBase):
     view_class = WPContributions
 
     def _check_access(self):
-        RHDisplayEventBase._check_access(self)
         if not self.subcontrib.can_access(session.user):
+            # perform event access check since it may send the user to the access key or registration page
+            RHDisplayEventBase._check_access(self)
             raise Forbidden
         published = contribution_settings.get(self.event, 'published')
         if (not published and not self.event.can_manage(session.user)
