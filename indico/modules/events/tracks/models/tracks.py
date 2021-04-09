@@ -16,8 +16,12 @@ def get_next_position(context):
     from indico.modules.events.tracks.models.groups import TrackGroup
 
     event_id = context.current_parameters['event_id']
-    track_max_position = db.session.query(db.func.max(Track.position)).filter_by(event_id=event_id).scalar()
-    track_group_max_position = db.session.query(db.func.max(TrackGroup.position)).filter_by(event_id=event_id).scalar()
+    track_max_position = (db.session.query(db.func.max(Track.position))
+                          .filter(Track.event_id == event_id)
+                          .scalar())
+    track_group_max_position = (db.session.query(db.func.max(TrackGroup.position))
+                                .filter(TrackGroup.event_id == event_id)
+                                .scalar())
     pos = max(track_max_position or 0, track_group_max_position or 0)
     return pos + 1
 

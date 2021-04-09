@@ -20,7 +20,9 @@ def _get_next_position(context):
     """Get the next question position for the event."""
     survey_id = context.current_parameters['survey_id']
     parent_id = context.current_parameters['parent_id']
-    res = db.session.query(db.func.max(SurveyItem.position)).filter_by(survey_id=survey_id, parent_id=parent_id).one()
+    res = (db.session.query(db.func.max(SurveyItem.position))
+           .filter(SurveyItem.survey_id == survey_id, SurveyItem.parent_id == parent_id)
+           .one())
     return (res[0] or 0) + 1
 
 

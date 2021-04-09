@@ -359,7 +359,7 @@ class Contribution(DescriptionMixin, ProtectionManagersMixin, LocationMixin, Att
         subquery = (db.select([db.func.max(PaperRevision.submitted_dt)])
                     .where(PaperRevision._contribution_id == cls.id)
                     .correlate_except(PaperRevision)
-                    .as_scalar())
+                    .scalar_subquery())
         return db.relationship(
             'PaperRevision',
             uselist=False,
@@ -392,14 +392,16 @@ class Contribution(DescriptionMixin, ProtectionManagersMixin, LocationMixin, Att
         from indico.modules.events.contributions.models.subcontributions import SubContribution
         query = (db.select([db.func.count(SubContribution.id)])
                  .where((SubContribution.contribution_id == cls.id) & ~SubContribution.is_deleted)
-                 .correlate_except(SubContribution))
+                 .correlate_except(SubContribution)
+                 .scalar_subquery())
         return db.column_property(query, deferred=True)
 
     @declared_attr
     def _paper_revision_count(cls):
         query = (db.select([db.func.count(PaperRevision.id)])
                  .where(PaperRevision._contribution_id == cls.id)
-                 .correlate_except(PaperRevision))
+                 .correlate_except(PaperRevision)
+                 .scalar_subquery())
         return db.column_property(query, deferred=True)
 
     def __init__(self, **kwargs):

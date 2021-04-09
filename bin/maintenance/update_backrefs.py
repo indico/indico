@@ -12,14 +12,13 @@ from operator import itemgetter
 import click
 from sqlalchemy import inspect
 
-from indico.core.db import db
-from indico.core.db.sqlalchemy.util.models import import_all_models
+from indico.core.db.sqlalchemy.util.models import get_all_models, import_all_models
 from indico.util.console import cformat
 
 
 def _find_backrefs():
     backrefs = defaultdict(list)
-    for cls in db.Model._decl_class_registry.values():
+    for cls in get_all_models():
         if not hasattr(cls, '__table__'):
             continue
         mapper = inspect(cls)

@@ -41,7 +41,7 @@ class PyIntEnum(TypeDecorator, SchemaType):
 
     def __init__(self, enum=None, exclude_values=None):
         self.enum = enum
-        self.exclude_values = set(exclude_values or ())
+        self.exclude_values = frozenset(exclude_values or ())
         TypeDecorator.__init__(self)
         SchemaType.__init__(self)
 
@@ -79,7 +79,7 @@ class PyIntEnum(TypeDecorator, SchemaType):
                 f'{name}.{x.name}' for x in sorted(self.exclude_values)
             ))
         else:
-            return '{}({})'.format(type(self).__name__, name)
+            return f'{type(self).__name__}({name})'
 
     def marshmallow_get_field_kwargs(self):
         return {'enum': self.enum}

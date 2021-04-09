@@ -982,7 +982,7 @@ def _mappers_configured():
     # Event.category_chain -- the category ids of the event, starting
     # with the root category down to the event's immediate parent.
     cte = Category.get_tree_cte()
-    query = select([cte.c.path]).where(cte.c.id == Event.category_id).correlate_except(cte)
+    query = select([cte.c.path]).where(cte.c.id == Event.category_id).correlate_except(cte).scalar_subquery()
     Event.category_chain = column_property(query, deferred=True)
 
     # Event.effective_protection_mode -- the effective protection mode
@@ -990,7 +990,8 @@ def _mappers_configured():
     # parent category
     query = (select([db.case({ProtectionMode.inheriting.value: Category.effective_protection_mode},
                              else_=Event.protection_mode, value=Event.protection_mode)])
-             .where(Category.id == Event.category_id))
+             .where(Category.id == Event.category_id)
+             .scalar_subquery())
     Event.effective_protection_mode = column_property(query, deferred=True)
 
     # Event.series_pos -- the position of the event in its series
@@ -999,13 +1000,14 @@ def _mappers_configured():
                 .where((event_alias.series_id == Event.series_id) & ~event_alias.is_deleted)
                 .correlate(Event)
                 .alias())
-    query = select([subquery.c.pos]).where(subquery.c.id == Event.id).correlate_except(subquery)
+    query = select([subquery.c.pos]).where(subquery.c.id == Event.id).correlate_except(subquery).scalar_subquery()
     Event.series_pos = column_property(query, group='series', deferred=True)
 
     # Event.series_count -- the number of events in the event's series
     query = (db.select([db.func.count(event_alias.id)])
              .where((event_alias.series_id == Event.series_id) & ~event_alias.is_deleted)
-             .correlate_except(event_alias))
+             .correlate_except(event_alias)
+             .scalar_subquery())
     Event.series_count = column_property(query, group='series', deferred=True)
 
 

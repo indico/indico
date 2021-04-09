@@ -568,7 +568,7 @@ class PrincipalPermissionsMixin(PrincipalMixin):
     @classmethod
     def principal_for_obj(cls):
         if isinstance(cls.principal_for, str):
-            return db.Model._decl_class_registry[cls.principal_for]
+            return db.Model.registry._class_registry[cls.principal_for]
         else:
             return cls.principal_for
 
@@ -655,7 +655,7 @@ class PrincipalComparator(Comparator):
         elif other.principal_type == PrincipalType.user:
             criteria = [self.cls.user_id == other.id]
         else:
-            raise ValueError('Unexpected object type {}: {}'.format(type(other), other))
+            raise ValueError(f'Unexpected object type {type(other)}: {other}')
         return db.and_(self.cls.type == other.principal_type, *criteria)
 
 

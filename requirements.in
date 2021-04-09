@@ -51,7 +51,7 @@ reportlab
 requests
 sentry-sdk[flask,celery,sqlalchemy,pure_eval]
 simplejson
-sqlalchemy<1.4  # 1.4 is a major release in SA, so needs more testing
+sqlalchemy
 termcolor
 terminaltables
 translitcodec

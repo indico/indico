@@ -26,7 +26,10 @@ def _get_next_position(context):
     regform_id = context.current_parameters['registration_form_id']
     parent_id = context.current_parameters['parent_id']
     res = (db.session.query(db.func.max(RegistrationFormItem.position))
-           .filter_by(parent_id=parent_id, registration_form_id=regform_id, is_deleted=False, is_enabled=True)
+           .filter(RegistrationFormItem.parent_id == parent_id,
+                   RegistrationFormItem.registration_form_id == regform_id,
+                   ~RegistrationFormItem.is_deleted,
+                   RegistrationFormItem.is_enabled)
            .one())
     return (res[0] or 0) + 1
 

@@ -287,14 +287,16 @@ class User(PersonMixin, db.Model):
         lazy=False,
         uselist=False,
         cascade='all, delete-orphan',
-        primaryjoin='(User.id == UserEmail.user_id) & UserEmail.is_primary'
+        primaryjoin='(User.id == UserEmail.user_id) & UserEmail.is_primary',
+        overlaps='_secondary_emails'
     )
     _secondary_emails = db.relationship(
         'UserEmail',
         lazy=True,
         cascade='all, delete-orphan',
         collection_class=set,
-        primaryjoin='(User.id == UserEmail.user_id) & ~UserEmail.is_primary'
+        primaryjoin='(User.id == UserEmail.user_id) & ~UserEmail.is_primary',
+        overlaps='_primary_email'
     )
     _all_emails = db.relationship(
         'UserEmail',
@@ -355,7 +357,8 @@ class User(PersonMixin, db.Model):
         uselist=False,
         cascade='all, delete-orphan',
         primaryjoin='(User.id == APIKey.user_id) & APIKey.is_active',
-        back_populates='user'
+        back_populates='user',
+        overlaps='old_api_keys'
     )
     #: the previous API keys of the user
     old_api_keys = db.relationship(
@@ -364,7 +367,8 @@ class User(PersonMixin, db.Model):
         cascade='all, delete-orphan',
         order_by='APIKey.created_dt.desc()',
         primaryjoin='(User.id == APIKey.user_id) & ~APIKey.is_active',
-        back_populates='user'
+        back_populates='user',
+        overlaps='api_key'
     )
     #: the identities used by this user
     identities = db.relationship(

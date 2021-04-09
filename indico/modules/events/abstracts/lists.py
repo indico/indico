@@ -151,7 +151,7 @@ class AbstractListGeneratorBase(ListGeneratorBase):
         if extra_filters:
             if extra_filters.get('multiple_tracks'):
                 submitted_for_count = (db.select([db.func.count()])
-                                       .as_scalar()
+                                       .scalar_subquery()
                                        .where(Abstract.submitted_for_tracks.prop.primaryjoin))
                 criteria.append(submitted_for_count > 1)
             if extra_filters.get('comments'):

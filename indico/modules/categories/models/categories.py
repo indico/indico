@@ -34,7 +34,7 @@ from indico.web.flask.util import url_for
 
 def _get_next_position(context):
     parent_id = context.current_parameters['parent_id']
-    res = db.session.query(db.func.max(Category.position)).filter_by(parent_id=parent_id).one()
+    res = db.session.query(db.func.max(Category.position)).filter(Category.parent_id == parent_id).one()
     return (res[0] or 0) + 1
 
 
@@ -539,7 +539,7 @@ def _mappers_configured():
     # (public/protected) of the category, even if it's inheriting it from its
     # parent category
     cte = Category.get_protection_cte()
-    query = select([cte.c.protection_mode]).where(cte.c.id == Category.id).correlate_except(cte)
+    query = select([cte.c.protection_mode]).where(cte.c.id == Category.id).correlate_except(cte).scalar_subquery()
     Category.effective_protection_mode = column_property(query, deferred=True, expire_on_flush=False)
 
     # Category.effective_icon_data -- the effective icon data of the category,
@@ -548,14 +548,16 @@ def _mappers_configured():
     query = (select([db.func.json_build_object('source_id', cte.c.source_id,
                                                'metadata', cte.c.icon_metadata)])
              .where(cte.c.id == Category.id)
-             .correlate_except(cte))
+             .correlate_except(cte)
+             .scalar_subquery())
     Category.effective_icon_data = column_property(query, deferred=True)
 
     # Category.event_count -- the number of events in the category itself,
     # excluding deleted events
     query = (select([db.func.count(Event.id)])
              .where((Event.category_id == Category.id) & ~Event.is_deleted)
-             .correlate_except(Event))
+             .correlate_except(Event)
+             .scalar_subquery())
     Category.event_count = column_property(query, deferred=True)
 
     # Category.has_events -- whether the category itself contains any
@@ -568,14 +570,14 @@ def _mappers_configured():
     # Category.chain_titles -- a list of the titles in the parent chain,
     # starting with the root category down to the current category.
     cte = Category.get_tree_cte('title')
-    query = select([cte.c.path]).where(cte.c.id == Category.id).correlate_except(cte)
+    query = select([cte.c.path]).where(cte.c.id == Category.id).correlate_except(cte).scalar_subquery()
     Category.chain_titles = column_property(query, deferred=True)
 
     # Category.chain -- a list of the ids and titles in the parent
     # chain, starting with the root category down to the current
     # category.  Each chain entry is a dict containing 'id' and `title`.
     cte = Category.get_tree_cte(lambda cat: db.func.json_build_object('id', cat.id, 'title', cat.title))
-    query = select([cte.c.path]).where(cte.c.id == Category.id).correlate_except(cte)
+    query = select([cte.c.path]).where(cte.c.id == Category.id).correlate_except(cte).scalar_subquery()
     Category.chain = column_property(query, deferred=True)
 
     # Category.deep_events_count -- the number of events in the category
@@ -585,7 +587,7 @@ def _mappers_configured():
                    cte.c.path.contains(array([Category.id])),
                    ~cte.c.is_deleted,
                    ~Event.is_deleted)
-    query = select([db.func.count()]).where(crit).correlate_except(Event)
+    query = select([db.func.count()]).where(crit).correlate_except(Event).scalar_subquery()
     Category.deep_events_count = column_property(query, deferred=True)
 
     # Category.deep_children_count -- the number of subcategories in the
@@ -593,7 +595,7 @@ def _mappers_configured():
     cte = Category.get_tree_cte()
     crit = db.and_(cte.c.path.contains(array([Category.id])),
                    cte.c.id != Category.id, ~cte.c.is_deleted)
-    query = select([db.func.count()]).where(crit).correlate_except(cte)
+    query = select([db.func.count()]).where(crit).correlate_except(cte).scalar_subquery()
     Category.deep_children_count = column_property(query, deferred=True)
 
 

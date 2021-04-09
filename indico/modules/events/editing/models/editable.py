@@ -274,11 +274,13 @@ def _mappers_configured():
              .where(EditingRevision.editable_id == Editable.id)
              .order_by(EditingRevision.created_dt.desc())
              .limit(1)
-             .correlate_except(EditingRevision))
+             .correlate_except(EditingRevision)
+             .scalar_subquery())
     Editable.state = column_property(query)
 
     # Editable.revision_count -- the number of revisions the editable has
     query = (select([db.func.count(EditingRevision.id)])
              .where(EditingRevision.editable_id == Editable.id)
-             .correlate_except(EditingRevision))
+             .correlate_except(EditingRevision)
+             .scalar_subquery())
     Editable.revision_count = column_property(query)

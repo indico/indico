@@ -158,7 +158,7 @@ class RegistrationListGenerator(ListGeneratorBase):
                         .filter(RegistrationData.registration_id == Registration.id)
                         .filter(db.or_(*criteria))
                         .correlate(Registration)
-                        .as_scalar())
+                        .scalar_subquery())
             query = query.filter(subquery == len(field_filters))
         return query.filter(db.or_(*items_criteria))
 

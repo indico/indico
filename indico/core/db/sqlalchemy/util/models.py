@@ -208,8 +208,7 @@ class IndicoModel(Model):
 
 @listens_for(orm.mapper, 'after_configured', once=True)
 def _mappers_configured():
-    from indico.core.db import db
-    for model in db.Model._decl_class_registry.values():
+    for model in get_all_models():
         if hasattr(model, '__table__') and model.allow_relationship_preloading:
             listen(model, 'load', model._populate_preloaded_relationships)
 
@@ -228,12 +227,18 @@ def import_all_models(package_name='indico'):
     for root, dirs, files in os.walk(package_root):
         if os.path.basename(root) == 'models':
             package = os.path.relpath(root, package_root).replace(os.sep, '.')
-            modules += ['{}.{}.{}'.format(package_name, package, name[:-3])
+            modules += [f'{package_name}.{package}.{name[:-3]}'
                         for name in files
                         if name.endswith('.py') and name != '__init__.py' and not name.endswith('_test.py')]
 
     for module in modules:
         import_module(module)
+
+
+def get_all_models():
+    """Get all models SQLAlchemy knows about."""
+    from indico.core.db import db
+    return {mapper.class_ for mapper in db.Model.registry.mappers}
 
 
 def attrs_changed(obj, *attrs):

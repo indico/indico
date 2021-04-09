@@ -5,8 +5,7 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from sqlalchemy import ForeignKeyConstraint, MetaData, Table
-from sqlalchemy.engine.reflection import Inspector
+from sqlalchemy import ForeignKeyConstraint, MetaData, Table, inspect
 from sqlalchemy.sql.ddl import DropConstraint, DropSchema, DropTable
 
 from indico.core.db.sqlalchemy.protection import ProtectionMode
@@ -63,7 +62,7 @@ DEFAULT_BADGE_DATA = {
 
 def get_all_tables(db):
     """Return a dict containing all tables grouped by schema."""
-    inspector = Inspector.from_engine(db.engine)
+    inspector = inspect(db.engine)
     schemas = sorted(set(inspector.get_schema_names()) - {'information_schema'})
     return dict(zip(schemas, (inspector.get_table_names(schema=schema) for schema in schemas)))
 
@@ -72,7 +71,7 @@ def delete_all_tables(db):
     """Drop all tables in the database."""
     conn = db.engine.connect()
     transaction = conn.begin()
-    inspector = Inspector.from_engine(db.engine)
+    inspector = inspect(db.engine)
     metadata = MetaData()
 
     all_schema_tables = get_all_tables(db)

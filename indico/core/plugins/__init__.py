@@ -16,8 +16,7 @@ from flask_pluginengine import (Plugin, PluginBlueprintMixin, PluginBlueprintSet
 from werkzeug.utils import cached_property
 
 from indico.core import signals
-from indico.core.db import db
-from indico.core.db.sqlalchemy.util.models import import_all_models
+from indico.core.db.sqlalchemy.util.models import get_all_models, import_all_models
 from indico.core.logger import Logger
 from indico.core.settings import SettingsProxy
 from indico.core.webpack import IndicoManifestLoader
@@ -109,13 +108,13 @@ class IndicoPlugin(Plugin):
         self._import_models()
 
     def _import_models(self):
-        old_models = set(db.Model._decl_class_registry.items())
+        old_models = get_all_models()
         import_all_models(self.package_name)
-        added_models = set(db.Model._decl_class_registry.items()) - old_models
+        added_models = get_all_models() - old_models
         # Ensure that only plugin schemas have been touched. It would be nice if we could actually
         # restrict a plugin to plugin_PLUGNNAME but since we load all models from the plugin's package
         # which could contain more than one plugin this is not easily possible.
-        for name, model in added_models:
+        for model in added_models:
             schema = model.__table__.schema
             # Allow models with non-plugin schema if they specify `polymorphic_identity` without a dedicated table
             if ('polymorphic_identity' in getattr(model, '__mapper_args__', ())
@@ -123,7 +122,7 @@ class IndicoPlugin(Plugin):
                 continue
             if not schema.startswith('plugin_'):
                 raise Exception("Plugin '{}' added a model which is not in a plugin schema ('{}' in '{}')"
-                                .format(self.name, name, schema))
+                                .format(self.name, model.__name__, schema))
 
     def connect(self, signal, receiver, **connect_kwargs):
         connect_kwargs['weak'] = False
@@ -209,7 +208,7 @@ class IndicoPlugin(Plugin):
         """
         vars_js = self.get_vars_js()
         if vars_js:
-            return 'var {}Plugin = {};'.format(self.name.title(), json.dumps(vars_js))
+            return f'var {self.name.title()}Plugin = {json.dumps(vars_js)};'
 
     def template_hook(self, name, receiver, priority=50, markup=True):
         """Register a function to be called when a template hook is invoked.

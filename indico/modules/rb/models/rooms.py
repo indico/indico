@@ -319,7 +319,7 @@ class Room(ProtectionManagersMixin, db.Model, Serializer):
         q = (db.session.query(db.m.Location.room_name_format)
              .filter(db.m.Location.id == cls.location_id)
              .correlate(Room)
-             .as_scalar())
+             .scalar_subquery())
         return db.func.format(q, cls.building, cls.floor, cls.number)
 
     @hybrid_property
@@ -398,7 +398,8 @@ class Room(ProtectionManagersMixin, db.Model, Serializer):
         """Search rooms which have a specific attribute."""
         return (Room.query
                 .with_entities(Room, RoomAttributeAssociation.value)
-                .join(Room.attributes, RoomAttributeAssociation.attribute)
+                .join(RoomAttributeAssociation)
+                .join(RoomAttribute)
                 .filter(RoomAttribute.name == attribute)
                 .all())
 

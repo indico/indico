@@ -66,5 +66,5 @@ def save_token(token_data, request):
          .filter_by(_scopes=db.cast(sorted(requested_scopes), ARRAY(db.String)))
          .order_by(OAuthToken.created_dt.desc())
          .offset(MAX_TOKENS_PER_SCOPE)
-         .subquery())
+         .scalar_subquery())
     OAuthToken.query.filter(OAuthToken.id.in_(q)).delete(synchronize_session='fetch')

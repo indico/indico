@@ -43,7 +43,7 @@ def _filter_coordinates(query, filters):
 
 
 def _make_room_text_filter(text):
-    text = '%{}%'.format(escape_like(text))
+    text = f'%{escape_like(text)}%'
     columns = ('site', 'division', 'building', 'floor', 'number', 'comments', 'full_name')
     return db.or_(getattr(Room, col).ilike(text) for col in columns)
 
@@ -161,7 +161,7 @@ def search_for_rooms(filters, allow_admin=False, availability=None):
                             EquipmentType.name.in_(filters['equipment']))
                     .join(EquipmentType, RoomEquipmentAssociation.c.equipment_id == EquipmentType.id)
                     .correlate(Room)
-                    .as_scalar())
+                    .scalar_subquery())
         query = query.filter(subquery == len(filters['equipment']))
     if filters.get('features'):
         for feature in filters['features']:

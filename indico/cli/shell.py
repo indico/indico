@@ -23,6 +23,7 @@ from indico.core import signals
 from indico.core.celery import celery
 from indico.core.config import config
 from indico.core.db import db
+from indico.core.db.sqlalchemy.util.models import get_all_models
 from indico.core.plugins import plugin_engine
 from indico.modules.events import Event
 from indico.util.console import cformat
@@ -57,11 +58,11 @@ def _add_to_context_smart(namespace, info, objects, get_name=attrgetter('__name_
     def _get_module(obj):
         segments = tuple(obj.__module__.split('.'))
         if segments[0].startswith('indico_'):  # plugin
-            return 'plugin:{}'.format(segments[0])
+            return f'plugin:{segments[0]}'
         elif segments[:2] == ('indico', 'modules'):
-            return 'module:{}'.format(segments[2])
+            return f'module:{segments[2]}'
         elif segments[:2] == ('indico', 'core'):
-            return 'core:{}'.format(segments[2])
+            return f'core:{segments[2]}'
         else:
             return '.'.join(segments[:-1] if len(segments) > 1 else segments)
 
@@ -88,8 +89,7 @@ def _make_shell_context():
                          color='yellow')
     # Models
     info.append(cformat('*** %{magenta!}Models%{reset} ***'))
-    models = [cls for name, cls in sorted(list(db.Model._decl_class_registry.items()), key=itemgetter(0))
-              if hasattr(cls, '__table__')]
+    models = [cls for cls in sorted(get_all_models(), key=attrgetter('__name__')) if hasattr(cls, '__table__')]
     add_to_context_smart(models)
     # Tasks
     info.append(cformat('*** %{magenta!}Tasks%{reset} ***'))

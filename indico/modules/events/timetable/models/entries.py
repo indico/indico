@@ -198,17 +198,17 @@ class TimetableEntry(db.Model):
                 db.select([SessionBlock.duration])
                 .where(SessionBlock.id == cls.session_block_id)
                 .correlate_except(SessionBlock)
-                .as_scalar(),
+                .scalar_subquery(),
             TimetableEntryType.CONTRIBUTION.value:
                 db.select([Contribution.duration])
                 .where(Contribution.id == cls.contribution_id)
                 .correlate_except(Contribution)
-                .as_scalar(),
+                .scalar_subquery(),
             TimetableEntryType.BREAK.value:
                 db.select([Break.duration])
                 .where(Break.id == cls.break_id)
                 .correlate_except(Break)
-                .as_scalar(),
+                .scalar_subquery(),
         }, value=cls.type)
 
     @hybrid_property

@@ -25,7 +25,9 @@ def _get_next_friendly_id(context):
 def _get_next_position(context):
     """Get the next menu entry position for the event."""
     contribution_id = context.current_parameters['contribution_id']
-    res = db.session.query(db.func.max(SubContribution.position)).filter_by(contribution_id=contribution_id).one()
+    res = (db.session.query(db.func.max(SubContribution.position))
+           .filter(SubContribution.contribution_id == contribution_id)
+           .one())
     return (res[0] or 0) + 1
 
 

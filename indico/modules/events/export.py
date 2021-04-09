@@ -26,6 +26,7 @@ import indico
 from indico.core.config import config
 from indico.core.db import db
 from indico.core.db.sqlalchemy.principals import PrincipalType
+from indico.core.db.sqlalchemy.util.models import get_all_models
 from indico.core.storage.backend import get_storage
 from indico.modules.events import Event, EventLogKind, EventLogRealm
 from indico.modules.events.contributions import Contribution
@@ -83,8 +84,7 @@ def _make_globals(**extra):
     Build a globals dict for the exec/eval environment that contains
     all the models and whatever extra data is needed.
     """
-    globals_ = {name: cls for name, cls in db.Model._decl_class_registry.items()
-                if hasattr(cls, '__table__')}
+    globals_ = {cls.__name__: cls for cls in get_all_models() if hasattr(cls, '__table__')}
     globals_.update(extra)
     return globals_
 

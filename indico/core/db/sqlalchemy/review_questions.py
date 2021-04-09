@@ -16,7 +16,7 @@ from indico.util.string import format_repr
 def _get_next_position(cls):
     def __get_next_position(context):
         event_id = context.current_parameters['event_id']
-        res = db.session.query(db.func.max(cls.position)).filter_by(event_id=event_id, is_deleted=False).one()
+        res = db.session.query(db.func.max(cls.position)).filter(cls.event_id == event_id, ~cls.is_deleted).one()
         return (res[0] or 0) + 1
     return __get_next_position
 

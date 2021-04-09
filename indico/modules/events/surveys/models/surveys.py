@@ -260,7 +260,7 @@ class Survey(db.Model):
         submissions = (db.session.query(db.func.count(db.m.SurveySubmission.id))
                        .filter(db.m.SurveySubmission.survey_id == cls.id)
                        .correlate(Survey)
-                       .as_scalar())
+                       .scalar_subquery())
         limit_criterion = db.case([(cls.submission_limit.is_(None), True)],
                                   else_=(submissions < cls.submission_limit))
         return ~cls.is_deleted & cls.questions.any() & cls.has_started & ~cls.has_ended & limit_criterion

@@ -19,7 +19,7 @@ from indico.util.string import format_repr, text_to_repr
 def _get_next_position(context):
     """Get the next contribution field position for the event."""
     event_id = context.current_parameters['event_id']
-    res = db.session.query(db.func.max(ContributionField.position)).filter_by(event_id=event_id).one()
+    res = db.session.query(db.func.max(ContributionField.position)).filter(ContributionField.event_id == event_id).one()
     return (res[0] or 0) + 1
 
 

@@ -76,7 +76,8 @@ class SessionBlock(LocationMixin, db.Model):
         from indico.modules.events.contributions.models.contributions import Contribution
         query = (db.select([db.func.count(Contribution.id)])
                  .where((Contribution.session_block_id == cls.id) & ~Contribution.is_deleted)
-                 .correlate_except(Contribution))
+                 .correlate_except(Contribution)
+                 .scalar_subquery())
         return db.column_property(query, deferred=True)
 
     def __init__(self, **kwargs):

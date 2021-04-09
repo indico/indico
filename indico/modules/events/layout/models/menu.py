@@ -21,7 +21,9 @@ def _get_next_position(context):
     """Get the next menu entry position for the event."""
     event_id = context.current_parameters['event_id']
     parent_id = context.current_parameters['parent_id']
-    res = db.session.query(db.func.max(MenuEntry.position)).filter_by(event_id=event_id, parent_id=parent_id).one()
+    res = (db.session.query(db.func.max(MenuEntry.position))
+           .filter(MenuEntry.event_id == event_id, MenuEntry.parent_id == parent_id)
+           .one())
     return (res[0] or 0) + 1
 
 

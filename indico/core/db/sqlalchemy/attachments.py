@@ -9,6 +9,7 @@ from sqlalchemy import orm
 from sqlalchemy.event import listens_for
 
 from indico.core.db import db
+from indico.core.db.sqlalchemy.util.models import get_all_models
 from indico.util.caching import memoize_request
 
 
@@ -50,7 +51,8 @@ def _make_attachment_count_column_property(cls):
                  ~Attachment.is_deleted,
                  (getattr(AttachmentFolder, cls.ATTACHMENT_FOLDER_ID_COLUMN) == cls.id)
              ))
-             .correlate_except(AttachmentFolder, Attachment))
+             .correlate_except(AttachmentFolder, Attachment)
+             .scalar_subquery())
     cls.attachment_count = db.column_property(query, deferred=True)
 
 
@@ -58,6 +60,6 @@ def _make_attachment_count_column_property(cls):
 def _mappers_configured():
     # We need to create the column property here since we cannot import
     # Attachment/AttachmentFolder while the models are being defined
-    for model in db.Model._decl_class_registry.values():
+    for model in get_all_models():
         if hasattr(model, '__table__') and issubclass(model, AttachedItemsMixin):
             _make_attachment_count_column_property(model)
