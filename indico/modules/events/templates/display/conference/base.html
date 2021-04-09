@@ -55,12 +55,15 @@
         <div id="confSectionsBox" class="clearfix">
             {% include 'flashed_messages.html' %}
             {{ render_event_header_msg(event, meeting=false) }}
+            {% set visible_menu_entries = conf_layout_params.menu | selectattr('is_visible') | list %}
             <div class="conf_leftMenu">
-                <ul id="outer">
-                    {%- for entry in conf_layout_params.menu if entry.is_visible %}
-                        {{ menu_entry_display(entry, active_entry_id=conf_layout_params.active_menu_item) }}
-                    {% endfor -%}
-                </ul>
+                {% if visible_menu_entries %}
+                    <ul id="outer">
+                        {%- for entry in visible_menu_entries %}
+                            {{ menu_entry_display(entry, active_entry_id=conf_layout_params.active_menu_item) }}
+                        {% endfor -%}
+                    </ul>
+                {% endif %}
 
                 {% if event.contact_emails or event.contact_phones -%}
                     <div class="support_box">
