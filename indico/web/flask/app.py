@@ -272,10 +272,12 @@ def configure_db(app):
 
         app.config['SQLALCHEMY_DATABASE_URI'] = config.SQLALCHEMY_DATABASE_URI
         app.config['SQLALCHEMY_RECORD_QUERIES'] = False
-        app.config['SQLALCHEMY_POOL_SIZE'] = config.SQLALCHEMY_POOL_SIZE
-        app.config['SQLALCHEMY_POOL_TIMEOUT'] = config.SQLALCHEMY_POOL_TIMEOUT
-        app.config['SQLALCHEMY_POOL_RECYCLE'] = config.SQLALCHEMY_POOL_RECYCLE
-        app.config['SQLALCHEMY_MAX_OVERFLOW'] = config.SQLALCHEMY_MAX_OVERFLOW
+        app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {
+            'pool_size': config.SQLALCHEMY_POOL_SIZE,
+            'pool_timeout': config.SQLALCHEMY_POOL_TIMEOUT,
+            'pool_recycle': config.SQLALCHEMY_POOL_RECYCLE,
+            'max_overflow': config.SQLALCHEMY_MAX_OVERFLOW,
+        }
 
     import_all_models()
     db.init_app(app)
