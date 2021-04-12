@@ -9,10 +9,12 @@ import json
 
 import pytest
 from flask.ctx import _AppCtxGlobals
+from marshmallow import EXCLUDE, INCLUDE, RAISE
 from webargs import fields
 from werkzeug.datastructures import ImmutableMultiDict
 from werkzeug.exceptions import UnprocessableEntity
 
+from indico.core import signals
 from indico.core.marshmallow import mm
 from indico.web.args import use_args, use_kwargs, use_rh_args, use_rh_kwargs
 
@@ -76,6 +78,94 @@ def test_stripping_whitespace(location):
         'c': fields.List(fields.String()),
     }, req, location=location)
     assert fn() == {'a': 1337, 'b': 'test', 'c': ['12', 'foo']}
+
+
+@pytest.mark.parametrize('location', ('query', 'form', 'json', 'json_or_form'))
+def test_mutability(location):
+    def _schema_pre_load(sender, data, **kwargs):
+        data['foo'] = 'bar'
+
+    with signals.plugin.schema_pre_load.connected_to(_schema_pre_load):
+        args = {
+            'a': '1337',
+            'b': 'test',
+        }
+        req = {
+            'query': MockRequest(args=args),
+            'form': MockRequest(form=args),
+            'json': MockRequest(json=args),
+            'json_or_form': MockRequest(form=args)
+        }[location]
+        fn = make_decorated_func(use_kwargs, {
+            'a': fields.Integer(),
+            'b': fields.String(),
+            'foo': fields.String(),
+        }, req, location=location)
+        assert fn() == {'a': 1337, 'b': 'test', 'foo': 'bar'}
+
+
+@pytest.mark.parametrize('location', ('query', 'form', 'json', 'json_or_form'))
+@pytest.mark.parametrize('unknown', (None, INCLUDE, EXCLUDE, RAISE))
+def test_unknown(location, unknown):
+    args = {
+        'a': '1337',
+        'b': 'test',
+        'foo': 'bar',
+    }
+    req = {
+        'query': MockRequest(args=args),
+        'form': MockRequest(form=args),
+        'json': MockRequest(json=args),
+        'json_or_form': MockRequest(form=args)
+    }[location]
+    # not setting unknown here will use our default of EXCLUDE
+    unknown_kw = {'unknown': unknown} if unknown is not None else {}
+    fn = make_decorated_func(use_kwargs, {
+        'a': fields.Integer(),
+        'b': fields.String(),
+    }, req, location=location, **unknown_kw)
+    if unknown == RAISE:
+        with pytest.raises(UnprocessableEntity) as exc_info:
+            fn()
+        assert exc_info.value.data['messages'] == {'foo': ['Unknown field.']}
+    else:
+        expected = {'a': 1337, 'b': 'test'}
+        if unknown == INCLUDE:
+            expected['foo'] = 'bar'
+        assert fn() == expected
+
+
+@pytest.mark.parametrize('location', ('query', 'form', 'json', 'json_or_form'))
+@pytest.mark.parametrize('unknown', (None, INCLUDE, EXCLUDE, RAISE))
+def test_unknown_schema(location, unknown):
+    class TestSchema(mm.Schema):
+        # not setting unknown here will use the schema-level default of RAISE
+        if unknown is not None:
+            Meta = type('Meta', (), {'unknown': unknown})
+        a = fields.Integer()
+        b = fields.String()
+
+    args = {
+        'a': '1337',
+        'b': 'test',
+        'foo': 'bar',
+    }
+    req = {
+        'query': MockRequest(args=args),
+        'form': MockRequest(form=args),
+        'json': MockRequest(json=args),
+        'json_or_form': MockRequest(form=args)
+    }[location]
+    fn = make_decorated_func(use_kwargs, TestSchema, req, location=location, unknown=None)
+    if unknown == RAISE or unknown is None:
+        with pytest.raises(UnprocessableEntity) as exc_info:
+            fn()
+        assert exc_info.value.data['messages'] == {'foo': ['Unknown field.']}
+    else:
+        expected = {'a': 1337, 'b': 'test'}
+        if unknown == INCLUDE:
+            expected['foo'] = 'bar'
+        assert fn() == expected
 
 
 @pytest.mark.parametrize('location', ('query', 'form', 'json'))
