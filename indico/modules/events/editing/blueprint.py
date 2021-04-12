@@ -62,6 +62,8 @@ _bp.add_url_rule('/editing/api/enabled-editable-types', 'api_enabled_editable_ty
                  management.RHEnabledEditableTypes, methods=('GET', 'POST'))
 _bp.add_url_rule('/editing/api/<any(paper,slides,poster):type>/editable-assignment/self-assign-enabled',
                  'api_self_assign_enabled', management.RHEditableSetSelfAssign, methods=('GET', 'PUT', 'DELETE'))
+_bp.add_url_rule('/editing/api/<any(paper,slides,poster):type>/editable-assignment/anonymous-team',
+                 'api_anonymous_team', management.RHEditableSetAnonymousTeam, methods=('GET', 'PUT', 'DELETE'))
 _bp.add_url_rule('/editing/api/<any(paper,slides,poster):type>/principals', 'api_editable_type_principals',
                  management.RHEditableTypePrincipals, methods=('GET', 'POST'))
 _bp.add_url_rule('/editing/api/<any(paper,slides,poster):type>/submission-enabled',

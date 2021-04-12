@@ -14,13 +14,14 @@ function UserAvatar({user}) {
       className="i-timeline-item-label avatar-placeholder"
       style={{backgroundColor: user.avatarBgColor}}
     >
-      {user.fullName[0]}
+      {user.anonymous ? '' : user.fullName[0]}
     </div>
   );
 }
 
 UserAvatar.propTypes = {
   user: PropTypes.shape({
+    anonymous: PropTypes.bool,
     fullName: PropTypes.string.isRequired,
     avatarBgColor: PropTypes.string.isRequired,
   }).isRequired,

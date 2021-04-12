@@ -3,5 +3,5 @@
 {% block subject -%}New editor judgment{%- endblock %}
 
 {% block body_text -%}
-{{ editor_name }} has left a judgment to an editable you are submitter of.
+{{ editor_name or 'Someone' }} has left a judgment to an editable you are submitter of.
 {% endblock %}

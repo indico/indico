@@ -7,6 +7,12 @@ Version 2.3.5
 
 *Unreleased*
 
+Improvements
+^^^^^^^^^^^^
+
+- Add an option to not disclose the names of editors and commenters to submitters in the
+  Paper Editing module (:issue:`4829`, :pr:`4865`)
+
 Bugfixes
 ^^^^^^^^
 

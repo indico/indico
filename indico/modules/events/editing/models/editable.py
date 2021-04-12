@@ -180,6 +180,23 @@ class Editable(db.Model):
         """Whether the user can create/see internal comments."""
         return self._has_general_editor_permissions(user)
 
+    def can_see_editor_names(self, user, actor=None):
+        """Whether the user can see the names of editing team members.
+
+        This is always true if team anonymity is not enabled; otherwise only
+        users who are member of the editing team will see names.
+
+        If an `actor` is set, the check applies to whether the name of this
+        particular user can be seen.
+        """
+        from indico.modules.events.editing.settings import editable_type_settings
+
+        return (
+            not editable_type_settings[self.type].get(self.event, 'anonymous_team') or
+            (actor and not self.can_see_editor_names(actor)) or
+            self._has_general_editor_permissions(user)
+        )
+
     def can_comment(self, user):
         """Whether the user can comment on the editable."""
         # We allow any user associated with the contribution to comment, even if they are
