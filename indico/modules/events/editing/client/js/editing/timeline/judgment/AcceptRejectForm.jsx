@@ -31,7 +31,10 @@ export default function AcceptRejectForm({action, setLoading}) {
     <FinalForm
       initialValues={{
         comment: '',
-        tags: lastRevision.tags.filter(t => !t.system).map(t => t.id),
+        tags: lastRevision.tags
+          .filter(t => !t.system)
+          .map(t => t.id)
+          .sort(),
       }}
       initialValuesEqual={_.isEqual}
       onSubmit={async formData => {
