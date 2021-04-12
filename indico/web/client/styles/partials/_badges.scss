@@ -190,6 +190,11 @@
     & > .i-badge-legend-right {
       float: right;
     }
+
+    & > .ellipsize {
+      @include ellipsis();
+      max-width: 100%;
+    }
   }
 }
 
