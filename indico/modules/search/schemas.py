@@ -58,7 +58,7 @@ class EventSchema(mm.SQLAlchemyAutoSchema):
 
     event_id = fields.Int(attribute='id')
     type = fields.Constant(SearchTarget.event.name)
-    type_format = fields.String(attribute='type')
+    type_format = fields.String(attribute='type.name')
     location = fields.Function(lambda event: LocationSchema().dump(event))
     persons = fields.List(fields.Nested(PersonSchema), attribute='person_links')
     category_path = fields.List(fields.Nested(CategorySchema), attribute='detailed_category_chain')
