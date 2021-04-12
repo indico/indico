@@ -71,7 +71,10 @@ export default function UpdateFilesForm({setLoading}) {
     <FinalForm
       initialValues={{
         comment: '',
-        tags: lastRevision.tags.filter(t => !t.system).map(t => t.id),
+        tags: lastRevision.tags
+          .filter(t => !t.system)
+          .map(t => t.id)
+          .sort(),
         files,
       }}
       initialValuesEqual={_.isEqual}

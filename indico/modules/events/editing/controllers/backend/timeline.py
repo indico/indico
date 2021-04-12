@@ -124,7 +124,11 @@ class RHEditable(RHContributionEditableBase):
     def _process(self):
         custom_actions = self._get_custom_actions()
         custom_actions_ctx = {self.editable.revisions[-1]: custom_actions}
-        schema = EditableSchema(context={'user': session.user, 'custom_actions': custom_actions_ctx})
+        schema = EditableSchema(context={
+            'user': session.user,
+            'custom_actions': custom_actions_ctx,
+            'can_see_editor_names': self.editable.can_see_editor_names,
+        })
         return schema.jsonify(self.editable)
 
 

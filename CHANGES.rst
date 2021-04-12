@@ -84,6 +84,17 @@ Version 2.3.5
 
 *Unreleased*
 
+Internationalization
+^^^^^^^^^^^^^^^^^^^^
+
+- New translation: Polish
+
+Improvements
+^^^^^^^^^^^^
+
+- Add an option to not disclose the names of editors and commenters to submitters in the
+  Paper Editing module (:issue:`4829`, :pr:`4865`)
+
 Bugfixes
 ^^^^^^^^
 
@@ -98,6 +109,9 @@ Bugfixes
   the contribution (:pr:`4860`)
 - Hide registration menu item if you cannot access the event and registrations are not
   exempt from event access checks (:pr:`4860`)
+- Fix inadvertently deleting a file uploaded during the "make changes" Editing action,
+  resulting in the revision sometimes still referencing the file even though it has been
+  deleted from storage (:pr:`4866`)
 
 Version 2.3.4
 -------------

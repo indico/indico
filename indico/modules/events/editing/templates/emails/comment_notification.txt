@@ -3,5 +3,5 @@
 {% block subject -%}New comment{%- endblock %}
 
 {% block body_text -%}
-{{ author_name }} has posted a new comment.
+{{ author_name or 'Someone' }} has posted a new comment.
 {% endblock %}

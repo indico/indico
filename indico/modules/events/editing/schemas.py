@@ -34,6 +34,16 @@ from indico.web.flask.util import url_for
 from indico.web.forms.colors import get_sui_colors
 
 
+def _get_anonymous_user():
+    return {
+        'identifier': 'AnonymousUser',
+        'avatar_url': url_for('assets.avatar'),
+        'id': -1,
+        'full_name': 'Someone',
+        'anonymous': True,
+    }
+
+
 class RevisionStateSchema(mm.Schema):
     title = fields.String()
     name = fields.String()
@@ -123,6 +133,13 @@ class EditingRevisionCommentSchema(mm.SQLAlchemyAutoSchema):
     can_modify = fields.Function(lambda comment, ctx: comment.can_modify(ctx.get('user')))
     modify_comment_url = fields.Function(lambda comment: url_for('event_editing.api_edit_comment', comment))
 
+    @post_dump(pass_original=True)
+    def anonymize_user(self, data, orig, **kwargs):
+        can_see_editor_names_fn = self.context.get('can_see_editor_names')
+        if can_see_editor_names_fn and data['user'] and not can_see_editor_names_fn(self.context['user'], orig.user):
+            data['user'] = _get_anonymous_user()
+        return data
+
 
 class EditingRevisionSchema(mm.SQLAlchemyAutoSchema):
     class Meta:
@@ -160,6 +177,16 @@ class EditingRevisionSchema(mm.SQLAlchemyAutoSchema):
         data['tags'].sort(key=lambda tag: natural_sort_key(tag['verbose_title']))
         return data
 
+    @post_dump(pass_original=True)
+    def anonymize_users(self, data, orig, **kwargs):
+        can_see_editor_names_fn = self.context.get('can_see_editor_names')
+        if can_see_editor_names_fn:
+            if data['editor'] and not can_see_editor_names_fn(self.context['user'], orig.editor):
+                data['editor'] = _get_anonymous_user()
+            if data['submitter'] and not can_see_editor_names_fn(self.context['user'], orig.submitter):
+                data['submitter'] = _get_anonymous_user()
+        return data
+
 
 class EditingRevisionSignedSchema(EditingRevisionSchema):
     files = fields.List(fields.Nested(EditingRevisionSignedFileSchema))
@@ -189,6 +216,13 @@ class EditableSchema(mm.SQLAlchemyAutoSchema):
     review_conditions_valid = fields.Boolean()
     editing_enabled = fields.Boolean()
     state = fields.Nested(EditableStateSchema)
+
+    @post_dump(pass_original=True)
+    def anonymize_editor(self, data, orig, **kwargs):
+        can_see_editor_names_fn = self.context.get('can_see_editor_names')
+        if can_see_editor_names_fn and data['editor'] and not can_see_editor_names_fn(self.context['user']):
+            data['editor'] = _get_anonymous_user()
+        return data
 
 
 class EditableDumpSchema(EditableSchema):

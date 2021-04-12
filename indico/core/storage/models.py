@@ -221,12 +221,15 @@ class StoredFileMixin:
         """Delete the file from storage."""
         if self.storage_file_id is None:
             raise Exception('There is no file to delete')
-        self.storage.delete(self.storage_file_id)
+        storage = self.storage
+        storage_file_id = self.storage_file_id
         if delete_from_db:
             db.session.delete(self)
+            db.session.flush()
         else:
             self.storage_backend = None
             self.storage_file_id = None
             self.size = None
             self.content_type = None
             self.filename = None
+        storage.delete(storage_file_id)

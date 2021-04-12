@@ -18,6 +18,7 @@ editing_settings = EventSettingsProxy('editing', {
 
 _defaults = {
     'self_assign_allowed': False,
+    'anonymous_team': False,
     'submission_enabled': False,
     'editing_enabled': False,
 }

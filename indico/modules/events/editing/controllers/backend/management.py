@@ -178,6 +178,19 @@ class RHEditableSetSelfAssign(RHEditableTypeManagementBase):
         return '', 204
 
 
+class RHEditableSetAnonymousTeam(RHEditableTypeManagementBase):
+    def _process_GET(self):
+        return jsonify(editable_type_settings[self.editable_type].get(self.event, 'anonymous_team'))
+
+    def _process_PUT(self):
+        editable_type_settings[self.editable_type].set(self.event, 'anonymous_team', True)
+        return '', 204
+
+    def _process_DELETE(self):
+        editable_type_settings[self.editable_type].set(self.event, 'anonymous_team', False)
+        return '', 204
+
+
 class RHEditableTypePrincipals(RHEditableTypeManagementBase):
     def _process_GET(self):
         permission_name = self.editable_type.editor_permission

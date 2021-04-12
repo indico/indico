@@ -421,8 +421,14 @@ def set_user_avatar(user, avatar, filename, lastmod=None):
     }
 
 
-def send_default_avatar(name):
-    avatar = render_template('users/avatar.svg', bg_color=get_color_for_username(name), text=name[0].upper())
+def send_default_avatar(name=None):
+    if name:
+        text = name[0].upper()
+        color = get_color_for_username(name)
+    else:
+        text = ''
+        color = '#cccccc'
+    avatar = render_template('users/avatar.svg', bg_color=color, text=text)
     return send_file('avatar.svg', BytesIO(avatar.encode()), mimetype='image/svg+xml',
                      no_cache=False, inline=True, safe=False, cache_timeout=(86400*7))
 

@@ -129,6 +129,7 @@ def favicon():
 
 
 @assets_blueprint.route('/avatar/<name>.svg')
-def avatar(name):
+@assets_blueprint.route('/avatar/blank.svg')
+def avatar(name=None):
     from indico.modules.users.util import send_default_avatar
     return send_default_avatar(name)

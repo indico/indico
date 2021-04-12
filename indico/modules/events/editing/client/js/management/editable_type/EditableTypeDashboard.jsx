@@ -6,6 +6,7 @@
 // LICENSE file for more details.
 /* global ajaxDialog:false */
 
+import anonymousTeamURL from 'indico-url:event_editing.api_anonymous_team';
 import enableEditingURL from 'indico-url:event_editing.api_editing_enabled';
 import selfAssignURL from 'indico-url:event_editing.api_self_assign_enabled';
 import enableSubmissionURL from 'indico-url:event_editing.api_submission_enabled';
@@ -45,6 +46,13 @@ export default function EditableTypeDashboard() {
     selfAssignSaving,
   ] = useTogglableValue(selfAssignURL({event_id: eventId, type}));
 
+  const [
+    anonymousTeamEnabled,
+    toggleAnonymousTeam,
+    anonymousTeamLoading,
+    anonymousTeamSaving,
+  ] = useTogglableValue(anonymousTeamURL({event_id: eventId, type}));
+
   const [submissionEnabled, toggleSubmission, submissionLoading] = useTogglableValue(
     enableSubmissionURL({event_id: eventId, type})
   );
@@ -70,7 +78,7 @@ export default function EditableTypeDashboard() {
     <>
       <ManagementPageSubTitle title={EditableTypeTitles[type]} />
       <ManagementPageBackButton url={dashboardURL({event_id: eventId})} />
-      {selfAssignLoading || submissionLoading || editingLoading ? (
+      {selfAssignLoading || anonymousTeamLoading || submissionLoading || editingLoading ? (
         <Loader active />
       ) : (
         <>
@@ -132,6 +140,13 @@ export default function EditableTypeDashboard() {
               label={Translate.string('Editing team')}
               description={Translate.string('Configure editing team')}
             >
+              <Checkbox
+                styleName="toolbar-checkbox"
+                toggle
+                checked={anonymousTeamEnabled}
+                onClick={!anonymousTeamSaving ? toggleAnonymousTeam : null}
+                label={Translate.string('Keep editing team members anonymous')}
+              />
               <a className="i-button icon-mail" onClick={contactEditingTeam}>
                 <Translate>Contact</Translate>
               </a>

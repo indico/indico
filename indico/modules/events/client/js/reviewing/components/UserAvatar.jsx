@@ -25,7 +25,6 @@ function UserAvatar({user}) {
 
 UserAvatar.propTypes = {
   user: PropTypes.shape({
-    fullName: PropTypes.string.isRequired,
     avatarURL: PropTypes.string,
   }).isRequired,
 };
