@@ -55,7 +55,7 @@ sqlalchemy
 termcolor
 terminaltables
 translitcodec
-webargs<8  # https://github.com/marshmallow-code/webargs/issues/580
+webargs
 werkzeug
 wtforms[ipaddress,email]
 xlsxwriter

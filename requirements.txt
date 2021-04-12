@@ -296,7 +296,7 @@ vine==5.0.0
     #   celery
 wcwidth==0.2.5
     # via prompt-toolkit
-webargs==7.0.1
+webargs==8.0.0
     # via -r requirements.in
 webencodings==0.5.1
     # via
