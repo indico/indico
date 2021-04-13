@@ -15,8 +15,6 @@ extends:
   - 'indico/react'
   - 'indico/react-hooks'
   - 'indico/prettier'
-  - 'prettier/babel'
-  - 'prettier/react'
 
 settings:
   # we don't use the webpack resolver because it is SLOW (~1s),
