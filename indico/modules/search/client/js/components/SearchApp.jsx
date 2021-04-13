@@ -132,11 +132,11 @@ export default function SearchApp() {
   const [fileResults, setFilePage] = useSearch(searchURL({type: 'attachment'}), query);
   const [noteResults, setNotePage] = useSearch(searchURL({type: 'event_note'}), query);
   const searchMap = [
-    ['Categories', categoryResults, setCategoryPage, Category],
-    ['Events', eventResults, setEventPage, Event],
-    ['Contributions', contributionResults, setContributionPage, Contribution],
-    ['Materials', fileResults, setFilePage, File],
-    ['Notes', noteResults, setNotePage, EventNote],
+    [Translate.string('Categories'), categoryResults, setCategoryPage, Category],
+    [Translate.string('Events'), eventResults, setEventPage, Event],
+    [Translate.string('Contributions'), contributionResults, setContributionPage, Contribution],
+    [Translate.string('Materials'), fileResults, setFilePage, File],
+    [Translate.string('Notes'), noteResults, setNotePage, EventNote],
   ];
   // Defaults to the first tab loading or with results
   const menuItem =
@@ -158,12 +158,12 @@ export default function SearchApp() {
         {q && (
           <>
             <Menu pointing secondary>
-              {searchMap.map(([_label, _results], idx) => (
+              {searchMap.map(([label, _results], idx) => (
                 <SearchTypeMenuItem
-                  key={_label}
+                  key={label}
                   index={idx}
                   active={menuItem === idx}
-                  title={Translate.string(_label)}
+                  title={label}
                   total={_results.total}
                   loading={_results.loading}
                   onClick={(e, {index}) => setActiveMenuItem(index)}
