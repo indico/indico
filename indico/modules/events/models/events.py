@@ -988,7 +988,7 @@ def _mappers_configured():
     # Event.detailed_category_chain -- the category chain of the event, starting
     # with the root category down to the event's immediate parent.
     cte = Category.get_tree_cte(lambda cat: db.func.json_build_object('id', cat.id, 'title', cat.title))
-    query = select([cte.c.path]).where(cte.c.id == Event.category_id).correlate_except(cte)
+    query = select([cte.c.path]).where(cte.c.id == Event.category_id).correlate_except(cte).scalar_subquery()
     Event.detailed_category_chain = column_property(query, deferred=True)
 
     # Event.effective_protection_mode -- the effective protection mode
