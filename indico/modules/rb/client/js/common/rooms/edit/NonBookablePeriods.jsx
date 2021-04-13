@@ -6,11 +6,11 @@
 // LICENSE file for more details.
 
 import moment from 'moment';
+import {nanoid} from 'nanoid';
 import PropTypes from 'prop-types';
 import React from 'react';
 import {ANCHOR_RIGHT} from 'react-dates/constants';
 import {Icon, Button} from 'semantic-ui-react';
-import shortid from 'shortid';
 
 import {DateRangePicker} from 'indico/react/components';
 import {Translate} from 'indico/react/i18n';
@@ -68,7 +68,7 @@ export default class NonBookablePeriods extends React.Component {
 
   renderEntry = (dateRangeItem, index) => {
     const {start_dt: startDt, end_dt: endDt} = dateRangeItem;
-    const key = shortid.generate();
+    const key = nanoid();
     return (
       <div key={key} className="flex-container">
         <DateRangePicker

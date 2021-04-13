@@ -6,10 +6,10 @@
 // LICENSE file for more details.
 
 import moment from 'moment';
+import {nanoid} from 'nanoid';
 import PropTypes from 'prop-types';
 import React from 'react';
 import {Button, Icon} from 'semantic-ui-react';
-import shortid from 'shortid';
 
 import {Translate} from 'indico/react/i18n';
 import {serializeTime} from 'indico/utils/date';
@@ -46,7 +46,7 @@ export default class DailyAvailability extends React.Component {
 
   renderEntry = (bookableHour, index) => {
     const {start_time: startT, end_time: endT} = bookableHour;
-    const key = shortid.generate();
+    const key = nanoid();
     return (
       <div key={key} className="flex-container">
         <TimeRangePicker
