@@ -41,7 +41,7 @@ def calculate_rooms_booked_time(rooms, start_date=None, end_date=None):
                                   db.cast(ReservationOccurrence.start_dt, db.Date) >= start_date,
                                   db.cast(ReservationOccurrence.end_dt, db.Date) <= end_date,
                                   ReservationOccurrence.is_valid)
-                          .join(ReservationOccurrence))
+                          .join(Reservation.occurrences))
 
     rsv_start = db.cast(ReservationOccurrence.start_dt, db.TIME)
     rsv_end = db.cast(ReservationOccurrence.end_dt, db.TIME)
