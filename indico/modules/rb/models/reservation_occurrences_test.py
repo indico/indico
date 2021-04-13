@@ -395,7 +395,7 @@ def test_can_cancel(create_reservation, dummy_user, freeze_time):
     assert reservation.occurrences[-1].can_cancel(dummy_user)
 
 
-def test_cannot_cancel_archived_reservation(create_reservation, dummy_user, freeze_time):
+def test_cannot_cancel_archived_or_ongoing_reservation(create_reservation, dummy_user, freeze_time):
     reservation = create_reservation(start_dt=datetime.combine(date.today(), time(11)),
                                      end_dt=datetime.combine(date.today(), time(17)),
                                      repeat_frequency=RepeatFrequency.NEVER)
@@ -403,10 +403,10 @@ def test_cannot_cancel_archived_reservation(create_reservation, dummy_user, free
     assert reservation.can_cancel(dummy_user)
 
     freeze_time(datetime.combine(date.today(), time(13)))
-    assert reservation.can_cancel(dummy_user)
+    assert not reservation.can_cancel(dummy_user)
 
     freeze_time(datetime.combine(date.today(), time(17)))
-    assert reservation.can_cancel(dummy_user)
+    assert not reservation.can_cancel(dummy_user)
 
     freeze_time(datetime.combine(date.today(), time(17, 1)))
     assert not reservation.can_cancel(dummy_user)

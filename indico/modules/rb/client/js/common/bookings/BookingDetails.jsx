@@ -571,7 +571,13 @@ class BookingDetails extends React.Component {
     return transformToLegendLabels(occurrenceTypes, inactiveTypes);
   };
 
-  renderActionButtons = (canCancel, canReject, showAccept, occurrenceCount, isAccepted) => {
+  renderActionButtons = (
+    canCancel,
+    canReject,
+    showAccept,
+    cancellableOccurrenceCount,
+    isAccepted
+  ) => {
     const {bookingStateChangeInProgress} = this.props;
     const {actionInProgress, activeConfirmation, acceptanceFormVisible} = this.state;
     const rejectButton = (
@@ -611,7 +617,7 @@ class BookingDetails extends React.Component {
             rows={2}
             required
           />
-          {isAccepted && occurrenceCount > 1 && (
+          {isAccepted && cancellableOccurrenceCount > 1 && (
             <FinalCheckbox
               name="_confirm"
               label={Translate.string(
@@ -688,26 +694,26 @@ class BookingDetails extends React.Component {
               </Modal.Header>
               <Modal.Content>
                 <p>
-                  <PluralTranslate count={occurrenceCount}>
+                  <PluralTranslate count={cancellableOccurrenceCount}>
                     <Singular>Are you sure you want to cancel this booking?</Singular>
                     <Plural>
-                      Are you sure you want to cancel this booking? This will cancel all{' '}
-                      <Param name="count" value={occurrenceCount} wrapper={<strong />} />{' '}
-                      occurrences.
+                      Are you sure you want to cancel this booking? This will cancel{' '}
+                      <Param name="count" value={cancellableOccurrenceCount} wrapper={<strong />} />{' '}
+                      upcoming occurrences.
                     </Plural>
                   </PluralTranslate>
                 </p>
-                <p>
-                  {occurrenceCount > 1 && (
+                {cancellableOccurrenceCount > 1 && (
+                  <p>
                     <Translate>
                       Single occurrences can be cancelled via the timeline view.
                     </Translate>
-                  )}
-                </p>
+                  </p>
+                )}
               </Modal.Content>
               <Modal.Actions>
                 <Button onClick={this.hideConfirm} content={Translate.string('Close')} />
-                {occurrenceCount > 1 && (
+                {cancellableOccurrenceCount > 1 && (
                   <Button
                     icon="calendar outline"
                     onClick={() => {
@@ -725,7 +731,7 @@ class BookingDetails extends React.Component {
                   content={PluralTranslate.string(
                     'Cancel booking',
                     'Cancel all occurrences',
-                    occurrenceCount
+                    cancellableOccurrenceCount
                   )}
                   negative
                 />
@@ -825,6 +831,9 @@ class BookingDetails extends React.Component {
     const showActionButtons = !isCancelled && !isRejected && (canCancel || canReject || showAccept);
     const activeBookings = _.omitBy(occurrences.bookings, value => _.isEmpty(value));
     const occurrenceCount = Object.keys(activeBookings).length;
+    const cancellableOccurrenceCount = Object.values(activeBookings).filter(date =>
+      date.some(occurrence => occurrence.canCancel)
+    ).length;
 
     return (
       <>
@@ -872,7 +881,13 @@ class BookingDetails extends React.Component {
             </Grid>
           </Modal.Content>
           {showActionButtons &&
-            this.renderActionButtons(canCancel, canReject, showAccept, occurrenceCount, isAccepted)}
+            this.renderActionButtons(
+              canCancel,
+              canReject,
+              showAccept,
+              cancellableOccurrenceCount,
+              isAccepted
+            )}
         </Modal>
         <Modal open={occurrencesVisible} onClose={this.hideOccurrences} size="large" closeIcon>
           <Modal.Header className="legend-header">
