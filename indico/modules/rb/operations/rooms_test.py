@@ -6,7 +6,10 @@
 # LICENSE file for more details.
 
 import pytest
+from flask import session
 
+from indico.modules.rb.models.rooms import Room
+from indico.modules.rb.operations.rooms import get_managed_room_ids, search_for_rooms
 from indico.modules.users import User
 
 
@@ -14,8 +17,7 @@ pytest_plugins = 'indico.modules.rb.testing.fixtures'
 
 
 @pytest.mark.parametrize('bulk_possible', (True, False))
-def test_managed_rooms(monkeypatch, bulk_possible, create_user, create_room, dummy_user):
-    from indico.modules.rb.operations.rooms import get_managed_room_ids
+def test_managed_rooms(monkeypatch, bulk_possible, create_user, create_room):
     monkeypatch.setattr(User, 'can_get_all_multipass_groups', bulk_possible)
 
     users = {
@@ -42,3 +44,15 @@ def test_managed_rooms(monkeypatch, bulk_possible, create_user, create_room, dum
     for key, user in user_map.items():
         room_ids = [room.id for room in room_map.values() if (room.owner == user_map[key] or room.can_manage(user))]
         assert get_managed_room_ids(user) == set(room_ids)
+
+
+@pytest.mark.usefixtures('request_context')
+def test_search_for_rooms(dummy_room, dummy_user):
+    session.set_session_user(dummy_user)
+    assert search_for_rooms({}).one() == dummy_room
+
+
+@pytest.mark.usefixtures('request_context')
+def test_search_for_rooms_with_entities(dummy_room, dummy_user):
+    session.set_session_user(dummy_user)
+    assert search_for_rooms({}).with_entities(Room.id, Room.full_name).one() == (dummy_room.id, '1/2-3')

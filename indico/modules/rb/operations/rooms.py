@@ -136,7 +136,6 @@ def search_for_rooms(filters, allow_admin=False, availability=None):
              .outerjoin(favorite_room_table, db.and_(favorite_room_table.c.user_id == session.user.id,
                                                      favorite_room_table.c.room_id == Room.id))
              .reset_joinpoint()  # otherwise filter_by() would apply to the favorite table
-             .options(joinedload('owner').load_only('id'))
              .filter(~Room.is_deleted)
              .order_by(favorite_room_table.c.user_id.is_(None), db.func.indico.natsort(Room.full_name)))
 
