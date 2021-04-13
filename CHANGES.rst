@@ -61,6 +61,8 @@ Bugfixes
 - Fail gracefully during registration import when two rows have different emails that belong
   to the same user (:pr:`4823`)
 - Restore the ability to see who's inheriting access from a parent object (:pr:`4833`)
+- Fix misleading message when cancelling a booking that already started and has past
+  occurrences that won't be cancelled (:issue:`4719`, :pr:`4861`)
 
 Internal Changes
 ^^^^^^^^^^^^^^^^
