@@ -11,6 +11,7 @@ Internationalization
 ^^^^^^^^^^^^^^^^^^^^
 
 - New translation: Polish
+- New translation: Mongolian
 
 Improvements
 ^^^^^^^^^^^^
