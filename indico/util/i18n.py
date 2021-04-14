@@ -118,15 +118,33 @@ def make_bound_ngettext(plugin_name, force_unicode=False):
     return smart_func('ungettext', plugin_name=plugin_name, force_unicode=force_unicode)
 
 
+def make_bound_pgettext(plugin_name, force_unicode=False):
+    """
+    Create a smart pgettext callable bound to the domain of the specified plugin.
+    """
+    return smart_func('upgettext', plugin_name=plugin_name, force_unicode=force_unicode)
+
+
+def make_bound_npgettext(plugin_name, force_unicode=False):
+    """
+    Create a smart npgettext callable bound to the domain of the specified plugin.
+    """
+    return smart_func('unpgettext', plugin_name=plugin_name, force_unicode=force_unicode)
+
+
 # Shortcuts
 _ = ugettext = gettext = make_bound_gettext(None)
 ungettext = ngettext = make_bound_ngettext(None)
+pgettext = make_bound_pgettext(None)
+npgettext = make_bound_npgettext(None)
 L_ = lazy_gettext
 
 # Plugin-context-sensitive gettext for templates
 # They always return unicode even when passed a bytestring
 gettext_context = make_bound_gettext(_use_context, force_unicode=True)
 ngettext_context = make_bound_ngettext(_use_context, force_unicode=True)
+pgettext_context = make_bound_pgettext(_use_context, force_unicode=True)
+npgettext_context = make_bound_npgettext(_use_context, force_unicode=True)
 
 # Just a marker for message extraction
 N_ = lambda text: text  # noqa
