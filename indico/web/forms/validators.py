@@ -293,7 +293,7 @@ class UsedIfChecked(UsedIf):
 
 
 class MaxDuration:
-    """Validate if TimeDeltaField value doesn't exceed `max_duration`."""
+    """Validate the duration doesn't exceed `max_duration`."""
 
     def __init__(self, max_duration=None, **kwargs):
         assert max_duration or kwargs
