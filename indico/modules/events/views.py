@@ -28,7 +28,6 @@ from indico.web.views import WPDecorated, WPJinjaMixin
 
 def _get_print_url(event, theme=None, theme_override=False):
     view = theme if theme_override else None
-
     if event.type_ == EventType.conference:
         return url_for('timetable.timetable', event, print='1', view=view)
     elif event.type_ == EventType.meeting:

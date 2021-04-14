@@ -141,7 +141,10 @@ def _handle_legacy_ids(app, **kwargs):
 
     # Endpoints which need to deal with non-standard event "ids" because they might be shorturls.
     # Those endpoints handle legacy event ids on their own so we ignore them here.
-    _non_standard_id_endpoints = {'events.shorturl', 'events.display', 'events.display_overview', 'events.create'}
+    _non_standard_id_endpoints = {
+        'events.shorturl', 'events.display', 'events.display_overview',
+        'events.create', 'events.prepare',
+    }
 
     # Match event ids which are either not purely numeric or have a leading zero without being exactly `0`
     _legacy_event_id_re = re.compile(r'/event/((?=0[^/]|\d*[^\d/])[^/]*)')

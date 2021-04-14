@@ -77,6 +77,9 @@ Internal Changes
   it's coming from OAuth, a signed url or the actual session (:pr:`4803`)
 - Add a new ``check_password_secure`` signal that can be used to implement additional password
   security checks (:pr:`4817`)
+- Add an endpoint to let external applications stage the creation of an event with some data to be
+  pre-filled when the user then opens the link returned by that endpoint (:pr:`4628`, thanks
+  :user:`adl1995`)
 
 
 ----
