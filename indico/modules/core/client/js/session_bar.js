@@ -6,8 +6,6 @@
 // LICENSE file for more details.
 
 (function() {
-  'use strict';
-
   function setupProtection() {
     $('#protection-details-link').qtip({
       style: {
@@ -26,14 +24,14 @@
       content: $('#protection-details'),
       show: {
         event: 'click',
-        effect: function() {
+        effect() {
           $(this).fadeIn(300);
         },
       },
       hide: {
         event: 'unfocus click',
         fixed: true,
-        effect: function() {
+        effect() {
           $(this).fadeOut(300);
         },
       },
@@ -41,10 +39,10 @@
   }
 
   function setupTimezone() {
-    var widget = $('#tz-selector-widget');
+    const widget = $('#tz-selector-widget');
     widget.on('change', 'input[name=tz_mode]', function() {
-      var customTZ = this.value === 'custom';
-      var customTZSelect = widget.find('select[name=tz]');
+      const customTZ = this.value === 'custom';
+      const customTZSelect = widget.find('select[name=tz]');
       customTZSelect.prop('disabled', !customTZ);
       if (customTZ) {
         customTZSelect.focus();
@@ -69,26 +67,26 @@
       content: widget,
       show: {
         event: 'click',
-        effect: function() {
+        effect() {
           $(this).fadeIn(300);
         },
       },
       hide: {
         event: 'unfocus click',
         fixed: true,
-        effect: function() {
+        effect() {
           $(this).fadeOut(300);
         },
       },
       events: {
-        show: function() {
+        show() {
           _.defer(scrollToCurrentTZ);
         },
       },
     });
 
     function scrollToCurrentTZ() {
-      var option = widget.find('select[name=tz] option:selected')[0];
+      const option = widget.find('select[name=tz] option:selected')[0];
       if (option) {
         option.scrollIntoView(false);
       }
@@ -96,7 +94,7 @@
   }
 
   function setupUserSettings() {
-    var link = $('#user-settings-link');
+    const link = $('#user-settings-link');
 
     $('#user-settings-widget a:not([data-toggle=dropdown])').on('click', function() {
       link.qtip('hide');
@@ -119,14 +117,14 @@
       content: $('#user-settings-widget'),
       show: {
         event: 'click',
-        effect: function() {
+        effect() {
           $(this).fadeIn(300);
         },
       },
       hide: {
         event: 'unfocus click',
         fixed: true,
-        effect: function() {
+        effect() {
           $(this).fadeOut(300);
         },
       },

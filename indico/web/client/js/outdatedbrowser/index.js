@@ -6,6 +6,7 @@
 // LICENSE file for more details.
 
 import preval from 'preval.macro';
+
 import outdatedBrowser from './outdatedbrowser';
 import './outdatedbrowser.css';
 

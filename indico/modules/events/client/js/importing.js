@@ -6,6 +6,7 @@
 // LICENSE file for more details.
 
 import _ from 'lodash';
+
 import {serializeDateTimeRange} from 'indico/utils/date';
 
 (function(global) {

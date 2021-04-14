@@ -6,26 +6,24 @@
 // LICENSE file for more details.
 
 (function(global) {
-  'use strict';
-
   global.setupCloneDialog = function setupCloneDialog() {
-    var $formContainer = $('#event-clone-form-container');
-    var $form = $('#event-clone-form');
-    var $eventCount = $('#event-count').hide();
-    var $eventList = $form.find('.event-list');
-    var $cloneErrors = $('#clone-errors').hide();
-    var step = $formContainer.data('step');
+    const $formContainer = $('#event-clone-form-container');
+    const $form = $('#event-clone-form');
+    const $eventCount = $('#event-count').hide();
+    const $eventList = $form.find('.event-list');
+    const $cloneErrors = $('#clone-errors').hide();
+    const step = $formContainer.data('step');
 
-    var clonerDependencies = $formContainer.data('clonerDependencies');
+    const clonerDependencies = $formContainer.data('clonerDependencies');
 
     function errorToHTML(error) {
-      if (typeof error == 'string') {
+      if (typeof error === 'string') {
         return error;
       } else {
         return $('<div>').append(
           error.map(function(item) {
-            var label = $('<strong>').append(item[0]);
-            var items = $('<ul>').append(
+            const label = $('<strong>').append(item[0]);
+            const items = $('<ul>').append(
               item[1].map(function(message) {
                 return $('<li>').text(message);
               })
@@ -36,9 +34,9 @@
       }
     }
 
-    var updateCount = _.debounce(function(force) {
-      var $cloneButton = $('.clone-action-button');
-      var serializedForm = $.param($form.serializeArray(), true);
+    const updateCount = _.debounce(function(force) {
+      const $cloneButton = $('.clone-action-button');
+      const serializedForm = $.param($form.serializeArray(), true);
 
       // make sure the form was actually changed
       if (!force && serializedForm === $form.data('initialData')) {
@@ -52,10 +50,10 @@
       $form.ajaxSubmit({
         url: $formContainer.data('preview-url'),
         method: 'POST',
-        success: function(data) {
+        success(data) {
           if (data.success) {
-            var $countNumber = $eventCount.find('.count');
-            var $lastDay = $eventCount.find('.last-day');
+            const $countNumber = $eventCount.find('.count');
+            const $lastDay = $eventCount.find('.last-day');
             $countNumber.text(data.count);
             $cloneErrors.hide();
             $eventCount.show();
@@ -88,9 +86,9 @@
 
     if (step === 2) {
       $form.find('#form-group-selected_items').on('change', 'input[type=checkbox]', function() {
-        var $this = $(this);
-        var dependencies = clonerDependencies[$this.val()];
-        var $field = $this.closest('.form-field');
+        const $this = $(this);
+        const dependencies = clonerDependencies[$this.val()];
+        const $field = $this.closest('.form-field');
 
         if ($this.prop('checked')) {
           if (dependencies.requires) {
@@ -118,9 +116,9 @@
       show: {
         event: 'click',
       },
-      content: function() {
-        var $ul = $('<ul>');
-        var events = $eventCount.data('event-dates').map(function(item) {
+      content() {
+        const $ul = $('<ul>');
+        const events = $eventCount.data('event-dates').map(function(item) {
           return $('<li>').text(moment(item.date).format('ddd L'));
         });
         $ul.append(events.slice(0, 20));

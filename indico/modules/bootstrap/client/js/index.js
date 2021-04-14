@@ -7,8 +7,6 @@
 
 // eslint-disable-next-line import/unambiguous
 $(document).ready(function() {
-  'use strict';
-
   // Header shrinking function
   $(window).scroll(function() {
     if (
@@ -24,13 +22,13 @@ $(document).ready(function() {
   // Instance Tracking slider
   const toggleCheckbox = $('#form-group-enable_tracking input:checkbox');
   toggleCheckbox.on('change', function() {
-    var $this = $(this);
-    var enabled = $this.prop('checked');
-    var itEmail = $('#contact_email');
-    var itContact = $('#contact_name');
-    var firstName = $('#first_name').val();
-    var lastName = $('#last_name').val();
-    var name = !!firstName && !!lastName ? '{0} {1}'.format(firstName, lastName) : '';
+    const $this = $(this);
+    const enabled = $this.prop('checked');
+    const itEmail = $('#contact_email');
+    const itContact = $('#contact_name');
+    const firstName = $('#first_name').val();
+    const lastName = $('#last_name').val();
+    const name = !!firstName && !!lastName ? '{0} {1}'.format(firstName, lastName) : '';
 
     itEmail.prop('required', enabled);
     itEmail.prop('disabled', !enabled);

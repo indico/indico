@@ -7,9 +7,10 @@
 
 /* global handleAjaxError:false */
 
-import moment from 'moment';
-import rbURL from 'indico-url:rb.roombooking';
 import checkRoomAvailabilityURL from 'indico-url:rb.check_room_available';
+import rbURL from 'indico-url:rb.roombooking';
+
+import moment from 'moment';
 
 import {camelizeKeys} from 'indico/utils/case';
 

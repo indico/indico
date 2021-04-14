@@ -5,11 +5,12 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
+import {FORM_ERROR} from 'final-form';
 import _ from 'lodash';
 import {createStore, combineReducers, applyMiddleware} from 'redux';
-import thunkMiddleware from 'redux-thunk';
 import {composeWithDevTools} from 'redux-devtools-extension';
-import {FORM_ERROR} from 'final-form';
+import thunkMiddleware from 'redux-thunk';
+
 import {handleSubmissionError} from 'indico/react/forms';
 import {handleAxiosError} from 'indico/utils/axios';
 

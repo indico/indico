@@ -6,19 +6,17 @@
 // LICENSE file for more details.
 
 (function(global) {
-  'use strict';
-
   global.setupBadgePrinting = function setupBadgePrinting(templates) {
-    var $template = $('#template');
-    var $pageLayout = $('#page_layout');
-    var $dashedBorder = $('#dashed_border');
-    var $pageSize = $('#page_size');
-    var $pageOrientation = $('#page_orientation');
-    var $marginEditor = $('.margin-editor');
-    var $infoMessage = $('.info');
+    const $template = $('#template');
+    const $pageLayout = $('#page_layout');
+    const $dashedBorder = $('#dashed_border');
+    const $pageSize = $('#page_size');
+    const $pageOrientation = $('#page_orientation');
+    const $marginEditor = $('.margin-editor');
+    const $infoMessage = $('.info');
 
     function toggleFoldableOption(template, pageSize, pageOrientation) {
-      var foldablePairs = {
+      const foldablePairs = {
         A0: 'A2',
         A1: 'A3',
         A2: 'A4',
@@ -41,8 +39,8 @@
 
     $template
       .on('change', function() {
-        var $this = $(this);
-        var template = templates[parseInt($this.val(), 10)];
+        const $this = $(this);
+        const template = templates[parseInt($this.val(), 10)];
 
         $pageLayout.closest('.form-group').toggle(!!template.backside_tpl_id);
         $pageLayout.val('front_only');

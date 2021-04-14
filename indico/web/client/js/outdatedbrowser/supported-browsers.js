@@ -12,6 +12,7 @@
 /* global module:false, __dirname:false */
 
 const path = require('path');
+
 const browserslist = require('browserslist');
 const semver = require('semver');
 const BROWSERSLIST_PATH = path.join(__dirname, '..', '..', '..', '..', '..', '.browserslistrc');

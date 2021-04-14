@@ -5,9 +5,9 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
+import * as PropTypes from 'prop-types';
 import * as React from 'react';
 import * as ReactDom from 'react-dom';
-import * as PropTypes from 'prop-types';
 import * as ReactRedux from 'react-redux';
 import * as Redux from 'redux';
 import * as SUIR from 'semantic-ui-react';

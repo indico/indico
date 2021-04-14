@@ -8,12 +8,14 @@
 import categoryStatisticsURL from 'indico-url:categories.statistics_json';
 
 import moment from 'moment';
-import React, {useContext, useMemo} from 'react';
 import PropTypes from 'prop-types';
+import React, {useContext, useMemo} from 'react';
 import {Chart} from 'react-charts';
 import {Container, Header, Segment, Statistic, Message, Loader} from 'semantic-ui-react';
-import {Param, Translate} from 'indico/react/i18n';
+
 import {useIndicoAxios} from 'indico/react/hooks';
+import {Param, Translate} from 'indico/react/i18n';
+
 import {LocaleContext} from '../context.js';
 import './CategoryStatistics.module.scss';
 

@@ -6,23 +6,21 @@
 // LICENSE file for more details.
 
 (function(global) {
-  'use strict';
-
   global.setupCategoryDisplaySubcatList = function setupCategoryDisplaySubcatList() {
-    var url = $('.category-list').data('subcat-info-url');
+    const url = $('.category-list').data('subcat-info-url');
     if (url === undefined) {
       // there's no .category-list if there are no subcategories
       return;
     }
     $.ajax({
-      url: url,
+      url,
       dataType: 'json',
-      success: function(data) {
+      success(data) {
         _.each(data.event_counts, function(count, id) {
-          var text = !count.value
+          const text = !count.value
             ? $T.gettext('empty')
             : $T.ngettext('{0} event', '{0} events', count.value).format(count.pretty);
-          $('#category-event-count-' + id).text(text);
+          $(`#category-event-count-${id}`).text(text);
         });
       },
     });
@@ -33,9 +31,9 @@
     showPastEvents,
     requestParams
   ) {
-    var $eventList = $('.event-list');
-    var $futureEvents = $eventList.find('.future-events');
-    var $pastEvents = $eventList.find('.past-events');
+    const $eventList = $('.event-list');
+    const $futureEvents = $eventList.find('.future-events');
+    const $pastEvents = $eventList.find('.past-events');
 
     setupToggleEventListButton($futureEvents, onToggleFutureEvents);
     setupToggleEventListButton($pastEvents, onTogglePastEvents);
@@ -71,8 +69,8 @@
     }
 
     function setupToggleEventListButton(wrapper, callback) {
-      var $wrapper = $(wrapper);
-      var $content = $wrapper.find('.events');
+      const $wrapper = $(wrapper);
+      const $content = $wrapper.find('.events');
 
       function updateMessage(visible) {
         $wrapper.find('.js-hide-message').toggle(visible);
@@ -88,7 +86,7 @@
 
       $wrapper.find('.js-toggle-list').on('click', function(evt, triggeredAutomatically) {
         evt.preventDefault();
-        var visible;
+        let visible;
         if ($content.is(':empty')) {
           visible = true;
           displaySpinner(true);
@@ -97,10 +95,10 @@
             data: {
               before: $content.data('event-list-before'),
               after: $content.data('event-list-after'),
-              ...requestParams
+              ...requestParams,
             },
             error: handleAjaxError,
-            success: function(data) {
+            success(data) {
               $content.html(data.html);
               $content.show();
               updateMessage(true);
@@ -124,21 +122,19 @@
   };
 
   global.setupCategoryDisplay = function setupCategoryDisplay() {
-    'use strict';
-
     $('.fav-button')
       .on('click', function() {
-        var $this = $(this);
-        var isFavorite = $this.hasClass('enabled');
+        const $this = $(this);
+        const isFavorite = $this.hasClass('enabled');
         $this.prop('disabled', true);
         $.ajax({
           url: $this.data('href'),
           method: isFavorite ? 'DELETE' : 'PUT',
           error: handleAjaxError,
-          success: function() {
+          success() {
             $this.toggleClass('enabled', !isFavorite);
           },
-          complete: function() {
+          complete() {
             $this.prop('disabled', false);
           },
         });
@@ -149,8 +145,8 @@
           delay: 500,
         },
         content: {
-          text: function() {
-            var $this = $(this);
+          text() {
+            const $this = $(this);
             if ($this.hasClass('enabled')) {
               return $T.gettext('Remove from your favourites');
             } else {

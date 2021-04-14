@@ -10,6 +10,7 @@
 /* eslint-disable max-len, no-var, object-shorthand, prefer-template */
 
 import _ from 'lodash';
+
 import {$T} from 'indico/utils/i18n';
 
 (function(global) {

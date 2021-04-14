@@ -6,9 +6,7 @@
 // LICENSE file for more details.
 
 (function(global) {
-  'use strict';
-
-  var HISTORY_API_SUPPORTED = !!history.pushState;
+  const HISTORY_API_SUPPORTED = !!history.pushState;
 
   function toggleFolder(evt) {
     if ($(evt.target).closest('.actions').length) {
@@ -32,20 +30,20 @@
 
     $(document).on('click', '[data-attachment-editor]', function(evt) {
       evt.preventDefault();
-      var $this = $(this);
+      const $this = $(this);
       if (this.disabled || $this.hasClass('disabled')) {
         return;
       }
-      var locator = $(this).data('locator');
-      var title = $(this).data('title');
-      var reloadOnChange = $this.data('reload-on-change') !== undefined;
+      const locator = $(this).data('locator');
+      const title = $(this).data('title');
+      const reloadOnChange = $this.data('reload-on-change') !== undefined;
       openAttachmentManager(locator, title, reloadOnChange, $this);
     });
   });
 
   global.setupAttachmentPreview = function setupAttachmentPreview() {
-    var attachment = $('.js-preview-dialog');
-    var pageURL = location.href.replace(/#.*$/, '');
+    const attachment = $('.js-preview-dialog');
+    const pageURL = location.href.replace(/#.*$/, '');
 
     // Previewer not supported on mobile browsers
     if ($.mobileBrowser) {
@@ -58,12 +56,12 @@
           $('.attachment-preview-dialog').trigger('ajaxDialog:close', [true]);
         } else {
           if (initial && HISTORY_API_SUPPORTED) {
-            var hash = location.hash;
+            const hash = location.hash;
             // start with a clean state, i.e. [..., page, page+preview]
             history.replaceState({}, document.title, pageURL);
             history.pushState({}, document.title, location.href + hash);
           }
-          var id = location.hash.split('#preview:')[1];
+          const id = location.hash.split('#preview:')[1];
           previewAttachment(id);
         }
       })
@@ -94,7 +92,7 @@
     }
 
     function previewAttachment(id) {
-      var attachment = $('.attachment[data-previewable][data-attachment-id="{0}"]'.format(id));
+      const attachment = $('.attachment[data-previewable][data-attachment-id="{0}"]'.format(id));
       if (!attachment.length) {
         clearHash();
         return;
@@ -103,7 +101,7 @@
         url: build_url(attachment.attr('href'), {preview: '1'}),
         title: attachment.data('title'),
         dialogClasses: 'attachment-preview-dialog',
-        onClose: function(data) {
+        onClose(data) {
           $('body').off('keydown.attachmentPreview');
           $('html, body').removeClass('prevent-scrolling');
           if (!data) {
@@ -112,8 +110,8 @@
             clearHash();
           }
         },
-        onOpen: function(popup) {
-          var dialog = popup.canvas.closest('.ui-dialog');
+        onOpen(popup) {
+          const dialog = popup.canvas.closest('.ui-dialog');
           dialog.prev('.ui-widget-overlay').addClass('attachment-preview-overlay');
           popup.canvas
             .find('.attachment-preview-content-wrapper, .js-close-preview')
@@ -121,8 +119,8 @@
               popup.canvas.trigger('ajaxDialog:close');
             });
           popup.canvas.find('.attachment-download').on('click', function() {
-            var $this = $(this);
-            var href = $this.attr('href');
+            const $this = $(this);
+            const href = $this.attr('href');
             $this.attr('href', build_url(href, {from_preview: '1', download: '1'}));
             _.defer(function() {
               $this.attr('href', href);
@@ -147,8 +145,8 @@
             dialog.show();
           });
         },
-        onLoadError: function(xhr) {
-          var hash = location.hash;
+        onLoadError(xhr) {
+          const hash = location.hash;
           clearHash();
           if (xhr.status == 404) {
             alertPopup($T.gettext('This file no longer exists. Please reload the page.'));
@@ -159,7 +157,7 @@
           if (Indico.User && Indico.User.id !== undefined) {
             alertPopup($T('You are not authorized to access this file.'), $T('Access Denied'));
           } else {
-            var msg = $T('This file is protected. You will be redirected to the login page.');
+            const msg = $T('This file is protected. You will be redirected to the login page.');
             confirmPrompt(msg, $T('Access Denied')).then(function() {
               location.href = build_url(Indico.Urls.Login, {next: location.href + hash});
             });
@@ -175,7 +173,7 @@
   };
 
   global.setupAttachmentEditor = function setupAttachmentEditor() {
-    var editor = $('.attachment-editor');
+    const editor = $('.attachment-editor');
 
     function flagChanged() {
       editor.trigger('ajaxDialog:setData', [true]);
@@ -185,13 +183,13 @@
       .on('click', '.tree .expandable', toggleFolder)
       .on('click', '.js-dialog-action', function(e) {
         e.preventDefault();
-        var $this = $(this);
+        const $this = $(this);
         ajaxDialog({
           trigger: this,
           url: $this.data('href'),
           title: $this.data('title'),
           hidePageHeader: true,
-          onClose: function(data) {
+          onClose(data) {
             if (data) {
               $('#attachments-container').html(data.attachment_list);
               flagChanged();
@@ -202,13 +200,13 @@
       .on('indico:confirmed', '.js-delete', function(e) {
         e.preventDefault();
 
-        var $this = $(this);
+        const $this = $(this);
         $.ajax({
           url: $this.data('href'),
           method: $this.data('method'),
           complete: IndicoUI.Dialogs.Util.progress(),
           error: handleAjaxError,
-          success: function(data) {
+          success(data) {
             $('#attachments-container').html(data.attachment_list);
             handleFlashes(data, true, editor);
             flagChanged();
@@ -225,12 +223,12 @@
   ) {
     reloadOnChange = reloadOnChange === undefined ? true : reloadOnChange;
     ajaxDialog({
-      trigger: trigger,
+      trigger,
       url: build_url(Indico.Urls.AttachmentManager, itemLocator),
       title: title || $T.gettext('Manage material'),
       confirmCloseUnsaved: false,
       hidePageHeader: true,
-      onClose: function(callbackData, customData) {
+      onClose(callbackData, customData) {
         if (customData && reloadOnChange) {
           location.reload();
         } else if (customData && trigger) {
@@ -248,7 +246,7 @@
       url: build_url(Indico.Urls.ManagementAttachmentInfoColumn, itemLocator),
       method: 'GET',
       error: handleAjaxError,
-      success: function(data) {
+      success(data) {
         column.replaceWith(data.html);
       },
     });
@@ -263,7 +261,7 @@
     folderProtection
   ) {
     folderField.on('change', function() {
-      var selectedFolder = $(this);
+      const selectedFolder = $(this);
       if (protectionInfo[selectedFolder.val()] && !protectionField.prop('checked')) {
         selfProtection.hide();
         inheritedProtection.hide();
@@ -284,7 +282,7 @@
 
   global.setupAttachmentTooltipButtons = function setupAttachmentTooltipButtons() {
     $('.attachments-tooltip-button').each(function() {
-      var button = $(this);
+      const button = $(this);
       button.qtip({
         content: {
           text: button.next('.material_list'),
@@ -300,10 +298,10 @@
           at: 'bottom left',
         },
         events: {
-          show: function() {
+          show() {
             button.addClass('open');
           },
-          hide: function() {
+          hide() {
             button.removeClass('open');
           },
         },

@@ -8,8 +8,6 @@
 /* eslint-disable max-len */
 
 (function(global) {
-  'use strict';
-
   /**
    * Check if the data returned by `cephalopodUrl` matches `localData`
    *
@@ -21,7 +19,7 @@
    */
   function _checkSynced(cephalopodUrl, localData, quiet) {
     quiet = quiet || false;
-    var defer = $.Deferred();
+    const defer = $.Deferred();
     $.ajax({
       url: cephalopodUrl,
       type: 'GET',
@@ -29,7 +27,7 @@
       timeout: 10000, // 10 seconds
     })
       .done(function onSuccess(response) {
-        var synced = true;
+        let synced = true;
         _.each(localData, function(localVal, key) {
           if (localVal === response[key]) {
             return;
@@ -39,7 +37,7 @@
         defer.resolve(synced);
       })
       .fail(function onError(xhr, status) {
-        var errMsg = $T.gettext('Unknown error while contacting the Community Hub');
+        let errMsg = $T.gettext('Unknown error while contacting the Community Hub');
         if (xhr.state() === 'rejected' && xhr.status === 200 && status === 'parsererror') {
           errMsg = $T.gettext('Internal error: Parse error on the reply of the Community Hub.');
         } else if (xhr.state() === 'rejected' && xhr.status === 0 && status === 'error') {
@@ -63,18 +61,18 @@
   }
 
   global.setupCephalopodSettings = function setupCephalopodSettings(cephalopodUrl, enabled) {
-    var $joined = $('#joined');
+    const $joined = $('#joined');
 
     $joined.on('change', function() {
       $('#sync-button').prop('disabled', !this.checked);
     });
 
-    var dfd = $.Deferred();
+    const dfd = $.Deferred();
     $.when(dfd).always(function(label) {
       $('#tracking-status')
-        .attr('class', 'action-box ' + label.class)
+        .attr('class', `action-box ${label.class}`)
         .find('.section > .icon')
-        .attr('class', 'icon ' + label.icon)
+        .attr('class', `icon ${label.icon}`)
         .next('.text')
         .children('.label')
         .html(label.title)

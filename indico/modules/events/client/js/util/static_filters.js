@@ -6,9 +6,7 @@
 // LICENSE file for more details.
 
 (function(global) {
-  'use strict';
-
-  var totalDurationDisplay;
+  let totalDurationDisplay;
 
   function formatState(visible, total) {
     return '{0} / {1}'.format('<strong>{0}</strong>'.format(visible.length), total.length);
@@ -26,11 +24,11 @@
   }
 
   function _applySearchFilters(searchBoxConfig) {
-    var $items = $(searchBoxConfig.listItems);
-    var term = $(searchBoxConfig.term).val();
-    var $state = $(searchBoxConfig.state);
-    var $visibleEntries, m;
-    var $filterPlaceholder = $(searchBoxConfig.placeholder);
+    const $items = $(searchBoxConfig.listItems);
+    let term = $(searchBoxConfig.term).val();
+    const $state = $(searchBoxConfig.state);
+    let $visibleEntries, m;
+    const $filterPlaceholder = $(searchBoxConfig.placeholder);
 
     if (!term) {
       if ($state.hasClass('active')) {
@@ -49,10 +47,10 @@
     // quick search of contribution by ID
     term = term.trim();
     if ((m = term.match(/^#(\d+)$/))) {
-      $visibleEntries = $items.filter('[data-friendly-id="' + m[1] + '"]');
+      $visibleEntries = $items.filter(`[data-friendly-id="${m[1]}"]`);
     } else {
       $visibleEntries = $items
-        .find('[data-searchable*="' + term.toLowerCase() + '"]')
+        .find(`[data-searchable*="${term.toLowerCase()}"]`)
         .closest(searchBoxConfig.itemHandle);
     }
 
@@ -76,8 +74,8 @@
   }
 
   global.setupSearchBox = function setupSearchBox(config) {
-    var applySearchFilters = _.partial(_applySearchFilters, config),
-      $term = $(config.term);
+    const applySearchFilters = _.partial(_applySearchFilters, config);
+    const $term = $(config.term);
 
     if ($term.length) {
       $term.realtimefilter({

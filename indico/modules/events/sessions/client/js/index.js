@@ -10,8 +10,6 @@ import 'indico/modules/events/util/types_dialog';
 import './session_display';
 
 (function(global) {
-  'use strict';
-
   function setupTableSorter() {
     $('#sessions .tablesorter').tablesorter({
       cssAsc: 'header-sort-asc',
@@ -25,15 +23,15 @@ import './session_display';
 
   function setupPalettePickers() {
     $('.palette-picker-trigger').each(function() {
-      var $this = $(this);
+      const $this = $(this);
       $this.palettepicker({
         availableColors: $this.data('colors'),
         selectedColor: $this.data('color'),
-        onSelect: function(background, text) {
+        onSelect(background, text) {
           $.ajax({
             url: $(this).data('href'),
             method: $(this).data('method'),
-            data: JSON.stringify({colors: {text: text, background: background}}),
+            data: JSON.stringify({colors: {text, background}}),
             dataType: 'json',
             contentType: 'application/json',
             error: handleAjaxError,
@@ -46,8 +44,8 @@ import './session_display';
 
   function patchObject(url, method, data) {
     return $.ajax({
-      url: url,
-      method: method,
+      url,
+      method,
       data: JSON.stringify(data),
       dataType: 'json',
       contentType: 'application/json',
@@ -56,7 +54,7 @@ import './session_display';
     });
   }
 
-  var filterConfig = {
+  const filterConfig = {
     itemHandle: 'tr',
     listItems: '#sessions-wrapper tr.session-row',
     term: '#search-input',
@@ -76,7 +74,7 @@ import './session_display';
     setupTableSorter();
     setupPalettePickers();
     handleRowSelection(false);
-    var applySearchFilters = setupSearchBox(filterConfig);
+    const applySearchFilters = setupSearchBox(filterConfig);
 
     $('#sessions .toolbar').on('click', '.disabled', function(evt) {
       evt.preventDefault();
@@ -91,20 +89,20 @@ import './session_display';
         _.defer(applySearchFilters);
       })
       .on('click', '.show-session-blocks', function() {
-        var $this = $(this);
+        const $this = $(this);
         ajaxDialog({
           title: $this.data('title'),
           url: $this.data('href'),
         });
       })
       .on('attachments:updated', function(evt) {
-        var target = $(evt.target);
+        const target = $(evt.target);
         reloadManagementAttachmentInfoColumn(target.data('locator'), target.closest('td'));
       });
 
     $('.js-submit-session-form').on('click', function(evt) {
       evt.preventDefault();
-      var $this = $(this);
+      const $this = $(this);
 
       if (!$this.hasClass('disabled')) {
         $('#sessions-wrapper form')
@@ -123,14 +121,14 @@ import './session_display';
         footerElements: [
           {
             title: $T.gettext('Add new type'),
-            onClick: function(sessionTypePicker) {
+            onClick(sessionTypePicker) {
               ajaxDialog({
                 title: $T.gettext('Add new type'),
                 url: createURL,
-                onClose: function(data) {
+                onClose(data) {
                   if (data) {
                     $('.session-type-picker').each(function() {
-                      var $this = $(this);
+                      const $this = $(this);
                       if ($this.data('indicoItempicker')) {
                         $this.itempicker('updateItemList', data.types);
                       } else {
@@ -144,12 +142,12 @@ import './session_display';
             },
           },
         ],
-        onSelect: function(newType) {
-          var $this = $(this);
-          var postData = {type_id: newType ? newType.id : null};
+        onSelect(newType) {
+          const $this = $(this);
+          const postData = {type_id: newType ? newType.id : null};
 
           return patchObject($this.data('href'), $this.data('method'), postData).then(function() {
-            var label = newType ? newType.title : $T.gettext('No type');
+            const label = newType ? newType.title : $T.gettext('No type');
             $this.find('.label').text(label);
           });
         },

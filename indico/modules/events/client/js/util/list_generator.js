@@ -9,7 +9,7 @@
 
 (function(global) {
   function colorizeFilter(filter) {
-    var dropdown = filter.find('.i-dropdown');
+    const dropdown = filter.find('.i-dropdown');
     filter.toggleClass('active highlight', dropdown.find(':checked').length > 0);
   }
 
@@ -21,13 +21,13 @@
 
   function setupStaticURLGeneration() {
     $('.js-static-url').on('click', function() {
-      var $this = $(this);
+      const $this = $(this);
       $.ajax({
         method: 'POST',
         url: $this.data('href'),
         error: handleAjaxError,
         complete: IndicoUI.Dialogs.Util.progress(),
-        success: function(data) {
+        success(data) {
           $this.copyURLTooltip(data.url);
         },
       });
@@ -35,7 +35,7 @@
   }
 
   global.handleRowSelection = function(trigger) {
-    var $obj = $('table.i-table input.select-row').on('change', function() {
+    const $obj = $('table.i-table input.select-row').on('change', function() {
       $(this)
         .closest('tr')
         .toggleClass('selected', this.checked);
@@ -62,12 +62,12 @@
   };
 
   global.setupListFilter = function() {
-    var visibleItems = $('#visible-items');
-    var hasColumnSelector = !!$('#visible-items').length;
+    const visibleItems = $('#visible-items');
+    const hasColumnSelector = !!$('#visible-items').length;
 
     $('.list-filter .filter').each(function() {
-      var $filter = $(this).parent();
-      var isOnlyFilter = !!$filter.find('[data-only-filter]').length;
+      const $filter = $(this).parent();
+      const isOnlyFilter = !!$filter.find('[data-only-filter]').length;
       $filter.dropdown({selector: "a[data-toggle='dropdown']", relative_to: $filter});
       if (!hasColumnSelector || isOnlyFilter) {
         $filter.find('.title-wrapper').on('click', function(evt) {
@@ -84,15 +84,15 @@
       if ($(evt.target).hasClass('filter')) {
         return;
       }
-      var $this = $(this);
-      var field = $this.closest('.title-wrapper');
-      var fieldId = field.data('id');
-      var visibilityIcon = field.find('.visibility');
-      var enabled = visibilityIcon.hasClass('enabled');
-      var isOnlyFilter = !!$this.parent().find('[data-only-filter]').length;
+      const $this = $(this);
+      const field = $this.closest('.title-wrapper');
+      const fieldId = field.data('id');
+      const visibilityIcon = field.find('.visibility');
+      const enabled = visibilityIcon.hasClass('enabled');
+      const isOnlyFilter = !!$this.parent().find('[data-only-filter]').length;
 
       if (hasColumnSelector && !isOnlyFilter) {
-        var itemsData = JSON.parse(visibleItems.val());
+        const itemsData = JSON.parse(visibleItems.val());
         if (enabled) {
           itemsData.splice(itemsData.indexOf(fieldId), 1);
         } else {
@@ -107,10 +107,10 @@
 
     if (hasColumnSelector) {
       $('.title-wrapper').each(function() {
-        var field = $(this);
-        var fieldId = field.data('id');
-        var itemsData = JSON.parse(visibleItems.val());
-        var isOnlyFilter = !!field.parent().find('[data-only-filter]').length;
+        const field = $(this);
+        const fieldId = field.data('id');
+        const itemsData = JSON.parse(visibleItems.val());
+        const isOnlyFilter = !!field.parent().find('[data-only-filter]').length;
 
         if (!isOnlyFilter) {
           if (itemsData.indexOf(fieldId) !== -1) {
@@ -127,8 +127,8 @@
         .prop('checked', false)
         .trigger('change');
       $('.js-clear-filters-message').show({
-        done: function() {
-          var $this = $(this);
+        done() {
+          const $this = $(this);
           setTimeout(function() {
             $this.slideUp();
           }, 4000);
@@ -141,7 +141,7 @@
     });
 
     $('.list-filter .title').on('mouseover', function() {
-      var title = $(this);
+      const title = $(this);
       // Show a qtip if the text is ellipsized
       if (this.offsetWidth < this.scrollWidth) {
         title.qtip({hide: 'mouseout', content: title.text(), overwrite: false}).qtip('show');
@@ -158,7 +158,7 @@
   };
 
   global.setupListGenerator = function(filterConfig) {
-    var applySearchFilters;
+    let applySearchFilters;
     if (filterConfig) {
       applySearchFilters = setupSearchBox(filterConfig);
     }
@@ -192,7 +192,7 @@
 
     $('.js-submit-list-form').on('click', function(e) {
       e.preventDefault();
-      var $this = $(this);
+      const $this = $(this);
       if (!$this.hasClass('disabled')) {
         $('.list form')
           .attr('action', $this.data('href'))

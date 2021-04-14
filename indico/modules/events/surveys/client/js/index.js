@@ -40,20 +40,20 @@ import 'chartist/dist/chartist.css';
     });
 
     $('#survey-results .survey-bar-chart').each(function(idx, elem) {
-      var labels = $(elem).data('labels');
-      var labelsHeight = labels.length * 20;
-      var containerHeight = $(elem)
+      const labels = $(elem).data('labels');
+      const labelsHeight = labels.length * 20;
+      const containerHeight = $(elem)
         .parents('.i-box-content')
         .outerHeight();
       new Chartist.Bar(
         elem,
         {
-          labels: labels,
+          labels,
           series: [$(elem).data('series-absolute')],
         },
         {
           horizontalBars: true,
-          height: Math.max(labelsHeight, containerHeight) + 'px',
+          height: `${Math.max(labelsHeight, containerHeight)}px`,
           reverseData: true,
           axisX: {
             onlyInteger: true,
@@ -72,7 +72,7 @@ import 'chartist/dist/chartist.css';
       ajaxDialog({
         url: build_url($(this).data('href')),
         title: $(this).data('title'),
-        onClose: function(data) {
+        onClose(data) {
           if (data) {
             location.reload();
           }
@@ -89,7 +89,7 @@ import 'chartist/dist/chartist.css';
           trigger: this,
           url: $(this).data('href'),
           title: $(this).data('title'),
-          onClose: function(data) {
+          onClose(data) {
             if (data) {
               updateQuestions(data);
             }
@@ -99,13 +99,13 @@ import 'chartist/dist/chartist.css';
       .on('indico:confirmed', '.js-delete-item', function(e) {
         e.preventDefault();
 
-        var $this = $(this);
+        const $this = $(this);
         $.ajax({
           url: $this.data('href'),
           method: $this.data('method'),
           complete: IndicoUI.Dialogs.Util.progress(),
           error: handleAjaxError,
-          success: function(data) {
+          success(data) {
             updateQuestions(data);
             handleFlashes(data, true, $('#survey-questionnaire-preview'));
           },
@@ -131,9 +131,9 @@ import 'chartist/dist/chartist.css';
     });
 
     $('.js-export-submissions').on('click', function() {
-      var $this = $(this);
+      const $this = $(this);
 
-      var form = $('<form>', {
+      const form = $('<form>', {
         method: 'POST',
         action: $this.data('href'),
       });
@@ -154,7 +154,7 @@ import 'chartist/dist/chartist.css';
 
     $('.js-delete-submission').on('indico:confirmed', function(evt) {
       evt.preventDefault();
-      var $this = $(this);
+      const $this = $(this);
 
       $.ajax({
         url: $this.data('href'),
@@ -164,7 +164,7 @@ import 'chartist/dist/chartist.css';
         },
         complete: IndicoUI.Dialogs.Util.progress(),
         error: handleAjaxError,
-        success: function() {
+        success() {
           $this.closest('.submission-row').remove();
           _disableButtons();
         },
@@ -173,8 +173,8 @@ import 'chartist/dist/chartist.css';
 
     $('#delete-submissions').on('indico:confirmed', function(evt) {
       evt.preventDefault();
-      var $this = $(this);
-      var submissionIds = $('.submission-ids:checked')
+      const $this = $(this);
+      const submissionIds = $('.submission-ids:checked')
         .map(function() {
           return $(this).val();
         })
@@ -188,7 +188,7 @@ import 'chartist/dist/chartist.css';
         },
         complete: IndicoUI.Dialogs.Util.progress(),
         error: handleAjaxError,
-        success: function() {
+        success() {
           $('.submission-ids:checked')
             .closest('.submission-row')
             .remove();
@@ -213,13 +213,13 @@ import 'chartist/dist/chartist.css';
   }
 
   global.setupQuestionnaireSorter = function setupQuestionnaireSorter() {
-    var container = $('#survey-questionnaire-preview');
+    const container = $('#survey-questionnaire-preview');
 
     function _save(mode, data) {
       $.ajax({
         url: container.data('sort-url'),
         method: 'POST',
-        data: $.extend({mode: mode}, data),
+        data: $.extend({mode}, data),
         complete: IndicoUI.Dialogs.Util.progress(),
         error: handleAjaxError,
       });
@@ -233,11 +233,11 @@ import 'chartist/dist/chartist.css';
       tolerance: 'pointer',
       distance: 10,
       axis: 'y',
-      start: function(e, ui) {
+      start(e, ui) {
         ui.placeholder.height(ui.helper.outerHeight());
       },
-      update: function() {
-        var sectionIds = container
+      update() {
+        const sectionIds = container
           .find('.js-sortable-survey-section')
           .map(function() {
             return $(this).data('sectionId');
@@ -255,20 +255,20 @@ import 'chartist/dist/chartist.css';
       tolerance: 'pointer',
       distance: 10,
       axis: 'y',
-      start: function() {
-        var $this = $(this);
+      start() {
+        const $this = $(this);
         $this.css('min-height', $this.height());
       },
-      stop: function() {
+      stop() {
         $(this).css('min-height', '');
       },
-      update: function(evt, ui) {
-        var $this = $(this);
+      update(evt, ui) {
+        const $this = $(this);
         // ignore update from the source list
         if (this !== ui.item.parent()[0]) {
           return;
         }
-        var itemIds = $this
+        const itemIds = $this
           .find('.survey-item')
           .map(function() {
             return $(this).data('itemId');
@@ -279,11 +279,11 @@ import 'chartist/dist/chartist.css';
           section_id: $this.closest('[data-section-id]').data('sectionId'),
         });
       },
-      receive: function() {
+      receive() {
         $(this).removeClass('empty');
       },
-      remove: function() {
-        var $this = $(this);
+      remove() {
+        const $this = $(this);
         $this.toggleClass('empty', !$this.find('li:not(.empty-msg)').length);
       },
     });

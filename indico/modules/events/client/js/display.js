@@ -17,7 +17,7 @@ import './util/social';
         subtitle: $element.data('subtitle'),
         url: $element.data('href'),
         confirmCloseUnsaved: true,
-        onClose: function(data, customData) {
+        onClose(data, customData) {
           if (data || customData) {
             location.reload();
           }
@@ -36,14 +36,14 @@ import './util/social';
       })
       .find('li a')
       .on('menu_select', function() {
-        var anchor = $(this).attr('href');
+        const anchor = $(this).attr('href');
         $('body, html').animate(
           {
             scrollTop: $(anchor).offset().top,
           },
           {
             duration: 700,
-            complete: function() {
+            complete() {
               location.href = anchor;
             },
           }
@@ -70,12 +70,12 @@ import './util/social';
 
   function toggleNote(element, visible, immediate) {
     // Note for event
-    var note = element.closest('.event-note-section');
+    let note = element.closest('.event-note-section');
     // Note for other elements
     if (note.length === 0) {
       note = element.closest('li').find('.note-area-wrapper');
     }
-    var content = note.hasClass('togglable') ? note : note.find('.togglable');
+    const content = note.hasClass('togglable') ? note : note.find('.togglable');
     if (immediate) {
       content.toggle(visible);
     } else {
@@ -85,9 +85,9 @@ import './util/social';
 
   $(document).ready(function() {
     $('.event-service-row > .trigger').on('click', function() {
-      var toggler = $(this);
+      const toggler = $(this);
       toggler.siblings('.event-service-details').slideToggle({
-        start: function() {
+        start() {
           toggler.toggleClass('icon-expand icon-collapse');
         },
         duration: 'fast',
@@ -96,34 +96,34 @@ import './util/social';
 
     $('.event-service-row-toggle').on('click', function(e) {
       e.preventDefault();
-      var toggler = $(this);
-      var togglerButton = $(this)
+      const toggler = $(this);
+      const togglerButton = $(this)
         .parent()
         .siblings('.trigger');
       toggler
         .parent()
         .siblings('.event-service-details')
         .slideToggle({
-          start: function() {
+          start() {
             togglerButton.toggleClass('icon-expand icon-collapse');
           },
           duration: 'fast',
         });
     });
 
-    var threeRowsHeight = 70;
+    const threeRowsHeight = 70;
     $('.participant-list-wrapper').toggleClass(
       'collapsible collapsed transparent-overlay',
       $('.participant-list').height() > threeRowsHeight
     );
-    var initialHeight = $('.participant-list-wrapper').height();
+    const initialHeight = $('.participant-list-wrapper').height();
 
     $('.participant-list-wrapper.transparent-overlay').on('click', function() {
-      var toggler = $('.participant-list-wrapper > .trigger');
-      var participantList = toggler.siblings('.participant-list');
-      var wrapper = participantList.parent();
+      const toggler = $('.participant-list-wrapper > .trigger');
+      const participantList = toggler.siblings('.participant-list');
+      const wrapper = participantList.parent();
       if (wrapper.hasClass('collapsed')) {
-        var newHeight = participantList.height();
+        const newHeight = participantList.height();
         participantList.height(initialHeight);
         wrapper.removeClass('collapsed transparent-overlay');
         wrapper.animate(
@@ -132,10 +132,10 @@ import './util/social';
           },
           {
             duration: 'fast',
-            start: function() {
+            start() {
               toggler.addClass('icon-collapse').removeClass('icon-expand');
             },
-            complete: function() {
+            complete() {
               participantList.height(newHeight);
             },
           }
@@ -148,10 +148,10 @@ import './util/social';
           },
           {
             duration: 'fast',
-            start: function() {
+            start() {
               toggler.removeClass('icon-collapse').addClass('icon-expand');
             },
-            complete: function() {
+            complete() {
               wrapper.addClass('collapsed');
             },
           }
@@ -173,7 +173,7 @@ import './util/social';
     $('.js-note-editor').ajaxDialog({
       title: $T('Edit minutes'),
       confirmCloseUnsaved: true,
-      onClose: function(data, customData) {
+      onClose(data, customData) {
         if (data || customData) {
           location.reload();
         }

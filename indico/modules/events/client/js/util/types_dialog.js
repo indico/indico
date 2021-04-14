@@ -7,7 +7,7 @@
 
 (function(global) {
   global.setupTypesDialog = function setupTypesDialog() {
-    var $manageTypes = $('.manage-types');
+    const $manageTypes = $('.manage-types');
 
     /* Set the customData to true indicating that the list needs to be refreshed */
     function dialogModified() {
@@ -26,7 +26,7 @@
     $('.js-new-type').on('ajaxDialog:closed', function(evt, data) {
       evt.preventDefault();
       if (data) {
-        var $lastRow = $('.manage-types table tr:last');
+        const $lastRow = $('.manage-types table tr:last');
         if ($lastRow.length) {
           $lastRow.after(data.html_row);
           dialogModified();
@@ -39,7 +39,7 @@
     $manageTypes.on('ajaxDialog:closed', '.js-edit-type', function(evt, data) {
       evt.preventDefault();
       if (data) {
-        var $row = $(this).closest('tr');
+        const $row = $(this).closest('tr');
         $row.replaceWith(data.html_row);
         dialogModified();
       }
@@ -47,14 +47,14 @@
 
     $manageTypes.on('indico:confirmed', '.js-delete-type', function(evt) {
       evt.preventDefault();
-      var $this = $(this);
+      const $this = $(this);
       $.ajax({
         url: $this.data('href'),
         method: $this.data('method'),
         complete: IndicoUI.Dialogs.Util.progress(),
         error: handleAjaxError,
-        success: function() {
-          var $row = $this.closest('tr');
+        success() {
+          const $row = $this.closest('tr');
           $row.remove();
           dialogModified();
           if ($('.manage-types table tbody tr').length === 0) {

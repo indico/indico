@@ -34,7 +34,7 @@ import './form/templates';
       ajaxDialog({
         url: $(this).data('href'),
         title: $(this).data('title'),
-        onClose: function(data) {
+        onClose(data) {
           if (data) {
             location.reload();
           }
@@ -45,9 +45,9 @@ import './form/templates';
 
   function setupRegistrationFormSummaryPage() {
     $('.js-check-conditions').on('click', function(e) {
-      var conditions = $('#conditions-accepted');
+      const conditions = $('#conditions-accepted');
       if (conditions.length && !conditions.prop('checked')) {
-        var msg =
+        const msg =
           'Please, confirm that you have read and accepted the Terms and Conditions before proceeding.';
         alertPopup($T.gettext(msg), $T.gettext('Terms and Conditions'));
         e.preventDefault();
@@ -63,13 +63,13 @@ import './form/templates';
     $('#payment-disabled-notice').on('indico:confirmed', '.js-enable-payments', function(evt) {
       evt.preventDefault();
 
-      var $this = $(this);
+      const $this = $(this);
       $.ajax({
         url: $this.data('href'),
         method: $this.data('method'),
         complete: IndicoUI.Dialogs.Util.progress(),
         error: handleAjaxError,
-        success: function(data) {
+        success(data) {
           $('#payment-disabled-notice').remove();
           $('#event-side-menu').html(data.event_menu);
         },

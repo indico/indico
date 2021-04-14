@@ -18,16 +18,16 @@ import './boa';
 
 (function(global) {
   global.setupAbstractList = function setupAbstractList() {
-    var abstractListContainer = $('#abstract-list');
+    const abstractListContainer = $('#abstract-list');
 
-    var filterConfig = {
+    const filterConfig = {
       itemHandle: 'tr',
       listItems: '#abstract-list tbody tr',
       term: '#search-input',
       state: '#filtering-state',
       placeholder: '#filter-placeholder',
     };
-    var applySearchFilters = setupListGenerator(filterConfig);
+    const applySearchFilters = setupListGenerator(filterConfig);
     abstractListContainer.on('indico:htmlUpdated', function() {
       abstractListContainer.find('.js-mathjax').mathJax();
       _.defer(applySearchFilters);
@@ -48,9 +48,9 @@ import './boa';
       tolerance: 'pointer',
       forcePlaceholderSize: true,
       placeholder: 'regform-section-sortable-placeholder',
-      update: function() {
-        var $elem = $('.email-templates > ul');
-        var sortedList = $elem
+      update() {
+        const $elem = $('.email-templates > ul');
+        const sortedList = $elem
           .find('li.email-template')
           .map(function(i, elem) {
             return $(elem).data('id');
@@ -70,15 +70,15 @@ import './boa';
 
     $('.email-preview-btn').on('click', function(evt) {
       evt.preventDefault();
-      var id = $(this).data('id');
-      var $previewBtn = $('#email-preview-btn-' + id);
+      const id = $(this).data('id');
+      const $previewBtn = $(`#email-preview-btn-${id}`);
       if ($previewBtn.data('visible')) {
         $previewBtn.text($T.gettext('Show preview'));
-        $('#email-preview-' + id).slideToggle();
+        $(`#email-preview-${id}`).slideToggle();
         $previewBtn.data('visible', false);
       } else {
         $previewBtn.text($T.gettext('Hide preview'));
-        $('#email-preview-' + id).slideToggle();
+        $(`#email-preview-${id}`).slideToggle();
         $previewBtn.data('visible', true);
       }
     });
@@ -92,8 +92,8 @@ import './boa';
 
     $('.js-toggle-stop-on-match').on('click', function(evt) {
       evt.preventDefault();
-      var $this = $(this);
-      var stopOnMatch = !$this.data('stop-on-match');
+      const $this = $(this);
+      const stopOnMatch = !$this.data('stop-on-match');
 
       if ($this.hasClass('disabled')) {
         return;
@@ -106,7 +106,7 @@ import './boa';
         dataType: 'json',
         contentType: 'application/json',
         error: handleAjaxError,
-        success: function() {
+        success() {
           $this.data('stop-on-match', stopOnMatch);
           $this.toggleClass('stop-processing-enabled', stopOnMatch);
         },
@@ -130,7 +130,7 @@ import './boa';
     }
 
     if (options.hasAbstracts) {
-      var filterConfig = {
+      const filterConfig = {
         itemHandle: 'div.contribution-row',
         listItems: '#display-contribution-list div.contribution-row',
         term: '#search-input',
@@ -138,7 +138,7 @@ import './boa';
         placeholder: '#filter-placeholder',
       };
 
-      var applySearchFilters = setupSearchBox(filterConfig);
+      const applySearchFilters = setupSearchBox(filterConfig);
       applySearchFilters();
     }
   };
@@ -152,7 +152,7 @@ import './boa';
     );
 
     $('body').on('change', '#accepted_track', function() {
-      var sessionId = options.trackSessionMap[$(this).val()];
+      const sessionId = options.trackSessionMap[$(this).val()];
       $('#session').val(sessionId || '__None');
     });
     $('#accepted_track').trigger('change');
