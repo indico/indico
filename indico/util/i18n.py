@@ -102,14 +102,32 @@ def make_bound_ngettext(plugin_name):
     return smart_func('ngettext', plugin_name=plugin_name)
 
 
+def make_bound_pgettext(plugin_name):
+    """
+    Create a smart pgettext callable bound to the domain of the specified plugin.
+    """
+    return smart_func('pgettext', plugin_name=plugin_name)
+
+
+def make_bound_npgettext(plugin_name):
+    """
+    Create a smart npgettext callable bound to the domain of the specified plugin.
+    """
+    return smart_func('npgettext', plugin_name=plugin_name)
+
+
 # Shortcuts
 _ = gettext = make_bound_gettext(None)
 ngettext = make_bound_ngettext(None)
+pgettext = make_bound_pgettext(None)
+npgettext = make_bound_npgettext(None)
 L_ = lazy_gettext
 
 # Plugin-context-sensitive gettext for templates
 gettext_context = make_bound_gettext(_use_context)
 ngettext_context = make_bound_ngettext(_use_context)
+pgettext_context = make_bound_pgettext(_use_context)
+npgettext_context = make_bound_npgettext(_use_context)
 
 
 class NullDomain(Domain):

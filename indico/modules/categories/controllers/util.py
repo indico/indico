@@ -16,14 +16,16 @@ from indico.core.db import db
 from indico.modules.events.models.events import Event
 from indico.modules.events.util import serialize_event_for_json_ld
 from indico.util.date_time import format_date
-from indico.util.i18n import _
+from indico.util.i18n import _, pgettext
 from indico.web.flask.util import url_for
 
 
 def group_by_month(events, now, tzinfo):
+    date_format = pgettext('babel date format for category event list headers (month/year only)', 'MMMM yyyy')
+
     def _format_tuple(x):
         (year, month), events = x
-        return {'name': format_date(date(year, month, 1), format='MMMM yyyy'),
+        return {'name': format_date(date(year, month, 1), format=date_format),
                 'events': list(events),
                 'is_current': year == now.year and month == now.month}
 
@@ -36,8 +38,9 @@ def group_by_month(events, now, tzinfo):
 
 
 def make_format_event_date_func(category):
+    day_month = pgettext('babel date format for category event list event entries (day/month only)', 'dd MMM')
+
     def fn(event):
-        day_month = 'dd MMM'
         tzinfo = category.display_tzinfo
         start_dt = event.start_dt.astimezone(tzinfo)
         end_dt = event.end_dt.astimezone(tzinfo)
