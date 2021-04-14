@@ -34,6 +34,7 @@ export default function WTFTimeField({timeId, uses24HourFormat, required, disabl
     <TimePicker
       showSecond={false}
       value={time}
+      focusOnOpen
       format={format}
       onChange={updateTime}
       use12Hours={!uses24HourFormat}
