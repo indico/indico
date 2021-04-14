@@ -27,6 +27,7 @@ from indico.web.flask.util import url_for
 from indico.web.forms.base import IndicoForm, generated_data
 from indico.web.forms.fields import (HiddenFieldList, IndicoDateTimeField, IndicoEnumSelectField, IndicoLocationField,
                                      IndicoProtectionField, IndicoTagListField, TimeDeltaField)
+from indico.web.forms.fields.datetime import IndicoDurationField
 from indico.web.forms.fields.principals import PermissionsField
 from indico.web.forms.validators import DateTimeRange, MaxDuration
 from indico.web.forms.widgets import SwitchWidget
@@ -179,8 +180,7 @@ class ContributionDurationForm(IndicoForm):
 
 
 class ContributionDefaultDurationForm(IndicoForm):
-    duration = TimeDeltaField(_('Duration'), [DataRequired(), MaxDuration(timedelta(days=1))],
-                              units=('minutes', 'hours'))
+    duration = IndicoDurationField(_('Duration'), [DataRequired()])
 
 
 class ContributionTypeForm(IndicoForm):
