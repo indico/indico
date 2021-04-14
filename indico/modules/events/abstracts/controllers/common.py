@@ -102,7 +102,7 @@ class AbstractsDownloadAttachmentsMixin(ZipGeneratorMixin):
 
     def _prepare_folder_structure(self, item):
         abstract_title = secure_filename(f'{item.abstract.friendly_id}_{item.abstract.title}', 'abstract')
-        file_name = secure_filename(f'{item.id}_{item.filename}', item.filename)
+        file_name = secure_filename(f'{item.id}_{item.filename}', str(item.id))
         return os.path.join(*self._adjust_path_length([abstract_title, file_name]))
 
     def _iter_items(self, abstracts):
