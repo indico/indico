@@ -1,11 +1,9 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
-
-from __future__ import unicode_literals
 
 from flask import flash, redirect, request, session
 from werkzeug.exceptions import BadRequest, Forbidden
@@ -16,21 +14,14 @@ from indico.modules.api import APIMode, api_settings
 from indico.modules.api.forms import AdminSettingsForm
 from indico.modules.api.models.keys import APIKey
 from indico.modules.api.views import WPAPIAdmin, WPAPIUserProfile
-from indico.modules.categories.models.categories import Category
-from indico.modules.events.contributions.models.contributions import Contribution
-from indico.modules.events.models.events import Event
-from indico.modules.events.sessions.models.sessions import Session
 from indico.modules.users.controllers import RHUserBase
 from indico.util.i18n import _
 from indico.web.flask.util import redirect_or_jsonify, url_for
 from indico.web.forms.base import FormDefaults
-from indico.web.http_api.util import generate_public_auth_request
-from indico.web.rh import RH
-from indico.web.util import jsonify_data
 
 
 class RHAPIAdminSettings(RHAdminBase):
-    """API settings (admin)"""
+    """API settings (admin)."""
 
     def _process(self):
         form = AdminSettingsForm(obj=FormDefaults(**api_settings.get_all()))
@@ -38,26 +29,26 @@ class RHAPIAdminSettings(RHAdminBase):
             api_settings.set_multi(form.data)
             flash(_('Settings saved'), 'success')
             return redirect(url_for('.admin_settings'))
-        count = APIKey.find(is_active=True).count()
+        count = APIKey.query.filter_by(is_active=True).count()
         return WPAPIAdmin.render_template('admin_settings.html', form=form, count=count)
 
 
 class RHAPIAdminKeys(RHAdminBase):
-    """API key list (admin)"""
+    """API key list (admin)."""
 
     def _process(self):
-        keys = sorted(APIKey.find_all(is_active=True), key=lambda ak: (ak.use_count == 0, ak.user.full_name))
+        keys = sorted(APIKey.query.filter_by(is_active=True), key=lambda ak: (ak.use_count == 0, ak.user.full_name))
         return WPAPIAdmin.render_template('admin_keys.html', keys=keys)
 
 
 class RHUserAPIBase(RHUserBase):
-    """Base class for user API management"""
+    """Base class for user API management."""
 
     allow_system_user = True
 
 
 class RHAPIUserProfile(RHUserAPIBase):
-    """API key details (user)"""
+    """API key details (user)."""
 
     def _process(self):
         key = self.user.api_key
@@ -72,7 +63,7 @@ class RHAPIUserProfile(RHUserAPIBase):
 
 
 class RHAPICreateKey(RHUserAPIBase):
-    """API key creation"""
+    """API key creation."""
 
     def _process(self):
         quiet = request.form.get('quiet') == '1'
@@ -105,7 +96,7 @@ class RHAPICreateKey(RHUserAPIBase):
 
 
 class RHAPIDeleteKey(RHUserAPIBase):
-    """API key deletion"""
+    """API key deletion."""
 
     def _process(self):
         key = self.user.api_key
@@ -115,7 +106,7 @@ class RHAPIDeleteKey(RHUserAPIBase):
 
 
 class RHAPITogglePersistent(RHUserAPIBase):
-    """API key - persistent signatures on/off"""
+    """API key - persistent signatures on/off."""
 
     def _process(self):
         quiet = request.form.get('quiet') == '1'
@@ -130,7 +121,7 @@ class RHAPITogglePersistent(RHUserAPIBase):
 
 
 class RHAPIBlockKey(RHUserAPIBase):
-    """API key blocking/unblocking"""
+    """API key blocking/unblocking."""
 
     def _check_access(self):
         RHUserAPIBase._check_access(self)
@@ -145,41 +136,3 @@ class RHAPIBlockKey(RHUserAPIBase):
         else:
             flash(_('The API key has been unblocked.'), 'success')
         return redirect(url_for('api.user_profile'))
-
-
-class RHAPIBuildURLs(RH):
-    def _process_args(self):
-        data = request.json
-        self.object = None
-        if 'categId' in data:
-            self.object = Category.get_or_404(data['categId'])
-        elif 'contribId' in data:
-            self.object = Contribution.get_or_404(data['contribId'])
-        elif 'sessionId' in data:
-            self.object = Session.get_or_404(data['sessionId'])
-        elif 'confId' in data:
-            self.object = Event.get_or_404(data['confId'])
-
-        if self.object is None:
-            raise BadRequest
-
-    def _process(self):
-        urls = {}
-        api_key = session.user.api_key if session.user else None
-        url_format = '/export/event/{0}/{1}/{2}.ics'
-        if isinstance(self.object, Contribution):
-            event = self.object.event
-            urls = generate_public_auth_request(api_key, url_format.format(event.id, 'contribution', self.object.id))
-        elif isinstance(self.object, Session):
-            event = self.object.event
-            urls = generate_public_auth_request(api_key, url_format.format(event.id, 'session', self.object.id))
-        elif isinstance(self.object, Category):
-            urls = generate_public_auth_request(api_key, '/export/categ/{0}.ics'.format(self.object.id),
-                                                {'from': '-31d'})
-        elif isinstance(self.object, Event):
-            urls = generate_public_auth_request(api_key, '/export/event/{0}.ics'.format(self.object.id))
-            event_urls = generate_public_auth_request(api_key, '/export/event/{0}.ics'.format(self.object.id),
-                                                      {'detail': 'contribution'})
-            urls['publicRequestDetailedURL'] = event_urls['publicRequestURL']
-            urls['authRequestDetailedURL'] = event_urls['authRequestURL']
-        return jsonify_data(flash=False, urls=urls)

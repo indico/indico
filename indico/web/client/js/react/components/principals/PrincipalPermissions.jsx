@@ -1,13 +1,13 @@
 // This file is part of Indico.
-// Copyright (C) 2002 - 2020 CERN
+// Copyright (C) 2002 - 2021 CERN
 //
 // Indico is free software; you can redistribute it and/or
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
 import _ from 'lodash';
-import React, {useState} from 'react';
 import PropTypes from 'prop-types';
+import React, {useState} from 'react';
 import {Button, Dropdown, Icon, Label, Popup} from 'semantic-ui-react';
 
 import {PopoverDropdownMenu} from 'indico/react/components';
@@ -66,14 +66,10 @@ const PrincipalPermissions = ({
         <Popup
           key={permission}
           position="right center"
-          popperModifiers={{
-            hide: {
-              enabled: false,
-            },
-            preventOverflow: {
-              enabled: false,
-            },
-          }}
+          popperModifiers={[
+            {name: 'hide', enabled: false},
+            {name: 'preventOverflow', enabled: false},
+          ]}
           trigger={
             <Label as="div" size="tiny" color={permissionMap[permission].color}>
               {permissionMap[permission].title}

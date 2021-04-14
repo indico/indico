@@ -1,11 +1,9 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
-
-from __future__ import unicode_literals
 
 import re
 
@@ -13,12 +11,11 @@ from sqlalchemy import func, inspect, over
 from sqlalchemy.sql import update
 
 
-TS_REGEX = re.compile(r'([@<>!()&|:\'])')
+TS_REGEX = re.compile(r'([@<>!()&|:\'\\])')
 
 
 def limit_groups(query, model, partition_by, order_by, limit=None, offset=0):
-    """Limits the number of rows returned for each group
-
+    """Limit the number of rows returned for each group.
 
     This utility allows you to apply a limit/offset to grouped rows of a query.
     Note that the query will only contain the data from `model`; i.e. you cannot
@@ -51,7 +48,7 @@ def db_dates_overlap(entity, start_column, start, end_column, end, inclusive=Fal
 
 
 def escape_like(value):
-    """Escapes a string to be used as a plain string in LIKE"""
+    """Escape a string to be used as a plain string in LIKE."""
     escape_char = '\\'
     return (value
             .replace(escape_char, escape_char * 2)  # literal escape char needs to be escaped
@@ -61,22 +58,29 @@ def escape_like(value):
 
 def preprocess_ts_string(text, prefix=True):
     atoms = [TS_REGEX.sub(r'\\\1', atom.strip()) for atom in text.split()]
-    return ' & '.join('{}:*'.format(atom) if prefix else atom for atom in atoms)
+    return ' & '.join(f'{atom}:*' if prefix else atom for atom in atoms)
 
 
 def has_extension(conn, name):
-    """Checks if the postgres database has a certain extension installed"""
+    """Check if the postgres database has a certain extension installed."""
     return conn.execute("SELECT EXISTS(SELECT TRUE FROM pg_extension WHERE extname = %s)", (name,)).scalar()
 
 
 def get_postgres_version():
     from indico.core.db import db
     version = db.engine.execute("SELECT current_setting('server_version_num')::int").scalar()
-    return '{}.{}.{}'.format(version // 10000, version % 10000 // 100, version % 100)
+    major = version // 10000
+    minor = version % 10000 // 100
+    patch = version % 100
+    if major >= 10:
+        # https://www.postgresql-archive.org/PG-VERSION-NUM-formatted-incorrectly-td6002110.html
+        return f'{major}.{patch}'
+    else:
+        return f'{major}.{minor}.{patch}'
 
 
 def increment_and_get(col, filter_, n=1):
-    """Increments and returns a numeric column.
+    """Increment and returns a numeric column.
 
     This is committed to the database immediately in a separate
     transaction to avoid possible conflicts.
@@ -117,16 +121,16 @@ def get_related_object(obj, relationship, criteria):
              such object could be found.
     """
     def _compare(a, b):
-        if isinstance(a, basestring) and a.isdigit():
+        if isinstance(a, str) and a.isdigit():
             a = int(a)
-        if isinstance(b, basestring) and b.isdigit():
+        if isinstance(b, str) and b.isdigit():
             b = int(b)
         return a == b
 
     # if the relationship is loaded evaluate the criteria in python
     if relationship not in inspect(obj).unloaded:
         return next((x for x in getattr(obj, relationship)
-                     if all(_compare(getattr(x, k), v) for k, v in criteria.iteritems())),
+                     if all(_compare(getattr(x, k), v) for k, v in criteria.items())),
                     None)
     # otherwise query that specific object
     cls = getattr(type(obj), relationship).prop.mapper.class_
@@ -152,7 +156,7 @@ def get_n_matching(query, n, predicate):
         _offset[0] += limit
         return rv
 
-    results = filter(predicate, _get())
+    results = list(filter(predicate, _get()))
     while len(results) < n:
         objects = _get()
         if not objects:

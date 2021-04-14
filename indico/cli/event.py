@@ -1,11 +1,9 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
-
-from __future__ import unicode_literals
 
 import sys
 
@@ -16,9 +14,6 @@ from indico.core.db import db
 from indico.modules.events import Event, EventLogKind, EventLogRealm
 from indico.modules.events.export import export_event, import_event
 from indico.modules.users.models.users import User
-
-
-click.disable_unicode_literals_warning = True
 
 
 @cli_group()
@@ -32,7 +27,7 @@ def cli():
               help="The user which will be shown on the log as having restored the event (default: no user).")
 @click.option('-m', '--message', 'message', metavar="MESSAGE", help="An additional message for the log")
 def restore(event_id, user_id, message):
-    """Restores a deleted event."""
+    """Restore a deleted event."""
     event = Event.get(event_id)
     user = User.get(user_id) if user_id else None
     if event is None:
@@ -42,17 +37,17 @@ def restore(event_id, user_id, message):
         click.secho('This event is not deleted', fg='yellow')
         sys.exit(1)
     event.is_deleted = False
-    text = 'Event restored: {}'.format(message) if message else 'Event restored'
+    text = f'Event restored: {message}' if message else 'Event restored'
     event.log(EventLogRealm.event, EventLogKind.positive, 'Event', text, user=user)
     db.session.commit()
-    click.secho('Event undeleted: "{}"'.format(event.title), fg='green')
+    click.secho(f'Event undeleted: "{event.title}"', fg='green')
 
 
 @cli.command()
 @click.argument('event_id', type=int)
 @click.argument('target_file', type=click.File('wb'))
 def export(event_id, target_file):
-    """Exports all data associated with an event.
+    """Export all data associated with an event.
 
     This exports the whole event as an archive which can be imported
     on another other Indico instance.  Importing an event is only
@@ -79,7 +74,7 @@ def export(event_id, target_file):
 @click.option('-c', '--category', 'category_id', type=int, default=0, metavar='ID',
               help='ID of the target category. Defaults to the root category.')
 def import_(source_file, create_users, force, verbose, yes, category_id):
-    """Imports an event exported from another Indico instance."""
+    """Import an event exported from another Indico instance."""
     click.echo('Importing event...')
     event = import_event(source_file, category_id, create_users=create_users, verbose=verbose, force=force)
     if event is None:

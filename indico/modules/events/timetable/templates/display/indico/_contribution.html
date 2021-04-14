@@ -6,8 +6,7 @@
 
 {% macro render_contribution(contrib, event, theme_settings, theme_context, parent=none, nested=false, hide_end_time=false,
                              timezone=none, show_notes=false, show_location=false) -%}
-    {% set anchor = slugify(contrib.friendly_id, contrib.title, maxlen=30) %}
-    <li class="timetable-item timetable-contrib" id="{{ anchor }}">
+    <li class="timetable-item timetable-contrib" id="{{ contrib.slug }}">
         <span class="timetable-time {{ 'nested' if nested else 'top-level' }}">
             {% if theme_settings.number_contributions %}
                 <span class="start-time">
@@ -20,7 +19,7 @@
 
         <div class="timetable-item-body flexcol">
             <div class="timetable-item-header flexrow">
-                <span class="timetable-title {{ 'nested' if nested }}" data-anchor="{{ anchor }}">
+                <span class="timetable-title {{ 'nested' if nested }}" data-anchor="{{ contrib.slug }}">
                     {{- contrib.title -}}
                 </span>
                 {% if contrib.duration and not theme_settings.hide_duration -%}

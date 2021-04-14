@@ -1,11 +1,9 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
-
-from __future__ import unicode_literals
 
 import itertools
 from enum import Enum
@@ -21,6 +19,7 @@ from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import object_session
 from werkzeug.utils import cached_property
 
+from indico.core import signals
 from indico.core.auth import multipass
 from indico.core.db import db
 from indico.core.db.sqlalchemy import PyIntEnum
@@ -30,21 +29,22 @@ from indico.core.db.sqlalchemy.util.models import get_default_values
 from indico.modules.users.models.affiliations import UserAffiliation
 from indico.modules.users.models.emails import UserEmail
 from indico.modules.users.models.favorites import favorite_category_table, favorite_user_table
+from indico.util.enum import RichIntEnum
 from indico.util.i18n import _
 from indico.util.locators import locator_property
-from indico.util.string import format_full_name, format_repr, return_ascii
-from indico.util.struct.enum import RichIntEnum
+from indico.util.string import format_full_name, format_repr
 from indico.web.flask.util import url_for
 
 
 class UserTitle(RichIntEnum):
-    __titles__ = ('', _('Mr'), _('Ms'), _('Mrs'), _('Dr'), _('Prof.'))
+    __titles__ = ('', _('Mr'), _('Ms'), _('Mrs'), _('Dr'), _('Prof.'), _('Mx'))
     none = 0
     mr = 1
     ms = 2
     mrs = 3
     dr = 4
     prof = 5
+    mx = 6
 
 
 class NameFormat(RichIntEnum):
@@ -67,7 +67,7 @@ class ProfilePictureSource(int, Enum):
     custom = 3
 
 
-class PersonMixin(object):
+class PersonMixin:
     """Add convenience properties and methods to person classes.
 
     Assumes the following attributes exist:
@@ -77,7 +77,7 @@ class PersonMixin(object):
     """
 
     def _get_title(self):
-        """Return title text"""
+        """Return title text."""
         if self._title is None:
             return get_default_values(type(self)).get('_title', UserTitle.none).title
         return self._title.title
@@ -157,19 +157,12 @@ def format_display_full_name(user, obj):
     elif name_format in (NameFormat.f_last, NameFormat.f_last_upper):
         return obj.get_full_name(last_name_first=False, last_name_upper=upper, abbrev_first_name=True)
     else:
-        raise ValueError('Invalid name format: {}'.format(name_format))
+        raise ValueError(f'Invalid name format: {name_format}')
 
 
 class User(PersonMixin, db.Model):
-    """Indico users"""
+    """Indico users."""
 
-    # Useful when dealing with both users and groups in the same code
-    is_group = False
-    is_single_person = True
-    is_event_role = False
-    is_category_role = False
-    is_registration_form = False
-    is_network = False
     principal_order = 0
     principal_type = PrincipalType.user
 
@@ -261,7 +254,7 @@ class User(PersonMixin, db.Model):
     signing_secret = db.Column(
         UUID,
         nullable=False,
-        default=lambda: unicode(uuid4())
+        default=lambda: str(uuid4())
     )
     #: the user profile picture
     picture = db.deferred(db.Column(
@@ -294,14 +287,16 @@ class User(PersonMixin, db.Model):
         lazy=False,
         uselist=False,
         cascade='all, delete-orphan',
-        primaryjoin='(User.id == UserEmail.user_id) & UserEmail.is_primary'
+        primaryjoin='(User.id == UserEmail.user_id) & UserEmail.is_primary',
+        overlaps='_secondary_emails'
     )
     _secondary_emails = db.relationship(
         'UserEmail',
         lazy=True,
         cascade='all, delete-orphan',
         collection_class=set,
-        primaryjoin='(User.id == UserEmail.user_id) & ~UserEmail.is_primary'
+        primaryjoin='(User.id == UserEmail.user_id) & ~UserEmail.is_primary',
+        overlaps='_primary_email'
     )
     _all_emails = db.relationship(
         'UserEmail',
@@ -362,7 +357,8 @@ class User(PersonMixin, db.Model):
         uselist=False,
         cascade='all, delete-orphan',
         primaryjoin='(User.id == APIKey.user_id) & APIKey.is_active',
-        back_populates='user'
+        back_populates='user',
+        overlaps='old_api_keys'
     )
     #: the previous API keys of the user
     old_api_keys = db.relationship(
@@ -371,7 +367,8 @@ class User(PersonMixin, db.Model):
         cascade='all, delete-orphan',
         order_by='APIKey.created_dt.desc()',
         primaryjoin='(User.id == APIKey.user_id) & ~APIKey.is_active',
-        back_populates='user'
+        back_populates='user',
+        overlaps='api_key'
     )
     #: the identities used by this user
     identities = db.relationship(
@@ -426,7 +423,7 @@ class User(PersonMixin, db.Model):
     # - modified_abstract_comments (AbstractComment.modified_by)
     # - modified_abstracts (Abstract.modified_by)
     # - modified_review_comments (PaperReviewComment.modified_by)
-    # - oauth_tokens (OAuthToken.user)
+    # - oauth_app_links (OAuthApplicationUserLink.user)
     # - owned_rooms (Room.owner)
     # - paper_competences (PaperCompetence.user)
     # - paper_reviews (PaperReview.user)
@@ -447,24 +444,12 @@ class User(PersonMixin, db.Model):
 
     @property
     def as_principal(self):
-        """The serializable principal identifier of this user"""
+        """The serializable principal identifier of this user."""
         return 'User', self.id
 
     @property
     def identifier(self):
-        return 'User:{}'.format(self.id)
-
-    @property
-    def as_avatar(self):
-        # TODO: remove this after DB is free of Avatars
-        from indico.modules.users.legacy import AvatarUserWrapper
-        avatar = AvatarUserWrapper(self.id)
-
-        # avoid garbage collection
-        avatar.user
-        return avatar
-
-    as_legacy = as_avatar
+        return f'User:{self.id}'
 
     @property
     def avatar_bg_color(self):
@@ -472,29 +457,32 @@ class User(PersonMixin, db.Model):
         return get_color_for_username(self.full_name)
 
     @property
-    def avatar_css(self):
-        return 'background-color: {};'.format(self.avatar_bg_color)
-
-    @property
     def external_identities(self):
-        """The external identities of the user"""
+        """The external identities of the user."""
         return {x for x in self.identities if x.provider != 'indico'}
 
     @property
     def local_identities(self):
-        """The local identities of the user"""
+        """The local identities of the user."""
         return {x for x in self.identities if x.provider == 'indico'}
 
     @property
     def local_identity(self):
-        """The main (most recently used) local identity"""
+        """The main (most recently used) local identity."""
         identities = sorted(self.local_identities, key=attrgetter('safe_last_login_dt'), reverse=True)
         return identities[0] if identities else None
 
     @property
     def secondary_local_identities(self):
-        """The local identities of the user except the main one"""
+        """The local identities of the user except the main one."""
         return self.local_identities - {self.local_identity}
+
+    @property
+    def last_login_dt(self):
+        """The datetime when the user last logged in."""
+        if not self.identities:
+            return None
+        return max(self.identities, key=attrgetter('safe_last_login_dt')).last_login_dt
 
     @locator_property
     def locator(self):
@@ -502,7 +490,7 @@ class User(PersonMixin, db.Model):
 
     @cached_property
     def settings(self):
-        """Returns the user settings proxy for this user"""
+        """Return the user settings proxy for this user."""
         from indico.modules.users import user_settings
         return user_settings.bind(self)
 
@@ -545,7 +533,9 @@ class User(PersonMixin, db.Model):
         return self.picture_metadata is not None
 
     @property
-    def picture_url(self):
+    def avatar_url(self):
+        if self.is_system:
+            return url_for('assets.image', filename='robot.svg')
         slug = self.picture_metadata['hash'] if self.picture_metadata else 'default'
         return url_for('users.user_profile_picture_display', self, slug=slug)
 
@@ -553,12 +543,11 @@ class User(PersonMixin, db.Model):
         """Convenience method for `user in user_or_group`."""
         return self == user
 
-    @return_ascii
     def __repr__(self):
         return format_repr(self, 'id', 'email', is_deleted=False, is_pending=False, _text=self.full_name)
 
     def can_be_modified(self, user):
-        """If this user can be modified by the given user"""
+        """If this user can be modified by the given user."""
         return self == user or user.is_admin
 
     def iter_identifiers(self, check_providers=False, providers=None):
@@ -587,36 +576,40 @@ class User(PersonMixin, db.Model):
 
     @property
     def can_get_all_multipass_groups(self):
-        """Check whether it is possible to get all multipass groups the user is in."""
+        """
+        Check whether it is possible to get all multipass groups the user is in.
+        """
         return all(multipass.identity_providers[x.provider].supports_get_identity_groups
                    for x in self.identities
                    if x.provider != 'indico' and x.provider in multipass.identity_providers)
 
     def iter_all_multipass_groups(self):
-        """Iterate over all multipass groups the user is in"""
+        """Iterate over all multipass groups the user is in."""
         return itertools.chain.from_iterable(multipass.identity_providers[x.provider].get_identity_groups(x.identifier)
                                              for x in self.identities
                                              if x.provider != 'indico' and x.provider in multipass.identity_providers)
 
     def get_full_name(self, *args, **kwargs):
         kwargs['_show_empty_names'] = True
-        return super(User, self).get_full_name(*args, **kwargs)
+        return super().get_full_name(*args, **kwargs)
 
     def make_email_primary(self, email):
-        """Promotes a secondary email address to the primary email address
+        """Promote a secondary email address to the primary email address.
 
         :param email: an email address that is currently a secondary email
         """
         secondary = next((x for x in self._secondary_emails if x.email == email), None)
         if secondary is None:
             raise ValueError('email is not a secondary email address')
+        old = self.email
         self._primary_email.is_primary = False
         db.session.flush()
         secondary.is_primary = True
         db.session.flush()
+        signals.users.primary_email_changed.send(self, old=old, new=email)
 
     def reset_signing_secret(self):
-        self.signing_secret = unicode(uuid4())
+        self.signing_secret = str(uuid4())
 
     def synchronize_data(self, refresh=False):
         """Synchronize the fields of the user from the sync identity.

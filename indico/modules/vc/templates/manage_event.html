@@ -14,6 +14,7 @@
                             <th class="small-column"></th>
                             <th></th>
                             <th>{% trans %}Name{% endtrans %}</th>
+                            <th></th>
                             <th class="col-50"></th>
                         </tr>
                     </thead>
@@ -31,6 +32,7 @@
                                     {% endif %}
                                 </td>
                                 <td>{{ vc_room.name }}</td>
+                                <td>{{ template_hook('event-vc-room-list-item-labels', event=event, vc_room=vc_room) }}</td>
                                 <td>
                                     <div class="toolbar vc-toolbar">
                                         <div class="group">
@@ -49,6 +51,7 @@
                                             {% endif %}
                                             <a data-href="{{ url_for('.manage_vc_rooms_remove', event_vc_room) }}"
                                                data-num-events="{{ vc_room.events | count }}"
+                                               data-extra-msg="{{ vc_room.plugin.get_extra_delete_msg(vc_room, event_vc_room) if vc_room.plugin else '' }}"
                                                class="i-button icon-remove js-vcroom-remove hide-if-locked"
                                                title="{% trans %}Detach{% endtrans %}"></a>
                                             {% if vc_room.status.name != 'deleted' and vc_room.plugin %}

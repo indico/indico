@@ -1,26 +1,26 @@
 // This file is part of Indico.
-// Copyright (C) 2002 - 2020 CERN
+// Copyright (C) 2002 - 2021 CERN
 //
 // Indico is free software; you can redistribute it and/or
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-/* global choiceConfirmPrompt:false */
+/* global choiceConfirmPrompt:false, confirmPrompt:false, build_url:false */
 
 import {$T} from 'indico/utils/i18n';
 
 (function(global) {
   // TODO: Add plugin i18n
-  var $t = $T;
+  const $t = $T;
 
   global.eventManageVCRooms = function() {
     $('.js-vcroom-remove').on('click', function(e) {
       e.preventDefault();
-      var $this = $(this);
-      var title, msg;
+      const $this = $(this);
+      let title, msg;
 
       function execute(url) {
-        var csrf = $('<input>', {
+        const csrf = $('<input>', {
           type: 'hidden',
           name: 'csrf_token',
           value: $('#csrf-token').attr('content'),
@@ -36,10 +36,10 @@ import {$T} from 'indico/utils/i18n';
 
       if ($this.data('numEvents') === 1) {
         title = $t('Delete videoconference room');
-        msg =
-          $t('Do you really want to remove this videoconference room from the event?') +
-          ' ' +
-          $t('Since it is only used in this event, it will be deleted from the server, too!');
+        msg = `${$t('Do you really want to remove this videoconference room from the event?')} ${$t(
+          'Since it is only used in this event, it will be deleted from the server, too!'
+        )}`;
+        msg += $this.data('extraMsg');
         confirmPrompt(msg, title).then(function() {
           execute($this.data('href'));
         });
@@ -49,13 +49,14 @@ import {$T} from 'indico/utils/i18n';
           .ngettext(
             '*',
             'This videoconference room is used in other Indico events.<br>Do you want to \
-                     <strong>delete</strong> it from all {0} events or just <strong>detach</strong> \
-                     it from this event?',
+            <strong>delete</strong> it from all {0} events or just <strong>detach</strong> \
+            it from this event?',
             $this.data('numEvents')
           )
           .format($this.data('numEvents'));
+        msg += $this.data('extraMsg');
         choiceConfirmPrompt(msg, title, $t('Detach'), $t('Delete')).then(function(choice) {
-          var url = build_url($this.data('href'), {delete_all: choice === 2 ? '1' : ''});
+          const url = build_url($this.data('href'), {delete_all: choice === 2 ? '1' : ''});
           execute(url);
         });
       }
@@ -63,8 +64,8 @@ import {$T} from 'indico/utils/i18n';
 
     $('.js-vcroom-refresh').on('click', function(e) {
       e.preventDefault();
-      var $this = $(this);
-      var csrf = $('<input>', {
+      const $this = $(this);
+      const csrf = $('<input>', {
         type: 'hidden',
         name: 'csrf_token',
         value: $('#csrf-token').attr('content'),
@@ -80,8 +81,7 @@ import {$T} from 'indico/utils/i18n';
 
     $('.vc-room-entry.deleted').qtip({
       content: $T(
-        'This room has been deleted and cannot be used. \
-                         You can detach it from the event, however.'
+        'This room has been deleted and cannot be used. You can detach it from the event, however.'
       ),
       position: {
         my: 'top center',
@@ -92,7 +92,7 @@ import {$T} from 'indico/utils/i18n';
     $('.toggle-details')
       .on('click', function(e) {
         e.preventDefault();
-        var $this = $(this);
+        const $this = $(this);
 
         if ($this.closest('.vc-room-entry.deleted').length) {
           return;
@@ -103,7 +103,7 @@ import {$T} from 'indico/utils/i18n';
           .next('tr')
           .find('.details-container')
           .slideToggle({
-            start: function() {
+            start() {
               $this.toggleClass('icon-next icon-expand');
             },
           });
@@ -112,9 +112,9 @@ import {$T} from 'indico/utils/i18n';
       .qtip({content: $T('Click to toggle collapse status')});
 
     $('.toggle .i-button').on('click', function() {
-      var toggle = $(this);
+      const toggle = $(this);
       toggle.toggleClass('icon-eye icon-eye-blocked');
-      var $input = toggle.siblings('input');
+      const $input = toggle.siblings('input');
       $input.prop('type', $input.prop('type') === 'text' ? 'password' : 'text');
     });
   };

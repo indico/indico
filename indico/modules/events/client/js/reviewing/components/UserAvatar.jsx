@@ -1,28 +1,31 @@
 // This file is part of Indico.
-// Copyright (C) 2002 - 2020 CERN
+// Copyright (C) 2002 - 2021 CERN
 //
 // Indico is free software; you can redistribute it and/or
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-import React from 'react';
+import imageURL from 'indico-url:assets.image';
+
 import PropTypes from 'prop-types';
+import React from 'react';
+import {Image} from 'semantic-ui-react';
 
 function UserAvatar({user}) {
   return (
-    <div
-      className="i-timeline-item-label avatar-placeholder"
-      style={{backgroundColor: user.avatarBgColor}}
-    >
-      {user.fullName[0]}
+    <div>
+      <Image
+        avatar
+        src={user.avatarURL || imageURL({filename: 'robot.svg'})}
+        className="profile-picture"
+      />
     </div>
   );
 }
 
 UserAvatar.propTypes = {
   user: PropTypes.shape({
-    fullName: PropTypes.string.isRequired,
-    avatarBgColor: PropTypes.string.isRequired,
+    avatarURL: PropTypes.string,
   }).isRequired,
 };
 

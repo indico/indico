@@ -80,6 +80,7 @@
                         <ul class="group-list">
                             {% for user_entry in search_results -%}
                                 <li class="flexrow f-a-center">
+                                    <img src="{{ user_entry.avatar_url }}" class="ui image circular profile-picture" alt="">
                                     <span>
                                         {%- if user_entry.profile_url -%}
                                             <a href="{{ user_entry.profile_url }}">{{ user_entry.full_name }}</a>

@@ -1,16 +1,14 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import unicode_literals
-
 from indico.core.db import db
 from indico.core.db.sqlalchemy.principals import PrincipalType
 from indico.util.locators import locator_property
-from indico.util.string import format_repr, return_ascii
+from indico.util.string import format_repr
 
 
 class CategoryRole(db.Model):
@@ -19,12 +17,6 @@ class CategoryRole(db.Model):
                       db.Index(None, 'category_id', 'code', unique=True),
                       {'schema': 'categories'})
 
-    is_group = False
-    is_event_role = False
-    is_registration_form = False
-    is_category_role = True
-    is_single_person = True
-    is_network = False
     principal_order = 2
     principal_type = PrincipalType.category_role
 
@@ -81,7 +73,6 @@ class CategoryRole(db.Model):
     def __contains__(self, user):
         return user is not None and self in user.category_roles
 
-    @return_ascii
     def __repr__(self):
         return format_repr(self, 'id', 'code', _text=self.name)
 
@@ -91,7 +82,7 @@ class CategoryRole(db.Model):
 
     @property
     def identifier(self):
-        return 'CategoryRole:{}'.format(self.id)
+        return f'CategoryRole:{self.id}'
 
     @property
     def css(self):

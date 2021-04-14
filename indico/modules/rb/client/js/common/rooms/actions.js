@@ -1,5 +1,5 @@
 // This file is part of Indico.
-// Copyright (C) 2002 - 2020 CERN
+// Copyright (C) 2002 - 2021 CERN
 //
 // Indico is free software; you can redistribute it and/or
 // modify it under the terms of the MIT License; see the
@@ -7,13 +7,14 @@
 
 import fetchEquipmentTypesURL from 'indico-url:rb.equipment_types';
 import fetchRoomURL from 'indico-url:rb.room';
-import fetchRoomsURL from 'indico-url:rb.rooms';
-import fetchRoomAvailabilityURL from 'indico-url:rb.room_availability';
 import fetchRoomAttributesURL from 'indico-url:rb.room_attributes';
+import fetchRoomAvailabilityURL from 'indico-url:rb.room_availability';
+import fetchRoomsURL from 'indico-url:rb.rooms';
 
 import {indicoAxios} from 'indico/utils/axios';
 import {camelizeKeys} from 'indico/utils/case';
 import {ajaxAction} from 'indico/utils/redux';
+
 import {openModal} from '../../actions';
 
 export const FETCH_EQUIPMENT_TYPES_REQUEST = 'rooms/FETCH_EQUIPMENT_TYPES_REQUEST';

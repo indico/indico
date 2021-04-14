@@ -1,11 +1,9 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
-
-from __future__ import unicode_literals
 
 import re
 from operator import attrgetter
@@ -18,7 +16,7 @@ from indico.util.decorators import classproperty
 from indico.util.signals import named_objects_from_signal
 
 
-class Placeholder(object):
+class Placeholder:
     """Base class for placeholders.
 
     Placeholders allow you to insert data in texts provided by users
@@ -67,12 +65,12 @@ class Placeholder(object):
 
     @classmethod
     def is_in(cls, text, **kwargs):
-        """Checks whether the placeholder is used in a string"""
+        """Check whether the placeholder is used in a string."""
         return cls.get_regex(**kwargs).search(text) is not None
 
     @classmethod
     def is_empty(cls, text, **kwargs):
-        """Checks whether the placeholder renders an empty string
+        """Check whether the placeholder renders an empty string.
 
         :param text: The text to replace placeholders in
         :param kwargs: arguments specific to the placeholder's context
@@ -89,7 +87,7 @@ class Placeholder(object):
 
     @classmethod
     def render(cls, **kwargs):
-        """Converts the placeholder to a string
+        """Convert the placeholder to a string.
 
         When a placeholder contains HTML that should not be escaped,
         the returned value should be returned as a
@@ -104,7 +102,7 @@ class Placeholder(object):
 
 
 class ParametrizedPlaceholder(Placeholder):
-    """Base class for placeholders that can take an argument
+    """Base class for placeholders that can take an argument.
 
     Such placeholders are used like this: ``{something:arg}`` with
     ``:arg`` being optional; if omitted the argument will be ``None``.
@@ -137,7 +135,7 @@ class ParametrizedPlaceholder(Placeholder):
 
     @classmethod
     def iter_param_info(cls, **kwargs):
-        """Yields information for known params.
+        """Yield information for known params.
 
         Each item yielded must be a ``(value, description)`` tuple.
 
@@ -157,7 +155,7 @@ class ParametrizedPlaceholder(Placeholder):
 
     @classmethod
     def is_empty(cls, text, **kwargs):
-        """Checks whether the placeholder renders an empty string
+        """Check whether the placeholder renders an empty string.
 
         :param text: The text to replace placeholders in
         :param kwargs: arguments specific to the placeholder's context
@@ -182,14 +180,14 @@ def get_placeholders(context, **kwargs):
 
 
 def replace_placeholders(context, text, escape_html=True, **kwargs):
-    """Replaces placeholders in a string.
+    """Replace placeholders in a string.
 
     :param context: the context where the placeholders are used
     :param text: the text to replace placeholders in
     :param escape_html: whether HTML escaping should be done
     :param kwargs: arguments specific to the context
     """
-    for placeholder in get_placeholders(context, **kwargs).viewvalues():
+    for placeholder in get_placeholders(context, **kwargs).values():
         text = placeholder.replace(text, escape_html=escape_html, **kwargs)
     return text
 
@@ -201,11 +199,11 @@ def get_empty_placeholders(context, text, **kwargs):
     :param text: the text containing some placeholders
     :param kwargs: arguments specific to the context
     """
-    return set(
+    return {
         placeholder.friendly_name
-        for placeholder in get_placeholders(context, **kwargs).viewvalues()
+        for placeholder in get_placeholders(context, **kwargs).values()
         if placeholder.is_in(text, **kwargs) and placeholder.is_empty(text, **kwargs)
-    )
+    }
 
 
 def get_missing_placeholders(context, text, **kwargs):
@@ -215,16 +213,16 @@ def get_missing_placeholders(context, text, **kwargs):
     :param text: the text to check
     :param kwargs: arguments specific to the context
     """
-    placeholders = {p for p in get_placeholders(context, **kwargs).itervalues() if p.required}
+    placeholders = {p for p in get_placeholders(context, **kwargs).values() if p.required}
     return {p.friendly_name for p in placeholders if not p.is_in(text, **kwargs)}
 
 
 def render_placeholder_info(context, **kwargs):
-    """Renders the list of available placeholders.
+    """Render the list of available placeholders.
 
     :param context: the context where the placeholders are used
     :param kwargs: arguments specific to the context
     """
-    placeholders = sorted(get_placeholders(context, **kwargs).values(), key=attrgetter('name'))
+    placeholders = sorted(list(get_placeholders(context, **kwargs).values()), key=attrgetter('name'))
     return Markup(render_template('placeholder_info.html', placeholder_kwargs=kwargs, placeholders=placeholders,
                                   ParametrizedPlaceholder=ParametrizedPlaceholder))

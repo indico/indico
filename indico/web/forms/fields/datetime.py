@@ -1,14 +1,11 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import absolute_import, unicode_literals
-
 import json
-from collections import OrderedDict
 from datetime import time, timedelta
 
 import dateutil.parser
@@ -48,24 +45,24 @@ class TimeDeltaField(Field):
         'hours': 'Hours',
         'days': 'Days'
     }
-    magnitudes = OrderedDict([
-        ('days', 86400),
-        ('hours', 3600),
-        ('minutes', 60),
-        ('seconds', 1)
-    ])
+    magnitudes = {
+        'days': 86400,
+        'hours': 3600,
+        'minutes': 60,
+        'seconds': 1,
+    }
 
     def __init__(self, *args, **kwargs):
         self.units = kwargs.pop('units', ('hours', 'days'))
-        super(TimeDeltaField, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
     @property
     def best_unit(self):
-        """Return the largest unit that covers the current timedelta"""
+        """Return the largest unit that covers the current timedelta."""
         if self.data is None:
             return None
         seconds = int(self.data.total_seconds())
-        for unit, magnitude in self.magnitudes.iteritems():
+        for unit, magnitude in self.magnitudes.items():
             if not seconds % magnitude:
                 return unit
         return 'seconds'
@@ -76,7 +73,7 @@ class TimeDeltaField(Field):
         choices = [(unit, self.unit_names[unit]) for unit in self.units]
         # Add whatever unit is necessary to represent the currenet value if we have one
         if best_unit and best_unit not in self.units:
-            choices.append((best_unit, '({})'.format(self.unit_names[best_unit])))
+            choices.append((best_unit, f'({self.unit_names[best_unit]})'))
         return choices
 
     def process_formdata(self, valuelist):
@@ -125,19 +122,19 @@ class RelativeDeltaField(Field):
         'months': 'Months',
         'years': 'Years'
     }
-    magnitudes = OrderedDict([
-        ('years', relativedelta(years=1)),
-        ('months', relativedelta(months=1)),
-        ('weeks', relativedelta(weeks=1)),
-        ('days', relativedelta(days=1)),
-        ('hours', relativedelta(hours=1)),
-        ('minutes', relativedelta(minutes=1)),
-        ('seconds', relativedelta(seconds=1))
-    ])
+    magnitudes = {
+        'years': relativedelta(years=1),
+        'months': relativedelta(months=1),
+        'weeks': relativedelta(weeks=1),
+        'days': relativedelta(days=1),
+        'hours': relativedelta(hours=1),
+        'minutes': relativedelta(minutes=1),
+        'seconds': relativedelta(seconds=1)
+    }
 
     def __init__(self, *args, **kwargs):
         self.units = kwargs.pop('units', ('hours', 'days'))
-        super(RelativeDeltaField, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
     @property
     def split_data(self):
@@ -155,7 +152,7 @@ class RelativeDeltaField(Field):
         number, unit = self.split_data
         if number is not None and unit not in self.units:
             # Add whatever unit is necessary to represent the currenet value if we have one
-            choices.append((unit, '({})'.format(self.unit_names[unit])))
+            choices.append((unit, f'({self.unit_names[unit]})'))
         return choices
 
     def process_formdata(self, valuelist):
@@ -185,8 +182,7 @@ class IndicoDateField(DateField):
 
     def __init__(self, *args, **kwargs):
         self.allow_clear = kwargs.pop('allow_clear', None)
-        super(IndicoDateField, self).__init__(*args, parse_kwargs={'dayfirst': True},
-                                              display_format='%d/%m/%Y', **kwargs)
+        super().__init__(*args, parse_kwargs={'dayfirst': True}, display_format='%d/%m/%Y', **kwargs)
         if self.allow_clear is None:
             self.allow_clear = not self.flags.required
 
@@ -234,7 +230,7 @@ class IndicoDateTimeField(DateTimeField):
         self.date_missing = False
         self.time_missing = False
         self.allow_clear = kwargs.pop('allow_clear', None)
-        super(IndicoDateTimeField, self).__init__(*args, parse_kwargs={'dayfirst': True}, **kwargs)
+        super().__init__(*args, parse_kwargs={'dayfirst': True}, **kwargs)
         if self.allow_clear is None:
             self.allow_clear = not self.flags.required
 
@@ -251,11 +247,11 @@ class IndicoDateTimeField(DateTimeField):
         if any(valuelist):
             if not valuelist[0]:
                 self.date_missing = True
-            if not valuelist[1]:
+            if len(valuelist) < 2 or not valuelist[1]:
                 self.time_missing = True
         if valuelist:
             valuelist = [' '.join(valuelist).strip()]
-        super(IndicoDateTimeField, self).process_formdata(valuelist)
+        super().process_formdata(valuelist)
         if self.data and not self.data.tzinfo:
             self.data = localize_as_utc(self.data, self.timezone)
 
@@ -319,7 +315,7 @@ class OccurrencesField(JSONField):
     def __init__(self, *args, **kwargs):
         self._timezone = kwargs.pop('timezone', None)
         kwargs.setdefault('default', [])
-        super(OccurrencesField, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
     def process_formdata(self, valuelist):
         def _deserialize(occ):
@@ -332,8 +328,8 @@ class OccurrencesField(JSONField):
             return localize_as_utc(dt, self.timezone), timedelta(minutes=occ['duration'])
 
         self.data = []
-        super(OccurrencesField, self).process_formdata(valuelist)
-        self.data = map(_deserialize, self.data)
+        super().process_formdata(valuelist)
+        self.data = list(map(_deserialize, self.data))
 
     def _value(self):
         def _serialize(occ):
@@ -345,7 +341,7 @@ class OccurrencesField(JSONField):
                     'time': dt.time().isoformat()[:-3],  # hh:mm only
                     'duration': int(occ[1].total_seconds() // 60)}
 
-        return json.dumps(map(_serialize, self.data))
+        return json.dumps(list(map(_serialize, self.data)))
 
     @property
     def timezone_field(self):
@@ -362,18 +358,18 @@ class OccurrencesField(JSONField):
 
 class IndicoTimezoneSelectField(SelectField):
     def __init__(self, *args, **kwargs):
-        super(IndicoTimezoneSelectField, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self.choices = [(v, v) for v in pytz.common_timezones]
         self.default = config.DEFAULT_TIMEZONE
 
     def process_data(self, value):
-        super(IndicoTimezoneSelectField, self).process_data(value)
+        super().process_data(value)
         if self.data is not None and self.data not in pytz.common_timezones_set:
             self.choices.append((self.data, self.data))
 
 
 class IndicoWeekDayRepetitionField(Field):
-    """ Field that lets you select an ordinal day of the week."""
+    """Field that lets you select an ordinal day of the week."""
 
     widget = JinjaWidget('forms/week_day_repetition_widget.html', single_line=True)
 
@@ -388,10 +384,10 @@ class IndicoWeekDayRepetitionField(Field):
     def __init__(self, *args, **kwargs):
         locale = get_current_locale()
         self.day_number_options = self.WEEK_DAY_NUMBER_CHOICES
-        self.week_day_options = [(n, locale.weekday(n, short=False)) for n in xrange(7)]
+        self.week_day_options = [(n, locale.weekday(n, short=False)) for n in range(7)]
         self.day_number_missing = False
         self.week_day_missing = False
-        super(IndicoWeekDayRepetitionField, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
     def process_formdata(self, valuelist):
         self.data = ()

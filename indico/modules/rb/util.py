@@ -1,11 +1,9 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
-
-from __future__ import unicode_literals
 
 import os
 from collections import namedtuple
@@ -22,7 +20,6 @@ from sqlalchemy.orm import joinedload
 from indico.core.config import config
 from indico.core.db import db
 from indico.core.db.sqlalchemy.links import LinkType
-from indico.legacy.common.cache import GenericCache
 from indico.modules.events import Event
 from indico.modules.events.contributions import Contribution
 from indico.modules.events.sessions import Session
@@ -31,19 +28,18 @@ from indico.modules.events.timetable.models.entries import TimetableEntry
 from indico.modules.events.timetable.util import find_latest_entry_end_dt
 from indico.util.caching import memoize_request
 from indico.util.date_time import now_utc, server_to_utc
+from indico.util.iterables import group_list
 from indico.util.string import crc32
-from indico.util.struct.iterables import group_list
 
 
 ROOM_PHOTO_DIMENSIONS = (290, 170)
 TempReservationOccurrence = namedtuple('ReservationOccurrenceTmp', ('start_dt', 'end_dt', 'reservation'))
 TempReservationConcurrentOccurrence = namedtuple('ReservationOccurrenceTmp', ('start_dt', 'end_dt', 'reservations'))
-_cache = GenericCache('Rooms')
 
 
 @memoize_request
 def rb_check_user_access(user):
-    """Checks if the user has access to the room booking system"""
+    """Check if the user has access to the room booking system."""
     from indico.modules.rb import rb_settings
     if rb_is_admin(user):
         return True
@@ -54,7 +50,7 @@ def rb_check_user_access(user):
 
 @memoize_request
 def rb_is_admin(user):
-    """Checks if the user is a room booking admin"""
+    """Check if the user is a room booking admin."""
     from indico.modules.rb import rb_settings
     if user.is_admin:
         return True
@@ -62,6 +58,7 @@ def rb_is_admin(user):
 
 
 def build_rooms_spritesheet():
+    from indico.modules.rb import rb_cache
     from indico.modules.rb.models.rooms import Room
     image_width, image_height = ROOM_PHOTO_DIMENSIONS
     rooms = Room.query.filter(Room.photo).options(joinedload('photo')).all()
@@ -85,9 +82,11 @@ def build_rooms_spritesheet():
     sprite.save(output, 'JPEG')
     value = output.getvalue()
     token = crc32(value)
-    _cache.set('rooms-sprite', value)
-    _cache.set('rooms-sprite-mapping', mapping)
-    _cache.set('rooms-sprite-token', token)
+    rb_cache.set_many({
+        'rooms-sprite': value,
+        'rooms-sprite-mapping': mapping,
+        'rooms-sprite-token': token,
+    })
     return token
 
 
@@ -99,40 +98,44 @@ def get_resized_room_photo(room):
 
 
 def remove_room_spritesheet_photo(room):
-    mapping = _cache.get('rooms-sprite-mapping')
+    from indico.modules.rb import rb_cache
+    mapping = rb_cache.get('rooms-sprite-mapping')
     if not mapping or room.id not in mapping:
         return
     del mapping[room.id]
-    _cache.set('rooms-sprite-mapping', mapping)
+    rb_cache.set('rooms-sprite-mapping', mapping)
 
 
 def group_by_occurrence_date(occurrences, sort_by=None):
-    return group_list(occurrences, key=lambda obj: obj.start_dt.date(), sort_by=sort_by)
+    key = lambda obj: obj.start_dt.date()
+    if sort_by is None:
+        sort_by = key
+    return group_list(occurrences, key=key, sort_by=sort_by)
 
 
 def serialize_occurrences(data):
-    from indico.modules.rb.schemas import (reservation_occurrences_schema)
-    return {dt.isoformat(): reservation_occurrences_schema.dump(data) for dt, data in data.iteritems()}
+    from indico.modules.rb.schemas import reservation_occurrences_schema
+    return {dt.isoformat(): reservation_occurrences_schema.dump(data) for dt, data in data.items()}
 
 
 def serialize_blockings(data):
-    from indico.modules.rb.schemas import (simple_blockings_schema)
-    return {dt.isoformat(): simple_blockings_schema.dump(data) for dt, data in data.iteritems()}
+    from indico.modules.rb.schemas import simple_blockings_schema
+    return {dt.isoformat(): simple_blockings_schema.dump(data) for dt, data in data.items()}
 
 
 def serialize_nonbookable_periods(data):
-    from indico.modules.rb.schemas import (nonbookable_periods_schema)
-    return {dt.isoformat(): nonbookable_periods_schema.dump(data) for dt, data in data.iteritems()}
+    from indico.modules.rb.schemas import nonbookable_periods_schema
+    return {dt.isoformat(): nonbookable_periods_schema.dump(data) for dt, data in data.items()}
 
 
 def serialize_unbookable_hours(data):
-    from indico.modules.rb.schemas import (bookable_hours_schema)
+    from indico.modules.rb.schemas import bookable_hours_schema
     return [bookable_hours_schema.dump(d) for d in data]
 
 
 def serialize_concurrent_pre_bookings(data):
-    from indico.modules.rb.schemas import (concurrent_pre_bookings_schema)
-    return {dt.isoformat(): concurrent_pre_bookings_schema.dump(data) for dt, data in data.iteritems()}
+    from indico.modules.rb.schemas import concurrent_pre_bookings_schema
+    return {dt.isoformat(): concurrent_pre_bookings_schema.dump(data) for dt, data in data.items()}
 
 
 def get_linked_object(type_, id_):
@@ -184,7 +187,7 @@ def serialize_booking_details(booking):
                                unbookable_hours={}, nonbookable_periods={}, overridable_blockings={})
     booking_details['occurrences'] = occurrences_by_type
     booking_details['date_range'] = [dt.isoformat() for dt in date_range]
-    for dt, [occ] in occurrences.iteritems():
+    for dt, [occ] in occurrences.items():
         serialized_occ = reservation_occurrences_schema_with_permissions.dump([occ])
         if occ.is_cancelled:
             occurrences_by_type['cancellations'][dt.isoformat()] = serialized_occ
@@ -216,7 +219,7 @@ def serialize_booking_details(booking):
 
 
 def serialize_availability(availability):
-    for data in availability.viewvalues():
+    for data in availability.values():
         data['blockings'] = serialize_blockings(data.get('blockings', {}))
         data['overridable_blockings'] = serialize_blockings(data.get('overridable_blockings', {}))
         data['nonbookable_periods'] = serialize_nonbookable_periods(data.get('nonbookable_periods', {}))
@@ -260,8 +263,7 @@ def _find_latest_entry_end_dt(event, day):
 
 
 def get_booking_params_for_event(event):
-    """
-    Get a set of RB interface parameters suitable for this event.
+    """Get a set of RB interface parameters suitable for this event.
 
     These parameters can then be used to construct a URL that will lead to a
     pre-filled search that matches the start/end times for a given day.
@@ -272,14 +274,14 @@ def get_booking_params_for_event(event):
     params = {
         'link_type': 'event',
         'link_id': event.id,
-        'text': '#{}'.format(event.room.id) if event.room else None,
+        'text': f'#{event.room.id}' if event.room else None,
     }
     all_times = {day: (_find_first_entry_start_dt(event, day), _find_latest_entry_end_dt(event, day))
                  for day in event.iter_days(tzinfo=event.tzinfo)}
     # if the timetable is empty on a given day, use (start_dt, end_dt) of the event
     all_times = [((day, (event.start_dt_local, event.end_dt_local)) if times[0] is None else (day, times))
-                 for day, times in all_times.viewitems()]
-    same_times = len(set(times for (_, times) in all_times)) == 1
+                 for day, times in all_times.items()]
+    same_times = len({times for (_, times) in all_times}) == 1
 
     if is_single_day or same_times:
         params['sd'] = event.start_dt_local.date().isoformat()

@@ -1,11 +1,9 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
-
-from __future__ import unicode_literals
 
 from wtforms.fields import BooleanField
 from wtforms.validators import InputRequired
@@ -36,7 +34,7 @@ class AbstractRatingReviewingQuestion(BaseField):
     @property
     def wtf_field_kwargs(self):
         range_ = self.object.event.cfa.rating_range
-        choices = [(n, unicode(n)) for n in range(range_[0], range_[1] + 1)]
+        choices = [(n, str(n)) for n in range(range_[0], range_[1] + 1)]
         return {'coerce': int, 'choices': choices, 'rating_range': range_, 'question': self.object}
 
 
@@ -50,7 +48,7 @@ class PaperRatingReviewingQuestion(BaseField):
     @property
     def wtf_field_kwargs(self):
         range_ = self.object.event.cfp.rating_range
-        choices = [(n, unicode(n)) for n in range(range_[0], range_[1] + 1)]
+        choices = [(n, str(n)) for n in range(range_[0], range_[1] + 1)]
         return {'coerce': int, 'choices': choices, 'rating_range': range_, 'question': self.object}
 
 

@@ -1,11 +1,9 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
-
-from __future__ import unicode_literals
 
 from indico.modules.events.registration import api
 from indico.modules.events.registration.controllers import display
@@ -16,7 +14,7 @@ from indico.web.flask.util import make_compat_redirect_func
 from indico.web.flask.wrappers import IndicoBlueprint
 
 
-_bp = IndicoBlueprint('event_registration', __name__, url_prefix='/event/<confId>', template_folder='templates',
+_bp = IndicoBlueprint('event_registration', __name__, url_prefix='/event/<int:event_id>', template_folder='templates',
                       virtual_template_folder='events/registration', event_feature='registration')
 
 # Management
@@ -70,7 +68,7 @@ _bp.add_url_rule(
 _bp.add_url_rule('/manage/registration/<int:reg_form_id>/registrations/<int:registration_id>/approve',
                  'approve_registration', reglists.RHRegistrationApprove, methods=('POST',))
 _bp.add_url_rule('/manage/registration/<int:reg_form_id>/registrations/<int:registration_id>/reject',
-                 'reject_registration', reglists.RHRegistrationReject, methods=('POST',))
+                 'reject_registration', reglists.RHRegistrationReject, methods=('GET', 'POST'))
 _bp.add_url_rule('/manage/registration/<int:reg_form_id>/registrations/<int:registration_id>/reset',
                  'reset_registration', reglists.RHRegistrationReset, methods=('POST',))
 _bp.add_url_rule('/manage/registration/<int:reg_form_id>/registrations/<int:registration_id>/withdraw',
@@ -91,8 +89,10 @@ _bp.add_url_rule('/manage/registration/<int:reg_form_id>/registrations/registrat
                  reglists.RHRegistrationsExportCSV, methods=('POST',))
 _bp.add_url_rule('/manage/registration/<int:reg_form_id>/registrations/registrations.xlsx',
                  'registrations_excel_export', reglists.RHRegistrationsExportExcel, methods=('POST',))
-_bp.add_url_rule('/manage/registration/<int:reg_form_id>/registrations/modify-status', 'registrations_modify_status',
-                 reglists.RHRegistrationsModifyStatus, methods=('POST',))
+_bp.add_url_rule('/manage/registration/<int:reg_form_id>/registrations/approve', 'registrations_approve',
+                 reglists.RHRegistrationsApprove, methods=('POST',))
+_bp.add_url_rule('/manage/registration/<int:reg_form_id>/registrations/reject', 'registrations_reject',
+                 reglists.RHRegistrationsReject, methods=('POST',))
 _bp.add_url_rule('/manage/registration/<int:reg_form_id>/registrations/check-in', 'registrations_check_in',
                  reglists.RHRegistrationBulkCheckIn, methods=('POST',))
 _bp.add_url_rule('/manage/registration/<int:reg_form_id>/registrations/attachments', 'registrations_attachments_export',
@@ -169,6 +169,8 @@ _bp.add_url_rule('/registrations/<int:reg_form_id>/check-email', 'check_email', 
 _bp.add_url_rule('/registrations/<int:reg_form_id>/decline-invitation', 'decline_invitation',
                  display.RHRegistrationFormDeclineInvitation, methods=('POST',))
 _bp.add_url_rule('/registrations/<int:reg_form_id>/ticket.pdf', 'ticket_download', display.RHTicketDownload)
+_bp.add_url_rule('/registrations/<int:reg_form_id>/<int:registration_id>/avatar', 'registration_avatar',
+                 display.RHRegistrationAvatar)
 
 
 # API
@@ -180,7 +182,7 @@ _bp.add_url_rule('/api/registration-forms', 'api_registration_forms', api.RHAPIR
 
 
 # Participants
-_bp_participation = IndicoBlueprint('event_participation', __name__, url_prefix='/event/<confId>',
+_bp_participation = IndicoBlueprint('event_participation', __name__, url_prefix='/event/<int:event_id>',
                                     template_folder='templates', virtual_template_folder='events/registration')
 _bp_participation.add_url_rule('/manage/participants/', 'manage', regforms.RHManageParticipants,
                                methods=('GET', 'POST'))
@@ -190,7 +192,6 @@ _bp_participation.add_url_rule('/manage/participants/', 'manage', regforms.RHMan
 _compat_bp = IndicoBlueprint('compat_event_registration', __name__, url_prefix='/event/<int:event_id>')
 _compat_bp.add_url_rule('/registration/', 'registration', compat_registration)
 _compat_bp.add_url_rule('/registration/<path:path>', 'registration', compat_registration)
-_compat_bp.add_url_rule('/registration/registrants', 'registrants',
-                        make_compat_redirect_func(_bp, 'participant_list', view_args_conv={'event_id': 'confId'}))
+_compat_bp.add_url_rule('/registration/registrants', 'registrants', make_compat_redirect_func(_bp, 'participant_list'))
 _compat_bp.add_url_rule('!/confRegistrantsDisplay.py/list', 'registrants_modpython',
                         make_compat_redirect_func(_bp, 'participant_list'))

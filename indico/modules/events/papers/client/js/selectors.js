@@ -1,5 +1,5 @@
 // This file is part of Indico.
-// Copyright (C) 2002 - 2020 CERN
+// Copyright (C) 2002 - 2021 CERN
 //
 // Indico is free software; you can redistribute it and/or
 // modify it under the terms of the MIT License; see the
@@ -8,6 +8,8 @@
 import {createSelector} from 'reselect';
 
 import {RequestState} from 'indico/utils/redux';
+
+import {PaperState} from './models';
 
 export const isFetchingInitialPaperDetails = state =>
   state.paper.requests.details.state === RequestState.STARTED && !state.paper.details;
@@ -38,6 +40,12 @@ export const canReviewPaper = createSelector(
   getPaperDetails,
   getPaperEvent,
   ({isInFinalState, canReview}, {isLocked}) => !isLocked && !isInFinalState && canReview
+);
+export const canSubmitNewRevision = createSelector(
+  getPaperDetails,
+  getPaperEvent,
+  ({canSubmitProceedings, canManage, state: {name: stateName}}, {isLocked}) =>
+    !isLocked && stateName === PaperState.to_be_corrected && (canManage || canSubmitProceedings)
 );
 export const canCommentPaper = createSelector(
   getPaperDetails,

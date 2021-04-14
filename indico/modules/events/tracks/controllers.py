@@ -1,11 +1,9 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
-
-from __future__ import unicode_literals
 
 from io import BytesIO
 from operator import attrgetter, itemgetter
@@ -38,11 +36,11 @@ def _render_track_list(event):
 
 
 class RHManageTracksBase(RHManageEventBase):
-    """Base class for all track management RHs"""
+    """Base class for all track management RHs."""
 
 
 class RHManageTrackBase(RHManageTracksBase):
-    """Base class for track management RHs related to a specific track"""
+    """Base class for track management RHs related to a specific track."""
 
     normalize_url_spec = {
         'locators': {
@@ -134,6 +132,8 @@ class RHDeleteTrack(RHManageTrackBase):
 
 
 class RHDisplayTracks(RHDisplayEventBase):
+    view_class = WPDisplayTracks
+
     def _process(self):
         program = track_settings.get(self.event, 'program')
         render_mode = track_settings.get(self.event, 'program_render_mode')
@@ -143,7 +143,7 @@ class RHDisplayTracks(RHDisplayEventBase):
                   .all())
         track_groups = self.event.track_groups
         items = sorted(tracks + track_groups, key=attrgetter('position'))
-        return WPDisplayTracks.render_template('display.html', self.event, program=program, items=items)
+        return self.view_class.render_template('display.html', self.event, program=program, items=items)
 
 
 class RHTracksPDF(RHDisplayEventBase):

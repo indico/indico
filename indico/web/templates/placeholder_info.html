@@ -8,7 +8,7 @@
     {% for placeholder in placeholders if placeholder.advanced == advanced and placeholder is subclassof ParametrizedPlaceholder -%}
         {% for param, description in placeholder.iter_param_info(**placeholder_kwargs) %}
             {{ br() }}
-            <span style="font-style: normal;">{ {{- placeholder.name -}}{%- if param is not none -%}:{{- param -}}{%- endif -%} }</span>:
+            <code class="placeholder">{ {{- placeholder.name -}}{%- if param is not none -%}:{{- param -}}{%- endif -%} }</code> -
             {{ description }} {% if placeholder.required %}(required){% endif %}
         {% endfor %}
     {% endfor %}

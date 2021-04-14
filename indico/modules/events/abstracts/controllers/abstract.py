@@ -1,11 +1,9 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
-
-from __future__ import unicode_literals
 
 from flask import flash, request, session
 from sqlalchemy.orm import defaultload, joinedload
@@ -49,7 +47,7 @@ class RHEditAbstract(RHAbstractBase):
 
     def _process(self):
         abstract_form_class = make_abstract_form(self.event, session.user, management=self.management)
-        custom_field_values = {'custom_{}'.format(x.contribution_field_id): x.data for x in self.abstract.field_values}
+        custom_field_values = {f'custom_{x.contribution_field_id}': x.data for x in self.abstract.field_values}
         defaults = FormDefaults(self.abstract, attachments=self.abstract.files, **custom_field_values)
         form = abstract_form_class(obj=defaults, abstract=self.abstract, event=self.event, management=self.management,
                                    invited=(self.abstract.state == AbstractState.invited))
@@ -81,7 +79,7 @@ class RHAbstractsDownloadAttachment(RHAbstractBase):
 
 
 class RHAbstractNotificationLog(RHAbstractBase):
-    """Show the notifications sent for an abstract"""
+    """Show the notifications sent for an abstract."""
 
     def _check_abstract_protection(self):
         return self.abstract.can_judge(session.user)
@@ -95,12 +93,12 @@ class RHAbstractExportPDF(RHAbstractBase):
         if not config.LATEX_ENABLED:
             raise NotFound
         pdf = AbstractToPDF(self.abstract)
-        filename = 'abstract-{}.pdf'.format(self.abstract.friendly_id)
+        filename = f'abstract-{self.abstract.friendly_id}.pdf'
         return send_file(filename, pdf.generate(), 'application/pdf')
 
 
 class RHAbstractExportFullPDF(RHAbstractBase):
-    """Export an abstract as PDF (with review details)"""
+    """Export an abstract as PDF (with review details)."""
 
     def _check_abstract_protection(self):
         return self.abstract.can_see_reviews(session.user)
@@ -109,5 +107,5 @@ class RHAbstractExportFullPDF(RHAbstractBase):
         if not config.LATEX_ENABLED:
             raise NotFound
         pdf = ConfManagerAbstractToPDF(self.abstract)
-        filename = 'abstract-{}-reviews.pdf'.format(self.abstract.friendly_id)
+        filename = f'abstract-{self.abstract.friendly_id}-reviews.pdf'
         return send_file(filename, pdf.generate(), 'application/pdf')

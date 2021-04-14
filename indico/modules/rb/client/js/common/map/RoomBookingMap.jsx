@@ -1,5 +1,5 @@
 // This file is part of Indico.
-// Copyright (C) 2002 - 2020 CERN
+// Copyright (C) 2002 - 2021 CERN
 //
 // Indico is free software; you can redistribute it and/or
 // modify it under the terms of the MIT License; see the
@@ -8,10 +8,12 @@
 import _ from 'lodash';
 import PropTypes from 'prop-types';
 import React from 'react';
-import {connect} from 'react-redux';
 import {Map, TileLayer} from 'react-leaflet';
 import Overridable from 'react-overridable';
+import {connect} from 'react-redux';
+
 import {selectors as configSelectors} from '../config';
+
 import MapMarkers from './MapMarkers';
 
 import 'leaflet/dist/leaflet.css';

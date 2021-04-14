@@ -4,9 +4,7 @@
 
 {% block html %}
     <div id="{{ field.id }}" class="{{ 'i-group' if vertical_alignment else 'group i-selection' }}">
-        {% if field.enum and field.enum.__css_classes__ %}
-            {% set options = field.enum | list %}
-        {% endif %}
+        {% set options = field.enum|list if field.enum and field.enum.__css_classes__ else none %}
         {% for subfield in field %}
             <div class="{{ 'i-radio' if vertical_alignment else 'inline-vcentered'}} radio-item-{{ loop.index0 }} {% if options %} {{ options[loop.index0].css_class }} {% endif %}">
                 {{ subfield(**input_args) }}

@@ -1,11 +1,9 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
-
-from __future__ import unicode_literals
 
 import re
 
@@ -38,17 +36,17 @@ class PaymentEventSettingsFormBase(IndicoForm):
     def __init__(self, *args, **kwargs):
         # Provide the plugin settings in case a plugin needs them for more complex form fields.
         self._plugin_settings = kwargs.pop('plugin_settings')
-        super(PaymentEventSettingsFormBase, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
 
-class PaymentPluginMixin(object):
+class PaymentPluginMixin:
     settings_form = PaymentPluginSettingsFormBase
     event_settings_form = PaymentEventSettingsFormBase
     #: Set containing all valid currencies. Set to `None` to allow all.
     valid_currencies = None
 
     def init(self):
-        super(PaymentPluginMixin, self).init()
+        super().init()
         if not self.name.startswith('payment_'):
             raise Exception('Payment plugins must be named payment_*')
         self.connect(signals.event_management.management_url, self.get_event_management_url)
@@ -68,7 +66,7 @@ class PaymentPluginMixin(object):
         return config.IMAGES_BASE_URL + '/payment_logo.png'
 
     def can_be_modified(self, user, event):
-        """Checks if the user is allowed to enable/disable/modify the payment method.
+        """Check if the user is allowed to enable/disable/modify the payment method.
 
         :param user: the :class:`.User` repesenting the user
         :param event: the :class:`Event`
@@ -85,7 +83,7 @@ class PaymentPluginMixin(object):
             return url_for('payment.event_plugin_edit', event, method=re.sub(r'^payment_', '', self.name))
 
     def get_invalid_regforms(self, event):
-        """Return registration forms with incompatible currencies"""
+        """Return registration forms with incompatible currencies."""
         from indico.modules.events.registration.models.forms import RegistrationForm
         invalid_regforms = []
         if self.valid_currencies is not None:
@@ -100,11 +98,11 @@ class PaymentPluginMixin(object):
         return currency in self.valid_currencies
 
     def get_method_name(self, event):
-        """Returns the (customized) name of the payment method."""
+        """Return the (customized) name of the payment method."""
         return self.event_settings.get(event, 'method_name')
 
     def adjust_payment_form_data(self, data):
-        """Updates the payment form data if necessary.
+        """Update the payment form data if necessary.
 
         This method can be overridden to update e.g. the amount based on choices the user makes
         in the payment form or to provide additional data to the form. To do so, `data` must
@@ -113,10 +111,9 @@ class PaymentPluginMixin(object):
         :param data: a dict containing event, registration, amount, currency,
                      settings and event_settings
         """
-        pass
 
     def render_payment_form(self, registration):
-        """Returns the payment form shown to the user.
+        """Return the payment form shown to the user.
 
         :param registration: a :class:`Registration` object
         """
@@ -133,13 +130,13 @@ class PaymentPluginMixin(object):
         return render_plugin_template('event_payment_form.html', **data)
 
     def render_transaction_details(self, transaction):
-        """Renders the transaction details in event management
+        """Render the transaction details in event management.
 
         Override this (or inherit from the template) to show more useful data such as transaction IDs
 
         :param transaction: the :class:`PaymentTransaction`
         """
         # Try using the template in the plugin first in case it extends the default one
-        return render_template(['{}:transaction_details.html'.format(transaction.plugin.name),
+        return render_template([f'{transaction.plugin.name}:transaction_details.html',
                                 'events/payment/transaction_details.html'],
                                plugin=transaction.plugin, transaction=transaction)

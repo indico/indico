@@ -1,5 +1,5 @@
 // This file is part of Indico.
-// Copyright (C) 2002 - 2020 CERN
+// Copyright (C) 2002 - 2021 CERN
 //
 // Indico is free software; you can redistribute it and/or
 // modify it under the terms of the MIT License; see the
@@ -8,24 +8,21 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 
+import {ICSCalendarLink} from 'indico/react/components';
 import {Translate} from 'indico/react/i18n';
 
-import ICSCalendarLink from './ICSCalendarLink';
-
 document.addEventListener('DOMContentLoaded', () => {
-  const userId = document.querySelector('body').dataset.userId;
   ReactDOM.render(
     <ICSCalendarLink
       endpoint="users.export_dashboard_ics"
-      urlParams={{user_id: userId}}
       options={[
-        {key: 'events', text: Translate.string('Events at hand'), queryParams: {linked: 'true'}},
+        {key: 'events', text: Translate.string('Events at hand'), extraParams: {include: 'linked'}},
         {
           key: 'categories',
           text: Translate.string('Categories'),
-          queryParams: {categories: 'true'},
+          extraParams: {include: 'categories'},
         },
-        {key: 'everything', text: Translate.string('Everything'), queryParams: {}},
+        {key: 'everything', text: Translate.string('Everything'), extraParams: {}},
       ]}
     />,
     document.querySelector('#dashboard-calendar-link')

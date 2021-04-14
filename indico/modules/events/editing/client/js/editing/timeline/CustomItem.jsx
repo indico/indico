@@ -1,23 +1,24 @@
 // This file is part of Indico.
-// Copyright (C) 2002 - 2020 CERN
+// Copyright (C) 2002 - 2021 CERN
 //
 // Indico is free software; you can redistribute it and/or
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
 import moment from 'moment';
+import PropTypes from 'prop-types';
 import React from 'react';
 import {useSelector} from 'react-redux';
-import PropTypes from 'prop-types';
 
 import UserAvatar from 'indico/modules/events/reviewing/components/UserAvatar';
 import {serializeDate} from 'indico/utils/date';
 
+import ResetReview from './ResetReview';
 import * as selectors from './selectors';
 import StateIndicator from './StateIndicator';
-import ResetReview from './ResetReview';
+import {blockItemPropTypes} from './util';
 
-export default function CustomItem({header, user, createdDt, html, revisionId, state}) {
+export default function CustomItem({item: {header, user, createdDt, html, revisionId}, state}) {
   const lastRevertableRevisionId = useSelector(selectors.getLastRevertableRevisionId);
 
   return (
@@ -50,18 +51,10 @@ export default function CustomItem({header, user, createdDt, html, revisionId, s
 }
 
 CustomItem.propTypes = {
-  createdDt: PropTypes.string.isRequired,
-  html: PropTypes.string,
+  item: PropTypes.shape(blockItemPropTypes).isRequired,
   state: PropTypes.string,
-  header: PropTypes.string.isRequired,
-  user: PropTypes.shape({
-    fullName: PropTypes.string.isRequired,
-    avatarBgColor: PropTypes.string.isRequired,
-  }).isRequired,
-  revisionId: PropTypes.number.isRequired,
 };
 
 CustomItem.defaultProps = {
-  html: null,
   state: null,
 };

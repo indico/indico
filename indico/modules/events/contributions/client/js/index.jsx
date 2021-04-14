@@ -1,5 +1,5 @@
 // This file is part of Indico.
-// Copyright (C) 2002 - 2020 CERN
+// Copyright (C) 2002 - 2021 CERN
 //
 // Indico is free software; you can redistribute it and/or
 // modify it under the terms of the MIT License; see the
@@ -19,10 +19,35 @@ import ReactDOM from 'react-dom';
 
 import 'indico/modules/events/util/types_dialog';
 import EditableSubmissionButton from 'indico/modules/events/editing/editing/EditableSubmissionButton';
-import {$T} from 'indico/utils/i18n';
-import {camelizeKeys} from 'indico/utils/case';
+import {IButton, ICSCalendarLink} from 'indico/react/components';
+import {Translate} from 'indico/react/i18n';
 import {indicoAxios, handleAxiosError} from 'indico/utils/axios';
+import {camelizeKeys} from 'indico/utils/case';
+import {$T} from 'indico/utils/i18n';
+
 import PublicationSwitch from './PublicationSwitch';
+
+document.addEventListener('DOMContentLoaded', () => {
+  const calendarContainer = document.querySelector('#contribution-calendar-link');
+
+  if (!calendarContainer) {
+    return;
+  }
+
+  const {contributionId, eventId} = calendarContainer.dataset;
+
+  ReactDOM.render(
+    <ICSCalendarLink
+      endpoint="contributions.export_ics"
+      params={{event_id: eventId, contrib_id: contributionId}}
+      renderButton={(onClick, classes) => (
+        <IButton icon="calendar" onClick={onClick} classes={classes} />
+      )}
+      options={[{key: 'contribution', text: Translate.string('Contribution'), extraParams: {}}]}
+    />,
+    calendarContainer
+  );
+});
 
 (function(global) {
   global.setupEditableSubmissionButton = async function setupEditableSubmissionButton() {
@@ -37,9 +62,9 @@ import PublicationSwitch from './PublicationSwitch';
     try {
       [fileTypeResponses, paperInfoResponse] = await Promise.all([
         Promise.all(
-          availableTypes.map(type => indicoAxios.get(fileTypesURL({confId: eventId, type})))
+          availableTypes.map(type => indicoAxios.get(fileTypesURL({event_id: eventId, type})))
         ),
-        indicoAxios.get(paperInfoURL({confId: eventId, contrib_id: contributionId}), {
+        indicoAxios.get(paperInfoURL({event_id: eventId, contrib_id: contributionId}), {
           validateStatus: status => (status >= 200 && status < 300) || status === 404,
         }),
       ]);
@@ -339,7 +364,7 @@ import PublicationSwitch from './PublicationSwitch';
       reloadManagementAttachmentInfoColumn(target.data('locator'), target.closest('td'));
       $(this).trigger('ajaxDialog:setData', [true]);
     });
-    $('#subcontribution-list').on('indico:htmlUpdated', function(evt) {
+    $('#subcontribution-list').on('indico:htmlUpdated', function() {
       $(this).trigger('ajaxDialog:setData', [true]);
     });
 

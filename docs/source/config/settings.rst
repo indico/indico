@@ -65,6 +65,26 @@ Authentication
 
     Default: ``False``
 
+.. data:: FAILED_LOGIN_RATE_LIMIT
+
+    Applies a rate limit to failed login attempts due to an invalid username
+    or password. When specifying multiple rate limits separated with a semicolon,
+    they are checked in that specific order, which can allow for a short burst of
+    attempts (e.g. a legitimate user trying multiple passwords they commonly use)
+    and then slowing down more strongly (in case someone tries to brute-force more
+    than just a few passwords).
+
+    Rate limiting is applied by IP address and only failed logins count against the
+    rate limit. It also does not apply to login attempts using external login systems
+    (SSO) as failures there are rarely related to invalid credentials coming from the
+    user (these would be rejected on the SSO side, which should implement its own rate
+    limiting).
+
+    The default allows a burst of 15 attempts, and then only 5 attempts every 15
+    minutes for the next 24 hours.  Setting the rate limit to ``None`` disables it.
+
+    Default: ``'5 per 15 minutes; 10 per day'``
+
 .. data:: EXTERNAL_REGISTRATION_URL
 
     The URL to an external page where people can register an account that
@@ -104,33 +124,9 @@ Authentication
 Cache
 -----
 
-.. data:: CACHE_BACKEND
-
-    The backend used for caching. Valid backends are ``redis``,
-    ``files``, and ``memcached``.
-
-    To use the ``redis`` backend (recommended), you need to set
-    :data:`REDIS_CACHE_URL` to the URL of your Redis instance.
-
-    With the ``files`` backend, cache data is stored in :data:`CACHE_DIR`,
-    which always needs to be set, even when using a different cache
-    backend since Indico needs to cache some data on disk.
-
-    To use the ``memcached`` backend, you need to install the
-    ``python-memcached`` package from PyPI and set :data:`MEMCACHED_SERVERS`
-    to a list containing at least one memcached server.
-
-    .. note::
-
-        We only test Indico with the ``redis`` cache backend. While
-        the other backends should work, we make no guarantees as
-        they are not actively being used or tested.
-
-    Default: ``'files'``
-
 .. data:: REDIS_CACHE_URL
 
-    The URL of the redis server to use with the ``redis`` cache backend.
+    The URL of the redis server to use for caching.
 
     If the Redis server requires authentication, use a URL like this:
     ``redis://unused:password@127.0.0.1:6379/1``
@@ -260,7 +256,7 @@ Customization
         {% extends '~footer.html' %}
 
         {% block footer_logo %}
-            {%- set filename = 'cern_small_light.png' if dark else 'cern_small.png' -%}
+            {%- set filename = 'cern_small_light.png' if dark|default(false) else 'cern_small.png' -%}
             <a href="https://home.cern/" class="footer-logo">
                 <img src="{{ url_for('assets.custom', filename=filename) }}" alt="CERN">
             </a>
@@ -510,6 +506,20 @@ Emails
     Emails about unhandled errors/exceptions are sent to this address.
 
     Default: ``None``
+
+
+Experimental Features
+----------------------
+
+.. data:: EXPERIMENTAL_EDITING_SERVICE
+
+    If enabled, event managers can connect the Editing module of their
+    events to an external microservice extending the normal Editing workflow.
+    As long as this is considered experimental, there are no guarantees
+    on backwards compatibility even in minor Indico version bumps. Please
+    check the `reference implementation`_ for details/changes.
+
+    Default: ``False``
 
 
 LaTeX
@@ -793,31 +803,11 @@ System
 
     Default: ``socket.getfqdn()``
 
-.. data:: FLOWER_URL
-
-    The URL of the `Flower`_ instance monitoring your Celery workers.
-    If set, a link to it will be displayed in the admin area.
-
-    To use flower, install it using ``pip install flower``, then start
-    it using ``indico celery flower``. By default it will listen on the
-    same host as specified in :data:`BASE_URL` (plain HTTP) on port 5555.
-    Authentication is done using OAuth so only Indico administrators
-    can access flower.  You need to configure the allowed auth callback
-    URLs in the admin area; otherwise authentication will fail with an
-    OAuth error.
-
-    .. note::
-
-        The information displayed by Flower is usually not very useful.
-        Unless you are very curious it is usually not worth using it.
-
-    Default: ``None``
-
 
 .. _Flask-SQLAlchemy documentation: https://flask-sqlalchemy.readthedocs.io/en/stable/config/#configuration-keys
 .. _Sentry: https://sentry.io
 .. _Celery documentation on brokers: https://celery.readthedocs.io/en/stable/getting-started/brokers/index.html
 .. _Celery documentation on periodic tasks: https://celery.readthedocs.io/en/stable/userguide/periodic-tasks.html#available-fields
-.. _Flower: https://flower.readthedocs.io/en/latest/
 .. _TeXLive: https://www.tug.org/texlive/
 .. _Flask-Multipass: https://flask-multipass.readthedocs.io
+.. _reference implementation: https://github.com/indico/openreferee

@@ -1,12 +1,11 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-
-class Serializer(object):
+class Serializer:
 
     schemaless = True
     encapsulate = True
@@ -30,9 +29,7 @@ class Serializer(object):
 
     @classmethod
     def create(cls, dformat, query_params=None, **kwargs):
-        """
-        A serializer factory
-        """
+        """A serializer factory."""
 
         query_params = query_params or {}
 

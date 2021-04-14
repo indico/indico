@@ -1,5 +1,5 @@
 // This file is part of Indico.
-// Copyright (C) 2002 - 2020 CERN
+// Copyright (C) 2002 - 2021 CERN
 //
 // Indico is free software; you can redistribute it and/or
 // modify it under the terms of the MIT License; see the
@@ -265,10 +265,10 @@ type(
 
     pdf: function() {
       if ($('html').data('static-site')) {
-        window.location = build_url(Indico.Urls.Timetable.default_pdf, {confId: this.eventInfo.id});
+        window.location = build_url(Indico.Urls.Timetable.default_pdf, {event_id: this.eventInfo.id});
       } else {
         ajaxDialog({
-          url: build_url(Indico.Urls.Timetable.pdf, {confId: this.eventInfo.id}),
+          url: build_url(Indico.Urls.Timetable.pdf, {event_id: this.eventInfo.id}),
           title: $T.gettext('Export to PDF'),
         });
       }
@@ -1563,7 +1563,7 @@ type(
       if (this.isSessionTimetable && this.canManageEvent) {
         var goBackLink = $('<a>', {
           class: 'icon-arrow-up i-button',
-          href: build_url(Indico.Urls.Timetable.management, {confId: this.eventInfo.id}),
+          href: build_url(Indico.Urls.Timetable.management, {event_id: this.eventInfo.id}),
         }).text($T.gettext('Go to event timetable'));
         return $('<div>', {class: 'group right'}).append(goBackLink);
       } else {

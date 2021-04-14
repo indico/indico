@@ -1,11 +1,9 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
-
-from __future__ import absolute_import, unicode_literals
 
 from flask import json
 from werkzeug.datastructures import FileStorage
@@ -17,7 +15,7 @@ from indico.web.forms.widgets import JinjaWidget
 
 
 class FileField(Field):
-    """A dropzone field"""
+    """A dropzone field."""
 
     widget = JinjaWidget('forms/dropzone_widget.html', editable=False)
 
@@ -53,7 +51,7 @@ class FileField(Field):
             self.widget_options['previewTemplate'] = tpl.thin_preview_template()
             self.widget_options['dictRemoveFile'] = tpl.remove_icon()
 
-        super(FileField, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self.widget_options['paramName'] = self.name
 
     def process_formdata(self, valuelist):
@@ -79,7 +77,7 @@ class EditableFileField(FileField):
     def __init__(self, *args, **kwargs):
         self.get_metadata = kwargs.pop('get_metadata', get_file_metadata)
         self.added_only = kwargs.pop('added_only', False)
-        super(EditableFileField, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self.widget_options['editable'] = True
 
     def process_formdata(self, valuelist):

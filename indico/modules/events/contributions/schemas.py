@@ -1,11 +1,9 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
-
-from __future__ import unicode_literals
 
 from marshmallow.fields import Raw, String
 from marshmallow_sqlalchemy import column2field
@@ -16,13 +14,13 @@ from indico.modules.events.contributions.models.fields import ContributionFieldV
 from indico.modules.events.contributions.models.types import ContributionType
 
 
-class ContributionSchema(mm.ModelSchema):
+class ContributionSchema(mm.SQLAlchemyAutoSchema):
     class Meta:
         model = Contribution
         fields = ('id', 'title', 'friendly_id', 'code')
 
 
-class ContributionTypeSchema(mm.ModelSchema):
+class ContributionTypeSchema(mm.SQLAlchemyAutoSchema):
     class Meta:
         model = ContributionType
         fields = ('id', 'name', 'description')

@@ -1,11 +1,9 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
-
-from __future__ import unicode_literals
 
 from flask import flash, render_template, request, session
 from werkzeug.exceptions import NotFound
@@ -41,7 +39,7 @@ def _render_paper_dashboard(event, view_class=None):
 
 
 class RHPapersDashboard(RHManagePapersBase):
-    """Dashboard of the papers module"""
+    """Dashboard of the papers module."""
 
     # Allow access even if the feature is disabled
     EVENT_FEATURE = None
@@ -54,7 +52,7 @@ class RHPapersDashboard(RHManagePapersBase):
 
 
 class RHManagePaperTeams(RHManagePapersBase):
-    """Modify managers of the papers module"""
+    """Modify managers of the papers module."""
 
     def _process(self):
         cfp = self.event.cfp
@@ -87,7 +85,7 @@ class RHManagePaperTeams(RHManagePapersBase):
 
 
 class RHSwitchReviewingType(RHManagePapersBase):
-    """Enable/disable the paper reviewing types"""
+    """Enable/disable the paper reviewing types."""
 
     def _process_PUT(self):
         set_reviewing_state(self.event, PaperReviewType[request.view_args['reviewing_type']], True)
@@ -99,19 +97,19 @@ class RHSwitchReviewingType(RHManagePapersBase):
 
 
 class RHManageCompetences(RHManagePapersBase):
-    """Manage the competences of the call for papers ACLs"""
+    """Manage the competences of the call for papers ACLs."""
 
     def _process(self):
         form_class = make_competences_form(self.event)
         user_competences = self.event.cfp.user_competences
-        defaults = {'competences_{}'.format(user_id): competences.competences
-                    for user_id, competences in user_competences.iteritems()}
+        defaults = {f'competences_{user_id}': competences.competences
+                    for user_id, competences in user_competences.items()}
         form = form_class(obj=FormDefaults(defaults))
         if form.validate_on_submit():
             key_prefix = 'competences_'
-            form_data = {int(key[len(key_prefix):]): value for key, value in form.data.iteritems()}
+            form_data = {int(key[len(key_prefix):]): value for key, value in form.data.items()}
             users = {u.id: u for u in User.query.filter(User.id.in_(form_data), ~User.is_deleted)}
-            for user_id, competences in form_data.iteritems():
+            for user_id, competences in form_data.items():
                 if user_id in user_competences:
                     update_competences(user_competences[user_id], competences)
                 elif competences:
@@ -122,7 +120,7 @@ class RHManageCompetences(RHManagePapersBase):
 
 
 class RHContactStaff(RHManagePapersBase):
-    """Send emails to reviewing staff"""
+    """Send emails to reviewing staff."""
 
     def _process(self):
         paper_persons_dict = {}
@@ -156,7 +154,7 @@ class RHScheduleCFP(RHManagePapersBase):
 
 
 class RHOpenCFP(RHManagePapersBase):
-    """Open the call for papers"""
+    """Open the call for papers."""
 
     def _process(self):
         open_cfp(self.event)
@@ -165,7 +163,7 @@ class RHOpenCFP(RHManagePapersBase):
 
 
 class RHCloseCFP(RHManagePapersBase):
-    """Close the call for papers"""
+    """Close the call for papers."""
 
     def _process(self):
         close_cfp(self.event)
@@ -203,8 +201,8 @@ class RHManageReviewingSettings(RHManagePapersBase):
 class RHSetDeadline(RHManagePapersBase):
     def _process(self):
         role = PaperReviewingRole[request.view_args['role']]
-        deadline = paper_reviewing_settings.get(self.event, '{}_deadline'.format(role.name))
-        enforce = paper_reviewing_settings.get(self.event, 'enforce_{}_deadline'.format(role.name))
+        deadline = paper_reviewing_settings.get(self.event, f'{role.name}_deadline')
+        enforce = paper_reviewing_settings.get(self.event, f'enforce_{role.name}_deadline')
         form = DeadlineForm(obj=FormDefaults(deadline=deadline, enforce=enforce), event=self.event)
         if form.validate_on_submit():
             set_deadline(self.event, role, form.deadline.data, form.enforce.data)
@@ -289,7 +287,7 @@ class RHDeleteReviewingQuestion(RHManageQuestionBase):
 
 class RHSortReviewingQuestions(RHReviewingQuestionsActionsBase):
     def _process(self):
-        question_ids = map(int, request.form.getlist('field_ids'))
+        question_ids = request.form.getlist('field_ids', type=int)
         if self.review_type == 'layout':
             questions = self.event.cfp.layout_review_questions
         else:

@@ -1,11 +1,9 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
-
-from __future__ import unicode_literals
 
 import itertools
 
@@ -22,9 +20,9 @@ from indico.core.db.sqlalchemy import PyIntEnum
 from indico.core.db.sqlalchemy.principals import EmailPrincipal, PrincipalType
 from indico.core.permissions import get_available_permissions
 from indico.util.caching import memoize_request
+from indico.util.enum import RichIntEnum
 from indico.util.i18n import _
 from indico.util.signals import values_from_signal
-from indico.util.struct.enum import RichIntEnum
 from indico.util.user import iter_acl
 from indico.web.util import jsonify_template
 
@@ -36,7 +34,7 @@ class ProtectionMode(RichIntEnum):
     protected = 2
 
 
-class ProtectionMixin(object):
+class ProtectionMixin:
     #: Whether the object protection mode is disabled
     disable_protection_mode = False
     #: The protection modes that are not allowed.  Can be overridden
@@ -60,7 +58,7 @@ class ProtectionMixin(object):
 
     @classmethod
     def register_protection_events(cls):
-        """Registers sqlalchemy events needed by this mixin.
+        """Register sqlalchemy events needed by this mixin.
 
         Call this method after the definition of a model which uses
         this mixin class.
@@ -120,7 +118,7 @@ class ProtectionMixin(object):
 
     @hybrid_property
     def is_self_protected(self):
-        """Checks whether the object itself is protected.
+        """Check whether the object itself is protected.
 
         If you also care about inherited protection from a parent,
         use `is_protected` instead.
@@ -132,7 +130,7 @@ class ProtectionMixin(object):
     @property
     def is_protected(self):
         """
-        Checks whether ths object is protected, either by itself or
+        Check whether this object is protected, either by itself or
         by inheriting from a protected object.
         """
         if self.disable_protection_mode:
@@ -147,11 +145,11 @@ class ProtectionMixin(object):
         if self.disable_protection_mode:
             return 'protection_mode=disabled'
         protection_mode = self.protection_mode.name if self.protection_mode is not None else None
-        return 'protection_mode={}'.format(protection_mode)
+        return f'protection_mode={protection_mode}'
 
     @property
     def protection_parent(self):
-        """The parent object to consult for ProtectionMode.inheriting"""
+        """The parent object to consult for ProtectionMode.inheriting."""
         raise NotImplementedError
 
     def _check_can_access_override(self, user, allow_admin, authorized=None):
@@ -169,7 +167,7 @@ class ProtectionMixin(object):
 
     @memoize_request
     def can_access(self, user, allow_admin=True):
-        """Checks if the user can access the object.
+        """Check if the user can access the object.
 
         :param user: The :class:`.User` to check. May be None if the
                      user is not logged in.
@@ -217,7 +215,7 @@ class ProtectionMixin(object):
                     # This should be the case for the top-level object,
                     # i.e. the root category, which shouldn't allow
                     # ProtectionMode.inheriting as it makes no sense.
-                    raise TypeError('protection_parent of {} is None'.format(self))
+                    raise TypeError(f'protection_parent of {self} is None')
                 elif hasattr(parent, 'can_access'):
                     rv = parent.can_access(user, allow_admin=allow_admin)
                 else:
@@ -226,7 +224,7 @@ class ProtectionMixin(object):
         else:
             # should never happen, but since this is a sensitive area
             # we better fail loudly if we have garbage
-            raise ValueError('Invalid protection mode: {}'.format(self.protection_mode))
+            raise ValueError(f'Invalid protection mode: {self.protection_mode}')
 
         override = self._check_can_access_override(user, allow_admin=allow_admin, authorized=rv)
         return override if override is not None else rv
@@ -261,10 +259,10 @@ class ProtectionMixin(object):
     @property
     def _access_key_session_key(self):
         cls, pks = inspect(self).identity_key[:2]
-        return '{}-{}'.format(cls.__name__, '-'.join(map(unicode, pks)))
+        return '{}-{}'.format(cls.__name__, '-'.join(map(str, pks)))
 
     def update_principal(self, principal, read_access=None, quiet=False):
-        """Updates access privileges for the given principal.
+        """Update access privileges for the given principal.
 
         :param principal: A `User`, `GroupProxy` or `EmailPrincipal` instance.
         :param read_access: If the principal should have explicit read
@@ -300,7 +298,7 @@ class ProtectionMixin(object):
         return entry
 
     def remove_principal(self, principal, quiet=False):
-        """Revokes all access privileges for the given principal.
+        """Revoke all access privileges for the given principal.
 
         This method doesn't do anything if the user is not in the
         object's ACL.
@@ -327,7 +325,7 @@ class ProtectionMixin(object):
 class ProtectionManagersMixin(ProtectionMixin):
     @property
     def all_manager_emails(self):
-        """Return the emails of all managers"""
+        """Return the emails of all managers."""
         # We ignore email principals here. They never signed up in indico anyway...
         return {p.principal.email
                 for p in self.acl_entries
@@ -335,7 +333,7 @@ class ProtectionManagersMixin(ProtectionMixin):
 
     @memoize_request
     def can_manage(self, user, permission=None, allow_admin=True, check_parent=True, explicit_permission=False):
-        """Checks if the user can manage the object.
+        """Check if the user can manage the object.
 
         :param user: The :class:`.User` to check. May be None if the
                      user is not logged in.
@@ -363,12 +361,15 @@ class ProtectionManagersMixin(ProtectionMixin):
                                     to ``False``.
         """
         if permission is not None and permission != 'ANY' and permission not in get_available_permissions(type(self)):
-            raise ValueError("permission '{}' is not valid for '{}' objects".format(permission, type(self).__name__))
+            raise ValueError(f"permission '{permission}' is not valid for '{type(self).__name__}' objects")
 
         if user is None:
             # An unauthorized user is never allowed to perform management operations.
             # Not even signals may override this since management code generally
             # expects session.user to be not None.
+            return False
+        if user.is_system:
+            # A system user has no email and thus access checks (against groups) may fail
             return False
 
         # Trigger signals for protection overrides
@@ -404,11 +405,11 @@ class ProtectionManagersMixin(ProtectionMixin):
         elif hasattr(parent, 'can_manage'):
             return parent.can_manage(user, allow_admin=allow_admin)
         else:
-            raise TypeError('protection_parent of {} is of invalid type {} ({})'.format(self, type(parent), parent))
+            raise TypeError(f'protection_parent of {self} is of invalid type {type(parent)} ({parent})')
 
     def update_principal(self, principal, read_access=None, full_access=None, permissions=None, add_permissions=None,
                          del_permissions=None, quiet=False):
-        """Updates access privileges for the given principal.
+        """Update access privileges for the given principal.
 
         If the principal is not in the ACL, it will be added if
         necessary.  If the changes remove all its privileges, it
@@ -455,7 +456,7 @@ class ProtectionManagersMixin(ProtectionMixin):
                 new_permissions |= add_permissions
             if del_permissions:
                 new_permissions -= del_permissions
-        invalid_permissions = new_permissions - get_available_permissions(type(self)).viewkeys()
+        invalid_permissions = new_permissions - get_available_permissions(type(self)).keys()
         if invalid_permissions:
             raise ValueError('Invalid permissions: {}'.format(', '.join(invalid_permissions)))
         entry.permissions = sorted(new_permissions)
@@ -515,7 +516,7 @@ class ProtectionManagersMixin(ProtectionMixin):
 
 
 def _get_acl_data(obj, principal):
-    """Helper function to get the necessary data for ACL modifications
+    """Helper function to get the necessary data for ACL modifications.
 
     :param obj: A `ProtectionMixin` instance
     :param principal: A User or GroupProxy uinstance
@@ -528,7 +529,7 @@ def _get_acl_data(obj, principal):
 
 
 def _resolve_principal(principal):
-    """Helper function to convert an email principal to a user if possible
+    """Helper function to convert an email principal to a user if possible.
 
     :param principal: A `User`, `GroupProxy` or `EmailPrincipal` instance.
     """

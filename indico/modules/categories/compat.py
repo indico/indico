@@ -1,11 +1,9 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
-
-from __future__ import unicode_literals
 
 import re
 
@@ -21,9 +19,9 @@ from indico.web.rh import RHSimple
 def compat_category(legacy_category_id, path=None):
     if not re.match(r'^\d+l\d+$', legacy_category_id):
         abort(404)
-    mapping = LegacyCategoryMapping.find_first(legacy_category_id=legacy_category_id)
+    mapping = LegacyCategoryMapping.query.filter_by(legacy_category_id=legacy_category_id).first()
     if mapping is None:
-        raise NotFound('Legacy category {} does not exist'.format(legacy_category_id))
+        raise NotFound(f'Legacy category {legacy_category_id} does not exist')
     view_args = request.view_args.copy()
     view_args['legacy_category_id'] = mapping.category_id
     # To create the same URL with the proper ID we take advantage of the

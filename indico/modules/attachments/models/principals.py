@@ -1,18 +1,15 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
-
-from __future__ import unicode_literals
 
 from sqlalchemy.ext.declarative import declared_attr
 
 from indico.core.db import db
 from indico.core.db.sqlalchemy.principals import PrincipalMixin
 from indico.core.db.sqlalchemy.util.models import auto_table_args
-from indico.util.string import return_ascii
 
 
 class AttachmentFolderPrincipal(PrincipalMixin, db.Model):
@@ -42,9 +39,8 @@ class AttachmentFolderPrincipal(PrincipalMixin, db.Model):
     # relationship backrefs:
     # - folder (AttachmentFolder.acl_entries)
 
-    @return_ascii
     def __repr__(self):
-        return '<AttachmentFolderPrincipal({}, {}, {})>'.format(self.id, self.folder_id, self.principal)
+        return f'<AttachmentFolderPrincipal({self.id}, {self.folder_id}, {self.principal})>'
 
 
 class AttachmentPrincipal(PrincipalMixin, db.Model):
@@ -74,6 +70,5 @@ class AttachmentPrincipal(PrincipalMixin, db.Model):
     # relationship backrefs:
     # - attachment (Attachment.acl_entries)
 
-    @return_ascii
     def __repr__(self):
-        return '<AttachmentPrincipal({}, {}, {})>'.format(self.id, self.attachment_id, self.principal)
+        return f'<AttachmentPrincipal({self.id}, {self.attachment_id}, {self.principal})>'

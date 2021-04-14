@@ -1,11 +1,9 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
-
-from __future__ import unicode_literals
 
 from flask import request, session
 from werkzeug.exceptions import Forbidden
@@ -15,11 +13,11 @@ from indico.modules.events.sessions.models.sessions import Session
 
 
 class RHManageSessionsBase(RHManageEventBase):
-    """Base RH for all session management RHs"""
+    """Base RH for all session management RHs."""
 
 
 class RHManageSessionBase(RHManageSessionsBase):
-    """Base RH for management of a single session"""
+    """Base RH for management of a single session."""
 
     normalize_url_spec = {
         'locators': {
@@ -37,7 +35,7 @@ class RHManageSessionBase(RHManageSessionsBase):
 
 
 class RHManageSessionsActionsBase(RHManageSessionsBase):
-    """Base class for classes performing actions on sessions"""
+    """Base class for classes performing actions on sessions."""
 
     def _process_args(self):
         RHManageSessionsBase._process_args(self)

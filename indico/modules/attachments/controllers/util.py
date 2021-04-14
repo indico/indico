@@ -1,11 +1,9 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
-
-from __future__ import unicode_literals
 
 from flask import request
 from werkzeug.exceptions import NotFound
@@ -15,7 +13,7 @@ from indico.modules.attachments.models.folders import AttachmentFolder
 
 
 class SpecificAttachmentMixin:
-    """Mixin for RHs that reference a specific attachment"""
+    """Mixin for RHs that reference a specific attachment."""
 
     normalize_url_spec = {
         'args': {
@@ -30,13 +28,13 @@ class SpecificAttachmentMixin:
     }
 
     def _process_args(self):
-        self.attachment = Attachment.find_one(id=request.view_args['attachment_id'], is_deleted=False)
+        self.attachment = Attachment.query.filter_by(id=request.view_args['attachment_id'], is_deleted=False).one()
         if self.attachment.folder.is_deleted:
             raise NotFound
 
 
 class SpecificFolderMixin:
-    """Mixin for RHs that reference a specific folder"""
+    """Mixin for RHs that reference a specific folder."""
 
     normalize_url_spec = {
         'locators': {
@@ -46,4 +44,4 @@ class SpecificFolderMixin:
     }
 
     def _process_args(self):
-        self.folder = AttachmentFolder.find_one(id=request.view_args['folder_id'], is_deleted=False)
+        self.folder = AttachmentFolder.query.filter_by(id=request.view_args['folder_id'], is_deleted=False).one()

@@ -1,37 +1,40 @@
 // This file is part of Indico.
-// Copyright (C) 2002 - 2020 CERN
+// Copyright (C) 2002 - 2021 CERN
 //
 // Indico is free software; you can redistribute it and/or
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 /* global ajaxDialog:false */
 
+import anonymousTeamURL from 'indico-url:event_editing.api_anonymous_team';
+import enableEditingURL from 'indico-url:event_editing.api_editing_enabled';
+import selfAssignURL from 'indico-url:event_editing.api_self_assign_enabled';
+import enableSubmissionURL from 'indico-url:event_editing.api_submission_enabled';
+import contactEditingTeamURL from 'indico-url:event_editing.contact_team';
 import dashboardURL from 'indico-url:event_editing.dashboard';
 import manageEditableTypeListURL from 'indico-url:event_editing.manage_editable_type_list';
 import manageFileTypesURL from 'indico-url:event_editing.manage_file_types';
 import manageReviewConditionsURL from 'indico-url:event_editing.manage_review_conditions';
-import selfAssignURL from 'indico-url:event_editing.api_self_assign_enabled';
-import enableSubmissionURL from 'indico-url:event_editing.api_submission_enabled';
-import enableEditingURL from 'indico-url:event_editing.api_editing_enabled';
-import contactEditingTeamURL from 'indico-url:event_editing.contact_team';
 
 import React, {useState} from 'react';
 import {useParams, Link} from 'react-router-dom';
 import {Checkbox, Loader} from 'semantic-ui-react';
 
-import {Translate} from 'indico/react/i18n';
 import {ManagementPageSubTitle, ManagementPageBackButton} from 'indico/react/components';
-import {useNumericParam} from 'indico/react/util/routing';
 import {useTogglableValue} from 'indico/react/hooks';
+import {Translate} from 'indico/react/i18n';
+import {useNumericParam} from 'indico/react/util/routing';
+
 import {EditableTypeTitles, GetNextEditableTitles} from '../../models';
 import Section from '../Section';
-import TeamManager from './TeamManager';
+
 import NextEditable from './NextEditable';
+import TeamManager from './TeamManager';
 
 import './EditableTypeDashboard.module.scss';
 
 export default function EditableTypeDashboard() {
-  const eventId = useNumericParam('confId');
+  const eventId = useNumericParam('event_id');
   const {type} = useParams();
   const [editorManagerVisible, setEditorManagerVisible] = useState(false);
   const [selfAssignModalVisible, setSelfAssignModalVisible] = useState(false);
@@ -41,19 +44,26 @@ export default function EditableTypeDashboard() {
     toggleSelfAssign,
     selfAssignLoading,
     selfAssignSaving,
-  ] = useTogglableValue(selfAssignURL({confId: eventId, type}));
+  ] = useTogglableValue(selfAssignURL({event_id: eventId, type}));
+
+  const [
+    anonymousTeamEnabled,
+    toggleAnonymousTeam,
+    anonymousTeamLoading,
+    anonymousTeamSaving,
+  ] = useTogglableValue(anonymousTeamURL({event_id: eventId, type}));
 
   const [submissionEnabled, toggleSubmission, submissionLoading] = useTogglableValue(
-    enableSubmissionURL({confId: eventId, type})
+    enableSubmissionURL({event_id: eventId, type})
   );
 
   const [editingEnabled, toggleEditing, editingLoading] = useTogglableValue(
-    enableEditingURL({confId: eventId, type})
+    enableEditingURL({event_id: eventId, type})
   );
 
   const contactEditingTeam = () => {
     ajaxDialog({
-      url: contactEditingTeamURL({confId: eventId, type}),
+      url: contactEditingTeamURL({event_id: eventId, type}),
       title: Translate.string('Send emails to the editing team'),
     });
   };
@@ -67,8 +77,8 @@ export default function EditableTypeDashboard() {
   return (
     <>
       <ManagementPageSubTitle title={EditableTypeTitles[type]} />
-      <ManagementPageBackButton url={dashboardURL({confId: eventId})} />
-      {selfAssignLoading || submissionLoading || editingLoading ? (
+      <ManagementPageBackButton url={dashboardURL({event_id: eventId})} />
+      {selfAssignLoading || anonymousTeamLoading || submissionLoading || editingLoading ? (
         <Loader active />
       ) : (
         <>
@@ -108,7 +118,7 @@ export default function EditableTypeDashboard() {
             >
               <Link
                 className="i-button icon-settings"
-                to={manageFileTypesURL({confId: eventId, type})}
+                to={manageFileTypesURL({event_id: eventId, type})}
               >
                 <Translate>Configure</Translate>
               </Link>
@@ -120,7 +130,7 @@ export default function EditableTypeDashboard() {
             >
               <Link
                 className="i-button icon-settings"
-                to={manageReviewConditionsURL({confId: eventId, type})}
+                to={manageReviewConditionsURL({event_id: eventId, type})}
               >
                 <Translate>Configure</Translate>
               </Link>
@@ -130,6 +140,13 @@ export default function EditableTypeDashboard() {
               label={Translate.string('Editing team')}
               description={Translate.string('Configure editing team')}
             >
+              <Checkbox
+                styleName="toolbar-checkbox"
+                toggle
+                checked={anonymousTeamEnabled}
+                onClick={!anonymousTeamSaving ? toggleAnonymousTeam : null}
+                label={Translate.string('Keep editing team members anonymous')}
+              />
               <a className="i-button icon-mail" onClick={contactEditingTeam}>
                 <Translate>Contact</Translate>
               </a>
@@ -154,7 +171,7 @@ export default function EditableTypeDashboard() {
               />
               <Link
                 className="i-button icon-settings"
-                to={manageEditableTypeListURL({confId: eventId, type})}
+                to={manageEditableTypeListURL({event_id: eventId, type})}
               >
                 <Translate>List</Translate>
               </Link>

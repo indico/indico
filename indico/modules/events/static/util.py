@@ -1,17 +1,15 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import unicode_literals
-
 import base64
 import mimetypes
 import re
-import urlparse
 from contextlib import contextmanager
+from urllib.parse import urlsplit, urlunsplit
 
 import requests
 from flask import current_app, g, request
@@ -54,7 +52,7 @@ def _create_data_uri(url, filename):
     data = base64.b64encode(response.content)
     content_type = (mimetypes.guess_type(filename)[0] or
                     response.headers.get('Content-Type', 'application/octet-stream'))
-    return 'data:{};base64,{}'.format(content_type, data)
+    return f'data:{content_type};base64,{data}'
 
 
 def _rewrite_event_asset_url(event, url):
@@ -62,7 +60,7 @@ def _rewrite_event_asset_url(event, url):
 
     Only assets contained within the event will be taken into account
     """
-    scheme, netloc, path, qs, anchor = urlparse.urlsplit(url)
+    scheme, netloc, path, qs, anchor = urlsplit(url)
     netloc = netloc or current_app.config['SERVER_NAME']
     scheme = scheme or 'https'
 
@@ -73,20 +71,20 @@ def _rewrite_event_asset_url(event, url):
         endpoint_info = endpoint_for_url(path)
         if endpoint_info:
             endpoint, data = endpoint_info
-            if endpoint == 'event_images.image_display' and int(data['confId']) == event.id:
+            if endpoint == 'event_images.image_display' and data['event_id'] == event.id:
                 image_file = ImageFile.get(data['image_id'])
                 if image_file and image_file.event == event:
-                    return 'images/{}-{}'.format(image_file.id, image_file.filename), image_file
+                    return f'images/{image_file.id}-{image_file.filename}', image_file
     # if the URL is not internal or just not an image,
     # we embed the contents using a data URI
-    data_uri = _create_data_uri(urlparse.urlunsplit((scheme, netloc, path, qs, '')), urlparse.urlsplit(path)[-1])
+    data_uri = _create_data_uri(urlunsplit((scheme, netloc, path, qs, '')), urlsplit(path)[-1])
     return data_uri, None
 
 
 def _remove_anchor(url):
     """Remove the anchor from a URL."""
-    scheme, netloc, path, qs, anchor = urlparse.urlsplit(url)
-    return urlparse.urlunsplit((scheme, netloc, path, qs, ''))
+    scheme, netloc, path, qs, anchor = urlsplit(url)
+    return urlunsplit((scheme, netloc, path, qs, ''))
 
 
 def rewrite_css_urls(event, css):
@@ -102,18 +100,18 @@ def rewrite_css_urls(event, css):
             rewritten_url, image_file = _rewrite_event_asset_url(event, prefix + url)
             if image_file:
                 used_images.add(image_file)
-            return 'url({})'.format(rewritten_url)
+            return f'url({rewritten_url})'
         else:
             rewritten_url = rewrite_static_url(url)
             used_urls.add(_remove_anchor(rewritten_url))
             if url.startswith('/static/plugins/'):
-                return "url('../../../../../{}')".format(rewritten_url)
+                return f"url('../../../../../{rewritten_url}')"
             else:
-                return "url('../../../{}')".format(rewritten_url)
+                return f"url('../../../{rewritten_url}')"
 
     indico_path = url_parse(config.BASE_URL).path
-    new_css = re.sub(_css_url_pattern.format(indico_path), _replace_url, css.decode('utf-8'), flags=re.MULTILINE)
-    return new_css.encode('utf-8'), used_urls, used_images
+    new_css = re.sub(_css_url_pattern.format(indico_path), _replace_url, css, flags=re.MULTILINE)
+    return new_css, used_urls, used_images
 
 
 def url_to_static_filename(endpoint, url):
@@ -130,7 +128,7 @@ def url_to_static_filename(endpoint, url):
         url = rewrite_static_url(url)
     else:
         # get rid of [/whatever]/event/1234
-        url = re.sub(r'{}(?:/event/\d+)?/(.*)'.format(indico_path), r'\1', url)
+        url = re.sub(fr'{indico_path}(?:/event/\d+)?/(.*)', r'\1', url)
         if not url.startswith('assets/'):
             # replace all remaining slashes
             url = url.rstrip('/').replace('/', '--')
@@ -160,9 +158,9 @@ class RewrittenManifest(Manifest):
     """A manifest that rewrites its asset paths."""
 
     def __init__(self, manifest):
-        super(RewrittenManifest, self).__init__()
+        super().__init__()
         self._entries = {k: JinjaManifestEntry(entry.name, self._rewrite_paths(entry._paths))
-                         for k, entry in manifest._entries.viewitems()}
+                         for k, entry in manifest._entries.items()}
         self.used_assets = set()
 
     def _rewrite_paths(self, paths):
@@ -170,7 +168,7 @@ class RewrittenManifest(Manifest):
 
     def __getitem__(self, key):
         self.used_assets.add(key)
-        return super(RewrittenManifest, self).__getitem__(key)
+        return super().__getitem__(key)
 
 
 @contextmanager
@@ -180,7 +178,7 @@ def collect_static_files():
     g.used_url_for_assets = set()
     used_assets = set()
     yield used_assets
-    for manifest in g.custom_manifests.viewvalues():
+    for manifest in g.custom_manifests.values():
         used_assets |= {p for k in manifest.used_assets for p in manifest[k]._paths}
     used_assets |= {rewrite_static_url(url) for url in g.used_url_for_assets}
     del g.custom_manifests

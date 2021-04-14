@@ -1,11 +1,9 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
-
-from __future__ import unicode_literals
 
 from indico.modules.events.timetable.controllers.display import (RHTimetable, RHTimetableEntryInfo,
                                                                  RHTimetableExportDefaultPDF, RHTimetableExportPDF)
@@ -32,7 +30,7 @@ from indico.web.flask.wrappers import IndicoBlueprint
 
 
 _bp = IndicoBlueprint('timetable', __name__, template_folder='templates', virtual_template_folder='events/timetable',
-                      url_prefix='/event/<confId>')
+                      url_prefix='/event/<int:event_id>')
 
 # Management
 _bp.add_url_rule('/manage/timetable/', 'management', RHManageTimetable)

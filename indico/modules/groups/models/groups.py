@@ -1,16 +1,13 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import unicode_literals
-
 from sqlalchemy.ext.declarative import declared_attr
 
 from indico.core.db import db
-from indico.util.string import return_ascii
 
 
 class LocalGroup(db.Model):
@@ -55,13 +52,12 @@ class LocalGroup(db.Model):
     # - in_settings_acls (SettingPrincipal.local_group)
     # - in_track_acls (TrackPrincipal.local_group)
 
-    @return_ascii
     def __repr__(self):
-        return '<LocalGroup({}, {})>'.format(self.id, self.name)
+        return f'<LocalGroup({self.id}, {self.name})>'
 
     @property
     def proxy(self):
-        """Returns a GroupProxy wrapping this group"""
+        """Return a GroupProxy wrapping this group."""
         from indico.modules.groups import GroupProxy
         return GroupProxy(self.id, _group=self)
 

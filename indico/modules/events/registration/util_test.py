@@ -1,11 +1,9 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
-
-from __future__ import unicode_literals
 
 from datetime import datetime
 from io import BytesIO
@@ -54,12 +52,23 @@ def test_import_registrations(dummy_regform, dummy_user):
     assert 'phone' not in data
 
 
-def test_import_error(dummy_regform):
+def test_import_error(dummy_regform, dummy_user, create_user):
+    dummy_user.secondary_emails.add('dummy@example.com')
+
     create_registration(dummy_regform, {
         'email': 'boss@example.com',
         'first_name': 'Big',
         'last_name': 'Boss'
     }, notify_user=False)
+
+    create_registration(dummy_regform, {
+        'email': '1337@example.com',
+        'first_name': 'Guinea',
+        'last_name': 'Pig'
+    }, notify_user=False)
+
+    user = create_user(123, email='test1@example.com')
+    user.secondary_emails.add('test2@example.com')
 
     # missing column
     csv = b'\n'.join([b'John,Doe,ACME Inc.,Regional Manager,+1-202-555-0140,jdoe@example.com',
@@ -105,6 +114,22 @@ def test_import_error(dummy_regform):
     assert 'a registration with this email already exists' in str(e.value)
     assert 'Row 1' in str(e.value)
 
+    # duplicate user (csv)
+    csv = b'\n'.join([b'Big,Boss,ACME Inc.,Supreme Leader,+1-202-555-1337,test1@example.com',
+                      b'Little,Boss,ACME Inc.,Wannabe Leader,+1-202-555-1338,test2@EXAMPLE.com'])
+
+    with pytest.raises(UserValueError) as e:
+        import_registrations_from_csv(dummy_regform, BytesIO(csv))
+    assert 'Row 2: email address belongs to the same user as in row 1' in str(e.value)
+
+    # duplicate user (registration)
+    csv = b'\n'.join([b'Big,Boss,ACME Inc.,Supreme Leader,+1-202-555-1337,dummy@example.com'])
+
+    with pytest.raises(UserValueError) as e:
+        import_registrations_from_csv(dummy_regform, BytesIO(csv))
+    assert 'a registration for this user already exists' in str(e.value)
+    assert 'Row 1' in str(e.value)
+
     # missing first name
     csv = b'\n'.join([b'Ray,Doe,ACME Inc.,Regional Manager,+1-202-555-0140,rdoe@example.com',
                       b',Buggy,ACME Inc.,CEO,,buggy@example.com'])
@@ -137,7 +162,7 @@ def test_get_event_regforms_no_registration(dummy_event, dummy_user, dummy_regfo
     regforms, registrations = get_event_regforms_registrations(dummy_event, dummy_user, include_scheduled)
 
     assert (dummy_regform in regforms) == expected_regform_flag
-    assert registrations.values() == [None]
+    assert list(registrations.values()) == [None]
 
 
 @pytest.mark.parametrize(('start_dt', 'end_dt', 'include_scheduled'), (
@@ -159,7 +184,7 @@ def test_get_event_regforms_registration(dummy_event, dummy_user, dummy_regform,
 
     regforms, registrations = get_event_regforms_registrations(dummy_event, dummy_user, include_scheduled=False)
 
-    assert registrations.values()[0].user == dummy_user
+    assert list(registrations.values())[0].user == dummy_user
     assert dummy_regform in regforms
 
 

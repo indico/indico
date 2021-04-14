@@ -1,16 +1,17 @@
 // This file is part of Indico.
-// Copyright (C) 2002 - 2020 CERN
+// Copyright (C) 2002 - 2021 CERN
 //
 // Indico is free software; you can redistribute it and/or
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-import React from 'react';
 import PropTypes from 'prop-types';
-import {useSelector} from 'react-redux';
+import React from 'react';
 import {Form as FinalForm} from 'react-final-form';
+import {useSelector} from 'react-redux';
 import {Button, Form, Popup} from 'semantic-ui-react';
 
+import {FinalRating} from 'indico/react/components/ReviewRating';
 import {
   FinalDropdown,
   FinalInput,
@@ -18,7 +19,6 @@ import {
   FinalTextArea,
   FinalSubmitButton,
 } from 'indico/react/forms';
-import {FinalRating} from 'indico/react/components/ReviewRating';
 import {Param, Translate} from 'indico/react/i18n';
 
 import {getReviewingQuestions, getPaperEvent} from '../selectors';

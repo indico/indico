@@ -1,89 +1,9 @@
 // This file is part of Indico.
-// Copyright (C) 2002 - 2020 CERN
+// Copyright (C) 2002 - 2021 CERN
 //
 // Indico is free software; you can redistribute it and/or
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
-
-type('InlineWidget', ['IWidget'], {
-  _error: function(error) {
-    showErrorDialog(error);
-  },
-});
-
-/*
- * This class implements a widget that interacts directly with the
- * remote server. States are handled, through a callback interface.
- */
-type(
-  'InlineRemoteWidget',
-  ['InlineWidget'],
-
-  {
-    _handleError: function(error) {
-      this._error(error);
-    },
-
-    _handleLoading: function(error) {
-      return Html.span({}, 'loading...');
-    },
-
-    _handleLoaded: function() {
-      // do nothing, overload
-    },
-
-    _handleSuccess: function() {
-      // do nothing, overload
-    },
-
-    _handleBackToEditMode: function() {
-      // do nothing, overload
-    },
-
-    draw: function() {
-      var self = this;
-
-      var content = this._handleContent();
-
-      // if the widget is set to load on startup,
-      // the content will be a 'loading' message
-      this.wcanvas = Html.div({}, this.loadOnStartup ? this._handleLoading() : content);
-
-      // observe state changes and call
-      // the handlers accordingly
-      this.source.state.observe(function(state) {
-        if (state == SourceState.Error) {
-          self._handleError(self.source.error.get());
-          self.wcanvas.set(content);
-          self.setMode('edit');
-          self._handleBackToEditMode();
-        } else if (state == SourceState.Loaded) {
-          self._handleLoaded(self.source.get());
-          self.wcanvas.set(content);
-          self.setMode('display');
-          self._handleSuccess();
-        } else {
-          self.wcanvas.set(self._handleLoading());
-        }
-      });
-
-      return self.wcanvas;
-    },
-  },
-  /*
-   * method - remote method
-   * attributes - attributes that are passed
-   * loadOnStartup - should the widget start loading from the
-   * server automatically?
-   */
-  function(method, attributes, loadOnStartup, callback) {
-    loadOnStartup = exists(loadOnStartup) ? loadOnStartup : true;
-    this.ready = new WatchValue();
-    this.ready.set(false);
-    this.loadOnStartup = loadOnStartup;
-    this.source = indicoSource(method, attributes, null, !loadOnStartup, callback);
-  }
-);
 
 type(
   'RealtimeTextBox',

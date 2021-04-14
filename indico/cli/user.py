@@ -1,11 +1,9 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
-
-from __future__ import print_function, unicode_literals
 
 import click
 from flask_multipass import IdentityInfo
@@ -18,10 +16,6 @@ from indico.modules.users import User
 from indico.modules.users.operations import create_user
 from indico.modules.users.util import search_users
 from indico.util.console import cformat, prompt_email, prompt_pass
-from indico.util.string import to_unicode
-
-
-click.disable_unicode_literals_warning = True
 
 
 @cli_group()
@@ -41,11 +35,11 @@ def _print_user_info(user):
         flags.append('%{cyan}pending%{reset}')
     print()
     print('User info:')
-    print("  ID: {}".format(user.id))
-    print("  First name: {}".format(user.first_name))
-    print("  Family name: {}".format(user.last_name))
-    print("  Email: {}".format(user.email))
-    print("  Affiliation: {}".format(user.affiliation))
+    print(f"  ID: {user.id}")
+    print(f"  First name: {user.first_name}")
+    print(f"  Family name: {user.last_name}")
+    print(f"  Email: {user.email}")
+    print(f"  Affiliation: {user.affiliation}")
     if flags:
         print(cformat("  Flags: {}".format(', '.join(flags))))
     print()
@@ -73,9 +67,9 @@ def _safe_lower(s):
 @click.option('--email', '-e', help='Email address of the user')
 @click.option('--affiliation', '-a', help='Affiliation of the user')
 def search(substring, include_deleted, include_pending, include_blocked, include_external, include_system, **criteria):
-    """Searches users matching some criteria"""
-    assert set(criteria.viewkeys()) == {'first_name', 'last_name', 'email', 'affiliation'}
-    criteria = {k: v for k, v in criteria.viewitems() if v is not None}
+    """Search users matching some criteria."""
+    assert set(criteria.keys()) == {'first_name', 'last_name', 'email', 'affiliation'}
+    criteria = {k: v for k, v in criteria.items() if v is not None}
     res = search_users(exact=(not substring), include_deleted=include_deleted, include_pending=include_pending,
                        include_blocked=include_blocked, external=include_external,
                        allow_system_user=include_system, **criteria)
@@ -83,7 +77,7 @@ def search(substring, include_deleted, include_pending, include_blocked, include
         print(cformat('%{yellow}No results found'))
         return
     elif len(res) > 100:
-        click.confirm('{} results found. Show them anyway?'.format(len(res)), abort=True)
+        click.confirm(f'{len(res)} results found. Show them anyway?', abort=True)
     users = sorted((u for u in res if isinstance(u, User)), key=lambda x: (x.first_name.lower(), x.last_name.lower(),
                                                                            x.email))
     externals = sorted((ii for ii in res if isinstance(ii, IdentityInfo)),
@@ -92,7 +86,7 @@ def search(substring, include_deleted, include_pending, include_blocked, include
     if users:
         table_data = [['ID', 'First Name', 'Last Name', 'Email', 'Affiliation']]
         for user in users:
-            table_data.append([unicode(user.id), user.first_name, user.last_name, user.email, user.affiliation])
+            table_data.append([str(user.id), user.first_name, user.last_name, user.email, user.affiliation])
         table = AsciiTable(table_data, cformat('%{white!}Users%{reset}'))
         table.justify_columns[0] = 'right'
         print(table.table)
@@ -111,7 +105,7 @@ def search(substring, include_deleted, include_pending, include_blocked, include
 @cli.command()
 @click.option('--admin/--no-admin', '-a/', 'grant_admin', is_flag=True, help='Grant admin rights')
 def create(grant_admin):
-    """Creates a new user"""
+    """Create a new user."""
     user_type = 'user' if not grant_admin else 'admin'
     while True:
         email = prompt_email()
@@ -127,7 +121,7 @@ def create(grant_admin):
     print()
     while True:
         username = click.prompt("Enter username").lower().strip()
-        if not Identity.find(provider='indico', identifier=username).count():
+        if not Identity.query.filter_by(provider='indico', identifier=username).has_rows():
             break
         print(cformat('%{red}Username already exists'))
     password = prompt_pass()
@@ -135,8 +129,7 @@ def create(grant_admin):
         return
 
     identity = Identity(provider='indico', identifier=username, password=password)
-    user = create_user(email, {'first_name': to_unicode(first_name), 'last_name': to_unicode(last_name),
-                               'affiliation': to_unicode(affiliation)}, identity)
+    user = create_user(email, {'first_name': first_name, 'last_name': last_name, 'affiliation': affiliation}, identity)
     user.is_admin = grant_admin
     _print_user_info(user)
 
@@ -149,7 +142,7 @@ def create(grant_admin):
 @cli.command()
 @click.argument('user_id', type=int)
 def grant_admin(user_id):
-    """Grants administration rights to a given user"""
+    """Grant administration rights to a given user."""
     user = User.get(user_id)
     if user is None:
         print(cformat("%{red}This user does not exist"))
@@ -167,7 +160,7 @@ def grant_admin(user_id):
 @cli.command()
 @click.argument('user_id', type=int)
 def revoke_admin(user_id):
-    """Revokes administration rights from a given user"""
+    """Revoke administration rights from a given user."""
     user = User.get(user_id)
     if user is None:
         print(cformat("%{red}This user does not exist"))
@@ -185,7 +178,7 @@ def revoke_admin(user_id):
 @cli.command()
 @click.argument('user_id', type=int)
 def block(user_id):
-    """Blocks a given user"""
+    """Block a given user."""
     user = User.get(user_id)
     if user is None:
         print(cformat("%{red}This user does not exist"))
@@ -203,7 +196,7 @@ def block(user_id):
 @cli.command()
 @click.argument('user_id', type=int)
 def unblock(user_id):
-    """Unblocks a given user"""
+    """Unblock a given user."""
     user = User.get(user_id)
     if user is None:
         print(cformat("%{red}This user does not exist"))

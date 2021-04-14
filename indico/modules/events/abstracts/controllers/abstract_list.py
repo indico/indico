@@ -1,11 +1,9 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
-
-from __future__ import unicode_literals
 
 from collections import defaultdict
 from operator import attrgetter
@@ -34,7 +32,7 @@ from indico.web.util import jsonify_data, jsonify_form, jsonify_template
 
 
 class RHAbstractListBase(RHManageAbstractsBase):
-    """Base class for all RHs using the abstract list generator"""
+    """Base class for all RHs using the abstract list generator."""
 
     def _process_args(self):
         RHManageAbstractsBase._process_args(self)
@@ -42,7 +40,7 @@ class RHAbstractListBase(RHManageAbstractsBase):
 
 
 class RHManageAbstractsActionsBase(RHAbstractListBase):
-    """Base class for RHs performing actions on selected abstracts"""
+    """Base class for RHs performing actions on selected abstracts."""
 
     _abstract_query_options = ()
 
@@ -55,12 +53,12 @@ class RHManageAbstractsActionsBase(RHAbstractListBase):
 
     def _process_args(self):
         RHAbstractListBase._process_args(self)
-        ids = map(int, request.form.getlist('abstract_id'))
+        ids = request.form.getlist('abstract_id', type=int)
         self.abstracts = self._abstract_query.filter(Abstract.id.in_(ids)).all()
 
 
 class RHBulkAbstractJudgment(RHManageAbstractsActionsBase):
-    """Perform bulk judgment operations on selected abstracts"""
+    """Perform bulk judgment operations on selected abstracts."""
 
     def _process(self):
         form = BulkAbstractJudgmentForm(event=self.event, abstract_id=[a.id for a in self.abstracts],
@@ -91,7 +89,7 @@ class RHAbstractList(DisplayAbstractListMixin, RHAbstractListBase):
     def _render_template(self, **kwargs):
         kwargs['track_session_map'] = {track.id: track.default_session_id for track in self.event.tracks}
         can_create = can_create_invited_abstracts(self.event)
-        return super(RHAbstractList, self)._render_template(can_create_invited_abstracts=can_create, **kwargs)
+        return super()._render_template(can_create_invited_abstracts=can_create, **kwargs)
 
 
 class RHAbstractListCustomize(CustomizeAbstractListMixin, RHAbstractListBase):
@@ -100,7 +98,7 @@ class RHAbstractListCustomize(CustomizeAbstractListMixin, RHAbstractListBase):
 
 
 class RHAbstractListStaticURL(RHAbstractListBase):
-    """Generate a static URL for the configuration of the abstract list"""
+    """Generate a static URL for the configuration of the abstract list."""
 
     ALLOW_LOCKED = True
 
@@ -169,7 +167,7 @@ class RHDeleteAbstracts(RHManageAbstractsActionsBase):
 
 
 class RHAbstractPersonList(RHManageAbstractsActionsBase):
-    """List of persons somehow related to abstracts (co-authors, speakers...)"""
+    """List of persons somehow related to abstracts (co-authors, speakers...)."""
 
     ALLOW_LOCKED = True
 
@@ -180,7 +178,9 @@ class RHAbstractPersonList(RHManageAbstractsActionsBase):
 
     def _process(self):
         submitters = {abstract.submitter for abstract in self.abstracts}
-        abstract_persons = AbstractPersonLink.find_all(AbstractPersonLink.abstract.has(self._membership_filter))
+        abstract_persons = (AbstractPersonLink.query
+                            .filter(AbstractPersonLink.abstract.has(self._membership_filter))
+                            .all())
         abstract_persons_dict = defaultdict(lambda: {'speaker': False, 'submitter': False, 'primary_author': False,
                                                      'secondary_author': False})
         for abstract_person in abstract_persons:

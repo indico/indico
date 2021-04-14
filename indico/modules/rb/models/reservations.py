@@ -1,13 +1,11 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import unicode_literals
-
-from collections import OrderedDict, defaultdict
+from collections import defaultdict
 from datetime import datetime
 
 from sqlalchemy import Date, Time
@@ -33,10 +31,10 @@ from indico.modules.rb.notifications.reservations import (notify_cancellation, n
                                                           notify_modification, notify_rejection, notify_reset_approval)
 from indico.modules.rb.util import get_prebooking_collisions, rb_is_admin
 from indico.util.date_time import format_date, format_time, now_utc
+from indico.util.enum import IndicoEnum
 from indico.util.i18n import _
 from indico.util.serializer import Serializer
-from indico.util.string import format_repr, return_ascii, to_unicode
-from indico.util.struct.enum import IndicoEnum
+from indico.util.string import format_repr
 from indico.web.flask.util import url_for
 
 
@@ -51,7 +49,7 @@ class RepeatFrequency(int, IndicoEnum):
     MONTH = 3
 
 
-class RepeatMapping(object):
+class RepeatMapping:
     mapping = {
         (RepeatFrequency.NEVER, 0): ('Single reservation',            None, 'none'),  # noqa: E241
         (RepeatFrequency.DAY,   1): ('Repeat daily',                  0,    'daily'),  # noqa: E241
@@ -70,9 +68,9 @@ class RepeatMapping(object):
         elif repeat_frequency == RepeatFrequency.DAY:
             return 'daily booking'
         elif repeat_frequency == RepeatFrequency.WEEK:
-            return 'weekly' if repeat_interval == 1 else 'every {} weeks'.format(repeat_interval)
+            return 'weekly' if repeat_interval == 1 else f'every {repeat_interval} weeks'
         elif repeat_frequency == RepeatFrequency.MONTH:
-            return 'monthly' if repeat_interval == 1 else 'every {} months'.format(repeat_interval)
+            return 'monthly' if repeat_interval == 1 else f'every {repeat_interval} months'
 
     @classmethod
     def get_short_name(cls, repeat_frequency, repeat_interval):
@@ -313,19 +311,19 @@ class Reservation(Serializer, db.Model):
     def event(self):
         return self.link.event if self.link else None
 
-    @return_ascii
     def __repr__(self):
         return format_repr(self, 'id', 'room_id', 'start_dt', 'end_dt', 'state', _text=self.booking_reason)
 
     @classmethod
     def create_from_data(cls, room, data, user, prebook=None, ignore_admin=False):
-        """Creates a new reservation.
+        """Create a new reservation.
 
         :param room: The Room that's being booked.
         :param data: A dict containing the booking data, usually from a :class:`NewBookingConfirmForm` instance
         :param user: The :class:`.User` who creates the booking.
         :param prebook: Instead of determining the booking type from the user's
                         permissions, always use the given mode.
+        :param ignore_admin: Whether to ignore the user's admin status.
         """
 
         populate_fields = ('start_dt', 'end_dt', 'repeat_frequency', 'repeat_interval', 'room_id', 'booking_reason')
@@ -349,7 +347,7 @@ class Reservation(Serializer, db.Model):
         reservation.booked_for_name = reservation.booked_for_user.full_name
         reservation.state = ReservationState.pending if prebook else ReservationState.accepted
         reservation.created_by_user = user
-        reservation.create_occurrences(True)
+        reservation.create_occurrences(True, allow_admin=(not ignore_admin))
         if not any(occ.is_valid for occ in reservation.occurrences):
             raise NoReportError(_('Reservation has no valid occurrences'))
         db.session.flush()
@@ -366,7 +364,7 @@ class Reservation(Serializer, db.Model):
         limit_per_room = kwargs.pop('limit_per_room', False)
         occurs_on = kwargs.pop('occurs_on')
         if kwargs:
-            raise ValueError('Unexpected kwargs: {}'.format(kwargs))
+            raise ValueError(f'Unexpected kwargs: {kwargs}')
 
         query = Reservation.query.options(joinedload(Reservation.room))
         if filters:
@@ -388,30 +386,31 @@ class Reservation(Serializer, db.Model):
             if offset:
                 query = query.offset(offset)
 
-        result = OrderedDict((r.id, {'reservation': r}) for r in query)
+        result = {r.id: {'reservation': r} for r in query}
 
         if 'occurrences' in args:
             occurrence_data = OrderedMultiDict(db.session.query(ReservationOccurrence.reservation_id,
                                                                 ReservationOccurrence)
-                                               .filter(ReservationOccurrence.reservation_id.in_(result.iterkeys()))
+                                               .filter(ReservationOccurrence.reservation_id.in_(result.keys()))
                                                .order_by(ReservationOccurrence.start_dt))
-            for id_, data in result.iteritems():
+            for id_, data in result.items():
                 data['occurrences'] = occurrence_data.getlist(id_)
 
-        return result.values()
+        return list(result.values())
 
     @staticmethod
     def find_overlapping_with(room, occurrences, skip_reservation_id=None):
-        return Reservation.find(Reservation.room == room,
-                                Reservation.id != skip_reservation_id,
-                                ReservationOccurrence.is_valid,
-                                ReservationOccurrence.filter_overlap(occurrences),
-                                _join=ReservationOccurrence)
+        return (Reservation.query
+                .filter(Reservation.room == room,
+                        Reservation.id != skip_reservation_id,
+                        ReservationOccurrence.is_valid,
+                        ReservationOccurrence.filter_overlap(occurrences))
+                .join(ReservationOccurrence))
 
     def accept(self, user, reason=None):
         self.state = ReservationState.accepted
         if reason:
-            log_msg = 'Reservation accepted: {}'.format(reason)
+            log_msg = f'Reservation accepted: {reason}'
         else:
             log_msg = 'Reservation accepted'
         self.add_edit_log(ReservationEditLog(user_name=user.full_name, info=[log_msg]))
@@ -437,7 +436,7 @@ class Reservation(Serializer, db.Model):
         signals.rb.booking_state_changed.send(self)
         if not silent:
             notify_cancellation(self)
-            log_msg = 'Reservation cancelled: {}'.format(reason) if reason else 'Reservation cancelled'
+            log_msg = f'Reservation cancelled: {reason}' if reason else 'Reservation cancelled'
             self.add_edit_log(ReservationEditLog(user_name=user.full_name, info=[log_msg]))
 
     def reject(self, user, reason, silent=False):
@@ -450,7 +449,7 @@ class Reservation(Serializer, db.Model):
         signals.rb.booking_state_changed.send(self)
         if not silent:
             notify_rejection(self)
-            log_msg = 'Reservation rejected: {}'.format(reason)
+            log_msg = f'Reservation rejected: {reason}'
             self.add_edit_log(ReservationEditLog(user_name=user.full_name, info=[log_msg]))
 
     def add_edit_log(self, edit_log):
@@ -474,6 +473,8 @@ class Reservation(Serializer, db.Model):
             return False
         if self.is_rejected or self.is_cancelled or self.is_archived:
             return False
+        if not self.occurrences.filter(ReservationOccurrence.is_within_cancel_grace_period).has_rows():
+            return False
 
         is_booked_or_owned_by_user = self.is_owned_by(user) or self.is_booked_for(user)
         return is_booked_or_owned_by_user or (allow_admin and rb_is_admin(user))
@@ -492,7 +493,7 @@ class Reservation(Serializer, db.Model):
             return False
         return allow_admin and rb_is_admin(user) and (self.is_cancelled or self.is_rejected)
 
-    def create_occurrences(self, skip_conflicts, user=None):
+    def create_occurrences(self, skip_conflicts, user=None, allow_admin=True):
         ReservationOccurrence.create_series_for_reservation(self)
         db.session.flush()
 
@@ -500,7 +501,8 @@ class Reservation(Serializer, db.Model):
             user = self.created_by_user
 
         # Check for conflicts with nonbookable periods
-        if not rb_is_admin(user) and not self.room.can_manage(user, permission='override'):
+        admin = allow_admin and rb_is_admin(user)
+        if not admin and not self.room.can_manage(user, permission='override'):
             nonbookable_periods = self.room.nonbookable_periods.filter(NonBookablePeriod.end_dt > self.start_dt)
             for occurrence in self.occurrences:
                 if not occurrence.is_valid:
@@ -516,7 +518,7 @@ class Reservation(Serializer, db.Model):
         blocked_rooms = self.room.get_blocked_rooms(*(occurrence.start_dt for occurrence in self.occurrences))
         for br in blocked_rooms:
             blocking = br.blocking
-            if blocking.can_override(user, room=self.room):
+            if blocking.can_override(user, room=self.room, allow_admin=allow_admin):
                 continue
             for occurrence in self.occurrences:
                 if occurrence.is_valid and blocking.is_active_at(occurrence.start_dt.date()):
@@ -526,7 +528,7 @@ class Reservation(Serializer, db.Model):
 
         # Check for conflicts with other occurrences
         conflicting_occurrences = self.get_conflicting_occurrences()
-        for occurrence, conflicts in conflicting_occurrences.iteritems():
+        for occurrence, conflicts in conflicting_occurrences.items():
             if not occurrence.is_valid:
                 continue
             if conflicts['confirmed']:
@@ -549,6 +551,8 @@ class Reservation(Serializer, db.Model):
 
     def get_conflicting_occurrences(self):
         valid_occurrences = self.occurrences.filter(ReservationOccurrence.is_valid).all()
+        if not valid_occurrences:
+            raise NoReportError(_('Reservation has no valid occurrences'))
         colliding_occurrences = ReservationOccurrence.find_overlapping_with(self.room, valid_occurrences, self.id).all()
         conflicts = defaultdict(lambda: dict(confirmed=[], pending=[]))
         for occurrence in valid_occurrences:
@@ -565,7 +569,7 @@ class Reservation(Serializer, db.Model):
         return self.created_by_user == user
 
     def modify(self, data, user):
-        """Modifies an existing reservation.
+        """Modify an existing reservation.
 
         :param data: A dict containing the booking data, usually from a :class:`ModifyBookingForm` instance
         :param user: The :class:`.User` who modifies the booking.
@@ -581,13 +585,13 @@ class Reservation(Serializer, db.Model):
         repetition_fields = {'repeat_frequency', 'repeat_interval'}
         # pretty names for logging
         field_names = {
-            'start_dt/date': u"start date",
-            'end_dt/date': u"end date",
-            'start_dt/time': u"start time",
-            'end_dt/time': u"end time",
-            'repetition': u"booking type",
-            'booked_for_user': u"'Booked for' user",
-            'booking_reason': u"booking reason",
+            'start_dt/date': "start date",
+            'end_dt/date': "end date",
+            'start_dt/time': "start time",
+            'end_dt/time': "end time",
+            'repetition': "booking type",
+            'booked_for_user': "'Booked for' user",
+            'booking_reason': "booking reason",
         }
 
         self.room.check_advance_days(data['end_dt'].date(), user)
@@ -602,7 +606,7 @@ class Reservation(Serializer, db.Model):
                 continue
             old = getattr(self, field)
             new = data[field]
-            converter = unicode
+            converter = str
             if old != new:
                 # Booked for user updates the (redundant) name
                 if field == 'booked_for_user':
@@ -635,17 +639,17 @@ class Reservation(Serializer, db.Model):
 
         # Create a verbose log entry for the modification
         log = ['Booking modified']
-        for field, change in changes.iteritems():
+        for field, change in changes.items():
             field_title = field_names.get(field, field)
             converter = change['converter']
-            old = to_unicode(converter(change['old']))
-            new = to_unicode(converter(change['new']))
+            old = converter(change['old'])
+            new = converter(change['new'])
             if not old:
-                log.append(u"The {} was set to '{}'".format(field_title, new))
+                log.append(f"The {field_title} was set to '{new}'")
             elif not new:
-                log.append(u"The {} was cleared".format(field_title))
+                log.append(f"The {field_title} was cleared")
             else:
-                log.append(u"The {} was changed from '{}' to '{}'".format(field_title, old, new))
+                log.append(f"The {field_title} was changed from '{old}' to '{new}'")
 
         self.edit_logs.append(ReservationEditLog(user_name=user.full_name, info=log))
 
@@ -668,7 +672,7 @@ class Reservation(Serializer, db.Model):
                         setattr(occurrence, col, getattr(old_occurrence, col))
             # Don't cause new notifications for the entire booking in case of daily repetition
             if self.repeat_frequency == RepeatFrequency.DAY and all(occ.notification_sent
-                                                                    for occ in old_occurrences.itervalues()):
+                                                                    for occ in old_occurrences.values()):
                 for occurrence in self.occurrences:
                     occurrence.notification_sent = True
 

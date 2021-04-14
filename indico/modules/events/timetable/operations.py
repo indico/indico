@@ -1,11 +1,9 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
-
-from __future__ import unicode_literals
 
 from operator import attrgetter
 
@@ -75,7 +73,7 @@ def create_timetable_entry(event, data, parent=None, extend_parent=False):
     signals.event.timetable_entry_created.send(entry)
     logger.info('Timetable entry %s created by %s', entry, user)
     entry.event.log(EventLogRealm.management, EventLogKind.positive, 'Timetable',
-                    "Entry for {} '{}' created".format(object_type, object_title), user,
+                    f"Entry for {object_type} '{object_title}' created", user,
                     data={'Time': format_datetime(entry.start_dt, timezone=event.tzinfo)})
     if extend_parent:
         entry.extend_parent()
@@ -101,7 +99,7 @@ def update_timetable_entry(entry, data):
         signals.event.timetable_entry_updated.send(entry, changes=changes)
         logger.info('Timetable entry %s updated by %s', entry, session.user)
         entry.event.log(EventLogRealm.management, EventLogKind.change, 'Timetable',
-                        "Entry for {} '{}' modified".format(object_type, object_title), session.user,
+                        f"Entry for {object_type} '{object_title}' modified", session.user,
                         data={'Time': format_datetime(entry.start_dt)})
 
 
@@ -113,7 +111,7 @@ def delete_timetable_entry(entry, log=True):
     if log:
         logger.info('Timetable entry %s deleted by %s', entry, session.user)
         entry.event.log(EventLogRealm.management, EventLogKind.negative, 'Timetable',
-                        "Entry for {} '{}' deleted".format(object_type, object_title), session.user,
+                        f"Entry for {object_type} '{object_title}' deleted", session.user,
                         data={'Time': format_datetime(entry.start_dt)})
 
 
@@ -133,7 +131,7 @@ def fit_session_block_entry(entry, log=True):
 
 
 def move_timetable_entry(entry, parent=None, day=None):
-    """Move the `entry` to another session or top-level timetable
+    """Move the `entry` to another session or top-level timetable.
 
     :param entry: `TimetableEntry` to be moved
     :param parent: If specified then the entry will be set as a child
@@ -171,7 +169,7 @@ def move_timetable_entry(entry, parent=None, day=None):
 
 
 def update_timetable_entry_object(entry, data):
-    """Update the `object` of a timetable entry according to its type"""
+    """Update the `object` of a timetable entry according to its type."""
     from indico.modules.events.contributions.operations import update_contribution
     obj = entry.object
     if entry.type == TimetableEntryType.CONTRIBUTION:
@@ -184,7 +182,7 @@ def update_timetable_entry_object(entry, data):
 
 
 def swap_timetable_entry(entry, direction, session_=None):
-    """Swap entry with closest gap or non-parallel sibling"""
+    """Swap entry with closest gap or non-parallel sibling."""
     in_session = session_ is not None
     sibling = get_sibling_entry(entry, direction=direction, in_session=in_session)
     if not sibling:

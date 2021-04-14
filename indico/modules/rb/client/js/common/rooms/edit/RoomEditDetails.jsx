@@ -1,16 +1,17 @@
 // This file is part of Indico.
-// Copyright (C) 2002 - 2020 CERN
+// Copyright (C) 2002 - 2021 CERN
 //
 // Indico is free software; you can redistribute it and/or
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
+import PropTypes from 'prop-types';
 import React from 'react';
 import {Form, Header, Tab} from 'semantic-ui-react';
-import PropTypes from 'prop-types';
+
 import {FinalPrincipal} from 'indico/react/components';
-import {Translate} from 'indico/react/i18n';
 import {FinalInput, FinalTextArea, validators as v} from 'indico/react/forms';
+import {Translate} from 'indico/react/i18n';
 
 export default function RoomEditDetails({active, favoriteUsersController}) {
   return (

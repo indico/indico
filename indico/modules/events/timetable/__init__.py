@@ -1,11 +1,9 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
-
-from __future__ import unicode_literals
 
 from flask import render_template, session
 
@@ -24,8 +22,8 @@ logger = Logger.get('events.timetable')
 
 @signals.event.sidemenu.connect
 def _extend_event_menu(sender, **kwargs):
-    from indico.modules.events.layout.util import MenuEntryData
     from indico.modules.events.contributions import contribution_settings
+    from indico.modules.events.layout.util import MenuEntryData
 
     def _visible_timetable(event):
         return contribution_settings.get(event, 'published')

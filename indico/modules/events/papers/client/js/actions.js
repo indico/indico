@@ -1,16 +1,16 @@
 // This file is part of Indico.
-// Copyright (C) 2002 - 2020 CERN
+// Copyright (C) 2002 - 2021 CERN
 //
 // Indico is free software; you can redistribute it and/or
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
+import commentActionsURL from 'indico-url:papers.api_comment_actions';
+import createCommentURL from 'indico-url:papers.api_create_comment';
+import createReviewURL from 'indico-url:papers.api_create_review';
+import judgePaperURL from 'indico-url:papers.api_judge_paper';
 import paperInfoURL from 'indico-url:papers.api_paper_details';
 import resetPaperStateURL from 'indico-url:papers.api_reset_paper_state';
-import createCommentURL from 'indico-url:papers.api_create_comment';
-import commentActionsURL from 'indico-url:papers.api_comment_actions';
-import judgePaperURL from 'indico-url:papers.api_judge_paper';
-import createReviewURL from 'indico-url:papers.api_create_review';
 import updateReviewURL from 'indico-url:papers.api_update_review';
 
 import {indicoAxios} from 'indico/utils/axios';
@@ -30,7 +30,7 @@ export const DELETE_COMMENT_ERROR = 'papers/DELETE_COMMENT_ERROR';
 
 export function fetchPaperDetails(eventId, contributionId) {
   return ajaxAction(
-    () => indicoAxios.get(paperInfoURL({confId: eventId, contrib_id: contributionId})),
+    () => indicoAxios.get(paperInfoURL({event_id: eventId, contrib_id: contributionId})),
     FETCH_PAPER_DETAILS_REQUEST,
     FETCH_PAPER_DETAILS_SUCCESS,
     FETCH_PAPER_DETAILS_ERROR
@@ -39,7 +39,7 @@ export function fetchPaperDetails(eventId, contributionId) {
 
 export function resetPaperJudgment(eventId, contributionId) {
   return ajaxAction(
-    () => indicoAxios.delete(resetPaperStateURL({confId: eventId, contrib_id: contributionId})),
+    () => indicoAxios.delete(resetPaperStateURL({event_id: eventId, contrib_id: contributionId})),
     RESET_PAPER_JUDGMENT_REQUEST,
     [RESET_PAPER_JUDGMENT_SUCCESS, () => fetchPaperDetails(eventId, contributionId)],
     RESET_PAPER_JUDGMENT_ERROR
@@ -48,7 +48,7 @@ export function resetPaperJudgment(eventId, contributionId) {
 
 export function createComment(eventId, contributionId, commentData) {
   const params = {
-    confId: eventId,
+    event_id: eventId,
     contrib_id: contributionId,
   };
 
@@ -62,7 +62,7 @@ export function createComment(eventId, contributionId, commentData) {
 
 export function updateComment(eventId, contributionId, revisionId, commentId, commentData) {
   const params = {
-    confId: eventId,
+    event_id: eventId,
     contrib_id: contributionId,
     revision_id: revisionId,
     comment_id: commentId,
@@ -78,7 +78,7 @@ export function updateComment(eventId, contributionId, revisionId, commentId, co
 
 export function deleteComment(eventId, contributionId, revisionId, commentId) {
   const params = {
-    confId: eventId,
+    event_id: eventId,
     contrib_id: contributionId,
     revision_id: revisionId,
     comment_id: commentId,
@@ -95,7 +95,10 @@ export function deleteComment(eventId, contributionId, revisionId, commentId) {
 export function judgePaper(eventId, contributionId, judgmentData) {
   return submitFormAction(
     () =>
-      indicoAxios.post(judgePaperURL({confId: eventId, contrib_id: contributionId}), judgmentData),
+      indicoAxios.post(
+        judgePaperURL({event_id: eventId, contrib_id: contributionId}),
+        judgmentData
+      ),
     null,
     () => fetchPaperDetails(eventId, contributionId),
     null
@@ -106,7 +109,7 @@ export function createReview(eventId, contributionId, group, reviewData) {
   return submitFormAction(
     () =>
       indicoAxios.post(
-        createReviewURL({confId: eventId, contrib_id: contributionId, review_type: group}),
+        createReviewURL({event_id: eventId, contrib_id: contributionId, review_type: group}),
         reviewData
       ),
     null,
@@ -120,7 +123,7 @@ export function updateReview(eventId, contributionId, revisionId, reviewId, revi
     () =>
       indicoAxios.post(
         updateReviewURL({
-          confId: eventId,
+          event_id: eventId,
           contrib_id: contributionId,
           revision_id: revisionId,
           review_id: reviewId,

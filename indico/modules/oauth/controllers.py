@@ -1,25 +1,28 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import unicode_literals
-
-from uuid import UUID
-
-from flask import flash, redirect, render_template, request, session
-from sqlalchemy.orm.exc import NoResultFound
+from authlib.oauth2.base import OAuth2Error
+from authlib.oauth2.rfc6749 import scope_to_list
+from authlib.oauth2.rfc8414 import AuthorizationServerMetadata
+from flask import flash, jsonify, redirect, render_template, request, session
+from sqlalchemy.orm import contains_eager
 from werkzeug.exceptions import Forbidden
 
+from indico.core.config import config
 from indico.core.db import db
+from indico.core.oauth.endpoints import IndicoIntrospectionEndpoint, IndicoRevocationEndpoint
+from indico.core.oauth.grants import IndicoAuthorizationCodeGrant, IndicoCodeChallenge
+from indico.core.oauth.logger import logger
+from indico.core.oauth.models.applications import OAuthApplication, OAuthApplicationUserLink
+from indico.core.oauth.models.tokens import OAuthToken
+from indico.core.oauth.oauth2 import auth_server
+from indico.core.oauth.scopes import SCOPES
 from indico.modules.admin import RHAdminBase
-from indico.modules.oauth import logger
 from indico.modules.oauth.forms import ApplicationForm
-from indico.modules.oauth.models.applications import SCOPES, OAuthApplication
-from indico.modules.oauth.models.tokens import OAuthToken
-from indico.modules.oauth.provider import oauth
 from indico.modules.oauth.views import WPOAuthAdmin, WPOAuthUserProfile
 from indico.modules.users.controllers import RHUserBase
 from indico.util.i18n import _
@@ -28,66 +31,110 @@ from indico.web.forms.base import FormDefaults
 from indico.web.rh import RH, RHProtected
 
 
+class RHOAuthMetadata(RH):
+    """Return RFC8414 Authorization Server Metadata."""
+
+    def _process(self):
+        metadata = AuthorizationServerMetadata(
+            authorization_endpoint=url_for('.oauth_authorize', _external=True),
+            token_endpoint=url_for('.oauth_token', _external=True),
+            introspection_endpoint=url_for('.oauth_introspect', _external=True),
+            revocation_endpoint=url_for('.oauth_revoke', _external=True),
+            issuer=config.BASE_URL,
+            response_types_supported=['code'],
+            response_modes_supported=['query'],
+            grant_types_supported=['authorization_code'],
+            scopes_supported=list(SCOPES),
+            token_endpoint_auth_methods_supported=list(IndicoAuthorizationCodeGrant.TOKEN_ENDPOINT_AUTH_METHODS),
+            introspection_endpoint_auth_methods_supported=list(IndicoIntrospectionEndpoint.CLIENT_AUTH_METHODS),
+            revocation_endpoint_auth_methods_supported=list(IndicoRevocationEndpoint.CLIENT_AUTH_METHODS),
+            code_challenge_methods_supported=list(IndicoCodeChallenge.SUPPORTED_CODE_CHALLENGE_METHOD),
+        )
+        metadata.validate()
+        return jsonify(metadata)
+
+
 class RHOAuthAuthorize(RHProtected):
     CSRF_ENABLED = False
 
-    def _process_args(self):
-        try:
-            UUID(hex=request.args['client_id'])
-        except ValueError:
-            raise NoResultFound
-        self.application = OAuthApplication.find_one(client_id=request.args['client_id'])
+    def _process(self):
+        rv = self._process_consent()
+        if rv is True:
+            return auth_server.create_authorization_response(grant_user=session.user)
+        elif rv is False:
+            return auth_server.create_authorization_response(grant_user=None)
+        else:
+            return rv
 
-    @oauth.authorize_handler
-    def _process(self, **kwargs):
+    def _process_consent(self):
+        try:
+            grant = auth_server.get_consent_grant(end_user=session.user)
+        except OAuth2Error as error:
+            return render_template('oauth/authorize_errors.html', error=error.error)
+
+        application = grant.client
+
         if request.method == 'POST':
             if 'confirm' not in request.form:
                 return False
-            logger.info('User %s authorized %s', session.user, self.application)
+            logger.info('User %s authorized %s', session.user, application)
             return True
-        if self.application.is_trusted:
-            logger.info('User %s automatically authorized %s', session.user, self.application)
+        elif application.is_trusted:
+            logger.info('User %s automatically authorized %s', session.user, application)
             return True
-        requested_scopes = set(kwargs['scopes'])
-        token = self.application.tokens.filter_by(user=session.user).first()
-        authorized_scopes = token.scopes if token else set()
+
+        link = application.user_links.filter_by(user=session.user).first()
+        authorized_scopes = set(link.scopes) if link else set()
+        requested_scopes = set(scope_to_list(grant.request.scope)) if grant.request.scope else authorized_scopes
         if requested_scopes <= authorized_scopes:
             return True
+
         new_scopes = requested_scopes - authorized_scopes
-        return render_template('oauth/authorize.html', application=self.application,
-                               authorized_scopes=filter(None, [SCOPES.get(s) for s in authorized_scopes]),
-                               new_scopes=filter(None, [SCOPES.get(s) for s in new_scopes]))
-
-
-class RHOAuthErrors(RHProtected):
-    def _process(self, **kwargs):
-        return render_template('oauth/authorize_errors.html', error=request.args['error'])
+        return render_template('oauth/authorize.html', application=application,
+                               authorized_scopes=[_f for _f in [SCOPES.get(s) for s in authorized_scopes] if _f],
+                               new_scopes=[_f for _f in [SCOPES.get(s) for s in new_scopes] if _f])
 
 
 class RHOAuthToken(RH):
     CSRF_ENABLED = False
 
-    @oauth.token_handler
-    def _process(self, **kwargs):
-        return None
+    def _process(self):
+        resp = auth_server.create_token_response()
+        resp.headers['Access-Control-Allow-Methods'] = 'POST'
+        resp.headers['Access-Control-Allow-Origin'] = '*'
+        return resp
+
+
+class RHOAuthIntrospect(RH):
+    CSRF_ENABLED = False
+
+    def _process(self):
+        return auth_server.create_endpoint_response('introspection')
+
+
+class RHOAuthRevoke(RH):
+    CSRF_ENABLED = False
+
+    def _process(self):
+        return auth_server.create_endpoint_response('revocation')
 
 
 class RHOAuthAdmin(RHAdminBase):
-    """OAuth server administration settings"""
+    """OAuth server administration settings."""
 
     def _process(self):
-        applications = OAuthApplication.find().order_by(db.func.lower(OAuthApplication.name)).all()
+        applications = OAuthApplication.query.order_by(db.func.lower(OAuthApplication.name)).all()
         return WPOAuthAdmin.render_template('apps.html', applications=applications)
 
 
 class RHOAuthAdminApplicationBase(RHAdminBase):
-    """Base class for single OAuth application RHs"""
+    """Base class for single OAuth application RHs."""
     def _process_args(self):
-        self.application = OAuthApplication.get(request.view_args['id'])
+        self.application = OAuthApplication.get_or_404(request.view_args['id'])
 
 
 class RHOAuthAdminApplication(RHOAuthAdminApplicationBase):
-    """Handles application details page"""
+    """Handle application details page."""
 
     def _process(self):
         form = ApplicationForm(obj=self.application, application=self.application)
@@ -102,7 +149,7 @@ class RHOAuthAdminApplication(RHOAuthAdminApplicationBase):
 
 
 class RHOAuthAdminApplicationDelete(RHOAuthAdminApplicationBase):
-    """Handles OAuth application deletion"""
+    """Handle OAuth application deletion."""
 
     def _check_access(self):
         RHOAuthAdminApplicationBase._check_access(self)
@@ -117,7 +164,7 @@ class RHOAuthAdminApplicationDelete(RHOAuthAdminApplicationBase):
 
 
 class RHOAuthAdminApplicationNew(RHAdminBase):
-    """Handles OAuth application registration"""
+    """Handle OAuth application registration."""
 
     def _process(self):
         form = ApplicationForm(obj=FormDefaults(is_enabled=True))
@@ -133,7 +180,7 @@ class RHOAuthAdminApplicationNew(RHAdminBase):
 
 
 class RHOAuthAdminApplicationReset(RHOAuthAdminApplicationBase):
-    """Resets the client secret of the OAuth application"""
+    """Reset the client secret of the OAuth application."""
 
     def _process(self):
         self.application.reset_client_secret()
@@ -143,34 +190,44 @@ class RHOAuthAdminApplicationReset(RHOAuthAdminApplicationBase):
 
 
 class RHOAuthAdminApplicationRevoke(RHOAuthAdminApplicationBase):
-    """Revokes all user tokens associated to the OAuth application"""
+    """Revoke all user tokens associated to the OAuth application."""
 
     def _process(self):
-        self.application.tokens.delete()
-        logger.info("All user tokens for %s revoked by %s", self.application, session.user)
-        flash(_("All user tokens for this application were revoked successfully"), 'success')
+        self.application.user_links.delete()
+        logger.info('Deauthorizing app %r for all users', self.application)
+        flash(_("App authorization revoked for all users."), 'success')
         return redirect(url_for('.app_details', self.application))
 
 
 class RHOAuthUserProfile(RHUserBase):
-    """OAuth overview (user)"""
+    """OAuth overview (user)."""
 
     def _process(self):
-        tokens = self.user.oauth_tokens.all()
-        return WPOAuthUserProfile.render_template('user_profile.html', 'applications', user=self.user, tokens=tokens)
+        authorizations = (
+            db.session.query(OAuthApplicationUserLink, db.func.max(OAuthToken.last_used_dt))
+            .with_parent(session.user)
+            .join(OAuthToken, OAuthToken.app_user_link_id == OAuthApplicationUserLink.id)
+            .join(OAuthApplication)
+            .options(contains_eager('application'))
+            .group_by(OAuthApplication.id, OAuthApplicationUserLink.id)
+            .order_by(OAuthApplication.name)
+            .all()
+        )
+        return WPOAuthUserProfile.render_template('user_profile.html', 'applications', user=self.user,
+                                                  authorizations=authorizations)
 
 
-class RHOAuthUserTokenRevoke(RHUserBase):
-    """Revokes user token"""
+class RHOAuthUserAppRevoke(RHUserBase):
+    """Revoke an oauth application's access to a user."""
 
     def _process_args(self):
         RHUserBase._process_args(self)
-        self.token = OAuthToken.get(request.view_args['id'])
-        if self.user != self.token.user:
-            raise Forbidden("You can only revoke tokens associated with your user")
+        self.application = OAuthApplication.get_or_404(request.view_args['id'])
 
     def _process(self):
-        db.session.delete(self.token)
-        logger.info("Token of application %s for user %s was revoked.", self.token.application, self.token.user)
-        flash(_("Token for {} has been revoked successfully").format(self.token.application.name), 'success')
+        link = OAuthApplicationUserLink.query.with_parent(self.user).with_parent(self.application).first()
+        if link:
+            logger.info('Deauthorizing app %r for user %r (scopes: %r)', self.application, self.user, link.scopes)
+            db.session.delete(link)
+        flash(_("Access for '{}' has been successfully revoked.").format(self.application.name), 'success')
         return redirect(url_for('.user_profile'))

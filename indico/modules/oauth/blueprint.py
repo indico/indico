@@ -1,27 +1,28 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import unicode_literals
-
 from flask import request
 
 from indico.modules.oauth.controllers import (RHOAuthAdmin, RHOAuthAdminApplication, RHOAuthAdminApplicationDelete,
                                               RHOAuthAdminApplicationNew, RHOAuthAdminApplicationReset,
-                                              RHOAuthAdminApplicationRevoke, RHOAuthAuthorize, RHOAuthErrors,
-                                              RHOAuthToken, RHOAuthUserProfile, RHOAuthUserTokenRevoke)
+                                              RHOAuthAdminApplicationRevoke, RHOAuthAuthorize, RHOAuthIntrospect,
+                                              RHOAuthMetadata, RHOAuthRevoke, RHOAuthToken, RHOAuthUserAppRevoke,
+                                              RHOAuthUserProfile)
 from indico.web.flask.wrappers import IndicoBlueprint
 
 
 _bp = IndicoBlueprint('oauth', __name__, template_folder='templates', virtual_template_folder='oauth')
 
 # Application endpoints
+_bp.add_url_rule('/.well-known/oauth-authorization-server', 'oauth_metadata', RHOAuthMetadata)
 _bp.add_url_rule('/oauth/authorize', 'oauth_authorize', RHOAuthAuthorize, methods=('GET', 'POST'))
-_bp.add_url_rule('/oauth/errors', 'oauth_errors', RHOAuthErrors)
 _bp.add_url_rule('/oauth/token', 'oauth_token', RHOAuthToken, methods=('POST',))
+_bp.add_url_rule('/oauth/introspect', 'oauth_introspect', RHOAuthIntrospect, methods=('POST',))
+_bp.add_url_rule('/oauth/revoke', 'oauth_revoke', RHOAuthRevoke, methods=('POST',))
 
 # Server administration
 _bp.add_url_rule('/admin/apps/', 'apps', RHOAuthAdmin)
@@ -34,7 +35,7 @@ _bp.add_url_rule('/admin/apps/<int:id>/revoke', 'app_revoke', RHOAuthAdminApplic
 # User profile
 with _bp.add_prefixed_rules('/user/<int:user_id>', '/user'):
     _bp.add_url_rule('/applications/', 'user_profile', RHOAuthUserProfile)
-    _bp.add_url_rule('/applications/<int:id>/revoke', 'user_token_revoke', RHOAuthUserTokenRevoke, methods=('POST',))
+    _bp.add_url_rule('/applications/<int:id>/revoke', 'user_app_revoke', RHOAuthUserAppRevoke, methods=('POST',))
 
 
 @_bp.url_defaults

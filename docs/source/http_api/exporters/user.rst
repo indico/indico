@@ -22,33 +22,27 @@ None
 
 
 Results
--------------
+-------
 
 Returns the user information (or an error in *JSON* format).
 
-Result for https://indico.server/export/user/36024.json?ak=00000000-0000-0000-0000-000000000000&pretty=yes::
+Result for https://indico.server/export/user/6.json?ak=00000000-0000-0000-0000-000000000000&pretty=yes::
 
     {
         "count": 1,
         "additionalInfo": {},
-        "_type": "HTTPAPIResult",
-        "complete": true,
-        "url": "https:\/\/indico.server\/export\/user\/36024.json?ak=00000000-0000-0000-0000-000000000000&pretty=yes",
-        "ts": 1367243741,
-        "results": [
-            {
-            "_type": "Avatar",
-            "name": "Alberto RESCO PEREZ",
-            "firstName": "Alberto",
-            "affiliation": "CERN",
-            "familyName": "Resco Perez",
+        "_type": "HTTPAPIResult"
+        "ts": 1610536660,
+        "url": "https:\/\/indico.server\/export\/user\/6.json?ak=00000000-0000-0000-0000-000000000000&pretty=yes",
+        "results": [{
+            "id": 6,
+            "first_name": "Guinea",
+            "last_name": "Pig",
+            "full_name": "Guinea Pig"
             "email": "test@cern.ch",
-            "phone": "+41XXXXXXXXX",
-            "_fossil": "avatar",
-            "title": "",
-            "id": "36024"
-            }
-        ]
+            "affiliation": "CERN",
+            "phone": "",
+            "avatar_url": "\/user\/6\/picture-default",
+            "identifier": "User:6",
+        }],
     }
-
-

@@ -1,16 +1,17 @@
 // This file is part of Indico.
-// Copyright (C) 2002 - 2020 CERN
+// Copyright (C) 2002 - 2021 CERN
 //
 // Indico is free software; you can redistribute it and/or
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
 import path from 'path';
-import glob from 'glob';
-import {customizeArray, mergeWithCustomize} from 'webpack-merge';
+
 import CopyWebpackPlugin from 'copy-webpack-plugin';
+import glob from 'glob';
 import {minify} from 'uglify-js';
 import webpack from 'webpack';
+import {customizeArray, mergeWithCustomize} from 'webpack-merge';
 
 import {
   getThemeEntryPoints,
@@ -149,9 +150,6 @@ export default env => {
     ],
     resolve: {
       alias: extraResolveAliases,
-    },
-    output: {
-      jsonpFunction: 'coreJsonp',
     },
   });
 };

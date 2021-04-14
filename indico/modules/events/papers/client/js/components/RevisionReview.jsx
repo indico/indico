@@ -1,13 +1,13 @@
 // This file is part of Indico.
-// Copyright (C) 2002 - 2020 CERN
+// Copyright (C) 2002 - 2021 CERN
 //
 // Indico is free software; you can redistribute it and/or
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-import React, {useState} from 'react';
-import PropTypes from 'prop-types';
 import moment from 'moment';
+import PropTypes from 'prop-types';
+import React, {useState} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
 import {Popup, Transition} from 'semantic-ui-react';
 
@@ -16,9 +16,10 @@ import {ReviewRating} from 'indico/react/components';
 import {Param, Translate} from 'indico/react/i18n';
 import {serializeDate} from 'indico/utils/date';
 
-import GroupReviewForm from './GroupReviewForm';
 import {updateReview as updateReviewAction} from '../actions';
 import {getPaperDetails} from '../selectors';
+
+import GroupReviewForm from './GroupReviewForm';
 
 export default function RevisionReview({review, revision}) {
   const [isEditing, setIsEditing] = useState(false);

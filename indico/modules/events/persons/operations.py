@@ -1,11 +1,9 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
-
-from __future__ import unicode_literals
 
 from flask import session
 
@@ -21,4 +19,4 @@ def update_person(person, data):
     signals.event.person_updated.send(person)
     logger.info('Person %s updated by %s', person, session.user)
     person.event.log(EventLogRealm.management, EventLogKind.change, 'Persons',
-                     "Person with email '{}' has been updated".format(person.email), session.user)
+                     f"Person with email '{person.email}' has been updated", session.user)

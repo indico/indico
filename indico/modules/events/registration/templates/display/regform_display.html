@@ -109,7 +109,7 @@
         <div ng-app="nd" ng-controller="AppCtrl">
             {% block regform %}
                 <div nd-reg-form
-                     conf-id="{{ event.id }}"
+                     event-id="{{ event.id }}"
                      conf-sections="{{ sections | tojson | forceescape }}"
                      conf-currency="{{ regform.currency }}"
                      user-info="{{ user_data | tojson | forceescape }}"

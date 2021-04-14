@@ -1,20 +1,22 @@
 // This file is part of Indico.
-// Copyright (C) 2002 - 2020 CERN
+// Copyright (C) 2002 - 2021 CERN
 //
 // Indico is free software; you can redistribute it and/or
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
+import createDecorator from 'final-form-calculate';
 import _ from 'lodash';
 import moment from 'moment';
+import PropTypes from 'prop-types';
 import React from 'react';
+import {Form as FinalForm} from 'react-final-form';
+import Overridable from 'react-overridable';
 import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
-import PropTypes from 'prop-types';
-import Overridable from 'react-overridable';
 import {Button, Checkbox, Form, Grid, Icon, List, Message, Modal, Segment} from 'semantic-ui-react';
-import {Form as FinalForm} from 'react-final-form';
-import createDecorator from 'final-form-calculate';
+
+import {FinalPrincipal} from 'indico/react/components';
 import {
   FinalCheckbox,
   FinalDropdown,
@@ -22,22 +24,23 @@ import {
   FinalTextArea,
   FieldCondition,
 } from 'indico/react/forms';
-import {Param, Plural, PluralTranslate, Singular, Translate} from 'indico/react/i18n';
-import {FinalPrincipal} from 'indico/react/components';
 import {FavoritesProvider} from 'indico/react/hooks';
+import {Param, Plural, PluralTranslate, Singular, Translate} from 'indico/react/i18n';
 import {IndicoPropTypes} from 'indico/react/util';
 import {createDT, isBookingStartDTValid, serializeTime} from 'indico/utils/date';
-import TimeInformation from '../../components/TimeInformation';
-import {selectors as roomsSelectors} from '../../common/rooms';
-import {selectors as linkingSelectors, linkDataShape} from '../../common/linking';
-import RoomBasicDetails from '../../components/RoomBasicDetails';
-import * as actions from './actions';
+
 import {openModal} from '../../actions';
-import {selectors as userSelectors} from '../../common/user';
-import {selectors as configSelectors} from '../../common/config';
-import * as bookRoomSelectors from './selectors';
 import {BookingObjectLink} from '../../common/bookings';
+import {selectors as configSelectors} from '../../common/config';
+import {selectors as linkingSelectors, linkDataShape} from '../../common/linking';
+import {selectors as roomsSelectors} from '../../common/rooms';
 import SingleRoomTimelineModal from '../../common/timeline/SingleRoomTimelineModal';
+import {selectors as userSelectors} from '../../common/user';
+import RoomBasicDetails from '../../components/RoomBasicDetails';
+import TimeInformation from '../../components/TimeInformation';
+
+import * as actions from './actions';
+import * as bookRoomSelectors from './selectors';
 
 import './BookRoomModal.module.scss';
 

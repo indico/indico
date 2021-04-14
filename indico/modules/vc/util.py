@@ -1,11 +1,9 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
-
-from __future__ import unicode_literals
 
 from sqlalchemy.orm import contains_eager
 
@@ -16,9 +14,9 @@ from indico.util.i18n import _
 
 
 def get_vc_plugins():
-    """Returns a dict containing the available videoconference plugins."""
+    """Return a dict containing the available videoconference plugins."""
     from indico.modules.vc import VCPluginMixin
-    return {p.service_name: p for p in plugin_engine.get_active_plugins().itervalues() if isinstance(p, VCPluginMixin)}
+    return {p.service_name: p for p in plugin_engine.get_active_plugins().values() if isinstance(p, VCPluginMixin)}
 
 
 def resolve_title(obj):
@@ -34,12 +32,12 @@ def get_linked_to_description(obj):
 
 
 def get_managed_vc_plugins(user):
-    """Returns the plugins the user can manage"""
-    return [p for p in get_vc_plugins().itervalues() if p.can_manage_vc(user)]
+    """Return the plugins the user can manage."""
+    return [p for p in get_vc_plugins().values() if p.can_manage_vc(user)]
 
 
 def find_event_vc_rooms(from_dt=None, to_dt=None, distinct=False):
-    """Finds VC rooms matching certain criteria
+    """Find VC rooms matching certain criteria.
 
     :param from_dt: earliest event/contribution to include
     :param to_dt: latest event/contribution to include
@@ -61,5 +59,4 @@ def find_event_vc_rooms(from_dt=None, to_dt=None, distinct=False):
             query = query.filter(Event.start_dt >= from_dt)
         if to_dt is not None:
             query = query.filter(Event.start_dt < to_dt)
-    for vc_room in query:
-        yield vc_room
+    yield from query

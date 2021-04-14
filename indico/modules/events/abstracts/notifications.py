@@ -1,14 +1,11 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import unicode_literals
-
 import itertools
-from collections import OrderedDict
 
 from flask import session
 
@@ -34,9 +31,9 @@ class EmailNotificationCondition(Condition):
     def get_available_values(cls, event=None, **kwargs):
         choices = cls._iter_available_values(event=event, **kwargs)
         if not cls.required:
-            return OrderedDict(itertools.chain([('*', cls.any_caption), ('', cls.none_caption)], choices))
+            return dict(itertools.chain([('*', cls.any_caption), ('', cls.none_caption)], choices))
         else:
-            return OrderedDict(choices)
+            return dict(choices)
 
     @classmethod
     def _iter_available_values(cls, event, **kwargs):
@@ -132,7 +129,7 @@ class ContributionTypeCondition(EmailNotificationCondition):
 
 
 def get_abstract_notification_tpl_module(email_tpl, abstract):
-    """Get the Jinja template module for a notification email
+    """Get the Jinja template module for a notification email.
 
     :param email_tpl: the abstract email template used to populate the
                       email subject/body

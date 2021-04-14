@@ -43,8 +43,8 @@
         {{ person.affiliation }}
     </td>
     <td class="i-table roles-column">
-        {% for role, role_data in person_data.roles.iteritems() %}
-            {%- if role != 'no_account' %}
+        {% for role, role_data in person_data.roles.items() %}
+            {%- if role not in ('no_account', 'no_registration') %}
                 {%- if role_data.elements -%}
                     <span class="i-tag outline contrast js-count-label" style="{{ role_data.css }};"
                           data-role-name="{{ role_data.name }}"

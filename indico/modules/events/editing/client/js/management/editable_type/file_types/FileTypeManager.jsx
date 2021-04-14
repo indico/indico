@@ -1,24 +1,27 @@
 // This file is part of Indico.
-// Copyright (C) 2002 - 2020 CERN
+// Copyright (C) 2002 - 2021 CERN
 //
 // Indico is free software; you can redistribute it and/or
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-import fileTypesURL from 'indico-url:event_editing.api_file_types';
 import createFileTypeURL from 'indico-url:event_editing.api_add_file_type';
 import editFileTypeURL from 'indico-url:event_editing.api_edit_file_type';
+import fileTypesURL from 'indico-url:event_editing.api_file_types';
 
-import React, {useReducer} from 'react';
 import PropTypes from 'prop-types';
+import React, {useReducer} from 'react';
 import {Button, Icon, Loader, Message, Segment, Popup, Label} from 'semantic-ui-react';
+
 import {RequestConfirm, TooltipIfTruncated} from 'indico/react/components';
-import {Param, Translate} from 'indico/react/i18n';
 import {getChangedValues, handleSubmitError} from 'indico/react/forms';
 import {useIndicoAxios} from 'indico/react/hooks';
+import {Param, Translate} from 'indico/react/i18n';
 import {handleAxiosError, indicoAxios} from 'indico/utils/axios';
-import FileTypeModal from './FileTypeModal';
+
 import {EditableType} from '../../../models';
+
+import FileTypeModal from './FileTypeModal';
 
 import './FileTypeManager.module.scss';
 
@@ -57,14 +60,14 @@ StatusIcon.propTypes = {
 export default function FileTypeManager({eventId, editableType}) {
   const [state, dispatch] = useReducer(fileTypesReducer, initialState);
   const {data, loading: isLoadingFileTypes, reFetch, lastData} = useIndicoAxios({
-    url: fileTypesURL({confId: eventId, type: editableType}),
+    url: fileTypesURL({event_id: eventId, type: editableType}),
     camelize: true,
     trigger: eventId,
   });
 
   const createFileType = async formData => {
     try {
-      await indicoAxios.post(createFileTypeURL({confId: eventId, type: editableType}), formData);
+      await indicoAxios.post(createFileTypeURL({event_id: eventId, type: editableType}), formData);
       reFetch();
     } catch (e) {
       return handleSubmitError(e);
@@ -72,7 +75,7 @@ export default function FileTypeManager({eventId, editableType}) {
   };
 
   const editFileType = async (fileTypeId, fileTypeData) => {
-    const url = editFileTypeURL({confId: eventId, file_type_id: fileTypeId, type: editableType});
+    const url = editFileTypeURL({event_id: eventId, file_type_id: fileTypeId, type: editableType});
 
     try {
       await indicoAxios.patch(url, fileTypeData);
@@ -83,7 +86,7 @@ export default function FileTypeManager({eventId, editableType}) {
   };
 
   const deleteFileType = async fileTypeId => {
-    const url = editFileTypeURL({confId: eventId, file_type_id: fileTypeId, type: editableType});
+    const url = editFileTypeURL({event_id: eventId, file_type_id: fileTypeId, type: editableType});
 
     try {
       await indicoAxios.delete(url);

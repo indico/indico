@@ -1,11 +1,9 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
-
-from __future__ import unicode_literals
 
 from datetime import datetime, timedelta
 
@@ -21,12 +19,12 @@ from indico.modules.events.logs.models.entries import EventLogKind
 from indico.modules.events.timetable.models.entries import TimetableEntry, TimetableEntryType
 from indico.modules.events.timetable.operations import fit_session_block_entry
 from indico.util.date_time import format_date, format_human_timedelta
+from indico.util.enum import RichEnum
 from indico.util.i18n import _
-from indico.util.struct.enum import RichEnum
-from indico.util.struct.iterables import materialize_iterable, window
+from indico.util.iterables import materialize_iterable, window
 
 
-class RescheduleMode(unicode, RichEnum):
+class RescheduleMode(str, RichEnum):
     __titles__ = {'none': 'Fit blocks', 'time': 'Start times', 'duration': 'Durations'}
     none = 'none'  # no action, just fit blocks..
     time = 'time'
@@ -37,9 +35,9 @@ class RescheduleMode(unicode, RichEnum):
         return RichEnum.title.fget(self)
 
 
-class Rescheduler(object):
+class Rescheduler:
     """
-    Compacts the the schedule of an event day by either adjusting
+    Compact the the schedule of an event day by either adjusting
     start times or durations of timetable entries.
 
     :param event: The event of which the timetable entries should
@@ -74,7 +72,7 @@ class Rescheduler(object):
         self.gap = gap
 
     def run(self):
-        """Perform the rescheduling"""
+        """Perform the rescheduling."""
         if self.fit_blocks:
             self._fit_blocks()
         if self.mode == RescheduleMode.time:

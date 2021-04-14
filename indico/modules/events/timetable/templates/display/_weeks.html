@@ -50,7 +50,7 @@
         {% if entry.type.name == 'CONTRIBUTION' and speakers %}
             <ul>
                 {% for link in speakers -%}
-                    <li>{{ render_user_data(link, show_title=false, italic_affiliation=italic_affiliation) }}</li>
+                    <li>{{ render_user_data(link, show_title=false) }}</li>
                 {% endfor %}
             </ul>
         {% endif %}
@@ -75,7 +75,7 @@
     <div class="{{ ' '.join(classes) }}" style="{{ '; '.join(extra_styles) }}" data-slot="{{ start_time }}">
         <span class="time">
             {{ start_time|format_time(timezone=timezone) if loop.first else '' }}
-            {% if hide_placeholders and show_end_times %}
+            {% if show_end_times %}
                 <span class="end-time">
                     {{ entry.end_dt | format_time(timezone=timezone) }}
                 </span>
@@ -118,7 +118,7 @@
         {% endif %}
     {% endif %}
     {% if height > 0 %}
-        <div class="row placeholder" data-slot="{{ start_time }}" style="height: {{ height }}px;">
+        <div class="row placeholder" data-slot="" style="height: {{ height }}px;">
         </div>
     {% endif %}
 {% endmacro %}
@@ -136,7 +136,10 @@
         {% endif %}
 
         {% set has_multi = false %}
+        {% set same_time = true %}
+        {% set extra_styles = [] %}
         {% if loop.first %}
+            {% set same_time = false %}
             {% set time_parts = (entry.duration.seconds/60) /5 %}
             {% set height = (time_parts * px_per_5_minutes) %}
             {% if to_subtract[-1] %}
@@ -174,8 +177,6 @@
                     {% set __ = extra_styles.append('background-color: #%s'|format(session.background_color)) %}
                 {% endif %}
             {% endif %}
-        {% else %}
-            {% set same_time = true %}
         {% endif %}
         {% if entry.type.name == 'CONTRIBUTION' or session %}
             {% if entry.type.name == 'CONTRIBUTION' %}
@@ -210,9 +211,9 @@
                         {{ day | format_date(format='full', timezone=timezone) }}
                     </div>
                     {% set hidden_count = [] %}
-                    {% for start_time, slot_entries in day_entries.viewitems() %}
+                    {% for start_time, slot_entries in day_entries.items() %}
                         {% set start_time_minutes = (start_time.strftime('%-H')|int*60 + start_time.strftime('%-M')|int) %}
-                        {% set next_entry = day_entries.keys()[loop.index] %}
+                        {% set next_entry = (day_entries.keys()|list)[loop.index] %}
                         {% if next_entry %}
                             {% set next_start_minutes = (next_entry.strftime('%-H')|int*60 + next_entry.strftime('%-M')|int)%}
                         {% else %}

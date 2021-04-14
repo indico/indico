@@ -1,11 +1,9 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
-
-from __future__ import unicode_literals
 
 from wtforms import Field
 
@@ -20,7 +18,7 @@ class LinkedObjectField(Field):
 
     def __init__(self, *args, **kwargs):
         self.ajax_endpoint = kwargs.pop('ajax_endpoint')
-        super(LinkedObjectField, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
     def _value(self):
         pass
@@ -38,14 +36,18 @@ class LinkedObjectField(Field):
 
 
 class ContributionField(LinkedObjectField):
-    """A selectize-based field to select a contribution that has no reservation yet."""
+    """
+    A selectize-based field to select a contribution that has no reservation yet.
+    """
     def __init__(self, *args, **kwargs):
         kwargs.setdefault('render_kw', {}).setdefault('placeholder', _('Enter contribution title or #id'))
-        super(ContributionField, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
 
 class SessionBlockField(LinkedObjectField):
-    """A selectize-based field to select a session block that has no reservation yet."""
+    """
+    A selectize-based field to select a session block that has no reservation yet.
+    """
     def __init__(self, *args, **kwargs):
         kwargs.setdefault('render_kw', {}).setdefault('placeholder', _('Enter session block title'))
-        super(SessionBlockField, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)

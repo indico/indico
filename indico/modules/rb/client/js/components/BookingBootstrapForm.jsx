@@ -1,5 +1,5 @@
 // This file is part of Indico.
-// Copyright (C) 2002 - 2020 CERN
+// Copyright (C) 2002 - 2021 CERN
 //
 // Indico is free software; you can redistribute it and/or
 // modify it under the terms of the MIT License; see the
@@ -9,9 +9,10 @@ import _ from 'lodash';
 import moment from 'moment';
 import PropTypes from 'prop-types';
 import React from 'react';
-import {connect} from 'react-redux';
 import Overridable from 'react-overridable';
+import {connect} from 'react-redux';
 import {Button, Form, Select} from 'semantic-ui-react';
+
 import {SingleDatePicker, DateRangePicker} from 'indico/react/components';
 import {PluralTranslate, Translate} from 'indico/react/i18n';
 import {
@@ -24,10 +25,12 @@ import {
   toMoment,
   initialEndTime,
 } from 'indico/utils/date';
-import TimeRangePicker from './TimeRangePicker';
-import {selectors as userSelectors} from '../common/user';
+
 import {selectors as configSelectors} from '../common/config';
+import {selectors as userSelectors} from '../common/user';
 import {sanitizeRecurrence} from '../util';
+
+import TimeRangePicker from './TimeRangePicker';
 
 import './BookingBootstrapForm.module.scss';
 

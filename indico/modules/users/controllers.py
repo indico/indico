@@ -1,11 +1,9 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
-
-from __future__ import unicode_literals
 
 from collections import namedtuple
 from io import BytesIO
@@ -17,20 +15,19 @@ from markupsafe import Markup, escape
 from marshmallow import fields
 from marshmallow_enum import EnumField
 from PIL import Image
-from sqlalchemy.orm import joinedload, load_only, subqueryload, undefer
+from sqlalchemy.orm import joinedload, load_only, subqueryload
 from sqlalchemy.orm.exc import StaleDataError
 from webargs import validate
 from werkzeug.exceptions import BadRequest, Forbidden, NotFound
-from werkzeug.http import parse_date
 
 from indico.core import signals
 from indico.core.auth import multipass
+from indico.core.cache import make_scoped_cache
 from indico.core.db import db
 from indico.core.db.sqlalchemy.util.queries import get_n_matching
 from indico.core.errors import UserValueError
 from indico.core.marshmallow import mm
 from indico.core.notifications import make_email, send_email
-from indico.legacy.common.cache import GenericCache
 from indico.modules.admin import RHAdminBase
 from indico.modules.auth import Identity
 from indico.modules.auth.models.registration_requests import RegistrationRequest
@@ -44,12 +41,12 @@ from indico.modules.users.forms import (AdminAccountRegistrationForm, AdminsForm
 from indico.modules.users.models.emails import UserEmail
 from indico.modules.users.models.users import ProfilePictureSource
 from indico.modules.users.operations import create_user
+from indico.modules.users.schemas import BasicCategorySchema
 from indico.modules.users.util import (get_gravatar_for_user, get_linked_events, get_related_categories,
-                                       get_suggested_categories, merge_users, search_users, serialize_user,
+                                       get_suggested_categories, merge_users, search_users, send_avatar, serialize_user,
                                        set_user_avatar)
-from indico.modules.users.views import WPUser, WPUserDashboard, WPUserProfilePic, WPUsersAdmin
+from indico.modules.users.views import WPUser, WPUserDashboard, WPUserFavorites, WPUserProfilePic, WPUsersAdmin
 from indico.util.date_time import now_utc
-from indico.util.event import truncate_path
 from indico.util.i18n import _
 from indico.util.images import square
 from indico.util.marshmallow import HumanizedDate, Principal, validate_with_message
@@ -60,12 +57,12 @@ from indico.web.flask.templating import get_template_module
 from indico.web.flask.util import send_file, url_for
 from indico.web.forms.base import FormDefaults
 from indico.web.http_api.metadata import Serializer
-from indico.web.rh import RHProtected, RHTokenProtected
-from indico.web.util import jsonify_data, jsonify_form, jsonify_template
+from indico.web.rh import RH, RHProtected, allow_signed_url
+from indico.web.util import is_legacy_signed_url_valid, jsonify_data, jsonify_form, jsonify_template
 
 
 IDENTITY_ATTRIBUTES = {'first_name', 'last_name', 'email', 'affiliation', 'full_name'}
-UserEntry = namedtuple('UserEntry', IDENTITY_ATTRIBUTES | {'profile_url', 'user'})
+UserEntry = namedtuple('UserEntry', IDENTITY_ATTRIBUTES | {'profile_url', 'avatar_url', 'user'})
 
 
 def get_events_in_categories(category_ids, user, limit=10):
@@ -133,13 +130,13 @@ class RHUserDashboard(RHUserBase):
         categories = get_related_categories(self.user)
         categories_events = []
         if categories:
-            category_ids = {c['categ'].id for c in categories.itervalues()}
+            category_ids = {c['categ'].id for c in categories.values()}
             categories_events = get_events_in_categories(category_ids, self.user)
         from_dt = now_utc(False) - relativedelta(weeks=1, hour=0, minute=0, second=0)
         linked_events = [(event, {'management': bool(roles & self.management_roles),
                                   'reviewing': bool(roles & self.reviewer_roles),
                                   'attendance': bool(roles & self.attendance_roles)})
-                         for event, roles in get_linked_events(self.user, from_dt, 10).iteritems()]
+                         for event, roles in get_linked_events(self.user, from_dt, 10).items()]
         return WPUserDashboard.render_template('dashboard.html', 'dashboard',
                                                user=self.user,
                                                categories=categories,
@@ -148,36 +145,51 @@ class RHUserDashboard(RHUserBase):
                                                linked_events=linked_events)
 
 
-class RHExportDashboardICS(RHTokenProtected):
+@allow_signed_url
+class RHExportDashboardICS(RHProtected):
+    def _get_user(self):
+        return session.user
+
     @use_kwargs({
         'from_': HumanizedDate(data_key='from', missing=lambda: now_utc(False) - relativedelta(weeks=1)),
         'include': fields.List(fields.Str(), missing={'linked', 'categories'}),
         'limit': fields.Integer(missing=100, validate=lambda v: 0 < v <= 500)
-    })
+    }, location='query')
     def _process(self, from_, include, limit):
-        categories = get_related_categories(self.user)
-        categories_events = []
-        if categories:
-            category_ids = {c['categ'].id for c in categories.itervalues()}
-            categories_events = get_events_in_categories(category_ids, self.user, limit=limit)
-
-        linked_events = get_linked_events(
-            self.user,
-            from_,
-            limit=limit,
-            load_also=('description', 'own_room_id', 'own_venue_id', 'own_room_name', 'own_venue_name')
-        )
-
+        user = self._get_user()
         all_events = set()
+
         if 'linked' in include:
-            all_events |= set(linked_events)
-        if 'categories' in include:
-            all_events |= set(categories_events)
+            all_events |= set(get_linked_events(
+                user,
+                from_,
+                limit=limit,
+                load_also=('description', 'own_room_id', 'own_venue_id', 'own_room_name', 'own_venue_name')
+            ))
+
+        if 'categories' in include and (categories := get_related_categories(user)):
+            category_ids = {c['categ'].id for c in categories.values()}
+            all_events |= set(get_events_in_categories(category_ids, user, limit=limit))
+
         all_events = sorted(all_events, key=lambda e: (e.start_dt, e.id))[:limit]
 
         response = {'results': [serialize_event_for_ical(event, 'events') for event in all_events]}
         serializer = Serializer.create('ics')
         return send_file('event.ics', BytesIO(serializer(response)), 'text/calendar')
+
+
+class RHExportDashboardICSLegacy(RHExportDashboardICS):
+    def _get_user(self):
+        user = User.get_or_404(request.view_args['user_id'], is_deleted=False)
+        if not is_legacy_signed_url_valid(user, request.full_path):
+            raise BadRequest('Invalid signature')
+        if user.is_blocked:
+            raise BadRequest('User blocked')
+        return user
+
+    def _check_access(self):
+        # disable the usual RHProtected access check; `_get_user` does it all
+        pass
 
 
 class RHPersonalData(RHUserBase):
@@ -209,14 +221,12 @@ class RHProfilePicturePreview(RHUserBase):
     This always uses a fresh picture without any caching.
     """
 
-    @use_kwargs({
-        'source': EnumField(ProfilePictureSource, location='view_args')
-    })
+    @use_kwargs({'source': EnumField(ProfilePictureSource)}, location='view_args')
     def _process(self, source):
         if source == ProfilePictureSource.standard:
             first_name = self.user.first_name[0].upper() if self.user.first_name else ''
             avatar = render_template('users/avatar.svg', bg_color=self.user.avatar_bg_color, text=first_name)
-            return send_file('avatar.svg', BytesIO(avatar.encode('utf-8')), mimetype='image/svg+xml',
+            return send_file('avatar.svg', BytesIO(avatar.encode()), mimetype='image/svg+xml',
                              no_cache=True, inline=True, safe=False)
         elif source == ProfilePictureSource.custom:
             metadata = self.user.picture_metadata
@@ -227,22 +237,14 @@ class RHProfilePicturePreview(RHUserBase):
             return send_file('avatar.png', BytesIO(gravatar), mimetype='image/png')
 
 
-class RHProfilePictureDisplay(RHUserBase):
+class RHProfilePictureDisplay(RH):
     """Display the user's profile picture."""
 
-    allow_system_user = True
+    def _process_args(self):
+        self.user = User.get_or_404(request.view_args['user_id'], is_deleted=False)
 
     def _process(self):
-        if self.user.picture_source == ProfilePictureSource.standard:
-            first_name = self.user.first_name[0].upper() if self.user.first_name else ''
-            avatar = render_template('users/avatar.svg', bg_color=self.user.avatar_bg_color, text=first_name)
-            return send_file('avatar.svg', BytesIO(avatar.encode('utf-8')), mimetype='image/svg+xml',
-                             no_cache=False, inline=True, safe=False, cache_timeout=(86400*7))
-
-        metadata = self.user.picture_metadata
-        return send_file('avatar.png', BytesIO(self.user.picture), mimetype=metadata['content_type'],
-                         inline=True, conditional=True, last_modified=parse_date(metadata['lastmod']),
-                         cache_timeout=(86400*7))
+        return send_avatar(self.user)
 
 
 class RHSaveProfilePicture(RHUserBase):
@@ -264,7 +266,7 @@ class RHSaveProfilePicture(RHUserBase):
             f = request.files['picture']
             try:
                 pic = Image.open(f)
-            except IOError:
+            except OSError:
                 raise UserValueError(_('You cannot upload this file as profile picture.'))
             if pic.format.lower() not in {'jpeg', 'png', 'gif', 'webp'}:
                 raise UserValueError(_('The file has an invalid format ({format}).').format(format=pic.format))
@@ -310,40 +312,42 @@ class RHUserPreferences(RHUserBase):
 
 class RHUserFavorites(RHUserBase):
     def _process(self):
-        query = (Category.query
-                 .filter(Category.id.in_(c.id for c in self.user.favorite_categories))
-                 .options(undefer('chain_titles')))
-        categories = sorted([(cat, truncate_path(cat.chain_titles[:-1], chars=50)) for cat in query],
-                            key=lambda c: (c[0].title, c[1]))
-        return WPUser.render_template('favorites.html', 'favorites', user=self.user, favorite_categories=categories)
+        return WPUserFavorites.render_template('favorites.html', 'favorites', user=self.user)
 
 
-class RHUserFavoritesUsersAdd(RHUserBase):
-    def _process(self):
-        users = [User.get(int(id_)) for id_ in request.form.getlist('user_id')]
-        self.user.favorite_users |= set(filter(None, users))
-        tpl = get_template_module('users/_favorites.html')
-        return jsonify(success=True, users=[serialize_user(user) for user in users],
-                       html=tpl.favorite_users_list(self.user))
+class RHUserFavoritesAPI(RHUserBase):
+    def _process_args(self):
+        RHUserBase._process_args(self)
+        self.fav_user = (
+            User.get_or_404(request.view_args['fav_user_id']) if 'fav_user_id' in request.view_args else None
+        )
 
+    def _process_GET(self):
+        return jsonify(sorted(u.id for u in self.user.favorite_users))
 
-class RHUserFavoritesUserRemove(RHUserBase):
-    def _process(self):
-        user = User.get(int(request.view_args['fav_user_id']))
-        self.user.favorite_users.discard(user)
-        try:
-            db.session.flush()
-        except StaleDataError:
-            # Deleted in another transaction
-            db.session.rollback()
-        return jsonify(success=True)
+    def _process_PUT(self):
+        self.user.favorite_users.add(self.fav_user)
+        return jsonify(self.user.id), 201
+
+    def _process_DELETE(self):
+        self.user.favorite_users.discard(self.fav_user)
+        return '', 204
 
 
 class RHUserFavoritesCategoryAPI(RHUserBase):
     def _process_args(self):
         RHUserBase._process_args(self)
-        self.category = Category.get_or_404(request.view_args['category_id'])
-        self.suggestion = self.user.suggested_categories.filter_by(category=self.category).first()
+        self.category = (
+            Category.get_or_404(request.view_args['category_id']) if 'category_id' in request.view_args else None
+        )
+        self.suggestion = (
+            self.user.suggested_categories.filter_by(category=self.category).first()
+            if 'category_id' in request.view_args
+            else None
+        )
+
+    def _process_GET(self):
+        return jsonify({d.id: BasicCategorySchema().dump(d) for d in self.user.favorite_categories})
 
     def _process_PUT(self):
         if self.category not in self.user.favorite_categories:
@@ -378,10 +382,10 @@ class RHUserSuggestionsRemove(RHUserBase):
 
 class RHUserEmails(RHUserBase):
     def _send_confirmation(self, email):
-        token_storage = GenericCache('confirm-email')
+        token_storage = make_scoped_cache('confirm-email')
         data = {'email': email, 'user_id': self.user.id}
         token = make_unique_token(lambda t: not token_storage.get(t))
-        token_storage.set(token, data, 24 * 3600)
+        token_storage.set(token, data, timeout=86400)
         send_email(make_email(email, template=get_template_module('users/emails/verify_email.txt',
                                                                   user=self.user, email=email, token=token)))
 
@@ -397,7 +401,7 @@ class RHUserEmails(RHUserBase):
 
 class RHUserEmailsVerify(RHUserBase):
     flash_user_status = False
-    token_storage = GenericCache('confirm-email')
+    token_storage = make_scoped_cache('confirm-email')
 
     def _validate(self, data):
         if not data:
@@ -407,7 +411,7 @@ class RHUserEmailsVerify(RHUserBase):
         if not user or user != self.user:
             flash(_('This token is for a different Indico user. Please login with the correct account'), 'error')
             return False, None
-        existing = UserEmail.find_first(is_user_deleted=False, email=data['email'])
+        existing = UserEmail.query.filter_by(is_user_deleted=False, email=data['email']).first()
         if existing and not existing.user.is_pending:
             if existing.user == self.user:
                 flash(_('This email address is already attached to your account.'))
@@ -464,7 +468,7 @@ class RHUserEmailsSetPrimary(RHUserBase):
 
 
 class RHAdmins(RHAdminBase):
-    """Show Indico administrators"""
+    """Show Indico administrators."""
 
     def _process(self):
         admins = set(User.query
@@ -489,14 +493,14 @@ class RHAdmins(RHAdminBase):
 
 
 class RHUsersAdmin(RHAdminBase):
-    """Admin users overview"""
+    """Admin users overview."""
 
     def _process(self):
         form = SearchForm(obj=FormDefaults(exact=True))
         form_data = form.data
         search_results = None
         num_of_users = User.query.count()
-        num_deleted_users = User.find(is_deleted=True).count()
+        num_deleted_users = User.query.filter_by(is_deleted=True).count()
 
         if form.validate_on_submit():
             search_results = []
@@ -504,24 +508,32 @@ class RHUsersAdmin(RHAdminBase):
             include_deleted = form_data.pop('include_deleted')
             include_pending = form_data.pop('include_pending')
             external = form_data.pop('external')
-            form_data = {k: v for (k, v) in form_data.iteritems() if v and v.strip()}
+            form_data = {k: v for (k, v) in form_data.items() if v and v.strip()}
             matches = search_users(exact=exact, include_deleted=include_deleted, include_pending=include_pending,
                                    include_blocked=True, external=external, allow_system_user=True, **form_data)
             for entry in matches:
                 if isinstance(entry, User):
                     search_results.append(UserEntry(
+                        avatar_url=entry.avatar_url,
                         profile_url=url_for('.user_profile', entry),
                         user=entry,
                         **{k: getattr(entry, k) for k in IDENTITY_ATTRIBUTES}
                     ))
                 else:
+                    if not entry.data['first_name'] and not entry.data['last_name']:
+                        full_name = '<no name>'
+                        initial = '?'
+                    else:
+                        full_name = f'{entry.data["first_name"]} {entry.data["last_name"]}'.strip()
+                        initial = full_name[0]
                     search_results.append(UserEntry(
+                        avatar_url=url_for('assets.avatar', name=initial),
                         profile_url=None,
                         user=None,
-                        full_name="{first_name} {last_name}".format(**entry.data.to_dict()),
+                        full_name=full_name,
                         **{k: entry.data.get(k) for k in (IDENTITY_ATTRIBUTES - {'full_name'})}
                     ))
-            search_results.sort(key=attrgetter('first_name', 'last_name'))
+            search_results.sort(key=attrgetter('full_name'))
 
         num_reg_requests = RegistrationRequest.query.count()
         return WPUsersAdmin.render_template('users_admin.html', 'users', form=form, search_results=search_results,
@@ -541,7 +553,7 @@ class RHUsersAdminSettings(RHAdminBase):
 
 
 class RHUsersAdminCreate(RHAdminBase):
-    """Create user (admin)"""
+    """Create user (admin)."""
 
     def _process(self):
         form = AdminAccountRegistrationForm()
@@ -594,7 +606,7 @@ def _get_merge_problems(source, target):
 
 
 class RHUsersAdminMerge(RHAdminBase):
-    """Merge users (admin)"""
+    """Merge users (admin)."""
 
     def _process(self):
         form = MergeForm()
@@ -620,14 +632,14 @@ class RHUsersAdminMergeCheck(RHAdminBase):
     @use_kwargs({
         'source': Principal(allow_external_users=True, required=True),
         'target': Principal(allow_external_users=True, required=True),
-    })
+    }, location='query')
     def _process(self, source, target):
         errors, warnings = _get_merge_problems(source, target)
         return jsonify(errors=errors, warnings=warnings, source=serialize_user(source), target=serialize_user(target))
 
 
 class RHRegistrationRequestList(RHAdminBase):
-    """List all registration requests"""
+    """List all registration requests."""
 
     def _process(self):
         requests = RegistrationRequest.query.order_by(RegistrationRequest.email).all()
@@ -635,7 +647,7 @@ class RHRegistrationRequestList(RHAdminBase):
 
 
 class RHRegistrationRequestBase(RHAdminBase):
-    """Base class to process a registration request"""
+    """Base class to process a registration request."""
 
     def _process_args(self):
         RHAdminBase._process_args(self)
@@ -643,7 +655,7 @@ class RHRegistrationRequestBase(RHAdminBase):
 
 
 class RHAcceptRegistrationRequest(RHRegistrationRequestBase):
-    """Accept a registration request"""
+    """Accept a registration request."""
 
     def _process(self):
         user, identity = register_user(self.request.email, self.request.extra_emails, self.request.user_data,
@@ -655,7 +667,7 @@ class RHAcceptRegistrationRequest(RHRegistrationRequestBase):
 
 
 class RHRejectRegistrationRequest(RHRegistrationRequestBase):
-    """Reject a registration request"""
+    """Reject a registration request."""
 
     def _process(self):
         db.session.delete(self.request)
@@ -665,25 +677,25 @@ class RHRejectRegistrationRequest(RHRegistrationRequestBase):
         return jsonify_data()
 
 
-class UserSearchResultSchema(mm.ModelSchema):
+class UserSearchResultSchema(mm.SQLAlchemyAutoSchema):
     class Meta:
         model = User
-        fields = ('id', 'identifier', 'email', 'affiliation', 'full_name')
+        fields = ('id', 'identifier', 'email', 'affiliation', 'full_name', 'first_name', 'last_name')
 
 
 search_result_schema = UserSearchResultSchema()
 
 
 class RHUserSearch(RHProtected):
-    """Search for users based on given criteria"""
+    """Search for users based on given criteria."""
 
     def _serialize_pending_user(self, entry):
         first_name = entry.data.get('first_name') or ''
         last_name = entry.data.get('last_name') or ''
-        full_name = '{} {}'.format(first_name, last_name).strip() or 'Unknown'
+        full_name = f'{first_name} {last_name}'.strip() or 'Unknown'
         affiliation = entry.data.get('affiliation') or ''
         email = entry.data['email'].lower()
-        ext_id = '{}:{}'.format(entry.provider.name, entry.identifier)
+        ext_id = f'{entry.provider.name}:{entry.identifier}'
         # detailed data to put in redis to create a pending user if needed
         self.externals[ext_id] = {
             'first_name': first_name,
@@ -697,10 +709,12 @@ class RHUserSearch(RHProtected):
         return {
             '_ext_id': ext_id,
             'id': None,
-            'identifier': 'ExternalUser:{}'.format(ext_id),
+            'identifier': f'ExternalUser:{ext_id}',
             'email': email,
             'affiliation': affiliation,
             'full_name': full_name,
+            'first_name': first_name,
+            'last_name': last_name,
         }
 
     def _serialize_entry(self, entry):
@@ -710,24 +724,24 @@ class RHUserSearch(RHProtected):
             return self._serialize_pending_user(entry)
 
     def _process_pending_users(self, results):
-        cache = GenericCache('external-user')
+        cache = make_scoped_cache('external-user')
         for entry in results:
             ext_id = entry.pop('_ext_id', None)
             if ext_id is not None:
-                cache.set(ext_id, self.externals[ext_id], 86400)
+                cache.set(ext_id, self.externals[ext_id], timeout=86400)
 
     @use_kwargs({
         'first_name': fields.Str(validate=validate.Length(min=1)),
         'last_name': fields.Str(validate=validate.Length(min=1)),
-        'email': fields.Str(validate=lambda s: len(s) > 3 and '@' in s),
+        'email': fields.Str(validate=lambda s: len(s) > 3),
         'affiliation': fields.Str(validate=validate.Length(min=1)),
         'exact': fields.Bool(missing=False),
         'external': fields.Bool(missing=False),
         'favorites_first': fields.Bool(missing=False)
     }, validate=validate_with_message(
-        lambda args: args.viewkeys() & {'first_name', 'last_name', 'email', 'affiliation'},
+        lambda args: args.keys() & {'first_name', 'last_name', 'email', 'affiliation'},
         'No criteria provided'
-    ))
+    ), location='query')
     def _process(self, exact, external, favorites_first, **criteria):
         matches = search_users(exact=exact, include_pending=True, external=external, **criteria)
         self.externals = {}
@@ -743,7 +757,7 @@ class RHUserSearch(RHProtected):
 
 class RHUserSearchInfo(RHProtected):
     def _process(self):
-        external_users_available = any(auth.supports_search for auth in multipass.identity_providers.itervalues())
+        external_users_available = any(auth.supports_search for auth in multipass.identity_providers.values())
         return jsonify(external_users_available=external_users_available)
 
 

@@ -8,7 +8,8 @@
                {% if field.data and not field.date_missing %}value="{{ field.data | format_date('code', timezone=field.timezone) }}"{% endif %}
                {{ input_args | html_params }}>{#--#}
         <input type="hidden" name="{{ field.name }}" id="{{ field.id }}-timestorage"
-                {% if field.data and not field.time_missing %}value="{{ field.data | format_time('code', timezone=field.timezone) }}"{% endif %}>
+                {% if field.data and not field.time_missing %}value="{{ field.data | format_time('code', timezone=field.timezone) }}"{% endif %}
+                {% if input_args.disabled %}disabled{% endif %}>
         <span id="{{ field.id }}"></span>
     </div>
 {% endblock %}

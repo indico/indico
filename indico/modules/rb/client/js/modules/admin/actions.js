@@ -1,22 +1,23 @@
 // This file is part of Indico.
-// Copyright (C) 2002 - 2020 CERN
+// Copyright (C) 2002 - 2021 CERN
 //
 // Indico is free software; you can redistribute it and/or
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-import settingsURL from 'indico-url:rb.admin_settings';
-import locationsURL from 'indico-url:rb.admin_locations';
-import roomsURL from 'indico-url:rb.admin_rooms';
-import roomURL from 'indico-url:rb.admin_room';
+import attributesURL from 'indico-url:rb.admin_attributes';
 import equipmentTypesURL from 'indico-url:rb.admin_equipment_types';
 import featuresURL from 'indico-url:rb.admin_features';
-import attributesURL from 'indico-url:rb.admin_attributes';
+import locationsURL from 'indico-url:rb.admin_locations';
+import roomURL from 'indico-url:rb.admin_room';
+import roomsURL from 'indico-url:rb.admin_rooms';
+import settingsURL from 'indico-url:rb.admin_settings';
 
 import _ from 'lodash';
 
 import {indicoAxios} from 'indico/utils/axios';
 import {ajaxAction, submitFormAction} from 'indico/utils/redux';
+
 import {actions as filtersActions} from '../../common/filters';
 
 export const FETCH_SETTINGS_REQUEST = 'admin/FETCH_SETTINGS_REQUEST';

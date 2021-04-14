@@ -1,14 +1,15 @@
 // This file is part of Indico.
-// Copyright (C) 2002 - 2020 CERN
+// Copyright (C) 2002 - 2021 CERN
 //
 // Indico is free software; you can redistribute it and/or
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
 import 'react-dates/initialize';
+import moment from 'moment';
 import PropTypes from 'prop-types';
 import React, {useEffect, useMemo, useRef, useState, useCallback} from 'react';
-import moment from 'moment';
+
 import {SingleDatePicker} from 'indico/react/components';
 import {Translate} from 'indico/react/i18n';
 import {toMoment} from 'indico/utils/date';

@@ -1,6 +1,4 @@
-# -*- coding: utf-8 -*-
-#
-# cds-indico documentation build configuration file, created by
+# indico documentation build configuration file, created by
 # sphinx-quickstart on Sun Nov 29 13:19:24 2009.
 #
 # This file is execfile()d with the current directory set to its containing dir.
@@ -30,8 +28,8 @@ sys.path.insert(0, os.path.abspath('.'))
 
 def _get_version():
     _version_re = re.compile(r'__version__\s+=\s+(.*)')
-    with open('../../indico/__init__.py', 'rb') as f:
-        version = str(ast.literal_eval(_version_re.search(f.read().decode('utf-8')).group(1)))
+    with open('../../indico/__init__.py') as f:
+        version = str(ast.literal_eval(_version_re.search(f.read()).group(1)))
     short_version = re.match(r'^(\d+(?:\.\d+)*).*?$', version).group(1)
     return short_version, version
 
@@ -65,8 +63,8 @@ source_encoding = 'utf-8'
 master_doc = 'index'
 
 # General information about the project.
-project = u'Indico'
-copyright = u'2019, Indico Team'
+project = 'Indico'
+copyright = '2020, Indico Team'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
@@ -168,7 +166,7 @@ html_static_path = ['_static']
 
 # Custom sidebar templates, maps document names to template names.
 html_sidebars = {
-   '**': ['about.html', 'navigation.html', 'searchbox.html']
+    '**': ['about.html', 'navigation.html', 'searchbox.html']
 }
 # Additional templates that should be rendered to pages, maps page names to
 # template names.
@@ -209,8 +207,7 @@ htmlhelp_basename = 'indicodoc'
 # Grouping the document tree into LaTeX files. List of tuples
 # (source start file, target name, title, author, documentclass [howto/manual]).
 latex_documents = [
-  ('index', 'indico.tex', u'Indico Documentation',
-   u'Indico Team', 'manual'),
+    ('index', 'indico.tex', 'Indico Documentation', 'Indico Team', 'manual'),
 ]
 
 # The name of an image file (relative to this directory) to place at the top of

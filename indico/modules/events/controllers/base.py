@@ -1,11 +1,9 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
-
-from __future__ import unicode_literals
 
 from flask import flash, redirect, request, session
 from werkzeug.exceptions import Forbidden, NotFound
@@ -20,7 +18,7 @@ from indico.web.rh import RH
 
 class RHEventBase(RH):
     def _process_args(self):
-        self.event = Event.get(int(request.view_args['confId']))
+        self.event = Event.get(request.view_args['event_id'])
         if self.event is None:
             raise NotFound(_('An event with this ID does not exist.'))
         elif self.event.is_deleted:

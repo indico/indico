@@ -1,25 +1,26 @@
 // This file is part of Indico.
-// Copyright (C) 2002 - 2020 CERN
+// Copyright (C) 2002 - 2021 CERN
 //
 // Indico is free software; you can redistribute it and/or
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-import React from 'react';
 import PropTypes from 'prop-types';
-import {bindActionCreators} from 'redux';
+import React from 'react';
 import {connect} from 'react-redux';
+import {bindActionCreators} from 'redux';
 import {Grid, Icon, Modal, Message} from 'semantic-ui-react';
 
 import {Translate} from 'indico/react/i18n';
 import {IndicoPropTypes} from 'indico/react/util';
 import {createDT, isBookingStartDTValid} from 'indico/utils/date';
 
-import RoomBasicDetails from '../../components/RoomBasicDetails';
-import BookingBootstrapForm from '../../components/BookingBootstrapForm';
+import {selectors as configSelectors} from '../../common/config';
 import {selectors as roomsSelectors} from '../../common/rooms';
 import {selectors as userSelectors} from '../../common/user';
-import {selectors as configSelectors} from '../../common/config';
+import BookingBootstrapForm from '../../components/BookingBootstrapForm';
+import RoomBasicDetails from '../../components/RoomBasicDetails';
+
 import * as bookRoomActions from './actions';
 import * as bookRoomSelectors from './selectors';
 

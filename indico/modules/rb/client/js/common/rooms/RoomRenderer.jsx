@@ -1,15 +1,17 @@
 // This file is part of Indico.
-// Copyright (C) 2002 - 2020 CERN
+// Copyright (C) 2002 - 2021 CERN
 //
 // Indico is free software; you can redistribute it and/or
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-import React from 'react';
 import PropTypes from 'prop-types';
-import {Button, Card} from 'semantic-ui-react';
+import React from 'react';
 import Overridable from 'react-overridable';
+import {Button, Card} from 'semantic-ui-react';
+
 import {Slot} from 'indico/react/util';
+
 import Room from '../../components/Room';
 import {withHoverListener} from '../map/util';
 

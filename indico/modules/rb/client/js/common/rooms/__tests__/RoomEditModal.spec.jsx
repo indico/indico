@@ -1,5 +1,5 @@
 // This file is part of Indico.
-// Copyright (C) 2002 - 2020 CERN
+// Copyright (C) 2002 - 2021 CERN
 //
 // Indico is free software; you can redistribute it and/or
 // modify it under the terms of the MIT License; see the
@@ -8,15 +8,17 @@
 import attributesURL from 'indico-url:rb.admin_attributes';
 import permissionInfoURL from 'indico-url:rb.permission_types';
 
+import {mount} from 'enzyme';
+import axiosMock from 'jest-mock-axios';
 import React from 'react';
 import {act} from 'react-dom/test-utils';
-import {mount} from 'enzyme';
-import {Tab} from 'semantic-ui-react';
+import {FieldArray} from 'react-final-form-arrays';
 import {Provider} from 'react-redux';
 import configureMockStore from 'redux-mock-store';
-import {FieldArray} from 'react-final-form-arrays';
-import axiosMock from 'jest-mock-axios';
+import {Tab} from 'semantic-ui-react';
+
 import {FinalField} from 'indico/react/forms';
+
 import RoomEditModal from '../edit/RoomEditModal';
 
 jest.mock('indico/react/components/principals/ACLField', () => () => null);

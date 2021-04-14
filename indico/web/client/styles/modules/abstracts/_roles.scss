@@ -1,5 +1,5 @@
 // This file is part of Indico.
-// Copyright (C) 2002 - 2020 CERN
+// Copyright (C) 2002 - 2021 CERN
 //
 // Indico is free software; you can redistribute it and/or
 // modify it under the terms of the MIT License; see the
@@ -89,7 +89,8 @@
     padding: 0;
 
     li {
-      padding: 0.1em 0.7em !important;
+      padding: 0.1em 0.7em;
+      -moz-padding-end: 2rem;
 
       & > ::before {
         cursor: pointer;
@@ -118,6 +119,10 @@
 
       .icon-stop.no-account {
         color: $yellow;
+      }
+
+      .icon-stop.no-registration {
+        color: $orange;
       }
 
       span.titled-rule {

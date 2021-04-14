@@ -1,11 +1,9 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
-
-from __future__ import unicode_literals
 
 import re
 from collections import namedtuple
@@ -54,7 +52,7 @@ def _extract_font_size(text):
     return int(FONT_SIZE_RE.match(text).group(1))
 
 
-class DesignerPDFBase(object):
+class DesignerPDFBase:
     def __init__(self, template, config):
         self.config = self._build_config(config)
         self.template = template
@@ -62,7 +60,7 @@ class DesignerPDFBase(object):
         self.backside_tpl_data = None
         if template.backside_template:
             self.backside_tpl_data = self._process_tpl_data(template.backside_template.data)
-        self.page_size = getattr(pagesizes, self.config.page_size.name)
+        self.page_size = self.config.page_size.size
         if self.config.page_orientation == PageOrientation.landscape:
             self.page_size = pagesizes.landscape(self.page_size)
         self.width, self.height = self.page_size
@@ -74,7 +72,7 @@ class DesignerPDFBase(object):
                        **tpl_data)
 
     def _remove_transparency(self, fd):
-        """Remove transparency from an image and replace it with white"""
+        """Remove transparency from an image and replace it with white."""
         img = Image.open(fd)
         # alpha-channel PNG: replace the transparent areas with plain white
         if img.mode == 'RGBA':

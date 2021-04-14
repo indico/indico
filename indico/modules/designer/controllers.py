@@ -1,11 +1,9 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
-
-from __future__ import unicode_literals
 
 import shutil
 from collections import defaultdict
@@ -89,8 +87,7 @@ def _render_template_list(target, event=None):
 
 
 class TemplateDesignerMixin:
-    """
-    Basic class for all template designer mixins.
+    """Basic class for all template designer mixins.
 
     It resolves the target object type from the blueprint URL.
     """
@@ -109,8 +106,7 @@ class TemplateDesignerMixin:
 
 
 class SpecificTemplateMixin(TemplateDesignerMixin):
-    """
-    Mixin that accepts a target template passed in the URL.
+    """Mixin that accepts a target template passed in the URL.
 
     The target category/event will be the owner of that template.
     """
@@ -135,7 +131,7 @@ class SpecificTemplateMixin(TemplateDesignerMixin):
         self.template = DesignerTemplate.get_or_404(request.view_args['template_id'])
 
 
-class BacksideTemplateProtectionMixin(object):
+class BacksideTemplateProtectionMixin:
     def _check_access(self):
         self._require_user()
         # Category templates can be used as backsides - we can't require management
@@ -180,7 +176,7 @@ class CloneTemplateMixin(TargetFromURLMixin):
         self.template = DesignerTemplate.get_or_404(request.view_args['template_id'])
 
     def _process(self):
-        title = "{} (copy)".format(self.template.title)
+        title = f"{self.template.title} (copy)"
         new_template = DesignerTemplate(title=title, type=self.template.type, data=self.template.data,
                                         **self.target_dict)
 
@@ -305,7 +301,7 @@ class RHDownloadTemplateImage(BacksideTemplateProtectionMixin, RHModifyDesignerT
 
     def _process_args(self):
         RHModifyDesignerTemplateBase._process_args(self)
-        self.image = DesignerImageFile.find_one(id=request.view_args['image_id'], template=self.template)
+        self.image = DesignerImageFile.query.filter_by(id=request.view_args['image_id'], template=self.template).first()
 
     def _process(self):
         return self.image.send()
@@ -320,7 +316,7 @@ class RHUploadBackgroundImage(RHModifyDesignerTemplateBase):
         data.seek(0)
         try:
             image_type = Image.open(data).format.lower()
-        except IOError:
+        except OSError:
             # Invalid image data
             return jsonify(error="Invalid image data!")
         data.seek(0)

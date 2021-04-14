@@ -1,11 +1,9 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
-
-from __future__ import unicode_literals
 
 from io import BytesIO
 
@@ -378,7 +376,7 @@ class RHRoomPhoto(RHRoomAdminBase):
         f = request.files['photo']
         try:
             photo = Image.open(f)
-        except IOError:
+        except OSError:
             raise UserValueError(_('You cannot upload this file as a room picture.'))
         if photo.format.lower() not in {'jpeg', 'png', 'gif'}:
             raise UserValueError(_('The file has an invalid format ({format}).').format(format=photo.format))
@@ -389,7 +387,7 @@ class RHRoomPhoto(RHRoomAdminBase):
         image_bytes.seek(0)
         self.room.photo = Photo(data=image_bytes.read())
         token = build_rooms_spritesheet()
-        return jsonify(rooms_sprite_token=unicode(token))
+        return jsonify(rooms_sprite_token=str(token))
 
 
 class RHRooms(RHRoomBookingAdminBase):

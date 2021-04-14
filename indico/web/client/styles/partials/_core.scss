@@ -1,5 +1,5 @@
 // This file is part of Indico.
-// Copyright (C) 2002 - 2020 CERN
+// Copyright (C) 2002 - 2021 CERN
 //
 // Indico is free software; you can redistribute it and/or
 // modify it under the terms of the MIT License; see the
@@ -101,6 +101,7 @@
     height: 3em;
     position: absolute;
     width: 100%;
+    z-index: 1;
   }
 }
 
@@ -122,7 +123,9 @@ img {
   border: 0;
 }
 
-label:not(.ui.checkbox),
-.label:not(.ui.checkbox) {
+.i-form label,
+.i-form .label,
+.i-button.label,
+.i-button.label:hover {
   font-weight: bold;
 }

@@ -1,18 +1,19 @@
 // This file is part of Indico.
-// Copyright (C) 2002 - 2020 CERN
+// Copyright (C) 2002 - 2021 CERN
 //
 // Indico is free software; you can redistribute it and/or
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
 import fetchBookingDetailsURL from 'indico-url:rb.booking_details';
+import bookingOccurrenceStateActionsURL from 'indico-url:rb.booking_occurrence_state_actions';
 import bookingStateActionsURL from 'indico-url:rb.booking_state_actions';
 import bookingDeleteURL from 'indico-url:rb.delete_booking';
 import bookingUpdateURL from 'indico-url:rb.update_booking';
-import bookingOccurrenceStateActionsURL from 'indico-url:rb.booking_occurrence_state_actions';
 
 import {indicoAxios} from 'indico/utils/axios';
 import {ajaxAction, submitFormAction} from 'indico/utils/redux';
+
 import {openModal} from '../../actions';
 
 export const BOOKING_DETAILS_RECEIVED = 'bookings/BOOKING_DETAILS_RECEIVED';

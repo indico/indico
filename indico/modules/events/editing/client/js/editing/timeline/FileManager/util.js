@@ -1,15 +1,18 @@
 // This file is part of Indico.
-// Copyright (C) 2002 - 2020 CERN
+// Copyright (C) 2002 - 2021 CERN
 //
 // Indico is free software; you can redistribute it and/or
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
+import globToRegExp from 'glob-to-regexp';
 import _ from 'lodash';
-import React from 'react';
 import PropTypes from 'prop-types';
+import React from 'react';
+
 import {indicoAxios, handleAxiosError} from 'indico/utils/axios';
 import {snakifyKeys} from 'indico/utils/case';
+
 import * as actions from './actions';
 import {getFiles} from './selectors';
 
@@ -106,11 +109,22 @@ export function mapFileTypes(fileTypes, files, uploadableFiles = []) {
     ...fileType,
     files: files.filter(file => file.fileType === fileType.id).map(f => ({...f, claimed: true})),
     invalidFiles: [],
-    uploadableFiles: uploadableFiles.filter(
+    uploadableFiles: filesForFileType(uploadableFiles, fileType),
+  }));
+}
+
+function filesForFileType(files, fileType) {
+  const templateRe = fileType.filenameTemplate && globToRegExp(fileType.filenameTemplate);
+  return files
+    .filter(
+      file =>
+        !fileType.filenameTemplate ||
+        templateRe.test(file.filename.slice(0, file.filename.lastIndexOf('.')))
+    )
+    .filter(
       file =>
         !fileType.extensions.length || fileType.extensions.includes(file.filename.split('.').pop())
-    ),
-  }));
+    );
 }
 
 export function getFilesFromRevision(fileTypes, revision) {

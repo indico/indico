@@ -1,11 +1,9 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
-
-from __future__ import unicode_literals
 
 from copy import deepcopy
 
@@ -24,7 +22,7 @@ class FieldConfigForm(IndicoForm):
                                description=_("Whether the user has to fill out the field"))
 
 
-class BaseField(object):
+class BaseField:
     """Base class for a custom field.
 
     To create a new field, subclass this class and register
@@ -62,29 +60,29 @@ class BaseField(object):
 
     @property
     def validators(self):
-        """Return a list of validators for this field"""
+        """Return a list of validators for this field."""
         return None
 
     @property
     def wtf_field_kwargs(self):
-        """Return a dict of kwargs for this field's wtforms field"""
+        """Return a dict of kwargs for this field's wtforms field."""
         return {}
 
     def create_wtf_field(self):
-        """Return a WTForms field for this field"""
+        """Return a WTForms field for this field."""
         return self._make_wtforms_field(self.wtf_field_class, self.validators, **self.wtf_field_kwargs)
 
     @classmethod
     def create_config_form(cls, *args, **kwargs):
-        """Create the WTForm to configure this field"""
+        """Create the WTForm to configure this field."""
         bases = (cls.config_form_base, cls.config_form) if cls.config_form is not None else (cls.config_form_base,)
-        form_cls = type(b'_FieldConfigForm', bases, {})
+        form_cls = type('_FieldConfigForm', bases, {})
         form = form_cls(*args, **kwargs)
         form._common_fields = cls.common_settings
         return form
 
     def copy_field_data(self):
-        """Return a copy of the field's configuration data"""
+        """Return a copy of the field's configuration data."""
         return deepcopy(self.object.field_data)
 
     def is_value_empty(self, value):
@@ -105,11 +103,11 @@ class BaseField(object):
             setattr(self.object, field, data[field])
         self.object.field_type = self.name
         self.object.field_data = {name: value
-                                  for name, value in data.iteritems()
+                                  for name, value in data.items()
                                   if name not in self.common_settings and name != 'csrf_token'}
 
     def get_friendly_value(self, value):
-        """Return the human-friendly version of the field's value
+        """Return the human-friendly version of the field's value.
 
         :param value: The database object containing the value of
                       the field

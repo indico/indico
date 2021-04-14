@@ -1,5 +1,5 @@
 // This file is part of Indico.
-// Copyright (C) 2002 - 2020 CERN
+// Copyright (C) 2002 - 2021 CERN
 //
 // Indico is free software; you can redistribute it and/or
 // modify it under the terms of the MIT License; see the
@@ -9,16 +9,17 @@ import contributionDisplayURL from 'indico-url:contributions.display_contributio
 import assignMyselfURL from 'indico-url:event_editing.api_assign_editable_self';
 import unassignEditorURL from 'indico-url:event_editing.api_unassign_editable';
 
+import PropTypes from 'prop-types';
 import React from 'react';
 import {useDispatch, useSelector} from 'react-redux';
-import PropTypes from 'prop-types';
-
 import {Message, Icon} from 'semantic-ui-react';
-import {Param, Translate} from 'indico/react/i18n';
+
 import {MathJax} from 'indico/react/components';
+import {Param, Translate} from 'indico/react/i18n';
 import {indicoAxios, handleAxiosError} from 'indico/utils/axios';
-import {getDetails} from './selectors';
+
 import {loadTimeline} from './actions';
+import {getDetails} from './selectors';
 
 export default function TimelineHeader({children, contribution, state, submitter, eventId}) {
   const {
@@ -35,7 +36,7 @@ export default function TimelineHeader({children, contribution, state, submitter
   const unassignEditor = async () => {
     try {
       await indicoAxios.delete(
-        unassignEditorURL({confId: eventId, contrib_id: contribution.id, type})
+        unassignEditorURL({event_id: eventId, contrib_id: contribution.id, type})
       );
     } catch (error) {
       return handleAxiosError(error);
@@ -45,7 +46,9 @@ export default function TimelineHeader({children, contribution, state, submitter
 
   const assignMyself = async () => {
     try {
-      await indicoAxios.put(assignMyselfURL({confId: eventId, contrib_id: contribution.id, type}));
+      await indicoAxios.put(
+        assignMyselfURL({event_id: eventId, contrib_id: contribution.id, type})
+      );
     } catch (error) {
       return handleAxiosError(error);
     }
@@ -83,7 +86,10 @@ export default function TimelineHeader({children, contribution, state, submitter
                   value={contribution.title}
                   wrapper={
                     <a
-                      href={contributionDisplayURL({contrib_id: contribution.id, confId: eventId})}
+                      href={contributionDisplayURL({
+                        event_id: eventId,
+                        contrib_id: contribution.id,
+                      })}
                     />
                   }
                 />

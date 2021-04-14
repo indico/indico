@@ -1,11 +1,9 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
-
-from __future__ import division, unicode_literals
 
 from collections import namedtuple
 
@@ -23,7 +21,7 @@ ConfigData = namedtuple('ConfigData', ['margin_horizontal', 'margin_vertical', '
 class PosterPDF(DesignerPDFBase):
 
     def __init__(self, template, config, event):
-        super(PosterPDF, self).__init__(template, config)
+        super().__init__(template, config)
         self.event = event
 
     def _build_config(self, config_data):
@@ -55,7 +53,9 @@ class PosterPDF(DesignerPDFBase):
             self._draw_item(canvas, item, tpl_data, text, config.margin_horizontal, config.margin_vertical)
 
     def _draw_poster(self, canvas, registration, pos_x, pos_y):
-        """Draw a badge for a given registration, at position pos_x, pos_y (top-left corner).
+        """
+        Draw a badge for a given registration, at position pos_x,
+        pos_y (top-left corner).
         """
         config = self.config
         tpl_data = self.tpl_data

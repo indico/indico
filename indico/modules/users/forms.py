@@ -1,11 +1,9 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
-
-from __future__ import unicode_literals
 
 from operator import itemgetter
 
@@ -29,7 +27,7 @@ from indico.web.forms.widgets import SwitchWidget, SyncedInputWidget
 
 
 class UserDetailsForm(SyncedInputsMixin, IndicoForm):
-    title = IndicoEnumSelectField(_('Title'), enum=UserTitle)
+    title = IndicoEnumSelectField(_('Title'), enum=UserTitle, sorted=True)
     first_name = StringField(_('First name'), [used_if_not_synced, DataRequired()], widget=SyncedInputWidget())
     last_name = StringField(_('Family name'), [used_if_not_synced, DataRequired()], widget=SyncedInputWidget())
     affiliation = StringField(_('Affiliation'), widget=SyncedInputWidget())
@@ -65,12 +63,12 @@ class UserPreferencesForm(IndicoForm):
         description=_('The previewer is used by default for image and text files, but not for PDF files.'))
 
     def __init__(self, *args, **kwargs):
-        super(UserPreferencesForm, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
-        locales = [(code, '{} ({})'.format(name, territory) if territory else name)
-                   for code, (name, territory) in get_all_locales().iteritems()]
+        locales = [(code, f'{name} ({territory})' if territory else name)
+                   for code, (name, territory) in get_all_locales().items()]
         self.lang.choices = sorted(locales, key=itemgetter(1))
-        self.timezone.choices = zip(common_timezones, common_timezones)
+        self.timezone.choices = list(zip(common_timezones, common_timezones))
         if self.timezone.object_data and self.timezone.object_data not in common_timezones_set:
             self.timezone.choices.append((self.timezone.object_data, self.timezone.object_data))
 
@@ -79,7 +77,13 @@ class UserEmailsForm(IndicoForm):
     email = EmailField(_('Add new email address'), [DataRequired(), Email()], filters=[lambda x: x.lower() if x else x])
 
     def validate_email(self, field):
-        if UserEmail.find(~User.is_pending, is_user_deleted=False, email=field.data, _join=User).count():
+        conflict = (UserEmail.query
+                    .filter(~User.is_pending,
+                            ~UserEmail.is_user_deleted,
+                            UserEmail.email == field.data)
+                    .join(User)
+                    .has_rows())
+        if conflict:
             raise ValidationError(_('This email address is already in use.'))
 
 
@@ -116,7 +120,7 @@ class AdminAccountRegistrationForm(LocalRegistrationForm):
         if config.LOCAL_IDENTITIES:
             for field in ('username', 'password', 'confirm_password'):
                 inject_validators(self, field, [HiddenUnless('create_identity')], early=True)
-        super(AdminAccountRegistrationForm, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         del self.comment
         if not config.LOCAL_IDENTITIES:
             del self.username

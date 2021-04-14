@@ -1,14 +1,15 @@
 // This file is part of Indico.
-// Copyright (C) 2002 - 2020 CERN
+// Copyright (C) 2002 - 2021 CERN
 //
 // Indico is free software; you can redistribute it and/or
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-import React, {useEffect} from 'react';
 import PropTypes from 'prop-types';
-import {Prompt} from 'react-router';
+import React, {useEffect} from 'react';
 import {FormSpy} from 'react-final-form';
+import {Prompt} from 'react-router';
+
 import {Translate} from '../../react/i18n';
 
 const UnloadPrompt = ({active, router, message}) => {

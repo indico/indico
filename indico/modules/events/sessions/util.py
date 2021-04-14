@@ -1,11 +1,9 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
-
-from __future__ import unicode_literals
 
 from collections import defaultdict
 from io import BytesIO
@@ -29,7 +27,7 @@ from indico.web.flask.util import url_for
 
 
 def can_manage_sessions(user, event, permission=None):
-    """Check whether a user can manage any sessions in an event"""
+    """Check whether a user can manage any sessions in an event."""
     if event.can_manage(user):
         return True
     return any(s.can_manage(user, permission)
@@ -71,16 +69,16 @@ class SessionListToPDF(PDFBase):
         rows = []
         row_values = []
         for col in [_('ID'), _('Type'), _('Title'), _('Code'), _('Description')]:
-            row_values.append(Paragraph('<b>{}</b>'.format(col), text_style))
+            row_values.append(Paragraph(f'<b>{col}</b>', text_style))
         rows.append(row_values)
 
         for sess in self.sessions:
             rows.append([
                 Paragraph(sess.friendly_id, text_style),
-                Paragraph(sess.type.name.encode('utf-8') if sess.type else '', text_style),
-                Paragraph(sess.title.encode('utf-8'), text_style),
-                Paragraph(sess.code.encode('utf-8'), text_style),
-                Paragraph(sess.description.encode('utf-8'), text_style)
+                Paragraph(sess.type.name if sess.type else '', text_style),
+                Paragraph(sess.title, text_style),
+                Paragraph(sess.code, text_style),
+                Paragraph(sess.description, text_style)
             ])
 
         col_widths = (None,) * 5
@@ -95,7 +93,7 @@ class SessionListToPDF(PDFBase):
 
 
 def generate_pdf_from_sessions(sessions):
-    """Generate a PDF file from a given session list"""
+    """Generate a PDF file from a given session list."""
     pdf = SessionListToPDF(sessions)
     return BytesIO(pdf.getPDFBin())
 
@@ -116,8 +114,9 @@ def session_coordinator_priv_enabled(event, priv):
 
 
 def get_events_with_linked_sessions(user, dt=None):
-    """Returns a dict with keys representing event_id and the values containing
-    data about the user rights for sessions within the event
+    """
+    Return a dict with keys representing event_id and the values containing
+    data about the user rights for sessions within the event.
 
     :param user: A `User`
     :param dt: Only include events taking place on/after that date
@@ -178,15 +177,8 @@ def serialize_session_for_ical(sess):
     }
 
 
-def get_session_ical_file(sess):
-    from indico.web.http_api.metadata.serializer import Serializer
-    data = {'results': serialize_session_for_ical(sess) if sess.start_dt and sess.end_dt else []}
-    serializer = Serializer.create('ics')
-    return BytesIO(serializer(data))
-
-
 def get_session_timetable_pdf(sess, **kwargs):
-    from indico.legacy.pdfinterface.conference import TimeTablePlain, TimetablePDFFormat
+    from indico.legacy.pdfinterface.conference import TimetablePDFFormat, TimeTablePlain
     pdf_format = TimetablePDFFormat(params={'coverPage': False})
     return TimeTablePlain(sess.event, session.user, showSessions=[sess.id], showDays=[],
                           sortingCrit=None, ttPDFFormat=pdf_format, pagesize='A4', fontsize='normal',

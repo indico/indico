@@ -1,5 +1,5 @@
 // This file is part of Indico.
-// Copyright (C) 2002 - 2020 CERN
+// Copyright (C) 2002 - 2021 CERN
 //
 // Indico is free software; you can redistribute it and/or
 // modify it under the terms of the MIT License; see the
@@ -9,9 +9,11 @@ import {combineReducers} from 'redux';
 
 import {camelizeKeys} from 'indico/utils/case';
 import {requestReducer} from 'indico/utils/redux';
-import * as roomsActions from './actions';
-import * as bookingActions from '../bookings/actions';
+
 import * as bookRoomActions from '../../modules/bookRoom/actions';
+import * as bookingActions from '../bookings/actions';
+
+import * as roomsActions from './actions';
 
 function filterAvailability(roomAvailability, bookingId) {
   return roomAvailability.map(availability => {

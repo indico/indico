@@ -1,14 +1,14 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
 from functools import partial
+from unittest.mock import MagicMock
 
 import pytest
-from mock import MagicMock
 
 from indico.core import signals
 from indico.core.db.sqlalchemy.principals import EmailPrincipal, PrincipalType
@@ -373,12 +373,14 @@ def test_has_management_permission_full_access_db(create_event, dummy_user, crea
     event.update_principal(create_user(123), permissions={'bar'})
     entry = event.update_principal(dummy_user, full_access=True)
 
-    def _find(*args):
-        return EventPrincipal.find(EventPrincipal.event == event, EventPrincipal.has_management_permission(*args))
+    def _query(*args):
+        return (EventPrincipal.query
+                .filter(EventPrincipal.event == event,
+                        EventPrincipal.has_management_permission(*args)))
 
-    assert _find().one() == entry
-    assert _find('foo').one() == entry
-    assert _find('ANY').count() == 2
+    assert _query().one() == entry
+    assert _query('foo').one() == entry
+    assert _query('ANY').count() == 2
 
 
 def test_has_management_permission_no_access():
@@ -393,12 +395,14 @@ def test_has_management_permission_no_access_db(create_event, dummy_user):
     event = create_event()
     event.update_principal(dummy_user, read_access=True)
 
-    def _find(*args):
-        return EventPrincipal.find(EventPrincipal.event == event, EventPrincipal.has_management_permission(*args))
+    def _query(*args):
+        return (EventPrincipal.query
+                .filter(EventPrincipal.event == event,
+                        EventPrincipal.has_management_permission(*args)))
 
-    assert not _find().count()
-    assert not _find('foo').count()
-    assert not _find('ANY').count()
+    assert not _query().count()
+    assert not _query('foo').count()
+    assert not _query('ANY').count()
 
 
 @pytest.mark.parametrize('explicit', (True, False))
@@ -418,13 +422,14 @@ def test_has_management_permission_explicit_db(create_event, dummy_user, create_
     event.update_principal(create_user(123), full_access=True)
     event.update_principal(dummy_user, full_access=True, permissions={'foo'})
 
-    def _find(permission):
-        return EventPrincipal.find(EventPrincipal.event == event,
-                                   EventPrincipal.has_management_permission(permission, explicit=explicit))
+    def _query(permission):
+        return (EventPrincipal.query
+                .filter(EventPrincipal.event == event,
+                        EventPrincipal.has_management_permission(permission, explicit=explicit)))
 
-    assert _find('foo').count() == (1 if explicit else 2)
-    assert _find('bar').count() == (0 if explicit else 2)
-    assert _find('ANY').count() == (1 if explicit else 2)
+    assert _query('foo').count() == (1 if explicit else 2)
+    assert _query('bar').count() == (0 if explicit else 2)
+    assert _query('ANY').count() == (1 if explicit else 2)
 
 
 def test_has_management_permission_explicit_fail():
@@ -449,9 +454,11 @@ def test_has_management_permission_db(create_event, create_user, dummy_user):
     event.update_principal(create_user(123), permissions={'bar'})
     entry = event.update_principal(dummy_user, permissions={'foo'})
 
-    def _find(*args):
-        return EventPrincipal.find(EventPrincipal.event == event, EventPrincipal.has_management_permission(*args))
+    def _query(*args):
+        return (EventPrincipal.query
+                .filter(EventPrincipal.event == event,
+                        EventPrincipal.has_management_permission(*args)))
 
-    assert not _find().count()
-    assert _find('foo').one() == entry
-    assert _find('ANY').count() == 2
+    assert not _query().count()
+    assert _query('foo').one() == entry
+    assert _query('ANY').count() == 2

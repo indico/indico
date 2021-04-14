@@ -1,21 +1,19 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import unicode_literals
-
 from wtforms.fields import PasswordField, SelectField, StringField, TextAreaField
 from wtforms.fields.html5 import EmailField
-from wtforms.validators import DataRequired, Email, Length, Optional, ValidationError
+from wtforms.validators import DataRequired, Email, Optional, ValidationError
 
 from indico.modules.auth import Identity
 from indico.modules.users import User
 from indico.util.i18n import _
 from indico.web.forms.base import IndicoForm, SyncedInputsMixin
-from indico.web.forms.validators import ConfirmPassword, used_if_not_synced
+from indico.web.forms.validators import ConfirmPassword, SecurePassword, used_if_not_synced
 from indico.web.forms.widgets import SyncedInputWidget
 
 
@@ -40,19 +38,26 @@ class LocalLoginForm(IndicoForm):
 
 class AddLocalIdentityForm(IndicoForm):
     username = StringField(_('Username'), [DataRequired(), _check_existing_username], filters=[_tolower])
-    password = PasswordField(_('Password'), [DataRequired(), Length(min=5)])
-    confirm_password = PasswordField(_('Confirm password'), [DataRequired(), ConfirmPassword('password')])
+    password = PasswordField(_('Password'), [DataRequired(), SecurePassword('set-user-password',
+                                                                            username_field='username')],
+                             render_kw={'autocomplete': 'new-password'})
+    confirm_password = PasswordField(_('Confirm password'), [DataRequired(), ConfirmPassword('password')],
+                                     render_kw={'autocomplete': 'new-password'})
 
 
 class EditLocalIdentityForm(IndicoForm):
     username = StringField(_('Username'), [DataRequired()], filters=[_tolower])
-    password = PasswordField(_('Current password'), [DataRequired()])
-    new_password = PasswordField(_('New password'), [Optional(), Length(min=5)])
-    confirm_new_password = PasswordField(_('Confirm password'), [ConfirmPassword('new_password')])
+    password = PasswordField(_('Current password'), [DataRequired()],
+                             render_kw={'autocomplete': 'current-password'})
+    new_password = PasswordField(_('New password'), [Optional(), SecurePassword('set-user-password',
+                                                                                username_field='username')],
+                                 render_kw={'autocomplete': 'new-password'})
+    confirm_new_password = PasswordField(_('Confirm password'), [ConfirmPassword('new_password')],
+                                         render_kw={'autocomplete': 'new-password'})
 
     def __init__(self, *args, **kwargs):
         self.identity = kwargs.pop('identity', None)
-        super(EditLocalIdentityForm, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
     def validate_password(self, field):
         if field.data != self.identity.password:
@@ -95,14 +100,17 @@ class MultipassRegistrationForm(SyncedInputsMixin, IndicoForm):
 class LocalRegistrationForm(RegistrationForm):
     email = EmailField(_('Email address'), [Email(), _check_existing_email])
     username = StringField(_('Username'), [DataRequired(), _check_existing_username], filters=[_tolower])
-    password = PasswordField(_('Password'), [DataRequired(), Length(min=5)])
-    confirm_password = PasswordField(_('Confirm password'), [DataRequired(), ConfirmPassword('password')])
+    password = PasswordField(_('Password'), [DataRequired(), SecurePassword('set-user-password',
+                                                                            username_field='username')],
+                             render_kw={'autocomplete': 'new-password'})
+    confirm_password = PasswordField(_('Confirm password'), [DataRequired(), ConfirmPassword('password')],
+                                     render_kw={'autocomplete': 'new-password'})
     comment = TextAreaField(_('Comment'), description=_("You can provide additional information or a comment for the "
                                                         "administrators who will review your registration."))
 
     @property
     def data(self):
-        data = super(LocalRegistrationForm, self).data
+        data = super().data
         data.pop('confirm_password', None)
         return data
 
@@ -129,5 +137,6 @@ class ResetPasswordEmailForm(IndicoForm):
 
 class ResetPasswordForm(IndicoForm):
     username = StringField(_('Username'))
-    password = PasswordField(_('New password'), [DataRequired(), Length(min=5)])
+    password = PasswordField(_('New password'), [DataRequired(), SecurePassword('set-user-password',
+                                                                                username_field='username')])
     confirm_password = PasswordField(_('Confirm password'), [DataRequired(), ConfirmPassword('password')])

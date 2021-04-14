@@ -1,11 +1,9 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
-
-from __future__ import division, unicode_literals
 
 from collections import defaultdict, namedtuple
 from itertools import chain, groupby
@@ -15,15 +13,15 @@ from indico.util.date_time import now_utc
 from indico.util.i18n import _
 
 
-class StatsBase(object):
+class StatsBase:
     def __init__(self, title, subtitle, type, **kwargs):
-        """Base class for registration form statistics
+        """Base class for registration form statistics.
 
         :param title: str -- the title for the stats box
         :param subtitle: str -- the subtitle for the stats box
         :param type: str -- the type used in Jinja to display the stats
         """
-        super(StatsBase, self).__init__(**kwargs)
+        super().__init__(**kwargs)
         self.title = title
         self.subtitle = subtitle
         self.type = type
@@ -34,7 +32,7 @@ class StatsBase(object):
 
 
 class Cell(namedtuple('Cell', ['type', 'data', 'colspan', 'classes', 'qtip'])):
-    """Hold data and type for a cell of a stats table"""
+    """Hold data and type for a cell of a stats table."""
 
     _type_defaults = {
         'str': '',
@@ -80,7 +78,7 @@ class Cell(namedtuple('Cell', ['type', 'data', 'colspan', 'classes', 'qtip'])):
             classes = []
         if data is None:
             data = Cell._type_defaults.get(type, None)
-        return super(Cell, cls).__new__(cls, type, data, colspan, classes, qtip)
+        return super().__new__(cls, type, data, colspan, classes, qtip)
 
 
 class DataItem(namedtuple('DataItem', ['regs', 'attendance', 'capacity', 'billable', 'cancelled', 'price',
@@ -88,7 +86,7 @@ class DataItem(namedtuple('DataItem', ['regs', 'attendance', 'capacity', 'billab
     def __new__(cls, regs=0, attendance=0, capacity=0, billable=False, cancelled=False, price=0, fixed_price=False,
                 paid=0, paid_amount=0, unpaid=0, unpaid_amount=0):
         """
-        Holds the aggregation of some data, intended for stats tables as
+        Hold the aggregation of some data, intended for stats tables as
         a aggregation from which to generate cells.
 
         :param regs: int -- number of registrant
@@ -108,16 +106,16 @@ class DataItem(namedtuple('DataItem', ['regs', 'attendance', 'capacity', 'billab
         :param unpaid_amount: float -- amount not already paid by
                               registrants
         """
-        return super(DataItem, cls).__new__(cls, regs, attendance, capacity, billable, cancelled, price, fixed_price,
-                                            paid, paid_amount, unpaid, unpaid_amount)
+        return super().__new__(cls, regs, attendance, capacity, billable, cancelled, price, fixed_price, paid,
+                               paid_amount, unpaid, unpaid_amount)
 
 
-class FieldStats(object):
-    """Holds stats for a registration form field"""
+class FieldStats:
+    """Hold stats for a registration form field."""
 
     def __init__(self, field, **kwargs):
         kwargs.setdefault('type', 'table')
-        super(FieldStats, self).__init__(**kwargs)
+        super().__init__(**kwargs)
         self._field = field
         self._regitems = self._get_registration_data(field)
         self._choices = self._get_choices(field)
@@ -133,12 +131,12 @@ class FieldStats(object):
     def _get_registration_data(self, field):
         registration_ids = [r.id for r in field.registration_form.active_registrations]
         field_data_ids = [data.id for data in field.data_versions]
-        return RegistrationData.find_all(RegistrationData.registration_id.in_(registration_ids),
-                                         RegistrationData.field_data_id.in_(field_data_ids),
-                                         RegistrationData.data != {})
+        return RegistrationData.query.filter(RegistrationData.registration_id.in_(registration_ids),
+                                             RegistrationData.field_data_id.in_(field_data_ids),
+                                             RegistrationData.data != {}).all()
 
     def _build_data(self):
-        """Build data from registration data and field choices
+        """Build data from registration data and field choices.
 
         :returns: (dict, bool) -- the data and a boolean to indicate
                   whether the data contains billing information or not.
@@ -150,15 +148,15 @@ class FieldStats(object):
             choices['billed'][k] = self._build_regitems_data(k, list(regitems))
         for k, regitems in groupby((regitem for regitem in regitems if not regitem.price), key=self._build_key):
             choices['not_billed'][k] = self._build_regitems_data(k, list(regitems))
-        for item in self._choices.itervalues():
+        for item in self._choices.values():
             key = 'billed' if item['price'] else 'not_billed'
             choices[key].setdefault(self._build_key(item), self._build_choice_data(item))
-        for key, choice in chain(choices['billed'].iteritems(), choices['not_billed'].iteritems()):
+        for key, choice in chain(choices['billed'].items(), choices['not_billed'].items()):
             data[key[:2]].append(choice)
         return data, bool(choices['billed'])
 
     def get_table(self):
-        """Returns a table containing the stats for each item.
+        """Return a table containing the stats for each item.
 
         :return: dict -- A table with a list of head cells
                  (key: `'head'`) and a list of rows (key: `'rows'`)
@@ -166,7 +164,7 @@ class FieldStats(object):
         """
         table = defaultdict(list)
         table['head'] = self._get_table_head()
-        for (name, id), data_items in sorted(self._data.iteritems()):
+        for (name, id), data_items in sorted(self._data.items()):
             total_regs = sum(detail.regs for detail in data_items)
             table['rows'].append(('single-row' if len(data_items) == 1 else 'header-row',
                                  self._get_main_row_cells(data_items, name, total_regs) +
@@ -180,7 +178,7 @@ class FieldStats(object):
         return table
 
     def _get_billing_cells(self, data_items):
-        """Return cells with billing information from data items
+        """Return cells with billing information from data items.
 
         :params data_items: [DataItem] -- Data items containing billing info
         :returns: [Cell] -- Cells containing billing information.
@@ -195,7 +193,7 @@ class FieldStats(object):
         unpaid_amount = sum(detail.unpaid_amount for detail in data_items if detail.billable)
         total = paid + unpaid
         total_amount = paid_amount + unpaid_amount
-        progress = [[paid / total, unpaid / total], '{} / {}'.format(paid, total)] if total else None
+        progress = [[paid / total, unpaid / total], f'{paid} / {total}'] if total else None
         return [Cell(),
                 Cell(type='progress-stacked', data=progress, classes=['paid-unpaid-progress']),
                 Cell(type='currency', data=paid_amount, classes=['paid-amount', 'stick-left']),
@@ -203,7 +201,7 @@ class FieldStats(object):
                 Cell(type='currency', data=total_amount)]
 
     def _get_billing_details_cells(self, detail):
-        """Return cells with detailed billing information
+        """Return cells with detailed billing information.
 
         :params item_details: DataItem -- Data items containing billing info
         :returns: [Cell] -- Cells containing billing information.
@@ -225,7 +223,7 @@ class FieldStats(object):
                 Cell(type='currency', data=detail.paid_amount + detail.unpaid_amount)]
 
     def _build_key(self, item):
-        """Return the key to sort and group field choices
+        """Return the key to sort and group field choices.
 
         It must include the caption and the id of the item as well as other
         billing information by which to aggregate.
@@ -236,7 +234,7 @@ class FieldStats(object):
         raise NotImplementedError
 
     def _build_regitems_data(self, key, regitems):
-        """Return a `DataItem` aggregating data from registration items
+        """Return a `DataItem` aggregating data from registration items.
 
         :param regitems: list -- list of registrations items to be aggregated
         :returns: DataItem -- the data aggregation
@@ -245,7 +243,7 @@ class FieldStats(object):
 
     def _build_choice_data(self, item):
         """
-        Returns a `DataItem` containing the aggregation of an item which
+        Return a `DataItem` containing the aggregation of an item which
         is billed to the registrants.
 
         :param item: list -- item to be aggregated
@@ -255,7 +253,7 @@ class FieldStats(object):
 
     def _get_table_head(self):
         """
-        Returns a list of `Cell` corresponding to the headers of a the
+        Return a list of `Cell` corresponding to the headers of a the
         table.
 
         :returns: [Cell] -- the headers of the table.
@@ -264,7 +262,7 @@ class FieldStats(object):
 
     def _get_main_row_cells(self, item_details, choice_caption, total_regs):
         """
-        Returns the cells of the main (header or single) row of the table.
+        Return the cells of the main (header or single) row of the table.
 
         Each `item` has a main row. The row is a list of `Cell` which matches
         the table head.
@@ -280,7 +278,7 @@ class FieldStats(object):
 
     def _get_sub_row_cells(self, details, total_regs):
         """
-        Returns the cells of the sub row of the table.
+        Return the cells of the sub row of the table.
 
         An `item` can have a sub row. The row is a list of `Cell` which
         matches the table head.
@@ -294,10 +292,10 @@ class FieldStats(object):
 
 
 class OverviewStats(StatsBase):
-    """Generic stats for a registration form"""
+    """Generic stats for a registration form."""
 
     def __init__(self, regform):
-        super(OverviewStats, self).__init__(title=_("Overview"), subtitle="", type='overview')
+        super().__init__(title=_("Overview"), subtitle="", type='overview')
         self.regform = regform
         self.registrations = regform.active_registrations
         self.countries, self.num_countries = self._get_countries()
@@ -313,7 +311,7 @@ class OverviewStats(StatsBase):
         if not countries:
             return [], 0
         # Sort by highest number of people per country then alphabetically per countries' name
-        countries = sorted(((val, name) for name, val in countries.iteritems()),
+        countries = sorted(((val, name) for name, val in countries.items()),
                            key=lambda x: (-x[0], x[1]), reverse=True)
         return countries[-15:], len(countries)
 
@@ -326,8 +324,8 @@ class OverviewStats(StatsBase):
 
 class AccommodationStats(FieldStats, StatsBase):
     def __init__(self, field):
-        super(AccommodationStats, self).__init__(title=_("Accommodation"), subtitle=field.title, field=field)
-        self.has_capacity = any(detail.capacity for acco_details in self._data.itervalues()
+        super().__init__(title=_("Accommodation"), subtitle=field.title, field=field)
+        self.has_capacity = any(detail.capacity for acco_details in self._data.values()
                                 for detail in acco_details if detail.capacity)
 
     def _get_occupancy(self, acco_details):
@@ -337,7 +335,7 @@ class AccommodationStats(FieldStats, StatsBase):
         if not capacity:
             return [Cell()]
         regs = sum(d.regs for d in acco_details)
-        return [Cell(type='progress', data=(regs / capacity, '{} / {}'.format(regs, capacity)))]
+        return [Cell(type='progress', data=(regs / capacity, f'{regs} / {capacity}'))]
 
     def _get_occupancy_details(self, details):
         if not self.has_capacity:
@@ -396,7 +394,7 @@ class AccommodationStats(FieldStats, StatsBase):
         return [
             Cell(type='str', data=' ' + choice_caption, classes=['cancelled-item'] if cancelled else []),
             Cell(type='progress', data=((total_regs / len(active_registrations),
-                                         '{} / {}'.format(total_regs, len(active_registrations)))
+                                         f'{total_regs} / {len(active_registrations)}')
                                         if active_registrations else None))
         ] + self._get_occupancy(data_items)
 
@@ -404,6 +402,6 @@ class AccommodationStats(FieldStats, StatsBase):
         return [
             Cell(type='str'),
             Cell(type='progress', data=((data_item.regs / total_regs,
-                                        '{} / {}'.format(data_item.regs, total_regs))
+                                        f'{data_item.regs} / {total_regs}')
                                         if total_regs else None)),
         ] + self._get_occupancy_details(data_item)

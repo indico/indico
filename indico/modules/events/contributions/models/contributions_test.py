@@ -1,11 +1,9 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
-
-from __future__ import unicode_literals
 
 from datetime import timedelta
 
@@ -15,7 +13,7 @@ import indico.modules.events.contributions.models.contributions as contrib_modul
 from indico.modules.events.contributions.models.contributions import Contribution
 
 
-class Incrementer(object):
+class Incrementer:
     def __init__(self):
         self.counter = 0
 
@@ -41,11 +39,11 @@ def test_contrib_friendly_id(monkeypatch, dummy_event, create_contribution):
 
     # pre-allocate 8 friendly ids
     Contribution.allocate_friendly_ids(dummy_event, 8)
-    assert g.friendly_ids[Contribution][dummy_event.id] == range(3, 11)
+    assert g.friendly_ids[Contribution][dummy_event.id] == list(range(3, 11))
     assert counter == 10
 
     for fid in g.friendly_ids[Contribution][dummy_event.id][:]:
-        contrib = create_contribution(dummy_event, 'Contribution {}'.format(fid), timedelta(minutes=30))
+        contrib = create_contribution(dummy_event, f'Contribution {fid}', timedelta(minutes=30))
         assert contrib.friendly_id == fid
 
     # increment_and_get doesn't get called because the ids

@@ -1,5 +1,5 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
@@ -39,8 +39,9 @@ def notify_comment(comment):
     recipients.discard(None)  # in case there's no editor assigned
     recipients.discard(author)  # never bother people about their own comments
     for recipient in recipients:
+        author_name = author.first_name if revision.editable.can_see_editor_names(recipient, author) else None
         tpl = get_template_module('events/editing/emails/comment_notification.txt',
-                                  author_name=author.first_name,
+                                  author_name=author_name,
                                   timeline_url=revision.editable.external_timeline_url,
                                   recipient_name=recipient.first_name)
         send_email(make_email(recipient.email, template=tpl))
@@ -49,8 +50,9 @@ def notify_comment(comment):
 def notify_editor_judgment(revision, editor):
     """Notify the submitter about a judgment made by an editor."""
     submitter = revision.submitter
+    editor_name = editor.first_name if revision.editable.can_see_editor_names(submitter) else None
     tpl = get_template_module('events/editing/emails/editor_judgment_notification.txt',
-                              editor_name=editor.first_name,
+                              editor_name=editor_name,
                               timeline_url=revision.editable.external_timeline_url,
                               recipient_name=submitter.first_name)
     send_email(make_email(submitter.email, template=tpl))

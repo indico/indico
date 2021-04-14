@@ -1,20 +1,17 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import unicode_literals
-
-from collections import OrderedDict
 from copy import deepcopy
 
 from wtforms.fields.core import UnboundField
 
 
 def get_form_field_names(form_class):
-    """Returns the list of field names of a WTForm
+    """Return the list of field names of a WTForm.
 
     :param form_class: A `Form` subclass
     """
@@ -65,6 +62,6 @@ def inject_validators(form, field_name, validators, early=False):
         unbound.kwargs['validators'] = validators
     setattr(form, field_name, unbound)
     if form._unbound_fields is not None:
-        unbound_fields = OrderedDict(form._unbound_fields)
+        unbound_fields = dict(form._unbound_fields)
         unbound_fields[field_name] = unbound
-        form._unbound_fields = unbound_fields.items()
+        form._unbound_fields = list(unbound_fields.items())

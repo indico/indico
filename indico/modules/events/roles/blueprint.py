@@ -1,11 +1,9 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
-
-from __future__ import unicode_literals
 
 from indico.modules.events.roles.controllers import (RHAddEventRole, RHAddEventRoleMembers, RHDeleteEventRole,
                                                      RHEditEventRole, RHEventRoleMembersImportCSV, RHEventRoles,
@@ -14,7 +12,7 @@ from indico.web.flask.wrappers import IndicoBlueprint
 
 
 _bp = IndicoBlueprint('event_roles', __name__, template_folder='templates', virtual_template_folder='events/roles',
-                      url_prefix='/event/<confId>/manage/roles')
+                      url_prefix='/event/<int:event_id>/manage/roles')
 
 _bp.add_url_rule('/', 'manage', RHEventRoles)
 _bp.add_url_rule('/create', 'add_role', RHAddEventRole, methods=('GET', 'POST'))

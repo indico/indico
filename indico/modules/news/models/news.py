@@ -1,17 +1,15 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import unicode_literals
-
 from indico.core.db import db
 from indico.core.db.sqlalchemy import UTCDateTime
 from indico.util.date_time import now_utc
 from indico.util.locators import locator_property
-from indico.util.string import format_repr, return_ascii, slugify
+from indico.util.string import format_repr, slugify
 from indico.web.flask.util import url_for
 
 
@@ -51,7 +49,7 @@ class NewsItem(db.Model):
 
     @property
     def anchor(self):
-        return 'news-{}'.format(self.id)
+        return f'news-{self.id}'
 
     @property
     def url(self):
@@ -61,6 +59,5 @@ class NewsItem(db.Model):
     def slug(self):
         return slugify(self.title, fallback=None)
 
-    @return_ascii
     def __repr__(self):
         return format_repr(self, 'id', _text=self.title)

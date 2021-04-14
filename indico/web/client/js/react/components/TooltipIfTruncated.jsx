@@ -1,12 +1,12 @@
 // This file is part of Indico.
-// Copyright (C) 2002 - 2020 CERN
+// Copyright (C) 2002 - 2021 CERN
 //
 // Indico is free software; you can redistribute it and/or
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-import React, {useRef} from 'react';
 import PropTypes from 'prop-types';
+import React, {useRef} from 'react';
 
 /*
  * Show a tooltip if the contents were truncated/ellipsized via CSS.

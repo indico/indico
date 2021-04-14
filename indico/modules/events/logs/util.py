@@ -1,11 +1,9 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
-
-from __future__ import unicode_literals
 
 import re
 from datetime import datetime
@@ -35,12 +33,12 @@ def make_diff_log(changes, fields):
             old and new value
     """
     data = {'_diff': True}
-    for key, field_data in fields.iteritems():
+    for key, field_data in fields.items():
         try:
             change = changes[key]
         except KeyError:
             continue
-        if isinstance(field_data, basestring):
+        if isinstance(field_data, str):
             field_data = {'title': field_data}
         title = field_data['title']
         convert = field_data.get('convert')
@@ -61,13 +59,13 @@ def make_diff_log(changes, fields):
             change = [orig_string(getattr(x, 'title', x.name))
                       if x is not None else default
                       for x in change]
-        elif all(isinstance(x, (int, long, float)) for x in change):
+        elif all(isinstance(x, (int, float)) for x in change):
             type_ = 'number'
         elif all(isinstance(x, (list, tuple)) for x in change):
             type_ = 'list'
         elif all(isinstance(x, set) for x in change):
             type_ = 'list'
-            change = map(sorted, change)
+            change = list(map(sorted, change))
         elif all(isinstance(x, bool) for x in change):
             type_ = 'bool'
         elif all(isinstance(x, datetime) for x in change):
@@ -75,7 +73,7 @@ def make_diff_log(changes, fields):
             change = [x.isoformat() for x in change]
         else:
             type_ = 'text'
-            change = map(unicode, map(orig_string, change))
+            change = list(map(str, map(orig_string, change)))
         data[title] = list(change) + [type_]
     return data
 
@@ -100,7 +98,7 @@ def render_changes(a, b, type_):
     elif type_ == 'text':
         return _diff_text(a or '', b or '')
     else:
-        raise NotImplementedError('Unexpected diff type: {}'.format(type_))
+        raise NotImplementedError(f'Unexpected diff type: {type_}')
 
 
 def _clean(strings, _linebreak_re=re.compile(r'\A(\n*)(.*?)(\n*)\Z', re.DOTALL)):
@@ -148,22 +146,21 @@ def _diff_list(a, b):
             output += seqm.a[a0:a1]
         elif opcode == 'insert':
             inserted = seqm.b[b0:b1]
-            output += map(Markup('<ins>{}</ins>').format, inserted)
+            output += list(map(Markup('<ins>{}</ins>').format, inserted))
         elif opcode == 'delete':
             deleted = seqm.a[a0:a1]
-            output += map(Markup('<del>{}</del>').format, deleted)
+            output += list(map(Markup('<del>{}</del>').format, deleted))
         elif opcode == 'replace':
             deleted = seqm.a[a0:a1]
             inserted = seqm.b[b0:b1]
-            output += map(Markup('<del>{}</del>').format, deleted)
-            output += map(Markup('<ins>{}</ins>').format, inserted)
+            output += list(map(Markup('<del>{}</del>').format, deleted))
+            output += list(map(Markup('<ins>{}</ins>').format, inserted))
         else:
             raise RuntimeError('unexpected opcode: ' + opcode)
     return Markup(', ').join(output)
 
 
 def serialize_log_entry(entry):
-    from indico.modules.users.util import get_color_for_username
     return {
         'id': entry.id,
         'type': entry.type,
@@ -176,6 +173,6 @@ def serialize_log_entry(entry):
         'payload': entry.data,
         'user': {
             'fullName': entry.user.full_name if entry.user else None,
-            'avatarColor': get_color_for_username(entry.user.full_name) if entry.user else None
+            'avatarURL': entry.user.avatar_url if entry.user else None
         }
     }

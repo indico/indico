@@ -1,11 +1,9 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
-
-from __future__ import unicode_literals
 
 from uuid import uuid4
 
@@ -22,9 +20,8 @@ from indico.core.notifications import make_email, send_email
 from indico.modules.events.registration.models.registrations import Registration
 from indico.modules.events.surveys import logger
 from indico.util.date_time import now_utc
+from indico.util.enum import IndicoEnum
 from indico.util.locators import locator_property
-from indico.util.string import return_ascii
-from indico.util.struct.enum import IndicoEnum
 from indico.web.flask.templating import get_template_module
 
 
@@ -63,7 +60,7 @@ class Survey(db.Model):
         UUID,
         unique=True,
         nullable=False,
-        default=lambda: unicode(uuid4())
+        default=lambda: str(uuid4())
     )
     # An introduction text for users of the survey
     introduction = db.Column(
@@ -216,12 +213,12 @@ class Survey(db.Model):
 
     @locator_property
     def locator(self):
-        return {'confId': self.event_id,
+        return {'event_id': self.event_id,
                 'survey_id': self.id}
 
     @locator.token
     def locator(self):
-        """A locator that adds the UUID if the survey is private"""
+        """A locator that adds the UUID if the survey is private."""
         token = self.uuid if self.private else None
         return dict(self.locator, token=token)
 
@@ -243,7 +240,7 @@ class Survey(db.Model):
 
     @property
     def start_notification_recipients(self):
-        """Returns all recipients of the notifications.
+        """Return all recipients of the notifications.
 
         This includes both explicit recipients and, if enabled,
         participants of the event.
@@ -263,7 +260,7 @@ class Survey(db.Model):
         submissions = (db.session.query(db.func.count(db.m.SurveySubmission.id))
                        .filter(db.m.SurveySubmission.survey_id == cls.id)
                        .correlate(Survey)
-                       .as_scalar())
+                       .scalar_subquery())
         limit_criterion = db.case([(cls.submission_limit.is_(None), True)],
                                   else_=(submissions < cls.submission_limit))
         return ~cls.is_deleted & cls.questions.any() & cls.has_started & ~cls.has_ended & limit_criterion
@@ -278,9 +275,8 @@ class Survey(db.Model):
     def is_visible(cls):
         return ~cls.is_deleted & cls.questions.any() & cls.has_started
 
-    @return_ascii
     def __repr__(self):
-        return '<Survey({}, {}): {}>'.format(self.id, self.event_id, self.title)
+        return f'<Survey({self.id}, {self.event_id}): {self.title}>'
 
     def can_submit(self, user):
         return self.is_active and (not self.require_user or user)

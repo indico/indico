@@ -1,17 +1,15 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import unicode_literals
-
 from operator import attrgetter
 from uuid import UUID
 
 from flask import flash, jsonify, redirect, request, session
-from sqlalchemy.orm import contains_eager, subqueryload
+from sqlalchemy.orm import contains_eager, joinedload, lazyload, load_only, subqueryload
 from werkzeug.exceptions import Forbidden, NotFound
 
 from indico.modules.auth.util import redirect_to_login
@@ -30,6 +28,7 @@ from indico.modules.events.registration.util import (check_registration_email, c
 from indico.modules.events.registration.views import (WPDisplayRegistrationFormConference,
                                                       WPDisplayRegistrationFormSimpleEvent,
                                                       WPDisplayRegistrationParticipantList)
+from indico.modules.users.util import send_avatar, send_default_avatar
 from indico.util.fs import secure_filename
 from indico.util.i18n import _
 from indico.web.flask.util import send_file, url_for
@@ -71,7 +70,7 @@ class RHRegistrationFormBase(RegistrationFormMixin, RHRegistrationFormDisplayBas
 
 
 class RHRegistrationFormRegistrationBase(RHRegistrationFormBase):
-    """Base for RHs handling individual registrations"""
+    """Base for RHs handling individual registrations."""
 
     REGISTRATION_REQUIRED = True
 
@@ -89,7 +88,7 @@ class RHRegistrationFormRegistrationBase(RHRegistrationFormBase):
 
 
 class RHRegistrationFormList(RHRegistrationFormDisplayBase):
-    """List of all registration forms in the event"""
+    """List of all registration forms in the event."""
 
     ALLOW_PROTECTED_EVENT = True
 
@@ -105,7 +104,7 @@ class RHRegistrationFormList(RHRegistrationFormDisplayBase):
 
 
 class RHParticipantList(RHRegistrationFormDisplayBase):
-    """List of all public registrations"""
+    """List of all public registrations."""
 
     view_class = WPDisplayRegistrationParticipantList
 
@@ -203,7 +202,7 @@ class RHParticipantList(RHRegistrationFormDisplayBase):
                     continue
                 tables.append(self._participant_list_table(regform))
             # There might be forms that have not been sorted by the user yet
-            tables += map(self._participant_list_table, regforms_dict.viewvalues())
+            tables.extend(map(self._participant_list_table, regforms_dict.values()))
 
         published = (RegistrationForm.query.with_parent(self.event)
                      .filter(RegistrationForm.publish_registrations_enabled)
@@ -221,7 +220,7 @@ class RHParticipantList(RHRegistrationFormDisplayBase):
 
 
 class InvitationMixin:
-    """Mixin for RHs that accept an invitation token"""
+    """Mixin for RHs that accept an invitation token."""
 
     def _process_args(self):
         self.invitation = None
@@ -234,13 +233,13 @@ class InvitationMixin:
         except ValueError:
             flash(_("Your invitation code is not valid."), 'warning')
             return
-        self.invitation = RegistrationInvitation.find(uuid=token).with_parent(self.regform).first()
+        self.invitation = RegistrationInvitation.query.filter_by(uuid=token).with_parent(self.regform).first()
         if self.invitation is None:
             flash(_("This invitation does not exist or has been withdrawn."), 'warning')
 
 
 class RHRegistrationFormCheckEmail(RHRegistrationFormBase):
-    """Checks how an email will affect the registration"""
+    """Check how an email will affect the registration."""
 
     ALLOW_PROTECTED_EVENT = True
 
@@ -257,7 +256,7 @@ class RHRegistrationFormCheckEmail(RHRegistrationFormBase):
 
 
 class RHRegistrationForm(InvitationMixin, RHRegistrationFormRegistrationBase):
-    """Display a registration form and registrations, and process submissions"""
+    """Display a registration form and registrations, and process submissions."""
 
     REGISTRATION_REQUIRED = False
     ALLOW_PROTECTED_EVENT = True
@@ -317,7 +316,7 @@ class RHRegistrationForm(InvitationMixin, RHRegistrationFormRegistrationBase):
 
 
 class RHRegistrationDisplayEdit(RegistrationEditMixin, RHRegistrationFormRegistrationBase):
-    """Submit a registration form"""
+    """Submit a registration form."""
 
     template_file = 'display/registration_modify.html'
     management = False
@@ -347,7 +346,7 @@ class RHRegistrationDisplayEdit(RegistrationEditMixin, RHRegistrationFormRegistr
 
 
 class RHRegistrationWithdraw(RHRegistrationFormRegistrationBase):
-    """Withdraw a registration"""
+    """Withdraw a registration."""
 
     def _check_access(self):
         RHRegistrationFormRegistrationBase._check_access(self)
@@ -361,7 +360,7 @@ class RHRegistrationWithdraw(RHRegistrationFormRegistrationBase):
 
 
 class RHRegistrationFormDeclineInvitation(InvitationMixin, RHRegistrationFormBase):
-    """Decline an invitation to register"""
+    """Decline an invitation to register."""
 
     ALLOW_PROTECTED_EVENT = True
 
@@ -377,7 +376,7 @@ class RHRegistrationFormDeclineInvitation(InvitationMixin, RHRegistrationFormBas
 
 
 class RHTicketDownload(RHRegistrationFormRegistrationBase):
-    """Generate ticket for a given registration"""
+    """Generate ticket for a given registration."""
 
     def _check_access(self):
         RHRegistrationFormRegistrationBase._check_access(self)
@@ -392,5 +391,34 @@ class RHTicketDownload(RHRegistrationFormRegistrationBase):
             raise Forbidden
 
     def _process(self):
-        filename = secure_filename('{}-Ticket.pdf'.format(self.event.title), 'ticket.pdf')
+        filename = secure_filename(f'{self.event.title}-Ticket.pdf', 'ticket.pdf')
         return send_file(filename, generate_ticket(self.registration), 'application/pdf')
+
+
+class RHRegistrationAvatar(RHDisplayEventBase):
+    """Display a standard avatar for a registration based on the full name."""
+
+    normalize_url_spec = {
+        'locators': {
+            lambda self: self.registration
+        }
+    }
+
+    def _process_args(self):
+        RHDisplayEventBase._process_args(self)
+        self.registration = (Registration.query
+                             .filter(Registration.id == request.view_args['registration_id'],
+                                     ~Registration.is_deleted,
+                                     ~RegistrationForm.is_deleted)
+                             .join(Registration.registration_form)
+                             .options(load_only('id', 'registration_form_id', 'first_name', 'last_name'),
+                                      lazyload('*'),
+                                      joinedload('registration_form').load_only('id', 'event_id'),
+                                      joinedload('user').load_only('id', 'first_name', 'last_name', 'title',
+                                                                   'picture_source', 'picture_metadata', 'picture'))
+                             .one())
+
+    def _process(self):
+        if self.registration.user:
+            return send_avatar(self.registration.user)
+        return send_default_avatar(self.registration.full_name)

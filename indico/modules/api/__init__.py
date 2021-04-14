@@ -1,11 +1,9 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
-
-from __future__ import unicode_literals
 
 from flask import session
 
@@ -13,8 +11,8 @@ from indico.core import signals
 from indico.core.db import db
 from indico.core.settings import SettingsProxy
 from indico.modules.api.models.keys import APIKey
+from indico.util.enum import IndicoEnum
 from indico.util.i18n import _
-from indico.util.struct.enum import IndicoEnum
 from indico.web.flask.util import url_for
 from indico.web.menu import SideMenuItem
 
@@ -44,7 +42,7 @@ def _merge_users(target, source, **kwargs):
     ak_user = target.api_key
     ak_merged = source.api_key
     # Move all inactive keys to the new user
-    APIKey.find(user_id=source.id, is_active=False).update({'user_id': target.id})
+    APIKey.query.filter_by(user_id=source.id, is_active=False).update({'user_id': target.id})
     if ak_merged and not ak_user:
         ak_merged.user = target
     elif ak_user and ak_merged:

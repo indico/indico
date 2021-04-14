@@ -1,11 +1,9 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
-
-from __future__ import unicode_literals
 
 from flask import g
 from sqlalchemy import DDL
@@ -31,7 +29,7 @@ from indico.modules.events.papers.models.papers import Paper
 from indico.modules.events.papers.models.revisions import PaperRevision, PaperRevisionState
 from indico.modules.events.sessions.util import session_coordinator_priv_enabled
 from indico.util.locators import locator_property
-from indico.util.string import format_repr, return_ascii
+from indico.util.string import format_repr, slugify
 
 
 def _get_next_friendly_id(context):
@@ -49,7 +47,7 @@ def _get_next_friendly_id(context):
     return increment_and_get(Event._last_friendly_contribution_id, Event.id == event_id)
 
 
-class CustomFieldsMixin(object):
+class CustomFieldsMixin:
     """Methods to process custom field data."""
 
     def get_field_value(self, field_id, raw=False):
@@ -108,7 +106,7 @@ class Contribution(DescriptionMixin, ProtectionManagersMixin, LocationMixin, Att
         from indico.modules.events import Event
         fid = increment_and_get(Event._last_friendly_contribution_id, Event.id == event.id, n)
         friendly_ids = g.setdefault('friendly_ids', {})
-        friendly_ids.setdefault(cls, {})[event.id] = range(fid - n + 1, fid + 1)
+        friendly_ids.setdefault(cls, {})[event.id] = list(range(fid - n + 1, fid + 1))
 
     @declared_attr
     def __table_args__(cls):
@@ -361,7 +359,7 @@ class Contribution(DescriptionMixin, ProtectionManagersMixin, LocationMixin, Att
         subquery = (db.select([db.func.max(PaperRevision.submitted_dt)])
                     .where(PaperRevision._contribution_id == cls.id)
                     .correlate_except(PaperRevision)
-                    .as_scalar())
+                    .scalar_subquery())
         return db.relationship(
             'PaperRevision',
             uselist=False,
@@ -394,14 +392,16 @@ class Contribution(DescriptionMixin, ProtectionManagersMixin, LocationMixin, Att
         from indico.modules.events.contributions.models.subcontributions import SubContribution
         query = (db.select([db.func.count(SubContribution.id)])
                  .where((SubContribution.contribution_id == cls.id) & ~SubContribution.is_deleted)
-                 .correlate_except(SubContribution))
+                 .correlate_except(SubContribution)
+                 .scalar_subquery())
         return db.column_property(query, deferred=True)
 
     @declared_attr
     def _paper_revision_count(cls):
         query = (db.select([db.func.count(PaperRevision.id)])
                  .where(PaperRevision._contribution_id == cls.id)
-                 .correlate_except(PaperRevision))
+                 .correlate_except(PaperRevision)
+                 .scalar_subquery())
         return db.column_property(query, deferred=True)
 
     def __init__(self, **kwargs):
@@ -410,7 +410,7 @@ class Contribution(DescriptionMixin, ProtectionManagersMixin, LocationMixin, Att
         # when assigning a new one (e.g. during cloning)
         kwargs.setdefault('note', None)
         kwargs.setdefault('timetable_entry', None)
-        super(Contribution, self).__init__(**kwargs)
+        super().__init__(**kwargs)
 
     @classmethod
     def preload_acl_entries(cls, event):
@@ -489,7 +489,7 @@ class Contribution(DescriptionMixin, ProtectionManagersMixin, LocationMixin, Att
 
     @property
     def verbose_title(self):
-        return '#{} ({})'.format(self.friendly_id, self.title)
+        return f'#{self.friendly_id} ({self.title})'
 
     @property
     def paper(self):
@@ -525,16 +525,19 @@ class Contribution(DescriptionMixin, ProtectionManagersMixin, LocationMixin, Att
     def has_published_editables(self):
         return any(e.published_revision_id is not None for e in self.enabled_editables)
 
+    @property
+    def slug(self):
+        return slugify(self.friendly_id, self.title, maxlen=30)
+
     def is_paper_reviewer(self, user):
         return user in self.paper_content_reviewers or user in self.paper_layout_reviewers
 
-    @return_ascii
     def __repr__(self):
         return format_repr(self, 'id', is_deleted=False, _text=self.title)
 
     def can_manage(self, user, permission=None, allow_admin=True, check_parent=True, explicit_permission=False):
-        if super(Contribution, self).can_manage(user, permission, allow_admin=allow_admin, check_parent=check_parent,
-                                                explicit_permission=explicit_permission):
+        if super().can_manage(user, permission, allow_admin=allow_admin, check_parent=check_parent,
+                              explicit_permission=explicit_permission):
             return True
         if (check_parent and self.session_id is not None and
                 self.session.can_manage(user, 'coordinate', allow_admin=allow_admin,

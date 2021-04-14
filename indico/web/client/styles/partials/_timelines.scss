@@ -1,5 +1,5 @@
 // This file is part of Indico.
-// Copyright (C) 2002 - 2020 CERN
+// Copyright (C) 2002 - 2021 CERN
 //
 // Indico is free software; you can redistribute it and/or
 // modify it under the terms of the MIT License; see the
@@ -129,13 +129,11 @@
   }
 }
 
-.i-timeline .i-timeline-item-label.avatar-placeholder {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: rgba(#fff, 0.9);
-  font-size: 1.65em;
-  border-radius: 50%;
+.ui.avatar.image.profile-picture {
+  width: 39px;
+  height: 39px;
+  max-width: 39px;
+  margin-right: 10px;
 }
 
 .i-timeline-separator {

@@ -1,25 +1,25 @@
 // This file is part of Indico.
-// Copyright (C) 2002 - 2020 CERN
+// Copyright (C) 2002 - 2021 CERN
 //
 // Indico is free software; you can redistribute it and/or
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-import saveURL from 'indico-url:users.save_profile_picture';
 import previewURL from 'indico-url:users.profile_picture_preview';
+import saveURL from 'indico-url:users.save_profile_picture';
 
+import createDecorator from 'final-form-calculate';
+import PropTypes from 'prop-types';
 import React, {useState, useCallback} from 'react';
 import ReactDOM from 'react-dom';
-import PropTypes from 'prop-types';
-import {Form as FinalForm, useField, useFormState} from 'react-final-form';
 import {useDropzone} from 'react-dropzone';
+import {Form as FinalForm, useField, useFormState} from 'react-final-form';
 import {Button, Form, Icon, Image, Card} from 'semantic-ui-react';
-import createDecorator from 'final-form-calculate';
-import {FinalSubmitButton} from 'indico/react/forms';
-import {TooltipIfTruncated} from 'indico/react/components';
-import {indicoAxios, handleAxiosError} from 'indico/utils/axios';
 
+import {TooltipIfTruncated} from 'indico/react/components';
+import {FinalSubmitButton} from 'indico/react/forms';
 import {Translate, Param} from 'indico/react/i18n';
+import {indicoAxios, handleAxiosError} from 'indico/utils/axios';
 
 import './ProfilePicture.module.scss';
 

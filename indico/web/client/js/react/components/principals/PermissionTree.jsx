@@ -1,12 +1,12 @@
 // This file is part of Indico.
-// Copyright (C) 2002 - 2020 CERN
+// Copyright (C) 2002 - 2021 CERN
 //
 // Indico is free software; you can redistribute it and/or
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-import React from 'react';
 import PropTypes from 'prop-types';
+import React from 'react';
 import {Button, Popup} from 'semantic-ui-react';
 
 import './PermissionTree.module.scss';
@@ -38,14 +38,10 @@ const PermissionTree = ({tree, permissionMap, exclude, hide, disabled, onSelect}
                 trigger={triggerFactory(id, itemDisabled)}
                 content={description}
                 position="right center"
-                popperModifiers={{
-                  hide: {
-                    enabled: false,
-                  },
-                  preventOverflow: {
-                    enabled: false,
-                  },
-                }}
+                popperModifiers={[
+                  {name: 'hide', enabled: false},
+                  {name: 'preventOverflow', enabled: false},
+                ]}
                 inverted
               />
             </div>

@@ -1,17 +1,18 @@
 // This file is part of Indico.
-// Copyright (C) 2002 - 2020 CERN
+// Copyright (C) 2002 - 2021 CERN
 //
 // Indico is free software; you can redistribute it and/or
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-import React, {useContext} from 'react';
 import PropTypes from 'prop-types';
+import React, {useContext} from 'react';
 import {Form as FinalForm} from 'react-final-form';
 import {Button, Form} from 'semantic-ui-react';
 
 import {FinalDropdown, FinalSubmitButton} from 'indico/react/forms';
 import {Translate} from 'indico/react/i18n';
+
 import ReviewConditionsContext from './context';
 
 import './ReviewConditionForm.module.scss';

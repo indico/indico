@@ -1,11 +1,9 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
-
-from __future__ import unicode_literals
 
 import re
 from operator import itemgetter
@@ -15,7 +13,8 @@ from wtforms.fields import BooleanField, StringField, TextAreaField
 from wtforms.validators import DataRequired, ValidationError
 
 from indico.core.db import db
-from indico.modules.oauth.models.applications import SCOPES, OAuthApplication
+from indico.core.oauth.models.applications import OAuthApplication
+from indico.core.oauth.scopes import SCOPES
 from indico.util.i18n import _
 from indico.web.forms.base import IndicoForm
 from indico.web.forms.fields import IndicoSelectMultipleCheckboxField, TextListField
@@ -39,26 +38,31 @@ class ApplicationForm(IndicoForm):
                                                    "redirect_uri sent by the OAuth client must use the same protocol "
                                                    "and host/port. If an entry contains a path, the redirect_uri's "
                                                    "path must start with this path."))
-    default_scopes = IndicoSelectMultipleCheckboxField('Allowed scopes', [DataRequired()],
-                                                       choices=sorted(SCOPES.items(), key=itemgetter(1)))
+    allowed_scopes = IndicoSelectMultipleCheckboxField('Allowed scopes', [DataRequired()],
+                                                       choices=sorted(SCOPES.items(), key=itemgetter(1)),
+                                                       description=_('Only scopes from this list may be requested by '
+                                                                     'the app.'))
     is_enabled = BooleanField(_("Enabled"), widget=SwitchWidget(),
                               description=_("If an application is not enabled, its OAuth tokens cannot be used and "
                                             "user cannot be prompted to authorize the application."))
+    allow_pkce_flow = BooleanField(_('Allow PKCE flow'), widget=SwitchWidget(),
+                                   description=_('If enabled, the application can use the client-side PKCE flow which '
+                                                 'does not require the use of the Client Secret to get a token.'))
     is_trusted = BooleanField(_("Trusted"), widget=SwitchWidget(),
                               description=_("Trusted applications will be granted authorization automatically and "
                                             "no intermediate page will be displayed during the authorization process."))
 
     def __init__(self, *args, **kwargs):
         self.application = kwargs.pop('application', None)
-        super(ApplicationForm, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         if self.application is not None:
             for field in self.application.system_app_type.enforced_data:
                 # preserve existing value for disabled fields
                 self[field].data = self[field].object_data
 
     def validate_name(self, field):
-        query = OAuthApplication.find(name=field.data)
+        query = OAuthApplication.query.filter_by(name=field.data)
         if self.application:
             query = query.filter(db.func.lower(OAuthApplication.name) != self.application.name.lower())
-        if query.count():
+        if query.has_rows():
             raise ValidationError(_("There is already an application with this name"))

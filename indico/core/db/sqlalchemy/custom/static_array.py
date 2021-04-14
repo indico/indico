@@ -1,5 +1,5 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
@@ -12,7 +12,7 @@
 StaticArray class and functions that SQLAlchemy can process instead of non hashable lists
 """
 
-from cStringIO import StringIO
+from io import StringIO
 
 from sqlalchemy import String, types
 from sqlalchemy.dialects.postgresql import ARRAY
@@ -25,7 +25,7 @@ class StaticArray(types.TypeDecorator):
     impl = types.TypeEngine
 
     def __init__(self):
-        super(StaticArray, self).__init__()
+        super().__init__()
         self.__supported = {PGDialect: ARRAY}
 
     def load_dialect_impl(self, dialect):

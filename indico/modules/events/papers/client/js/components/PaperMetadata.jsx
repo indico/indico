@@ -1,16 +1,17 @@
 // This file is part of Indico.
-// Copyright (C) 2002 - 2020 CERN
+// Copyright (C) 2002 - 2021 CERN
 //
 // Indico is free software; you can redistribute it and/or
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-import React from 'react';
 import moment from 'moment';
+import React from 'react';
 import {useSelector} from 'react-redux';
 
-import {serializeDate} from 'indico/utils/date';
 import {Param, Translate} from 'indico/react/i18n';
+import {serializeDate} from 'indico/utils/date';
+
 import {getPaperDetails} from '../selectors';
 
 export default function PaperMetadata() {

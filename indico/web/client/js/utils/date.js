@@ -1,5 +1,5 @@
 // This file is part of Indico.
-// Copyright (C) 2002 - 2020 CERN
+// Copyright (C) 2002 - 2021 CERN
 //
 // Indico is free software; you can redistribute it and/or
 // modify it under the terms of the MIT License; see the
@@ -33,7 +33,8 @@ export async function setMomentLocale(locale) {
   const territory = parts[parts.length - 1];
   let momentLocale;
 
-  if (language === territory) {
+  if (language === territory || language === 'uk') {
+    // XXX: see the comment on `moment_lang` in Python regarding this ugly hack
     momentLocale = language;
   } else {
     momentLocale = `${language}-${territory}`;

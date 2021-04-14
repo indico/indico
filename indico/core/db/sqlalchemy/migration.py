@@ -1,11 +1,9 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
-
-from __future__ import print_function, unicode_literals
 
 import os
 
@@ -35,14 +33,14 @@ class PluginScriptDirectory(ScriptDirectory):
     versions = None
 
     def __init__(self, *args, **kwargs):
-        super(PluginScriptDirectory, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self.dir = PluginScriptDirectory.dir
         # use __dict__ since it's a memoized property
         self.__dict__['_version_locations'] = [current_plugin.alembic_versions_path]
 
     @classmethod
     def from_config(cls, config):
-        instance = super(PluginScriptDirectory, cls).from_config(config)
+        instance = super().from_config(config)
         instance.dir = PluginScriptDirectory.dir
         instance.__dict__['_version_locations'] = [current_plugin.alembic_versions_path]
         return instance
@@ -62,6 +60,9 @@ def _require_extensions(*names):
 def _require_pg_version(version):
     # convert version string such as '9.4.10' to `90410` which is the
     # format used by server_version_num
+    # FIXME: this will not work for versions >= 10, since the second segment there is the patch version
+    # but once we require a newer postgres, we can ditch the logic here and only use the major version
+    # since that will be the only relevant version number
     req_version = sum(segment * 10**(4 - 2*i) for i, segment in enumerate(map(int, version.split('.'))))
     cur_version = db.engine.execute("SELECT current_setting('server_version_num')::int").scalar()
     if cur_version >= req_version:
@@ -97,7 +98,7 @@ def prepare_db(empty=False, root_path=None, verbose=True):
         alembic.command.ScriptDirectory = PluginScriptDirectory
         plugin_msg = cformat("%{cyan}Setting the alembic version of the %{cyan!}{}%{reset}%{cyan} "
                              "plugin to HEAD%{reset}")
-        for plugin in plugin_engine.get_active_plugins().itervalues():
+        for plugin in plugin_engine.get_active_plugins().values():
             if not os.path.exists(plugin.alembic_versions_path):
                 continue
             if verbose:
@@ -108,7 +109,7 @@ def prepare_db(empty=False, root_path=None, verbose=True):
         tables = get_all_tables(db)
 
     tables['public'] = [t for t in tables['public'] if not t.startswith('alembic_version')]
-    if any(tables.viewvalues()):
+    if any(tables.values()):
         if verbose:
             print(cformat('%{red}Your database is not empty!'))
             print(cformat('%{yellow}If you just added a new table/model, create an alembic revision instead!'))

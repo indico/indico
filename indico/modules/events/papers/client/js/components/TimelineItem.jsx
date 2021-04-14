@@ -1,14 +1,14 @@
 // This file is part of Indico.
-// Copyright (C) 2002 - 2020 CERN
+// Copyright (C) 2002 - 2021 CERN
 //
 // Indico is free software; you can redistribute it and/or
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
 import _ from 'lodash';
-import React, {useState} from 'react';
-import PropTypes from 'prop-types';
 import moment from 'moment';
+import PropTypes from 'prop-types';
+import React, {useState} from 'react';
 import {useSelector} from 'react-redux';
 import {Transition} from 'semantic-ui-react';
 
@@ -16,17 +16,19 @@ import UserAvatar from 'indico/modules/events/reviewing/components/UserAvatar';
 import {Param, Translate} from 'indico/react/i18n';
 import {serializeDate} from 'indico/utils/date';
 
+import {canCommentPaper, canReviewPaper, canSubmitNewRevision, getPaperDetails} from '../selectors';
+
 import PaperReviewForm from './PaperReviewForm';
 import RevisionJudgment from './RevisionJudgment';
 import RevisionTimeline from './RevisionTimeline';
 import SubmitRevision from './SubmitRevision';
-import {canCommentPaper, canReviewPaper, getPaperDetails} from '../selectors';
 
 export default function TimelineItem({block}) {
   const {submitter, isLastRevision, number, submittedDt, files, timeline} = block;
   const submitterName = submitter.isSystem ? Translate.string('A user') : submitter.fullName;
   const canComment = useSelector(canCommentPaper);
   const canReview = useSelector(canReviewPaper);
+  const canSubmitRevision = useSelector(canSubmitNewRevision);
   const paper = useSelector(getPaperDetails);
   const [visible, setVisible] = useState(isLastRevision);
 
@@ -91,7 +93,7 @@ export default function TimelineItem({block}) {
                 <div className="i-timeline-connect-down to-separator" />
               </div>
               <div className="i-timeline-separator" />
-              <SubmitRevision />
+              {canSubmitRevision && <SubmitRevision />}
               {paper.isInFinalState && <RevisionJudgment revision={block} />}
             </>
           )}

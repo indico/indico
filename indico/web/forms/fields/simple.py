@@ -1,11 +1,9 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
-
-from __future__ import absolute_import, unicode_literals
 
 import json
 
@@ -26,7 +24,7 @@ class IndicoSelectMultipleCheckboxField(SelectMultipleField):
 
 class IndicoSelectMultipleCheckboxBooleanField(IndicoSelectMultipleCheckboxField):
     def process_formdata(self, valuelist):
-        super(IndicoSelectMultipleCheckboxBooleanField, self).process_formdata(valuelist)
+        super().process_formdata(valuelist)
         values = set(self.data)
         self.data = {x[0]: x[0] in values for x in self.choices}
 
@@ -41,7 +39,7 @@ class IndicoRadioField(RadioField):
 
     def __init__(self, *args, **kwargs):
         self.option_orientation = kwargs.pop('orientation', 'vertical')
-        super(IndicoRadioField, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
 
 class JSONField(HiddenField):
@@ -59,7 +57,7 @@ class JSONField(HiddenField):
 
     def populate_obj(self, obj, name):
         if self.CAN_POPULATE:
-            super(JSONField, self).populate_obj(obj, name)
+            super().populate_obj(obj, name)
 
 
 class HiddenFieldList(HiddenField):
@@ -104,8 +102,8 @@ class TextListField(TextAreaField):
 
 class EmailListField(TextListField):
     def process_formdata(self, valuelist):
-        super(EmailListField, self).process_formdata(valuelist)
-        self.data = map(sanitize_email, self.data)
+        super().process_formdata(valuelist)
+        self.data = list(map(sanitize_email, self.data))
 
     def _validate_item(self, line):
         if not validate_email(line):
@@ -119,20 +117,20 @@ class IndicoPasswordField(PasswordField):
 
     def __init__(self, *args, **kwargs):
         self.toggle = kwargs.pop('toggle', False)
-        super(IndicoPasswordField, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
 
 class IndicoStaticTextField(Field):
-    """Return an html element with text taken from this field's value"""
+    """Return an html element with text taken from this field's value."""
 
     widget = JinjaWidget('forms/static_text_widget.html')
 
     def __init__(self, *args, **kwargs):
         self.text_value = kwargs.pop('text', '')
-        super(IndicoStaticTextField, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
     def process_data(self, data):
-        self.text_value = self.data = unicode(data)
+        self.text_value = self.data = str(data)
 
     def _value(self):
         return self.text_value
@@ -142,7 +140,7 @@ class IndicoEmailRecipientsField(Field):
     widget = JinjaWidget('forms/email_recipients_widget.html', single_kwargs=True)
 
     def process_data(self, data):
-        self.data = sorted(data, key=unicode.lower)
+        self.data = sorted(data, key=str.lower)
         self.text_value = ', '.join(data)
         self.count = len(data)
 

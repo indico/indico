@@ -1,5 +1,5 @@
 // This file is part of Indico.
-// Copyright (C) 2002 - 2020 CERN
+// Copyright (C) 2002 - 2021 CERN
 //
 // Indico is free software; you can redistribute it and/or
 // modify it under the terms of the MIT License; see the
@@ -71,6 +71,14 @@
   .infogrid {
     @extend %font-family-modern-body;
     margin-bottom: 1em;
+
+    li p {
+      margin-bottom: 0;
+    }
+
+    ul {
+      margin-bottom: 0.8em;
+    }
   }
 
   .item-attachments .i-button {
@@ -185,6 +193,11 @@
 
     .contrib-title {
       font-size: 1.2em;
+    }
+
+    .contrib-code {
+      color: $dark-gray;
+      font-size: 0.8em;
     }
 
     .description {

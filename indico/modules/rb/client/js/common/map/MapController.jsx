@@ -1,23 +1,25 @@
 // This file is part of Indico.
-// Copyright (C) 2002 - 2020 CERN
+// Copyright (C) 2002 - 2021 CERN
 //
 // Indico is free software; you can redistribute it and/or
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
 import _ from 'lodash';
+import PropTypes from 'prop-types';
 import React from 'react';
 import {connect} from 'react-redux';
-import PropTypes from 'prop-types';
 import {Button, Checkbox, Dimmer, Dropdown, Loader, Popup, Sticky} from 'semantic-ui-react';
+
 import {Translate} from 'indico/react/i18n';
 
-import {getAreaBounds, getMapBounds, getRoomListBounds, checkRoomsInBounds} from './util';
+import {actions as filtersActions} from '../filters';
+
+import * as mapActions from './actions';
 import RoomBookingMap from './RoomBookingMap';
 import RoomBookingMapControl from './RoomBookingMapControl';
-import {actions as filtersActions} from '../filters';
-import * as mapActions from './actions';
 import * as mapSelectors from './selectors';
+import {getAreaBounds, getMapBounds, getRoomListBounds, checkRoomsInBounds} from './util';
 
 import './MapController.module.scss';
 
@@ -34,6 +36,8 @@ class MapController extends React.Component {
     actions: PropTypes.exact({
       toggleMapSearch: PropTypes.func.isRequired,
       updateLocation: PropTypes.func.isRequired,
+      // XXX: this seemingly unused action may be used by plugins!
+      // eslint-disable-next-line react/no-unused-prop-types
       setFilterParameter: PropTypes.func.isRequired,
     }).isRequired,
   };

@@ -9,12 +9,10 @@
 {%- endblock %}
 
 {% block body -%}
-    {%- filter dedent -%}
-        {%- trans -%}
-            You recently added the e-mail address {{ email }} to your Indico account.
-            Please click the following link to confirm this action.
-        {%- endtrans %}
+{%- trans notrimmed -%}
+You recently added the e-mail address {{ email }} to your Indico account.
+Please click the following link to confirm this action.
+{%- endtrans %}
 
-        {{ url_for('.user_emails_verify', token=token, _external=true) }}
-    {%- endfilter -%}
+{{ url_for('.user_emails_verify', token=token, _external=true) }}
 {%- endblock %}

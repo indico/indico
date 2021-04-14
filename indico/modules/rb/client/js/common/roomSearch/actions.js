@@ -1,17 +1,20 @@
 // This file is part of Indico.
-// Copyright (C) 2002 - 2020 CERN
+// Copyright (C) 2002 - 2021 CERN
 //
 // Indico is free software; you can redistribute it and/or
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
 import searchRoomsURL from 'indico-url:rb.search_rooms';
+
 import {indicoAxios} from 'indico/utils/axios';
 import {ajaxAction} from 'indico/utils/redux';
-import {preProcessParameters} from '../../util';
-import {ajax as ajaxFilterRules} from './serializers';
-import {validateFilters} from '../filters';
+
 import {selectors as userSelectors} from '../../common/user';
+import {preProcessParameters} from '../../util';
+import {validateFilters} from '../filters';
+
+import {ajax as ajaxFilterRules} from './serializers';
 
 export function roomSearchActionsFactory(namespace) {
   const SEARCH_RESULTS_RECEIVED = `${namespace}/SEARCH_RESULTS_RECEIVED`;

@@ -1,5 +1,5 @@
 // This file is part of Indico.
-// Copyright (C) 2002 - 2020 CERN
+// Copyright (C) 2002 - 2021 CERN
 //
 // Indico is free software; you can redistribute it and/or
 // modify it under the terms of the MIT License; see the
@@ -7,14 +7,17 @@
 
 import principalsURL from 'indico-url:core.principals';
 
-import React, {useEffect, useState} from 'react';
 import PropTypes from 'prop-types';
+import React, {useEffect, useState} from 'react';
 import {Icon, List} from 'semantic-ui-react';
+
 import {indicoAxios, handleAxiosError} from 'indico/utils/axios';
 import {camelizeKeys} from 'indico/utils/case';
-import {UserSearch} from './Search';
-import {EmptyPrincipalListItem, PendingPrincipalListItem, PrincipalListItem} from './items';
+
 import {FinalField} from '../../forms';
+
+import {EmptyPrincipalListItem, PendingPrincipalListItem, PrincipalListItem} from './items';
+import {UserSearch} from './Search';
 
 import './items.module.scss';
 

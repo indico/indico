@@ -1,11 +1,9 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
-
-from __future__ import unicode_literals
 
 from flask import request, session
 from sqlalchemy.orm import contains_eager
@@ -26,15 +24,15 @@ class RHNetworkBase(RHAdminBase):
 
 
 class RHManageNetworks(RHNetworkBase):
-    """Management list for IPNetworks"""
+    """Management list for IPNetworks."""
 
     def _process(self):
-        network_groups = IPNetworkGroup.find().order_by(IPNetworkGroup.name).all()
+        network_groups = IPNetworkGroup.query.order_by(IPNetworkGroup.name).all()
         return WPNetworksAdmin.render_template('networks.html', 'ip_networks', network_groups=network_groups)
 
 
 class RHCreateNetworkGroup(RHNetworkBase):
-    """Dialog to create an IPNetworkGroup"""
+    """Dialog to create an IPNetworkGroup."""
 
     def _process(self):
         form = IPNetworkGroupForm()
@@ -49,14 +47,14 @@ class RHCreateNetworkGroup(RHNetworkBase):
 
 
 class RHAdminNetworkGroupBase(RHNetworkBase):
-    """Base class for managing in IPNetworkGroup"""
+    """Base class for managing in IPNetworkGroup."""
 
     def _process_args(self):
         self.network_group = IPNetworkGroup.get_or_404(request.view_args['network_group_id'])
 
 
 class RHEditNetworkGroup(RHAdminNetworkGroupBase):
-    """Dialog to edit an IPNetworkGroup"""
+    """Dialog to edit an IPNetworkGroup."""
 
     def _process(self):
         form = IPNetworkGroupForm(obj=self.network_group)
@@ -68,7 +66,7 @@ class RHEditNetworkGroup(RHAdminNetworkGroupBase):
 
 
 class RHDeleteNetworkGroup(RHAdminNetworkGroupBase):
-    """Dialog to delete an IPNetworkGroup"""
+    """Dialog to delete an IPNetworkGroup."""
 
     def _process_GET(self):
         query = (self.network_group.in_event_acls

@@ -1,19 +1,17 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
-
-from __future__ import print_function
 
 import hashlib
 import hmac
 import optparse
 import sys
 import time
-import urllib
 from contextlib import closing
+from urllib.parse import urlencode
 
 import requests
 from flask import Flask, Response, abort, request
@@ -24,7 +22,7 @@ app = Flask(__name__)
 
 
 def build_indico_request(path, params, api_key=None, secret_key=None, only_public=False):
-    items = params.items() if hasattr(params, 'items') else list(params)
+    items = list(params.items()) if hasattr(params, 'items') else list(params)
     if api_key:
         items.append(('apikey', api_key))
     if only_public:
@@ -32,8 +30,8 @@ def build_indico_request(path, params, api_key=None, secret_key=None, only_publi
     if secret_key:
         items.append(('timestamp', str(int(time.time()))))
         items = sorted(items, key=lambda x: x[0].lower())
-        url = '%s?%s' % (path, urllib.urlencode(items))
-        signature = hmac.new(secret_key, url, hashlib.sha1).hexdigest()
+        url = '{}?{}'.format(path, urlencode(items))
+        signature = hmac.new(secret_key.encode(), url.encode(), hashlib.sha1).hexdigest()
         items.append(('signature', signature))
     return items
 

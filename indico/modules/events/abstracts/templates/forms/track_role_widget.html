@@ -7,7 +7,7 @@
             <span class="i-box-title">{{ title }}</span>
         </div>
         <div class="i-box-content">
-            {% if caller %}
+            {% if caller is defined %}
                 <p class="text-superfluous">
                     {{ caller() }}
                 </p>

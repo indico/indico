@@ -1,5 +1,5 @@
 // This file is part of Indico.
-// Copyright (C) 2002 - 2020 CERN
+// Copyright (C) 2002 - 2021 CERN
 //
 // Indico is free software; you can redistribute it and/or
 // modify it under the terms of the MIT License; see the
@@ -11,8 +11,8 @@ import {Provider} from 'react-redux';
 
 import createReduxStore from 'indico/utils/redux';
 
-import EventLog from './components/EventLog';
 import {fetchLogEntries, setMetadataQuery} from './actions';
+import EventLog from './components/EventLog';
 import reducer from './reducers';
 
 import '../style/logs.scss';

@@ -1,21 +1,18 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import unicode_literals
-
 from indico.core.settings import AttributeProxyProperty
 from indico.modules.events.models.reviews import ProposalMixin
 from indico.modules.events.papers.models.revisions import PaperRevisionState
 from indico.util.locators import locator_property
-from indico.util.string import return_ascii
 
 
 class Paper(ProposalMixin):
-    """Proxy class to facilitate access to all paper-related properties"""
+    """Proxy class to facilitate access to all paper-related properties."""
 
     proxied_attr = 'contribution'
 
@@ -27,10 +24,9 @@ class Paper(ProposalMixin):
     def __init__(self, contribution):
         self.contribution = contribution
 
-    @return_ascii
     def __repr__(self):
         state = self.state.name if self.last_revision else None
-        return '<Paper(contribution_id={}, state={})>'.format(self.contribution.id, state)
+        return f'<Paper(contribution_id={self.contribution.id}, state={state})>'
 
     @locator_property
     def locator(self):

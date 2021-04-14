@@ -1,12 +1,12 @@
 // This file is part of Indico.
-// Copyright (C) 2002 - 2020 CERN
+// Copyright (C) 2002 - 2021 CERN
 //
 // Indico is free software; you can redistribute it and/or
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-import _ from 'lodash';
 import {FORM_ERROR} from 'final-form';
+import _ from 'lodash';
 
 function flatten(value) {
   // marshmallow's List returns an object with the index as the key

@@ -1,11 +1,9 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
-
-from __future__ import unicode_literals
 
 from operator import itemgetter
 
@@ -42,7 +40,7 @@ from indico.util.marshmallow import (ModelList, NaiveDateTime, Principal, Princi
 from indico.util.string import natural_sort_key
 
 
-class RoomAttributeValuesSchema(mm.ModelSchema):
+class RoomAttributeValuesSchema(mm.SQLAlchemyAutoSchema):
     title = String(attribute='attribute.title')
     name = String(attribute='attribute.name')
 
@@ -51,13 +49,13 @@ class RoomAttributeValuesSchema(mm.ModelSchema):
         fields = ('value', 'title', 'name')
 
 
-class AttributesSchema(mm.ModelSchema):
+class AttributesSchema(mm.SQLAlchemyAutoSchema):
     class Meta:
         model = RoomAttribute
         fields = ('name', 'title', 'is_required', 'is_hidden')
 
 
-class RoomSchema(mm.ModelSchema):
+class RoomSchema(mm.SQLAlchemyAutoSchema):
     owner_name = String(attribute='owner.full_name')
 
     class Meta:
@@ -68,7 +66,7 @@ class RoomSchema(mm.ModelSchema):
                   'owner_name', 'available_equipment', 'has_photo', 'verbose_name', 'map_url', 'site')
 
 
-class AdminRoomSchema(mm.ModelSchema):
+class AdminRoomSchema(mm.SQLAlchemyAutoSchema):
     class Meta:
         modal = Room
         fields = ('id', 'location_id', 'name', 'full_name', 'sprite_position', 'owner_name', 'comments')
@@ -120,20 +118,20 @@ class RoomUpdateArgsSchema(mm.Schema):
     protection_mode = EnumField(ProtectionMode)
 
 
-class RoomEquipmentSchema(mm.ModelSchema):
+class RoomEquipmentSchema(mm.SQLAlchemyAutoSchema):
     class Meta:
         model = Room
         fields = ('available_equipment',)
 
 
-class MapAreaSchema(mm.ModelSchema):
+class MapAreaSchema(mm.SQLAlchemyAutoSchema):
     class Meta:
         model = MapArea
         fields = ('name', 'top_left_latitude', 'top_left_longitude', 'bottom_right_latitude', 'bottom_right_longitude',
                   'is_default', 'id')
 
 
-class ReservationSchema(mm.ModelSchema):
+class ReservationSchema(mm.SQLAlchemyAutoSchema):
     start_dt = NaiveDateTime()
     end_dt = NaiveDateTime()
 
@@ -164,7 +162,7 @@ class ReservationUserEventSchema(mm.Schema):
     end_dt = DateTime()
 
 
-class ReservationOccurrenceSchema(mm.ModelSchema):
+class ReservationOccurrenceSchema(mm.SQLAlchemyAutoSchema):
     reservation = Nested(ReservationSchema)
     state = EnumField(ReservationState)
     start_dt = NaiveDateTime()
@@ -210,7 +208,7 @@ class ReservationEditLogSchema(UserSchema):
         return data
 
 
-class ReservationLinkSchema(mm.ModelSchema):
+class ReservationLinkSchema(mm.SQLAlchemyAutoSchema):
     type = EnumField(LinkType, attribute='link_type')
     id = Function(lambda link: link.object.id)
 
@@ -219,7 +217,7 @@ class ReservationLinkSchema(mm.ModelSchema):
         fields = ('type', 'id')
 
 
-class ReservationDetailsSchema(mm.ModelSchema):
+class ReservationDetailsSchema(mm.SQLAlchemyAutoSchema):
     booked_for_user = Nested(UserSchema, only=('id', 'identifier', 'full_name', 'phone', 'email'))
     created_by_user = Nested(UserSchema, only=('id', 'identifier', 'full_name', 'email'))
     edit_logs = Nested(ReservationEditLogSchema, many=True)
@@ -251,7 +249,7 @@ class ReservationDetailsSchema(mm.ModelSchema):
         return {'user': user_permissions, 'admin': admin_permissions}
 
 
-class BlockedRoomSchema(mm.ModelSchema):
+class BlockedRoomSchema(mm.SQLAlchemyAutoSchema):
     room = Nested(RoomSchema, only=('id', 'name', 'sprite_position', 'full_name'))
     state = EnumField(BlockedRoomState)
 
@@ -266,7 +264,7 @@ class BlockedRoomSchema(mm.ModelSchema):
         return data
 
 
-class BlockingSchema(mm.ModelSchema):
+class BlockingSchema(mm.SQLAlchemyAutoSchema):
     blocked_rooms = Nested(BlockedRoomSchema, many=True)
     allowed = PrincipalList()
     permissions = Method('_get_permissions')
@@ -285,7 +283,7 @@ class BlockingSchema(mm.ModelSchema):
         return {'user': user_permissions, 'admin': admin_permissions}
 
 
-class NonBookablePeriodSchema(mm.ModelSchema):
+class NonBookablePeriodSchema(mm.SQLAlchemyAutoSchema):
     start_dt = NaiveDateTime()
     end_dt = NaiveDateTime()
 
@@ -294,13 +292,13 @@ class NonBookablePeriodSchema(mm.ModelSchema):
         fields = ('start_dt', 'end_dt')
 
 
-class BookableHoursSchema(mm.ModelSchema):
+class BookableHoursSchema(mm.SQLAlchemyAutoSchema):
     class Meta:
         model = BookableHours
         fields = ('start_time', 'end_time')
 
 
-class LocationsSchema(mm.ModelSchema):
+class LocationsSchema(mm.SQLAlchemyAutoSchema):
     rooms = Nested(RoomSchema, many=True, only=('id', 'name', 'full_name', 'sprite_position'))
 
     class Meta:
@@ -308,7 +306,7 @@ class LocationsSchema(mm.ModelSchema):
         fields = ('id', 'name', 'rooms')
 
 
-class AdminLocationsSchema(mm.ModelSchema):
+class AdminLocationsSchema(mm.SQLAlchemyAutoSchema):
     can_delete = Function(lambda loc: not loc.rooms)
 
     class Meta:
@@ -343,18 +341,18 @@ class CreateBookingSchema(mm.Schema):
     admin_override_enabled = fields.Bool(missing=False)
 
     @validates_schema(skip_on_field_errors=True)
-    def validate_dts(self, data):
+    def validate_dts(self, data, **kwargs):
         if data['start_dt'] >= data['end_dt']:
             raise ValidationError(_('Booking cannot end before it starts'))
 
 
-class RoomFeatureSchema(mm.ModelSchema):
+class RoomFeatureSchema(mm.SQLAlchemyAutoSchema):
     class Meta:
         model = RoomFeature
         fields = ('id', 'name', 'title', 'icon')
 
 
-class EquipmentTypeSchema(mm.ModelSchema):
+class EquipmentTypeSchema(mm.SQLAlchemyAutoSchema):
     features = Nested(RoomFeatureSchema, many=True)
     used = Function(lambda eq, ctx: eq.id in ctx['used_ids'])
 
@@ -363,13 +361,13 @@ class EquipmentTypeSchema(mm.ModelSchema):
         fields = ('id', 'name', 'features', 'used')
 
 
-class AdminEquipmentTypeSchema(mm.ModelSchema):
+class AdminEquipmentTypeSchema(mm.SQLAlchemyAutoSchema):
     class Meta:
         model = EquipmentType
         fields = ('id', 'name', 'features')
 
 
-class RoomAttributeSchema(mm.ModelSchema):
+class RoomAttributeSchema(mm.SQLAlchemyAutoSchema):
     hidden = Boolean(attribute='is_hidden')
 
     class Meta:
@@ -386,7 +384,7 @@ class LocationArgs(mm.Schema):
     map_url_template = fields.URL(schemes={'http', 'https'}, allow_none=True, missing='')
 
     @validates('name')
-    def _check_name_unique(self, name):
+    def _check_name_unique(self, name, **kwargs):
         location = self.context['location']
         query = Location.query.filter(~Location.is_deleted, func.lower(Location.name) == name.lower())
         if location:
@@ -395,7 +393,7 @@ class LocationArgs(mm.Schema):
             raise ValidationError(_('Name must be unique'))
 
     @validates('room_name_format')
-    def _check_room_name_format_placeholders(self, room_name_format):
+    def _check_room_name_format_placeholders(self, room_name_format, **kwargs):
         missing = {x for x in ('{building}', '{floor}', '{number}') if x not in room_name_format}
         if missing:
             # validated client-side, no i18n needed
@@ -411,7 +409,7 @@ class FeatureArgs(mm.Schema):
     icon = fields.String(missing='')
 
     @validates('name')
-    def _check_name_unique(self, name):
+    def _check_name_unique(self, name, **kwargs):
         feature = self.context['feature']
         query = RoomFeature.query.filter(func.lower(RoomFeature.name) == name.lower())
         if feature:
@@ -428,7 +426,7 @@ class EquipmentTypeArgs(mm.Schema):
     features = ModelList(RoomFeature, missing=[])
 
     @validates('name')
-    def _check_name_unique(self, name):
+    def _check_name_unique(self, name, **kwargs):
         equipment_type = self.context['equipment_type']
         query = EquipmentType.query.filter(func.lower(EquipmentType.name) == name.lower())
         if equipment_type:
@@ -446,7 +444,7 @@ class RoomAttributeArgs(mm.Schema):
     hidden = fields.Bool(missing=False)
 
     @validates('name')
-    def _check_name_unique(self, name):
+    def _check_name_unique(self, name, **kwargs):
         attribute = self.context['attribute']
         query = RoomAttribute.query.filter(func.lower(RoomAttribute.name) == name.lower())
         if attribute:
@@ -473,7 +471,7 @@ class SettingsSchema(mm.Schema):
     grace_period = fields.Int(validate=validate.Range(min=0, max=24), allow_none=True)
 
     @validates('tileserver_url')
-    def _check_tileserver_url_placeholders(self, tileserver_url):
+    def _check_tileserver_url_placeholders(self, tileserver_url, **kwargs):
         if tileserver_url is None:
             return
         missing = {x for x in ('{x}', '{y}', '{z}') if x not in tileserver_url}

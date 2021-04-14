@@ -1,21 +1,28 @@
 // This file is part of Indico.
-// Copyright (C) 2002 - 2020 CERN
+// Copyright (C) 2002 - 2021 CERN
 //
 // Indico is free software; you can redistribute it and/or
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-import _ from 'lodash';
-import React, {useCallback, useReducer, useContext, useRef, useMemo, useEffect} from 'react';
-import globToRegExp from 'glob-to-regexp';
-import PropTypes from 'prop-types';
 import {fromEvent} from 'file-selector';
+import globToRegExp from 'glob-to-regexp';
+import _ from 'lodash';
+import PropTypes from 'prop-types';
+import React, {useCallback, useReducer, useContext, useRef, useMemo, useEffect} from 'react';
 import {useDropzone} from 'react-dropzone';
 import {Field} from 'react-final-form';
 import {Dropdown, Icon, Message, Popup} from 'semantic-ui-react';
+
 import {TooltipIfTruncated} from 'indico/react/components';
 import {uploadFile, deleteFile} from 'indico/react/components/files/util';
 import {Param, Translate} from 'indico/react/i18n';
+
+import * as actions from './actions';
+import FileList from './FileList';
+import reducer from './reducer';
+import {getFiles, getUploadedFileUUIDs, getValidationError, isUploading} from './selectors';
+import Uploads from './Uploads';
 import {
   FileManagerContext,
   filePropTypes,
@@ -26,11 +33,6 @@ import {
   mapFileTypes,
   getFileToDelete,
 } from './util';
-import FileList from './FileList';
-import Uploads from './Uploads';
-import reducer from './reducer';
-import * as actions from './actions';
-import {getFiles, getUploadedFileUUIDs, getValidationError, isUploading} from './selectors';
 
 import './FileManager.module.scss';
 
@@ -84,7 +86,12 @@ export function Dropzone({
 
       const templateRe = globToRegExp(filenameTemplate);
       return eventFiles.filter(file => {
-        const filename = file.name.slice(0, file.name.indexOf('.'));
+        if (file.name === undefined) {
+          // most likely the file is just being dragged over and hasn't been dropped yet.
+          // in that case only its type is available but not the name
+          return true;
+        }
+        const filename = file.name.slice(0, file.name.lastIndexOf('.'));
         if (!templateRe.test(filename)) {
           dispatch(actions.invalidTemplate(id, file.name));
           return false;
@@ -95,7 +102,7 @@ export function Dropzone({
   });
 
   return (
-    <div {...getRootProps()} styleName="outer-dropzone">
+    <div {...getRootProps()}>
       <input {...getInputProps()} />
       <div styleName="dropzone" className={isDragActive ? 'active' : ''}>
         <Icon color="grey" size="big" name={showNewFileIcon ? 'plus circle' : 'exchange'} />
@@ -183,23 +190,25 @@ function FileType({
           ))}
         </div>
       )}
-      <Dropzone dropzoneRef={ref} fileType={fileType} files={files} uploadURL={uploadURL} />
-      {uploadableFiles && uploadableFiles.length > 0 && (
-        <Dropdown
-          className="primary"
-          style={{marginTop: '1em'}}
-          text={Translate.string('Use an existing file')}
-          options={uploadableFiles.map((uf, i) => ({
-            text: uf.filename,
-            value: i,
-            disabled: files.some(f => f.id === uf.id),
-          }))}
-          onChange={onChangeDropdown}
-          selectOnNavigation={false}
-          selectOnBlur={false}
-          value={null}
-        />
-      )}
+      <div styleName="outer-dropzone">
+        {uploadableFiles && uploadableFiles.length > 0 && (
+          <Dropdown
+            className="primary"
+            style={{marginBottom: '1em'}}
+            text={Translate.string('Use an existing file')}
+            options={uploadableFiles.map((uf, i) => ({
+              text: uf.filename,
+              value: i,
+              disabled: files.some(f => f.id === uf.id),
+            }))}
+            onChange={onChangeDropdown}
+            selectOnNavigation={false}
+            selectOnBlur={false}
+            value={null}
+          />
+        )}
+        <Dropzone dropzoneRef={ref} fileType={fileType} files={files} uploadURL={uploadURL} />
+      </div>
     </div>
   );
 }

@@ -1,11 +1,9 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
-
-from __future__ import unicode_literals
 
 from platform import python_version
 
@@ -24,7 +22,6 @@ from indico.modules.core.settings import core_settings
 from indico.modules.users import User
 from indico.util.i18n import _, get_all_locales
 from indico.util.network import is_private_url
-from indico.util.string import to_unicode
 from indico.util.system import get_os
 from indico.web.flask.templating import get_template_module
 from indico.web.flask.util import url_for
@@ -56,10 +53,10 @@ class RHBootstrap(RH):
 
         # Creating new user
         user = User()
-        user.first_name = to_unicode(setup_form.first_name.data)
-        user.last_name = to_unicode(setup_form.last_name.data)
-        user.affiliation = to_unicode(setup_form.affiliation.data)
-        user.email = to_unicode(setup_form.email.data)
+        user.first_name = setup_form.first_name.data
+        user.last_name = setup_form.last_name.data
+        user.affiliation = setup_form.affiliation.data
+        user.email = setup_form.email.data
         user.is_admin = True
 
         identity = Identity(provider='indico', identifier=setup_form.username.data, password=setup_form.password.data)
@@ -90,13 +87,13 @@ class RHBootstrap(RH):
             try:
                 register_instance(contact_name, contact_email)
             except (HTTPError, ValueError) as err:
-                message = get_template_module('bootstrap/flash_messages.html').community_error(err=err)
+                message = get_template_module('bootstrap/flash_messages.html').community_error(err=str(err))
                 category = 'error'
             except Timeout:
                 message = get_template_module('bootstrap/flash_messages.html').community_timeout()
                 category = 'error'
             except RequestException as exc:
-                message = get_template_module('bootstrap/flash_messages.html').community_exception(exc=exc)
+                message = get_template_module('bootstrap/flash_messages.html').community_exception(err=str(exc))
                 category = 'error'
             else:
                 message = get_template_module('bootstrap/flash_messages.html').community_success()

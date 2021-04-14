@@ -1,11 +1,9 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
-
-from __future__ import unicode_literals
 
 from wtforms.fields import BooleanField, StringField, TextAreaField
 from wtforms.validators import DataRequired, Optional
@@ -21,7 +19,7 @@ from indico.web.forms.widgets import SwitchWidget
 
 
 def get_contrib_field_types():
-    """Get a dict containing all contribution field types"""
+    """Get a dict containing all contribution field types."""
     return get_field_definitions(ContributionField)
 
 
@@ -47,7 +45,7 @@ class ContribField(BaseField):
     common_settings = ('title', 'description', 'is_required', 'is_active', 'visibility', 'is_user_editable')
 
     def __init__(self, obj, management=True):
-        super(ContribField, self).__init__(obj)
+        super().__init__(obj)
         self.management = management
 
     @property

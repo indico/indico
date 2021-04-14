@@ -1,13 +1,11 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import unicode_literals
-
-from collections import OrderedDict, defaultdict
+from collections import defaultdict
 from operator import attrgetter
 
 from flask import flash, request
@@ -27,7 +25,7 @@ class RHPluginsBase(RHAdminBase):
 
 class RHPlugins(RHPluginsBase):
     def _process(self):
-        plugins = [p for p in plugin_engine.get_active_plugins().viewvalues()]
+        plugins = [p for p in plugin_engine.get_active_plugins().values()]
         categories = defaultdict(list)
         other = []
         for plugin in plugins:
@@ -40,9 +38,9 @@ class RHPlugins(RHPluginsBase):
         # listed in the front
         for category in categories:
             categories[category].sort(key=attrgetter('configurable', 'title'))
-        ordered_categories = OrderedDict(sorted(categories.items()))
+        ordered_categories = dict(sorted(categories.items()))
         if other:
-            ordered_categories[PluginCategory.other] = other
+            ordered_categories[PluginCategory.other] = sorted(other, key=attrgetter('configurable', 'title'))
         return WPPlugins.render_template('index.html', categorized_plugins=ordered_categories)
 
 

@@ -1,15 +1,15 @@
 // This file is part of Indico.
-// Copyright (C) 2002 - 2020 CERN
+// Copyright (C) 2002 - 2021 CERN
 //
 // Indico is free software; you can redistribute it and/or
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
 import _ from 'lodash';
-import React from 'react';
 import PropTypes from 'prop-types';
-import {useDispatch, useSelector} from 'react-redux';
+import React from 'react';
 import {Form as FinalForm} from 'react-final-form';
+import {useDispatch, useSelector} from 'react-redux';
 import {Form} from 'semantic-ui-react';
 
 import {FinalSubmitButton, FinalTextArea} from 'indico/react/forms';
@@ -18,6 +18,7 @@ import {Translate} from 'indico/react/i18n';
 import {EditingReviewAction} from '../../../models';
 import {reviewEditable} from '../actions';
 import {getLastRevision, getNonSystemTags} from '../selectors';
+
 import FinalTagInput from './TagInput';
 
 export default function RequestChangesForm({setLoading, onSuccess}) {
@@ -48,7 +49,10 @@ export default function RequestChangesForm({setLoading, onSuccess}) {
       subscription={{}}
       initialValues={{
         comment: '',
-        tags: lastRevision.tags.filter(t => !t.system).map(t => t.id),
+        tags: lastRevision.tags
+          .filter(t => !t.system)
+          .map(t => t.id)
+          .sort(),
       }}
       initialValuesEqual={_.isEqual}
     >

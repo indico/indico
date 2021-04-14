@@ -1,19 +1,19 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import unicode_literals
-
 from flask import redirect, request, session
 from flask_multipass import MultipassException
+from werkzeug.exceptions import Forbidden
 
 from indico.core import signals
 from indico.core.auth import multipass
 from indico.core.config import config
 from indico.core.db import db
+from indico.core.errors import NoReportError
 from indico.core.logger import Logger
 from indico.modules.auth.models.identities import Identity
 from indico.modules.auth.models.registration_requests import RegistrationRequest
@@ -75,7 +75,7 @@ def process_identity(identity_info):
 
 
 def login_user(user, identity=None, admin_impersonation=False):
-    """Set the session user and performs on-login logic
+    """Set the session user and performs on-login logic.
 
     When specifying `identity`, the provider/identitifer information
     is saved in the session so the identity management page can prevent
@@ -91,7 +91,7 @@ def login_user(user, identity=None, admin_impersonation=False):
         session.timezone = user.settings.get('timezone', config.DEFAULT_TIMEZONE)
     else:
         session.timezone = 'LOCAL'
-    session.user = user
+    session.set_session_user(user)
     session.lang = user.settings.get('lang')
     if not admin_impersonation:
         if identity:
@@ -100,6 +100,7 @@ def login_user(user, identity=None, admin_impersonation=False):
         else:
             session.pop('login_identity', None)
         user.synchronize_data()
+    signals.users.logged_in.send(user, identity=identity, admin_impersonation=admin_impersonation)
 
 
 @signals.menu.items.connect_via('user-profile-sidemenu')
@@ -109,7 +110,33 @@ def _extend_profile_sidemenu(sender, user, **kwargs):
 
 @signals.users.registered.connect
 def _delete_requests(user, **kwargs):
-    for req in RegistrationRequest.find(RegistrationRequest.email.in_(user.all_emails)):
+    for req in RegistrationRequest.query.filter(RegistrationRequest.email.in_(user.all_emails)):
         logger.info('Deleting registration request %r due to registration of %r', req, user)
         db.session.delete(req)
     db.session.flush()
+
+
+@signals.app_created.connect
+def _handle_insecure_password_logins(app, **kwargs):
+    @app.before_request
+    def _redirect_if_insecure():
+        if not request.endpoint:
+            return
+
+        if (
+            request.blueprint == 'assets' or
+            request.endpoint.endswith('.static') or
+            request.endpoint in ('auth.logout', 'auth.accounts', 'core.contact', 'core.change_lang')
+        ):
+            return
+
+        if 'insecure_password_error' not in session:
+            return
+
+        if request.method != 'GET':
+            raise NoReportError.wrap_exc(Forbidden(_('You need to change your password')))
+
+        if request.is_xhr or request.is_json:
+            return
+
+        return redirect(url_for('auth.accounts'))

@@ -1,11 +1,9 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
-
-from __future__ import unicode_literals
 
 from datetime import datetime, time
 
@@ -45,12 +43,12 @@ def update_room_attributes(room, attributes):
 def update_room_availability(room, availability):
     if 'bookable_hours' in availability:
         room.bookable_hours.order_by(False).delete()
-        unique_bh = set((hours['start_time'], hours['end_time']) for hours in availability['bookable_hours'])
+        unique_bh = {(hours['start_time'], hours['end_time']) for hours in availability['bookable_hours']}
         db.session.add_all(
             [BookableHours(room=room, start_time=hours[0], end_time=hours[1]) for hours in unique_bh])
     if 'nonbookable_periods' in availability:
         room.nonbookable_periods.order_by(False).delete()
-        unique_nbp = set((period['start_dt'], period['end_dt']) for period in availability['nonbookable_periods'])
+        unique_nbp = {(period['start_dt'], period['end_dt']) for period in availability['nonbookable_periods']}
         db.session.add_all(
             [NonBookablePeriod(room=room, start_dt=datetime.combine(period[0], time(0, 0)),
                                end_dt=datetime.combine(period[1], time(23, 59))) for period in unique_nbp])

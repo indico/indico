@@ -1,13 +1,10 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import unicode_literals
-
-from collections import OrderedDict
 from operator import attrgetter
 
 from flask import flash, request, session
@@ -30,7 +27,7 @@ class AbstractListGeneratorBase(ListGeneratorBase):
     show_contribution_fields = True
 
     def __init__(self, event):
-        super(AbstractListGeneratorBase, self).__init__(event)
+        super().__init__(event)
 
         self.default_list_config = {
             'items': (),
@@ -38,28 +35,21 @@ class AbstractListGeneratorBase(ListGeneratorBase):
         }
         track_empty = {None: _('No track')}
         type_empty = {None: _('No type')}
-        track_choices = OrderedDict((unicode(t.id), t.title) for t in sorted(self.event.tracks,
-                                                                             key=attrgetter('title')))
-        type_choices = OrderedDict((unicode(t.id), t.name) for t in sorted(self.event.contribution_types,
-                                                                           key=attrgetter('name')))
-        self.static_items = OrderedDict([
-            ('state', {'title': _('State'), 'filter_choices': {state.value: state.title for state in AbstractState}}),
-            ('submitter', {'title': _('Submitter')}),
-            ('authors', {'title': _('Primary authors')}),
-            ('accepted_track', {'title': _('Accepted track'),
-                                'filter_choices': OrderedDict(track_empty.items() + track_choices.items())}),
-            ('submitted_for_tracks', {'title': _('Submitted for tracks'),
-                                      'filter_choices': OrderedDict(track_empty.items() + track_choices.items())}),
-            ('reviewed_for_tracks', {'title': _('Reviewed for tracks'),
-                                     'filter_choices': OrderedDict(track_empty.items() + track_choices.items())}),
-            ('accepted_contrib_type', {'title': _('Accepted type'),
-                                       'filter_choices': OrderedDict(type_empty.items() + type_choices.items())}),
-            ('submitted_contrib_type', {'title': _('Submitted type'),
-                                        'filter_choices': OrderedDict(type_empty.items() + type_choices.items())}),
-            ('score', {'title': _('Score')}),
-            ('submitted_dt', {'title': _('Submission date')}),
-            ('modified_dt', {'title': _('Modification date')})
-        ])
+        track_choices = {str(t.id): t.title for t in sorted(self.event.tracks, key=attrgetter('title'))}
+        type_choices = {str(t.id): t.name for t in sorted(self.event.contribution_types, key=attrgetter('name'))}
+        self.static_items = {
+            'state': {'title': _('State'), 'filter_choices': {state.value: state.title for state in AbstractState}},
+            'submitter': {'title': _('Submitter')},
+            'authors': {'title': _('Primary authors')},
+            'accepted_track': {'title': _('Accepted track'), 'filter_choices': track_empty | track_choices},
+            'submitted_for_tracks': {'title': _('Submitted for tracks'), 'filter_choices': track_empty | track_choices},
+            'reviewed_for_tracks': {'title': _('Reviewed for tracks'), 'filter_choices': track_empty | track_choices},
+            'accepted_contrib_type': {'title': _('Accepted type'), 'filter_choices': type_empty | type_choices},
+            'submitted_contrib_type': {'title': _('Submitted type'), 'filter_choices': type_empty | type_choices},
+            'score': {'title': _('Score')},
+            'submitted_dt': {'title': _('Submission date')},
+            'modified_dt': {'title': _('Modification date')}
+        }
         self.extra_filters = {}
         self.list_config = self._get_config()
 
@@ -72,11 +62,14 @@ class AbstractListGeneratorBase(ListGeneratorBase):
         return [{'id': id_, 'caption': self.static_items[id_]['title']} for id_ in self.static_items if id_ in ids]
 
     def get_all_contribution_fields(self):
-        """Return the list of contribution fields for the event"""
+        """Return the list of contribution fields for the event."""
         return self.event.contribution_fields if self.show_contribution_fields else []
 
     def _get_sorted_contribution_fields(self, item_ids):
-        """Return the contribution fields ordered by their position in the abstract form."""
+        """
+        Return the contribution fields ordered by their position in
+        the abstract form.
+        """
 
         if not item_ids or not self.show_contribution_fields:
             return []
@@ -87,12 +80,12 @@ class AbstractListGeneratorBase(ListGeneratorBase):
                 .all())
 
     def _get_filters_from_request(self):
-        filters = super(AbstractListGeneratorBase, self)._get_filters_from_request()
+        filters = super()._get_filters_from_request()
         for field in self.event.contribution_fields:
             if field.field_type == 'single_choice':
-                options = request.form.getlist('field_{}'.format(field.id))
+                options = request.form.getlist(f'field_{field.id}')
                 if options:
-                    filters['fields'][unicode(field.id)] = options
+                    filters['fields'][str(field.id)] = options
         return filters
 
     def _build_query(self):
@@ -120,7 +113,7 @@ class AbstractListGeneratorBase(ListGeneratorBase):
             return query
 
         if field_filters:
-            for contribution_type_id, field_values in field_filters.iteritems():
+            for contribution_type_id, field_values in field_filters.items():
                 criteria.append(Abstract.field_values.any(db.and_(
                     AbstractFieldValue.contribution_field_id == contribution_type_id,
                     AbstractFieldValue.data.op('#>>')('{}').in_(field_values)
@@ -134,7 +127,7 @@ class AbstractListGeneratorBase(ListGeneratorBase):
                 'submitted_for_tracks': Abstract.submitted_for_tracks,
                 'reviewed_for_tracks': Abstract.reviewed_for_tracks
             }
-            for key, column in static_filters.iteritems():
+            for key, column in static_filters.items():
                 ids = set(item_filters.get(key, ()))
                 if not ids:
                     continue
@@ -158,7 +151,7 @@ class AbstractListGeneratorBase(ListGeneratorBase):
         if extra_filters:
             if extra_filters.get('multiple_tracks'):
                 submitted_for_count = (db.select([db.func.count()])
-                                       .as_scalar()
+                                       .scalar_subquery()
                                        .where(Abstract.submitted_for_tracks.prop.primaryjoin))
                 criteria.append(submitted_for_count > 1)
             if extra_filters.get('comments'):
@@ -209,42 +202,45 @@ class AbstractListGeneratorBase(ListGeneratorBase):
 
 
 class AbstractListGeneratorManagement(AbstractListGeneratorBase):
-    """Listing and filtering actions in the abstract list in the management view"""
+    """
+    Listing and filtering actions in the abstract list in the
+    management view.
+    """
 
     list_link_type = 'abstract_management'
     endpoint = '.manage_abstract_list'
 
     def __init__(self, event):
-        super(AbstractListGeneratorManagement, self).__init__(event)
+        super().__init__(event)
         self.default_list_config['items'] = ('submitted_contrib_type', 'accepted_contrib_type', 'state')
         if event.tracks:
             self.default_list_config['items'] += ('submitted_for_tracks', 'reviewed_for_tracks', 'accepted_track')
-        self.extra_filters = OrderedDict([
-            ('multiple_tracks', {'title': _('Proposed for multiple tracks'), 'type': 'bool'}),
-            ('comments', {'title': _('Must have comments'), 'type': 'bool'})
-        ])
+        self.extra_filters = {
+            'multiple_tracks': {'title': _('Proposed for multiple tracks'), 'type': 'bool'},
+            'comments': {'title': _('Must have comments'), 'type': 'bool'}
+        }
 
 
 class AbstractListGeneratorDisplay(AbstractListGeneratorBase):
-    """Listing and filtering actions in the abstract list in the display view"""
+    """
+    Listing and filtering actions in the abstract list in the display view.
+    """
 
     list_link_type = 'abstract_display'
     endpoint = '.display_reviewable_track_abstracts'
     show_contribution_fields = False
 
     def __init__(self, event, track):
-        super(AbstractListGeneratorDisplay, self).__init__(event)
+        super().__init__(event)
         self.track = track
         self.default_list_config['items'] = ('accepted_contrib_type', 'state')
         items = {'submitted_contrib_type', 'submitter', 'accepted_contrib_type', 'state'}
         if self.track.can_convene(session.user):
             items.add('score')
-        self.static_items = OrderedDict((key, value)
-                                        for key, value in self.static_items.iteritems()
-                                        if key in items)
+        self.static_items = {key: value for key, value in self.static_items.items() if key in items}
 
     def _build_query(self):
-        return (super(AbstractListGeneratorDisplay, self)._build_query()
+        return (super()._build_query()
                 .filter(Abstract.state != AbstractState.invited,
                         Abstract.reviewed_for_tracks.contains(self.track)))
 
@@ -258,6 +254,6 @@ class AbstractListGeneratorDisplay(AbstractListGeneratorBase):
                 .all())
 
     def get_list_kwargs(self):
-        kwargs = super(AbstractListGeneratorDisplay, self).get_list_kwargs()
+        kwargs = super().get_list_kwargs()
         kwargs['reviewed_abstracts'] = self.get_user_reviewed_abstracts_for_track(session.user, self.track)
         return kwargs

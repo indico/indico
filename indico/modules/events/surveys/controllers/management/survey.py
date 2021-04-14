@@ -1,11 +1,9 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
-
-from __future__ import unicode_literals
 
 from flask import flash, redirect, session
 
@@ -26,7 +24,7 @@ from indico.web.util import jsonify_data, jsonify_form, jsonify_template
 
 
 class RHManageSurveys(RHManageSurveysBase):
-    """Survey management overview (list of surveys)"""
+    """Survey management overview (list of surveys)."""
 
     def _process(self):
         surveys = (Survey.query.with_parent(self.event)
@@ -37,7 +35,7 @@ class RHManageSurveys(RHManageSurveysBase):
 
 
 class RHManageSurvey(RHManageSurveyBase):
-    """Specific survey management (overview)"""
+    """Specific survey management (overview)."""
 
     def _process(self):
         submitted_surveys = [s for s in self.survey.submissions if s.is_submitted]
@@ -46,7 +44,7 @@ class RHManageSurvey(RHManageSurveyBase):
 
 
 class RHEditSurvey(RHManageSurveyBase):
-    """Edit a survey's basic data/settings"""
+    """Edit a survey's basic data/settings."""
 
     def _get_form_defaults(self):
         return FormDefaults(self.survey, limit_submissions=self.survey.submission_limit is not None)
@@ -64,7 +62,7 @@ class RHEditSurvey(RHManageSurveyBase):
 
 
 class RHDeleteSurvey(RHManageSurveyBase):
-    """Delete a survey"""
+    """Delete a survey."""
 
     def _process(self):
         self.survey.is_deleted = True
@@ -74,7 +72,7 @@ class RHDeleteSurvey(RHManageSurveyBase):
 
 
 class RHCreateSurvey(RHManageSurveysBase):
-    """Create a new survey"""
+    """Create a new survey."""
 
     def _process(self):
         form = SurveyForm(obj=FormDefaults(require_user=True), event=self.event)
@@ -93,7 +91,7 @@ class RHCreateSurvey(RHManageSurveysBase):
 
 
 class RHScheduleSurvey(RHManageSurveyBase):
-    """Schedule a survey's start/end dates"""
+    """Schedule a survey's start/end dates."""
 
     def _get_form_defaults(self):
         return FormDefaults(self.survey)
@@ -117,7 +115,7 @@ class RHScheduleSurvey(RHManageSurveyBase):
 
 
 class RHCloseSurvey(RHManageSurveyBase):
-    """Close a survey (prevent users from submitting responses)"""
+    """Close a survey (prevent users from submitting responses)."""
 
     def _process(self):
         self.survey.close()
@@ -127,7 +125,7 @@ class RHCloseSurvey(RHManageSurveyBase):
 
 
 class RHOpenSurvey(RHManageSurveyBase):
-    """Open a survey (allows users to submit responses)"""
+    """Open a survey (allows users to submit responses)."""
 
     def _process(self):
         if self.survey.state == SurveyState.finished:
@@ -142,7 +140,7 @@ class RHOpenSurvey(RHManageSurveyBase):
 
 
 class RHSendSurveyLinks(RHManageSurveyBase):
-    """Send emails with URL of the survey"""
+    """Send emails with URL of the survey."""
 
     def _process(self):
         tpl = get_template_module('events/surveys/emails/survey_link_email.html', event=self.event)

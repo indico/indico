@@ -1,5 +1,5 @@
 // This file is part of Indico.
-// Copyright (C) 2002 - 2020 CERN
+// Copyright (C) 2002 - 2021 CERN
 //
 // Indico is free software; you can redistribute it and/or
 // modify it under the terms of the MIT License; see the
@@ -12,8 +12,6 @@ import 'indico/modules/events/reviews';
 import setupReactPaperTimeline from './setup';
 
 (function(global) {
-  'use strict';
-
   global.setupPaperAssignmentList = function setupPaperAssignmentList() {
     const filterConfig = {
       itemHandle: 'tr',
@@ -116,7 +114,7 @@ import setupReactPaperTimeline from './setup';
           html.append(title);
           if ($this.is('.js-count-label')) {
             const list = $('<ul>', {class: 'qbubble-item-list'});
-            const items = _.values($this.data('items'));
+            const items = Object.values($this.data('items'));
             $.each(items, function(i, val) {
               const item = $('<li>');
               item.append(

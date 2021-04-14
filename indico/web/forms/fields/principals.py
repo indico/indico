@@ -1,11 +1,9 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
-
-from __future__ import absolute_import, unicode_literals
 
 import json
 from operator import attrgetter
@@ -42,10 +40,10 @@ def serialize_principal(principal):
         return serialize_category_role(principal)
     elif principal.principal_type == PrincipalType.registration_form:
         return serialize_registration_form(principal)
-    elif principal.is_group:
+    elif principal.principal_type in (PrincipalType.local_group, PrincipalType.multipass_group):
         return serialize_group(principal)
     else:
-        raise ValueError('Invalid principal: {} ({})'.format(principal, principal.principal_type))
+        raise ValueError(f'Invalid principal: {principal} ({principal.principal_type})')
 
 
 class PrincipalListField(HiddenField):
@@ -79,7 +77,7 @@ class PrincipalListField(HiddenField):
         self.allow_registration_forms = kwargs.pop('allow_registration_forms', False)
         self.allow_emails = kwargs.pop('allow_emails', False)
         self._event = kwargs.pop('event')(kwargs['_form']) if 'event' in kwargs else None
-        super(PrincipalListField, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
     def _convert_principal(self, principal):
         event_id = self._event.id if self._event else None
@@ -102,16 +100,14 @@ class PrincipalListField(HiddenField):
             return [x.identifier for x in self._get_data()]
 
     def _get_data(self):
-        return sorted(self.data) if self.data else []
+        return sorted(self.data, key=attrgetter('identifier')) if self.data else []
 
 
 class AccessControlListField(PrincipalListField):
     def __init__(self, *args, **kwargs):
-        # The text of the link that changes the protection mode of the object to protected
-        self.default_text = kwargs.pop('default_text')
         # Hardcoded value of the protected field for legacy compatibility
         self.protected_field_id = 'protected'
-        super(AccessControlListField, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
 
 class PrincipalField(HiddenField):
@@ -128,7 +124,7 @@ class PrincipalField(HiddenField):
 
     def __init__(self, *args, **kwargs):
         self.allow_external_users = kwargs.pop('allow_external_users', False)
-        super(PrincipalField, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
     def process_formdata(self, valuelist):
         if valuelist:
@@ -155,8 +151,8 @@ class PermissionsField(JSONField):
 
     def __init__(self, *args, **kwargs):
         self.object_type = kwargs.pop('object_type')
-        super(PermissionsField, self).__init__(*args, **kwargs)
-        self.ip_networks = map(serialize_ip_network_group, IPNetworkGroup.query.filter_by(hidden=False))
+        super().__init__(*args, **kwargs)
+        self.ip_networks = list(map(serialize_ip_network_group, IPNetworkGroup.query.filter_by(hidden=False)))
 
     @property
     def event(self):
@@ -174,8 +170,8 @@ class PermissionsField(JSONField):
 
     @property
     def category_roles(self):
-        from indico.modules.categories.util import serialize_category_role
         from indico.modules.categories.models.roles import CategoryRole
+        from indico.modules.categories.util import serialize_category_role
         category_roles = CategoryRole.get_category_roles(self.category)
         return [serialize_category_role(role, legacy=True) for role in category_roles]
 

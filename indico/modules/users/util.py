@@ -1,25 +1,22 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import unicode_literals
-
 import hashlib
 import os
-from collections import OrderedDict
 from datetime import datetime
 from io import BytesIO
 from operator import itemgetter
 
 import requests
-from flask import session
+from flask import render_template, session
 from PIL import Image
 from sqlalchemy.orm import contains_eager, joinedload, load_only, undefer
 from sqlalchemy.sql.expression import nullslast
-from werkzeug.http import http_date
+from werkzeug.http import http_date, parse_date
 
 from indico.core import signals
 from indico.core.auth import multipass
@@ -35,11 +32,13 @@ from indico.modules.users.models.affiliations import UserAffiliation
 from indico.modules.users.models.emails import UserEmail
 from indico.modules.users.models.favorites import favorite_user_table
 from indico.modules.users.models.suggestions import SuggestedCategory
+from indico.modules.users.models.users import ProfilePictureSource
 from indico.util.date_time import now_utc
 from indico.util.event import truncate_path
 from indico.util.fs import secure_filename
 from indico.util.i18n import _
 from indico.util.string import crc32, remove_accents
+from indico.web.flask.util import send_file
 
 
 # colors for user-specific avatar bubbles
@@ -49,12 +48,12 @@ user_colors = ['#e06055', '#ff8a65', '#e91e63', '#f06292', '#673ab7', '#ba68c8',
 
 
 def get_admin_emails():
-    """Get the email addresses of all Indico admins"""
+    """Get the email addresses of all Indico admins."""
     return {u.email for u in User.query.filter_by(is_admin=True, is_deleted=False)}
 
 
 def get_related_categories(user, detailed=True):
-    """Gets the related categories of a user for the dashboard"""
+    """Get the related categories of a user for the dashboard."""
     favorites = set()
     if user.favorite_categories:
         favorites = set(Category.query
@@ -77,11 +76,11 @@ def get_related_categories(user, detailed=True):
             'managed': categ in managed,
             'path': truncate_path(categ.chain_titles[:-1], chars=50)
         }
-    return OrderedDict(sorted(res.items(), key=itemgetter(0)))
+    return dict(sorted(res.items(), key=itemgetter(0)))
 
 
 def get_suggested_categories(user):
-    """Gets the suggested categories of a user for the dashboard"""
+    """Get the suggested categories of a user for the dashboard."""
     related = set(get_related_categories(user, detailed=False))
     res = []
     category_strategy = contains_eager('category')
@@ -108,23 +107,23 @@ def get_suggested_categories(user):
 
 
 def get_linked_events(user, dt, limit=None, load_also=()):
-    """Get the linked events and the user's roles in them
+    """Get the linked events and the user's roles in them.
 
     :param user: A `User`
     :param dt: Only include events taking place on/after that date
     :param limit: Max number of events
     """
-    from indico.modules.events.abstracts.util import (get_events_with_abstract_reviewer_convener,
-                                                      get_events_with_abstract_persons)
+    from indico.modules.events.abstracts.util import (get_events_with_abstract_persons,
+                                                      get_events_with_abstract_reviewer_convener)
     from indico.modules.events.contributions.util import get_events_with_linked_contributions
     from indico.modules.events.papers.util import get_events_with_paper_roles
     from indico.modules.events.registration.util import get_events_registered
     from indico.modules.events.sessions.util import get_events_with_linked_sessions
     from indico.modules.events.surveys.util import get_events_with_submitted_surveys
-    from indico.modules.events.util import (get_events_managed_by, get_events_created_by,
+    from indico.modules.events.util import (get_events_created_by, get_events_managed_by,
                                             get_events_with_linked_event_persons)
 
-    links = OrderedDict()
+    links = {}
     for event_id in get_events_registered(user, dt):
         links.setdefault(event_id, set()).add('registration_registrant')
     for event_id in get_events_with_submitted_surveys(user, dt):
@@ -133,21 +132,21 @@ def get_linked_events(user, dt, limit=None, load_also=()):
         links.setdefault(event_id, set()).add('conference_manager')
     for event_id in get_events_created_by(user, dt):
         links.setdefault(event_id, set()).add('conference_creator')
-    for event_id, principal_roles in get_events_with_linked_sessions(user, dt).iteritems():
+    for event_id, principal_roles in get_events_with_linked_sessions(user, dt).items():
         links.setdefault(event_id, set()).update(principal_roles)
-    for event_id, principal_roles in get_events_with_linked_contributions(user, dt).iteritems():
+    for event_id, principal_roles in get_events_with_linked_contributions(user, dt).items():
         links.setdefault(event_id, set()).update(principal_roles)
-    for event_id, role in get_events_with_linked_event_persons(user, dt).iteritems():
+    for event_id, role in get_events_with_linked_event_persons(user, dt).items():
         links.setdefault(event_id, set()).add(role)
-    for event_id, roles in get_events_with_abstract_reviewer_convener(user, dt).iteritems():
+    for event_id, roles in get_events_with_abstract_reviewer_convener(user, dt).items():
         links.setdefault(event_id, set()).update(roles)
-    for event_id, roles in get_events_with_abstract_persons(user, dt).iteritems():
+    for event_id, roles in get_events_with_abstract_persons(user, dt).items():
         links.setdefault(event_id, set()).update(roles)
-    for event_id, roles in get_events_with_paper_roles(user, dt).iteritems():
+    for event_id, roles in get_events_with_paper_roles(user, dt).items():
         links.setdefault(event_id, set()).update(roles)
 
     if not links:
-        return OrderedDict()
+        return {}
 
     query = (Event.query
              .filter(~Event.is_deleted,
@@ -160,11 +159,11 @@ def get_linked_events(user, dt, limit=None, load_also=()):
              .order_by(Event.start_dt, Event.id))
     if limit is not None:
         query = query.limit(limit)
-    return OrderedDict((event, links[event.id]) for event in query)
+    return {event: links[event.id] for event in query}
 
 
 def serialize_user(user):
-    """Serialize user to JSON-like object"""
+    """Serialize user to JSON-like object."""
     return {
         'id': user.id,
         'title': user.title,
@@ -214,7 +213,7 @@ def build_user_search_query(criteria, exact=False, include_deleted=False, includ
             raise ValueError("'name' is not compatible with (first|last)_name")
         query = query.filter(_build_name_search(name.replace(',', '').split()))
 
-    for k, v in criteria.iteritems():
+    for k, v in criteria.items():
         query = query.filter(unaccent_match(getattr(User, k), v, exact))
 
     # wrap as subquery so we can apply order regardless of distinct-by-id
@@ -232,7 +231,7 @@ def build_user_search_query(criteria, exact=False, include_deleted=False, includ
 
 def search_users(exact=False, include_deleted=False, include_pending=False, include_blocked=False,
                  external=False, allow_system_user=False, **criteria):
-    """Searches for users.
+    """Search for users.
 
     :param exact: Indicates if only exact matches should be returned.
                   This is MUCH faster than a non-exact saerch,
@@ -256,7 +255,7 @@ def search_users(exact=False, include_deleted=False, include_pending=False, incl
              objects for existing users.
     """
 
-    criteria = {key: value.strip() for key, value in criteria.iteritems() if value.strip()}
+    criteria = {key: value.strip() for key, value in criteria.items() if value.strip()}
 
     if not criteria:
         return set()
@@ -290,11 +289,11 @@ def search_users(exact=False, include_deleted=False, include_pending=False, incl
                 found_emails[ident.data['email'].lower()] = ident
                 found_identities[(ident.provider, ident.identifier)] = ident
 
-    return set(found_emails.viewvalues()) | system_user
+    return set(found_emails.values()) | system_user
 
 
 def get_user_by_email(email, create_pending=False):
-    """finds a user based on his email address.
+    """Find a user based on his email address.
 
     :param email: The email address of the user.
     :param create_pending: If True, this function searches for external
@@ -328,17 +327,17 @@ def get_user_by_email(email, create_pending=False):
 
 
 def merge_users(source, target, force=False):
-    """Merge two users together, unifying all related data
+    """Merge two users together, unifying all related data.
 
     :param source: source user (will be set as deleted)
     :param target: target user (final)
     """
 
     if source.is_deleted and not force:
-        raise ValueError('Source user {} has been deleted. Merge aborted.'.format(source))
+        raise ValueError(f'Source user {source} has been deleted. Merge aborted.')
 
     if target.is_deleted:
-        raise ValueError('Target user {} has been deleted. Merge aborted.'.format(target))
+        raise ValueError(f'Target user {target} has been deleted. Merge aborted.')
 
     # Move emails to the target user
     primary_source_email = source.email
@@ -385,11 +384,11 @@ def get_color_for_username(username):
 
 
 def get_gravatar_for_user(user, identicon, size=256, lastmod=None):
-    gravatar_url = 'https://www.gravatar.com/avatar/{}'.format(hashlib.md5(user.email.lower()).hexdigest())
+    gravatar_url = f'https://www.gravatar.com/avatar/{hashlib.md5(user.email.lower().encode()).hexdigest()}'
     if identicon:
-        params = {'d': 'identicon', 's': unicode(size), 'forcedefault': 'y'}
+        params = {'d': 'identicon', 's': str(size), 'forcedefault': 'y'}
     else:
-        params = {'d': 'mp', 's': unicode(size)}
+        params = {'d': 'mp', 's': str(size)}
     headers = {'If-Modified-Since': lastmod} if lastmod is not None else {}
     resp = requests.get(gravatar_url, params=params, headers=headers)
     if resp.status_code == 304:
@@ -420,3 +419,25 @@ def set_user_avatar(user, avatar, filename, lastmod=None):
         'content_type': 'image/png',
         'lastmod': lastmod,
     }
+
+
+def send_default_avatar(name=None):
+    if name:
+        text = name[0].upper()
+        color = get_color_for_username(name)
+    else:
+        text = ''
+        color = '#cccccc'
+    avatar = render_template('users/avatar.svg', bg_color=color, text=text)
+    return send_file('avatar.svg', BytesIO(avatar.encode()), mimetype='image/svg+xml',
+                     no_cache=False, inline=True, safe=False, cache_timeout=(86400*7))
+
+
+def send_avatar(user):
+    if user.picture_source == ProfilePictureSource.standard:
+        return send_default_avatar(user.full_name)
+
+    metadata = user.picture_metadata
+    return send_file('avatar.png', BytesIO(user.picture), mimetype=metadata['content_type'],
+                     inline=True, conditional=True, last_modified=parse_date(metadata['lastmod']),
+                     cache_timeout=(86400*7))

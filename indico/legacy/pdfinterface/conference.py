@@ -1,5 +1,5 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
@@ -23,7 +23,6 @@ from reportlab.rl_config import defaultPageSize
 from speaklater import is_lazy_string
 
 from indico.core.db import db
-from indico.legacy.common import utils
 from indico.legacy.pdfinterface.base import PageBreak, Paragraph, PDFBase, PDFWithTOC, Spacer, escape, modifiedFontSize
 from indico.modules.events.layout.util import get_menu_entry_by_name
 from indico.modules.events.registration.models.items import PersonalDataType
@@ -33,7 +32,7 @@ from indico.modules.events.tracks.settings import track_settings
 from indico.util.date_time import format_date, format_datetime, format_human_timedelta, format_time, now_utc
 from indico.util.i18n import _, ngettext
 from indico.util.string import (format_full_name, html_color_to_rgb, natural_sort_key, render_markdown,
-                                sanitize_for_platypus, strip_tags, to_unicode, truncate)
+                                sanitize_for_platypus, strip_tags, truncate)
 
 
 # Change reportlab default pdf font Helvetica to indico ttf font,
@@ -51,7 +50,7 @@ def _get_sans_style_sheet():
     }
 
     styles = getSampleStyleSheet()
-    for name, style in styles.byName.iteritems():
+    for name, style in styles.byName.items():
         if hasattr(style, 'fontName'):
             style.fontName = _font_map.get(style.fontName, style.fontName)
         if hasattr(style, 'bulletFontName'):
@@ -64,7 +63,7 @@ class ProgrammeToPDF(PDFBase):
     def __init__(self, event, tz=None):
         self.event = event
         self._tz = self.event.tzinfo
-        self._title = get_menu_entry_by_name('program', event).localized_title.encode('utf-8')
+        self._title = get_menu_entry_by_name('program', event).localized_title
         PDFBase.__init__(self, title='program.pdf')
 
     def firstPage(self, c, doc):
@@ -73,7 +72,7 @@ class ProgrammeToPDF(PDFBase):
         height = self._drawLogo(c)
 
         if not height:
-            height = self._drawWrappedString(c, escape(strip_tags(self.event.title).encode('utf-8')),
+            height = self._drawWrappedString(c, escape(strip_tags(self.event.title)),
                                              height=self._PAGE_HEIGHT - 2*inch)
 
         c.setFont('Times-Bold', 15)
@@ -84,18 +83,18 @@ class ProgrammeToPDF(PDFBase):
             self.event.start_dt_local.strftime("%A %d %B %Y"), self.event.end_dt_local.strftime("%A %d %B %Y")))
         if self.event.venue_name:
             height-=1*cm
-            c.drawCentredString(self._PAGE_WIDTH / 2.0, height, escape(self.event.venue_name.encode('utf-8')))
+            c.drawCentredString(self._PAGE_WIDTH / 2.0, height, escape(self.event.venue_name))
         c.setFont('Times-Bold', 30)
         height-=6*cm
         c.drawCentredString(self._PAGE_WIDTH/2.0, height, self._title)
-        self._drawWrappedString(c, "%s / %s" % (strip_tags(self.event.title).encode('utf-8'), self._title),
+        self._drawWrappedString(c, f"{strip_tags(self.event.title)} / {self._title}",
                                 width=inch, height=0.75*inch, font='Times-Roman', size=9, color=(0.5,0.5,0.5), align="left", maximumWidth=self._PAGE_WIDTH-3.5*inch, measurement=inch, lineSpacing=0.15)
         c.drawRightString(self._PAGE_WIDTH - inch, 0.75 * inch, now_utc().strftime("%A %d %B %Y"))
         c.restoreState()
 
     def laterPages(self, c, doc):
         c.saveState()
-        self._drawWrappedString(c, "%s / %s" % (escape(strip_tags(self.event.title).encode('utf-8')), self._title),
+        self._drawWrappedString(c, f"{escape(strip_tags(self.event.title))} / {self._title}",
                                 width=inch, height=self._PAGE_HEIGHT-0.75*inch, font='Times-Roman', size=9,
                                 color=(0.5, 0.5, 0.5), align="left", maximumWidth=self._PAGE_WIDTH - 3.5*inch,
                                 measurement=inch, lineSpacing=0.15)
@@ -116,25 +115,25 @@ class ProgrammeToPDF(PDFBase):
         for i, part in enumerate(re.split(r'\n+', event_program)):
             if i > 0 and re.match(r'<(p|ul|ol)\b[^>]*>', part):
                 # extra spacing before a block-level element
-                parts.append(u'<br/>')
+                parts.append('<br/>')
             parts.append(part)
-        story.append(Paragraph(u'\n<br/>\n'.join(parts).encode('utf-8'), style))
+        story.append(Paragraph('\n<br/>\n'.join(parts), style))
 
         story.append(Spacer(1, 0.4*inch))
         items = self.event.get_sorted_tracks()
         for item in items:
-            bogustext = item.title.encode('utf-8')
+            bogustext = item.title
             p = Paragraph(escape(bogustext), styles["Heading1"])
             self._story.append(p)
-            bogustext = item.description.encode('utf-8')
+            bogustext = item.description
             p = Paragraph(escape(bogustext), style)
             story.append(p)
             if isinstance(item, TrackGroup) and item.tracks:
                 for track in item.tracks:
-                    bogustext = track.title.encode('utf-8')
+                    bogustext = track.title
                     p = Paragraph(escape(bogustext), styles["Heading2"])
                     self._story.append(p)
-                    bogustext = track.description.encode('utf-8')
+                    bogustext = track.description
                     p = Paragraph(escape(bogustext), style)
                     story.append(p)
             story.append(Spacer(1, 0.4*inch))
@@ -272,7 +271,7 @@ class TimeTablePlain(PDFWithTOC):
             if self._ttPDFFormat.showLogo():
                 self._drawLogo(c, False)
 
-            height = self._drawWrappedString(c, self.event.title.encode('utf-8'))
+            height = self._drawWrappedString(c, self.event.title)
             c.setFont('Times-Bold', modifiedFontSize(15, self._fontsize))
             height -= 2 * cm
             c.drawCentredString(self._PAGE_WIDTH / 2.0, height,
@@ -284,7 +283,7 @@ class TimeTablePlain(PDFWithTOC):
             c.setFont('Times-Bold', modifiedFontSize(30, self._fontsize))
             height -= 1 * cm
             c.drawCentredString(self._PAGE_WIDTH / 2.0, height, self._title)
-            self._drawWrappedString(c, "{} / {}".format(self.event.title.encode('utf-8'), self._title),
+            self._drawWrappedString(c, f"{self.event.title} / {self._title}",
                                     width=inch,
                                     height=0.75 * inch, font='Times-Roman', size=modifiedFontSize(9, self._fontsize),
                                     color=(0.5, 0.5, 0.5), align="left", maximumWidth=self._PAGE_WIDTH - 3.5 * inch,
@@ -297,7 +296,7 @@ class TimeTablePlain(PDFWithTOC):
         maxi = self._PAGE_WIDTH - 2 * cm
         if doc.getCurrentPart().strip():
             maxi = self._PAGE_WIDTH - 6 * cm
-        self._drawWrappedString(c, "{} / {}".format(self.event.title.encode('utf-8'), self._title),
+        self._drawWrappedString(c, f"{self.event.title} / {self._title}",
                                 width=1 * cm,
                                 height=self._PAGE_HEIGHT - 1 * cm, font='Times-Roman',
                                 size=modifiedFontSize(9, self._fontsize), color=(0.5, 0.5, 0.5), align="left",
@@ -340,14 +339,14 @@ class TimeTablePlain(PDFWithTOC):
         self._styles["subContrib"] = subContStyle
 
     def _getSessionColor(self, block):
-        session_color = '#{}'.format(block.session.colors.background)
+        session_color = f'#{block.session.colors.background}'
         return html_color_to_rgb(session_color)
 
     def _get_speaker_name(self, speaker):
         speaker_name = speaker.get_full_name(last_name_first=True, show_title=self._ttPDFFormat.showSpeakerTitle(),
                                              abbrev_first_name=False)
         if self._showSpeakerAffiliation and speaker.affiliation:
-            speaker_name += u' ({})'.format(speaker.affiliation)
+            speaker_name += f' ({speaker.affiliation})'
         return speaker_name
 
     def _processContribution(self, contrib, l):
@@ -356,28 +355,28 @@ class TimeTablePlain(PDFWithTOC):
 
         lt = []
         date = format_time(contrib.start_dt, timezone=self._tz)
-        caption = u'[{}] {}'.format(contrib.friendly_id, escape(contrib.title))
+        caption = f'[{contrib.friendly_id}] {escape(contrib.title)}'
         if not self._ttPDFFormat.showContribId():
             caption = escape(contrib.title)
         elif self._ttPDFFormat.showLengthContribs():
-            caption = u"{} ({})".format(caption, format_human_timedelta(contrib.timetable_entry.duration))
+            caption = f"{caption} ({format_human_timedelta(contrib.timetable_entry.duration)})"
         elif self._ttPDFFormat.showContribAbstract():
-            caption = u'<font face="Times-Bold"><b>{}</b></font>'.format(caption)
+            caption = f'<font face="Times-Bold"><b>{caption}</b></font>'
 
         color_cell = ""
-        caption = u'<font size="{}">{}</font>'.format(unicode(modifiedFontSize(10, self._fontsize)), caption)
-        lt.append([self._fontify(caption.encode('utf-8'), 10)])
+        caption = f'<font size="{str(modifiedFontSize(10, self._fontsize))}">{caption}</font>'
+        lt.append([self._fontify(caption, 10)])
 
         if self._useColors():
             color_cell = " "
         if self._ttPDFFormat.showContribAbstract():
             speaker_list = [self._get_speaker_name(spk) for spk in contrib.speakers]
             if speaker_list:
-                speaker_title = u' {}: '.format(ngettext(u'Presenter', u'Presenters', len(speaker_list)))
-                speaker_content = speaker_title + u', '.join(speaker_list)
-                speaker_content = u'<font name="Times-Italic"><i>{}</i></font>'.format(speaker_content)
+                speaker_title = ' {}: '.format(ngettext('Presenter', 'Presenters', len(speaker_list)))
+                speaker_content = speaker_title + ', '.join(speaker_list)
+                speaker_content = f'<font name="Times-Italic"><i>{speaker_content}</i></font>'
                 lt.append([self._fontify(speaker_content, 9)])
-            caption = escape(unicode(contrib.description))
+            caption = escape(str(contrib.description))
             lt.append([self._fontify(caption, 9)])
             caption_and_speakers = Table(lt, colWidths=None, style=self._tsSpk)
             if color_cell:
@@ -401,17 +400,17 @@ class TimeTablePlain(PDFWithTOC):
                 return
 
             lt = []
-            caption = '- [{}] {}'.format(subc.friendly_id, escape(subc.title.encode('utf-8')))
+            caption = f'- [{subc.friendly_id}] {escape(subc.title)}'
             if not self._ttPDFFormat.showContribId():
-                caption = '- {}' .format(escape(subc.title.encode('utf-8')))
+                caption = '- {}' .format(escape(subc.title))
             elif self._ttPDFFormat.showLengthContribs():
-                caption = '{} ({})'.format(caption, format_human_timedelta(subc.timetable_entry.duration))
+                caption = f'{caption} ({format_human_timedelta(subc.timetable_entry.duration)})'
 
-            caption = '<font size="{}">{}</font>'.format(str(modifiedFontSize(10, self._fontsize)), caption)
+            caption = f'<font size="{str(modifiedFontSize(10, self._fontsize))}">{caption}</font>'
             lt.append([Paragraph(caption, self._styles["subContrib"])])
             if self._ttPDFFormat.showContribAbstract():
                 caption = '<font size="{}">{}</font>'.format(str(modifiedFontSize(9, self._fontsize)),
-                                                             escape(unicode(subc.description)))
+                                                             escape(str(subc.description)))
                 lt.append([Paragraph(caption, self._styles["subContrib"])])
 
             speaker_list = [[Paragraph(escape(self._get_speaker_name(spk)), self._styles["table_body"])]
@@ -438,22 +437,22 @@ class TimeTablePlain(PDFWithTOC):
             return
 
         lt = []
-        caption_text = u"[{}] {}".format(contrib.friendly_id, escape(contrib.title))
+        caption_text = f"[{contrib.friendly_id}] {escape(contrib.title)}"
         if not self._ttPDFFormat.showContribId():
             caption_text = escape(contrib.title)
         if self._ttPDFFormat.showLengthContribs():
-            caption_text = u"{} ({})".format(caption_text, format_human_timedelta(contrib.duration))
-        caption_text = u'<font name="Times-Bold">{}</font>'.format(caption_text)
-        lt.append([self._fontify(caption_text.encode('utf-8'), 10)])
+            caption_text = f"{caption_text} ({format_human_timedelta(contrib.duration)})"
+        caption_text = f'<font name="Times-Bold">{caption_text}</font>'
+        lt.append([self._fontify(caption_text, 10)])
         board_number = contrib.board_number
         if self._ttPDFFormat.showContribAbstract() and self._ttPDFFormat.showContribPosterAbstract():
             speaker_list = [self._get_speaker_name(spk) for spk in contrib.speakers]
             if speaker_list:
-                speaker_word = u'{}: '.format(ngettext(u'Presenter', u'Presenters', len(speaker_list)))
+                speaker_word = '{}: '.format(ngettext('Presenter', 'Presenters', len(speaker_list)))
                 speaker_text = speaker_word + ', '.join(speaker_list)
-                speaker_text = u'<font face="Times-Italic"><i>{}</i></font>'.format(speaker_text)
+                speaker_text = f'<font face="Times-Italic"><i>{speaker_text}</i></font>'
                 lt.append([self._fontify(speaker_text, 10)])
-            caption_text = escape(unicode(contrib.description))
+            caption_text = escape(str(contrib.description))
             lt.append([self._fontify(caption_text, 9)])
             caption_and_speakers = Table(lt, colWidths=None, style=self._tsSpk)
             if self._useColors():
@@ -476,15 +475,15 @@ class TimeTablePlain(PDFWithTOC):
                 return
 
             lt = []
-            caption_text = "- [{}] {}".format(subc.friendly_id, escape(subc.title.encode('utf-8')))
+            caption_text = f"- [{subc.friendly_id}] {escape(subc.title)}"
             if not self._ttPDFFormat.showContribId():
-                caption_text = "- {}".format(subc.friendly_id)
+                caption_text = f"- {subc.friendly_id}"
             if self._ttPDFFormat.showLengthContribs():
-                caption_text = "{} ({})".format(caption_text, escape(format_human_timedelta(subc.duration)))
+                caption_text = f"{caption_text} ({escape(format_human_timedelta(subc.duration))})"
             lt.append([Paragraph(caption_text, self._styles["subContrib"])])
             if self._ttPDFFormat.showContribAbstract():
-                caption_text = u'<font size="{}">{}</font>'.format(str(modifiedFontSize(9, self._fontsize)),
-                                                                   escape(unicode(subc.description)))
+                caption_text = '<font size="{}">{}</font>'.format(str(modifiedFontSize(9, self._fontsize)),
+                                                                   escape(str(subc.description)))
                 lt.append([Paragraph(caption_text, self._styles["subContrib"])])
             speaker_list = [[Paragraph(escape(self._get_speaker_name(spk)), self._styles["table_body"])]
                             for spk in subc.speakers]
@@ -541,36 +540,37 @@ class TimeTablePlain(PDFWithTOC):
                 if not sess_block.can_access(self._user):
                     continue
 
-                room = u''
+                room = ''
                 if sess_block.room_name:
-                    room = u' - {}'.format(escape(sess_block.room_name))
+                    room = f' - {escape(sess_block.room_name)}'
 
                 session_caption = sess_block.full_title
                 conv = []
                 for c in sess_block.person_links:
                     if self._showSpeakerAffiliation and c.affiliation:
-                        conv.append(u"{} ({})".format(escape(c.get_full_name(last_name_first=True,
-                                                                             last_name_upper=False,
-                                                                             abbrev_first_name=False)),
+                        conv.append("{} ({})".format(escape(c.get_full_name(last_name_first=True,
+                                                                            last_name_upper=False,
+                                                                            abbrev_first_name=False)),
                                                       escape(c.affiliation)))
                     else:
                         conv.append(escape(c.full_name))
 
-                conv = u'; '.join(conv)
+                conv = '; '.join(conv)
                 if conv:
-                    conv = u'<font face="Times-Bold"><b>-{}: {}</b></font>'.format(_(u"Conveners"), conv)
+                    conv = '<font face="Times-Bold"><b>-{}: {}</b></font>'.format(_("Conveners"), conv)
 
                 res.append(Paragraph('', self._styles["session_title"]))
 
                 if self._ttPDFFormat.showDateCloseToSessions():
-                    start_dt = to_unicode(format_datetime(sess_block.timetable_entry.start_dt, timezone=self._tz))
+                    start_dt = format_datetime(sess_block.timetable_entry.start_dt, timezone=self._tz)
                 else:
-                    start_dt = to_unicode(format_time(sess_block.timetable_entry.start_dt, timezone=self._tz))
+                    start_dt = format_time(sess_block.timetable_entry.start_dt, timezone=self._tz)
 
-                sess_caption = u'<font face="Times-Bold">{}</font>'.format(escape(session_caption))
-                text = u'<u>{}</u>{} ({}-{})'.format(
+                sess_caption = f'<font face="Times-Bold">{escape(session_caption)}</font>'
+                text = '<u>{}</u>{} ({}-{})'.format(
                     sess_caption, room, start_dt,
-                    to_unicode(format_time(sess_block.timetable_entry.end_dt, timezone=self._tz)))
+                    format_time(sess_block.timetable_entry.end_dt, timezone=self._tz)
+                )
 
                 p1 = Paragraph(text, self._styles["session_title"])
                 if self._useColors():
@@ -580,14 +580,14 @@ class TimeTablePlain(PDFWithTOC):
 
                 res.append(p1)
                 if self._ttPDFFormat.showTitleSessionTOC():
-                    self._indexedFlowable[p1] = {'text': escape(sess_block.session.title.encode('utf-8')), 'level': 2}
+                    self._indexedFlowable[p1] = {'text': escape(sess_block.session.title), 'level': 2}
 
                 # add session description
                 if self._showSessionDescription and sess_block.session.description:
-                    text = u'<i>{}</i>'.format(escape(unicode(sess_block.session.description)))
+                    text = f'<i>{escape(str(sess_block.session.description))}</i>'
                     res.append(Paragraph(text, self._styles["session_description"]))
 
-                p2 = Paragraph(conv.encode('utf-8'), self._styles["conveners"])
+                p2 = Paragraph(conv, self._styles["conveners"])
                 res.append(p2)
                 l = []
                 ts = deepcopy(originalts)
@@ -622,14 +622,14 @@ class TimeTablePlain(PDFWithTOC):
                             self._processContribution(obj, l)
                         elif s_entry.type == TimetableEntryType.BREAK:
                             lt = []
-                            date = self._fontify('{}'.format(format_time(s_entry.start_dt, timezone=self._tz)))
+                            date = self._fontify(format_time(s_entry.start_dt, timezone=self._tz))
 
                             if self._ttPDFFormat.showLengthContribs():
-                                caption = u'{} ({})'.format(obj.title, format_human_timedelta(s_entry.duration))
+                                caption = f'{obj.title} ({format_human_timedelta(s_entry.duration)})'
                             else:
                                 caption = obj.title
 
-                            lt.append([self._fontify(caption.encode('utf-8'), 10)])
+                            lt.append([self._fontify(caption, 10)])
                             caption = Table(lt, colWidths=None, style=self._tsSpk)
 
                             if self._ttPDFFormat.showContribAbstract():
@@ -668,27 +668,27 @@ class TimeTablePlain(PDFWithTOC):
                 if not contrib.can_access(self._user):
                     continue
 
-                room = u''
+                room = ''
                 if contrib.room_name:
-                    room = u' - {}'.format(escape(contrib.room_name))
+                    room = f' - {escape(contrib.room_name)}'
 
-                speakers = u'; '.join([self._get_speaker_name(spk) for spk in contrib.speakers])
+                speakers = '; '.join([self._get_speaker_name(spk) for spk in contrib.speakers])
                 if speakers.strip():
-                    speaker_word = ngettext(u'Presenter', u'Presenters', len(contrib.speakers))
-                    speakers = u'<font face="Times-Bold"><b>- {}: {}</b></font>'.format(speaker_word, speakers)
+                    speaker_word = ngettext('Presenter', 'Presenters', len(contrib.speakers))
+                    speakers = f'<font face="Times-Bold"><b>- {speaker_word}: {speakers}</b></font>'
 
-                text = u'<u>{}</u>{} ({}-{})'.format(escape(contrib.title), room,
-                                                     to_unicode(format_time(entry.start_dt, timezone=self._tz)),
-                                                     to_unicode(format_time(entry.end_dt, timezone=self._tz)))
-                p1 = Paragraph(text.encode('utf-8'), self._styles["session_title"])
+                text = '<u>{}</u>{} ({}-{})'.format(escape(contrib.title), room,
+                                                    format_time(entry.start_dt, timezone=self._tz),
+                                                    format_time(entry.end_dt, timezone=self._tz))
+                p1 = Paragraph(text, self._styles["session_title"])
                 res.append(p1)
                 if self._ttPDFFormat.showTitleSessionTOC():
-                    self._indexedFlowable[p1] = {'text': escape(contrib.title.encode('utf-8')), 'level': 2}
+                    self._indexedFlowable[p1] = {'text': escape(contrib.title), 'level': 2}
 
-                p2 = Paragraph(speakers.encode('utf-8'), self._styles["conveners"])
+                p2 = Paragraph(speakers, self._styles["conveners"])
                 res.append(p2)
                 if self._ttPDFFormat.showContribAbstract():
-                    p3 = Paragraph(escape(unicode(contrib.description)), self._styles["contrib_description"])
+                    p3 = Paragraph(escape(str(contrib.description)), self._styles["contrib_description"])
                     res.append(p3)
                 if entry == entries[-1]:  # if it is the last one, we do the page break and remove the previous one.
                     if self._ttPDFFormat.showNewPagePerSession():
@@ -697,19 +697,19 @@ class TimeTablePlain(PDFWithTOC):
             elif self._ttPDFFormat.showBreaksAtConfLevel() and entry.type == TimetableEntryType.BREAK:
                 break_entry = entry
                 break_ = break_entry.object
-                room = u''
+                room = ''
                 if break_.room_name:
-                    room = u' - {}'.format(escape(break_.room_name))
+                    room = f' - {escape(break_.room_name)}'
 
-                text = u'<u>{}</u>{} ({}-{})'.format(escape(break_.title), room,
-                                                     to_unicode(format_time(break_entry.start_dt, timezone=self._tz)),
-                                                     to_unicode(format_time(break_entry.end_dt, timezone=self._tz)))
+                text = '<u>{}</u>{} ({}-{})'.format(escape(break_.title), room,
+                                                    format_time(break_entry.start_dt, timezone=self._tz),
+                                                    format_time(break_entry.end_dt, timezone=self._tz))
 
-                p1 = Paragraph(text.encode('utf-8'), self._styles["session_title"])
+                p1 = Paragraph(text, self._styles["session_title"])
                 res.append(p1)
 
                 if self._ttPDFFormat.showTitleSessionTOC():
-                    self._indexedFlowable[p1] = {'text': escape(break_.title.encode('utf-8')), 'level': 2}
+                    self._indexedFlowable[p1] = {'text': escape(break_.title), 'level': 2}
 
                 if entry == entries[-1]:  # if it is the last one, we do the page break and remove the previous one.
                     if self._ttPDFFormat.showNewPagePerSession():
@@ -726,7 +726,7 @@ class TimeTablePlain(PDFWithTOC):
             s.fontSize = 18
             s.leading = 22
             s.alignment = TA_CENTER
-            p = Paragraph(escape(self.event.title.encode('utf-8')), s)
+            p = Paragraph(escape(self.event.title), s)
             story.append(p)
             story.append(Spacer(1, 0.4 * inch))
 
@@ -798,7 +798,7 @@ class SimplifiedTimeTablePlain(PDFBase):
         self._styles["day"] = dayStl
 
     def _haveSessionSlotsTitles(self, session):
-        """Checks if the session has slots with titles or not"""
+        """Check if the session has slots with titles or not."""
         for ss in session.blocks:
             if ss.title.strip():
                 return True
@@ -827,52 +827,52 @@ class SimplifiedTimeTablePlain(PDFBase):
                     lastSessions.append(sess)
                     e = sess
                 title = e.title
-                res.append(Paragraph(u'<font face="Times-Bold"><b> {}:</b></font> {}'
-                                     .format(_(u"Session"), escape(title)).encode('utf-8'),
+                res.append(Paragraph('<font face="Times-Bold"><b> {}:</b></font> {}'
+                                     .format(_("Session"), escape(title)),
                                      self._styles["normal"]))
-                room_time = escape(session_slot.room_name) if session_slot.room_name else u''
-                room_time = (u'<font face="Times-Bold"><b> {}:</b></font> {}({}-{})'
-                             .format(_(u"Time and Place"), room_time,
-                                     to_unicode(format_time(entry.start_dt, timezone=self._tz)),
-                                     to_unicode(format_time(entry.end_dt, timezone=self._tz))))
+                room_time = escape(session_slot.room_name) if session_slot.room_name else ''
+                room_time = ('<font face="Times-Bold"><b> {}:</b></font> {}({}-{})'
+                             .format(_("Time and Place"), room_time,
+                                     format_time(entry.start_dt, timezone=self._tz),
+                                     format_time(entry.end_dt, timezone=self._tz)))
                 res.append(Paragraph(room_time, self._styles["normal"]))
                 conveners = [c.full_name for c in session_slot.person_links]
                 if conveners:
-                    conveners_text = (u'<font face="Times-Bold"><b> {}:</b></font> {}'
-                                      .format(ngettext(u'Convener', u'Conveners', len(conveners)),
-                                              u'; '.join(conveners)))
-                    res.append(Paragraph(conveners_text.encode('utf-8'), self._styles["normal"]))
+                    conveners_text = ('<font face="Times-Bold"><b> {}:</b></font> {}'
+                                      .format(ngettext('Convener', 'Conveners', len(conveners)),
+                                              '; '.join(conveners)))
+                    res.append(Paragraph(conveners_text, self._styles["normal"]))
                 res.append(Spacer(1, 0.2 * inch))
             elif self._ttPDFFormat.showContribsAtConfLevel() and entry.type == TimetableEntryType.CONTRIBUTION:
                 contrib = entry.object
                 if not contrib.can_access(self._user):
                     continue
 
-                res.append(Paragraph(u'<font face="Times-Bold"><b> {}:</b></font> {}'
-                                     .format(_(u"Contribution"), escape(contrib.title)), self._styles["normal"]))
+                res.append(Paragraph('<font face="Times-Bold"><b> {}:</b></font> {}'
+                                     .format(_("Contribution"), escape(contrib.title)), self._styles["normal"]))
 
-                room_time = escape(contrib.room_name) if contrib.room_name else u''
-                room_time = (u'<font face="Times-Bold"><b> {}:</b></font> {}({}-{})'
-                             .format(_(u"Time and Place"), room_time,
-                                     to_unicode(format_date(entry.start_dt, timezone=self._tz)),
-                                     to_unicode(format_date(entry.end_dt, timezone=self._tz))))
+                room_time = escape(contrib.room_name) if contrib.room_name else ''
+                room_time = ('<font face="Times-Bold"><b> {}:</b></font> {}({}-{})'
+                             .format(_("Time and Place"), room_time,
+                                     format_date(entry.start_dt, timezone=self._tz),
+                                     format_date(entry.end_dt, timezone=self._tz)))
                 res.append(Paragraph(room_time, self._styles["normal"]))
                 spks = [s.full_name for s in contrib.speakers]
                 if spks:
-                    speaker_word = u'{}: '.format(ngettext(u'Presenter', u'Presenters', len(spks)))
-                    res.append(Paragraph(u'<font face="Times-Bold"><b> {}:</b></font> {}'
-                                         .format(speaker_word, u"; ".join(spks)), self._styles["normal"]))
+                    speaker_word = '{}: '.format(ngettext('Presenter', 'Presenters', len(spks)))
+                    res.append(Paragraph('<font face="Times-Bold"><b> {}:</b></font> {}'
+                                         .format(speaker_word, "; ".join(spks)), self._styles["normal"]))
                 res.append(Spacer(1, 0.2 * inch))
             elif self._ttPDFFormat.showBreaksAtConfLevel() and entry.type == TimetableEntryType.BREAK:
                 break_ = entry.object
                 title = break_.title
-                res.append(Paragraph(u'<font face="Times-Bold"><b> {}:</b></font> {}'
-                                     .format(_(u"Break"), escape(title)), self._styles["normal"]))
-                room_time = escape(break_.room_name) if break_.room_name else u''
-                room_time = (u'<font face="Times-Bold"><b> {}:</b></font> {}({}-{})'
-                             .format(_(u"Time and Place"), room_time,
-                                     to_unicode(format_date(entry.start_dt, timezone=self._tz)),
-                                     to_unicode(format_date(entry.end_dt, timezone=self._tz))))
+                res.append(Paragraph('<font face="Times-Bold"><b> {}:</b></font> {}'
+                                     .format(_("Break"), escape(title)), self._styles["normal"]))
+                room_time = escape(break_.room_name) if break_.room_name else ''
+                room_time = ('<font face="Times-Bold"><b> {}:</b></font> {}({}-{})'
+                             .format(_("Time and Place"), room_time,
+                                     format_date(entry.start_dt, timezone=self._tz),
+                                     format_date(entry.end_dt, timezone=self._tz)))
                 res.append(Paragraph(room_time, self._styles["normal"]))
                 res.append(Spacer(1, 0.2 * inch))
         res.append(PageBreak())
@@ -894,16 +894,16 @@ class SimplifiedTimeTablePlain(PDFBase):
             if not day_entries:
                 current_day += timedelta(days=1)
                 continue
-            text = u'{} - {}-{}'.format(
+            text = '{} - {}-{}'.format(
                 escape(self.event.title),
-                escape(to_unicode(format_date(self.event.start_dt, timezone=self._tz))),
-                escape(to_unicode(format_date(self.event.end_dt, timezone=self._tz)))
+                escape(format_date(self.event.start_dt, timezone=self._tz)),
+                escape(format_date(self.event.end_dt, timezone=self._tz))
             )
             if self.event.venue_name:
-                text = u'%s, %s.' % (text, escape(self.event.venue_name))
-            p = Paragraph(text.encode('utf-8'), self._styles["title"])
+                text = f'{text}, {escape(self.event.venue_name)}.'
+            p = Paragraph(text, self._styles["title"])
             story.append(p)
-            text2 = u'{}: {}'.format(_(u'Daily Programme'), escape(current_day.strftime("%A %d %B %Y")))
+            text2 = '{}: {}'.format(_('Daily Programme'), escape(current_day.strftime("%A %d %B %Y")))
             p2 = Paragraph(text2, self._styles["day"])
             story.append(p2)
             story.append(Spacer(1, 0.4 * inch))
@@ -929,7 +929,7 @@ class RegistrantToPDF(PDFBase):
         c.saveState()
         c.setFont('Times-Bold', 30)
         if not self._drawLogo(c):
-            self._drawWrappedString(c, escape(self.event.title.encode('utf-8')),
+            self._drawWrappedString(c, escape(self.event.title),
                                     height=self._PAGE_HEIGHT - 2*inch)
         c.setFont('Times-Bold', 25)
         c.setLineWidth(3)
@@ -953,11 +953,11 @@ class RegistrantToPDF(PDFBase):
             story.append(Spacer(inch, space*cm, registration.full_name))
 
         def _print_row(caption, value):
-            if isinstance(caption, unicode) or is_lazy_string(caption):
-                caption = unicode(caption).encode('utf-8')
-            if isinstance(value, unicode) or is_lazy_string(value):
-                value = unicode(value).encode('utf-8')
-            text = '<b>{field_name}</b>: {field_value}'.format(field_name=caption, field_value=value)
+            if isinstance(caption, str) or is_lazy_string(caption):
+                caption = str(caption)
+            if isinstance(value, str) or is_lazy_string(value):
+                value = str(value)
+            text = f'<b>{caption}</b>: {value}'
             _append_text_to_story(text)
 
         def _print_section(caption):
@@ -976,15 +976,15 @@ class RegistrantToPDF(PDFBase):
 
         header_style = ParagraphStyle({}, style, fontSize=16)
         header_data = [
-            [Paragraph(full_name_title.encode('utf-8'), header_style),
-             Paragraph('#{}'.format(registration.friendly_id),
+            [Paragraph(full_name_title, header_style),
+             Paragraph(f'#{registration.friendly_id}',
                        ParagraphStyle({}, header_style, alignment=TA_RIGHT))],
         ]
         header_table_style = TableStyle([('LEFTPADDING', (0, 0), (-1, -1), 0),
                                          ('RIGHTPADDING', (0, 0), (-1, -1), 0)])
         tbl = Table(header_data, style=header_table_style, colWidths=[None, cm])
         story.append(tbl)
-        indexedFlowable[tbl] = {'text': registration.full_name.encode('utf-8'), 'level': 1}
+        indexedFlowable[tbl] = {'text': registration.full_name, 'level': 1}
 
         style = ParagraphStyle({})
         style.fontName = 'Sans'
@@ -1045,7 +1045,7 @@ class RegistrantsListToBookPDF(PDFWithTOC):
         c.saveState()
         c.setFont('Times-Bold', 30)
         if not self._drawLogo(c):
-            self._drawWrappedString(c, escape(self.event.title.encode('utf-8')),
+            self._drawWrappedString(c, escape(self.event.title),
                                     height=self._PAGE_HEIGHT - 2*inch)
         c.setFont('Times-Bold', 35)
         c.drawCentredString(self._PAGE_WIDTH/2, self._PAGE_HEIGHT/2, self._title)
@@ -1061,13 +1061,11 @@ class RegistrantsListToBookPDF(PDFWithTOC):
         c.saveState()
         c.setFont('Times-Roman', 9)
         c.setFillColorRGB(0.5, 0.5, 0.5)
-        confTitle = escape(truncate(self.event.title, 30).encode('utf-8'))
+        confTitle = escape(truncate(self.event.title, 30))
         c.drawString(inch, self._PAGE_HEIGHT - 0.75 * inch, "%s / %s"%(confTitle, self._title))
-        title = doc.getCurrentPart()
-        if len(doc.getCurrentPart())>50:
-            title = utils.unicodeSlice(doc.getCurrentPart(), 0, 50) + "..."
+        title = truncate(doc.getCurrentPart(), 50)
         c.drawRightString(self._PAGE_WIDTH - inch, self._PAGE_HEIGHT - 0.75 * inch, "%s"%title)
-        c.drawRightString(self._PAGE_WIDTH - inch, 0.75 * inch, u" {} {} ".format(_(u"Page"), doc.page))
+        c.drawRightString(self._PAGE_WIDTH - inch, 0.75 * inch, " {} {} ".format(_("Page"), doc.page))
         c.drawString(inch,  0.75 * inch, now_utc().strftime("%A %d %B %Y"))
         c.restoreState()
 
@@ -1103,7 +1101,7 @@ class RegistrantsListToPDF(PDFBase):
         showLogo = False
         c.setFont('Times-Bold', 30)
         if not showLogo:
-            self._drawWrappedString(c, escape(self.event.title.encode('utf-8')),
+            self._drawWrappedString(c, escape(self.event.title),
                                     height=self._PAGE_HEIGHT - 0.75*inch)
         c.setFont('Times-Bold', 25)
         c.setLineWidth(3)
@@ -1120,8 +1118,8 @@ class RegistrantsListToPDF(PDFBase):
         style.fontName = "Sans"
         style.fontSize = 12
         style.alignment = TA_CENTER
-        text = u'<b>{}</b>'.format(_(u"List of registrants"))
-        p = Paragraph(text, style, part=escape(self.event.title.encode('utf-8')))
+        text = '<b>{}</b>'.format(_("List of registrants"))
+        p = Paragraph(text, style, part=escape(self.event.title))
         p.spaceAfter = 30
         story.append(p)
 
@@ -1149,11 +1147,11 @@ class RegistrantsListToPDF(PDFBase):
         for item in self._display:
             if item.input_type == 'accommodation':
                 accommodation_col_counter += 1
-                lp.append(Paragraph("<b>{}</b>".format(item.title.encode('utf-8')), text_format))
+                lp.append(Paragraph(f"<b>{item.title}</b>", text_format))
                 lp.append(Paragraph("<b>{}</b>".format(_('Arrival date')), text_format))
                 lp.append(Paragraph("<b>{}</b>".format(_('Departure date')), text_format))
             else:
-                lp.append(Paragraph("<b>{}</b>".format(item.title.encode('utf-8')), text_format))
+                lp.append(Paragraph(f"<b>{item.title}</b>", text_format))
         if 'reg_date' in self.static_items:
             lp.append(Paragraph('<b>{}</b>'.format(_('Registration date')), text_format))
         if 'state' in self.static_items:
@@ -1169,15 +1167,15 @@ class RegistrantsListToPDF(PDFBase):
         for registration in self._regList:
             lp = []
             lp.append(Paragraph(registration.friendly_id, text_format))
-            lp.append(Paragraph("{} {}".format(registration.first_name.encode('utf-8'),
-                                               registration.last_name.encode('utf-8')), text_format))
+            lp.append(Paragraph("{} {}".format(registration.first_name,
+                                               registration.last_name), text_format))
             data = registration.data_by_field
             for item in self._display:
                 friendly_data = data.get(item.id).friendly_data if data.get(item.id) else ''
                 if item.input_type == 'accommodation':
                     if friendly_data:
                         friendly_data = data[item.id].friendly_data
-                        lp.append(Paragraph(friendly_data['choice'].encode('utf-8'), text_format))
+                        lp.append(Paragraph(friendly_data['choice'], text_format))
                         lp.append(Paragraph(format_date(friendly_data['arrival_date']), text_format))
                         lp.append(Paragraph(format_date(friendly_data['departure_date']), text_format))
                     else:
@@ -1187,18 +1185,18 @@ class RegistrantsListToPDF(PDFBase):
                         lp.append(Paragraph('', text_format))
                 elif item.input_type == 'multi_choice':
                     if friendly_data:
-                        multi_choice_data = ', '.join(friendly_data).encode('utf-8')
+                        multi_choice_data = ', '.join(friendly_data)
                         lp.append(Paragraph(multi_choice_data, text_format))
                     else:
                         lp.append(Paragraph('', text_format))
                 else:
-                    if isinstance(friendly_data, unicode):
-                        friendly_data = friendly_data.encode('utf-8')
+                    if isinstance(friendly_data, str):
+                        friendly_data = friendly_data
                     lp.append(Paragraph(str(friendly_data), text_format))
             if 'reg_date' in self.static_items:
                 lp.append(Paragraph(format_datetime(registration.submitted_dt), text_format))
             if 'state' in self.static_items:
-                lp.append(Paragraph(registration.state.title.encode('utf-8'), text_format))
+                lp.append(Paragraph(registration.state.title, text_format))
             if 'price' in self.static_items:
                 lp.append(Paragraph(registration.render_price(), text_format))
             if 'checked_in' in self.static_items:

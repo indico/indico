@@ -1,11 +1,9 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
-
-from __future__ import unicode_literals
 
 import os
 from glob import glob
@@ -28,4 +26,4 @@ def get_custom_assets(type_):
     if type_ not in ('js', 'css'):
         raise ValueError('Invalid custom asset type')
     return [url_for('assets.custom', folder=type_, filename=name)
-            for name in _get_custom_files(type_, '*.{}'.format(type_))]
+            for name in _get_custom_files(type_, f'*.{type_}')]

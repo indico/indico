@@ -1,5 +1,5 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
@@ -11,7 +11,7 @@ from math import ceil
 from dateutil import rrule
 from sqlalchemy import Date, or_
 from sqlalchemy.ext.hybrid import hybrid_property
-from sqlalchemy.orm import defaultload
+from sqlalchemy.orm import contains_eager, defaultload
 from sqlalchemy.sql import cast
 
 from indico.core import signals
@@ -24,9 +24,9 @@ from indico.modules.rb.models.util import proxy_to_reservation_if_last_valid_occ
 from indico.modules.rb.util import rb_is_admin
 from indico.util import date_time
 from indico.util.date_time import format_date
+from indico.util.enum import IndicoEnum
 from indico.util.serializer import Serializer
-from indico.util.string import format_repr, return_ascii
-from indico.util.struct.enum import IndicoEnum
+from indico.util.string import format_repr
 from indico.web.flask.util import url_for
 
 
@@ -118,7 +118,6 @@ class ReservationOccurrence(db.Model, Serializer):
             _external=True,
         )
 
-    @return_ascii
     def __repr__(self):
         return format_repr(self, 'reservation_id', 'start_dt', 'end_dt', 'state')
 
@@ -148,17 +147,17 @@ class ReservationOccurrence(db.Model, Serializer):
 
         elif repeat_frequency == RepeatFrequency.DAY:
             if repeat_interval != 1:
-                raise IndicoError(u'Unsupported interval')
+                raise IndicoError('Unsupported interval')
             return rrule.rrule(rrule.DAILY, dtstart=start, until=end)
 
         elif repeat_frequency == RepeatFrequency.WEEK:
             if repeat_interval <= 0:
-                raise IndicoError(u'Unsupported interval')
+                raise IndicoError('Unsupported interval')
             return rrule.rrule(rrule.WEEKLY, dtstart=start, until=end, interval=repeat_interval)
 
         elif repeat_frequency == RepeatFrequency.MONTH:
             if repeat_interval == 0:
-                raise IndicoError(u'Unsupported interval')
+                raise IndicoError('Unsupported interval')
             position = int(ceil(start.day / 7.0))
             if position == 5:
                 # The fifth weekday of the month will always be the last one
@@ -166,7 +165,7 @@ class ReservationOccurrence(db.Model, Serializer):
             return rrule.rrule(rrule.MONTHLY, dtstart=start, until=end, byweekday=start.weekday(),
                                bysetpos=position, interval=repeat_interval)
 
-        raise IndicoError(u'Unexpected frequency {}'.format(repeat_frequency))
+        raise IndicoError(f'Unexpected frequency {repeat_frequency}')
 
     @staticmethod
     def filter_overlap(occurrences):
@@ -179,13 +178,13 @@ class ReservationOccurrence(db.Model, Serializer):
     def find_overlapping_with(cls, room, occurrences, skip_reservation_id=None):
         from indico.modules.rb.models.reservations import Reservation
 
-        return (ReservationOccurrence
-                .find(Reservation.room == room,
-                      Reservation.id != skip_reservation_id,
-                      ReservationOccurrence.is_valid,
-                      ReservationOccurrence.filter_overlap(occurrences),
-                      _eager=ReservationOccurrence.reservation,
-                      _join=ReservationOccurrence.reservation)
+        return (ReservationOccurrence.query
+                .filter(Reservation.room == room,
+                        Reservation.id != skip_reservation_id,
+                        ReservationOccurrence.is_valid,
+                        ReservationOccurrence.filter_overlap(occurrences))
+                .join(ReservationOccurrence.reservation)
+                .options(contains_eager(ReservationOccurrence.reservation))
                 .options(cls.NO_RESERVATION_USER_STRATEGY))
 
     def can_reject(self, user, allow_admin=True):
@@ -212,9 +211,9 @@ class ReservationOccurrence(db.Model, Serializer):
         self.rejection_reason = reason or None
         signals.rb.booking_occurrence_state_changed.send(self)
         if not silent:
-            log = [u'Day cancelled: {}'.format(format_date(self.date).decode('utf-8'))]
+            log = [f'Day cancelled: {format_date(self.date)}']
             if reason:
-                log.append(u'Reason: {}'.format(reason))
+                log.append(f'Reason: {reason}')
             self.reservation.add_edit_log(ReservationEditLog(user_name=user.full_name, info=log))
             from indico.modules.rb.notifications.reservation_occurrences import notify_cancellation
             notify_cancellation(self)
@@ -225,8 +224,8 @@ class ReservationOccurrence(db.Model, Serializer):
         self.rejection_reason = reason or None
         signals.rb.booking_occurrence_state_changed.send(self)
         if not silent:
-            log = [u'Day rejected: {}'.format(format_date(self.date).decode('utf-8')),
-                   u'Reason: {}'.format(reason)]
+            log = [f'Day rejected: {format_date(self.date)}',
+                   f'Reason: {reason}']
             self.reservation.add_edit_log(ReservationEditLog(user_name=user.full_name, info=log))
             from indico.modules.rb.notifications.reservation_occurrences import notify_rejection
             notify_rejection(self)

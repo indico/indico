@@ -1,11 +1,9 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
-
-from __future__ import unicode_literals
 
 from datetime import time
 
@@ -40,10 +38,10 @@ class ReferenceTypeForm(IndicoForm):
 
     def __init__(self, *args, **kwargs):
         self.reference_type = kwargs.pop('reference_type', None)
-        super(ReferenceTypeForm, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
     def validate_name(self, field):
-        query = ReferenceType.find(db.func.lower(ReferenceType.name) == field.data.lower())
+        query = ReferenceType.query.filter(db.func.lower(ReferenceType.name) == field.data.lower())
         if self.reference_type:
             query = query.filter(ReferenceType.id != self.reference_type.id)
         if query.count():
@@ -56,11 +54,11 @@ class ReferenceTypeForm(IndicoForm):
 
 class EventLabelForm(IndicoForm):
     title = StringField(_('Title'), [DataRequired()])
-    color = SelectField(_('Color'), [DataRequired()], choices=zip(get_sui_colors(), get_sui_colors()))
+    color = SelectField(_('Color'), [DataRequired()], choices=list(zip(get_sui_colors(), get_sui_colors())))
 
     def __init__(self, *args, **kwargs):
         self.event_label = kwargs.pop('event_label', None)
-        super(EventLabelForm, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
     def validate_title(self, field):
         query = EventLabel.query.filter(db.func.lower(EventLabel.title) == field.data.lower())
@@ -71,7 +69,7 @@ class EventLabelForm(IndicoForm):
 
 
 class EventCreationFormBase(IndicoForm):
-    category = CategoryField(_('Category'), [DataRequired()], allow_subcats=False, require_event_creation_rights=True)
+    category = CategoryField(_('Category'), [DataRequired()], require_event_creation_rights=True)
     title = StringField(_('Event title'), [DataRequired()])
     timezone = IndicoTimezoneSelectField(_('Timezone'), [DataRequired()])
     location_data = IndicoLocationField(_('Location'), allow_location_inheritance=False, edit_address=False)

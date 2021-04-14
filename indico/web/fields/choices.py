@@ -1,11 +1,9 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
-
-from __future__ import division, unicode_literals
 
 from wtforms.fields import SelectField
 from wtforms.fields.html5 import IntegerField
@@ -23,13 +21,13 @@ class _ChoiceFieldBase(BaseField):
         Return a copy of the field's configuration data without
         the IDs used to identify selected options.
         """
-        field_data_copy = super(_ChoiceFieldBase, self).copy_field_data()
+        field_data_copy = super().copy_field_data()
         for option in field_data_copy['options']:
             del option['id']
         return field_data_copy
 
 
-class SingleChoiceConfigForm(object):
+class SingleChoiceConfigForm:
     display_type = IndicoRadioField(_('Display type'), [DataRequired()],
                                     description=_('Widget that will be used to render the available options'),
                                     choices=[('radio', _('Radio buttons')),
@@ -47,14 +45,14 @@ class SingleChoiceConfigForm(object):
 
 class _EmptyNoneSelectField(SelectField):
     def process_formdata(self, valuelist):
-        super(_EmptyNoneSelectField, self).process_formdata(valuelist)
+        super().process_formdata(valuelist)
         if not self.data:
             self.data = None
 
 
 class _EmptyNoneRadioField(IndicoRadioField):
     def process_formdata(self, valuelist):
-        super(_EmptyNoneRadioField, self).process_formdata(valuelist)
+        super().process_formdata(valuelist)
         if not self.data:
             self.data = None
 
@@ -88,7 +86,7 @@ class SingleChoiceField(_ChoiceFieldBase):
         return option_map.get(value) or ''
 
 
-class MultiSelectConfigForm(object):
+class MultiSelectConfigForm:
     options = MultiStringField(_('Options'), [DataRequired()], field=('option', _('option')), unique=True,
                                uuid_field='id', sortable=True, description=_('Specify the answers the user can select'))
     min_choices = IntegerField(_("Minimum choices"), [HiddenUnless('is_required'), Optional(), NumberRange(min=0)],

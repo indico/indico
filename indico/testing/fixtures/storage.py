@@ -1,11 +1,9 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
-
-from __future__ import unicode_literals
 
 from hashlib import md5
 from io import BytesIO
@@ -36,7 +34,7 @@ class MemoryStorage(Storage):
     def save(self, file_id, content_type, filename, fileobj):
         data = self._ensure_fileobj(fileobj).read()
         self.files[file_id] = (content_type, filename, data)
-        return file_id, md5(data).hexdigest().decode('ascii')
+        return file_id, md5(data).hexdigest()
 
     def delete(self, file_id):
         del self.files[file_id]

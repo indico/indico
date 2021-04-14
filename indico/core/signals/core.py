@@ -1,5 +1,5 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
@@ -85,4 +85,12 @@ only the correct field types are returned.
 db_schema_created = _signals.signal('db-schema-created', """
 Executed when a new database schema is created.  The *sender* is the
 name of the schema.
+""")
+
+check_password_secure = _signals.signal('check-password-secure', """
+Check whether a password is secure. The *sender* is a string indicating
+the context where the password check happens, the plaintext password is
+sent in the *password* kwarg. To fail the security check for a password,
+the signal handler should return a string describing why the password is
+not secure.
 """)

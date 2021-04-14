@@ -1,11 +1,9 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
-
-from collections import OrderedDict
 
 import pytest
 
@@ -26,7 +24,7 @@ class ActionCondition(TestCondition):
 
     @classmethod
     def get_available_values(cls, **kwargs):
-        return OrderedDict([('add', 'added'), ('del', 'deleted')])
+        return {'add': 'added', 'del': 'deleted'}
 
     @classmethod
     def check(cls, values, action, **kwargs):
@@ -40,7 +38,7 @@ class FooCondition(TestCondition):
 
     @classmethod
     def get_available_values(cls, **kwargs):
-        return OrderedDict([(1, '1'), (2, '2'), (3, '3')])
+        return {1: '1', 2: '2', 3: '3'}
 
     @classmethod
     def check(cls, values, foo, **kwargs):

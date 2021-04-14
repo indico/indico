@@ -1,26 +1,30 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import unicode_literals
+import functools
 
 from flask import current_app, request
 from flask_multipass import InvalidCredentials, Multipass, NoSuchUser
+from werkzeug.local import LocalProxy
 
+from indico.core.config import config
+from indico.core.limiter import make_rate_limiter
 from indico.core.logger import Logger
 
 
 logger = Logger.get('auth')
+login_rate_limiter = LocalProxy(functools.cache(lambda: make_rate_limiter('login', config.FAILED_LOGIN_RATE_LIMIT)))
 
 
 class IndicoMultipass(Multipass):
     @property
     def default_local_auth_provider(self):
         """The default form-based auth provider."""
-        return next((p for p in self.auth_providers.itervalues() if not p.is_external and p.settings.get('default')),
+        return next((p for p in self.auth_providers.values() if not p.is_external and p.settings.get('default')),
                     None)
 
     @property
@@ -29,11 +33,11 @@ class IndicoMultipass(Multipass):
 
         This is the identity provider used to sync user data.
         """
-        return next((p for p in self.identity_providers.itervalues() if p.settings.get('synced_fields')), None)
+        return next((p for p in self.identity_providers.values() if p.settings.get('synced_fields')), None)
 
     @property
     def synced_fields(self):
-        """The keys to be synchronized
+        """The keys to be synchronized.
 
         This is the set of keys to be synced to user data.
         The ``email`` can never be synchronized.
@@ -47,17 +51,17 @@ class IndicoMultipass(Multipass):
         return synced_fields
 
     def init_app(self, app):
-        super(IndicoMultipass, self).init_app(app)
+        super().init_app(app)
         with app.app_context():
             self._check_default_provider()
 
     def _check_default_provider(self):
         # Ensure that there is maximum one sync provider
-        sync_providers = [p for p in self.identity_providers.itervalues() if p.settings.get('synced_fields')]
+        sync_providers = [p for p in self.identity_providers.values() if p.settings.get('synced_fields')]
         if len(sync_providers) > 1:
             raise ValueError('There can only be one sync provider.')
         # Ensure that there is exactly one form-based default auth provider
-        auth_providers = self.auth_providers.values()
+        auth_providers = list(self.auth_providers.values())
         external_providers = [p for p in auth_providers if p.is_external]
         local_providers = [p for p in auth_providers if not p.is_external]
         if any(p.settings.get('default') for p in external_providers):
@@ -75,6 +79,7 @@ class IndicoMultipass(Multipass):
 
     def handle_auth_error(self, exc, redirect_to_login=False):
         if isinstance(exc, (NoSuchUser, InvalidCredentials)):
+            login_rate_limiter.hit()
             logger.warning('Invalid credentials (ip=%s, provider=%s): %s',
                            request.remote_addr, exc.provider.name if exc.provider else None, exc)
         else:
@@ -84,7 +89,7 @@ class IndicoMultipass(Multipass):
                 fn = logger.debug
             fn('Authentication via %s failed: %s (%r)', exc.provider.name if exc.provider else None, exc_str,
                exc.details)
-        return super(IndicoMultipass, self).handle_auth_error(exc, redirect_to_login=redirect_to_login)
+        return super().handle_auth_error(exc, redirect_to_login=redirect_to_login)
 
 
 multipass = IndicoMultipass()

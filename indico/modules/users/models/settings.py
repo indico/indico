@@ -1,11 +1,9 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
-
-from __future__ import unicode_literals
 
 from functools import wraps
 
@@ -13,11 +11,10 @@ from indico.core.db import db
 from indico.core.settings import SettingsProxyBase
 from indico.core.settings.models.base import JSONSettingsBase
 from indico.core.settings.util import get_all_settings, get_setting
-from indico.util.string import return_ascii
 
 
 class UserSetting(JSONSettingsBase, db.Model):
-    """User-specific settings"""
+    """User-specific settings."""
     __table_args__ = (db.Index(None, 'user_id', 'module', 'name'),
                       db.Index(None, 'user_id', 'module'),
                       db.UniqueConstraint('user_id', 'module', 'name'),
@@ -42,9 +39,8 @@ class UserSetting(JSONSettingsBase, db.Model):
         )
     )
 
-    @return_ascii
     def __repr__(self):
-        return '<UserSetting({}, {}, {}, {!r})>'.format(self.user_id, self.module, self.name, self.value)
+        return f'<UserSetting({self.user_id}, {self.module}, {self.name}, {self.value!r})>'
 
 
 def user_or_id(f):
@@ -67,16 +63,16 @@ def user_or_id(f):
 
 
 class UserSettingsProxy(SettingsProxyBase):
-    """Proxy class to access user-specific settings for a certain module"""
+    """Proxy class to access user-specific settings for a certain module."""
 
     @property
     def query(self):
-        """Returns a query object filtering by the proxy's module."""
-        return UserSetting.find(module=self.module)
+        """Return a query object filtering by the proxy's module."""
+        return UserSetting.query.filter_by(module=self.module)
 
     @user_or_id
     def get_all(self, user, no_defaults=False):
-        """Retrieves all settings
+        """Retrieve all settings.
 
         :param user: ``{'user': user}`` or ``{'user_id': id}``
         :param no_defaults: Only return existing settings and ignore defaults.
@@ -86,7 +82,7 @@ class UserSettingsProxy(SettingsProxyBase):
 
     @user_or_id
     def get(self, user, name, default=SettingsProxyBase.default_sentinel):
-        """Retrieves the value of a single setting.
+        """Retrieve the value of a single setting.
 
         :param user: ``{'user': user}`` or ``{'user_id': id}``
         :param name: Setting name
@@ -98,7 +94,7 @@ class UserSettingsProxy(SettingsProxyBase):
 
     @user_or_id
     def set(self, user, name, value):
-        """Sets a single setting.
+        """Set a single setting.
 
         :param user: ``{'user': user}`` or ``{'user_id': id}``
         :param name: Setting name
@@ -110,20 +106,20 @@ class UserSettingsProxy(SettingsProxyBase):
 
     @user_or_id
     def set_multi(self, user, items):
-        """Sets multiple settings at once.
+        """Set multiple settings at once.
 
         :param user: ``{'user': user}`` or ``{'user_id': id}``
         :param items: Dict containing the new settings
         """
         for name in items:
             self._check_name(name)
-        items = {k: self._convert_from_python(k, v) for k, v in items.iteritems()}
+        items = {k: self._convert_from_python(k, v) for k, v in items.items()}
         UserSetting.set_multi(self.module, items, **user)
         self._flush_cache()
 
     @user_or_id
     def delete(self, user, *names):
-        """Deletes settings.
+        """Delete settings.
 
         :param user: ``{'user': user}`` or ``{'user_id': id}``
         :param names: One or more names of settings to delete
@@ -135,7 +131,7 @@ class UserSettingsProxy(SettingsProxyBase):
 
     @user_or_id
     def delete_all(self, user):
-        """Deletes all settings.
+        """Delete all settings.
 
         :param user: ``{'user': user}`` or ``{'user_id': id}``
         """

@@ -1,11 +1,9 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
-
-from __future__ import unicode_literals
 
 from datetime import timedelta
 
@@ -18,7 +16,7 @@ from indico.util.date_time import now_utc
 
 @memoize_redis(3600)
 def get_recent_news():
-    """Get a list of recent news for the home page"""
+    """Get a list of recent news for the home page."""
     settings = news_settings.get_all()
     if not settings['show_recent']:
         return []

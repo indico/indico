@@ -1,28 +1,25 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import absolute_import, unicode_literals
-
-import cPickle
+import pickle
 import uuid
 from datetime import datetime, timedelta
 
-from flask import flash, request
+from flask import current_app, request
 from flask.sessions import SessionInterface, SessionMixin
-from markupsafe import Markup
 from werkzeug.datastructures import CallbackDict
 from werkzeug.utils import cached_property
 
+from indico.core.cache import make_scoped_cache
 from indico.core.config import config
-from indico.legacy.common.cache import GenericCache
 from indico.modules.users import User
 from indico.util.date_time import get_display_tz
-from indico.util.decorators import cached_writable_property
-from indico.util.i18n import _, set_best_lang
+from indico.util.i18n import set_best_lang
+from indico.web.util import get_request_user
 
 
 class BaseSession(CallbackDict, SessionMixin):
@@ -48,36 +45,30 @@ class BaseSession(CallbackDict, SessionMixin):
 # - Always prefix the dict keys backing a property with an underscore (to prevent clashes with externally-set items)
 # - When you store something like the avatar that involves a DB lookup, use cached_writable_property
 class IndicoSession(BaseSession):
-    @cached_writable_property('_user')
+    @property
     def user(self):
-        user_id = self.get('_user_id')
-        user = User.get(user_id) if user_id is not None else None
-        if user and user.is_deleted:
-            merged_into_user = user.merged_into_user
-            user = None
-            # If the user is deleted and the request is likely to be seen by
-            # the user, we forcefully log him out and inform him about it.
-            if not request.is_xhr and request.blueprint != 'assets':
-                self.clear()
-                if merged_into_user:
-                    msg = _('Your profile has been merged into <strong>{}</strong>. Please log in using that profile.')
-                    flash(Markup(msg).format(merged_into_user.full_name), 'warning')
-                else:
-                    flash(_('Your profile has been deleted.'), 'error')
-        elif user and user.is_blocked:
-            user = None
-            if not request.is_xhr and request.blueprint != 'assets':
-                self.clear()
-                flash(_('Your Indico profile has been blocked.'), 'error')
-        return user
+        return get_request_user()[0]
 
-    @user.setter
-    def user(self, user):
+    def set_session_user(self, user):
+        """Set the user logged in via this session."""
+        if not current_app.testing:
+            # Sanity check since logging in via the session during a request authenticated
+            # via token/oauth never makes sense. Disabled during testing since we usually
+            # know what we're doing there.
+            current_user, source = get_request_user()
+            if current_user is not None and source != 'session':
+                raise Exception('Cannot set session user while authenticated using other means')
+
         if user is None:
             self.pop('_user_id', None)
         else:
             self['_user_id'] = user.id
         self._refresh_sid = True
+
+    def get_session_user(self):
+        """Get the user logged in via this session."""
+        user_id = self.get('_user_id')
+        return User.get(user_id) if user_id is not None else None
 
     @property
     def lang(self):
@@ -92,10 +83,16 @@ class IndicoSession(BaseSession):
         parts = self.lang.lower().split('_')  # e.g. `en_GB` or `zh_Hans_CN`
         lang = parts[0]
         territory = parts[-1]
-        if lang == territory:
+        if lang == territory or lang == 'uk':
+            # TODO we should add some metadata that stores the canonical locale name and
+            # the name of the moment locale to avoid hacks like the one here. for example,
+            # fr_FR is handled somewhat nicely, but ukrainian (uk_UA) needs an explicit check
+            # since it's a single-country locale but locale and territory name are different..
+            # `setMomentLocale` in JS has the same problem, so any fix here should be applied
+            # over there as well.
             return lang
         else:
-            return '{}-{}'.format(lang, territory)
+            return f'{lang}-{territory}'
 
     @cached_property
     def csrf_token(self):
@@ -134,12 +131,12 @@ class IndicoSession(BaseSession):
 
 class IndicoSessionInterface(SessionInterface):
     pickle_based = True
-    serializer = cPickle
+    serializer = pickle
     session_class = IndicoSession
     temporary_session_lifetime = timedelta(days=7)
 
     def __init__(self):
-        self.storage = GenericCache('flask-session')
+        self.storage = make_scoped_cache('flask-session')
 
     def generate_sid(self):
         return str(uuid.uuid4())
@@ -175,7 +172,12 @@ class IndicoSessionInterface(SessionInterface):
             return self.session_class(sid=self.generate_sid(), new=True)
         data = self.storage.get(sid)
         if data is not None:
-            return self.session_class(self.serializer.loads(data), sid=sid)
+            try:
+                return self.session_class(self.serializer.loads(data), sid=sid)
+            except TypeError:
+                # fall through to generating a new session; this likely happens when
+                # you have a session saved on Python 2
+                pass
         return self.session_class(sid=self.generate_sid(), new=True)
 
     def save_session(self, app, session, response):

@@ -1,11 +1,9 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
-
-from __future__ import unicode_literals
 
 import posixpath
 
@@ -13,7 +11,7 @@ from indico.core.config import config
 from indico.core.db import db
 from indico.core.storage import StoredFileMixin
 from indico.util.fs import secure_filename
-from indico.util.string import return_ascii, strict_unicode
+from indico.util.string import strict_str
 
 
 class ImageFile(StoredFileMixin, db.Model):
@@ -54,13 +52,12 @@ class ImageFile(StoredFileMixin, db.Model):
         return dict(self.event.locator, image_id=self.id, filename=self.filename)
 
     def _build_storage_path(self):
-        path_segments = ['event', strict_unicode(self.event.id), 'images']
+        path_segments = ['event', strict_str(self.event.id), 'images']
         self.assign_id()
         filename = '{}-{}'.format(self.id, secure_filename(self.filename, 'file'))
         path = posixpath.join(*(path_segments + [filename]))
         return config.ATTACHMENT_STORAGE, path
 
-    @return_ascii
     def __repr__(self):
         return '<ImageFile({}, {}, {}, {})>'.format(
             self.id,

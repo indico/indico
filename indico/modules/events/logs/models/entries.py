@@ -1,20 +1,17 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
-
-from __future__ import unicode_literals
 
 from sqlalchemy.dialects.postgresql import JSON, JSONB
 
 from indico.core.db import db
 from indico.core.db.sqlalchemy import PyIntEnum, UTCDateTime
 from indico.util.date_time import now_utc
+from indico.util.enum import IndicoEnum, RichIntEnum
 from indico.util.i18n import _
-from indico.util.string import return_ascii
-from indico.util.struct.enum import IndicoEnum, RichIntEnum
 
 
 class EventLogRealm(RichIntEnum):
@@ -34,7 +31,7 @@ class EventLogKind(int, IndicoEnum):
 
 
 class EventLogEntry(db.Model):
-    """Log entries for events"""
+    """Log entries for events."""
     __tablename__ = 'logs'
     __table_args__ = (db.Index(None, 'meta', postgresql_using='gin'),
                       {'schema': 'events'})
@@ -132,7 +129,7 @@ class EventLogEntry(db.Model):
         return get_log_renderers().get(self.type)
 
     def render(self):
-        """Renders the log entry to be displayed.
+        """Render the log entry to be displayed.
 
         If the renderer is not available anymore, e.g. because of a
         disabled plugin, ``None`` is returned.
@@ -140,7 +137,6 @@ class EventLogEntry(db.Model):
         renderer = self.renderer
         return renderer.render_entry(self) if renderer else None
 
-    @return_ascii
     def __repr__(self):
         realm = self.realm.name if self.realm is not None else None
         return '<EventLogEntry({}, {}, {}, {}, {}): {}>'.format(self.id, self.event_id, self.logged_dt, realm,

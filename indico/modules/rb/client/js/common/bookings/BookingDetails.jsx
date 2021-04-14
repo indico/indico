@@ -1,5 +1,5 @@
 // This file is part of Indico.
-// Copyright (C) 2002 - 2020 CERN
+// Copyright (C) 2002 - 2021 CERN
 //
 // Indico is free software; you can redistribute it and/or
 // modify it under the terms of the MIT License; see the
@@ -9,11 +9,11 @@ import bookingLinkURL from 'indico-url:rb.booking_link';
 
 import _ from 'lodash';
 import moment from 'moment';
-import React from 'react';
 import PropTypes from 'prop-types';
+import React from 'react';
 import {Form as FinalForm} from 'react-final-form';
-import {bindActionCreators} from 'redux';
 import {connect} from 'react-redux';
+import {bindActionCreators} from 'redux';
 import {
   Button,
   Confirm,
@@ -28,25 +28,27 @@ import {
   Popup,
 } from 'semantic-ui-react';
 
-import {toMoment, serializeDate} from 'indico/utils/date';
-import {Param, Plural, PluralTranslate, Singular, Translate} from 'indico/react/i18n';
-import {FinalCheckbox, FinalTextArea} from 'indico/react/forms';
-import {Responsive} from 'indico/react/util';
 import {ClipboardButton} from 'indico/react/components';
-import {DailyTimelineContent, TimelineLegend} from '../timeline';
+import {FinalCheckbox, FinalTextArea} from 'indico/react/forms';
+import {Param, Plural, PluralTranslate, Singular, Translate} from 'indico/react/i18n';
+import {Responsive} from 'indico/react/util';
+import {toMoment, serializeDate} from 'indico/utils/date';
+
+import {openModal} from '../../actions';
+import RoomBasicDetails from '../../components/RoomBasicDetails';
+import RoomKeyLocation from '../../components/RoomKeyLocation';
+import TimeInformation from '../../components/TimeInformation';
 import {
   getRecurrenceInfo,
   PopupParam,
   getOccurrenceTypes,
   transformToLegendLabels,
 } from '../../util';
-import RoomBasicDetails from '../../components/RoomBasicDetails';
-import RoomKeyLocation from '../../components/RoomKeyLocation';
-import TimeInformation from '../../components/TimeInformation';
-import {openModal} from '../../actions';
+import {DailyTimelineContent, TimelineLegend} from '../timeline';
+
+import * as bookingsActions from './actions';
 import LazyBookingObjectLink from './LazyBookingObjectLink';
 import * as bookingsSelectors from './selectors';
-import * as bookingsActions from './actions';
 
 import './BookingDetails.module.scss';
 
@@ -569,7 +571,13 @@ class BookingDetails extends React.Component {
     return transformToLegendLabels(occurrenceTypes, inactiveTypes);
   };
 
-  renderActionButtons = (canCancel, canReject, showAccept, occurrenceCount, isAccepted) => {
+  renderActionButtons = (
+    canCancel,
+    canReject,
+    showAccept,
+    cancellableOccurrenceCount,
+    isAccepted
+  ) => {
     const {bookingStateChangeInProgress} = this.props;
     const {actionInProgress, activeConfirmation, acceptanceFormVisible} = this.state;
     const rejectButton = (
@@ -609,7 +617,7 @@ class BookingDetails extends React.Component {
             rows={2}
             required
           />
-          {isAccepted && occurrenceCount > 1 && (
+          {isAccepted && cancellableOccurrenceCount > 1 && (
             <FinalCheckbox
               name="_confirm"
               label={Translate.string(
@@ -686,26 +694,26 @@ class BookingDetails extends React.Component {
               </Modal.Header>
               <Modal.Content>
                 <p>
-                  <PluralTranslate count={occurrenceCount}>
+                  <PluralTranslate count={cancellableOccurrenceCount}>
                     <Singular>Are you sure you want to cancel this booking?</Singular>
                     <Plural>
-                      Are you sure you want to cancel this booking? This will cancel all{' '}
-                      <Param name="count" value={occurrenceCount} wrapper={<strong />} />{' '}
-                      occurrences.
+                      Are you sure you want to cancel this booking? This will cancel{' '}
+                      <Param name="count" value={cancellableOccurrenceCount} wrapper={<strong />} />{' '}
+                      upcoming occurrences.
                     </Plural>
                   </PluralTranslate>
                 </p>
-                <p>
-                  {occurrenceCount > 1 && (
+                {cancellableOccurrenceCount > 1 && (
+                  <p>
                     <Translate>
                       Single occurrences can be cancelled via the timeline view.
                     </Translate>
-                  )}
-                </p>
+                  </p>
+                )}
               </Modal.Content>
               <Modal.Actions>
                 <Button onClick={this.hideConfirm} content={Translate.string('Close')} />
-                {occurrenceCount > 1 && (
+                {cancellableOccurrenceCount > 1 && (
                   <Button
                     icon="calendar outline"
                     onClick={() => {
@@ -723,7 +731,7 @@ class BookingDetails extends React.Component {
                   content={PluralTranslate.string(
                     'Cancel booking',
                     'Cancel all occurrences',
-                    occurrenceCount
+                    cancellableOccurrenceCount
                   )}
                   negative
                 />
@@ -823,6 +831,9 @@ class BookingDetails extends React.Component {
     const showActionButtons = !isCancelled && !isRejected && (canCancel || canReject || showAccept);
     const activeBookings = _.omitBy(occurrences.bookings, value => _.isEmpty(value));
     const occurrenceCount = Object.keys(activeBookings).length;
+    const cancellableOccurrenceCount = Object.values(activeBookings).filter(date =>
+      date.some(occurrence => occurrence.canCancel)
+    ).length;
 
     return (
       <>
@@ -870,7 +881,13 @@ class BookingDetails extends React.Component {
             </Grid>
           </Modal.Content>
           {showActionButtons &&
-            this.renderActionButtons(canCancel, canReject, showAccept, occurrenceCount, isAccepted)}
+            this.renderActionButtons(
+              canCancel,
+              canReject,
+              showAccept,
+              cancellableOccurrenceCount,
+              isAccepted
+            )}
         </Modal>
         <Modal open={occurrencesVisible} onClose={this.hideOccurrences} size="large" closeIcon>
           <Modal.Header className="legend-header">

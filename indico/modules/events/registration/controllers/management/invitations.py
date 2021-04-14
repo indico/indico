@@ -1,11 +1,9 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
-
-from __future__ import unicode_literals
 
 from flask import flash, request
 from sqlalchemy.orm import joinedload
@@ -38,7 +36,7 @@ def _render_invitation_list(regform):
 
 
 class RHRegistrationFormInvitations(RHManageRegFormBase):
-    """Overview of all registration invitations"""
+    """Overview of all registration invitations."""
 
     def _process(self):
         invitations = _query_invitation_list(self.regform)
@@ -47,7 +45,7 @@ class RHRegistrationFormInvitations(RHManageRegFormBase):
 
 
 class RHRegistrationFormInvite(RHManageRegFormBase):
-    """Invite someone to register"""
+    """Invite someone to register."""
 
     def _create_invitation(self, user, skip_moderation, email_from, email_subject, email_body):
         invitation = RegistrationInvitation(
@@ -94,7 +92,7 @@ class RHRegistrationFormInvitationBase(RHManageRegFormBase):
 
 
 class RHRegistrationFormDeleteInvitation(RHRegistrationFormInvitationBase):
-    """Delete a registration invitation"""
+    """Delete a registration invitation."""
 
     def _process(self):
         db.session.delete(self.invitation)

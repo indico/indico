@@ -1,11 +1,9 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
-
-from __future__ import unicode_literals
 
 from functools import partial
 
@@ -22,7 +20,7 @@ from indico.modules.events.fields import IndicoThemeSelectField
 from indico.modules.events.models.events import EventType
 from indico.modules.networks import IPNetworkGroup
 from indico.util.i18n import _
-from indico.util.user import principal_from_fossil
+from indico.util.user import principal_from_identifier
 from indico.web.forms.base import IndicoForm
 from indico.web.forms.colors import get_role_colors
 from indico.web.forms.fields import (EditableFileField, EmailListField, HiddenFieldList, IndicoEnumSelectField,
@@ -97,7 +95,7 @@ class CategoryProtectionForm(IndicoForm):
 
     def __init__(self, *args, **kwargs):
         self.protected_object = self.category = kwargs.pop('category')
-        super(CategoryProtectionForm, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self._init_visibility()
 
     def _init_visibility(self):
@@ -111,8 +109,11 @@ class CategoryProtectionForm(IndicoForm):
 
     def validate_permissions(self, field):
         for principal_fossil, permissions in field.data:
-            principal = principal_from_fossil(principal_fossil, allow_networks=True, allow_pending=True,
-                                              category=self.category)
+            principal = principal_from_identifier(principal_fossil['identifier'],
+                                                  allow_groups=True,
+                                                  allow_networks=True,
+                                                  allow_category_roles=True,
+                                                  category_id=self.category.id)
             if isinstance(principal, IPNetworkGroup) and set(permissions) - {READ_ACCESS_PERMISSION}:
                 msg = _('IP networks cannot have management permissions: {}').format(principal.name)
                 raise ValidationError(msg)
@@ -122,7 +123,7 @@ class CategoryProtectionForm(IndicoForm):
 
 
 class CreateCategoryForm(IndicoForm):
-    """Form to create a new Category"""
+    """Form to create a new Category."""
 
     title = StringField(_("Title"), [DataRequired()])
     description = IndicoMarkdownField(_("Description"))
@@ -132,15 +133,16 @@ class SplitCategoryForm(IndicoForm):
     first_category = StringField(_('Category name #1'), [DataRequired()],
                                  description=_('Selected events will be moved into a new sub-category with this '
                                                'title.'))
-    second_category = StringField(_('Category name #2'), [DataRequired()],
+    second_category = StringField(_('Category name #2'),
                                   description=_('Events that were not selected will be moved into a new sub-category '
-                                                'with this title.'))
+                                                'with this title. If omitted, those events will remain in the current '
+                                                'category.'))
     event_id = HiddenFieldList()
     all_selected = BooleanField(widget=HiddenCheckbox())
     submitted = HiddenField()
 
     def __init__(self, *args, **kwargs):
-        super(SplitCategoryForm, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         if self.all_selected.data:
             self.event_id.data = []
             self.first_category.label.text = _('Category name')
@@ -148,7 +150,7 @@ class SplitCategoryForm(IndicoForm):
             del self.second_category
 
     def is_submitted(self):
-        return super(SplitCategoryForm, self).is_submitted() and 'submitted' in request.form
+        return super().is_submitted() and 'submitted' in request.form
 
 
 class UpcomingEventsForm(IndicoForm):
@@ -196,7 +198,7 @@ class CategoryRoleForm(IndicoForm):
     def __init__(self, *args, **kwargs):
         self.role = kwargs.get('obj')
         self.category = kwargs.pop('category')
-        super(CategoryRoleForm, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
     def validate_code(self, field):
         query = CategoryRole.query.with_parent(self.category).filter_by(code=field.data)

@@ -16,7 +16,7 @@
             <div class="i-label filter" {{ 'data-only-filter' if item_id == 'unassigned' }}>
                 <a class="icon-filter" data-toggle="dropdown"></a>
                 <ul class="i-dropdown" style="display: none;">
-                    {% for value, caption in filter_choices.iteritems() %}
+                    {% for value, caption in filter_choices.items() %}
                         <li>
                             {% set value = none if value is none else value|string %}
                             <input type="checkbox" name="field_{{ item_id }}" value="{{ value }}"
@@ -68,7 +68,7 @@
            value="{{ visible_items | tojson | forceescape }}">
     <h3>{% trans %}General paper assignment info{% endtrans %}</h3>
     <div class="flexrow f-wrap">
-        {% for item_id, item in static_items.iteritems() %}
+        {% for item_id, item in static_items.items() %}
             {% set filter_choices = item.get('filter_choices') %}
             {{ _render_column_selector(item_id, item, filter_choices, is_static_item=true) }}
         {% endfor %}

@@ -1,11 +1,12 @@
 // This file is part of Indico.
-// Copyright (C) 2002 - 2020 CERN
+// Copyright (C) 2002 - 2021 CERN
 //
 // Indico is free software; you can redistribute it and/or
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
 /* eslint-disable max-len */
+/* global _ */
 
 import {$T} from '../../utils/i18n';
 import Palette from '../../utils/palette';
@@ -29,14 +30,6 @@ import Palette from '../../utils/palette';
       dialogSubtitle: null,
       // Disallow action on specific categories
       actionOn: {
-        categoriesWithSubcategories: {
-          disabled: false,
-          message: $T.gettext('Not possible for categories containing subcategories'),
-        },
-        categoriesWithEvents: {
-          disabled: false,
-          message: $T.gettext('Not possible for categories containing events'),
-        },
         categoriesWithoutEventCreationRights: {
           disabled: false,
           message: $T.gettext('Not possible for categories where you cannot create events'),
@@ -57,7 +50,7 @@ import Palette from '../../utils/palette';
       },
       // Callback for action button
       // If it returns a deferred object the dialog will close only when it gets resolved
-      onAction: function() {},
+      onAction() {},
     },
 
     // Caches for data of already visited categories and search results
@@ -70,8 +63,8 @@ import Palette from '../../utils/palette';
     _currentCategoryRequest: null,
     _currentSearchRequest: null,
 
-    _create: function() {
-      var self = this;
+    _create() {
+      const self = this;
       if (_.isObject(self.options.category)) {
         self._fillCache(self.options.category);
         self._categoryId = self.options.category.category.id;
@@ -85,8 +78,8 @@ import Palette from '../../utils/palette';
       }
     },
 
-    _createInline: function() {
-      var self = this;
+    _createInline() {
+      const self = this;
       self.element.addClass('categorynav');
       self._createList();
       self._createSearchField();
@@ -94,16 +87,16 @@ import Palette from '../../utils/palette';
       self.goToCategory(self._categoryId);
     },
 
-    _createInDialog: function() {
-      var self = this;
-      var $content = $('<div>', {class: 'categorynav-dialog-content'});
+    _createInDialog() {
+      const self = this;
+      const $content = $('<div>', {class: 'categorynav-dialog-content'});
       ajaxDialog({
         title: self.options.dialogTitle,
         subtitle: self.options.dialogSubtitle,
         content: $content[0].outerHTML,
         closeButton: true,
         fullyModal: true,
-        onOpen: function(dialog) {
+        onOpen(dialog) {
           self.element = dialog.contentContainer.children('.categorynav-dialog-content');
           self.dialog = dialog;
           self._createInline();
@@ -111,8 +104,8 @@ import Palette from '../../utils/palette';
       });
     },
 
-    _createList: function() {
-      var self = this;
+    _createList() {
+      const self = this;
       self.$category = $('<div>');
       self.$categoryTree = $('<ul>', {class: 'group-list'});
       self.$categoryResultsList = $('<ul>', {class: 'group-list search-results-list'});
@@ -134,8 +127,8 @@ import Palette from '../../utils/palette';
       self.element.append(self.$categoryList);
     },
 
-    _createSearchField: function() {
-      var self = this;
+    _createSearchField() {
+      const self = this;
       self.$searchInput = $('<input>', {
         type: 'search',
         placeholder: $T.gettext('Search'),
@@ -143,7 +136,7 @@ import Palette from '../../utils/palette';
       self.element.prepend(self.$searchInput);
       self.$searchInput.realtimefilter({
         wait: 500,
-        callback: function(value) {
+        callback(value) {
           if (!value) {
             self._clearSearch();
           } else {
@@ -153,22 +146,22 @@ import Palette from '../../utils/palette';
       });
     },
 
-    _createBindings: function() {
-      var self = this;
+    _createBindings() {
+      const self = this;
       self.element.on('click', '.js-action', function(evt) {
-        var $this = $(this);
+        const $this = $(this);
         evt.stopPropagation();
         if (!$this.hasClass('disabled')) {
           self._onAction($this.data('categoryId'));
         }
       });
       self.element.on('click', '.js-go-to', function(evt) {
-        var categoryId = $(this).data('categoryId');
+        const categoryId = $(this).data('categoryId');
         self.goToCategory(categoryId);
         evt.preventDefault();
       });
       self.element.on('click', '.js-navigate-up', function() {
-        var parentId = $(this).data('parentId');
+        const parentId = $(this).data('parentId');
         self.goToCategory(parentId);
       });
       self.element.on('click', '.js-search', function() {
@@ -180,18 +173,18 @@ import Palette from '../../utils/palette';
       });
     },
 
-    _buildBreadcrumbs: function(path, clickable) {
-      var $breadcrumbs = $('<ul>', {class: 'breadcrumbs'});
-      var tag = clickable ? '<a>' : '<span>';
+    _buildBreadcrumbs(path, clickable) {
+      const $breadcrumbs = $('<ul>', {class: 'breadcrumbs'});
+      const tag = clickable ? '<a>' : '<span>';
 
       _.each(path, function(category, idx) {
-        var $item = $('<li>');
-        var $segment = $(tag, {
+        const $item = $('<li>');
+        const $segment = $(tag, {
           'text': category.title,
           'data-category-id': category.id,
         }).toggleClass('js-go-to', clickable);
         if (idx === 0) {
-          $item.text($T.gettext('in') + ' ');
+          $item.text(`${$T.gettext('in')} `);
         }
         if (clickable) {
           $segment.attr('href', '');
@@ -203,17 +196,17 @@ import Palette from '../../utils/palette';
       return $breadcrumbs;
     },
 
-    _buildCategory: function(category, isSubcategory, withBreadcrumbs, clickableBreadcrumbs) {
-      var self = this;
-      var tag = isSubcategory ? '<li>' : '<div>';
-      var itemClass = isSubcategory ? 'subcategory' : 'current-category';
+    _buildCategory(category, isSubcategory, withBreadcrumbs, clickableBreadcrumbs) {
+      const self = this;
+      const tag = isSubcategory ? '<li>' : '<div>';
+      const itemClass = isSubcategory ? 'subcategory' : 'current-category';
 
-      var $category = $(tag, {
-        class: 'item ' + itemClass,
-        id: 'category-' + category.id,
+      const $category = $(tag, {
+        class: `item ${itemClass}`,
+        id: `category-${category.id}`,
       });
 
-      var $categoryTitle = $('<div>', {class: 'title-wrapper'});
+      const $categoryTitle = $('<div>', {class: 'title-wrapper'});
       $categoryTitle.append(
         $('<span>', {
           class: 'title',
@@ -230,12 +223,12 @@ import Palette from '../../utils/palette';
       $category.append($categoryTitle);
       $category.append(self._buildSidePanel(category, isSubcategory));
 
-      var $protectionIcon = $('<span>', {
+      const $protectionIcon = $('<span>', {
         class: 'protection',
         title: $T.gettext('This category is protected'),
       }).toggleClass('icon-shield', category.is_protected);
       if (isSubcategory) {
-        var $protection = $('<div>', {class: 'protection-wrapper'}).append($protectionIcon);
+        const $protection = $('<div>', {class: 'protection-wrapper'}).append($protectionIcon);
         $categoryTitle.before($protection);
       } else if (category.is_protected) {
         $breadcrumbs.before($protectionIcon);
@@ -244,14 +237,14 @@ import Palette from '../../utils/palette';
       return $category;
     },
 
-    _buildCurrentCategory: function(category) {
-      var self = this;
+    _buildCurrentCategory(category) {
+      const self = this;
       return self._buildCategory(category, false, true, true);
     },
 
-    _buildSubcategory: function(category, withBreadcrumbs) {
-      var self = this;
-      var $subcategory = self._buildCategory(category, true, withBreadcrumbs, false);
+    _buildSubcategory(category, withBreadcrumbs) {
+      const self = this;
+      const $subcategory = self._buildCategory(category, true, withBreadcrumbs, false);
 
       if (category.can_access) {
         $subcategory.addClass('can-access js-go-to');
@@ -261,24 +254,24 @@ import Palette from '../../utils/palette';
       return $subcategory;
     },
 
-    _buildSidePanel: function(category, forSubcategory) {
-      var self = this;
-      var $buttonWrapper = $('<div>', {class: 'button-wrapper'});
-      var $button = $('<span>', {
+    _buildSidePanel(category, forSubcategory) {
+      const self = this;
+      const $buttonWrapper = $('<div>', {class: 'button-wrapper'});
+      const $button = $('<span>', {
         'class': 'action-button js-action',
         'text': self.options.actionButtonText,
         'data-category-id': category.id,
       });
       $buttonWrapper.append($('<div>').append($button));
 
-      var canActOn = self._canActOn(category, true);
+      const canActOn = self._canActOn(category, true);
       if (!canActOn.allowed) {
         $button.addClass('disabled').attr('title', canActOn.message);
       }
 
       if (!forSubcategory && category.parent_path && category.parent_path.length) {
-        var parent = _.last(category.parent_path);
-        var $arrowUp = $('<a>', {
+        const parent = _.last(category.parent_path);
+        const $arrowUp = $('<a>', {
           'class': 'icon-arrow-up navigate-up js-navigate-up',
           'title': $T.gettext('Go to parent: {0}'.format(parent.title)),
           'data-parent-id': parent.id,
@@ -287,26 +280,23 @@ import Palette from '../../utils/palette';
       }
 
       if (forSubcategory) {
-        var $info = $('<div>', {
+        const $info = $('<div>', {
           class: 'stats icon-list',
-          title:
-            $T
-              .ngettext('{0} category', '{0} categories', category.deep_category_count)
-              .format(category.deep_category_count) +
-            ' | ' +
-            $T
-              .ngettext('{0} event', '{0} events', category.deep_event_count)
-              .format(category.deep_event_count),
+          title: `${$T
+            .ngettext('{0} category', '{0} categories', category.deep_category_count)
+            .format(category.deep_category_count)} | ${$T
+            .ngettext('{0} event', '{0} events', category.deep_event_count)
+            .format(category.deep_event_count)}`,
         });
-        var $categories = $('<span>', {
+        const $categories = $('<span>', {
           class: 'categories-count',
           text: category.deep_category_count,
         });
-        var $events = $('<span>', {
+        const $events = $('<span>', {
           class: 'events-count',
           text: category.deep_event_count,
         });
-        var $separator = $('<span>', {
+        const $separator = $('<span>', {
           class: 'stats-separator',
           text: ' | ',
         });
@@ -320,14 +310,14 @@ import Palette from '../../utils/palette';
       return $buttonWrapper;
     },
 
-    _buildPlaceholder: function(category) {
-      var self = this;
-      var $placeholder = $('<div>').append(
+    _buildPlaceholder(category) {
+      const self = this;
+      const $placeholder = $('<div>').append(
         $('<div>', {class: 'placeholder-text', text: self.options.emptyCategoryText})
       );
-      var parent = _.last(category.parent_path);
-      var actionButtonText = self.options.actionButtonText.toLowerCase();
-      var html;
+      const parent = _.last(category.parent_path);
+      const actionButtonText = self.options.actionButtonText.toLowerCase();
+      let html;
       if (!category.parent_path.length) {
         // Root category is empty
         if (self._canActOn(category)) {
@@ -351,12 +341,12 @@ import Palette from '../../utils/palette';
           )
           .format(category.id, actionButtonText, parent.id);
       }
-      $placeholder.append($('<div>', {html: html}));
+      $placeholder.append($('<div>', {html}));
       return $placeholder;
     },
 
-    _buildNoResultsPlaceholder: function() {
-      var $placeholder = $('<div>')
+    _buildNoResultsPlaceholder() {
+      const $placeholder = $('<div>')
         .append(
           $('<div>', {
             class: 'placeholder-text',
@@ -374,11 +364,11 @@ import Palette from '../../utils/palette';
       return $placeholder;
     },
 
-    _ellipsizeBreadcrumbs: function($category) {
-      var $breadcrumbs = $category.find('.breadcrumbs');
-      var availableSpace = $category.find('.title-wrapper').width();
-      var $ellipsis = $('<li>', {class: 'ellipsis'});
-      var shortened = false;
+    _ellipsizeBreadcrumbs($category) {
+      const $breadcrumbs = $category.find('.breadcrumbs');
+      const availableSpace = $category.find('.title-wrapper').width();
+      const $ellipsis = $('<li>', {class: 'ellipsis'});
+      const shortened = false;
 
       // Prevent infinite loop if for any reason $category is not in DOM
       if (!availableSpace) {
@@ -386,8 +376,8 @@ import Palette from '../../utils/palette';
       }
 
       while ($breadcrumbs.outerWidth() >= availableSpace) {
-        var $segments = $breadcrumbs.children(':not(.ellipsis)');
-        var middleIndex = Math.floor($segments.length / 2);
+        const $segments = $breadcrumbs.children(':not(.ellipsis)');
+        const middleIndex = Math.floor($segments.length / 2);
         if (!shortened) {
           $segments.eq(middleIndex).replaceWith($ellipsis);
         } else {
@@ -396,31 +386,30 @@ import Palette from '../../utils/palette';
       }
     },
 
-    _highlightQuery: function(query, $result) {
-      var $title = $result.find('.title');
-      var title = $title.text();
-      var indexStart = title.toLowerCase().search(query.toLowerCase());
-      var indexEnd = indexStart + query.length;
+    _highlightQuery(query, $result) {
+      const $title = $result.find('.title');
+      const title = $title.text();
+      const indexStart = title.toLowerCase().search(query.toLowerCase());
+      const indexEnd = indexStart + query.length;
 
       $title.html(
-        title.substring(0, indexStart) +
-          '<strong>' +
-          title.substring(indexStart, indexEnd) +
-          '</strong>' +
-          title.substring(indexEnd)
+        `${title.substring(0, indexStart)}<strong>${title.substring(
+          indexStart,
+          indexEnd
+        )}</strong>${title.substring(indexEnd)}`
       );
     },
 
-    _renderCurrentCategory: function(category) {
-      var self = this;
-      var $currentCategory = self._buildCurrentCategory(category);
+    _renderCurrentCategory(category) {
+      const self = this;
+      const $currentCategory = self._buildCurrentCategory(category);
       self.$category.replaceWith($currentCategory);
       self.$category = $currentCategory;
       self._ellipsizeBreadcrumbs(self.$category);
     },
 
-    _renderCategoryTree: function(subcategories, category) {
-      var self = this;
+    _renderCategoryTree(subcategories, category) {
+      const self = this;
       _.each(subcategories, function(subcategory) {
         self.$categoryTree.append(self._buildSubcategory(subcategory));
       });
@@ -430,13 +419,13 @@ import Palette from '../../utils/palette';
       self._postRenderList();
     },
 
-    _renderSearchResults: function(categories, query) {
-      var self = this;
+    _renderSearchResults(categories, query) {
+      const self = this;
       self.$category.hide();
       self.$categoryResultsList.empty();
       self._toggleSearchResultsView(true);
       _.each(categories, function(category) {
-        var $result = self._buildSubcategory(category, true);
+        const $result = self._buildSubcategory(category, true);
         if (category.is_favorite) {
           $result.find('.icon-wrapper').append(
             $('<i>', {
@@ -464,9 +453,9 @@ import Palette from '../../utils/palette';
       self._postRenderList();
     },
 
-    _renderSearchResultInfo: function(count, totalCount) {
-      var self = this;
-      var $stats = $('<span>', {
+    _renderSearchResultInfo(count, totalCount) {
+      const self = this;
+      const $stats = $('<span>', {
         class: 'result-stats',
         text: totalCount
           ? $T.gettext('Displaying {0} out of {1} results.').format(count, totalCount)
@@ -474,10 +463,10 @@ import Palette from '../../utils/palette';
       });
       if (totalCount !== count || !totalCount) {
         $stats.text(
-          $stats.text() + ' ' + $T('Make the search more specific for more accurate results')
+          `${$stats.text()} ${$T('Make the search more specific for more accurate results')}`
         );
       }
-      var $clear = $('<a>', {
+      const $clear = $('<a>', {
         class: 'clear js-clear-search',
         text: $T.gettext('Clear search'),
       });
@@ -488,13 +477,13 @@ import Palette from '../../utils/palette';
         .show();
     },
 
-    _postRenderList: function() {
-      var self = this;
-      var statsMaxWidth = 0;
-      var $stats = self.$categoryList.find('.item:not(.hiding) .stats:visible');
+    _postRenderList() {
+      const self = this;
+      let statsMaxWidth = 0;
+      const $stats = self.$categoryList.find('.item:not(.hiding) .stats:visible');
 
       $stats.each(function() {
-        var width = this.getBoundingClientRect().width;
+        const width = this.getBoundingClientRect().width;
         if (width > statsMaxWidth) {
           statsMaxWidth = width;
         }
@@ -504,16 +493,16 @@ import Palette from '../../utils/palette';
       $stats.width(Math.ceil(statsMaxWidth));
 
       // Indents subcategories when protection icon is visible
-      var hasProtectedCategories = !!self.$categoryTree.find('.icon-shield').length;
+      const hasProtectedCategories = !!self.$categoryTree.find('.icon-shield').length;
       self.$categoryTree.toggleClass('with-protected', hasProtectedCategories);
 
       // Make sure the list stays always scrolled at the top
       self.$categoryTree.scrollTop(0);
     },
 
-    _getCurrentCategory: function(id) {
-      var self = this;
-      var dfd = $.Deferred();
+    _getCurrentCategory(id) {
+      const self = this;
+      const dfd = $.Deferred();
 
       function resolve() {
         dfd.resolve(self._categories[id]);
@@ -528,12 +517,12 @@ import Palette from '../../utils/palette';
       return dfd.promise();
     },
 
-    _getCategoryTree: function(id) {
-      var self = this;
-      var dfd = $.Deferred();
+    _getCategoryTree(id) {
+      const self = this;
+      const dfd = $.Deferred();
 
       function resolve() {
-        var subcategories = [];
+        const subcategories = [];
         _.each(self._subcategories[id], function(scId) {
           subcategories.push(self._categories[scId]);
         });
@@ -549,9 +538,9 @@ import Palette from '../../utils/palette';
       return dfd.promise();
     },
 
-    _getSearchResults: function(query) {
-      var self = this;
-      var dfd = $.Deferred();
+    _getSearchResults(query) {
+      const self = this;
+      const dfd = $.Deferred();
 
       function resolve() {
         dfd.resolve(self._searchResultData[query], query);
@@ -566,8 +555,8 @@ import Palette from '../../utils/palette';
       return dfd.promise();
     },
 
-    _fetchCategory: function(id, callback) {
-      var self = this;
+    _fetchCategory(id, callback) {
+      const self = this;
 
       // Don't send another request if one for the same ID is ongoing
       if (self._currentCategoryRequest && self._currentCategoryRequest.categoryId === id) {
@@ -578,20 +567,20 @@ import Palette from '../../utils/palette';
       self._currentCategoryRequest = $.ajax({
         url: build_url(Indico.Urls.Categories.info, {category_id: id}),
         dataType: 'json',
-        beforeSend: function() {
+        beforeSend() {
           self._toggleLoading(true, true);
         },
-        complete: function() {
+        complete() {
           self._toggleLoading(false, true);
           self._currentCategoryRequest = null;
         },
-        error: function(xhr) {
+        error(xhr) {
           // XXX: Re-enable error handling once we skip retrieving protected parents
           if (xhr.status !== 403) {
             handleAjaxError(xhr);
           }
         },
-        success: function(data) {
+        success(data) {
           if (data && self._isInDOM()) {
             self._fillCache(data);
             callback();
@@ -602,8 +591,8 @@ import Palette from '../../utils/palette';
       self._currentCategoryRequest.categoryId = id;
     },
 
-    _fetchReachableCategories: function(id) {
-      var self = this;
+    _fetchReachableCategories(id) {
+      const self = this;
       $.ajax({
         url: build_url(Indico.Urls.Categories.infoFrom, {category_id: id}),
         method: 'POST',
@@ -614,7 +603,7 @@ import Palette from '../../utils/palette';
             return +n;
           }),
         }),
-        success: function(data) {
+        success(data) {
           if (data) {
             _.each(data.categories, function(category) {
               self._fillCache(category);
@@ -624,8 +613,8 @@ import Palette from '../../utils/palette';
       });
     },
 
-    _fetchSearchResults: function(query, callback) {
-      var self = this;
+    _fetchSearchResults(query, callback) {
+      const self = this;
 
       function fillCache(data) {
         self._searchResultData[query] = data;
@@ -635,22 +624,22 @@ import Palette from '../../utils/palette';
       self._currentSearchRequest = $.ajax({
         url: build_url(Indico.Urls.Categories.search),
         data: {q: query},
-        beforeSend: function() {
+        beforeSend() {
           if (self._currentSearchRequest != null) {
             self._currentSearchRequest.abort();
           }
           self._toggleLoading(true);
         },
-        complete: function() {
+        complete() {
           self._toggleLoading(false);
         },
-        error: function(jqXHR) {
+        error(jqXHR) {
           if (jqXHR.statusText === 'abort') {
             return;
           }
           handleAjaxError(jqXHR);
         },
-        success: function(data) {
+        success(data) {
           if (data && self._isInDOM()) {
             fillCache(data);
             callback();
@@ -659,21 +648,21 @@ import Palette from '../../utils/palette';
       });
     },
 
-    _fillCache: function(data) {
-      var self = this;
+    _fillCache(data) {
+      const self = this;
       self._categories[data.category.id] = _.omit(data.category, 'subcategories');
       self._subcategories[data.category.id] = _.pluck(data.subcategories, 'id');
       _.each(data.subcategories, self._fillSingleCategoryCache.bind(self));
       _.each(data.supercategories, self._fillSingleCategoryCache.bind(self));
     },
 
-    _fillSingleCategoryCache: function(category) {
-      var self = this;
+    _fillSingleCategoryCache(category) {
+      const self = this;
       self._categories[category.id] = $.extend(self._categories[category.id], category);
     },
 
-    _clearSearch: function() {
-      var self = this;
+    _clearSearch() {
+      const self = this;
 
       if (self._currentSearchRequest != null) {
         self._currentSearchRequest.abort();
@@ -685,11 +674,11 @@ import Palette from '../../utils/palette';
       self._toggleTreeView(true);
     },
 
-    _onAction: function(categoryId) {
-      var self = this;
+    _onAction(categoryId) {
+      const self = this;
 
       function callback() {
-        var res = self.options.onAction(self._categories[categoryId]);
+        let res = self.options.onAction(self._categories[categoryId]);
         if (res === undefined) {
           res = $.Deferred().resolve();
         }
@@ -702,7 +691,7 @@ import Palette from '../../utils/palette';
       }
 
       if (self.options.confirmation) {
-        var text = $T
+        const text = $T
           .gettext('You selected category <em>{0}</em>. Are you sure you want to proceed?')
           .format(self._categories[categoryId].title);
         confirmPrompt(text, $T.gettext('Confirm action')).then(callback);
@@ -711,17 +700,15 @@ import Palette from '../../utils/palette';
       }
     },
 
-    _canActOn: function(category, withMessage) {
-      var self = this;
-      var result = {allowed: true, message: ''};
-      var canActOnCategories = self._canActOnCategories(category, true);
-      var canActOnCategoriesDescendingFrom = self._canActOnCategoriesDescendingFrom(category, true);
-      var canActOnCategoriesWithEvents = self._canActOnCategoriesWithEvents(category, true);
-      var canActOnCategoriesWithSubcategories = self._canActOnCategoriesWithSubcategories(
+    _canActOn(category, withMessage) {
+      const self = this;
+      let result = {allowed: true, message: ''};
+      const canActOnCategories = self._canActOnCategories(category, true);
+      const canActOnCategoriesDescendingFrom = self._canActOnCategoriesDescendingFrom(
         category,
         true
       );
-      var canActOnCategoriesWithoutEventCreationRights = self._canActOnCategoriesWithoutEventCreationRights(
+      const canActOnCategoriesWithoutEventCreationRights = self._canActOnCategoriesWithoutEventCreationRights(
         category,
         true
       );
@@ -730,10 +717,6 @@ import Palette from '../../utils/palette';
         result = canActOnCategories;
       } else if (!canActOnCategoriesDescendingFrom.allowed) {
         result = canActOnCategoriesDescendingFrom;
-      } else if (!canActOnCategoriesWithEvents.allowed) {
-        result = canActOnCategoriesWithEvents;
-      } else if (!canActOnCategoriesWithSubcategories.allowed) {
-        result = canActOnCategoriesWithSubcategories;
       } else if (!canActOnCategoriesWithoutEventCreationRights.allowed) {
         result = canActOnCategoriesWithoutEventCreationRights;
       }
@@ -741,10 +724,10 @@ import Palette from '../../utils/palette';
       return withMessage ? result : result.allowed;
     },
 
-    _canActOnCategoriesWithoutEventCreationRights: function(category, withMessage) {
-      var self = this;
-      var result = {allowed: true, message: ''};
-      var categoriesWithoutEventCreationRights =
+    _canActOnCategoriesWithoutEventCreationRights(category, withMessage) {
+      const self = this;
+      const result = {allowed: true, message: ''};
+      const categoriesWithoutEventCreationRights =
         self.options.actionOn.categoriesWithoutEventCreationRights;
       if (categoriesWithoutEventCreationRights.disabled && !category.can_create_events) {
         result.allowed = false;
@@ -753,40 +736,16 @@ import Palette from '../../utils/palette';
       return withMessage ? result : result.allowed;
     },
 
-    _canActOnCategoriesWithSubcategories: function(category, withMessage) {
-      var self = this;
-      var result = {allowed: true, message: ''};
-      var hasSubcategories = !!category.deep_category_count;
-      var categoriesWithSubcategories = self.options.actionOn.categoriesWithSubcategories;
-      if (categoriesWithSubcategories.disabled && hasSubcategories) {
-        result.allowed = false;
-        result.message = categoriesWithSubcategories.message;
-      }
-      return withMessage ? result : result.allowed;
-    },
-
-    _canActOnCategoriesWithEvents: function(category, withMessage) {
-      var self = this;
-      var result = {allowed: true, message: ''};
-      var hasOnlyEvents = category.has_events && !category.deep_category_count;
-      var categoriesWithEvents = self.options.actionOn.categoriesWithEvents;
-      if (categoriesWithEvents.disabled && hasOnlyEvents) {
-        result.allowed = false;
-        result.message = categoriesWithEvents.message;
-      }
-      return withMessage ? result : result.allowed;
-    },
-
-    _canActOnCategoriesDescendingFrom: function(category, withMessage) {
-      var self = this;
-      var result = {allowed: true, message: ''};
-      var categoriesDescendingFrom = self.options.actionOn.categoriesDescendingFrom;
+    _canActOnCategoriesDescendingFrom(category, withMessage) {
+      const self = this;
+      const result = {allowed: true, message: ''};
+      const categoriesDescendingFrom = self.options.actionOn.categoriesDescendingFrom;
 
       if (categoriesDescendingFrom.disabled) {
-        var id;
-        var pathIds = _.pluck(category.parent_path, 'id').reverse();
-        var ids = categoriesDescendingFrom.ids;
-        for (var i in pathIds) {
+        let id;
+        const pathIds = _.pluck(category.parent_path, 'id').reverse();
+        const ids = categoriesDescendingFrom.ids;
+        for (const i in pathIds) {
           id = pathIds[i];
           if (_.contains(ids, id)) {
             result.allowed = false;
@@ -799,18 +758,18 @@ import Palette from '../../utils/palette';
       return withMessage ? result : result.allowed;
     },
 
-    _canActOnCategories: function(category, withMessage) {
-      var self = this;
-      var result = {allowed: true, message: ''};
-      var categories = self.options.actionOn.categories;
+    _canActOnCategories(category, withMessage) {
+      const self = this;
+      const result = {allowed: true, message: ''};
+      const categories = self.options.actionOn.categories;
 
       if (categories.disabled) {
         if (_.contains(categories.ids, category.id)) {
           result.allowed = false;
           result.message = categories.message;
         } else {
-          for (var i in categories.groups) {
-            var group = categories.groups[i];
+          for (const i in categories.groups) {
+            const group = categories.groups[i];
             if (_.contains(group.ids, category.id)) {
               result.allowed = false;
               result.message = group.message;
@@ -823,34 +782,34 @@ import Palette from '../../utils/palette';
       return withMessage ? result : result.allowed;
     },
 
-    _toggleLoading: function(state, disableInput) {
-      var self = this;
+    _toggleLoading(state, disableInput) {
+      const self = this;
       self.$categoryList.toggleClass('loading', state);
       if (disableInput) {
         self.element.find('input').prop('disabled', state);
       }
     },
 
-    _toggleTreeView: function(visible) {
-      var self = this;
+    _toggleTreeView(visible) {
+      const self = this;
       self.$category.toggle(visible);
       self.$categoryTree.toggle(visible);
       self.$placeholderEmpty.toggleClass('hidden', !visible);
     },
 
-    _toggleSearchResultsView: function(visible) {
-      var self = this;
+    _toggleSearchResultsView(visible) {
+      const self = this;
       self.$categoryResultsInfo.toggle(visible);
       self.$categoryResultsList.toggle(visible);
     },
 
-    _isInDOM: function() {
-      var self = this;
+    _isInDOM() {
+      const self = this;
       return $.contains(document, self.element[0]);
     },
 
-    goToCategory: function(id) {
-      var self = this;
+    goToCategory(id) {
+      const self = this;
 
       function render() {
         self._clearSearch();
@@ -868,8 +827,8 @@ import Palette from '../../utils/palette';
       }
     },
 
-    searchCategories: function(query) {
-      var self = this;
+    searchCategories(query) {
+      const self = this;
 
       if (query.length < 3) {
         return;

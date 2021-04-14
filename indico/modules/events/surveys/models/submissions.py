@@ -1,18 +1,15 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
-
-from __future__ import unicode_literals
 
 from sqlalchemy.dialects.postgresql import JSONB
 
 from indico.core.db import db
 from indico.core.db.sqlalchemy import UTCDateTime
 from indico.core.db.sqlalchemy.util.queries import increment_and_get
-from indico.util.string import return_ascii
 
 
 def _get_next_friendly_id(context):
@@ -107,9 +104,8 @@ class SurveySubmission(db.Model):
     def locator(self):
         return dict(self.survey.locator, submission_id=self.id)
 
-    @return_ascii
     def __repr__(self):
-        return '<SurveySubmission({}, {}, {})>'.format(self.id, self.survey_id, self.user_id)
+        return f'<SurveySubmission({self.id}, {self.survey_id}, {self.user_id})>'
 
 
 class SurveyAnswer(db.Model):
@@ -152,9 +148,8 @@ class SurveyAnswer(db.Model):
     def is_empty(self):
         return self.question.field.is_value_empty(self)
 
-    @return_ascii
     def __repr__(self):
-        return '<SurveyAnswer({}, {}): {}>'.format(self.submission_id, self.question_id, self.data)
+        return f'<SurveyAnswer({self.submission_id}, {self.question_id}): {self.data}>'
 
     @property
     def answer_data(self):

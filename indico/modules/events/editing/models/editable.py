@@ -1,11 +1,9 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
-
-from __future__ import unicode_literals
 
 from sqlalchemy import orm
 from sqlalchemy.event import listens_for
@@ -14,10 +12,10 @@ from sqlalchemy.sql import select
 
 from indico.core.db import db
 from indico.core.db.sqlalchemy import PyIntEnum
+from indico.util.enum import RichIntEnum
 from indico.util.i18n import _
 from indico.util.locators import locator_property
-from indico.util.string import format_repr, return_ascii
-from indico.util.struct.enum import RichIntEnum
+from indico.util.string import format_repr
 from indico.web.flask.util import url_for
 
 
@@ -100,7 +98,6 @@ class Editable(db.Model):
     # relationship backrefs:
     # - revisions (EditingRevision.editable)
 
-    @return_ascii
     def __repr__(self):
         return format_repr(self, 'id', 'contribution_id', 'type')
 
@@ -180,6 +177,23 @@ class Editable(db.Model):
         """Whether the user can create/see internal comments."""
         return self._has_general_editor_permissions(user)
 
+    def can_see_editor_names(self, user, actor=None):
+        """Whether the user can see the names of editing team members.
+
+        This is always true if team anonymity is not enabled; otherwise only
+        users who are member of the editing team will see names.
+
+        If an `actor` is set, the check applies to whether the name of this
+        particular user can be seen.
+        """
+        from indico.modules.events.editing.settings import editable_type_settings
+
+        return (
+            not editable_type_settings[self.type].get(self.event, 'anonymous_team') or
+            (actor and not self.can_see_editor_names(actor)) or
+            self._has_general_editor_permissions(user)
+        )
+
     def can_comment(self, user):
         """Whether the user can comment on the editable."""
         # We allow any user associated with the contribution to comment, even if they are
@@ -239,7 +253,7 @@ class Editable(db.Model):
 
 @listens_for(orm.mapper, 'after_configured', once=True)
 def _mappers_configured():
-    from .revisions import EditingRevision, InitialRevisionState, FinalRevisionState
+    from .revisions import EditingRevision, FinalRevisionState, InitialRevisionState
 
     # Editable.state -- the state of the editable itself
     cases = db.cast(db.case({
@@ -260,11 +274,13 @@ def _mappers_configured():
              .where(EditingRevision.editable_id == Editable.id)
              .order_by(EditingRevision.created_dt.desc())
              .limit(1)
-             .correlate_except(EditingRevision))
+             .correlate_except(EditingRevision)
+             .scalar_subquery())
     Editable.state = column_property(query)
 
     # Editable.revision_count -- the number of revisions the editable has
     query = (select([db.func.count(EditingRevision.id)])
              .where(EditingRevision.editable_id == Editable.id)
-             .correlate_except(EditingRevision))
+             .correlate_except(EditingRevision)
+             .scalar_subquery())
     Editable.revision_count = column_property(query)

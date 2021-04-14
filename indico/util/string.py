@@ -1,5 +1,5 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
@@ -9,11 +9,8 @@
 String manipulation functions
 """
 
-from __future__ import absolute_import
 
 import binascii
-import functools
-import os
 import re
 import string
 import unicodedata
@@ -25,12 +22,11 @@ from uuid import uuid4
 import bleach
 import email_validator
 import markdown
-import translitcodec  # noqa: F401 (this is NOT unused. it needs to be imported to register the codec)
+import translitcodec
 from html2text import HTML2Text
 from jinja2.filters import do_striptags
 from lxml import etree, html
 from markupsafe import Markup, escape
-from speaklater import _LazyString, is_lazy_string
 from sqlalchemy import ForeignKeyConstraint, inspect
 
 
@@ -71,60 +67,22 @@ BLEACH_ALLOWED_STYLES_HTML = [
 ]
 
 
-LATEX_MATH_PLACEHOLDER = u"\uE000"
+LATEX_MATH_PLACEHOLDER = "\uE000"
 
 
-def encode_if_unicode(s):
-    if isinstance(s, _LazyString) and isinstance(s.value, unicode):
-        s = unicode(s)
-    return s.encode('utf-8') if isinstance(s, unicode) else s
-
-
-def safe_upper(text):
-    if isinstance(text, unicode):
-        return text.upper()
-    else:
-        return text.decode('utf-8').upper().encode('utf-8')
-
-
-def remove_accents(text, reencode=True):
-    if not isinstance(text, unicode):
-        text = text.decode('utf-8')
-    result = u''.join((c for c in unicodedata.normalize('NFD', text) if unicodedata.category(c) != 'Mn'))
-    if reencode:
-        return result.encode('utf-8')
-    else:
-        return result
-
-
-def fix_broken_string(text, as_unicode=False):
-    try:
-        text = text.decode('utf-8')
-    except UnicodeDecodeError:
-        try:
-            text = text.decode('latin1')
-        except UnicodeDecodeError:
-            text = unicode(text, 'utf-8', errors='replace')
-    return text if as_unicode else text.encode('utf-8')
-
-
-def to_unicode(text):
-    """Converts a string to unicode if it isn't already unicode."""
-    return fix_broken_string(text, as_unicode=True) if isinstance(text, str) else unicode(text)
+def remove_accents(text):
+    return ''.join(c for c in unicodedata.normalize('NFD', text) if unicodedata.category(c) != 'Mn')
 
 
 def remove_non_alpha(text):
     return ''.join(c for c in text if c.isalnum())
 
 
-def unicode_to_ascii(text):
-    if not isinstance(text, unicode):
-        text = to_unicode(text)
-    text = text.encode('translit/long')
-    return text.encode('ascii', 'ignore')
+def str_to_ascii(text):
+    return translitcodec.long_encode(text)[0].encode('ascii', 'ignore').decode().strip()
 
 
-def strict_unicode(value):
+def strict_str(value):
     """Convert a value to unicode or fails if it is None.
 
     Useful when converting e.g. IDs to path segments.  Usually they
@@ -132,14 +90,14 @@ def strict_unicode(value):
     up with a literal ``None`` in the path).
     """
     if value is None:
-        raise TypeError('strict_unicode does not accept `None`')
-    return unicode(value)
+        raise TypeError('strict_str does not accept `None`')
+    return str(value)
 
 
 def slugify(*args, **kwargs):
-    """Joins a series of strings into a URL slug.
+    """Join a series of strings into a URL slug.
 
-    - normalizes unicode to proper ascii repesentations
+    - normalizes strings to proper ascii repesentations
     - removes non-alphanumeric characters
     - replaces whitespace with dashes
 
@@ -152,68 +110,41 @@ def slugify(*args, **kwargs):
     maxlen = kwargs.get('maxlen')
     fallback = kwargs.get('fallback', '')
 
-    value = u'-'.join(to_unicode(val) for val in args)
-    value = value.encode('translit/long')
-    value = re.sub(r'[^\w\s-]', u'', value).strip()
+    value = '-'.join(str(val) for val in args)
+    value = translitcodec.long_encode(value)[0]
+    value = re.sub(r'[^\w\s-]', '', value, flags=re.ASCII).strip()
 
     if lower:
         value = value.lower()
-    value = re.sub(r'[-\s]+', u'-', value)
+    value = re.sub(r'[-\s]+', '-', value)
     if maxlen:
-        value = value[0:maxlen].rstrip(u'-')
+        value = value[0:maxlen].rstrip('-')
 
     return value or fallback
 
 
-def return_ascii(f):
-    """Decorator to normalize all unicode characters.
-
-    This is useful for __repr__ methods which **MUST** return a plain string to
-    avoid encoding to utf8 or ascii all the time."""
-    @functools.wraps(f)
-    def wrapper(*args, **kwargs):
-        return unicode_to_ascii(f(*args, **kwargs))
-    return wrapper
-
-
-def truncate(text, max_size, ellipsis='...', encoding='utf-8'):
-    """
-    Truncate text, taking unicode chars into account
-    """
-    encode = False
-
-    if isinstance(text, str):
-        encode = True
-        text = text.decode(encoding)
-
+def truncate(text, max_size, ellipsis='...'):
+    """Truncate text if it's too long."""
     if len(text) > max_size:
         text = text[:max_size] + ellipsis
-
-    if encode:
-        text = text.encode(encoding)
-
     return text
 
 
 def strip_tags(text):
     """Strip HTML tags and replace adjacent whitespace by one space."""
-    encode = False
-    if isinstance(text, str):
-        encode = True
-        text = text.decode('utf-8')
-    text = do_striptags(text)
-    return text.encode('utf-8') if encode else text
+    return do_striptags(text)
 
 
 def render_markdown(text, escape_latex_math=True, md=None, **kwargs):
-    """ Mako markdown to HTML filter
-        :param text: Markdown source to convert to HTML
-        :param escape_latex_math: Whether math expression should be left untouched or a function that will be called
-                                  to replace math-mode segments.
-        :param md: An alternative markdown processor (can be used
-                   to generate e.g. a different format)
-        :param kwargs: Extra arguments to pass on to the markdown
-                       processor
+    """Mako markdown to HTML filter.
+
+    :param text: Markdown source to convert to HTML
+    :param escape_latex_math: Whether math expression should be left untouched or a function that will be called
+                              to replace math-mode segments.
+    :param md: An alternative markdown processor (can be used
+               to generate e.g. a different format)
+    :param kwargs: Extra arguments to pass on to the markdown
+                   processor
     """
     if escape_latex_math:
         math_segments = []
@@ -225,7 +156,7 @@ def render_markdown(text, escape_latex_math=True, md=None, **kwargs):
             math_segments.append(segment)
             return LATEX_MATH_PLACEHOLDER
 
-        text = re.sub(r'\$[^\$]+\$|\$\$(^\$)\$\$', _math_replace, to_unicode(text))
+        text = re.sub(r'\$[^\$]+\$|\$\$(^\$)\$\$', _math_replace, text)
 
     if md is None:
         result = bleach.clean(markdown.markdown(text, **kwargs), tags=BLEACH_ALLOWED_TAGS,
@@ -240,7 +171,7 @@ def render_markdown(text, escape_latex_math=True, md=None, **kwargs):
 
 
 def sanitize_for_platypus(text):
-    """Sanitize HTML to be used in platypus"""
+    """Sanitize HTML to be used in platypus."""
     tags = ['b', 'br', 'em', 'font', 'i', 'img', 'strike', 'strong', 'sub', 'sup', 'u', 'span', 'div', 'p']
     attrs = {
         'font': ['size', 'face', 'color'],
@@ -269,7 +200,6 @@ def validate_email(email):
     This checks both if it looks valid and if it has valid
     MX (or A/AAAA) records.
     """
-    email = to_unicode(email)
     try:
         email_validator.validate_email(email)
     except email_validator.EmailNotValidError:
@@ -288,9 +218,8 @@ def validate_email_verbose(email):
              ``'undeliverable'`` depending on whether the email address has
              syntax errors or dns validation failed.
     """
-    email = to_unicode(email)
     try:
-        email_validator.validate_email(to_unicode(email))
+        email_validator.validate_email(email)
     except email_validator.EmailUndeliverableError:
         return 'undeliverable'
     except email_validator.EmailNotValidError:
@@ -301,7 +230,6 @@ def validate_email_verbose(email):
 
 def validate_emails(emails):
     """Validate a space/semicolon/comma-separated list of email addresses."""
-    emails = to_unicode(emails)
     emails = re.split(r'[\s;,]+', emails)
     return all(validate_email(email) for email in emails if email)
 
@@ -319,17 +247,15 @@ def strip_control_chars(text):
 
 
 def html_color_to_rgb(hexcolor):
-    """
-    convert #RRGGBB to an (R, G, B) tuple
-    """
+    """Convert #RRGGBB to an (R, G, B) tuple."""
 
     if not hexcolor.startswith('#'):
-        raise ValueError("Invalid color string '{}' (should start with '#')".format(hexcolor))
+        raise ValueError(f"Invalid color string '{hexcolor}' (should start with '#')")
 
     hexcolor = hexcolor[1:]
 
     if len(hexcolor) not in {3, 6}:
-        raise ValueError("'#{}'' is not in #RRGGBB or #RGB format".format(hexcolor))
+        raise ValueError(f"'#{hexcolor}'' is not in #RRGGBB or #RGB format")
 
     if len(hexcolor) == 3:
         hexcolor = ''.join(c * 2 for c in hexcolor)
@@ -338,53 +264,40 @@ def html_color_to_rgb(hexcolor):
 
 
 def strip_whitespace(s):
-    """Removes trailing/leading whitespace if a string was passed.
+    """Remove trailing/leading whitespace if a string was passed.
 
     This utility is useful in cases where you might get None or
     non-string values such as WTForms filters.
     """
-    if isinstance(s, basestring):
+    if isinstance(s, str):
         s = s.strip()
     return s
 
 
 def make_unique_token(is_unique):
-    """Create a unique UUID4-based token
+    """Create a unique UUID4-based token.
 
     :param is_unique: a callable invoked with the token which should
                       return a boolean indicating if the token is actually
     """
-    token = unicode(uuid4())
+    token = str(uuid4())
     while not is_unique(token):
-        token = unicode(uuid4())
+        token = str(uuid4())
     return token
 
 
-def encode_utf8(f):
-    @functools.wraps(f)
-    def _wrapper(*args, **kwargs):
-        rv = f(*args, **kwargs)
-        if not rv:
-            return ''
-        if is_lazy_string(rv):
-            rv = rv.value
-        return rv.encode('utf-8') if isinstance(rv, unicode) else str(rv)
-
-    return _wrapper
-
-
 def is_legacy_id(id_):
-    """Checks if an ID is a broken legacy ID.
+    """Check if an ID is a broken legacy ID.
 
     These IDs are not compatible with new code since they are not
     numeric or have a leading zero, resulting in different objects
     with the same numeric id.
     """
-    return not isinstance(id_, (int, long)) and (not id_.isdigit() or str(int(id_)) != id_)
+    return not isinstance(id_, int) and (not id_.isdigit() or str(int(id_)) != id_)
 
 
 def text_to_repr(text, html=False, max_length=50):
-    """Converts text to a suitable string for a repr
+    """Convert text to a suitable string for a repr.
 
     :param text: A string which might contain html and/or linebreaks
     :param html: If True, HTML tags are stripped.
@@ -393,23 +306,23 @@ def text_to_repr(text, html=False, max_length=50):
     :return: A string that contains no linebreaks or HTML tags.
     """
     if text is None:
-        text = u''
+        text = ''
     if html:
         text = bleach.clean(text, tags=[], strip=True)
-    text = re.sub(r'\s+', u' ', text)
+    text = re.sub(r'\s+', ' ', text)
     if max_length is not None and len(text) > max_length:
-        text = text[:max_length] + u'...'
+        text = text[:max_length] + '...'
     return text.strip()
 
 
 def alpha_enum(value):
     """Convert integer to ordinal letter code (a, b, c, ... z, aa, bb, ...)."""
     max_len = len(string.ascii_lowercase)
-    return unicode(string.ascii_lowercase[value % max_len] * (value / max_len + 1))
+    return str(string.ascii_lowercase[value % max_len] * (value // max_len + 1))
 
 
 def format_repr(obj, *args, **kwargs):
-    """Creates a pretty repr string from object attributes
+    """Create a pretty repr string from object attributes.
 
     :param obj: The object to show the repr for.
     :param args: The names of arguments to include in the repr.
@@ -446,33 +359,33 @@ def format_repr(obj, *args, **kwargs):
                                     for t in inspect(cls).tables
                                     for c in t.constraints
                                     if isinstance(c, ForeignKeyConstraint))) if hasattr(cls, '__table__') else set()
-    formatted_args = [unicode(_format_value(getattr(obj, arg)))
+    formatted_args = [str(_format_value(getattr(obj, arg)))
                       if arg not in fkeys
-                      else u'{}={}'.format(arg, _format_value(getattr(obj, arg)))
+                      else f'{arg}={_format_value(getattr(obj, arg))}'
                       for arg in args]
     for name, default_value in sorted(kwargs.items()):
         value = getattr(obj, name)
         if value != default_value:
-            formatted_args.append(u'{}={}'.format(name, _format_value(value)))
+            formatted_args.append(f'{name}={_format_value(value)}')
     if text_arg is not None:
-        return u'<{}({}): "{}">'.format(obj_name, u', '.join(formatted_args), text_arg)
+        return '<{}({}): "{}">'.format(obj_name, ', '.join(formatted_args), text_arg)
     elif raw_text_arg is not None:
-        return u'<{}({}): {}>'.format(obj_name, u', '.join(formatted_args), raw_text_arg)
+        return '<{}({}): {}>'.format(obj_name, ', '.join(formatted_args), raw_text_arg)
     elif repr_arg is not None:
-        return u'<{}({}): {!r}>'.format(obj_name, u', '.join(formatted_args), repr_arg)
+        return '<{}({}): {!r}>'.format(obj_name, ', '.join(formatted_args), repr_arg)
     else:
-        return u'<{}({})>'.format(obj_name, u', '.join(formatted_args))
+        return '<{}({})>'.format(obj_name, ', '.join(formatted_args))
 
 
 def snakify(name):
-    """Converts a camelCased name to snake_case"""
+    """Convert a camelCased name to snake_case."""
     # from http://stackoverflow.com/a/1176023/298479
     name = re.sub(r'(.)([A-Z][a-z]+)', r'\1_\2', name)
     return re.sub(r'([a-z0-9])([A-Z])', r'\1_\2', name).lower()
 
 
 def camelize(name):
-    """Converts a snake_cased name to camelCase."""
+    """Convert a snake_cased name to camelCase."""
     parts = name.split('_')
     underscore = ''
     if name.startswith('_'):
@@ -486,31 +399,31 @@ def _convert_keys(value, convert_func):
         return type(value)(_convert_keys(x, convert_func) for x in value)
     elif not isinstance(value, dict):
         return value
-    return {convert_func(k): _convert_keys(v, convert_func) for k, v in value.iteritems()}
+    return {convert_func(k): _convert_keys(v, convert_func) for k, v in value.items()}
 
 
 def camelize_keys(dict_):
-    """Convert the keys of a dict to camelCase"""
+    """Convert the keys of a dict to camelCase."""
     return _convert_keys(dict_, camelize)
 
 
 def snakify_keys(dict_):
-    """Convert the keys of a dict to snake_case"""
+    """Convert the keys of a dict to snake_case."""
     return _convert_keys(dict_, snakify)
 
 
 def crc32(data):
-    """Calculates a CRC32 checksum.
+    """Calculate a CRC32 checksum.
 
-    When a unicode object is passed, it is encoded as UTF-8.
+    When a str is passed, it is encoded as UTF-8.
     """
-    if isinstance(data, unicode):
+    if isinstance(data, str):
         data = data.encode('utf-8')
     return binascii.crc32(data) & 0xffffffff
 
 
 def normalize_phone_number(value):
-    """Normalize phone number so it doesn't contain invalid characters
+    """Normalize phone number so it doesn't contain invalid characters.
 
     This removes all characters besides a leading +, digits and x as
     described here: http://stackoverflow.com/a/123681/298479
@@ -520,7 +433,7 @@ def normalize_phone_number(value):
 
 def format_full_name(first_name, last_name, title=None, last_name_first=True, last_name_upper=True,
                      abbrev_first_name=True, show_title=False):
-    """Returns the user's name in the specified notation.
+    """Return the user's name in the specified notation.
 
     Note: Do not use positional arguments (except for the names/title)
     when calling this method.  Always use keyword arguments!
@@ -540,10 +453,9 @@ def format_full_name(first_name, last_name, title=None, last_name_first=True, la
     if not first_name:
         full_name = last_name
     else:
-        first_name = u'{}.'.format(first_name[0].upper()) if abbrev_first_name else first_name
-        full_name = u'{}, {}'.format(last_name, first_name) if last_name_first else u'{} {}'.format(first_name,
-                                                                                                    last_name)
-    return full_name if not show_title or not title else u'{} {}'.format(title, full_name)
+        first_name = f'{first_name[0].upper()}.' if abbrev_first_name else first_name
+        full_name = f'{last_name}, {first_name}' if last_name_first else f'{first_name} {last_name}'
+    return full_name if not show_title or not title else f'{title} {full_name}'
 
 
 def sanitize_email(email, require_valid=False):
@@ -565,42 +477,8 @@ def html_to_plaintext(string):
     return html.html5parser.fromstring(string).xpath('string()')
 
 
-def inject_unicode_debug(s, level=1):
-    """
-    Wrap a string in invisible unicode characters to trigger a unicode
-    error when erroneously mixing unicode and bytestrings.  If unicode
-    debug mode is not enabled, this function returns its argument
-    without touching it.
-
-    :param s: a unicode string
-    :param level: the minimum unicode debug level needed to inject
-                  the spaces.  the more likely it is to break things
-                  the higher it should be.
-    """
-
-    # Enabling unicode debugging injects an invisible zero-width space at the
-    # beginning and end of every translated string.  This will cause errors in case
-    # of implicit conversions from bytes to unicode or vice versa instead of
-    # silently succeeding for english (ascii) strings and then failing in languages
-    # where the same string is not plain ascii.  This setting should be enabled only
-    # during development and never in production.
-    # Level 1 will inject it only in translated strings and is usually safe while
-    # level 2 will inject it in formatted date/time values too which may result in
-    # strange/broken behavior in certain form fields.
-
-    try:
-        unicode_debug_level = int(os.environ.get('INDICO_UNICODE_DEBUG', '0'))
-    except ValueError:
-        unicode_debug_level = 0
-
-    if unicode_debug_level < level:
-        return s
-    else:
-        return u'\N{ZERO WIDTH SPACE}' + s + u'\N{ZERO WIDTH SPACE}'
-
-
 class RichMarkup(Markup):
-    """unicode/Markup subclass that detects preformatted text
+    """Unicode/Markup subclass that detects preformatted text.
 
     Note that HTML in this string will NOT be escaped when displaying
     it in a jinja template.
@@ -608,11 +486,11 @@ class RichMarkup(Markup):
 
     __slots__ = ('_preformatted',)
 
-    def __new__(cls, content=u'', preformatted=None):
+    def __new__(cls, content='', preformatted=None):
         obj = Markup.__new__(cls, content)
         if preformatted is None:
             tmp = content.lower()
-            obj._preformatted = not any(tag in tmp for tag in (u'<p>', u'<p ', u'<br', u'<li>'))
+            obj._preformatted = not any(tag in tmp for tag in ('<p>', '<p ', '<br', '<li>'))
         else:
             obj._preformatted = preformatted
         return obj
@@ -620,9 +498,9 @@ class RichMarkup(Markup):
     def __html__(self):
         # XXX: ensure we have no harmful HTML - there are certain malicious values that
         # are not caught by the legacy sanitizer that runs at submission time
-        string = RichMarkup(sanitize_html(unicode(self)), preformatted=self._preformatted)
+        string = RichMarkup(sanitize_html(str(self)), preformatted=self._preformatted)
         if string._preformatted:
-            return u'<div class="preformatted">{}</div>'.format(string)
+            return f'<div class="preformatted">{string}</div>'
         else:
             return string
 
@@ -630,22 +508,22 @@ class RichMarkup(Markup):
         return {slot: getattr(self, slot) for slot in self.__slots__ if hasattr(self, slot)}
 
     def __setstate__(self, state):
-        for slot, value in state.iteritems():
+        for slot, value in state.items():
             setattr(self, slot, value)
 
 
 class MarkdownText(Markup):
-    """unicode/Markup class that renders markdown."""
+    """Unicode/Markup class that renders markdown."""
 
     def __html__(self):
-        return render_markdown(unicode(self), extensions=('nl2br', 'tables'))
+        return render_markdown(str(self), extensions=('nl2br', 'tables'))
 
 
 class PlainText(Markup):
-    """unicode/Markup class that renders plain text."""
+    """Unicode/Markup class that renders plain text."""
 
     def __html__(self):
-        return u'<div class="preformatted">{}</div>'.format(escape(unicode(self)))
+        return f'<div class="preformatted">{escape(str(self))}</div>'
 
 
 def handle_legacy_description(field, obj, get_render_mode=attrgetter('render_mode'),
@@ -661,10 +539,10 @@ def handle_legacy_description(field, obj, get_render_mode=attrgetter('render_mod
     from indico.core.db.sqlalchemy.descriptions import RenderMode
     from indico.util.i18n import _
     if get_render_mode(obj) == RenderMode.html:
-        field.warning = _(u"This text has been automatically converted from HTML to Markdown. "
-                          u"Please double-check that it's properly displayed.")
+        field.warning = _("This text has been automatically converted from HTML to Markdown. "
+                          "Please double-check that it's properly displayed.")
         ht = HTML2Text(bodywidth=0)
         desc = get_value(obj)
         if RichMarkup(desc)._preformatted:
-            desc = desc.replace(u'\n', u'<br>\n')
+            desc = desc.replace('\n', '<br>\n')
         field.data = ht.handle(desc)

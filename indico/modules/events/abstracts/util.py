@@ -1,16 +1,14 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import unicode_literals
-
 import errno
 import os
 import shutil
-from collections import OrderedDict, defaultdict, namedtuple
+from collections import defaultdict, namedtuple
 
 from sqlalchemy.orm import joinedload, load_only, noload
 
@@ -34,8 +32,11 @@ from indico.web.flask.templating import get_template_module
 
 
 def build_default_email_template(event, tpl_type):
-    """Build a default e-mail template based on a notification type provided by the user."""
-    email = get_template_module('events/abstracts/emails/default_{}_notification.txt'.format(tpl_type))
+    """
+    Build a default e-mail template based on a notification type
+    provided by the user.
+    """
+    email = get_template_module(f'events/abstracts/emails/default_{tpl_type}_notification.txt')
     tpl = AbstractEmailTemplate(body=email.get_body(),
                                 extra_cc_emails=[],
                                 reply_to_address=event.contact_emails[0] if event.contact_emails else '',
@@ -47,31 +48,31 @@ def build_default_email_template(event, tpl_type):
 
 
 def generate_spreadsheet_from_abstracts(abstracts, static_item_ids, dynamic_items):
-    """Generates a spreadsheet data from a given abstract list.
+    """Generate a spreadsheet data from a given abstract list.
 
     :param abstracts: The list of abstracts to include in the file
     :param static_item_ids: The abstract properties to be used as columns
     :param dynamic_items: Contribution fields as extra columns
     """
     field_names = ['Id', 'Title']
-    static_item_mapping = OrderedDict([
-        ('state', ('State', lambda x: x.state.title)),
-        ('submitter', ('Submitter', lambda x: x.submitter.full_name)),
-        ('authors', ('Primary authors', lambda x: [a.full_name for a in x.primary_authors])),
-        ('accepted_track', ('Accepted track', lambda x: x.accepted_track.short_title if x.accepted_track else None)),
-        ('submitted_for_tracks', ('Submitted for tracks',
-                                  lambda x: [t.short_title for t in x.submitted_for_tracks])),
-        ('reviewed_for_tracks', ('Reviewed for tracks', lambda x: [t.short_title for t in x.reviewed_for_tracks])),
-        ('accepted_contrib_type', ('Accepted type',
-                                   lambda x: x.accepted_contrib_type.name if x.accepted_contrib_type else None)),
-        ('submitted_contrib_type', ('Submitted type',
-                                    lambda x: x.submitted_contrib_type.name if x.submitted_contrib_type else None)),
-        ('score', ('Score', lambda x: round(x.score, 1) if x.score is not None else None)),
-        ('submitted_dt', ('Submission date', lambda x: x.submitted_dt)),
-        ('modified_dt', ('Modification date', lambda x: x.modified_dt if x.modified_dt else ''))
-    ])
+    static_item_mapping = {
+        'state': ('State', lambda x: x.state.title),
+        'submitter': ('Submitter', lambda x: x.submitter.full_name),
+        'authors': ('Primary authors', lambda x: [a.full_name for a in x.primary_authors]),
+        'accepted_track': ('Accepted track', lambda x: x.accepted_track.short_title if x.accepted_track else None),
+        'submitted_for_tracks': ('Submitted for tracks',
+                                 lambda x: [t.short_title for t in x.submitted_for_tracks]),
+        'reviewed_for_tracks': ('Reviewed for tracks', lambda x: [t.short_title for t in x.reviewed_for_tracks]),
+        'accepted_contrib_type': ('Accepted type',
+                                  lambda x: x.accepted_contrib_type.name if x.accepted_contrib_type else None),
+        'submitted_contrib_type': ('Submitted type',
+                                   lambda x: x.submitted_contrib_type.name if x.submitted_contrib_type else None),
+        'score': ('Score', lambda x: round(x.score, 1) if x.score is not None else None),
+        'submitted_dt': ('Submission date', lambda x: x.submitted_dt),
+        'modified_dt': ('Modification date', lambda x: x.modified_dt if x.modified_dt else ''),
+    }
     field_names.extend(unique_col(item.title, item.id) for item in dynamic_items)
-    field_names.extend(title for name, (title, fn) in static_item_mapping.iteritems() if name in static_item_ids)
+    field_names.extend(title for name, (title, fn) in static_item_mapping.items() if name in static_item_ids)
     rows = []
     for abstract in abstracts:
         data = abstract.data_by_field
@@ -82,7 +83,7 @@ def generate_spreadsheet_from_abstracts(abstracts, static_item_ids, dynamic_item
         for item in dynamic_items:
             key = unique_col(item.title, item.id)
             abstract_dict[key] = data[item.id].friendly_data if item.id in data else ''
-        for name, (title, fn) in static_item_mapping.iteritems():
+        for name, (title, fn) in static_item_mapping.items():
             if name not in static_item_ids:
                 continue
             value = fn(abstract)
@@ -108,7 +109,7 @@ def create_mock_abstract(event):
 
     class _MockLocator(dict):
         def __init__(self, locator, **sublocators):
-            super(_MockLocator, self).__init__(locator)
+            super().__init__(locator)
             self._sublocators = sublocators
 
         def __getattr__(self, attr):
@@ -131,7 +132,7 @@ def create_mock_abstract(event):
                                 track=track,
                                 session=session,
                                 type=contribution_type,
-                                locator={'confId': -314, 'contrib_id': 1234})
+                                locator={'event_id': -314, 'contrib_id': 1234})
 
     target_abstract = Abstract(friendly_id=315,
                                title="Broken Symmetry",
@@ -143,8 +144,8 @@ def create_mock_abstract(event):
                                contribution=contribution,
                                primary_authors=[englert, brout],
                                secondary_authors=[guralnik, hagen, kibble, higgs],
-                               locator=_MockLocator({'confId': -314, 'abstract_id': 1235},
-                                                    token={'confId': -314,
+                               locator=_MockLocator({'event_id': -314, 'abstract_id': 1235},
+                                                    token={'event_id': -314,
                                                            'uuid': '12345678-9abc-def0-1234-56789abcdef0'}),
                                judgment_comment='Vague but interesting!',
                                merged_into=None)
@@ -159,8 +160,8 @@ def create_mock_abstract(event):
                         contribution=contribution,
                         primary_authors=[englert, brout],
                         secondary_authors=[guralnik, hagen, kibble, higgs],
-                        locator=_MockLocator({'confId': -314, 'abstract_id': 1234},
-                                             token={'confId': -314, 'uuid': '12345678-9abc-def0-1234-56789abcdef0'}),
+                        locator=_MockLocator({'event_id': -314, 'abstract_id': 1234},
+                                             token={'event_id': -314, 'uuid': '12345678-9abc-def0-1234-56789abcdef0'}),
                         judgment_comment='Vague but interesting!',
                         merged_into=target_abstract)
 
@@ -168,7 +169,7 @@ def create_mock_abstract(event):
 
 
 def make_abstract_form(event, user, notification_option=False, management=False, invited=False):
-    """Extends the abstract WTForm to add the extra fields.
+    """Extend the abstract WTForm to add the extra fields.
 
     Each extra field will use a field named ``custom_ID``.
 
@@ -181,8 +182,8 @@ def make_abstract_form(event, user, notification_option=False, management=False,
     :param invited: Whether the form is used to create an invited abstract
     :return: An `AbstractForm` subclass.
     """
-    from indico.modules.events.abstracts.forms import (AbstractForm, MultiTrackMixin, SingleTrackMixin, NoTrackMixin,
-                                                       SendNotificationsMixin)
+    from indico.modules.events.abstracts.forms import (AbstractForm, MultiTrackMixin, NoTrackMixin,
+                                                       SendNotificationsMixin, SingleTrackMixin)
 
     mixins = []
     if not event.tracks:
@@ -195,20 +196,20 @@ def make_abstract_form(event, user, notification_option=False, management=False,
         mixins.append(SendNotificationsMixin)
     if invited:
         mixins.append(InvitedAbstractMixin)
-    form_class = type(b'_AbstractForm', tuple(mixins) + (AbstractForm,), {})
+    form_class = type('_AbstractForm', tuple(mixins) + (AbstractForm,), {})
     for custom_field in event.contribution_fields:
         field_impl = custom_field.mgmt_field if management else custom_field.field
         if field_impl is None:
             # field definition is not available anymore
             continue
-        if custom_field.is_user_editable or event.can_manage(user):
-            name = 'custom_{}'.format(custom_field.id)
+        if custom_field.is_active and (custom_field.is_user_editable or event.can_manage(user)):
+            name = f'custom_{custom_field.id}'
             setattr(form_class, name, field_impl.create_wtf_field())
     return form_class
 
 
 def get_user_abstracts(event, user):
-    """Get the list of abstracts where the user is a reviewer/convener"""
+    """Get the list of abstracts where the user is a reviewer/convener."""
     return (Abstract.query.with_parent(event)
             .options(joinedload('reviews'),
                      joinedload('person_links'))
@@ -230,7 +231,7 @@ def get_visible_reviewed_for_tracks(abstract, user):
 
 
 def get_user_tracks(event, user):
-    """Get the list of tracks where the user is a reviewer/convener"""
+    """Get the list of tracks where the user is a reviewer/convener."""
     tracks = Track.query.with_parent(event).order_by(Track.title).all()
     if (event.can_manage(user, permission='review_all_abstracts', explicit_permission=True) or
             event.can_manage(user, permission='convene_all_abstracts', explicit_permission=True)):
@@ -277,7 +278,7 @@ def get_track_reviewer_abstract_counts(event, user):
 
 
 def create_boa(event):
-    """Create the book of abstracts if necessary
+    """Create the book of abstracts if necessary.
 
     :return: The path to the PDF file
     """
@@ -290,7 +291,7 @@ def create_boa(event):
             return path
     pdf = AbstractBook(event)
     tmp_path = pdf.generate()
-    filename = 'boa-{}.pdf'.format(event.id)
+    filename = f'boa-{event.id}.pdf'
     full_path = os.path.join(config.CACHE_DIR, filename)
     shutil.move(tmp_path, full_path)
     boa_settings.set(event, 'cache_path', filename)
@@ -307,7 +308,7 @@ def create_boa_tex(event):
 
 
 def clear_boa_cache(event):
-    """Delete the cached book of abstract"""
+    """Delete the cached book of abstract."""
     path = boa_settings.get(event, 'cache_path')
     if path:
         try:

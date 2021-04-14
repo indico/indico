@@ -4,6 +4,7 @@
 # Interesting post on max line length:
 # http://stackoverflow.com/questions/88942/why-should-python-pep-8-specify-a-maximum-line-length-of-79-characters
 
+PYUPGRADE_CMD='pyupgrade --py39-plus --keep-percent-format'
 FLAKE8_CMD='flake8'
 ESLINT_CMD='npx eslint'
 STYLELINT_CMD='npx stylelint'
@@ -59,25 +60,52 @@ if [[ ${#FILES[@]} -ne 0 ]]; then
 fi
 
 
-# Flake8
+# flake8, pyupgrade
 _get_files '*.py'
 if [[ ${#FILES[@]} -ne 0 ]]; then
     if ! RESULT=$($FLAKE8_CMD "${FILES[@]}"); then
         STATUS=1
         echo "${RED}There are python issues in your code:${RESET}"
         echo "$RESULT"
+        echo
+    fi
+
+    # thanks to pyupgrade not having any option to output a diff, we have to
+    # use this incredibly ugly workaround...
+    PYUPGRADE_RESULT=""
+    for f in "${FILES[@]}"; do
+        if ! RESULT=$(diff -u --label "a/$f" --label "b/$f" "$f" <($PYUPGRADE_CMD - < "$f")); then
+            STATUS=1
+            echo "${YELLOW}Outdated python constructs found in ${BRIGHTYELLOW}${f}${RESET}"
+            RESULT=$(IFS= echo "$RESULT" | pygmentize -l diff -f terminal256 -O style=native,bg=dark)
+            if [[ -n "$PYUPGRADE_RESULT" ]]; then
+                PYUPGRADE_RESULT=$(IFS= printf '%s\n%s' "$PYUPGRADE_RESULT" "$RESULT")
+            else
+                PYUPGRADE_RESULT=$(IFS= printf '\n%s' "$RESULT")
+            fi
+        fi
+    done
+
+    if [[ -n "$PYUPGRADE_RESULT" ]]; then
+        echo
+        echo "${RED}There are pyupgrade issues in your code:${RESET}"
+        IFS= echo "$PYUPGRADE_RESULT"
+        echo
+        echo "${CYAN}Run this command to update the files:${RESET}"
+        echo "git diff --staged --name-only --diff-filter d '*.py' | xargs -d'\n' ${PYUPGRADE_CMD}"
     fi
 fi
 
 
 # isort
-if ! RESULT=$(python -c 'import sys; from isort.hooks import git_hook; sys.exit(git_hook(strict=True))'); then
+if ! RESULT=$(python -c 'import sys; from isort.hooks import git_hook; sys.exit(git_hook(strict=True))' 2>&1); then
     STATUS=1
+    echo
     echo "${RED}There are isort issues in your code:${RESET}"
     echo "$RESULT"
     echo
     echo "${CYAN}Run this command to sort the imports:${RESET}"
-    echo "git diff --staged --name-only --diff-filter d '*.py' | xargs isort"
+    echo "git diff --staged --name-only --diff-filter d '*.py' | xargs -d'\n' isort"
 fi
 
 

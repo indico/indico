@@ -7,7 +7,7 @@
             {%- trans %}Add new question{% endtrans -%}
         </a>
         <ul class="i-dropdown">
-            {% for name, field_type in field_types.iteritems() -%}
+            {% for name, field_type in field_types.items() -%}
                 <li>
                     <a class="js-action-button"
                        data-href="{{ url_for(endpoints.create, event, field_type=name, **common_url_args) }}"

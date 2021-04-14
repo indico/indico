@@ -1,11 +1,9 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
-
-from __future__ import unicode_literals
 
 from flask import request, session
 from werkzeug.exceptions import Forbidden, NotFound
@@ -39,7 +37,7 @@ class RHCategoryBase(RH):
 
 
 class RHDisplayCategoryBase(RHCategoryBase):
-    """Base class for category display pages"""
+    """Base class for category display pages."""
 
     def _check_access(self):
         if not self.category.can_access(session.user):

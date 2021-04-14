@@ -1,18 +1,15 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import unicode_literals
-
 from indico.core.db import db
-from indico.util.string import return_ascii
 
 
 class LegacyEventMapping(db.Model):
-    """Legacy event ID mapping
+    """Legacy event ID mapping.
 
     Legacy events (imported from CDS agenda) have non-numeric IDs
     which are not supported by any new code. This mapping maps them
@@ -45,6 +42,5 @@ class LegacyEventMapping(db.Model):
         )
     )
 
-    @return_ascii
     def __repr__(self):
-        return '<LegacyEventMapping({}, {})>'.format(self.legacy_event_id, self.event_id)
+        return f'<LegacyEventMapping({self.legacy_event_id}, {self.event_id})>'

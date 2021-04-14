@@ -1,23 +1,24 @@
 // This file is part of Indico.
-// Copyright (C) 2002 - 2020 CERN
+// Copyright (C) 2002 - 2021 CERN
 //
 // Indico is free software; you can redistribute it and/or
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-import React from 'react';
 import PropTypes from 'prop-types';
-import {bindActionCreators} from 'redux';
-import {connect} from 'react-redux';
+import React from 'react';
 import {Form as FinalForm} from 'react-final-form';
+import {connect} from 'react-redux';
+import {bindActionCreators} from 'redux';
 import {Button, Confirm, Dropdown, Form, Icon} from 'semantic-ui-react';
 
-import {serializeDate} from 'indico/utils/date';
 import {PopoverDropdownMenu} from 'indico/react/components';
 import {FinalTextArea} from 'indico/react/forms';
 import {Param, Translate} from 'indico/react/i18n';
+import {serializeDate} from 'indico/utils/date';
 
 import {actions as bookingsActions} from '../bookings';
+
 import SingleRoomTimelineModal from './SingleRoomTimelineModal';
 
 import './RowActionsDropdown.module.scss';

@@ -1,16 +1,17 @@
 // This file is part of Indico.
-// Copyright (C) 2002 - 2020 CERN
+// Copyright (C) 2002 - 2021 CERN
 //
 // Indico is free software; you can redistribute it and/or
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-import getMapAreasURL from 'indico-url:rb.map_areas';
 import adminMapAreasActionsURL from 'indico-url:rb.admin_map_areas';
+import getMapAreasURL from 'indico-url:rb.map_areas';
 
 import {indicoAxios} from 'indico/utils/axios';
 import {snakifyKeys} from 'indico/utils/case';
 import {ajaxAction} from 'indico/utils/redux';
+
 import * as mapSelectors from './selectors';
 
 export const UPDATE_LOCATION = 'map/UPDATE_LOCATION';

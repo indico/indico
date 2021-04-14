@@ -1,27 +1,29 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import unicode_literals
-
 from indico.core.db.sqlalchemy import db
 from indico.core.db.sqlalchemy.descriptions import DescriptionMixin, RenderMode
 from indico.core.db.sqlalchemy.protection import ProtectionManagersMixin
 from indico.util.locators import locator_property
-from indico.util.string import format_repr, return_ascii, text_to_repr
+from indico.util.string import format_repr, text_to_repr
 
 
 def get_next_position(context):
     from indico.modules.events.tracks.models.groups import TrackGroup
 
     event_id = context.current_parameters['event_id']
-    track_max_position = db.session.query(db.func.max(Track.position)).filter_by(event_id=event_id).scalar()
-    track_group_max_position = db.session.query(db.func.max(TrackGroup.position)).filter_by(event_id=event_id).scalar()
-    pos = max(track_max_position, track_group_max_position)
-    return (pos or 0) + 1
+    track_max_position = (db.session.query(db.func.max(Track.position))
+                          .filter(Track.event_id == event_id)
+                          .scalar())
+    track_group_max_position = (db.session.query(db.func.max(TrackGroup.position))
+                                .filter(TrackGroup.event_id == event_id)
+                                .scalar())
+    pos = max(track_max_position or 0, track_group_max_position or 0)
+    return pos + 1
 
 
 class Track(DescriptionMixin, ProtectionManagersMixin, db.Model):
@@ -117,25 +119,24 @@ class Track(DescriptionMixin, ProtectionManagersMixin, db.Model):
 
     @property
     def full_title(self):
-        return '{} - {}'.format(self.code, self.title) if self.code else self.title
+        return f'{self.code} - {self.title}' if self.code else self.title
 
     @property
     def title_with_group(self):
-        return '{}: {}'.format(self.track_group.title, self.title) if self.track_group else self.title
+        return f'{self.track_group.title}: {self.title}' if self.track_group else self.title
 
     @property
     def short_title_with_group(self):
-        return '{}: {}'.format(self.track_group.title, self.short_title) if self.track_group else self.short_title
+        return f'{self.track_group.title}: {self.short_title}' if self.track_group else self.short_title
 
     @property
     def full_title_with_group(self):
-        return '{}: {}'.format(self.track_group.title, self.full_title) if self.track_group else self.full_title
+        return f'{self.track_group.title}: {self.full_title}' if self.track_group else self.full_title
 
     @locator_property
     def locator(self):
         return dict(self.event.locator, track_id=self.id)
 
-    @return_ascii
     def __repr__(self):
         return format_repr(self, 'id', _text=text_to_repr(self.title))
 

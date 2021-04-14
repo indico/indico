@@ -1,11 +1,9 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
-
-from __future__ import unicode_literals
 
 from flask import redirect, session
 from werkzeug.exceptions import Forbidden
@@ -36,7 +34,7 @@ from indico.web.util import jsonify_data, jsonify_form, jsonify_template
 
 
 class RHEventSettings(RHManageEventBase):
-    """Event settings dashboard"""
+    """Event settings dashboard."""
 
     def _check_access(self):
         if not session.user:

@@ -1,11 +1,9 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
-
-from __future__ import unicode_literals
 
 from flask import render_template
 from sqlalchemy.dialects.postgresql import JSONB
@@ -15,8 +13,8 @@ from indico.core.db.sqlalchemy import PyIntEnum
 from indico.core.db.sqlalchemy.custom.utcdatetime import UTCDateTime
 from indico.core.logger import Logger
 from indico.util.date_time import now_utc
-from indico.util.string import format_repr, return_ascii
-from indico.util.struct.enum import IndicoEnum
+from indico.util.enum import IndicoEnum
+from indico.util.string import format_repr
 
 
 class InvalidTransactionStatus(Exception):
@@ -59,7 +57,7 @@ class TransactionStatus(int, IndicoEnum):
     rejected = 5
 
 
-class TransactionStatusTransition(object):
+class TransactionStatusTransition:
 
     initial_statuses = [TransactionStatus.cancelled, TransactionStatus.failed, TransactionStatus.rejected]
 
@@ -73,7 +71,7 @@ class TransactionStatusTransition(object):
         elif transaction.status == TransactionStatus.pending:
             return cls._next_from_pending(action, manual)
         else:
-            raise InvalidTransactionStatus("Invalid transaction status code '{}'".format(transaction.status))
+            raise InvalidTransactionStatus(f"Invalid transaction status code '{transaction.status}'")
 
     @staticmethod
     def _next_from_initial(action, manual=False):
@@ -131,7 +129,7 @@ class TransactionStatusTransition(object):
 
 
 class PaymentTransaction(db.Model):
-    """Payment transactions"""
+    """Payment transactions."""
     __tablename__ = 'payment_transactions'
     __table_args__ = (db.CheckConstraint('amount > 0', 'positive_amount'),
                       {'schema': 'events'})
@@ -202,19 +200,18 @@ class PaymentTransaction(db.Model):
     def is_manual(self):
         return self.provider == '_manual'
 
-    @return_ascii
     def __repr__(self):
         # in case of a new object we might not have the default status set
         status = TransactionStatus(self.status).name if self.status is not None else None
         return format_repr(self, 'id', 'registration_id', 'provider', 'amount', 'currency', 'timestamp', status=status)
 
     def render_details(self):
-        """Renders the transaction details"""
+        """Render the transaction details."""
         if self.is_manual:
-            return render_template('events/payment/transaction_details_manual.html', transaction=self)
+            return render_template('events/payment/transaction_details_manual.html', transaction=self, plugin=None)
         plugin = self.plugin
         if plugin is None:
-            return '[plugin not loaded: {}]'.format(self.provider)
+            return f'[plugin not loaded: {self.provider}]'
         with plugin.plugin_context():
             return plugin.render_transaction_details(self)
 

@@ -1,11 +1,9 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
-
-from __future__ import unicode_literals
 
 from sqlalchemy.ext.hybrid import hybrid_property
 
@@ -14,8 +12,8 @@ from indico.util.locators import locator_property
 from indico.web.flask.util import url_for
 
 
-class ProposalGroupProxy(object):
-    """Represents the object that the proposals can be grouped by.
+class ProposalGroupProxy:
+    """The object that the proposals can be grouped by.
 
     It provides all necessary methods for building the URLs, displaying the
     grouping information, etc.
@@ -56,11 +54,12 @@ class ProposalGroupProxy(object):
         return self.instance.locator
 
     def __repr__(self):
-        return '<ProposalGroupProxy: {}>'.format(self.instance)
+        return f'<ProposalGroupProxy: {self.instance}>'
 
 
-class ProposalRevisionMixin(object):
-    """ Properties and methods of a proposal revision."""
+class ProposalRevisionMixin:
+    """Properties and methods of a proposal revision."""
+
     #: The attribute  of the revision used to fetch the proposal object.
     proposal_attr = None
     #: Whether the reviewing process supports multiple revisions per proposal.
@@ -92,7 +91,7 @@ class ProposalRevisionMixin(object):
     def get_reviewer_render_data(self, user):
         groups = self.get_reviewed_for_groups(user, include_reviewed=True)
         reviews = {x.group: x for x in self.get_reviews(user=user)}
-        reviewed_groups = {x.group for x in reviews.itervalues()}
+        reviewed_groups = {x.group for x in reviews.values()}
         missing_groups = groups - reviewed_groups
         return {'groups': groups,
                 'missing_groups': missing_groups,
@@ -100,10 +99,12 @@ class ProposalRevisionMixin(object):
                 'reviews': reviews}
 
 
-class ProposalMixin(object):
-    """Classes that represent a proposal object should extend this class (ex:
+class ProposalMixin:
+    """
+    Classes that represent a proposal object should extend this class (ex:
     Abstract, Paper).
     """
+
     #: A unique identifier to handle rendering differences between proposal
     #: types
     proposal_type = None
@@ -163,19 +164,20 @@ class ProposalMixin(object):
         return url_for(self.create_judgment_endpoint, self)
 
 
-class ProposalCommentMixin(object):
+class ProposalCommentMixin:
     timeline_item_type = 'comment'
 
     def can_edit(self, user):
         raise NotImplementedError
 
 
-class ProposalReviewMixin(object):
-    """Mixin for proposal reviews
+class ProposalReviewMixin:
+    """Mixin for proposal reviews.
 
     Classes that represent a review of a proposal should extend this class
     (ex: AbstractReview, PaperReview).
     """
+
     #: A unique identifier to handle rendering differences between timeline
     #: items
     timeline_item_type = 'review'

@@ -1,11 +1,9 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
-
-from __future__ import unicode_literals
 
 from flask import redirect, request, session
 from werkzeug.exceptions import Forbidden
@@ -25,8 +23,16 @@ class RHDownloadEventAttachment(DownloadAttachmentMixin, RHDisplayEventBase):
         DownloadAttachmentMixin._process_args(self)
 
     def _check_access(self):
-        RHDisplayEventBase._check_access(self)
-        DownloadAttachmentMixin._check_access(self)
+        try:
+            DownloadAttachmentMixin._check_access(self)
+        except Forbidden:
+            # if we get here the user has no access to the attachment itself so we
+            # trigger the event access check since it may show the access key form
+            # or registration required message
+            RHDisplayEventBase._check_access(self)
+            # the user may have access to the event but not the material so if we
+            # are here we need to re-raise the original exception
+            raise
 
 
 class RHListEventAttachmentFolder(SpecificFolderMixin, RHDisplayEventBase):
@@ -35,8 +41,10 @@ class RHListEventAttachmentFolder(SpecificFolderMixin, RHDisplayEventBase):
         SpecificFolderMixin._process_args(self)
 
     def _check_access(self):
-        RHDisplayEventBase._check_access(self)
         if not self.folder.can_access(session.user):
+            # basically the same logic as in RHDownloadEventAttachment. see the comments
+            # there for a more detailed explanation.
+            RHDisplayEventBase._check_access(self)
             raise Forbidden
 
     def _process(self):

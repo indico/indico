@@ -1,25 +1,26 @@
 // This file is part of Indico.
-// Copyright (C) 2002 - 2020 CERN
+// Copyright (C) 2002 - 2021 CERN
 //
 // Indico is free software; you can redistribute it and/or
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
 import createBookingURL from 'indico-url:rb.create_booking';
-import fetchTimelineURL from 'indico-url:rb.timeline';
-import fetchSuggestionsURL from 'indico-url:rb.suggestions';
-import searchRoomsURL from 'indico-url:rb.search_rooms';
 import fetchEventsURL from 'indico-url:rb.events';
+import searchRoomsURL from 'indico-url:rb.search_rooms';
+import fetchSuggestionsURL from 'indico-url:rb.suggestions';
+import fetchTimelineURL from 'indico-url:rb.timeline';
 
 import {indicoAxios, handleAxiosError} from 'indico/utils/axios';
 import {ajaxAction, submitFormAction} from 'indico/utils/redux';
-import {ajax as ajaxRules} from './serializers';
-import {validateFilters} from '../../common/filters';
-import {preProcessParameters} from '../../util';
-import {openModal} from '../../actions';
 
+import {openModal} from '../../actions';
+import {validateFilters} from '../../common/filters';
 import {roomSearchActionsFactory, ajaxRules as ajaxFilterRules} from '../../common/roomSearch';
 import {selectors as userSelectors} from '../../common/user';
+import {preProcessParameters} from '../../util';
+
+import {ajax as ajaxRules} from './serializers';
 
 // Booking creation
 export const CREATE_BOOKING_REQUEST = 'bookRoom/CREATE_BOOKING_REQUEST';

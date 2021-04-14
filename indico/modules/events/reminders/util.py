@@ -1,18 +1,16 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
-
-from __future__ import unicode_literals
 
 from indico.modules.events.models.events import EventType
 from indico.web.flask.templating import get_template_module
 
 
 def make_reminder_email(event, with_agenda, with_description, note):
-    """Returns the template module for the reminder email.
+    """Return the template module for the reminder email.
 
     :param event: The event
     :param with_agenda: If the event's agenda should be included

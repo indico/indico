@@ -1,5 +1,6 @@
 {% extends 'layout/auth_base.html' %}
 {% from 'auth/_login_form.html' import login_form %}
+{% from 'message_box.html' import message_box %}
 
 {% block content %}
     <div class="centered-column">
@@ -12,6 +13,13 @@
                     </div>
                 {% endif %}
                 {% include 'flashed_messages.html' %}
+                {% if retry_in %}
+                    {% call message_box('error') %}
+                        {% trans delay=retry_in|format_human_timedelta(granularity='minutes') %}
+                            Too many failed login attempts. Please wait {{ delay }}.
+                        {% endtrans %}
+                    {% endcall %}
+                {% endif %}
                 <div id="form-wrapper">
                     {{ login_form(active_provider, form) }}
                 </div>

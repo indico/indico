@@ -1,5 +1,5 @@
 // This file is part of Indico.
-// Copyright (C) 2002 - 2020 CERN
+// Copyright (C) 2002 - 2021 CERN
 //
 // Indico is free software; you can redistribute it and/or
 // modify it under the terms of the MIT License; see the
@@ -11,9 +11,10 @@ import {Provider} from 'react-redux';
 
 // eslint-disable-next-line import/no-cycle
 import createReduxStore from 'indico/utils/redux';
+
 import {addError, showReportForm} from './actions';
-import reducer from './reducers';
 import ErrorDialog from './container';
+import reducer from './reducers';
 
 let store;
 export default function showReactErrorDialog(error, instantReport = false) {

@@ -1,5 +1,5 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
@@ -10,9 +10,9 @@ Base export interface
 """
 
 import re
-import urllib
 from datetime import datetime, time, timedelta
 from types import GeneratorType
+from urllib.parse import unquote
 
 import pytz
 from flask import current_app, request
@@ -32,7 +32,7 @@ from indico.web.http_api.responses import HTTPAPIError
 from indico.web.http_api.util import get_query_parameter
 
 
-class HTTPAPIHook(object):
+class HTTPAPIHook:
     """This class is the hook between the query (path+params) and the generator of the results (fossil).
        It is also in charge of checking the parameters and the access rights.
     """
@@ -45,7 +45,7 @@ class HTTPAPIHook(object):
     DEFAULT_DETAIL = None  # abstract
     MAX_RECORDS = {}
     SERIALIZER_TYPE_MAP = {}  # maps fossil type names to friendly names (useful for plugins e.g. RoomCERN --> Room)
-    VALID_FORMATS = None  # None = all formats
+    VALID_FORMATS = None  # None = all formats except 'bin'
     GUEST_ALLOWED = True  # When False, it forces authentication
     COMMIT = False  # commit database changes
     HTTP_POST = False  # require (and allow) HTTP POST
@@ -54,7 +54,7 @@ class HTTPAPIHook(object):
     @classmethod
     def parseRequest(cls, path, queryParams):
         """Parse a request path and return a hook and the requested data type."""
-        path = urllib.unquote(path)
+        path = unquote(path)
         hooks = cls.HOOK_LIST
         for expCls in hooks:
             Logger.get('HTTPAPIHook.parseRequest').debug(expCls)
@@ -67,6 +67,8 @@ class HTTPAPIHook(object):
                 if format not in DataFetcher.getAllowedFormats():
                     return None, None
                 elif expCls.VALID_FORMATS and format not in expCls.VALID_FORMATS:
+                    return None, None
+                elif expCls.VALID_FORMATS is None and format == 'bin':
                     return None, None
                 return expCls(queryParams, type, gd, format), format
         return None, None
@@ -106,8 +108,8 @@ class HTTPAPIHook(object):
             tzName = config.DEFAULT_TIMEZONE
         try:
             self._tz = pytz.timezone(tzName)
-        except pytz.UnknownTimeZoneError as e:
-            raise HTTPAPIError("Bad timezone: '%s'" % e.message, 400)
+        except pytz.UnknownTimeZoneError as exc:
+            raise HTTPAPIError(f"Bad timezone: '{exc}'", 400)
         max = self.MAX_RECORDS.get(self._detail, 1000)
         self._userLimit = get_query_parameter(self._queryParams, ['n', 'limit'], 0, integer=True)
         if self._userLimit > max:
@@ -164,7 +166,7 @@ class HTTPAPIHook(object):
         return False, resultList, complete, extra
 
     def __call__(self, user):
-        """Perform the actual exporting"""
+        """Perform the actual exporting."""
         if self.HTTP_POST != (request.method == 'POST'):
             # XXX: this should never happen, since HTTP_POST is only used within /api/,
             # where the flask url rule requires POST
@@ -195,7 +197,7 @@ class HTTPAPIHook(object):
         return resultList, extra, complete, self.SERIALIZER_TYPE_MAP
 
 
-class DataFetcher(object):
+class DataFetcher:
     _deltas = {'yesterday': timedelta(-1),
                'tomorrow': timedelta(1)}
 
@@ -254,8 +256,8 @@ class DataFetcher(object):
 
         try:
             rel, value = cls._parseDateTime(dateTime, ctx == 'from')
-        except ArgumentParseError as e:
-            raise HTTPAPIError(e.message, 400)
+        except ArgumentParseError as exc:
+            raise HTTPAPIError(str(exc), 400)
 
         if rel == 'abs':
             return tz.localize(value) if not value.tzinfo else value
@@ -271,7 +273,7 @@ class DataFetcher(object):
 
 class IteratedDataFetcher(DataFetcher):
     def __init__(self, user, hook):
-        super(IteratedDataFetcher, self).__init__(user, hook)
+        super().__init__(user, hook)
         self._tz = hook._tz
         self._offset = hook._offset
         self._limit = hook._limit

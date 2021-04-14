@@ -1,11 +1,9 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
-
-from __future__ import unicode_literals
 
 from indico.core import signals
 from indico.util.signals import named_objects_from_signal
@@ -16,7 +14,7 @@ __all__ = ('BaseField', 'get_field_definitions')
 
 
 def get_field_definitions(for_):
-    """Gets a dict containing all field definitions
+    """Get a dict containing all field definitions.
 
     :param for_: The identifier/object passed to the `get_fields`
                  signal to identify which fields to get.

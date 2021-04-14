@@ -1,5 +1,5 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
@@ -70,7 +70,6 @@ Version 2.1: (August 2013)
   * Update math delimiters
 """
 
-from __future__ import absolute_import
 
 import os
 import re
@@ -79,7 +78,8 @@ import uuid
 from io import BytesIO
 from mimetypes import guess_extension
 from tempfile import NamedTemporaryFile
-from urlparse import urlparse
+from urllib.parse import urlparse
+from xml.etree import ElementTree as etree
 
 import markdown
 import requests
@@ -96,7 +96,7 @@ start_double_quote_re = re.compile(r'''(^|\s|'|`)"''')
 end_double_quote_re = re.compile(r'"(,|\.|\s|$)')
 
 Image.init()
-IMAGE_FORMAT_EXTENSIONS = {format: ext for (ext, format) in Image.EXTENSION.viewitems()}
+IMAGE_FORMAT_EXTENSIONS = {format: ext for (ext, format) in Image.EXTENSION.items()}
 
 safe_mathmode_commands = {
     'above', 'abovewithdelims', 'acute', 'aleph', 'alpha', 'amalg', 'And', 'angle', 'approx', 'arccos', 'arcsin',
@@ -153,6 +153,9 @@ def unescape_html_entities(text):
 
 
 def latex_escape(text, ignore_math=True, ignore_braces=False):
+    if text is None:
+        return ''
+
     chars = {
         "#": r"\#",
         "$": r"\$",
@@ -176,7 +179,7 @@ def latex_escape(text, ignore_math=True, ignore_braces=False):
     def substitute(x):
         return chars[x.group()]
 
-    math_placeholder = '[*LaTeXmath-{}*]'.format(unicode(uuid.uuid4()))
+    math_placeholder = f'[*LaTeXmath-{str(uuid.uuid4())}*]'
 
     def math_replace(m):
         math_segments.append(m.group(0))
@@ -191,7 +194,7 @@ def latex_escape(text, ignore_math=True, ignore_braces=False):
 
     if ignore_math:
         # Sanitize math-mode segments and put them back in place
-        math_segments = map(sanitize_mathmode, math_segments)
+        math_segments = list(map(sanitize_mathmode, math_segments))
         res = re.sub(re.escape(math_placeholder), lambda _: "\\protect " + math_segments.pop(0), res)
 
     return res
@@ -226,8 +229,7 @@ def unescape_latex_entities(text):
 
 
 def latex_render_error(message):
-    """
-    Generate nice error box in LaTeX document.
+    """Generate nice error box in LaTeX document.
 
     :param message: The error message
     :returns: LaTeX code for error box
@@ -239,8 +241,7 @@ def latex_render_error(message):
 
 
 def latex_render_image(src, alt, tmpdir, strict=False):
-    """
-    Generate LaTeX code that includes an arbitrary image from a URL.
+    """Generate LaTeX code that includes an arbitrary image from a URL.
 
     This involves fetching the image from a web server and figuring out its
     MIME type. A temporary file will be created, which is not immediately
@@ -256,20 +257,20 @@ def latex_render_image(src, alt, tmpdir, strict=False):
     """
     try:
         if urlparse(src).scheme not in ('http', 'https'):
-            raise ImageURLException("URL scheme not supported: {}".format(src))
+            raise ImageURLException(f"URL scheme not supported: {src}")
         else:
             try:
                 resp = requests.get(src, verify=False, timeout=5)
             except InvalidURL:
-                raise ImageURLException("Cannot understand URL '{}'".format(src))
+                raise ImageURLException(f"Cannot understand URL '{src}'")
             except (requests.Timeout, ConnectionError):
-                raise ImageURLException("Problem downloading image ({})".format(src))
+                raise ImageURLException(f"Problem downloading image ({src})")
             except requests.TooManyRedirects:
-                raise ImageURLException("Too many redirects downloading image ({})".format(src))
+                raise ImageURLException(f"Too many redirects downloading image ({src})")
             extension = None
 
             if resp.status_code != 200:
-                raise ImageURLException("[{}] Error fetching image".format(resp.status_code))
+                raise ImageURLException(f"[{resp.status_code}] Error fetching image")
 
             if resp.headers.get('content-type'):
                 extension = guess_extension(resp.headers['content-type'])
@@ -282,15 +283,15 @@ def latex_render_image(src, alt, tmpdir, strict=False):
                     image = Image.open(BytesIO(resp.content))
                     # Worst case scenario, assume it's PNG
                     extension = IMAGE_FORMAT_EXTENSIONS.get(image.format, '.png')
-                except IOError:
+                except OSError:
                     raise ImageURLException("Cannot read image data. Maybe not an image file?")
             with NamedTemporaryFile(prefix='indico-latex-', suffix=extension, dir=tmpdir, delete=False) as tempfile:
                 tempfile.write(resp.content)
-    except ImageURLException as e:
+    except ImageURLException as exc:
         if strict:
             raise
         else:
-            return latex_render_error("Could not include image: {}".format(e.message)), None
+            return latex_render_error(f'Could not include image: {exc}'), None
 
     # Using graphicx and ajustbox package for *max width*
     return (textwrap.dedent(r"""
@@ -329,26 +330,21 @@ class LaTeXExtension(markdown.Extension):
         md.postprocessors.register(link_pp, 'link', md.postprocessors._priority[-1].priority - 1)
 
         # Needed for LaTeX postprocessors not to choke on URL-encoded urls
-        md.inlinePatterns.register(NonEncodedAutoMailPattern(markdown.inlinepatterns.AUTOMAIL_RE, md), 'automail',
-                                   md.treeprocessors._priority[-1].priority - 1)
+        md.inlinePatterns.register(NonEncodedAutoMailPattern(markdown.inlinepatterns.AUTOMAIL_RE, md), 'automail', 110)
 
     def reset(self):
         pass
 
 
 class NonEncodedAutoMailPattern(markdown.inlinepatterns.Pattern):
-    """Reimplementation of AutoMailPattern to avoid URL-encoded links"""
+    """Reimplementation of AutoMailPattern to avoid URL-encoded links."""
 
     def handleMatch(self, m):
-        el = markdown.util.etree.Element('a')
+        el = etree.Element('a')
         email = self.unescape(m.group(2))
-        if email.startswith("mailto:"):
-            email = email[len("mailto:"):]
+        email.removeprefix('mailto:')
         el.text = markdown.util.AtomicString(''.join(email))
-        mailto = "mailto:" + email
-        mailto = "".join([markdown.util.AMP_SUBSTITUTE + '#%d;' %
-                          ord(letter) for letter in mailto])
-        el.set('href', latex_escape(mailto, ignore_math=False))
+        el.set('href', f'mailto:{email}')
         return el
 
 
@@ -357,8 +353,10 @@ class LaTeXTreeProcessor(markdown.treeprocessors.Treeprocessor):
         self.configs = configs
 
     def run(self, doc):
-        """Walk the dom converting relevant nodes to text nodes with relevant
-        content."""
+        """
+        Walk the dom converting relevant nodes to text nodes with relevant
+        content.
+        """
         latex_text = self.tolatex(doc)
         doc.clear()
         doc.text = latex_text
@@ -370,9 +368,8 @@ class LaTeXTreeProcessor(markdown.treeprocessors.Treeprocessor):
         if ournode.text:
             subcontent += escape_latex_entities(ournode.text)
 
-        if ournode.getchildren():
-            for child in ournode.getchildren():
-                subcontent += self.tolatex(child)
+        for child in ournode:
+            subcontent += self.tolatex(child)
 
         if ournode.tag == 'h1':
             buffer += '\n\n\\section{%s}\n' % subcontent
@@ -431,7 +428,7 @@ class LaTeXTreeProcessor(markdown.treeprocessors.Treeprocessor):
             buffer += latex_render_image(ournode.get('src'), ournode.get('alt'), tmpdir=self.configs.get('tmpdir'))[0]
         elif ournode.tag == 'a':
             # this one gets escaped in convert_link_to_latex
-            buffer += '<a href=\"%s\">%s</a>' % (ournode.get('href'), subcontent)
+            buffer += '<a href="{}">{}</a>'.format(ournode.get('href'), subcontent)
         else:
             buffer = subcontent
 
@@ -452,7 +449,8 @@ class UnescapeHtmlTextPostProcessor(markdown.postprocessors.Postprocessor):
 class MathTextPostProcessor(markdown.postprocessors.Postprocessor):
 
     def run(self, instr):
-        """Convert all math sections in {text} whether latex, asciimathml or
+        """
+        Convert all math sections in {text} whether latex, asciimathml or
         latexmathml formatted to latex.
 
         This assumes you are using $$ as your mathematics delimiter (*not* the
@@ -468,7 +466,7 @@ class MathTextPostProcessor(markdown.postprocessors.Postprocessor):
 
         def repl_2(matchobj):
             text = unescape_latex_entities(matchobj.group(1))
-            return '$%s$%s' % (text, matchobj.group(2))
+            return f'${text}${matchobj.group(2)}'
 
         # $$ ..... $$
         pat = re.compile(r'^\$\$([^$]*)\$\$\s*$', re.MULTILINE)
@@ -497,4 +495,4 @@ class LinkTextPostProcessor(markdown.postprocessors.Postprocessor):
 
 def convert_link_to_latex(instr):
     dom = html5parser.fragment_fromstring(instr)
-    return u'\\href{%s}{%s}' % (latex_escape(dom.get('href'), ignore_math=True), dom.text)
+    return '\\href{%s}{%s}' % (latex_escape(dom.get('href'), ignore_math=True), dom.text)

@@ -1,13 +1,12 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import unicode_literals
-
 import weakref
+from collections.abc import Mapping
 
 from flask import flash, g, request, session
 from flask_wtf import FlaskForm
@@ -22,22 +21,21 @@ from indico.core import signals
 from indico.core.auth import multipass
 from indico.util.i18n import _
 from indico.util.signals import values_from_signal
-from indico.util.string import return_ascii, strip_whitespace
+from indico.util.string import strip_whitespace
 from indico.web.flask.util import url_for
 
 
-class _DataWrapper(object):
-    """Wrapper for the return value of generated_data properties"""
+class _DataWrapper:
+    """Wrapper for the return value of generated_data properties."""
     def __init__(self, data):
         self.data = data
 
-    @return_ascii
     def __repr__(self):
-        return '<DataWrapper({!r})>'.format(self.data)
+        return f'<DataWrapper({self.data!r})>'
 
 
 class generated_data(property):
-    """property decorator for generated data in forms"""
+    """Property decorator for generated data in forms."""
 
     def __get__(self, obj, objtype=None):
         if obj is None:
@@ -54,18 +52,18 @@ class IndicoFormMeta(FormMeta):
         # form and doing so could actually result in infinite recursion
         # if the signal receiver didn't specify a sender.
         if kwargs.pop('__extended', False):
-            return super(IndicoFormMeta, cls).__call__(*args, **kwargs)
+            return super().__call__(*args, **kwargs)
         extra_fields = values_from_signal(signals.add_form_fields.send(cls))
         # If there are no extra fields, we don't need any custom logic
         # and simply create an instance of the original form.
         if not extra_fields:
-            return super(IndicoFormMeta, cls).__call__(*args, **kwargs)
+            return super().__call__(*args, **kwargs)
         kwargs['__extended'] = True
-        ext_cls = type(b'_Extended' + cls.__name__, (cls,), {})
+        ext_cls = type('_Extended' + cls.__name__, (cls,), {})
         for name, field in extra_fields:
             name = 'ext__' + name
             if hasattr(ext_cls, name):
-                raise RuntimeError('Field name collision in {}: {}'.format(cls.__name__, name))
+                raise RuntimeError(f'Field name collision in {cls.__name__}: {name}')
             setattr(ext_cls, name, field)
         return ext_cls(*args, **kwargs)
 
@@ -86,9 +84,7 @@ class IndicoFormCSRF(CSRF):
         raise ValidationError(_('Invalid CSRF token'))
 
 
-class IndicoForm(FlaskForm):
-    __metaclass__ = IndicoFormMeta
-
+class IndicoForm(FlaskForm, metaclass=IndicoFormMeta):
     class Meta:
         csrf = True
         csrf_class = IndicoFormCSRF
@@ -114,7 +110,7 @@ class IndicoForm(FlaskForm):
             # change it for some reason we can always replace it everywhere
             kwargs['meta'] = kwargs.get('meta') or {}
             kwargs['meta'].setdefault('csrf', csrf_enabled)
-        super(IndicoForm, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self.ajax_response = None
 
     def process_ajax(self):
@@ -130,7 +126,7 @@ class IndicoForm(FlaskForm):
         field_id = request.args.get('__wtf_ajax')
         if not field_id:
             return False
-        field = next((f for f in self._fields.itervalues() if f.id == field_id and isinstance(f, AjaxFieldMixin)), None)
+        field = next((f for f in self._fields.values() if f.id == field_id and isinstance(f, AjaxFieldMixin)), None)
         if not field:
             return False
         rv = field.process_ajax()
@@ -138,7 +134,7 @@ class IndicoForm(FlaskForm):
         return True
 
     def validate(self):
-        valid = super(IndicoForm, self).validate()
+        valid = super().validate()
         if not valid:
             return False
         if not all(values_from_signal(signals.form_validated.send(self), single_value=True)):
@@ -154,7 +150,7 @@ class IndicoForm(FlaskForm):
         """
 
     def populate_obj(self, obj, fields=None, skip=None, existing_only=False):
-        """Populates the given object with form data.
+        """Populate the given object with form data.
 
         If `fields` is set, only fields from that list are populated.
         If `skip` is set, fields in that list are skipped.
@@ -176,13 +172,13 @@ class IndicoForm(FlaskForm):
             return True
 
         # Populate data from actual fields
-        for name, field in self._fields.iteritems():
+        for name, field in self._fields.items():
             if not _included(name):
                 continue
             field.populate_obj(obj, name)
 
         # Populate generated data
-        for name, value in self.generated_data.iteritems():
+        for name, value in self.generated_data.items():
             if not _included(name):
                 continue
             setattr(obj, name, value)
@@ -196,19 +192,19 @@ class IndicoForm(FlaskForm):
     def error_list(self):
         """A list containing all errors, prefixed with the field's label.'"""
         all_errors = []
-        for field_name, errors in self.errors.iteritems():
+        for field_name, errors in self.errors.items():
             for error in errors:
                 if isinstance(error, dict) and isinstance(self[field_name], FieldList):
                     for field in self[field_name].entries:
-                        all_errors += ['{}: {}'.format(self[field_name].label.text, sub_error)
+                        all_errors += [f'{self[field_name].label.text}: {sub_error}'
                                        for sub_error in field.form.error_list]
                 else:
-                    all_errors.append('{}: {}'.format(self[field_name].label.text, error))
+                    all_errors.append(f'{self[field_name].label.text}: {error}')
         return all_errors
 
     @property
     def generated_data(self):
-        """Returns a dict containing all generated data"""
+        """Return a dict containing all generated data."""
         cls = type(self)
         return {field: getattr(self, field).data
                 for field in dir(cls)
@@ -216,15 +212,15 @@ class IndicoForm(FlaskForm):
 
     @property
     def data(self):
-        """Extends form.data with generated data from properties"""
+        """Extend form.data with generated data from properties."""
         data = {k: v
-                for k, v in super(IndicoForm, self).data.iteritems()
+                for k, v in super(IndicoForm, self).data.items()
                 if k != self.meta.csrf_field_name and not k.startswith('ext__')}
         data.update(self.generated_data)
         return data
 
 
-class FormDefaults(object):
+class FormDefaults:
     """Simple wrapper to be used for Form(obj=...) default values.
 
     It allows you to specify default values via kwargs or certain attrs from an object.
@@ -238,13 +234,13 @@ class FormDefaults(object):
 
     def __init__(self, obj=None, attrs=None, skip_attrs=None, **defaults):
         self.__obj = obj
-        self.__use_items = hasattr(obj, 'iteritems') and hasattr(obj, 'get')  # smells like a dict
+        self.__use_items = isinstance(obj, Mapping)
         self.__obj_attrs = attrs
         self.__obj_attrs_skip = skip_attrs
         self.__defaults = defaults
 
     def __valid_attr(self, name):
-        """Checks if an attr may be retrieved from the object"""
+        """Check if an attr may be retrieved from the object."""
         if self.__obj is None:
             return False
         if self.__obj_attrs is not None and name not in self.__obj_attrs:
@@ -257,7 +253,7 @@ class FormDefaults(object):
         self.__defaults[key] = value
 
     def __setattr__(self, key, value):
-        if key.startswith('_{}__'.format(type(self).__name__)):
+        if key.startswith(f'_{type(self).__name__}__'):
             object.__setattr__(self, key, value)
         else:
             self.__defaults[key] = value
@@ -277,7 +273,7 @@ class FormDefaults(object):
         return hasattr(self, item)
 
 
-class SyncedInputsMixin(object):
+class SyncedInputsMixin:
     """Mixin for a form having inputs using the ``SyncedInputWidget``.
 
     This mixin will process the synced fields, adding them the necessary
@@ -298,7 +294,7 @@ class SyncedInputsMixin(object):
     def __init__(self, *args, **kwargs):
         synced_fields = kwargs.pop('synced_fields', set())
         synced_values = kwargs.pop('synced_values', {})
-        super(SyncedInputsMixin, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self.syncable_fields = set(synced_values)
         for key in ('first_name', 'last_name'):
             if not synced_values.get(key):
@@ -319,7 +315,7 @@ class SyncedInputsMixin(object):
         return set(request.form.getlist('synced_fields')) & self.syncable_fields
 
 
-class AjaxFieldMixin(object):
+class AjaxFieldMixin:
     """Mixin for a Field to be able to handle AJAX requests.
 
     This mixin will allow you to handle AJAX requests during regular

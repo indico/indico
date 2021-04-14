@@ -1,16 +1,14 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import unicode_literals
-
 import json
 
 from flask import flash, jsonify, request, session
-from sqlalchemy.orm import joinedload
+from sqlalchemy.orm import contains_eager, joinedload
 from sqlalchemy.orm.exc import NoResultFound
 from werkzeug.datastructures import MultiDict
 from werkzeug.exceptions import NotFound
@@ -33,7 +31,7 @@ from indico.web.util import jsonify_data, jsonify_form, jsonify_template
 
 
 class RHManageSurveyQuestionnaire(RHManageSurveyBase):
-    """Manage the questionnaire of a survey (question overview page)"""
+    """Manage the questionnaire of a survey (question overview page)."""
 
     def _process(self):
         field_types = get_field_types()
@@ -43,7 +41,7 @@ class RHManageSurveyQuestionnaire(RHManageSurveyBase):
 
 
 class RHExportSurveyQuestionnaire(RHManageSurveyBase):
-    """Export the questionnaire to JSON format"""
+    """Export the questionnaire to JSON format."""
 
     def _process(self):
         sections = [section.to_dict() for section in self.survey.sections]
@@ -53,7 +51,7 @@ class RHExportSurveyQuestionnaire(RHManageSurveyBase):
 
 
 class RHImportSurveyQuestionnaire(RHManageSurveyBase):
-    """Import a questionnaire in JSON format"""
+    """Import a questionnaire in JSON format."""
 
     def _remove_false_values(self, data):
         # The forms consider a missing key as False (and a False value as True)
@@ -74,7 +72,7 @@ class RHImportSurveyQuestionnaire(RHManageSurveyBase):
 
     def _import_section(self, data):
         self._remove_false_values(data)
-        form = SectionForm(formdata=MultiDict(data.items()), csrf_enabled=False)
+        form = SectionForm(formdata=MultiDict(list(data.items())), csrf_enabled=False)
         if form.validate():
             section = add_survey_section(self.survey, form.data)
             for item in data['content']:
@@ -85,18 +83,18 @@ class RHImportSurveyQuestionnaire(RHManageSurveyBase):
     def _import_section_item(self, section, data):
         self._remove_false_values(data)
         if data['type'] == 'text':
-            form = TextForm(formdata=MultiDict(data.items()), csrf_enabled=False)
+            form = TextForm(formdata=MultiDict(list(data.items())), csrf_enabled=False)
             if form.validate():
                 add_survey_text(section, form.data)
             else:
                 raise ValueError('Invalid text item')
         elif data['type'] == 'question':
-            for key, value in data['field_data'].iteritems():
+            for key, value in data['field_data'].items():
                 if value is not None:
                     data[key] = value
             field_cls = get_field_types()[data['field_type']]
             data = field_cls.process_imported_data(data)
-            form = field_cls.create_config_form(formdata=MultiDict(data.items()), csrf_enabled=False)
+            form = field_cls.create_config_form(formdata=MultiDict(list(data.items())), csrf_enabled=False)
             if not form.validate():
                 raise ValueError('Invalid question: {}'.format('\n'.join(form.error_list)))
             add_survey_question(section, field_cls, form.data)
@@ -107,9 +105,9 @@ class RHImportSurveyQuestionnaire(RHManageSurveyBase):
             try:
                 data = json.load(form.json_file.data.stream)
                 self._import_data(data)
-            except ValueError as exception:
+            except ValueError as exc:
                 db.session.rollback()
-                logger.info('%s tried to import an invalid JSON file: %s', session.user, exception.message)
+                logger.info('%s tried to import an invalid JSON file: %s', session.user, exc)
                 flash(_("Invalid file selected."), 'error')
             else:
                 flash(_("The questionnaire has been imported."), 'success')
@@ -119,7 +117,7 @@ class RHImportSurveyQuestionnaire(RHManageSurveyBase):
 
 
 class RHManageSurveySectionBase(RHManageSurveysBase):
-    """Base class for RHs that deal with a specific survey section"""
+    """Base class for RHs that deal with a specific survey section."""
 
     normalize_url_spec = {
         'locators': {
@@ -130,13 +128,17 @@ class RHManageSurveySectionBase(RHManageSurveysBase):
 
     def _process_args(self):
         RHManageSurveysBase._process_args(self)
-        self.section = SurveySection.find_one(SurveySection.id == request.view_args['section_id'], ~Survey.is_deleted,
-                                              _join=SurveySection.survey, _eager=SurveySection.survey)
+        self.section = (SurveySection.query
+                        .filter(SurveySection.id == request.view_args['section_id'],
+                                ~Survey.is_deleted)
+                        .join(SurveySection.survey)
+                        .options(contains_eager(SurveySection.survey))
+                        .one())
         self.survey = self.section.survey
 
 
 class RHManageSurveyTextBase(RHManageSurveysBase):
-    """Base class for RHs that deal with a specific survey text item"""
+    """Base class for RHs that deal with a specific survey text item."""
 
     normalize_url_spec = {
         'locators': {
@@ -146,13 +148,17 @@ class RHManageSurveyTextBase(RHManageSurveysBase):
 
     def _process_args(self):
         RHManageSurveysBase._process_args(self)
-        self.text = SurveyText.find_one(SurveyText.id == request.view_args['text_id'], ~Survey.is_deleted,
-                                        _join=SurveyText.survey, _eager=SurveyText.survey)
+        self.text = (SurveyText.query
+                     .filter(SurveyText.id == request.view_args['text_id'],
+                             ~Survey.is_deleted)
+                     .join(SurveyText.survey)
+                     .options(contains_eager(SurveyText.survey))
+                     .one())
         self.survey = self.text.survey
 
 
 class RHManageSurveyQuestionBase(RHManageSurveysBase):
-    """Base class for RHs that deal with a specific survey question"""
+    """Base class for RHs that deal with a specific survey question."""
 
     normalize_url_spec = {
         'locators': {
@@ -162,14 +168,17 @@ class RHManageSurveyQuestionBase(RHManageSurveysBase):
 
     def _process_args(self):
         RHManageSurveysBase._process_args(self)
-        self.question = SurveyQuestion.find_one(SurveyQuestion.id == request.view_args['question_id'],
-                                                ~Survey.is_deleted,
-                                                _join=SurveyQuestion.survey, _eager=SurveyQuestion.survey)
+        self.question = (SurveyQuestion.query
+                         .filter(SurveyQuestion.id == request.view_args['question_id'],
+                                 ~Survey.is_deleted)
+                         .join(SurveyQuestion.survey)
+                         .options(contains_eager(SurveyQuestion.survey))
+                         .one())
         self.survey = self.question.survey
 
 
 class RHAddSurveySection(RHManageSurveyBase):
-    """Add a new section to a survey"""
+    """Add a new section to a survey."""
 
     def _process(self):
         form = SectionForm()
@@ -185,7 +194,7 @@ class RHAddSurveySection(RHManageSurveyBase):
 
 
 class RHEditSurveySection(RHManageSurveySectionBase):
-    """Edit a survey section"""
+    """Edit a survey section."""
 
     def _process(self):
         form = SectionForm(obj=FormDefaults(self.section))
@@ -204,7 +213,7 @@ class RHEditSurveySection(RHManageSurveySectionBase):
 
 
 class RHDeleteSurveySection(RHManageSurveySectionBase):
-    """Delete a survey section and all its questions"""
+    """Delete a survey section and all its questions."""
 
     def _process(self):
         db.session.delete(self.section)
@@ -219,7 +228,7 @@ class RHDeleteSurveySection(RHManageSurveySectionBase):
 
 
 class RHAddSurveyText(RHManageSurveySectionBase):
-    """Add a new text item to a survey"""
+    """Add a new text item to a survey."""
 
     def _process(self):
         form = TextForm()
@@ -231,7 +240,7 @@ class RHAddSurveyText(RHManageSurveySectionBase):
 
 
 class RHEditSurveyText(RHManageSurveyTextBase):
-    """Edit a survey text item"""
+    """Edit a survey text item."""
 
     def _process(self):
         form = TextForm(obj=FormDefaults(self.text))
@@ -245,7 +254,7 @@ class RHEditSurveyText(RHManageSurveyTextBase):
 
 
 class RHDeleteSurveyText(RHManageSurveyTextBase):
-    """Delete a survey text item"""
+    """Delete a survey text item."""
 
     def _process(self):
         db.session.delete(self.text)
@@ -256,7 +265,7 @@ class RHDeleteSurveyText(RHManageSurveyTextBase):
 
 
 class RHAddSurveyQuestion(RHManageSurveySectionBase):
-    """Add a new question to a survey"""
+    """Add a new question to a survey."""
 
     def _process(self):
         try:
@@ -285,7 +294,7 @@ class RHAddSurveyQuestion(RHManageSurveySectionBase):
 
 
 class RHEditSurveyQuestion(RHManageSurveyQuestionBase):
-    """Edit a survey question"""
+    """Edit a survey question."""
 
     def _process(self):
         form = self.question.field.create_config_form(obj=FormDefaults(self.question, **self.question.field_data))
@@ -300,7 +309,7 @@ class RHEditSurveyQuestion(RHManageSurveyQuestionBase):
 
 
 class RHDeleteSurveyQuestion(RHManageSurveyQuestionBase):
-    """Delete a survey question"""
+    """Delete a survey question."""
 
     def _process(self):
         db.session.delete(self.question)
@@ -311,28 +320,34 @@ class RHDeleteSurveyQuestion(RHManageSurveyQuestionBase):
 
 
 class RHSortSurveyItems(RHManageSurveyBase):
-    """Sort survey items/sections and/or move items them between sections"""
+    """Sort survey items/sections and/or move items them between sections."""
 
     def _sort_sections(self):
         sections = {section.id: section for section in self.survey.sections}
-        section_ids = map(int, request.form.getlist('section_ids'))
+        section_ids = request.form.getlist('section_ids', type=int)
         for position, section_id in enumerate(section_ids, 1):
             sections[section_id].position = position
         logger.info('Sections in %s reordered by %s', self.survey, session.user)
 
     def _sort_items(self):
-        section = SurveySection.find_one(survey=self.survey, id=request.form['section_id'],
-                                         _eager=SurveySection.children)
+        section = (SurveySection.query
+                   .filter_by(survey=self.survey, id=request.form['section_id'])
+                   .options(joinedload(SurveySection.children))
+                   .one())
         section_items = {x.id: x for x in section.children}
-        item_ids = map(int, request.form.getlist('item_ids'))
+        item_ids = request.form.getlist('item_ids', type=int)
         changed_section = None
         for position, item_id in enumerate(item_ids, 1):
             try:
                 section_items[item_id].position = position
             except KeyError:
                 # item is not in section, was probably moved
-                item = SurveyItem.find_one(SurveyItem.survey == self.survey, SurveyItem.id == item_id,
-                                           SurveyItem.type != SurveyItemType.section, _eager=SurveyItem.parent)
+                item = (SurveyItem.query
+                        .filter(SurveyItem.survey == self.survey,
+                                SurveyItem.id == item_id,
+                                SurveyItem.type != SurveyItemType.section)
+                        .options(joinedload(SurveyItem.parent))
+                        .one())
                 changed_section = item.parent
                 item.position = position
                 item.parent = section
@@ -354,8 +369,8 @@ class RHSortSurveyItems(RHManageSurveyBase):
 
 def _render_questionnaire_preview(survey):
     # load the survey once again with all the necessary data
-    survey = (Survey
-              .find(id=survey.id)
+    survey = (Survey.query
+              .filter_by(id=survey.id)
               .options(joinedload(Survey.sections).joinedload(SurveySection.children))
               .one())
     tpl = get_template_module('events/surveys/management/_questionnaire_preview.html')

@@ -1,5 +1,5 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
@@ -188,8 +188,8 @@ finishing_reservations = [
 
 def test_roombooking_notifications(mocker, create_user, create_room, create_reservation, freeze_time):
     rb_settings.set_multi(settings)
-    user_map = {key: create_user(id_, **data) for id_, (key, data) in enumerate(users.iteritems(), 1)}
-    room_map = {key: create_room(**data) for key, data in rooms.iteritems()}
+    user_map = {key: create_user(id_, **data) for id_, (key, data) in enumerate(users.items(), 1)}
+    room_map = {key: create_room(**data) for key, data in rooms.items()}
 
     notification_map = defaultdict(dict)
     end_notification_map = defaultdict(dict)

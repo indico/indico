@@ -1,11 +1,9 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
-
-from __future__ import unicode_literals
 
 import posixpath
 
@@ -14,7 +12,7 @@ from indico.core.db import db
 from indico.core.storage.models import StoredFileMixin
 from indico.util.fs import secure_filename
 from indico.util.locators import locator_property
-from indico.util.string import format_repr, return_ascii, strict_unicode
+from indico.util.string import format_repr, strict_str
 
 
 class PaperTemplate(StoredFileMixin, db.Model):
@@ -54,7 +52,6 @@ class PaperTemplate(StoredFileMixin, db.Model):
         )
     )
 
-    @return_ascii
     def __repr__(self):
         return format_repr(self, 'id', 'event_id', 'filename', content_type=None)
 
@@ -64,7 +61,7 @@ class PaperTemplate(StoredFileMixin, db.Model):
 
     def _build_storage_path(self):
         self.assign_id()
-        path_segments = ['event', strict_unicode(self.event.id), 'paper_templates']
+        path_segments = ['event', strict_str(self.event.id), 'paper_templates']
         filename = '{}_{}'.format(self.id, secure_filename(self.filename, 'file'))
         path = posixpath.join(*(path_segments + [filename]))
         return config.ATTACHMENT_STORAGE, path

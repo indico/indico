@@ -1,5 +1,5 @@
 // This file is part of Indico.
-// Copyright (C) 2002 - 2020 CERN
+// Copyright (C) 2002 - 2021 CERN
 //
 // Indico is free software; you can redistribute it and/or
 // modify it under the terms of the MIT License; see the
@@ -7,11 +7,13 @@
 
 import _ from 'lodash';
 import moment from 'moment';
-import React from 'react';
 import PropTypes from 'prop-types';
+import React from 'react';
 import {START_DATE, END_DATE} from 'react-dates/constants';
+
 import {DateRangePicker} from 'indico/react/components';
 import {serializeDate} from 'indico/utils/date';
+
 import {FinalField} from '../../forms';
 
 import './DatePeriodField.module.scss';

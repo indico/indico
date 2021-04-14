@@ -1,5 +1,5 @@
 // This file is part of Indico.
-// Copyright (C) 2002 - 2020 CERN
+// Copyright (C) 2002 - 2021 CERN
 //
 // Indico is free software; you can redistribute it and/or
 // modify it under the terms of the MIT License; see the
@@ -7,18 +7,19 @@
 
 import editReviewConditionURL from 'indico-url:event_editing.api_edit_review_condition';
 
-import React, {useState, useContext} from 'react';
 import PropTypes from 'prop-types';
+import React, {useState, useContext} from 'react';
 import {Icon, Label} from 'semantic-ui-react';
 
 import {RequestConfirm, TooltipIfTruncated} from 'indico/react/components';
-import {Translate} from 'indico/react/i18n';
 import {handleSubmitError} from 'indico/react/forms';
+import {Translate} from 'indico/react/i18n';
 import {handleAxiosError, indicoAxios} from 'indico/utils/axios';
 
-import ReviewConditionForm from './ReviewConditionForm';
 import {EditableType} from '../../../models';
+
 import ReviewConditionsContext from './context';
+import ReviewConditionForm from './ReviewConditionForm';
 
 import './ConditionInfo.module.scss';
 
@@ -26,7 +27,7 @@ export default function ConditionInfo({fileTypes, condId, editableType, onUpdate
   const [isEditing, setIsEditing] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const {eventId} = useContext(ReviewConditionsContext);
-  const url = editReviewConditionURL({confId: eventId, condition_id: condId, type: editableType});
+  const url = editReviewConditionURL({event_id: eventId, condition_id: condId, type: editableType});
 
   const deleteCondition = async () => {
     try {

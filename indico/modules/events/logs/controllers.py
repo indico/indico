@@ -1,11 +1,9 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
-
-from __future__ import unicode_literals
 
 from flask import jsonify, request
 
@@ -27,12 +25,12 @@ def _contains(field, text):
 
 def _get_metadata_query():
     return {k[len('meta.'):]: int(v) if v.isdigit() else v
-            for k, v in request.args.iteritems()
+            for k, v in request.args.items()
             if k.startswith('meta.')}
 
 
 class RHEventLogs(RHManageEventBase):
-    """Shows the modification/action log for the event"""
+    """Show the modification/action log for the event."""
 
     def _process(self):
         metadata_query = _get_metadata_query()

@@ -1,16 +1,14 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import unicode_literals
-
 from sqlalchemy.ext.declarative import declared_attr
 
 from indico.core.db import db
-from indico.util.string import format_repr, return_ascii
+from indico.util.string import format_repr
 
 
 class EditingTag(db.Model):
@@ -66,9 +64,8 @@ class EditingTag(db.Model):
     @property
     def verbose_title(self):
         """Properly formatted title, including tag code."""
-        return '{}: {}'.format(self.code, self.title)
+        return f'{self.code}: {self.title}'
 
-    @return_ascii
     def __repr__(self):
         return format_repr(self, 'id', 'event_id', system=False, _text=self.title)
 

@@ -1,11 +1,9 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
-
-from __future__ import unicode_literals
 
 from flask import session
 from jinja2.filters import do_filesizeformat
@@ -100,7 +98,7 @@ def _get_feature_definitions(sender, **kwargs):
 @signals.event_management.image_created.connect
 def _log_image_created(image, user, **kwargs):
     image.event.log(EventLogRealm.management, EventLogKind.positive, 'Layout',
-                    'Added image "{}"'.format(image.filename), user, data={
+                    f'Added image "{image.filename}"', user, data={
                         'File name': image.filename,
                         'File type': image.content_type,
                         'File size': do_filesizeformat(image.size)
@@ -110,7 +108,7 @@ def _log_image_created(image, user, **kwargs):
 @signals.event_management.image_deleted.connect
 def _log_image_deleted(image, user, **kwargs):
     image.event.log(EventLogRealm.management, EventLogKind.negative, 'Layout',
-                    'Deleted image "{}"'.format(image.filename), user, data={
+                    f'Deleted image "{image.filename}"', user, data={
                         'File name': image.filename
                     })
 

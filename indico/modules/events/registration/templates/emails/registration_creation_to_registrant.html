@@ -16,15 +16,13 @@
             {{ render_text_unpaid() }}
         {% endblock %}
     </p>
-    <p>
-        {% if registration.state.name == 'pending' %}
-            {{ registration.registration_form.message_pending | escape | urlize }}
-        {% elif registration.state.name == 'unpaid' %}
-            {{ registration.registration_form.message_unpaid | escape | urlize }}
-        {% elif registration.state.name == 'complete' %}
-            {{ registration.registration_form.message_complete | escape | urlize }}
-        {% endif %}
-    </p>
+    {% if registration.state.name == 'pending' %}
+        {{ registration.registration_form.message_pending | markdown }}
+    {% elif registration.state.name == 'unpaid' %}
+        {{ registration.registration_form.message_unpaid | markdown }}
+    {% elif registration.state.name == 'complete' %}
+        {{ registration.registration_form.message_complete | markdown }}
+    {% endif %}
 {%- endblock %}
 
 {% block registration_footer %}
@@ -47,6 +45,13 @@
         ({{ event.start_dt|format_datetime(timezone=event.tzinfo, locale='en_GB') }}
         -
         {{ event.end_dt|format_datetime(timezone=event.tzinfo, locale='en_GB') }})
+    {% endif %}
+{% endmacro %}
+
+
+{% macro render_rejection_reason() %}
+    {% if registration.state.name == 'rejected' and registration.rejection_reason %}
+        <br>Rejection reason: {{ registration.rejection_reason }}<br>
     {% endif %}
 {% endmacro %}
 

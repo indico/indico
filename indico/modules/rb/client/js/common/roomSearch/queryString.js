@@ -1,18 +1,19 @@
 // This file is part of Indico.
-// Copyright (C) 2002 - 2020 CERN
+// Copyright (C) 2002 - 2021 CERN
 //
 // Indico is free software; you can redistribute it and/or
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
+import {LOCATION_CHANGE} from 'connected-react-router';
 import _ from 'lodash';
 import {createQueryStringReducer, validator as v} from 'redux-router-querystring';
-import {LOCATION_CHANGE} from 'connected-react-router';
 
-import {history} from '../../history';
 import * as actions from '../../actions';
-import {initialRoomFilterStateFactory} from './reducers';
+import {history} from '../../history';
 import {boolStateField} from '../../util';
+
+import {initialRoomFilterStateFactory} from './reducers';
 
 export const rules = {
   recurrence: {

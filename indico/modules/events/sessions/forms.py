@@ -1,11 +1,9 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
-
-from __future__ import unicode_literals
 
 from datetime import timedelta
 
@@ -42,7 +40,7 @@ class SessionForm(IndicoForm):
 
     def __init__(self, *args, **kwargs):
         event = kwargs.pop('event')
-        super(SessionForm, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         if event.type != 'conference':
             del self.code
             del self.type
@@ -61,7 +59,7 @@ class SessionProtectionForm(IndicoForm):
     def __init__(self, *args, **kwargs):
         self.protected_object = session = kwargs.pop('session')
         self.event = session.event
-        super(SessionProtectionForm, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
     def validate_permissions(self, field):
         check_permissions(self.event, field)
@@ -75,7 +73,7 @@ class SessionBlockForm(IndicoForm):
 
     def __init__(self, *args, **kwargs):
         self.session_block = kwargs.pop('session_block', None)
-        super(SessionBlockForm, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
 
 class MeetingSessionBlockForm(IndicoForm):
@@ -87,7 +85,7 @@ class MeetingSessionBlockForm(IndicoForm):
     def __init__(self, *args, **kwargs):
         self.event = kwargs.pop('event')
         self.session_block = kwargs.pop('session_block', None)
-        super(MeetingSessionBlockForm, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
     @property
     def session_fields(self):
@@ -99,7 +97,7 @@ class MeetingSessionBlockForm(IndicoForm):
 
 
 class SessionTypeForm(IndicoForm):
-    """Form to create or edit a SessionType"""
+    """Form to create or edit a SessionType."""
 
     name = StringField(_("Name"), [DataRequired()])
     is_poster = BooleanField(_("Poster"), widget=SwitchWidget(),
@@ -109,7 +107,7 @@ class SessionTypeForm(IndicoForm):
     def __init__(self, *args, **kwargs):
         self.event = kwargs.pop('event')
         self.session_type = kwargs.get('obj')
-        super(SessionTypeForm, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
     def validate_name(self, field):
         query = SessionType.query.with_parent(self.event).filter(db.func.lower(SessionType.name) == field.data.lower())

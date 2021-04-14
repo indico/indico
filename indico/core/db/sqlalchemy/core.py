@@ -1,11 +1,9 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
-
-from __future__ import absolute_import
 
 import sys
 from contextlib import contextmanager
@@ -27,14 +25,14 @@ from indico.core.db.sqlalchemy.util.models import IndicoBaseQuery, IndicoModel
 
 
 class ConstraintViolated(Exception):
-    """Indicates that a constraint trigger was violated"""
+    """Indicate that a constraint trigger was violated."""
     def __init__(self, message, orig):
-        super(ConstraintViolated, self).__init__(message)
+        super().__init__(message)
         self.orig = orig
 
 
 def handle_sqlalchemy_database_error():
-    """Handle a SQLAlchemy DatabaseError exception nicely
+    """Handle a SQLAlchemy DatabaseError exception nicely.
 
     Currently this only takes care of custom INDX exception
     raised from constraint triggers.  It must be invoked from an
@@ -52,10 +50,10 @@ def handle_sqlalchemy_database_error():
         raise
     msg = exc.orig.diag.message_primary
     if exc.orig.diag.message_detail:
-        msg += ': {}'.format(exc.orig.diag.message_detail)
+        msg += f': {exc.orig.diag.message_detail}'
     if exc.orig.diag.message_hint:
-        msg += ' ({})'.format(exc.orig.diag.message_hint)
-    raise ConstraintViolated(msg, exc.orig), None, tb  # raise with original traceback
+        msg += f' ({exc.orig.diag.message_hint})'
+    raise ConstraintViolated(msg, exc.orig) from exc
 
 
 def _after_commit(*args, **kwargs):
@@ -66,16 +64,16 @@ def _after_commit(*args, **kwargs):
 
 class IndicoSQLAlchemy(SQLAlchemy):
     def __init__(self, *args, **kwargs):
-        super(IndicoSQLAlchemy, self).__init__(*args, **kwargs)
-        self.m = type(b'_Models', (object,), {})
+        super().__init__(*args, **kwargs)
+        self.m = type('_Models', (object,), {})
 
     def create_session(self, *args, **kwargs):
-        session = super(IndicoSQLAlchemy, self).create_session(*args, **kwargs)
+        session = super().create_session(*args, **kwargs)
         listen(session, 'after_commit', _after_commit)
         return session
 
     def enforce_constraints(self):
-        """Enables immedaite enforcing of deferred constraints.
+        """Enable immediate enforcing of deferred constraints.
 
         This should be done at the end of normal request processing
         and exceptions should be handled in a clean way that goes
@@ -98,7 +96,7 @@ class IndicoSQLAlchemy(SQLAlchemy):
 
     @contextmanager
     def tmp_session(self):
-        """Provides a contextmanager with a temporary SQLAlchemy session.
+        """Provide a contextmanager with a temporary SQLAlchemy session.
 
         This allows you to use SQLAlchemy e.g. in a `after_this_request`
         callback without having to worry about things like the ZODB extension,
@@ -133,7 +131,7 @@ def _before_create(target, connection, **kw):
     for schema in schemas:
         if not _schema_exists(connection, schema):
             CreateSchema(schema).execute(connection)
-            signals.db_schema_created.send(unicode(schema), connection=connection)
+            signals.db_schema_created.send(str(schema), connection=connection)
     # Create our custom functions
     create_unaccent_function(connection)
     create_natsort_function(connection)
@@ -156,7 +154,7 @@ def _mapper_configured(mapper, class_):
 
 
 def _column_names(constraint, table):
-    return '_'.join((c if isinstance(c, basestring) else c.name) for c in constraint.columns)
+    return '_'.join((c if isinstance(c, str) else c.name) for c in constraint.columns)
 
 
 def _unique_index(constraint, table):

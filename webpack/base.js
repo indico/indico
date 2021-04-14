@@ -1,5 +1,5 @@
 // This file is part of Indico.
-// Copyright (C) 2002 - 2020 CERN
+// Copyright (C) 2002 - 2021 CERN
 //
 // Indico is free software; you can redistribute it and/or
 // modify it under the terms of the MIT License; see the
@@ -9,33 +9,13 @@ import {createHash} from 'crypto';
 import fs from 'fs';
 import path from 'path';
 
-import chalk from 'chalk';
-import webpack from 'webpack';
-
+import autoprefixer from 'autoprefixer';
 import MiniCssExtractPlugin from 'mini-css-extract-plugin';
-import ManifestPlugin from 'webpack-manifest-plugin';
-import ProgressBarPlugin from 'progress-bar-webpack-plugin';
 import importOnce from 'node-sass-import-once';
+import postcssURL from 'postcss-url';
 import TerserPlugin from 'terser-webpack-plugin';
-
-class FixedMiniCssExtractPlugin extends MiniCssExtractPlugin {
-  // This very awful workaround prevents a weird `<undefined>.pop()` in the plugin
-  // that's caused by who-knows-what (NOT related to dynamic imports).
-  // See this github issue for details:
-  // https://github.com/webpack-contrib/mini-css-extract-plugin/issues/257
-  renderContentAsset(compilation, chunk, modules, requestShortener) {
-    const [chunkGroup] = chunk.groupsIterable;
-    let rv;
-    const getModuleIndex2 = chunkGroup.getModuleIndex2;
-    try {
-      chunkGroup.getModuleIndex2 = null;
-      rv = super.renderContentAsset(compilation, chunk, modules, requestShortener);
-    } finally {
-      chunkGroup.getModuleIndex2 = getModuleIndex2;
-    }
-    return rv;
-  }
-}
+import webpack from 'webpack';
+import {WebpackManifestPlugin} from 'webpack-manifest-plugin';
 
 function _resolveTheme(rootPath, indicoClientPath, filePath) {
   const indicoRelativePath = path.resolve(indicoClientPath, filePath);
@@ -179,7 +159,7 @@ export function webpackDefaults(env, config, bundles, isPlugin = false) {
   function buildSCSSLoader(cssLoaderOptions = {}) {
     return [
       {
-        loader: FixedMiniCssExtractPlugin.loader,
+        loader: MiniCssExtractPlugin.loader,
         options: {
           publicPath: config.build.distURL,
         },
@@ -203,13 +183,13 @@ export function webpackDefaults(env, config, bundles, isPlugin = false) {
         loader: 'postcss-loader',
         options: {
           sourceMap: true,
-          config: {
-            path: path.join(globalBuildConfig.rootPath, 'postcss.config.js'),
-            ctx: {
-              postCSSURLOptions: {
+          postcssOptions: {
+            plugins: [
+              autoprefixer,
+              postcssURL({
                 url: postCSSURLResolver,
-              },
-            },
+              }),
+            ],
           },
         },
       },
@@ -231,6 +211,7 @@ export function webpackDefaults(env, config, bundles, isPlugin = false) {
 
   return {
     devtool: 'source-map',
+    cache: true,
     context: config.build.clientPath,
     output: {
       path: config.build.distPath,
@@ -266,7 +247,7 @@ export function webpackDefaults(env, config, bundles, isPlugin = false) {
               test: /\.css$/,
               use: [
                 {
-                  loader: FixedMiniCssExtractPlugin.loader,
+                  loader: MiniCssExtractPlugin.loader,
                 },
                 {
                   loader: 'css-loader',
@@ -278,8 +259,8 @@ export function webpackDefaults(env, config, bundles, isPlugin = false) {
               test: /\.module\.scss$/,
               use: buildSCSSLoader({
                 modules: {
-                  context: path.resolve(globalBuildConfig.clientPath, '../../modules'),
-                  localIdentName: '[path]___[name]__[local]___[hash:base64:5]',
+                  localIdentContext: path.resolve(globalBuildConfig.clientPath, '../../modules'),
+                  localIdentName: '[path]___[name]__[local]___[contenthash:base64:5]',
                 },
                 importLoaders: 1,
               }),
@@ -293,26 +274,23 @@ export function webpackDefaults(env, config, bundles, isPlugin = false) {
       ],
     },
     plugins: [
-      new ManifestPlugin({
+      new WebpackManifestPlugin({
         fileName: 'manifest.json',
         publicPath: config.build.distURL,
       }),
       // Do not load moment locales (we'll load them explicitly)
       new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/),
-      new FixedMiniCssExtractPlugin({
+      new MiniCssExtractPlugin({
         filename: 'css/[name].[contenthash:8].css',
       }),
-      new ProgressBarPlugin({
-        format:
-          // eslint-disable-next-line prefer-template
-          chalk.cyan('Code being sent to the moon and back \u{1f680} \u{1f311}') +
-          '  [:bar] ' +
-          chalk.green.bold(':percent') +
-          ' (:elapsed seconds)',
+      new webpack.ProvidePlugin({
+        process: 'process/browser',
       }),
     ],
     resolve: {
       alias: [{name: 'indico', alias: path.join(indicoClientPath, 'js/')}],
+      // Webpack 5 does not include polyfills for node.js core modules by default
+      fallback: {path: require.resolve('path-browserify')},
       symlinks: false,
       extensions: ['.js', '.json', '.jsx'],
       modules: nodeModules,
@@ -320,7 +298,7 @@ export function webpackDefaults(env, config, bundles, isPlugin = false) {
     resolveLoader: {
       modules: nodeModules,
     },
-    externals: (context, request, callback) => {
+    externals: ({context, request}, callback) => {
       // tell webpack to make certain packages use window.jQuery (and not load it again)
       if (/^jquery$/.test(request) && /(selectize|fullcalendar)/.test(context)) {
         return callback(null, 'jQuery');
@@ -378,10 +356,6 @@ export function webpackDefaults(env, config, bundles, isPlugin = false) {
             /js\/mathjax(\/unpacked)?\/extensions\/a11y\/mathmaps\/.+\.js$/,
           ],
           extractComments: false,
-          // default options from webpack
-          cache: true,
-          parallel: true,
-          sourceMap: true,
         }),
       ],
     },

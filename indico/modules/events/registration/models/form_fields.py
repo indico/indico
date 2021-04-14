@@ -1,11 +1,9 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
-
-from __future__ import unicode_literals
 
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.event import listens_for
@@ -14,11 +12,11 @@ from werkzeug.datastructures import ImmutableDict
 from indico.core.db import db
 from indico.modules.events.registration.fields import get_field_types
 from indico.modules.events.registration.models.items import RegistrationFormItem, RegistrationFormItemType
-from indico.util.string import camelize_keys, return_ascii
+from indico.util.string import camelize_keys
 
 
 class RegistrationFormFieldData(db.Model):
-    """Description of a registration form field"""
+    """Description of a registration form field."""
 
     __tablename__ = 'form_field_data'
     __table_args__ = {'schema': 'event_registration'}
@@ -45,13 +43,12 @@ class RegistrationFormFieldData(db.Model):
     # - field (RegistrationFormItem.data_versions)
     # - registration_data (RegistrationData.field_data)
 
-    @return_ascii
     def __repr__(self):
-        return '<RegistrationFormFieldData({}, {})>'.format(self.id, self.field_id)
+        return f'<RegistrationFormFieldData({self.id}, {self.field_id})>'
 
 
 class RegistrationFormField(RegistrationFormItem):
-    """A registration form field"""
+    """A registration form field."""
 
     __mapper_args__ = {
         'polymorphic_identity': RegistrationFormItemType.field
@@ -88,13 +85,13 @@ class RegistrationFormField(RegistrationFormItem):
         base_dict = dict(self.versioned_data, **self.data)
         base_dict.update(is_enabled=self.is_enabled, title=self.title, is_required=self.is_required,
                          input_type=self.input_type, html_name=self.html_field_name,
-                         **super(RegistrationFormField, self).view_data)
+                         **super().view_data)
         base_dict.update(self.field_impl.view_data)
         return camelize_keys(base_dict)
 
     @property
     def html_field_name(self):
-        return 'field_{}'.format(self.id)
+        return f'field_{self.id}'
 
     def get_friendly_data(self, registration_data, **kwargs):
         return self.field_impl.get_friendly_data(registration_data, **kwargs)
@@ -110,7 +107,7 @@ class RegistrationFormPersonalDataField(RegistrationFormField):
 
     @property
     def view_data(self):
-        data = dict(super(RegistrationFormPersonalDataField, self).view_data,
+        data = dict(super().view_data,
                     field_is_required=self.personal_data_type.is_required,
                     field_is_personal_data=True)
         return camelize_keys(data)

@@ -1,21 +1,21 @@
 // This file is part of Indico.
-// Copyright (C) 2002 - 2020 CERN
+// Copyright (C) 2002 - 2021 CERN
 //
 // Indico is free software; you can redistribute it and/or
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
+import {push} from 'connected-react-router';
+import PropTypes from 'prop-types';
 import qs from 'qs';
 import React from 'react';
-import {bindActionCreators} from 'redux';
 import {connect} from 'react-redux';
-import PropTypes from 'prop-types';
-import {push} from 'connected-react-router';
+import {bindActionCreators} from 'redux';
 
+import {modalHandlers as bookingsModalHandlers} from '../common/bookings';
+import {modalHandlers as roomsModalHandlers} from '../common/rooms';
 import {modalHandlers as blockingModalHandlers} from '../modules/blockings';
 import {modalHandlers as bookRoomModalHandlers} from '../modules/bookRoom';
-import {modalHandlers as roomsModalHandlers} from '../common/rooms';
-import {modalHandlers as bookingsModalHandlers} from '../common/bookings';
 import * as globalSelectors from '../selectors';
 
 class ModalController extends React.PureComponent {

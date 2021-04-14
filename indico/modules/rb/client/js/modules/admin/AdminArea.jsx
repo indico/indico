@@ -1,27 +1,30 @@
 // This file is part of Indico.
-// Copyright (C) 2002 - 2020 CERN
+// Copyright (C) 2002 - 2021 CERN
 //
 // Indico is free software; you can redistribute it and/or
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-import React from 'react';
 import PropTypes from 'prop-types';
+import React from 'react';
+import {connect} from 'react-redux';
 import {Route} from 'react-router-dom';
 import {bindActionCreators} from 'redux';
-import {connect} from 'react-redux';
 import {Container, Grid} from 'semantic-ui-react';
+
 import {ConditionalRoute} from 'indico/react/util';
-import {selectors as userSelectors} from '../../common/user';
+
 import {selectors as mapSelectors} from '../../common/map';
-import AdminMenu from './AdminMenu';
-import AdminLocationRooms from './AdminLocationRooms';
-import EquipmentPage from './EquipmentPage';
-import AttributesPage from './AttributesPage';
-import LocationPage from './LocationPage';
-import SettingsPage from './SettingsPage';
-import MapAreasPage from './MapAreasPage';
+import {selectors as userSelectors} from '../../common/user';
+
 import * as adminActions from './actions';
+import AdminLocationRooms from './AdminLocationRooms';
+import AdminMenu from './AdminMenu';
+import AttributesPage from './AttributesPage';
+import EquipmentPage from './EquipmentPage';
+import LocationPage from './LocationPage';
+import MapAreasPage from './MapAreasPage';
+import SettingsPage from './SettingsPage';
 
 import './AdminArea.module.scss';
 

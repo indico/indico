@@ -1,11 +1,9 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
-
-from __future__ import unicode_literals
 
 from datetime import time
 
@@ -59,7 +57,7 @@ class SurveyForm(IndicoForm):
 
     def __init__(self, *args, **kwargs):
         self.event = kwargs.pop('event')
-        super(SurveyForm, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
     def validate_title(self, field):
         query = (Survey.query.with_parent(self.event)
@@ -67,7 +65,7 @@ class SurveyForm(IndicoForm):
                          Survey.title != field.object_data,
                          ~Survey.is_deleted))
         if query.count():
-            raise ValidationError(_('There is already a survey named "{}" on this event'.format(escape(field.data))))
+            raise ValidationError(_(f'There is already a survey named "{escape(field.data)}" on this event'))
 
     def post_validate(self):
         if not self.anonymous.data:
@@ -88,7 +86,7 @@ class ScheduleSurveyForm(IndicoForm):
         survey = kwargs.pop('survey')
         self.allow_reschedule_start = kwargs.pop('allow_reschedule_start')
         self.timezone = survey.event.timezone
-        super(ScheduleSurveyForm, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         if not survey.start_notification_sent or not self.allow_reschedule_start:
             del self.resend_start_notification
 
@@ -123,12 +121,12 @@ class InvitationForm(IndicoForm):
 
     def __init__(self, *args, **kwargs):
         event = kwargs.pop('event')
-        super(InvitationForm, self).__init__(*args, **kwargs)
-        self.from_address.choices = event.get_allowed_sender_emails().items()
+        super().__init__(*args, **kwargs)
+        self.from_address.choices = list(event.get_allowed_sender_emails().items())
         self.body.description = render_placeholder_info('survey-link-email', event=None, survey=None)
 
     def is_submitted(self):
-        return super(InvitationForm, self).is_submitted() and 'submitted' in request.form
+        return super().is_submitted() and 'submitted' in request.form
 
     def validate_body(self, field):
         missing = get_missing_placeholders('survey-link-email', field.data, event=None, survey=None)

@@ -1,39 +1,44 @@
 // This file is part of Indico.
-// Copyright (C) 2002 - 2020 CERN
+// Copyright (C) 2002 - 2021 CERN
 //
 // Indico is free software; you can redistribute it and/or
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-import uploadURL from 'indico-url:event_editing.api_upload';
 import createSubmitterRevisionURL from 'indico-url:event_editing.api_create_submitter_revision';
+import uploadURL from 'indico-url:event_editing.api_upload';
 
 import _ from 'lodash';
 import React from 'react';
-import {useSelector, useDispatch} from 'react-redux';
 import {Form as FinalForm} from 'react-final-form';
+import {useSelector, useDispatch} from 'react-redux';
 import {Form} from 'semantic-ui-react';
-import {Translate} from 'indico/react/i18n';
-import {FinalSubmitButton} from 'indico/react/forms';
+
 import UserAvatar from 'indico/modules/events/reviewing/components/UserAvatar';
+import {FinalSubmitButton} from 'indico/react/forms';
+import {Translate} from 'indico/react/i18n';
+
+import {createRevision} from './actions';
 import {FinalFileManager} from './FileManager';
 import {getFilesFromRevision} from './FileManager/util';
 import * as selectors from './selectors';
-import {createRevision} from './actions';
 
 export default function SubmitRevision() {
   const {eventId, contributionId, editableType} = useSelector(selectors.getStaticData);
   const fileTypes = useSelector(selectors.getFileTypes);
   const lastRevision = useSelector(selectors.getLastRevision);
   const dispatch = useDispatch();
-  const currentUser = {fullName: Indico.User.full_name, avatarBgColor: Indico.User.avatar_bg_color};
+  const currentUser = {
+    fullName: Indico.User.full_name,
+    avatarURL: Indico.User.avatar_url,
+  };
   const files = getFilesFromRevision(fileTypes, lastRevision);
 
   const submitRevision = async formData => {
     const rv = await dispatch(
       createRevision(
         createSubmitterRevisionURL({
-          confId: eventId,
+          event_id: eventId,
           contrib_id: contributionId,
           type: editableType,
           revision_id: lastRevision.id,
@@ -68,7 +73,7 @@ export default function SubmitRevision() {
                     fileTypes={fileTypes}
                     files={lastRevision.files}
                     uploadURL={uploadURL({
-                      confId: eventId,
+                      event_id: eventId,
                       contrib_id: contributionId,
                       type: editableType,
                     })}

@@ -1,5 +1,5 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
@@ -8,7 +8,7 @@
 from sqlalchemy.dialects.postgresql import JSONB
 
 from indico.core.db import db
-from indico.util.string import format_repr, return_ascii
+from indico.util.string import format_repr
 
 
 class RoomAttributeAssociation(db.Model):
@@ -44,9 +44,8 @@ class RoomAttributeAssociation(db.Model):
     # relationship backrefs:
     # - room (Room.attributes)
 
-    @return_ascii
     def __repr__(self):
-        return u'<RoomAttributeAssociation({0}, {1}, {2})>'.format(self.room_id, self.attribute.name, self.value)
+        return f'<RoomAttributeAssociation({self.room_id}, {self.attribute.name}, {self.value})>'
 
 
 class RoomAttribute(db.Model):
@@ -76,6 +75,5 @@ class RoomAttribute(db.Model):
     # relationship backrefs:
     # - room_associations (RoomAttributeAssociation.attribute)
 
-    @return_ascii
     def __repr__(self):
         return format_repr(self, 'id', 'name')

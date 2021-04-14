@@ -1,11 +1,9 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
-
-from __future__ import unicode_literals
 
 from flask import flash, jsonify, redirect, render_template, request, session
 
@@ -18,7 +16,6 @@ from indico.modules.events.reminders.util import make_reminder_email
 from indico.modules.events.reminders.views import WPReminders
 from indico.util.date_time import format_datetime
 from indico.util.i18n import _
-from indico.util.string import to_unicode
 from indico.web.flask.util import url_for
 from indico.web.forms.base import FormDefaults
 from indico.web.util import jsonify_data, jsonify_template
@@ -29,7 +26,7 @@ class RHRemindersBase(RHManageEventBase):
 
 
 class RHSpecificReminderBase(RHRemindersBase):
-    """Base class for pages related to a specific reminder"""
+    """Base class for pages related to a specific reminder."""
 
     normalize_url_spec = {
         'locators': {
@@ -43,7 +40,7 @@ class RHSpecificReminderBase(RHRemindersBase):
 
 
 class RHListReminders(RHRemindersBase):
-    """Shows the list of event reminders"""
+    """Show the list of event reminders."""
 
     def _process(self):
         reminders = EventReminder.query.with_parent(self.event).order_by(EventReminder.scheduled_dt.desc()).all()
@@ -51,7 +48,7 @@ class RHListReminders(RHRemindersBase):
 
 
 class RHDeleteReminder(RHSpecificReminderBase):
-    """Deletes a reminder"""
+    """Delete a reminder."""
 
     def _process(self):
         if self.reminder.is_sent:
@@ -60,19 +57,19 @@ class RHDeleteReminder(RHSpecificReminderBase):
             db.session.delete(self.reminder)
             logger.info('Reminder deleted by %s: %s', session.user, self.reminder)
             flash(_("The reminder at {} has been deleted.")
-                  .format(to_unicode(format_datetime(self.reminder.scheduled_dt))), 'success')
+                  .format(format_datetime(self.reminder.scheduled_dt)), 'success')
         return redirect(url_for('.list', self.event))
 
 
 def _send_reminder(reminder):
-    """Send reminder immediately"""
+    """Send reminder immediately."""
     reminder.send()
     logger.info('Reminder sent by %s: %s', session.user, reminder)
     flash(_('The reminder has been sent.'), 'success')
 
 
 class RHEditReminder(RHSpecificReminderBase):
-    """Modifies an existing reminder"""
+    """Modify an existing reminder."""
 
     def _get_defaults(self):
         reminder = self.reminder
@@ -97,7 +94,7 @@ class RHEditReminder(RHSpecificReminderBase):
             else:
                 logger.info('Reminder modified by %s: %s', session.user, reminder)
                 flash(_("The reminder at {} has been modified.")
-                      .format(to_unicode(format_datetime(reminder.scheduled_dt))), 'success')
+                      .format(format_datetime(reminder.scheduled_dt)), 'success')
             return jsonify_data(flash=False)
 
         return jsonify_template('events/reminders/edit_reminder.html', event=self.event, reminder=reminder,
@@ -105,10 +102,10 @@ class RHEditReminder(RHSpecificReminderBase):
 
 
 class RHAddReminder(RHRemindersBase):
-    """Adds a new reminder"""
+    """Add a new reminder."""
 
     def _process(self):
-        form = ReminderForm(event=self.event, schedule_type='relative')
+        form = ReminderForm(event=self.event, schedule_type='relative', attach_ical=True)
         if form.validate_on_submit():
             reminder = EventReminder(creator=session.user, event=self.event)
             form.populate_obj(reminder, existing_only=True)
@@ -119,14 +116,14 @@ class RHAddReminder(RHRemindersBase):
             else:
                 logger.info('Reminder created by %s: %s', session.user, reminder)
                 flash(_("A reminder at {} has been created.")
-                      .format(to_unicode(format_datetime(reminder.scheduled_dt))), 'success')
+                      .format(format_datetime(reminder.scheduled_dt)), 'success')
             return jsonify_data(flash=False)
 
         return jsonify_template('events/reminders/edit_reminder.html', event=self.event, reminder=None, form=form)
 
 
 class RHPreviewReminder(RHRemindersBase):
-    """Previews the email for a reminder"""
+    """Preview the email for a reminder."""
 
     def _process(self):
         include_summary = request.form.get('include_summary') == '1'

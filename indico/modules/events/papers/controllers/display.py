@@ -1,11 +1,9 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
-
-from __future__ import unicode_literals
 
 from flask import request, session
 from werkzeug.exceptions import Forbidden
@@ -57,7 +55,7 @@ class RHPaperTimeline(RHPaperBase):
 
 
 class RHDownloadPaperFile(RHPaperBase):
-    """Download a paper file"""
+    """Download a paper file."""
 
     normalize_url_spec = {
         'locators': {
@@ -90,7 +88,7 @@ class RHReviewingArea(RHPapersBase):
 
 
 class RHCallForPapers(RHPapersBase):
-    """Show the main CFP page"""
+    """Show the main CFP page."""
 
     def _check_access(self):
         if not session.user:
@@ -112,7 +110,7 @@ class RHCallForPapers(RHPapersBase):
 
 
 class RHSelectContribution(RHCallForPapers):
-    """Select a contribution for which the user wants to submit a paper"""
+    """Select a contribution for which the user wants to submit a paper."""
 
     def _process(self):
         return jsonify_template('events/papers/display/select_contribution.html', contributions=self.contribs)

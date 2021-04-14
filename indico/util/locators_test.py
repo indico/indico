@@ -1,5 +1,5 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
@@ -18,12 +18,12 @@ def test_get_locator_none():
 
 
 def test_get_locator():
-    class _Prop(object):
+    class _Prop:
         @property
         def locator(self):
             return {'foo': 'bar'}
 
-    class _Locator(object):
+    class _Locator:
         @locator_property
         def locator(self):
             return {'foo': 'bar'}
@@ -34,7 +34,7 @@ def test_get_locator():
 
 
 def test_locator_property():
-    class _Test(object):
+    class _Test:
         @locator_property
         def locator(self):
             return {'foo': 'bar'}
@@ -53,7 +53,7 @@ def test_locator_property():
 
 
 def test_locator_property_lazy():
-    class _Test(object):
+    class _Test:
         @locator_property
         def locator(self):
             accessed.append('locator')
@@ -85,7 +85,7 @@ def test_locator_property_lazy():
 
 def test_locator_property_nested():
     with pytest.raises(AttributeError):
-        class _Test(object):
+        class _Test:
             @locator_property
             def locator(self):
                 pass

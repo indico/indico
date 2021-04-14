@@ -1,11 +1,9 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
-
-from __future__ import unicode_literals
 
 from uuid import uuid4
 
@@ -18,9 +16,9 @@ from indico.core.db import db
 from indico.core.db.sqlalchemy import PyIntEnum
 from indico.modules.users.models.users import UserTitle
 from indico.util.decorators import strict_classproperty
+from indico.util.enum import IndicoEnum
 from indico.util.i18n import orig_string
-from indico.util.string import camelize_keys, format_repr, return_ascii
-from indico.util.struct.enum import IndicoEnum
+from indico.util.string import camelize_keys, format_repr
 
 
 def _get_next_position(context):
@@ -28,7 +26,10 @@ def _get_next_position(context):
     regform_id = context.current_parameters['registration_form_id']
     parent_id = context.current_parameters['parent_id']
     res = (db.session.query(db.func.max(RegistrationFormItem.position))
-           .filter_by(parent_id=parent_id, registration_form_id=regform_id, is_deleted=False, is_enabled=True)
+           .filter(RegistrationFormItem.parent_id == parent_id,
+                   RegistrationFormItem.registration_form_id == regform_id,
+                   ~RegistrationFormItem.is_deleted,
+                   RegistrationFormItem.is_enabled)
            .one())
     return (res[0] or 0) + 1
 
@@ -43,7 +44,9 @@ class RegistrationFormItemType(int, IndicoEnum):
 
 # We are not using a RichIntEnum since one of the instances is named "title".
 class PersonalDataType(int, IndicoEnum):
-    """Description of the personal data items that exist on every registration form"""
+    """
+    Description of the personal data items that exist on every registration form.
+    """
 
     __titles__ = [None, 'Email Address', 'First Name', 'Last Name', 'Affiliation', 'Title', 'Address',
                   'Phone Number', 'Country', 'Position']
@@ -68,16 +71,6 @@ class PersonalDataType(int, IndicoEnum):
                       'places_limit': 0,
                       'is_enabled': True}
         return [
-            (cls.title, {
-                'title': cls.title.get_title(),
-                'input_type': 'single_choice',
-                'data': {
-                    'item_type': 'dropdown',
-                    'with_extra_slots': False,
-                    'choices': [dict(title_item, id=unicode(uuid4()), caption=orig_string(t.title))
-                                for t in UserTitle if t]
-                }
-            }),
             (cls.first_name, {
                 'title': cls.first_name.get_title(),
                 'input_type': 'text'
@@ -119,6 +112,18 @@ class PersonalDataType(int, IndicoEnum):
                 'is_enabled': False,
                 'position': 1003
             }),
+            (cls.title, {
+                'title': cls.title.get_title(),
+                'input_type': 'single_choice',
+                'is_enabled': False,
+                'position': 1004,
+                'data': {
+                    'item_type': 'dropdown',
+                    'with_extra_slots': False,
+                    'choices': [dict(title_item, id=str(uuid4()), caption=orig_string(t.title))
+                                for t in UserTitle if t]
+                }
+            }),
         ]
 
     @property
@@ -138,14 +143,14 @@ class PersonalDataType(int, IndicoEnum):
 
 
 class RegistrationFormItem(db.Model):
-    """Generic registration form item"""
+    """Generic registration form item."""
 
     __tablename__ = 'form_items'
     __table_args__ = (
         db.CheckConstraint("(input_type IS NULL) = (type NOT IN ({t.field}, {t.field_pd}))"
                            .format(t=RegistrationFormItemType),
                            name='valid_input'),
-        db.CheckConstraint("NOT is_manager_only OR type = {type}".format(type=RegistrationFormItemType.section),
+        db.CheckConstraint(f"NOT is_manager_only OR type = {RegistrationFormItemType.section}",
                            name='valid_manager_only'),
         db.CheckConstraint("(type IN ({t.section}, {t.section_pd})) = (parent_id IS NULL)"
                            .format(t=RegistrationFormItemType),
@@ -156,7 +161,7 @@ class RegistrationFormItem(db.Model):
         db.CheckConstraint("NOT is_deleted OR (type NOT IN ({t.section_pd}, {t.field_pd}))"
                            .format(t=RegistrationFormItemType),
                            name='pd_not_deleted'),
-        db.CheckConstraint("is_enabled OR type != {type}".format(type=RegistrationFormItemType.section_pd),
+        db.CheckConstraint(f"is_enabled OR type != {RegistrationFormItemType.section_pd}",
                            name='pd_section_enabled'),
         db.CheckConstraint("is_enabled OR type != {type} OR personal_data_type NOT IN "
                            "({pt.email}, {pt.first_name}, {pt.last_name})"
@@ -170,9 +175,9 @@ class RegistrationFormItem(db.Model):
                            .format(t=RegistrationFormItemType),
                            name='current_data_id_only_field'),
         db.Index('ix_uq_form_items_pd_section', 'registration_form_id', unique=True,
-                 postgresql_where=db.text('type = {type}'.format(type=RegistrationFormItemType.section_pd))),
+                 postgresql_where=db.text(f'type = {RegistrationFormItemType.section_pd}')),
         db.Index('ix_uq_form_items_pd_field', 'registration_form_id', 'personal_data_type', unique=True,
-                 postgresql_where=db.text('type = {type}'.format(type=RegistrationFormItemType.field_pd))),
+                 postgresql_where=db.text(f'type = {RegistrationFormItemType.field_pd}')),
         {'schema': 'event_registration'}
     )
     __mapper_args__ = {
@@ -309,7 +314,7 @@ class RegistrationFormItem(db.Model):
 
     @property
     def view_data(self):
-        """Returns object with data that Angular can understand"""
+        """Return object with data that Angular can understand."""
         return dict(id=self.id, description=self.description, position=self.position)
 
     @hybrid_property
@@ -342,14 +347,13 @@ class RegistrationFormItem(db.Model):
                    .exists())
         return cls.is_enabled & ~cls.is_deleted & ((cls.parent_id == None) | query)  # noqa
 
-    @return_ascii
     def __repr__(self):
         return format_repr(self, 'id', 'registration_form_id', is_enabled=True, is_deleted=False, is_manager_only=False,
                            _text=self.title)
 
 
 class RegistrationFormSection(RegistrationFormItem):
-    """Registration form section that can contain fields and text"""
+    """Registration form section that can contain fields and text."""
 
     __mapper_args__ = {
         'polymorphic_identity': RegistrationFormItemType.section
@@ -369,7 +373,7 @@ class RegistrationFormSection(RegistrationFormItem):
 
     @property
     def own_data(self):
-        field_data = dict(super(RegistrationFormSection, self).view_data,
+        field_data = dict(super().view_data,
                           enabled=self.is_enabled,
                           title=self.title,
                           is_manager_only=self.is_manager_only,
@@ -390,13 +394,13 @@ class RegistrationFormPersonalDataSection(RegistrationFormSection):
 
     @property
     def view_data(self):
-        field_data = dict(super(RegistrationFormPersonalDataSection, self).view_data, is_personal_data=True)
+        field_data = dict(super().view_data, is_personal_data=True)
         del field_data['isPersonalData']
         return camelize_keys(field_data)
 
 
 class RegistrationFormText(RegistrationFormItem):
-    """Text to be displayed in registration form sections"""
+    """Text to be displayed in registration form sections."""
 
     __mapper_args__ = {
         'polymorphic_identity': RegistrationFormItemType.text
@@ -408,6 +412,6 @@ class RegistrationFormText(RegistrationFormItem):
 
     @property
     def view_data(self):
-        field_data = dict(super(RegistrationFormText, self).view_data, is_enabled=self.is_enabled, input_type='label',
+        field_data = dict(super().view_data, is_enabled=self.is_enabled, input_type='label',
                           title=self.title)
         return camelize_keys(field_data)

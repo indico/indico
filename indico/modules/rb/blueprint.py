@@ -1,11 +1,9 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
-
-from __future__ import unicode_literals
 
 import json
 
@@ -121,22 +119,22 @@ _bp.add_url_rule('/api/admin/rooms/<int:room_id>/photo', 'admin_room_photo', adm
 _bp.add_url_rule('/api/admin/map-areas', 'admin_map_areas', admin.RHMapAreas, methods=('POST', 'PATCH', 'DELETE'))
 
 # Event linking
-_bp.add_url_rule('!/event/<confId>/manage/rooms/', 'event_booking_list', event.RHEventBookingList)
-_bp.add_url_rule('!/event/<confId>/manage/rooms/linking/contributions', 'event_linkable_contributions',
+_bp.add_url_rule('!/event/<int:event_id>/manage/rooms/', 'event_booking_list', event.RHEventBookingList)
+_bp.add_url_rule('!/event/<int:event_id>/manage/rooms/linking/contributions', 'event_linkable_contributions',
                  event.RHListLinkableContributions)
-_bp.add_url_rule('!/event/<confId>/manage/rooms/linking/session-blocks', 'event_linkable_session_blocks',
+_bp.add_url_rule('!/event/<int:event_id>/manage/rooms/linking/session-blocks', 'event_linkable_session_blocks',
                  event.RHListLinkableSessionBlocks)
 
 
 # Deep/quick links
 @_bp.route('/room/<int:room_id>')
 def room_link(room_id):
-    return redirect(url_for('rb.roombooking', modal='room-details:{}'.format(room_id)))
+    return redirect(url_for('rb.roombooking', modal=f'room-details:{room_id}'))
 
 
 @_bp.route('/booking/<int:booking_id>')
 def booking_link(booking_id):
-    return redirect(url_for('rb.roombooking', modal='booking-details:{}'.format(booking_id)))
+    return redirect(url_for('rb.roombooking', modal=f'booking-details:{booking_id}'))
 
 
 @_bp.route('/booking/<int:booking_id>/cancel/<date>')
@@ -152,7 +150,7 @@ def my_bookings_link():
 
 @_bp.route('/blocking/<int:blocking_id>')
 def blocking_link(blocking_id):
-    return redirect(url_for('rb.roombooking', path='blockings', modal='blocking-details:{}'.format(blocking_id)))
+    return redirect(url_for('rb.roombooking', path='blockings', modal=f'blocking-details:{blocking_id}'))
 
 
 _compat_bp = IndicoBlueprint('compat_rb', __name__, url_prefix='/rooms')

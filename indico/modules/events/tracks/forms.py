@@ -1,11 +1,9 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
-
-from __future__ import unicode_literals
 
 from wtforms.ext.sqlalchemy.fields import QuerySelectField
 from wtforms.fields import StringField
@@ -31,7 +29,7 @@ class TrackForm(IndicoForm):
 
     def __init__(self, *args, **kwargs):
         event = kwargs.pop('event')
-        super(TrackForm, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self.default_session.query = Session.query.with_parent(event)
         self.track_group.query = TrackGroup.query.with_parent(event)
 

@@ -1,11 +1,9 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
-
-from __future__ import unicode_literals
 
 from hashlib import sha1
 
@@ -16,11 +14,10 @@ from indico.modules.events.settings import EventSettingsProxy
 from indico.util.caching import make_hashable, memoize_request
 from indico.util.decorators import cached_classproperty, classproperty
 from indico.util.i18n import _
-from indico.util.string import return_ascii
 from indico.web.flask.templating import get_overridable_template_name, get_template_module
 
 
-class AgreementPersonInfo(object):
+class AgreementPersonInfo:
     def __init__(self, name=None, email=None, user=None, data=None):
         if user:
             if not name:
@@ -35,21 +32,20 @@ class AgreementPersonInfo(object):
         self.user = user
         self.data = data
 
-    @return_ascii
     def __repr__(self):
-        return '<AgreementPersonInfo({}, {}, {})>'.format(self.name, self.email, self.identifier)
+        return f'<AgreementPersonInfo({self.name}, {self.email}, {self.identifier})>'
 
     @property
     def identifier(self):
         data_string = None
         if self.data:
-            data_string = '-'.join('{}={}'.format(k, make_hashable(v)) for k, v in sorted(self.data.viewitems()))
-        identifier = '{}:{}'.format(self.email, data_string or None)
-        return sha1(identifier).hexdigest()
+            data_string = '-'.join(f'{k}={make_hashable(v)}' for k, v in sorted(self.data.items()))
+        identifier = f'{self.email}:{data_string or None}'
+        return sha1(identifier.encode()).hexdigest()
 
 
-class AgreementDefinitionBase(object):
-    """Base class for agreement definitions"""
+class AgreementDefinitionBase:
+    """Base class for agreement definitions."""
 
     #: unique name of the agreement definition
     name = None
@@ -78,27 +74,28 @@ class AgreementDefinitionBase(object):
     @cached_classproperty
     @classmethod
     def event_settings(cls):
-        return EventSettingsProxy('agreement_{}'.format(cls.name), cls.default_event_settings)
+        return EventSettingsProxy(f'agreement_{cls.name}', cls.default_event_settings)
 
     @classmethod
     def can_access_api(cls, user, event):
-        """Checks if a user can list the agreements for an event"""
+        """Check if a user can list the agreements for an event."""
         return event.can_manage(user)
 
     @classmethod
     def extend_api_data(cls, event, person, agreement, data):  # pragma: no cover
-        """Extends the data returned in the HTTP API
+        """Extend the data returned in the HTTP API.
 
         :param event: the event
         :param person: the :class:`AgreementPersonInfo`
         :param agreement: the :class:`Agreement` if available
         :param data: a dict containing the default data for the agreement
         """
-        pass
 
     @classmethod
     def get_email_body_template(cls, event, **kwargs):
-        """Returns the template of the email body for this agreement definition"""
+        """
+        Return the template of the email body for this agreement definition.
+        """
         template_name = cls.email_body_template_name or 'emails/agreement_default_body.html'
         template_path = get_overridable_template_name(template_name, cls.plugin, 'events/agreements/')
         return get_template_module(template_path, event=event)
@@ -106,7 +103,9 @@ class AgreementDefinitionBase(object):
     @classmethod
     @memoize_request
     def get_people(cls, event):
-        """Returns a dictionary of :class:`AgreementPersonInfo` required to sign agreements"""
+        """
+        Return a dictionary of :class:`AgreementPersonInfo` required to sign agreements.
+        """
         people = cls.iter_people(event)
         if people is None:
             return {}
@@ -114,20 +113,22 @@ class AgreementDefinitionBase(object):
 
     @classmethod
     def get_people_not_notified(cls, event):
-        """Returns a dictionary of :class:`AgreementPersonInfo` yet to be notified"""
+        """
+        Return a dictionary of :class:`AgreementPersonInfo` yet to be notified.
+        """
         people = cls.get_people(event)
         sent_agreements = {a.identifier for a in event.agreements.filter_by(type=cls.name)}
         return {k: v for k, v in people.items() if v.identifier not in sent_agreements}
 
     @classmethod
     def get_stats_for_signed_agreements(cls, event):
-        """Returns a digest of signed agreements on an event
+        """Return a digest of signed agreements on an event.
 
         :param event: the event
         :return: (everybody_signed, num_accepted, num_rejected)
         """
         people = cls.get_people(event)
-        identifiers = [p.identifier for p in people.itervalues()]
+        identifiers = [p.identifier for p in people.values()]
         query = event.agreements.filter(Agreement.type == cls.name, Agreement.identifier.in_(identifiers))
         num_accepted = query.filter(Agreement.accepted).count()
         num_rejected = query.filter(Agreement.rejected).count()
@@ -136,12 +137,12 @@ class AgreementDefinitionBase(object):
 
     @classmethod
     def is_active(cls, event):
-        """Checks if the agreement type is active for a given event"""
+        """Check if the agreement type is active for a given event."""
         return bool(cls.get_people(event))
 
     @classmethod
     def is_agreement_orphan(cls, event, agreement):
-        """Checks if the agreement no longer has a corresponding person info record"""
+        """Check if the agreement no longer has a corresponding person info record."""
         return agreement.identifier not in cls.get_people(event)
 
     @classmethod
@@ -152,7 +153,7 @@ class AgreementDefinitionBase(object):
 
     @classmethod
     def render_data(cls, event, data):  # pragma: no cover
-        """Returns extra data to display in the agreement list
+        """Return extra data to display in the agreement list.
 
         If you want a column to be rendered as HTML, use a :class:`~markupsafe.Markup`
         object instead of a plain string.
@@ -165,20 +166,17 @@ class AgreementDefinitionBase(object):
 
     @classmethod
     def handle_accepted(cls, agreement):  # pragma: no cover
-        """Handles logic on agreement accepted"""
-        pass
+        """Handle logic on agreement accepted."""
 
     @classmethod
     def handle_rejected(cls, agreement):  # pragma: no cover
-        """Handles logic on agreement rejected"""
-        pass
+        """Handle logic on agreement rejected."""
 
     @classmethod
     def handle_reset(cls, agreement):  # pragma: no cover
-        """Handles logic on agreement reset"""
-        pass
+        """Handle logic on agreement reset."""
 
     @classmethod
     def iter_people(cls, event):  # pragma: no cover
-        """Yields :class:`AgreementPersonInfo` required to sign agreements"""
+        """Yield :class:`AgreementPersonInfo` required to sign agreements."""
         raise NotImplementedError

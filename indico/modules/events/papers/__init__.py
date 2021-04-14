@@ -1,5 +1,5 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
@@ -11,7 +11,6 @@ The "inputs" of this module are the conference papers, which will be uploaded
 by the corresponding authors/submitters.
 """
 
-from __future__ import unicode_literals
 
 from flask import session
 

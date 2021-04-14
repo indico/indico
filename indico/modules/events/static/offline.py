@@ -1,5 +1,5 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
@@ -32,13 +32,14 @@ from indico.modules.attachments.models.folders import AttachmentFolder
 from indico.modules.events.contributions.controllers.display import (RHAuthorList, RHContributionAuthor,
                                                                      RHContributionDisplay, RHContributionList,
                                                                      RHSpeakerList, RHSubcontributionDisplay)
-from indico.modules.events.contributions.util import get_contribution_ical_file
+from indico.modules.events.contributions.ical import contribution_to_ical
 from indico.modules.events.layout.models.menu import MenuEntryType
 from indico.modules.events.layout.util import menu_entries_for_event
 from indico.modules.events.models.events import EventType
 from indico.modules.events.registration.controllers.display import RHParticipantList
 from indico.modules.events.sessions.controllers.display import RHDisplaySession
-from indico.modules.events.sessions.util import get_session_ical_file, get_session_timetable_pdf
+from indico.modules.events.sessions.ical import session_to_ical
+from indico.modules.events.sessions.util import get_session_timetable_pdf
 from indico.modules.events.static.util import collect_static_files, override_request_endpoint, rewrite_css_urls
 from indico.modules.events.timetable.controllers.display import RHTimetable
 from indico.modules.events.timetable.util import get_timetable_offline_pdf_generator
@@ -53,9 +54,9 @@ from indico.web.rh import RH
 def create_static_site(rh, event):
     """Create a static (offline) version of an Indico event.
 
-       :param rh: Request handler object
-       :param event: Event in question
-       :return: Path to the resulting ZIP file
+    :param rh: Request handler object
+    :param event: Event in question
+    :return: Path to the resulting ZIP file
     """
     try:
         g.static_site = True
@@ -71,7 +72,7 @@ def _normalize_path(path):
     return secure_filename(strip_tags(path))
 
 
-class StaticEventCreator(object):
+class StaticEventCreator:
     """Define process which generates a static (offline) version of an Indico event."""
 
     def __init__(self, rh, event):
@@ -79,18 +80,19 @@ class StaticEventCreator(object):
         self.event = event
         self._display_tz = self.event.display_tzinfo.zone
         self._zip_file = None
-        self._content_dir = _normalize_path(u'OfflineWebsite-{}'.format(event.title))
+        self._content_dir = _normalize_path(f'OfflineWebsite-{event.title}')
         self._web_dir = os.path.join(get_root_path('indico'), 'web')
         self._static_dir = os.path.join(self._web_dir, 'static')
 
     def create(self):
         """Trigger the creation of a ZIP file containing the site."""
-        temp_file = NamedTemporaryFile(suffix='indico.tmp', dir=config.TEMP_DIR)
+        temp_file = NamedTemporaryFile(prefix=f'static-{self.event.id}-', suffix='.zip', dir=config.TEMP_DIR,
+                                       delete=False)
         self._zip_file = ZipFile(temp_file.name, 'w', allowZip64=True)
 
         with collect_static_files() as used_assets:
             # create the home page html
-            html = self._create_home().encode('utf-8')
+            html = self._create_home()
 
             # Mathjax plugins can only be known in runtime
             self._copy_folder(os.path.join(self._content_dir, 'static', 'dist', 'js', 'mathjax'),
@@ -112,17 +114,15 @@ class StaticEventCreator(object):
         if config.CUSTOMIZATION_DIR:
             self._copy_customization_files(used_assets)
 
-        temp_file.delete = False
         chmod_umask(temp_file.name)
         self._zip_file.close()
         return temp_file.name
 
     def _write_generated_js(self):
-        global_js = generate_global_file().encode('utf-8')
-        user_js = generate_user_file().encode('utf-8')
-        i18n_js = u"window.TRANSLATIONS = {};".format(generate_i18n_file(session.lang)).encode('utf-8')
-        react_i18n_js = u"window.REACT_TRANSLATIONS = {};".format(
-            generate_i18n_file(session.lang, react=True)).encode('utf-8')
+        global_js = generate_global_file()
+        user_js = generate_user_file()
+        i18n_js = f"window.TRANSLATIONS = {generate_i18n_file(session.lang)};"
+        react_i18n_js = f"window.REACT_TRANSLATIONS = {generate_i18n_file(session.lang, react=True)};"
         gen_path = os.path.join(self._content_dir, 'assets')
         self._zip_file.writestr(os.path.join(gen_path, 'js-vars', 'global.js'), global_js)
         self._zip_file.writestr(os.path.join(gen_path, 'js-vars', 'user.js'), user_js)
@@ -206,7 +206,7 @@ class StaticEventCreator(object):
                     continue
                 if attachment.type == AttachmentType.file:
                     dst_path = posixpath.join(self._content_dir, "material", type_,
-                                              "{}-{}".format(attachment.id, attachment.file.filename))
+                                              f"{attachment.id}-{attachment.file.filename}")
                     with attachment.file.get_local_path() as file_path:
                         self._copy_file(dst_path, file_path)
 
@@ -224,7 +224,7 @@ class StaticEventCreator(object):
 
 class StaticConferenceCreator(StaticEventCreator):
     def __init__(self, rh, event):
-        super(StaticConferenceCreator, self).__init__(rh, event)
+        super().__init__(rh, event)
         # Menu entries we want to include in the offline version.
         # Those which are backed by a WP class get their name from that class;
         # the others are simply hardcoded.
@@ -240,7 +240,7 @@ class StaticConferenceCreator(StaticEventCreator):
             RHTimetable: WPStaticTimetable,
             RHDisplayTracks: WPStaticConferenceProgram
         }
-        for rh_cls, wp in rhs.viewitems():
+        for rh_cls, wp in rhs.items():
             rh = rh_cls()
             rh.view_class = wp
             if rh_cls is RHTimetable:
@@ -255,7 +255,7 @@ class StaticConferenceCreator(StaticEventCreator):
             for image_file in used_images:
                 with image_file.open() as f:
                     self._zip_file.writestr(os.path.join(self._content_dir,
-                                                         'images/{}-{}'.format(image_file.id, image_file.filename)),
+                                                         f'images/{image_file.id}-{image_file.filename}'),
                                             f.read())
         if self.event.has_logo:
             self._zip_file.writestr(os.path.join(self._content_dir, 'logo.png'), self.event.logo)
@@ -298,7 +298,7 @@ class StaticConferenceCreator(StaticEventCreator):
     def _get_builtin_page(self, entry):
         obj = self._menu_offline_items.get(entry.name)
         if isinstance(obj, RH):
-            request.view_args = {'confId': self.event.id}
+            request.view_args = {'event_id': self.event.id}
             with override_request_endpoint(obj.view_class.endpoint):
                 obj._process_args()
                 self._add_page(obj._process(), obj.view_class.endpoint, self.event)
@@ -312,7 +312,7 @@ class StaticConferenceCreator(StaticEventCreator):
         self._add_page(html, 'event_pages.page_display', page)
 
     def _get_url(self, uh_or_endpoint, target, **params):
-        if isinstance(uh_or_endpoint, basestring):
+        if isinstance(uh_or_endpoint, str):
             return url_for(uh_or_endpoint, target, **params)
         else:
             return str(uh_or_endpoint.getStaticURL(target, **params))
@@ -320,7 +320,7 @@ class StaticConferenceCreator(StaticEventCreator):
     def _add_page(self, html, uh_or_endpoint, target=None, **params):
         url = self._get_url(uh_or_endpoint, target, **params)
         fname = os.path.join(self._content_dir, url)
-        self._zip_file.writestr(fname, html.encode('utf-8'))
+        self._zip_file.writestr(fname, html)
 
     def _add_from_rh(self, rh_class, view_class, params, url_for_target):
         rh = rh_class()
@@ -333,7 +333,7 @@ class StaticConferenceCreator(StaticEventCreator):
 
     def _get_contrib(self, contrib):
         self._add_from_rh(RHContributionDisplay, WPStaticContributionDisplay,
-                          {'confId': self.event.id, 'contrib_id': contrib.id},
+                          {'event_id': self.event.id, 'contrib_id': contrib.id},
                           contrib)
         if config.LATEX_ENABLED:
             self._add_pdf(contrib, 'contributions.export_pdf', ContribToPDF, contrib=contrib)
@@ -344,16 +344,16 @@ class StaticConferenceCreator(StaticEventCreator):
             self._get_author(contrib, author)
 
         if contrib.timetable_entry:
-            self._add_file(get_contribution_ical_file(contrib), 'contributions.export_ics', contrib)
+            self._add_file(contribution_to_ical(contrib), 'contributions.export_ics', contrib)
 
     def _get_sub_contrib(self, subcontrib):
         self._add_from_rh(RHSubcontributionDisplay, WPStaticSubcontributionDisplay,
-                          {'confId': self.event.id, 'contrib_id': subcontrib.contribution.id,
+                          {'event_id': self.event.id, 'contrib_id': subcontrib.contribution.id,
                            'subcontrib_id': subcontrib.id}, subcontrib)
 
     def _get_author(self, contrib, author):
         rh = RHContributionAuthor()
-        params = {'confId': self.event.id, 'contrib_id': contrib.id, 'person_id': author.id}
+        params = {'event_id': self.event.id, 'contrib_id': contrib.id, 'person_id': author.id}
         request.view_args = params
         with override_request_endpoint('contributions.display_author'):
             rh._process_args()
@@ -362,12 +362,12 @@ class StaticConferenceCreator(StaticEventCreator):
 
     def _get_session(self, session):
         self._add_from_rh(RHDisplaySession, WPStaticSessionDisplay,
-                          {'confId': self.event.id, 'session_id': session.id}, session)
+                          {'event_id': self.event.id, 'session_id': session.id}, session)
 
         pdf = get_session_timetable_pdf(session, tz=self._display_tz)
         self._add_pdf(session, 'sessions.export_session_timetable', pdf)
 
-        self._add_file(get_session_ical_file(session), 'sessions.export_ics', session)
+        self._add_file(session_to_ical(session), 'sessions.export_ics', session)
 
     def _add_pdf(self, target, uh_or_endpoint, generator_class_or_instance, **kwargs):
         if inspect.isclass(generator_class_or_instance):
@@ -379,11 +379,11 @@ class StaticConferenceCreator(StaticEventCreator):
             # Got legacy reportlab PDF generator instead of the LaTex-based one
             self._add_file(pdf.getPDFBin(), uh_or_endpoint, target)
         else:
-            with open(pdf.generate()) as f:
+            with open(pdf.generate(), 'rb') as f:
                 self._add_file(f, uh_or_endpoint, target)
 
     def _add_file(self, file_like_or_str, uh_or_endpoint, target):
-        if isinstance(file_like_or_str, str):
+        if isinstance(file_like_or_str, (str, bytes)):
             content = file_like_or_str
         else:
             content = file_like_or_str.read()

@@ -1,18 +1,16 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
-
-from __future__ import unicode_literals
 
 from sqlalchemy.ext.declarative import declared_attr
 
 from indico.core.db import db
 from indico.core.db.sqlalchemy.principals import PrincipalPermissionsMixin, PrincipalType
 from indico.core.db.sqlalchemy.util.models import auto_table_args
-from indico.util.string import format_repr, return_ascii
+from indico.util.string import format_repr
 
 
 class EventPrincipal(PrincipalPermissionsMixin, db.Model):
@@ -51,6 +49,5 @@ class EventPrincipal(PrincipalPermissionsMixin, db.Model):
     # relationship backrefs:
     # - event (Event.acl_entries)
 
-    @return_ascii
     def __repr__(self):
         return format_repr(self, 'id', 'event_id', 'principal', read_access=False, full_access=False, permissions=[])

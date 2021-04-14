@@ -2,16 +2,296 @@ Changelog
 =========
 
 
-Version 2.3.1
+Version 3.0
+-----------
+
+*Unreleased*
+
+Major Features
+^^^^^^^^^^^^^^
+
+- The OAuth provider module has been re-implemented based on a more modern
+  library (authlib). Support for the somewhat insecure *implicit flow* has been
+  removed in favor of the code-with-PKCE flow. Tokens are now stored more securely
+  as a hash instead of plaintext. For a given user/app/scope combination, only a
+  certain amount of tokens are stored; once the limit has been reached older tokens
+  will be discarded. The OAuth provider now exposes its metadata via a well-known
+  URI (RFC 8414) and also has endpoints to introspect or revoke a token. (:issue:`4685`,
+  :pr:`4798`)
+
+Improvements
+^^^^^^^^^^^^
+
+- Categories may now contain both events and subcategories at the same time
+  (:issue:`4679`, :pr:`4725`, :pr:`4757`)
+- Show the user's profile picture in many more places (:issue:`4625`, :pr:`4747`)
+- Use a more modern search dialog when searching for users (:issue:`4674`, :pr:`4743`)
+- Add an option to refresh event person data from the underlying user when cloning an
+  event (:issue:`4750`, :pr:`4760`)
+- Add options for attaching iCal files to complete registration and event reminder
+  emails (:issue:`1158`, :pr:`4780`)
+- Use the new token-based URLs instead of API keys for persistent ical links and replace
+  the calendar link widgets in category, event, session and contribution views with the
+  more modern ones used in dashboard (:issue:`4776`, :pr:`4801`)
+- Add an option to export editables to JSON (:issue:`4767`, :pr:`4810`)
+- Add an option to export paper peer reviewing data to JSON (:issue:`4767`, :pr:`4818`)
+- Passwords are now checked against a list of breached passwords ("Have I Been Pwned")
+  in a secure and anonymous way that does not disclose any data. If a user logs in with
+  an insecure password, they are forced to change it before they can continue using Indico
+  (:pr:`4817`)
+- Failed login attempts now trigger rate limiting to prevent brute-force attacks
+  (:issue:`1550`, :pr:`4817`)
+- Allow filtering the "Participant Roles" page by users who have not registered for the event
+  (:issue:`4763`, :pr:`4822`)
+- iCalendar exports now include contact data, event logo URL and, when exporting
+  sessions/contributions, the UID of the related event. Also, only non-empty fields
+  are exported. (:issue:`4785`, :issue:`4586`, :issue:`4587`, :issue:`4791`,
+  :pr:`4820`)
+- Allow adding groups/roles as "authorized abstract submitters" (:pr:`4834`)
+- Direct links to (sub-)contributions in meetings using the URLs usually meant for
+  conferences now redirect to the meeting view page (:pr:`4847`)
+- Use a more compact setup QR code for the mobile *Indico check-in* app; the latest version of
+  the app is now required. (:pr:`4844`)
+
+Bugfixes
+^^^^^^^^
+
+- Take registrations of users who are only members of a custom event role into account on the
+  "Participant Roles" page (:pr:`4822`)
+- Fail gracefully during registration import when two rows have different emails that belong
+  to the same user (:pr:`4823`)
+- Restore the ability to see who's inheriting access from a parent object (:pr:`4833`)
+- Fix misleading message when cancelling a booking that already started and has past
+  occurrences that won't be cancelled (:issue:`4719`, :pr:`4861`)
+
+Internal Changes
+^^^^^^^^^^^^^^^^
+
+- Require Python 3.9 - older Python versions (especially Python 2.7) are **no longer supported**
+- ``confId`` has been changed to ``event_id`` and the corresponding URL path segments
+  now enforce numeric data (and thus pass the id as a number instead of string)
+- ``CACHE_BACKEND`` has been removed; Indico now always uses Redis for caching
+- The integration with flower (celery monitoring tool) has been removed as it was not widely used,
+  did not provide much benefit, and it is no longer compatible with the latest Celery version
+- ``session.user`` now returns the user related to the current request, regardless of whether
+  it's coming from OAuth, a signed url or the actual session (:pr:`4803`)
+- Add a new ``check_password_secure`` signal that can be used to implement additional password
+  security checks (:pr:`4817`)
+
+
+----
+
+Version 2.3.5
 -------------
 
 *Unreleased*
+
+Internationalization
+^^^^^^^^^^^^^^^^^^^^
+
+- New translation: Polish
+
+Improvements
+^^^^^^^^^^^^
+
+- Add an option to not disclose the names of editors and commenters to submitters in the
+  Paper Editing module (:issue:`4829`, :pr:`4865`)
+
+Bugfixes
+^^^^^^^^
+
+- Do not show soft-deleted long-lasting events in category calendar (:pr:`4824`)
+- Do not show management-related links in editing hybrid view unless the user has
+  access to them (:pr:`4830`)
+- Fix error when assigning paper reviewer roles with notifications enabled and one
+  of the reviewing types disabled (:pr:`4838`)
+- Fix viewing timetable entries if you cannot access the event but a specific session
+  inside it (:pr:`4857`)
+- Fix viewing contributions if you cannot access the event but have explicit access to
+  the contribution (:pr:`4860`)
+- Hide registration menu item if you cannot access the event and registrations are not
+  exempt from event access checks (:pr:`4860`)
+- Fix inadvertently deleting a file uploaded during the "make changes" Editing action,
+  resulting in the revision sometimes still referencing the file even though it has been
+  deleted from storage (:pr:`4866`)
+
+Version 2.3.4
+-------------
+
+*Released on March 11, 2021*
+
+Security fixes
+^^^^^^^^^^^^^^
+
+- Fix some open redirects which could help making harmful URLs look more trustworthy by linking
+  to Indico and having it redirect the user to a malicious site (:issue:`4814`, :pr:`4815`)
+- The :data:`BASE_URL` is now always enforced and requests whose Host header does not match
+  are rejected. This prevents malicious actors from tricking Indico into sending e.g. a
+  password reset link to a user that points to a host controlled by the attacker instead of
+  the actual Indico host (:pr:`4815`)
+
+.. note::
+
+    If the webserver is already configured to enforce a canonical host name and redirects or
+    rejects such requests, this cannot be exploited. Additionally, exploiting this problem requires
+    user interaction: they would need to click on a password reset link which they never requested,
+    and which points to a domain that does not match the one where Indico is running.
+
+Improvements
+^^^^^^^^^^^^
+
+- Fail more gracefully is a user has an invalid locale set and fall back to the default
+  locale or English in case the default locale is invalid as well
+- Log an error if the configured default locale does not exist
+- Add ID-1 page size for badge printing (:pr:`4774`, thanks :user:`omegak`)
+- Allow managers to specify a reason when rejecting registrants and add a new placeholder
+  for the rejection reason when emailing registrants (:pr:`4769`, thanks :user:`vasantvohra`)
+
+Bugfixes
+^^^^^^^^
+
+- Fix the "Videoconference Rooms" page in conference events when there are any VC rooms
+  attached but the corresponding plugin is no longer installed
+- Fix deleting events which have a videoconference room attached which has its VC plugin
+  no longer installed
+- Do not auto-redirect to SSO when an MS office user agent is detected (:issue:`4720`,
+  :pr:`4731`)
+- Allow Editing team to view editables of unpublished contributions (:issue:`4811`, :pr:`4812`)
+
+Internal Changes
+^^^^^^^^^^^^^^^^
+
+- Also trigger the ``ical-export`` metadata signal when exporting events for a whole category
+- Add ``primary_email_changed`` signal (:pr:`4802`, thanks :user:`openprojects`)
+
+Version 2.3.3
+-------------
+
+*Released on January 25, 2021*
+
+Security fixes
+^^^^^^^^^^^^^^
+
+- JSON locale data for invalid locales is no longer cached on disk; instead a 404 error is
+  triggered. This avoids creating small files in the cache folder for each invalid locale
+  that is requested. (:pr:`4766`)
+
+Internationalization
+^^^^^^^^^^^^^^^^^^^^
+
+- New translation: Ukrainian
+
+Improvements
+^^^^^^^^^^^^
+
+- Add a new "Until approved" option for a registration form's "Modification allowed"
+  setting (:pr:`4740`, thanks :user:`vasantvohra`)
+- Show last login time in dashboard (:pr:`4735`, thanks :user:`vasantvohra`)
+- Allow Markdown in the "Message for complete registrations" option of a registration
+  form (:pr:`4741`)
+- Improve video conference linking dropdown for contributions/sessions (hide unscheduled,
+  show start time) (:pr:`4753`)
+- Show timetable filter button in conferences with a meeting-like timetable
+
+Bugfixes
+^^^^^^^^
+
+- Fix error when converting malformed HTML links to LaTeX
+- Hide inactive contribution/abstract fields in submit/edit forms (:pr:`4755`)
+- Fix adding registrants to a session ACL
+
+Internal Changes
+^^^^^^^^^^^^^^^^
+
+- Videoconference plugins may now display a custom message for the prompt when deleting
+  a videoconference room (:pr:`4733`)
+- Videoconference plugins may now override the behavior when cloning an event with
+  attached videoconference rooms (:pr:`4732`)
+
+Version 2.3.2
+-------------
+
+*Released on November 30, 2020*
+
+Improvements
+^^^^^^^^^^^^
+
+- Disable title field by default in new registration forms (:issue:`4688`, :pr:`4692`)
+- Add gender-neutral "Mx" title (:issue:`4688`, :pr:`4692`)
+- Add contributions placeholder for emails (:pr:`4716`, thanks :user:`bpedersen2`)
+- Show program codes in contribution list (:pr:`4713`)
+- Display the target URL of link materials if the user can access them (:issue:`2599`,
+  :pr:`4718`)
+- Show the revision number for all revisions in the Editing timeline (:pr:`4708`)
+
+Bugfixes
+^^^^^^^^
+
+- Only consider actual speakers in the "has registered speakers" contribution list filter
+  (:pr:`4712`, thanks :user:`bpedersen2`)
+- Correctly filter events in "Sync with your calendar" links (this fix only applies to newly
+  generated links) (:pr:`4717`)
+- Correctly grant access to attachments inside public sessions/contribs even if the event
+  is more restricted (:pr:`4721`)
+- Fix missing filename pattern check when suggesting files from Paper Peer Reviewing to submit
+  for Editing (:pr:`4715`)
+- Fix filename pattern check in Editing when a filename contains dots (:pr:`4715`)
+- Require explicit admin override (or being whitelisted) to override blockings (:pr:`4706`)
+- Clone custom abstract/contribution fields when cloning abstract settings (:pr:`4724`,
+  thanks :user:`bpedersen2`)
+- Fix error when rescheduling a survey that already has submissions (:issue:`4730`)
+
+Version 2.3.1
+-------------
+
+*Released on October 27, 2020*
+
+Security fixes
+^^^^^^^^^^^^^^
+- Fix potential data leakage between OAuth-authenticated and unauthenticated HTTP API requests
+  for the same resource (:pr:`4663`)
+
+.. note::
+
+    Due to OAuth access to the HTTP API having been broken until this version, we do not
+    believe this was actually exploitable on any Indico instance. In addition, only Indico
+    administrators can create OAuth applications, so regardless of the bug there is no risk
+    for any instance which does not have OAuth applications with the ``read:legacy_api``
+    scope.
+
+Improvements
+^^^^^^^^^^^^
+
+- Generate material packages in a background task to avoid timeouts or using excessive
+  amounts of disk space in case of people submitting several times (:pr:`4630`)
+- Add new :data:`EXPERIMENTAL_EDITING_SERVICE` setting to enable extending an event's Editing
+  workflow through an `OpenReferee server <https://github.com/indico/openreferee/>`_ (:pr:`4659`)
 
 Bugfixes
 ^^^^^^^^
 
 - Only show the warning about draft mode in a conference if it actually has any
   contributions or timetable entries
+- Do not show incorrect modification deadline in abstract management area if no
+  such deadline has been set (:pr:`4650`)
+- Fix layout problem when minutes contain overly large embedded images (:issue:`4653`,
+  :pr:`4654`)
+- Prevent pending registrations from being marked as checked-in (:pr:`4646`, thanks
+  :user:`omegak`)
+- Fix OAuth access to HTTP API (:pr:`4663`)
+- Fix ICS export of events with draft timetable and contribution detail level
+  (:pr:`4666`)
+- Fix paper revision submission field being displayed for judges/reviewers (:pr:`4667`)
+- Fix managers not being able to submit paper revisions on behalf of the user (:pr:`4667`)
+
+Internal Changes
+^^^^^^^^^^^^^^^^
+
+- Add ``registration_form_wtform_created`` signal and send form data in
+  ``registration_created`` and ``registration_updated`` signals (:pr:`4642`,
+  thanks :user:`omegak`)
+- Add ``logged_in`` signal
+
 
 Version 2.3
 -----------

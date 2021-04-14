@@ -1,13 +1,10 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import unicode_literals
-
-from collections import OrderedDict
 from contextlib import contextmanager
 from datetime import timedelta
 from operator import attrgetter
@@ -20,7 +17,7 @@ from sqlalchemy.dialects.postgresql import ARRAY, JSONB
 from sqlalchemy.event import listens_for
 from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.ext.hybrid import hybrid_method, hybrid_property
-from sqlalchemy.orm import column_property
+from sqlalchemy.orm import column_property, joinedload
 from sqlalchemy.orm.base import NEVER_SET, NO_VALUE
 from sqlalchemy.sql import select
 
@@ -38,15 +35,15 @@ from indico.core.db.sqlalchemy.util.queries import db_dates_overlap, get_related
 from indico.modules.categories import Category
 from indico.modules.events.logs import EventLogEntry
 from indico.modules.events.management.util import get_non_inheriting_objects
-from indico.modules.events.models.persons import PersonLinkDataMixin
+from indico.modules.events.models.persons import EventPerson, PersonLinkDataMixin
 from indico.modules.events.settings import EventSettingProperty, event_contact_settings, event_core_settings
 from indico.modules.events.timetable.models.entries import TimetableEntry
 from indico.util.caching import memoize_request
 from indico.util.date_time import get_display_tz, now_utc, overlaps
 from indico.util.decorators import strict_classproperty
+from indico.util.enum import RichIntEnum
 from indico.util.i18n import _
-from indico.util.string import format_repr, return_ascii, text_to_repr, to_unicode
-from indico.util.struct.enum import RichIntEnum
+from indico.util.string import format_repr, text_to_repr
 from indico.web.flask.util import url_for
 
 
@@ -68,7 +65,7 @@ class _EventSettingProperty(EventSettingProperty):
 
 class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionManagersMixin, AttachedItemsMixin,
             AttachedNotesMixin, PersonLinkDataMixin, db.Model):
-    """An Indico event
+    """An Indico event.
 
     This model contains the most basic information related to an event.
 
@@ -468,7 +465,7 @@ class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionMan
 
     @property
     def event(self):
-        """Convenience property so all event entities have it"""
+        """Convenience property so all event entities have it."""
         return self
 
     @property
@@ -490,7 +487,7 @@ class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionMan
 
     @property
     def locator(self):
-        return {'confId': self.id}
+        return {'event_id': self.id}
 
     @property
     def logo_url(self):
@@ -573,12 +570,12 @@ class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionMan
     @property
     def short_url(self):
         id_ = self.url_shortcut or self.id
-        return url_for('events.shorturl', confId=id_)
+        return url_for('events.shorturl', event_id=id_)
 
     @property
     def short_external_url(self):
         id_ = self.url_shortcut or self.id
-        return url_for('events.shorturl', confId=id_, _external=True)
+        return url_for('events.shorturl', event_id=id_, _external=True)
 
     @property
     def map_url(self):
@@ -594,7 +591,7 @@ class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionMan
 
     @property
     def display_tzinfo(self):
-        """The tzinfo of the event as preferred by the current user"""
+        """The tzinfo of the event as preferred by the current user."""
         return get_display_tz(self, as_timezone=True)
 
     @property
@@ -617,7 +614,7 @@ class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionMan
     @property
     @contextmanager
     def logging_disabled(self):
-        """Temporarily disables event logging
+        """Temporarily disable event logging.
 
         This is useful when performing actions e.g. during event
         creation or at other times where adding entries to the event
@@ -631,7 +628,7 @@ class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionMan
 
     @hybrid_method
     def happens_between(self, from_dt=None, to_dt=None):
-        """Check whether the event takes place within two dates"""
+        """Check whether the event takes place within two dates."""
         if from_dt is not None and to_dt is not None:
             # any event that takes place during the specified range
             return overlaps((self.start_dt, self.end_dt), (from_dt, to_dt), inclusive=True)
@@ -660,7 +657,7 @@ class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionMan
 
     @hybrid_method
     def starts_between(self, from_dt=None, to_dt=None):
-        """Check whether the event starts within two dates"""
+        """Check whether the event starts within two dates."""
         if from_dt is not None and to_dt is not None:
             return from_dt <= self.start_dt <= to_dt
         elif from_dt is not None:
@@ -683,7 +680,7 @@ class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionMan
 
     @hybrid_method
     def ends_after(self, dt):
-        """Check whether the event ends on/after the specified date"""
+        """Check whether the event ends on/after the specified date."""
         return self.end_dt >= dt if dt is not None else True
 
     @ends_after.expression
@@ -695,7 +692,7 @@ class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionMan
         return self.end_dt - self.start_dt
 
     def can_lock(self, user):
-        """Check whether the user can lock/unlock the event"""
+        """Check whether the user can lock/unlock the event."""
         return user and (user.is_admin or user == self.creator or self.category.can_manage(user))
 
     def can_display(self, user):
@@ -731,7 +728,7 @@ class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionMan
         return rv
 
     def get_verbose_title(self, show_speakers=False, show_series_pos=False):
-        """Get the event title with some additional information
+        """Get the event title with some additional information.
 
         :param show_speakers: Whether to prefix the title with the
                               speakers of the event.
@@ -741,10 +738,10 @@ class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionMan
         """
         title = self.title
         if show_speakers and self.person_links:
-            speakers = ', '.join(sorted([pl.full_name for pl in self.person_links], key=unicode.lower))
-            title = '{}, "{}"'.format(speakers, title)
+            speakers = ', '.join(sorted([pl.full_name for pl in self.person_links], key=str.lower))
+            title = f'{speakers}, "{title}"'
         if show_series_pos and self.series and self.series.show_sequence_in_title:
-            title = '{} ({}/{})'.format(title, self.series_pos, self.series_count)
+            title = f'{title} ({self.series_pos}/{self.series_count})'
         return title
 
     def get_label_markup(self, size=''):
@@ -754,21 +751,21 @@ class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionMan
         return Markup(render_template('events/label.html', label=label, message=self.label_message, size=size))
 
     def get_non_inheriting_objects(self):
-        """Get a set of child objects that do not inherit protection"""
+        """Get a set of child objects that do not inherit protection."""
         return get_non_inheriting_objects(self)
 
     def get_contribution(self, id_):
-        """Get a contribution of the event"""
+        """Get a contribution of the event."""
         return get_related_object(self, 'contributions', {'id': id_})
 
     def get_sorted_tracks(self):
-        """Return tracks and track groups in the correct order"""
+        """Return tracks and track groups in the correct order."""
         track_groups = self.track_groups
         tracks = [track for track in self.tracks if not track.track_group]
         return sorted(tracks + track_groups, key=attrgetter('position'))
 
     def get_session(self, id_=None, friendly_id=None):
-        """Get a session of the event"""
+        """Get a session of the event."""
         if friendly_id is None and id_ is not None:
             criteria = {'id': id_}
         elif id_ is None and friendly_id is not None:
@@ -778,7 +775,7 @@ class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionMan
         return get_related_object(self, 'sessions', criteria)
 
     def get_session_block(self, id_, scheduled_only=False):
-        """Get a session block of the event"""
+        """Get a session block of the event."""
         from indico.modules.events.sessions.models.blocks import SessionBlock
         query = SessionBlock.query.filter(SessionBlock.id == id_,
                                           SessionBlock.session.has(event=self, is_deleted=False))
@@ -804,7 +801,7 @@ class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionMan
                                chairpersons (or lecture speakers)
         :param extra: An email address that is always included, even
                       if it is not in any of the included lists.
-        :return: An OrderedDict mapping emails to pretty names
+        :return: A dictionary mapping emails to pretty names
         """
         emails = {}
         # Contact/Support
@@ -829,15 +826,15 @@ class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionMan
         if extra:
             emails.setdefault(extra, extra)
         # Sanitize and format emails
-        emails = {to_unicode(email.strip().lower()): '{} <{}>'.format(to_unicode(name), to_unicode(email))
-                  for email, name in emails.iteritems()
+        emails = {email.strip().lower(): f'{name} <{email}>'
+                  for email, name in emails.items()
                   if email and email.strip()}
         own_email = session.user.email if has_request_context() and session.user else None
-        return OrderedDict(sorted(emails.items(), key=lambda x: (x[0] != own_email, x[1].lower())))
+        return dict(sorted(list(emails.items()), key=lambda x: (x[0] != own_email, x[1].lower())))
 
     @memoize_request
     def has_feature(self, feature):
-        """Check if a feature is enabled for the event"""
+        """Check if a feature is enabled for the event."""
         from indico.modules.events.features.util import is_feature_enabled
         return is_feature_enabled(self, feature)
 
@@ -881,7 +878,7 @@ class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionMan
         return next((v for v in self.contribution_fields if v.id == field_id), '')
 
     def move_start_dt(self, start_dt):
-        """Set event start_dt and adjust its timetable entries"""
+        """Set event start_dt and adjust its timetable entries."""
         diff = start_dt - self.start_dt
         for entry in self.timetable_entries.filter(TimetableEntry.parent_id.is_(None)):
             new_dt = entry.start_dt + diff
@@ -895,7 +892,7 @@ class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionMan
             start_dt = start_dt.astimezone(tzinfo)
             end_dt = end_dt.astimezone(tzinfo)
         duration = (end_dt.replace(hour=23, minute=59) - start_dt.replace(hour=0, minute=0)).days
-        for offset in xrange(duration + 1):
+        for offset in range(duration + 1):
             day = (start_dt + timedelta(days=offset)).date()
             if day <= end_dt.date():
                 yield day
@@ -905,7 +902,7 @@ class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionMan
         db.m.Session.preload_acl_entries(self)
 
     def move(self, category):
-        from indico.modules.events import EventLogRealm, EventLogKind
+        from indico.modules.events import EventLogKind, EventLogRealm
         old_category = self.category
         self.category = category
         sep = ' \N{RIGHT-POINTING DOUBLE ANGLE QUOTATION MARK} '
@@ -917,12 +914,20 @@ class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionMan
                  data={'From': old_path, 'To': new_path})
 
     def delete(self, reason, user=None):
-        from indico.modules.events import logger, EventLogRealm, EventLogKind
+        from indico.modules.events import EventLogKind, EventLogRealm, logger
         self.is_deleted = True
         signals.event.deleted.send(self, user=user)
         db.session.flush()
         logger.info('Event %r deleted [%s]', self, reason)
         self.log(EventLogRealm.event, EventLogKind.negative, 'Event', 'Event deleted', user, data={'Reason': reason})
+
+    def refresh_event_persons(self, *, notify=True):
+        """Update the data for all EventPersons based on the linked Users.
+
+        :param notify: Whether to trigger the ``person_updated`` signal.
+        """
+        for person in self.persons.filter(EventPerson.user_id.isnot(None)).options(joinedload('user')):
+            person.sync_user(notify=notify)
 
     @property
     @memoize_request
@@ -944,7 +949,6 @@ class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionMan
     def has_ended(self):
         return self.end_dt <= now_utc()
 
-    @return_ascii
     def __repr__(self):
         return format_repr(self, 'id', 'start_dt', 'end_dt', is_deleted=False, is_locked=False,
                            _text=text_to_repr(self.title, max_length=75))
@@ -978,7 +982,7 @@ def _mappers_configured():
     # Event.category_chain -- the category ids of the event, starting
     # with the root category down to the event's immediate parent.
     cte = Category.get_tree_cte()
-    query = select([cte.c.path]).where(cte.c.id == Event.category_id).correlate_except(cte)
+    query = select([cte.c.path]).where(cte.c.id == Event.category_id).correlate_except(cte).scalar_subquery()
     Event.category_chain = column_property(query, deferred=True)
 
     # Event.effective_protection_mode -- the effective protection mode
@@ -986,7 +990,8 @@ def _mappers_configured():
     # parent category
     query = (select([db.case({ProtectionMode.inheriting.value: Category.effective_protection_mode},
                              else_=Event.protection_mode, value=Event.protection_mode)])
-             .where(Category.id == Event.category_id))
+             .where(Category.id == Event.category_id)
+             .scalar_subquery())
     Event.effective_protection_mode = column_property(query, deferred=True)
 
     # Event.series_pos -- the position of the event in its series
@@ -995,13 +1000,14 @@ def _mappers_configured():
                 .where((event_alias.series_id == Event.series_id) & ~event_alias.is_deleted)
                 .correlate(Event)
                 .alias())
-    query = select([subquery.c.pos]).where(subquery.c.id == Event.id).correlate_except(subquery)
+    query = select([subquery.c.pos]).where(subquery.c.id == Event.id).correlate_except(subquery).scalar_subquery()
     Event.series_pos = column_property(query, group='series', deferred=True)
 
     # Event.series_count -- the number of events in the event's series
     query = (db.select([db.func.count(event_alias.id)])
              .where((event_alias.series_id == Event.series_id) & ~event_alias.is_deleted)
-             .correlate_except(event_alias))
+             .correlate_except(event_alias)
+             .scalar_subquery())
     Event.series_count = column_property(query, group='series', deferred=True)
 
 

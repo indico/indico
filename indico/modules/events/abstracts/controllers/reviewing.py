@@ -1,11 +1,9 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
-
-from __future__ import unicode_literals
 
 from flask import flash, jsonify, request, session
 from sqlalchemy.orm import joinedload, subqueryload
@@ -34,7 +32,9 @@ from indico.web.util import _pop_injected_js, jsonify_data, jsonify_template
 
 
 class RHListOtherAbstracts(RHAbstractsBase):
-    """AJAX endpoint that lists all abstracts in the event (dict representation)."""
+    """
+    AJAX endpoint that lists all abstracts in the event (dict representation).
+    """
 
     ALLOW_LOCKED = True
 
@@ -60,7 +60,7 @@ class RHListOtherAbstracts(RHAbstractsBase):
             query = query.filter(Abstract.id.notin_(self.excluded_ids))
 
         result = [{'id': abstract.id, 'friendly_id': abstract.friendly_id, 'title': abstract.title,
-                   'full_title': '#{}: {}'.format(abstract.friendly_id, abstract.title)}
+                   'full_title': f'#{abstract.friendly_id}: {abstract.title}'}
                   for abstract in query
                   if abstract.can_access(session.user)]
         return jsonify(result)
@@ -109,7 +109,7 @@ class RHWithdrawAbstract(RHAbstractBase):
 
 
 class RHDisplayAbstractListBase(RHAbstractsBase):
-    """Base class for all abstract list operations"""
+    """Base class for all abstract list operations."""
 
     normalize_url_spec = {
         'locators': {
@@ -128,7 +128,7 @@ class RHDisplayAbstractListBase(RHAbstractsBase):
 
 
 class RHSubmitAbstractReview(RHAbstractBase):
-    """Review an abstract in a specific track"""
+    """Review an abstract in a specific track."""
 
     normalize_url_spec = {
         'locators': {
@@ -212,7 +212,7 @@ class RHAbstractCommentBase(RHAbstractBase):
 class RHEditAbstractComment(RHAbstractCommentBase):
     def _process(self):
         form = AbstractCommentForm(obj=self.comment, abstract=self.abstract, user=session.user,
-                                   prefix='edit-comment-{}-'.format(self.comment.id))
+                                   prefix=f'edit-comment-{self.comment.id}-')
         if form.validate_on_submit():
             update_abstract_comment(self.comment, form.data)
             return jsonify_data(flash=False, html=render_abstract_page(self.abstract, management=self.management))
@@ -252,11 +252,11 @@ class RHDisplayAbstractListCustomize(CustomizeAbstractListMixin, RHDisplayAbstra
 
 
 class RHDisplayAbstractsActionsBase(RHDisplayAbstractListBase):
-    """Base class for classes performing actions on abstract"""
+    """Base class for classes performing actions on abstract."""
 
     def _process_args(self):
         RHDisplayAbstractListBase._process_args(self)
-        ids = map(int, request.form.getlist('abstract_id'))
+        ids = request.form.getlist('abstract_id', type=int)
         self.abstracts = Abstract.query.with_parent(self.track, 'abstracts_reviewed').filter(Abstract.id.in_(ids)).all()
 
 

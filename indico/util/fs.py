@@ -1,11 +1,9 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
-
-from __future__ import unicode_literals
 
 import errno
 import hashlib
@@ -16,7 +14,7 @@ from datetime import datetime
 
 from werkzeug.utils import secure_filename as _secure_filename
 
-from indico.util.string import to_unicode, unicode_to_ascii
+from indico.util.string import str_to_ascii
 
 
 _control_char_re = re.compile(r'[\x00-\x1f]+')
@@ -34,7 +32,7 @@ def silentremove(filename):
 
 
 def secure_filename(filename, fallback):
-    """Returns a secure version of a filename.
+    """Return a secure version of a filename.
 
     This removes possibly dangerous characters and also converts the
     filename to plain ASCII for maximum compatibility. It should only
@@ -49,7 +47,7 @@ def secure_filename(filename, fallback):
     """
     if not filename:
         return fallback
-    return _secure_filename(unicode_to_ascii(to_unicode(filename))) or fallback
+    return _secure_filename(str_to_ascii(filename)) or fallback
 
 
 def secure_client_filename(filename, fallback='file'):
@@ -134,7 +132,7 @@ def cleanup_dir(path, min_age, dry_run=False, exclude=None):
     """
     min_mtime = int(time.mktime((datetime.now() - min_age).timetuple()))
     if not path or path == '/':
-        raise ValueError('Invalid path for cleanup: {}'.format(path))
+        raise ValueError(f'Invalid path for cleanup: {path}')
     deleted = set()
     for root, dirs, files in os.walk(path):
         relroot = os.path.relpath(root, path)
@@ -184,4 +182,4 @@ def get_file_checksum(fileobj, chunk_size=1024*1024, algorithm=hashlib.md5):
         if not chunk:
             break
         checksum.update(chunk)
-    return unicode(checksum.hexdigest())
+    return str(checksum.hexdigest())

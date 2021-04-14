@@ -1,11 +1,9 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
-
-from __future__ import unicode_literals
 
 from datetime import date, datetime, time, timedelta
 
@@ -69,7 +67,7 @@ def test_get_booking_params_for_event_same_times(create_event, dummy_room, start
         'params': dict({
             'link_id': event.id,
             'link_type': 'event',
-            'text': '#{}'.format(dummy_room.id),
+            'text': f'#{dummy_room.id}',
         }, **expected_params)
     }
 
@@ -97,7 +95,7 @@ def test_get_booking_params_for_event_multiple_times(create_event, create_contri
         'params': {
             'link_type': 'event',
             'link_id': event.id,
-            'text': '#{}'.format(dummy_room.id),
+            'text': f'#{dummy_room.id}',
         },
         'time_info': [
             (date(2019, 8, 16), dict({'sd': '2019-08-16'}, **expected_params)),

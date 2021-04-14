@@ -2,7 +2,7 @@
 
 import os
 import sys
-from cStringIO import StringIO
+from io import StringIO
 
 from docutils import nodes
 from docutils.parsers.rst import Directive
@@ -10,7 +10,10 @@ from docutils.statemachine import string2lines
 
 
 class ExecDirective(Directive):
-    """Execute the specified python code and insert the output into the document"""
+    """
+    Execute the specified python code and insert the output into the document.
+    """
+
     has_content = True
 
     def run(self):
@@ -19,7 +22,7 @@ class ExecDirective(Directive):
         old_stdout, sys.stdout = sys.stdout, StringIO()
 
         try:
-            exec '\n'.join(self.content)
+            exec('\n'.join(self.content))
             text = sys.stdout.getvalue()
             lines = string2lines(text, tab_width, convert_whitespace=True)
             self.state_machine.insert_input(lines, source)

@@ -1,16 +1,13 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import unicode_literals
-
 import csv
 from collections import defaultdict
 from datetime import timedelta
-from io import BytesIO
 from operator import attrgetter
 
 import dateutil.parser
@@ -31,19 +28,21 @@ from indico.modules.events.contributions.operations import create_contribution
 from indico.modules.events.models.events import Event
 from indico.modules.events.models.persons import EventPerson
 from indico.modules.events.persons.util import get_event_person
+from indico.modules.events.timetable.models.entries import TimetableEntry
 from indico.modules.events.util import serialize_person_link, track_time_changes
 from indico.util.date_time import format_human_timedelta
 from indico.util.i18n import _
-from indico.util.string import to_unicode, validate_email
+from indico.util.spreadsheets import csv_text_io_wrapper
+from indico.util.string import validate_email
 from indico.web.flask.templating import get_template_module
 from indico.web.flask.util import send_file, url_for
-from indico.web.http_api.metadata.serializer import Serializer
 from indico.web.util import jsonify_data
 
 
 def get_events_with_linked_contributions(user, dt=None):
-    """Returns a dict with keys representing event_id and the values containing
-    data about the user rights for contributions within the event
+    """
+    Return a dict with keys representing event_id and the values containing
+    data about the user rights for contributions within the event.
 
     :param user: A `User`
     :param dt: Only include events taking place on/after that date
@@ -88,7 +87,7 @@ def get_events_with_linked_contributions(user, dt=None):
 
 
 def serialize_contribution_person_link(person_link, is_submitter=None):
-    """Serialize ContributionPersonLink to JSON-like object"""
+    """Serialize ContributionPersonLink to JSON-like object."""
     data = serialize_person_link(person_link)
     data['isSpeaker'] = person_link.is_speaker
     if not isinstance(person_link, SubContributionPersonLink):
@@ -122,7 +121,7 @@ def sort_contribs(contribs, sort_by):
         key_func = attrgetter('friendly_id')
     elif sort_by == BOASortField.title:
         key_func = attrgetter('title')
-    elif isinstance(sort_by, (str, unicode)) and sort_by:
+    elif isinstance(sort_by, str) and sort_by:
         key_func = attrgetter(mapping.get(sort_by) or sort_by)
     else:
         key_func = attrgetter('title')
@@ -130,8 +129,10 @@ def sort_contribs(contribs, sort_by):
 
 
 def generate_spreadsheet_from_contributions(contributions):
-    """Return a tuple consisting of spreadsheet columns and respective
-    contribution values"""
+    """
+    Return a tuple consisting of spreadsheet columns and respective
+    contribution values.
+    """
 
     has_board_number = any(c.board_number for c in contributions)
     has_authors = any(pl.author_type != AuthorType.none for c in contributions for pl in c.person_links)
@@ -174,7 +175,7 @@ def generate_spreadsheet_from_contributions(contributions):
 
 
 def make_contribution_form(event):
-    """Extends the contribution WTForm to add the extra fields.
+    """Extend the contribution WTForm to add the extra fields.
 
     Each extra field will use a field named ``custom_ID``.
 
@@ -183,13 +184,15 @@ def make_contribution_form(event):
     """
     from indico.modules.events.contributions.forms import ContributionForm
 
-    form_class = type(b'_ContributionForm', (ContributionForm,), {})
+    form_class = type('_ContributionForm', (ContributionForm,), {})
     for custom_field in event.contribution_fields:
         field_impl = custom_field.mgmt_field
         if field_impl is None:
             # field definition is not available anymore
             continue
-        name = 'custom_{}'.format(custom_field.id)
+        if not custom_field.is_active:
+            continue
+        name = f'custom_{custom_field.id}'
         setattr(form_class, name, field_impl.create_wtf_field())
     return form_class
 
@@ -207,7 +210,7 @@ def _query_contributions_with_user_as_submitter(event, user):
 
 
 def get_contributions_with_user_as_submitter(event, user):
-    """Get a list of contributions in which the `user` has submission rights"""
+    """Get a list of contributions in which the `user` has submission rights."""
     return (_query_contributions_with_user_as_submitter(event, user)
             .options(joinedload('acl_entries'))
             .order_by(db.func.lower(Contribution.title))
@@ -216,6 +219,26 @@ def get_contributions_with_user_as_submitter(event, user):
 
 def has_contributions_with_user_as_submitter(event, user):
     return _query_contributions_with_user_as_submitter(event, user).has_rows()
+
+
+def get_contributions_for_person(event, person, only_speakers=False):
+    """Get all contributions for an event person.
+
+    If ``only_speakers`` is true, then only contributions where the person is a
+    speaker are returned
+    """
+    cl_join = db.and_(ContributionPersonLink.person_id == person.id,
+                      ContributionPersonLink.contribution_id == Contribution.id)
+
+    if only_speakers:
+        cl_join &= ContributionPersonLink.is_speaker
+
+    return (Contribution.query
+            .with_parent(event)
+            .join(ContributionPersonLink, cl_join)
+            .outerjoin(TimetableEntry)
+            .order_by(TimetableEntry.start_dt, db.func.lower(Contribution.title), Contribution.friendly_id)
+            .all())
 
 
 def serialize_contribution_for_ical(contrib):
@@ -233,21 +256,15 @@ def serialize_contribution_for_ical(contrib):
     }
 
 
-def get_contribution_ical_file(contrib):
-    data = {'results': serialize_contribution_for_ical(contrib)}
-    serializer = Serializer.create('ics')
-    return BytesIO(serializer(data))
-
-
 def import_contributions_from_csv(event, f):
     """Import timetable contributions from a CSV file into an event."""
-    reader = csv.reader(f.read().splitlines())
-    contrib_data = []
+    with csv_text_io_wrapper(f) as ftxt:
+        reader = csv.reader(ftxt.read().splitlines())
 
+    contrib_data = []
     for num_row, row in enumerate(reader, 1):
         try:
-            start_dt, duration, title, first_name, last_name, affiliation, email = \
-                [to_unicode(value).strip() for value in row]
+            start_dt, duration, title, first_name, last_name, affiliation, email = [value.strip() for value in row]
             email = email.lower()
         except ValueError:
             raise UserValueError(_('Row {}: malformed CSV data - please check that the number of columns is correct')
@@ -294,7 +311,7 @@ def import_contributions_from_csv(event, f):
             contribution = create_contribution(event, contrib_fields, extend_parent=True)
 
         contributions.append(contribution)
-        for key, val in changes[event].viewitems():
+        for key, val in changes[event].items():
             all_changes[key].append(val)
 
         email = speaker_data['email']

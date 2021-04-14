@@ -1,5 +1,5 @@
 // This file is part of Indico.
-// Copyright (C) 2002 - 2020 CERN
+// Copyright (C) 2002 - 2021 CERN
 //
 // Indico is free software; you can redistribute it and/or
 // modify it under the terms of the MIT License; see the
@@ -11,7 +11,7 @@ ndRegForm.controller('SectionCtrl', function($scope, $rootScope, regFormFactory)
 
   var getRequestParams = function(section) {
     return {
-      confId: $rootScope.confId,
+      eventId: $rootScope.eventId,
       sectionId: section.id,
       confFormId: $rootScope.confFormId,
     };

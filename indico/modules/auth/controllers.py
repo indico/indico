@@ -1,11 +1,9 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
-
-from __future__ import unicode_literals
 
 from flask import flash, jsonify, redirect, render_template, request, session
 from itsdangerous import BadData, BadSignature
@@ -14,7 +12,7 @@ from webargs import fields
 from werkzeug.exceptions import BadRequest, Forbidden, NotFound
 
 from indico.core import signals
-from indico.core.auth import multipass
+from indico.core.auth import login_rate_limiter, multipass
 from indico.core.config import config
 from indico.core.db import db
 from indico.core.notifications import make_email, send_email
@@ -49,7 +47,7 @@ def _get_provider(name, external):
 
 
 class RHLogin(RH):
-    """The login page"""
+    """The login page."""
 
     # Disable global CSRF check. The form might not be an IndicoForm
     # but a normal WTForm from Flask-WTF which does not use the same
@@ -65,9 +63,14 @@ class RHLogin(RH):
             multipass.set_next_url()
             return multipass.redirect_success()
 
+        # Some clients attempt to incorrectly resolve redirections internally.
+        # See https://github.com/indico/indico/issues/4720 for details
+        user_agent = request.headers.get('User-Agent', '')
+        sso_redirect = not any(s in user_agent for s in ('ms-office', 'Microsoft Office'))
+
         # If we have only one provider, and this provider is external, we go there immediately
         # However, after a failed login we need to show the page to avoid a redirect loop
-        if not session.pop('_multipass_auth_failed', False) and 'provider' not in request.view_args:
+        if not session.pop('_multipass_auth_failed', False) and 'provider' not in request.view_args and sso_redirect:
             single_auth_provider = multipass.single_auth_provider
             if single_auth_provider and single_auth_provider.is_external:
                 multipass.set_next_url()
@@ -82,25 +85,30 @@ class RHLogin(RH):
             return provider.initiate_external_login()
 
         # If we have a POST request we submitted a login form for a local provider
+        rate_limit_exceeded = False
         if request.method == 'POST':
             active_provider = provider = _get_provider(request.form['_provider'], False)
             form = provider.login_form()
-            if form.validate_on_submit():
+            rate_limit_exceeded = not login_rate_limiter.test()
+            if not rate_limit_exceeded and form.validate_on_submit():
                 response = multipass.handle_login_form(provider, form.data)
                 if response:
                     return response
+                # re-check since a failed login may have triggered the rate limit
+                rate_limit_exceeded = not login_rate_limiter.test()
         # Otherwise we show the form for the default provider
         else:
             active_provider = multipass.default_local_auth_provider
             form = active_provider.login_form() if active_provider else None
 
-        providers = multipass.auth_providers.values()
+        providers = list(multipass.auth_providers.values())
+        retry_in = login_rate_limiter.get_reset_delay() if rate_limit_exceeded else None
         return render_template('auth/login_page.html', form=form, providers=providers, active_provider=active_provider,
-                               login_reason=login_reason)
+                               login_reason=login_reason, retry_in=retry_in)
 
 
 class RHLoginForm(RH):
-    """Retrieves a login form (json)"""
+    """Retrieve a login form (json)."""
 
     def _process(self):
         provider = _get_provider(request.view_args['provider'], False)
@@ -110,10 +118,13 @@ class RHLoginForm(RH):
 
 
 class RHLogout(RH):
-    """Logs the user out"""
+    """Log the user out."""
 
     def _process(self):
-        return multipass.logout(request.args.get('next') or url_for_index(), clear_session=True)
+        next_url = request.args.get('next')
+        if not next_url or not multipass.validate_next_url(next_url):
+            next_url = url_for_index()
+        return multipass.logout(next_url, clear_session=True)
 
 
 def _send_confirmation(email, salt, endpoint, template, template_args=None, url_args=None, data=None):
@@ -129,7 +140,7 @@ def _send_confirmation(email, salt, endpoint, template, template_args=None, url_
 
 
 class RHLinkAccount(RH):
-    """Links a new identity with an existing user.
+    """Link a new identity with an existing user.
 
     This RH is only used if the identity information contains an
     email address and an existing user was found.
@@ -161,7 +172,7 @@ class RHLinkAccount(RH):
 
         if self.must_choose_email:
             form = SelectEmailForm()
-            form.email.choices = zip(self.emails, self.emails)
+            form.email.choices = list(zip(self.emails, self.emails))
         else:
             form = IndicoForm()
 
@@ -196,7 +207,7 @@ class RHLinkAccount(RH):
 
 
 class RHRegister(RH):
-    """Creates a new indico user.
+    """Create a new indico user.
 
     This handles two cases:
     - creation of a new user with a locally stored username and password
@@ -220,7 +231,7 @@ class RHRegister(RH):
             raise Forbidden('Local registration is disabled')
 
     def _get_verified_email(self):
-        """Checks if there is an email verification token."""
+        """Check if there is an email verification token."""
         try:
             token = request.args['token']
         except KeyError:
@@ -282,8 +293,8 @@ class RHRegister(RH):
     def _prepare_registration_data(self, form, handler):
         email = form.email.data
         extra_emails = handler.get_all_emails(form) - {email}
-        user_data = {k: v for k, v in form.data.viewitems() if k in {'first_name', 'last_name', 'affiliation',
-                                                                     'address', 'phone'}}
+        user_data = {k: v for k, v in form.data.items()
+                     if k in {'first_name', 'last_name', 'affiliation', 'address', 'phone'}}
         user_data.update(handler.get_extra_user_data(form))
         identity_data = handler.get_identity_data(form)
         settings = {
@@ -317,7 +328,7 @@ class RHRegister(RH):
 
 
 class RHAccounts(RHUserBase):
-    """Displays user accounts"""
+    """Display user accounts."""
 
     def _create_form(self):
         if self.user.local_identity:
@@ -336,9 +347,12 @@ class RHAccounts(RHUserBase):
         self.user.local_identity.identifier = form.data['username']
         if form.data['new_password']:
             self.user.local_identity.password = form.data['new_password']
+            session.pop('insecure_password_error', None)
         flash(_("Your local account credentials have been updated successfully"), 'success')
 
     def _process(self):
+        insecure_login_password_error = session.get('insecure_password_error')
+
         form = self._create_form()
         if form.validate_on_submit():
             if isinstance(form, AddLocalIdentityForm):
@@ -346,13 +360,14 @@ class RHAccounts(RHUserBase):
             elif isinstance(form, EditLocalIdentityForm):
                 self._handle_edit_local_account(form)
             return redirect(url_for('auth.accounts'))
-        provider_titles = {name: provider.title for name, provider in multipass.identity_providers.iteritems()}
+        provider_titles = {name: provider.title for name, provider in multipass.identity_providers.items()}
         return WPAuthUser.render_template('accounts.html', 'accounts',
-                                          form=form, user=self.user, provider_titles=provider_titles)
+                                          form=form, user=self.user, provider_titles=provider_titles,
+                                          insecure_login_password_error=insecure_login_password_error)
 
 
 class RHRemoveAccount(RHUserBase):
-    """Removes an identity linked to a user"""
+    """Remove an identity linked to a user."""
 
     def _process_args(self):
         RHUserBase._process_args(self)
@@ -375,7 +390,7 @@ class RHRemoveAccount(RHUserBase):
         return redirect(url_for('.accounts'))
 
 
-class RegistrationHandler(object):
+class RegistrationHandler:
     form = None
 
     def __init__(self, rh):
@@ -445,18 +460,18 @@ class MultipassRegistrationHandler(RegistrationHandler):
         return FormDefaults(self.identity_info['data'])
 
     def create_form(self):
-        form = super(MultipassRegistrationHandler, self).create_form()
+        form = super().create_form()
         # We only want the phone/address fields if the provider gave us data for it
         for field in {'address', 'phone'}:
             if field in form and not self.identity_info['data'].get(field):
                 delattr(form, field)
         emails = self.identity_info['data'].getlist('email')
-        form.email.choices = zip(emails, emails)
+        form.email.choices = list(zip(emails, emails))
         return form
 
     def form(self, **kwargs):
         if self.from_sync_provider:
-            synced_values = {k: v or '' for k, v in self.identity_info['data'].iteritems()}
+            synced_values = {k: v or '' for k, v in self.identity_info['data'].items()}
             return MultipassRegistrationForm(synced_fields=multipass.synced_fields, synced_values=synced_values,
                                              **kwargs)
         else:
@@ -471,7 +486,7 @@ class MultipassRegistrationHandler(RegistrationHandler):
         return self.identity_info['moderated']
 
     def get_all_emails(self, form):
-        emails = super(MultipassRegistrationHandler, self).get_all_emails(form)
+        emails = super().get_all_emails(form)
         return emails | set(self.identity_info['data'].getlist('email'))
 
     def get_identity_data(self, form):
@@ -480,7 +495,7 @@ class MultipassRegistrationHandler(RegistrationHandler):
                 'data': self.identity_info['data'], 'multipass_data': self.identity_info['multipass_data']}
 
     def get_extra_user_data(self, form):
-        data = super(MultipassRegistrationHandler, self).get_extra_user_data(form)
+        data = super().get_extra_user_data(form)
         if self.from_sync_provider:
             data['synced_fields'] = form.synced_fields | {field for field in multipass.synced_fields
                                                           if field not in form}
@@ -494,8 +509,9 @@ class LocalRegistrationHandler(RegistrationHandler):
     form = LocalRegistrationForm
 
     def __init__(self, rh):
-        if 'next' in request.args:
-            session['register_next_url'] = request.args['next']
+        next_url = request.args.get('next')
+        if next_url and multipass.validate_next_url(next_url):
+            session['register_next_url'] = next_url
 
     @property
     def widget_attrs(self):
@@ -510,7 +526,7 @@ class LocalRegistrationHandler(RegistrationHandler):
         return config.LOCAL_MODERATION
 
     def get_all_emails(self, form):
-        emails = super(LocalRegistrationHandler, self).get_all_emails(form)
+        emails = super().get_all_emails(form)
         if not self.must_verify_email:
             emails.add(session['register_verified_email'])
         return emails
@@ -532,7 +548,7 @@ class LocalRegistrationHandler(RegistrationHandler):
         return FormDefaults(**data)
 
     def create_form(self):
-        form = super(LocalRegistrationHandler, self).create_form()
+        form = super().create_form()
         if not self.must_verify_email:
             form.email.data = session['register_verified_email']
         return form
@@ -547,7 +563,7 @@ class LocalRegistrationHandler(RegistrationHandler):
 
 
 class RHResetPassword(RH):
-    """Resets the password for a local identity."""
+    """Reset the password for a local identity."""
 
     def _process_args(self):
         if not config.LOCAL_IDENTITIES:

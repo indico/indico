@@ -1,13 +1,10 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import unicode_literals
-
-from collections import OrderedDict
 from datetime import datetime, timedelta
 
 from dateutil import rrule
@@ -33,19 +30,19 @@ REPEAT_FORM_MAP = {
     'pattern': CloneRepeatPatternForm
 }
 
-RRULE_FREQ_MAP = OrderedDict([
-    ('years', rrule.YEARLY),
-    ('months', rrule.MONTHLY),
-    ('weeks', rrule.WEEKLY),
-    ('days', rrule.DAILY),
-    ('hours', rrule.HOURLY),
-    ('minutes', rrule.MINUTELY),
-    ('seconds', rrule.SECONDLY)
-])
+RRULE_FREQ_MAP = {
+    'years': rrule.YEARLY,
+    'months': rrule.MONTHLY,
+    'weeks': rrule.WEEKLY,
+    'days': rrule.DAILY,
+    'hours': rrule.HOURLY,
+    'minutes': rrule.MINUTELY,
+    'seconds': rrule.SECONDLY,
+}
 
 
 def relativedelta_to_rrule_interval(rdelta):
-    for unit, freq in RRULE_FREQ_MAP.viewitems():
+    for unit, freq in RRULE_FREQ_MAP.items():
         value = getattr(rdelta, unit)
         if value:
             return freq, value
@@ -61,7 +58,7 @@ def get_clone_calculator(repeatability, event):
         raise BadRequest
 
 
-class CloneCalculator(object):
+class CloneCalculator:
     def __init__(self, event):
         self.event = event
 
@@ -80,7 +77,7 @@ class CloneCalculator(object):
         return args
 
     def calculate(self, formdata):
-        """Calculate dates of cloned events
+        """Calculate dates of cloned events.
 
         :return: a ``(dates, last_day_of_month)`` tuple
         """
@@ -88,7 +85,7 @@ class CloneCalculator(object):
         if form.validate():
             return self._calculate(form)
         else:
-            raise ValueError([(unicode(getattr(form, k).label.text), v) for k, v in form.errors.viewitems()])
+            raise ValueError([(str(getattr(form, k).label.text), v) for k, v in form.errors.items()])
 
 
 class PatternCloneCalculator(CloneCalculator):
@@ -135,8 +132,8 @@ class RHClonePreview(RHManageEventBase):
             dates, last_day_of_month = clone_calculator.calculate(request.form)
             if len(dates) > 100:
                 raise ValueError(_("You can clone maximum of 100 times at once"))
-        except ValueError as e:
-            return jsonify(error={'message': e.message})
+        except ValueError as exc:
+            return jsonify(error={'message': str(exc)})
         return jsonify_data(count=len(dates), dates=dates, last_day_of_month=last_day_of_month, flash=False)
 
 
@@ -179,16 +176,20 @@ class RHCloneEvent(RHManageEventBase):
 
             if form.validate_on_submit():
                 if form.repeatability.data == 'once':
-                    dates = [form.start_dt.data]
+                    # only one repetition
+                    clone = clone_event(
+                        self.event, None, form.start_dt.data, set(form.selected_items.data), form.category.data,
+                        form.refresh_users.data
+                    )
+                    flash(_('Welcome to your cloned event!'), 'success')
+                    return jsonify_data(redirect=url_for('event_management.settings', clone), flash=False)
                 else:
+                    # recurring event
                     clone_calculator = get_clone_calculator(form.repeatability.data, self.event)
                     dates = clone_calculator.calculate(request.form)[0]
-                clones = [clone_event(self.event, start_dt, set(form.selected_items.data), form.category.data)
-                          for start_dt in dates]
-                if len(clones) == 1:
-                    flash(_('Welcome to your cloned event!'), 'success')
-                    return jsonify_data(redirect=url_for('event_management.settings', clones[0]), flash=False)
-                else:
+                    for n, start_dt in enumerate(dates, 1):
+                        clone_event(self.event, n, start_dt, set(form.selected_items.data), form.category.data,
+                                    form.refresh_users.data)
                     flash(_('{} new events created.').format(len(dates)), 'success')
                     return jsonify_data(redirect=form.category.data.url, flash=False)
             else:
@@ -262,6 +263,6 @@ class RHImportEventDetails(RHManageEventBase):
         form = ImportSourceEventForm()
         try:
             event = _get_import_source_from_url(self.event, form.source_event_url.data)
-        except ValueError as e:
-            return jsonify(error={'message': e.message})
+        except ValueError as exc:
+            return jsonify(error={'message': str(exc)})
         return jsonify_data(event=schema.dump(event))

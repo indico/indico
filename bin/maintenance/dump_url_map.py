@@ -1,5 +1,5 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
@@ -18,7 +18,7 @@ def get_map_version():
     # build a version identifier that is very likely to be different
     # whenever something changed
     h = hashlib.md5()
-    h.update(os.getcwd())
+    h.update(os.getcwd().encode())
     h.update(subprocess.check_output(['git', 'describe', '--always']))
     h.update(subprocess.check_output(['git', 'status']))
     h.update(subprocess.check_output(['git', 'diff']))
@@ -27,9 +27,9 @@ def get_map_version():
 
 def get_rules(plugins):
     from indico.web.flask.app import make_app
-    app = make_app(set_path=True, testing=True, config_override={'BASE_URL': 'http://localhost/',
-                                                                 'SECRET_KEY': '*' * 16,
-                                                                 'PLUGINS': plugins})
+    app = make_app(testing=True, config_override={'BASE_URL': 'http://localhost/',
+                                                  'SECRET_KEY': '*' * 16,
+                                                  'PLUGINS': plugins})
     return dump_url_map(app.url_map)
 
 
@@ -39,12 +39,13 @@ def get_rules(plugins):
 @click.option('-p', '--plugin', 'plugins', multiple=True, help='Include URLs from the specified plugins')
 def main(force, output, plugins):
     """
-    Dumps the URL routing map to JSON for use by the `babel-flask-url` babel plugin.
+    Dump the URL routing map to JSON for use by the `babel-flask-url`
+    babel plugin.
     """
     try:
         with open(output) as f:
             data = json.load(f)
-    except IOError:
+    except OSError:
         data = {}
     version = get_map_version()
     if not force and data.get('version') == version:

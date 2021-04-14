@@ -1,5 +1,5 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
@@ -34,7 +34,7 @@ class RoomBookingHookBase(HTTPAPIHook):
     GUEST_ALLOWED = False
 
     def _getParams(self):
-        super(RoomBookingHookBase, self)._getParams()
+        super()._getParams()
         self._fromDT = utc_to_server(self._fromDT.astimezone(pytz.utc)).replace(tzinfo=None) if self._fromDT else None
         self._toDT = utc_to_server(self._toDT.astimezone(pytz.utc)).replace(tzinfo=None) if self._toDT else None
         self._occurrences = _yesno(get_query_parameter(self._queryParams, ['occ', 'occurrences'], 'no'))
@@ -56,9 +56,9 @@ class RoomHook(RoomBookingHookBase):
     VALID_FORMATS = ('json', 'jsonp', 'xml')
 
     def _getParams(self):
-        super(RoomHook, self)._getParams()
+        super()._getParams()
         self._location = self._pathParams['location']
-        self._ids = map(int, self._pathParams['idlist'].split('-'))
+        self._ids = list(map(int, self._pathParams['idlist'].split('-')))
         if self._detail not in {'rooms', 'reservations'}:
             raise HTTPAPIError('Invalid detail level: %s' % self._detail, 400)
 
@@ -94,7 +94,7 @@ class RoomNameHook(RoomBookingHookBase):
     VALID_FORMATS = ('json', 'jsonp', 'xml')
 
     def _getParams(self):
-        super(RoomNameHook, self)._getParams()
+        super()._getParams()
         self._location = self._pathParams['location']
         self._room_name = self._pathParams['room_name']
 
@@ -107,7 +107,7 @@ class RoomNameHook(RoomBookingHookBase):
         if loc is None:
             return
 
-        search_str = '%{}%'.format(self._room_name)
+        search_str = f'%{self._room_name}%'
         rooms_data = Room.get_with_data(
             filters=[
                 Room.location_id == loc.id,
@@ -135,7 +135,7 @@ class ReservationHook(RoomBookingHookBase):
         return {'ical_serializer': _ical_serialize_reservation}
 
     def _getParams(self):
-        super(ReservationHook, self)._getParams()
+        super()._getParams()
         self._locations = self._pathParams['loclist'].split('-')
 
     def export_reservation(self, user):
@@ -158,7 +158,7 @@ class BookRoomHook(HTTPAPIHook):
     HTTP_POST = True
 
     def _getParams(self):
-        super(BookRoomHook, self)._getParams()
+        super()._getParams()
         self._fromDT = utc_to_server(self._fromDT.astimezone(pytz.utc)).replace(tzinfo=None) if self._fromDT else None
         self._toDT = utc_to_server(self._toDT.astimezone(pytz.utc)).replace(tzinfo=None) if self._toDT else None
         if not self._fromDT or not self._toDT or self._fromDT.date() != self._toDT.date():
@@ -175,7 +175,7 @@ class BookRoomHook(HTTPAPIHook):
         if not users:
             raise HTTPAPIError('Username does not exist')
         elif len(users) != 1:
-            raise HTTPAPIError('Ambiguous username ({} users found)'.format(len(users)))
+            raise HTTPAPIError(f'Ambiguous username ({len(users)} users found)')
         user = users[0]
 
         self._params = {
@@ -185,7 +185,7 @@ class BookRoomHook(HTTPAPIHook):
             'from': self._fromDT,
             'to': self._toDT
         }
-        missing = [key for key, val in self._params.iteritems() if not val]
+        missing = [key for key, val in self._params.items() if not val]
         if missing:
             raise HTTPAPIError('Required params missing: {}'.format(', '.join(missing)))
         self._room = Room.get(self._params['room_id'])
@@ -216,14 +216,14 @@ class BookRoomHook(HTTPAPIHook):
         except ConflictingOccurrences:
             raise HTTPAPIError('Failed to create the booking due to conflicts with other bookings')
         except IndicoError as e:
-            raise HTTPAPIError('Failed to create the booking: {}'.format(e))
+            raise HTTPAPIError(f'Failed to create the booking: {e}')
         db.session.add(reservation)
         db.session.flush()
         return {'reservationID': reservation.id}
 
 
 def _export_reservations(hook, limit_per_room, include_rooms, extra_filters=None):
-    """Exports reservations.
+    """Export reservations.
 
     :param hook: The HTTPAPIHook instance
     :param limit_per_room: Should the limit/offset be applied per room
@@ -243,7 +243,7 @@ def _export_reservations(hook, limit_per_room, include_rooms, extra_filters=None
         filters.append(cast(Reservation.start_dt, Time) >= hook._fromDT.time())
     filters += _get_reservation_state_filter(hook._queryParams)
     occurs = [datetime.strptime(x, '%Y-%m-%d').date()
-              for x in filter(None, get_query_parameter(hook._queryParams, ['occurs'], '').split(','))]
+              for x in [_f for _f in get_query_parameter(hook._queryParams, ['occurs'], '').split(',') if _f]]
     data = []
     if hook._occurrences:
         data.append('occurrences')
@@ -260,7 +260,7 @@ def _export_reservations(hook, limit_per_room, include_rooms, extra_filters=None
 
 
 def _serializable_room(room_data, reservations=None):
-    """Serializable room data
+    """Serializable room data.
 
     :param room_data: Room data
     :param reservations: MultiDict mapping for room id => reservations
@@ -273,7 +273,7 @@ def _serializable_room(room_data, reservations=None):
 
 
 def _serializable_room_minimal(room):
-    """Serializable minimal room data (inside reservations)
+    """Serializable minimal room data (inside reservations).
 
     :param room: A `Room`
     """
@@ -283,7 +283,7 @@ def _serializable_room_minimal(room):
 
 
 def _serializable_reservation(reservation_data, include_room=False):
-    """Serializable reservation (standalone or inside room)
+    """Serializable reservation (standalone or inside room).
 
     :param reservation_data: Reservation data
     :param include_room: Include minimal room information
@@ -315,7 +315,7 @@ def _ical_serialize_repeatability(data):
         recur['interval'] = data['repeat_interval']
     elif data['repeat_frequency'] == RepeatFrequency.MONTH:
         recur['freq'] = 'monthly'
-        recur['byday'] = '{}{}'.format(start_dt_utc.day // 7, WEEK_DAYS[start_dt_utc.weekday()])
+        recur['byday'] = f'{start_dt_utc.day // 7}{WEEK_DAYS[start_dt_utc.weekday()]}'
     return recur
 
 
@@ -330,8 +330,8 @@ def _ical_serialize_reservation(cal, data, now):
     event.add('dtend', end_dt_utc)
     event.add('url', data['bookingUrl'])
     event.add('summary', data['reason'])
-    event.add('location', u'{}: {}'.format(data['location'], data['room']['fullName']))
-    event.add('description', data['reason'].decode('utf-8') + '\n\n' + data['bookingUrl'])
+    event.add('location', '{}: {}'.format(data['location'], data['room']['fullName']))
+    event.add('description', data['reason'] + '\n\n' + data['bookingUrl'])
     if data['repeat_frequency'] != RepeatFrequency.NEVER:
         event.add('rrule', _ical_serialize_repeatability(data))
     cal.add_component(event)

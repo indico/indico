@@ -1,11 +1,9 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
-
-from __future__ import unicode_literals
 
 import json
 import os
@@ -29,7 +27,7 @@ from indico.core import signals
 from indico.core.config import config
 from indico.core.errors import NoReportError, UserValueError
 from indico.core.permissions import FULL_ACCESS_PERMISSION, READ_ACCESS_PERMISSION
-from indico.modules.api import api_settings
+from indico.modules.categories.models.roles import CategoryRole
 from indico.modules.events import Event
 from indico.modules.events.contributions.models.contributions import Contribution
 from indico.modules.events.contributions.models.subcontributions import SubContribution
@@ -37,17 +35,19 @@ from indico.modules.events.layout import theme_settings
 from indico.modules.events.models.events import EventType
 from indico.modules.events.models.persons import EventPerson
 from indico.modules.events.models.principals import EventPrincipal
+from indico.modules.events.models.roles import EventRole
 from indico.modules.events.models.static_list_links import StaticListLink
 from indico.modules.events.registration.models.forms import RegistrationForm
 from indico.modules.events.sessions.models.sessions import Session
 from indico.modules.events.timetable.models.breaks import Break
 from indico.modules.events.timetable.models.entries import TimetableEntry
 from indico.modules.networks import IPNetworkGroup
+from indico.modules.users import User
+from indico.util.caching import memoize_request
 from indico.util.fs import chmod_umask, secure_filename
 from indico.util.i18n import _
 from indico.util.string import strip_tags
-from indico.util.user import principal_from_fossil
-from indico.web.flask.templating import get_template_module
+from indico.util.user import principal_from_identifier
 from indico.web.flask.util import send_file, url_for
 from indico.web.forms.colors import get_colors
 
@@ -58,7 +58,7 @@ def check_event_locked(rh, event, force=False):
 
 
 def get_object_from_args(args=None):
-    """Retrieves an event object from request arguments.
+    """Retrieve an event object from request arguments.
 
     This utility is meant to be used in cases where the same controller
     can deal with objects attached to various parts of an event which
@@ -75,7 +75,7 @@ def get_object_from_args(args=None):
     if args is None:
         args = request.view_args
     object_type = args['object_type']
-    event = Event.find_first(id=args['confId'], is_deleted=False)
+    event = Event.get(args['event_id'], is_deleted=False)
     if event is None:
         obj = None
     elif object_type == 'event':
@@ -85,11 +85,13 @@ def get_object_from_args(args=None):
     elif object_type == 'contribution':
         obj = Contribution.query.with_parent(event).filter_by(id=args['contrib_id']).first()
     elif object_type == 'subcontribution':
-        obj = SubContribution.find(SubContribution.id == args['subcontrib_id'], ~SubContribution.is_deleted,
-                                   SubContribution.contribution.has(event=event, id=args['contrib_id'],
-                                                                    is_deleted=False)).first()
+        obj = (SubContribution.query
+               .filter(SubContribution.id == args['subcontrib_id'],
+                       ~SubContribution.is_deleted,
+                       SubContribution.contribution.has(event=event, id=args['contrib_id'], is_deleted=False))
+               .first())
     else:
-        raise ValueError('Unexpected object type: {}'.format(object_type))
+        raise ValueError(f'Unexpected object type: {object_type}')
     if obj is not None:
         return object_type, event, obj
     else:
@@ -123,7 +125,7 @@ def get_theme(event, override_theme_id=None):
 
 
 def get_events_managed_by(user, dt=None):
-    """Gets the IDs of events where the user has management privs.
+    """Get the IDs of events where the user has management privs.
 
     :param user: A `User`
     :param dt: Only include events taking place on/after that date
@@ -138,7 +140,7 @@ def get_events_managed_by(user, dt=None):
 
 
 def get_events_created_by(user, dt=None):
-    """Gets the IDs of events created by the user
+    """Get the IDs of events created by the user.
 
     :param user: A `User`
     :param dt: Only include events taking place on/after that date
@@ -152,7 +154,7 @@ def get_events_created_by(user, dt=None):
 
 def get_events_with_linked_event_persons(user, dt=None):
     """
-    Returns a dict containing the event ids and role for all events
+    Return a dict containing the event ids and role for all events
     where the user is a chairperson or (in case of a lecture) speaker.
 
     :param user: A `User`
@@ -175,7 +177,7 @@ def get_random_color(event):
 
 
 def serialize_event_person(person):
-    """Serialize EventPerson to JSON-like object"""
+    """Serialize EventPerson to JSON-like object."""
     return {'_type': 'EventPerson',
             'id': person.id,
             'email': person.email,
@@ -190,7 +192,7 @@ def serialize_event_person(person):
 
 
 def serialize_person_link(person_link):
-    """Serialize PersonLink to JSON-like object"""
+    """Serialize PersonLink to JSON-like object."""
     data = {'email': person_link.person.email,
             'name': person_link.display_full_name,
             'fullName': person_link.display_full_name,
@@ -200,7 +202,8 @@ def serialize_person_link(person_link):
             'affiliation': person_link.affiliation,
             'phone': person_link.phone,
             'address': person_link.address,
-            'displayOrder': person_link.display_order}
+            'displayOrder': person_link.display_order,
+            'userId': person_link.person.user_id}
     if person_link.person.id is not None:
         # In case of a newly added person we only serialize the data again
         # if the form's validation failed and the field needs to be displayed
@@ -216,7 +219,7 @@ def serialize_person_link(person_link):
 
 
 def update_object_principals(obj, new_principals, read_access=False, full_access=False, permission=None):
-    """Updates an object's ACL with a new list of principals
+    """Update an object's ACL with a new list of principals.
 
     Exactly one argument out of `read_access`, `full_access` and `role` must be specified.
 
@@ -253,7 +256,7 @@ def update_object_principals(obj, new_principals, read_access=False, full_access
     return {'added': added, 'removed': removed}
 
 
-class ListGeneratorBase(object):
+class ListGeneratorBase:
     """Base class for classes performing actions on Indico object lists.
 
     :param event: The associated `Event`
@@ -286,7 +289,7 @@ class ListGeneratorBase(object):
         This ID will be used as a key to set the list's configuration to the
         session.
         """
-        return '{}_config_{}'.format(self.list_link_type, self.entry_parent.id)
+        return f'{self.list_link_type}_config_{self.entry_parent.id}'
 
     def _get_config(self):
         """Load the list's configuration from the DB and return it."""
@@ -299,7 +302,7 @@ class ListGeneratorBase(object):
         return session.get(session_key, self.default_list_config)
 
     def _split_item_ids(self, item_ids, separator_type=None):
-        """Separate the dynamic item ids from the static
+        """Separate the dynamic item ids from the static.
 
         :param item_ids: The list of ids to be splitted.
         :param separator_type: The type of the item to base the partitioning on.
@@ -313,7 +316,7 @@ class ListGeneratorBase(object):
                  partitioning.
         """
         if separator_type == 'dynamic':
-            dynamic_item_ids = [item_id for item_id in item_ids if not isinstance(item_id, basestring)]
+            dynamic_item_ids = [item_id for item_id in item_ids if not isinstance(item_id, str)]
             return dynamic_item_ids, [item_id for item_id in item_ids if item_id not in dynamic_item_ids]
         elif separator_type == 'static':
             static_item_ids = [item_id for item_id in item_ids if item_id in self.static_items]
@@ -338,14 +341,14 @@ class ListGeneratorBase(object):
         """Get the new filters after the filter form is submitted."""
         def get_selected_options(item_id, item):
             if item.get('filter_choices') or item.get('type') == 'bool':
-                return [x if x != 'None' else None for x in request.form.getlist('field_{}'.format(item_id))]
+                return [x if x != 'None' else None for x in request.form.getlist(f'field_{item_id}')]
 
         filters = deepcopy(self.default_list_config['filters'])
-        for item_id, item in self.static_items.iteritems():
+        for item_id, item in self.static_items.items():
             options = get_selected_options(item_id, item)
             if options:
                 filters['items'][item_id] = options
-        for item_id, item in self.extra_filters.iteritems():
+        for item_id, item in self.extra_filters.items():
             options = get_selected_options(item_id, item)
             if options:
                 filters['extra'][item_id] = options
@@ -383,34 +386,8 @@ class ListGeneratorBase(object):
         raise NotImplementedError
 
 
-def get_base_ical_parameters(user, detail, path, params=None):
-    """Returns a dict of all parameters expected by iCal template"""
-
-    from indico.web.http_api.util import generate_public_auth_request
-
-    api_mode = api_settings.get('security_mode')
-    persistent_allowed = api_settings.get('allow_persistent')
-    api_key = user.api_key if user else None
-    persistent_user_enabled = api_key.is_persistent_allowed if api_key else None
-    tpl = get_template_module('api/_messages.html')
-    persistent_agreement = tpl.get_ical_persistent_msg()
-    top_urls = generate_public_auth_request(api_key, path, params)
-    urls = generate_public_auth_request(api_key, path, dict(params or {}, detail=detail))
-    request_urls = {
-        'publicRequestURL': top_urls['publicRequestURL'],
-        'authRequestURL': top_urls['authRequestURL'],
-        'publicRequestDetailedURL': urls['publicRequestURL'],
-        'authRequestDetailedURL': urls['authRequestURL']
-    }
-
-    return {'api_mode': api_mode, 'api_key': api_key, 'persistent_allowed': persistent_allowed,
-            'persistent_user_enabled': persistent_user_enabled, 'api_active': api_key is not None,
-            'api_key_user_agreement': tpl.get_ical_api_key_msg(), 'api_persistent_user_agreement': persistent_agreement,
-            'user_logged': user is not None, 'request_urls': request_urls}
-
-
 def create_event_logo_tmp_file(event, tmpdir=None):
-    """Creates a temporary file with the event's logo
+    """Create a temporary file with the event's logo.
 
     If `tmpdir` is specified, the logo file is created in there and
     a path relative to that directory is returned.
@@ -471,7 +448,7 @@ def track_time_changes(auto_extend=False, user=None):
                     raise UserValueError(_("Your action requires modification of session block boundaries, but you are "
                                            "not authorized to manage the session block."))
         old_times = g.pop('old_times')
-        for obj, info in old_times.iteritems():
+        for obj, info in old_times.items():
             if isinstance(obj, TimetableEntry):
                 obj = obj.object
             if obj.start_dt != info['start_dt']:
@@ -480,13 +457,13 @@ def track_time_changes(auto_extend=False, user=None):
                 changes[obj]['duration'] = (info['duration'], obj.duration)
             if obj.end_dt != info['end_dt']:
                 changes[obj]['end_dt'] = (info['end_dt'], obj.end_dt)
-        for obj, obj_changes in changes.iteritems():
+        for obj, obj_changes in changes.items():
             entry = None if isinstance(obj, Event) else obj.timetable_entry
             signals.event.times_changed.send(type(obj), entry=entry, obj=obj, changes=obj_changes)
 
 
 def register_time_change(entry):
-    """Register a time-related change for a timetable entry
+    """Register a time-related change for a timetable entry.
 
     This is an internal helper function used in the models to record
     changes of the start time or duration.  The changes are exposed
@@ -498,7 +475,7 @@ def register_time_change(entry):
     try:
         old_times = g.old_times
     except AttributeError:
-        msg = 'Time change of {} was not tracked'.format(entry)
+        msg = f'Time change of {entry} was not tracked'
         if current_app.config.get('REPL'):
             warnings.warn(msg + ' (exception converted to a warning since you are using the REPL)', stacklevel=2)
             return
@@ -513,7 +490,7 @@ def register_time_change(entry):
 
 
 def register_event_time_change(event):
-    """Register a time-related change for an event
+    """Register a time-related change for an event.
 
     This is an internal helper function used in the model to record
     changes of the start time or end time.  The changes are exposed
@@ -525,7 +502,7 @@ def register_event_time_change(event):
     try:
         old_times = g.old_times
     except AttributeError:
-        msg = 'Time change of {} was not tracked'.format(event)
+        msg = f'Time change of {event} was not tracked'
         if current_app.config.get('REPL'):
             warnings.warn(msg + ' (exception converted to a warning since you are using the REPL)', stacklevel=2)
             return
@@ -568,7 +545,7 @@ def serialize_event_for_json_ld(event, full=False):
     if full and event.description:
         data['description'] = strip_tags(event.description)
     if full and event.person_links:
-        data['performer'] = map(serialize_person_for_json_ld, event.person_links)
+        data['performer'] = list(map(serialize_person_for_json_ld, event.person_links))
     if full and event.has_logo:
         data['image'] = event.external_logo_url
     return data
@@ -586,15 +563,15 @@ def serialize_person_for_json_ld(person):
 
 
 def get_field_values(form_data):
-    """Split the form fields between custom and static"""
-    fields = {x: form_data[x] for x in form_data.iterkeys() if not x.startswith('custom_')}
-    custom_fields = {x: form_data[x] for x in form_data.iterkeys() if x.startswith('custom_')}
+    """Split the form fields between custom and static."""
+    fields = {x: form_data[x] for x in form_data.keys() if not x.startswith('custom_')}
+    custom_fields = {x: form_data[x] for x in form_data.keys() if x.startswith('custom_')}
     return fields, custom_fields
 
 
 def set_custom_fields(obj, custom_fields_data):
     changes = {}
-    for custom_field_name, custom_field_value in custom_fields_data.iteritems():
+    for custom_field_name, custom_field_value in custom_fields_data.items():
         custom_field_id = int(custom_field_name[7:])  # Remove the 'custom_' part
         old_value = obj.set_custom_field(custom_field_id, custom_field_value)
         if old_value != custom_field_value:
@@ -602,16 +579,20 @@ def set_custom_fields(obj, custom_fields_data):
     return changes
 
 
-def check_permissions(event, field, allow_networks=False, allow_registration_forms=False):
+def check_permissions(event, field, allow_networks=False):
     for principal_fossil, permissions in field.data:
-        principal = principal_from_fossil(principal_fossil, allow_emails=True, allow_networks=allow_networks,
-                                          allow_pending=True, allow_registration_forms=allow_registration_forms,
-                                          event=event, category=event.category)
-        if allow_networks and isinstance(principal, IPNetworkGroup) and set(permissions) - {READ_ACCESS_PERMISSION}:
+        principal = principal_from_identifier(principal_fossil['identifier'],
+                                              allow_groups=True,
+                                              allow_category_roles=True,
+                                              allow_event_roles=True,
+                                              allow_emails=True,
+                                              allow_registration_forms=True,
+                                              allow_networks=allow_networks,
+                                              event_id=event.id)
+        if isinstance(principal, IPNetworkGroup) and set(permissions) - {READ_ACCESS_PERMISSION}:
             msg = _('IP networks cannot have management permissions: {}').format(principal.name)
             return msg
-        if (allow_registration_forms and isinstance(principal, RegistrationForm)
-                and set(permissions) - {READ_ACCESS_PERMISSION}):
+        if isinstance(principal, RegistrationForm) and set(permissions) - {READ_ACCESS_PERMISSION}:
             msg = _('Registrants cannot have management permissions: {}').format(principal.name)
             return msg
         if FULL_ACCESS_PERMISSION in permissions and len(permissions) != 1:
@@ -634,11 +615,10 @@ def get_event_from_url(url):
 
 
 class ZipGeneratorMixin:
-    """Mixin for RHs that generate zip with files"""
+    """Mixin for RHs that generate zip with files."""
 
     def _adjust_path_length(self, segments):
-        """
-        Shorten the path length to < 260 chars.
+        """Shorten the path length to < 260 chars.
 
         Windows' built-in ZIP tool doesn't like files whose
         total path exceeds ~260 chars. Here we progressively
@@ -659,33 +639,47 @@ class ZipGeneratorMixin:
         return reversed(result)
 
     def _iter_items(self, files_holder):
-        for f in files_holder:
-            yield f
+        yield from files_holder
 
-    def _generate_zip_file(self, files_holder, name_prefix='material', name_suffix=None):
+    def _generate_zip_file(self, files_holder, name_prefix='material', name_suffix=None, return_file=False):
         """Generate a zip file containing the files passed.
 
         :param files_holder: An iterable (or an iterable containing) object that
                              contains the files to be added in the zip file.
         :param name_prefix: The prefix to the zip file name
         :param name_suffix: The suffix to the zip file name
-        :return: The generated zip file.
+        :param return_file: Return the temp file instead of a response
         """
 
-        temp_file = NamedTemporaryFile(suffix='indico.tmp', dir=config.TEMP_DIR)
+        temp_file = NamedTemporaryFile(suffix='.zip', dir=config.TEMP_DIR, delete=False)
         with ZipFile(temp_file.name, 'w', allowZip64=True) as zip_handler:
             self.used_filenames = set()
             for item in self._iter_items(files_holder):
                 name = self._prepare_folder_structure(item)
                 self.used_filenames.add(name)
                 with item.get_local_path() as filepath:
-                    zip_handler.write(filepath.encode('utf-8'), name)
+                    zip_handler.write(filepath, name)
 
-        temp_file.delete = False
-        zip_file_name = '{}-{}.zip'.format(name_prefix, name_suffix) if name_suffix else '{}.zip'.format(name_prefix)
+        zip_file_name = f'{name_prefix}-{name_suffix}.zip' if name_suffix else f'{name_prefix}.zip'
         chmod_umask(temp_file.name)
+        if return_file:
+            return temp_file
         return send_file(zip_file_name, temp_file.name, 'application/zip', inline=False)
 
     def _prepare_folder_structure(self, item):
-        file_name = secure_filename('{}_{}'.format(unicode(item.id), item.filename), item.filename)
+        file_name = secure_filename(f'{item.id}_{item.filename}', str(item.id))
         return os.path.join(*self._adjust_path_length([file_name]))
+
+
+@memoize_request
+def get_all_user_roles(event, user):
+    event_roles = set(
+        EventRole.query.with_parent(event)
+        .filter(EventRole.members.any(User.id == user.id))
+    )
+    category_roles = set(
+        CategoryRole.query
+        .join(event.category.chain_query.subquery())
+        .filter(CategoryRole.members.any(User.id == user.id))
+    )
+    return event_roles, category_roles

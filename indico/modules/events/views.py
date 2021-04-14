@@ -1,11 +1,9 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
-
-from __future__ import print_function, unicode_literals
 
 import posixpath
 
@@ -23,7 +21,7 @@ from indico.modules.events.models.events import EventType
 from indico.modules.events.util import serialize_event_for_json_ld
 from indico.util.date_time import format_date
 from indico.util.mathjax import MathjaxMixin
-from indico.util.string import strip_tags, to_unicode, truncate
+from indico.util.string import strip_tags, truncate
 from indico.web.flask.util import url_for
 from indico.web.views import WPDecorated, WPJinjaMixin
 
@@ -53,7 +51,7 @@ def render_event_header(event, conference_layout=False, theme=None, theme_overri
     print_url = _get_print_url(event, theme, theme_override) if not conference_layout else None
     show_nav_bar = event.type_ != EventType.conference or layout_settings.get(event, 'show_nav_bar')
     themes = {tid: {'name': data['title'], 'user_visible': data.get('user_visible')}
-              for tid, data in theme_settings.get_themes_for(event.type_.name).viewitems()}
+              for tid, data in theme_settings.get_themes_for(event.type_.name).items()}
     return render_template('events/header.html',
                            event=event, print_url=print_url, show_nav_bar=show_nav_bar, themes=themes, theme=theme)
 
@@ -61,8 +59,8 @@ def render_event_header(event, conference_layout=False, theme=None, theme_overri
 def render_event_footer(event, dark=False):
     location = event.venue_name
     if event.room_name:
-        location = '{} ({})'.format(event.room_name, location)
-    description = '{}\n\n{}'.format(truncate(event.description, 1000), event.short_external_url).strip()
+        location = f'{event.room_name} ({location})'
+    description = f'{truncate(event.description, 1000)}\n\n{event.short_external_url}'.strip()
     google_calendar_params = {
         'action': 'TEMPLATE',
         'text': event.title,
@@ -90,11 +88,11 @@ class WPEventAdmin(WPAdmin):
 
 class WPEventBase(WPDecorated):
     ALLOW_JSON = False
-    bundles = ('module_events.display.js', 'module_events.contributions.js')
+    bundles = ('module_events.display.js', 'module_events.contributions.js', 'module_events.header.js')
 
     @property
     def page_metadata(self):
-        metadata = super(WPEventBase, self).page_metadata
+        metadata = super().page_metadata
         return {
             'og': dict(metadata['og'], **{
                 'title': self.event.title,
@@ -113,24 +111,24 @@ class WPEventBase(WPDecorated):
         WPDecorated.__init__(self, rh, **kwargs)
         start_dt_local = event_.start_dt_display.astimezone(event_.display_tzinfo)
         end_dt_local = event_.end_dt_display.astimezone(event_.display_tzinfo)
-        dates = ' ({})'.format(to_unicode(format_date(start_dt_local, format='long')))
+        dates = ' ({})'.format(format_date(start_dt_local, format='long'))
         if start_dt_local.date() != end_dt_local.date():
             if start_dt_local.year == end_dt_local.year and start_dt_local.month == end_dt_local.month:
-                dates = ' ({}-{})'.format(start_dt_local.day, to_unicode(format_date(end_dt_local, format='long')))
+                dates = ' ({}-{})'.format(start_dt_local.day, format_date(end_dt_local, format='long'))
             else:
-                dates = ' ({} - {})'.format(to_unicode(format_date(start_dt_local, format='long')),
-                                            to_unicode(format_date(end_dt_local, format='long')))
-        self.title = '{} {}'.format(strip_tags(self.event.title), dates)
+                dates = ' ({} - {})'.format(format_date(start_dt_local, format='long'),
+                                            format_date(end_dt_local, format='long'))
+        self.title = f'{strip_tags(self.event.title)} {dates}'
         page_title = kwargs.get('page_title')
         if page_title:
-            self.title += ': {}'.format(strip_tags(page_title))
+            self.title += f': {strip_tags(page_title)}'
 
     def _get_header(self):
         raise NotImplementedError  # must be overridden by meeting/lecture and conference WPs
 
 
 class WPSimpleEventDisplayBase(MathjaxMixin, WPEventBase):
-    """Base class for displaying something on a lecture/meeting page"""
+    """Base class for displaying something on a lecture/meeting page."""
 
     def __init__(self, rh, event_, **kwargs):
         self.event = event_
@@ -144,7 +142,12 @@ class WPSimpleEventDisplayBase(MathjaxMixin, WPEventBase):
 
 
 class WPSimpleEventDisplay(WPSimpleEventDisplayBase):
-    bundles = ('module_vc.js', 'module_vc.css', 'module_events.cloning.js', 'module_events.importing.js')
+    bundles = (
+        'module_vc.js',
+        'module_vc.css',
+        'module_events.cloning.js',
+        'module_events.importing.js',
+    )
 
     def __init__(self, rh, conf, theme_id, theme_override=False):
         WPSimpleEventDisplayBase.__init__(self, rh, conf)
@@ -159,11 +162,13 @@ class WPSimpleEventDisplay(WPSimpleEventDisplayBase):
         print_stylesheet = self.theme.get('print_stylesheet')
         if plugin:
             manifest = plugin.manifest
+            if manifest is None:
+                raise RuntimeError(f'Assets for plugin {plugin.name} have not been built')
         else:
             manifest = current_app.manifest
         return {
-            'screen': (manifest['themes_{}.css'.format(self.theme_file_name)],),
-            'print': ((manifest['themes_{}.print.css'.format(self.theme_file_name)],)
+            'screen': (manifest[f'themes_{self.theme_file_name}.css'],),
+            'print': ((manifest[f'themes_{self.theme_file_name}.print.css'],)
                       if print_stylesheet else ())
         }
 
@@ -205,16 +210,15 @@ class WPSimpleEventDisplay(WPSimpleEventDisplayBase):
                if (plugin and tpl_name[0] == ':')
                else posixpath.join('events/display', tpl_name))
 
-        rv = render_template(tpl,
-                             event=self.event,
-                             category=self.event.category.title,
-                             timezone=self.event.display_tzinfo,
-                             theme_settings=self.theme.get('settings', {}),
-                             theme_user_settings=layout_settings.get(self.event, 'timetable_theme_settings'),
-                             files=files,
-                             folders=folders,
-                             lectures=lectures)
-        return rv.encode('utf-8')
+        return render_template(tpl,
+                               event=self.event,
+                               category=self.event.category.title,
+                               timezone=self.event.display_tzinfo,
+                               theme_settings=self.theme.get('settings', {}),
+                               theme_user_settings=layout_settings.get(self.event, 'timetable_theme_settings'),
+                               files=files,
+                               folders=folders,
+                               lectures=lectures)
 
 
 class WPConferenceDisplayBase(WPJinjaMixin, MathjaxMixin, WPEventBase):
@@ -239,7 +243,7 @@ class WPConferenceDisplayBase(WPJinjaMixin, MathjaxMixin, WPEventBase):
             'menu': menu_entries_for_event(self.event),
             'active_menu_item': self.sidemenu_option,
             'bg_color_css': 'background: #{0}; border-color: #{0};'.format(bg_color) if bg_color else '',
-            'text_color_css': 'color: #{};'.format(text_color) if text_color else '',
+            'text_color_css': f'color: #{text_color};' if text_color else '',
             'announcement': announcement
         }
 
@@ -284,7 +288,7 @@ class WPConferenceDisplayBase(WPJinjaMixin, MathjaxMixin, WPEventBase):
                                             event=self.event, form=css_override_form,
                                             download_url=self._kwargs['css_url_override'])
             body = override_html + body
-        return WPEventBase._apply_decoration(self, to_unicode(body))
+        return WPEventBase._apply_decoration(self, body)
 
 
 class WPConferenceDisplay(WPConferenceDisplayBase):

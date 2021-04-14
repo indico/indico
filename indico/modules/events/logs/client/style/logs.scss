@@ -1,5 +1,5 @@
 // This file is part of Indico.
-// Copyright (C) 2002 - 2020 CERN
+// Copyright (C) 2002 - 2021 CERN
 //
 // Indico is free software; you can redistribute it and/or
 // modify it under the terms of the MIT License; see the
@@ -147,16 +147,10 @@
       justify-content: space-between;
       margin-left: 1em;
 
-      .avatar-placeholder {
-        cursor: default;
+      .user-picture {
         opacity: 0.8;
         width: 25px;
         height: 25px;
-        display: flex;
-        justify-content: center;
-        color: rgba(#fff, 0.9);
-        background-color: #45f;
-        font-size: 1em;
         border-radius: 50%;
       }
 

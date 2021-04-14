@@ -1,5 +1,5 @@
 // This file is part of Indico.
-// Copyright (C) 2002 - 2020 CERN
+// Copyright (C) 2002 - 2021 CERN
 //
 // Indico is free software; you can redistribute it and/or
 // modify it under the terms of the MIT License; see the
@@ -8,6 +8,7 @@
 import deleteFileURL from 'indico-url:files.delete_file';
 
 import _ from 'lodash';
+
 import {handleAxiosError, indicoAxios} from 'indico/utils/axios';
 
 export async function uploadFile(url, file, onUploadProgress) {

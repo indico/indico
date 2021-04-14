@@ -41,6 +41,8 @@
     {{ render_image_form(icon_form, 'icon', '.manage_icon', _('Icon'), _('Delete Icon?'), delete_icon_prompt) }}
     {{ render_image_form(logo_form, 'logo', '.manage_logo', _('Logo'), _('Delete Logo?'), delete_logo_prompt) }}
 
+    {% block after_forms %}{% endblock %}
+
     <script>
         (function() {
             'use strict';

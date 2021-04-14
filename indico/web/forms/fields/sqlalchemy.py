@@ -1,11 +1,9 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
-
-from __future__ import absolute_import, unicode_literals
 
 from wtforms.ext.sqlalchemy.fields import QuerySelectMultipleField
 from wtforms.widgets import CheckboxInput
@@ -22,16 +20,16 @@ class IndicoQuerySelectMultipleField(QuerySelectMultipleField):
     def __init__(self, *args, **kwargs):
         self.modify_object_list = kwargs.pop('modify_object_list', None)
         self.collection_class = kwargs.pop('collection_class', list)
-        super(IndicoQuerySelectMultipleField, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
     def _get_object_list(self):
-        object_list = super(IndicoQuerySelectMultipleField, self)._get_object_list()
+        object_list = super()._get_object_list()
         if self.modify_object_list:
             object_list = list(self.modify_object_list(object_list))
         return object_list
 
     def _get_data(self):
-        data = super(IndicoQuerySelectMultipleField, self)._get_data()
+        data = super()._get_data()
         return self.collection_class(data)
 
     data = property(_get_data, QuerySelectMultipleField._set_data)

@@ -1,4 +1,4 @@
-{% extends 'categories/management/full_width_base.html' if category else 'events/management/full_width_base.html' %}
+{% extends 'categories/management/full_width_base.html' if category|default(none) else 'events/management/full_width_base.html' %}
 
 {% from 'message_box.html' import message_box %}
 
@@ -38,7 +38,7 @@
         </div>
         <div class="back-warning-qtip-content hidden">
             <ul class="js-back-affected qbubble-item-list">
-                {% for related_tpls_owner, related_tpls in related_tpls_per_owner.iteritems() %}
+                {% for related_tpls_owner, related_tpls in related_tpls_per_owner.items() %}
                     {% for related_tpl in related_tpls %}
                         <li>{{ related_tpl.title }} ({{ related_tpls_owner.title }})</li>
                     {% endfor %}
@@ -305,7 +305,7 @@
                 <div class="flexrow f-a-baseline">
                     <label for="element-list">{% trans %}Insert element:{% endtrans %}</label>
                     <select id="element-list">
-                        {% for group_id, group in placeholders.viewitems() | sort(attribute='1.title') %}
+                        {% for group_id, group in placeholders.items() | sort(attribute='1.title') %}
                             {% if group_id not in config.disallow_groups %}
                                 <optgroup label="{{ group.title }}">
                                     {% for option_id, option in group.options|dictsort(by='value') %}

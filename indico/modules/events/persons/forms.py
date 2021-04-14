@@ -1,11 +1,9 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
-
-from __future__ import unicode_literals
 
 from flask import request
 from wtforms.fields import BooleanField, HiddenField, SelectField, StringField, TextAreaField
@@ -34,17 +32,17 @@ class EmailEventPersonsForm(IndicoForm):
     def __init__(self, *args, **kwargs):
         register_link = kwargs.pop('register_link')
         event = kwargs.pop('event')
-        super(EmailEventPersonsForm, self).__init__(*args, **kwargs)
-        self.from_address.choices = event.get_allowed_sender_emails().items()
+        super().__init__(*args, **kwargs)
+        self.from_address.choices = list(event.get_allowed_sender_emails().items())
         self.body.description = render_placeholder_info('event-persons-email', event=None, person=None,
                                                         register_link=register_link)
 
     def is_submitted(self):
-        return super(EmailEventPersonsForm, self).is_submitted() and 'submitted' in request.form
+        return super().is_submitted() and 'submitted' in request.form
 
 
 class EventPersonForm(IndicoForm):
-    title = IndicoEnumSelectField(_('Title'), enum=UserTitle)
+    title = IndicoEnumSelectField(_('Title'), enum=UserTitle, sorted=True)
     first_name = StringField(_('First name'), [DataRequired()])
     last_name = StringField(_('Family name'), [DataRequired()])
     affiliation = StringField(_('Affiliation'))

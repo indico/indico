@@ -1,16 +1,18 @@
 // This file is part of Indico.
-// Copyright (C) 2002 - 2020 CERN
+// Copyright (C) 2002 - 2021 CERN
 //
 // Indico is free software; you can redistribute it and/or
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-import React from 'react';
 import PropTypes from 'prop-types';
+import React from 'react';
 import Overridable from 'react-overridable';
 import {Button, Icon, Segment} from 'semantic-ui-react';
+
 import {Param, Translate} from 'indico/react/i18n';
 import {toMoment} from 'indico/utils/date';
+
 import {renderRecurrence} from '../util';
 
 import './TimeInformation.module.scss';

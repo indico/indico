@@ -1,19 +1,20 @@
 // This file is part of Indico.
-// Copyright (C) 2002 - 2020 CERN
+// Copyright (C) 2002 - 2021 CERN
 //
 // Indico is free software; you can redistribute it and/or
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-import permissionInfoURL from 'indico-url:rb.permission_types';
 import principalsURL from 'indico-url:core.principals';
-import eventPrincipalsURL from 'indico-url:event_management.api_principals';
-import eventRolesURL from 'indico-url:event_management.api_event_roles';
 import eventCategoryRolesURL from 'indico-url:event_management.api_category_roles';
+import eventRolesURL from 'indico-url:event_management.api_event_roles';
+import eventPrincipalsURL from 'indico-url:event_management.api_principals';
 import registrationFormsURL from 'indico-url:event_registration.api_registration_forms';
+import permissionInfoURL from 'indico-url:rb.permission_types';
 
 import _ from 'lodash';
 import {useState, useEffect} from 'react';
+
 import {useIndicoAxios} from 'indico/react/hooks';
 
 import {PermissionManager} from './util';
@@ -28,7 +29,7 @@ export const useFetchPrincipals = (principalIds, eventId = null) => {
   const missingPrincipalIds = _.difference(principalIds, Object.keys(informationMap));
 
   const {data} = useIndicoAxios({
-    url: eventId === null ? principalsURL() : eventPrincipalsURL({confId: eventId}),
+    url: eventId === null ? principalsURL() : eventPrincipalsURL({event_id: eventId}),
     forceDispatchEffect: () => !!missingPrincipalIds.length,
     trigger: principalIds,
     camelize: true,
@@ -74,7 +75,7 @@ export const usePermissionInfo = () => {
 
 const _useFetchPrincipalList = (eventId, enabled, urlFunc, options = {}) => {
   const {data, loading} = useIndicoAxios({
-    url: urlFunc({confId: eventId}),
+    url: urlFunc({event_id: eventId}),
     trigger: enabled ? eventId : null,
     forceDispatchEffect: () => enabled && eventId !== null,
     camelize: true,

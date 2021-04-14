@@ -1,13 +1,15 @@
 // This file is part of Indico.
-// Copyright (C) 2002 - 2020 CERN
+// Copyright (C) 2002 - 2021 CERN
 //
 // Indico is free software; you can redistribute it and/or
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-(function(global) {
-  'use strict';
+/* global handleAjaxError:true */
 
+import _ from 'lodash';
+
+(function(global) {
   global.setupProtectionWidget = function setupProtectionWidget(options) {
     options = $.extend(
       true,
@@ -22,13 +24,11 @@
       options
     );
 
-    var inputs = $('input[name=' + options.fieldName + '][id^=' + options.fieldId + ']');
-    var $enableAclLink = $('.enable-acl-link');
-    var $aclListField = $('.acl-list-field');
+    const inputs = $(`input[name=${options.fieldName}][id^=${options.fieldId}]`);
 
     inputs.on('change', function() {
-      var $this = $(this);
-      var isProtected =
+      const $this = $(this);
+      const isProtected =
         $this.val() === 'protected' || ($this.val() === 'inheriting' && options.parentProtected);
 
       if (this.checked) {
@@ -42,7 +42,7 @@
             url: options.aclMessageUrl,
             data: {mode: $this.val()},
             error: handleAjaxError,
-            success: function(data) {
+            success(data) {
               $this
                 .closest('form')
                 .find('.inheriting-acl-message')
@@ -50,8 +50,6 @@
             },
           });
         }
-        $aclListField.toggleClass('hidden', !isProtected);
-        $enableAclLink.toggleClass('hidden', isProtected);
         if (options.permissionsFieldId) {
           $('#permissions-widget-{0}'.format(options.permissionsFieldId)).trigger(
             'indico:protectionModeChanged',
@@ -59,11 +57,6 @@
           );
         }
       }
-    });
-
-    $enableAclLink.on('click', function(evt) {
-      evt.preventDefault();
-      $('input[name=' + options.fieldName + '][value="protected"]').trigger('click');
     });
 
     _.defer(function() {

@@ -1,20 +1,22 @@
 // This file is part of Indico.
-// Copyright (C) 2002 - 2020 CERN
+// Copyright (C) 2002 - 2021 CERN
 //
 // Indico is free software; you can redistribute it and/or
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
 import {combineReducers} from 'redux';
+
 import {camelizeKeys} from 'indico/utils/case';
 import {requestReducer} from 'indico/utils/redux';
 
+import {actions as adminActions} from '../../modules/admin';
+import * as bookRoomActions from '../../modules/bookRoom/actions';
+import {sanitizeRecurrence} from '../../util';
 import {filterReducerFactory} from '../filters';
 import {mapSearchReducerFactory} from '../map';
+
 import {roomSearchActionsFactory} from './actions';
-import * as bookRoomActions from '../../modules/bookRoom/actions';
-import {actions as adminActions} from '../../modules/admin';
-import {sanitizeRecurrence} from '../../util';
 
 export function processRoomFilters(filters, param) {
   if (param === 'recurrence') {

@@ -12,7 +12,7 @@
       "indico/modules/users/*": ["./indico/modules/users/client/js/*"],
       "indico/modules/events/reviewing/*": ["./indico/modules/events/client/js/reviewing/*"],
       "indico/modules/events/editing/*": ["./indico/modules/events/editing/client/js/*"],
-      "indico/modules/events/util/*": ["./indico/modules/events/client/js/util/*"],
+      "indico/modules/events/*": ["./indico/modules/events/client/js/*"],
       "indico/*": ["./indico/web/client/js/*"]
     }
   },

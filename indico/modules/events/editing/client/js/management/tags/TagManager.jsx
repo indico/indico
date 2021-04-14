@@ -1,23 +1,24 @@
 // This file is part of Indico.
-// Copyright (C) 2002 - 2020 CERN
+// Copyright (C) 2002 - 2021 CERN
 //
 // Indico is free software; you can redistribute it and/or
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-import tagsURL from 'indico-url:event_editing.api_tags';
 import createTagURL from 'indico-url:event_editing.api_create_tag';
 import editTagURL from 'indico-url:event_editing.api_edit_tag';
+import tagsURL from 'indico-url:event_editing.api_tags';
 
-import React, {useReducer} from 'react';
 import PropTypes from 'prop-types';
+import React, {useReducer} from 'react';
 import {Button, Icon, Label, Loader, Message, Segment, Popup} from 'semantic-ui-react';
 
-import {Param, Translate} from 'indico/react/i18n';
 import {RequestConfirm} from 'indico/react/components';
 import {getChangedValues, handleSubmitError} from 'indico/react/forms';
 import {useIndicoAxios} from 'indico/react/hooks';
+import {Param, Translate} from 'indico/react/i18n';
 import {handleAxiosError, indicoAxios} from 'indico/utils/axios';
+
 import TagModal from './TagModal';
 
 import './TagManager.module.scss';
@@ -45,14 +46,14 @@ function tagsReducer(state, action) {
 export default function TagManager({eventId}) {
   const [state, dispatch] = useReducer(tagsReducer, initialState);
   const {data, loading: isLoadingTags, reFetch, lastData} = useIndicoAxios({
-    url: tagsURL({confId: eventId}),
+    url: tagsURL({event_id: eventId}),
     camelize: true,
     trigger: eventId,
   });
 
   const createTag = async formData => {
     try {
-      await indicoAxios.post(createTagURL({confId: eventId}), formData);
+      await indicoAxios.post(createTagURL({event_id: eventId}), formData);
       reFetch();
     } catch (e) {
       return handleSubmitError(e);
@@ -60,7 +61,7 @@ export default function TagManager({eventId}) {
   };
 
   const editTag = async (tagId, tagData) => {
-    const url = editTagURL({confId: eventId, tag_id: tagId});
+    const url = editTagURL({event_id: eventId, tag_id: tagId});
 
     try {
       await indicoAxios.patch(url, tagData);
@@ -71,7 +72,7 @@ export default function TagManager({eventId}) {
   };
 
   const deleteTag = async tagId => {
-    const url = editTagURL({confId: eventId, tag_id: tagId});
+    const url = editTagURL({event_id: eventId, tag_id: tagId});
 
     try {
       await indicoAxios.delete(url);

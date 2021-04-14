@@ -1,11 +1,9 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
-
-from __future__ import unicode_literals
 
 from flask import current_app, g
 
@@ -13,7 +11,7 @@ from indico.modules.events.papers.controllers import api, display, management, p
 from indico.web.flask.wrappers import IndicoBlueprint
 
 
-_bp = IndicoBlueprint('papers', __name__, url_prefix='/event/<confId>', template_folder='templates',
+_bp = IndicoBlueprint('papers', __name__, url_prefix='/event/<int:event_id>', template_folder='templates',
                       virtual_template_folder='events/papers')
 
 # API
@@ -96,6 +94,9 @@ for prefix, is_management in (('/manage/papers/assignment-list', True), ('/paper
                      paper.RHAssignPapers, methods=('POST',), defaults=defaults)
     _bp.add_url_rule(prefix + '/unassign/<any(judge,content_reviewer,layout_reviewer):role>', 'unassign_papers',
                      paper.RHUnassignPapers, methods=('POST',), defaults=defaults)
+    if is_management:
+        _bp.add_url_rule(prefix + '/export-json', 'export_json', paper.RHExportPapersJSON, methods=('POST',),
+                         defaults=defaults)
 
 
 @_bp.url_defaults
@@ -106,8 +107,3 @@ def _add_management_flag(endpoint, values):
         # XXX: using getattr because the conference menu builds the url from an
         # RH without the management attribute
         values['management'] = getattr(g.rh, 'management', False)
-
-
-# Legacy URLs
-_compat_bp = IndicoBlueprint('compat_papers', __name__, url_prefix='/event/<int:confId>')
-# TODO...

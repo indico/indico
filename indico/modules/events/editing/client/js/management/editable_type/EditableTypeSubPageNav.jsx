@@ -1,5 +1,5 @@
 // This file is part of Indico.
-// Copyright (C) 2002 - 2020 CERN
+// Copyright (C) 2002 - 2021 CERN
 //
 // Indico is free software; you can redistribute it and/or
 // modify it under the terms of the MIT License; see the
@@ -7,21 +7,22 @@
 
 import editableTypeURL from 'indico-url:event_editing.manage_editable_type';
 
-import React from 'react';
 import PropTypes from 'prop-types';
+import React from 'react';
 import {useParams} from 'react-router-dom';
 
-import {useNumericParam} from 'indico/react/util/routing';
 import {
   ManagementPageBackButton,
   ManagementPageTitle,
   ManagementPageSubTitle,
 } from 'indico/react/components';
 import {Translate} from 'indico/react/i18n';
+import {useNumericParam} from 'indico/react/util/routing';
+
 import {EditableTypeTitles} from '../../models';
 
 export default function EditableTypeSubPageNav({title}) {
-  const eventId = useNumericParam('confId');
+  const eventId = useNumericParam('event_id');
   const {type} = useParams();
   return (
     <>
@@ -29,7 +30,7 @@ export default function EditableTypeSubPageNav({title}) {
         title={Translate.string('Editing ({type})', {type: EditableTypeTitles[type]})}
       />
       <ManagementPageSubTitle title={title} />
-      <ManagementPageBackButton url={editableTypeURL({confId: eventId, type})} />
+      <ManagementPageBackButton url={editableTypeURL({event_id: eventId, type})} />
     </>
   );
 }

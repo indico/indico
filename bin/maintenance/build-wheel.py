@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
@@ -51,7 +51,7 @@ def run(cmd, title, shell=False):
     try:
         subprocess.check_output(cmd, stderr=subprocess.STDOUT, shell=shell)
     except subprocess.CalledProcessError as exc:
-        fail('{} failed'.format(title), verbose_msg=exc.output)
+        fail(f'{title} failed', verbose_msg=exc.output)
 
 
 def build_assets():
@@ -112,7 +112,7 @@ def git_is_clean_indico():
             ['git', 'diff', '--stat', '--color=always', '--staged'] + toplevel,
             ['git', 'clean', '-dn', '-e', '__pycache__'] + toplevel]
     for cmd in cmds:
-        rv = subprocess.check_output(cmd, stderr=subprocess.STDOUT)
+        rv = subprocess.check_output(cmd, stderr=subprocess.STDOUT, text=True)
         if rv:
             return False, rv
     return True, None
@@ -123,8 +123,7 @@ def _iter_package_modules(package_masks):
         path = '/'.join(package.split('.'))
         if not os.path.exists(os.path.join(path, '__init__.py')):
             continue
-        for f in glob(os.path.join(path, '*.py')):
-            yield f
+        yield from glob(os.path.join(path, '*.py'))
 
 
 def _get_included_files(package_masks):
@@ -141,7 +140,8 @@ def _get_included_files(package_masks):
 
 def _get_ignored_package_files_indico():
     files = set(_get_included_files(('indico', 'indico.*')))
-    output = subprocess.check_output(['git', 'ls-files', '--others', '--ignored', '--exclude-standard', 'indico/'])
+    output = subprocess.check_output(['git', 'ls-files', '--others', '--ignored', '--exclude-standard', 'indico/'],
+                                     text=True)
     ignored = {line for line in output.splitlines()}
     dist_path = 'indico/web/static/dist/'
     i18n_re = re.compile(r'^indico/translations/[a-zA-Z_]+/LC_MESSAGES/(?:messages\.mo|messages-react\.json)')
@@ -164,14 +164,14 @@ def git_is_clean_plugin():
         # plugins we don't have any package data to include anyway...
         cmds.append(['git', 'clean', '-dn', '-e', '__pycache__'] + toplevel)
     for cmd in cmds:
-        rv = subprocess.check_output(cmd, stderr=subprocess.STDOUT)
+        rv = subprocess.check_output(cmd, stderr=subprocess.STDOUT, text=True)
         if rv:
             return False, rv
     if not toplevel:
         # If we have just a single pyfile we don't need to check for ignored files
         return True, None
     rv = subprocess.check_output(['git', 'ls-files', '--others', '--ignored', '--exclude-standard'] + toplevel,
-                                 stderr=subprocess.STDOUT)
+                                 stderr=subprocess.STDOUT, text=True)
     garbage_re = re.compile(r'(\.(py[co]|mo)$)|(/__pycache__/)|(^({})/static/dist/)'.format('|'.join(toplevel)))
     garbage = [x for x in rv.splitlines() if not garbage_re.search(x)]
     if garbage:
@@ -185,7 +185,7 @@ def patch_indico_version(add_version_suffix):
 
 
 def patch_plugin_version(add_version_suffix):
-    return _patch_version(add_version_suffix, 'setup.py', r"^(\s+)version='([^']+)'(,?)$", r"\1version='\2{}'\3")
+    return _patch_version(add_version_suffix, 'setup.cfg', r'^version = (.+)$', r'version = \1{}')
 
 
 @contextmanager
@@ -203,10 +203,10 @@ def _patch_version(add_version_suffix, file_name, search, replace):
     if not add_version_suffix:
         yield
         return
-    rev = subprocess.check_output(['git', 'rev-parse', '--short', 'HEAD']).strip()
+    rev = subprocess.check_output(['git', 'rev-parse', '--short', 'HEAD'], text=True).strip()
     suffix = '+{}.{}'.format(datetime.now().strftime('%Y%m%d%H%M'), rev)
     info('adding version suffix: ' + suffix, unimportant=True)
-    with open(file_name, 'rb+') as f:
+    with open(file_name, 'r+') as f:
         old_content = f.read()
         f.seek(0)
         f.truncate()
@@ -221,11 +221,13 @@ def _patch_version(add_version_suffix, file_name, search, replace):
 
 
 @click.group()
-@click.option('--target-dir', '-d', type=click.Path(exists=True, file_okay=False, resolve_path=True), default='dist/',
+@click.option('--target-dir', '-d', type=click.Path(file_okay=False, resolve_path=True), default='dist/',
               help='target dir for build wheels relative to the current dir')
 @click.pass_obj
 def cli(obj, target_dir):
     obj['target_dir'] = target_dir
+    if not os.path.exists(target_dir):
+        os.makedirs(target_dir)
     os.chdir(os.path.join(os.path.dirname(__file__), '..', '..'))
 
 
@@ -235,7 +237,7 @@ def cli(obj, target_dir):
 @click.option('--ignore-unclean', is_flag=True, help='Ignore unclean working tree')
 @click.pass_obj
 def build_indico(obj, assets, add_version_suffix, ignore_unclean):
-    """Builds the indico wheel."""
+    """Build the indico wheel."""
     target_dir = obj['target_dir']
     # check for unclean git status
     clean, output = git_is_clean_indico()
@@ -261,7 +263,7 @@ def build_indico(obj, assets, add_version_suffix, ignore_unclean):
 
 def _validate_plugin_dir(ctx, param, value):
     if not os.path.exists(os.path.join(value, 'setup.py')):
-        raise click.BadParameter('no setup.py found in {}'.format(value))
+        raise click.BadParameter(f'no setup.py found in {value}')
     return value
 
 
@@ -278,7 +280,7 @@ def _plugin_has_assets(plugin_dir):
 @click.option('--ignore-unclean', is_flag=True, help='Ignore unclean working tree')
 @click.pass_obj
 def build_plugin(obj, assets, plugin_dir, add_version_suffix, ignore_unclean):
-    """Builds a plugin wheel.
+    """Build a plugin wheel.
 
     PLUGIN_DIR is the path to the folder containing the plugin's setup.py
     """
@@ -310,7 +312,7 @@ def build_plugin(obj, assets, plugin_dir, add_version_suffix, ignore_unclean):
 @click.option('--ignore-unclean', is_flag=True, help='Ignore unclean working tree')
 @click.pass_context
 def build_all_plugins(ctx, plugins_dir, add_version_suffix, ignore_unclean):
-    """Builds all plugin wheels in a directory.
+    """Build all plugin wheels in a directory.
 
     PLUGINS_DIR is the path to the folder containing the plugin directories
     """

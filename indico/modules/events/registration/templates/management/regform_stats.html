@@ -63,7 +63,7 @@
             <div class="stats-item">
                 <span>{% trans %}Registrants per country{% endtrans %}</span><span></span>
             </div>
-            <div id="countriesPlot" style="width:500px; height:{{height}}px;"></div>
+            <div id="countriesPlot" style="width:500px; height:{{ height }}px;"></div>
             <script>
                 $(document).ready(function generateBasicStats() {
                     var countries = {{ stats.countries|tojson }};
@@ -205,7 +205,7 @@
 
 {% macro _generate_cell(cell) %}
     <td
-        {%- if cell.colspan > 1 %} colspan="{{cell.colspan}}" {%- endif -%}
+        {%- if cell.colspan > 1 %} colspan="{{ cell.colspan }}" {%- endif -%}
         {%- if cell.qtip %} title="{{ cell.qtip }}" {%- endif -%}
         {%- if cell.classes %} class="{{ ' '.join(cell.classes) }}" {%- endif -%}>
     {{- caller() -}}

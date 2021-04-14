@@ -1,19 +1,17 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
-
-from __future__ import unicode_literals
 
 import os
 from collections import defaultdict
 from itertools import chain
 from operator import attrgetter
 
-from flask import flash, request, session
-from sqlalchemy.orm import selectinload
+from flask import flash, jsonify, request, session
+from sqlalchemy.orm import selectinload, subqueryload
 from werkzeug.exceptions import Forbidden
 from werkzeug.utils import cached_property
 
@@ -23,6 +21,7 @@ from indico.modules.events.papers.forms import BulkPaperJudgmentForm
 from indico.modules.events.papers.lists import PaperAssignmentListGenerator, PaperJudgingAreaListGeneratorDisplay
 from indico.modules.events.papers.models.revisions import PaperRevisionState
 from indico.modules.events.papers.operations import judge_paper, update_reviewing_roles
+from indico.modules.events.papers.schemas import CallForPapersSchema, PaperDumpSchema
 from indico.modules.events.papers.settings import PaperReviewingRole
 from indico.modules.events.papers.views import WPDisplayJudgingArea, WPManagePapers
 from indico.modules.events.util import ZipGeneratorMixin
@@ -46,7 +45,7 @@ CONTRIB_ROLE_MAP = {
 
 
 class RHPapersListBase(RHJudgingAreaBase):
-    """Base class for assignment/judging paper lists"""
+    """Base class for assignment/judging paper lists."""
 
     @cached_property
     def list_generator(self):
@@ -57,7 +56,7 @@ class RHPapersListBase(RHJudgingAreaBase):
 
 
 class RHPapersList(RHPapersListBase):
-    """Display the paper list for assignment/judging"""
+    """Display the paper list for assignment/judging."""
 
     @cached_property
     def view_class(self):
@@ -72,7 +71,7 @@ class RHPapersList(RHPapersListBase):
 
 
 class RHCustomizePapersList(RHPapersListBase):
-    """Filter options and columns to display for the paper list"""
+    """Filter options and columns to display for the paper list."""
 
     ALLOW_LOCKED = True
 
@@ -90,14 +89,14 @@ class RHCustomizePapersList(RHPapersListBase):
 
 
 class RHPapersActionBase(RHPapersListBase):
-    """Base class for actions on selected papers"""
+    """Base class for actions on selected papers."""
 
     def _get_contrib_query_options(self):
         return ()
 
     def _process_args(self):
         RHPapersListBase._process_args(self)
-        ids = map(int, request.form.getlist('contribution_id'))
+        ids = request.form.getlist('contribution_id', type=int)
         self.contributions = (self.list_generator._build_query()
                               .filter(Contribution.id.in_(ids))
                               .options(*self._get_contrib_query_options())
@@ -105,28 +104,60 @@ class RHPapersActionBase(RHPapersListBase):
 
 
 class RHDownloadPapers(ZipGeneratorMixin, RHPapersActionBase):
-    """Generate a ZIP file with paper files for a given list of contributions"""
+    """
+    Generate a ZIP file with paper files for a given list of contributions.
+    """
 
     ALLOW_LOCKED = True
 
     def _prepare_folder_structure(self, item):
         paper_title = secure_filename('{}_{}'.format(item.paper.contribution.friendly_id,
                                                      item.paper.contribution.title), 'paper')
-        file_name = secure_filename('{}_{}'.format(item.id, item.filename), 'paper')
+        file_name = secure_filename(f'{item.id}_{item.filename}', 'paper')
         return os.path.join(*self._adjust_path_length([paper_title, file_name]))
 
     def _iter_items(self, contributions):
-        contributions_with_paper = [c for c in self.contributions if c.paper]
+        contributions_with_paper = [c for c in contributions if c.paper]
         for contrib in contributions_with_paper:
-            for f in contrib.paper.last_revision.files:
-                yield f
+            yield from contrib.paper.last_revision.files
 
     def _process(self):
         return self._generate_zip_file(self.contributions, name_prefix='paper-files', name_suffix=self.event.id)
 
 
+class RHExportPapersJSON(RHPapersActionBase):
+    """Generate a JSON file with all the paper details."""
+
+    ALLOW_LOCKED = True
+
+    def _check_access(self):
+        RHPapersActionBase._check_access(self)
+        if not self.management:
+            raise Forbidden
+
+    def _get_contrib_query_options(self):
+        revisions_strategy = subqueryload('_paper_revisions')
+        revisions_strategy.subqueryload('comments').joinedload('user')
+        revisions_strategy.subqueryload('files')
+        reviews_strategy = revisions_strategy.subqueryload('reviews')
+        reviews_strategy.joinedload('user')
+        ratings_strategy = reviews_strategy.subqueryload('ratings')
+        ratings_strategy.joinedload('question')
+        revisions_strategy.joinedload('submitter')
+        revisions_strategy.joinedload('judge')
+        return (revisions_strategy,)
+
+    def _process(self):
+        papers = [c.paper for c in self.contributions if c.paper]
+        cfp_dump = CallForPapersSchema().dump(self.event.cfp)
+        papers_dump = PaperDumpSchema(many=True).dump(papers)
+        response = jsonify(version=1, papers=papers_dump, **cfp_dump)
+        response.headers['Content-Disposition'] = 'attachment; filename="papers.json"'
+        return response
+
+
 class RHJudgePapers(RHPapersActionBase):
-    """Bulk judgment of papers"""
+    """Bulk judgment of papers."""
 
     def _process(self):
         form = BulkPaperJudgmentForm(event=self.event, judgment=request.form.get('judgment'),
@@ -153,7 +184,7 @@ class RHJudgePapers(RHPapersActionBase):
 
 
 class RHAssignPapersBase(RHPapersActionBase):
-    """Base class for assigning/unassigning paper reviewing roles"""
+    """Base class for assigning/unassigning paper reviewing roles."""
 
     def _get_contrib_query_options(self):
         return [selectinload('person_links')]
@@ -161,7 +192,7 @@ class RHAssignPapersBase(RHPapersActionBase):
     def _process_args(self):
         RHPapersActionBase._process_args(self)
         self.role = PaperReviewingRole[request.view_args['role']]
-        user_ids = map(int, request.form.getlist('user_id'))
+        user_ids = request.form.getlist('user_id', type=int)
         self.users = {u for u in CFP_ROLE_MAP[self.role](self.event.cfp) if u.id in user_ids}
 
     def _check_access(self):
@@ -196,15 +227,15 @@ class RHAssignPapersBase(RHPapersActionBase):
     def _render_form(self, users, action):
         conflicts = self._get_conflicts(users)
         user_competences = self.event.cfp.user_competences
-        competences = {'competences_{}'.format(user_id): competences.competences
-                       for user_id, competences in user_competences.iteritems()}
+        competences = {f'competences_{user_id}': competences.competences
+                       for user_id, competences in user_competences.items()}
         return jsonify_template('events/papers/assign_role.html', event=self.event, role=self.role.name,
                                 action=action, users=users, competences=competences,
                                 contribs=self.contributions, conflicts=conflicts)
 
 
 class RHAssignPapers(RHAssignPapersBase):
-    """Render the user list to assign paper reviewing roles"""
+    """Render the user list to assign paper reviewing roles."""
 
     def _process(self):
         if self.users:
@@ -214,7 +245,7 @@ class RHAssignPapers(RHAssignPapersBase):
 
 
 class RHUnassignPapers(RHAssignPapersBase):
-    """Render the user list to unassign paper reviewing roles"""
+    """Render the user list to unassign paper reviewing roles."""
 
     def _process(self):
         if self.users:

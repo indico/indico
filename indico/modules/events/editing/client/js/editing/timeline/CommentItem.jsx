@@ -1,5 +1,5 @@
 // This file is part of Indico.
-// Copyright (C) 2002 - 2020 CERN
+// Copyright (C) 2002 - 2021 CERN
 //
 // Indico is free software; you can redistribute it and/or
 // modify it under the terms of the MIT License; see the
@@ -8,20 +8,19 @@
 import moment from 'moment';
 import React, {useState} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
-import PropTypes from 'prop-types';
 import {Button, Confirm} from 'semantic-ui-react';
 
+import {blockItemPropTypes} from 'indico/modules/events/editing/editing/timeline/util';
 import UserAvatar from 'indico/modules/events/reviewing/components/UserAvatar';
 import {Param, Translate} from 'indico/react/i18n';
 import {serializeDate} from 'indico/utils/date';
 
-import CommentForm from './CommentForm';
 import {deleteRevisionComment, modifyRevisionComment} from './actions';
+import CommentForm from './CommentForm';
 import {getLastRevision} from './selectors';
 
 const INDICO_BOT_USER = {
   fullName: 'Indico Bot',
-  avatarBgColor: '#8f8f8f',
 };
 
 export default function Comment({
@@ -146,25 +145,4 @@ export default function Comment({
   );
 }
 
-Comment.propTypes = {
-  revisionId: PropTypes.number.isRequired,
-  createdDt: PropTypes.string.isRequired,
-  html: PropTypes.string.isRequired,
-  text: PropTypes.string.isRequired,
-  canModify: PropTypes.bool.isRequired,
-  modifyCommentURL: PropTypes.string.isRequired,
-  user: PropTypes.shape({
-    fullName: PropTypes.string.isRequired,
-    avatarBgColor: PropTypes.string.isRequired,
-  }),
-  modifiedDt: PropTypes.string,
-  internal: PropTypes.bool,
-  system: PropTypes.bool,
-};
-
-Comment.defaultProps = {
-  user: null,
-  modifiedDt: null,
-  internal: false,
-  system: false,
-};
+Comment.propTypes = blockItemPropTypes;

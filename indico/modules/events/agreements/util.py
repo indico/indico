@@ -1,11 +1,9 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
-
-from __future__ import unicode_literals
 
 from indico.core import signals
 from indico.core.db import db
@@ -19,7 +17,7 @@ def get_agreement_definitions():
 
 
 def send_new_agreements(event, name, people, email_body, cc_addresses, from_address):
-    """Creates and send agreements for a list of people on a given event.
+    """Create and send agreements for a list of people on a given event.
 
     :param event: The `Event` associated with the agreement
     :param name: The agreement type matcing a :class:`AgreementDefinition` name
@@ -29,7 +27,7 @@ def send_new_agreements(event, name, people, email_body, cc_addresses, from_addr
     :param from_address: Email address of the sender
     """
     agreements = []
-    for person in people.itervalues():
+    for person in people.values():
         agreement = Agreement.create_from_data(event=event, type_=name, person=person)
         db.session.add(agreement)
         agreements.append(agreement)

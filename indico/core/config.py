@@ -1,11 +1,9 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
-
-from __future__ import absolute_import, unicode_literals
 
 import ast
 import codecs
@@ -32,7 +30,6 @@ DEFAULTS = {
     'ATTACHMENT_STORAGE': 'default',
     'AUTH_PROVIDERS': {},
     'BASE_URL': None,
-    'CACHE_BACKEND': 'files',
     'CACHE_DIR': '/opt/indico/cache',
     'CATEGORY_CLEANUP': {},
     'CELERY_BROKER': None,
@@ -49,9 +46,10 @@ DEFAULTS = {
     'DEFAULT_TIMEZONE': 'UTC',
     'DISABLE_CELERY_CHECK': None,
     'ENABLE_ROOMBOOKING': False,
+    'EXPERIMENTAL_EDITING_SERVICE': False,
     'EXTERNAL_REGISTRATION_URL': None,
-    'FLOWER_URL': None,
     'HELP_URL': 'https://learn.getindico.io',
+    'FAILED_LOGIN_RATE_LIMIT': '5 per 15 minutes; 10 per day',
     'IDENTITY_PROVIDERS': {},
     'LOCAL_IDENTITIES': True,
     'LOCAL_MODERATION': False,
@@ -143,9 +141,9 @@ def _parse_config(path):
     locals_ = {}
     with codecs.open(path, encoding='utf-8') as config_file:
         # XXX: unicode_literals is inherited from this file
-        exec compile(config_file.read(), path, 'exec') in globals_, locals_
-    return {unicode(k if k.isupper() else _convert_key(k)): v
-            for k, v in locals_.iteritems()
+        exec(compile(config_file.read(), path, 'exec'), globals_, locals_)
+    return {str(k if k.isupper() else _convert_key(k)): v
+            for k, v in locals_.items()
             if k[0] != '_'}
 
 
@@ -160,8 +158,6 @@ def _convert_key(name):
 
 
 def _postprocess_config(data):
-    if data['DEFAULT_TIMEZONE'] not in pytz.all_timezones_set:
-        raise ValueError('Invalid default timezone: {}'.format(data['DEFAULT_TIMEZONE']))
     data['BASE_URL'] = data['BASE_URL'].rstrip('/')
     data['STATIC_SITE_STORAGE'] = data['STATIC_SITE_STORAGE'] or data['ATTACHMENT_STORAGE']
     if data['DISABLE_CELERY_CHECK'] is None:
@@ -173,8 +169,8 @@ def _sanitize_data(data, allow_internal=False):
     if allow_internal:
         allowed |= set(INTERNAL_DEFAULTS)
     for key in set(data) - allowed:
-        warnings.warn('Ignoring unknown config key {}'.format(key))
-    return {k: v for k, v in data.iteritems() if k in allowed}
+        warnings.warn(f'Ignoring unknown config key {key}')
+    return {k: v for k, v in data.items() if k in allowed}
 
 
 def load_config(only_defaults=False, override=None):
@@ -208,7 +204,7 @@ def load_config(only_defaults=False, override=None):
     return ImmutableDict(data)
 
 
-class IndicoConfig(object):
+class IndicoConfig:
     """Wrapper for the Indico configuration.
 
     It exposes all config keys as read-only attributes.
@@ -255,11 +251,17 @@ class IndicoConfig(object):
 
     @property
     def IMAGES_BASE_URL(self):
-        return 'static/images' if g.get('static_site') else url_parse('{}/images'.format(self.BASE_URL)).path
+        return 'static/images' if g.get('static_site') else url_parse(f'{self.BASE_URL}/images').path
 
     @property
     def LATEX_ENABLED(self):
         return bool(self.XELATEX_PATH)
+
+    def validate(self):
+        from indico.core.auth import login_rate_limiter
+        login_rate_limiter._get_current_object()  # fail in case FAILED_LOGIN_RATE_LIMIT invalid
+        if self.DEFAULT_TIMEZONE not in pytz.all_timezones_set:
+            raise ValueError(f'Invalid default timezone: {self.DEFAULT_TIMEZONE}')
 
     def __getattr__(self, name):
         try:

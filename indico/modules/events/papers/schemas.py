@@ -1,11 +1,9 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
-
-from __future__ import unicode_literals
 
 from markupsafe import escape
 from marshmallow import post_dump
@@ -36,7 +34,7 @@ class CallForPapersSchema(mm.Schema):
     rating_range = List(Integer())
 
 
-class PaperEventSchema(mm.ModelSchema):
+class PaperEventSchema(mm.SQLAlchemyAutoSchema):
     cfp = Nested(CallForPapersSchema)
 
     class Meta:
@@ -44,7 +42,7 @@ class PaperEventSchema(mm.ModelSchema):
         fields = ('id', 'title', 'is_locked', 'cfp')
 
 
-class PaperFileSchema(mm.ModelSchema):
+class PaperFileSchema(mm.SQLAlchemyAutoSchema):
     icon = Function(lambda paper_file: icon_from_mimetype(paper_file.content_type))
     download_url = Function(lambda paper_file: url_for('papers.download_file', paper_file))
 
@@ -97,7 +95,7 @@ class PaperReviewTypeSchema(mm.Schema):
     value = Integer()
 
 
-class PaperRevisionSchema(mm.ModelSchema):
+class PaperRevisionSchema(mm.SQLAlchemyAutoSchema):
     submitter = Nested(UserSchema)
     judge = Nested(UserSchema)
     spotlight_file = Nested(PaperFileSchema)
@@ -123,19 +121,19 @@ class PaperRevisionSchema(mm.ModelSchema):
             data[name] = [review_type_schema.dump(item.instance) for item in data[name]]
 
         reviews = {}
-        for key, value in data['reviews'].viewitems():
+        for key, value in data['reviews'].items():
             reviews[orig_string(key.instance.title)] = paper_review_schema.dump(value)
         data['reviews'] = reviews
         return data
 
 
-class PaperReviewQuestionSchema(mm.ModelSchema):
+class PaperReviewQuestionSchema(mm.SQLAlchemyAutoSchema):
     class Meta:
         model = PaperReviewQuestion
         fields = ('id', 'type', 'field_type', 'title', 'position', 'description', 'is_required', 'field_data')
 
 
-class PaperRatingSchema(mm.ModelSchema):
+class PaperRatingSchema(mm.SQLAlchemyAutoSchema):
     question = Nested(PaperReviewQuestionSchema)
 
     class Meta:
@@ -149,7 +147,7 @@ class PaperRatingSchema(mm.ModelSchema):
         return data
 
 
-class PaperReviewSchema(mm.ModelSchema):
+class PaperReviewSchema(mm.SQLAlchemyAutoSchema):
     score = Decimal(places=2, as_string=True)
     user = Nested(UserSchema)
     visibility = Nested(PaperCommentVisibilitySchema)
@@ -170,7 +168,20 @@ class PaperReviewSchema(mm.ModelSchema):
         return review.can_edit(user, check_state=True) and is_type_reviewing_possible(cfp, review.type)
 
 
-class PaperReviewCommentSchema(mm.ModelSchema):
+class PaperReviewDumpSchema(PaperReviewSchema):
+    class Meta(PaperReviewSchema.Meta):
+        exclude = [f for f in PaperReviewSchema.Meta.fields if f.startswith('can_')]
+
+
+class PaperRevisionDumpSchema(PaperRevisionSchema):
+    class Meta(PaperRevisionSchema.Meta):
+        fields = PaperRevisionSchema.Meta.fields + ('reviews',)
+        exclude = ('reviewer_data',)
+
+    reviews = List(Nested(PaperReviewDumpSchema))
+
+
+class PaperReviewCommentSchema(mm.SQLAlchemyAutoSchema):
     user = Nested(UserSchema)
     visibility = Nested(PaperCommentVisibilitySchema)
     modified_by = Nested(UserSchema)
@@ -191,6 +202,7 @@ class PaperSchema(mm.Schema):
     revisions = List(Nested(PaperRevisionSchema))
     last_revision = Nested(PaperRevisionSchema)
     state = Nested(PaperRevisionStateSchema)
+    can_manage = Function(lambda paper, ctx: paper.cfp.is_manager(ctx.get('user')))
     can_judge = Function(lambda paper, ctx: paper.can_judge(ctx.get('user')))
     can_comment = Function(lambda paper, ctx: paper.can_comment(ctx.get('user'), check_state=True))
     can_review = Function(lambda paper, ctx: paper.can_review(ctx.get('user')))
@@ -202,6 +214,13 @@ class PaperSchema(mm.Schema):
         lambda paper, ctx: paper.event.has_feature('editing')
         and 'paper' in editing_settings.get(paper.event, 'editable_types')
     )
+
+
+class PaperDumpSchema(PaperSchema):
+    revisions = List(Nested(PaperRevisionDumpSchema))
+
+    class Meta(PaperSchema.Meta):
+        fields = ('is_in_final_state', 'contribution', 'revisions', 'state')
 
 
 paper_schema = PaperSchema()

@@ -1,11 +1,9 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
-
-from __future__ import absolute_import, unicode_literals
 
 import inspect
 import os
@@ -28,7 +26,7 @@ from indico.web.util import jsonify_data
 
 
 def discover_blueprints():
-    """Discovers all blueprints inside the indico package
+    """Discover all blueprints inside the indico package.
 
     Only blueprints in a ``blueprint.py`` module or inside a
     ``blueprints`` package are loaded. Any other files are not touched
@@ -69,7 +67,7 @@ def discover_blueprints():
 
 @memoize
 def make_view_func(obj):
-    """Turns an object in to a view function.
+    """Turn an object in to a view function.
 
     This function is called on each view_func passed to IndicoBlueprint.add_url_route().
     It handles RH classes and normal functions.
@@ -97,7 +95,7 @@ def make_view_func(obj):
 
 @memoize
 def redirect_view(endpoint, code=302):
-    """Creates a view function that redirects to the given endpoint."""
+    """Create a view function that redirects to the given endpoint."""
     def _redirect(**kwargs):
         params = dict(request.args.to_dict(), **kwargs)
         return redirect(_url_for(endpoint, **params), code=code)
@@ -113,14 +111,14 @@ def make_compat_redirect_func(blueprint, endpoint, view_func=None, view_args_con
             return view_func(**view_args)
         # Ugly hack to get non-list arguments unless they are used multiple times.
         # This is necessary since passing a list for an URL path argument breaks things.
-        view_args.update((k, v[0] if len(v) == 1 else v) for k, v in request.args.iterlists())
+        view_args.update((k, v[0] if len(v) == 1 else v) for k, v in request.args.lists())
         if view_args_conv is not None:
-            for oldkey, newkey in view_args_conv.iteritems():
+            for oldkey, newkey in view_args_conv.items():
                 value = view_args.pop(oldkey, None)
                 if newkey is not None:
                     view_args[newkey] = value
         try:
-            target = _url_for('%s.%s' % (getattr(blueprint, 'name', blueprint), endpoint), **view_args)
+            target = _url_for('{}.{}'.format(getattr(blueprint, 'name', blueprint), endpoint), **view_args)
         except (BuildError, ValueError):
             raise NotFound
         return redirect(target, 302 if current_app.debug else 301)
@@ -145,16 +143,18 @@ def url_for(endpoint, *targets, **values):
         for target in targets:
             if target:  # don't fail on None or mako's Undefined
                 locator.update(get_locator(target))
-        intersection = set(locator.iterkeys()) & set(values.iterkeys())
+        intersection = set(locator.keys()) & set(values.keys())
         if intersection:
             raise ValueError('url_for kwargs collide with locator: %s' % ', '.join(intersection))
         values.update(locator)
 
-    for key, value in values.iteritems():
+    for key, value in values.items():
         # Avoid =True and =False in the URL
         if isinstance(value, bool):
             values[key] = int(value)
 
+    values.setdefault('_external', False)
+    values = dict(sorted(values.items()))
     url = _url_for(endpoint, **values)
     if g.get('static_site') and 'custom_manifests' in g and not values.get('_external'):
         # for static sites we assume all relative urls need to be
@@ -169,7 +169,7 @@ def url_for(endpoint, *targets, **values):
 
 
 def url_rule_to_js(endpoint):
-    """Converts the rule(s) of an endpoint to a JavaScript object.
+    """Convert the rule(s) of an endpoint to a JavaScript object.
 
     Use this if you need to build an URL in JavaScript, but only if
     you really have to do that instead of e.g. building the URL on
@@ -202,16 +202,16 @@ def url_rule_to_js(endpoint):
                         'data': data
                     } for is_dynamic, data in rule._trace
                 ],
-                'converters': dict((key, type(converter).__name__)
-                                   for key, converter in rule._converters.iteritems()
-                                   if not isinstance(converter, UnicodeConverter))
+                'converters': {key: type(converter).__name__
+                               for key, converter in rule._converters.items()
+                               if not isinstance(converter, UnicodeConverter)}
             } for rule in current_app.url_map.iter_rules(endpoint)
         ]
     }
 
 
 def redirect_or_jsonify(location, flash=True, **json_data):
-    """Returns a redirect or json response.
+    """Return a redirect or json response.
 
     If the request was an XHR we return JSON, otherwise we redirect.
     Unless set to another value, the JSON data includes `success=True`
@@ -251,7 +251,7 @@ def make_content_disposition_args(attachment_filename):
 
 def send_file(name, path_or_fd, mimetype, last_modified=None, no_cache=True, inline=None, conditional=False, safe=True,
               **kwargs):
-    """Sends a file to the user.
+    """Send a file to the user.
 
     `name` is required and should be the filename visible to the user.
     `path_or_fd` is either the physical path to the file or a file-like object (e.g. a StringIO).
@@ -281,7 +281,7 @@ def send_file(name, path_or_fd, mimetype, last_modified=None, no_cache=True, inl
     try:
         rv = _send_file(path_or_fd, mimetype=mimetype, as_attachment=not inline, attachment_filename=name,
                         conditional=conditional, last_modified=last_modified, **kwargs)
-    except IOError:
+    except OSError:
         if not current_app.debug:
             raise
         raise NotFound('File not found: %s' % path_or_fd)
@@ -325,7 +325,7 @@ def endpoint_for_url(url, base_url=None):
 # Note: When adding custom converters please do not forget to add them to converter_functions in routing.js
 # if they need any custom processing (i.e. not just encodeURIComponent) in JavaScript.
 class ListConverter(BaseConverter):
-    """Matches a dash-separated list"""
+    """Match a dash-separated list."""
 
     def __init__(self, map):
         BaseConverter.__init__(self, map)
@@ -337,10 +337,10 @@ class ListConverter(BaseConverter):
     def to_url(self, value):
         if isinstance(value, (list, tuple, set)):
             value = '-'.join(value)
-        return super(ListConverter, self).to_url(value)
+        return super().to_url(value)
 
 
-class XAccelMiddleware(object):
+class XAccelMiddleware:
     """A WSGI Middleware that converts X-Sendfile headers to X-Accel-Redirect
     headers if possible.
 
@@ -350,7 +350,7 @@ class XAccelMiddleware(object):
 
     def __init__(self, app, mapping):
         self.app = app
-        self.mapping = [(str(k), str(v)) for k, v in mapping.iteritems()]
+        self.mapping = [(str(k), str(v)) for k, v in mapping.items()]
 
     def __call__(self, environ, start_response):
         def _start_response(status, headers, exc_info=None):
@@ -364,8 +364,8 @@ class XAccelMiddleware(object):
             if xsf_path:
                 uri = self.make_x_accel_header(xsf_path)
                 if not uri:
-                    raise ValueError('Could not map {} to a URI'.format(xsf_path))
-                new_headers.append((b'X-Accel-Redirect', uri))
+                    raise ValueError(f'Could not map {xsf_path} to a URI')
+                new_headers.append(('X-Accel-Redirect', uri))
             return start_response(status, new_headers, exc_info)
 
         return self.app(environ, _start_response)

@@ -1,28 +1,28 @@
 // This file is part of Indico.
-// Copyright (C) 2002 - 2020 CERN
+// Copyright (C) 2002 - 2021 CERN
 //
 // Indico is free software; you can redistribute it and/or
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-import qs from 'qs';
-import React from 'react';
-import PropTypes from 'prop-types';
-import {Dropdown, Icon, Label} from 'semantic-ui-react';
-
-import userDashboard from 'indico-url:users.user_dashboard';
-import userPreferences from 'indico-url:users.user_preferences';
 import authLogout from 'indico-url:auth.logout';
 import adminDashboard from 'indico-url:core.admin_dashboard';
 import changeLanguage from 'indico-url:core.change_lang';
+import userDashboard from 'indico-url:users.user_dashboard';
+import userPreferences from 'indico-url:users.user_preferences';
 
+import PropTypes from 'prop-types';
+import qs from 'qs';
+import React from 'react';
+import {Dropdown, Icon, Image} from 'semantic-ui-react';
+
+import {impersonateUser} from 'indico/modules/core/impersonation';
 import {Translate} from 'indico/react/i18n';
 import {indicoAxios, handleAxiosError} from 'indico/utils/axios';
-import {impersonateUser} from 'indico/modules/core/impersonation';
-import {UserSearch} from './principals/Search';
 
-import './UserMenu.module.scss';
 import {useFavoriteUsers} from '../hooks';
+
+import {UserSearch} from './principals/Search';
 
 async function postAndReload(selectedLanguage) {
   try {
@@ -59,19 +59,8 @@ export default function UserMenu({userData, languages, hasLoadedConfig, hasLoade
     return '';
   }
 
-  const {firstName, lastName, email, language, isAdmin, avatarBgColor} = userData;
-  const avatar = (
-    <Label
-      circular
-      size="large"
-      style={{
-        backgroundColor: avatarBgColor,
-      }}
-      styleName="user-menu-avatar"
-    >
-      {firstName[0]}
-    </Label>
-  );
+  const {firstName, lastName, email, language, isAdmin, avatarURL} = userData;
+  const avatar = <Image avatar src={avatarURL} size="mini" />;
 
   const languageSelector = trigger => {
     return (
@@ -146,7 +135,7 @@ UserMenu.propTypes = {
     id: PropTypes.number,
     language: PropTypes.string,
     isAdmin: PropTypes.bool,
-    avatarBgColor: PropTypes.string,
+    avatarURL: PropTypes.string,
   }).isRequired,
   languages: PropTypes.object.isRequired,
   hasLoadedConfig: PropTypes.bool.isRequired,

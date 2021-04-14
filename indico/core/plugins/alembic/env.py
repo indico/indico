@@ -1,5 +1,5 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
@@ -31,13 +31,12 @@ logging.config.fileConfig(config.config_file_name)
 config.set_main_option('sqlalchemy.url', current_app.config.get('SQLALCHEMY_DATABASE_URI'))
 target_metadata = current_app.extensions['migrate'].db.metadata
 
-plugin_schema = 'plugin_{}'.format(current_plugin.name)
-version_table = 'alembic_version_plugin_{}'.format(current_plugin.name)
+plugin_schema = f'plugin_{current_plugin.name}'
+version_table = f'alembic_version_plugin_{current_plugin.name}'
 
 
-def _include_symbol(tablename, schema):
-    # We only include tables in this plugin's schema in migrations
-    return schema == plugin_schema
+def _include_object(object_, name, type_, reflected, compare_to):
+    return type_ != 'table' or object_.schema == plugin_schema
 
 
 def _render_item(type_, obj, autogen_context):
@@ -59,11 +58,10 @@ def run_migrations_offline():
 
     Calls to context.execute() here emit the given string to the
     script output.
-
     """
     url = config.get_main_option('sqlalchemy.url')
     context.configure(url=url, target_metadata=target_metadata, include_schemas=True,
-                      include_symbol=_include_symbol, render_item=_render_item, version_table=version_table,
+                      include_object=_include_object, render_item=_render_item, version_table=version_table,
                       version_table_schema='public', template_args={'toplevel_code': set()})
 
     with context.begin_transaction():
@@ -75,7 +73,6 @@ def run_migrations_online():
 
     In this scenario we need to create an Engine
     and associate a connection with the context.
-
     """
     engine = engine_from_config(config.get_section(config.config_ini_section),
                                 prefix='sqlalchemy.',
@@ -83,7 +80,7 @@ def run_migrations_online():
 
     connection = engine.connect()
     context.configure(connection=connection, target_metadata=target_metadata, include_schemas=True,
-                      include_symbol=_include_symbol, render_item=_render_item, version_table=version_table,
+                      include_object=_include_object, render_item=_render_item, version_table=version_table,
                       version_table_schema='public', template_args={'toplevel_code': set()})
 
     try:

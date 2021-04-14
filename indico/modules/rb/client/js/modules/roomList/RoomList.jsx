@@ -1,36 +1,37 @@
 // This file is part of Indico.
-// Copyright (C) 2002 - 2020 CERN
+// Copyright (C) 2002 - 2021 CERN
 //
 // Indico is free software; you can redistribute it and/or
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
 import _ from 'lodash';
-import React from 'react';
 import PropTypes from 'prop-types';
-import {bindActionCreators} from 'redux';
+import React from 'react';
+import Overridable from 'react-overridable';
 import {connect} from 'react-redux';
-import {Button, Dropdown, Grid} from 'semantic-ui-react';
 import {Route} from 'react-router-dom';
+import {bindActionCreators} from 'redux';
 import LazyScroll from 'redux-lazy-scroll';
 import {stateToQueryString} from 'redux-router-querystring';
-import Overridable from 'react-overridable';
+import {Button, Dropdown, Grid} from 'semantic-ui-react';
 
-import {Responsive, Slot} from 'indico/react/util';
 import {StickyWithScrollBack, ResponsivePopup} from 'indico/react/components';
 import {Param, Plural, PluralTranslate, Translate, Singular} from 'indico/react/i18n';
+import {Responsive, Slot} from 'indico/react/util';
 import {camelizeKeys} from 'indico/utils/case';
 
-import {pushStateMergeProps} from '../../util';
-import roomFilterBarFactory from './RoomFilterBar';
-import searchBarFactory from '../../components/SearchBar';
-import CardPlaceholder from '../../components/CardPlaceholder';
-import {BlockingModal} from '../blockings';
 import {BookingExportModal} from '../../common/bookings';
-import {rules as queryStringSerializer} from '../../common/roomSearch/queryString';
 import {mapControllerFactory, selectors as mapSelectors} from '../../common/map';
 import {actions as roomsActions, RoomRenderer} from '../../common/rooms';
+import {rules as queryStringSerializer} from '../../common/roomSearch/queryString';
+import CardPlaceholder from '../../components/CardPlaceholder';
+import searchBarFactory from '../../components/SearchBar';
+import {pushStateMergeProps} from '../../util';
+import {BlockingModal} from '../blockings';
+
 import * as roomsListActions from './actions';
+import roomFilterBarFactory from './RoomFilterBar';
 import * as roomsListSelectors from './selectors';
 
 import './RoomList.module.scss';

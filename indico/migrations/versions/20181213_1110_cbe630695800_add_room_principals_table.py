@@ -5,7 +5,6 @@ Revises: 252c0015c9a0
 Create Date: 2018-12-13 11:10:12.684382
 """
 
-from __future__ import print_function
 
 import json
 
@@ -96,14 +95,14 @@ def _upgrade_permissions():
         if booking_group:
             group_kwargs = _group_to_kwargs(booking_group)
             if group_kwargs is None:
-                print('WARNING: Invalid booking group: {}'.format(booking_group))
+                print(f'WARNING: Invalid booking group: {booking_group}')
             else:
                 permission = 'prebook' if reservations_need_confirmation else 'book'
                 _create_acl_entry(conn, room_id, permissions={permission}, **group_kwargs)
         if manager_group:
             group_kwargs = _group_to_kwargs(manager_group)
             if group_kwargs is None:
-                print('WARNING: Invalid manager group: {}'.format(manager_group))
+                print(f'WARNING: Invalid manager group: {manager_group}')
             else:
                 _create_acl_entry(conn, room_id, full_access=True, **group_kwargs)
 
@@ -161,9 +160,9 @@ def _downgrade_permissions():
                 continue
             if row.type == PrincipalType.local_group and not default_group_provider:
                 if row.full_access:
-                    _set_attribute_value(conn, room_id, manager_group_attr_id, unicode(row.local_group_id))
+                    _set_attribute_value(conn, room_id, manager_group_attr_id, str(row.local_group_id))
                 if 'book' in row.permissions or 'prebook' in row.permissions:
-                    _set_attribute_value(conn, room_id, booking_group_attr_id, unicode(row.local_group_id))
+                    _set_attribute_value(conn, room_id, booking_group_attr_id, str(row.local_group_id))
             elif (row.type == PrincipalType.multipass_group and default_group_provider and
                     row.mp_group_provider == default_group_provider.name):
                 if row.full_access:
@@ -212,7 +211,7 @@ def upgrade():
                     postgresql_where=sa.text('type = 3'))
     op.add_column('rooms', sa.Column('protection_mode',
                                      PyIntEnum(ProtectionMode, exclude_values={ProtectionMode.inheriting}),
-                                     nullable=False, server_default=unicode(ProtectionMode.protected.value)),
+                                     nullable=False, server_default=str(ProtectionMode.protected.value)),
                   schema='roombooking')
     _upgrade_permissions()
     op.alter_column('rooms', 'protection_mode', server_default=None, schema='roombooking')

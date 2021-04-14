@@ -1,7 +1,7 @@
 <div class="error-box">
     <h1>{{ error_message }}</h1>
     <p>{{ error_description }}</p>
-    {% if g.saved_error_uuid and not standalone %}
+    {% if g.saved_error_uuid and not standalone|default(false) %}
         <button id="report-error" class="i-button big">
             {%- trans %}Report Error{% endtrans -%}
         </button>

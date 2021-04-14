@@ -1,13 +1,11 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import unicode_literals
-
-from collections import OrderedDict, defaultdict
+from collections import defaultdict
 from operator import itemgetter
 
 from flask import flash, jsonify, redirect, request, session
@@ -27,7 +25,7 @@ from indico.modules.vc.util import find_event_vc_rooms, get_managed_vc_plugins, 
 from indico.modules.vc.views import WPVCEventPage, WPVCManageEvent, WPVCService
 from indico.util.date_time import as_utc, get_day_end, get_day_start, now_utc
 from indico.util.i18n import _
-from indico.util.struct.iterables import group_list
+from indico.util.iterables import group_list
 from indico.web.flask.util import url_for
 from indico.web.forms.base import FormDefaults
 from indico.web.rh import RHProtected
@@ -46,11 +44,10 @@ def process_vc_room_association(plugin, event, vc_room, form, event_vc_room=None
         if event_vc_room.link_object is not None:
             # check whether there is a room-event association already present
             # for the given event, room and plugin
-            q = VCRoomEventAssociation.find(
-                VCRoomEventAssociation.event == event,
-                VCRoomEventAssociation.link_object == event_vc_room.link_object,
-                _join=VCRoom
-            )
+            q = (VCRoomEventAssociation.query
+                 .filter(VCRoomEventAssociation.event == event,
+                         VCRoomEventAssociation.link_object == event_vc_room.link_object)
+                 .join(VCRoom))
             if allow_same_room:
                 q = q.filter(VCRoom.id != vc_room.id)
             existing = {x.vc_room for x in q}
@@ -86,24 +83,27 @@ class RHEventVCRoomMixin:
 
 
 class RHVCManageEvent(RHVCManageEventBase):
-    """Lists the available videoconference rooms"""
+    """List the available videoconference rooms."""
 
     def _process(self):
         room_event_assocs = VCRoomEventAssociation.find_for_event(self.event, include_hidden=True,
                                                                   include_deleted=True).all()
         event_vc_rooms = [event_vc_room for event_vc_room in room_event_assocs if event_vc_room.vc_room.plugin]
         return WPVCManageEvent.render_template('manage_event.html', self.event,
-                                               event_vc_rooms=event_vc_rooms, plugins=get_vc_plugins().values())
+                                               event_vc_rooms=event_vc_rooms, plugins=list(get_vc_plugins().values()))
 
 
 class RHVCManageEventSelectService(RHVCManageEventBase):
-    """List available videoconference plugins to create a new videoconference room"""
+    """
+    List available videoconference plugins to create a new
+    videoconference room.
+    """
 
     def _process(self):
         action = request.args.get('vc_room_action', '.manage_vc_rooms_create')
         attach = request.args.get('attach', '')
         return jsonify_template('vc/manage_event_select.html', event=self.event, vc_room_action=action,
-                                plugins=get_vc_plugins().values(), attach=attach)
+                                plugins=list(get_vc_plugins().values()), attach=attach)
 
 
 class RHVCManageEventCreateBase(RHVCManageEventBase):
@@ -116,7 +116,7 @@ class RHVCManageEventCreateBase(RHVCManageEventBase):
 
 
 class RHVCManageEventCreate(RHVCManageEventCreateBase):
-    """Loads the form for the selected VC plugin"""
+    """Load the form for the selected VC plugin."""
 
     def _process(self):
         if not self.plugin.can_manage_vc_rooms(session.user, self.event):
@@ -136,7 +136,7 @@ class RHVCManageEventCreate(RHVCManageEventCreateBase):
                 return jsonify_data(flash=False)
 
             with db.session.no_autoflush:
-                self.plugin.update_data_vc_room(vc_room, form.data)
+                self.plugin.update_data_vc_room(vc_room, form.data, is_new=True)
 
             try:
                 # avoid flushing the incomplete vc room to the database
@@ -147,7 +147,7 @@ class RHVCManageEventCreate(RHVCManageEventCreateBase):
                 if err.field is None:
                     raise
                 field = getattr(form, err.field)
-                field.errors.append(err.message)
+                field.errors.append(str(err))
                 db.session.rollback()  # otherwise the incomplete vc room would be added to the db!
             else:
                 db.session.add(vc_room)
@@ -172,7 +172,7 @@ class RHVCSystemEventBase(RHEventVCRoomMixin, RHVCManageEventBase):
 
 
 class RHVCManageEventModify(RHVCSystemEventBase):
-    """Modifies an existing VC room"""
+    """Modify an existing VC room."""
 
     def _process(self):
         if not self.plugin.can_manage_vc_rooms(session.user, self.event):
@@ -200,13 +200,13 @@ class RHVCManageEventModify(RHVCSystemEventBase):
             except VCRoomNotFoundError as err:
                 Logger.get('modules.vc').warning("VC room %r not found. Setting it as deleted.", self.vc_room)
                 self.vc_room.status = VCRoomStatus.deleted
-                flash(err.message, 'error')
+                flash(str(err), 'error')
                 return jsonify_data(flash=False)
             except VCRoomError as err:
                 if err.field is None:
                     raise
                 field = getattr(form, err.field)
-                field.errors.append(err.message)
+                field.errors.append(str(err))
                 db.session.rollback()
             else:
                 # TODO
@@ -224,7 +224,7 @@ class RHVCManageEventModify(RHVCSystemEventBase):
 
 
 class RHVCManageEventRefresh(RHVCSystemEventBase):
-    """Refreshes an existing VC room, fetching information from the VC system"""
+    """Refresh an existing VC room, fetching information from the VC system."""
 
     def _process(self):
         if not self.plugin.can_manage_vc_rooms(session.user, self.event):
@@ -239,7 +239,7 @@ class RHVCManageEventRefresh(RHVCSystemEventBase):
         except VCRoomNotFoundError as err:
             Logger.get('modules.vc').warning("VC room %r not found. Setting it as deleted.", self.vc_room)
             self.vc_room.status = VCRoomStatus.deleted
-            flash(err.message, 'error')
+            flash(str(err), 'error')
             return redirect(url_for('.manage_vc_rooms', self.event))
 
         flash(_("{plugin_name} room '{room.name}' refreshed").format(
@@ -248,7 +248,7 @@ class RHVCManageEventRefresh(RHVCSystemEventBase):
 
 
 class RHVCManageEventRemove(RHVCSystemEventBase):
-    """Removes an existing VC room"""
+    """Remove an existing VC room."""
 
     def _process(self):
         if not self.plugin.can_manage_vc_rooms(session.user, self.event):
@@ -264,22 +264,23 @@ class RHVCManageEventRemove(RHVCSystemEventBase):
 
 
 class RHVCEventPage(RHDisplayEventBase):
-    """Lists the VC rooms in an event page"""
+    """List the VC rooms in an event page."""
 
     def _process(self):
-        event_vc_rooms = VCRoomEventAssociation.find_for_event(self.event).all()
+        event_vc_rooms = [event_vc_room
+                          for event_vc_room in VCRoomEventAssociation.find_for_event(self.event).all()
+                          if event_vc_room.vc_room.plugin]
         vc_plugins_available = bool(get_vc_plugins())
         linked_to = defaultdict(lambda: defaultdict(list))
         for event_vc_room in event_vc_rooms:
-            if event_vc_room.vc_room.plugin:
-                linked_to[event_vc_room.link_type.name][event_vc_room.link_object].append(event_vc_room)
+            linked_to[event_vc_room.link_type.name][event_vc_room.link_object].append(event_vc_room)
         return WPVCEventPage.render_template('event_vc.html', self.event,
                                              event_vc_rooms=event_vc_rooms, linked_to=linked_to,
                                              vc_plugins_available=vc_plugins_available)
 
 
 class RHVCManageAttach(RHVCManageEventCreateBase):
-    """Attaches a room to the event"""
+    """Attach a room to the event."""
 
     def _process(self):
         defaults = FormDefaults(self.plugin.get_vc_room_attach_form_defaults(self.event))
@@ -292,7 +293,7 @@ class RHVCManageAttach(RHVCManageEventCreateBase):
                 flash(_("You are not allowed to attach {plugin_name} rooms to this event.").format(
                     plugin_name=self.plugin.friendly_name), 'error')
             elif not self.plugin.can_manage_vc_room(session.user, vc_room):
-                flash(_("You are not authorized to attach the room '{room.name}'".format(room=vc_room)), 'error')
+                flash(_("You are not authorized to attach the room '{0}'").format(vc_room.name), 'error')
             else:
                 event_vc_room = process_vc_room_association(self.plugin, self.event, vc_room, form)
                 if event_vc_room:
@@ -306,7 +307,7 @@ class RHVCManageAttach(RHVCManageEventCreateBase):
 
 
 class RHVCManageSearch(RHVCManageEventCreateBase):
-    """Searches for a room based on its name"""
+    """Search for a room based on its name."""
 
     def _process_args(self):
         RHVCManageEventCreateBase._process_args(self)
@@ -336,7 +337,7 @@ class RHVCManageSearch(RHVCManageEventCreateBase):
 
 
 class RHVCRoomList(RHProtected):
-    """Provides a list of videoconference rooms"""
+    """Provide a list of videoconference rooms."""
 
     def _check_access(self):
         RHProtected._check_access(self)
@@ -355,6 +356,6 @@ class RHVCRoomList(RHProtected):
                                  key=lambda r: r.event.start_dt.date(),
                                  sort_by=lambda r: r.event.start_dt,
                                  sort_reverse=reverse)
-            results = OrderedDict(sorted(results.viewitems(), key=itemgetter(0), reverse=reverse))
+            results = dict(sorted(results.items(), key=itemgetter(0), reverse=reverse))
         return WPVCService.render_template('vc_room_list.html', form=form, results=results,
                                            action=url_for('.vc_room_list'))

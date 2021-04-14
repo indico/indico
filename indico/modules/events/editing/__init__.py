@@ -1,11 +1,9 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
-
-from __future__ import unicode_literals
 
 from flask import flash, session
 
@@ -36,8 +34,8 @@ class EditingFeature(EventFeature):
 
     @classmethod
     def enabled(cls, event, cloning):
-        from indico.modules.events.editing.models.file_types import EditingFileType
         from indico.modules.events.editing.models.editable import EditableType
+        from indico.modules.events.editing.models.file_types import EditingFileType
         types_with_filetypes = {type_ for type_, in db.session.query(EditingFileType.type).with_parent(event)}
         types_without_filetypes = set(EditableType) - types_with_filetypes
         for type_ in types_without_filetypes:

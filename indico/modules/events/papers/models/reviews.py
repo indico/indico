@@ -1,20 +1,18 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import division, unicode_literals
-
 from indico.core.db.sqlalchemy import PyIntEnum, UTCDateTime, db
 from indico.core.db.sqlalchemy.descriptions import RenderMode, RenderModeMixin
 from indico.modules.events.models.reviews import ProposalGroupProxy, ProposalReviewMixin
 from indico.util.date_time import now_utc
+from indico.util.enum import RichIntEnum
 from indico.util.i18n import _
 from indico.util.locators import locator_property
-from indico.util.string import format_repr, return_ascii
-from indico.util.struct.enum import RichIntEnum
+from indico.util.string import format_repr
 
 
 class PaperAction(RichIntEnum):
@@ -37,8 +35,8 @@ class PaperTypeProxy(ProposalGroupProxy):
         return {'review_type': self.instance.name}
 
 
-class PaperJudgmentProxy(object):
-    """Represents a timeline item for the non final judgments"""
+class PaperJudgmentProxy:
+    """A timeline item for the non final judgments."""
 
     timeline_item_type = 'judgment'
 
@@ -49,13 +47,12 @@ class PaperJudgmentProxy(object):
     def created_dt(self):
         return self.paper.judgment_dt
 
-    @return_ascii
     def __repr__(self):
-        return '<PaperJudgmentProxy: {}>'.format(self.paper)
+        return f'<PaperJudgmentProxy: {self.paper}>'
 
 
 class PaperCommentVisibility(RichIntEnum):
-    """Most to least restrictive visibility for paper comments"""
+    """Most to least restrictive visibility for paper comments."""
     __titles__ = [None,
                   _("Visible only to judges"),
                   _("Visible to reviewers and judges"),
@@ -68,7 +65,7 @@ class PaperCommentVisibility(RichIntEnum):
 
 
 class PaperReview(ProposalReviewMixin, RenderModeMixin, db.Model):
-    """Represents a paper review, emitted by a layout or content reviewer"""
+    """A paper review, emitted by a layout or content reviewer."""
 
     possible_render_modes = {RenderMode.markdown}
     default_render_mode = RenderMode.markdown
@@ -149,7 +146,6 @@ class PaperReview(ProposalReviewMixin, RenderModeMixin, db.Model):
     def locator(self):
         return dict(self.revision.locator, review_id=self.id)
 
-    @return_ascii
     def __repr__(self):
         return format_repr(self, 'id', 'type', 'revision_id', 'user_id', proposed_action=None)
 

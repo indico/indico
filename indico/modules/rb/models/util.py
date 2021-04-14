@@ -1,5 +1,5 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
@@ -9,7 +9,7 @@ from functools import wraps
 
 
 def proxy_to_reservation_if_last_valid_occurrence(f):
-    """Forwards a method call to `self.reservation` if there is only one occurrence."""
+    """Forward a method call to `self.reservation` if there is only one occurrence."""
     @wraps(f)
     def wrapper(self, *args, **kwargs):
         from indico.modules.rb.models.reservation_occurrences import ReservationOccurrence

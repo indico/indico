@@ -1,38 +1,40 @@
 // This file is part of Indico.
-// Copyright (C) 2002 - 2020 CERN
+// Copyright (C) 2002 - 2021 CERN
 //
 // Indico is free software; you can redistribute it and/or
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-import React from 'react';
-import {connect} from 'react-redux';
-import PropTypes from 'prop-types';
-import {Link, Redirect, Route, Switch} from 'react-router-dom';
 import {ConnectedRouter} from 'connected-react-router';
-import {Dimmer, Header, Icon, Loader, Responsive, Segment, Sidebar} from 'semantic-ui-react';
+import PropTypes from 'prop-types';
+import React from 'react';
 import Overridable from 'react-overridable';
+import {connect} from 'react-redux';
+import MediaQuery from 'react-responsive';
+import {Link, Redirect, Route, Switch} from 'react-router-dom';
+import {Dimmer, Header, Icon, Loader, Segment, Sidebar} from 'semantic-ui-react';
 
 import {Translate} from 'indico/react/i18n';
 import {ConditionalRoute} from 'indico/react/util';
-import SidebarMenu, {SidebarTrigger} from './SidebarMenu';
-import AdminArea from '../modules/admin';
-import Landing from '../modules/landing';
-import Calendar from '../modules/calendar';
-import BookRoom from '../modules/bookRoom';
-import RoomList from '../modules/roomList';
-import BlockingList from '../modules/blockings';
-import ModalController from '../modals';
-import Menu from './Menu';
-import AdminOverrideBar from './AdminOverrideBar';
-import {LinkBar} from '../common/linking';
+
+import * as globalActions from '../actions';
 import {actions as configActions} from '../common/config';
+import {LinkBar} from '../common/linking';
 import {actions as mapActions} from '../common/map';
 import {actions as roomsActions} from '../common/rooms';
 import {actions as userActions} from '../common/user';
-import * as globalActions from '../actions';
-
+import ModalController from '../modals';
+import AdminArea from '../modules/admin';
+import BlockingList from '../modules/blockings';
+import BookRoom from '../modules/bookRoom';
+import Calendar from '../modules/calendar';
+import Landing from '../modules/landing';
+import RoomList from '../modules/roomList';
 import * as globalSelectors from '../selectors';
+
+import AdminOverrideBar from './AdminOverrideBar';
+import Menu from './Menu';
+import SidebarMenu, {SidebarTrigger} from './SidebarMenu';
 import './App.module.scss';
 
 class App extends React.Component {
@@ -135,9 +137,9 @@ class App extends React.Component {
               <h1>
                 <Link to="/" onClick={() => resetPageState('bookRoom')}>
                   <Icon name={iconName} />
-                  <Responsive as="span" minWidth={500}>
+                  <MediaQuery as="span" minWidth={500}>
                     {title}
-                  </Responsive>
+                  </MediaQuery>
                 </Link>
               </h1>
             </div>
@@ -148,11 +150,15 @@ class App extends React.Component {
             </div>
             <div styleName="rb-menu-bar-side-right">
               <SidebarTrigger
-                onClick={() => {
+                onClick={evt => {
                   document.body.classList.add('scrolling-disabled');
                   this.setState({
                     userActionsVisible: true,
                   });
+                  // XXX: for some reason react 17 immediately closes the sidebar again after
+                  // opening it, but stopping the click event from propagating avoids this, so it's
+                  // likely related to the changes in event handling
+                  evt.stopPropagation();
                 }}
                 active={userActionsVisible}
               />

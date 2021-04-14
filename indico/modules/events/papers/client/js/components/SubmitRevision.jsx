@@ -1,5 +1,5 @@
 // This file is part of Indico.
-// Copyright (C) 2002 - 2020 CERN
+// Copyright (C) 2002 - 2021 CERN
 //
 // Indico is free software; you can redistribute it and/or
 // modify it under the terms of the MIT License; see the
@@ -17,8 +17,8 @@ import {Translate} from 'indico/react/i18n';
 import {indicoAxios, handleAxiosError} from 'indico/utils/axios';
 
 import {fetchPaperDetails} from '../actions';
-import {getCurrentUser, getPaperDetails} from '../selectors';
 import {PaperState} from '../models';
+import {getCurrentUser, getPaperDetails} from '../selectors';
 
 export default function SubmitRevision() {
   const {
@@ -47,7 +47,7 @@ export default function SubmitRevision() {
 
     try {
       await indicoAxios.post(
-        submitRevisionURL({confId: eventId, contrib_id: contributionId}),
+        submitRevisionURL({event_id: eventId, contrib_id: contributionId}),
         formData,
         {headers}
       );

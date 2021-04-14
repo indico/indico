@@ -1,23 +1,26 @@
 // This file is part of Indico.
-// Copyright (C) 2002 - 2020 CERN
+// Copyright (C) 2002 - 2021 CERN
 //
 // Indico is free software; you can redistribute it and/or
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-import React, {useState} from 'react';
 import PropTypes from 'prop-types';
+import React, {useState} from 'react';
 import {connect} from 'react-redux';
 import {Button, Header, Item, Message} from 'semantic-ui-react';
+
 import {Translate, Param} from 'indico/react/i18n';
-import ItemPlaceholder from '../../components/ItemPlaceholder';
-import AdminRoomItem from './AdminRoomItem';
-import searchBarFactory from '../../components/SearchBar';
-import * as adminSelectors from './selectors';
+
 import {RoomEditModal} from '../../common/rooms';
+import ItemPlaceholder from '../../components/ItemPlaceholder';
+import searchBarFactory from '../../components/SearchBar';
+
+import * as adminActions from './actions';
+import AdminRoomItem from './AdminRoomItem';
+import * as adminSelectors from './selectors';
 
 import './AdminLocationRooms.module.scss';
-import * as adminActions from './actions';
 
 const SearchBar = searchBarFactory('admin', adminSelectors);
 

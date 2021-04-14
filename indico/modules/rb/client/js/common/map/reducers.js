@@ -1,14 +1,17 @@
 // This file is part of Indico.
-// Copyright (C) 2002 - 2020 CERN
+// Copyright (C) 2002 - 2021 CERN
 //
 // Indico is free software; you can redistribute it and/or
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
 import {combineReducers} from 'redux';
+
 import {requestReducer} from 'indico/utils/redux';
-import * as mapActions from './actions';
+
 import * as globalActions from '../../actions';
+
+import * as mapActions from './actions';
 import {getAreaBounds} from './util';
 
 const initialUiState = {

@@ -1,11 +1,9 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
-
-from __future__ import unicode_literals
 
 from flask import flash, request
 
@@ -20,14 +18,14 @@ from indico.web.util import jsonify_data, jsonify_form, jsonify_template
 
 
 class RHManagePaperTemplates(RHManagePapersBase):
-    """Manage the available paper templates"""
+    """Manage the available paper templates."""
 
     def _process(self):
         return jsonify_template('events/papers/management/templates.html', event=self.event)
 
 
 class RHManagePaperTemplateBase(RHManagePapersBase):
-    """Base class to manage a specific paper template"""
+    """Base class to manage a specific paper template."""
 
     normalize_url_spec = {
         'locators': {
@@ -46,7 +44,7 @@ def _render_teplate_list(event):
 
 
 class RHUploadPaperTemplate(RHManagePapersBase):
-    """Upload a new paper template"""
+    """Upload a new paper template."""
 
     def _process(self):
         form = PaperTemplateForm()
@@ -58,7 +56,7 @@ class RHUploadPaperTemplate(RHManagePapersBase):
 
 
 class RHEditPaperTemplate(RHManagePaperTemplateBase):
-    """Edit a paper template"""
+    """Edit a paper template."""
 
     def _process(self):
         form = PaperTemplateForm(template=self.template, obj=FormDefaults(self.template, template=self.template))
@@ -71,7 +69,7 @@ class RHEditPaperTemplate(RHManagePaperTemplateBase):
 
 
 class RHDeletePaperTemplate(RHManagePaperTemplateBase):
-    """Delete a paper template"""
+    """Delete a paper template."""
 
     def _process(self):
         delete_paper_template(self.template)
@@ -80,7 +78,7 @@ class RHDeletePaperTemplate(RHManagePaperTemplateBase):
 
 
 class RHDownloadPaperTemplate(RHPapersBase):
-    """Download a paper template"""
+    """Download a paper template."""
 
     normalize_url_spec = {
         'locators': {

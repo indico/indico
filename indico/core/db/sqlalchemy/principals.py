@@ -1,11 +1,9 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
-
-from __future__ import unicode_literals
 
 from sqlalchemy.dialects.postgresql import ARRAY
 from sqlalchemy.ext.declarative import declared_attr
@@ -16,9 +14,8 @@ from indico.core.db.sqlalchemy import PyIntEnum, db
 from indico.core.db.sqlalchemy.util.models import get_simple_column_attrs
 from indico.core.permissions import get_available_permissions
 from indico.util.decorators import classproperty, strict_classproperty
-from indico.util.fossilize import Fossilizable, IFossil, fossilizes
-from indico.util.string import format_repr, return_ascii
-from indico.util.struct.enum import IndicoEnum
+from indico.util.enum import IndicoEnum
+from indico.util.string import format_repr
 
 
 class PrincipalType(int, IndicoEnum):
@@ -47,14 +44,14 @@ def _make_check(type_, allow_emails, allow_networks, allow_event_roles, allow_ca
         all_cols.add('registration_form_id')
     required_cols = all_cols & set(cols)
     forbidden_cols = all_cols - required_cols
-    criteria = ['{} IS NULL'.format(col) for col in sorted(forbidden_cols)]
-    criteria += ['{} IS NOT NULL'.format(col) for col in sorted(required_cols)]
+    criteria = [f'{col} IS NULL' for col in sorted(forbidden_cols)]
+    criteria += [f'{col} IS NOT NULL' for col in sorted(required_cols)]
     condition = 'type != {} OR ({})'.format(type_, ' AND '.join(criteria))
-    return db.CheckConstraint(condition, 'valid_{}'.format(type_.name))
+    return db.CheckConstraint(condition, f'valid_{type_.name}')
 
 
 def serialize_email_principal(email):
-    """Serialize email principal to a simple dict"""
+    """Serialize email principal to a simple dict."""
     return {
         '_type': 'Email',
         'email': email.email,
@@ -64,39 +61,14 @@ def serialize_email_principal(email):
     }
 
 
-class IEmailPrincipalFossil(IFossil):
-    def getId(self):
-        pass
-    getId.produce = lambda x: x.email
-
-    def getIdentifier(self):
-        pass
-    getIdentifier.produce = lambda x: 'Email:{}'.format(x.email)
-
-    def getEmail(self):
-        pass
-    getEmail.produce = lambda x: x.email
-
-    def getName(self):
-        pass
-    getName.produce = lambda x: x.name
-
-
-class EmailPrincipal(Fossilizable):
-    """Wrapper for email principals
+class EmailPrincipal:
+    """Wrapper for email principals.
 
     :param email: The email address.
     """
 
     principal_type = PrincipalType.email
-    is_network = False
-    is_group = False
-    is_single_person = True
-    is_event_role = False
-    is_category_role = False
-    is_registration_form = False
     principal_order = 0
-    fossilizes(IEmailPrincipalFossil)
 
     def __init__(self, email):
         self.email = email.lower()
@@ -106,17 +78,13 @@ class EmailPrincipal(Fossilizable):
         return self.email
 
     @property
-    def as_legacy(self):
-        return self
-
-    @property
     def user(self):
         from indico.modules.users import User
         return User.query.filter(~User.is_deleted, User.all_emails == self.email).first()
 
     @property
     def identifier(self):
-        return 'Email:{}'.format(self.email)
+        return f'Email:{self.email}'
 
     def __eq__(self, other):
         return isinstance(other, EmailPrincipal) and self.email == other.email
@@ -132,12 +100,11 @@ class EmailPrincipal(Fossilizable):
             return False
         return self.email in user.all_emails
 
-    @return_ascii
     def __repr__(self):
         return format_repr(self, 'email')
 
 
-class PrincipalMixin(object):
+class PrincipalMixin:
     #: The name of the backref added to `User` and `LocalGroup`.
     #: For consistency, it is recommended to name the backref
     #: ``in_foo_acl`` with *foo* describing the ACL where this
@@ -166,16 +133,16 @@ class PrincipalMixin(object):
     def __auto_table_args(cls):
         uniques = ()
         if cls.unique_columns:
-            uniques = [db.Index('ix_uq_{}_user'.format(cls.__tablename__), 'user_id', *cls.unique_columns, unique=True,
-                                postgresql_where=db.text('type = {}'.format(PrincipalType.user))),
-                       db.Index('ix_uq_{}_local_group'.format(cls.__tablename__), 'local_group_id', *cls.unique_columns,
-                                unique=True, postgresql_where=db.text('type = {}'.format(PrincipalType.local_group))),
-                       db.Index('ix_uq_{}_mp_group'.format(cls.__tablename__), 'mp_group_provider', 'mp_group_name',
+            uniques = [db.Index(f'ix_uq_{cls.__tablename__}_user', 'user_id', *cls.unique_columns, unique=True,
+                                postgresql_where=db.text(f'type = {PrincipalType.user}')),
+                       db.Index(f'ix_uq_{cls.__tablename__}_local_group', 'local_group_id', *cls.unique_columns,
+                                unique=True, postgresql_where=db.text(f'type = {PrincipalType.local_group}')),
+                       db.Index(f'ix_uq_{cls.__tablename__}_mp_group', 'mp_group_provider', 'mp_group_name',
                                 *cls.unique_columns, unique=True,
-                                postgresql_where=db.text('type = {}'.format(PrincipalType.multipass_group)))]
+                                postgresql_where=db.text(f'type = {PrincipalType.multipass_group}'))]
             if cls.allow_emails:
-                uniques.append(db.Index('ix_uq_{}_email'.format(cls.__tablename__), 'email', *cls.unique_columns,
-                                        unique=True, postgresql_where=db.text('type = {}'.format(PrincipalType.email))))
+                uniques.append(db.Index(f'ix_uq_{cls.__tablename__}_email', 'email', *cls.unique_columns,
+                                        unique=True, postgresql_where=db.text(f'type = {PrincipalType.email}')))
         indexes = [db.Index(None, 'mp_group_provider', 'mp_group_name')]
         checks = [_make_check(PrincipalType.user, cls.allow_emails, cls.allow_networks, cls.allow_event_roles,
                               cls.allow_category_roles, cls.allow_registration_forms, 'user_id'),
@@ -452,7 +419,7 @@ class PrincipalMixin(object):
         elif self.type == PrincipalType.user:
             self.user = value
         else:
-            raise ValueError('Unexpected principal type: {}'.format(self.type))
+            raise ValueError(f'Unexpected principal type: {self.type}')
 
     @principal.comparator
     def principal(cls):
@@ -488,7 +455,7 @@ class PrincipalMixin(object):
         return set()
 
     def merge_privs(self, other):
-        """Merges the privileges of another principal
+        """Merge the privileges of another principal.
 
         :param other: Another principal object.
         """
@@ -499,7 +466,7 @@ class PrincipalMixin(object):
 
     @classmethod
     def merge_users(cls, target, source, relationship_attr):
-        """Merges two users in the ACL.
+        """Merge two users in the ACL.
 
         :param target: The target user of the merge.
         :param source: The user that is being merged into `target`.
@@ -523,8 +490,9 @@ class PrincipalMixin(object):
     @classmethod
     def replace_email_with_user(cls, user, relationship_attr):
         """
-        Replaces all email-based entries matching the user's email
+        Replace all email-based entries matching the user's email
         addresses with user-based entries.
+
         If the user is already in the ACL, the two entries are merged.
 
         :param user: A User object.
@@ -536,8 +504,8 @@ class PrincipalMixin(object):
         """
         assert cls.allow_emails
         updated = set()
-        query = (cls
-                 .find(cls.email.in_(user.all_emails))
+        query = (cls.query
+                 .filter(cls.email.in_(user.all_emails))
                  .options(noload('user'), noload('local_group'), joinedload(relationship_attr).load_only('id')))
         for entry in query:
             parent = getattr(entry, relationship_attr)
@@ -599,14 +567,14 @@ class PrincipalPermissionsMixin(PrincipalMixin):
     @classproperty
     @classmethod
     def principal_for_obj(cls):
-        if isinstance(cls.principal_for, basestring):
-            return db.Model._decl_class_registry[cls.principal_for]
+        if isinstance(cls.principal_for, str):
+            return db.Model.registry._class_registry[cls.principal_for]
         else:
             return cls.principal_for
 
     @hybrid_method
     def has_management_permission(self, permission=None, explicit=False):
-        """Checks whether a principal has a certain management permission.
+        """Check whether a principal has a certain management permission.
 
         The check always succeeds if the user is a full manager; in
         that case the list of permissions is ignored.
@@ -622,7 +590,7 @@ class PrincipalPermissionsMixin(PrincipalMixin):
             return self.full_access
         elif not explicit and self.full_access:
             return True
-        valid_permissions = get_available_permissions(self.principal_for_obj).viewkeys()
+        valid_permissions = get_available_permissions(self.principal_for_obj).keys()
         current_permissions = set(self.permissions) & valid_permissions
         if permission == 'ANY':
             return bool(current_permissions)
@@ -636,12 +604,12 @@ class PrincipalPermissionsMixin(PrincipalMixin):
             if explicit:
                 raise ValueError('permission must be specified if explicit=True')
             return cls.full_access
-        valid_permissions = get_available_permissions(cls.principal_for_obj).viewkeys()
+        valid_permissions = get_available_permissions(cls.principal_for_obj).keys()
         if permission == 'ANY':
             crit = (cls.permissions.op('&&')(db.func.cast(valid_permissions, ARRAY(db.String))))
         else:
             assert permission in valid_permissions, \
-                "invalid permission '{}' for object '{}'".format(permission, cls.principal_for_obj)
+                f"invalid permission '{permission}' for object '{cls.principal_for_obj}'"
             crit = (cls.permissions.op('&&')(db.func.cast([permission], ARRAY(db.String))))
         if explicit:
             return crit
@@ -687,7 +655,7 @@ class PrincipalComparator(Comparator):
         elif other.principal_type == PrincipalType.user:
             criteria = [self.cls.user_id == other.id]
         else:
-            raise ValueError('Unexpected object type {}: {}'.format(type(other), other))
+            raise ValueError(f'Unexpected object type {type(other)}: {other}')
         return db.and_(self.cls.type == other.principal_type, *criteria)
 
 

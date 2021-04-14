@@ -1,11 +1,9 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
-
-from __future__ import unicode_literals
 
 from flask import flash, redirect, request, session
 from sqlalchemy.orm import defaultload
@@ -16,7 +14,7 @@ from indico.util.string import camelize_keys
 
 
 class RegistrationFormMixin:
-    """Mixin for single registration form RH"""
+    """Mixin for single registration form RH."""
 
     normalize_url_spec = {
         'locators': {

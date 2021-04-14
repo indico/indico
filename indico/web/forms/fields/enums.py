@@ -1,11 +1,9 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
-
-from __future__ import absolute_import, unicode_literals
 
 from operator import attrgetter
 
@@ -15,7 +13,7 @@ from wtforms.widgets import RadioInput, Select
 from indico.web.forms.widgets import JinjaWidget
 
 
-class _EnumFieldMixin(object):
+class _EnumFieldMixin:
     keep_enum = True
 
     def process_formdata(self, valuelist):
@@ -32,13 +30,13 @@ class _EnumFieldMixin(object):
 
 
 class IndicoEnumSelectField(_EnumFieldMixin, SelectFieldBase):
-    """Select field backed by a :class:`RichEnum`"""
+    """Select field backed by a :class:`RichEnum`."""
 
     widget = Select()
 
     def __init__(self, label=None, validators=None, enum=None, sorted=False, only=None, skip=None, none=None,
                  titles=None, keep_enum=True, **kwargs):
-        super(IndicoEnumSelectField, self).__init__(label, validators, **kwargs)
+        super().__init__(label, validators, **kwargs)
         self.enum = enum
         self.sorted = sorted
         self.only = set(only) if only is not None else None
@@ -64,10 +62,10 @@ class IndicoEnumRadioField(IndicoEnumSelectField):
 
 
 class HiddenEnumField(_EnumFieldMixin, HiddenField):
-    """Hidden field that only accepts values from an Enum"""
+    """Hidden field that only accepts values from an Enum."""
 
     def __init__(self, label=None, validators=None, enum=None, only=None, skip=None, none=None, **kwargs):
-        super(HiddenEnumField, self).__init__(label, validators, **kwargs)
+        super().__init__(label, validators, **kwargs)
         self.enum = enum
         self.only = only
         self.skip = skip or set()
@@ -75,7 +73,7 @@ class HiddenEnumField(_EnumFieldMixin, HiddenField):
 
     def process_formdata(self, valuelist):
         old_data = self.data
-        super(HiddenEnumField, self).process_formdata(valuelist)
+        super().process_formdata(valuelist)
         if self.data is not None and (self.data in self.skip or (self.only is not None and self.data not in self.only)):
             self.data = old_data
             raise ValueError(self.gettext('Not a valid choice'))

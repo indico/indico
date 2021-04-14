@@ -1,11 +1,9 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
-
-from __future__ import unicode_literals
 
 from functools import partial
 
@@ -18,7 +16,7 @@ from indico.web.flask.util import make_compat_redirect_func
 from indico.web.flask.wrappers import IndicoBlueprint
 
 
-_bp = IndicoBlueprint('abstracts', __name__, url_prefix='/event/<confId>', template_folder='templates',
+_bp = IndicoBlueprint('abstracts', __name__, url_prefix='/event/<int:event_id>', template_folder='templates',
                       virtual_template_folder='events/abstracts')
 
 # Display pages (not related to any specific abstract)
@@ -171,7 +169,7 @@ def _add_management_flag(endpoint, values):
 
 
 # Legacy URLs - display
-_compat_bp = IndicoBlueprint('compat_abstracts', __name__, url_prefix='/event/<int:confId>')
+_compat_bp = IndicoBlueprint('compat_abstracts', __name__, url_prefix='/event/<int:event_id>')
 _compat_bp.add_url_rule('/call-for-abstracts/', 'cfa', make_compat_redirect_func(_bp, 'call_for_abstracts'))
 _compat_bp.add_url_rule('/call-for-abstracts/my-abstracts', 'mine',
                         make_compat_redirect_func(_bp, 'call_for_abstracts'))

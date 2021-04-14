@@ -1,14 +1,11 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import print_function, unicode_literals
-
-from sqlalchemy import ForeignKeyConstraint, MetaData, Table
-from sqlalchemy.engine.reflection import Inspector
+from sqlalchemy import ForeignKeyConstraint, MetaData, Table, inspect
 from sqlalchemy.sql.ddl import DropConstraint, DropSchema, DropTable
 
 from indico.core.db.sqlalchemy.protection import ProtectionMode
@@ -64,23 +61,23 @@ DEFAULT_BADGE_DATA = {
 
 
 def get_all_tables(db):
-    """Returns a dict containing all tables grouped by schema"""
-    inspector = Inspector.from_engine(db.engine)
+    """Return a dict containing all tables grouped by schema."""
+    inspector = inspect(db.engine)
     schemas = sorted(set(inspector.get_schema_names()) - {'information_schema'})
     return dict(zip(schemas, (inspector.get_table_names(schema=schema) for schema in schemas)))
 
 
 def delete_all_tables(db):
-    """Drops all tables in the database"""
+    """Drop all tables in the database."""
     conn = db.engine.connect()
     transaction = conn.begin()
-    inspector = Inspector.from_engine(db.engine)
+    inspector = inspect(db.engine)
     metadata = MetaData()
 
     all_schema_tables = get_all_tables(db)
     tables = []
     all_fkeys = []
-    for schema, schema_tables in all_schema_tables.iteritems():
+    for schema, schema_tables in all_schema_tables.items():
         for table_name in schema_tables:
             fkeys = [ForeignKeyConstraint((), (), name=fk['name'])
                      for fk in inspector.get_foreign_keys(table_name, schema=schema)
@@ -106,11 +103,11 @@ def delete_all_tables(db):
 
 
 def create_all_tables(db, verbose=False, add_initial_data=True):
-    """Create all tables and required initial objects"""
+    """Create all tables and required initial objects."""
+    from indico.core.oauth.models.applications import OAuthApplication, SystemAppType
     from indico.modules.categories import Category
     from indico.modules.designer import TemplateType
     from indico.modules.designer.models.templates import DesignerTemplate
-    from indico.modules.oauth.models.applications import OAuthApplication, SystemAppType
     from indico.modules.users import User
     if verbose:
         print(cformat('%{green}Creating tables'))

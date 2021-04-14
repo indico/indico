@@ -1,12 +1,11 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
 from datetime import date, datetime, time
-from itertools import izip
 
 import pytest
 from dateutil.relativedelta import relativedelta
@@ -62,7 +61,7 @@ def overlapping_occurrences(create_occurrence):
 
 def test_date(dummy_occurrence):
     assert dummy_occurrence.date == date.today()
-    assert ReservationOccurrence.find_first(date=date.today()) == dummy_occurrence
+    assert ReservationOccurrence.query.filter_by(date=date.today()).first() == dummy_occurrence
 
 
 # ======================================================================================================================
@@ -74,7 +73,7 @@ def test_create_series_for_reservation(dummy_reservation):
     occurrences = ReservationOccurrence.iter_create_occurrences(start=dummy_reservation.start_dt,
                                                                 end=dummy_reservation.end_dt,
                                                                 repetition=dummy_reservation.repetition)
-    for occ1, occ2 in izip(dummy_reservation.occurrences, occurrences):
+    for occ1, occ2 in zip(dummy_reservation.occurrences, occurrences):
         assert occ1.start_dt == occ2.start_dt
         assert occ1.end_dt == occ2.end_dt
         assert occ1.is_cancelled == dummy_reservation.is_cancelled
@@ -83,8 +82,8 @@ def test_create_series_for_reservation(dummy_reservation):
 
 
 def test_create_series(creation_params):
-    for occ1, occ2 in izip(list(ReservationOccurrence.iter_create_occurrences(**creation_params)),
-                           ReservationOccurrence.create_series(**creation_params)):
+    for occ1, occ2 in zip(list(ReservationOccurrence.iter_create_occurrences(**creation_params)),
+                          ReservationOccurrence.create_series(**creation_params)):
         assert occ1.start_dt == occ2.start_dt
         assert occ1.end_dt == occ2.end_dt
 
@@ -99,7 +98,6 @@ def test_iter_create_occurrences(creation_params):
 
 def test_iter_start_time_invalid():
     invalid_frequency = -1
-    assert invalid_frequency not in RepeatFrequency
     with pytest.raises(IndicoError):
         ReservationOccurrence.iter_start_time(start=date.today(), end=date.today(), repetition=(invalid_frequency, 0))
 
@@ -204,7 +202,7 @@ def test_filter_overlap(create_occurrence, overlapping_combination_from_2am_to_4
     occ2 = ReservationOccurrence(start_dt=date.today() + relativedelta(hour=start_hour),
                                  end_dt=date.today() + relativedelta(hour=end_hour))
     overlap_filter = ReservationOccurrence.filter_overlap([occ2])
-    assert (occ1 in ReservationOccurrence.find_all(overlap_filter)) == expected
+    assert (occ1 in ReservationOccurrence.query.filter(overlap_filter).all()) == expected
 
 
 def test_find_overlapping_with_different_room(overlapping_occurrences, create_room):
@@ -397,7 +395,7 @@ def test_can_cancel(create_reservation, dummy_user, freeze_time):
     assert reservation.occurrences[-1].can_cancel(dummy_user)
 
 
-def test_cannot_cancel_archived_reservation(create_reservation, dummy_user, freeze_time):
+def test_cannot_cancel_archived_or_ongoing_reservation(create_reservation, dummy_user, freeze_time):
     reservation = create_reservation(start_dt=datetime.combine(date.today(), time(11)),
                                      end_dt=datetime.combine(date.today(), time(17)),
                                      repeat_frequency=RepeatFrequency.NEVER)
@@ -405,10 +403,10 @@ def test_cannot_cancel_archived_reservation(create_reservation, dummy_user, free
     assert reservation.can_cancel(dummy_user)
 
     freeze_time(datetime.combine(date.today(), time(13)))
-    assert reservation.can_cancel(dummy_user)
+    assert not reservation.can_cancel(dummy_user)
 
     freeze_time(datetime.combine(date.today(), time(17)))
-    assert reservation.can_cancel(dummy_user)
+    assert not reservation.can_cancel(dummy_user)
 
     freeze_time(datetime.combine(date.today(), time(17, 1)))
     assert not reservation.can_cancel(dummy_user)

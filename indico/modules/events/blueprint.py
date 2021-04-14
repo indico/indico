@@ -1,11 +1,9 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
-
-from __future__ import unicode_literals
 
 from indico.modules.events.controllers.admin import (RHCreateEventLabel, RHCreateReferenceType, RHDeleteEventLabel,
                                                      RHDeleteReferenceType, RHEditEventLabel, RHEditReferenceType,
@@ -38,7 +36,7 @@ _bp.add_url_rule('/admin/event-labels/<int:event_label_id>/edit', 'update_event_
 _bp.add_url_rule('/admin/event-labels/<int:event_label_id>', 'delete_event_label', RHDeleteEventLabel,
                  methods=('DELETE',))
 
-_bp.add_url_rule('/event/<confId>/event.ics', 'export_event_ical', RHExportEventICAL)
+_bp.add_url_rule('/event/<int:event_id>/event.ics', 'export_event_ical', RHExportEventICAL)
 
 # Creation
 _bp.add_url_rule('/event/create/<any(lecture,meeting,conference):event_type>', 'create', RHCreateEvent,
@@ -47,15 +45,18 @@ _bp.add_url_rule('/event/create/<any(lecture,meeting,conference):event_type>', '
 # Main entry points supporting shortcut URLs
 # /e/ accepts slashes, /event/ doesn't - this is intended. We do not want to support slashes in the old namespace
 # since it's a major pain in the ass to do so (and its route would eat anything that's usually a 404)
-_bp.add_url_rule('/e/<path:confId>', 'shorturl', event_or_shorturl, strict_slashes=False,
+_bp.add_url_rule('/e/<path:event_id>', 'shorturl', event_or_shorturl, strict_slashes=False,
                  defaults={'shorturl_namespace': True})
-_bp.add_url_rule('/event/<confId>/', 'display', event_or_shorturl)
-_bp.add_url_rule('/event/<confId>/overview', 'display_overview', event_or_shorturl, defaults={'force_overview': True})
-_bp.add_url_rule('/event/<confId>/other-view', 'display_other', redirect_view('timetable.timetable'))
+# XXX: these two entries below use a string event_id on purpose, since they need to handle shortcuts
+# and possibly legacy ids as well
+_bp.add_url_rule('/event/<event_id>/', 'display', event_or_shorturl)
+_bp.add_url_rule('/event/<event_id>/overview', 'display_overview', event_or_shorturl,
+                 defaults={'force_overview': True})
+_bp.add_url_rule('/event/<int:event_id>/other-view', 'display_other', redirect_view('timetable.timetable'))
 
 # Misc
-_bp.add_url_rule('/event/<confId>/key-access', 'key_access', RHEventAccessKey, methods=('POST',))
-_bp.add_url_rule('/event/<confId>/event.marc.xml', 'marcxml', RHEventMarcXML)
+_bp.add_url_rule('/event/<int:event_id>/key-access', 'key_access', RHEventAccessKey, methods=('POST',))
+_bp.add_url_rule('/event/<int:event_id>/event.marc.xml', 'marcxml', RHEventMarcXML)
 
 
 # Legacy URLs
@@ -65,5 +66,6 @@ _compat_bp.add_url_rule('/conferenceOtherViews.py', 'display_other_modpython',
                         make_compat_redirect_func(_bp, 'display_other'))
 _compat_bp.add_url_rule('/conferenceDisplay.py/overview', 'display_overview_modpython',
                         make_compat_redirect_func(_bp, 'display_overview'))
-_compat_bp.add_url_rule('/event/<confId>/my-conference/', 'display_mystuff', make_compat_redirect_func(_bp, 'display'))
+_compat_bp.add_url_rule('/event/<int:event_id>/my-conference/', 'display_mystuff',
+                        make_compat_redirect_func(_bp, 'display'))
 _compat_bp.add_url_rule('/myconference.py', 'display_mystuff_modpython', make_compat_redirect_func(_bp, 'display'))

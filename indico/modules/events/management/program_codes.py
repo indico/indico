@@ -1,13 +1,9 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
-
-from __future__ import unicode_literals
-
-from collections import OrderedDict
 
 from indico.modules.events.management.settings import program_codes_settings
 from indico.util.date_time import format_datetime
@@ -33,20 +29,20 @@ def generate_program_codes(event, object_type, objects):
         context = 'program-codes-session-block'
         template_setting = 'session_block_template'
     else:
-        raise ValueError('Invalid object type: {}'.format(object_type))
+        raise ValueError(f'Invalid object type: {object_type}')
 
     template = program_codes_settings.get(event, template_setting)
-    return OrderedDict(
-        (obj, (replace_placeholders(context, template, escape_html=False, **{kwarg: obj}),
-               get_empty_placeholders(context, template, **{kwarg: obj})))
+    return {
+        obj: (replace_placeholders(context, template, escape_html=False, **{kwarg: obj}),
+              get_empty_placeholders(context, template, **{kwarg: obj}))
         for obj in objects
-    )
+    }
 
 
 def _make_date_placeholder(class_name, name, render_kwarg, date_format, description, transform=None):
-    dct = {b'name': name, b'description': description, b'render_kwarg': render_kwarg, b'date_format': date_format,
-           b'transform': staticmethod(transform) if transform else None}
-    return type(str(class_name), (DatePlaceholder,), dct)
+    dct = {'name': name, 'description': description, 'render_kwarg': render_kwarg, 'date_format': date_format,
+           'transform': staticmethod(transform) if transform else None}
+    return type(class_name, (DatePlaceholder,), dct)
 
 
 class ContributionIDPlaceholder(ParametrizedPlaceholder):
@@ -58,13 +54,13 @@ class ContributionIDPlaceholder(ParametrizedPlaceholder):
     @classmethod
     def render(cls, param, contribution):
         if param is None:
-            return unicode(contribution.friendly_id)
+            return str(contribution.friendly_id)
         try:
             padding = max(1, min(int(param), 10))
         except ValueError:
-            return unicode(contribution.friendly_id)
+            return str(contribution.friendly_id)
         else:
-            return unicode(contribution.friendly_id).zfill(padding)
+            return str(contribution.friendly_id).zfill(padding)
 
 
 class ContributionSessionCodePlaceholder(Placeholder):
@@ -101,11 +97,10 @@ class DatePlaceholder(Placeholder):
     def render(cls, **kwargs):
         arg = kwargs.pop(cls.render_kwarg)
         if kwargs:
-            raise TypeError('render() got unexpected kwargs: {}'.format(kwargs))
+            raise TypeError(f'render() got unexpected kwargs: {kwargs}')
         if not arg.start_dt:
             return ''
-        formatted = format_datetime(arg.start_dt, cls.date_format, locale='en_GB', timezone=arg.event.tzinfo,
-                                    as_unicode=True)
+        formatted = format_datetime(arg.start_dt, cls.date_format, locale='en_GB', timezone=arg.event.tzinfo)
         return cls.transform(formatted) if cls.transform else formatted
 
 
@@ -139,7 +134,7 @@ class SubContributionIDPlaceholder(Placeholder):
 
     @classmethod
     def render(cls, subcontribution):
-        return unicode(subcontribution.friendly_id)
+        return str(subcontribution.friendly_id)
 
 
 class SubContributionContributionCodePlaceholder(Placeholder):
@@ -157,7 +152,7 @@ class SessionIDPlaceholder(Placeholder):
 
     @classmethod
     def render(cls, session):
-        return unicode(session.friendly_id)
+        return str(session.friendly_id)
 
 
 class SessionSessionTypeCodePlaceholder(Placeholder):

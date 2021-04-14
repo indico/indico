@@ -26,7 +26,7 @@ to the ``[base]`` and ``[updates]`` sections, as described in the
 
 .. code-block:: shell
 
-    yum install -y yum install https://download.postgresql.org/pub/repos/yum/reporpms/EL-7-x86_64/pgdg-redhat-repo-latest.noarch.rpm
+    yum install -y https://download.postgresql.org/pub/repos/yum/reporpms/EL-7-x86_64/pgdg-redhat-repo-latest.noarch.rpm
     yum install -y postgresql96 postgresql96-server postgresql96-libs postgresql96-devel postgresql96-contrib
     yum install -y httpd mod_proxy_uwsgi mod_ssl mod_xsendfile
     yum install -y gcc redis uwsgi uwsgi-plugin-python2
@@ -135,6 +135,10 @@ most cases.
         ErrorLog /opt/indico/log/apache/error.log
         LogLevel error
         ServerSignature Off
+
+        <If "%{HTTP_HOST} != 'YOURHOSTNAME'">
+            Redirect 301 / https://YOURHOSTNAME/
+        </If>
 
         AliasMatch "^/(images|fonts)(.*)/(.+?)(__v[0-9a-f]+)?\.([^.]+)$" "/opt/indico/web/static/$1$2/$3.$5"
         AliasMatch "^/(css|dist|images|fonts)/(.*)$" "/opt/indico/web/static/$1/$2"

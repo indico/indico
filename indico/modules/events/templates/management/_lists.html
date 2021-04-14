@@ -8,7 +8,7 @@
 {% macro render_filter_statistics(displayed_num, total_num, total_duration) %}
     {{ render_displayed_entries_fragment(displayed_num, total_num) }}
     <span id="total-duration" class="i-button label icon-time"
-          title="{% trans total=total_duration[0]|format_human_timedelta, scheduled=total_duration[1]|format_human_timedelta %}{{ total }} total duration of which {{scheduled}} are scheduled{% endtrans %}">
+          title="{% trans total=total_duration[0]|format_human_timedelta, scheduled=total_duration[1]|format_human_timedelta %}{{ total }} total duration of which {{ scheduled }} are scheduled{% endtrans %}">
         <strong>{{ total_duration[0] | format_human_timedelta }}</strong>
     </span>
 {% endmacro %}

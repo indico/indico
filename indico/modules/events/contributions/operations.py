@@ -1,11 +1,9 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
-
-from __future__ import unicode_literals
 
 from flask import session
 
@@ -26,7 +24,7 @@ from indico.modules.events.util import set_custom_fields
 
 
 def _ensure_consistency(contrib):
-    """Unschedule contribution if not consistent with timetable
+    """Unschedule contribution if not consistent with timetable.
 
     A contribution that has no session assigned, may not be scheduled
     inside a session.  A contribution that has a session assigned may
@@ -66,13 +64,13 @@ def create_contribution(event, contrib_data, custom_fields_data=None, session_bl
     signals.event.contribution_created.send(contrib)
     logger.info('Contribution %s created by %s', contrib, user)
     contrib.log(EventLogRealm.management, EventLogKind.positive, 'Contributions',
-                'Contribution "{}" has been created'.format(contrib.title), user)
+                f'Contribution "{contrib.title}" has been created', user)
     return contrib
 
 
 @no_autoflush
 def update_contribution(contrib, contrib_data, custom_fields_data=None):
-    """Update a contribution
+    """Update a contribution.
 
     :param contrib: The `Contribution` to update
     :param contrib_data: A dict containing the data to update
@@ -106,7 +104,7 @@ def update_contribution(contrib, contrib_data, custom_fields_data=None):
         signals.event.contribution_updated.send(contrib, changes=changes)
         logger.info('Contribution %s updated by %s', contrib, session.user)
         contrib.log(EventLogRealm.management, EventLogKind.change, 'Contributions',
-                    'Contribution "{}" has been updated'.format(contrib.title), session.user)
+                    f'Contribution "{contrib.title}" has been updated', session.user)
     return rv
 
 
@@ -118,7 +116,7 @@ def delete_contribution(contrib):
     signals.event.contribution_deleted.send(contrib)
     logger.info('Contribution %s deleted by %s', contrib, session.user)
     contrib.log(EventLogRealm.management, EventLogKind.negative, 'Contributions',
-                'Contribution "{}" has been deleted'.format(contrib.title), session.user)
+                f'Contribution "{contrib.title}" has been deleted', session.user)
 
 
 def create_subcontribution(contrib, data):
@@ -129,7 +127,7 @@ def create_subcontribution(contrib, data):
     signals.event.subcontribution_created.send(subcontrib)
     logger.info('Subcontribution %s created by %s', subcontrib, session.user)
     subcontrib.event.log(EventLogRealm.management, EventLogKind.positive, 'Subcontributions',
-                         'Subcontribution "{}" has been created'.format(subcontrib.title), session.user,
+                         f'Subcontribution "{subcontrib.title}" has been created', session.user,
                          meta={'subcontribution_id': subcontrib.id})
     return subcontrib
 
@@ -140,7 +138,7 @@ def update_subcontribution(subcontrib, data):
     signals.event.subcontribution_updated.send(subcontrib)
     logger.info('Subcontribution %s updated by %s', subcontrib, session.user)
     subcontrib.event.log(EventLogRealm.management, EventLogKind.change, 'Subcontributions',
-                         'Subcontribution "{}" has been updated'.format(subcontrib.title), session.user,
+                         f'Subcontribution "{subcontrib.title}" has been updated', session.user,
                          meta={'subcontribution_id': subcontrib.id})
 
 
@@ -150,7 +148,7 @@ def delete_subcontribution(subcontrib):
     signals.event.subcontribution_deleted.send(subcontrib)
     logger.info('Subcontribution %s deleted by %s', subcontrib, session.user)
     subcontrib.event.log(EventLogRealm.management, EventLogKind.negative, 'Subcontributions',
-                         'Subcontribution "{}" has been deleted'.format(subcontrib.title), session.user,
+                         f'Subcontribution "{subcontrib.title}" has been deleted', session.user,
                          meta={'subcontribution_id': subcontrib.id})
 
 
@@ -171,7 +169,7 @@ def create_contribution_from_abstract(abstract, contrib_session=None):
         duration = contrib_session.default_contribution_duration
     else:
         duration = contribution_settings.get(event, 'default_duration')
-    custom_fields_data = {'custom_{}'.format(field_value.contribution_field.id): field_value.data for
+    custom_fields_data = {f'custom_{field_value.contribution_field.id}': field_value.data for
                           field_value in abstract.field_values}
     contrib = create_contribution(event, {'friendly_id': abstract.friendly_id,
                                           'title': abstract.title,

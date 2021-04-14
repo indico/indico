@@ -1,5 +1,5 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
@@ -8,7 +8,6 @@
 from sqlalchemy.ext.hybrid import hybrid_method
 
 from indico.core.db import db
-from indico.util.string import return_ascii
 
 
 class NonBookablePeriod(db.Model):
@@ -35,9 +34,8 @@ class NonBookablePeriod(db.Model):
     # relationship backrefs:
     # - room (Room.nonbookable_periods)
 
-    @return_ascii
     def __repr__(self):
-        return u'<NonBookablePeriod({0}, {1}, {2})>'.format(
+        return '<NonBookablePeriod({}, {}, {})>'.format(
             self.room_id,
             self.start_dt,
             self.end_dt

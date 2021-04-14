@@ -1,15 +1,12 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import unicode_literals
-
 import posixpath
 import time
-from collections import OrderedDict
 from decimal import Decimal
 from uuid import uuid4
 
@@ -30,12 +27,13 @@ from indico.modules.events.payment.models.transactions import TransactionStatus
 from indico.modules.users.models.users import format_display_full_name
 from indico.util.date_time import now_utc
 from indico.util.decorators import classproperty
+from indico.util.enum import RichIntEnum
 from indico.util.fs import secure_filename
 from indico.util.i18n import L_
 from indico.util.locators import locator_property
 from indico.util.signals import values_from_signal
-from indico.util.string import format_full_name, format_repr, return_ascii, strict_unicode
-from indico.util.struct.enum import RichIntEnum
+from indico.util.string import format_full_name, format_repr, strict_str
+from indico.web.flask.util import url_for
 
 
 class RegistrationState(RichIntEnum):
@@ -56,7 +54,7 @@ def _get_next_friendly_id(context):
 
 
 class Registration(db.Model):
-    """Somebody's registration for an event through a registration form"""
+    """Somebody's registration for an event through a registration form."""
     __tablename__ = 'registrations'
     __table_args__ = (db.CheckConstraint('email = lower(email)', 'lowercase_email'),
                       db.Index(None, 'friendly_id', 'event_id', unique=True,
@@ -80,7 +78,7 @@ class Registration(db.Model):
         index=True,
         unique=True,
         nullable=False,
-        default=lambda: unicode(uuid4())
+        default=lambda: str(uuid4())
     )
     #: The human-friendly ID for the object
     friendly_id = db.Column(
@@ -172,7 +170,7 @@ class Registration(db.Model):
         index=True,
         unique=True,
         nullable=False,
-        default=lambda: unicode(uuid4())
+        default=lambda: str(uuid4())
     )
     #: Whether the person has checked in. Setting this also sets or clears
     #: `checked_in_dt`.
@@ -186,7 +184,12 @@ class Registration(db.Model):
         UTCDateTime,
         nullable=True
     )
-
+    #: If given a reason for rejection
+    rejection_reason = db.Column(
+        db.String,
+        nullable=False,
+        default='',
+    )
     #: The Event containing this registration
     event = db.relationship(
         'Event',
@@ -234,8 +237,12 @@ class Registration(db.Model):
     def get_all_for_event(cls, event):
         """Retrieve all registrations in all registration forms of an event."""
         from indico.modules.events.registration.models.forms import RegistrationForm
-        return Registration.find_all(Registration.is_active, ~RegistrationForm.is_deleted,
-                                     RegistrationForm.event_id == event.id, _join=Registration.registration_form)
+        return (Registration.query
+                .filter(Registration.is_active,
+                        ~RegistrationForm.is_deleted,
+                        RegistrationForm.event_id == event.id)
+                .join(Registration.registration_form)
+                .all())
 
     @hybrid_property
     def is_active(self):
@@ -281,7 +288,7 @@ class Registration(db.Model):
 
     @locator.uuid
     def locator(self):
-        """A locator that uses uuid instead of id"""
+        """A locator that uses uuid instead of id."""
         return dict(self.registration_form.locator, token=self.uuid)
 
     @property
@@ -315,7 +322,7 @@ class Registration(db.Model):
 
     @property
     def full_name(self):
-        """Returns the user's name in 'Firstname Lastname' notation."""
+        """Return the user's name in 'Firstname Lastname' notation."""
         return self.get_full_name(last_name_first=False)
 
     @property
@@ -324,19 +331,24 @@ class Registration(db.Model):
         return format_display_full_name(session.user, self)
 
     @property
+    def avatar_url(self):
+        """Return the url of the user's avatar."""
+        return url_for('event_registration.registration_avatar', self)
+
+    @property
     def is_ticket_blocked(self):
-        """Check whether the ticket is blocked by a plugin"""
+        """Check whether the ticket is blocked by a plugin."""
         return any(values_from_signal(signals.event.is_ticket_blocked.send(self), single_value=True))
 
     @property
     def is_paid(self):
-        """Returns whether the registration has been paid for."""
+        """Return whether the registration has been paid for."""
         paid_states = {TransactionStatus.successful, TransactionStatus.pending}
         return self.transaction is not None and self.transaction.status in paid_states
 
     @property
     def payment_dt(self):
-        """The date/time when the registration has been paid for"""
+        """The date/time when the registration has been paid for."""
         return self.transaction.timestamp if self.is_paid else None
 
     @property
@@ -360,26 +372,26 @@ class Registration(db.Model):
 
     @property
     def summary_data(self):
-        """Export registration data nested in sections and fields"""
+        """Export registration data nested in sections and fields."""
 
         def _fill_from_regform():
             for section in self.registration_form.sections:
                 if not section.is_visible:
                     continue
-                summary[section] = OrderedDict()
+                summary[section] = {}
                 for field in section.fields:
                     if not field.is_visible:
                         continue
                     summary[section][field] = field_summary[field]
 
         def _fill_from_registration():
-            for field, data in field_summary.iteritems():
+            for field, data in field_summary.items():
                 section = field.parent
-                summary.setdefault(section, OrderedDict())
+                summary.setdefault(section, {})
                 if field not in summary[section]:
                     summary[section][field] = data
 
-        summary = OrderedDict()
+        summary = {}
         field_summary = {x.field_data.field: x for x in self.data}
         _fill_from_regform()
         _fill_from_registration()
@@ -399,13 +411,12 @@ class Registration(db.Model):
     def order_by_name(cls):
         return db.func.lower(cls.last_name), db.func.lower(cls.first_name), cls.friendly_id
 
-    @return_ascii
     def __repr__(self):
         return format_repr(self, 'id', 'registration_form_id', 'email', 'state',
                            user_id=None, is_deleted=False, _text=self.full_name)
 
     def get_full_name(self, last_name_first=True, last_name_upper=False, abbrev_first_name=False):
-        """Returns the user's in the specified notation.
+        """Return the user's in the specified notation.
 
         If not format options are specified, the name is returned in
         the 'Lastname, Firstname' notation.
@@ -448,7 +459,7 @@ class Registration(db.Model):
         return self._render_price(self.price_adjustment)
 
     def sync_state(self, _skip_moderation=True):
-        """Sync the state of the registration"""
+        """Sync the state of the registration."""
         initial_state = self.state
         regform = self.registration_form
         invitation = self.invitation
@@ -473,7 +484,7 @@ class Registration(db.Model):
             signals.event.registration_state_updated.send(self, previous_state=initial_state)
 
     def update_state(self, approved=None, paid=None, rejected=None, withdrawn=None, _skip_moderation=False):
-        """Update the state of the registration for a given action
+        """Update the state of the registration for a given action.
 
         The accepted kwargs are the possible actions. ``True`` means that the
         action occured and ``False`` that it was reverted.
@@ -551,7 +562,7 @@ class Registration(db.Model):
 
 
 class RegistrationData(StoredFileMixin, db.Model):
-    """Data entry within a registration for a field in a registration form"""
+    """Data entry within a registration for a field in a registration form."""
 
     __tablename__ = 'registration_data'
     __table_args__ = {'schema': 'event_registration'}
@@ -645,15 +656,14 @@ class RegistrationData(StoredFileMixin, db.Model):
     file = property(fset=_set_file)
     del _set_file
 
-    @return_ascii
     def __repr__(self):
-        return '<RegistrationData({}, {}): {}>'.format(self.registration_id, self.field_data_id, self.data)
+        return f'<RegistrationData({self.registration_id}, {self.field_data_id}): {self.data}>'
 
     def _build_storage_path(self):
         self.registration.registration_form.assign_id()
         self.registration.assign_id()
-        path_segments = ['event', strict_unicode(self.registration.event_id), 'registrations',
-                         strict_unicode(self.registration.registration_form.id), strict_unicode(self.registration.id)]
+        path_segments = ['event', strict_str(self.registration.event_id), 'registrations',
+                         strict_str(self.registration.registration_form.id), strict_str(self.registration.id)]
         assert None not in path_segments
         # add timestamp in case someone uploads the same file again
         filename = '{}-{}-{}'.format(self.field_data.field_id, int(time.time()), secure_filename(self.filename, 'file'))

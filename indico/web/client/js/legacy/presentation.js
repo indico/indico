@@ -1,5 +1,5 @@
 // This file is part of Indico.
-// Copyright (C) 2002 - 2020 CERN
+// Copyright (C) 2002 - 2021 CERN
 //
 // Indico is free software; you can redistribute it and/or
 // modify it under the terms of the MIT License; see the
@@ -20,7 +20,6 @@ import './libs/presentation/Data/WatchObject';
 import './libs/presentation/Data/Binding';
 import './libs/presentation/Data/Logic';
 import './libs/presentation/Data/Json';
-import './libs/presentation/Data/Remote';
 import './libs/presentation/Data/DateTime';
 import './libs/presentation/Ui/XElement';
 import './libs/presentation/Ui/Html';

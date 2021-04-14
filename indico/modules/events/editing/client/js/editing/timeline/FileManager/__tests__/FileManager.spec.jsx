@@ -1,20 +1,19 @@
 // This file is part of Indico.
-// Copyright (C) 2002 - 2020 CERN
+// Copyright (C) 2002 - 2021 CERN
 //
 // Indico is free software; you can redistribute it and/or
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
 import {shallow, mount} from 'enzyme';
-import {act} from 'react-dom/test-utils';
-
 import mockAxios from 'jest-mock-axios';
 import React from 'react';
+import {act} from 'react-dom/test-utils';
 
 import * as axiosUtils from 'indico/utils/axios';
 
-import * as actions from '../actions';
 import FileManager, {Dropzone} from '..';
+import * as actions from '../actions';
 
 expect.extend({
   toContainFile(received, file) {

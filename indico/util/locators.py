@@ -1,19 +1,17 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import unicode_literals
-
-from UserDict import IterableUserDict, UserDict
+from collections import UserDict
 
 from werkzeug.utils import cached_property
 
 
-class locator_property(object):
-    """Defines a smart locator property.
+class locator_property:
+    """Define a smart locator property.
 
     This behaves pretty much like a normal read-only property and the
     decorated function should return a dict containing the necessary
@@ -62,7 +60,7 @@ class locator_property(object):
 
 
 def get_locator(obj):
-    """Retrieves the locator data from an object.
+    """Retrieve the locator data from an object.
 
     The object may be a dictionary (in case a locator is passed) or
     an object with a ``locator`` property.
@@ -77,10 +75,10 @@ def get_locator(obj):
     elif hasattr(obj, 'locator'):
         return obj.locator
     else:
-        raise TypeError('{} does not contain a locator'.format(obj))
+        raise TypeError(f'{obj} does not contain a locator')
 
 
-class _LocatorDict(IterableUserDict, object):
+class _LocatorDict(UserDict):
     def __init__(self, locator, obj):
         # call to super constructor is omitted on purpose
         self._locator = locator

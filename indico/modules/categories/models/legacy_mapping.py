@@ -1,18 +1,15 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import unicode_literals
-
 from indico.core.db import db
-from indico.util.string import return_ascii
 
 
 class LegacyCategoryMapping(db.Model):
-    """Legacy category ID mapping
+    """Legacy category ID mapping.
 
     Legacy categories have non-numeric IDs which are not supported by
     any new code. This mapping maps them to proper integer IDs to
@@ -45,6 +42,5 @@ class LegacyCategoryMapping(db.Model):
         )
     )
 
-    @return_ascii
     def __repr__(self):
-        return '<LegacyCategoryMapping({}, {})>'.format(self.legacy_category_id, self.category_id)
+        return f'<LegacyCategoryMapping({self.legacy_category_id}, {self.category_id})>'

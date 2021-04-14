@@ -1,11 +1,9 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
-
-from __future__ import unicode_literals
 
 import fnmatch
 import os
@@ -29,22 +27,22 @@ class EditingFilesField(Dict):
         keys_field = ModelField(EditingFileType, get_query=lambda m: self.editing_file_types_query)
         values_field = FilesField(required=True, allow_claimed=allow_claimed_files)
         validators = kwargs.pop('validate', []) + [self.validate_files]
-        super(EditingFilesField, self).__init__(keys=keys_field, values=values_field, validate=validators, **kwargs)
+        super().__init__(keys=keys_field, values=values_field, validate=validators, **kwargs)
 
     def validate_files(self, value):
         required_types = {ft for ft in self.editing_file_types_query if ft.required}
 
         # ensure all required file types have files
-        required_missing = required_types - {ft for ft, files in value.viewitems() if files}
+        required_missing = required_types - {ft for ft, files in value.items() if files}
         if required_missing:
             raise ValidationError('Required file types missing: {}'
                                   .format(', '.join(ft.name for ft in required_missing)))
 
         seen = set()
-        for file_type, files in value.viewitems():
+        for file_type, files in value.items():
             # ensure single-file types don't have too many files
             if not file_type.allow_multiple_files and len(files) > 1:
-                raise ValidationError('File type "{}" allows only one file'.format(file_type.name))
+                raise ValidationError(f'File type "{file_type.name}" allows only one file')
 
             # ensure all files have allowed extensions
             valid_extensions = {ext.lower() for ext in file_type.extensions}
@@ -67,7 +65,7 @@ class EditingFilesField(Dict):
             duplicates = set(files) & seen
             if duplicates:
                 raise ValidationError('Files found in multiple types: {}'
-                                      .format(', '.join(unicode(f.uuid) for f in duplicates)))
+                                      .format(', '.join(str(f.uuid) for f in duplicates)))
 
             seen |= set(files)
 
@@ -80,7 +78,7 @@ class EditingTagsField(ModelList):
                 query = query.filter_by(system=False)
             return query
 
-        super(EditingTagsField, self).__init__(model=EditingTag, get_query=_get_query, collection_class=set, **kwargs)
+        super().__init__(model=EditingTag, get_query=_get_query, collection_class=set, **kwargs)
 
 
 class EditableList(ModelList):
@@ -89,4 +87,4 @@ class EditableList(ModelList):
             return (m.query
                     .join(Contribution)
                     .filter(~Contribution.is_deleted, Contribution.event_id == event.id, m.type == editable_type))
-        super(EditableList, self).__init__(model=Editable, get_query=_get_query, collection_class=set, **kwargs)
+        super().__init__(model=Editable, get_query=_get_query, collection_class=set, **kwargs)

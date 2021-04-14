@@ -1,11 +1,9 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
-
-from __future__ import unicode_literals
 
 from collections import defaultdict
 
@@ -32,7 +30,7 @@ def build_material_legacy_api_data(linked_object):
         for folder in query:
             cache[folder.object].append(folder)
 
-    return filter(None, map(_build_folder_legacy_api_data, cache.get(linked_object, [])))
+    return [_f for _f in map(_build_folder_legacy_api_data, cache.get(linked_object, [])) if _f]
 
 
 def _build_folder_legacy_api_data(folder):
@@ -83,7 +81,7 @@ def build_folders_api_data(linked_object):
     folders = get_attached_folders(linked_object, preload_event=True)
     if not folders:
         return []
-    return filter(None, map(_build_folder_api_data, folders))
+    return [_f for _f in map(_build_folder_api_data, folders) if _f]
 
 
 def _build_folder_api_data(folder):

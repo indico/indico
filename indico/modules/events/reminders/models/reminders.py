@@ -1,11 +1,9 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
-
-from __future__ import unicode_literals
 
 from sqlalchemy.dialects.postgresql import ARRAY
 from sqlalchemy.ext.hybrid import hybrid_property
@@ -13,15 +11,16 @@ from sqlalchemy.ext.hybrid import hybrid_property
 from indico.core.db import db
 from indico.core.db.sqlalchemy import UTCDateTime
 from indico.core.notifications import make_email, send_email
+from indico.modules.events.ical import event_to_ical
 from indico.modules.events.registration.models.registrations import Registration
 from indico.modules.events.reminders import logger
 from indico.modules.events.reminders.util import make_reminder_email
 from indico.util.date_time import now_utc
-from indico.util.string import format_repr, return_ascii
+from indico.util.string import format_repr
 
 
 class EventReminder(db.Model):
-    """Email reminders for events"""
+    """Email reminders for events."""
     __tablename__ = 'reminders'
     __table_args__ = (db.Index(None, 'scheduled_dt', postgresql_where=db.text('not is_sent')),
                       {'schema': 'events'})
@@ -93,6 +92,12 @@ class EventReminder(db.Model):
         nullable=False,
         default=False
     )
+    #: If the notification should include the event's iCalendar file.
+    attach_ical = db.Column(
+        db.Boolean,
+        nullable=False,
+        default=True
+    )
     #: The address to use as Reply-To in the notification email.
     reply_to_address = db.Column(
         db.String,
@@ -130,7 +135,7 @@ class EventReminder(db.Model):
 
     @property
     def all_recipients(self):
-        """Returns all recipients of the notifications.
+        """Return all recipients of the notifications.
 
         This includes both explicit recipients and, if enabled,
         participants of the event.
@@ -143,7 +148,7 @@ class EventReminder(db.Model):
 
     @hybrid_property
     def is_relative(self):
-        """Returns if the reminder is relative to the event time"""
+        """Return if the reminder is relative to the event time."""
         return self.event_start_delta is not None
 
     @is_relative.expression
@@ -155,16 +160,22 @@ class EventReminder(db.Model):
         return not self.is_sent and self.scheduled_dt <= now_utc()
 
     def send(self):
-        """Sends the reminder to its recipients."""
+        """Send the reminder to its recipients."""
         self.is_sent = True
         recipients = self.all_recipients
         if not recipients:
             logger.info('Notification %s has no recipients; not sending anything', self)
             return
         email_tpl = make_reminder_email(self.event, self.include_summary, self.include_description, self.message)
-        email = make_email(bcc_list=recipients, from_address=self.reply_to_address, template=email_tpl)
+        attachments = []
+        if self.attach_ical:
+            event_ical = event_to_ical(self.event)
+            attachments.append(('event.ics', event_ical, 'text/calendar'))
+        email = make_email(
+            bcc_list=recipients, from_address=self.reply_to_address, template=email_tpl, attachments=attachments
+        )
+        logger.info(self.event.organizer_info)
         send_email(email, self.event, 'Reminder', self.creator)
 
-    @return_ascii
     def __repr__(self):
         return format_repr(self, 'id', 'event_id', 'scheduled_dt', is_sent=False)

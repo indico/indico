@@ -1,24 +1,26 @@
 // This file is part of Indico.
-// Copyright (C) 2002 - 2020 CERN
+// Copyright (C) 2002 - 2021 CERN
 //
 // Indico is free software; you can redistribute it and/or
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
 import _ from 'lodash';
-import React from 'react';
-import {bindActionCreators} from 'redux';
-import {connect} from 'react-redux';
 import PropTypes from 'prop-types';
+import React from 'react';
+import {connect} from 'react-redux';
+import {bindActionCreators} from 'redux';
 import {Card, Icon, Label, Loader, Popup, Button} from 'semantic-ui-react';
 
+import {TooltipIfTruncated, ResponsivePopup} from 'indico/react/components';
 import {Translate} from 'indico/react/i18n';
 import {Markdown, Slot} from 'indico/react/util';
-import {TooltipIfTruncated, ResponsivePopup} from 'indico/react/components';
-import SpriteImage from './SpriteImage';
-import DimmableImage from './DimmableImage';
+
 import {actions as userActions, selectors as userSelectors} from '../common/user';
+
+import DimmableImage from './DimmableImage';
 import RoomFeatureEntry from './RoomFeatureEntry';
+import SpriteImage from './SpriteImage';
 
 import './Room.module.scss';
 

@@ -1,11 +1,9 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
-
-from __future__ import unicode_literals
 
 from flask import jsonify, request, session
 from werkzeug.exceptions import BadRequest
@@ -34,7 +32,7 @@ def _fill_form_field_with_data(field, field_data, set_data=True):
 
 
 class RHManageRegFormFieldBase(RHManageRegFormSectionBase):
-    """Base class for a specific field within a registration form"""
+    """Base class for a specific field within a registration form."""
 
     field_class = RegistrationFormField
     normalize_url_spec = {
@@ -49,7 +47,7 @@ class RHManageRegFormFieldBase(RHManageRegFormSectionBase):
 
 
 class RHRegistrationFormToggleFieldState(RHManageRegFormFieldBase):
-    """Enable/Disable a field"""
+    """Enable/Disable a field."""
 
     def _process(self):
         enabled = request.args.get('enable') == 'true'
@@ -64,7 +62,7 @@ class RHRegistrationFormToggleFieldState(RHManageRegFormFieldBase):
 
 
 class RHRegistrationFormModifyField(RHManageRegFormFieldBase):
-    """Remove/Modify a field"""
+    """Remove/Modify a field."""
 
     def _process_DELETE(self):
         if self.field.type == RegistrationFormItemType.field_pd:
@@ -87,7 +85,7 @@ class RHRegistrationFormModifyField(RHManageRegFormFieldBase):
 
 
 class RHRegistrationFormMoveField(RHManageRegFormFieldBase):
-    """Change position of a field within the section"""
+    """Change position of a field within the section."""
 
     def _process(self):
         new_position = request.json['endPos'] + 1
@@ -104,7 +102,7 @@ class RHRegistrationFormMoveField(RHManageRegFormFieldBase):
                 return (old_position < field.position <= new_position and field.id != self.field.id and
                         not field.is_deleted and field.is_enabled)
             start_enum = self.field.position
-        to_update = filter(fn, self.section.children)
+        to_update = list(filter(fn, self.section.children))
         self.field.position = new_position
         for pos, field in enumerate(to_update, start_enum):
             field.position = pos
@@ -113,7 +111,7 @@ class RHRegistrationFormMoveField(RHManageRegFormFieldBase):
 
 
 class RHRegistrationFormAddField(RHManageRegFormSectionBase):
-    """Add a field to the section"""
+    """Add a field to the section."""
 
     def _process(self):
         field_data = snakify_keys(request.json['fieldData'])
@@ -125,12 +123,12 @@ class RHRegistrationFormAddField(RHManageRegFormSectionBase):
 
 
 class RHRegistrationFormToggleTextState(RHRegistrationFormToggleFieldState):
-    """Enable/Disable a static text field"""
+    """Enable/Disable a static text field."""
     field_class = RegistrationFormText
 
 
 class RHRegistrationFormModifyText(RHRegistrationFormModifyField):
-    """Remove/Modify a static text field"""
+    """Remove/Modify a static text field."""
     field_class = RegistrationFormText
 
     def _process_PATCH(self):
@@ -141,12 +139,12 @@ class RHRegistrationFormModifyText(RHRegistrationFormModifyField):
 
 
 class RHRegistrationFormMoveText(RHRegistrationFormMoveField):
-    """Change position of a static text field within the section"""
+    """Change position of a static text field within the section."""
     field_class = RegistrationFormText
 
 
 class RHRegistrationFormAddText(RHManageRegFormSectionBase):
-    """Add a static text field to a section"""
+    """Add a static text field to a section."""
 
     def _process(self):
         field_data = snakify_keys(request.json['fieldData'])

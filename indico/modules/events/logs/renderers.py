@@ -1,18 +1,16 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
-
-from __future__ import unicode_literals
 
 from flask import render_template
 
 from indico.modules.events.logs.util import render_changes
 
 
-class EventLogRendererBase(object):
+class EventLogRendererBase:
     """Base class for event log renderers."""
 
     #: unique name of the log renderer (matches EventLogEntry.type)
@@ -26,16 +24,16 @@ class EventLogRendererBase(object):
 
     @classmethod
     def render_entry(cls, entry):
-        """Renders the log entry row
+        """Render the log entry row.
 
         :param entry: A :class:`.EventLogEntry`
         """
-        template = '{}:{}'.format(cls.plugin.name, cls.template_name) if cls.plugin is not None else cls.template_name
+        template = f'{cls.plugin.name}:{cls.template_name}' if cls.plugin is not None else cls.template_name
         return render_template(template, entry=entry, data=cls.get_data(entry), **cls.template_kwargs)
 
     @classmethod
     def get_data(cls, entry):
-        """Returns the entry data in a format suitable for the template.
+        """Return the entry data in a format suitable for the template.
 
         This method may be overridden if the entry's data needs to be
         preprocessed before being passed to the template.

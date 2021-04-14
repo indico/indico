@@ -1,11 +1,9 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
-
-from __future__ import unicode_literals
 
 from flask import session
 
@@ -23,7 +21,7 @@ def create_track(event, data):
     db.session.flush()
     logger.info('Track %r created by %r', track, session.user)
     event.log(EventLogRealm.management, EventLogKind.positive, 'Tracks',
-              'Track "{}" has been created.'.format(track.title), session.user)
+              f'Track "{track.title}" has been created.', session.user)
     return track
 
 
@@ -32,7 +30,7 @@ def update_track(track, data):
     db.session.flush()
     logger.info('Track %r modified by %r', track, session.user)
     track.event.log(EventLogRealm.management, EventLogKind.change, 'Tracks',
-                    'Track "{}" has been modified.'.format(track.title), session.user)
+                    f'Track "{track.title}" has been modified.', session.user)
 
 
 def delete_track(track):
@@ -53,7 +51,7 @@ def create_track_group(event, data):
     db.session.flush()
     logger.info('Track group %r created by %r', track_group, session.user)
     event.log(EventLogRealm.management, EventLogKind.positive, 'Track Groups',
-              'Track group "{}" has been created.'.format(track_group.title), session.user)
+              f'Track group "{track_group.title}" has been created.', session.user)
 
 
 def update_track_group(track_group, data):
@@ -61,7 +59,7 @@ def update_track_group(track_group, data):
     db.session.flush()
     logger.info('Track group %r updated by %r', track_group, session.user)
     track_group.event.log(EventLogRealm.management, EventLogKind.positive, 'Track Groups',
-                          'Track group "{}" has been updated.'.format(track_group.title), session.user)
+                          f'Track group "{track_group.title}" has been updated.', session.user)
 
 
 def delete_track_group(track_group):

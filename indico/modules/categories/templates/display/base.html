@@ -4,6 +4,8 @@
     <div class="category-header flexrow">
         {% if category.is_root or category.attachment_count or category.can_manage(session.user) %}
             {% set category_title_classes = 'sidebar-padding' %}
+        {% else %}
+            {% set category_title_classes = '' %}
         {% endif %}
         <h1 class="category-title {{ category_title_classes }}">
             {% block title %}
@@ -19,7 +21,7 @@
             {% endblock %}
         </h1>
         {% block cat_toolbar %}
-            <div id="category-toolbar" class="toolbar">
+            <div id="category-toolbar" class="toolbar fixed-height">
                 <div class="group">
                     {% block cat_create_event %}
                         {{ create_event_button(category, classes="highlight", text=_("Create event"), with_tooltip=false) }}
@@ -42,13 +44,7 @@
                         {% endif %}
                     {% endblock %}
                     {% block cat_export %}
-                        <a href="#"
-                           class="i-button icon-calendar arrow js-export-ical"
-                           title="{% trans %}Export to scheduling tool{% endtrans %}"
-                           data-id="{{ category.id }}"></a>
-                        {% with item=category, ics_url=url_for('categories.export_ical', category) -%}
-                            {% include 'categories/category_export_ical.html' %}
-                        {%- endwith %}
+                        <div id="category-calendar-link" data-category-id="{{ category.id }}"></div>
                     {% endblock %}
                     {% block cat_view_dropdown %}
                         <a class="i-button icon-eye arrow js-dropdown"
@@ -118,10 +114,6 @@
                 window.location.href = build_url(Indico.Urls.Categories.display, {category_id: category.id});
             }
         });
-    });
-    $('.js-export-ical').on('click', function(evt) {
-        evt.preventDefault();
-        $(this).trigger('menu_select');
     });
     setupCategoryDisplay();
 </script>

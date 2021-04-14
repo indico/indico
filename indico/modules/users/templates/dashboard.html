@@ -28,7 +28,7 @@
 {%- endblock %}
 
 {% block banner_actions -%}
-    <div id="dashboard-calendar-link" class="calendar-ics-link"></div>
+    <div id="dashboard-calendar-link"></div>
 {% endblock %}
 
 {% block content %}
@@ -37,7 +37,7 @@
             <div class="dashboard-col">
                 <div class="your-details">
                     <div class="avatar-image">
-                        <img src="{{ user.picture_url }}" alt="" class="ui large circular label">
+                        <img src="{{ user.avatar_url }}" alt="" class="ui large circular label">
                     </div>
                     <div class="your-details-wrapper">
                         <h3>{{ user.full_name }}</h3>
@@ -49,6 +49,17 @@
                                 </div>
                             {% endif %}
                             {{ labels(user) }}
+                            <br>
+                            <div class="ui small label">
+                                {% trans %}Last login{% endtrans %}
+                                <div class="detail">
+                                    {% if user.last_login_dt %}
+                                        {{ user.last_login_dt | format_datetime }}
+                                    {% else %}
+                                        {% trans %}Never{% endtrans %}
+                                    {% endif %}
+                                </div>
+                            </div>
                         </div>
                         {% if user.affiliation %}
                             <div>
@@ -127,7 +138,7 @@
                                 </span>
                             </li>
                         {% else %}
-                            {% for category in categories.itervalues() %}
+                            {% for category in categories.values() %}
                                 {{ user_category(category.categ, category.path, category.managed) }}
                             {% endfor %}
                         {% endif %}

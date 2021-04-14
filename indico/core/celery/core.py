@@ -1,20 +1,18 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import print_function, unicode_literals
-
 import logging
 import os
+from contextlib import ExitStack
 from operator import itemgetter
 
 from celery import Celery
 from celery.app.log import Logging
 from celery.beat import PersistentScheduler
-from contextlib2 import ExitStack
 from flask_pluginengine import current_plugin, plugin_context
 from sqlalchemy import inspect
 from terminaltables import AsciiTable
@@ -25,13 +23,11 @@ from indico.core.db import db
 from indico.core.notifications import flush_email_queue, init_email_queue
 from indico.core.plugins import plugin_engine
 from indico.util.console import cformat
-from indico.util.fossilize import clearCache
-from indico.util.string import return_ascii
 from indico.web.flask.stats import request_stats_request_started
 
 
 class IndicoCelery(Celery):
-    """Celery sweetened with some Indico/Flask-related sugar
+    """Celery sweetened with some Indico/Flask-related sugar.
 
     The following extra params are available on the `task` decorator:
 
@@ -45,7 +41,7 @@ class IndicoCelery(Celery):
 
     def __init__(self, *args, **kwargs):
         kwargs.setdefault('log', IndicoCeleryLogging)
-        super(IndicoCelery, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self.flask_app = None
         self._patch_task()
 
@@ -65,6 +61,7 @@ class IndicoCelery(Celery):
         self.conf['result_serializer'] = 'pickle'
         self.conf['task_serializer'] = 'pickle'
         self.conf['accept_content'] = ['json', 'yaml', 'pickle']
+        self.conf['task_always_eager'] = app.config['TESTING']
         # Allow indico.conf to override settings
         self.conf.update(config.CELERY_CONFIG)
         assert self.flask_app is None or self.flask_app is app
@@ -100,7 +97,7 @@ class IndicoCelery(Celery):
         return decorator
 
     def _patch_task(self):
-        """Patches the `task` decorator to run tasks inside the indico environment"""
+        """Patch the `task` decorator to run tasks inside the indico environment."""
         class IndicoTask(self.Task):
             abstract = True
 
@@ -113,8 +110,8 @@ class IndicoCelery(Celery):
                 if current_plugin:
                     options['headers'] = options.get('headers') or {}  # None in a retry
                     options['headers']['indico_plugin'] = current_plugin.name
-                return super(IndicoTask, s).apply_async(args=args, kwargs=kwargs, task_id=task_id, producer=producer,
-                                                        link=link, link_error=link_error, shadow=shadow, **options)
+                return super().apply_async(args=args, kwargs=kwargs, task_id=task_id, producer=producer,
+                                           link=link, link_error=link_error, shadow=shadow, **options)
 
             def __call__(s, *args, **kwargs):
                 stack = ExitStack()
@@ -124,18 +121,17 @@ class IndicoCelery(Celery):
                 args = _CelerySAWrapper.unwrap_args(args)
                 kwargs = _CelerySAWrapper.unwrap_kwargs(kwargs)
                 plugin = getattr(s, 'plugin', s.request.get('indico_plugin'))
-                if isinstance(plugin, basestring):
+                if isinstance(plugin, str):
                     plugin_name = plugin
                     plugin = plugin_engine.get_plugin(plugin)
                     if plugin is None:
                         stack.close()
                         raise ValueError('Plugin not active: ' + plugin_name)
                 stack.enter_context(plugin_context(plugin))
-                clearCache()
                 with stack:
                     request_stats_request_started()
                     init_email_queue()
-                    rv = super(IndicoTask, s).__call__(*args, **kwargs)
+                    rv = super().__call__(*args, **kwargs)
                     flush_email_queue()
                     return rv
 
@@ -147,15 +143,15 @@ class IndicoCeleryLogging(Logging):
         # don't let celery mess with the root logger
         if logger is logging.getLogger():
             return
-        super(IndicoCeleryLogging, self)._configure_logger(logger, *args, **kwargs)
+        super()._configure_logger(logger, *args, **kwargs)
 
 
 class IndicoPersistentScheduler(PersistentScheduler):
-    """Celery scheduler that allows indico.conf to override specific entries"""
+    """Celery scheduler that allows indico.conf to override specific entries."""
 
     def setup_schedule(self):
         deleted = set()
-        for task_name, entry in config.SCHEDULED_TASK_OVERRIDE.iteritems():
+        for task_name, entry in config.SCHEDULED_TASK_OVERRIDE.items():
             if task_name not in self.app.conf['beat_schedule']:
                 self.logger.error('Invalid entry in ScheduledTaskOverride: %s', task_name)
                 continue
@@ -167,7 +163,7 @@ class IndicoPersistentScheduler(PersistentScheduler):
                 self.app.conf['beat_schedule'][task_name].update(entry)
             else:
                 self.app.conf['beat_schedule'][task_name]['schedule'] = entry
-        super(IndicoPersistentScheduler, self).setup_schedule()
+        super().setup_schedule()
         if not self.app.conf['worker_redirect_stdouts']:
             # print the schedule unless we are in production where
             # this output would get redirected to a logger which is
@@ -176,7 +172,7 @@ class IndicoPersistentScheduler(PersistentScheduler):
 
     def _print_schedule(self, deleted):
         table_data = [['Name', 'Schedule']]
-        for entry in sorted(self.app.conf['beat_schedule'].itervalues(), key=itemgetter('task')):
+        for entry in sorted(self.app.conf['beat_schedule'].values(), key=itemgetter('task')):
             table_data.append([cformat('%{yellow!}{}%{reset}').format(entry['task']),
                                cformat('%{green}{!r}%{reset}').format(entry['schedule'])])
         for task_name in sorted(deleted):
@@ -185,7 +181,7 @@ class IndicoPersistentScheduler(PersistentScheduler):
         print(AsciiTable(table_data, cformat('%{white!}Periodic Tasks%{reset}')).table)
 
 
-class _CelerySAWrapper(object):
+class _CelerySAWrapper:
     """Wrapper to safely pass SQLAlchemy objects to tasks.
 
     This is achieved by passing only the model name and its PK values
@@ -204,10 +200,9 @@ class _CelerySAWrapper(object):
     def object(self):
         obj = self.identity_key[0].get(self.identity_key[1])
         if obj is None:
-            raise ValueError('Object not in DB: {}'.format(self))
+            raise ValueError(f'Object not in DB: {self}')
         return obj
 
-    @return_ascii
     def __repr__(self):
         model, args = self.identity_key[:2]
         return '<{}: {}>'.format(model.__name__, ','.join(map(repr, args)))
@@ -218,7 +213,7 @@ class _CelerySAWrapper(object):
 
     @classmethod
     def wrap_kwargs(cls, kwargs):
-        return {k: cls(v) if isinstance(v, db.Model) else v for k, v in kwargs.iteritems()}
+        return {k: cls(v) if isinstance(v, db.Model) else v for k, v in kwargs.items()}
 
     @classmethod
     def unwrap_args(cls, args):
@@ -226,4 +221,4 @@ class _CelerySAWrapper(object):
 
     @classmethod
     def unwrap_kwargs(cls, kwargs):
-        return {k: v.object if isinstance(v, cls) else v for k, v in kwargs.iteritems()}
+        return {k: v.object if isinstance(v, cls) else v for k, v in kwargs.items()}

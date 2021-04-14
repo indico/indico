@@ -1,13 +1,10 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import unicode_literals
-
-from collections import OrderedDict
 from datetime import timedelta
 
 import dateutil.parser
@@ -18,7 +15,7 @@ from werkzeug.utils import cached_property
 from indico.core.db import db
 
 
-class SettingConverter(object):
+class SettingConverter:
     """
     Implement a custom conversion between Python types and
     JSON-serializable types.
@@ -92,7 +89,7 @@ class ModelConverter(SettingConverter):
 
     @cached_property
     def model(self):
-        model = getattr(db.m, self._model) if isinstance(self._model, basestring) else self._model
+        model = getattr(db.m, self._model) if isinstance(self._model, str) else self._model
         assert len(inspect(model).primary_key) == 1
         return model
 
@@ -125,7 +122,7 @@ class ModelListConverter(SettingConverter):
 
     @cached_property
     def model(self):
-        if isinstance(self._model, basestring):
+        if isinstance(self._model, str):
             return getattr(db.m, self._model)
         return self._model
 
@@ -145,13 +142,3 @@ class ModelListConverter(SettingConverter):
         if not value:
             return []
         return self.collection_class(self.model.query.filter(self.column.in_(value)))
-
-
-class OrderedDictConverter(SettingConverter):
-    @staticmethod
-    def from_python(value):
-        return value.items()
-
-    @staticmethod
-    def to_python(value):
-        return OrderedDict(value)

@@ -1,11 +1,9 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
-
-from __future__ import unicode_literals
 
 import click
 
@@ -23,9 +21,6 @@ from indico.modules.events.sessions import Session
 from indico.modules.events.sessions.models.principals import SessionPrincipal
 
 
-click.disable_unicode_literals_warning = True
-
-
 @cli_group()
 def cli():
     pass
@@ -34,7 +29,7 @@ def cli():
 def _fix_role_principals(principals, get_event):
     role_attrs = get_simple_column_attrs(EventRole) | {'members'}
     for p in principals:
-        click.echo('Fixing {}'.format(p))
+        click.echo(f'Fixing {p}')
         event = get_event(p)
         try:
             event_role = [r for r in event.roles if r.code == p.event_role.code][0]
@@ -42,14 +37,14 @@ def _fix_role_principals(principals, get_event):
             event_role = EventRole(event=event)
             event_role.populate_from_attrs(p.event_role, role_attrs)
         else:
-            click.echo('  using existing role {}'.format(event_role))
+            click.echo(f'  using existing role {event_role}')
         p.event_role = event_role
     db.session.flush()
 
 
 @cli.command()
 def fix_event_role_acls():
-    """Fixes ACLs referencing event roles from other events.
+    """Fix ACLs referencing event roles from other events.
 
     This happened due to a bug prior to 2.2.3 when cloning an event
     which had event roles in its ACL.

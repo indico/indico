@@ -1,11 +1,9 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
-
-from __future__ import unicode_literals
 
 from io import BytesIO
 
@@ -14,11 +12,12 @@ from sqlalchemy.orm import joinedload, subqueryload
 from werkzeug.exceptions import Forbidden
 
 from indico.modules.events.controllers.base import RHDisplayEventBase
+from indico.modules.events.sessions.ical import session_to_ical
 from indico.modules.events.sessions.models.sessions import Session
-from indico.modules.events.sessions.util import get_session_ical_file, get_session_timetable_pdf, get_sessions_for_user
+from indico.modules.events.sessions.util import get_session_timetable_pdf, get_sessions_for_user
 from indico.modules.events.sessions.views import WPDisplayMySessionsConference, WPDisplaySession
-from indico.modules.events.util import get_base_ical_parameters
 from indico.web.flask.util import send_file
+from indico.web.rh import allow_signed_url
 
 
 class RHDisplaySessionList(RHDisplayEventBase):
@@ -52,9 +51,6 @@ class RHDisplaySession(RHDisplaySessionBase):
     view_class = WPDisplaySession
 
     def _process(self):
-        ical_params = get_base_ical_parameters(session.user, 'sessions',
-                                               '/export/event/{0}/session/{1}.ics'.format(self.event.id,
-                                                                                          self.session.id))
         contributions_strategy = subqueryload('contributions')
         contributions_strategy.joinedload('track')
         _contrib_tte_strategy = contributions_strategy.joinedload('timetable_entry')
@@ -71,12 +67,16 @@ class RHDisplaySession(RHDisplaySessionBase):
                 .options(contributions_strategy, blocks_strategy)
                 .one())
         return self.view_class.render_template('display/session_display.html', self.event,
-                                               sess=sess, page_title=sess.title, **ical_params)
+                                               sess=sess, page_title=sess.title)
 
 
+@allow_signed_url
 class RHExportSessionToICAL(RHDisplaySessionBase):
     def _process(self):
-        return send_file('session.ics', get_session_ical_file(self.session), 'text/calendar')
+        detailed = request.args.get('detail') == 'contributions'
+
+        return send_file('session.ics', BytesIO(session_to_ical(self.session, detailed)),
+                         'text/calendar')
 
 
 class RHExportSessionTimetableToPDF(RHDisplaySessionBase):

@@ -1,5 +1,5 @@
 // This file is part of Indico.
-// Copyright (C) 2002 - 2020 CERN
+// Copyright (C) 2002 - 2021 CERN
 //
 // Indico is free software; you can redistribute it and/or
 // modify it under the terms of the MIT License; see the
@@ -10,12 +10,13 @@ import moment from 'moment';
 import {createQueryStringReducer, validator as v} from 'redux-router-querystring';
 
 import * as actions from '../../actions';
-import {history} from '../../history';
-import {initialState} from './reducers';
-import {defaultStateField, boolStateField} from '../../util';
 import {actions as filtersActions} from '../../common/filters';
 import {rules as roomSearchQueryStringRules} from '../../common/roomSearch/queryString';
+import {history} from '../../history';
+import {defaultStateField, boolStateField} from '../../util';
+
 import * as calendarActions from './actions';
+import {initialState} from './reducers';
 
 const rules = {
   ...roomSearchQueryStringRules,

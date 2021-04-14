@@ -1,13 +1,13 @@
 // This file is part of Indico.
-// Copyright (C) 2002 - 2020 CERN
+// Copyright (C) 2002 - 2021 CERN
 //
 // Indico is free software; you can redistribute it and/or
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-import React, {useState} from 'react';
-import PropTypes from 'prop-types';
 import moment from 'moment';
+import PropTypes from 'prop-types';
+import React, {useState} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
 import {Button, Confirm, Icon, Popup} from 'semantic-ui-react';
 
@@ -16,8 +16,8 @@ import {Param, Translate} from 'indico/react/i18n';
 import {serializeDate} from 'indico/utils/date';
 
 import {resetPaperJudgment} from '../actions';
-import {getPaperDetails, isPaperStateResetInProgress} from '../selectors';
 import {PaperState} from '../models';
+import {getPaperDetails, isPaperStateResetInProgress} from '../selectors';
 
 export default function RevisionJudgment({revision}) {
   const {state, judge, isLastRevision, judgmentCommentHtml, judgmentDt} = revision;

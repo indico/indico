@@ -1,11 +1,9 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
-
-from __future__ import unicode_literals
 
 from blinker import Namespace
 
@@ -19,6 +17,13 @@ Called once a user registers (either locally or joins through a provider). The
 the user went through a moderation process (this also includes users created
 by an administrator manually) or was created immediately on registration;
 the identity associated with the registration is passed in the `identity` kwarg.
+""")
+
+logged_in = _signals.signal('logged-in', """
+Called when a user logs in. The *sender* is the User who logged in. Depending
+on whether this was a regular login or an admin impersonating the user, either
+the *identity* kwarg is set to the `Identity` used by the user to log in or the
+*admin_impersonation* kwarg is ``True``.
 """)
 
 registration_requested = _signals.signal('registration-requested', """
@@ -41,4 +46,9 @@ Expected to return a `ExtraUserPreferences` subclass which implements extra
 preferences for the user preference page. The *sender* is the user for whom the
 preferences page is being shown which might not be the currently logged-in
 user!
+""")
+
+primary_email_changed = _signals.signal('primary-email-changed', """
+Called when the primary address is changed. The *sender* is
+the user object and the `new` and `old` values are passed as kwargs.
 """)

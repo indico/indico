@@ -1,30 +1,31 @@
 // This file is part of Indico.
-// Copyright (C) 2002 - 2020 CERN
+// Copyright (C) 2002 - 2021 CERN
 //
 // Indico is free software; you can redistribute it and/or
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-import React, {useEffect, useState} from 'react';
-import {useSelector} from 'react-redux';
 import moment from 'moment';
 import PropTypes from 'prop-types';
+import React, {useEffect, useState} from 'react';
+import {useSelector} from 'react-redux';
 
 import UserAvatar from 'indico/modules/events/reviewing/components/UserAvatar';
 import {Param, Translate} from 'indico/react/i18n';
 import {serializeDate} from 'indico/utils/date';
 
 import ChangesConfirmation from './ChangesConfirmation';
-import RevisionLog from './RevisionLog';
-import ReviewForm from './ReviewForm';
-import {blockPropTypes} from './util';
-import * as selectors from './selectors';
+import CustomActions from './CustomActions';
 import FileDisplay from './FileDisplay';
+import ReviewForm from './ReviewForm';
+import RevisionLog from './RevisionLog';
+import * as selectors from './selectors';
 import StateIndicator from './StateIndicator';
+import {blockPropTypes} from './util';
 
 import './TimelineItem.module.scss';
 
-export default function TimelineItem({block}) {
+export default function TimelineItem({block, index}) {
   const {submitter, createdDt} = block;
   const lastBlock = useSelector(selectors.getLastTimelineBlock);
   const needsSubmitterConfirmation = useSelector(selectors.needsSubmitterConfirmation);
@@ -55,15 +56,18 @@ export default function TimelineItem({block}) {
             id={`block-info-${block.id}`}
           >
             <div className="i-box-header flexrow">
-              <div className="f-self-stretch">
-                {block.header ? (
-                  <strong>{block.header}</strong>
-                ) : (
-                  <Translate>
-                    <Param name="submitterName" value={submitter.fullName} wrapper={<strong />} />{' '}
-                    submitted revision <Param name="revisionNumber" value={`#${block.number}`} />
-                  </Translate>
-                )}{' '}
+              <div className="f-self-stretch" styleName="header">
+                <span styleName="item-index">#{index + 1}</span>{' '}
+                <span>
+                  {block.header ? (
+                    <strong>{block.header}</strong>
+                  ) : (
+                    <Translate>
+                      <Param name="submitterName" value={submitter.fullName} wrapper={<strong />} />{' '}
+                      submitted a revision
+                    </Translate>
+                  )}
+                </span>{' '}
                 <time dateTime={serializeDate(createdDt, moment.HTML5_FMT.DATETIME_LOCAL)}>
                   {serializeDate(createdDt, 'LL')}
                 </time>
@@ -98,11 +102,14 @@ export default function TimelineItem({block}) {
                 )}
               </div>
             )}
+            {!!block.customActions.length && (
+              <CustomActions url={block.customActionURL} actions={block.customActions} />
+            )}
           </div>
         </div>
       </div>
       {visible && (
-        <RevisionLog items={block.items} separator={isLastBlock}>
+        <RevisionLog items={block.items} state={block.finalState.name} separator={isLastBlock}>
           {isLastBlock && !['accepted', 'rejected'].includes(editableState.name) && canComment && (
             <ReviewForm block={block} />
           )}
@@ -114,4 +121,5 @@ export default function TimelineItem({block}) {
 
 TimelineItem.propTypes = {
   block: PropTypes.shape(blockPropTypes).isRequired,
+  index: PropTypes.number.isRequired,
 };

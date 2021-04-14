@@ -1,11 +1,9 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
-
-from __future__ import unicode_literals
 
 from flask import session
 from sqlalchemy.orm import joinedload
@@ -21,35 +19,34 @@ from indico.util.placeholders import get_placeholders
 
 def get_placeholder_options():
     return {name: placeholder
-            for name, placeholder in get_placeholders('designer-fields').viewitems()
+            for name, placeholder in get_placeholders('designer-fields').items()
             if not placeholder.admin_only or session.user.is_admin}
 
 
 def get_nested_placeholder_options():
-    groups = {group_id: {'title': group_title, 'options': {}} for group_id, group_title in GROUP_TITLES.viewitems()}
-    for name, placeholder in get_placeholder_options().viewitems():
-        groups[placeholder.group]['options'][name] = unicode(placeholder.description)
+    groups = {group_id: {'title': group_title, 'options': {}} for group_id, group_title in GROUP_TITLES.items()}
+    for name, placeholder in get_placeholder_options().items():
+        groups[placeholder.group]['options'][name] = str(placeholder.description)
     return groups
 
 
 def get_image_placeholder_types():
-    return [name for name, placeholder in get_placeholder_options().viewitems() if placeholder.is_image]
+    return [name for name, placeholder in get_placeholder_options().items() if placeholder.is_image]
 
 
 def get_all_templates(obj):
-    """Get all templates usable by an event/category"""
+    """Get all templates usable by an event/category."""
     category = obj.category if isinstance(obj, Event) else obj
-    return set(DesignerTemplate.find_all(DesignerTemplate.category_id.in_(categ['id'] for categ in category.chain)))
+    return set(DesignerTemplate.query.filter(DesignerTemplate.category_id.in_(categ['id'] for categ in category.chain)))
 
 
 def get_inherited_templates(obj):
-    """Get all templates inherited by a given event/category"""
+    """Get all templates inherited by a given event/category."""
     return get_all_templates(obj) - set(obj.designer_templates)
 
 
 def get_not_deletable_templates(obj):
-    """Get all non-deletable templates for an event/category"""
-
+    """Get all non-deletable templates for an event/category."""
     not_deletable_criteria = [
         DesignerTemplate.is_system_template,
         DesignerTemplate.backside_template_of != None,  # noqa

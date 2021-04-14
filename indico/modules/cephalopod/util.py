@@ -1,11 +1,9 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
-
-from __future__ import unicode_literals
 
 import json
 
@@ -36,7 +34,7 @@ def register_instance(contact, email):
     try:
         response.raise_for_status()
     except HTTPError as err:
-        logger.error('failed to register the server to the community hub, got: %s', err.message)
+        logger.error('failed to register the server to the community hub, got: %s', err)
         cephalopod_settings.set('joined', False)
         raise
     except Timeout:
@@ -44,7 +42,7 @@ def register_instance(contact, email):
         cephalopod_settings.set('joined', False)
         raise
     except RequestException as err:
-        logger.error('unexpected exception while registering the server with the Community Hub: %s', err.message)
+        logger.error('unexpected exception while registering the server with the Community Hub: %s', err)
         raise
 
     json_response = response.json()
@@ -71,13 +69,13 @@ def unregister_instance():
         response.raise_for_status()
     except HTTPError as err:
         if err.response.status_code != 404:
-            logger.error('failed to unregister the server to the community hub, got: %s', err.message)
+            logger.error('failed to unregister the server to the community hub, got: %s', err)
             raise
     except Timeout:
         logger.error('failed to unregister: timeout while contacting the community hub')
         raise
     except RequestException as err:
-        logger.error('unexpected exception while unregistering the server with the Community Hub: %s', err.message)
+        logger.error('unexpected exception while unregistering the server with the Community Hub: %s', err)
         raise
     cephalopod_settings.set('joined', False)
     logger.info('successfully unregistered the server from the community hub')
@@ -107,13 +105,13 @@ def sync_instance(contact, email):
             logger.warn('unable to synchronize: the server was not registered, registering the server now')
             register_instance(contact, email)
         else:
-            logger.error('failed to synchronize the server with the community hub, got: %s', err.message)
+            logger.error('failed to synchronize the server with the community hub, got: %s', err)
             raise
     except Timeout:
         logger.error('failed to synchronize: timeout while contacting the community hub')
         raise
     except RequestException as err:
-        logger.error('unexpected exception while synchronizing the server with the Community Hub: %s', err.message)
+        logger.error('unexpected exception while synchronizing the server with the Community Hub: %s', err)
         raise
     else:
         cephalopod_settings.set_multi({

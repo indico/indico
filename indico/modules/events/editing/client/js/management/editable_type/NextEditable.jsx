@@ -1,31 +1,33 @@
 // This file is part of Indico.
-// Copyright (C) 2002 - 2020 CERN
+// Copyright (C) 2002 - 2021 CERN
 //
 // Indico is free software; you can redistribute it and/or
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-import editableListURL from 'indico-url:event_editing.api_filter_editables_by_filetypes';
 import assignMyselfURL from 'indico-url:event_editing.api_assign_editable_self';
 import fileTypesURL from 'indico-url:event_editing.api_file_types';
+import editableListURL from 'indico-url:event_editing.api_filter_editables_by_filetypes';
 
 import _ from 'lodash';
+import PropTypes from 'prop-types';
 import React, {useState, useEffect} from 'react';
 import {useHistory} from 'react-router-dom';
-import PropTypes from 'prop-types';
 import {Button, Loader, Modal, Table, Checkbox, Dimmer} from 'semantic-ui-react';
-import {camelizeKeys} from 'indico/utils/case';
+
+import {useIndicoAxios} from 'indico/react/hooks';
 import {Translate} from 'indico/react/i18n';
 import {indicoAxios, handleAxiosError} from 'indico/utils/axios';
-import {useIndicoAxios} from 'indico/react/hooks';
-import {EditableType, GetNextEditableTitles} from '../../models';
+import {camelizeKeys} from 'indico/utils/case';
+
 import {fileTypePropTypes} from '../../editing/timeline/FileManager/util';
+import {EditableType, GetNextEditableTitles} from '../../models';
 
 import './NextEditable.module.scss';
 
 export default function NextEditable({eventId, editableType, onClose, management}) {
   const {data: fileTypes, loading: isLoadingFileTypes} = useIndicoAxios({
-    url: fileTypesURL({confId: eventId, type: editableType}),
+    url: fileTypesURL({event_id: eventId, type: editableType}),
     camelize: true,
     trigger: [eventId, editableType],
   });
@@ -67,10 +69,13 @@ function NextEditableDisplay({eventId, editableType, onClose, fileTypes, managem
       setLoading(true);
       let response;
       try {
-        response = await indicoAxios.post(editableListURL({confId: eventId, type: editableType}), {
-          extensions: _.pickBy(filters, x => Array.isArray(x)),
-          has_files: _.pickBy(filters, x => !Array.isArray(x)),
-        });
+        response = await indicoAxios.post(
+          editableListURL({event_id: eventId, type: editableType}),
+          {
+            extensions: _.pickBy(filters, x => Array.isArray(x)),
+            has_files: _.pickBy(filters, x => !Array.isArray(x)),
+          }
+        );
       } catch (e) {
         handleAxiosError(e);
         setLoading(false);
@@ -110,7 +115,7 @@ function NextEditableDisplay({eventId, editableType, onClose, fileTypes, managem
     try {
       await indicoAxios.put(
         assignMyselfURL({
-          confId: eventId,
+          event_id: eventId,
           contrib_id: selectedEditable.contributionId,
           type: editableType,
         })

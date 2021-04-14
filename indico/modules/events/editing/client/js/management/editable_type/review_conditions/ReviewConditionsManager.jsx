@@ -1,5 +1,5 @@
 // This file is part of Indico.
-// Copyright (C) 2002 - 2020 CERN
+// Copyright (C) 2002 - 2021 CERN
 //
 // Indico is free software; you can redistribute it and/or
 // modify it under the terms of the MIT License; see the
@@ -16,8 +16,8 @@ import {Translate} from 'indico/react/i18n';
 import {indicoAxios} from 'indico/utils/axios';
 
 import ConditionInfo from './ConditionInfo';
-import ReviewConditionForm from './ReviewConditionForm';
 import ReviewConditionsContext from './context';
+import ReviewConditionForm from './ReviewConditionForm';
 
 import './ReviewConditionsManager.module.scss';
 
@@ -25,7 +25,7 @@ export default function ReviewConditionsManager() {
   const {eventId, fileTypes, editableType} = useContext(ReviewConditionsContext);
   const [isAdding, setIsAdding] = useState(false);
   const {loading, reFetch, data: eventConditionsSetting, lastData} = useIndicoAxios({
-    url: reviewConditionsURL({confId: eventId, type: editableType}),
+    url: reviewConditionsURL({event_id: eventId, type: editableType}),
     trigger: eventId,
   });
 
@@ -43,7 +43,10 @@ export default function ReviewConditionsManager() {
   ]);
   const createNewCondition = async formData => {
     try {
-      await indicoAxios.post(reviewConditionsURL({confId: eventId, type: editableType}), formData);
+      await indicoAxios.post(
+        reviewConditionsURL({event_id: eventId, type: editableType}),
+        formData
+      );
       setIsAdding(false);
       reFetch();
     } catch (e) {

@@ -1,21 +1,19 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import unicode_literals
-
-import re
-
 import requests
-from flask import flash, jsonify, redirect, request, session
+from flask import current_app, flash, jsonify, redirect, request, session
 from packaging.version import Version
 from pkg_resources import DistributionNotFound, get_distribution
 from pytz import common_timezones_set
 from webargs import fields
-from werkzeug.exceptions import BadRequest, NotFound, ServiceUnavailable
+from webargs.flaskparser import abort
+from werkzeug.exceptions import NotFound, ServiceUnavailable
+from werkzeug.routing import BuildError
 from werkzeug.urls import url_join, url_parse
 
 import indico
@@ -24,6 +22,7 @@ from indico.core.db.sqlalchemy.principals import PrincipalType
 from indico.core.errors import NoReportError, UserValueError
 from indico.core.logger import Logger
 from indico.core.notifications import make_email, send_email
+from indico.core.sentry import submit_user_feedback
 from indico.core.settings import PrefixSettingsProxy
 from indico.modules.admin import RHAdminBase
 from indico.modules.cephalopod import cephalopod_settings
@@ -33,7 +32,7 @@ from indico.modules.core.views import WPContact, WPSettings
 from indico.modules.legal import legal_settings
 from indico.modules.users.controllers import RHUserBase
 from indico.util.i18n import _, get_all_locales
-from indico.util.marshmallow import PrincipalDict
+from indico.util.marshmallow import PrincipalDict, validate_with_message
 from indico.util.string import sanitize_html
 from indico.web.args import use_kwargs
 from indico.web.errors import load_error_data
@@ -41,7 +40,7 @@ from indico.web.flask.templating import get_template_module
 from indico.web.flask.util import url_for
 from indico.web.forms.base import FormDefaults
 from indico.web.rh import RH, RHProtected
-from indico.web.util import signed_url_for
+from indico.web.util import signed_url_for_user
 
 
 class RHContact(RH):
@@ -59,8 +58,8 @@ class RHReportErrorAPI(RH):
 
     def _save_report(self, email, comment):
         self._send_email(email, comment)
-        if config.SENTRY_DSN and self.error_data['sentry_event_id'] is not None:
-            self._send_sentry(email, comment)
+        if self.error_data['sentry_event_id'] is not None:
+            submit_user_feedback(self.error_data, email, comment)
 
     def _send_email(self, email, comment):
         # using reply-to for the user email would be nicer, but email clients
@@ -73,28 +72,6 @@ class RHReportErrorAPI(RH):
                                        server_name=url_parse(config.BASE_URL).netloc)
         send_email(make_email(config.SUPPORT_EMAIL, from_address=(email or config.NO_REPLY_EMAIL), template=template))
 
-    def _send_sentry(self, email, comment):
-        # strip password and query string from the DSN, and all auth data from the POST target
-        dsn = re.sub(r':[^@/]+(?=@)', '', config.SENTRY_DSN)
-        url = url_parse(dsn)
-        dsn = unicode(url.replace(query=None))
-        verify = url.decode_query().get('ca_certs', True)
-        url = unicode(url.replace(path='/api/embed/error-page/', netloc=url._split_netloc()[1], query=None))
-        user_data = self.error_data['request_info']['user'] or {'name': 'Anonymous', 'email': config.NO_REPLY_EMAIL}
-        try:
-            rv = requests.post(url,
-                               params={'dsn': dsn,
-                                       'eventId': self.error_data['sentry_event_id']},
-                               data={'name': user_data['name'],
-                                     'email': email or user_data['email'],
-                                     'comments': comment},
-                               headers={'Origin': config.BASE_URL},
-                               verify=verify)
-            rv.raise_for_status()
-        except Exception:
-            # don't bother users if this fails!
-            Logger.get('sentry').exception('Could not submit user feedback')
-
     @use_kwargs({
         'email': fields.Email(missing=None),
         'comment': fields.String(required=True),
@@ -105,7 +82,7 @@ class RHReportErrorAPI(RH):
 
 
 class RHSettings(RHAdminBase):
-    """General settings"""
+    """General settings."""
 
     def _get_cephalopod_data(self):
         if not cephalopod_settings.get('joined'):
@@ -140,7 +117,7 @@ class RHSettings(RHAdminBase):
 
 
 class RHChangeTimezone(RH):
-    """Update the session/user timezone"""
+    """Update the session/user timezone."""
 
     def _process(self):
         mode = request.form['tz_mode']
@@ -163,7 +140,7 @@ class RHChangeTimezone(RH):
 
 
 class RHChangeLanguage(RH):
-    """Update the session/user language"""
+    """Update the session/user language."""
 
     def _process(self):
         language = request.form['lang']
@@ -176,11 +153,11 @@ class RHChangeLanguage(RH):
 
 
 class RHVersionCheck(RHAdminBase):
-    """Check the installed indico version against pypi"""
+    """Check the installed indico version against pypi."""
 
     def _check_version(self, distribution, current_version=None):
         try:
-            response = requests.get('https://pypi.org/pypi/{}/json'.format(distribution))
+            response = requests.get(f'https://pypi.org/pypi/{distribution}/json')
         except requests.RequestException as exc:
             Logger.get('versioncheck').warning('Version check for %s failed: %s', distribution, exc)
             raise NoReportError.wrap_exc(ServiceUnavailable())
@@ -201,8 +178,8 @@ class RHVersionCheck(RHAdminBase):
             # if we are stable, get the latest stable version
             versions = [v for v in map(Version, data['releases']) if not v.is_prerelease]
             latest_version = max(versions) if versions else None
-        return {'current_version': unicode(current_version),
-                'latest_version': unicode(latest_version) if latest_version else None,
+        return {'current_version': str(current_version),
+                'latest_version': str(latest_version) if latest_version else None,
                 'outdated': (current_version < latest_version) if latest_version else False}
 
     def _process(self):
@@ -210,7 +187,7 @@ class RHVersionCheck(RHAdminBase):
                        plugins=self._check_version('indico-plugins'))
 
 
-class PrincipalsMixin(object):
+class PrincipalsMixin:
     def _serialize_principal(self, identifier, principal):
         if principal.principal_type == PrincipalType.user:
             return {'identifier': identifier,
@@ -218,7 +195,11 @@ class PrincipalsMixin(object):
                     'user_id': principal.id,
                     'invalid': principal.is_deleted,
                     'name': principal.display_full_name,
-                    'detail': ('{} ({})'.format(principal.email, principal.affiliation)
+                    'first_name': principal.first_name,
+                    'last_name': principal.last_name,
+                    'email': principal.email,
+                    'affiliation': principal.affiliation,
+                    'detail': (f'{principal.email} ({principal.affiliation})'
                                if principal.affiliation else principal.email)}
         elif principal.principal_type == PrincipalType.local_group:
             return {'identifier': identifier,
@@ -257,7 +238,7 @@ class PrincipalsMixin(object):
 
     def _process(self):
         return jsonify({identifier: self._serialize_principal(identifier, principal)
-                        for identifier, principal in self.values.viewitems()})
+                        for identifier, principal in self.values.items()})
 
 
 class RHPrincipals(PrincipalsMixin, RHProtected):
@@ -275,18 +256,40 @@ class RHPrincipals(PrincipalsMixin, RHProtected):
         self.values = values
 
 
-class RHSignURL(RHProtected):
-    def _process(self):
-        endpoint = request.json.get('endpoint')
-        if not endpoint:
-            raise BadRequest
-        # filter out non-standard args
-        url_params = request.json.get('url_params', {})
-        url_params = {k: v for k, v in url_params.viewitems() if not k.startswith('_')}
-        query_params = request.json.get('query_params', {})
-        query_params = {k: v for k, v in query_params.viewitems() if not k.startswith('_')}
-        url = signed_url_for(session.user, endpoint, url_params=url_params, _external=True, **query_params)
-        Logger.get('url_signing').info("%s signed URL for endpoint '%s' (%s)", session.user, endpoint, url)
+class RHSignURL(RH):
+    """Create a persistent signed URL for a user.
+
+    This build a url and adds a signature that authenticates the user without
+    requiring them to have session cookies. It is meant for cases where the
+    user actively requests a persistent link to use outside their browser,
+    e.g. for a calendar feed.
+
+    When called without authentication, no token is added, so it just behaves
+    as the normal ``url_for`` in order to allow client-side code to be more
+    straightforward and always call this API regardless of whether the user is
+    authenticated or not.
+    """
+
+    @use_kwargs({
+        'endpoint': fields.String(required=True,
+                                  validate=validate_with_message(lambda ep: ep in current_app.view_functions,
+                                                                 'Invalid endpoint')),
+        'params': fields.Dict(keys=fields.String(), missing={},
+                              validate=validate_with_message(lambda params: not any(x.startswith('_') for x in params),
+                                                             'Params starting with an underscore are not allowed'))
+    })
+    def _process(self, endpoint, params):
+        try:
+            if session.user:
+                url = signed_url_for_user(session.user, endpoint, _external=True, **params)
+                Logger.get('url_signing').info("%s signed URL for endpoint '%s' with params %r", session.user, endpoint,
+                                               params)
+            else:
+                url = url_for(endpoint, _external=True, **params)
+        except BuildError as exc:
+            # if building fails for a valid endpoint we can be pretty sure that it's due to
+            # some required params missing
+            abort(422, messages={'params': [str(exc)]})
         return jsonify(url=url)
 
 

@@ -14,7 +14,7 @@
           class="{{ 'i-form' if i_form }} {{ 'disable-fields-if-locked' if disable_if_locked }} {{ orientation }} {{ classes }}"
           {% if id %}id="{{ id }}"{% endif %}
           {% if multipart %}enctype="multipart/form-data"{% endif %}
-          {% if caller %}{{ caller() }}{% endif %}
+          {% if caller is defined %}{{ caller() }}{% endif %}
           {% if no_ajax %}data-no-ajax{% endif %}
           {{ extra_attrs|html_params }}>
         {% if form.meta.csrf -%}
@@ -48,7 +48,7 @@
         {% if field.widget.input_type == 'checkbox' %}
             <div class="form-checkbox-label">{{ field.label() }}</div>
         {% endif %}
-        {%- if caller -%}
+        {%- if caller is defined -%}
             {{ caller() }}
         {%- endif -%}
         {% if not hide_description and field.description %}
@@ -81,7 +81,7 @@
             {% endif %}
             {% set widget_attrs = dict(widget_attrs, placeholder=(field.label.text if placeholder else widget_attrs.get('placeholder', ''))) %}
             {% set classes = 'form-field %s' | format(classes) %}
-            {%- if caller -%}
+            {%- if caller is defined -%}
                 {% set caller_ = caller %}
                 {% call form_field(field, classes, widget_attrs, disabled=disabled, hide_description=hide_description) -%}
                     {{ caller_() }}
@@ -102,7 +102,7 @@
 
 {# `form` and `i_form` args are there in case we need them in the future #}
 {% macro form_footer(form, i_form=true, skip_label=false, align_right=false, classes='') -%}
-    {% if caller %}
+    {% if caller is defined %}
         <div class="form-group form-group-footer {{ classes }}">
             {% if not skip_label -%}
                 <div class="form-label"></div>
@@ -160,7 +160,7 @@
     {% if message %}
         {{ message_box('warning', message=message, icon=true) }}
     {% endif %}
-    {% if caller %}
+    {% if caller is defined %}
         {{ caller() }}
     {% else %}
         {{ form_rows(form, fields=fields, disable=disabled_fields, skip_labels=skip_labels) }}

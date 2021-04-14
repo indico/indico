@@ -1,18 +1,14 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import unicode_literals
-
 from sqlalchemy import DDL, Index, text
 from sqlalchemy.event import listens_for
 from sqlalchemy.sql import func
 from sqlalchemy.sql.elements import conv
-
-from indico.util.string import to_unicode
 
 
 # if you wonder why search_path is set and the two-argument `unaccent` function is used,
@@ -41,7 +37,7 @@ def create_unaccent_function(conn):
 
 
 def define_unaccented_lowercase_index(column):
-    """Defines an index that uses the indico_unaccent function.
+    """Define an index that uses the indico_unaccent function.
 
     Since this is usually used for searching, the column's value is
     also converted to lowercase before being unaccented. To make proper
@@ -61,14 +57,14 @@ def define_unaccented_lowercase_index(column):
         col_func = func.indico.indico_unaccent(func.lower(column))
         index_kwargs = {'postgresql_using': 'gin',
                         'postgresql_ops': {col_func.key: 'gin_trgm_ops'}}
-        Index(conv('ix_{}_{}_unaccent'.format(column.table.name, column.name)), col_func, **index_kwargs).create(conn)
+        Index(conv(f'ix_{column.table.name}_{column.name}_unaccent'), col_func, **index_kwargs).create(conn)
 
 
 def unaccent_match(column, value, exact):
     from indico.core.db import db
-    value = to_unicode(value).replace('%', r'\%').replace('_', r'\_').lower()
+    value = value.replace('%', r'\%').replace('_', r'\_').lower()
     if not exact:
-        value = '%{}%'.format(value)
+        value = f'%{value}%'
     # we always use LIKE, even for an exact match. when using the pg_trgm indexes this is
     # actually faster than `=`
     return db.func.indico.indico_unaccent(db.func.lower(column)).ilike(db.func.indico.indico_unaccent(value))

@@ -1,5 +1,5 @@
 {%- if page_metadata.og -%}
-    {% for key, value in page_metadata.og.viewitems() -%}
+    {% for key, value in page_metadata.og.items() -%}
         <meta property="og:{{ key }}" content="{{ value|striptags|truncate(500) }}">
     {% endfor %}
 {%- endif %}

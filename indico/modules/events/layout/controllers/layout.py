@@ -1,11 +1,9 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
-
-from __future__ import unicode_literals
 
 import os
 from io import BytesIO
@@ -30,7 +28,7 @@ from indico.modules.events.models.events import EventType
 from indico.modules.events.views import WPConferenceDisplay
 from indico.util.fs import secure_filename
 from indico.util.i18n import _
-from indico.util.string import crc32, to_unicode
+from indico.util.string import crc32
 from indico.web.flask.templating import get_template_module
 from indico.web.flask.util import send_file, url_for
 from indico.web.forms import fields as indico_fields
@@ -47,19 +45,19 @@ def _make_theme_settings_form(event, theme):
         settings = theme_settings.themes[theme]['user_settings']
     except KeyError:
         return None
-    form_class = type(b'ThemeSettingsForm', (IndicoForm,), {})
-    for name, field_data in settings.iteritems():
+    form_class = type('ThemeSettingsForm', (IndicoForm,), {})
+    for name, field_data in settings.items():
         field_type = field_data['type']
         field_class = getattr(indico_fields, field_type, None) or getattr(wtforms_fields, field_type, None)
         if not field_class:
-            raise Exception('Invalid field type: {}'.format(field_type))
+            raise Exception(f'Invalid field type: {field_type}')
         label = field_data['caption']
         description = field_data.get('description')
         validators = [DataRequired()] if field_data.get('required') else []
         field = field_class(label, validators, description=description, **field_data.get('kwargs', {}))
         setattr(form_class, name, field)
 
-    defaults = {name: field_data.get('defaults') for name, field_data in settings.iteritems()}
+    defaults = {name: field_data.get('defaults') for name, field_data in settings.items()}
     if theme == event.theme:
         defaults.update(layout_settings.get(event, 'timetable_theme_settings'))
 
@@ -90,7 +88,7 @@ class RHLayoutEdit(RHLayoutBase):
         ret = self._process_request()
         new_values = layout_settings.get_all(self.event)
         # Skip `timetable_theme_settings` as they are dynamically generated from themes.yaml
-        changes = {k: (old_values[k], v) for k, v in new_values.iteritems()
+        changes = {k: (old_values[k], v) for k, v in new_values.items()
                    if old_values[k] != v and k != 'timetable_theme_settings'}
         if changes:
             form_cls = ConferenceLayoutForm if self.event.type_ == EventType.conference else LectureMeetingLayoutForm
@@ -130,7 +128,7 @@ class RHLayoutEdit(RHLayoutBase):
                 layout_settings.set(self.event, 'timetable_theme_settings', tt_theme_settings_form.data)
             else:
                 layout_settings.delete(self.event, 'timetable_theme_settings')
-            data = {unicode(key): value for key, value in form.data.iteritems() if key in layout_settings.defaults}
+            data = {str(key): value for key, value in form.data.items() if key in layout_settings.defaults}
             layout_settings.set_multi(self.event, data)
             if form.theme.data == '_custom':
                 layout_settings.set(self.event, 'use_custom_css', True)
@@ -151,7 +149,7 @@ class RHLayoutLogoUpload(RHLayoutBase):
         f = request.files['logo']
         try:
             img = Image.open(f)
-        except IOError:
+        except OSError:
             flash(_('You cannot upload this file as a logo.'), 'error')
             return jsonify_data(content=None)
         if img.format.lower() not in {'jpeg', 'png', 'gif'}:
@@ -189,7 +187,7 @@ class RHLayoutLogoDelete(RHLayoutBase):
 class RHLayoutCSSUpload(RHLayoutBase):
     def _process(self):
         f = request.files['css_file']
-        self.event.stylesheet = to_unicode(f.read()).strip()
+        self.event.stylesheet = str(f.read()).strip()
         self.event.stylesheet_metadata = {
             'hash': crc32(self.event.stylesheet),
             'size': len(self.event.stylesheet),
@@ -259,5 +257,5 @@ class RHLayoutCSSDisplay(RHDisplayEventBase):
     def _process(self):
         if not self.event.has_stylesheet:
             raise NotFound
-        data = BytesIO(self.event.stylesheet.encode('utf-8'))
+        data = BytesIO(self.event.stylesheet.encode())
         return send_file(self.event.stylesheet_metadata['filename'], data, mimetype='text/css', conditional=True)

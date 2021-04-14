@@ -1,12 +1,13 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
+from unittest.mock import MagicMock
+
 import pytest
-from mock import MagicMock
 
 from indico.util.signals import named_objects_from_signal, values_from_signal
 
@@ -16,8 +17,7 @@ def _make_signal_response(objects):
 
 
 def _make_gen(*values):
-    for value in values:
-        yield value
+    yield from values
 
 
 @pytest.mark.parametrize(('retvals', 'expected'), (
@@ -63,7 +63,7 @@ def test_values_from_signal_multi_value_types():
 def test_values_from_signal_return_plugins():
     vals = ('a', 'b', 'c')
     signal_response = _make_signal_response(vals) + [(MagicMock(indico_plugin='foo'), 'd')]
-    assert values_from_signal(signal_response, return_plugins=True) == set(zip([None] * 3, vals) + [('foo', 'd')])
+    assert values_from_signal(signal_response, return_plugins=True) == set(list(zip([None] * 3, vals)) + [('foo', 'd')])
     assert values_from_signal(signal_response) == set(vals + ('d',))
 
 

@@ -1,11 +1,9 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
-
-from __future__ import absolute_import, unicode_literals
 
 import mimetypes
 import re
@@ -65,7 +63,7 @@ _regex_mapping = [(re.compile(regex), icon) for regex, icon in _regex_mapping]
 
 
 def icon_from_mimetype(mimetype, default_icon='icon-file-filled'):
-    """Gets the most suitable icon for a MIME type."""
+    """Get the most suitable icon for a MIME type."""
     mimetype = mimetype.lower()
     try:
         return _exact_mapping[mimetype]
@@ -77,10 +75,10 @@ def icon_from_mimetype(mimetype, default_icon='icon-file-filled'):
 
 
 def register_custom_mimetypes():
-    """Registers additional extension/mimetype mappings.
+    """Register additional extension/mimetype mappings.
 
     This is used for mimetypes/extensions that are not in the official
     mapping but useful, e.g. because indico has special handling for
     files with that type.
     """
-    mimetypes.add_type(b'text/markdown', b'.md')
+    mimetypes.add_type('text/markdown', '.md')

@@ -1,24 +1,26 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import absolute_import, unicode_literals
-
 import traceback
 from uuid import uuid4
 
+import sentry_sdk
 from flask import g, jsonify, render_template, request, session
 from itsdangerous import BadData
 from sqlalchemy.exc import OperationalError
 from werkzeug.exceptions import Forbidden, HTTPException
 
+from indico.core.cache import make_scoped_cache
 from indico.core.errors import NoReportError
-from indico.legacy.common.cache import GenericCache
 from indico.web.util import get_request_info
 from indico.web.views import WPError
+
+
+error_cache = make_scoped_cache('errors')
 
 
 def render_error(exc, title, message, code, standalone=False):
@@ -41,7 +43,7 @@ def render_error(exc, title, message, code, standalone=False):
 
 
 def load_error_data(uuid):
-    return GenericCache('errors').get(uuid)
+    return error_cache.get(uuid)
 
 
 def _save_error(exc, title, message):
@@ -51,7 +53,7 @@ def _save_error(exc, title, message):
         return
     if not _is_error_reportable(exc):
         return
-    g.saved_error_uuid = uuid = unicode(uuid4())
+    g.saved_error_uuid = uuid = str(uuid4())
     # XXX: keep this outside - it must be called before `get_request_info()`
     # as that function may mess up `sys.exc_info()` in case accessing user
     # details fails
@@ -60,8 +62,8 @@ def _save_error(exc, title, message):
             'message': message,
             'request_info': get_request_info(),
             'traceback': tb,
-            'sentry_event_id': g.get('sentry_event_id')}
-    GenericCache('errors').set(uuid, data, 7200)
+            'sentry_event_id': sentry_sdk.last_event_id()}
+    error_cache.set(uuid, data, timeout=7200)
 
 
 def _need_json_response():
@@ -73,7 +75,7 @@ def _is_error_reporting_opted_out(code):
     if not header:
         return
     codes = header.split(',')
-    return unicode(code) in codes
+    return str(code) in codes
 
 
 def _is_error_reportable(exc):

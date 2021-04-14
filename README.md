@@ -71,8 +71,8 @@ The main meeting points for the community are:
  * the Chat Room
 ([#indico on Freenode](https://webchat.freenode.net/?channels=indico) or on [Matrix](https://riot.im/app/#/room/#indico:matrix.org)).
 
-We follow [CERN's Values](https://hr-dep.web.cern.ch/content/cern-values-0) and the principles established by
-[CERN's Code of Conduct](https://hr-dep.web.cern.ch/content/code-of-conduct).
+We follow [CERN's Values](https://hr.web.cern.ch/cerns-values) and the principles established by
+[CERN's Code of Conduct](https://hr.web.cern.ch/codeofconduct).
 
 ## History
 

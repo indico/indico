@@ -1,28 +1,24 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import unicode_literals
-
 from indico.core.db.sqlalchemy.descriptions import RENDER_MODE_WRAPPER_MAP
 from indico.modules.events.abstracts.settings import abstracts_reviewing_settings, abstracts_settings
 from indico.modules.events.settings import EventSettingProperty
 from indico.util.date_time import now_utc
-from indico.util.string import return_ascii
 
 
-class CallForAbstracts(object):
-    """Proxy class to facilitate access to the call for abstracts settings"""
+class CallForAbstracts:
+    """Proxy class to facilitate access to the call for abstracts settings."""
 
     def __init__(self, event):
         self.event = event
 
-    @return_ascii
     def __repr__(self):
-        return '<CallForAbstracts({}, start_dt={}, end_dt={})>'.format(self.event.id, self.start_dt, self.end_dt)
+        return f'<CallForAbstracts({self.event.id}, start_dt={self.start_dt}, end_dt={self.end_dt})>'
 
     start_dt = EventSettingProperty(abstracts_settings, 'start_dt')
     end_dt = EventSettingProperty(abstracts_settings, 'end_dt')

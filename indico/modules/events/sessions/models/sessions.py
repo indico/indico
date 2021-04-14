@@ -1,11 +1,9 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
-
-from __future__ import unicode_literals
 
 from datetime import timedelta
 from operator import attrgetter
@@ -25,7 +23,7 @@ from indico.modules.events.management.util import get_non_inheriting_objects
 from indico.modules.events.timetable.models.entries import TimetableEntry, TimetableEntryType
 from indico.util.caching import memoize_request
 from indico.util.locators import locator_property
-from indico.util.string import format_repr, return_ascii
+from indico.util.string import format_repr
 
 
 def _get_next_friendly_id(context):
@@ -147,7 +145,7 @@ class Session(DescriptionMixin, ColorMixin, ProtectionManagersMixin, LocationMix
         # an extra query to check whether there is an object associated
         # when assigning a new one (e.g. during cloning)
         kwargs.setdefault('note', None)
-        super(Session, self).__init__(**kwargs)
+        super().__init__(**kwargs)
 
     @classmethod
     def preload_acl_entries(cls, event):
@@ -163,7 +161,7 @@ class Session(DescriptionMixin, ColorMixin, ProtectionManagersMixin, LocationMix
 
     @property
     def session(self):
-        """Convenience property so all event entities have it"""
+        """Convenience property so all event entities have it."""
         return self
 
     @property
@@ -206,10 +204,9 @@ class Session(DescriptionMixin, ColorMixin, ProtectionManagersMixin, LocationMix
         return dict(self.event.locator, session_id=self.id)
 
     def get_non_inheriting_objects(self):
-        """Get a set of child objects that do not inherit protection"""
+        """Get a set of child objects that do not inherit protection."""
         return get_non_inheriting_objects(self)
 
-    @return_ascii
     def __repr__(self):
         return format_repr(self, 'id', is_deleted=False, _text=self.title)
 

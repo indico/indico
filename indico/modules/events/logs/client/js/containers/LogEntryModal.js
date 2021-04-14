@@ -1,5 +1,5 @@
 // This file is part of Indico.
-// Copyright (C) 2002 - 2020 CERN
+// Copyright (C) 2002 - 2021 CERN
 //
 // Indico is free software; you can redistribute it and/or
 // modify it under the terms of the MIT License; see the
@@ -7,8 +7,8 @@
 
 import {connect} from 'react-redux';
 
-import LogEntryModal from '../components/LogEntryModal';
 import {setDetailedView, showRelatedEntries, viewNextEntry, viewPrevEntry} from '../actions';
+import LogEntryModal from '../components/LogEntryModal';
 
 const mapStateToProps = ({logs}) => ({
   currentViewIndex: logs.currentViewIndex,

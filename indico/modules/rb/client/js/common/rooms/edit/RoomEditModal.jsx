@@ -1,43 +1,44 @@
 // This file is part of Indico.
-// Copyright (C) 2002 - 2020 CERN
+// Copyright (C) 2002 - 2021 CERN
 //
 // Indico is free software; you can redistribute it and/or
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
+import attributesURL from 'indico-url:rb.admin_attributes';
 import roomURL from 'indico-url:rb.admin_room';
-import roomsURL from 'indico-url:rb.admin_rooms';
 import roomAttributesURL from 'indico-url:rb.admin_room_attributes';
 import roomAvailabilityURL from 'indico-url:rb.admin_room_availability';
-import attributesURL from 'indico-url:rb.admin_attributes';
-import updateRoomEquipmentURL from 'indico-url:rb.admin_update_room_equipment';
+import roomsURL from 'indico-url:rb.admin_rooms';
 import updateRoomAttributesURL from 'indico-url:rb.admin_update_room_attributes';
 import updateRoomAvailabilityURL from 'indico-url:rb.admin_update_room_availability';
+import updateRoomEquipmentURL from 'indico-url:rb.admin_update_room_equipment';
 
-import _ from 'lodash';
-import React, {useEffect, useState, useCallback, useMemo} from 'react';
-import {useDispatch, useSelector} from 'react-redux';
-import PropTypes from 'prop-types';
-import {Form as FinalForm, FormSpy} from 'react-final-form';
-import {Button, Dimmer, Form, Grid, Loader, Menu, Message, Modal, Tab} from 'semantic-ui-react';
 import arrayMutators from 'final-form-arrays';
+import _ from 'lodash';
+import PropTypes from 'prop-types';
+import React, {useEffect, useState, useCallback, useMemo} from 'react';
+import {Form as FinalForm, FormSpy} from 'react-final-form';
+import {useDispatch, useSelector} from 'react-redux';
+import {Button, Dimmer, Form, Grid, Loader, Menu, Message, Modal, Tab} from 'semantic-ui-react';
 
-import {snakifyKeys} from 'indico/utils/case';
-import {Translate} from 'indico/react/i18n';
-import {indicoAxios, handleAxiosError} from 'indico/utils/axios';
+import {usePermissionInfo} from 'indico/react/components/principals/hooks';
 import {getChangedValues, handleSubmitError} from 'indico/react/forms';
 import {useFavoriteUsers, useIndicoAxios} from 'indico/react/hooks';
-import {usePermissionInfo} from 'indico/react/components/principals/hooks';
+import {Translate} from 'indico/react/i18n';
+import {indicoAxios, handleAxiosError} from 'indico/utils/axios';
+import {snakifyKeys} from 'indico/utils/case';
 
 import {actions as roomsActions} from '../../../common/rooms';
 import {actions as userActions} from '../../../common/user';
 import {getAllEquipmentTypes} from '../selectors';
-import RoomPhoto from './RoomPhoto';
+
 import RoomEditDetails from './RoomEditDetails';
-import RoomEditNotifications from './RoomEditNotifications';
 import RoomEditLocation from './RoomEditLocation';
-import RoomEditPermissions from './RoomEditPermissions';
+import RoomEditNotifications from './RoomEditNotifications';
 import RoomEditOptions from './RoomEditOptions';
+import RoomEditPermissions from './RoomEditPermissions';
+import RoomPhoto from './RoomPhoto';
 import TabPaneError from './TabPaneError';
 
 import './RoomEditModal.module.scss';

@@ -1,11 +1,9 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
-
-from __future__ import unicode_literals
 
 from itertools import chain
 
@@ -19,31 +17,31 @@ from indico.util.signals import named_objects_from_signal
 
 
 def get_feature_definitions():
-    """Gets a dict containing all feature definitions"""
+    """Get a dict containing all feature definitions."""
     return named_objects_from_signal(signals.event.get_feature_definitions.send(), plugin_attr='plugin')
 
 
 def get_feature_definition(name):
-    """Gets a feature definition"""
+    """Get a feature definition."""
     try:
         return get_feature_definitions()[name]
     except KeyError:
-        raise RuntimeError('Feature does not exist: {}'.format(name))
+        raise RuntimeError(f'Feature does not exist: {name}')
 
 
 def get_enabled_features(event, only_explicit=False):
-    """Returns a set of enabled feature names for an event"""
+    """Return a set of enabled feature names for an event."""
     enabled_features = features_event_settings.get(event, 'enabled')
     if enabled_features is not None:
         return set(enabled_features)
     elif only_explicit:
         return set()
     else:
-        return {name for name, feature in get_feature_definitions().iteritems() if feature.is_default_for_event(event)}
+        return {name for name, feature in get_feature_definitions().items() if feature.is_default_for_event(event)}
 
 
 def set_feature_enabled(event, name, state):
-    """Enables/disables a feature for an event
+    """Enable/disable a feature for an event.
 
     :param event: The event.
     :param name: The name of the feature.
@@ -81,14 +79,14 @@ def get_disallowed_features(event):
     for an event.
     """
     disallowed = {feature
-                  for feature in get_feature_definitions().itervalues()
+                  for feature in get_feature_definitions().values()
                   if not feature.is_allowed_for_event(event)}
     indirectly_disallowed = set(chain.from_iterable(feature.required_by_deep for feature in disallowed))
     return indirectly_disallowed | {f.name for f in disallowed}
 
 
 def is_feature_enabled(event, name):
-    """Checks if a feature is enabled for an event.
+    """Check if a feature is enabled for an event.
 
     :param event: The event (or event ID) to check.
     :param name: The name of the feature.
@@ -98,23 +96,23 @@ def is_feature_enabled(event, name):
     if enabled_features is not None:
         return feature.name in enabled_features
     else:
-        if isinstance(event, (basestring, int, long)):
+        if isinstance(event, (str, int)):
             event = Event.get(event)
         return event and feature.is_default_for_event(event)
 
 
 def require_feature(event, name):
-    """Raises a NotFound error if a feature is not enabled
+    """Raise a NotFound error if a feature is not enabled.
 
     :param event: The event (or event ID) to check.
     :param name: The name of the feature.
     """
     if not is_feature_enabled(event, name):
         feature = get_feature_definition(name)
-        raise NotFound("The '{}' feature is not enabled for this event.".format(feature.friendly_name))
+        raise NotFound(f"The '{feature.friendly_name}' feature is not enabled for this event.")
 
 
 def format_feature_names(names):
-    return ', '.join(sorted(unicode(f.friendly_name)
-                            for f in get_feature_definitions().itervalues()
+    return ', '.join(sorted(str(f.friendly_name)
+                            for f in get_feature_definitions().values()
                             if f.name in names))

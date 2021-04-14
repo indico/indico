@@ -1,18 +1,16 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import unicode_literals
-
 from indico.core.db import db
-from indico.util.string import format_repr, return_ascii
+from indico.util.string import format_repr
 
 
 class LegacyImageMapping(db.Model):
-    """Legacy image id mapping
+    """Legacy image id mapping.
 
     Legacy images had event-unique numeric ids. Using this
     mapping we can resolve old ones to their new id.
@@ -52,13 +50,12 @@ class LegacyImageMapping(db.Model):
         )
     )
 
-    @return_ascii
     def __repr__(self):
         return format_repr(self, 'legacy_image_id', 'image_id')
 
 
 class LegacyPageMapping(db.Model):
-    """Legacy page id mapping
+    """Legacy page id mapping.
 
     Legacy pages had event-unique numeric ids. Using this
     mapping we can resolve old ones to their new id.
@@ -98,6 +95,5 @@ class LegacyPageMapping(db.Model):
         )
     )
 
-    @return_ascii
     def __repr__(self):
         return format_repr(self, 'legacy_page_id', 'page_id')

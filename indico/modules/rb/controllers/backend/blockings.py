@@ -1,11 +1,9 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
-
-from __future__ import unicode_literals
 
 from flask import jsonify, request, session
 from webargs import fields
@@ -58,7 +56,7 @@ class RHRoomBlockings(RHRoomBookingBase):
         'timeframe': fields.Str(missing=None),
         'my_rooms': fields.Bool(missing=False),
         'mine': fields.Bool(missing=False)
-    })
+    }, location='query')
     def _process(self, timeframe, my_rooms, mine):
         filters = {'timeframe': timeframe, 'created_by': session.user if mine else None,
                    'in_rooms_owned_by': session.user if my_rooms else None}

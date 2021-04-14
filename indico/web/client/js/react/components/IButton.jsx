@@ -1,12 +1,12 @@
 // This file is part of Indico.
-// Copyright (C) 2002 - 2020 CERN
+// Copyright (C) 2002 - 2021 CERN
 //
 // Indico is free software; you can redistribute it and/or
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-import React from 'react';
 import PropTypes from 'prop-types';
+import React from 'react';
 
 import {toClasses} from 'indico/react/util';
 
@@ -20,6 +20,7 @@ export default class IButton extends React.PureComponent {
     highlight: PropTypes.bool,
     disabled: PropTypes.bool,
     icon: PropTypes.string,
+    dropdown: PropTypes.bool,
   };
 
   static defaultProps = {
@@ -31,14 +32,29 @@ export default class IButton extends React.PureComponent {
     highlight: false,
     disabled: false,
     icon: '',
+    dropdown: false,
   };
 
   render() {
-    const {classes, disabled, highlight, href, title, children, onClick, icon} = this.props;
+    const {
+      classes,
+      disabled,
+      highlight,
+      href,
+      title,
+      children,
+      onClick,
+      icon,
+      dropdown,
+    } = this.props;
     const finalClasses = {...classes, 'i-button': true, disabled, highlight};
 
     if (icon) {
       finalClasses[`icon-${icon}`] = true;
+    }
+
+    if (dropdown) {
+      finalClasses['arrow'] = true;
     }
 
     const attrs = {

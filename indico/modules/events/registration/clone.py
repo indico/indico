@@ -1,11 +1,9 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
-
-from __future__ import unicode_literals
 
 from indico.core import signals
 from indico.core.db import db
@@ -57,7 +55,7 @@ class RegistrationFormCloner(EventCloner):
         return bool(event.registration_forms)
 
     def _clone_form_items(self, old_form, new_form, clone_all_revisions):
-        old_sections = RegistrationFormSection.find(RegistrationFormSection.registration_form_id == old_form.id)
+        old_sections = RegistrationFormSection.query.filter(RegistrationFormSection.registration_form_id == old_form.id)
         items_attrs = get_simple_column_attrs(RegistrationFormSection)
         for old_section in old_sections:
             new_section = RegistrationFormSection(**{attr: getattr(old_section, attr) for attr in items_attrs})
@@ -108,7 +106,7 @@ class RegistrationCloner(EventCloner):
     def run(self, new_event, cloners, shared_data, event_exists=False):
         form_map = shared_data['registration_forms']['form_map']
         field_data_map = shared_data['registration_forms']['field_data_map']
-        for old_form, new_form in form_map.iteritems():
+        for old_form, new_form in form_map.items():
             self._clone_registrations(old_form, new_form, field_data_map)
         self._synchronize_registration_friendly_id(new_event)
         db.session.flush()

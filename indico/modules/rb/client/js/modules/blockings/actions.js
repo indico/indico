@@ -1,23 +1,25 @@
 // This file is part of Indico.
-// Copyright (C) 2002 - 2020 CERN
+// Copyright (C) 2002 - 2021 CERN
 //
 // Indico is free software; you can redistribute it and/or
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-import fetchBlockingsURL from 'indico-url:rb.blockings';
 import fetchBlockingURL from 'indico-url:rb.blocking';
-import createBlockingURL from 'indico-url:rb.create_blocking';
-import updateBlockingURL from 'indico-url:rb.update_blocking';
 import blockingActionsURL from 'indico-url:rb.blocking_actions';
+import fetchBlockingsURL from 'indico-url:rb.blockings';
+import createBlockingURL from 'indico-url:rb.create_blocking';
 import deleteBlockingURL from 'indico-url:rb.delete_blocking';
+import updateBlockingURL from 'indico-url:rb.update_blocking';
 
 import {indicoAxios} from 'indico/utils/axios';
 import {ajaxAction, submitFormAction} from 'indico/utils/redux';
-import {preProcessParameters} from '../../util';
-import {ajax as ajaxRules} from './serializers';
-import {actions as filtersActions} from '../../common/filters';
+
 import {openModal} from '../../actions';
+import {actions as filtersActions} from '../../common/filters';
+import {preProcessParameters} from '../../util';
+
+import {ajax as ajaxRules} from './serializers';
 
 export const FETCH_BLOCKINGS_REQUEST = 'blockings/FETCH_BLOCKINGS_REQUEST';
 export const FETCH_BLOCKINGS_SUCCESS = 'blockings/FETCH_BLOCKINGS_SUCCESS';

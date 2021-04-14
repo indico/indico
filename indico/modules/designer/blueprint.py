@@ -1,11 +1,9 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
-
-from __future__ import unicode_literals
 
 from indico.modules.designer.controllers import (RHAddCategoryTemplate, RHAddEventTemplate, RHCloneCategoryTemplate,
                                                  RHCloneEventTemplate, RHDeleteDesignerTemplate,
@@ -42,7 +40,7 @@ for object_type in ('event', 'category'):
     if object_type == 'category':
         prefix = '/category/<int:category_id>'
     else:
-        prefix = '/event/<int:confId>'
+        prefix = '/event/<int:event_id>'
     prefix += '/manage/designer'
     _bp.add_url_rule(prefix + '/', 'template_list', _dispatch(RHListEventTemplates, RHListCategoryTemplates),
                      defaults={'object_type': object_type})

@@ -1,5 +1,5 @@
 // This file is part of Indico.
-// Copyright (C) 2002 - 2020 CERN
+// Copyright (C) 2002 - 2021 CERN
 //
 // Indico is free software; you can redistribute it and/or
 // modify it under the terms of the MIT License; see the
@@ -8,7 +8,9 @@
 import _ from 'lodash';
 import moment from 'moment';
 import {createSelector} from 'reselect';
+
 import {RequestState} from 'indico/utils/redux';
+
 import {selectors as roomsSelectors} from '../rooms';
 import {isUserAdminOverrideEnabled} from '../user/selectors';
 

@@ -1,18 +1,16 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
-
-from __future__ import unicode_literals
 
 from sqlalchemy.dialects.postgresql import ARRAY, JSONB
 from werkzeug.datastructures import MultiDict
 
 from indico.core.db import db
 from indico.util.locators import locator_property
-from indico.util.string import format_repr, return_ascii
+from indico.util.string import format_repr
 
 
 class RegistrationRequest(db.Model):
@@ -81,6 +79,5 @@ class RegistrationRequest(db.Model):
             identity_data['data'] = dict(identity_data['data'].lists())
         self._identity_data = identity_data
 
-    @return_ascii
     def __repr__(self):
         return format_repr(self, 'id', 'email')

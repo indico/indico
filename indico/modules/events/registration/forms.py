@@ -1,11 +1,9 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
-
-from __future__ import unicode_literals
 
 from datetime import time
 from operator import itemgetter
@@ -19,6 +17,7 @@ from wtforms.widgets.html5 import NumberInput
 
 from indico.core import signals
 from indico.core.config import config
+from indico.core.db import db
 from indico.modules.designer import PageLayout, PageOrientation, PageSize, TemplateType
 from indico.modules.designer.util import get_default_ticket_on_category, get_inherited_templates
 from indico.modules.events.features.util import is_feature_enabled
@@ -45,8 +44,8 @@ def _check_if_payment_required(form, field):
 
 class RegistrationFormForm(IndicoForm):
     _price_fields = ('currency', 'base_price')
-    _registrant_notification_fields = ('notification_sender_address',
-                                       'message_pending', 'message_unpaid', 'message_complete')
+    _registrant_notification_fields = ('notification_sender_address', 'message_pending', 'message_unpaid',
+                                       'message_complete', 'attach_ical')
     _manager_notification_fields = ('manager_notifications_enabled', 'manager_notification_recipients')
     _special_fields = _price_fields + _registrant_notification_fields + _manager_notification_fields
 
@@ -83,12 +82,23 @@ class RegistrationFormForm(IndicoForm):
     currency = SelectField(_('Currency'), [DataRequired()], description=_('The currency for new registrations'))
     notification_sender_address = StringField(_('Notification sender address'), [IndicoEmail()],
                                               filters=[lambda x: (x or None)])
-    message_pending = TextAreaField(_("Message for pending registrations"),
-                                    description=_("Text included in emails sent to pending registrations"))
-    message_unpaid = TextAreaField(_("Message for unpaid registrations"),
-                                   description=_("Text included in emails sent to unpaid registrations"))
-    message_complete = TextAreaField(_("Message for complete registrations"),
-                                     description=_("Text included in emails sent to complete registrations"))
+    message_pending = TextAreaField(
+        _("Message for pending registrations"),
+        description=_("Text included in emails sent to pending registrations (Markdown syntax)")
+    )
+    message_unpaid = TextAreaField(
+        _("Message for unpaid registrations"),
+        description=_("Text included in emails sent to unpaid registrations (Markdown syntax)")
+    )
+    message_complete = TextAreaField(
+        _("Message for complete registrations"),
+        description=_("Text included in emails sent to complete registrations (Markdown syntax)")
+    )
+    attach_ical = BooleanField(
+        _('Attach iCalendar file'),
+        widget=SwitchWidget(),
+        description=_('Attach an iCalendar file to the mail sent once a registration is complete')
+    )
     manager_notifications_enabled = BooleanField(_('Enabled'), widget=SwitchWidget(),
                                                  description=_("Enable notifications to managers about registrations"))
     manager_notification_recipients = EmailListField(_('List of recipients'),
@@ -98,11 +108,11 @@ class RegistrationFormForm(IndicoForm):
 
     def __init__(self, *args, **kwargs):
         self.event = kwargs.pop('event')
-        super(RegistrationFormForm, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self._set_currencies()
         self.notification_sender_address.description = _('Email address set as the sender of all '
                                                          'notifications sent to users. If empty, '
-                                                         'then {0} is used.'.format(config.NO_REPLY_EMAIL))
+                                                         'then {email} is used.').format(email=config.NO_REPLY_EMAIL)
 
     def _set_currencies(self):
         currencies = [(c['code'], '{0[code]} ({0[name]})'.format(c)) for c in payment_settings.get('currencies')]
@@ -122,7 +132,7 @@ class RegistrationFormScheduleForm(IndicoForm):
     def __init__(self, *args, **kwargs):
         regform = kwargs.pop('regform')
         self.timezone = regform.event.timezone
-        super(RegistrationFormScheduleForm, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
 
 class InvitationFormBase(IndicoForm):
@@ -137,10 +147,10 @@ class InvitationFormBase(IndicoForm):
     def __init__(self, *args, **kwargs):
         self.regform = kwargs.pop('regform')
         event = self.regform.event
-        super(InvitationFormBase, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         if not self.regform.moderation_enabled:
             del self.skip_moderation
-        self.email_from.choices = event.get_allowed_sender_emails().items()
+        self.email_from.choices = list(event.get_allowed_sender_emails().items())
         self.email_body.description = render_placeholder_info('registration-invitation-email', invitation=None)
 
     def validate_email_body(self, field):
@@ -168,9 +178,9 @@ class InvitationFormNew(InvitationFormBase):
                  'affiliation': self.affiliation.data}]
 
     def validate_email(self, field):
-        if RegistrationInvitation.find(email=field.data).with_parent(self.regform).count():
+        if RegistrationInvitation.query.filter_by(email=field.data).with_parent(self.regform).has_rows():
             raise ValidationError(_("There is already an invitation with this email address."))
-        if Registration.find(email=field.data, is_active=True).with_parent(self.regform).count():
+        if Registration.query.filter_by(email=field.data, is_active=True).with_parent(self.regform).has_rows():
             raise ValidationError(_("There is already a registration with this email address."))
 
 
@@ -219,8 +229,8 @@ class EmailRegistrantsForm(IndicoForm):
     def __init__(self, *args, **kwargs):
         self.regform = kwargs.pop('regform')
         event = self.regform.event
-        super(EmailRegistrantsForm, self).__init__(*args, **kwargs)
-        self.from_address.choices = event.get_allowed_sender_emails().items()
+        super().__init__(*args, **kwargs)
+        self.from_address.choices = list(event.get_allowed_sender_emails().items())
         self.body.description = render_placeholder_info('registration-email', regform=self.regform, registration=None)
 
     def validate_body(self, field):
@@ -229,7 +239,7 @@ class EmailRegistrantsForm(IndicoForm):
             raise ValidationError(_('Missing placeholders: {}').format(', '.join(missing)))
 
     def is_submitted(self):
-        return super(EmailRegistrantsForm, self).is_submitted() and 'submitted' in request.form
+        return super().is_submitted() and 'submitted' in request.form
 
 
 class TicketsForm(IndicoForm):
@@ -256,7 +266,7 @@ class TicketsForm(IndicoForm):
 
     def __init__(self, *args, **kwargs):
         event = kwargs.pop('event')
-        super(TicketsForm, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         default_tpl = get_default_ticket_on_category(event.category)
         all_templates = set(event.designer_templates) | get_inherited_templates(event)
         badge_templates = [(tpl.id, tpl.title) for tpl in all_templates
@@ -288,11 +298,14 @@ class ParticipantsDisplayForm(IndicoForm):
         try:
             jsonschema.validate(field.data, schema)
         except jsonschema.ValidationError as exc:
-            raise ValidationError(exc.message)
+            raise ValidationError(str(exc))
 
 
 class ParticipantsDisplayFormColumnsForm(IndicoForm):
-    """Form to customize the columns for a particular registration form on the participant list."""
+    """
+    Form to customize the columns for a particular registration form
+    on the participant list.
+    """
     json = JSONField()
 
     def validate_json(self, field):
@@ -308,11 +321,13 @@ class ParticipantsDisplayFormColumnsForm(IndicoForm):
         try:
             jsonschema.validate(field.data, schema)
         except jsonschema.ValidationError as exc:
-            raise ValidationError(exc.message)
+            raise ValidationError(str(exc))
 
 
 class RegistrationManagersForm(IndicoForm):
-    """Form to manage users with privileges to modify registration-related items"""
+    """
+    Form to manage users with privileges to modify registration-related items.
+    """
 
     managers = PrincipalListField(_('Registration managers'), allow_groups=True, allow_emails=True,
                                   allow_external_users=True,
@@ -321,13 +336,15 @@ class RegistrationManagersForm(IndicoForm):
 
     def __init__(self, *args, **kwargs):
         self.event = kwargs.pop('event')
-        super(RegistrationManagersForm, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
 
 class CreateMultipleRegistrationsForm(IndicoForm):
-    """Form to create multiple registrations of Indico users at the same time."""
+    """
+    Form to create multiple registrations of Indico users at the same time.
+    """
 
-    user_principals = PrincipalListField(_("Indico users"), [DataRequired()])
+    user_principals = PrincipalListField(_("Indico users"), [DataRequired()], allow_external_users=True)
     notify_users = BooleanField(_("Send e-mail notifications"),
                                 default=True,
                                 description=_("Notify the users about the registration."),
@@ -336,13 +353,15 @@ class CreateMultipleRegistrationsForm(IndicoForm):
     def __init__(self, *args, **kwargs):
         self._regform = kwargs.pop('regform')
         open_add_user_dialog = kwargs.pop('open_add_user_dialog', False)
-        super(CreateMultipleRegistrationsForm, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self.user_principals.open_immediately = open_add_user_dialog
 
     def validate_user_principals(self, field):
         for user in field.data:
-            if user.registrations.filter_by(registration_form=self._regform, is_deleted=False).one_or_none():
+            if user in db.session and self._regform.get_registration(user=user):
                 raise ValidationError(_("A registration for {} already exists.").format(user.full_name))
+            elif self._regform.get_registration(email=user.email):
+                raise ValidationError(_("A registration for {} already exists.").format(user.email))
 
 
 class BadgeSettingsForm(IndicoForm):
@@ -372,14 +391,14 @@ class BadgeSettingsForm(IndicoForm):
         badge_templates = [tpl for tpl in all_templates if tpl.type.name == 'badge']
         signals.event.filter_selectable_badges.send(type(self), badge_templates=badge_templates)
         tickets = kwargs.pop('tickets')
-        super(BadgeSettingsForm, self).__init__(**kwargs)
-        self.template.choices = sorted(((unicode(tpl.id), tpl.title)
+        super().__init__(**kwargs)
+        self.template.choices = sorted(((str(tpl.id), tpl.title)
                                         for tpl in badge_templates
                                         if tpl.is_ticket == tickets),
                                        key=itemgetter(1))
 
     def is_submitted(self):
-        return super(BadgeSettingsForm, self).is_submitted() and 'submitted' in request.form
+        return super().is_submitted() and 'submitted' in request.form
 
 
 class ImportRegistrationsForm(IndicoForm):
@@ -391,6 +410,16 @@ class ImportRegistrationsForm(IndicoForm):
 
     def __init__(self, *args, **kwargs):
         self.regform = kwargs.pop('regform')
-        super(ImportRegistrationsForm, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         if not self.regform.moderation_enabled:
             del self.skip_moderation
+
+
+class RejectRegistrantsForm(IndicoForm):
+    rejection_reason = TextAreaField(_('Reason'), description=_("You can provide a reason for the rejection here."))
+    attach_rejection_reason = BooleanField(_('Attach reason'), widget=SwitchWidget())
+    registration_id = HiddenFieldList()
+    submitted = HiddenField()
+
+    def is_submitted(self):
+        return super().is_submitted() and 'submitted' in request.form

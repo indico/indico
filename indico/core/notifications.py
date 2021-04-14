@@ -1,11 +1,9 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
-
-from __future__ import unicode_literals
 
 import re
 import time
@@ -17,7 +15,7 @@ from flask import g
 from indico.core.config import config
 from indico.core.db import db
 from indico.core.logger import Logger
-from indico.util.string import to_unicode, truncate
+from indico.util.string import truncate
 
 
 logger = Logger.get('emails')
@@ -33,13 +31,13 @@ def email_sender(fn):
             mails = list(mails)
         elif not isinstance(mails, list):
             mails = [mails]
-        for mail in filter(None, mails):
+        for mail in [_f for _f in mails if _f]:
             send_email(mail)
     return wrapper
 
 
 def send_email(email, event=None, module=None, user=None, log_metadata=None):
-    """Sends an email created by :func:`make_email`.
+    """Send an email created by :func:`make_email`.
 
     When called while inside a RH, the email will be queued and only
     sent or passed on to celery once the database commit succeeded.
@@ -77,7 +75,7 @@ def _log_email(email, event, module, user, meta=None):
         'state': 'pending',
         'sent_dt': None,
     }
-    return event.log(EventLogRealm.emails, EventLogKind.other, to_unicode(module or 'Unknown'), log_data['subject'],
+    return event.log(EventLogRealm.emails, EventLogKind.other, module or 'Unknown', log_data['subject'],
                      user, type_='email', data=log_data, meta=meta)
 
 
@@ -122,7 +120,7 @@ def flush_email_queue():
 
 def make_email(to_list=None, cc_list=None, bcc_list=None, from_address=None, reply_address=None, attachments=None,
                subject=None, body=None, template=None, html=False):
-    """Creates an email.
+    """Create an email.
 
     The preferred way to specify the email content is using the
     `template` argument. To do so, use :func:`.get_template_module` on
@@ -161,18 +159,18 @@ def make_email(to_list=None, cc_list=None, bcc_list=None, from_address=None, rep
         cc_list = set()
     if bcc_list is None:
         bcc_list = set()
-    to_list = {to_list} if isinstance(to_list, basestring) else to_list
-    cc_list = {cc_list} if isinstance(cc_list, basestring) else cc_list
-    bcc_list = {bcc_list} if isinstance(bcc_list, basestring) else bcc_list
-    reply_address = {reply_address} if isinstance(reply_address, basestring) else (reply_address or set())
+    to_list = {to_list} if isinstance(to_list, str) else to_list
+    cc_list = {cc_list} if isinstance(cc_list, str) else cc_list
+    bcc_list = {bcc_list} if isinstance(bcc_list, str) else bcc_list
+    reply_address = {reply_address} if isinstance(reply_address, str) else (reply_address or set())
     return {
-        'to': set(map(to_unicode, to_list)),
-        'cc': set(map(to_unicode, cc_list)),
-        'bcc': set(map(to_unicode, bcc_list)),
-        'from': to_unicode(from_address or config.NO_REPLY_EMAIL),
-        'reply_to': set(map(to_unicode, reply_address)),
+        'to': set(to_list),
+        'cc': set(cc_list),
+        'bcc': set(bcc_list),
+        'from': from_address or config.NO_REPLY_EMAIL,
+        'reply_to': set(reply_address),
         'attachments': attachments or [],
-        'subject': to_unicode(subject).strip(),
-        'body': to_unicode(body).strip(),
+        'subject': subject.strip(),
+        'body': body.strip(),
         'html': html,
     }

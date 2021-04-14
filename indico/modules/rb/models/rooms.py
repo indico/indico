@@ -1,5 +1,5 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
@@ -19,7 +19,6 @@ from indico.core.db.sqlalchemy.principals import PrincipalType
 from indico.core.db.sqlalchemy.protection import ProtectionManagersMixin, ProtectionMode
 from indico.core.db.sqlalchemy.util.queries import db_dates_overlap
 from indico.core.errors import NoReportError
-from indico.legacy.common.cache import GenericCache
 from indico.modules.rb.models.blocked_rooms import BlockedRoom
 from indico.modules.rb.models.blockings import Blocking
 from indico.modules.rb.models.equipment import EquipmentType, RoomEquipmentAssociation
@@ -33,11 +32,8 @@ from indico.modules.rb.models.room_nonbookable_periods import NonBookablePeriod
 from indico.modules.rb.util import rb_is_admin
 from indico.util.i18n import _
 from indico.util.serializer import Serializer
-from indico.util.string import format_repr, natural_sort_key, return_ascii
+from indico.util.string import format_repr
 from indico.web.flask.util import url_for
-
-
-_cache = GenericCache('Rooms')
 
 
 class Room(ProtectionManagersMixin, db.Model, Serializer):
@@ -323,15 +319,15 @@ class Room(ProtectionManagersMixin, db.Model, Serializer):
         q = (db.session.query(db.m.Location.room_name_format)
              .filter(db.m.Location.id == cls.location_id)
              .correlate(Room)
-             .as_scalar())
+             .scalar_subquery())
         return db.func.format(q, cls.building, cls.floor, cls.number)
 
     @hybrid_property
     def full_name(self):
         if self.verbose_name:
-            return u'{} - {}'.format(self.generate_name(), self.verbose_name)
+            return f'{self.generate_name()} - {self.verbose_name}'
         else:
-            return u'{}'.format(self.generate_name())
+            return f'{self.generate_name()}'
 
     @full_name.expression
     def full_name(cls):
@@ -345,10 +341,10 @@ class Room(ProtectionManagersMixin, db.Model, Serializer):
 
     @property
     def sprite_position(self):
-        sprite_mapping = _cache.get('rooms-sprite-mapping')
+        from indico.modules.rb import rb_cache
+        sprite_mapping = rb_cache.get('rooms-sprite-mapping')
         return sprite_mapping.get(self.id, 0) if sprite_mapping else 0  # placeholder at position 0
 
-    @return_ascii
     def __repr__(self):
         return format_repr(self, 'id', 'full_name', is_deleted=False)
 
@@ -380,7 +376,7 @@ class Room(ProtectionManagersMixin, db.Model, Serializer):
         elif value:
             attr = RoomAttribute.query.filter_by(name=name).first()
             if not attr:
-                raise ValueError("Attribute {} does not exist".format(name))
+                raise ValueError(f"Attribute {name} does not exist")
             attr_assoc = RoomAttributeAssociation()
             attr_assoc.value = value
             attr_assoc.attribute = attr
@@ -390,7 +386,7 @@ class Room(ProtectionManagersMixin, db.Model, Serializer):
     def generate_name(self):
         if self.location is None:
             warnings.warn('Room has no location; using default name format')
-            return '{}/{}-{}'.format(self.building, self.floor, self.number)
+            return f'{self.building}/{self.floor}-{self.number}'
         return self.location.room_name_format.format(
             building=self.building,
             floor=self.floor,
@@ -398,18 +394,12 @@ class Room(ProtectionManagersMixin, db.Model, Serializer):
         )
 
     @classmethod
-    def find_all(cls, *args, **kwargs):
-        """Retrieves rooms, sorted by location and full name"""
-        rooms = super(Room, cls).find_all(*args, **kwargs)
-        rooms.sort(key=lambda r: natural_sort_key(r.location_name + r.full_name))
-        return rooms
-
-    @classmethod
     def find_with_attribute(cls, attribute):
-        """Search rooms which have a specific attribute"""
+        """Search rooms which have a specific attribute."""
         return (Room.query
                 .with_entities(Room, RoomAttributeAssociation.value)
-                .join(Room.attributes, RoomAttributeAssociation.attribute)
+                .join(RoomAttributeAssociation)
+                .join(RoomAttribute)
                 .filter(RoomAttribute.name == attribute)
                 .all())
 
@@ -421,7 +411,7 @@ class Room(ProtectionManagersMixin, db.Model, Serializer):
         filters = kwargs.pop('filters', None)
         order = kwargs.pop('order', [Location.name, Room.building, Room.floor, Room.number, Room.verbose_name])
         if kwargs:
-            raise ValueError('Unexpected kwargs: {}'.format(kwargs))
+            raise ValueError(f'Unexpected kwargs: {kwargs}')
 
         query = Room.query
         entities = [Room]
@@ -447,7 +437,7 @@ class Room(ProtectionManagersMixin, db.Model, Serializer):
     @staticmethod
     def filter_available(start_dt, end_dt, repetition, include_blockings=True, include_pre_bookings=True,
                          include_pending_blockings=False):
-        """Returns a SQLAlchemy filter criterion ensuring that the room is available during the given time."""
+        """Return a SQLAlchemy filter criterion ensuring that the room is available during the given time."""
         # Check availability against reservation occurrences
         dummy_occurrences = ReservationOccurrence.create_series(start_dt, end_dt, repetition)
         overlap_criteria = ReservationOccurrence.filter_overlap(dummy_occurrences)
@@ -591,8 +581,8 @@ class Room(ProtectionManagersMixin, db.Model, Serializer):
     def can_manage(self, user, permission=None, allow_admin=True, check_parent=True, explicit_permission=False):
         if user and user == self.owner and (permission is None or not explicit_permission):
             return True
-        return super(Room, self).can_manage(user, permission=permission, allow_admin=allow_admin,
-                                            check_parent=check_parent, explicit_permission=explicit_permission)
+        return super().can_manage(user, permission=permission, allow_admin=allow_admin, check_parent=check_parent,
+                                  explicit_permission=explicit_permission)
 
     def can_book(self, user, allow_admin=True):
         # XXX: When changing the logic in here, make sure to update get_permissions_for_user as well!
@@ -646,7 +636,7 @@ class Room(ProtectionManagersMixin, db.Model, Serializer):
         if quiet or ok:
             return ok
         else:
-            msg = _(u'You cannot book this room more than {} days in advance')
+            msg = _('You cannot book this room more than {} days in advance')
             raise NoReportError(msg.format(self.max_advance_days))
 
     def check_bookable_hours(self, start_time, end_time, user=None, quiet=False):
@@ -660,7 +650,7 @@ class Room(ProtectionManagersMixin, db.Model, Serializer):
                 return True
         if quiet:
             return False
-        raise NoReportError(u'Room cannot be booked at this time')
+        raise NoReportError('Room cannot be booked at this time')
 
 
 Room.register_protection_events()

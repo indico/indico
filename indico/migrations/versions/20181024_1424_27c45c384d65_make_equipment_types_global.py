@@ -35,7 +35,7 @@ def _make_names_unique():
         conflict = conn.execute("SELECT COUNT(*) FROM roombooking.equipment_types WHERE id != %s AND name = %s",
                                 (row.id, row.name)).scalar()
         if conflict:
-            new_name = '{} ({})'.format(row.name, row.location)
+            new_name = f'{row.name} ({row.location})'
             conn.execute('UPDATE roombooking.equipment_types SET name = %s WHERE id = %s', (new_name, row.id))
 
 
@@ -57,7 +57,7 @@ def downgrade():
     if default_location_id is None:
         if conn.execute('SELECT COUNT(*) FROM roombooking.locations').scalar():
             raise Exception('Please set a default location')
-    default_location = unicode(default_location_id) if default_location_id is not None else None
+    default_location = str(default_location_id) if default_location_id is not None else None
     op.add_column('equipment_types', sa.Column('location_id', sa.Integer(), nullable=False,
                                                server_default=default_location),
                   schema='roombooking')

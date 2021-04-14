@@ -4,15 +4,13 @@
 
 
 {% macro render_subcontribution(subcontrib, event, theme_settings, theme_context, show_notes=true) %}
-    {% set contrib = subcontrib.contribution %}
-    {% set anchor = slugify('sc', contrib.friendly_id, subcontrib.friendly_id, subcontrib.title, maxlen=30) %}
-    <li class="timetable-subcontrib timetable-item" id="{{ anchor }}">
+    <li class="timetable-subcontrib timetable-item" id="{{ subcontrib.slug }}">
         <div class="timetable-item-body flexcol">
             <div class="timetable-item-header flexrow">
-                <span class="timetable-title" data-anchor="{{ anchor }}">
+                <span class="timetable-title" data-anchor="{{ subcontrib.slug }}">
                     {% if theme_settings.number_contributions %}
-                        {{- theme_context.num_contribution }}.
-                        {{- theme_context.num_subcontribution }}
+                        {%- set n_scontrib = theme_context.num_subcontribution -%}
+                        {{- 'abcdefghijklmnopqrstuvwxyz'[n_scontrib % 28 - 1] * (n_scontrib / 28 + 1)|int }})
                     {% endif %}
                     {{- subcontrib.title -}}
                 </span>

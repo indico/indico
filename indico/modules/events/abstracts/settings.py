@@ -1,17 +1,15 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import unicode_literals
-
 from indico.core.db.sqlalchemy.descriptions import RenderMode
 from indico.core.settings.converters import DatetimeConverter, EnumConverter
 from indico.modules.events.settings import EventSettingsProxy
+from indico.util.enum import RichEnum
 from indico.util.i18n import _
-from indico.util.struct.enum import RichEnum
 
 
 class BOASortField(RichEnum):
@@ -45,7 +43,7 @@ class SubmissionRightsType(RichEnum):
 
 
 class BOALinkFormat(RichEnum):
-    """LaTeX book of abstracts link format setting
+    """LaTeX book of abstracts link format setting.
 
     value is a 2-tuple of strings:
     first is the hyperref option to use

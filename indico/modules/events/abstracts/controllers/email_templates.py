@@ -1,11 +1,9 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
-
-from __future__ import unicode_literals
 
 from flask import request
 from werkzeug.exceptions import BadRequest
@@ -106,7 +104,7 @@ class RHEmailTemplateREST(RHEditEmailTemplateBase):
         if request.json is None:
             raise BadRequest('Expected JSON payload')
 
-        invalid_fields = request.json.viewkeys() - {'stop_on_match'}
+        invalid_fields = request.json.keys() - {'stop_on_match'}
         if invalid_fields:
             raise BadRequest("Invalid fields: {}".format(', '.join(invalid_fields)))
 

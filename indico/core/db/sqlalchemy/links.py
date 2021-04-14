@@ -1,11 +1,9 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
-
-from __future__ import unicode_literals
 
 from functools import partial
 from itertools import chain
@@ -17,8 +15,8 @@ from sqlalchemy.ext.hybrid import Comparator, hybrid_property
 from indico.core.db import db
 from indico.core.db.sqlalchemy import PyIntEnum
 from indico.util.decorators import strict_classproperty
+from indico.util.enum import RichIntEnum
 from indico.util.i18n import _
-from indico.util.struct.enum import RichIntEnum
 
 
 class LinkType(RichIntEnum):
@@ -46,28 +44,28 @@ _columns_for_types = {
 
 
 def _make_checks(allowed_link_types):
-    available_columns = set(chain.from_iterable(cols for type_, cols in _columns_for_types.iteritems()
+    available_columns = set(chain.from_iterable(cols for type_, cols in _columns_for_types.items()
                                                 if type_ in allowed_link_types))
-    yield db.CheckConstraint('(event_id IS NULL) = (link_type = {})'.format(LinkType.category), 'valid_event_id')
+    yield db.CheckConstraint(f'(event_id IS NULL) = (link_type = {LinkType.category})', 'valid_event_id')
     for link_type in allowed_link_types:
         required_cols = available_columns & _columns_for_types[link_type]
         forbidden_cols = available_columns - required_cols
-        criteria = ['{} IS NULL'.format(col) for col in sorted(forbidden_cols)]
-        criteria += ['{} IS NOT NULL'.format(col) for col in sorted(required_cols)]
+        criteria = [f'{col} IS NULL' for col in sorted(forbidden_cols)]
+        criteria += [f'{col} IS NOT NULL' for col in sorted(required_cols)]
         condition = 'link_type != {} OR ({})'.format(link_type, ' AND '.join(criteria))
-        yield db.CheckConstraint(condition, 'valid_{}_link'.format(link_type.name))
+        yield db.CheckConstraint(condition, f'valid_{link_type.name}_link')
 
 
 def _make_uniques(allowed_link_types, extra_criteria=None):
     for link_type in allowed_link_types:
-        where = ['link_type = {}'.format(link_type.value)]
+        where = [f'link_type = {link_type.value}']
         if extra_criteria is not None:
             where += list(extra_criteria)
         yield db.Index(None, *_columns_for_types[link_type], unique=True,
                        postgresql_where=db.text(' AND '.join(where)))
 
 
-class LinkMixin(object):
+class LinkMixin:
     #: The link types that are supported.  Can be overridden in the
     #: model using the mixin.  Affects the table structure, so any
     #: changes to it should go along with a migration step!
@@ -89,13 +87,13 @@ class LinkMixin(object):
     def __auto_table_args(cls):
         args = tuple(_make_checks(cls.allowed_link_types))
         if cls.unique_links:
-            extra_criteria = [cls.unique_links] if isinstance(cls.unique_links, basestring) else None
+            extra_criteria = [cls.unique_links] if isinstance(cls.unique_links, str) else None
             args = args + tuple(_make_uniques(cls.allowed_link_types, extra_criteria))
         return args
 
     @classmethod
     def register_link_events(cls):
-        """Registers sqlalchemy events needed by this mixin.
+        """Register sqlalchemy events needed by this mixin.
 
         Call this method after the definition of a model which uses
         this mixin class.
@@ -123,11 +121,11 @@ class LinkMixin(object):
                 assert event is not None
                 target.event = event
 
-        for rel, fn in event_mapping.iteritems():
+        for rel, fn in event_mapping.items():
             if rel is not None:
                 listen(rel, 'set', partial(_set_event_obj, fn))
 
-        for rel, link_type in type_mapping.iteritems():
+        for rel, link_type in type_mapping.items():
             if rel is not None:
                 listen(rel, 'set', partial(_set_link_type, link_type))
 
@@ -337,7 +335,7 @@ class LinkMixin(object):
         elif isinstance(obj, db.m.SubContribution):
             self.subcontribution = obj
         else:
-            raise TypeError('Unexpected object: {}'.format(obj))
+            raise TypeError(f'Unexpected object: {obj}')
 
     @object.comparator
     def object(cls):
@@ -345,15 +343,15 @@ class LinkMixin(object):
 
     @property
     def link_repr(self):
-        """A kwargs-style string suitable for the object's repr"""
+        """A kwargs-style string suitable for the object's repr."""
         info = [('link_type', self.link_type.name if self.link_type is not None else 'None')]
         info.extend((key, getattr(self, key)) for key in _all_columns if getattr(self, key) is not None)
-        return ', '.join('{}={}'.format(key, value) for key, value in info)
+        return ', '.join(f'{key}={value}' for key, value in info)
 
     @property
     def link_event_log_data(self):
         """
-        Returns a dict containing information about the linked object
+        Return a dict containing information about the linked object
         suitable for the event log.
 
         It does not return any information for an object linked to a
@@ -400,4 +398,4 @@ class LinkedObjectComparator(Comparator):
             return db.and_(self.cls.link_type == LinkType.subcontribution,
                            self.cls.subcontribution_id == other.id)
         else:
-            raise ValueError('Unexpected object type {}: {}'.format(type(other), other))
+            raise ValueError(f'Unexpected object type {type(other)}: {other}')

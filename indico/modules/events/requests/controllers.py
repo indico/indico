@@ -1,11 +1,9 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
-
-from __future__ import unicode_literals
 
 from flask import flash, redirect, request, session
 from werkzeug.exceptions import BadRequest, Forbidden, NotFound
@@ -37,7 +35,7 @@ class EventOrRequestManagerMixin:
 
 
 class RHRequestsEventRequests(EventOrRequestManagerMixin, RHManageEventBase):
-    """Overview of existing requests (event)"""
+    """Overview of existing requests (event)."""
 
     def _process(self):
         definitions = get_request_definitions()
@@ -45,15 +43,15 @@ class RHRequestsEventRequests(EventOrRequestManagerMixin, RHManageEventBase):
             raise NotFound
         requests = Request.find_latest_for_event(self.event)
         if self.protection_overridden:
-            definitions = {name: def_ for name, def_ in definitions.iteritems() if def_.can_be_managed(session.user)}
-            requests = {name: req for name, req in requests.iteritems()
+            definitions = {name: def_ for name, def_ in definitions.items() if def_.can_be_managed(session.user)}
+            requests = {name: req for name, req in requests.items()
                         if req.definition and req.definition.can_be_managed(session.user)}
         return WPRequestsEventManagement.render_template('events/requests/event_requests.html', self.event,
                                                          definitions=definitions, requests=requests)
 
 
 class RHRequestsEventRequestBase(RHManageEventBase):
-    """Base class for pages handling a specific request type"""
+    """Base class for pages handling a specific request type."""
 
     #: if a request must be present in the database
     _require_request = True
@@ -70,7 +68,7 @@ class RHRequestsEventRequestBase(RHManageEventBase):
 
 
 class RHRequestsEventRequestDetailsBase(EventOrRequestManagerMixin, RHRequestsEventRequestBase):
-    """Base class for the details/edit/manage views of a specific request"""
+    """Base class for the details/edit/manage views of a specific request."""
 
     def _process(self):
         self.is_manager = self.definition.can_be_managed(session.user)
@@ -99,7 +97,7 @@ class RHRequestsEventRequestDetailsBase(EventOrRequestManagerMixin, RHRequestsEv
 
 
 class RHRequestsEventRequestDetails(RHRequestsEventRequestDetailsBase):
-    """Details/form for a specific request"""
+    """Details/form for a specific request."""
 
     _require_request = False
 
@@ -135,7 +133,7 @@ class RHRequestsEventRequestDetails(RHRequestsEventRequestDetailsBase):
 
 
 class RHRequestsEventRequestProcess(RHRequestsEventRequestDetailsBase):
-    """Accept/Reject a request"""
+    """Accept/Reject a request."""
 
     def _check_access(self):
         self._require_user()
@@ -173,7 +171,7 @@ class RHRequestsEventRequestProcess(RHRequestsEventRequestDetailsBase):
 
 
 class RHRequestsEventRequestWithdraw(EventOrRequestManagerMixin, RHRequestsEventRequestBase):
-    """Withdraw a request"""
+    """Withdraw a request."""
 
     def _check_access(self):
         EventOrRequestManagerMixin._check_access(self)

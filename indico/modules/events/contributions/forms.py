@@ -1,11 +1,9 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
-
-from __future__ import unicode_literals
 
 from datetime import timedelta
 
@@ -64,7 +62,7 @@ class ContributionForm(IndicoForm):
         self.session_block = kwargs.get('session_block')
         self.timezone = self.event.timezone
         to_schedule = kwargs.pop('to_schedule', False)
-        super(ContributionForm, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self.type.query = self.event.contribution_types
         if self.event.type != 'conference':
             self.person_link_data.label.text = _("Speakers")
@@ -102,10 +100,10 @@ class ContributionProtectionForm(IndicoForm):
     def __init__(self, *args, **kwargs):
         self.protected_object = contribution = kwargs.pop('contrib')
         self.event = contribution.event
-        super(ContributionProtectionForm, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
     def validate_permissions(self, field):
-        except_msg = check_permissions(self.event, field, allow_registration_forms=True)
+        except_msg = check_permissions(self.event, field)
         if except_msg:
             raise ValidationError(except_msg)
 
@@ -128,7 +126,7 @@ class SubContributionForm(IndicoForm):
     def __init__(self, *args, **kwargs):
         self.event = kwargs.pop('event')
         self.subcontrib = kwargs.pop('subcontrib', None)
-        super(SubContributionForm, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
 
 class ContributionStartDateForm(IndicoForm):
@@ -141,7 +139,7 @@ class ContributionStartDateForm(IndicoForm):
         self.contrib = kwargs.pop('contrib')
         self.event = self.contrib.event
         self.timezone = self.event.timezone
-        super(ContributionStartDateForm, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
     def validate_start_dt(self, field):
         event = self.contrib.event
@@ -162,7 +160,7 @@ class ContributionDurationForm(IndicoForm):
 
     def __init__(self, *args, **kwargs):
         self.contrib = kwargs.pop('contrib')
-        super(ContributionDurationForm, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
     def validate_duration(self, field):
         if field.errors:
@@ -186,7 +184,7 @@ class ContributionDefaultDurationForm(IndicoForm):
 
 
 class ContributionTypeForm(IndicoForm):
-    """Form to create or edit a ContributionType"""
+    """Form to create or edit a ContributionType."""
 
     name = StringField(_("Name"), [DataRequired()])
     is_private = BooleanField(_("Private"), widget=SwitchWidget(),
@@ -197,7 +195,7 @@ class ContributionTypeForm(IndicoForm):
     def __init__(self, *args, **kwargs):
         self.event = kwargs.pop('event')
         self.contrib_type = kwargs.get('obj')
-        super(ContributionTypeForm, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
     def validate_name(self, field):
         query = self.event.contribution_types.filter(db.func.lower(ContributionType.name) == field.data.lower())
@@ -217,9 +215,9 @@ class ContributionExportTeXForm(IndicoForm):
 
     def __init__(self, *args, **kwargs):
         self.contribs = kwargs.get('contribs')
-        super(ContributionExportTeXForm, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         if not self.contribution_ids.data:
             self.contribution_ids.data = [c.id for c in self.contribs]
 
     def is_submitted(self):
-        return super(ContributionExportTeXForm, self).is_submitted() and 'submitted' in request.form
+        return super().is_submitted() and 'submitted' in request.form

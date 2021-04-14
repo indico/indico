@@ -1,5 +1,5 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
@@ -16,12 +16,11 @@ from werkzeug.urls import url_parse
 
 from indico.core.config import config
 from indico.util.date_time import now_utc
-from indico.util.string import to_unicode
 from indico.web.http_api.metadata.serializer import Serializer
 
 
 class vRecur(ical.vRecur):
-    """Fix vRecur so the frequency comes first"""
+    """Fix vRecur so the frequency comes first."""
     def ical(self):
         # SequenceTypes
         result = ['FREQ=%s' % self.types['FREQ'](self['FREQ']).ical()]
@@ -32,7 +31,7 @@ class vRecur(ical.vRecur):
             if not type(vals) in ical.prop.SequenceTypes:
                 vals = [vals]
             vals = ','.join([typ(val).ical() for val in vals])
-            result.append('%s=%s' % (key, vals))
+            result.append(f'{key}={vals}')
         return ';'.join(result)
 
 
@@ -54,17 +53,14 @@ def serialize_event(cal, fossil, now, id_prefix="indico-event"):
     event.add('dtstart', _deserialize_date(fossil['startDate']))
     event.add('dtend', _deserialize_date(fossil['endDate']))
     event.add('url', fossil['url'])
-    event.add('summary', to_unicode(fossil['title']))
+    event.add('summary', fossil['title'])
     loc = fossil['location'] or ''
-    if loc:
-        loc = to_unicode(loc)
     if fossil['roomFullname']:
-        loc += ' ' + to_unicode(fossil['roomFullname'])
+        loc += ' ' + fossil['roomFullname']
     event.add('location', loc)
     description = ''
     if fossil.get('speakers'):
-        speakers = ('{} ({})'.format(speaker['fullName'].encode('utf-8'),
-                                     speaker['affiliation'].encode('utf-8')) for speaker in fossil['speakers'])
+        speakers = ['{} ({})'.format(speaker['fullName'], speaker['affiliation']) for speaker in fossil['speakers']]
         description += 'Speakers: {}\n'.format(', '.join(speakers))
 
     if fossil['description']:
@@ -72,12 +68,10 @@ def serialize_event(cal, fossil, now, id_prefix="indico-event"):
         if not desc_text:
             desc_text = '<p/>'
         try:
-            description += '{}\n\n{}'.format(to_unicode(html.fromstring(to_unicode(desc_text))
-                                                        .text_content()).encode('utf-8'),
-                                             fossil['url'].encode('utf-8'))
+            description += '{}\n\n{}'.format(html.fromstring(desc_text).text_content(), fossil['url'])
         except ParserError:
             # this happens e.g. if desc_text contains only a html comment
-            description += fossil['url'].encode('utf-8')
+            description += fossil['url']
     else:
         description += fossil['url']
     event.add('description', description)
@@ -90,7 +84,7 @@ def serialize_contribs(cal, fossil, now):
     else:
         for sfossil in fossil['contributions']:
             if sfossil['startDate']:
-                sfossil['id'] = "%s-%s" % (fossil['id'], sfossil['id'])
+                sfossil['id'] = "{}-{}".format(fossil['id'], sfossil['id'])
                 serialize_event(cal, sfossil, now, id_prefix="indico-contribution")
 
 
@@ -104,7 +98,7 @@ def serialize_sessions(cal, fossil, now):
     else:
         for sfossil in fossil['sessions']:
             if sfossil['startDate']:
-                serialize_session(cal, sfossil, now, fid="%s-%s" % (fossil['id'], sfossil['id']))
+                serialize_session(cal, sfossil, now, fid="{}-{}".format(fossil['id'], sfossil['id']))
 
 
 def serialize_session(cal, fossil, now, fid=None):

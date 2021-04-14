@@ -1,11 +1,9 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
-
-from __future__ import unicode_literals
 
 from operator import attrgetter
 
@@ -33,12 +31,12 @@ from indico.web.rh import RHProtected
 
 
 class RHGroups(RHAdminBase):
-    """Admin group overview"""
+    """Admin group overview."""
 
     def _process(self):
         query = LocalGroup.query.options(joinedload(LocalGroup.members)).order_by(db.func.lower(LocalGroup.name))
         groups = [g.proxy for g in query]
-        providers = [p for p in multipass.identity_providers.itervalues() if p.supports_groups]
+        providers = [p for p in multipass.identity_providers.values() if p.supports_groups]
         form = SearchForm(obj=FormDefaults(exact=True))
         groups_enabled = True
         if not providers and not config.LOCAL_GROUPS:
@@ -55,8 +53,8 @@ class RHGroups(RHAdminBase):
         if groups_enabled and form.validate_on_submit():
             search_providers = None if not providers or not form.provider.data else {form.provider.data}
             search_results = GroupProxy.search(form.name.data, exact=form.exact.data, providers=search_providers)
-            search_results.sort(key=attrgetter('provider', 'name'))
-        provider_titles = {p.name: p.title for p in multipass.identity_providers.itervalues()}
+            search_results.sort(key=lambda x: (x.provider or '', x.name))
+        provider_titles = {p.name: p.title for p in multipass.identity_providers.values()}
         provider_titles[None] = _('Local')
         return WPGroupsAdmin.render_template('groups.html', groups=groups, providers=providers, form=form,
                                              search_results=search_results, provider_titles=provider_titles,
@@ -77,7 +75,7 @@ class RHGroupBase(RHAdminBase):
 
 
 class RHGroupDetails(RHGroupBase):
-    """Admin group details"""
+    """Admin group details."""
 
     def _process(self):
         group = self.group
@@ -86,7 +84,7 @@ class RHGroupDetails(RHGroupBase):
 
 
 class RHGroupMembers(RHGroupBase):
-    """Admin group memberlist (json)"""
+    """Admin group memberlist (json)."""
 
     def _process(self):
         group = self.group
@@ -95,7 +93,7 @@ class RHGroupMembers(RHGroupBase):
 
 
 class RHGroupEdit(RHAdminBase):
-    """Admin group modification/creation"""
+    """Admin group modification/creation."""
 
     def _process_args(self):
         if not config.LOCAL_GROUPS:
@@ -135,7 +133,7 @@ class RHLocalGroupBase(RHAdminBase):
 
 
 class RHGroupDelete(RHLocalGroupBase):
-    """Admin group deletion"""
+    """Admin group deletion."""
 
     def _process(self):
         db.session.delete(self.group)
@@ -144,7 +142,7 @@ class RHGroupDelete(RHLocalGroupBase):
 
 
 class RHGroupDeleteMember(RHLocalGroupBase):
-    """Admin group member deletion (ajax)"""
+    """Admin group member deletion (ajax)."""
 
     def _process(self):
         self.group.members.discard(User.get(request.view_args['user_id']))
@@ -155,7 +153,7 @@ class RHGroupSearch(RHProtected):
     @use_kwargs({
         'name': fields.Str(required=True),
         'exact': fields.Bool(missing=False),
-    })
+    }, location='query')
     def _process(self, name, exact):
         groups = GroupProxy.search(name, exact=exact)
         total = len(groups)

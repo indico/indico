@@ -1,5 +1,5 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
@@ -25,7 +25,7 @@ from indico.web.flask.app import configure_db
 
 @pytest.fixture(scope='session')
 def postgresql():
-    """Provides a clean temporary PostgreSQL server/database.
+    """Provide a clean temporary PostgreSQL server/database.
 
     If the environment variable `INDICO_TEST_DATABASE_URI` is set, this fixture
     will do nothing and simply return the connection string from that variable
@@ -40,16 +40,16 @@ def postgresql():
 
     # Ensure we have initdb and a recent enough postgres version
     try:
-        version_output = subprocess.check_output(['initdb', '--version'])
+        version_output = subprocess.check_output(['initdb', '--version'], text=True)
     except Exception as e:
-        pytest.skip('Could not retrieve PostgreSQL version: {}'.format(e))
-    pg_version = map(int, re.match(r'initdb \(PostgreSQL\) ((?:\d+\.?)+)', version_output).group(1).split('.'))
+        pytest.skip(f'Could not retrieve PostgreSQL version: {e}')
+    pg_version = list(map(int, re.match(r'initdb \(PostgreSQL\) ((?:\d+\.?)+)', version_output).group(1).split('.')))
     if pg_version[0] < 9 or (pg_version[0] == 9 and pg_version[1] < 6):
-        pytest.skip('PostgreSQL version is too old: {}'.format(version_output))
+        pytest.skip(f'PostgreSQL version is too old: {version_output}')
 
     # Prepare server instance and a test database
     temp_dir = tempfile.mkdtemp(prefix='indicotestpg.')
-    postgres_args = '-h "" -k "{}"'.format(temp_dir)
+    postgres_args = f'-h "" -k "{temp_dir}"'
     try:
         silent_check_call(['initdb', '--encoding', 'UTF8', temp_dir])
         silent_check_call(['pg_ctl', '-D', temp_dir, '-w', '-o', postgres_args, 'start'])
@@ -58,9 +58,9 @@ def postgresql():
         silent_check_call(['psql', '-h', temp_dir, db_name, '-c', 'CREATE EXTENSION pg_trgm;'])
     except Exception as e:
         shutil.rmtree(temp_dir)
-        pytest.skip('Could not init/start PostgreSQL: {}'.format(e))
+        pytest.skip(f'Could not init/start PostgreSQL: {e}')
 
-    yield 'postgresql:///{}?host={}'.format(db_name, temp_dir)
+    yield f'postgresql:///{db_name}?host={temp_dir}'
 
     try:
         silent_check_call(['pg_ctl', '-D', temp_dir, '-m', 'immediate', 'stop'])
@@ -70,16 +70,16 @@ def postgresql():
             with open(os.path.join(temp_dir, 'postmaster.pid')) as f:
                 pid = int(f.readline().strip())
                 os.kill(pid, signal.SIGKILL)
-            pytest.skip('Could not stop postgresql; killed it instead: {}'.format(e))
+            pytest.skip(f'Could not stop postgresql; killed it instead: {e}')
         except Exception as e:
-            pytest.skip('Could not stop/kill postgresql: {}'.format(e))
+            pytest.skip(f'Could not stop/kill postgresql: {e}')
     finally:
         shutil.rmtree(temp_dir)
 
 
 @pytest.fixture(scope='session')
 def database(app, postgresql):
-    """Creates a test database which is destroyed afterwards
+    """Create a test database which is destroyed afterwards.
 
     Used only internally, if you need to access the database use `db` instead to ensure
     your modifications are not persistent!
@@ -99,10 +99,14 @@ def database(app, postgresql):
 
 @pytest.fixture
 def db(database, monkeypatch):
-    """Provides database access and ensures changes do not persist"""
+    """Provide database access and ensure changes do not persist."""
     # Prevent database/session modifications
     monkeypatch.setattr(database.session, 'commit', database.session.flush)
     monkeypatch.setattr(database.session, 'remove', lambda: None)
+    rollback = database.session.rollback
+    # disable rollback in case we use the test client where RHs do a rollback
+    # XXX maybe we should do nested transactions?
+    monkeypatch.setattr(database.session, 'rollback', lambda: None)
 
     @contextmanager
     def _tmp_session():
@@ -113,14 +117,14 @@ def db(database, monkeypatch):
 
     monkeypatch.setattr(database, 'tmp_session', _tmp_session, lambda: None)
     yield database
-    database.session.rollback()
+    rollback()
     database.session.remove()
 
 
 @pytest.fixture
 @pytest.mark.usefixtures('db')
 def count_queries():
-    """Provides a query counter.
+    """Provide a query counter.
 
     Usage::
 

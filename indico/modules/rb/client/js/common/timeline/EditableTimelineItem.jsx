@@ -1,5 +1,5 @@
 // This file is part of Indico.
-// Copyright (C) 2002 - 2020 CERN
+// Copyright (C) 2002 - 2021 CERN
 //
 // Indico is free software; you can redistribute it and/or
 // modify it under the terms of the MIT License; see the
@@ -8,6 +8,7 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import {Popup} from 'semantic-ui-react';
+
 import {Translate} from 'indico/react/i18n';
 
 import TimelineItem from './TimelineItem';
@@ -294,7 +295,7 @@ export default class EditableTimelineItem extends React.Component {
               header={`${hintPosition.hours}:${hintPosition.minutes.toString().padStart(2, '0')}`}
               content={tip}
               position="top left"
-              offset={hintPosition.pixels}
+              offset={[hintPosition.pixels, 0]}
               context={canvasRef}
               size="mini"
               styleName="editable-timeline-time-popup"

@@ -1,11 +1,9 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
-
-from __future__ import unicode_literals
 
 import mimetypes
 
@@ -23,7 +21,6 @@ from indico.modules.attachments.operations import add_attachment_link
 from indico.modules.attachments.util import get_attached_items
 from indico.util.fs import secure_client_filename
 from indico.util.i18n import _, ngettext
-from indico.util.string import to_unicode
 from indico.web.flask.templating import get_template_module
 from indico.web.flask.util import url_for
 from indico.web.forms.base import FormDefaults
@@ -56,12 +53,12 @@ def _get_parent_info(parent):
 
 
 def _get_folders_protection_info(linked_object):
-    folders = AttachmentFolder.find(object=linked_object, is_deleted=False)
+    folders = AttachmentFolder.query.filter_by(object=linked_object, is_deleted=False)
     return {folder.id: folder.is_self_protected for folder in folders}
 
 
 class ManageAttachmentsMixin:
-    """Shows the attachment management page"""
+    """Show the attachment management page."""
     wp = None
 
     def _process(self):
@@ -76,7 +73,7 @@ class ManageAttachmentsMixin:
 
 
 class AddAttachmentFilesMixin:
-    """Upload file attachments"""
+    """Upload file attachments."""
 
     def _process(self):
         form = AddAttachmentFilesForm(linked_object=self.object)
@@ -85,7 +82,7 @@ class AddAttachmentFilesMixin:
             folder = form.folder.data or AttachmentFolder.get_or_create_default(linked_object=self.object)
             for f in files:
                 filename = secure_client_filename(f.filename)
-                attachment = Attachment(folder=folder, user=session.user, title=to_unicode(f.filename),
+                attachment = Attachment(folder=folder, user=session.user, title=f.filename,
                                         type=AttachmentType.file, protection_mode=form.protection_mode.data)
                 if attachment.is_self_protected:
                     attachment.acl = form.acl.data
@@ -101,11 +98,12 @@ class AddAttachmentFilesMixin:
             return jsonify_data(attachment_list=_render_attachment_list(self.object))
         return jsonify_template('attachments/upload.html', form=form, action=url_for('.upload', self.object),
                                 protection_message=_render_protection_message(self.object),
-                                folders_protection_info=_get_folders_protection_info(self.object))
+                                folders_protection_info=_get_folders_protection_info(self.object),
+                                existing_attachment=None)
 
 
 class AddAttachmentLinkMixin:
-    """Add link attachment"""
+    """Add link attachment."""
 
     def _process(self):
         form = AddAttachmentLinkForm(linked_object=self.object)
@@ -119,7 +117,7 @@ class AddAttachmentLinkMixin:
 
 
 class EditAttachmentMixin(SpecificAttachmentMixin):
-    """Edit an attachment"""
+    """Edit an attachment."""
 
     def _process(self):
         defaults = FormDefaults(self.attachment, protected=self.attachment.is_self_protected, skip_attrs={'file'})
@@ -158,7 +156,7 @@ class EditAttachmentMixin(SpecificAttachmentMixin):
 
 
 class CreateFolderMixin:
-    """Create a new empty folder"""
+    """Create a new empty folder."""
 
     def _process(self):
         form = AttachmentFolderForm(obj=FormDefaults(is_always_visible=True), linked_object=self.object)
@@ -177,7 +175,7 @@ class CreateFolderMixin:
 
 
 class EditFolderMixin(SpecificFolderMixin):
-    """Edit a folder"""
+    """Edit a folder."""
 
     def _process(self):
         defaults = FormDefaults(self.folder, protected=self.folder.is_self_protected)
@@ -197,7 +195,7 @@ class EditFolderMixin(SpecificFolderMixin):
 
 
 class DeleteFolderMixin(SpecificFolderMixin):
-    """Delete a folder"""
+    """Delete a folder."""
 
     def _process(self):
         self.folder.is_deleted = True
@@ -208,7 +206,7 @@ class DeleteFolderMixin(SpecificFolderMixin):
 
 
 class DeleteAttachmentMixin(SpecificAttachmentMixin):
-    """Delete an attachment"""
+    """Delete an attachment."""
 
     def _process(self):
         self.attachment.is_deleted = True

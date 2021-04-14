@@ -1,11 +1,9 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
-
-from __future__ import unicode_literals
 
 from uuid import UUID
 
@@ -20,7 +18,7 @@ from indico.util.decorators import classproperty
 
 
 class SpecificAbstractMixin:
-    """Mixin for RHs that deal with a specific abstract"""
+    """Mixin for RHs that deal with a specific abstract."""
 
     # whether the RH should use Abstract's UUID when querying
     USE_ABSTRACT_UUID = False
@@ -64,7 +62,7 @@ class SpecificAbstractMixin:
 
 
 class RHAbstractsBase(RHDisplayEventBase):
-    """Base class for all abstract-related RHs"""
+    """Base class for all abstract-related RHs."""
 
     EVENT_FEATURE = 'abstracts'
 
@@ -77,21 +75,21 @@ class RHAbstractsBase(RHDisplayEventBase):
 
     @property
     def management(self):
-        """Whether the RH is currently used in the management area"""
+        """Whether the RH is currently used in the management area."""
         return request.view_args.get('management', False)
 
 
 class RHManageAbstractsBase(ManageEventMixin, RHAbstractsBase):
     """
     Base class for all abstract-related RHs that require full event
-    management permissions
+    management permissions.
     """
 
     DENY_FRAMES = True
 
     @property
     def management(self):
-        """Whether the RH is currently used in the management area"""
+        """Whether the RH is currently used in the management area."""
         return request.view_args.get('management', True)
 
 

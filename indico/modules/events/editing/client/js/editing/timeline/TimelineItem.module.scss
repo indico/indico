@@ -1,10 +1,22 @@
 // This file is part of Indico.
-// Copyright (C) 2002 - 2020 CERN
+// Copyright (C) 2002 - 2021 CERN
 //
 // Indico is free software; you can redistribute it and/or
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
+@import 'base/palette';
+
 .state-indicator {
   margin-left: 5px;
+}
+
+.item-index {
+  color: $gray;
+}
+
+.header > :not(:first-child)::before {
+  content: '\00B7' !important;
+  padding-right: 0.3em;
+  color: $gray;
 }

@@ -5,7 +5,7 @@
 {% endblock %}
 
 {% block content %}
-    {% for category, plugins in categorized_plugins.iteritems() %}
+    {% for category, plugins in categorized_plugins.items() %}
         <div class="i-plugins-list">
             <h2>{{ category }}</h2>
             <div class="i-badges-list">
@@ -16,7 +16,7 @@
                     {%- else %} title="{% trans %}This plugin has no configurable options{% endtrans %}"
                     {%- endif %}>
                         <div class="i-badge-legend">
-                            <span class="i-badge-legend-right">{{ plugin.version }}</span>
+                            <span class="i-badge-legend-right ellipsize">{{ plugin.version }}</span>
                         </div>
                         <div class="i-badge-content">
                             <span class="i-badge-title">{{ plugin.title }}</span>

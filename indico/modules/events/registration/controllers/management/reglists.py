@@ -1,11 +1,9 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
-
-from __future__ import unicode_literals
 
 import os
 import uuid
@@ -16,11 +14,11 @@ from sqlalchemy.orm import joinedload, subqueryload
 from werkzeug.exceptions import BadRequest, Forbidden, NotFound
 
 from indico.core import signals
+from indico.core.cache import make_scoped_cache
 from indico.core.config import config
 from indico.core.db import db
 from indico.core.errors import NoReportError
 from indico.core.notifications import make_email, send_email
-from indico.legacy.common.cache import GenericCache
 from indico.legacy.pdfinterface.conference import RegistrantsListToBookPDF, RegistrantsListToPDF
 from indico.modules.designer import PageLayout, TemplateType
 from indico.modules.designer.models.templates import DesignerTemplate
@@ -36,7 +34,8 @@ from indico.modules.events.registration.controllers import RegistrationEditMixin
 from indico.modules.events.registration.controllers.management import (RHManageRegFormBase, RHManageRegFormsBase,
                                                                        RHManageRegistrationBase)
 from indico.modules.events.registration.forms import (BadgeSettingsForm, CreateMultipleRegistrationsForm,
-                                                      EmailRegistrantsForm, ImportRegistrationsForm)
+                                                      EmailRegistrantsForm, ImportRegistrationsForm,
+                                                      RejectRegistrantsForm)
 from indico.modules.events.registration.models.items import PersonalDataType, RegistrationFormItemType
 from indico.modules.events.registration.models.registrations import Registration, RegistrationData, RegistrationState
 from indico.modules.events.registration.notifications import notify_registration_state_update
@@ -46,17 +45,18 @@ from indico.modules.events.registration.util import (create_registration, genera
                                                      import_registrations_from_csv, make_registration_form)
 from indico.modules.events.registration.views import WPManageRegistration
 from indico.modules.events.util import ZipGeneratorMixin
-from indico.modules.users import User
 from indico.util.fs import secure_filename
 from indico.util.i18n import _, ngettext
+from indico.util.marshmallow import Principal
 from indico.util.placeholders import replace_placeholders
 from indico.util.spreadsheets import send_csv, send_xlsx
+from indico.web.args import use_kwargs
 from indico.web.flask.templating import get_template_module
 from indico.web.flask.util import send_file, url_for
-from indico.web.util import jsonify_data, jsonify_template
+from indico.web.util import jsonify_data, jsonify_form, jsonify_template
 
 
-badge_cache = GenericCache('badge-printing')
+badge_cache = make_scoped_cache('badge-printing')
 
 
 def _render_registration_details(registration):
@@ -66,7 +66,7 @@ def _render_registration_details(registration):
 
 
 class RHRegistrationsListManage(RHManageRegFormBase):
-    """List all registrations of a specific registration form of an event"""
+    """List all registrations of a specific registration form of an event."""
 
     def _process(self):
         if self.list_generator.static_link_used:
@@ -81,7 +81,7 @@ class RHRegistrationsListManage(RHManageRegFormBase):
 
 
 class RHRegistrationsListCustomize(RHManageRegFormBase):
-    """Filter options and columns to display for a registrations list of an event"""
+    """Filter options and columns to display for a registrations list of an event."""
 
     ALLOW_LOCKED = True
 
@@ -100,7 +100,7 @@ class RHRegistrationsListCustomize(RHManageRegFormBase):
 
 
 class RHRegistrationListStaticURL(RHManageRegFormBase):
-    """Generate a static URL for the configuration of the registrations list"""
+    """Generate a static URL for the configuration of the registrations list."""
 
     ALLOW_LOCKED = True
 
@@ -109,7 +109,7 @@ class RHRegistrationListStaticURL(RHManageRegFormBase):
 
 
 class RHRegistrationDetails(RHManageRegistrationBase):
-    """Displays information about a registration"""
+    """Display information about a registration."""
 
     def _process(self):
         registration_details_html = _render_registration_details(self.registration)
@@ -119,7 +119,7 @@ class RHRegistrationDetails(RHManageRegistrationBase):
 
 
 class RHRegistrationDownloadAttachment(RHManageRegFormsBase):
-    """Download a file attached to a registration"""
+    """Download a file attached to a registration."""
 
     normalize_url_spec = {
         'locators': {
@@ -129,10 +129,10 @@ class RHRegistrationDownloadAttachment(RHManageRegFormsBase):
 
     def _process_args(self):
         RHManageRegFormsBase._process_args(self)
-        self.field_data = (RegistrationData
-                           .find(RegistrationData.registration_id == request.view_args['registration_id'],
-                                 RegistrationData.field_data_id == request.view_args['field_data_id'],
-                                 RegistrationData.filename.isnot(None))
+        self.field_data = (RegistrationData.query
+                           .filter(RegistrationData.registration_id == request.view_args['registration_id'],
+                                   RegistrationData.field_data_id == request.view_args['field_data_id'],
+                                   RegistrationData.filename.isnot(None))
                            .options(joinedload('registration').joinedload('registration_form'))
                            .one())
 
@@ -159,7 +159,7 @@ class RHRegistrationEdit(RegistrationEditMixin, RHManageRegistrationBase):
 
 
 class RHRegistrationsActionBase(RHManageRegFormBase):
-    """Base class for classes performing actions on registrations"""
+    """Base class for classes performing actions on registrations."""
 
     registration_query_options = ()
 
@@ -175,7 +175,7 @@ class RHRegistrationsActionBase(RHManageRegFormBase):
 
 
 class RHRegistrationEmailRegistrantsPreview(RHRegistrationsActionBase):
-    """Previews the email that will be sent to registrants"""
+    """Preview the email that will be sent to registrants."""
 
     def _process(self):
         if not self.registrations:
@@ -193,7 +193,7 @@ class RHRegistrationEmailRegistrantsPreview(RHRegistrationsActionBase):
 
 
 class RHRegistrationEmailRegistrants(RHRegistrationsActionBase):
-    """Send email to selected registrants"""
+    """Send email to selected registrants."""
 
     def _send_emails(self, form):
         for registration in self.registrations:
@@ -233,7 +233,7 @@ class RHRegistrationEmailRegistrants(RHRegistrationsActionBase):
 
 
 class RHRegistrationDelete(RHRegistrationsActionBase):
-    """Delete selected registrations"""
+    """Delete selected registrations."""
 
     def _process(self):
         for registration in self.registrations:
@@ -241,7 +241,7 @@ class RHRegistrationDelete(RHRegistrationsActionBase):
             signals.event.registration_deleted.send(registration)
             logger.info('Registration %s deleted by %s', registration, session.user)
             registration.log(EventLogRealm.management, EventLogKind.negative, 'Registration',
-                             'Registration deleted: {}'.format(registration.full_name),
+                             f'Registration deleted: {registration.full_name}',
                              session.user, data={'Email': registration.email})
         num_reg_deleted = len(self.registrations)
         flash(ngettext("Registration was deleted.",
@@ -250,20 +250,15 @@ class RHRegistrationDelete(RHRegistrationsActionBase):
 
 
 class RHRegistrationCreate(RHManageRegFormBase):
-    """Create new registration (management area)"""
+    """Create new registration (management area)."""
 
-    def _get_user_data(self):
-        user_id = request.args.get('user')
-        if user_id is None:
+    @use_kwargs({
+        'user': Principal(allow_external_users=True, missing=None),
+    }, location='query')
+    def _get_user_data(self, user):
+        if user is None:
             return {}
-        elif user_id.isdigit():
-            # existing indico user
-            user = User.find_first(id=user_id, is_deleted=False)
-            user_data = {t.name: getattr(user, t.name, None) if user else '' for t in PersonalDataType}
-        else:
-            # non-indico user
-            data = GenericCache('pending_identities').get(user_id, {})
-            user_data = {t.name: data.get(t.name) for t in PersonalDataType}
+        user_data = {t.name: getattr(user, t.name, None) for t in PersonalDataType}
         user_data['title'] = get_title_uuid(self.regform, user_data['title'])
         return user_data
 
@@ -286,7 +281,7 @@ class RHRegistrationCreate(RHManageRegFormBase):
 
 
 class RHRegistrationCreateMultiple(RHManageRegFormBase):
-    """Create multiple registrations for Indico users (management area)"""
+    """Create multiple registrations for Indico users (management area)."""
 
     def _register_user(self, user, notify):
         # Fill only the personal data fields, custom fields are left empty.
@@ -309,7 +304,7 @@ class RHRegistrationCreateMultiple(RHManageRegFormBase):
 
 
 class RHRegistrationsExportBase(RHRegistrationsActionBase):
-    """Base class for all registration list export RHs"""
+    """Base class for all registration list export RHs."""
 
     ALLOW_LOCKED = True
     registration_query_options = (subqueryload('data'),)
@@ -320,7 +315,7 @@ class RHRegistrationsExportBase(RHRegistrationsActionBase):
 
 
 class RHRegistrationsExportPDFTable(RHRegistrationsExportBase):
-    """Export registration list to a PDF in table style"""
+    """Export registration list to a PDF in table style."""
 
     def _process(self):
         pdf = RegistrantsListToPDF(self.event, reglist=self.registrations, display=self.export_config['regform_items'],
@@ -336,7 +331,7 @@ class RHRegistrationsExportPDFTable(RHRegistrationsExportBase):
 
 
 class RHRegistrationsExportPDFBook(RHRegistrationsExportBase):
-    """Export registration list to a PDF in book style"""
+    """Export registration list to a PDF in book style."""
 
     def _process(self):
         static_item_ids, item_ids = self.list_generator.get_item_ids()
@@ -345,7 +340,7 @@ class RHRegistrationsExportPDFBook(RHRegistrationsExportBase):
 
 
 class RHRegistrationsExportCSV(RHRegistrationsExportBase):
-    """Export registration list to a CSV file"""
+    """Export registration list to a CSV file."""
 
     def _process(self):
         headers, rows = generate_spreadsheet_from_registrations(self.registrations, self.export_config['regform_items'],
@@ -354,7 +349,7 @@ class RHRegistrationsExportCSV(RHRegistrationsExportBase):
 
 
 class RHRegistrationsExportExcel(RHRegistrationsExportBase):
-    """Export registration list to an XLSX file"""
+    """Export registration list to an XLSX file."""
 
     def _process(self):
         headers, rows = generate_spreadsheet_from_registrations(self.registrations, self.export_config['regform_items'],
@@ -414,15 +409,20 @@ class RHRegistrationsPrintBadges(RHRegistrationsActionBase):
         else:
             pdf_class = RegistrantsListToBadgesPDF
         registration_ids = config_params.pop('registration_ids')
-        registrations = Registration.query.filter(Registration.id.in_(registration_ids)).all()
+        registrations = (Registration.query.with_parent(self.event)
+                         .filter(Registration.id.in_(registration_ids),
+                                 Registration.is_active)
+                         .order_by(*Registration.order_by_name)
+                         .options(subqueryload('data').joinedload('field_data'))
+                         .all())
         signals.event.designer.print_badge_template.send(self.template, regform=self.regform,
                                                          registrations=registrations)
-        pdf = pdf_class(self.template, config_params, self.event, registration_ids)
-        return send_file('Badges-{}.pdf'.format(self.event.id), pdf.get_pdf(), 'application/pdf')
+        pdf = pdf_class(self.template, config_params, self.event, registrations)
+        return send_file(f'Badges-{self.event.id}.pdf', pdf.get_pdf(), 'application/pdf')
 
 
 class RHRegistrationsConfigBadges(RHRegistrationsActionBase):
-    """Print badges for the selected registrations"""
+    """Print badges for the selected registrations."""
 
     ALLOW_LOCKED = True
     TICKET_BADGES = False
@@ -439,7 +439,7 @@ class RHRegistrationsConfigBadges(RHRegistrationsActionBase):
         'A8': (5.2, 7.4),
     }
 
-    format_map_landscape = {name: (h, w) for name, (w, h) in format_map_portrait.iteritems()}
+    format_map_landscape = {name: (h, w) for name, (w, h) in format_map_portrait.items()}
 
     def _process_args(self):
         RHManageRegFormBase._process_args(self)
@@ -454,7 +454,7 @@ class RHRegistrationsConfigBadges(RHRegistrationsActionBase):
     def _get_format(self, tpl):
         from indico.modules.designer.pdf import PIXELS_CM
         format_map = self.format_map_landscape if tpl.data['width'] > tpl.data['height'] else self.format_map_portrait
-        return next((frm for frm, frm_size in format_map.iteritems()
+        return next((frm for frm, frm_size in format_map.items()
                      if (frm_size[0] == float(tpl.data['width']) / PIXELS_CM and
                          frm_size[1] == float(tpl.data['height']) / PIXELS_CM)), 'custom')
 
@@ -496,8 +496,8 @@ class RHRegistrationsConfigBadges(RHRegistrationsActionBase):
                 event_badge_settings.set_multi(self.event, data)
             data['registration_ids'] = [x.id for x in registrations]
 
-            key = unicode(uuid.uuid4())
-            badge_cache.set(key, data, time=1800)
+            key = str(uuid.uuid4())
+            badge_cache.set(key, data, timeout=1800)
             download_url = url_for('.registrations_print_badges', self.regform, template_id=template_id, uuid=key)
             return jsonify_data(flash=False, redirect=download_url, redirect_no_loading=True)
         return jsonify_template('events/registration/management/print_badges.html', event=self.event,
@@ -506,20 +506,20 @@ class RHRegistrationsConfigBadges(RHRegistrationsActionBase):
 
 
 class RHRegistrationsConfigTickets(RHRegistrationsConfigBadges):
-    """Print tickets for selected registrations"""
+    """Print tickets for selected registrations."""
 
     TICKET_BADGES = True
 
     @property
     def _default_template_id(self):
-        return unicode(self.regform.ticket_template_id) if self.regform.ticket_template_id else None
+        return str(self.regform.ticket_template_id) if self.regform.ticket_template_id else None
 
     def _filter_registrations(self, registrations):
         return [r for r in registrations if not r.is_ticket_blocked]
 
 
 class RHRegistrationTogglePayment(RHManageRegistrationBase):
-    """Modify the payment status of a registration"""
+    """Modify the payment status of a registration."""
 
     def _process(self):
         pay = request.form.get('pay') == '1'
@@ -536,21 +536,22 @@ class RHRegistrationTogglePayment(RHManageRegistrationBase):
         return jsonify_data(html=_render_registration_details(self.registration))
 
 
-def _modify_registration_status(registration, approve):
+def _modify_registration_status(registration, approve, rejection_reason='', attach_rejection_reason=False):
     if registration.state != RegistrationState.pending:
         return
     if approve:
         registration.update_state(approved=True)
     else:
+        registration.rejection_reason = rejection_reason
         registration.update_state(rejected=True)
     db.session.flush()
-    notify_registration_state_update(registration)
+    notify_registration_state_update(registration, attach_rejection_reason)
     status = 'approved' if approve else 'rejected'
     logger.info('Registration %s was %s by %s', registration, status, session.user)
 
 
 class RHRegistrationApprove(RHManageRegistrationBase):
-    """Accept a registration"""
+    """Accept a registration."""
 
     def _process(self):
         _modify_registration_status(self.registration, approve=True)
@@ -558,15 +559,20 @@ class RHRegistrationApprove(RHManageRegistrationBase):
 
 
 class RHRegistrationReject(RHManageRegistrationBase):
-    """Reject a registration"""
+    """Reject a registration."""
 
     def _process(self):
-        _modify_registration_status(self.registration, approve=False)
-        return jsonify_data(html=_render_registration_details(self.registration))
+        form = RejectRegistrantsForm()
+        message = _("Rejecting this registration will trigger a notification email.")
+        if form.validate_on_submit():
+            _modify_registration_status(self.registration, approve=False, rejection_reason=form.rejection_reason.data,
+                                        attach_rejection_reason=form.attach_rejection_reason.data)
+            return jsonify_data(html=_render_registration_details(self.registration))
+        return jsonify_form(form, disabled_until_change=False, submit=_('Reject'), message=message)
 
 
 class RHRegistrationReset(RHManageRegistrationBase):
-    """Reset a registration back to a non-approved status"""
+    """Reset a registration back to a non-approved status."""
 
     def _process(self):
         if self.registration.has_conflict():
@@ -575,12 +581,14 @@ class RHRegistrationReset(RHManageRegistrationBase):
         if self.registration.state in (RegistrationState.complete, RegistrationState.unpaid):
             self.registration.update_state(approved=False)
         elif self.registration.state == RegistrationState.rejected:
+            self.registration.rejection_reason = ''
             self.registration.update_state(rejected=False)
         elif self.registration.state == RegistrationState.withdrawn:
             self.registration.update_state(withdrawn=False)
             notify_registration_state_update(self.registration)
         else:
             raise BadRequest(_('The registration cannot be reset in its current state.'))
+        self.registration.checked_in = False
         logger.info('Registration %r was reset by %r', self.registration, session.user)
         return jsonify_data(html=_render_registration_details(self.registration))
 
@@ -599,9 +607,11 @@ class RHRegistrationManageWithdraw(RHManageRegistrationBase):
 
 
 class RHRegistrationCheckIn(RHManageRegistrationBase):
-    """Set checked in state of a registration"""
+    """Set checked in state of a registration."""
 
     def _process_PUT(self):
+        if self.registration.state not in (RegistrationState.complete, RegistrationState.unpaid):
+            raise BadRequest(_('This registration cannot be marked as checked-in'))
         self.registration.checked_in = True
         signals.event.registration_checkin_updated.send(self.registration)
         return jsonify_data(html=_render_registration_details(self.registration))
@@ -613,12 +623,14 @@ class RHRegistrationCheckIn(RHManageRegistrationBase):
 
 
 class RHRegistrationBulkCheckIn(RHRegistrationsActionBase):
-    """Bulk apply check-in/not checked-in state to registrations"""
+    """Bulk apply check-in/not checked-in state to registrations."""
 
     def _process(self):
         check_in = request.form['flag'] == '1'
         msg = 'checked-in' if check_in else 'not checked-in'
         for registration in self.registrations:
+            if registration.state not in (RegistrationState.complete, RegistrationState.unpaid):
+                continue
             registration.checked_in = check_in
             signals.event.registration_checkin_updated.send(registration)
             logger.info('Registration %s marked as %s by %s', registration, msg, session.user)
@@ -626,33 +638,46 @@ class RHRegistrationBulkCheckIn(RHRegistrationsActionBase):
         return jsonify_data(**self.list_generator.render_list())
 
 
-class RHRegistrationsModifyStatus(RHRegistrationsActionBase):
-    """Accept/Reject selected registrations"""
+class RHRegistrationsApprove(RHRegistrationsActionBase):
+    """Accept selected registrations from registration list."""
 
     def _process(self):
-        approve = request.form['flag'] == '1'
         for registration in self.registrations:
-            _modify_registration_status(registration, approve)
-        flash(_("The status of the selected registrations was updated successfully."), 'success')
+            _modify_registration_status(registration, approve=True)
+        flash(_("The selected registrations were successfully approved."), 'success')
         return jsonify_data(**self.list_generator.render_list())
 
 
+class RHRegistrationsReject(RHRegistrationsActionBase):
+    """Reject selected registrations from registration list."""
+
+    def _process(self):
+        form = RejectRegistrantsForm(registration_id=[r.id for r in self.registrations])
+        message = _("Rejecting these registrations will trigger a notification email for each registrant.")
+        if form.validate_on_submit():
+            for registration in self.registrations:
+                _modify_registration_status(registration, approve=False, rejection_reason=form.rejection_reason.data,
+                                            attach_rejection_reason=form.attach_rejection_reason.data)
+            flash(_("The selected registrations were successfully rejected."), 'success')
+            return jsonify_data(**self.list_generator.render_list())
+        return jsonify_form(form, disabled_until_change=False, submit=_('Reject'), message=message)
+
+
 class RHRegistrationsExportAttachments(RHRegistrationsExportBase, ZipGeneratorMixin):
-    """Export registration attachments in a zip file"""
+    """Export registration attachments in a zip file."""
 
     def _prepare_folder_structure(self, attachment):
         registration = attachment.registration
         regform_title = secure_filename(attachment.registration.registration_form.title, 'registration_form')
         registrant_name = secure_filename("{}_{}".format(registration.get_full_name(),
-                                          unicode(registration.friendly_id)), registration.friendly_id)
+                                          str(registration.friendly_id)), registration.friendly_id)
         file_name = secure_filename("{}_{}_{}".format(attachment.field_data.field.title, attachment.field_data.field_id,
                                                       attachment.filename), attachment.filename)
         return os.path.join(*self._adjust_path_length([regform_title, registrant_name, file_name]))
 
     def _iter_items(self, attachments):
-        for reg_attachments in attachments.itervalues():
-            for reg_attachment in reg_attachments:
-                yield reg_attachment
+        for reg_attachments in attachments.values():
+            yield from reg_attachments
 
     def _process(self):
         attachments = {}

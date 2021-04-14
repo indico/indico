@@ -1,11 +1,9 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
-
-from __future__ import unicode_literals
 
 from uuid import uuid4
 
@@ -16,9 +14,8 @@ from werkzeug.exceptions import ServiceUnavailable
 from indico.core.db import db
 from indico.core.db.sqlalchemy import PyIntEnum, UTCDateTime
 from indico.util.date_time import now_utc
+from indico.util.enum import RichIntEnum
 from indico.util.i18n import _
-from indico.util.string import return_ascii
-from indico.util.struct.enum import RichIntEnum
 
 
 class AgreementState(RichIntEnum):
@@ -33,7 +30,7 @@ class AgreementState(RichIntEnum):
 
 
 class Agreement(db.Model):
-    """Agreements between a person and Indico"""
+    """Agreements between a person and Indico."""
     __tablename__ = 'agreements'
     __table_args__ = (db.UniqueConstraint('event_id', 'type', 'identifier'),
                       {'schema': 'events'})
@@ -173,10 +170,9 @@ class Agreement(db.Model):
 
     @property
     def locator(self):
-        return {'confId': self.event_id,
+        return {'event_id': self.event_id,
                 'id': self.id}
 
-    @return_ascii
     def __repr__(self):
         state = self.state.name if self.state is not None else None
         return '<Agreement({}, {}, {}, {}, {}, {})>'.format(self.id, self.event_id, self.type, self.identifier,

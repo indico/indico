@@ -1,5 +1,5 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
@@ -15,9 +15,7 @@ from indico.modules.events.controllers.base import AccessKeyRequired, RHDisplayE
 
 @pytest.mark.usefixtures('request_context')
 def test_event_public_access(db, create_event):
-    """
-    Ensure if a null user can access a public event
-    """
+    """Ensure if a null user can access a public event."""
     rh = RHProtectedEventBase()
     rh.event = create_event(1, protection_mode=ProtectionMode.public)
     rh._check_access()
@@ -26,15 +24,15 @@ def test_event_public_access(db, create_event):
 @pytest.mark.usefixtures('request_context')
 def test_event_protected_access(db, create_user, create_event):
     """
-    Ensure a null user cannot access a protected event
-    Ensure a user with respective ACL entry can access a protected event
+    Ensure a null user cannot access a protected event. Ensure a user
+    with respective ACL entry can access a protected event.
     """
     rh = RHProtectedEventBase()
     rh.event = create_event(2, protection_mode=ProtectionMode.protected)
     with pytest.raises(Forbidden):
         rh._check_access()
     user = create_user(1)
-    session.user = user
+    session.set_session_user(user)
     with pytest.raises(Forbidden):
         rh._check_access()
     rh.event.update_principal(user, read_access=True)
@@ -44,7 +42,7 @@ def test_event_protected_access(db, create_user, create_event):
 @pytest.mark.usefixtures('request_context')
 def test_event_key_access(create_user, create_event):
     """
-    Ensure the event doesn't reject the user if an access key is required
+    Ensure the event doesn't reject the user if an access key is required.
     """
     rh = RHDisplayEventBase()
     rh.event = create_event(2, protection_mode=ProtectionMode.protected, access_key='abc')
@@ -53,5 +51,5 @@ def test_event_key_access(create_user, create_event):
 
     user = create_user(1)
     rh.event.update_principal(user, read_access=True)
-    session.user = user
+    session.set_session_user(user)
     rh._check_access()

@@ -1,5 +1,5 @@
 // This file is part of Indico.
-// Copyright (C) 2002 - 2020 CERN
+// Copyright (C) 2002 - 2021 CERN
 //
 // Indico is free software; you can redistribute it and/or
 // modify it under the terms of the MIT License; see the
@@ -65,6 +65,18 @@ li > table + .note-area-wrapper {
       color: $black;
     }
 
+    li p {
+      margin-bottom: 0;
+    }
+
+    ul {
+      margin-bottom: 0.8em;
+    }
+
+    img {
+      max-width: 100%;
+    }
+
     > :first-child {
       margin-top: 0;
     }
@@ -102,7 +114,7 @@ li > table + .note-area-wrapper {
     }
 
     &.collapsed {
-      max-height: 4.75em;
+      max-height: 4.3em;
       overflow: hidden;
     }
 
@@ -135,31 +147,23 @@ li > table + .note-area-wrapper {
     @extend %font-family-title;
 
     padding: 0;
-    margin: 0;
+    margin: 0 0 0 -0.2em;
     list-style-type: none;
   }
 }
 
-.event-user {
+.ui.image.label.meeting-participant {
+  @extend %font-family-modern-body;
+  font-weight: normal;
+  font-size: 0.95em;
+
+  display: inline-block;
+  margin-bottom: 4px;
+  margin-left: 0.2em;
+
   &.checked-in {
-    @include border-all($pastel-green);
     background: lighten($pastel-green, 30%);
     color: darken($pastel-green, 20%);
-
-    &::before {
-      color: $pastel-green;
-    }
-  }
-
-  &.no-label {
-    background: none;
-    border: none;
-    color: $dark-gray;
-    padding: 0;
-
-    &::before {
-      color: $gray;
-    }
   }
 }
 

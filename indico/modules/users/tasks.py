@@ -1,5 +1,5 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
@@ -12,8 +12,8 @@ from indico.core.celery import celery
 from indico.modules.users import logger
 from indico.modules.users.models.users import ProfilePictureSource, User
 from indico.modules.users.util import get_gravatar_for_user, set_user_avatar
+from indico.util.iterables import committing_iterator
 from indico.util.string import crc32
-from indico.util.struct.iterables import committing_iterator
 
 
 @celery.periodic_task(name='update_gravatars', run_every=crontab(minute='0', hour='0'))

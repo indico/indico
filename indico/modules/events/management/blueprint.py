@@ -1,11 +1,9 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
-
-from __future__ import unicode_literals
 
 from indico.modules.events import event_management_object_url_prefixes
 from indico.modules.events.management.controllers import actions, cloning, posters, program_codes, protection, settings
@@ -15,7 +13,7 @@ from indico.web.flask.wrappers import IndicoBlueprint
 
 _bp = IndicoBlueprint('event_management', __name__, template_folder='templates',
                       virtual_template_folder='events/management',
-                      url_prefix='/event/<confId>/manage')
+                      url_prefix='/event/<int:event_id>/manage')
 
 # Settings
 _bp.add_url_rule('/', 'settings', settings.RHEventSettings)
@@ -34,7 +32,7 @@ _bp.add_url_rule('/lock', 'lock', actions.RHLockEvent, methods=('GET', 'POST'))
 _bp.add_url_rule('/unlock', 'unlock', actions.RHUnlockEvent, methods=('POST',))
 _bp.add_url_rule('/move', 'move', actions.RHMoveEvent, methods=('POST',))
 # Protection
-_bp.add_url_rule('/api/principals', 'api_principals', protection.RHEventPrincipals, methods=('GET', 'POST'))
+_bp.add_url_rule('/api/principals', 'api_principals', protection.RHEventPrincipals, methods=('POST',))
 _bp.add_url_rule('/api/event-roles', 'api_event_roles', protection.RHEventRolesJSON)
 _bp.add_url_rule('/api/category-roles', 'api_category_roles', protection.RHCategoryRolesJSON)
 _bp.add_url_rule('/protection', 'protection', protection.RHEventProtection, methods=('GET', 'POST'))
@@ -64,14 +62,14 @@ _bp.add_url_rule('/program-codes/assign/subcontributions', 'assign_program_codes
                  program_codes.RHAssignProgramCodesSubContributions, methods=('GET', 'POST'))
 
 
-for object_type, prefixes in event_management_object_url_prefixes.iteritems():
+for object_type, prefixes in event_management_object_url_prefixes.items():
     if object_type == 'subcontribution':
         continue
     for prefix in prefixes:
-        prefix = '!/event/<confId>' + prefix
+        prefix = '!/event/<int:event_id>' + prefix
         _bp.add_url_rule(prefix + '/show-non-inheriting', 'show_non_inheriting', protection.RHShowNonInheriting,
                          defaults={'object_type': object_type})
 
 
-_compat_bp = IndicoBlueprint('compat_event_management', __name__, url_prefix='/event/<confId>/manage')
+_compat_bp = IndicoBlueprint('compat_event_management', __name__, url_prefix='/event/<int:event_id>/manage')
 _compat_bp.add_url_rule('/general/', 'settings', make_compat_redirect_func(_bp, 'settings'))

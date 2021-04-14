@@ -1,11 +1,9 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
-
-from __future__ import unicode_literals
 
 from flask import request, session
 from werkzeug.exceptions import Forbidden, NotFound
@@ -17,7 +15,7 @@ from indico.modules.events.util import check_event_locked
 
 
 class RHPapersBase(RHDisplayEventBase):
-    """Base class for all paper-related RHs"""
+    """Base class for all paper-related RHs."""
 
     EVENT_FEATURE = 'papers'
 
@@ -29,14 +27,14 @@ class RHPapersBase(RHDisplayEventBase):
 
     @property
     def management(self):
-        """Whether the RH is currently used in the management area"""
+        """Whether the RH is currently used in the management area."""
         return request.view_args.get('management', False)
 
 
 class RHManagePapersBase(ManageEventMixin, RHPapersBase):
     """
     Base class for all paper-related RHs that require full event
-    management permissions
+    management permissions.
     """
 
     PERMISSION = 'paper_manager'
@@ -44,12 +42,12 @@ class RHManagePapersBase(ManageEventMixin, RHPapersBase):
 
     @property
     def management(self):
-        """Whether the RH is currently used in the management area"""
+        """Whether the RH is currently used in the management area."""
         return request.view_args.get('management', True)
 
 
 class RHJudgingAreaBase(RHPapersBase):
-    """Base class for all paper-related RHs only available to judges/managers"""
+    """Base class for all paper-related RHs only available to judges/managers."""
 
     def _check_access(self):
         RHPapersBase._check_access(self)

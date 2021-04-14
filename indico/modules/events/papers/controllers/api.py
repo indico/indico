@@ -1,11 +1,9 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
-
-from __future__ import unicode_literals
 
 from flask import request, session
 from marshmallow_enum import EnumField
@@ -109,13 +107,11 @@ class RHSubmitNewRevision(RHPaperBase):
     def _check_paper_protection(self):
         if not RHPaperBase._check_paper_protection(self):
             return False
-        if not self.contribution.can_submit_proceedings(session.user):
+        if not self.contribution.can_submit_proceedings(session.user) and not self.event.cfp.is_manager(session.user):
             return False
         return self.contribution.paper.state == PaperRevisionState.to_be_corrected
 
-    @use_kwargs({
-        'files': fields.List(fields.Field(), location='files', required=True)
-    })
+    @use_kwargs({'files': fields.List(fields.Field(), required=True)}, location='files')
     def _process(self, files):
         create_paper_revision(self.paper, session.user, files)
         return '', 204
@@ -148,12 +144,12 @@ def _parse_review_args(event, review_type):
         elif question.field_type == 'bool':
             field_cls = fields.Bool
         else:
-            raise Exception('Invalid question field type: {}'.format(question.field_type))
-        args_schema['question_{}'.format(question.id)] = field_cls(**attrs)
+            raise Exception(f'Invalid question field type: {question.field_type}')
+        args_schema[f'question_{question.id}'] = field_cls(**attrs)
 
     data = parser.parse(args_schema)
-    questions_data = {k: v for k, v in data.iteritems() if k.startswith('question_')}
-    review_data = {k: v for k, v in data.iteritems() if not k.startswith('question_')}
+    questions_data = {k: v for k, v in data.items() if k.startswith('question_')}
+    review_data = {k: v for k, v in data.items() if not k.startswith('question_')}
     return questions_data, review_data
 
 

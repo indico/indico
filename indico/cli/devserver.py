@@ -1,11 +1,9 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
-
-from __future__ import print_function, unicode_literals
 
 import os
 
@@ -63,11 +61,11 @@ def run_server(info, host, port, url, ssl, ssl_key, ssl_cert, quiet, proxy, enab
 
     if not url:
         proto = 'https' if ssl else 'http'
-        url_host = '[{}]'.format(host) if ':' in host else host
+        url_host = f'[{host}]' if ':' in host else host
         if (port == 80 and not ssl) or (port == 443 and ssl):
-            url = '{}://{}'.format(proto, url_host)
+            url = f'{proto}://{url_host}'
         else:
-            url = '{}://{}:{}'.format(proto, url_host, port)
+            url = f'{proto}://{url_host}:{port}'
 
     os.environ['INDICO_DEV_SERVER'] = '1'
     os.environ.pop('FLASK_DEBUG', None)
@@ -76,9 +74,9 @@ def run_server(info, host, port, url, ssl, ssl_key, ssl_cert, quiet, proxy, enab
     })
 
     if os.environ.get('WERKZEUG_RUN_MAIN') != 'true':
-        print(' * Serving Indico on {}'.format(url))
+        print(f' * Serving Indico on {url}')
         if evalex_whitelist:
-            print(' * Werkzeug debugger console on {}/console'.format(url))
+            print(f' * Werkzeug debugger console on {url}/console')
             if evalex_whitelist is True:  # noqa
                 print(' * Werkzeug debugger console is available to all clients!')
 
@@ -146,7 +144,7 @@ class DebuggedIndico(DebuggedApplication):
     def __init__(self, *args, **kwargs):
         self._evalex_whitelist = None
         self._request_ip = None
-        super(DebuggedIndico, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
     @property
     def evalex(self):
@@ -166,7 +164,7 @@ class DebuggedIndico(DebuggedApplication):
         if self._request_ip.startswith('::ffff:'):
             # convert ipv6-style ipv4 to the regular ipv4 notation
             self._request_ip = self._request_ip[7:]
-        return super(DebuggedIndico, self).__call__(environ, start_response)
+        return super().__call__(environ, start_response)
 
 
 class QuietWSGIRequestHandler(WSGIRequestHandler):
@@ -175,8 +173,8 @@ class QuietWSGIRequestHandler(WSGIRequestHandler):
 
     def log_request(self, code='-', size='-'):
         if code not in (304, 200):
-            super(QuietWSGIRequestHandler, self).log_request(code, size)
+            super().log_request(code, size)
         elif '?__debugger__=yes&cmd=resource' in self.path:
             pass  # don't log debugger resources, they are quite uninteresting
         elif not any(self.path.startswith(self.INDICO_URL_PREFIX + x) for x in self.IGNORED_PATH_PREFIXES):
-            super(QuietWSGIRequestHandler, self).log_request(code, size)
+            super().log_request(code, size)

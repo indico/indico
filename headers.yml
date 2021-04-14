@@ -1,0 +1,11 @@
+root: true
+name: CERN
+start_year: 2002
+header: |-
+  {comment_start} This file is part of Indico.
+  {comment_middle} Copyright (C) {dates} {name}
+  {comment_middle}
+  {comment_middle} Indico is free software; you can redistribute it and/or
+  {comment_middle} modify it under the terms of the MIT License; see the
+  {comment_middle} LICENSE file for more details.
+  {comment_end}

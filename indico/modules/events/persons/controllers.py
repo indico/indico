@@ -1,30 +1,37 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import unicode_literals
-
 import itertools
-from collections import OrderedDict, defaultdict
+from collections import defaultdict
 
-from flask import flash, redirect, request, session
+from flask import flash, jsonify, redirect, request, session
+from marshmallow import fields
+from sqlalchemy import and_, or_
 from sqlalchemy.orm import contains_eager, joinedload
+from webargs import validate
 
 from indico.core.db import db
+from indico.core.db.sqlalchemy.custom.unaccent import unaccent_match
 from indico.core.db.sqlalchemy.principals import PrincipalType
 from indico.core.notifications import make_email, send_email
 from indico.modules.events import EventLogKind, EventLogRealm
+from indico.modules.events.abstracts.models.abstracts import Abstract
+from indico.modules.events.abstracts.models.persons import AbstractPersonLink
 from indico.modules.events.contributions.models.contributions import Contribution
+from indico.modules.events.contributions.models.persons import ContributionPersonLink, SubContributionPersonLink
 from indico.modules.events.contributions.models.principals import ContributionPrincipal
+from indico.modules.events.contributions.models.subcontributions import SubContribution
 from indico.modules.events.management.controllers import RHManageEventBase
 from indico.modules.events.models.persons import EventPerson
 from indico.modules.events.models.principals import EventPrincipal
 from indico.modules.events.models.roles import EventRole
 from indico.modules.events.persons.forms import EmailEventPersonsForm, EventPersonForm
 from indico.modules.events.persons.operations import update_person
+from indico.modules.events.persons.schemas import EventPersonSchema
 from indico.modules.events.persons.views import WPManagePersons
 from indico.modules.events.registration.models.registrations import Registration
 from indico.modules.events.sessions.models.principals import SessionPrincipal
@@ -32,7 +39,9 @@ from indico.modules.events.sessions.models.sessions import Session
 from indico.modules.users import User
 from indico.util.date_time import now_utc
 from indico.util.i18n import _, ngettext
+from indico.util.marshmallow import validate_with_message
 from indico.util.placeholders import replace_placeholders
+from indico.web.args import use_kwargs
 from indico.web.flask.templating import get_template_module
 from indico.web.flask.util import jsonify_data, url_for
 from indico.web.forms.base import FormDefaults
@@ -85,7 +94,7 @@ class RHPersonsBase(RHManageEventBase):
         event_strategy.joinedload('person').joinedload('user')
 
         chairpersons = {link.person for link in self.event.person_links}
-        persons = defaultdict(lambda: {'roles': OrderedDict(),
+        persons = defaultdict(lambda: {'roles': {},
                                        'registrations': [],
                                        'has_event_person': True,
                                        'id_field_name': 'person_id'})
@@ -152,29 +161,35 @@ class RHPersonsBase(RHManageEventBase):
 
             event_user_roles_data = {}
             for role in event_user_roles[event_person.user]:
-                event_user_roles_data['custom_{}'.format(role.id)] = {'name': role.name, 'code': role.code,
-                                                                      'css': role.css}
-            event_user_roles_data = OrderedDict(sorted(event_user_roles_data.items(), key=lambda t: t[1]['code']))
-            data['roles'] = OrderedDict(data['roles'].items() + event_user_roles_data.items())
+                event_user_roles_data[f'custom_{role.id}'] = {'name': role.name, 'code': role.code, 'css': role.css}
+            event_user_roles_data = dict(sorted(event_user_roles_data.items(), key=lambda t: t[1]['code']))
+            data['roles'] = data['roles'] | event_user_roles_data
 
             event_person_users.add(event_person.user)
 
-        internal_role_users = defaultdict(lambda: {'roles': OrderedDict(),
+        internal_role_users = defaultdict(lambda: {'roles': {},
                                                    'person': [],
+                                                   'registrations': [],
                                                    'has_event_person': False,
                                                    'id_field_name': 'user_id'})
-        for user, roles in event_user_roles.viewitems():
+        for user, roles in event_user_roles.items():
             if user in event_person_users:
                 continue
             for role in roles:
                 user_metadata = internal_role_users[user.email]
                 user_metadata['person'] = user
-                user_metadata['roles']['custom_{}'.format(role.id)] = {'name': role.name, 'code': role.code,
-                                                                       'css': role.css}
-            user_metadata['roles'] = OrderedDict(sorted(user_metadata['roles'].items(), key=lambda x: x[1]['code']))
+                user_metadata['roles'][f'custom_{role.id}'] = {'name': role.name, 'code': role.code, 'css': role.css}
+            user_metadata['roles'] = dict(sorted(user_metadata['roles'].items(), key=lambda x: x[1]['code']))
+
+        regs = (Registration.query
+                .with_parent(self.event)
+                .filter(Registration.user_id.in_(data['person'].id for data in internal_role_users.values()))
+                .all())
+        for reg in regs:
+            internal_role_users[reg.user.email]['registrations'].append(reg)
 
         # Some EventPersons will have no roles since they were connected to deleted things
-        persons = {email: data for email, data in persons.viewitems() if any(data['roles'].viewvalues())}
+        persons = {email: data for email, data in persons.items() if any(data['roles'].values())}
         persons = dict(persons, **internal_role_users)
         return persons
 
@@ -185,19 +200,22 @@ class RHPersonsList(RHPersonsBase):
                                  .filter(EventPrincipal.type == PrincipalType.email,
                                          EventPrincipal.has_management_permission('submit')))
 
-        contrib_principal_query = (ContributionPrincipal.find(Contribution.event == self.event,
-                                                              ContributionPrincipal.type == PrincipalType.email,
-                                                              ContributionPrincipal.has_management_permission('submit'))
+        contrib_principal_query = (ContributionPrincipal.query
+                                   .filter(Contribution.event == self.event,
+                                           ContributionPrincipal.type == PrincipalType.email,
+                                           ContributionPrincipal.has_management_permission('submit'))
                                    .join(Contribution)
                                    .options(contains_eager('contribution')))
 
-        session_principal_query = (SessionPrincipal.find(Session.event == self.event,
-                                                         SessionPrincipal.type == PrincipalType.email,
-                                                         SessionPrincipal.has_management_permission())
-                                   .join(Session).options(joinedload('session').joinedload('acl_entries')))
+        session_principal_query = (SessionPrincipal.query
+                                   .filter(Session.event == self.event,
+                                           SessionPrincipal.type == PrincipalType.email,
+                                           SessionPrincipal.has_management_permission())
+                                   .join(Session)
+                                   .options(joinedload('session').joinedload('acl_entries')))
 
         persons = self.get_persons()
-        person_list = sorted(persons.viewvalues(), key=lambda x: x['person'].display_full_name.lower())
+        person_list = sorted(persons.values(), key=lambda x: x['person'].display_full_name.lower())
 
         num_no_account = 0
         for principal in itertools.chain(event_principal_query, contrib_principal_query, session_principal_query):
@@ -206,15 +224,18 @@ class RHPersonsList(RHPersonsBase):
             if not persons[principal.email].get('no_account'):
                 persons[principal.email]['roles']['no_account'] = True
                 num_no_account += 1
-        custom_roles = {'custom_{}'.format(r.id): {'name': r.name, 'code': r.code, 'color': r.color}
+        custom_roles = {f'custom_{r.id}': {'name': r.name, 'code': r.code, 'color': r.color}
                         for r in self.event.roles}
+        for person_data in persons.values():
+            if not person_data['registrations']:
+                person_data['roles']['no_registration'] = True
         return WPManagePersons.render_template('management/person_list.html', self.event, persons=person_list,
                                                num_no_account=num_no_account, builtin_roles=BUILTIN_ROLES,
                                                custom_roles=custom_roles)
 
 
 class RHEmailEventPersons(RHManageEventBase):
-    """Send emails to selected EventPersons"""
+    """Send emails to selected EventPersons."""
 
     def _process_args(self):
         self.no_account = request.args.get('no_account') == '1'
@@ -281,7 +302,7 @@ class RHEmailEventPersons(RHManageEventBase):
 
 
 class RHGrantSubmissionRights(RHManageEventBase):
-    """Grants submission rights to all contribution speakers"""
+    """Grant submission rights to all contribution speakers."""
 
     def _process(self):
         count = 0
@@ -302,7 +323,7 @@ class RHGrantSubmissionRights(RHManageEventBase):
 
 
 class RHGrantModificationRights(RHManageEventBase):
-    """Grants session modification rights to all session conveners"""
+    """Grant session modification rights to all session conveners."""
 
     def _process(self):
         count = 0
@@ -320,7 +341,7 @@ class RHGrantModificationRights(RHManageEventBase):
 
 
 class RHRevokeSubmissionRights(RHManageEventBase):
-    """Revokes submission rights"""
+    """Revoke submission rights."""
 
     def _process(self):
         count = 0
@@ -351,3 +372,53 @@ class RHEditEventPerson(RHPersonsBase):
             tpl = get_template_module('events/persons/management/_person_list_row.html')
             return jsonify_data(html=tpl.render_person_row(person_data, bool(self.event.registration_forms)))
         return jsonify_form(form)
+
+
+class RHEventPersonSearch(RHPersonsBase):
+    def _search_event_persons(self, exact=False, **criteria):
+        criteria = {key: v for key, value in criteria.items() if (v := value.strip())}
+
+        if not criteria:
+            return []
+
+        query = EventPerson.query.distinct(EventPerson.id).filter(EventPerson.event_id == self.event.id)
+
+        query = query.filter(
+            or_(
+                EventPerson.abstract_links.any(AbstractPersonLink.abstract.has(~Abstract.is_deleted)),
+                EventPerson.contribution_links.any(ContributionPersonLink.contribution.has(~Contribution.is_deleted)),
+                EventPerson.event_links.any(),
+                EventPerson.subcontribution_links.any(
+                    SubContributionPersonLink.subcontribution.has(
+                        and_(~SubContribution.is_deleted, SubContribution.contribution.has(~Contribution.is_deleted))
+                    )
+                ),
+                EventPerson.session_block_links.any(),
+            )
+        )
+
+        for k, v in criteria.items():
+            query = query.filter(unaccent_match(getattr(EventPerson, k), v, exact))
+
+        # wrap as subquery so we can apply order regardless of distinct-by-id
+        query = query.from_self()
+        query = query.order_by(
+            db.func.lower(db.func.indico.indico_unaccent(EventPerson.first_name)),
+            db.func.lower(db.func.indico.indico_unaccent(EventPerson.last_name)),
+            EventPerson.id,
+        )
+        return query.limit(10).all(), query.count()
+
+    @use_kwargs({
+        'first_name': fields.Str(validate=validate.Length(min=1)),
+        'last_name': fields.Str(validate=validate.Length(min=1)),
+        'email': fields.Str(validate=lambda s: len(s) > 3),
+        'affiliation': fields.Str(validate=validate.Length(min=1)),
+        'exact': fields.Bool(missing=False),
+    }, validate=validate_with_message(
+        lambda args: args.keys() & {'first_name', 'last_name', 'email', 'affiliation'},
+        'No criteria provided'
+    ), location='query')
+    def _process(self, exact, **criteria):
+        matches, total = self._search_event_persons(exact=exact, **criteria)
+        return jsonify(users=EventPersonSchema().dump(matches, many=True), total=total)

@@ -1,5 +1,5 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
@@ -7,7 +7,6 @@
 
 # flake8: noqa
 
-import string
 from collections import defaultdict
 from datetime import datetime
 
@@ -17,9 +16,7 @@ from indico.legacy.common.xmlGen import XMLGen
 from indico.modules.attachments.models.attachments import Attachment, AttachmentType
 from indico.modules.attachments.models.folders import AttachmentFolder
 from indico.modules.groups import GroupProxy
-from indico.modules.groups.legacy import LDAPGroupWrapper
 from indico.modules.users import User
-from indico.modules.users.legacy import AvatarUserWrapper
 from indico.util.event import uniqueId
 from indico.web.flask.util import url_for
 
@@ -28,7 +25,7 @@ def get_map_url(item):
     return item.room.map_url if item.room else None
 
 
-class outputGenerator(object):
+class outputGenerator:
     def __init__(self, user, XG=None):
         self.__user = user
         if XG is not None:
@@ -46,9 +43,7 @@ class outputGenerator(object):
             return "INDICOSEARCH.PUBLIC"
 
     def _generateACLDatafield(self, eType, memberList, objId, out):
-        """
-        Generates a specific MARCXML 506 field containing the ACL
-        """
+        """Generate a specific MARCXML 506 field containing the ACL."""
         if eType:
             out.openTag("datafield", [["tag", "506"],
                                       ["ind1", "1"], ["ind2", " "]])
@@ -75,25 +70,20 @@ class outputGenerator(object):
         obj could be a Conference, Session, Contribution, Material, Resource
         or SubContribution object.
         """
-
         if acl is None:
             acl = obj.get_access_list()
 
         # Populate two lists holding email/group strings instead of
-        # Avatar/Group objects
+        # User/Group objects
         allowed_logins = set()
         allowed_groups = []
 
         for user_obj in acl:
-            if isinstance(user_obj, (User, AvatarUserWrapper)):
-                if isinstance(user_obj, AvatarUserWrapper):
-                    user_obj = user_obj.user
+            if isinstance(user_obj, User):
                 # user names for all non-local accounts
                 for provider, identifier in user_obj.iter_identifiers():
                     if provider != 'indico':
                         allowed_logins.add(identifier)
-            elif isinstance(user_obj, LDAPGroupWrapper):
-                allowed_groups.append(user_obj.getId())
             elif isinstance(user_obj, GroupProxy) and not user_obj.is_local:
                 allowed_groups.append(user_obj.name)
 
@@ -118,7 +108,7 @@ class outputGenerator(object):
         out.writeXML(xml)
 
     def _generate_category_path(self, event, out):
-        path = [unicode(c.id) for c in event.category.chain_query.options(load_only('id'))]
+        path = [str(c.id) for c in event.category.chain_query.options(load_only('id'))]
         out.openTag("datafield", [["tag", "650"], ["ind1", " "], ["ind2", "7"]])
         out.writeTag("subfield", ":".join(path), [["code", "a"]])
         out.closeTag("datafield")
@@ -146,8 +136,10 @@ class outputGenerator(object):
 
         sd = event.start_dt
         ed = event.end_dt
-        out.writeTag("subfield","%d-%s-%sT%s:%s:00Z" %(sd.year, string.zfill(sd.month,2), string.zfill(sd.day,2), string.zfill(sd.hour,2), string.zfill(sd.minute,2)),[["code","9"]])
-        out.writeTag("subfield","%d-%s-%sT%s:%s:00Z" %(ed.year, string.zfill(ed.month,2), string.zfill(ed.day,2), string.zfill(ed.hour,2), string.zfill(ed.minute,2)),[["code","z"]])
+        out.writeTag("subfield","%04d-%02d-%02dT%02d:%02d:00Z" % (sd.year, sd.month, sd.day, sd.hour, sd.minute),
+                     [["code","9"]])
+        out.writeTag("subfield","%04d-%02d-%02dT%02d:%02d:00Z" % (ed.year, ed.month, ed.day, ed.hour, ed.minute),
+                     [["code","z"]])
 
         out.writeTag("subfield", uniqueId(event), [["code", "g"]])
         out.closeTag("datafield")
@@ -157,7 +149,8 @@ class outputGenerator(object):
         sd = event.start_dt
         if sd is not None:
             out.openTag("datafield",[["tag","518"],["ind1"," "],["ind2"," "]])
-            out.writeTag("subfield","%d-%s-%sT%s:%s:00Z" %(sd.year, string.zfill(sd.month,2), string.zfill(sd.day,2), string.zfill(sd.hour,2), string.zfill(sd.minute,2)),[["code","d"]])
+            out.writeTag("subfield","%04d-%02d-%02dT%02d:%02d:00Z" % (sd.year, sd.month, sd.day, sd.hour, sd.minute),
+                         [["code","d"]])
             out.closeTag("datafield")
 
         out.openTag("datafield",[["tag","520"],["ind1"," "],["ind2"," "]])
@@ -301,11 +294,11 @@ class outputGenerator(object):
             self.noteToXMLMarc21(contrib.note, out=out)
 
         out.openTag("datafield",[["tag","962"],["ind1"," "],["ind2"," "]])
-        out.writeTag("subfield", 'INDICO.{}'.format(uniqueId(contrib.event)), [["code", "b"]])
+        out.writeTag("subfield", f'INDICO.{uniqueId(contrib.event)}', [["code", "b"]])
         out.closeTag("datafield")
 
         out.openTag("datafield",[["tag","970"],["ind1"," "],["ind2"," "]])
-        out.writeTag("subfield", 'INDICO.{}'.format(uniqueId(contrib)), [["code", "a"]])
+        out.writeTag("subfield", f'INDICO.{uniqueId(contrib)}', [["code", "a"]])
         out.closeTag("datafield")
 
         out.openTag("datafield",[["tag","980"],["ind1"," "],["ind2"," "]])
@@ -353,10 +346,10 @@ class outputGenerator(object):
             users[user].append('Author')
         for user in sList:
             users[user].append('Speaker')
-        for user, roles in users.iteritems():
+        for user, roles in users.items():
             tag = '100' if user in contrib.primary_authors else '700'
             out.openTag('datafield', [['tag', tag], ['ind1', ' '], ['ind2', ' ']])
-            out.writeTag('subfield', u'{} {}'.format(user.last_name, user.first_name), [['code', 'a']])
+            out.writeTag('subfield', f'{user.last_name} {user.first_name}', [['code', 'a']])
             for role in roles:
                 out.writeTag('subfield', role, [['code', 'e']])
             out.writeTag('subfield', user.affiliation, [['code', 'u']])
@@ -376,7 +369,7 @@ class outputGenerator(object):
 
         out.writeTag("leader", "00000nmm  2200000uu 4500")
         out.openTag("datafield",[["tag","035"],["ind1"," "],["ind2"," "]])
-        out.writeTag("subfield", 'INDICO.{}'.format(uniqueId(subcontrib)), [["code", "a"]])
+        out.writeTag("subfield", f'INDICO.{uniqueId(subcontrib)}', [["code", "a"]])
         out.closeTag("datafield")
     #
         out.openTag("datafield",[["tag","035"],["ind1"," "],["ind2"," "]])
@@ -423,11 +416,11 @@ class outputGenerator(object):
             self.noteToXMLMarc21(subcontrib.note, out=out)
 
         out.openTag("datafield",[["tag","962"],["ind1"," "],["ind2"," "]])
-        out.writeTag("subfield", 'INDICO.{}'.format(uniqueId(subcontrib.event)), [["code", "b"]])
+        out.writeTag("subfield", f'INDICO.{uniqueId(subcontrib.event)}', [["code", "b"]])
         out.closeTag("datafield")
 
         out.openTag("datafield",[["tag","970"],["ind1"," "],["ind2"," "]])
-        confcont = 'INDICO.{}'.format(uniqueId(subcontrib))
+        confcont = f'INDICO.{uniqueId(subcontrib)}'
         out.writeTag("subfield",confcont,[["code","a"]])
         out.closeTag("datafield")
 
@@ -443,9 +436,13 @@ class outputGenerator(object):
     def materialToXMLMarc21(self, obj, out=None):
         if not out:
             out = self._XMLGen
-        for attachment in (Attachment.find(~AttachmentFolder.is_deleted, AttachmentFolder.object == obj,
-                                           is_deleted=False, _join=AttachmentFolder)
-                                     .options(joinedload(Attachment.legacy_mapping))):
+        query = (Attachment.query
+                 .filter(~AttachmentFolder.is_deleted,
+                         AttachmentFolder.object == obj,
+                         ~Attachment.is_deleted)
+                 .join(AttachmentFolder)
+                 .options(joinedload(Attachment.legacy_mapping)))
+        for attachment in query:
             if attachment.can_access(self.__user):
                 self.resourceToXMLMarc21(attachment, out)
                 self._generateAccessList(acl=self._attachment_access_list(attachment), out=out,
@@ -461,11 +458,11 @@ class outputGenerator(object):
 
     def _attachment_unique_id(self, attachment, add_prefix=True):
         if attachment.legacy_mapping:
-            unique_id = 'm{}.{}'.format(attachment.legacy_mapping.material_id, attachment.legacy_mapping.resource_id)
+            unique_id = f'm{attachment.legacy_mapping.material_id}.{attachment.legacy_mapping.resource_id}'
         else:
-            unique_id = 'a{}'.format(attachment.id)
-        unique_id = '{}{}'.format(uniqueId(attachment.folder.object), unique_id)
-        return 'INDICO.{}'.format(unique_id) if add_prefix else unique_id
+            unique_id = f'a{attachment.id}'
+        unique_id = f'{uniqueId(attachment.folder.object)}{unique_id}'
+        return f'INDICO.{unique_id}' if add_prefix else unique_id
 
     def _attachment_access_list(self, attachment):
         linked_object = attachment.folder.object
@@ -511,7 +508,7 @@ class outputGenerator(object):
             out = self._XMLGen
         out.openTag('datafield', [['tag', '856'], ['ind1', '4'], ['ind2', ' ']])
         out.writeTag('subfield', url_for('event_notes.view', note, _external=True), [['code', 'u']])
-        out.writeTag('subfield', u'{} - Minutes'.format(note.object.title), [['code', 'y']])
-        out.writeTag('subfield', 'INDICO.{}'.format(uniqueId(note)), [['code', '3']])
+        out.writeTag('subfield', f'{note.object.title} - Minutes', [['code', 'y']])
+        out.writeTag('subfield', f'INDICO.{uniqueId(note)}', [['code', '3']])
         out.writeTag('subfield', 'resource', [['code', 'x']])
         out.closeTag('datafield')

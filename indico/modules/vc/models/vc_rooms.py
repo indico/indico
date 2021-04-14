@@ -1,11 +1,9 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
-
-from __future__ import unicode_literals
 
 from functools import partial
 from itertools import chain
@@ -21,8 +19,7 @@ from indico.core.logger import Logger
 from indico.modules.vc.notifications import notify_deleted
 from indico.util.caching import memoize_request
 from indico.util.date_time import now_utc
-from indico.util.string import return_ascii
-from indico.util.struct.enum import IndicoEnum
+from indico.util.enum import IndicoEnum
 
 
 class VCRoomLinkType(int, IndicoEnum):
@@ -39,14 +36,14 @@ _columns_for_types = {
 
 
 def _make_checks():
-    available_columns = set(chain.from_iterable(cols for type_, cols in _columns_for_types.iteritems()))
+    available_columns = set(chain.from_iterable(cols for type_, cols in _columns_for_types.items()))
     for link_type in VCRoomLinkType:
         required_cols = available_columns & _columns_for_types[link_type]
         forbidden_cols = available_columns - required_cols
-        criteria = ['{} IS NULL'.format(col) for col in sorted(forbidden_cols)]
-        criteria += ['{} IS NOT NULL'.format(col) for col in sorted(required_cols)]
+        criteria = [f'{col} IS NULL' for col in sorted(forbidden_cols)]
+        criteria += [f'{col} IS NOT NULL' for col in sorted(required_cols)]
         condition = 'link_type != {} OR ({})'.format(link_type, ' AND '.join(criteria))
-        yield db.CheckConstraint(condition, 'valid_{}_link'.format(link_type.name))
+        yield db.CheckConstraint(condition, f'valid_{link_type.name}_link')
 
 
 class VCRoomStatus(int, IndicoEnum):
@@ -125,9 +122,8 @@ class VCRoom(db.Model):
     def locator(self):
         return {'vc_room_id': self.id, 'service': self.type}
 
-    @return_ascii
     def __repr__(self):
-        return '<VCRoom({}, {}, {})>'.format(self.id, self.name, self.type)
+        return f'<VCRoom({self.id}, {self.name}, {self.type})>'
 
 
 class VCRoomEventAssociation(db.Model):
@@ -256,11 +252,11 @@ class VCRoomEventAssociation(db.Model):
                 assert event is not None
                 target.event = event
 
-        for rel, fn in event_mapping.iteritems():
+        for rel, fn in event_mapping.items():
             if rel is not None:
                 listen(rel, 'set', partial(_set_event_obj, fn))
 
-        for rel, link_type in type_mapping.iteritems():
+        for rel, link_type in type_mapping.items():
             if rel is not None:
                 listen(rel, 'set', partial(_set_link_type, link_type))
 
@@ -287,23 +283,22 @@ class VCRoomEventAssociation(db.Model):
         elif isinstance(obj, db.m.SessionBlock):
             self.linked_block = obj
         else:
-            raise TypeError('Unexpected object: {}'.format(obj))
+            raise TypeError(f'Unexpected object: {obj}')
 
     @link_object.comparator
     def link_object(cls):
         return _LinkObjectComparator(cls)
 
-    @return_ascii
     def __repr__(self):
-        return '<VCRoomEventAssociation({}, {})>'.format(self.event_id, self.vc_room)
+        return f'<VCRoomEventAssociation({self.event_id}, {self.vc_room})>'
 
     @classmethod
     def find_for_event(cls, event, include_hidden=False, include_deleted=False, only_linked_to_event=False, **kwargs):
-        """Returns a Query that retrieves the videoconference rooms for an event
+        """Return a Query that retrieves the videoconference rooms for an event.
 
         :param event: an indico Event
         :param only_linked_to_event: only retrieve the vc rooms linked to the whole event
-        :param kwargs: extra kwargs to pass to ``find()``
+        :param kwargs: extra kwargs to pass to ``filter_by()``
         """
         if only_linked_to_event:
             kwargs['link_type'] = int(VCRoomLinkType.event)
@@ -319,11 +314,11 @@ class VCRoomEventAssociation(db.Model):
     @classmethod
     @memoize_request
     def get_linked_for_event(cls, event):
-        """Get a dict mapping link objects to event vc rooms"""
+        """Get a dict mapping link objects to event vc rooms."""
         return {vcr.link_object: vcr for vcr in cls.find_for_event(event)}
 
     def delete(self, user, delete_all=False):
-        """Deletes a VC room from an event
+        """Delete a VC room from an event.
 
         If the room is not used anywhere else, the room itself is also deleted.
 
@@ -344,8 +339,8 @@ class VCRoomEventAssociation(db.Model):
             )
             vc_room.events.remove(self)
         db.session.flush()
-        if not vc_room.events:
-            Logger.get('modules.vc').info("Deleting VC room {}".format(vc_room))
+        if vc_room.plugin and not vc_room.events:
+            Logger.get('modules.vc').info(f"Deleting VC room {vc_room}")
             if vc_room.status != VCRoomStatus.deleted:
                 vc_room.plugin.delete_room(vc_room, self.event)
                 notify_deleted(vc_room.plugin, vc_room, self, self.event, user)
@@ -374,4 +369,4 @@ class _LinkObjectComparator(Comparator):
             return db.and_(self.cls.link_type == VCRoomLinkType.contribution,
                            self.cls.contribution_id == other.id)
         else:
-            raise TypeError('Unexpected object type {}: {}'.format(type(other), other))
+            raise TypeError(f'Unexpected object type {type(other)}: {other}')

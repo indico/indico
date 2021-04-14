@@ -1,5 +1,5 @@
 // This file is part of Indico.
-// Copyright (C) 2002 - 2020 CERN
+// Copyright (C) 2002 - 2021 CERN
 //
 // Indico is free software; you can redistribute it and/or
 // modify it under the terms of the MIT License; see the
@@ -18,7 +18,7 @@ type(
       info.set('sessionTimetable', self.isSessionTimetable);
 
       var urlArgs = {
-        confId: eventData.conferenceId,
+        event_id: eventData.conferenceId,
         entry_id: eventData.scheduleEntryId,
       };
       if (self.timetable.isSessionTimetable) {
@@ -50,7 +50,7 @@ type(
     editEntryStartEndDate: function(startDate, endDate, eventData, shift, undo) {
       var self = this;
       var urlArgs = {
-        confId: eventData.conferenceId,
+        event_id: eventData.conferenceId,
         entry_id: eventData.scheduleEntryId,
       };
 
@@ -91,7 +91,7 @@ type(
       }
 
       var urlArgs = {
-        confId: eventData.conferenceId,
+        event_id: eventData.conferenceId,
         entry_id: eventData.scheduleEntryId,
       };
       if (self.isSessionTimetable) {
@@ -210,7 +210,7 @@ type(
       var self = this;
       var params = self._addParams();
       var urlArgs = {
-        confId: self.eventInfo.id,
+        event_id: self.eventInfo.id,
         day: params.selectedDay,
       };
       if (self.session !== null) {
@@ -237,7 +237,7 @@ type(
       var params = this._addParams('Session');
       ajaxDialog({
         trigger: this,
-        url: build_url(Indico.Urls.Timetable.sessions.add, {confId: params.conference}),
+        url: build_url(Indico.Urls.Timetable.sessions.add, {event_id: params.conference}),
         title: $T.gettext('Add session'),
         onClose: function(data) {
           if (data) {
@@ -256,7 +256,7 @@ type(
       var self = this;
       var params = this._addToSessionParams(session, 'SessionSlot');
       var urlArgs = {
-        confId: params.conference,
+        event_id: params.conference,
         day: params.selectedDay,
         parent_session_id: params.session,
       };
@@ -305,7 +305,7 @@ type(
       }
 
       var urlArgs = {
-        confId: eventData.conferenceId,
+        event_id: eventData.conferenceId,
         entry_id: eventData.scheduleEntryId,
       };
 

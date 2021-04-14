@@ -1,11 +1,9 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
-
-from __future__ import unicode_literals
 
 from indico.modules.events.surveys.controllers.display import RHSaveSurveyAnswers, RHSubmitSurvey, RHSurveyList
 from indico.modules.events.surveys.controllers.management.questionnaire import (RHAddSurveyQuestion, RHAddSurveySection,
@@ -29,7 +27,7 @@ from indico.web.flask.wrappers import IndicoBlueprint
 
 
 _bp = IndicoBlueprint('surveys', __name__, template_folder='templates', virtual_template_folder='events/surveys',
-                      url_prefix='/event/<confId>', event_feature='surveys')
+                      url_prefix='/event/<int:event_id>', event_feature='surveys')
 
 # survey display/submission
 _bp.add_url_rule('/surveys/', 'display_survey_list', RHSurveyList)

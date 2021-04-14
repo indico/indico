@@ -1,5 +1,5 @@
 // This file is part of Indico.
-// Copyright (C) 2002 - 2020 CERN
+// Copyright (C) 2002 - 2021 CERN
 //
 // Indico is free software; you can redistribute it and/or
 // modify it under the terms of the MIT License; see the
@@ -9,15 +9,17 @@ import enabledEditableTypesURL from 'indico-url:event_editing.api_enabled_editab
 import manageEditableTypeURL from 'indico-url:event_editing.manage_editable_type';
 import manageEditableTypeListURL from 'indico-url:event_editing.manage_editable_type_list';
 
-import React, {useState} from 'react';
 import PropTypes from 'prop-types';
-import {Button, Checkbox, Form, Loader, Popup} from 'semantic-ui-react';
-import {Link} from 'react-router-dom';
+import React, {useState} from 'react';
 import {Form as FinalForm} from 'react-final-form';
-import {Translate} from 'indico/react/i18n';
-import {useIndicoAxios} from 'indico/react/hooks';
+import {Link} from 'react-router-dom';
+import {Button, Checkbox, Form, Loader, Popup} from 'semantic-ui-react';
+
 import {FinalCheckbox, FinalSubmitButton, handleSubmitError} from 'indico/react/forms';
+import {useIndicoAxios} from 'indico/react/hooks';
+import {Translate} from 'indico/react/i18n';
 import {indicoAxios} from 'indico/utils/axios';
+
 import {editableTypeOrder, EditableTypeTitles} from '../models';
 
 import './EditableTypeList.module.scss';
@@ -29,7 +31,7 @@ export default function EditableTypeList({eventId}) {
     loading: isLoadingEnabledEditableTypes,
     reFetch,
   } = useIndicoAxios({
-    url: enabledEditableTypesURL({confId: eventId}),
+    url: enabledEditableTypesURL({event_id: eventId}),
     camelize: true,
     trigger: eventId,
   });
@@ -41,7 +43,7 @@ export default function EditableTypeList({eventId}) {
   }
 
   const handleSubmit = async formData => {
-    const url = enabledEditableTypesURL({confId: eventId});
+    const url = enabledEditableTypesURL({event_id: eventId});
     const enabledTypes = Object.keys(formData).filter(name => formData[name]);
     try {
       await indicoAxios.post(url, {editable_types: enabledTypes});
@@ -108,13 +110,13 @@ export default function EditableTypeList({eventId}) {
             <div className="toolbar">
               <Link
                 className="i-button icon-list"
-                to={manageEditableTypeListURL({confId: eventId, type})}
+                to={manageEditableTypeListURL({event_id: eventId, type})}
               >
                 <Translate>List</Translate>
               </Link>
               <Link
                 className="i-button icon-settings"
-                to={manageEditableTypeURL({confId: eventId, type})}
+                to={manageEditableTypeURL({event_id: eventId, type})}
               >
                 <Translate>Manage</Translate>
               </Link>

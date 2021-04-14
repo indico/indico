@@ -1,11 +1,9 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
-
-from __future__ import unicode_literals
 
 from flask import session
 
@@ -17,7 +15,7 @@ from indico.modules.attachments.models.folders import AttachmentFolder
 
 
 def add_attachment_link(data, linked_object):
-    """Add a link attachment to linked_object"""
+    """Add a link attachment to linked_object."""
     folder = data.pop('folder', None)
     if not folder:
         folder = AttachmentFolder.get_or_create_default(linked_object=linked_object)

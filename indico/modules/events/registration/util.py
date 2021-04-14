@@ -1,21 +1,18 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import unicode_literals
-
 import csv
 import itertools
-from collections import OrderedDict
 from operator import attrgetter
 
 from flask import current_app, json, session
 from qrcode import QRCode, constants
 from sqlalchemy import and_, or_
-from sqlalchemy.orm import joinedload, load_only, undefer
+from sqlalchemy.orm import contains_eager, joinedload, load_only, undefer
 from werkzeug.urls import url_parse
 from wtforms import BooleanField, ValidationError
 
@@ -44,14 +41,14 @@ from indico.modules.events.registration.notifications import (notify_registratio
 from indico.modules.users.util import get_user_by_email
 from indico.util.date_time import format_date
 from indico.util.i18n import _
-from indico.util.spreadsheets import unique_col
-from indico.util.string import to_unicode, validate_email, validate_email_verbose
+from indico.util.spreadsheets import csv_text_io_wrapper, unique_col
+from indico.util.string import validate_email, validate_email_verbose
 from indico.web.forms.base import IndicoForm
 from indico.web.forms.widgets import SwitchWidget
 
 
 def get_title_uuid(regform, title):
-    """Convert a string title to its UUID value
+    """Convert a string title to its UUID value.
 
     If the title does not exist in the title PD field, it will be
     ignored and returned as ``None``.
@@ -65,7 +62,7 @@ def get_title_uuid(regform, title):
     if title_field is None:  # should never happen
         return None
     valid_choices = {x['id'] for x in title_field.current_data.versioned_data['choices']}
-    uuid = next((k for k, v in title_field.data['captions'].iteritems() if v == title), None)
+    uuid = next((k for k, v in title_field.data['captions'].items() if v == title), None)
     return {uuid: 1} if uuid in valid_choices else None
 
 
@@ -95,7 +92,7 @@ def get_event_section_data(regform, management=False, registration=None):
 
 
 def check_registration_email(regform, email, registration=None, management=False):
-    """Checks whether an email address is suitable for registration.
+    """Check whether an email address is suitable for registration.
 
     :param regform: The registration form
     :param email: The email address
@@ -144,7 +141,7 @@ def check_registration_email(regform, email, registration=None, management=False
 
 
 def make_registration_form(regform, management=False, registration=None):
-    """Creates a WTForm based on registration form fields"""
+    """Create a WTForm based on registration form fields."""
 
     class RegistrationFormWTF(IndicoForm):
         if management:
@@ -161,13 +158,15 @@ def make_registration_form(regform, management=False, registration=None):
 
         field_impl = form_item.field_impl
         setattr(RegistrationFormWTF, form_item.html_field_name, field_impl.create_wtf_field())
+    signals.event.registration_form_wtform_created.send(regform, registration=registration, management=management,
+                                                        wtform_cls=RegistrationFormWTF)
 
     RegistrationFormWTF.modified_registration = registration
     return RegistrationFormWTF
 
 
 def create_personal_data_fields(regform):
-    """Creates the special section/fields for personal data."""
+    """Create the special section/fields for personal data."""
     section = next((s for s in regform.sections if s.type == RegistrationFormItemType.section_pd), None)
     if section is None:
         section = RegistrationFormPersonalDataSection(registration_form=regform, title='Personal Data')
@@ -182,7 +181,7 @@ def create_personal_data_fields(regform):
                                                   is_required=pd_type.is_required)
         if not data.get('is_enabled', True):
             field.position = data['position']
-        for key, value in data.iteritems():
+        for key, value in data.items():
             setattr(field, key, value)
         field.data, versioned_data = field.field_impl.process_field_data(data.pop('data', {}))
         field.current_data = RegistrationFormFieldData(versioned_data=versioned_data)
@@ -190,8 +189,9 @@ def create_personal_data_fields(regform):
 
 
 def url_rule_to_angular(endpoint):
-    """Converts a flask-style rule to angular style"""
+    """Convert a flask-style rule to angular style."""
     mapping = {
+        'event_id': 'eventId',
         'reg_form_id': 'confFormId',
         'section_id': 'sectionId',
         'field_id': 'fieldId',
@@ -220,14 +220,14 @@ def create_registration(regform, data, invitation=None, management=False, notify
             value = data.get(form_item.html_field_name)
         data_entry = RegistrationData()
         registration.data.append(data_entry)
-        for attr, value in form_item.field_impl.process_form_data(registration, value).iteritems():
+        for attr, value in form_item.field_impl.process_form_data(registration, value).items():
             setattr(data_entry, attr, value)
         if form_item.type == RegistrationFormItemType.field_pd and form_item.personal_data_type.column:
             setattr(registration, form_item.personal_data_type.column, value)
     if invitation is None:
         # Associate invitation based on email in case the user did not use the link
-        invitation = (RegistrationInvitation
-                      .find(email=data['email'], registration_id=None)
+        invitation = (RegistrationInvitation.query
+                      .filter_by(email=data['email'], registration_id=None)
                       .with_parent(regform)
                       .first())
     if invitation:
@@ -235,12 +235,12 @@ def create_registration(regform, data, invitation=None, management=False, notify
         invitation.registration = registration
     registration.sync_state(_skip_moderation=skip_moderation)
     db.session.flush()
-    signals.event.registration_created.send(registration, management=management)
+    signals.event.registration_created.send(registration, management=management, data=data)
     notify_registration_creation(registration, notify_user)
     logger.info('New registration %s by %s', registration, user)
     registration.log(EventLogRealm.management if management else EventLogRealm.participants,
                      EventLogKind.positive, 'Registration',
-                     'New registration: {}'.format(registration.full_name), user, data={'Email': registration.email})
+                     f'New registration: {registration.full_name}', user, data={'Email': registration.email})
     return registration
 
 
@@ -271,7 +271,7 @@ def modify_registration(registration, data, management=False, notify_user=True):
 
         attrs = field_impl.process_form_data(registration, value, data_by_field[form_item.id],
                                              billable_items_locked=billable_items_locked)
-        for key, val in attrs.iteritems():
+        for key, val in attrs.items():
             setattr(data_by_field[form_item.id], key, val)
         if form_item.type == RegistrationFormItemType.field_pd and form_item.personal_data_type.column:
             key = form_item.personal_data_type.column
@@ -286,46 +286,46 @@ def modify_registration(registration, data, management=False, notify_user=True):
                         old_price, registration.price)
     if personal_data_changes:
         signals.event.registration_personal_data_modified.send(registration, change=personal_data_changes)
-    signals.event.registration_updated.send(registration, management=management)
+    signals.event.registration_updated.send(registration, management=management, data=data)
     notify_registration_modification(registration, notify_user)
     logger.info('Registration %s modified by %s', registration, session.user)
     registration.log(EventLogRealm.management if management else EventLogRealm.participants,
                      EventLogKind.change, 'Registration',
-                     'Registration modified: {}'.format(registration.full_name),
+                     f'Registration modified: {registration.full_name}',
                      session.user, data={'Email': registration.email})
 
 
 def generate_spreadsheet_from_registrations(registrations, regform_items, static_items):
-    """Generates a spreadsheet data from a given registration list.
+    """Generate a spreadsheet data from a given registration list.
 
     :param registrations: The list of registrations to include in the file
     :param regform_items: The registration form items to be used as columns
     :param static_items: Registration form information as extra columns
     """
     field_names = ['ID', 'Name']
-    special_item_mapping = OrderedDict([
-        ('reg_date', ('Registration date', lambda x: x.submitted_dt)),
-        ('state', ('Registration state', lambda x: x.state.title)),
-        ('price', ('Price', lambda x: x.render_price())),
-        ('checked_in', ('Checked in', lambda x: x.checked_in)),
-        ('checked_in_date', ('Check-in date', lambda x: x.checked_in_dt if x.checked_in else '')),
-        ('payment_date', ('Payment date', lambda x: (x.transaction.timestamp
-                                                     if (x.transaction is not None and
-                                                         x.transaction.status == TransactionStatus.successful)
-                                                     else '')))
-    ])
+    special_item_mapping = {
+        'reg_date': ('Registration date', lambda x: x.submitted_dt),
+        'state': ('Registration state', lambda x: x.state.title),
+        'price': ('Price', lambda x: x.render_price()),
+        'checked_in': ('Checked in', lambda x: x.checked_in),
+        'checked_in_date': ('Check-in date', lambda x: x.checked_in_dt if x.checked_in else ''),
+        'payment_date': ('Payment date', lambda x: (x.transaction.timestamp
+                                                    if (x.transaction is not None and
+                                                        x.transaction.status == TransactionStatus.successful)
+                                                    else '')),
+    }
     for item in regform_items:
         field_names.append(unique_col(item.title, item.id))
         if item.input_type == 'accommodation':
             field_names.append(unique_col('{} ({})'.format(item.title, 'Arrival'), item.id))
             field_names.append(unique_col('{} ({})'.format(item.title, 'Departure'), item.id))
-    field_names.extend(title for name, (title, fn) in special_item_mapping.iteritems() if name in static_items)
+    field_names.extend(title for name, (title, fn) in special_item_mapping.items() if name in static_items)
     rows = []
     for registration in registrations:
         data = registration.data_by_field
         registration_dict = {
             'ID': registration.friendly_id,
-            'Name': "{} {}".format(registration.first_name, registration.last_name)
+            'Name': f"{registration.first_name} {registration.last_name}"
         }
         for item in regform_items:
             key = unique_col(item.title, item.id)
@@ -339,7 +339,7 @@ def generate_spreadsheet_from_registrations(registrations, regform_items, static
                 registration_dict[key] = format_date(departure_date) if departure_date else ''
             else:
                 registration_dict[key] = data[item.id].friendly_data if item.id in data else ''
-        for name, (title, fn) in special_item_mapping.iteritems():
+        for name, (title, fn) in special_item_mapping.items():
             if name not in static_items:
                 continue
             value = fn(registration)
@@ -366,13 +366,13 @@ def get_published_registrations(event):
     :param event: the `Event` to get registrations for
     :return: list of `Registration` objects
     """
-    return (Registration
-            .find(Registration.is_publishable,
-                  ~RegistrationForm.is_deleted,
-                  RegistrationForm.event_id == event.id,
-                  RegistrationForm.publish_registrations_enabled,
-                  _join=Registration.registration_form,
-                  _eager=Registration.registration_form)
+    return (Registration.query
+            .filter(Registration.is_publishable,
+                    ~RegistrationForm.is_deleted,
+                    RegistrationForm.event_id == event.id,
+                    RegistrationForm.publish_registrations_enabled)
+            .join(Registration.registration_form)
+            .options(contains_eager(Registration.registration_form))
             .order_by(db.func.lower(Registration.first_name),
                       db.func.lower(Registration.last_name),
                       Registration.friendly_id)
@@ -380,7 +380,7 @@ def get_published_registrations(event):
 
 
 def get_events_registered(user, dt=None):
-    """Gets the IDs of events where the user is registered.
+    """Get the IDs of events where the user is registered.
 
     :param user: A `User`
     :param dt: Only include events taking place on/after that date
@@ -414,7 +414,7 @@ def _build_base_registration_info(registration):
         'registrant_id': str(registration.id),
         'checked_in': registration.checked_in,
         'checkin_secret': registration.ticket_uuid,
-        'full_name': '{} {}'.format(personal_data.get('title', ''), registration.full_name),
+        'full_name': '{} {}'.format(personal_data.get('title', ''), registration.full_name).strip(),
         'personal_data': personal_data
     }
 
@@ -453,7 +453,7 @@ def generate_ticket_qr_code(registration):
     qr_data = {
         "registrant_id": registration.id,
         "checkin_secret": registration.ticket_uuid,
-        "event_id": unicode(registration.event.id),
+        "event_id": str(registration.event.id),
         "server_url": config.BASE_URL,
         "version": 1
     }
@@ -522,10 +522,11 @@ def generate_ticket(registration):
     from indico.modules.events.registration.controllers.management.tickets import DEFAULT_TICKET_PRINTING_SETTINGS
     template = (registration.registration_form.ticket_template or
                 get_default_ticket_on_category(registration.event.category))
+    registrations = [registration]
     signals.event.designer.print_badge_template.send(template, regform=registration.registration_form,
-                                                     registrations=[registration])
+                                                     registrations=registrations)
     pdf_class = RegistrantsListToBadgesPDFFoldable if template.backside_template else RegistrantsListToBadgesPDF
-    pdf = pdf_class(template, DEFAULT_TICKET_PRINTING_SETTINGS, registration.event, [registration.id])
+    pdf = pdf_class(template, DEFAULT_TICKET_PRINTING_SETTINGS, registration.event, registrations)
     return pdf.get_pdf()
 
 
@@ -534,7 +535,7 @@ def get_ticket_attachments(registration):
 
 
 def update_regform_item_positions(regform):
-    """Update positions when deleting/disabling an item in order to prevent gaps"""
+    """Update positions when deleting/disabling an item in order to prevent gaps."""
     section_positions = itertools.count(1)
     disabled_section_positions = itertools.count(1000)
     for section in sorted(regform.sections, key=attrgetter('position')):
@@ -550,14 +551,20 @@ def update_regform_item_positions(regform):
 
 def import_registrations_from_csv(regform, fileobj, skip_moderation=True, notify_users=False):
     """Import event registrants from a CSV file into a form."""
-    reader = csv.reader(fileobj.read().splitlines())
-    query = db.session.query(Registration.email).with_parent(regform).filter(Registration.is_active)
-    registered_emails = {email for (email,) in query}
+    with csv_text_io_wrapper(fileobj) as ftxt:
+        reader = csv.reader(ftxt.read().splitlines())
+    reg_data = (db.session.query(Registration.user_id, Registration.email)
+                .with_parent(regform)
+                .filter(Registration.is_active)
+                .all())
+    registered_user_ids = {rd.user_id for rd in reg_data if rd.user_id is not None}
+    registered_emails = {rd.email for rd in reg_data}
     used_emails = set()
+    email_row_map = {}
     todo = []
     for row_num, row in enumerate(reader, 1):
         try:
-            first_name, last_name, affiliation, position, phone, email = [to_unicode(value).strip() for value in row]
+            first_name, last_name, affiliation, position, phone, email = [value.strip() for value in row]
             email = email.lower()
         except ValueError:
             raise UserValueError(_('Row {}: malformed CSV data - please check that the number of columns is correct')
@@ -571,10 +578,20 @@ def import_registrations_from_csv(regform, fileobj, skip_moderation=True, notify
             raise UserValueError(_('Row {}: missing first or last name').format(row_num))
         if email in registered_emails:
             raise UserValueError(_('Row {}: a registration with this email already exists').format(row_num))
+
+        user = get_user_by_email(email)
+        if user and user.id in registered_user_ids:
+            raise UserValueError(_('Row {}: a registration for this user already exists').format(row_num))
         if email in used_emails:
             raise UserValueError(_('Row {}: email address is not unique').format(row_num))
+        if conflict_row_num := email_row_map.get(email):
+            raise UserValueError(_('Row {}: email address belongs to the same user as in row {}')
+                                 .format(row_num, conflict_row_num))
 
         used_emails.add(email)
+        if user:
+            email_row_map.update((e, row_num) for e in user.all_emails)
+
         todo.append({
             'email': email,
             'first_name': first_name.title(),
@@ -597,10 +614,10 @@ def get_registered_event_persons(event):
 
 
 def serialize_registration_form(regform):
-    """Serialize registration form to JSON-like object"""
+    """Serialize registration form to JSON-like object."""
     return {
         'id': regform.id,
         'name': regform.title,
-        'identifier': 'RegistrationForm:{}'.format(regform.id),
+        'identifier': f'RegistrationForm:{regform.id}',
         '_type': 'RegistrationForm'
     }

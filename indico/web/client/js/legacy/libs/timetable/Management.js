@@ -1,5 +1,5 @@
 // This file is part of Indico.
-// Copyright (C) 2002 - 2020 CERN
+// Copyright (C) 2002 - 2021 CERN
 //
 // Indico is free software; you can redistribute it and/or
 // modify it under the terms of the MIT License; see the
@@ -157,7 +157,7 @@ type(
     _preload: [
       function(hook) {
         var self = this;
-        var args = {confId: self.args.get('conference')};
+        var args = {event_id: self.args.get('conference')};
         if (self.timetable.contextInfo.sessionSlotId) {
           args.session_block_id = self.timetable.contextInfo.sessionSlotId;
         }
@@ -193,7 +193,7 @@ type(
 
     addExisting: function(contributionIds, date) {
       var self = this;
-      var urlArgs = {confId: self.args.get('conference')};
+      var urlArgs = {event_id: self.args.get('conference')};
       if (self.args.get('slot')) {
         urlArgs.block_id = self.args.get('slot');
       }
@@ -320,7 +320,7 @@ type(
     draw: function() {
       var self = this;
       var urlArgs = {
-        confId: self.args.get('conference'),
+        event_id: self.args.get('conference'),
         day: self.args.get('selectedDay'),
       };
       if (self.args.get('slot')) {
@@ -696,7 +696,7 @@ type(
           if (!confirm) {
             return;
           }
-          var urlArgs = {confId: self.tt.eventInfo.id};
+          var urlArgs = {event_id: self.tt.eventInfo.id};
           var data = {
             mode: self.rescheduleAction,
             gap: +self.minuteInput.get(),
@@ -864,7 +864,7 @@ type(
         return;
       }
       var urlArgs = {
-        confId: self.tt.contextInfo.conferenceId,
+        event_id: self.tt.contextInfo.conferenceId,
         block_id: self.tt.contextInfo.sessionSlotId,
       };
       if (self.tt.isSessionTimetable) {

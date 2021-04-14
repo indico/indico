@@ -1,11 +1,9 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
-
-from __future__ import unicode_literals
 
 from flask import redirect, request
 
@@ -17,8 +15,7 @@ from indico.modules.categories.controllers.display import (RHCategoryCalendarVie
                                                            RHCategoryUpcomingEvent, RHDisplayCategory, RHEventList,
                                                            RHExportCategoryAtom, RHExportCategoryICAL,
                                                            RHReachableCategoriesInfo, RHShowFutureEventsInCategory,
-                                                           RHShowPastEventsInCategory, RHSubcatInfo,
-                                                           RHXMLExportCategoryInfo)
+                                                           RHShowPastEventsInCategory, RHSubcatInfo)
 from indico.modules.categories.controllers.management import (RHAddCategoryRole, RHAddCategoryRoleMembers,
                                                               RHCategoryRoleMembersImportCSV, RHCategoryRoles,
                                                               RHCreateCategory, RHDeleteCategory, RHDeleteCategoryRole,
@@ -34,7 +31,7 @@ from indico.web.flask.wrappers import IndicoBlueprint
 
 
 def _redirect_event_creation(category_id, event_type):
-    anchor = 'create-event:{}:{}'.format(event_type, category_id)
+    anchor = f'create-event:{event_type}:{category_id}'
     return redirect(url_for('.display', category_id=category_id, _anchor=anchor))
 
 
@@ -94,9 +91,6 @@ _bp.add_url_rule('/upcoming', 'upcoming_event', RHCategoryUpcomingEvent)
 
 # Event creation - redirect to anchor page opening the dialog
 _bp.add_url_rule('/create/event/<any(lecture,meeting,conference):event_type>', view_func=_redirect_event_creation)
-
-# TODO: remember to refactor it at some point
-_bp.add_url_rule('!/xmlGateway.py/getCategoryInfo', 'category_xml_info', RHXMLExportCategoryInfo)
 
 # Short URLs
 _bp.add_url_rule('!/categ/<int:category_id>', view_func=redirect_view('.display'), strict_slashes=False)

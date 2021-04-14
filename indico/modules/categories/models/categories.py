@@ -1,11 +1,9 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
-
-from __future__ import unicode_literals
 
 import pytz
 from sqlalchemy import DDL, orm
@@ -27,16 +25,16 @@ from indico.core.db.sqlalchemy.searchable_titles import SearchableTitleMixin
 from indico.core.db.sqlalchemy.util.models import auto_table_args
 from indico.util.date_time import get_display_tz
 from indico.util.decorators import strict_classproperty
+from indico.util.enum import RichIntEnum
 from indico.util.i18n import _
 from indico.util.locators import locator_property
-from indico.util.string import MarkdownText, format_repr, return_ascii, text_to_repr
-from indico.util.struct.enum import RichIntEnum
+from indico.util.string import MarkdownText, format_repr, text_to_repr
 from indico.web.flask.util import url_for
 
 
 def _get_next_position(context):
     parent_id = context.current_parameters['parent_id']
-    res = db.session.query(db.func.max(Category.position)).filter_by(parent_id=parent_id).one()
+    res = db.session.query(db.func.max(Category.position)).filter(Category.parent_id == parent_id).one()
     return (res[0] or 0) + 1
 
 
@@ -57,7 +55,7 @@ class EventMessageMode(RichIntEnum):
 
 
 class Category(SearchableTitleMixin, DescriptionMixin, ProtectionManagersMixin, AttachedItemsMixin, db.Model):
-    """An Indico category"""
+    """An Indico category."""
 
     __tablename__ = 'categories'
     disallowed_protection_modes = frozenset()
@@ -74,7 +72,7 @@ class Category(SearchableTitleMixin, DescriptionMixin, ProtectionManagersMixin, 
                 db.CheckConstraint("(logo IS NULL) = (logo_metadata::text = 'null')", 'valid_logo'),
                 db.CheckConstraint("(parent_id IS NULL) = (id = 0)", 'valid_parent'),
                 db.CheckConstraint("(id != 0) OR NOT is_deleted", 'root_not_deleted'),
-                db.CheckConstraint("(id != 0) OR (protection_mode != {})".format(ProtectionMode.inheriting),
+                db.CheckConstraint(f"(id != 0) OR (protection_mode != {ProtectionMode.inheriting})",
                                    'root_not_inheriting'),
                 db.CheckConstraint('visibility IS NULL OR visibility > 0', 'valid_visibility'),
                 {'schema': 'categories'})
@@ -234,7 +232,6 @@ class Category(SearchableTitleMixin, DescriptionMixin, ProtectionManagersMixin, 
     def event_message(cls):
         return cls._event_message
 
-    @return_ascii
     def __repr__(self):
         return format_repr(self, 'id', is_deleted=False, _text=text_to_repr(self.title, max_length=75))
 
@@ -248,16 +245,12 @@ class Category(SearchableTitleMixin, DescriptionMixin, ProtectionManagersMixin, 
 
     @classmethod
     def get_root(cls):
-        """Get the root category"""
+        """Get the root category."""
         return cls.query.filter(cls.is_root).one()
 
     @property
     def url(self):
         return url_for('categories.display', self)
-
-    @property
-    def has_only_events(self):
-        return self.has_events and not self.children
 
     @hybrid_property
     def is_root(self):
@@ -289,7 +282,7 @@ class Category(SearchableTitleMixin, DescriptionMixin, ProtectionManagersMixin, 
 
     @property
     def display_tzinfo(self):
-        """The tzinfo of the category or the one specified by the user"""
+        """The tzinfo of the category or the one specified by the user."""
         return get_display_tz(self, as_timezone=True)
 
     def can_create_events(self, user):
@@ -459,7 +452,10 @@ class Category(SearchableTitleMixin, DescriptionMixin, ProtectionManagersMixin, 
 
     @property
     def own_visibility_horizon(self):
-        """Get the highest category this one would like to be visible from (configured visibility)."""
+        """
+        Get the highest category this one would like to be visible
+        from (configured visibility).
+        """
         if self.visibility is None:
             return Category.get_root()
         else:
@@ -467,7 +463,10 @@ class Category(SearchableTitleMixin, DescriptionMixin, ProtectionManagersMixin, 
 
     @property
     def real_visibility_horizon(self):
-        """Get the highest category this one is actually visible from (as limited by categories above)."""
+        """
+        Get the highest category this one is actually visible
+        from (as limited by categories above).
+        """
         horizon_id, final_visibility = self.visibility_horizon_query.one()
         if final_visibility is not None and final_visibility < 0:
             return None  # Category is invisible
@@ -540,7 +539,7 @@ def _mappers_configured():
     # (public/protected) of the category, even if it's inheriting it from its
     # parent category
     cte = Category.get_protection_cte()
-    query = select([cte.c.protection_mode]).where(cte.c.id == Category.id).correlate_except(cte)
+    query = select([cte.c.protection_mode]).where(cte.c.id == Category.id).correlate_except(cte).scalar_subquery()
     Category.effective_protection_mode = column_property(query, deferred=True, expire_on_flush=False)
 
     # Category.effective_icon_data -- the effective icon data of the category,
@@ -549,14 +548,16 @@ def _mappers_configured():
     query = (select([db.func.json_build_object('source_id', cte.c.source_id,
                                                'metadata', cte.c.icon_metadata)])
              .where(cte.c.id == Category.id)
-             .correlate_except(cte))
+             .correlate_except(cte)
+             .scalar_subquery())
     Category.effective_icon_data = column_property(query, deferred=True)
 
     # Category.event_count -- the number of events in the category itself,
     # excluding deleted events
     query = (select([db.func.count(Event.id)])
              .where((Event.category_id == Category.id) & ~Event.is_deleted)
-             .correlate_except(Event))
+             .correlate_except(Event)
+             .scalar_subquery())
     Category.event_count = column_property(query, deferred=True)
 
     # Category.has_events -- whether the category itself contains any
@@ -569,14 +570,14 @@ def _mappers_configured():
     # Category.chain_titles -- a list of the titles in the parent chain,
     # starting with the root category down to the current category.
     cte = Category.get_tree_cte('title')
-    query = select([cte.c.path]).where(cte.c.id == Category.id).correlate_except(cte)
+    query = select([cte.c.path]).where(cte.c.id == Category.id).correlate_except(cte).scalar_subquery()
     Category.chain_titles = column_property(query, deferred=True)
 
     # Category.chain -- a list of the ids and titles in the parent
     # chain, starting with the root category down to the current
     # category.  Each chain entry is a dict containing 'id' and `title`.
     cte = Category.get_tree_cte(lambda cat: db.func.json_build_object('id', cat.id, 'title', cat.title))
-    query = select([cte.c.path]).where(cte.c.id == Category.id).correlate_except(cte)
+    query = select([cte.c.path]).where(cte.c.id == Category.id).correlate_except(cte).scalar_subquery()
     Category.chain = column_property(query, deferred=True)
 
     # Category.deep_events_count -- the number of events in the category
@@ -586,7 +587,7 @@ def _mappers_configured():
                    cte.c.path.contains(array([Category.id])),
                    ~cte.c.is_deleted,
                    ~Event.is_deleted)
-    query = select([db.func.count()]).where(crit).correlate_except(Event)
+    query = select([db.func.count()]).where(crit).correlate_except(Event).scalar_subquery()
     Category.deep_events_count = column_property(query, deferred=True)
 
     # Category.deep_children_count -- the number of subcategories in the
@@ -594,7 +595,7 @@ def _mappers_configured():
     cte = Category.get_tree_cte()
     crit = db.and_(cte.c.path.contains(array([Category.id])),
                    cte.c.id != Category.id, ~cte.c.is_deleted)
-    query = select([db.func.count()]).where(crit).correlate_except(cte)
+    query = select([db.func.count()]).where(crit).correlate_except(cte).scalar_subquery()
     Category.deep_children_count = column_property(query, deferred=True)
 
 

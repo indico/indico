@@ -1,11 +1,9 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
-
-from __future__ import unicode_literals
 
 from itertools import chain
 from operator import attrgetter
@@ -16,10 +14,10 @@ from indico.core.db.sqlalchemy.descriptions import RenderMode, RenderModeMixin
 from indico.modules.events.models.reviews import ProposalRevisionMixin
 from indico.modules.events.papers.models.reviews import PaperJudgmentProxy, PaperReviewType
 from indico.util.date_time import now_utc
+from indico.util.enum import RichIntEnum
 from indico.util.i18n import _
 from indico.util.locators import locator_property
-from indico.util.string import format_repr, return_ascii
-from indico.util.struct.enum import RichIntEnum
+from indico.util.string import format_repr
 
 
 class PaperRevisionState(RichIntEnum):
@@ -34,7 +32,7 @@ class PaperRevisionState(RichIntEnum):
 class PaperRevision(ProposalRevisionMixin, RenderModeMixin, db.Model):
     __tablename__ = 'revisions'
     __table_args__ = (db.Index(None, 'contribution_id', unique=True,
-                               postgresql_where=db.text('state = {}'.format(PaperRevisionState.accepted))),
+                               postgresql_where=db.text(f'state = {PaperRevisionState.accepted}')),
                       db.UniqueConstraint('contribution_id', 'submitted_dt'),
                       db.CheckConstraint('(state IN ({}, {}, {})) = (judge_id IS NOT NULL)'
                                          .format(PaperRevisionState.accepted, PaperRevisionState.rejected,
@@ -133,9 +131,8 @@ class PaperRevision(ProposalRevisionMixin, RenderModeMixin, db.Model):
         paper = kwargs.pop('paper', None)
         if paper:
             kwargs.setdefault('_contribution', paper.contribution)
-        super(PaperRevision, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
-    @return_ascii
     def __repr__(self):
         return format_repr(self, 'id', '_contribution_id', state=None)
 
@@ -200,7 +197,7 @@ class PaperRevision(ProposalRevisionMixin, RenderModeMixin, db.Model):
     def has_user_reviewed(self, user, review_type=None):
         from indico.modules.events.papers.models.reviews import PaperReviewType
         if review_type:
-            if isinstance(review_type, basestring):
+            if isinstance(review_type, str):
                 review_type = PaperReviewType[review_type]
             return any(review.user == user and review.type == review_type for review in self.reviews)
         else:

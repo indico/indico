@@ -1,5 +1,5 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
@@ -29,7 +29,7 @@ def test_is_active_at(create_blocking, check_date, expected):
     check_date = datetime.strptime(check_date, '%Y-%m-%d').date()
     blocking = create_blocking(start_date=start_date, end_date=end_date)
     assert blocking.is_active_at(check_date) == expected
-    assert Blocking.find_first(Blocking.is_active_at(check_date)) == (blocking if expected else None)
+    assert Blocking.query.filter(Blocking.is_active_at(check_date)).first() == (blocking if expected else None)
 
 
 def test_created_by_user(dummy_blocking, dummy_user, create_user):

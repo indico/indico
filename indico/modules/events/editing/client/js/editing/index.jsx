@@ -1,5 +1,5 @@
 // This file is part of Indico.
-// Copyright (C) 2002 - 2020 CERN
+// Copyright (C) 2002 - 2021 CERN
 //
 // Indico is free software; you can redistribute it and/or
 // modify it under the terms of the MIT License; see the
@@ -11,11 +11,13 @@ import editableTypeListURL from 'indico-url:event_editing.editable_type_list';
 import React from 'react';
 import ReactDOM from 'react-dom';
 import {BrowserRouter as Router, Route, Switch} from 'react-router-dom';
+
 import {routerPathFromFlask} from 'indico/react/util/routing';
+
+import {EditableList} from '../management/editable_type';
 
 import EditingView from './page_layout';
 import ReduxTimeline from './ReduxTimeline';
-import {EditableList} from '../management/editable_type';
 
 document.addEventListener('DOMContentLoaded', async () => {
   const editingElement = document.querySelector('#editing-view');
@@ -35,18 +37,18 @@ document.addEventListener('DOMContentLoaded', async () => {
     <Router>
       <Route
         path={[
-          routerPathFromFlask(timelineURL, ['confId', 'contrib_id', 'type']),
-          routerPathFromFlask(editableTypeListURL, ['confId', 'type']),
+          routerPathFromFlask(timelineURL, ['event_id', 'contrib_id', 'type']),
+          routerPathFromFlask(editableTypeListURL, ['event_id', 'type']),
         ]}
       >
         <EditingView eventTitle={eventTitle}>
           <Switch>
             <Route
               exact
-              path={routerPathFromFlask(timelineURL, ['confId', 'contrib_id', 'type'])}
+              path={routerPathFromFlask(timelineURL, ['event_id', 'contrib_id', 'type'])}
               component={ReduxTimeline}
             />
-            <Route exact path={routerPathFromFlask(editableTypeListURL, ['confId', 'type'])}>
+            <Route exact path={routerPathFromFlask(editableTypeListURL, ['event_id', 'type'])}>
               <EditableList management={false} />
             </Route>
           </Switch>

@@ -1,11 +1,9 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
-
-from __future__ import unicode_literals
 
 from flask import flash, request, session
 from werkzeug.exceptions import Forbidden
@@ -29,12 +27,12 @@ class RHFeaturesBase(RHManageEventBase):
 
 
 class RHFeatures(RHFeaturesBase):
-    """Shows the list of available event features"""
+    """Show the list of available event features."""
 
     def _make_form(self):
-        form_class = type(b'FeaturesForm', (IndicoForm,), {})
+        form_class = type('FeaturesForm', (IndicoForm,), {})
         disallowed = get_disallowed_features(self.event)
-        for name, feature in sorted(get_feature_definitions().iteritems(), key=lambda x: x[1].friendly_name):
+        for name, feature in sorted(get_feature_definitions().items(), key=lambda x: x[1].friendly_name):
             if name in disallowed:
                 continue
             field = BooleanField(feature.friendly_name, widget=SwitchWidget(), description=feature.description)
@@ -49,7 +47,7 @@ class RHFeatures(RHFeaturesBase):
 
 
 class RHSwitchFeature(RHFeaturesBase):
-    """Enables/disables a feature"""
+    """Enable/disable a feature."""
 
     def render_event_menu(self):
         return render_sidemenu('event-management-sidemenu', active_item=WPFeatures.sidemenu_option,
@@ -68,7 +66,7 @@ class RHSwitchFeature(RHFeaturesBase):
                   .format(features=format_feature_names(changed)), 'success')
             logger.info("Feature '%s' for event %s enabled by %s", feature.name, self.event, session.user)
             self.event.log(EventLogRealm.management, EventLogKind.positive, 'Features',
-                           'Enabled {}'.format(feature.friendly_name), session.user)
+                           f'Enabled {feature.friendly_name}', session.user)
         return jsonify_data(enabled=True, event_menu=self.render_event_menu(), changed=list(changed))
 
     def _process_DELETE(self):
@@ -82,5 +80,5 @@ class RHSwitchFeature(RHFeaturesBase):
                   .format(features=format_feature_names(changed)), 'warning')
             logger.info("Feature '%s' for event %s disabled by %s", feature.name, self.event, session.user)
             self.event.log(EventLogRealm.management, EventLogKind.negative, 'Features',
-                           'Disabled {}'.format(feature.friendly_name), session.user)
+                           f'Disabled {feature.friendly_name}', session.user)
         return jsonify_data(enabled=False, event_menu=self.render_event_menu(), changed=list(changed))

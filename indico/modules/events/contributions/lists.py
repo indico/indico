@@ -1,13 +1,10 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import unicode_literals
-
-from collections import OrderedDict
 from datetime import timedelta
 from operator import attrgetter
 
@@ -33,30 +30,27 @@ class ContributionListGenerator(ListGeneratorBase):
     check_access = False
 
     def __init__(self, event):
-        super(ContributionListGenerator, self).__init__(event)
+        super().__init__(event)
         self.default_list_config = {'filters': {'items': {}}}
 
         session_empty = {None: _('No session')}
         track_empty = {None: _('No track')}
         type_empty = {None: _('No type')}
-        session_choices = OrderedDict((unicode(s.id), s.title) for s in sorted(self.event.sessions,
-                                                                               key=attrgetter('title')))
-        track_choices = OrderedDict((unicode(t.id), t.title) for t in sorted(self.event.tracks,
-                                                                             key=attrgetter('title')))
-        type_choices = OrderedDict((unicode(t.id), t.name) for t in sorted(self.event.contribution_types,
-                                                                           key=attrgetter('name')))
-        self.static_items = OrderedDict([
-            ('session', {'title': _('Session'),
-                         'filter_choices': OrderedDict(session_empty.items() + session_choices.items())}),
-            ('track', {'title': _('Track'),
-                       'filter_choices': OrderedDict(track_empty.items() + track_choices.items())}),
-            ('type', {'title': _('Type'),
-                      'filter_choices': OrderedDict(type_empty.items() + type_choices.items())}),
-            ('status', {'title': _('Status'), 'filter_choices': {'scheduled': _('Scheduled'),
-                                                                 'unscheduled': _('Not scheduled')}}),
-            ('speakers', {'title': _('Speakers'), 'filter_choices': {'registered': _('Registered'),
-                                                                     'not_registered': _('Not registered')}})
-        ])
+        session_choices = {str(s.id): s.title for s in sorted(self.event.sessions, key=attrgetter('title'))}
+        track_choices = {str(t.id): t.title for t in sorted(self.event.tracks, key=attrgetter('title'))}
+        type_choices = {str(t.id): t.name for t in sorted(self.event.contribution_types, key=attrgetter('name'))}
+        self.static_items = {
+            'session': {'title': _('Session'),
+                        'filter_choices': session_empty | session_choices},
+            'track': {'title': _('Track'),
+                      'filter_choices': track_empty | track_choices},
+            'type': {'title': _('Type'),
+                     'filter_choices': type_empty | type_choices},
+            'status': {'title': _('Status'), 'filter_choices': {'scheduled': _('Scheduled'),
+                                                                'unscheduled': _('Not scheduled')}},
+            'speakers': {'title': _('Speakers'), 'filter_choices': {'registered': _('Registered'),
+                                                                    'not_registered': _('Not registered')}},
+        }
 
         self.list_config = self._get_config()
 
@@ -90,6 +84,7 @@ class ContributionListGenerator(ListGeneratorBase):
             registration_join_criteria = db.and_(
                 Registration.event_id == Contribution.event_id,
                 Registration.is_active,
+                ContributionPersonLink.is_speaker,
                 (Registration.user_id == EventPerson.user_id) | (Registration.email == EventPerson.email)
             )
             contrib_query = (db.session.query(Contribution.id)
@@ -111,7 +106,7 @@ class ContributionListGenerator(ListGeneratorBase):
         filter_cols = {'session': Contribution.session_id,
                        'track': Contribution.track_id,
                        'type': Contribution.type_id}
-        for key, column in filter_cols.iteritems():
+        for key, column in filter_cols.items():
             ids = set(filters['items'].get(key, ()))
             if not ids:
                 continue

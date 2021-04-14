@@ -1,12 +1,13 @@
 // This file is part of Indico.
-// Copyright (C) 2002 - 2020 CERN
+// Copyright (C) 2002 - 2021 CERN
 //
 // Indico is free software; you can redistribute it and/or
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-import React, {useCallback, useEffect, useMemo, useState} from 'react';
 import PropTypes from 'prop-types';
+import React, {useCallback, useEffect, useMemo, useState} from 'react';
+
 import {PrincipalListField} from 'indico/react/components/principals';
 import {useFavoriteUsers} from 'indico/react/hooks';
 

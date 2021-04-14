@@ -1,5 +1,5 @@
 // This file is part of Indico.
-// Copyright (C) 2002 - 2020 CERN
+// Copyright (C) 2002 - 2021 CERN
 //
 // Indico is free software; you can redistribute it and/or
 // modify it under the terms of the MIT License; see the
@@ -7,8 +7,9 @@
 
 import debounce from 'lodash/debounce';
 import {connect} from 'react-redux';
-import SearchBox from '../components/SearchBox';
+
 import {setKeyword, fetchLogEntries, setPage} from '../actions';
+import SearchBox from '../components/SearchBox';
 
 const mapDispatchToProps = dispatch => ({
   setKeyword: debounce(keyword => {

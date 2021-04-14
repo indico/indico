@@ -1,13 +1,13 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import unicode_literals
+import re
 
-from flask import flash, redirect, render_template, request, session
+from flask import flash, redirect, request, session
 from werkzeug.exceptions import BadRequest, NotFound
 
 from indico.core import signals
@@ -20,7 +20,6 @@ from indico.modules.events.models.events import Event
 from indico.modules.events.models.legacy_mapping import LegacyEventMapping
 from indico.util.i18n import _, ngettext, orig_string
 from indico.util.string import is_legacy_id
-from indico.web.flask.templating import template_hook
 from indico.web.flask.util import url_for
 from indico.web.menu import SideMenuItem, TopMenuItem, TopMenuSection
 
@@ -29,7 +28,7 @@ __all__ = ('Event', 'logger', 'event_management_object_url_prefixes', 'event_obj
 logger = Logger.get('events')
 
 #: URL prefixes for the various event objects (public area)
-#: All prefixes are expected to be used inside the '/event/<confId>'
+#: All prefixes are expected to be used inside the '/event/<int:event_id>'
 #: url space.
 event_object_url_prefixes = {
     'event': [''],
@@ -39,7 +38,7 @@ event_object_url_prefixes = {
 }
 
 #: URL prefixes for the various event objects (management area)
-#: All prefixes are expected to be used inside the '/event/<confId>'
+#: All prefixes are expected to be used inside the '/event/<int:event_id>'
 #: url space.
 event_management_object_url_prefixes = {
     'event': ['/manage'],
@@ -87,7 +86,7 @@ def _log_acl_changes(sender, obj, principal, entry, is_new, old_data, quiet, **k
 
     def _format_permissions(permissions):
         permissions = set(permissions)
-        return ', '.join(sorted(orig_string(p.friendly_name) for p in available_permissions.itervalues()
+        return ', '.join(sorted(orig_string(p.friendly_name) for p in available_permissions.values()
                                 if p.name in permissions))
 
     data = {}
@@ -98,7 +97,7 @@ def _log_acl_changes(sender, obj, principal, entry, is_new, old_data, quiet, **k
     elif principal.principal_type == PrincipalType.local_group:
         data['Group'] = principal.name
     elif principal.principal_type == PrincipalType.multipass_group:
-        data['Group'] = '{} ({})'.format(principal.name, principal.provider_title)
+        data['Group'] = f'{principal.name} ({principal.provider_title})'
     elif principal.principal_type == PrincipalType.network:
         data['IP Network'] = principal.name
     elif principal.principal_type == PrincipalType.registration_form:
@@ -134,7 +133,7 @@ def _log_acl_changes(sender, obj, principal, entry, is_new, old_data, quiet, **k
 @signals.app_created.connect
 def _handle_legacy_ids(app, **kwargs):
     """
-    Handles the redirect from broken legacy event ids such as a12345
+    Handle the redirect from broken legacy event ids such as a12345
     or 0123 which cannot be converted to an integer without an error
     or losing relevant information (0123 and 123 may be different
     events).
@@ -142,32 +141,31 @@ def _handle_legacy_ids(app, **kwargs):
 
     # Endpoints which need to deal with non-standard event "ids" because they might be shorturls.
     # Those endpoints handle legacy event ids on their own so we ignore them here.
-    _non_standard_id_endpoints = {'events.shorturl', 'events.display', 'events.display_overview'}
+    _non_standard_id_endpoints = {'events.shorturl', 'events.display', 'events.display_overview', 'events.create'}
+
+    # Match event ids which are either not purely numeric or have a leading zero without being exactly `0`
+    _legacy_event_id_re = re.compile(r'/event/((?=0[^/]|\d*[^\d/])[^/]*)')
 
     @app.before_request
     def _redirect_legacy_id():
-        if not request.view_args or request.endpoint in _non_standard_id_endpoints:
+        if request.endpoint in _non_standard_id_endpoints:
             return
 
-        key = event_id = None
-        if 'confId' in request.view_args:
-            key = 'confId'
-            event_id = request.view_args['confId']
-        elif 'event_id' in request.view_args:
-            key = 'event_id'
-            event_id = request.view_args['event_id']
-
-        if event_id is None or not is_legacy_id(event_id):
+        if not (match := _legacy_event_id_re.match(request.path)):
             return
+
+        event_id = match.group(1)
+        assert is_legacy_id(event_id)
+
         if request.method != 'GET':
             raise BadRequest('Unexpected non-GET request with legacy event ID')
 
-        mapping = LegacyEventMapping.find_first(legacy_event_id=event_id)
+        mapping = LegacyEventMapping.query.filter_by(legacy_event_id=event_id).first()
         if mapping is None:
-            raise NotFound('Legacy event {} does not exist'.format(event_id))
+            raise NotFound(f'Legacy event {event_id} does not exist')
 
-        request.view_args[key] = unicode(mapping.event_id)
-        return redirect(url_for(request.endpoint, **dict(request.args.to_dict(), **request.view_args)), 301)
+        new_url = _legacy_event_id_re.sub(f'/event/{mapping.event_id}', request.url, count=1)
+        return redirect(new_url, 302 if app.debug else 301)
 
 
 @signals.app_created.connect
@@ -244,11 +242,3 @@ def _event_cloned(old_event, new_event, **kwargs):
     new_event.contact_title = old_event.contact_title
     new_event.contact_emails = old_event.contact_emails
     new_event.contact_phones = old_event.contact_phones
-
-
-@template_hook('event-ical-export')
-def _render_event_ical_export(event, **kwargs):
-    from indico.modules.events.util import get_base_ical_parameters
-    return render_template('events/display/event_ical_export.html', item=event,
-                           ics_url=url_for('events.export_event_ical', event),
-                           **get_base_ical_parameters(session.user, 'events', '/export/event/{0}.ics'.format(event.id)))

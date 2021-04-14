@@ -1,7 +1,7 @@
 {% from 'forms/_form.html' import form_header, form_footer, form_fieldset, form_rows %}
 {% from 'message_box.html' import message_box %}
 {% set editable = not reminder or not reminder.is_sent %}
-{% set disabled_fields = () if editable else form._fields.viewkeys() %}
+{% set disabled_fields = () if editable else form._fields.keys() %}
 
 <div class="reminders">
     {% if reminder and reminder.is_overdue %}
@@ -43,6 +43,7 @@
                         return {
                             include_summary: $('#include_summary').prop('checked') ? '1' : '0',
                             include_description: $('#include_description').prop('checked') ? '1' : '0',
+                            attach_ical: $('#attach_ical').prop('checked') ? '1' : '0',
                             message: $('#message').val()
                         };
                     }

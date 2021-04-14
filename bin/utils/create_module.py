@@ -1,11 +1,9 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
-
-from __future__ import unicode_literals
 
 import os
 import re
@@ -14,7 +12,6 @@ from collections import defaultdict
 from datetime import date
 
 import click
-click.disable_unicode_literals_warning = True
 
 
 def _validate_indico_dir(ctx, param, value):
@@ -63,20 +60,18 @@ def touch(path):
 
 def write(f, text=''):
     if text:
-        f.write(text.encode('ascii'))
-    f.write(b'\n')
+        f.write(text)
+    f.write('\n')
 
 
 def write_header(f):
-    f.write(textwrap.dedent(b"""
+    f.write(textwrap.dedent("""
         # This file is part of Indico.
         # Copyright (C) 2002 - {year} CERN
         #
         # Indico is free software; you can redistribute it and/or
         # modify it under the terms of the MIT License; see the
         # LICENSE file for more details.
-
-        from __future__ import unicode_literals
 
     """).lstrip().format(year=date.today().year))
 
@@ -86,8 +81,8 @@ def write_model(f, class_name, event):
     table_name = _snakify(class_name) + 's'
     if event and table_name.startswith('event_'):
         table_name = table_name[6:]
-    f.write(b'\n\n')
-    f.write(textwrap.dedent(b"""
+    f.write('\n\n')
+    f.write(textwrap.dedent("""
         class {cls}(db.Model):
             __tablename__ = '{table}'
             __table_args__ = {{'schema': '{schema}'}}
@@ -98,7 +93,6 @@ def write_model(f, class_name, event):
                 primary_key=True
             )
 
-            @return_ascii
             def __repr__(self):
                 return format_repr(self, 'id')
     """).lstrip().format(cls=class_name, table=table_name, schema=schema))
@@ -128,18 +122,18 @@ def main(indico_dir, name, module_dir, event, models, blueprint, templates, cont
         if not os.path.exists(models_dir):
             os.mkdir(models_dir)
             touch(os.path.join(models_dir, '__init__.py'))
-        for module_name, class_names in model_classes.iteritems():
-            model_path = os.path.join(models_dir, '{}.py'.format(module_name))
+        for module_name, class_names in model_classes.items():
+            model_path = os.path.join(models_dir, f'{module_name}.py')
             if os.path.exists(model_path):
-                raise click.exceptions.UsageError('Cannot create model in {} (file already exists)'.format(module_name))
+                raise click.exceptions.UsageError(f'Cannot create model in {module_name} (file already exists)')
             with open(model_path, 'w') as f:
                 write_header(f)
                 write(f, 'from indico.core.db import db')
-                write(f, 'from indico.util.string import format_repr, return_ascii')
+                write(f, 'from indico.util.string import format_repr')
                 for class_name in class_names:
                     write_model(f, class_name, event)
     if blueprint:
-        blueprint_name = 'event_{}'.format(name) if event else name
+        blueprint_name = f'event_{name}' if event else name
         blueprint_path = os.path.join(module_dir, 'blueprint.py')
         if os.path.exists(blueprint_path):
             raise click.exceptions.UsageError('Cannot create blueprint (file already exists)')
@@ -148,11 +142,11 @@ def main(indico_dir, name, module_dir, event, models, blueprint, templates, cont
             write(f, 'from indico.web.flask.wrappers import IndicoBlueprint')
             write(f)
             if templates:
-                virtual_template_folder = 'events/{}'.format(name) if event else name
+                virtual_template_folder = f'events/{name}' if event else name
                 write(f, "_bp = IndicoBlueprint('{}', __name__, template_folder='templates',\n\
                       virtual_template_folder='{}')".format(blueprint_name, virtual_template_folder))
             else:
-                write(f, "_bp = IndicoBlueprint('{}', __name__)".format(blueprint_name))
+                write(f, f"_bp = IndicoBlueprint('{blueprint_name}', __name__)")
             write(f)
     if templates:
         templates_dir = os.path.join(module_dir, 'templates')

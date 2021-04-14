@@ -1,11 +1,9 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
-
-from __future__ import unicode_literals
 
 from wtforms.fields import BooleanField, SelectField, TextAreaField
 from wtforms.validators import DataRequired, ValidationError
@@ -44,14 +42,15 @@ class ReminderForm(IndicoForm):
                                    description=_("Includes a simple text version of the event's agenda in the email."))
     include_description = BooleanField(_('Include description'),
                                        description=_("Includes the event's description in the email."))
+    attach_ical = BooleanField(_('Attach iCalendar file'),
+                               description=_('Attach an iCalendar file to the event reminder.'))
 
     def __init__(self, *args, **kwargs):
         self.event = kwargs.pop('event')
         self.timezone = self.event.timezone
-        super(ReminderForm, self).__init__(*args, **kwargs)
-        self.reply_to_address.choices = (self.event
-                                         .get_allowed_sender_emails(extra=self.reply_to_address.object_data)
-                                         .items())
+        super().__init__(*args, **kwargs)
+        self.reply_to_address.choices = (list(self.event
+                                         .get_allowed_sender_emails(extra=self.reply_to_address.object_data).items()))
         if self.event.type_ == EventType.lecture:
             del self.include_summary
 

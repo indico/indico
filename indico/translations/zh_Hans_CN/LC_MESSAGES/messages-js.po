@@ -3,14 +3,14 @@
 # This file is distributed under the same license as the indico project.
 # 
 # Translators:
-# Lanxin Ma <ma@ihep.ac.cn>, 2019-2020
+# Lanxin Ma <ma@ihep.ac.cn>, 2019-2021
 # 中天 梁 <liangzt@ihep.ac.cn>, 2020
 msgid ""
 msgstr ""
 "Project-Id-Version: Indico\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2020-09-09 09:51+0200\n"
-"PO-Revision-Date: 2020-09-14 02:45+0000\n"
+"POT-Creation-Date: 2020-12-15 14:00+0100\n"
+"PO-Revision-Date: 2021-01-15 07:43+0000\n"
 "Last-Translator: Lanxin Ma <ma@ihep.ac.cn>\n"
 "Language-Team: Chinese (China) (GB2312) (http://www.transifex.com/indico/indico/language/zh_CN.GB2312/)\n"
 "MIME-Version: 1.0\n"
@@ -20,26 +20,30 @@ msgstr ""
 "Language: zh_CN.GB2312\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 
-#: indico/modules/attachments/client/js/index.js:154
+#: indico/modules/attachments/client/js/legacy.js:154
 msgid "This file no longer exists. Please reload the page."
 msgstr "这个文件不再存在，请重新加载这个页面。"
 
-#: indico/modules/attachments/client/js/index.js:160
+#: indico/modules/attachments/client/js/legacy.js:160
 msgid "You are not authorized to access this file."
 msgstr "您无权访问此文件。"
 
-#: indico/modules/attachments/client/js/index.js:160
-#: indico/modules/attachments/client/js/index.js:163
+#: indico/modules/attachments/client/js/legacy.js:160
+#: indico/modules/attachments/client/js/legacy.js:163
 msgid "Access Denied"
 msgstr "拒绝访问"
 
-#: indico/modules/attachments/client/js/index.js:162
+#: indico/modules/attachments/client/js/legacy.js:162
 msgid "This file is protected. You will be redirected to the login page."
 msgstr "此文件受保护。你将被重定向到登录页面。"
 
-#: indico/modules/attachments/client/js/index.js:230
+#: indico/modules/attachments/client/js/legacy.js:230
 msgid "Manage material"
 msgstr "管理材料"
+
+#: indico/modules/attachments/client/js/package.js:48
+msgid "Building package"
+msgstr "生成包"
 
 #: indico/modules/categories/client/js/calendar.js:24
 msgid "Today"
@@ -557,11 +561,11 @@ msgstr "增加新类型"
 msgid "No type"
 msgstr "无类型"
 
-#: indico/modules/vc/client/js/index.js:82
+#: indico/modules/vc/client/js/index.js:83
 msgid ""
-"This room has been deleted and cannot be used. \n"
-"                         You can detach it from the event, however."
-msgstr "此会议室已经被删除不能再用了。\n然而，你可以把它与事件分离。"
+"This room has been deleted and cannot be used. You can detach it from the "
+"event, however."
+msgstr "此会议室已被删除，无法使用。但是，您可以将其与事件分离。"
 
 #: indico/modules/vc/client/js/index.js:112
 msgid "Click to toggle collapse status"

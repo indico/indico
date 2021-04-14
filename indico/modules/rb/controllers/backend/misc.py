@@ -1,11 +1,9 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
-
-from __future__ import unicode_literals
 
 from datetime import date, datetime, time, timedelta
 from io import BytesIO
@@ -17,9 +15,8 @@ from indico.core.config import config
 from indico.core.db.sqlalchemy.util.queries import db_dates_overlap
 from indico.core.permissions import get_permissions_info
 from indico.modules.legal import legal_settings
-from indico.modules.rb import rb_settings
+from indico.modules.rb import rb_cache, rb_settings
 from indico.modules.rb.controllers import RHRoomBookingBase
-from indico.modules.rb.controllers.backend.common import _cache
 from indico.modules.rb.models.equipment import EquipmentType
 from indico.modules.rb.models.map_areas import MapArea
 from indico.modules.rb.models.reservation_occurrences import ReservationOccurrence
@@ -43,7 +40,7 @@ class RHConfig(RHRoomBookingBase):
             tos_html = None
         if privacy_policy_url:
             privacy_policy_html = None
-        return jsonify(rooms_sprite_token=unicode(_cache.get('rooms-sprite-token', '')),
+        return jsonify(rooms_sprite_token=str(rb_cache.get('rooms-sprite-token', '')),
                        languages=get_all_locales(),
                        tileserver_url=rb_settings.get('tileserver_url'),
                        grace_period=rb_settings.get('grace_period'),
@@ -65,12 +62,12 @@ class RHUserInfo(RHRoomBookingBase):
 
 class RHRoomsSprite(RHRoomBookingBase):
     def _process(self):
-        sprite_mapping = _cache.get('rooms-sprite-mapping')
+        sprite_mapping = rb_cache.get('rooms-sprite-mapping')
         if sprite_mapping is None:
             build_rooms_spritesheet()
         if 'version' not in request.view_args:
-            return redirect(url_for('.sprite', version=_cache.get('rooms-sprite-token')))
-        photo_data = _cache.get('rooms-sprite')
+            return redirect(url_for('.sprite', version=rb_cache.get('rooms-sprite-token')))
+        photo_data = rb_cache.get('rooms-sprite')
         return send_file('rooms-sprite.jpg', BytesIO(photo_data), 'image/jpeg', no_cache=False, cache_timeout=365*86400)
 
 

@@ -1,5 +1,5 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
@@ -18,11 +18,7 @@ def make_hashable(obj):
     if isinstance(obj, list):
         return tuple(obj)
     elif isinstance(obj, dict):
-        return frozenset((k, make_hashable(v)) for k, v in obj.iteritems())
-    elif hasattr(obj, 'getId') and obj.getId.__self__ is not None:
-        # getId of AvatarUserWrapper would access a cached property, we can't have that here
-        id_ = obj.getId() if obj.__class__.__name__ != 'AvatarUserWrapper' else obj.id
-        return obj.__class__.__name__, id_
+        return frozenset((k, make_hashable(v)) for k, v in obj.items())
     return obj
 
 
@@ -41,7 +37,7 @@ def memoize(obj):
 
 
 def memoize_request(f):
-    """Memoize a function during the current request"""
+    """Memoize a function during the current request."""
     @wraps(f)
     def memoizer(*args, **kwargs):
         if not has_request_context() or current_app.config['TESTING'] or current_app.config.get('REPL'):
@@ -62,7 +58,7 @@ def memoize_request(f):
 
 
 def memoize_redis(ttl):
-    """Memoize a function in redis
+    """Memoize a function in redis.
 
     The cached value can be cleared by calling the method
     ``clear_cached()`` of the decorated function with the same
@@ -73,8 +69,8 @@ def memoize_redis(ttl):
     :param ttl: How long the result should be cached.  May be a
                 timedelta or a number (seconds).
     """
-    from indico.legacy.common.cache import GenericCache
-    cache = GenericCache('memoize')
+    from indico.core.cache import make_scoped_cache
+    cache = make_scoped_cache('memoize')
 
     def decorator(f):
         def _get_key(args, kwargs):
@@ -96,7 +92,7 @@ def memoize_redis(ttl):
             value = cache.get(key, _notset)
             if value is _notset:
                 value = f(*args, **kwargs)
-                cache.set(key, value, ttl)
+                cache.set(key, value, timeout=ttl)
             return value
 
         memoizer.clear_cached = _clear_cached

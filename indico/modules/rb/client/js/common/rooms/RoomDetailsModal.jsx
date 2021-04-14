@@ -1,35 +1,38 @@
 // This file is part of Indico.
-// Copyright (C) 2002 - 2020 CERN
+// Copyright (C) 2002 - 2021 CERN
 //
 // Indico is free software; you can redistribute it and/or
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-import _ from 'lodash';
-import qs from 'qs';
-import moment from 'moment';
-import React from 'react';
 import {push as pushRoute} from 'connected-react-router';
-import {bindActionCreators} from 'redux';
+import _ from 'lodash';
+import moment from 'moment';
 import PropTypes from 'prop-types';
-import {connect} from 'react-redux';
+import qs from 'qs';
+import React from 'react';
 import Overridable from 'react-overridable';
+import {connect} from 'react-redux';
+import {bindActionCreators} from 'redux';
 import {Button, Grid, Icon, Modal, Header, Message, List, Segment, Popup} from 'semantic-ui-react';
+
 import {Translate, Param} from 'indico/react/i18n';
 import {IndicoPropTypes, Markdown, Responsive, useResponsive} from 'indico/react/util';
 import {serializeDate} from 'indico/utils/date';
-import {getOccurrenceTypes, transformToLegendLabels} from '../../util';
+
+import * as globalActions from '../../actions';
+import {actions as bookingsActions} from '../../common/bookings';
+import {actions as filtersActions} from '../../common/filters';
 import RoomBasicDetails from '../../components/RoomBasicDetails';
 import RoomKeyLocation from '../../components/RoomKeyLocation';
-import RoomStats from './RoomStats';
-import {DailyTimelineContent, TimelineLegend} from '../timeline';
-import * as roomsSelectors from './selectors';
-import * as globalActions from '../../actions';
 import {actions as bookRoomActions} from '../../modules/bookRoom';
 import {actions as calendarActions} from '../../modules/calendar';
-import {actions as filtersActions} from '../../common/filters';
-import {actions as bookingsActions} from '../../common/bookings';
+import {getOccurrenceTypes, transformToLegendLabels} from '../../util';
+import {DailyTimelineContent, TimelineLegend} from '../timeline';
+
 import RoomEditModal from './edit/RoomEditModal';
+import RoomStats from './RoomStats';
+import * as roomsSelectors from './selectors';
 
 import './RoomDetailsModal.module.scss';
 

@@ -1,5 +1,5 @@
 // This file is part of Indico.
-// Copyright (C) 2002 - 2020 CERN
+// Copyright (C) 2002 - 2021 CERN
 //
 // Indico is free software; you can redistribute it and/or
 // modify it under the terms of the MIT License; see the
@@ -7,6 +7,7 @@
 
 import _ from 'lodash';
 import PropTypes from 'prop-types';
+
 import {Translate} from 'indico/react/i18n';
 
 /**
@@ -100,6 +101,7 @@ export class PrincipalType {
   static categoryRole = 'category_role';
   static registrationForm = 'registration_form';
   static email = 'email';
+  static eventPerson = 'event_person';
   /* eslint-enable lines-between-class-members */
 
   static propType = PropTypes.oneOf([
@@ -110,6 +112,7 @@ export class PrincipalType {
     PrincipalType.categoryRole,
     PrincipalType.registrationForm,
     PrincipalType.email,
+    PrincipalType.eventPerson,
   ]);
 
   static getPendingText(type) {
@@ -120,6 +123,7 @@ export class PrincipalType {
       [PrincipalType.eventRole]: Translate.string('Unknown event role'),
       [PrincipalType.categoryRole]: Translate.string('Unknown category role'),
       [PrincipalType.registrationForm]: Translate.string('Unknown registration form'),
+      [PrincipalType.eventPerson]: Translate.string('Unknown event person'),
     }[type];
   }
 
@@ -148,6 +152,7 @@ export class PrincipalType {
       [PrincipalType.multipassGroup]: 'users',
       [PrincipalType.registrationForm]: 'id badge outline',
       [PrincipalType.email]: 'envelope outline',
+      [PrincipalType.eventPerson]: 'user',
       // event/category roles have no icon but their code
     }[type];
   }
@@ -161,6 +166,7 @@ export class PrincipalType {
       [PrincipalType.registrationForm]: 3,
       [PrincipalType.user]: 4,
       [PrincipalType.email]: 5,
+      [PrincipalType.eventPerson]: 6,
     }[type];
   }
 }
@@ -180,6 +186,8 @@ export function getTypeFromIdentifier(identifier) {
     return PrincipalType.registrationForm;
   } else if (identifier.startsWith('Email:')) {
     return PrincipalType.email;
+  } else if (identifier.startsWith('EventPerson:')) {
+    return PrincipalType.eventPerson;
   } else {
     throw new Error(`Identifier ${identifier} has unknown type`);
   }

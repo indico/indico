@@ -1,11 +1,9 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
-
-from __future__ import unicode_literals
 
 from flask import flash, redirect, request, session
 from sqlalchemy.orm import joinedload
@@ -127,7 +125,7 @@ class RHSubmitSurvey(RHSubmitSurveyBase):
             self.submission = SurveySubmission(survey=survey, user=session.user)
         self.submission.is_anonymous = survey.anonymous
         for question in survey.questions:
-            answer = SurveyAnswer(question=question, data=getattr(form, 'question_{}'.format(question.id)).data)
+            answer = SurveyAnswer(question=question, data=getattr(form, f'question_{question.id}').data)
             self.submission.answers.append(answer)
         return self.submission
 
@@ -139,7 +137,7 @@ class RHSaveSurveyAnswers(RHSubmitSurveyBase):
             raise Forbidden
 
     def _process(self):
-        pending_answers = {k: v for k, v in request.form.iterlists() if k.startswith('question_')}
+        pending_answers = {k: v for k, v in request.form.lists() if k.startswith('question_')}
         if not self.submission:
             self.submission = SurveySubmission(survey=self.survey, user=session.user)
         self.submission.pending_answers = pending_answers

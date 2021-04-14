@@ -1,11 +1,9 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
-
-from __future__ import unicode_literals
 
 from collections import defaultdict
 
@@ -24,7 +22,6 @@ from indico.modules.attachments.models.principals import AttachmentFolderPrincip
 from indico.modules.attachments.util import can_manage_attachments
 from indico.util.decorators import strict_classproperty
 from indico.util.locators import locator_property
-from indico.util.string import return_ascii
 
 
 class AttachmentFolder(LinkMixin, ProtectionMixin, db.Model):
@@ -38,7 +35,7 @@ class AttachmentFolder(LinkMixin, ProtectionMixin, db.Model):
     @strict_classproperty
     @staticmethod
     def __auto_table_args():
-        default_inheriting = 'not (is_default and protection_mode != {})'.format(ProtectionMode.inheriting.value)
+        default_inheriting = f'not (is_default and protection_mode != {ProtectionMode.inheriting.value})'
         return (db.CheckConstraint(default_inheriting, 'default_inheriting'),
                 db.CheckConstraint('is_default = (title IS NULL)', 'default_or_title'),
                 db.CheckConstraint('not (is_default and is_deleted)', 'default_not_deleted'),
@@ -118,15 +115,15 @@ class AttachmentFolder(LinkMixin, ProtectionMixin, db.Model):
 
     @classmethod
     def get_or_create_default(cls, linked_object):
-        """Gets the default folder for the given object or creates it."""
-        folder = cls.find_first(is_default=True, object=linked_object)
+        """Get the default folder for the given object or creates it."""
+        folder = cls.query.filter_by(is_default=True, object=linked_object).first()
         if folder is None:
             folder = cls(is_default=True, object=linked_object)
         return folder
 
     @classmethod
     def get_or_create(cls, linked_object, title=None):
-        """Gets a folder for the given object or creates it.
+        """Get a folder for the given object or create it.
 
         If no folder title is specified, the default folder will be
         used.  It is the caller's responsibility to add the folder
@@ -136,7 +133,8 @@ class AttachmentFolder(LinkMixin, ProtectionMixin, db.Model):
         if title is None:
             return AttachmentFolder.get_or_create_default(linked_object)
         else:
-            folder = AttachmentFolder.find_first(object=linked_object, is_default=False, is_deleted=False, title=title)
+            folder = AttachmentFolder.query.filter_by(object=linked_object, is_default=False, is_deleted=False,
+                                                      title=title).first()
             return folder or AttachmentFolder(object=linked_object, title=title)
 
     @locator_property
@@ -144,16 +142,16 @@ class AttachmentFolder(LinkMixin, ProtectionMixin, db.Model):
         return dict(self.object.locator, folder_id=self.id)
 
     def can_access(self, user, *args, **kwargs):
-        """Checks if the user is allowed to access the folder.
+        """Check if the user is allowed to access the folder.
 
         This is the case if the user has access the folder or if the
         user can manage attachments for the linked object.
         """
-        return (super(AttachmentFolder, self).can_access(user, *args, **kwargs) or
+        return (super().can_access(user, *args, **kwargs) or
                 can_manage_attachments(self.object, user))
 
     def can_view(self, user):
-        """Checks if the user can see the folder.
+        """Check if the user can see the folder.
 
         This does not mean the user can actually access its contents.
         It just determines if it is visible to him or not.
@@ -162,11 +160,11 @@ class AttachmentFolder(LinkMixin, ProtectionMixin, db.Model):
             return False
         if not self.object.can_access(user):
             return False
-        return self.is_always_visible or super(AttachmentFolder, self).can_access(user)
+        return self.is_always_visible or super().can_access(user)
 
     @classmethod
     def get_for_linked_object(cls, linked_object, preload_event=False):
-        """Gets the attachments for the given object.
+        """Get the attachments for the given object.
 
         This only returns attachments that haven't been deleted.
 
@@ -207,7 +205,6 @@ class AttachmentFolder(LinkMixin, ProtectionMixin, db.Model):
 
             return g.event_attachments[event].get(linked_object, [])
 
-    @return_ascii
     def __repr__(self):
         return '<AttachmentFolder({}, {}{}{}{}, {}, {})>'.format(
             self.id,

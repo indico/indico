@@ -1,11 +1,9 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
-
-from __future__ import unicode_literals
 
 import mimetypes
 from io import BytesIO
@@ -32,11 +30,11 @@ from indico.web.views import WPJinjaMixin
 
 
 class RHAgreementManagerBase(RHManageEventBase):
-    """Base class for agreement management RHs"""
+    """Base class for agreement management RHs."""
 
 
 class RHAgreementForm(RHDisplayEventBase):
-    """Agreement form page"""
+    """Agreement form page."""
 
     normalize_url_spec = {
         'locators': {
@@ -85,22 +83,22 @@ class RHAgreementForm(RHDisplayEventBase):
 
 
 class RHAgreementManager(RHAgreementManagerBase):
-    """Agreements types page (admin)"""
+    """Agreements types page (admin)."""
 
     def _process(self):
-        definitions = get_agreement_definitions().values()
+        definitions = list(get_agreement_definitions().values())
         return WPAgreementManager.render_template('agreement_types.html', self.event, definitions=definitions)
 
 
 class RHAgreementManagerDetails(RHAgreementManagerBase):
-    """Management page for all agreements of a certain type (admin)"""
+    """Management page for all agreements of a certain type (admin)."""
 
     def _process_args(self):
         RHAgreementManagerBase._process_args(self)
         definition_name = request.view_args['definition']
         self.definition = get_agreement_definitions().get(definition_name)
         if self.definition is None:
-            raise NotFound("Agreement type '{}' does not exist".format(definition_name))
+            raise NotFound(f"Agreement type '{definition_name}' does not exist")
         if not self.definition.is_active(self.event):
             flash(_("The '{}' agreement is not used in this event.").format(self.definition.title), 'error')
             return redirect(url_for('.event_agreements', self.event))
@@ -116,7 +114,7 @@ class RHAgreementManagerDetails(RHAgreementManagerBase):
 
 
 class RHAgreementManagerDetailsToggleNotifications(RHAgreementManagerDetails):
-    """Toggles notifications to managers for an agreement type on an event"""
+    """Toggle notifications to managers for an agreement type on an event."""
 
     def _process(self):
         enabled = request.form['enabled'] == '1'
@@ -152,7 +150,7 @@ class RHAgreementManagerDetailsSend(RHAgreementManagerDetailsEmailBase):
 
     def _get_people(self):
         identifiers = set(request.form.getlist('references'))
-        return {k: v for k, v in self.definition.get_people_not_notified(self.event).iteritems()
+        return {k: v for k, v in self.definition.get_people_not_notified(self.event).items()
                 if v.email and v.identifier in identifiers}
 
     def _success_handler(self, form):
@@ -184,7 +182,7 @@ class RHAgreementManagerDetailsSendAll(RHAgreementManagerDetailsSend):
     dialog_template = 'events/agreements/dialogs/agreement_email_form_send_all.html'
 
     def _get_people(self):
-        return {k: v for k, v in self.definition.get_people_not_notified(self.event).iteritems() if v.email}
+        return {k: v for k, v in self.definition.get_people_not_notified(self.event).items() if v.email}
 
 
 class RHAgreementManagerDetailsRemindAll(RHAgreementManagerDetailsRemind):
@@ -214,7 +212,7 @@ class RHAgreementManagerDetailsAgreementBase(RHAgreementManagerDetails):
 
 
 class RHAgreementManagerDetailsSubmitAnswer(RHAgreementManagerDetails):
-    """Submits the answer of an agreement on behalf of the person"""
+    """Submit the answer of an agreement on behalf of the person."""
 
     def _process_args(self):
         RHAgreementManagerDetails._process_args(self)
@@ -247,7 +245,7 @@ class RHAgreementManagerDetailsSubmitAnswer(RHAgreementManagerDetails):
                 agreement.attachment = form.document.data.read()
             else:
                 agreement.reject(from_ip=request.remote_addr, on_behalf=True)
-            flash(_("Agreement answered on behalf of {0}".format(agreement.person_name)), 'success')
+            flash(_('Agreement answered on behalf of {0}').format(agreement.person_name), 'success')
             return jsonify(success=True)
         return WPJinjaMixin.render_template('events/agreements/dialogs/agreement_submit_answer_form.html', form=form,
                                             event=self.event, agreement=agreement)

@@ -1,11 +1,9 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
-
-from __future__ import unicode_literals
 
 from indico.core.db import db
 from indico.core.db.sqlalchemy.util.models import get_simple_column_attrs
@@ -21,7 +19,7 @@ from indico.util.i18n import _
 class AbstractSettingsCloner(EventCloner):
     name = 'abstracts_settings'
     friendly_name = _('Call for Abstracts (settings, email templates, review questions)')
-    requires = {'contribution_types', 'tracks'}
+    requires = {'contribution_fields', 'contribution_types', 'tracks'}
 
     @property
     def is_visible(self):
@@ -33,8 +31,8 @@ class AbstractSettingsCloner(EventCloner):
     @no_autoflush
     def run(self, new_event, cloners, shared_data, event_exists=False):
         self._contrib_type_id_map = {old.id: new.id
-                                     for old, new in shared_data['contribution_types']['contrib_type_map'].iteritems()}
-        self._track_id_map = {old.id: new.id for old, new in shared_data['tracks']['track_map'].iteritems()}
+                                     for old, new in shared_data['contribution_types']['contrib_type_map'].items()}
+        self._track_id_map = {old.id: new.id for old, new in shared_data['tracks']['track_map'].items()}
         self._clone_settings(new_event)
         self._clone_email_templates(new_event)
         self._clone_review_questions(new_event)
@@ -57,7 +55,7 @@ class AbstractSettingsCloner(EventCloner):
         for old_tpl in self.old_event.abstract_email_templates:
             tpl = AbstractEmailTemplate()
             tpl.populate_from_attrs(old_tpl, attrs)
-            tpl.rules = filter(None, map(self._clone_email_template_rule, old_tpl.rules))
+            tpl.rules = [_f for _f in map(self._clone_email_template_rule, old_tpl.rules) if _f]
             new_event.abstract_email_templates.append(tpl)
 
     def _clone_email_template_rule(self, old_rule):

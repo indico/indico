@@ -1,22 +1,23 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import unicode_literals
-
 from sqlalchemy import orm
 from sqlalchemy.event import listens_for
 
 from indico.core.db import db
+from indico.core.db.sqlalchemy.util.models import get_all_models
 from indico.util.caching import memoize_request
 
 
-class AttachedItemsMixin(object):
-    """Allows for easy retrieval of structured information about
-       items attached to the object"""
+class AttachedItemsMixin:
+    """
+    Allow for easy retrieval of structured information about
+    items attached to the object.
+    """
 
     #: When set to ``True`` will preload all items that exist for the same event.
     #: Should be set to False when not applicable (no object.event[_new] property).
@@ -50,7 +51,8 @@ def _make_attachment_count_column_property(cls):
                  ~Attachment.is_deleted,
                  (getattr(AttachmentFolder, cls.ATTACHMENT_FOLDER_ID_COLUMN) == cls.id)
              ))
-             .correlate_except(AttachmentFolder, Attachment))
+             .correlate_except(AttachmentFolder, Attachment)
+             .scalar_subquery())
     cls.attachment_count = db.column_property(query, deferred=True)
 
 
@@ -58,6 +60,6 @@ def _make_attachment_count_column_property(cls):
 def _mappers_configured():
     # We need to create the column property here since we cannot import
     # Attachment/AttachmentFolder while the models are being defined
-    for model in db.Model._decl_class_registry.itervalues():
+    for model in get_all_models():
         if hasattr(model, '__table__') and issubclass(model, AttachedItemsMixin):
             _make_attachment_count_column_property(model)

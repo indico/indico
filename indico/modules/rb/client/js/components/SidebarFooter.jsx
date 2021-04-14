@@ -1,21 +1,23 @@
 // This file is part of Indico.
-// Copyright (C) 2002 - 2020 CERN
+// Copyright (C) 2002 - 2021 CERN
 //
 // Indico is free software; you can redistribute it and/or
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
 import contactURL from 'indico-url:core.contact';
-import tosURL from 'indico-url:legal.display_tos';
 import privacyPolicyURL from 'indico-url:legal.display_privacy';
+import tosURL from 'indico-url:legal.display_tos';
 
-import React, {useState} from 'react';
 import PropTypes from 'prop-types';
-import {Icon, Menu, Modal} from 'semantic-ui-react';
+import React, {useState} from 'react';
 import {connect} from 'react-redux';
+import {Icon, Menu, Modal} from 'semantic-ui-react';
+
+import {ResponsivePopup} from 'indico/react/components';
 import {Translate} from 'indico/react/i18n';
 import {Responsive} from 'indico/react/util';
-import {ResponsivePopup} from 'indico/react/components';
+
 import {selectors as configSelectors} from '../common/config';
 
 const buildMenuItems = (helpURL, hasTOS, hasPrivacyPolicy, contactEmail) => {

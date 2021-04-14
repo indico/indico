@@ -1,5 +1,5 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
@@ -30,7 +30,7 @@ def test_reject(dummy_user, dummy_blocking, smtp, with_user, with_reason):
     if with_user:
         kwargs['user'] = dummy_user
     if with_reason:
-        kwargs['reason'] = u'foo'
+        kwargs['reason'] = 'foo'
     br.reject(**kwargs)
     assert br.state == BlockedRoom.State.rejected
     mail = extract_emails(smtp, one=True, to=dummy_blocking.created_by_user.email, subject='Room blocking REJECTED')

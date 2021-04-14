@@ -1,17 +1,15 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import unicode_literals
-
 import os
 from io import BytesIO
 from zipfile import ZipFile
 
-from flask import session
+from flask import jsonify, session
 from werkzeug.exceptions import BadRequest
 
 from indico.core.db import db
@@ -26,7 +24,8 @@ from indico.modules.events.editing.models.revisions import EditingRevision, Fina
 from indico.modules.events.editing.models.tags import EditingTag
 from indico.modules.events.editing.notifications import (notify_comment, notify_editor_judgment,
                                                          notify_submitter_confirmation, notify_submitter_upload)
-from indico.modules.events.editing.schemas import EditingConfirmationAction, EditingReviewAction
+from indico.modules.events.editing.schemas import (EditableDumpSchema, EditingConfirmationAction, EditingFileTypeSchema,
+                                                   EditingReviewAction)
 from indico.modules.events.logs import EventLogKind, EventLogRealm
 from indico.util.date_time import now_utc
 from indico.util.fs import secure_filename
@@ -45,10 +44,10 @@ class InvalidEditableState(BadRequest):
     """
 
     def __init__(self):
-        super(InvalidEditableState, self).__init__(_('The requested action is not possible on this revision'))
+        super().__init__(_('The requested action is not possible on this revision'))
 
 
-def _ensure_latest_revision(revision):
+def ensure_latest_revision(revision):
     if revision != revision.editable.revisions[-1]:
         raise InvalidEditableState
 
@@ -69,7 +68,7 @@ def _make_editable_files(editable, files):
         return []
     editable_files = [
         EditingRevisionFile(file=file, file_type=file_type)
-        for file_type, file_list in files.viewitems()
+        for file_type, file_list in files.items()
         for file in file_list
     ]
     for ef in editable_files:
@@ -99,7 +98,7 @@ def delete_editable(editable):
 
 
 def publish_editable_revision(revision):
-    _ensure_latest_revision(revision)
+    ensure_latest_revision(revision)
     revision.editable.published_revision = revision
     db.session.flush()
     logger.info('Revision %r marked as published', revision)
@@ -107,7 +106,7 @@ def publish_editable_revision(revision):
 
 @no_autoflush
 def review_editable_revision(revision, editor, action, comment, tags, files=None):
-    _ensure_latest_revision(revision)
+    ensure_latest_revision(revision)
     _ensure_state(revision, initial=InitialRevisionState.ready_for_review, final=FinalRevisionState.none)
     revision.editor = editor
     revision.comment = comment
@@ -121,9 +120,9 @@ def review_editable_revision(revision, editor, action, comment, tags, files=None
     }[action]
 
     db.session.flush()
+    new_revision = None
     if action == EditingReviewAction.accept:
         _ensure_publishable_files(revision)
-        publish_editable_revision(revision)
     elif action in (EditingReviewAction.update, EditingReviewAction.update_accept):
         final_state = FinalRevisionState.none
         editable_editor = None
@@ -138,17 +137,15 @@ def review_editable_revision(revision, editor, action, comment, tags, files=None
                                        tags=revision.tags)
         _ensure_publishable_files(new_revision)
         revision.editable.revisions.append(new_revision)
-        if action == EditingReviewAction.update_accept:
-            db.session.flush()
-            publish_editable_revision(new_revision)
     db.session.flush()
-    notify_editor_judgment(revision, session.user)
+    notify_editor_judgment(revision, editor)
     logger.info('Revision %r reviewed by %s [%s]', revision, editor, action.name)
+    return new_revision
 
 
 @no_autoflush
 def confirm_editable_changes(revision, submitter, action, comment):
-    _ensure_latest_revision(revision)
+    ensure_latest_revision(revision)
     _ensure_state(revision, initial=InitialRevisionState.needs_submitter_confirmation, final=FinalRevisionState.none)
     revision.final_state = {
         EditingConfirmationAction.accept: FinalRevisionState.accepted,
@@ -159,7 +156,6 @@ def confirm_editable_changes(revision, submitter, action, comment):
     db.session.flush()
     if action == EditingConfirmationAction.accept:
         _ensure_publishable_files(revision)
-        publish_editable_revision(revision)
     db.session.flush()
     notify_submitter_confirmation(revision, submitter, action)
     logger.info('Revision %r confirmed by %s [%s]', revision, submitter, action.name)
@@ -167,14 +163,15 @@ def confirm_editable_changes(revision, submitter, action, comment):
 
 @no_autoflush
 def replace_revision(revision, user, comment, files, tags, initial_state=None):
-    _ensure_latest_revision(revision)
+    ensure_latest_revision(revision)
     _ensure_state(revision,
                   initial=(InitialRevisionState.new, InitialRevisionState.ready_for_review),
                   final=FinalRevisionState.none)
     revision.comment = comment
     revision.tags = tags
     revision.final_state = FinalRevisionState.replaced
-    new_revision = EditingRevision(submitter=user,
+    revision.editor = user
+    new_revision = EditingRevision(submitter=revision.submitter,
                                    initial_state=(initial_state or revision.initial_state),
                                    files=_make_editable_files(revision.editable, files))
     revision.editable.revisions.append(new_revision)
@@ -184,7 +181,7 @@ def replace_revision(revision, user, comment, files, tags, initial_state=None):
 
 @no_autoflush
 def create_submitter_revision(prev_revision, user, files):
-    _ensure_latest_revision(prev_revision)
+    ensure_latest_revision(prev_revision)
     _ensure_state(prev_revision, final=FinalRevisionState.needs_submitter_changes)
     new_revision = EditingRevision(submitter=user,
                                    initial_state=InitialRevisionState.ready_for_review,
@@ -194,6 +191,7 @@ def create_submitter_revision(prev_revision, user, files):
     db.session.flush()
     notify_submitter_upload(new_revision)
     logger.info('Revision %r created by submitter %s', new_revision, user)
+    return new_revision
 
 
 def _ensure_latest_revision_with_final_state(revision):
@@ -230,7 +228,7 @@ def undo_review(revision):
 
 @no_autoflush
 def create_revision_comment(revision, user, text, internal=False):
-    _ensure_latest_revision(revision)
+    ensure_latest_revision(revision)
     comment = EditingRevisionComment(user=user, text=text, internal=internal)
     revision.comments.append(comment)
     db.session.flush()
@@ -240,7 +238,7 @@ def create_revision_comment(revision, user, text, internal=False):
 
 @no_autoflush
 def update_revision_comment(comment, updates):
-    _ensure_latest_revision(comment.revision)
+    ensure_latest_revision(comment.revision)
     comment.populate_from_dict(updates)
     comment.modified_dt = now_utc()
     db.session.flush()
@@ -249,7 +247,7 @@ def update_revision_comment(comment, updates):
 
 @no_autoflush
 def delete_revision_comment(comment):
-    _ensure_latest_revision(comment.revision)
+    ensure_latest_revision(comment.revision)
     comment.is_deleted = True
     db.session.flush()
     logger.info('Comment on revision %r deleted: %r', comment.revision, comment)
@@ -349,7 +347,7 @@ def unassign_editor(editable):
     db.session.flush()
 
 
-def generate_editables_zip(editables):
+def generate_editables_zip(event, editable_type, editables):
     buf = BytesIO()
     with ZipFile(buf, 'w', allowZip64=True) as zip_file:
         for editable in editables:
@@ -362,21 +360,30 @@ def generate_editables_zip(editables):
     return send_file('files.zip', buf, 'application/zip', inline=False)
 
 
+def generate_editables_json(event, editable_type, editables):
+    file_types = EditingFileType.query.with_parent(event).filter_by(type=editable_type).all()
+    file_types_dump = EditingFileTypeSchema(many=True).dump(file_types)
+    editables_dump = EditableDumpSchema(many=True).dump(editables)
+    response = jsonify(version=1, file_types=file_types_dump, editables=editables_dump)
+    response.headers['Content-Disposition'] = 'attachment; filename="editables.json"'
+    return response
+
+
 def _compose_filepath(editable, revision_file):
     file_obj = revision_file.file
     contrib = editable.contribution
     editable_type = editable.type.name
-    code = 'Editable-{}'.format(contrib.friendly_id)
+    code = f'Editable-{contrib.friendly_id}'
 
     if contrib.code:
-        code += '-{}'.format(contrib.code)
+        code += f'-{contrib.code}'
 
-    filepath = os.path.join(secure_filename('{}-{}'.format(contrib.title, contrib.id),
-                                            'contribution-{}'.format(contrib.id)),
+    filepath = os.path.join(secure_filename(f'{contrib.title}-{contrib.id}',
+                                            f'contribution-{contrib.id}'),
                             editable_type, code, revision_file.file_type.name)
     filename, ext = os.path.splitext(file_obj.filename)
     filename = secure_filename(file_obj.filename,
-                               'revision-file-{}-{}{}'.format(revision_file.revision_id, file_obj.id, ext))
+                               f'revision-file-{revision_file.revision_id}-{file_obj.id}{ext}')
     return os.path.join(filepath, filename)
 
 

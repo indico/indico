@@ -1,18 +1,16 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
-
-from __future__ import unicode_literals
 
 from indico.core import signals
 from indico.util.decorators import classproperty
 from indico.util.signals import named_objects_from_signal
 
 
-class Condition(object):
+class Condition:
     """Base class for conditions.
 
     `Condition`s allow you to define criteria to match on and then evaluate
@@ -37,14 +35,14 @@ class Condition(object):
 
     @classmethod
     def is_used(cls, rule):
-        """Check whether the condition is used in a rule"""
+        """Check whether the condition is used in a rule."""
         return rule.get(cls.name) is not None
 
     @classmethod
     def is_none(cls, **kwargs):
         """Check whether the condition requires a null value.
 
-            Inheriting methods should overload this
+        Inheriting methods should overload this
         """
         raise NotImplementedError
 
@@ -64,7 +62,7 @@ class Condition(object):
 
     @classmethod
     def _clean_values(cls, values, **kwargs):
-        return list(cls.get_available_values(**kwargs).viewkeys() & set(values))
+        return list(cls.get_available_values(**kwargs).keys() & set(values))
 
     @classmethod
     def check(cls, values, **kwargs):
@@ -100,7 +98,7 @@ def check_rule(context, rule, **kwargs):
     :param rule: the rule to check
     :param kwargs: arguments specific to the context
     """
-    for name, condition in get_conditions(context, **kwargs).iteritems():
+    for name, condition in get_conditions(context, **kwargs).items():
         if not condition.is_used(rule):
             if condition.required:
                 return False
@@ -122,5 +120,5 @@ def get_missing_conditions(context, rule, **kwargs):
     :param rule: the rule to check
     :param kwargs: arguments specific to the context
     """
-    rules = {condition for condition in get_conditions(context, **kwargs).itervalues() if condition.required}
+    rules = {condition for condition in get_conditions(context, **kwargs).values() if condition.required}
     return {condition.friendly_name for condition in rules if not condition.is_used(rule)}

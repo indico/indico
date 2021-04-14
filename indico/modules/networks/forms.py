@@ -1,11 +1,9 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
-
-from __future__ import unicode_literals
 
 from wtforms.fields import BooleanField, StringField, TextAreaField
 from wtforms.validators import DataRequired
@@ -23,7 +21,7 @@ attachment_access_override_warning = _('Do you really want to grant everyone wit
 
 
 class IPNetworkGroupForm(IndicoForm):
-    """Form to create or edit an IPNetworkGroup"""
+    """Form to create or edit an IPNetworkGroup."""
 
     name = StringField(_("Name"), [DataRequired()])
     description = TextAreaField(_("Description"))
@@ -37,11 +35,11 @@ class IPNetworkGroupForm(IndicoForm):
 
     def __init__(self, *args, **kwargs):
         self._network_group_id = kwargs['obj'].id if 'obj' in kwargs else None
-        super(IPNetworkGroupForm, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
     def validate_name(self, field):
-        query = IPNetworkGroup.find(db.func.lower(IPNetworkGroup.name) == field.data.lower())
+        query = IPNetworkGroup.query.filter(db.func.lower(IPNetworkGroup.name) == field.data.lower())
         if self._network_group_id is not None:
             query = query.filter(IPNetworkGroup.id != self._network_group_id)
-        if query.first():
+        if query.has_rows():
             raise ValueError(_("An IP network with this name already exists."))

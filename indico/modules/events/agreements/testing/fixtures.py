@@ -1,5 +1,5 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
@@ -15,7 +15,7 @@ from indico.modules.events.agreements.models.agreements import Agreement, Agreem
 
 @pytest.fixture
 def create_person():
-    """Returns a callable which lets you create AgreementPersonInfo"""
+    """Return a callable which lets you create AgreementPersonInfo."""
 
     def _create_person(name, email, data=None):
         person = AgreementPersonInfo(name=name, email=email, data=data)
@@ -26,7 +26,7 @@ def create_person():
 
 @pytest.fixture
 def create_agreement(db, dummy_event, dummy_person):
-    """Returns a a callable which lets you create agreements"""
+    """Return a a callable which lets you create agreements."""
 
     def _create_agreement(state):
         agreement = Agreement(uuid=str(uuid4()), event=dummy_event, type='dummy',
@@ -46,7 +46,7 @@ def dummy_person(create_person):
 
 @pytest.fixture
 def dummy_agreement(create_agreement):
-    """Gives you a dummy agreement with pending state"""
+    """Give you a dummy agreement with pending state."""
     return create_agreement(state=AgreementState.pending)
 
 

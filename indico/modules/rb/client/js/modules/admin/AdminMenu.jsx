@@ -1,20 +1,23 @@
 // This file is part of Indico.
-// Copyright (C) 2002 - 2020 CERN
+// Copyright (C) 2002 - 2021 CERN
 //
 // Indico is free software; you can redistribute it and/or
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-import React from 'react';
 import PropTypes from 'prop-types';
-import {bindActionCreators} from 'redux';
-import {Link, NavLink, withRouter} from 'react-router-dom';
-import {Icon, Menu, Placeholder} from 'semantic-ui-react';
+import React from 'react';
 import {connect} from 'react-redux';
+import {Link, NavLink, withRouter} from 'react-router-dom';
+import {bindActionCreators} from 'redux';
+import {Icon, Menu, Placeholder} from 'semantic-ui-react';
+
 import {Translate} from 'indico/react/i18n';
+
 import {selectors as mapSelectors} from '../../common/map';
-import * as adminSelectors from './selectors';
+
 import * as adminActions from './actions';
+import * as adminSelectors from './selectors';
 
 import './AdminMenu.module.scss';
 

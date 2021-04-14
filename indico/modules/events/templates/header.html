@@ -10,12 +10,12 @@
     <span class="separator"></span>
 
     {% if rel.first is not none %}
-        <a class="i-button text-color subtle icon-first" href="{{ url_for('events.display', confId=rel.first) }}"
+        <a class="i-button text-color subtle icon-first" href="{{ url_for('events.display', event_id=rel.first) }}"
            title="{% trans %}Oldest event{% endtrans %}"></a>
     {% endif %}
 
     {% if rel.prev is not none %}
-        <a class="i-button text-color subtle icon-prev" href="{{ url_for('events.display', confId=rel.prev) }}"
+        <a class="i-button text-color subtle icon-prev" href="{{ url_for('events.display', event_id=rel.prev) }}"
            title="{% trans %}Older event{% endtrans %}"></a>
     {% endif %}
 
@@ -23,12 +23,12 @@
        title="{% trans %}Up to category{% endtrans %}"></a>
 
     {% if rel.next is not none %}
-        <a class="i-button text-color subtle icon-next" href="{{ url_for('events.display', confId=rel.next) }}"
+        <a class="i-button text-color subtle icon-next" href="{{ url_for('events.display', event_id=rel.next) }}"
            title="{% trans %}Newer event{% endtrans %}"></a>
     {% endif %}
 
     {% if rel.last is not none %}
-        <a class="i-button text-color subtle icon-last" href="{{ url_for('events.display', confId=rel.last) }}"
+        <a class="i-button text-color subtle icon-last" href="{{ url_for('events.display', event_id=rel.last) }}"
            title="{% trans %}Newest event{% endtrans %}"></a>
     {% endif %}
 
@@ -175,7 +175,8 @@
 
 
 {%- set dates = event.iter_days(tzinfo=event.tzinfo)|list -%}
-{%- set show_filter_button = event.type == 'meeting' and (dates|length > 1 or event.sessions) -%}
+{%- set show_filter_button = (event.type == 'meeting' or (event.type == 'conference' and theme))
+                             and (dates|length > 1 or event.sessions) -%}
 {%- set filters_active = show_filter_button and (request.args.get('showDate', 'all') != 'all' or
                                                  request.args.get('showSession', 'all') != 'all' or
                                                  request.args.get('detailLevel', 'contribution') != 'contribution') -%}
@@ -200,9 +201,8 @@
                     {{ _render_filters() }}
                 {% endif %}
 
-                <a class="i-button text-color subtle icon-calendar js-export-ical" id="exportIcal{{ event.id }}" data-id="{{ event.id }}"
-                   title="{% trans %}Export to iCal{% endtrans %}"></a>
-                {{ template_hook('event-ical-export', event=event) }}
+                <div id="event-calendar-link" data-event-id="{{ event.id }}"
+                     data-event-contrib-count="{{ event.contributions|length }}"></div>
 
                 {% if event.type == 'meeting' %}
                     <a class="i-button text-color subtle icon-file-pdf" title="{% trans %}Export to PDF{% endtrans %}"
@@ -241,12 +241,3 @@
 {% if event.type != 'conference' %}
     {%- include 'flashed_messages.html' -%}
 {% endif %}
-
-<script>
-    $(document).ready(function() {
-        $('.js-export-ical').on('click', function(evt) {
-            evt.preventDefault();
-            $(this).trigger('menu_select');
-        });
-    });
-</script>

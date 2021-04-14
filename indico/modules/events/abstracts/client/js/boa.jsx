@@ -1,24 +1,24 @@
 // This file is part of Indico.
-// Copyright (C) 2002 - 2020 CERN
+// Copyright (C) 2002 - 2021 CERN
 //
 // Indico is free software; you can redistribute it and/or
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-import uploadBOAFileURL from 'indico-url:abstracts.upload_boa_file';
 import customBOAURL from 'indico-url:abstracts.manage_custom_boa';
+import uploadBOAFileURL from 'indico-url:abstracts.upload_boa_file';
 
+import PropTypes from 'prop-types';
 import React, {useState} from 'react';
 import ReactDOM from 'react-dom';
-import PropTypes from 'prop-types';
-
 import {Form as FinalForm} from 'react-final-form';
 import {Form, Modal, Button} from 'semantic-ui-react';
+
+import {FinalSingleFileManager} from 'indico/react/components';
+import {fileDetailsShape} from 'indico/react/components/files/props';
 import {FinalSubmitButton, handleSubmitError} from 'indico/react/forms';
 import {Translate} from 'indico/react/i18n';
-import {FinalSingleFileManager} from 'indico/react/components';
 import {indicoAxios, handleAxiosError} from 'indico/utils/axios';
-import {fileDetailsShape} from 'indico/react/components/files/props';
 
 export default function CustomBOAModal({eventId, initialFile, hasLatex}) {
   const [modalOpen, setModalOpen] = useState(false);
@@ -28,7 +28,7 @@ export default function CustomBOAModal({eventId, initialFile, hasLatex}) {
   const deleteExistingBOA = async () => {
     setDeleting(true);
     try {
-      await indicoAxios.delete(customBOAURL({confId: eventId}));
+      await indicoAxios.delete(customBOAURL({event_id: eventId}));
     } catch (e) {
       handleAxiosError(e);
       setDeleting(false);
@@ -39,7 +39,7 @@ export default function CustomBOAModal({eventId, initialFile, hasLatex}) {
 
   const handleSubmit = async ({file}) => {
     try {
-      await indicoAxios.post(customBOAURL({confId: eventId}), {file});
+      await indicoAxios.post(customBOAURL({event_id: eventId}), {file});
     } catch (e) {
       return handleSubmitError(e);
     }
@@ -95,7 +95,7 @@ export default function CustomBOAModal({eventId, initialFile, hasLatex}) {
                       name="file"
                       validExtensions={['pdf']}
                       initialFileDetails={initialFile}
-                      uploadURL={uploadBOAFileURL({confId: eventId})}
+                      uploadURL={uploadBOAFileURL({event_id: eventId})}
                       required
                       hideValidationError
                     />

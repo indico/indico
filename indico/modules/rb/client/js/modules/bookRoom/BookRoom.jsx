@@ -1,43 +1,44 @@
 // This file is part of Indico.
-// Copyright (C) 2002 - 2020 CERN
+// Copyright (C) 2002 - 2021 CERN
 //
 // Indico is free software; you can redistribute it and/or
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-import {connect} from 'react-redux';
-import {stateToQueryString} from 'redux-router-querystring';
+import _ from 'lodash';
 import moment from 'moment';
 import PropTypes from 'prop-types';
 import React from 'react';
-import {bindActionCreators} from 'redux';
-import _ from 'lodash';
-import {Button, Card, Grid, Header, Icon, Popup, Divider} from 'semantic-ui-react';
-import LazyScroll from 'redux-lazy-scroll';
 import Overridable from 'react-overridable';
+import {connect} from 'react-redux';
+import {bindActionCreators} from 'redux';
+import LazyScroll from 'redux-lazy-scroll';
+import {stateToQueryString} from 'redux-router-querystring';
+import {Button, Card, Grid, Header, Icon, Popup, Divider} from 'semantic-ui-react';
 
+import {StickyWithScrollBack, ResponsivePopup} from 'indico/react/components';
 import {Translate} from 'indico/react/i18n';
 import {Slot, toClasses, IndicoPropTypes, Responsive} from 'indico/react/util';
 import {serializeTime, serializeDate} from 'indico/utils/date';
-import {StickyWithScrollBack, ResponsivePopup} from 'indico/react/components';
 
-import searchBarFactory from '../../components/SearchBar';
-import CardPlaceholder from '../../components/CardPlaceholder';
-import BookingFilterBar from './BookingFilterBar';
-import {roomFilterBarFactory} from '../../modules/roomList';
-import BookingTimeline from './BookingTimeline';
-import SearchResultCount from './SearchResultCount';
-import {TimelineHeader} from '../../common/timeline';
-import {rules as qsFilterRules} from '../../common/roomSearch/queryString';
-import {rules as qsBookRoomRules} from './queryString';
-import * as bookRoomActions from './actions';
 import {actions as filtersActions} from '../../common/filters';
-import {actions as roomsActions, RoomRenderer} from '../../common/rooms';
-import {selectors as userSelectors} from '../../common/user';
-import * as bookRoomSelectors from './selectors';
 import {mapControllerFactory, selectors as mapSelectors} from '../../common/map';
-import BookingSuggestion from './BookingSuggestion';
+import {actions as roomsActions, RoomRenderer} from '../../common/rooms';
+import {rules as qsFilterRules} from '../../common/roomSearch/queryString';
+import {TimelineHeader} from '../../common/timeline';
+import {selectors as userSelectors} from '../../common/user';
+import CardPlaceholder from '../../components/CardPlaceholder';
+import searchBarFactory from '../../components/SearchBar';
+import {roomFilterBarFactory} from '../../modules/roomList';
 import {getOccurrenceTypes, transformToLegendLabels} from '../../util';
+
+import * as bookRoomActions from './actions';
+import BookingFilterBar from './BookingFilterBar';
+import BookingSuggestion from './BookingSuggestion';
+import BookingTimeline from './BookingTimeline';
+import {rules as qsBookRoomRules} from './queryString';
+import SearchResultCount from './SearchResultCount';
+import * as bookRoomSelectors from './selectors';
 
 import './BookRoom.module.scss';
 
@@ -60,7 +61,6 @@ class BookRoom extends React.Component {
     isAdminOverrideEnabled: PropTypes.bool.isRequired,
     timelineAvailability: PropTypes.array.isRequired,
     actions: PropTypes.exact({
-      setFilterParameter: PropTypes.func.isRequired,
       clearTextFilter: PropTypes.func.isRequired,
       searchRooms: PropTypes.func.isRequired,
       fetchRoomSuggestions: PropTypes.func.isRequired,
@@ -477,8 +477,6 @@ const mapDispatchToProps = dispatch => ({
       clearTextFilter: () => filtersActions.setFilterParameter('bookRoom', 'text', null),
       fetchRoomSuggestions: bookRoomActions.fetchRoomSuggestions,
       resetRoomSuggestions: bookRoomActions.resetRoomSuggestions,
-      setFilterParameter: (param, value) =>
-        filtersActions.setFilterParameter('bookRoom', param, value),
       toggleTimelineView: bookRoomActions.toggleTimelineView,
       openRoomDetails: roomsActions.openRoomDetailsBook,
       openBookingForm: bookRoomActions.openBookingForm,

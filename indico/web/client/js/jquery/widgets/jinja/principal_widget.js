@@ -1,5 +1,5 @@
 // This file is part of Indico.
-// Copyright (C) 2002 - 2020 CERN
+// Copyright (C) 2002 - 2021 CERN
 //
 // Indico is free software; you can redistribute it and/or
 // modify it under the terms of the MIT License; see the
@@ -13,6 +13,7 @@ window.setupPrincipalWidget = function setupPrincipalWidget({
   fieldId,
   required,
   withExternalUsers,
+  disabled,
 }) {
   const field = document.getElementById(fieldId);
 
@@ -22,6 +23,7 @@ window.setupPrincipalWidget = function setupPrincipalWidget({
       defaultValue={field.value}
       required={required}
       withExternalUsers={withExternalUsers}
+      disabled={disabled}
     />,
     document.getElementById(`principalField-${fieldId}`)
   );

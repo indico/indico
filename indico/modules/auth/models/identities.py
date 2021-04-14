@@ -1,11 +1,9 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
-
-from __future__ import unicode_literals
 
 from datetime import datetime
 
@@ -16,11 +14,10 @@ from indico.core.db import db
 from indico.core.db.sqlalchemy import UTCDateTime
 from indico.util.date_time import as_utc, now_utc
 from indico.util.passwords import PasswordProperty
-from indico.util.string import return_ascii
 
 
 class Identity(db.Model):
-    """Identities of Indico users"""
+    """Identities of Indico users."""
     __tablename__ = 'identities'
     __table_args__ = (db.UniqueConstraint('provider', 'identifier'),
                       {'schema': 'users'})
@@ -93,14 +90,13 @@ class Identity(db.Model):
 
     @property
     def safe_last_login_dt(self):
-        """last_login_dt that is safe for sorting (no None values)"""
+        """last_login_dt that is safe for sorting (no None values)."""
         return self.last_login_dt or as_utc(datetime(1970, 1, 1))
 
     def register_login(self, ip):
-        """Updates the last login information"""
+        """Update the last login information."""
         self.last_login_dt = now_utc()
         self.last_login_ip = ip
 
-    @return_ascii
     def __repr__(self):
-        return '<Identity({}, {}, {}, {})>'.format(self.id, self.user_id, self.provider, self.identifier)
+        return f'<Identity({self.id}, {self.user_id}, {self.provider}, {self.identifier})>'

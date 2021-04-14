@@ -1,5 +1,5 @@
 // This file is part of Indico.
-// Copyright (C) 2002 - 2020 CERN
+// Copyright (C) 2002 - 2021 CERN
 //
 // Indico is free software; you can redistribute it and/or
 // modify it under the terms of the MIT License; see the
@@ -11,8 +11,6 @@ function imageFunctionGenerator(url) {
   };
 }
 
-var indicoSource = curry(jsonRpcValue, Indico.Urls.JsonRpcService);
-var indicoRequest = curry(jsonRpc, Indico.Urls.JsonRpcService);
 var imageSrc = imageFunctionGenerator(Indico.Urls.ImagesBase);
 
 function pixels(val) {

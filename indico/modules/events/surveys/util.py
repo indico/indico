@@ -1,11 +1,9 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
-
-from __future__ import unicode_literals
 
 from operator import attrgetter
 
@@ -21,34 +19,34 @@ from indico.web.forms.base import IndicoForm
 
 
 def make_survey_form(survey):
-    """Creates a WTForm from survey questions.
+    """Create a WTForm from survey questions.
 
     Each question will use a field named ``question_ID``.
 
     :param survey: The `Survey` for which to create the form.
     :return: An `IndicoForm` subclass.
     """
-    form_class = type(b'SurveyForm', (IndicoForm,), {})
+    form_class = type('SurveyForm', (IndicoForm,), {})
 
     for question in survey.questions:
         field_impl = question.field
         if field_impl is None:
             # field definition is not available anymore
             continue
-        name = 'question_{}'.format(question.id)
+        name = f'question_{question.id}'
         setattr(form_class, name, field_impl.create_wtf_field())
     return form_class
 
 
 def save_submitted_survey_to_session(submission):
-    """Save submission of a survey to session for further checks"""
+    """Save submission of a survey to session for further checks."""
     session.setdefault('submitted_surveys', {})[submission.survey.id] = submission.id
     session.modified = True
 
 
 @memoize_request
 def was_survey_submitted(survey):
-    """Check whether the current user has submitted a survey"""
+    """Check whether the current user has submitted a survey."""
     from indico.modules.events.surveys.models.surveys import Survey
     query = (Survey.query.with_parent(survey.event)
              .filter(Survey.submissions.any(db.and_(SurveySubmission.is_submitted,
@@ -59,11 +57,11 @@ def was_survey_submitted(survey):
     submission_id = session.get('submitted_surveys', {}).get(survey.id)
     if submission_id is None:
         return False
-    return SurveySubmission.find(id=submission_id, is_submitted=True).has_rows()
+    return SurveySubmission.query.filter_by(id=submission_id, is_submitted=True).has_rows()
 
 
 def is_submission_in_progress(survey):
-    """Check whether the current user has a survey submission in progress"""
+    """Check whether the current user has a survey submission in progress."""
     from indico.modules.events.surveys.models.surveys import Survey
     if session.user:
         query = (Survey.query.with_parent(survey.event)
@@ -76,7 +74,7 @@ def is_submission_in_progress(survey):
 
 
 def generate_spreadsheet_from_survey(survey, submission_ids):
-    """Generates spreadsheet data from a given survey.
+    """Generate spreadsheet data from a given survey.
 
     :param survey: `Survey` for which the user wants to export submissions
     :param submission_ids: The list of submissions to include in the file
@@ -104,25 +102,29 @@ def generate_spreadsheet_from_survey(survey, submission_ids):
 
 def _format_title(question):
     if question.parent.title:
-        return '{}: {}'.format(question.parent.title, question.title)
+        return f'{question.parent.title}: {question.title}'
     else:
         return question.title
 
 
 def _filter_submissions(survey, submission_ids):
     if submission_ids:
-        return SurveySubmission.find_all(SurveySubmission.id.in_(submission_ids), survey=survey)
+        return (SurveySubmission.query
+                .filter(SurveySubmission.id.in_(submission_ids),
+                        SurveySubmission.survey == survey)
+                .all())
     return [x for x in survey.submissions if x.is_submitted]
 
 
 def get_events_with_submitted_surveys(user, dt=None):
-    """Gets the IDs of events where the user submitted a survey.
+    """Get the IDs of events where the user submitted a survey.
 
     :param user: A `User`
     :param dt: Only include events taking place on/after that date
     :return: A set of event ids
     """
     from indico.modules.events.surveys.models.surveys import Survey
+
     # Survey submissions are not stored in links anymore, so we need to get them directly
     query = (user.survey_submissions
              .options(load_only('survey_id'))

@@ -1,11 +1,9 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
-
-from __future__ import unicode_literals
 
 from flask import session
 
@@ -21,12 +19,14 @@ from indico.util.i18n import orig_string
 
 
 def create_session(event, data):
-    """Create a new session with the information passed in the `data` argument"""
+    """
+    Create a new session with the information passed in the `data` argument.
+    """
     event_session = Session(event=event)
     event_session.populate_from_dict(data)
     db.session.flush()
     event.log(EventLogRealm.management, EventLogKind.positive, 'Sessions',
-              'Session "{}" has been created'.format(event_session.title), session.user,
+              f'Session "{event_session.title}" has been created', session.user,
               meta={'session_id': event_session.id})
     logger.info('Session %s created by %s', event_session, session.user)
     return event_session
@@ -45,12 +45,12 @@ def create_session_block(session_, data):
 
 
 def update_session(event_session, data):
-    """Update a session based on the information in the `data`"""
+    """Update a session based on the information in the `data`."""
     event_session.populate_from_dict(data)
     db.session.flush()
     signals.event.session_updated.send(event_session)
     event_session.event.log(EventLogRealm.management, EventLogKind.change, 'Sessions',
-                            'Session "{}" has been updated'.format(event_session.title), session.user,
+                            f'Session "{event_session.title}" has been updated', session.user,
                             meta={'session_id': event_session.id})
     logger.info('Session %s modified by %s', event_session, session.user)
 
@@ -68,20 +68,20 @@ def _delete_session_timetable_entries(event_session):
 
 
 def delete_session(event_session):
-    """Delete session from the event"""
+    """Delete session from the event."""
     event_session.is_deleted = True
     for contribution in event_session.contributions[:]:
         contribution.session = None
     _delete_session_timetable_entries(event_session)
     signals.event.session_deleted.send(event_session)
     event_session.event.log(EventLogRealm.management, EventLogKind.negative, 'Sessions',
-                            'Session "{}" has been deleted'.format(event_session.title), session.user,
+                            f'Session "{event_session.title}" has been deleted', session.user,
                             meta={'session_id': event_session.id})
     logger.info('Session %s deleted by %s', event_session, session.user)
 
 
 def update_session_block(session_block, data):
-    """Update a session block with data passed in the `data` argument"""
+    """Update a session block with data passed in the `data` argument."""
     from indico.modules.events.timetable.operations import update_timetable_entry
 
     start_dt = data.pop('start_dt', None)
@@ -91,7 +91,7 @@ def update_session_block(session_block, data):
     session_block.populate_from_dict(data)
     db.session.flush()
     session_block.event.log(EventLogRealm.management, EventLogKind.change, 'Sessions',
-                            'Session block "{}" has been updated'.format(session_block.title), session.user,
+                            f'Session block "{session_block.title}" has been updated', session.user,
                             meta={'session_block_id': session_block.id})
     logger.info('Session block %s modified by %s', session_block, session.user)
 
@@ -118,14 +118,14 @@ def delete_session_block(session_block):
         delete_session(session_)
     db.session.flush()
     event.log(EventLogRealm.management, EventLogKind.negative, 'Sessions',
-              'Session block "{}" has been deleted'.format(session_block.title), session.user,
+              f'Session block "{session_block.title}" has been deleted', session.user,
               meta={'session_block_id': session_block.id})
     logger.info('Session block %s deleted by %s', session_block, session.user)
 
 
 def update_session_coordinator_privs(event, data):
     changes = {}
-    for priv, enabled in data.iteritems():
+    for priv, enabled in data.items():
         setting = COORDINATOR_PRIV_SETTINGS[priv]
         if session_settings.get(event, setting) == enabled:
             continue
@@ -134,6 +134,6 @@ def update_session_coordinator_privs(event, data):
     db.session.flush()
     logger.info('Session coordinator privs of event %r updated with %r by %r', event, data, session.user)
     if changes:
-        log_fields = {priv: orig_string(title) for priv, title in COORDINATOR_PRIV_TITLES.iteritems()}
+        log_fields = {priv: orig_string(title) for priv, title in COORDINATOR_PRIV_TITLES.items()}
         event.log(EventLogRealm.management, EventLogKind.change, 'Sessions', 'Coordinator privileges updated',
                   session.user, data={'Changes': make_diff_log(changes, log_fields)})

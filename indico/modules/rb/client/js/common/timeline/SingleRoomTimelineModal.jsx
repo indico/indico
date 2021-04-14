@@ -1,22 +1,24 @@
 // This file is part of Indico.
-// Copyright (C) 2002 - 2020 CERN
+// Copyright (C) 2002 - 2021 CERN
 //
 // Indico is free software; you can redistribute it and/or
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
 import _ from 'lodash';
+import PropTypes from 'prop-types';
 import React, {useEffect} from 'react';
 import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
-import PropTypes from 'prop-types';
 import {Modal, Icon, Popup} from 'semantic-ui-react';
 
 import {serializeDate} from 'indico/utils/date';
-import {getOccurrenceTypes, transformToLegendLabels} from '../../util';
+
 import {actions as bookRoomActions, selectors as bookRoomSelectors} from '../../modules/bookRoom';
-import TimelineLegend from './TimelineLegend';
+import {getOccurrenceTypes, transformToLegendLabels} from '../../util';
+
 import DailyTimelineContent from './DailyTimelineContent';
+import TimelineLegend from './TimelineLegend';
 
 import './SingleRoomTimelineModal.module.scss';
 

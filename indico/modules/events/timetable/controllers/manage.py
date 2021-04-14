@@ -1,11 +1,9 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
-
-from __future__ import unicode_literals
 
 import dateutil.parser
 from flask import jsonify, request, session
@@ -31,7 +29,7 @@ from indico.web.util import jsonify_data
 
 
 class RHManageTimetable(RHManageTimetableBase):
-    """Display timetable management page"""
+    """Display timetable management page."""
 
     session_management_level = SessionManagementLevel.coordinate
 
@@ -63,7 +61,7 @@ class RHManageSessionTimetable(RHManageTimetableBase):
 
 
 class RHTimetableREST(RHManageTimetableEntryBase):
-    """RESTful timetable actions"""
+    """RESTful timetable actions."""
 
     def _get_contribution_updates(self, data):
         updates = {'parent': None}
@@ -89,13 +87,13 @@ class RHTimetableREST(RHManageTimetableEntryBase):
         return updates
 
     def _process_POST(self):
-        """Create new timetable entry"""
+        """Create new timetable entry."""
         data = request.json
         required_keys = {'start_dt'}
         allowed_keys = {'start_dt', 'contribution_id', 'session_block_id', 'force'}
-        if set(data.viewkeys()) > allowed_keys:
+        if set(data.keys()) > allowed_keys:
             raise BadRequest('Invalid keys found')
-        elif required_keys > set(data.viewkeys()):
+        elif required_keys > set(data.keys()):
             raise BadRequest('Required keys missing')
         updates = {'start_dt': dateutil.parser.parse(data['start_dt'])}
         if 'contribution_id' in data:
@@ -107,10 +105,10 @@ class RHTimetableREST(RHManageTimetableEntryBase):
         return jsonify(start_dt=entry.start_dt.isoformat(), id=entry.id)
 
     def _process_PATCH(self):
-        """Update a timetable entry"""
+        """Update a timetable entry."""
         data = request.json
         # TODO: support breaks
-        if set(data.viewkeys()) > {'start_dt'}:
+        if set(data.keys()) > {'start_dt'}:
             raise BadRequest('Invalid keys found')
         updates = {}
         if 'start_dt' in data:
@@ -121,7 +119,7 @@ class RHTimetableREST(RHManageTimetableEntryBase):
         return jsonify()
 
     def _process_DELETE(self):
-        """Delete a timetable entry"""
+        """Delete a timetable entry."""
         if self.entry.type == TimetableEntryType.SESSION_BLOCK:
             delete_session_block(self.entry.session_block)
         elif self.event.type != 'conference' and self.entry.type == TimetableEntryType.CONTRIBUTION:
@@ -163,7 +161,7 @@ class RHBreakREST(RHManageTimetableBase):
 
     def _process_PATCH(self):
         data = request.json
-        if set(data.viewkeys()) > {'colors'}:
+        if set(data.keys()) > {'colors'}:
             raise BadRequest
         if 'colors' in data:
             colors = ColorTuple(**data['colors'])
@@ -173,7 +171,7 @@ class RHBreakREST(RHManageTimetableBase):
 
 
 class RHCloneContribution(RHManageTimetableBase):
-    """Clone a contribution and schedule it at the same position"""
+    """Clone a contribution and schedule it at the same position."""
 
     def _process_args(self):
         RHManageTimetableBase._process_args(self)

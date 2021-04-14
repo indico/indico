@@ -1,11 +1,9 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
-
-from __future__ import unicode_literals
 
 from datetime import datetime, time
 from operator import attrgetter
@@ -15,8 +13,7 @@ from indico.core.db.sqlalchemy import PyIntEnum
 from indico.modules.rb.models.reservation_occurrences import ReservationOccurrence
 from indico.modules.rb.models.reservations import Reservation
 from indico.modules.rb.notifications.blockings import notify_request_response
-from indico.util.string import return_ascii
-from indico.util.struct.enum import RichIntEnum
+from indico.util.enum import RichIntEnum
 
 
 class BlockedRoomState(RichIntEnum):
@@ -91,23 +88,22 @@ class BlockedRoom(db.Model):
         ]
 
         # Whole reservations to reject
-        reservations = Reservation.find_all(
+        reservations = Reservation.query.filter(
             Reservation.start_dt >= start_dt,
             Reservation.end_dt <= end_dt,
             *reservation_criteria
-        )
+        ).all()
 
         # Single occurrences to reject
-        occurrences = ReservationOccurrence.find_all(
+        occurrences = ReservationOccurrence.query.filter(
             ReservationOccurrence.start_dt >= start_dt,
             ReservationOccurrence.end_dt <= end_dt,
             ReservationOccurrence.is_valid,
             ~ReservationOccurrence.reservation_id.in_(map(attrgetter('id'), reservations)) if reservations else True,
             *reservation_criteria,
-            _join=Reservation
-        )
+        ).join(Reservation).all()
 
-        reason = 'Conflict with blocking {}: {}'.format(self.blocking.id, self.blocking.reason)
+        reason = f'Conflict with blocking {self.blocking.id}: {self.blocking.reason}'
 
         for reservation in reservations:
             if self.blocking.can_override(reservation.created_by_user, room=reservation.room):
@@ -125,9 +121,8 @@ class BlockedRoom(db.Model):
             # This is the case if it's a new blocking for a room managed by the creator
             notify_request_response(self)
 
-    @return_ascii
     def __repr__(self):
-        return '<BlockedRoom({0}, {1}, {2})>'.format(
+        return '<BlockedRoom({}, {}, {})>'.format(
             self.blocking_id,
             self.room_id,
             self.state_name

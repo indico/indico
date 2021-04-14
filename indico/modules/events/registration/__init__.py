@@ -1,11 +1,9 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
-
-from __future__ import unicode_literals
 
 from flask import flash, render_template, session
 
@@ -55,7 +53,7 @@ def _extend_event_management_menu(sender, event, **kwargs):
 
 @template_hook('conference-home-info')
 def _inject_regform_announcement(event, **kwargs):
-    from indico.modules.events.registration.util import get_registrations_with_tickets, get_event_regforms
+    from indico.modules.events.registration.util import get_event_regforms, get_registrations_with_tickets
     if event.has_feature('registration'):
         all_regforms = get_event_regforms(event, session.user)
         user_registrations = sum(regform[1] for regform in all_regforms)
@@ -87,6 +85,8 @@ def _extend_event_menu(sender, **kwargs):
     def _visible_registration(event):
         if not event.has_feature('registration'):
             return False
+        if not event.can_access(session.user) and not (event.has_regform_in_acl and event.public_regform_access):
+            return False
         if any(form.is_scheduled for form in event.registration_forms):
             return True
         if not session.user:
@@ -114,11 +114,11 @@ def _associate_registrations(user, **kwargs):
     subquery = db.session.query(reg_alias).filter(reg_alias.user_id == user.id,
                                                   reg_alias.registration_form_id == Registration.registration_form_id,
                                                   ~reg_alias.is_deleted)
-    registrations = (Registration
-                     .find(Registration.user_id == None,  # noqa
-                           Registration.email.in_(user.all_emails),
-                           ~subquery.exists(),
-                           ~Registration.is_deleted)
+    registrations = (Registration.query
+                     .filter(Registration.user_id.is_(None),
+                             Registration.email.in_(user.all_emails),
+                             ~subquery.exists(),
+                             ~Registration.is_deleted)
                      .order_by(Registration.submitted_dt.desc())
                      .all())
     if not registrations:
@@ -144,8 +144,9 @@ def _get_event_management_url(event, **kwargs):
 
 @signals.get_placeholders.connect_via('registration-invitation-email')
 def _get_invitation_placeholders(sender, invitation, **kwargs):
-    from indico.modules.events.registration.placeholders.invitations import (FirstNamePlaceholder, LastNamePlaceholder,
-                                                                             InvitationLinkPlaceholder)
+    from indico.modules.events.registration.placeholders.invitations import (FirstNamePlaceholder,
+                                                                             InvitationLinkPlaceholder,
+                                                                             LastNamePlaceholder)
     yield FirstNamePlaceholder
     yield LastNamePlaceholder
     yield InvitationLinkPlaceholder
@@ -153,16 +154,18 @@ def _get_invitation_placeholders(sender, invitation, **kwargs):
 
 @signals.get_placeholders.connect_via('registration-email')
 def _get_registration_placeholders(sender, regform, registration, **kwargs):
-    from indico.modules.events.registration.placeholders.registrations import (IDPlaceholder, LastNamePlaceholder,
-                                                                               FirstNamePlaceholder, LinkPlaceholder,
-                                                                               EventTitlePlaceholder,
-                                                                               EventLinkPlaceholder, FieldPlaceholder)
+    from indico.modules.events.registration.placeholders.registrations import (EventLinkPlaceholder,
+                                                                               EventTitlePlaceholder, FieldPlaceholder,
+                                                                               FirstNamePlaceholder, IDPlaceholder,
+                                                                               LastNamePlaceholder, LinkPlaceholder,
+                                                                               RejectionReasonPlaceholder)
     yield FirstNamePlaceholder
     yield LastNamePlaceholder
     yield EventTitlePlaceholder
     yield EventLinkPlaceholder
     yield IDPlaceholder
     yield LinkPlaceholder
+    yield RejectionReasonPlaceholder
     yield FieldPlaceholder
 
 
@@ -178,7 +181,7 @@ def _get_management_permissions(sender, **kwargs):
 
 @signals.event_management.get_cloners.connect
 def _get_registration_cloners(sender, **kwargs):
-    from indico.modules.events.registration.clone import RegistrationFormCloner, RegistrationCloner
+    from indico.modules.events.registration.clone import RegistrationCloner, RegistrationFormCloner
     yield RegistrationFormCloner
     yield RegistrationCloner
 

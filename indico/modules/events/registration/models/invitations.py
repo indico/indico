@@ -1,11 +1,9 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
-
-from __future__ import unicode_literals
 
 from uuid import uuid4
 
@@ -13,10 +11,10 @@ from sqlalchemy.dialects.postgresql import UUID
 
 from indico.core.db import db
 from indico.core.db.sqlalchemy import PyIntEnum
+from indico.util.enum import RichIntEnum
 from indico.util.i18n import L_
 from indico.util.locators import locator_property
-from indico.util.string import format_repr, return_ascii
-from indico.util.struct.enum import RichIntEnum
+from indico.util.string import format_repr
 
 
 class InvitationState(RichIntEnum):
@@ -27,7 +25,7 @@ class InvitationState(RichIntEnum):
 
 
 class RegistrationInvitation(db.Model):
-    """An invitation for someone to register"""
+    """An invitation for someone to register."""
     __tablename__ = 'invitations'
     __table_args__ = (db.CheckConstraint("(state = {state}) OR (registration_id IS NULL)"
                                          .format(state=InvitationState.accepted), name='registration_state'),
@@ -45,7 +43,7 @@ class RegistrationInvitation(db.Model):
         index=True,
         unique=True,
         nullable=False,
-        default=lambda: unicode(uuid4())
+        default=lambda: str(uuid4())
     )
     #: The ID of the registration form
     registration_form_id = db.Column(
@@ -117,12 +115,11 @@ class RegistrationInvitation(db.Model):
     def locator(self):
         """A locator suitable for 'display' pages.
 
-        Instead of the numeric ID it uses the UUID
+        Instead of the numeric ID it uses the UUID.
         """
         assert self.uuid is not None
         return dict(self.registration_form.locator, invitation=self.uuid)
 
-    @return_ascii
     def __repr__(self):
-        full_name = '{} {}'.format(self.first_name, self.last_name)
+        full_name = f'{self.first_name} {self.last_name}'
         return format_repr(self, 'id', 'registration_form_id', 'email', 'state', _text=full_name)

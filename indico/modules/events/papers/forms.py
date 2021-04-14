@@ -1,11 +1,9 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
-
-from __future__ import unicode_literals
 
 from datetime import time
 
@@ -27,9 +25,9 @@ from indico.web.forms.widgets import SwitchWidget
 
 
 def make_competences_form(event):
-    form_class = type(b'PaperCompetencesForm', (IndicoForm,), {})
+    form_class = type('PaperCompetencesForm', (IndicoForm,), {})
     for entry in event.cfp.assignees:
-        name = 'competences_{}'.format(entry.id)
+        name = f'competences_{entry.id}'
         field = IndicoTagListField('Competences')
         setattr(form_class, name, field)
     return form_class
@@ -49,7 +47,7 @@ class PaperTeamsForm(IndicoForm):
 
     def __init__(self, *args, **kwargs):
         self.event = kwargs.pop('event')
-        super(PaperTeamsForm, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         if not self.event.cfp.content_reviewing_enabled:
             del self.content_reviewers
         if not self.event.cfp.layout_reviewing_enabled:
@@ -64,7 +62,7 @@ class PapersScheduleForm(IndicoForm):
 
     def __init__(self, *args, **kwargs):
         self.event = kwargs.pop('event')
-        super(PapersScheduleForm, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
 
 class BulkPaperJudgmentForm(IndicoForm):
@@ -76,14 +74,14 @@ class BulkPaperJudgmentForm(IndicoForm):
 
     def __init__(self, *args, **kwargs):
         self.event = kwargs.pop('event')
-        super(BulkPaperJudgmentForm, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
     def is_submitted(self):
-        return super(BulkPaperJudgmentForm, self).is_submitted() and 'submitted' in request.form
+        return super().is_submitted() and 'submitted' in request.form
 
 
 class PaperReviewingSettingsForm(IndicoForm):
-    """Settings form for paper reviewing"""
+    """Settings form for paper reviewing."""
 
     RATING_FIELDS = ('scale_lower', 'scale_upper')
 
@@ -95,7 +93,7 @@ class PaperReviewingSettingsForm(IndicoForm):
     def __init__(self, *args, **kwargs):
         self.event = kwargs.pop('event')
         self.has_ratings = kwargs.pop('has_ratings', False)
-        super(PaperReviewingSettingsForm, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         if self.has_ratings:
             self.scale_upper.warning = _("Some reviewers have already submitted ratings so the scale cannot be changed "
                                          "anymore.")
@@ -112,7 +110,7 @@ class PaperReviewingSettingsForm(IndicoForm):
 
     @property
     def data(self):
-        data = super(PaperReviewingSettingsForm, self).data
+        data = super().data
         if self.has_ratings:
             for key in self.RATING_FIELDS:
                 del data[key]
@@ -142,7 +140,7 @@ class PaperTemplateForm(IndicoForm):
         template = kwargs.pop('template', None)
         if template is None:
             inject_validators(self, 'template', [DataRequired()])
-        super(PaperTemplateForm, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
 
 class DeadlineForm(IndicoForm):
@@ -151,4 +149,4 @@ class DeadlineForm(IndicoForm):
 
     def __init__(self, *args, **kwargs):
         self.event = kwargs.pop('event')
-        super(DeadlineForm, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)

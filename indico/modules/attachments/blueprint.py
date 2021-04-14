@@ -1,11 +1,9 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
-
-from __future__ import unicode_literals
 
 import itertools
 
@@ -15,6 +13,7 @@ from indico.modules.attachments.controllers.display.category import RHDownloadCa
 from indico.modules.attachments.controllers.display.event import (RHDownloadEventAttachment,
                                                                   RHListEventAttachmentFolder,
                                                                   RHPackageEventAttachmentsDisplay)
+from indico.modules.attachments.controllers.event_package import RHPackageEventAttachmentsStatus
 from indico.modules.attachments.controllers.management.category import (RHAddCategoryAttachmentFiles,
                                                                         RHAddCategoryAttachmentLink,
                                                                         RHCreateCategoryFolder,
@@ -50,13 +49,13 @@ def _dispatch(event_rh, category_rh):
 
 
 # Management
-items = itertools.chain(event_management_object_url_prefixes.iteritems(), [('category', ['/manage'])])
+items = itertools.chain(event_management_object_url_prefixes.items(), [('category', ['/manage'])])
 for object_type, prefixes in items:
     for prefix in prefixes:
         if object_type == 'category':
             prefix = '/category/<int:category_id>' + prefix
         else:
-            prefix = '/event/<int:confId>' + prefix
+            prefix = '/event/<int:event_id>' + prefix
         _bp.add_url_rule(prefix + '/attachments/', 'management',
                          _dispatch(RHManageEventAttachments, RHManageCategoryAttachments),
                          defaults={'object_type': object_type})
@@ -86,13 +85,13 @@ for object_type, prefixes in items:
                          methods=('DELETE',), defaults={'object_type': object_type})
 
 # Display/download
-items = itertools.chain(event_object_url_prefixes.iteritems(), [('category', [''])])
+items = itertools.chain(event_object_url_prefixes.items(), [('category', [''])])
 for object_type, prefixes in items:
     for prefix in prefixes:
         if object_type == 'category':
             prefix = '/category/<category_id>' + prefix
         else:
-            prefix = '/event/<confId>' + prefix
+            prefix = '/event/<int:event_id>' + prefix
         _bp.add_url_rule(prefix + '/attachments/<int:folder_id>/<int:attachment_id>/<filename>', 'download',
                          _dispatch(RHDownloadEventAttachment, RHDownloadCategoryAttachment),
                          defaults={'object_type': object_type})
@@ -105,14 +104,16 @@ for object_type, prefixes in items:
 
 
 # Package
-_bp.add_url_rule('/event/<confId>/attachments/package', 'package',
+_bp.add_url_rule('/event/<int:event_id>/attachments/package', 'package',
                  RHPackageEventAttachmentsDisplay, methods=('GET', 'POST'))
-_bp.add_url_rule('/event/<confId>/manage/attachments/package', 'package_management',
+_bp.add_url_rule('/event/<int:event_id>/manage/attachments/package', 'package_management',
                  RHPackageEventAttachmentsManagement, methods=('GET', 'POST'))
+_bp.add_url_rule('/event/<int:event_id>/attachments/package/status/<task_id>', 'package_status',
+                 RHPackageEventAttachmentsStatus)
 
 
 # Legacy redirects for the old URLs
-_compat_bp = IndicoBlueprint('compat_attachments', __name__, url_prefix='/event/<event_id>')
+_compat_bp = IndicoBlueprint('compat_attachments', __name__, url_prefix='/event/<int:event_id>')
 compat_folder_rules = [
     '/material/<material_id>/',
     '/session/<session_id>/contribution/<contrib_id>/material/<material_id>/',
@@ -133,17 +134,17 @@ compat_attachment_rules = [
     '/contribution/<contrib_id>/<subcontrib_id>/material/<material_id>/<resource_id>.<ext>'
 ]
 old_obj_prefix_rules = {
-    'session': ['!/event/<confId>/session/<sessionId>'],
-    'contribution': ['!/event/<confId>/session/<sessionId>/contribution/<contribId>',
-                     '!/event/<confId>/contribution/<contribId>'],
-    'subcontribution': ['!/event/<confId>/session/<sessionId>/contribution/<contribId>/<subContId>',
-                        '!/event/<confId>/contribution/<contribId>/<subContId>']
+    'session': ['!/event/<int:event_id>/session/<sessionId>'],
+    'contribution': ['!/event/<int:event_id>/session/<sessionId>/contribution/<contribId>',
+                     '!/event/<int:event_id>/contribution/<contribId>'],
+    'subcontribution': ['!/event/<int:event_id>/session/<sessionId>/contribution/<contribId>/<subContId>',
+                        '!/event/<int:event_id>/contribution/<contribId>/<subContId>']
 }
 for rule in compat_folder_rules:
     _compat_bp.add_url_rule(rule, 'folder', compat_folder)
 for rule in compat_attachment_rules:
     _compat_bp.add_url_rule(rule, 'attachment', compat_attachment)
-for object_type, prefixes in old_obj_prefix_rules.iteritems():
+for object_type, prefixes in old_obj_prefix_rules.items():
     for prefix in prefixes:
         # we rely on url normalization to redirect to the proper URL for the object
         _compat_bp.add_url_rule(prefix + '/attachments/<int:folder_id>/<int:attachment_id>/<filename>',

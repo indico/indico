@@ -1,16 +1,14 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import unicode_literals
-
 from indico.modules.events.models.persons import EventPerson
 from indico.modules.users import User
 from indico.modules.users.models.users import UserTitle
-from indico.util.user import principal_from_fossil
+from indico.util.user import principal_from_identifier
 
 
 def create_event_person(event, create_untrusted_persons=False, **data):
@@ -27,8 +25,7 @@ def get_event_person_for_user(event, user, create_untrusted_persons=False):
     return EventPerson.for_user(user, event, is_untrusted=create_untrusted_persons)
 
 
-def get_event_person(event, data, create_untrusted_persons=False, allow_external=False, allow_emails=False,
-                     allow_networks=False):
+def get_event_person(event, data, create_untrusted_persons=False, allow_external=False):
     """Get an EventPerson from dictionary data.
 
     If there is already an event person in the same event and for the same user,
@@ -48,13 +45,11 @@ def get_event_person(event, data, create_untrusted_persons=False, allow_external
         # We have no way to identify an existing event person with the provided information
         return create_event_person(event, create_untrusted_persons=create_untrusted_persons, **data)
     elif person_type == 'Avatar':
-        # XXX: existing_data
-        principal = principal_from_fossil(data, allow_pending=allow_external, allow_emails=allow_emails,
-                                          allow_networks=allow_networks)
+        principal = principal_from_identifier(data['identifier'], allow_external_users=allow_external)
         return get_event_person_for_user(event, principal, create_untrusted_persons=create_untrusted_persons)
     elif person_type == 'EventPerson':
         return event.persons.filter_by(id=data['id']).one()
     elif person_type == 'PersonLink':
         return event.persons.filter_by(id=data['personId']).one()
     else:
-        raise ValueError("Unknown person type '{}'".format(person_type))
+        raise ValueError(f"Unknown person type '{person_type}'")

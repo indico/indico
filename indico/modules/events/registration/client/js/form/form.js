@@ -1,9 +1,11 @@
 // This file is part of Indico.
-// Copyright (C) 2002 - 2020 CERN
+// Copyright (C) 2002 - 2021 CERN
 //
 // Indico is free software; you can redistribute it and/or
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
+
+/* eslint-disable import/unambiguous */
 
 window.ndRegForm = angular.module('nd.regform', ['ui.sortable', 'ngResource', 'ngSanitize']);
 
@@ -13,12 +15,12 @@ window.ndRegForm = angular.module('nd.regform', ['ui.sortable', 'ngResource', 'n
 
 ndRegForm.value(
   'editionURL',
-  Indico.Urls.Base + '/event/:confId/manage/registration/:confFormId/form/'
+  Indico.Urls.Base + '/event/:eventId/manage/registration/:confFormId/form/'
 );
 
 ndRegForm.value(
   'displayurl',
-  Indico.Urls.Base + '/event/:confId/registration/:confFormId/sections'
+  Indico.Urls.Base + '/event/:eventId/registration/:confFormId/sections'
 );
 
 ndRegForm.value('sortableoptions', {
@@ -84,7 +86,7 @@ ndRegForm.factory('regFormFactory', function(
     },
     Sections: $resource(
       urls.section.add,
-      {confId: '@confId', sectionId: '@sectionId', confFormId: '@confFormId'},
+      {eventId: '@eventId', sectionId: '@sectionId', confFormId: '@confFormId'},
       {
         remove: {method: 'DELETE', url: urls.section.modify, isArray: true},
         enable: {method: 'POST', url: urls.section.toggle, params: {enable: true}},
@@ -95,7 +97,7 @@ ndRegForm.factory('regFormFactory', function(
     ),
     Fields: $resource(
       urls.field.add,
-      {confId: '@confId', sectionId: '@sectionId', fieldId: '@fieldId', confFormId: '@confFormId'},
+      {eventId: '@eventId', sectionId: '@sectionId', fieldId: '@fieldId', confFormId: '@confFormId'},
       {
         remove: {method: 'DELETE', url: urls.field.modify},
         enable: {method: 'POST', url: urls.field.toggle, params: {enable: true}},
@@ -106,7 +108,7 @@ ndRegForm.factory('regFormFactory', function(
     ),
     Labels: $resource(
       urls.text.add,
-      {confId: '@confId', sectionId: '@sectionId', fieldId: '@fieldId', confFormId: '@confFormId'},
+      {eventId: '@eventId', sectionId: '@sectionId', fieldId: '@fieldId', confFormId: '@confFormId'},
       {
         remove: {method: 'DELETE', url: urls.text.modify},
         enable: {method: 'POST', url: urls.text.toggle, params: {enable: true}},
@@ -128,7 +130,7 @@ ndRegForm.directive('ndRegForm', function($rootScope, url, sortableoptions, regF
     templateUrl: url.tpl('registrationform.tpl.html'),
 
     scope: {
-      confId: '@',
+      eventId: '@',
       confFormId: '@',
       confCurrency: '@',
       confSections: '@',
@@ -154,7 +156,7 @@ ndRegForm.directive('ndRegForm', function($rootScope, url, sortableoptions, regF
       $scope.registrationData = angular.fromJson($scope.registrationData);
       $scope.registrationMetaData = angular.fromJson($scope.registrationMetaData);
 
-      $rootScope.confId = $scope.confId;
+      $rootScope.eventId = $scope.eventId;
       $rootScope.confFormId = $scope.confFormId;
       $rootScope.eventStartDate = $scope.eventStartDate;
       $rootScope.eventEndDate = $scope.eventEndDate;
@@ -192,7 +194,7 @@ ndRegForm.directive('ndRegForm', function($rootScope, url, sortableoptions, regF
 
           regFormFactory.Sections.save(
             {
-              confId: $scope.confId,
+              eventId: $scope.eventId,
               title: data.newsection.title,
               description: data.newsection.description,
               is_manager_only: managerOnly,
@@ -216,7 +218,7 @@ ndRegForm.directive('ndRegForm', function($rootScope, url, sortableoptions, regF
         moveSection: function(section, position) {
           regFormFactory.Sections.move(
             {
-              confId: $scope.confId,
+              eventId: $scope.eventId,
               sectionId: section.id,
               endPos: position,
               confFormId: $scope.confFormId,
@@ -234,7 +236,7 @@ ndRegForm.directive('ndRegForm', function($rootScope, url, sortableoptions, regF
         restoreSection: function(section) {
           regFormFactory.Sections.enable(
             {
-              confId: $rootScope.confId,
+              eventId: $rootScope.eventId,
               sectionId: section.id,
               confFormId: $rootScope.confFormId,
             },
@@ -258,7 +260,7 @@ ndRegForm.directive('ndRegForm', function($rootScope, url, sortableoptions, regF
         removeSection: function(section) {
           regFormFactory.Sections.remove(
             {
-              confId: $rootScope.confId,
+              eventId: $rootScope.eventId,
               sectionId: section.id,
               confFormId: $rootScope.confFormId,
             },

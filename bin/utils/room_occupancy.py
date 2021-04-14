@@ -1,11 +1,9 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
-
-from __future__ import print_function
 
 from datetime import date
 
@@ -15,6 +13,7 @@ from dateutil.relativedelta import relativedelta
 from indico.modules.rb.models.locations import Location
 from indico.modules.rb.models.rooms import Room
 from indico.modules.rb.statistics import calculate_rooms_occupancy
+from indico.util.string import natural_sort_key
 from indico.web.flask.app import make_app
 
 
@@ -23,10 +22,10 @@ def _main(location):
     past_month = yesterday - relativedelta(days=29)
     past_year = yesterday - relativedelta(years=1)
 
-    if not location:
-        rooms = Room.find_all()
-    else:
-        rooms = Room.find_all(Location.name.in_(location), _join=Location)
+    query = Room.query
+    if location:
+        query = query.join(Location).filter(Location.name.in_(location))
+    rooms = sorted(query, key=lambda r: natural_sort_key(r.location_name + r.full_name))
 
     print('Month\tYear\tPublic?\tRoom')
     for room in rooms:

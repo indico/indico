@@ -9,14 +9,12 @@
 {%- endblock %}
 
 {% block body -%}
-    {%- filter dedent -%}
-        {%- trans -%}
-            You started the Indico profile creation process.  To continue, you need to verify
-            that {{ email }} is indeed your email address.
+{%- trans notrimmed -%}
+You started the Indico profile creation process.  To continue, you need to verify
+that {{ email }} is indeed your email address.
 
-            Please click the following link to continue the registration process:
-        {%- endtrans %}
+Please click the following link to continue the registration process:
+{%- endtrans %}
 
-        {{ url }}
-    {%- endfilter -%}
+{{ url }}
 {%- endblock %}

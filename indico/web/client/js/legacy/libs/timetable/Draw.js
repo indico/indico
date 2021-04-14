@@ -1,9 +1,11 @@
 // This file is part of Indico.
-// Copyright (C) 2002 - 2020 CERN
+// Copyright (C) 2002 - 2021 CERN
 //
 // Indico is free software; you can redistribute it and/or
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
+
+/* eslint-disable import/unambiguous */
 
 type(
   'TimetableBlockBase',
@@ -490,7 +492,7 @@ function loadBalloonContent(self, api, editable) {
     ? Indico.Urls.Timetable.entries.info.manage
     : Indico.Urls.Timetable.entries.info.display;
   var urlParams = {
-    confId: self.eventData.conferenceId,
+    event_id: self.eventData.conferenceId,
     entry_id: entryId,
   };
   if (self.timetable.isSessionTimetable) {
@@ -608,7 +610,7 @@ function loadBalloonContent(self, api, editable) {
 
         $content.find('.js-move').on('click', function() {
           var urlArgs = {
-            confId: self.eventData.conferenceId,
+            event_id: self.eventData.conferenceId,
             entry_id: self.eventData.scheduleEntryId,
           };
           if (self.timetable.isSessionTimetable) {
@@ -692,12 +694,12 @@ function drawBalloon(self, evt, editable) {
     var url;
     if (self.eventData.entryType == 'Session') {
       url = build_url(Indico.Urls.Sessions.display_session, {
-        confId: self.eventData.conferenceId,
+        event_id: self.eventData.conferenceId,
         session_id: self.eventData.sessionId,
       });
     } else if (self.eventData.entryType == 'Contribution') {
       url = build_url(Indico.Urls.Contributions.display_contribution, {
-        confId: self.eventData.conferenceId,
+        event_id: self.eventData.conferenceId,
         contrib_id: self.eventData.contributionId,
       });
     } else {
@@ -1474,13 +1476,13 @@ type(
             title: $T.gettext('Edit'),
             data: {
               title: $T.gettext('Edit poster'),
-              confId: blockData.conferenceId,
+              eventId: blockData.conferenceId,
               timetableEntryId: blockData.scheduleEntryId,
             },
           }).on('click', function(evt, params) {
             var $this = $(this);
             var urlArgs = {
-              confId: $this.data('confId'),
+              event_id: $this.data('eventId'),
               entry_id: $this.data('timetableEntryId'),
             };
             if (self.timetable.isSessionTimetable) {
@@ -1508,13 +1510,13 @@ type(
             title: $T.gettext('Manage protection'),
             data: {
               title: $T.gettext('Manage poster protection'),
-              confId: blockData.conferenceId,
+              eventId: blockData.conferenceId,
               contribId: blockData.contributionId,
             },
           }).on('click', function(evt) {
             var $this = $(this);
             var urlArgs = {
-              confId: $this.data('confId'),
+              event_id: $this.data('eventId'),
               contrib_id: $this.data('contribId'),
             };
             ajaxDialog({

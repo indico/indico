@@ -1,11 +1,9 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
-
-from __future__ import unicode_literals
 
 from operator import attrgetter
 
@@ -14,6 +12,7 @@ from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import mapper
 
+from indico.core import signals
 from indico.core.db.sqlalchemy import PyIntEnum, UTCDateTime, db
 from indico.core.db.sqlalchemy.principals import EmailPrincipal
 from indico.core.db.sqlalchemy.util.models import auto_table_args, override_attr
@@ -21,10 +20,10 @@ from indico.core.db.sqlalchemy.util.session import no_autoflush
 from indico.modules.users.models.users import PersonMixin, UserTitle
 from indico.util.decorators import strict_classproperty
 from indico.util.locators import locator_property
-from indico.util.string import format_repr, return_ascii
+from indico.util.string import format_repr
 
 
-class PersonLinkDataMixin(object):
+class PersonLinkDataMixin:
     @property
     def person_link_data(self):
         return {x: x.is_submitter for x in self.person_links}
@@ -33,13 +32,13 @@ class PersonLinkDataMixin(object):
     @no_autoflush
     def person_link_data(self, value):
         # Revoke submission rights for removed persons
-        for person_link in set(self.person_links) - value.viewkeys():
+        for person_link in set(self.person_links) - value.keys():
             principal = person_link.person.principal
             if principal:
                 self.update_principal(principal, del_permissions={'submit'})
         # Update person links
-        self.person_links = value.keys()
-        for person_link, is_submitter in value.iteritems():
+        self.person_links = list(value.keys())
+        for person_link, is_submitter in value.items():
             person = person_link.person
             principal = person.principal
             if not principal:
@@ -48,7 +47,7 @@ class PersonLinkDataMixin(object):
             self.update_principal(principal, **action)
 
 
-class AuthorsSpeakersMixin(object):
+class AuthorsSpeakersMixin:
     AUTHORS_SPEAKERS_DISPLAY_ORDER_ATTR = 'display_order_key'
 
     @property
@@ -175,7 +174,6 @@ class EventPerson(PersonMixin, db.Model):
     def locator(self):
         return dict(self.event.locator, person_id=self.id)
 
-    @return_ascii
     def __repr__(self):
         return format_repr(self, 'id', is_untrusted=False, _text=self.full_name)
 
@@ -187,6 +185,10 @@ class EventPerson(PersonMixin, db.Model):
             return EmailPrincipal(self.email)
         return None
 
+    @property
+    def identifier(self):
+        return f'EventPerson:{self.id}'
+
     @classmethod
     def create_from_user(cls, user, event=None, is_untrusted=False):
         return EventPerson(user=user, event=event, first_name=user.first_name, last_name=user.last_name,
@@ -195,7 +197,7 @@ class EventPerson(PersonMixin, db.Model):
 
     @classmethod
     def for_user(cls, user, event=None, is_untrusted=False):
-        """Return EventPerson for a matching User in Event creating if needed"""
+        """Return EventPerson for a matching User in Event creating if needed."""
         person = event.persons.filter_by(user=user).first() if event else None
         return person or cls.create_from_user(user, event, is_untrusted=is_untrusted)
 
@@ -219,7 +221,7 @@ class EventPerson(PersonMixin, db.Model):
     @classmethod
     def link_user_by_email(cls, user):
         """
-        Links all email-based persons matching the user's
+        Link all email-based persons matching the user's
         email addresses with the user.
 
         :param user: A User object.
@@ -240,6 +242,23 @@ class EventPerson(PersonMixin, db.Model):
                 existing.merge_person_info(event_person)
                 db.session.delete(event_person)
         db.session.flush()
+
+    def sync_user(self, *, notify=True):
+        """Update all person data based on the current user data.
+
+        :param notify: Whether to trigger the ``person_updated`` signal.
+        """
+        if not self.user:
+            return
+        fields = ('first_name', 'last_name', 'email', 'affiliation', 'address', 'phone')
+        has_changes = False
+        for field in fields:
+            new = getattr(self.user, field)
+            if getattr(self, field) != new:
+                setattr(self, field, new)
+                has_changes = True
+        if notify and has_changes:
+            signals.event.person_updated.send(self)
 
     @no_autoflush
     def merge_person_info(self, other):
@@ -301,7 +320,7 @@ class EventPerson(PersonMixin, db.Model):
         db.session.flush()
 
     def has_role(self, role, obj):
-        """Whether the person has a role in the ACL list of a given object"""
+        """Whether the person has a role in the ACL list of a given object."""
         principals = [x for x in obj.acl_entries if x.has_management_permission(role, explicit=True)]
         return any(x
                    for x in principals
@@ -441,7 +460,7 @@ class PersonLinkBase(PersonMixin, db.Model):
     def __init__(self, *args, **kwargs):
         # Needed in order to ensure `person` is set before the overridable attrs
         self.person = kwargs.pop('person', None)
-        super(PersonLinkBase, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
 
 class EventPersonLink(PersonLinkBase):
@@ -472,7 +491,6 @@ class EventPersonLink(PersonLinkBase):
             raise Exception("No event to check submission rights against")
         return self.person.has_role('submit', self.event)
 
-    @return_ascii
     def __repr__(self):
         return format_repr(self, 'id', 'person_id', 'event_id', _text=self.full_name)
 

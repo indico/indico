@@ -1,11 +1,9 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
-
-from __future__ import unicode_literals
 
 from indico.modules.events.papers.models.competences import PaperCompetence
 from indico.modules.events.papers.models.reviews import PaperReviewType
@@ -13,18 +11,17 @@ from indico.modules.events.papers.settings import PaperReviewingRole, paper_revi
 from indico.modules.events.settings import EventSettingProperty
 from indico.util.caching import memoize_request
 from indico.util.date_time import now_utc
-from indico.util.string import MarkdownText, return_ascii
+from indico.util.string import MarkdownText
 
 
-class CallForPapers(object):
-    """Proxy class to facilitate access to the call for papers settings"""
+class CallForPapers:
+    """Proxy class to facilitate access to the call for papers settings."""
 
     def __init__(self, event):
         self.event = event
 
-    @return_ascii
     def __repr__(self):
-        return '<CallForPapers({}, start_dt={}, end_dt={})>'.format(self.event.id, self.start_dt, self.end_dt)
+        return f'<CallForPapers({self.event.id}, start_dt={self.start_dt}, end_dt={self.end_dt})>'
 
     start_dt = EventSettingProperty(paper_reviewing_settings, 'start_dt')
     end_dt = EventSettingProperty(paper_reviewing_settings, 'end_dt')
@@ -71,7 +68,7 @@ class CallForPapers(object):
         elif reviewing_type == PaperReviewType.layout:
             self.layout_reviewing_enabled = enable
         else:
-            raise ValueError('Invalid reviewing type: {}'.format(reviewing_type))
+            raise ValueError(f'Invalid reviewing type: {reviewing_type}')
 
     def get_reviewing_state(self, reviewing_type):
         if reviewing_type == PaperReviewType.content:
@@ -79,7 +76,7 @@ class CallForPapers(object):
         elif reviewing_type == PaperReviewType.layout:
             return self.layout_reviewing_enabled
         else:
-            raise ValueError('Invalid reviewing type: {}'.format(reviewing_type))
+            raise ValueError(f'Invalid reviewing type: {reviewing_type}')
 
     @property
     def managers(self):

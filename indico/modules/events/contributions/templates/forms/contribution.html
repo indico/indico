@@ -6,7 +6,7 @@
     {{ form_header(form) }}
     {{ form_row(form.title) }}
     {{ form_row(form.description, widget_attrs={'rows': 10}) }}
-    {{ form_rows(form, fields=fields or none, skip=skip_fields) }}
+    {{ form_rows(form, fields=fields|default(none), skip=skip_fields) }}
     {% call form_fieldset(_('Advanced'), collapsible=true) %}
         {{ form_rows(form, fields=form.custom_field_names + ('references', 'board_number', 'code')) }}
     {% endcall %}

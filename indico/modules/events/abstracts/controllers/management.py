@@ -1,11 +1,9 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
-
-from __future__ import unicode_literals
 
 from operator import itemgetter
 
@@ -42,7 +40,7 @@ from indico.web.util import jsonify_data, jsonify_form, jsonify_template
 
 
 class RHAbstractsDashboard(RHManageAbstractsBase):
-    """Dashboard of the abstracts module"""
+    """Dashboard of the abstracts module."""
 
     # Allow access even if the feature is disabled
     EVENT_FEATURE = None
@@ -61,7 +59,7 @@ class RHAbstractsDashboard(RHManageAbstractsBase):
 
 
 class RHScheduleCFA(RHManageAbstractsBase):
-    """Schedule the call for abstracts"""
+    """Schedule the call for abstracts."""
 
     def _process(self):
         form = AbstractsScheduleForm(obj=FormDefaults(**abstracts_settings.get_all(self.event)),
@@ -78,7 +76,7 @@ class RHScheduleCFA(RHManageAbstractsBase):
 
 
 class RHOpenCFA(RHManageAbstractsBase):
-    """Open the call for abstracts"""
+    """Open the call for abstracts."""
 
     def _process(self):
         open_cfa(self.event)
@@ -87,7 +85,7 @@ class RHOpenCFA(RHManageAbstractsBase):
 
 
 class RHCloseCFA(RHManageAbstractsBase):
-    """Close the call for abstracts"""
+    """Close the call for abstracts."""
 
     def _process(self):
         close_cfa(self.event)
@@ -96,7 +94,7 @@ class RHCloseCFA(RHManageAbstractsBase):
 
 
 class RHManageAbstractSubmission(RHManageAbstractsBase):
-    """Configure abstract submission"""
+    """Configure abstract submission."""
 
     def _process(self):
         settings = abstracts_settings.get_all(self.event)
@@ -113,7 +111,7 @@ class RHManageAbstractSubmission(RHManageAbstractsBase):
 
 
 class RHManageAbstractReviewing(RHManageAbstractsBase):
-    """Configure abstract reviewing"""
+    """Configure abstract reviewing."""
 
     def _process(self):
         has_ratings = (AbstractReviewRating.query
@@ -263,6 +261,6 @@ class RHDeleteAbstractReviewingQuestion(RHReviewingQuestionBase):
 
 class RHSortReviewingQuestions(RHManageAbstractsBase):
     def _process(self):
-        question_ids = map(int, request.form.getlist('field_ids'))
+        question_ids = request.form.getlist('field_ids', type=int)
         sort_reviewing_questions(self.event.abstract_review_questions, question_ids)
         return jsonify_data(flash=False)

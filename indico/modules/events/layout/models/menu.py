@@ -1,11 +1,9 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
-
-from __future__ import unicode_literals
 
 from flask import g, session
 from sqlalchemy.orm import joinedload
@@ -13,9 +11,9 @@ from werkzeug.utils import cached_property
 
 from indico.core.db import db
 from indico.core.db.sqlalchemy import PyIntEnum
+from indico.util.enum import RichIntEnum
 from indico.util.i18n import _
-from indico.util.string import format_repr, return_ascii, slugify, text_to_repr
-from indico.util.struct.enum import RichIntEnum
+from indico.util.string import format_repr, slugify, text_to_repr
 from indico.web.flask.util import url_for
 
 
@@ -23,7 +21,9 @@ def _get_next_position(context):
     """Get the next menu entry position for the event."""
     event_id = context.current_parameters['event_id']
     parent_id = context.current_parameters['parent_id']
-    res = db.session.query(db.func.max(MenuEntry.position)).filter_by(event_id=event_id, parent_id=parent_id).one()
+    res = (db.session.query(db.func.max(MenuEntry.position))
+           .filter(MenuEntry.event_id == event_id, MenuEntry.parent_id == parent_id)
+           .one())
     return (res[0] or 0) + 1
 
 
@@ -36,10 +36,10 @@ class MenuEntryType(RichIntEnum):
     page = 5
 
 
-class MenuEntryMixin(object):
+class MenuEntryMixin:
     def __init__(self, **kwargs):
         event = kwargs.pop('event', kwargs.get('event'))
-        super(MenuEntryMixin, self).__init__(**kwargs)
+        super().__init__(**kwargs)
         # XXX: not calling this `event` since this one should NOT use
         # the relationship to avoid mixing data from different DB sessions
         # when updating/populating the menu (which happens in a separate
@@ -66,11 +66,11 @@ class MenuEntryMixin(object):
             return None
         elif self.is_internal_link:
             data = self.default_data
-            if data.static_site and isinstance(data.static_site, basestring) and g.get('static_site'):
+            if data.static_site and isinstance(data.static_site, str) and g.get('static_site'):
                 return data.static_site
             kwargs = dict(data.url_kwargs)
             if self.name == 'timetable':
-                from indico.modules.events. layout import layout_settings
+                from indico.modules.events.layout import layout_settings
                 if layout_settings.get(self.event_ref, 'timetable_by_room'):
                     kwargs['layout'] = 'room'
                 if layout_settings.get(self.event_ref, 'timetable_detailed'):
@@ -160,7 +160,6 @@ class MenuEntryMixin(object):
     def locator(self):
         return dict(self.event_ref.locator, menu_entry_id=self.id)
 
-    @return_ascii
     def __repr__(self):
         return '<{}({}, {}, {}, position={})>'.format(
             type(self).__name__,
@@ -173,7 +172,7 @@ class MenuEntryMixin(object):
 
 class TransientMenuEntry(MenuEntryMixin):
     def __init__(self, event, is_enabled, name, position, children):
-        super(TransientMenuEntry, self).__init__(event=event)
+        super().__init__(event=event)
         self.is_enabled = is_enabled
         self.title = None
         self.name = name
@@ -437,6 +436,5 @@ class EventPage(db.Model):
     def is_default(self):
         return self.menu_entry.event.default_page_id == self.id
 
-    @return_ascii
     def __repr__(self):
         return format_repr(self, 'id', _text=text_to_repr(self.html, html=True))

@@ -96,7 +96,7 @@
 {% macro _choice_answer(question, chart_type, short_labels=false) %}
     {% set summary = question.get_summary() %}
     <div class="chart-answer">
-        {% for label, value in summary.relative.iteritems() %}
+        {% for label, value in summary.relative.items() %}
             <div class="chart-option-details">
                 <strong>{{ loop.index0|alpha_enum|upper }}. {{ label }}</strong>: {{ summary.absolute[label] }} ({{ '%0.2f'|format(value * 100) }}%)
             </div>
@@ -113,7 +113,7 @@
             <div class="axis-x-label">{% trans %}# of times chosen{% endtrans %}</div>
         {% endif %}
         <div class="survey-{{ chart_type }}-chart"
-            data-labels="{{ (summary.labels if short_labels else summary.absolute.keys())|tojson|forceescape }}"
+            data-labels="{{ (summary.labels if short_labels else summary.absolute|list)|tojson|forceescape }}"
             data-series-absolute="{{ summary.absolute.values() }}"
             data-series-relative="{{ summary.relative.values() }}"></div>
     </div>

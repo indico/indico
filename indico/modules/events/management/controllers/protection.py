@@ -1,11 +1,9 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
-
-from __future__ import unicode_literals
 
 from operator import attrgetter
 
@@ -40,7 +38,7 @@ from indico.web.util import jsonify_template
 
 
 class RHShowNonInheriting(RHManageEventBase):
-    """Show a list of non-inheriting child objects"""
+    """Show a list of non-inheriting child objects."""
 
     def _process_args(self):
         RHManageEventBase._process_args(self)
@@ -54,14 +52,14 @@ class RHShowNonInheriting(RHManageEventBase):
 
 
 class RHEventACL(RHManageEventBase):
-    """Display the inherited ACL of the event"""
+    """Display the inherited ACL of the event."""
 
     def _process(self):
         return render_acl(self.event)
 
 
 class RHEventACLMessage(RHManageEventBase):
-    """Render the inheriting ACL message"""
+    """Render the inheriting ACL message."""
 
     def _process(self):
         mode = ProtectionMode[request.args['mode']]
@@ -70,11 +68,11 @@ class RHEventACLMessage(RHManageEventBase):
 
 
 class RHEventProtection(RHManageEventBase):
-    """Show event protection"""
+    """Show event protection."""
 
     def _process(self):
         form = EventProtectionForm(obj=FormDefaults(**self._get_defaults()), event=self.event)
-        selectable_permissions = {k for k, v in get_available_permissions(Event).viewitems() if v.user_selectable}
+        selectable_permissions = {k for k, v in get_available_permissions(Event).items() if v.user_selectable}
         user_permissions = [(p.principal, set(p.permissions)) for p in self.event.acl_entries]
         hidden_permissions = sorted([
             (principal, sorted(perms))
@@ -98,7 +96,7 @@ class RHEventProtection(RHManageEventBase):
         registration_managers = {p.principal for p in self.event.acl_entries
                                  if p.has_management_permission('registration', explicit=True)}
         event_session_settings = session_settings.get_all(self.event)
-        coordinator_privs = {name: event_session_settings[val] for name, val in COORDINATOR_PRIV_SETTINGS.iteritems()
+        coordinator_privs = {name: event_session_settings[val] for name, val in COORDINATOR_PRIV_SETTINGS.items()
                              if event_session_settings.get(val)}
         permissions = [[serialize_principal(p.principal), list(get_principal_permissions(p, Event))]
                        for p in self.event.acl_entries]

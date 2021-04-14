@@ -1,15 +1,13 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import absolute_import, unicode_literals
-
 import itertools
 import posixpath
-from urlparse import urlparse
+from urllib.parse import urlparse
 
 from flask import current_app, g, render_template, request, session
 from markupsafe import Markup
@@ -22,7 +20,6 @@ from indico.modules.legal import legal_settings
 from indico.util.decorators import classproperty
 from indico.util.i18n import _, get_all_locales
 from indico.util.signals import values_from_signal
-from indico.util.string import to_unicode
 from indico.web.flask.templating import get_template_module
 from indico.web.flask.util import url_for
 from indico.web.menu import build_menu_structure
@@ -84,7 +81,7 @@ def render_session_bar(protected_object=None, local_tz=None, force_local_tz=Fals
     return Markup(rv)
 
 
-class WPJinjaMixin(object):
+class WPJinjaMixin:
     """Mixin for WPs backed by Jinja templates.
 
     This allows you to use a single WP class and its layout, CSS,
@@ -110,7 +107,7 @@ class WPJinjaMixin(object):
 
     @classmethod
     def render_template(cls, template_name_or_list=None, *wp_args, **context):
-        """Renders a jinja template inside the WP
+        """Render a jinja template inside the WP.
 
         :param template_name_or_list: the name of the template - if unsed, the
                                       `_template` attribute of the class is used.
@@ -129,7 +126,7 @@ class WPJinjaMixin(object):
 
     @classmethod
     def render_string(cls, html, *wp_args):
-        """Renders a string inside the WP
+        """Render a string inside the WP.
 
         :param html: a string containing html
         :param wp_args: list of arguments to be passed to the WP's' constructor
@@ -140,7 +137,7 @@ class WPJinjaMixin(object):
     def _prefix_template(cls, template):
         if cls.template_prefix and cls.template_prefix[-1] != '/':
             raise ValueError('template_prefix needs to end with a slash')
-        if isinstance(template, basestring):
+        if isinstance(template, str):
             return cls.template_prefix + template
         else:
             templates = []
@@ -158,7 +155,7 @@ class WPJinjaMixin(object):
         return self.render_template_func(template, **params)
 
 
-class WPBundleMixin(object):
+class WPBundleMixin:
     bundles = ('exports.js',)
     print_bundles = tuple()
 
@@ -184,7 +181,7 @@ class WPBundleMixin(object):
 
             for bundle in attr:
                 if config.DEBUG and bundle in seen_bundles:
-                    raise Exception("Duplicate bundle found in {}: '{}'".format(class_.__name__, bundle))
+                    raise Exception(f"Duplicate bundle found in {class_.__name__}: '{bundle}'")
                 seen_bundles.add(bundle)
                 yield bundle
 
@@ -211,7 +208,7 @@ class WPBase(WPBundleMixin):
         self._kwargs = kwargs
 
     def get_extra_css_files(self):
-        """Return CSS urls that will be included after all other CSS"""
+        """Return CSS urls that will be included after all other CSS."""
         return []
 
     @classproperty
@@ -225,10 +222,9 @@ class WPBase(WPBundleMixin):
         return _bundles
 
     def _get_head_content(self):
-        """
-        Returns _additional_ content between <head></head> tags.
-        Please note that <title>, <meta> and standard CSS are always included.
+        """Return _additional_ content between <head></head> tags.
 
+        Please note that <title>, <meta> and standard CSS are always included.
         Override this method to add your own, page-specific loading of
         JavaScript, CSS and other legal content for HTML <head> tag.
         """
@@ -259,10 +255,10 @@ class WPBase(WPBundleMixin):
                                               multi_value_types=list)
         custom_js = list(current_app.manifest['__custom.js'])
         custom_css = list(current_app.manifest['__custom.css'])
-        css_files = map(self._fix_path, self.get_extra_css_files() + custom_css)
-        js_files = map(self._fix_path, custom_js)
+        css_files = list(map(self._fix_path, self.get_extra_css_files() + custom_css))
+        js_files = list(map(self._fix_path, custom_js))
 
-        body = to_unicode(self._display(params))
+        body = self._display(params)
         bundles = itertools.chain((current_app.manifest[x] for x in self._resolve_bundles()
                                    if x in current_app.manifest._entries),
                                   self.additional_bundles['screen'], injected_bundles)
@@ -275,8 +271,8 @@ class WPBase(WPBundleMixin):
                                site_name=core_settings.get('site_title'),
                                social=social_settings.get_all(),
                                page_metadata=self.page_metadata,
-                               page_title=' - '.join(unicode(x) for x in title_parts if x),
-                               head_content=to_unicode(self._get_head_content()),
+                               page_title=' - '.join(str(x) for x in title_parts if x),
+                               head_content=self._get_head_content(),
                                body=body)
 
 
@@ -316,8 +312,8 @@ class WPNewBase(WPBundleMixin, WPJinjaMixin):
                                               multi_value_types=list)
         custom_js = list(current_app.manifest['__custom.js'])
         custom_css = list(current_app.manifest['__custom.css'])
-        css_files = map(cls._fix_path, custom_css)
-        js_files = map(cls._fix_path, custom_js)
+        css_files = list(map(cls._fix_path, custom_css))
+        js_files = list(map(cls._fix_path, custom_js))
 
         bundles = itertools.chain((current_app.manifest[x] for x in cls._resolve_bundles()
                                    if x in current_app.manifest._entries),
@@ -331,7 +327,7 @@ class WPNewBase(WPBundleMixin, WPJinjaMixin):
                                bundles=bundles, print_bundles=print_bundles,
                                site_name=core_settings.get('site_title'),
                                social=social_settings.get_all(),
-                               page_title=' - '.join(unicode(x) for x in title_parts if x),
+                               page_title=' - '.join(str(x) for x in title_parts if x),
                                **params)
 
 
@@ -347,7 +343,7 @@ class WPDecorated(WPBase):
     def _apply_decoration(self, body):
         breadcrumbs = self._get_breadcrumbs()
         return '<div class="header">{}</div>\n<div class="main">{}<div>{}</div></div>\n{}'.format(
-            self._get_header(), breadcrumbs, to_unicode(body), self._get_footer())
+            self._get_header(), breadcrumbs, body, self._get_footer())
 
     def _display(self, params):
         params = dict(params, **self._kwargs)

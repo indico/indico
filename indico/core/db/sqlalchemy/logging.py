@@ -1,16 +1,15 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import absolute_import, unicode_literals
-
 import logging
 import pprint
 import time
 import traceback
+from collections.abc import Mapping
 
 from flask import appcontext_tearing_down, current_app, g, has_request_context, request, request_tearing_down
 from sqlalchemy.engine import Engine
@@ -34,19 +33,23 @@ def _interesting_tb_item(item, paths):
     return (item[0].endswith('.tpl.py') or any(item[0].startswith(p) for p in paths)) and 'sqlalchemy' not in item[0]
 
 
+def _frame_to_tuple(frame):
+    return frame.filename, frame.lineno, frame.name, frame.line
+
+
 def _get_sql_line():
-    paths = [current_app.root_path] + [p.root_path for p in plugin_engine.get_active_plugins().itervalues()]
+    paths = [current_app.root_path] + [p.root_path for p in plugin_engine.get_active_plugins().values()]
     stack = [item for item in reversed(traceback.extract_stack()) if _interesting_tb_item(item, paths)]
     for i, item in enumerate(stack):
         return {'file': item[0],
                 'line': item[1],
                 'function': item[2],
-                'items': stack[i:i+5]}
+                'items': [_frame_to_tuple(frame) for frame in stack[i:i+5]]}
 
 
 def _fix_param(param):
-    if hasattr(param, 'iteritems'):
-        return {k: _fix_param(v) for k, v in param.iteritems()}
+    if isinstance(param, Mapping):
+        return {k: _fix_param(v) for k, v in param.items()}
     return '<binary>' if param.__class__.__name__ == 'Binary' else param
 
 
@@ -79,13 +82,13 @@ def apply_db_loggers(app, force=False):
             ).rstrip()
         else:
             # UPDATEs can't be traced back to their source since they are executed only on flush
-            log_msg = 'Start Query:\n{0}\n{1}'.format(
+            log_msg = 'Start Query:\n{}\n{}'.format(
                 _prettify_sql(statement),
                 _prettify_params(parameters) if parameters else ''
             ).rstrip()
         # psycopg2._psycopg.Binary objects are extremely weird and don't work in isinstance checks
-        if hasattr(parameters, 'iteritems'):
-            parameters = {k: _fix_param(v) for k, v in parameters.iteritems()}
+        if hasattr(parameters, 'items'):
+            parameters = {k: _fix_param(v) for k, v in parameters.items()}
         else:
             parameters = tuple(_fix_param(v) for v in parameters)
         logger.debug(log_msg,

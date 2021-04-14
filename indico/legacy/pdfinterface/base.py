@@ -1,5 +1,5 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
@@ -11,6 +11,7 @@ import cgi
 import math
 import os
 import xml.sax.saxutils as saxutils
+from io import BytesIO
 
 import pkg_resources
 from PIL import Image as PILImage
@@ -28,7 +29,7 @@ from reportlab.platypus.frames import Frame
 
 from indico.legacy.common.utils import isStringHTML
 from indico.util.i18n import _
-from indico.util.string import sanitize_for_platypus, to_unicode
+from indico.util.string import sanitize_for_platypus
 
 
 ratio = math.sqrt(math.sqrt(2.0))
@@ -145,10 +146,12 @@ def int_to_roman(value):
 
 class Paragraph(platypus.Paragraph):
     """
-    add a part attribute for drawing the name of the current part on the laterPages function
+    Add a part attribute for drawing the name of the current part
+    on the laterPages function.
     """
+
     def __init__(self, text, style, part="", bulletText=None, frags=None, caseSensitive=1):
-        platypus.Paragraph.__init__(self, to_unicode(text), style, bulletText, frags, caseSensitive)
+        platypus.Paragraph.__init__(self, str(text), style, bulletText, frags, caseSensitive)
         self._part = part
 
     def setPart(self, part):
@@ -158,11 +161,12 @@ class Paragraph(platypus.Paragraph):
         return self._part
 
 class SimpleParagraph(platypus.Flowable):
-    """  Simple and fast paragraph.
+    """Simple and fast paragraph.
 
     WARNING! This paragraph cannot break the line and doesn't have almost any formatting methods.
              It's used only to increase PDF performance in places where normal paragraph is not needed.
     """
+
     def __init__(self, text, fontSize = 10, indent = 0, spaceAfter = 2):
         platypus.Flowable.__init__(self)
         self.text = text
@@ -180,18 +184,19 @@ class SimpleParagraph(platypus.Flowable):
         self.canv.drawString(self.indent, self.spaceAfter, self.text)
 
 class TableOfContentsEntry(Paragraph):
+    """Class used to create table of contents entry with its number.
+
+    Much faster than table of table of contents from platypus lib
     """
-        Class used to create table of contents entry with its number.
-        Much faster than table of table of contents from platypus lib
-    """
+
     def __init__(self, text, pageNumber, style, part="", bulletText=None, frags=None, caseSensitive=1):
-        Paragraph.__init__(self, to_unicode(text), style, part, bulletText, frags, caseSensitive)
+        Paragraph.__init__(self, str(text), style, part, bulletText, frags, caseSensitive)
         self._part = part
         self._pageNumber = pageNumber
 
     def _drawDots(self):
         """
-        Draws row of dots from the end of the abstract title to the page number.
+        Draw row of dots from the end of the abstract title to the page number.
         """
         try:
             freeSpace = int(self.blPara.lines[-1][0])
@@ -258,20 +263,6 @@ class Preformatted(platypus.Preformatted):
     def getPart(self):
         return self._part
 
-
-class FileDummy:
-    def __init__(self):
-        self._data = ""
-        self.name = "fileDummy"
-
-    def write(self, data):
-        self._data += data
-
-    def getData(self):
-        return self._data
-
-    def close(self):
-        pass
 
 class CanvasA0(Canvas):
     def __init__(self,filename,
@@ -363,7 +354,7 @@ class PDFBase:
             #create a new document
             #As the constructor of SimpleDocTemplate can take only a filename or a file object,
             #to keep the PDF data not in a file, we use a dummy file object which save the data in a string
-            self._fileDummy = FileDummy()
+            self._fileDummy = BytesIO()
             if printLandscape:
                 self._doc = SimpleDocTemplate(self._fileDummy, pagesize=landscape(PDFSizes().PDFpagesizes[pagesize]))
             else:
@@ -390,28 +381,26 @@ class PDFBase:
         setTTFonts()
 
     def firstPage(self, c, doc):
-        """set the first page of the document
-        This function is call by doc.build method for the first page
+        """Set the first page of the document.
+
+        This function is called by doc.build method for the first page.
         """
-        pass
 
     def laterPages(self, c, doc):
-        """set the layout of the page after the first
-        This function is call by doc.build method one each page after the first
+        """Set the layout of the page after the first.
+
+        This function is called by doc.build method one each page after the first.
         """
-        pass
 
     def getBody(self, story=None):
-        """add the content to the story
-        """
-        pass
+        """Add the content to the story."""
 
     def getPDFBin(self):
         #build the pdf in the fileDummy
         self.getBody()
         self._doc.build(self._story, onFirstPage=self.firstPage, onLaterPages=self.laterPages)
         #return the data from the fileDummy
-        return self._fileDummy.getData()
+        return self._fileDummy.getvalue()
 
     def _drawWrappedString(self, c, text, font='Times-Bold', size=30, color=(0, 0, 0), align="center", width=None,
                            height=None, measurement=cm, lineSpacing=1, maximumWidth=None):
@@ -462,8 +451,7 @@ class PDFBase:
                 startHeight = self._PAGE_HEIGHT
 
                 if drawTitle:
-                    startHeight = self._drawWrappedString(c, escape(self.event.title.encode('utf-8')),
-                                                          height=self._PAGE_HEIGHT - inch)
+                    startHeight = self._drawWrappedString(c, escape(self.event.title), height=self._PAGE_HEIGHT - inch)
 
                 # lower edge of the image
                 startHeight = startHeight - inch / 2 - height
@@ -471,16 +459,14 @@ class PDFBase:
                 # draw horizontally centered, with recalculated width and height
                 c.drawImage(imagePath, self._PAGE_WIDTH/2.0 - width/2, startHeight, width, height, mask="auto")
                 return startHeight
-            except IOError:
+            except OSError:
                 if drawTitle:
-                    self._drawWrappedString(c, escape(self.event.title.encode('utf-8')),
-                                            height=self._PAGE_HEIGHT - inch)
+                    self._drawWrappedString(c, escape(self.event.title), height=self._PAGE_HEIGHT - inch)
         return 0
 
 
 def _doNothing(canvas, doc):
-    "Dummy callback for onPage"
-    pass
+    "Dummy callback for onPage."
 
 
 class DocTemplateWithTOC(SimpleDocTemplate):
@@ -532,7 +518,7 @@ class DocTemplateWithTOC(SimpleDocTemplate):
             self._tocStory.append(Spacer(inch, 2*cm))
             for entry in self._toc:
                 indent = ((entry[0] - 1) * 50)
-                toc_entry = TableOfContentsEntry('<para leftIndent={}>{}</para>'.format(indent, entry[1]),
+                toc_entry = TableOfContentsEntry(f'<para leftIndent={indent}>{entry[1]}</para>',
                                                  str(entry[2]), entryStyle)
                 self._tocStory.append(toc_entry)
 
@@ -552,7 +538,7 @@ class DocTemplateWithTOC(SimpleDocTemplate):
         SimpleDocTemplate.multiBuild(self, story, maxPasses, canvasmaker=canvasMaker)
         self._prepareTOC()
         contentFile = self.filename
-        self.filename = FileDummy()
+        self.filename = BytesIO()
         self.pageTemplates = []
         self.addPageTemplates([PageTemplate(id='First',frames=frameT, onPage=onFirstPage,pagesize=self.pagesize)])
         if onFirstPage is _doNothing and hasattr(self,'onFirstPage'):
@@ -564,33 +550,26 @@ class DocTemplateWithTOC(SimpleDocTemplate):
         self.mergePDFs(self.filename, contentFile)
 
     def mergePDFs(self, pdf1, pdf2):
-        from pyPdf import PdfFileWriter, PdfFileReader
-        import cStringIO
-        outputStream = cStringIO.StringIO()
-        pdf1Stream = cStringIO.StringIO()
-        pdf2Stream = cStringIO.StringIO()
-        pdf1Stream.write(pdf1.getData())
-        pdf2Stream.write(pdf2.getData())
+        from PyPDF2 import PdfFileReader, PdfFileWriter
         output = PdfFileWriter()
-        background_pages = PdfFileReader(pdf1Stream)
-        foreground_pages = PdfFileReader(pdf2Stream)
+        background_pages = PdfFileReader(pdf1)
+        foreground_pages = PdfFileReader(pdf2)
         for page in background_pages.pages:
             output.addPage(page)
         for page in foreground_pages.pages:
             output.addPage(page)
-        output.write(outputStream)
-        pdf2._data = outputStream.getvalue()
-        outputStream.close()
+        outputbuf = BytesIO()
+        output.write(outputbuf)
+        pdf2.seek(0)
+        pdf2.truncate()
+        pdf2.write(outputbuf.getvalue())
 
     def getCurrentPart(self):
         return self._part
 
 
 class PDFWithTOC(PDFBase):
-    """
-    create a PDF with a Table of Contents
-
-    """
+    """Create a PDF with a Table of Contents."""
 
     def __init__(self, story=None, pagesize='A4', fontsize='normal', firstPageNumber=1, include_toc=True):
         self._fontsize = fontsize
@@ -601,7 +580,7 @@ class PDFWithTOC(PDFBase):
             self._story.append(Spacer(inch, 0*cm))
 
         self._indexedFlowable = {}
-        self._fileDummy = FileDummy()
+        self._fileDummy = BytesIO()
 
         self._doc = DocTemplateWithTOC(self._indexedFlowable, self._fileDummy, firstPageNumber=firstPageNumber,
                                        pagesize=PDFSizes().PDFpagesizes[pagesize],
@@ -613,9 +592,9 @@ class PDFWithTOC(PDFBase):
         setTTFonts()
 
     def _processTOCPage(self):
-        """ Generates page with table of contents.
+        """Generates page with table of contents.
 
-        Not used, because table of contents is generated automatically inside DocTemplateWithTOC class
+        Not used, because table of contents is generated automatically inside DocTemplateWithTOC class.
         """
         style1 = ParagraphStyle({})
         style1.fontName = "Times-Bold"
@@ -630,15 +609,14 @@ class PDFWithTOC(PDFBase):
         self._story.append(PageBreak())
 
     def getBody(self, story=None):
-        """add the content to the story
+        """Add the content to the story.
         When you want to put a paragraph p in the toc, add it to the self._indexedFlowable as this:
             self._indexedFlowable[p] = {"text":"my title", "level":1}
         """
         if not story:
             story = self._story
-        pass
 
     def getPDFBin(self):
         self.getBody()
         self._doc.multiBuild(self._story, onFirstPage=self.firstPage, onLaterPages=self.laterPages)
-        return self._fileDummy.getData()
+        return self._fileDummy.getvalue()

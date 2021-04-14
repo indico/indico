@@ -1,11 +1,9 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
-
-from __future__ import print_function, unicode_literals
 
 import os
 import sys
@@ -45,20 +43,20 @@ def cli(ctx, plugin=None, all_plugins=False):
 
 @cli.command()
 def prepare():
-    """Initializes a new database (creates tables, sets alembic rev to HEAD)"""
+    """Initialize a new database (creates tables, sets alembic rev to HEAD)."""
     return prepare_db()
 
 
 def _stamp(plugin=None, revision=None):
-    table = 'alembic_version' if not plugin else 'alembic_version_plugin_{}'.format(plugin)
-    db.session.execute('DELETE FROM {}'.format(table))
+    table = 'alembic_version' if not plugin else f'alembic_version_plugin_{plugin}'
+    db.session.execute(f'DELETE FROM {table}')
     if revision:
-        db.session.execute('INSERT INTO {} VALUES (:revision)'.format(table), {'revision': revision})
+        db.session.execute(f'INSERT INTO {table} VALUES (:revision)', {'revision': revision})
 
 
 @cli.command()
 def reset_alembic():
-    """Resets the alembic state carried over from 1.9.x
+    """Reset the alembic state carried over from 1.9.x.
 
     Only run this command right after upgrading from a 1.9.x version
     so the references to old alembic revisions (which were removed in
@@ -88,16 +86,16 @@ def reset_alembic():
         # All revisions were just data migrations -> get rid of them
         if plugin not in plugins:
             continue
-        print('[{}] Deleting revision table'.format(plugin))
-        db.session.execute('DROP TABLE alembic_version_plugin_{}'.format(plugin))
+        print(f'[{plugin}] Deleting revision table')
+        db.session.execute(f'DROP TABLE alembic_version_plugin_{plugin}')
     plugin_revisions = {'chat': '3888761f35f7',
                         'livesync': 'aa0dbc6c14aa',
                         'outlook': '6093a83228a7',
                         'vc_vidyo': '6019621fea50'}
-    for plugin, revision in plugin_revisions.iteritems():
+    for plugin, revision in plugin_revisions.items():
         if plugin not in plugins:
             continue
-        print('[{}] Stamping to new revision'.format(plugin))
+        print(f'[{plugin}] Stamping to new revision')
         _stamp(plugin, revision)
     db.session.commit()
 
@@ -115,8 +113,8 @@ def _safe_downgrade(*args, **kwargs):
         skip_confirm = False
         print(cformat('%{yellow!}***%{reset} '
                       "%{red!}Debug mode is NOT ACTIVE, so make sure you are on the right machine!"))
-    if not skip_confirm and raw_input(cformat('%{yellow!}***%{reset} '
-                                              'To confirm this, enter %{yellow!}YES%{reset}: ')) != 'YES':
+    if not skip_confirm and input(cformat('%{yellow!}***%{reset} '
+                                          'To confirm this, enter %{yellow!}YES%{reset}: ')) != 'YES':
         print(cformat('%{green}Aborted%{reset}'))
         sys.exit(1)
     else:
@@ -131,7 +129,7 @@ def _call_with_plugins(*args, **kwargs):
     if plugin:
         plugins = {plugin_engine.get_plugin(plugin)}
     elif all_plugins:
-        plugins = set(plugin_engine.get_active_plugins().viewvalues())
+        plugins = set(plugin_engine.get_active_plugins().values())
     else:
         plugins = None
 
@@ -150,7 +148,7 @@ def _call_with_plugins(*args, **kwargs):
 
 
 def _setup_cli():
-    for command in flask_migrate_cli.commands.itervalues():
+    for command in flask_migrate_cli.commands.values():
         if command.name == 'init':
             continue
         command.callback = partial(with_appcontext(_call_with_plugins), _func=command.callback)

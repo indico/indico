@@ -1,12 +1,17 @@
 // This file is part of Indico.
-// Copyright (C) 2002 - 2020 CERN
+// Copyright (C) 2002 - 2021 CERN
 //
 // Indico is free software; you can redistribute it and/or
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-/* global ChooseUsersPopup:false */
+import React from 'react';
+import ReactDOM from 'react-dom';
 
+import {GroupSearch, UserSearch} from 'indico/react/components/principals/Search';
+import {PrincipalType} from 'indico/react/components/principals/util';
+import {FavoritesProvider} from 'indico/react/hooks';
+import {Translate} from 'indico/react/i18n';
 import Palette from 'indico/utils/palette';
 
 (function($) {
@@ -169,7 +174,7 @@ import Palette from 'indico/utils/palette';
         return $('<button>', {
           type: 'button',
           class: 'i-button text-color borderless icon-only icon-edit disabled',
-          title: title,
+          title,
         });
       } else {
         return $('<button>', {
@@ -433,29 +438,6 @@ import Palette from 'indico/utils/palette';
         this._renderDuplicatesTooltip(this._findEntryIndex(principal));
       });
     },
-    _addUserGroup() {
-      const _addPrincipals = principals => {
-        // Grant read access by default
-        this._addItems(principals, [READ_ACCESS_PERMISSIONS]);
-      };
-
-      const dialog = new ChooseUsersPopup(
-        $T.gettext('Select a user or group to add'),
-        true,
-        null,
-        true,
-        true,
-        null,
-        false,
-        false,
-        false,
-        _addPrincipals,
-        null,
-        true
-      );
-
-      dialog.execute();
-    },
     _create() {
       this.$permissionsWidgetList = this.element.find('.permissions-widget-list');
       this.$dataField = this.element.find('input[type=hidden]');
@@ -478,10 +460,69 @@ import Palette from 'indico/utils/palette';
         this._render();
       });
 
-      // Manage the addition to users/groups to the acl
-      $('.js-add-user-group').on('click', () => {
-        this._addUserGroup();
-      });
+      // Manage adding users/groups to the acl
+      const userSearchTrigger = triggerProps => (
+        <a className="i-button" {...triggerProps}>
+          <Translate>User</Translate>
+        </a>
+      );
+
+      const groupSearchTrigger = triggerProps => (
+        <a className="i-button" {...triggerProps}>
+          <Translate>Group</Translate>
+        </a>
+      );
+
+      const existing = JSON.parse(this.$dataField.val()).map(e => e[0].identifier);
+
+      ReactDOM.render(
+        <FavoritesProvider>
+          {([favorites]) => (
+            <>
+              <UserSearch
+                favorites={favorites}
+                existing={existing.filter(e => e.startsWith('User'))}
+                onAddItems={e => {
+                  const items = e.map(({identifier, userId, name, firstName, lastName}) => ({
+                    identifier,
+                    name,
+                    id: userId,
+                    familyName: lastName,
+                    firstName,
+                    _type: 'Avatar',
+                  }));
+                  this._addItems(items, [READ_ACCESS_PERMISSIONS]);
+                }}
+                triggerFactory={userSearchTrigger}
+              />
+              <GroupSearch
+                existing={existing.filter(e => e.startsWith('Group'))}
+                onAddItems={e => {
+                  const items = e.map(({identifier, name, type, provider}) => {
+                    let id;
+                    if (type === PrincipalType.localGroup) {
+                      const splitIdentifier = identifier.split(':');
+                      id = splitIdentifier[splitIdentifier.length - 1];
+                    } else {
+                      id = name;
+                    }
+                    return {
+                      identifier,
+                      name,
+                      provider,
+                      _type: type === PrincipalType.localGroup ? 'LocalGroup' : 'MultipassGroup',
+                      id,
+                    };
+                  });
+                  this._addItems(items, [READ_ACCESS_PERMISSIONS]);
+                }}
+                triggerFactory={groupSearchTrigger}
+              />
+            </>
+          )}
+        </FavoritesProvider>,
+        document.getElementById('js-add-user-group')
+      );
 
       // Manage the creation of new roles
       $('.js-new-role').on('ajaxDialog:closed', (evt, data) => {

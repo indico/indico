@@ -1,13 +1,11 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import unicode_literals
-
-from datetime import date, timedelta
+from datetime import date, datetime, timedelta
 from operator import attrgetter
 
 from flask_pluginengine import current_plugin
@@ -19,6 +17,7 @@ from wtforms.validators import DataRequired, Length, NumberRange, Optional, Vali
 from indico.modules.events.sessions import Session
 from indico.modules.events.sessions.models.blocks import SessionBlock
 from indico.modules.vc.models import VCRoom, VCRoomStatus
+from indico.util.date_time import as_utc, format_datetime
 from indico.util.i18n import _
 from indico.web.flask.util import url_for
 from indico.web.forms.base import IndicoForm, generated_data
@@ -40,16 +39,16 @@ class VCRoomField(HiddenField):
 
 
 class LinkingWidget(JinjaWidget):
-    """Renders a composite radio/select field"""
+    """Render a composite radio/select field."""
 
     def __init__(self, **context):
-        super(LinkingWidget, self).__init__('forms/linking_widget.html', single_line=True, **context)
+        super().__init__('forms/linking_widget.html', single_line=True, **context)
 
     def __call__(self, field, **kwargs):
         form = field.get_form()
         has_error = {subfield.data: (subfield.data in form.conditional_fields and form[subfield.data].errors)
                      for subfield in field}
-        return super(LinkingWidget, self).__call__(field, form=form, has_error=has_error, **kwargs)
+        return super().__call__(field, form=form, has_error=has_error, **kwargs)
 
 
 class VCPluginSettingsFormBase(IndicoForm):
@@ -82,11 +81,20 @@ class VCRoomLinkFormBase(IndicoForm):
 
     def __init__(self, *args, **kwargs):
         self.event = kwargs.pop('event')
-        super(VCRoomLinkFormBase, self).__init__(*args, **kwargs)
-        contrib_choices = [(contrib.id, contrib.title) for contrib in
-                           sorted(self.event.contributions, key=attrgetter('title'))]
-        blocks = SessionBlock.find(SessionBlock.session.has((Session.event == self.event) & ~Session.is_deleted))
-        block_choices = [(block.id, block.full_title) for block in sorted(blocks, key=attrgetter('full_title'))]
+        super().__init__(*args, **kwargs)
+        contrib_choices = [(contrib.id, '{} (#{}, {})'.format(contrib.title,
+                                                              contrib.friendly_id,
+                                                              format_datetime(contrib.start_dt,
+                                                                              timezone=self.event.tzinfo)))
+                           for contrib in sorted(self.event.contributions,
+                                                 key=lambda c: (c.title, c.start_dt or as_utc(datetime(1970, 1, 1))))
+                           if contrib.start_dt is not None]
+        blocks = (SessionBlock.query
+                  .filter(SessionBlock.session.has((Session.event == self.event) & ~Session.is_deleted))
+                  .all())
+        block_choices = [(block.id, '{} ({})'.format(block.full_title,
+                                                     format_datetime(block.start_dt, timezone=self.event.tzinfo)))
+                         for block in sorted(blocks, key=attrgetter('full_title', 'start_dt'))]
         self.contribution.choices = [('', _("Please select a contribution"))] + contrib_choices
         self.block.choices = [('', _("Please select a session block"))] + block_choices
 
@@ -95,10 +103,10 @@ class VCRoomAttachFormBase(VCRoomLinkFormBase):
     room = VCRoomField(
         _("Room to link"), [DataRequired()],
         description=_("Please start writing the name of the room you would like to attach. "
-                      "Indico will suggest existing rooms."))
+                      "Indico will suggest existing rooms. Only rooms created through Indico can be attached."))
 
     def __init__(self, *args, **kwargs):
-        super(VCRoomAttachFormBase, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self.room.widget.search_url = url_for('.manage_vc_rooms_search', self.event, service=kwargs.pop('service'))
 
 
@@ -110,13 +118,13 @@ class VCRoomFormBase(VCRoomLinkFormBase):
 
     def validate_name(self, field):
         if field.data:
-            room = VCRoom.find_first(VCRoom.name == field.data, VCRoom.status != VCRoomStatus.deleted,
-                                     VCRoom.type == self.service_name)
+            room = VCRoom.query.filter(VCRoom.name == field.data, VCRoom.status != VCRoomStatus.deleted,
+                                       VCRoom.type == self.service_name).first()
             if room and room != self.vc_room:
                 raise ValidationError(_("There is already a room with this name"))
 
     def __init__(self, *args, **kwargs):
-        super(VCRoomFormBase, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self.vc_room = kwargs.pop('vc_room')
         self.service_name = current_plugin.service_name
 

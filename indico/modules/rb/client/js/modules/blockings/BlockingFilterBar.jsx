@@ -1,19 +1,20 @@
 // This file is part of Indico.
-// Copyright (C) 2002 - 2020 CERN
+// Copyright (C) 2002 - 2021 CERN
 //
 // Indico is free software; you can redistribute it and/or
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
+import PropTypes from 'prop-types';
 import React from 'react';
+import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
 import {Button, Dropdown} from 'semantic-ui-react';
-import PropTypes from 'prop-types';
-import {connect} from 'react-redux';
 
-import {toClasses} from 'indico/react/util';
-import {Translate} from 'indico/react/i18n';
 import {ResponsivePopup} from 'indico/react/components';
+import {Translate} from 'indico/react/i18n';
+import {toClasses} from 'indico/react/util';
+
 import * as blockingsActions from './actions';
 import * as blockingsSelectors from './selectors';
 

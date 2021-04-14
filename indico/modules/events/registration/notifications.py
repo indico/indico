@@ -1,16 +1,15 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import unicode_literals
-
 from flask import session
 
 from indico.core import signals
 from indico.core.notifications import make_email, send_email
+from indico.modules.events.ical import event_to_ical
 from indico.modules.events.registration.models.registrations import RegistrationState
 from indico.util.placeholders import replace_placeholders
 from indico.util.signals import values_from_signal
@@ -27,9 +26,9 @@ def notify_invitation(invitation, email_subject, email_body, from_address):
     send_email(email, invitation.registration_form.event, 'Registration', user)
 
 
-def _notify_registration(registration, template, to_managers=False):
+def _notify_registration(registration, template, to_managers=False, attach_rejection_reason=False):
     from indico.modules.events.registration.util import get_ticket_attachments
-    attachments = None
+    attachments = []
     regform = registration.registration_form
     tickets_handled = values_from_signal(signals.event.is_ticketing_handled.send(regform), single_value=True)
     if (not to_managers and
@@ -37,9 +36,13 @@ def _notify_registration(registration, template, to_managers=False):
             regform.ticket_on_email and
             not any(tickets_handled) and
             registration.state == RegistrationState.complete):
-        attachments = get_ticket_attachments(registration)
+        attachments += get_ticket_attachments(registration)
+    if not to_managers and registration.registration_form.attach_ical:
+        event_ical = event_to_ical(registration.event)
+        attachments.append(('event.ics', event_ical, 'text/calendar'))
 
-    template = get_template_module('events/registration/emails/{}'.format(template), registration=registration)
+    template = get_template_module(f'events/registration/emails/{template}', registration=registration,
+                                   attach_rejection_reason=attach_rejection_reason)
     to_list = registration.email if not to_managers else registration.registration_form.manager_notification_recipients
     from_address = registration.registration_form.sender_address if not to_managers else None
     mail = make_email(to_list=to_list, template=template, html=True, from_address=from_address, attachments=attachments)
@@ -62,7 +65,8 @@ def notify_registration_modification(registration, notify_user=True):
         _notify_registration(registration, 'registration_modification_to_managers.html', to_managers=True)
 
 
-def notify_registration_state_update(registration):
-    _notify_registration(registration, 'registration_state_update_to_registrant.html')
+def notify_registration_state_update(registration, attach_rejection_reason=False):
+    _notify_registration(registration, 'registration_state_update_to_registrant.html',
+                         attach_rejection_reason=attach_rejection_reason)
     if registration.registration_form.manager_notifications_enabled:
         _notify_registration(registration, 'registration_state_update_to_managers.html', to_managers=True)

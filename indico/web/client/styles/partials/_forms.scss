@@ -1,5 +1,5 @@
 // This file is part of Indico.
-// Copyright (C) 2002 - 2020 CERN
+// Copyright (C) 2002 - 2021 CERN
 //
 // Indico is free software; you can redistribute it and/or
 // modify it under the terms of the MIT License; see the
@@ -278,6 +278,32 @@ form {
     .handle {
       height: $i-form-height;
       line-height: $i-form-height;
+    }
+  }
+
+  .labeled.input {
+    display: inline-flex;
+    align-items: stretch;
+    padding-bottom: 0.5em;
+
+    .label {
+      flex: 1;
+      background: #e8e8e8;
+      padding: 0.55em 1em;
+      border-radius: 0.3rem 0 0 0.3rem;
+      font-size: 0.95em;
+      font-weight: normal;
+    }
+
+    input {
+      flex: 1;
+      border-top-left-radius: 0;
+      border-bottom-left-radius: 0;
+      border-left: transparent;
+    }
+
+    input:focus {
+      border-left: 1px solid $blue;
     }
   }
 }

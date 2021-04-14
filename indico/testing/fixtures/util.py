@@ -1,5 +1,5 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
@@ -16,7 +16,7 @@ from sqlalchemy.sql.functions import _FunctionGenerator
 
 @pytest.fixture
 def monkeypatch_methods(monkeypatch):
-    """Monkeypatches all methods from `cls` onto `target`
+    """Monkeypatch all methods from `cls` onto `target`.
 
     This utility lets you easily mock multiple methods in an existing class.
     In case of classmethods the binding will not be changed, i.e. `cls` will
@@ -28,14 +28,14 @@ def monkeypatch_methods(monkeypatch):
             if method.__self__ is None:
                 # For unbound methods we need to copy the underlying function
                 method = method.__func__
-            monkeypatch.setattr('{}.{}'.format(target, name), method)
+            monkeypatch.setattr(f'{target}.{name}', method)
 
     return _monkeypatch_methods
 
 
 @pytest.fixture
 def freeze_time(monkeypatch):
-    """Returns a function that freezes the current time
+    """Return a function that freezes the current time.
 
     It affects datetime.now, date.today, etc. and also SQLAlchemy's `func.now()`
     which simply returns the current time from `datetime.now()` instead of

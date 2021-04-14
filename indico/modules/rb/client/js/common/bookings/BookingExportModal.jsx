@@ -1,5 +1,5 @@
 // This file is part of Indico.
-// Copyright (C) 2002 - 2020 CERN
+// Copyright (C) 2002 - 2021 CERN
 //
 // Indico is free software; you can redistribute it and/or
 // modify it under the terms of the MIT License; see the
@@ -8,21 +8,21 @@
 import exportBookingsURL from 'indico-url:rb.export_bookings';
 
 import _ from 'lodash';
+import PropTypes from 'prop-types';
 import React from 'react';
 import {Form as FinalForm} from 'react-final-form';
 import {Button, Form, Modal} from 'semantic-ui-react';
-import PropTypes from 'prop-types';
 
-import {Translate} from 'indico/react/i18n';
-import {indicoAxios} from 'indico/utils/axios';
 import {FinalDatePeriod} from 'indico/react/components';
-import {snakifyKeys} from 'indico/utils/case';
 import {
   validators as v,
   FinalRadio,
   handleSubmitError,
   FinalSubmitButton,
 } from 'indico/react/forms';
+import {Translate} from 'indico/react/i18n';
+import {indicoAxios} from 'indico/utils/axios';
+import {snakifyKeys} from 'indico/utils/case';
 
 import FinalRoomSelector from '../../components/RoomSelector';
 

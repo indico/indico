@@ -1,11 +1,9 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
-
-from __future__ import unicode_literals
 
 from flask import has_request_context, render_template, session
 
@@ -95,4 +93,4 @@ def _get_vc_cloner(sender, **kwargs):
 
 @signals.users.merged.connect
 def _merge_users(target, source, **kwargs):
-    VCRoom.find(created_by_id=source.id).update({VCRoom.created_by_id: target.id})
+    VCRoom.query.filter_by(created_by_id=source.id).update({VCRoom.created_by_id: target.id})

@@ -1,20 +1,18 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import division, unicode_literals
-
 from indico.core.db.sqlalchemy import PyIntEnum, UTCDateTime, db
 from indico.core.db.sqlalchemy.descriptions import RenderMode, RenderModeMixin
 from indico.modules.events.models.reviews import ProposalReviewMixin
 from indico.util.date_time import now_utc
+from indico.util.enum import RichIntEnum
 from indico.util.i18n import _
 from indico.util.locators import locator_property
-from indico.util.string import format_repr, return_ascii
-from indico.util.struct.enum import RichIntEnum
+from indico.util.string import format_repr
 
 
 class AbstractAction(RichIntEnum):
@@ -28,7 +26,7 @@ class AbstractAction(RichIntEnum):
 
 
 class AbstractReview(ProposalReviewMixin, RenderModeMixin, db.Model):
-    """Represents an abstract review, emitted by a reviewer"""
+    """An abstract review, emitted by a reviewer."""
 
     possible_render_modes = {RenderMode.markdown}
     default_render_mode = RenderMode.markdown
@@ -165,7 +163,6 @@ class AbstractReview(ProposalReviewMixin, RenderModeMixin, db.Model):
     def locator(self):
         return dict(self.abstract.locator, review_id=self.id)
 
-    @return_ascii
     def __repr__(self):
         return format_repr(self, 'id', 'abstract_id', 'user_id', proposed_action=None)
 
@@ -200,7 +197,7 @@ class AbstractReview(ProposalReviewMixin, RenderModeMixin, db.Model):
 
 
 class AbstractCommentVisibility(RichIntEnum):
-    """Most to least restrictive visibility for abstract comments"""
+    """Most to least restrictive visibility for abstract comments."""
     __titles__ = [None,
                   _("Visible only to judges"),
                   _("Visible to conveners and judges"),

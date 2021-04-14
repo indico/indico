@@ -1,11 +1,9 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
-
-from __future__ import unicode_literals
 
 from collections import Counter
 from datetime import timedelta
@@ -308,9 +306,9 @@ class RHLegacyTimetableScheduleContribution(RHManageTimetableBase):
         data = request.json
         required_keys = {'contribution_ids', 'day'}
         allowed_keys = required_keys | {'session_block_id'}
-        if set(data.viewkeys()) > allowed_keys:
+        if set(data.keys()) > allowed_keys:
             raise BadRequest('Invalid keys found')
-        elif required_keys > set(data.viewkeys()):
+        elif required_keys > set(data.keys()):
             raise BadRequest('Required keys missing')
         entries = []
         day = dateutil.parser.parse(data['day']).date()
@@ -405,7 +403,7 @@ class RHLegacyTimetableFitBlock(RHManageTimetableBase):
 
 
 class RHLegacyTimetableMoveEntry(RHManageTimetableEntryBase):
-    """Moves a TimetableEntry into a Session or top-level timetable"""
+    """Move a TimetableEntry into a Session or top-level timetable."""
 
     def _process_GET(self):
         current_day = dateutil.parser.parse(request.args.get('day')).date()
@@ -483,7 +481,7 @@ class RHLegacyTimetableSwapEntries(RHManageTimetableEntryBase):
 
 
 class RHLegacyTimetableEditEntryDateTime(RHManageTimetableEntryBase):
-    """Changes the start_dt of a `TimetableEntry`"""
+    """Change the start_dt of a `TimetableEntry`."""
 
     @property
     def session_management_level(self):

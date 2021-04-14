@@ -3,7 +3,7 @@
 {% from 'forms/_form.html' import form_header, form_rows, form_footer %}
 {% from 'message_box.html' import message_box %}
 
-{% set num_tokens = application.tokens.count() %}
+{% set num_users = application.user_links.count() %}
 
 
 {% block subtitle %}
@@ -21,9 +21,9 @@
                 <div class="group">
                     <button class="i-button"
                         data-href="{{ url_for('.app_revoke', application) }}" data-method="POST"
-                        data-confirm="{% trans %}Are you sure you want to revoke all {{ num_tokens }} user tokens?{% endtrans %}"
-                        {% if not num_tokens %}disabled{% endif %}>
-                        {%- trans %}Revoke user tokens{% endtrans -%}
+                        data-confirm="{% trans %}Are you sure you want to revoke all {{ num_users }} user authorizations?{% endtrans %}"
+                        {% if not num_users %}disabled{% endif %}>
+                        {%- trans %}Revoke user authorizations{% endtrans -%}
                     </button>
                     <button class="i-button"
                         data-href="{{ url_for('.app_reset', application) }}" data-method="POST"
@@ -47,7 +47,7 @@
                     {% trans %}Users:{% endtrans %}
                 </span>
                 <span class="content">
-                    {{ num_tokens }}
+                    {{ num_users }}
                 </span>
             </div>
         </div>
@@ -64,13 +64,15 @@
             <dl class="i-data-list dt-select-disabled">
                 {# Do not translate <dt> since they are the official terms in OAuth2 RFC #}
                 <dt>Client ID</dt>{#--#}
-                <dd><code>{{ application.client_id }}</code></dd>
+                <dd>{{ clipboard_text(application.client_id) }}</dd>
                 <dt>Client Secret</dt>{#--#}
-                <dd><code>{{ application.client_secret }}</code></dd>
+                <dd>{{ clipboard_text(application.client_secret) }}</dd>
                 <dt>Authorize URL</dt>{#--#}
-                <dd><code>{{ url_for('.oauth_authorize', _external=true) }}</code></dd>
+                <dd>{{ clipboard_text(url_for('.oauth_authorize', _external=true)) }}</dd>
                 <dt>Access token URL</dt>{#--#}
-                <dd><code>{{ url_for('.oauth_token', _external=true) }}</code></dd>
+                <dd>{{ clipboard_text(url_for('.oauth_token', _external=true)) }}</dd>
+                <dt>OAuth metadata</dt>{#--#}
+                <dd>{{ clipboard_text(url_for('.oauth_metadata', _external=true), as_link=true) }}</dd>
             </dl>
             <hr>
             {{ form_header(form) }}
@@ -83,3 +85,16 @@
         </div>
     </div>
 {% endblock %}
+
+{% macro clipboard_text(url, as_link=false) %}
+    {% if as_link %}
+        <a href="{{ url }}"><code>{{ url }}</code></a>
+    {% else %}
+        <code>{{ url }}</code>
+    {% endif %}
+    <span class="icon-clipboard js-copy-to-clipboard"
+          title="{% trans %}Copy to clipboard{% endtrans %}"
+          style="cursor: pointer; margin-left: 0.5em;"
+          data-clipboard-text="{{ url }}"
+          data-clipboard-action="copy"></span>
+{% endmacro %}

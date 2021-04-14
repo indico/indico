@@ -20,15 +20,15 @@
 {% endmacro %}
 
 {% macro community_error(err) %}
-    {%- trans error=err.message %}Failed to register to the Community Hub: {{ error }}.{% endtrans %}<br>
+    {%- trans %}Failed to register to the Community Hub: {{ err }}.{% endtrans %}<br>
     {%- trans link=url_for('cephalopod.index') -%}
         See the logs for details and try again <a href="{{ link }}">here</a>.
     {%- endtrans -%}
 {% endmacro %}
 
-{% macro community_exception(exc) %}
-    {%- trans error=exc.message -%}
-        An unexpected exception happened while registering the server to the Community Hub: {{ error }}.
+{% macro community_exception(err) %}
+    {%- trans -%}
+        An unexpected exception happened while registering the server to the Community Hub: {{ err }}.
     {%- endtrans %}<br>
     {%- trans link=url_for('cephalopod.index') -%}
         See the logs for details and try again <a href="{{ link }}">here</a>.

@@ -1,17 +1,17 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import unicode_literals
-
+from flask import session
 from flask_multipass.providers.sqlalchemy import SQLAlchemyAuthProviderBase, SQLAlchemyIdentityProviderBase
 
 from indico.modules.auth import Identity
 from indico.modules.auth.forms import LocalLoginForm
 from indico.modules.users import User
+from indico.util.passwords import validate_secure_password
 
 
 class IndicoAuthProvider(SQLAlchemyAuthProviderBase):
@@ -23,7 +23,11 @@ class IndicoAuthProvider(SQLAlchemyAuthProviderBase):
 
     def check_password(self, identity, password):
         # No, the passwords are not stored in plaintext. Magic is happening here!
-        return identity.password == password
+        if identity.password != password:
+            return False
+        if error := validate_secure_password('login', password, username=identity.identifier, fast=True):
+            session['insecure_password_error'] = error
+        return True
 
 
 class IndicoIdentityProvider(SQLAlchemyIdentityProviderBase):

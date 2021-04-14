@@ -1,11 +1,9 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
-
-from __future__ import unicode_literals
 
 import codecs
 import os
@@ -37,10 +35,9 @@ from indico.util.date_time import format_date, format_human_timedelta, format_ti
 from indico.util.fs import chmod_umask
 from indico.util.i18n import _, ngettext
 from indico.util.string import render_markdown
-from indico.web.flask.templating import EnsureUnicodeExtension
 
 
-class PDFLaTeXBase(object):
+class PDFLaTeXBase:
     _table_of_contents = False
     LATEX_TEMPLATE = None
 
@@ -75,7 +72,7 @@ class PDFLaTeXBase(object):
                     if f.startswith('.') or f.endswith(('.py', '.pyc', '.pyo')):
                         continue
                     file_path = os.path.join(dirpath, f)
-                    archive_name = os.path.relpath(file_path, self.source_dir).encode('utf-8')
+                    archive_name = os.path.relpath(file_path, self.source_dir)
                     zip_handler.write(os.path.abspath(file_path), archive_name)
         buf.seek(0)
         return buf
@@ -83,17 +80,17 @@ class PDFLaTeXBase(object):
 
 class LaTeXRuntimeException(Exception):
     def __init__(self, source_file, log_file):
-        super(LaTeXRuntimeException, self).__init__('LaTeX compilation of {} failed'.format(source_file))
+        super().__init__(f'LaTeX compilation of {source_file} failed')
         self.source_file = source_file
         self.log_file = log_file
 
     @property
     def message(self):
-        return "Could not compile '{}'. Read '{}' for details".format(self.source_file, self.log_file)
+        return f"Could not compile '{self.source_file}'. Read '{self.log_file}' for details"
 
 
 class LatexEscapeExtension(Extension):
-    """Ensures all strings in Jinja are latex-escaped"""
+    """Ensure all strings in Jinja are latex-escaped."""
 
     def filter_stream(self, stream):
         in_trans = False
@@ -121,20 +118,18 @@ class LatexEscapeExtension(Extension):
             yield token
 
 
-class RawLatex(unicode):
+class RawLatex(str):
     pass
 
 
 def _latex_escape(s, ignore_braces=False):
-    if not isinstance(s, basestring) or isinstance(s, RawLatex):
+    if not isinstance(s, str) or isinstance(s, RawLatex):
         return s
-    if isinstance(s, str):
-        s = s.decode('utf-8')
     return RawLatex(mdx_latex.latex_escape(s, ignore_braces=ignore_braces))
 
 
-class LatexRunner(object):
-    """Handles the PDF generation from a chosen LaTeX template"""
+class LatexRunner:
+    """Handle the PDF generation from a chosen LaTeX template."""
 
     def __init__(self, source_dir, has_toc=False):
         self.source_dir = source_dir
@@ -152,8 +147,9 @@ class LatexRunner(object):
             subprocess.check_call(
                 pdflatex_cmd,
                 stdout=log_file,
+                stderr=subprocess.STDOUT,
                 cwd=self.source_dir,
-                env=dict(os.environ, TEXMFCNF='{}:'.format(os.path.dirname(__file__)))
+                env=dict(os.environ, TEXMFCNF=f'{os.path.dirname(__file__)}:')
             )
             Logger.get('pdflatex').debug("PDF created successfully!")
 
@@ -178,8 +174,8 @@ class LatexRunner(object):
                           block_start_string=r'\JINJA{', block_end_string='}',
                           variable_start_string=r'\VAR{', variable_end_string='}',
                           comment_start_string=r'\#{', comment_end_string='}')
-        env.filters['format_date'] = EnsureUnicodeExtension.wrap_func(format_date)
-        env.filters['format_time'] = EnsureUnicodeExtension.wrap_func(format_time)
+        env.filters['format_date'] = format_date
+        env.filters['format_time'] = format_time
         env.filters['format_duration'] = lambda delta: format_human_timedelta(delta, 'minutes')
         env.filters['latex'] = _latex_escape
         env.filters['rawlatex'] = RawLatex
@@ -246,7 +242,7 @@ class AbstractToPDF(PDFLaTeXBase):
     LATEX_TEMPLATE = 'single_doc'
 
     def __init__(self, abstract, tz=None):
-        super(AbstractToPDF, self).__init__()
+        super().__init__()
 
         self._abstract = abstract
         event = abstract.event
@@ -273,7 +269,7 @@ class AbstractToPDF(PDFLaTeXBase):
                 return escape(abstract.accepted_track.full_title)
         else:
             tracks = sorted(abstract.submitted_for_tracks | abstract.reviewed_for_tracks, key=attrgetter('position'))
-            return u'; '.join(escape(t.full_title) for t in tracks)
+            return '; '.join(escape(t.full_title) for t in tracks)
 
     @staticmethod
     def _get_contrib_type(abstract):
@@ -285,7 +281,7 @@ class AbstractsToPDF(PDFLaTeXBase):
     LATEX_TEMPLATE = 'report'
 
     def __init__(self, event, abstracts, tz=None):
-        super(AbstractsToPDF, self).__init__()
+        super().__init__()
         if tz is None:
             self._tz = event.timezone
 
@@ -306,7 +302,7 @@ class AbstractsToPDF(PDFLaTeXBase):
 
 class ConfManagerAbstractToPDF(AbstractToPDF):
     def __init__(self, abstract, tz=None):
-        super(ConfManagerAbstractToPDF, self).__init__(abstract, tz)
+        super().__init__(abstract, tz)
 
         self._args.update({
             'management': True,
@@ -318,18 +314,18 @@ class ConfManagerAbstractToPDF(AbstractToPDF):
     def _get_status(abstract):
         state_title = abstract.state.title.upper()
         if abstract.state == AbstractState.duplicate:
-            return u"{} (#{}: {})".format(state_title, abstract.duplicate_of.friendly_id, abstract.duplicate_of.title)
+            return f"{state_title} (#{abstract.duplicate_of.friendly_id}: {abstract.duplicate_of.title})"
         elif abstract.state == AbstractState.merged:
-            return u"{} (#{}: {})".format(state_title, abstract.merged_into.friendly_id, abstract.merged_into.title)
+            return f"{state_title} (#{abstract.merged_into.friendly_id}: {abstract.merged_into.title})"
         else:
             return abstract.state.title.upper()
 
     @staticmethod
     def _get_track_reviewing_states(abstract):
         def _format_review_action(review):
-            action = unicode(review.proposed_action.title)
+            action = str(review.proposed_action.title)
             if review.proposed_action == AbstractAction.accept and review.proposed_contribution_type:
-                return u'{}: {}'.format(action, review.proposed_contribution_type.name)
+                return f'{action}: {review.proposed_contribution_type.name}'
             else:
                 return action
 
@@ -348,19 +344,19 @@ class ConfManagerAbstractToPDF(AbstractToPDF):
                 proposed_contrib_types = {r.proposed_contribution_type.name for r in track_reviews
                                           if r.proposed_contribution_type}
                 if proposed_contrib_types:
-                    contrib_types = u', '.join(proposed_contrib_types)
-                    review_state = u'{}: {}'.format(review_state, contrib_types)
+                    contrib_types = ', '.join(proposed_contrib_types)
+                    review_state = f'{review_state}: {contrib_types}'
             elif track_review_state == AbstractReviewingState.mixed:
                 other_tracks = {x.title for r in track_reviews for x in r.proposed_tracks}
                 proposed_actions = {x.proposed_action for x in track_reviews}
                 no_track_actions = proposed_actions - {AbstractAction.change_tracks}
                 other_info = []
                 if no_track_actions:
-                    other_info.append(u', '.join(unicode(a.title) for a in no_track_actions))
+                    other_info.append(', '.join(str(a.title) for a in no_track_actions))
                 if other_tracks:
-                    other_info.append(_(u"Proposed for other tracks: {}").format(u', '.join(other_tracks)))
+                    other_info.append(_("Proposed for other tracks: {}").format(', '.join(other_tracks)))
                 if other_info:
-                    review_state = u'{}: {}'.format(review_state, u'; '.join(other_info))
+                    review_state = '{}: {}'.format(review_state, '; '.join(other_info))
 
             elif track_review_state not in {AbstractReviewingState.negative, AbstractReviewingState.conflicting}:
                 continue
@@ -370,7 +366,7 @@ class ConfManagerAbstractToPDF(AbstractToPDF):
 
 class ConfManagerAbstractsToPDF(AbstractsToPDF):
     def __init__(self, event, abstracts, tz=None):
-        super(ConfManagerAbstractsToPDF, self).__init__(event, abstracts, tz)
+        super().__init__(event, abstracts, tz)
 
         self._args.update({
             'management': True,
@@ -383,7 +379,7 @@ class ContribToPDF(PDFLaTeXBase):
     LATEX_TEMPLATE = 'single_doc'
 
     def __init__(self, contrib, tz=None):
-        super(ContribToPDF, self).__init__()
+        super().__init__()
 
         event = contrib.event
         affiliations, author_mapping, coauthor_mapping = extract_affiliations(contrib)
@@ -407,7 +403,7 @@ class ContribsToPDF(PDFLaTeXBase):
     LATEX_TEMPLATE = 'report'
 
     def __init__(self, event, contribs, tz=None):
-        super(ContribsToPDF, self).__init__()
+        super().__init__()
 
         self._args.update({
             'doc_type': 'contribution',
@@ -426,7 +422,7 @@ class ContributionBook(PDFLaTeXBase):
     LATEX_TEMPLATE = 'contribution_list_book'
 
     def __init__(self, event, user, contribs=None, tz=None, sort_by=""):
-        super(ContributionBook, self).__init__()
+        super().__init__()
 
         tz = tz or event.timezone
         contribs = sort_contribs(contribs or event.contributions, sort_by)
@@ -473,6 +469,6 @@ class AbstractBook(ContributionBook):
 
     def __init__(self, event, tz=None):
         sort_by = boa_settings.get(event, 'sort_by')
-        super(AbstractBook, self).__init__(event, None, sort_by=sort_by)
+        super().__init__(event, None, sort_by=sort_by)
         self._args['show_ids'] = boa_settings.get(event, 'show_abstract_ids')
         self._args['url'] = None

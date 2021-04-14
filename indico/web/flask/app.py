@@ -1,17 +1,15 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import absolute_import, unicode_literals
-
 import os
 import uuid
 
 from babel.numbers import format_currency, get_currency_name
-from flask import _app_ctx_stack, request
+from flask import _app_ctx_stack, render_template, request
 from flask.helpers import get_root_path
 from flask_pluginengine import current_plugin, plugins_loaded
 from markupsafe import Markup
@@ -33,22 +31,24 @@ from indico.core.config import IndicoConfig, config, load_config
 from indico.core.db.sqlalchemy import db
 from indico.core.db.sqlalchemy.logging import apply_db_loggers
 from indico.core.db.sqlalchemy.util.models import import_all_models
+from indico.core.limiter import limiter
 from indico.core.logger import Logger
 from indico.core.marshmallow import mm
+from indico.core.oauth.oauth2 import setup_oauth_provider
 from indico.core.plugins import plugin_engine, url_for_plugin
+from indico.core.sentry import init_sentry
 from indico.core.webpack import IndicoManifestLoader, webpack
 from indico.modules.auth.providers import IndicoAuthProvider, IndicoIdentityProvider
 from indico.modules.auth.util import url_for_login, url_for_logout
-from indico.modules.oauth import oauth
 from indico.util import date_time as date_time_util
-from indico.util.i18n import _, babel, get_current_locale, gettext_context, ngettext_context
+from indico.util.i18n import _, babel, get_all_locales, get_current_locale, gettext_context, ngettext_context
 from indico.util.mimetypes import icon_from_mimetype
 from indico.util.signals import values_from_signal
 from indico.util.string import RichMarkup, alpha_enum, crc32, html_to_plaintext, sanitize_html, slugify
 from indico.web.flask.errors import errors_bp
 from indico.web.flask.stats import get_request_stats, setup_request_stats
-from indico.web.flask.templating import (EnsureUnicodeExtension, call_template_hook, decodeprincipal, dedent, groupby,
-                                         instanceof, markdown, natsort, plusdelta, subclassof, underline)
+from indico.web.flask.templating import (call_template_hook, decodeprincipal, dedent, groupby, instanceof, markdown,
+                                         natsort, plusdelta, subclassof, underline)
 from indico.web.flask.util import ListConverter, XAccelMiddleware, discover_blueprints, url_for, url_rule_to_js
 from indico.web.flask.wrappers import IndicoFlask
 from indico.web.forms.jinja_helpers import is_single_line_field, iter_form_fields, render_field
@@ -57,17 +57,12 @@ from indico.web.util import url_for_index
 from indico.web.views import render_session_bar
 
 
-def configure_app(app, set_path=False):
+def configure_app(app):
     config = IndicoConfig(app.config['INDICO'])  # needed since we don't have an app ctx yet
     app.config['DEBUG'] = config.DEBUG
     app.config['SECRET_KEY'] = config.SECRET_KEY
     app.config['LOGGER_NAME'] = 'flask.app'
     app.config['LOGGER_HANDLER_POLICY'] = 'never'
-    if config.SENTRY_DSN:
-        app.config['SENTRY_CONFIG'] = {
-            'dsn': config.SENTRY_DSN,
-            'release': indico.__version__
-        }
     if not app.config['SECRET_KEY'] or len(app.config['SECRET_KEY']) < 16:
         raise ValueError('SECRET_KEY must be set to a random secret of at least 16 characters. '
                          'You can generate one using os.urandom(32) in Python shell.')
@@ -78,37 +73,34 @@ def configure_app(app, set_path=False):
     app.config['TRAP_BAD_REQUEST_ERRORS'] = config.DEBUG
     app.config['SESSION_COOKIE_NAME'] = 'indico_session'
     app.config['PERMANENT_SESSION_LIFETIME'] = config.SESSION_LIFETIME
+    app.config['RATELIMIT_STORAGE_URL'] = config.REDIS_CACHE_URL or 'memory://'
     configure_cache(app, config)
     configure_multipass(app, config)
     app.config['PLUGINENGINE_NAMESPACE'] = 'indico.plugins'
     app.config['PLUGINENGINE_PLUGINS'] = config.PLUGINS
-    if set_path:
-        base = url_parse(config.BASE_URL)
-        app.config['PREFERRED_URL_SCHEME'] = base.scheme
-        app.config['SERVER_NAME'] = base.netloc
-        if base.path:
-            app.config['APPLICATION_ROOT'] = base.path
+    base = url_parse(config.BASE_URL)
+    app.config['PREFERRED_URL_SCHEME'] = base.scheme
+    app.config['SERVER_NAME'] = base.netloc
+    if base.path:
+        app.config['APPLICATION_ROOT'] = base.path
     configure_xsendfile(app, config.STATIC_FILE_METHOD)
     if config.USE_PROXY:
         app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_proto=1, x_host=1)
     configure_webpack(app)
+    configure_emails(app, config)
 
 
 def configure_cache(app, config):
-    # TODO: remove anything but redis in 3.0; nobody is using it and it
-    # has not been tested recently.
-    app.config['CACHE_DEFAULT_TIMEOUT'] = -1
-    if app.config['TESTING']:
-        app.config['CACHE_TYPE'] = 'simple'
-    elif config.CACHE_BACKEND == 'redis':
-        app.config['CACHE_TYPE'] = 'redis'
+    app.config['CACHE_DEFAULT_TIMEOUT'] = 0
+    app.config['CACHE_KEY_PREFIX'] = f'indico_{_get_cache_version()}_'
+    if config.REDIS_CACHE_URL is not None or not app.testing:
+        # We configure the redis cache if we have the URL, or if we are not in testing mode in
+        # order to fail properly if redis is not configured.
+        app.config['CACHE_TYPE'] = 'indico.core.cache.IndicoRedisCache'
         app.config['CACHE_REDIS_URL'] = config.REDIS_CACHE_URL
-    elif config.CACHE_BACKEND == 'memcached':
-        app.config['CACHE_TYPE'] = 'memcached'
-        app.config['CACHE_MEMCACHED_SERVERS'] = config.MEMCACHED_SERVERS
-    elif config.CACHE_BACKEND == 'files':
-        app.config['CACHE_TYPE'] = 'filesystem'
-        app.config['CACHE_DIR'] = os.path.join(config.CACHE_DIR, 'flask-cache')
+    else:
+        app.config['CACHE_TYPE'] = 'flask_caching.backends.nullcache.NullCache'
+        app.config['CACHE_NO_NULL_WARNING'] = True
 
 
 def configure_multipass(app, config):
@@ -131,7 +123,7 @@ def configure_multipass_local(app):
     app.config['MULTIPASS_AUTH_PROVIDERS'] = dict(app.config['MULTIPASS_AUTH_PROVIDERS'], indico={
         'type': IndicoAuthProvider,
         'title': 'Indico',
-        'default': not any(p.get('default') for p in app.config['MULTIPASS_AUTH_PROVIDERS'].itervalues())
+        'default': not any(p.get('default') for p in app.config['MULTIPASS_AUTH_PROVIDERS'].values())
     })
     app.config['MULTIPASS_IDENTITY_PROVIDERS'] = dict(app.config['MULTIPASS_IDENTITY_PROVIDERS'], indico={
         'type': IndicoIdentityProvider,
@@ -149,10 +141,22 @@ def configure_webpack(app):
     app.config['WEBPACKEXT_MANIFEST_PATH'] = os.path.join('dist', 'manifest.json')
 
 
+def configure_emails(app, config):
+    # TODO: use more straightforward mapping between EMAIL_* app settings and indico.conf settings
+    app.config['EMAIL_BACKEND'] = 'indico.vendor.django_mail.backends.smtp.EmailBackend'
+    app.config['EMAIL_HOST'] = config.SMTP_SERVER[0]
+    app.config['EMAIL_PORT'] = config.SMTP_SERVER[1]
+    app.config['EMAIL_HOST_USER'] = config.SMTP_LOGIN
+    app.config['EMAIL_HOST_PASSWORD'] = config.SMTP_PASSWORD
+    app.config['EMAIL_USE_TLS'] = config.SMTP_USE_TLS
+    app.config['EMAIL_USE_SSL'] = False
+    app.config['EMAIL_TIMEOUT'] = config.SMTP_TIMEOUT
+
+
 def configure_xsendfile(app, method):
     if not method:
         return
-    elif isinstance(method, basestring):
+    elif isinstance(method, str):
         args = None
     else:
         method, args = method
@@ -177,11 +181,13 @@ def _get_indico_version():
     return 'v' + '-'.join(version_parts)
 
 
+def _get_cache_version():
+    version = Version(indico.__version__)
+    return f'v{version.major}.{version.minor}'
+
+
 def setup_jinja(app):
     app.jinja_env.policies['ext.i18n.trimmed'] = True
-    # Unicode hack
-    app.jinja_env.add_extension(EnsureUnicodeExtension)
-    app.add_template_filter(EnsureUnicodeExtension.ensure_unicode)
     # Useful (Python) builtins
     app.add_template_global(dict)
     # Global functions
@@ -198,7 +204,7 @@ def setup_jinja(app):
     app.add_template_global(url_for_index)
     app.add_template_global(url_for_login)
     app.add_template_global(url_for_logout)
-    app.add_template_global(lambda: unicode(uuid.uuid4()), 'uuid')
+    app.add_template_global(lambda: str(uuid.uuid4()), 'uuid')
     app.add_template_global(icon_from_mimetype)
     app.add_template_global(render_sidemenu)
     app.add_template_global(slugify)
@@ -212,12 +218,12 @@ def setup_jinja(app):
     # Useful constants
     app.add_template_global('^([0-9]|0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]$', name='time_regex_hhmm')  # for input[type=time]
     # Filters (indico functions returning UTF8)
-    app.add_template_filter(EnsureUnicodeExtension.wrap_func(date_time_util.format_date))
-    app.add_template_filter(EnsureUnicodeExtension.wrap_func(date_time_util.format_time))
-    app.add_template_filter(EnsureUnicodeExtension.wrap_func(date_time_util.format_datetime))
-    app.add_template_filter(EnsureUnicodeExtension.wrap_func(date_time_util.format_human_date))
-    app.add_template_filter(EnsureUnicodeExtension.wrap_func(date_time_util.format_timedelta))
-    app.add_template_filter(EnsureUnicodeExtension.wrap_func(date_time_util.format_number))
+    app.add_template_filter(date_time_util.format_date)
+    app.add_template_filter(date_time_util.format_time)
+    app.add_template_filter(date_time_util.format_datetime)
+    app.add_template_filter(date_time_util.format_human_date)
+    app.add_template_filter(date_time_util.format_timedelta)
+    app.add_template_filter(date_time_util.format_number)
     # Filters (new ones returning unicode)
     app.add_template_filter(date_time_util.format_human_timedelta)
     app.add_template_filter(date_time_util.format_pretty_date)
@@ -266,10 +272,12 @@ def configure_db(app):
 
         app.config['SQLALCHEMY_DATABASE_URI'] = config.SQLALCHEMY_DATABASE_URI
         app.config['SQLALCHEMY_RECORD_QUERIES'] = False
-        app.config['SQLALCHEMY_POOL_SIZE'] = config.SQLALCHEMY_POOL_SIZE
-        app.config['SQLALCHEMY_POOL_TIMEOUT'] = config.SQLALCHEMY_POOL_TIMEOUT
-        app.config['SQLALCHEMY_POOL_RECYCLE'] = config.SQLALCHEMY_POOL_RECYCLE
-        app.config['SQLALCHEMY_MAX_OVERFLOW'] = config.SQLALCHEMY_MAX_OVERFLOW
+        app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {
+            'pool_size': config.SQLALCHEMY_POOL_SIZE,
+            'pool_timeout': config.SQLALCHEMY_POOL_TIMEOUT,
+            'pool_recycle': config.SQLALCHEMY_POOL_RECYCLE,
+            'max_overflow': config.SQLALCHEMY_MAX_OVERFLOW,
+        }
 
     import_all_models()
     db.init_app(app)
@@ -284,6 +292,7 @@ def extend_url_map(app):
 
 
 def add_handlers(app):
+    app.before_request(canonicalize_url)
     app.before_request(reject_nuls)
     app.after_request(inject_current_url)
     app.register_blueprint(errors_bp)
@@ -301,11 +310,11 @@ def add_blueprints(app):
 def add_plugin_blueprints(app):
     blueprint_names = set()
     for plugin, blueprint in values_from_signal(signals.plugin.get_blueprints.send(app), return_plugins=True):
-        expected_names = {'plugin_{}'.format(plugin.name), 'plugin_compat_{}'.format(plugin.name)}
+        expected_names = {f'plugin_{plugin.name}', f'plugin_compat_{plugin.name}'}
         if blueprint.name not in expected_names:
-            raise Exception("Blueprint '{}' does not match plugin name '{}'".format(blueprint.name, plugin.name))
+            raise Exception(f"Blueprint '{blueprint.name}' does not match plugin name '{plugin.name}'")
         if blueprint.name in blueprint_names:
-            raise Exception("Blueprint '{}' defined by multiple plugins".format(blueprint.name))
+            raise Exception(f"Blueprint '{blueprint.name}' defined by multiple plugins")
         if not config.ROUTE_OLD_URLS and blueprint.name.startswith('plugin_compat_'):
             continue
         blueprint_names.add(blueprint.name)
@@ -313,8 +322,15 @@ def add_plugin_blueprints(app):
             app.register_blueprint(blueprint)
 
 
+def canonicalize_url():
+    url_root = request.url_root.rstrip('/')
+    if config.BASE_URL != url_root:
+        Logger.get('flask').info('Received request with invalid url root for %s', request.url)
+        return render_template('bad_url_error.html'), 404
+
+
 def reject_nuls():
-    for key, values in request.values.iterlists():
+    for key, values in request.values.lists():
         if '\0' in key or any('\0' in x for x in values):
             raise BadRequest('NUL byte found in request data')
 
@@ -333,6 +349,7 @@ def inject_current_url(response):
         # In case of URLs containing utter garbage (usually a 404
         # anyway) they may not be latin1-compatible so let's not
         # add the header at all in this case instead of failing later
+        # XXX: apparently this is still the case in Python3
         url.encode('latin1')
     except UnicodeEncodeError:
         return response
@@ -340,13 +357,11 @@ def inject_current_url(response):
     return response
 
 
-def make_app(set_path=False, testing=False, config_override=None):
+def make_app(testing=False, config_override=None):
     # If you are reading this code and wonder how to access the app:
     # >>> from flask import current_app as app
     # This only works while inside an application context but you really shouldn't have any
     # reason to access it outside this method without being inside an application context.
-    # When set_path is enabled, SERVER_NAME and APPLICATION_ROOT are set according to BASE_URL
-    # so URLs can be generated without an app context, e.g. in the indico shell
 
     if _app_ctx_stack.top:
         Logger.get('flask').warn('make_app called within app context, using existing app')
@@ -354,20 +369,24 @@ def make_app(set_path=False, testing=False, config_override=None):
     app = IndicoFlask('indico', static_folder='web/static', static_url_path='/', template_folder='web/templates')
     app.config['TESTING'] = testing
     app.config['INDICO'] = load_config(only_defaults=testing, override=config_override)
-    configure_app(app, set_path)
+    configure_app(app)
 
     with app.app_context():
         if not testing:
             Logger.init(app)
+            init_sentry(app)
         celery.init_app(app)
         cache.init_app(app)
         babel.init_app(app)
+        if config.DEFAULT_LOCALE not in get_all_locales():
+            Logger.get('i18n').error(f'Configured DEFAULT_LOCALE ({config.DEFAULT_LOCALE}) does not exist')
         multipass.init_app(app)
-        oauth.init_app(app)
+        setup_oauth_provider(app)
         webpack.init_app(app)
         setup_jinja(app)
         configure_db(app)
         mm.init_app(app)  # must be called after `configure_db`!
+        limiter.init_app(app)
         extend_url_map(app)
         add_handlers(app)
         setup_request_stats(app)
@@ -380,4 +399,5 @@ def make_app(set_path=False, testing=False, config_override=None):
         add_plugin_blueprints(app)
         # themes can be provided by plugins
         signals.app_created.send(app)
+        config.validate()
     return app

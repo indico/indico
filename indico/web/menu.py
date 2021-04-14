@@ -1,21 +1,19 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
-
-from __future__ import absolute_import, unicode_literals
 
 from flask import render_template
 from markupsafe import Markup
 
 from indico.core import signals
 from indico.util.signals import named_objects_from_signal
-from indico.util.string import format_repr, return_ascii
+from indico.util.string import format_repr
 
 
-class _MenuSectionBase(object):
+class _MenuSectionBase:
     is_section = True
 
     def __init__(self, name, title, weight=-1):
@@ -37,7 +35,7 @@ class _MenuSectionBase(object):
 
 
 class SideMenuSection(_MenuSectionBase):
-    """Defines a side menu section (item set).
+    """Define a side menu section (item set).
 
     :param name: the unique name of the section
     :param title: the title of the section (displayed)
@@ -47,7 +45,7 @@ class SideMenuSection(_MenuSectionBase):
     """
 
     def __init__(self, name, title, weight=-1, active=False, icon=None):
-        super(SideMenuSection, self).__init__(name, title, weight)
+        super().__init__(name, title, weight)
         self._active = active
         self.icon = 'icon-' + icon if icon else None
 
@@ -55,13 +53,12 @@ class SideMenuSection(_MenuSectionBase):
     def active(self):
         return self._active or any(item.active for item in self._items)
 
-    @return_ascii
     def __repr__(self):
         return format_repr(self, 'name', 'title', active=False)
 
 
-class SideMenuItem(object):
-    """Defines a side menu item.
+class SideMenuItem:
+    """Define a side menu item.
 
     :param name: the unique name (within the menu) of the item
     :param title: the title of the menu item (displayed)
@@ -85,26 +82,24 @@ class SideMenuItem(object):
         self.weight = weight
         self.icon = ('icon-' + icon) if icon else None
 
-    @return_ascii
     def __repr__(self):
         return format_repr(self, 'name', 'title', 'url', active=False, disabled=False)
 
 
 class TopMenuSection(_MenuSectionBase):
-    """Defines a top menu section (dropdown).
+    """Define a top menu section (dropdown).
 
     :param name: the unique name of the section
     :param title: the title of the section (displayed)
     :param weight: the "weight" (higher means it shows up first)
     """
 
-    @return_ascii
     def __repr__(self):
         return format_repr(self, 'name', 'title')
 
 
-class TopMenuItem(object):
-    """Defines a top menu item.
+class TopMenuItem:
+    """Define a top menu item.
 
     :param name: the unique name (within the menu) of the item
     :param title: the title of the menu item (displayed)
@@ -122,7 +117,6 @@ class TopMenuItem(object):
         self.section = section
         self.weight = weight
 
-    @return_ascii
     def __repr__(self):
         return format_repr(self, 'name', 'title', 'url')
 
@@ -143,11 +137,11 @@ def build_menu_structure(menu_id, active_item=None, **kwargs):
     top_level = set()
     sections = {}
 
-    for id_, section in named_objects_from_signal(signals.menu.sections.send(menu_id, **kwargs)).iteritems():
+    for id_, section in named_objects_from_signal(signals.menu.sections.send(menu_id, **kwargs)).items():
         sections[id_] = section
         top_level.add(section)
 
-    for id_, item in named_objects_from_signal(signals.menu.items.send(menu_id, **kwargs)).iteritems():
+    for id_, item in named_objects_from_signal(signals.menu.items.send(menu_id, **kwargs)).items():
         if id_ == active_item:
             item.active = True
         if item.section is None:

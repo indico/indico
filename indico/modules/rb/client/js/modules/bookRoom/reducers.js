@@ -1,5 +1,5 @@
 // This file is part of Indico.
-// Copyright (C) 2002 - 2020 CERN
+// Copyright (C) 2002 - 2021 CERN
 //
 // Indico is free software; you can redistribute it and/or
 // modify it under the terms of the MIT License; see the
@@ -9,10 +9,12 @@ import {combineReducers} from 'redux';
 
 import {camelizeKeys} from 'indico/utils/case';
 import {requestReducer} from 'indico/utils/redux';
-import * as actions from './actions';
+
 import * as globalActions from '../../actions';
 import {roomSearchReducerFactory} from '../../common/roomSearch/reducers';
 import {initialDatePickerState} from '../../common/timeline/reducers';
+
+import * as actions from './actions';
 
 export const initialTimelineState = {
   availability: [],

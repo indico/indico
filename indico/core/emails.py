@@ -1,29 +1,29 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import absolute_import, unicode_literals
-
-import cPickle
 import os
+import pickle
 import tempfile
 from datetime import date
+from email.utils import make_msgid
 
 import click
 from celery.exceptions import MaxRetriesExceededError, Retry
 from sqlalchemy.orm.attributes import flag_modified
+from werkzeug.urls import url_parse
 
 from indico.core.celery import celery
 from indico.core.config import config
 from indico.core.db import db
 from indico.core.logger import Logger
 from indico.util.date_time import now_utc
-from indico.util.emails.backend import EmailBackend
-from indico.util.emails.message import EmailMessage
 from indico.util.string import truncate
+from indico.vendor.django_mail import get_connection
+from indico.vendor.django_mail.message import EmailMessage
 
 
 logger = Logger.get('emails')
@@ -81,7 +81,7 @@ def do_send_email(email, log_entry=None, _from_task=False):
     :param _from_task: Indicates that this function is called from
                        the celery task responsible for sending emails.
     """
-    with EmailBackend(timeout=config.SMTP_TIMEOUT) as conn:
+    with get_connection() as conn:
         msg = EmailMessage(subject=email['subject'], body=email['body'], from_email=email['from'],
                            to=email['to'], cc=email['cc'], bcc=email['bcc'], reply_to=email['reply_to'],
                            attachments=email['attachments'], connection=conn)
@@ -89,6 +89,7 @@ def do_send_email(email, log_entry=None, _from_task=False):
             msg.extra_headers['To'] = 'Undisclosed-recipients:;'
         if email['html']:
             msg.content_subtype = 'html'
+        msg.extra_headers['message-id'] = make_msgid(domain=url_parse(config.BASE_URL).host)
         msg.send()
     if not _from_task:
         logger.info('Sent email "%s"', truncate(email['subject'], 100))
@@ -106,10 +107,10 @@ def update_email_log_state(log_entry, failed=False):
 
 
 def store_failed_email(email, log_entry=None):
-    prefix = 'failed-email-{}-'.format(date.today().isoformat())
+    prefix = f'failed-email-{date.today().isoformat()}-'
     fd, name = tempfile.mkstemp(prefix=prefix, dir=config.TEMP_DIR)
     with os.fdopen(fd, 'wb') as f:
-        cPickle.dump((email, log_entry.id if log_entry else None), f)
+        pickle.dump((email, log_entry.id if log_entry else None), f)
     return name
 
 
@@ -117,7 +118,7 @@ def resend_failed_email(path):
     """Try re-sending an email that previously failed."""
     from indico.modules.events.logs import EventLogEntry
     with open(path, 'rb') as f:
-        email, log_entry_id = cPickle.load(f)
+        email, log_entry_id = pickle.load(f)
     log_entry = EventLogEntry.get(log_entry_id) if log_entry_id is not None else None
     do_send_email(email, log_entry)
     db.session.commit()

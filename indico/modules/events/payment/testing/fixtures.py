@@ -1,5 +1,5 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
@@ -12,7 +12,7 @@ from indico.modules.events.payment.models.transactions import PaymentTransaction
 
 @pytest.fixture
 def create_transaction():
-    """Returns a callable which lets you create transactions"""
+    """Return a callable which lets you create transactions."""
 
     def _create_transaction(status, **params):
         params.setdefault('amount', 10)
@@ -26,5 +26,5 @@ def create_transaction():
 
 @pytest.fixture
 def dummy_transaction(create_transaction):
-    """Gives you a dummy successful transaction"""
+    """Return a dummy successful transaction."""
     return create_transaction(status=TransactionStatus.successful)

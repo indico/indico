@@ -1,5 +1,5 @@
 // This file is part of Indico.
-// Copyright (C) 2002 - 2020 CERN
+// Copyright (C) 2002 - 2021 CERN
 //
 // Indico is free software; you can redistribute it and/or
 // modify it under the terms of the MIT License; see the
@@ -7,11 +7,11 @@
 
 import contributionDisplayURL from 'indico-url:contributions.display_contribution';
 
-import React from 'react';
 import PropTypes from 'prop-types';
+import React from 'react';
 
-import {Param, Translate} from 'indico/react/i18n';
 import {MathJax} from 'indico/react/components';
+import {Param, Translate} from 'indico/react/i18n';
 
 export default function TimelineHeader({children, contribution, state, submitter, eventId}) {
   return (
@@ -39,7 +39,10 @@ export default function TimelineHeader({children, contribution, state, submitter
                   value={contribution.title}
                   wrapper={
                     <a
-                      href={contributionDisplayURL({contrib_id: contribution.id, confId: eventId})}
+                      href={contributionDisplayURL({
+                        event_id: eventId,
+                        contrib_id: contribution.id,
+                      })}
                     />
                   }
                 />

@@ -1,11 +1,9 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
-
-from __future__ import unicode_literals
 
 import json
 
@@ -13,10 +11,11 @@ from wtforms.fields import BooleanField, RadioField
 from wtforms.validators import Length, NumberRange
 from wtforms.widgets.core import HiddenInput, Input, Select, TextArea
 
-from indico.util.struct.enum import RichEnum
+from indico.util.enum import RichEnum
 from indico.web.forms.fields import (IndicoEnumRadioField, IndicoQuerySelectMultipleCheckboxField,
                                      IndicoSelectMultipleCheckboxField)
-from indico.web.forms.validators import ConfirmPassword, HiddenUnless, IndicoRegexp, SoftLength, WordCount
+from indico.web.forms.validators import (ConfirmPassword, HiddenUnless, IndicoRegexp, SecurePassword, SoftLength,
+                                         WordCount)
 from indico.web.forms.widgets import SelectizeWidget, TypeaheadWidget
 
 
@@ -51,6 +50,8 @@ def _attrs_for_validators(field, validators):
                 attrs['minlength'] = validator.min
             if validator.max >= 0:
                 attrs['maxlength'] = validator.max
+        elif isinstance(validator, SecurePassword):
+            attrs['minlength'] = validator.MIN_LENGTH
         elif isinstance(validator, IndicoRegexp) and validator.client_side:
             attrs['pattern'] = validator.regex.pattern
         elif isinstance(validator, NumberRange):
@@ -77,7 +78,7 @@ def _attrs_for_validators(field, validators):
 
 
 def render_field(field, widget_attrs, disabled=None):
-    """Renders a WTForms field, taking into account validators"""
+    """Render a WTForms field, taking into account validators."""
     if not widget_attrs.get('placeholder'):
         widget_attrs = dict(widget_attrs)
         widget_attrs.pop('placeholder', None)
@@ -92,7 +93,7 @@ def render_field(field, widget_attrs, disabled=None):
 
 
 def iter_form_fields(form, fields=None, skip=None, hidden_fields=False):
-    """Iterates over the fields in a WTForm
+    """Iterate over the fields in a WTForm.
 
     :param fields: If specified only fields that are in this list are
                    yielded. This also overrides the field order.
@@ -112,5 +113,4 @@ def iter_form_fields(form, fields=None, skip=None, hidden_fields=False):
         field_iter = (field for field in field_iter if field.short_name not in skip)
     if hidden_fields is not None:
         field_iter = (field for field in field_iter if isinstance(field.widget, HiddenInput) == hidden_fields)
-    for field in field_iter:
-        yield field
+    yield from field_iter

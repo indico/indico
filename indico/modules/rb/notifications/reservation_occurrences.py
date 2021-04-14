@@ -1,5 +1,5 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
@@ -13,17 +13,17 @@ from indico.web.flask.templating import get_template_module
 
 class ReservationOccurrenceNotification(ReservationNotification):
     def __init__(self, occurrence):
-        super(ReservationOccurrenceNotification, self).__init__(occurrence.reservation)
+        super().__init__(occurrence.reservation)
         self.occurrence = occurrence
         self.start_dt = format_datetime(occurrence.start_dt)
 
     def _get_email_subject(self, **mail_params):
         mail_params = dict(mail_params, **{'subject_suffix': '(SINGLE OCCURRENCE)'})
-        return super(ReservationOccurrenceNotification, self)._get_email_subject(**mail_params)
+        return super()._get_email_subject(**mail_params)
 
     def _make_body(self, mail_params, **body_params):
         body_params['occurrence'] = self.occurrence
-        return super(ReservationOccurrenceNotification, self)._make_body(mail_params, **body_params)
+        return super()._make_body(mail_params, **body_params)
 
 
 @email_sender
@@ -31,7 +31,7 @@ def notify_cancellation(occurrence):
     if not occurrence.is_cancelled:
         raise ValueError('Occurrence is not cancelled')
     notification = ReservationOccurrenceNotification(occurrence)
-    return filter(None, [
+    return [_f for _f in [
         notification.compose_email_to_user(
             subject='Booking cancelled on',
             template_name='occurrence_cancellation_email_to_user'
@@ -40,7 +40,7 @@ def notify_cancellation(occurrence):
             subject='Booking cancelled on',
             template_name='occurrence_cancellation_email_to_manager'
         ),
-    ])
+    ] if _f]
 
 
 @email_sender
@@ -48,7 +48,7 @@ def notify_rejection(occurrence):
     if not occurrence.is_rejected:
         raise ValueError('Occurrence is not rejected')
     notification = ReservationOccurrenceNotification(occurrence)
-    return filter(None, [
+    return [_f for _f in [
         notification.compose_email_to_user(
             subject='Booking rejected on',
             template_name='occurrence_rejection_email_to_user'
@@ -57,7 +57,7 @@ def notify_rejection(occurrence):
             subject='Booking rejected on',
             template_name='occurrence_rejection_email_to_manager'
         )
-    ])
+    ] if _f]
 
 
 @email_sender

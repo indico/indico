@@ -1,11 +1,9 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
-
-from __future__ import unicode_literals
 
 from indico.core.settings.converters import EnumConverter
 from indico.modules.designer import PageOrientation, PageSize
@@ -33,7 +31,7 @@ BADGE_SETTING_CONVERTERS = {
 
 
 class RegistrationSettingsProxy(EventSettingsProxy):
-    """Store per-event registration settings"""
+    """Store per-event registration settings."""
 
     def get_participant_list_columns(self, event, form=None):
         if form is None:
@@ -42,8 +40,8 @@ class RegistrationSettingsProxy(EventSettingsProxy):
         else:
             try:
                 # The int values are automatically converted to unicode when saved as JSON
-                form_columns = self.get(event, 'participant_list_form_columns')[unicode(form.id)]
-                return map(int, form_columns)
+                form_columns = self.get(event, 'participant_list_form_columns')[str(form.id)]
+                return list(map(int, form_columns))
             except (ValueError, KeyError):
                 # No settings for this form, default to the ones for the merged form
                 column_names = self.get_participant_list_columns(event)
@@ -61,14 +59,14 @@ class RegistrationSettingsProxy(EventSettingsProxy):
                 # The int values are automatically converted to unicode when saved
                 # as JSON. Do it explicitely so that it keeps working if the
                 # behavior changes and makes sense with the code above.
-                form_columns[unicode(form.id)] = columns
+                form_columns[str(form.id)] = columns
             else:
-                form_columns.pop(unicode(form.id), None)
+                form_columns.pop(str(form.id), None)
             self.set(event, 'participant_list_form_columns', form_columns)
 
     def get_participant_list_form_ids(self, event):
         # Int values are converted to str when saved as JSON
-        return map(int, self.get(event, 'participant_list_forms'))
+        return list(map(int, self.get(event, 'participant_list_forms')))
 
     def set_participant_list_form_ids(self, event, form_ids):
         self.set(event, 'participant_list_forms', form_ids)

@@ -1,11 +1,9 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
-
-from __future__ import unicode_literals
 
 from sqlalchemy.dialects.postgresql import JSONB
 
@@ -14,9 +12,8 @@ from indico.core.db.sqlalchemy import PyIntEnum, UTCDateTime
 from indico.core.db.sqlalchemy.util.queries import limit_groups
 from indico.modules.events.requests import get_request_definitions
 from indico.util.date_time import now_utc
+from indico.util.enum import RichIntEnum
 from indico.util.i18n import _
-from indico.util.string import return_ascii
-from indico.util.struct.enum import RichIntEnum
 
 
 class RequestState(RichIntEnum):
@@ -28,7 +25,7 @@ class RequestState(RichIntEnum):
 
 
 class Request(db.Model):
-    """Event-related requests, e.g. for a webcast"""
+    """Event-related requests, e.g. for a webcast."""
     __tablename__ = 'requests'
     __table_args__ = {'schema': 'events'}
 
@@ -133,21 +130,20 @@ class Request(db.Model):
 
     @property
     def can_be_modified(self):
-        """Determines if the request can be modified or if a new one must be sent"""
+        """Determine if the request can be modified or if a new one must be sent."""
         return self.state in {RequestState.pending, RequestState.accepted}
 
     @property
     def locator(self):
-        return {'confId': self.event_id, 'type': self.type}
+        return {'event_id': self.event_id, 'type': self.type}
 
-    @return_ascii
     def __repr__(self):
         state = self.state.name if self.state is not None else None
-        return '<Request({}, {}, {}, {})>'.format(self.id, self.event_id, self.type, state)
+        return f'<Request({self.id}, {self.event_id}, {self.type}, {state})>'
 
     @classmethod
     def find_latest_for_event(cls, event, type_=None):
-        """Returns the latest requests for a given event.
+        """Return the latest requests for a given event.
 
         :param event: the event to find the requests for
         :param type_: the request type to retrieve, or `None` to get all

@@ -1,11 +1,9 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
-
-from __future__ import unicode_literals
 
 from flask import jsonify, request, session
 from sqlalchemy.orm import subqueryload, undefer
@@ -58,7 +56,7 @@ def _render_session_list(event):
 
 
 class RHSessionsList(RHManageSessionsBase):
-    """Display list of all sessions within the event"""
+    """Display list of all sessions within the event,"""
 
     def _process(self):
         selected_entry = request.args.get('selected')
@@ -69,7 +67,7 @@ class RHSessionsList(RHManageSessionsBase):
 
 
 class RHCreateSession(RHManageSessionsBase):
-    """Create a session in the event"""
+    """Create a session in the event."""
 
     def _get_response(self, new_session):
         sessions = [{'id': s.id, 'title': s.title, 'colors': s.colors} for s in self.event.sessions]
@@ -90,7 +88,7 @@ class RHCreateSession(RHManageSessionsBase):
 
 
 class RHModifySession(RHManageSessionBase):
-    """Modify a session"""
+    """Modify a session."""
 
     def _process(self):
         form = SessionForm(obj=self.session, event=self.event)
@@ -101,7 +99,7 @@ class RHModifySession(RHManageSessionBase):
 
 
 class RHDeleteSessions(RHManageSessionsActionsBase):
-    """Remove multiple sessions"""
+    """Remove multiple sessions."""
 
     def _process(self):
         for sess in self.sessions:
@@ -114,7 +112,7 @@ class RHManageSessionsExportBase(RHManageSessionsActionsBase):
 
 
 class RHExportSessionsCSV(RHManageSessionsExportBase):
-    """Export list of sessions to a CSV"""
+    """Export list of sessions to a CSV."""
 
     def _process(self):
         headers, rows = generate_spreadsheet_from_sessions(self.sessions)
@@ -122,7 +120,7 @@ class RHExportSessionsCSV(RHManageSessionsExportBase):
 
 
 class RHExportSessionsExcel(RHManageSessionsExportBase):
-    """Export list of sessions to a XLSX"""
+    """Export list of sessions to a XLSX."""
 
     def _process(self):
         headers, rows = generate_spreadsheet_from_sessions(self.sessions)
@@ -130,7 +128,7 @@ class RHExportSessionsExcel(RHManageSessionsExportBase):
 
 
 class RHExportSessionsPDF(RHManageSessionsExportBase):
-    """Export list of sessions to a PDF"""
+    """Export list of sessions to a PDF."""
 
     def _process(self):
         pdf_file = generate_pdf_from_sessions(self.sessions)
@@ -138,7 +136,7 @@ class RHExportSessionsPDF(RHManageSessionsExportBase):
 
 
 class RHSessionREST(RHManageSessionBase):
-    """Perform update or removal of a session"""
+    """Perform update or removal of a session."""
 
     def _process_DELETE(self):
         delete_session(self.session)
@@ -173,7 +171,7 @@ class RHSessionREST(RHManageSessionBase):
 
 
 class RHSessionPersonList(RHContributionPersonListMixin, RHManageSessionsActionsBase):
-    """List of persons in the session's contributions"""
+    """List of persons in the session's contributions."""
 
     template = 'events/sessions/management/session_person_list.html'
     ALLOW_LOCKED = True
@@ -185,7 +183,7 @@ class RHSessionPersonList(RHContributionPersonListMixin, RHManageSessionsActions
 
 
 class RHSessionProtection(RHManageSessionBase):
-    """Manage session protection"""
+    """Manage session protection."""
 
     def _process(self):
         form = SessionProtectionForm(obj=FormDefaults(**self._get_defaults()), session=self.session,
@@ -204,14 +202,14 @@ class RHSessionProtection(RHManageSessionBase):
 
 
 class RHSessionACL(RHManageSessionBase):
-    """Display the ACL of the session"""
+    """Display the ACL of the session."""
 
     def _process(self):
         return render_acl(self.session)
 
 
 class RHSessionACLMessage(RHManageSessionBase):
-    """Render the inheriting ACL message"""
+    """Render the inheriting ACL message."""
 
     def _process(self):
         mode = ProtectionMode[request.args['mode']]
@@ -220,7 +218,7 @@ class RHSessionACLMessage(RHManageSessionBase):
 
 
 class RHManageSessionBlock(RHManageSessionBase):
-    """Manage a block of a session"""
+    """Manage a block of a session."""
 
     normalize_url_spec = {
         'locators': {
@@ -236,8 +234,8 @@ class RHManageSessionBlock(RHManageSessionBase):
         form = MeetingSessionBlockForm(obj=FormDefaults(**self._get_form_defaults()), event=self.event,
                                        session_block=self.session_block)
         if form.validate_on_submit():
-            session_data = {k[8:]: v for k, v in form.data.iteritems() if k in form.session_fields}
-            block_data = {k[6:]: v for k, v in form.data.iteritems() if k in form.block_fields}
+            session_data = {k[8:]: v for k, v in form.data.items() if k in form.session_fields}
+            block_data = {k[6:]: v for k, v in form.data.items() if k in form.block_fields}
             update_session(self.session, session_data)
             update_session_block(self.session_block, block_data)
             return jsonify_data(flash=False)
@@ -258,7 +256,7 @@ class RHSessionBlocks(RHManageSessionBase):
 
 
 class RHManageSessionTypes(RHManageSessionsBase):
-    """Dialog to manage the session types of an event"""
+    """Dialog to manage the session types of an event."""
 
     def _process(self):
         return jsonify_template('events/sessions/management/types_dialog.html', event=self.event,
@@ -266,7 +264,7 @@ class RHManageSessionTypes(RHManageSessionsBase):
 
 
 class RHManageSessionTypeBase(RHManageSessionsBase):
-    """Manage a session type of an event"""
+    """Manage a session type of an event."""
 
     normalize_url_spec = {
         'locators': {
@@ -280,7 +278,7 @@ class RHManageSessionTypeBase(RHManageSessionsBase):
 
 
 class RHEditSessionType(RHManageSessionTypeBase):
-    """Dialog to edit a SessionType"""
+    """Dialog to edit a SessionType."""
 
     def _process(self):
         form = SessionTypeForm(event=self.event, obj=self.session_type)
@@ -289,13 +287,13 @@ class RHEditSessionType(RHManageSessionTypeBase):
             form.populate_obj(self.session_type)
             db.session.flush()
             self.event.log(EventLogRealm.management, EventLogKind.change, 'Sessions',
-                           'Updated type: {}'.format(old_name), session.user)
+                           f'Updated type: {old_name}', session.user)
             return jsonify_data(html_row=render_session_type_row(self.session_type), flash=False)
         return jsonify_form(form)
 
 
 class RHCreateSessionType(RHManageSessionsBase):
-    """Dialog to add a SessionType"""
+    """Dialog to add a SessionType."""
 
     def _process(self):
         form = SessionTypeForm(event=self.event)
@@ -305,7 +303,7 @@ class RHCreateSessionType(RHManageSessionsBase):
             self.event.session_types.append(session_type)
             db.session.flush()
             self.event.log(EventLogRealm.management, EventLogKind.positive, 'Sessions',
-                           'Added type: {}'.format(session_type.name), session.user)
+                           f'Added type: {session_type.name}', session.user)
             types = [{'id': t.id, 'title': t.name} for t in self.event.session_types]
             return jsonify_data(types=types, new_type_id=session_type.id,
                                 html_row=render_session_type_row(session_type))
@@ -313,11 +311,11 @@ class RHCreateSessionType(RHManageSessionsBase):
 
 
 class RHDeleteSessionType(RHManageSessionTypeBase):
-    """Dialog to delete a SessionType"""
+    """Dialog to delete a SessionType."""
 
     def _process(self):
         db.session.delete(self.session_type)
         db.session.flush()
         self.event.log(EventLogRealm.management, EventLogKind.negative, 'Sessions',
-                       'Deleted type: {}'.format(self.session_type.name), session.user)
+                       f'Deleted type: {self.session_type.name}', session.user)
         return jsonify_data(flash=False)

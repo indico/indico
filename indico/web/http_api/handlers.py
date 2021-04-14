@@ -1,5 +1,5 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
@@ -14,35 +14,34 @@ import hmac
 import posixpath
 import re
 import time
-import urllib
-from urlparse import parse_qs
+from urllib.parse import parse_qs, urlencode
 from uuid import UUID
 
+import sentry_sdk
+from authlib.oauth2 import OAuth2Error
 from flask import current_app, g, request, session
 from werkzeug.exceptions import BadRequest, NotFound
 
+from indico.core.cache import make_scoped_cache
 from indico.core.db import db
 from indico.core.logger import Logger
-from indico.legacy.common.cache import GenericCache
+from indico.core.oauth import require_oauth
 from indico.modules.api import APIMode, api_settings
 from indico.modules.api.models.keys import APIKey
-from indico.modules.oauth import oauth
-from indico.modules.oauth.provider import load_token
-from indico.util.fossilize import clearCache, fossilize
-from indico.util.string import to_unicode
 from indico.web.http_api import HTTPAPIHook
-from indico.web.http_api.fossils import IHTTPAPIExportResultFossil
 from indico.web.http_api.metadata.serializer import Serializer
-from indico.web.http_api.responses import HTTPAPIError, HTTPAPIResult
+from indico.web.http_api.responses import HTTPAPIError, HTTPAPIResult, HTTPAPIResultSchema
 from indico.web.http_api.util import get_query_parameter
 
 
 # Remove the extension at the end or before the querystring
 RE_REMOVE_EXTENSION = re.compile(r'\.(\w+)(?:$|(?=\?))')
 
+API_CACHE = make_scoped_cache('legacy-http-api')
+
 
 def normalizeQuery(path, query, remove=('signature',), separate=False):
-    """Normalize request path and query so it can be used for caching and signing
+    """Normalize request path and query so it can be used for caching and signing.
 
     Returns a string consisting of path and sorted query string.
     Dynamic arguments like signature and timestamp are removed from the query string.
@@ -50,16 +49,16 @@ def normalizeQuery(path, query, remove=('signature',), separate=False):
     qparams = parse_qs(query)
     sorted_params = []
 
-    for key, values in sorted(qparams.items(), key=lambda x: x[0].lower()):
+    for key, values in sorted(list(qparams.items()), key=lambda x: x[0].lower()):
         key = key.lower()
         if key not in remove:
             for v in sorted(values):
                 sorted_params.append((key, v))
 
     if separate:
-        return path, sorted_params and urllib.urlencode(sorted_params)
+        return path, sorted_params and urlencode(sorted_params)
     elif sorted_params:
-        return '%s?%s' % (path, urllib.urlencode(sorted_params))
+        return f'{path}?{urlencode(sorted_params)}'
     else:
         return path
 
@@ -70,7 +69,7 @@ def validateSignature(ak, signature, timestamp, path, query):
         raise HTTPAPIError('Signature invalid (no timestamp)', 403)
     elif timestamp and abs(timestamp - int(time.time())) > ttl:
         raise HTTPAPIError('Signature invalid (bad timestamp)', 403)
-    digest = hmac.new(ak.secret, normalizeQuery(path, query), hashlib.sha1).hexdigest()
+    digest = hmac.new(ak.secret.encode(), normalizeQuery(path, query).encode(), hashlib.sha1).hexdigest()
     if signature != digest:
         raise HTTPAPIError('Signature invalid', 403)
 
@@ -85,7 +84,7 @@ def checkAK(apiKey, signature, timestamp, path, query):
         UUID(hex=apiKey)
     except ValueError:
         raise HTTPAPIError('Malformed API key', 400)
-    ak = APIKey.find_first(token=apiKey, is_active=True)
+    ak = APIKey.query.filter_by(token=apiKey, is_active=True).first()
     if not ak:
         raise HTTPAPIError('Invalid API key', 403)
     if ak.is_blocked:
@@ -103,12 +102,11 @@ def checkAK(apiKey, signature, timestamp, path, query):
 
 def handler(prefix, path):
     path = posixpath.join('/', prefix, path)
-    clearCache()  # init fossil cache
     logger = Logger.get('httpapi')
     if request.method == 'POST':
         # Convert POST data to a query string
-        queryParams = [(key, [x.encode('utf-8') for x in values]) for key, values in request.form.iterlists()]
-        query = urllib.urlencode(queryParams, doseq=1)
+        queryParams = list(request.form.lists())
+        query = urlencode(queryParams, doseq=1)
         # we only need/keep multiple values so we can properly validate the signature.
         # the legacy code below expects a dict with just the first value.
         # if you write a new api endpoint that needs multiple values get them from
@@ -116,8 +114,8 @@ def handler(prefix, path):
         queryParams = {key: values[0] for key, values in queryParams}
     else:
         # Parse the actual query string
-        queryParams = dict((key, value.encode('utf-8')) for key, value in request.args.iteritems())
-        query = request.query_string
+        queryParams = {key: value for key, value in request.args.items()}
+        query = request.query_string.decode()
 
     apiKey = get_query_parameter(queryParams, ['ak', 'apikey'], None)
     cookieAuth = get_query_parameter(queryParams, ['ca', 'cookieauth'], 'no') == 'yes'
@@ -129,20 +127,12 @@ def handler(prefix, path):
     onlyAuthed = get_query_parameter(queryParams, ['oa', 'onlyauthed'], 'no') == 'yes'
     scope = 'read:legacy_api' if request.method == 'GET' else 'write:legacy_api'
 
-    if not request.headers.get('Authorization', '').lower().startswith('basic '):
+    oauth_token = None
+    if request.headers.get('Authorization', '').lower().startswith('bearer '):
         try:
-            oauth_valid, oauth_request = oauth.verify_request([scope])
-            if not oauth_valid and oauth_request and oauth_request.error_message != 'Bearer token not found.':
-                raise BadRequest('OAuth error: {}'.format(oauth_request.error_message))
-            elif g.get('received_oauth_token') and oauth_request.error_message == 'Bearer token not found.':
-                raise BadRequest('OAuth error: Invalid token')
-        except ValueError:
-            # XXX: Dirty hack to workaround a bug in flask-oauthlib that causes it
-            #      not to properly urlencode request query strings
-            #      Related issue (https://github.com/lepture/flask-oauthlib/issues/213)
-            oauth_valid = False
-    else:
-        oauth_valid = False
+            oauth_token = require_oauth.acquire_token([scope])
+        except OAuth2Error as exc:
+            raise BadRequest(f'OAuth error: {exc}')
 
     # Get our handler function and its argument and response type
     hook, dformat = HTTPAPIHook.parseRequest(path, queryParams)
@@ -165,8 +155,9 @@ def handler(prefix, path):
             if not used_session.user:  # ignore guest sessions
                 used_session = None
 
-        if apiKey or oauth_valid or not used_session:
-            if not oauth_valid:
+        if apiKey or oauth_token or not used_session:
+            auth_token = None
+            if not oauth_token:
                 # Validate the API key (and its signature)
                 ak, enforceOnlyPublic = checkAK(apiKey, signature, timestamp, path, query)
                 if enforceOnlyPublic:
@@ -174,39 +165,55 @@ def handler(prefix, path):
                 # Create an access wrapper for the API key's user
                 user = ak.user if ak and not onlyPublic else None
             else:  # Access Token (OAuth)
-                at = load_token(oauth_request.access_token.access_token)
-                user = at.user if at and not onlyPublic else None
+                user = oauth_token.user if not onlyPublic else None
             # Get rid of API key in cache key if we did not impersonate a user
             if ak and user is None:
                 cacheKey = normalizeQuery(path, query,
                                           remove=('_', 'ak', 'apiKey', 'signature', 'timestamp', 'nc', 'nocache',
-                                                  'oa', 'onlyauthed'))
+                                                  'oa', 'onlyauthed', 'access_token'))
             else:
                 cacheKey = normalizeQuery(path, query,
-                                          remove=('_', 'signature', 'timestamp', 'nc', 'nocache', 'oa', 'onlyauthed'))
+                                          remove=('_', 'signature', 'timestamp', 'nc', 'nocache', 'oa', 'onlyauthed',
+                                                  'access_token'))
                 if signature:
                     # in case the request was signed, store the result under a different key
                     cacheKey = 'signed_' + cacheKey
+                if auth_token:
+                    # if oauth was used, we also make the cache key unique
+                    cacheKey = f'oauth-{auth_token.id}_{cacheKey}'
         else:
             # We authenticated using a session cookie.
+            # XXX: This is not used anymore within indico and should be removed whenever we rewrite
+            # the code here.
             token = request.headers.get('X-CSRF-Token', get_query_parameter(queryParams, ['csrftoken']))
             if used_session.csrf_protected and used_session.csrf_token != token:
                 raise HTTPAPIError('Invalid CSRF token', 403)
             user = used_session.user if not onlyPublic else None
-            userPrefix = 'user-{}_'.format(used_session.user.id)
-            cacheKey = userPrefix + normalizeQuery(path, query,
-                                                   remove=('_', 'nc', 'nocache', 'ca', 'cookieauth', 'oa', 'onlyauthed',
-                                                           'csrftoken'))
+            cacheKey = normalizeQuery(path, query,
+                                      remove=('_', 'nc', 'nocache', 'ca', 'cookieauth', 'oa', 'onlyauthed',
+                                              'csrftoken'))
+
+        if user is not None:
+            # We *always* prefix the cache key with the user ID so we never get an overlap between
+            # authenticated and unauthenticated requests
+            cacheKey = f'user-{user.id}_{cacheKey}'
+            sentry_sdk.set_user({
+                'id': user.id,
+                'email': user.email,
+                'name': user.full_name,
+                'source': 'http_api'
+            })
+        else:
+            cacheKey = f'public_{cacheKey}'
 
         # Bail out if the user requires authentication but is not authenticated
         if onlyAuthed and not user:
             raise HTTPAPIError('Not authenticated', 403)
 
         addToCache = not hook.NO_CACHE
-        cache = GenericCache('HTTPAPI')
         cacheKey = RE_REMOVE_EXTENSION.sub('', cacheKey)
         if not noCache:
-            obj = cache.get(cacheKey)
+            obj = API_CACHE.get(cacheKey)
             if obj is not None:
                 result, extra, ts, complete, typeMap = obj
                 addToCache = False
@@ -225,20 +232,19 @@ def handler(prefix, path):
         if result is not None and addToCache:
             ttl = api_settings.get('cache_ttl')
             if ttl > 0:
-                cache.set(cacheKey, (result, extra, ts, complete, typeMap), ttl)
+                API_CACHE.set(cacheKey, (result, extra, ts, complete, typeMap), ttl)
     except HTTPAPIError as e:
         error = e
-        if e.getCode():
-            status_code = e.getCode()
+        if e.code:
+            status_code = e.code
 
     if result is None and error is None:
-        # TODO: usage page
         raise NotFound
     else:
         if ak and error is None:
             # Commit only if there was an API key and no error
             norm_path, norm_query = normalizeQuery(path, query, remove=('signature', 'timestamp'), separate=True)
-            uri = to_unicode('?'.join(filter(None, (norm_path, norm_query))))
+            uri = '?'.join([_f for _f in (norm_path, norm_query) if _f])
             ak.register_used(request.remote_addr, uri, not onlyPublic)
             db.session.commit()
         else:
@@ -259,11 +265,9 @@ def handler(prefix, path):
                 # use JSON, since it is universal
                 serializer = Serializer.create('json')
 
-            result = fossilize(error)
-        else:
-            if serializer.encapsulate:
-                result = fossilize(HTTPAPIResult(result, path, query, ts, complete, extra), IHTTPAPIExportResultFossil)
-                del result['_fossil']
+            result = {'message': error.message}
+        elif serializer.encapsulate:
+            result = HTTPAPIResultSchema().dump(HTTPAPIResult(result, path, query, ts, extra))
 
         try:
             data = serializer(result)

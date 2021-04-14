@@ -1,11 +1,9 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
-
-from __future__ import unicode_literals
 
 from indico.modules.events.abstracts.models.abstracts import AbstractState
 from indico.util.i18n import _, orig_string
@@ -47,7 +45,7 @@ class AbstractIDPlaceholder(Placeholder):
 
     @classmethod
     def render(cls, abstract):
-        return unicode(abstract.friendly_id)
+        return str(abstract.friendly_id)
 
 
 class AbstractTitlePlaceholder(Placeholder):
@@ -190,7 +188,7 @@ class TargetAbstractIDPlaceholder(Placeholder):
     @classmethod
     def render(cls, abstract):
         target = abstract.merged_into or abstract.duplicate_of
-        return unicode(target.friendly_id) if target else ''
+        return str(target.friendly_id) if target else ''
 
 
 class TargetAbstractTitlePlaceholder(Placeholder):

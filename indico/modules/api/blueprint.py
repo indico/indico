@@ -1,32 +1,25 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import unicode_literals
-
 from flask import request
 
-from indico.legacy.services.interface.rpc.json import process as jsonrpc_handler
-from indico.modules.api.controllers import (RHAPIAdminKeys, RHAPIAdminSettings, RHAPIBlockKey, RHAPIBuildURLs,
-                                            RHAPICreateKey, RHAPIDeleteKey, RHAPITogglePersistent, RHAPIUserProfile)
+from indico.modules.api.controllers import (RHAPIAdminKeys, RHAPIAdminSettings, RHAPIBlockKey, RHAPICreateKey,
+                                            RHAPIDeleteKey, RHAPITogglePersistent, RHAPIUserProfile)
 from indico.web.flask.wrappers import IndicoBlueprint
 from indico.web.http_api.handlers import handler as api_handler
 
 
 _bp = IndicoBlueprint('api', __name__, template_folder='templates', virtual_template_folder='api')
 
-# Legacy JSON-RPC API
-_bp.add_url_rule('/services/json-rpc', view_func=jsonrpc_handler, endpoint='jsonrpc', methods=('POST',))
-
 # HTTP API
 _bp.add_url_rule('/export/<path:path>', view_func=api_handler, endpoint='httpapi', defaults={'prefix': 'export'})
 _bp.add_url_rule('/api/<path:path>', view_func=api_handler, endpoint='httpapi', defaults={'prefix': 'api'},
                  methods=('POST',))
 _bp.add_url_rule('/<any(api, export):prefix>', endpoint='httpapi', build_only=True)
-_bp.add_url_rule('/api/build-urls', 'build_urls', RHAPIBuildURLs, methods=('POST',))
 
 # Administration
 _bp.add_url_rule('/admin/api/', 'admin_settings', RHAPIAdminSettings, methods=('GET', 'POST'))

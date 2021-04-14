@@ -15,8 +15,6 @@ extends:
   - 'indico/react'
   - 'indico/react-hooks'
   - 'indico/prettier'
-  - 'prettier/babel'
-  - 'prettier/react'
 
 settings:
   # we don't use the webpack resolver because it is SLOW (~1s),
@@ -30,9 +28,10 @@ settings:
         - ['indico/modules/users', './indico/modules/users/client/js']
         - ['indico/modules/events/reviewing', './indico/modules/events/client/js/reviewing']
         - ['indico/modules/events/editing', './indico/modules/events/editing/client/js']
-        - ['indico/modules/events/util', './indico/modules/events/client/js/util']
+        - ['indico/modules/events', './indico/modules/events/client/js']
         - ['indico', './indico/web/client/js']
       extensions: [.js, .jsx, .json]
+  import/internal-regex: ^indico/
   react:
     version: detect
 
@@ -45,6 +44,21 @@ rules:
     - ignore: ['^indico-url:']
   import/no-cycle:
     - warn
+  import/order:
+    - error
+    - groups: [builtin, external, internal, parent, sibling, index]
+      alphabetize:
+        order: asc
+        caseInsensitive: true
+      pathGroups:
+        - pattern: indico-url:*
+          group: external
+          position: before
+        - pattern: '{.,..,../..,../../..}/**/*.+(css|scss)' # eslint-plugin-import#1239
+          group: sibling
+          position: after
+      pathGroupsExcludedImportTypes: [builtin]
+      newlines-between: always
   new-cap:
     - error
     - capIsNewExceptionPattern: '\$\.(Event|Deferred)$'

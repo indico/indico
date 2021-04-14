@@ -1,5 +1,5 @@
 // This file is part of Indico.
-// Copyright (C) 2002 - 2020 CERN
+// Copyright (C) 2002 - 2021 CERN
 //
 // Indico is free software; you can redistribute it and/or
 // modify it under the terms of the MIT License; see the
@@ -11,8 +11,8 @@ import {Provider} from 'react-redux';
 
 import createReduxStore from 'indico/utils/redux';
 
-import paperReducers from './reducers';
 import Paper from './components/Paper';
+import paperReducers from './reducers';
 
 export default () => {
   const rootElement = document.querySelector('.paper-timeline');
@@ -26,7 +26,7 @@ export default () => {
     staticData: {
       user: {
         fullName: Indico.User.full_name,
-        avatarBgColor: Indico.User.avatar_bg_color,
+        avatarURL: Indico.User.avatar_url,
       },
     },
   };

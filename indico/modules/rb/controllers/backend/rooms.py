@@ -1,11 +1,9 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
-
-from __future__ import unicode_literals
 
 from datetime import date, datetime, time, timedelta
 from io import BytesIO
@@ -58,7 +56,7 @@ class RHSearchRooms(RHRoomBookingBase):
     @use_args(dict(search_room_args, **{
         'unavailable': fields.Bool(missing=False),
         'admin_override_enabled': fields.Bool(missing=False)
-    }))
+    }), location='query')
     def _process(self, args):
         filter_availability = all(x in args for x in ('start_dt', 'end_dt', 'repeat_frequency', 'repeat_interval'))
         only_unavailable = args.pop('unavailable')
@@ -185,7 +183,7 @@ class RHCheckRoomAvailable(RHRoomBase):
     @use_kwargs({
         'start_dt': NaiveDateTime(),
         'end_dt': NaiveDateTime(),
-    })
+    }, location='query')
     def _process(self, start_dt, end_dt):
         return jsonify(check_room_available(self.room, start_dt, end_dt))
 

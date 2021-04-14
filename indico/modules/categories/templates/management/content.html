@@ -1,16 +1,8 @@
 {% extends 'categories/management/base.html' %}
 
 {% from 'categories/management/_events_list.html' import render_events_list %}
+{% from 'categories/management/_create_category_button.html' import create_category_button %}
 {% from 'events/management/_create_event_button.html' import create_event_button %}
-
-{% macro _create_category_button(classes='') %}
-    <a class="i-button {{ classes }}"
-       data-ajax-dialog
-       data-href="{{ url_for('.create_subcategory', category) }}"
-       data-title="{% trans %}New category{% endtrans %}">
-        {% trans %}New category{% endtrans %}
-    </a>
-{% endmacro %}
 
 {% macro subcategory_row(subcategory) %}
     <tr class="i-table"
@@ -42,23 +34,30 @@
     </tr>
 {% endmacro %}
 
-{% macro subcategories_table(subcategories) %}
+{% macro subcategories_table(subcategories, has_events=false) %}
     <div class="toolbars space-after">
         <div class="toolbar">
-            <a class="i-button icon-checkbox-checked arrow js-dropdown" data-toggle="dropdown"></a>
-            <ul class="i-dropdown">
-                <li>
-                    <a href="#" data-select-all=".category-management input:checkbox[name=category_id]">
-                        {% trans %}All{% endtrans %}
-                    </a>
-                </li>
-                <li>
-                    <a href="#" data-select-none=".category-management input:checkbox[name=category_id]">
-                        {% trans %}None{% endtrans %}
-                    </a>
-                </li>
-            </ul>
-            {{ _create_category_button(classes='highlight icon-plus') }}
+            <div class="group">
+                <a class="i-button icon-checkbox-checked arrow js-dropdown" data-toggle="dropdown"></a>
+                <ul class="i-dropdown">
+                    <li>
+                        <a href="#" data-select-all=".category-management input:checkbox[name=category_id]">
+                            {% trans %}All{% endtrans %}
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" data-select-none=".category-management input:checkbox[name=category_id]">
+                            {% trans %}None{% endtrans %}
+                        </a>
+                    </li>
+                </ul>
+            </div>
+            <div class="group">
+                {{ create_category_button(category, classes='highlight icon-plus') }}
+                {% if not has_events %}
+                    {{ create_event_button(category, text=_("Create event")) }}
+                {% endif %}
+            </div>
             <div class="group">
                 <button class="i-button icon-sort-alpha-asc js-sort-categories"
                         title="{% trans %}Sort categories alphabetically (ascending){% endtrans %}"
@@ -117,11 +116,11 @@
         <p>
             {% trans %}This category is empty. A category can either hold categories or events.{% endtrans %}
         </p>
-        {{ _create_category_button() }}
-        {{ create_event_button(category, text=_("New event")) }}
+        {{ create_category_button(category) }}
+        {{ create_event_button(category, text=_("Create event")) }}
     {% else %}
         {% if subcategories %}
-            {{ subcategories_table(subcategories) }}
+            {{ subcategories_table(subcategories, events.total|bool) }}
             <script>
                 setupCategoryTable({{ category.id }});
             </script>

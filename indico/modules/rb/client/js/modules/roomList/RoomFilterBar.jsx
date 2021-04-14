@@ -1,29 +1,30 @@
 // This file is part of Indico.
-// Copyright (C) 2002 - 2020 CERN
+// Copyright (C) 2002 - 2021 CERN
 //
 // Indico is free software; you can redistribute it and/or
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-import React from 'react';
-import {Button, Icon, Label} from 'semantic-ui-react';
 import PropTypes from 'prop-types';
+import React from 'react';
+import Overridable from 'react-overridable';
 import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
-import Overridable from 'react-overridable';
+import {Button, Icon, Label} from 'semantic-ui-react';
 
 import {Translate, Param} from 'indico/react/i18n';
 import {Responsive} from 'indico/react/util';
 
-import CapacityForm from './filters/CapacityForm';
-import EquipmentForm from './filters/EquipmentForm';
-import BuildingForm from './filters/BuildingForm';
-import ShowOnlyForm from './filters/ShowOnlyForm';
-import {FilterBarController, FilterDropdownFactory} from '../../common/filters/FilterBar';
 import {actions as filtersActions} from '../../common/filters';
+import {FilterBarController, FilterDropdownFactory} from '../../common/filters/FilterBar';
+import {selectors as roomsSelectors} from '../../common/rooms';
 import {selectors as userSelectors} from '../../common/user';
 
-import {selectors as roomsSelectors} from '../../common/rooms';
+import BuildingForm from './filters/BuildingForm';
+import CapacityForm from './filters/CapacityForm';
+import EquipmentForm from './filters/EquipmentForm';
+import ShowOnlyForm from './filters/ShowOnlyForm';
+
 import './RoomFilterBar.module.scss';
 
 /* eslint-disable react/prop-types */

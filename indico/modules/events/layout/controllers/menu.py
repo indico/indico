@@ -1,11 +1,9 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
-
-from __future__ import unicode_literals
 
 from itertools import count
 
@@ -130,7 +128,7 @@ class RHMenuEntryPosition(RHMenuEntryEditBase):
                 raise BadRequest('Menu entry "{0}" cannot be moved to another menu: Invalid type "{0.type.name}".'
                                  .format(self.entry))
             if self.entry.is_root and self.entry.children:
-                raise BadRequest('Menu entry "{0}" cannot be moved to another menu: Entry has nested entries.'
+                raise BadRequest('Menu entry "{}" cannot be moved to another menu: Entry has nested entries.'
                                  .format(self.entry))
 
             parent_entry = None
@@ -141,7 +139,7 @@ class RHMenuEntryPosition(RHMenuEntryEditBase):
                                         MenuEntry.parent_id.is_(None))
                                 .first())
                 if not parent_entry:
-                    raise BadRequest('New parent entry not found for Menu entry "{0}".'.format(self.entry))
+                    raise BadRequest(f'New parent entry not found for Menu entry "{self.entry}".')
 
             self.entry.insert(parent_entry, position)
 
@@ -211,7 +209,7 @@ class RHMenuAddEntry(RHMenuBase):
 class RHMenuDeleteEntry(RHMenuEntryEditBase):
     def _process(self):
         if self.entry.type not in (MenuEntryType.user_link, MenuEntryType.page, MenuEntryType.separator):
-            raise BadRequest('Menu entry of type {} cannot be deleted'.format(self.entry.type.name))
+            raise BadRequest(f'Menu entry of type {self.entry.type.name} cannot be deleted')
 
         position_gen = count(self.entry.position)
         if self.entry.children:

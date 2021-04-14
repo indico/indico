@@ -19,6 +19,7 @@ exclude =
     indico.egg-info
     node_modules
     .*/
+    indico.conf
     # TODO: remove the next two entries and use extend-exclude once flake8 3.8.0 is out
     .git
     __pycache__
@@ -45,3 +46,5 @@ per-file-ignores =
     indico/util/mdx_latex_test.py:E501
     # allow nicely aligned parametrizations
     indico/*_test.py:E241
+    # sphinx config has many commented-out variables with no space after `#`
+    docs/source/conf.py:E265

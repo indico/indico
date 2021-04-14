@@ -1,11 +1,9 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
-
-from __future__ import unicode_literals
 
 from operator import attrgetter
 
@@ -42,8 +40,8 @@ def _serialize_user(user):
 
 def _get_users_in_roles(data):
     user_ids = {user_id
-                for user_roles in data.viewvalues()
-                for users in user_roles.viewvalues()
+                for user_roles in data.values()
+                for users in user_roles.values()
                 for user_id in users}
     if not user_ids:
         return []
@@ -53,7 +51,7 @@ def _get_users_in_roles(data):
 def _get_users(ids):
     if not ids:
         return set()
-    return set(User.find(User.id.in_(ids), ~User.is_deleted))
+    return set(User.query.filter(User.id.in_(ids), ~User.is_deleted))
 
 
 class EmailRuleListField(JSONField):
@@ -74,27 +72,27 @@ class EmailRuleListField(JSONField):
             c.name: {
                 'title': c.description,
                 'labelText': c.label_text,
-                'options': list(c.get_available_values(event=self.event).viewitems()),
+                'options': list(c.get_available_values(event=self.event).items()),
                 'compatibleWith': c.compatible_with,
                 'required': c.required
             } for c in self.accepted_condition_types
         }
 
     def pre_validate(self, form):
-        super(EmailRuleListField, self).pre_validate(form)
+        super().pre_validate(form)
         if not all(self.data):
             raise ValueError(_('Rules may not be empty'))
-        if any('*' in crit for rule in self.data for crit in rule.itervalues()):
+        if any('*' in crit for rule in self.data for crit in rule.values()):
             # '*' (any) rules should never be included in the JSON, and having
             # such an entry would result in the rule never passing.
             raise ValueError('Unexpected "*" criterion')
 
     def _value(self):
-        return super(EmailRuleListField, self)._value() if self.data else '[]'
+        return super()._value() if self.data else '[]'
 
 
 class AbstractPersonLinkListField(PersonLinkListFieldBase):
-    """A field to configure a list of abstract persons"""
+    """A field to configure a list of abstract persons."""
 
     person_link_cls = AbstractPersonLink
     linked_object_attr = 'abstract'
@@ -113,7 +111,7 @@ class AbstractPersonLinkListField(PersonLinkListFieldBase):
         self.require_primary_author = True
         self.sort_by_last_name = True
         self.disable_user_search = kwargs.pop('disable_user_search', False)
-        super(AbstractPersonLinkListField, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
     def _convert_data(self, data):
         return list({self._get_person_link(x) for x in data})
@@ -122,7 +120,7 @@ class AbstractPersonLinkListField(PersonLinkListFieldBase):
     def _get_person_link(self, data):
         extra_data = {'author_type': data.pop('authorType', self.default_author_type),
                       'is_speaker': data.pop('isSpeaker', self.default_is_speaker)}
-        return super(AbstractPersonLinkListField, self)._get_person_link(data, extra_data)
+        return super()._get_person_link(data, extra_data)
 
     def _serialize_person_link(self, principal, extra_data=None):
         extra_data = extra_data or {}
@@ -132,7 +130,7 @@ class AbstractPersonLinkListField(PersonLinkListFieldBase):
         return data
 
     def pre_validate(self, form):
-        super(AbstractPersonLinkListField, self).pre_validate(form)
+        super().pre_validate(form)
         for person_link in self.data:
             if not self.allow_authors and person_link.author_type != AuthorType.none:
                 if not self.object_data or person_link not in self.object_data:
@@ -151,15 +149,15 @@ class AbstractField(QuerySelectField):
         kwargs.setdefault('allow_blank', True)
         kwargs.setdefault('render_kw', {}).setdefault('placeholder', _('Enter abstract title or #id'))
         kwargs['query_factory'] = self._get_query
-        kwargs['get_label'] = lambda a: '#{}: {}'.format(a.friendly_id, a.title)
+        kwargs['get_label'] = lambda a: f'#{a.friendly_id}: {a.title}'
         self.ajax_endpoint = kwargs.pop('ajax_endpoint')
         self.excluded_abstract_ids = set()
-        super(AbstractField, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
     @classmethod
     def _serialize_abstract(cls, abstract):
         return {'id': abstract.id, 'friendly_id': abstract.friendly_id, 'title': abstract.title,
-                'full_title': '#{}: {}'.format(abstract.friendly_id, abstract.title)}
+                'full_title': f'#{abstract.friendly_id}: {abstract.title}'}
 
     def _get_query(self):
         query = Abstract.query.with_parent(self.event).options(joinedload('submitter').lazyload('*'))
@@ -177,7 +175,7 @@ class AbstractField(QuerySelectField):
         return self._serialize_abstract(self.data) if self.data else None
 
     def pre_validate(self, form):
-        super(AbstractField, self).pre_validate(form)
+        super().pre_validate(form)
         if self.data is not None and self.data.id in self.excluded_abstract_ids:
             raise ValueError(_('This abstract cannot be selected.'))
 
@@ -219,4 +217,4 @@ class TrackRoleField(JSONField):
         return [serialize_category_role(role) for role in category_roles]
 
     def _value(self):
-        return super(TrackRoleField, self)._value() if self.data else '[]'
+        return super()._value() if self.data else '[]'

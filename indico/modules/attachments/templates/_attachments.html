@@ -8,10 +8,12 @@
 
 {% macro render_attachment(attachment, has_label=false, classes='') %}
     {% set previewable = (attachment.file.is_previewable and not g.static_site) or false %}
+    {% set visible_link = attachment.type.name == 'link' and (not attachment.is_protected or attachment.can_access(session.user)) %}
     <a class="attachment {{ get_attachment_icon(attachment) }} {% if attachment.is_self_protected %}is-protected{% endif %} {% if has_label %}has-label{% endif %} {%- if previewable %} js-preview-dialog{% endif %} {{ classes }}"
        data-previewable="{{ previewable|tojson }}"
        data-attachment-id="{{ attachment.id }}"
-       href="{{ attachment.download_url }}" target="_blank"
+       href="{{ attachment.link_url if visible_link else attachment.download_url }}" target="_blank"
+       rel="noopener noreferrer"
        title="{{ attachment.description or attachment.title }}
               {%- if attachment.is_self_protected %} ({% trans %}Protected{% endtrans %}){% endif %}">
         {%- if not has_label -%}

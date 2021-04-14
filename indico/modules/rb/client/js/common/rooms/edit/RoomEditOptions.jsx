@@ -1,19 +1,21 @@
 // This file is part of Indico.
-// Copyright (C) 2002 - 2020 CERN
+// Copyright (C) 2002 - 2021 CERN
 //
 // Indico is free software; you can redistribute it and/or
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-import React, {useMemo} from 'react';
-import {Dropdown, Form, Header, Tab} from 'semantic-ui-react';
 import _ from 'lodash';
-import {FieldArray} from 'react-final-form-arrays';
 import PropTypes from 'prop-types';
-import {Translate} from 'indico/react/i18n';
+import React, {useMemo} from 'react';
+import {FieldArray} from 'react-final-form-arrays';
+import {Dropdown, Form, Header, Tab} from 'semantic-ui-react';
+
 import {FinalCheckbox, FinalField, FinalInput, validators as v} from 'indico/react/forms';
-import EquipmentList from './EquipmentList';
+import {Translate} from 'indico/react/i18n';
+
 import DailyAvailability from './DailyAvailability';
+import EquipmentList from './EquipmentList';
 import NonBookablePeriods from './NonBookablePeriods';
 
 export default function RoomEditOptions({active, showEquipment, globalAttributes}) {

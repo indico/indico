@@ -1,11 +1,9 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
-
-from __future__ import unicode_literals
 
 from io import BytesIO
 
@@ -16,7 +14,6 @@ from indico.modules.events.registration.util import generate_ticket_qr_code
 from indico.util.date_time import format_date, format_datetime
 from indico.util.i18n import _
 from indico.util.placeholders import Placeholder
-from indico.util.string import to_unicode
 
 
 __all__ = ('EventDatesPlaceholder', 'EventDescriptionPlaceholder', 'RegistrationFullNamePlaceholder',
@@ -98,13 +95,11 @@ class EventDatesPlaceholder(DesignerPlaceholder):
     @classmethod
     def render(cls, event):
         start_dt, end_dt = event.start_dt_local, event.end_dt_local
-        interval = _("{} to {}").format(to_unicode(format_date(start_dt, format='long')),
-                                        to_unicode(format_date(end_dt, format='long')))
+        interval = _('{} to {}').format(format_date(start_dt, format='long'), format_date(end_dt, format='long'))
         if start_dt.date() == end_dt.date():
-            interval = to_unicode(format_datetime(start_dt))
+            interval = format_datetime(start_dt)
         elif start_dt.date().replace(day=1) == end_dt.date().replace(day=1):
-            interval = "{} - {} {}".format(start_dt.day, end_dt.day,
-                                           to_unicode(format_date(start_dt, format='MMMM yyyy')))
+            interval = '{} - {} {}'.format(start_dt.day, end_dt.day, format_date(start_dt, format='MMMM yyyy'))
         return interval
 
 

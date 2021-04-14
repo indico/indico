@@ -1,11 +1,9 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
-
-from __future__ import unicode_literals
 
 from indico.core.db.sqlalchemy.colors import ColorTuple
 
@@ -54,7 +52,7 @@ def get_sui_colors():
 
 
 def get_role_colors():
-    """Get the list of colors available for event/category roles"""
+    """Get the list of colors available for event/category roles."""
     return ['005272', '007cac', '5d95ea',
             'af0000', 'a76766',
             '999999', '555555', '777777',

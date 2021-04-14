@@ -1,18 +1,15 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
-
-from __future__ import unicode_literals
 
 from sqlalchemy.ext.declarative import declared_attr
 
 from indico.core.db import db
 from indico.core.db.sqlalchemy.principals import PrincipalMixin
 from indico.core.db.sqlalchemy.util.models import auto_table_args
-from indico.util.string import return_ascii
 
 
 class BlockingPrincipal(PrincipalMixin, db.Model):
@@ -37,7 +34,6 @@ class BlockingPrincipal(PrincipalMixin, db.Model):
     # relationship backrefs:
     # - blocking (Blocking._allowed)
 
-    @return_ascii
     def __repr__(self):
         return '<BlockingPrincipal({}, {}, {})>'.format(
             self.id,

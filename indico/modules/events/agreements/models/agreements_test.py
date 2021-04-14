@@ -1,13 +1,14 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
+from unittest.mock import MagicMock
+
 import pytest
 from freezegun import freeze_time
-from mock import MagicMock
 from werkzeug.exceptions import ServiceUnavailable
 
 from indico.modules.events.agreements.models.agreements import Agreement, AgreementState
@@ -27,7 +28,7 @@ pytest_plugins = 'indico.modules.events.agreements.testing.fixtures'
 def test_accepted(dummy_agreement, state, expected):
     dummy_agreement.state = state
     assert dummy_agreement.accepted == expected
-    assert Agreement.find_one(accepted=expected) == dummy_agreement
+    assert Agreement.query.filter_by(accepted=expected).one() == dummy_agreement
 
 
 @pytest.mark.parametrize(('state', 'expected'), (
@@ -41,8 +42,8 @@ def test_pending(dummy_agreement, state, expected):
     dummy_agreement.state = state
     filter_ = Agreement.pending if expected else ~Agreement.pending
     assert dummy_agreement.pending == expected
-    assert Agreement.find_one(filter_) == dummy_agreement
-    assert not Agreement.find_first(~filter_)
+    assert Agreement.query.filter(filter_).first() == dummy_agreement
+    assert not Agreement.query.filter(~filter_).has_rows()
 
 
 @pytest.mark.parametrize(('state', 'expected'), (
@@ -55,7 +56,7 @@ def test_pending(dummy_agreement, state, expected):
 def test_rejected(dummy_agreement, state, expected):
     dummy_agreement.state = state
     assert dummy_agreement.rejected == expected
-    assert Agreement.find_one(rejected=expected) == dummy_agreement
+    assert Agreement.query.filter_by(rejected=expected).one() == dummy_agreement
 
 
 @pytest.mark.parametrize(('state', 'expected'), (
@@ -68,7 +69,7 @@ def test_rejected(dummy_agreement, state, expected):
 def test_signed_on_behalf(dummy_agreement, state, expected):
     dummy_agreement.state = state
     assert dummy_agreement.signed_on_behalf == expected
-    assert Agreement.find_one(signed_on_behalf=expected) == dummy_agreement
+    assert Agreement.query.filter_by(signed_on_behalf=expected).one() == dummy_agreement
 
 
 def test_definition(mocker):
@@ -83,7 +84,7 @@ def test_locator():
     event_id = 9000
     agreement = Agreement(id=id_, event_id=event_id)
     assert agreement.locator == {'id': id_,
-                                 'confId': event_id}
+                                 'event_id': event_id}
 
 
 @pytest.mark.parametrize('person_with_user', (True, False))

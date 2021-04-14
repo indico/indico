@@ -1,11 +1,9 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
-
-from __future__ import unicode_literals
 
 from markupsafe import Markup
 
@@ -72,6 +70,15 @@ class LinkPlaceholder(Placeholder):
         return Markup('<a href="{url}">{url}</a>').format(url=url)
 
 
+class RejectionReasonPlaceholder(Placeholder):
+    name = 'rejection_reason'
+    description = _("The reason why the registration was rejected")
+
+    @classmethod
+    def render(cls, regform, registration):
+        return registration.rejection_reason
+
+
 class FieldPlaceholder(ParametrizedPlaceholder):
     name = 'field'
     description = None
@@ -101,5 +108,5 @@ class FieldPlaceholder(ParametrizedPlaceholder):
             if field.personal_data_type in own_placeholder_types:
                 continue
             for key, description in field.field_impl.iter_placeholder_info():
-                name = unicode(field.id) if key is None else '{}:{}'.format(field.id, key)
+                name = str(field.id) if key is None else f'{field.id}:{key}'
                 yield name, description

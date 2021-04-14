@@ -1,11 +1,9 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
-
-from __future__ import unicode_literals
 
 from indico.modules.attachments.api.util import build_folders_api_data
 from indico.modules.events import Event
@@ -26,7 +24,7 @@ class AttachmentsExportHook(HTTPAPIHook):
     VALID_FORMATS = ('json', 'jsonp', 'xml')
 
     def _getParams(self):
-        super(AttachmentsExportHook, self)._getParams()
+        super()._getParams()
         event = self._obj = Event.get(self._pathParams['event_id'], is_deleted=False)
         if event is None:
             raise HTTPAPIError('No such event', 404)

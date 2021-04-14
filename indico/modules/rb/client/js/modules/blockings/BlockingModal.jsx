@@ -1,23 +1,26 @@
 // This file is part of Indico.
-// Copyright (C) 2002 - 2020 CERN
+// Copyright (C) 2002 - 2021 CERN
 //
 // Indico is free software; you can redistribute it and/or
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
 import _ from 'lodash';
-import React from 'react';
-import {bindActionCreators} from 'redux';
-import {connect} from 'react-redux';
 import PropTypes from 'prop-types';
-import {Button, Confirm, Form, Grid, Message, Icon, Modal, Popup} from 'semantic-ui-react';
+import React from 'react';
 import {Form as FinalForm} from 'react-final-form';
-import {Param, Translate} from 'indico/react/i18n';
-import {FinalTextArea} from 'indico/react/forms';
+import {connect} from 'react-redux';
+import {bindActionCreators} from 'redux';
+import {Button, Confirm, Form, Grid, Message, Icon, Modal, Popup} from 'semantic-ui-react';
+
 import {FinalDatePeriod, FinalPrincipalList} from 'indico/react/components';
+import {FinalTextArea} from 'indico/react/forms';
 import {FavoritesProvider} from 'indico/react/hooks';
-import FinalRoomSelector from '../../components/RoomSelector';
+import {Param, Translate} from 'indico/react/i18n';
+
 import {selectors as userSelectors} from '../../common/user';
+import FinalRoomSelector from '../../components/RoomSelector';
+
 import * as blockingsActions from './actions';
 
 import './BlockingModal.module.scss';

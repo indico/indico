@@ -1,11 +1,9 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
-
-from __future__ import unicode_literals
 
 from wtforms.fields.core import BooleanField, StringField
 from wtforms.validators import DataRequired, InputRequired, Length
@@ -30,7 +28,7 @@ class EventRoleForm(IndicoForm):
     def __init__(self, *args, **kwargs):
         self.role = kwargs.get('obj')
         self.event = kwargs.pop('event')
-        super(EventRoleForm, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
     def validate_code(self, field):
         query = EventRole.query.with_parent(self.event).filter_by(code=field.data)

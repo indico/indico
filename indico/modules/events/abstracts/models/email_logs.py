@@ -1,17 +1,15 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import unicode_literals
-
 from sqlalchemy.dialects.postgresql import ARRAY, JSONB
 
 from indico.core.db.sqlalchemy import UTCDateTime, db
 from indico.util.date_time import now_utc
-from indico.util.string import format_repr, return_ascii
+from indico.util.string import format_repr
 
 
 class AbstractEmailLogEntry(db.Model):
@@ -89,13 +87,12 @@ class AbstractEmailLogEntry(db.Model):
         )
     )
 
-    @return_ascii
     def __repr__(self):
         return format_repr(self, 'id', 'abstract_id', _text=self.subject)
 
     @classmethod
     def create_from_email(cls, email_data, email_tpl, user=None):
-        """Create a new log entry from the data used to send an email
+        """Create a new log entry from the data used to send an email.
 
         :param email_data: email data as returned from `make_email`
         :param email_tpl: the abstract email template that created the

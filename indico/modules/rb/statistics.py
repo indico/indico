@@ -1,11 +1,9 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
-
-from __future__ import division, unicode_literals
 
 from datetime import date, datetime, time
 
@@ -37,12 +35,13 @@ def calculate_rooms_booked_time(rooms, start_date=None, end_date=None):
     if start_date is None:
         start_date = end_date - relativedelta(days=29)
     # Reservations on working days
-    reservations = Reservation.find(Reservation.room_id.in_(r.id for r in rooms),
-                                    db.extract('dow', ReservationOccurrence.start_dt).between(1, 5),
-                                    db.cast(ReservationOccurrence.start_dt, db.Date) >= start_date,
-                                    db.cast(ReservationOccurrence.end_dt, db.Date) <= end_date,
-                                    ReservationOccurrence.is_valid,
-                                    _join=ReservationOccurrence)
+    reservations_query = (Reservation.query
+                          .filter(Reservation.room_id.in_(r.id for r in rooms),
+                                  db.extract('dow', ReservationOccurrence.start_dt).between(1, 5),
+                                  db.cast(ReservationOccurrence.start_dt, db.Date) >= start_date,
+                                  db.cast(ReservationOccurrence.end_dt, db.Date) <= end_date,
+                                  ReservationOccurrence.is_valid)
+                          .join(Reservation.occurrences))
 
     rsv_start = db.cast(ReservationOccurrence.start_dt, db.TIME)
     rsv_end = db.cast(ReservationOccurrence.end_dt, db.TIME)
@@ -56,7 +55,7 @@ def calculate_rooms_booked_time(rooms, start_date=None, end_date=None):
         ((rsv_start >= start) & (rsv_end <= end), db.extract('epoch', rsv_end - rsv_start))
     ], else_=0) for start, end in slots)
 
-    return reservations.with_entities(db.func.sum(overlaps)).scalar() or 0
+    return reservations_query.with_entities(db.func.sum(overlaps)).scalar() or 0
 
 
 def calculate_rooms_occupancy(rooms, start=None, end=None):

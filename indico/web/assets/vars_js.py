@@ -1,11 +1,9 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
-
-from __future__ import unicode_literals
 
 import os
 
@@ -18,7 +16,7 @@ from indico.core.plugins import plugin_engine
 from indico.modules.auth.util import url_for_login
 from indico.modules.events.registration.util import url_rule_to_angular
 from indico.modules.users.util import serialize_user
-from indico.util.i18n import po_to_json
+from indico.util.i18n import get_all_locales, po_to_json
 from indico.web.flask.util import url_for, url_rule_to_js
 
 
@@ -41,6 +39,10 @@ def get_locale_data(path, name, domain, react=False):
 
 
 def generate_i18n_file(locale_name, react=False):
+    all_locales = get_all_locales()
+    if locale_name not in all_locales:
+        locale_name = config.DEFAULT_LOCALE if config.DEFAULT_LOCALE in all_locales else 'en_GB'
+
     root_path = os.path.join(current_app.root_path, 'translations')
     i18n_data = get_locale_data(root_path, locale_name, 'indico', react=react)
     if not i18n_data:
@@ -48,7 +50,7 @@ def generate_i18n_file(locale_name, react=False):
         i18n_data = {'indico': {'': {'domain': 'indico',
                                      'lang': locale_name}}}
 
-    for pid, plugin in plugin_engine.get_active_plugins().iteritems():
+    for pid, plugin in plugin_engine.get_active_plugins().items():
         data = {}
         if plugin.translation_path:
             data = get_locale_data(plugin.translation_path, locale_name, pid, react=react)
@@ -72,7 +74,7 @@ def generate_user_file(user=None):
             'email': user.email,
             'favorite_users': {u.id: serialize_user(u) for u in user.favorite_users},
             'language': session.lang,
-            'avatar_bg_color': user.avatar_bg_color,
+            'avatar_url': user.avatar_url,
             'is_admin': user.is_admin,
             'full_name': user.full_name
         }
@@ -84,29 +86,23 @@ def generate_global_file():
         'name': auth.name,
         'title': auth.title,
         'supports_groups': auth.supports_groups
-    } for auth in multipass.identity_providers.itervalues() if auth.supports_search]
+    } for auth in multipass.identity_providers.values() if auth.supports_search]
 
     indico_vars = {
-        'Debug': config.DEBUG,
+        'ExperimentalEditingService': config.EXPERIMENTAL_EDITING_SERVICE,
         'Urls': {
             'Base': config.BASE_URL,
             'BasePath': url_parse(config.BASE_URL).path.rstrip('/'),
-            'JsonRpcService': url_for('api.jsonrpc'),
             'ExportAPIBase': url_for('api.httpapi', prefix='export'),
             'APIBase': url_for('api.httpapi', prefix='api'),
 
             'ImagesBase': config.IMAGES_BASE_URL,
 
             'Login': url_for_login(),
-            'Favorites': url_for('users.user_favorites'),
-            'FavoriteUserAdd': url_for('users.user_favorites_users_add'),
-            'FavoriteUserRemove': url_rule_to_js('users.user_favorites_user_remove'),
 
             'AttachmentManager': url_rule_to_js('attachments.management'),
             'ManagementAttachmentInfoColumn': url_rule_to_js('attachments.management_info_column'),
 
-            'APIKeyCreate': url_for('api.key_create'),
-            'APIKeyTogglePersistent': url_for('api.key_toggle_persistent'),
             'FontSassBundle': current_app.manifest['fonts.css']._paths,
 
             'EventCreation': url_rule_to_js('events.create'),

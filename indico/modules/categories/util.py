@@ -1,13 +1,10 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import unicode_literals
-
-from collections import OrderedDict
 from datetime import date, timedelta
 
 from pytz import timezone
@@ -29,7 +26,7 @@ from indico.modules.events.timetable.models.entries import TimetableEntry, Timet
 from indico.util.caching import memoize_redis
 from indico.util.date_time import now_utc
 from indico.util.i18n import _, ngettext
-from indico.util.struct.iterables import materialize_iterable
+from indico.util.iterables import materialize_iterable
 
 
 def get_events_by_year(category_id=None):
@@ -37,7 +34,7 @@ def get_events_by_year(category_id=None):
 
     :param category_id: The category ID to get statistics for. Events
                         from subcategories are also included.
-    :return: An `OrderedDict` mapping years to event counts.
+    :return: A dictionary mapping years to event counts.
     """
     category_filter = Event.category_chain_overlaps(category_id) if category_id else True
     query = (db.session
@@ -47,7 +44,7 @@ def get_events_by_year(category_id=None):
                      category_filter)
              .order_by('year')
              .group_by('year'))
-    return OrderedDict(query)
+    return dict(query)
 
 
 def get_contribs_by_year(category_id=None):
@@ -56,7 +53,7 @@ def get_contribs_by_year(category_id=None):
     :param category_id: The category ID to get statistics for.
                         Contributions from subcategories are also
                         included.
-    :return: An `OrderedDict` mapping years to contribution counts.
+    :return: A dictionary mapping years to contribution counts.
     """
     category_filter = Event.category_chain_overlaps(category_id) if category_id else True
     query = (db.session
@@ -68,7 +65,7 @@ def get_contribs_by_year(category_id=None):
                      category_filter)
              .order_by('year')
              .group_by('year'))
-    return OrderedDict(query)
+    return dict(query)
 
 
 def get_min_year(category_id=None):
@@ -132,7 +129,7 @@ def get_category_stats(category_id=None):
 @memoize_redis(3600)
 @materialize_iterable()
 def get_upcoming_events():
-    """Get the global list of upcoming events"""
+    """Get the global list of upcoming events."""
     from indico.modules.events import Event
     data = upcoming_events_settings.get_all()
     if not data['max_entries'] or not data['entries']:
@@ -210,7 +207,7 @@ def get_image_data(image_type, category):
 
 
 def serialize_category_role(role, legacy=True):
-    """Serialize role to JSON-like object"""
+    """Serialize role to JSON-like object."""
     if legacy:
         return {
             'id': role.id,
@@ -218,12 +215,12 @@ def serialize_category_role(role, legacy=True):
             'code': role.code,
             'color': role.color,
             'category': role.category.title,
-            'identifier': 'CategoryRole:{}'.format(role.id),
+            'identifier': f'CategoryRole:{role.id}',
             '_type': 'CategoryRole'
         }
     else:
         return {
             'id': role.id,
             'name': role.name,
-            'identifier': 'CategoryRole:{}'.format(role.id),
+            'identifier': f'CategoryRole:{role.id}',
         }

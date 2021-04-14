@@ -1,18 +1,16 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
-
-from __future__ import unicode_literals
 
 import re
 
 from sqlalchemy.ext.hybrid import hybrid_property
 
 from indico.core.db import db
-from indico.util.string import format_repr, return_ascii
+from indico.util.string import format_repr
 
 
 class Location(db.Model):
@@ -83,6 +81,5 @@ class Location(db.Model):
     # - session_blocks (SessionBlock.own_venue)
     # - sessions (Session.own_venue)
 
-    @return_ascii
     def __repr__(self):
         return format_repr(self, 'id', 'name', is_deleted=False)

@@ -1,5 +1,5 @@
 // This file is part of Indico.
-// Copyright (C) 2002 - 2020 CERN
+// Copyright (C) 2002 - 2021 CERN
 //
 // Indico is free software; you can redistribute it and/or
 // modify it under the terms of the MIT License; see the
@@ -13,6 +13,8 @@ import 'jquery-colorbox/example1/colorbox.css';
 import 'jquery-form';
 
 // moment.js locales
+import 'moment/locale/pl';
+import 'moment/locale/uk';
 import 'moment/locale/zh-cn';
 import 'moment/locale/es';
 import 'moment/locale/fr';

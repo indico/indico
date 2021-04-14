@@ -1,11 +1,9 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
-
-from __future__ import unicode_literals
 
 from flask import request, session
 from werkzeug.exceptions import NotFound, Unauthorized
@@ -22,14 +20,14 @@ from indico.web.args import parser
 from indico.web.rh import RequireUserMixin
 
 
-class TokenAccessMixin(object):
+class TokenAccessMixin:
     SERVICE_ALLOWED = False
     is_service_call = False
 
     def _token_can_access(self):
         # we need to "fish" the event here because at this point _check_params
         # hasn't run yet
-        event = Event.get_or_404(int(request.view_args['confId']), is_deleted=False)
+        event = Event.get_or_404(request.view_args['event_id'], is_deleted=False)
         if not self.SERVICE_ALLOWED or not request.bearer_token:
             return False
 
@@ -43,7 +41,7 @@ class TokenAccessMixin(object):
     def _check_csrf(self):
         # check CSRF if there is no bearer token or there's a session cookie
         if session.user or not request.bearer_token:
-            super(TokenAccessMixin, self)._check_csrf()
+            super()._check_csrf()
 
 
 class RHEditingBase(TokenAccessMixin, RequireUserMixin, RHDisplayEventBase):
@@ -65,7 +63,7 @@ class RHEditingManagementBase(TokenAccessMixin, RHManageEventBase):
 
     def _check_access(self):
         if not TokenAccessMixin._token_can_access(self):
-            super(RHEditingManagementBase, self)._check_access()
+            super()._check_access()
 
 
 class RHEditableTypeManagementBase(RHEditingManagementBase):
@@ -105,6 +103,11 @@ class RHContributionEditableBase(TokenAccessMixin, RequireUserMixin, RHContribut
         if not TokenAccessMixin._token_can_access(self):
             RequireUserMixin._check_access(self)
             RHContributionDisplayBase._check_access(self)
+
+    def _can_view_unpublished(self):
+        if super()._can_view_unpublished():
+            return True
+        return self.editable is not None and self.editable.can_see_timeline(session.user)
 
     def _process_args(self):
         RHContributionDisplayBase._process_args(self)

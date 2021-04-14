@@ -2,17 +2,8 @@
 
 
 {% block html %}
-    {% if acl %}
-        <a href="#" class="enable-acl-link hidden"
-           title='{% trans %}This will change the protection mode to "Protected"{% endtrans %}'>
-            {{- field.default_text -}}
-        </a>
-    {% endif %}
     {% set value_json = field._value() | tojson %}
-    <div class="i-form-field-fixed-width {{ 'acl-list-field' if acl }}" data-tooltip-anchor>
-        {% if acl %}
-            <div class="inheriting-acl-message"></div>
-        {% endif %}
+    <div class="i-form-field-fixed-width" data-tooltip-anchor>
         <div id="userGroupList-{{ field.id }}" style="margin-bottom: 10px;"></div>
         <input type="hidden" id="{{ field.id }}" name="{{ field.name }}" value="{{ value_json | forceescape }}"
                {{ input_args | html_params }}>

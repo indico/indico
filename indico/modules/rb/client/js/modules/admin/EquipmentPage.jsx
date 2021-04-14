@@ -1,18 +1,19 @@
 // This file is part of Indico.
-// Copyright (C) 2002 - 2020 CERN
+// Copyright (C) 2002 - 2021 CERN
 //
 // Indico is free software; you can redistribute it and/or
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-import React from 'react';
 import PropTypes from 'prop-types';
-import {bindActionCreators} from 'redux';
+import React from 'react';
 import {connect} from 'react-redux';
+import {bindActionCreators} from 'redux';
 import {Grid} from 'semantic-ui-react';
+
 import * as adminActions from './actions';
-import RoomFeatureList from './RoomFeatureList';
 import EquipmentTypeList from './EquipmentTypeList';
+import RoomFeatureList from './RoomFeatureList';
 
 class EquipmentPage extends React.PureComponent {
   static propTypes = {

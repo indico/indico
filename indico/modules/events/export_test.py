@@ -1,11 +1,9 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
-
-from __future__ import unicode_literals
 
 import os
 import tarfile
@@ -24,7 +22,7 @@ from indico.modules.events.sessions import Session
 from indico.util.date_time import as_utc
 
 
-class _MockUUID(object):
+class _MockUUID:
     def __init__(self):
         self.counter = 0
 
@@ -42,7 +40,7 @@ def reproducible_uuids(monkeypatch):
 
 @pytest.fixture
 def static_indico_version(monkeypatch):
-    monkeypatch.setattr('indico.__version__', b'1.3.3.7')
+    monkeypatch.setattr('indico.__version__', '1.3.3.7')
 
 
 @pytest.mark.usefixtures('reproducible_uuids', 'static_indico_version')
@@ -61,13 +59,13 @@ def test_event_export(db, dummy_event, monkeypatch):
     export_event(dummy_event, f)
     f.seek(0)
 
-    with open(os.path.join(os.path.dirname(__file__), 'export_test_1.yaml'), 'r') as ref_file:
+    with open(os.path.join(os.path.dirname(__file__), 'export_test_1.yaml')) as ref_file:
         data_yaml_content = ref_file.read()
 
     # check composition of tarfile and data.yaml content
     with tarfile.open(fileobj=f) as tarf:
         assert tarf.getnames() == ['data.yaml']
-        assert tarf.extractfile('data.yaml').read() == data_yaml_content
+        assert tarf.extractfile('data.yaml').read().decode() == data_yaml_content
 
 
 @pytest.mark.usefixtures('reproducible_uuids')
@@ -94,9 +92,9 @@ def test_event_attachment_export(db, dummy_event, dummy_attachment):
         event_uid = objs[0][1]['id'][1]
 
         # check that the exported metadata contains all the right objects
-        assert [obj[0] for obj in objs] == [u'events.events', u'events.sessions', u'events.contributions',
-                                            u'events.contributions', u'attachments.folders', u'attachments.attachments',
-                                            u'attachments.files']
+        assert [obj[0] for obj in objs] == ['events.events', 'events.sessions', 'events.contributions',
+                                            'events.contributions', 'attachments.folders', 'attachments.attachments',
+                                            'attachments.files']
         # check that the attached file's metadata is included
         assert objs[5][1]['title'] == 'dummy_attachment'
         assert objs[5][1]['folder_id'] is not None
@@ -109,15 +107,15 @@ def test_event_attachment_export(db, dummy_event, dummy_attachment):
         assert file_['md5'] == '5eb63bbbe01eeed093cb22bb8f5acdc3'
         # check that the file itself was included (and verify content)
         assert tarf.getnames() == ['00000000-0000-4000-8000-000000000013', 'data.yaml']
-        assert tarf.extractfile('00000000-0000-4000-8000-000000000013').read() == 'hello world'
+        assert tarf.extractfile('00000000-0000-4000-8000-000000000013').read() == b'hello world'
 
 
 @pytest.mark.usefixtures('static_indico_version')
 def test_event_import(db, dummy_user):
-    with open(os.path.join(os.path.dirname(__file__), 'export_test_2.yaml'), 'r') as ref_file:
+    with open(os.path.join(os.path.dirname(__file__), 'export_test_2.yaml')) as ref_file:
         data_yaml_content = ref_file.read()
 
-    data_yaml = BytesIO(data_yaml_content.encode('utf-8'))
+    data_yaml = BytesIO(data_yaml_content.encode())
     tar_buffer = BytesIO()
 
     # User should be matched by e-mail
@@ -148,4 +146,4 @@ def test_event_import(db, dummy_user):
     attachment = folder.attachments[0]
     assert attachment.title == 'dummy_attachment'
     # Check that the actual file is accessible
-    assert attachment.file.open().read() == 'hello world'
+    assert attachment.file.open().read() == b'hello world'

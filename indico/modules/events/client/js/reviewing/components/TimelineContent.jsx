@@ -1,12 +1,12 @@
 // This file is part of Indico.
-// Copyright (C) 2002 - 2020 CERN
+// Copyright (C) 2002 - 2021 CERN
 //
 // Indico is free software; you can redistribute it and/or
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-import React from 'react';
 import PropTypes from 'prop-types';
+import React from 'react';
 
 export default function TimelineContent({blocks, itemComponent: Component}) {
   return blocks.map((block, index) => {
@@ -19,7 +19,7 @@ export default function TimelineContent({blocks, itemComponent: Component}) {
             </div>
           </div>
         )}
-        <Component block={block} />
+        <Component block={block} index={index} />
       </React.Fragment>
     );
   });

@@ -1,14 +1,12 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import absolute_import
-
+from collections import UserDict
 from datetime import date, datetime
-from UserDict import UserDict
 
 from speaklater import _LazyString
 
@@ -20,14 +18,14 @@ except ImportError:
 
 
 class IndicoJSONEncoder(_json.JSONEncoder):
-    """
-    Custom JSON encoder that supports more types
+    """Custom JSON encoder that supports more types.
+
      * datetime objects
     """
     def __init__(self, *args, **kwargs):
         if kwargs.get('separators') is None:
             kwargs['separators'] = (',', ':')
-        super(IndicoJSONEncoder, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
     def default(self, o):
         if isinstance(o, _LazyString):
@@ -42,9 +40,7 @@ class IndicoJSONEncoder(_json.JSONEncoder):
 
 
 def dumps(obj, **kwargs):
-    """
-    Simple wrapper around json.dumps()
-    """
+    """Simple wrapper around json.dumps()."""
     if kwargs.pop('pretty', False):
         kwargs['indent'] = 4 * ' '
     textarea = kwargs.pop('textarea', False)
@@ -57,7 +53,5 @@ def dumps(obj, **kwargs):
 
 
 def loads(string):
-    """
-    Simple wrapper around json.decode()
-    """
+    """Simple wrapper around json.decode()."""
     return _json.loads(string)

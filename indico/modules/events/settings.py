@@ -1,11 +1,9 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
-
-from __future__ import unicode_literals
 
 import os
 import re
@@ -36,7 +34,7 @@ def event_or_id(f):
 
 
 class EventACLProxy(ACLProxyBase):
-    """Proxy class for event-specific ACL settings"""
+    """Proxy class for event-specific ACL settings."""
 
     @event_or_id
     def get(self, event, name):
@@ -50,7 +48,7 @@ class EventACLProxy(ACLProxyBase):
 
     @event_or_id
     def set(self, event, name, acl):
-        """Replaces an ACL with a new one
+        """Replace an ACL with a new one.
 
         :param event: Event (or its ID)
         :param name: Setting name
@@ -62,7 +60,7 @@ class EventACLProxy(ACLProxyBase):
 
     @event_or_id
     def contains_user(self, event, name, user):
-        """Checks if a user is in an ACL.
+        """Check if a user is in an ACL.
 
         To pass this check, the user can either be in the ACL itself
         or in a group in the ACL.
@@ -75,7 +73,7 @@ class EventACLProxy(ACLProxyBase):
 
     @event_or_id
     def add_principal(self, event, name, principal):
-        """Adds a principal to an ACL
+        """Add a principal to an ACL.
 
         :param event: Event (or its ID)
         :param name: Setting name
@@ -87,7 +85,7 @@ class EventACLProxy(ACLProxyBase):
 
     @event_or_id
     def remove_principal(self, event, name, principal):
-        """Removes a principal from an ACL
+        """Remove a principal from an ACL.
 
         :param event: Event (or its ID)
         :param name: Setting name
@@ -98,24 +96,24 @@ class EventACLProxy(ACLProxyBase):
         self._flush_cache()
 
     def merge_users(self, target, source):
-        """Replaces all ACL user entries for `source` with `target`"""
+        """Replace all ACL user entries for `source` with `target`."""
         EventSettingPrincipal.merge_users(self.module, target, source)
         self._flush_cache()
 
 
 class EventSettingsProxy(SettingsProxyBase):
-    """Proxy class to access event-specific settings for a certain module"""
+    """Proxy class to access event-specific settings for a certain module."""
 
     acl_proxy_class = EventACLProxy
 
     @property
     def query(self):
-        """Returns a query object filtering by the proxy's module."""
-        return EventSetting.find(module=self.module)
+        """Return a query object filtering by the proxy's module."""
+        return EventSetting.query.filter_by(module=self.module)
 
     @event_or_id
     def get_all(self, event, no_defaults=False):
-        """Retrieves all settings
+        """Retrieve all settings.
 
         :param event: Event (or its ID)
         :param no_defaults: Only return existing settings and ignore defaults.
@@ -125,7 +123,7 @@ class EventSettingsProxy(SettingsProxyBase):
 
     @event_or_id
     def get(self, event, name, default=SettingsProxyBase.default_sentinel):
-        """Retrieves the value of a single setting.
+        """Retrieve the value of a single setting.
 
         :param event: Event (or its ID)
         :param name: Setting name
@@ -137,7 +135,7 @@ class EventSettingsProxy(SettingsProxyBase):
 
     @event_or_id
     def set(self, event, name, value):
-        """Sets a single setting.
+        """Set a single setting.
 
         :param event: Event (or its ID)
         :param name: Setting name
@@ -149,12 +147,12 @@ class EventSettingsProxy(SettingsProxyBase):
 
     @event_or_id
     def set_multi(self, event, items):
-        """Sets multiple settings at once.
+        """Set multiple settings at once.
 
         :param event: Event (or its ID)
         :param items: Dict containing the new settings
         """
-        items = {k: self._convert_from_python(k, v) for k, v in items.iteritems()}
+        items = {k: self._convert_from_python(k, v) for k, v in items.items()}
         self._split_call(items,
                          lambda x: EventSetting.set_multi(self.module, x, event_id=event),
                          lambda x: EventSettingPrincipal.set_acl_multi(self.module, x, event_id=event))
@@ -162,7 +160,7 @@ class EventSettingsProxy(SettingsProxyBase):
 
     @event_or_id
     def delete(self, event, *names):
-        """Deletes settings.
+        """Delete settings.
 
         :param event: Event (or its ID)
         :param names: One or more names of settings to delete
@@ -174,7 +172,7 @@ class EventSettingsProxy(SettingsProxyBase):
 
     @event_or_id
     def delete_all(self, event):
-        """Deletes all settings.
+        """Delete all settings.
 
         :param event: Event (or its ID)
         """
@@ -187,7 +185,7 @@ class EventSettingProperty(SettingProperty):
     attr = 'event'
 
 
-class ThemeSettingsProxy(object):
+class ThemeSettingsProxy:
     @property
     @memoize
     def settings(self):
@@ -204,7 +202,7 @@ class ThemeSettingsProxy(object):
             with open(path) as f:
                 data = f.read()
             settings = {k: v
-                        for k, v in yaml.safe_load(core_data + '\n' + data).viewitems()
+                        for k, v in yaml.safe_load(core_data + '\n' + data).items()
                         if not k.startswith('__core_')}
             # We assume there's no more than one theme plugin that provides defaults.
             # If that's not the case the last one "wins". We could reject this but it
@@ -215,7 +213,7 @@ class ThemeSettingsProxy(object):
             # to avoid using definition names that are likely to cause collisions.
             # Either way, if someone does this on purpose chances are good they want
             # to override a default style so let them do so...
-            for name, definition in settings.get('definitions', {}).viewitems():
+            for name, definition in settings.get('definitions', {}).items():
                 definition['plugin'] = plugin
                 definition.setdefault('user_visible', False)
                 core_settings['definitions'][name] = definition
@@ -233,7 +231,7 @@ class ThemeSettingsProxy(object):
 
     @memoize
     def get_themes_for(self, event_type):
-        return {theme_id: theme_data for theme_id, theme_data in self.themes.viewitems()
+        return {theme_id: theme_data for theme_id, theme_data in self.themes.items()
                 if event_type in theme_data['event_types']}
 
 

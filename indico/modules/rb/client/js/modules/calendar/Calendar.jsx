@@ -1,5 +1,5 @@
 // This file is part of Indico.
-// Copyright (C) 2002 - 2020 CERN
+// Copyright (C) 2002 - 2021 CERN
 //
 // Indico is free software; you can redistribute it and/or
 // modify it under the terms of the MIT License; see the
@@ -8,27 +8,28 @@
 import _ from 'lodash';
 import PropTypes from 'prop-types';
 import React from 'react';
+import Overridable from 'react-overridable';
+import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
 import {Button, Container, Grid, Icon, Popup} from 'semantic-ui-react';
-import {connect} from 'react-redux';
-import Overridable from 'react-overridable';
 
+import {StickyWithScrollBack, ResponsivePopup} from 'indico/react/components';
 import {Translate} from 'indico/react/i18n';
 import {Responsive} from 'indico/react/util';
-import {StickyWithScrollBack, ResponsivePopup} from 'indico/react/components';
 import {serializeDate} from 'indico/utils/date';
 
-import searchBarFactory from '../../components/SearchBar';
-import * as calendarActions from './actions';
-import * as calendarSelectors from './selectors';
 import {actions as bookingsActions} from '../../common/bookings';
 import {actions as filtersActions} from '../../common/filters';
 import {actions as roomsActions} from '../../common/rooms';
 import {ElasticTimeline, TimelineHeader} from '../../common/timeline';
-import CalendarListView from './CalendarListView';
+import searchBarFactory from '../../components/SearchBar';
+import {getOccurrenceTypes, transformToLegendLabels} from '../../util';
 import {actions as bookRoomActions} from '../bookRoom';
 import {roomFilterBarFactory} from '../roomList';
-import {getOccurrenceTypes, transformToLegendLabels} from '../../util';
+
+import * as calendarActions from './actions';
+import CalendarListView from './CalendarListView';
+import * as calendarSelectors from './selectors';
 
 import './Calendar.module.scss';
 

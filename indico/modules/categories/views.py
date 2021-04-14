@@ -1,11 +1,9 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
-
-from __future__ import unicode_literals
 
 from markupsafe import escape
 
@@ -21,7 +19,7 @@ class WPManageUpcomingEvents(WPAdmin):
 
 
 class WPCategory(MathjaxMixin, WPJinjaMixin, WPDecorated):
-    """WP for category display pages"""
+    """WP for category display pages."""
 
     template_prefix = 'categories/'
     ALLOW_JSON = False
@@ -61,13 +59,13 @@ class WPCategory(MathjaxMixin, WPJinjaMixin, WPDecorated):
 
 
 class WPCategoryCalendar(WPCategory):
-    """WP for category calendar page"""
+    """WP for category calendar page."""
 
     bundles = ('module_categories.calendar.js', 'module_categories.calendar.css')
 
 
 class WPCategoryManagement(WPCategory):
-    """WP for category management pages"""
+    """WP for category management pages."""
 
     MANAGEMENT = True
     bundles = ('module_categories.management.js',)

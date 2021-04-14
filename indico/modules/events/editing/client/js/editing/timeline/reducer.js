@@ -1,5 +1,5 @@
 // This file is part of Indico.
-// Copyright (C) 2002 - 2020 CERN
+// Copyright (C) 2002 - 2021 CERN
 //
 // Indico is free software; you can redistribute it and/or
 // modify it under the terms of the MIT License; see the
@@ -8,7 +8,7 @@
 import {camelizeKeys} from 'indico/utils/case';
 
 import {SET_LOADING, SET_DETAILS, SET_NEW_DETAILS} from './actions';
-import {processRevisions} from './selectors';
+import {processRevisions} from './util';
 
 export const initialState = {
   details: null,

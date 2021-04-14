@@ -1,59 +1,62 @@
 // This file is part of Indico.
-// Copyright (C) 2002 - 2020 CERN
+// Copyright (C) 2002 - 2021 CERN
 //
 // Indico is free software; you can redistribute it and/or
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-import editableTypeURL from 'indico-url:event_editing.manage_editable_type';
-import editorsURL from 'indico-url:event_editing.api_editable_type_editors';
-import editableListURL from 'indico-url:event_editing.api_editable_list';
-import editablesArchiveURL from 'indico-url:event_editing.api_prepare_editables_archive';
 import assignEditorURL from 'indico-url:event_editing.api_assign_editor';
 import assignSelfEditorURL from 'indico-url:event_editing.api_assign_myself';
-import unassignEditorURL from 'indico-url:event_editing.api_unassign_editor';
+import editableListURL from 'indico-url:event_editing.api_editable_list';
+import editorsURL from 'indico-url:event_editing.api_editable_type_editors';
 import canAssignSelfURL from 'indico-url:event_editing.api_editor_self_assign_allowed';
+import editablesArchiveURL from 'indico-url:event_editing.api_prepare_editables_archive';
+import unassignEditorURL from 'indico-url:event_editing.api_unassign_editor';
+import editableTypeURL from 'indico-url:event_editing.manage_editable_type';
 
-import React, {useState, useMemo} from 'react';
-import PropTypes from 'prop-types';
-import {useParams, Link} from 'react-router-dom';
-import {Button, Icon, Input, Loader, Checkbox, Message, Dropdown} from 'semantic-ui-react';
-import {Column, Table, SortDirection, WindowScroller} from 'react-virtualized';
 import _ from 'lodash';
+import PropTypes from 'prop-types';
+import React, {useState, useMemo} from 'react';
+import {useParams, Link} from 'react-router-dom';
+import {Column, Table, SortDirection, WindowScroller} from 'react-virtualized';
+import {Button, Icon, Input, Loader, Checkbox, Message, Dropdown} from 'semantic-ui-react';
+
 import {
   TooltipIfTruncated,
   ManagementPageSubTitle,
   ManagementPageBackButton,
 } from 'indico/react/components';
-import {useNumericParam} from 'indico/react/util/routing';
-import {Translate} from 'indico/react/i18n';
 import {useIndicoAxios} from 'indico/react/hooks';
+import {Translate} from 'indico/react/i18n';
+import {useNumericParam} from 'indico/react/util/routing';
 import {indicoAxios, handleAxiosError} from 'indico/utils/axios';
 import {camelizeKeys} from 'indico/utils/case';
 import Palette from 'indico/utils/palette';
+
+import StateIndicator from '../../editing/timeline/StateIndicator';
 import {userPropTypes} from '../../editing/timeline/util';
 import {EditableType, GetNextEditableTitles} from '../../models';
-import StateIndicator from '../../editing/timeline/StateIndicator';
+
 import NextEditable from './NextEditable';
 
 import './EditableList.module.scss';
 
 export default function EditableList({management}) {
-  const eventId = useNumericParam('confId');
+  const eventId = useNumericParam('event_id');
   const {type} = useParams();
   const {data: contribList, loading: isLoadingContribList} = useIndicoAxios({
-    url: editableListURL({confId: eventId, type}),
+    url: editableListURL({event_id: eventId, type}),
     camelize: true,
     trigger: [eventId, type],
   });
   const {data: editors, loading: isLoadingEditors} = useIndicoAxios({
-    url: editorsURL({confId: eventId, type}),
+    url: editorsURL({event_id: eventId, type}),
     camelize: true,
     trigger: [eventId, type],
     forceDispatchEffect: () => management,
   });
   const {data: canAssignSelf, loading: isLoadingCanAssignSelf} = useIndicoAxios({
-    url: canAssignSelfURL({confId: eventId, type}),
+    url: canAssignSelfURL({event_id: eventId, type}),
     trigger: [eventId, type],
     forceDispatchEffect: () => !management,
   });
@@ -295,13 +298,16 @@ function EditableListDisplay({
     }
   };
 
-  const checkedEditablesRequest = async (urlFunc, data = {}) => {
+  const checkedEditablesRequest = async (urlFunc, data = {}, urlData = {}) => {
     let response;
     try {
-      response = await indicoAxios.post(urlFunc({confId: eventId, type: editableType}), {
-        editables: checked,
-        ...data,
-      });
+      response = await indicoAxios.post(
+        urlFunc({event_id: eventId, type: editableType, ...urlData}),
+        {
+          editables: checked,
+          ...data,
+        }
+      );
     } catch (error) {
       handleAxiosError(error);
       return null;
@@ -314,7 +320,15 @@ function EditableListDisplay({
 
   const downloadAllFiles = async () => {
     setActiveRequest('download');
-    const rv = await checkedEditablesRequest(editablesArchiveURL);
+    const rv = await checkedEditablesRequest(editablesArchiveURL, {}, {archive_type: 'archive'});
+    if (rv) {
+      location.href = rv.downloadURL;
+    }
+  };
+
+  const exportJSON = async () => {
+    setActiveRequest('json');
+    const rv = await checkedEditablesRequest(editablesArchiveURL, {}, {archive_type: 'json'});
     if (rv) {
       location.href = rv.downloadURL;
     }
@@ -344,7 +358,7 @@ function EditableListDisplay({
     <>
       {management && <ManagementPageSubTitle title={title} />}
       {management && (
-        <ManagementPageBackButton url={editableTypeURL({confId: eventId, type: editableType})} />
+        <ManagementPageBackButton url={editableTypeURL({event_id: eventId, type: editableType})} />
       )}
       <div styleName="editable-topbar">
         <div>
@@ -397,12 +411,20 @@ function EditableListDisplay({
                   loading={activeRequest === 'unassign'}
                 />
               </Button.Group>{' '}
-              <Button
-                disabled={!hasCheckedContribs || !!activeRequest}
-                content={Translate.string('Download all files')}
-                onClick={downloadAllFiles}
-                loading={activeRequest === 'download'}
-              />
+              <Button.Group>
+                <Button
+                  disabled={!hasCheckedContribs || !!activeRequest}
+                  content={Translate.string('Download all files')}
+                  onClick={downloadAllFiles}
+                  loading={activeRequest === 'download'}
+                />
+                <Button
+                  disabled={!hasCheckedContribs || !!activeRequest}
+                  content={Translate.string('Export as JSON')}
+                  onClick={exportJSON}
+                  loading={activeRequest === 'json'}
+                />
+              </Button.Group>
             </>
           )}
         </div>

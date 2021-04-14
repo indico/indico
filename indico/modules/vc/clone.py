@@ -1,11 +1,9 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
-
-from __future__ import unicode_literals
 
 from indico.core.db import db
 from indico.modules.events.cloning import EventCloner
@@ -27,6 +25,10 @@ class VCCloner(EventCloner):
 
     @property
     def is_available(self):
+        if self.n_occurrence > 1:
+            # if we're not on the first occurrence, we shouldn't do this check,
+            # since there's the possibility all rooms are gone in the meantime
+            return True
         return self._has_content(self.old_event)
 
     def has_conflicts(self, target_event):
@@ -57,6 +59,10 @@ class VCCloner(EventCloner):
                 link_object = self._session_block_map[old_event_vc_room.link_object]
             if link_object is None:
                 continue
-            event_vc_room = VCRoomEventAssociation(show=old_event_vc_room.show, data=old_event_vc_room.data,
-                                                   link_object=link_object)
-            old_event_vc_room.vc_room.events.append(event_vc_room)
+            plugin = old_event_vc_room.vc_room.plugin
+            if not plugin:
+                continue
+            clone = plugin.clone_room(old_event_vc_room, link_object)
+            if clone:
+                # the plugin may decide to not clone the room
+                old_event_vc_room.vc_room.events.append(clone)

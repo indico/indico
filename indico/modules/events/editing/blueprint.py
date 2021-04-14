@@ -1,18 +1,16 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
-
-from __future__ import unicode_literals
 
 from indico.modules.events.editing.controllers import frontend
 from indico.modules.events.editing.controllers.backend import common, editable_list, management, service, timeline
 from indico.web.flask.wrappers import IndicoBlueprint
 
 
-_bp = IndicoBlueprint('event_editing', __name__, url_prefix='/event/<confId>', template_folder='templates',
+_bp = IndicoBlueprint('event_editing', __name__, url_prefix='/event/<int:event_id>', template_folder='templates',
                       virtual_template_folder='events/editing')
 
 # Frontend (management)
@@ -62,6 +60,8 @@ _bp.add_url_rule('/editing/api/enabled-editable-types', 'api_enabled_editable_ty
                  management.RHEnabledEditableTypes, methods=('GET', 'POST'))
 _bp.add_url_rule('/editing/api/<any(paper,slides,poster):type>/editable-assignment/self-assign-enabled',
                  'api_self_assign_enabled', management.RHEditableSetSelfAssign, methods=('GET', 'PUT', 'DELETE'))
+_bp.add_url_rule('/editing/api/<any(paper,slides,poster):type>/editable-assignment/anonymous-team',
+                 'api_anonymous_team', management.RHEditableSetAnonymousTeam, methods=('GET', 'PUT', 'DELETE'))
 _bp.add_url_rule('/editing/api/<any(paper,slides,poster):type>/principals', 'api_editable_type_principals',
                  management.RHEditableTypePrincipals, methods=('GET', 'POST'))
 _bp.add_url_rule('/editing/api/<any(paper,slides,poster):type>/submission-enabled',
@@ -73,10 +73,10 @@ _bp.add_url_rule('/editing/api/service/connect', 'api_service_connect', service.
 _bp.add_url_rule('/editing/api/service/disconnect', 'api_service_disconnect', service.RHDisconnectService,
                  methods=('POST',))
 _bp.add_url_rule('/editing/api/service/status', 'api_service_status', service.RHServiceStatus)
-_bp.add_url_rule('/editing/api/<any(paper,slides,poster):type>/editables/prepare-archive',
+_bp.add_url_rule('/editing/api/<any(paper,slides,poster):type>/editables/prepare-<any(archive,json):archive_type>',
                  'api_prepare_editables_archive', editable_list.RHPrepareEditablesArchive, methods=('POST',))
-_bp.add_url_rule('/editing/<any(paper,slides,poster):type>/editables/archive/<uuid:uuid>.zip', 'download_archive',
-                 editable_list.RHDownloadArchive)
+_bp.add_url_rule('/editing/<any(paper,slides,poster):type>/editables/<any(archive,json):archive_type>/<uuid:uuid>.zip',
+                 'download_archive', editable_list.RHDownloadArchive)
 _bp.add_url_rule('/editing/api/<any(paper,slides,poster):type>/editables/assign', 'api_assign_editor',
                  editable_list.RHAssignEditor, methods=('POST',))
 _bp.add_url_rule('/editing/api/<any(paper,slides,poster):type>/editables/assign/me', 'api_assign_myself',
@@ -117,3 +117,5 @@ _bp.add_url_rule(contrib_api_prefix + '/<int:revision_id>/comments/', 'api_creat
                  timeline.RHCreateRevisionComment, methods=('POST',),)
 _bp.add_url_rule(contrib_api_prefix + '/<int:revision_id>/comments/<int:comment_id>',
                  'api_edit_comment', timeline.RHEditRevisionComment, methods=('PATCH', 'DELETE'),)
+_bp.add_url_rule(contrib_api_prefix + '/<int:revision_id>/custom-action', 'api_custom_action',
+                 timeline.RHTriggerExtraRevisionAction, methods=('POST',),)

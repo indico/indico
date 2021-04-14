@@ -1,5 +1,5 @@
 // This file is part of Indico.
-// Copyright (C) 2002 - 2020 CERN
+// Copyright (C) 2002 - 2021 CERN
 //
 // Indico is free software; you can redistribute it and/or
 // modify it under the terms of the MIT License; see the
@@ -10,9 +10,10 @@ import {useDispatch, useSelector} from 'react-redux';
 
 import {Param, Translate} from 'indico/react/i18n';
 
-import LogEntryList from '../containers/LogEntryList';
-import Toolbar from './Toolbar';
 import {clearMetadataQuery} from '../actions';
+import LogEntryList from '../containers/LogEntryList';
+
+import Toolbar from './Toolbar';
 
 function MetadataQueryMessage() {
   const dispatch = useDispatch();

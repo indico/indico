@@ -1,11 +1,9 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
-
-from __future__ import unicode_literals
 
 import posixpath
 from itertools import groupby
@@ -94,7 +92,7 @@ def inject_meeting_body(event, **kwargs):
                 (detail_level not in ('contribution', 'all') or show_session != 'all')):
             continue
         elif (entry.type == TimetableEntryType.SESSION_BLOCK and show_session != 'all' and
-                unicode(entry.object.session.friendly_id) != show_session):
+                str(entry.object.session.friendly_id) != show_session):
             continue
 
         if entry.type == TimetableEntryType.BREAK:

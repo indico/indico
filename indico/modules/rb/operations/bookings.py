@@ -1,13 +1,11 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import unicode_literals
-
-from collections import OrderedDict, defaultdict
+from collections import defaultdict
 from datetime import date, datetime, time
 from itertools import chain, groupby
 from operator import attrgetter, itemgetter
@@ -37,8 +35,8 @@ from indico.modules.rb.util import (group_by_occurrence_date, serialize_availabi
                                     serialize_unbookable_hours)
 from indico.util.date_time import iterdays, overlaps, server_to_utc
 from indico.util.i18n import _
+from indico.util.iterables import group_list
 from indico.util.string import natural_sort_key
-from indico.util.struct.iterables import group_list
 
 
 def group_blockings(blocked_rooms, dates):
@@ -103,9 +101,9 @@ def get_existing_rooms_occurrences(rooms, start_dt, end_dt, repeat_frequency, re
 
 def get_rooms_availability(rooms, start_dt, end_dt, repeat_frequency, repeat_interval, skip_conflicts_with=None,
                            admin_override_enabled=False, skip_past_conflicts=False):
-    availability = OrderedDict()
+    availability = {}
     candidates = ReservationOccurrence.create_series(start_dt, end_dt, (repeat_frequency, repeat_interval))
-    date_range = sorted(set(cand.start_dt.date() for cand in candidates))
+    date_range = sorted({cand.start_dt.date() for cand in candidates})
     occurrences = get_existing_rooms_occurrences(rooms, start_dt.replace(hour=0, minute=0),
                                                  end_dt.replace(hour=23, minute=59), repeat_frequency, repeat_interval)
     blocked_rooms = get_rooms_blockings(rooms, start_dt.date(), end_dt.date())
@@ -175,8 +173,8 @@ def _bookings_query(filters, noload_room=False):
 
     text = filters.get('text')
     room_ids = filters.get('room_ids')
-    booking_criteria = [Reservation.booking_reason.ilike('%{}%'.format(text)),
-                        Reservation.booked_for_name.ilike('%{}%'.format(text))]
+    booking_criteria = [Reservation.booking_reason.ilike(f'%{text}%'),
+                        Reservation.booked_for_name.ilike(f'%{text}%')]
     if room_ids and text:
         query = query.filter(db.or_(Room.id.in_(room_ids), *booking_criteria))
     elif room_ids:
@@ -226,13 +224,13 @@ def get_room_calendar(start_date, end_date, room_ids, include_inactive=False, **
                                                                          explicit=True))
     dates = [d.date() for d in iterdays(start_dt, end_dt)]
 
-    calendar = OrderedDict((room.id, {
+    calendar = {room.id: {
         'room_id': room.id,
         'nonbookable_periods': group_nonbookable_periods(nonbookable_periods.get(room.id, []), dates),
         'unbookable_hours': unbookable_hours.get(room.id, []),
         'blockings': group_blockings(nonoverridable_blocked_rooms.get(room.id, []), dates),
         'overridable_blockings': group_blockings(overridable_blocked_rooms.get(room.id, []), dates),
-    }) for room in rooms)
+    } for room in rooms}
 
     for room_id, occurrences in occurrences_by_room:
         occurrences = list(occurrences)
@@ -290,7 +288,7 @@ def get_room_details_availability(room, start_dt, end_dt):
 
 
 def get_booking_occurrences(booking):
-    date_range = sorted(set(cand.start_dt.date() for cand in booking.occurrences))
+    date_range = sorted({cand.start_dt.date() for cand in booking.occurrences})
     occurrences = group_by_occurrence_date(booking.occurrences)
     return date_range, occurrences
 
@@ -327,7 +325,7 @@ def create_booking_for_event(room_id, event):
         default_timezone = timezone(config.DEFAULT_TIMEZONE)
         start_dt = event.start_dt.astimezone(default_timezone).replace(tzinfo=None)
         end_dt = event.end_dt.astimezone(default_timezone).replace(tzinfo=None)
-        booking_reason = "Event '{}'".format(event.title)
+        booking_reason = f"Event '{event.title}'"
         data = dict(start_dt=start_dt, end_dt=end_dt, booked_for_user=event.creator, booking_reason=booking_reason,
                     repeat_frequency=RepeatFrequency.NEVER, event_id=event.id)
         booking = Reservation.create_from_data(room, data, session.user, ignore_admin=True)
@@ -422,7 +420,7 @@ def split_booking(booking, new_booking_data):
 
     prebook = not room.can_book(session.user, allow_admin=False) and room.can_prebook(session.user, allow_admin=False)
     resv = Reservation.create_from_data(room, dict(new_booking_data, start_dt=new_start_dt), session.user,
-                                        prebook=prebook)
+                                        prebook=prebook, ignore_admin=True)
     for new_occ in resv.occurrences:
         new_occ_start = new_occ.start_dt.date()
         if new_occ_start in cancelled_dates:
@@ -432,11 +430,11 @@ def split_booking(booking, new_booking_data):
 
     booking.edit_logs.append(ReservationEditLog(user_name=session.user.full_name, info=[
         'Split into a new booking',
-        'booking_link:{}'.format(resv.id)
+        f'booking_link:{resv.id}'
     ]))
     resv.edit_logs.append(ReservationEditLog(user_name=session.user.full_name, info=[
         'Split from another booking',
-        'booking_link:{}'.format(booking.id)
+        f'booking_link:{booking.id}'
     ]))
     return resv
 
@@ -510,12 +508,12 @@ def get_booking_edit_calendar_data(booking, booking_changes):
     room_availability['cancellations'] = {}
     room_availability['rejections'] = {}
     others = defaultdict(list)
-    for k, v in chain(room_availability['bookings'].iteritems(), room_availability['pre_bookings'].iteritems()):
+    for k, v in chain(room_availability['bookings'].items(), room_availability['pre_bookings'].items()):
         others[k].extend(v)
-    other_bookings = {dt: filter(lambda x: x.reservation.id != booking.id, other) for dt, other in others.iteritems()}
+    other_bookings = {dt: [x for x in other if x.reservation.id != booking.id] for dt, other in others.items()}
     candidates = room_availability['candidates']
 
-    for dt, dt_candidates in candidates.iteritems():
+    for dt, dt_candidates in candidates.items():
         if dt in cancelled_dates:
             candidates[dt] = []
             room_availability['cancellations'].update({dt: dt_candidates})

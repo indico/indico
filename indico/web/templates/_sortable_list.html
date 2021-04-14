@@ -14,7 +14,7 @@
             <div class="actions">
                 <div class="move-prev"></div>
                 <div class="move-next"></div>
-                {% if caller %}
+                {% if caller is defined %}
                     {{ caller(item) }}
                 {% endif %}
             </div>
@@ -24,7 +24,7 @@
 
 {% macro sortable_list(items, classes="", draggable=true, title=none, id=none, invisible_handle=false) -%}
     {# Caller is called with an item and must render the action buttons. #}
-    {% set _caller = caller %}
+    {% set _caller = caller|default(none) %}
     <div class="sortable-list js-sortable-list-widget {{ classes }}"
          {% if id %}id="{{ id }}"{% endif %}
          {% if not draggable %}data-disable-dragging{% endif %}>
@@ -44,7 +44,7 @@
 {% macro sortable_lists(enabled_title, enabled_items, disabled_title, disabled_items, classes="", draggable=true,
                         id=none, invisible_handle=false) -%}
     {# Caller is called with an item and must render the action buttons. #}
-    {% set _caller = caller %}
+    {% set _caller = caller|default(none) %}
     <div class="sortable-list js-sortable-list-widget {{ classes }}"
          {% if id %}id="{{ id }}"{% endif %}
          {% if not draggable %}data-disable-dragging{% endif %}>

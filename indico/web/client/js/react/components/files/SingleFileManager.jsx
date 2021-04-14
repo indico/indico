@@ -1,18 +1,20 @@
 // This file is part of Indico.
-// Copyright (C) 2002 - 2020 CERN
+// Copyright (C) 2002 - 2021 CERN
 //
 // Indico is free software; you can redistribute it and/or
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-import React, {useCallback, useReducer} from 'react';
 import PropTypes from 'prop-types';
+import React, {useCallback, useReducer} from 'react';
 import {useDropzone} from 'react-dropzone';
 import {Field} from 'react-final-form';
+
 import {FinalField} from 'indico/react/forms';
 import {Translate} from 'indico/react/i18n';
-import {fileDetailsShape} from './props';
+
 import {SingleFileArea} from './FileArea';
+import {fileDetailsShape} from './props';
 import {deleteFile, uploadFile, UploadState} from './util';
 
 function reducer(state, action) {

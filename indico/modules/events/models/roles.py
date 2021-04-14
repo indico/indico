@@ -1,16 +1,14 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import unicode_literals
-
 from indico.core.db import db
 from indico.core.db.sqlalchemy.principals import PrincipalType
 from indico.util.locators import locator_property
-from indico.util.string import format_repr, return_ascii
+from indico.util.string import format_repr
 
 
 class EventRole(db.Model):
@@ -19,12 +17,6 @@ class EventRole(db.Model):
                       db.Index(None, 'event_id', 'code', unique=True),
                       {'schema': 'events'})
 
-    is_group = False
-    is_event_role = True
-    is_category_role = False
-    is_single_person = True
-    is_network = False
-    is_registration_form = False
     principal_order = 2
     principal_type = PrincipalType.event_role
 
@@ -80,7 +72,6 @@ class EventRole(db.Model):
     def __contains__(self, user):
         return user is not None and self in user.event_roles
 
-    @return_ascii
     def __repr__(self):
         return format_repr(self, 'id', 'code', _text=self.name)
 
@@ -90,7 +81,7 @@ class EventRole(db.Model):
 
     @property
     def identifier(self):
-        return 'EventRole:{}'.format(self.id)
+        return f'EventRole:{self.id}'
 
     @property
     def css(self):

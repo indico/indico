@@ -1,11 +1,9 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
-
-from __future__ import unicode_literals
 
 from datetime import date, datetime, time, timedelta
 
@@ -63,7 +61,7 @@ def test_modify_relationship_with_deleted(db, dummy_event):
     # this should hard-delete c but not touch cd since it's not in the relationship
     event.contributions = [c2]
     db.session.flush()
-    assert set(Contribution.find_all()) == {cd, c2}
+    assert set(Contribution.query) == {cd, c2}
 
 
 @pytest.mark.parametrize(('category_pm', 'event_pm', 'effective_pm'), (

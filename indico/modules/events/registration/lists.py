@@ -1,13 +1,9 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
-
-from __future__ import unicode_literals
-
-from collections import OrderedDict
 
 from flask import request
 from sqlalchemy.orm import joinedload
@@ -28,37 +24,37 @@ class RegistrationListGenerator(ListGeneratorBase):
     list_link_type = 'registration'
 
     def __init__(self, regform):
-        super(RegistrationListGenerator, self).__init__(regform.event, entry_parent=regform)
+        super().__init__(regform.event, entry_parent=regform)
         self.regform = regform
         self.default_list_config = {
             'items': ('title', 'email', 'affiliation', 'reg_date', 'state'),
             'filters': {'fields': {}, 'items': {}}
         }
-        self.static_items = OrderedDict([
-            ('reg_date', {
+        self.static_items = {
+            'reg_date': {
                 'title': _('Registration Date'),
-            }),
-            ('price', {
+            },
+            'price': {
                 'title': _('Price'),
-            }),
-            ('state', {
+            },
+            'state': {
                 'title': _('State'),
                 'filter_choices': {str(state.value): state.title for state in RegistrationState}
-            }),
-            ('checked_in', {
+            },
+            'checked_in': {
                 'title': _('Checked in'),
                 'filter_choices': {
                     '0': _('No'),
                     '1': _('Yes')
                 }
-            }),
-            ('checked_in_date', {
+            },
+            'checked_in_date': {
                 'title': _('Check-in date'),
-            }),
-            ('payment_date', {
+            },
+            'payment_date': {
                 'title': _('Payment date'),
-            })
-        ])
+            },
+        }
         self.personal_items = ('title', 'first_name', 'last_name', 'email', 'position', 'affiliation', 'address',
                                'phone', 'country')
         self.list_config = self._get_config()
@@ -73,8 +69,8 @@ class RegistrationListGenerator(ListGeneratorBase):
         result = []
         for item_id in ids:
             if item_id in self.personal_items:
-                field = RegistrationFormItem.find_one(registration_form=self.regform,
-                                                      personal_data_type=PersonalDataType[item_id])
+                field = RegistrationFormItem.query.filter_by(registration_form=self.regform,
+                                                             personal_data_type=PersonalDataType[item_id]).one()
                 result.append({
                     'id': field.id,
                     'caption': field.title
@@ -91,7 +87,7 @@ class RegistrationListGenerator(ListGeneratorBase):
         result = []
         personal_data_field_ids = {x.personal_data_type: x.id for x in self.regform.form_items if x.is_field}
         for item_id in ids:
-            if isinstance(item_id, basestring):
+            if isinstance(item_id, str):
                 personal_data_type = PersonalDataType.get(item_id)
                 if personal_data_type:
                     item_id = personal_data_field_ids[personal_data_type]
@@ -99,12 +95,14 @@ class RegistrationListGenerator(ListGeneratorBase):
         return result
 
     def _get_sorted_regform_items(self, item_ids):
-        """Return the form items ordered by their position in the registration form."""
+        """
+        Return the form items ordered by their position in the registration form.
+        """
 
         if not item_ids:
             return []
-        return (RegistrationFormItem
-                .find(~RegistrationFormItem.is_deleted, RegistrationFormItem.id.in_(item_ids))
+        return (RegistrationFormItem.query
+                .filter(~RegistrationFormItem.is_deleted, RegistrationFormItem.id.in_(item_ids))
                 .with_parent(self.regform)
                 .join(RegistrationFormItem.parent, aliased=True)
                 .filter(~RegistrationFormItem.is_deleted)  # parent deleted
@@ -114,10 +112,10 @@ class RegistrationListGenerator(ListGeneratorBase):
                 .all())
 
     def _get_filters_from_request(self):
-        filters = super(RegistrationListGenerator, self)._get_filters_from_request()
+        filters = super()._get_filters_from_request()
         for field in self.regform.form_items:
             if field.is_field and field.input_type in {'single_choice', 'multi_choice', 'country', 'bool', 'checkbox'}:
-                options = request.form.getlist('field_{}'.format(field.id))
+                options = request.form.getlist(f'field_{field.id}')
                 if options:
                     filters['fields'][str(field.id)] = options
         return filters
@@ -135,13 +133,13 @@ class RegistrationListGenerator(ListGeneratorBase):
         field_types = {str(f.id): f.field_impl for f in self.regform.form_items
                        if f.is_field and not f.is_deleted and (f.parent_id is None or not f.parent.is_deleted)}
         field_filters = {field_id: data_list
-                         for field_id, data_list in filters['fields'].iteritems()
+                         for field_id, data_list in filters['fields'].items()
                          if field_id in field_types}
         if not field_filters and not filters['items']:
             return query
         criteria = [db.and_(RegistrationFormFieldData.field_id == field_id,
                             field_types[field_id].create_sql_filter(data_list))
-                    for field_id, data_list in field_filters.iteritems()]
+                    for field_id, data_list in field_filters.items()]
         items_criteria = []
         if 'checked_in' in filters['items']:
             checked_in_values = filters['items']['checked_in']
@@ -160,7 +158,7 @@ class RegistrationListGenerator(ListGeneratorBase):
                         .filter(RegistrationData.registration_id == Registration.id)
                         .filter(db.or_(*criteria))
                         .correlate(Registration)
-                        .as_scalar())
+                        .scalar_subquery())
             query = query.filter(subquery == len(field_filters))
         return query.filter(db.or_(*items_criteria))
 

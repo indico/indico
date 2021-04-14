@@ -1,11 +1,9 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
-
-from __future__ import unicode_literals
 
 from flask import flash, request, session
 from werkzeug.exceptions import Forbidden, NotFound
@@ -26,7 +24,7 @@ from indico.web.util import jsonify_data, jsonify_form, jsonify_template
 
 
 class RHCallForAbstracts(RHAbstractsBase):
-    """Show the main CFA page"""
+    """Show the main CFA page."""
 
     def _process(self):
         abstracts = get_user_abstracts(self.event, session.user) if session.user else []
@@ -35,7 +33,7 @@ class RHCallForAbstracts(RHAbstractsBase):
 
 
 class RHMyAbstractsExportPDF(RHAbstractsBase):
-    """Export the list of the user's abstracts as PDF"""
+    """Export the list of the user's abstracts as PDF."""
 
     def _check_access(self):
         if not session.user:
@@ -90,7 +88,7 @@ class RHSubmitInvitedAbstract(RHAbstractBase):
     def _create_form(self):
         form_user = session.user or self.abstract.submitter
         abstract_form_cls = make_abstract_form(self.event, form_user)
-        custom_field_values = {'custom_{}'.format(x.contribution_field_id): x.data for x in self.abstract.field_values}
+        custom_field_values = {f'custom_{x.contribution_field_id}': x.data for x in self.abstract.field_values}
         form_defaults = FormDefaults(self.abstract, **custom_field_values)
         return abstract_form_cls(obj=form_defaults, event=self.event, abstract=self.abstract)
 

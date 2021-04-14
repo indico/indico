@@ -28,7 +28,7 @@ def upgrade():
     for type_ in EditableType:
         res = conn.execute(
             "SELECT event_id, value FROM events.settings WHERE module = 'editing' AND name = %s",
-            ("{}_review_conditions".format(type_.name),),
+            (f"{type_.name}_review_conditions",),
         )
         for event_id, value in res:
             for condition in value:
@@ -45,7 +45,7 @@ def upgrade():
                     )
         conn.execute(
             "DELETE FROM events.settings WHERE module = 'editing' AND name = %s",
-            ("{}_review_conditions".format(type_.name),),
+            (f"{type_.name}_review_conditions",),
         )
 
 
@@ -61,12 +61,12 @@ def downgrade():
                 "SELECT file_type_id FROM event_editing.review_condition_file_types WHERE review_condition_id = %s",
                 (id,),
             )
-            value = [unicode(uuid4()), [f[0] for f in file_types.fetchall()]]
+            value = [str(uuid4()), [f[0] for f in file_types.fetchall()]]
             review_conditions[event_id].append(value)
         for key, value in review_conditions.items():
             conn.execute(
                 "INSERT INTO events.settings (event_id, module, name, value) VALUES (%s, 'editing', %s, %s)",
-                (key, "{}_review_conditions".format(type_.name), json.dumps(value)),
+                (key, f"{type_.name}_review_conditions", json.dumps(value)),
             )
 
     conn.execute("DELETE FROM event_editing.review_condition_file_types")

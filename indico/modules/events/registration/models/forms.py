@@ -1,11 +1,9 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
-
-from __future__ import unicode_literals
 
 from uuid import UUID
 
@@ -26,30 +24,24 @@ from indico.modules.events.registration.models.form_fields import RegistrationFo
 from indico.modules.events.registration.models.registrations import Registration, RegistrationState
 from indico.util.caching import memoize_request
 from indico.util.date_time import now_utc
+from indico.util.enum import RichIntEnum
 from indico.util.i18n import L_
-from indico.util.string import return_ascii
-from indico.util.struct.enum import RichIntEnum
 
 
 class ModificationMode(RichIntEnum):
-    __titles__ = [None, L_('Until modification deadline'), L_('Until payment'), L_('Never')]
+    __titles__ = [None, L_('Until modification deadline'), L_('Until payment'), L_('Never'), L_('Until approved')]
     allowed_always = 1
     allowed_until_payment = 2
     not_allowed = 3
+    allowed_until_approved = 4
 
 
 class RegistrationForm(db.Model):
-    """A registration form for an event"""
+    """A registration form for an event."""
 
     __tablename__ = 'forms'
     principal_type = PrincipalType.registration_form
     principal_order = 2
-    is_group = False
-    is_network = False
-    is_single_person = False
-    is_event_role = False
-    is_category_role = False
-    is_registration_form = True
 
     __table_args__ = (db.Index('ix_uq_forms_participation', 'event_id', unique=True,
                                postgresql_where=db.text('is_participation AND NOT is_deleted')),
@@ -193,6 +185,12 @@ class RegistrationForm(db.Model):
         nullable=False,
         default=''
     )
+    #: If the completed registration email should include the event's iCalendar file.
+    attach_ical = db.Column(
+        db.Boolean,
+        nullable=False,
+        default=False
+    )
     #: Whether the manager notifications for this event are enabled
     manager_notifications_enabled = db.Column(
         db.Boolean,
@@ -310,8 +308,13 @@ class RegistrationForm(db.Model):
                 .has_rows())
 
     @property
+    def name(self):
+        # needed when sorting acl entries by name
+        return self.title
+
+    @property
     def identifier(self):
-        return 'RegistrationForm:{}'.format(self.id)
+        return f'RegistrationForm:{self.id}'
 
     @hybrid_property
     def has_ended(self):
@@ -396,16 +399,17 @@ class RegistrationForm(db.Model):
         contact_email = self.event.contact_emails[0] if self.event.contact_emails else None
         return self.notification_sender_address or contact_email
 
-    @return_ascii
     def __repr__(self):
-        return '<RegistrationForm({}, {}, {})>'.format(self.id, self.event_id, self.title)
+        return f'<RegistrationForm({self.id}, {self.event_id}, {self.title})>'
 
     def is_modification_allowed(self, registration):
-        """Checks whether a registration may be modified"""
+        """Check whether a registration may be modified."""
         if not registration.is_active:
             return False
         elif self.modification_mode == ModificationMode.allowed_always:
             return True
+        elif self.modification_mode == ModificationMode.allowed_until_approved:
+            return registration.state == RegistrationState.pending
         elif self.modification_mode == ModificationMode.allowed_until_payment:
             return not registration.is_paid
         else:
@@ -416,7 +420,7 @@ class RegistrationForm(db.Model):
 
     @memoize_request
     def get_registration(self, user=None, uuid=None, email=None):
-        """Retrieves registrations for this registration form by user or uuid"""
+        """Retrieve registrations for this registration form by user or uuid."""
         if (bool(user) + bool(uuid) + bool(email)) != 1:
             raise ValueError("Exactly one of `user`, `uuid` and `email` must be specified")
         if user:
@@ -434,7 +438,7 @@ class RegistrationForm(db.Model):
         return format_currency(self.base_price, self.currency, locale=session.lang or 'en_GB')
 
     def get_personal_data_field_id(self, personal_data_type):
-        """Returns the field id corresponding to the personal data field with the given name."""
+        """Return the field id corresponding to the personal data field with the given name."""
         for field in self.active_fields:
             if (isinstance(field, RegistrationFormPersonalDataField) and
                     field.personal_data_type == personal_data_type):
@@ -445,10 +449,12 @@ class RegistrationForm(db.Model):
 def _mappers_configured():
     query = (select([db.func.count(Registration.id)])
              .where((Registration.registration_form_id == RegistrationForm.id) & Registration.is_active)
-             .correlate_except(Registration))
+             .correlate_except(Registration)
+             .scalar_subquery())
     RegistrationForm.active_registration_count = column_property(query, deferred=True)
 
     query = (select([db.func.count(Registration.id)])
              .where((Registration.registration_form_id == RegistrationForm.id) & ~Registration.is_deleted)
-             .correlate_except(Registration))
+             .correlate_except(Registration)
+             .scalar_subquery())
     RegistrationForm.existing_registrations_count = column_property(query, deferred=True)

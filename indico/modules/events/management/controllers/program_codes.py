@@ -1,11 +1,9 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
-
-from __future__ import unicode_literals
 
 from flask import flash, request, session
 
@@ -69,12 +67,12 @@ class RHAssignProgramCodesBase(RHManageEventBase):
     def _get_update_log_data(self, updates):
         changes = {}
         fields = {}
-        for obj, change in updates.viewitems():
+        for obj, change in updates.items():
             title = getattr(obj, 'full_title', obj.title)
             friendly_id = getattr(obj, 'friendly_id', None)
             if friendly_id is not None:
-                title = '#{}: {}'.format(friendly_id, title)
-            key = 'obj_{}'.format(obj.id)
+                title = f'#{friendly_id}: {title}'
+            key = f'obj_{obj.id}'
             fields[key] = {'type': 'string', 'title': title}
             changes[key] = change
         return {'Changes': make_diff_log(changes, fields)}
@@ -83,7 +81,7 @@ class RHAssignProgramCodesBase(RHManageEventBase):
         if 'assign' in request.form:
             updates = {}
             for obj in self.objects:
-                code = request.form['code_{}'.format(obj.id)].strip()
+                code = request.form[f'code_{obj.id}'].strip()
                 if code != obj.code:
                     updates[obj] = (obj.code, code)
                     obj.code = code
@@ -107,7 +105,7 @@ class RHAssignProgramCodesSessions(RHAssignProgramCodesBase):
     hidden_post_field = 'session_id'
 
     def _get_objects(self):
-        ids = map(int, request.form.getlist('session_id'))
+        ids = request.form.getlist('session_id', type=int)
         return (Session.query
                 .with_parent(self.event)
                 .filter(Session.id.in_(ids) if ids else True)
@@ -135,7 +133,7 @@ class RHAssignProgramCodesContributions(RHAssignProgramCodesBase):
     hidden_post_field = 'contribution_id'
 
     def _get_objects(self):
-        ids = map(int, request.form.getlist('contribution_id'))
+        ids = request.form.getlist('contribution_id', type=int)
         return (Contribution.query
                 .with_parent(self.event)
                 .filter(Contribution.id.in_(ids) if ids else True)

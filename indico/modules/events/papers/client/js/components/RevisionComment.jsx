@@ -1,13 +1,13 @@
 // This file is part of Indico.
-// Copyright (C) 2002 - 2020 CERN
+// Copyright (C) 2002 - 2021 CERN
 //
 // Indico is free software; you can redistribute it and/or
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-import React, {useState} from 'react';
-import PropTypes from 'prop-types';
 import moment from 'moment';
+import PropTypes from 'prop-types';
+import React, {useState} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
 import {Button, Confirm, Popup} from 'semantic-ui-react';
 
@@ -16,10 +16,11 @@ import {getChangedValues} from 'indico/react/forms';
 import {Param, Translate} from 'indico/react/i18n';
 import {serializeDate} from 'indico/utils/date';
 
-import CommentForm from './CommentForm';
 import {deleteComment, updateComment as updateCommentAction} from '../actions';
 import {CommentVisibility} from '../models';
 import {getPaperContribution, getPaperEvent, isDeletingComment} from '../selectors';
+
+import CommentForm from './CommentForm';
 
 export default function RevisionComment({comment, revision}) {
   const dispatch = useDispatch();

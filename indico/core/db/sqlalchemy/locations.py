@@ -1,11 +1,9 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
-
-from __future__ import unicode_literals
 
 from sqlalchemy.event import listens_for
 from sqlalchemy.ext.declarative import declared_attr
@@ -14,7 +12,7 @@ from indico.core.db import db
 from indico.util.decorators import strict_classproperty
 
 
-class LocationMixin(object):
+class LocationMixin:
     """Mixin to store location information in a model.
 
     A location in this context can be either a reference to a room in
@@ -51,7 +49,7 @@ class LocationMixin(object):
 
     @classmethod
     def register_location_events(cls):
-        """Registers sqlalchemy events needed by this mixin.
+        """Register sqlalchemy events needed by this mixin.
 
         Call this method after the definition of a model which uses
         this mixin class.
@@ -199,20 +197,30 @@ class LocationMixin(object):
     def venue_name(self, venue_name):
         self.own_venue_name = venue_name
 
-    def get_room_name(self, full=True):
+    def get_room_name(self, full=True, verbose=False):
         """The name of the room where this item is located.
 
-        :param full: by default, if the room has a "friendly name" too
-                     (e.g. 'Main Amphitheatre'), a composite name will be
-                     returned. If ``full`` is set to ``False``, only the
-                     "friendly name" will be returned in that case.
+        If both ``full`` and ``verbose`` are set to ``False``, the
+        "friendly name" will be returned in that case. Both ``full`` and
+        ``verbose`` cannot be set to ``True``.
+
+        :param full: If the room has a "friendly name" (e.g. 'Main
+                     Amphitheatre'), a composite name will be returned.
+        :param verbose: The `verbose_name` of the room will be returned.
         """
+        assert sum([full, verbose]) <= 1
         if self.inherit_location and self.location_parent is None:
             return ''
         room = self.room
         if room is not None:
-            return room.full_name if full else room.name
-        return self.own_room_name if not self.inherit_location else self.location_parent.room_name
+            if full:
+                return room.full_name
+            elif verbose and room.verbose_name:
+                return room.verbose_name
+            else:
+                return room.name
+        return (self.own_room_name if not self.inherit_location
+                else self.location_parent.get_room_name(full=full, verbose=verbose))
 
     @property
     def room_name(self):
@@ -225,7 +233,7 @@ class LocationMixin(object):
 
     @property
     def has_location_info(self):
-        """Whether the object has basic location information set"""
+        """Whether the object has basic location information set."""
         return bool(self.venue_name or self.room_name)
 
     @property

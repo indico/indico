@@ -1,11 +1,9 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
-
-from __future__ import unicode_literals
 
 from flask import session
 
@@ -50,7 +48,7 @@ def _event_times_changed(sender, obj, **kwargs):
 @signals.users.merged.connect
 def _merge_users(target, source, **kwargs):
     from indico.modules.events.reminders.models.reminders import EventReminder
-    EventReminder.find(creator_id=source.id).update({EventReminder.creator_id: target.id})
+    EventReminder.query.filter_by(creator_id=source.id).update({EventReminder.creator_id: target.id})
 
 
 @signals.event_management.get_cloners.connect

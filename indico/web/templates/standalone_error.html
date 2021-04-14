@@ -57,7 +57,7 @@
 <div class="wrapper">
     <div class="page-header">
         <a href="{{ url_for_index() }}">
-            <img alt="logo" class="header-logo" src="{{ indico_config.IMAGES_BASE_URL }}/logo_indico.png">
+            <img alt="logo" class="header-logo" src="{{ url_for('assets.image', filename='logo_indico.png') }}">
         </a>
     </div>
     {% with standalone=true %}

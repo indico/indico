@@ -1,10 +1,9 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
-
 
 class classproperty(property):
     def __get__(self, obj, type=None):
@@ -22,8 +21,8 @@ class strict_classproperty(classproperty):
     """
     def __get__(self, obj, type=None):
         if obj is not None:
-            raise AttributeError('Attribute is not available on instances of {}'.format(type.__name__))
-        return super(strict_classproperty, self).__get__(obj, type)
+            raise AttributeError(f'Attribute is not available on instances of {type.__name__}')
+        return super().__get__(obj, type)
 
 
 class cached_classproperty(property):

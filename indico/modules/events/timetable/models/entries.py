@@ -1,11 +1,9 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
-
-from __future__ import unicode_literals
 
 from datetime import timedelta
 
@@ -19,10 +17,10 @@ from indico.core.db import db
 from indico.core.db.sqlalchemy import PyIntEnum, UTCDateTime
 from indico.core.db.sqlalchemy.util.models import populate_one_to_one_backrefs
 from indico.util.date_time import overlaps
+from indico.util.enum import RichIntEnum
 from indico.util.i18n import _
 from indico.util.locators import locator_property
-from indico.util.string import format_repr, return_ascii
-from indico.util.struct.enum import RichIntEnum
+from indico.util.string import format_repr
 
 
 class TimetableEntryType(RichIntEnum):
@@ -37,10 +35,10 @@ def _make_check(type_, *cols):
     all_cols = {'session_block_id', 'contribution_id', 'break_id'}
     required_cols = all_cols & set(cols)
     forbidden_cols = all_cols - required_cols
-    criteria = ['{} IS NULL'.format(col) for col in sorted(forbidden_cols)]
-    criteria += ['{} IS NOT NULL'.format(col) for col in sorted(required_cols)]
+    criteria = [f'{col} IS NULL' for col in sorted(forbidden_cols)]
+    criteria += [f'{col} IS NOT NULL' for col in sorted(required_cols)]
     condition = 'type != {} OR ({})'.format(type_, ' AND '.join(criteria))
-    return db.CheckConstraint(condition, 'valid_{}'.format(type_.name.lower()))
+    return db.CheckConstraint(condition, f'valid_{type_.name.lower()}')
 
 
 class TimetableEntry(db.Model):
@@ -52,7 +50,7 @@ class TimetableEntry(db.Model):
                 _make_check(TimetableEntryType.SESSION_BLOCK, 'session_block_id'),
                 _make_check(TimetableEntryType.CONTRIBUTION, 'contribution_id'),
                 _make_check(TimetableEntryType.BREAK, 'break_id'),
-                db.CheckConstraint("type != {} OR parent_id IS NULL".format(TimetableEntryType.SESSION_BLOCK),
+                db.CheckConstraint(f"type != {TimetableEntryType.SESSION_BLOCK} OR parent_id IS NULL",
                                    'valid_parent'),
                 {'schema': 'events'})
 
@@ -180,7 +178,7 @@ class TimetableEntry(db.Model):
         elif isinstance(value, Break):
             self.break_ = value
         elif value is not None:
-            raise TypeError('Unexpected object: {}'.format(value))
+            raise TypeError(f'Unexpected object: {value}')
 
     @hybrid_property
     def duration(self):
@@ -200,17 +198,17 @@ class TimetableEntry(db.Model):
                 db.select([SessionBlock.duration])
                 .where(SessionBlock.id == cls.session_block_id)
                 .correlate_except(SessionBlock)
-                .as_scalar(),
+                .scalar_subquery(),
             TimetableEntryType.CONTRIBUTION.value:
                 db.select([Contribution.duration])
                 .where(Contribution.id == cls.contribution_id)
                 .correlate_except(Contribution)
-                .as_scalar(),
+                .scalar_subquery(),
             TimetableEntryType.BREAK.value:
                 db.select([Break.duration])
                 .where(Break.id == cls.break_id)
                 .correlate_except(Break)
-                .as_scalar(),
+                .scalar_subquery(),
         }, value=cls.type)
 
     @hybrid_property
@@ -235,7 +233,7 @@ class TimetableEntry(db.Model):
 
     @property
     def siblings(self):
-        from indico.modules.events.timetable.util import get_top_level_entries, get_nested_entries
+        from indico.modules.events.timetable.util import get_nested_entries, get_top_level_entries
         tzinfo = self.event.tzinfo
         day = self.start_dt.astimezone(tzinfo).date()
         siblings = (get_nested_entries(self.event)[self.parent_id]
@@ -256,12 +254,11 @@ class TimetableEntry(db.Model):
     def locator(self):
         return dict(self.event.locator, entry_id=self.id)
 
-    @return_ascii
     def __repr__(self):
         return format_repr(self, 'id', 'type', 'start_dt', 'end_dt', _repr=self.object)
 
     def can_view(self, user):
-        """Checks whether the user will see this entry in the timetable."""
+        """Check whether the user will see this entry in the timetable."""
         if self.type in (TimetableEntryType.CONTRIBUTION, TimetableEntryType.BREAK):
             return self.object.can_access(user)
         elif self.type == TimetableEntryType.SESSION_BLOCK:

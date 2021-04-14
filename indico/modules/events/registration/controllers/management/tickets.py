@@ -1,11 +1,9 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
-
-from __future__ import unicode_literals
 
 from io import BytesIO
 
@@ -14,11 +12,11 @@ from flask import json, render_template
 
 from indico.core.config import config
 from indico.core.db import db
+from indico.core.oauth.models.applications import OAuthApplication, SystemAppType
 from indico.modules.designer import PageOrientation, PageSize
 from indico.modules.events.registration.controllers.management import RHManageRegFormBase
 from indico.modules.events.registration.forms import TicketsForm
-from indico.modules.oauth.models.applications import OAuthApplication, SystemAppType
-from indico.web.flask.util import send_file, url_for
+from indico.web.flask.util import send_file
 from indico.web.util import jsonify_data, jsonify_template
 
 
@@ -61,17 +59,16 @@ class RHTicketConfigQRCodeImage(RHManageRegFormBase):
             border=1
         )
 
-        checkin_app = OAuthApplication.find_one(system_app_type=SystemAppType.checkin)
+        checkin_app = OAuthApplication.query.filter_by(system_app_type=SystemAppType.checkin).one()
         qr_data = {
-            "event_id": self.event.id,
-            "title": self.event.title,
-            "date": self.event.start_dt.isoformat(),
-            "version": 1,
-            "server": {
-                "base_url": config.BASE_URL,
-                "consumer_key": checkin_app.client_id,
-                "auth_url": url_for('oauth.oauth_authorize', _external=True),
-                "token_url": url_for('oauth.oauth_token', _external=True)
+            'event_id': self.event.id,
+            'title': self.event.title,
+            'date': self.event.start_dt.isoformat(),
+            'version': 2,
+            'server': {
+                'base_url': config.BASE_URL,
+                'client_id': checkin_app.client_id,
+                'scope': 'registrants',
             }
         }
         json_qr_data = json.dumps(qr_data)

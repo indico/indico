@@ -1,11 +1,9 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
-
-from __future__ import unicode_literals
 
 import re
 
@@ -16,7 +14,7 @@ from indico.core import signals
 from indico.modules.events.contributions import Contribution
 from indico.modules.events.sessions.models.blocks import SessionBlock
 from indico.modules.vc.forms import VCPluginSettingsFormBase
-from indico.modules.vc.models.vc_rooms import VCRoomLinkType
+from indico.modules.vc.models.vc_rooms import VCRoomEventAssociation, VCRoomLinkType
 from indico.util.decorators import classproperty
 from indico.web.flask.templating import get_overridable_template_name
 from indico.web.forms.base import FormDefaults
@@ -25,7 +23,7 @@ from indico.web.forms.base import FormDefaults
 PREFIX_RE = re.compile('^vc_')
 
 
-class VCPluginMixin(object):
+class VCPluginMixin:
     settings_form = VCPluginSettingsFormBase
     default_settings = {'notification_emails': []}
     acl_settings = {'acl', 'managers'}
@@ -37,7 +35,7 @@ class VCPluginMixin(object):
     friendly_name = None
 
     def init(self):
-        super(VCPluginMixin, self).init()
+        super().init()
         if not self.name.startswith('vc_'):
             raise Exception('Videoconference plugins must be named vc_*')
         self.connect(signals.users.merged, self._merge_users)
@@ -85,35 +83,41 @@ class VCPluginMixin(object):
         return set(self.settings.get('notification_emails', set()))
 
     def render_form(self, **kwargs):
-        """Renders the videoconference room form
+        """Render the videoconference room form.
+
         :param kwargs: arguments passed to the template
         """
         return render_template('vc/manage_event_create_room.html', **kwargs)
 
     def render_info_box(self, vc_room, event_vc_room, event, **kwargs):
-        """Renders the information shown in the expandable box of a VC room row
+        """Render the information shown in the expandable box of a VC room row.
+
         :param vc_room: the VC room object
         :param event_vc_room: the association of an event and a VC room
         :param event: the event with the current VC room attached to it
         :param kwargs: arguments passed to the template
         """
-        return render_plugin_template('{}:info_box.html'.format(self.name), plugin=self, event_vc_room=event_vc_room,
+        return render_plugin_template(f'{self.name}:info_box.html', plugin=self, event_vc_room=event_vc_room,
                                       event=event, vc_room=vc_room, settings=self.settings, **kwargs)
 
     def render_manage_event_info_box(self, vc_room, event_vc_room, event, **kwargs):
-        """Renders the information shown in the expandable box on a VC room in the management area
+        """
+        Render the information shown in the expandable box on a
+        VC room in the management area.
 
         :param vc_room: the VC room object
         :param event_vc_room: the association of an event and a VC room
         :param event: the event with the current VC room attached to it
         :param kwargs: arguments passed to the template
         """
-        return render_plugin_template('{}:manage_event_info_box.html'.format(self.name), plugin=self,
+        return render_plugin_template(f'{self.name}:manage_event_info_box.html', plugin=self,
                                       event_vc_room=event_vc_room, event=event, vc_room=vc_room,
                                       settings=self.settings, **kwargs)
 
     def render_buttons(self, vc_room, event_vc_room, **kwargs):
-        """Renders a list of plugin specific buttons (eg: Join URL, etc) in the management area
+        """
+        Render a list of plugin specific buttons (eg: Join URL, etc)
+        in the management area.
 
         :param vc_room: the VC room object
         :param event_vc_room: the association of an event and a VC room
@@ -122,8 +126,21 @@ class VCPluginMixin(object):
         name = get_overridable_template_name('management_buttons.html', self, core_prefix='vc/')
         return render_template(name, plugin=self, vc_room=vc_room, event_vc_room=event_vc_room, **kwargs)
 
+    def get_extra_delete_msg(self, vc_room, event_vc_room):
+        """
+        Return a custom message to show in the confirmation dialog
+        when deleting a VC room.
+
+        :param vc_room: the VC room object
+        :param event_vc_room: the association of an event and a VC room
+        :return: a string (may contain HTML) with the message to display
+        """
+        return ''
+
     def render_event_buttons(self, vc_room, event_vc_room, **kwargs):
-        """Renders a list of plugin specific buttons (eg: Join URL, etc) in the event page
+        """
+        Render a list of plugin specific buttons (eg: Join URL, etc)
+        in the event page.
 
         :param vc_room: the VC room object
         :param event_vc_room: the association of an event and a VC room
@@ -134,7 +151,7 @@ class VCPluginMixin(object):
                                event=event_vc_room.event, **kwargs)
 
     def create_form(self, event, existing_vc_room=None, existing_event_vc_room=None):
-        """Creates the videoconference room form
+        """Create the videoconference room form.
 
         :param event: the event the videoconference room is for
         :param existing_vc_room: a vc_room from which to retrieve data for the form
@@ -177,7 +194,7 @@ class VCPluginMixin(object):
         if event_vc_room.data is None:
             event_vc_room.data = {}
 
-    def update_data_vc_room(self, vc_room, data):
+    def update_data_vc_room(self, vc_room, data, is_new=False):
         if 'name' in data:
             vc_room.name = data.pop('name')
 
@@ -187,8 +204,18 @@ class VCPluginMixin(object):
     def create_room(self, vc_room, event):
         raise NotImplementedError('Plugin must implement create_room()')
 
+    def clone_room(self, old_event_vc_room, link_object):
+        """Clone the room, returning a new :class:`VCRoomEventAssociation`.
+
+        :param old_event_vc_room: the original :class:`VCRoomEventAssociation`
+        :param link_object: the new object the association will be tied to
+        :return: the new :class:`VCRoomEventAssociation`
+        """
+        return VCRoomEventAssociation(show=old_event_vc_room.show, data=old_event_vc_room.data,
+                                      link_object=link_object)
+
     def can_manage_vc_rooms(self, user, event):
-        """Checks if a user can manage vc rooms on an event"""
+        """Check if a user can manage vc rooms on an event."""
         if self.can_manage_vc(user):
             return True
 
@@ -197,13 +224,13 @@ class VCPluginMixin(object):
         return self.settings.acls.contains_user('acl', user)
 
     def can_manage_vc_room(self, user, room):
-        """Checks if a user can manage a vc room"""
+        """Check if a user can manage a vc room."""
         return (user.is_admin or
                 self.can_manage_vc(user) or
                 any(evt_assoc.event.can_manage(user) for evt_assoc in room.events))
 
     def can_manage_vc(self, user):
-        """Checks if a user has management rights on this VC system"""
+        """Check if a user has management rights on this VC system."""
         if user.is_admin:
             return True
         return self.settings.acls.contains_user('managers', user)

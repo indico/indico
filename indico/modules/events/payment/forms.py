@@ -1,11 +1,9 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
-
-from __future__ import unicode_literals
 
 from wtforms.fields.core import SelectField
 from wtforms.fields.simple import TextAreaField
@@ -37,7 +35,7 @@ class AdminSettingsForm(IndicoForm):
     conditions = TextAreaField(_('Conditions'), description=CONDITIONS_DESC)
 
     def __init__(self, *args, **kwargs):
-        super(AdminSettingsForm, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self._set_currencies()
 
     def _set_currencies(self):

@@ -1,11 +1,9 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
-
-from __future__ import unicode_literals
 
 from collections import defaultdict
 
@@ -22,7 +20,7 @@ from indico.util.i18n import _
 from indico.web.util import jsonify_template
 
 
-class ManageEventMixin(object):
+class ManageEventMixin:
     ALLOW_LOCKED = False
     PERMISSION = None
 
@@ -38,7 +36,7 @@ class ManageEventMixin(object):
 
 
 class RHManageEventBase(RHEventBase, ManageEventMixin):
-    """Base class for event management RHs"""
+    """Base class for event management RHs."""
 
     DENY_FRAMES = True
 
@@ -47,19 +45,21 @@ class RHManageEventBase(RHEventBase, ManageEventMixin):
 
 
 class RHContributionPersonListMixin:
-    """List of persons somehow related to contributions (co-authors, speakers...)"""
+    """
+    List of persons somehow related to contributions (co-authors, speakers...).
+    """
 
     @property
     def _membership_filter(self):
         raise NotImplementedError
 
     def _process(self):
-        contribution_persons = (ContributionPersonLink
-                                .find(ContributionPersonLink.contribution.has(self._membership_filter))
+        contribution_persons = (ContributionPersonLink.query
+                                .filter(ContributionPersonLink.contribution.has(self._membership_filter))
                                 .all())
-        contribution_persons.extend(SubContributionPersonLink
-                                    .find(SubContributionPersonLink.subcontribution
-                                          .has(SubContribution.contribution.has(self._membership_filter)))
+        contribution_persons.extend(SubContributionPersonLink.query
+                                    .filter(SubContributionPersonLink.subcontribution
+                                            .has(SubContribution.contribution.has(self._membership_filter)))
                                     .all())
 
         registered_persons = get_registered_event_persons(self.event)

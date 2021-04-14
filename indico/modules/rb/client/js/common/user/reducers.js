@@ -1,5 +1,5 @@
 // This file is part of Indico.
-// Copyright (C) 2002 - 2020 CERN
+// Copyright (C) 2002 - 2021 CERN
 //
 // Indico is free software; you can redistribute it and/or
 // modify it under the terms of the MIT License; see the
@@ -8,13 +8,14 @@
 import {combineReducers} from 'redux';
 
 import {requestReducer} from 'indico/utils/redux';
+
 import * as actions from './actions';
 
 const initialUserInfoState = {
   firstName: '',
   lastName: '',
   email: '',
-  avatarBgColor: '',
+  avatarURL: '',
   language: '',
   isAdmin: false,
   isRBAdmin: false,
@@ -52,7 +53,7 @@ export default combineReducers({
           lastName: user.last_name,
           fullName: user.full_name,
           email: user.email,
-          avatarBgColor: user.avatar_bg_color,
+          avatarURL: user.avatar_url,
           language: user.language,
           isAdmin: user.is_admin,
           isRBAdmin: user.is_rb_admin,

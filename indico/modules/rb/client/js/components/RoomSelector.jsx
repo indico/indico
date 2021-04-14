@@ -1,19 +1,22 @@
 // This file is part of Indico.
-// Copyright (C) 2002 - 2020 CERN
+// Copyright (C) 2002 - 2021 CERN
 //
 // Indico is free software; you can redistribute it and/or
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-import _ from 'lodash';
-import React from 'react';
-import PropTypes from 'prop-types';
-import {Button, Dropdown, Grid, Icon, List, Message, Segment} from 'semantic-ui-react';
 import getLocationsURL from 'indico-url:rb.locations';
-import {indicoAxios, handleAxiosError} from 'indico/utils/axios';
+
+import _ from 'lodash';
+import PropTypes from 'prop-types';
+import React from 'react';
+import {Button, Dropdown, Grid, Icon, List, Message, Segment} from 'semantic-ui-react';
+
 import {FinalField} from 'indico/react/forms';
 import {Translate} from 'indico/react/i18n';
+import {indicoAxios, handleAxiosError} from 'indico/utils/axios';
 import {camelizeKeys} from 'indico/utils/case';
+
 import SpriteImage from './SpriteImage';
 
 import './RoomSelector.module.scss';

@@ -1,11 +1,9 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
-
-from __future__ import unicode_literals
 
 import errno
 import json
@@ -18,8 +16,7 @@ from flask_pluginengine import (Plugin, PluginBlueprintMixin, PluginBlueprintSet
 from werkzeug.utils import cached_property
 
 from indico.core import signals
-from indico.core.db import db
-from indico.core.db.sqlalchemy.util.models import import_all_models
+from indico.core.db.sqlalchemy.util.models import get_all_models, import_all_models
 from indico.core.logger import Logger
 from indico.core.settings import SettingsProxy
 from indico.core.webpack import IndicoManifestLoader
@@ -27,8 +24,8 @@ from indico.modules.events.settings import EventSettingsProxy
 from indico.modules.events.static.util import RewrittenManifest
 from indico.modules.users import UserSettingsProxy
 from indico.util.decorators import cached_classproperty, classproperty
+from indico.util.enum import IndicoEnum
 from indico.util.i18n import NullDomain, _
-from indico.util.struct.enum import IndicoEnum
 from indico.web.flask.templating import get_template_module, register_template_hook
 from indico.web.flask.util import url_for, url_rule_to_js
 from indico.web.flask.wrappers import IndicoBlueprint, IndicoBlueprintSetupState
@@ -36,7 +33,7 @@ from indico.web.menu import SideMenuItem
 from indico.web.views import WPJinjaMixin
 
 
-class PluginCategory(unicode, IndicoEnum):
+class PluginCategory(str, IndicoEnum):
     search = _('Search')
     synchronization = _('Synchronization')
     payment = _('Payment')
@@ -44,9 +41,12 @@ class PluginCategory(unicode, IndicoEnum):
     videoconference = _('Videoconference')
     other = _('Other')
 
+    def __str__(self):
+        return self.value
+
 
 class IndicoPlugin(Plugin):
-    """Base class for an Indico plugin
+    """Base class for an Indico plugin.
 
     All your plugins need to inherit from this class. It extends the
     `Plugin` class from Flask-PluginEngine with useful indico-specific
@@ -108,13 +108,13 @@ class IndicoPlugin(Plugin):
         self._import_models()
 
     def _import_models(self):
-        old_models = set(db.Model._decl_class_registry.items())
+        old_models = get_all_models()
         import_all_models(self.package_name)
-        added_models = set(db.Model._decl_class_registry.items()) - old_models
+        added_models = get_all_models() - old_models
         # Ensure that only plugin schemas have been touched. It would be nice if we could actually
         # restrict a plugin to plugin_PLUGNNAME but since we load all models from the plugin's package
         # which could contain more than one plugin this is not easily possible.
-        for name, model in added_models:
+        for model in added_models:
             schema = model.__table__.schema
             # Allow models with non-plugin schema if they specify `polymorphic_identity` without a dedicated table
             if ('polymorphic_identity' in getattr(model, '__mapper_args__', ())
@@ -122,7 +122,7 @@ class IndicoPlugin(Plugin):
                 continue
             if not schema.startswith('plugin_'):
                 raise Exception("Plugin '{}' added a model which is not in a plugin schema ('{}' in '{}')"
-                                .format(self.name, name, schema))
+                                .format(self.name, model.__name__, schema))
 
     def connect(self, signal, receiver, **connect_kwargs):
         connect_kwargs['weak'] = False
@@ -131,29 +131,28 @@ class IndicoPlugin(Plugin):
         signal.connect(func, **connect_kwargs)
 
     def get_blueprints(self):
-        """Return blueprints to be registered on the application
+        """Return blueprints to be registered on the application.
 
         A single blueprint can be returned directly, for multiple blueprint you need
         to yield them or return an iterable.
         """
-        pass
 
     def get_vars_js(self):
-        """Return a dictionary with variables to be added to vars.js file"""
+        """Return a dictionary with variables to be added to vars.js file."""
         return None
 
     @cached_property
     def translation_path(self):
-        """
-        Return translation files to be used by the plugin.
-        By default, get <root_path>/translations, unless it does not exist
+        """Return translation files to be used by the plugin.
+
+        By default, get <root_path>/translations, unless it does not exist.
         """
         translations_path = os.path.join(self.root_path, 'translations')
         return translations_path if os.path.exists(translations_path) else None
 
     @cached_property
     def translation_domain(self):
-        """Return the domain for this plugin's translation_path"""
+        """Return the domain for this plugin's translation_path."""
         path = self.translation_path
         return Domain(path) if path else NullDomain()
 
@@ -161,7 +160,7 @@ class IndicoPlugin(Plugin):
         try:
             loader = IndicoManifestLoader(custom=False)
             return loader.load(os.path.join(self.root_path, 'static', 'dist', 'manifest.json'))
-        except IOError as exc:
+        except OSError as exc:
             if exc.errno != errno.ENOENT:
                 raise
             return None
@@ -178,7 +177,7 @@ class IndicoPlugin(Plugin):
         return self._get_manifest()
 
     def inject_bundle(self, name, view_class=None, subclasses=True, condition=None):
-        """Injects an asset bundle into Indico's pages
+        """Inject an asset bundle into Indico's pages.
 
         :param name: Name of the bundle
         :param view_class: If a WP class is specified, only inject it into pages using that class
@@ -189,7 +188,10 @@ class IndicoPlugin(Plugin):
 
         def _do_inject(sender):
             if condition is None or condition():
-                return self.manifest[name]
+                try:
+                    return self.manifest[name]
+                except TypeError:
+                    raise RuntimeError(f'Assets for plugin {self.name} have not been built')
 
         if view_class is None:
             self.connect(signals.plugin.inject_bundle, _do_inject)
@@ -203,75 +205,78 @@ class IndicoPlugin(Plugin):
             self.connect(signals.plugin.inject_bundle, _func)
 
     def inject_vars_js(self):
-        """Returns a string that will define variables for the plugin in the vars.js file"""
+        """
+        Return a string that will define variables for the plugin in
+        the vars.js file.
+        """
         vars_js = self.get_vars_js()
         if vars_js:
-            return 'var {}Plugin = {};'.format(self.name.title(), json.dumps(vars_js))
+            return f'var {self.name.title()}Plugin = {json.dumps(vars_js)};'
 
     def template_hook(self, name, receiver, priority=50, markup=True):
-        """Registers a function to be called when a template hook is invoked.
+        """Register a function to be called when a template hook is invoked.
 
-        For details see :func:`~indico.web.flask.templating.register_template_hook`
+        For details see :func:`~indico.web.flask.templating.register_template_hook`.
         """
         register_template_hook(name, receiver, priority, markup, self)
 
     @classproperty
     @classmethod
     def logger(cls):
-        return Logger.get('plugin.{}'.format(cls.name))
+        return Logger.get(f'plugin.{cls.name}')
 
     @cached_classproperty
     @classmethod
     def settings(cls):
-        """:class:`SettingsProxy` for the plugin's settings"""
+        """:class:`SettingsProxy` for the plugin's settings."""
         if cls.name is None:
             raise RuntimeError('Plugin has not been loaded yet')
         instance = cls.instance
         with instance.plugin_context():  # in case the default settings come from a property
-            return SettingsProxy('plugin_{}'.format(cls.name), instance.default_settings, cls.strict_settings,
+            return SettingsProxy(f'plugin_{cls.name}', instance.default_settings, cls.strict_settings,
                                  acls=cls.acl_settings, converters=cls.settings_converters)
 
     @cached_classproperty
     @classmethod
     def event_settings(cls):
-        """:class:`EventSettingsProxy` for the plugin's event-specific settings"""
+        """:class:`EventSettingsProxy` for the plugin's event-specific settings."""
         if cls.name is None:
             raise RuntimeError('Plugin has not been loaded yet')
         instance = cls.instance
         with instance.plugin_context():  # in case the default settings come from a property
-            return EventSettingsProxy('plugin_{}'.format(cls.name), instance.default_event_settings,
+            return EventSettingsProxy(f'plugin_{cls.name}', instance.default_event_settings,
                                       cls.strict_settings, acls=cls.acl_event_settings,
                                       converters=cls.event_settings_converters)
 
     @cached_classproperty
     @classmethod
     def user_settings(cls):
-        """:class:`UserSettingsProxy` for the plugin's user-specific settings"""
+        """:class:`UserSettingsProxy` for the plugin's user-specific settings."""
         if cls.name is None:
             raise RuntimeError('Plugin has not been loaded yet')
         instance = cls.instance
         with instance.plugin_context():  # in case the default settings come from a property
-            return UserSettingsProxy('plugin_{}'.format(cls.name), instance.default_user_settings,
+            return UserSettingsProxy(f'plugin_{cls.name}', instance.default_user_settings,
                                      cls.strict_settings, converters=cls.user_settings_converters)
 
 
 def plugin_url_rule_to_js(endpoint):
     """Like :func:`~indico.web.flask.util.url_rule_to_js` but prepending plugin name prefix to the endpoint"""
     if '.' in endpoint[1:]:  # 'foo' or '.foo' should not get the prefix
-        endpoint = 'plugin_{}'.format(endpoint)
+        endpoint = f'plugin_{endpoint}'
     return url_rule_to_js(endpoint)
 
 
 def url_for_plugin(endpoint, *targets, **values):
     """Like :func:`~indico.web.flask.util.url_for` but prepending ``'plugin_'`` to the blueprint name."""
     if '.' in endpoint[1:]:  # 'foo' or '.foo' should not get the prefix
-        endpoint = 'plugin_{}'.format(endpoint)
+        endpoint = f'plugin_{endpoint}'
     return url_for(endpoint, *targets, **values)
 
 
 def get_plugin_template_module(template_name, **context):
     """Like :func:`~indico.web.flask.templating.get_template_module`, but using plugin templates"""
-    template_name = '{}:{}'.format(current_plugin.name, template_name)
+    template_name = f'{current_plugin.name}:{template_name}'
     return get_template_module(template_name, **context)
 
 
@@ -283,9 +288,9 @@ class IndicoPluginBlueprintSetupState(PluginBlueprintSetupStateMixin, IndicoBlue
     def add_url_rule(self, rule, endpoint=None, view_func=None, **options):
         if rule.startswith('/static'):
             with self._unprefixed():
-                super(IndicoPluginBlueprintSetupState, self).add_url_rule(rule, endpoint, view_func, **options)
+                super().add_url_rule(rule, endpoint, view_func, **options)
         else:
-            super(IndicoPluginBlueprintSetupState, self).add_url_rule(rule, endpoint, view_func, **options)
+            super().add_url_rule(rule, endpoint, view_func, **options)
 
 
 class IndicoPluginBlueprint(PluginBlueprintMixin, IndicoBlueprint):

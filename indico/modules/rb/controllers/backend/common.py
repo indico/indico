@@ -1,20 +1,14 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import unicode_literals
-
 from marshmallow_enum import EnumField
 from webargs import fields
 
-from indico.legacy.common.cache import GenericCache
 from indico.modules.rb.models.reservations import RepeatFrequency
-
-
-_cache = GenericCache('Rooms')
 
 
 search_room_args = {

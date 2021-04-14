@@ -1,11 +1,9 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
-
-from __future__ import unicode_literals
 
 from indico.core.db import db
 from indico.core.db.sqlalchemy.attachments import AttachedItemsMixin
@@ -13,7 +11,7 @@ from indico.core.db.sqlalchemy.descriptions import DescriptionMixin, RenderMode
 from indico.core.db.sqlalchemy.notes import AttachedNotesMixin
 from indico.core.db.sqlalchemy.util.queries import increment_and_get
 from indico.util.locators import locator_property
-from indico.util.string import format_repr, return_ascii
+from indico.util.string import format_repr, slugify
 
 
 def _get_next_friendly_id(context):
@@ -27,7 +25,9 @@ def _get_next_friendly_id(context):
 def _get_next_position(context):
     """Get the next menu entry position for the event."""
     contribution_id = context.current_parameters['contribution_id']
-    res = db.session.query(db.func.max(SubContribution.position)).filter_by(contribution_id=contribution_id).one()
+    res = (db.session.query(db.func.max(SubContribution.position))
+           .filter(SubContribution.contribution_id == contribution_id)
+           .one())
     return (res[0] or 0) + 1
 
 
@@ -114,7 +114,7 @@ class SubContribution(DescriptionMixin, AttachedItemsMixin, AttachedNotesMixin, 
         # an extra query to check whether there is an object associated
         # when assigning a new one (e.g. during cloning)
         kwargs.setdefault('note', None)
-        super(SubContribution, self).__init__(**kwargs)
+        super().__init__(**kwargs)
 
     @property
     def event(self):
@@ -130,12 +130,12 @@ class SubContribution(DescriptionMixin, AttachedItemsMixin, AttachedNotesMixin, 
 
     @property
     def session(self):
-        """Convenience property so all event entities have it"""
+        """Convenience property so all event entities have it."""
         return self.contribution.session if self.contribution.session_id is not None else None
 
     @property
     def timetable_entry(self):
-        """Convenience property so all event entities have it"""
+        """Convenience property so all event entities have it."""
         return self.contribution.timetable_entry
 
     @property
@@ -144,7 +144,11 @@ class SubContribution(DescriptionMixin, AttachedItemsMixin, AttachedNotesMixin, 
 
     @speakers.setter
     def speakers(self, value):
-        self.person_links = value.keys()
+        self.person_links = list(value.keys())
+
+    @property
+    def slug(self):
+        return slugify('sc', self.contribution.friendly_id, self.friendly_id, self.title, maxlen=30)
 
     @property
     def location_parent(self):
@@ -156,7 +160,6 @@ class SubContribution(DescriptionMixin, AttachedItemsMixin, AttachedNotesMixin, 
     def get_manager_list(self, recursive=False, include_groups=True):
         return self.contribution.get_manager_list(recursive=recursive, include_groups=include_groups)
 
-    @return_ascii
     def __repr__(self):
         return format_repr(self, 'id', is_deleted=False, _text=self.title)
 

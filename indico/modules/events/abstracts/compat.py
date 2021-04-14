@@ -1,11 +1,9 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
-
-from __future__ import unicode_literals
 
 from flask import redirect
 
@@ -15,6 +13,6 @@ from indico.web.rh import RHSimple
 
 
 @RHSimple.wrap_function
-def compat_abstract(endpoint, confId, friendly_id, track_id=None, management=False):
-    abstract = Abstract.find(event_id=confId, friendly_id=friendly_id).first_or_404()
+def compat_abstract(endpoint, event_id, friendly_id, track_id=None, management=False):
+    abstract = Abstract.query.filter_by(event_id=event_id, friendly_id=friendly_id).first_or_404()
     return redirect(url_for('abstracts.' + endpoint, abstract, management=management))

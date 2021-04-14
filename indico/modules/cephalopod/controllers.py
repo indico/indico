@@ -1,11 +1,9 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
-
-from __future__ import unicode_literals
 
 import platform
 
@@ -67,11 +65,11 @@ class RHCephalopod(RHCephalopodBase):
             elif enabled and not uuid:
                 register_instance(name, email)
         except HTTPError as err:
-            flash(_("Operation failed, the community hub returned: {err.message}").format(err=err), 'error')
+            flash(_("Operation failed, the community hub returned: {err}").format(err=err), 'error')
         except Timeout:
             flash(_("The operation timed-out. Please try again in a while."), 'error')
         except RequestException as err:
-            flash(_("Unexpected exception while contacting the Community Hub: {err.message}").format(err=err))
+            flash(_("Unexpected exception while contacting the Community Hub: {err}").format(err=err))
 
         return redirect(url_for('.index'))
 
@@ -87,12 +85,12 @@ class RHCephalopodSync(RHCephalopodBase):
             try:
                 sync_instance(contact_name, contact_email)
             except HTTPError as err:
-                flash(_("Synchronization failed, the community hub returned: {err.message}").format(err=err),
+                flash(_("Synchronization failed, the community hub returned: {err}").format(err=err),
                       'error')
             except Timeout:
                 flash(_("Synchronization timed-out. Please try again in a while."), 'error')
             except RequestException as err:
-                flash(_("Unexpected exception while contacting the Community Hub: {err.message}").format(err=err))
+                flash(_("Unexpected exception while contacting the Community Hub: {err}").format(err=err))
 
             return redirect(url_for('.index'))
 

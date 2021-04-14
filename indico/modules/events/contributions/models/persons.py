@@ -1,17 +1,15 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import unicode_literals
-
 from indico.core.db.sqlalchemy import PyIntEnum, db
 from indico.modules.events.models.persons import PersonLinkBase
+from indico.util.enum import IndicoEnum
 from indico.util.locators import locator_property
-from indico.util.string import format_repr, return_ascii
-from indico.util.struct.enum import IndicoEnum
+from indico.util.string import format_repr
 
 
 class AuthorType(int, IndicoEnum):
@@ -72,7 +70,6 @@ class ContributionPersonLink(PersonLinkBase):
     def locator(self):
         return dict(self.contribution.locator, person_id=self.id)
 
-    @return_ascii
     def __repr__(self):
         return format_repr(self, 'id', 'person_id', 'contribution_id', is_speaker=False, author_type=AuthorType.none,
                            _text=self.full_name)
@@ -103,6 +100,5 @@ class SubContributionPersonLink(PersonLinkBase):
     # relationship backrefs:
     # - subcontribution (SubContribution.person_links)
 
-    @return_ascii
     def __repr__(self):
         return format_repr(self, 'id', 'person_id', 'subcontribution_id', _text=self.full_name)

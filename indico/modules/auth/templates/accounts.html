@@ -3,6 +3,19 @@
 
 {% block user_content %}
     {% if indico_config.LOCAL_IDENTITIES %}
+        {% if insecure_login_password_error %}
+            {% call message_box('error') %}
+                {% trans %}
+                    The password you used to login is no longer secure:
+                {% endtrans %}
+                <strong>{{ insecure_login_password_error }}</strong>
+                <br>
+                {% trans %}
+                    You need to change your password in order to keep using Indico.
+                {% endtrans %}
+            {% endcall %}
+        {% endif %}
+
         <div class="i-box-group vert">
             <div class="i-box">
                 <div class="i-box-header">
@@ -124,6 +137,11 @@
                                     {% if identity.id == session.login_identity %}
                                         <button class="ui primary tiny button" disabled
                                             title="{% trans %}The account used to log in cannot be unlinked{% endtrans %}">
+                                            {% trans %}Unlink{% endtrans %}
+                                        </button>
+                                    {% elif insecure_login_password_error %}
+                                        <button class="ui primary tiny button" disabled
+                                            title="{% trans %}You need to change your password{% endtrans %}">
                                             {% trans %}Unlink{% endtrans %}
                                         </button>
                                     {% else %}

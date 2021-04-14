@@ -1,14 +1,15 @@
 // This file is part of Indico.
-// Copyright (C) 2002 - 2020 CERN
+// Copyright (C) 2002 - 2021 CERN
 //
 // Indico is free software; you can redistribute it and/or
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
 import _ from 'lodash';
-import React from 'react';
 import PropTypes from 'prop-types';
+import React from 'react';
 import {Dropdown} from 'semantic-ui-react';
+
 import {Translate} from 'indico/react/i18n';
 
 export default function ExtensionList({value, disabled, onChange, onFocus, onBlur}) {

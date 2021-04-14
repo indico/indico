@@ -10,15 +10,25 @@ Web assets such as JavaScript and SCSS files are compiled using `Webpack <https:
 requires NodeJS to be present. You can find information on how to install NodeJS
 `here <https://nodejs.org/en/download/package-manager/>`_.
 
-Do not use the default NodeJS packages from your Linux distribution as they are usually outdated or come wit
+Do not use the default NodeJS packages from your Linux distribution as they are usually outdated or come with
 an outdated npm version.
+
+Since only few Linux distributions include Python 3.9 in their package managers, we recommend installing
+`pyenv <https://github.com/pyenv/pyenv-installer>`_ and then install the latest Python 3.9 version using
+``pyenv install 3.9.1`` (adapt this command in case a newer version is available).
+
+.. tip::
+
+    You can run ``pyenv doctor`` once you installed and enabled pyenv in order to see whether all dependencies are
+    met. There's a good chance that you need to install some additional system packages beyond those listed below, and using
+    this tool will tell you what exactly you need.
 
 CentOS/Fedora
 +++++++++++++
 
 .. code-block:: shell
 
-    yum install -y gcc redis python-devel python-virtualenv libjpeg-turbo-devel libxslt-devel libxml2-devel \
+    yum install -y gcc redis libjpeg-turbo-devel libxslt-devel libxml2-devel \
         libffi-devel pcre-devel libyaml-devel redhat-rpm-config \
         postgresql postgresql-server postgresql-contrib libpq-devel
     systemctl start redis.service postgresql.service
@@ -29,7 +39,7 @@ Debian/Ubuntu
 
 .. code-block:: shell
 
-    apt install -y --install-recommends python-dev python-virtualenv libxslt1-dev libxml2-dev libffi-dev libpcre3-dev \
+    apt install -y --install-recommends libxslt1-dev libxml2-dev libffi-dev libpcre3-dev \
         libyaml-dev build-essential redis-server postgresql libpq-dev
 
 Then on Debian::
@@ -46,14 +56,8 @@ macOS
 
 We recommend that you use `Homebrew <https://brew.sh/>`_::
 
-    brew install python2 redis libjpeg libffi pcre libyaml postgresql
+    brew install redis libjpeg libffi pcre libyaml postgresql
     brew services start postgresql
-    pip install virtualenv
-
-Note: Homebrew dropped support for the python2 formula at the end of 2019.
-As an alternative you can install it directly using the latest commit::
-
-    brew install https://raw.githubusercontent.com/Homebrew/homebrew-core/86a44a0a552c673a05f11018459c9f5faae3becc/Formula/python@2.rb
 
 
 Creating the directory structure
@@ -69,8 +73,17 @@ developers keep all their code inside a ``dev`` or ``code`` dir. We will assume 
 We will need a virtualenv where to run Indico::
 
     cd ~/dev/indico
-    virtualenv env -p /usr/bin/python2.7
+    pyenv local 3.9.1
+    python -m venv env
 
+.. note::
+
+    After setting the version with pyenv, it's a good idea to use ``python -V`` to ensure you are really running that
+    particular Python version; depending on the shell you may need to restart your shell first. In case you installed
+    a newer version than 3.9.1 earlier, adapt the pyenv command accordingly.
+
+
+.. _cloning:
 
 Cloning Indico
 --------------
@@ -103,8 +116,8 @@ unnecessarily. This is why we advise that you include a fake SMTP server in your
 `Maildump <https://github.com/ThiefMaster/maildump>`_ does exactly this and runs on Python. It should be quite simple
 to set up::
 
-    virtualenv maildump -p /usr/bin/python2.7
-    ./maildump/bin/pip install -U pip setuptools
+    python -m venv maildump
+    ./maildump/bin/pip install -U pip setuptools wheel
     ./maildump/bin/pip install maildump
     ./maildump/bin/maildump -p /tmp/maildump.pid
 
@@ -122,17 +135,18 @@ Creating the DB
     createdb indico -T indico_template
 
 
+.. _configuring-dev:
+
 Configuring
 -----------
 
 Let's get into the Indico virtualenv::
 
     source ./env/bin/activate
-    pip install -U pip setuptools
+    pip install -U pip setuptools wheel
 
     cd src
-    pip install -r requirements.dev.txt
-    pip install -e .
+    pip install -e '.[dev]'
     npm ci
 
 Then, follow the instructions given by the wizard::

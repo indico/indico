@@ -1,11 +1,9 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
-
-from __future__ import unicode_literals
 
 import re
 
@@ -15,6 +13,7 @@ from marshmallow_enum import EnumField
 from sqlalchemy import func
 
 from indico.core.marshmallow import mm
+from indico.modules.categories.models.roles import CategoryRole
 from indico.modules.events.contributions.models.contributions import Contribution
 from indico.modules.events.contributions.schemas import ContributionSchema
 from indico.modules.events.editing.models.comments import EditingRevisionComment
@@ -24,14 +23,25 @@ from indico.modules.events.editing.models.review_conditions import EditingReview
 from indico.modules.events.editing.models.revision_files import EditingRevisionFile
 from indico.modules.events.editing.models.revisions import EditingRevision, InitialRevisionState
 from indico.modules.events.editing.models.tags import EditingTag
+from indico.modules.events.util import get_all_user_roles
 from indico.modules.users import User
 from indico.util.caching import memoize_request
+from indico.util.enum import IndicoEnum
 from indico.util.i18n import _
 from indico.util.marshmallow import PrincipalList, not_empty
 from indico.util.string import natural_sort_key
-from indico.util.struct.enum import IndicoEnum
 from indico.web.flask.util import url_for
 from indico.web.forms.colors import get_sui_colors
+
+
+def _get_anonymous_user():
+    return {
+        'identifier': 'AnonymousUser',
+        'avatar_url': url_for('assets.avatar'),
+        'id': -1,
+        'full_name': 'Someone',
+        'anonymous': True,
+    }
 
 
 class RevisionStateSchema(mm.Schema):
@@ -46,13 +56,13 @@ class EditableStateSchema(mm.Schema):
     css_class = fields.String()
 
 
-class EditingUserSchema(mm.ModelSchema):
+class EditingUserSchema(mm.SQLAlchemyAutoSchema):
     class Meta:
         model = User
-        fields = ('id', 'avatar_bg_color', 'full_name', 'identifier')
+        fields = ('id', 'full_name', 'identifier', 'avatar_url')
 
 
-class EditingFileTypeSchema(mm.ModelSchema):
+class EditingFileTypeSchema(mm.SQLAlchemyAutoSchema):
     class Meta:
         model = EditingFileType
         fields = ('id', 'name', 'extensions', 'allow_multiple_files', 'required', 'publishable', 'is_used',
@@ -72,7 +82,7 @@ class EditingFileTypeSchema(mm.ModelSchema):
         return data
 
 
-class EditingTagSchema(mm.ModelSchema):
+class EditingTagSchema(mm.SQLAlchemyAutoSchema):
     class Meta:
         model = EditingTag
         fields = (
@@ -91,7 +101,7 @@ class EditingTagSchema(mm.ModelSchema):
         return data
 
 
-class EditingRevisionFileSchema(mm.ModelSchema):
+class EditingRevisionFileSchema(mm.SQLAlchemyAutoSchema):
     class Meta:
         model = EditingRevisionFile
         fields = ('uuid', 'filename', 'size', 'content_type', 'file_type', 'download_url', 'external_download_url')
@@ -104,7 +114,14 @@ class EditingRevisionFileSchema(mm.ModelSchema):
     external_download_url = fields.String()
 
 
-class EditingRevisionCommentSchema(mm.ModelSchema):
+class EditingRevisionSignedFileSchema(EditingRevisionFileSchema):
+    class Meta(EditingRevisionFileSchema.Meta):
+        fields = ('uuid', 'filename', 'size', 'content_type', 'file_type', 'signed_download_url')
+
+    signed_download_url = fields.String(attribute='file.signed_download_url')
+
+
+class EditingRevisionCommentSchema(mm.SQLAlchemyAutoSchema):
     class Meta:
         model = EditingRevisionComment
         fields = ('id', 'user', 'created_dt', 'modified_dt', 'internal', 'system', 'text', 'html', 'can_modify',
@@ -116,13 +133,20 @@ class EditingRevisionCommentSchema(mm.ModelSchema):
     can_modify = fields.Function(lambda comment, ctx: comment.can_modify(ctx.get('user')))
     modify_comment_url = fields.Function(lambda comment: url_for('event_editing.api_edit_comment', comment))
 
+    @post_dump(pass_original=True)
+    def anonymize_user(self, data, orig, **kwargs):
+        can_see_editor_names_fn = self.context.get('can_see_editor_names')
+        if can_see_editor_names_fn and data['user'] and not can_see_editor_names_fn(self.context['user'], orig.user):
+            data['user'] = _get_anonymous_user()
+        return data
 
-class EditingRevisionSchema(mm.ModelSchema):
+
+class EditingRevisionSchema(mm.SQLAlchemyAutoSchema):
     class Meta:
         model = EditingRevision
         fields = ('id', 'created_dt', 'submitter', 'editor', 'files', 'comment', 'comment_html', 'comments',
-                  'initial_state', 'final_state', 'tags', 'create_comment_url', 'download_files_url', 'review_url',
-                  'confirm_url')
+                  'initial_state', 'final_state', 'tags', 'create_comment_url', 'download_files_url',
+                  'review_url', 'confirm_url', 'custom_actions', 'custom_action_url')
 
     comment_html = fields.Function(lambda rev: escape(rev.comment))
     submitter = fields.Nested(EditingUserSchema)
@@ -136,6 +160,8 @@ class EditingRevisionSchema(mm.ModelSchema):
     download_files_url = fields.Function(lambda revision: url_for('event_editing.revision_files_export', revision))
     review_url = fields.Function(lambda revision: url_for('event_editing.api_review_editable', revision))
     confirm_url = fields.Method('_get_confirm_url')
+    custom_action_url = fields.Function(lambda revision: url_for('event_editing.api_custom_action', revision))
+    custom_actions = fields.Function(lambda revision, ctx: ctx.get('custom_actions', {}).get(revision, []))
 
     def _get_confirm_url(self, revision):
         if revision.initial_state == InitialRevisionState.needs_submitter_confirmation and not revision.final_state:
@@ -151,8 +177,22 @@ class EditingRevisionSchema(mm.ModelSchema):
         data['tags'].sort(key=lambda tag: natural_sort_key(tag['verbose_title']))
         return data
 
+    @post_dump(pass_original=True)
+    def anonymize_users(self, data, orig, **kwargs):
+        can_see_editor_names_fn = self.context.get('can_see_editor_names')
+        if can_see_editor_names_fn:
+            if data['editor'] and not can_see_editor_names_fn(self.context['user'], orig.editor):
+                data['editor'] = _get_anonymous_user()
+            if data['submitter'] and not can_see_editor_names_fn(self.context['user'], orig.submitter):
+                data['submitter'] = _get_anonymous_user()
+        return data
 
-class EditableSchema(mm.ModelSchema):
+
+class EditingRevisionSignedSchema(EditingRevisionSchema):
+    files = fields.List(fields.Nested(EditingRevisionSignedFileSchema))
+
+
+class EditableSchema(mm.SQLAlchemyAutoSchema):
     class Meta:
         model = Editable
         fields = ('id', 'type', 'editor', 'revisions', 'contribution', 'can_comment', 'review_conditions_valid',
@@ -177,8 +217,20 @@ class EditableSchema(mm.ModelSchema):
     editing_enabled = fields.Boolean()
     state = fields.Nested(EditableStateSchema)
 
+    @post_dump(pass_original=True)
+    def anonymize_editor(self, data, orig, **kwargs):
+        can_see_editor_names_fn = self.context.get('can_see_editor_names')
+        if can_see_editor_names_fn and data['editor'] and not can_see_editor_names_fn(self.context['user']):
+            data['editor'] = _get_anonymous_user()
+        return data
 
-class EditableBasicSchema(mm.ModelSchema):
+
+class EditableDumpSchema(EditableSchema):
+    class Meta(EditableSchema.Meta):
+        fields = [f for f in EditableSchema.Meta.fields if not f.startswith('can_')]
+
+
+class EditableBasicSchema(mm.SQLAlchemyAutoSchema):
     class Meta:
         model = Editable
         fields = ('id', 'type', 'state', 'editor', 'timeline_url', 'revision_count')
@@ -188,7 +240,7 @@ class EditableBasicSchema(mm.ModelSchema):
     timeline_url = fields.String()
 
 
-class EditingEditableListSchema(mm.ModelSchema):
+class EditingEditableListSchema(mm.SQLAlchemyAutoSchema):
     class Meta:
         model = Contribution
         fields = ('id', 'friendly_id', 'title', 'code', 'editable')
@@ -203,7 +255,7 @@ class EditingEditableListSchema(mm.ModelSchema):
         return EditableBasicSchema().dump(editable)
 
 
-class FilteredEditableSchema(mm.ModelSchema):
+class FilteredEditableSchema(mm.SQLAlchemyAutoSchema):
     class Meta:
         model = Editable
         fields = ('contribution_id', 'contribution_title', 'contribution_code', 'contribution_friendly_id',
@@ -240,7 +292,7 @@ class ReviewEditableArgs(mm.Schema):
     comment = fields.String(missing='')
 
     @validates_schema(skip_on_field_errors=True)
-    def validate_everything(self, data):
+    def validate_everything(self, data, **kwargs):
         if data['action'] != EditingReviewAction.accept and not data['comment']:
             raise ValidationError('This field is required', 'comment')
 
@@ -260,7 +312,7 @@ class EditableTagArgs(mm.Schema):
     system = fields.Bool(missing=False)
 
     @validates('code')
-    def _check_for_unique_tag_code(self, code):
+    def _check_for_unique_tag_code(self, code, **kwargs):
         event = self.context['event']
         tag = self.context['tag']
         query = EditingTag.query.with_parent(event).filter(func.lower(EditingTag.code) == code.lower())
@@ -270,7 +322,7 @@ class EditableTagArgs(mm.Schema):
             raise ValidationError(_('Tag code must be unique'))
 
     @validates('system')
-    def _check_only_services_set_system_tags(self, value):
+    def _check_only_services_set_system_tags(self, value, **kwargs):
         if value and not self.context['is_service_call']:
             raise ValidationError('Only custom editing workflows can set system tags')
 
@@ -287,7 +339,7 @@ class EditableFileTypeArgs(mm.Schema):
     publishable = fields.Boolean()
 
     @validates('name')
-    def _check_for_unique_file_type_name(self, name):
+    def _check_for_unique_file_type_name(self, name, **kwargs):
         event = self.context['event']
         file_type = self.context['file_type']
         editable_type = self.context['editable_type']
@@ -300,18 +352,18 @@ class EditableFileTypeArgs(mm.Schema):
             raise ValidationError(_('Name must be unique'))
 
     @validates('filename_template')
-    def _check_for_correct_filename_template(self, template):
+    def _check_for_correct_filename_template(self, template, **kwargs):
         if template is not None and '.' in template:
             raise ValidationError(_('Filename template cannot include dots'))
 
     @validates('extensions')
-    def _check_for_correct_extensions_format(self, extensions):
+    def _check_for_correct_extensions_format(self, extensions, **kwargs):
         for extension in extensions:
             if re.match(r'^[*.]+', extension):
                 raise ValidationError(_('Extensions cannot have leading dots'))
 
     @validates('publishable')
-    def _check_if_can_unset_or_delete(self, publishable):
+    def _check_if_can_unset_or_delete(self, publishable, **kwargs):
         event = self.context['event']
         file_type = self.context['file_type']
         editable_type = self.context['editable_type']
@@ -333,7 +385,7 @@ class EditingReviewConditionArgs(mm.Schema):
     file_types = fields.List(fields.Int(), required=True, validate=not_empty)
 
     @validates('file_types')
-    def _validate_file_types(self, file_types):
+    def _validate_file_types(self, file_types, **kwargs):
         editable_type = self.context['editable_type']
         event = self.context['event']
         event_file_types = {ft.id for ft in event.editing_file_types}
@@ -363,3 +415,56 @@ class EditableTypePrincipalsSchema(mm.Schema):
         rh_context = ('event',)
 
     principals = PrincipalList(many=True, allow_event_roles=True, allow_category_roles=True)
+
+
+class ReviewCommentSchema(mm.Schema):
+    text = fields.String(required=True)
+    internal = fields.Boolean(missing=False)
+
+
+class RoleSchema(mm.Schema):
+    name = fields.String()
+    code = fields.String()
+    source = fields.Method('_get_source')
+
+    def _get_source(self, role):
+        return 'category' if isinstance(role, CategoryRole) else 'event'
+
+
+class ServiceUserSchema(mm.SQLAlchemyAutoSchema):
+    class Meta:
+        model = User
+        fields = ('id', 'full_name', 'email', 'roles', 'manager', 'submitter', 'editor')
+
+    roles = fields.Method('_get_roles')
+    manager = fields.Function(lambda user, ctx: ctx['editable'].event.can_manage(user, 'editing_manager'))
+    submitter = fields.Function(lambda user, ctx: ctx['editable'].can_perform_submitter_actions(user))
+    editor = fields.Function(lambda user, ctx: ctx['editable'].can_perform_editor_actions(user))
+
+    def _get_roles(self, user):
+        event = self.context['editable'].event
+        event_roles, category_roles = get_all_user_roles(event, user)
+        roles = RoleSchema(many=True).dump(event_roles | category_roles)
+        return sorted(roles, key=lambda r: (r['source'], r['code']))
+
+
+class ServiceReviewEditableSchema(mm.Schema):
+    publish = fields.Boolean(missing=True)
+    comment = fields.String()
+    comments = fields.List(fields.Nested(ReviewCommentSchema))
+    tags = fields.List(fields.Int())
+
+
+class ServiceActionSchema(mm.Schema):
+    name = fields.String(required=True)
+    title = fields.String(required=True)
+    color = fields.String(missing=None)
+    icon = fields.String(missing=None)
+    confirm = fields.String(missing=None)
+
+
+class ServiceActionResultSchema(mm.Schema):
+    publish = fields.Boolean()
+    comments = fields.List(fields.Nested(ReviewCommentSchema))
+    tags = fields.List(fields.Int())
+    redirect = fields.String()

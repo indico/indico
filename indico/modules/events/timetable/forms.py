@@ -1,11 +1,9 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
-
-from __future__ import unicode_literals
 
 from datetime import datetime, timedelta
 
@@ -30,7 +28,7 @@ from indico.web.forms.validators import HiddenUnless, MaxDuration
 from indico.web.forms.widgets import SwitchWidget
 
 
-class EntryFormMixin(object):
+class EntryFormMixin:
     _entry_type = None
     _default_duration = None
     _display_fields = None
@@ -52,11 +50,11 @@ class EntryFormMixin(object):
                 else:
                     defaults.duration = self._default_duration
                 kwargs['obj'] = defaults
-        super(EntryFormMixin, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
     @property
     def data(self):
-        data = super(EntryFormMixin, self).data
+        data = super().data
         del data['time']
         return data
 
@@ -106,7 +104,7 @@ class ContributionEntryForm(EntryFormMixin, ContributionForm):
 
     def __init__(self, *args, **kwargs):
         kwargs['to_schedule'] = kwargs.get('to_schedule', True)
-        super(ContributionEntryForm, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
     @property
     def _default_duration(self):
@@ -126,7 +124,7 @@ class SessionBlockEntryForm(EntryFormMixin, SessionBlockForm):
                 raise ValidationError(_("This duration is too short to fit the entries within."))
 
     def validate_duration(self, field):
-        super(SessionBlockEntryForm, self).validate_duration(field)
+        super().validate_duration(field)
         if self.session_block and self.start_dt.data:
             self._validate_duration(self.session_block.timetable_entry, field, self.start_dt)
 
@@ -138,10 +136,10 @@ class BaseEntryForm(EntryFormMixin, IndicoForm):
     def __init__(self, *args, **kwargs):
         self.entry = kwargs.pop('entry')
         self._entry_type = self.entry.type
-        super(BaseEntryForm, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
     def validate_duration(self, field):
-        super(BaseEntryForm, self).validate_duration(field)
+        super().validate_duration(field)
         if self.entry.type == TimetableEntryType.SESSION_BLOCK and self.entry.children:
             SessionBlockEntryForm._validate_duration(self.entry, field, self.start_dt)
 

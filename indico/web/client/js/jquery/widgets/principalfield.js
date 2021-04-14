@@ -1,5 +1,5 @@
 // This file is part of Indico.
-// Copyright (C) 2002 - 2020 CERN
+// Copyright (C) 2002 - 2021 CERN
 //
 // Indico is free software; you can redistribute it and/or
 // modify it under the terms of the MIT License; see the
@@ -95,28 +95,6 @@
       self.people = _.sortBy(self.people, 'name');
       self.options.onAdd(self.people);
       self._update();
-    },
-
-    choose: function choose() {
-      var self = this;
-      function handle(people) {
-        self.add(people);
-      }
-      var userChoosePopup = new ChooseUsersPopup(
-        $T('Choose person'),
-        true,
-        self.options.eventId,
-        self.options.enableGroupsTab,
-        self.options.showFavoriteUsers,
-        self.options.suggestedUsers,
-        !self.options.multiChoice,
-        true,
-        false,
-        handle,
-        null,
-        self.options.allowExternalUsers
-      );
-      userChoosePopup.execute();
     },
 
     edit: function edit(personId) {

@@ -1,11 +1,9 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
-
-from __future__ import unicode_literals
 
 from flask import jsonify, request, session
 from werkzeug.exceptions import BadRequest
@@ -19,7 +17,7 @@ from indico.web.util import jsonify_data
 
 
 class RHManageRegFormSectionBase(RHManageRegFormBase):
-    """Base class for a specific registration form section"""
+    """Base class for a specific registration form section."""
 
     normalize_url_spec = {
         'locators': {
@@ -33,7 +31,7 @@ class RHManageRegFormSectionBase(RHManageRegFormBase):
 
 
 class RHRegistrationFormAddSection(RHManageRegFormBase):
-    """Add a section to the registration form"""
+    """Add a section to the registration form."""
 
     def _process(self):
         section = RegistrationFormSection(registration_form=self.regform)
@@ -47,7 +45,7 @@ class RHRegistrationFormAddSection(RHManageRegFormBase):
 
 
 class RHRegistrationFormModifySection(RHManageRegFormSectionBase):
-    """Delete/modify a section"""
+    """Delete/modify a section."""
 
     def _process_DELETE(self):
         if self.section.type == RegistrationFormItemType.section_pd:
@@ -59,9 +57,9 @@ class RHRegistrationFormModifySection(RHManageRegFormSectionBase):
 
     def _process_PATCH(self):
         changes = request.json['changes']
-        if set(changes.viewkeys()) > {'title', 'description'}:
+        if set(changes.keys()) > {'title', 'description'}:
             raise BadRequest
-        for field, value in changes.iteritems():
+        for field, value in changes.items():
             setattr(self.section, field, value)
         db.session.flush()
         logger.info('Section %s modified by %s: %s', self.section, session.user, changes)
@@ -69,7 +67,7 @@ class RHRegistrationFormModifySection(RHManageRegFormSectionBase):
 
 
 class RHRegistrationFormToggleSection(RHManageRegFormSectionBase):
-    """Enable/disable a section"""
+    """Enable/disable a section."""
 
     def _process_POST(self):
         enabled = request.args.get('enable') == 'true'
@@ -86,7 +84,7 @@ class RHRegistrationFormToggleSection(RHManageRegFormSectionBase):
 
 
 class RHRegistrationFormMoveSection(RHManageRegFormSectionBase):
-    """Move a section within the registration form"""
+    """Move a section within the registration form."""
 
     def _process(self):
         new_position = request.json['endPos'] + 1
@@ -103,8 +101,11 @@ class RHRegistrationFormMoveSection(RHManageRegFormSectionBase):
                 return (old_position < section.position <= new_position and section.id != self.section.id
                         and not section.is_deleted and section.is_enabled)
             start_enum = self.section.position
-        to_update = filter(fn, RegistrationFormSection.find(registration_form=self.regform, is_deleted=False)
-                                                      .order_by(RegistrationFormSection.position).all())
+        to_update = list(filter(fn,
+                                RegistrationFormSection.query
+                                .filter_by(registration_form=self.regform, is_deleted=False)
+                                .order_by(RegistrationFormSection.position)
+                                .all()))
         self.section.position = new_position
         for pos, section in enumerate(to_update, start_enum):
             section.position = pos

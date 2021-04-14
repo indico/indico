@@ -11,7 +11,7 @@
 {% endblock %}
 
 {% block subtitle %}
-    #{{registration.friendly_id}}: {{registration.first_name}} {{ registration.last_name }}
+    #{{ registration.friendly_id }}: {{ registration.first_name }} {{ registration.last_name }}
 {% endblock %}
 
 {% block content %}
@@ -21,7 +21,7 @@
         <div ng-app="nd" ng-controller="AppCtrl">
             {% block regform %}
                 <div nd-reg-form
-                     conf-id="{{ event.id }}"
+                     event-id="{{ event.id }}"
                      conf-sections="{{ sections | tojson | forceescape }}"
                      conf-currency="{{ registration.currency }}"
                      post-url="{{ request.url | tojson | forceescape }}"
@@ -41,6 +41,8 @@
                 {% trans %}The modification period is over{% endtrans %}
             {%- elif registration.registration_form.modification_mode.name == 'allowed_until_payment' -%}
                 {% trans %}Modification is not allowed after payment.{% endtrans %}
+            {%- elif registration.registration_form.modification_mode.name == 'allowed_until_approved' -%}
+                {% trans %}Modification is not allowed once approved.{% endtrans %}
             {%- else -%}
                 {% trans %}The event organizer has disabled data modification.{% endtrans %}
             {%- endif %}

@@ -1,11 +1,9 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
-
-from __future__ import unicode_literals
 
 from collections import defaultdict
 from operator import attrgetter
@@ -27,7 +25,6 @@ from indico.modules.events.timetable.models.entries import TimetableEntry, Timet
 from indico.util.caching import memoize_request
 from indico.util.date_time import format_time, get_day_end, iterdays
 from indico.util.i18n import _
-from indico.util.string import to_unicode
 from indico.web.flask.templating import get_template_module
 from indico.web.forms.colors import get_colors
 
@@ -58,9 +55,10 @@ def _query_blocks(event_ids, dates_overlap, detail_level='session'):
     else:
         options.append(contains_eager(SessionBlock.timetable_entry))
 
-    return (SessionBlock.find(~Session.is_deleted,
-                              Session.event_id.in_(event_ids),
-                              dates_overlap(TimetableEntry))
+    return (SessionBlock.query
+            .filter(~Session.is_deleted,
+                    Session.event_id.in_(event_ids),
+                    dates_overlap(TimetableEntry))
             .options(*options)
             .join(TimetableEntry)
             .join(Session))
@@ -88,7 +86,7 @@ def find_latest_entry_end_dt(obj, day=None):
             raise ValueError("Day specified for session block.")
         entries = obj.timetable_entry.children
     else:
-        raise ValueError("Invalid object type {}".format(type(obj)))
+        raise ValueError(f"Invalid object type {type(obj)}")
     return max(entries, key=attrgetter('end_dt')).end_dt if entries else None
 
 
@@ -119,7 +117,7 @@ def find_next_start_dt(duration, obj, day=None, force=False):
         earliest_dt = obj.timetable_entry.start_dt
         latest_dt = obj.timetable_entry.end_dt
     else:
-        raise ValueError("Invalid object type {}".format(type(obj)))
+        raise ValueError(f"Invalid object type {type(obj)}")
     max_duration = latest_dt - earliest_dt
     if duration > max_duration:
         return earliest_dt if force else None
@@ -171,7 +169,8 @@ def get_category_timetable(categ_ids, start_dt, end_dt, detail_level='event', tz
 
     # then, retrieve detailed information about the events
     event_ids = set(items)
-    query = (Event.find(Event.id.in_(event_ids))
+    query = (Event.query
+             .filter(Event.id.in_(event_ids))
              .options(subqueryload(Event.person_links).joinedload(EventPersonLink.person),
                       joinedload(Event.own_room).noload('owner'),
                       joinedload(Event.own_venue),
@@ -195,7 +194,7 @@ def get_category_timetable(categ_ids, start_dt, end_dt, detail_level='event', tz
                     else:
                         ongoing_events.append(e)
             else:
-                for start_d, start_dts in items[e.id].viewitems():
+                for start_d, start_dts in items[e.id].items():
                     scheduled_events[start_d].append((start_dts[0], e))
         else:
             events.append(e)
@@ -225,9 +224,10 @@ def get_category_timetable(categ_ids, start_dt, end_dt, detail_level='event', tz
                 result[b.session.event_id]['blocks'].append(b)
 
     if detail_level == 'contribution':
-        query = (Contribution.find(Contribution.event_id.in_(event_ids),
-                                   dates_overlap(TimetableEntry),
-                                   ~Contribution.is_deleted)
+        query = (Contribution.query
+                 .filter(Contribution.event_id.in_(event_ids),
+                         dates_overlap(TimetableEntry),
+                         ~Contribution.is_deleted)
                  .options(contains_eager(Contribution.timetable_entry),
                           joinedload(Contribution.person_links))
                  .join(TimetableEntry))
@@ -239,7 +239,8 @@ def get_category_timetable(categ_ids, start_dt, end_dt, detail_level='event', tz
             for c in query:
                 result[c.event_id]['contributions'].append(c)
 
-        query = (Break.find(TimetableEntry.event_id.in_(event_ids), dates_overlap(TimetableEntry))
+        query = (Break.query
+                 .filter(TimetableEntry.event_id.in_(event_ids), dates_overlap(TimetableEntry))
                  .options(contains_eager(Break.timetable_entry))
                  .join(TimetableEntry))
         if grouped:
@@ -286,7 +287,7 @@ def render_session_timetable(session, timetable_layout=None, management=False):
 
 
 def get_session_block_entries(event, day):
-    """Returns a list of event top-level session blocks for the given `day`"""
+    """Return a list of event top-level session blocks for the given `day`."""
     return (event.timetable_entries
             .filter(db.cast(TimetableEntry.start_dt.astimezone(event.tzinfo), db.Date) == day.date(),
                     TimetableEntry.type == TimetableEntryType.SESSION_BLOCK)
@@ -294,7 +295,7 @@ def get_session_block_entries(event, day):
 
 
 def shift_following_entries(entry, shift, session_=None):
-    """Reschedules entries starting after the given entry by the given shift."""
+    """Reschedule entries starting after the given entry by the given shift."""
     query = entry.siblings_query.filter(TimetableEntry.start_dt >= entry.end_dt)
     if session_ and not entry.parent:
         query.filter(TimetableEntry.type == TimetableEntryType.SESSION_BLOCK,
@@ -307,7 +308,7 @@ def shift_following_entries(entry, shift, session_=None):
 
 
 def get_timetable_offline_pdf_generator(event):
-    from indico.legacy.pdfinterface.conference import TimeTablePlain, TimetablePDFFormat
+    from indico.legacy.pdfinterface.conference import TimetablePDFFormat, TimeTablePlain
     pdf_format = TimetablePDFFormat()
     return TimeTablePlain(event, session.user, sortingCrit=None, ttPDFFormat=pdf_format, pagesize='A4',
                           fontsize='normal')
@@ -315,7 +316,7 @@ def get_timetable_offline_pdf_generator(event):
 
 def get_time_changes_notifications(changes, tzinfo, entry=None):
     notifications = []
-    for obj, change in changes.iteritems():
+    for obj, change in changes.items():
         if entry:
             if entry.object == obj:
                 continue
@@ -341,7 +342,7 @@ def get_time_changes_notifications(changes, tzinfo, entry=None):
             else:
                 raise ValueError("Invalid change in session block.")
         if msg:
-            notifications.append(msg.format(to_unicode(format_time(new_time, timezone=tzinfo))))
+            notifications.append(msg.format(format_time(new_time, timezone=tzinfo)))
     return notifications
 
 

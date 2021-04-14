@@ -1,11 +1,9 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
-
-from __future__ import absolute_import, unicode_literals
 
 from wtforms import TextAreaField
 
@@ -34,6 +32,6 @@ class IndicoMarkdownField(TextAreaField):
             # WMD relies on this awful ID :/
             kwargs['id'] = 'wmd-input-f_' + orig_id
         else:
-            kwargs.setdefault('description', _(u"You can use Markdown or basic HTML formatting tags."))
-        super(IndicoMarkdownField, self).__init__(*args, **kwargs)
+            kwargs.setdefault('description', _("You can use Markdown or basic HTML formatting tags."))
+        super().__init__(*args, **kwargs)
         self.orig_id = orig_id

@@ -1,11 +1,9 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
-
-from __future__ import unicode_literals
 
 import posixpath
 
@@ -14,9 +12,9 @@ from indico.core.db import db
 from indico.core.db.sqlalchemy import PyIntEnum, UTCDateTime
 from indico.core.storage import StoredFileMixin
 from indico.util.date_time import now_utc
+from indico.util.enum import RichIntEnum
 from indico.util.i18n import _
-from indico.util.string import format_repr, return_ascii, strict_unicode
-from indico.util.struct.enum import RichIntEnum
+from indico.util.string import format_repr, strict_str
 
 
 class StaticSiteState(RichIntEnum):
@@ -91,15 +89,14 @@ class StaticSite(StoredFileMixin, db.Model):
 
     @property
     def locator(self):
-        return {'confId': self.event_id, 'id': self.id}
+        return {'event_id': self.event_id, 'id': self.id}
 
     def _build_storage_path(self):
-        path_segments = ['event', strict_unicode(self.event.id), 'static']
+        path_segments = ['event', strict_str(self.event.id), 'static']
         self.assign_id()
-        filename = '{}-{}'.format(self.id, self.filename)
+        filename = f'{self.id}-{self.filename}'
         path = posixpath.join(*(path_segments + [filename]))
         return config.STATIC_SITE_STORAGE, path
 
-    @return_ascii
     def __repr__(self):
         return format_repr(self, 'id', 'event_id', 'state')

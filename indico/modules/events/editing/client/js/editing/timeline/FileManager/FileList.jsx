@@ -1,18 +1,20 @@
 // This file is part of Indico.
-// Copyright (C) 2002 - 2020 CERN
+// Copyright (C) 2002 - 2021 CERN
 //
 // Indico is free software; you can redistribute it and/or
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-import React, {useContext, useCallback, useState} from 'react';
 import PropTypes from 'prop-types';
+import React, {useContext, useCallback, useState} from 'react';
 import {useDropzone} from 'react-dropzone';
 import {Icon} from 'semantic-ui-react';
+
 import {TooltipIfTruncated} from 'indico/react/components';
 import {uploadFile, deleteFile} from 'indico/react/components/files/util';
-import {FileManagerContext, filePropTypes, uploadFiles, fileTypePropTypes} from './util';
+
 import * as actions from './actions';
+import {FileManagerContext, filePropTypes, uploadFiles, fileTypePropTypes} from './util';
 
 import './FileManager.module.scss';
 

@@ -1,11 +1,9 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
-
-from __future__ import unicode_literals
 
 import posixpath
 
@@ -14,7 +12,7 @@ from indico.core.db import db
 from indico.core.storage.models import StoredFileMixin
 from indico.util.fs import secure_filename
 from indico.util.locators import locator_property
-from indico.util.string import format_repr, return_ascii, strict_unicode, text_to_repr
+from indico.util.string import format_repr, strict_str, text_to_repr
 
 
 class PaperFile(StoredFileMixin, db.Model):
@@ -64,9 +62,8 @@ class PaperFile(StoredFileMixin, db.Model):
         paper = kwargs.pop('paper', None)
         if paper:
             kwargs.setdefault('_contribution', paper.contribution)
-        super(PaperFile, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
-    @return_ascii
     def __repr__(self):
         return format_repr(self, 'id', '_contribution_id', content_type=None, _text=text_to_repr(self.filename))
 
@@ -84,8 +81,8 @@ class PaperFile(StoredFileMixin, db.Model):
 
     def _build_storage_path(self):
         self.assign_id()
-        path_segments = ['event', strict_unicode(self._contribution.event.id), 'papers',
-                         '{}_{}'.format(self.id, strict_unicode(self._contribution.id))]
+        path_segments = ['event', strict_str(self._contribution.event.id), 'papers',
+                         f'{self.id}_{strict_str(self._contribution.id)}']
         filename = secure_filename(self.filename, 'paper')
         path = posixpath.join(*(path_segments + [filename]))
         return config.ATTACHMENT_STORAGE, path

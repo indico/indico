@@ -1,11 +1,9 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
-
-from __future__ import unicode_literals
 
 import pytest
 
@@ -106,7 +104,7 @@ def test_get_event_person_edit(db, dummy_event, dummy_user):
         'familyName': 'Doe',
         'affiliation': 'ACME Inc.'
     }
-    person_1 = get_event_person(dummy_event, dict(data, _type='Avatar', id=dummy_user.id))
+    person_1 = get_event_person(dummy_event, dict(data, _type='Avatar', identifier=f'User:{dummy_user.id}'))
     assert person_1.id is None
     assert person_1.user == dummy_user
     db.session.add(person_1)

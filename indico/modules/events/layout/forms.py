@@ -1,11 +1,9 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
-
-from __future__ import unicode_literals
 
 from wtforms.fields import BooleanField, SelectField, TextAreaField
 from wtforms.fields.html5 import URLField
@@ -30,12 +28,12 @@ THEMES = [('', _('No theme selected')),
 
 
 def _get_timetable_theme_choices(event):
-    it = ((tid, data['title']) for tid, data in theme_settings.get_themes_for(event.type).viewitems())
+    it = ((tid, data['title']) for tid, data in theme_settings.get_themes_for(event.type).items())
     return sorted(it, key=lambda x: x[1].lower())
 
 
 def _get_conference_theme_choices():
-    plugin_themes = [(k, v[1]) for k, v in get_plugin_conference_themes().iteritems()]
+    plugin_themes = [(k, v[1]) for k, v in get_plugin_conference_themes().items()]
     return THEMES + sorted(plugin_themes, key=lambda x: x[1].lower())
 
 
@@ -60,7 +58,7 @@ class LoggedLayoutForm(IndicoForm):
 
     @property
     def log_fields_metadata(self):
-        return {k: self.build_field_metadata(v) for k, v in self._fields.iteritems()}
+        return {k: self.build_field_metadata(v) for k, v in self._fields.items()}
 
 
 class ConferenceLayoutForm(LoggedLayoutForm):
@@ -102,7 +100,7 @@ class ConferenceLayoutForm(LoggedLayoutForm):
 
     def __init__(self, *args, **kwargs):
         self.event = kwargs.pop('event')
-        super(ConferenceLayoutForm, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self.timetable_theme.choices = [('', _('Default'))] + _get_timetable_theme_choices(self.event)
         self.theme.choices = _get_conference_theme_choices()
 
@@ -118,7 +116,7 @@ class LectureMeetingLayoutForm(LoggedLayoutForm):
 
     def __init__(self, *args, **kwargs):
         event = kwargs.pop('event')
-        super(LectureMeetingLayoutForm, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self.timetable_theme.choices = _get_timetable_theme_choices(event)
 
 
@@ -133,7 +131,7 @@ class CSSForm(IndicoForm):
                                  get_metadata=get_css_file_data, handle_flashes=True)
 
     def __init__(self, *args, **kwargs):
-        super(CSSForm, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self.css_file.description = _("If you want to fully customize your conference page you can create your own "
                                       "stylesheet and upload it. An example stylesheet can be downloaded "
                                       "<a href='{base_url}/standard.css' target='_blank'>here</a>."
@@ -147,7 +145,7 @@ class MenuBuiltinEntryForm(IndicoForm):
 
     def __init__(self, *args, **kwargs):
         entry = kwargs.pop('entry')
-        super(MenuBuiltinEntryForm, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self.custom_title.description = _("If you customize the title, that title is used regardless of the user's "
                                           "language preference.  The default title <strong>{title}</strong> is "
                                           "displayed in the user's language.").format(title=entry.default_data.title)
@@ -182,7 +180,7 @@ class CSSSelectionForm(IndicoForm):
 
     def __init__(self, *args, **kwargs):
         event = kwargs.pop('event')
-        super(CSSSelectionForm, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self.theme.choices = _get_conference_theme_choices()
         if event.has_stylesheet:
             custom = [('_custom', _("Custom CSS file ({name})").format(name=event.stylesheet_metadata['filename']))]

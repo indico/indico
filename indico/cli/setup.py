@@ -1,11 +1,9 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
-
-from __future__ import unicode_literals
 
 import os
 import re
@@ -13,6 +11,7 @@ import shutil
 import socket
 import sys
 from operator import attrgetter
+from pathlib import Path
 from smtplib import SMTP
 
 import click
@@ -20,10 +19,8 @@ from click import wrap_text
 from flask.helpers import get_root_path
 from pkg_resources import iter_entry_points
 from prompt_toolkit import prompt
-from prompt_toolkit.contrib.completers import PathCompleter, WordCompleter
-from prompt_toolkit.layout.lexers import SimpleLexer
-from prompt_toolkit.styles import style_from_dict
-from prompt_toolkit.token import Token
+from prompt_toolkit.completion import PathCompleter, WordCompleter
+from prompt_toolkit.styles import Style
 from pytz import all_timezones, common_timezones
 from redis import RedisError, StrictRedis
 from sqlalchemy import create_engine
@@ -35,9 +32,6 @@ from werkzeug.urls import url_parse
 from indico.core.db.sqlalchemy.util.models import import_all_models
 from indico.util.console import cformat
 from indico.util.string import validate_email
-
-
-click.disable_unicode_literals_warning = True
 
 
 def _echo(msg=''):
@@ -81,25 +75,25 @@ def _get_dirs(target_dir):
     return get_root_path('indico'), os.path.abspath(target_dir)
 
 
-PROMPT_TOOLKIT_STYLE = style_from_dict({
-    Token.HELP: '#aaaaaa',
-    Token.PROMPT: '#5f87ff',
-    Token.DEFAULT: '#dfafff',
-    Token.BRACKET: '#ffffff',
-    Token.COLON: '#ffffff',
-    Token.INPUT: '#aaffaa',
+PROMPT_TOOLKIT_STYLE = Style.from_dict({
+    'help': '#aaaaaa',
+    'prompt': '#5f87ff',
+    'default': '#dfafff',
+    'bracket': '#ffffff',
+    'colon': '#ffffff',
+    '': '#aaffaa',  # user input
 })
 
 
 def _prompt(message, default='', path=False, list_=None, required=True, validate=None, allow_invalid=False,
             password=False, help=None):
-    def _get_prompt_tokens(cli):
+    def _get_prompt_tokens():
         rv = [
-            (Token.PROMPT, message),
-            (Token.COLON, ': '),
+            ('class:prompt', message),
+            ('class:colon', ': '),
         ]
         if first and help:
-            rv.insert(0, (Token.HELP, wrap_text(help) + '\n'))
+            rv.insert(0, ('class:help', wrap_text(help) + '\n'))
         return rv
 
     completer = None
@@ -114,8 +108,8 @@ def _prompt(message, default='', path=False, list_=None, required=True, validate
     first = True
     while True:
         try:
-            rv = prompt(get_prompt_tokens=_get_prompt_tokens, default=default, is_password=password,
-                        completer=completer, lexer=SimpleLexer(Token.INPUT), style=PROMPT_TOOLKIT_STYLE)
+            rv = prompt(_get_prompt_tokens(), default=default, is_password=password,
+                        completer=completer, style=PROMPT_TOOLKIT_STYLE)
         except (EOFError, KeyboardInterrupt):
             sys.exit(1)
         # pasting a multiline string works even with multiline disabled :(
@@ -136,22 +130,22 @@ def _prompt(message, default='', path=False, list_=None, required=True, validate
 
 
 def _confirm(message, default=False, abort=False, help=None):
-    def _get_prompt_tokens(cli):
+    def _get_prompt_tokens():
         rv = [
-            (Token.PROMPT, message),
-            (Token.BRACKET, ' ['),
-            (Token.DEFAULT, 'Y/n' if default else 'y/N'),
-            (Token.BRACKET, ']'),
-            (Token.COLON, ': '),
+            ('class:prompt', message),
+            ('class:bracket', ' ['),
+            ('class:default', 'Y/n' if default else 'y/N'),
+            ('class:bracket', ']'),
+            ('class:colon', ': '),
         ]
         if first and help:
-            rv.insert(0, (Token.HELP, wrap_text(help) + '\n'))
+            rv.insert(0, ('class:help', wrap_text(help) + '\n'))
         return rv
 
     first = True
     while True:
         try:
-            rv = prompt(get_prompt_tokens=_get_prompt_tokens, lexer=SimpleLexer(Token.INPUT),
+            rv = prompt(_get_prompt_tokens(),
                         completer=WordCompleter(['yes', 'no'], ignore_case=True, sentence=True),
                         style=PROMPT_TOOLKIT_STYLE)
         except (EOFError, KeyboardInterrupt):
@@ -175,12 +169,12 @@ def _confirm(message, default=False, abort=False, help=None):
 
 @click.group()
 def cli():
-    """This script helps with the initial steps of installing Indico"""
+    """This script helps with the initial steps of installing Indico."""
 
 
 @cli.command()
 def list_plugins():
-    """Lists the available indico plugins."""
+    """List the available Indico plugins."""
     import_all_models()
     table_data = [['Name', 'Title']]
     for ep in sorted(iter_entry_points('indico.plugins'), key=attrgetter('name')):
@@ -193,7 +187,7 @@ def list_plugins():
 @cli.command()
 @click.argument('target_dir')
 def create_symlinks(target_dir):
-    """Creates useful symlinks to run Indico from a webserver.
+    """Create useful symlinks to run Indico from a webserver.
 
     This lets you use static paths for the WSGI file and the htdocs
     folder so you do not need to update your webserver config when
@@ -207,7 +201,7 @@ def create_symlinks(target_dir):
 @cli.command()
 @click.argument('target_dir')
 def create_logging_config(target_dir):
-    """Creates the default logging config file for Indico.
+    """Create the default logging config file for Indico.
 
     If a file already exists it is left untouched. This command is
     usually only used when doing a fresh indico installation when
@@ -220,11 +214,11 @@ def create_logging_config(target_dir):
 @cli.command()
 @click.option('--dev', is_flag=True)
 def wizard(dev):
-    """Runs a setup wizard to configure Indico from scratch."""
+    """Run a setup wizard to configure Indico from scratch."""
     SetupWizard().run(dev=dev)
 
 
-class SetupWizard(object):
+class SetupWizard:
     def __init__(self):
         self._missing_dirs = set()
         self.root_path = None
@@ -273,7 +267,7 @@ class SetupWizard(object):
             sys.exit(1)
 
     def _check_venv(self):
-        if not hasattr(sys, 'real_prefix'):
+        if sys.prefix == sys.base_prefix:
             _warn('It looks like you are not using a virtualenv. This is unsupported and strongly discouraged.')
             _prompt_abort()
 
@@ -286,7 +280,6 @@ class SetupWizard(object):
                 # we want to go up a level since the data dir should not be
                 # created inside the source directory
                 default_root = os.path.dirname(default_root)
-            default_root = default_root.decode(sys.getfilesystemencoding())
         else:
             default_root = '/opt/indico'
         self.root_path = _prompt('Indico root path', default=default_root, path=True,
@@ -300,7 +293,7 @@ class SetupWizard(object):
         if not sys.prefix.startswith(self.root_path + '/'):
             _warn('It is recommended to have the virtualenv inside the root directory, e.g. {}/.venv'
                   .format(self.root_path))
-            _warn('The virtualenv is currently located in {}'.format(sys.prefix))
+            _warn(f'The virtualenv is currently located in {sys.prefix}')
             _prompt_abort()
         self.data_root_path = os.path.join(self.root_path, 'data') if dev else self.root_path
 
@@ -352,7 +345,7 @@ class SetupWizard(object):
                 return False
             return True
 
-        default_url = ('http://127.0.0.1:8000' if dev else 'https://{}'.format(socket.getfqdn()))
+        default_url = ('http://127.0.0.1:8000' if dev else f'https://{socket.getfqdn()}')
         url = _prompt('Indico URL', validate=_check_url, allow_invalid=True,
                       default=default_url,
                       help='Indico needs to know the URL through which it is accessible. '
@@ -367,7 +360,7 @@ class SetupWizard(object):
                 engine.connect().close()
             except OperationalError as exc:
                 if not silent:
-                    _warn('Invalid database URI: ' + unicode(exc.orig).strip())
+                    _warn('Invalid database URI: ' + str(exc.orig).strip())
                 return False
             else:
                 return True
@@ -389,7 +382,7 @@ class SetupWizard(object):
             try:
                 client.ping()
             except RedisError as exc:
-                _warn('Invalid redis URI: ' + unicode(exc))
+                _warn('Invalid redis URI: ' + str(exc))
                 return False
             else:
                 return True
@@ -454,7 +447,7 @@ class SetupWizard(object):
                                 help=('Indico needs an SMTP server to send emails.' if first else None))
             if smtp_host != default_smtp_host:
                 default_smtp_port = _get_default_smtp(smtp_host)[1]
-            smtp_port = int(_prompt('SMTP port', default=unicode(default_smtp_port or 25)))
+            smtp_port = int(_prompt('SMTP port', default=str(default_smtp_port or 25)))
             smtp_user = _prompt('SMTP username', default=smtp_user, required=False,
                                 help=('If your SMTP server requires authentication, '
                                       'enter the username now.' if first else None))
@@ -469,7 +462,7 @@ class SetupWizard(object):
                     smtp.login(smtp_user, smtp_password)
                 smtp.quit()
             except Exception as exc:
-                _warn('SMTP connection failed: ' + unicode(exc))
+                _warn('SMTP connection failed: ' + str(exc))
                 if not click.confirm('Keep these settings anyway?'):
                     default_smtp_host = smtp_host
                     default_smtp_port = smtp_port
@@ -483,7 +476,8 @@ class SetupWizard(object):
     def _prompt_defaults(self):
         def _get_all_locales():
             # get all directories in indico/translations
-            return os.walk(os.path.join(get_root_path('indico'), 'translations')).next()[1]
+            root = Path(get_root_path('indico')) / 'translations'
+            return [ent.name for ent in root.iterdir() if ent.is_dir()]
 
         def _get_system_timezone():
             candidates = []
@@ -498,7 +492,7 @@ class SetupWizard(object):
             # as e.g. https://stackoverflow.com/a/12523283/298479 suggests
             # since this is ambiguous and we rather have the user type their
             # timezone if we don't have a very likely match.
-            return next((unicode(tz) for tz in candidates if tz in common_timezones), '')
+            return next((str(tz) for tz in candidates if tz in common_timezones), '')
 
         self.default_locale = _prompt('Default locale', default='en_GB', list_=_get_all_locales(),
                                       help='Specify the default language/locale used by Indico.')
@@ -541,44 +535,43 @@ class SetupWizard(object):
             create_config_link = False
 
         config_data = [
-            b'# General settings',
-            b'SQLALCHEMY_DATABASE_URI = {!r}'.format(self.db_uri.encode('utf-8')),
-            b'SECRET_KEY = {!r}'.format(os.urandom(32)),
-            b'BASE_URL = {!r}'.format(self.indico_url.encode('utf-8')),
-            b'CELERY_BROKER = {!r}'.format(self.redis_uri_celery.encode('utf-8')),
-            b'REDIS_CACHE_URL = {!r}'.format(self.redis_uri_cache.encode('utf-8')),
-            b"CACHE_BACKEND = 'redis'",
-            b'DEFAULT_TIMEZONE = {!r}'.format(self.default_timezone.encode('utf-8')),
-            b'DEFAULT_LOCALE = {!r}'.format(self.default_locale.encode('utf-8')),
-            b'ENABLE_ROOMBOOKING = {!r}'.format(self.rb_active),
-            b'CACHE_DIR = {!r}'.format(os.path.join(self.data_root_path, 'cache').encode('utf-8')),
-            b'TEMP_DIR = {!r}'.format(os.path.join(self.data_root_path, 'tmp').encode('utf-8')),
-            b'LOG_DIR = {!r}'.format(os.path.join(self.data_root_path, 'log').encode('utf-8')),
-            b'STORAGE_BACKENDS = {!r}'.format({k.encode('utf-8'): v.encode('utf-8')
-                                              for k, v in storage_backends.iteritems()}),
-            b"ATTACHMENT_STORAGE = 'default'",
-            b'ROUTE_OLD_URLS = True' if self.old_archive_dir else None,
-            b'',
-            b'# Email settings',
-            b'SMTP_SERVER = {!r}'.format((self.smtp_host.encode('utf-8'), self.smtp_port)),
-            b'SMTP_USE_TLS = {!r}'.format(bool(self.smtp_user and self.smtp_password)),
-            b'SMTP_LOGIN = {!r}'.format(self.smtp_user.encode('utf-8')),
-            b'SMTP_PASSWORD = {!r}'.format(self.smtp_password.encode('utf-8')),
-            b'SUPPORT_EMAIL = {!r}'.format(self.admin_email.encode('utf-8')),
-            b'PUBLIC_SUPPORT_EMAIL = {!r}'.format(self.contact_email.encode('utf-8')),
-            b'NO_REPLY_EMAIL = {!r}'.format(self.noreply_email.encode('utf-8'))
+            '# General settings',
+            f'SQLALCHEMY_DATABASE_URI = {self.db_uri!r}',
+            f'SECRET_KEY = {os.urandom(32)!r}',
+            f'BASE_URL = {self.indico_url!r}',
+            f'CELERY_BROKER = {self.redis_uri_celery!r}',
+            f'REDIS_CACHE_URL = {self.redis_uri_cache!r}',
+            f'DEFAULT_TIMEZONE = {self.default_timezone!r}',
+            f'DEFAULT_LOCALE = {self.default_locale!r}',
+            f'ENABLE_ROOMBOOKING = {self.rb_active!r}',
+            'CACHE_DIR = {!r}'.format(os.path.join(self.data_root_path, 'cache')),
+            'TEMP_DIR = {!r}'.format(os.path.join(self.data_root_path, 'tmp')),
+            'LOG_DIR = {!r}'.format(os.path.join(self.data_root_path, 'log')),
+            'STORAGE_BACKENDS = {!r}'.format({k: v
+                                              for k, v in storage_backends.items()}),
+            "ATTACHMENT_STORAGE = 'default'",
+            'ROUTE_OLD_URLS = True' if self.old_archive_dir else None,
+            '',
+            '# Email settings',
+            f'SMTP_SERVER = {(self.smtp_host, self.smtp_port)!r}',
+            f'SMTP_USE_TLS = {bool(self.smtp_user and self.smtp_password)!r}',
+            f'SMTP_LOGIN = {self.smtp_user!r}',
+            f'SMTP_PASSWORD = {self.smtp_password!r}',
+            f'SUPPORT_EMAIL = {self.admin_email!r}',
+            f'PUBLIC_SUPPORT_EMAIL = {self.contact_email!r}',
+            f'NO_REPLY_EMAIL = {self.noreply_email!r}'
         ]
 
         if dev:
             config_data += [
-                b'',
-                b'# Development options',
-                b'DB_LOG = True',
-                b'DEBUG = True',
-                b'SMTP_USE_CELERY = False'
+                '',
+                '# Development options',
+                'DB_LOG = True',
+                'DEBUG = True',
+                'SMTP_USE_CELERY = False'
             ]
 
-        config = b'\n'.join(x for x in config_data if x is not None)
+        config = '\n'.join(x for x in config_data if x is not None)
 
         if dev:
             if not os.path.exists(self.data_root_path):
@@ -590,8 +583,8 @@ class SetupWizard(object):
             os.mkdir(path)
 
         _echo(cformat('%{magenta}Creating %{magenta!}{}%{reset}%{magenta}').format(self.config_path))
-        with open(self.config_path, 'wb') as f:
-            f.write(config + b'\n')
+        with open(self.config_path, 'w') as f:
+            f.write(config + '\n')
 
         package_root = get_root_path('indico')
         _copy(os.path.normpath(os.path.join(package_root, 'logging.yaml.sample')),

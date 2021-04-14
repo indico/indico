@@ -1,11 +1,9 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
-
-from __future__ import unicode_literals
 
 from copy import deepcopy
 
@@ -14,8 +12,8 @@ from wtforms.validators import DataRequired, Optional
 from indico.modules.events.registration.models.registrations import RegistrationData
 
 
-class RegistrationFormFieldBase(object):
-    """Base class for a registration form field definition"""
+class RegistrationFormFieldBase:
+    """Base class for a registration form field definition."""
 
     #: unique name of the field type
     name = None
@@ -39,7 +37,7 @@ class RegistrationFormFieldBase(object):
 
     @property
     def validators(self):
-        """Returns a list of validators for this field"""
+        """Return a list of validators for this field."""
         return None
 
     @property
@@ -47,7 +45,7 @@ class RegistrationFormFieldBase(object):
         return None
 
     def calculate_price(self, reg_data, versioned_data):
-        """Calculates the price of the field
+        """Calculate the price of the field.
 
         :param reg_data: The user data for the field
         :param versioned_data: The versioned field data to use
@@ -56,7 +54,7 @@ class RegistrationFormFieldBase(object):
 
     def create_sql_filter(self, data_list):
         """
-        Creates a SQL criterion to check whether the field's value is
+        Create a SQL criterion to check whether the field's value is
         in `data_list`.  The function is expected to return an
         operation on ``Registrationdata.data``.
         """
@@ -94,7 +92,7 @@ class RegistrationFormFieldBase(object):
 
     @classmethod
     def process_field_data(cls, data, old_data=None, old_versioned_data=None):
-        """Processes the settings of the field.
+        """Process the settings of the field.
 
         :param data: The field data from the client
         :param old_data: The old unversioned field data (if available)
@@ -105,8 +103,8 @@ class RegistrationFormFieldBase(object):
         data = dict(data)
         if 'places_limit' in data:
             data['places_limit'] = int(data['places_limit']) if data['places_limit'] else 0
-        versioned_data = {k: v for k, v in data.iteritems() if k in cls.versioned_data_fields}
-        unversioned_data = {k: v for k, v in data.iteritems() if k not in cls.versioned_data_fields}
+        versioned_data = {k: v for k, v in data.items() if k in cls.versioned_data_fields}
+        unversioned_data = {k: v for k, v in data.items() if k not in cls.versioned_data_fields}
         return unversioned_data, versioned_data
 
     @classmethod
@@ -118,7 +116,7 @@ class RegistrationFormFieldBase(object):
         return self.unprocess_field_data(self.form_item.versioned_data, self.form_item.data)
 
     def get_friendly_data(self, registration_data, for_humans=False, for_search=False):
-        """Return the data contained in the field
+        """Return the data contained in the field.
 
         If for_humans is True, return a human-readable string representation.
         If for_search is True, return a string suitable for comparison in search.
@@ -126,13 +124,13 @@ class RegistrationFormFieldBase(object):
         return registration_data.data
 
     def iter_placeholder_info(self):
-        yield None, 'Value of "{}" ({})'.format(self.form_item.title, self.form_item.parent.title)
+        yield None, f'Value of "{self.form_item.title}" ({self.form_item.parent.title})'
 
     def render_placeholder(self, data, key=None):
         return self.get_friendly_data(data)
 
     def get_places_used(self):
-        """Returns the number of used places for the field"""
+        """Return the number of used places for the field."""
         return 0
 
 
@@ -142,7 +140,7 @@ class RegistrationFormBillableField(RegistrationFormFieldBase):
         data = deepcopy(data)
         data.setdefault('is_billable', False)
         data['price'] = float(data['price']) if data.get('price') else 0
-        return super(RegistrationFormBillableField, cls).process_field_data(data, old_data, old_versioned_data)
+        return super().process_field_data(data, old_data, old_versioned_data)
 
     def calculate_price(self, reg_data, versioned_data):
         return versioned_data.get('price', 0) if versioned_data.get('is_billable') else 0
@@ -152,13 +150,13 @@ class RegistrationFormBillableField(RegistrationFormFieldBase):
             new_data_version = self.form_item.current_data
         if billable_items_locked and old_data.price != self.calculate_price(value, new_data_version.versioned_data):
             return {}
-        return super(RegistrationFormBillableField, self).process_form_data(registration, value, old_data)
+        return super().process_form_data(registration, value, old_data)
 
 
 class RegistrationFormBillableItemsField(RegistrationFormBillableField):
     @classmethod
     def process_field_data(cls, data, old_data=None, old_versioned_data=None):
-        unversioned_data, versioned_data = super(RegistrationFormBillableItemsField, cls).process_field_data(
+        unversioned_data, versioned_data = super().process_field_data(
             data, old_data, old_versioned_data)
         # we don't have field-level billing data here
         del versioned_data['is_billable']

@@ -1,11 +1,9 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
-
-from __future__ import unicode_literals
 
 from flask import session
 
@@ -29,9 +27,9 @@ connect_log_signals()
 @signals.users.merged.connect
 def _merge_users(target, source, **kwargs):
     from indico.modules.attachments.models.attachments import Attachment, AttachmentFile
-    from indico.modules.attachments.models.principals import AttachmentPrincipal, AttachmentFolderPrincipal
-    Attachment.find(user_id=source.id).update({Attachment.user_id: target.id})
-    AttachmentFile.find(user_id=source.id).update({AttachmentFile.user_id: target.id})
+    from indico.modules.attachments.models.principals import AttachmentFolderPrincipal, AttachmentPrincipal
+    Attachment.query.filter_by(user_id=source.id).update({Attachment.user_id: target.id})
+    AttachmentFile.query.filter_by(user_id=source.id).update({AttachmentFile.user_id: target.id})
     AttachmentPrincipal.merge_users(target, source, 'attachment')
     AttachmentFolderPrincipal.merge_users(target, source, 'folder')
 
@@ -59,3 +57,8 @@ def _extend_category_management_menu(sender, category, **kwargs):
 def _get_attachment_cloner(sender, **kwargs):
     from indico.modules.attachments.clone import AttachmentCloner
     return AttachmentCloner
+
+
+@signals.import_tasks.connect
+def _import_tasks(sender, **kwargs):
+    import indico.modules.attachments.tasks  # noqa: F401

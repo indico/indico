@@ -1,15 +1,17 @@
 // This file is part of Indico.
-// Copyright (C) 2002 - 2020 CERN
+// Copyright (C) 2002 - 2021 CERN
 //
 // Indico is free software; you can redistribute it and/or
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-import _ from 'lodash';
-import React from 'react';
-import PropTypes from 'prop-types';
-import {Header, Grid, Placeholder} from 'semantic-ui-react';
 import getRoomStatsDataURL from 'indico-url:rb.room_stats';
+
+import _ from 'lodash';
+import PropTypes from 'prop-types';
+import React from 'react';
+import {Header, Grid, Placeholder} from 'semantic-ui-react';
+
 import {Translate, Param, PluralTranslate, Singular, Plural} from 'indico/react/i18n';
 import {indicoAxios, handleAxiosError} from 'indico/utils/axios';
 import {camelizeKeys} from 'indico/utils/case';

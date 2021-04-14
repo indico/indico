@@ -1,5 +1,5 @@
 // This file is part of Indico.
-// Copyright (C) 2002 - 2020 CERN
+// Copyright (C) 2002 - 2021 CERN
 //
 // Indico is free software; you can redistribute it and/or
 // modify it under the terms of the MIT License; see the
@@ -211,23 +211,6 @@ watchType.load = function(target, object) {
   }
   return target;
 };
-
-/**
- * Attaches watch getters created from the properties from the object to the target and returns the object.
- * @param {Object} target
- * @param {Array} properties
- * @param {WatchObject} [object]
- * @return {WatchObject}
- */
-function mixWatchGetters(target, properties, object) {
-  if (!exists(object)) {
-    object = new WatchObject();
-  }
-  iterate(properties, function(property) {
-    target[property] = object.getter(property);
-  });
-  return object;
-}
 
 /**
  * Attaches watch accessors created from the properties from the object to the target and returns the object.

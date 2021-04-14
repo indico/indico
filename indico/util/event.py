@@ -1,5 +1,5 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
@@ -10,7 +10,7 @@ from indico.core.db import db
 
 def uniqueId(obj):
     if isinstance(obj, db.m.Contribution):
-        return '{}.{}'.format(obj.event_id, obj.legacy_mapping.legacy_contribution_id if obj.legacy_mapping else obj.id)
+        return f'{obj.event_id}.{obj.legacy_mapping.legacy_contribution_id if obj.legacy_mapping else obj.id}'
     elif isinstance(obj, db.m.SubContribution):
         return '{}.{}.{}'.format(
             obj.event.id,
@@ -18,16 +18,16 @@ def uniqueId(obj):
             obj.legacy_mapping.legacy_subcontribution_id if obj.legacy_mapping else obj.id
         )
     elif isinstance(obj, db.m.Session):
-        return '{}.s{}'.format(obj.event_id, obj.legacy_mapping.legacy_session_id if obj.legacy_mapping else obj.id)
+        return f'{obj.event_id}.s{obj.legacy_mapping.legacy_session_id if obj.legacy_mapping else obj.id}'
     elif isinstance(obj, db.m.SessionBlock):
         return '{}.s{}.{}'.format(obj.event.id,
                                   obj.legacy_mapping.legacy_session_id if obj.legacy_mapping else obj.session.id,
                                   obj.legacy_mapping.legacy_session_block_id if obj.legacy_mapping else obj.id)
     elif isinstance(obj, db.m.EventNote):
-        return '{}.n{}'.format(uniqueId(obj.object), obj.id)
+        return f'{uniqueId(obj.object)}.n{obj.id}'
     else:
-        # XXX: anything besides Conference/Event?! probably not..
-        return obj.getId() if hasattr(obj, 'getId') else obj.id
+        # XXX: anything besides Event?! probably not..
+        return obj.id
 
 
 def truncate_path(full_path, chars=30, skip_first=True):

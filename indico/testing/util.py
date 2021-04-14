@@ -1,5 +1,5 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
@@ -7,11 +7,11 @@
 
 import operator
 import re
-from itertools import imap, product
+from itertools import product
 
 
 def bool_matrix(template, mask=None, expect=None):
-    """Creates a boolean matrix suitable for parametrized tests.
+    """Create a boolean matrix suitable for parametrized tests.
 
     This function lets you create a boolean matrix with certain columns being
     fixed to a static value or certain combinations being skipped. It also adds
@@ -76,8 +76,8 @@ def bool_matrix(template, mask=None, expect=None):
         mask = '.' * len(template)
 
     mapping = {'0': False, '1': True, '.': None}
-    template = tuple(imap(mapping.__getitem__, template))
-    mask = tuple(imap(mapping.__getitem__, mask))
+    template = tuple(map(mapping.__getitem__, template))
+    mask = tuple(map(mapping.__getitem__, mask))
     # full truth table
     iterable = product((True, False), repeat=len(template))
     if exclude_all:
@@ -109,7 +109,7 @@ def bool_matrix(template, mask=None, expect=None):
 
 
 def extract_emails(smtp, required=True, count=None, one=False, regex=False, **kwargs):
-    """Extracts emails from an smtp outbox.
+    """Extract emails from an smtp outbox.
 
     :param smtp: The `smtp` fixture from the testcase
     :param required: Fail if no matching emails were found
@@ -126,7 +126,7 @@ def extract_emails(smtp, required=True, count=None, one=False, regex=False, **kw
     compare = re.search if regex else operator.eq
     found = []
     for mail in smtp.outbox:
-        for header, value in kwargs.iteritems():
+        for header, value in kwargs.items():
             if not compare(value, mail[header]):
                 break
         else:  # everything matched
@@ -137,14 +137,14 @@ def extract_emails(smtp, required=True, count=None, one=False, regex=False, **kw
     if required:
         assert found, 'No matching emails found'
     if count is not None:
-        assert len(found) == count, 'Expected {} emails, got {}'.format(count, len(found))
+        assert len(found) == count, f'Expected {count} emails, got {len(found)}'
     if one:
         return found[0] if found else None
     return found
 
 
 def extract_logs(caplog, required=True, count=None, one=False, regex=False, **kwargs):
-    """Extracts log records from python's logging system.
+    """Extract log records from python's logging system.
 
     :param caplog: The `caplog` fixture from the testcase
     :param required: Fail if no matching records were found
@@ -161,7 +161,7 @@ def extract_logs(caplog, required=True, count=None, one=False, regex=False, **kw
     compare = re.search if regex else operator.eq
     found = []
     for record in caplog.handler.records:
-        for key, value in kwargs.iteritems():
+        for key, value in kwargs.items():
             if not compare(value, getattr(record, key)):
                 break
         else:  # everything matched
@@ -172,7 +172,7 @@ def extract_logs(caplog, required=True, count=None, one=False, regex=False, **kw
     if required:
         assert found, 'No matching records found'
     if count is not None:
-        assert len(found) == count, 'Expected {} records, got {}'.format(count, len(found))
+        assert len(found) == count, f'Expected {count} records, got {len(found)}'
     if one:
         return found[0] if found else None
     return found

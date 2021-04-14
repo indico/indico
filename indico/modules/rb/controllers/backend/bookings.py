@@ -1,11 +1,9 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
-
-from __future__ import unicode_literals
 
 import uuid
 from datetime import date, datetime, time
@@ -17,11 +15,11 @@ from marshmallow_enum import EnumField
 from werkzeug.exceptions import Forbidden, NotFound
 
 from indico.core import signals
+from indico.core.cache import make_scoped_cache
 from indico.core.db import db
 from indico.core.db.sqlalchemy.links import LinkType
 from indico.core.db.sqlalchemy.util.queries import db_dates_overlap
 from indico.core.errors import NoReportError
-from indico.legacy.common.cache import GenericCache
 from indico.modules.rb import rb_settings
 from indico.modules.rb.controllers import RHRoomBookingBase
 from indico.modules.rb.controllers.backend.common import search_room_args
@@ -49,7 +47,7 @@ from indico.web.util import ExpectedError
 NUM_SUGGESTIONS = 5
 
 
-_export_cache = GenericCache('bookings-export')
+_export_cache = make_scoped_cache('bookings-export')
 
 
 class RHTimeline(RHRoomBookingBase):
@@ -63,16 +61,18 @@ class RHTimeline(RHRoomBookingBase):
         'end_dt': fields.DateTime(required=True),
         'repeat_frequency': EnumField(RepeatFrequency, missing='NEVER'),
         'repeat_interval': fields.Int(missing=1),
-        'room_ids': fields.List(fields.Int(), missing=[]),
         'skip_conflicts_with': fields.List(fields.Int(), missing=None),
         'admin_override_enabled': fields.Bool(missing=False)
+    }, location='query')
+    @use_kwargs({
+        'room_ids': fields.List(fields.Int(), missing=[]),
     })
     def _process(self, room_ids, **kwargs):
         rooms = [self.room] if self.room else Room.query.filter(Room.id.in_(room_ids), ~Room.is_deleted).all()
         date_range, availability = get_rooms_availability(rooms, **kwargs)
         date_range = [dt.isoformat() for dt in date_range]
 
-        for data in availability.viewvalues():
+        for data in availability.values():
             # add additional helpful attributes
             data.update({
                 'num_days_available': len(date_range) - len(data['conflicts']),
@@ -84,18 +84,20 @@ class RHTimeline(RHRoomBookingBase):
             availability = serialized[self.room.id]
         else:
             # keep order of original room id list
-            availability = sorted(serialized.items(), key=lambda x: room_ids.index(x[0]))
+            availability = sorted(list(serialized.items()), key=lambda x: room_ids.index(x[0]))
         return jsonify(availability=availability, date_range=date_range)
 
 
 class RHCalendar(RHRoomBookingBase):
     @use_kwargs({
-        'start_date': fields.Date(missing=lambda: date.today().isoformat()),
+        'start_date': fields.Date(missing=lambda: date.today()),
         'end_date': fields.Date(missing=None),
         'my_bookings': fields.Bool(missing=False),
         'show_inactive': fields.Bool(missing=False),
-        'room_ids': fields.List(fields.Int(), missing=None),
         'text': fields.String(missing=None)
+    }, location='query')
+    @use_kwargs({
+        'room_ids': fields.List(fields.Int(), missing=None),
     })
     def _process(self, start_date, end_date, room_ids, my_bookings, show_inactive, text):
         booked_for_user = session.user if my_bookings else None
@@ -103,17 +105,19 @@ class RHCalendar(RHRoomBookingBase):
             end_date = start_date
         calendar = get_room_calendar(start_date, end_date, room_ids, booked_for_user=booked_for_user,
                                      include_inactive=show_inactive, text=text)
-        return jsonify(serialize_availability(calendar).values())
+        return jsonify(list(serialize_availability(calendar).values()))
 
 
 class RHActiveBookings(RHRoomBookingBase):
     @use_kwargs({
-        'room_ids': fields.List(fields.Int(), missing=None),
         'start_dt': fields.DateTime(missing=None),
         'last_reservation_id': fields.Int(missing=None),
         'my_bookings': fields.Bool(missing=False),
         'limit': fields.Int(missing=40),
         'text': fields.String(missing=None)
+    }, location='query')
+    @use_kwargs({
+        'room_ids': fields.List(fields.Int(), missing=None),
     })
     def _process(self, room_ids, start_dt, last_reservation_id, my_bookings, limit, text):
         start_dt = start_dt or datetime.combine(date.today(), time(0, 0))
@@ -158,8 +162,9 @@ class RHCreateBooking(RHRoomBookingBase):
     def _process(self):
         args = self.args
         args.setdefault('booked_for_user', session.user)
+        admin_override = args['admin_override_enabled']
 
-        if not is_booking_start_within_grace_period(args['start_dt'], session.user, args['admin_override_enabled']):
+        if not is_booking_start_within_grace_period(args['start_dt'], session.user, admin_override):
             raise ExpectedError(_('You cannot create a booking which starts in the past'))
 
         # Check that the booking is not longer than allowed
@@ -170,13 +175,14 @@ class RHCreateBooking(RHRoomBookingBase):
             raise ExpectedError(msg)
 
         try:
-            resv = Reservation.create_from_data(self.room, args, session.user, prebook=self.prebook)
+            resv = Reservation.create_from_data(self.room, args, session.user, prebook=self.prebook,
+                                                ignore_admin=(not admin_override))
             if args.get('link_type') is not None and args.get('link_id') is not None:
                 self._link_booking(resv, args['link_type'], args['link_id'], args['link_back'])
             db.session.flush()
         except NoReportError as e:
             db.session.rollback()
-            raise ExpectedError(unicode(e))
+            raise ExpectedError(str(e))
 
         serialized_occurrences = serialize_occurrences(group_by_occurrence_date(resv.occurrences.all()))
         if self.prebook:
@@ -187,7 +193,7 @@ class RHCreateBooking(RHRoomBookingBase):
 
 
 class RHRoomSuggestions(RHRoomBookingBase):
-    @use_args(search_room_args)
+    @use_args(search_room_args, location='query')
     def _process(self, args):
         return jsonify(get_suggestions(args, limit=NUM_SUGGESTIONS))
 
@@ -261,7 +267,7 @@ class RHDeleteBooking(RHBookingBase):
 
 
 class RHLinkedObjectData(RHRoomBookingBase):
-    """Fetch data from event, contribution or session block"""
+    """Fetch data from event, contribution or session block."""
 
     def _process_args(self):
         type_ = LinkType[request.view_args['type']]
@@ -280,7 +286,7 @@ class RHBookingEditCalendars(RHBookingBase):
         'end_dt': fields.DateTime(required=True),
         'repeat_frequency': EnumField(RepeatFrequency, missing='NEVER'),
         'repeat_interval': fields.Int(missing=1),
-    })
+    }, location='query')
     def _process(self, **kwargs):
         return jsonify(get_booking_edit_calendar_data(self.booking, kwargs))
 
@@ -318,7 +324,7 @@ class RHUpdateBooking(RHBookingBase):
         today = date.today()
         calendar = get_room_calendar(args['start_dt'] or today, args['end_dt'] or today, [args['room_id']])
         return jsonify(booking=dict(serialize_booking_details(self.booking), **additional_booking_attrs),
-                       room_calendar=serialize_availability(calendar).values())
+                       room_calendar=list(serialize_availability(calendar).values()))
 
 
 class RHMyUpcomingBookings(RHRoomBookingBase):
@@ -344,7 +350,7 @@ class RHMatchingEvents(RHRoomBookingBase):
         'end_dt': fields.DateTime(),
         'repeat_frequency': EnumField(RepeatFrequency, missing='NEVER'),
         'repeat_interval': fields.Int(missing=1),
-    })
+    }, location='query')
     def _process(self, start_dt, end_dt, repeat_frequency, repeat_interval):
         events = get_matching_events(start_dt, end_dt, repeat_frequency, repeat_interval)
         return jsonify(reservation_user_event_schema.dump(events))
@@ -386,7 +392,7 @@ class RHBookingExport(RHRoomBookingBase):
         'room_ids': fields.List(fields.Int(), required=True),
         'start_date': fields.Date(required=True),
         'end_date': fields.Date(required=True),
-        'format': fields.Str(validate.OneOf({'csv', 'xlsx'}), required=True),
+        'format': fields.Str(validate=validate.OneOf({'csv', 'xlsx'}), required=True),
     })
     def _process(self, room_ids, start_date, end_date, format):
         occurrences = (ReservationOccurrence.query
@@ -397,9 +403,9 @@ class RHBookingExport(RHRoomBookingBase):
                                                 'start_dt', datetime.combine(start_date, time()),
                                                 'end_dt', datetime.combine(end_date, time.max)))).all()
 
-        token = unicode(uuid.uuid4())
+        token = str(uuid.uuid4())
         headers, rows = generate_spreadsheet_from_occurrences(occurrences)
-        _export_cache.set(token, {'headers': headers, 'rows': rows}, time=1800)
+        _export_cache.set(token, {'headers': headers, 'rows': rows}, timeout=1800)
         download_url = url_for('rb.export_bookings_file', format=format, token=token)
         return jsonify(url=download_url)
 

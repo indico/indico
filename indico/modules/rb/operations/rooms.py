@@ -1,11 +1,9 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
-
-from __future__ import unicode_literals
 
 from datetime import date, datetime, time
 
@@ -45,7 +43,7 @@ def _filter_coordinates(query, filters):
 
 
 def _make_room_text_filter(text):
-    text = '%{}%'.format(escape_like(text))
+    text = f'%{escape_like(text)}%'
     columns = ('site', 'division', 'building', 'floor', 'number', 'comments', 'full_name')
     return db.or_(getattr(Room, col).ilike(text) for col in columns)
 
@@ -138,7 +136,6 @@ def search_for_rooms(filters, allow_admin=False, availability=None):
              .outerjoin(favorite_room_table, db.and_(favorite_room_table.c.user_id == session.user.id,
                                                      favorite_room_table.c.room_id == Room.id))
              .reset_joinpoint()  # otherwise filter_by() would apply to the favorite table
-             .options(joinedload('owner').load_only('id'))
              .filter(~Room.is_deleted)
              .order_by(favorite_room_table.c.user_id.is_(None), db.func.indico.natsort(Room.full_name)))
 
@@ -163,7 +160,7 @@ def search_for_rooms(filters, allow_admin=False, availability=None):
                             EquipmentType.name.in_(filters['equipment']))
                     .join(EquipmentType, RoomEquipmentAssociation.c.equipment_id == EquipmentType.id)
                     .correlate(Room)
-                    .as_scalar())
+                    .scalar_subquery())
         query = query.filter(subquery == len(filters['equipment']))
     if filters.get('features'):
         for feature in filters['features']:

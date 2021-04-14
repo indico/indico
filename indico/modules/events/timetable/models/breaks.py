@@ -1,11 +1,9 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
-
-from __future__ import unicode_literals
 
 from sqlalchemy import DDL
 from sqlalchemy.event import listens_for
@@ -18,7 +16,7 @@ from indico.core.db.sqlalchemy.descriptions import DescriptionMixin, RenderMode
 from indico.core.db.sqlalchemy.locations import LocationMixin
 from indico.core.db.sqlalchemy.util.models import auto_table_args
 from indico.util.locators import locator_property
-from indico.util.string import format_repr, return_ascii
+from indico.util.string import format_repr
 
 
 class Break(DescriptionMixin, ColorMixin, LocationMixin, db.Model):
@@ -74,7 +72,6 @@ class Break(DescriptionMixin, ColorMixin, LocationMixin, db.Model):
     def end_dt(self):
         return self.timetable_entry.start_dt + self.duration if self.timetable_entry else None
 
-    @return_ascii
     def __repr__(self):
         return format_repr(self, 'id', _text=self.title)
 

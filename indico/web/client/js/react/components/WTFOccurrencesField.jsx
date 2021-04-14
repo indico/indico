@@ -1,17 +1,18 @@
 // This file is part of Indico.
-// Copyright (C) 2002 - 2020 CERN
+// Copyright (C) 2002 - 2021 CERN
 //
 // Indico is free software; you can redistribute it and/or
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
 import _ from 'lodash';
-import React, {useState, useEffect, useMemo, useRef} from 'react';
 import moment from 'moment';
-import TimePicker from 'rc-time-picker';
 import PropTypes from 'prop-types';
-import {Translate} from 'indico/react/i18n';
+import TimePicker from 'rc-time-picker';
+import React, {useState, useEffect, useMemo, useRef} from 'react';
+
 import {SingleDatePicker} from 'indico/react/components';
+import {Translate} from 'indico/react/i18n';
 
 function triggerChange(field) {
   field.dispatchEvent(new Event('change', {bubbles: true}));

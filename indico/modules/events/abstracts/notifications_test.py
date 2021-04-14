@@ -1,11 +1,9 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
-
-from __future__ import unicode_literals
 
 import re
 
@@ -65,7 +63,7 @@ def dummy_abstract(db, dummy_event, dummy_user, create_dummy_person):
                         title="Broken Symmetry and the Mass of Gauge Vector Mesons",
                         event=dummy_event,
                         submitter=dummy_user,
-                        locator={'confId': -314, 'abstract_id': 1234},
+                        locator={'event_id': -314, 'abstract_id': 1234},
                         judgment_comment='Vague but interesting!')
 
     author1 = create_dummy_person(abstract, 'John', 'Doe', 'doe@example.com', 'ACME', UserTitle.mr, True,

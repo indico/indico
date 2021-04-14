@@ -1,5 +1,5 @@
 // This file is part of Indico.
-// Copyright (C) 2002 - 2020 CERN
+// Copyright (C) 2002 - 2021 CERN
 //
 // Indico is free software; you can redistribute it and/or
 // modify it under the terms of the MIT License; see the
@@ -9,19 +9,19 @@ import _ from 'lodash';
 import moment from 'moment';
 import PropTypes from 'prop-types';
 import React from 'react';
-import {AutoSizer, List, WindowScroller} from 'react-virtualized';
-import {Icon, Message, Popup, Placeholder} from 'semantic-ui-react';
-import LazyScroll from 'redux-lazy-scroll';
 import Overridable from 'react-overridable';
+import {AutoSizer, List, WindowScroller} from 'react-virtualized';
+import LazyScroll from 'redux-lazy-scroll';
+import {Icon, Message, Popup, Placeholder} from 'semantic-ui-react';
 
-import {Translate} from 'indico/react/i18n';
-import {toMoment} from 'indico/utils/date';
 import {TooltipIfTruncated} from 'indico/react/components';
+import {Translate} from 'indico/react/i18n';
 import {Responsive} from 'indico/react/util';
+import {toMoment} from 'indico/utils/date';
 
+import EditableTimelineItem from './EditableTimelineItem';
 import RowActionsDropdown from './RowActionsDropdown';
 import TimelineItem from './TimelineItem';
-import EditableTimelineItem from './EditableTimelineItem';
 
 import './TimelineContent.module.scss';
 

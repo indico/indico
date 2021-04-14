@@ -1,11 +1,9 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
-
-from __future__ import unicode_literals
 
 import string
 from collections import namedtuple
@@ -42,17 +40,17 @@ class ColorTuple(namedtuple('ColorTuple', ('text', 'background'))):
                 raise ValueError('Colors must be be `rgb` or `rrggbb`')
             if not all(c in string.hexdigits for color in colors for c in color):
                 raise ValueError('Colors must only use hex digits')
-        return super(ColorTuple, cls).__new__(cls, *colors)
+        return super().__new__(cls, *colors)
 
     def __nonzero__(self):
         return all(self)
 
     @property
     def css(self):
-        return 'color: #{} !important; background: #{} !important'.format(self.text, self.background)
+        return f'color: #{self.text} !important; background: #{self.background} !important'
 
 
-class ColorMixin(object):
+class ColorMixin:
     """Mixin to store text+background colors in a model.
 
     For convenience (e.g. for WTForms integrations when selecting both
@@ -95,7 +93,7 @@ class ColorMixin(object):
 
     @property
     def colors(self):
-        """The current set of colors or None if no colors are set"""
+        """The current set of colors or None if no colors are set."""
         colors = ColorTuple(self.text_color, self.background_color)
         return colors or self.default_colors
 

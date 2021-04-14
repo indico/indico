@@ -1,11 +1,9 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
-
-from __future__ import unicode_literals
 
 from uuid import uuid4
 
@@ -30,7 +28,7 @@ class RHCheckServiceURL(RHEditingManagementBase):
 
     @use_kwargs({
         'url': fields.URL(schemes={'http', 'https'}, required=True),
-    })
+    }, location='query')
     def _process(self, url):
         url = url.rstrip('/')
         return jsonify(check_service_url(url))
@@ -43,7 +41,7 @@ class RHConnectService(RHEditingManagementBase):
         'url': fields.URL(schemes={'http', 'https'}, required=True),
     })
     def _process(self, url):
-        if not config.DEBUG:
+        if not config.EXPERIMENTAL_EDITING_SERVICE:
             raise ServiceUnavailable('This functionality is not available yet')
         if editing_settings.get(self.event, 'service_url'):
             raise BadRequest('Service URL already set')
@@ -55,7 +53,7 @@ class RHConnectService(RHEditingManagementBase):
             editing_settings.set(self.event, 'service_event_identifier', make_event_identifier(self.event))
         editing_settings.set_multi(self.event, {
             'service_url': url,
-            'service_token': unicode(uuid4()),
+            'service_token': str(uuid4()),
         })
         # we need to commit the token so the service can already use it when processing
         # the enabled event in case it wants to set up tags etc
@@ -102,7 +100,7 @@ class RHDisconnectService(RHEditingManagementBase):
 
 
 class RHServiceStatus(RHEditingManagementBase):
-    """Get the status of the currently connected service"""
+    """Get the status of the currently connected service."""
 
     def _process(self):
         if not editing_settings.get(self.event, 'service_url'):

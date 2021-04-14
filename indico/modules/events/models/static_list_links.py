@@ -1,11 +1,9 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
-
-from __future__ import unicode_literals
 
 from uuid import UUID, uuid4
 
@@ -15,7 +13,7 @@ from sqlalchemy.dialects.postgresql import UUID as pg_UUID
 from indico.core.db import db
 from indico.core.db.sqlalchemy import UTCDateTime
 from indico.util.date_time import now_utc
-from indico.util.string import format_repr, return_ascii
+from indico.util.string import format_repr
 
 
 class StaticListLink(db.Model):
@@ -47,7 +45,7 @@ class StaticListLink(db.Model):
         index=True,
         unique=True,
         nullable=False,
-        default=lambda: unicode(uuid4())
+        default=lambda: str(uuid4())
     )
     created_dt = db.Column(
         UTCDateTime,
@@ -75,7 +73,7 @@ class StaticListLink(db.Model):
 
     @classmethod
     def load(cls, event, type_, uuid):
-        """Load the data associated with a link
+        """Load the data associated with a link.
 
         :param event: the `Event` the link belongs to
         :param type_: the type of the link
@@ -117,6 +115,5 @@ class StaticListLink(db.Model):
         db.session.flush()
         return static_list_link
 
-    @return_ascii
     def __repr__(self):
         return format_repr(self, 'id', 'uuid')

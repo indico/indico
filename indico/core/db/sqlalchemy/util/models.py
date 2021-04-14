@@ -1,11 +1,9 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
-
-from __future__ import unicode_literals
 
 import os
 from copy import copy
@@ -16,7 +14,7 @@ from flask_sqlalchemy import BaseQuery, Model, Pagination
 from sqlalchemy import Column, inspect, orm
 from sqlalchemy.event import listen, listens_for
 from sqlalchemy.ext.hybrid import hybrid_property
-from sqlalchemy.orm import contains_eager, joinedload
+from sqlalchemy.orm import joinedload
 from sqlalchemy.orm.attributes import get_history, set_committed_value
 from sqlalchemy.orm.exc import NoResultFound
 
@@ -60,44 +58,13 @@ class IndicoBaseQuery(BaseQuery):
 
 
 class IndicoModel(Model):
-    """Indico DB model"""
+    """Indico DB model."""
 
     #: Whether relationship preloading is allowed.  If disabled,
     #: the on-load event that populates relationship from the preload
     #: cache is not registered.
     allow_relationship_preloading = False
     query_class = IndicoBaseQuery
-
-    @classmethod
-    def find(cls, *args, **kwargs):
-        special_field_names = ('join', 'eager')
-        special_fields = {}
-        for key in special_field_names:
-            value = kwargs.pop('_{}'.format(key), ())
-            if not isinstance(value, (list, tuple)):
-                value = (value,)
-            special_fields[key] = value
-        joined_eager = set(special_fields['eager']) & set(special_fields['join'])
-        options = []
-        options += [joinedload(rel) for rel in special_fields['eager'] if rel not in joined_eager]
-        options += [contains_eager(rel) for rel in joined_eager]
-        return (cls.query
-                .filter_by(**kwargs)
-                .join(*special_fields['join'])
-                .filter(*args)
-                .options(*options))
-
-    @classmethod
-    def find_all(cls, *args, **kwargs):
-        return cls.find(*args, **kwargs).all()
-
-    @classmethod
-    def find_first(cls, *args, **kwargs):
-        return cls.find(*args, **kwargs).first()
-
-    @classmethod
-    def find_one(cls, *args, **kwargs):
-        return cls.find(*args, **kwargs).one()
 
     @classmethod
     def get(cls, oid, is_deleted=None):
@@ -164,12 +131,12 @@ class IndicoModel(Model):
         cache = g.get('relationship_cache', {}).get(type(target))
         if not cache:
             return
-        for rel, value in cache['data'].get(target, {}).iteritems():
+        for rel, value in cache['data'].get(target, {}).items():
             if rel not in target.__dict__:
                 set_committed_value(target, rel, value)
 
     def assign_id(self):
-        """Immediately assigns an ID to the object.
+        """Immediately assign an ID to the object.
 
         This only works if the table has exactly one serial column.
         It also "wastes" the ID if the new object is not actually
@@ -196,7 +163,7 @@ class IndicoModel(Model):
         setattr(self, attr_name, id_)
 
     def populate_from_dict(self, data, keys=None, skip=None, track_changes=True):
-        """Populates the object with values in a dictionary
+        """Populate the object with values in a dictionary.
 
         :param data: a dict containing values to populate the object.
         :param keys: If set, only keys from that list are populated.
@@ -207,13 +174,13 @@ class IndicoModel(Model):
         """
         cls = type(self)
         changed = {}
-        for key, value in data.iteritems():
+        for key, value in data.items():
             if keys and key not in keys:
                 continue
             if skip and key in skip:
                 continue
             if not hasattr(cls, key):
-                raise ValueError("{} has no attribute '{}'".format(cls.__name__, key))
+                raise ValueError(f"{cls.__name__} has no attribute '{key}'")
             if not track_changes:
                 setattr(self, key, value)
                 continue
@@ -227,7 +194,7 @@ class IndicoModel(Model):
         return changed if track_changes else None
 
     def populate_from_attrs(self, obj, attrs):
-        """Populates the object from another object's attributes
+        """Populate the object from another object's attributes.
 
         :param obj: an object
         :param attrs: a set containing the attributes to copy
@@ -235,20 +202,19 @@ class IndicoModel(Model):
         cls = type(self)
         for attr in attrs:
             if not hasattr(cls, attr):
-                raise ValueError("{} has no attribute '{}'".format(cls.__name__, attr))
+                raise ValueError(f"{cls.__name__} has no attribute '{attr}'")
             setattr(self, attr, getattr(obj, attr))
 
 
 @listens_for(orm.mapper, 'after_configured', once=True)
 def _mappers_configured():
-    from indico.core.db import db
-    for model in db.Model._decl_class_registry.itervalues():
+    for model in get_all_models():
         if hasattr(model, '__table__') and model.allow_relationship_preloading:
             listen(model, 'load', model._populate_preloaded_relationships)
 
 
 def import_all_models(package_name='indico'):
-    """Utility that imports all modules in indico/**/models/
+    """Utility that imports all modules in indico/**/models/.
 
     :param package_name: Package name to scan for models. If unset,
                          the top-level package containing this file
@@ -261,7 +227,7 @@ def import_all_models(package_name='indico'):
     for root, dirs, files in os.walk(package_root):
         if os.path.basename(root) == 'models':
             package = os.path.relpath(root, package_root).replace(os.sep, '.')
-            modules += ['{}.{}.{}'.format(package_name, package, name[:-3])
+            modules += [f'{package_name}.{package}.{name[:-3]}'
                         for name in files
                         if name.endswith('.py') and name != '__init__.py' and not name.endswith('_test.py')]
 
@@ -269,8 +235,14 @@ def import_all_models(package_name='indico'):
         import_module(module)
 
 
+def get_all_models():
+    """Get all models SQLAlchemy knows about."""
+    from indico.core.db import db
+    return {mapper.class_ for mapper in db.Model.registry.mappers}
+
+
 def attrs_changed(obj, *attrs):
-    """Checks if the given fields have been changed since the last flush
+    """Check if the given fields have been changed since the last flush.
 
     :param obj: SQLAlchemy-mapped object
     :param attrs: attribute names
@@ -279,8 +251,10 @@ def attrs_changed(obj, *attrs):
 
 
 def get_default_values(model):
-    """Returns a dict containing all static default values of a model.
+    """Return a dict containing all static default values of a model.
+
     This only takes `default` into account, not `server_default`.
+
     :param model: A SQLAlchemy model
     """
     return {attr.key: attr.columns[0].default.arg
@@ -290,7 +264,7 @@ def get_default_values(model):
 
 def get_simple_column_attrs(model):
     """
-    Returns a set containing all "simple" column attributes, i.e.
+    Return a set containing all "simple" column attributes, i.e.
     attributes which map to a table column and are neither primary
     key nor foreign key.
 
@@ -308,7 +282,7 @@ def get_simple_column_attrs(model):
 
 
 def auto_table_args(cls, **extra_kwargs):
-    """Merges SQLAlchemy ``__table_args__`` values.
+    """Merge SQLAlchemy ``__table_args__`` values.
 
     This is useful when using mixins to compose model classes if the
     mixins need to define custom ``__table_args__``. Since defining
@@ -346,7 +320,7 @@ def auto_table_args(cls, **extra_kwargs):
             else:
                 posargs.extend(value)
         else:  # pragma: no cover
-            raise ValueError('Unexpected tableargs: {}'.format(value))
+            raise ValueError(f'Unexpected tableargs: {value}')
     kwargs.update(extra_kwargs)
     if posargs and kwargs:
         return tuple(posargs) + (kwargs,)
@@ -357,11 +331,11 @@ def auto_table_args(cls, **extra_kwargs):
 
 
 def _get_backref_name(relationship):
-    return relationship.backref if isinstance(relationship.backref, basestring) else relationship.backref[0]
+    return relationship.backref if isinstance(relationship.backref, str) else relationship.backref[0]
 
 
 def populate_one_to_one_backrefs(model, *relationships):
-    """Populates the backref of a one-to-one relationship on load
+    """Populate the backref of a one-to-one relationship on load.
 
     See this post in the SQLAlchemy docs on why it's useful/necessary:
     http://docs.sqlalchemy.org/en/latest/orm/loading_relationships.html#creating-custom-load-rules
@@ -377,7 +351,7 @@ def populate_one_to_one_backrefs(model, *relationships):
 
         @listens_for(model, 'load')
         def _populate_backrefs(target, context):
-            for name, backref in mappings.iteritems():
+            for name, backref in mappings.items():
                 # __dict__ to avoid triggering lazy-loaded relationships
                 if target.__dict__.get(name) is not None:
                     set_committed_value(getattr(target, name), backref, target)

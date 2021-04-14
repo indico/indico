@@ -1,11 +1,9 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
-
-from __future__ import unicode_literals
 
 from datetime import timedelta
 
@@ -37,7 +35,7 @@ def build_static_site(static_site):
         zip_file_path = create_static_site(rh, static_site.event)
         static_site.state = StaticSiteState.success
         static_site.content_type = 'application/zip'
-        static_site.filename = 'offline_site_{}.zip'.format(static_site.event.id)
+        static_site.filename = f'offline_site_{static_site.event.id}.zip'
         with open(zip_file_path, 'rb') as f:
             static_site.save(f)
         db.session.commit()
@@ -61,12 +59,14 @@ def notify_static_site_success(static_site):
 
 @celery.periodic_task(name='static_sites_cleanup', run_every=crontab(minute='30', hour='3', day_of_week='monday'))
 def static_sites_cleanup(days=30):
-    """Clean up old static sites
+    """Clean up old static sites.
 
     :param days: number of days after which to remove static sites
     """
-    expired_sites = StaticSite.find_all(StaticSite.requested_dt < (now_utc() - timedelta(days=days)),
-                                        StaticSite.state == StaticSiteState.success)
+    expired_sites = (StaticSite.query
+                     .filter(StaticSite.requested_dt < (now_utc() - timedelta(days=days)),
+                             StaticSite.state == StaticSiteState.success)
+                     .all())
     logger.info('Removing %d expired static sites from the past %d days', len(expired_sites), days)
     try:
         for site in expired_sites:

@@ -1,11 +1,9 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
-
-from __future__ import unicode_literals
 
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.event import listens_for
@@ -14,15 +12,17 @@ from indico.core.db import db
 from indico.core.db.sqlalchemy import PyIntEnum
 from indico.core.db.sqlalchemy.descriptions import DescriptionMixin, RenderMode
 from indico.modules.events.surveys.fields import get_field_types
-from indico.util.string import return_ascii, text_to_repr
-from indico.util.struct.enum import IndicoEnum
+from indico.util.enum import IndicoEnum
+from indico.util.string import text_to_repr
 
 
 def _get_next_position(context):
     """Get the next question position for the event."""
     survey_id = context.current_parameters['survey_id']
     parent_id = context.current_parameters['parent_id']
-    res = db.session.query(db.func.max(SurveyItem.position)).filter_by(survey_id=survey_id, parent_id=parent_id).one()
+    res = (db.session.query(db.func.max(SurveyItem.position))
+           .filter(SurveyItem.survey_id == survey_id, SurveyItem.parent_id == parent_id)
+           .one())
     return (res[0] or 0) + 1
 
 
@@ -171,16 +171,15 @@ class SurveyQuestion(SurveyItem):
         return [a for a in self.answers if not a.is_empty]
 
     def get_summary(self, **kwargs):
-        """Returns the summary of answers submitted for this question."""
+        """Return the summary of answers submitted for this question."""
         if self.field:
             return self.field.get_summary(**kwargs)
 
-    @return_ascii
     def __repr__(self):
-        return '<SurveyQuestion({}, {}, {}, {})>'.format(self.id, self.survey_id, self.field_type, self.title)
+        return f'<SurveyQuestion({self.id}, {self.survey_id}, {self.field_type}, {self.title})>'
 
     def to_dict(self):
-        data = super(SurveyQuestion, self).to_dict()
+        data = super().to_dict()
         data.update({'is_required': self.is_required, 'field_type': self.field_type,
                      'field_data': self.field.copy_field_data()})
         return data
@@ -206,12 +205,11 @@ class SurveySection(SurveyItem):
     def locator(self):
         return dict(self.survey.locator, section_id=self.id)
 
-    @return_ascii
     def __repr__(self):
-        return '<SurveySection({}, {}, {})>'.format(self.id, self.survey_id, self.title)
+        return f'<SurveySection({self.id}, {self.survey_id}, {self.title})>'
 
     def to_dict(self):
-        data = super(SurveySection, self).to_dict()
+        data = super().to_dict()
         content = [child.to_dict() for child in self.children]
         data.update({'content': content, 'display_as_section': self.display_as_section})
         if not self.display_as_section:
@@ -229,13 +227,12 @@ class SurveyText(SurveyItem):
     def locator(self):
         return dict(self.survey.locator, section_id=self.parent_id, text_id=self.id)
 
-    @return_ascii
     def __repr__(self):
         desc = text_to_repr(self.description)
-        return '<SurveyText({}, {}): "{}")>'.format(self.id, self.survey_id, desc)
+        return f'<SurveyText({self.id}, {self.survey_id}): "{desc}")>'
 
     def to_dict(self):
-        data = super(SurveyText, self).to_dict()
+        data = super().to_dict()
         del data['title']
         return data
 

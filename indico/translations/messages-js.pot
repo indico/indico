@@ -1,14 +1,14 @@
 # Translations template for indico.
-# Copyright (C) 2020 ORGANIZATION
+# Copyright (C) 2021 ORGANIZATION
 # This file is distributed under the same license as the indico project.
-# FIRST AUTHOR <EMAIL@ADDRESS>, 2020.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2021.
 #
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: indico 2.3-dev\n"
+"Project-Id-Version: indico 2.3.5-dev\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2020-09-09 09:51+0200\n"
+"POT-Creation-Date: 2021-04-14 10:29+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,24 +17,28 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.8.0\n"
 
-#: indico/modules/attachments/client/js/index.js:154
+#: indico/modules/attachments/client/js/legacy.js:154
 msgid "This file no longer exists. Please reload the page."
 msgstr ""
 
-#: indico/modules/attachments/client/js/index.js:160
+#: indico/modules/attachments/client/js/legacy.js:160
 msgid "You are not authorized to access this file."
 msgstr ""
 
-#: indico/modules/attachments/client/js/index.js:160 indico/modules/attachments/client/js/index.js:163
+#: indico/modules/attachments/client/js/legacy.js:160 indico/modules/attachments/client/js/legacy.js:163
 msgid "Access Denied"
 msgstr ""
 
-#: indico/modules/attachments/client/js/index.js:162
+#: indico/modules/attachments/client/js/legacy.js:162
 msgid "This file is protected. You will be redirected to the login page."
 msgstr ""
 
-#: indico/modules/attachments/client/js/index.js:230
+#: indico/modules/attachments/client/js/legacy.js:230
 msgid "Manage material"
+msgstr ""
+
+#: indico/modules/attachments/client/js/package.js:48
+msgid "Building package"
 msgstr ""
 
 #: indico/modules/categories/client/js/calendar.js:24
@@ -536,10 +540,8 @@ msgstr ""
 msgid "No type"
 msgstr ""
 
-#: indico/modules/vc/client/js/index.js:82
-msgid ""
-"This room has been deleted and cannot be used. \n"
-"                         You can detach it from the event, however."
+#: indico/modules/vc/client/js/index.js:83
+msgid "This room has been deleted and cannot be used. You can detach it from the event, however."
 msgstr ""
 
 #: indico/modules/vc/client/js/index.js:112

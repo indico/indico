@@ -1,11 +1,9 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
-
-from __future__ import division, unicode_literals
 
 from collections import defaultdict
 from itertools import chain
@@ -29,10 +27,10 @@ from indico.modules.events.contributions.models.persons import AuthorType
 from indico.modules.events.models.persons import AuthorsSpeakersMixin
 from indico.modules.events.models.reviews import ProposalMixin, ProposalRevisionMixin
 from indico.util.date_time import now_utc
+from indico.util.enum import IndicoEnum, RichIntEnum
 from indico.util.i18n import _
 from indico.util.locators import locator_property
-from indico.util.string import MarkdownText, format_repr, return_ascii, text_to_repr
-from indico.util.struct.enum import IndicoEnum, RichIntEnum
+from indico.util.string import MarkdownText, format_repr, text_to_repr
 
 
 class AbstractState(RichIntEnum):
@@ -84,7 +82,7 @@ class EditTrackMode(int, IndicoEnum):
 
 class Abstract(ProposalMixin, ProposalRevisionMixin, DescriptionMixin, CustomFieldsMixin, AuthorsSpeakersMixin,
                db.Model):
-    """Represents an abstract that can be associated to a Contribution."""
+    """An abstract that can be associated to a Contribution."""
 
     __tablename__ = 'abstracts'
     __auto_table_args = (db.Index(None, 'friendly_id', 'event_id', unique=True,
@@ -109,7 +107,7 @@ class Abstract(ProposalMixin, ProposalRevisionMixin, DescriptionMixin, CustomFie
                                             .format(AbstractState.accepted, AbstractState.rejected,
                                                     AbstractState.merged, AbstractState.duplicate),
                                             name='judgment_dt_if_judged'),
-                         db.CheckConstraint('(state != {}) OR (uuid IS NOT NULL)'.format(AbstractState.invited),
+                         db.CheckConstraint(f'(state != {AbstractState.invited}) OR (uuid IS NOT NULL)',
                                             name='uuid_if_invited'),
                          {'schema': 'event_abstracts'})
 
@@ -438,15 +436,15 @@ class Abstract(ProposalMixin, ProposalRevisionMixin, DescriptionMixin, CustomFie
             return AbstractReviewingState.not_started
         track_states = {x: self.get_track_reviewing_state(x) for x in self.reviewed_for_tracks}
         positiveish_states = {AbstractReviewingState.positive, AbstractReviewingState.conflicting}
-        if any(x == AbstractReviewingState.not_started for x in track_states.itervalues()):
+        if any(x == AbstractReviewingState.not_started for x in track_states.values()):
             return AbstractReviewingState.in_progress
-        elif all(x == AbstractReviewingState.negative for x in track_states.itervalues()):
+        elif all(x == AbstractReviewingState.negative for x in track_states.values()):
             return AbstractReviewingState.negative
-        elif all(x in positiveish_states for x in track_states.itervalues()):
+        elif all(x in positiveish_states for x in track_states.values()):
             if len(self.reviewed_for_tracks) > 1:
                 # Accepted for more than one track
                 return AbstractReviewingState.conflicting
-            elif any(x == AbstractReviewingState.conflicting for x in track_states.itervalues()):
+            elif any(x == AbstractReviewingState.conflicting for x in track_states.values()):
                 # The only accepted track is in conflicting state
                 return AbstractReviewingState.conflicting
             else:
@@ -487,7 +485,7 @@ class Abstract(ProposalMixin, ProposalRevisionMixin, DescriptionMixin, CustomFie
 
     @property
     def verbose_title(self):
-        return '#{} ({})'.format(self.friendly_id, self.title)
+        return f'#{self.friendly_id} ({self.title})'
 
     @property
     def is_in_final_state(self):
@@ -497,7 +495,6 @@ class Abstract(ProposalMixin, ProposalRevisionMixin, DescriptionMixin, CustomFie
     def modification_ended(self):
         return self.event.cfa.modification_ended
 
-    @return_ascii
     def __repr__(self):
         return format_repr(self, 'id', 'event_id', is_deleted=False, _text=text_to_repr(self.title))
 

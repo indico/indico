@@ -6,7 +6,7 @@
         {% endif %}
         <div class="days-container-wrapper">
             <div class="days-container {%- if top_level_entries | length > 6 %} scrollable{% endif %}">
-                {% for day, entries in top_level_entries.iteritems() | sort %}
+                {% for day, entries in top_level_entries.items() | sort %}
                         <button class="i-button big day {%- if day == current_day %} highlight{% endif %}"
                                 data-day="{{ day }}">
                             {{- day | format_date(format='EEE, d MMM') -}}
@@ -25,7 +25,7 @@
     <div class="section-title">{% trans %}Move to:{% endtrans %}</div>
     <div class="i-box just-group-list with-hover-effect blocks">
         <div class="i-box-content">
-            {% for day, tt_entries in top_level_entries.iteritems() %}
+            {% for day, tt_entries in top_level_entries.items() %}
                 <ul class="group-list blocks-list" data-show-for="{{ day }}">
                     <li class="item top-level flexrow f-a-center
                                {{ 'selected' if parent_entry is none and day == current_day }}"

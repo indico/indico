@@ -1,11 +1,9 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
-
-from __future__ import unicode_literals
 
 from flask import flash, jsonify, redirect, request, session
 from werkzeug.exceptions import BadRequest, NotFound
@@ -27,7 +25,7 @@ from indico.web.util import jsonify_data, jsonify_form, jsonify_template
 
 
 class RHPaymentAdminSettings(RHAdminBase):
-    """Payment settings in server admin area"""
+    """Payment settings in server admin area."""
 
     def _process(self):
         form = AdminSettingsForm(obj=FormDefaults(**payment_settings.get_all()))
@@ -36,39 +34,39 @@ class RHPaymentAdminSettings(RHAdminBase):
             flash(_('Settings saved'), 'success')
             return redirect(url_for('.admin_settings'))
         return WPPaymentAdmin.render_template('admin_settings.html', 'payment',
-                                              form=form, plugins=get_payment_plugins().values())
+                                              form=form, plugins=list(get_payment_plugins().values()))
 
 
 class RHPaymentAdminPluginSettings(RHPluginDetails):
-    """Payment plugin settings in server admin area"""
+    """Payment plugin settings in server admin area."""
     back_button_endpoint = 'payment.admin_settings'
 
 
 class RHPaymentManagementBase(RHManageEventBase):
-    """Base RH for event management pages"""
+    """Base RH for event management pages."""
 
     EVENT_FEATURE = 'payment'
 
 
 class RHPaymentBase(RHRegistrationFormRegistrationBase):
-    """Base RH for non-management payment pages"""
+    """Base RH for non-management payment pages."""
     EVENT_FEATURE = 'payment'
 
 
 class RHPaymentSettings(RHPaymentManagementBase):
-    """Display payment settings"""
+    """Display payment settings."""
 
     def _process(self):
         methods = get_payment_plugins()
-        enabled_methods = [method for method in methods.itervalues()
+        enabled_methods = [method for method in methods.values()
                            if method.event_settings.get(self.event, 'enabled')]
         return WPPaymentEventManagement.render_template('management/payments.html', self.event,
                                                         settings=payment_event_settings.get_all(self.event),
-                                                        methods=methods.items(), enabled_methods=enabled_methods)
+                                                        methods=list(methods.items()), enabled_methods=enabled_methods)
 
 
 class RHPaymentSettingsEdit(RHPaymentManagementBase):
-    """Edit payment settings"""
+    """Edit payment settings."""
 
     def _process(self):
         current_event_settings = payment_event_settings.get_all(self.event)
@@ -82,7 +80,7 @@ class RHPaymentSettingsEdit(RHPaymentManagementBase):
 
 
 class RHPaymentPluginEdit(RHPaymentManagementBase):
-    """Configure a payment plugin for an event"""
+    """Configure a payment plugin for an event."""
 
     def _process_args(self):
         RHPaymentManagementBase._process_args(self)
@@ -104,7 +102,7 @@ class RHPaymentPluginEdit(RHPaymentManagementBase):
         can_modify = bool(session.user) and self.plugin.can_be_modified(session.user, self.event)
         plugin_settings = self.plugin.settings.get_all()
         plugin_event_settings = self.plugin.event_settings.get_all(self.event)
-        defaults = FormDefaults({k: v for k, v in plugin_event_settings.iteritems() if v is not None},
+        defaults = FormDefaults({k: v for k, v in plugin_event_settings.items() if v is not None},
                                 **plugin_settings)
         form = self.plugin.event_settings_form(prefix='payment-', obj=defaults, plugin_settings=plugin_settings)
         if can_modify and form.validate_on_submit():
@@ -124,23 +122,23 @@ class RHPaymentPluginEdit(RHPaymentManagementBase):
 
 
 class RHPaymentCheckout(RHPaymentBase):
-    """Display payment checkout page"""
+    """Display payment checkout page."""
 
     def _process(self):
         if self.registration.state != RegistrationState.unpaid:
             flash(_("The registration doesn't need to be paid"), 'error')
             return redirect(url_for('event_registration.display_regform', self.registration.locator.registrant))
         plugins = get_active_payment_plugins(self.event)
-        valid_plugins = {k: v for k, v in plugins.iteritems() if v.supports_currency(self.registration.currency)}
-        force_plugin = valid_plugins.items()[0] if len(valid_plugins) == 1 else None  # only one plugin available
+        valid_plugins = {k: v for k, v in plugins.items() if v.supports_currency(self.registration.currency)}
+        force_plugin = list(valid_plugins.items())[0] if len(valid_plugins) == 1 else None  # only one plugin available
         return WPPaymentEvent.render_template('event_checkout.html', self.event,
                                               registration=self.registration,
                                               regform=self.registration.registration_form,
-                                              plugins=valid_plugins.items(), force_plugin=force_plugin)
+                                              plugins=list(valid_plugins.items()), force_plugin=force_plugin)
 
 
 class RHPaymentForm(RHPaymentBase):
-    """Load the form for the selected payment plugin"""
+    """Load the form for the selected payment plugin."""
 
     def _process_args(self):
         RHPaymentBase._process_args(self)

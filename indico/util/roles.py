@@ -1,11 +1,9 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
-
-from __future__ import unicode_literals
 
 import csv
 
@@ -15,24 +13,26 @@ from indico.core.errors import UserValueError
 from indico.modules.events.roles.forms import ImportMembersCSVForm
 from indico.modules.users import User
 from indico.util.i18n import _, ngettext
-from indico.util.string import to_unicode, validate_email
+from indico.util.spreadsheets import csv_text_io_wrapper
+from indico.util.string import validate_email
 from indico.web.flask.templating import get_template_module
 from indico.web.util import jsonify_data, jsonify_template
 
 
-class ImportRoleMembersMixin(object):
+class ImportRoleMembersMixin:
     """Import members from a CSV file into a role."""
 
     logger = None
 
     def import_members_from_csv(self, f):
-        reader = csv.reader(f.read().splitlines())
-        emails = set()
+        with csv_text_io_wrapper(f) as ftxt:
+            reader = csv.reader(ftxt.read().splitlines())
 
+        emails = set()
         for num_row, row in enumerate(reader, 1):
             if len(row) != 1:
                 raise UserValueError(_('Row {}: malformed CSV data').format(num_row))
-            email = to_unicode(row[0]).strip().lower()
+            email = row[0].strip().lower()
 
             if email and not validate_email(email):
                 raise UserValueError(_('Row {row}: invalid email address: {email}').format(row=num_row, email=email))
@@ -54,12 +54,12 @@ class ImportRoleMembersMixin(object):
             if form.remove_existing.data:
                 deleted_members = self.role.members - users
                 for member in deleted_members:
-                    self.logger.info('User {} removed from role {} by {}'.format(member, self.role, session.user))
+                    self.logger.info(f'User {member} removed from role {self.role} by {session.user}')
                 self.role.members = users
             else:
                 self.role.members |= users
             for user in new_members:
-                self.logger.info('User {} added to role {} by {}'.format(user, self.role, session.user))
+                self.logger.info(f'User {user} added to role {self.role} by {session.user}')
             flash(ngettext("{} member has been imported.",
                            "{} members have been imported.",
                            len(users)).format(len(users)), 'success')

@@ -1,11 +1,9 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
-
-from __future__ import print_function, unicode_literals
 
 import atexit
 import os
@@ -34,7 +32,7 @@ def _disable_reloader(argv):
     return argv
 
 
-class Watcher(object):
+class Watcher:
     def __init__(self, path, patterns):
         self.path = path
         self.name = path.replace('/', '-').strip('-')
@@ -77,10 +75,10 @@ class Watcher(object):
         return triggered
 
     def __repr__(self):
-        return '<Watcher({!r}, {!r})>'.format(self.path, self.patterns)
+        return f'<Watcher({self.path!r}, {self.patterns!r})>'
 
 
-class Watchman(object):
+class Watchman:
     def __init__(self):
         self._proc = None
         self._watchers = set()

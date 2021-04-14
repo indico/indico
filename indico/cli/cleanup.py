@@ -1,11 +1,9 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
-
-from __future__ import unicode_literals
 
 from datetime import timedelta
 
@@ -26,13 +24,13 @@ def _print_files(files):
 def cleanup_cmd(temp=False, cache=False, min_age=1, dry_run=False, verbose=False):
     if cache:
         if verbose:
-            click.echo(click.style('cleaning cache ({})'.format(config.CACHE_DIR), fg='white', bold=True))
+            click.echo(click.style(f'cleaning cache ({config.CACHE_DIR})', fg='white', bold=True))
         deleted = cleanup_dir(config.CACHE_DIR, timedelta(days=min_age), dry_run=dry_run)
         if verbose:
             _print_files(deleted)
     if temp:
         if verbose:
-            click.echo(click.style('cleaning temp ({})'.format(config.TEMP_DIR), fg='white', bold=True))
+            click.echo(click.style(f'cleaning temp ({config.TEMP_DIR})', fg='white', bold=True))
         deleted = cleanup_dir(config.TEMP_DIR, timedelta(days=min_age), dry_run=dry_run)
         if verbose:
             _print_files(deleted)

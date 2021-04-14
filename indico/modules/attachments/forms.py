@@ -1,11 +1,9 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
-
-from __future__ import unicode_literals
 
 from wtforms.ext.sqlalchemy.fields import QuerySelectField
 from wtforms.fields import BooleanField, TextAreaField
@@ -35,15 +33,14 @@ class AttachmentFormBase(IndicoForm):
                                  allow_groups=True, allow_external_users=True, allow_event_roles=True,
                                  allow_category_roles=True, allow_registration_forms=True,
                                  event=lambda form: form.event,
-                                 default_text=_('Restrict access to this material'),
                                  description=_("The list of users and groups allowed to access the material"))
 
     def __init__(self, *args, **kwargs):
         linked_object = kwargs.pop('linked_object')
         self.event = getattr(linked_object, 'event', None)  # not present in categories
-        super(AttachmentFormBase, self).__init__(*args, **kwargs)
-        self.folder.query = (AttachmentFolder
-                             .find(object=linked_object, is_default=False, is_deleted=False)
+        super().__init__(*args, **kwargs)
+        self.folder.query = (AttachmentFolder.query
+                             .filter_by(object=linked_object, is_default=False, is_deleted=False)
                              .order_by(db.func.lower(AttachmentFolder.title)))
 
     @generated_data
@@ -75,7 +72,7 @@ class EditAttachmentFileForm(EditAttachmentFormBase):
                              description=_("Already uploaded file. Replace it by adding a new file."))
 
 
-class AttachmentLinkFormMixin(object):
+class AttachmentLinkFormMixin:
     title = StringField(_("Title"), [DataRequired()])
     link_url = URLField(_("URL"), [DataRequired()])
 
@@ -97,7 +94,6 @@ class AttachmentFolderForm(IndicoForm):
                                  allow_groups=True, allow_external_users=True, allow_event_roles=True,
                                  allow_category_roles=True, allow_registration_forms=True,
                                  event=lambda form: form.event,
-                                 default_text=_('Restrict access to this folder'),
                                  description=_("The list of users and groups allowed to access the folder"))
     is_always_visible = BooleanField(_("Always Visible"),
                                      [HiddenUnless('is_hidden', value=False)],
@@ -115,13 +111,13 @@ class AttachmentFolderForm(IndicoForm):
     def __init__(self, *args, **kwargs):
         self.linked_object = kwargs.pop('linked_object')
         self.event = getattr(self.linked_object, 'event', None)  # not present in categories
-        super(AttachmentFolderForm, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self.title.choices = self._get_title_suggestions()
 
     def _get_title_suggestions(self):
         query = db.session.query(AttachmentFolder.title).filter_by(is_deleted=False, is_default=False,
                                                                    object=self.linked_object)
-        existing = set(x[0] for x in query)
+        existing = {x[0] for x in query}
         suggestions = set(get_default_folder_names()) - existing
         if self.title.data:
             suggestions.add(self.title.data)

@@ -1,11 +1,9 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
-
-from __future__ import unicode_literals
 
 import os
 import random
@@ -33,9 +31,10 @@ from indico.modules.rb.models.reservations import Reservation, ReservationLink
 from indico.modules.users import User
 from indico.util.fs import secure_filename
 from indico.util.i18n import _, ngettext
+from indico.util.marshmallow import PrincipalList
 from indico.util.roles import ImportRoleMembersMixin
 from indico.util.string import crc32
-from indico.util.user import principal_from_fossil
+from indico.web.args import use_kwargs
 from indico.web.flask.templating import get_template_module
 from indico.web.flask.util import url_for
 from indico.web.forms.base import FormDefaults
@@ -133,7 +132,7 @@ class RHCategoryImageUploadBase(RHManageCategoryBase):
         f = request.files[self.IMAGE_TYPE]
         try:
             img = Image.open(f)
-        except IOError:
+        except OSError:
             flash(_('You cannot upload this file as an icon/logo.'), 'error')
             return jsonify_data(content=None)
         if img.format.lower() not in {'jpeg', 'png', 'gif'}:
@@ -156,13 +155,13 @@ class RHCategoryImageUploadBase(RHManageCategoryBase):
         }
         self._set_image(content, metadata)
         flash(self.SAVED_FLASH_MSG, 'success')
-        logger.info("New {} '%s' uploaded by %s (%s)".format(self.IMAGE_TYPE), f.filename, session.user, self.category)
+        logger.info(f"New {self.IMAGE_TYPE} '%s' uploaded by %s (%s)", f.filename, session.user, self.category)
         return jsonify_data(content=get_image_data(self.IMAGE_TYPE, self.category))
 
     def _process_DELETE(self):
         self._set_image(None, None)
         flash(self.DELETED_FLASH_MSG, 'success')
-        logger.info("{} of %s deleted by %s".format(self.IMAGE_TYPE.title()), self.category, session.user)
+        logger.info(f"{self.IMAGE_TYPE.title()} of %s deleted by %s", self.category, session.user)
         return jsonify_data(content=None)
 
 
@@ -293,7 +292,7 @@ class RHMoveCategory(RHMoveCategoryBase):
 
 
 class RHDeleteSubcategories(RHManageCategoryBase):
-    """Bulk-delete subcategories"""
+    """Bulk-delete subcategories."""
 
     def _process_args(self):
         RHManageCategoryBase._process_args(self)
@@ -306,7 +305,7 @@ class RHDeleteSubcategories(RHManageCategoryBase):
         if 'confirmed' in request.form:
             for subcategory in self.subcategories:
                 if not subcategory.is_empty:
-                    raise BadRequest('Category "{}" is not empty'.format(subcategory.title))
+                    raise BadRequest(f'Category "{subcategory.title}" is not empty')
                 delete_category(subcategory)
             return jsonify_data(flash=False, is_empty=self.category.is_empty)
         return jsonify_template('categories/management/delete_categories.html', categories=self.subcategories,
@@ -318,7 +317,7 @@ class RHMoveSubcategories(RHMoveCategoryBase):
 
     def _process_args(self):
         RHMoveCategoryBase._process_args(self)
-        subcategory_ids = map(int, request.values.getlist('category_id'))
+        subcategory_ids = request.values.getlist('category_id', type=int)
         self.subcategories = (Category.query.with_parent(self.category)
                               .filter(Category.id.in_(subcategory_ids))
                               .order_by(Category.title)
@@ -346,7 +345,7 @@ class RHSortSubcategories(RHManageCategoryBase):
 
 
 class RHManageCategorySelectedEventsBase(RHManageCategoryBase):
-    """Base RH to manage selected events in a category"""
+    """Base RH to manage selected events in a category."""
 
     def _process_args(self):
         RHManageCategoryBase._process_args(self)
@@ -359,7 +358,7 @@ class RHManageCategorySelectedEventsBase(RHManageCategoryBase):
 
 
 class RHDeleteEvents(RHManageCategorySelectedEventsBase):
-    """Delete multiple events"""
+    """Delete multiple events."""
 
     def _process(self):
         is_submitted = 'confirmed' in request.form
@@ -390,9 +389,9 @@ class RHSplitCategory(RHManageCategorySelectedEventsBase):
         form = SplitCategoryForm(formdata=request.form)
         if form.validate_on_submit():
             self._move_events(self.sel_events, form.first_category.data)
-            if not form.all_selected.data:
+            if not form.all_selected.data and form.second_category.data:
                 self._move_events(self.cat_events - self.sel_events, form.second_category.data)
-            if form.all_selected.data:
+            if form.all_selected.data or not form.second_category.data:
                 flash(_('Your events have been moved to the category "{}"')
                       .format(form.first_category.data), 'success')
             else:
@@ -425,7 +424,7 @@ class RHMoveEvents(RHManageCategorySelectedEventsBase):
 
 
 class RHCategoryRoles(RHManageCategoryBase):
-    """Category role management"""
+    """Category role management."""
 
     def _process(self):
         return WPCategoryManagement.render_template('management/roles.html', self.category, 'roles',
@@ -433,7 +432,7 @@ class RHCategoryRoles(RHManageCategoryBase):
 
 
 class RHAddCategoryRole(RHManageCategoryBase):
-    """Add a new category role"""
+    """Add a new category role."""
 
     def _process(self):
         form = CategoryRoleForm(category=self.category, color=self._get_color())
@@ -452,7 +451,7 @@ class RHAddCategoryRole(RHManageCategoryBase):
 
 
 class RHManageCategoryRole(RHManageCategoryBase):
-    """Base class to manage a specific category role"""
+    """Base class to manage a specific category role."""
 
     normalize_url_spec = {
         'locators': {
@@ -466,7 +465,7 @@ class RHManageCategoryRole(RHManageCategoryBase):
 
 
 class RHEditCategoryRole(RHManageCategoryRole):
-    """Edit a category role"""
+    """Edit a category role."""
 
     def _process(self):
         form = CategoryRoleForm(obj=self.role, category=self.category)
@@ -479,7 +478,7 @@ class RHEditCategoryRole(RHManageCategoryRole):
 
 
 class RHDeleteCategoryRole(RHManageCategoryRole):
-    """Delete a category role"""
+    """Delete a category role."""
 
     def _process(self):
         db.session.delete(self.role)
@@ -488,7 +487,7 @@ class RHDeleteCategoryRole(RHManageCategoryRole):
 
 
 class RHRemoveCategoryRoleMember(RHManageCategoryRole):
-    """Remove a user from a category role"""
+    """Remove a user from a category role."""
 
     normalize_url_spec = dict(RHManageCategoryRole.normalize_url_spec, preserved_args={'user_id'})
 
@@ -504,18 +503,19 @@ class RHRemoveCategoryRoleMember(RHManageCategoryRole):
 
 
 class RHAddCategoryRoleMembers(RHManageCategoryRole):
-    """Add users to a category role"""
+    """Add users to a category role."""
 
-    def _process(self):
-        for data in request.json['users']:
-            user = principal_from_fossil(data, allow_pending=True, allow_groups=False)
-            if user not in self.role.members:
-                self.role.members.add(user)
-                logger.info('User %r added to role %r by %r', user, self.role, session.user)
+    @use_kwargs({
+        'users': PrincipalList(required=True, allow_external_users=True),
+    })
+    def _process(self, users):
+        for user in users - self.role.members:
+            self.role.members.add(user)
+            logger.info('User %r added to role %r by %r', user, self.role, session.user)
         return jsonify_data(html=_render_role(self.role, collapsed=False))
 
 
 class RHCategoryRoleMembersImportCSV(ImportRoleMembersMixin, RHManageCategoryRole):
-    """Add users to a category role from CSV"""
+    """Add users to a category role from CSV."""
 
     logger = logger

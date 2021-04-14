@@ -1,24 +1,29 @@
 // This file is part of Indico.
-// Copyright (C) 2002 - 2020 CERN
+// Copyright (C) 2002 - 2021 CERN
 //
 // Indico is free software; you can redistribute it and/or
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-import React from 'react';
 import PropTypes from 'prop-types';
+import React from 'react';
+
+import {FinalRevisionState} from '../../models';
 
 import CommentItem from './CommentItem';
 import CustomItem from './CustomItem';
+import {blockItemPropTypes} from './util';
 
-export default function RevisionLog({items, children, separator}) {
+export default function RevisionLog({items, state, children, separator}) {
   return (
     <div className="i-timeline">
       <div className="i-timeline with-line">
         <div className="i-timeline-connect-up" />
         {items.map(item => {
-          const Component = item.custom ? CustomItem : CommentItem;
-          return <Component key={item.id} {...item} />;
+          if (item.custom) {
+            return <CustomItem key={item.id} item={item} state={state} />;
+          }
+          return <CommentItem key={item.id} {...item} />;
         })}
         {children}
       </div>
@@ -35,7 +40,8 @@ export default function RevisionLog({items, children, separator}) {
 }
 
 RevisionLog.propTypes = {
-  items: PropTypes.array.isRequired,
+  items: PropTypes.arrayOf(PropTypes.shape(blockItemPropTypes)).isRequired,
+  state: PropTypes.oneOf(Object.values(FinalRevisionState)),
   children: PropTypes.node,
   separator: PropTypes.bool,
 };
@@ -43,4 +49,5 @@ RevisionLog.propTypes = {
 RevisionLog.defaultProps = {
   children: null,
   separator: false,
+  state: null,
 };

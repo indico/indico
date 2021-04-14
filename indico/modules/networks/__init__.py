@@ -1,11 +1,9 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
-
-from __future__ import unicode_literals
 
 from flask import has_request_context, request, session
 
@@ -33,6 +31,6 @@ def _can_access(cls, obj, user, authorized, **kwargs):
     # Grant full access to attachments/folders to certain networks
     if not has_request_context() or not request.remote_addr or authorized is not None:
         return
-    ip = unicode(request.remote_addr)
+    ip = str(request.remote_addr)
     if any(net.contains_ip(ip) for net in IPNetworkGroup.query.filter_by(attachment_access_override=True)):
         return True

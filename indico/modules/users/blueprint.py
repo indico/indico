@@ -1,25 +1,23 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import unicode_literals
-
 from flask import request
 
-from indico.modules.users.api import RHUserFavoritesAPI, fetch_authenticated_user
+from indico.modules.users.api import RHUserAPI
 from indico.modules.users.controllers import (RHAcceptRegistrationRequest, RHAdmins, RHExportDashboardICS,
-                                              RHPersonalData, RHProfilePictureDisplay, RHProfilePicturePage,
-                                              RHProfilePicturePreview, RHRegistrationRequestList,
+                                              RHExportDashboardICSLegacy, RHPersonalData, RHProfilePictureDisplay,
+                                              RHProfilePicturePage, RHProfilePicturePreview, RHRegistrationRequestList,
                                               RHRejectRegistrationRequest, RHSaveProfilePicture, RHUserBlock,
                                               RHUserDashboard, RHUserEmails, RHUserEmailsDelete, RHUserEmailsSetPrimary,
-                                              RHUserEmailsVerify, RHUserFavorites, RHUserFavoritesCategoryAPI,
-                                              RHUserFavoritesUserRemove, RHUserFavoritesUsersAdd, RHUserPreferences,
-                                              RHUsersAdmin, RHUsersAdminCreate, RHUsersAdminMerge,
-                                              RHUsersAdminMergeCheck, RHUsersAdminSettings, RHUserSearch,
-                                              RHUserSearchInfo, RHUserSuggestionsRemove)
+                                              RHUserEmailsVerify, RHUserFavorites, RHUserFavoritesAPI,
+                                              RHUserFavoritesCategoryAPI, RHUserPreferences, RHUsersAdmin,
+                                              RHUsersAdminCreate, RHUsersAdminMerge, RHUsersAdminMergeCheck,
+                                              RHUsersAdminSettings, RHUserSearch, RHUserSearchInfo,
+                                              RHUserSuggestionsRemove)
 from indico.web.flask.wrappers import IndicoBlueprint
 
 
@@ -56,31 +54,30 @@ with _bp.add_prefixed_rules('/<int:user_id>'):
     _bp.add_url_rule('/profile/picture', 'save_profile_picture', RHSaveProfilePicture, methods=('POST',))
     _bp.add_url_rule('/profile/picture/preview/<any(standard,gravatar,identicon,custom):source>',
                      'profile_picture_preview', RHProfilePicturePreview)
-    _bp.add_url_rule('/picture-<slug>', 'user_profile_picture_display', RHProfilePictureDisplay)
     _bp.add_url_rule('/preferences/', 'user_preferences', RHUserPreferences, methods=('GET', 'POST'))
     _bp.add_url_rule('/favorites/', 'user_favorites', RHUserFavorites)
-    _bp.add_url_rule('/favorites/users/', 'user_favorites_users_add', RHUserFavoritesUsersAdd, methods=('POST',))
-    _bp.add_url_rule('/favorites/users/<int:fav_user_id>', 'user_favorites_user_remove', RHUserFavoritesUserRemove,
-                     methods=('DELETE',))
-    _bp.add_url_rule('/favorites/categories/<int:category_id>', 'user_favorites_category_api',
-                     RHUserFavoritesCategoryAPI, methods=('PUT', 'DELETE'))
+    _bp.add_url_rule('/api/favorites/users', 'favorites_api', RHUserFavoritesAPI)
+    _bp.add_url_rule('/api/favorites/users/<int:fav_user_id>', 'favorites_api', RHUserFavoritesAPI,
+                     methods=('PUT', 'DELETE'))
+    _bp.add_url_rule('/api/favorites/categories', 'user_favorites_category_api', RHUserFavoritesCategoryAPI)
+    _bp.add_url_rule('/api/favorites/categories/<int:category_id>', 'user_favorites_category_api',
+                     RHUserFavoritesCategoryAPI, methods=('GET', 'PUT', 'DELETE'))
     _bp.add_url_rule('/emails/', 'user_emails', RHUserEmails, methods=('GET', 'POST'))
     _bp.add_url_rule('/emails/verify/<token>', 'user_emails_verify', RHUserEmailsVerify)
     _bp.add_url_rule('/emails/<email>', 'user_emails_delete', RHUserEmailsDelete, methods=('DELETE',))
     _bp.add_url_rule('/emails/make-primary', 'user_emails_set_primary', RHUserEmailsSetPrimary, methods=('POST',))
     _bp.add_url_rule('/blocked', 'user_block', RHUserBlock, methods=('PUT', 'DELETE'))
 
-_bp.add_url_rule('/<int:user_id>/dashboard.ics', 'export_dashboard_ics', RHExportDashboardICS)
+_bp.add_url_rule('/dashboard.ics', 'export_dashboard_ics', RHExportDashboardICS)
+_bp.add_url_rule('/<int:user_id>/dashboard.ics', 'export_dashboard_ics_legacy', RHExportDashboardICSLegacy)
+_bp.add_url_rule('/<int:user_id>/picture-<slug>', 'user_profile_picture_display', RHProfilePictureDisplay)
 
 # User search
 _bp.add_url_rule('/search/info', 'user_search_info', RHUserSearchInfo)
 _bp.add_url_rule('/search/', 'user_search', RHUserSearch)
 
 # Users API
-_bp.add_url_rule('!/api/user/', 'authenticated_user', fetch_authenticated_user)
-
-_bp.add_url_rule('/api/favorites/', 'favorites_api', RHUserFavoritesAPI)
-_bp.add_url_rule('/api/favorites/<int:user_id>', 'favorites_api', RHUserFavoritesAPI, methods=('PUT', 'DELETE'))
+_bp.add_url_rule('!/api/user/', 'authenticated_user', RHUserAPI)
 
 
 @_bp.url_defaults

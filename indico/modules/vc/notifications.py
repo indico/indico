@@ -1,11 +1,9 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
-
-from __future__ import unicode_literals
 
 from indico.core.notifications import make_email, send_email
 from indico.modules.vc.util import get_linked_to_description
@@ -13,7 +11,7 @@ from indico.web.flask.templating import get_overridable_template_name, get_templ
 
 
 def notify_created(plugin, room, room_assoc, event, user):
-    """Notifies about the creation of a vc_room.
+    """Notify about the creation of a vc_room.
 
     :param room: the vc_room
     :param event: the event
@@ -27,7 +25,7 @@ def notify_created(plugin, room, room_assoc, event, user):
 
 
 def notify_deleted(plugin, room, room_assoc, event, user):
-    """Notifies about the deletion of a vc_room from the system.
+    """Notify about the deletion of a vc_room from the system.
 
     :param room: the vc_room
     :param event: the event

@@ -1,11 +1,9 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
-
-from __future__ import unicode_literals
 
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.ext.hybrid import Comparator, hybrid_property
@@ -15,7 +13,7 @@ from indico.core.db.sqlalchemy import PyIntEnum
 from indico.modules.designer import DEFAULT_CONFIG, TemplateType
 from indico.util.locators import locator_property
 from indico.util.placeholders import get_placeholders
-from indico.util.string import format_repr, return_ascii
+from indico.util.string import format_repr
 
 
 TEMPLATE_DEFAULTS = {
@@ -127,7 +125,7 @@ class DesignerTemplate(db.Model):
             }
             size = DEFAULT_CONFIG[tpl_type]['tpl_size']
             data.update({'width': size[0], 'height': size[1]})
-        super(DesignerTemplate, self).__init__(data=data, **kwargs)
+        super().__init__(data=data, **kwargs)
 
     @hybrid_property
     def owner(self):
@@ -151,7 +149,6 @@ class DesignerTemplate(db.Model):
         else:
             return False
 
-    @return_ascii
     def __repr__(self):
         return format_repr(self, 'id', 'event_id', 'category_id', _text=self.title)
 
@@ -170,4 +167,4 @@ class _OwnerComparator(Comparator):
         elif isinstance(other, db.m.Category):
             return self.cls.category == other
         else:
-            raise ValueError('Unexpected object type {}: {}'.format(type(other), other))
+            raise ValueError(f'Unexpected object type {type(other)}: {other}')

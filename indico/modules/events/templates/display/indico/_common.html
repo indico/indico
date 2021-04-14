@@ -58,22 +58,22 @@
     <span>{{ user_data.display_full_name }}</span>
     {%- if user_data.affiliation -%}
         <span class="affiliation">
-            ({#--#}
             <span class="text">
+                ({#--#}
                 {%- if italic_affiliation -%}
                     <em>{{ user_data.affiliation }}</em>
                 {%- else -%}
                     {{ user_data.affiliation }}
                 {%- endif -%}
+                {#--#}){#--#}
             </span>
-            {#--#}){#--#}
         </span>
     {%- endif -%}
 {%- endmacro %}
 
 {% macro render_users(user_list, span_class='', title=true, italic_affiliation=false, separator=', ') -%}
     {%- for link in user_list -%}
-        {%- if caller -%}
+        {%- if caller is defined -%}
             {{- caller(link) -}}
         {%- else -%}
             <span class="{{ span_class }}">

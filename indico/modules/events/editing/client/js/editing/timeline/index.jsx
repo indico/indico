@@ -1,5 +1,5 @@
 // This file is part of Indico.
-// Copyright (C) 2002 - 2020 CERN
+// Copyright (C) 2002 - 2021 CERN
 //
 // Indico is free software; you can redistribute it and/or
 // modify it under the terms of the MIT License; see the
@@ -12,12 +12,12 @@ import {Loader, Message} from 'semantic-ui-react';
 import TimelineHeader from 'indico/modules/events/editing/editing/timeline/TimelineHeader';
 import TimelineContent from 'indico/modules/events/reviewing/components/TimelineContent';
 import {Param, Translate} from 'indico/react/i18n';
-import SubmitRevision from './SubmitRevision';
 
 import * as actions from './actions';
-import * as selectors from './selectors';
-import TimelineItem from './TimelineItem';
 import FileDisplay from './FileDisplay';
+import * as selectors from './selectors';
+import SubmitRevision from './SubmitRevision';
+import TimelineItem from './TimelineItem';
 
 const POLLING_SECONDS = 10;
 

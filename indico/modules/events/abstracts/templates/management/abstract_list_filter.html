@@ -14,7 +14,7 @@
             <div class="i-label filter">
                 <a class="icon-filter" data-toggle="dropdown"></a>
                 <ul class="i-dropdown" style="display: none">
-                    {% for value, caption in filter_choices.iteritems() %}
+                    {% for value, caption in filter_choices.items() %}
                         <li>
                             <input type="checkbox" name="field_{{ item_id }}" value="{{ value }}"
                                    id="field_{{ item_id }}_option_{{ value }}"
@@ -80,7 +80,7 @@
            value="{{ visible_items | tojson | forceescape }}">
     <h3>{% trans %}General abstract info{% endtrans %}</h3>
     <div class="flexrow f-wrap">
-        {% for item_id, item in static_items.iteritems() %}
+        {% for item_id, item in static_items.items() %}
             {% set filter_choices = item.get('filter_choices') %}
             {{ _render_column_selector(item_id, item, filter_choices, is_static_item=true) }}
         {% endfor %}
@@ -98,7 +98,7 @@
     {% if extra_filters %}
         <h3>{% trans %}Extra filters{% endtrans %}</h3>
         <div class="i-form horizontal">
-            {% for item_id, item in extra_filters.iteritems() %}
+            {% for item_id, item in extra_filters.items() %}
                 {% set name = 'field_{}'.format(item_id) %}
                 {% if item.type == 'bool' %}
                     {{ _render_boolean_filter(id=item_id, name=name, label=item.title) }}

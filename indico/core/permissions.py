@@ -1,11 +1,9 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
-
-from __future__ import unicode_literals
 
 from indico.core import signals
 from indico.util.caching import memoize_request
@@ -17,7 +15,7 @@ FULL_ACCESS_PERMISSION = '_full_access'
 READ_ACCESS_PERMISSION = '_read_access'
 
 
-class ManagementPermission(object):
+class ManagementPermission:
     """Base class for management permissions.
 
     To create a new permission, subclass this class and register
@@ -41,13 +39,13 @@ class ManagementPermission(object):
 
 @memoize_request
 def get_available_permissions(type_):
-    """Gets a dict containing all permissions for a given object type"""
+    """Get a dict containing all permissions for a given object type."""
     return named_objects_from_signal(signals.acl.get_management_permissions.send(type_))
 
 
 def check_permissions(type_):
     """
-    Retrieves the permissions for an object type and ensures they are
+    Retrieve the permissions for an object type and ensure they are
     defined properly.
 
     This function should be executed from a function connected to the
@@ -57,21 +55,24 @@ def check_permissions(type_):
     permissions = get_available_permissions(type_)
     if not all(x.islower() for x in permissions):
         raise RuntimeError('Management permissions must be all-lowercase')
-    if len(list(x for x in permissions.viewvalues() if x.default)) > 1:
+    if len(list(x for x in permissions.values() if x.default)) > 1:
         raise RuntimeError('Only one permission can be the default')
 
 
 def get_permissions_info(_type):
-    """Retrieve the permissions that can be set in the protection page and related information
+    """
+    Retrieve the permissions that can be set in the protection page
+    and related information.
+
     :param _type: The type of the permissions retrieved (e.g. Event, Category)
     :return: A tuple containing a dict with the available permissions and a dict with the permissions tree
     """
-    from indico.modules.events import Event
     from indico.modules.categories import Category
+    from indico.modules.events import Event
     from indico.modules.events.contributions import Contribution
     from indico.modules.events.sessions import Session
-    from indico.modules.rb.models.rooms import Room
     from indico.modules.events.tracks import Track
+    from indico.modules.rb.models.rooms import Room
 
     description_mapping = {
         FULL_ACCESS_PERMISSION: {
@@ -92,7 +93,7 @@ def get_permissions_info(_type):
         }
     }
 
-    selectable_permissions = {k: v for k, v in get_available_permissions(_type).viewitems() if v.user_selectable}
+    selectable_permissions = {k: v for k, v in get_available_permissions(_type).items() if v.user_selectable}
     special_permissions = {
         FULL_ACCESS_PERMISSION: {
             'title': _('Manage'),
@@ -115,7 +116,7 @@ def get_permissions_info(_type):
             'description': special_permissions[FULL_ACCESS_PERMISSION]['description'],
             'children': {
                 perm.name: {'title': perm.friendly_name, 'description': perm.description}
-                for name, perm in selectable_permissions.viewitems()
+                for name, perm in selectable_permissions.items()
             }
         },
         READ_ACCESS_PERMISSION: {
@@ -125,12 +126,12 @@ def get_permissions_info(_type):
     }
     available_permissions = dict({k: {
         'title': v.friendly_name,
-        'css_class': 'permission-{}-{}'.format(_type.__name__.lower(), v.name),
+        'css_class': f'permission-{_type.__name__.lower()}-{v.name}',
         'description': v.description,
         'default': v.default,
         'color': v.color,
-    } for k, v in selectable_permissions.viewitems()}, **special_permissions)
-    default = next((k for k, v in available_permissions.viewitems() if v['default']), None)
+    } for k, v in selectable_permissions.items()}, **special_permissions)
+    default = next((k for k, v in available_permissions.items() if v['default']), None)
 
     return available_permissions, permissions_tree, default
 
@@ -163,7 +164,10 @@ def get_unified_permissions(principal, all_permissions=False):
 
 
 def get_split_permissions(permissions):
-    """Split a list of permissions into a `has_full_access, has_read_access, list_with_others` tuple."""
+    """
+    Split a list of permissions into a `has_full_access, has_read_access,
+    list_with_others` tuple.
+    """
     full_access_permission = FULL_ACCESS_PERMISSION in permissions
     read_access_permission = READ_ACCESS_PERMISSION in permissions
     other_permissions = permissions - {FULL_ACCESS_PERMISSION, READ_ACCESS_PERMISSION}
@@ -172,31 +176,33 @@ def get_split_permissions(permissions):
 
 def update_permissions(obj, form):
     """Update the permissions of an object, based on the corresponding WTForm."""
-    from indico.util.user import principal_from_fossil
     from indico.modules.categories import Category
     from indico.modules.events import Event
+    from indico.util.user import principal_from_identifier
 
-    event = category = None
+    event_id = category_id = None
     if isinstance(obj, Category):
-        category = obj
+        category_id = obj.id
     elif isinstance(obj, Event):
-        event = obj
+        event_id = obj.id
     else:
-        event = obj.event
-        category = event.category
+        event_id = obj.event.id
+        category_id = obj.event.category.id
 
     current_principal_permissions = {p.principal: get_principal_permissions(p, type(obj))
                                      for p in obj.acl_entries}
-    current_principal_permissions = {k: v for k, v in current_principal_permissions.iteritems() if v}
+    current_principal_permissions = {k: v for k, v in current_principal_permissions.items() if v}
     new_principal_permissions = {
-        principal_from_fossil(
-            fossil,
-            allow_emails=True,
+        principal_from_identifier(
+            fossil['identifier'],
+            allow_groups=True,
             allow_networks=True,
-            allow_pending=True,
-            allow_registration_forms=True,
-            event=event,
-            category=category,
+            allow_emails=True,
+            allow_registration_forms=(event_id is not None),
+            allow_event_roles=(event_id is not None),
+            allow_category_roles=(event_id is not None or category_id is not None),
+            event_id=event_id,
+            category_id=category_id,
         ): set(permissions)
         for fossil, permissions in form.permissions.data
     }
@@ -204,15 +210,16 @@ def update_permissions(obj, form):
 
 
 def update_principals_permissions(obj, current, new):
-    """Handle the updates of permissions and creations/deletions of acl principals.
+    """
+    Handle the updates of permissions and creations/deletions of acl principals.
 
     :param obj: The object to update. Must have ``acl_entries``
     :param current: A dict mapping principals to a set with its current permissions
     :param new: A dict mapping principals to a set with its new permissions
     """
-    user_selectable_permissions = {v.name for k, v in get_available_permissions(type(obj)).viewitems()
+    user_selectable_permissions = {v.name for k, v in get_available_permissions(type(obj)).items()
                                    if v.user_selectable}
-    for principal, permissions in current.viewitems():
+    for principal, permissions in current.items():
         if principal not in new:
             permissions_kwargs = {
                 'full_access': False,

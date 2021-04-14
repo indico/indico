@@ -1,4 +1,5 @@
 {% from 'pagination.html' import render_pagination, render_pagination_entries_fragment %}
+{% from 'categories/management/_create_category_button.html' import create_category_button %}
 {% from 'events/management/_create_event_button.html' import create_event_button %}
 
 {% macro event_row(event) %}
@@ -92,6 +93,9 @@
                 </ul>
             </div>
             <div class="group">
+                {% if not category.children %}
+                    {{ create_category_button(category) }}
+                {% endif %}
                 {{ create_event_button(category, classes='icon-plus highlight', text=_("Create event")) }}
             </div>
         </div>

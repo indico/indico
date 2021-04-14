@@ -1,11 +1,9 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
-
-from __future__ import unicode_literals
 
 from sqlalchemy.ext.declarative import declared_attr
 
@@ -15,7 +13,7 @@ from indico.core.db.sqlalchemy.review_comments import ReviewCommentMixin
 from indico.modules.events.abstracts.models.reviews import AbstractCommentVisibility
 from indico.modules.events.models.reviews import ProposalCommentMixin
 from indico.util.locators import locator_property
-from indico.util.string import format_repr, return_ascii, text_to_repr
+from indico.util.string import format_repr, text_to_repr
 
 
 class AbstractComment(ProposalCommentMixin, ReviewCommentMixin, db.Model):
@@ -60,7 +58,6 @@ class AbstractComment(ProposalCommentMixin, ReviewCommentMixin, db.Model):
     def locator(self):
         return dict(self.abstract.locator, comment_id=self.id)
 
-    @return_ascii
     def __repr__(self):
         return format_repr(self, 'id', 'abstract_id', is_deleted=False, _text=text_to_repr(self.text))
 

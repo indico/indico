@@ -1,11 +1,9 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
-
-from __future__ import unicode_literals
 
 from datetime import datetime, time
 
@@ -27,7 +25,7 @@ from indico.modules.events.operations import create_event
 from indico.modules.rb import rb_settings
 from indico.modules.rb.util import rb_check_user_access
 from indico.util.date_time import now_utc
-from indico.util.struct.iterables import materialize_iterable
+from indico.util.iterables import materialize_iterable
 from indico.web.flask.util import url_for
 from indico.web.forms.base import FormDefaults
 from indico.web.rh import RHProtected
@@ -35,7 +33,7 @@ from indico.web.util import jsonify_data, jsonify_template, url_for_index
 
 
 class RHCreateEvent(RHProtected):
-    """Create a new event"""
+    """Create a new event."""
 
     def _process_args(self):
         self.event_type = EventType[request.view_args['event_type']]
@@ -83,7 +81,7 @@ class RHCreateEvent(RHProtected):
             # Copy person link data since we would otherwise end up
             # adding the EventPersons of the first event in all other
             # events of the series.
-            for link, submitter in link_data.iteritems():
+            for link, submitter in link_data.items():
                 link_copy = EventPersonLink(**{col: getattr(link, col)
                                                for col in get_simple_column_attrs(EventPersonLink)})
                 link_copy.person = EventPerson(**{col: getattr(link.person, col)
@@ -103,7 +101,7 @@ class RHCreateEvent(RHProtected):
 
     def _process(self):
         if not request.is_xhr:
-            return redirect(url_for_index(_anchor='create-event:{}'.format(self.event_type.name)))
+            return redirect(url_for_index(_anchor=f'create-event:{self.event_type.name}'))
         form_cls = LectureCreationForm if self.event_type == EventType.lecture else EventCreationForm
         form = form_cls(obj=self._get_form_defaults(), prefix='event-creation-')
         if form.validate_on_submit():

@@ -1,28 +1,27 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import unicode_literals
-
 import re
 from datetime import date, timedelta
-from types import NoneType
 
 from wtforms.validators import EqualTo, Length, Regexp, StopValidation, ValidationError
 
 from indico.util.date_time import as_utc, format_date, format_datetime, format_human_timedelta, format_time, now_utc
 from indico.util.i18n import _, ngettext
+from indico.util.passwords import validate_secure_password
 from indico.util.string import is_valid_mail
 
 
-class UsedIf(object):
-    """Makes a WTF field "used" if a given condition evaluates to True.
+class UsedIf:
+    """Make a WTF field "used" if a given condition evaluates to True.
 
     If the field is not used, validation stops.
     """
+
     field_flags = ('conditional',)
 
     def __init__(self, condition):
@@ -38,8 +37,8 @@ class UsedIf(object):
             raise StopValidation()
 
 
-class HiddenUnless(object):
-    """Hides and disables a field unless another field has a certain value.
+class HiddenUnless:
+    """Hide and disable a field unless another field has a certain value.
 
     :param field: The name of the other field to check
     :param value: The value to check for.  If unspecified, any truthy
@@ -48,11 +47,12 @@ class HiddenUnless(object):
                           ``object_data`` it had before (i.e. data set
                           via `FormDefaults`).
     """
+
     field_flags = ('initially_hidden',)
 
     def __init__(self, field, value=None, preserve_data=False):
         self.field = field
-        self.value = value if isinstance(value, (set, list, tuple, NoneType)) else {value}
+        self.value = value if value is None or isinstance(value, (set, list, tuple)) else {value}
         self.preserve_data = preserve_data
 
     def __call__(self, form, field):
@@ -74,11 +74,12 @@ class HiddenUnless(object):
             raise StopValidation()
 
 
-class Exclusive(object):
-    """Makes a WTF field mutually exclusive with other fields.
+class Exclusive:
+    """Make a WTF field mutually exclusive with other fields.
 
     If any of the given fields have a value, the validated field may not have one.
     """
+
     def __init__(self, *fields):
         self.fields = fields
 
@@ -86,31 +87,32 @@ class Exclusive(object):
         if field.data is None:
             return
         if any(form[f].data is not None for f in self.fields):
-            field_names = sorted(unicode(form[f].label.text) for f in self.fields)
-            msg = ngettext(u'This field is mutually exclusive with another field: {}',
-                           u'This field is mutually exclusive with other fields: {}',
+            field_names = sorted(str(form[f].label.text) for f in self.fields)
+            msg = ngettext('This field is mutually exclusive with another field: {}',
+                           'This field is mutually exclusive with other fields: {}',
                            len(field_names))
-            raise ValidationError(msg.format(u', '.join(field_names)))
+            raise ValidationError(msg.format(', '.join(field_names)))
 
 
 class ConfirmPassword(EqualTo):
     def __init__(self, fieldname):
-        super(ConfirmPassword, self).__init__(fieldname, message=_('The passwords do not match.'))
+        super().__init__(fieldname, message=_('The passwords do not match.'))
 
 
-class IndicoEmail(object):
-    """Validates one or more email addresses"""
+class IndicoEmail:
+    """Validate one or more email addresses."""
+
     def __init__(self, multi=False):
         self.multi = multi
 
     def __call__(self, form, field):
         if field.data and not is_valid_mail(field.data, self.multi):
-            msg = _(u'Invalid email address list') if self.multi else _(u'Invalid email address')
+            msg = _('Invalid email address list') if self.multi else _('Invalid email address')
             raise ValidationError(msg)
 
 
-class DateRange(object):
-    """Validates that a date is within the specified boundaries"""
+class DateRange:
+    """Validate that a date is within the specified boundaries."""
 
     field_flags = ('date_range',)
 
@@ -156,8 +158,8 @@ class DateRange(object):
         return latest
 
 
-class DateTimeRange(object):
-    """Validates that a datetime is within the specified boundaries"""
+class DateTimeRange:
+    """Validate that a datetime is within the specified boundaries."""
 
     field_flags = ('datetime_range',)
 
@@ -205,8 +207,8 @@ class DateTimeRange(object):
         return as_utc(latest) if latest else latest
 
 
-class LinkedDate(object):
-    """Validates that a date field happens before or/and after another.
+class LinkedDate:
+    """Validate that a date field happens before or/and after another.
 
     If both ``not_before`` and ``not_after`` are set to ``True``, both fields have to
     be equal.
@@ -238,8 +240,8 @@ class LinkedDate(object):
             raise ValidationError(_("{} can't be equal to {}").format(field.label, linked_field.label))
 
 
-class LinkedDateTime(object):
-    """Validates that a datetime field happens before or/and after another.
+class LinkedDateTime:
+    """Validate that a datetime field happens before or/and after another.
 
     If both ``not_before`` and ``not_after`` are set to ``True``, both fields have to
     be equal.
@@ -287,11 +289,11 @@ class UsedIfChecked(UsedIf):
         def _condition(form, field):
             return form._fields.get(field_name).data
 
-        super(UsedIfChecked, self).__init__(_condition)
+        super().__init__(_condition)
 
 
-class MaxDuration(object):
-    """Validates if TimeDeltaField value doesn't exceed `max_duration`"""
+class MaxDuration:
+    """Validate if TimeDeltaField value doesn't exceed `max_duration`."""
 
     def __init__(self, max_duration=None, **kwargs):
         assert max_duration or kwargs
@@ -303,7 +305,7 @@ class MaxDuration(object):
             raise ValidationError(_('Duration cannot exceed {}').format(format_human_timedelta(self.max_duration)))
 
 
-class TimeRange(object):
+class TimeRange:
     """Validate the time lies within boundaries."""
 
     def __init__(self, earliest=None, latest=None):
@@ -326,8 +328,8 @@ class TimeRange(object):
         raise ValidationError(message.format(earliest=_format_time(self.earliest), latest=_format_time(self.latest)))
 
 
-class WordCount(object):
-    """Validates the word count of a string.
+class WordCount:
+    """Validate the word count of a string.
 
     :param min: The minimum number of words in the string.  If not
                 provided, the minimum word count will not be checked.
@@ -364,7 +366,7 @@ class IndicoRegexp(Regexp):
 
     def __init__(self, *args, **kwargs):
         self.client_side = kwargs.pop('client_side', True)
-        super(IndicoRegexp, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
 
 class SoftLength(Length):
@@ -376,3 +378,23 @@ class SoftLength(Length):
     whitespace which is in line with the behavior in all our forms
     where surrounding whitespace is stripped before validation.
     """
+
+
+class SecurePassword:
+    """Validate that a string is a secure password."""
+
+    # This is only defined here so the `_attrs_for_validators` util does
+    # not need to hard-code it.
+    MIN_LENGTH = 8
+
+    def __init__(self, context='wtforms-field', username_field=None):
+        self.context = context
+        self.username_field = username_field
+
+    def __call__(self, form, field):
+        username = ''
+        if self.username_field:
+            username = form[self.username_field].data or ''
+        password = field.data or ''
+        if error := validate_secure_password(self.context, password, username=username):
+            raise ValidationError(error)

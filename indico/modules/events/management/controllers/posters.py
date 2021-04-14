@@ -1,18 +1,16 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
-
-from __future__ import unicode_literals
 
 import uuid
 
 from flask import request
 from werkzeug.exceptions import Forbidden, NotFound
 
-from indico.legacy.common.cache import GenericCache
+from indico.core.cache import make_scoped_cache
 from indico.modules.designer.models.templates import DesignerTemplate
 from indico.modules.events.management.controllers import RHManageEventBase
 from indico.modules.events.management.forms import PosterPrintingForm
@@ -22,7 +20,7 @@ from indico.web.flask.util import send_file, url_for
 from indico.web.util import jsonify_data, jsonify_form
 
 
-poster_cache = GenericCache('poster-printing')
+poster_cache = make_scoped_cache('poster-printing')
 
 
 class RHPosterPrintSettings(RHManageEventBase):
@@ -38,8 +36,8 @@ class RHPosterPrintSettings(RHManageEventBase):
         if form.validate_on_submit():
             data = dict(form.data)
             template_id = data.pop('template')
-            key = unicode(uuid.uuid4())
-            poster_cache.set(key, data, time=1800)
+            key = str(uuid.uuid4())
+            poster_cache.set(key, data, timeout=1800)
             download_url = url_for('.print_poster', self.event, template_id=template_id, uuid=key)
             return jsonify_data(flash=False, redirect=download_url, redirect_no_loading=True)
         return jsonify_form(form, disabled_until_change=False, back=_('Cancel'), submit=_('Download PDF'))
@@ -65,4 +63,4 @@ class RHPrintEventPoster(RHManageEventBase):
             raise NotFound
 
         pdf = PosterPDF(self.template, config_params, self.event)
-        return send_file('Poster-{}.pdf'.format(self.event.id), pdf.get_pdf(), 'application/pdf')
+        return send_file(f'Poster-{self.event.id}.pdf', pdf.get_pdf(), 'application/pdf')

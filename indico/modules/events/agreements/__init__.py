@@ -1,11 +1,9 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
-
-from __future__ import unicode_literals
 
 from flask import session
 
@@ -43,7 +41,7 @@ def _extend_event_management_menu(sender, event, **kwargs):
 
 @signals.users.merged.connect
 def _merge_users(target, source, **kwargs):
-    Agreement.find(user_id=source.id).update({Agreement.user_id: target.id})
+    Agreement.query.filter_by(user_id=source.id).update({Agreement.user_id: target.id})
 
 
 @signals.get_placeholders.connect_via('agreement-email')

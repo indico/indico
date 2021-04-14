@@ -1,11 +1,9 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
-
-from __future__ import unicode_literals
 
 from flask import redirect, request, session
 from werkzeug.exceptions import BadRequest, Forbidden
@@ -20,7 +18,7 @@ from indico.web.util import jsonify_template
 
 
 class DownloadAttachmentMixin(SpecificAttachmentMixin):
-    """Download an attachment"""
+    """Download an attachment."""
 
     def _check_access(self):
         if not self.attachment.can_access(session.user):

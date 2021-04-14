@@ -1,11 +1,9 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
-
-from __future__ import unicode_literals
 
 from collections import defaultdict
 from datetime import date
@@ -22,7 +20,7 @@ from indico.modules.rb.models.blockings import Blocking
 from indico.modules.rb.models.rooms import Room
 from indico.modules.rb.notifications.blockings import notify_request
 from indico.modules.rb.operations.rooms import get_managed_room_ids
-from indico.util.struct.iterables import group_list
+from indico.util.iterables import group_list
 
 
 def get_room_blockings(timeframe=None, created_by=None, in_rooms_owned_by=None):
@@ -58,7 +56,7 @@ def filter_blocked_rooms(blocked_rooms, overridable_only=False, nonoverridable_o
 
 
 def group_blocked_rooms(blocked_rooms):
-    return group_list(blocked_rooms, key=attrgetter('room_id'))
+    return group_list(blocked_rooms, key=attrgetter('room_id'), sort_by=attrgetter('room_id'))
 
 
 def get_blockings_with_rooms(start_date, end_date):
@@ -122,7 +120,7 @@ def _approve_or_request_rooms(blocking, blocked_rooms=None):
         else:
             # TODO: notify all managers of a room?
             rooms_by_owner[blocked_room.room.owner].append(blocked_room)
-    for owner, rooms in rooms_by_owner.iteritems():
+    for owner, rooms in rooms_by_owner.items():
         notify_request(owner, blocking, rooms)
 
 
