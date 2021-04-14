@@ -10,6 +10,7 @@ import './ckeditor_widget';
 import './color_picker_widget';
 import './date_widget';
 import './datetime_widget';
+import './duration_widget';
 import './time_widget';
 import './linking_widget';
 import './location_widget';
