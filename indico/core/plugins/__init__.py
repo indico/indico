@@ -188,7 +188,10 @@ class IndicoPlugin(Plugin):
 
         def _do_inject(sender):
             if condition is None or condition():
-                return self.manifest[name]
+                try:
+                    return self.manifest[name]
+                except TypeError:
+                    raise RuntimeError(f'Assets for plugin {self.name} have not been built')
 
         if view_class is None:
             self.connect(signals.plugin.inject_bundle, _do_inject)

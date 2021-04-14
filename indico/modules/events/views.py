@@ -162,6 +162,8 @@ class WPSimpleEventDisplay(WPSimpleEventDisplayBase):
         print_stylesheet = self.theme.get('print_stylesheet')
         if plugin:
             manifest = plugin.manifest
+            if manifest is None:
+                raise RuntimeError(f'Assets for plugin {plugin.name} have not been built')
         else:
             manifest = current_app.manifest
         return {
