@@ -8,10 +8,9 @@
 from indico.modules.events.controllers.admin import (RHCreateEventLabel, RHCreateReferenceType, RHDeleteEventLabel,
                                                      RHDeleteReferenceType, RHEditEventLabel, RHEditReferenceType,
                                                      RHEventLabels, RHReferenceTypes)
-from indico.modules.events.controllers.creation import RHCreateEvent
+from indico.modules.events.controllers.creation import RHCreateEvent, RHPrepareEvent
 from indico.modules.events.controllers.display import RHEventAccessKey, RHEventMarcXML, RHExportEventICAL
 from indico.modules.events.controllers.entry import event_or_shorturl
-from indico.modules.events.controllers.preparation import RHPrepareEvent
 from indico.web.flask.util import make_compat_redirect_func, redirect_view
 from indico.web.flask.wrappers import IndicoBlueprint
 

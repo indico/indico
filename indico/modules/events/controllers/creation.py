@@ -6,11 +6,13 @@
 # LICENSE file for more details.
 
 from datetime import datetime, time
+from uuid import uuid4
 
 from dateutil.relativedelta import relativedelta
-from flask import flash, redirect, render_template, request, session
+from flask import flash, jsonify, redirect, render_template, request, session
 from markupsafe import Markup
-from pytz import timezone
+from pytz import common_timezones_set, timezone
+from webargs import fields
 from werkzeug.utils import cached_property
 
 from indico.core.cache import make_scoped_cache
@@ -27,9 +29,11 @@ from indico.modules.rb import rb_settings
 from indico.modules.rb.util import rb_check_user_access
 from indico.util.date_time import now_utc
 from indico.util.iterables import materialize_iterable
+from indico.util.marshmallow import NaiveDateTime
+from indico.web.args import use_kwargs
 from indico.web.flask.util import url_for
 from indico.web.forms.base import FormDefaults
-from indico.web.rh import RHProtected
+from indico.web.rh import RH, RHProtected
 from indico.web.util import jsonify_data, jsonify_template, url_for_index
 
 
@@ -143,3 +147,31 @@ class RHCreateEvent(RHProtected):
                                 event_type=self.event_type.name, single_category=self.single_category,
                                 check_room_availability=check_room_availability,
                                 rb_excluded_categories=rb_excluded_categories)
+
+
+class RHPrepareEvent(RH):
+    """Prepare the creation of an event with some data."""
+
+    CSRF_ENABLED = False
+
+    @use_kwargs({
+        'title': fields.String(required=True),
+        'start_dt': NaiveDateTime(required=True),
+        'tz': fields.String(missing=config.DEFAULT_TIMEZONE, validate=lambda v: v in common_timezones_set),
+        'duration': fields.Integer(required=True, validate=lambda v: v > 0),
+        'event_type': fields.String(missing='meeting'),
+    })
+    def _process(self, title, start_dt, tz, duration, event_type):
+        event_key = str(uuid4())
+        start_dt = timezone(tz).localize(start_dt)
+        prepared_event_data_store.set(
+            event_key,
+            {
+                'title': title,
+                'start_dt': start_dt,
+                'duration': duration,
+                'event_type': event_type,
+            },
+            3600
+        )
+        return jsonify(url=url_for_index(_external=True, _anchor=f'create-event:meeting::{event_key}'))
