@@ -165,7 +165,7 @@ def judge_paper(paper, judgment, comment, judge):
     notify_paper_judgment(paper)
     logger.info('Paper %r was judged by %r to %s', paper, judge, orig_string(judgment.title))
     paper.event.log(EventLogRealm.reviewing, EventLogKind.change, 'Papers',
-                    'Paper "{}" was judged'.format(orig_string(paper.verbose_title)), judge,
+                    f'Paper "{orig_string(paper.verbose_title)}" was judged', judge,
                     data=log_data)
 
 
@@ -237,10 +237,10 @@ def update_reviewing_roles(event, users, contributions, role, assign):
             notify_paper_assignment(user, role, contributions, event, assign)
     if assign:
         event.log(EventLogRealm.reviewing, EventLogKind.positive, 'Papers',
-                  'Papers assigned ({})'.format(orig_string(role.title)), session.user, data=log_data)
+                  f'Papers assigned ({orig_string(role.title)})', session.user, data=log_data)
     else:
         event.log(EventLogRealm.reviewing, EventLogKind.negative, 'Papers',
-                  'Papers unassigned ({})'.format(orig_string(role.title)), session.user, data=log_data)
+                  f'Papers unassigned ({orig_string(role.title)})', session.user, data=log_data)
     db.session.flush()
     logger.info('Paper reviewing roles in event %r updated by %r', event, session.user)
 

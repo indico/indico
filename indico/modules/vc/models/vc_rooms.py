@@ -369,4 +369,4 @@ class _LinkObjectComparator(Comparator):
             return db.and_(self.cls.link_type == VCRoomLinkType.contribution,
                            self.cls.contribution_id == other.id)
         else:
-            raise TypeError('Unexpected object type {}: {}'.format(type(other), other))
+            raise TypeError(f'Unexpected object type {type(other)}: {other}')

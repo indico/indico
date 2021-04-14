@@ -361,7 +361,7 @@ class ProtectionManagersMixin(ProtectionMixin):
                                     to ``False``.
         """
         if permission is not None and permission != 'ANY' and permission not in get_available_permissions(type(self)):
-            raise ValueError("permission '{}' is not valid for '{}' objects".format(permission, type(self).__name__))
+            raise ValueError(f"permission '{permission}' is not valid for '{type(self).__name__}' objects")
 
         if user is None:
             # An unauthorized user is never allowed to perform management operations.
@@ -405,7 +405,7 @@ class ProtectionManagersMixin(ProtectionMixin):
         elif hasattr(parent, 'can_manage'):
             return parent.can_manage(user, allow_admin=allow_admin)
         else:
-            raise TypeError('protection_parent of {} is of invalid type {} ({})'.format(self, type(parent), parent))
+            raise TypeError(f'protection_parent of {self} is of invalid type {type(parent)} ({parent})')
 
     def update_principal(self, principal, read_access=None, full_access=None, permissions=None, add_permissions=None,
                          del_permissions=None, quiet=False):

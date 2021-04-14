@@ -146,7 +146,7 @@ class AttachmentPackageGeneratorMixin(ZipGeneratorMixin):
         path = os.path.join(*self._adjust_path_length([_f for _f in segments if _f]))
         while path in self.used_filenames:
             # prepend the id if there's a path collision
-            segments[-1] = '{}-{}'.format(attachment.id, segments[-1])
+            segments[-1] = f'{attachment.id}-{segments[-1]}'
             path = os.path.join(*self._adjust_path_length([_f for _f in segments if _f]))
         return path
 

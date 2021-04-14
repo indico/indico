@@ -361,12 +361,12 @@ def format_repr(obj, *args, **kwargs):
                                     if isinstance(c, ForeignKeyConstraint))) if hasattr(cls, '__table__') else set()
     formatted_args = [str(_format_value(getattr(obj, arg)))
                       if arg not in fkeys
-                      else '{}={}'.format(arg, _format_value(getattr(obj, arg)))
+                      else f'{arg}={_format_value(getattr(obj, arg))}'
                       for arg in args]
     for name, default_value in sorted(kwargs.items()):
         value = getattr(obj, name)
         if value != default_value:
-            formatted_args.append('{}={}'.format(name, _format_value(value)))
+            formatted_args.append(f'{name}={_format_value(value)}')
     if text_arg is not None:
         return '<{}({}): "{}">'.format(obj_name, ', '.join(formatted_args), text_arg)
     elif raw_text_arg is not None:
@@ -453,7 +453,7 @@ def format_full_name(first_name, last_name, title=None, last_name_first=True, la
     if not first_name:
         full_name = last_name
     else:
-        first_name = '{}.'.format(first_name[0].upper()) if abbrev_first_name else first_name
+        first_name = f'{first_name[0].upper()}.' if abbrev_first_name else first_name
         full_name = f'{last_name}, {first_name}' if last_name_first else f'{first_name} {last_name}'
     return full_name if not show_title or not title else f'{title} {full_name}'
 
@@ -523,7 +523,7 @@ class PlainText(Markup):
     """Unicode/Markup class that renders plain text."""
 
     def __html__(self):
-        return '<div class="preformatted">{}</div>'.format(escape(str(self)))
+        return f'<div class="preformatted">{escape(str(self))}</div>'
 
 
 def handle_legacy_description(field, obj, get_render_mode=attrgetter('render_mode'),

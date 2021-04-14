@@ -137,7 +137,7 @@ def extract_emails(smtp, required=True, count=None, one=False, regex=False, **kw
     if required:
         assert found, 'No matching emails found'
     if count is not None:
-        assert len(found) == count, 'Expected {} emails, got {}'.format(count, len(found))
+        assert len(found) == count, f'Expected {count} emails, got {len(found)}'
     if one:
         return found[0] if found else None
     return found
@@ -172,7 +172,7 @@ def extract_logs(caplog, required=True, count=None, one=False, regex=False, **kw
     if required:
         assert found, 'No matching records found'
     if count is not None:
-        assert len(found) == count, 'Expected {} records, got {}'.format(count, len(found))
+        assert len(found) == count, f'Expected {count} records, got {len(found)}'
     if one:
         return found[0] if found else None
     return found

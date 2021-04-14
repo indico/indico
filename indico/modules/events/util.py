@@ -667,7 +667,7 @@ class ZipGeneratorMixin:
         return send_file(zip_file_name, temp_file.name, 'application/zip', inline=False)
 
     def _prepare_folder_structure(self, item):
-        file_name = secure_filename('{}_{}'.format(str(item.id), item.filename), item.filename)
+        file_name = secure_filename(f'{item.id}_{item.filename}', item.filename)
         return os.path.join(*self._adjust_path_length([file_name]))
 
 

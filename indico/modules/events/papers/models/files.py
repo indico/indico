@@ -82,7 +82,7 @@ class PaperFile(StoredFileMixin, db.Model):
     def _build_storage_path(self):
         self.assign_id()
         path_segments = ['event', strict_str(self._contribution.event.id), 'papers',
-                         '{}_{}'.format(self.id, strict_str(self._contribution.id))]
+                         f'{self.id}_{strict_str(self._contribution.id)}']
         filename = secure_filename(self.filename, 'paper')
         path = posixpath.join(*(path_segments + [filename]))
         return config.ATTACHMENT_STORAGE, path

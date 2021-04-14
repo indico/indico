@@ -60,7 +60,7 @@ def render_event_footer(event, dark=False):
     location = event.venue_name
     if event.room_name:
         location = f'{event.room_name} ({location})'
-    description = '{}\n\n{}'.format(truncate(event.description, 1000), event.short_external_url).strip()
+    description = f'{truncate(event.description, 1000)}\n\n{event.short_external_url}'.strip()
     google_calendar_params = {
         'action': 'TEMPLATE',
         'text': event.title,
@@ -118,10 +118,10 @@ class WPEventBase(WPDecorated):
             else:
                 dates = ' ({} - {})'.format(format_date(start_dt_local, format='long'),
                                             format_date(end_dt_local, format='long'))
-        self.title = '{} {}'.format(strip_tags(self.event.title), dates)
+        self.title = f'{strip_tags(self.event.title)} {dates}'
         page_title = kwargs.get('page_title')
         if page_title:
-            self.title += ': {}'.format(strip_tags(page_title))
+            self.title += f': {strip_tags(page_title)}'
 
     def _get_header(self):
         raise NotImplementedError  # must be overridden by meeting/lecture and conference WPs

@@ -58,7 +58,7 @@ def normalizeQuery(path, query, remove=('signature',), separate=False):
     if separate:
         return path, sorted_params and urlencode(sorted_params)
     elif sorted_params:
-        return '{}?{}'.format(path, urlencode(sorted_params))
+        return f'{path}?{urlencode(sorted_params)}'
     else:
         return path
 

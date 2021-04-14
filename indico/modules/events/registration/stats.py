@@ -394,7 +394,7 @@ class AccommodationStats(FieldStats, StatsBase):
         return [
             Cell(type='str', data=' ' + choice_caption, classes=['cancelled-item'] if cancelled else []),
             Cell(type='progress', data=((total_regs / len(active_registrations),
-                                         '{} / {}'.format(total_regs, len(active_registrations)))
+                                         f'{total_regs} / {len(active_registrations)}')
                                         if active_registrations else None))
         ] + self._get_occupancy(data_items)
 

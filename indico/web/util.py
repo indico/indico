@@ -133,7 +133,7 @@ def _format_request_data(data, hide_passwords=False):
     rv = {}
     for key, values in data:
         if hide_passwords and 'password' in key:
-            values = [v if not v else '<{} chars hidden>'.format(len(v)) for v in values]
+            values = [v if not v else f'<{len(v)} chars hidden>' for v in values]
         rv[key] = values if len(values) != 1 else values[0]
     return rv
 

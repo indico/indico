@@ -41,7 +41,7 @@ class _ProtectedObjectWrapper:
         elif isinstance(self.object, db.m.Attachment):
             return _('File')
         else:
-            raise TypeError('Unexpected object of type {}: {}'.format(type(self.object).__name__, self.object))
+            raise TypeError(f'Unexpected object of type {type(self.object).__name__}: {self.object}')
 
     @property
     def edit_link_attrs(self):
@@ -62,7 +62,7 @@ class _ProtectedObjectWrapper:
                     'data-title': _('Edit attachment "{name}"').format(name=self.object.title),
                     'data-href': url_for('attachments.modify_attachment', self.object)}
         else:
-            raise TypeError('Unexpected object of type {}: {}'.format(type(self.object).__name__, self.object))
+            raise TypeError(f'Unexpected object of type {type(self.object).__name__}: {self.object}')
 
     def __repr__(self):
         return f'<_ProtectedObjectWrapper({self.object})>'
@@ -165,7 +165,7 @@ def get_non_inheriting_objects(root):
                 yield _ProtectedObjectWrapper(attachment)
 
     else:
-        raise TypeError('Unexpected object of type {}: {}'.format(type(root).__name__, root))
+        raise TypeError(f'Unexpected object of type {type(root).__name__}: {root}')
 
 
 @contextmanager

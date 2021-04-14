@@ -99,7 +99,7 @@ def handle_exception(exc, message=None):
     if not current_app.debug or request.is_xhr or request.is_json:
         sentry_sdk.capture_exception(exc)
         if message is None:
-            message = '{}: {}'.format(type(exc).__name__, str(exc))
+            message = f'{type(exc).__name__}: {str(exc)}'
         if os.environ.get('INDICO_DEV_SERVER') == '1':
             # If we are in the dev server, we always want to see a traceback on the
             # console, even if this was an API request.

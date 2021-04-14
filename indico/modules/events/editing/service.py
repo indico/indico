@@ -102,7 +102,7 @@ def service_handle_enabled(event):
         'endpoints': _get_event_endpoints(event)
     }
     try:
-        resp = requests.put(_build_url(event, '/event/{}'.format(_get_event_identifier(event))),
+        resp = requests.put(_build_url(event, f'/event/{_get_event_identifier(event)}'),
                             headers=_get_headers(event, include_token=False), json=data)
         resp.raise_for_status()
     except requests.RequestException as exc:
@@ -112,7 +112,7 @@ def service_handle_enabled(event):
 
 def service_handle_disconnected(event):
     try:
-        resp = requests.delete(_build_url(event, '/event/{}'.format(_get_event_identifier(event))),
+        resp = requests.delete(_build_url(event, f'/event/{_get_event_identifier(event)}'),
                                headers=_get_headers(event))
         resp.raise_for_status()
     except requests.RequestException as exc:
@@ -122,7 +122,7 @@ def service_handle_disconnected(event):
 
 def service_get_status(event):
     try:
-        resp = requests.get(_build_url(event, '/event/{}'.format(_get_event_identifier(event))),
+        resp = requests.get(_build_url(event, f'/event/{_get_event_identifier(event)}'),
                             headers=_get_headers(event))
         resp.raise_for_status()
     except requests.ConnectionError:

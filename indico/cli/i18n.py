@@ -178,7 +178,7 @@ def check_format_strings():
         invalid = _get_invalid_po_format_strings(path)
         if invalid:
             all_valid = False
-            click.echo('Found invalid format strings in {}'.format(os.path.relpath(path, root_path)))
+            click.echo(f'Found invalid format strings in {os.path.relpath(path, root_path)}')
             for item in invalid:
                 click.echo(cformat('%{yellow}{}%{reset} | %{yellow!}{}%{reset}\n%{red}{}%{reset} != %{red!}{}%{reset}')
                            .format(item['orig'], item['trans'],

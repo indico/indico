@@ -174,7 +174,7 @@ class SingleChoiceField(ChoiceBaseField):
             return ''
         uuid, number_of_slots = list(registration_data.data.items())[0]
         caption = registration_data.field_data.field.data['captions'][uuid]
-        return '{} (+{})'.format(caption, number_of_slots - 1) if number_of_slots > 1 else caption
+        return f'{caption} (+{number_of_slots - 1})' if number_of_slots > 1 else caption
 
     def process_form_data(self, registration, value, old_data=None, billable_items_locked=False, new_data_version=None):
         if billable_items_locked and old_data.price:
@@ -200,7 +200,7 @@ class MultiChoiceField(ChoiceBaseField):
     def get_friendly_data(self, registration_data, for_humans=False, for_search=False):
         def _format_item(uuid, number_of_slots):
             caption = self.form_item.data['captions'][uuid]
-            return '{} (+{})'.format(caption, number_of_slots - 1) if number_of_slots > 1 else caption
+            return f'{caption} (+{number_of_slots - 1})' if number_of_slots > 1 else caption
 
         reg_data = registration_data.data
         if not reg_data:

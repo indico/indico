@@ -138,7 +138,7 @@ class MultipleItemsField(HiddenField):
         coercions = {f['id']: f['coerce'] for f in self.fields if f.get('coerce') is not None}
         for i, item in enumerate(self.serialized_data):
             if not isinstance(item, dict):
-                raise ValueError('Invalid item type: {}'.format(type(item).__name__))
+                raise ValueError(f'Invalid item type: {type(item).__name__}')
             item_keys = set(item)
             if self.uuid_field:
                 item_keys.discard(self.uuid_field)
@@ -146,7 +146,7 @@ class MultipleItemsField(HiddenField):
                 raise ValueError('Invalid item (bad keys): {}'.format(escape(', '.join(item.keys()))))
             if self.unique_field:
                 if item[self.unique_field] in unique_used:
-                    raise ValueError('{} must be unique'.format(self.field_names[self.unique_field]))
+                    raise ValueError(f'{self.field_names[self.unique_field]} must be unique')
                 unique_used.add(item[self.unique_field])
             if self.uuid_field and not self.uuid_field_opaque:
                 if item[self.uuid_field] in uuid_used:

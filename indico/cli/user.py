@@ -77,7 +77,7 @@ def search(substring, include_deleted, include_pending, include_blocked, include
         print(cformat('%{yellow}No results found'))
         return
     elif len(res) > 100:
-        click.confirm('{} results found. Show them anyway?'.format(len(res)), abort=True)
+        click.confirm(f'{len(res)} results found. Show them anyway?', abort=True)
     users = sorted((u for u in res if isinstance(u, User)), key=lambda x: (x.first_name.lower(), x.last_name.lower(),
                                                                            x.email))
     externals = sorted((ii for ii in res if isinstance(ii, IdentityInfo)),

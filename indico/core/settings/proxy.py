@@ -68,9 +68,9 @@ class SettingsProxyBase:
 
     def __repr__(self):
         if self._bound_args:
-            return '<{}({}, {})>'.format(type(self).__name__, self.module, self._bound_args)
+            return f'<{type(self).__name__}({self.module}, {self._bound_args})>'
         else:
-            return '<{}({})>'.format(type(self).__name__, self.module)
+            return f'<{type(self).__name__}({self.module})>'
 
     def bind(self, *args):
         """Return a version of this proxy that is bound to some arguments.

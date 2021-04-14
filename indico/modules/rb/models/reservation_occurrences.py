@@ -211,7 +211,7 @@ class ReservationOccurrence(db.Model, Serializer):
         self.rejection_reason = reason or None
         signals.rb.booking_occurrence_state_changed.send(self)
         if not silent:
-            log = ['Day cancelled: {}'.format(format_date(self.date))]
+            log = [f'Day cancelled: {format_date(self.date)}']
             if reason:
                 log.append(f'Reason: {reason}')
             self.reservation.add_edit_log(ReservationEditLog(user_name=user.full_name, info=log))
@@ -224,7 +224,7 @@ class ReservationOccurrence(db.Model, Serializer):
         self.rejection_reason = reason or None
         signals.rb.booking_occurrence_state_changed.send(self)
         if not silent:
-            log = ['Day rejected: {}'.format(format_date(self.date)),
+            log = [f'Day rejected: {format_date(self.date)}',
                    f'Reason: {reason}']
             self.reservation.add_edit_log(ReservationEditLog(user_name=user.full_name, info=log))
             from indico.modules.rb.notifications.reservation_occurrences import notify_rejection

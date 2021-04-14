@@ -73,7 +73,7 @@ class TimeDeltaField(Field):
         choices = [(unit, self.unit_names[unit]) for unit in self.units]
         # Add whatever unit is necessary to represent the currenet value if we have one
         if best_unit and best_unit not in self.units:
-            choices.append((best_unit, '({})'.format(self.unit_names[best_unit])))
+            choices.append((best_unit, f'({self.unit_names[best_unit]})'))
         return choices
 
     def process_formdata(self, valuelist):
@@ -152,7 +152,7 @@ class RelativeDeltaField(Field):
         number, unit = self.split_data
         if number is not None and unit not in self.units:
             # Add whatever unit is necessary to represent the currenet value if we have one
-            choices.append((unit, '({})'.format(self.unit_names[unit])))
+            choices.append((unit, f'({self.unit_names[unit]})'))
         return choices
 
     def process_formdata(self, valuelist):

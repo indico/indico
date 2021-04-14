@@ -272,7 +272,7 @@ class LocationWidget(JinjaWidget):
         elif isinstance(parent, db.m.Event):
             return 'Event', parent.title
         else:
-            raise TypeError('Unexpected parent type {}'.format(type(parent)))
+            raise TypeError(f'Unexpected parent type {type(parent)}')
 
     def get_sorted_rooms(self, location):
         result = [{'name': room.full_name, 'id': room.id, 'venue_id': room.location_id}

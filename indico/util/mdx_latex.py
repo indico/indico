@@ -179,7 +179,7 @@ def latex_escape(text, ignore_math=True, ignore_braces=False):
     def substitute(x):
         return chars[x.group()]
 
-    math_placeholder = '[*LaTeXmath-{}*]'.format(str(uuid.uuid4()))
+    math_placeholder = f'[*LaTeXmath-{str(uuid.uuid4())}*]'
 
     def math_replace(m):
         math_segments.append(m.group(0))
@@ -466,7 +466,7 @@ class MathTextPostProcessor(markdown.postprocessors.Postprocessor):
 
         def repl_2(matchobj):
             text = unescape_latex_entities(matchobj.group(1))
-            return '${}${}'.format(text, matchobj.group(2))
+            return f'${text}${matchobj.group(2)}'
 
         # $$ ..... $$
         pat = re.compile(r'^\$\$([^$]*)\$\$\s*$', re.MULTILINE)

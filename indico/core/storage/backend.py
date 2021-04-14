@@ -200,7 +200,7 @@ class Storage:
         raise NotImplementedError
 
     def __repr__(self):
-        return '<{}()>'.format(type(self).__name__)
+        return f'<{type(self).__name__}()>'
 
 
 class ReadOnlyStorageMixin:

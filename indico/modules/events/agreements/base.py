@@ -39,8 +39,8 @@ class AgreementPersonInfo:
     def identifier(self):
         data_string = None
         if self.data:
-            data_string = '-'.join('{}={}'.format(k, make_hashable(v)) for k, v in sorted(self.data.items()))
-        identifier = '{}:{}'.format(self.email, data_string or None)
+            data_string = '-'.join(f'{k}={make_hashable(v)}' for k, v in sorted(self.data.items()))
+        identifier = f'{self.email}:{data_string or None}'
         return sha1(identifier.encode()).hexdigest()
 
 

@@ -311,7 +311,7 @@ class RHShowPastEventsInCategory(RHShowEventsInCategoryBase):
 @allow_signed_url
 class RHExportCategoryICAL(RHDisplayCategoryBase):
     def _process(self):
-        filename = '{}-category.ics'.format(secure_filename(self.category.title, str(self.category.id)))
+        filename = f'{secure_filename(self.category.title, str(self.category.id))}-category.ics'
         buf = serialize_categories_ical([self.category.id], session.user,
                                         Event.end_dt >= (now_utc() - timedelta(weeks=4)))
         return send_file(filename, buf, 'text/calendar')
@@ -319,7 +319,7 @@ class RHExportCategoryICAL(RHDisplayCategoryBase):
 
 class RHExportCategoryAtom(RHDisplayCategoryBase):
     def _process(self):
-        filename = '{}-category.atom'.format(secure_filename(self.category.title, str(self.category.id)))
+        filename = f'{secure_filename(self.category.title, str(self.category.id))}-category.atom'
         buf = serialize_category_atom(self.category,
                                       url_for(request.endpoint, self.category, _external=True),
                                       session.user,

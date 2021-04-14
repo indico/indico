@@ -294,11 +294,11 @@ class outputGenerator:
             self.noteToXMLMarc21(contrib.note, out=out)
 
         out.openTag("datafield",[["tag","962"],["ind1"," "],["ind2"," "]])
-        out.writeTag("subfield", 'INDICO.{}'.format(uniqueId(contrib.event)), [["code", "b"]])
+        out.writeTag("subfield", f'INDICO.{uniqueId(contrib.event)}', [["code", "b"]])
         out.closeTag("datafield")
 
         out.openTag("datafield",[["tag","970"],["ind1"," "],["ind2"," "]])
-        out.writeTag("subfield", 'INDICO.{}'.format(uniqueId(contrib)), [["code", "a"]])
+        out.writeTag("subfield", f'INDICO.{uniqueId(contrib)}', [["code", "a"]])
         out.closeTag("datafield")
 
         out.openTag("datafield",[["tag","980"],["ind1"," "],["ind2"," "]])
@@ -369,7 +369,7 @@ class outputGenerator:
 
         out.writeTag("leader", "00000nmm  2200000uu 4500")
         out.openTag("datafield",[["tag","035"],["ind1"," "],["ind2"," "]])
-        out.writeTag("subfield", 'INDICO.{}'.format(uniqueId(subcontrib)), [["code", "a"]])
+        out.writeTag("subfield", f'INDICO.{uniqueId(subcontrib)}', [["code", "a"]])
         out.closeTag("datafield")
     #
         out.openTag("datafield",[["tag","035"],["ind1"," "],["ind2"," "]])
@@ -416,11 +416,11 @@ class outputGenerator:
             self.noteToXMLMarc21(subcontrib.note, out=out)
 
         out.openTag("datafield",[["tag","962"],["ind1"," "],["ind2"," "]])
-        out.writeTag("subfield", 'INDICO.{}'.format(uniqueId(subcontrib.event)), [["code", "b"]])
+        out.writeTag("subfield", f'INDICO.{uniqueId(subcontrib.event)}', [["code", "b"]])
         out.closeTag("datafield")
 
         out.openTag("datafield",[["tag","970"],["ind1"," "],["ind2"," "]])
-        confcont = 'INDICO.{}'.format(uniqueId(subcontrib))
+        confcont = f'INDICO.{uniqueId(subcontrib)}'
         out.writeTag("subfield",confcont,[["code","a"]])
         out.closeTag("datafield")
 
@@ -461,7 +461,7 @@ class outputGenerator:
             unique_id = f'm{attachment.legacy_mapping.material_id}.{attachment.legacy_mapping.resource_id}'
         else:
             unique_id = f'a{attachment.id}'
-        unique_id = '{}{}'.format(uniqueId(attachment.folder.object), unique_id)
+        unique_id = f'{uniqueId(attachment.folder.object)}{unique_id}'
         return f'INDICO.{unique_id}' if add_prefix else unique_id
 
     def _attachment_access_list(self, attachment):
@@ -509,6 +509,6 @@ class outputGenerator:
         out.openTag('datafield', [['tag', '856'], ['ind1', '4'], ['ind2', ' ']])
         out.writeTag('subfield', url_for('event_notes.view', note, _external=True), [['code', 'u']])
         out.writeTag('subfield', f'{note.object.title} - Minutes', [['code', 'y']])
-        out.writeTag('subfield', 'INDICO.{}'.format(uniqueId(note)), [['code', '3']])
+        out.writeTag('subfield', f'INDICO.{uniqueId(note)}', [['code', '3']])
         out.writeTag('subfield', 'resource', [['code', 'x']])
         out.closeTag('datafield')

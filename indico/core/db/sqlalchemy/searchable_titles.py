@@ -48,5 +48,5 @@ class SearchableTitleMixin:
         crit = db.func.to_tsvector('simple', cls.title).match(preprocess_ts_string(search_string),
                                                               postgresql_regconfig='simple')
         if exact:
-            crit = crit & cls.title.ilike('%{}%'.format(escape_like(search_string)))
+            crit = crit & cls.title.ilike(f'%{escape_like(search_string)}%')
         return crit

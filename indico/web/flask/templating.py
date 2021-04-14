@@ -29,7 +29,7 @@ indentation_re = re.compile(r'^ +', re.MULTILINE)
 
 
 def underline(s, sep='-'):
-    return '{}\n{}'.format(s, sep * len(s))
+    return f'{s}\n{sep * len(s)}'
 
 
 def markdown(value):
@@ -179,7 +179,7 @@ def call_template_hook(*name, **kwargs):
     :param kwargs: Data to pass to the signal receivers.
     """
     if len(name) != 1:
-        raise TypeError('call_template_hook() accepts only one positional argument, {} given'.format(len(name)))
+        raise TypeError(f'call_template_hook() accepts only one positional argument, {len(name)} given')
     name = name[0]
     as_list = kwargs.pop('as_list', False)
     values = []

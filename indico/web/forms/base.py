@@ -196,10 +196,10 @@ class IndicoForm(FlaskForm, metaclass=IndicoFormMeta):
             for error in errors:
                 if isinstance(error, dict) and isinstance(self[field_name], FieldList):
                     for field in self[field_name].entries:
-                        all_errors += ['{}: {}'.format(self[field_name].label.text, sub_error)
+                        all_errors += [f'{self[field_name].label.text}: {sub_error}'
                                        for sub_error in field.form.error_list]
                 else:
-                    all_errors.append('{}: {}'.format(self[field_name].label.text, error))
+                    all_errors.append(f'{self[field_name].label.text}: {error}')
         return all_errors
 
     @property
@@ -253,7 +253,7 @@ class FormDefaults:
         self.__defaults[key] = value
 
     def __setattr__(self, key, value):
-        if key.startswith('_{}__'.format(type(self).__name__)):
+        if key.startswith(f'_{type(self).__name__}__'):
             object.__setattr__(self, key, value)
         else:
             self.__defaults[key] = value

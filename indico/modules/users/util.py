@@ -384,7 +384,7 @@ def get_color_for_username(username):
 
 
 def get_gravatar_for_user(user, identicon, size=256, lastmod=None):
-    gravatar_url = 'https://www.gravatar.com/avatar/{}'.format(hashlib.md5(user.email.lower().encode()).hexdigest())
+    gravatar_url = f'https://www.gravatar.com/avatar/{hashlib.md5(user.email.lower().encode()).hexdigest()}'
     if identicon:
         params = {'d': 'identicon', 's': str(size), 'forcedefault': 'y'}
     else:

@@ -221,13 +221,13 @@ class RHEditableSetSubmission(RHEditableTypeManagementBase):
 
     def _process_PUT(self):
         self.event.log(EventLogRealm.management, EventLogKind.positive, 'Editing',
-                       'Opened {} submission'.format(orig_string(self.editable_type.title)), session.user)
+                       f'Opened {orig_string(self.editable_type.title)} submission', session.user)
         editable_type_settings[self.editable_type].set(self.event, 'submission_enabled', True)
         return '', 204
 
     def _process_DELETE(self):
         self.event.log(EventLogRealm.management, EventLogKind.negative, 'Editing',
-                       'Closed {} submission'.format(orig_string(self.editable_type.title)), session.user)
+                       f'Closed {orig_string(self.editable_type.title)} submission', session.user)
         editable_type_settings[self.editable_type].set(self.event, 'submission_enabled', False)
         return '', 204
 
@@ -238,13 +238,13 @@ class RHEditableSetEditing(RHEditableTypeManagementBase):
 
     def _process_PUT(self):
         self.event.log(EventLogRealm.management, EventLogKind.positive, 'Editing',
-                       'Opened {} editing'.format(orig_string(self.editable_type.title)), session.user)
+                       f'Opened {orig_string(self.editable_type.title)} editing', session.user)
         editable_type_settings[self.editable_type].set(self.event, 'editing_enabled', True)
         return '', 204
 
     def _process_DELETE(self):
         self.event.log(EventLogRealm.management, EventLogKind.negative, 'Editing',
-                       'Closed {} editing'.format(orig_string(self.editable_type.title)), session.user)
+                       f'Closed {orig_string(self.editable_type.title)} editing', session.user)
         editable_type_settings[self.editable_type].set(self.event, 'editing_enabled', False)
         return '', 204
 

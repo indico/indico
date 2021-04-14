@@ -87,7 +87,8 @@ def verbose_iterator(iterable, total, get_id, get_title=None, print_every=10, pr
     for i, item in enumerate(iterable, 1):
         if i % print_every == 0 or i == total:
             remaining_seconds = int((time.time() - start_time) / i * (total - i))
-            remaining = '{:02}:{:02}'.format(remaining_seconds // 60, remaining_seconds % 60)
+            minutes, seconds = divmod(remaining_seconds, 60)
+            remaining = f'{minutes:02}:{seconds:02}'
             id_ = get_id(item)
             title = get_title(item).replace('\n', ' ') if get_title else ''
             text = fmt.format(i, total, (i / total * 100.0), remaining, id_, title)

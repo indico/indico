@@ -101,9 +101,8 @@ class AbstractsDownloadAttachmentsMixin(ZipGeneratorMixin):
     """Generate a ZIP file with attachment files for a given list of abstracts."""
 
     def _prepare_folder_structure(self, item):
-        abstract_title = secure_filename('{}_{}'.format(str(item.abstract.friendly_id), item.abstract.title),
-                                         'abstract')
-        file_name = secure_filename('{}_{}'.format(str(item.id), item.filename), item.filename)
+        abstract_title = secure_filename(f'{item.abstract.friendly_id}_{item.abstract.title}', 'abstract')
+        file_name = secure_filename(f'{item.id}_{item.filename}', item.filename)
         return os.path.join(*self._adjust_path_length([abstract_title, file_name]))
 
     def _iter_items(self, abstracts):

@@ -158,7 +158,7 @@ class IndicoLocale(Locale):
 
 def _remove_locale_script(locale):
     parts = locale.split('_')  # e.g. `en_GB` or `zh_Hans_CN`
-    return '{}_{}'.format(parts[0], parts[-1])
+    return f'{parts[0]}_{parts[-1]}'
 
 
 @babel.localeselector
@@ -203,7 +203,7 @@ def set_best_lang(check_session=True):
 
     # normalize to xx_YY capitalization
     resolved_lang = re.sub(r'^([a-zA-Z]+)_([a-zA-Z]+)$',
-                           lambda m: '{}_{}'.format(m.group(1).lower(), m.group(2).upper()),
+                           lambda m: f'{m.group(1).lower()}_{m.group(2).upper()}',
                            resolved_lang)
 
     # As soon as we looked up a language, cache it during the request.

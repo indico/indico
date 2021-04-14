@@ -121,8 +121,8 @@ class StaticEventCreator:
     def _write_generated_js(self):
         global_js = generate_global_file()
         user_js = generate_user_file()
-        i18n_js = "window.TRANSLATIONS = {};".format(generate_i18n_file(session.lang))
-        react_i18n_js = "window.REACT_TRANSLATIONS = {};".format(generate_i18n_file(session.lang, react=True))
+        i18n_js = f"window.TRANSLATIONS = {generate_i18n_file(session.lang)};"
+        react_i18n_js = f"window.REACT_TRANSLATIONS = {generate_i18n_file(session.lang, react=True)};"
         gen_path = os.path.join(self._content_dir, 'assets')
         self._zip_file.writestr(os.path.join(gen_path, 'js-vars', 'global.js'), global_js)
         self._zip_file.writestr(os.path.join(gen_path, 'js-vars', 'user.js'), user_js)

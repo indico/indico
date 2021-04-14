@@ -175,7 +175,7 @@ class BookRoomHook(HTTPAPIHook):
         if not users:
             raise HTTPAPIError('Username does not exist')
         elif len(users) != 1:
-            raise HTTPAPIError('Ambiguous username ({} users found)'.format(len(users)))
+            raise HTTPAPIError(f'Ambiguous username ({len(users)} users found)')
         user = users[0]
 
         self._params = {
@@ -315,7 +315,7 @@ def _ical_serialize_repeatability(data):
         recur['interval'] = data['repeat_interval']
     elif data['repeat_frequency'] == RepeatFrequency.MONTH:
         recur['freq'] = 'monthly'
-        recur['byday'] = '{}{}'.format(start_dt_utc.day // 7, WEEK_DAYS[start_dt_utc.weekday()])
+        recur['byday'] = f'{start_dt_utc.day // 7}{WEEK_DAYS[start_dt_utc.weekday()]}'
     return recur
 
 

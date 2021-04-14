@@ -149,7 +149,7 @@ class LatexRunner:
                 stdout=log_file,
                 stderr=subprocess.STDOUT,
                 cwd=self.source_dir,
-                env=dict(os.environ, TEXMFCNF='{}:'.format(os.path.dirname(__file__)))
+                env=dict(os.environ, TEXMFCNF=f'{os.path.dirname(__file__)}:')
             )
             Logger.get('pdflatex').debug("PDF created successfully!")
 

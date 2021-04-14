@@ -244,7 +244,7 @@ class RH:
 
         if config.PROFILE:
             result = [None]
-            profile_path = os.path.join(config.TEMP_DIR, '{}-{}.prof'.format(type(self).__name__, time.time()))
+            profile_path = os.path.join(config.TEMP_DIR, f'{type(self).__name__}-{time.time()}.prof')
             cProfile.runctx('result[0] = self._process()', globals(), locals(), profile_path)
             rv = result[0]
         else:

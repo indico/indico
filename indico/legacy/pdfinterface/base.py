@@ -518,7 +518,7 @@ class DocTemplateWithTOC(SimpleDocTemplate):
             self._tocStory.append(Spacer(inch, 2*cm))
             for entry in self._toc:
                 indent = ((entry[0] - 1) * 50)
-                toc_entry = TableOfContentsEntry('<para leftIndent={}>{}</para>'.format(indent, entry[1]),
+                toc_entry = TableOfContentsEntry(f'<para leftIndent={indent}>{entry[1]}</para>',
                                                  str(entry[2]), entryStyle)
                 self._tocStory.append(toc_entry)
 

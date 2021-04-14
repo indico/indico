@@ -167,4 +167,4 @@ class _OwnerComparator(Comparator):
         elif isinstance(other, db.m.Category):
             return self.cls.category == other
         else:
-            raise ValueError('Unexpected object type {}: {}'.format(type(other), other))
+            raise ValueError(f'Unexpected object type {type(other)}: {other}')

@@ -398,4 +398,4 @@ class LinkedObjectComparator(Comparator):
             return db.and_(self.cls.link_type == LinkType.subcontribution,
                            self.cls.subcontribution_id == other.id)
         else:
-            raise ValueError('Unexpected object type {}: {}'.format(type(other), other))
+            raise ValueError(f'Unexpected object type {type(other)}: {other}')
