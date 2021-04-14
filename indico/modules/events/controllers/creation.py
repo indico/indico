@@ -13,9 +13,9 @@ from markupsafe import Markup
 from pytz import timezone
 from werkzeug.utils import cached_property
 
+from indico.core.cache import make_scoped_cache
 from indico.core.config import config
 from indico.core.db.sqlalchemy.util.models import get_simple_column_attrs
-from indico.legacy.common.cache import GenericCache
 from indico.modules.categories import Category
 from indico.modules.events.forms import EventCreationForm, LectureCreationForm
 from indico.modules.events.models.events import EventType
@@ -31,6 +31,9 @@ from indico.web.flask.util import url_for
 from indico.web.forms.base import FormDefaults
 from indico.web.rh import RHProtected
 from indico.web.util import jsonify_data, jsonify_template, url_for_index
+
+
+prepared_event_data_store = make_scoped_cache('event-preparation')
 
 
 class RHCreateEvent(RHProtected):
@@ -52,8 +55,7 @@ class RHCreateEvent(RHProtected):
 
     def _get_prepared_data(self):
         try:
-            cache = GenericCache('event-preparation')
-            data = cache.get(request.args['event_uuid'])
+            data = prepared_event_data_store.get(request.args['event_uuid'])
         except KeyError:
             return None
         if not data:

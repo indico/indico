@@ -1,5 +1,5 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2020 CERN
+# Copyright (C) 2002 - 2021 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
@@ -11,12 +11,15 @@ from flask import jsonify
 from pytz import common_timezones_set, timezone
 from webargs import fields
 
+from indico.core.cache import make_scoped_cache
 from indico.core.config import config
-from indico.legacy.common.cache import GenericCache
 from indico.util.marshmallow import NaiveDateTime
 from indico.web.args import use_kwargs
 from indico.web.rh import RH
 from indico.web.util import url_for_index
+
+
+prepared_event_data_store = make_scoped_cache('event-preparation')
 
 
 class RHPrepareEvent(RH):
@@ -33,9 +36,8 @@ class RHPrepareEvent(RH):
     })
     def _process(self, title, start_dt, tz, duration, event_type):
         event_key = str(uuid4())
-        cache = GenericCache('event-preparation')
         start_dt = timezone(tz).localize(start_dt)
-        cache.set(
+        prepared_event_data_store.set(
             event_key,
             {
                 'title': title,
