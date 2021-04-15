@@ -187,7 +187,7 @@ class IndicoDurationField(TimeField):
             return int(self.data.total_seconds())
 
     def process_formdata(self, valuelist):
-        if valuelist and len(valuelist) == 1:
+        if valuelist:
             self.data = timedelta(seconds=int(valuelist[0]))
 
 
