@@ -141,6 +141,10 @@
 
 .qbubble-contrib-duration {
   max-width: 420px !important;
+
+  & div form {
+    height: 200px;
+  }
 }
 
 #contributions-fixed-fields {

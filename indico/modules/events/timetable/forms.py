@@ -22,7 +22,8 @@ from indico.util.i18n import _
 from indico.web.forms.base import FormDefaults, IndicoForm, generated_data
 from indico.web.forms.colors import get_colors
 from indico.web.forms.fields import (FileField, IndicoLocationField, IndicoPalettePickerField,
-                                     IndicoSelectMultipleCheckboxBooleanField, IndicoTimeField, TimeDeltaField)
+                                     IndicoSelectMultipleCheckboxBooleanField, IndicoTimeField)
+from indico.web.forms.fields.datetime import IndicoDurationField
 from indico.web.forms.util import get_form_field_names
 from indico.web.forms.validators import HiddenUnless, MaxDuration
 from indico.web.forms.widgets import SwitchWidget
@@ -34,8 +35,8 @@ class EntryFormMixin:
     _display_fields = None
 
     time = IndicoTimeField(_("Start time"), [InputRequired()])
-    duration = TimeDeltaField(_("Duration"), [DataRequired(), MaxDuration(timedelta(hours=24))],
-                              units=('minutes', 'hours'))
+    duration = IndicoDurationField(_('Duration'), [DataRequired(), MaxDuration(timedelta(hours=24))],
+                                   default=timedelta(minutes=20))
 
     def __init__(self, *args, **kwargs):
         self.event = kwargs['event']
