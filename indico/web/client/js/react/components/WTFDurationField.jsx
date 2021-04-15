@@ -10,7 +10,17 @@ import PropTypes from 'prop-types';
 import TimePicker from 'rc-time-picker';
 import React, {useEffect, useMemo, useRef, useState, useCallback} from 'react';
 
-const timeToSeconds = time => (time ? time.diff(moment().startOf('day'), 'seconds') : null);
+const timeToSeconds = time => {
+  if (!time) {
+    return null;
+  }
+
+  // avoid counting seconds in a DST day.
+  const safeDate = time.date(1).month(0);
+
+  return safeDate.diff(safeDate.clone().startOf('day'), 'seconds');
+};
+
 const secondsToTime = seconds =>
   moment()
     .startOf('day')
