@@ -52,6 +52,8 @@ Improvements
   conferences now redirect to the meeting view page (:pr:`4847`)
 - Use a more compact setup QR code for the mobile *Indico check-in* app; the latest version of
   the app is now required. (:pr:`4844`)
+- Duration fields in different forms throughout the application are now easier to use.
+  (:issue:`2462`, :pr:`4873`)
 
 Bugfixes
 ^^^^^^^^
