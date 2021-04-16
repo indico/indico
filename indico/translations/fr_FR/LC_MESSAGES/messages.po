@@ -16,8 +16,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Indico\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2021-03-10 21:51+0100\n"
-"PO-Revision-Date: 2021-03-11 10:31+0000\n"
+"POT-Creation-Date: 2021-04-14 10:29+0200\n"
+"PO-Revision-Date: 2021-04-16 12:42+0000\n"
 "Last-Translator: Thomas Baron <thomas.baron@cern.ch>\n"
 "Language-Team: French (France) (http://www.transifex.com/indico/indico/language/fr_FR/)\n"
 "MIME-Version: 1.0\n"
@@ -1516,64 +1516,64 @@ msgstr "Votre profil Indico a été bloqué."
 msgid "Accounts"
 msgstr "Comptes"
 
-#: indico/modules/auth/controllers.py:126
+#: indico/modules/auth/controllers.py:134
 msgid ""
 "We have sent you a verification email. Please check your mailbox within the "
 "next hour and open the link in that email."
 msgstr "Nous vous avons envoyé un courriel de vérification. Veuillez ouvrir ce courrier dans l'heure qui vient et ouvrir le lien qu'il contient."
 
-#: indico/modules/auth/controllers.py:158
+#: indico/modules/auth/controllers.py:166
 msgid ""
 "You have successfully validated your email address and can now proceed with "
 "the login."
 msgstr "Vous avez validé votre adresse électronique avec succès et pouvez maintenant vous connecter."
 
-#: indico/modules/auth/controllers.py:174
+#: indico/modules/auth/controllers.py:182
 msgid "The validation email has already been sent."
 msgstr "Le courriel de validation a été envoyé."
 
-#: indico/modules/auth/controllers.py:242
+#: indico/modules/auth/controllers.py:250
 msgid ""
 "You may change your email address after finishing the registration process."
 msgstr "Vous pourrez changer votre adresse électronique après avoir fini la procédure d'enregistrement."
 
-#: indico/modules/auth/controllers.py:244
+#: indico/modules/auth/controllers.py:252
 msgid ""
 "You have successfully validated your email address and can now proceed with "
 "the registration."
 msgstr "Vous avez validé votre adresse électronique et pouvez maintenant continuer l'inscription."
 
-#: indico/modules/auth/controllers.py:270
+#: indico/modules/auth/controllers.py:278
 msgid ""
 "There is already some information in Indico that concerns you. We are going "
 "to link it automatically."
 msgstr "Il existe déjà des informations dans Indico qui vous concernent. Nous allons les relier à vous automatiquement."
 
-#: indico/modules/auth/controllers.py:305
+#: indico/modules/auth/controllers.py:313
 msgid ""
 "Your registration request has been received. We will send you an email once "
 "it has been processed."
 msgstr "Votre demande d'enregistrement a bien été reçue. Nous vous enverrons un courriel aussitot qu'elle aura été traitée."
 
-#: indico/modules/auth/controllers.py:312
+#: indico/modules/auth/controllers.py:320
 msgid ""
 "You have sucessfully registered your Indico profile. Check <a "
 "href=\"{url}\">your profile</a> for further details and settings."
 msgstr "Vous avez enregistré votre profil Indico avec succès. Vérifiez <a href=\"{url}\">votre profil</a> pour plus de détails et d'options."
 
-#: indico/modules/auth/controllers.py:333
+#: indico/modules/auth/controllers.py:341
 msgid "Local account added successfully"
 msgstr "Compte local créé avec succès"
 
-#: indico/modules/auth/controllers.py:339
+#: indico/modules/auth/controllers.py:347
 msgid "Your local account credentials have been updated successfully"
 msgstr "Les données de connexion de votre compte local ont bien été mises à jour"
 
-#: indico/modules/auth/controllers.py:374
+#: indico/modules/auth/controllers.py:382
 msgid "{provider} ({identifier}) successfully removed from your accounts"
 msgstr "{provider} ({identifier}) a bien été supprimé de vos comptes"
 
-#: indico/modules/auth/controllers.py:587
+#: indico/modules/auth/controllers.py:596
 msgid "Your password has been changed successfully."
 msgstr "Votre mot de passe a bien été modifié."
 
@@ -2518,7 +2518,7 @@ msgstr "Vous n'êtes pas autorisé à accéder à cette catégorie."
 msgid "If you believe you should have access, please contact {}"
 msgstr "Si vous pensez que vous devriez avoir l'accès, veuillez contacter {}"
 
-#: indico/modules/categories/controllers/display.py:580
+#: indico/modules/categories/controllers/display.py:581
 msgid "There are no upcoming events for this category"
 msgstr "Aucun événement à venir dans cette catégorie"
 
@@ -2641,7 +2641,18 @@ msgid_plural "You have moved {count} events to the category \"{cat}\""
 msgstr[0] "Vous avez déplacé un événement vers la catégorie \"{cat}\""
 msgstr[1] "Vous avez déplacé {count} événements vers la catégorie \"{cat}\""
 
-#: indico/modules/categories/controllers/util.py:129
+#: indico/modules/categories/controllers/util.py:27
+msgctxt "babel date format for category event list headers (month/year only)"
+msgid "MMMM yyyy"
+msgstr "MMMM yyyy"
+
+#: indico/modules/categories/controllers/util.py:44
+msgctxt ""
+"babel date format for category event list event entries (day/month only)"
+msgid "dd MMM"
+msgstr "dd MMM"
+
+#: indico/modules/categories/controllers/util.py:132
 msgid "Events of \"{}\""
 msgstr "Evénements de \"{}\""
 
@@ -6981,9 +6992,9 @@ msgstr "PDF"
 msgid "TeX archive"
 msgstr "Archive TeX"
 
-#: indico/modules/events/contributions/controllers/display.py:67
-#: indico/modules/events/contributions/controllers/display.py:79
-#: indico/modules/events/contributions/controllers/display.py:258
+#: indico/modules/events/contributions/controllers/display.py:70
+#: indico/modules/events/contributions/controllers/display.py:82
+#: indico/modules/events/contributions/controllers/display.py:262
 msgid "The contributions of this event have not been published yet."
 msgstr "Les contributions de cet événement n'ont pas encore été publiées."
 
@@ -7681,33 +7692,33 @@ msgstr "Édition (balises configurées, types de fichier, conditions de relectur
 msgid "The requested action is not possible on this revision"
 msgstr "L'action demandée est impossible sur cette révision"
 
-#: indico/modules/events/editing/schemas.py:285
+#: indico/modules/events/editing/schemas.py:319
 msgid "Tag code must be unique"
 msgstr "Le code de balise doit être unique"
 
-#: indico/modules/events/editing/schemas.py:315
+#: indico/modules/events/editing/schemas.py:349
 #: indico/modules/rb/schemas.py:395 indico/modules/rb/schemas.py:420
 #: indico/modules/rb/schemas.py:437 indico/modules/rb/schemas.py:455
 msgid "Name must be unique"
 msgstr "Le nom doit être unique"
 
-#: indico/modules/events/editing/schemas.py:320
+#: indico/modules/events/editing/schemas.py:354
 msgid "Filename template cannot include dots"
 msgstr "Les modèles de nom de fichier ne peuvent pas contenir de points"
 
-#: indico/modules/events/editing/schemas.py:326
+#: indico/modules/events/editing/schemas.py:360
 msgid "Extensions cannot have leading dots"
 msgstr "Les extensions ne peuvent pas commencer par des points"
 
-#: indico/modules/events/editing/schemas.py:341
+#: indico/modules/events/editing/schemas.py:375
 msgid "Cannot unset the only publishable file type"
 msgstr "Impossible de désactiver le seul type de fichier publiable"
 
-#: indico/modules/events/editing/schemas.py:358
+#: indico/modules/events/editing/schemas.py:392
 msgid "Invalid file type used"
 msgstr "Type de fichier utilisé incorrect"
 
-#: indico/modules/events/editing/schemas.py:362
+#: indico/modules/events/editing/schemas.py:396
 msgid "Conditions have to be unique"
 msgstr "Les conditions doivent être uniques"
 
@@ -7756,25 +7767,25 @@ msgstr "Aucun fichier pour cet article"
 msgid "You cannot perform this action on this revision"
 msgstr "Action impossible sur cette révision"
 
-#: indico/modules/events/editing/controllers/backend/timeline.py:167
+#: indico/modules/events/editing/controllers/backend/timeline.py:171
 msgid "Editable already exists"
 msgstr "L'éditable existe déjà"
 
-#: indico/modules/events/editing/controllers/backend/timeline.py:180
+#: indico/modules/events/editing/controllers/backend/timeline.py:184
 msgid "Submission failed, please try again later."
 msgstr "Le dépôt a échoué, veuillez ré-essayer ultérieurement."
 
-#: indico/modules/events/editing/controllers/backend/timeline.py:209
-#: indico/modules/events/editing/controllers/backend/timeline.py:236
-#: indico/modules/events/editing/controllers/backend/timeline.py:288
+#: indico/modules/events/editing/controllers/backend/timeline.py:213
+#: indico/modules/events/editing/controllers/backend/timeline.py:240
+#: indico/modules/events/editing/controllers/backend/timeline.py:292
 msgid "Failed processing review, please try again later."
 msgstr "Echec du traitement de l'évaluation, veuillez re-essayer plus tard."
 
-#: indico/modules/events/editing/controllers/backend/timeline.py:417
+#: indico/modules/events/editing/controllers/backend/timeline.py:421
 msgid "You do not have the permission to unassign this user"
 msgstr "Vous n'avez pas la permission de dissocier cet utilisateur"
 
-#: indico/modules/events/editing/controllers/backend/timeline.py:428
+#: indico/modules/events/editing/controllers/backend/timeline.py:432
 msgid "You do not have the permission to assign yourself"
 msgstr "Vous ne pouvez pas vous assigner vous-même"
 
@@ -10536,9 +10547,9 @@ msgid "No persons"
 msgstr "Aucune personne"
 
 #: indico/modules/events/registration/__init__.py:52
-#: indico/modules/events/registration/__init__.py:103
-#: indico/modules/events/registration/__init__.py:190
-#: indico/modules/events/registration/__init__.py:200
+#: indico/modules/events/registration/__init__.py:105
+#: indico/modules/events/registration/__init__.py:192
+#: indico/modules/events/registration/__init__.py:202
 #: indico/modules/events/registration/templates/display/_event_regform_base.html:7
 #: indico/modules/events/registration/templates/display/_meeting_registration_base.html:7
 #: indico/modules/events/registration/templates/display/conference_home.html:36
@@ -10549,23 +10560,23 @@ msgstr "Aucune personne"
 msgid "Registration"
 msgstr "Inscription"
 
-#: indico/modules/events/registration/__init__.py:105
+#: indico/modules/events/registration/__init__.py:107
 msgid "Participant List"
 msgstr "Liste des participants"
 
-#: indico/modules/events/registration/__init__.py:135
+#: indico/modules/events/registration/__init__.py:137
 msgid "A registration has been linked to your account."
 msgid_plural "{n} registrations have been linked to your account."
 msgstr[0] "Une inscription a été reliée à votre compte."
 msgstr[1] "{n} inscriptions ont été reliées à votre compte."
 
-#: indico/modules/events/registration/__init__.py:191
+#: indico/modules/events/registration/__init__.py:193
 msgid ""
 "Gives event managers the opportunity to handle registrations within the "
 "event."
 msgstr "Donne aux administrateurs d'événement la possibilité de traiter les inscriptions pour l'événement."
 
-#: indico/modules/events/registration/__init__.py:201
+#: indico/modules/events/registration/__init__.py:203
 msgid "Grants management access to the registration form."
 msgstr "Accorde les droits de gestion du formulaire d'inscription."
 
@@ -15683,83 +15694,83 @@ msgstr "Profil de {name}"
 msgid "My Profile"
 msgstr "Mon Profil"
 
-#: indico/modules/users/models/users.py:41
+#: indico/modules/users/models/users.py:42
 msgid "Mr"
 msgstr "M."
 
-#: indico/modules/users/models/users.py:41
+#: indico/modules/users/models/users.py:42
 msgid "Ms"
 msgstr "Mlle"
 
-#: indico/modules/users/models/users.py:41
+#: indico/modules/users/models/users.py:42
 msgid "Mrs"
 msgstr "Mme"
 
-#: indico/modules/users/models/users.py:41
+#: indico/modules/users/models/users.py:42
 msgid "Dr"
 msgstr "Dr"
 
-#: indico/modules/users/models/users.py:41
+#: indico/modules/users/models/users.py:42
 msgid "Prof."
 msgstr "Prof."
 
-#: indico/modules/users/models/users.py:41
+#: indico/modules/users/models/users.py:42
 msgid "Mx"
 msgstr "Mx"
 
-#: indico/modules/users/models/users.py:52
+#: indico/modules/users/models/users.py:53
 msgid "John Doe"
 msgstr "Jean Martin"
 
-#: indico/modules/users/models/users.py:52
+#: indico/modules/users/models/users.py:53
 msgid "Doe, John"
 msgstr "Martin, Jean"
 
-#: indico/modules/users/models/users.py:52
+#: indico/modules/users/models/users.py:53
 msgid "Doe, J."
 msgstr "Martin, J."
 
-#: indico/modules/users/models/users.py:52
+#: indico/modules/users/models/users.py:53
 msgid "J. Doe"
 msgstr "J. Martin"
 
-#: indico/modules/users/models/users.py:53
+#: indico/modules/users/models/users.py:54
 msgid "John DOE"
 msgstr "Jean MARTIN"
 
-#: indico/modules/users/models/users.py:53
+#: indico/modules/users/models/users.py:54
 msgid "DOE, John"
 msgstr "MARTIN, Jean"
 
-#: indico/modules/users/models/users.py:53
+#: indico/modules/users/models/users.py:54
 msgid "DOE, J."
 msgstr "MARTIN, J."
 
-#: indico/modules/users/models/users.py:53
+#: indico/modules/users/models/users.py:54
 msgid "J. DOE"
 msgstr "J. MARTIN"
 
-#: indico/modules/users/models/users.py:137
+#: indico/modules/users/models/users.py:138
 msgid "first name"
 msgstr "prénom"
 
-#: indico/modules/users/models/users.py:138
+#: indico/modules/users/models/users.py:139
 msgid "family name"
 msgstr "nom de famille"
 
-#: indico/modules/users/models/users.py:139
+#: indico/modules/users/models/users.py:140
 msgid "affiliation"
 msgstr "affiliation"
 
-#: indico/modules/users/models/users.py:140
+#: indico/modules/users/models/users.py:141
 msgid "address"
 msgstr "adresse"
 
-#: indico/modules/users/models/users.py:141
+#: indico/modules/users/models/users.py:142
 msgid "phone number"
 msgstr "numéro de téléphone"
 
-#: indico/modules/users/models/users.py:651
+#: indico/modules/users/models/users.py:654
 msgid ""
 "Your {field_name} has been synchronised from '{old_value}' to '{new_value}'."
 msgstr "Votre {field_name} a été synchronisé(e) de '{old_value}' à '{new_value}'."
@@ -16534,7 +16545,7 @@ msgstr "Numéro"
 msgid "Yes/No"
 msgstr "Oui/Non"
 
-#: indico/web/flask/app.py:127
+#: indico/web/flask/app.py:126
 msgid "Login failed: {error}"
 msgstr "Echec de la connection: {error}"
 
@@ -16878,14 +16889,14 @@ msgstr "S'authentifier"
 
 #: indico/web/templates/bad_url_error.html:1
 msgid "Invalid URL"
-msgstr "URL incorrect"
+msgstr "URL non valide"
 
 #: indico/web/templates/bad_url_error.html:4
 #, python-format
 msgid ""
 "This Indico instance can only be accessed via <a "
 "href=\"%(url)s\">%(url)s</a>"
-msgstr "Cette instance d'Indico ne peut être accédée que via <a href=\"%(url)s\">%(url)s</a>"
+msgstr "Cette instance d'Indico peut seulement être accédée via <a href=\"%(url)s\">%(url)s</a>"
 
 #: indico/web/templates/confirmation_dialog.html:7
 msgid "I understand what this means. Please go ahead."
