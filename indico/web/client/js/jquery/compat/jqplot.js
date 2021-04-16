@@ -9,45 +9,17 @@
 // imports all necesssay jqplot files,
 // $ is automatically extended with jqplot functionality.
 
-import 'jqplot/src/jqplot.core';
-import 'jqplot/src/jqplot.axisLabelRenderer';
-import 'jqplot/src/jqplot.axisTickRenderer';
-import 'jqplot/src/jqplot.canvasGridRenderer';
-import 'jqplot/src/jqplot.divTitleRenderer';
-import 'jqplot/src/jqplot.effects.core';
-import 'jqplot/src/jqplot.effects.blind';
-import 'jqplot/src/jqplot.linePattern';
-import 'jqplot/src/jqplot.lineRenderer';
-import 'jqplot/src/jqplot.linearAxisRenderer';
-import 'jqplot/src/jqplot.linearTickGenerator';
-import 'jqplot/src/jqplot.markerRenderer';
-import 'jqplot/src/jqplot.shadowRenderer';
-import 'jqplot/src/jqplot.shapeRenderer';
-import 'jqplot/src/jqplot.sprintf';
-import 'jqplot/src/jqplot.tableLegendRenderer';
-import 'jqplot/src/jqplot.themeEngine';
-import 'jqplot/src/jqplot.toImage';
-import 'jqplot/src/jsdate';
+import 'updated-jqplot';
 
-import 'jqplot/src/plugins/jqplot.barRenderer';
-import 'jqplot/src/plugins/jqplot.barRenderer.js';
-import 'jqplot/src/plugins/jqplot.canvasAxisLabelRenderer';
-import 'jqplot/src/plugins/jqplot.canvasAxisLabelRenderer.js';
-import 'jqplot/src/plugins/jqplot.canvasAxisTickRenderer';
-import 'jqplot/src/plugins/jqplot.canvasAxisTickRenderer.js';
-import 'jqplot/src/plugins/jqplot.canvasTextRenderer';
-import 'jqplot/src/plugins/jqplot.canvasTextRenderer.js';
-import 'jqplot/src/plugins/jqplot.categoryAxisRenderer';
-import 'jqplot/src/plugins/jqplot.categoryAxisRenderer.js';
-import 'jqplot/src/plugins/jqplot.cursor';
-import 'jqplot/src/plugins/jqplot.cursor.js';
-import 'jqplot/src/plugins/jqplot.dateAxisRenderer';
-import 'jqplot/src/plugins/jqplot.dateAxisRenderer.js';
-import 'jqplot/src/plugins/jqplot.highlighter';
-import 'jqplot/src/plugins/jqplot.highlighter.js';
-import 'jqplot/src/plugins/jqplot.logAxisRenderer';
-import 'jqplot/src/plugins/jqplot.logAxisRenderer.js';
-import 'jqplot/src/plugins/jqplot.pointLabels';
-import 'jqplot/src/plugins/jqplot.pointLabels.js';
+import 'updated-jqplot/dist/plugins/jqplot.barRenderer';
+import 'updated-jqplot/dist/plugins/jqplot.canvasAxisLabelRenderer';
+import 'updated-jqplot/dist/plugins/jqplot.canvasAxisTickRenderer';
+import 'updated-jqplot/dist/plugins/jqplot.canvasTextRenderer';
+import 'updated-jqplot/dist/plugins/jqplot.categoryAxisRenderer';
+import 'updated-jqplot/dist/plugins/jqplot.cursor';
+import 'updated-jqplot/dist/plugins/jqplot.dateAxisRenderer';
+import 'updated-jqplot/dist/plugins/jqplot.highlighter';
+import 'updated-jqplot/dist/plugins/jqplot.logAxisRenderer';
+import 'updated-jqplot/dist/plugins/jqplot.pointLabels';
 
-import 'jqplot/src/jquery.jqplot.css';
+import 'updated-jqplot/dist/jquery.jqplot.css';
