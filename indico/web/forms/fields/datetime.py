@@ -177,6 +177,20 @@ class IndicoTimeField(TimeField):
     widget = JinjaWidget('forms/time_widget.html', single_line=True, single_kwargs=True)
 
 
+class IndicoDurationField(Field):
+    widget = JinjaWidget('forms/duration_widget.html', single_line=True, single_kwargs=True)
+
+    def _value(self):
+        if self.data is None:
+            return 0
+        else:
+            return int(self.data.total_seconds())
+
+    def process_formdata(self, valuelist):
+        if valuelist:
+            self.data = timedelta(seconds=int(valuelist[0]))
+
+
 class IndicoDateField(DateField):
     widget = JinjaWidget('forms/date_widget.html', single_line=True, single_kwargs=True)
 

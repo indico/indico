@@ -5,22 +5,41 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
+import moment from 'moment';
 import PropTypes from 'prop-types';
 import TimePicker from 'rc-time-picker';
 import React, {useEffect, useMemo, useRef, useState, useCallback} from 'react';
 
-import {toMoment} from 'indico/utils/date';
+const timeToSeconds = time => {
+  if (!time) {
+    return null;
+  }
 
-export default function WTFTimeField({timeId, uses24HourFormat, required, disabled}) {
+  // avoid counting seconds in a DST day.
+  const safeDate = time.date(1).month(0);
+
+  return safeDate.diff(safeDate.clone().startOf('day'), 'seconds');
+};
+
+const secondsToTime = seconds =>
+  moment()
+    .startOf('day')
+    .seconds(seconds);
+
+export default function WTFDurationField({timeId, required, disabled}) {
   const timeField = useMemo(() => document.getElementById(timeId), [timeId]);
-  const [time, setTime] = useState(toMoment(timeField.value, 'HH:mm', true));
-  const format = uses24HourFormat ? 'HH:mm' : 'hh:mm a';
+  const [time, setTime] = useState(secondsToTime(timeField.value));
   const timePickerRef = useRef(null);
 
-  const updateTime = useCallback(
+  const handleTimePickerChange = useCallback(
     value => {
-      timeField.value = value ? value.format('HH:mm') : '';
-      setTime(value);
+      // zero duration can come from the user selecting 0 minutes then 0 hours,
+      // but disabling 0 hours when minutes are 0 is bad for usability
+      if (value && value.hour() === 0 && value.minute() === 0) {
+        value.minutes(1);
+      }
+      setTime(value || null);
+      timeField.value = timeToSeconds(value);
       timeField.dispatchEvent(new Event('change', {bubbles: true}));
     },
     [timeField]
@@ -35,12 +54,12 @@ export default function WTFTimeField({timeId, uses24HourFormat, required, disabl
       showSecond={false}
       value={time}
       focusOnOpen
-      format={format}
-      onChange={updateTime}
-      use12Hours={!uses24HourFormat}
+      format="H:mm"
+      onChange={handleTimePickerChange}
       allowEmpty={false}
-      placeholder="--:--"
+      placeholder="h:mm"
       disabled={disabled}
+      disabledMinutes={h => (h === 0 ? [0] : [])}
       ref={timePickerRef}
       // keep the picker in the DOM tree of the surrounding element to avoid
       // e.g. qbubbles from closing when a picker is used inside one and the
@@ -50,14 +69,13 @@ export default function WTFTimeField({timeId, uses24HourFormat, required, disabl
   );
 }
 
-WTFTimeField.propTypes = {
+WTFDurationField.propTypes = {
   timeId: PropTypes.string.isRequired,
-  uses24HourFormat: PropTypes.bool.isRequired,
   required: PropTypes.bool,
   disabled: PropTypes.bool,
 };
 
-WTFTimeField.defaultProps = {
+WTFDurationField.defaultProps = {
   required: false,
   disabled: false,
 };

@@ -141,6 +141,10 @@
 
 .qbubble-contrib-duration {
   max-width: 420px !important;
+
+  .qtip-content {
+    overflow: visible;
+  }
 }
 
 #contributions-fixed-fields {

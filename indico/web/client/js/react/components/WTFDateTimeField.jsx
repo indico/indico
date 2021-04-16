@@ -185,6 +185,7 @@ export default function WTFDateTimeField({
       <TimePicker
         showSecond={false}
         value={time}
+        focusOnOpen
         format={format}
         onChange={updateTime}
         use12Hours={!uses24HourFormat}

@@ -19,7 +19,8 @@ from indico.util.i18n import _
 from indico.web.flask.util import url_for
 from indico.web.forms.base import IndicoForm
 from indico.web.forms.colors import get_colors
-from indico.web.forms.fields import IndicoLocationField, IndicoPalettePickerField, IndicoProtectionField, TimeDeltaField
+from indico.web.forms.fields import IndicoLocationField, IndicoPalettePickerField, IndicoProtectionField
+from indico.web.forms.fields.datetime import IndicoDurationField
 from indico.web.forms.fields.principals import PermissionsField
 from indico.web.forms.widgets import SwitchWidget
 
@@ -29,10 +30,11 @@ class SessionForm(IndicoForm):
     code = StringField(_('Session code'), description=_('The code that will identify the session in the Book of '
                                                         'Abstracts.'))
     description = TextAreaField(_('Description'))
-    default_contribution_duration = TimeDeltaField(_('Default contribution duration'), units=('minutes', 'hours'),
-                                                   description=_('Duration that a contribution created within this '
-                                                                 'session will have by default.'),
-                                                   default=timedelta(minutes=20))
+    default_contribution_duration = IndicoDurationField(_('Default contribution duration'),
+                                                        description=_('Duration that a contribution created within '
+                                                                      'this session will have by default.'),
+                                                        default=timedelta(minutes=20))
+
     type = QuerySelectField(_("Type"), get_label='name', allow_blank=True, blank_text=_("No type selected"))
     location_data = IndicoLocationField(_("Default location"),
                                         description=_("Default location for blocks inside the session."))

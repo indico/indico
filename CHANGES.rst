@@ -52,6 +52,8 @@ Improvements
   conferences now redirect to the meeting view page (:pr:`4847`)
 - Use a more compact setup QR code for the mobile *Indico check-in* app; the latest version of
   the app is now required. (:pr:`4844`)
+- Contribution duration fields now use a widget similar to the time picker that makes selecting
+  durations easier. (:issue:`2462`, :pr:`4873`)
 
 Bugfixes
 ^^^^^^^^
