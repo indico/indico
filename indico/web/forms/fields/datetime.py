@@ -177,7 +177,7 @@ class IndicoTimeField(TimeField):
     widget = JinjaWidget('forms/time_widget.html', single_line=True, single_kwargs=True)
 
 
-class IndicoDurationField(TimeField):
+class IndicoDurationField(Field):
     widget = JinjaWidget('forms/duration_widget.html', single_line=True, single_kwargs=True)
 
     def _value(self):
