@@ -33,6 +33,11 @@ export default function WTFDurationField({timeId, required, disabled}) {
 
   const handleTimePickerChange = useCallback(
     value => {
+      // zero duration can come from the user selecting 0 minutes then 0 hours,
+      // but disabling 0 hours when minutes are 0 is bad for usability
+      if (value && value.hour() === 0 && value.minute() === 0) {
+        value.minutes(1);
+      }
       setTime(value || null);
       timeField.value = timeToSeconds(value);
       timeField.dispatchEvent(new Event('change', {bubbles: true}));
@@ -54,6 +59,7 @@ export default function WTFDurationField({timeId, required, disabled}) {
       allowEmpty={false}
       placeholder="h:mm"
       disabled={disabled}
+      disabledMinutes={h => (h === 0 ? [0] : [])}
       ref={timePickerRef}
       // keep the picker in the DOM tree of the surrounding element to avoid
       // e.g. qbubbles from closing when a picker is used inside one and the
