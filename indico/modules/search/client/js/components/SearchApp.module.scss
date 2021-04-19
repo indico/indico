@@ -5,14 +5,11 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-.checkbox {
-  display: inline !important;
-
-  label {
-    display: inline !important;
-  }
+.menu {
+  overflow-x: scroll;
+  padding-bottom: 2px;
 }
 
-.capitalize {
-  text-transform: capitalize !important;
+.grid {
+  justify-content: center;
 }

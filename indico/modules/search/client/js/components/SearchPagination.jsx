@@ -8,10 +8,13 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import {Pagination} from 'semantic-ui-react';
+
 import './SearchPagination.module.scss';
+import {useResponsive} from 'indico/react/util';
 
 // TODO: consider getting rid of such a simple wrapper
 export default function SearchPagination({activePage, numOfPages, onPageChange}) {
+  const {isWideScreen} = useResponsive();
   const handlePageChange = (e, {activePage: active}) => {
     onPageChange(active);
   };
@@ -22,8 +25,8 @@ export default function SearchPagination({activePage, numOfPages, onPageChange})
         activePage={activePage}
         onPageChange={handlePageChange}
         totalPages={numOfPages}
-        boundaryRange={1}
-        siblingRange={2}
+        boundaryRange={isWideScreen ? 1 : 0}
+        siblingRange={isWideScreen ? 2 : 1}
       />
     </div>
   );

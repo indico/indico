@@ -25,6 +25,8 @@ import NoResults from './results/NoResults';
 import SearchBar from './SearchBar';
 import SideBar from './SideBar';
 
+import './SearchApp.module.scss';
+
 function useSearch(url, query) {
   const [page, setPage] = useState(1);
 
@@ -148,16 +150,18 @@ export default function SearchApp() {
   const handleQuery = (value, type = 'q') => setQuery(type, value, type === 'q');
 
   return (
-    <Grid padded>
-      <Grid.Column width={2} />
-      <Grid.Column width={3}>
-        <SideBar query={filters} aggregations={results.aggregations} onChange={handleQuery} />
-      </Grid.Column>
-      <Grid.Column width={6}>
+    <Grid columns={2} doubling padded styleName="grid">
+      {Object.keys(filters).length > 0 ||
+        (results.aggregations.length > 0 && (
+          <Grid.Column width={3} only="large screen">
+            <SideBar query={filters} aggregations={results.aggregations} onChange={handleQuery} />
+          </Grid.Column>
+        ))}
+      <Grid.Column width={7}>
         <SearchBar onSearch={handleQuery} searchTerm={q || ''} />
         {q && (
           <>
-            <Menu pointing secondary>
+            <Menu pointing secondary styleName="menu">
               {searchMap.map(([label, _results], idx) => (
                 <SearchTypeMenuItem
                   key={label}

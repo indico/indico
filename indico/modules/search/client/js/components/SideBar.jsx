@@ -15,22 +15,18 @@ export default function SideBar({query, aggregations, onChange}) {
   const handleChange = (type, value) =>
     onChange && onChange(query[type] === value ? undefined : value, type);
 
-  return (
-    <div styleName="sidebar">
-      {aggregations
-        .filter(({buckets}) => buckets && buckets.length)
-        .map(({key, label, buckets}) => (
-          <AggregationList
-            key={key}
-            name={key}
-            title={label}
-            items={buckets}
-            query={query}
-            onChange={handleChange}
-          />
-        ))}
-    </div>
-  );
+  return aggregations
+    .filter(({buckets}) => buckets && buckets.length)
+    .map(({key, label, buckets}) => (
+      <AggregationList
+        key={key}
+        name={key}
+        title={label}
+        items={buckets}
+        query={query}
+        onChange={handleChange}
+      />
+    ));
 }
 
 function AggregationList({name, title, items, query, onChange}) {
@@ -43,7 +39,7 @@ function AggregationList({name, title, items, query, onChange}) {
     }));
 
   return (
-    <Table fixed singleLine celled padded>
+    <Table fixed singleLine celled padded unstackable>
       <Table.Header>
         <Table.Row>
           <Table.HeaderCell styleName="capitalize">{title}</Table.HeaderCell>
