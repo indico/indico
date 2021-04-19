@@ -1,4 +1,3 @@
-pojson
 babel
 flask
 Flask-BabelEx

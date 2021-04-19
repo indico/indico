@@ -34,6 +34,7 @@ coverage==5.5
     # via pytest-cov
 docutils==0.16
     # via
+    #   plantweb
     #   sphinx
     #   sphinx-rtd-theme
 flake8-colors==0.1.9
@@ -106,6 +107,8 @@ pep517==0.10.0
     # via pip-tools
 pip-tools==6.1.0
     # via -r requirements.dev.in
+plantweb==1.2.1
+    # via -r requirements.dev.in
 pluggy==0.13.1
     # via pytest
 port-for==0.4
@@ -162,6 +165,7 @@ redis[hiredis]==3.5.3
 requests==2.25.1
     # via
     #   -c requirements.txt
+    #   plantweb
     #   sphinx
     #   transifex-client
 schemainspect==3.0.1616029793
@@ -171,6 +175,7 @@ six==1.15.0
     #   -c requirements.txt
     #   livereload
     #   migra
+    #   plantweb
     #   python-dateutil
     #   schemainspect
     #   sqlbag
