@@ -65,7 +65,7 @@ class SurveyForm(IndicoForm):
                          Survey.title != field.object_data,
                          ~Survey.is_deleted))
         if query.count():
-            raise ValidationError(_(f'There is already a survey named "{escape(field.data)}" on this event'))
+            raise ValidationError(_('There is already a survey named "{}" on this event').format(escape(field.data)))
 
     def post_validate(self):
         if not self.anonymous.data:
