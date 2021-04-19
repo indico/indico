@@ -94,3 +94,10 @@ sent in the *password* kwarg. To fail the security check for a password,
 the signal handler should return a string describing why the password is
 not secure.
 """)
+
+before_notification_send = _signals.signal('before-notification-send', """
+Executed before a notification is sent.  The *sender* is a string representing
+the type of notification.  The notification email that will be sent is passed in
+the ``email`` kwarg.  The additional kwargs passed to this signal depend on the
+context.
+""")

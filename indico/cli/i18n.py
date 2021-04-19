@@ -12,6 +12,7 @@ import subprocess
 import sys
 from distutils.dist import Distribution
 from functools import wraps
+from itertools import chain
 from pkgutil import walk_packages
 
 import click
@@ -187,6 +188,10 @@ def check_format_strings():
     sys.exit(0 if all_valid else 1)
 
 
+def _extract_placeholders(string):
+    return set(re.findall(r'(\{[^}]+\})', string))
+
+
 def _get_invalid_po_format_strings(path):
     with open(path, 'rb') as f:
         po_data = read_po(f)
@@ -201,9 +206,13 @@ def _get_invalid_po_format_strings(path):
             # since there are many strings containing e.g. just `%`
             # which are never used for formatting, and babel's
             # `_validate_format` checker fails on those too
-            orig_placeholders = set(re.findall(r'(\{[^}]+\})', orig))
-            trans_placeholders = set(re.findall(r'(\{[^}]+\})', trans))
-            if orig_placeholders != trans_placeholders:
+            orig_placeholders = _extract_placeholders(orig)
+            # in some cases the english singular doesn't use the placeholder but rather e.g. "One".
+            # but depending on the language (usually with nplurals=1) the singular version MUST include
+            # the placeholder, so we need to consider those as well
+            orig_plural_placeholders = set(chain.from_iterable(map(_extract_placeholders, all_orig[1:])))
+            trans_placeholders = _extract_placeholders(trans)
+            if trans_placeholders not in (orig_placeholders, orig_plural_placeholders):
                 invalid.append({
                     'orig': orig,
                     'trans': trans,

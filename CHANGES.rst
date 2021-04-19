@@ -95,6 +95,7 @@ Internationalization
 ^^^^^^^^^^^^^^^^^^^^
 
 - New translation: Polish
+- New translation: Mongolian
 
 Improvements
 ^^^^^^^^^^^^
@@ -119,6 +120,12 @@ Bugfixes
 - Fix inadvertently deleting a file uploaded during the "make changes" Editing action,
   resulting in the revision sometimes still referencing the file even though it has been
   deleted from storage (:pr:`4866`)
+- Fix sorting abstracts by date (:pr:`4877`)
+
+Internal Changes
+^^^^^^^^^^^^^^^^
+
+- Add ``before_notification_send`` signal (:pr:`4874`, thanks :user:`omegak`)
 
 Version 2.3.4
 -------------
