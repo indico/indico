@@ -8,7 +8,7 @@
 {% block content %}
     <div id="template-list">
         {{ render_template_list(target.designer_templates, target, inherited_templates=inherited_templates,
-                                event=event, default_ticket=default_ticket, default_badge=default_badge,
+                                event=event|default(none), default_ticket=default_ticket, default_badge=default_badge,
                                 not_deletable_templates=not_deletable_templates) }}
     </div>
 {% endblock %}

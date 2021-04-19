@@ -150,7 +150,7 @@
                 <div class="tool backside-tools">
                     <span>{% trans %}Back side template:{% endtrans %}</span>
                     <span class="backside-template-title">
-                        {{- template.backside_template.title -}}
+                        {{- template.backside_template.title if template.backside_template -}}
                     </span>
                     <button class="js-remove-backside i-button icon-remove icon-only text-color subtle"
                             title="{% trans %}Remove back side{% endtrans %}"></button>
@@ -306,7 +306,7 @@
                     <label for="element-list">{% trans %}Insert element:{% endtrans %}</label>
                     <select id="element-list">
                         {% for group_id, group in placeholders.items() | sort(attribute='1.title') %}
-                            {% if group_id not in config.disallow_groups %}
+                            {% if config.disallow_groups and group_id not in config.disallow_groups %}
                                 <optgroup label="{{ group.title }}">
                                     {% for option_id, option in group.options|dictsort(by='value') %}
                                         <option value="{{ option_id }}">{{ option }}</option>

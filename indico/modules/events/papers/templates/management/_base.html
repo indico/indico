@@ -1,4 +1,4 @@
-{% extends 'layout/base.html' if standalone else 'events/management/base.html' %}
+{% extends 'layout/base.html' if standalone|default(false) else 'events/management/base.html' %}
 
 {% block page_content_class %}{{ super() }} paper-page{% endblock %}
 {% block page_id %}paper-page{% endblock %}

@@ -101,6 +101,7 @@
                             </td>
                             {% for item in static_columns %}
                                 {% if item.id == 'state' %}
+                                    {% set sort_text = '' %}
                                     {% if contrib.paper %}
                                         {% set acceptances = contrib.paper.last_revision.reviews|selectattr('proposed_action.name', 'equalto', 'accept')|list|length %}
                                         {% set sort_text = '{}-{}-{}'.format('1' if contrib.paper.is_in_final_state else '0', contrib.paper.last_revision.state.name, acceptances) %}

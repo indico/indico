@@ -235,10 +235,6 @@
     </div>
 
     <script>
-        {% if selected_entry %}
-            $('#search-input').val('#{{ selected_entry }}').trigger('change');
-        {% endif %}
-
         setupAbstractList();
         setupAbstractJudgment({
             trackSessionMap: {{ track_session_map|tojson }}
