@@ -12,8 +12,8 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import {List, Icon} from 'semantic-ui-react';
 
-import '../ResultList.module.scss';
 import {toMoment, serializeDate} from 'indico/utils/date';
+import '../ResultList.module.scss';
 
 import CategoryPath from './CategoryPath';
 
