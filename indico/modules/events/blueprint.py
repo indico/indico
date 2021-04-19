@@ -9,7 +9,7 @@ from indico.modules.events.controllers.admin import (RHCreateEventLabel, RHCreat
                                                      RHDeleteReferenceType, RHEditEventLabel, RHEditReferenceType,
                                                      RHEventLabels, RHReferenceTypes)
 from indico.modules.events.controllers.creation import RHCreateEvent, RHPrepareEvent
-from indico.modules.events.controllers.display import RHEventAccessKey, RHEventMarcXML, RHExportEventICAL
+from indico.modules.events.controllers.display import RHEventAccessKey, RHExportEventICAL
 from indico.modules.events.controllers.entry import event_or_shorturl
 from indico.web.flask.util import make_compat_redirect_func, redirect_view
 from indico.web.flask.wrappers import IndicoBlueprint
@@ -57,7 +57,6 @@ _bp.add_url_rule('/event/<int:event_id>/other-view', 'display_other', redirect_v
 
 # Misc
 _bp.add_url_rule('/event/<int:event_id>/key-access', 'key_access', RHEventAccessKey, methods=('POST',))
-_bp.add_url_rule('/event/<int:event_id>/event.marc.xml', 'marcxml', RHEventMarcXML)
 
 
 # Legacy URLs

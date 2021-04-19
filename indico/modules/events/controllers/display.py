@@ -9,8 +9,6 @@ from io import BytesIO
 
 from flask import jsonify, redirect, request, session
 
-from indico.legacy.common.output import outputGenerator
-from indico.legacy.common.xmlGen import XMLGen
 from indico.modules.events.controllers.base import RHDisplayEventBase, RHEventBase
 from indico.modules.events.ical import event_to_ical
 from indico.modules.events.layout.views import WPPage
@@ -70,19 +68,3 @@ class RHEventAccessKey(RHEventBase):
     def _process(self):
         self.event.set_session_access_key(request.form['access_key'])
         return jsonify(valid=self.event.check_access_key())
-
-
-class RHEventMarcXML(RHDisplayEventBase):
-    def _process(self):
-        xmlgen = XMLGen()
-        xmlgen.initXml()
-        outgen = outputGenerator(session.user, xmlgen)
-        xmlgen.openTag('marc:record', [
-            ['xmlns:marc', 'http://www.loc.gov/MARC21/slim'],
-            ['xmlns:xsi', 'http://www.w3.org/2001/XMLSchema-instance'],
-            ['xsi:schemaLocation',
-             'http://www.loc.gov/MARC21/slim http://www.loc.gov/standards/marcxml/schema/MARC21slim.xsd']
-        ])
-        outgen.confToXMLMarc21(self.event)
-        xmlgen.closeTag('marc:record')
-        return send_file(f'event-{self.event.id}.marc.xml', BytesIO(xmlgen.getXml().encode()), 'application/xml')
