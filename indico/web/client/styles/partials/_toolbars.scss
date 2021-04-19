@@ -40,6 +40,10 @@ $i-button-spacing: 0.3rem;
     & input[type='text'] {
       height: $toolbar-thin-height;
     }
+
+    :not(.ui) > input[type='text'] {
+      height: $toolbar-thin-height;
+    }
   }
 
   &.thinner {
