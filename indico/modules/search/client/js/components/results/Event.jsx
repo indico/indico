@@ -5,12 +5,14 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
+import eventURL from 'indico-url:events.display';
+
 import moment from 'moment';
 import PropTypes from 'prop-types';
 import React from 'react';
 import {List, Icon} from 'semantic-ui-react';
-import '../ResultList.module.scss';
 
+import '../ResultList.module.scss';
 import {toMoment, serializeDate} from 'indico/utils/date';
 
 import CategoryPath from './CategoryPath';
@@ -30,11 +32,11 @@ const renderDates = (startDt, endDt) =>
     </List.Item>
   );
 
-const Event = ({typeFormat: type, title, url, categoryPath, startDt, endDt, chairPersons}) => {
+const Event = ({typeFormat: type, eventId, title, categoryPath, startDt, endDt, chairPersons}) => {
   return (
     <div styleName="item">
       <List.Header styleName="header">
-        <a href={url}>{title}</a>
+        <a href={eventURL({event_id: eventId})}>{title}</a>
       </List.Header>
       <List.Description styleName="description">
         {/* if it's a lecture print the list of speakers */}
@@ -77,7 +79,7 @@ const personShape = PropTypes.shape({
 
 Event.propTypes = {
   title: PropTypes.string.isRequired,
-  url: PropTypes.string.isRequired,
+  eventId: PropTypes.number.isRequired,
   typeFormat: PropTypes.oneOf(['lecture', 'meeting', 'conference']),
   startDt: PropTypes.string.isRequired,
   endDt: PropTypes.string.isRequired,
