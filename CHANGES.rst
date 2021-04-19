@@ -36,6 +36,7 @@ Bugfixes
 - Fix inadvertently deleting a file uploaded during the "make changes" Editing action,
   resulting in the revision sometimes still referencing the file even though it has been
   deleted from storage (:pr:`4866`)
+- Fix sorting abstracts by date (:pr:`4877`)
 
 Internal Changes
 ^^^^^^^^^^^^^^^^
