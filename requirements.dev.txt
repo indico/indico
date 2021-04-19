@@ -40,7 +40,7 @@ flake8-colors==0.1.9
     # via -r requirements.dev.in
 flake8-quotes==3.2.0
     # via -r requirements.dev.in
-flake8==3.9.0
+flake8==3.9.1
     # via
     #   -r requirements.dev.in
     #   flake8-colors
@@ -104,7 +104,7 @@ packaging==20.9
     #   sqlbag
 pep517==0.10.0
     # via pip-tools
-pip-tools==6.0.1
+pip-tools==6.1.0
     # via -r requirements.dev.in
 pluggy==0.13.1
     # via pytest
@@ -203,7 +203,7 @@ sphinxcontrib-qthelp==1.0.3
     # via sphinx
 sphinxcontrib-serializinghtml==1.1.4
     # via sphinx
-sqlalchemy==1.4.7
+sqlalchemy==1.4.9
     # via
     #   -c requirements.txt
     #   schemainspect
