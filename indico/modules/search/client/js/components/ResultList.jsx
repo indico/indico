@@ -7,9 +7,9 @@
 
 import PropTypes from 'prop-types';
 import React from 'react';
-import {List, Placeholder, Segment} from 'semantic-ui-react';
+import {List, Pagination, Placeholder, Segment} from 'semantic-ui-react';
 
-import SearchPagination from './SearchPagination';
+import {useResponsive} from 'indico/react/util';
 import './ResultList.module.scss';
 
 export default function ResultList({
@@ -20,6 +20,8 @@ export default function ResultList({
   loading,
   onPageChange,
 }) {
+  const {isWideScreen} = useResponsive();
+
   return (
     <>
       <Segment>
@@ -54,7 +56,15 @@ export default function ResultList({
         </List>
       </Segment>
       {numPages > 1 && (
-        <SearchPagination activePage={page} numOfPages={numPages} onPageChange={onPageChange} />
+        <div styleName="pagination">
+          <Pagination
+            activePage={page}
+            onPageChange={(e, {activePage}) => onPageChange(activePage)}
+            totalPages={numPages}
+            boundaryRange={isWideScreen ? 1 : 0}
+            siblingRange={isWideScreen ? 2 : 1}
+          />
+        </div>
       )}
     </>
   );
