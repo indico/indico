@@ -5,6 +5,8 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
+import contributionURL from 'indico-url:contributions.display_contribution';
+
 import PropTypes from 'prop-types';
 import React from 'react';
 import {List, Icon} from 'semantic-ui-react';
@@ -13,44 +15,55 @@ import {toMoment, serializeDate} from 'indico/utils/date';
 
 import '../ResultList.module.scss';
 
-const Contribution = ({title, url, startDt, persons}) => (
-  <div styleName="item">
-    <List.Header styleName="header">
-      <a href={url}>{title}</a>
-    </List.Header>
-    <List.Description styleName="description">
-      <List.Item>
-        {persons.length !== 0 && (
-          <ul>
-            {persons.length > 1 ? <Icon name="users" /> : <Icon name="user" />}
-            {persons.map(person => (
-              <li key={person.id}>
-                {person.title ? `${person.title} ${person.name}` : person.name}
-              </li>
-            ))}
-          </ul>
-        )}
-      </List.Item>
-      {startDt && (
+const Contribution = ({eventId, contributionId, title, startDt, persons}) => {
+  persons = [...new Map(persons.map(p => [p.name + p.affiliation, p])).values()];
+
+  return (
+    <div styleName="item">
+      <List.Header styleName="header">
+        <a href={contributionURL({event_id: eventId, contrib_id: contributionId})}>{title}</a>
+      </List.Header>
+      <List.Description styleName="description">
         <List.Item>
-          <Icon name="calendar alternate outline" />
-          {serializeDate(toMoment(startDt), 'DD MMMM YYYY HH:mm')}
+          {persons.length !== 0 && (
+            <ul>
+              {persons.length > 1 ? <Icon name="users" /> : <Icon name="user" />}
+              {persons.map(person => (
+                <li key={person}>
+                  {person.name}
+                  {person.affiliation ? ` (${person.affiliation.substring(0, 12)})` : ''}
+                </li>
+              ))}
+            </ul>
+          )}
         </List.Item>
-      )}
-    </List.Description>
-  </div>
-);
+        {startDt && (
+          <List.Item>
+            <Icon name="calendar alternate outline" />
+            {serializeDate(toMoment(startDt), 'DD MMMM YYYY HH:mm')}
+          </List.Item>
+        )}
+      </List.Description>
+    </div>
+  );
+};
 
 Contribution.propTypes = {
   title: PropTypes.string.isRequired,
-  url: PropTypes.string.isRequired,
-  startDt: PropTypes.string.isRequired,
+  contributionId: PropTypes.number.isRequired,
+  eventId: PropTypes.number.isRequired,
+  startDt: PropTypes.string,
   persons: PropTypes.arrayOf(
     PropTypes.shape({
-      id: PropTypes.number.isRequired,
-      title: PropTypes.string.isRequired,
       name: PropTypes.string.isRequired,
+      affiliation: PropTypes.string,
     })
-  ).isRequired,
+  ),
 };
+
+Contribution.defaultProps = {
+  startDt: undefined,
+  persons: [],
+};
+
 export default Contribution;
