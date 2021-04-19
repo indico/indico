@@ -11,7 +11,7 @@ colorclass
 distro
 email-validator
 feedgen
-flask-babelex
+flask-babel
 flask-caching
 flask-limiter
 flask-marshmallow
@@ -51,6 +51,7 @@ reportlab
 requests
 sentry-sdk[flask,celery,sqlalchemy,pure_eval]
 simplejson
+speaklater
 sqlalchemy
 termcolor
 terminaltables

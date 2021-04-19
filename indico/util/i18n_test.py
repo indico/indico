@@ -12,7 +12,7 @@ from babel.messages import Catalog
 from babel.messages.mofile import write_mo
 from babel.support import Translations
 from flask import has_request_context, request, session
-from flask_babelex import get_domain
+from flask_babel import get_domain
 from speaklater import _LazyString
 from werkzeug.datastructures import LanguageAccept
 
