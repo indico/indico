@@ -66,6 +66,7 @@ const Event = ({typeFormat: type, title, url, categoryPath, startDt, endDt, chai
 
 Event.defaultProps = {
   chairPersons: [],
+  typeFormat: 'meeting',
 };
 
 const personShape = PropTypes.shape({
@@ -77,14 +78,13 @@ const personShape = PropTypes.shape({
 Event.propTypes = {
   title: PropTypes.string.isRequired,
   url: PropTypes.string.isRequired,
-  typeFormat: PropTypes.oneOf(['lecture', 'meeting', 'conference']).isRequired,
+  typeFormat: PropTypes.oneOf(['lecture', 'meeting', 'conference']),
   startDt: PropTypes.string.isRequired,
   endDt: PropTypes.string.isRequired,
   categoryPath: PropTypes.arrayOf(
     PropTypes.shape({
       id: PropTypes.number.isRequired,
       title: PropTypes.string.isRequired,
-      url: PropTypes.string.isRequired,
     })
   ).isRequired,
   chairPersons: PropTypes.arrayOf(personShape),
