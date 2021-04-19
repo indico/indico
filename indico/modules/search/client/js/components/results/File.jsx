@@ -43,7 +43,9 @@ const File = ({title, url, typeFormat: type, filename, modifiedDt, user}) => (
       <List.Item>
         <ul>
           <Icon name="user" />
-          <li>{user.name}</li>
+          <li>
+            {user.name} {user.affiliation ? `(${user.affiliation})` : ''}
+          </li>
         </ul>
       </List.Item>
       <List.Item>
@@ -61,8 +63,8 @@ File.propTypes = {
   filename: PropTypes.string,
   modifiedDt: PropTypes.string.isRequired,
   user: PropTypes.shape({
-    title: PropTypes.string.isRequired,
     name: PropTypes.string.isRequired,
+    affiliation: PropTypes.string,
   }).isRequired,
 };
 
