@@ -10,7 +10,7 @@ import json
 import os
 
 from flask import g, session
-from flask_babelex import Domain
+from flask_babel import Domain
 from flask_pluginengine import (Plugin, PluginBlueprintMixin, PluginBlueprintSetupStateMixin, PluginEngine,
                                 current_plugin, render_plugin_template, wrap_in_plugin_context)
 from werkzeug.utils import cached_property

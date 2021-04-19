@@ -1,5 +1,5 @@
 babel
 flask
-Flask-BabelEx
+Flask-Babel
 sphinx-issues
 plantweb

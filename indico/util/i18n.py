@@ -14,7 +14,7 @@ from babel.core import LOCALE_ALIASES, Locale
 from babel.messages.pofile import read_po
 from babel.support import NullTranslations
 from flask import current_app, g, has_app_context, has_request_context, request, session
-from flask_babelex import Babel, Domain, get_domain
+from flask_babel import Babel, Domain, get_domain
 from flask_pluginengine import current_plugin
 from speaklater import is_lazy_string, make_lazy_string
 from werkzeug.utils import cached_property
