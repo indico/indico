@@ -67,7 +67,7 @@
         </a>
     {% endif %}
 
-    {% if not no_javascript %}
+    {% if not no_javascript|default(false) %}
         <script>
             setupReviewingPage();
             setupAbstractJudgment({
