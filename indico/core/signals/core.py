@@ -86,3 +86,10 @@ db_schema_created = _signals.signal('db-schema-created', """
 Executed when a new database schema is created.  The *sender* is the
 name of the schema.
 """)
+
+before_notification_send = _signals.signal('before-notification-send', """
+Executed before a notification is sent.  The *sender* is a string representing
+the type of notification.  The notification email that will be sent is passed in
+the ``email`` kwarg.  The additional kwargs passed to this signal depend on the
+context.
+""")

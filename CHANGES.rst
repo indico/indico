@@ -37,6 +37,11 @@ Bugfixes
   resulting in the revision sometimes still referencing the file even though it has been
   deleted from storage (:pr:`4866`)
 
+Internal Changes
+^^^^^^^^^^^^^^^^
+
+- Add ``before_notification_send`` signal (:pr:`4874`, thanks :user:`omegak`)
+
 Version 2.3.4
 -------------
 
