@@ -17,7 +17,7 @@ const EventNote = ({title, url, content, highlight}) => (
     </List.Header>
     <List.Description styleName="description">
       {highlight?.content
-        .slice(0, 3) // eslint-disable-next-line react/no-array-index-key
+        ?.slice(0, 3) // eslint-disable-next-line react/no-array-index-key
         .map((html, idx) => <span key={html + idx} dangerouslySetInnerHTML={{__html: html}} />) || (
         <span>{content.slice(0, 240)}</span>
       )}
@@ -30,7 +30,7 @@ EventNote.propTypes = {
   content: PropTypes.string.isRequired,
   url: PropTypes.string.isRequired,
   highlight: PropTypes.shape({
-    content: PropTypes.array.isRequired,
+    content: PropTypes.array,
   }),
 };
 
