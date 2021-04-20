@@ -14,9 +14,13 @@ import {Translate, Param} from 'indico/react/i18n';
 const NoResults = ({query}) => (
   <Message warning>
     <Message.Header>{Translate.string('No Results')}</Message.Header>
-    <Translate>
-      Your search - <Param name="query" value={query} /> - did not match any results
-    </Translate>
+    {query ? (
+      <Translate>
+        Your search - <Param name="query" value={query} /> - did not match any results
+      </Translate>
+    ) : (
+      <Translate>Please enter a term above to begin searching</Translate>
+    )}
   </Message>
 );
 
