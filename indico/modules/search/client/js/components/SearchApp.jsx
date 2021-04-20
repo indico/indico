@@ -30,11 +30,11 @@ import './SearchApp.module.scss';
 function useSearch(url, query) {
   const [page, setPage] = useState(1);
 
-  const {data, error, loading, lastData} = useIndicoAxios({
+  const {data, loading, lastData} = useIndicoAxios({
     url,
     camelize: true,
     options: {params: {...query, page}},
-    forceDispatchEffect: () => !!query,
+    forceDispatchEffect: () => query?.q,
     trigger: [url, query, page],
     customHandler: undefined,
   });
@@ -51,10 +51,9 @@ function useSearch(url, query) {
         total: data?.total || 0,
         data: data?.results || [],
         aggregations: data?.aggregations || lastData?.aggregations || [],
-        // ensure the initial state is loading, as the data is undefined
-        loading: (!data && !error) || loading,
+        loading,
       }),
-      [page, data, lastData, error, loading]
+      [page, data, lastData, loading]
     ),
     setPage,
   ];
@@ -151,42 +150,37 @@ export default function SearchApp() {
 
   return (
     <Grid columns={2} doubling padded styleName="grid">
-      {Object.keys(filters).length > 0 ||
-        (results.aggregations.length > 0 && (
-          <Grid.Column width={3} only="large screen">
-            <SideBar query={filters} aggregations={results.aggregations} onChange={handleQuery} />
-          </Grid.Column>
-        ))}
+      {results.aggregations.length > 0 && (
+        <Grid.Column width={3} only="large screen">
+          <SideBar query={filters} aggregations={results.aggregations} onChange={handleQuery} />
+        </Grid.Column>
+      )}
       <Grid.Column width={7}>
         <SearchBar onSearch={handleQuery} searchTerm={q || ''} />
-        {q && (
-          <>
-            <Menu pointing secondary styleName="menu">
-              {searchMap.map(([label, _results], idx) => (
-                <SearchTypeMenuItem
-                  key={label}
-                  index={idx}
-                  active={menuItem === idx}
-                  title={label}
-                  total={_results.total}
-                  loading={_results.loading}
-                  onClick={(e, {index}) => setActiveMenuItem(index)}
-                />
-              ))}
-            </Menu>
-            {results.total || isAnyLoading ? (
-              <ResultList
-                component={Component}
-                page={results.page}
-                numPages={results.pages}
-                data={results.data}
-                onPageChange={setPage}
-                loading={results.loading}
-              />
-            ) : (
-              <NoResults query={q} />
-            )}
-          </>
+        <Menu pointing secondary styleName="menu">
+          {searchMap.map(([label, _results], idx) => (
+            <SearchTypeMenuItem
+              key={label}
+              index={idx}
+              active={menuItem === idx}
+              title={label}
+              total={_results.total}
+              loading={_results.loading}
+              onClick={(e, {index}) => setActiveMenuItem(index)}
+            />
+          ))}
+        </Menu>
+        {q && (results.total || isAnyLoading) ? (
+          <ResultList
+            component={Component}
+            page={results.page}
+            numPages={results.pages}
+            data={results.data}
+            onPageChange={setPage}
+            loading={results.loading}
+          />
+        ) : (
+          <NoResults query={q} />
         )}
       </Grid.Column>
     </Grid>
