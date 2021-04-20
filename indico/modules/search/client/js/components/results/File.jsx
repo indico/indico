@@ -44,7 +44,8 @@ const File = ({title, url, typeFormat: type, filename, modifiedDt, user}) => (
         <ul>
           <Icon name="user" />
           <li>
-            {user.name} {user.affiliation ? `(${user.affiliation})` : ''}
+            {user.name}
+            {user.affiliation ? ` (${user.affiliation})` : ''}
           </li>
         </ul>
       </List.Item>

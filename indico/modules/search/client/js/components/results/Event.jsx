@@ -39,21 +39,19 @@ const Event = ({typeFormat: type, eventId, title, categoryPath, startDt, endDt, 
         <a href={eventURL({event_id: eventId})}>{title}</a>
       </List.Header>
       <List.Description styleName="description">
-        {/* if it's a lecture print the list of speakers */}
         {type === 'lecture' && chairPersons.length !== 0 && (
           <List.Item>
-            {chairPersons.map(i => (
-              <div key={i.name}>
-                {i.title
-                  ? `${i.title} ${i.name} (${i.affiliation})`
-                  : `${i.name} (${i.affiliation})`}
+            {chairPersons.map(person => (
+              <div key={person.name}>
+                {person.name}
+                <span styleName="muted">
+                  {person.affiliation ? ` (${person.affiliation})` : ''}
+                </span>
               </div>
             ))}
           </List.Item>
         )}
-
         {renderDates(startDt, endDt)}
-        {/* Render the path */}
         {categoryPath.length !== 0 && (
           <List.Item>
             <List.Description>
@@ -72,7 +70,6 @@ Event.defaultProps = {
 };
 
 const personShape = PropTypes.shape({
-  id: PropTypes.number,
   name: PropTypes.string.isRequired,
   affiliation: PropTypes.string.isRequired,
 });

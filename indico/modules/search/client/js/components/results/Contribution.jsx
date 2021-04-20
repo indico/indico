@@ -31,7 +31,9 @@ const Contribution = ({eventId, contributionId, title, startDt, persons}) => {
               {persons.map(person => (
                 <li key={person}>
                   {person.name}
-                  {person.affiliation ? ` (${person.affiliation.substring(0, 12)})` : ''}
+                  <span styleName="muted">
+                    {person.affiliation ? ` (${person.affiliation})` : ''}
+                  </span>
                 </li>
               ))}
             </ul>
