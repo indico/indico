@@ -14,7 +14,7 @@ PostgreSQL is installed from its upstream repos to get a much more recent versio
     echo "deb http://apt.postgresql.org/pub/repos/apt/ $(lsb_release -cs)-pgdg main" > /etc/apt/sources.list.d/pgdg.list
     wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | apt-key add -
     apt update
-    apt install -y --install-recommends postgresql-9.6 libpq-dev apache2 libapache2-mod-proxy-uwsgi libapache2-mod-xsendfile python-dev python-virtualenv libxslt1-dev libxml2-dev libffi-dev libpcre3-dev libyaml-dev build-essential redis-server uwsgi uwsgi-plugin-python
+    apt install -y --install-recommends postgresql-13 libpq-dev apache2 libapache2-mod-proxy-uwsgi libapache2-mod-xsendfile libxslt1-dev libxml2-dev libffi-dev libpcre3-dev libyaml-dev libssl-dev zlib1g-dev libbz2-dev libreadline-dev libsqlite3-dev libncurses5-dev libncursesw5-dev xz-utils libffi-dev liblzma-dev uuid-dev build-essential redis-server
 
 
 If you use Debian, run this command:
@@ -67,8 +67,7 @@ most cases.
 
 .. code-block:: shell
 
-    ln -s /etc/uwsgi/apps-available/indico.ini /etc/uwsgi/apps-enabled/indico.ini
-    cat > /etc/uwsgi/apps-available/indico.ini <<'EOF'
+    cat > /etc/uwsgi-indico.ini <<'EOF'
     [uwsgi]
     uid = indico
     gid = www-data
@@ -85,7 +84,6 @@ most cases.
     procname-prefix-spaced = indico
     disable-logging = true
 
-    plugin = python
     single-interpreter = true
 
     touch-reload = /opt/indico/web/indico.wsgi
@@ -100,6 +98,33 @@ most cases.
     harakiri-verbose = true
     reload-on-rss = 2048
     evil-reload-on-rss = 8192
+    EOF
+
+We also need a systemd unit to start uWSGI.
+
+.. code-block:: shell
+
+    cat > /etc/systemd/system/indico-uwsgi.service <<'EOF'
+    [Unit]
+    Description=Indico uWSGI
+    After=network.target
+
+    [Service]
+    ExecStart=/opt/indico/.venv/bin/uwsgi --ini /etc/uwsgi-indico.ini
+    ExecReload=/bin/kill -HUP $MAINPID
+    Restart=always
+    SyslogIdentifier=indico-uwsgi
+    User=indico
+    Group=www-data
+    UMask=0027
+    Type=notify
+    NotifyAccess=all
+    KillMode=mixed
+    KillSignal=SIGQUIT
+    TimeoutStopSec=300
+
+    [Install]
+    WantedBy=multi-user.target
     EOF
 
 
@@ -123,13 +148,16 @@ most cases.
     <VirtualHost *:443>
         ServerName YOURHOSTNAME
         DocumentRoot "/var/empty/apache"
+        Protocols h2 http/1.1
 
         SSLEngine             on
         SSLCertificateFile    /etc/ssl/indico/indico.crt
         SSLCertificateKeyFile /etc/ssl/indico/indico.key
-        SSLProtocol           all -SSLv2 -SSLv3
-        SSLCipherSuite        ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305:ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:DHE-RSA-AES128-GCM-SHA256:DHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-AES128-SHA256:ECDHE-RSA-AES128-SHA256:ECDHE-ECDSA-AES128-SHA:ECDHE-RSA-AES256-SHA384:ECDHE-RSA-AES128-SHA:ECDHE-ECDSA-AES256-SHA384:ECDHE-ECDSA-AES256-SHA:ECDHE-RSA-AES256-SHA:DHE-RSA-AES128-SHA256:DHE-RSA-AES128-SHA:DHE-RSA-AES256-SHA256:DHE-RSA-AES256-SHA:ECDHE-ECDSA-DES-CBC3-SHA:ECDHE-RSA-DES-CBC3-SHA:EDH-RSA-DES-CBC3-SHA:AES128-GCM-SHA256:AES256-GCM-SHA384:AES128-SHA256:AES256-SHA256:AES128-SHA:AES256-SHA:DES-CBC3-SHA:!DSS
-        SSLHonorCipherOrder   on
+
+        SSLProtocol           all -SSLv3 -TLSv1 -TLSv1.1
+        SSLCipherSuite        ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305:DHE-RSA-AES128-GCM-SHA256:DHE-RSA-AES256-GCM-SHA384
+        SSLHonorCipherOrder   off
+        SSLSessionTickets     off
 
         XSendFile on
         XSendFilePath /opt/indico
@@ -168,8 +196,8 @@ Now enable the necessary modules and the indico site in apache:
 
 .. _deb-apache-ssl:
 
-4. Create an SSL Certificate
-----------------------------
+4. Create a TLS Certificate
+---------------------------
 
 First, create the folders for the certificate/key and set restrictive
 permissions on them:
@@ -237,6 +265,7 @@ Celery runs as a background daemon. Add a systemd unit file for it:
     [Install]
     WantedBy=multi-user.target
     EOF
+
     systemctl daemon-reload
 
 
@@ -247,21 +276,43 @@ Now create a user that will be used to run Indico and switch to it:
     useradd -rm -g www-data -d /opt/indico -s /bin/bash indico
     su - indico
 
-
-You are now ready to install Indico:
-
-.. note::
-
-    If you need to migrate from Indico 1.2, you must install Indico 2.0, regardless
-    of what the latest Indico version is.  If this is the case for you, replace the
-    last command in the block below with ``pip install 'indico<2.1'``
-
+The first thing to do is installing pyenv - we use it to install the latest Python version
+as not all Linux distributions include it and like this Indico can benefit from the latest
+Python features.
 
 .. code-block:: shell
 
-    virtualenv ~/.venv
+    curl -L https://github.com/pyenv/pyenv-installer/raw/master/bin/pyenv-installer | bash
+
+    cat >> ~/.bashrc <<'EOF'
+    export PATH="/opt/indico/.pyenv/bin:$PATH"
+    eval "$(pyenv init -)"
+    EOF
+
+    source ~/.bashrc
+
+You are now ready to install Python 3.9:
+
+Run ``pyenv install --list | egrep '^\s*3\.9\.'`` to check for the latest available version and
+then install it and set it as the active Python version (replace ``x`` in both lines).
+
+.. code-block:: shell
+
+    pyenv install 3.9.x
+    pyenv global 3.9.x
+
+This may take a while since pyenv needs to compile the specified Python version. Once done, you
+may want to use ``python -V`` to confirm that you are indeed using the version you just installed.
+
+You are now ready to install Indico:
+
+.. code-block:: shell
+
+    python -m venv --upgrade-deps --prompt indico ~/.venv
     source ~/.venv/bin/activate
-    pip install -U pip setuptools
+    echo 'source ~/.venv/bin/activate' >> ~/.bashrc
+    pip install wheel
+    pip install uwsgi
     pip install indico
 
 
@@ -314,8 +365,8 @@ server is rebooted:
 
 .. code-block:: shell
 
-    systemctl restart uwsgi.service apache2.service indico-celery.service
-    systemctl enable uwsgi.service apache2.service postgresql.service redis-server.service indico-celery.service
+    systemctl restart apache2.service indico-celery.service indico-uwsgi.service
+    systemctl enable apache2.service postgresql.service redis-server.service indico-celery.service indico-uwsgi.service
 
 
 .. _deb-apache-letsencrypt:
@@ -339,7 +390,7 @@ If you use Ubuntu, install the certbot PPA:
     apt update
 
 
-To avoid ugly SSL warnings in your browsers, the easiest option is to
+To avoid ugly TLS warnings in your browsers, the easiest option is to
 get a free certificate from Let's Encrypt. We also enable the cronjob
 to renew it automatically:
 
