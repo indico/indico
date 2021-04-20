@@ -38,6 +38,10 @@ function AggregationList({name, title, items, query, onChange}) {
       count,
     }));
 
+  if (!items.length) {
+    return null;
+  }
+
   return (
     <Table fixed singleLine celled padded unstackable>
       <Table.Header>
