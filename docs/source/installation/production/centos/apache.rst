@@ -1,6 +1,14 @@
 Apache
 ======
 
+.. warning::
+
+    CentOS 8 with Apache is **not supported**, as some important packages
+    (mod_xsendfile and mod_proxy_uwsgi) are not (yet?) available for
+    CentOS 8 in first-party repos. Once they are in EPEL, there is a
+    good chance this guide will work as expected.
+
+
 .. _centos-apache-epel:
 
 1. Enable EPEL
@@ -20,16 +28,27 @@ Apache
 2. Install Packages
 -------------------
 
-Edit ``/etc/yum.repos.d/CentOS-Base.repo`` and add ``exclude=postgresql*``
-to the ``[base]`` and ``[updates]`` sections, as described in the
-`PostgreSQL wiki`_.
+If you are on CentOS 7, edit ``/etc/yum.repos.d/CentOS-Base.repo`` and add
+``exclude=postgresql*`` to the ``[base]`` and ``[updates]`` sections, as
+described in the `PostgreSQL wiki`_ and then run these commands:
 
 .. code-block:: shell
 
-    yum install -y https://download.postgresql.org/pub/repos/yum/reporpms/EL-7-x86_64/pgdg-redhat-repo-latest.noarch.rpm
     yum install -y centos-release-scl
+    yum install -y https://download.postgresql.org/pub/repos/yum/reporpms/EL-7-x86_64/pgdg-redhat-repo-latest.noarch.rpm
+
+If you are on CentOS 8, run this instead:
+
+.. code-block:: shell
+
+    dnf install -y https://download.postgresql.org/pub/repos/yum/reporpms/EL-8-x86_64/pgdg-redhat-repo-latest.noarch.rpm
+    dnf -qy module disable postgresql
+    yum config-manager --set-enabled powertools
+
+.. code-block:: shell
+
     yum install -y postgresql13 postgresql13-server postgresql13-libs postgresql13-devel postgresql13-contrib
-    yum install -y git gcc redis httpd mod_proxy_uwsgi mod_ssl mod_xsendfile
+    yum install -y git gcc make redis httpd mod_proxy_uwsgi mod_ssl mod_xsendfile
     yum install -y libjpeg-turbo-devel libxslt-devel libxml2-devel libffi-devel pcre-devel libyaml-devel zlib-devel bzip2 bzip2-devel readline-devel sqlite sqlite-devel openssl-devel xz xz-devel libffi-devel findutils libuuid-devel
     /usr/pgsql-13/bin/postgresql-13-setup initdb
     systemctl start postgresql-13.service redis.service
@@ -412,7 +431,7 @@ server is rebooted:
 
 .. note::
 
-    This is only needed if you use CC7 as CentOS7 has no firewall enabled
+    This is only needed if you use CC7 as CentOS 7/8 have no firewall enabled
     by default
 
 
@@ -471,11 +490,17 @@ Add the Shibboleth yum repository:
     If you use CC7, Shibboleth is already available and there is no
     need to add the repo manually.
 
+If you use CentOS 7:
 
 .. code-block:: shell
 
     curl -fsSL -o /etc/yum.repos.d/shibboleth.repo 'https://shibboleth.net/cgi-bin/sp_repo.cgi?platform=CentOS_7'
 
+If you use CentOS 8:
+
+.. code-block:: shell
+
+    curl -fsSL -o /etc/yum.repos.d/shibboleth.repo 'https://shibboleth.net/cgi-bin/sp_repo.cgi?platform=CentOS_8'
 
 Now install Shibboleth itself.  When prompted to accept the GPG key
 of the Shibboleth yum repo, confirm the prompt.
