@@ -93,7 +93,9 @@ function NoResults({query}) {
     <Message warning={!!query}>
       {query ? (
         <>
-          <Message.Header>{Translate.string('No Results')}</Message.Header>
+          <Message.Header>
+            <Translate>No Results</Translate>
+          </Message.Header>
           <Translate>
             Your search - <Param name="query" value={query} /> - did not match any results
           </Translate>
