@@ -13,9 +13,11 @@ import React from 'react';
 import {List, Icon} from 'semantic-ui-react';
 
 import {toMoment, serializeDate} from 'indico/utils/date';
-import '../ResultList.module.scss';
 
 import CategoryPath from './CategoryPath';
+import PersonList from './PersonList';
+
+import '../ResultList.module.scss';
 
 /* if end date == start date only show start date */
 const renderDates = (startDt, endDt) =>
@@ -32,7 +34,15 @@ const renderDates = (startDt, endDt) =>
     </List.Item>
   );
 
-const Event = ({typeFormat: type, eventId, title, categoryPath, startDt, endDt, chairPersons}) => {
+export default function Event({
+  typeFormat: type,
+  eventId,
+  title,
+  categoryPath,
+  startDt,
+  endDt,
+  chairPersons,
+}) {
   return (
     <div styleName="item">
       <List.Header styleName="header">
@@ -41,14 +51,7 @@ const Event = ({typeFormat: type, eventId, title, categoryPath, startDt, endDt, 
       <List.Description styleName="description">
         {type === 'lecture' && chairPersons.length !== 0 && (
           <List.Item>
-            {chairPersons.map(person => (
-              <div key={person.name}>
-                {person.name}
-                <span styleName="muted">
-                  {person.affiliation ? ` (${person.affiliation})` : ''}
-                </span>
-              </div>
-            ))}
+            <PersonList persons={chairPersons} />
           </List.Item>
         )}
         {renderDates(startDt, endDt)}
@@ -62,17 +65,12 @@ const Event = ({typeFormat: type, eventId, title, categoryPath, startDt, endDt, 
       </List.Description>
     </div>
   );
-};
+}
 
 Event.defaultProps = {
   chairPersons: [],
   typeFormat: 'meeting',
 };
-
-const personShape = PropTypes.shape({
-  name: PropTypes.string.isRequired,
-  affiliation: PropTypes.string.isRequired,
-});
 
 Event.propTypes = {
   title: PropTypes.string.isRequired,
@@ -86,7 +84,10 @@ Event.propTypes = {
       title: PropTypes.string.isRequired,
     })
   ).isRequired,
-  chairPersons: PropTypes.arrayOf(personShape),
+  chairPersons: PropTypes.arrayOf(
+    PropTypes.shape({
+      name: PropTypes.string.isRequired,
+      affiliation: PropTypes.string.isRequired,
+    })
+  ),
 };
-
-export default Event;

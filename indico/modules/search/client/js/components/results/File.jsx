@@ -9,8 +9,11 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import {List, Icon} from 'semantic-ui-react';
 
-import '../ResultList.module.scss';
 import {toMoment, serializeDate} from 'indico/utils/date';
+
+import PersonList from './PersonList';
+
+import '../ResultList.module.scss';
 
 const iconSelector = filename => {
   switch (filename?.split('.').pop()) {
@@ -41,13 +44,7 @@ const File = ({title, url, typeFormat: type, filename, modifiedDt, user}) => (
     </List.Header>
     <List.Description styleName="description">
       <List.Item>
-        <ul>
-          <Icon name="user" />
-          <li>
-            {user.name}
-            {user.affiliation ? ` (${user.affiliation})` : ''}
-          </li>
-        </ul>
+        <PersonList persons={[user]} />
       </List.Item>
       <List.Item>
         <Icon name="calendar alternate outline" />

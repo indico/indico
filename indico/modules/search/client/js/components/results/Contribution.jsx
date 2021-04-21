@@ -13,42 +13,30 @@ import {List, Icon} from 'semantic-ui-react';
 
 import {toMoment, serializeDate} from 'indico/utils/date';
 
+import PersonList from './PersonList';
+
 import '../ResultList.module.scss';
 
-const Contribution = ({eventId, contributionId, title, startDt, persons}) => {
-  persons = [...new Map(persons.map(p => [p.name + p.affiliation, p])).values()];
-
-  return (
-    <div styleName="item">
-      <List.Header styleName="header">
-        <a href={contributionURL({event_id: eventId, contrib_id: contributionId})}>{title}</a>
-      </List.Header>
-      <List.Description styleName="description">
+const Contribution = ({eventId, contributionId, title, startDt, persons}) => (
+  <div styleName="item">
+    <List.Header styleName="header">
+      <a href={contributionURL({event_id: eventId, contrib_id: contributionId})}>{title}</a>
+    </List.Header>
+    <List.Description styleName="description">
+      {persons.length !== 0 && (
         <List.Item>
-          {persons.length !== 0 && (
-            <ul>
-              {persons.length > 1 ? <Icon name="users" /> : <Icon name="user" />}
-              {persons.map(person => (
-                <li key={person}>
-                  {person.name}
-                  <span styleName="muted">
-                    {person.affiliation ? ` (${person.affiliation})` : ''}
-                  </span>
-                </li>
-              ))}
-            </ul>
-          )}
+          <PersonList persons={persons} />
         </List.Item>
-        {startDt && (
-          <List.Item>
-            <Icon name="calendar alternate outline" />
-            {serializeDate(toMoment(startDt), 'DD MMMM YYYY HH:mm')}
-          </List.Item>
-        )}
-      </List.Description>
-    </div>
-  );
-};
+      )}
+      {startDt && (
+        <List.Item>
+          <Icon name="calendar alternate outline" />
+          {serializeDate(toMoment(startDt), 'DD MMMM YYYY HH:mm')}
+        </List.Item>
+      )}
+    </List.Description>
+  </div>
+);
 
 Contribution.propTypes = {
   title: PropTypes.string.isRequired,
