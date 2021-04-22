@@ -8,12 +8,11 @@
 import searchURL from 'indico-url:search.api_search';
 
 import PropTypes from 'prop-types';
-import React, {useCallback, useEffect, useMemo, useState} from 'react';
-import {useHistory} from 'react-router-dom';
-import {Grid, Loader, Menu} from 'semantic-ui-react';
+import React, {useEffect, useMemo, useState} from 'react';
+import {Grid, Loader, Menu, Message} from 'semantic-ui-react';
 
-import {useIndicoAxios} from 'indico/react/hooks';
-import {Translate} from 'indico/react/i18n';
+import {useIndicoAxios, useQueryParams} from 'indico/react/hooks';
+import {Param, Translate} from 'indico/react/i18n';
 
 import ResultList from './ResultList';
 import Category from './results/Category';
@@ -21,18 +20,19 @@ import Contribution from './results/Contribution';
 import Event from './results/Event';
 import EventNote from './results/EventNote';
 import File from './results/File';
-import NoResults from './results/NoResults';
 import SearchBar from './SearchBar';
 import SideBar from './SideBar';
+
+import './SearchApp.module.scss';
 
 function useSearch(url, query) {
   const [page, setPage] = useState(1);
 
-  const {data, error, loading, lastData} = useIndicoAxios({
+  const {data, loading, lastData} = useIndicoAxios({
     url,
     camelize: true,
     options: {params: {...query, page}},
-    forceDispatchEffect: () => !!query,
+    forceDispatchEffect: () => query?.q,
     trigger: [url, query, page],
     customHandler: undefined,
   });
@@ -49,10 +49,9 @@ function useSearch(url, query) {
         total: data?.total || 0,
         data: data?.results || [],
         aggregations: data?.aggregations || lastData?.aggregations || [],
-        // ensure the initial state is loading, as the data is undefined
-        loading: (!data && !error) || loading,
+        loading,
       }),
-      [page, data, lastData, error, loading]
+      [page, data, lastData, loading]
     ),
     setPage,
   ];
@@ -89,35 +88,28 @@ SearchTypeMenuItem.defaultProps = {
   onClick: undefined,
 };
 
-function useQueryParams() {
-  const [query, _setQuery] = useState(window.location.search);
-  const queryObject = useMemo(() => Object.fromEntries(new URLSearchParams(query)), [query]);
-  const history = useHistory();
-
-  const setQuery = useCallback(
-    (type, name, reset) => {
-      const params = new URLSearchParams(reset ? undefined : query);
-      if (name !== undefined) {
-        params.set(type, name);
-      } else {
-        params.delete(type);
-      }
-      const _query = params.toString();
-      history.push({
-        pathname: window.location.pathname,
-        search: `?${_query}`,
-      });
-      _setQuery(_query);
-    },
-    [history, query]
+function NoResults({query}) {
+  return (
+    <Message warning={!!query}>
+      {query ? (
+        <>
+          <Message.Header>
+            <Translate>No Results</Translate>
+          </Message.Header>
+          <Translate>
+            Your search - <Param name="query" value={query} /> - did not match any results
+          </Translate>
+        </>
+      ) : (
+        <Translate>Please enter a term above to begin searching</Translate>
+      )}
+    </Message>
   );
-
-  useEffect(() => {
-    return history.listen(location => _setQuery(location.search));
-  }, [history, query, _setQuery]);
-
-  return [queryObject, setQuery];
 }
+
+NoResults.propTypes = {
+  query: PropTypes.string.isRequired,
+};
 
 export default function SearchApp() {
   const [query, setQuery] = useQueryParams();
@@ -148,41 +140,38 @@ export default function SearchApp() {
   const handleQuery = (value, type = 'q') => setQuery(type, value, type === 'q');
 
   return (
-    <Grid padded>
-      <Grid.Column width={2} />
-      <Grid.Column width={3}>
-        <SideBar query={filters} aggregations={results.aggregations} onChange={handleQuery} />
-      </Grid.Column>
-      <Grid.Column width={6}>
+    <Grid columns={2} doubling padded styleName="grid">
+      {results.aggregations.length > 0 && (
+        <Grid.Column width={3} only="large screen">
+          <SideBar query={filters} aggregations={results.aggregations} onChange={handleQuery} />
+        </Grid.Column>
+      )}
+      <Grid.Column width={7}>
         <SearchBar onSearch={handleQuery} searchTerm={q || ''} />
-        {q && (
-          <>
-            <Menu pointing secondary>
-              {searchMap.map(([label, _results], idx) => (
-                <SearchTypeMenuItem
-                  key={label}
-                  index={idx}
-                  active={menuItem === idx}
-                  title={label}
-                  total={_results.total}
-                  loading={_results.loading}
-                  onClick={(e, {index}) => setActiveMenuItem(index)}
-                />
-              ))}
-            </Menu>
-            {results.total || isAnyLoading ? (
-              <ResultList
-                component={Component}
-                page={results.page}
-                numPages={results.pages}
-                data={results.data}
-                onPageChange={setPage}
-                loading={results.loading}
-              />
-            ) : (
-              <NoResults query={q} />
-            )}
-          </>
+        <Menu pointing secondary styleName="menu">
+          {searchMap.map(([label, _results], idx) => (
+            <SearchTypeMenuItem
+              key={label}
+              index={idx}
+              active={menuItem === idx}
+              title={label}
+              total={_results.total}
+              loading={_results.loading}
+              onClick={(e, {index}) => setActiveMenuItem(index)}
+            />
+          ))}
+        </Menu>
+        {q && (results.total || isAnyLoading) ? (
+          <ResultList
+            component={Component}
+            page={results.page}
+            numPages={results.pages}
+            data={results.data}
+            onPageChange={setPage}
+            loading={results.loading}
+          />
+        ) : (
+          <NoResults query={q} />
         )}
       </Grid.Column>
     </Grid>

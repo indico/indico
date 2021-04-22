@@ -11,7 +11,8 @@ import favoriteUsersURL from 'indico-url:users.favorites_api';
 import useAxios from '@use-hooks/axios';
 import _ from 'lodash';
 import PropTypes from 'prop-types';
-import {useCallback, useEffect, useRef, useState} from 'react';
+import {useCallback, useEffect, useMemo, useRef, useState} from 'react';
+import {useHistory} from 'react-router-dom';
 
 import {handleAxiosError, indicoAxios} from '../utils/axios';
 import {camelizeKeys} from '../utils/case';
@@ -227,4 +228,42 @@ export function useTimeout(callback, delay) {
       return () => clearTimeout(id);
     }
   }, [delay]);
+}
+
+/**
+ * React hook that parses the query string into an object.
+ *
+ * Provides an array [query, setQuery] similar to useState and allows adding/updating a parameter or
+ * removing it by setting it as undefined.
+ *
+ * @returns {Array<{object, function}>}
+ */
+export function useQueryParams() {
+  const [query, _setQuery] = useState(window.location.search);
+  const queryObject = useMemo(() => Object.fromEntries(new URLSearchParams(query)), [query]);
+  const history = useHistory();
+
+  const setQuery = useCallback(
+    (type, name, reset) => {
+      const params = new URLSearchParams(reset ? undefined : query);
+      if (name !== undefined) {
+        params.set(type, name);
+      } else {
+        params.delete(type);
+      }
+      const _query = params.toString();
+      history.push({
+        pathname: window.location.pathname,
+        search: `?${_query}`,
+      });
+      _setQuery(_query);
+    },
+    [history, query]
+  );
+
+  useEffect(() => {
+    return history.listen(location => _setQuery(location.search));
+  }, [history, query, _setQuery]);
+
+  return [queryObject, setQuery];
 }
