@@ -54,13 +54,14 @@ class EventSchema(mm.SQLAlchemyAutoSchema):
     class Meta:
         model = Event
         fields = ('event_id', 'type', 'type_format', 'title', 'description', 'url', 'keywords', 'location', 'persons',
-                  'category_path', 'start_dt', 'end_dt')
+                  'category_id', 'category_path', 'start_dt', 'end_dt')
 
     event_id = fields.Int(attribute='id')
     type = fields.Constant(SearchTarget.event.name)
     type_format = fields.String(attribute='_type.name')
     location = fields.Function(lambda event: LocationSchema().dump(event))
     persons = fields.List(fields.Nested(PersonSchema), attribute='person_links')
+    category_id = fields.Int()
     category_path = fields.List(fields.Nested(CategorySchema), attribute='detailed_category_chain')
     note = fields.String()
 
@@ -69,7 +70,7 @@ class AttachmentSchema(mm.SQLAlchemyAutoSchema):
     class Meta:
         model = Attachment
         fields = ('attachment_id', 'type', 'type_format', 'title', 'filename', 'event_id', 'contribution_id',
-                  'subcontribution_id', 'user', 'url', 'category_path', 'content', 'modified_dt')
+                  'subcontribution_id', 'user', 'url', 'category_id', 'category_path', 'content', 'modified_dt')
 
     attachment_id = fields.Int(attribute='id')
     type = fields.Constant(SearchTarget.attachment.name)
@@ -79,6 +80,7 @@ class AttachmentSchema(mm.SQLAlchemyAutoSchema):
     contribution_id = fields.Method('_contribution_id')
     subcontribution_id = fields.Method('_subcontribution_id')
     user = fields.Nested(PersonSchema)
+    category_id = fields.Int(attribute='folder.event.category_id')
     category_path = fields.List(fields.Nested(CategorySchema), attribute='folder.event.detailed_category_chain')
     url = fields.String(attribute='download_url')
     content = fields.String()
@@ -95,13 +97,14 @@ class ContributionSchema(mm.SQLAlchemyAutoSchema):
     class Meta:
         model = Contribution
         fields = ('contribution_id', 'type', 'type_format', 'event_id', 'title', 'description', 'location',
-                  'persons', 'url', 'category_path', 'start_dt', 'end_dt')
+                  'persons', 'url', 'category_id', 'category_path', 'start_dt', 'end_dt')
 
     contribution_id = fields.Int(attribute='id')
     type = fields.Constant(SearchTarget.contribution.name)
     type_format = fields.String(attribute='type.name')
     location = fields.Function(lambda contrib: LocationSchema().dump(contrib))
     persons = fields.List(fields.Nested(PersonSchema), attribute='person_links')
+    category_id = fields.Int(attribute='event.category_id')
     category_path = fields.List(fields.Nested(CategorySchema), attribute='event.detailed_category_chain')
     url = fields.Function(lambda contrib: url_for('contributions.display_contribution', contrib, _external=False))
 
@@ -110,13 +113,14 @@ class SubContributionSchema(mm.SQLAlchemyAutoSchema):
     class Meta:
         model = SubContribution
         fields = ('subcontribution_id', 'type', 'title', 'description', 'event_id', 'contribution_id', 'persons',
-                  'location', 'url', 'category_path')
+                  'location', 'url', 'category_id', 'category_path')
 
     subcontribution_id = fields.Int(attribute='id')
     type = fields.Constant(SearchTarget.subcontribution.name)
     event_id = fields.Int(attribute='contribution.event_id')
     persons = fields.List(fields.Nested(PersonSchema), attribute='person_links')
     location = fields.Function(lambda subc: LocationSchema().dump(subc.contribution))
+    category_id = fields.Int(attribute='event.category_id')
     category_path = fields.List(fields.Nested(CategorySchema), attribute='event.detailed_category_chain')
     url = fields.Function(lambda subc: url_for('contributions.display_subcontribution', subc, _external=False))
 
@@ -125,13 +129,14 @@ class EventNoteSchema(mm.SQLAlchemyAutoSchema):
     class Meta:
         model = EventNote
         fields = ('note_id', 'type', 'content', 'event_id', 'contribution_id', 'subcontribution_id', 'url',
-                  'category_path', 'created_dt')
+                  'category_id', 'category_path', 'created_dt')
 
     note_id = fields.Int(attribute='id')
     type = fields.Constant(SearchTarget.event_note.name)
     content = fields.Str(attribute='html')
     contribution_id = fields.Int(attribute='object.id')
     subcontribution_id = fields.Int()
+    category_id = fields.Int(attribute='event.category_id')
     category_path = fields.List(fields.Nested(CategorySchema), attribute='event.detailed_category_chain')
     url = fields.Function(lambda note: url_for('event_notes.view', note, _external=False))
     # session_id = fields.Function(lambda note: note.session.id if note.session else None)
