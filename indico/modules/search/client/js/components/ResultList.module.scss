@@ -12,6 +12,7 @@
 
   .header {
     font-size: 18px;
+    line-height: 1.2;
   }
 
   .description {
@@ -25,6 +26,7 @@
   }
 
   .description ul {
+    display: inline;
     margin: 0;
     padding: 0;
   }
@@ -32,13 +34,17 @@
   .description li {
     display: inline;
 
-    &::after {
+    &:not(:first-of-type)::before {
       content: ', ';
     }
 
-    &:last-child::after {
-      content: '';
+    &:nth-of-type(1n + 4) {
+      display: none;
     }
+  }
+
+  .muted {
+    color: $dark-gray;
   }
 
   em {
