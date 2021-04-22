@@ -36,7 +36,9 @@ export default function SearchBar({onSearch, searchTerm}) {
   const handleSubmit = event => {
     event.preventDefault();
     setSearchOpen(false);
-    onSearch(keyword);
+    if (keyword) {
+      onSearch(keyword);
+    }
   };
 
   const handleSearchChange = (e, data) => {
