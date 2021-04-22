@@ -47,7 +47,7 @@ function useSearch(url, query) {
         pages: data?.pages || 1,
         total: data?.total || 0,
         data: data?.results || [],
-        aggregations: data?.aggregations || lastData?.aggregations || [],
+        aggregations: data?.aggregations || lastData?.aggregations || {},
         loading,
       }),
       [page, data, lastData, loading]
@@ -140,7 +140,7 @@ export default function SearchApp() {
 
   return (
     <Grid columns={2} doubling padded styleName="grid">
-      {results.aggregations.length > 0 && (
+      {Object.keys(results.aggregations).length > 0 && (
         <Grid.Column width={3} only="large screen">
           <SideBar query={filters} aggregations={results.aggregations} onChange={handleQuery} />
         </Grid.Column>

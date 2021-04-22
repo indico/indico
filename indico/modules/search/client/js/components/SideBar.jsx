@@ -15,9 +15,9 @@ export default function SideBar({query, aggregations, onChange}) {
   const handleChange = (type, value) =>
     onChange && onChange(query[type] === value ? undefined : value, type);
 
-  return aggregations
-    .filter(({buckets}) => buckets && buckets.length)
-    .map(({key, label, buckets}) => (
+  return Object.entries(aggregations)
+    .filter(([, {buckets}]) => buckets && buckets.length)
+    .map(([key, {label, buckets}]) => (
       <AggregationList
         key={key}
         name={key}
@@ -77,12 +77,12 @@ AggregationList.propTypes = {
 
 SideBar.propTypes = {
   query: PropTypes.object,
-  aggregations: PropTypes.array,
+  aggregations: PropTypes.object,
   onChange: PropTypes.func,
 };
 
 SideBar.defaultProps = {
   query: {},
-  aggregations: [],
+  aggregations: {},
   onChange: undefined,
 };
