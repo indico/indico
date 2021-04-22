@@ -10,34 +10,32 @@ import React from 'react';
 import {List} from 'semantic-ui-react';
 import '../ResultList.module.scss';
 
-const EventNote = ({title, url, content, highlight}) => {
-  return (
-    <div styleName="item">
-      <List.Header styleName="header">
-        <a href={url}>{title}</a>
-      </List.Header>
-      <List.Description styleName="description">
-        {highlight.content ? (
-          highlight.content
-            .slice(0, 3)
-            .map(html => <span key={html} dangerouslySetInnerHTML={{__html: html}} />)
-        ) : (
-          <span>{content.slice(0, 240)}</span>
-        )}
-      </List.Description>
-    </div>
-  );
-};
+const EventNote = ({title, url, content, highlight}) => (
+  <div styleName="item">
+    <List.Header styleName="header">
+      <a href={url}>{title}</a>
+    </List.Header>
+    <List.Description styleName="description">
+      {highlight?.content
+        ?.slice(0, 3) // eslint-disable-next-line react/no-array-index-key
+        .map((html, idx) => <span key={html + idx} dangerouslySetInnerHTML={{__html: html}} />) || (
+        <span>{content.slice(0, 240)}</span>
+      )}
+    </List.Description>
+  </div>
+);
 
 EventNote.propTypes = {
   title: PropTypes.string.isRequired,
   content: PropTypes.string.isRequired,
   url: PropTypes.string.isRequired,
-  highlight: PropTypes.array,
+  highlight: PropTypes.shape({
+    content: PropTypes.array,
+  }),
 };
 
 EventNote.defaultProps = {
-  highlight: [],
+  highlight: {},
 };
 
 export default EventNote;
