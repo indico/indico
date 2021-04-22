@@ -250,7 +250,7 @@ def format_pretty_date(dt, locale=None, tzinfo=None):
         'next_day': _("'Tomorrow'"),
         'last_week': _("'Last' EEEE"),
         'next_week': _("EEEE"),
-        'other': _("{date_fmt}")
+        'other': '{date_fmt}'
     })
 
 
