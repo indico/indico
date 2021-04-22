@@ -34,7 +34,6 @@ function useSearch(url, query) {
     options: {params: {...query, page}},
     forceDispatchEffect: () => query?.q,
     trigger: [url, query, page],
-    customHandler: undefined,
   });
 
   useEffect(() => {
