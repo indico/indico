@@ -244,8 +244,7 @@
 .search-page {
   @extend %indico-page-standalone;
 
-  .title {
-    text-align: center;
-    margin-left: -65em;
+  .title .text {
+    margin-left: 2%;
   }
 }
