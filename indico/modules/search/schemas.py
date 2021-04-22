@@ -113,7 +113,7 @@ class SubContributionSchema(mm.SQLAlchemyAutoSchema):
     class Meta:
         model = SubContribution
         fields = ('subcontribution_id', 'type', 'title', 'description', 'event_id', 'contribution_id', 'persons',
-                  'location', 'url', 'category_id', 'category_path')
+                  'location', 'url', 'category_id', 'category_path', 'start_dt', 'end_dt')
 
     subcontribution_id = fields.Int(attribute='id')
     type = fields.Constant(SearchTarget.subcontribution.name)
@@ -123,6 +123,8 @@ class SubContributionSchema(mm.SQLAlchemyAutoSchema):
     category_id = fields.Int(attribute='event.category_id')
     category_path = fields.List(fields.Nested(CategorySchema), attribute='event.detailed_category_chain')
     url = fields.Function(lambda subc: url_for('contributions.display_subcontribution', subc, _external=False))
+    start_dt = fields.DateTime(attribute='contribution.start_dt')
+    end_dt = fields.DateTime(attribute='contribution.end_dt')
 
 
 class EventNoteSchema(mm.SQLAlchemyAutoSchema):
@@ -134,10 +136,9 @@ class EventNoteSchema(mm.SQLAlchemyAutoSchema):
     note_id = fields.Int(attribute='id')
     type = fields.Constant(SearchTarget.event_note.name)
     content = fields.Str(attribute='html')
-    contribution_id = fields.Int(attribute='object.id')
+    contribution_id = fields.Int()
     subcontribution_id = fields.Int()
     category_id = fields.Int(attribute='event.category_id')
     category_path = fields.List(fields.Nested(CategorySchema), attribute='event.detailed_category_chain')
     url = fields.Function(lambda note: url_for('event_notes.view', note, _external=False))
-    # session_id = fields.Function(lambda note: note.session.id if note.session else None)
-    created_dt = fields.DateTime(attribute='current_revision.created_dt', format='%Y-%m-%dT%H:%M')
+    created_dt = fields.DateTime(attribute='current_revision.created_dt')
