@@ -17,16 +17,22 @@ export default function PersonList({persons}) {
   persons = [...new Map(persons.map(p => [p.name + p.affiliation, p])).values()];
 
   return (
-    <ul>
+    <>
       {persons.length > 1 ? <Icon name="users" /> : <Icon name="user" />}
-      {persons.slice(0, 2).map((person, idx, arr) => (
-        <li key={person.name + person.affiliation}>
-          {person.name}
-          <span styleName="muted">{person.affiliation ? ` (${person.affiliation})` : ''}</span>
-          {persons.length > 2 && idx + 1 === arr.length && ` ${Translate.string('et al.')}`}
-        </li>
-      ))}
-    </ul>
+      <ul>
+        {persons.slice(0, 2).map(person => (
+          <li key={person.name + person.affiliation}>
+            {person.name}
+            <span styleName="muted">{person.affiliation ? ` (${person.affiliation})` : ''}</span>
+          </li>
+        ))}
+        {persons.length > 2 && (
+          <li>
+            <Translate>et al.</Translate>
+          </li>
+        )}
+      </ul>
+    </>
   );
 }
 
