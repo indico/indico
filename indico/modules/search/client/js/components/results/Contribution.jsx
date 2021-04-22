@@ -5,32 +5,29 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
+import contributionURL from 'indico-url:contributions.display_contribution';
+
 import PropTypes from 'prop-types';
 import React from 'react';
 import {List, Icon} from 'semantic-ui-react';
 
 import {toMoment, serializeDate} from 'indico/utils/date';
 
+import PersonList from './PersonList';
+
 import '../ResultList.module.scss';
 
-const Contribution = ({title, url, startDt, persons}) => (
+const Contribution = ({eventId, contributionId, title, startDt, persons}) => (
   <div styleName="item">
     <List.Header styleName="header">
-      <a href={url}>{title}</a>
+      <a href={contributionURL({event_id: eventId, contrib_id: contributionId})}>{title}</a>
     </List.Header>
     <List.Description styleName="description">
-      <List.Item>
-        {persons.length !== 0 && (
-          <ul>
-            {persons.length > 1 ? <Icon name="users" /> : <Icon name="user" />}
-            {persons.map(person => (
-              <li key={person.id}>
-                {person.title ? `${person.title} ${person.name}` : person.name}
-              </li>
-            ))}
-          </ul>
-        )}
-      </List.Item>
+      {persons.length !== 0 && (
+        <List.Item>
+          <PersonList persons={persons} />
+        </List.Item>
+      )}
       {startDt && (
         <List.Item>
           <Icon name="calendar alternate outline" />
@@ -43,14 +40,20 @@ const Contribution = ({title, url, startDt, persons}) => (
 
 Contribution.propTypes = {
   title: PropTypes.string.isRequired,
-  url: PropTypes.string.isRequired,
-  startDt: PropTypes.string.isRequired,
+  contributionId: PropTypes.number.isRequired,
+  eventId: PropTypes.number.isRequired,
+  startDt: PropTypes.string,
   persons: PropTypes.arrayOf(
     PropTypes.shape({
-      id: PropTypes.number.isRequired,
-      title: PropTypes.string.isRequired,
       name: PropTypes.string.isRequired,
+      affiliation: PropTypes.string,
     })
-  ).isRequired,
+  ),
 };
+
+Contribution.defaultProps = {
+  startDt: undefined,
+  persons: [],
+};
+
 export default Contribution;
