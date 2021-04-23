@@ -97,7 +97,7 @@ class ContributionSchema(mm.SQLAlchemyAutoSchema):
     class Meta:
         model = Contribution
         fields = ('contribution_id', 'type', 'type_format', 'event_id', 'title', 'description', 'location',
-                  'persons', 'url', 'category_id', 'category_path', 'start_dt', 'end_dt')
+                  'persons', 'url', 'category_id', 'category_path', 'start_dt', 'end_dt', 'duration')
 
     contribution_id = fields.Int(attribute='id')
     type = fields.Constant(SearchTarget.contribution.name)
@@ -107,13 +107,14 @@ class ContributionSchema(mm.SQLAlchemyAutoSchema):
     category_id = fields.Int(attribute='event.category_id')
     category_path = fields.List(fields.Nested(CategorySchema), attribute='event.detailed_category_chain')
     url = fields.Function(lambda contrib: url_for('contributions.display_contribution', contrib, _external=False))
+    duration = fields.TimeDelta(precision=fields.TimeDelta.MINUTES)
 
 
 class SubContributionSchema(mm.SQLAlchemyAutoSchema):
     class Meta:
         model = SubContribution
         fields = ('subcontribution_id', 'type', 'title', 'description', 'event_id', 'contribution_id', 'persons',
-                  'location', 'url', 'category_id', 'category_path', 'start_dt', 'end_dt')
+                  'location', 'url', 'category_id', 'category_path', 'start_dt', 'end_dt', 'duration')
 
     subcontribution_id = fields.Int(attribute='id')
     type = fields.Constant(SearchTarget.subcontribution.name)
@@ -125,6 +126,7 @@ class SubContributionSchema(mm.SQLAlchemyAutoSchema):
     url = fields.Function(lambda subc: url_for('contributions.display_subcontribution', subc, _external=False))
     start_dt = fields.DateTime(attribute='contribution.start_dt')
     end_dt = fields.DateTime(attribute='contribution.end_dt')
+    duration = fields.TimeDelta(precision=fields.TimeDelta.MINUTES)
 
 
 class EventNoteSchema(mm.SQLAlchemyAutoSchema):
