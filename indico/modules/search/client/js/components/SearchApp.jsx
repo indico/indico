@@ -35,12 +35,12 @@ const camelizeValues = obj =>
     {}
   );
 
-function useSearch(url, query, type = undefined) {
+function useSearch(url, query, type, category) {
   const [page, setPage] = useState(1);
 
   const {data, loading, lastData} = useIndicoAxios({
     url,
-    options: {params: {...query, type, page}},
+    options: {params: {...query, type, page, category}},
     forceDispatchEffect: () => query?.q,
     trigger: [url, query, page],
   });
@@ -123,18 +123,20 @@ NoResults.defaultProps = {
   query: undefined,
 };
 
-export default function SearchApp() {
+export default function SearchApp({category}) {
   const [query, setQuery] = useQueryParams();
   const [activeMenuItem, setActiveMenuItem] = useState(undefined);
   const {q, ...filters} = query;
-  const [categoryResults, setCategoryPage] = useSearch(searchURL(), query, 'category');
-  const [eventResults, setEventPage] = useSearch(searchURL(), query, 'event');
-  const [contributionResults, setContributionPage] = useSearch(searchURL(), query, [
-    'contribution',
-    'subcontribution',
-  ]);
-  const [fileResults, setFilePage] = useSearch(searchURL(), query, 'attachment');
-  const [noteResults, setNotePage] = useSearch(searchURL(), query, 'event_note');
+  const [categoryResults, setCategoryPage] = useSearch(searchURL(), query, 'category', category);
+  const [eventResults, setEventPage] = useSearch(searchURL(), query, 'event', category);
+  const [contributionResults, setContributionPage] = useSearch(
+    searchURL(),
+    query,
+    ['contribution', 'subcontribution'],
+    category
+  );
+  const [fileResults, setFilePage] = useSearch(searchURL(), query, 'attachment', category);
+  const [noteResults, setNotePage] = useSearch(searchURL(), query, 'event_note', category);
   const searchMap = [
     [Translate.string('Categories'), categoryResults, setCategoryPage, Category],
     [Translate.string('Events'), eventResults, setEventPage, Event],
@@ -189,3 +191,11 @@ export default function SearchApp() {
     </Grid>
   );
 }
+
+SearchApp.propTypes = {
+  category: PropTypes.string,
+};
+
+SearchApp.defaultProps = {
+  category: undefined,
+};

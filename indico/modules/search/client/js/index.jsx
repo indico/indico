@@ -13,9 +13,10 @@ import SearchApp from './components/SearchApp';
 
 document.addEventListener('DOMContentLoaded', () => {
   const root = document.querySelector('#search-root');
+
   ReactDOM.render(
     <Router>
-      <SearchApp />
+      <SearchApp category={root.dataset.categoryId} />
     </Router>,
     root
   );
