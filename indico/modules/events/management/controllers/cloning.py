@@ -178,7 +178,7 @@ class RHCloneEvent(RHManageEventBase):
                 if form.repeatability.data == 'once':
                     # only one repetition
                     clone = clone_event(
-                        self.event, None, form.start_dt.data, set(form.selected_items.data), form.category.data,
+                        self.event, 0, form.start_dt.data, set(form.selected_items.data), form.category.data,
                         form.refresh_users.data
                     )
                     flash(_('Welcome to your cloned event!'), 'success')
