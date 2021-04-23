@@ -28,10 +28,9 @@ def render_breadcrumbs(*titles, **kwargs):
     category = kwargs.get('category', None)
     event = kwargs.get('event', None)
     management = kwargs.get('management', False)
-    assert bool(titles) + bool(event) + bool(category) == 1
+    assert bool(titles) or bool(event) or bool(category)
     if not category and not event:
         items = [(_('Home'), url_for_index())]
-        items += [(x, None) if isinstance(x, str) else x for x in titles]
     else:
         items = []
         if event:
@@ -40,4 +39,5 @@ def render_breadcrumbs(*titles, **kwargs):
         for cat in category.chain_query[::-1]:
             items.append((cat.title, url_for('categories.manage_content', cat) if management else cat.url))
         items.reverse()
+    items += [(x, None) if isinstance(x, str) else x for x in titles]
     return render_template('breadcrumbs.html', items=items, management=management)
