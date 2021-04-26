@@ -9,8 +9,6 @@ Apache
     good chance this guide will work as expected.
 
 
-.. _centos-apache-epel:
-
 1. Enable EPEL
 --------------
 
@@ -22,8 +20,6 @@ Apache
 
     If you use CC7, EPEL is already enabled and this step is not necessary
 
-
-.. _centos-apache-pkg:
 
 2. Install Packages
 -------------------
@@ -54,8 +50,6 @@ If you are on CentOS 8, run this instead:
     systemctl start postgresql-13.service redis.service
 
 
-.. _centos-apache-db:
-
 3. Create a Database
 --------------------
 
@@ -73,8 +67,6 @@ Postgres extensions (which can only be done by the Postgres superuser)
     Do not forget to setup a cronjob that creates regular database
     backups once you start using Indico in production!
 
-
-.. _centos-apache-web:
 
 4. Configure uWSGI & Apache
 ---------------------------
@@ -208,8 +200,6 @@ Now enable the uwsgi proxy module in apache:
     echo 'LoadModule proxy_uwsgi_module modules/mod_proxy_uwsgi.so' > /etc/httpd/conf.modules.d/proxy_uwsgi.conf
 
 
-.. _centos-apache-ssl:
-
 5. Create a TLS Certificate
 ---------------------------
 
@@ -251,8 +241,6 @@ commercial certification authority or get a free one from
     Apache from starting.
 
 
-.. _centos-apache-selinux:
-
 6. Configure SELinux
 --------------------
 
@@ -284,8 +272,6 @@ should be handled.
     EOF
     semodule -i /tmp/indico.cil
 
-
-.. _centos-apache-install:
 
 7. Install Indico
 -----------------
@@ -365,8 +351,6 @@ You are now ready to install Indico:
     pip install indico
 
 
-.. _centos-apache-config:
-
 8. Configure Indico
 -------------------
 
@@ -405,8 +389,6 @@ Finally you can create the database schema and switch back to *root*:
     exit
 
 
-.. _centos-apache-launch:
-
 10. Launch Indico
 -----------------
 
@@ -418,8 +400,6 @@ server is rebooted:
     systemctl restart httpd.service indico-celery.service indico-uwsgi.service
     systemctl enable httpd.service postgresql-13.service redis.service indico-celery.service indico-uwsgi.service
 
-
-.. _centos-apache-firewall:
 
 11. Open the Firewall
 ---------------------
@@ -434,8 +414,6 @@ server is rebooted:
     This is only needed if you use CC7 as CentOS 7/8 have no firewall enabled
     by default
 
-
-.. _centos-apache-letsencrypt:
 
 12. Optional: Get a Certificate from Let's Encrypt
 --------------------------------------------------
@@ -454,16 +432,12 @@ to renew it automatically:
     systemctl enable certbot-renew.timer
 
 
-.. _centos-apache-user:
-
 13. Create an Indico user
 -------------------------
 
 Access ``https://YOURHOSTNAME`` in your browser and follow the steps
 displayed there to create your initial user.
 
-
-.. _centos-apache-latex:
 
 14. Install TeXLive
 -------------------

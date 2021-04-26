@@ -3,8 +3,6 @@ nginx
 
 .. include:: ../_sso_note.rst
 
-.. _deb-pkg:
-
 1. Install Packages
 -------------------
 
@@ -42,8 +40,6 @@ Afterwards, make sure the services you just installed are running:
     systemctl start postgresql.service redis-server.service
 
 
-.. _deb-db:
-
 2. Create a Database
 --------------------
 
@@ -61,8 +57,6 @@ extensions (which can only be done by the Postgres superuser).
     Do not forget to setup a cronjob that creates regular database
     backups once you start using Indico in production!
 
-
-.. _deb-web:
 
 3. Configure uWSGI & nginx
 --------------------------
@@ -209,8 +203,6 @@ We also need a systemd unit to start uWSGI.
     EOF
 
 
-.. _deb-ssl:
-
 4. Create a TLS Certificate
 ---------------------------
 
@@ -267,8 +259,6 @@ commercial certification authority or get a free one from
     config references a directory yet to be created, which prevents
     nginx from starting.
 
-
-.. _deb-install:
 
 5. Install Indico
 -----------------
@@ -347,8 +337,6 @@ You are now ready to install Indico:
     pip install indico
 
 
-.. _deb-config:
-
 6. Configure Indico
 -------------------
 
@@ -386,8 +374,6 @@ Finally, you can create the database schema and switch back to *root*:
     exit
 
 
-.. _deb-launch:
-
 8. Launch Indico
 ----------------
 
@@ -399,8 +385,6 @@ server is rebooted:
     systemctl restart nginx.service indico-celery.service indico-uwsgi.service
     systemctl enable nginx.service postgresql.service redis-server.service indico-celery.service indico-uwsgi.service
 
-
-.. _deb-letsencrypt:
 
 9. Optional: Get a Certificate from Let's Encrypt
 -------------------------------------------------
@@ -435,16 +419,12 @@ to renew it automatically:
     systemctl enable certbot.timer
 
 
-.. _deb-user:
-
 10. Create an Indico user
 -------------------------
 
 Access ``https://YOURHOSTNAME`` in your browser and follow the steps
 displayed there to create your initial user.
 
-
-.. _deb-latex:
 
 11. Install TeXLive
 -------------------

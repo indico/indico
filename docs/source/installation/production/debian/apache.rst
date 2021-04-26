@@ -1,8 +1,6 @@
 Apache
 ======
 
-.. _deb-apache-pkg:
-
 1. Install Packages
 -------------------
 
@@ -37,8 +35,6 @@ Afterwards, make sure the services you just installed are running:
     systemctl start postgresql.service redis-server.service
 
 
-.. _deb-apache-db:
-
 2. Create a Database
 --------------------
 
@@ -56,8 +52,6 @@ extensions (which can only be done by the Postgres superuser).
     Do not forget to setup a cronjob that creates regular database
     backups once you start using Indico in production!
 
-
-.. _deb-apache-web:
 
 3. Configure uWSGI & Apache
 ---------------------------
@@ -194,8 +188,6 @@ Now enable the necessary modules and the indico site in apache:
     a2ensite indico indico-sslredir
 
 
-.. _deb-apache-ssl:
-
 4. Create a TLS Certificate
 ---------------------------
 
@@ -236,8 +228,6 @@ commercial certification authority or get a free one from
     config references a directory yet to be created, which prevents
     Apache from starting.
 
-
-.. _deb-apache-install:
 
 5. Install Indico
 -----------------
@@ -316,8 +306,6 @@ You are now ready to install Indico:
     pip install indico
 
 
-.. _deb-apache-config:
-
 6. Configure Indico
 -------------------
 
@@ -355,8 +343,6 @@ Finally, you can create the database schema and switch back to *root*:
     exit
 
 
-.. _deb-apache-launch:
-
 8. Launch Indico
 ----------------
 
@@ -368,8 +354,6 @@ server is rebooted:
     systemctl restart apache2.service indico-celery.service indico-uwsgi.service
     systemctl enable apache2.service postgresql.service redis-server.service indico-celery.service indico-uwsgi.service
 
-
-.. _deb-apache-letsencrypt:
 
 9. Optional: Get a Certificate from Let's Encrypt
 -------------------------------------------------
@@ -404,16 +388,12 @@ to renew it automatically:
     systemctl enable certbot.timer
 
 
-.. _deb-apache-user:
-
 10. Create an Indico user
 -------------------------
 
 Access ``https://YOURHOSTNAME`` in your browser and follow the steps
 displayed there to create your initial user.
 
-
-.. _deb-apache-latex:
 
 11. Install TeXLive
 -------------------

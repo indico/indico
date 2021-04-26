@@ -3,8 +3,6 @@ nginx
 
 .. include:: ../_sso_note.rst
 
-.. _centos-epel:
-
 1. Enable EPEL
 --------------
 
@@ -16,8 +14,6 @@ nginx
 
     If you use CC7, EPEL is already enabled and this step is not necessary
 
-
-.. _centos-pkg:
 
 2. Install Packages
 -------------------
@@ -50,8 +46,6 @@ Now install all the required packages:
     systemctl start postgresql-13.service redis.service
 
 
-.. _centos-db:
-
 3. Create a Database
 --------------------
 
@@ -69,8 +63,6 @@ Postgres extensions (which can only be done by the Postgres superuser)
     Do not forget to setup a cronjob that creates regular database
     backups once you start using Indico in production!
 
-
-.. _centos-web:
 
 4. Configure uWSGI & nginx
 --------------------------
@@ -215,8 +207,6 @@ We also need a systemd unit to start uWSGI.
     EOF
 
 
-.. _centos-ssl:
-
 5. Create a TLS Certificate
 ---------------------------
 
@@ -274,8 +264,6 @@ commercial certification authority or get a free one from
     nginx from starting.
 
 
-.. _centos-selinux:
-
 6. Configure SELinux
 --------------------
 
@@ -307,8 +295,6 @@ should be handled.
     EOF
     semodule -i /tmp/indico.cil
 
-
-.. _centos-install:
 
 7. Install Indico
 -----------------
@@ -388,8 +374,6 @@ You are now ready to install Indico:
     pip install indico
 
 
-.. _centos-config:
-
 8. Configure Indico
 -------------------
 
@@ -428,8 +412,6 @@ Finally you can create the database schema and switch back to *root*:
     exit
 
 
-.. _centos-launch:
-
 10. Launch Indico
 -----------------
 
@@ -441,8 +423,6 @@ server is rebooted:
     systemctl restart nginx.service indico-celery.service indico-uwsgi.service
     systemctl enable nginx.service postgresql-13.service redis.service indico-celery.service indico-uwsgi.service
 
-
-.. _centos-firewall:
 
 11. Open the Firewall
 ---------------------
@@ -457,8 +437,6 @@ server is rebooted:
     This is only needed if you use CC7 as CentOS 7/8 have no firewall enabled
     by default
 
-
-.. _centos-letsencrypt:
 
 12. Optional: Get a Certificate from Let's Encrypt
 --------------------------------------------------
@@ -477,16 +455,12 @@ to renew it automatically:
     systemctl enable certbot-renew.timer
 
 
-.. _centos-user:
-
 13. Create an Indico user
 -------------------------
 
 Access ``https://YOURHOSTNAME`` in your browser and follow the steps
 displayed there to create your initial user.
 
-
-.. _centos-latex:
 
 14. Install TeXLive
 -------------------
