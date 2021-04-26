@@ -30,7 +30,7 @@ library (psycopg2):
 
 .. code-block:: shell
 
-    export PATH="$PATH:/usr/pgsql-9.6/bin"
+    export PATH="$PATH:/usr/pgsql-13/bin"
 
 You are now ready to install the latest version of Indico:
 
