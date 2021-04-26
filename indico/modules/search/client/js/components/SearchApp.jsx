@@ -13,6 +13,7 @@ import {Grid, Loader, Menu, Message} from 'semantic-ui-react';
 
 import {useIndicoAxios, useQueryParams} from 'indico/react/hooks';
 import {Param, Translate} from 'indico/react/i18n';
+import {camelizeKeys} from 'indico/utils/case';
 
 import ResultList from './ResultList';
 import Category from './results/Category';
@@ -25,12 +26,20 @@ import SideBar from './SideBar';
 
 import './SearchApp.module.scss';
 
+const camelizeValues = obj =>
+  Object.entries(obj).reduce(
+    (acc, [key, val]) => ({
+      ...acc,
+      [key]: camelizeKeys(val),
+    }),
+    {}
+  );
+
 function useSearch(url, query) {
   const [page, setPage] = useState(1);
 
   const {data, loading, lastData} = useIndicoAxios({
     url,
-    camelize: true,
     options: {params: {...query, page}},
     forceDispatchEffect: () => query?.q,
     trigger: [url, query, page],
@@ -46,8 +55,8 @@ function useSearch(url, query) {
         page,
         pages: data?.pages || 1,
         total: data?.total || 0,
-        data: data?.results || [],
-        aggregations: data?.aggregations || lastData?.aggregations || {},
+        data: camelizeKeys(data?.results || []),
+        aggregations: camelizeValues(data?.aggregations || lastData?.aggregations || {}),
         loading,
       }),
       [page, data, lastData, loading]
