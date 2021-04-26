@@ -67,8 +67,8 @@ class InternalSearch(IndicoSearchProvider):
         elif object_type == SearchTarget.event:
             total, results = InternalSearch.search_events(page, query)
         else:
-            return 0, {}, []
-        return total, math.ceil(total / self.RESULTS_PER_PAGE), results, []
+            total, results = 0, []
+        return total, math.ceil(total / self.RESULTS_PER_PAGE), results, {}
 
     @staticmethod
     def search_categories(page, q):
