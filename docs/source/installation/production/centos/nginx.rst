@@ -3,8 +3,6 @@ nginx
 
 .. include:: ../_sso_note.rst
 
-.. _centos-epel:
-
 1. Enable EPEL
 --------------
 
@@ -17,26 +15,36 @@ nginx
     If you use CC7, EPEL is already enabled and this step is not necessary
 
 
-.. _centos-pkg:
-
 2. Install Packages
 -------------------
 
-Edit ``/etc/yum.repos.d/CentOS-Base.repo`` and add ``exclude=postgresql*``
-to the ``[base]`` and ``[updates]`` sections, as described in the
-`PostgreSQL wiki`_.
+If you are on CentOS 7, edit ``/etc/yum.repos.d/CentOS-Base.repo`` and add
+``exclude=postgresql*`` to the ``[base]`` and ``[updates]`` sections, as
+described in the `PostgreSQL wiki`_ and then run these commands:
 
 .. code-block:: shell
 
+    yum install -y centos-release-scl
     yum install -y https://download.postgresql.org/pub/repos/yum/reporpms/EL-7-x86_64/pgdg-redhat-repo-latest.noarch.rpm
-    yum install -y postgresql96 postgresql96-server postgresql96-libs postgresql96-devel postgresql96-contrib
-    yum install -y gcc redis nginx uwsgi uwsgi-plugin-python2
-    yum install -y python-devel python-virtualenv libjpeg-turbo-devel libxslt-devel libxml2-devel libffi-devel pcre-devel libyaml-devel
-    /usr/pgsql-9.6/bin/postgresql96-setup initdb
-    systemctl start postgresql-9.6.service redis.service
 
+If you are on CentOS 8, run this instead:
 
-.. _centos-db:
+.. code-block:: shell
+
+    dnf install -y https://download.postgresql.org/pub/repos/yum/reporpms/EL-8-x86_64/pgdg-redhat-repo-latest.noarch.rpm
+    dnf -qy module disable postgresql
+    yum config-manager --set-enabled powertools
+
+Now install all the required packages:
+
+.. code-block:: shell
+
+    yum install -y postgresql13 postgresql13-server postgresql13-libs postgresql13-devel postgresql13-contrib
+    yum install -y git gcc make redis nginx
+    yum install -y libjpeg-turbo-devel libxslt-devel libxml2-devel libffi-devel pcre-devel libyaml-devel zlib-devel bzip2 bzip2-devel readline-devel sqlite sqlite-devel openssl-devel xz xz-devel libffi-devel findutils libuuid-devel
+    /usr/pgsql-13/bin/postgresql-13-setup initdb
+    systemctl start postgresql-13.service redis.service
+
 
 3. Create a Database
 --------------------
@@ -56,8 +64,6 @@ Postgres extensions (which can only be done by the Postgres superuser)
     backups once you start using Indico in production!
 
 
-.. _centos-web:
-
 4. Configure uWSGI & nginx
 --------------------------
 
@@ -66,7 +72,7 @@ most cases.
 
 .. code-block:: shell
 
-    cat > /etc/uwsgi.ini <<'EOF'
+    cat > /etc/uwsgi-indico.ini <<'EOF'
     [uwsgi]
     uid = indico
     gid = nginx
@@ -84,7 +90,6 @@ most cases.
     procname-prefix-spaced = indico
     disable-logging = true
 
-    plugin = python
     single-interpreter = true
 
     touch-reload = /opt/indico/web/indico.wsgi
@@ -101,6 +106,32 @@ most cases.
     evil-reload-on-rss = 8192
     EOF
 
+We also need a systemd unit to start uWSGI.
+
+.. code-block:: shell
+
+    cat > /etc/systemd/system/indico-uwsgi.service <<'EOF'
+    [Unit]
+    Description=Indico uWSGI
+    After=network.target
+
+    [Service]
+    ExecStart=/opt/indico/.venv/bin/uwsgi --ini /etc/uwsgi-indico.ini
+    ExecReload=/bin/kill -HUP $MAINPID
+    Restart=always
+    SyslogIdentifier=indico-uwsgi
+    User=indico
+    Group=nginx
+    UMask=0027
+    Type=notify
+    NotifyAccess=all
+    KillMode=mixed
+    KillSignal=SIGQUIT
+    TimeoutStopSec=300
+
+    [Install]
+    WantedBy=multi-user.target
+    EOF
 
 .. note::
 
@@ -123,15 +154,16 @@ most cases.
       listen       [::]:443 ssl http2 default ipv6only=on;
       server_name  YOURHOSTNAME;
 
-      ssl on;
-
       ssl_certificate           /etc/ssl/indico/indico.crt;
       ssl_certificate_key       /etc/ssl/indico/indico.key;
+      ssl_dhparam               /etc/ssl/indico/ffdhe2048;
+
+      ssl_session_timeout       1d;
       ssl_session_cache         shared:SSL:10m;
-      ssl_session_timeout       5m;
-      ssl_protocols             TLSv1 TLSv1.1 TLSv1.2;
-      ssl_ciphers               ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305:ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:DHE-RSA-AES128-GCM-SHA256:DHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-AES128-SHA256:ECDHE-RSA-AES128-SHA256:ECDHE-ECDSA-AES128-SHA:ECDHE-RSA-AES256-SHA384:ECDHE-RSA-AES128-SHA:ECDHE-ECDSA-AES256-SHA384:ECDHE-ECDSA-AES256-SHA:ECDHE-RSA-AES256-SHA:DHE-RSA-AES128-SHA256:DHE-RSA-AES128-SHA:DHE-RSA-AES256-SHA256:DHE-RSA-AES256-SHA:ECDHE-ECDSA-DES-CBC3-SHA:ECDHE-RSA-DES-CBC3-SHA:EDH-RSA-DES-CBC3-SHA:AES128-GCM-SHA256:AES256-GCM-SHA384:AES128-SHA256:AES256-SHA256:AES128-SHA:AES256-SHA:DES-CBC3-SHA:!DSS;
-      ssl_prefer_server_ciphers on;
+      ssl_session_tickets       off;
+      ssl_protocols             TLSv1.2 TLSv1.3;
+      ssl_ciphers               ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305:DHE-RSA-AES128-GCM-SHA256:DHE-RSA-AES256-GCM-SHA384;
+      ssl_prefer_server_ciphers off;
 
       access_log            /opt/indico/log/nginx/access.log combined;
       error_log             /opt/indico/log/nginx/error.log;
@@ -175,22 +207,8 @@ most cases.
     EOF
 
 
-You also need to create a systemd drop-in config to ensure uWSGI works correctly:
-
-.. code-block:: shell
-
-    mkdir -p /etc/systemd/system/uwsgi.service.d
-    cat > /etc/systemd/system/uwsgi.service.d/old-exec-start.conf <<'EOF'
-    [Service]
-    ExecStart=
-    ExecStart=/usr/sbin/uwsgi --ini /etc/uwsgi.ini
-    EOF
-
-
-.. _centos-ssl:
-
-5. Create an SSL Certificate
-----------------------------
+5. Create a TLS Certificate
+---------------------------
 
 First, create the folders for the certificate/key and set restrictive
 permissions on them:
@@ -200,6 +218,22 @@ permissions on them:
     mkdir /etc/ssl/indico
     chown root:root /etc/ssl/indico/
     chmod 700 /etc/ssl/indico
+
+We also use a strong set of pre-generated DH params (ffdhe2048 from RFC7919)
+as suggested in Mozilla's TLS config recommendations:
+
+.. code-block:: shell
+
+    cat > /etc/ssl/indico/ffdhe2048 <<'EOF'
+    -----BEGIN DH PARAMETERS-----
+    MIIBCAKCAQEA//////////+t+FRYortKmq/cViAnPTzx2LnFg84tNpWp4TZBFGQz
+    +8yTnc4kmz75fS/jY2MMddj2gbICrsRhetPfHtXV/WVhJDP1H18GbtCFY2VVPe0a
+    87VXE15/V8k1mE8McODmi3fipona8+/och3xWKE2rec1MKzKT0g6eXq8CrGCsyT7
+    YdEIqUuyyOP7uWrat2DX9GgdT0Kj3jlN9K5W7edjcrsZCwenyO4KbXCeAvzhzffi
+    7MA0BM0oNC9hkXL+nOmFg/+OTxIy7vKBg8P+OxtMb61zO7X8vC7CIAXFjvGDfRaD
+    ssbzSibBsu/6iGtCOGEoXJf//////////wIBAg==
+    -----END DH PARAMETERS-----
+    EOF
 
 If you are just trying out Indico you can simply use a self-signed
 certificate (your browser will show a warning which you will have
@@ -229,8 +263,6 @@ commercial certification authority or get a free one from
     config references a directory yet to be created, which prevents
     nginx from starting.
 
-
-.. _centos-selinux:
 
 6. Configure SELinux
 --------------------
@@ -264,8 +296,6 @@ should be handled.
     semodule -i /tmp/indico.cil
 
 
-.. _centos-install:
-
 7. Install Indico
 -----------------
 
@@ -292,6 +322,7 @@ Celery runs as a background daemon. Add a systemd unit file for it:
     [Install]
     WantedBy=multi-user.target
     EOF
+
     systemctl daemon-reload
 
 
@@ -302,26 +333,46 @@ Now create a user that will be used to run Indico and switch to it:
     useradd -rm -g nginx -d /opt/indico -s /bin/bash indico
     su - indico
 
-
-You are now ready to install Indico:
-
-.. note::
-
-    If you need to migrate from Indico 1.2, you must install Indico 2.0, regardless
-    of what the latest Indico version is.  If this is the case for you, replace the
-    last command in the block below with ``pip install 'indico<2.1'``
-
+The first thing to do is installing pyenv - we use it to install the latest Python version
+as not all Linux distributions include it and like this Indico can benefit from the latest
+Python features.
 
 .. code-block:: shell
 
-    virtualenv ~/.venv
+    curl -L https://github.com/pyenv/pyenv-installer/raw/master/bin/pyenv-installer | bash
+
+    cat >> ~/.bashrc <<'EOF'
+    export PATH="/opt/indico/.pyenv/bin:$PATH"
+    eval "$(pyenv init -)"
+    EOF
+
+    source ~/.bashrc
+
+You are now ready to install Python 3.9:
+
+Run ``pyenv install --list | egrep '^\s*3\.9\.'`` to check for the latest available version and
+then install it and set it as the active Python version (replace ``x`` in both lines).
+
+.. code-block:: shell
+
+    pyenv install 3.9.x
+    pyenv global 3.9.x
+
+This may take a while since pyenv needs to compile the specified Python version. Once done, you
+may want to use ``python -V`` to confirm that you are indeed using the version you just installed.
+
+You are now ready to install Indico:
+
+.. code-block:: shell
+
+    python -m venv --upgrade-deps --prompt indico ~/.venv
     source ~/.venv/bin/activate
-    export PATH="$PATH:/usr/pgsql-9.6/bin"
-    pip install -U pip setuptools
+    export PATH="$PATH:/usr/pgsql-13/bin"
+    echo 'source ~/.venv/bin/activate' >> ~/.bashrc
+    pip install wheel
+    pip install uwsgi
     pip install indico
 
-
-.. _centos-config:
 
 8. Configure Indico
 -------------------
@@ -361,8 +412,6 @@ Finally you can create the database schema and switch back to *root*:
     exit
 
 
-.. _centos-launch:
-
 10. Launch Indico
 -----------------
 
@@ -371,11 +420,9 @@ server is rebooted:
 
 .. code-block:: shell
 
-    systemctl restart uwsgi.service nginx.service indico-celery.service
-    systemctl enable uwsgi.service nginx.service postgresql-9.6.service redis.service indico-celery.service
+    systemctl restart nginx.service indico-celery.service indico-uwsgi.service
+    systemctl enable nginx.service postgresql-13.service redis.service indico-celery.service indico-uwsgi.service
 
-
-.. _centos-firewall:
 
 11. Open the Firewall
 ---------------------
@@ -387,16 +434,14 @@ server is rebooted:
 
 .. note::
 
-    This is only needed if you use CC7 as CentOS7 has no firewall enabled
+    This is only needed if you use CC7 as CentOS 7/8 have no firewall enabled
     by default
 
-
-.. _centos-letsencrypt:
 
 12. Optional: Get a Certificate from Let's Encrypt
 --------------------------------------------------
 
-To avoid ugly SSL warnings in your browsers, the easiest option is to
+To avoid ugly TLS warnings in your browsers, the easiest option is to
 get a free certificate from Let's Encrypt. We also enable the cronjob
 to renew it automatically:
 
@@ -410,16 +455,12 @@ to renew it automatically:
     systemctl enable certbot-renew.timer
 
 
-.. _centos-user:
-
 13. Create an Indico user
 -------------------------
 
 Access ``https://YOURHOSTNAME`` in your browser and follow the steps
 displayed there to create your initial user.
 
-
-.. _centos-latex:
 
 14. Install TeXLive
 -------------------

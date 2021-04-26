@@ -15,7 +15,7 @@ an outdated npm version.
 
 Since only few Linux distributions include Python 3.9 in their package managers, we recommend installing
 `pyenv <https://github.com/pyenv/pyenv-installer>`_ and then install the latest Python 3.9 version using
-``pyenv install 3.9.1`` (adapt this command in case a newer version is available).
+``pyenv install 3.9.4`` (adapt this command in case a newer version is available).
 
 .. tip::
 
@@ -73,14 +73,14 @@ developers keep all their code inside a ``dev`` or ``code`` dir. We will assume 
 We will need a virtualenv where to run Indico::
 
     cd ~/dev/indico
-    pyenv local 3.9.1
+    pyenv local 3.9.4
     python -m venv env
 
 .. note::
 
     After setting the version with pyenv, it's a good idea to use ``python -V`` to ensure you are really running that
     particular Python version; depending on the shell you may need to restart your shell first. In case you installed
-    a newer version than 3.9.1 earlier, adapt the pyenv command accordingly.
+    a newer version than 3.9.4 earlier, adapt the pyenv command accordingly.
 
 
 .. _cloning:

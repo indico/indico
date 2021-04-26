@@ -20,21 +20,25 @@ from indico.modules.bootstrap.forms import BootstrapForm
 from indico.modules.cephalopod.util import register_instance
 from indico.modules.core.settings import core_settings
 from indico.modules.users import User
-from indico.util.i18n import _, get_all_locales
+from indico.util.i18n import get_all_locales
 from indico.util.network import is_private_url
 from indico.util.system import get_os
 from indico.web.flask.templating import get_template_module
-from indico.web.flask.util import url_for
 from indico.web.rh import RH
 from indico.web.util import url_for_index
 
 
 class RHBootstrap(RH):
-    def _process_GET(self):
+    def _process(self):
         if User.query.filter_by(is_system=False).has_rows():
             return redirect(url_for_index())
+
+        form = BootstrapForm()
+        if form.validate_on_submit():
+            return self._handle_submit(form)
+
         return render_template('bootstrap/bootstrap.html',
-                               form=BootstrapForm(),
+                               form=form,
                                timezone=config.DEFAULT_TIMEZONE,
                                languages=get_all_locales(),
                                operating_system=get_os(),
@@ -43,14 +47,7 @@ class RHBootstrap(RH):
                                python_version=python_version(),
                                show_local_warning=(config.DEBUG or is_private_url(request.url_root)))
 
-    def _process_POST(self):
-        if User.query.filter_by(is_system=False).has_rows():
-            return redirect(url_for_index())
-        setup_form = BootstrapForm(request.form)
-        if not setup_form.validate():
-            flash(_("Some fields are invalid. Please, correct them and submit the form again."), 'error')
-            return redirect(url_for('bootstrap.index'))
-
+    def _handle_submit(self, setup_form):
         # Creating new user
         user = User()
         user.first_name = setup_form.first_name.data

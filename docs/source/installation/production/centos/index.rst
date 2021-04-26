@@ -1,5 +1,5 @@
-CentOS7 / CC7
-=============
+CentOS / CC7
+============
 
 .. include:: _intro.rst
 

@@ -239,7 +239,6 @@ class SetupWizard:
         self.default_locale = None
         self.default_timezone = None
         self.rb_active = None
-        self.old_archive_dir = None
 
     def run(self, dev):
         self._check_root()
@@ -256,8 +255,6 @@ class SetupWizard:
         self._prompt_smtp_data(dev=dev)
         self._prompt_defaults()
         self._prompt_misc()
-        if not dev:
-            self._prompt_migration()
         self._setup(dev=dev)
 
     def _check_root(self):
@@ -507,23 +504,8 @@ class SetupWizard:
                                        'of rooms available in your organization in Indico and use it to book them, it '
                                        'is recommended to leave the room booking system disabled.')
 
-    def _prompt_migration(self):
-        def _check_path(path):
-            if os.path.exists(path):
-                return True
-            _warn('Directory does not exist')
-            return False
-
-        self.old_archive_dir = _prompt('Old archive dir', path=True, required=False, validate=_check_path,
-                                       allow_invalid=True,
-                                       help='If you are upgrading from Indico 1.2, please specify the path to the '
-                                            'ArchiveDir of the old indico version.  Leave this empty if you are not '
-                                            'upgrading.')
-
     def _setup(self, dev=False):
         storage_backends = {'default': 'fs:' + os.path.join(self.data_root_path, 'archive')}
-        if self.old_archive_dir:
-            storage_backends['legacy'] = 'fs-readonly:' + self.old_archive_dir
 
         config_link_path = os.path.expanduser('~/.indico.conf')
         if not dev:
@@ -550,7 +532,6 @@ class SetupWizard:
             'STORAGE_BACKENDS = {!r}'.format({k: v
                                               for k, v in storage_backends.items()}),
             "ATTACHMENT_STORAGE = 'default'",
-            'ROUTE_OLD_URLS = True' if self.old_archive_dir else None,
             '',
             '# Email settings',
             f'SMTP_SERVER = {(self.smtp_host, self.smtp_port)!r}',
@@ -605,8 +586,4 @@ class SetupWizard:
             _echo(cformat('Run %{green!}export INDICO_CONFIG={}%{reset} to use your config file')
                   .format(self.config_path))
 
-        if self.old_archive_dir:
-            _echo(cformat('Check %{green!}https://git.io/vHP6o%{reset} for a guide on how to '
-                          'import data from Indico v1.2'))
-        else:
-            _echo(cformat('You can now run %{green!}indico db prepare%{reset} to initialize your Indico database'))
+        _echo(cformat('You can now run %{green!}indico db prepare%{reset} to initialize your Indico database'))
