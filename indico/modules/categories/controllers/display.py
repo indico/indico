@@ -30,7 +30,7 @@ from indico.modules.categories.models.categories import Category
 from indico.modules.categories.serialize import (serialize_categories_ical, serialize_category, serialize_category_atom,
                                                  serialize_category_chain)
 from indico.modules.categories.util import get_category_stats, get_upcoming_events
-from indico.modules.categories.views import WPCategory, WPCategoryCalendar, WPCategorySearch, WPCategoryStatistics
+from indico.modules.categories.views import WPCategory, WPCategoryCalendar, WPCategoryStatistics
 from indico.modules.events.models.events import Event
 from indico.modules.events.timetable.util import get_category_timetable
 from indico.modules.news.util import get_recent_news
@@ -576,8 +576,3 @@ class RHCategoryUpcomingEvent(RHDisplayCategoryBase):
         res = get_n_matching(query, 1, lambda event: event.can_access(session.user))
         if res:
             return res[0]
-
-
-class RHCategorySearchDisplay(RHDisplayCategoryBase):
-    def _process(self):
-        return WPCategorySearch.render_template('display/search.html', self.category)

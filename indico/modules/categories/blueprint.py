@@ -11,12 +11,11 @@ from indico.modules.categories.compat import compat_category
 from indico.modules.categories.controllers.admin import RHManageUpcomingEvents
 from indico.modules.categories.controllers.display import (RHCategoryCalendarView, RHCategoryIcon, RHCategoryInfo,
                                                            RHCategoryLogo, RHCategoryOverview, RHCategorySearch,
-                                                           RHCategorySearchDisplay, RHCategoryStatistics,
-                                                           RHCategoryStatisticsJSON, RHCategoryUpcomingEvent,
-                                                           RHDisplayCategory, RHEventList, RHExportCategoryAtom,
-                                                           RHExportCategoryICAL, RHReachableCategoriesInfo,
-                                                           RHShowFutureEventsInCategory, RHShowPastEventsInCategory,
-                                                           RHSubcatInfo)
+                                                           RHCategoryStatistics, RHCategoryStatisticsJSON,
+                                                           RHCategoryUpcomingEvent, RHDisplayCategory, RHEventList,
+                                                           RHExportCategoryAtom, RHExportCategoryICAL,
+                                                           RHReachableCategoriesInfo, RHShowFutureEventsInCategory,
+                                                           RHShowPastEventsInCategory, RHSubcatInfo)
 from indico.modules.categories.controllers.management import (RHAddCategoryRole, RHAddCategoryRoleMembers,
                                                               RHCategoryRoleMembersImportCSV, RHCategoryRoles,
                                                               RHCreateCategory, RHDeleteCategory, RHDeleteCategoryRole,
@@ -102,9 +101,6 @@ _bp.add_url_rule('!/category/search', 'search', RHCategorySearch)
 
 # Administration
 _bp.add_url_rule('!/admin/upcoming-events', 'manage_upcoming', RHManageUpcomingEvents, methods=('GET', 'POST'))
-
-# Search
-_bp.add_url_rule('!/category/<int:category_id>/search', 'category_search', RHCategorySearchDisplay)
 
 
 @_bp.before_request

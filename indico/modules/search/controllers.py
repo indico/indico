@@ -15,12 +15,13 @@ from sqlalchemy.orm import undefer
 from indico.core.db import db
 from indico.core.db.sqlalchemy.protection import ProtectionMode
 from indico.modules.categories import Category
+from indico.modules.categories.controllers.base import RHDisplayCategoryBase
 from indico.modules.events import Event
 from indico.modules.groups import GroupProxy
 from indico.modules.search.base import IndicoSearchProvider, SearchTarget, get_search_provider
 from indico.modules.search.result_schemas import CategoryResultSchema, EventResultSchema, ResultSchema
 from indico.modules.search.schemas import DetailedCategorySchema, EventSchema
-from indico.modules.search.views import WPSearch
+from indico.modules.search.views import WPCategorySearch, WPSearch
 from indico.util.caching import memoize_redis
 from indico.web.args import use_kwargs
 from indico.web.rh import RH
@@ -38,6 +39,11 @@ def get_groups(user):
 class RHSearchDisplay(RH):
     def _process(self):
         return WPSearch.render_template('search.html')
+
+
+class RHCategorySearchDisplay(RHDisplayCategoryBase):
+    def _process(self):
+        return WPCategorySearch.render_template('category_search.html', self.category)
 
 
 class RHAPISearch(RH):

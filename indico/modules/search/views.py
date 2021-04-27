@@ -5,6 +5,7 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
+from indico.modules.categories.views import WPCategory
 from indico.util.i18n import _
 from indico.web.breadcrumbs import render_breadcrumbs
 from indico.web.views import WPDecorated, WPJinjaMixin
@@ -19,3 +20,17 @@ class WPSearch(WPJinjaMixin, WPDecorated):
 
     def _get_body(self, params):
         return self._get_page_content(params)
+
+
+class WPCategorySearch(WPCategory):
+    """WP for category-limited search"""
+    bundles = ('module_search.js', 'module_search.css')
+    template_prefix = 'search/'
+
+    def __init__(self, rh, category, **kwargs):
+        WPCategory.__init__(self, rh, category, **kwargs)
+
+    def _get_breadcrumbs(self):
+        if not self.category or self.category.is_root:
+            return ''
+        return render_breadcrumbs(_('Search'), category=self.category)
