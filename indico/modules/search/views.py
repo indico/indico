@@ -23,9 +23,9 @@ class WPSearch(WPJinjaMixin, WPDecorated):
 
 
 class WPCategorySearch(WPCategory):
-    """WP for category-limited search"""
-    bundles = ('module_search.js', 'module_search.css')
+    """WP for category-scoped search"""
     template_prefix = 'search/'
+    bundles = ('module_search.js', 'module_search.css')
 
     def __init__(self, rh, category, **kwargs):
         WPCategory.__init__(self, rh, category, **kwargs)

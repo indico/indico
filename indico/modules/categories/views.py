@@ -25,7 +25,7 @@ class WPCategory(MathjaxMixin, WPJinjaMixin, WPDecorated):
 
     template_prefix = 'categories/'
     ALLOW_JSON = False
-    bundles = ('module_categories.js',)
+    bundles = ('module_categories.js', 'module_categories.css')
 
     def __init__(self, rh, category, **kwargs):
         kwargs['category'] = category
