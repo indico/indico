@@ -104,8 +104,7 @@ class InternalSearch(IndicoSearchProvider):
 
     @staticmethod
     def search_subcategories(page, q, category_id):
-        # TODO: This must filter subcategories.
-        results = (Category.query
+        results = (Category.get(category_id).deep_children_query
                    .filter(Category.title_matches(q),
                            ~Category.is_deleted)
                    .options(undefer('chain'))
