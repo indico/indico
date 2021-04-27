@@ -206,7 +206,7 @@ class AttachmentFolder(LinkMixin, ProtectionMixin, db.Model):
             return g.event_attachments[event].get(linked_object, [])
 
     def __repr__(self):
-        return '<AttachmentFolder({}, {}{}{}{}, {}, {})>'.format(
+        return '<AttachmentFolder({}, {}{}{}{}{}, {})>'.format(
             self.id,
             self.title,
             ', is_default=True' if self.is_default else '',
