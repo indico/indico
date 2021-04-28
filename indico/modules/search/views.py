@@ -27,9 +27,6 @@ class WPCategorySearch(WPCategory):
     template_prefix = 'search/'
     bundles = ('module_search.js', 'module_search.css')
 
-    def __init__(self, rh, category, **kwargs):
-        WPCategory.__init__(self, rh, category, **kwargs)
-
     def _get_breadcrumbs(self):
         if not self.category or self.category.is_root:
             return ''

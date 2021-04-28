@@ -14,9 +14,9 @@
   justify-content: space-between;
 
   span {
-    // @include ellipsis();
+    @include ellipsis();
     font-size: 0.95em;
     color: $dark-gray;
-    // width: 50%;
+    width: 50%;
   }
 }

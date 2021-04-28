@@ -24,28 +24,33 @@ const resultRenderer = ({label}, keyword) => (
 
 export default function SearchBox({onSearch, category}) {
   const [keyword, setKeyword] = useState('');
-  const options =
-    category.id !== 0
-      ? [
-          {value: 'category', title: category.title, label: 'In this category ↵'},
-          {value: 'global', title: 'Global', label: 'All Indico ↵'},
-        ]
-      : [];
+  const options = !category.isRoot
+    ? [
+        {value: 'category', title: category.title, label: 'In this category ↵'},
+        {value: 'global', title: 'Global', label: 'All Indico ↵'},
+      ]
+    : [];
 
   const handleSearchChange = event => {
     setKeyword(event.target.value);
   };
 
-  const handleResultSelect = (e, data) => {
-    if (data.result.value === 'category') {
-      onSearch(keyword, category.id);
-    } else {
-      onSearch(keyword);
+  // form submit happens when no option is selected in search (eg. in home category)
+  const handleSubmit = () => {
+    if (!keyword) {
+      return;
     }
+
+    console.log('handleSubmit', keyword, category.isRoot);
+    onSearch(keyword, category.isRoot);
+  };
+
+  const handleResultSelect = (e, data) => {
+    onSearch(keyword, data.result.value === 'global');
   };
 
   return (
-    <Form>
+    <Form onSubmit={handleSubmit}>
       <Search
         input={{fluid: true}}
         placeholder={Translate.string('Enter your search term')}
@@ -64,12 +69,9 @@ export default function SearchBox({onSearch, category}) {
 
 SearchBox.propTypes = {
   onSearch: PropTypes.func.isRequired,
-  category: PropTypes.object,
-};
-
-SearchBox.defaultProps = {
-  category: {
-    title: undefined,
-    id: undefined,
-  },
+  category: PropTypes.shape({
+    id: PropTypes.number.isRequired,
+    title: PropTypes.string.isRequired,
+    isRoot: PropTypes.bool.isRequired,
+  }).isRequired,
 };

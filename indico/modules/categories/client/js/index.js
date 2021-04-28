@@ -23,20 +23,22 @@ import {LocaleContext} from './context.js';
 (function(global) {
   document.addEventListener('DOMContentLoaded', () => {
     const domContainer = document.querySelector('#search-box');
+
     if (domContainer) {
+      const id = parseInt(domContainer.dataset.id, 10);
+      const title = domContainer.dataset.title;
+      const isRoot = domContainer.dataset.isRoot === 'true';
+
       ReactDOM.render(
         React.createElement(SearchBox, {
-          onSearch: (keyword, categoryId) => {
-            if (categoryId) {
-              window.location = categorySearchUrl({category_id: categoryId, q: keyword});
-            } else {
+          onSearch: (keyword, isGlobal) => {
+            if (isGlobal) {
               window.location = searchUrl({q: keyword});
+            } else {
+              window.location = categorySearchUrl({category_id: id, q: keyword});
             }
           },
-          category: {
-            id: parseInt(domContainer.dataset.categoryId, 10),
-            title: domContainer.dataset.categoryTitle,
-          },
+          category: {id, title, isRoot},
         }),
         domContainer
       );

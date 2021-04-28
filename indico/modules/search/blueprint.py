@@ -5,7 +5,7 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from indico.modules.search.controllers import (RHCategorySearchDisplay, RHAPISearch, RHAPISearchPlaceholders,
+from indico.modules.search.controllers import (RHAPISearch, RHAPISearchPlaceholders, RHCategorySearchDisplay,
                                                RHSearchDisplay)
 from indico.web.flask.wrappers import IndicoBlueprint
 
