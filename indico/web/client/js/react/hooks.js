@@ -244,12 +244,17 @@ export function useQueryParams() {
   const history = useHistory();
 
   const setQuery = useCallback(
-    (type, name, reset) => {
+    (key, value, reset) => {
       const params = new URLSearchParams(reset ? undefined : query);
-      if (name !== undefined) {
-        params.set(type, name);
+      if (value !== undefined) {
+        if (Array.isArray(value)) {
+          params.delete(key);
+          value.forEach(v => params.append(key, v));
+        } else {
+          params.set(key, value);
+        }
       } else {
-        params.delete(type);
+        params.delete(key);
       }
       const _query = params.toString();
       history.push({
