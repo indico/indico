@@ -56,7 +56,7 @@ class RHAPISearch(RH):
         if not search_provider or SearchTarget.category in type:
             search_provider = InternalSearch
         access = get_groups(session.user) if session.user else []
-        total, pages, results, aggs = search_provider().search(q, access, page, type, params)
+        total, pages, results, aggs = search_provider().search(q, access, page, type, **params)
         return {
             'total': total,
             'pages': pages,
@@ -66,7 +66,7 @@ class RHAPISearch(RH):
 
 
 class InternalSearch(IndicoSearchProvider):
-    def search(self, query, access, page=1, object_types=(), params=None):
+    def search(self, query, access, page=1, object_types=(), **params):
         if SearchTarget.category in object_types:
             total, results = InternalSearch.search_categories(page, query)
         elif SearchTarget.event in object_types:
