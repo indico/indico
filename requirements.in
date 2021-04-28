@@ -40,6 +40,7 @@ pillow
 prompt-toolkit
 psycopg2
 pycountry
+pygments
 pypdf2
 python-dateutil
 pytz
