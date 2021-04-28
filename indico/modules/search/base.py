@@ -28,12 +28,12 @@ class IndicoSearchProvider:
     RESULTS_PER_PAGE = 10
 
     def search(self, query, access, page=1, object_types=(), **params):
-        """Search using a custom service across multiple targets
+        """Search using a custom service across multiple targets.
 
-        :param query Keyword based query string
-        :param access The requester access control list
-        :param page The target page
-        :param object_types A filter for a specific `SearchTarget`
-        :param params Any additional search params such as filters
+        :param query: Keyword based query string
+        :param access: The requester access control list
+        :param page: The target page
+        :param object_types: A filter for a specific `SearchTarget`
+        :param params: Any additional search params such as filters
         """
         raise NotImplementedError()

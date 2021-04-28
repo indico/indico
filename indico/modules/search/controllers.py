@@ -40,12 +40,13 @@ class RHSearchDisplay(RH):
 
 
 class RHAPISearch(RH):
-    """API for searching across all records with the current search provider
+    """API for searching across all records with the current search provider.
 
     Besides pagination, filters or placeholders may be passed as query parameters.
     Since `type` may be a list, the results from the search provider are not mixed with
     the InternalSearch.
     """
+
     @use_kwargs({
         'page': fields.Int(missing=1),
         'q': fields.String(required=True),
