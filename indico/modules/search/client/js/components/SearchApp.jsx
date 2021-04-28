@@ -35,12 +35,12 @@ const camelizeValues = obj =>
     {}
   );
 
-function useSearch(url, query) {
+function useSearch(url, query, type = undefined) {
   const [page, setPage] = useState(1);
 
   const {data, loading, lastData} = useIndicoAxios({
     url,
-    options: {params: {...query, page}},
+    options: {params: {...query, type, page}},
     forceDispatchEffect: () => query?.q,
     trigger: [url, query, page],
   });
@@ -123,14 +123,14 @@ export default function SearchApp() {
   const [query, setQuery] = useQueryParams();
   const [activeMenuItem, setActiveMenuItem] = useState(undefined);
   const {q, ...filters} = query;
-  const [categoryResults, setCategoryPage] = useSearch(searchURL({type: 'category'}), query);
-  const [eventResults, setEventPage] = useSearch(searchURL({type: 'event'}), query);
-  const [contributionResults, setContributionPage] = useSearch(
-    searchURL({type: 'contribution'}),
-    query
-  );
-  const [fileResults, setFilePage] = useSearch(searchURL({type: 'attachment'}), query);
-  const [noteResults, setNotePage] = useSearch(searchURL({type: 'event_note'}), query);
+  const [categoryResults, setCategoryPage] = useSearch(searchURL(), query, 'category');
+  const [eventResults, setEventPage] = useSearch(searchURL(), query, 'event');
+  const [contributionResults, setContributionPage] = useSearch(searchURL(), query, [
+    'contribution',
+    'subcontribution',
+  ]);
+  const [fileResults, setFilePage] = useSearch(searchURL(), query, 'attachment');
+  const [noteResults, setNotePage] = useSearch(searchURL(), query, 'event_note');
   const searchMap = [
     [Translate.string('Categories'), categoryResults, setCategoryPage, Category],
     [Translate.string('Events'), eventResults, setEventPage, Event],
