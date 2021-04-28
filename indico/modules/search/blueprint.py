@@ -15,5 +15,4 @@ _bp = IndicoBlueprint('search', __name__, template_folder='templates', virtual_t
 _bp.add_url_rule('/search/', 'search', RHSearchDisplay)
 
 # Search APIs
-_bp.add_url_rule('/search/api/<any(event,category,contribution,attachment,event_note):type>',
-                 'api_search', RHAPISearch)
+_bp.add_url_rule('/search/api', 'api_search', RHAPISearch)

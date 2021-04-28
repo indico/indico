@@ -40,17 +40,25 @@ class RHSearchDisplay(RH):
 
 
 class RHAPISearch(RH):
+    """API for searching across all records with the current search provider
+
+    Besides pagination, filters or placeholders may be passed as query parameters.
+    A boolean flag `internal` can be used to override the service to an internal lookup.
+    Since `type` may be a list, the results from the search provider are not mixed with
+    the InternalSearch.
+    """
     @use_kwargs({
         'page': fields.Int(missing=1),
         'q': fields.String(required=True),
+        'type': fields.List(EnumField(SearchTarget), missing=None),
+        'internal': fields.Boolean(missing=False)
     }, location='query', unknown=INCLUDE)
-    @use_kwargs({'type': EnumField(SearchTarget)}, location='view_args')
-    def _process(self, type, page, q, **params):
+    def _process(self, page, q, type, internal, **params):
         search_provider = get_search_provider()
-        if not search_provider or type == SearchTarget.category:
+        if not search_provider or internal:
             search_provider = InternalSearch
         access = get_groups(session.user) if session.user else []
-        total, pages, results, aggs = search_provider().search(q, access, type, page, params)
+        total, pages, results, aggs = search_provider().search(q, access, page, type, params)
         return {
             'total': total,
             'pages': pages,
@@ -60,11 +68,10 @@ class RHAPISearch(RH):
 
 
 class InternalSearch(IndicoSearchProvider):
-    def search(self, query, access, object_type=SearchTarget.event, page=1, params=None):
-        # Without any search provider, internally we only support categories and events
-        if object_type == SearchTarget.category:
+    def search(self, query, access, page=1, object_types=(), params=None):
+        if SearchTarget.category in object_types:
             total, results = InternalSearch.search_categories(page, query)
-        elif object_type == SearchTarget.event:
+        elif SearchTarget.event in object_types:
             total, results = InternalSearch.search_events(page, query)
         else:
             total, results = 0, []
