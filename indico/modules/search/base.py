@@ -6,13 +6,14 @@
 # LICENSE file for more details.
 
 from indico.core import signals
+from indico.modules.search.controllers import InternalSearch
 from indico.util.enum import IndicoEnum
 from indico.util.signals import values_from_signal
 
 
 def get_search_provider():
     providers = signals.get_search_providers.send()
-    return values_from_signal(providers, as_list=True)[0] if len(providers) else None
+    return values_from_signal(providers, as_list=True)[0] if len(providers) else InternalSearch
 
 
 class SearchTarget(int, IndicoEnum):

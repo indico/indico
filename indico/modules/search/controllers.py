@@ -54,7 +54,7 @@ class RHAPISearch(RH):
     }, location='query', unknown=INCLUDE)
     def _process(self, page, q, type, **params):
         search_provider = get_search_provider()
-        if not search_provider or type == [SearchTarget.category]:
+        if type == [SearchTarget.category]:
             search_provider = InternalSearch
         access = get_groups(session.user) if session.user else []
         total, pages, results, aggs = search_provider().search(q, access, page, type, **params)
