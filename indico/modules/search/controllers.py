@@ -43,19 +43,17 @@ class RHAPISearch(RH):
     """API for searching across all records with the current search provider
 
     Besides pagination, filters or placeholders may be passed as query parameters.
-    A boolean flag `internal` can be used to override the service to an internal lookup.
     Since `type` may be a list, the results from the search provider are not mixed with
     the InternalSearch.
     """
     @use_kwargs({
         'page': fields.Int(missing=1),
         'q': fields.String(required=True),
-        'type': fields.List(EnumField(SearchTarget), missing=None),
-        'internal': fields.Boolean(missing=False)
+        'type': fields.List(EnumField(SearchTarget), missing=None)
     }, location='query', unknown=INCLUDE)
-    def _process(self, page, q, type, internal, **params):
+    def _process(self, page, q, type, **params):
         search_provider = get_search_provider()
-        if not search_provider or internal:
+        if not search_provider or SearchTarget.category in type:
             search_provider = InternalSearch
         access = get_groups(session.user) if session.user else []
         total, pages, results, aggs = search_provider().search(q, access, page, type, params)

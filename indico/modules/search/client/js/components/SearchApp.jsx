@@ -40,7 +40,7 @@ function useSearch(url, query, type = undefined) {
 
   const {data, loading, lastData} = useIndicoAxios({
     url,
-    options: {params: {...query, type, page, internal: type === 'category'}},
+    options: {params: {...query, type, page}},
     forceDispatchEffect: () => query?.q,
     trigger: [url, query, page],
   });
