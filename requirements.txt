@@ -213,7 +213,9 @@ pycountry==20.7.3
 pycparser==2.20
     # via cffi
 pygments==2.8.1
-    # via ipython
+    # via
+    #   -r requirements.in
+    #   ipython
 pynpm==0.1.2
     # via
     #   flask-webpackext
