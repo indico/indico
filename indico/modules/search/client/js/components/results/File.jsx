@@ -20,6 +20,9 @@ const iconSelector = filename => {
     case 'doc':
     case 'docx':
       return {color: 'blue', name: 'file word outline'};
+    case 'md':
+    case 'txt':
+      return {color: 'blue', name: 'file alternate outline'};
     case 'zip':
       return {color: 'yellow', name: 'file archive outline'};
     case 'ppt':
