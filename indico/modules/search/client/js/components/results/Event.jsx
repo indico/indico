@@ -5,8 +5,6 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-import eventURL from 'indico-url:events.display';
-
 import moment from 'moment';
 import PropTypes from 'prop-types';
 import React from 'react';
@@ -34,24 +32,16 @@ const renderDates = (startDt, endDt) =>
     </List.Item>
   );
 
-export default function Event({
-  typeFormat: type,
-  eventId,
-  title,
-  categoryPath,
-  startDt,
-  endDt,
-  chairPersons,
-}) {
+export default function Event({eventType, url, title, categoryPath, startDt, endDt, persons}) {
   return (
     <div styleName="item">
       <List.Header styleName="header">
-        <a href={eventURL({event_id: eventId})}>{title}</a>
+        <a href={url}>{title}</a>
       </List.Header>
       <List.Description styleName="description">
-        {type === 'lecture' && chairPersons.length !== 0 && (
+        {['lecture', 'meeting'].includes(eventType) && persons.length !== 0 && (
           <List.Item>
-            <PersonList persons={chairPersons} />
+            <PersonList persons={persons} />
           </List.Item>
         )}
         {renderDates(startDt, endDt)}
@@ -68,14 +58,13 @@ export default function Event({
 }
 
 Event.defaultProps = {
-  chairPersons: [],
-  typeFormat: 'meeting',
+  persons: [],
 };
 
 Event.propTypes = {
   title: PropTypes.string.isRequired,
-  eventId: PropTypes.number.isRequired,
-  typeFormat: PropTypes.oneOf(['lecture', 'meeting', 'conference']),
+  url: PropTypes.string.isRequired,
+  eventType: PropTypes.oneOf(['lecture', 'meeting', 'conference']).isRequired,
   startDt: PropTypes.string.isRequired,
   endDt: PropTypes.string.isRequired,
   categoryPath: PropTypes.arrayOf(
@@ -84,7 +73,7 @@ Event.propTypes = {
       title: PropTypes.string.isRequired,
     })
   ).isRequired,
-  chairPersons: PropTypes.arrayOf(
+  persons: PropTypes.arrayOf(
     PropTypes.shape({
       name: PropTypes.string.isRequired,
       affiliation: PropTypes.string.isRequired,

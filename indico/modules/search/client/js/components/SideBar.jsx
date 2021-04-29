@@ -32,8 +32,8 @@ export default function SideBar({query, aggregations, onChange}) {
 function AggregationList({name, title, items, query, onChange}) {
   items = items
     .filter(b => b.key)
-    .map(({key, fromAsString: from, toAsString: to, docCount: count}) => ({
-      key: from || to ? `[${from || '*'} TO ${to || '*'}]` : key,
+    .map(({key, filter, docCount: count}) => ({
+      key: filter,
       label: key.charAt(0).toUpperCase() + key.slice(1),
       count,
     }));

@@ -18,6 +18,7 @@ from indico.modules.categories import Category
 from indico.modules.events import Event
 from indico.modules.groups import GroupProxy
 from indico.modules.search.base import IndicoSearchProvider, SearchTarget, get_search_provider
+from indico.modules.search.result_schemas import ResultSchema
 from indico.modules.search.schemas import DetailedCategorySchema, EventSchema
 from indico.modules.search.views import WPSearch
 from indico.util.caching import memoize_redis
@@ -57,13 +58,8 @@ class RHAPISearch(RH):
         if type == [SearchTarget.category]:
             search_provider = InternalSearch
         access = get_groups(session.user) if session.user else []
-        total, pages, results, aggs = search_provider().search(q, access, page, type, **params)
-        return {
-            'total': total,
-            'pages': pages,
-            'results': results,
-            'aggregations': aggs
-        }
+        result = search_provider().search(q, access, page, type, **params)
+        return ResultSchema().dump(result)
 
 
 class RHAPISearchPlaceholders(RH):
