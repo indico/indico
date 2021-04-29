@@ -7,7 +7,7 @@
 
 import math
 
-from flask import session
+from flask import jsonify, session
 from marshmallow import INCLUDE, fields
 from marshmallow_enum import EnumField
 from sqlalchemy.orm import undefer
@@ -64,6 +64,13 @@ class RHAPISearch(RH):
             'results': results,
             'aggregations': aggs
         }
+
+
+class RHAPISearchPlaceholders(RH):
+    def _process(self):
+        search_provider = get_search_provider()
+        # TODO: validate
+        return jsonify(search_provider().get_placeholders())
 
 
 class InternalSearch(IndicoSearchProvider):

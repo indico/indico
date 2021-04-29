@@ -6,12 +6,13 @@
 # LICENSE file for more details.
 
 from indico.core import signals
-from indico.modules.search.controllers import InternalSearch
 from indico.util.enum import IndicoEnum
 from indico.util.signals import values_from_signal
 
 
 def get_search_provider():
+    from indico.modules.search.controllers import InternalSearch
+
     providers = signals.get_search_providers.send()
     return values_from_signal(providers, as_list=True)[0] if len(providers) else InternalSearch
 
@@ -38,3 +39,6 @@ class IndicoSearchProvider:
         :param params: Any additional search params such as filters
         """
         raise NotImplementedError()
+
+    def get_placeholders(self):
+        return []
