@@ -43,9 +43,11 @@ const File = ({title, url, typeFormat: type, filename, modifiedDt, user}) => (
       <a href={url}>{title}</a>
     </List.Header>
     <List.Description styleName="description">
-      <List.Item>
-        <PersonList persons={[user]} />
-      </List.Item>
+      {user && (
+        <List.Item>
+          <PersonList persons={[user]} />
+        </List.Item>
+      )}
       <List.Item>
         <Icon name="calendar alternate outline" />
         {serializeDate(toMoment(modifiedDt), 'DD MMMM YYYY HH:mm')}
@@ -63,11 +65,12 @@ File.propTypes = {
   user: PropTypes.shape({
     name: PropTypes.string.isRequired,
     affiliation: PropTypes.string,
-  }).isRequired,
+  }),
 };
 
 File.defaultProps = {
   filename: undefined,
+  user: null,
 };
 
 export default File;
