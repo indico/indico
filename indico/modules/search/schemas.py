@@ -43,7 +43,7 @@ class DetailedCategorySchema(mm.SQLAlchemyAutoSchema):
 class PersonSchema(mm.Schema):
     name = fields.Function(lambda p: p.get_full_name(last_name_first=False, last_name_upper=False,
                                                      abbrev_first_name=False, show_title=True))
-    affiliation = fields.String()
+    affiliation = fields.Function(lambda p: p.affiliation or None)
 
     @post_dump(pass_original=True)
     def skip_system_user(self, data, orig, **kwargs):
