@@ -5,9 +5,6 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-import contributionURL from 'indico-url:contributions.display_contribution';
-import subcontributionURL from 'indico-url:contributions.display_subcontribution';
-
 import PropTypes from 'prop-types';
 import React from 'react';
 import {List, Icon} from 'semantic-ui-react';
@@ -18,12 +15,7 @@ import PersonList from './PersonList';
 
 import '../ResultList.module.scss';
 
-function Contribution({eventId, contributionId, subcontributionId, title, startDt, persons}) {
-  const urlParams = {event_id: eventId, contrib_id: contributionId};
-  const url = subcontributionId
-    ? subcontributionURL({...urlParams, subcontrib_id: subcontributionId})
-    : contributionURL(urlParams);
-
+function Contribution({url, title, startDt, persons}) {
   return (
     <div styleName="item">
       <List.Header styleName="header">
@@ -48,9 +40,7 @@ function Contribution({eventId, contributionId, subcontributionId, title, startD
 
 Contribution.propTypes = {
   title: PropTypes.string.isRequired,
-  contributionId: PropTypes.number.isRequired,
-  subcontributionId: PropTypes.number,
-  eventId: PropTypes.number.isRequired,
+  url: PropTypes.string.isRequired,
   startDt: PropTypes.string,
   persons: PropTypes.arrayOf(
     PropTypes.shape({
@@ -63,7 +53,6 @@ Contribution.propTypes = {
 Contribution.defaultProps = {
   startDt: undefined,
   persons: [],
-  subcontributionId: undefined,
 };
 
 export default Contribution;

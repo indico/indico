@@ -39,7 +39,7 @@ const iconSelector = filename => {
   }
 };
 
-const File = ({title, url, typeFormat: type, filename, modifiedDt, user}) => (
+const File = ({title, url, attachmentType: type, filename, modifiedDt, user}) => (
   <div styleName="item">
     <List.Header styleName="header">
       <Icon size="large" {...(type === 'file' ? iconSelector(filename) : {name: 'linkify'})} />
@@ -62,7 +62,7 @@ const File = ({title, url, typeFormat: type, filename, modifiedDt, user}) => (
 File.propTypes = {
   title: PropTypes.string.isRequired,
   url: PropTypes.string.isRequired,
-  typeFormat: PropTypes.string.isRequired,
+  attachmentType: PropTypes.oneOf(['file', 'link']).isRequired,
   filename: PropTypes.string,
   modifiedDt: PropTypes.string.isRequired,
   user: PropTypes.shape({
