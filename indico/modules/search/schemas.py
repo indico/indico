@@ -95,7 +95,7 @@ class AttachmentSchema(mm.SQLAlchemyAutoSchema):
     filename = fields.String(attribute='file.filename')
     event_id = fields.Int(attribute='folder.event.id')
     contribution_id = fields.Method('_contribution_id')
-    subcontribution_id = fields.Method('_subcontribution_id')
+    subcontribution_id = fields.Int(attribute='folder.subcontribution_id')
     user = fields.Nested(PersonSchema)
     category_id = fields.Int(attribute='folder.event.category_id')
     category_path = fields.List(fields.Nested(CategorySchema), attribute='folder.event.detailed_category_chain')
@@ -103,11 +103,11 @@ class AttachmentSchema(mm.SQLAlchemyAutoSchema):
     content = fields.String()
 
     def _contribution_id(self, attachment):
-        return attachment.folder.contribution_id if attachment.folder.link_type == LinkType.contribution else None
-
-    def _subcontribution_id(self, attachment):
-        return attachment.folder.subcontribution_id \
-            if attachment.folder.link_type == LinkType.subcontribution else None
+        if attachment.folder.link_type == LinkType.contribution:
+            return attachment.folder.contribution_id
+        elif attachment.folder.link_type == LinkType.subcontribution:
+            return attachment.folder.subcontribution.contribution_id
+        return None
 
 
 class ContributionSchema(mm.SQLAlchemyAutoSchema):
@@ -155,9 +155,15 @@ class EventNoteSchema(mm.SQLAlchemyAutoSchema):
     note_id = fields.Int(attribute='id')
     type = fields.Constant(SearchTarget.event_note.name)
     content = fields.Str(attribute='html')
-    contribution_id = fields.Int()
+    contribution_id = fields.Method('_contribution_id')
     subcontribution_id = fields.Int()
     category_id = fields.Int(attribute='event.category_id')
     category_path = fields.List(fields.Nested(CategorySchema), attribute='event.detailed_category_chain')
     url = fields.Function(lambda note: url_for('event_notes.view', note, _external=False))
     created_dt = fields.DateTime(attribute='current_revision.created_dt')
+
+    def _contribution_id(self, note):
+        if note.link_type == LinkType.contribution:
+            return note.contribution_id
+        elif note.link_type == LinkType.subcontribution:
+            return note.subcontribution.contribution_id
