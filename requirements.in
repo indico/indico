@@ -33,6 +33,7 @@ lxml[html5]
 markdown
 markupsafe
 marshmallow-enum
+marshmallow-oneofschema
 marshmallow-sqlalchemy
 marshmallow<3.10.0  # https://github.com/marshmallow-code/marshmallow-sqlalchemy/issues/361
 packaging

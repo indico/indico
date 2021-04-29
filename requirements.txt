@@ -172,6 +172,8 @@ markupsafe==1.1.1
     #   wtforms
 marshmallow-enum==1.5.1
     # via -r requirements.in
+marshmallow-oneofschema==2.1.0
+    # via -r requirements.in
 marshmallow-sqlalchemy==0.24.2
     # via -r requirements.in
 marshmallow==3.9.1
@@ -179,6 +181,7 @@ marshmallow==3.9.1
     #   -r requirements.in
     #   flask-marshmallow
     #   marshmallow-enum
+    #   marshmallow-oneofschema
     #   marshmallow-sqlalchemy
     #   webargs
 node-semver==0.8.0

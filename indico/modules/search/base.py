@@ -48,6 +48,8 @@ class IndicoSearchProvider:
         :param page: The target page
         :param object_types: A filter for a specific `SearchTarget`
         :param params: Any additional search params such as filters
+
+        :return: a dict with the `ResultSchema` structure
         """
         raise NotImplementedError()
 
