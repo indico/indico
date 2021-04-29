@@ -81,7 +81,6 @@ class EventSchema(mm.SQLAlchemyAutoSchema):
     persons = NoneRemovingList(fields.Nested(PersonSchema), attribute='person_links')
     category_id = fields.Int()
     category_path = fields.List(fields.Nested(CategorySchema), attribute='detailed_category_chain')
-    note = fields.String()
 
 
 class AttachmentSchema(mm.SQLAlchemyAutoSchema):
