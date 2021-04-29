@@ -16,6 +16,7 @@ from indico.modules.events.contributions import Contribution
 from indico.modules.events.contributions.models.subcontributions import SubContribution
 from indico.modules.events.notes.models.notes import EventNote
 from indico.modules.search.base import SearchTarget
+from indico.modules.users.models.users import User
 from indico.web.flask.util import url_for
 
 
@@ -33,21 +34,38 @@ class DetailedCategorySchema(mm.SQLAlchemyAutoSchema):
 
     path = fields.List(fields.Nested(CategorySchema), attribute='chain')
 
-    @post_dump()
+    @post_dump
     def update_path(self, c, **kwargs):
         c['path'] = c['path'][:-1]
         return c
 
 
 class PersonSchema(mm.Schema):
-    name = fields.Function(lambda e: e.title and f'{e.title} {e.name}' or e.name)
+    name = fields.Function(lambda p: p.get_full_name(last_name_first=False, last_name_upper=False,
+                                                     abbrev_first_name=False, show_title=True))
     affiliation = fields.String()
+
+    @post_dump(pass_original=True)
+    def skip_system_user(self, data, orig, **kwargs):
+        # obj can be a User or a PersonLinkBase subclass
+        user = orig if isinstance(orig, User) else orig.person.user
+        if user and user.is_system:
+            return None
+        return data
 
 
 class LocationSchema(mm.Schema):
     venue_name = fields.String()
     room_name = fields.String()
     address = fields.String()
+
+
+class NoneRemovingList(fields.List):
+    def _serialize(self, value, attr, obj, **kwargs):
+        rv = super()._serialize(value, attr, obj, **kwargs)
+        if rv is None:
+            return None
+        return [x for x in rv if x is not None]
 
 
 class EventSchema(mm.SQLAlchemyAutoSchema):
@@ -60,7 +78,7 @@ class EventSchema(mm.SQLAlchemyAutoSchema):
     type = fields.Constant(SearchTarget.event.name)
     type_format = fields.String(attribute='_type.name')
     location = fields.Function(lambda event: LocationSchema().dump(event))
-    persons = fields.List(fields.Nested(PersonSchema), attribute='person_links')
+    persons = NoneRemovingList(fields.Nested(PersonSchema), attribute='person_links')
     category_id = fields.Int()
     category_path = fields.List(fields.Nested(CategorySchema), attribute='detailed_category_chain')
     note = fields.String()
@@ -103,7 +121,7 @@ class ContributionSchema(mm.SQLAlchemyAutoSchema):
     type = fields.Constant(SearchTarget.contribution.name)
     type_format = fields.String(attribute='type.name')
     location = fields.Function(lambda contrib: LocationSchema().dump(contrib))
-    persons = fields.List(fields.Nested(PersonSchema), attribute='person_links')
+    persons = NoneRemovingList(fields.Nested(PersonSchema), attribute='person_links')
     category_id = fields.Int(attribute='event.category_id')
     category_path = fields.List(fields.Nested(CategorySchema), attribute='event.detailed_category_chain')
     url = fields.Function(lambda contrib: url_for('contributions.display_contribution', contrib, _external=False))
@@ -119,7 +137,7 @@ class SubContributionSchema(mm.SQLAlchemyAutoSchema):
     subcontribution_id = fields.Int(attribute='id')
     type = fields.Constant(SearchTarget.subcontribution.name)
     event_id = fields.Int(attribute='contribution.event_id')
-    persons = fields.List(fields.Nested(PersonSchema), attribute='person_links')
+    persons = NoneRemovingList(fields.Nested(PersonSchema), attribute='person_links')
     location = fields.Function(lambda subc: LocationSchema().dump(subc.contribution))
     category_id = fields.Int(attribute='event.category_id')
     category_path = fields.List(fields.Nested(CategorySchema), attribute='event.detailed_category_chain')
