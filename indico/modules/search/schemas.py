@@ -86,10 +86,12 @@ class EventSchema(mm.SQLAlchemyAutoSchema):
 class AttachmentSchema(mm.SQLAlchemyAutoSchema):
     class Meta:
         model = Attachment
-        fields = ('attachment_id', 'type', 'type_format', 'title', 'filename', 'event_id', 'contribution_id',
-                  'subcontribution_id', 'user', 'url', 'category_id', 'category_path', 'content', 'modified_dt')
+        fields = ('attachment_id', 'folder_id', 'type', 'type_format', 'title', 'filename', 'event_id',
+                  'contribution_id', 'subcontribution_id', 'user', 'url', 'category_id', 'category_path',
+                  'modified_dt')
 
     attachment_id = fields.Int(attribute='id')
+    folder_id = fields.Int(attribute='folder_id')
     type = fields.Constant(SearchTarget.attachment.name)
     type_format = fields.String(attribute='type.name')
     filename = fields.String(attribute='file.filename')
@@ -100,7 +102,6 @@ class AttachmentSchema(mm.SQLAlchemyAutoSchema):
     category_id = fields.Int(attribute='folder.event.category_id')
     category_path = fields.List(fields.Nested(CategorySchema), attribute='folder.event.detailed_category_chain')
     url = fields.String(attribute='download_url')
-    content = fields.String()
 
     def _contribution_id(self, attachment):
         if attachment.folder.link_type == LinkType.contribution:
@@ -150,17 +151,18 @@ class EventNoteSchema(mm.SQLAlchemyAutoSchema):
     class Meta:
         model = EventNote
         fields = ('note_id', 'type', 'content', 'event_id', 'contribution_id', 'subcontribution_id', 'url',
-                  'category_id', 'category_path', 'created_dt')
+                  'category_id', 'category_path', 'modified_dt', 'user')
 
     note_id = fields.Int(attribute='id')
     type = fields.Constant(SearchTarget.event_note.name)
-    content = fields.Str(attribute='html')
+    content = fields.Str(attribute='current_revision.source')
     contribution_id = fields.Method('_contribution_id')
     subcontribution_id = fields.Int()
     category_id = fields.Int(attribute='event.category_id')
     category_path = fields.List(fields.Nested(CategorySchema), attribute='event.detailed_category_chain')
     url = fields.Function(lambda note: url_for('event_notes.view', note, _external=False))
-    created_dt = fields.DateTime(attribute='current_revision.created_dt')
+    modified_dt = fields.DateTime(attribute='current_revision.created_dt')
+    user = fields.Nested(PersonSchema, attribute='current_revision.user')
 
     def _contribution_id(self, note):
         if note.link_type == LinkType.contribution:
