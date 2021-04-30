@@ -116,7 +116,11 @@ function NoResults({query}) {
 }
 
 NoResults.propTypes = {
-  query: PropTypes.string.isRequired,
+  query: PropTypes.string,
+};
+
+NoResults.defaultProps = {
+  query: undefined,
 };
 
 export default function SearchApp() {

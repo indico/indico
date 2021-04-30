@@ -5,22 +5,16 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
+import placeholderURL from 'indico-url:search.api_search_placeholders';
+
 import PropTypes from 'prop-types';
 import React, {useState, useEffect} from 'react';
 import {Form, Label, Search} from 'semantic-ui-react';
-import './SearchBar.module.scss';
 
+import {useIndicoAxios} from 'indico/react/hooks';
 import {Translate} from 'indico/react/i18n';
 
-// TODO: query from indico
-const placeholders = [
-  {title: 'title:', label: 'An entry title (such as: event, contribution, attachment, event_note)'},
-  {title: 'person:', label: "A speaker, author or event chair's name"},
-  {title: 'affiliation:', label: "A speaker, author or event chair's affiliation"},
-  {title: 'type:', label: 'An entry type (such as: conference, meeting, link, PDF)'},
-  {title: 'venue:', label: "The event's venue name"},
-  {title: 'keyword:', label: 'A keyword associated with an event'},
-];
+import './SearchBar.module.scss';
 
 const resultRenderer = ({title, label}) => (
   <span styleName="placeholder">
@@ -30,7 +24,8 @@ const resultRenderer = ({title, label}) => (
 
 export default function SearchBar({onSearch, searchTerm}) {
   const [keyword, setKeyword] = useState(searchTerm);
-  const [results, setResults] = useState(placeholders);
+  const {data: placeholders} = useIndicoAxios({url: placeholderURL(), trigger: 'once'});
+  const [results, setResults] = useState(null);
   const [isSearchOpen, setSearchOpen] = useState(false);
 
   const handleSubmit = event => {
@@ -44,14 +39,14 @@ export default function SearchBar({onSearch, searchTerm}) {
   const handleSearchChange = (e, data) => {
     const queries = data.value.split(/\s+/);
     const value = queries[queries.length - 1];
-    setResults(placeholders.filter(x => !value || x.title.startsWith(value)));
+    setResults(placeholders.filter(x => !value || x.key.startsWith(value)));
     setSearchOpen(true);
     setKeyword(data.value);
   };
 
   const handleResultSelect = (e, data) => {
     const queries = data.value.split(/\s+/).slice(0, -1);
-    queries.push(data.result.title);
+    queries.push(`${data.result.title}:`);
     setKeyword(queries.join(' '));
   };
 
@@ -59,12 +54,16 @@ export default function SearchBar({onSearch, searchTerm}) {
     setKeyword(searchTerm);
   }, [searchTerm]);
 
+  useEffect(() => {
+    setResults(placeholders);
+  }, [placeholders]);
+
   return (
     <Form onSubmit={handleSubmit}>
       <Search
         input={{fluid: true}}
         placeholder={Translate.string('Enter your search term')}
-        results={results}
+        results={results?.map(x => ({title: x.key, label: x.label}))}
         value={keyword}
         open={isSearchOpen}
         showNoResults={false}
