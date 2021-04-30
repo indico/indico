@@ -70,7 +70,7 @@ class RHAPISearchPlaceholders(RH):
     def _process(self):
         search_provider = get_search_provider()
         placeholders = search_provider().get_placeholders()
-        return jsonify(placeholders if not PlaceholderSchema(many=True).validate(placeholders) else [])
+        return jsonify(PlaceholderSchema(many=True).load(placeholders))
 
 
 class InternalSearch(IndicoSearchProvider):
