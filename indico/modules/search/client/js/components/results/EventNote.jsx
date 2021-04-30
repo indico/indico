@@ -9,6 +9,7 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import {List} from 'semantic-ui-react';
 
+import Highlight from './Highlight';
 import {Path, pathPropType} from './Path';
 
 import '../ResultList.module.scss';
@@ -19,11 +20,7 @@ const EventNote = ({title, url, content, highlight, categoryPath, eventPath}) =>
       <a href={url}>{title}</a>
     </List.Header>
     <List.Description styleName="description">
-      {highlight?.content
-        ?.slice(0, 3) // eslint-disable-next-line react/no-array-index-key
-        .map((html, idx) => <div key={html + idx} dangerouslySetInnerHTML={{__html: html}} />) || (
-        <span>{content.slice(0, 240)}</span>
-      )}
+      <Highlight text={content} highlight={highlight.content} />
       {categoryPath.length !== 0 && (
         <List.Item>
           <List.Description>

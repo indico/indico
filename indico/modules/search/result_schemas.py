@@ -42,6 +42,7 @@ class PersonSchema(_ResultSchemaBase):
 
 class HighlightSchema(_ResultSchemaBase):
     content = fields.List(fields.String())
+    description = fields.List(fields.String())
 
 
 class ResultSchemaBase(_ResultSchemaBase):
@@ -65,6 +66,7 @@ class EventResultSchema(ResultSchemaBase):
     start_dt = fields.DateTime(required=True)
     end_dt = fields.DateTime(required=True)
     persons = fields.List(fields.Nested(PersonSchema), required=True)
+    highlight = fields.Nested(HighlightSchema, missing={})
     # extra fields that are not taken from the data returned by the search engine
     url = fields.Method('_get_url')
 
@@ -82,6 +84,7 @@ class ContributionResultSchema(ResultSchemaBase):
     end_dt = fields.DateTime(required=True)
     persons = fields.List(fields.Nested(PersonSchema), required=True)
     duration = fields.TimeDelta(precision=fields.TimeDelta.MINUTES)
+    highlight = fields.Nested(HighlightSchema, missing={})
     # extra fields that are not taken from the data returned by the search engine
     url = fields.Method('_get_url')
     event_path = fields.Method('_get_event_path', dump_only=True)
@@ -172,7 +175,7 @@ class EventNoteResultSchema(ResultSchemaBase):
     user = fields.Nested(PersonSchema, missing=None)
     modified_dt = fields.DateTime(required=True)
     content = fields.String(required=True)
-    highlight = fields.Nested(HighlightSchema, missing=None)
+    highlight = fields.Nested(HighlightSchema, missing={})
     # extra fields that are not taken from the data returned by the search engine
     url = fields.Method('_get_url')
     event_path = fields.Method('_get_event_path', dump_only=True)
