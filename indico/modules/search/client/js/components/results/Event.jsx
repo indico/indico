@@ -12,7 +12,7 @@ import {List, Icon} from 'semantic-ui-react';
 
 import {toMoment, serializeDate} from 'indico/utils/date';
 
-import CategoryPath from './CategoryPath';
+import {Path, pathPropType} from './Path';
 import PersonList from './PersonList';
 
 import '../ResultList.module.scss';
@@ -48,7 +48,7 @@ export default function Event({eventType, url, title, categoryPath, startDt, end
         {categoryPath.length !== 0 && (
           <List.Item>
             <List.Description>
-              <CategoryPath path={categoryPath} />
+              <Path path={categoryPath} />
             </List.Description>
           </List.Item>
         )}
@@ -67,12 +67,7 @@ Event.propTypes = {
   eventType: PropTypes.oneOf(['lecture', 'meeting', 'conference']).isRequired,
   startDt: PropTypes.string.isRequired,
   endDt: PropTypes.string.isRequired,
-  categoryPath: PropTypes.arrayOf(
-    PropTypes.shape({
-      id: PropTypes.number.isRequired,
-      title: PropTypes.string.isRequired,
-    })
-  ).isRequired,
+  categoryPath: pathPropType.isRequired,
   persons: PropTypes.arrayOf(
     PropTypes.shape({
       name: PropTypes.string.isRequired,
