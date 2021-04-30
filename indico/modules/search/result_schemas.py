@@ -213,7 +213,7 @@ class ResultItemSchema(OneOfSchema):
     }
 
     class Meta:
-        # OneOfEschema passes the own schema's `unknown` value to the target schemas
+        # OneOfSchema passes the own schema's `unknown` value to the target schemas
         unknown = EXCLUDE
 
     def get_obj_type(self, obj):
