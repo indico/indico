@@ -96,7 +96,7 @@ class SubContributionResultSchema(ContributionResultSchema):
 class AttachmentResultSchema(ResultSchemaBase):
     type = EnumField(SearchTarget, validate=require_search_target(SearchTarget.attachment))
     attachment_id = fields.Int(required=True)
-    folder_id = fields.Int(missing=1337)  # TODO make it required
+    folder_id = fields.Int(required=True)
     event_id = fields.Int(required=True)
     contribution_id = fields.Int(missing=None)
     subcontribution_id = fields.Int(missing=None)
@@ -122,7 +122,7 @@ class EventNoteResultSchema(ResultSchemaBase):
     subcontribution_id = fields.Int(missing=None)
     title = fields.String(required=True)
     user = fields.Nested(_PersonSchema, missing=None)
-    created_dt = fields.DateTime(required=True)
+    modified_dt = fields.DateTime(required=True)
     content = fields.String(required=True)
     highlight = fields.Nested(_HighlightSchema, missing=None)
     url = fields.Method('_get_url')
