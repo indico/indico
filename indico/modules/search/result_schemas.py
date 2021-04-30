@@ -81,7 +81,7 @@ class ContributionResultSchema(ResultSchemaBase):
     title = fields.String(required=True)
     description = fields.String(required=True)
     start_dt = fields.DateTime(missing=None)
-    end_dt = fields.DateTime(required=True)
+    end_dt = fields.DateTime(missing=None)
     persons = fields.List(fields.Nested(PersonSchema), required=True)
     duration = fields.TimeDelta(precision=fields.TimeDelta.MINUTES)
     highlight = fields.Nested(HighlightSchema, missing={})
