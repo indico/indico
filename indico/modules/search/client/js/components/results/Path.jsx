@@ -5,34 +5,36 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-import categoryURL from 'indico-url:categories.display';
-
 import PropTypes from 'prop-types';
 import React from 'react';
 import {Breadcrumb, Icon} from 'semantic-ui-react';
 
-import './CategoryPath.module.scss';
+import './Path.module.scss';
 
-export default function CategoryPath({path}) {
+export const pathPropType = PropTypes.arrayOf(
+  PropTypes.shape({
+    type: PropTypes.string.isRequired,
+    id: PropTypes.number.isRequired,
+    title: PropTypes.string.isRequired,
+    url: PropTypes.string.isRequired,
+  })
+);
+
+export function Path({path}) {
   const sections = path.map(item => ({
-    key: item.id,
-    href: categoryURL({category_id: item.id}),
+    key: `${item.type}-${item.id}`,
+    href: item.url,
     content: item.title,
   }));
 
   return (
-    <span styleName="category-path">
+    <span styleName="path">
       <Icon name="sitemap" />
       <Breadcrumb divider="»" sections={sections} />
     </span>
   );
 }
 
-CategoryPath.propTypes = {
-  path: PropTypes.arrayOf(
-    PropTypes.shape({
-      id: PropTypes.number.isRequired,
-      title: PropTypes.string.isRequired,
-    })
-  ).isRequired,
+Path.propTypes = {
+  path: pathPropType.isRequired,
 };
