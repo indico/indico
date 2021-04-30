@@ -21,7 +21,7 @@ const EventNote = ({title, url, content, highlight, categoryPath, eventPath}) =>
     <List.Description styleName="description">
       {highlight?.content
         ?.slice(0, 3) // eslint-disable-next-line react/no-array-index-key
-        .map((html, idx) => <span key={html + idx} dangerouslySetInnerHTML={{__html: html}} />) || (
+        .map((html, idx) => <div key={html + idx} dangerouslySetInnerHTML={{__html: html}} />) || (
         <span>{content.slice(0, 240)}</span>
       )}
       {categoryPath.length !== 0 && (
