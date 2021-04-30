@@ -7,7 +7,7 @@
 
 import math
 
-from flask import session
+from flask import jsonify, session
 from marshmallow import INCLUDE, fields
 from marshmallow_enum import EnumField
 from sqlalchemy.orm import undefer
@@ -54,7 +54,7 @@ class RHAPISearch(RH):
     }, location='query', unknown=INCLUDE)
     def _process(self, page, q, type, **params):
         search_provider = get_search_provider()
-        if not search_provider or type == [SearchTarget.category]:
+        if type == [SearchTarget.category]:
             search_provider = InternalSearch
         access = get_groups(session.user) if session.user else []
         total, pages, results, aggs = search_provider().search(q, access, page, type, **params)
@@ -64,6 +64,13 @@ class RHAPISearch(RH):
             'results': results,
             'aggregations': aggs
         }
+
+
+class RHAPISearchPlaceholders(RH):
+    def _process(self):
+        search_provider = get_search_provider()
+        placeholders = search_provider().get_placeholders()
+        return jsonify([p.dump() for p in placeholders])
 
 
 class InternalSearch(IndicoSearchProvider):
