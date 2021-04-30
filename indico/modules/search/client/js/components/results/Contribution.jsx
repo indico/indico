@@ -16,13 +16,22 @@ import PersonList from './PersonList';
 
 import '../ResultList.module.scss';
 
-export default function Contribution({url, title, startDt, persons, categoryPath, eventPath}) {
+export default function Contribution({
+  url,
+  title,
+  description,
+  startDt,
+  persons,
+  categoryPath,
+  eventPath,
+}) {
   return (
     <div styleName="item">
       <List.Header styleName="header">
         <a href={url}>{title}</a>
       </List.Header>
       <List.Description styleName="description">
+        {description && <span>{description.slice(0, 240)}</span>}
         {persons.length !== 0 && (
           <List.Item>
             <PersonList persons={persons} />
@@ -48,6 +57,7 @@ export default function Contribution({url, title, startDt, persons, categoryPath
 
 Contribution.propTypes = {
   title: PropTypes.string.isRequired,
+  description: PropTypes.string.isRequired,
   url: PropTypes.string.isRequired,
   startDt: PropTypes.string,
   persons: PropTypes.arrayOf(
