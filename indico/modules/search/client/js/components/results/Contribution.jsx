@@ -11,11 +11,12 @@ import {List, Icon} from 'semantic-ui-react';
 
 import {toMoment, serializeDate} from 'indico/utils/date';
 
+import {Path, pathPropType} from './Path';
 import PersonList from './PersonList';
 
 import '../ResultList.module.scss';
 
-function Contribution({url, title, startDt, persons}) {
+export default function Contribution({url, title, startDt, persons, categoryPath, eventPath}) {
   return (
     <div styleName="item">
       <List.Header styleName="header">
@@ -33,6 +34,13 @@ function Contribution({url, title, startDt, persons}) {
             {serializeDate(toMoment(startDt), 'DD MMMM YYYY HH:mm')}
           </List.Item>
         )}
+        {categoryPath.length !== 0 && (
+          <List.Item>
+            <List.Description>
+              <Path path={[...categoryPath, ...eventPath]} />
+            </List.Description>
+          </List.Item>
+        )}
       </List.Description>
     </div>
   );
@@ -48,11 +56,11 @@ Contribution.propTypes = {
       affiliation: PropTypes.string,
     })
   ),
+  categoryPath: pathPropType.isRequired,
+  eventPath: pathPropType.isRequired,
 };
 
 Contribution.defaultProps = {
-  startDt: undefined,
+  startDt: null,
   persons: [],
 };
-
-export default Contribution;

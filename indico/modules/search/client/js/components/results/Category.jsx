@@ -9,7 +9,7 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import {List} from 'semantic-ui-react';
 
-import CategoryPath from './CategoryPath';
+import {Path} from './Path';
 import '../ResultList.module.scss';
 
 export default function Category({title, path, url}) {
@@ -21,7 +21,7 @@ export default function Category({title, path, url}) {
       {path.length !== 0 && (
         <div styleName="description">
           <List.Description>
-            <CategoryPath path={path} />
+            <Path path={path} />
           </List.Description>
         </div>
       )}
