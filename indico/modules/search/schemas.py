@@ -20,11 +20,6 @@ from indico.modules.users.models.users import User
 from indico.web.flask.util import url_for
 
 
-class PlaceholderSchema(mm.Schema):
-    key = fields.String(required=True)
-    label = fields.String(required=True)
-
-
 class CategorySchema(mm.SQLAlchemyAutoSchema):
     class Meta:
         model = Category

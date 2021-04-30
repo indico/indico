@@ -5,6 +5,8 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
+import dataclasses
+
 from indico.core import signals
 from indico.util.enum import IndicoEnum
 from indico.util.signals import values_from_signal
@@ -26,6 +28,15 @@ class SearchTarget(int, IndicoEnum):
     attachment = 6
 
 
+@dataclasses.dataclass
+class SearchPlaceholder:
+    key: str
+    label: str
+
+    def dump(self):
+        return dataclasses.asdict(self)
+
+
 class IndicoSearchProvider:
     RESULTS_PER_PAGE = 10
 
@@ -41,4 +52,10 @@ class IndicoSearchProvider:
         raise NotImplementedError()
 
     def get_placeholders(self):
+        """
+        Retrieve the list of search shortcuts that will be shown to users
+        when typing a search query.
+
+        :return: a list of `SearchPlaceholder` instances
+        """
         return []
