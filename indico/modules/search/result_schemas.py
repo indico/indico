@@ -16,34 +16,27 @@ from indico.modules.search.base import SearchTarget
 from indico.web.flask.util import url_for
 
 
-class _CategoryPathSchema(mm.Schema):
+class _ResultSchemaBase(mm.Schema):
     class Meta:
         unknown = EXCLUDE
 
+
+class CategoryPathSchema(_ResultSchemaBase):
     id = fields.Int(required=True)
     title = fields.String(required=True)
 
 
-class _PersonSchema(mm.Schema):
-    class Meta:
-        unknown = EXCLUDE
-
+class PersonSchema(_ResultSchemaBase):
     name = fields.String(required=True)
     affiliation = fields.String(missing='')
 
 
-class _HighlightSchema(mm.Schema):
-    class Meta:
-        unknown = EXCLUDE
-
+class HighlightSchema(_ResultSchemaBase):
     content = fields.List(fields.String())
 
 
-class ResultSchemaBase(mm.Schema):
-    class Meta:
-        unknown = EXCLUDE
-
-    category_path = fields.List(fields.Nested(_CategoryPathSchema), required=True)
+class ResultSchemaBase(_ResultSchemaBase):
+    category_path = fields.List(fields.Nested(CategoryPathSchema), required=True)
 
 
 def require_search_target(target):
@@ -61,7 +54,7 @@ class EventResultSchema(ResultSchemaBase):
     event_type = EnumField(EventType, required=True)
     start_dt = fields.DateTime(required=True)
     end_dt = fields.DateTime(required=True)
-    persons = fields.List(fields.Nested(_PersonSchema), required=True)
+    persons = fields.List(fields.Nested(PersonSchema), required=True)
     url = fields.Method('_get_url')
 
     def _get_url(self, data):
@@ -75,7 +68,7 @@ class ContributionResultSchema(ResultSchemaBase):
     title = fields.String(required=True)
     start_dt = fields.DateTime(missing=None)
     end_dt = fields.DateTime(required=True)
-    persons = fields.List(fields.Nested(_PersonSchema), required=True)
+    persons = fields.List(fields.Nested(PersonSchema), required=True)
     duration = fields.TimeDelta(precision=fields.TimeDelta.MINUTES)
     url = fields.Method('_get_url')
 
@@ -102,7 +95,7 @@ class AttachmentResultSchema(ResultSchemaBase):
     subcontribution_id = fields.Int(missing=None)
     title = fields.String(required=True)
     filename = fields.String(missing=None)
-    user = fields.Nested(_PersonSchema, missing=None)
+    user = fields.Nested(PersonSchema, missing=None)
     attachment_type = EnumField(AttachmentType, required=True)
     modified_dt = fields.DateTime(required=True)
     url = fields.Method('_get_url')
@@ -121,10 +114,10 @@ class EventNoteResultSchema(ResultSchemaBase):
     contribution_id = fields.Int(missing=None)
     subcontribution_id = fields.Int(missing=None)
     title = fields.String(required=True)
-    user = fields.Nested(_PersonSchema, missing=None)
+    user = fields.Nested(PersonSchema, missing=None)
     modified_dt = fields.DateTime(required=True)
     content = fields.String(required=True)
-    highlight = fields.Nested(_HighlightSchema, missing=None)
+    highlight = fields.Nested(HighlightSchema, missing=None)
     url = fields.Method('_get_url')
 
     def _get_url(self, data):
@@ -132,19 +125,13 @@ class EventNoteResultSchema(ResultSchemaBase):
                        contrib_id=data['contribution_id'], subcontrib_id=data['subcontribution_id'])
 
 
-class BucketSchema(mm.Schema):
-    class Meta:
-        unknown = EXCLUDE
-
+class BucketSchema(_ResultSchemaBase):
     key = fields.String(required=True)
     doc_count = fields.Int(required=True)
     filter = fields.String(required=True)
 
 
-class AggregationSchema(mm.Schema):
-    class Meta:
-        unknown = EXCLUDE
-
+class AggregationSchema(_ResultSchemaBase):
     label = fields.String(required=True)
     buckets = fields.List(fields.Nested(BucketSchema), required=True)
 
@@ -175,10 +162,7 @@ class ResultItemSchema(OneOfSchema):
         return rv
 
 
-class ResultSchema(mm.Schema):
-    class Meta:
-        unknown = EXCLUDE
-
+class ResultSchema(_ResultSchemaBase):
     total = fields.Int(required=True)
     pages = fields.Int(required=True)
     results = fields.List(fields.Nested(ResultItemSchema), required=True)
