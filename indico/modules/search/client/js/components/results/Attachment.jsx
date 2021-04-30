@@ -11,6 +11,7 @@ import {List, Icon} from 'semantic-ui-react';
 
 import {toMoment, serializeDate} from 'indico/utils/date';
 
+import {Path, pathPropType} from './Path';
 import PersonList from './PersonList';
 
 import '../ResultList.module.scss';
@@ -39,7 +40,16 @@ const iconSelector = filename => {
   }
 };
 
-const File = ({title, url, attachmentType: type, filename, modifiedDt, user}) => (
+const Attachment = ({
+  title,
+  url,
+  attachmentType: type,
+  filename,
+  modifiedDt,
+  user,
+  categoryPath,
+  eventPath,
+}) => (
   <div styleName="item">
     <List.Header styleName="header">
       <Icon size="large" {...(type === 'file' ? iconSelector(filename) : {name: 'linkify'})} />
@@ -55,11 +65,18 @@ const File = ({title, url, attachmentType: type, filename, modifiedDt, user}) =>
         <Icon name="calendar alternate outline" />
         {serializeDate(toMoment(modifiedDt), 'DD MMMM YYYY HH:mm')}
       </List.Item>
+      {categoryPath.length !== 0 && (
+        <List.Item>
+          <List.Description>
+            <Path path={[...categoryPath, ...eventPath]} />
+          </List.Description>
+        </List.Item>
+      )}
     </List.Description>
   </div>
 );
 
-File.propTypes = {
+Attachment.propTypes = {
   title: PropTypes.string.isRequired,
   url: PropTypes.string.isRequired,
   attachmentType: PropTypes.oneOf(['file', 'link']).isRequired,
@@ -69,11 +86,13 @@ File.propTypes = {
     name: PropTypes.string.isRequired,
     affiliation: PropTypes.string,
   }),
+  categoryPath: pathPropType.isRequired,
+  eventPath: pathPropType.isRequired,
 };
 
-File.defaultProps = {
+Attachment.defaultProps = {
   filename: undefined,
   user: null,
 };
 
-export default File;
+export default Attachment;

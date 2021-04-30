@@ -16,11 +16,11 @@ import {Param, Translate} from 'indico/react/i18n';
 import {camelizeKeys} from 'indico/utils/case';
 
 import ResultList from './ResultList';
+import Attachment from './results/Attachment';
 import Category from './results/Category';
 import Contribution from './results/Contribution';
 import Event from './results/Event';
 import EventNote from './results/EventNote';
-import File from './results/File';
 import SearchBar from './SearchBar';
 import SideBar from './SideBar';
 
@@ -139,7 +139,7 @@ export default function SearchApp() {
     [Translate.string('Categories'), categoryResults, setCategoryPage, Category],
     [Translate.string('Events'), eventResults, setEventPage, Event],
     [Translate.string('Contributions'), contributionResults, setContributionPage, Contribution],
-    [Translate.string('Materials'), fileResults, setFilePage, File],
+    [Translate.string('Materials'), fileResults, setFilePage, Attachment],
     [Translate.string('Notes'), noteResults, setNotePage, EventNote],
   ];
   // Defaults to the first tab loading or with results
