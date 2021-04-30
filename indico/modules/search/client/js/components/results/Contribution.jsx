@@ -11,6 +11,7 @@ import {List, Icon} from 'semantic-ui-react';
 
 import {toMoment, serializeDate} from 'indico/utils/date';
 
+import Highlight from './Highlight';
 import {Path, pathPropType} from './Path';
 import PersonList from './PersonList';
 
@@ -20,6 +21,7 @@ export default function Contribution({
   url,
   title,
   description,
+  highlight,
   startDt,
   persons,
   categoryPath,
@@ -31,7 +33,7 @@ export default function Contribution({
         <a href={url}>{title}</a>
       </List.Header>
       <List.Description styleName="description">
-        {description && <span>{description.slice(0, 240)}</span>}
+        <Highlight text={description} highlight={highlight.description} />
         {persons.length !== 0 && (
           <List.Item>
             <PersonList persons={persons} />
@@ -65,12 +67,14 @@ Contribution.propTypes = {
       name: PropTypes.string.isRequired,
       affiliation: PropTypes.string,
     })
-  ),
+  ).isRequired,
+  highlight: PropTypes.shape({
+    description: PropTypes.array,
+  }).isRequired,
   categoryPath: pathPropType.isRequired,
   eventPath: pathPropType.isRequired,
 };
 
 Contribution.defaultProps = {
   startDt: null,
-  persons: [],
 };
