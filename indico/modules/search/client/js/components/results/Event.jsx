@@ -32,13 +32,23 @@ const renderDates = (startDt, endDt) =>
     </List.Item>
   );
 
-export default function Event({eventType, url, title, categoryPath, startDt, endDt, persons}) {
+export default function Event({
+  eventType,
+  url,
+  title,
+  description,
+  categoryPath,
+  startDt,
+  endDt,
+  persons,
+}) {
   return (
     <div styleName="item">
       <List.Header styleName="header">
         <a href={url}>{title}</a>
       </List.Header>
       <List.Description styleName="description">
+        {description && <span>{description.slice(0, 240)}</span>}
         {['lecture', 'meeting'].includes(eventType) && persons.length !== 0 && (
           <List.Item>
             <PersonList persons={persons} />
@@ -63,6 +73,7 @@ Event.defaultProps = {
 
 Event.propTypes = {
   title: PropTypes.string.isRequired,
+  description: PropTypes.string.isRequired,
   url: PropTypes.string.isRequired,
   eventType: PropTypes.oneOf(['lecture', 'meeting', 'conference']).isRequired,
   startDt: PropTypes.string.isRequired,
