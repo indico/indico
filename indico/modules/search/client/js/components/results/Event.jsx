@@ -12,6 +12,7 @@ import {List, Icon} from 'semantic-ui-react';
 
 import {toMoment, serializeDate} from 'indico/utils/date';
 
+import Highlight from './Highlight';
 import {Path, pathPropType} from './Path';
 import PersonList from './PersonList';
 
@@ -37,6 +38,7 @@ export default function Event({
   url,
   title,
   description,
+  highlight,
   categoryPath,
   startDt,
   endDt,
@@ -48,7 +50,7 @@ export default function Event({
         <a href={url}>{title}</a>
       </List.Header>
       <List.Description styleName="description">
-        {description && <span>{description.slice(0, 240)}</span>}
+        <Highlight text={description} highlight={highlight.description} />
         {['lecture', 'meeting'].includes(eventType) && persons.length !== 0 && (
           <List.Item>
             <PersonList persons={persons} />
@@ -67,10 +69,6 @@ export default function Event({
   );
 }
 
-Event.defaultProps = {
-  persons: [],
-};
-
 Event.propTypes = {
   title: PropTypes.string.isRequired,
   description: PropTypes.string.isRequired,
@@ -84,5 +82,8 @@ Event.propTypes = {
       name: PropTypes.string.isRequired,
       affiliation: PropTypes.string.isRequired,
     })
-  ),
+  ).isRequired,
+  highlight: PropTypes.shape({
+    description: PropTypes.array,
+  }).isRequired,
 };
