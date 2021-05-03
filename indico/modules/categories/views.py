@@ -5,12 +5,14 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
+from flask import request
 from markupsafe import escape
 
 from indico.modules.admin.views import WPAdmin
 from indico.util.i18n import _
 from indico.util.mathjax import MathjaxMixin
 from indico.web.breadcrumbs import render_breadcrumbs
+from indico.web.flask.util import url_for
 from indico.web.views import WPDecorated, WPJinjaMixin, render_header
 
 
@@ -78,10 +80,18 @@ class WPCategoryManagement(WPCategory):
         return render_header(category=self.category, protected_object=self.category,
                              local_tz=self.category.timezone, force_local_tz=True)
 
+    def _get_parent_category_breadcrumb_url(self, category, management=False):
+        if not management:
+            return category.url
+        params = dict(request.view_args, **request.args.to_dict(False))
+        del params['category_id']
+        return url_for(request.endpoint, category, **params)
+
     def _get_breadcrumbs(self):
         if self.category.is_root:
             return ''
-        return render_breadcrumbs(category=self.category, management=True)
+        return render_breadcrumbs(category=self.category, management=True,
+                                  category_url_factory=self._get_parent_category_breadcrumb_url)
 
 
 class WPCategoryStatistics(WPCategory):
