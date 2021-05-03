@@ -103,6 +103,5 @@ class InternalSearch(IndicoSearchProvider):
                            ~Event.is_deleted)
                    .order_by(db.func.lower(Event.title))
                    .paginate(page, IndicoSearchProvider.RESULTS_PER_PAGE))
-        # XXX make this less ugly when getting rid of type_format outside the citadel plugin
-        res = [{'event_type': ev.pop('type_format'), **ev} for ev in EventSchema(many=True).dump(results.items)]
+        res = EventSchema(many=True).dump(results.items)
         return results.total, EventResultSchema(many=True).load(res)
