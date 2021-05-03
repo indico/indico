@@ -193,7 +193,7 @@ export default function SearchApp({category}) {
 }
 
 SearchApp.propTypes = {
-  category: PropTypes.string,
+  category: PropTypes.number,
 };
 
 SearchApp.defaultProps = {
