@@ -61,12 +61,12 @@ class LocationSchema(mm.Schema):
 class EventSchema(mm.SQLAlchemyAutoSchema):
     class Meta:
         model = Event
-        fields = ('event_id', 'type', 'type_format', 'title', 'description', 'url', 'keywords', 'location', 'persons',
+        fields = ('event_id', 'type', 'event_type', 'title', 'description', 'url', 'keywords', 'location', 'persons',
                   'category_id', 'category_path', 'start_dt', 'end_dt')
 
     event_id = fields.Int(attribute='id')
     type = fields.Constant(SearchTarget.event.name)
-    type_format = fields.String(attribute='_type.name')
+    event_type = fields.String(attribute='_type.name')
     location = fields.Function(lambda event: LocationSchema().dump(event))
     persons = NoneRemovingList(fields.Nested(PersonSchema), attribute='person_links')
     category_id = fields.Int()
