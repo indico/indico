@@ -5,7 +5,7 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from flask import render_template
+from flask import render_template, session
 
 from indico.util.i18n import _
 from indico.web.flask.util import url_for
@@ -38,7 +38,7 @@ def render_breadcrumbs(*titles, category=None, event=None, management=False, cat
             category = event.category
         if category_url_factory is None:
             category_url_factory = lambda cat, management: (url_for('categories.manage_content', cat)
-                                                            if management
+                                                            if management and cat.can_manage(session.user)
                                                             else cat.url)
         for cat in category.chain_query[::-1]:
             items.append((cat.title, category_url_factory(cat, management=management)))
