@@ -29,7 +29,7 @@ class DetailedCategorySchema(mm.SQLAlchemyAutoSchema):
         fields = ('type', 'category_id', 'title', 'category_path')
 
     category_id = fields.Int(attribute='id')
-    type = fields.Constant(SearchTarget.category)
+    type = fields.Constant(SearchTarget.category.name)
     category_path = fields.List(fields.Nested(CategorySchema), attribute='chain')
 
     @post_dump
