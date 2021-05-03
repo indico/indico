@@ -18,7 +18,7 @@ from indico.modules.categories import Category
 from indico.modules.events import Event
 from indico.modules.groups import GroupProxy
 from indico.modules.search.base import IndicoSearchProvider, SearchTarget, get_search_provider
-from indico.modules.search.result_schemas import ResultSchema
+from indico.modules.search.result_schemas import EventResultSchema, ResultSchema
 from indico.modules.search.schemas import DetailedCategorySchema, EventSchema
 from indico.modules.search.views import WPSearch
 from indico.util.caching import memoize_redis
@@ -71,13 +71,17 @@ class RHAPISearchPlaceholders(RH):
 
 class InternalSearch(IndicoSearchProvider):
     def search(self, query, access, page=1, object_types=(), **params):
-        if SearchTarget.category in object_types:
+        if object_types == [SearchTarget.category]:
             total, results = InternalSearch.search_categories(page, query)
-        elif SearchTarget.event in object_types:
+        elif object_types == [SearchTarget.event]:
             total, results = InternalSearch.search_events(page, query)
         else:
             total, results = 0, []
-        return total, math.ceil(total / self.RESULTS_PER_PAGE), results, {}
+        return {
+            'total': total,
+            'pages': math.ceil(total / self.RESULTS_PER_PAGE),
+            'results': results,
+        }
 
     @staticmethod
     def search_categories(page, q):
@@ -99,4 +103,6 @@ class InternalSearch(IndicoSearchProvider):
                            ~Event.is_deleted)
                    .order_by(db.func.lower(Event.title))
                    .paginate(page, IndicoSearchProvider.RESULTS_PER_PAGE))
-        return results.total, EventSchema(many=True).dump(results.items)
+        # XXX make this less ugly when getting rid of type_format outside the citadel plugin
+        res = [{'event_type': ev.pop('type_format'), **ev} for ev in EventSchema(many=True).dump(results.items)]
+        return results.total, EventResultSchema(many=True).load(res)

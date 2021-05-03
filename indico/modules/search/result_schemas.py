@@ -57,6 +57,16 @@ def require_search_target(target):
     return validate
 
 
+class CategoryResultSchema(ResultSchemaBase):
+    type = EnumField(SearchTarget, validate=require_search_target(SearchTarget.category))
+    category_id = fields.Int(required=True)
+    title = fields.String(required=True)
+    url = fields.Method('_get_url')
+
+    def _get_url(self, data):
+        return url_for('categories.display', category_id=data['category_id'])
+
+
 class EventResultSchema(ResultSchemaBase):
     type = EnumField(SearchTarget, validate=require_search_target(SearchTarget.event))
     event_id = fields.Int(required=True)
@@ -205,6 +215,7 @@ class ResultItemSchema(OneOfSchema):
     type_field = 'type'
     type_field_remove = False
     type_schemas = {
+        SearchTarget.category.name: CategoryResultSchema,
         SearchTarget.event.name: EventResultSchema,
         SearchTarget.contribution.name: ContributionResultSchema,
         SearchTarget.subcontribution.name: SubContributionResultSchema,
