@@ -9,19 +9,20 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import {List} from 'semantic-ui-react';
 
-import {Path} from './Path';
+import {Path, pathPropType} from './Path';
+
 import '../ResultList.module.scss';
 
-export default function Category({title, path, url}) {
+export default function Category({title, categoryPath, url}) {
   return (
     <div styleName="item">
       <List.Header styleName="header">
         <a href={url}>{title}</a>
       </List.Header>
-      {path.length !== 0 && (
+      {categoryPath.length !== 0 && (
         <div styleName="description">
           <List.Description>
-            <Path path={path} />
+            <Path path={categoryPath} />
           </List.Description>
         </div>
       )}
@@ -31,12 +32,6 @@ export default function Category({title, path, url}) {
 
 Category.propTypes = {
   title: PropTypes.string.isRequired,
-  path: PropTypes.arrayOf(
-    PropTypes.shape({
-      id: PropTypes.number.isRequired,
-      title: PropTypes.string.isRequired,
-      url: PropTypes.string.isRequired,
-    })
-  ).isRequired,
+  categoryPath: pathPropType.isRequired,
   url: PropTypes.string.isRequired,
 };

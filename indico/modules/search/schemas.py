@@ -30,13 +30,15 @@ class CategorySchema(mm.SQLAlchemyAutoSchema):
 
 class DetailedCategorySchema(mm.SQLAlchemyAutoSchema):
     class Meta:
-        fields = ('id', 'title', 'url', 'path')
+        fields = ('type', 'category_id', 'title', 'category_path')
 
-    path = fields.List(fields.Nested(CategorySchema), attribute='chain')
+    category_id = fields.Int(attribute='id')
+    type = fields.Constant(SearchTarget.category)
+    category_path = fields.List(fields.Nested(CategorySchema), attribute='chain')
 
     @post_dump
     def update_path(self, c, **kwargs):
-        c['path'] = c['path'][:-1]
+        c['category_path'] = c['category_path'][:-1]
         return c
 
 
