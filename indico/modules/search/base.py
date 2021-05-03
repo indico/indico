@@ -29,7 +29,7 @@ class SearchTarget(int, IndicoEnum):
 
 
 @dataclasses.dataclass
-class SearchPlaceholder:
+class SearchFilter:
     key: str
     label: str
 
@@ -58,6 +58,15 @@ class IndicoSearchProvider:
         Retrieve the list of search shortcuts that will be shown to users
         when typing a search query.
 
-        :return: a list of `SearchPlaceholder` instances
+        :return: a list of `SearchFilter` instances
+        """
+        return []
+
+    def get_filters(self):
+        """
+        Retrieve the list of search filters available as aggregations to
+        each query result.
+
+        :return: a list of `SearchFilter` instances
         """
         return []
