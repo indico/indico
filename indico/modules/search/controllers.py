@@ -18,7 +18,7 @@ from indico.modules.categories import Category
 from indico.modules.events import Event
 from indico.modules.groups import GroupProxy
 from indico.modules.search.base import IndicoSearchProvider, SearchTarget, get_search_provider
-from indico.modules.search.result_schemas import EventResultSchema, ResultSchema
+from indico.modules.search.result_schemas import CategoryResultSchema, EventResultSchema, ResultSchema
 from indico.modules.search.schemas import DetailedCategorySchema, EventSchema
 from indico.modules.search.views import WPSearch
 from indico.util.caching import memoize_redis
@@ -93,7 +93,8 @@ class InternalSearch(IndicoSearchProvider):
                    .paginate(page, IndicoSearchProvider.RESULTS_PER_PAGE))
         # XXX should we only show categories the user can access?
         # this would be nicer but then we can't easily paginate...
-        return results.total, DetailedCategorySchema(many=True).dump(results.items)
+        res = DetailedCategorySchema(many=True).dump(results.items)
+        return results.total, CategoryResultSchema(many=True).load(res)
 
     @staticmethod
     def search_events(page, q):
