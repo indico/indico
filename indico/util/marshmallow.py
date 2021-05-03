@@ -11,7 +11,7 @@ from uuid import UUID
 
 from dateutil import parser, relativedelta
 from marshmallow import ValidationError
-from marshmallow.fields import DateTime, Field
+from marshmallow.fields import DateTime, Field, List
 from marshmallow.utils import from_iso_datetime
 from sqlalchemy import inspect
 
@@ -352,3 +352,13 @@ class FileField(ModelField):
         if not self.allow_claimed and rv is not None and rv.claimed:
             self.fail('claimed')
         return rv
+
+
+class NoneRemovingList(List):
+    """Marshmallow field for a `List` that skips None during serialization."""
+
+    def _serialize(self, value, attr, obj, **kwargs):
+        rv = super()._serialize(value, attr, obj, **kwargs)
+        if rv is None:
+            return None
+        return [x for x in rv if x is not None]
