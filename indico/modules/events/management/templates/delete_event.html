@@ -17,7 +17,7 @@
 {% endset %}
 
 {% call confirmation_dialog('danger', message=confirmation_message, ok_text=_('Delete event')) %}
-    {% trans event_title=event.title -%}
-        You are about to <strong>delete</strong> the whole event "<strong>{{ event_title }}</strong>"!
+    {% trans event_title=event.title, event_date=event.start_dt|format_date(timezone=event.tzinfo) -%}
+        You are about to <strong>delete</strong> the whole event <strong>{{ event_title }} ({{ event_date }})</strong>
     {%- endtrans %}
 {% endcall %}
