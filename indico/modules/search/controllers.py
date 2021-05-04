@@ -78,9 +78,9 @@ class RHAPISearchPlaceholders(RH):
 class InternalSearch(IndicoSearchProvider):
     def search(self, query, access, page=1, object_types=(), **params):
         if object_types == [SearchTarget.category]:
-            total, results = InternalSearch.search_categories(page, query, params['category_id'])
+            total, results = InternalSearch.search_categories(page, query, params.get('category_id'))
         elif object_types == [SearchTarget.event]:
-            total, results = InternalSearch.search_events(page, query, params['category_id'])
+            total, results = InternalSearch.search_events(page, query, params.get('category_id'))
         else:
             total, results = 0, []
         return {
@@ -91,47 +91,32 @@ class InternalSearch(IndicoSearchProvider):
 
     @staticmethod
     def search_categories(page, q, category_id):
-        results = (Category.query
+        query = Category.query if not category_id else Category.get(category_id).deep_children_query
+
+        results = (query
                    .filter(Category.title_matches(q),
                            ~Category.is_deleted)
                    .options(undefer('chain'))
                    .order_by(db.func.lower(Category.title))
                    .paginate(page, IndicoSearchProvider.RESULTS_PER_PAGE))
+
         # XXX should we only show categories the user can access?
         # this would be nicer but then we can't easily paginate...
         res = DetailedCategorySchema(many=True).dump(results.items)
         return results.total, CategoryResultSchema(many=True).load(res)
 
     @staticmethod
-    def search_subcategories(page, q, category_id):
-        results = (Category.get(category_id).deep_children_query
-                   .filter(Category.title_matches(q),
-                           ~Category.is_deleted)
-                   .options(undefer('chain'))
-                   .order_by(db.func.lower(Category.title))
-                   .paginate(page, IndicoSearchProvider.RESULTS_PER_PAGE))
-        # XXX should we only show categories the user can access?
-        # this would be nicer but then we can't easily paginate...
-        return results.total, DetailedCategorySchema(many=True).dump(results.items)
-
-    @staticmethod
     def search_events(page, q, category_id):
+        filters = [Event.title_matches(q), Event.effective_protection_mode == ProtectionMode.public,
+                   ~Event.is_deleted]
+
+        if category_id is not None:
+            filters.append(Event.category_chain_overlaps(category_id))
+
         results = (Event.query
-                   .filter(Event.title_matches(q),
-                           Event.effective_protection_mode == ProtectionMode.public,
-                           ~Event.is_deleted)
+                   .filter(*filters)
                    .order_by(db.func.lower(Event.title))
                    .paginate(page, IndicoSearchProvider.RESULTS_PER_PAGE))
+
         res = EventSchema(many=True).dump(results.items)
         return results.total, EventResultSchema(many=True).load(res)
-
-    @staticmethod
-    def search_category_events(page, q, category_id):
-        results = (Event.query
-                   .filter(Event.category_chain_overlaps(category_id),
-                           Event.title_matches(q),
-                           Event.effective_protection_mode == ProtectionMode.public,
-                           ~Event.is_deleted)
-                   .order_by(db.func.lower(Event.title))
-                   .paginate(page, IndicoSearchProvider.RESULTS_PER_PAGE))
-        return results.total, EventSchema(many=True).dump(results.items)

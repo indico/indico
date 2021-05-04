@@ -35,12 +35,12 @@ const camelizeValues = obj =>
     {}
   );
 
-function useSearch(url, query, type, category) {
+function useSearch(url, query, type, categoryId) {
   const [page, setPage] = useState(1);
 
   const {data, loading, lastData} = useIndicoAxios({
     url,
-    options: {params: {...query, type, page, category}},
+    options: {params: {...query, type, page, category_id: categoryId}},
     forceDispatchEffect: () => query?.q,
     trigger: [url, query, page],
   });
@@ -123,20 +123,20 @@ NoResults.defaultProps = {
   query: undefined,
 };
 
-export default function SearchApp({category}) {
+export default function SearchApp({categoryId}) {
   const [query, setQuery] = useQueryParams();
   const [activeMenuItem, setActiveMenuItem] = useState(undefined);
   const {q, ...filters} = query;
-  const [categoryResults, setCategoryPage] = useSearch(searchURL(), query, 'category', category);
-  const [eventResults, setEventPage] = useSearch(searchURL(), query, 'event', category);
+  const [categoryResults, setCategoryPage] = useSearch(searchURL(), query, 'category', categoryId);
+  const [eventResults, setEventPage] = useSearch(searchURL(), query, 'event', categoryId);
   const [contributionResults, setContributionPage] = useSearch(
     searchURL(),
     query,
     ['contribution', 'subcontribution'],
-    category
+    categoryId
   );
-  const [fileResults, setFilePage] = useSearch(searchURL(), query, 'attachment', category);
-  const [noteResults, setNotePage] = useSearch(searchURL(), query, 'event_note', category);
+  const [fileResults, setFilePage] = useSearch(searchURL(), query, 'attachment', categoryId);
+  const [noteResults, setNotePage] = useSearch(searchURL(), query, 'event_note', categoryId);
   const searchMap = [
     [Translate.string('Categories'), categoryResults, setCategoryPage, Category],
     [Translate.string('Events'), eventResults, setEventPage, Event],
@@ -193,9 +193,9 @@ export default function SearchApp({category}) {
 }
 
 SearchApp.propTypes = {
-  category: PropTypes.number,
+  categoryId: PropTypes.number,
 };
 
 SearchApp.defaultProps = {
-  category: undefined,
+  categoryId: undefined,
 };

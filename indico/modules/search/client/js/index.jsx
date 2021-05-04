@@ -16,7 +16,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   ReactDOM.render(
     <Router>
-      <SearchApp category={root.dataset.categoryId} />
+      <SearchApp categoryId={parseInt(root.dataset.categoryId, 10) || undefined} />
     </Router>,
     root
   );
