@@ -3,9 +3,9 @@
 {% block page_class %}search-page{% endblock %}
 
 {% block title %}
-    {% trans %}Search within category:{% endtrans %} {{ category.title }}
+    {% trans %}Searching within{% endtrans %} "{{ category.title }}"
 {% endblock %}
 
 {% block content %}
-    <div id="search-root" data-category-id="{{ category.id }}"></div>
+    <div id="search-root" data-id="{{ category.id }}" data-title="{{ category.title }}"></div>
 {% endblock %}

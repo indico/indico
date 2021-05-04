@@ -6,6 +6,7 @@
 // LICENSE file for more details.
 
 import searchURL from 'indico-url:search.api_search';
+import searchPageURL from 'indico-url:search.search';
 
 import PropTypes from 'prop-types';
 import React, {useEffect, useMemo, useState} from 'react';
@@ -96,37 +97,89 @@ SearchTypeMenuItem.defaultProps = {
   onClick: undefined,
 };
 
-function NoResults({query}) {
-  return (
-    <Message warning={!!query}>
-      {query ? (
-        <>
-          <Message.Header>
-            <Translate>No Results</Translate>
-          </Message.Header>
+function ResultHeader({query, hasResults, categoryTitle}) {
+  const isGlobal = !categoryTitle;
+
+  // initial message when no search has been performed
+  if (!query && !hasResults) {
+    return (
+      <Message>
+        {isGlobal ? (
+          <Translate>Enter a term above to begin searching.</Translate>
+        ) : (
+          <Translate>
+            Enter a term above to begin searching inside the{' '}
+            <Param name="categoryTitle" value={categoryTitle} wrapper={<strong />} /> category. You
+            can{' '}
+            <Param name="link" wrapper={<a href={searchPageURL()} />}>
+              search all of Indico instead
+            </Param>
+            .
+          </Translate>
+        )}
+      </Message>
+    );
+  }
+
+  // after search, no results
+  if (query && !hasResults) {
+    return (
+      <Message warning={!!query}>
+        <Message.Header>
+          <Translate>No Results</Translate>
+        </Message.Header>
+        {isGlobal ? (
           <Translate>
             Your search - <Param name="query" value={query} /> - did not match any results
           </Translate>
-        </>
-      ) : (
-        <Translate>Please enter a term above to begin searching</Translate>
-      )}
-    </Message>
-  );
+        ) : (
+          <Translate>
+            Your search - <Param name="query" value={query} /> - did not match any results. You
+            could try{' '}
+            <Param name="link" wrapper={<a href={searchPageURL({q: query})} />}>
+              searching all of Indico instead
+            </Param>
+            .
+          </Translate>
+        )}
+      </Message>
+    );
+  }
+
+  // after search in a category, offer global search
+  if (hasResults && !isGlobal) {
+    return (
+      <Message>
+        Showing results inside{' '}
+        <Param name="categoryTitle" value={categoryTitle} wrapper={<strong />} /> category. You can{' '}
+        <Param name="link" wrapper={<a href={searchPageURL({q: query})} />}>
+          search all of Indico instead
+        </Param>
+        .
+      </Message>
+    );
+  }
+
+  return null;
 }
 
-NoResults.propTypes = {
+ResultHeader.propTypes = {
+  hasResults: PropTypes.bool,
   query: PropTypes.string,
+  categoryTitle: PropTypes.string,
 };
 
-NoResults.defaultProps = {
+ResultHeader.defaultProps = {
+  hasResults: false,
   query: undefined,
+  categoryTitle: undefined,
 };
 
-export default function SearchApp({categoryId}) {
+export default function SearchApp({category}) {
   const [query, setQuery] = useQueryParams();
   const [activeMenuItem, setActiveMenuItem] = useState(undefined);
   const {q, ...filters} = query;
+  const {id: categoryId, title: categoryTitle} = category;
   const [categoryResults, setCategoryPage] = useSearch(searchURL(), query, 'category', categoryId);
   const [eventResults, setEventPage] = useSearch(searchURL(), query, 'event', categoryId);
   const [contributionResults, setContributionPage] = useSearch(
@@ -175,7 +228,10 @@ export default function SearchApp({categoryId}) {
             />
           ))}
         </Menu>
-        {q && (results.total || isAnyLoading) ? (
+        {!isAnyLoading && (
+          <ResultHeader query={q} hasResults={!!results.total} categoryTitle={categoryTitle} />
+        )}
+        {q && (results.total || isAnyLoading) && (
           <ResultList
             component={Component}
             page={results.page}
@@ -184,8 +240,6 @@ export default function SearchApp({categoryId}) {
             onPageChange={setPage}
             loading={results.loading}
           />
-        ) : (
-          <NoResults query={q} />
         )}
       </Grid.Column>
     </Grid>
@@ -193,9 +247,8 @@ export default function SearchApp({categoryId}) {
 }
 
 SearchApp.propTypes = {
-  categoryId: PropTypes.number,
-};
-
-SearchApp.defaultProps = {
-  categoryId: undefined,
+  category: PropTypes.shape({
+    id: PropTypes.number,
+    title: PropTypes.string,
+  }).isRequired,
 };
