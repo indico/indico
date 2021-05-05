@@ -6,11 +6,12 @@
 // LICENSE file for more details.
 
 import searchURL from 'indico-url:search.api_search';
+import searchOptionsURL from 'indico-url:search.api_search_options';
 import searchPageURL from 'indico-url:search.search';
 
 import PropTypes from 'prop-types';
 import React, {useEffect, useMemo, useState} from 'react';
-import {Grid, Loader, Menu, Message} from 'semantic-ui-react';
+import {Dropdown, Grid, Loader, Menu, Message} from 'semantic-ui-react';
 
 import {useIndicoAxios, useQueryParams} from 'indico/react/hooks';
 import {Param, Translate} from 'indico/react/i18n';
@@ -175,10 +176,40 @@ ResultHeader.defaultProps = {
   categoryTitle: undefined,
 };
 
+function SearchOptions({sort, sortOptions, onSortChange}) {
+  const selected = sortOptions.find(x => x.key === sort) || sortOptions[0];
+
+  return !sortOptions.length ? null : (
+    <div styleName="search-options">
+      <Dropdown
+        text={Translate.string('Sort by: {value}', {value: selected.label})}
+        onChange={(e, data) => onSortChange(data.value)}
+        options={sortOptions.map(x => ({value: x.key, text: x.label}))}
+      />
+    </div>
+  );
+}
+
+SearchOptions.propTypes = {
+  sort: PropTypes.string,
+  sortOptions: PropTypes.array,
+  onSortChange: PropTypes.func.isRequired,
+};
+
+SearchOptions.defaultProps = {
+  sort: undefined,
+  sortOptions: undefined,
+};
+
 export default function SearchApp({category}) {
   const [query, setQuery] = useQueryParams();
   const [activeMenuItem, setActiveMenuItem] = useState(undefined);
-  const {q, ...filters} = query;
+  const {q, sort, ...filters} = query;
+  const {data: options} = useIndicoAxios({
+    url: searchOptionsURL(),
+    trigger: 'once',
+    camelize: true,
+  });
   const [categoryResults, setCategoryPage] = useSearch(
     searchURL(),
     query,
@@ -218,7 +249,11 @@ export default function SearchApp({category}) {
         </Grid.Column>
       )}
       <Grid.Column width={7}>
-        <SearchBar onSearch={handleQuery} searchTerm={q || ''} />
+        <SearchBar
+          onSearch={handleQuery}
+          searchTerm={q || ''}
+          placeholders={options?.placeholders || []}
+        />
         <Menu pointing secondary styleName="menu">
           {searchMap.map(([label, _results], idx) => (
             <SearchTypeMenuItem
@@ -232,6 +267,11 @@ export default function SearchApp({category}) {
             />
           ))}
         </Menu>
+        <SearchOptions
+          sort={sort}
+          sortOptions={options?.sortOptions || []}
+          onSortChange={value => handleQuery(value, 'sort')}
+        />
         {!isAnyLoading && (
           <ResultHeader query={q} hasResults={!!results.total} categoryTitle={category?.title} />
         )}

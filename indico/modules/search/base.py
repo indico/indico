@@ -33,6 +33,12 @@ class SearchFilter:
     key: str
     label: str
 
+
+@dataclasses.dataclass
+class SearchOptions:
+    placeholders: list[SearchFilter]
+    sort_options: list[SearchFilter]
+
     def dump(self):
         return dataclasses.asdict(self)
 
@@ -66,6 +72,14 @@ class IndicoSearchProvider:
         """
         Retrieve the list of search filters available as aggregations to
         each query result.
+
+        :return: a list of `SearchFilter` instances
+        """
+        return []
+
+    def get_sort_options(self):
+        """
+        Retrieve the list of search sortable options.
 
         :return: a list of `SearchFilter` instances
         """
