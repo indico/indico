@@ -29,15 +29,15 @@ class SearchTarget(int, IndicoEnum):
 
 
 @dataclasses.dataclass
-class SearchFilter:
+class SearchOption:
     key: str
     label: str
 
 
 @dataclasses.dataclass
 class SearchOptions:
-    placeholders: list[SearchFilter]
-    sort_options: list[SearchFilter]
+    placeholders: list[SearchOption]
+    sort_options: list[SearchOption]
 
     def dump(self):
         return dataclasses.asdict(self)
