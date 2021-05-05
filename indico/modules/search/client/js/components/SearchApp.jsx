@@ -39,7 +39,7 @@ const camelizeValues = obj =>
 function useSearch(url, query, type, categoryId) {
   const [page, setPage] = useState(1);
 
-  const {data, loading, lastData} = useIndicoAxios({
+  const {data, error, loading, lastData} = useIndicoAxios({
     url,
     options: {params: {...query, type, page, category_id: categoryId}},
     forceDispatchEffect: () => query?.q,
@@ -58,9 +58,9 @@ function useSearch(url, query, type, categoryId) {
         total: data?.total || 0,
         data: camelizeKeys(data?.results || []),
         aggregations: camelizeValues(data?.aggregations || lastData?.aggregations || {}),
-        loading,
+        loading: loading || (query.q && !data && !error),
       }),
-      [page, data, lastData, loading]
+      [page, data, error, lastData, loading, query.q]
     ),
     setPage,
   ];
