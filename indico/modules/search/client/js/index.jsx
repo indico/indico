@@ -13,12 +13,11 @@ import SearchApp from './components/SearchApp';
 
 document.addEventListener('DOMContentLoaded', () => {
   const root = document.querySelector('#search-root');
-  const id = parseInt(root.dataset.id, 10) || undefined;
-  const title = root.dataset.title;
+  const category = root.dataset.category ? JSON.parse(root.dataset.category) : null;
 
   ReactDOM.render(
     <Router>
-      <SearchApp category={{id, title}} />
+      <SearchApp category={category} />
     </Router>,
     root
   );

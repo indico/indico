@@ -3,9 +3,11 @@
 {% block page_class %}search-page{% endblock %}
 
 {% block title %}
-    {% trans %}Searching within{% endtrans %} "{{ category.title }}"
+    {% trans cat=category.title %}Searching within "{{ cat }}"{% endtrans %}
 {% endblock %}
 
 {% block content %}
-    <div id="search-root" data-id="{{ category.id }}" data-title="{{ category.title }}"></div>
+    <div id="search-root"
+         data-category="{{ {'id': category.id, 'title': category.title} | tojson | forceescape }}"
+    ></div>
 {% endblock %}

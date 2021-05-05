@@ -25,9 +25,7 @@ import {LocaleContext} from './context.js';
     const domContainer = document.querySelector('#search-box');
 
     if (domContainer) {
-      const id = parseInt(domContainer.dataset.id, 10);
-      const title = domContainer.dataset.title;
-      const isRoot = domContainer.dataset.isRoot === 'true';
+      const category = JSON.parse(domContainer.dataset.category);
 
       ReactDOM.render(
         React.createElement(SearchBox, {
@@ -35,10 +33,10 @@ import {LocaleContext} from './context.js';
             if (isGlobal) {
               window.location = searchUrl({q: keyword});
             } else {
-              window.location = categorySearchUrl({category_id: id, q: keyword});
+              window.location = categorySearchUrl({category_id: category.id, q: keyword});
             }
           },
-          category: {id, title, isRoot},
+          category,
         }),
         domContainer
       );

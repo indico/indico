@@ -179,17 +179,21 @@ export default function SearchApp({category}) {
   const [query, setQuery] = useQueryParams();
   const [activeMenuItem, setActiveMenuItem] = useState(undefined);
   const {q, ...filters} = query;
-  const {id: categoryId, title: categoryTitle} = category;
-  const [categoryResults, setCategoryPage] = useSearch(searchURL(), query, 'category', categoryId);
-  const [eventResults, setEventPage] = useSearch(searchURL(), query, 'event', categoryId);
+  const [categoryResults, setCategoryPage] = useSearch(
+    searchURL(),
+    query,
+    'category',
+    category?.id
+  );
+  const [eventResults, setEventPage] = useSearch(searchURL(), query, 'event', category?.id);
   const [contributionResults, setContributionPage] = useSearch(
     searchURL(),
     query,
     ['contribution', 'subcontribution'],
-    categoryId
+    category?.id
   );
-  const [fileResults, setFilePage] = useSearch(searchURL(), query, 'attachment', categoryId);
-  const [noteResults, setNotePage] = useSearch(searchURL(), query, 'event_note', categoryId);
+  const [fileResults, setFilePage] = useSearch(searchURL(), query, 'attachment', category?.id);
+  const [noteResults, setNotePage] = useSearch(searchURL(), query, 'event_note', category?.id);
   const searchMap = [
     [Translate.string('Categories'), categoryResults, setCategoryPage, Category],
     [Translate.string('Events'), eventResults, setEventPage, Event],
@@ -229,7 +233,7 @@ export default function SearchApp({category}) {
           ))}
         </Menu>
         {!isAnyLoading && (
-          <ResultHeader query={q} hasResults={!!results.total} categoryTitle={categoryTitle} />
+          <ResultHeader query={q} hasResults={!!results.total} categoryTitle={category?.title} />
         )}
         {q && (results.total || isAnyLoading) && (
           <ResultList
@@ -248,7 +252,11 @@ export default function SearchApp({category}) {
 
 SearchApp.propTypes = {
   category: PropTypes.shape({
-    id: PropTypes.number,
-    title: PropTypes.string,
-  }).isRequired,
+    id: PropTypes.number.isRequired,
+    title: PropTypes.string.isRequired,
+  }),
+};
+
+SearchApp.defaultProps = {
+  category: null,
 };

@@ -107,8 +107,11 @@ class InternalSearch(IndicoSearchProvider):
 
     @staticmethod
     def search_events(page, q, category_id):
-        filters = [Event.title_matches(q), Event.effective_protection_mode == ProtectionMode.public,
-                   ~Event.is_deleted]
+        filters = [
+            Event.title_matches(q),
+            Event.effective_protection_mode == ProtectionMode.public,
+            ~Event.is_deleted
+        ]
 
         if category_id is not None:
             filters.append(Event.category_chain_overlaps(category_id))
