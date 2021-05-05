@@ -5,7 +5,8 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from indico.modules.search.controllers import RHAPISearch, RHAPISearchPlaceholders, RHSearchDisplay
+from indico.modules.search.controllers import (RHAPISearch, RHAPISearchPlaceholders, RHCategorySearchDisplay,
+                                               RHSearchDisplay)
 from indico.web.flask.wrappers import IndicoBlueprint
 
 
@@ -13,6 +14,7 @@ _bp = IndicoBlueprint('search', __name__, template_folder='templates', virtual_t
 
 # Frontend
 _bp.add_url_rule('/search/', 'search', RHSearchDisplay)
+_bp.add_url_rule('!/category/<int:category_id>/search', 'category_search', RHCategorySearchDisplay)
 
 # Search APIs
 _bp.add_url_rule('/search/api/placeholders', 'api_search_placeholders', RHAPISearchPlaceholders)

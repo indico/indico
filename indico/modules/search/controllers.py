@@ -15,12 +15,13 @@ from sqlalchemy.orm import undefer
 from indico.core.db import db
 from indico.core.db.sqlalchemy.protection import ProtectionMode
 from indico.modules.categories import Category
+from indico.modules.categories.controllers.base import RHDisplayCategoryBase
 from indico.modules.events import Event
 from indico.modules.groups import GroupProxy
 from indico.modules.search.base import IndicoSearchProvider, SearchTarget, get_search_provider
 from indico.modules.search.result_schemas import CategoryResultSchema, EventResultSchema, ResultSchema
 from indico.modules.search.schemas import DetailedCategorySchema, EventSchema
-from indico.modules.search.views import WPSearch
+from indico.modules.search.views import WPCategorySearch, WPSearch
 from indico.util.caching import memoize_redis
 from indico.web.args import use_kwargs
 from indico.web.rh import RH
@@ -38,6 +39,11 @@ def get_groups(user):
 class RHSearchDisplay(RH):
     def _process(self):
         return WPSearch.render_template('search.html')
+
+
+class RHCategorySearchDisplay(RHDisplayCategoryBase):
+    def _process(self):
+        return WPCategorySearch.render_template('category_search.html', self.category)
 
 
 class RHAPISearch(RH):
@@ -72,9 +78,9 @@ class RHAPISearchPlaceholders(RH):
 class InternalSearch(IndicoSearchProvider):
     def search(self, query, access, page=1, object_types=(), **params):
         if object_types == [SearchTarget.category]:
-            total, results = InternalSearch.search_categories(page, query)
+            total, results = InternalSearch.search_categories(page, query, params.get('category_id'))
         elif object_types == [SearchTarget.event]:
-            total, results = InternalSearch.search_events(page, query)
+            total, results = InternalSearch.search_events(page, query, params.get('category_id'))
         else:
             total, results = 0, []
         return {
@@ -84,25 +90,36 @@ class InternalSearch(IndicoSearchProvider):
         }
 
     @staticmethod
-    def search_categories(page, q):
-        results = (Category.query
+    def search_categories(page, q, category_id):
+        query = Category.query if not category_id else Category.get(category_id).deep_children_query
+
+        results = (query
                    .filter(Category.title_matches(q),
                            ~Category.is_deleted)
                    .options(undefer('chain'))
                    .order_by(db.func.lower(Category.title))
                    .paginate(page, IndicoSearchProvider.RESULTS_PER_PAGE))
+
         # XXX should we only show categories the user can access?
         # this would be nicer but then we can't easily paginate...
         res = DetailedCategorySchema(many=True).dump(results.items)
         return results.total, CategoryResultSchema(many=True).load(res)
 
     @staticmethod
-    def search_events(page, q):
+    def search_events(page, q, category_id):
+        filters = [
+            Event.title_matches(q),
+            Event.effective_protection_mode == ProtectionMode.public,
+            ~Event.is_deleted
+        ]
+
+        if category_id is not None:
+            filters.append(Event.category_chain_overlaps(category_id))
+
         results = (Event.query
-                   .filter(Event.title_matches(q),
-                           Event.effective_protection_mode == ProtectionMode.public,
-                           ~Event.is_deleted)
+                   .filter(*filters)
                    .order_by(db.func.lower(Event.title))
                    .paginate(page, IndicoSearchProvider.RESULTS_PER_PAGE))
+
         res = EventSchema(many=True).dump(results.items)
         return results.total, EventResultSchema(many=True).load(res)

@@ -117,6 +117,10 @@ $i-button-spacing: 0.3rem;
   .group {
     @extend %toolbar-group;
   }
+
+  .search-box {
+    min-width: 300px;
+  }
 }
 
 .toolbars {
