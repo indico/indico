@@ -40,7 +40,7 @@ class DetailedCategorySchema(mm.SQLAlchemyAutoSchema):
 
 class PersonSchema(mm.Schema):
     name = fields.Function(lambda p: p.get_full_name(last_name_first=False, last_name_upper=False,
-                                                     abbrev_first_name=False, show_title=True))
+                                                     abbrev_first_name=False, show_title=False))
     affiliation = fields.Function(lambda p: p.affiliation or None)
 
     @post_dump(pass_original=True)
