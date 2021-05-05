@@ -5,6 +5,7 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
+import categorySearchUrl from 'indico-url:search.category_search';
 import searchUrl from 'indico-url:search.search';
 
 import React from 'react';
@@ -22,12 +23,20 @@ import {LocaleContext} from './context.js';
 (function(global) {
   document.addEventListener('DOMContentLoaded', () => {
     const domContainer = document.querySelector('#search-box');
+
     if (domContainer) {
+      const category = JSON.parse(domContainer.dataset.category);
+
       ReactDOM.render(
         React.createElement(SearchBox, {
-          onSearch: keyword => {
-            window.location = searchUrl({q: keyword});
+          onSearch: (keyword, isGlobal) => {
+            if (isGlobal) {
+              window.location = searchUrl({q: keyword});
+            } else {
+              window.location = categorySearchUrl({category_id: category.id, q: keyword});
+            }
           },
+          category,
         }),
         domContainer
       );

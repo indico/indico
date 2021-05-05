@@ -1,0 +1,13 @@
+{% extends 'layout/base.html' %}
+
+{% block page_class %}search-page{% endblock %}
+
+{% block title %}
+    {% trans cat=category.title %}Searching within "{{ cat }}"{% endtrans %}
+{% endblock %}
+
+{% block content %}
+    <div id="search-root"
+         data-category="{{ {'id': category.id, 'title': category.title} | tojson | forceescape }}"
+    ></div>
+{% endblock %}

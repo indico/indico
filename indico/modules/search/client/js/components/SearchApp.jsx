@@ -6,6 +6,7 @@
 // LICENSE file for more details.
 
 import searchURL from 'indico-url:search.api_search';
+import searchPageURL from 'indico-url:search.search';
 
 import PropTypes from 'prop-types';
 import React, {useEffect, useMemo, useState} from 'react';
@@ -35,12 +36,12 @@ const camelizeValues = obj =>
     {}
   );
 
-function useSearch(url, query, type = undefined) {
+function useSearch(url, query, type, categoryId) {
   const [page, setPage] = useState(1);
 
-  const {data, loading, lastData} = useIndicoAxios({
+  const {data, error, loading, lastData} = useIndicoAxios({
     url,
-    options: {params: {...query, type, page}},
+    options: {params: {...query, type, page, category_id: categoryId}},
     forceDispatchEffect: () => query?.q,
     trigger: [url, query, page],
   });
@@ -57,9 +58,9 @@ function useSearch(url, query, type = undefined) {
         total: data?.total || 0,
         data: camelizeKeys(data?.results || []),
         aggregations: camelizeValues(data?.aggregations || lastData?.aggregations || {}),
-        loading,
+        loading: loading || (query.q && !data && !error),
       }),
-      [page, data, lastData, loading]
+      [page, data, error, lastData, loading, query.q]
     ),
     setPage,
   ];
@@ -96,45 +97,103 @@ SearchTypeMenuItem.defaultProps = {
   onClick: undefined,
 };
 
-function NoResults({query}) {
-  return (
-    <Message warning={!!query}>
-      {query ? (
-        <>
-          <Message.Header>
-            <Translate>No Results</Translate>
-          </Message.Header>
+function ResultHeader({query, hasResults, categoryTitle}) {
+  const isGlobal = !categoryTitle;
+
+  // initial message when no search has been performed
+  if (!query && !hasResults) {
+    return (
+      <Message>
+        {isGlobal ? (
+          <Translate>Enter a term above to begin searching.</Translate>
+        ) : (
+          <Translate>
+            Enter a term above to begin searching inside the{' '}
+            <Param name="categoryTitle" value={categoryTitle} wrapper={<strong />} /> category. You
+            can{' '}
+            <Param name="link" wrapper={<a href={searchPageURL()} />}>
+              search all of Indico instead
+            </Param>
+            .
+          </Translate>
+        )}
+      </Message>
+    );
+  }
+
+  // after search, no results
+  if (query && !hasResults) {
+    return (
+      <Message warning={!!query}>
+        <Message.Header>
+          <Translate>No Results</Translate>
+        </Message.Header>
+        {isGlobal ? (
           <Translate>
             Your search - <Param name="query" value={query} /> - did not match any results
           </Translate>
-        </>
-      ) : (
-        <Translate>Please enter a term above to begin searching</Translate>
-      )}
-    </Message>
-  );
+        ) : (
+          <Translate>
+            Your search - <Param name="query" value={query} /> - did not match any results. You
+            could try{' '}
+            <Param name="link" wrapper={<a href={searchPageURL({q: query})} />}>
+              searching all of Indico instead
+            </Param>
+            .
+          </Translate>
+        )}
+      </Message>
+    );
+  }
+
+  // after search in a category, offer global search
+  if (hasResults && !isGlobal) {
+    return (
+      <Message>
+        Showing results inside{' '}
+        <Param name="categoryTitle" value={categoryTitle} wrapper={<strong />} /> category. You can{' '}
+        <Param name="link" wrapper={<a href={searchPageURL({q: query})} />}>
+          search all of Indico instead
+        </Param>
+        .
+      </Message>
+    );
+  }
+
+  return null;
 }
 
-NoResults.propTypes = {
+ResultHeader.propTypes = {
+  hasResults: PropTypes.bool,
   query: PropTypes.string,
+  categoryTitle: PropTypes.string,
 };
 
-NoResults.defaultProps = {
+ResultHeader.defaultProps = {
+  hasResults: false,
   query: undefined,
+  categoryTitle: undefined,
 };
 
-export default function SearchApp() {
+export default function SearchApp({category}) {
   const [query, setQuery] = useQueryParams();
   const [activeMenuItem, setActiveMenuItem] = useState(undefined);
   const {q, ...filters} = query;
-  const [categoryResults, setCategoryPage] = useSearch(searchURL(), query, 'category');
-  const [eventResults, setEventPage] = useSearch(searchURL(), query, 'event');
-  const [contributionResults, setContributionPage] = useSearch(searchURL(), query, [
-    'contribution',
-    'subcontribution',
-  ]);
-  const [fileResults, setFilePage] = useSearch(searchURL(), query, 'attachment');
-  const [noteResults, setNotePage] = useSearch(searchURL(), query, 'event_note');
+  const [categoryResults, setCategoryPage] = useSearch(
+    searchURL(),
+    query,
+    'category',
+    category?.id
+  );
+  const [eventResults, setEventPage] = useSearch(searchURL(), query, 'event', category?.id);
+  const [contributionResults, setContributionPage] = useSearch(
+    searchURL(),
+    query,
+    ['contribution', 'subcontribution'],
+    category?.id
+  );
+  const [fileResults, setFilePage] = useSearch(searchURL(), query, 'attachment', category?.id);
+  const [noteResults, setNotePage] = useSearch(searchURL(), query, 'event_note', category?.id);
   const searchMap = [
     [Translate.string('Categories'), categoryResults, setCategoryPage, Category],
     [Translate.string('Events'), eventResults, setEventPage, Event],
@@ -173,7 +232,10 @@ export default function SearchApp() {
             />
           ))}
         </Menu>
-        {q && (results.total || isAnyLoading) ? (
+        {!isAnyLoading && (
+          <ResultHeader query={q} hasResults={!!results.total} categoryTitle={category?.title} />
+        )}
+        {q && (results.total || isAnyLoading) && (
           <ResultList
             component={Component}
             page={results.page}
@@ -182,10 +244,19 @@ export default function SearchApp() {
             onPageChange={setPage}
             loading={results.loading}
           />
-        ) : (
-          <NoResults query={q} />
         )}
       </Grid.Column>
     </Grid>
   );
 }
+
+SearchApp.propTypes = {
+  category: PropTypes.shape({
+    id: PropTypes.number.isRequired,
+    title: PropTypes.string.isRequired,
+  }),
+};
+
+SearchApp.defaultProps = {
+  category: null,
+};
