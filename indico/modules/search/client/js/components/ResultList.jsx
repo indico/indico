@@ -46,7 +46,7 @@ export default function ResultList({
             </Placeholder>
           ) : (
             data.map(item => (
-              <List.Item key={item.url}>
+              <List.Item key={item}>
                 <List.Content>
                   <Component {...item} />
                 </List.Content>
