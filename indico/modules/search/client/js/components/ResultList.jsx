@@ -5,11 +5,13 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
+import {nanoid} from 'nanoid';
 import PropTypes from 'prop-types';
 import React from 'react';
 import {List, Pagination, Placeholder, Segment} from 'semantic-ui-react';
 
 import {useResponsive} from 'indico/react/util';
+
 import './ResultList.module.scss';
 
 export default function ResultList({
@@ -46,7 +48,7 @@ export default function ResultList({
             </Placeholder>
           ) : (
             data.map(item => (
-              <List.Item key={item}>
+              <List.Item key={nanoid()}>
                 <List.Content>
                   <Component {...item} />
                 </List.Content>
