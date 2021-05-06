@@ -516,6 +516,64 @@ def register_event_time_change(event):
             old_times[event][field] = getattr(event, field)
 
 
+@contextmanager
+def track_location_changes():
+    """Track location changes of event objects.
+
+    This provides a list of changes while the context manager was
+    active and also triggers `location_changed` signals.
+
+    If the code running inside the ``with`` block of this context
+    manager raises an exception, no signals will be triggered.
+    """
+    if 'old_locations' in g:
+        raise RuntimeError('location change tracking may not be nested')
+    g.old_locations = defaultdict(dict)
+    changes = defaultdict(dict)
+    try:
+        yield changes
+    except Exception:
+        del g.old_locations
+        raise
+    else:
+        old_locations = g.pop('old_locations')
+        cols = ('own_room_id', 'own_room_name', 'own_venue_id', 'own_venue_name', 'own_address', 'inherit_location')
+        for obj, info in old_locations.items():
+            for col in cols:
+                new_value = getattr(obj, col)
+                if new_value != info[col]:
+                    changes[obj][col] = (info[col], new_value)
+        for obj, obj_changes in changes.items():
+            signals.event.location_changed.send(type(obj), obj=obj, changes=obj_changes)
+
+
+def register_location_change(entry):
+    """Register a location-related change for an event object.
+
+    This is an internal helper function used in the models to record
+    changes of the location information.  The changes are exposed
+    through the `track_location_changes` contextmanager function.
+    """
+    # if it's a new object it's not a change so we just ignore it
+    if not inspect(entry).persistent:
+        return
+    try:
+        old_locations = g.old_locations
+    except AttributeError:
+        msg = f'Location change of {entry} was not tracked'
+        if current_app.config.get('REPL'):
+            warnings.warn(msg + ' (exception converted to a warning since you are using the REPL)', stacklevel=2)
+            return
+        elif current_app.config['TESTING']:
+            warnings.warn(msg + ' (exception converted to a warning during tests)', stacklevel=2)
+            return
+        else:
+            raise RuntimeError(msg)
+    for field in ('own_room_id', 'own_room_name', 'own_venue_id', 'own_venue_name', 'own_address', 'inherit_location'):
+        if old_locations[entry].get(field) is None:
+            old_locations[entry][field] = getattr(entry, field)
+
+
 def serialize_event_for_ical(event, detail_level):
     from indico.modules.events.contributions.util import serialize_contribution_for_ical
     fossil = 'conferenceMetadataWithContribs' if detail_level == 'contributions' else 'conferenceMetadata'

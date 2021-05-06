@@ -23,7 +23,7 @@ from indico.modules.events.models.labels import EventLabel
 from indico.modules.events.models.references import ReferenceType
 from indico.modules.events.operations import update_event
 from indico.modules.events.timetable.models.entries import TimetableEntry
-from indico.modules.events.util import track_time_changes
+from indico.modules.events.util import track_location_changes, track_time_changes
 from indico.modules.rb.models.reservation_occurrences import ReservationOccurrence
 from indico.modules.rb.models.reservations import Reservation
 from indico.modules.rb.models.rooms import Room
@@ -102,11 +102,14 @@ class RHEditEventDataBase(RHManageEventBase):
         return jsonify_data(settings_box=self.render_settings_box(),
                             right_header=render_event_management_header_right(self.event))
 
+    def _update(self, form_data):
+        update_event(self.event, **form_data)
+
     def _process(self):
         form = self.form_class(obj=self.event, event=self.event)
         if form.validate_on_submit():
             with flash_if_unregistered(self.event, lambda: self.event.person_links):
-                update_event(self.event, **form.data)
+                self._update(form.data)
             return self.jsonify_success()
         self.commit = False
         return self.render_form(form)
@@ -120,6 +123,10 @@ class RHEditEventData(RHEditEventDataBase):
 class RHEditEventLocation(RHEditEventDataBase):
     form_class = EventLocationForm
     section_name = 'location'
+
+    def _update(self, form_data):
+        with track_location_changes():
+            return super()._update(form_data)
 
 
 class RHEditEventPersons(RHEditEventDataBase):
