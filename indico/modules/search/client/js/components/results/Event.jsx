@@ -59,6 +59,7 @@ export default function Event({
           </List.Item>
         )}
         {renderDates(startDt, endDt)}
+        <LocationItem location={location} />
         {categoryPath.length !== 0 && (
           <List.Item>
             <List.Description>
@@ -66,7 +67,6 @@ export default function Event({
             </List.Description>
           </List.Item>
         )}
-        <LocationItem location={location} />
       </List.Description>
     </div>
   );
