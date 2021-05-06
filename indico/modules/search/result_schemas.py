@@ -67,6 +67,12 @@ class CategoryResultSchema(ResultSchemaBase):
         return url_for('categories.display', category_id=data['category_id'])
 
 
+class LocationResultSchema(mm.Schema):
+    venue_name = fields.String(required=True)
+    room_name = fields.String(required=True)
+    address = fields.String(required=True)
+
+
 class EventResultSchema(ResultSchemaBase):
     type = EnumField(SearchTarget, validate=require_search_target(SearchTarget.event))
     event_id = fields.Int(required=True)
@@ -76,6 +82,7 @@ class EventResultSchema(ResultSchemaBase):
     start_dt = fields.DateTime(required=True)
     end_dt = fields.DateTime(required=True)
     persons = fields.List(fields.Nested(PersonSchema), required=True)
+    location = fields.Nested(LocationResultSchema, required=True)
     highlight = fields.Nested(HighlightSchema, missing={})
     # extra fields that are not taken from the data returned by the search engine
     url = fields.Method('_get_url')
@@ -93,6 +100,7 @@ class ContributionResultSchema(ResultSchemaBase):
     start_dt = fields.DateTime(missing=None)
     end_dt = fields.DateTime(missing=None)
     persons = fields.List(fields.Nested(PersonSchema), required=True)
+    location = fields.Nested(LocationResultSchema, required=True)
     duration = fields.TimeDelta(precision=fields.TimeDelta.MINUTES)
     highlight = fields.Nested(HighlightSchema, missing={})
     # extra fields that are not taken from the data returned by the search engine

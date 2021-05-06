@@ -13,6 +13,7 @@ import {List, Icon} from 'semantic-ui-react';
 import {toMoment, serializeDate} from 'indico/utils/date';
 
 import Highlight from './Highlight';
+import {LocationItem, locationPropType} from './LocationItem';
 import {Path, pathPropType} from './Path';
 import PersonList from './PersonList';
 
@@ -43,6 +44,7 @@ export default function Event({
   startDt,
   endDt,
   persons,
+  location,
 }) {
   return (
     <div styleName="item">
@@ -64,6 +66,7 @@ export default function Event({
             </List.Description>
           </List.Item>
         )}
+        <LocationItem location={location} />
       </List.Description>
     </div>
   );
@@ -83,6 +86,7 @@ Event.propTypes = {
       affiliation: PropTypes.string.isRequired,
     })
   ).isRequired,
+  location: locationPropType.isRequired,
   highlight: PropTypes.shape({
     description: PropTypes.array,
   }).isRequired,
