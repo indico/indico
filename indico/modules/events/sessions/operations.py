@@ -15,6 +15,7 @@ from indico.modules.events.models.events import EventType
 from indico.modules.events.sessions import COORDINATOR_PRIV_SETTINGS, COORDINATOR_PRIV_TITLES, logger, session_settings
 from indico.modules.events.sessions.models.blocks import SessionBlock
 from indico.modules.events.sessions.models.sessions import Session
+from indico.modules.events.util import track_location_changes
 from indico.util.i18n import orig_string
 
 
@@ -46,7 +47,8 @@ def create_session_block(session_, data):
 
 def update_session(event_session, data):
     """Update a session based on the information in the `data`."""
-    event_session.populate_from_dict(data)
+    with track_location_changes():
+        event_session.populate_from_dict(data)
     db.session.flush()
     signals.event.session_updated.send(event_session)
     event_session.event.log(EventLogRealm.management, EventLogKind.change, 'Sessions',
@@ -88,8 +90,10 @@ def update_session_block(session_block, data):
     if start_dt is not None:
         session_block.timetable_entry.move(start_dt)
         update_timetable_entry(session_block.timetable_entry, {'start_dt': start_dt})
-    session_block.populate_from_dict(data)
+    with track_location_changes():
+        session_block.populate_from_dict(data)
     db.session.flush()
+    signals.event.session_block_updated.send(session_block)
     session_block.event.log(EventLogRealm.management, EventLogKind.change, 'Sessions',
                             f'Session block "{session_block.title}" has been updated', session.user,
                             meta={'session_block_id': session_block.id})

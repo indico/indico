@@ -52,12 +52,22 @@ Called when a new event is created. The `sender` is the new Event. The `cloning`
 kwarg indictates whether the event is a clone.
 """)
 
+location_changed = _signals.signal('location-changed', """
+Called when the location of an object changed. The `sender` is the type
+of the object, the object itself is passed as `obj`. The changes are passed
+in the `changes` kwarg.
+""")
+
 session_updated = _signals.signal('session-updated', """
 Called when a session is updated. The *sender* is the session.
 """)
 
 session_deleted = _signals.signal('session-deleted', """
 Called when a session is deleted. The *sender* is the session.
+""")
+
+session_block_updated = _signals.signal('session-block-updated', """
+Called when a session block is updated. The *sender* is the session block.
 """)
 
 session_block_deleted = _signals.signal('session-block-deleted', """
