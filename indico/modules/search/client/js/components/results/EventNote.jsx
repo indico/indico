@@ -7,20 +7,26 @@
 
 import PropTypes from 'prop-types';
 import React from 'react';
-import {List} from 'semantic-ui-react';
+import {Icon, List} from 'semantic-ui-react';
+
+import {serializeDate, toMoment} from 'indico/utils/date';
 
 import Highlight from './Highlight';
 import {Path, pathPropType} from './Path';
 
 import '../ResultList.module.scss';
 
-const EventNote = ({title, url, content, highlight, categoryPath, eventPath}) => (
+const EventNote = ({title, url, content, modifiedDt, highlight, categoryPath, eventPath}) => (
   <div styleName="item">
     <List.Header styleName="header">
       <a href={url}>{title}</a>
     </List.Header>
     <List.Description styleName="description">
       <Highlight text={content} highlight={highlight.content} />
+      <List.Item>
+        <Icon name="calendar alternate outline" />
+        {serializeDate(toMoment(modifiedDt), 'DD MMMM YYYY HH:mm')}
+      </List.Item>
       {categoryPath.length !== 0 && (
         <List.Item>
           <List.Description>
@@ -36,6 +42,7 @@ EventNote.propTypes = {
   title: PropTypes.string.isRequired,
   content: PropTypes.string.isRequired,
   url: PropTypes.string.isRequired,
+  modifiedDt: PropTypes.string.isRequired,
   highlight: PropTypes.shape({
     content: PropTypes.array,
   }),
