@@ -20,7 +20,7 @@
         <td class="title">
             <a class="js-mathjax" href="{{ event.url }}">{{ event.title }}</a>
             <span class="details">
-                {% if show_chairpersons and event.person_links %}
+                {% if event.type == 'lecture' and event.person_links %}
                     ({{ event.person_links|map(attribute='full_name')|sort|join('; ') }})
                 {% endif %}
                 {% if event.effective_protection_mode.name == 'protected' %}

@@ -23,13 +23,15 @@
                             {% set vc_room = event_vc_room.vc_room %}
                             <tr class="vc-room-entry {% if vc_room.status.name == 'deleted' %}deleted{% endif %}">
                                 <td><a href="#" class="icon-next toggle-details"></a></td>
-                                <td>{% if vc_room.plugin %}
+                                <td>
+                                    {%- if vc_room.plugin %}
                                         <img class="plugin-logo"
                                              src="{{ vc_room.plugin.logo_url}}"
-                                             alt="{{ vc_room.friendly_name }}" title="{{ vc_room.friendly_name}}">
+                                             alt="{{ vc_room.plugin.friendly_name }}"
+                                             title="{{ vc_room.plugin.friendly_name}}">
                                     {% else %}
                                         {{ vc_room.type }}
-                                    {% endif %}
+                                    {% endif -%}
                                 </td>
                                 <td>{{ vc_room.name }}</td>
                                 <td>{{ template_hook('event-vc-room-list-item-labels', event=event, vc_room=vc_room) }}</td>
