@@ -17,6 +17,7 @@ from sqlalchemy.event import listens_for
 from sqlalchemy.ext.associationproxy import association_proxy
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import object_session
+from sqlalchemy.sql import select
 from werkzeug.utils import cached_property
 
 from indico.core import signals
@@ -216,7 +217,8 @@ class User(PersonMixin, db.Model):
     merged_into_id = db.Column(
         db.Integer,
         db.ForeignKey('users.users.id'),
-        nullable=True
+        nullable=True,
+        index=True
     )
     #: if the user is the default system user
     is_system = db.Column(
@@ -652,6 +654,17 @@ class User(PersonMixin, db.Model):
             if identity_info:
                 identity.data = identity_info.data
         return identity
+
+    def get_merged_from_users_recursive(self):
+        """Get the users merged into this users recursively."""
+        user_alias = db.aliased(User)
+        cte_query = (select([user_alias.id.label('merged_from_id')])
+                     .where(user_alias.merged_into_id == self.id)
+                     .cte(recursive=True))
+        rec_query = (select([user_alias.id])
+                     .where(user_alias.merged_into_id == cte_query.c.merged_from_id))
+        cte = cte_query.union_all(rec_query)
+        return User.query.join(cte, User.id == cte.c.merged_from_id).all()
 
 
 @listens_for(User._primary_email, 'set')
