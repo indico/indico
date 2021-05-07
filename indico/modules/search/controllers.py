@@ -18,7 +18,7 @@ from indico.modules.categories import Category
 from indico.modules.categories.controllers.base import RHDisplayCategoryBase
 from indico.modules.events import Event
 from indico.modules.groups import GroupProxy
-from indico.modules.search.base import IndicoSearchProvider, SearchTarget, get_search_provider
+from indico.modules.search.base import IndicoSearchProvider, SearchOptions, SearchTarget, get_search_provider
 from indico.modules.search.result_schemas import CategoryResultSchema, EventResultSchema, ResultSchema
 from indico.modules.search.schemas import DetailedCategorySchema, EventSchema
 from indico.modules.search.views import WPCategorySearch, WPSearch
@@ -68,11 +68,12 @@ class RHAPISearch(RH):
         return ResultSchema().dump(result)
 
 
-class RHAPISearchPlaceholders(RH):
+class RHAPISearchOptions(RH):
     def _process(self):
-        search_provider = get_search_provider()
-        placeholders = search_provider().get_placeholders()
-        return jsonify([p.dump() for p in placeholders])
+        search_provider = get_search_provider()()
+        placeholders = search_provider.get_placeholders()
+        sort_options = search_provider.get_sort_options()
+        return jsonify(SearchOptions(placeholders, sort_options).dump())
 
 
 class InternalSearch(IndicoSearchProvider):

@@ -5,13 +5,10 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-import placeholderURL from 'indico-url:search.api_search_placeholders';
-
 import PropTypes from 'prop-types';
 import React, {useState, useEffect} from 'react';
 import {Form, Label, Search} from 'semantic-ui-react';
 
-import {useIndicoAxios} from 'indico/react/hooks';
 import {Translate} from 'indico/react/i18n';
 
 import './SearchBar.module.scss';
@@ -22,9 +19,8 @@ const resultRenderer = ({title, label}) => (
   </span>
 );
 
-export default function SearchBar({onSearch, searchTerm}) {
+export default function SearchBar({onSearch, searchTerm, placeholders}) {
   const [keyword, setKeyword] = useState(searchTerm);
-  const {data: placeholders} = useIndicoAxios({url: placeholderURL(), trigger: 'once'});
   const [results, setResults] = useState(null);
   const [isSearchOpen, setSearchOpen] = useState(false);
 
@@ -81,4 +77,14 @@ export default function SearchBar({onSearch, searchTerm}) {
 SearchBar.propTypes = {
   onSearch: PropTypes.func.isRequired,
   searchTerm: PropTypes.string.isRequired,
+  placeholders: PropTypes.arrayOf(
+    PropTypes.shape({
+      key: PropTypes.string,
+      label: PropTypes.string,
+    })
+  ),
+};
+
+SearchBar.defaultProps = {
+  placeholders: [],
 };
