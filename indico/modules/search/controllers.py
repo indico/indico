@@ -29,7 +29,8 @@ from indico.web.rh import RH
 
 @memoize_redis(3600)
 def get_groups(user):
-    access = [user.identifier] + [x.identifier for x in user.local_groups]
+    access = [user.identifier]
+    access += [GroupProxy(x.id, _group=x).identifier for x in user.local_groups]
     if user.can_get_all_multipass_groups:
         access += [GroupProxy(x.name, x.provider.name, x).identifier
                    for x in user.iter_all_multipass_groups()]
