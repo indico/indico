@@ -48,6 +48,7 @@ class PyIPNetwork(TypeDecorator):
     """Custom type which handles values from a PEP-3144 ip network."""
 
     impl = CIDR
+    cache_ok = True
 
     def process_bind_param(self, value, dialect):
         return str(_ip_network(value)) if value is not None else None

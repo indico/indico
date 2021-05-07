@@ -23,6 +23,7 @@ from sqlalchemy.sql import expression
 
 class StaticArray(types.TypeDecorator):
     impl = types.TypeEngine
+    cache_ok = True
 
     def __init__(self):
         super().__init__()

@@ -14,6 +14,7 @@ from sqlalchemy.util import memoized_property
 
 class UTCDateTime(types.TypeDecorator):
     impl = types.DateTime
+    cache_ok = True
 
     class Comparator(types.DateTime.Comparator):
         def astimezone(self, tz):

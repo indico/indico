@@ -38,6 +38,7 @@ class PyIntEnum(TypeDecorator, SchemaType):
     """
 
     impl = SmallInteger
+    cache_ok = True
 
     def __init__(self, enum=None, exclude_values=None):
         self.enum = enum
