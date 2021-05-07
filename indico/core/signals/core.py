@@ -102,7 +102,8 @@ the ``email`` kwarg.  The additional kwargs passed to this signal depend on the
 context.
 """)
 
-# TODO write the docstring for this signal..
 get_search_providers = _signals.signal('get-search-providers', """
-Expected to return...
+Expected to return exactly one `IndicoSearchProvider` subclass. No more than one
+handler for this signal may return one as using multiple search providers at the
+same time is not possible.
 """)
