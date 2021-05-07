@@ -189,6 +189,9 @@ function SearchOptions({sort, sortOptions, onSortChange}) {
         text={Translate.string('Sort by: {value}', {value: selected.label})}
         onChange={(e, data) => onSortChange(data.value)}
         options={sortOptions.map(x => ({value: x.key, text: x.label}))}
+        selectOnNavigation={false}
+        selectOnBlur={false}
+        value={selected.key}
       />
     </div>
   );
