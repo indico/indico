@@ -23,7 +23,8 @@ class WPSearch(WPJinjaMixin, WPDecorated):
 
 
 class WPCategorySearch(WPCategory):
-    """WP for category-scoped search"""
+    """WP for category-scoped search."""
+
     template_prefix = 'search/'
     bundles = ('module_search.js', 'module_search.css')
 
