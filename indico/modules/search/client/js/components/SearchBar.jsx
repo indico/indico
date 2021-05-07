@@ -77,7 +77,12 @@ export default function SearchBar({onSearch, searchTerm, placeholders}) {
 SearchBar.propTypes = {
   onSearch: PropTypes.func.isRequired,
   searchTerm: PropTypes.string.isRequired,
-  placeholders: PropTypes.array,
+  placeholders: PropTypes.arrayOf(
+    PropTypes.shape({
+      key: PropTypes.string,
+      label: PropTypes.string,
+    })
+  ),
 };
 
 SearchBar.defaultProps = {

@@ -177,9 +177,13 @@ ResultHeader.defaultProps = {
 };
 
 function SearchOptions({sort, sortOptions, onSortChange}) {
+  if (!sortOptions.length) {
+    return null;
+  }
+
   const selected = sortOptions.find(x => x.key === sort) || sortOptions[0];
 
-  return !sortOptions.length ? null : (
+  return (
     <div styleName="search-options">
       <Dropdown
         text={Translate.string('Sort by: {value}', {value: selected.label})}
@@ -192,7 +196,12 @@ function SearchOptions({sort, sortOptions, onSortChange}) {
 
 SearchOptions.propTypes = {
   sort: PropTypes.string,
-  sortOptions: PropTypes.array,
+  sortOptions: PropTypes.arrayOf(
+    PropTypes.shape({
+      key: PropTypes.string,
+      label: PropTypes.string,
+    })
+  ),
   onSortChange: PropTypes.func.isRequired,
 };
 
