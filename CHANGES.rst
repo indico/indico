@@ -10,6 +10,10 @@ Version 3.0
 Major Features
 ^^^^^^^^^^^^^^
 
+- There is a new built-in search module which provides basic search functionality out
+  of the box, and for more advanced needs (such as full text search in uploaded files)
+  plugins can provide their own search functionality (e.g. using ElasticSearch).
+  (:pr:`4841`)
 - The OAuth provider module has been re-implemented based on a more modern
   library (authlib). Support for the somewhat insecure *implicit flow* has been
   removed in favor of the code-with-PKCE flow. Tokens are now stored more securely

@@ -19,6 +19,7 @@ $i-button-spacing: 0.3rem;
 
   display: flex;
   flex-shrink: 0;
+  align-items: center;
   min-height: $toolbar-height;
 
   &.fixed-height {
@@ -115,6 +116,10 @@ $i-button-spacing: 0.3rem;
 
   .group {
     @extend %toolbar-group;
+  }
+
+  .search-box {
+    min-width: 300px;
   }
 }
 
@@ -265,6 +270,10 @@ $i-button-spacing: 0.3rem;
       border-bottom-left-radius: 0;
       border-top-left-radius: 0;
     }
+  }
+
+  #search-box {
+    margin: 0 2em;
   }
 }
 

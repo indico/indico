@@ -7,6 +7,7 @@
 
 from sqlalchemy.event import listens_for
 from sqlalchemy.ext.declarative import declared_attr
+from sqlalchemy.orm.base import NEVER_SET, NO_VALUE
 
 from indico.core.db import db
 from indico.util.decorators import strict_classproperty
@@ -65,6 +66,19 @@ class LocationMixin:
             if value is not None:
                 target.own_room_name = ''
                 target.own_venue = value.location
+
+        cols = ('own_room_id', 'own_room_name', 'own_venue_id', 'own_venue_name', 'own_address', 'inherit_location')
+        for col in cols:
+            if col == 'inherit_location' and not cls.allow_location_inheritance:
+                continue
+
+            @listens_for(getattr(cls, col), 'set')
+            def _set_col(target, value, oldvalue, *unused):
+                from indico.modules.events.util import register_location_change
+                if oldvalue in (NEVER_SET, NO_VALUE):
+                    return
+                if value != oldvalue:
+                    register_location_change(target)
 
     @property
     def location_parent(self):

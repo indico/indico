@@ -240,3 +240,11 @@
   background: transparent;
   color: white;
 }
+
+.search-page {
+  @extend %indico-page-standalone;
+
+  .title .text {
+    margin-left: 2%;
+  }
+}
