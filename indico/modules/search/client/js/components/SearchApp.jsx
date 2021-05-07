@@ -238,11 +238,11 @@ export default function SearchApp({category}) {
   const [fileResults, setFilePage] = useSearch(searchURL(), query, 'attachment', category?.id);
   const [noteResults, setNotePage] = useSearch(searchURL(), query, 'event_note', category?.id);
   const searchMap = [
-    [Translate.string('Categories'), categoryResults, setCategoryPage, Category],
     [Translate.string('Events'), eventResults, setEventPage, Event],
     [Translate.string('Contributions'), contributionResults, setContributionPage, Contribution],
     [Translate.string('Materials'), fileResults, setFilePage, Attachment],
     [Translate.string('Notes'), noteResults, setNotePage, EventNote],
+    [Translate.string('Categories'), categoryResults, setCategoryPage, Category],
   ];
   // Defaults to the first tab loading or with results
   const menuItem =
