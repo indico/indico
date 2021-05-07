@@ -38,7 +38,7 @@ def delete_unclaimed_files():
         except StorageReadOnlyError:
             file.meta['deletion_failed'] = True
             flag_modified(file, 'meta')
-            logger.warn('Could not delete unclaimed file %s (read-only storage)', file_repr)
+            logger.warning('Could not delete unclaimed file %s (read-only storage)', file_repr)
         except StorageError as exc:
             logger.error('Could not delete unclaimed file %s: %s', file_repr, exc)
         else:

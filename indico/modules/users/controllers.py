@@ -481,11 +481,11 @@ class RHAdmins(RHAdminBase):
             removed = admins - form.admins.data
             for user in added:
                 user.is_admin = True
-                logger.warn('Admin rights granted to %r by %r [%s]', user, session.user, request.remote_addr)
+                logger.warning('Admin rights granted to %r by %r [%s]', user, session.user, request.remote_addr)
                 flash(_('Admin added: {name} ({email})').format(name=user.name, email=user.email), 'success')
             for user in removed:
                 user.is_admin = False
-                logger.warn('Admin rights revoked from %r by %r [%s]', user, session.user, request.remote_addr)
+                logger.warning('Admin rights revoked from %r by %r [%s]', user, session.user, request.remote_addr)
                 flash(_('Admin removed: {name} ({email})').format(name=user.name, email=user.email), 'success')
             return redirect(url_for('.admins'))
 

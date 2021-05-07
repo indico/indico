@@ -168,7 +168,7 @@ class RH:
                 except BuildError as e:
                     if current_app.debug:
                         raise
-                    logger.warn('BuildError during normalization: %s', e)
+                    logger.warning('BuildError during normalization: %s', e)
                     raise NotFound
             else:
                 raise NotFound('The URL contains invalid data. Please go to the previous page and refresh it.')

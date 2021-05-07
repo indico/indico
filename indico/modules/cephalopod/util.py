@@ -86,7 +86,7 @@ def sync_instance(contact, email):
     email = email or cephalopod_settings.get('contact_email')
     # registration needed if the instance does not have a uuid
     if not cephalopod_settings.get('uuid'):
-        logger.warn('unable to synchronize: missing uuid, registering the server instead')
+        logger.warning('unable to synchronize: missing uuid, registering the server instead')
         register_instance(contact, email)
         return
 
@@ -102,7 +102,7 @@ def sync_instance(contact, email):
         response.raise_for_status()
     except HTTPError as err:
         if err.response.status_code == 404:
-            logger.warn('unable to synchronize: the server was not registered, registering the server now')
+            logger.warning('unable to synchronize: the server was not registered, registering the server now')
             register_instance(contact, email)
         else:
             logger.error('failed to synchronize the server with the community hub, got: %s', err)

@@ -364,7 +364,7 @@ def make_app(testing=False, config_override=None):
     # reason to access it outside this method without being inside an application context.
 
     if _app_ctx_stack.top:
-        Logger.get('flask').warn('make_app called within app context, using existing app')
+        Logger.get('flask').warning('make_app called within app context, using existing app')
         return _app_ctx_stack.top.app
     app = IndicoFlask('indico', static_folder='web/static', static_url_path='/', template_folder='web/templates')
     app.config['TESTING'] = testing
