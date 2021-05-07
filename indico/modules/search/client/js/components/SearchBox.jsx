@@ -42,15 +42,13 @@ export default function SearchBox({onSearch, category}) {
 
   // form submit happens when no option is selected in search (eg. in home category)
   const handleSubmit = () => {
-    if (!keyword) {
-      return;
+    if (keyword.trim()) {
+      onSearch(keyword.trim(), category.isRoot);
     }
-
-    onSearch(keyword, category.isRoot);
   };
 
   const handleResultSelect = (e, data) => {
-    onSearch(keyword, data.result.value === 'global');
+    onSearch(keyword.trim(), data.result.value === 'global');
   };
 
   return (

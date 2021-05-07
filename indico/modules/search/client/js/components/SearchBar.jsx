@@ -27,8 +27,8 @@ export default function SearchBar({onSearch, searchTerm, placeholders}) {
   const handleSubmit = event => {
     event.preventDefault();
     setSearchOpen(false);
-    if (keyword) {
-      onSearch(keyword);
+    if (keyword.trim()) {
+      onSearch(keyword.trim());
     }
   };
 
