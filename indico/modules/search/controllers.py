@@ -28,8 +28,8 @@ from indico.web.rh import RH
 
 
 @memoize_redis(3600)
-def get_groups(user):
-    access = [user.identifier]
+def get_user_access(user):
+    access = [user.identifier] + [u.identifier for u in user.get_merged_from_users_recursive()]
     access += [GroupProxy(x.id, _group=x).identifier for x in user.local_groups]
     if user.can_get_all_multipass_groups:
         access += [GroupProxy(x.name, x.provider.name, x).identifier
@@ -64,7 +64,7 @@ class RHAPISearch(RH):
         search_provider = get_search_provider()
         if type == [SearchTarget.category]:
             search_provider = InternalSearch
-        access = get_groups(session.user) if session.user else []
+        access = get_user_access(session.user) if session.user else []
         result = search_provider().search(q, access, page, type, **params)
         return ResultSchema().dump(result)
 
