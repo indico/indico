@@ -14,9 +14,15 @@ from indico.util.signals import values_from_signal
 
 def get_search_provider():
     from indico.modules.search.controllers import InternalSearch
+    providers = values_from_signal(signals.get_search_providers.send(), as_list=True)
 
-    providers = signals.get_search_providers.send()
-    return values_from_signal(providers, as_list=True)[0] if len(providers) else InternalSearch
+    if not providers:
+        return InternalSearch
+    elif len(providers) == 1:
+        return providers[0]
+    else:
+        providers_str = ', '.join(f'{x.__module__}.{x.__name__}' for x in providers)
+        raise RuntimeError(f'Only one search provider can be defined (found: {providers_str})')
 
 
 class SearchTarget(int, IndicoEnum):
