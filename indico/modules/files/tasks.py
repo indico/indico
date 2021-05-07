@@ -36,10 +36,12 @@ def delete_unclaimed_files():
         try:
             file.delete(delete_from_db=True)
         except StorageReadOnlyError:
+            db.session.rollback()  # undo deletion from db
             file.meta['deletion_failed'] = True
             flag_modified(file, 'meta')
             logger.warning('Could not delete unclaimed file %s (read-only storage)', file_repr)
         except StorageError as exc:
+            db.session.rollback()  # undo deletion from db
             logger.error('Could not delete unclaimed file %s: %s', file_repr, exc)
         else:
             logger.info('Removed unclaimed file %s', file_repr)
