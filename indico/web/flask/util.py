@@ -8,7 +8,6 @@
 import inspect
 import os
 import re
-import unicodedata
 from importlib import import_module
 
 from flask import Blueprint, current_app, g, redirect, request
@@ -17,7 +16,7 @@ from flask import url_for as _url_for
 from flask.helpers import get_root_path
 from werkzeug.exceptions import HTTPException, NotFound
 from werkzeug.routing import BaseConverter, BuildError, RequestRedirect, UnicodeConverter
-from werkzeug.urls import url_parse, url_quote
+from werkzeug.urls import url_parse
 
 from indico.core.config import config
 from indico.util.caching import memoize
@@ -236,19 +235,6 @@ def _is_office_mimetype(mimetype):
     return False
 
 
-# taken from flask's send_file code
-def make_content_disposition_args(attachment_filename):
-    try:
-        attachment_filename = attachment_filename.encode('ascii')
-    except UnicodeEncodeError:
-        return {
-            'filename': unicodedata.normalize('NFKD', attachment_filename).encode('ascii', 'ignore'),
-            'filename*': "UTF-8''%s" % url_quote(attachment_filename, safe=b''),
-        }
-    else:
-        return {'filename': attachment_filename}
-
-
 def send_file(name, path_or_fd, mimetype, last_modified=None, no_cache=True, inline=None, conditional=False, safe=True,
               **kwargs):
     """Send a file to the user.
@@ -279,7 +265,7 @@ def send_file(name, path_or_fd, mimetype, last_modified=None, no_cache=True, inl
     if safe and mimetype in ('text/html', 'image/svg+xml'):
         inline = False
     try:
-        rv = _send_file(path_or_fd, mimetype=mimetype, as_attachment=not inline, attachment_filename=name,
+        rv = _send_file(path_or_fd, mimetype=mimetype, as_attachment=(not inline), download_name=name,
                         conditional=conditional, last_modified=last_modified, **kwargs)
     except OSError:
         if not current_app.debug:
@@ -287,9 +273,6 @@ def send_file(name, path_or_fd, mimetype, last_modified=None, no_cache=True, inl
         raise NotFound('File not found: %s' % path_or_fd)
     if safe:
         rv.headers.add('Content-Security-Policy', "script-src 'self'; object-src 'self'")
-    if inline:
-        # send_file does not add this header if as_attachment is False
-        rv.headers.add('Content-Disposition', 'inline', **make_content_disposition_args(name))
     # if the request is conditional, then caching shouldn't be disabled
     if not conditional and no_cache:
         del rv.expires
