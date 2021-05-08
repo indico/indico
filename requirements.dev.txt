@@ -48,7 +48,7 @@ flake8==3.9.1
     #   flake8-quotes
 flask-url-map-serializer==0.0.1
     # via -r requirements.dev.in
-flask==1.1.2
+flask==2.0.0
     # via
     #   -c requirements.txt
     #   flask-url-map-serializer
@@ -76,18 +76,18 @@ iniconfig==1.1.1
     # via pytest
 isort==5.8.0
     # via -r requirements.dev.in
-itsdangerous==1.1.0
+itsdangerous==2.0.0
     # via
     #   -c requirements.txt
     #   flask
-jinja2==2.11.3
+jinja2==3.0.0
     # via
     #   -c requirements.txt
     #   flask
     #   sphinx
 livereload==2.6.3
     # via sphinx-autobuild
-markupsafe==1.1.1
+markupsafe==2.0.0
     # via
     #   -c requirements.txt
     #   jinja2
@@ -234,7 +234,7 @@ urllib3==1.26.4
     #   -c requirements.txt
     #   requests
     #   transifex-client
-werkzeug==1.0.1
+werkzeug==2.0.0
     # via
     #   -c requirements.txt
     #   flask

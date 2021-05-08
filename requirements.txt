@@ -103,7 +103,7 @@ flask-webpackext==1.0.2
     # via -r requirements.in
 flask-wtf==0.14.3
     # via -r requirements.in
-flask==1.1.2
+flask==2.0.0
     # via
     #   -r requirements.in
     #   flask-babel
@@ -137,14 +137,14 @@ ipython-genutils==0.2.0
     # via traitlets
 ipython==7.23.1
     # via -r requirements.in
-itsdangerous==1.1.0
+itsdangerous==2.0.0
     # via
     #   -r requirements.in
     #   flask
     #   flask-wtf
 jedi==0.18.0
     # via ipython
-jinja2==2.11.3
+jinja2==3.0.0
     # via
     #   -r requirements.in
     #   flask
@@ -164,7 +164,7 @@ mako==1.1.4
     # via alembic
 markdown==3.3.4
     # via -r requirements.in
-markupsafe==1.1.1
+markupsafe==2.0.0
     # via
     #   -r requirements.in
     #   jinja2
@@ -312,7 +312,7 @@ webencodings==0.5.1
     # via
     #   bleach
     #   html5lib
-werkzeug==1.0.1
+werkzeug==2.0.0
     # via
     #   -r requirements.in
     #   flask
