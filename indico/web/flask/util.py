@@ -271,7 +271,7 @@ def send_file(name, path_or_fd, mimetype, last_modified=None, no_cache=True, inl
     assert '/' in mimetype
     if inline is None:
         inline = mimetype not in ('text/csv', 'text/xml', 'application/xml')
-    if request.user_agent.platform == 'android':
+    if request.user_agent.platform == 'Android':
         # Android is just full of fail when it comes to inline content-disposition...
         inline = False
     if _is_office_mimetype(mimetype):

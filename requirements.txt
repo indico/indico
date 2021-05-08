@@ -296,6 +296,8 @@ traitlets==5.0.5
     #   matplotlib-inline
 translitcodec==0.6.0
     # via -r requirements.in
+ua-parser==0.10.0
+    # via -r requirements.in
 urllib3==1.26.4
     # via
     #   requests

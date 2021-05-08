@@ -58,6 +58,7 @@ sqlalchemy
 termcolor
 terminaltables
 translitcodec
+ua-parser
 webargs
 werkzeug
 wtforms[ipaddress,email]
