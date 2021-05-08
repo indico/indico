@@ -41,7 +41,8 @@ from indico.core.webpack import IndicoManifestLoader, webpack
 from indico.modules.auth.providers import IndicoAuthProvider, IndicoIdentityProvider
 from indico.modules.auth.util import url_for_login, url_for_logout
 from indico.util import date_time as date_time_util
-from indico.util.i18n import _, babel, get_all_locales, get_current_locale, gettext_context, ngettext_context
+from indico.util.i18n import (_, babel, get_all_locales, get_current_locale, gettext_context, ngettext_context,
+                              npgettext_context, pgettext_context)
 from indico.util.mimetypes import icon_from_mimetype
 from indico.util.signals import values_from_signal
 from indico.util.string import RichMarkup, alpha_enum, crc32, html_to_plaintext, sanitize_html, slugify
@@ -248,7 +249,8 @@ def setup_jinja(app):
     app.add_template_test(subclassof)  # only use this test if you really have to!
     # i18n
     app.jinja_env.add_extension('jinja2.ext.i18n')
-    app.jinja_env.install_gettext_callables(gettext_context, ngettext_context, True)
+    app.jinja_env.install_gettext_callables(gettext_context, ngettext_context, True,
+                                            pgettext=pgettext_context, npgettext=npgettext_context)
 
 
 def setup_jinja_customization(app):
