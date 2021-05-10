@@ -67,9 +67,9 @@
       var block = blocks
         .slice(i, j + 1)
         .join('')
-        .replace(/&/g, '&') // use HTML entity for &
-        .replace(/</g, '<') // use HTML entity for <
-        .replace(/>/g, '>'); // use HTML entity for >
+        .replace(/&/g, '&amp;') // use HTML entity for &
+        .replace(/</g, '&lt;') // use HTML entity for <
+        .replace(/>/g, '&gt;'); // use HTML entity for >
       if (HUB.Browser.isMSIE) {
         block = block.replace(/(%[^\n]*)\n/g, '$1<br/>\n');
       }
