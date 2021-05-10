@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: indico 2.3.5-dev\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2021-04-14 10:29+0200\n"
+"POT-Creation-Date: 2021-05-10 16:36+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -586,7 +586,7 @@ msgstr ""
 msgid "You have unsaved changes that will be lost."
 msgstr ""
 
-#: indico/web/client/js/jquery/utils/declarative.js:251 indico/web/client/js/jquery/widgets/categorynavigator.js:708
+#: indico/web/client/js/jquery/utils/declarative.js:251 indico/web/client/js/jquery/widgets/categorynavigator.js:706
 #: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:1345
 msgid "Confirm action"
 msgstr ""
@@ -782,31 +782,31 @@ msgstr ""
 msgid "You can <a class=\"js-search\">modify</a> or <a class=\"js-clear-search\">clear</a> your search."
 msgstr ""
 
-#: indico/web/client/js/jquery/widgets/categorynavigator.js:444
+#: indico/web/client/js/jquery/widgets/categorynavigator.js:442
 msgid "In favourite categories"
 msgstr ""
 
-#: indico/web/client/js/jquery/widgets/categorynavigator.js:451
+#: indico/web/client/js/jquery/widgets/categorynavigator.js:449
 msgid "Search result"
 msgstr ""
 
-#: indico/web/client/js/jquery/widgets/categorynavigator.js:472
+#: indico/web/client/js/jquery/widgets/categorynavigator.js:470
 msgid "Displaying {0} out of {1} results."
 msgstr ""
 
-#: indico/web/client/js/jquery/widgets/categorynavigator.js:473
+#: indico/web/client/js/jquery/widgets/categorynavigator.js:471
 msgid "There are no results."
 msgstr ""
 
-#: indico/web/client/js/jquery/widgets/categorynavigator.js:477
+#: indico/web/client/js/jquery/widgets/categorynavigator.js:475
 msgid "Make the search more specific for more accurate results"
 msgstr ""
 
-#: indico/web/client/js/jquery/widgets/categorynavigator.js:482
+#: indico/web/client/js/jquery/widgets/categorynavigator.js:480
 msgid "Clear search"
 msgstr ""
 
-#: indico/web/client/js/jquery/widgets/categorynavigator.js:706
+#: indico/web/client/js/jquery/widgets/categorynavigator.js:704
 msgid "You selected category <em>{0}</em>. Are you sure you want to proceed?"
 msgstr ""
 

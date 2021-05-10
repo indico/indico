@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: indico 2.3.5-dev\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2021-04-14 10:29+0200\n"
+"POT-Creation-Date: 2021-05-10 16:36+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -95,7 +95,9 @@ msgstr ""
 
 #: indico/core/celery/templates/celery_tasks.html:12
 #, python-format
-msgid "Monitor Indico's Celery tasks with Flower <a class=\"bold\" href=\"%(flower_url)s\" target=\"_blank\">here</a>."
+msgid ""
+"Monitor Indico's Celery tasks with Flower <a class=\"bold\" href=\"%(flower_url)s\" target=\"_blank\" rel=\"noopener "
+"noreferrer\">here</a>."
 msgstr ""
 
 #: indico/core/celery/templates/celery_tasks.html:18
@@ -1272,13 +1274,13 @@ msgstr ""
 msgid "Download package"
 msgstr ""
 
-#: indico/modules/attachments/templates/preview.html:9 indico/modules/attachments/templates/preview.html:11
+#: indico/modules/attachments/templates/preview.html:10 indico/modules/attachments/templates/preview.html:12
 #: indico/modules/events/agreements/templates/agreement_type_details.html:63
 #: indico/modules/events/static/templates/static_sites.html:42 indico/modules/events/static/templates/static_sites.html:61
 msgid "Download"
 msgstr ""
 
-#: indico/modules/attachments/templates/preview.html:15
+#: indico/modules/attachments/templates/preview.html:16
 #: indico/modules/events/contributions/templates/management/fields_dialog.html:51
 #: indico/modules/events/contributions/templates/management/types_dialog.html:43
 #: indico/modules/events/notes/templates/edit_note.html:8
@@ -1606,7 +1608,9 @@ msgstr ""
 
 #: indico/modules/auth/templates/login_page.html:67
 #, python-format
-msgid "If you do not have an account yet, you can <a href=\"%(url)s\" target=\"_blank\">create one here</a>."
+msgid ""
+"If you do not have an account yet, you can <a href=\"%(url)s\" target=\"_blank\" rel=\"noopener noreferrer\">create "
+"one here</a>."
 msgstr ""
 
 #: indico/modules/auth/templates/login_page.html:73 indico/modules/events/payment/templates/event_plugin_edit.html:38
@@ -4999,20 +5003,20 @@ msgstr ""
 msgid "n/a"
 msgstr ""
 
-#: indico/modules/events/abstracts/templates/management/_abstract_list.html:218
+#: indico/modules/events/abstracts/templates/management/_abstract_list.html:220
 msgid "You have reviewed this abstract"
 msgstr ""
 
-#: indico/modules/events/abstracts/templates/management/_abstract_list.html:227
+#: indico/modules/events/abstracts/templates/management/_abstract_list.html:229
 #: indico/modules/events/abstracts/templates/reviewing/public.html:444
 msgid "Go to contribution"
 msgstr ""
 
-#: indico/modules/events/abstracts/templates/management/_abstract_list.html:239
+#: indico/modules/events/abstracts/templates/management/_abstract_list.html:241
 msgid "The filtering criteria do not match with any of the existing abstracts. Try to clear the filters."
 msgstr ""
 
-#: indico/modules/events/abstracts/templates/management/_abstract_list.html:243
+#: indico/modules/events/abstracts/templates/management/_abstract_list.html:245
 msgid "There are no abstracts yet."
 msgstr ""
 
@@ -8866,7 +8870,7 @@ msgstr ""
 msgid "Please check the review and submit a revised version"
 msgstr ""
 
-#: indico/modules/events/papers/templates/_contributions.html:197
+#: indico/modules/events/papers/templates/_contributions.html:198
 msgid "Proceedings"
 msgstr ""
 

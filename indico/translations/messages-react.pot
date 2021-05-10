@@ -1,6 +1,6 @@
 msgid ""
 msgstr ""
-"POT-Creation-Date: 2021-04-21 10:30+0200\n"
+"POT-Creation-Date: 2021-05-21 16:36+0200\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "MIME-Version: 1.0\n"
@@ -1444,7 +1444,7 @@ msgstr ""
 #: indico/modules/rb/client/js/common/timeline/RowActionsDropdown.jsx:198
 #: indico/modules/rb/client/js/common/timeline/RowActionsDropdown.jsx:210
 #: indico/modules/rb/client/js/modules/blockings/BlockingModal.jsx:432
-#: indico/modules/rb/client/js/modules/bookRoom/BookRoomModal.jsx:664
+#: indico/modules/rb/client/js/modules/bookRoom/BookRoomModal.jsx:663
 msgid "Close"
 msgstr ""
 
@@ -1694,17 +1694,17 @@ msgid "Changing date or time will revert it back to a pre-booking."
 msgstr ""
 
 #: indico/modules/rb/client/js/common/bookings/BookingEditForm.jsx:264
-#: indico/modules/rb/client/js/modules/bookRoom/BookRoomModal.jsx:595
+#: indico/modules/rb/client/js/modules/bookRoom/BookRoomModal.jsx:594
 msgid "I'll be using it myself"
 msgstr ""
 
 #: indico/modules/rb/client/js/common/bookings/BookingEditForm.jsx:274
-#: indico/modules/rb/client/js/modules/bookRoom/BookRoomModal.jsx:601
+#: indico/modules/rb/client/js/modules/bookRoom/BookRoomModal.jsx:600
 msgid "I'm booking it for someone else"
 msgstr ""
 
 #: indico/modules/rb/client/js/common/bookings/BookingEditForm.jsx:293
-#: indico/modules/rb/client/js/modules/bookRoom/BookRoomModal.jsx:621
+#: indico/modules/rb/client/js/modules/bookRoom/BookRoomModal.jsx:620
 msgid "Reason for booking"
 msgstr ""
 
@@ -1794,7 +1794,7 @@ msgstr ""
 msgid "Your booking will be linked to a session block:"
 msgstr ""
 
-#: indico/modules/rb/client/js/common/linking/LinkBar.jsx:60
+#: indico/modules/rb/client/js/common/linking/LinkBar.jsx:59
 msgid "Exit linking mode"
 msgstr ""
 
@@ -1811,7 +1811,7 @@ msgid "Zoom out to include all listed rooms"
 msgstr ""
 
 #: indico/modules/rb/client/js/common/rooms/RoomDetailsModal.jsx:204
-#: indico/modules/rb/client/js/modules/bookRoom/BookRoomModal.jsx:589
+#: indico/modules/rb/client/js/modules/bookRoom/BookRoomModal.jsx:588
 msgid "Usage"
 msgstr ""
 
@@ -2268,7 +2268,7 @@ msgid "List of Rooms"
 msgstr ""
 
 #: indico/modules/rb/client/js/components/Menu.jsx:22
-#: indico/modules/rb/client/js/modules/bookRoom/BookRoomModal.jsx:673
+#: indico/modules/rb/client/js/modules/bookRoom/BookRoomModal.jsx:672
 msgid "Bookings"
 msgstr ""
 
@@ -2926,7 +2926,7 @@ msgid "One or more bookings would conflict with yours."
 msgstr ""
 
 #: indico/modules/rb/client/js/modules/bookRoom/BookFromListModal.jsx:170
-#: indico/modules/rb/client/js/modules/bookRoom/BookRoomModal.jsx:643
+#: indico/modules/rb/client/js/modules/bookRoom/BookRoomModal.jsx:642
 msgid "Bookings in the past are not allowed."
 msgstr ""
 
@@ -2977,15 +2977,15 @@ msgstr ""
 msgid "You need to provide a reason"
 msgstr ""
 
-#: indico/modules/rb/client/js/modules/bookRoom/BookRoomModal.jsx:415
+#: indico/modules/rb/client/js/modules/bookRoom/BookRoomModal.jsx:414
 msgid "Choose an event"
 msgstr ""
 
-#: indico/modules/rb/client/js/modules/bookRoom/BookRoomModal.jsx:464
+#: indico/modules/rb/client/js/modules/bookRoom/BookRoomModal.jsx:463
 msgid "Event"
 msgstr ""
 
-#: indico/modules/rb/client/js/modules/bookRoom/BookRoomModal.jsx:467
+#: indico/modules/rb/client/js/modules/bookRoom/BookRoomModal.jsx:466
 msgid ""
 "You have an event taking place during the selected time. If you are booking "
 "the room for this event, please select it below. The room of the selected "
@@ -3053,31 +3053,31 @@ msgid ""
 "pre-bookings will automatically be rejected:"
 msgstr ""
 
-#: indico/modules/rb/client/js/modules/bookRoom/BookRoomModal.jsx:488
+#: indico/modules/rb/client/js/modules/bookRoom/BookRoomModal.jsx:487
 msgid "Assign the room {room} to this event"
 msgstr ""
 
-#: indico/modules/rb/client/js/modules/bookRoom/BookRoomModal.jsx:489
+#: indico/modules/rb/client/js/modules/bookRoom/BookRoomModal.jsx:488
 msgid "Assign the room {room} to this contribution"
 msgstr ""
 
-#: indico/modules/rb/client/js/modules/bookRoom/BookRoomModal.jsx:492
+#: indico/modules/rb/client/js/modules/bookRoom/BookRoomModal.jsx:491
 msgid "Assign the room {room} to this session block"
 msgstr ""
 
-#: indico/modules/rb/client/js/modules/bookRoom/BookRoomModal.jsx:498
+#: indico/modules/rb/client/js/modules/bookRoom/BookRoomModal.jsx:497
 msgid "Assign the room {room} to this event (instead of {oldRoom})"
 msgstr ""
 
-#: indico/modules/rb/client/js/modules/bookRoom/BookRoomModal.jsx:504
+#: indico/modules/rb/client/js/modules/bookRoom/BookRoomModal.jsx:503
 msgid "Assign the room {room} to this contribution (instead of {oldRoom})"
 msgstr ""
 
-#: indico/modules/rb/client/js/modules/bookRoom/BookRoomModal.jsx:511
+#: indico/modules/rb/client/js/modules/bookRoom/BookRoomModal.jsx:510
 msgid "Assign the room {room} to this session block (instead of {oldRoom})"
 msgstr ""
 
-#: indico/modules/rb/client/js/modules/bookRoom/BookRoomModal.jsx:665
+#: indico/modules/rb/client/js/modules/bookRoom/BookRoomModal.jsx:664
 msgid "I've changed my mind!"
 msgstr ""
 
