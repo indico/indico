@@ -65,7 +65,7 @@
         {% elif indico_config.EXTERNAL_REGISTRATION_URL %}
             <p class="register">
                 {% trans url=indico_config.EXTERNAL_REGISTRATION_URL -%}
-                    If you do not have an account yet, you can <a href="{{ url }}" target="_blank">create one here</a>.
+                    If you do not have an account yet, you can <a href="{{ url }}" target="_blank" rel="noopener noreferrer">create one here</a>.
                 {%- endtrans %}
             </p>
         {% endif %}

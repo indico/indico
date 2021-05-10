@@ -11,7 +11,7 @@
             {%- call message_box('info', fixed_width=true) -%}
                 {%- trans flower_url=indico_config.FLOWER_URL -%}
                     Monitor Indico's Celery tasks with Flower
-                    <a class="bold" href="{{ flower_url }}" target="_blank">here</a>.
+                    <a class="bold" href="{{ flower_url }}" target="_blank" rel="noopener noreferrer">here</a>.
                 {%- endtrans -%}
             {%- endcall %}
         {%- endif -%}
