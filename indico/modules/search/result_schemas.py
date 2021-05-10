@@ -5,10 +5,12 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from marshmallow import EXCLUDE, ValidationError, fields
+from marshmallow import EXCLUDE, ValidationError, fields, post_dump
 from marshmallow_enum import EnumField
 from marshmallow_oneofschema import OneOfSchema
+from sqlalchemy.sql import select
 
+from indico.core.db import db
 from indico.core.db.sqlalchemy.links import LinkType
 from indico.core.marshmallow import mm
 from indico.modules.attachments.models.attachments import AttachmentType
@@ -16,7 +18,11 @@ from indico.modules.attachments.models.folders import AttachmentFolder
 from indico.modules.events.contributions.models.contributions import Contribution
 from indico.modules.events.models.events import Event, EventType
 from indico.modules.events.notes.models.notes import EventNote
+from indico.modules.events.sessions.models.blocks import SessionBlock
+from indico.modules.events.sessions.models.sessions import Session
+from indico.modules.rb.models.locations import Location
 from indico.modules.search.base import SearchTarget
+from indico.modules.users.models.affiliations import UserAffiliation
 from indico.web.flask.util import url_for
 
 
@@ -251,3 +257,36 @@ class ResultSchema(_ResultSchemaBase):
     pages = fields.Int(required=True)
     results = fields.List(fields.Nested(ResultItemSchema), required=True)
     aggregations = fields.Dict(fields.String(), fields.Nested(AggregationSchema), missing={})
+
+    @post_dump
+    def _normalize_aggregations(self, data, **kwargs):
+        if affiliations := data.get('aggregations', {}).get('affiliation'):
+            if keys := {b['key'] for b in affiliations['buckets'] if b['key']}:
+                # XXX use EventPerson here as well? would be another good source of affiliation names
+                mapping = _get_most_common_capitalization(UserAffiliation.name, keys)
+                for b in affiliations['buckets']:
+                    b['key'] = mapping.get(b['key'].lower(), b['key'].title())
+
+        if venues := data.get('aggregations', {}).get('venue'):
+            if keys := {b['key'] for b in venues['buckets'] if b['key']}:
+                venue_cte = (db.session
+                             .query(Location.name.label('name'))
+                             .union(select([Event.own_venue_name.label('name')]),
+                                    select([Contribution.own_venue_name.label('name')]),
+                                    select([Session.own_venue_name.label('name')]),
+                                    select([SessionBlock.own_venue_name.label('name')]))
+                             .cte())
+                mapping = _get_most_common_capitalization(venue_cte.c.name, keys)
+                for b in venues['buckets']:
+                    b['key'] = mapping.get(b['key'].lower(), b['key'].title())
+        return data
+
+
+def _get_most_common_capitalization(column, values):
+    query = (db.session.query(db.func.first_value(column)
+                              .over(order_by=db.func.count().desc(), partition_by=db.func.lower(column))
+                              .distinct()
+                              .label('name'))
+             .filter(db.func.lower(column).in_({v.lower() for v in values}))
+             .group_by(column))
+    return {v.lower(): v for v, in query}
