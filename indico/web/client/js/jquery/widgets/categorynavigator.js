@@ -402,13 +402,11 @@ import Palette from '../../utils/palette';
       var indexStart = title.toLowerCase().search(query.toLowerCase());
       var indexEnd = indexStart + query.length;
 
-      $title.html(
-        title.substring(0, indexStart) +
-          '<strong>' +
-          title.substring(indexStart, indexEnd) +
-          '</strong>' +
-          title.substring(indexEnd)
-      );
+      const prefix = $('<span />').text(title.substring(0, indexStart));
+      const highlight = $('<strong />').text(title.substring(indexStart, indexEnd));
+      const suffix = $('<span />').text(title.substring(indexEnd));
+
+      $title.empty().append(prefix, highlight, suffix);
     },
 
     _renderCurrentCategory: function(category) {

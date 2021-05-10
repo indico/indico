@@ -291,7 +291,7 @@
             }
 
             while ($main.outerHeight() > $this.height() && ($main.outerHeight() - parseInt($main.css('line-height'), 10)) > 1) {
-                $title.html($title.text().slice(0, -5) + '&#8230;');
+                $title.text($title.text().slice(0, -5) + '…');
             }
         });
     });

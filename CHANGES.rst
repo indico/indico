@@ -7,6 +7,15 @@ Version 2.3.5
 
 *Unreleased*
 
+Security fixes
+^^^^^^^^^^^^^^
+
+- Fix XSS vulnerabilities in the category picker (via category titles), location widget (via room and
+  venue names defined by an Indico administrator) and the "Indico Weeks View" timetable theme (via
+  contribution/break titles defined by an event organizer). As neither of these objects can be created
+  by untrusted users (on a properly configured instance) we consider the severity of this vulnerability
+  "minor" (:pr:`4897`)
+
 Internationalization
 ^^^^^^^^^^^^^^^^^^^^
 

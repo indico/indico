@@ -223,7 +223,7 @@
 
     function highlightOption(inputField, value) {
       var highlighter = inputField.siblings('.keyword-highlighter');
-      highlighter.html(value).addClass('visible');
+      highlighter.text(value).addClass('visible');
     }
 
     function cleanQuery(query) {
@@ -327,6 +327,9 @@
       cancelButton: false,
       callback: {
         onInit: function(node) {
+          // XXX: setting this affects all instances of typeahead, but we want to be protected
+          // from XSS everywhere anyway
+          this.helper.cleanStringFromScript = v => $('<span />').text(v).html();
           this.query = this.rawQuery = node.val(); // Updates the results dropdown on init
           handleKeystrokes(node);
         },
@@ -407,6 +410,9 @@
       display: 'name',
       callback: {
         onInit: function(node) {
+          // XXX: setting this affects all instances of typeahead, but we want to be protected
+          // from XSS everywhere anyway
+          this.helper.cleanStringFromScript = v => $('<span />').text(v).html();
           this.query = this.rawQuery = node.val();
           handleKeystrokes(node);
         },
