@@ -46,7 +46,10 @@ class LocationMixin:
                                              'inherited_location'))
         fkeys = [db.ForeignKeyConstraint(['venue_id', 'room_id'],
                                          ['roombooking.rooms.location_id', 'roombooking.rooms.id'])]
-        return tuple(checks) + tuple(fkeys)
+        indexes = [
+            db.Index(f'ix_uq_{cls.__tablename__}_venue_name_lower', db.func.lower(cls.own_venue_name))
+        ]
+        return tuple(checks) + tuple(fkeys) + tuple(indexes)
 
     @classmethod
     def register_location_events(cls):

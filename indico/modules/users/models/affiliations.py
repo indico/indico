@@ -5,13 +5,19 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
+from sqlalchemy.ext.declarative import declared_attr
+
 from indico.core.db import db
 from indico.core.db.sqlalchemy.custom.unaccent import define_unaccented_lowercase_index
 
 
 class UserAffiliation(db.Model):
     __tablename__ = 'affiliations'
-    __table_args__ = {'schema': 'users'}
+
+    @declared_attr
+    def __table_args__(cls):
+        return (db.Index('ix_uq_affiliations_name_lower', db.func.lower(cls.name)),
+                {'schema': 'users'})
 
     #: the unique id of the affiliations
     id = db.Column(

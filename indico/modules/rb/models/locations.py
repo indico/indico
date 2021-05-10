@@ -7,6 +7,7 @@
 
 import re
 
+from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.ext.hybrid import hybrid_property
 
 from indico.core.db import db
@@ -15,8 +16,12 @@ from indico.util.string import format_repr
 
 class Location(db.Model):
     __tablename__ = 'locations'
-    __table_args__ = (db.Index(None, 'name', unique=True, postgresql_where=db.text('NOT is_deleted')),
-                      {'schema': 'roombooking'})
+
+    @declared_attr
+    def __table_args__(cls):
+        return (db.Index(None, 'name', unique=True, postgresql_where=db.text('NOT is_deleted')),
+                db.Index('ix_uq_locations_name_lower', db.func.lower(cls.name)),
+                {'schema': 'roombooking'})
 
     id = db.Column(
         db.Integer,
