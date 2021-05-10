@@ -389,8 +389,7 @@ class BookRoomModal extends React.Component {
     if (link) {
       return (
         <span styleName="link-active">
-          {/* eslint-disable-next-line react/jsx-no-target-blank */}
-          <a href={link} target="_blank">
+          <a href={link} target="_blank" rel="noopener noreferrer">
             <Icon name="external" link />
           </a>
         </span>

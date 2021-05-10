@@ -3,7 +3,7 @@
 # This file is distributed under the same license as the indico project.
 # 
 # Translators:
-# Adrian Mönnich, 2017-2018
+# Adrian Mönnich, 2017-2018,2021
 # Adrian Mönnich, 2017
 # Dirk Hoffmann <Hoffmann@cppm.in2p3.fr>, 2012-2014,2020
 # Jacques <jacques.dafflon@gmail.com>, 2015
@@ -16,9 +16,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Indico\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2021-04-14 10:29+0200\n"
-"PO-Revision-Date: 2021-04-16 12:42+0000\n"
-"Last-Translator: Thomas Baron <thomas.baron@cern.ch>\n"
+"POT-Creation-Date: 2021-05-10 16:36+0200\n"
+"PO-Revision-Date: 2021-05-10 14:49+0000\n"
+"Last-Translator: Adrian Mönnich\n"
 "Language-Team: French (France) (http://www.transifex.com/indico/indico/language/fr_FR/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -111,8 +111,9 @@ msgstr "Une version différente d'Indico est exécutée sur le planificateur de 
 #, python-format
 msgid ""
 "Monitor Indico's Celery tasks with Flower <a class=\"bold\" "
-"href=\"%(flower_url)s\" target=\"_blank\">here</a>."
-msgstr "Monitorer les tâches Celery avec Flower <a class=\"bold\" href=\"%(flower_url)s\" target=\"_blank\">ici</a>."
+"href=\"%(flower_url)s\" target=\"_blank\" rel=\"noopener "
+"noreferrer\">here</a>."
+msgstr "Monitorer les tâches Celery avec Flower <a class=\"bold\" href=\"%(flower_url)s\" target=\"_blank\" rel=\"noopener noreferrer\">ici</a>."
 
 #: indico/core/celery/templates/celery_tasks.html:18
 msgid "Periodic Tasks"
@@ -1480,15 +1481,15 @@ msgstr "Retour"
 msgid "Download package"
 msgstr "Télécharger le fichier ZIP"
 
-#: indico/modules/attachments/templates/preview.html:9
-#: indico/modules/attachments/templates/preview.html:11
+#: indico/modules/attachments/templates/preview.html:10
+#: indico/modules/attachments/templates/preview.html:12
 #: indico/modules/events/agreements/templates/agreement_type_details.html:63
 #: indico/modules/events/static/templates/static_sites.html:42
 #: indico/modules/events/static/templates/static_sites.html:61
 msgid "Download"
 msgstr "Télécharger "
 
-#: indico/modules/attachments/templates/preview.html:15
+#: indico/modules/attachments/templates/preview.html:16
 #: indico/modules/events/contributions/templates/management/fields_dialog.html:51
 #: indico/modules/events/contributions/templates/management/types_dialog.html:43
 #: indico/modules/events/notes/templates/edit_note.html:8
@@ -1865,8 +1866,8 @@ msgstr "Si vous n'avez pas encore de compte, vous pouvez en <a href=\"%(url)s\">
 #, python-format
 msgid ""
 "If you do not have an account yet, you can <a href=\"%(url)s\" "
-"target=\"_blank\">create one here</a>."
-msgstr "Si vous n'avez pas encore de compte, vous pouvez en <a href=\"%(url)s\" target=\"_blank\">créer un ici</a>."
+"target=\"_blank\" rel=\"noopener noreferrer\">create one here</a>."
+msgstr "Si vous n'avez pas encore de compte, vous pouvez en <a href=\"%(url)s\" target=\"_blank\" rel=\"noopener noreferrer\">créer un ici</a>."
 
 #: indico/modules/auth/templates/login_page.html:73
 #: indico/modules/events/payment/templates/event_plugin_edit.html:38
@@ -5534,22 +5535,22 @@ msgstr "Ce résumé a été accepté pour la thématique \"%(other_track)s\""
 msgid "n/a"
 msgstr "n/a"
 
-#: indico/modules/events/abstracts/templates/management/_abstract_list.html:218
+#: indico/modules/events/abstracts/templates/management/_abstract_list.html:220
 msgid "You have reviewed this abstract"
 msgstr "Vous avez évalué ce résumé"
 
-#: indico/modules/events/abstracts/templates/management/_abstract_list.html:227
+#: indico/modules/events/abstracts/templates/management/_abstract_list.html:229
 #: indico/modules/events/abstracts/templates/reviewing/public.html:444
 msgid "Go to contribution"
 msgstr "Aller à la contribution"
 
-#: indico/modules/events/abstracts/templates/management/_abstract_list.html:239
+#: indico/modules/events/abstracts/templates/management/_abstract_list.html:241
 msgid ""
 "The filtering criteria do not match with any of the existing abstracts. Try "
 "to clear the filters."
 msgstr "Les critères de filtrage ne renvoient aucun résumé. Essayez de les supprimer."
 
-#: indico/modules/events/abstracts/templates/management/_abstract_list.html:243
+#: indico/modules/events/abstracts/templates/management/_abstract_list.html:245
 msgid "There are no abstracts yet."
 msgstr "Il n'y a encore aucun résumé."
 
@@ -9641,7 +9642,7 @@ msgstr "Votre article doit être corrigé"
 msgid "Please check the review and submit a revised version"
 msgstr "Veuillez vérifier l'évaluation et déposer une version révisée"
 
-#: indico/modules/events/papers/templates/_contributions.html:197
+#: indico/modules/events/papers/templates/_contributions.html:198
 msgid "Proceedings"
 msgstr "Actes"
 

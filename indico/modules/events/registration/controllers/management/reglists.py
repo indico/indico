@@ -209,7 +209,7 @@ class RHRegistrationEmailRegistrants(RHRegistrationsActionBase):
             email = make_email(to_list=registration.email, cc_list=form.cc_addresses.data, bcc_list=bcc,
                                from_address=form.from_address.data, template=template, html=True,
                                attachments=attachments)
-            send_email(email, self.event, 'Registration')
+            send_email(email, self.event, 'Registration', log_metadata={'registration_id': registration.id})
 
     def _process(self):
         tpl = get_template_module('events/registration/emails/custom_email_default.html')

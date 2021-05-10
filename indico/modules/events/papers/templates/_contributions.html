@@ -178,7 +178,8 @@
                     {% set icon = icon_from_mimetype(file.content_type, 'icon-file-filled') %}
                     <tr>
                         <td class="revision-file-row">
-                            <a href="{{ download_url }}" class="attachment {{ icon }}" target="_blank">
+                            <a href="{{ download_url }}" class="attachment {{ icon }}" target="_blank"
+                               rel="noopener noreferrer">
                                 {{ file.filename }}
                             </a>
                         </td>
