@@ -13,7 +13,7 @@ import time
 
 import pywatchman
 from flask.helpers import get_root_path
-from werkzeug._reloader import _find_observable_paths
+from werkzeug._reloader import _find_watchdog_paths
 
 from indico.util.console import cformat
 
@@ -89,7 +89,7 @@ class Watchman:
         self._client = pywatchman.client(timeout=300)
         self._client.capabilityCheck(required=['wildmatch', 'cmd-watch-project'])
         indico_project_root = os.path.realpath(os.path.join(get_root_path('indico'), '..'))
-        paths = sorted({os.path.realpath(p) for p in _find_observable_paths() if os.path.exists(p)})
+        paths = sorted({os.path.realpath(p) for p in _find_watchdog_paths(set(), set()) if os.path.exists(p)})
         for path in paths:
             patterns = ['**/*.py', '**/entry_points.txt']
             if path == indico_project_root:
