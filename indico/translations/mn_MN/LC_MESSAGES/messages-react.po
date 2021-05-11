@@ -1,11 +1,12 @@
 # 
 # Translators:
 # Pedro Lourenço <pedroob221@gmail.com>, 2021
+# batpurev batchuluun <batpurev@gmail.com>, 2021
 # 
 msgid ""
 msgstr ""
-"POT-Creation-Date: 2021-04-21 10:30+0200\n"
-"Last-Translator: Pedro Lourenço <pedroob221@gmail.com>, 2021\n"
+"POT-Creation-Date: 2021-05-21 16:36+0200\n"
+"Last-Translator: batpurev batchuluun <batpurev@gmail.com>, 2021\n"
 "Language-Team: Mongolian (Mongolia) (https://www.transifex.com/indico/teams/6478/mn_MN/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -500,7 +501,7 @@ msgstr "Бэлэн биш"
 #: indico/modules/events/editing/client/js/editing/timeline/TimelineHeader.jsx:79
 #: indico/modules/events/papers/client/js/components/TimelineHeader.jsx:34
 msgid "{submitterName} submitted for the contribution {contributionLink}"
-msgstr "{хүргүүлэгчийнНэр}-г хувь нэмэр {хувь нэмрийнХолбоос}-т хүргүүлсэн"
+msgstr "{contributionLink}-г хувь нэмэр {submitterName}-т хүргүүлсэн"
 
 #: indico/modules/events/editing/client/js/editing/timeline/TimelineHeader.jsx:95
 msgid "{editorName} is the assigned editor"
@@ -551,7 +552,7 @@ msgstr "Энэ хувилбар шинэчлэгдсэн"
 #: indico/modules/events/editing/client/js/editing/timeline/index.jsx:65
 msgid "{link}Click here to refresh{/link} and see the most recent version."
 msgstr ""
-"{link} Энд дарж сэргээнэ үү {/ link}, хамгийн сүүлийн хувилбарыг нь үзнэ үү."
+"{link} Энд дарж сэргээнэ үү{/link}, хамгийн сүүлийн хувилбарыг нь үзнэ үү."
 
 #: indico/modules/events/editing/client/js/editing/timeline/judgment/AcceptRejectForm.jsx:67
 #: indico/modules/events/editing/client/js/editing/timeline/judgment/UpdateFilesForm.jsx:33
@@ -685,7 +686,7 @@ msgstr "Тохируулж засварлах ажлын урсгалын төл
 
 #: indico/modules/events/editing/client/js/management/ManageService.jsx:54
 msgid "Workflow service unavailable: {error}"
-msgstr "Ажлын урсгалын үйлчилгээ байхгүй байна: {алдаа}"
+msgstr "Ажлын урсгалын үйлчилгээ байхгүй байна: {error}"
 
 #: indico/modules/events/editing/client/js/management/ManageService.jsx:63
 msgid "Use a custom editing workflow provided by an external service"
@@ -1060,7 +1061,7 @@ msgid ""
 "placeholder for the contribution programme code."
 msgstr ""
 "Энэ төрлийн бүх файлууд тохирч байх ёстой глобал загварын файлын нэрийн "
-"загвар (жишээлбэл, {example}). Цэг оруулахыг хориглоно. {Placeholder} -ийг "
+"загвар (жишээлбэл, {example}). Цэг оруулахыг хориглоно. {placeholder} -ийг "
 "шимтгэлийн програмын кодод зориулж газар эзэмшигч болгон ашиглах боломжтой."
 
 #: indico/modules/events/editing/client/js/management/editable_type/file_types/FileTypeModal.jsx:87
@@ -1312,7 +1313,7 @@ msgstr "Энэ асуултыг заавал үнэлнэ үү"
 
 #: indico/modules/events/papers/client/js/components/GroupReviewForm.jsx:148
 msgid "Reviewing in {group}"
-msgstr "{Group} -д хянаж байна"
+msgstr "{group} -д хянаж байна"
 
 #: indico/modules/events/papers/client/js/components/GroupReviewForm.jsx:159
 msgid "Ratings"
@@ -1374,7 +1375,7 @@ msgstr "Илгээсэн хүнд сэтгэгдэл үлдээнэ үү ..."
 
 #: indico/modules/events/papers/client/js/components/PaperMetadata.jsx:32
 msgid "Submitted on {date} by {submitter}"
-msgstr "{Date} дээр {submitter} илгээсэн"
+msgstr "{date} дээр {submitter} илгээсэн"
 
 #: indico/modules/events/papers/client/js/components/PaperReviewForm.jsx:63
 #: indico/modules/events/papers/client/js/components/PaperReviewForm.jsx:71
@@ -1387,7 +1388,7 @@ msgstr "Хяналт өөрчлөх"
 
 #: indico/modules/events/papers/client/js/components/RevisionComment.jsx:81
 msgid "On {modificationDate} by {modifiedBy}"
-msgstr "{ModificationDate} дээр {modifiedBy}"
+msgstr "{modificationDate} дээр {modifiedBy}"
 
 #: indico/modules/events/papers/client/js/components/RevisionJudgment.jsx:40
 msgid "{judgeName} accepted this paper."
@@ -1435,11 +1436,11 @@ msgstr "{reviewerName} сэтгэгдэл үлдээв"
 
 #: indico/modules/events/papers/client/js/components/RevisionReview.jsx:112
 msgid "Proposed to {actionName}accept{/actionName}"
-msgstr "{ActionName} хүлээн авах {/actionName} -г санал болгосон"
+msgstr "{actionName} хүлээн авах {/actionName} -г санал болгосон"
 
 #: indico/modules/events/papers/client/js/components/RevisionReview.jsx:120
 msgid "Proposed to {actionName}reject{/actionName}"
-msgstr "{ActionName} татгалзах {/ActionName} санал болгосон"
+msgstr "{actionName} татгалзах {/actionName} санал болгосон"
 
 #: indico/modules/events/papers/client/js/components/RevisionReview.jsx:128
 msgid "Proposed to {actionName}correct{/actionName}"
@@ -1515,7 +1516,7 @@ msgstr "Энэ өдөр ({date}) -д ямар ч тохиолдол гарааг
 #: indico/modules/rb/client/js/common/timeline/RowActionsDropdown.jsx:198
 #: indico/modules/rb/client/js/common/timeline/RowActionsDropdown.jsx:210
 #: indico/modules/rb/client/js/modules/blockings/BlockingModal.jsx:432
-#: indico/modules/rb/client/js/modules/bookRoom/BookRoomModal.jsx:664
+#: indico/modules/rb/client/js/modules/bookRoom/BookRoomModal.jsx:663
 msgid "Close"
 msgstr "Хаах"
 
@@ -1777,17 +1778,17 @@ msgstr ""
 "Огноо эсвэл цагийг өөрчлөх нь урьдчилж захиалга руу буцааж өгөх болно."
 
 #: indico/modules/rb/client/js/common/bookings/BookingEditForm.jsx:264
-#: indico/modules/rb/client/js/modules/bookRoom/BookRoomModal.jsx:595
+#: indico/modules/rb/client/js/modules/bookRoom/BookRoomModal.jsx:594
 msgid "I'll be using it myself"
 msgstr "Би өөрөө үүнийг ашиглах болно"
 
 #: indico/modules/rb/client/js/common/bookings/BookingEditForm.jsx:274
-#: indico/modules/rb/client/js/modules/bookRoom/BookRoomModal.jsx:601
+#: indico/modules/rb/client/js/modules/bookRoom/BookRoomModal.jsx:600
 msgid "I'm booking it for someone else"
 msgstr "Би үүнийг өөр хүнд захиалж өгч байна"
 
 #: indico/modules/rb/client/js/common/bookings/BookingEditForm.jsx:293
-#: indico/modules/rb/client/js/modules/bookRoom/BookRoomModal.jsx:621
+#: indico/modules/rb/client/js/modules/bookRoom/BookRoomModal.jsx:620
 msgid "Reason for booking"
 msgstr "Захиалга өгөх шалтгаан"
 
@@ -1877,7 +1878,7 @@ msgstr "Таны захиалгыг хувь нэмэртэй холбоно."
 msgid "Your booking will be linked to a session block:"
 msgstr "Энэ захиалга нь сессион блоктой холбох болно:"
 
-#: indico/modules/rb/client/js/common/linking/LinkBar.jsx:60
+#: indico/modules/rb/client/js/common/linking/LinkBar.jsx:59
 msgid "Exit linking mode"
 msgstr "Холбох горимоос гарах"
 
@@ -1894,7 +1895,7 @@ msgid "Zoom out to include all listed rooms"
 msgstr "Бүртгэгдсэн бүх өрөөг багтаахын тулд хэмжээг нь томруул"
 
 #: indico/modules/rb/client/js/common/rooms/RoomDetailsModal.jsx:204
-#: indico/modules/rb/client/js/modules/bookRoom/BookRoomModal.jsx:589
+#: indico/modules/rb/client/js/modules/bookRoom/BookRoomModal.jsx:588
 msgid "Usage"
 msgstr "Хэрэглээ"
 
@@ -2356,7 +2357,7 @@ msgid "List of Rooms"
 msgstr "Өрөөнүүдийн жагсаалт"
 
 #: indico/modules/rb/client/js/components/Menu.jsx:22
-#: indico/modules/rb/client/js/modules/bookRoom/BookRoomModal.jsx:673
+#: indico/modules/rb/client/js/modules/bookRoom/BookRoomModal.jsx:672
 msgid "Bookings"
 msgstr "Захиалга"
 
@@ -2875,7 +2876,7 @@ msgstr[1] "{count} өрөөнүүд"
 
 #: indico/modules/rb/client/js/modules/blockings/BlockingCard.jsx:73
 msgid "Created by {createdBy}"
-msgstr "{CreatedBy} үүсгэсэн"
+msgstr "{createdBy} үүсгэсэн"
 
 #: indico/modules/rb/client/js/modules/blockings/BlockingFilterBar.jsx:22
 msgid "Active and future"
@@ -3048,7 +3049,7 @@ msgid "One or more bookings would conflict with yours."
 msgstr "Нэг буюу хэд хэдэн захиалга таны захиалгатай зөрчилдөх болно."
 
 #: indico/modules/rb/client/js/modules/bookRoom/BookFromListModal.jsx:170
-#: indico/modules/rb/client/js/modules/bookRoom/BookRoomModal.jsx:643
+#: indico/modules/rb/client/js/modules/bookRoom/BookRoomModal.jsx:642
 msgid "Bookings in the past are not allowed."
 msgstr "Өнгөрсөн хугацаанд захиалга өгөхийг хориглоно."
 
@@ -3099,15 +3100,15 @@ msgstr "Хэрэглэгчээ зааж өгнө үү"
 msgid "You need to provide a reason"
 msgstr "Та шалтгааныг нь өгөх хэрэгтэй"
 
-#: indico/modules/rb/client/js/modules/bookRoom/BookRoomModal.jsx:415
+#: indico/modules/rb/client/js/modules/bookRoom/BookRoomModal.jsx:414
 msgid "Choose an event"
 msgstr "Арга хэмжээ сонгоорой"
 
-#: indico/modules/rb/client/js/modules/bookRoom/BookRoomModal.jsx:464
+#: indico/modules/rb/client/js/modules/bookRoom/BookRoomModal.jsx:463
 msgid "Event"
 msgstr "Үйл явдал"
 
-#: indico/modules/rb/client/js/modules/bookRoom/BookRoomModal.jsx:467
+#: indico/modules/rb/client/js/modules/bookRoom/BookRoomModal.jsx:466
 msgid ""
 "You have an event taking place during the selected time. If you are booking "
 "the room for this event, please select it below. The room of the selected "
@@ -3190,34 +3191,34 @@ msgstr ""
 "Хэрэв та энэ захиалгыг бий болговол урьдчилсан захиалгын давхардсан дараахь "
 "өдрүүд автоматаар татгалзах болно:"
 
-#: indico/modules/rb/client/js/modules/bookRoom/BookRoomModal.jsx:488
+#: indico/modules/rb/client/js/modules/bookRoom/BookRoomModal.jsx:487
 msgid "Assign the room {room} to this event"
 msgstr "Энэ арга хэмжээнд өрөөг {room} оноох"
 
-#: indico/modules/rb/client/js/modules/bookRoom/BookRoomModal.jsx:489
+#: indico/modules/rb/client/js/modules/bookRoom/BookRoomModal.jsx:488
 msgid "Assign the room {room} to this contribution"
 msgstr "Өрөөнд {room} энэ хувь нэмэрт хуваарилна уу"
 
-#: indico/modules/rb/client/js/modules/bookRoom/BookRoomModal.jsx:492
+#: indico/modules/rb/client/js/modules/bookRoom/BookRoomModal.jsx:491
 msgid "Assign the room {room} to this session block"
 msgstr "Энэхүү хурлын блок руу өрөө {room}-г оноох"
 
-#: indico/modules/rb/client/js/modules/bookRoom/BookRoomModal.jsx:498
+#: indico/modules/rb/client/js/modules/bookRoom/BookRoomModal.jsx:497
 msgid "Assign the room {room} to this event (instead of {oldRoom})"
 msgstr "({oldRoom} энэний оронд) энэхүү үйл явдалд өрөө {room}-г оноох"
 
-#: indico/modules/rb/client/js/modules/bookRoom/BookRoomModal.jsx:504
+#: indico/modules/rb/client/js/modules/bookRoom/BookRoomModal.jsx:503
 msgid "Assign the room {room} to this contribution (instead of {oldRoom})"
 msgstr ""
 "( {oldRoom} энэний оронд) дээр энэхүү хувь нэмэрт зориулж өрөө {room}-г "
 "оноох"
 
-#: indico/modules/rb/client/js/modules/bookRoom/BookRoomModal.jsx:511
+#: indico/modules/rb/client/js/modules/bookRoom/BookRoomModal.jsx:510
 msgid "Assign the room {room} to this session block (instead of {oldRoom})"
 msgstr ""
 "({oldRoom} энэний оронд) дээр энэхүү хурлын блок руу өрөө {room}-г оноох"
 
-#: indico/modules/rb/client/js/modules/bookRoom/BookRoomModal.jsx:665
+#: indico/modules/rb/client/js/modules/bookRoom/BookRoomModal.jsx:664
 msgid "I've changed my mind!"
 msgstr "Би бодлоо өөрчиллөө!"
 

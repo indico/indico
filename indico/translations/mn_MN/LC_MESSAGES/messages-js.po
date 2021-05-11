@@ -10,7 +10,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Indico\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2021-04-14 10:29+0200\n"
+"POT-Creation-Date: 2021-05-10 16:36+0200\n"
 "PO-Revision-Date: 2021-04-13 07:57+0000\n"
 "Last-Translator: batpurev batchuluun <batpurev@gmail.com>\n"
 "Language-Team: Mongolian (Mongolia) (http://www.transifex.com/indico/indico/language/mn_MN/)\n"
@@ -629,7 +629,7 @@ msgid "You have unsaved changes that will be lost."
 msgstr "Танд алдагдах хадгалагдаагүй өөрчлөлтүүд байна."
 
 #: indico/web/client/js/jquery/utils/declarative.js:251
-#: indico/web/client/js/jquery/widgets/categorynavigator.js:708
+#: indico/web/client/js/jquery/widgets/categorynavigator.js:706
 #: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:1345
 msgid "Confirm action"
 msgstr "Үйлдэлийг батлах"
@@ -834,31 +834,31 @@ msgid ""
 "search\">clear</a> your search."
 msgstr "Та хайлтаа <a class=\"js-search\">өөрчилж </a>, эсвэл <a class=\"js-clear-search\">устгаж</a> болно."
 
-#: indico/web/client/js/jquery/widgets/categorynavigator.js:444
+#: indico/web/client/js/jquery/widgets/categorynavigator.js:442
 msgid "In favourite categories"
 msgstr "Дуртай ангилал дотор"
 
-#: indico/web/client/js/jquery/widgets/categorynavigator.js:451
+#: indico/web/client/js/jquery/widgets/categorynavigator.js:449
 msgid "Search result"
 msgstr "Хайлтын үр дүн"
 
-#: indico/web/client/js/jquery/widgets/categorynavigator.js:472
+#: indico/web/client/js/jquery/widgets/categorynavigator.js:470
 msgid "Displaying {0} out of {1} results."
 msgstr "{1} үр дүнгүүдээс {0}-г харуулж байна."
 
-#: indico/web/client/js/jquery/widgets/categorynavigator.js:473
+#: indico/web/client/js/jquery/widgets/categorynavigator.js:471
 msgid "There are no results."
 msgstr "Үр дүн олдсонгүй."
 
-#: indico/web/client/js/jquery/widgets/categorynavigator.js:477
+#: indico/web/client/js/jquery/widgets/categorynavigator.js:475
 msgid "Make the search more specific for more accurate results"
 msgstr "Илүү нарийвчилсан үр дүнг гаргахын тулд хайлтаа илүү тодорхой болгох"
 
-#: indico/web/client/js/jquery/widgets/categorynavigator.js:482
+#: indico/web/client/js/jquery/widgets/categorynavigator.js:480
 msgid "Clear search"
 msgstr "Хайлтаа арилгах"
 
-#: indico/web/client/js/jquery/widgets/categorynavigator.js:706
+#: indico/web/client/js/jquery/widgets/categorynavigator.js:704
 msgid "You selected category <em>{0}</em>. Are you sure you want to proceed?"
 msgstr "Та ангилал <em>{0}</em>-г сонгосон. Та үргэлжлүүлэхийг хүсэж байгаадаа итгэлтэй байна уу?"
 

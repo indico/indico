@@ -11,8 +11,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Indico\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2021-04-14 10:29+0200\n"
-"PO-Revision-Date: 2021-04-15 08:38+0000\n"
+"POT-Creation-Date: 2021-05-10 16:36+0200\n"
+"PO-Revision-Date: 2021-05-11 09:45+0000\n"
 "Last-Translator: batpurev batchuluun <batpurev@gmail.com>\n"
 "Language-Team: Mongolian (Mongolia) (http://www.transifex.com/indico/indico/language/mn_MN/)\n"
 "MIME-Version: 1.0\n"
@@ -106,8 +106,9 @@ msgstr "Celery ажлын хуваарь гаргагч нь Индикогий�
 #, python-format
 msgid ""
 "Monitor Indico's Celery tasks with Flower <a class=\"bold\" "
-"href=\"%(flower_url)s\" target=\"_blank\">here</a>."
-msgstr "Indico-н цоохор майлзын даалгаврыг цэцгээр шалгах <a class=\"bold\" href=\"%(flower_url)s\" target=\"_blank\">энд</a>."
+"href=\"%(flower_url)s\" target=\"_blank\" rel=\"noopener "
+"noreferrer\">here</a>."
+msgstr ""
 
 #: indico/core/celery/templates/celery_tasks.html:18
 msgid "Periodic Tasks"
@@ -1252,7 +1253,7 @@ msgstr "Дэд хувь нэмэр"
 #: indico/modules/attachments/controllers/management/base.py:99
 msgid "The attachment has been uploaded"
 msgid_plural "{count} attachments have been uploaded"
-msgstr[0] "{count} хавсралт байршуулагдсан байна"
+msgstr[0] "Хавсралт байршуулагдсан байна"
 msgstr[1] "{count} хавсралт байршуулсан байна"
 
 #: indico/modules/attachments/controllers/management/base.py:114
@@ -1475,15 +1476,15 @@ msgstr "Буцах"
 msgid "Download package"
 msgstr "Багцыг татаж авах"
 
-#: indico/modules/attachments/templates/preview.html:9
-#: indico/modules/attachments/templates/preview.html:11
+#: indico/modules/attachments/templates/preview.html:10
+#: indico/modules/attachments/templates/preview.html:12
 #: indico/modules/events/agreements/templates/agreement_type_details.html:63
 #: indico/modules/events/static/templates/static_sites.html:42
 #: indico/modules/events/static/templates/static_sites.html:61
 msgid "Download"
 msgstr "Татаж авах"
 
-#: indico/modules/attachments/templates/preview.html:15
+#: indico/modules/attachments/templates/preview.html:16
 #: indico/modules/events/contributions/templates/management/fields_dialog.html:51
 #: indico/modules/events/contributions/templates/management/types_dialog.html:43
 #: indico/modules/events/notes/templates/edit_note.html:8
@@ -1860,8 +1861,8 @@ msgstr "Танд Indico бүртгэл хараахан байхгүй бол, �
 #, python-format
 msgid ""
 "If you do not have an account yet, you can <a href=\"%(url)s\" "
-"target=\"_blank\">create one here</a>."
-msgstr "Танд бүртгэл хараахан байхгүй бол, та <a href=\"%(url)s\">бүртгэлээ энд үүсгэж</a>болно."
+"target=\"_blank\" rel=\"noopener noreferrer\">create one here</a>."
+msgstr ""
 
 #: indico/modules/auth/templates/login_page.html:73
 #: indico/modules/events/payment/templates/event_plugin_edit.html:38
@@ -2469,7 +2470,7 @@ msgstr "Ийм кодтой үүрэг аль хэдийн байна."
 #: indico/modules/categories/util.py:180
 msgid "From the category above"
 msgid_plural "From {} categories above"
-msgstr[0] "Дээрх {} ангилалуудаас "
+msgstr[0] "Дээрх ангилалаас "
 msgstr[1] "Дээрх {} ангилалуудаас "
 
 #: indico/modules/categories/util.py:185
@@ -2608,7 +2609,7 @@ msgstr[1] "{0} ангилалуудыг \"{1}\" рүү зөөсөн.  "
 #: indico/modules/categories/controllers/management.py:378
 msgid "You have deleted one event"
 msgid_plural "You have deleted {} events"
-msgstr[0] "Та {} үйл явдал устгасан."
+msgstr[0] "Та нэг үйл явдал устгасан."
 msgstr[1] "Та {} үйл явдлуудыг устгасан."
 
 #: indico/modules/categories/controllers/management.py:396
@@ -2633,8 +2634,8 @@ msgstr "Та зөвхөн үйл явдал үүсгэх зөвшөөрөлтэ�
 #: indico/modules/categories/controllers/management.py:422
 msgid "You have moved one event to the category \"{cat}\""
 msgid_plural "You have moved {count} events to the category \"{cat}\""
-msgstr[0] "Та {count} үйл явдлыг \"{}\" ангилал руу шилжүүлэв"
-msgstr[1] "Та {count} үйл явдлыг \"{}\" ангилалд шилжүүлэв."
+msgstr[0] "Та үйл явдлыг \"{cat}\" ангилал руу шилжүүлэв"
+msgstr[1] "Та {count} үйл явдлыг \"{cat}\" ангилалд шилжүүлэв."
 
 #: indico/modules/categories/controllers/util.py:27
 msgctxt "babel date format for category event list headers (month/year only)"
@@ -3381,7 +3382,7 @@ msgstr "Загвар амжилттай хадгалагдсан."
 #: indico/modules/events/layout/controllers/images.py:74
 msgid "The image has been uploaded"
 msgid_plural "{count} images have been uploaded"
-msgstr[0] "{count} зураг байршуулагдсан байна"
+msgstr[0] "Зураг байршуулагдсан байна"
 msgstr[1] "{count} зураг байршуулсан"
 
 #: indico/modules/designer/controllers.py:352
@@ -3928,7 +3929,7 @@ msgstr "%(link_start)sОдоогийн загварыг сонгох%(link_end)s
 msgid "You have been granted manager/submission privileges for an event."
 msgid_plural ""
 "You have been granted manager/submission privileges for {} events."
-msgstr[0] "Танд {} үйл явдлуудад менежэрийн/материал илгээх эрх олгогдсон байна"
+msgstr[0] "Танд үйл явдлуудад менежэрийн/материал илгээх эрх олгогдсон байна"
 msgstr[1] "Танд {} үйл явдалд менежэрийн/материал илгээх эрх олгогдсон байна."
 
 #: indico/modules/events/__init__.py:185
@@ -4012,7 +4013,7 @@ msgstr "Ач холбогдол"
 
 #: indico/modules/events/fields.py:156
 msgid "There is already a person with the email {}"
-msgstr "Цахим шуудантай хүн аль хэдийн байна."
+msgstr "Цахим шуудантай хүн аль хэдийн байна {}"
 
 #: indico/modules/events/fields.py:200
 msgid "Person with email '{}' is duplicated"
@@ -4144,7 +4145,7 @@ msgstr "Таны авах арга хэмжээ хурлыг хаах заагт
 
 #: indico/modules/events/util.py:619
 msgid "Registrants cannot have management permissions: {}"
-msgstr "Бүртгүүлэгчдэд удирдлагын зөвшөөрөл шаардлагагүй."
+msgstr "Бүртгүүлэгчдэд удирдлагын зөвшөөрөл шаардлагагүй: {}"
 
 #: indico/modules/events/util.py:629 indico/modules/events/util.py:632
 msgid "Invalid event URL"
@@ -4161,7 +4162,7 @@ msgstr "Энэ үйл явдал байхгүй байна."
 #: indico/modules/events/abstracts/templates/display/_base.html:4
 #: indico/modules/events/abstracts/templates/management/_base.html:7
 msgid "Call for Abstracts"
-msgstr "Хуурангуй ном шаардах"
+msgstr "Хураангуй илгээх"
 
 #: indico/modules/events/abstracts/__init__.py:92
 msgid ""
@@ -4208,7 +4209,7 @@ msgstr "Талбайг Хянах"
 
 #: indico/modules/events/abstracts/clone.py:23
 msgid "Call for Abstracts (settings, email templates, review questions)"
-msgstr "Хуурангуй Ном Шаардах (тохиргоо, цахим шуудангийн загварууд, хяналтын асуултууд)"
+msgstr "Хураангуй илгээх (тохиргоо, цахим шуудангийн загварууд, хяналтын асуултууд)"
 
 #: indico/modules/events/abstracts/fields.py:86
 msgid "Rules may not be empty"
@@ -5068,14 +5069,14 @@ msgstr "Амжилттай өөрчлөлт оруулсан хураангуй"
 #: indico/modules/events/abstracts/controllers/abstract_list.py:76
 msgid "One abstract has been judged."
 msgid_plural "{num} abstracts have been judged."
-msgstr[0] "{num} хураангуйнуудыг шүүв."
+msgstr[0] "Нэг хураангуйг шүүв."
 msgstr[1] "{num} хураангуйг шүүв."
 
 #: indico/modules/events/abstracts/controllers/abstract_list.py:80
 msgid "One abstract has been skipped since it is already judged."
 msgid_plural ""
 "{num} abstracts have been skipped since they are already judged."
-msgstr[0] "{num} хураангуй аль хэдийн шүүсэн байсан тул алгасав."
+msgstr[0] "Нэг хураангуй аль хэдийн шүүсэн байсан тул алгасав."
 msgstr[1] "{num} хураангуйнуудыг аль хэдийн шүүсэн байсан тул алгасав."
 
 #: indico/modules/events/abstracts/controllers/abstract_list.py:84
@@ -5096,14 +5097,14 @@ msgstr "'{}' хураангуй амжилттай үүсгэв"
 #: indico/modules/events/abstracts/controllers/abstract_list.py:161
 msgid "The abstract has been deleted."
 msgid_plural "{count} abstracts have been deleted."
-msgstr[0] "'{}' хураангуй устгагдлаа."
-msgstr[1] "'{}' хураангуй устгалаа."
+msgstr[0] "Хураангуй устгагдлаа."
+msgstr[1] "'{count}' хураангуй устгалаа."
 
 #: indico/modules/events/abstracts/controllers/abstract_list.py:165
 msgid "The linked contribution has been deleted."
 msgid_plural "{count} linked contributions have been deleted."
-msgstr[0] "'{}' холбоостой өгүүллэг устгагдлаа."
-msgstr[1] "'{}' холбоостой өгүүллэг устгалаа."
+msgstr[0] "Холбоостой өгүүллэг устгагдлаа."
+msgstr[1] "'{count}' холбоостой өгүүллэг устгалаа."
 
 #: indico/modules/events/abstracts/controllers/boa.py:39
 msgid "Book of Abstract settings have been saved"
@@ -5529,22 +5530,22 @@ msgstr "Хураангуйнууд нь энэ мөрөнд хүлээн зөв�
 msgid "n/a"
 msgstr "хамаарахгүй"
 
-#: indico/modules/events/abstracts/templates/management/_abstract_list.html:218
+#: indico/modules/events/abstracts/templates/management/_abstract_list.html:220
 msgid "You have reviewed this abstract"
 msgstr "Та энэ хураангуйг хянасан байна"
 
-#: indico/modules/events/abstracts/templates/management/_abstract_list.html:227
+#: indico/modules/events/abstracts/templates/management/_abstract_list.html:229
 #: indico/modules/events/abstracts/templates/reviewing/public.html:444
 msgid "Go to contribution"
 msgstr "Өгүүлэл рүү очих"
 
-#: indico/modules/events/abstracts/templates/management/_abstract_list.html:239
+#: indico/modules/events/abstracts/templates/management/_abstract_list.html:241
 msgid ""
 "The filtering criteria do not match with any of the existing abstracts. Try "
 "to clear the filters."
 msgstr "Шүүлтүүрийн шалгуур одоо буй өгүүллүүдийн алинтай нь таарахгүй байна."
 
-#: indico/modules/events/abstracts/templates/management/_abstract_list.html:243
+#: indico/modules/events/abstracts/templates/management/_abstract_list.html:245
 msgid "There are no abstracts yet."
 msgstr "Өгүүллүүд хараахан байхгүй байна."
 
@@ -6762,7 +6763,7 @@ msgid ""
 msgid_plural ""
 "You have been granted manager/submission privileges for {} contributions."
 msgstr[0] "Танд өгүүлэлд менежэрын/материал илгээх эрх олгогдсон байна."
-msgstr[1] "Танд өгүүлэлд менежэрын/материал илгээх эрх олгогдсон байна."
+msgstr[1] "Танд өгүүлэлд менежэрын/материал илгээх эрх олгогдсон байна. {}"
 
 #: indico/modules/events/contributions/__init__.py:98
 msgid "Grants management rights for materials and minutes."
@@ -6963,11 +6964,11 @@ msgstr "{} эгнээ: буруу бүтэцтэй CSV дата - багануу
 
 #: indico/modules/events/contributions/util.py:284
 msgid "Row {row}: can't parse date: \"{date}\""
-msgstr "{} эгнээ: огноог задлах боломжгүй байна: \"{date}\""
+msgstr "{row} эгнээ: огноог задлах боломжгүй байна: \"{date}\""
 
 #: indico/modules/events/contributions/util.py:289
 msgid "Row {row}: can't parse duration: {duration}"
-msgstr "{} эгнээ: үргэлжлэх хугацаа задлах боломжгүй байна: \"{duration}\""
+msgstr "{row} эгнээ: үргэлжлэх хугацаа задлах боломжгүй байна: \"{duration}\""
 
 #: indico/modules/events/contributions/util.py:293
 msgid "Row {}: contribution title is required"
@@ -6975,7 +6976,7 @@ msgstr "{} эгнээ: өгүүллийн нэр шаардлагатай"
 
 #: indico/modules/events/contributions/util.py:296 indico/util/roles.py:38
 msgid "Row {row}: invalid email address: {email}"
-msgstr "{} эгнээ: буруу цахим шуудангийн хаяг: \"{email}\""
+msgstr "{row} эгнээ: буруу цахим шуудангийн хаяг: \"{email}\""
 
 #: indico/modules/events/contributions/templates/management/contributions.html:110
 #: indico/modules/events/contributions/util.py:361
@@ -7004,24 +7005,24 @@ msgstr "'{}' өгүүлэл амжилттай шинэчлэгдэв"
 #: indico/modules/events/contributions/controllers/management.py:221
 msgid "The contribution has been deleted."
 msgid_plural "{count} contributions have been deleted."
-msgstr[0] "{count} өгүүлэл устгагдлаа."
+msgstr[0] "Өгүүлэл устгагдлаа."
 msgstr[1] "{count} өгүүлэл устгагдлаа."
 
 #: indico/modules/events/contributions/controllers/management.py:246
 msgid "Contribution '{}' successfully deleted"
-msgstr "{count} өгүүлэл амжилттай устгагдлаа."
+msgstr "{} өгүүлэл амжилттай устгагдлаа."
 
 #: indico/modules/events/contributions/controllers/management.py:333
 msgid "Subcontribution '{}' created successfully"
-msgstr "{count} дагалдах өгүүлэл амжилттай устгагдлаа."
+msgstr "{} дагалдах өгүүлэл амжилттай устгагдлаа."
 
 #: indico/modules/events/contributions/controllers/management.py:345
 msgid "Subcontribution '{}' updated successfully"
-msgstr "{count} дагалдах өгүүлэл амжилттай шинэчлэгдлээ."
+msgstr "{} дагалдах өгүүлэл амжилттай шинэчлэгдлээ."
 
 #: indico/modules/events/contributions/controllers/management.py:358
 msgid "Subcontribution '{}' deleted successfully"
-msgstr "{count} дагалдах өгүүлэл амжилттай устгагдлаа."
+msgstr "{} дагалдах өгүүлэл амжилттай устгагдлаа."
 
 #: indico/modules/events/contributions/controllers/management.py:438
 msgid "The selected contributions do not have any materials."
@@ -8048,7 +8049,7 @@ msgid ""
 "If you customize the title, that title is used regardless of the user's "
 "language preference.  The default title <strong>{title}</strong> is "
 "displayed in the user's language."
-msgstr "Та гарчгийг тохируулбал, хэрэглэгчийн хэлний сонголтоос үл хамааран тухайн гарчгийг хэрэглэх болно. Үндсэн гарчиг <strong>{гарчиг}</strong>-г хэрэглэгчийн хэлээр харуулна."
+msgstr "Та гарчгийг тохируулбал, хэрэглэгчийн хэлний сонголтоос үл хамааран тухайн гарчгийг хэрэглэх болно. Үндсэн гарчиг <strong>{title}</strong>-г хэрэглэгчийн хэлээр харуулна."
 
 #: indico/modules/events/layout/forms.py:163
 msgid "Open in a new tab"
@@ -8691,7 +8692,7 @@ msgstr "Хавсралтыг засварлах \"{name}\""
 #: indico/modules/events/management/util.py:187
 msgid "You have added a user with no Indico account."
 msgid_plural "You have added {} users with no Indico account."
-msgstr[0] "Та Индико аккаунтгүй {} хэрэглэгч нэмсэн байна."
+msgstr[0] "Та Индико аккаунтгүй хэрэглэгч нэмсэн байна."
 msgstr[1] "Та Индико аккаунтгүй {} хэрэглэгч нэмсэн байна."
 
 #: indico/modules/events/management/util.py:189
@@ -9043,20 +9044,20 @@ msgstr "Энэ үйл явдал түгжигдсэн байна, өөрчлөх
 
 #: indico/modules/events/management/templates/clone_event.html:32
 msgid "1. Repetition"
-msgstr "Давтагдал"
+msgstr "1. Давтагдал"
 
 #: indico/modules/events/management/templates/clone_event.html:38
 #: indico/modules/events/management/templates/import_event.html:37
 msgid "2. Contents"
-msgstr "Агуулга"
+msgstr "2. Агуулга"
 
 #: indico/modules/events/management/templates/clone_event.html:44
 msgid "3. Category"
-msgstr "Ангилал"
+msgstr "3. Ангилал"
 
 #: indico/modules/events/management/templates/clone_event.html:50
 msgid "4. Dates"
-msgstr "Огноо"
+msgstr "4. Огноо"
 
 #: indico/modules/events/management/templates/clone_event.html:58
 msgid "How should the event be cloned?"
@@ -9094,7 +9095,7 @@ msgid ""
 "Please note that if you delete the event you will lose all the information "
 "contained in it, %(strong)sincluding %(num_bookings)s Room "
 "Booking(s)%(endstrong)s linked to it. This operation is irreversible!"
-msgstr "Хэрэв та үйл явдлыг устгавал үүнд агуулагдсан бүх мэдээлэл алдагдах болохыг анхаарна уу. %(strong)sҮүнд үүнтэй холбогдсон%(num_bookings)s Өрөө захиалах %(endstrong)sорох болно. Энэ үйлдлийг буцаах боломжгүй."
+msgstr "Хэрэв та үйл явдлыг устгавал үүнд агуулагдсан бүх мэдээлэл алдагдах болохыг анхаарна уу. %(strong)sҮүнд үүнтэй холбогдсон%(num_bookings)s Өрөө(нүүд) захиалах %(endstrong)sорох болно. Энэ үйлдлийг буцаах боломжгүй."
 
 #: indico/modules/events/management/templates/delete_event.html:12
 msgid ""
@@ -9119,7 +9120,7 @@ msgid ""
 "Please note that if you delete the events you will lose all the information "
 "contained in them, %(strong)sincluding %(num_bookings)s Room "
 "Booking(s)%(endstrong)s. This operation is irreversible!"
-msgstr "Хэрэв та үйл явдлыг устгавал үүнд агуулагдсан бүх мэдээлэл алдагдах болохыг анхаарна уу. %(strong)sҮүнд үүнтэй холбогдсон%(num_bookings)s Өрөө захиалах %(endstrong)sорох болно. Энэ үйлдлийг буцаах боломжгүй."
+msgstr "Хэрэв та үйл явдлыг устгавал үүнд агуулагдсан бүх мэдээлэл алдагдах болохыг анхаарна уу. %(strong)sҮүнд үүнтэй холбогдсон%(num_bookings)s Өрөө(нүүд) захиалах %(endstrong)sорох болно. Энэ үйлдлийг буцаах боломжгүй."
 
 #: indico/modules/events/management/templates/delete_events.html:13
 msgid ""
@@ -9485,7 +9486,7 @@ msgstr "Багуудын гишүүдийг амжилттай шинэчилл�
 #: indico/modules/events/papers/controllers/management.py:83
 msgid "Users have been removed from 1 contribution"
 msgid_plural "Users have been removed from {} contributions"
-msgstr[0] "{} өгүүллээс хэрэглэгчдийг хасав"
+msgstr[0] "1 өгүүллээс хэрэглэгчдийг хасав"
 msgstr[1] "{} өгүүллээс хэрэглэгчдийг хасав"
 
 #: indico/modules/events/papers/controllers/management.py:119
@@ -9527,7 +9528,7 @@ msgstr "Шүүх эцсийн хугацааг тогтоолоо."
 #: indico/modules/events/papers/controllers/paper.py:144
 msgid "One paper has been judged."
 msgid_plural "{num} papers have been judged."
-msgstr[0] "{num} нийтлэл шүүв."
+msgstr[0] "Нэг нийтлэл шүүв."
 msgstr[1] "{num} нийтлэл шүүв."
 
 #: indico/modules/events/papers/controllers/paper.py:148
@@ -9537,8 +9538,8 @@ msgid ""
 msgid_plural ""
 "{num} contributions have been skipped since they have no paper submitted yet"
 " or they are in a final state."
-msgstr[0] "Нийтлэл хараахан илгээгээгүй эсвэл эцсийн шатны байдалтай байсан тул {num} өгүүллийг алгасав."
-msgstr[1] "Нийтлэл хараахан илгээгээгүй эсвэл эцсийн шатны байдалд орсон байсан тул {num} өгүүллийг алгасав."
+msgstr[0] "Нийтлэл хараахан илгээгээгүй эсвэл эцсийн шатны байдалтай байсан тул өгүүллийг алгасав."
+msgstr[1] "Нийтлэл хараахан илгээгээгүй эсвэл эцсийн шатны байдалд орсон байсан тул {num} өгүүллүүдийг алгасав."
 
 #: indico/modules/events/papers/controllers/paper.py:177
 msgid "Paper reviewing roles have been assigned."
@@ -9636,7 +9637,7 @@ msgstr "Таны өгүүллийг засах шаардлагатай"
 msgid "Please check the review and submit a revised version"
 msgstr "Хяналтыг шалгаж, зассан хувилбарыг хүргүүлнэ үү"
 
-#: indico/modules/events/papers/templates/_contributions.html:197
+#: indico/modules/events/papers/templates/_contributions.html:198
 msgid "Proceedings"
 msgstr "Үргэлжлэл"
 
@@ -10349,20 +10350,20 @@ msgstr "Оролцогчдын ажил үүрэг"
 #: indico/modules/events/surveys/controllers/management/survey.py:153
 msgid "Your email has been sent."
 msgid_plural "{} emails have been sent."
-msgstr[0] "{} цахим шуудан илгээгдсэн байна."
+msgstr[0] "Цахим шуудан илгээгдсэн байна."
 msgstr[1] "{} цахим шуудан илгээгдсэн байна."
 
 #: indico/modules/events/persons/controllers.py:299
 msgid "Submission rights have been granted to one speaker"
 msgid_plural "Submission rights have been granted to {} speakers"
-msgstr[0] "{} илтгэгч нарт материал илгээх эрх олгогдсон байна."
+msgstr[0] "Илтгэгч нарт материал илгээх эрх олгогдсон байна."
 msgstr[1] "{} илтгэгч нарт материал илгээх эрх олгогдсон байна."
 
 #: indico/modules/events/persons/controllers.py:317
 msgid "Session modification rights have been granted to one session convener"
 msgid_plural ""
 "Session modification rights have been granted to {} session conveners"
-msgstr[0] "{} хурал удирдагч нарт хурал өөрчлөх эрх олгогдсон байна"
+msgstr[0] "Хурал удирдагч нарт хурал өөрчлөх эрх олгогдсон байна"
 msgstr[1] "{} хурал удирдагч нарт хурал өөрчлөх эрх олгогдсон байна"
 
 #: indico/modules/events/persons/controllers.py:336
@@ -10562,8 +10563,8 @@ msgstr "Оролцогчдын жагсаалт"
 #: indico/modules/events/registration/__init__.py:137
 msgid "A registration has been linked to your account."
 msgid_plural "{n} registrations have been linked to your account."
-msgstr[0] "Таны аккаунтад {} бүртгэл холбогдсон байна."
-msgstr[1] "Таны аккаунтад {} бүртгэл холбогдсон байна."
+msgstr[0] "Таны аккаунтад бүртгэл холбогдсон байна."
+msgstr[1] "Таны аккаунтад {n} бүртгэл холбогдсон байна."
 
 #: indico/modules/events/registration/__init__.py:193
 msgid ""
@@ -11083,8 +11084,8 @@ msgstr "Та бүртгүүлэх урилгаа татгалзлаа."
 #: indico/modules/events/registration/controllers/management/invitations.py:75
 msgid "The invitation has been sent."
 msgid_plural "{n} invitations have been sent."
-msgstr[0] "{} урилга илгээгдсэн байна."
-msgstr[1] "{} урилга илгээгдсэн байна."
+msgstr[0] "Урилга илгээгдсэн байна."
+msgstr[1] "{n} урилга илгээгдсэн байна."
 
 #: indico/modules/events/registration/controllers/management/regforms.py:64
 msgid "The participants display settings have been saved."
@@ -11125,13 +11126,13 @@ msgstr "Сонгосон бүртгүүлэгчийг устгалаа."
 #: indico/modules/events/registration/controllers/management/reglists.py:226
 msgid "The email was sent."
 msgid_plural "{num} emails were sent."
-msgstr[0] "{num} цахим шуудан илгээгдсэн байна."
+msgstr[0] "Цахим шуудан илгээгдсэн байна."
 msgstr[1] "{num} цахим шуудан илгээгдсэн байна."
 
 #: indico/modules/events/registration/controllers/management/reglists.py:248
 msgid "Registration was deleted."
 msgid_plural "{num} registrations were deleted."
-msgstr[0] "{num} бүртгэл устгагдсан байна."
+msgstr[0] "Бүртгэл устгагдсан байна."
 msgstr[1] "{num} бүртгэл устгагдсан байна."
 
 #: indico/modules/events/registration/controllers/management/reglists.py:277
@@ -11147,8 +11148,8 @@ msgstr "PDF-г хүснэгт маягаар үүсгэхэд текст хэт 
 #: indico/modules/events/registration/controllers/management/reglists.py:379
 msgid "{} registration has been imported."
 msgid_plural "{} registrations have been imported."
-msgstr[0] "{num} бүртгэл импортлогдсон байна."
-msgstr[1] "{num} бүртгэл импортлогдсон байна."
+msgstr[0] "{} бүртгэл импортлогдсон байна."
+msgstr[1] "{} бүртгэл импортлогдсон байна."
 
 #: indico/modules/events/registration/controllers/management/reglists.py:572
 msgid "Rejecting this registration will trigger a notification email."
@@ -12700,7 +12701,7 @@ msgstr "Зохицуулагчдыг хурлуудынхаа хурлын бл�
 msgid "You have been granted manager/coordination privileges for a session."
 msgid_plural ""
 "You have been granted manager/coordination privileges for {} sessions."
-msgstr[0] "Танд {} хуралд менежэрын/зохицуулалт хийх эрх олгогдсон байна."
+msgstr[0] "Танд хуралд менежэрын/зохицуулалт хийх эрх олгогдсон байна."
 msgstr[1] "Танд {} хуралд менежэрын/зохицуулалт хийх эрх олгогдсон байна."
 
 #: indico/modules/events/sessions/__init__.py:85
@@ -16314,7 +16315,7 @@ msgstr "EEEE"
 
 #: indico/util/date_time.py:273
 msgid "{date_fmt}"
-msgstr "{time_fmt}"
+msgstr "{date_fmt}"
 
 #: indico/util/date_time.py:288
 msgid "'Yesterday' 'at' {time_fmt}"
@@ -16353,8 +16354,8 @@ msgstr "Дугуй"
 #: indico/util/i18n_test.py:97 indico/util/i18n_test.py:98
 msgid "{} cow"
 msgid_plural "{} cows"
-msgstr[0] "0} үнээнүүд"
-msgstr[1] "{0} үнээ"
+msgstr[0] "{} үнээ"
+msgstr[1] "{} үнээнүүд"
 
 #: indico/util/i18n_test.py:114
 msgid "I need a drink."
@@ -16389,8 +16390,8 @@ msgstr[1] "{} гишүүн импортлогдов."
 #: indico/util/roles.py:69
 msgid "There is no user with this email address: {}"
 msgid_plural "There are no users with these email addresses: {}"
-msgstr[0] "Ийм цахим шуудангийн хаягуудтай хэрэглэгч нар байхгүй байна."
-msgstr[1] "Ийм цахим шуудангийн хаягуудтай хэрэглэгч нар байхгүй байна."
+msgstr[0] "Ийм цахим шуудангийн хаягуудтай хэрэглэгч нар байхгүй байна: {}"
+msgstr[1] "Ийм цахим шуудангийн хаягуудтай хэрэглэгч нар байхгүй байна: {}"
 
 #: indico/util/string.py:664
 msgid ""
@@ -16587,8 +16588,8 @@ msgstr "Хүчингүй CSRF токен"
 #: indico/web/forms/validators.py:95
 msgid "This field is mutually exclusive with another field: {}"
 msgid_plural "This field is mutually exclusive with other fields: {}"
-msgstr[0] "Энэ талбар бусад талбаруудтай харилцан онцгой эрхтэй байна."
-msgstr[1] "Энэ талбар бусад талбаруудтай харилцан онцгой эрхтэй байна."
+msgstr[0] "Энэ талбар бусад талбаруудтай харилцан онцгой эрхтэй байна: {}"
+msgstr[1] "Энэ талбар бусад талбаруудтай харилцан онцгой эрхтэй байна: {}"
 
 #: indico/web/forms/validators.py:101
 msgid "The passwords do not match."
