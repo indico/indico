@@ -35,8 +35,8 @@
 {%- endmacro %}
 
 {% macro render_attachments_folders(item=none, files=[], folders=[]) %}
-    {% set files = item.attached_items.files if item else files %}
-    {% set folders = item.attached_items.folders if item else folders %}
+    {% set files = item.attached_items.get('files', []) if item else files %}
+    {% set folders = item.attached_items.get('folders', []) if item else folders %}
 
     <div class="attachments-display-container toolbar">
         {% for attachment in files %}
