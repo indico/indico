@@ -34,6 +34,25 @@ definitions:
     settings:
       show_notes: true
 
+  standard_numbered:
+    <<: *standard
+    title: Indico style - numbered
+    settings:
+      hide_duration: true
+      hide_session_block_time: true
+      hide_end_time: true
+      number_contributions: true
+
+  standard_numbered_inline_minutes:
+    <<: *standard
+    title: Indico style - numbered + minutes
+    settings:
+      hide_duration: true
+      hide_session_block_time: true
+      hide_end_time: true
+      number_contributions: true
+      show_notes: true
+
   nicecompact:
     event_types: [conference, meeting]
     stylesheet: compact.scss

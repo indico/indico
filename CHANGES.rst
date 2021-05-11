@@ -58,6 +58,8 @@ Improvements
   the app is now required. (:pr:`4844`)
 - Contribution duration fields now use a widget similar to the time picker that makes selecting
   durations easier. (:issue:`2462`, :pr:`4873`)
+- Add new meeting themes that show sequential numbers instead of start times for contributions
+  (:pr:`4899`)
 
 Bugfixes
 ^^^^^^^^
