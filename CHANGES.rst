@@ -60,6 +60,8 @@ Improvements
   durations easier. (:issue:`2462`, :pr:`4873`)
 - Add new meeting themes that show sequential numbers instead of start times for contributions
   (:pr:`4899`)
+- Remove the very outdated "Compact style" theme (it's still available via the ``themes_legacy``
+  plugin) (:issue:`4900`, :pr:`4899`)
 
 Bugfixes
 ^^^^^^^^

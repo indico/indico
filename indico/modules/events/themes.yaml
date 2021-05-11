@@ -53,13 +53,6 @@ definitions:
       number_contributions: true
       show_notes: true
 
-  nicecompact:
-    event_types: [conference, meeting]
-    stylesheet: compact.scss
-    template: compact.html
-    title: Compact style
-    user_visible: true
-
   indico_weeks_view:
     event_types: [conference, meeting]
     stylesheet: weeks.scss
