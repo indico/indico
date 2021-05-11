@@ -59,6 +59,8 @@ definitions:
     template: weeks.html
     title: Indico Weeks View
     user_visible: true
+    settings:
+      page_is_dark: false
     user_settings:
       colors:
         caption: Contribution Colours

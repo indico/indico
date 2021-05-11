@@ -188,7 +188,8 @@ class WPSimpleEventDisplay(WPSimpleEventDisplayBase):
         return render_event_header(self.event, theme=self.theme_id, theme_override=self.theme_override)
 
     def _get_footer(self):
-        return render_event_footer(self.event, dark=True)
+        dark = self.theme.get('settings', {}).get('page_is_dark', True)
+        return render_event_footer(self.event, dark=dark)
 
     def _get_body(self, params):
         attached_items = self.event.attached_items
