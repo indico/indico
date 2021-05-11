@@ -9,6 +9,7 @@
 
 .item {
   padding: 1em 0;
+  margin-bottom: 0.3em;
 
   .header {
     font-size: 18px;
@@ -19,10 +20,17 @@
     padding-top: 0.7em;
     font-size: 13px;
     font-style: italic;
+    color: $black;
 
     :global(.item) {
       padding: 0.1em 0;
     }
+  }
+
+  .summary {
+    margin-bottom: 0.5em;
+    padding-left: 1em;
+    color: $light-black;
   }
 
   .description ul {
@@ -49,6 +57,10 @@
 
   em {
     background-color: rgba($indico-blue, 0.3);
+  }
+
+  :global(.ui.breadcrumb a.section) {
+    color: $indico-blue;
   }
 }
 

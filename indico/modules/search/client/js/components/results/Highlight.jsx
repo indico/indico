@@ -8,13 +8,20 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 
+import '../ResultList.module.scss';
+
 export default function Highlight({text, highlight}) {
   if (highlight?.length) {
-    return highlight
-      .slice(0, 3) // eslint-disable-next-line react/no-array-index-key
-      .map((html, idx) => <div key={html + idx} dangerouslySetInnerHTML={{__html: html}} />);
+    return (
+      <div styleName="summary">
+        {highlight.slice(0, 3).map((html, idx) => (
+          // eslint-disable-next-line react/no-array-index-key
+          <div key={html + idx} dangerouslySetInnerHTML={{__html: html}} />
+        ))}
+      </div>
+    );
   }
-  return <span>{text.slice(0, 240)}</span>;
+  return <div styleName="summary">{text.slice(0, 240)}</div>;
 }
 
 Highlight.propTypes = {
