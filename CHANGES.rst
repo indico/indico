@@ -2,6 +2,16 @@ Changelog
 =========
 
 
+Version 2.3.6
+-------------
+
+*Unreleased*
+
+Bugfixes
+^^^^^^^^
+
+- None so far :)
+
 Version 2.3.5
 -------------
 
