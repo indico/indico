@@ -1,5 +1,5 @@
 # Translations template for indico.
-# Copyright (C) 2020 ORGANIZATION
+# Copyright (C) 2021 ORGANIZATION
 # This file is distributed under the same license as the indico project.
 # 
 # Translators:
@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Indico\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2020-12-15 14:00+0100\n"
+"POT-Creation-Date: 2021-05-10 16:36+0200\n"
 "PO-Revision-Date: 2021-01-15 07:43+0000\n"
 "Last-Translator: Lanxin Ma <ma@ihep.ac.cn>\n"
 "Language-Team: Chinese (China) (GB2312) (http://www.transifex.com/indico/indico/language/zh_CN.GB2312/)\n"
@@ -614,7 +614,7 @@ msgid "You have unsaved changes that will be lost."
 msgstr "您尚未保存的更改将丢失。"
 
 #: indico/web/client/js/jquery/utils/declarative.js:251
-#: indico/web/client/js/jquery/widgets/categorynavigator.js:708
+#: indico/web/client/js/jquery/widgets/categorynavigator.js:706
 #: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:1345
 msgid "Confirm action"
 msgstr "确认操作"
@@ -813,31 +813,31 @@ msgid ""
 "search\">clear</a> your search."
 msgstr "你可以 <a class=\"js-search\"> 修改 </a> 或 <a class=\"js-clear-search\"> 清除 </a> 你的搜索。"
 
-#: indico/web/client/js/jquery/widgets/categorynavigator.js:444
+#: indico/web/client/js/jquery/widgets/categorynavigator.js:442
 msgid "In favourite categories"
 msgstr "在收藏类别里"
 
-#: indico/web/client/js/jquery/widgets/categorynavigator.js:451
+#: indico/web/client/js/jquery/widgets/categorynavigator.js:449
 msgid "Search result"
 msgstr "查询结果"
 
-#: indico/web/client/js/jquery/widgets/categorynavigator.js:472
+#: indico/web/client/js/jquery/widgets/categorynavigator.js:470
 msgid "Displaying {0} out of {1} results."
 msgstr "显示 {1} 个结果中的 {0}个。"
 
-#: indico/web/client/js/jquery/widgets/categorynavigator.js:473
+#: indico/web/client/js/jquery/widgets/categorynavigator.js:471
 msgid "There are no results."
 msgstr "无结果。"
 
-#: indico/web/client/js/jquery/widgets/categorynavigator.js:477
+#: indico/web/client/js/jquery/widgets/categorynavigator.js:475
 msgid "Make the search more specific for more accurate results"
 msgstr "使搜索更具体以获得更准确的结果"
 
-#: indico/web/client/js/jquery/widgets/categorynavigator.js:482
+#: indico/web/client/js/jquery/widgets/categorynavigator.js:480
 msgid "Clear search"
 msgstr "清空查询"
 
-#: indico/web/client/js/jquery/widgets/categorynavigator.js:706
+#: indico/web/client/js/jquery/widgets/categorynavigator.js:704
 msgid "You selected category <em>{0}</em>. Are you sure you want to proceed?"
 msgstr "你选择了类别 <em> {0} </em>。 你确定要继续吗？"
 
