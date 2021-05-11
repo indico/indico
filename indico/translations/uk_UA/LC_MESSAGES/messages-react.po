@@ -1,11 +1,12 @@
 # 
 # Translators:
 # Andrii Verbytskyi <andrii.verbytskyi@mpp.mpg.de>, 2021
+# Adrian Mönnich, 2021
 # 
 msgid ""
 msgstr ""
-"POT-Creation-Date: 2021-01-21 09:43+0100\n"
-"Last-Translator: Andrii Verbytskyi <andrii.verbytskyi@mpp.mpg.de>, 2021\n"
+"POT-Creation-Date: 2021-05-21 16:36+0200\n"
+"Last-Translator: Adrian Mönnich, 2021\n"
 "Language-Team: Ukrainian (Ukraine) (https://www.transifex.com/indico/teams/6478/uk_UA/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -267,7 +268,7 @@ msgid "Submit slides"
 msgstr "Подати слайди"
 
 #: indico/modules/events/editing/client/js/editing/EditableSubmissionButton.jsx:101
-#: indico/modules/events/editing/client/js/editing/timeline/judgment/RequestChangesForm.jsx:67
+#: indico/modules/events/editing/client/js/editing/timeline/judgment/RequestChangesForm.jsx:70
 #: indico/modules/events/editing/client/js/management/editable_type/TeamManager.jsx:80
 #: indico/modules/events/editing/client/js/management/editable_type/file_types/FileTypeModal.jsx:116
 #: indico/modules/events/editing/client/js/management/tags/TagModal.jsx:63
@@ -283,19 +284,19 @@ msgstr "Подати файли"
 msgid "Editable list"
 msgstr "Список для редагування"
 
-#: indico/modules/events/editing/client/js/editing/page_layout/MenuBar.jsx:68
+#: indico/modules/events/editing/client/js/editing/page_layout/MenuBar.jsx:71
 msgid "other modules"
 msgstr "інші модулі"
 
-#: indico/modules/events/editing/client/js/editing/page_layout/MenuBar.jsx:84
+#: indico/modules/events/editing/client/js/editing/page_layout/MenuBar.jsx:87
 msgid "other views"
 msgstr "інші види"
 
-#: indico/modules/events/editing/client/js/editing/page_layout/MenuBar.jsx:89
+#: indico/modules/events/editing/client/js/editing/page_layout/MenuBar.jsx:92
 msgid "Display"
 msgstr "Відобразити"
 
-#: indico/modules/events/editing/client/js/editing/page_layout/MenuBar.jsx:94
+#: indico/modules/events/editing/client/js/editing/page_layout/MenuBar.jsx:98
 msgid "Management"
 msgstr "Керування"
 
@@ -336,9 +337,9 @@ msgid "Reject"
 msgstr "Відхилити"
 
 #: indico/modules/events/editing/client/js/editing/timeline/CommentForm.jsx:54
-#: indico/modules/events/editing/client/js/editing/timeline/judgment/AcceptRejectForm.jsx:52
-#: indico/modules/events/editing/client/js/editing/timeline/judgment/RequestChangesForm.jsx:60
-#: indico/modules/events/editing/client/js/editing/timeline/judgment/UpdateFilesForm.jsx:135
+#: indico/modules/events/editing/client/js/editing/timeline/judgment/AcceptRejectForm.jsx:55
+#: indico/modules/events/editing/client/js/editing/timeline/judgment/RequestChangesForm.jsx:63
+#: indico/modules/events/editing/client/js/editing/timeline/judgment/UpdateFilesForm.jsx:138
 #: indico/modules/events/papers/client/js/components/CommentForm.jsx:92
 msgid "Leave a comment..."
 msgstr "Залишити коментар..."
@@ -502,7 +503,7 @@ msgstr "Не готово"
 #: indico/modules/events/editing/client/js/editing/timeline/TimelineHeader.jsx:79
 #: indico/modules/events/papers/client/js/components/TimelineHeader.jsx:34
 msgid "{submitterName} submitted for the contribution {contributionLink}"
-msgstr "{submitterName} подав(-ла)  роботу {revisionNumber}"
+msgstr "{submitterName} подав(-ла)  роботу {contributionLink}"
 
 #: indico/modules/events/editing/client/js/editing/timeline/TimelineHeader.jsx:95
 msgid "{editorName} is the assigned editor"
@@ -555,7 +556,7 @@ msgid "{link}Click here to refresh{/link} and see the most recent version."
 msgstr ""
 "{link}Натисніть тут, щоб оновити{/link} та перегляньте останню версію."
 
-#: indico/modules/events/editing/client/js/editing/timeline/judgment/AcceptRejectForm.jsx:64
+#: indico/modules/events/editing/client/js/editing/timeline/judgment/AcceptRejectForm.jsx:67
 #: indico/modules/events/editing/client/js/editing/timeline/judgment/UpdateFilesForm.jsx:33
 #: indico/web/client/js/react/components/RequestConfirm.jsx:60
 #: indico/web/client/js/react/components/principals/Search.jsx:332
@@ -579,7 +580,7 @@ msgstr "Помітьте код чи заголовок"
 msgid "Confirm & Approve"
 msgstr "Підтвердити"
 
-#: indico/modules/events/editing/client/js/editing/timeline/judgment/UpdateFilesForm.jsx:103
+#: indico/modules/events/editing/client/js/editing/timeline/judgment/UpdateFilesForm.jsx:106
 msgid "There are no publishable files. Please upload a {types} file."
 msgid_plural ""
 "There are no publishable files. Please upload a file in at least one of the "
@@ -597,7 +598,7 @@ msgstr[3] ""
 "Файлів, які можна опублікувати, немає. Завантажте файли принаймні одного з "
 "таких типів: {types}"
 
-#: indico/modules/events/editing/client/js/editing/timeline/judgment/UpdateFilesForm.jsx:126
+#: indico/modules/events/editing/client/js/editing/timeline/judgment/UpdateFilesForm.jsx:129
 msgid "There is no publishable file uploaded."
 msgstr "Не існує завантаженого файлу що можна опублікувати"
 
@@ -650,7 +651,7 @@ msgstr ""
 "увімкнути будь-які редаговані типи."
 
 #: indico/modules/events/editing/client/js/management/EditableTypeList.jsx:115
-#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:161
+#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:176
 msgid "List"
 msgstr "Список"
 
@@ -676,8 +677,8 @@ msgid "Configure the tags that can be assigned to revisions"
 msgstr "Налаштуйте теги, які можна призначити редакціям"
 
 #: indico/modules/events/editing/client/js/management/EditingManagementDashboard.jsx:31
-#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:115
-#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:127
+#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:123
+#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:135
 msgid "Configure"
 msgstr "Змінити"
 
@@ -859,98 +860,102 @@ msgstr "Введіть ID чи пошуковий запит"
 msgid "There are no editables yet."
 msgstr "Матеріали для редагування покищо відсутні."
 
-#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:59
+#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:67
 msgid "Send emails to the editing team"
 msgstr "Надіслати  електронні листи команді редакторів"
 
-#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:64
+#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:72
 msgid "Assign an editor to papers"
 msgstr "Призначити редактора статтей"
 
-#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:65
+#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:73
 msgid "Assign an editor to posters"
 msgstr "Призначити редактора постерів"
 
-#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:66
+#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:74
 msgid "Assign an editor to slides"
 msgstr "Призначити редактора слайдів"
 
-#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:82
+#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:90
 msgid "Submission is open"
 msgstr "Подача матеріалів розпочата"
 
-#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:83
+#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:91
 msgid "Submission is not open"
 msgstr "Подача не розпочата"
 
-#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:85
+#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:93
 msgid "Toggle whether users can submit new editables"
 msgstr ""
 "Перемкніть чи можуть користувачі подавати нові матеріали для редагувані"
 
-#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:88
-#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:101
+#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:96
+#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:109
 msgid "Close now"
 msgstr "Закінчити зараз"
 
-#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:88
-#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:101
+#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:96
+#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:109
 msgid "Start now"
 msgstr "Почати зараз"
 
-#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:95
+#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:103
 msgid "Editing is open"
 msgstr "Редагування розпочато"
 
-#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:96
+#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:104
 msgid "Editing is not open"
 msgstr "Редагування не розпочато"
 
-#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:98
+#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:106
 msgid "Toggle whether editors can review submissions"
 msgstr "Перемикач, чи можуть редактори переглядати подані матеріали"
 
-#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:108
+#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:116
 #: indico/modules/events/editing/client/js/management/editable_type/file_types/index.jsx:24
 msgid "File types"
 msgstr "Тип файлів"
 
-#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:109
+#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:117
 msgid "Configure file types"
 msgstr "Налаштувати типи файлів"
 
-#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:120
+#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:128
 msgid "Ready for review conditions"
 msgstr "Готово для  умов рецензування"
 
-#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:121
+#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:129
 msgid "Configure conditions for reviewing"
 msgstr "Налаштувати умови рецензування"
 
-#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:132
+#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:140
 msgid "Editing team"
 msgstr "Команда редакторів"
 
-#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:133
+#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:141
 msgid "Configure editing team"
 msgstr "Налаштувати команду редакторів"
 
-#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:136
+#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:148
+msgid "Keep editing team members anonymous"
+msgstr "Зберігти анонімність членів редакційної команди"
+
+#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:151
 #: indico/modules/rb/client/js/common/rooms/edit/RoomEditDetails.jsx:20
 #: indico/modules/rb/client/js/components/SidebarFooter.jsx:43
 #: indico/modules/rb/client/js/components/SidebarFooter.jsx:127
 msgid "Contact"
 msgstr "Контакти"
 
-#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:139
+#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:154
 msgid "Manage team"
 msgstr "Керувати командою"
 
-#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:147
+#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:162
 msgid "Editor assignment"
 msgstr "Призначення редактора"
 
-#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:155
+#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:170
 msgid "Allow editors to self-assign editables"
 msgstr "Дозволити редакторам призначати матеріали для редагування"
 
@@ -1516,7 +1521,7 @@ msgstr "Для цієї дати ({date}) немає повторень."
 #: indico/modules/rb/client/js/common/timeline/RowActionsDropdown.jsx:198
 #: indico/modules/rb/client/js/common/timeline/RowActionsDropdown.jsx:210
 #: indico/modules/rb/client/js/modules/blockings/BlockingModal.jsx:432
-#: indico/modules/rb/client/js/modules/bookRoom/BookRoomModal.jsx:664
+#: indico/modules/rb/client/js/modules/bookRoom/BookRoomModal.jsx:663
 msgid "Close"
 msgstr "Закрити"
 
@@ -1785,17 +1790,17 @@ msgid "Changing date or time will revert it back to a pre-booking."
 msgstr "Зміна часу зміни статусу на попереднє бронювання"
 
 #: indico/modules/rb/client/js/common/bookings/BookingEditForm.jsx:264
-#: indico/modules/rb/client/js/modules/bookRoom/BookRoomModal.jsx:595
+#: indico/modules/rb/client/js/modules/bookRoom/BookRoomModal.jsx:594
 msgid "I'll be using it myself"
 msgstr "Я роблю бронювання для себе"
 
 #: indico/modules/rb/client/js/common/bookings/BookingEditForm.jsx:274
-#: indico/modules/rb/client/js/modules/bookRoom/BookRoomModal.jsx:601
+#: indico/modules/rb/client/js/modules/bookRoom/BookRoomModal.jsx:600
 msgid "I'm booking it for someone else"
 msgstr "Я бронюю аудиторію для іншого користувача"
 
 #: indico/modules/rb/client/js/common/bookings/BookingEditForm.jsx:293
-#: indico/modules/rb/client/js/modules/bookRoom/BookRoomModal.jsx:621
+#: indico/modules/rb/client/js/modules/bookRoom/BookRoomModal.jsx:620
 msgid "Reason for booking"
 msgstr "Мета бронювання"
 
@@ -1885,7 +1890,7 @@ msgstr "Це бронювання буде пов'язано з доповідд
 msgid "Your booking will be linked to a session block:"
 msgstr "Це бронювання буде пов'язано з блоком засідань:"
 
-#: indico/modules/rb/client/js/common/linking/LinkBar.jsx:60
+#: indico/modules/rb/client/js/common/linking/LinkBar.jsx:59
 msgid "Exit linking mode"
 msgstr "Вийти з режиму зв'язування"
 
@@ -1902,7 +1907,7 @@ msgid "Zoom out to include all listed rooms"
 msgstr "Зменшити щоб включити всі обрані аудиторії"
 
 #: indico/modules/rb/client/js/common/rooms/RoomDetailsModal.jsx:204
-#: indico/modules/rb/client/js/modules/bookRoom/BookRoomModal.jsx:589
+#: indico/modules/rb/client/js/modules/bookRoom/BookRoomModal.jsx:588
 msgid "Usage"
 msgstr "Використання"
 
@@ -2276,7 +2281,7 @@ msgstr "Показати  часову шкалу аудиторії"
 
 #: indico/modules/rb/client/js/common/timeline/RowActionsDropdown.jsx:191
 msgid "Are you sure you want to cancel this occurrence ({serializedDate})?"
-msgstr "Ви впевнені, що хочете видалити цю подію ({date})?"
+msgstr "Ви впевнені, що хочете видалити цю подію ({serializedDate})?"
 
 #: indico/modules/rb/client/js/common/timeline/RowActionsDropdown.jsx:207
 msgid "Confirm rejection"
@@ -2371,7 +2376,7 @@ msgid "List of Rooms"
 msgstr "Список аудиторій"
 
 #: indico/modules/rb/client/js/components/Menu.jsx:22
-#: indico/modules/rb/client/js/modules/bookRoom/BookRoomModal.jsx:673
+#: indico/modules/rb/client/js/modules/bookRoom/BookRoomModal.jsx:672
 msgid "Bookings"
 msgstr "Бронювання"
 
@@ -2742,7 +2747,7 @@ msgstr "Оновити"
 #: indico/modules/rb/client/js/modules/admin/RoomFeatureList.jsx:48
 msgid "Provided by {count}1{/count} equipment type"
 msgid_plural "Provided by {count} equipment types"
-msgstr[0] "Забезпечується 1   типом обладнання"
+msgstr[0] "Забезпечується {count}1{/count} типом обладнання"
 msgstr[1] "Забезпечується {count}  типами обладнання"
 msgstr[2] "Забезпечується {count}  типами обладнання"
 msgstr[3] "Забезпечується {count}  типами обладнання"
@@ -3078,7 +3083,7 @@ msgid "One or more bookings would conflict with yours."
 msgstr "Одна чи більше бронювання суперечать вашим."
 
 #: indico/modules/rb/client/js/modules/bookRoom/BookFromListModal.jsx:170
-#: indico/modules/rb/client/js/modules/bookRoom/BookRoomModal.jsx:643
+#: indico/modules/rb/client/js/modules/bookRoom/BookRoomModal.jsx:642
 msgid "Bookings in the past are not allowed."
 msgstr "Бронювання в минуломк заборонені."
 
@@ -3129,15 +3134,15 @@ msgstr "Будь ласка,  вкажіть користувача."
 msgid "You need to provide a reason"
 msgstr "Вам потрібно вказати причину"
 
-#: indico/modules/rb/client/js/modules/bookRoom/BookRoomModal.jsx:415
+#: indico/modules/rb/client/js/modules/bookRoom/BookRoomModal.jsx:414
 msgid "Choose an event"
 msgstr "Виберіть  захід"
 
-#: indico/modules/rb/client/js/modules/bookRoom/BookRoomModal.jsx:464
+#: indico/modules/rb/client/js/modules/bookRoom/BookRoomModal.jsx:463
 msgid "Event"
 msgstr "Захід"
 
-#: indico/modules/rb/client/js/modules/bookRoom/BookRoomModal.jsx:467
+#: indico/modules/rb/client/js/modules/bookRoom/BookRoomModal.jsx:466
 msgid ""
 "You have an event taking place during the selected time. If you are booking "
 "the room for this event, please select it below. The room of the selected "
@@ -3228,31 +3233,31 @@ msgstr ""
 "Якщо ви створили це бронювання, наступні дні, що перекриваються існуючими "
 "попередніми замовленнями, автоматично буде відхилено:"
 
-#: indico/modules/rb/client/js/modules/bookRoom/BookRoomModal.jsx:488
+#: indico/modules/rb/client/js/modules/bookRoom/BookRoomModal.jsx:487
 msgid "Assign the room {room} to this event"
 msgstr "Присвоїти цій події аудиторію {room}"
 
-#: indico/modules/rb/client/js/modules/bookRoom/BookRoomModal.jsx:489
+#: indico/modules/rb/client/js/modules/bookRoom/BookRoomModal.jsx:488
 msgid "Assign the room {room} to this contribution"
 msgstr "Присвоїти цій доповіді  аудиторію {room}"
 
-#: indico/modules/rb/client/js/modules/bookRoom/BookRoomModal.jsx:492
+#: indico/modules/rb/client/js/modules/bookRoom/BookRoomModal.jsx:491
 msgid "Assign the room {room} to this session block"
 msgstr "Присвоїти цьому блоку сесій  аудиторію {room}"
 
-#: indico/modules/rb/client/js/modules/bookRoom/BookRoomModal.jsx:498
+#: indico/modules/rb/client/js/modules/bookRoom/BookRoomModal.jsx:497
 msgid "Assign the room {room} to this event (instead of {oldRoom})"
 msgstr "Присвоїти цій події аудиторію {room} (замість {oldRoom})"
 
-#: indico/modules/rb/client/js/modules/bookRoom/BookRoomModal.jsx:504
+#: indico/modules/rb/client/js/modules/bookRoom/BookRoomModal.jsx:503
 msgid "Assign the room {room} to this contribution (instead of {oldRoom})"
 msgstr "Присвоїти цій доповіді  аудиторію {room} (замість {oldRoom})"
 
-#: indico/modules/rb/client/js/modules/bookRoom/BookRoomModal.jsx:511
+#: indico/modules/rb/client/js/modules/bookRoom/BookRoomModal.jsx:510
 msgid "Assign the room {room} to this session block (instead of {oldRoom})"
 msgstr "Присвоїти цьому блоку засідань  аудиторію {room} (замість {oldRoom})"
 
-#: indico/modules/rb/client/js/modules/bookRoom/BookRoomModal.jsx:665
+#: indico/modules/rb/client/js/modules/bookRoom/BookRoomModal.jsx:664
 msgid "I've changed my mind!"
 msgstr "Я змінив(-ла) думку!"
 
